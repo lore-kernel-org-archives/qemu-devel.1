@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gKjKm-0004Bd-Ko
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:22:54 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gKjYJ-0005ep-P5
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:36:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gKjKk-0007r9-5T
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:22:52 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50754)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gKjKj-0007qb-SU
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:22:50 -0500
-Received: by mail-wm1-x343.google.com with SMTP id 124-v6so1069639wmw.0
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 04:22:49 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gKjYI-0008Gu-Dq
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:36:51 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 8 Nov 2018 12:36:32 +0000
+Message-ID: <0b21e367-3b44-dc16-d0ab-024974246a1a@virtuozzo.com>
+References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
+	<20180807174311.32454-4-vsementsov@virtuozzo.com>
+	<6e19aaeb-8acc-beb9-5ece-9ae6101637a9@redhat.com>
+	<9aa2ee7b-2dcb-be00-5501-c616f5c5fda0@virtuozzo.com>
+	<20181107181631.GC4721@linux.fritz.box>
+	<df8e5a97-c79c-c8c2-6dd4-7373239d6601@virtuozzo.com>
+	<20181108103334.GB6006@linux.fritz.box>
+In-Reply-To: <20181108103334.GB6006@linux.fritz.box>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AA67F5DD17C2C442858512400DF9389A@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 8 Nov 2018 16:22:35 +0400
-Message-ID: <CAJ+F1C+fLxg5JhO7o2xbw5pXvhGhkSpiquogTZ-z7tvex2Wxeg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 00/27] qapi: add #if pre-processor
- conditions to generated code (part 2)
+Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: split out reading normal
+ clusters from qcow2_co_preadv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,195 +31,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU <qemu-devel@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Denis Lunev <den@virtuozzo.com>
 
-Hi
-
-On Fri, Jul 6, 2018 at 2:59 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Hi,
->
-> This is the second part of the "add #if pre-processor conditions to
-> generated code" series, adding schema member conditions (roughly
-> 16-38/49).
->
-> Members can be exploded as dictionnary with 'type'/'if' keys:
->
-> { 'struct': 'TestIfStruct', 'data':
->   { 'foo': 'int',
->     'bar': { 'type': 'int', 'if': 'defined(TEST_IF_STRUCT_BAR)'} } }
->
-> Enum values can be exploded as dictionnary with 'type'/'if' keys:
->
-> { 'enum': 'TestIfEnum', 'data':
->   [ 'foo',
->     { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ] }
->
-> v6:
-> - subset of v5 series: add schema member conditions
-> - split "qapi: factor out check_known_keys()", error report improvements
-> - add a patch to "qapi: include osdep.h in type headers" to avoid
->   potential build configuration change issues
-> - rebased, on top of Markus's qapi-next branch (first 4 patches,
->   included for patchew testing)
-
-Rebased series updated on github branch:
-https://github.com/elmarco/qemu/commits/qapi-if
-
-(minor conflicts and changes, thus not resending, still waiting for
-review of v6)
-
-thanks
-
->
-> Marc-Andr=C3=A9 Lureau (26):
->   qmp-shell: learn to send commands with quoted arguments
->   json: remove useless return value from lexer/parser
->   tests: change /0.15/* tests to /qmp/*
->   qapi: include osdep.h in type headers
->   qapi: do not define enumeration value explicitly
->   qapi: rename QAPISchemaEnumType.values to .members
->   qapi: change enum visitor and gen_enum* to take QAPISchemaMember
->   tests: print enum type members more like object type members
->   qapi: factor out checking for keys
->   qapi: improve reporting of unknown or missing keys
->   qapi: add a dictionnary form with 'name' key for enum members
->   qapi: add 'if' to enum members
->   qapi-event: add 'if' condition to implicit event enum
->   qapi: rename allow_dict to allow_implicit
->   qapi: add a dictionary form with 'type' key for members
->   qapi: add 'if' to implicit struct members
->   qapi: add an error in case a discriminator is conditionnal
->   qapi: add 'if' on union members
->   qapi: add 'if' to alternate members
->   qapi: add #if conditions to generated code members
->   docs: document schema configuration
->   qapi: add 'If:' condition to enum values documentation
->   qapi: add 'If:' condition to struct members documentation
->   qapi: add condition to variants documentation
->   qapi: add more conditions to SPICE
->   qapi: add conditions to REPLICATION type/commands on the schema
->
-> Markus Armbruster (1):
->   qapi: Fix some pycodestyle-3 complaints
->
->  qapi/block-core.json                          |  13 +-
->  qapi/char.json                                |  16 +-
->  qapi/migration.json                           |  12 +-
->  scripts/qapi/common.py                        | 256 ++++++++++++------
->  scripts/qapi/doc.py                           |  16 +-
->  scripts/qapi/events.py                        |   2 +-
->  scripts/qapi/introspect.py                    |  16 +-
->  scripts/qapi/types.py                         |  11 +-
->  scripts/qapi/visit.py                         |  10 +-
->  include/qapi/qmp/json-lexer.h                 |   4 +-
->  include/qapi/qmp/json-streamer.h              |   4 +-
->  migration/colo.c                              |  16 +-
->  monitor.c                                     |   5 -
->  qobject/json-lexer.c                          |  23 +-
->  qobject/json-streamer.c                       |   8 +-
->  tests/test-qmp-cmds.c                         |  10 +-
->  docs/devel/qapi-code-gen.txt                  |  19 ++
->  scripts/qmp/qmp-shell                         |   3 +-
->  tests/Makefile.include                        |   8 +-
->  tests/qapi-schema/alternate-base.err          |   1 +
->  tests/qapi-schema/alternate-invalid-dict.err  |   1 +
->  ...ember.exit =3D> alternate-invalid-dict.exit} |   0
->  tests/qapi-schema/alternate-invalid-dict.json |   4 +
->  ...-member.out =3D> alternate-invalid-dict.out} |   0
->  tests/qapi-schema/comments.out                |  14 +-
->  tests/qapi-schema/doc-bad-section.out         |  13 +-
->  tests/qapi-schema/doc-good.json               |  11 +-
->  tests/qapi-schema/doc-good.out                |  22 +-
->  tests/qapi-schema/doc-good.texi               |   8 +-
->  tests/qapi-schema/double-type.err             |   1 +
->  tests/qapi-schema/empty.out                   |   9 +-
->  tests/qapi-schema/enum-bad-member.err         |   1 +
->  tests/qapi-schema/enum-bad-member.exit        |   1 +
->  tests/qapi-schema/enum-bad-member.json        |   2 +
->  tests/qapi-schema/enum-bad-member.out         |   0
->  .../qapi-schema/enum-dict-member-unknown.err  |   2 +
->  .../qapi-schema/enum-dict-member-unknown.exit |   1 +
->  .../qapi-schema/enum-dict-member-unknown.json |   2 +
->  .../qapi-schema/enum-dict-member-unknown.out  |   0
->  tests/qapi-schema/enum-dict-member.err        |   1 -
->  tests/qapi-schema/enum-dict-member.json       |   2 -
->  tests/qapi-schema/enum-if-invalid.err         |   1 +
->  tests/qapi-schema/enum-if-invalid.exit        |   1 +
->  tests/qapi-schema/enum-if-invalid.json        |   3 +
->  tests/qapi-schema/enum-if-invalid.out         |   0
->  tests/qapi-schema/enum-missing-data.err       |   2 +-
->  tests/qapi-schema/event-case.out              |   9 +-
->  tests/qapi-schema/event-nest-struct.err       |   2 +-
->  tests/qapi-schema/flat-union-inline.err       |   2 +-
->  .../flat-union-invalid-if-discriminator.err   |   1 +
->  .../flat-union-invalid-if-discriminator.exit  |   1 +
->  .../flat-union-invalid-if-discriminator.json  |  17 ++
->  .../flat-union-invalid-if-discriminator.out   |   0
->  tests/qapi-schema/ident-with-escape.out       |   9 +-
->  tests/qapi-schema/include-relpath.out         |  14 +-
->  tests/qapi-schema/include-repetition.out      |  14 +-
->  tests/qapi-schema/include-simple.out          |  14 +-
->  tests/qapi-schema/indented-expr.out           |   9 +-
->  tests/qapi-schema/nested-struct-data.err      |   2 +-
->  tests/qapi-schema/qapi-schema-test.json       |  38 ++-
->  tests/qapi-schema/qapi-schema-test.out        |  76 +++++-
->  .../struct-member-invalid-dict.err            |   1 +
->  .../struct-member-invalid-dict.exit           |   1 +
->  .../struct-member-invalid-dict.json           |   3 +
->  .../struct-member-invalid-dict.out            |   0
->  tests/qapi-schema/test-qapi.py                |  22 +-
->  .../qapi-schema/union-branch-invalid-dict.err |   1 +
->  .../union-branch-invalid-dict.exit            |   1 +
->  .../union-branch-invalid-dict.json            |   4 +
->  .../qapi-schema/union-branch-invalid-dict.out |   0
->  tests/qapi-schema/unknown-expr-key.err        |   3 +-
->  tests/qapi-schema/unknown-expr-key.json       |   2 +-
->  72 files changed, 574 insertions(+), 227 deletions(-)
->  create mode 100644 tests/qapi-schema/alternate-invalid-dict.err
->  rename tests/qapi-schema/{enum-dict-member.exit =3D> alternate-invalid-d=
-ict.exit} (100%)
->  create mode 100644 tests/qapi-schema/alternate-invalid-dict.json
->  rename tests/qapi-schema/{enum-dict-member.out =3D> alternate-invalid-di=
-ct.out} (100%)
->  create mode 100644 tests/qapi-schema/enum-bad-member.err
->  create mode 100644 tests/qapi-schema/enum-bad-member.exit
->  create mode 100644 tests/qapi-schema/enum-bad-member.json
->  create mode 100644 tests/qapi-schema/enum-bad-member.out
->  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.err
->  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.exit
->  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.json
->  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.out
->  delete mode 100644 tests/qapi-schema/enum-dict-member.err
->  delete mode 100644 tests/qapi-schema/enum-dict-member.json
->  create mode 100644 tests/qapi-schema/enum-if-invalid.err
->  create mode 100644 tests/qapi-schema/enum-if-invalid.exit
->  create mode 100644 tests/qapi-schema/enum-if-invalid.json
->  create mode 100644 tests/qapi-schema/enum-if-invalid.out
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.err
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.exit
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.json
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.out
->  create mode 100644 tests/qapi-schema/struct-member-invalid-dict.err
->  create mode 100644 tests/qapi-schema/struct-member-invalid-dict.exit
->  create mode 100644 tests/qapi-schema/struct-member-invalid-dict.json
->  create mode 100644 tests/qapi-schema/struct-member-invalid-dict.out
->  create mode 100644 tests/qapi-schema/union-branch-invalid-dict.err
->  create mode 100644 tests/qapi-schema/union-branch-invalid-dict.exit
->  create mode 100644 tests/qapi-schema/union-branch-invalid-dict.json
->  create mode 100644 tests/qapi-schema/union-branch-invalid-dict.out
->
-> --
-> 2.18.0.rc1
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+MDguMTEuMjAxOCAxMzozMywgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMDguMTEuMjAxOCB1bSAx
+MTowMiBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDA3
+LjExLjIwMTggMjE6MTYsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gKEJyb2tlbiBxdW90aW5nIGlu
+IHRleHQvcGxhaW4gYWdhaW4pDQo+Pj4NCj4+PiBBbSAwMS4xMS4yMDE4IHVtIDEzOjE3IGhhdCBW
+bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IGdlc2NocmllYmVuOg0KPj4+PiAyNy4wOS4yMDE4
+IDIwOjM1LCBNYXggUmVpdHogd3JvdGU6DQo+Pj4+DQo+Pj4+ICAgICAgIE9uIDA3LjA4LjE4IDE5
+OjQzLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4+Pg0KPj4+PiAgICAg
+ICAgICAgTWVtb3J5IGFsbG9jYXRpb24gbWF5IGJlY29tZSBsZXNzIGVmZmljaWVudCBmb3IgZW5j
+cnlwdGVkIGNhc2UuIEl0J3MgYQ0KPj4+PiAgICAgICAgICAgcGF5bWVudCBmb3IgZnVydGhlciBh
+c3luY2hyb25vdXMgc2NoZW1lLg0KPj4+Pg0KPj4+PiAgICAgICAgICAgU2lnbmVkLW9mZi1ieTog
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0K
+Pj4+PiAgICAgICAgICAgLS0tDQo+Pj4+ICAgICAgICAgICAgYmxvY2svcWNvdzIuYyB8IDExNCAr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+DQo+Pj4+ICAgICAgICAgICAgMSBmaWxlIGNoYW5nZWQsIDY0IGluc2VydGlvbnMoKyksIDUwIGRl
+bGV0aW9ucygtKQ0KPj4+Pg0KPj4+PiAgICAgICAgICAgZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cy
+LmMgYi9ibG9jay9xY293Mi5jDQo+Pj4+ICAgICAgICAgICBpbmRleCA2NWUzY2EwMGUyLi41ZTdm
+MmVlMzE4IDEwMDY0NA0KPj4+PiAgICAgICAgICAgLS0tIGEvYmxvY2svcWNvdzIuYw0KPj4+PiAg
+ICAgICAgICAgKysrIGIvYmxvY2svcWNvdzIuYw0KPj4+PiAgICAgICAgICAgQEAgLTE4MDgsNiAr
+MTgwOCw2NyBAQCBvdXQ6DQo+Pj4+ICAgICAgICAgICAgICAgIHJldHVybiByZXQ7DQo+Pj4+ICAg
+ICAgICAgICAgfQ0KPj4+Pg0KPj4+PiAgICAgICAgICAgK3N0YXRpYyBjb3JvdXRpbmVfZm4gaW50
+IHFjb3cyX2NvX3ByZWFkdl9ub3JtYWwoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+Pj4+ICAgICAg
+ICAgICArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50
+NjRfdCBmaWxlX2NsdXN0ZXJfb2Zmc2V0LA0KPj4+PiAgICAgICAgICAgKyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3Qgb2Zmc2V0LA0KPj4+PiAg
+ICAgICAgICAgKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+dWludDY0X3QgYnl0ZXMsDQo+Pj4+ICAgICAgICAgICArICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBRRU1VSU9WZWN0b3IgKnFpb3YsDQo+Pj4+ICAgICAgICAg
+ICArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRf
+dCBxaW92X29mZnNldCkNCj4+Pj4gICAgICAgICAgICt7DQo+Pj4+ICAgICAgICAgICArICAgIGlu
+dCByZXQ7DQo+Pj4+ICAgICAgICAgICArICAgIEJEUlZRY293MlN0YXRlICpzID0gYnMtPm9wYXF1
+ZTsNCj4+Pj4gICAgICAgICAgICsgICAgdm9pZCAqY3J5cHRfYnVmID0gTlVMTDsNCj4+Pj4gICAg
+ICAgICAgICsgICAgUUVNVUlPVmVjdG9yIGhkX3Fpb3Y7DQo+Pj4+ICAgICAgICAgICArICAgIGlu
+dCBvZmZzZXRfaW5fY2x1c3RlciA9IG9mZnNldF9pbnRvX2NsdXN0ZXIocywgb2Zmc2V0KTsNCj4+
+Pj4gICAgICAgICAgICsNCj4+Pj4gICAgICAgICAgICsgICAgaWYgKChmaWxlX2NsdXN0ZXJfb2Zm
+c2V0ICYgNTExKSAhPSAwKSB7DQo+Pj4+ICAgICAgICAgICArICAgICAgICByZXR1cm4gLUVJTzsN
+Cj4+Pj4gICAgICAgICAgICsgICAgfQ0KPj4+PiAgICAgICAgICAgKw0KPj4+PiAgICAgICAgICAg
+KyAgICBxZW11X2lvdmVjX2luaXQoJmhkX3Fpb3YsIHFpb3YtPm5pb3YpOw0KPj4+Pg0KPj4+PiAg
+ICAgICBTbyB5b3UncmUgbm90IGp1c3QgcmUtYWxsb2NhdGluZyB0aGUgYm91bmNlIGJ1ZmZlciBm
+b3IgZXZlcnkgc2luZ2xlDQo+Pj4+ICAgICAgIGNhbGwsIGJ1dCBhbHNvIHRoaXMgSS9PIHZlY3Rv
+ci4gIEhtLg0KPj4+IEFuZCB0aGlzIG9uZSBpcyBhY3R1YWxseSBhdCBsZWFzdCBhIGxpdHRsZSBt
+b3JlIHNlcmlvdXMsIEkgdGhpbmsuDQo+Pj4NCj4+PiBEZWNyeXB0aW9uIGFuZCBkZWNvbXByZXNz
+aW9uIChpbmNsdWRpbmcgY29weWluZyBiZXR3ZWVuIHRoZSBvcmlnaW5hbA0KPj4+IHFpb3YgYW5k
+IHRoZSBib3VuY2UgYnVmZmVyKSBhcmUgYWxyZWFkeSB2ZXJ5IHNsb3csIHNvIGFsbG9jYXRpbmcg
+YQ0KPj4+IGJvdW5jZSBidWZmZXIgb3Igbm90IHNob3VsZG4ndCBtYWtlIGFueSBub3RpY2FibGUg
+ZGlmZmVyZW5jZS4NCj4+Pg0KPj4+IEJ1dCBJJ2QgbGlrZSB0byBrZWVwIGFsbG9jYXRpb25zIG91
+dCBvZiB0aGUgZmFzdCBwYXRoIGFzIG11Y2ggYXMgd2UgY2FuLg0KPj4+DQo+Pj4+ICAgICAgICAg
+ICArICAgIGlmIChicy0+ZW5jcnlwdGVkKSB7DQo+Pj4+ICAgICAgICAgICArICAgICAgICBhc3Nl
+cnQocy0+Y3J5cHRvKTsNCj4+Pj4gICAgICAgICAgICsgICAgICAgIGFzc2VydChieXRlcyA8PSBR
+Q09XX01BWF9DUllQVF9DTFVTVEVSUyAqIHMtPmNsdXN0ZXJfc2l6ZSk7DQo+Pj4+ICAgICAgICAg
+ICArDQo+Pj4+ICAgICAgICAgICArICAgICAgICBjcnlwdF9idWYgPSBxZW11X3RyeV9ibG9ja2Fs
+aWduKGJzLT5maWxlLT5icywgYnl0ZXMpOw0KPj4+Pg0KPj4+PiAgICAgICAxLiBXaHkgZGlkIHlv
+dSByZW1vdmUgdGhlIGNvbW1lbnQ/DQo+Pj4+DQo+Pj4+ICAgICAgIDIuIFRoZSBjaGVjayBmb3Ig
+d2hldGhlciBjcnlwdF9idWYgd2FzIHN1Y2Nlc3NmdWxseSBhbGxvY2F0ZWQgaXMgbWlzc2luZy4N
+Cj4+Pj4NCj4+Pj4gICAgICAgMy4gRG8geW91IGhhdmUgYW55IGJlbmNobWFya3MgZm9yIGVuY3J5
+cHRlZCBpbWFnZXM/ICBIYXZpbmcgdG8gYWxsb2NhdGUNCj4+Pj4gICAgICAgdGhlIGJvdW5jZSBi
+dWZmZXIgZm9yIHBvdGVudGlhbGx5IGV2ZXJ5IHNpbmdsZSBjbHVzdGVyIHNvdW5kcyByYXRoZXIg
+YmFkDQo+Pj4+ICAgICAgIHRvIG1lLg0KPj4+IEFjdHVhbGx5LCBiZW5jaG1hcmtzIGZvciBub3Jt
+YWwsIGZ1bGx5IGFsbG9jYXRlZCBpbWFnZXMgd291bGQgYmUgYQ0KPj4+IGxpdHRsZSBtb3JlIGlu
+dGVyZXN0aW5nLiBUaG91Z2ggSSdtIG5vdCBzdXJlIGlmIHFjb3cyIGFjdHVhbGx5IHBlcmZvcm1z
+DQo+Pj4gd2VsbCBlbm91Z2ggdGhhdCB3ZSdsbCBzZWUgYW55IGRpZmZlcmVuY2UgZXZlbiB0aGVy
+ZSAod2hlbiB3ZSBtZWFzdXJlZA0KPj4+IG1lbW9yeSBhbGxvY2F0aW9uIG92ZXJoZWFkIGV0Yy4g
+Zm9yIHJhdyBpbWFnZXMgaW4gdGhlIGNvbnRleHQgb2YNCj4+PiBjb21wYXJpbmcgY29yb3V0aW5l
+cyB0byBBSU8gY2FsbGJhY2sgc3R5ZXMsIHRoZSBkaWZmZXJlbmNlIHdhcyBhbHJlYWR5DQo+Pj4g
+aGFyZCB0byBzZWUpLg0KPj4NCj4+IE9rLCBJJ2xsIGJlbmNobWFyayBpdCBhbmQvb3IgaW1wcm92
+ZSBmYXN0IHBhdGggKHlvdSBtZWFuIGNvZGUgcGF0aCwNCj4+IHdoZXJlIHdlIHNraXAgY29yb3V0
+aW5lcyBjcmVhdGlvbiwgdG8gaGFuZGxlIHRoZSB3aG9sZSByZXF1ZXN0IGF0IG9uY2UsDQo+PiB5
+ZXM/KS4NCj4gDQo+IEkgaGFkIGxlc3MgdGhlIHNwZWNpZmljIGNvZGUgcGF0aCBpbiBtaW5kLCBi
+dXQgdGhlIGNhc2Ugb2YgcmVhZGluZw0KPiB1bmFsbG9jYXRlZCBjbHVzdGVycyBvciByZWFkaW5n
+L3dyaXRpbmcgYW4gYWxyZWFkeSBhbGxvY2F0ZWQgYXJlYSBvZg0KPiBub3JtYWwgb3IgemVybyBj
+bHVzdGVycyAobm8gY29tcHJlc3Npb24sIG5vIGVuY3JweXRpb24sIG5vIG90aGVyIGZhbmN5DQo+
+IHN0dWZmKS4gVGhlc2UgYXJlIHRoZSBjYXNlcyB0aGF0IHFjb3cyIGltYWdlcyB3aWxsIGhpdCB0
+aGUgbW9zdCBpbg0KPiBwcmFjdGljZS4NCg0KVGhlcmUgYXJlIGFscmVhZHkgc29tZSBiZW5jaG1h
+cmtzIGluIHRoZSB0aHJlYWQgc3RhcnRlZCBmcm9tIHRoZSBjb3ZlciANCmxldHRlciBvZiB0aGUg
+c2VyaWVzLg0KDQo+IA0KPj4gSG1tLCBhbGwgdGhpcyBzdGFmZiB3aXRoIGhkX3Fpb3YncyBpbiBt
+YW55IHBsYWNlcyBpcyBkdWUgdG8gd2UgZG9uJ3QNCj4+IGhhdmUgcWlvdl9vZmZzZXQgcGFyYW1l
+dGVyIGluIC5iZHJ2X2NvX3ByZWFkdi4uIElzIGl0IGEgYmFkIGlkZWEgdG8NCj4+IGFkZCBpdD8N
+Cj4gDQo+IEkgYWN0dWFsbHkgdGhvdWdodCB0aGUgc2FtZSB5ZXN0ZXJkYXksIHRob3VnaCBJJ20g
+bm90IGNvbXBsZXRlbHkgc3VyZQ0KPiB5ZXQgYWJvdXQgaXQuIEl0IG1ha2VzIHRoZSBpbnRlcmZh
+Y2VzIGEgYml0IHVnbGllciwgYnV0IGl0IGNvdWxkIGluZGVlZA0KPiBzYXZlIHVzIHNvbWUgd29y
+ayBpbiB0aGUgSS9PIHBhdGgsIHNvIHVubGVzcyB3ZSBmaW5kIGJpZ2dlciByZWFzb25zDQo+IGFn
+YWluc3QgaXQsIG1heWJlIHdlIHNob3VsZCBkbyB0aGF0Lg0KPiANCj4+IEFueXdheSwgSSBub3cg
+dGhpbmssIGl0J3MgYmV0dGVyIHRvIHN0YXJ0IHdpdGggZGVjb21wcmVzcy10aHJlYWRzDQo+PiBz
+ZXJpZXMsIGFzIGNvbXByZXNzLXRocmVhZHMgYXJlIGFscmVhZHkgbWVyZ2VkLCB0aGVuIGJyaW5n
+IGVuY3J5cHRpb24gdG8NCj4+IHRocmVhZHMgdG9vLCBhbmQgdGhlbiByZXR1cm4gdG8gdGhlc2Ug
+c2VyaWVzLiBUaGlzIHdheSB3aWxsIHJlbW92ZSBzb21lDQo+PiBxdWVzdGlvbnMgYWJvdXQgYWxs
+b2NhdGlvbiwgYW5kIG1heSBiZSBpdCB3b3VsZCBiZSBzaW1wbGVyIGFuZCBtb3JlDQo+PiBjb25z
+aXN0ZW50IHRvIGJyaW5nIG1vcmUgdGhpbmdzIHRvIGNvcm91dGluZXMsIG5vdCBvbmx5IG5vcm1h
+bCBjbHVzdGVycy4NCj4gDQo+IE9rYXksIHdlIGNhbiBkbyB0aGF0Lg0KPiANCj4gS2V2aW4NCj4g
+DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
