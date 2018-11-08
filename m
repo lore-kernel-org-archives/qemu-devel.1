@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gKoZg-0004uo-DT
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:58:37 -0500
+	(envelope-from <cminyard@mvista.com>) id 1gKoZg-0004up-F4
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:58:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gKoZZ-0003O8-F5
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:58:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40696)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gKoZR-0003L8-S8
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:58:24 -0500
-References: <41ceda53-467e-32a1-8fa6-13f0f9c08ad1@redhat.com>
-	<CAFEAcA9oCs+Y1fnY8dOR16n_Hn7PaHziL7K0HZK6=BAd_Gyecg@mail.gmail.com>
-	<e496287e-f8ba-3608-42e1-efb697cfc784@redhat.com>
-	<20181107154114.GC27585@caravaggio>
-	<dd68d3e8-6448-3a67-3212-fd3d3bfba2e2@redhat.com>
-	<20181107192414.GH12503@habkost.net>
-	<c6bbfeb8-53c5-0e0c-cf36-14e586cfb581@redhat.com>
-	<a0decaa7-d83b-b0ad-60ea-aa0890feb905@redhat.com>
-	<20181108130648.GJ12503@habkost.net>
-	<95a93d53-f87d-bd96-9363-582c4eae4160@redhat.com>
-	<20181108171437.GM12503@habkost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dda55f75-58d3-111c-4f43-99a9f686981e@redhat.com>
-Date: Thu, 8 Nov 2018 18:58:11 +0100
+	(envelope-from <cminyard@mvista.com>) id 1gKoZW-0003NG-Mq
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:58:36 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:33552)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1gKoZR-0003Ko-S6
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:58:22 -0500
+Received: by mail-oi1-x243.google.com with SMTP id x204-v6so2225907oia.0
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 09:58:19 -0800 (PST)
+References: <20181107155405.24013-1-minyard@acm.org>
+	<20181107155405.24013-4-minyard@acm.org>
+	<CAFEAcA9hp0VzN484uugfc4kzh3pSDMn3PU+ozfc_XPT5P-QsBw@mail.gmail.com>
+From: Corey Minyard <cminyard@mvista.com>
+Message-ID: <25d95354-e536-dff6-0936-7e8d951108a5@mvista.com>
+Date: Thu, 8 Nov 2018 11:58:16 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181108171437.GM12503@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] QEMU and Kconfig
+In-Reply-To: <CAFEAcA9hp0VzN484uugfc4kzh3pSDMn3PU+ozfc_XPT5P-QsBw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+Subject: Re: [Qemu-devel] [PATCH 3/3] i2c: Add vmstate handling to the smbus
+ eeprom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +32,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, "Zhong, Yang" <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <minyard@acm.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 08/11/2018 18:14, Eduardo Habkost wrote:
-> Keeping in mind that I might be talking about extra challenges we
-> won't address right now (no cart before the horse), I have new
-> questions:
-> 
-> Why you say backends are not a target configuration and
-> accelerators are?  What's the definition of "target
-> configuration"?
+On 11/8/18 8:08 AM, Peter Maydell wrote:
+> On 7 November 2018 at 15:54,  <minyard@acm.org> wrote:
+>> From: Corey Minyard <cminyard@mvista.com>
+>>
+>> This was if the eeprom is accessed during a state transfer, the
+>> transfer will be reliable.
+>>
+>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> ---
+>>   hw/i2c/smbus_eeprom.c | 16 +++++++++++++++-
+>>   1 file changed, 15 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+>> index f18aa3de35..d4430b0c5d 100644
+>> --- a/hw/i2c/smbus_eeprom.c
+>> +++ b/hw/i2c/smbus_eeprom.c
+>> @@ -29,6 +29,8 @@
+>>
+>>   //#define DEBUG
+>>
+>> +#define TYPE_SMBUS_EEPROM_DEVICE "smbus-eeprom"
+> The part of this patch which is adding the usual QOM
+> macros is good, but we should provide also the
+> cast-macro (the one that's an OBJECT_CHECK(...)).
+> And this should be separate from adding the vmstate.
+>
+>> +
+>>   typedef struct SMBusEEPROMDevice {
+>>       SMBusDevice smbusdev;
+>>       void *data;
+>> @@ -97,6 +99,17 @@ static uint8_t eeprom_read_data(SMBusDevice *dev, uint8_t cmd, int n)
+>>       return eeprom_receive_byte(dev);
+>>   }
+>>
+>> +static const VMStateDescription vmstate_smbus_eeprom = {
+>> +    .name = TYPE_SMBUS_EEPROM_DEVICE,
+> Generally we don't use the TYPE_FOO constant for the vmstate
+> name, because we can usually freely change the TYPE_FOO string without
+> breaking back-compat, but we can't change the vmstate name.
+> So we decouple them to make it more obvious when a change might
+> be changing the migration on-the-wire format.
+>
 
-Something that affects the way
+Ok, I've updated the code to use the standard type name and cast method
+(in a separate patch) and I fixed the vmstate name.  It is better, you are
+right.
 
-> Are we explicitly restricting the scope of this work to
-> enabling/disabling device emulation code right now?  Why?  Why
-> wouldn't we use kconfig to enable/disable simple backends with no
-> host dependency like SLIRP?
 
-I think it would be more confusing if some backends were to use kconfig
-and some wouldn't.  We could certainly add something like
+>> +    .version_id = 1,
+>> +    .minimum_version_id = 1,
+>> +    .fields      = (VMStateField[]) {
+>> +        VMSTATE_SMBUS_DEVICE(smbusdev, SMBusEEPROMDevice),
+>> +        VMSTATE_UINT8(offset, SMBusEEPROMDevice),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+> This doesn't do anything for migration of the actual data contents.
+> The current users of this device (hw/arm/aspeed.c and the
+> smbus_eeprom_init() function) doesn't do anything
+> to migrate the contents. For that matter, "user of the device
+> passes a pointer to a random lump of memory via a device property"
+> is a bit funky as an interface. The device should allocate its
+> own memory and migrate it, and the user should just pass the
+> initial required contents (default being "zero-initialize",
+> which is what everybody except the mips_fulong2e, mips_malta
+> and sam460ex want).
 
-config VHOST_NET
-    depends on HOST_LINUX
-    default y
 
-config SPICE
-    depends on HAVE_SPICE_SERVER
-    default Y
+I debated on this, and it depends on what the eeprom is used for.  If
+it's a DRAM eeprom, it shouldn't need to be transferred.
+If it's something where the host stores data for later use, you do.
+Since it wasn't being cloned before, it probably won't matter now.
 
-etc. but I think we agree it's more of a long term idea.
+But even in the DRAM eeprom case, it shouldn't matter if it gets
+transferred.  So it's probably safe to just transfer it.  Easy enough
+to add.
 
-> Don't we want to make backends configurable per binary, too?
-> e.g.: I would expect the default configuration for a NEMU-like
-> binary to disable many backends.
 
-Sure, we could do that.  However, right now you cannot have multiple
-binaries for a single target, so you couldn't have one single build
-include both a "full-blown" and a "reduced" x86 target.  Therefore,
-including e.g. SLIRP in qemu-system-arm but not in qemu-system-x86_64
-does not seem too interesting to me.  It would be different if you could
-build qemu-system-arm, qemu-system-x86_64, qemu-system-x86_64-lite, etc.
+>
+> Does this also break migration from an old QEMU to a new one?
+> (For Aspeed that's probably ok, but we should flag it up in the
+> commit message if so. x86 uses need care...)
+>
+There is no transfer before, so I don't see why it would break anything.
+Am I missing something?
 
-Paolo
+-corey
 
-> 
->> It would surely be possible for configure to call into minikconf to
->> parse a configuration file and apply dependencies (do we actually have
->> dependencies across configure options?) or something like that, but
->> let's not put the cart before the horse...
-> 
-> Agreed.
-> 
+>> +
+>>   static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+>>   {
+>>       SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *)dev;
+>> @@ -121,12 +134,13 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+>>       sc->write_data = eeprom_write_data;
+>>       sc->read_data = eeprom_read_data;
+>>       dc->props = smbus_eeprom_properties;
+>> +    dc->vmsd = &vmstate_smbus_eeprom;
+>>       /* Reason: pointer property "data" */
+>>       dc->user_creatable = false;
+>>   }
+>>
+>>   static const TypeInfo smbus_eeprom_info = {
+>> -    .name          = "smbus-eeprom",
+>> +    .name          = TYPE_SMBUS_EEPROM_DEVICE,
+>>       .parent        = TYPE_SMBUS_DEVICE,
+>>       .instance_size = sizeof(SMBusEEPROMDevice),
+>>       .class_init    = smbus_eeprom_class_initfn,
+>> --
+>> 2.17.1
+> thanks
+> -- PMM
