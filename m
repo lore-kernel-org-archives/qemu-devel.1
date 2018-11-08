@@ -1,26 +1,33 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:58250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gKk5L-0006Km-Kx
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:11:03 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gKk5V-0006Km-Nf
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:11:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gKk2k-0000d4-2C
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:08:23 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:36655)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gKk2j-0000c4-Ko
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:08:17 -0500
-Received: by mail-wr1-f68.google.com with SMTP id z13-v6so18808194wrs.3
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 05:08:16 -0800 (PST)
-References: <20181108125256.30986-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7a7929a8-74d3-ed14-b284-f420afe824ea@redhat.com>
-Date: Thu, 8 Nov 2018 14:08:06 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1gKk1M-00081K-SL
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:06:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34268)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gKk1M-00080y-MM
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 08:06:52 -0500
+Date: Thu, 8 Nov 2018 11:06:48 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181108130648.GJ12503@habkost.net>
+References: <87b22690-e39c-3b46-dcb4-f6abc3213142@redhat.com>
+	<CAFEAcA8yHb4MdtsJuXcswQp93DN5tSeN9dn8AWWL9se0DKvdcg@mail.gmail.com>
+	<41ceda53-467e-32a1-8fa6-13f0f9c08ad1@redhat.com>
+	<CAFEAcA9oCs+Y1fnY8dOR16n_Hn7PaHziL7K0HZK6=BAd_Gyecg@mail.gmail.com>
+	<e496287e-f8ba-3608-42e1-efb697cfc784@redhat.com>
+	<20181107154114.GC27585@caravaggio>
+	<dd68d3e8-6448-3a67-3212-fd3d3bfba2e2@redhat.com>
+	<20181107192414.GH12503@habkost.net>
+	<c6bbfeb8-53c5-0e0c-cf36-14e586cfb581@redhat.com>
+	<a0decaa7-d83b-b0ad-60ea-aa0890feb905@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181108125256.30986-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/tcg-op.h: Add multiple include guard
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a0decaa7-d83b-b0ad-60ea-aa0890feb905@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] QEMU and Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +36,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, patches@linaro.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, "Zhong, Yang" <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 8/11/18 13:52, Peter Maydell wrote:
-> The tcg-op.h header was missing the usual guard against multiple
-> inclusion; add it.
-> 
-> (Spotted by lgtm.com's static analyzer.)
+On Thu, Nov 08, 2018 at 10:55:21AM +0100, Paolo Bonzini wrote:
+> On 07/11/2018 20:30, Thomas Huth wrote:
+> > On 2018-11-07 20:24, Eduardo Habkost wrote:
+> >> On Wed, Nov 07, 2018 at 06:39:54PM +0100, Paolo Bonzini wrote:
+> >>> On 07/11/2018 16:41, Samuel Ortiz wrote:
+> >>>> - The Kconfig parser would be used to generate the equivalent of w=
+hat we
+> >>>>   currently have under default-configs/
+> >=20
+> > I think we would still have something like default-configs - but ther=
+e
+> > would only be the bare minimum config switches in there, the rest wou=
+ld
+> > be pulled in by dependencies.
+>=20
+> Yes, in theory default-configs would end up empty, except for possibly
+> some commented lines to show the "default y" symbols for the target.
+>=20
+> > We could then also even have multiple config directories:
+> >=20
+> > ./configs
+> >  +-------/default-softmmu
+> >  +-------/default-linux-user
+> >  +-------/nemu (or lean-kvm or something similar)
+> >  +...
+> >=20
+> > ... just my 0.02 =E2=82=AC, feel free to ignore that idea ;-)
+>=20
+> Yup, one can also think of a configure option like "./configure
+> --with-device-config=3Dconfigs/nemu/" to pick up the alternative
+> configurations.
+>=20
+> >> Also, I would like to eventually replace many ./configure options
+> >> with options read from a build configuration file.
+> >>
+> >> Distributions often have huge ./configure command lines in their
+> >> QEMU packages, and they could be replaced by simple build
+> >> configuration files.
+> >>
+> >> Having a mode that requires all build options to be specified
+> >> explicitly (instead of silently picking a default) would be
+> >> useful for distributions, too.
+> >=20
+> > I think we should maybe not mix host configuration (via ./configure) =
+and
+> > the target configuration (via kconfig), should we?
+>=20
+> Yeah, the configure command line is a different story.  If there are
+> suggestion on how to improve it, great, but let's not conflate it with
+> Kconfig.
 
-I'm pretty sure there are more occurences.
+I believe we have many ./configure options that are supposed to
+be target configuration.  e.g.: --enable-slirp, --eanble-kvm,
+--enable-xen, etc.
 
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->   tcg/tcg-op.h | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-> index 7513c1eb7c5..db4e9188f42 100644
-> --- a/tcg/tcg-op.h
-> +++ b/tcg/tcg-op.h
-> @@ -22,6 +22,9 @@
->    * THE SOFTWARE.
->    */
->   
-> +#ifndef TCG_TCG_OP_H
-> +#define TCG_TCG_OP_H
-> +
->   #include "tcg.h"
->   #include "exec/helper-proto.h"
->   #include "exec/helper-gen.h"
-> @@ -1267,3 +1270,5 @@ static inline void tcg_gen_trunc_ptr_i32(TCGv_i32 r, TCGv_ptr a)
->   
->   #undef PTR
->   #undef NAT
-> +
-> +#endif /* TCG_TCG_OP_H */
-> 
+--=20
+Eduardo
