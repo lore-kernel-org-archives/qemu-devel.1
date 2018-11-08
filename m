@@ -1,29 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gKgM8-00081v-R4
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:12:07 -0500
+	(envelope-from <armbru@redhat.com>) id 1gKgNs-0003T6-Lk
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:13:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gKgM4-0007Re-RU
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:12:04 -0500
+	(envelope-from <armbru@redhat.com>) id 1gKgNn-0000nf-1F
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:13:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42178)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gKgNk-0000dJ-Jm
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 04:13:46 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181023152306.3123-1-david@redhat.com>
+	<20181023152306.3123-2-david@redhat.com>
+	<87pnvqdvsj.fsf@dusky.pond.sub.org>
+	<e8fe86a1-d075-2ea8-d1f4-e08e5dceee07@redhat.com>
+	<875zxingqn.fsf@dusky.pond.sub.org>
+	<440eb166-73d1-77b6-5dd9-66a0abd7d665@redhat.com>
+	<87muqn5ydc.fsf@dusky.pond.sub.org>
+	<1ec41fe2-d4b4-fce2-9381-818ee3356409@redhat.com>
+	<87tvkv2r2b.fsf@dusky.pond.sub.org>
+	<64720ade-c69d-40a4-5359-2132711c01cd@redhat.com>
+	<87d0rgvrbk.fsf@dusky.pond.sub.org>
+	<fcbd588d-f51c-4ab4-fa45-ad5360aff5b1@redhat.com>
+	<8736scq7y9.fsf@dusky.pond.sub.org>
+	<bfebc5b0-cebd-8a83-3106-effba5332094@redhat.com>
+Date: Thu, 08 Nov 2018 10:13:30 +0100
+In-Reply-To: <bfebc5b0-cebd-8a83-3106-effba5332094@redhat.com> (David
+	Hildenbrand's message of "Thu, 8 Nov 2018 09:54:08 +0100")
+Message-ID: <878t24ort1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20181031003120.26771-1-ehabkost@redhat.com>
-	<20181031003120.26771-12-ehabkost@redhat.com>
-	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
-	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
-	<20181106141302.GP12503@habkost.net>
-	<87efbxxw1c.fsf@dusky.pond.sub.org>
-	<8ecdbb0e-aaf8-ddc5-6442-87977585d9d8@redhat.com>
-	<87y3a4ot3g.fsf@dusky.pond.sub.org>
-In-Reply-To: <87y3a4ot3g.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 8 Nov 2018 10:11:38 +0100
-Message-ID: <CAAdtpL7Z3EpyD33t0rXS=UGUS2kCnC_f4EzQyOOt9CR_VHOSsg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Fix Python 3 detection
- on older GNU make versions
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] qapi: use qemu_strtoi64() in
+ parse_str
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +40,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-Hi Markus,
+David Hildenbrand <david@redhat.com> writes:
 
-
-Le jeu. 8 nov. 2018 09:46, Markus Armbruster <armbru@redhat.com> a =C3=A9cr=
-it :
-
-> Cleber Rosa <crosa@redhat.com> writes:
+>>> Would it be valid to do something like this (skipping elements without a
+>>> proper visit_type_int)
+>>>
+>>> visit_start_list();
+>>> visit_next_list();  more input, returns "there's more"
+>>> visit_next_list();  parses "1-3,", buffers 2-3, skips over 1
+>>> visit_type_int();   returns 2
+>>> ...
+>> 
+>> Excellent question!
+>> 
+>> Here's the relevant part of visit_start_list()'s contract in visitor.h:
+>> 
+>>  * After visit_start_list() succeeds, the caller may visit its members
+>>  * one after the other.  A real visit (where @obj is non-NULL) uses
+>>  * visit_next_list() for traversing the linked list, while a virtual
+>>  * visit (where @obj is NULL) uses other means.  For each list
+>>  * element, call the appropriate visit_type_FOO() with name set to
+>>  * NULL and obj set to the address of the value member of the list
+>>  * element.  Finally, visit_end_list() needs to be called with the
+>>  * same @list to clean up, even if intermediate visits fail.  See the
+>>  * examples above.
+>> 
+>> So, you *may* visit members, and you *must* call visit_end_list().
+>> 
+>> But what are "real" and "virtual" visits?  Again, the contract:
+>> 
+>>  * @list must be non-NULL for a real walk, in which case @size
+>>  * determines how much memory an input or clone visitor will allocate
+>>  * into *@list (at least sizeof(GenericList)).  Some visitors also
+>>  * allow @list to be NULL for a virtual walk, in which case @size is
+>>  * ignored.
+>> 
+>> I'm not sure whether I just decreased or increased global confusion ;)
 >
-> > On 11/7/18 1:05 AM, Markus Armbruster wrote:
-> >> Eduardo Habkost <ehabkost@redhat.com> writes:
-> >>
-> >>> The $(SHELLSTATUS) variable requires GNU make >=3D 4.2, but Travis
-> >>> seems to provide an older version.  Change the existing rules to
-> >>> use command output instead of exit code, to make it compatible
-> >>> with older GNU make versions.
-> >>>
-> >>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >>> ---
-> >>> I think that's the cause of the Travis failures.  I have
-> >>> submitted a test job right now, at:
-> >>>   https://travis-ci.org/ehabkost/qemu-hacks/jobs/451387962
-> >>> Let's see if it fixes the issue.
-> >>> ---
-> >>>  tests/Makefile.include | 4 ++--
-> >>>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> >>> index d2e577eabb..074eece558 100644
-> >>> --- a/tests/Makefile.include
-> >>> +++ b/tests/Makefile.include
-> >>> @@ -913,8 +913,8 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
-> >>>  # information please refer to "avocado --help".
-> >>>  AVOCADO_SHOW=3Dnone
-> >>>
-> >>> -$(shell $(PYTHON) -c 'import sys; assert sys.version_info >=3D (3,0)=
-'
-> >/dev/null 2>&1)
-> >>> -ifeq ($(.SHELLSTATUS),0)
-> >>> +PYTHON3 =3D $(shell $(PYTHON) -c 'import sys; print(1 if
-> sys.version_info >=3D (3, 0) else 0)')
-> >>> +ifeq ($(PYTHON3), 1)
-> >>>  $(TESTS_VENV_DIR): $(TESTS_VENV_REQ)
-> >>>     $(call quiet-command, \
-> >>>              $(PYTHON) -m venv --system-site-packages $@, \
-> >>
-> >> PEP 394 recommends software distributions install Python 3 into the
-> >> default path as python3, and users use that instead of python, except
-> >> for programs that are source compatible with both 2 and 3.  So, is
-> >> finding out whether python is a Python 3 really appropriate?  Why can'=
-t
-> >> we just use python3 and be done with it?
-> >>
-> >
-> > I mentioned that before, when you pointed out the issue you fix here,
-> > that configure may be the best place to get the Python version (not onl=
-y
-> > the major version) and make it available elsewhere.  Even if not used
-> > for other purposes, it is IMO important information to show on the
-> > resulting "configure" output.
-> >
-> > I'm sending patches to do that in a few.
-> >
-> >> If we can't: isn't this a configure problem?
-> >>
-> >
-> > I believe adhering to PEP394 is a good thing, but even that document
-> > recognizes that the real world is not a perfect place: "however, end
-> > users should be aware that python refers to python3 on at least Arch
-> > Linux".  And it only covers *nix systems, so if we hope to care for
-> > non-*nix systems, we have to check the Python version manually.
-> >
-> > So, I guess the safest approach from QEMU's side is to check for the
-> > version indeed.
+> I was reading over these comments and got slightly confused :)
 >
-> If somebody can point to a system people still use where python3 doesn't
-> get you a Python 3, but python does, catering for such (crappy) systems
-> in configure makes sense.  Until then, it's a waste of brain waves and
-> configure run time.
+>> 
+>> The file comment explains:
+>> 
+>>  * The QAPI schema defines both a set of C data types, and a QMP wire
+>>  * format.  QAPI objects can contain references to other QAPI objects,
+>>  * resulting in a directed acyclic graph.  QAPI also generates visitor
+>>  * functions to walk these graphs.  This file represents the interface
+>>  * for doing work at each node of a QAPI graph; it can also be used
+>>  * for a virtual walk, where there is no actual QAPI C struct.
+>> 
+>> A real walk with an output visitor works like this (error handling
+>> omitted for now):
+>> 
+>>     Error *err = NULL;
+>>     intList *tail;
+>>     size_t size = sizeof(**obj);
+>> 
+>>     // fetch list's head into *obj, start the list in output
+>>     visit_start_list(v, name, (GenericList **)obj, size, &err);
+>> 
+>>     // iterate over list's tails
+>>     // below the hood, visit_next_list() iterates over the GenericList
+>>     for (tail = *obj; tail;
+>>          tail = (intList *)visit_next_list(v, (GenericList *)tail, size)) {
+>>         // visit current tail's first member, add it to output
+>>         visit_type_int(v, NULL, &tail->value, &err);
+>>     }
+>> 
+>>     // end the list in output
+>>     visit_end_list(v, (void **)obj);
+>> 
+>> The exact same code works for a real walk with an input visitor, where
+>> visit_next_list() iterates over the *input* and builds up the
+>> GenericList.  Compare qobject_input_next_list() and
+>> qobject_output_next_list().
+>> 
+>> The code above is a straight copy of generated visit_type_intList() with
+>> error handling cut and comments added.
+>> 
+>> A real walk works on a QAPI-generated C type.  QAPI generates a real
+>> walk for each such type.  Open-coding a real walk would senselessly
+>> duplicate the generated one, so we don't.  Thus, a real walk always
+>> visits each member.
+>> 
+>> Okay, I lied: it visits each member until it runs into an error and
+>> bails out.  See generated visit_type_intList() in
+>> qapi/qapi-builtin-visit.c.
+>> 
+>> A virtual walk doesn't work with a GenericList *.  Calling
+>> visit_next_list() makes no sense then.  visitor.h gives this example of
+>> a virtual walk:
 >
-> PEP 394 mentions Arch Linux.  It's been seven years.  What's the most
-> recent version of Arch Linux that's still crappy in this regard?
->
+> Alright, so we must not support virtual walks. But supporting it would
+> not harm :)
 
-Arch doesn't provide python2 by default, thus python points to python3.
-I think what's crappy is scripts expecting python to be python2.
+Hmm, let me check something... aha!  Both string-input-visitor.h and
+string-output-visitor.h have this comment:
 
+ * The string input visitor does not implement support for visiting
+ * QAPI structs, alternates, null, or arbitrary QTypes.  It also
+ * requires a non-null list argument to visit_start_list().
+
+The last sentence means virtual walks are not supported.  We owe thanks
+to Eric Blake for his commit d9f62dde130 :)
+
+>> 
+>>  * Thus, a virtual walk corresponding to '{ "list": [1, 2] }' looks
+>>  * like:
+>>  *
+>>  * <example>
+>>  *  Visitor *v;
+>>  *  Error *err = NULL;
+>>  *  int value;
+>>  *
+>>  *  v = FOO_visitor_new(...);
+>>  *  visit_start_struct(v, NULL, NULL, 0, &err);
+>>  *  if (err) {
+>>  *      goto out;
+>>  *  }
+>>  *  visit_start_list(v, "list", NULL, 0, &err);
+>>  *  if (err) {
+>>  *      goto outobj;
+>>  *  }
+>>  *  value = 1;
+>>  *  visit_type_int(v, NULL, &value, &err);
+>>  *  if (err) {
+>>  *      goto outlist;
+>>  *  }
+>>  *  value = 2;
+>>  *  visit_type_int(v, NULL, &value, &err);
+>>  *  if (err) {
+>>  *      goto outlist;
+>>  *  }
+>>  * outlist:
+>>  *  visit_end_list(v, NULL);
+>>  *  if (!err) {
+>>  *      visit_check_struct(v, &err);
+>>  *  }
+>>  * outobj:
+>>  *  visit_end_struct(v, NULL);
+>>  * out:
+>>  *  error_propagate(errp, err);
+>>  *  visit_free(v);
+>> 
+>> Why could this be useful?
+>> 
+>> 1. With the QObject input visitor, it's an alternative way to
+>>    destructure a QObject into a bunch of C variables.  The "obvious" way
+>>    would be calling the QObject accessors.  By using the visitors you
+>>    get much the error checking code for free.  YMMV.
+>> 
+>> 2. With the QObject output visitor, it's an alternative way to build up
+>>    a QObject.  The "obvious" way would be calling the constructors
+>>    directly.
+>> 
+>> 3. With the string input / output visitors, it's a way to parse / format
+>>    string visitor syntax without having to construct the C type first.
+>> 
+>> Right now, we have no virtual list walks outside tests.  We do have
+>> virtual struct walks outside tests.
+>> 
+>>> Or mixing types
+>>>
+>>> visit_start_list();
+>>> visit_next_list();
+>>> visit_type_int64();
+>>> visit_next_list();
+>>> visit_type_uint64();
+>> 
+>> Another excellent question.
+>> 
+>> QAPI can only express homogeneous lists, i.e. lists of some type T.
+>> 
+>> The generated visit_type_TList call the same visit_type_T() for all list
+>> members.
 >
+> Okay, my point would be: Somebody coding its own visit code should not
+> assume this to work.
+>
+>> 
+>> QAPI type 'any' is the top type, but visit_type_anyList() still calls
+>> visit_type_any() for all list members.
+>> 
+>> Virtual walks could of course do anything.  Since they don't exist
+>> outside tests, we can outlaw doing things that cause us trouble.
+>> 
+>> The virtual walks we currently have in tests/ seem to walk only
+>> homogeneous lists, i.e. always call the same visit_type_T().
+>
+> Okay, so bailing out if types are switched (e.g. just about to report a
+> range of uin64_t and somebody asks for a int64_t) is valid.
+
+I think that would be okay.
+
+>> 
+>>> IOW, can I assume that after every visit_next_list(), visit_type_X is
+>>> called, and that X remains the same for one pass over the list?
+>> 
+>> As far as I can tell, existing code is just fine with that assumption.
+>> We'd have to write it into the contract, though.
+>> 
+>>> Also, I assume it is supposed to work like this
+>>>
+>>> visit_start_list();
+>>> visit_next_list();  more input, returns "there's more"
+>>> visit_type_int();   returns 1 (parses 1-3, buffers 1-3)
+>>> visit_type_int();   returns 1
+>>> visit_type_int();   returns 1
+>>> visit_next_list();  more input, unbuffers 1
+>>> visit_type_int();   returns 2
+>>>
+>>> So unbuffering actually happens on visit_next_list()?
+>> 
+>> I believe this violates the contract.
+>> 
+>> If it's a real walk, the contract wants you to call visit_next_list()
+>> between subsequent visit_type_int().
+>> 
+>> If it's a virtual walk, calling visit_next_list() makes no sense.
+>> 
+>> More questions?
+>> 
+>
+> Thanks for the excessive answer! I think that should be enough to come
+> up with a RFC of a *rewrite* of the string input visitor :)
+
+You're welcome!  I love great questions, they make me *think*.
+
+Besides, if something's worth doing, it's probably worth overdoing ;)
