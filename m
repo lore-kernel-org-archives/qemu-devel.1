@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gKmsR-0005Ue-IJ
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:55 -0500
+	(envelope-from <philmd@redhat.com>) id 1gKmsR-0005V3-Ur
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gKmsO-0000v8-MN
+	(envelope-from <philmd@redhat.com>) id 1gKmsO-0000uZ-5o
 	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:51 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:49092)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gKmsO-0000l6-6u
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:35076)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gKmsN-0000qI-Qv
 	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 11:09:48 -0500
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu,  8 Nov 2018 18:08:08 +0200
-Message-Id: <20181108160818.5485-13-yuval.shaia@oracle.com>
-In-Reply-To: <20181108160818.5485-1-yuval.shaia@oracle.com>
-References: <20181108160818.5485-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v2 12/22] vmxnet3: Move some definitions to
- header file
+Received: by mail-wr1-f68.google.com with SMTP id z16-v6so21857549wrv.2
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 08:09:42 -0800 (PST)
+References: <20181106110548.4209-1-luc.michel@greensocs.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <af576b19-511c-f9e7-cc42-166d63ab6d39@redhat.com>
+Date: Thu, 8 Nov 2018 17:09:38 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181106110548.4209-1-luc.michel@greensocs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 00/16] gdbstub: support for the
+ multiprocess extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,316 +30,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com
+To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, alistair@alistair23.me, mark.burton@greensocs.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
 
-pvrdma setup requires vmxnet3 device on PCI function 0 and PVRDMA device
-on PCI function 1.
-pvrdma device needs to access vmxnet3 device object for several reasons:
-1. Make sure PCI function 0 is vmxnet3.
-2. To monitor vmxnet3 device state.
-3. To configure node_guid accoring to vmxnet3 device's MAC address.
+On 6/11/18 12:05, Luc Michel wrote:
+> changes since v3:
+>    - patch 1    cpu_cluster.h: remove QEMU_ from the multiple includes
+>                 guard #ifdef/#define [Alistair]
+> 
+>    - patch 1    cpu_cluster.c: include osdep.h first [Alistair]
+> 
+>    - patch 1    use uint64_t for cluster ID for prosperity :) [Philippe]
 
-To be able to access vmxnet3 device the definition of VMXNET3State is
-moved to a new header file.
+Actually my comment about 32-bit had the opposite meaning, I suppose 
+having 256 kind of cpu cores in the same SoC is probably enough for a 
+long time IMHO.
 
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
----
- hw/net/vmxnet3.c      | 116 +-----------------------------------
- hw/net/vmxnet3_defs.h | 133 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 134 insertions(+), 115 deletions(-)
- create mode 100644 hw/net/vmxnet3_defs.h
-
-diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-index 3648630386..54746a4030 100644
---- a/hw/net/vmxnet3.c
-+++ b/hw/net/vmxnet3.c
-@@ -18,7 +18,6 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
--#include "net/net.h"
- #include "net/tap.h"
- #include "net/checksum.h"
- #include "sysemu/sysemu.h"
-@@ -29,6 +28,7 @@
- #include "migration/register.h"
- 
- #include "vmxnet3.h"
-+#include "vmxnet3_defs.h"
- #include "vmxnet_debug.h"
- #include "vmware_utils.h"
- #include "net_tx_pkt.h"
-@@ -131,23 +131,11 @@ typedef struct VMXNET3Class {
-     DeviceRealize parent_dc_realize;
- } VMXNET3Class;
- 
--#define TYPE_VMXNET3 "vmxnet3"
--#define VMXNET3(obj) OBJECT_CHECK(VMXNET3State, (obj), TYPE_VMXNET3)
--
- #define VMXNET3_DEVICE_CLASS(klass) \
-     OBJECT_CLASS_CHECK(VMXNET3Class, (klass), TYPE_VMXNET3)
- #define VMXNET3_DEVICE_GET_CLASS(obj) \
-     OBJECT_GET_CLASS(VMXNET3Class, (obj), TYPE_VMXNET3)
- 
--/* Cyclic ring abstraction */
--typedef struct {
--    hwaddr pa;
--    uint32_t size;
--    uint32_t cell_size;
--    uint32_t next;
--    uint8_t gen;
--} Vmxnet3Ring;
--
- static inline void vmxnet3_ring_init(PCIDevice *d,
- 				     Vmxnet3Ring *ring,
-                                      hwaddr pa,
-@@ -245,108 +233,6 @@ vmxnet3_dump_rx_descr(struct Vmxnet3_RxDesc *descr)
-               descr->rsvd, descr->dtype, descr->ext1, descr->btype);
- }
- 
--/* Device state and helper functions */
--#define VMXNET3_RX_RINGS_PER_QUEUE (2)
--
--typedef struct {
--    Vmxnet3Ring tx_ring;
--    Vmxnet3Ring comp_ring;
--
--    uint8_t intr_idx;
--    hwaddr tx_stats_pa;
--    struct UPT1_TxStats txq_stats;
--} Vmxnet3TxqDescr;
--
--typedef struct {
--    Vmxnet3Ring rx_ring[VMXNET3_RX_RINGS_PER_QUEUE];
--    Vmxnet3Ring comp_ring;
--    uint8_t intr_idx;
--    hwaddr rx_stats_pa;
--    struct UPT1_RxStats rxq_stats;
--} Vmxnet3RxqDescr;
--
--typedef struct {
--    bool is_masked;
--    bool is_pending;
--    bool is_asserted;
--} Vmxnet3IntState;
--
--typedef struct {
--        PCIDevice parent_obj;
--        NICState *nic;
--        NICConf conf;
--        MemoryRegion bar0;
--        MemoryRegion bar1;
--        MemoryRegion msix_bar;
--
--        Vmxnet3RxqDescr rxq_descr[VMXNET3_DEVICE_MAX_RX_QUEUES];
--        Vmxnet3TxqDescr txq_descr[VMXNET3_DEVICE_MAX_TX_QUEUES];
--
--        /* Whether MSI-X support was installed successfully */
--        bool msix_used;
--        hwaddr drv_shmem;
--        hwaddr temp_shared_guest_driver_memory;
--
--        uint8_t txq_num;
--
--        /* This boolean tells whether RX packet being indicated has to */
--        /* be split into head and body chunks from different RX rings  */
--        bool rx_packets_compound;
--
--        bool rx_vlan_stripping;
--        bool lro_supported;
--
--        uint8_t rxq_num;
--
--        /* Network MTU */
--        uint32_t mtu;
--
--        /* Maximum number of fragments for indicated TX packets */
--        uint32_t max_tx_frags;
--
--        /* Maximum number of fragments for indicated RX packets */
--        uint16_t max_rx_frags;
--
--        /* Index for events interrupt */
--        uint8_t event_int_idx;
--
--        /* Whether automatic interrupts masking enabled */
--        bool auto_int_masking;
--
--        bool peer_has_vhdr;
--
--        /* TX packets to QEMU interface */
--        struct NetTxPkt *tx_pkt;
--        uint32_t offload_mode;
--        uint32_t cso_or_gso_size;
--        uint16_t tci;
--        bool needs_vlan;
--
--        struct NetRxPkt *rx_pkt;
--
--        bool tx_sop;
--        bool skip_current_tx_pkt;
--
--        uint32_t device_active;
--        uint32_t last_command;
--
--        uint32_t link_status_and_speed;
--
--        Vmxnet3IntState interrupt_states[VMXNET3_MAX_INTRS];
--
--        uint32_t temp_mac;   /* To store the low part first */
--
--        MACAddr perm_mac;
--        uint32_t vlan_table[VMXNET3_VFT_SIZE];
--        uint32_t rx_mode;
--        MACAddr *mcast_list;
--        uint32_t mcast_list_len;
--        uint32_t mcast_list_buff_size; /* needed for live migration. */
--
--        /* Compatibility flags for migration */
--        uint32_t compat_flags;
--} VMXNET3State;
--
- /* Interrupt management */
- 
- /*
-diff --git a/hw/net/vmxnet3_defs.h b/hw/net/vmxnet3_defs.h
-new file mode 100644
-index 0000000000..6c19d29b12
---- /dev/null
-+++ b/hw/net/vmxnet3_defs.h
-@@ -0,0 +1,133 @@
-+/*
-+ * QEMU VMWARE VMXNET3 paravirtual NIC
-+ *
-+ * Copyright (c) 2012 Ravello Systems LTD (http://ravellosystems.com)
-+ *
-+ * Developed by Daynix Computing LTD (http://www.daynix.com)
-+ *
-+ * Authors:
-+ * Dmitry Fleytman <dmitry@daynix.com>
-+ * Tamir Shomer <tamirs@daynix.com>
-+ * Yan Vugenfirer <yan@daynix.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "net/net.h"
-+#include "hw/net/vmxnet3.h"
-+
-+#define TYPE_VMXNET3 "vmxnet3"
-+#define VMXNET3(obj) OBJECT_CHECK(VMXNET3State, (obj), TYPE_VMXNET3)
-+
-+/* Device state and helper functions */
-+#define VMXNET3_RX_RINGS_PER_QUEUE (2)
-+
-+/* Cyclic ring abstraction */
-+typedef struct {
-+    hwaddr pa;
-+    uint32_t size;
-+    uint32_t cell_size;
-+    uint32_t next;
-+    uint8_t gen;
-+} Vmxnet3Ring;
-+
-+typedef struct {
-+    Vmxnet3Ring tx_ring;
-+    Vmxnet3Ring comp_ring;
-+
-+    uint8_t intr_idx;
-+    hwaddr tx_stats_pa;
-+    struct UPT1_TxStats txq_stats;
-+} Vmxnet3TxqDescr;
-+
-+typedef struct {
-+    Vmxnet3Ring rx_ring[VMXNET3_RX_RINGS_PER_QUEUE];
-+    Vmxnet3Ring comp_ring;
-+    uint8_t intr_idx;
-+    hwaddr rx_stats_pa;
-+    struct UPT1_RxStats rxq_stats;
-+} Vmxnet3RxqDescr;
-+
-+typedef struct {
-+    bool is_masked;
-+    bool is_pending;
-+    bool is_asserted;
-+} Vmxnet3IntState;
-+
-+typedef struct {
-+        PCIDevice parent_obj;
-+        NICState *nic;
-+        NICConf conf;
-+        MemoryRegion bar0;
-+        MemoryRegion bar1;
-+        MemoryRegion msix_bar;
-+
-+        Vmxnet3RxqDescr rxq_descr[VMXNET3_DEVICE_MAX_RX_QUEUES];
-+        Vmxnet3TxqDescr txq_descr[VMXNET3_DEVICE_MAX_TX_QUEUES];
-+
-+        /* Whether MSI-X support was installed successfully */
-+        bool msix_used;
-+        hwaddr drv_shmem;
-+        hwaddr temp_shared_guest_driver_memory;
-+
-+        uint8_t txq_num;
-+
-+        /* This boolean tells whether RX packet being indicated has to */
-+        /* be split into head and body chunks from different RX rings  */
-+        bool rx_packets_compound;
-+
-+        bool rx_vlan_stripping;
-+        bool lro_supported;
-+
-+        uint8_t rxq_num;
-+
-+        /* Network MTU */
-+        uint32_t mtu;
-+
-+        /* Maximum number of fragments for indicated TX packets */
-+        uint32_t max_tx_frags;
-+
-+        /* Maximum number of fragments for indicated RX packets */
-+        uint16_t max_rx_frags;
-+
-+        /* Index for events interrupt */
-+        uint8_t event_int_idx;
-+
-+        /* Whether automatic interrupts masking enabled */
-+        bool auto_int_masking;
-+
-+        bool peer_has_vhdr;
-+
-+        /* TX packets to QEMU interface */
-+        struct NetTxPkt *tx_pkt;
-+        uint32_t offload_mode;
-+        uint32_t cso_or_gso_size;
-+        uint16_t tci;
-+        bool needs_vlan;
-+
-+        struct NetRxPkt *rx_pkt;
-+
-+        bool tx_sop;
-+        bool skip_current_tx_pkt;
-+
-+        uint32_t device_active;
-+        uint32_t last_command;
-+
-+        uint32_t link_status_and_speed;
-+
-+        Vmxnet3IntState interrupt_states[VMXNET3_MAX_INTRS];
-+
-+        uint32_t temp_mac;   /* To store the low part first */
-+
-+        MACAddr perm_mac;
-+        uint32_t vlan_table[VMXNET3_VFT_SIZE];
-+        uint32_t rx_mode;
-+        MACAddr *mcast_list;
-+        uint32_t mcast_list_len;
-+        uint32_t mcast_list_buff_size; /* needed for live migration. */
-+
-+        /* Compatibility flags for migration */
-+        uint32_t compat_flags;
-+} VMXNET3State;
--- 
-2.17.2
+> 
+>    - patch 1    auto-assign a cluster ID to newly created clusters [Philippe]
+> 
+>    - patch 2    fix mid-code variable declaration [Alistair]
+> 
+>    - patch 3    add a comment in gdb_get_cpu_pid() when retrieving CPU
+>                 parent canonical path [Alistair]
+> 
+>    - patch 14   fix a typo in the commit message [Alistair]
+> 
+> changes since v2:
+>    - patch 1    introducing the cpu-cluster type. I didn't opt for an
+>                 Interface, but I can add one if you think it's necessary.
+>                 For now this class inherits from Device and has a
+>                 cluster-id property, used by the GDB stub to compute a
+>                 PID.
+> 
+>    - patch 2    removed GDB group related code as it has been replaced
+>                 with CPU clusters
+> 
+>    - patch 2/8  moved GDBProcess target_xml field introduction into patch
+>                 8 [Philippe]
+> 
+>    - patch 3    gdb_get_cpu_pid() now search for CPU being a child of a
+>                 cpu-cluster object. Use the cluster-id to compute the PID.
+> 
+>    - patch 4    gdb_get_process() does not rely on s->processes array
+>                 indices anymore as PIDs can now be sparse. Instead, iterate
+>                 over the array to find the process.
+> 
+>    - patch 3/4  removed Reviewed-by tags because of substantial changes.
+> 
+>    - patch 4/7  read_thread_id() hardening [Philippe]
+> 
+>    - patch 12   safer vAttach packet parsing [Phillipe]
+> 
+>    - patch 16   put APUs and RPUs in different clusters instead of GDB
+>                 groups
+> 
+> changes since v1:
+>    - rename qemu_get_thread_id() to gdb_fmt_thread_id() [Philippe]
+>    - check qemu_strtoul() return value for 'D' packets [Philippe]
+> 
+> 
+> This series adds support for the multiprocess extension of the GDB
+> remote protocol in the QEMU GDB stub.
+> 
+> This extension is useful to split QEMU emulated CPUs in different
+> processes from the point of view of the GDB client. It adds the
+> possibility to debug different kind of processors (e.g. an AArch64 and
+> an ARMv7 CPU) at the same time (it is not possible otherwise since GDB
+> expects an SMP view at the thread granularity.
+> 
+> CPUs are grouped using specially named QOM containers. CPUs that are
+> children of such a container are grouped under the same GDB process.
+> 
+> The last patch groups the CPUs of different model in the zynqmp machines
+> into separate processes.
+> 
+> To test this patchset, you can use the following commands:
+> 
+> (Note that this requires a recent enough GDB, I think GDB 7.2 is OK.
+> Also, it must be compiled to support both ARM and AArch64 architectures)
+> 
+> Run QEMU: (-smp 6 in xlnx-zcu102 enables both cortex-a53 and cortex-r5
+> CPUs)
+> 
+> qemu-system-aarch64 -M xlnx-zcu102 -gdb tcp::1234 -S -smp 6
+> 
+> Run the following commands in GDB:
+> 
+> target extended :1234
+> add-inferior
+> inferior 2
+> attach 2
+> info threads
+> 
+> I want to thanks the Xilinx's QEMU team who sponsored this work for
+> their collaboration and their prototype implementation.
+> 
+> Luc Michel (16):
+>    hw/cpu: introduce CPU clusters
+>    gdbstub: introduce GDB processes
+>    gdbstub: add multiprocess support to '?' packets
+>    gdbstub: add multiprocess support to 'H' and 'T' packets
+>    gdbstub: add multiprocess support to vCont packets
+>    gdbstub: add multiprocess support to 'sC' packets
+>    gdbstub: add multiprocess support to (f|s)ThreadInfo and
+>      ThreadExtraInfo
+>    gdbstub: add multiprocess support to Xfer:features:read:
+>    gdbstub: add multiprocess support to gdb_vm_state_change()
+>    gdbstub: add multiprocess support to 'D' packets
+>    gdbstub: add support for extended mode packet
+>    gdbstub: add support for vAttach packets
+>    gdbstub: processes initialization on new peer connection
+>    gdbstub: gdb_set_stop_cpu: ignore request when process is not attached
+>    gdbstub: add multiprocess extension support
+>    arm/xlnx-zynqmp: put APUs and RPUs in separate CPU clusters
+> 
+>   include/hw/arm/xlnx-zynqmp.h |   3 +
+>   include/hw/cpu/cluster.h     |  38 +++
+>   gdbstub.c                    | 632 ++++++++++++++++++++++++++++++-----
+>   hw/arm/xlnx-zynqmp.c         |  21 +-
+>   hw/cpu/cluster.c             |  59 ++++
+>   hw/cpu/Makefile.objs         |   2 +-
+>   6 files changed, 674 insertions(+), 81 deletions(-)
+>   create mode 100644 include/hw/cpu/cluster.h
+>   create mode 100644 hw/cpu/cluster.c
+> 
