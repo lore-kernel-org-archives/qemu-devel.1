@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gKhRU-0004Tw-Qe
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:21:45 -0500
+	(envelope-from <thuth@redhat.com>) id 1gKhRs-0004gG-S4
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:22:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gKhNJ-00087h-GT
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:17:27 -0500
-Received: from mail-cys01nam02on0138.outbound.protection.outlook.com
-	([104.47.37.138]:2704
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gKhNJ-00086d-7v
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:17:21 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Thu, 8 Nov 2018 10:17:16 +0000
-Message-ID: <BN6PR2201MB1251FFDEF482BBFBCC9FF1D5C6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <cover.1541616663.git.noring@nocrew.org>,
-	<b7502a7707b8b75d500c96e81a76b03fdd67865c.1541616663.git.noring@nocrew.org>
-In-Reply-To: <b7502a7707b8b75d500c96e81a76b03fdd67865c.1541616663.git.noring@nocrew.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <thuth@redhat.com>) id 1gKhKV-0003Qd-Vj
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:14:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42478)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gKhKU-0003OT-8O
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 05:14:27 -0500
+References: <20180924092120.GA30163@caravaggio>
+	<7c2b477e-bdac-c887-2510-82fe04acdcfe@redhat.com>
+	<87b22690-e39c-3b46-dcb4-f6abc3213142@redhat.com>
+	<CAFEAcA8yHb4MdtsJuXcswQp93DN5tSeN9dn8AWWL9se0DKvdcg@mail.gmail.com>
+	<41ceda53-467e-32a1-8fa6-13f0f9c08ad1@redhat.com>
+	<CAFEAcA9oCs+Y1fnY8dOR16n_Hn7PaHziL7K0HZK6=BAd_Gyecg@mail.gmail.com>
+	<e496287e-f8ba-3608-42e1-efb697cfc784@redhat.com>
+	<20181107154114.GC27585@caravaggio>
+	<dd68d3e8-6448-3a67-3212-fd3d3bfba2e2@redhat.com>
+	<20181107192414.GH12503@habkost.net>
+	<c6bbfeb8-53c5-0e0c-cf36-14e586cfb581@redhat.com>
+	<a0decaa7-d83b-b0ad-60ea-aa0890feb905@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <28af4bea-e017-cdab-e5e4-a9809cb2e409@redhat.com>
+Date: Thu, 8 Nov 2018 11:14:21 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] target/mips: Fix HI[ac] and LO[ac]
- 32-bit truncation with MIPS64 DSP ASE
+In-Reply-To: <a0decaa7-d83b-b0ad-60ea-aa0890feb905@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] QEMU and Kconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,105 +38,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>, Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, Jia Liu <proljc@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Samuel Ortiz <sameo@linux.intel.com>, "Zhong, Yang" <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-> From: Fredrik Noring <noring@nocrew.org>
-> Sent: Wednesday, November 7, 2018 8:18 PM
-> To: Aleksandar Markovic; Aurelien Jarno; Philippe Mathieu-Daud=E9; Richar=
-d Henderson
-> Cc: J=FCrgen Urban; Maciej W. Rozycki; Jia Liu; qemu-devel@nongnu.org
-> Subject: [PATCH v2 3/6] target/mips: Fix HI[ac] and LO[ac] 32-bit truncat=
-ion with > MIPS64 DSP ASE
+On 2018-11-08 10:55, Paolo Bonzini wrote:
+> On 07/11/2018 20:30, Thomas Huth wrote:
+>> On 2018-11-07 20:24, Eduardo Habkost wrote:
+>>> On Wed, Nov 07, 2018 at 06:39:54PM +0100, Paolo Bonzini wrote:
+>>>> On 07/11/2018 16:41, Samuel Ortiz wrote:
+>>>>> - The Kconfig parser would be used to generate the equivalent of wh=
+at we
+>>>>>   currently have under default-configs/
+>>
+>> I think we would still have something like default-configs - but there
+>> would only be the bare minimum config switches in there, the rest woul=
+d
+>> be pulled in by dependencies.
 >=20
-> This change removes the 32-bit truncation of the HI[ac] and LO[ac]
-> special purpose registers when ac range from 1 to 3 for the instructions
-> MFHI, MFLO, MTHI and MTLO. The "MIPS Architecture for Programmers Volume
-> IV-e: MIPS DSP Module for MIPS64 Architecture" manual specifies that all
-> 64 bits are copied in all cases:
->=20
->    MFHI: GPR[rd]63..0 <- HI[ac]63..0
->    MFLO: GPR[rd]63..0 <- LO[ac]63..0
->    MTHI: HI[ac]63..0 <- GPR[rs]63..0
->    MTLO: LO[ac]63..0 <- GPR[rs]63..0
->=20
-> Fixes: 4133498f8e53 ("Use correct acc value to index cpu_HI/cpu_LO rather=
- than using > a fix number")
-> Cc: Jia Liu <proljc@gmail.com>
-> Reported-by: Maciej W. Rozycki <macro@linux-mips.org>
-> Signed-off-by: Fredrik Noring <noring@nocrew.org>
-> ---
->  target/mips/translate.c | 36 ++++--------------------------------
->  1 file changed, 4 insertions(+), 32 deletions(-)
->=20
+> Yes, in theory default-configs would end up empty, except for possibly
+> some commented lines to show the "default y" symbols for the target.
 
-Hi, Fredrik.
+I think we should enable the machines in the default configs (and maybe
+optional devices that are not automatically selected by machines), e.g.:
 
-Thanks for this follow-up patch. I will consider it, even if I perhaps don'=
-t include it for 3.1. Let's see if Jia has some comments.
+CONFIG_I440FX=3Dy
+CONFIG_Q35=3Dy
+CONFIG_VIRTPC=3Dy
+CONFIG_ISAPC=3Dy
+CONFIG_VIRTIO=3Dy
+CONFIG_PARALLEL=3Dy
 
-Aleksandar
+In configs/nemu (or configs/lean-kvm or however we'll call it), you will
+then only have:
 
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 3ddd70043a..19ae7d2f1c 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -4409,49 +4409,21 @@ static void gen_HILO(DisasContext *ctx, uint32_t =
-opc, int > acc, int reg)
->=20
->      switch (opc) {
->      case OPC_MFHI:
-> -#if defined(TARGET_MIPS64)
-> -        if (acc !=3D 0) {
-> -            tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_HI[acc]);
-> -        } else
-> -#endif
-> -        {
-> -            tcg_gen_mov_tl(cpu_gpr[reg], cpu_HI[acc]);
-> -        }
-> +        tcg_gen_mov_tl(cpu_gpr[reg], cpu_HI[acc]);
->          break;
->      case OPC_MFLO:
-> -#if defined(TARGET_MIPS64)
-> -        if (acc !=3D 0) {
-> -            tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_LO[acc]);
-> -        } else
-> -#endif
-> -        {
-> -            tcg_gen_mov_tl(cpu_gpr[reg], cpu_LO[acc]);
-> -        }
-> +        tcg_gen_mov_tl(cpu_gpr[reg], cpu_LO[acc]);
->          break;
->      case OPC_MTHI:
->          if (reg !=3D 0) {
-> -#if defined(TARGET_MIPS64)
-> -            if (acc !=3D 0) {
-> -                tcg_gen_ext32s_tl(cpu_HI[acc], cpu_gpr[reg]);
-> -            } else
-> -#endif
-> -            {
-> -                tcg_gen_mov_tl(cpu_HI[acc], cpu_gpr[reg]);
-> -            }
-> +            tcg_gen_mov_tl(cpu_HI[acc], cpu_gpr[reg]);
->          } else {
->              tcg_gen_movi_tl(cpu_HI[acc], 0);
->          }
->          break;
->      case OPC_MTLO:
->          if (reg !=3D 0) {
-> -#if defined(TARGET_MIPS64)
-> -            if (acc !=3D 0) {
-> -                tcg_gen_ext32s_tl(cpu_LO[acc], cpu_gpr[reg]);
-> -            } else
-> -#endif
-> -            {
-> -                tcg_gen_mov_tl(cpu_LO[acc], cpu_gpr[reg]);
-> -            }
-> +            tcg_gen_mov_tl(cpu_LO[acc], cpu_gpr[reg]);
->          } else {
->              tcg_gen_movi_tl(cpu_LO[acc], 0);
->          }
-> --
-> 2.18.1
->=20
-> =
+CONFIG_Q35=3Dy
+CONFIG_VIRTPC=3Dy
+CONFIG_VIRTIO=3Dy
+
+Would that make sense?
+
+ Thomas
