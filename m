@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gKpOX-0003tE-BD
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:51:10 -0500
+	(envelope-from <palmer@sifive.com>) id 1gKpQe-0006Zp-Gl
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:53:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gKpOV-00007c-9j
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:51:08 -0500
-Received: from ste-pvt-msa1.bahnhof.se ([213.80.101.70]:21423)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gKpOU-0008Uc-Q3
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:51:07 -0500
-Date: Thu, 8 Nov 2018 19:50:58 +0100
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <20181108185058.GA21067@sx9>
-References: <cover.1541616663.git.noring@nocrew.org>
-	<e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>
-	<BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism
- of special R5900 opcodes
+	(envelope-from <palmer@sifive.com>) id 1gKpQT-0001Wg-9u
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:53:14 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38459)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gKpQS-0000zc-Vg
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 13:53:09 -0500
+Received: by mail-pl1-x643.google.com with SMTP id p4-v6so7567895plo.5
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 10:52:19 -0800 (PST)
+Date: Thu, 08 Nov 2018 10:52:17 -0800 (PST)
+In-Reply-To: <CAKmqyKPHDx7iTQRaY7+5v13oE-ARzpqFDOo4e98Y4bHGH7s+Ww@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-10e50b53-fc97-4315-9a4d-6934d7acd223@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL] A Single RISC-V Patch for 3.1-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, qemu-devel@nongnu.org
+To: alistair23@gmail.com, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-Hi Aleksandar,
+On Thu, 08 Nov 2018 10:38:51 PST (-0800), alistair23@gmail.com wrote:
+> On Thu, Nov 8, 2018 at 10:35 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>>
+>> The following changes since commit a7ce790a029bd94eb320d8c69f38900f5233997e:
+>>
+>>   tcg/tcg-op.h: Add multiple include guard (2018-11-08 15:15:32 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://github.com/riscv/riscv-qemu.git tags/riscv-for-master-3.1-rc1
+>>
+>> for you to fetch changes up to 00a014ac01feac875468d38c376f7e06f050f992:
+>>
+>>   riscv: spike: Fix memory leak in the board init (2018-11-08 08:41:06 -0800)
+>>
+>> ----------------------------------------------------------------
+>> A Single RISC-V Patch for 3.1-rc1
+>>
+>> This tag contains a single patch that I'd like to target for rc1: a fix
+>> for a memory leak that was detected by static code analysis.
+>>
+>> There are still three patch sets that I'd like to try to get up for 3.1:
+>>
+>> * The patch set Basian just published that contains fixes for a pair of
+>>   issues he found when converting our port to decodetree.
+>> * An as-of-yet-unwritten fix to the third issue that Basian pointed out.
+>> * A fix to our fflags bug, which is currently coupled to some CSR
+>>   refactoring that I don't think is OK for 3.1.
+>
+> There is one more patch fixing a memory leak in the virt board as well.
 
-> Fredrik, do you know by any chance if a document exists that would justify
-> inclusion of non-R5900 DMULT, DMULTU, DDIV, DDIVU in R5900 executables by
-> gcc for R5900? Is it included by cross-gcc or by native gcc, or by both?
-> 
-> I think gcc folks must have had a good reason for that, some kind of
-> design - it can't be 'I really like/miss this instruction, let's include
-> it...'
+Oh, sorry about that -- I thought they were the same patch!
 
-The R5900 reports itself as MIPS III and DMULT, DMULTU, DDIV and DDIVU
-are part of the MIPS III ISA. They are emulated in user mode to support
-generic MIPS III programs.
+Peter: let me know if you want me to submit a new copy of this PR with both 
+patches or a follow-on PR.  Sorry for the noise!
 
-I have now obtained an R5900 n32 ABI toolchain. R5900 n32 ABI emulation
-support is recognised with
-
-http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg01609.html
-
-and a test of DMULT emulation is available with
-
-http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg01610.html
-
-Fredrik
+>> I'm at Plumbers next week (and I think Alistair is there too?), but I'll
+>> try to find a way to squeeze in as much as possible.
+>
+> Yep! I'll be there.
+>
+> Alistair
+>
+>>
+>> ----------------------------------------------------------------
+>> Alistair Francis (1):
+>>       riscv: spike: Fix memory leak in the board init
+>>
+>>  hw/riscv/spike.c | 6 +++---
+>>  1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>>
