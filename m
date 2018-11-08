@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gKni5-0002ol-Sc
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:03:21 -0500
+	(envelope-from <bounces@canonical.com>) id 1gKnlp-0006hz-Fu
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gKni3-0007wk-3r
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:03:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54634)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gKni2-0007li-Qv
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:03:11 -0500
-References: <CALMp9eQ5zWxb2N9fyYz=WcQshwk0L6qQ4D6L6+p_dzMo4H=txA@mail.gmail.com>
-	<20181102034649.43559-1-liran.alon@oracle.com>
-	<CALMp9eRk=a1FEyr78NRGBBZ2iFCo5s2n5N=bM4zR=YF56oob3A@mail.gmail.com>
-	<1C803EF0-9E1B-4E1B-A4DD-4BE788A7A1FF@oracle.com>
-	<DF5EC0F1-BA8D-4B85-BB1A-B22234235FBA@oracle.com>
-	<CALMp9eQSptO+S1NZjQQUa=HQCXFOevHwTDS9i0KXHCGSfKzEkA@mail.gmail.com>
-	<a567de11-a106-fd6d-7998-1a18ba17eaaa@redhat.com>
-	<939A6255-306C-431C-8799-0D56A30A3BD5@oracle.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d29d27ba-f34e-6dd6-4eec-8e75971269e3@redhat.com>
-Date: Thu, 8 Nov 2018 18:02:58 +0100
+	(envelope-from <bounces@canonical.com>) id 1gKnlo-0004xs-F9
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:05 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39824)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gKnlo-0004wY-3z
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:04 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gKnlk-0003Nn-Re
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 17:07:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 310BC2E80E6
+	for <qemu-devel@nongnu.org>; Thu,  8 Nov 2018 17:07:00 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <939A6255-306C-431C-8799-0D56A30A3BD5@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
- save and restore nested state
+Date: Thu, 08 Nov 2018 16:48:31 -0000
+From: Thomas Huth <1734810@bugs.launchpad.net>
+Reply-To: Bug 1734810 <1734810@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151184788907.20350.3674834740850334109.malonedeb@chaenomeles.canonical.com>
+Message-Id: <154169571161.2165.4747843012061114368.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1734810] Re: Windows guest virtual PC running
+ abnormally slow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liran Alon <liran.alon@oracle.com>
-Cc: Jim Mattson <jmattson@google.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm list <kvm@vger.kernel.org>, mtosatti@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 08/11/2018 10:57, Liran Alon wrote:
->=20
->=20
->> On 8 Nov 2018, at 11:50, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 08/11/2018 01:45, Jim Mattson wrote:
->>> I have no attachments to the current design. I had used a data[] blob=
-,
->>> because I didn't think userspace would have any need to know what was
->>> in there. However, I am now seeing the error of my ways. For example,
->>> the userspace instruction emulator needs to know the contents of the
->>> vmcs12 to emulate instructions when in guest mode.
->>
->> Yeah, we're probably going to have to document the KVM vmcs12 structur=
-e,
->> possibly moving it to uapi.  But that's a different thing from
->> save/restore state, which can use the 4K or 8K data[] blob.
->>
->> Paolo
->=20
-> But regardless of if we document vmcs12 or not, the current blob we
-> have today should be separated to well-defined blobs/structs (cached_vm=
-cs12
-> and cached_shadow_vmcs12) and each blob should have a relevant flag tha=
-t specifies
-> it is valid (saved by kernel or requested to be restored by userspace).
-> Additional future nested-state should be added as additional
-> well-defined blobs/structs with appropriate flags.
+At least please try to answer my questions in comment #3: Is
+virtualization enabled in your BIOS? Is KVM enabled on your system (i.e.
+are the kvm.ko and kvm_intel.ko or kvm_amd.ko modules loaded)?
 
-We are somewhat limited by the ABI of the released kernel versions, and
-it's unlikely that the structure will change in the short term.  So I
-think it's okay if we just define that the first 4K of data are the VMCS
-and the second 8K are the shadow VMCS, whenever format=3D0 in the
-kvm_nested_state struct.
+-- =
 
-Paolo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1734810
 
-> Then, in QEMU, each such well-defined blob/struct should have it=E2=80=99=
-s own subsection with a relevant .needed() method.
-> This will allow us to preserve required backwards compatibility.
->=20
-> Agreed?
->=20
-> -Liran
->=20
+Title:
+  Windows guest virtual PC running abnormally slow
+
+Status in Boxes:
+  New
+Status in KVM:
+  New
+Status in libvirt:
+  New
+Status in QEMU:
+  Invalid
+Status in spice related packages:
+  Confirmed
+Status in gnome-boxes package in Ubuntu:
+  Confirmed
+
+Bug description:
+  Guest systems running Windows 10 in a virtualized environment run
+  unacceptably slow, with no option in Boxes to offer the virtual
+  machine more (or less) cores from my physical CPU.
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 17.10
+  Package: gnome-boxes 3.26.1-1
+  ProcVersionSignature: Ubuntu 4.13.0-17.20-lowlatency 4.13.8
+  Uname: Linux 4.13.0-17-lowlatency x86_64
+  ApportVersion: 2.20.7-0ubuntu3.5
+  Architecture: amd64
+  CurrentDesktop: ubuntu:GNOME
+  Date: Tue Nov 28 00:37:11 2017
+  ProcEnviron:
+   TERM=3Dxterm-256color
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  SourcePackage: gnome-boxes
+  UpgradeStatus: No upgrade log present (probably fresh install)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/gnome-boxes/+bug/1734810/+subscriptions
