@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gKjYJ-0005ep-P5
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:36:55 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gKjaV-0007cs-SS
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:39:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gKjYI-0008Gu-Dq
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:36:51 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 8 Nov 2018 12:36:32 +0000
-Message-ID: <0b21e367-3b44-dc16-d0ab-024974246a1a@virtuozzo.com>
-References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
-	<20180807174311.32454-4-vsementsov@virtuozzo.com>
-	<6e19aaeb-8acc-beb9-5ece-9ae6101637a9@redhat.com>
-	<9aa2ee7b-2dcb-be00-5501-c616f5c5fda0@virtuozzo.com>
-	<20181107181631.GC4721@linux.fritz.box>
-	<df8e5a97-c79c-c8c2-6dd4-7373239d6601@virtuozzo.com>
-	<20181108103334.GB6006@linux.fritz.box>
-In-Reply-To: <20181108103334.GB6006@linux.fritz.box>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AA67F5DD17C2C442858512400DF9389A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <cohuck@redhat.com>) id 1gKjaR-0001Ft-Iq
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 07:39:07 -0500
+Date: Thu, 8 Nov 2018 13:38:50 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181108133850.4a2de972.cohuck@redhat.com>
+In-Reply-To: <20181105102044.20547-4-david@redhat.com>
+References: <20181105102044.20547-1-david@redhat.com>
+	<20181105102044.20547-4-david@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: split out reading normal
- clusters from qcow2_co_preadv
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/10] s390x/pci: rename hotplug handler
+ callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +24,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Denis Lunev <den@virtuozzo.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr .
+	David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-MDguMTEuMjAxOCAxMzozMywgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMDguMTEuMjAxOCB1bSAx
-MTowMiBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDA3
-LjExLjIwMTggMjE6MTYsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gKEJyb2tlbiBxdW90aW5nIGlu
-IHRleHQvcGxhaW4gYWdhaW4pDQo+Pj4NCj4+PiBBbSAwMS4xMS4yMDE4IHVtIDEzOjE3IGhhdCBW
-bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IGdlc2NocmllYmVuOg0KPj4+PiAyNy4wOS4yMDE4
-IDIwOjM1LCBNYXggUmVpdHogd3JvdGU6DQo+Pj4+DQo+Pj4+ICAgICAgIE9uIDA3LjA4LjE4IDE5
-OjQzLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4+Pg0KPj4+PiAgICAg
-ICAgICAgTWVtb3J5IGFsbG9jYXRpb24gbWF5IGJlY29tZSBsZXNzIGVmZmljaWVudCBmb3IgZW5j
-cnlwdGVkIGNhc2UuIEl0J3MgYQ0KPj4+PiAgICAgICAgICAgcGF5bWVudCBmb3IgZnVydGhlciBh
-c3luY2hyb25vdXMgc2NoZW1lLg0KPj4+Pg0KPj4+PiAgICAgICAgICAgU2lnbmVkLW9mZi1ieTog
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0K
-Pj4+PiAgICAgICAgICAgLS0tDQo+Pj4+ICAgICAgICAgICAgYmxvY2svcWNvdzIuYyB8IDExNCAr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-DQo+Pj4+ICAgICAgICAgICAgMSBmaWxlIGNoYW5nZWQsIDY0IGluc2VydGlvbnMoKyksIDUwIGRl
-bGV0aW9ucygtKQ0KPj4+Pg0KPj4+PiAgICAgICAgICAgZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cy
-LmMgYi9ibG9jay9xY293Mi5jDQo+Pj4+ICAgICAgICAgICBpbmRleCA2NWUzY2EwMGUyLi41ZTdm
-MmVlMzE4IDEwMDY0NA0KPj4+PiAgICAgICAgICAgLS0tIGEvYmxvY2svcWNvdzIuYw0KPj4+PiAg
-ICAgICAgICAgKysrIGIvYmxvY2svcWNvdzIuYw0KPj4+PiAgICAgICAgICAgQEAgLTE4MDgsNiAr
-MTgwOCw2NyBAQCBvdXQ6DQo+Pj4+ICAgICAgICAgICAgICAgIHJldHVybiByZXQ7DQo+Pj4+ICAg
-ICAgICAgICAgfQ0KPj4+Pg0KPj4+PiAgICAgICAgICAgK3N0YXRpYyBjb3JvdXRpbmVfZm4gaW50
-IHFjb3cyX2NvX3ByZWFkdl9ub3JtYWwoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+Pj4+ICAgICAg
-ICAgICArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50
-NjRfdCBmaWxlX2NsdXN0ZXJfb2Zmc2V0LA0KPj4+PiAgICAgICAgICAgKyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3Qgb2Zmc2V0LA0KPj4+PiAg
-ICAgICAgICAgKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-dWludDY0X3QgYnl0ZXMsDQo+Pj4+ICAgICAgICAgICArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBRRU1VSU9WZWN0b3IgKnFpb3YsDQo+Pj4+ICAgICAgICAg
-ICArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50NjRf
-dCBxaW92X29mZnNldCkNCj4+Pj4gICAgICAgICAgICt7DQo+Pj4+ICAgICAgICAgICArICAgIGlu
-dCByZXQ7DQo+Pj4+ICAgICAgICAgICArICAgIEJEUlZRY293MlN0YXRlICpzID0gYnMtPm9wYXF1
-ZTsNCj4+Pj4gICAgICAgICAgICsgICAgdm9pZCAqY3J5cHRfYnVmID0gTlVMTDsNCj4+Pj4gICAg
-ICAgICAgICsgICAgUUVNVUlPVmVjdG9yIGhkX3Fpb3Y7DQo+Pj4+ICAgICAgICAgICArICAgIGlu
-dCBvZmZzZXRfaW5fY2x1c3RlciA9IG9mZnNldF9pbnRvX2NsdXN0ZXIocywgb2Zmc2V0KTsNCj4+
-Pj4gICAgICAgICAgICsNCj4+Pj4gICAgICAgICAgICsgICAgaWYgKChmaWxlX2NsdXN0ZXJfb2Zm
-c2V0ICYgNTExKSAhPSAwKSB7DQo+Pj4+ICAgICAgICAgICArICAgICAgICByZXR1cm4gLUVJTzsN
-Cj4+Pj4gICAgICAgICAgICsgICAgfQ0KPj4+PiAgICAgICAgICAgKw0KPj4+PiAgICAgICAgICAg
-KyAgICBxZW11X2lvdmVjX2luaXQoJmhkX3Fpb3YsIHFpb3YtPm5pb3YpOw0KPj4+Pg0KPj4+PiAg
-ICAgICBTbyB5b3UncmUgbm90IGp1c3QgcmUtYWxsb2NhdGluZyB0aGUgYm91bmNlIGJ1ZmZlciBm
-b3IgZXZlcnkgc2luZ2xlDQo+Pj4+ICAgICAgIGNhbGwsIGJ1dCBhbHNvIHRoaXMgSS9PIHZlY3Rv
-ci4gIEhtLg0KPj4+IEFuZCB0aGlzIG9uZSBpcyBhY3R1YWxseSBhdCBsZWFzdCBhIGxpdHRsZSBt
-b3JlIHNlcmlvdXMsIEkgdGhpbmsuDQo+Pj4NCj4+PiBEZWNyeXB0aW9uIGFuZCBkZWNvbXByZXNz
-aW9uIChpbmNsdWRpbmcgY29weWluZyBiZXR3ZWVuIHRoZSBvcmlnaW5hbA0KPj4+IHFpb3YgYW5k
-IHRoZSBib3VuY2UgYnVmZmVyKSBhcmUgYWxyZWFkeSB2ZXJ5IHNsb3csIHNvIGFsbG9jYXRpbmcg
-YQ0KPj4+IGJvdW5jZSBidWZmZXIgb3Igbm90IHNob3VsZG4ndCBtYWtlIGFueSBub3RpY2FibGUg
-ZGlmZmVyZW5jZS4NCj4+Pg0KPj4+IEJ1dCBJJ2QgbGlrZSB0byBrZWVwIGFsbG9jYXRpb25zIG91
-dCBvZiB0aGUgZmFzdCBwYXRoIGFzIG11Y2ggYXMgd2UgY2FuLg0KPj4+DQo+Pj4+ICAgICAgICAg
-ICArICAgIGlmIChicy0+ZW5jcnlwdGVkKSB7DQo+Pj4+ICAgICAgICAgICArICAgICAgICBhc3Nl
-cnQocy0+Y3J5cHRvKTsNCj4+Pj4gICAgICAgICAgICsgICAgICAgIGFzc2VydChieXRlcyA8PSBR
-Q09XX01BWF9DUllQVF9DTFVTVEVSUyAqIHMtPmNsdXN0ZXJfc2l6ZSk7DQo+Pj4+ICAgICAgICAg
-ICArDQo+Pj4+ICAgICAgICAgICArICAgICAgICBjcnlwdF9idWYgPSBxZW11X3RyeV9ibG9ja2Fs
-aWduKGJzLT5maWxlLT5icywgYnl0ZXMpOw0KPj4+Pg0KPj4+PiAgICAgICAxLiBXaHkgZGlkIHlv
-dSByZW1vdmUgdGhlIGNvbW1lbnQ/DQo+Pj4+DQo+Pj4+ICAgICAgIDIuIFRoZSBjaGVjayBmb3Ig
-d2hldGhlciBjcnlwdF9idWYgd2FzIHN1Y2Nlc3NmdWxseSBhbGxvY2F0ZWQgaXMgbWlzc2luZy4N
-Cj4+Pj4NCj4+Pj4gICAgICAgMy4gRG8geW91IGhhdmUgYW55IGJlbmNobWFya3MgZm9yIGVuY3J5
-cHRlZCBpbWFnZXM/ICBIYXZpbmcgdG8gYWxsb2NhdGUNCj4+Pj4gICAgICAgdGhlIGJvdW5jZSBi
-dWZmZXIgZm9yIHBvdGVudGlhbGx5IGV2ZXJ5IHNpbmdsZSBjbHVzdGVyIHNvdW5kcyByYXRoZXIg
-YmFkDQo+Pj4+ICAgICAgIHRvIG1lLg0KPj4+IEFjdHVhbGx5LCBiZW5jaG1hcmtzIGZvciBub3Jt
-YWwsIGZ1bGx5IGFsbG9jYXRlZCBpbWFnZXMgd291bGQgYmUgYQ0KPj4+IGxpdHRsZSBtb3JlIGlu
-dGVyZXN0aW5nLiBUaG91Z2ggSSdtIG5vdCBzdXJlIGlmIHFjb3cyIGFjdHVhbGx5IHBlcmZvcm1z
-DQo+Pj4gd2VsbCBlbm91Z2ggdGhhdCB3ZSdsbCBzZWUgYW55IGRpZmZlcmVuY2UgZXZlbiB0aGVy
-ZSAod2hlbiB3ZSBtZWFzdXJlZA0KPj4+IG1lbW9yeSBhbGxvY2F0aW9uIG92ZXJoZWFkIGV0Yy4g
-Zm9yIHJhdyBpbWFnZXMgaW4gdGhlIGNvbnRleHQgb2YNCj4+PiBjb21wYXJpbmcgY29yb3V0aW5l
-cyB0byBBSU8gY2FsbGJhY2sgc3R5ZXMsIHRoZSBkaWZmZXJlbmNlIHdhcyBhbHJlYWR5DQo+Pj4g
-aGFyZCB0byBzZWUpLg0KPj4NCj4+IE9rLCBJJ2xsIGJlbmNobWFyayBpdCBhbmQvb3IgaW1wcm92
-ZSBmYXN0IHBhdGggKHlvdSBtZWFuIGNvZGUgcGF0aCwNCj4+IHdoZXJlIHdlIHNraXAgY29yb3V0
-aW5lcyBjcmVhdGlvbiwgdG8gaGFuZGxlIHRoZSB3aG9sZSByZXF1ZXN0IGF0IG9uY2UsDQo+PiB5
-ZXM/KS4NCj4gDQo+IEkgaGFkIGxlc3MgdGhlIHNwZWNpZmljIGNvZGUgcGF0aCBpbiBtaW5kLCBi
-dXQgdGhlIGNhc2Ugb2YgcmVhZGluZw0KPiB1bmFsbG9jYXRlZCBjbHVzdGVycyBvciByZWFkaW5n
-L3dyaXRpbmcgYW4gYWxyZWFkeSBhbGxvY2F0ZWQgYXJlYSBvZg0KPiBub3JtYWwgb3IgemVybyBj
-bHVzdGVycyAobm8gY29tcHJlc3Npb24sIG5vIGVuY3JweXRpb24sIG5vIG90aGVyIGZhbmN5DQo+
-IHN0dWZmKS4gVGhlc2UgYXJlIHRoZSBjYXNlcyB0aGF0IHFjb3cyIGltYWdlcyB3aWxsIGhpdCB0
-aGUgbW9zdCBpbg0KPiBwcmFjdGljZS4NCg0KVGhlcmUgYXJlIGFscmVhZHkgc29tZSBiZW5jaG1h
-cmtzIGluIHRoZSB0aHJlYWQgc3RhcnRlZCBmcm9tIHRoZSBjb3ZlciANCmxldHRlciBvZiB0aGUg
-c2VyaWVzLg0KDQo+IA0KPj4gSG1tLCBhbGwgdGhpcyBzdGFmZiB3aXRoIGhkX3Fpb3YncyBpbiBt
-YW55IHBsYWNlcyBpcyBkdWUgdG8gd2UgZG9uJ3QNCj4+IGhhdmUgcWlvdl9vZmZzZXQgcGFyYW1l
-dGVyIGluIC5iZHJ2X2NvX3ByZWFkdi4uIElzIGl0IGEgYmFkIGlkZWEgdG8NCj4+IGFkZCBpdD8N
-Cj4gDQo+IEkgYWN0dWFsbHkgdGhvdWdodCB0aGUgc2FtZSB5ZXN0ZXJkYXksIHRob3VnaCBJJ20g
-bm90IGNvbXBsZXRlbHkgc3VyZQ0KPiB5ZXQgYWJvdXQgaXQuIEl0IG1ha2VzIHRoZSBpbnRlcmZh
-Y2VzIGEgYml0IHVnbGllciwgYnV0IGl0IGNvdWxkIGluZGVlZA0KPiBzYXZlIHVzIHNvbWUgd29y
-ayBpbiB0aGUgSS9PIHBhdGgsIHNvIHVubGVzcyB3ZSBmaW5kIGJpZ2dlciByZWFzb25zDQo+IGFn
-YWluc3QgaXQsIG1heWJlIHdlIHNob3VsZCBkbyB0aGF0Lg0KPiANCj4+IEFueXdheSwgSSBub3cg
-dGhpbmssIGl0J3MgYmV0dGVyIHRvIHN0YXJ0IHdpdGggZGVjb21wcmVzcy10aHJlYWRzDQo+PiBz
-ZXJpZXMsIGFzIGNvbXByZXNzLXRocmVhZHMgYXJlIGFscmVhZHkgbWVyZ2VkLCB0aGVuIGJyaW5n
-IGVuY3J5cHRpb24gdG8NCj4+IHRocmVhZHMgdG9vLCBhbmQgdGhlbiByZXR1cm4gdG8gdGhlc2Ug
-c2VyaWVzLiBUaGlzIHdheSB3aWxsIHJlbW92ZSBzb21lDQo+PiBxdWVzdGlvbnMgYWJvdXQgYWxs
-b2NhdGlvbiwgYW5kIG1heSBiZSBpdCB3b3VsZCBiZSBzaW1wbGVyIGFuZCBtb3JlDQo+PiBjb25z
-aXN0ZW50IHRvIGJyaW5nIG1vcmUgdGhpbmdzIHRvIGNvcm91dGluZXMsIG5vdCBvbmx5IG5vcm1h
-bCBjbHVzdGVycy4NCj4gDQo+IE9rYXksIHdlIGNhbiBkbyB0aGF0Lg0KPiANCj4gS2V2aW4NCj4g
-DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Mon,  5 Nov 2018 11:20:37 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> The callbacks are also called for cold plugged devices. Drop the "hot"
+> to better match the actual callback names.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-pci-bus.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
+[I assume this series will go through the pci tree?]
