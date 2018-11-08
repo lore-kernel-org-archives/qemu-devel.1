@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gKnlp-0006hy-Cq
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:10 -0500
+	(envelope-from <bounces@canonical.com>) id 1gKnm0-0006nH-Qa
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gKnln-0004xK-Hn
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39708)
+	(envelope-from <bounces@canonical.com>) id 1gKnlu-00051X-Cr
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:13 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39964)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gKnln-0004uT-6V
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:03 -0500
+	id 1gKnls-0004yD-Sl
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 12:07:09 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gKnlj-0003Nd-4s
-	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 17:06:59 +0000
+	id 1gKnlo-0004Jo-5L
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 17:07:04 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5F1AA2E817B
-	for <qemu-devel@nongnu.org>; Thu,  8 Nov 2018 17:06:58 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id BEDB32E80CE
+	for <qemu-devel@nongnu.org>; Thu,  8 Nov 2018 17:07:03 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Nov 2018 16:44:02 -0000
+Date: Thu, 08 Nov 2018 16:50:50 -0000
 From: Thomas Huth <1734810@bugs.launchpad.net>
 Reply-To: Bug 1734810 <1734810@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <151184788907.20350.3674834740850334109.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154169544275.1849.14981850604716870126.malone@gac.canonical.com>
+Message-Id: <154169585102.24447.3807402176416309095.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1734810] Re: Windows guest virtual PC running
  abnormally slow
@@ -39,15 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Jeb, if you open a bug against QEMU here, we expect some information how
-QEMU is run. If you only interact with Gnome Boxes, then please only
-open a bug against Boxes - best in their Bug tracker here:
-https://bugzilla.gnome.org/ ... I guess nobody of the Boxes project is
-checking Launchpad, so reporting Boxes bugs here in Launchpad does not
-make much sense.
+And for the CLI parameters, you could run this in a console window for
+example, after starting your guest:
 
-** Changed in: qemu
-       Status: Confirmed =3D> Invalid
+ps aux | grep qemu
 
 -- =
 
