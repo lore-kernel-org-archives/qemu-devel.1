@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gKeMz-0002h1-Tt
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 02:04:50 -0500
+	(envelope-from <sw@weilnetz.de>) id 1gKfF2-0001TZ-RM
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 03:00:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gKeMy-0000Fo-Ui
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 02:04:49 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1541528230-31817-1-git-send-email-thuth@redhat.com>
-	<c0febf9a-f098-112d-9c8d-c320cc66b04a@redhat.com>
-	<12974ebb-09de-c6e9-1dd7-5199a8ae6b05@redhat.com>
-	<CAFEAcA-B74FQgj3COyGZ_SAAvSUA6=OaLdy5--NoAgHgEGZkpg@mail.gmail.com>
-	<87k1louaze.fsf@dusky.pond.sub.org>
-	<4b0e9b3f-5d88-9ef2-d0c5-f241067001d0@redhat.com>
-	<CAFEAcA_N7zeuMGGvUBC6xu-AK2gH0n+aNwJOkhs7yWFx_3DbsQ@mail.gmail.com>
-Date: Thu, 08 Nov 2018 08:04:25 +0100
-In-Reply-To: <CAFEAcA_N7zeuMGGvUBC6xu-AK2gH0n+aNwJOkhs7yWFx_3DbsQ@mail.gmail.com>
-	(Peter Maydell's message of "Wed, 7 Nov 2018 19:42:11 +0000")
-Message-ID: <87in18qccm.fsf@dusky.pond.sub.org>
+	(envelope-from <sw@weilnetz.de>) id 1gKfEv-00028L-E3
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 03:00:37 -0500
+Received: from mail.weilnetz.de ([37.120.169.71]:33978
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1gKfEu-0001lc-OA
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 03:00:33 -0500
+References: <1540498768-8736-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1540498768-8736-4-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <03cea7f3-cbb7-6e4d-3104-01aba47cde09@weilnetz.de>
+Date: Thu, 8 Nov 2018 09:00:02 +0100
 MIME-Version: 1.0
+In-Reply-To: <1540498768-8736-4-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add an entry for the 'collie'
- machine
+Subject: Re: [Qemu-devel] [PULL 3/3] target/mips: Add disassembler support
+ for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On 25.10.18 22:19, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>=20
+> Add disassembler support for nanoMIPS.
+>=20
+> Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
+> Signed-off-by: Matthew Fortune <matthew.fortune@mips.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  MAINTAINERS           |     2 +
+>  configure             |     3 +
+>  disas/Makefile.objs   |     1 +
+>  disas/nanomips.cpp    | 22242 ++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  disas/nanomips.h      |  1099 +++
+>  include/disas/bfd.h   |     1 +
+>  include/exec/poison.h |     1 +
+>  target/mips/cpu.c     |    13 +-
+>  8 files changed, 23360 insertions(+), 2 deletions(-)
+>  create mode 100644 disas/nanomips.cpp
+>  create mode 100644 disas/nanomips.h
 
-> On 7 November 2018 at 19:39, Thomas Huth <thuth@redhat.com> wrote:
->> On 2018-11-07 17:08, Markus Armbruster wrote:
->>> Peter Maydell <peter.maydell@linaro.org> writes:
->>>
->>>> On 6 November 2018 at 18:52, Thomas Huth <thuth@redhat.com> wrote:
->>>>> On 2018-11-06 19:49, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>>> On 6/11/18 19:17, Thomas Huth wrote:
->>>>>>> There is no active maintainer, but since Peter is picking up
->>>>>>> patches via qemu-arm@nongnu.org, I think we could at least use
->>>>>>> "Odd Fixes" as status here.
->>>>>>
->>>>>> This looks more as "Orphan" to me...
->>>>>
->>>>> I'll leave it up to Peter for the final decision...
->>>>
->>>> I think we're not very consistent[*] in our usage of the various
->>>> statuses in the MAINTAINERS file. I guess "Odd Fixes" makes
->>>> sense in that, well, if you send a patch to this
->>>> code and cc me I'll review it and put it in the tree. (This
->>>> is true of any of the arm boards we have.)
->>>>
->>>> [*] We have one thing tagged Orphan, which is bsd-user/,
->>>> and some things tagged Odd Fixes with no listed maintainer,
->>>> and some things tagged Odd Fixes which are in practice more
->>>> like Orphan (for instance sh4), and we list "fpu/" as
->>>> Odd Fixes despite having given it a pretty thorough
->>>> overhaul very recently, and so on...
->>>>
->>>> If you wanted a mechanizable rule, you could try something
->>>> like "every file which is in status Odd Fixes or better
->>>> must list with M: at least one named individual who has
->>>> submitted a pull request in the last nine months" :-)
->>>
->>> Sounds like an excellent idea to me!
->>
->> Well, for me "odd fixes" means that there is someone around who might
->> pick up the patch and throw it into a PULL request.
 
-That someone should be listed with M:.
+Hi,
 
->>                                                     "Orphan" means it's
->> mostly in vain to send patches for this subsystem, since there is nobody
->> going to pick up your patch. So for the ARM boards, I'd say that "odd
->> fixes" is a better choice, since Peter still picks up most of the
->> patches via the "L: qemu-arm@nongnu.org" (big thanks for this, by the wa=
-y!).
->
-> I think there should be a named person, though. A list
-> isn't a maintainer (at least not for the big whole
-> subsystem lists we have).
+the disassembler needs more work for the next QEMU release: it uses lots
+of wrong format strings which will result in wrong output at least on
+big endian hosts.
 
-Agree.
+This patch enables the compiler errors to see those bugs:
+
+diff --git a/disas/nanomips.cpp b/disas/nanomips.cpp
+index 1238c2ff33..62be5b6d00 100644
+--- a/disas/nanomips.cpp
++++ b/disas/nanomips.cpp
+@@ -138,7 +138,7 @@ namespace img
+         return a;
+     }
+
+-    std::string format(const char *format, ...)
++    std::string GCC_FMT_ATTR(1, 2) format(const char *format, ...)
+     {
+         char buffer[256];
+         va_list args;
+
+I also noticed that the code does not use POSIX data types but
+introduces its own integer types in disas/nanomips.h. This should be
+fixed, too, because it prevents the use of PRIu64 etc. in the format
+strings.
+
+Regards
+Stefan Weil
