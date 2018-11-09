@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gLBK0-0005V1-VV
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:15:57 -0500
+	(envelope-from <mst@redhat.com>) id 1gLBKv-0005xY-Hn
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:16:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gLBJz-0002MP-RC
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:15:56 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41879)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gLBJz-0002EE-BJ
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:15:55 -0500
-Received: by mail-ot1-x341.google.com with SMTP id u16so2122593otk.8
-	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 10:15:41 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1gLBKs-00033x-6S
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:16:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gLBKr-00033R-WE
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:16:50 -0500
+Date: Fri, 9 Nov 2018 13:16:38 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181109131622-mutt-send-email-mst@kernel.org>
+References: <20181108111531.30671-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181109173553.22341-2-peter.maydell@linaro.org>
-References: <20181109173553.22341-1-peter.maydell@linaro.org>
-	<20181109173553.22341-2-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 9 Nov 2018 18:15:20 +0000
-Message-ID: <CAFEAcA8pbw-D_9P3RYGMZbFXBFD6PzFNgrVLEb_RYQ11YuFdOQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/2] target/arm: Hyp mode R14 is
- shared with User and System
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181108111531.30671-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/8] Use 'https://' instead of 'git://'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Adam Lackorzynski <adam.lackorzynski@kernkonzept.com>, "patches@linaro.org" <patches@linaro.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Daniel Berrange <berrange@redhat.com>, eblake@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Jeff Cody <jcody@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>, cohuck@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On 9 November 2018 at 17:35, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Hyp mode is an exception to the general rule that each AArch32
-> mode has its own r13, r14 and SPSR -- it has a banked r13 and
-> SPSR but shares its r14 with User and System mode. We were
-> incorrectly implementing it as banked, which meant that on
-> entry to Hyp mode r14 was 0 rather than the USR/SYS r14.
->
-> We provide a new function r14_bank_number() which is like
-> the existing bank_number() but provides the index into
-> env->banked_r14[]; bank_number() provides the index to use
-> for env->banked_r13[] and env->banked_cpsr[].
->
-> All the points in the code that were using bank_number()
-> to index into env->banked_r14[] are updated for consintency:
->  * switch_mode() -- this is the only place where we fix
->    an actual bug
->  * aarch64_sync_32_to_64() and aarch64_sync_64_to_32():
->    no behavioural change as we already special-cased Hyp R14
->  * kvm32.c: no behavioural change since the guest can't ever
->    be in Hyp mode, but conceptually the right thing to do
->  * msr_banked()/mrs_banked(): we can never get to the case
->    that accesses banked_r14[] with tgtmode == ARM_CPU_MODE_HYP,
->    so no behavioural change
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/internals.h | 16 ++++++++++++++++
->  target/arm/helper.c    | 29 +++++++++++++++--------------
->  target/arm/kvm32.c     |  4 ++--
->  target/arm/op_helper.c |  2 +-
->  4 files changed, 34 insertions(+), 17 deletions(-)
+On Thu, Nov 08, 2018 at 11:15:23AM +0000, Stefan Hajnoczi wrote:
+> v4:
+>  * Once more, with feeling!  Fix 'https//' in get_maintainer.pl [Philippe]
+> v3:
+>  * Fix broken openhackware URL [Eric]
+>  * Convert a few remaining URLs [Eric]
+> v2:
+>  * Use HTTPS for repo.or.cz [Eric]
+> 
+> Jeff Cody has enabled git smart HTTP support on qemu.org.  From now on HTTPS is
+> the preferred protocol because it adds some protection against
+> man-in-the-middle when cloning a repo.
+> 
+> This patch series updates git:// URLs and changes them to https://.  The https:// URL format is:
+> 
+>   https://git.qemu.org/git/<project>.git
+> 
+> The old git:// URL format was:
+> 
+>   git://git.qemu.org/<project>.git
+> 
+> I have also updated git://github.com/ and repo.or.cz URLs because they offer HTTPS.
+> 
+> I have tested that submodules continue to work after the change to .gitmodules.
 
-Rats, this bit accidentally didn't make it into this patch:
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 2b62c53f5b5..eb6fb82fb81 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -725,7 +725,7 @@ uint32_t HELPER(mrs_banked)(CPUARMState *env,
-uint32_t tgtmode, uint32_t regno)
-     case 13:
-         return env->banked_r13[bank_number(tgtmode)];
-     case 14:
--        return env->banked_r14[bank_number(tgtmode)];
-+        return env->banked_r14[r14_bank_number(tgtmode)];
-     case 8 ... 12:
-         switch (tgtmode) {
-         case ARM_CPU_MODE_USR:
-
-
-(it's one of the "no behavioural change" bits).
-
-thanks
--- PMM
+> Stefan Hajnoczi (8):
+>   README: use 'https://' instead of 'git://'
+>   get_maintainer: use 'https://' instead of 'git://'
+>   MAINTAINERS: use 'https://' instead of 'git://' for GitHub
+>   gitmodules: use 'https://' instead of 'git://'
+>   git: use HTTPS git URLs for repo.or.cz
+>   pc-testdev: use HTTPS git URL
+>   target-alpha: use HTTPS git URL for palcode
+>   docker: use HTTPS git URL for virglrenderer
+> 
+>  MAINTAINERS                                  | 88 ++++++++++----------
+>  hw/misc/pc-testdev.c                         |  2 +-
+>  .gitmodules                                  | 34 ++++----
+>  README                                       |  4 +-
+>  pc-bios/README                               |  8 +-
+>  scripts/get_maintainer.pl                    |  2 +-
+>  tests/docker/dockerfiles/debian-amd64.docker |  2 +-
+>  7 files changed, 70 insertions(+), 70 deletions(-)
+> 
+> -- 
+> 2.19.1
