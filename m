@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gL5KR-0004X3-8c
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:52:00 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gL5wp-00029P-PN
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 07:31:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gL5KQ-00077Y-9G
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:51:59 -0500
-Received: from mga05.intel.com ([192.55.52.43]:56447)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
-	id 1gL5KP-00074h-V0
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:51:58 -0500
-From: Yu Zhang <yu.c.zhang@linux.intel.com>
-Date: Fri,  9 Nov 2018 19:49:47 +0800
-Message-Id: <1541764187-10732-4-git-send-email-yu.c.zhang@linux.intel.com>
-In-Reply-To: <1541764187-10732-1-git-send-email-yu.c.zhang@linux.intel.com>
-References: <1541764187-10732-1-git-send-email-yu.c.zhang@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v1 3/3] intel-iommu: search iotlb for levels
- supported by the address width.
+	(envelope-from <alex.bennee@linaro.org>) id 1gL5wa-0007a4-Np
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 07:31:34 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33932)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gL5wY-0007XF-0m
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 07:31:22 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f1-v6so3677336wmg.1
+	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 04:31:15 -0800 (PST)
+References: <20181108160115.20747-1-philmd@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181108160115.20747-1-philmd@redhat.com>
+Date: Fri, 09 Nov 2018 12:31:13 +0000
+Message-ID: <87k1lm5t66.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] travis: Split the OSX job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-This patch updates vtd_lookup_iotlb() to search cached mappings only
-for all page levels supported by address width of current vIOMMU. Also,
-to cover 57-bit width, the shift of source id(VTD_IOTLB_SID_SHIFT) and
-of page level(VTD_IOTLB_LVL_SHIFT) are enlarged by 9 - the stride of
-one paging structure level.
 
-Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
----
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com> 
-Cc: Richard Henderson <rth@twiddle.net> 
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>
----
- hw/i386/intel_iommu.c          | 5 +++--
- hw/i386/intel_iommu_internal.h | 7 ++-----
- 2 files changed, 5 insertions(+), 7 deletions(-)
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 9cdf755..ce7e17e 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -254,11 +254,12 @@ static uint64_t vtd_get_iotlb_gfn(hwaddr addr, uint32_t level)
- static VTDIOTLBEntry *vtd_lookup_iotlb(IntelIOMMUState *s, uint16_t source_id,
-                                        hwaddr addr)
- {
--    VTDIOTLBEntry *entry;
-+    VTDIOTLBEntry *entry = NULL;
-     uint64_t key;
-     int level;
-+    int max_level = (s->aw_bits - VTD_PAGE_SHIFT_4K) / VTD_SL_LEVEL_BITS;
- 
--    for (level = VTD_SL_PT_LEVEL; level < VTD_SL_PML4_LEVEL; level++) {
-+    for (level = VTD_SL_PT_LEVEL; level < max_level; level++) {
-         key = vtd_get_iotlb_key(vtd_get_iotlb_gfn(addr, level),
-                                 source_id, level);
-         entry = g_hash_table_lookup(s->iotlb, &key);
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index a7ef24b..bdf2b7c 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -114,8 +114,8 @@
-                                      VTD_INTERRUPT_ADDR_FIRST + 1)
- 
- /* The shift of source_id in the key of IOTLB hash table */
--#define VTD_IOTLB_SID_SHIFT         36
--#define VTD_IOTLB_LVL_SHIFT         52
-+#define VTD_IOTLB_SID_SHIFT         45
-+#define VTD_IOTLB_LVL_SHIFT         61
- #define VTD_IOTLB_MAX_SIZE          1024    /* Max size of the hash table */
- 
- /* IOTLB_REG */
-@@ -450,9 +450,6 @@ typedef struct VTDRootEntry VTDRootEntry;
- #define VTD_SL_LEVEL_BITS           9
- 
- /* Second Level Paging Structure */
--#define VTD_SL_PML4_LEVEL           4
--#define VTD_SL_PDP_LEVEL            3
--#define VTD_SL_PD_LEVEL             2
- #define VTD_SL_PT_LEVEL             1
- #define VTD_SL_PT_ENTRY_NR          512
- 
--- 
-1.9.1
+> The current OSX job often reach the 50min Travis-CI time limit.
+>
+> Split it in two jobs, which as of this commit took:
+> - system: ~39min
+> - user:    ~9min
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+I suggested a different split in:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01695.html
+
+Does a user build actually build anything we can run?
+
+> ---
+>  .travis.yml | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index aa49c7b114..827f2252b6 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -107,7 +107,11 @@ matrix:
+>      - env: CONFIG=3D"--disable-tcg"
+>             TEST_CMD=3D""
+>        compiler: gcc
+> -    - env: CONFIG=3D""
+> +    # OSX builds
+> +    - env: CONFIG=3D"--disable-user"
+> +      os: osx
+> +      compiler: clang
+> +    - env: CONFIG=3D"--disable-system --disable-tools --disable-docs --d=
+isable-guest-agent"
+>        os: osx
+>        compiler: clang
+>      # Python builds
+
+
+--
+Alex Benn=C3=A9e
