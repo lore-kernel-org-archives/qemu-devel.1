@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gL8Nz-0007QL-No
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:07:52 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gL8bC-0001CF-29
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gL8Nw-0007QX-R6
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:07:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gL8Nw-0006m5-Jz
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:07:48 -0500
-From: Cleber Rosa <crosa@redhat.com>
-Date: Fri,  9 Nov 2018 10:07:10 -0500
-Message-Id: <20181109150710.31085-5-crosa@redhat.com>
-In-Reply-To: <20181109150710.31085-1-crosa@redhat.com>
-References: <20181109150710.31085-1-crosa@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gL8b8-0002yI-Pw
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:21:29 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42773)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gL8b6-0002jU-V9
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:21:25 -0500
+Received: by mail-wr1-x444.google.com with SMTP id y15-v6so2283225wru.9
+	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 07:21:23 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri,  9 Nov 2018 15:21:14 +0000
+Message-Id: <20181109152119.9242-3-alex.bennee@linaro.org>
+In-Reply-To: <20181109152119.9242-1-alex.bennee@linaro.org>
+References: <20181109152119.9242-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 4/4] check-help: visual and content improvements
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 2/7] target/arm64: hold BQL when calling
+ do_interrupt()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +31,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Caio Carrara <ccarrara@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-The "check" target is not a target that will run all other tests
-listed, so in order to be accurate it's necessary to list those that
-will run.  The same is true for "check-clean".
+Fix the assertion failure when running interrupts.
 
-Then, to give a better visual impression of the differences in the
-various targets, let's add empty lines.
-
-Finally, a small (and hopeful) grammar fix from a non-native speaker.
-
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tests/Makefile.include | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ target/arm/kvm64.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c0a341c923..552faf9bbe 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -3,7 +3,8 @@
- check-help:
- 	@echo "Regression testing targets:"
- 	@echo
--	@echo " $(MAKE) check                Run all tests"
-+	@echo " $(MAKE) check                Run unit, qapi-schema, qtest and d=
-ecodetree"
-+	@echo
- 	@echo " $(MAKE) check-qtest-TARGET   Run qtest tests for given target"
- 	@echo " $(MAKE) check-qtest          Run qtest tests"
- 	@echo " $(MAKE) check-unit           Run qobject tests"
-@@ -12,12 +13,13 @@ check-help:
- 	@echo " $(MAKE) check-block          Run block tests"
- 	@echo " $(MAKE) check-tcg            Run TCG tests"
- 	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) te=
-sts"
-+	@echo
- 	@echo " $(MAKE) check-report.html    Generates an HTML test report"
- 	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
--	@echo " $(MAKE) check-clean          Clean the tests"
-+	@echo " $(MAKE) check-clean          Clean the tests and related data"
- 	@echo
- 	@echo "Please note that HTML reports do not regenerate if the unit test=
-s"
--	@echo "has not changed."
-+	@echo "have not changed."
- 	@echo
- 	@echo "The variable SPEED can be set to control the gtester speed setti=
-ng."
- 	@echo "Default options are -k and (for $(MAKE) V=3D1) --verbose; they c=
-an be"
---=20
-2.19.1
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 6351a54b28..c39150e5e1 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -1000,7 +1000,9 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
+     cs->exception_index = EXCP_BKPT;
+     env->exception.syndrome = debug_exit->hsr;
+     env->exception.vaddress = debug_exit->far;
++    qemu_mutex_lock_iothread();
+     cc->do_interrupt(cs);
++    qemu_mutex_unlock_iothread();
+ 
+     return false;
+ }
+-- 
+2.17.1
