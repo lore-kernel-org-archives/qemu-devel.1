@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gL7OD-00011o-LG
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:04:10 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gL7P9-00024o-JH
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:05:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gL7O9-0003u3-EW
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:04:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gL7O9-0003mo-5a
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:03:57 -0500
-Date: Fri, 9 Nov 2018 15:03:54 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181109140354.bgib5g5v62iafhks@sirius.home.kraxel.org>
-References: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
-	<20181109111731.vxdmqmkorblcnntx@sirius.home.kraxel.org>
-	<20181109112953.w4wtltwxpl4z2lpj@sirius.home.kraxel.org>
-	<1724064a-acdc-5571-4f54-f0ac021027d0@redhat.com>
-	<6e7304f6-b81a-982f-a94c-d8df4202a82e@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gL7P2-0005Pc-DX
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:04:57 -0500
+Resent-Message-Id: <E1gL7P2-0005Pc-DX@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21322)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gL7P0-0004wY-JW
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:04:50 -0500
+Message-ID: <154177126111.301.14584998508984713643@015909e0f939>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20181106110548.4209-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6e7304f6-b81a-982f-a94c-d8df4202a82e@redhat.com>
-Subject: [Qemu-devel] deprecating/removing bluetooth (was: Re: List of files
- containing devices which have not been QOMified)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 9 Nov 2018 05:47:43 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v4 00/16] gdbstub: support for the
+ multiprocess extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: luc.michel@greensocs.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, ehabkost@redhat.com, alistair@alistair23.me, mark.burton@greensocs.com, f4bug@amsat.org, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
 
-On Fri, Nov 09, 2018 at 02:16:53PM +0100, Paolo Bonzini wrote:
-> On 09/11/2018 13:39, Thomas Huth wrote:
-> > On 2018-11-09 12:29, Gerd Hoffmann wrote:
-> >>
-> >> Tried this after studying docs:
-> >>
-> >>   qemu -usb -device usb-bt-dongle -bt hci,vlan=0 -bt device:keyboard
-> >>
-> >> Segfaults right anway on first keypress.
-> >> I guess that qualifies as "broken and obviously unused".
-> > 
-> > Thanks for checking! I guess that means we could even get rid of it
-> > without deprecating it first if it is broken already for more than two
-> > releases...?
-> 
-> I think what others were using bluetooth passthrough.  But it's
-> certainly possible that it's broken.
-
-That code is in bt-*.c (toplevel dir).  Likewise no actual code changes
-since ages.  Comes in two variants, host + vhci.  vhci commit says:
-
-    commit ab2b6f507ded382df734fe6a237ec56e2f421de4
-    Author: balrog <balrog@c046a42c-6fe2-441c-8c8c-71466251a162>
-    Date:   Mon Sep 29 00:31:41 2008 +0000
-
-        Use VHCI to allow the host os to participate in a qemu bluetooth "vlan".
-    
-        This does the reverse of bt-host.c, proxying from guest to host.
-        Appears to be more reliable.
-
-Hmm.  Not much of a clue.  Also ten years old.
-
-There is also a null hci, not connecting to anything.  Probably useful as
-dummy when your board has bluetooth (see arm/nseries) but you don't want
-hook up any bluetooth devices.
-
-Anyone has used bluetooth passthrough and can report what the state is?
-
-I guess the keyboard can be dropped right away no matter what.
-
-cheers,
-  Gerd
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgxMTA2MTEwNTQ4LjQyMDktMS1sdWMubWljaGVsQGdyZWVuc29jcy5jb20K
+U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwMC8xNl0gZ2Ric3R1Yjogc3VwcG9ydCBm
+b3IgdGhlIG11bHRpcHJvY2VzcyBleHRlbnNpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
+RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
+JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
+ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
+IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
+dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
+ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
+TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZmIzMThmZWMyNCBhcm0veGxueC16eW5x
+bXA6IHB1dCBBUFVzIGFuZCBSUFVzIGluIHNlcGFyYXRlIENQVSBjbHVzdGVycwpjNWE2MmMxNmRm
+IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3MgZXh0ZW5zaW9uIHN1cHBvcnQKMjg5YjE0NDI0ZCBn
+ZGJzdHViOiBnZGJfc2V0X3N0b3BfY3B1OiBpZ25vcmUgcmVxdWVzdCB3aGVuIHByb2Nlc3MgaXMg
+bm90IGF0dGFjaGVkCjliODMyZDdmMmIgZ2Ric3R1YjogcHJvY2Vzc2VzIGluaXRpYWxpemF0aW9u
+IG9uIG5ldyBwZWVyIGNvbm5lY3Rpb24KNDQ2NzdlYjM1ZCBnZGJzdHViOiBhZGQgc3VwcG9ydCBm
+b3IgdkF0dGFjaCBwYWNrZXRzCmQ2MDExYjliNDYgZ2Ric3R1YjogYWRkIHN1cHBvcnQgZm9yIGV4
+dGVuZGVkIG1vZGUgcGFja2V0CmZjZDAxMjM1MjUgZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBz
+dXBwb3J0IHRvICdEJyBwYWNrZXRzCjBlYjJjY2NhMTMgZ2Ric3R1YjogYWRkIG11bHRpcHJvY2Vz
+cyBzdXBwb3J0IHRvIGdkYl92bV9zdGF0ZV9jaGFuZ2UoKQoyMTY4ZWVkZDIwIGdkYnN0dWI6IGFk
+ZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byBYZmVyOmZlYXR1cmVzOnJlYWQ6CjIyYTBlYTk3ZjIg
+Z2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBzdXBwb3J0IHRvIChmfHMpVGhyZWFkSW5mbyBhbmQg
+VGhyZWFkRXh0cmFJbmZvCjc0YzBiZmIxM2QgZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBzdXBw
+b3J0IHRvICdzQycgcGFja2V0cwpjNmM0YTA4NzE0IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mg
+c3VwcG9ydCB0byB2Q29udCBwYWNrZXRzCjUxOThkYTUzNmYgZ2Ric3R1YjogYWRkIG11bHRpcHJv
+Y2VzcyBzdXBwb3J0IHRvICdIJyBhbmQgJ1QnIHBhY2tldHMKNDhkNDMwYWViMSBnZGJzdHViOiBh
+ZGQgbXVsdGlwcm9jZXNzIHN1cHBvcnQgdG8gJz8nIHBhY2tldHMKZGYzOTRiODQxMiBnZGJzdHVi
+OiBpbnRyb2R1Y2UgR0RCIHByb2Nlc3NlcwpkYWViNjY2ODcxIGh3L2NwdTogaW50cm9kdWNlIENQ
+VSBjbHVzdGVycwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xNjogaHcv
+Y3B1OiBpbnRyb2R1Y2UgQ1BVIGNsdXN0ZXJzLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzMxOiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBzdGF0aWNzIHRvIDAg
+b3IgTlVMTAojNjM6IEZJTEU6IGh3L2NwdS9jbHVzdGVyLmM6Mjg6CisgICAgc3RhdGljIHVpbnQ2
+NF90IGNsdXN0ZXJfaWRfYXV0b19pbmNyZW1lbnQgPSAwOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdh
+cm5pbmdzLCAxMDIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8xNjogZ2Ric3R1YjogaW50cm9kdWNlIEdEQiBwcm9j
+ZXNzZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xNjogZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBz
+dXBwb3J0IHRvICc/JyBwYWNrZXRzLi4uCkNoZWNraW5nIFBBVENIIDQvMTY6IGdkYnN0dWI6IGFk
+ZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byAnSCcgYW5kICdUJyBwYWNrZXRzLi4uCkNoZWNraW5n
+IFBBVENIIDUvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byB2Q29udCBw
+YWNrZXRzLi4uCkNoZWNraW5nIFBBVENIIDYvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mg
+c3VwcG9ydCB0byAnc0MnIHBhY2tldHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xNjogZ2Ric3R1Yjog
+YWRkIG11bHRpcHJvY2VzcyBzdXBwb3J0IHRvIChmfHMpVGhyZWFkSW5mbyBhbmQgVGhyZWFkRXh0
+cmFJbmZvLi4uCkNoZWNraW5nIFBBVENIIDgvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mg
+c3VwcG9ydCB0byBYZmVyOmZlYXR1cmVzOnJlYWQ6Li4uCkNoZWNraW5nIFBBVENIIDkvMTY6IGdk
+YnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mgc3VwcG9ydCB0byBnZGJfdm1fc3RhdGVfY2hhbmdlKCku
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTY6IGdkYnN0dWI6IGFkZCBtdWx0aXByb2Nlc3Mgc3VwcG9y
+dCB0byAnRCcgcGFja2V0cy4uLgpDaGVja2luZyBQQVRDSCAxMS8xNjogZ2Ric3R1YjogYWRkIHN1
+cHBvcnQgZm9yIGV4dGVuZGVkIG1vZGUgcGFja2V0Li4uCkNoZWNraW5nIFBBVENIIDEyLzE2OiBn
+ZGJzdHViOiBhZGQgc3VwcG9ydCBmb3IgdkF0dGFjaCBwYWNrZXRzLi4uCkNoZWNraW5nIFBBVENI
+IDEzLzE2OiBnZGJzdHViOiBwcm9jZXNzZXMgaW5pdGlhbGl6YXRpb24gb24gbmV3IHBlZXIgY29u
+bmVjdGlvbi4uLgpDaGVja2luZyBQQVRDSCAxNC8xNjogZ2Ric3R1YjogZ2RiX3NldF9zdG9wX2Nw
+dTogaWdub3JlIHJlcXVlc3Qgd2hlbiBwcm9jZXNzIGlzIG5vdCBhdHRhY2hlZC4uLgpDaGVja2lu
+ZyBQQVRDSCAxNS8xNjogZ2Ric3R1YjogYWRkIG11bHRpcHJvY2VzcyBleHRlbnNpb24gc3VwcG9y
+dC4uLgpDaGVja2luZyBQQVRDSCAxNi8xNjogYXJtL3hsbngtenlucW1wOiBwdXQgQVBVcyBhbmQg
+UlBVcyBpbiBzZXBhcmF0ZSBDUFUgY2x1c3RlcnMuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
+IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
