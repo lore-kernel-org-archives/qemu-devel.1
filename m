@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gL8bC-0001CS-5r
+	(envelope-from <alex.bennee@linaro.org>) id 1gL8bC-0001CK-3u
 	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gL8bA-00030Q-Fm
+	(envelope-from <alex.bennee@linaro.org>) id 1gL8b8-0002y2-PD
 	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:21:29 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38703)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32810)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gL8bA-0002xU-2N
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:21:28 -0500
-Received: by mail-wr1-x442.google.com with SMTP id e3-v6so2298968wrs.5
-	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 07:21:26 -0800 (PST)
+	id 1gL8b6-0002Zo-V4
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:21:25 -0500
+Received: by mail-wr1-x441.google.com with SMTP id u9-v6so2313312wrr.0
+	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 07:21:22 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  9 Nov 2018 15:21:19 +0000
-Message-Id: <20181109152119.9242-8-alex.bennee@linaro.org>
+Date: Fri,  9 Nov 2018 15:21:13 +0000
+Message-Id: <20181109152119.9242-2-alex.bennee@linaro.org>
 In-Reply-To: <20181109152119.9242-1-alex.bennee@linaro.org>
 References: <20181109152119.9242-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 7/7] arm: fix aa64_generate_debug_exceptions
- to work with EL2
+Subject: [Qemu-devel] [PATCH v3 1/7] target/arm64: properly handle DBGVR
+ RESS bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +33,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-The test was incomplete and incorrectly caused debug exceptions to be
-generated when returning to EL2 after a failed attempt to single-step
-an EL1 instruction. Fix this while cleaning up the function a little.
+This only fails with some (broken) versions of gdb but we should
+treat the top bits of DBGBVR as RESS. Properly sign extend QEMU's
+reference copy of dbgbvr and also update the register descriptions in
+the comment.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 ---
+v2
+  - sanitise register on insertion
+  - update reference description
 v3
-  - further re-arrangement as suggested by rth
+  - fix bogus sextract64
 ---
- target/arm/cpu.h | 39 ++++++++++++++++++++++++---------------
- 1 file changed, 24 insertions(+), 15 deletions(-)
+ target/arm/kvm64.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 1efff21a18..814ff69bc2 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2764,23 +2764,35 @@ static inline bool arm_v7m_csselr_razwi(ARMCPU *cpu)
-     return (cpu->clidr & R_V7M_CLIDR_CTYPE_ALL_MASK) != 0;
- }
- 
-+/* See AArch64.GenerateDebugExceptionsFrom() in ARM ARM pseudocode */
- static inline bool aa64_generate_debug_exceptions(CPUARMState *env)
- {
--    if (arm_is_secure(env)) {
--        /* MDCR_EL3.SDD disables debug events from Secure state */
--        if (extract32(env->cp15.mdcr_el3, 16, 1) != 0
--            || arm_current_el(env) == 3) {
--            return false;
--        }
-+    int cur_el = arm_current_el(env);
-+    int debug_el;
-+
-+    if (cur_el == 3) {
-+        return false;
-     }
- 
--    if (arm_current_el(env) == arm_debug_target_el(env)) {
--        if ((extract32(env->cp15.mdscr_el1, 13, 1) == 0)
--            || (env->daif & PSTATE_D)) {
--            return false;
--        }
-+    /* MDCR_EL3.SDD disables debug events from Secure state */
-+    if (arm_is_secure_below_el3(env)
-+        && extract32(env->cp15.mdcr_el3, 16, 1)) {
-+        return false;
-     }
--    return true;
-+
-+    /*
-+     * Same EL to same EL debug exceptions need MDSCR_KDE enabled
-+     * while not masking the (D)ebug bit in DAIF.
-+     */
-+    debug_el = arm_debug_target_el(env);
-+
-+    if (cur_el == debug_el) {
-+        return extract32(env->cp15.mdscr_el1, 13, 1)
-+            && !(env->daif & PSTATE_D);
-+    }
-+
-+    /* Otherwise the debug target needs to be a higher EL */
-+    return debug_el > cur_el;
- }
- 
- static inline bool aa32_generate_debug_exceptions(CPUARMState *env)
-@@ -2833,9 +2845,6 @@ static inline bool aa32_generate_debug_exceptions(CPUARMState *env)
-  * since the pseudocode has it at all callsites except for the one in
-  * CheckSoftwareStep(), where it is elided because both branches would
-  * always return the same value.
-- *
-- * Parts of the pseudocode relating to EL2 and EL3 are omitted because we
-- * don't yet implement those exception levels or their associated trap bits.
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 5de8ff0ac5..6351a54b28 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -103,7 +103,7 @@ static void kvm_arm_init_debug(CPUState *cs)
+  * capable of fancier matching but that will require exposing that
+  * fanciness to GDB's interface
+  *
+- * D7.3.2 DBGBCR<n>_EL1, Debug Breakpoint Control Registers
++ * DBGBCR<n>_EL1, Debug Breakpoint Control Registers
+  *
+  *  31  24 23  20 19   16 15 14  13  12   9 8   5 4    3 2   1  0
+  * +------+------+-------+-----+----+------+-----+------+-----+---+
+@@ -115,12 +115,25 @@ static void kvm_arm_init_debug(CPUState *cs)
+  * SSC/HMC/PMC: Security, Higher and Priv access control (Table D-12)
+  * BAS: Byte Address Select (RES1 for AArch64)
+  * E: Enable bit
++ *
++ * DBGBVR<n>_EL1, Debug Breakpoint Value Registers
++ *
++ *  63  53 52       49 48       2  1 0
++ * +------+-----------+----------+-----+
++ * | RESS | VA[52:49] | VA[48:2] | 0 0 |
++ * +------+-----------+----------+-----+
++ *
++ * Depending on the addressing mode bits the top bits of the register
++ * are a sign extension of the highest applicable VA bit. Some
++ * versions of GDB don't do it correctly so we ensure they are correct
++ * here so future PC comparisons will work properly.
   */
- static inline bool arm_generate_debug_exceptions(CPUARMState *env)
++
+ static int insert_hw_breakpoint(target_ulong addr)
  {
+     HWBreakpoint brk = {
+         .bcr = 0x1,                             /* BCR E=1, enable */
+-        .bvr = addr
++        .bvr = sextract64(addr, 0, 53)
+     };
+ 
+     if (cur_hw_bps >= max_hw_bps) {
 -- 
 2.17.1
