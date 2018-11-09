@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gL6ls-0002iE-BO
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:24:25 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gL6uN-00017E-WA
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:33:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <noring@nocrew.org>) id 1gL6lo-0005o4-BF
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:24:24 -0500
-Received: from ste-pvt-msa2.bahnhof.se ([213.80.101.71]:12095)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <noring@nocrew.org>) id 1gL6ln-0005lQ-W8
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:24:20 -0500
-Date: Fri, 9 Nov 2018 14:24:11 +0100
-From: Fredrik Noring <noring@nocrew.org>
-Message-ID: <20181109132411.GA2303@sx9>
-References: <cover.1541616663.git.noring@nocrew.org>
-	<e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>
-	<BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<BN6PR2201MB1251F9977B0D4B901801275CC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	(envelope-from <tcminyard@gmail.com>) id 1gL6uK-0008T3-OL
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:33:11 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34954)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gL6uK-0008Rr-JM
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:33:08 -0500
+Received: by mail-oi1-x242.google.com with SMTP id v198-v6so1459698oif.2
+	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 05:33:08 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+Reply-To: minyard@acm.org
+References: <20181108141944.15769-1-minyard@acm.org>
+	<20181108232211.GB26872@umbus.fritz.box>
+From: Corey Minyard <minyard@acm.org>
+Message-ID: <8a03cead-db46-f4fb-1e57-30bec0802bc8@acm.org>
+Date: Fri, 9 Nov 2018 07:33:03 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <BN6PR2201MB1251F9977B0D4B901801275CC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism
- of special R5900 opcodes
+In-Reply-To: <20181108232211.GB26872@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+Subject: Re: [Qemu-devel] [PATCH 0/2] ipmi: Allow UUID to be set for a BMC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?utf-8?Q?J=C3=BCrgen?= Urban <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-Hi Aleksandar,
+On 11/8/18 5:22 PM, David Gibson wrote:
+> On Thu, Nov 08, 2018 at 08:19:42AM -0600, minyard@acm.org wrote:
+>> The code was using the qemu UUID for the BMC.  But that's really
+>> not a good method.  In general, you don't want the GUID to change
+>> when you migrate, and you want the GUID to be the same between
+>> invocations of qemu (if you have a GUID).
+> Hrm.  Generally the qemu UUID should remain the same across a
+> migration too, and I think that will be the case if using libvirt.
+> Maybe not if running qemu by hand and not specifying the uuid on the
+> command line.
+>
+> I don't really have an objection to allowing the BMC's id to be
+> explicitly controlled, but the rationale above seems a bit
+> disingenuous.
 
-> > The R5900 reports itself as MIPS III ...
-> 
-> This is very unclear. What do you mean by this? How does R5900 do that? I
-> can't find any trace of such intentions in R5900 docs.
 
-In QEMU, we have previously defined the R5900 as MIPS III by
+I'm not sure about migration.  I suppose it could be migrated, but I
+would consider the BMC part of the hardware that needs to be the
+same on both sides.  It's a fuzzy line, I suppose.  The qemu UUID
+is migrated, so I suppose that's not an issue.
 
-#define CPU_R5900 (CPU_MIPS3 | INSN_R5900)
+Controlling it explicitly is important for some testing I do, and might
+be for other people at some point in time, if you are trying to
+emulate something specific.  And when re-invoking qemu, you
+might want to keep it the same to avoid confusing software.
 
-by referring to the "Toshiba TX System RISC TX79 Core Architecture" manual
+The big question for you is the lack of a GUID if it's not supplied.
+With this change, the get GUID command will return a "command
+not supported" error if the GUID is not supplied.
 
-https://wiki.qemu.org/File:C790.pdf
+Thanks,
 
-It says in the introduction, for example, that
+-corey
 
-	3.1 Introduction
-
-	The C790 supports all MIPS III instructions with the exception of
-	64-bit multiply, 64-bit divide, Load Linked and Store Conditional
-	instructions. It also supports a limited number of MIPS IV
-	instructions and additional C790-specific instructions, such as
-	Multiply/Add instructions and multimedia instructions.
-
-The manual mentions MIPS III in several other places, and appendix A-1
-"CPU Instruction Set Details" describes the implemented MIPS III subset.
-
-> > ... and DMULT, DMULTU, DDIV and DDIVU
-> > are part of the MIPS III ISA. They are emulated in user mode to support
-> > generic MIPS III programs.
-> 
-> Pure MIPS III executables should not be a concern of the R5900 emulation,
-> but R5900 executables.
-
-Many Linux distributions rely on precompiled packages, and they are often
-made to work with a broad range of hardware. This is done in part by
-choosing a common denominator, such as MIPS III. Compatibility with other
-implementations means that the R5900 more easily can be part of the MIPS
-Linux ecosystem.
-
-In contrast, Gentoo Linux mainly builds its packages locally from source,
-often optimised for the hardware, such as the R5900. Even so, Gentoo does
-rely on a small set of precompiled "stage 3" packages for the installation,
-and so the argument above still applies.
-
-> Could you please provide a document that would justify inclusion of these
-> non-R5900 instruction in an R5900 emulation?
-
-Would you accept the TX79 manual mentioned above as such a document?
-
-Fredrik
+>> Plus, if you have multiple BMCs, they need to have different
+>> GUIDs or the host code cannot tell them apart.  I'm not sure
+>> anyone really uses multiple BMCs, but I do a lot of testing
+>> with that scenario.
+>>
+>> This change lets the user set the GUID on the command line, and
+>> if the GUID is not set return an error for the GUID fetch command.
+>> This maps better to how IPMI should work.
+>>
+>> This change relies on the UUID being set to all zeros to know that
+>> it is not set.  This is not optimal, perhaps, but an all zero
+>> UUID isn't valid (it's the Nil UUID), so it should be ok.
