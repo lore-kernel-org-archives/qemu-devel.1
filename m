@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gLCtz-00018g-17
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:57:11 -0500
+	(envelope-from <wainersm@redhat.com>) id 1gLCux-0004Vd-5t
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:58:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gLCtt-0000o0-UZ
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:57:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33052)
+	(envelope-from <wainersm@redhat.com>) id 1gLCus-0001O0-0o
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:58:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56024)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gLCtt-0000nK-Gg
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:57:05 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gLCur-0001NQ-Am
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:58:05 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 89C6E81E05
-	for <qemu-devel@nongnu.org>; Fri,  9 Nov 2018 19:57:04 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  9 Nov 2018 23:56:53 +0400
-Message-Id: <20181109195653.11867-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] RFC: net/socket: learn to talk with a unix
- dgram socket
+	by mx1.redhat.com (Postfix) with ESMTPS id 9AE0D30014D2
+	for <qemu-devel@nongnu.org>; Fri,  9 Nov 2018 19:58:04 +0000 (UTC)
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Date: Fri,  9 Nov 2018 14:58:00 -0500
+Message-Id: <20181109195800.19071-1-wainersm@redhat.com>
+Subject: [Qemu-devel] [PATCH] Acceptance test: add coverage tests for -smp
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,96 +29,242 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, rjones@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: crosa@redhat.com, philmd@redhat.com, ehabkost@redhat.com, ccarrara@redhat.com
 
--net socket has a fd argument, and may be passed pre-opened sockets.
+This adds tests for SMP option, by passing -smp with
+various combinations of cpus, cores, threads, and sockets
+values it checks that invalid topologies are not accepted
+as well as missing values are correctly calculated.
 
-TCP sockets use framing.
-UDP sockets have datagram boundaries.
-
-When given a unix dgram socket, it will be able to read from it, but
-will attempt to send on the dgram_dst, which is unset. The other end
-will not receive the data.
-
-Let's teach -net socket to recognize a UNIX DGRAM socket, and use the
-regular send() command (without dgram_dst).
-
-This makes running slirp out-of-process possible that
-way (python pseudo-code):
-
-a, b =3D socket.socketpair(socket.AF_UNIX, socket.SOCK_DGRAM)
-
-subprocess.Popen('qemu -net socket,fd=3D%d -net user' % a.fileno(), shell=
-=3DTrue)
-subprocess.Popen('qemu ... -net nic -net socket,fd=3D%d' % b.fileno(), sh=
-ell=3DTrue)
-
-(to make slirp a seperate project altogether, we would have to have
-some compatibility code and/or deprecate various options & HMP
-commands for dynamic port forwarding etc - but this looks like a
-reachable goal)
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 ---
- net/socket.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ tests/acceptance/smp_option_coverage.py | 218 ++++++++++++++++++++++++
+ 1 file changed, 218 insertions(+)
+ create mode 100644 tests/acceptance/smp_option_coverage.py
 
-diff --git a/net/socket.c b/net/socket.c
-index 7095eb749f..8a9c30892d 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -119,9 +119,13 @@ static ssize_t net_socket_receive_dgram(NetClientSta=
-te *nc, const uint8_t *buf,
-     ssize_t ret;
-=20
-     do {
--        ret =3D qemu_sendto(s->fd, buf, size, 0,
--                          (struct sockaddr *)&s->dgram_dst,
--                          sizeof(s->dgram_dst));
-+        if (s->dgram_dst.sin_family !=3D AF_UNIX) {
-+            ret =3D qemu_sendto(s->fd, buf, size, 0,
-+                              (struct sockaddr *)&s->dgram_dst,
-+                              sizeof(s->dgram_dst));
-+        } else {
-+            ret =3D send(s->fd, buf, size, 0);
-+        }
-     } while (ret =3D=3D -1 && errno =3D=3D EINTR);
-=20
-     if (ret =3D=3D -1 && errno =3D=3D EAGAIN) {
-@@ -322,6 +326,15 @@ static NetSocketState *net_socket_fd_init_dgram(NetC=
-lientState *peer,
-     int newfd;
-     NetClientState *nc;
-     NetSocketState *s;
-+    SocketAddress *sa;
-+    SocketAddressType sa_type;
+diff --git a/tests/acceptance/smp_option_coverage.py b/tests/acceptance/smp_option_coverage.py
+new file mode 100644
+index 0000000000..ab68d1a67d
+--- /dev/null
++++ b/tests/acceptance/smp_option_coverage.py
+@@ -0,0 +1,218 @@
++# QEMU -smp option coverage test.
++#
++# Copyright (c) 2018 Red Hat, Inc.
++#
++# Author:
++#  Wainer dos Santos Moschetta <wainersm@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
 +
-+    sa =3D socket_local_address(fd, errp);
-+    if (!sa) {
-+        return NULL;
-+    }
-+    sa_type =3D sa->type;
-+    qapi_free_SocketAddress(sa);
-=20
-     /* fd passed: multicast: "learn" dgram_dst address from bound addres=
-s and save it
-      * Because this may be "shared" socket from a "master" process, data=
-grams would be recv()
-@@ -365,8 +378,12 @@ static NetSocketState *net_socket_fd_init_dgram(NetC=
-lientState *peer,
-                  "socket: fd=3D%d (cloned mcast=3D%s:%d)",
-                  fd, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
-     } else {
-+        if (sa_type =3D=3D SOCKET_ADDRESS_TYPE_UNIX) {
-+            s->dgram_dst.sin_family =3D AF_UNIX;
-+        }
++from functools import reduce
++from avocado.utils.process import run
 +
-         snprintf(nc->info_str, sizeof(nc->info_str),
--                 "socket: fd=3D%d", fd);
-+                 "socket: fd=3D%d %s", fd, SocketAddressType_str(sa_type=
-));
-     }
-=20
-     return s;
---=20
-2.19.1.708.g4ede3d42df
++from avocado_qemu import Test
++
++
++class SmpOption(Test):
++    """
++    Launches QEMU with various cpus, cores, threads, sockets, and maxcpus
++    combination through -smp option, to check it does not accept invalid SMP
++    topologies as well as it is able to calculate correctly any missing values.
++
++    :avocado: enable
++    :avocado: tags=slow,coverage
++    """
++    def setUp(self):
++        super().setUp()
++        self.cores = self.params.get('cores', default=2)
++        self.threads = self.params.get('threads', default=2)
++        self.sockets = self.params.get('sockets', default=2)
++        self.cpus = self.params.get('cpus', default=8)
++
++    def get_smp_topology(self):
++        """
++        Returns a dict with the id of cores, threads and sockets.
++        """
++        res = self.vm.qmp('query-hotpluggable-cpus')['return']
++        cpus = [x['props'] for x in res]
++
++        return reduce(lambda x, y: {'core-id': x['core-id'].union([y['core-id']]),
++                                    'thread-id': x['thread-id'].union([y['thread-id']]),
++                                    'socket-id': x['socket-id'].union([y['socket-id']])},
++                      cpus, {'core-id': set(), 'thread-id': set(), 'socket-id': set()})
++
++    @staticmethod
++    def build_option(**kwargs):
++        """
++        Builds string for the -smp option.
++        Use cpus, cores, threads, sockets, maxcpus keys.
++        """
++        option_list = []
++        if kwargs.get('cpus', None) is not None:
++            option_list.append(str(kwargs.get('cpus')))
++        for key, val in kwargs.items():
++            if key == 'cpus':
++                continue
++            option_list.append('%s=%s' % (key, val))
++
++        return ",".join(option_list)
++
++    def launch_and_check(self, expect_cores=1, expect_threads=1,
++                         expect_sockets=1, **kwargs):
++        """
++        Launches VM and check its SMP topology was correctly set.
++        Use cpus, cores, threads, sockets, and maxcpus keys to specify the
++        topology.
++        """
++        option = self.build_option(**{key: val for key, val in kwargs.items()
++                                      if key in ['cpus', 'cores', 'threads',
++                                                 'sockets', 'maxcpus']})
++        self.vm.add_args('-smp', option)
++        self.vm.launch()
++        smp = self.get_smp_topology()
++        self.assertEqual(smp['core-id'], set(range(0, expect_cores)))
++        self.assertEqual(smp['thread-id'], set(range(0, expect_threads)))
++        self.assertEqual(smp['socket-id'], set(range(0, expect_sockets)))
++
++    def launch_and_check_fail(self, **kwargs):
++        """
++        Launches VM and check the process exits with expected error code, for
++        cases where the topology is expected not valid.
++        """
++        option = self.build_option(**kwargs)
++        res = run("%s -smp %s" % (self.qemu_bin, option), timeout=10,
++                  ignore_status=True)
++        self.assertNotEqual(res.exit_status, 0)
++
++    # Passing cpus and maxcpus only.
++    #
++
++    def test_cpus_eq_maxcpus(self):
++        self.launch_and_check(cpus=self.cpus,
++                              maxcpus=self.cpus,
++                              expect_sockets=self.cpus)
++
++    def test_cpus_lt_maxcpus(self):
++        maxcpus = self.cpus * 2
++        self.launch_and_check(cpus=self.cpus,
++                              maxcpus=maxcpus,
++                              expect_sockets=maxcpus)
++
++    def test_cpus_gt_maxcpus(self):
++        self.launch_and_check_fail(cpus=self.cpus,
++                                   maxcpus=self.cpus // 2)
++
++    # Passing a combination of cores, threads and sockets only.
++    #
++
++    def test_no_cores_no_threads_no_sockets(self):
++        self.launch_and_check(cpus=self.cpus,
++                              expect_sockets=self.cpus)
++
++    def test_no_cores_no_threads_sockets(self):
++        self.launch_and_check(sockets=self.sockets,
++                              expect_sockets=self.sockets)
++
++    def test_no_cores_threads_no_sockets(self):
++        self.launch_and_check(threads=self.threads,
++                              expect_threads=self.threads)
++
++    def test_no_cores_threads_sockets(self):
++        self.launch_and_check(threads=self.threads,
++                              sockets=self.sockets,
++                              expect_threads=self.threads,
++                              expect_sockets=self.sockets)
++
++    def test_cores_no_threads_no_sockets(self):
++        self.launch_and_check(cores=self.cores,
++                              expect_cores=self.cores)
++
++    def test_cores_no_threads_sockets(self):
++        self.launch_and_check(cores=self.cores,
++                              sockets=self.sockets,
++                              expect_cores=self.cores,
++                              expect_sockets=self.sockets)
++
++    def test_cores_threads_no_sockets(self):
++        self.launch_and_check(cores=self.cores,
++                              threads=self.threads,
++                              expect_cores=self.cores,
++                              expect_threads=self.threads)
++
++    def test_cores_threads_sockets(self):
++        self.launch_and_check(cores=self.cores,
++                              threads=self.threads,
++                              sockets=self.sockets,
++                              expect_cores=self.cores,
++                              expect_threads=self.threads,
++                              expect_sockets=self.sockets)
++
++    # Passing cpus always and a combination of cores, threads and sockets.
++    #
++
++    def test_cpus_no_cores_no_threads_sockets(self):
++        self.launch_and_check(cpus=self.cpus,
++                              sockets=self.sockets,
++                              expect_cores=self.cpus // self.sockets,
++                              expect_sockets=self.sockets)
++
++    def test_cpus_no_cores_threads_no_sockets(self):
++        self.launch_and_check(cpus=self.cpus,
++                              threads=self.threads,
++                              expect_threads=self.threads,
++                              expect_sockets=self.cpus // self.threads)
++
++    def test_cpus_no_cores_threads_sockets(self):
++        self.launch_and_check(cpus=self.cpus,
++                              threads=self.threads,
++                              sockets=self.sockets,
++                              expect_threads=self.threads,
++                              expect_sockets=self.sockets,
++                              expect_cores=self.cpus // (self.threads * self.sockets))
++
++    def test_cpus_cores_no_threads_no_sockets(self):
++        self.launch_and_check(cpus=self.cpus,
++                              cores=self.cores,
++                              expect_cores=self.cores,
++                              expect_sockets=self.cpus // self.cores)
++
++    def test_cpus_cores_no_threads_sockets(self):
++        self.launch_and_check(cpus=self.cpus,
++                              cores=self.cores,
++                              sockets=self.sockets,
++                              expect_cores=self.cores,
++                              expect_sockets=self.sockets,
++                              expect_threads=self.cpus // (self.cores * self.sockets))
++
++    def test_cpus_cores_threads_no_sockets(self):
++        self.launch_and_check(cpus=self.cpus,
++                              cores=self.cores,
++                              threads=self.threads,
++                              expect_cores=self.cores,
++                              expect_threads=self.threads,
++                              expect_sockets=self.cpus // (self.cores * self.threads))
++
++    def test_cpus_cores_threads_sockets(self):
++        self.launch_and_check(cpus=self.cores * self.threads * self.sockets,
++                              cores=self.cores,
++                              threads=self.threads,
++                              sockets=self.sockets,
++                              expect_cores=self.cores,
++                              expect_threads=self.threads,
++                              expect_sockets=self.sockets)
++
++    # Passing cpus less (or greater) than cores, threads and sockets.
++    #
++
++    def test_cpus_lt_cores_threads_sockets(self):
++        self.launch_and_check_fail(cpus=(self.cores * self.threads * self.sockets) // 2,
++                                   cores=self.cores,
++                                   threads=self.threads,
++                                   sockets=self.sockets,)
++
++    def test_cpus_gt_cores_threads_sockets(self):
++        self.launch_and_check_fail(cpus=self.cores * self.threads * self.sockets * 2,
++                                   cores=self.cores,
++                                   threads=self.threads,
++                                   sockets=self.sockets)
+-- 
+2.17.2
