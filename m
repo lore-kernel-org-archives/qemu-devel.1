@@ -1,15 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhijianx.li@intel.com>) id 1gL6d5-0006Qu-7l
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:15:20 -0500
+	(envelope-from <zhijianx.li@intel.com>) id 1gL74h-0007ew-Kx
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:43:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhijianx.li@intel.com>) id 1gL6d0-0004sG-Gk
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:15:19 -0500
-Received: from mga03.intel.com ([134.134.136.65]:44350)
+	(envelope-from <zhijianx.li@intel.com>) id 1gL74e-0003Tr-CZ
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:43:51 -0500
+Received: from mga11.intel.com ([192.55.52.93]:20644)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <zhijianx.li@intel.com>)
-	id 1gL6cw-0004i7-S6
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:15:12 -0500
+	id 1gL74d-0003LB-VW
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:43:48 -0500
 References: <1541674784-25936-1-git-send-email-lizhijian@cn.fujitsu.com>
 	<1541674784-25936-2-git-send-email-lizhijian@cn.fujitsu.com>
 	<CAFEAcA_47wyar3WNhuBmNPdr02RHx-wn_TeyFaajpjzvzG8j5Q@mail.gmail.com>
@@ -18,8 +18,8 @@ References: <1541674784-25936-1-git-send-email-lizhijian@cn.fujitsu.com>
 	<38905d35-29af-b522-1629-b13e98a47a42@intel.com>
 	<d30b404d-624e-0497-879a-2d5df2eb9f31@suse.com>
 From: Li Zhijian <zhijianx.li@intel.com>
-Message-ID: <01ae76b5-bc70-7859-91e3-7e60e3cca247@intel.com>
-Date: Fri, 9 Nov 2018 21:11:17 +0800
+Message-ID: <b7b608dc-1743-5e1f-3b88-94d784c4cab2@intel.com>
+Date: Fri, 9 Nov 2018 21:40:36 +0800
 MIME-Version: 1.0
 In-Reply-To: <d30b404d-624e-0497-879a-2d5df2eb9f31@suse.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -57,8 +57,19 @@ Just noticed that there is a field xloadflags at recent protocol
   628         - If 1, kernel/boot_params/cmdline/ramdisk can be above 4G.
   629
 
-maybe we can reuse this field and append a new Bit 5 XLF_INITRD_SIZE_4G or such
+maybe we can reuse this field and append a new Bit 5 XLF_INITRD_MAX_SIZE_4G and increase header version.
+For the old protocol version 2.12+, if  XLF_CAN_BE_LOADED_ABOVE_4G is set, we can also realize ~4GB initrd is allowed.
 
+bootloader side:
+if protocol >= 2.15
+    if XLF_INITRD_LOAD_BELOW_4G
+       support ~4G initrd
+    fi
+else if protocol >=2.12
+    if XLF_CAN_BE_LOADED_ABOVE_4G
+     support ~4G initrd
+    fi
+fi
 
 thanks
 Zhijian
