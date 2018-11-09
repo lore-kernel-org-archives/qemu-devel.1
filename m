@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gL9zQ-0008Az-Qp
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 11:50:37 -0500
+	(envelope-from <crosa@redhat.com>) id 1gLAFK-0003T8-HK
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:07:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gL9zL-0000Ev-7M
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 11:50:36 -0500
-Received: from eddie.linux-mips.org ([148.251.95.138]:54256
-	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gL9zK-0008Ms-Kb
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 11:50:31 -0500
-Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
-	with ESMTP id S23990875AbeKIQt3N-8bv (ORCPT
-	<rfc822;qemu-devel@nongnu.org>); Fri, 9 Nov 2018 17:49:29 +0100
-Date: Fri, 9 Nov 2018 16:49:29 +0000 (GMT)
-Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
-From: "Maciej W. Rozycki" <macro@linux-mips.org>
-In-Reply-To: <BN6PR2201MB1251A570A76178D7BD66B247C6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Message-ID: <alpine.LFD.2.21.1811091634470.27920@eddie.linux-mips.org>
-References: <cover.1541616663.git.noring@nocrew.org>
-	<e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>
-	<BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<BN6PR2201MB1251F9977B0D4B901801275CC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20181109132411.GA2303@sx9>
-	<BN6PR2201MB12512E2D06C8A6CD54BBEE8EC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>,
-	<20181109143529.GA10409@sx9>,
-	<BN6PR2201MB12513465BDF12670379AA72DC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<BN6PR2201MB1251A570A76178D7BD66B247C6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	(envelope-from <crosa@redhat.com>) id 1gLAFF-0005wC-WE
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:07:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43070)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gLAFF-0005vq-PA
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:06:57 -0500
+References: <20181109153002.597-1-crosa@redhat.com>
+	<20181109153002.597-2-crosa@redhat.com>
+	<CAFEAcA8-Av_d7A0GEQGfkdC90N41or=vni480k=4dO2daXkdZQ@mail.gmail.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <88024cb3-2248-fa6b-4bc9-2926a798b15c@redhat.com>
+Date: Fri, 9 Nov 2018 12:06:47 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism
- of special R5900 opcodes
+In-Reply-To: <CAFEAcA8-Av_d7A0GEQGfkdC90N41or=vni480k=4dO2daXkdZQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 1/2] tests/test-qht-par: test gets
+ stuck intermittently on OSX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,37 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: Fredrik Noring <noring@nocrew.org>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, G 3 <programmingkidx@gmail.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 
-On Fri, 9 Nov 2018, Aleksandar Markovic wrote:
 
-> > > I think that the best solution that you exclude DDIV, DDIVU, DMULT, DMULTU
-> > > in a separate patch - there is no document to support their inclusion.
-> >
-> > As Maciej noted, the 64-bit MIPS Linux psABI is indivisible, so how could
-> > your alternative possibly work?
+
+On 11/9/18 10:34 AM, Peter Maydell wrote:
+> On 9 November 2018 at 15:30, Cleber Rosa <crosa@redhat.com> wrote:
+>> To be fully honest, this may not be a OSX (alone) condition, but may
+>> be a situation that only happens with OSX on Travis-CI, were resources
+>> are quite limited.
+>>
+>> I have personal experience with tests that exercise parallelism or
+>> depend on timing to fail on Travis.  Because I'm not 100% certain that
+>> this is a situation that only happens with OSX on Travis-CI, and
+>> because I'm not certain that we should be skipping tests because
+>> they're running on Travis-CI, let's disable them on OSX as a whole.
 > 
-> Since we are rapidly approaching 3.1 release, we don't have time for 
-> prolonged discussions - so please provide the patch that removes 
-> emulation of these instructions that don't belong to R5900 set, and, if 
-> you find a justification document later on, they can be reintroduced in 
-> 3.1+ timeframe.
+> Does this test still get stuck in builds after a458774ad711bceabefb ?
+> That fixed an OSX-specific problem that caused hangs (notably
+> in test-bdrv-drain, but it could I guess also affect other tests).
+> 
 
- You know well enough that nobody was bothered over the years to actually 
-document the 64-bit MIPS Linux psABI (there is the 64-bit ELF document 
-from SGI, relevant for IRIX, which has been partially implemented by 
-Linux) and even when it comes to the 32-bit psABI the only document is 
-from SGI from mid 1990s, that has several errors and surely was not 
-written with Linux in mind (and FWIW not entirely with IRIX either).
+It didn't get stuck here:
 
- The psABI has been set by the architecture back in 1991 and what Linux 
-has implemented on top of that around 2001, along with common sense.  You 
-can't question what was done 17 years ago asking for a backing piece of 
-paper (possibly virtual).  You can put anything on paper and if it does 
-not match reality, then it is irrelevant.
+https://travis-ci.org/clebergnu/qemu/jobs/452663111
 
- If you question what I state, then ask the MIPS/Linux kernel developers 
-at the relevant mailing list, i.e. <linux-mips@linux-mips.org>.
+So I believe that was the common issue indeed.  Thanks for pointing that
+out.  Also, the other patch in this series also seems to be unnecessary now.
 
-  Maciej
+- Cleber.
+
+> thanks
+> -- PMM
+> 
