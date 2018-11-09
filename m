@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gL7EM-0000FF-2U
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:53:51 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gL7OD-00011o-LG
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:04:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gL7EG-0006je-Na
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:53:49 -0500
-Received: from eddie.linux-mips.org ([148.251.95.138]:34238
-	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gL7E9-0006LH-Ib
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:53:39 -0500
-Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
-	with ESMTP id S23991062AbeKINx1h0uqw (ORCPT
-	<rfc822;qemu-devel@nongnu.org>); Fri, 9 Nov 2018 14:53:27 +0100
-Date: Fri, 9 Nov 2018 13:53:27 +0000 (GMT)
-Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
-From: "Maciej W. Rozycki" <macro@linux-mips.org>
-In-Reply-To: <BN6PR2201MB1251F9977B0D4B901801275CC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Message-ID: <alpine.LFD.2.21.1811091341070.27920@eddie.linux-mips.org>
-References: <cover.1541616663.git.noring@nocrew.org>,
-	<e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>,
-	<BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<BN6PR2201MB1251F9977B0D4B901801275CC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	(envelope-from <kraxel@redhat.com>) id 1gL7O9-0003u3-EW
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:04:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34488)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gL7O9-0003mo-5a
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:03:57 -0500
+Date: Fri, 9 Nov 2018 15:03:54 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181109140354.bgib5g5v62iafhks@sirius.home.kraxel.org>
+References: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
+	<20181109111731.vxdmqmkorblcnntx@sirius.home.kraxel.org>
+	<20181109112953.w4wtltwxpl4z2lpj@sirius.home.kraxel.org>
+	<1724064a-acdc-5571-4f54-f0ac021027d0@redhat.com>
+	<6e7304f6-b81a-982f-a94c-d8df4202a82e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism
- of special R5900 opcodes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6e7304f6-b81a-982f-a94c-d8df4202a82e@redhat.com>
+Subject: [Qemu-devel] deprecating/removing bluetooth (was: Re: List of files
+ containing devices which have not been QOMified)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,22 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Cc: Fredrik Noring <noring@nocrew.org>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, 9 Nov 2018, Aleksandar Markovic wrote:
-
-> > ... and DMULT, DMULTU, DDIV and DDIVU
-> > are part of the MIPS III ISA. They are emulated in user mode to support
-> > generic MIPS III programs.
+On Fri, Nov 09, 2018 at 02:16:53PM +0100, Paolo Bonzini wrote:
+> On 09/11/2018 13:39, Thomas Huth wrote:
+> > On 2018-11-09 12:29, Gerd Hoffmann wrote:
+> >>
+> >> Tried this after studying docs:
+> >>
+> >>   qemu -usb -device usb-bt-dongle -bt hci,vlan=0 -bt device:keyboard
+> >>
+> >> Segfaults right anway on first keypress.
+> >> I guess that qualifies as "broken and obviously unused".
+> > 
+> > Thanks for checking! I guess that means we could even get rid of it
+> > without deprecating it first if it is broken already for more than two
+> > releases...?
 > 
-> Pure MIPS III executables should not be a concern of the R5900 
-> emulation, but R5900 executables.
+> I think what others were using bluetooth passthrough.  But it's
+> certainly possible that it's broken.
 
- I repeat: MIPS III is the available instruction set defined with the base 
-64-bit MIPS Linux psABI and must not be subsetted.  You have to support it 
-in QEMU Linux user emulation mode for any 64-bit MIPS processor and this 
-is not debatable, period.  QEMU has no control over the Linux ABI, it has 
-to accept it as it is.
+That code is in bt-*.c (toplevel dir).  Likewise no actual code changes
+since ages.  Comes in two variants, host + vhci.  vhci commit says:
 
-  Maciej
+    commit ab2b6f507ded382df734fe6a237ec56e2f421de4
+    Author: balrog <balrog@c046a42c-6fe2-441c-8c8c-71466251a162>
+    Date:   Mon Sep 29 00:31:41 2008 +0000
+
+        Use VHCI to allow the host os to participate in a qemu bluetooth "vlan".
+    
+        This does the reverse of bt-host.c, proxying from guest to host.
+        Appears to be more reliable.
+
+Hmm.  Not much of a clue.  Also ten years old.
+
+There is also a null hci, not connecting to anything.  Probably useful as
+dummy when your board has bluetooth (see arm/nseries) but you don't want
+hook up any bluetooth devices.
+
+Anyone has used bluetooth passthrough and can report what the state is?
+
+I guess the keyboard can be dropped right away no matter what.
+
+cheers,
+  Gerd
