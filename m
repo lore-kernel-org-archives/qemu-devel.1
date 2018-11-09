@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gL4zs-0006Zf-Qu
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:30:48 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gL4zw-0006eW-86
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:30:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gL4zq-00008v-Sk
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:30:44 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gL4zt-0000MG-IB
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:30:48 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri,  9 Nov 2018 12:29:41 +0100
-Message-Id: <20181109112957.10067-3-eric.auger@redhat.com>
+Date: Fri,  9 Nov 2018 12:29:44 +0100
+Message-Id: <20181109112957.10067-6-eric.auger@redhat.com>
 In-Reply-To: <20181109112957.10067-1-eric.auger@redhat.com>
 References: <20181109112957.10067-1-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v8 02/18] linux-headers: Partial update for
- virtio-iommu v0.8
+Subject: [Qemu-devel] [RFC v8 05/18] virtio-iommu: Add the iommu regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,200 +22,203 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com, jean-philippe.brucker@arm.com
 Cc: kevin.tian@intel.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com
 
-Partial sync against Jean-Philippe's branch:
-git://linux-arm.org/linux-jpb.git virtio-iommu/v0.8
+This patch initializes the iommu memory regions so that
+PCIe end point transactions get translated. The translation
+function is not yet implemented though.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- include/standard-headers/linux/virtio_ids.h   |   1 +
- include/standard-headers/linux/virtio_iommu.h | 159 ++++++++++++++++++
- linux-headers/linux/virtio_iommu.h            |   1 +
- 3 files changed, 161 insertions(+)
- create mode 100644 include/standard-headers/linux/virtio_iommu.h
- create mode 100644 linux-headers/linux/virtio_iommu.h
 
-diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
-index 6d5c3b2d4f..cfe47c5d9a 100644
---- a/include/standard-headers/linux/virtio_ids.h
-+++ b/include/standard-headers/linux/virtio_ids.h
-@@ -43,5 +43,6 @@
- #define VIRTIO_ID_INPUT        18 /* virtio input */
- #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
- #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
-+#define VIRTIO_ID_IOMMU        23 /* virtio IOMMU */
+---
+v6 -> v7:
+- use primary_bus
+- rebase on new translate proto featuring iommu_idx
+
+v5 -> v6:
+- include qapi/error.h
+- fix g_hash_table_lookup key in virtio_iommu_find_add_as
+
+v4 -> v5:
+- use PCI bus handle as a key
+- use get_primary_pci_bus() callback
+
+v3 -> v4:
+- add trace_virtio_iommu_init_iommu_mr
+
+v2 -> v3:
+- use IOMMUMemoryRegion
+- iommu mr name built with BDF
+- rename smmu_get_sid into virtio_iommu_get_sid and use PCI_BUILD_BDF
+---
+ hw/virtio/trace-events           |  2 +
+ hw/virtio/virtio-iommu.c         | 94 ++++++++++++++++++++++++++++++++
+ include/hw/virtio/virtio-iommu.h |  2 +
+ 3 files changed, 98 insertions(+)
+
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index e6177ca0e4..9270b0463e 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -59,3 +59,5 @@ virtio_iommu_attach(uint32_t domain_id, uint32_t ep_id) "domain=%d endpoint=%d"
+ virtio_iommu_detach(uint32_t domain_id, uint32_t ep_id) "domain=%d endpoint=%d"
+ virtio_iommu_map(uint32_t domain_id, uint64_t virt_start, uint64_t virt_end, uint64_t phys_start, uint32_t flags) "domain=%d virt_start=0x%"PRIx64" virt_end=0x%"PRIx64 " phys_start=0x%"PRIx64" flags=%d"
+ virtio_iommu_unmap(uint32_t domain_id, uint64_t virt_start, uint64_t virt_end) "domain=%d virt_start=0x%"PRIx64" virt_end=0x%"PRIx64
++virtio_iommu_translate(const char *name, uint32_t rid, uint64_t iova, int flag) "mr=%s rid=%d addr=0x%"PRIx64" flag=%d"
++virtio_iommu_init_iommu_mr(char *iommu_mr) "init %s"
+diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+index 5346440c51..2043623b30 100644
+--- a/hw/virtio/virtio-iommu.c
++++ b/hw/virtio/virtio-iommu.c
+@@ -22,6 +22,10 @@
+ #include "qemu-common.h"
+ #include "hw/virtio/virtio.h"
+ #include "sysemu/kvm.h"
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "hw/i386/pc.h"
++#include "hw/arm/virt.h"
+ #include "trace.h"
  
- #endif /* _LINUX_VIRTIO_IDS_H */
-diff --git a/include/standard-headers/linux/virtio_iommu.h b/include/standard-headers/linux/virtio_iommu.h
-new file mode 100644
-index 0000000000..0a40b21ea9
---- /dev/null
-+++ b/include/standard-headers/linux/virtio_iommu.h
-@@ -0,0 +1,159 @@
-+/* SPDX-License-Identifier: BSD-3-Clause */
-+/*
-+ * Virtio-iommu definition v0.8
-+ *
-+ * Copyright (C) 2018 Arm Ltd.
-+ */
-+#ifndef _LINUX_VIRTIO_IOMMU_H
-+#define _LINUX_VIRTIO_IOMMU_H
+ #include "standard-headers/linux/virtio_ids.h"
+@@ -33,6 +37,50 @@
+ /* Max size */
+ #define VIOMMU_DEFAULT_QUEUE_SIZE 256
+ 
++static inline uint16_t virtio_iommu_get_sid(IOMMUDevice *dev)
++{
++    return PCI_BUILD_BDF(pci_bus_num(dev->bus), dev->devfn);
++}
 +
-+#include "standard-headers/linux/types.h"
++static AddressSpace *virtio_iommu_find_add_as(PCIBus *bus, void *opaque,
++                                              int devfn)
++{
++    VirtIOIOMMU *s = opaque;
++    IOMMUPciBus *sbus = g_hash_table_lookup(s->as_by_busptr, bus);
++    IOMMUDevice *sdev;
 +
-+/* Feature bits */
-+#define VIRTIO_IOMMU_F_INPUT_RANGE		0
-+#define VIRTIO_IOMMU_F_DOMAIN_BITS		1
-+#define VIRTIO_IOMMU_F_MAP_UNMAP		2
-+#define VIRTIO_IOMMU_F_BYPASS			3
-+#define VIRTIO_IOMMU_F_PROBE			4
++    if (!sbus) {
++        sbus = g_malloc0(sizeof(IOMMUPciBus) +
++                         sizeof(IOMMUDevice *) * IOMMU_PCI_DEVFN_MAX);
++        sbus->bus = bus;
++        g_hash_table_insert(s->as_by_busptr, bus, sbus);
++    }
 +
-+struct virtio_iommu_config {
-+	/* Supported page sizes */
-+	uint64_t					page_size_mask;
-+	/* Supported IOVA range */
-+	struct virtio_iommu_range {
-+		uint64_t				start;
-+		uint64_t				end;
-+	} input_range;
-+	/* Max domain ID size */
-+	uint8_t					domain_bits;
-+	uint8_t					padding[3];
-+	/* Probe buffer size */
-+	uint32_t					probe_size;
++    sdev = sbus->pbdev[devfn];
++    if (!sdev) {
++        char *name = g_strdup_printf("%s-%d-%d",
++                                     TYPE_VIRTIO_IOMMU_MEMORY_REGION,
++                                     pci_bus_num(bus), devfn);
++        sdev = sbus->pbdev[devfn] = g_malloc0(sizeof(IOMMUDevice));
++
++        sdev->viommu = s;
++        sdev->bus = bus;
++        sdev->devfn = devfn;
++
++        trace_virtio_iommu_init_iommu_mr(name);
++
++        memory_region_init_iommu(&sdev->iommu_mr, sizeof(sdev->iommu_mr),
++                                 TYPE_VIRTIO_IOMMU_MEMORY_REGION,
++                                 OBJECT(s), name,
++                                 UINT64_MAX);
++        address_space_init(&sdev->as,
++                           MEMORY_REGION(&sdev->iommu_mr), TYPE_VIRTIO_IOMMU);
++    }
++
++    return &sdev->as;
++
++}
++
+ static int virtio_iommu_attach(VirtIOIOMMU *s,
+                                struct virtio_iommu_req_attach *req)
+ {
+@@ -204,6 +252,27 @@ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
+     }
+ }
+ 
++static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
++                                            IOMMUAccessFlags flag,
++                                            int iommu_idx)
++{
++    IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
++    uint32_t sid;
++
++    IOMMUTLBEntry entry = {
++        .target_as = &address_space_memory,
++        .iova = addr,
++        .translated_addr = addr,
++        .addr_mask = ~(hwaddr)0,
++        .perm = IOMMU_NONE,
++    };
++
++    sid = virtio_iommu_get_sid(sdev);
++
++    trace_virtio_iommu_translate(mr->parent_obj.name, sid, addr, flag);
++    return entry;
++}
++
+ static void virtio_iommu_get_config(VirtIODevice *vdev, uint8_t *config_data)
+ {
+     VirtIOIOMMU *dev = VIRTIO_IOMMU(vdev);
+@@ -286,6 +355,15 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
+     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_DOMAIN_BITS);
+     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MAP_UNMAP);
+     virtio_add_feature(&s->features, VIRTIO_IOMMU_F_BYPASS);
++
++    memset(s->as_by_bus_num, 0, sizeof(s->as_by_bus_num));
++    s->as_by_busptr = g_hash_table_new(NULL, NULL);
++
++    if (s->primary_bus) {
++        pci_setup_iommu(s->primary_bus, virtio_iommu_find_add_as, s);
++    } else {
++        error_setg(errp, "VIRTIO-IOMMU is not attached to any PCI bus!");
++    }
+ }
+ 
+ static void virtio_iommu_device_unrealize(DeviceState *dev, Error **errp)
+@@ -344,6 +422,14 @@ static void virtio_iommu_class_init(ObjectClass *klass, void *data)
+     vdc->vmsd = &vmstate_virtio_iommu_device;
+ }
+ 
++static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
++                                                  void *data)
++{
++    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
++
++    imrc->translate = virtio_iommu_translate;
++}
++
+ static const TypeInfo virtio_iommu_info = {
+     .name = TYPE_VIRTIO_IOMMU,
+     .parent = TYPE_VIRTIO_DEVICE,
+@@ -352,9 +438,17 @@ static const TypeInfo virtio_iommu_info = {
+     .class_init = virtio_iommu_class_init,
+ };
+ 
++static const TypeInfo virtio_iommu_memory_region_info = {
++    .parent = TYPE_IOMMU_MEMORY_REGION,
++    .name = TYPE_VIRTIO_IOMMU_MEMORY_REGION,
++    .class_init = virtio_iommu_memory_region_class_init,
 +};
 +
-+/* Request types */
-+#define VIRTIO_IOMMU_T_ATTACH			0x01
-+#define VIRTIO_IOMMU_T_DETACH			0x02
-+#define VIRTIO_IOMMU_T_MAP			0x03
-+#define VIRTIO_IOMMU_T_UNMAP			0x04
-+#define VIRTIO_IOMMU_T_PROBE			0x05
 +
-+/* Status types */
-+#define VIRTIO_IOMMU_S_OK			0x00
-+#define VIRTIO_IOMMU_S_IOERR			0x01
-+#define VIRTIO_IOMMU_S_UNSUPP			0x02
-+#define VIRTIO_IOMMU_S_DEVERR			0x03
-+#define VIRTIO_IOMMU_S_INVAL			0x04
-+#define VIRTIO_IOMMU_S_RANGE			0x05
-+#define VIRTIO_IOMMU_S_NOENT			0x06
-+#define VIRTIO_IOMMU_S_FAULT			0x07
+ static void virtio_register_types(void)
+ {
+     type_register_static(&virtio_iommu_info);
++    type_register_static(&virtio_iommu_memory_region_info);
+ }
+ 
+ type_init(virtio_register_types)
+diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
+index 4d47b6abeb..f55f48d304 100644
+--- a/include/hw/virtio/virtio-iommu.h
++++ b/include/hw/virtio/virtio-iommu.h
+@@ -28,6 +28,8 @@
+ #define VIRTIO_IOMMU(obj) \
+         OBJECT_CHECK(VirtIOIOMMU, (obj), TYPE_VIRTIO_IOMMU)
+ 
++#define TYPE_VIRTIO_IOMMU_MEMORY_REGION "virtio-iommu-memory-region"
 +
-+struct virtio_iommu_req_head {
-+	uint8_t					type;
-+	uint8_t					reserved[3];
-+};
-+
-+struct virtio_iommu_req_tail {
-+	uint8_t					status;
-+	uint8_t					reserved[3];
-+};
-+
-+struct virtio_iommu_req_attach {
-+	struct virtio_iommu_req_head		head;
-+	uint32_t					domain;
-+	uint32_t					endpoint;
-+	uint8_t					reserved[8];
-+	struct virtio_iommu_req_tail		tail;
-+};
-+
-+struct virtio_iommu_req_detach {
-+	struct virtio_iommu_req_head		head;
-+	uint32_t					domain;
-+	uint32_t					endpoint;
-+	uint8_t					reserved[8];
-+	struct virtio_iommu_req_tail		tail;
-+};
-+
-+#define VIRTIO_IOMMU_MAP_F_READ			(1 << 0)
-+#define VIRTIO_IOMMU_MAP_F_WRITE		(1 << 1)
-+#define VIRTIO_IOMMU_MAP_F_EXEC			(1 << 2)
-+#define VIRTIO_IOMMU_MAP_F_MMIO			(1 << 3)
-+
-+#define VIRTIO_IOMMU_MAP_F_MASK			(VIRTIO_IOMMU_MAP_F_READ |	\
-+						 VIRTIO_IOMMU_MAP_F_WRITE |	\
-+						 VIRTIO_IOMMU_MAP_F_EXEC |	\
-+						 VIRTIO_IOMMU_MAP_F_MMIO)
-+
-+struct virtio_iommu_req_map {
-+	struct virtio_iommu_req_head		head;
-+	uint32_t					domain;
-+	uint64_t					virt_start;
-+	uint64_t					virt_end;
-+	uint64_t					phys_start;
-+	uint32_t					flags;
-+	struct virtio_iommu_req_tail		tail;
-+};
-+
-+struct virtio_iommu_req_unmap {
-+	struct virtio_iommu_req_head		head;
-+	uint32_t					domain;
-+	uint64_t					virt_start;
-+	uint64_t					virt_end;
-+	uint8_t					reserved[4];
-+	struct virtio_iommu_req_tail		tail;
-+};
-+
-+#define VIRTIO_IOMMU_PROBE_T_NONE		0
-+#define VIRTIO_IOMMU_PROBE_T_RESV_MEM		1
-+
-+#define VIRTIO_IOMMU_PROBE_T_MASK		0xfff
-+
-+struct virtio_iommu_probe_property {
-+	uint16_t					type;
-+	uint16_t					length;
-+};
-+
-+#define VIRTIO_IOMMU_RESV_MEM_T_RESERVED	0
-+#define VIRTIO_IOMMU_RESV_MEM_T_MSI		1
-+
-+struct virtio_iommu_probe_resv_mem {
-+	struct virtio_iommu_probe_property	head;
-+	uint8_t					subtype;
-+	uint8_t					reserved[3];
-+	uint64_t					start;
-+	uint64_t					end;
-+};
-+
-+struct virtio_iommu_req_probe {
-+	struct virtio_iommu_req_head		head;
-+	uint32_t					endpoint;
-+	uint8_t					reserved[64];
-+
-+	uint8_t					properties[];
-+
-+	/*
-+	 * Tail follows the variable-length properties array. No padding,
-+	 * property lengths are all aligned on 8 bytes.
-+	 */
-+};
-+
-+/* Fault types */
-+#define VIRTIO_IOMMU_FAULT_R_UNKNOWN		0
-+#define VIRTIO_IOMMU_FAULT_R_DOMAIN		1
-+#define VIRTIO_IOMMU_FAULT_R_MAPPING		2
-+
-+#define VIRTIO_IOMMU_FAULT_F_READ		(1 << 0)
-+#define VIRTIO_IOMMU_FAULT_F_WRITE		(1 << 1)
-+#define VIRTIO_IOMMU_FAULT_F_EXEC		(1 << 2)
-+#define VIRTIO_IOMMU_FAULT_F_ADDRESS		(1 << 8)
-+
-+struct virtio_iommu_fault {
-+	uint8_t					reason;
-+	uint8_t					reserved[3];
-+	uint32_t					flags;
-+	uint32_t					endpoint;
-+	uint8_t					reserved2[4];
-+	uint64_t					address;
-+};
-+
-+#endif
-diff --git a/linux-headers/linux/virtio_iommu.h b/linux-headers/linux/virtio_iommu.h
-new file mode 100644
-index 0000000000..2dc4609c16
---- /dev/null
-+++ b/linux-headers/linux/virtio_iommu.h
-@@ -0,0 +1 @@
-+#include "standard-headers/linux/virtio_iommu.h"
+ #define IOMMU_PCI_BUS_MAX      256
+ #define IOMMU_PCI_DEVFN_MAX    256
+ 
 -- 
 2.17.2
