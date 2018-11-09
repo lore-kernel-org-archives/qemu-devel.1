@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gL8n3-000437-OZ
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:33:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gL8om-00051h-CP
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:35:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gL8n0-0001Kn-6g
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:33:45 -0500
-Received: from mail-by2nam03on0721.outbound.protection.outlook.com
-	([2a01:111:f400:fe4a::721]:14063
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gL8mz-0001Jm-RY
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:33:42 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Fri, 9 Nov 2018 15:23:36 +0000
-Message-ID: <BN6PR2201MB1251A570A76178D7BD66B247C6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <cover.1541616663.git.noring@nocrew.org>
-	<e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>
-	<BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<BN6PR2201MB1251F9977B0D4B901801275CC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<20181109132411.GA2303@sx9>
-	<BN6PR2201MB12512E2D06C8A6CD54BBEE8EC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>,
-	<20181109143529.GA10409@sx9>,
-	<BN6PR2201MB12513465BDF12670379AA72DC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-In-Reply-To: <BN6PR2201MB12513465BDF12670379AA72DC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peter.maydell@linaro.org>) id 1gL8ol-0002Ut-AF
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:35:32 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40389)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gL8oe-0002Do-KE
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:35:26 -0500
+Received: by mail-oi1-x243.google.com with SMTP id u130-v6so1775561oie.7
+	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 07:35:04 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism
- of special R5900 opcodes
+In-Reply-To: <20181109153002.597-2-crosa@redhat.com>
+References: <20181109153002.597-1-crosa@redhat.com>
+	<20181109153002.597-2-crosa@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Nov 2018 15:34:42 +0000
+Message-ID: <CAFEAcA8-Av_d7A0GEQGfkdC90N41or=vni480k=4dO2daXkdZQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH 1/2] tests/test-qht-par: test gets
+ stuck intermittently on OSX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,29 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, G 3 <programmingkidx@gmail.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-> From: Fredrik Noring <noring@nocrew.org>
-> Subject: Re: [PATCH v2 4/6] target/mips: Fix decoding mechanism of specia=
-l R5900 opcodes
+On 9 November 2018 at 15:30, Cleber Rosa <crosa@redhat.com> wrote:
+> To be fully honest, this may not be a OSX (alone) condition, but may
+> be a situation that only happens with OSX on Travis-CI, were resources
+> are quite limited.
 >
-> Hi Aleksandar,
->
-> > Tx79 mentions the opposite: that DDIV, DDIVU, DMULT, DMULTU are not
-> > included in R5900 set.
-> >
-> > I think that the best solution that you exclude DDIV, DDIVU, DMULT, DMU=
-LTU
-> > in a separate patch - there is no document to support their inclusion.
->
-> As Maciej noted, the 64-bit MIPS Linux psABI is indivisible, so how could
-> your alternative possibly work?
+> I have personal experience with tests that exercise parallelism or
+> depend on timing to fail on Travis.  Because I'm not 100% certain that
+> this is a situation that only happens with OSX on Travis-CI, and
+> because I'm not certain that we should be skipping tests because
+> they're running on Travis-CI, let's disable them on OSX as a whole.
 
-Since we are rapidly approaching 3.1 release, we don't have time for prolon=
-ged discussions - so please provide the patch that removes emulation of the=
-se instructions that don't belong to R5900 set, and, if you find a justific=
-ation document later on, they can be reintroduced in 3.1+ timeframe.
+Does this test still get stuck in builds after a458774ad711bceabefb ?
+That fixed an OSX-specific problem that caused hangs (notably
+in test-bdrv-drain, but it could I guess also affect other tests).
 
-Thanks,
-Aleksnadar=
+thanks
+-- PMM
