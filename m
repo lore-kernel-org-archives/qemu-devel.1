@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gL92P-0005xc-Td
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:49:38 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gL95e-0003GD-Cp
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:52:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gL92K-0004F1-Ql
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:49:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44701)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gL92E-000452-KB
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:49:28 -0500
-Date: Fri, 9 Nov 2018 13:49:08 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181109154908.GW12503@habkost.net>
+	(envelope-from <alex.bennee@linaro.org>) id 1gL95b-0006oj-6v
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:52:58 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33848)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gL95Z-0006nO-BC
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:52:53 -0500
+Received: by mail-wr1-x441.google.com with SMTP id j26-v6so2411157wre.1
+	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 07:52:52 -0800 (PST)
 References: <20181109150710.31085-1-crosa@redhat.com>
-	<20181109150710.31085-2-crosa@redhat.com>
+	<20181109150710.31085-4-crosa@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181109150710.31085-4-crosa@redhat.com>
+Date: Fri, 09 Nov 2018 15:52:49 +0000
+Message-ID: <87efbu5ju6.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181109150710.31085-2-crosa@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] configure: keep track of Python version
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/4] Travis CI: make specified Python
+ versions usable on jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +32,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>
 
-On Fri, Nov 09, 2018 at 10:07:07AM -0500, Cleber Rosa wrote:
-> Some functionality is dependent on the Python version
-> detected/configured on configure.  While it's possible to run the
-> Python version later and check for the version, doing it once is
-> preferable.  Also, it's a relevant information to keep in build logs,
-> as the overall behavior of the build can be affected by it.
-> 
+
+Cleber Rosa <crosa@redhat.com> writes:
+
+> For the two Python jobs, which seem to have the goal of making sure
+> QEMU builds successfully on the 3.0-3.6 spectrum of Python 3 versions,
+> the specified version is only applicable if a Python virtual
+> environment is used.  To do that, it's necessary to define the
+> (primary?) language of the job to be Python.
+>
+> Also, Travis doesn't have a 3.0 Python installation available for the
+> chosen distro, 3.2 being the lower version available.
+>
+> Reference: https://docs.travis-ci.com/user/languages/python/#specifying-p=
+ython-versions
 > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+Do you want me to take this via my tree or keep it with the other patches?
+
 > ---
->  configure | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index 74e313a810..67fff0290d 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1740,6 +1740,9 @@ if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
->        "Use --python=/path/to/python to specify a supported Python."
->  fi
->  
-> +# Preserve python version since some functionality is dependent on it
-> +python_version=$($python -V 2>&1 | sed -e 's/Python\ //')
-
-What about:
-  $($python -c 'import sys;print(sys.version)')
-?
-
-It is very verbose, but I think that's a good thing.
-
-> +
->  # Suppress writing compiled files
->  python="$python -B"
->  
-> @@ -5918,7 +5921,7 @@ echo "LDFLAGS           $LDFLAGS"
->  echo "QEMU_LDFLAGS      $QEMU_LDFLAGS"
->  echo "make              $make"
->  echo "install           $install"
-> -echo "python            $python"
-> +echo "python            $python ($python_version)"
->  if test "$slirp" = "yes" ; then
->      echo "smbd              $smbd"
->  fi
-> @@ -6823,6 +6826,7 @@ echo "INSTALL_DATA=$install -c -m 0644" >> $config_host_mak
->  echo "INSTALL_PROG=$install -c -m 0755" >> $config_host_mak
->  echo "INSTALL_LIB=$install -c -m 0644" >> $config_host_mak
->  echo "PYTHON=$python" >> $config_host_mak
-> +echo "PYTHON_VERSION=$python_version" >> $config_host_mak
-
-The output of "python -V" and "sys.version" seems to be meant for
-humans, not software.  If we really want something to be used in
-conditional makefile rules, I'd prefer to use sys.version_info.
-e.g.:
-
-  python_major_version="$($python -c 'import sys;print(sys.version_info[0])')"
-  echo "PYTHON_MAJOR_VERSION=$python_major_version"
+>  .travis.yml | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index aa49c7b114..5c18d3e268 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -112,9 +112,11 @@ matrix:
+>        compiler: clang
+>      # Python builds
+>      - env: CONFIG=3D"--target-list=3Dx86_64-softmmu"
+> +      language: python
+>        python:
+> -        - "3.0"
+> +        - "3.2"
+>      - env: CONFIG=3D"--target-list=3Dx86_64-softmmu"
+> +      language: python
+>        python:
+>          - "3.6"
+>      # Acceptance (Functional) tests
 
 
->  echo "CC=$cc" >> $config_host_mak
->  if $iasl -h > /dev/null 2>&1; then
->    echo "IASL=$iasl" >> $config_host_mak
-> -- 
-> 2.19.1
-> 
-
--- 
-Eduardo
+--
+Alex Benn=C3=A9e
