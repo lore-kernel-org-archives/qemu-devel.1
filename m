@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gL78z-0001bV-6V
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:48:18 -0500
+	(envelope-from <mingo.kernel.org@gmail.com>) id 1gL15z-0008Cr-Cv
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 02:20:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gL78p-0008Nl-Oq
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:48:13 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  9 Nov 2018 13:47:29 +0000
-Message-Id: <20181109134731.11605-2-peter.maydell@linaro.org>
-In-Reply-To: <20181109134731.11605-1-peter.maydell@linaro.org>
-References: <20181109134731.11605-1-peter.maydell@linaro.org>
+	(envelope-from <mingo.kernel.org@gmail.com>) id 1gL15v-0005NB-4F
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 02:20:47 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40217)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mingo.kernel.org@gmail.com>)
+	id 1gL15m-0004wd-G4
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 02:20:38 -0500
+Received: by mail-wm1-x343.google.com with SMTP id b203-v6so969598wme.5
+	for <qemu-devel@nongnu.org>; Thu, 08 Nov 2018 23:20:20 -0800 (PST)
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Date: Fri, 9 Nov 2018 08:20:15 +0100
+From: Ingo Molnar <mingo@kernel.org>
+Message-ID: <20181109072015.GA86700@gmail.com>
+References: <1541674784-25936-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1541674784-25936-2-git-send-email-lizhijian@cn.fujitsu.com>
+	<CAFEAcA_47wyar3WNhuBmNPdr02RHx-wn_TeyFaajpjzvzG8j5Q@mail.gmail.com>
+	<c50d103e-95c3-c44c-d852-b6d7f8114b3a@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for-v3.1 1/3] Revert "target/arm: Implement
- HCR.VI and VF"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c50d103e-95c3-c44c-d852-b6d7f8114b3a@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [RFC/PoC PATCH 1/3] i386: set initrd_max to 4G - 1
+ to allow up to 4G initrd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,113 +34,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Adam Lackorzynski <adam.lackorzynski@kernkonzept.com>
+To: Li Zhijian <lizhijian@cn.fujitsu.com>, Juergen Gross <jgross@suse.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, x86@kernel.org, hpa@zytor.com, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de, QEMU Developers <qemu-devel@nongnu.org>, Philip Li <philip.li@intel.com>, zhijianx.li@intel.com, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Kees Cook <keescook@chromium.org>
 
-This reverts commit 8a0fc3a29fc2315325400c738f807d0d4ae0ab7f.
 
-The implementation of HCR.VI and VF in that commit is not
-correct -- they do not track the overall "is there a pending
-VIRQ or VFIQ" status, but whether there is a pending interrupt
-due to "this mechanism", ie the hypervisor having set the VI/VF
-bits. The overall pending state for VIRQ and VFIQ is effectively
-the logical OR of the inbound lines from the GIC with the
-VI and VF bits. Commit 8a0fc3a29fc231 would result in pending
-VIRQ/VFIQ possibly being lost when the hypervisor wrote to HCR.
+* Li Zhijian <lizhijian@cn.fujitsu.com> wrote:
 
-As a preliminary to implementing the HCR.VI/VF feature properly,
-revert the broken one entirely.
+> > If the kernel initrd creation process creates an initrd which
+> > is larger than 2GB and also claims that it can't be placed
+> > with any part of it above 2GB, then that sounds like a bug
+> > in the initrd creation process...
+> 
+> Exactly, it's a real problem.
+> 
+> Add x86 maintainers and LKML:
+> 
+> The background is that QEMU want to support up to 4G initrd. but linux header (
+> initrd_addr_max field) only allow 2G-1.
+> Is one of the below approaches reasonable:
+> 1) change initrd_addr_max to 4G-1 directly simply(arch/x86/boot/header.S)?
+> 2) lie QEMU bootloader the initrd_addr_max is 4G-1 even though header said 2G-1
+> 3) any else
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/helper.c | 47 ++++-----------------------------------------
- 1 file changed, 4 insertions(+), 43 deletions(-)
+A 10 years old comment from hpa says:
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 851ea9aa977..f3878f505b7 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -3931,7 +3931,6 @@ static const ARMCPRegInfo el3_no_el2_v8_cp_reginfo[] = {
- static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
- {
-     ARMCPU *cpu = arm_env_get_cpu(env);
--    CPUState *cs = ENV_GET_CPU(env);
-     uint64_t valid_mask = HCR_MASK;
- 
-     if (arm_feature(env, ARM_FEATURE_EL3)) {
-@@ -3950,28 +3949,6 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
-     /* Clear RES0 bits.  */
-     value &= valid_mask;
- 
--    /*
--     * VI and VF are kept in cs->interrupt_request. Modifying that
--     * requires that we have the iothread lock, which is done by
--     * marking the reginfo structs as ARM_CP_IO.
--     * Note that if a write to HCR pends a VIRQ or VFIQ it is never
--     * possible for it to be taken immediately, because VIRQ and
--     * VFIQ are masked unless running at EL0 or EL1, and HCR
--     * can only be written at EL2.
--     */
--    g_assert(qemu_mutex_iothread_locked());
--    if (value & HCR_VI) {
--        cs->interrupt_request |= CPU_INTERRUPT_VIRQ;
--    } else {
--        cs->interrupt_request &= ~CPU_INTERRUPT_VIRQ;
--    }
--    if (value & HCR_VF) {
--        cs->interrupt_request |= CPU_INTERRUPT_VFIQ;
--    } else {
--        cs->interrupt_request &= ~CPU_INTERRUPT_VFIQ;
--    }
--    value &= ~(HCR_VI | HCR_VF);
--
-     /* These bits change the MMU setup:
-      * HCR_VM enables stage 2 translation
-      * HCR_PTW forbids certain page-table setups
-@@ -3999,32 +3976,16 @@ static void hcr_writelow(CPUARMState *env, const ARMCPRegInfo *ri,
-     hcr_write(env, NULL, value);
- }
- 
--static uint64_t hcr_read(CPUARMState *env, const ARMCPRegInfo *ri)
--{
--    /* The VI and VF bits live in cs->interrupt_request */
--    uint64_t ret = env->cp15.hcr_el2 & ~(HCR_VI | HCR_VF);
--    CPUState *cs = ENV_GET_CPU(env);
--
--    if (cs->interrupt_request & CPU_INTERRUPT_VIRQ) {
--        ret |= HCR_VI;
--    }
--    if (cs->interrupt_request & CPU_INTERRUPT_VFIQ) {
--        ret |= HCR_VF;
--    }
--    return ret;
--}
--
- static const ARMCPRegInfo el2_cp_reginfo[] = {
-     { .name = "HCR_EL2", .state = ARM_CP_STATE_AA64,
--      .type = ARM_CP_IO,
-       .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 0,
-       .access = PL2_RW, .fieldoffset = offsetof(CPUARMState, cp15.hcr_el2),
--      .writefn = hcr_write, .readfn = hcr_read },
-+      .writefn = hcr_write },
-     { .name = "HCR", .state = ARM_CP_STATE_AA32,
--      .type = ARM_CP_ALIAS | ARM_CP_IO,
-+      .type = ARM_CP_ALIAS,
-       .cp = 15, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 0,
-       .access = PL2_RW, .fieldoffset = offsetof(CPUARMState, cp15.hcr_el2),
--      .writefn = hcr_writelow, .readfn = hcr_read },
-+      .writefn = hcr_writelow },
-     { .name = "ELR_EL2", .state = ARM_CP_STATE_AA64,
-       .type = ARM_CP_ALIAS,
-       .opc0 = 3, .opc1 = 4, .crn = 4, .crm = 0, .opc2 = 1,
-@@ -4261,7 +4222,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
- 
- static const ARMCPRegInfo el2_v8_cp_reginfo[] = {
-     { .name = "HCR2", .state = ARM_CP_STATE_AA32,
--      .type = ARM_CP_ALIAS | ARM_CP_IO,
-+      .type = ARM_CP_ALIAS,
-       .cp = 15, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 4,
-       .access = PL2_RW,
-       .fieldoffset = offsetofhigh32(CPUARMState, cp15.hcr_el2),
--- 
-2.19.1
+  initrd_addr_max: .long 0x7fffffff
+                                        # (Header version 0x0203 or later)
+                                        # The highest safe address for
+                                        # the contents of an initrd
+                                        # The current kernel allows up to 4 GB,
+                                        # but leave it at 2 GB to avoid
+                                        # possible bootloader bugs.
+
+To avoid the potential of bugs lurking in dozens of major and hundreds of 
+minor iterations of various Linux bootloaders I'd prefer a real solution 
+and extend it - because if there's a 2GB initrd for some weird reason 
+today there might be a 4GB one in two years.
+
+The real solution would be to:
+
+ - Extend the boot protocol with a 64-bit field, named initrd_addr64_max 
+   or such.
+
+ - We don't change the old field - but if the new field is set by new
+   kernels then new bootloaders can use that as a new initrd_addr64_max
+   value. (or reject to load the kernel if the address is too high.)
+
+ - The kernel build should also emit a warning when building larger than 
+   2GB initrds, with a list of bootloaders that support the new protocol.
+
+Or something along those lines.
+
+Thanks,
+
+	Ingo
