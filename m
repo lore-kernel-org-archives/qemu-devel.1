@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gL7Ac-0003kv-Ea
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:49:59 -0500
+	(envelope-from <berto@igalia.com>) id 1gL7DD-0005yK-JB
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:52:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gL7AX-0002y7-Im
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:49:57 -0500
-Date: Fri, 9 Nov 2018 14:49:41 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181109144941.471b4028.cohuck@redhat.com>
-In-Reply-To: <20181025144644.15464-50-cota@braap.org>
-References: <20181025144644.15464-1-cota@braap.org>
-	<20181025144644.15464-50-cota@braap.org>
+	(envelope-from <berto@igalia.com>) id 1gL7D7-0005Yy-8a
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 08:52:39 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <fc16b42c-5825-b9f8-5127-4c8a6d8b173b@virtuozzo.com>
+References: <20181101182738.70462-1-vsementsov@virtuozzo.com>
+	<20181101182738.70462-7-vsementsov@virtuozzo.com>
+	<w514lcudz3y.fsf@maestria.local.igalia.com>
+	<e1d4fa92-9f84-080c-04e3-4fc9b683c11d@virtuozzo.com>
+	<w511s7ydxzz.fsf@maestria.local.igalia.com>
+	<fc16b42c-5825-b9f8-5127-4c8a6d8b173b@virtuozzo.com>
+Date: Fri, 09 Nov 2018 14:51:42 +0100
+Message-ID: <w511s7uwe8h.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v4 50/71] s390x: convert to
- cpu_interrupt_request
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 6/7] qcow2: aio support for
+ compressed cluster read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,22 +27,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>
 
-On Thu, 25 Oct 2018 10:46:23 -0400
-"Emilio G. Cota" <cota@braap.org> wrote:
+On Tue 06 Nov 2018 05:24:36 PM CET, Vladimir Sementsov-Ogievskiy wrote:
+>> Is there any reason why some parts of the QEMU code use qemu_blockalign
+>> and others qemu_try_blockalign() ? From what I can see it seems to be up
+>> to whoever wrote it...
+>
+> As I understand, the good reason to use _try_ versions, is when we are
+> allocating some size, taken from user input, so it may be
+> unpredictable large (hm, or just any really large allocation), so, I
+> use try_malloc for compressed size, which may be very large in somehow
+> corrupted image.
 
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: David Hildenbrand <david@redhat.com>
-> Cc: qemu-s390x@nongnu.org
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  hw/intc/s390_flic.c | 2 +-
->  target/s390x/cpu.c  | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+Ah right, the value of the compressed size field can be up to 8192
+sectors, or 4MB.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+I realized that you should add the coroutine_fn annotation to
+qcow2_co_preadv_compressed(). Other than that the patch looks good so,
+with that changed,
+
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
