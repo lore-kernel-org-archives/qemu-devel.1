@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gLAHG-0006IY-Cd
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:09:03 -0500
+	(envelope-from <danielhb413@gmail.com>) id 1gLAfC-0002L1-Ql
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:33:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gLAHA-0007Vd-Qx
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:09:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41525)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gLAHA-0007Da-AX
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:08:56 -0500
-References: <20181109153002.597-1-crosa@redhat.com>
-	<20181109153002.597-2-crosa@redhat.com>
-	<20181109155640.GA12624@flamenco>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <cff78fc4-cd40-9498-c26a-068344ae19b7@redhat.com>
-Date: Fri, 9 Nov 2018 12:08:13 -0500
+	(envelope-from <danielhb413@gmail.com>) id 1gLAf8-0007Lf-UZ
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:33:45 -0500
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:37263)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1gLAf7-0006o1-Li
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:33:42 -0500
+Received: by mail-qk1-x741.google.com with SMTP id 131so2933525qkd.4
+	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 09:33:26 -0800 (PST)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Date: Fri,  9 Nov 2018 15:33:07 -0200
+Message-Id: <20181109173309.25212-2-danielhb413@gmail.com>
+In-Reply-To: <20181109173309.25212-1-danielhb413@gmail.com>
+References: <20181109173309.25212-1-danielhb413@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20181109155640.GA12624@flamenco>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] tests/test-qht-par: test gets
- stuck intermittently on OSX
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for-3.2 v10 1/3] qmp: query-current-machine
+ with wakeup-suspend-support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +29,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, programmingkidx@gmail.com, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, ehabkost@redhat.com, armbru@redhat.com, mst@redhat.com, imammedo@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>
 
+When issuing the qmp/hmp 'system_wakeup' command, what happens in a
+nutshell is:
 
+- qmp_system_wakeup_request set runstate to RUNNING, sets a wakeup_reason
+and notify the event
+- in the main_loop, all vcpus are paused, a system reset is issued, all
+subscribers of wakeup_notifiers receives a notification, vcpus are then
+resumed and the wake up QAPI event is fired
 
-On 11/9/18 10:56 AM, Emilio G. Cota wrote:
-> On Fri, Nov 09, 2018 at 10:30:01 -0500, Cleber Rosa wrote:
->> To be fully honest, this may not be a OSX (alone) condition, but may
->> be a situation that only happens with OSX on Travis-CI, were resources
->> are quite limited.
->>
->> I have personal experience with tests that exercise parallelism or
->> depend on timing to fail on Travis.  Because I'm not 100% certain that
->> this is a situation that only happens with OSX on Travis-CI, and
->> because I'm not certain that we should be skipping tests because
->> they're running on Travis-CI, let's disable them on OSX as a whole.
->>
->> A small note: this type of change makes me believe that there should
->> be a list of testing related caveats or TODO list tracked on the
->> documentation.
->>
->> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> 
-> Is there a way to know where it hangs?
-> 
-> Also, are these the g_test_quick tests, or the other ones? It it's
-> just a matter of the program taking too long to run, we could just
-> reduce the length of the !quick tests (currently at 5s vs. 1s for
-> the quick ones).
-> 
-> Thanks,
-> 
-> 		Emilio
-> 
+Note that this procedure alone doesn't ensure that the guest will awake
+from SUSPENDED state - the subscribers of the wake up event must take
+action to resume the guest, otherwise the guest will simply reboot. At
+this moment, only the ACPI machines via acpi_pm1_cnt_init has wake-up
+from suspend support.
 
-Looks like the common cause was fixed a458774ad711bceabefb, as pointed
-out by Peter.
+However, only the presence of 'system_wakeup' is required for QGA to
+support 'guest-suspend-ram' and 'guest-suspend-hybrid' at this moment.
+This means that the user/management will expect to suspend the guest using
+one of those suspend commands and then resume execution using system_wakeup,
+regardless of the support offered in system_wakeup in the first place.
 
-- Cleber.
+This patch creates a new API called query-current-machine [1], that holds
+a new flag called 'wakeup-suspend-support' that indicates if the guest
+supports wake up from suspend via system_wakeup. The machine is considered
+to implement wake-up support if a call to a new 'qemu_register_wakeup_support'
+is made during its init, as it is now being done inside acpi_pm1_cnt_init.
+This allows for any other machine type to declare wake-up support regardless
+of ACPI state or wakeup_notifiers subscription, making easier for
+newer implementations that might have its own mechanisms in the future.
+
+This is the expected output of query-current-machine when running a x86
+guest:
+
+{"execute" : "query-current-machine"}
+{"return": {"wakeup-suspend-support": true}}
+
+Running the same x86 guest, but with the --no-acpi option:
+
+{"execute" : "query-current-machine"}
+{"return": {"wakeup-suspend-support": false}}
+
+This is the output when running a pseries guest:
+
+{"execute" : "query-current-machine"}
+{"return": {"wakeup-suspend-support": false}}
+
+With this extra tool, management can avoid situations where a guest
+that does not have proper suspend/wake capabilities ends up in
+inconsistent state (e.g.
+https://github.com/open-power-host-os/qemu/issues/31).
+
+[1] the decision of creating the query-current-machine API is based
+on discussions in the QEMU mailing list where it was decided that
+query-target wasn't a proper place to store the wake-up flag, neither
+was query-machines because this isn't a static property of the
+machine object. This new API can then be used to store other
+dynamic machine properties that are scattered around the code
+ATM. More info at:
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04235.html
+
+Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+---
+ hw/acpi/core.c          |  6 ++++++
+ hw/i386/xen/xen-hvm.c   |  5 +++++
+ include/sysemu/sysemu.h |  1 +
+ qapi/misc.json          | 24 ++++++++++++++++++++++++
+ vl.c                    | 19 +++++++++++++++++++
+ 5 files changed, 55 insertions(+)
+
+diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+index aafdc61648..52e18d7810 100644
+--- a/hw/acpi/core.c
++++ b/hw/acpi/core.c
+@@ -617,6 +617,12 @@ void acpi_pm1_cnt_init(ACPIREGS *ar, MemoryRegion *parent,
+     ar->pm1.cnt.s4_val = s4_val;
+     ar->wakeup.notify = acpi_notify_wakeup;
+     qemu_register_wakeup_notifier(&ar->wakeup);
++
++    /*
++     * Register wake-up support in QMP query-current-machine API
++     */
++    qemu_register_wakeup_support();
++
+     memory_region_init_io(&ar->pm1.cnt.io, memory_region_owner(parent),
+                           &acpi_pm_cnt_ops, ar, "acpi-cnt", 2);
+     memory_region_add_subregion(parent, 4, &ar->pm1.cnt.io);
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 935a3676c8..2143d33b18 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -1405,6 +1405,11 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+     state->wakeup.notify = xen_wakeup_notifier;
+     qemu_register_wakeup_notifier(&state->wakeup);
+ 
++    /*
++     * Register wake-up support in QMP query-current-machine API
++     */
++    qemu_register_wakeup_support();
++
+     rc = xen_map_ioreq_server(state);
+     if (rc < 0) {
+         goto err;
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 8d6095d98b..0446adacc6 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -77,6 +77,7 @@ void qemu_register_suspend_notifier(Notifier *notifier);
+ void qemu_system_wakeup_request(WakeupReason reason);
+ void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
+ void qemu_register_wakeup_notifier(Notifier *notifier);
++void qemu_register_wakeup_support(void);
+ void qemu_system_shutdown_request(ShutdownCause reason);
+ void qemu_system_powerdown_request(void);
+ void qemu_register_powerdown_notifier(Notifier *notifier);
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 6c1c5c0a37..9b86576e61 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -2008,6 +2008,30 @@
+ ##
+ { 'command': 'query-machines', 'returns': ['MachineInfo'] }
+ 
++##
++# @CurrentMachineParams:
++#
++# Information describing the running machine parameters.
++#
++# @wakeup-suspend-support: true if the machine supports wake up from
++#                          suspend
++#
++# Since: 3.2.0
++##
++{ 'struct': 'CurrentMachineParams',
++  'data': { 'wakeup-suspend-support': 'bool'} }
++
++##
++# @query-current-machine:
++#
++# Return information on the current virtual machine.
++#
++# Returns: CurrentMachineParams
++#
++# Since: 3.2.0
++##
++{ 'command': 'query-current-machine', 'returns': 'CurrentMachineParams' }
++
+ ##
+ # @CpuDefinitionInfo:
+ #
+diff --git a/vl.c b/vl.c
+index 55bab005b6..5813a8785f 100644
+--- a/vl.c
++++ b/vl.c
+@@ -191,6 +191,7 @@ bool boot_strict;
+ uint8_t *boot_splash_filedata;
+ size_t boot_splash_filedata_size;
+ uint8_t qemu_extra_params_fw[2];
++bool wakeup_suspend_enabled;
+ 
+ int icount_align_option;
+ 
+@@ -1782,6 +1783,24 @@ void qemu_register_wakeup_notifier(Notifier *notifier)
+     notifier_list_add(&wakeup_notifiers, notifier);
+ }
+ 
++void qemu_register_wakeup_support(void)
++{
++    wakeup_suspend_enabled = true;
++}
++
++static bool qemu_wakeup_suspend_enabled(void)
++{
++    return wakeup_suspend_enabled;
++}
++
++CurrentMachineParams *qmp_query_current_machine(Error **errp)
++{
++    CurrentMachineParams *params = g_malloc0(sizeof(*params));
++    params->wakeup_suspend_support = qemu_wakeup_suspend_enabled();
++
++    return params;
++}
++
+ void qemu_system_killed(int signal, pid_t pid)
+ {
+     shutdown_signal = signal;
+-- 
+2.19.1
