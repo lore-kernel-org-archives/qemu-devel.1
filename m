@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gLAFK-0003T8-HK
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:07:03 -0500
+	(envelope-from <crosa@redhat.com>) id 1gLAHG-0006IY-Cd
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:09:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gLAFF-0005wC-WE
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:07:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43070)
+	(envelope-from <crosa@redhat.com>) id 1gLAHA-0007Vd-Qx
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:09:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41525)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gLAFF-0005vq-PA
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:06:57 -0500
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gLAHA-0007Da-AX
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 12:08:56 -0500
 References: <20181109153002.597-1-crosa@redhat.com>
 	<20181109153002.597-2-crosa@redhat.com>
-	<CAFEAcA8-Av_d7A0GEQGfkdC90N41or=vni480k=4dO2daXkdZQ@mail.gmail.com>
+	<20181109155640.GA12624@flamenco>
 From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <88024cb3-2248-fa6b-4bc9-2926a798b15c@redhat.com>
-Date: Fri, 9 Nov 2018 12:06:47 -0500
+Message-ID: <cff78fc4-cd40-9498-c26a-068344ae19b7@redhat.com>
+Date: Fri, 9 Nov 2018 12:08:13 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8-Av_d7A0GEQGfkdC90N41or=vni480k=4dO2daXkdZQ@mail.gmail.com>
+In-Reply-To: <20181109155640.GA12624@flamenco>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -30,13 +30,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, G 3 <programmingkidx@gmail.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, programmingkidx@gmail.com, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
 
 
-On 11/9/18 10:34 AM, Peter Maydell wrote:
-> On 9 November 2018 at 15:30, Cleber Rosa <crosa@redhat.com> wrote:
+On 11/9/18 10:56 AM, Emilio G. Cota wrote:
+> On Fri, Nov 09, 2018 at 10:30:01 -0500, Cleber Rosa wrote:
 >> To be fully honest, this may not be a OSX (alone) condition, but may
 >> be a situation that only happens with OSX on Travis-CI, were resources
 >> are quite limited.
@@ -46,21 +46,26 @@ On 11/9/18 10:34 AM, Peter Maydell wrote:
 >> this is a situation that only happens with OSX on Travis-CI, and
 >> because I'm not certain that we should be skipping tests because
 >> they're running on Travis-CI, let's disable them on OSX as a whole.
+>>
+>> A small note: this type of change makes me believe that there should
+>> be a list of testing related caveats or TODO list tracked on the
+>> documentation.
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > 
-> Does this test still get stuck in builds after a458774ad711bceabefb ?
-> That fixed an OSX-specific problem that caused hangs (notably
-> in test-bdrv-drain, but it could I guess also affect other tests).
+> Is there a way to know where it hangs?
+> 
+> Also, are these the g_test_quick tests, or the other ones? It it's
+> just a matter of the program taking too long to run, we could just
+> reduce the length of the !quick tests (currently at 5s vs. 1s for
+> the quick ones).
+> 
+> Thanks,
+> 
+> 		Emilio
 > 
 
-It didn't get stuck here:
-
-https://travis-ci.org/clebergnu/qemu/jobs/452663111
-
-So I believe that was the common issue indeed.  Thanks for pointing that
-out.  Also, the other patch in this series also seems to be unnecessary now.
+Looks like the common cause was fixed a458774ad711bceabefb, as pointed
+out by Peter.
 
 - Cleber.
-
-> thanks
-> -- PMM
-> 
