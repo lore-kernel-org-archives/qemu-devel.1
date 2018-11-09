@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gKuiM-0003Bh-C3
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 19:32:00 -0500
+	(envelope-from <dongli.zhang@oracle.com>) id 1gKvsv-0008Bz-Ml
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 20:47:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gKuiK-0002Oe-QA
-	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 19:31:57 -0500
-References: <20181031003120.26771-12-ehabkost@redhat.com>
-	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
-	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
-	<20181106141302.GP12503@habkost.net>
-	<87efbxxw1c.fsf@dusky.pond.sub.org>
-	<8ecdbb0e-aaf8-ddc5-6442-87977585d9d8@redhat.com>
-	<87y3a4ot3g.fsf@dusky.pond.sub.org>
-	<f69012ad-af21-783c-d378-acd3131451e4@redhat.com>
-	<20181108165136.GK12503@habkost.net>
-	<d8782551-ca89-c70c-a2b9-0ba665171c63@redhat.com>
-	<20181108182644.GP12503@habkost.net>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <9ffbcd46-07a0-ea31-66a9-c29fb2ef8c64@redhat.com>
-Date: Thu, 8 Nov 2018 19:31:25 -0500
+	(envelope-from <dongli.zhang@oracle.com>) id 1gKvsu-00021D-Lz
+	for qemu-devel@nongnu.org; Thu, 08 Nov 2018 20:46:57 -0500
+References: <20181105205641.17862-1-v.mayatskih@gmail.com>
+	<20181105205641.17862-2-v.mayatskih@gmail.com>
+	<d96db69e-1276-b4d5-e8a1-e9cdf8bda567@oracle.com>
+	<20181108114640-mutt-send-email-mst@kernel.org>
+From: Dongli Zhang <dongli.zhang@oracle.com>
+Message-ID: <1b0590da-68a2-cc52-bfe8-cb6e59eb43ec@oracle.com>
+Date: Fri, 9 Nov 2018 09:48:17 +0800
 MIME-Version: 1.0
-In-Reply-To: <20181108182644.GP12503@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20181108114640-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Fix Python 3 detection
- on older GNU make versions
+Subject: Re: [Qemu-devel] [PATCH 1/1 V2] Add vhost-pci-blk driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Vitaly Mayatskikh <v.mayatskih@gmail.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
 
 
 
-On 11/8/18 1:26 PM, Eduardo Habkost wrote:
-> On Thu, Nov 08, 2018 at 12:36:37PM -0500, Cleber Rosa wrote:
+On 11/09/2018 12:47 AM, Michael S. Tsirkin wrote:
+> On Thu, Nov 08, 2018 at 10:09:00PM +0800, Dongli Zhang wrote:
+>> It looks the kernel space vhost-blk can only process raw image.
 >>
+>> How about to verify that only raw image is used in the drive command line when
+>> vhost-blk-pci is paired with it?
 >>
->> On 11/8/18 11:51 AM, Eduardo Habkost wrote:
+>> Otherwise, vhost-blk-pci might be working with qcow2 image without any warning
+>> on qemu side.
 >>
->>> I'm not sure I agree with the "is an important thing to keep
->>> track of" part.  I don't think we'll have any need to keep track
->>> of the Python version in shell script or makefiles after we start
->>> requiring Python 3.
->>>
->>
->> Well, "Python 3" is not a uniform thing.  There are many changes across
->> the 3.x spectrum that can bite you.  I'm speaking out of the experience
->> with Avocado, that supports Python 3.4, 3.5 and 3.6 (and that reminds me
->> we should add tests for 3.7).
+>> Dongli Zhang
 > 
-> Do you expect us to need to keep track of the exact Python
-> version before running the Python interpreter?  Code written in
-> Python doesn't count, because it can simply use sys.version_info.
-> 
+> raw being raw can you really verify that?
 > 
 
-You're right, Python code can do that.  My proposal is really to
-facilitate other parts of the test automation, and as described later,
-the debugging on remote systems.
+I meant to verify the property 'format=' of '-drive', e.g., to check if
+BlockBackend->root->bs->drv->format_name is raw?
 
->>
->>> Extra cleanups (like moving version checks to ./configure) are
->>> still welcome, but keep in mind that this will probably be thrown
->>> away once we drop Python 2 support.
->>>
->>
->> I don't think it should.  Let me give the example of a "Python 3.0" job
->> on Travis, related to the following snippet:
->>
->>     # Python builds
->>     - env: CONFIG="--target-list=x86_64-softmmu"
->>       python:
->>         - "3.0"
->>
->> If you look at https://travis-ci.org/clebergnu/qemu/jobs/452033247#L983
->> you'll see that the intended goal was missed.  That has to do with how
->> Travis makes the requested Python version available, and it was only
->> obvious because this branch prints the Python version used.
->>
->> Developers writing Python code, for instance tests, may assume a given
->> API that doesn't exist or behave like they expect, and not knowing the
->> Python version used on a remote environment makes debugging extra hard.
-> 
-> I'm not sure I get your point.  We can surely add diagnostic
-> messages to show the Python version, and we can make ./configure
-> fail if Python 3 is unavailable.  I'm talking about adding code
-> to ./configure to save Python version info for makefile rules and
-> shell scripts.  I expect the extra code to be unnecessary in the
-> future.
-> 
+We allow the user to erroneously give a qcow2 file with 'format=raw'. However,
+if 'format=qcow2' is set explicitly, vhots-blk-pci would exit with error as only
+raw is supported in kernel space.
 
-I'm definitely happy if you agree with printing the Python version,
-that's where most of the value is indeed.  Then, if we need to keep the
-version in the generate Makefile is something to be seen.
-
-- Cleber.
+Dongli Zhang
