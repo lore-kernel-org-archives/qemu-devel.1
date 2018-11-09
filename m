@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gL8om-00051h-CP
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:35:33 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gL8z1-0004Zi-EX
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:46:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gL8ol-0002Ut-AF
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:35:32 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40389)
+	(envelope-from <alex.bennee@linaro.org>) id 1gL8yx-0001M0-ME
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:46:07 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:32960)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gL8oe-0002Do-KE
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:35:26 -0500
-Received: by mail-oi1-x243.google.com with SMTP id u130-v6so1775561oie.7
-	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 07:35:04 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gL8yw-0001AS-3I
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:46:03 -0500
+Received: by mail-wr1-x444.google.com with SMTP id u9-v6so2398562wrr.0
+	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 07:46:00 -0800 (PST)
+References: <20181109152119.9242-1-alex.bennee@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181109152119.9242-1-alex.bennee@linaro.org>
+Date: Fri, 09 Nov 2018 15:45:57 +0000
+Message-ID: <87ftwa5k5m.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181109153002.597-2-crosa@redhat.com>
-References: <20181109153002.597-1-crosa@redhat.com>
-	<20181109153002.597-2-crosa@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 9 Nov 2018 15:34:42 +0000
-Message-ID: <CAFEAcA8-Av_d7A0GEQGfkdC90N41or=vni480k=4dO2daXkdZQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] tests/test-qht-par: test gets
- stuck intermittently on OSX
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] KVM Guest Debug fixes (plus TCG EL2
+ debug tweaks)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, G 3 <programmingkidx@gmail.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-On 9 November 2018 at 15:30, Cleber Rosa <crosa@redhat.com> wrote:
-> To be fully honest, this may not be a OSX (alone) condition, but may
-> be a situation that only happens with OSX on Travis-CI, were resources
-> are quite limited.
+
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+
+> Hi,
 >
-> I have personal experience with tests that exercise parallelism or
-> depend on timing to fail on Travis.  Because I'm not 100% certain that
-> this is a situation that only happens with OSX on Travis-CI, and
-> because I'm not certain that we should be skipping tests because
-> they're running on Travis-CI, let's disable them on OSX as a whole.
+> I missed a fix I'd applied locally from v2 so this is a resend with
+> some additional tags, some changes suggested by rth and one more fix
+> for the test case.
+>
+> So these are fixes for guest debug when running under KVM. While
+> re-spinning these I came across an anomaly which pointed to a kernel bug
+> that caused the 1st single-step to fail. This is being discussed at on
+> the kvm-arm list:
+>
+>   Subject: [RFC PATCH] KVM: arm64: don't single-step for non-emulated fau=
+lts
+>   Date: Wed, 7 Nov 2018 17:10:31 +0000
+>   Message-Id: <20181107171031.22573-1-alex.bennee@linaro.org>
+>
+> It looks like there will be another patch series on its way to address
+> this.
 
-Does this test still get stuck in builds after a458774ad711bceabefb ?
-That fixed an OSX-specific problem that caused hangs (notably
-in test-bdrv-drain, but it could I guess also affect other tests).
+For reference Mark has posted this now:
 
-thanks
--- PMM
+   Subject: [PATCH 0/2] kvm/arm: make singlestep behaviour consistent
+   Date: Fri,  9 Nov 2018 15:07:09 +0000
+   Message-Id: <20181109150711.45864-1-mark.rutland@arm.com>
+--
+Alex Benn=C3=A9e
