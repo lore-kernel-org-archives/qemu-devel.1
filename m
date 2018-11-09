@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gL3qu-0007SE-Cm
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 05:17:25 -0500
+	(envelope-from <fziglio@redhat.com>) id 1gL3uJ-000221-Pc
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 05:20:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gL3qn-0001nM-Pa
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 05:17:22 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:40001
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gL3qn-0001dG-Fc
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 05:17:17 -0500
-References: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <8a4b7981-cc1f-d2a7-2d92-9bf54a4bb42a@ilande.co.uk>
-Date: Fri, 9 Nov 2018 10:17:02 +0000
+	(envelope-from <fziglio@redhat.com>) id 1gL3uG-0004ec-EM
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 05:20:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43918)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1gL3uG-0004TE-3U
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 05:20:52 -0500
+Date: Fri, 9 Nov 2018 05:20:40 -0500 (EST)
+From: Frediano Ziglio <fziglio@redhat.com>
+Message-ID: <1833668908.41731563.1541758840856.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20181109101056.oyqapawhy5jmeut4@sirius.home.kraxel.org>
+References: <20181107104921.20536-1-lhrazky@redhat.com>
+	<20181107104921.20536-2-lhrazky@redhat.com>
+	<20181108064927.i6llxv4kgcrdon7n@sirius.home.kraxel.org>
+	<1541671510.16655.506.camel@redhat.com>
+	<20181109101056.oyqapawhy5jmeut4@sirius.home.kraxel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] List of files containing devices which have not
- been QOMified
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH spice v3 1/3] QXL interface: add a
+ function to identify monitors in the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: =?utf-8?B?THVrw6HFoSBIcsOhemvDvQ==?= <lhrazky@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-On 06/11/2018 18:43, Peter Maydell wrote:
+> On Thu, Nov 08, 2018 at 11:05:10AM +0100, Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=
+=BD wrote:
+> > Hello,
+> >=20
+> > On Thu, 2018-11-08 at 07:49 +0100, Gerd Hoffmann wrote:
+> > >   Hi,
+> > >=20
+> > > > + * The device_display_id_{start,count} denotes the sequence of dev=
+ice
+> > > > display
+> > > > + * IDs that map to the zero-based sequence of monitor IDs provided=
+ by
+> > > > monitors
+> > > > + * config on this interface. For example with device_display_id_st=
+art
+> > > > =3D 2 and
+> > > > + * device_display_id_count =3D 3 you get the following mapping:
+> > > > + * monitor_id  ->  device_display_id
+> > > > + *          0  ->  2
+> > > > + *          1  ->  3
+> > > > + *          2  ->  4
+> > > > + *
+> > > > + * Note this example is unsupported in practice. The only supporte=
+d
+> > > > cases are
+> > > > + * either a single device display ID (count =3D 1) or multiple dev=
+ice
+> > > > display IDs
+> > > > + * in a sequence starting from 0.
+> > >=20
+> > > This is confusing.  The usage of this api in the qemu counterpart loo=
+ks
+> > > sane though.
+> >=20
+> > Not sure what you find confusing in particular... The example? Using an
+> > example and then saying it's not supported?
+>=20
+> Yes, that for example.  Also wondering why device_display_id doesn't
+> start at zero.
+>=20
 
-> I had an idea for how to get a rough list of source files
-> containing devices that haven't been QOMified. The theory
-> is that a pre-QOM device generally has an "init" function
-> which allocates memory for the device struct. So looking in
-> hw/ for files which call g_new*() or g_malloc*() should get
-> us all the non-QOM devices (as well as a pile of false
-> positives, of course). The following link is the result of
-> doing that and then eyeballing the results for false positives
-> and throwing those out. It might have missed one or two
-> files or included one or two by mistake. But I think it's
-> pretty close, and it seems to have caught all the obvious
-> ones I knew about. There are 61 files on this list.
-> 
-> I am also suspicious about hw/bt/ but don't know enough
-> about that subsystem to say if it could benefit from
-> using QOM objects more.
+You introduced this ID so you should remember.
+It starts from 0, just this is not the first registration, the other displa=
+ys
+were registered to other QXL instances.
+This was introduced for virtio-gpu to be able to register the different
+outputs to different QXL instances so to have
 
-> hw/ppc/prep.c
+first output/display:
+  spice_qxl_set_device_info(instance1, path1, 0, 1);
+second:
+  spice_qxl_set_device_info(instance2, path1, 1, 1);
+third:
+  spice_qxl_set_device_info(instance3, path1, 2, 1);
 
-I had a quick look at this and AFAICT it's in the old -M prep code which is
-deprecated and hopefully scheduled for removal soon, so I think we can leave this one.
+So as you can see device_display_id start from 0 but does not mean
+is always 0 for every call.
 
-> hw/sparc64/sparc64.c
+> cheers,
+>   Gerd
+>=20
+>=20
+>=20
 
-This would appear to be from sparc64_cpu_devinit() which sets up a ResetData
-structure like this:
-
-    reset_info = g_malloc0(sizeof(ResetData));
-    reset_info->cpu = cpu;
-    reset_info->prom_addr = prom_addr;
-    qemu_register_reset(main_cpu_reset, reset_info);
-
-Presumably this can now be handled by using CPUClass's reset() method? The prom_addr
-field is a per-machine parameter that is used to derive the starting PC for the CPU,
-so I believe converting this to a qdev parameter on the SPARC CPU should suffice.
-
-
-ATB,
-
-Mark.
+Frediano
