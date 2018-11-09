@@ -1,19 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gL7eL-00063q-P1
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:20:42 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gL7gy-0007a3-Dg
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:23:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gL7eI-0005J1-H3
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:20:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57892)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gL7eI-0005Ic-Av
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:20:38 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  9 Nov 2018 15:20:32 +0100
-Message-Id: <20181109142032.1628-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] pulseaudio: process audio data in smaller
- chunks
+	(envelope-from <amarkovic@wavecomp.com>) id 1gL7gu-0007VH-9l
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:23:24 -0500
+Received: from mail-co1nam03on0090.outbound.protection.outlook.com
+	([104.47.40.90]:12570
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gL7gt-0007Tu-SQ
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 09:23:20 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 9 Nov 2018 14:23:16 +0000
+Message-ID: <BN6PR2201MB12512E2D06C8A6CD54BBEE8EC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <cover.1541616663.git.noring@nocrew.org>
+	<e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>
+	<BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<BN6PR2201MB1251F9977B0D4B901801275CC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>,
+	<20181109132411.GA2303@sx9>
+In-Reply-To: <20181109132411.GA2303@sx9>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism
+ of special R5900 opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Max Ehrlich <maxehr@umiacs.umd.edu>, Martin Schrodt <martin@schrodt.org>
+To: Fredrik Noring <noring@nocrew.org>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-The rate of pulseaudio absorbing the audio stream is used to control the
-the rate of the guests audio stream.  When the emulated hardware uses
-small chunks (like intel-hda does) we need small chunks on the audio
-backend side too, otherwise that feedback loop doesn't work very well.
+> From: Fredrik Noring <noring@nocrew.org>
+> Subject: Re: [PATCH v2 4/6] target/mips: Fix decoding mechanism of specia=
+l R5900 opcodes
+>=20
+> >
+> > Could you please provide a document that would justify inclusion of the=
+se
+> > non-R5900 instruction in an R5900 emulation?
+>=20
+> Would you accept the TX79 manual mentioned above as such a document?
+>
 
-Cc: Max Ehrlich <maxehr@umiacs.umd.edu>
-Cc: Martin Schrodt <martin@schrodt.org>
-Buglink: https://bugs.launchpad.net/bugs/1795527
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- audio/paaudio.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Tx79 mentions the opposite: that DDIV, DDIVU, DMULT, DMULTU are not include=
+d in R5900 set.
 
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 949769774d..4c100bc318 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -227,7 +227,7 @@ static void *qpa_thread_out (void *arg)
-             }
-         }
- 
--        decr = to_mix = audio_MIN (pa->live, pa->g->conf.samples >> 2);
-+        decr = to_mix = audio_MIN(pa->live, pa->g->conf.samples >> 5);
-         rpos = pa->rpos;
- 
-         if (audio_pt_unlock(&pa->pt, __func__)) {
-@@ -319,7 +319,7 @@ static void *qpa_thread_in (void *arg)
-             }
-         }
- 
--        incr = to_grab = audio_MIN (pa->dead, pa->g->conf.samples >> 2);
-+        incr = to_grab = audio_MIN(pa->dead, pa->g->conf.samples >> 5);
-         wpos = pa->wpos;
- 
-         if (audio_pt_unlock(&pa->pt, __func__)) {
--- 
-2.9.3
+I think that the best solution that you exclude DDIV, DDIVU, DMULT, DMULTU =
+in a separate patch - there is no document to support their inclusion.
+
+Aleksandar=
