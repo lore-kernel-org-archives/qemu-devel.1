@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gL8bC-0001CF-29
+	(envelope-from <alex.bennee@linaro.org>) id 1gL8bC-0001CS-5r
 	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gL8b8-0002yI-Pw
+	(envelope-from <alex.bennee@linaro.org>) id 1gL8bA-00030Q-Fm
 	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:21:29 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42773)
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38703)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gL8b6-0002jU-V9
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:21:25 -0500
-Received: by mail-wr1-x444.google.com with SMTP id y15-v6so2283225wru.9
-	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 07:21:23 -0800 (PST)
+	id 1gL8bA-0002xU-2N
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:21:28 -0500
+Received: by mail-wr1-x442.google.com with SMTP id e3-v6so2298968wrs.5
+	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 07:21:26 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  9 Nov 2018 15:21:14 +0000
-Message-Id: <20181109152119.9242-3-alex.bennee@linaro.org>
+Date: Fri,  9 Nov 2018 15:21:19 +0000
+Message-Id: <20181109152119.9242-8-alex.bennee@linaro.org>
 In-Reply-To: <20181109152119.9242-1-alex.bennee@linaro.org>
 References: <20181109152119.9242-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 2/7] target/arm64: hold BQL when calling
- do_interrupt()
+Subject: [Qemu-devel] [PATCH v3 7/7] arm: fix aa64_generate_debug_exceptions
+ to work with EL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +33,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Fix the assertion failure when running interrupts.
+The test was incomplete and incorrectly caused debug exceptions to be
+generated when returning to EL2 after a failed attempt to single-step
+an EL1 instruction. Fix this while cleaning up the function a little.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/kvm64.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 6351a54b28..c39150e5e1 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -1000,7 +1000,9 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit)
-     cs->exception_index = EXCP_BKPT;
-     env->exception.syndrome = debug_exit->hsr;
-     env->exception.vaddress = debug_exit->far;
-+    qemu_mutex_lock_iothread();
-     cc->do_interrupt(cs);
-+    qemu_mutex_unlock_iothread();
- 
-     return false;
+---
+v3
+  - further re-arrangement as suggested by rth
+---
+ target/arm/cpu.h | 39 ++++++++++++++++++++++++---------------
+ 1 file changed, 24 insertions(+), 15 deletions(-)
+
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 1efff21a18..814ff69bc2 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2764,23 +2764,35 @@ static inline bool arm_v7m_csselr_razwi(ARMCPU *cpu)
+     return (cpu->clidr & R_V7M_CLIDR_CTYPE_ALL_MASK) != 0;
  }
+ 
++/* See AArch64.GenerateDebugExceptionsFrom() in ARM ARM pseudocode */
+ static inline bool aa64_generate_debug_exceptions(CPUARMState *env)
+ {
+-    if (arm_is_secure(env)) {
+-        /* MDCR_EL3.SDD disables debug events from Secure state */
+-        if (extract32(env->cp15.mdcr_el3, 16, 1) != 0
+-            || arm_current_el(env) == 3) {
+-            return false;
+-        }
++    int cur_el = arm_current_el(env);
++    int debug_el;
++
++    if (cur_el == 3) {
++        return false;
+     }
+ 
+-    if (arm_current_el(env) == arm_debug_target_el(env)) {
+-        if ((extract32(env->cp15.mdscr_el1, 13, 1) == 0)
+-            || (env->daif & PSTATE_D)) {
+-            return false;
+-        }
++    /* MDCR_EL3.SDD disables debug events from Secure state */
++    if (arm_is_secure_below_el3(env)
++        && extract32(env->cp15.mdcr_el3, 16, 1)) {
++        return false;
+     }
+-    return true;
++
++    /*
++     * Same EL to same EL debug exceptions need MDSCR_KDE enabled
++     * while not masking the (D)ebug bit in DAIF.
++     */
++    debug_el = arm_debug_target_el(env);
++
++    if (cur_el == debug_el) {
++        return extract32(env->cp15.mdscr_el1, 13, 1)
++            && !(env->daif & PSTATE_D);
++    }
++
++    /* Otherwise the debug target needs to be a higher EL */
++    return debug_el > cur_el;
+ }
+ 
+ static inline bool aa32_generate_debug_exceptions(CPUARMState *env)
+@@ -2833,9 +2845,6 @@ static inline bool aa32_generate_debug_exceptions(CPUARMState *env)
+  * since the pseudocode has it at all callsites except for the one in
+  * CheckSoftwareStep(), where it is elided because both branches would
+  * always return the same value.
+- *
+- * Parts of the pseudocode relating to EL2 and EL3 are omitted because we
+- * don't yet implement those exception levels or their associated trap bits.
+  */
+ static inline bool arm_generate_debug_exceptions(CPUARMState *env)
+ {
 -- 
 2.17.1
