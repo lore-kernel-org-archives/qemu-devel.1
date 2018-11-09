@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gL8k7-0002Ea-Ru
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:30:44 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gL8n3-000437-OZ
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:33:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gL8k6-0007xo-SD
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:30:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56192)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gL8k6-0007wg-Kb
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:30:42 -0500
-From: Cleber Rosa <crosa@redhat.com>
-Date: Fri,  9 Nov 2018 10:30:02 -0500
-Message-Id: <20181109153002.597-3-crosa@redhat.com>
-In-Reply-To: <20181109153002.597-1-crosa@redhat.com>
-References: <20181109153002.597-1-crosa@redhat.com>
-MIME-Version: 1.0
+	(envelope-from <amarkovic@wavecomp.com>) id 1gL8n0-0001Kn-6g
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:33:45 -0500
+Received: from mail-by2nam03on0721.outbound.protection.outlook.com
+	([2a01:111:f400:fe4a::721]:14063
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gL8mz-0001Jm-RY
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:33:42 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 9 Nov 2018 15:23:36 +0000
+Message-ID: <BN6PR2201MB1251A570A76178D7BD66B247C6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <cover.1541616663.git.noring@nocrew.org>
+	<e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>
+	<BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<BN6PR2201MB1251F9977B0D4B901801275CC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+	<20181109132411.GA2303@sx9>
+	<BN6PR2201MB12512E2D06C8A6CD54BBEE8EC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>,
+	<20181109143529.GA10409@sx9>,
+	<BN6PR2201MB12513465BDF12670379AA72DC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+In-Reply-To: <BN6PR2201MB12513465BDF12670379AA72DC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH 2/2] Travis CI: break down OSX+clang jobs
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism
+ of special R5900 opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +38,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, programmingkidx@gmail.com, Wainer dos Santos Moschetta <wainersm@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Fredrik Noring <noring@nocrew.org>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-The OSX jobs were timing out on Travis, due to the long time they need
-to run tests with all targets.  Let's break them down to avoid hitting
-the time limit, and at the same time, give faster results.
+> From: Fredrik Noring <noring@nocrew.org>
+> Subject: Re: [PATCH v2 4/6] target/mips: Fix decoding mechanism of specia=
+l R5900 opcodes
+>
+> Hi Aleksandar,
+>
+> > Tx79 mentions the opposite: that DDIV, DDIVU, DMULT, DMULTU are not
+> > included in R5900 set.
+> >
+> > I think that the best solution that you exclude DDIV, DDIVU, DMULT, DMU=
+LTU
+> > in a separate patch - there is no document to support their inclusion.
+>
+> As Maciej noted, the 64-bit MIPS Linux psABI is indivisible, so how could
+> your alternative possibly work?
 
-Additionally the qtest based tests were hanging intermittently.  The
-first debugging attempt involved making their execution verbose.  That
-alone seemed to produce a positive effect and no hangs were observed
-after that.  Given that Travis checks for output to decide if a test
-is hung or not, it makes sense that a verbose execution minimizes
-false positives.
+Since we are rapidly approaching 3.1 release, we don't have time for prolon=
+ged discussions - so please provide the patch that removes emulation of the=
+se instructions that don't belong to R5900 set, and, if you find a justific=
+ation document later on, they can be reintroduced in 3.1+ timeframe.
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- .travis.yml | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
-
-diff --git a/.travis.yml b/.travis.yml
-index aa49c7b114..505561aae6 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -107,7 +107,34 @@ matrix:
-     - env: CONFIG=3D"--disable-tcg"
-            TEST_CMD=3D""
-       compiler: gcc
--    - env: CONFIG=3D""
-+    # osx+clang jobs are broken in a number of target specific sets to
-+    # allow jobs to finish before timing out
-+    - env: CONFIG=3D"--target-list=3Daarch64-softmmu,alpha-softmmu,arm-s=
-oftmmu,cris-softmmu"
-+           TEST_CMD=3D"make V=3D1 check"
-+      os: osx
-+      compiler: clang
-+    - env: CONFIG=3D"--target-list=3Di386-softmmu,lm32-softmmu,m68k-soft=
-mmu,moxie-softmmu"
-+           TEST_CMD=3D"make V=3D1 check"
-+      os: osx
-+      compiler: clang
-+    - env: CONFIG=3D"--target-list=3Dmips-softmmu,mips64-softmmu,mips64e=
-l-softmmu,mipsel-softmmu"
-+           TEST_CMD=3D"make V=3D1 check"
-+      os: osx
-+      compiler: clang
-+    - env: CONFIG=3D"--target-list=3Dnios2-softmmu,or1k-softmmu,ppc-soft=
-mmu,ppc64-softmmu,riscv32-softmmu"
-+           TEST_CMD=3D"make V=3D1 check"
-+      os: osx
-+      compiler: clang
-+    - env: CONFIG=3D"--target-list=3Ds390x-softmmu,sh4-softmmu,sh4eb-sof=
-tmmu,sparc-softmmu,sparc64-softmmu"
-+           TEST_CMD=3D"make V=3D1 check"
-+      os: osx
-+      compiler: clang
-+    - env: CONFIG=3D"--target-list=3Dunicore32-softmmu,x86_64-softmmu,xt=
-ensa-softmmu,xtensaeb-softmmu"
-+           TEST_CMD=3D"make V=3D1 check"
-+      os: osx
-+      compiler: clang
-+    - env: CONFIG=3D"--target-list=3Dhppa-softmmu,microblaze-softmmu,mic=
-roblazeel-softmmu,tricore-softmmu,riscv64-softmmu"
-+           TEST_CMD=3D"make V=3D1 check"
-       os: osx
-       compiler: clang
-     # Python builds
---=20
-2.19.1
+Thanks,
+Aleksnadar=
