@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gLBPv-0001Ap-Jx
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:22:04 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gLBTF-0005Id-Fj
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:25:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1gLBPr-0000Bq-5E
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:22:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47158)
+	(envelope-from <ehabkost@redhat.com>) id 1gLBT8-0003Ne-AQ
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:25:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43606)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1gLBPq-0000BT-Tp
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:21:59 -0500
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Date: Fri,  9 Nov 2018 13:21:53 -0500
-Message-Id: <20181109182153.5390-1-wainersm@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gLBT1-0003Fi-3N
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 13:25:17 -0500
+Date: Fri, 9 Nov 2018 16:25:01 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181109182501.GY12503@habkost.net>
+References: <20181109150710.31085-1-crosa@redhat.com>
+	<20181109150710.31085-2-crosa@redhat.com>
+	<20181109154908.GW12503@habkost.net>
+	<2426066f-37b0-acb8-f5f9-02fec9b6d7fa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] Acceptance tests: add Linux initrd checking
- test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2426066f-37b0-acb8-f5f9-02fec9b6d7fa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] configure: keep track of Python version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,99 +29,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ccarrara@redhat.com, ehabkost@redhat.com, crosa@redhat.com, philmd@redhat.com, lizhijian@cn.fujitsu.com
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 
-QEMU used to exits with a not accurate error message when
-an initrd > 2GiB was passed. That was fixed on patch:
+On Fri, Nov 09, 2018 at 11:39:32AM -0500, Cleber Rosa wrote:
+> 
+> 
+> On 11/9/18 10:49 AM, Eduardo Habkost wrote:
+> > On Fri, Nov 09, 2018 at 10:07:07AM -0500, Cleber Rosa wrote:
+> >> Some functionality is dependent on the Python version
+> >> detected/configured on configure.  While it's possible to run the
+> >> Python version later and check for the version, doing it once is
+> >> preferable.  Also, it's a relevant information to keep in build logs,
+> >> as the overall behavior of the build can be affected by it.
+> >>
+> >> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> >> ---
+> >>  configure | 6 +++++-
+> >>  1 file changed, 5 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/configure b/configure
+> >> index 74e313a810..67fff0290d 100755
+> >> --- a/configure
+> >> +++ b/configure
+> >> @@ -1740,6 +1740,9 @@ if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
+> >>        "Use --python=/path/to/python to specify a supported Python."
+> >>  fi
+> >>  
+> >> +# Preserve python version since some functionality is dependent on it
+> >> +python_version=$($python -V 2>&1 | sed -e 's/Python\ //')
+> > 
+> > What about:
+> >   $($python -c 'import sys;print(sys.version)')
+> > ?
+> > 
+> > It is very verbose, but I think that's a good thing.
+> > 
+> 
+> Well, something like:
+> 
+> '3.7.1 (default, Oct 23 2018, 18:19:07) \n[GCC 8.2.1 20180801 (Red Hat
+> 8.2.1-2)]'
+> 
+> Doesn't qualify as simply the Python *version*.  The documentation[1]
+> puts it clearly: "A string containing the version number of the Python
+> interpreter plus additional information on the build number and compiler
+> used. This string is displayed when the interactive interpreter is started."
+> 
+> I can't see how the compiler used on the Python build, or the build
+> date, can be significant to someone debugging the type of Python code
+> that will be on QEMU.
 
-	commit f3839fda5771596152b75dd1e1a6d050e6e6e380
-	Author: Li Zhijian <lizhijian@cn.fujitsu.com>
-	Date:   Thu Sep 13 18:07:13 2018 +0800
+No problem to me.
 
-    	change get_image_size return type to int64_t
+> 
+> >> +
+> >>  # Suppress writing compiled files
+> >>  python="$python -B"
+> >>  
+> >> @@ -5918,7 +5921,7 @@ echo "LDFLAGS           $LDFLAGS"
+> >>  echo "QEMU_LDFLAGS      $QEMU_LDFLAGS"
+> >>  echo "make              $make"
+> >>  echo "install           $install"
+> >> -echo "python            $python"
+> >> +echo "python            $python ($python_version)"
+> >>  if test "$slirp" = "yes" ; then
+> >>      echo "smbd              $smbd"
+> >>  fi
+> >> @@ -6823,6 +6826,7 @@ echo "INSTALL_DATA=$install -c -m 0644" >> $config_host_mak
+> >>  echo "INSTALL_PROG=$install -c -m 0755" >> $config_host_mak
+> >>  echo "INSTALL_LIB=$install -c -m 0644" >> $config_host_mak
+> >>  echo "PYTHON=$python" >> $config_host_mak
+> >> +echo "PYTHON_VERSION=$python_version" >> $config_host_mak
+> > 
+> > The output of "python -V" and "sys.version" seems to be meant for
+> > humans, not software.  If we really want something to be used in
+> > conditional makefile rules, I'd prefer to use sys.version_info.
+> > e.g.:
+> > 
+> 
+> "Python -V" is quite different from "sys.version".  Indeed it includes
+> the "Python " prefix, but that's all, everything else is the version number.
 
-This change adds a regression test for that fix. It starts
-QEMU with a 2GiB dummy initrd, and check it evaluates the file
-size correctly and prints accurate message.
+Is this a guarantee documented somewhere?
 
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Reviewed-by: Caio Carrara <ccarrara@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
+> 
+> >   python_major_version="$($python -c 'import sys;print(sys.version_info[0])')"
+> >   echo "PYTHON_MAJOR_VERSION=$python_major_version"
+> > 
+> > 
+> 
+> No, I'm actually interested in the other version components, not just
+> the major version.  As I tried to explain in another thread, differences
+> from Python 3.0 to 3.4 are many, and from 3.4 to 3.6 and so on.
 
-Changes in v2:
- * disambiguous GB vs GiB in comments and commit msg [ehabkost]
- * uses max_size variable [crosa]
- * checks return code equals to 1 [ehabkost]
- * checks expected message contain needed max_size [crosa]
+Do you have any examples in mind?  I really doubt we will need to
+look at the Python minor version number inside shell scripts or
+makefiles.
 
----
- tests/acceptance/linux_initrd.py | 48 ++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
- create mode 100644 tests/acceptance/linux_initrd.py
+> 
+> Then, we can either introduce "PYTHON_MAJOR_VERSION",
+> "PYTHON_MINOR_VERSION", "PYTHON_RELEASE" of sorts, or just have a single
+> dot separated version string.
 
-diff --git a/tests/acceptance/linux_initrd.py b/tests/acceptance/linux_in=
-itrd.py
-new file mode 100644
-index 0000000000..737355c2ef
---- /dev/null
-+++ b/tests/acceptance/linux_initrd.py
-@@ -0,0 +1,48 @@
-+# Linux initrd acceptance test.
-+#
-+# Copyright (c) 2018 Red Hat, Inc.
-+#
-+# Author:
-+#  Wainer dos Santos Moschetta <wainersm@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+import tempfile
-+from avocado.utils.process import run
-+
-+from avocado_qemu import Test
-+
-+
-+class LinuxInitrd(Test):
-+    """
-+    Checks QEMU evaluates correctly the initrd file passed as -initrd op=
-tion.
-+
-+    :avocado: enable
-+    :avocado: tags=3Dx86_64
-+    """
-+
-+    timeout =3D 60
-+
-+    def test_with_2gib_file_should_exit_error_msg(self):
-+        """
-+        Pretends to boot QEMU with an initrd file with size of 2GiB
-+        and expect it exits with error message.
-+        """
-+        kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/28/'
-+                      'Everything/x86_64/os/images/pxeboot/vmlinuz')
-+        kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
-+        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-+        max_size =3D 2 * (1024 ** 3) - 1
-+
-+        with tempfile.NamedTemporaryFile() as initrd:
-+            initrd.seek(max_size)
-+            initrd.write(b'\0')
-+            initrd.flush()
-+            cmd =3D "%s -kernel %s -initrd %s" % (self.qemu_bin, kernel_=
-path,
-+                                                initrd.name)
-+            res =3D run(cmd, ignore_status=3DTrue)
-+            self.assertEqual(res.exit_status, 1)
-+            expected_msg =3D r'.*initrd is too large.*max: \d+, need %s.=
-*' % (
-+                max_size + 1)
-+            self.assertRegex(res.stderr_text, expected_msg)
---=20
-2.17.2
+A dot separated version string would work for me, too.  I don't
+mind the format that much, because I expect the new variable to
+become unnecessary in the next year.  :)
+
+-- 
+Eduardo
