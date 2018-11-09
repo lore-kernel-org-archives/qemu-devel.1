@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gL95e-0003GD-Cp
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:52:59 -0500
+	(envelope-from <cota@braap.org>) id 1gL99R-0004lA-F0
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:56:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gL95b-0006oj-6v
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:52:58 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33848)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gL95Z-0006nO-BC
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:52:53 -0500
-Received: by mail-wr1-x441.google.com with SMTP id j26-v6so2411157wre.1
-	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 07:52:52 -0800 (PST)
-References: <20181109150710.31085-1-crosa@redhat.com>
-	<20181109150710.31085-4-crosa@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181109150710.31085-4-crosa@redhat.com>
-Date: Fri, 09 Nov 2018 15:52:49 +0000
-Message-ID: <87efbu5ju6.fsf@linaro.org>
+	(envelope-from <cota@braap.org>) id 1gL99O-0001j1-7q
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:56:53 -0500
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:56331)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gL99O-0001aI-10
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 10:56:50 -0500
+Date: Fri, 9 Nov 2018 10:56:40 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181109155640.GA12624@flamenco>
+References: <20181109153002.597-1-crosa@redhat.com>
+	<20181109153002.597-2-crosa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/4] Travis CI: make specified Python
- versions usable on jobs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181109153002.597-2-crosa@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/2] tests/test-qht-par: test gets
+ stuck intermittently on OSX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +29,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, Caio Carrara <ccarrara@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Wainer dos Santos Moschetta <wainersm@redhat.com>, programmingkidx@gmail.com, Caio Carrara <ccarrara@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-
-Cleber Rosa <crosa@redhat.com> writes:
-
-> For the two Python jobs, which seem to have the goal of making sure
-> QEMU builds successfully on the 3.0-3.6 spectrum of Python 3 versions,
-> the specified version is only applicable if a Python virtual
-> environment is used.  To do that, it's necessary to define the
-> (primary?) language of the job to be Python.
->
-> Also, Travis doesn't have a 3.0 Python installation available for the
-> chosen distro, 3.2 being the lower version available.
->
-> Reference: https://docs.travis-ci.com/user/languages/python/#specifying-p=
-ython-versions
+On Fri, Nov 09, 2018 at 10:30:01 -0500, Cleber Rosa wrote:
+> To be fully honest, this may not be a OSX (alone) condition, but may
+> be a situation that only happens with OSX on Travis-CI, were resources
+> are quite limited.
+> 
+> I have personal experience with tests that exercise parallelism or
+> depend on timing to fail on Travis.  Because I'm not 100% certain that
+> this is a situation that only happens with OSX on Travis-CI, and
+> because I'm not certain that we should be skipping tests because
+> they're running on Travis-CI, let's disable them on OSX as a whole.
+> 
+> A small note: this type of change makes me believe that there should
+> be a list of testing related caveats or TODO list tracked on the
+> documentation.
+> 
 > Signed-off-by: Cleber Rosa <crosa@redhat.com>
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Is there a way to know where it hangs?
 
-Do you want me to take this via my tree or keep it with the other patches?
+Also, are these the g_test_quick tests, or the other ones? It it's
+just a matter of the program taking too long to run, we could just
+reduce the length of the !quick tests (currently at 5s vs. 1s for
+the quick ones).
 
-> ---
->  .travis.yml | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index aa49c7b114..5c18d3e268 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -112,9 +112,11 @@ matrix:
->        compiler: clang
->      # Python builds
->      - env: CONFIG=3D"--target-list=3Dx86_64-softmmu"
-> +      language: python
->        python:
-> -        - "3.0"
-> +        - "3.2"
->      - env: CONFIG=3D"--target-list=3Dx86_64-softmmu"
-> +      language: python
->        python:
->          - "3.6"
->      # Acceptance (Functional) tests
+Thanks,
 
-
---
-Alex Benn=C3=A9e
+		Emilio
