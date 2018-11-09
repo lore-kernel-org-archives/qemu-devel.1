@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gL3Al-0001AN-JG
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 04:33:52 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gL3Qc-0000lJ-Sx
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 04:50:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gL3Ak-00019I-Gk
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 04:33:51 -0500
-Date: Fri, 9 Nov 2018 10:33:16 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181109093316.GA4635@dhcp-200-186.str.redhat.com>
-References: <20181105205641.17862-1-v.mayatskih@gmail.com>
-	<20181105205641.17862-2-v.mayatskih@gmail.com>
-	<d96db69e-1276-b4d5-e8a1-e9cdf8bda567@oracle.com>
-	<20181108114640-mutt-send-email-mst@kernel.org>
-	<1b0590da-68a2-cc52-bfe8-cb6e59eb43ec@oracle.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1gL3QY-0005zE-RX
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 04:50:14 -0500
+Received: from mail-cys01nam02on0108.outbound.protection.outlook.com
+	([104.47.37.108]:59904
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gL3QY-0005y6-I7
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 04:50:10 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 9 Nov 2018 09:50:06 +0000
+Message-ID: <BN6PR2201MB1251F9977B0D4B901801275CC6C60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <cover.1541616663.git.noring@nocrew.org>,
+	<e8e6bfd053f051d5195ec030f06749b24f867b13.1541616663.git.noring@nocrew.org>,
+	<BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
+In-Reply-To: <BN6PR2201MB12512C561DAD7AE29946682CC6C50@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1b0590da-68a2-cc52-bfe8-cb6e59eb43ec@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1 V2] Add vhost-pci-blk driver
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] target/mips: Fix decoding mechanism
+ of special R5900 opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +33,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Vitaly Mayatskikh <v.mayatskih@gmail.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
+To: Fredrik Noring <noring@nocrew.org>, Aurelien Jarno <aurelien@aurel32.net>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: =?iso-8859-1?Q?J=FCrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Am 09.11.2018 um 02:48 hat Dongli Zhang geschrieben:
-> 
-> 
-> On 11/09/2018 12:47 AM, Michael S. Tsirkin wrote:
-> > On Thu, Nov 08, 2018 at 10:09:00PM +0800, Dongli Zhang wrote:
-> >> It looks the kernel space vhost-blk can only process raw image.
-> >>
-> >> How about to verify that only raw image is used in the drive command line when
-> >> vhost-blk-pci is paired with it?
-> >>
-> >> Otherwise, vhost-blk-pci might be working with qcow2 image without any warning
-> >> on qemu side.
-> >>
-> >> Dongli Zhang
-> > 
-> > raw being raw can you really verify that?
-> 
-> I meant to verify the property 'format=' of '-drive', e.g., to check if
-> BlockBackend->root->bs->drv->format_name is raw?
+> From: Fredrik Noring <noring@nocrew.org>
+> Subject: Re: [PATCH v2 4/6] target/mips: Fix decoding mechanism of specia=
+l R5900 opcodes
+>=20
+> Hi Aleksandar,
+>=20
+> > Fredrik, do you know by any chance if a document exists that would just=
+ify
+> > inclusion of non-R5900 DMULT, DMULTU, DDIV, DDIVU in R5900 executables =
+by
+> > gcc for R5900? Is it included by cross-gcc or by native gcc, or by both=
+?
+> >
+> > I think gcc folks must have had a good reason for that, some kind of
+> > design - it can't be 'I really like/miss this instruction, let's includ=
+e
+> > it...'
+>=20
+> The R5900 reports itself as MIPS III ...
 
-I don't like string comparisons for this, but at least check for "file"
-and "host_device" then, because "raw" is a format driver that can be
-used above any protocol driver, not just for local files.
+This is very unclear. What do you mean by this? How does R5900 do that? I c=
+an't find any trace of such intentions in R5900 docs.
 
-Though rather than comparing strings, I'd check bs->drv == &bdrv_file.
+> ... and DMULT, DMULTU, DDIV and DDIVU
+> are part of the MIPS III ISA. They are emulated in user mode to support
+> generic MIPS III programs.
 
-> We allow the user to erroneously give a qcow2 file with 'format=raw'.
-> However, if 'format=qcow2' is set explicitly, vhots-blk-pci would exit
-> with error as only raw is supported in kernel space.
+Pure MIPS III executables should not be a concern of the R5900 emulation, b=
+ut R5900 executables.
 
-Please note that the QEMU block layer offers various options even for
-file-posix images, and silently ignoring them is probably not very nice.
-So just checking the driver is not enough, you also need to check that
-no feature is enabled that vhost can't provide.
+Could you please provide a document that would justify inclusion of these n=
+on-R5900 instruction in an R5900 emulation?
 
-At first sight, this includes at least detect-zeroes, copy-on-read and
-cache.no-flush. There may be more, but this just needs some work to find
-all of them. More interesting question: How will we make sure that the
-list is updated when we add new options?
-
-Is it actually a good idea to use the block layer at all for this, or
-would just taking a filename string be a better idea for this device?
-Of course, if you want to do automatic switchover as Stefan suggested,
-havin a block node is required and we need to figure out the exact
-conditions when we can switch and a way to keep them updated when we
-change things.
-
-Kevin
+Thanks,
+Aleksandar
