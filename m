@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gLCHJ-00019G-VE
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:17:15 -0500
+	(envelope-from <palmer@sifive.com>) id 1gLCKX-0002Xl-Jv
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:20:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gLCHF-0006vb-2g
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:17:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45402)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gLCHC-0006ly-WE
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:17:07 -0500
-Date: Fri, 9 Nov 2018 17:16:57 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181109191657.GB12503@habkost.net>
-References: <c6bbfeb8-53c5-0e0c-cf36-14e586cfb581@redhat.com>
-	<a0decaa7-d83b-b0ad-60ea-aa0890feb905@redhat.com>
-	<20181108130648.GJ12503@habkost.net>
-	<95a93d53-f87d-bd96-9363-582c4eae4160@redhat.com>
-	<20181108171437.GM12503@habkost.net>
-	<dda55f75-58d3-111c-4f43-99a9f686981e@redhat.com>
-	<20181108184242.GQ12503@habkost.net>
-	<2f4793c3-5509-1def-3157-02bc0d9bbe26@redhat.com>
-	<20181108210047.GU12503@habkost.net>
-	<00978318-b3b4-bd00-25c5-7b843cc09f13@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00978318-b3b4-bd00-25c5-7b843cc09f13@redhat.com>
-Subject: Re: [Qemu-devel] QEMU and Kconfig
+	(envelope-from <palmer@sifive.com>) id 1gLCKT-0001lx-Rc
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:20:33 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:39119)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gLCKO-0001Zd-F4
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 14:20:24 -0500
+Received: by mail-pl1-x641.google.com with SMTP id b5-v6so1356209pla.6
+	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 11:20:17 -0800 (PST)
+Date: Fri,  9 Nov 2018 11:19:34 -0800
+Message-Id: <20181109191933.6641-2-palmer@sifive.com>
+In-Reply-To: <20181109191933.6641-1-palmer@sifive.com>
+References: <20181109191933.6641-1-palmer@sifive.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Subject: [Qemu-devel] [PATCH for 3.1] RISC-V: Respect fences for user-only
+ emulators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, "Zhong, Yang" <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-riscv@nongnu.org, richard.henderson@linaro.org
+Cc: qemu-devel@nongnu.org, Palmer Dabbelt <palmer@sifive.com>
 
-On Fri, Nov 09, 2018 at 11:10:21AM +0100, Paolo Bonzini wrote:
-> On 08/11/2018 22:00, Eduardo Habkost wrote:
-> > Understood.  My interpretation of "target" was just "a QEMU
-> > binary".  In other words, I thought we were talking about
-> > anything that could be compiled in/out from a specific QEMU
-> > binary.
-> 
-> The idea is "target" as opposed to "host".
-> 
-> > Do you have a specific reason to restrict the scope to only
-> > guest-visible effects?  Is this just a way to reduce the effort
-> > required for the task, or there are other caveats I'm missing?
-> 
-> Because that's what default-configs/ is for---producing
-> config-devices.mak.  IOW it's mostly to reduce the scope, but also
-> because there are differences between config-devices.mak (produced from
-> default-configs/) and config-{host,target}.h (produced by configure).
+Our current fence implementation ignores fences for the user-only
+configurations.  This is incorrect but unlikely to manifest: it requires
+multi-threaded user-only code that takes advantage of the weakness in
+the host's memory model and can be inlined by TCG.
 
-I have the impression that the build system has an implicit
-assumption: that any build option that affects only one QEMU
-binary is always guest-visible, and that any build option that is
-not guest visible must affect all built QEMU binaries.  Is this
-going to be always true?
+This patch simply treats fences the same way for all our emulators.
+I've given it to testing as I don't want to construct a test that would
+actually trigger the failure.
 
+Our fence implementation has an additional deficiency where we map all
+RISC-V fences to full fences.  Now that we have a formal memory model
+for RISC-V we can start to take advantage of the strength bits on our
+fence instructions.  This requires a bit more though, so I'm going to
+split it out because the implementation is still correct without taking
+advantage of these weaker fences.
 
-> 
-> In particular, config-host.h and config-target.h are header files, but
-> config-devices.mak is not because the same file is linked into multiple
-> QEMU binaries that can and will enable different devices.  The only way
-> to use a hypothetical config-devices.h would be to move its users from
-> common-obj-y to obj-y.
+Thanks to Richard Henderson for pointing out both of the issues.
 
-Yeah, I wouldn't want to move things to obj-y.  I would prefer to
-make kconfig affect only makefile variables (not header files and
-macros).
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+---
+ target/riscv/translate.c | 2 --
+ 1 file changed, 2 deletions(-)
 
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 18d7b6d1471d..624d1c679a84 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -1766,7 +1766,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+                      GET_RM(ctx->opcode));
+         break;
+     case OPC_RISC_FENCE:
+-#ifndef CONFIG_USER_ONLY
+         if (ctx->opcode & 0x1000) {
+             /* FENCE_I is a no-op in QEMU,
+              * however we need to end the translation block */
+@@ -1777,7 +1776,6 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+             /* FENCE is a full memory barrier. */
+             tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
+         }
+-#endif
+         break;
+     case OPC_RISC_SYSTEM:
+         gen_system(env, ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
 -- 
-Eduardo
+2.18.1
