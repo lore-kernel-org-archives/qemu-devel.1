@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gL4Yn-0003u6-0J
+	(envelope-from <david@redhat.com>) id 1gL4Yn-0003uA-0h
 	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:02:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gL4Yk-0004Oo-NT
+	(envelope-from <david@redhat.com>) id 1gL4Yj-0004Nt-Fp
 	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:02:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46926)
+Received: from mx1.redhat.com ([209.132.183.28]:49130)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gL4Yi-0004D8-Ks
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:02:41 -0500
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gL4Yi-0004EC-Em
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:02:40 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Fri,  9 Nov 2018 12:02:17 +0100
-Message-Id: <20181109110221.10553-3-david@redhat.com>
+Date: Fri,  9 Nov 2018 12:02:19 +0100
+Message-Id: <20181109110221.10553-5-david@redhat.com>
 In-Reply-To: <20181109110221.10553-1-david@redhat.com>
 References: <20181109110221.10553-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 2/6] qapi: use qemu_strtod() in
- string-input-visitor
+Subject: [Qemu-devel] [PATCH RFC 4/6] test-string-input-visitor: use virtual
+ walk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +27,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Let's use the new function.
+We now support virtual walks, so use that instead.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- qapi/string-input-visitor.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ tests/test-string-input-visitor.c | 36 +++++++++++--------------------
+ 1 file changed, 12 insertions(+), 24 deletions(-)
 
-diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-index b3fdd0827d..dee708d384 100644
---- a/qapi/string-input-visitor.c
-+++ b/qapi/string-input-visitor.c
-@@ -20,6 +20,7 @@
- #include "qemu/option.h"
- #include "qemu/queue.h"
- #include "qemu/range.h"
-+#include "qemu/cutils.h"
+diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
+index 0a4152f79d..2f6360e9ca 100644
+--- a/tests/test-string-input-visitor.c
++++ b/tests/test-string-input-visitor.c
+@@ -114,7 +114,6 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
+     uint64_t expect4[] = { UINT64_MAX };
+     Error *err = NULL;
+     int64List *res = NULL;
+-    int64List *tail;
+     Visitor *v;
+     int64_t val;
  
+@@ -151,39 +150,28 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
  
- struct StringInputVisitor
-@@ -313,12 +314,9 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
-                               Error **errp)
- {
-     StringInputVisitor *siv = to_siv(v);
--    char *endp = (char *) siv->string;
-     double val;
+     v = visitor_input_test_init(data, "0,2-3");
  
--    errno = 0;
--    val = strtod(siv->string, &endp);
--    if (errno || endp == siv->string || *endp) {
-+    if (qemu_strtod(siv->string, NULL, &val)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
-                    "number");
-         return;
+-    /* Would be simpler if the visitor genuinely supported virtual walks */
+-    visit_start_list(v, NULL, (GenericList **)&res, sizeof(*res),
+-                     &error_abort);
+-    tail = res;
+-    visit_type_int64(v, NULL, &tail->value, &error_abort);
+-    g_assert_cmpint(tail->value, ==, 0);
+-    tail = (int64List *)visit_next_list(v, (GenericList *)tail, sizeof(*res));
+-    g_assert(tail);
+-    visit_type_int64(v, NULL, &tail->value, &error_abort);
+-    g_assert_cmpint(tail->value, ==, 2);
+-    tail = (int64List *)visit_next_list(v, (GenericList *)tail, sizeof(*res));
+-    g_assert(tail);
++    visit_start_list(v, NULL, NULL, 0, &error_abort);
++    visit_type_int64(v, NULL, &val, &error_abort);
++    g_assert_cmpint(val, ==, 0);
++    visit_type_int64(v, NULL, &val, &error_abort);
++    g_assert_cmpint(val, ==, 2);
+ 
+     visit_check_list(v, &err);
+     error_free_or_abort(&err);
+-    visit_end_list(v, (void **)&res);
+-
+-    qapi_free_int64List(res);
++    visit_end_list(v, NULL);
+ 
+     /* Visit beyond end of list */
++
+     v = visitor_input_test_init(data, "0");
+ 
+-    visit_start_list(v, NULL, (GenericList **)&res, sizeof(*res),
+-                     &error_abort);
+-    tail = res;
+-    visit_type_int64(v, NULL, &tail->value, &err);
+-    g_assert_cmpint(tail->value, ==, 0);
++    visit_start_list(v, NULL, NULL, 0, &error_abort);
++    visit_type_int64(v, NULL, &val, &err);
++    g_assert_cmpint(val, ==, 0);
+     visit_type_int64(v, NULL, &val, &err);
+     error_free_or_abort(&err);
+-    visit_check_list(v, &error_abort);
+-    visit_end_list(v, (void **)&res);
+ 
+-    qapi_free_int64List(res);
++    visit_check_list(v, &error_abort);
++    visit_end_list(v, NULL);
+ }
+ 
+ static void test_visitor_in_bool(TestInputVisitorData *data,
 -- 
 2.17.2
