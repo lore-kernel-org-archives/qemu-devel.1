@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gL1iq-0004qj-Di
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 03:00:59 -0500
+	(envelope-from <xiezhide@huawei.com>) id 1gL1pr-0008JQ-U6
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 03:08:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gL1in-0006Hn-0i
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 03:00:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gL1im-0006Bc-Lv
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 03:00:52 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gL1il-0007S9-2X
-	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 08:00:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DFEA82E80CB
-	for <qemu-devel@nongnu.org>; Fri,  9 Nov 2018 08:00:50 +0000 (UTC)
+	(envelope-from <xiezhide@huawei.com>) id 1gL1pe-0005MK-66
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 03:08:03 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2286 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gL1pY-0005AO-8U
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 03:07:54 -0500
+From: xiezhide <xiezhide@huawei.com>
+Date: Fri, 9 Nov 2018 08:07:33 +0000
+Message-ID: <A02D6AA901860840B46E751C5E9E38B42AFDB13F@DGGEML532-MBX.china.huawei.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Nov 2018 07:50:08 -0000
-From: Zhaocong <1802465@bugs.launchpad.net>
-Reply-To: Bug 1802465 <1802465@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154174980807.2749.13752196954108515323.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1802465] [NEW] typing string via VNC is unreliable
+Subject: [Qemu-devel] [PATCH 0/2] virtio-9p: qmp interface for set/query io
+ throttle for fsdev devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,88 +26,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "groug@kaod.org" <groug@kaod.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "berto@igalia.com" <berto@igalia.com>"dgilbert@redhat.com" <dgilbert@redhat.com>"armbru@redhat.com" <armbru@redhat.com>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>
 
-Public bug reported:
+These patches provide the qmp interface, to set/query the io throttle
+status of the all fsdev devices that are present in a vm.
+Some of the patches also remove the
+duplicate code that was present in block and fsdev files.
 
-QEMU version is 3.0.0
+Zhide Xie (2):
+  fsdev-qmp: qmp interface for set/query io throttle for fsdev devices.
+  fsdev-qmp: fix coding style issue
 
-# Description
+Makefile                                                |  20 +++-
+Makefile.objs                                       |   8 ++
+block/throttle.c                                   |   6 +-
+blockdev.c                                             |  96 +-------------=
+---
+fsdev/qemu-fsdev-dummy.c            |  11 ++
+fsdev/qemu-fsdev-throttle.c            | 144 +++++++++++++++++---------
+fsdev/qemu-fsdev-throttle.h           |   6 +-
+fsdev/qemu-fsdev.c                            |  29 ++++++
+hmp-commands-info.hx                     |  15 +++
+hmp-commands.hx                             |  15 +++
+hmp.c                                                     |  83 +++++++++++=
+++--
+hmp.h                                                     |   4 +
+include/qemu/throttle-options.h    |   3 +-
+include/qemu/throttle.h                   |   4 +-
+include/qemu/typedefs.h                  |   1 +
+monitor.c                                               |   4 +
+qapi/block-core.json                           | 122 +---------------------
+qapi/fsdev.json                                     |  96 +++++++++++++++++
+qapi/qapi-schema.json                       |   1 +
+qapi/tlimits.json                                   |  89 ++++++++++++++++
+qmp.c                                                      |  12 +++
+util/throttle.c                                        | 224 ++++++++++++++=
+++++++++++++--------------
+22 files changed, 639 insertions(+), 354 deletions(-)
+create mode 100644 qapi/fsdev.json
+create mode 100644 qapi/tlimits.json
 
-The problem is that, when typing string through VNC, it can be
-unreliable -- sometimes some key strokes get skipped, sometimes get
-swapped, sometimes get repeated.  There's no problem when typing through
-VNC on physical hardware.
-
-# Steps to reproduce
-
-1. Launch virtual machine by:
-
-    qemu-kvm -display vnc=3D:1 -m 2048 opensuse-leap-15.qcow2
-
-2. Connect to VNC by:
-
-    vncviewer -Shared :5901
-
-3. Simulate a series of key strokes by "vncdotool" [1]:
-
-    vncdotool -s 127.0.0.1::5901 typefile strings_to_be_typed.txt
-
-4. Usually after a few hundred keys are typed, something goes wrong.
-
-I attached a screenshot that it mistypes " hello" to "h ello".
-
-[1] https://github.com/sibson/vncdotool
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "qemu-vnc-mistype.png"
-   https://bugs.launchpad.net/bugs/1802465/+attachment/5210655/+files/qemu-=
-vnc-mistype.png
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1802465
-
-Title:
-  typing string via VNC is unreliable
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU version is 3.0.0
-
-  # Description
-
-  The problem is that, when typing string through VNC, it can be
-  unreliable -- sometimes some key strokes get skipped, sometimes get
-  swapped, sometimes get repeated.  There's no problem when typing
-  through VNC on physical hardware.
-
-  # Steps to reproduce
-
-  1. Launch virtual machine by:
-
-      qemu-kvm -display vnc=3D:1 -m 2048 opensuse-leap-15.qcow2
-
-  2. Connect to VNC by:
-
-      vncviewer -Shared :5901
-
-  3. Simulate a series of key strokes by "vncdotool" [1]:
-
-      vncdotool -s 127.0.0.1::5901 typefile strings_to_be_typed.txt
-
-  4. Usually after a few hundred keys are typed, something goes wrong.
-
-  I attached a screenshot that it mistypes " hello" to "h ello".
-
-  [1] https://github.com/sibson/vncdotool
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1802465/+subscriptions
+--
+1.8.3.1
