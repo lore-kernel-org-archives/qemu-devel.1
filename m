@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gL5G7-00007K-1R
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:47:32 -0500
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gL5KQ-0004Wu-0b
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:51:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gL5Fz-0002S6-EZ
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:47:25 -0500
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:34696)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gL5Ft-00026L-O7
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:47:19 -0500
-Received: by mail-oi1-x232.google.com with SMTP id i138-v6so1232908oib.1
-	for <qemu-devel@nongnu.org>; Fri, 09 Nov 2018 03:47:06 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20181108204111.786455-1-groug@kaod.org>
-References: <20181108204111.786455-1-groug@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 9 Nov 2018 11:46:45 +0000
-Message-ID: <CAFEAcA8E_Yd-6cPsstWUqyQ=RVpyHa99R3X=PYFSe_P-y3nWvg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] 9p fixes for v3.1.0-rc1
+	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gL5KM-0006zM-N7
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:51:57 -0500
+Received: from mga05.intel.com ([192.55.52.43]:56441)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
+	id 1gL5KM-0006rm-Dm
+	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 06:51:54 -0500
+From: Yu Zhang <yu.c.zhang@linux.intel.com>
+Date: Fri,  9 Nov 2018 19:49:44 +0800
+Message-Id: <1541764187-10732-1-git-send-email-yu.c.zhang@linux.intel.com>
+Subject: [Qemu-devel] [PATCH v1 0/3] intel-iommu: add support for 5-level
+ virtual IOMMU.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>
 
-On 8 November 2018 at 20:41, Greg Kurz <groug@kaod.org> wrote:
-> The following changes since commit a7ce790a029bd94eb320d8c69f38900f5233997e:
->
->   tcg/tcg-op.h: Add multiple include guard (2018-11-08 15:15:32 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/gkurz/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 5b76ef50f62079a2389ba28cacaf6cce68b1a0ed:
->
->   9p: write lock path in v9fs_co_open2() (2018-11-08 21:19:05 +0100)
->
-> ----------------------------------------------------------------
-> Fixes a potential use-after-free issue that could be triggered by a
-> misbehaving guest.
->
-> ----------------------------------------------------------------
-> Greg Kurz (1):
->       9p: write lock path in v9fs_co_open2()
->
->  hw/9pfs/cofile.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+Intel's upcoming processors will extend maximum linear address width to
+57 bits, and introduce 5-level paging for CPU. Meanwhile, the platform
+will also extend the maximum guest address width for IOMMU to 57 bits,
+thus introducing the 5-level paging for 2nd level translation(See chapter 3
+in Intel Virtualization Technology for Directed I/O). 
 
-Applied, thanks.
+This patch set extends the current logic to support a wider address width.
+A 5-level paging capable IOMMU(for 2nd level translation) can be rendered
+with configuration "device intel-iommu,x-aw-bits=57".
 
--- PMM
+
+Yu Zhang (3):
+  intel-iommu: differentiate host address width from IOVA address width.
+  intel-iommu: extend VTD emulation to allow 57-bit IOVA address width.
+  intel-iommu: search iotlb for levels supported by the address width.
+---
+Cc: "Michael S. Tsirkin" <mst@redhat.com> 
+Cc: Igor Mammedov <imammedo@redhat.com> 
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com> 
+Cc: Richard Henderson <rth@twiddle.net> 
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>
+
+
+ hw/i386/acpi-build.c           |   2 +-
+ hw/i386/intel_iommu.c          | 101 +++++++++++++++++++++++++++--------------
+ hw/i386/intel_iommu_internal.h |  13 ++++--
+ include/hw/i386/intel_iommu.h  |  10 ++--
+ 4 files changed, 83 insertions(+), 43 deletions(-)
+
+-- 
+1.9.1
