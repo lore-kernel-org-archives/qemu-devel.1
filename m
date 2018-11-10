@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gLK9N-0003uH-Oa
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 22:41:34 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gLOOv-0003qc-0G
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 03:13:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gLK9M-0003vz-Le
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 22:41:33 -0500
-Received: from m12-14.163.com ([220.181.12.14]:47065)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gLK9I-0003uq-Or
-	for qemu-devel@nongnu.org; Fri, 09 Nov 2018 22:41:30 -0500
-From: Li Qiang <liq3ea@163.com>
-Date: Fri,  9 Nov 2018 19:41:15 -0800
-Message-Id: <20181110034115.103335-3-liq3ea@163.com>
-In-Reply-To: <20181110034115.103335-1-liq3ea@163.com>
-References: <20181110034115.103335-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH 2/2] hw: fw_cfg: refactor fw_cfg_reboot()
+	(envelope-from <luc.michel@greensocs.com>) id 1gLOOt-0000nm-Ai
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 03:13:52 -0500
+From: Luc Michel <luc.michel@greensocs.com>
+Date: Sat, 10 Nov 2018 09:11:43 +0100
+Message-Id: <20181110081147.4027-13-luc.michel@greensocs.com>
+In-Reply-To: <20181110081147.4027-1-luc.michel@greensocs.com>
+References: <20181110081147.4027-1-luc.michel@greensocs.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 12/16] gdbstub: add support for vAttach
+ packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +22,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, kraxel@redhat.com, armbru@redhat.com, lersek@redhat.com, philmd@redhat.com
-Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
+To: qemu-devel@nongnu.org
+Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Currently the user can set a negative reboot_timeout.
-Also it is wrong to parse 'reboot-timeout' with qemu_opt_get() and then
-convert it to number. This patch refactor this function by following:
-1. ensure reboot_timeout is in 0~0xffff
-2. use qemu_opt_get_number() to parse reboot_timeout
-3. simlify code
+Add support for the vAttach packets. In multiprocess mode, GDB sends
+them to attach to additional processes.
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
+Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 ---
- hw/nvram/fw_cfg.c | 23 +++++++++++------------
- vl.c              |  2 +-
- 2 files changed, 12 insertions(+), 13 deletions(-)
+ gdbstub.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 78f43dad93..6aca80846a 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -178,24 +178,23 @@ static void fw_cfg_bootsplash(FWCfgState *s)
- 
- static void fw_cfg_reboot(FWCfgState *s)
- {
--    int reboot_timeout = -1;
--    char *p;
--    const char *temp;
-+    const char *reboot_timeout = NULL;
- 
-     /* get user configuration */
-     QemuOptsList *plist = qemu_find_opts("boot-opts");
-     QemuOpts *opts = QTAILQ_FIRST(&plist->head);
--    if (opts != NULL) {
--        temp = qemu_opt_get(opts, "reboot-timeout");
--        if (temp != NULL) {
--            p = (char *)temp;
--            reboot_timeout = strtol(p, &p, 10);
--        }
-+    reboot_timeout = qemu_opt_get(opts, "reboot-timeout");
+diff --git a/gdbstub.c b/gdbstub.c
+index 4132227092..ba365808db 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1340,10 +1340,45 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+                     break;
+                 }
+                 goto unknown_command;
+             }
+             break;
++        } else if (strncmp(p, "Attach;", 7) =3D=3D 0) {
++            unsigned long pid;
 +
-+    if (reboot_timeout == NULL) {
-+        return;
-     }
-+    int64_t rt_val = qemu_opt_get_number(opts, "reboot-timeout", -1);
++            p +=3D 7;
 +
-     /* validate the input */
--    if (reboot_timeout > 0xffff) {
--        error_report("reboot timeout is larger than 65535, force it to 65535.");
--        reboot_timeout = 0xffff;
-+    if (rt_val < 0 || rt_val > 0xffff) {
-+        error_report("reboot timeout is invalid,"
-+                     "it should be a value between 0 and 65535");
-+        exit(1);
-     }
-     fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&reboot_timeout, 4), 4);
- }
-diff --git a/vl.c b/vl.c
-index be37da46f0..086127ff0b 100644
---- a/vl.c
-+++ b/vl.c
-@@ -339,7 +339,7 @@ static QemuOptsList qemu_boot_opts = {
-             .type = QEMU_OPT_NUMBER,
-         }, {
-             .name = "reboot-timeout",
--            .type = QEMU_OPT_STRING,
-+            .type = QEMU_OPT_NUMBER,
-         }, {
-             .name = "strict",
-             .type = QEMU_OPT_BOOL,
--- 
-2.17.1
++            if (qemu_strtoul(p, &p, 16, &pid)) {
++                put_packet(s, "E22");
++                break;
++            }
++
++            process =3D gdb_get_process(s, pid);
++
++            if (process =3D=3D NULL) {
++                put_packet(s, "E22");
++                break;
++            }
++
++            cpu =3D get_first_cpu_in_process(s, process);
++
++            if (cpu =3D=3D NULL) {
++                /* Refuse to attach an empty process */
++                put_packet(s, "E22");
++                break;
++            }
++
++            process->attached =3D true;
++
++            s->g_cpu =3D cpu;
++            s->c_cpu =3D cpu;
++
++            snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRA=
+P,
++                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_=
+id)));
++
++            put_packet(s, buf);
++            break;
+         } else {
+             goto unknown_command;
+         }
+     case 'k':
+         /* Kill the target */
+--=20
+2.19.1
