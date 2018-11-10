@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gLTbC-0004e3-E0
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 08:46:56 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gLTbE-0004he-VH
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 08:46:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gLTb8-0008SN-GK
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 08:46:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47452)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gLTbD-0000EZ-Py
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 08:46:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gLTb8-0007uu-3c
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 08:46:50 -0500
+	id 1gLTbD-0000CJ-EJ
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 08:46:55 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Sat, 10 Nov 2018 17:45:40 +0400
-Message-Id: <20181110134548.14741-6-marcandre.lureau@redhat.com>
+Date: Sat, 10 Nov 2018 17:45:43 +0400
+Message-Id: <20181110134548.14741-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20181110134548.14741-1-marcandre.lureau@redhat.com>
 References: <20181110134548.14741-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.2 05/13] slirp: remove unused EMU_RSH
+Subject: [Qemu-devel] [PATCH for-3.2 08/13] slirp: remove Monitor dependency,
+ return a string for info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +31,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-EMU_RSH handling was dropped in commit
-0d62c4cfe21752df4c1d6e2c2398f15d5eaa794a.
-
-The assignment, and subsequent free() of ex_ptr->ex_exec to so->extra
-looks unsafe (double free is likely to occur).
+There is nothing performance-sensitive in returning an allocated
+string for info, and handling the monitor_printf() on the caller side.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/misc.h     | 1 -
- slirp/slirp.c    | 2 --
- slirp/socket.c   | 4 ----
- slirp/tcp_subr.c | 1 -
- 4 files changed, 8 deletions(-)
+ slirp/libslirp.h |  2 +-
+ net/slirp.c      |  7 ++++---
+ slirp/misc.c     | 23 +++++++++++++----------
+ 3 files changed, 18 insertions(+), 14 deletions(-)
 
-diff --git a/slirp/misc.h b/slirp/misc.h
-index 64ca88c3b7..94829722cd 100644
---- a/slirp/misc.h
-+++ b/slirp/misc.h
-@@ -26,7 +26,6 @@ struct ex_list {
- #define EMU_REALAUDIO 0x5
- #define EMU_RLOGIN 0x6
- #define EMU_IDENT 0x7
--#define EMU_RSH 0x8
+diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+index a4f390ee89..04b6db9f49 100644
+--- a/slirp/libslirp.h
++++ b/slirp/libslirp.h
+@@ -35,7 +35,7 @@ int slirp_remove_hostfwd(Slirp *slirp, int is_udp,
+ int slirp_add_exec(Slirp *slirp, void *chardev, const char *cmdline,
+                    struct in_addr *guest_addr, int guest_port);
 =20
- #define EMU_NOCONNECT 0x10	/* Don't connect */
+-void slirp_connection_info(Slirp *slirp, Monitor *mon);
++char *slirp_connection_info(Slirp *slirp);
 =20
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 58d1ef64e9..daa0d5d4bd 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -1491,8 +1491,6 @@ static int slirp_state_load(QEMUFile *f, void *opaq=
-ue, int version_id)
-         }
-         if (!ex_ptr)
-             return -EINVAL;
--
--        so->extra =3D (void *)ex_ptr->ex_exec;
+ void slirp_socket_recv(Slirp *slirp, struct in_addr guest_addr,
+                        int guest_port, const uint8_t *buf, int size);
+diff --git a/net/slirp.c b/net/slirp.c
+index 0bb12567fe..dfc72cfc2e 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -828,10 +828,11 @@ void hmp_info_usernet(Monitor *mon, const QDict *qd=
+ict)
+     QTAILQ_FOREACH(s, &slirp_stacks, entry) {
+         int id;
+         bool got_hub_id =3D net_hub_id_for_client(&s->nc, &id) =3D=3D 0;
+-        monitor_printf(mon, "Hub %d (%s):\n",
++        char *info =3D slirp_connection_info(s->slirp);
++        monitor_printf(mon, "Hub %d (%s):\n%s",
+                        got_hub_id ? id : -1,
+-                       s->nc.name);
+-        slirp_connection_info(s->slirp, mon);
++                       s->nc.name, info);
++        g_free(info);
      }
+ }
 =20
-     return vmstate_load_state(f, &vmstate_slirp, slirp, version_id);
-diff --git a/slirp/socket.c b/slirp/socket.c
-index 322383a1f9..ff6ef1e334 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -91,10 +91,6 @@ sofree(struct socket *so)
-   soqfree(so, &slirp->if_fastq);
-   soqfree(so, &slirp->if_batchq);
+diff --git a/slirp/misc.c b/slirp/misc.c
+index 1e9415e729..54edc0b0b9 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -8,7 +8,6 @@
+ #include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "libslirp.h"
+-#include "monitor/monitor.h"
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
 =20
--  if (so->so_emu=3D=3DEMU_RSH && so->extra) {
--	sofree(so->extra);
--	so->extra=3DNULL;
--  }
-   if (so =3D=3D slirp->tcp_last_so) {
-       slirp->tcp_last_so =3D &slirp->tcb;
-   } else if (so =3D=3D slirp->udp_last_so) {
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index e0bf7ad070..eb894b6527 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -546,7 +546,6 @@ static const struct tos_t tcptos[] =3D {
- 	  {0, 23, IPTOS_LOWDELAY, 0},	/* telnet */
- 	  {0, 80, IPTOS_THROUGHPUT, 0},	/* WWW */
- 	  {0, 513, IPTOS_LOWDELAY, EMU_RLOGIN|EMU_NOCONNECT},	/* rlogin */
--	  {0, 514, IPTOS_LOWDELAY, EMU_RSH|EMU_NOCONNECT},	/* shell */
- 	  {0, 544, IPTOS_LOWDELAY, EMU_KSH},		/* kshell */
- 	  {0, 543, IPTOS_LOWDELAY, 0},	/* klogin */
- 	  {0, 6667, IPTOS_THROUGHPUT, EMU_IRC},	/* IRC */
+@@ -185,8 +184,9 @@ fork_exec(struct socket *so, const char *ex)
+ }
+ #endif
+=20
+-void slirp_connection_info(Slirp *slirp, Monitor *mon)
++char *slirp_connection_info(Slirp *slirp)
+ {
++    GString *str =3D g_string_new(NULL);
+     const char * const tcpstates[] =3D {
+         [TCPS_CLOSED]       =3D "CLOSED",
+         [TCPS_LISTEN]       =3D "LISTEN",
+@@ -208,8 +208,9 @@ void slirp_connection_info(Slirp *slirp, Monitor *mon=
+)
+     const char *state;
+     char buf[20];
+=20
+-    monitor_printf(mon, "  Protocol[State]    FD  Source Address  Port  =
+ "
+-                        "Dest. Address  Port RecvQ SendQ\n");
++    g_string_append_printf(str,
++        "  Protocol[State]    FD  Source Address  Port   "
++        "Dest. Address  Port RecvQ SendQ\n");
+=20
+     for (so =3D slirp->tcb.so_next; so !=3D &slirp->tcb; so =3D so->so_n=
+ext) {
+         if (so->so_state & SS_HOSTFWD) {
+@@ -231,10 +232,10 @@ void slirp_connection_info(Slirp *slirp, Monitor *m=
+on)
+             dst_port =3D so->so_fport;
+         }
+         snprintf(buf, sizeof(buf), "  TCP[%s]", state);
+-        monitor_printf(mon, "%-19s %3d %15s %5d ", buf, so->s,
++        g_string_append_printf(str, "%-19s %3d %15s %5d ", buf, so->s,
+                        src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "=
+*",
+                        ntohs(src.sin_port));
+-        monitor_printf(mon, "%15s %5d %5d %5d\n",
++        g_string_append_printf(str, "%15s %5d %5d %5d\n",
+                        inet_ntoa(dst_addr), ntohs(dst_port),
+                        so->so_rcv.sb_cc, so->so_snd.sb_cc);
+     }
+@@ -254,10 +255,10 @@ void slirp_connection_info(Slirp *slirp, Monitor *m=
+on)
+             dst_addr =3D so->so_faddr;
+             dst_port =3D so->so_fport;
+         }
+-        monitor_printf(mon, "%-19s %3d %15s %5d ", buf, so->s,
++        g_string_append_printf(str, "%-19s %3d %15s %5d ", buf, so->s,
+                        src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "=
+*",
+                        ntohs(src.sin_port));
+-        monitor_printf(mon, "%15s %5d %5d %5d\n",
++        g_string_append_printf(str, "%15s %5d %5d %5d\n",
+                        inet_ntoa(dst_addr), ntohs(dst_port),
+                        so->so_rcv.sb_cc, so->so_snd.sb_cc);
+     }
+@@ -267,9 +268,11 @@ void slirp_connection_info(Slirp *slirp, Monitor *mo=
+n)
+                      (so->so_expire - curtime) / 1000);
+         src.sin_addr =3D so->so_laddr;
+         dst_addr =3D so->so_faddr;
+-        monitor_printf(mon, "%-19s %3d %15s  -    ", buf, so->s,
++        g_string_append_printf(str, "%-19s %3d %15s  -    ", buf, so->s,
+                        src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "=
+*");
+-        monitor_printf(mon, "%15s  -    %5d %5d\n", inet_ntoa(dst_addr),
++        g_string_append_printf(str, "%15s  -    %5d %5d\n", inet_ntoa(ds=
+t_addr),
+                        so->so_rcv.sb_cc, so->so_snd.sb_cc);
+     }
++
++    return g_string_free(str, FALSE);
+ }
 --=20
 2.19.1.708.g4ede3d42df
