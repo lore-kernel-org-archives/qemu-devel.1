@@ -1,29 +1,29 @@
 Received: from eggs.gnu.org ([208.118.235.92]:57555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gLXrd-0007e8-Uw
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gLXrh-0007e8-6c
 	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:20:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gLXqY-0006Kf-TA
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:19:06 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46789)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gLXpX-0005Tk-Et
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:18:02 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52402)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gLXqY-0006Jq-LM
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:19:02 -0500
-Received: by mail-wr1-x443.google.com with SMTP id 74-v6so5109367wrb.13
-	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 10:19:02 -0800 (PST)
+	id 1gLXpX-0005TI-8B
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:17:59 -0500
+Received: by mail-wm1-x343.google.com with SMTP id r11-v6so4789400wmb.2
+	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 10:17:59 -0800 (PST)
 References: <20181108160818.5485-1-yuval.shaia@oracle.com>
-	<20181108160818.5485-9-yuval.shaia@oracle.com>
+	<20181108160818.5485-8-yuval.shaia@oracle.com>
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <58b12b20-39ae-233b-0a23-10ceed0e8c79@gmail.com>
-Date: Sat, 10 Nov 2018 20:18:58 +0200
+Message-ID: <8688ab5e-3821-e4bf-4712-def5ceef1664@gmail.com>
+Date: Sat, 10 Nov 2018 20:17:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181108160818.5485-9-yuval.shaia@oracle.com>
+In-Reply-To: <20181108160818.5485-8-yuval.shaia@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 08/22] hw/pvrdma: Set the correct opcode
- for recv completion
+Subject: Re: [Qemu-devel] [PATCH v2 07/22] hw/pvrdma: Make default pkey
+ 0xFFFF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,38 +37,33 @@ To: Yuval Shaia <yuval.shaia@oracle.com>, dmitry.fleytman@gmail.com, jasowang@re
 
 
 On 11/8/18 6:08 PM, Yuval Shaia wrote:
-> The function pvrdma_post_cqe populates CQE entry with opcode from the
-> given completion element. For receive operation value was not set. Fix
-> it by setting it to IBV_WC_RECV.
+> Commit 6e7dba23af ("hw/pvrdma: Make default pkey 0xFFFF") exports
+> default pkey as external definition but omit the change from 0x7FFF to
+> 0xFFFF.
+>
+> Fixes: 6e7dba23af ("hw/pvrdma: Make default pkey 0xFFFF")
 >
 > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 > ---
->   hw/rdma/vmw/pvrdma_qp_ops.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+>   hw/rdma/vmw/pvrdma.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-> index 762700a205..7b0f440fda 100644
-> --- a/hw/rdma/vmw/pvrdma_qp_ops.c
-> +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-> @@ -196,8 +196,9 @@ int pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
->           comp_ctx = g_malloc(sizeof(CompHandlerCtx));
->           comp_ctx->dev = dev;
->           comp_ctx->cq_handle = qp->recv_cq_handle;
-> -        comp_ctx->cqe.qp = qp_handle;
->           comp_ctx->cqe.wr_id = wqe->hdr.wr_id;
-> +        comp_ctx->cqe.qp = qp_handle;
-
-Not sure the above chunk is needed.
-
-> +        comp_ctx->cqe.opcode = IBV_WC_RECV;
+> diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
+> index e3742d893a..15c3f28b86 100644
+> --- a/hw/rdma/vmw/pvrdma.h
+> +++ b/hw/rdma/vmw/pvrdma.h
+> @@ -52,7 +52,7 @@
+>   #define PVRDMA_FW_VERSION    14
 >   
+>   /* Some defaults */
+> -#define PVRDMA_PKEY          0x7FFF
+> +#define PVRDMA_PKEY          0xFFFF
+>   
+>   typedef struct DSRInfo {
+>       dma_addr_t dma;
 
-Anyway
 
 Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 
 Thanks,
 Marcel
-
->           rdma_backend_post_recv(&dev->backend_dev, &dev->rdma_dev_res,
->                                  &qp->backend_qp, qp->qp_type,
