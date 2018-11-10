@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gLOP7-00045I-PZ
+	(envelope-from <luc.michel@greensocs.com>) id 1gLOP7-00045J-Pu
 	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 03:14:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gLOP5-00010C-Iv
+	(envelope-from <luc.michel@greensocs.com>) id 1gLOP5-00010J-Jc
 	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 03:14:05 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Sat, 10 Nov 2018 09:11:47 +0100
-Message-Id: <20181110081147.4027-17-luc.michel@greensocs.com>
+Date: Sat, 10 Nov 2018 09:11:39 +0100
+Message-Id: <20181110081147.4027-9-luc.michel@greensocs.com>
 In-Reply-To: <20181110081147.4027-1-luc.michel@greensocs.com>
 References: <20181110081147.4027-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 16/16] arm/xlnx-zynqmp: put APUs and RPUs in
- separate CPU clusters
+Subject: [Qemu-devel] [PATCH v5 08/16] gdbstub: add multiprocess support to
+ Xfer:features:read:
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,115 +26,169 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Create two separate CPU clusters for APUs and RPUs.
+Change the Xfer:features:read: packet handling to support the
+multiprocess extension. This packet is used to request the XML
+description of the CPU. In multiprocess mode, different descriptions can
+be sent for different processes.
+
+This function now takes the process to send the description for as a
+parameter, and use a buffer in the process structure to store the
+generated description.
+
+It takes the first CPU of the process to generate the description.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/hw/arm/xlnx-zynqmp.h |  3 +++
- hw/arm/xlnx-zynqmp.c         | 21 +++++++++++++++++----
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ gdbstub.c | 47 +++++++++++++++++++++++++++--------------------
+ 1 file changed, 27 insertions(+), 20 deletions(-)
 
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 98f925ab84..591515c760 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -29,10 +29,11 @@
- #include "hw/dma/xlnx_dpdma.h"
- #include "hw/dma/xlnx-zdma.h"
- #include "hw/display/xlnx_dp.h"
- #include "hw/intc/xlnx-zynqmp-ipi.h"
- #include "hw/timer/xlnx-zynqmp-rtc.h"
-+#include "hw/cpu/cluster.h"
+diff --git a/gdbstub.c b/gdbstub.c
+index 43c9211bfa..aae3cce01a 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -298,10 +298,12 @@ typedef struct GDBRegisterState {
+ } GDBRegisterState;
 =20
- #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
- #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
-                                        TYPE_XLNX_ZYNQMP)
-=20
-@@ -75,10 +76,12 @@
- typedef struct XlnxZynqMPState {
-     /*< private >*/
-     DeviceState parent_obj;
-=20
-     /*< public >*/
-+    CPUClusterState apu_cluster;
-+    CPUClusterState rpu_cluster;
-     ARMCPU apu_cpu[XLNX_ZYNQMP_NUM_APU_CPUS];
-     ARMCPU rpu_cpu[XLNX_ZYNQMP_NUM_RPU_CPUS];
-     GICState gic;
-     MemoryRegion gic_mr[XLNX_ZYNQMP_GIC_REGIONS][XLNX_ZYNQMP_GIC_ALIASES=
-];
-=20
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index c195040350..42a138074c 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -176,16 +176,22 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState =
-*s, const char *boot_cpu,
- {
-     Error *err =3D NULL;
-     int i;
-     int num_rpus =3D MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQM=
-P_NUM_RPU_CPUS);
-=20
-+    object_initialize_child(OBJECT(s), "rpu-cluster", &s->rpu_cluster,
-+                            sizeof(s->rpu_cluster), TYPE_CPU_CLUSTER,
-+                            &error_abort, NULL);
+ typedef struct GDBProcess {
+     uint32_t pid;
+     bool attached;
 +
-+    qdev_init_nofail(DEVICE(&s->rpu_cluster));
-+
-     for (i =3D 0; i < num_rpus; i++) {
-         char *name;
++    char target_xml[1024];
+ } GDBProcess;
 =20
-         object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
-                           "cortex-r5f-" TYPE_ARM_CPU);
--        object_property_add_child(OBJECT(s), "rpu-cpu[*]",
-+        object_property_add_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
-                                   OBJECT(&s->rpu_cpu[i]), &error_abort);
-=20
-         name =3D object_get_canonical_path_component(OBJECT(&s->rpu_cpu[=
-i]));
-         if (strcmp(name, boot_cpu)) {
-             /* Secondary CPUs start in PSCI powered-down state */
-@@ -211,14 +217,19 @@ static void xlnx_zynqmp_init(Object *obj)
- {
-     XlnxZynqMPState *s =3D XLNX_ZYNQMP(obj);
-     int i;
-     int num_apus =3D MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
-=20
-+    object_initialize_child(obj, "apu-cluster", &s->apu_cluster,
-+                            sizeof(s->apu_cluster), TYPE_CPU_CLUSTER,
-+                            &error_abort, NULL);
-+
-     for (i =3D 0; i < num_apus; i++) {
--        object_initialize_child(obj, "apu-cpu[*]", &s->apu_cpu[i],
--                                sizeof(s->apu_cpu[i]),
--                                "cortex-a53-" TYPE_ARM_CPU, &error_abort=
-, NULL);
-+        object_initialize_child(OBJECT(&s->apu_cluster), "apu-cpu[*]",
-+                                &s->apu_cpu[i], sizeof(s->apu_cpu[i]),
-+                                "cortex-a53-" TYPE_ARM_CPU, &error_abort=
-,
-+                                NULL);
+ enum RSState {
+     RS_INACTIVE,
+     RS_IDLE,
+@@ -804,55 +806,57 @@ static CPUState *gdb_first_cpu(const GDBState *s)
      }
 =20
-     sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
-                           gic_class_name());
+     return cpu;
+ }
 =20
-@@ -331,10 +342,12 @@ static void xlnx_zynqmp_realize(DeviceState *dev, E=
-rror **errp)
-     qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", num_apus);
-     qdev_prop_set_bit(DEVICE(&s->gic), "has-security-extensions", s->sec=
-ure);
-     qdev_prop_set_bit(DEVICE(&s->gic),
-                       "has-virtualization-extensions", s->virt);
+-static const char *get_feature_xml(const char *p, const char **newp,
+-                                   CPUClass *cc)
++static const char *get_feature_xml(const GDBState *s, const char *p,
++                                   const char **newp, GDBProcess *proces=
+s)
+ {
+     size_t len;
+     int i;
+     const char *name;
+-    static char target_xml[1024];
++    CPUState *cpu =3D get_first_cpu_in_process(s, process);
++    CPUClass *cc =3D CPU_GET_CLASS(cpu);
 =20
-+    qdev_init_nofail(DEVICE(&s->apu_cluster));
+     len =3D 0;
+     while (p[len] && p[len] !=3D ':')
+         len++;
+     *newp =3D p + len;
+=20
+     name =3D NULL;
+     if (strncmp(p, "target.xml", len) =3D=3D 0) {
++        char *buf =3D process->target_xml;
++        const size_t buf_sz =3D sizeof(process->target_xml);
 +
-     /* Realize APUs before realizing the GIC. KVM requires this.  */
-     for (i =3D 0; i < num_apus; i++) {
-         char *name;
+         /* Generate the XML description for this CPU.  */
+-        if (!target_xml[0]) {
++        if (!buf[0]) {
+             GDBRegisterState *r;
+-            CPUState *cpu =3D first_cpu;
 =20
-         object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUI=
-T_SMC,
+-            pstrcat(target_xml, sizeof(target_xml),
++            pstrcat(buf, buf_sz,
+                     "<?xml version=3D\"1.0\"?>"
+                     "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">"
+                     "<target>");
+             if (cc->gdb_arch_name) {
+                 gchar *arch =3D cc->gdb_arch_name(cpu);
+-                pstrcat(target_xml, sizeof(target_xml), "<architecture>"=
+);
+-                pstrcat(target_xml, sizeof(target_xml), arch);
+-                pstrcat(target_xml, sizeof(target_xml), "</architecture>=
+");
++                pstrcat(buf, buf_sz, "<architecture>");
++                pstrcat(buf, buf_sz, arch);
++                pstrcat(buf, buf_sz, "</architecture>");
+                 g_free(arch);
+             }
+-            pstrcat(target_xml, sizeof(target_xml), "<xi:include href=3D=
+\"");
+-            pstrcat(target_xml, sizeof(target_xml), cc->gdb_core_xml_fil=
+e);
+-            pstrcat(target_xml, sizeof(target_xml), "\"/>");
++            pstrcat(buf, buf_sz, "<xi:include href=3D\"");
++            pstrcat(buf, buf_sz, cc->gdb_core_xml_file);
++            pstrcat(buf, buf_sz, "\"/>");
+             for (r =3D cpu->gdb_regs; r; r =3D r->next) {
+-                pstrcat(target_xml, sizeof(target_xml), "<xi:include hre=
+f=3D\"");
+-                pstrcat(target_xml, sizeof(target_xml), r->xml);
+-                pstrcat(target_xml, sizeof(target_xml), "\"/>");
++                pstrcat(buf, buf_sz, "<xi:include href=3D\"");
++                pstrcat(buf, buf_sz, r->xml);
++                pstrcat(buf, buf_sz, "\"/>");
+             }
+-            pstrcat(target_xml, sizeof(target_xml), "</target>");
++            pstrcat(buf, buf_sz, "</target>");
+         }
+-        return target_xml;
++        return buf;
+     }
+     if (cc->gdb_get_dynamic_xml) {
+-        CPUState *cpu =3D first_cpu;
+         char *xmlname =3D g_strndup(p, len);
+         const char *xml =3D cc->gdb_get_dynamic_xml(cpu, xmlname);
+=20
+         g_free(xmlname);
+         if (xml) {
+@@ -1258,10 +1262,11 @@ out:
+ }
+=20
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
++    GDBProcess *process;
+     CPUClass *cc;
+     const char *p;
+     uint32_t pid, tid;
+     int ch, reg_size, type, res;
+     uint8_t mem_buf[MAX_PACKET_LENGTH];
+@@ -1639,18 +1644,19 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+         }
+         if (strncmp(p, "Xfer:features:read:", 19) =3D=3D 0) {
+             const char *xml;
+             target_ulong total_len;
+=20
+-            cc =3D CPU_GET_CLASS(first_cpu);
++            process =3D gdb_get_cpu_process(s, s->g_cpu);
++            cc =3D CPU_GET_CLASS(s->g_cpu);
+             if (cc->gdb_core_xml_file =3D=3D NULL) {
+                 goto unknown_command;
+             }
+=20
+             gdb_has_xml =3D true;
+             p +=3D 19;
+-            xml =3D get_feature_xml(p, &p, cc);
++            xml =3D get_feature_xml(s, p, &p, process);
+             if (!xml) {
+                 snprintf(buf, sizeof(buf), "E00");
+                 put_packet(s, buf);
+                 break;
+             }
+@@ -2319,10 +2325,11 @@ static int find_cpu_clusters(Object *child, void =
+*opaque)
+         process =3D &s->processes[s->process_num - 1];
+=20
+         /* GDB process IDs -1 and 0 are reserved */
+         process->pid =3D cluster->cluster_id + 1;
+         process->attached =3D false;
++        process->target_xml[0] =3D '\0';
+         return 0;
+     }
+=20
+     return object_child_foreach(child, find_cpu_clusters, opaque);
+ }
 --=20
 2.19.1
