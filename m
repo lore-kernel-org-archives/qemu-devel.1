@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43203)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLYta-0001ri-My
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 14:26:15 -0500
+	id 1gLZ1l-0008CD-Kk
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 14:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLYtV-0000SX-Uo
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 14:26:14 -0500
+	id 1gLZ1g-00082x-V9
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 14:34:41 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gLZ1f-0007yS-5s
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 14:34:36 -0500
+Received: by mail-wr1-x442.google.com with SMTP id o15-v6so5233840wrv.4
+	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 11:34:28 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20181109173553.22341-1-peter.maydell@linaro.org>
-	<20181109173553.22341-2-peter.maydell@linaro.org>
-	<CAFEAcA8pbw-D_9P3RYGMZbFXBFD6PzFNgrVLEb_RYQ11YuFdOQ@mail.gmail.com>
+References: <20181109160014.28646-1-mdroth@linux.vnet.ibm.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5d8b596c-50f8-f637-f73a-8a5cb56ac908@amsat.org>
-Date: Sat, 10 Nov 2018 20:26:06 +0100
+Message-ID: <dc234347-1e4f-2139-bd00-26f049a007f0@amsat.org>
+Date: Sat, 10 Nov 2018 20:34:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8pbw-D_9P3RYGMZbFXBFD6PzFNgrVLEb_RYQ11YuFdOQ@mail.gmail.com>
+In-Reply-To: <20181109160014.28646-1-mdroth@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/2] target/arm: Hyp mode R14 is
- shared with User and System
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] build: qga: add macro to force use of
+ native mingw32 assert()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +35,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Adam Lackorzynski <adam.lackorzynski@kernkonzept.com>, "patches@linaro.org" <patches@linaro.org>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>
 
-On 11/9/18 7:15 PM, Peter Maydell wrote:
-> On 9 November 2018 at 17:35, Peter Maydell <peter.maydell@linaro.org> wrote:
->> Hyp mode is an exception to the general rule that each AArch32
->> mode has its own r13, r14 and SPSR -- it has a banked r13 and
->> SPSR but shares its r14 with User and System mode. We were
->> incorrectly implementing it as banked, which meant that on
->> entry to Hyp mode r14 was 0 rather than the USR/SYS r14.
->>
->> We provide a new function r14_bank_number() which is like
->> the existing bank_number() but provides the index into
->> env->banked_r14[]; bank_number() provides the index to use
->> for env->banked_r13[] and env->banked_cpsr[].
->>
->> All the points in the code that were using bank_number()
->> to index into env->banked_r14[] are updated for consintency:
->>  * switch_mode() -- this is the only place where we fix
->>    an actual bug
->>  * aarch64_sync_32_to_64() and aarch64_sync_64_to_32():
->>    no behavioural change as we already special-cased Hyp R14
->>  * kvm32.c: no behavioural change since the guest can't ever
->>    be in Hyp mode, but conceptually the right thing to do
->>  * msr_banked()/mrs_banked(): we can never get to the case
->>    that accesses banked_r14[] with tgtmode == ARM_CPU_MODE_HYP,
->>    so no behavioural change
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  target/arm/internals.h | 16 ++++++++++++++++
->>  target/arm/helper.c    | 29 +++++++++++++++--------------
->>  target/arm/kvm32.c     |  4 ++--
->>  target/arm/op_helper.c |  2 +-
->>  4 files changed, 34 insertions(+), 17 deletions(-)
-> 
-> Rats, this bit accidentally didn't make it into this patch:
-> 
-> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index 2b62c53f5b5..eb6fb82fb81 100644
-> --- a/target/arm/op_helper.c
-> +++ b/target/arm/op_helper.c
-> @@ -725,7 +725,7 @@ uint32_t HELPER(mrs_banked)(CPUARMState *env,
-> uint32_t tgtmode, uint32_t regno)
->      case 13:
->          return env->banked_r13[bank_number(tgtmode)];
->      case 14:
-> -        return env->banked_r14[bank_number(tgtmode)];
-> +        return env->banked_r14[r14_bank_number(tgtmode)];
->      case 8 ... 12:
->          switch (tgtmode) {
->          case ARM_CPU_MODE_USR:
-> 
-> 
-> (it's one of the "no behavioural change" bits).
+Hi Michael,
 
-With this hunk:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 11/9/18 5:00 PM, Michael Roth wrote:
+> When building qemu-ga for w32 with VSS support, some parts of qemu-ga
+> are not linked against glib, specifically the C++ bits used to
+> create the VSS provider DLL. With 3ebee3b191e, we now define assert()
+> as g_assert() for all mingw32 builds via osdep.h, which results in the
+> following build breakage:
+> 
+>   x86_64-w64-mingw32-g++ -o qga/vss-win32/qga-vss.dll qga/vss-win32/requester.o qga/vss-win32/provider.o qga/vss-win32/install.o /home/mdroth/w/qemu4.git/qga/vss-win32/qga-vss.def  -shared -Wl,--add-stdcall-alias,--enable-stdcall-fixup -lole32 -loleaut32 -lshlwapi -luuid -static
+>   qga/vss-win32/requester.o: In function `requester_freeze':
+>   /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:284: undefined reference to `g_assertion_message_expr'
+>   qga/vss-win32/requester.o: In function `requester_thaw':
+>   /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:508: undefined reference to `g_assertion_message_expr'
+>   /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:509: undefined reference to `g_assertion_message_expr'
+>   collect2: error: ld returned 1 exit status
+>   make: *** [/home/mdroth/w/qemu4.git/qga/vss-win32/Makefile.objs:10: qga/vss-win32/qga-vss.dll] Error 1
+>   make: *** Waiting for unfinished jobs....
+> 
+> Fix this by introducing a USE_NATIVE_MINGW32_ASSERT macro that can
+> be defined prior to inclusion of osdep.h in individual C/C++ files
+> that don't link against glib.
+> 
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> ---
+>  include/qemu/osdep.h        | 2 +-
+>  qga/vss-win32/install.cpp   | 2 +-
+>  qga/vss-win32/provider.cpp  | 2 +-
+>  qga/vss-win32/requester.cpp | 2 +-
+>  qga/vss-win32/vss-common.h  | 2 ++
+>  5 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 3bf48bcdec..59364bfeb0 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -129,7 +129,7 @@ extern int daemon(int, int);
+>   * code that is unreachable when features are disabled.
+>   * All supported versions of Glib's g_assert() satisfy this requirement.
+>   */
+> -#ifdef __MINGW32__
+> +#if defined(__MINGW32__) && !defined(USE_NATIVE_MINGW32_ASSERT)
+>  #undef assert
+>  #define assert(x)  g_assert(x)
+>  #endif
 
-Thanks for the detailed patch description,
+OK.
+
+> diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
+> index 6713e58670..6ed2d5930c 100644
+> --- a/qga/vss-win32/install.cpp
+> +++ b/qga/vss-win32/install.cpp
+> @@ -10,9 +10,9 @@
+>   * See the COPYING file in the top-level directory.
+>   */
+>  
+> +#include "vss-common.h"
+>  #include "qemu/osdep.h"
+
+I don't like breaking the rule and not using "qemu/osdep.h" first.
+(See below for suggestion).
+
+>  
+> -#include "vss-common.h"
+>  #include <inc/win2003/vscoordint.h>
+>  #include "install.h"
+>  #include <wbemidl.h>
+> diff --git a/qga/vss-win32/provider.cpp b/qga/vss-win32/provider.cpp
+> index 72d8b0e19d..d298af91b2 100644
+> --- a/qga/vss-win32/provider.cpp
+> +++ b/qga/vss-win32/provider.cpp
+> @@ -10,8 +10,8 @@
+>   * See the COPYING file in the top-level directory.
+>   */
+>  
+> -#include "qemu/osdep.h"
+>  #include "vss-common.h"
+> +#include "qemu/osdep.h"
+
+Ditto.
+
+>  #include <inc/win2003/vscoordint.h>
+>  #include <inc/win2003/vsprov.h>
+>  
+> diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
+> index 5378c55d23..d239bd9598 100644
+> --- a/qga/vss-win32/requester.cpp
+> +++ b/qga/vss-win32/requester.cpp
+> @@ -10,8 +10,8 @@
+>   * See the COPYING file in the top-level directory.
+>   */
+>  
+> -#include "qemu/osdep.h"
+>  #include "vss-common.h"
+> +#include "qemu/osdep.h"
+
+Ditto.
+
+>  #include "requester.h"
+>  #include "install.h"
+>  #include <inc/win2003/vswriter.h>
+> diff --git a/qga/vss-win32/vss-common.h b/qga/vss-win32/vss-common.h
+> index 61c170b52e..275cbb59c5 100644
+> --- a/qga/vss-win32/vss-common.h
+> +++ b/qga/vss-win32/vss-common.h
+> @@ -13,6 +13,8 @@
+>  #ifndef VSS_COMMON_H
+>  #define VSS_COMMON_H
+>  
+> +#define USE_NATIVE_MINGW32_ASSERT
+
+I believe you can add this in the "VSS SDK" section of the ./configure
+script:
+
+-- >8 --
+diff --git a/configure b/configure
+@@ -4588,7 +4588,7 @@ int main(void) { return VSS_CTX_BACKUP; }
+ EOF
+   if compile_prog "$vss_win32_include" "" ; then
+     guest_agent_with_vss="yes"
+-    QEMU_CFLAGS="$QEMU_CFLAGS $vss_win32_include"
++    QEMU_CFLAGS="$QEMU_CFLAGS -DUSE_NATIVE_MINGW32_ASSERT
+$vss_win32_include"
+     libs_qga="-lole32 -loleaut32 -lshlwapi -lstdc++
+-Wl,--enable-stdcall-fixup $libs_qga"
+     qga_vss_provider="qga/vss-win32/qga-vss.dll qga/vss-win32/qga-vss.tlb"
+   else
+---
+
+What do you think?
+
+Regards,
 
 Phil.
 
-> thanks
-> -- PMM
+> +
+>  #define __MIDL_user_allocate_free_DEFINED__
+>  #include <windows.h>
+>  #include <shlwapi.h>
 > 
