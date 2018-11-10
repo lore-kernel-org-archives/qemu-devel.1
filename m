@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gLOOu-0003q2-Mc
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 03:13:53 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gLOOv-0003qy-8M
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 03:13:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gLOOt-0000nb-B8
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 03:13:52 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gLOOt-0000ns-BC
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 03:13:53 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Sat, 10 Nov 2018 09:11:42 +0100
-Message-Id: <20181110081147.4027-12-luc.michel@greensocs.com>
+Date: Sat, 10 Nov 2018 09:11:37 +0100
+Message-Id: <20181110081147.4027-7-luc.michel@greensocs.com>
 In-Reply-To: <20181110081147.4027-1-luc.michel@greensocs.com>
 References: <20181110081147.4027-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 11/16] gdbstub: add support for extended
- mode packet
+Subject: [Qemu-devel] [PATCH v5 06/16] gdbstub: add multiprocess support to
+ 'sC' packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +26,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Add support for the '!' extended mode packet. This is required for the
-multiprocess extension.
+Change the sC packet handling to support the multiprocess extension.
+Instead of returning the first thread, we return the first thread of the
+current process.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- gdbstub.c | 3 +++
- 1 file changed, 3 insertions(+)
+ gdbstub.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index bd4895ac0a..4132227092 100644
+index ba8b1a3413..9be83486f5 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1294,10 +1294,13 @@ static int gdb_handle_packet(GDBState *s, const c=
+@@ -1546,13 +1546,18 @@ static int gdb_handle_packet(GDBState *s, const c=
 har *line_buf)
-     trace_gdbstub_io_command(line_buf);
-=20
-     p =3D line_buf;
-     ch =3D *p++;
-     switch(ch) {
-+    case '!':
-+        put_packet(s, "OK");
-+        break;
-     case '?':
-         /* TODO: Make this return the correct value for user-mode.  */
-         snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
-                  gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread=
-_id)));
-         put_packet(s, buf);
+             type =3D strtoul(p, (char **)&p, 16);
+             sstep_flags =3D type;
+             put_packet(s, "OK");
+             break;
+         } else if (strcmp(p,"C") =3D=3D 0) {
+-            /* "Current thread" remains vague in the spec, so always ret=
+urn
+-             *  the first CPU (gdb returns the first thread). */
+-            put_packet(s, "QC1");
++            /* "Current thread" remains vague in the spec, so always ret=
+urn the
++             * first thread of the current process (gdb returns the firs=
+t
++             * thread).
++             */
++            cpu =3D get_first_cpu_in_process(s, gdb_get_cpu_process(s, s=
+->g_cpu));
++            snprintf(buf, sizeof(buf), "QC%s",
++                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_=
+id)));
++            put_packet(s, buf);
+             break;
+         } else if (strcmp(p,"fThreadInfo") =3D=3D 0) {
+             s->query_cpu =3D first_cpu;
+             goto report_cpuinfo;
+         } else if (strcmp(p,"sThreadInfo") =3D=3D 0) {
 --=20
 2.19.1
