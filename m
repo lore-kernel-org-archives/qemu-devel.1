@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gLXz4-0007OD-G2
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:27:51 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gLY69-0004AK-DF
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:35:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gLXz3-00074R-Qr
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:27:50 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43624)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gLY64-0005yX-G5
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:35:09 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38136)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gLXz3-00072x-If
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:27:49 -0500
-Received: by mail-wr1-x443.google.com with SMTP id y3-v6so5121160wrh.10
-	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 10:27:49 -0800 (PST)
+	id 1gLXXw-00031r-32
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 12:59:48 -0500
+Received: by mail-wr1-x442.google.com with SMTP id e3-v6so5103955wrs.5
+	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 09:59:47 -0800 (PST)
 References: <20181108160818.5485-1-yuval.shaia@oracle.com>
-	<20181108160818.5485-14-yuval.shaia@oracle.com>
+	<20181108160818.5485-5-yuval.shaia@oracle.com>
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <ee9f5ed6-f68b-eb45-2d2a-357ff1c47cf0@gmail.com>
-Date: Sat, 10 Nov 2018 20:27:44 +0200
+Message-ID: <8fdf3fd4-a11e-b1fc-bb86-fd47e3d7df20@gmail.com>
+Date: Sat, 10 Nov 2018 19:59:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181108160818.5485-14-yuval.shaia@oracle.com>
+In-Reply-To: <20181108160818.5485-5-yuval.shaia@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 13/22] hw/pvrdma: Make sure PCI function
- 0 is vmxnet3
+Subject: Re: [Qemu-devel] [PATCH v2 04/22] hw/rdma: Abort send-op if fail to
+ create addr handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +37,30 @@ To: Yuval Shaia <yuval.shaia@oracle.com>, dmitry.fleytman@gmail.com, jasowang@re
 
 
 On 11/8/18 6:08 PM, Yuval Shaia wrote:
-> Guest driver enforces it, we should also.
+> Function create_ah might return NULL, let's exit with an error.
 >
 > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 > ---
->   hw/rdma/vmw/pvrdma.h      | 2 ++
->   hw/rdma/vmw/pvrdma_main.c | 3 +++
->   2 files changed, 5 insertions(+)
+>   hw/rdma/rdma_backend.c | 4 ++++
+>   1 file changed, 4 insertions(+)
 >
-> diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-> index b019cb843a..10a3c4fb7c 100644
-> --- a/hw/rdma/vmw/pvrdma.h
-> +++ b/hw/rdma/vmw/pvrdma.h
-> @@ -20,6 +20,7 @@
->   #include "hw/pci/pci.h"
->   #include "hw/pci/msix.h"
->   #include "chardev/char-fe.h"
-> +#include "hw/net/vmxnet3_defs.h"
->   
->   #include "../rdma_backend_defs.h"
->   #include "../rdma_rm_defs.h"
-> @@ -85,6 +86,7 @@ typedef struct PVRDMADev {
->       RdmaBackendDev backend_dev;
->       RdmaDeviceResources rdma_dev_res;
->       CharBackend mad_chr;
-> +    VMXNET3State *func0;
->   } PVRDMADev;
->   #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
->   
-> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> index ac8c092db0..fa6468d221 100644
-> --- a/hw/rdma/vmw/pvrdma_main.c
-> +++ b/hw/rdma/vmw/pvrdma_main.c
-> @@ -576,6 +576,9 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
->           return;
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index d7a4bbd91f..1e148398a2 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -338,6 +338,10 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+>       if (qp_type == IBV_QPT_UD) {
+>           wr.wr.ud.ah = create_ah(backend_dev, qp->ibpd,
+>                                   backend_dev->backend_gid_idx, dgid);
+> +        if (!wr.wr.ud.ah) {
+> +            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+> +            goto out_dealloc_cqe_ctx;
+> +        }
+>           wr.wr.ud.remote_qpn = dqpn;
+>           wr.wr.ud.remote_qkey = dqkey;
 >       }
->   
-> +    /* Break if not vmxnet3 device in slot 0 */
-> +    dev->func0 = VMXNET3(pci_get_function_0(pdev));
-> +
 
-I don't see the error code flow in case VMXNET3 is not func 0.
-Am I missing something?
-
+Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 
 Thanks,
 Marcel
-
->       memdev_root = object_resolve_path("/objects", NULL);
->       if (memdev_root) {
->           object_child_foreach(memdev_root, pvrdma_check_ram_shared, &ram_shared);
