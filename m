@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gLU9B-0006rS-Ui
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gLU9D-0006QB-14
 	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 09:22:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gLTxG-0000Qn-FP
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 09:09:45 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:44348)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gLTur-00061w-Or
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 09:07:16 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:60324)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gLTxG-0000F7-5s
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 09:09:42 -0500
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sat, 10 Nov 2018 15:09:23 +0100
-Message-Id: <20181110140925.22457-3-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20181110140925.22457-1-samuel.thibault@ens-lyon.org>
-References: <20181110140925.22457-1-samuel.thibault@ens-lyon.org>
+	id 1gLTur-00061G-Hx
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 09:07:13 -0500
+Date: Sat, 10 Nov 2018 15:07:11 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20181110140711.gfhxxmzpgtklhiag@function>
+References: <20181110134548.14741-1-marcandre.lureau@redhat.com>
+	<20181110134548.14741-11-marcandre.lureau@redhat.com>
+	<20181110135335.pw35cgnbyuzgbecx@function>
+	<CAFEAcA93Vszet7tq4gDm7UhoHmf2MBeBvHM_spxX-8A34-LEBg@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA93Vszet7tq4gDm7UhoHmf2MBeBvHM_spxX-8A34-LEBg@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/4] slirp: Use g_new() to allocate sockets in
- socreate()
+Subject: Re: [Qemu-devel] [PATCH for-3.2 10/13] slirp: improve subprocess
+ socket creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+Peter Maydell, le sam. 10 nov. 2018 14:04:10 +0000, a ecrit:
+> On 10 November 2018 at 13:53, Samuel Thibault <samuel.thibault@gnu.org>=
+ wrote:
+> > Marc-Andr=C3=A9 Lureau, le sam. 10 nov. 2018 17:45:45 +0400, a ecrit:
+> >> @@ -163,23 +183,14 @@ fork_exec(struct socket *so, const char *ex)
+> >>               exit(1);
+> >>
+> >>        default:
+> >> -             qemu_add_child_watch(pid);
+> >> -                /*
+> >> -                 * XXX this could block us...
+> >> -                 * XXX Should set a timer here, and if accept() doe=
+sn't
+> >> -                 * return after X seconds, declare it a failure
+> >> -                 * The only reason this will block forever is if so=
+cket()
+> >> -                 * of connect() fail in the child process
+> >> -                 */
+> >
+> > At least this got fixed by Peter lately, so please rebase.
+>=20
+> My patches aren't in master yet, though -- do you have a
+> public slirp tree that slirp patches should be based on?
+> (I'm assuming you're planning a pull request too.)
 
-The slirp socreate() function can only fail if the attempt
-to malloc() the struct socket fails. Switch to using
-g_new() instead, which will allow us to remove the
-error-handling code from its callers.
+Ah, right.
+My tree is documented in MAINTAINERS :)
+git https://people.debian.org/~sthibault/qemu.git slirp
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
----
- slirp/socket.c    | 14 ++++++--------
- slirp/tcp_input.c |  4 ++--
- slirp/tcp_subr.c  |  2 +-
- 3 files changed, 9 insertions(+), 11 deletions(-)
+Let me push that to master indeed.
 
-diff --git a/slirp/socket.c b/slirp/socket.c
-index 322383a1f9..35a9a14565 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -46,17 +46,15 @@ struct socket *solookup(struct socket **last, struct =
-socket *head,
- struct socket *
- socreate(Slirp *slirp)
- {
--  struct socket *so;
-+    struct socket *so =3D g_new(struct socket, 1);
-=20
--  so =3D (struct socket *)malloc(sizeof(struct socket));
--  if(so) {
-     memset(so, 0, sizeof(struct socket));
-     so->so_state =3D SS_NOFDREF;
-     so->s =3D -1;
-     so->slirp =3D slirp;
-     so->pollfds_idx =3D -1;
--  }
--  return(so);
-+
-+    return so;
- }
-=20
- /*
-@@ -110,7 +108,7 @@ sofree(struct socket *so)
-   if (so->so_tcpcb) {
-       free(so->so_tcpcb);
-   }
--  free(so);
-+  g_free(so);
- }
-=20
- size_t sopreprbuf(struct socket *so, struct iovec *iov, int *np)
-@@ -721,8 +719,8 @@ tcp_listen(Slirp *slirp, uint32_t haddr, u_int hport,=
- uint32_t laddr,
-=20
- 	/* Don't tcp_attach... we don't need so_snd nor so_rcv */
- 	if ((so->so_tcpcb =3D tcp_newtcpcb(so)) =3D=3D NULL) {
--		free(so);
--		return NULL;
-+            g_free(so);
-+            return NULL;
- 	}
- 	insque(so, &slirp->tcb);
-=20
-diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
-index 07bcbdb2dd..4f79c95fdb 100644
---- a/slirp/tcp_input.c
-+++ b/slirp/tcp_input.c
-@@ -432,8 +432,8 @@ findso:
- 	  if ((so =3D socreate(slirp)) =3D=3D NULL)
- 	    goto dropwithreset;
- 	  if (tcp_attach(so) < 0) {
--	    free(so); /* Not sofree (if it failed, it's not insqued) */
--	    goto dropwithreset;
-+            g_free(so); /* Not sofree (if it failed, it's not insqued) *=
-/
-+            goto dropwithreset;
- 	  }
-=20
- 	  sbreserve(&so->so_snd, TCP_SNDSPACE);
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index 8d0f94b75f..0270c89ae3 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -475,7 +475,7 @@ void tcp_connect(struct socket *inso)
-             return;
-         }
-         if (tcp_attach(so) < 0) {
--            free(so); /* NOT sofree */
-+            g_free(so); /* NOT sofree */
-             return;
-         }
-         so->lhost =3D inso->lhost;
---=20
-2.19.1
+Samuel
