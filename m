@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gLUNz-0006Dw-DQ
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 09:37:20 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gLUT1-00014S-8B
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 09:42:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gLUNy-00084E-PN
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 09:37:19 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:60662)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gLUSu-00045w-VE
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 09:42:29 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:60710)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gLUNy-00083k-Gw
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 09:37:18 -0500
-Date: Sat, 10 Nov 2018 15:37:16 +0100
+	id 1gLUSu-00044u-Mk
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 09:42:24 -0500
+Date: Sat, 10 Nov 2018 15:42:22 +0100
 From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20181110143716.pfowo6jusn7o5qyr@function>
+Message-ID: <20181110144222.ef22bxryrpauxwxd@function>
 References: <20181110134548.14741-1-marcandre.lureau@redhat.com>
-	<20181110134548.14741-10-marcandre.lureau@redhat.com>
+	<20181110134548.14741-12-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20181110134548.14741-10-marcandre.lureau@redhat.com>
+In-Reply-To: <20181110134548.14741-12-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 09/13] slirp: fix slirp_add_exec()
- leaks
+Subject: Re: [Qemu-devel] [PATCH for-3.2 11/13] slirp: replace the poor-man
+ string split with g_strsplit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,8 +33,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Cc: qemu-devel@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>
 
-Marc-Andr=C3=A9 Lureau, le sam. 10 nov. 2018 17:45:44 +0400, a ecrit:
-> Free the list elements allocated in add_exec().
+Marc-Andr=C3=A9 Lureau, le sam. 10 nov. 2018 17:45:46 +0400, a ecrit:
+> Use the glib function for the work, fix a potential crash on >256 words=
+.
 
 Applied to my tree, thanks!
 
