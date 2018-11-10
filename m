@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gLOmX-0000EB-Dp
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 03:38:18 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gLRFr-0000zF-Ra
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 06:16:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gLOmR-0004BG-O1
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 03:38:16 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37710)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gLOmQ-00043G-IA
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 03:38:11 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p2-v6so3857614wmc.2
-	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 00:38:02 -0800 (PST)
-References: <20181109191933.6641-1-palmer@sifive.com>
-	<20181109191933.6641-2-palmer@sifive.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c6e88f7e-aaef-5d0e-be10-cce1a6e4bdeb@linaro.org>
-Date: Sat, 10 Nov 2018 09:37:56 +0100
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gLRFm-00037S-Q6
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 06:16:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49474)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gLRFm-00030E-Jv
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 06:16:38 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EFA4F394D52
+	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 11:16:36 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Sat, 10 Nov 2018 15:16:23 +0400
+Message-Id: <20181110111623.31356-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181109191933.6641-2-palmer@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for 3.1] RISC-V: Respect fences for
- user-only emulators
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] edid: silence a stringop-overflow warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 11/9/18 8:19 PM, Palmer Dabbelt wrote:
-> Our current fence implementation ignores fences for the user-only
-> configurations.  This is incorrect but unlikely to manifest: it requires
-> multi-threaded user-only code that takes advantage of the weakness in
-> the host's memory model and can be inlined by TCG.
-> 
-> This patch simply treats fences the same way for all our emulators.
-> I've given it to testing as I don't want to construct a test that would
-> actually trigger the failure.
-> 
-> Our fence implementation has an additional deficiency where we map all
-> RISC-V fences to full fences.  Now that we have a formal memory model
-> for RISC-V we can start to take advantage of the strength bits on our
-> fence instructions.  This requires a bit more though, so I'm going to
-> split it out because the implementation is still correct without taking
-> advantage of these weaker fences.
-> 
-> Thanks to Richard Henderson for pointing out both of the issues.
-> 
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> ---
->  target/riscv/translate.c | 2 --
->  1 file changed, 2 deletions(-)
+Simplify the code that doesn't need strncpy() since length of string
+is already computed.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+/home/elmarco/src/qemu/hw/display/edid-generate.c: In function 'edid_desc=
+_text':
+/home/elmarco/src/qemu/hw/display/edid-generate.c:168:5: error: 'strncpy'=
+ specified bound depends on the length of the source argument [-Werror=3D=
+stringop-overflow=3D]
+     strncpy((char *)(desc + 5), text, len);
+     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/elmarco/src/qemu/hw/display/edid-generate.c:164:11: note: length co=
+mputed here
+     len =3D strlen(text);
+           ^~~~~~~~~~~~
+cc1: all warnings being treated as errors
 
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/display/edid-generate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-r~
+diff --git a/hw/display/edid-generate.c b/hw/display/edid-generate.c
+index bdf5e1d4d4..77d9127344 100644
+--- a/hw/display/edid-generate.c
++++ b/hw/display/edid-generate.c
+@@ -165,7 +165,7 @@ static void edid_desc_text(uint8_t *desc, uint8_t typ=
+e,
+     if (len > 12) {
+         len =3D 12;
+     }
+-    strncpy((char *)(desc + 5), text, len);
++    memcpy(desc + 5, text, len);
+     desc[5 + len] =3D '\n';
+ }
+=20
+--=20
+2.19.1.708.g4ede3d42df
