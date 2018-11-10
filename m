@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36676)
+Received: from eggs.gnu.org ([208.118.235.92]:57555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gLV4L-0006ZF-UC
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 10:21:06 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gLXrd-0007e8-Uw
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:20:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gLV4F-0008Ss-Cw
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 10:21:05 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:43587
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gLV4F-0008ML-3F
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 10:20:59 -0500
-Received: from host86-161-196-117.range86-161.btcentralplus.com
-	([86.161.196.117] helo=[192.168.1.65])
-	by s16892447.onlinehome-server.info with esmtpsa
-	(TLS1.0:RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gLV4M-00073N-HV
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 15:21:07 +0000
-References: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
-	<8a4b7981-cc1f-d2a7-2d92-9bf54a4bb42a@ilande.co.uk>
-	<CAFEAcA_L_L-NiqS98P9n4LShHyBBujNrkQXThEgQ0C7nVC86cQ@mail.gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <a92fc500-6c7c-d995-744d-cf7e36d76e0b@ilande.co.uk>
-Date: Sat, 10 Nov 2018 15:20:44 +0000
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gLXqY-0006Kf-TA
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:19:06 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46789)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1gLXqY-0006Jq-LM
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 13:19:02 -0500
+Received: by mail-wr1-x443.google.com with SMTP id 74-v6so5109367wrb.13
+	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 10:19:02 -0800 (PST)
+References: <20181108160818.5485-1-yuval.shaia@oracle.com>
+	<20181108160818.5485-9-yuval.shaia@oracle.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <58b12b20-39ae-233b-0a23-10ceed0e8c79@gmail.com>
+Date: Sat, 10 Nov 2018 20:18:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_L_L-NiqS98P9n4LShHyBBujNrkQXThEgQ0C7nVC86cQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+In-Reply-To: <20181108160818.5485-9-yuval.shaia@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] List of files containing devices which have not
- been QOMified
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 08/22] hw/pvrdma: Set the correct opcode
+ for recv completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,45 +32,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-On 09/11/2018 10:31, Peter Maydell wrote:
-
-> On 9 November 2018 at 10:17, Mark Cave-Ayland
-> <mark.cave-ayland@ilande.co.uk> wrote:
->> On 06/11/2018 18:43, Peter Maydell wrote:
->>
->>> I had an idea for how to get a rough list of source files
->>> containing devices that haven't been QOMified. The theory
->>> is that a pre-QOM device generally has an "init" function
->>> which allocates memory for the device struct. So looking in
->>> hw/ for files which call g_new*() or g_malloc*() should get
->>> us all the non-QOM devices (as well as a pile of false
->>> positives, of course).
-> 
->>> hw/sparc64/sparc64.c
->>
->> This would appear to be from sparc64_cpu_devinit() which sets up a ResetData
->> structure like this:
->>
->>     reset_info = g_malloc0(sizeof(ResetData));
->>     reset_info->cpu = cpu;
->>     reset_info->prom_addr = prom_addr;
->>     qemu_register_reset(main_cpu_reset, reset_info);
-> 
-> I think the code I saw that looked like a non-QOMified
-> device was cpu_timer_create().
-> 
-> The ResetData stuff is just working around the fact that
-> CPUs don't get reset unless the board code does something
-> to arrange for that to happen, so it's OK. (I would like
-> us to eventually tackle properly overhauling our approach
-> to reset, but that's a separate body of work.)
-
-Ah okay. The above timers are certainly internal CPU timers rather than external, so
-should they still be QOMified? How are timers modelled for other CPUs?
+To: Yuval Shaia <yuval.shaia@oracle.com>, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com
 
 
-ATB,
 
-Mark.
+On 11/8/18 6:08 PM, Yuval Shaia wrote:
+> The function pvrdma_post_cqe populates CQE entry with opcode from the
+> given completion element. For receive operation value was not set. Fix
+> it by setting it to IBV_WC_RECV.
+>
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> ---
+>   hw/rdma/vmw/pvrdma_qp_ops.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
+> index 762700a205..7b0f440fda 100644
+> --- a/hw/rdma/vmw/pvrdma_qp_ops.c
+> +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
+> @@ -196,8 +196,9 @@ int pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
+>           comp_ctx = g_malloc(sizeof(CompHandlerCtx));
+>           comp_ctx->dev = dev;
+>           comp_ctx->cq_handle = qp->recv_cq_handle;
+> -        comp_ctx->cqe.qp = qp_handle;
+>           comp_ctx->cqe.wr_id = wqe->hdr.wr_id;
+> +        comp_ctx->cqe.qp = qp_handle;
+
+Not sure the above chunk is needed.
+
+> +        comp_ctx->cqe.opcode = IBV_WC_RECV;
+>   
+
+Anyway
+
+Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+
+Thanks,
+Marcel
+
+>           rdma_backend_post_recv(&dev->backend_dev, &dev->rdma_dev_res,
+>                                  &qp->backend_qp, qp->qp_type,
