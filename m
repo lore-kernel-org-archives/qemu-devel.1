@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gLbmG-0001Fu-99
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 17:30:53 -0500
+	(envelope-from <bounces@canonical.com>) id 1gLcK2-0003xr-5y
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 18:05:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gLbmD-0006PJ-1m
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 17:30:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46086)
+	(envelope-from <bounces@canonical.com>) id 1gLcJw-000536-84
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 18:05:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47628)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gLbmC-0006Ne-RH
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 17:30:48 -0500
+	id 1gLcJs-0004yN-Av
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 18:05:37 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gLbm6-00047d-Ck
-	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 22:30:42 +0000
+	id 1gLcJp-0005i5-4L
+	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 23:05:33 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5DFFB2E80C9
-	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 22:30:42 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id E8D4D2E80CC
+	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 23:05:32 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 10 Nov 2018 22:23:42 -0000
-From: inactive <1802684@bugs.launchpad.net>
+Date: Sat, 10 Nov 2018 22:56:42 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
+References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
+Message-Id: <154189060257.2596.980851164468173377.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1802684] [NEW] QEMU gui crashes on macOS Mojave
+Subject: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,114 +38,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Public bug reported:
-
-QEMU release 3.0.0 as well as a recent head build
-
-/usr/local/Cellar/qemu/HEAD-03c1ca1 (147 files, 257.2MB)
-  Built from source on 2018-11-06 at 13:41:32 with: --with-gtk+3 --with-sdl=
-2 --with-libusb
-/usr/local/Cellar/qemu/3.0.0 (137 files, 261.6MB) *
-  Poured from bottle on 2018-11-10 at 22:58:32 with: --with-gtk+3 --with-li=
-busb --with-sdl2
-
-Crashes when attempting to use any gui interface (tried SDL and default
-Cocoa):
-
-2018-11-10 22:58:41.799 qemu-system-aarch64[42982:1102466] *** Terminating =
-app due to uncaught exception 'NSInternalInconsistencyException', reason: '=
-NSWindow drag regions should only be invalidated on the Main Thread!'
-*** First throw call stack:
-(
-	0   CoreFoundation                      0x00007fff3ea96ecd __exceptionPrep=
-rocess + 256
-	1   libobjc.A.dylib                     0x00007fff6ab49720 objc_exception_=
-throw + 48
-	2   CoreFoundation                      0x00007fff3eab095d -[NSException r=
-aise] + 9
-	3   AppKit                              0x00007fff3bfb13fa -[NSWindow(NSWi=
-ndow_Theme) _postWindowNeedsToResetDragMarginsUnlessPostingDisabled] + 324
-	4   AppKit                              0x00007fff3bfb6850 -[NSView setFra=
-meSize:] + 2082
-	5   AppKit                              0x00007fff3c02747d -[NSVisualEffec=
-tView setFrameSize:] + 171
-	6   AppKit                              0x00007fff3c0811b1 -[NSTitlebarVie=
-w setFrameSize:] + 84
-	7   AppKit                              0x00007fff3bfb5859 -[NSView setFra=
-me:] + 478
-	8   AppKit                              0x00007fff3c081154 -[NSTitlebarVie=
-w resizeWithOldSuperviewSize:] + 100
-	9   AppKit                              0x00007fff3bfbc95e -[NSView resize=
-SubviewsWithOldSize:] + 502
-	10  AppKit                              0x00007fff3bfb66d9 -[NSView setFra=
-meSize:] + 1707
-	11  AppKit                              0x00007fff3c9773c0 -[NSTitlebarCon=
-tainerView setFrameSize:] + 142
-	12  AppKit                              0x00007fff3bfb5859 -[NSView setFra=
-me:] + 478
-	13  AppKit                              0x00007fff3bfbcdb5 -[NSView resize=
-WithOldSuperviewSize:] + 776
-	14  AppKit                              0x00007fff3bfbc95e -[NSView resize=
-SubviewsWithOldSize:] + 502
-	15  AppKit                              0x00007fff3bfb66d9 -[NSView setFra=
-meSize:] + 1707
-	16  AppKit                              0x00007fff3c024570 -[NSThemeFrame =
-setFrameSize:] + 495
-	17  AppKit                              0x00007fff3c011223 -[NSWindow _set=
-Frame:updateBorderViewSize:] + 966
-	18  AppKit                              0x00007fff3c010b46 -[NSWindow _old=
-PlaceWindow:] + 547
-	19  AppKit                              0x00007fff3c010151 -[NSWindow _set=
-FrameCommon:display:stashSize:] + 3006
-	20  AppKit                              0x00007fff3c00f57d -[NSWindow _set=
-Frame:display:allowImplicitAnimation:stashSize:] + 192
-	21  AppKit                              0x00007fff3c019ff8 -[NSWindow setF=
-rame:display:animate:] + 567
-	22  qemu-system-aarch64                 0x000000010b7b2abf qemu-system-aar=
-ch64 + 3668671
-	23  qemu-system-aarch64                 0x000000010b7b6356 qemu-system-aar=
-ch64 + 3683158
-	24  qemu-system-aarch64                 0x000000010b7ad836 qemu-system-aar=
-ch64 + 3647542
-	25  qemu-system-aarch64                 0x000000010b4ce769 qemu-system-aar=
-ch64 + 636777
-	26  qemu-system-aarch64                 0x000000010b487c24 qemu-system-aar=
-ch64 + 347172
-	27  qemu-system-aarch64                 0x000000010b487a15 qemu-system-aar=
-ch64 + 346645
-	28  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-aar=
-ch64 + 346353
-	29  qemu-system-aarch64                 0x000000010b4414aa qemu-system-aar=
-ch64 + 58538
-	30  qemu-system-aarch64                 0x000000010b4f78c3 qemu-system-aar=
-ch64 + 805059
-	31  qemu-system-aarch64                 0x000000010b487c24 qemu-system-aar=
-ch64 + 347172
-	32  qemu-system-aarch64                 0x000000010b487a15 qemu-system-aar=
-ch64 + 346645
-	33  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-aar=
-ch64 + 346353
-	34  qemu-system-aarch64                 0x000000010b4b8f57 qemu-system-aar=
-ch64 + 548695
-	35  qemu-system-aarch64                 0x000000010b49c3af qemu-system-aar=
-ch64 + 431023
-	36  ???                                 0x00000001117891f3 0x0 + 4588081651
-)
-libc++abi.dylib: terminating with uncaught exception of type NSException
-fish: 'qemu-system-aarch64 -M raspi3 -=E2=80=A6' terminated by signal SIGAB=
-RT (Abort)
-
-
-macOS Mojave 10.14.2 Beta (18C38b)
-Qemu in the same configuration used to work in High Sierra, started crashin=
-g only after upgrade to Mojave.
-
-Command line:
-`qemu-system-aarch64 -M raspi3 -d in_asm -serial stdio -kernel $1.bin`
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Thanks for the bug report. It looks like Mojave is pickier about apps
+not calling various GUI update functions from the "wrong" thread. We
+probably need to figure out how to dispatch those to the main thread
+instead of whatever thread we were on. Unfortunately we don't really
+have anybody in QEMU upstream who knows much about OSX or its GUI, and I
+suspect we don't have anybody with Mojave (my system is still High
+Sierra and I don't plan to upgrade it for a while); help and patches
+appreciated from anybody who does...
 
 -- =
 
