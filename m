@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58135)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLaZI-0005lC-NP
+	id 1gLaZI-0005lD-Nm
 	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 16:13:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLaZF-0002A2-Ca
+	id 1gLaZG-0002B5-JR
 	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 16:13:24 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35705)
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50372)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLaZF-00029E-6Z
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 16:13:21 -0500
-Received: by mail-wr1-x442.google.com with SMTP id z16-v6so5395267wrv.2
-	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 13:13:21 -0800 (PST)
+	id 1gLaZG-0002AJ-DS
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 16:13:22 -0500
+Received: by mail-wm1-x341.google.com with SMTP id 124-v6so5051102wmw.0
+	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 13:13:22 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sat, 10 Nov 2018 22:13:12 +0100
-Message-Id: <20181110211313.6922-2-f4bug@amsat.org>
+Date: Sat, 10 Nov 2018 22:13:13 +0100
+Message-Id: <20181110211313.6922-3-f4bug@amsat.org>
 In-Reply-To: <20181110211313.6922-1-f4bug@amsat.org>
 References: <20181110211313.6922-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/2] MAINTAINERS: Add scripts/decodetree.py to
- the TCG section
+Subject: [Qemu-devel] [PATCH 2/2] decodetree: Add multiple include guard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,24 +34,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Richard Henderson <rth@twiddle.net>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+
+It is necessary when splitting an ISA, or when using multiple ISAs.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+ scripts/decodetree.py | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 126fe0be7e..45e4bfcd87 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -112,6 +112,7 @@ S: Maintained
- F: cpus.c
- F: exec.c
- F: accel/tcg/
-+F: scripts/decodetree.py
- F: include/exec/cpu*.h
- F: include/exec/exec-all.h
- F: include/exec/helper*.h
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index 0bc73b5990..5dea15e7a5 100755
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -1030,7 +1030,11 @@ def main():
+     else:
+         output_fd = sys.stdout
+ 
++    hdr_guard = filename.split(os.path.sep)[-1].upper().replace('.', '_') + "_H"
++
+     output_autogen()
++    output('#ifndef ' + hdr_guard + '\n')
++    output('#define ' + hdr_guard + '\n')
+     for n in sorted(arguments.keys()):
+         f = arguments[n]
+         f.output_def()
+@@ -1066,6 +1070,7 @@ def main():
+     t.output_code(4, False, 0, 0)
+ 
+     output('}\n')
++    output('#endif /* ' + hdr_guard + ' */\n')
+ 
+     if output_file:
+         output_fd.close()
 -- 
 2.19.1
