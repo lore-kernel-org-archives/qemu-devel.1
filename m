@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1gLmpn-0006s7-BV
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 05:19:22 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gLn2I-0004MW-Jp
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 05:32:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1gLmph-0002ex-Fz
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 05:19:15 -0500
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:43736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
-	id 1gLmph-0002eO-3e
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 05:19:09 -0500
-Received: by mail-yb1-xb44.google.com with SMTP id h187-v6so2796190ybg.10
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 02:19:08 -0800 (PST)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gLn2E-0005Xq-Gi
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 05:32:10 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:54374)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gLn2E-0005Sn-5s
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 05:32:06 -0500
+Date: Sun, 11 Nov 2018 12:31:51 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20181111103150.GG2974@lap1>
+References: <20181108160818.5485-1-yuval.shaia@oracle.com>
+	<20181108160818.5485-6-yuval.shaia@oracle.com>
+	<70268ddc-0be6-6128-e9c1-28037c11a5a9@gmail.com>
 MIME-Version: 1.0
-References: <20181109145827.23076-1-yuri.benditovich@daynix.com>
-	<20181109125947-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20181109125947-mutt-send-email-mst@kernel.org>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Sun, 11 Nov 2018 12:18:54 +0200
-Message-ID: <CAOEp5OdXFYYDB_7vNFsrtf=iwpL+ys9Hf_0gR-JXJ+wLnmDw5g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: support RSC v4/v6 tcp traffic
- for Windows HCK
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <70268ddc-0be6-6128-e9c1-28037c11a5a9@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 05/22] hw/rdma: Add support for MAD
+ packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,1147 +31,567 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S . Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-devel@nongnu.org, Yan Vugenfirer <yan@daynix.com>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, yuval.shaia@oracle.com
 
-On Fri, Nov 9, 2018 at 8:11 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+On Sat, Nov 10, 2018 at 08:15:27PM +0200, Marcel Apfelbaum wrote:
+> Hi Yuval
+>=20
+> On 11/8/18 6:08 PM, Yuval Shaia wrote:
+> > MAD (Management Datagram) packets are widely used by various modules
+> > both in kernel and in user space for example the rdma_* API which is
+> > used to create and maintain "connection" layer on top of RDMA uses
+> > several types of MAD packets.
+>=20
+> Can you add a link to MAD spec to commit or event in the code?
 
-> Looks good to me. Some comments below
->
-> On Fri, Nov 09, 2018 at 04:58:27PM +0200, Yuri Benditovich wrote:
-> > This commit adds implementation of RX packets
-> > coalescing, compatible with requirements of Windows
-> > Hardware compatibility kit.
-> >
-> > The device enables feature VIRTIO_NET_F_RSC_EXT in
-> > host features if it supports extended RSC functionality
-> > as defined in the specification.
-> > This feature requires at least one of VIRTIO_NET_F_GUEST_TSO4,
-> > VIRTIO_NET_F_GUEST_TSO6. Windows guest driver acks
-> > this feature only if VIRTIO_NET_F_CTRL_GUEST_OFFLOADS
-> > is also present.
-> >
-> > In case vhost is enabled the feature bit is cleared in
-> > host_features during device initialization.
-> >
-> > If the guest driver acks VIRTIO_NET_F_RSC_EXT feature,
-> > the device coalesces TCPv4 and TCPv6 packets (if
-> > respective VIRTIO_NET_F_GUEST_TSO feature is on,
-> > populates extended RSC information in virtio header
-> > and sets VIRTIO_NET_HDR_F_RSC_INFO bit in header flags.
-> > The device does not recalculate checksums in the coalesced
-> > packet, so they are not valid.
-> >
-> > In this case:
-> > All the data packets in a tcp connection are cached
-> > to a single buffer in every receive interval, and will
-> > be sent out via a timer, the 'virtio_net_rsc_timeout'
-> > controls the interval, this value may impact the
-> > performance and response time of tcp connection,
-> > 50000(50us) is an experience value to gain a performance
-> > improvement, since the whql test sends packets every 100us,
-> > so '300000(300us)' passes the test case, it is the default
-> > value as well, tune it via the command line parameter
-> > 'rsc_interval' within 'virtio-net-pci' device, for example,
-> > to launch a guest with interval set as '500000':
-> >
-> > 'virtio-net-pci,netdev=hostnet1,bus=pci.0,id=net1,mac=00,
-> > guest_rsc_ext=on,rsc_interval=500000'
-> >
-> > The timer will only be triggered if the packets pool is not empty,
-> > and it'll drain off all the cached packets.
-> >
-> > 'NetRscChain' is used to save the segments of IPv4/6 in a
-> > VirtIONet device.
-> >
-> > A new segment becomes a 'Candidate' as well as it passed sanity check,
-> > the main handler of TCP includes TCP window update, duplicated
-> > ACK check and the real data coalescing.
-> >
-> > An 'Candidate' segment means:
-> > 1. Segment is within current window and the sequence is the expected one.
-> > 2. 'ACK' of the segment is in the valid window.
-> >
-> > Sanity check includes:
-> > 1. Incorrect version in IP header
-> > 2. An IP options or IP fragment
-> > 3. Not a TCP packet
-> > 4. Sanity size check to prevent buffer overflow attack.
-> > 5. An ECN packet
-> >
-> > Even though, there might more cases should be considered such as
-> > ip identification other flags, while it breaks the test because
-> > windows set it to the same even it's not a fragment.
-> >
-> > Normally it includes 2 typical ways to handle a TCP control flag,
-> > 'bypass' and 'finalize', 'bypass' means should be sent out directly,
-> > while 'finalize' means the packets should also be bypassed, but this
-> > should be done after search for the same connection packets in the
-> > pool and drain all of them out, this is to avoid out of order fragment.
-> >
-> > All the 'SYN' packets will be bypassed since this always begin a new'
-> > connection, other flags such 'URG/FIN/RST/CWR/ECE' will trigger a
-> > finalization, because this normally happens upon a connection is going
-> > to be closed, an 'URG' packet also finalize current coalescing unit.
-> >
-> > Statistics can be used to monitor the basic coalescing status, the
-> > 'out of order' and 'out of window' means how many retransmitting packets,
-> > thus describe the performance intuitively.
-> >
-> > Difference between ip v4 and v6 processing:
-> >  Fragment length in ipv4 header includes itself, while it's not
-> >  included for ipv6, thus means ipv6 can carry a real 65535 payload.
-> >
-> > Signed-off-by: Wei Xu <address@hidden>
->
-> Pls put in the full address, QEMU doesn't accept anonymous
-> code donations.
->
-> > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+Have no idea where to take it from, does it requires some subscription or
+so?
+
+>=20
+> > To support MAD packets the device uses an external utility
+> > (contrib/rdmacm-mux) to relay packets from and to the guest driver.
+>=20
+> Can the device be used without MADs support?
+
+Since we have a support now i don't see a reason why we like to use (or
+even expose) device with no MAD support.
+
+> If not, can you update the pvrdma documentation to
+> reflect the changes?
+
+Sure, missed that, will document the changes in v3.
+
+>=20
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 > > ---
-> >  hw/net/virtio-net.c                         | 648 +++++++++++++++++++-
-> >  include/hw/virtio/virtio-net.h              |  81 +++
-> >  include/net/eth.h                           |   2 +
-> >  include/standard-headers/linux/virtio_net.h |   8 +
-> >  4 files changed, 734 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > index 385b1a03e9..43a7021409 100644
-> > --- a/hw/net/virtio-net.c
-> > +++ b/hw/net/virtio-net.c
-> > @@ -41,6 +41,28 @@
-> >  #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
-> >  #define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
-> >
-> > +#define VIRTIO_NET_IP4_ADDR_SIZE   8        /* ipv4 saddr + daddr */
+> >   hw/rdma/rdma_backend.c      | 263 +++++++++++++++++++++++++++++++++=
+++-
+> >   hw/rdma/rdma_backend.h      |   4 +-
+> >   hw/rdma/rdma_backend_defs.h |  10 +-
+> >   hw/rdma/vmw/pvrdma.h        |   2 +
+> >   hw/rdma/vmw/pvrdma_main.c   |   4 +-
+> >   5 files changed, 273 insertions(+), 10 deletions(-)
+> >=20
+> > diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> > index 1e148398a2..3eb0099f8d 100644
+> > --- a/hw/rdma/rdma_backend.c
+> > +++ b/hw/rdma/rdma_backend.c
+> > @@ -16,8 +16,13 @@
+> >   #include "qemu/osdep.h"
+> >   #include "qemu/error-report.h"
+> >   #include "qapi/error.h"
+> > +#include "qapi/qmp/qlist.h"
+> > +#include "qapi/qmp/qnum.h"
+> >   #include <infiniband/verbs.h>
+> > +#include <infiniband/umad_types.h>
+> > +#include <infiniband/umad.h>
+> > +#include <rdma/rdma_user_cm.h>
+> >   #include "trace.h"
+> >   #include "rdma_utils.h"
+> > @@ -33,16 +38,25 @@
+> >   #define VENDOR_ERR_MAD_SEND         0x206
+> >   #define VENDOR_ERR_INVLKEY          0x207
+> >   #define VENDOR_ERR_MR_SMALL         0x208
+> > +#define VENDOR_ERR_INV_MAD_BUFF     0x209
+> > +#define VENDOR_ERR_INV_NUM_SGE      0x210
+> >   #define THR_NAME_LEN 16
+> >   #define THR_POLL_TO  5000
+> > +#define MAD_HDR_SIZE sizeof(struct ibv_grh)
 > > +
-> > +#define VIRTIO_NET_TCP_FLAG         0x3F
-> > +#define VIRTIO_NET_TCP_HDR_LENGTH   0xF000
+> >   typedef struct BackendCtx {
+> > -    uint64_t req_id;
+> >       void *up_ctx;
+> >       bool is_tx_req;
+> > +    struct ibv_sge sge; /* Used to save MAD recv buffer */
+> >   } BackendCtx;
+> > +struct backend_umad {
+> > +    struct ib_user_mad hdr;
+> > +    char mad[RDMA_MAX_PRIVATE_DATA];
+> > +};
 > > +
-> > +/* IPv4 max payload, 16 bits in the header */
-> > +#define VIRTIO_NET_MAX_IP4_PAYLOAD (65535 - sizeof(struct ip_header))
-> > +#define VIRTIO_NET_MAX_TCP_PAYLOAD 65535
-> > +
-> > +/* header length value in ip header without option */
-> > +#define VIRTIO_NET_IP4_HEADER_LENGTH 5
-> > +
-> > +#define ETH_IP6_HDR_SZ (ETH_HDR_SZ + IP6_HDR_SZ)
->
-> is this used anywhere?
->
-> > +#define VIRTIO_NET_IP6_ADDR_SIZE   32      /* ipv6 saddr + daddr */
-> > +#define VIRTIO_NET_MAX_IP6_PAYLOAD VIRTIO_NET_MAX_TCP_PAYLOAD
-> > +
-> > +/* Purge coalesced packets timer interval, This value affects the
-> performance
-> > +   a lot, and should be tuned carefully, '300000'(300us) is the
-> recommended
-> > +   value to pass the WHQL test, '50000' can gain 2x netperf throughput
-> with
-> > +   tso/gso/gro 'off'. */
-> > +#define VIRTIO_NET_RSC_INTERVAL 300000
->
-> Maybe _DEFAULT_INTERVAL ?
->
-> > +
-> >  /*
-> >   * Calculate the number of bytes up to and including the given 'field'
-> of
-> >   * 'container'.
-> > @@ -628,6 +650,9 @@ static uint64_t virtio_net_get_features(VirtIODevice
-> *vdev, uint64_t features,
-> >      if (!get_vhost_net(nc->peer)) {
-> >          return features;
-> >      }
-> > +    /* clear RSC_EXT feature in case of VHOST*/
->
-> space before *
->
-> > +    virtio_clear_feature(&features, VIRTIO_NET_F_RSC_EXT);
-> > +
->
-> why is vhost special?
->
-> >      features = vhost_net_get_features(get_vhost_net(nc->peer),
-> features);
-> >      vdev->backend_features = features;
-> >
-> > @@ -701,6 +726,11 @@ static void virtio_net_set_features(VirtIODevice
-> *vdev, uint64_t features)
-> >                                 virtio_has_feature(features,
-> >                                                    VIRTIO_F_VERSION_1));
-> >
-> > +    n->rsc4_enabled = virtio_has_feature(features,
-> VIRTIO_NET_F_RSC_EXT) &&
-> > +        virtio_has_feature(features, VIRTIO_NET_F_GUEST_TSO4);
-> > +    n->rsc6_enabled = virtio_has_feature(features,
-> VIRTIO_NET_F_RSC_EXT) &&
-> > +        virtio_has_feature(features, VIRTIO_NET_F_GUEST_TSO6);
-> > +
-> >      if (n->has_vnet_hdr) {
-> >          n->curr_guest_offloads =
-> >              virtio_net_guest_offloads_by_features(features);
-> > @@ -781,6 +811,12 @@ static int virtio_net_handle_offloads(VirtIONet *n,
-> uint8_t cmd,
-> >              return VIRTIO_NET_ERR;
-> >          }
-> >
-> > +        n->rsc4_enabled = virtio_has_feature(offloads,
-> VIRTIO_NET_F_RSC_EXT) &&
-> > +            virtio_has_feature(offloads, VIRTIO_NET_F_GUEST_TSO4);
-> > +        n->rsc6_enabled = virtio_has_feature(offloads,
-> VIRTIO_NET_F_RSC_EXT) &&
-> > +            virtio_has_feature(offloads, VIRTIO_NET_F_GUEST_TSO6);
-> > +        virtio_clear_feature(&offloads, VIRTIO_NET_F_RSC_EXT);
-> > +
-> >          supported_offloads = virtio_net_supported_guest_offloads(n);
-> >          if (offloads & ~supported_offloads) {
-> >              return VIRTIO_NET_ERR;
-> > @@ -1253,6 +1289,7 @@ static ssize_t
-> virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-> >              }
-> >
-> >              receive_header(n, sg, elem->in_num, buf, size);
-> > +
-> >              offset = n->host_hdr_len;
-> >              total += n->guest_hdr_len;
-> >              guest_offset = n->guest_hdr_len;
->
-> let's not do unrelated whitespace tweaks pls
->
-> > @@ -1292,7 +1329,7 @@ static ssize_t
-> virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-> >      return size;
-> >  }
-> >
-> > -static ssize_t virtio_net_receive(NetClientState *nc, const uint8_t
-> *buf,
-> > +static ssize_t virtio_net_do_receive(NetClientState *nc, const uint8_t
-> *buf,
-> >                                    size_t size)
-> >  {
-> >      ssize_t r;
-> > @@ -1303,6 +1340,601 @@ static ssize_t virtio_net_receive(NetClientState
-> *nc, const uint8_t *buf,
-> >      return r;
-> >  }
-> >
-> > +static void virtio_net_rsc_extract_unit4(NetRscChain *chain,
-> > +                                         const uint8_t *buf,
-> NetRscUnit* unit)
->
->
-> space before * not after
->
+> >   static void (*comp_handler)(int status, unsigned int vendor_err, vo=
+id *ctx);
+> >   static void dummy_comp_handler(int status, unsigned int vendor_err,=
+ void *ctx)
+> > @@ -286,6 +300,49 @@ static int build_host_sge_array(RdmaDeviceResour=
+ces *rdma_dev_res,
+> >       return 0;
+> >   }
+> > +static int mad_send(RdmaBackendDev *backend_dev, struct ibv_sge *sge=
+,
+> > +                    uint32_t num_sge)
 > > +{
-> > +    uint16_t ip_hdrlen;
-> > +    struct ip_header *ip;
-> > +
-> > +    ip = (struct ip_header *)(buf + chain->n->guest_hdr_len
-> > +                              + sizeof(struct eth_header));
-> > +    unit->ip = (void *)ip;
-> > +    ip_hdrlen = (ip->ip_ver_len & 0xF) << 2;
-> > +    unit->ip_plen = &ip->ip_len;
-> > +    unit->tcp = (struct tcp_header *)(((uint8_t *)unit->ip) +
-> ip_hdrlen);
-> > +    unit->tcp_hdrlen = (htons(unit->tcp->th_offset_flags) & 0xF000) >>
-> 10;
-> > +    unit->payload = htons(*unit->ip_plen) - ip_hdrlen -
-> unit->tcp_hdrlen;
-> > +}
-> > +
-> > +static void virtio_net_rsc_extract_unit6(NetRscChain *chain,
-> > +                                         const uint8_t *buf,
-> NetRscUnit* unit)
-> > +{
-> > +    struct ip6_header *ip6;
-> > +
-> > +    ip6 = (struct ip6_header *)(buf + chain->n->guest_hdr_len
-> > +                                 + sizeof(struct eth_header));
-> > +    unit->ip = ip6;
-> > +    unit->ip_plen = &(ip6->ip6_ctlun.ip6_un1.ip6_un1_plen);
-> > +    unit->tcp = (struct tcp_header *)(((uint8_t *)unit->ip)\
-> > +                                        + sizeof(struct ip6_header));
-> > +    unit->tcp_hdrlen = (htons(unit->tcp->th_offset_flags) & 0xF000) >>
-> 10;
-> > +
-> > +    /* There is a difference between payload lenght in ipv4 and v6,
-> > +       ip header is excluded in ipv6 */
-> > +    unit->payload = htons(*unit->ip_plen) - unit->tcp_hdrlen;
-> > +}
-> > +
-> > +static size_t virtio_net_rsc_drain_seg(NetRscChain *chain, NetRscSeg
-> *seg)
-> > +{
+> > +    struct backend_umad umad =3D {0};
+> > +    char *hdr, *msg;
 > > +    int ret;
-> > +    struct virtio_net_hdr *h;
 > > +
-> > +    h = (struct virtio_net_hdr *)seg->buf;
-> > +    h->flags = 0;
-> > +    h->gso_type = VIRTIO_NET_HDR_GSO_NONE;
+> > +    pr_dbg("num_sge=3D%d\n", num_sge);
 > > +
-> > +    if (seg->is_coalesced) {
-> > +        h->rsc_ext_num_packets = seg->packets;
-> > +        h->rsc_ext_num_dupacks = seg->dup_ack;
-> > +        h->flags = VIRTIO_NET_HDR_F_RSC_INFO;
-> > +        if (chain->proto == ETH_P_IP) {
-> > +            h->gso_type = VIRTIO_NET_HDR_GSO_TCPV4;
-> > +        } else {
-> > +            h->gso_type = VIRTIO_NET_HDR_GSO_TCPV6;
-> > +        }
+> > +    if (num_sge !=3D 2) {
+> > +        return -EINVAL;
 > > +    }
 > > +
-> > +    ret = virtio_net_do_receive(seg->nc, seg->buf, seg->size);
-> > +    QTAILQ_REMOVE(&chain->buffers, seg, next);
-> > +    g_free(seg->buf);
-> > +    g_free(seg);
+> > +    umad.hdr.length =3D sge[0].length + sge[1].length;
+> > +    pr_dbg("msg_len=3D%d\n", umad.hdr.length);
 > > +
-> > +    return ret;
+> > +    if (umad.hdr.length > sizeof(umad.mad)) {
+> > +        return -ENOMEM;
+> > +    }
+> > +
+> > +    umad.hdr.addr.qpn =3D htobe32(1);
+> > +    umad.hdr.addr.grh_present =3D 1;
+> > +    umad.hdr.addr.gid_index =3D backend_dev->backend_gid_idx;
+> > +    memcpy(umad.hdr.addr.gid, backend_dev->gid.raw, sizeof(umad.hdr.=
+addr.gid));
+> > +    umad.hdr.addr.hop_limit =3D 1;
+> > +
+> > +    hdr =3D rdma_pci_dma_map(backend_dev->dev, sge[0].addr, sge[0].l=
+ength);
+> > +    msg =3D rdma_pci_dma_map(backend_dev->dev, sge[1].addr, sge[1].l=
+ength);
+> > +
+> > +    memcpy(&umad.mad[0], hdr, sge[0].length);
+> > +    memcpy(&umad.mad[sge[0].length], msg, sge[1].length);
+> > +
+> > +    rdma_pci_dma_unmap(backend_dev->dev, msg, sge[1].length);
+> > +    rdma_pci_dma_unmap(backend_dev->dev, hdr, sge[0].length);
+> > +
+> > +    ret =3D qemu_chr_fe_write(backend_dev->mad_chr_be, (const uint8_=
+t *)&umad,
+> > +                            sizeof(umad));
+> > +
+> > +    pr_dbg("qemu_chr_fe_write=3D%d\n", ret);
+> > +
+> > +    return (ret !=3D sizeof(umad));
 > > +}
 > > +
-> > +static void virtio_net_rsc_purge(void *opq)
-> > +{
-> > +    NetRscSeg *seg, *rn;
-> > +    NetRscChain *chain = (NetRscChain *)opq;
-> > +
-> > +    QTAILQ_FOREACH_SAFE(seg, &chain->buffers, next, rn) {
-> > +        if (virtio_net_rsc_drain_seg(chain, seg) == 0) {
-> > +            chain->stat.purge_failed++;
-> > +            continue;
-> > +        }
-> > +    }
-> > +
-> > +    chain->stat.timer++;
-> > +    if (!QTAILQ_EMPTY(&chain->buffers)) {
-> > +        timer_mod(chain->drain_timer,
-> > +              qemu_clock_get_ns(QEMU_CLOCK_HOST) +
-> chain->n->rsc_timeout);
-> > +    }
-> > +}
-> > +
-> > +static void virtio_net_rsc_cleanup(VirtIONet *n)
-> > +{
-> > +    NetRscChain *chain, *rn_chain;
-> > +    NetRscSeg *seg, *rn_seg;
-> > +
-> > +    QTAILQ_FOREACH_SAFE(chain, &n->rsc_chains, next, rn_chain) {
-> > +        QTAILQ_FOREACH_SAFE(seg, &chain->buffers, next, rn_seg) {
-> > +            QTAILQ_REMOVE(&chain->buffers, seg, next);
-> > +            g_free(seg->buf);
-> > +            g_free(seg);
-> > +        }
-> > +
-> > +        timer_del(chain->drain_timer);
-> > +        timer_free(chain->drain_timer);
-> > +        QTAILQ_REMOVE(&n->rsc_chains, chain, next);
-> > +        g_free(chain);
-> > +    }
-> > +}
-> > +
-> > +static void virtio_net_rsc_cache_buf(NetRscChain *chain, NetClientState
-> *nc,
-> > +                                     const uint8_t *buf, size_t size)
-> > +{
-> > +    uint16_t hdr_len;
-> > +    NetRscSeg *seg;
-> > +
-> > +    hdr_len = chain->n->guest_hdr_len;
-> > +    seg = g_malloc(sizeof(NetRscSeg));
-> > +    seg->buf = g_malloc(hdr_len + sizeof(struct eth_header)
-> > +        + sizeof(struct ip6_header) + VIRTIO_NET_MAX_TCP_PAYLOAD);
-> > +    memcpy(seg->buf, buf, size);
-> > +    seg->size = size;
-> > +    seg->packets = 1;
-> > +    seg->dup_ack = 0;
-> > +    seg->is_coalesced = 0;
-> > +    seg->nc = nc;
-> > +
-> > +    QTAILQ_INSERT_TAIL(&chain->buffers, seg, next);
-> > +    chain->stat.cache++;
-> > +
-> > +    switch (chain->proto) {
-> > +    case ETH_P_IP:
-> > +        virtio_net_rsc_extract_unit4(chain, seg->buf, &seg->unit);
-> > +        break;
-> > +    case ETH_P_IPV6:
-> > +        virtio_net_rsc_extract_unit6(chain, seg->buf, &seg->unit);
-> > +        break;
-> > +    default:
-> > +        g_assert_not_reached();
-> > +    }
-> > +}
-> > +
-> > +static int32_t virtio_net_rsc_handle_ack(NetRscChain *chain,
-> > +                                         NetRscSeg *seg, const uint8_t
-> *buf,
-> > +                                         struct tcp_header *n_tcp,
-> > +                                         struct tcp_header *o_tcp)
-> > +{
-> > +    uint32_t nack, oack;
-> > +    uint16_t nwin, owin;
-> > +
-> > +    nack = htonl(n_tcp->th_ack);
-> > +    nwin = htons(n_tcp->th_win);
-> > +    oack = htonl(o_tcp->th_ack);
-> > +    owin = htons(o_tcp->th_win);
-> > +
-> > +    if ((nack - oack) >= VIRTIO_NET_MAX_TCP_PAYLOAD) {
-> > +        chain->stat.ack_out_of_win++;
-> > +        return RSC_FINAL;
-> > +    } else if (nack == oack) {
-> > +        /* duplicated ack or window probe */
-> > +        if (nwin == owin) {
-> > +            /* duplicated ack, add dup ack count due to whql test up to
-> 1 */
-> > +            chain->stat.dup_ack++;
-> > +            return RSC_FINAL;
-> > +        } else {
-> > +            /* Coalesce window update */
-> > +            o_tcp->th_win = n_tcp->th_win;
-> > +            chain->stat.win_update++;
-> > +            return RSC_COALESCE;
-> > +        }
-> > +    } else {
-> > +        /* pure ack, go to 'C', finalize*/
-> > +        chain->stat.pure_ack++;
-> > +        return RSC_FINAL;
-> > +    }
-> > +}
-> > +
-> > +static int32_t virtio_net_rsc_coalesce_data(NetRscChain *chain,
-> > +                                            NetRscSeg *seg, const
-> uint8_t *buf,
-> > +                                            NetRscUnit *n_unit)
-> > +{
-> > +    void *data;
-> > +    uint16_t o_ip_len;
-> > +    uint32_t nseq, oseq;
-> > +    NetRscUnit *o_unit;
-> > +
-> > +    o_unit = &seg->unit;
-> > +    o_ip_len = htons(*o_unit->ip_plen);
-> > +    nseq = htonl(n_unit->tcp->th_seq);
-> > +    oseq = htonl(o_unit->tcp->th_seq);
-> > +
-> > +    /* out of order or retransmitted. */
-> > +    if ((nseq - oseq) > VIRTIO_NET_MAX_TCP_PAYLOAD) {
-> > +        chain->stat.data_out_of_win++;
-> > +        return RSC_FINAL;
-> > +    }
-> > +
-> > +    data = ((uint8_t *)n_unit->tcp) + n_unit->tcp_hdrlen;
-> > +    if (nseq == oseq) {
-> > +        if ((o_unit->payload == 0) && n_unit->payload) {
-> > +            /* From no payload to payload, normal case, not a dup ack
-> or etc */
-> > +            chain->stat.data_after_pure_ack++;
-> > +            goto coalesce;
-> > +        } else {
-> > +            return virtio_net_rsc_handle_ack(chain, seg, buf,
-> > +                                             n_unit->tcp, o_unit->tcp);
-> > +        }
-> > +    } else if ((nseq - oseq) != o_unit->payload) {
-> > +        /* Not a consistent packet, out of order */
-> > +        chain->stat.data_out_of_order++;
-> > +        return RSC_FINAL;
-> > +    } else {
-> > +coalesce:
-> > +        if ((o_ip_len + n_unit->payload) > chain->max_payload) {
-> > +            chain->stat.over_size++;
-> > +            return RSC_FINAL;
-> > +        }
-> > +
-> > +        /* Here comes the right data, the payload length in v4/v6 is
-> different,
-> > +           so use the field value to update and record the new data len
-> */
-> > +        o_unit->payload += n_unit->payload; /* update new data len */
-> > +
-> > +        /* update field in ip header */
-> > +        *o_unit->ip_plen = htons(o_ip_len + n_unit->payload);
-> > +
-> > +        /* Bring 'PUSH' big, the whql test guide says 'PUSH' can be
-> coalesced
-> > +           for windows guest, while this may change the behavior for
-> linux
-> > +           guest (only if it uses RSC feature). */
-> > +        o_unit->tcp->th_offset_flags = n_unit->tcp->th_offset_flags;
-> > +
-> > +        o_unit->tcp->th_ack = n_unit->tcp->th_ack;
-> > +        o_unit->tcp->th_win = n_unit->tcp->th_win;
-> > +
-> > +        memmove(seg->buf + seg->size, data, n_unit->payload);
-> > +        seg->size += n_unit->payload;
-> > +        seg->packets++;
-> > +        chain->stat.coalesced++;
-> > +        return RSC_COALESCE;
-> > +    }
-> > +}
-> > +
-> > +static int32_t virtio_net_rsc_coalesce4(NetRscChain *chain, NetRscSeg
-> *seg,
-> > +                                        const uint8_t *buf, size_t size,
-> > +                                        NetRscUnit *unit)
-> > +{
-> > +    struct ip_header *ip1, *ip2;
-> > +
-> > +    ip1 = (struct ip_header *)(unit->ip);
-> > +    ip2 = (struct ip_header *)(seg->unit.ip);
-> > +    if ((ip1->ip_src ^ ip2->ip_src) || (ip1->ip_dst ^ ip2->ip_dst)
-> > +        || (unit->tcp->th_sport ^ seg->unit.tcp->th_sport)
-> > +        || (unit->tcp->th_dport ^ seg->unit.tcp->th_dport)) {
-> > +        chain->stat.no_match++;
-> > +        return RSC_NO_MATCH;
-> > +    }
-> > +
-> > +    return virtio_net_rsc_coalesce_data(chain, seg, buf, unit);
-> > +}
-> > +
-> > +static int32_t virtio_net_rsc_coalesce6(NetRscChain *chain, NetRscSeg
-> *seg,
-> > +                        const uint8_t *buf, size_t size, NetRscUnit
-> *unit)
-> > +{
-> > +    struct ip6_header *ip1, *ip2;
-> > +
-> > +    ip1 = (struct ip6_header *)(unit->ip);
-> > +    ip2 = (struct ip6_header *)(seg->unit.ip);
-> > +    if (memcmp(&ip1->ip6_src, &ip2->ip6_src, sizeof(struct in6_address))
-> > +        || memcmp(&ip1->ip6_dst, &ip2->ip6_dst, sizeof(struct
-> in6_address))
-> > +        || (unit->tcp->th_sport ^ seg->unit.tcp->th_sport)
-> > +        || (unit->tcp->th_dport ^ seg->unit.tcp->th_dport)) {
-> > +            chain->stat.no_match++;
-> > +            return RSC_NO_MATCH;
-> > +    }
-> > +
-> > +    return virtio_net_rsc_coalesce_data(chain, seg, buf, unit);
-> > +}
-> > +
-> > +/* Packets with 'SYN' should bypass, other flag should be sent after
-> drain
-> > + * to prevent out of order */
-> > +static int virtio_net_rsc_tcp_ctrl_check(NetRscChain *chain,
-> > +                                         struct tcp_header *tcp)
-> > +{
-> > +    uint16_t tcp_hdr;
-> > +    uint16_t tcp_flag;
-> > +
-> > +    tcp_flag = htons(tcp->th_offset_flags);
-> > +    tcp_hdr = (tcp_flag & VIRTIO_NET_TCP_HDR_LENGTH) >> 10;
-> > +    tcp_flag &= VIRTIO_NET_TCP_FLAG;
-> > +    tcp_flag = htons(tcp->th_offset_flags) & 0x3F;
-> > +    if (tcp_flag & TH_SYN) {
-> > +        chain->stat.tcp_syn++;
-> > +        return RSC_BYPASS;
-> > +    }
-> > +
-> > +    if (tcp_flag & (TH_FIN | TH_URG | TH_RST | TH_ECE | TH_CWR)) {
-> > +        chain->stat.tcp_ctrl_drain++;
-> > +        return RSC_FINAL;
-> > +    }
-> > +
-> > +    if (tcp_hdr > sizeof(struct tcp_header)) {
-> > +        chain->stat.tcp_all_opt++;
-> > +        return RSC_FINAL;
-> > +    }
-> > +
-> > +    return RSC_CANDIDATE;
-> > +}
-> > +
-> > +static size_t virtio_net_rsc_do_coalesce(NetRscChain *chain,
-> > +                                         NetClientState *nc,
-> > +                                         const uint8_t *buf, size_t
-> size,
-> > +                                         NetRscUnit *unit)
-> > +{
-> > +    int ret;
-> > +    NetRscSeg *seg, *nseg;
-> > +
-> > +    if (QTAILQ_EMPTY(&chain->buffers)) {
-> > +        chain->stat.empty_cache++;
-> > +        virtio_net_rsc_cache_buf(chain, nc, buf, size);
-> > +        timer_mod(chain->drain_timer,
-> > +              qemu_clock_get_ns(QEMU_CLOCK_HOST) +
-> chain->n->rsc_timeout);
-> > +        return size;
-> > +    }
-> > +
-> > +    QTAILQ_FOREACH_SAFE(seg, &chain->buffers, next, nseg) {
-> > +        if (chain->proto == ETH_P_IP) {
-> > +            ret = virtio_net_rsc_coalesce4(chain, seg, buf, size, unit);
-> > +        } else {
-> > +            ret = virtio_net_rsc_coalesce6(chain, seg, buf, size, unit);
-> > +        }
-> > +
-> > +        if (ret == RSC_FINAL) {
-> > +            if (virtio_net_rsc_drain_seg(chain, seg) == 0) {
-> > +                /* Send failed */
-> > +                chain->stat.final_failed++;
-> > +                return 0;
+> >   void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+> >                               RdmaBackendQP *qp, uint8_t qp_type,
+> >                               struct ibv_sge *sge, uint32_t num_sge,
+> > @@ -304,9 +361,13 @@ void rdma_backend_post_send(RdmaBackendDev *back=
+end_dev,
+> >               comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
+> >           } else if (qp_type =3D=3D IBV_QPT_GSI) {
+> >               pr_dbg("QP1\n");
+> > -            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ct=
+x);
+> > +            rc =3D mad_send(backend_dev, sge, num_sge);
+> > +            if (rc) {
+> > +                comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND=
+, ctx);
+> > +            } else {
+> > +                comp_handler(IBV_WC_SUCCESS, 0, ctx);
 > > +            }
+> >           }
+> > -        pr_dbg("qp->ibqp is NULL for qp_type %d!!!\n", qp_type);
+> >           return;
+> >       }
+> > @@ -370,6 +431,48 @@ out_free_bctx:
+> >       g_free(bctx);
+> >   }
+> > +static unsigned int save_mad_recv_buffer(RdmaBackendDev *backend_dev=
+,
+> > +                                         struct ibv_sge *sge, uint32=
+_t num_sge,
+> > +                                         void *ctx)
+> > +{
+> > +    BackendCtx *bctx;
+> > +    int rc;
+> > +    uint32_t bctx_id;
 > > +
-> > +            /* Send current packet */
-> > +            return virtio_net_do_receive(nc, buf, size);
-> > +        } else if (ret == RSC_NO_MATCH) {
-> > +            continue;
-> > +        } else {
-> > +            /* Coalesced, mark coalesced flag to tell calc cksum for
-> ipv4 */
-> > +            seg->is_coalesced = 1;
-> > +            return size;
-> > +        }
+> > +    if (num_sge !=3D 1) {
+> > +        pr_dbg("Invalid num_sge (%d), expecting 1\n", num_sge);
+> > +        return VENDOR_ERR_INV_NUM_SGE;
 > > +    }
 > > +
-> > +    chain->stat.no_match_cache++;
-> > +    virtio_net_rsc_cache_buf(chain, nc, buf, size);
-> > +    return size;
+> > +    if (sge[0].length < RDMA_MAX_PRIVATE_DATA + sizeof(struct ibv_gr=
+h)) {
+> > +        pr_dbg("Too small buffer for MAD\n");
+> > +        return VENDOR_ERR_INV_MAD_BUFF;
+> > +    }
+> > +
+> > +    pr_dbg("addr=3D0x%" PRIx64"\n", sge[0].addr);
+> > +    pr_dbg("length=3D%d\n", sge[0].length);
+> > +    pr_dbg("lkey=3D%d\n", sge[0].lkey);
+> > +
+> > +    bctx =3D g_malloc0(sizeof(*bctx));
+> > +
+> > +    rc =3D rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id=
+, bctx);
+> > +    if (unlikely(rc)) {
+> > +        g_free(bctx);
+> > +        pr_dbg("Fail to allocate cqe_ctx\n");
+> > +        return VENDOR_ERR_NOMEM;
+> > +    }
+> > +
+> > +    pr_dbg("bctx_id %d, bctx %p, ctx %p\n", bctx_id, bctx, ctx);
+> > +    bctx->up_ctx =3D ctx;
+> > +    bctx->sge =3D *sge;
+> > +
+> > +    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
+> > +    qlist_append_int(backend_dev->recv_mads_list.list, bctx_id);
+> > +    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
+> > +
+> > +    return 0;
 > > +}
 > > +
-> > +/* Drain a connection data, this is to avoid out of order segments */
-> > +static size_t virtio_net_rsc_drain_flow(NetRscChain *chain,
-> NetClientState *nc,
-> > +                                        const uint8_t *buf, size_t size,
-> > +                                        uint16_t ip_start, uint16_t
-> ip_size,
-> > +                                        uint16_t tcp_port)
+> >   void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+> >                               RdmaDeviceResources *rdma_dev_res,
+> >                               RdmaBackendQP *qp, uint8_t qp_type,
+> > @@ -388,7 +491,10 @@ void rdma_backend_post_recv(RdmaBackendDev *back=
+end_dev,
+> >           }
+> >           if (qp_type =3D=3D IBV_QPT_GSI) {
+> >               pr_dbg("QP1\n");
+> > -            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ct=
+x);
+> > +            rc =3D save_mad_recv_buffer(backend_dev, sge, num_sge, c=
+tx);
+> > +            if (rc) {
+> > +                comp_handler(IBV_WC_GENERAL_ERR, rc, ctx);
+> > +            }
+> >           }
+> >           return;
+> >       }
+> > @@ -517,7 +623,6 @@ int rdma_backend_create_qp(RdmaBackendQP *qp, uin=
+t8_t qp_type,
+> >       switch (qp_type) {
+> >       case IBV_QPT_GSI:
+> > -        pr_dbg("QP1 unsupported\n");
+> >           return 0;
+> >       case IBV_QPT_RC:
+> > @@ -748,11 +853,146 @@ static int init_device_caps(RdmaBackendDev *ba=
+ckend_dev,
+> >       return 0;
+> >   }
+> > +static inline void build_mad_hdr(struct ibv_grh *grh, union ibv_gid =
+*sgid,
+> > +                                 union ibv_gid *my_gid, int paylen)
 > > +{
-> > +    NetRscSeg *seg, *nseg;
-> > +    uint32_t ppair1, ppair2;
+> > +    grh->paylen =3D htons(paylen);
+> > +    grh->sgid =3D *sgid;
+> > +    grh->dgid =3D *my_gid;
 > > +
-> > +    ppair1 = *(uint32_t *)(buf + tcp_port);
-> > +    QTAILQ_FOREACH_SAFE(seg, &chain->buffers, next, nseg) {
-> > +        ppair2 = *(uint32_t *)(seg->buf + tcp_port);
-> > +        if (memcmp(buf + ip_start, seg->buf + ip_start, ip_size)
-> > +            || (ppair1 != ppair2)) {
-> > +            continue;
-> > +        }
-> > +        if (virtio_net_rsc_drain_seg(chain, seg) == 0) {
-> > +            chain->stat.drain_failed++;
-> > +        }
-> > +
-> > +        break;
-> > +    }
-> > +
-> > +    return virtio_net_do_receive(nc, buf, size);
+> > +    pr_dbg("paylen=3D%d (net=3D0x%x)\n", paylen, grh->paylen);
+> > +    pr_dbg("my_gid=3D0x%llx\n", my_gid->global.interface_id);
+> > +    pr_dbg("gid=3D0x%llx\n", sgid->global.interface_id);
 > > +}
 > > +
-> > +static int32_t virtio_net_rsc_sanity_check4(NetRscChain *chain,
-> > +                                            struct ip_header *ip,
-> > +                                            const uint8_t *buf, size_t
-> size)
+> > +static inline int mad_can_receieve(void *opaque)
 > > +{
-> > +    uint16_t ip_len;
-> > +
-> > +    /* Not an ipv4 packet */
-> > +    if (((ip->ip_ver_len & 0xF0) >> 4) != IP_HEADER_VERSION_4) {
-> > +        chain->stat.ip_option++;
-> > +        return RSC_BYPASS;
-> > +    }
-> > +
-> > +    /* Don't handle packets with ip option */
-> > +    if ((ip->ip_ver_len & 0xF) != VIRTIO_NET_IP4_HEADER_LENGTH) {
-> > +        chain->stat.ip_option++;
-> > +        return RSC_BYPASS;
-> > +    }
-> > +
-> > +    if (ip->ip_p != IPPROTO_TCP) {
-> > +        chain->stat.bypass_not_tcp++;
-> > +        return RSC_BYPASS;
-> > +    }
-> > +
-> > +    /* Don't handle packets with ip fragment */
-> > +    if (!(htons(ip->ip_off) & IP_DF)) {
-> > +        chain->stat.ip_frag++;
-> > +        return RSC_BYPASS;
-> > +    }
-> > +
-> > +    /* Don't handle packets with ecn flag */
-> > +    if (IPTOS_ECN(ip->ip_tos)) {
-> > +        chain->stat.ip_ecn++;
-> > +        return RSC_BYPASS;
-> > +    }
-> > +
-> > +    ip_len = htons(ip->ip_len);
-> > +    if (ip_len < (sizeof(struct ip_header) + sizeof(struct tcp_header))
-> > +        || ip_len > (size - chain->n->guest_hdr_len -
-> > +                     sizeof(struct eth_header))) {
-> > +        chain->stat.ip_hacked++;
-> > +        return RSC_BYPASS;
-> > +    }
-> > +
-> > +    return RSC_CANDIDATE;
+> > +    return sizeof(struct backend_umad);
 > > +}
 > > +
-> > +static size_t virtio_net_rsc_receive4(NetRscChain *chain,
-> NetClientState* nc,
-> > +                                      const uint8_t *buf, size_t size)
+> > +static void mad_read(void *opaque, const uint8_t *buf, int size)
 > > +{
-> > +    int32_t ret;
-> > +    uint16_t hdr_len;
-> > +    NetRscUnit unit;
+> > +    RdmaBackendDev *backend_dev =3D (RdmaBackendDev *)opaque;
+> > +    QObject *o_ctx_id;
+> > +    unsigned long cqe_ctx_id;
+> > +    BackendCtx *bctx;
+> > +    char *mad;
+> > +    struct backend_umad *umad;
 > > +
-> > +    hdr_len = ((VirtIONet *)(chain->n))->guest_hdr_len;
+> > +    assert(size !=3D sizeof(umad));
+> > +    umad =3D (struct backend_umad *)buf;
 > > +
-> > +    if (size < (hdr_len + sizeof(struct eth_header) + sizeof(struct
-> ip_header)
-> > +        + sizeof(struct tcp_header))) {
-> > +        chain->stat.bypass_not_tcp++;
-> > +        return virtio_net_do_receive(nc, buf, size);
+> > +    pr_dbg("Got %d bytes\n", size);
+> > +    pr_dbg("umad->hdr.length=3D%d\n", umad->hdr.length);
+> > +
+> > +#ifdef PVRDMA_DEBUG
+> > +    struct umad_hdr *hdr =3D (struct umad_hdr *)&msg->umad.mad;
+> > +    pr_dbg("bv %x cls %x cv %x mtd %x st %d tid %" PRIx64 " at %x at=
+m %x\n",
+> > +           hdr->base_version, hdr->mgmt_class, hdr->class_version,
+> > +           hdr->method, hdr->status, be64toh(hdr->tid),
+> > +           hdr->attr_id, hdr->attr_mod);
+> > +#endif
+> > +
+> > +    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
+> > +    o_ctx_id =3D qlist_pop(backend_dev->recv_mads_list.list);
+> > +    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
+> > +    if (!o_ctx_id) {
+> > +        pr_dbg("No more free MADs buffers, waiting for a while\n");
+> > +        sleep(THR_POLL_TO);
+>=20
+> Why do we sleep here? Seems a little odd.
+
+Well, this should never happen. The guest driver on load, pushes 512
+buffers and then refill it back on every MAD CQ.
+But what device should do in case the bucket is empty? The best i found i=
+s
+to wait and retry, just to cover a burst that will be fixed soon.
+
+Any other idea is welcome.
+
+>=20
+> > +        return;
 > > +    }
 > > +
-> > +    virtio_net_rsc_extract_unit4(chain, buf, &unit);
-> > +    if (virtio_net_rsc_sanity_check4(chain, unit.ip, buf, size)
-> > +        != RSC_CANDIDATE) {
-> > +        return virtio_net_do_receive(nc, buf, size);
+> > +    cqe_ctx_id =3D qnum_get_uint(qobject_to(QNum, o_ctx_id));
+> > +    bctx =3D rdma_rm_get_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_=
+id);
+> > +    if (unlikely(!bctx)) {
+> > +        pr_dbg("Error: Fail to find ctx for %ld\n", cqe_ctx_id);
+> > +        return;
 > > +    }
 > > +
-> > +    ret = virtio_net_rsc_tcp_ctrl_check(chain, unit.tcp);
-> > +    if (ret == RSC_BYPASS) {
-> > +        return virtio_net_do_receive(nc, buf, size);
-> > +    } else if (ret == RSC_FINAL) {
-> > +        return virtio_net_rsc_drain_flow(chain, nc, buf, size,
-> > +                ((hdr_len + sizeof(struct eth_header)) + 12),
-> > +                VIRTIO_NET_IP4_ADDR_SIZE,
-> > +                hdr_len + sizeof(struct eth_header) + sizeof(struct
-> ip_header));
-> > +    }
+> > +    pr_dbg("id %ld, bctx %p, ctx %p\n", cqe_ctx_id, bctx, bctx->up_c=
+tx);
 > > +
-> > +    return virtio_net_rsc_do_coalesce(chain, nc, buf, size, &unit);
-> > +}
-> > +
-> > +static int32_t virtio_net_rsc_sanity_check6(NetRscChain *chain,
-> > +                                            struct ip6_header *ip6,
-> > +                                            const uint8_t *buf, size_t
-> size)
-> > +{
-> > +    uint16_t ip_len;
-> > +
-> > +    if (((ip6->ip6_ctlun.ip6_un1.ip6_un1_flow & 0xF0) >> 4)
-> > +        != IP_HEADER_VERSION_6) {
-> > +        return RSC_BYPASS;
-> > +    }
-> > +
-> > +    /* Both option and protocol is checked in this */
-> > +    if (ip6->ip6_ctlun.ip6_un1.ip6_un1_nxt != IPPROTO_TCP) {
-> > +        chain->stat.bypass_not_tcp++;
-> > +        return RSC_BYPASS;
-> > +    }
-> > +
-> > +    ip_len = htons(ip6->ip6_ctlun.ip6_un1.ip6_un1_plen);
-> > +    if (ip_len < sizeof(struct tcp_header) ||
-> > +        ip_len > (size - chain->n->guest_hdr_len - sizeof(struct
-> eth_header)
-> > +                  - sizeof(struct ip6_header))) {
-> > +        chain->stat.ip_hacked++;
-> > +        return RSC_BYPASS;
-> > +    }
-> > +
-> > +    /* Don't handle packets with ecn flag */
-> > +    if (IP6_ECN(ip6->ip6_ctlun.ip6_un3.ip6_un3_ecn)) {
-> > +        chain->stat.ip_ecn++;
-> > +        return RSC_BYPASS;
-> > +    }
-> > +
-> > +    return RSC_CANDIDATE;
-> > +}
-> > +
-> > +static size_t virtio_net_rsc_receive6(void *opq, NetClientState* nc,
-> > +                                      const uint8_t *buf, size_t size)
-> > +{
-> > +    int32_t ret;
-> > +    uint16_t hdr_len;
-> > +    NetRscChain *chain;
-> > +    NetRscUnit unit;
-> > +
-> > +    chain = (NetRscChain *)opq;
-> > +    hdr_len = ((VirtIONet *)(chain->n))->guest_hdr_len;
-> > +
-> > +    if (size < (hdr_len + sizeof(struct eth_header) + sizeof(struct
-> ip6_header)
-> > +        + sizeof(tcp_header))) {
-> > +        return virtio_net_do_receive(nc, buf, size);
-> > +    }
-> > +
-> > +    virtio_net_rsc_extract_unit6(chain, buf, &unit);
-> > +    if (RSC_CANDIDATE != virtio_net_rsc_sanity_check6(chain,
-> > +                                                 unit.ip, buf, size)) {
-> > +        return virtio_net_do_receive(nc, buf, size);
-> > +    }
-> > +
-> > +    ret = virtio_net_rsc_tcp_ctrl_check(chain, unit.tcp);
-> > +    if (ret == RSC_BYPASS) {
-> > +        return virtio_net_do_receive(nc, buf, size);
-> > +    } else if (ret == RSC_FINAL) {
-> > +        return virtio_net_rsc_drain_flow(chain, nc, buf, size,
-> > +                ((hdr_len + sizeof(struct eth_header)) + 8),
-> > +                VIRTIO_NET_IP6_ADDR_SIZE,
-> > +                hdr_len + sizeof(struct eth_header)
-> > +                + sizeof(struct ip6_header));
-> > +    }
-> > +
-> > +    return virtio_net_rsc_do_coalesce(chain, nc, buf, size, &unit);
-> > +}
-> > +
-> > +static NetRscChain *virtio_net_rsc_lookup_chain(VirtIONet * n,
-> > +                                                NetClientState *nc,
-> > +                                                uint16_t proto)
-> > +{
-> > +    NetRscChain *chain;
-> > +
-> > +    if ((proto != (uint16_t)ETH_P_IP) && (proto !=
-> (uint16_t)ETH_P_IPV6)) {
-> > +        return NULL;
-> > +    }
-> > +
-> > +    QTAILQ_FOREACH(chain, &n->rsc_chains, next) {
-> > +        if (chain->proto == proto) {
-> > +            return chain;
-> > +        }
-> > +    }
-> > +
-> > +    chain = g_malloc(sizeof(*chain));
-> > +    chain->n = n;
-> > +    chain->proto = proto;
-> > +    if (proto == (uint16_t)ETH_P_IP) {
-> > +        chain->max_payload = VIRTIO_NET_MAX_IP4_PAYLOAD;
-> > +        chain->gso_type = VIRTIO_NET_HDR_GSO_TCPV4;
+> > +    mad =3D rdma_pci_dma_map(backend_dev->dev, bctx->sge.addr,
+> > +                           bctx->sge.length);
+> > +    if (!mad || bctx->sge.length < umad->hdr.length + MAD_HDR_SIZE) =
+{
+> > +        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_MAD_BUFF,
+> > +                     bctx->up_ctx);
 > > +    } else {
-> > +        chain->max_payload = VIRTIO_NET_MAX_IP6_PAYLOAD;
-> > +        chain->gso_type = VIRTIO_NET_HDR_GSO_TCPV6;
+> > +        memset(mad, 0, bctx->sge.length);
+> > +        build_mad_hdr((struct ibv_grh *)mad,
+> > +                      (union ibv_gid *)&umad->hdr.addr.gid,
+> > +                      &backend_dev->gid, umad->hdr.length);
+> > +        memcpy(&mad[MAD_HDR_SIZE], umad->mad, umad->hdr.length);
+> > +        rdma_pci_dma_unmap(backend_dev->dev, mad, bctx->sge.length);
+> > +
+> > +        comp_handler(IBV_WC_SUCCESS, 0, bctx->up_ctx);
 > > +    }
-> > +    chain->drain_timer = timer_new_ns(QEMU_CLOCK_HOST,
-> > +                                      virtio_net_rsc_purge, chain);
-> > +    memset(&chain->stat, 0, sizeof(chain->stat));
 > > +
-> > +    QTAILQ_INIT(&chain->buffers);
-> > +    QTAILQ_INSERT_TAIL(&n->rsc_chains, chain, next);
-> > +
-> > +    return chain;
+> > +    g_free(bctx);
+> > +    rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_id);
 > > +}
 > > +
-> > +static ssize_t virtio_net_rsc_receive(NetClientState *nc,
-> > +                                      const uint8_t *buf,
-> > +                                      size_t size)
+> > +static int mad_init(RdmaBackendDev *backend_dev)
 > > +{
-> > +    uint16_t proto;
-> > +    NetRscChain *chain;
-> > +    struct eth_header *eth;
-> > +    VirtIONet *n;
+> > +    struct backend_umad umad =3D {0};
+> > +    int ret;
 > > +
-> > +    n = qemu_get_nic_opaque(nc);
-> > +    if (size < (n->host_hdr_len + sizeof(struct eth_header))) {
-> > +        return virtio_net_do_receive(nc, buf, size);
+> > +    if (!qemu_chr_fe_backend_connected(backend_dev->mad_chr_be)) {
+> > +        pr_dbg("Missing chardev for MAD multiplexer\n");
+> > +        return -EIO;
 > > +    }
 > > +
-> > +    eth = (struct eth_header *)(buf + n->guest_hdr_len);
-> > +    proto = htons(eth->h_proto);
+> > +    qemu_chr_fe_set_handlers(backend_dev->mad_chr_be, mad_can_receie=
+ve,
+> > +                             mad_read, NULL, NULL, backend_dev, NULL=
+, true);
 > > +
-> > +    chain = virtio_net_rsc_lookup_chain(n, nc, proto);
-> > +    if (chain) {
-> > +        chain->stat.received++;
-> > +        if (proto == (uint16_t)ETH_P_IP && n->rsc4_enabled) {
-> > +            return virtio_net_rsc_receive4(chain, nc, buf, size);
-> > +        } else if (proto == (uint16_t)ETH_P_IPV6 && n->rsc6_enabled) {
-> > +            return virtio_net_rsc_receive6(chain, nc, buf, size);
+> > +    /* Register ourself */
+> > +    memcpy(umad.hdr.addr.gid, backend_dev->gid.raw, sizeof(umad.hdr.=
+addr.gid));
+> > +    ret =3D qemu_chr_fe_write(backend_dev->mad_chr_be, (const uint8_=
+t *)&umad,
+> > +                            sizeof(umad.hdr));
+> > +    if (ret !=3D sizeof(umad.hdr)) {
+> > +        pr_dbg("Fail to register to rdma_umadmux (%d)\n", ret);
+>=20
+> Why only a dbg message and=A0 not fail the init proc in this case ?
+
+You are correct, this code is moved and fixed in patch #11.
+
+>=20
+> > +    }
+> > +
+> > +    qemu_mutex_init(&backend_dev->recv_mads_list.lock);
+> > +    backend_dev->recv_mads_list.list =3D qlist_new();
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static void mad_stop(RdmaBackendDev *backend_dev)
+> > +{
+> > +    QObject *o_ctx_id;
+> > +    unsigned long cqe_ctx_id;
+> > +    BackendCtx *bctx;
+> > +
+> > +    pr_dbg("Closing MAD\n");
+> > +
+> > +    /* Clear MAD buffers list */
+> > +    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
+>=20
+> Does it makes sense to lock only around the
+> qlist_post call?
+
+Yes, it does.
+But since this function is called when devices is going down i do not see=
+ a
+reason to release the lock just to allow "list" users to append entries i=
+n
+between.
+
+>=20
+>=20
+> Thanks,
+> Marcel
+>=20
+> > +    do {
+> > +        o_ctx_id =3D qlist_pop(backend_dev->recv_mads_list.list);
+> > +        if (o_ctx_id) {
+> > +            cqe_ctx_id =3D qnum_get_uint(qobject_to(QNum, o_ctx_id))=
+;
+> > +            bctx =3D rdma_rm_get_cqe_ctx(backend_dev->rdma_dev_res, =
+cqe_ctx_id);
+> > +            if (bctx) {
+> > +                rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, c=
+qe_ctx_id);
+> > +                g_free(bctx);
+> > +            }
 > > +        }
-> > +    }
-> > +    return virtio_net_do_receive(nc, buf, size);
+> > +    } while (o_ctx_id);
+> > +    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
 > > +}
 > > +
-> > +static ssize_t virtio_net_receive(NetClientState *nc, const uint8_t
-> *buf,
-> > +                                  size_t size)
+> > +static void mad_fini(RdmaBackendDev *backend_dev)
 > > +{
-> > +    VirtIONet *n = qemu_get_nic_opaque(nc);
-> > +    if ((n->rsc4_enabled || n->rsc6_enabled)) {
-> > +        return virtio_net_rsc_receive(nc, buf, size);
-> > +    } else {
-> > +        return virtio_net_do_receive(nc, buf, size);
-> > +    }
+> > +    qlist_destroy_obj(QOBJECT(backend_dev->recv_mads_list.list));
+> > +    qemu_mutex_destroy(&backend_dev->recv_mads_list.lock);
 > > +}
 > > +
-> >  static int32_t virtio_net_flush_tx(VirtIONetQueue *q);
-> >
-> >  static void virtio_net_tx_complete(NetClientState *nc, ssize_t len)
-> > @@ -1342,7 +1974,7 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue
-> *q)
-> >          ssize_t ret;
-> >          unsigned int out_num;
-> >          struct iovec sg[VIRTQUEUE_MAX_SIZE], sg2[VIRTQUEUE_MAX_SIZE +
-> 1], *out_sg;
-> > -        struct virtio_net_hdr_mrg_rxbuf mhdr;
-> > +        struct virtio_net_hdr_mrg_rxbuf hdr;
-> >
-> >          elem = virtqueue_pop(q->tx_vq, sizeof(VirtQueueElement));
-> >          if (!elem) {
-> > @@ -1359,7 +1991,7 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue
-> *q)
-> >          }
-> >
-> >          if (n->has_vnet_hdr) {
-> > -            if (iov_to_buf(out_sg, out_num, 0, &mhdr, n->guest_hdr_len)
-> <
-> > +            if (iov_to_buf(out_sg, out_num, 0, &hdr, n->guest_hdr_len) <
-> >                  n->guest_hdr_len) {
-> >                  virtio_error(vdev, "virtio-net header incorrect");
-> >                  virtqueue_detach_element(q->tx_vq, elem, 0);
-> > @@ -1367,8 +1999,8 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue
-> *q)
-> >                  return -EINVAL;
-> >              }
-> >              if (n->needs_vnet_hdr_swap) {
-> > -                virtio_net_hdr_swap(vdev, (void *) &mhdr);
-> > -                sg2[0].iov_base = &mhdr;
-> > +                virtio_net_hdr_swap(vdev, (void *) &hdr);
-> > +                sg2[0].iov_base = &hdr;
-> >                  sg2[0].iov_len = n->guest_hdr_len;
-> >                  out_num = iov_copy(&sg2[1], ARRAY_SIZE(sg2) - 1,
-> >                                     out_sg, out_num,
-> > @@ -2075,6 +2707,7 @@ static void virtio_net_device_realize(DeviceState
-> *dev, Error **errp)
-> >      nc = qemu_get_queue(n->nic);
-> >      nc->rxfilter_notify_enabled = 1;
-> >
-> > +    QTAILQ_INIT(&n->rsc_chains);
-> >      n->qdev = dev;
-> >  }
-> >
-> > @@ -2104,6 +2737,7 @@ static void
-> virtio_net_device_unrealize(DeviceState *dev, Error **errp)
-> >      timer_free(n->announce_timer);
-> >      g_free(n->vqs);
-> >      qemu_del_nic(n->nic);
-> > +    virtio_net_rsc_cleanup(n);
-> >      virtio_cleanup(vdev);
-> >  }
-> >
-> > @@ -2184,6 +2818,10 @@ static Property virtio_net_properties[] = {
-> >      DEFINE_PROP_BIT64("ctrl_guest_offloads", VirtIONet, host_features,
-> >                      VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, true),
-> >      DEFINE_PROP_BIT64("mq", VirtIONet, host_features, VIRTIO_NET_F_MQ,
-> false),
-> > +    DEFINE_PROP_BIT64("guest_rsc_ext", VirtIONet, host_features,
-> > +                    VIRTIO_NET_F_RSC_EXT, false),
-> > +    DEFINE_PROP_UINT32("rsc_interval", VirtIONet, rsc_timeout,
-> > +                       VIRTIO_NET_RSC_INTERVAL),
->
-> what if interval is set without guest_rsc_ext? should init fail?
->
-
-I would not fail the init, in case the RSC_EXT feature is not active the
-configuration of the timer does not have any effect.
-
-
->
-> >      DEFINE_NIC_PROPERTIES(VirtIONet, nic_conf),
-> >      DEFINE_PROP_UINT32("x-txtimer", VirtIONet, net_conf.txtimer,
-> >                         TX_TIMER_INTERVAL),
-> > diff --git a/include/hw/virtio/virtio-net.h
-> b/include/hw/virtio/virtio-net.h
-> > index 4d7f3c82ca..0da99dcfa0 100644
-> > --- a/include/hw/virtio/virtio-net.h
-> > +++ b/include/hw/virtio/virtio-net.h
-> > @@ -44,6 +44,83 @@ typedef struct virtio_net_conf
-> >      uint8_t duplex;
-> >  } virtio_net_conf;
-> >
-> > +/* Coalesced packets type & status */
-> > +typedef enum {
-> > +    RSC_COALESCE,           /* Data been coalesced */
-> > +    RSC_FINAL,              /* Will terminate current connection */
-> > +    RSC_NO_MATCH,           /* No matched in the buffer pool */
-> > +    RSC_BYPASS,             /* Packet to be bypass, not tcp, tcp ctrl,
-> etc */
-> > +    RSC_CANDIDATE                /* Data want to be coalesced */
-> > +} COALESCE_STATUS;
->
-> Should be CoalesceStatus.
->
+> >   int rdma_backend_init(RdmaBackendDev *backend_dev, PCIDevice *pdev,
+> >                         RdmaDeviceResources *rdma_dev_res,
+> >                         const char *backend_device_name, uint8_t port=
+_num,
+> >                         uint8_t backend_gid_idx, struct ibv_device_at=
+tr *dev_attr,
+> > -                      Error **errp)
+> > +                      CharBackend *mad_chr_be, Error **errp)
+> >   {
+> >       int i;
+> >       int ret =3D 0;
+> > @@ -763,7 +1003,7 @@ int rdma_backend_init(RdmaBackendDev *backend_de=
+v, PCIDevice *pdev,
+> >       memset(backend_dev, 0, sizeof(*backend_dev));
+> >       backend_dev->dev =3D pdev;
+> > -
+> > +    backend_dev->mad_chr_be =3D mad_chr_be;
+> >       backend_dev->backend_gid_idx =3D backend_gid_idx;
+> >       backend_dev->port_num =3D port_num;
+> >       backend_dev->rdma_dev_res =3D rdma_dev_res;
+> > @@ -854,6 +1094,13 @@ int rdma_backend_init(RdmaBackendDev *backend_d=
+ev, PCIDevice *pdev,
+> >       pr_dbg("interface_id=3D0x%" PRIx64 "\n",
+> >              be64_to_cpu(backend_dev->gid.global.interface_id));
+> > +    ret =3D mad_init(backend_dev);
+> > +    if (ret) {
+> > +        error_setg(errp, "Fail to initialize mad");
+> > +        ret =3D -EIO;
+> > +        goto out_destroy_comm_channel;
+> > +    }
 > > +
-> > +typedef struct NetRscStat {
-> > +    uint32_t received;
-> > +    uint32_t coalesced;
-> > +    uint32_t over_size;
-> > +    uint32_t cache;
-> > +    uint32_t empty_cache;
-> > +    uint32_t no_match_cache;
-> > +    uint32_t win_update;
-> > +    uint32_t no_match;
-> > +    uint32_t tcp_syn;
-> > +    uint32_t tcp_ctrl_drain;
-> > +    uint32_t dup_ack;
-> > +    uint32_t dup_ack1;
-> > +    uint32_t dup_ack2;
-> > +    uint32_t pure_ack;
-> > +    uint32_t ack_out_of_win;
-> > +    uint32_t data_out_of_win;
-> > +    uint32_t data_out_of_order;
-> > +    uint32_t data_after_pure_ack;
-> > +    uint32_t bypass_not_tcp;
-> > +    uint32_t tcp_option;
-> > +    uint32_t tcp_all_opt;
-> > +    uint32_t ip_frag;
-> > +    uint32_t ip_ecn;
-> > +    uint32_t ip_hacked;
-> > +    uint32_t ip_option;
-> > +    uint32_t purge_failed;
-> > +    uint32_t drain_failed;
-> > +    uint32_t final_failed;
-> > +    int64_t  timer;
-> > +} NetRscStat;
+> >       backend_dev->comp_thread.run =3D false;
+> >       backend_dev->comp_thread.is_running =3D false;
+> > @@ -885,11 +1132,13 @@ void rdma_backend_stop(RdmaBackendDev *backend=
+_dev)
+> >   {
+> >       pr_dbg("Stopping rdma_backend\n");
+> >       stop_backend_thread(&backend_dev->comp_thread);
+> > +    mad_stop(backend_dev);
+> >   }
+> >   void rdma_backend_fini(RdmaBackendDev *backend_dev)
+> >   {
+> >       rdma_backend_stop(backend_dev);
+> > +    mad_fini(backend_dev);
+> >       g_hash_table_destroy(ah_hash);
+> >       ibv_destroy_comp_channel(backend_dev->channel);
+> >       ibv_close_device(backend_dev->context);
+> > diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+> > index 3ccc9a2494..fc83330251 100644
+> > --- a/hw/rdma/rdma_backend.h
+> > +++ b/hw/rdma/rdma_backend.h
+> > @@ -17,6 +17,8 @@
+> >   #define RDMA_BACKEND_H
+> >   #include "qapi/error.h"
+> > +#include "chardev/char-fe.h"
 > > +
-> > +/* Rsc unit general info used to checking if can coalescing */
-> > +typedef struct NetRscUnit {
-> > +    void *ip;   /* ip header */
-> > +    uint16_t *ip_plen;      /* data len pointer in ip header field */
-> > +    struct tcp_header *tcp; /* tcp header */
-> > +    uint16_t tcp_hdrlen;    /* tcp header len */
-> > +    uint16_t payload;       /* pure payload without virtio/eth/ip/tcp */
-> > +} NetRscUnit;
+> >   #include "rdma_rm_defs.h"
+> >   #include "rdma_backend_defs.h"
+> > @@ -50,7 +52,7 @@ int rdma_backend_init(RdmaBackendDev *backend_dev, =
+PCIDevice *pdev,
+> >                         RdmaDeviceResources *rdma_dev_res,
+> >                         const char *backend_device_name, uint8_t port=
+_num,
+> >                         uint8_t backend_gid_idx, struct ibv_device_at=
+tr *dev_attr,
+> > -                      Error **errp);
+> > +                      CharBackend *mad_chr_be, Error **errp);
+> >   void rdma_backend_fini(RdmaBackendDev *backend_dev);
+> >   void rdma_backend_start(RdmaBackendDev *backend_dev);
+> >   void rdma_backend_stop(RdmaBackendDev *backend_dev);
+> > diff --git a/hw/rdma/rdma_backend_defs.h b/hw/rdma/rdma_backend_defs.=
+h
+> > index 7404f64002..2a7e667075 100644
+> > --- a/hw/rdma/rdma_backend_defs.h
+> > +++ b/hw/rdma/rdma_backend_defs.h
+> > @@ -16,8 +16,9 @@
+> >   #ifndef RDMA_BACKEND_DEFS_H
+> >   #define RDMA_BACKEND_DEFS_H
+> > -#include <infiniband/verbs.h>
+> >   #include "qemu/thread.h"
+> > +#include "chardev/char-fe.h"
+> > +#include <infiniband/verbs.h>
+> >   typedef struct RdmaDeviceResources RdmaDeviceResources;
+> > @@ -28,6 +29,11 @@ typedef struct RdmaBackendThread {
+> >       bool is_running; /* Set by the thread to report its status */
+> >   } RdmaBackendThread;
+> > +typedef struct RecvMadList {
+> > +    QemuMutex lock;
+> > +    QList *list;
+> > +} RecvMadList;
 > > +
-> > +/* Coalesced segmant */
-> > +typedef struct NetRscSeg {
-> > +    QTAILQ_ENTRY(NetRscSeg) next;
-> > +    void *buf;
-> > +    size_t size;
-> > +    uint16_t packets;
-> > +    uint16_t dup_ack;
-> > +    bool is_coalesced;      /* need recal ipv4 header checksum, mark
-> here */
-> > +    NetRscUnit unit;
-> > +    NetClientState *nc;
-> > +} NetRscSeg;
->
->
-> If these structs are generic and not virtio specific,
-> pls put them and code for handling them in generic files
-> under net/. OTOH if they are virtio specific, please
-> prefix names with Virtio.
->
-> > +
-> > +struct VirtIONet;
-> > +typedef struct VirtIONet VirtIONet;
-> > +
-> > +/* Chain is divided by protocol(ipv4/v6) and NetClientInfo */
-> > +typedef struct NetRscChain {
-> > +    QTAILQ_ENTRY(NetRscChain) next;
-> > +    VirtIONet *n;                            /* VirtIONet */
-> > +    uint16_t proto;
-> > +    uint8_t  gso_type;
-> > +    uint16_t max_payload;
-> > +    QEMUTimer *drain_timer;
-> > +    QTAILQ_HEAD(, NetRscSeg) buffers;
-> > +    NetRscStat stat;
-> > +} NetRscChain;
-> > +
-> >  /* Maximum packet size we can receive from tap device: header + 64k */
-> >  #define VIRTIO_NET_MAX_BUFSIZE (sizeof(struct virtio_net_hdr) + (64 *
-> KiB))
-> >
-> > @@ -66,12 +143,16 @@ typedef struct VirtIONet {
-> >      VirtIONetQueue *vqs;
-> >      VirtQueue *ctrl_vq;
-> >      NICState *nic;
-> > +    QTAILQ_HEAD(, NetRscChain) rsc_chains;
->
-> what exactly happens with these chains on migration?
->
-
-This feature (software implementation of RSC in QEMU) is intended to be
-used in
-the environment of certification tests which never uses migration. These
-chains
-and accumulated segments (if any) are lost in case of migration. I'll add
-the note about it
-in commit's message.
-
-
-
->
-> >      uint32_t tx_timeout;
-> >      int32_t tx_burst;
-> >      uint32_t has_vnet_hdr;
-> >      size_t host_hdr_len;
-> >      size_t guest_hdr_len;
-> >      uint64_t host_features;
-> > +    uint32_t rsc_timeout;
-> > +    uint8_t rsc4_enabled;
-> > +    uint8_t rsc6_enabled;
-> >      uint8_t has_ufo;
-> >      uint32_t mergeable_rx_bufs;
-> >      uint8_t promisc;
-> > diff --git a/include/net/eth.h b/include/net/eth.h
-> > index e6dc8a7ba0..7f45c678e7 100644
-> > --- a/include/net/eth.h
-> > +++ b/include/net/eth.h
-> > @@ -177,6 +177,8 @@ struct tcp_hdr {
-> >  #define TH_PUSH 0x08
-> >  #define TH_ACK  0x10
-> >  #define TH_URG  0x20
-> > +#define TH_ECE  0x40
-> > +#define TH_CWR  0x80
-> >      u_short th_win;      /* window */
-> >      u_short th_sum;      /* checksum */
-> >      u_short th_urp;      /* urgent pointer */
-> > diff --git a/include/standard-headers/linux/virtio_net.h
-> b/include/standard-headers/linux/virtio_net.h
-> > index 260c3681d7..0d8658c06a 100644
-> > --- a/include/standard-headers/linux/virtio_net.h
-> > +++ b/include/standard-headers/linux/virtio_net.h
-> > @@ -57,6 +57,10 @@
-> >                                        * Steering */
-> >  #define VIRTIO_NET_F_CTRL_MAC_ADDR 23        /* Set MAC address */
-> >
-> > +#define VIRTIO_NET_F_RSC_EXT 38
->
-> Should it be VIRTIO_NET_F_GUEST_RSC_EXT ?
->
-
-IMO, not. In the spec the name of the feature is VIRTIO_NET_F_RSC_EXT and
-it is actually host feature
-and its effect is how the host sets the fields in the header.
-
-
->
-> > +#define VIRTIO_NET_F_GUEST_RSC4_DONT_USE     41      /* reserved */
-> > +#define VIRTIO_NET_F_GUEST_RSC6_DONT_USE     42      /* reserved */
-> > +
-> >  #define VIRTIO_NET_F_STANDBY   62    /* Act as standby for another
-> device
-> >                                        * with the same MAC.
-> >                                        */
-> > @@ -104,6 +108,7 @@ struct virtio_net_config {
-> >  struct virtio_net_hdr_v1 {
-> >  #define VIRTIO_NET_HDR_F_NEEDS_CSUM  1       /* Use csum_start,
-> csum_offset */
-> >  #define VIRTIO_NET_HDR_F_DATA_VALID  2       /* Csum is valid */
-> > +#define VIRTIO_NET_HDR_F_RSC_INFO    4       /* rsc_ext data in csum_
-> fields */
-> >       uint8_t flags;
-> >  #define VIRTIO_NET_HDR_GSO_NONE              0       /* Not a GSO frame
-> */
-> >  #define VIRTIO_NET_HDR_GSO_TCPV4     1       /* GSO frame, IPv4 TCP
-> (TSO) */
-> > @@ -118,6 +123,9 @@ struct virtio_net_hdr_v1 {
-> >       __virtio16 num_buffers; /* Number of merged rx buffers */
-> >  };
-> >
-> > +#define rsc_ext_num_packets          csum_start
-> > +#define rsc_ext_num_dupacks          csum_offset
->
-> I would prefer an inline function to set the field, or a union.
->
->
-> > +
-> >  #ifndef VIRTIO_NET_NO_LEGACY
-> >  /* This header comes first in the scatter-gather list.
-> >   * For legacy virtio, if VIRTIO_F_ANY_LAYOUT is not negotiated, it must
->
-> This part needs to get into the Linux header. Pls post there.
-> Until it does you can put it in virtio-net.c
->
->
-> > --
-> > 2.17.1
->
+> >   typedef struct RdmaBackendDev {
+> >       struct ibv_device_attr dev_attr;
+> >       RdmaBackendThread comp_thread;
+> > @@ -39,6 +45,8 @@ typedef struct RdmaBackendDev {
+> >       struct ibv_comp_channel *channel;
+> >       uint8_t port_num;
+> >       uint8_t backend_gid_idx;
+> > +    RecvMadList recv_mads_list;
+> > +    CharBackend *mad_chr_be;
+> >   } RdmaBackendDev;
+> >   typedef struct RdmaBackendPD {
+> > diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
+> > index e2d9f93cdf..e3742d893a 100644
+> > --- a/hw/rdma/vmw/pvrdma.h
+> > +++ b/hw/rdma/vmw/pvrdma.h
+> > @@ -19,6 +19,7 @@
+> >   #include "qemu/units.h"
+> >   #include "hw/pci/pci.h"
+> >   #include "hw/pci/msix.h"
+> > +#include "chardev/char-fe.h"
+> >   #include "../rdma_backend_defs.h"
+> >   #include "../rdma_rm_defs.h"
+> > @@ -83,6 +84,7 @@ typedef struct PVRDMADev {
+> >       uint8_t backend_port_num;
+> >       RdmaBackendDev backend_dev;
+> >       RdmaDeviceResources rdma_dev_res;
+> > +    CharBackend mad_chr;
+> >   } PVRDMADev;
+> >   #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NA=
+ME)
+> > diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> > index ca5fa8d981..6c8c0154fa 100644
+> > --- a/hw/rdma/vmw/pvrdma_main.c
+> > +++ b/hw/rdma/vmw/pvrdma_main.c
+> > @@ -51,6 +51,7 @@ static Property pvrdma_dev_properties[] =3D {
+> >       DEFINE_PROP_INT32("dev-caps-max-qp-init-rd-atom", PVRDMADev,
+> >                         dev_attr.max_qp_init_rd_atom, MAX_QP_INIT_RD_=
+ATOM),
+> >       DEFINE_PROP_INT32("dev-caps-max-ah", PVRDMADev, dev_attr.max_ah=
+, MAX_AH),
+> > +    DEFINE_PROP_CHR("mad-chardev", PVRDMADev, mad_chr),
+> >       DEFINE_PROP_END_OF_LIST(),
+> >   };
+> > @@ -613,7 +614,8 @@ static void pvrdma_realize(PCIDevice *pdev, Error=
+ **errp)
+> >       rc =3D rdma_backend_init(&dev->backend_dev, pdev, &dev->rdma_de=
+v_res,
+> >                              dev->backend_device_name, dev->backend_p=
+ort_num,
+> > -                           dev->backend_gid_idx, &dev->dev_attr, err=
+p);
+> > +                           dev->backend_gid_idx, &dev->dev_attr, &de=
+v->mad_chr,
+> > +                           errp);
+> >       if (rc) {
+> >           goto out;
+> >       }
+>=20
