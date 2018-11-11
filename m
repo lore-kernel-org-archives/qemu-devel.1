@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gLxOU-0005FX-J3
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 16:35:51 -0500
+	(envelope-from <bounces@canonical.com>) id 1gLxOU-0005FZ-KK
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 16:35:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gLxOR-0000BG-48
+	(envelope-from <bounces@canonical.com>) id 1gLxOP-0000AY-6Y
 	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 16:35:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58430)
+Received: from indium.canonical.com ([91.189.90.7]:58424)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gLxON-0008US-8h
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 16:35:40 -0500
+	id 1gLxOI-0008UJ-Gi
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 16:35:39 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gLxOA-0007fu-9T
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 21:35:26 +0000
+	id 1gLxO9-0007ft-V8
+	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 21:35:25 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 46B032E80C9
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 21:35:26 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id EAC2A2E80C7
+	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 21:35:25 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 11 Nov 2018 21:28:54 -0000
+Date: Sun, 11 Nov 2018 21:26:12 -0000
 From: inactive <1802684@bugs.launchpad.net>
 Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
-Message-Id: <154197173461.25168.496460197222648653.malone@chaenomeles.canonical.com>
+Message-Id: <154197157285.25211.15176122743398446819.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
 List-Id: <qemu-devel.nongnu.org>
@@ -38,9 +38,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Changes reviewable in a decent web-ui here -
-https://github.com/qemu/qemu/compare/master...berkus:mojave-cocoa-
-fix?expand=3D1
+Patches emailed.
 
 -- =
 
