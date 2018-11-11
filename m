@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLzHf-0003Ji-82
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:52 -0500
+	(envelope-from <nsoffer@redhat.com>) id 1gLzHm-0003Q3-1e
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLzHc-0007IC-T1
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:51 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39363)
+	(envelope-from <nsoffer@redhat.com>) id 1gLzHi-0007WI-QV
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:57 -0500
+Received: from mail-vs1-f48.google.com ([209.85.217.48]:41081)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLzHc-0007Dq-JY
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:48 -0500
-Received: by mail-wm1-x344.google.com with SMTP id u13-v6so6507408wmc.4
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 15:36:42 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 12 Nov 2018 00:36:19 +0100
-Message-Id: <20181111233622.8976-9-f4bug@amsat.org>
-In-Reply-To: <20181111233622.8976-1-f4bug@amsat.org>
-References: <20181111233622.8976-1-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1gLzHi-0007TG-KL
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:54 -0500
+Received: by mail-vs1-f48.google.com with SMTP id t17so4093506vsc.8
+	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 15:36:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 08/11] target/mips: Add a decodetree stub
+References: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
+In-Reply-To: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Mon, 12 Nov 2018 01:36:42 +0200
+Message-ID: <CAMRbyysA2h5MbJM8LyyYfFOOttH_D+Fc=Nb51vcvk=o+=hJsbA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] KVM Forum block no[td]es
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,86 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peer Adelt <peer.adelt@hni.uni-paderborn.de>, Richard Henderson <rth@twiddle.net>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, den@openvz.org
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- target/mips/Makefile.objs   |  8 ++++++++
- target/mips/insns.decode    |  2 ++
- target/mips/translate.c     |  7 +++++++
- target/mips/translate.inc.c | 13 +++++++++++++
- 4 files changed, 30 insertions(+)
- create mode 100644 target/mips/insns.decode
- create mode 100644 target/mips/translate.inc.c
+On Mon, Nov 12, 2018 at 12:25 AM Max Reitz <mreitz@redhat.com> wrote:
 
-diff --git a/target/mips/Makefile.objs b/target/mips/Makefile.objs
-index 651f36f517..3510835d57 100644
---- a/target/mips/Makefile.objs
-+++ b/target/mips/Makefile.objs
-@@ -2,3 +2,11 @@ obj-y += translate.o dsp_helper.o op_helper.o lmi_helper.o helper.o cpu.o
- obj-y += gdbstub.o msa_helper.o mips-semi.o
- obj-$(CONFIG_SOFTMMU) += machine.o cp0_timer.o
- obj-$(CONFIG_KVM) += kvm.o
-+
-+DECODETREE = $(SRC_PATH)/scripts/decodetree.py
-+
-+target/mips/decode.inc.c: $(SRC_PATH)/target/mips/insns.decode $(DECODETREE)
-+	$(call quiet-command,\
-+	  $(PYTHON) $(DECODETREE) -o $@ $<, "GEN", $(TARGET_DIR)$@)
-+
-+target/mips/translate.o: target/mips/decode.inc.c
-diff --git a/target/mips/insns.decode b/target/mips/insns.decode
-new file mode 100644
-index 0000000000..7fbf21cbb9
---- /dev/null
-+++ b/target/mips/insns.decode
-@@ -0,0 +1,2 @@
-+# MIPS32/MIPS64 Instruction Set
-+#
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e726f3ec00..560325c563 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -27848,6 +27848,8 @@ static void gen_msa(CPUMIPSState *env, DisasContext *ctx)
- 
- }
- 
-+#include "translate.inc.c"
-+
- static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
- {
-     int32_t offset;
-@@ -27872,6 +27874,11 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-         gen_set_label(l1);
-     }
- 
-+    /* Transition to the auto-generated decoder.  */
-+    if (decode(ctx, ctx->opcode)) {
-+        return;
-+    }
-+
-     op = MASK_OP_MAJOR(ctx->opcode);
-     rs = (ctx->opcode >> 21) & 0x1f;
-     rt = (ctx->opcode >> 16) & 0x1f;
-diff --git a/target/mips/translate.inc.c b/target/mips/translate.inc.c
-new file mode 100644
-index 0000000000..69fe78ac89
---- /dev/null
-+++ b/target/mips/translate.inc.c
-@@ -0,0 +1,13 @@
-+/*
-+ *  MIPS emulation for QEMU - MIPS32 translation routines
-+ *
-+ *  Copyright (c) 2004-2005 Jocelyn Mayer
-+ *  Copyright (c) 2006 Marius Groeger (FPU operations)
-+ *  Copyright (c) 2006 Thiemo Seufer (MIPS32R2 support)
-+ *  Copyright (c) 2018 Philippe Mathieu-Daudé
-+ *
-+ * This code is licensed under the GNU GPLv2 and later.
-+ */
-+
-+/* Include the auto-generated decoder.  */
-+#include "decode.inc.c"
--- 
-2.17.2
+> This is what I=E2=80=99ve taken from two or three BoF-like get-togethers =
+on
+> blocky things.  Amendments are more than welcome, of course.
+
+...
+
+> Bitmaps
+>
+=3D=3D=3D=3D=3D=3D=3D
+>
+> (Got this section from sneaking into a BoF I wasn=E2=80=99t invited to.  =
+Oh
+> well.  Won=E2=80=99t hurt to include them here.)
+>
+> Currently, when dirty bitmaps are loaded, all IN_USE bitmaps are just
+> not loaded at all and completely ignored.  That isn=E2=80=99t correct, th=
+ough,
+> they should either still be loaded (and automatically treated and
+> written back as fully dirty), or at least qemu-img check should
+> =E2=80=9Crepair=E2=80=9D them (i.e. fully dirtying them).
+>
+
+I'm not sure making bitmaps dirty is better.
+
+When bitmap is marked IN_USE, it means that we cannot use it for
+backup. Deleting the bitmap or making it as bad so it cannot be used
+for the next backup is the same. Making the bitmap as dirty will full
+the management layer that everything was fine when the next backup
+includes the entire disk. It is better to cause the next backup to fail
+in a verbose way, since the backup software can recover by doing
+a full backup.
+
+Sometimes qemu (running in a mode as bare as possible) is better than
+> using qemu-img convert, for instance.  It gives you more control
+> (through QMP; you get e.g. better progress reporting), you get all of
+> the mirror optimizations (we do have optimizations for convert, too,
+> but whether it=E2=80=99s any good to write the same (or different?)
+> optimizations twice is another question), and you get a common
+> interface for everything (online and offline).
+> Note that besides a bare qemu we=E2=80=99ve also always wanted to convert=
+ as
+> many qemu-img operations into frontends for block jobs as possible.
+> We have only done this for commit, however, even though convert looked
+> like basically the ideal target.  It was just too hard with too little
+> apparent gain, like always (and convert supports additional features
+> like concatenation which we don=E2=80=99t have in the runtime block layer
+> yet).
+>
+
+I'm not sure it is better to run qemu and use qemu-img as thin wrapper
+over qmp.
+
+For example, management system may ascociate qemu-img
+with a sanlock lease, and sanlock may try to terminate qemu-img when
+a lease is invalidated. In this case sanlock will succeed while qemu is til=
+l
+accessing storage it should not access.
+...
+
+> Transacitonable bitmap primitives (e.g. copying a bitmap) would be
+> nice so you can use them when creating a snapshot.  Then it=E2=80=99d be =
+up to
+> the management layer to make use of them:
+> - Do you want to continue using the very same bitmap?  Copy it then
+>   (or move it, depending on what exactly you want to do and what
+>   primitives there are)
+> - Do you want to start with a new bitmap?  Then just create a new one
+>   along with the overlay.
+>
+
+Having both options sounds good, but we can start with the first.
+
+Nir
