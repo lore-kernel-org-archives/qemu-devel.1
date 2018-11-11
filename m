@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gLqY0-000543-OM
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 09:17:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gLr1e-00052a-VI
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 09:47:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gLqXv-0002t2-Da
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 09:17:08 -0500
-Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:34258)
+	(envelope-from <peter.maydell@linaro.org>) id 1gLr1c-0004SA-U4
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 09:47:46 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33987)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1gLqXv-0002sh-50
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 09:17:03 -0500
-Received: by mail-it1-x144.google.com with SMTP id t189-v6so8520025itf.1
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 06:17:02 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <mailman.21071.1541921951.1283.qemu-devel@nongnu.org>
-Date: Sun, 11 Nov 2018 09:16:59 -0500
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gLr1b-0004Ps-0w
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 09:47:44 -0500
+Received: by mail-ot1-x342.google.com with SMTP id t5so5789724otk.1
+	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 06:47:41 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20181109152119.9242-8-alex.bennee@linaro.org>
+References: <20181109152119.9242-1-alex.bennee@linaro.org>
+	<20181109152119.9242-8-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 11 Nov 2018 14:47:20 +0000
+Message-ID: <CAFEAcA-iOLcP50jbKLJwpwL333hbQi1t0ig6zp8SNNLsJL8=vw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <F2462E98-6B72-4674-9A9A-6C04E6842F24@gmail.com>
-References: <mailman.21071.1541921951.1283.qemu-devel@nongnu.org>
-Subject: [Qemu-devel]  [Bug 1802684] Re: QEMU gui crashes on macOS 	Mojave
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] arm: fix
+ aa64_generate_debug_exceptions to work with EL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: 1802684@bugs.launchpad.net
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
+On 9 November 2018 at 15:21, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+> The test was incomplete and incorrectly caused debug exceptions to be
+> generated when returning to EL2 after a failed attempt to single-step
+> an EL1 instruction. Fix this while cleaning up the function a little.
 
-> On Nov 11, 2018, at 2:39 AM, qemu-devel-request@nongnu.org wrote:
->=20
-> Thanks for the bug report. It looks like Mojave is pickier about apps
-> not calling various GUI update functions from the "wrong" thread. We
-> probably need to figure out how to dispatch those to the main thread
-> instead of whatever thread we were on. Unfortunately we don't really
-> have anybody in QEMU upstream who knows much about OSX or its GUI, and =
-I
-> suspect we don't have anybody with Mojave (my system is still High
-> Sierra and I don't plan to upgrade it for a while); help and patches
-> appreciated from anybody who does...
+> @@ -2833,9 +2845,6 @@ static inline bool aa32_generate_debug_exceptions(C=
+PUARMState *env)
+>   * since the pseudocode has it at all callsites except for the one in
+>   * CheckSoftwareStep(), where it is elided because both branches would
+>   * always return the same value.
+> - *
+> - * Parts of the pseudocode relating to EL2 and EL3 are omitted because w=
+e
+> - * don't yet implement those exception levels or their associated trap b=
+its.
+>   */
 
->  	21  AppKit                              0x00007fff3c019ff8 =
--[NSWindow setFrame:display:animate:] + 567
+In hindsight I regret not standardizing on a greppable tag for
+marking these kinds of "we don't do X because we don't implement
+feature Y" comments...
 
-I would use the [performSelectorOnMainThread: withObject: =
-waitUntilDone:] method to fix this problem. It should go here in the =
-call stack. I would make the patch myself but I don't know where this =
-call takes place in qemu-system-aarch64.
-
->  	22  qemu-system-aarch64                 0x000000010b7b2abf =
-qemu-system-aarch64 + 3668671
+thanks
+-- PMM
