@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53238)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLzHf-0003Jg-7j
+	id 1gLzHf-0003Jb-6q
 	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLzHc-0007Hg-Ld
+	id 1gLzHc-0007HK-EB
 	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:51 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35491)
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:36742)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLzHc-0007Fh-9p
+	id 1gLzHc-00074j-35
 	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:48 -0500
-Received: by mail-wr1-x442.google.com with SMTP id z16-v6so7399044wrv.2
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 15:36:46 -0800 (PST)
+Received: by mail-wr1-x434.google.com with SMTP id z13-v6so7399511wrs.3
+	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 15:36:33 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 12 Nov 2018 00:36:22 +0100
-Message-Id: <20181111233622.8976-12-f4bug@amsat.org>
-In-Reply-To: <20181111233622.8976-1-f4bug@amsat.org>
-References: <20181111233622.8976-1-f4bug@amsat.org>
+Date: Mon, 12 Nov 2018 00:36:11 +0100
+Message-Id: <20181111233622.8976-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 11/11] target/mips: Port MIPS64 DCL[Z/O] to
- decodetree
+Subject: [Qemu-devel] [RFC PATCH 00/11] decodetree: Add tokens to ease
+ checking ISA flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +33,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peer Adelt <peer.adelt@hni.uni-paderborn.de>, Richard Henderson <rth@twiddle.net>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- target/mips/insns.decode    | 12 ++++++++++++
- target/mips/translate.inc.c | 12 ++++++++++++
- 2 files changed, 24 insertions(+)
+Hi Richard,
 
-diff --git a/target/mips/insns.decode b/target/mips/insns.decode
-index 8a1a7acf3a..e256220211 100644
---- a/target/mips/insns.decode
-+++ b/target/mips/insns.decode
-@@ -2,9 +2,21 @@
- #
- # From:
- # - MIPS32 Architecture For Programmers Volume II-A (Document Number: MD00086)
-+# - MIPS64 Architecture For Programmers Volume II-A (Document Number: MD00087)
-+
-+&rs_rt_rd       rs rt rd
-+
-+@rs_rt_rd       ...... rs:5  rt:5  rd:5  00000 ......   &rs_rt_rd
- 
- ####
- # System Instructions
- ####
- 
- synci           000001 ----- 11111 ----------------          >insn=ISA_MIPS32R2
-+
-+####
-+# Special2 Instructions
-+####
-+
-+dclz            011100 ..... ..... ..... ..... 100100   @rs_rt_rd   ?ctx->insn_flags&ISA_MIPS64
-+dclo            011100 ..... ..... ..... ..... 100101   @rs_rt_rd   ?ctx->insn_flags&ISA_MIPS64
-diff --git a/target/mips/translate.inc.c b/target/mips/translate.inc.c
-index f3dcd32f98..90fe868605 100644
---- a/target/mips/translate.inc.c
-+++ b/target/mips/translate.inc.c
-@@ -18,3 +18,15 @@ static bool trans_synci(DisasContext *dc, arg_synci *a)
-     dc->base.is_jmp = DISAS_STOP;
-     return true;
- }
-+
-+static bool trans_dclz(DisasContext *ctx, arg_rs_rt_rd *a)
-+{
-+    gen_cl(ctx, OPC_DCLZ, a->rd, a->rs);
-+    return true;
-+}
-+
-+static bool trans_dclo(DisasContext *ctx, arg_rs_rt_rd *a)
-+{
-+    gen_cl(ctx, OPC_DCLO, a->rd, a->rs);
-+    return true;
-+}
+I have been wondering how we can simplify when dealing with multiple ISAs.
+I used the MIPS arch because it aims to be simple, but handling the multiple
+ISAs/ASEs as once is a mess, with the particular case of the MIPS32R6.
+
+First I wanted to split the translate.c in various ISA/ASE-related files,
+but this there are too many inlined func involved, I found it handy to use
+the ?cond token, so we can link all translate functions without worrying
+about #ifdef'ry.
+The translating functions are now smaller/easier to read.
+
+Then I wanted to add stricter ISA check, to not deal with multiple
+specifications included more than once, and ease overlapping patterns.
+
+I'm not super happy with this series (in particular the token added
+are MIPS oriented, you can not use spaces in the condition), but I'm
+interested by what you think :)
+
+Rebasing decodetree specs is painful, so better figure what's the best
+now before continuing.
+
+At some point I'd like to get to the one ISA/ASE per file, so we can share
+compilation units between targets (via $common-obj) and also be able to
+disable completely some ISAs, for whatever reason (downstream/obsolete/...).
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (11):
+  MAINTAINERS: Add scripts/decodetree.py to the TCG section
+  decodetree: Add multiple include guard
+  target/mips: Move the !ISA_MIPS32R6 check out of
+    decode_opc_special2_legacy
+  target/mips: Avoid access to CPUMIPSState from decode* functions
+  decodetree: Force Python to print unsigned values
+  scripts/decodetree: Allow empty specifications
+  scripts/decodetree: Add add_func_check()
+  target/mips: Add a decodetree stub
+  target/mips: Port SYNCI to decodetree
+  scripts/decodetree: Add add_cond_check()
+  target/mips: Port MIPS64 DCL[Z/O] to decodetree
+
+ MAINTAINERS                 |  1 +
+ scripts/decodetree.py       | 62 ++++++++++++++++++++++++++++++-------
+ target/mips/Makefile.objs   |  8 +++++
+ target/mips/insns.decode    | 22 +++++++++++++
+ target/mips/translate.c     | 20 ++++++------
+ target/mips/translate.inc.c | 32 +++++++++++++++++++
+ 6 files changed, 123 insertions(+), 22 deletions(-)
+ create mode 100644 target/mips/insns.decode
+ create mode 100644 target/mips/translate.inc.c
+
 -- 
 2.17.2
