@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53241)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLzHf-0003Jb-6q
+	id 1gLzHf-0003Je-6w
 	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLzHc-0007HK-EB
+	id 1gLzHb-0007Ga-Th
 	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:51 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:36742)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42818)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLzHc-00074j-35
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:48 -0500
-Received: by mail-wr1-x434.google.com with SMTP id z13-v6so7399511wrs.3
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 15:36:33 -0800 (PST)
+	id 1gLzHb-0007DH-KW
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:36:47 -0500
+Received: by mail-wr1-x441.google.com with SMTP id u5-v6so2107232wrn.9
+	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 15:36:41 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 12 Nov 2018 00:36:11 +0100
-Message-Id: <20181111233622.8976-1-f4bug@amsat.org>
+Date: Mon, 12 Nov 2018 00:36:18 +0100
+Message-Id: <20181111233622.8976-8-f4bug@amsat.org>
+In-Reply-To: <20181111233622.8976-1-f4bug@amsat.org>
+References: <20181111233622.8976-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 00/11] decodetree: Add tokens to ease
- checking ISA flags
+Subject: [Qemu-devel] [RFC PATCH 07/11] scripts/decodetree: Add
+ add_func_check()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,61 +35,107 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peer Adelt <peer.adelt@hni.uni-paderborn.de>, Richard Henderson <rth@twiddle.net>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-Hi Richard,
+The '>' token allow to call a check(arg) function.
 
-I have been wondering how we can simplify when dealing with multiple ISAs.
-I used the MIPS arch because it aims to be simple, but handling the multiple
-ISAs/ASEs as once is a mess, with the particular case of the MIPS32R6.
+This is useful to assert an instruction is supported by an ISA.
 
-First I wanted to split the translate.c in various ISA/ASE-related files,
-but this there are too many inlined func involved, I found it handy to use
-the ?cond token, so we can link all translate functions without worrying
-about #ifdef'ry.
-The translating functions are now smaller/easier to read.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ scripts/decodetree.py | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
-Then I wanted to add stricter ISA check, to not deal with multiple
-specifications included more than once, and ease overlapping patterns.
-
-I'm not super happy with this series (in particular the token added
-are MIPS oriented, you can not use spaces in the condition), but I'm
-interested by what you think :)
-
-Rebasing decodetree specs is painful, so better figure what's the best
-now before continuing.
-
-At some point I'd like to get to the one ISA/ASE per file, so we can share
-compilation units between targets (via $common-obj) and also be able to
-disable completely some ISAs, for whatever reason (downstream/obsolete/...).
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daudé (11):
-  MAINTAINERS: Add scripts/decodetree.py to the TCG section
-  decodetree: Add multiple include guard
-  target/mips: Move the !ISA_MIPS32R6 check out of
-    decode_opc_special2_legacy
-  target/mips: Avoid access to CPUMIPSState from decode* functions
-  decodetree: Force Python to print unsigned values
-  scripts/decodetree: Allow empty specifications
-  scripts/decodetree: Add add_func_check()
-  target/mips: Add a decodetree stub
-  target/mips: Port SYNCI to decodetree
-  scripts/decodetree: Add add_cond_check()
-  target/mips: Port MIPS64 DCL[Z/O] to decodetree
-
- MAINTAINERS                 |  1 +
- scripts/decodetree.py       | 62 ++++++++++++++++++++++++++++++-------
- target/mips/Makefile.objs   |  8 +++++
- target/mips/insns.decode    | 22 +++++++++++++
- target/mips/translate.c     | 20 ++++++------
- target/mips/translate.inc.c | 32 +++++++++++++++++++
- 6 files changed, 123 insertions(+), 22 deletions(-)
- create mode 100644 target/mips/insns.decode
- create mode 100644 target/mips/translate.inc.c
-
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index 41ed67132d..2450cc1a63 100755
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -420,7 +420,7 @@ class Arguments:
+ 
+ class General:
+     """Common code between instruction formats and instruction patterns"""
+-    def __init__(self, name, lineno, base, fixb, fixm, udfm, fldm, flds):
++    def __init__(self, name, lineno, base, fixb, fixm, udfm, fldm, flds, chkfs):
+         self.name = name
+         self.file = input_file
+         self.lineno = lineno
+@@ -430,6 +430,7 @@ class General:
+         self.undefmask = udfm
+         self.fieldmask = fldm
+         self.fields = flds
++        self.check_funcs = chkfs
+ 
+     def __str__(self):
+         r = self.name
+@@ -480,6 +481,8 @@ class Pattern(General):
+             output(ind, self.base.extract_name(), '(&u.f_', arg, ', insn);\n')
+         for n, f in self.fields.items():
+             output(ind, 'u.f_', arg, '.', n, ' = ', f.str_extract(), ';\n')
++        for f, a in self.check_funcs:
++            output(ind, 'check_', f, '(ctx, ', a, ');\n')
+         output(ind, 'return ', translate_prefix, '_', self.name,
+                '(ctx, &u.f_', arg, ');\n')
+ # end Pattern
+@@ -583,6 +586,11 @@ def add_field_byname(lineno, flds, new_name, old_name):
+     return add_field(lineno, flds, new_name, lookup_field(lineno, old_name))
+ 
+ 
++def add_func_check(lineno, chkfns, check_funcname, check_arg):
++    chkfns += [(check_funcname, check_arg)]
++    return chkfns
++
++
+ def infer_argument_set(flds):
+     global arguments
+     global decode_function
+@@ -624,7 +632,7 @@ def infer_format(arg, fieldmask, flds):
+     if not arg:
+         arg = infer_argument_set(flds)
+ 
+-    fmt = Format(name, 0, arg, 0, 0, 0, fieldmask, var_flds)
++    fmt = Format(name, 0, arg, 0, 0, 0, fieldmask, var_flds, [])
+     formats[name] = fmt
+ 
+     return (fmt, const_flds)
+@@ -646,6 +654,7 @@ def parse_generic(lineno, is_format, name, toks):
+     undefmask = 0
+     width = 0
+     flds = {}
++    chkfns = []
+     arg = None
+     fmt = None
+     for t in toks:
+@@ -690,6 +699,13 @@ def parse_generic(lineno, is_format, name, toks):
+             flds = add_field(lineno, flds, fname, ConstField(value))
+             continue
+ 
++        # '>FUNC=ARG' calls check_FUNC(ctx, ARG).
++        if t[0] == '>':
++            (fname, farg) = t[1:].split('=')
++            tt = t[2 + len(fname) + len(farg):]
++            chkfns = add_func_check(lineno, chkfns, fname, farg)
++            continue
++
+         # Pattern of 0s, 1s, dots and dashes indicate required zeros,
+         # required ones, or dont-cares.
+         if re_fullmatch('[01.-]+', t):
+@@ -752,7 +768,7 @@ def parse_generic(lineno, is_format, name, toks):
+         if name in formats:
+             error(lineno, 'duplicate format name', name)
+         fmt = Format(name, lineno, arg, fixedbits, fixedmask,
+-                     undefmask, fieldmask, flds)
++                     undefmask, fieldmask, flds, chkfns)
+         formats[name] = fmt
+     else:
+         # Patterns can reference a format ...
+@@ -779,7 +795,7 @@ def parse_generic(lineno, is_format, name, toks):
+             if f not in flds.keys() and f not in fmt.fields.keys():
+                 error(lineno, 'field {0} not initialized'.format(f))
+         pat = Pattern(name, lineno, fmt, fixedbits, fixedmask,
+-                      undefmask, fieldmask, flds)
++                      undefmask, fieldmask, flds, chkfns)
+         patterns.append(pat)
+ 
+     # Validate the masks that we have assembled.
 -- 
 2.17.2
