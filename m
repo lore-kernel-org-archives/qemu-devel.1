@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56321)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLzRD-0006BC-5m
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:46:45 -0500
+	id 1gLzUm-0001va-3s
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:50:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLzR8-0006EU-9G
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:46:42 -0500
+	id 1gLzUi-0007Kn-VG
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:50:24 -0500
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:38829)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gLzUi-0007Ke-Bb
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 18:50:20 -0500
+Received: by mail-yw1-f68.google.com with SMTP id i65-v6so3742607ywc.5
+	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 15:50:20 -0800 (PST)
 MIME-Version: 1.0
-References: <20181107123652.23417-1-marcandre.lureau@redhat.com>
-	<20181107123652.23417-6-marcandre.lureau@redhat.com>
-In-Reply-To: <20181107123652.23417-6-marcandre.lureau@redhat.com>
+References: <20181103154104.69228-1-liq3ea@163.com>
+In-Reply-To: <20181103154104.69228-1-liq3ea@163.com>
 From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 12 Nov 2018 00:46:24 +0100
-Message-ID: <CAAdtpL7Ppk1CNVFzXrjgoaQ13wXuK=7pQ_DDUrEVm8wsxmsDnQ@mail.gmail.com>
+Date: Mon, 12 Nov 2018 00:50:08 +0100
+Message-ID: <CAAdtpL5xZChUiGCiUB25Pvj5oRpoVJRDb0pMzKCAmPYpUV8a3Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 05/14] qdev: move
- qdev_prop_register_global_list() to tests
+Subject: Re: [Qemu-devel] [PATCH] hw: virtio-pci: drop DO_UPCAST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,120 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.ibm.com, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Li Qiang <liq3ea@163.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Wed, Nov 7, 2018 at 1:40 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
+On Sat, Nov 3, 2018 at 4:42 PM Li Qiang <liq3ea@163.com> wrote:
 >
-> The function is only used by a test, move it there.
+> Use VIRTIO_PCI MACRO instead.
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Li Qiang <liq3ea@163.com>
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 > ---
->  include/hw/qdev-properties.h   |  1 -
->  hw/core/qdev-properties.c      |  9 ---------
->  tests/test-qdev-global-props.c | 18 ++++++++++++++----
->  3 files changed, 14 insertions(+), 14 deletions(-)
+>  hw/virtio/virtio-pci.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-> index a95f4a73eb..3ab9cd2eb6 100644
-> --- a/include/hw/qdev-properties.h
-> +++ b/include/hw/qdev-properties.h
-> @@ -249,7 +249,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char =
-*name, int value);
->  void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
->
->  void qdev_prop_register_global(GlobalProperty *prop);
-> -void qdev_prop_register_global_list(GlobalProperty *props);
->  int qdev_prop_check_globals(void);
->  void qdev_prop_set_globals(DeviceState *dev);
->  void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *=
-dev,
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index ab61d502fd..bd84c4ea4c 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -1180,15 +1180,6 @@ void qdev_prop_register_global(GlobalProperty *pro=
-p)
->      global_props =3D g_list_append(global_props, prop);
->  }
->
-> -void qdev_prop_register_global_list(GlobalProperty *props)
-> -{
-> -    int i;
-> -
-> -    for (i =3D 0; props[i].driver !=3D NULL; i++) {
-> -        qdev_prop_register_global(props+i);
-> -    }
-> -}
-> -
->  int qdev_prop_check_globals(void)
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index a954799267..277dc20c81 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -597,7 +597,7 @@ virtio_address_space_read(VirtIOPCIProxy *proxy, hwad=
+dr addr,
+>  static void virtio_write_config(PCIDevice *pci_dev, uint32_t address,
+>                                  uint32_t val, int len)
 >  {
->      GList *l;
-> diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-prop=
-s.c
-> index ccdf6c57c1..b1eb505442 100644
-> --- a/tests/test-qdev-global-props.c
-> +++ b/tests/test-qdev-global-props.c
-> @@ -89,6 +89,16 @@ static void test_static_prop(void)
->      g_test_trap_assert_stdout("");
->  }
+> -    VirtIOPCIProxy *proxy =3D DO_UPCAST(VirtIOPCIProxy, pci_dev, pci_dev=
+);
+> +    VirtIOPCIProxy *proxy =3D VIRTIO_PCI(pci_dev);
+>      VirtIODevice *vdev =3D virtio_bus_get_device(&proxy->bus);
+>      struct virtio_pci_cfg_cap *cfg;
 >
-> +static void register_global_properties(GlobalProperty *props)
-> +{
-> +    int i;
-> +
-> +    for (i =3D 0; props[i].driver !=3D NULL; i++) {
-> +        qdev_prop_register_global(props + i);
-> +    }
-> +}
-> +
-> +
->  /* Test setting of static property using global properties */
->  static void test_static_globalprop_subprocess(void)
+> @@ -630,7 +630,7 @@ static void virtio_write_config(PCIDevice *pci_dev, u=
+int32_t address,
+>  static uint32_t virtio_read_config(PCIDevice *pci_dev,
+>                                     uint32_t address, int len)
 >  {
-> @@ -98,7 +108,7 @@ static void test_static_globalprop_subprocess(void)
->          {}
->      };
+> -    VirtIOPCIProxy *proxy =3D DO_UPCAST(VirtIOPCIProxy, pci_dev, pci_dev=
+);
+> +    VirtIOPCIProxy *proxy =3D VIRTIO_PCI(pci_dev);
+>      struct virtio_pci_cfg_cap *cfg;
 >
-> -    qdev_prop_register_global_list(props);
-> +    register_global_properties(props);
->
->      mt =3D STATIC_TYPE(object_new(TYPE_STATIC_PROPS));
->      qdev_init_nofail(DEVICE(mt));
-> @@ -216,7 +226,7 @@ static void test_dynamic_globalprop_subprocess(void)
->      };
->      int global_error;
->
-> -    qdev_prop_register_global_list(props);
-> +    register_global_properties(props);
->
->      mt =3D DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
->      qdev_init_nofail(DEVICE(mt));
-> @@ -261,7 +271,7 @@ static void test_dynamic_globalprop_nouser_subprocess=
-(void)
->      };
->      int global_error;
->
-> -    qdev_prop_register_global_list(props);
-> +    register_global_properties(props);
->
->      mt =3D DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
->      qdev_init_nofail(DEVICE(mt));
-> @@ -299,7 +309,7 @@ static void test_subclass_global_props(void)
->          {}
->      };
->
-> -    qdev_prop_register_global_list(props);
-> +    register_global_properties(props);
->
->      mt =3D STATIC_TYPE(object_new(TYPE_SUBCLASS));
->      qdev_init_nofail(DEVICE(mt));
+>      if (proxy->config_cap &&
 > --
-> 2.19.1.708.g4ede3d42df
+> 2.17.1
+>
 >
 >
