@@ -1,33 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gLxOU-0005FZ-KK
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 16:35:47 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gLyAR-0007O5-2Q
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 17:25:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gLxOP-0000AY-6Y
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 16:35:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58424)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gLxOI-0008UJ-Gi
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 16:35:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gLxO9-0007ft-V8
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 21:35:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EAC2A2E80C7
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 21:35:25 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1gLyAP-0002Ob-Ib
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 17:25:19 -0500
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
+Date: Sun, 11 Nov 2018 23:25:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 11 Nov 2018 21:26:12 -0000
-From: inactive <1802684@bugs.launchpad.net>
-Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
-Message-Id: <154197157285.25211.15176122743398446819.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dDF7fHuWxqxI2tph7q5NJ5jKQHuxa4eRp"
+Subject: [Qemu-devel] KVM Forum block no[td]es
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,127 +21,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>, "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Patches emailed.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dDF7fHuWxqxI2tph7q5NJ5jKQHuxa4eRp
+From: Max Reitz <mreitz@redhat.com>
+To: Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
+Subject: KVM Forum block no[td]es
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+This is what I=E2=80=99ve taken from two or three BoF-like get-togethers =
+on
+blocky things.  Amendments are more than welcome, of course.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1802684
 
-Title:
-  QEMU gui crashes on macOS Mojave
 
-Status in QEMU:
-  New
+Permission system
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Bug description:
-  QEMU release 3.0.0 as well as a recent head build
+GRAPH_MOD
+---------
 
-  /usr/local/Cellar/qemu/HEAD-03c1ca1 (147 files, 257.2MB)
-    Built from source on 2018-11-06 at 13:41:32 with: --with-gtk+3 --with-s=
-dl2 --with-libusb
-  /usr/local/Cellar/qemu/3.0.0 (137 files, 261.6MB) *
-    Poured from bottle on 2018-11-10 at 22:58:32 with: --with-gtk+3 --with-=
-libusb --with-sdl2
+We need some way for the commit job to prevent graph changes on its
+chain while it is running.  Our current blocker doesn=E2=80=99t do the jo=
+b,
+however.  What to do?
 
-  Crashes when attempting to use any gui interface (tried SDL and
-  default Cocoa):
+- We have no idea how to make a *permission* work.  Maybe the biggest
+  problem is that it just doesn=E2=80=99t work as a permission, because t=
+he
+  commit job doesn=E2=80=99t own the BdrvChildren that would need to be
+  blocked (namely the @backing BdrvChild).
 
-  2018-11-10 22:58:41.799 qemu-system-aarch64[42982:1102466] *** Terminatin=
-g app due to uncaught exception 'NSInternalInconsistencyException', reason:=
- 'NSWindow drag regions should only be invalidated on the Main Thread!'
-  *** First throw call stack:
-  (
-  	0   CoreFoundation                      0x00007fff3ea96ecd __exceptionPr=
-eprocess + 256
-  	1   libobjc.A.dylib                     0x00007fff6ab49720 objc_exceptio=
-n_throw + 48
-  	2   CoreFoundation                      0x00007fff3eab095d -[NSException=
- raise] + 9
-  	3   AppKit                              0x00007fff3bfb13fa -[NSWindow(NS=
-Window_Theme) _postWindowNeedsToResetDragMarginsUnlessPostingDisabled] + 324
-  	4   AppKit                              0x00007fff3bfb6850 -[NSView setF=
-rameSize:] + 2082
-  	5   AppKit                              0x00007fff3c02747d -[NSVisualEff=
-ectView setFrameSize:] + 171
-  	6   AppKit                              0x00007fff3c0811b1 -[NSTitlebarV=
-iew setFrameSize:] + 84
-  	7   AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	8   AppKit                              0x00007fff3c081154 -[NSTitlebarV=
-iew resizeWithOldSuperviewSize:] + 100
-  	9   AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	10  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	11  AppKit                              0x00007fff3c9773c0 -[NSTitlebarC=
-ontainerView setFrameSize:] + 142
-  	12  AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	13  AppKit                              0x00007fff3bfbcdb5 -[NSView resi=
-zeWithOldSuperviewSize:] + 776
-  	14  AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	15  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	16  AppKit                              0x00007fff3c024570 -[NSThemeFram=
-e setFrameSize:] + 495
-  	17  AppKit                              0x00007fff3c011223 -[NSWindow _s=
-etFrame:updateBorderViewSize:] + 966
-  	18  AppKit                              0x00007fff3c010b46 -[NSWindow _o=
-ldPlaceWindow:] + 547
-  	19  AppKit                              0x00007fff3c010151 -[NSWindow _s=
-etFrameCommon:display:stashSize:] + 3006
-  	20  AppKit                              0x00007fff3c00f57d -[NSWindow _s=
-etFrame:display:allowImplicitAnimation:stashSize:] + 192
-  	21  AppKit                              0x00007fff3c019ff8 -[NSWindow se=
-tFrame:display:animate:] + 567
-  	22  qemu-system-aarch64                 0x000000010b7b2abf qemu-system-a=
-arch64 + 3668671
-  	23  qemu-system-aarch64                 0x000000010b7b6356 qemu-system-a=
-arch64 + 3683158
-  	24  qemu-system-aarch64                 0x000000010b7ad836 qemu-system-a=
-arch64 + 3647542
-  	25  qemu-system-aarch64                 0x000000010b4ce769 qemu-system-a=
-arch64 + 636777
-  	26  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	27  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	28  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	29  qemu-system-aarch64                 0x000000010b4414aa qemu-system-a=
-arch64 + 58538
-  	30  qemu-system-aarch64                 0x000000010b4f78c3 qemu-system-a=
-arch64 + 805059
-  	31  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	32  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	33  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	34  qemu-system-aarch64                 0x000000010b4b8f57 qemu-system-a=
-arch64 + 548695
-  	35  qemu-system-aarch64                 0x000000010b49c3af qemu-system-a=
-arch64 + 431023
-  	36  ???                                 0x00000001117891f3 0x0 + 4588081=
-651
-  )
-  libc++abi.dylib: terminating with uncaught exception of type NSException
-  fish: 'qemu-system-aarch64 -M raspi3 -=E2=80=A6' terminated by signal SIG=
-ABRT (Abort)
+- A property of BdrvChild that can be set by a non-parent seems more
+  feasible, e.g. a counter where changing the child is possible only
+  if the counter is 0.  This also actually makes sense in what it
+  means.
+  (We never quite knew what =E2=80=9Ctaking the GRAPH_PERMISSION=E2=80=9D=
+ or
+  =E2=80=9Cunsharing the GRPAH_MOD permission=E2=80=9D was supposed to me=
+an.  Figuring
+  that out always took like half an our in any face-to-face meeting,
+  and then we decided it was pretty much useless for any case we had
+  at hand.)
 
-  =
 
-  macOS Mojave 10.14.2 Beta (18C38b)
-  Qemu in the same configuration used to work in High Sierra, started crash=
-ing only after upgrade to Mojave.
+Reopen
+------
 
-  Command line:
-  `qemu-system-aarch64 -M raspi3 -d in_asm -serial stdio -kernel $1.bin`
+How should permissions be handled while the reopen is under way?
+Maybe we should take the union of @perm before and after, and the
+intersection of @shared before and after?
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1802684/+subscriptions
+- Taking permissions is a transaction that can fail.  Reopen, too, is
+  a transaction, and we want to go from the intermediate to the final
+  permissions in reopen=E2=80=99s commit part, so that transition is not
+  allowed to fail.
+  Since with the above model we would only relax things during that
+  transition (relinquishing bits from @perm and adding bits to
+  @shared), this transition should in theory be possible without any
+  failure.  However, in practice things are different, as permission
+  changes with file-posix nodes imply lock changes on the filesystem
+  -- which may always fail.  Arguably failures from changing the
+  file-posix locks can be ignored, because that just means that the
+  file claims more permissions to be taken and less to be shared than
+  is actually the case.  Which means you may not be able to open the
+  file in some other application, while you should be, but that=E2=80=99s=
+ the
+  benign kind of error.  You won=E2=80=99t be able to access data in a wa=
+y
+  you shouldn=E2=80=99t be able to.
+  - Note that we have this issue already, so in general dropping
+    permissions sometimes aborts because code assumes that dropping
+    permissions is always safe and can never result in an error.  It
+    seems best to ignore such protocol layer errors in the generic
+    block layer rather than handling this in every protocol driver
+    itself.
+    (The block layer should discard errors from dropping permissions
+    on the protocol layer.)
+
+- Is it possible that changing an option may require taking an
+  intermediate permission that is required neither before nor after
+  the reopen process?
+  Changing a child link comes to mind (like changing a child from one
+  BDS to another, where the visible data changes, which would mean we
+  may want to e.g. unshare CONSISTENT_READ during the reopen).
+  However:
+  1. It is unfeasible to unshare that for all child changes.
+     Effectively everything requires CONSISTENT_READ, and for good
+     reason.
+  2. Why would a user even change a BDS to something of a different
+     content?
+  3. Anything that currently allows you to change a child node assumes
+     that the user always changes it to something of the same content
+     (some take extra care to verify this, like mirror, which makes
+     sure that @replaces and the target are connected, and there are
+     only filter nodes in between).
+  Always using the same enforcing model as mirror does (no. 3 above)
+  does not really work, though, because one use case is to copy a
+  backing file offline to some different storage and then replace the
+  files via QMP.  To qemu, both files are completely unrelated.
+
+
+Block jobs, including blockdev-copy
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Example for use of the fleecing filter:
+- The real target is on slow storage.  Put an overlay on fast storage
+  on top of it.  Then use that overlay as the target of the fleecing
+  filter (and commit the data later or on the side), so that the
+  backup job does not slow down the guest.
+
+For a unified copy job, having a backup/fleecing filter is not a
+problem on the way.  One thing we definitely have to and can do is to
+copy common functionality into a shared file so that the different
+jobs can at least share that.
+
+COR/Stream:
+- There should be a way to discard ranges that have been copied into
+  the overlay from the backing files to save space
+- Also, the COR filter should integrated with the stream job (at some
+  point, as always)
+
+Hole punching with active commit:
+- Putting data into the target and punching holes in the overlays to
+  make it visible on the active disk may be reasonable for some, but
+  not for others -- it should be an option.  You want this if saving
+  space is important, but you may not want this if speed is more
+  important (depends on your backing chain length and other factors
+  then, but that=E2=80=99s your choice).
+
+- Another thing: If we don=E2=80=99t need to punch any holes because the
+  intermediate layers aren=E2=80=99t allocated anyway, we don=E2=80=99t n=
+eed to write
+  the data into the active disk either.  This can probably be done
+  indiscriminately, because the check for this does not concern the
+  protocol layer but only qemu-controlled metadata, so it should be
+  deterministically fast (want_zero=3Dfalse).
+
+
+qcow2
+=3D=3D=3D=3D=3D
+
+Recovering corrupt images:
+- Salvaging qemu-img convert would help (one that doesn=E2=80=99t abort
+  everything on encountering a single I/O error)
+- We may want to add an in-sync L1 table copy to recover from the
+  worst kinds of corruptions.  Checksumming would be a good idea
+  (then), too.
+  - Should we update the checksum every time?  If it=E2=80=99s just the s=
+um of
+    all L1 entry values, why not, doing the update is trivial then and
+    does not involve looking at any but the entries modified.
+
+Online check:
+- This would need to be a block job
+- The check function would probably need to be a proper coroutine
+  (that does not just lock everything)
+- Would be very complicated if you wanted it to work on R/W images.
+  It=E2=80=99s probably the best to focus on making this work for read-on=
+ly
+  images, because you can always just put a temporary snapshot over
+  the image for the time of the test and then commit it down after the
+  check is done.
+
+
+Bitmaps
+=3D=3D=3D=3D=3D=3D=3D
+
+(Got this section from sneaking into a BoF I wasn=E2=80=99t invited to.  =
+Oh
+well.  Won=E2=80=99t hurt to include them here.)
+
+Currently, when dirty bitmaps are loaded, all IN_USE bitmaps are just
+not loaded at all and completely ignored.  That isn=E2=80=99t correct, th=
+ough,
+they should either still be loaded (and automatically treated and
+written back as fully dirty), or at least qemu-img check should
+=E2=80=9Crepair=E2=80=9D them (i.e. fully dirtying them).
+
+Sometimes qemu (running in a mode as bare as possible) is better than
+using qemu-img convert, for instance.  It gives you more control
+(through QMP; you get e.g. better progress reporting), you get all of
+the mirror optimizations (we do have optimizations for convert, too,
+but whether it=E2=80=99s any good to write the same (or different?)
+optimizations twice is another question), and you get a common
+interface for everything (online and offline).
+Note that besides a bare qemu we=E2=80=99ve also always wanted to convert=
+ as
+many qemu-img operations into frontends for block jobs as possible.
+We have only done this for commit, however, even though convert looked
+like basically the ideal target.  It was just too hard with too little
+apparent gain, like always (and convert supports additional features
+like concatenation which we don=E2=80=99t have in the runtime block layer=
+
+yet).
+
+Someone (not that someone=E2=84=A2, but actually some specific someone) i=
+s
+about to make qemu-img info display the list of persistent bitmaps.
+Potential reviewers should be aware of the fact that this should be
+done bye adding that information to ImageInfoSpecificQCow2.
+
+Transacitonable bitmap primitives (e.g. copying a bitmap) would be
+nice so you can use them when creating a snapshot.  Then it=E2=80=99d be =
+up to
+the management layer to make use of them:
+- Do you want to continue using the very same bitmap?  Copy it then
+  (or move it, depending on what exactly you want to do and what
+  primitives there are)
+- Do you want to start with a new bitmap?  Then just create a new one
+  along with the overlay.
+
+
+Misc topics
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+SEEK_HOLE/SEEK_DATA:
+- According to Denis, the bugs left in SEEK_HOLE and fiemap are the
+  same now, but the former is slow when you seek over large ranges
+  (because we just want to know whether a certain portion is allocated
+  or not, but SEEK_HOLE/DATA actively seeks until the next hole/data
+  region and queries all metadata on that path, regardless whether we
+  even care anymore)
+  - Whether the bugs are the same depends on the version of Linux,
+    however, and there is no clear way to determine for qemu whether
+    fiemap is usable or not
+  - Making it a configure option would leave it to the user or
+    distribution, who should know for sure
+
+Multiqueue with multiple iothreads:
+- Kevin says Paolo says he=E2=80=99s working on it.  But there are some
+  prerequisites left, the main one apparently being that there is one
+  aio_poll() left that polls from the wrong context.  With that gone,
+  we can also probably drop AIO context altogether.
+
+Some things we want from a cache block driver:
+- An optional maximum resident memory size; in this case, the driver
+  needs to be backed by another node it uses for swapping
+- Should support taking a bitmap from the cached node, from which it
+  would then preload all dirty clusters
+
+
+--dDF7fHuWxqxI2tph7q5NJ5jKQHuxa4eRp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvorDwACgkQ9AfbAGHV
+z0AIJQf/ZnMazJ8sgZ45KIMNdJ2uwPa7yVGeCh875qriTryI8jBFgGVLlNZdbEUb
+XBTbItl+9sKdbWMrKn+bS5oCaBUsa/KK+qHC5m3EKnXPn1N1ftbCwnL+1atG+ynI
+y23Wo1Fsc14XhloJYlfXwom/iN0vDkoD2M51djgMd83HIEWXXVkARKAhjKbh2yJO
+hlT0j5iD7QMeEFhCr6PuKdYW1v5Qvpk1TKg22fXiUiHLMZHYQ8D4uwtB75chH2HJ
+PnC9ftak/+MFF6yIoS8i7hjBr1NIEW0Ph+5wvrJQnQ8MbNkZ+xCmZHJZsiYkbpE4
+9qaY0Ykio1WzlXYov6e9TEW8wFrmIg==
+=dhby
+-----END PGP SIGNATURE-----
+
+--dDF7fHuWxqxI2tph7q5NJ5jKQHuxa4eRp--
