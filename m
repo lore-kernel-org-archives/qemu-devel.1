@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gLdKw-0003jb-1j
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 19:10:47 -0500
+	(envelope-from <flukshun@gmail.com>) id 1gLdSm-0000qn-HA
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 19:18:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gLdKs-0000bI-U0
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 19:10:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50570)
+	(envelope-from <flukshun@gmail.com>) id 1gLdSj-0008UY-As
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 19:18:52 -0500
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:33244)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gLdKs-0000a0-7l
-	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 19:10:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gLdKq-0000W5-88
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 00:10:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2F0B12E80C7
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 00:10:40 +0000 (UTC)
-MIME-Version: 1.0
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gLdSf-0008TQ-VF
+	for qemu-devel@nongnu.org; Sat, 10 Nov 2018 19:18:46 -0500
+Received: by mail-ot1-x331.google.com with SMTP id q1so4989215otk.0
+	for <qemu-devel@nongnu.org>; Sat, 10 Nov 2018 16:18:44 -0800 (PST)
+Sender: fluxion <flukshun@gmail.com>
 Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 11 Nov 2018 00:01:16 -0000
-From: inactive <1802684@bugs.launchpad.net>
-Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
-Message-Id: <154189447653.25256.5795757936249052912.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <dc234347-1e4f-2139-bd00-26f049a007f0@amsat.org>
+References: <20181109160014.28646-1-mdroth@linux.vnet.ibm.com>
+	<dc234347-1e4f-2139-bd00-26f049a007f0@amsat.org>
+Message-ID: <154189551108.30771.11921228391873134084@sif>
+Date: Sat, 10 Nov 2018 18:18:31 -0600
+Subject: Re: [Qemu-devel] [PATCH] build: qga: add macro to force use of
+ native mingw32 assert()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,127 +31,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>
 
-I'll see if I have some time this weekend to dig into qemu Cocoa layer.
+Quoting Philippe Mathieu-Daud=C3=A9 (2018-11-10 13:34:25)
+> Hi Michael,
+> =
 
--- =
+> On 11/9/18 5:00 PM, Michael Roth wrote:
+> > When building qemu-ga for w32 with VSS support, some parts of qemu-ga
+> > are not linked against glib, specifically the C++ bits used to
+> > create the VSS provider DLL. With 3ebee3b191e, we now define assert()
+> > as g_assert() for all mingw32 builds via osdep.h, which results in the
+> > following build breakage:
+> > =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1802684
+> >   x86_64-w64-mingw32-g++ -o qga/vss-win32/qga-vss.dll qga/vss-win32/req=
+uester.o qga/vss-win32/provider.o qga/vss-win32/install.o /home/mdroth/w/qe=
+mu4.git/qga/vss-win32/qga-vss.def  -shared -Wl,--add-stdcall-alias,--enable=
+-stdcall-fixup -lole32 -loleaut32 -lshlwapi -luuid -static
+> >   qga/vss-win32/requester.o: In function `requester_freeze':
+> >   /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:284: undefined r=
+eference to `g_assertion_message_expr'
+> >   qga/vss-win32/requester.o: In function `requester_thaw':
+> >   /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:508: undefined r=
+eference to `g_assertion_message_expr'
+> >   /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:509: undefined r=
+eference to `g_assertion_message_expr'
+> >   collect2: error: ld returned 1 exit status
+> >   make: *** [/home/mdroth/w/qemu4.git/qga/vss-win32/Makefile.objs:10: q=
+ga/vss-win32/qga-vss.dll] Error 1
+> >   make: *** Waiting for unfinished jobs....
+> > =
 
-Title:
-  QEMU gui crashes on macOS Mojave
+> > Fix this by introducing a USE_NATIVE_MINGW32_ASSERT macro that can
+> > be defined prior to inclusion of osdep.h in individual C/C++ files
+> > that don't link against glib.
+> > =
 
-Status in QEMU:
-  New
+> > Cc: Richard Henderson <richard.henderson@linaro.org>
+> > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > ---
+> >  include/qemu/osdep.h        | 2 +-
+> >  qga/vss-win32/install.cpp   | 2 +-
+> >  qga/vss-win32/provider.cpp  | 2 +-
+> >  qga/vss-win32/requester.cpp | 2 +-
+> >  qga/vss-win32/vss-common.h  | 2 ++
+> >  5 files changed, 6 insertions(+), 4 deletions(-)
+> > =
 
-Bug description:
-  QEMU release 3.0.0 as well as a recent head build
+> > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> > index 3bf48bcdec..59364bfeb0 100644
+> > --- a/include/qemu/osdep.h
+> > +++ b/include/qemu/osdep.h
+> > @@ -129,7 +129,7 @@ extern int daemon(int, int);
+> >   * code that is unreachable when features are disabled.
+> >   * All supported versions of Glib's g_assert() satisfy this requiremen=
+t.
+> >   */
+> > -#ifdef __MINGW32__
+> > +#if defined(__MINGW32__) && !defined(USE_NATIVE_MINGW32_ASSERT)
+> >  #undef assert
+> >  #define assert(x)  g_assert(x)
+> >  #endif
+> =
 
-  /usr/local/Cellar/qemu/HEAD-03c1ca1 (147 files, 257.2MB)
-    Built from source on 2018-11-06 at 13:41:32 with: --with-gtk+3 --with-s=
-dl2 --with-libusb
-  /usr/local/Cellar/qemu/3.0.0 (137 files, 261.6MB) *
-    Poured from bottle on 2018-11-10 at 22:58:32 with: --with-gtk+3 --with-=
-libusb --with-sdl2
+> OK.
+> =
 
-  Crashes when attempting to use any gui interface (tried SDL and
-  default Cocoa):
+> > diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
+> > index 6713e58670..6ed2d5930c 100644
+> > --- a/qga/vss-win32/install.cpp
+> > +++ b/qga/vss-win32/install.cpp
+> > @@ -10,9 +10,9 @@
+> >   * See the COPYING file in the top-level directory.
+> >   */
+> >  =
 
-  2018-11-10 22:58:41.799 qemu-system-aarch64[42982:1102466] *** Terminatin=
-g app due to uncaught exception 'NSInternalInconsistencyException', reason:=
- 'NSWindow drag regions should only be invalidated on the Main Thread!'
-  *** First throw call stack:
-  (
-  	0   CoreFoundation                      0x00007fff3ea96ecd __exceptionPr=
-eprocess + 256
-  	1   libobjc.A.dylib                     0x00007fff6ab49720 objc_exceptio=
-n_throw + 48
-  	2   CoreFoundation                      0x00007fff3eab095d -[NSException=
- raise] + 9
-  	3   AppKit                              0x00007fff3bfb13fa -[NSWindow(NS=
-Window_Theme) _postWindowNeedsToResetDragMarginsUnlessPostingDisabled] + 324
-  	4   AppKit                              0x00007fff3bfb6850 -[NSView setF=
-rameSize:] + 2082
-  	5   AppKit                              0x00007fff3c02747d -[NSVisualEff=
-ectView setFrameSize:] + 171
-  	6   AppKit                              0x00007fff3c0811b1 -[NSTitlebarV=
-iew setFrameSize:] + 84
-  	7   AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	8   AppKit                              0x00007fff3c081154 -[NSTitlebarV=
-iew resizeWithOldSuperviewSize:] + 100
-  	9   AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	10  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	11  AppKit                              0x00007fff3c9773c0 -[NSTitlebarC=
-ontainerView setFrameSize:] + 142
-  	12  AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	13  AppKit                              0x00007fff3bfbcdb5 -[NSView resi=
-zeWithOldSuperviewSize:] + 776
-  	14  AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	15  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	16  AppKit                              0x00007fff3c024570 -[NSThemeFram=
-e setFrameSize:] + 495
-  	17  AppKit                              0x00007fff3c011223 -[NSWindow _s=
-etFrame:updateBorderViewSize:] + 966
-  	18  AppKit                              0x00007fff3c010b46 -[NSWindow _o=
-ldPlaceWindow:] + 547
-  	19  AppKit                              0x00007fff3c010151 -[NSWindow _s=
-etFrameCommon:display:stashSize:] + 3006
-  	20  AppKit                              0x00007fff3c00f57d -[NSWindow _s=
-etFrame:display:allowImplicitAnimation:stashSize:] + 192
-  	21  AppKit                              0x00007fff3c019ff8 -[NSWindow se=
-tFrame:display:animate:] + 567
-  	22  qemu-system-aarch64                 0x000000010b7b2abf qemu-system-a=
-arch64 + 3668671
-  	23  qemu-system-aarch64                 0x000000010b7b6356 qemu-system-a=
-arch64 + 3683158
-  	24  qemu-system-aarch64                 0x000000010b7ad836 qemu-system-a=
-arch64 + 3647542
-  	25  qemu-system-aarch64                 0x000000010b4ce769 qemu-system-a=
-arch64 + 636777
-  	26  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	27  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	28  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	29  qemu-system-aarch64                 0x000000010b4414aa qemu-system-a=
-arch64 + 58538
-  	30  qemu-system-aarch64                 0x000000010b4f78c3 qemu-system-a=
-arch64 + 805059
-  	31  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	32  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	33  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	34  qemu-system-aarch64                 0x000000010b4b8f57 qemu-system-a=
-arch64 + 548695
-  	35  qemu-system-aarch64                 0x000000010b49c3af qemu-system-a=
-arch64 + 431023
-  	36  ???                                 0x00000001117891f3 0x0 + 4588081=
-651
-  )
-  libc++abi.dylib: terminating with uncaught exception of type NSException
-  fish: 'qemu-system-aarch64 -M raspi3 -=E2=80=A6' terminated by signal SIG=
-ABRT (Abort)
+> > +#include "vss-common.h"
+> >  #include "qemu/osdep.h"
+> =
 
-  =
+> I don't like breaking the rule and not using "qemu/osdep.h" first.
+> (See below for suggestion).
 
-  macOS Mojave 10.14.2 Beta (18C38b)
-  Qemu in the same configuration used to work in High Sierra, started crash=
-ing only after upgrade to Mojave.
+Yah, if it can be easily avoided that's probably the better route.
 
-  Command line:
-  `qemu-system-aarch64 -M raspi3 -d in_asm -serial stdio -kernel $1.bin`
+> =
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1802684/+subscriptions
+> >  =
+
+> > -#include "vss-common.h"
+> >  #include <inc/win2003/vscoordint.h>
+> >  #include "install.h"
+> >  #include <wbemidl.h>
+> > diff --git a/qga/vss-win32/provider.cpp b/qga/vss-win32/provider.cpp
+> > index 72d8b0e19d..d298af91b2 100644
+> > --- a/qga/vss-win32/provider.cpp
+> > +++ b/qga/vss-win32/provider.cpp
+> > @@ -10,8 +10,8 @@
+> >   * See the COPYING file in the top-level directory.
+> >   */
+> >  =
+
+> > -#include "qemu/osdep.h"
+> >  #include "vss-common.h"
+> > +#include "qemu/osdep.h"
+> =
+
+> Ditto.
+> =
+
+> >  #include <inc/win2003/vscoordint.h>
+> >  #include <inc/win2003/vsprov.h>
+> >  =
+
+> > diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
+> > index 5378c55d23..d239bd9598 100644
+> > --- a/qga/vss-win32/requester.cpp
+> > +++ b/qga/vss-win32/requester.cpp
+> > @@ -10,8 +10,8 @@
+> >   * See the COPYING file in the top-level directory.
+> >   */
+> >  =
+
+> > -#include "qemu/osdep.h"
+> >  #include "vss-common.h"
+> > +#include "qemu/osdep.h"
+> =
+
+> Ditto.
+> =
+
+> >  #include "requester.h"
+> >  #include "install.h"
+> >  #include <inc/win2003/vswriter.h>
+> > diff --git a/qga/vss-win32/vss-common.h b/qga/vss-win32/vss-common.h
+> > index 61c170b52e..275cbb59c5 100644
+> > --- a/qga/vss-win32/vss-common.h
+> > +++ b/qga/vss-win32/vss-common.h
+> > @@ -13,6 +13,8 @@
+> >  #ifndef VSS_COMMON_H
+> >  #define VSS_COMMON_H
+> >  =
+
+> > +#define USE_NATIVE_MINGW32_ASSERT
+> =
+
+> I believe you can add this in the "VSS SDK" section of the ./configure
+> script:
+> =
+
+> -- >8 --
+> diff --git a/configure b/configure
+> @@ -4588,7 +4588,7 @@ int main(void) { return VSS_CTX_BACKUP; }
+>  EOF
+>    if compile_prog "$vss_win32_include" "" ; then
+>      guest_agent_with_vss=3D"yes"
+> -    QEMU_CFLAGS=3D"$QEMU_CFLAGS $vss_win32_include"
+> +    QEMU_CFLAGS=3D"$QEMU_CFLAGS -DUSE_NATIVE_MINGW32_ASSERT
+> $vss_win32_include"
+>      libs_qga=3D"-lole32 -loleaut32 -lshlwapi -lstdc++
+> -Wl,--enable-stdcall-fixup $libs_qga"
+>      qga_vss_provider=3D"qga/vss-win32/qga-vss.dll qga/vss-win32/qga-vss.=
+tlb"
+>    else
+> ---
+> =
+
+> What do you think?
+
+This may pass it on to the qemu build itself, but something similar for
+just the VSS DLL target might do the trick. I'll give that a shot,
+thanks.
+
+> =
+
+> Regards,
+> =
+
+> Phil.
+> =
+
+> > +
+> >  #define __MIDL_user_allocate_free_DEFINED__
+> >  #include <windows.h>
+> >  #include <shlwapi.h>
+> > =
+
+>=20
