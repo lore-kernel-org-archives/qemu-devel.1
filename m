@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gLoLC-00017V-Fx
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 06:55:47 -0500
+	(envelope-from <bounces@canonical.com>) id 1gLoZq-00014U-PY
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 07:10:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gLoL9-0001w9-DH
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 06:55:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42622)
+	(envelope-from <bounces@canonical.com>) id 1gLoZn-0005ox-E2
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 07:10:54 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43198)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gLoL9-0001sC-1n
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 06:55:43 -0500
+	id 1gLoZn-0005kl-5i
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 07:10:51 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gLoL0-0000Gd-5I
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 11:55:34 +0000
+	id 1gLoZf-000110-ND
+	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 12:10:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0320A2E80CC
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 11:55:34 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9F6A82E8047
+	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 12:10:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 11 Nov 2018 11:46:08 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 11 Nov 2018 12:00:32 -0000
+From: inactive <1802684@bugs.launchpad.net>
 Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
-Message-Id: <154193676904.2485.3644811663284969128.malone@soybean.canonical.com>
+Message-Id: <154193763260.25168.1523239305926253506.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
 List-Id: <qemu-devel.nongnu.org>
@@ -38,29 +38,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The code for the cocoa stuff is in ui/cocoa.m. Quick notes on structure:
+I made DisplayChangeListener callbacks dispatch updates to the main
+thread and it stopped crashing. However, pure Cocoa UI seems non-
+functional - I can't focus the window, I don't see any application
+menus, and the fb does not update.
 
- * there is a weird thing where cocoa.m provides its own main(), and arrang=
-es that the function which is main() for every other UI is renamed qemu_mai=
-n() and called later (I'd like to get rid of that one day if we could, it's=
- just weird)
- * cocoa_display_init() is the "initialize the display" entry point -- this=
- will always be called from on the main thread (strictly, from whichever th=
-read OSX calls our applicationDidFinishLaunching callback on, but I assume =
-that's the main thread)
- * the runtime entry points into the cocoa UI code are just the functions i=
-n the DisplayChangeListener struct: cocoa_update(), cocoa_switch() and coco=
-a_refresh()
+I'm looking at making SDL code thread-safe the same way - because it
+also calls into Cocoa, and crashes in the same way.
 
-Arranging for the last 3 to schedule their operation onto the main
-thread is probably what's needed. Things I don't know:
-
- * should this "run thing on main thread" be synchronous or asynchronous? (=
-sync is probably safest)
- * what's the right OSX API to do this?
- * how can we most cleanly do this in a way that still works on OSX 10.6 (t=
-he oldest we currently support)? (I suspect we'll need ifdefs and fall back=
- to "just run on this thread" on older versions)
+What is the process for submitting PRs to qemu? I'm used to github but I
+see you use your own git hosting.
 
 -- =
 
