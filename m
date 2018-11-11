@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gLrDO-0003n2-Av
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 09:59:56 -0500
+	(envelope-from <nsoffer@redhat.com>) id 1gLrci-0002Oa-4l
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 10:26:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gLrDL-0002CZ-1d
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 09:59:54 -0500
-Received: from mail-it1-x12e.google.com ([2607:f8b0:4864:20::12e]:37317)
+	(envelope-from <nsoffer@redhat.com>) id 1gLrcd-0002Af-4h
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 10:26:04 -0500
+Received: from mail-ua1-f42.google.com ([209.85.222.42]:46078)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1gLrDK-000268-BF
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 09:59:50 -0500
-Received: by mail-it1-x12e.google.com with SMTP id j79-v6so9836703itb.2
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 06:59:42 -0800 (PST)
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Sun, 11 Nov 2018 09:59:38 -0500
-References: <mailman.21086.1541937348.1283.qemu-devel@nongnu.org>
-In-Reply-To: <mailman.21086.1541937348.1283.qemu-devel@nongnu.org>
-Message-Id: <EF302223-2690-4FC2-9B05-23802B0320A3@gmail.com>
-Subject: Re: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1gLrcZ-00020J-LS
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 10:25:57 -0500
+Received: by mail-ua1-f42.google.com with SMTP id e16so1015643uam.12
+	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 07:25:33 -0800 (PST)
+MIME-Version: 1.0
+References: <20181107121319.GC14842@redhat.com>
+	<d797ae29-97ba-9c18-68ec-a2943bdf7728@redhat.com>
+In-Reply-To: <d797ae29-97ba-9c18-68ec-a2943bdf7728@redhat.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Sun, 11 Nov 2018 17:25:21 +0200
+Message-ID: <CAMRbyyuQSyq=Tg-o-k8BhpwHUPuwHLBL2Pa=5VOcUmx5xNywog@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Change in qemu 2.12 causes qemu-img convert to NBD
+ to write more data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, edgar.kaziakhmedov@virtuozzo.com
 
+On Wed, Nov 7, 2018 at 6:42 PM Eric Blake <eblake@redhat.com> wrote:
 
-> On Nov 11, 2018, at 6:55 AM, qemu-devel-request@nongnu.org wrote:
->=20
-> The code for the cocoa stuff is in ui/cocoa.m. Quick notes on =
-structure:
->=20
-> * there is a weird thing where cocoa.m provides its own main(), and =
-arranges that the function which is main() for every other UI is renamed =
-qemu_main() and called later (I'd like to get rid of that one day if we =
-could, it's just weird)
-> * cocoa_display_init() is the "initialize the display" entry point -- =
-this will always be called from on the main thread (strictly, from =
-whichever thread OSX calls our applicationDidFinishLaunching callback =
-on, but I assume that's the main thread)
-> * the runtime entry points into the cocoa UI code are just the =
-functions in the DisplayChangeListener struct: cocoa_update(), =
-cocoa_switch() and cocoa_refresh()
->=20
-> Arranging for the last 3 to schedule their operation onto the main
-> thread is probably what's needed. Things I don't know:
->=20
-> * should this "run thing on main thread" be synchronous or =
-asynchronous? (sync is probably safest)
-synchronous sounds good.=20
+> On 11/7/18 6:13 AM, Richard W.M. Jones wrote:
+> > (I'm not going to claim this is a bug, but it causes a large, easily
+> > measurable performance regression in virt-v2v).
+>
+> I haven't closely looked at at this email thread yet, but a quick first
+> impression:
+>
+>
+> > In qemu 2.12 this behaviour changed:
+> >
+> >    $ nbdkit --filter=log memory size=6G logfile=/tmp/log \
+> >        --run './qemu-img convert ./fedora-28.img -n $nbd'
+> >    $ grep '\.\.\.$' /tmp/log | sed 's/.*\([A-Z][a-z]*\).*/\1/' | uniq -c
+> >        193 Zero
+> >       1246 Write
+> >
+> > It now zeroes the whole disk up front and then writes data over the
+> > top of the zeroed blocks.
+> >
+> > The reason for the performance regression is that in the first case we
+> > write 6G in total.  In the second case we write 6G of zeroes up front,
+> > followed by the amount of data in the disk image (in this case the
+> > test disk image contains 1G of non-sparse data, so we write about 7G
+> > in total).
+>
+> There was talk on the NBD list a while ago about the idea of letting the
+> server advertise to the client when the image is known to start in an
+> all-zero state, so that the client doesn't have to waste time writing
+> zeroes (or relying on repeated NBD_CMD_BLOCK_STATUS calls to learn the
+> same).  This may be justification for reviving that topic.
+>
 
-> * what's the right OSX API to do this?
-=
-https://developer.apple.com/documentation/objectivec/nsobject/1414900-perf=
-ormselectoronmainthread?language=3Dobjc
+This is a good idea in general, since in some cases we know that
+a volume is already zeroed (e.g. new file on NFS/Gluster storage). But with
+block storage, we typically don't have any guarantee about storage content,
+and qemu need to zero or write the entire device, so this does not solve the
+issue discussed in this thread.
 
-> * how can we most cleanly do this in a way that still works on OSX =
-10.6 (the oldest we currently support)? (I suspect we'll need ifdefs and =
-fall back to "just run on this thread" on older versions)
-
-I would make another function called switchSurfaceInternal: and then =
-move all the code from switchSurface: to this new function. Then have =
-the switchSurface: method call the switchSurfaceInternal: method by =
-using [performSelectorOnMainThread:withObject:waitUntilDone:].=20
-
-The call would look like this:=20
-[self performSelectorOnMainThread: @selector(switchSurface:) withObject: =
-surface waitUntilDone: YES]
-
-I'm not sure if waitUntilDone should be set to YES. QEMU might work =
-faster if it is set to NO.=20
-
-Thank you.=
+Nir
