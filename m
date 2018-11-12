@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gMCDx-00030c-C1
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:25:54 -0500
+	(envelope-from <noirfate@gmail.com>) id 1gM7aT-0000tU-SH
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 03:28:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gMCDs-00065l-12
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:25:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42544)
+	(envelope-from <noirfate@gmail.com>) id 1gM7aQ-0002LI-9m
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 03:28:49 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:35599)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gMCDq-0005z8-07
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:25:47 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gMCDg-0004wF-2O
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 13:25:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F261C2E80CB
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 13:25:35 +0000 (UTC)
+	(Exim 4.71) (envelope-from <noirfate@gmail.com>) id 1gM7aO-0002Hy-Di
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 03:28:45 -0500
+Received: by mail-pl1-x643.google.com with SMTP id n4-v6so3990025plp.2
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 00:28:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 12 Nov 2018 13:17:14 -0000
-From: Chen Zhang <1802915@bugs.launchpad.net>
-Reply-To: Bug 1802915 <1802915@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154202828346.10437.1411488850787353605.malonedeb@wampee.canonical.com>
-Message-Id: <154202863465.2665.5183903606856524753.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1802915] Re: GTK display refresh rate is throttled
+References: <154155007870.439125.16160474206652257208.stgit@bahia.lan>
+In-Reply-To: <154155007870.439125.16160474206652257208.stgit@bahia.lan>
+From: zhibin hu <noirfate@gmail.com>
+Date: Mon, 12 Nov 2018 16:28:28 +0800
+Message-ID: <CACcO5F4FBW9QiaTA1w61z5pwt6Z3F1n73=rL4Af=6-K5zq0-EQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] 9p: write lock path in v9fs_co_open2()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +27,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: groug@kaod.org
+Cc: qemu-devel@nongnu.org, prasad@redhat.com
 
-Slow motion clips for host/guest were uploaded as attachments.
+hi,
 
-** Attachment added: "slow motion for host os"
-   https://bugs.launchpad.net/qemu/+bug/1802915/+attachment/5211843/+files/=
-host.mov
+i use this patch with qemu 3.0.0 and it seems not fix completely.
 
--- =
+[root@localhost ~]# ./qemu-system-x86_64 -snapshot -m 1024 -smp 2
+-enable-kvm -net nic,model=e1000 -net
+tap,helper=/usr/libexec/qemu-bridge-helper -hda
+/var/lib/libvirt/images/test.qcow2 -fsdev
+local,id=test_dev,path=/tmp,security_model=none -device
+virtio-9p-pci,fsdev=test_dev,mount_tag=test_mount -vnc 0.0.0.0:1
+==5014==WARNING: ASan doesn't fully support makecontext/swapcontext
+functions and may produce false positives in some cases!
+=================================================================
+==5014==ERROR: AddressSanitizer: heap-use-after-free on address
+0x60200014fc50 at pc 0x7f90c908697d bp 0x7f9053444970 sp 0x7f9053444118
+READ of size 2 at 0x60200014fc50 thread T17
+    #0 0x7f90c908697c  (/lib64/libasan.so.5+0x9997c)
+    #1 0x7f90c8452693 in g_path_get_basename
+(/lib64/libglib-2.0.so.0+0x39693)
+    #2 0x559c1b78eb56 in local_lstat hw/9pfs/9p-local.c:182
+    #3 0x559c1b799628 in v9fs_co_lstat hw/9pfs/cofile.c:53
+    #4 0x559c1b777ee1 in fid_to_qid hw/9pfs/9p.c:598
+    #5 0x559c1b77aeae in v9fs_attach hw/9pfs/9p.c:1017
+    #6 0x559c1c145976 in coroutine_trampoline util/coroutine-ucontext.c:116
+    #7 0x7f90bd6855ff in __correctly_grouped_prefixwc
+(/lib64/libc.so.6+0x4c5ff)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1802915
+0x60200014fc50 is located 0 bytes inside of 2-byte region
+[0x60200014fc50,0x60200014fc52)
+freed by thread T0 here:
+    #0 0x7f90c90db880 in __interceptor_free (/lib64/libasan.so.5+0xee880)
+    #1 0x7f90c846b4d1 in g_free (/lib64/libglib-2.0.so.0+0x524d1)
+    #2 0x559c1b775ce4 in v9fs_path_copy hw/9pfs/9p.c:195
+    #3 0x559c1b78425d in v9fs_create hw/9pfs/9p.c:2297
+    #4 0x559c1c145976 in coroutine_trampoline util/coroutine-ucontext.c:116
+    #5 0x7f90bd6855ff in __correctly_grouped_prefixwc
+(/lib64/libc.so.6+0x4c5ff)
 
-Title:
-  GTK display refresh rate is throttled
+previously allocated by thread T4 here:
+    #0 0x7f90c90dbc48 in malloc (/lib64/libasan.so.5+0xeec48)
+    #1 0x7f90bd743c37 in __GI___vasprintf_chk (/lib64/libc.so.6+0x10ac37)
 
-Status in QEMU:
-  New
+Thread T17 created by T16 here:
+    #0 0x7f90c9038443 in pthread_create (/lib64/libasan.so.5+0x4b443)
+    #1 0x559c1c10461e in qemu_thread_create util/qemu-thread-posix.c:534
+    #2 0x559c1c0f2be4 in do_spawn_thread util/thread-pool.c:135
+    #3 0x559c1c0f2498 in worker_thread util/thread-pool.c:83
+    #4 0x559c1c1043e0 in qemu_thread_start util/qemu-thread-posix.c:504
+    #5 0x7f90bd9ff593 in start_thread (/lib64/libpthread.so.0+0x7593)
 
-Bug description:
-  Guest OS running with GL enabled GTK display shows a reduced refresh
-  rate, e.g. moving cursor around with iGVT-g DMA Buf.
+Thread T16 created by T0 here:
+    #0 0x7f90c9038443 in pthread_create (/lib64/libasan.so.5+0x4b443)
+    #1 0x559c1c10461e in qemu_thread_create util/qemu-thread-posix.c:534
+    #2 0x559c1c0f2be4 in do_spawn_thread util/thread-pool.c:135
+    #3 0x559c1c0f2c73 in spawn_thread_bh_fn util/thread-pool.c:143
+    #4 0x559c1c0ef4d0 in aio_bh_call util/async.c:90
+    #5 0x559c1c0ef787 in aio_bh_poll util/async.c:118
+    #6 0x559c1c0fb5bd in aio_dispatch util/aio-posix.c:436
+    #7 0x559c1c0f026f in aio_ctx_dispatch util/async.c:261
+    #8 0x7f90c84658ac in g_main_context_dispatch
+(/lib64/libglib-2.0.so.0+0x4c8ac)
 
-  It seems that a default refresh interval GUI_REFRESH_INTERVAL_DEFAULT
-  (30ms) is defined in include/ui/console.h, throttling the display
-  refresh rate at 33Hz.
+Thread T4 created by T0 here:
+    #0 0x7f90c9038443 in pthread_create (/lib64/libasan.so.5+0x4b443)
+    #1 0x559c1c10461e in qemu_thread_create util/qemu-thread-posix.c:534
+    #2 0x559c1b2e7258 in qemu_kvm_start_vcpu /root/qemu-3.0.0/cpus.c:1935
+    #3 0x559c1b2e7a0b in qemu_init_vcpu /root/qemu-3.0.0/cpus.c:2001
+    #4 0x559c1b583f0c in x86_cpu_realizefn
+/root/qemu-3.0.0/target/i386/cpu.c:4996
+    #5 0x559c1b87f1e8 in device_set_realized hw/core/qdev.c:826
+    #6 0x559c1bde6e62 in property_set_bool qom/object.c:1984
+    #7 0x559c1bde2b0e in object_property_set qom/object.c:1176
+    #8 0x559c1bde9b00 in object_property_set_qobject qom/qom-qobject.c:27
+    #9 0x559c1bde2e2b in object_property_set_bool qom/object.c:1242
+    #10 0x559c1b4f2452 in pc_new_cpu /root/qemu-3.0.0/hw/i386/pc.c:1107
+    #11 0x559c1b4f2993 in pc_cpus_init /root/qemu-3.0.0/hw/i386/pc.c:1155
+    #12 0x559c1b4fc9cb in pc_init1 /root/qemu-3.0.0/hw/i386/pc_piix.c:153
+    #13 0x559c1b4fe81d in pc_init_v3_0
+/root/qemu-3.0.0/hw/i386/pc_piix.c:438
+    #14 0x559c1b890f29 in machine_run_board_init hw/core/machine.c:830
+    #15 0x559c1b6d246e in main /root/qemu-3.0.0/vl.c:4516
+    #16 0x7f90bd65c11a in __libc_start_main (/lib64/libc.so.6+0x2311a)
 
-  To correct this throttle issue, a shorter interval should be applied
-  to display change listener or the default value should be used.
+SUMMARY: AddressSanitizer: heap-use-after-free
+(/lib64/libasan.so.5+0x9997c)
+Shadow bytes around the buggy address:
+  0x0c0480021f30: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c0480021f40: fa fa fd fa fa fa fd fd fa fa fa fa fa fa fa fa
+  0x0c0480021f50: fa fa fa fa fa fa fa fa fa fa fd fa fa fa fd fd
+  0x0c0480021f60: fa fa fd fa fa fa fa fa fa fa fd fa fa fa fa fa
+  0x0c0480021f70: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fd fa
+=>0x0c0480021f80: fa fa fa fa fa fa fd fa fa fa[fd]fa fa fa fd fa
+  0x0c0480021f90: fa fa fd fd fa fa fd fa fa fa fa fa fa fa fd fa
+  0x0c0480021fa0: fa fa fd fa fa fa fd fa fa fa fd fa fa fa fa fa
+  0x0c0480021fb0: fa fa fd fa fa fa fa fa fa fa fa fa fa fa fd fd
+  0x0c0480021fc0: fa fa fd fa fa fa fa fa fa fa fa fa fa fa fd fa
+  0x0c0480021fd0: fa fa fd fa fa fa fd fa fa fa fa fa fa fa fd fa
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==5014==ABORTING
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1802915/+subscriptions
+thanks.
+
+On Wed, Nov 7, 2018 at 8:21 AM Greg Kurz <groug@kaod.org> wrote:
+
+> The assumption that the fid cannot be used by any other operation is
+> wrong. At least, nothing prevents a misbehaving client to create a
+> file with a given fid, and to pass this fid to some other operation
+> at the same time (ie, without waiting for the response to the creation
+> request). The call to v9fs_path_copy() performed by the worker thread
+> after the file was created can race with any access to the fid path
+> performed by some other thread. This causes use-after-free issues that
+> can be detected by ASAN with a custom 9p client.
+>
+> Unlike other operations that only read the fid path, v9fs_co_open2()
+> does modify it. It should hence take the write lock.
+>
+> Cc: P J P <ppandit@redhat.com>
+> Reported-by: zhibin hu <noirfate@gmail.com>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/9pfs/cofile.c |    6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/9pfs/cofile.c b/hw/9pfs/cofile.c
+> index 88791bc327ac..9c22837cda32 100644
+> --- a/hw/9pfs/cofile.c
+> +++ b/hw/9pfs/cofile.c
+> @@ -140,10 +140,10 @@ int coroutine_fn v9fs_co_open2(V9fsPDU *pdu,
+> V9fsFidState *fidp,
+>      cred.fc_gid = gid;
+>      /*
+>       * Hold the directory fid lock so that directory path name
+> -     * don't change. Read lock is fine because this fid cannot
+> -     * be used by any other operation.
+> +     * don't change. Take the write lock to be sure this fid
+> +     * cannot be used by another operation.
+>       */
+> -    v9fs_path_read_lock(s);
+> +    v9fs_path_write_lock(s);
+>      v9fs_co_run_in_worker(
+>          {
+>              err = s->ops->open2(&s->ctx, &fidp->path,
+>
+>
