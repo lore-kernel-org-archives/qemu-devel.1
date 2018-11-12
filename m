@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gM2mO-0002Ah-7h
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:20:49 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gM2mO-0002Ac-4f
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:20:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gM2mN-0003En-Dz
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gM2mN-0003ER-Aj
 	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:20:48 -0500
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Mon, 12 Nov 2018 19:42:20 +0800
-Message-Id: <1542022940-46849-7-git-send-email-peng.hao2@zte.com.cn>
+Date: Mon, 12 Nov 2018 19:42:19 +0800
+Message-Id: <1542022940-46849-6-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1542022940-46849-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1542022940-46849-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V6 6/6]  pvpanic : update pvpanic document
+Subject: [Qemu-devel] [PATCH V6 5/6] hw/arm/virt: add pvpanic device in virt
+ acpi table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,50 +23,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-Add mmio support info in docs/specs/pvpanic.txt.
+add pvpanic device in virt acpi table, so when kenrel command line uses
+acpi=force, kernel can get info from acpi table in aarch64.
 
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- docs/specs/pvpanic.txt | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ hw/arm/virt-acpi-build.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/docs/specs/pvpanic.txt b/docs/specs/pvpanic.txt
-index c7bbacc..5d8e9dc 100644
---- a/docs/specs/pvpanic.txt
-+++ b/docs/specs/pvpanic.txt
-@@ -1,7 +1,7 @@
- PVPANIC DEVICE
- ==============
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 5785fb6..d126cee 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -61,6 +61,21 @@ static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
+     }
+ }
  
--pvpanic device is a simulated ISA device, through which a guest panic
-+pvpanic device is a simulated device, through which a guest panic
- event is sent to qemu, and a QMP event is generated. This allows
- management apps (e.g. libvirt) to be notified and respond to the event.
- 
-@@ -9,6 +9,10 @@ The management app has the option of waiting for GUEST_PANICKED events,
- and/or polling for guest-panicked RunState, to learn when the pvpanic
- device has fired a panic event.
- 
-+When pvpanic device is implemented as a ISA device, it supports IOPORT 
-+mode. If pvpanic device supports MMIO mode, it will be implemented as
-+a SYSBUS device.
++static void acpi_dsdt_add_pvpanic(Aml *scope, const MemMapEntry *pvpanic_memmap)
++{
++    Aml *dev = aml_device("PANC");
++    aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0001")));
++    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
 +
- ISA Interface
- -------------
- 
-@@ -19,6 +23,13 @@ Software should set only bits both itself and the device recognize.
- Currently, only bit 0 is recognized, setting it indicates a guest panic
- has happened.
- 
-+SYSBUS Interface
-+--------------
++    Aml *crs = aml_resource_template();
++    aml_append(crs, aml_memory32_fixed(pvpanic_memmap->base,
++                                       pvpanic_memmap->size, AML_READ_WRITE));
 +
-+It is basically the same as ISA interface except that it uses MMIO. Pvpanic exposes
-+a address space region 0x09060000--0x09060001 in arm virt machine.
-+Currently only the first byte is used. 
++    aml_append(dev, aml_name_decl("_CRS", crs));
 +
- ACPI Interface
- --------------
- 
++    aml_append(scope, dev);
++}
++
+ static void acpi_dsdt_add_uart(Aml *scope, const MemMapEntry *uart_memmap,
+                                            uint32_t uart_irq)
+ {
+@@ -770,6 +785,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     acpi_dsdt_add_cpus(scope, vms->smp_cpus);
+     acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
+                        (irqmap[VIRT_UART] + ARM_SPI_BASE));
++    acpi_dsdt_add_pvpanic(scope, &memmap[VIRT_PVPANIC]);
+     acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
+     acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
+     acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
 -- 
 1.8.3.1
