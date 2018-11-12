@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gM2lu-0001ur-8t
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:20:19 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gM2mO-0002Ah-7h
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:20:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gM2lr-0001ee-7q
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:20:18 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gM2mN-0003En-Dz
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:20:48 -0500
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Mon, 12 Nov 2018 19:42:17 +0800
-Message-Id: <1542022940-46849-4-git-send-email-peng.hao2@zte.com.cn>
+Date: Mon, 12 Nov 2018 19:42:20 +0800
+Message-Id: <1542022940-46849-7-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1542022940-46849-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1542022940-46849-1-git-send-email-peng.hao2@zte.com.cn>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH V6 3/6] hw/misc/pvpanic: Add the MMIO interface
+Subject: [Qemu-devel] [PATCH V6 6/6]  pvpanic : update pvpanic document
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,194 +22,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-Add pvpanic new type "TYPE=5FPVPANIC=5FMMIO"
+Add mmio support info in docs/specs/pvpanic.txt.
 
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/misc/pvpanic.c         | 81 +++++++++++++++++++++++++++++++++++++------=
-----
- include/hw/misc/pvpanic.h |  1 +
- 2 files changed, 65 insertions(+), 17 deletions(-)
+ docs/specs/pvpanic.txt | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
-index dd3aef2..5d0fbc6 100644
---- a/hw/misc/pvpanic.c
-+++ b/hw/misc/pvpanic.c
-@@ -2,10 +2,12 @@
-  * QEMU simulated pvpanic device.
-  *
-  * Copyright Fujitsu, Corp. 2013
-+ * Copyright (c) 2018 ZTE Ltd.
-  *
-  * Authors:
-  *     Wen Congyang <wency@cn.fujitsu.com>
-  *     Hu Tao <hutao@cn.fujitsu.com>
-+ *     Peng Hao <peng.hao2@zte.com.cn>
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-  * See the COPYING file in the top-level directory.
-@@ -25,9 +27,6 @@
- /* The pv event value */
- #define PVPANIC=5FPANICKED        (1 << PVPANIC=5FF=5FPANICKED)
-=20
--#define PVPANIC(obj)    \
--    OBJECT=5FCHECK(PVPanicState, (obj), TYPE=5FPVPANIC)
--
- static void handle=5Fevent(int event)
- {
-     static bool logged;
-@@ -45,30 +44,50 @@ static void handle=5Fevent(int event)
-=20
- #include "hw/isa/isa.h"
-=20
--typedef struct PVPanicState {
--    /* private */
--    ISADevice isadev;
-+/* PVPanicISAState for ISA device and
-+ * use ioport.
-+ */
-+typedef struct PVPanicISAState {
-+     /* private */
-+     ISADevice isadev;
-+     uint16=5Ft ioport;
-=20
-     /* public */
-     MemoryRegion mr;
--    uint16=5Ft ioport;
--} PVPanicState;
-+} PVPanicISAState;
+diff --git a/docs/specs/pvpanic.txt b/docs/specs/pvpanic.txt
+index c7bbacc..5d8e9dc 100644
+--- a/docs/specs/pvpanic.txt
++++ b/docs/specs/pvpanic.txt
+@@ -1,7 +1,7 @@
+ PVPANIC DEVICE
+ ==============
+ 
+-pvpanic device is a simulated ISA device, through which a guest panic
++pvpanic device is a simulated device, through which a guest panic
+ event is sent to qemu, and a QMP event is generated. This allows
+ management apps (e.g. libvirt) to be notified and respond to the event.
+ 
+@@ -9,6 +9,10 @@ The management app has the option of waiting for GUEST_PANICKED events,
+ and/or polling for guest-panicked RunState, to learn when the pvpanic
+ device has fired a panic event.
+ 
++When pvpanic device is implemented as a ISA device, it supports IOPORT 
++mode. If pvpanic device supports MMIO mode, it will be implemented as
++a SYSBUS device.
 +
-+/* PVPanicMMIOState for sysbus device and
-+ * use mmio.
-+ */
-+typedef struct PVPanicMMIOState {
-+    /* private */
-+    SysBusDevice busdev;
+ ISA Interface
+ -------------
+ 
+@@ -19,6 +23,13 @@ Software should set only bits both itself and the device recognize.
+ Currently, only bit 0 is recognized, setting it indicates a guest panic
+ has happened.
+ 
++SYSBUS Interface
++--------------
 +
-+     /* public */
-+    MemoryRegion mr;
-+} PVPanicMMIOState;
++It is basically the same as ISA interface except that it uses MMIO. Pvpanic exposes
++a address space region 0x09060000--0x09060001 in arm virt machine.
++Currently only the first byte is used. 
 +
-+#define PVPANIC=5FISA(obj)    \
-+    OBJECT=5FCHECK(PVPanicISAState, (obj), TYPE=5FPVPANIC)
-+
-+#define PVPANIC=5FMMIO(obj)    \
-+    OBJECT=5FCHECK(PVPanicMMIOState, (obj), TYPE=5FPVPANIC=5FMMIO)
-=20
- /* return supported events on read */
--static uint64=5Ft pvpanic=5Fioport=5Fread(void *opaque, hwaddr addr, unsig=
-ned size)
-+static uint64=5Ft pvpanic=5Fread(void *opaque, hwaddr addr, unsigned size)
- {
-     return PVPANIC=5FPANICKED;
- }
-=20
--static void pvpanic=5Fioport=5Fwrite(void *opaque, hwaddr addr, uint64=5Ft=
- val,
-+static void pvpanic=5Fwrite(void *opaque, hwaddr addr, uint64=5Ft val,
-                                  unsigned size)
- {
-     handle=5Fevent(val);
- }
-=20
- static const MemoryRegionOps pvpanic=5Fops =3D {
--    .read =3D pvpanic=5Fioport=5Fread,
--    .write =3D pvpanic=5Fioport=5Fwrite,
-+    .read =3D pvpanic=5Fread,
-+    .write =3D pvpanic=5Fwrite,
-     .impl =3D {
-         .min=5Faccess=5Fsize =3D 1,
-         .max=5Faccess=5Fsize =3D 1,
-@@ -77,15 +96,16 @@ static const MemoryRegionOps pvpanic=5Fops =3D {
-=20
- static void pvpanic=5Fisa=5Finitfn(Object *obj)
- {
--    PVPanicState *s =3D PVPANIC(obj);
-+    PVPanicISAState *s =3D PVPANIC=5FISA(obj);
-=20
--    memory=5Fregion=5Finit=5Fio(&s->mr, OBJECT(s), &pvpanic=5Fops, s, "pvp=
-anic", 1);
-+    memory=5Fregion=5Finit=5Fio(&s->mr, OBJECT(s), &pvpanic=5Fops, s,
-+                          TYPE=5FPVPANIC, 1);
- }
-=20
- static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev, Error **errp)
- {
-     ISADevice *d =3D ISA=5FDEVICE(dev);
--    PVPanicState *s =3D PVPANIC(dev);
-+    PVPanicISAState *s =3D PVPANIC=5FISA(dev);
-     FWCfgState *fw=5Fcfg =3D fw=5Fcfg=5Ffind();
-     uint16=5Ft *pvpanic=5Fport;
-=20
-@@ -102,7 +122,7 @@ static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev,=
- Error **errp)
- }
-=20
- static Property pvpanic=5Fisa=5Fproperties[] =3D {
--    DEFINE=5FPROP=5FUINT16(PVPANIC=5FIOPORT=5FPROP, PVPanicState, ioport, =
-0x505),
-+    DEFINE=5FPROP=5FUINT16(PVPANIC=5FIOPORT=5FPROP, PVPanicISAState, iopor=
-t, 0x505),
-     DEFINE=5FPROP=5FEND=5FOF=5FLIST(),
- };
-=20
-@@ -118,14 +138,41 @@ static void pvpanic=5Fisa=5Fclass=5Finit(ObjectClass =
-*klass, void *data)
- static TypeInfo pvpanic=5Fisa=5Finfo =3D {
-     .name          =3D TYPE=5FPVPANIC,
-     .parent        =3D TYPE=5FISA=5FDEVICE,
--    .instance=5Fsize =3D sizeof(PVPanicState),
-+    .instance=5Fsize =3D sizeof(PVPanicISAState),
-     .instance=5Finit =3D pvpanic=5Fisa=5Finitfn,
-     .class=5Finit    =3D pvpanic=5Fisa=5Fclass=5Finit,
- };
-=20
-+
-+static void pvpanic=5Fmmio=5Finitfn(Object *obj)
-+{
-+    PVPanicMMIOState *s =3D PVPANIC=5FMMIO(obj);
-+    SysBusDevice *sbd =3D SYS=5FBUS=5FDEVICE(obj);
-+
-+    memory=5Fregion=5Finit=5Fio(&s->mr, OBJECT(s), &pvpanic=5Fops, s,
-+                          TYPE=5FPVPANIC=5FMMIO, 2);
-+    sysbus=5Finit=5Fmmio(sbd, &s->mr);
-+}
-+
-+static void pvpanic=5Fmmio=5Fclass=5Finit(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE=5FCLASS(klass);
-+
-+    set=5Fbit(DEVICE=5FCATEGORY=5FMISC, dc->categories);
-+}
-+
-+static TypeInfo pvpanic=5Fmmio=5Finfo =3D {
-+    .name          =3D TYPE=5FPVPANIC=5FMMIO,
-+    .parent        =3D TYPE=5FSYS=5FBUS=5FDEVICE,
-+    .instance=5Fsize =3D sizeof(PVPanicMMIOState),
-+    .instance=5Finit =3D pvpanic=5Fmmio=5Finitfn,
-+    .class=5Finit    =3D pvpanic=5Fmmio=5Fclass=5Finit,
-+};
-+
- static void pvpanic=5Fregister=5Ftypes(void)
- {
-     type=5Fregister=5Fstatic(&pvpanic=5Fisa=5Finfo);
-+    type=5Fregister=5Fstatic(&pvpanic=5Fmmio=5Finfo);
- }
-=20
- type=5Finit(pvpanic=5Fregister=5Ftypes)
-diff --git a/include/hw/misc/pvpanic.h b/include/hw/misc/pvpanic.h
-index 1ee071a..19c0fbb 100644
---- a/include/hw/misc/pvpanic.h
-+++ b/include/hw/misc/pvpanic.h
-@@ -17,6 +17,7 @@
- #define TYPE=5FPVPANIC "pvpanic"
-=20
- #define PVPANIC=5FIOPORT=5FPROP "ioport"
-+#define TYPE=5FPVPANIC=5FMMIO "pvpanic-mmio"
-=20
- static inline uint16=5Ft pvpanic=5Fport(void)
- {
---=20
+ ACPI Interface
+ --------------
+ 
+-- 
 1.8.3.1
