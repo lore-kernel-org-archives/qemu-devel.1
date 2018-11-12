@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gMF86-0004eM-3g
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:32:06 -0500
+	(envelope-from <hpa@zytor.com>) id 1gMFNz-0007Dl-D5
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:48:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gMF7v-0002Qa-BK
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:31:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52502)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gMF7u-00020S-Jv
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:31:51 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4CA4E83F44
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 16:31:47 +0000 (UTC)
-Date: Mon, 12 Nov 2018 14:31:40 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181112163140.GM12503@habkost.net>
-References: <20181109195800.19071-1-wainersm@redhat.com>
+	(envelope-from <hpa@zytor.com>) id 1gMFNj-00087D-R1
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:48:19 -0500
+Received: from terminus.zytor.com ([198.137.202.136]:48969 helo=mail.zytor.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hpa@zytor.com>) id 1gMFNh-00082E-7X
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:48:10 -0500
+References: <1541674784-25936-2-git-send-email-lizhijian@cn.fujitsu.com>
+	<CAFEAcA_47wyar3WNhuBmNPdr02RHx-wn_TeyFaajpjzvzG8j5Q@mail.gmail.com>
+	<c50d103e-95c3-c44c-d852-b6d7f8114b3a@cn.fujitsu.com>
+	<20181109072015.GA86700@gmail.com>
+	<38905d35-29af-b522-1629-b13e98a47a42@intel.com>
+	<d30b404d-624e-0497-879a-2d5df2eb9f31@suse.com>
+	<b7b608dc-1743-5e1f-3b88-94d784c4cab2@intel.com>
+	<d9c293bd-b43f-999c-55f1-3b90a6020065@zytor.com>
+	<20181112045624.GA28219@gmail.com>
+	<fcf1d6b5-e64f-3aea-f794-99237e1988cf@zytor.com>
+	<20181112061940.GA61749@gmail.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Message-ID: <b78eb4e1-5671-f407-0779-0f1e893be272@zytor.com>
+Date: Mon, 12 Nov 2018 08:47:14 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181109195800.19071-1-wainersm@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Acceptance test: add coverage tests for
- -smp option
+In-Reply-To: <20181112061940.GA61749@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC/PoC PATCH 1/3] i386: set initrd_max to 4G - 1
+ to allow up to 4G initrd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,256 +38,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Cc: qemu-devel@nongnu.org, crosa@redhat.com, philmd@redhat.com, ccarrara@redhat.com
+To: Ingo Molnar <mingo@kernel.org>
+Cc: Li Zhijian <zhijianx.li@intel.com>, Juergen Gross <jgross@suse.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Maydell <peter.maydell@linaro.org>, x86@kernel.org, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de, QEMU Developers <qemu-devel@nongnu.org>, Philip Li <philip.li@intel.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Kees Cook <keescook@chromium.org>
 
-On Fri, Nov 09, 2018 at 02:58:00PM -0500, Wainer dos Santos Moschetta wrote:
-> This adds tests for SMP option, by passing -smp with
-> various combinations of cpus, cores, threads, and sockets
-> values it checks that invalid topologies are not accepted
-> as well as missing values are correctly calculated.
+On 11/11/18 10:19 PM, Ingo Molnar wrote:
 > 
-> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-
-The test code looks nice to me, but: how exactly do you expect
-this to be executed?
-
-Do we have a test runner or multiplexer configuration already
-able to generate the cores/threads/sockets/cpus parameters?
-
-
-> ---
->  tests/acceptance/smp_option_coverage.py | 218 ++++++++++++++++++++++++
->  1 file changed, 218 insertions(+)
->  create mode 100644 tests/acceptance/smp_option_coverage.py
+>> In part as a result of this exchange I have spent some time thinking 
+>> about the boot protocol and its dependencies, and there is, in fact, a 
+>> much more serious problem that needs to be addressed: it is not 
+>> currently possible in a forward-compatible way to map all data areas 
+>> that may be occupied by bootloader-provided data. The kernel proper has 
+>> an advantage here, in that the kernel will by definition always be the 
+>> "owner of the protocol" (anything the kernel doesn't know how to map 
+>> won't be used by the kernel anyway), but it really isn't a good 
+>> situation. So I'm currently trying to think up a way to make that 
+>> possible.
 > 
-> diff --git a/tests/acceptance/smp_option_coverage.py b/tests/acceptance/smp_option_coverage.py
-> new file mode 100644
-> index 0000000000..ab68d1a67d
-> --- /dev/null
-> +++ b/tests/acceptance/smp_option_coverage.py
-> @@ -0,0 +1,218 @@
-> +# QEMU -smp option coverage test.
-> +#
-> +# Copyright (c) 2018 Red Hat, Inc.
-> +#
-> +# Author:
-> +#  Wainer dos Santos Moschetta <wainersm@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or
-> +# later.  See the COPYING file in the top-level directory.
-> +
-> +from functools import reduce
-> +from avocado.utils.process import run
-> +
-> +from avocado_qemu import Test
-> +
-> +
-> +class SmpOption(Test):
-> +    """
-> +    Launches QEMU with various cpus, cores, threads, sockets, and maxcpus
-> +    combination through -smp option, to check it does not accept invalid SMP
-> +    topologies as well as it is able to calculate correctly any missing values.
-> +
-> +    :avocado: enable
-> +    :avocado: tags=slow,coverage
-> +    """
-> +    def setUp(self):
-> +        super().setUp()
-> +        self.cores = self.params.get('cores', default=2)
-> +        self.threads = self.params.get('threads', default=2)
-> +        self.sockets = self.params.get('sockets', default=2)
-> +        self.cpus = self.params.get('cpus', default=8)
-> +
-> +    def get_smp_topology(self):
-> +        """
-> +        Returns a dict with the id of cores, threads and sockets.
-> +        """
-> +        res = self.vm.qmp('query-hotpluggable-cpus')['return']
-> +        cpus = [x['props'] for x in res]
-> +
-> +        return reduce(lambda x, y: {'core-id': x['core-id'].union([y['core-id']]),
-> +                                    'thread-id': x['thread-id'].union([y['thread-id']]),
-> +                                    'socket-id': x['socket-id'].union([y['socket-id']])},
-> +                      cpus, {'core-id': set(), 'thread-id': set(), 'socket-id': set()})
-> +
-> +    @staticmethod
-> +    def build_option(**kwargs):
-> +        """
-> +        Builds string for the -smp option.
-> +        Use cpus, cores, threads, sockets, maxcpus keys.
-> +        """
-> +        option_list = []
-> +        if kwargs.get('cpus', None) is not None:
-> +            option_list.append(str(kwargs.get('cpus')))
-> +        for key, val in kwargs.items():
-> +            if key == 'cpus':
-> +                continue
-> +            option_list.append('%s=%s' % (key, val))
-> +
-> +        return ",".join(option_list)
-> +
-> +    def launch_and_check(self, expect_cores=1, expect_threads=1,
-> +                         expect_sockets=1, **kwargs):
-> +        """
-> +        Launches VM and check its SMP topology was correctly set.
-> +        Use cpus, cores, threads, sockets, and maxcpus keys to specify the
-> +        topology.
-> +        """
-> +        option = self.build_option(**{key: val for key, val in kwargs.items()
-> +                                      if key in ['cpus', 'cores', 'threads',
-> +                                                 'sockets', 'maxcpus']})
-> +        self.vm.add_args('-smp', option)
-> +        self.vm.launch()
-> +        smp = self.get_smp_topology()
-> +        self.assertEqual(smp['core-id'], set(range(0, expect_cores)))
-> +        self.assertEqual(smp['thread-id'], set(range(0, expect_threads)))
-> +        self.assertEqual(smp['socket-id'], set(range(0, expect_sockets)))
-> +
-> +    def launch_and_check_fail(self, **kwargs):
-> +        """
-> +        Launches VM and check the process exits with expected error code, for
-> +        cases where the topology is expected not valid.
-> +        """
-> +        option = self.build_option(**kwargs)
-> +        res = run("%s -smp %s" % (self.qemu_bin, option), timeout=10,
-> +                  ignore_status=True)
-> +        self.assertNotEqual(res.exit_status, 0)
-> +
-> +    # Passing cpus and maxcpus only.
-> +    #
-> +
-> +    def test_cpus_eq_maxcpus(self):
-> +        self.launch_and_check(cpus=self.cpus,
-> +                              maxcpus=self.cpus,
-> +                              expect_sockets=self.cpus)
-> +
-> +    def test_cpus_lt_maxcpus(self):
-> +        maxcpus = self.cpus * 2
-> +        self.launch_and_check(cpus=self.cpus,
-> +                              maxcpus=maxcpus,
-> +                              expect_sockets=maxcpus)
-> +
-> +    def test_cpus_gt_maxcpus(self):
-> +        self.launch_and_check_fail(cpus=self.cpus,
-> +                                   maxcpus=self.cpus // 2)
-> +
-> +    # Passing a combination of cores, threads and sockets only.
-> +    #
-> +
-> +    def test_no_cores_no_threads_no_sockets(self):
-> +        self.launch_and_check(cpus=self.cpus,
-> +                              expect_sockets=self.cpus)
-> +
-> +    def test_no_cores_no_threads_sockets(self):
-> +        self.launch_and_check(sockets=self.sockets,
-> +                              expect_sockets=self.sockets)
-> +
-> +    def test_no_cores_threads_no_sockets(self):
-> +        self.launch_and_check(threads=self.threads,
-> +                              expect_threads=self.threads)
-> +
-> +    def test_no_cores_threads_sockets(self):
-> +        self.launch_and_check(threads=self.threads,
-> +                              sockets=self.sockets,
-> +                              expect_threads=self.threads,
-> +                              expect_sockets=self.sockets)
-> +
-> +    def test_cores_no_threads_no_sockets(self):
-> +        self.launch_and_check(cores=self.cores,
-> +                              expect_cores=self.cores)
-> +
-> +    def test_cores_no_threads_sockets(self):
-> +        self.launch_and_check(cores=self.cores,
-> +                              sockets=self.sockets,
-> +                              expect_cores=self.cores,
-> +                              expect_sockets=self.sockets)
-> +
-> +    def test_cores_threads_no_sockets(self):
-> +        self.launch_and_check(cores=self.cores,
-> +                              threads=self.threads,
-> +                              expect_cores=self.cores,
-> +                              expect_threads=self.threads)
-> +
-> +    def test_cores_threads_sockets(self):
-> +        self.launch_and_check(cores=self.cores,
-> +                              threads=self.threads,
-> +                              sockets=self.sockets,
-> +                              expect_cores=self.cores,
-> +                              expect_threads=self.threads,
-> +                              expect_sockets=self.sockets)
-> +
-> +    # Passing cpus always and a combination of cores, threads and sockets.
-> +    #
-> +
-> +    def test_cpus_no_cores_no_threads_sockets(self):
-> +        self.launch_and_check(cpus=self.cpus,
-> +                              sockets=self.sockets,
-> +                              expect_cores=self.cpus // self.sockets,
-> +                              expect_sockets=self.sockets)
-> +
-> +    def test_cpus_no_cores_threads_no_sockets(self):
-> +        self.launch_and_check(cpus=self.cpus,
-> +                              threads=self.threads,
-> +                              expect_threads=self.threads,
-> +                              expect_sockets=self.cpus // self.threads)
-> +
-> +    def test_cpus_no_cores_threads_sockets(self):
-> +        self.launch_and_check(cpus=self.cpus,
-> +                              threads=self.threads,
-> +                              sockets=self.sockets,
-> +                              expect_threads=self.threads,
-> +                              expect_sockets=self.sockets,
-> +                              expect_cores=self.cpus // (self.threads * self.sockets))
-> +
-> +    def test_cpus_cores_no_threads_no_sockets(self):
-> +        self.launch_and_check(cpus=self.cpus,
-> +                              cores=self.cores,
-> +                              expect_cores=self.cores,
-> +                              expect_sockets=self.cpus // self.cores)
-> +
-> +    def test_cpus_cores_no_threads_sockets(self):
-> +        self.launch_and_check(cpus=self.cpus,
-> +                              cores=self.cores,
-> +                              sockets=self.sockets,
-> +                              expect_cores=self.cores,
-> +                              expect_sockets=self.sockets,
-> +                              expect_threads=self.cpus // (self.cores * self.sockets))
-> +
-> +    def test_cpus_cores_threads_no_sockets(self):
-> +        self.launch_and_check(cpus=self.cpus,
-> +                              cores=self.cores,
-> +                              threads=self.threads,
-> +                              expect_cores=self.cores,
-> +                              expect_threads=self.threads,
-> +                              expect_sockets=self.cpus // (self.cores * self.threads))
-> +
-> +    def test_cpus_cores_threads_sockets(self):
-> +        self.launch_and_check(cpus=self.cores * self.threads * self.sockets,
-> +                              cores=self.cores,
-> +                              threads=self.threads,
-> +                              sockets=self.sockets,
-> +                              expect_cores=self.cores,
-> +                              expect_threads=self.threads,
-> +                              expect_sockets=self.sockets)
-> +
-> +    # Passing cpus less (or greater) than cores, threads and sockets.
-> +    #
-> +
-> +    def test_cpus_lt_cores_threads_sockets(self):
-> +        self.launch_and_check_fail(cpus=(self.cores * self.threads * self.sockets) // 2,
-> +                                   cores=self.cores,
-> +                                   threads=self.threads,
-> +                                   sockets=self.sockets,)
-> +
-> +    def test_cpus_gt_cores_threads_sockets(self):
-> +        self.launch_and_check_fail(cpus=self.cores * self.threads * self.sockets * 2,
-> +                                   cores=self.cores,
-> +                                   threads=self.threads,
-> +                                   sockets=self.sockets)
-> -- 
-> 2.17.2
-> 
+> I might be a bit dense early in the morning, but could you elaborate? 
+> What do you mean by mapping all data areas?
 
--- 
-Eduardo
+Alright, awake now...
+
+As it sits right now, the protocol contains a number of data structures with
+pointers, pointing to a variety of memory areas that can be set up by the
+bootloader. Now, consider something like KASLR or a secondary boot loader
+where we need to allocate memory in between the primary bootloader and the
+kernel to be run. With the kernel proper, in the absence of KASLR, we have
+solved this by marking out exactly how much memory the kernel may need before
+it has its own memory manager up and running, but KASLR needs to move it
+outside this range, and a secondary boot loader shim of some sort may need to
+allocate additional data structures. In the particular case of an UEFI system
+where we do the right thing (which Grub2 doesn't, by default) and enter via
+the kernel UEFI stub we are okay, but for other boot scenarios we are in
+trouble: even if we know where all the pointers are and how to determine the
+size of various data structures, once the protocol is updated with new
+information then that is no longer valid.
+
+The setup_data linked list solves that under certain circumstances, but in
+others it has turned out to not be adequate.
+
+There are a couple of options:
+
+a) Not allow any new pointers to memory areas in what is considered system
+   RAM. Such data structures *must* have a setup_data linked list header.
+   Pointers into E820 table reserved areas are still acceptable.
+
+b) Create a new E820 table memory type for "boot data", similar to what UEFI
+   already has, and encourage boot loaders to mark any allocated memory
+   structures that way.  The main problem with that is that the poor quality
+   of boot loaders may mean that that fails to happen, and because it wouldn't
+   "fail hard" it is likely that they will get it wrong.
+
+   The difference from the RESERVED memory type is that the kernel can reclaim
+   that memory after the data has been recovered.
+
+c) This might be the preferred option:
+
+   1. Just like (a), do not allow new pointers to memory areas in system RAM
+      in struct boot_params.
+   2. Create a subrange of struct setup_data (e.g. bit 30 = 1) explicitly
+      containing pointers to other data structures, including sizes, in a
+      way that can be parsed by generic code.
+   3. Encourage boot loaders to make sure the setup_data list is in order of
+      ascending address (and WARN if it is not.)
+   4. Add (b) as an option, for responsible boot loaders ;) to provide an
+      extra level of protection.
