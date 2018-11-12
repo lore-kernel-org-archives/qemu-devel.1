@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gM9Ql-0000xC-Ct
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:26:56 -0500
+	(envelope-from <berto@igalia.com>) id 1gM9a5-000792-VF
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:36:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gM9Qh-0003r5-DG
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:26:55 -0500
+	(envelope-from <berto@igalia.com>) id 1gM9Zy-0000fu-S1
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:36:32 -0500
 From: Alberto Garcia <berto@igalia.com>
 In-Reply-To: <62cb7e48-9120-ace4-cd84-f462b3100251@redhat.com>
 References: <cover.1541595424.git.berto@igalia.com>
 	<d213fb4eb326353eccde0ea1c5a05bba2da706e0.1541595424.git.berto@igalia.com>
 	<62cb7e48-9120-ace4-cd84-f462b3100251@redhat.com>
-Date: Mon, 12 Nov 2018 11:26:11 +0100
-Message-ID: <w51muqebni4.fsf@maestria.local.igalia.com>
+Date: Mon, 12 Nov 2018 11:36:23 +0100
+Message-ID: <w51k1libn14.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH v4 14/15] block: Remove assertions from
@@ -28,36 +28,16 @@ To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 On Sun 11 Nov 2018 10:01:05 PM CET, Max Reitz wrote:
-> On 07.11.18 13:59, Alberto Garcia wrote:
->> This function takes three options (cache.direct, cache.no-flush and
->> read-only) from a QemuOpts object and updates the flags accordingly.
+>> -    assert(qemu_opt_find(opts, BDRV_OPT_CACHE_DIRECT));
+>>      if (qemu_opt_get_bool_del(opts, BDRV_OPT_CACHE_DIRECT, false)) {
+>>          *flags |= BDRV_O_NOCACHE;
+>>      }
+>>  
+>>      *flags &= ~BDRV_O_RDWR;
 >
-> and auto-read-only now
+> Unrelated to this patch, but isn't BDRV_O_AUTO_RDONLY missing here?
 
-Oops, will update.
-
-> Hm, seems like one way to solve it and I can't really find issue with
-> it.  So, let's first give a
->
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
->
-> However, I wonder why you dropped your patch from v1 for this.  It
-> seemed more reasonable to me.  You're basically trading half-updating
-> the flags for just not touching them at all (and the latter seems
-> better, even though it's all an error in the end anyway).
-
-The main reason why I'm doing this is because if we keep the assertions
-then we're forced to have these four options always set, and I don't see
-any reason why they would need to be.
-
-It's not a problem now but it will be later on. Have a look at this
-early implementation of qmp_x_blockdev_reopen():
-
-   https://lists.gnu.org/archive/html/qemu-block/2018-06/msg00795.html
-
-Here we need to explicitly set those options to false if they're
-unset. 'false' is already the default value of all of them, so this
-shouldn't be necessary, but if we don't do it we'd hit the assertions
-that I'm removing in this patch.
+I forgot to mention, but I think you're right here. I'll include this
+fix in the next version of the series.
 
 Berto
