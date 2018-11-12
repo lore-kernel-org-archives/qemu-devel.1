@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1gMARd-0002lu-9s
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 06:31:54 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gMAXl-0007qC-5U
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 06:38:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1gMARc-0001hY-6K
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 06:31:53 -0500
-Received: from mail-yw1-xc2f.google.com ([2607:f8b0:4864:20::c2f]:38192)
+	(envelope-from <peter.maydell@linaro.org>) id 1gMAXk-0005pp-Dd
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 06:38:13 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43566)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
-	id 1gMARb-0001fg-Rf
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 06:31:52 -0500
-Received: by mail-yw1-xc2f.google.com with SMTP id i65-v6so4230331ywc.5
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 03:31:50 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gMAXj-0005pJ-WD
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 06:38:12 -0500
+Received: by mail-oi1-x243.google.com with SMTP id j202-v6so6866919oih.10
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 03:38:11 -0800 (PST)
 MIME-Version: 1.0
-References: <20181109145827.23076-1-yuri.benditovich@daynix.com>
-	<20181109125947-mutt-send-email-mst@kernel.org>
-	<CAOEp5OdXFYYDB_7vNFsrtf=iwpL+ys9Hf_0gR-JXJ+wLnmDw5g@mail.gmail.com>
-	<20181111215232-mutt-send-email-mst@kernel.org>
-	<CAOEp5Oe_TFTpQ_yBGJ-OyCw_Zne7bF0nUGV8XpG+4Fd+TJ7i8g@mail.gmail.com>
-	<b800852b-e81e-459c-c6e1-15d4c99fc0eb@redhat.com>
-In-Reply-To: <b800852b-e81e-459c-c6e1-15d4c99fc0eb@redhat.com>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Mon, 12 Nov 2018 13:31:36 +0200
-Message-ID: <CAOEp5OeNpxdmuNqSTr8C2NZ=oSOY6S4TO3Y5PY+1dKDbap4zDw@mail.gmail.com>
+In-Reply-To: <20181108175246.13416-3-richard.henderson@linaro.org>
+References: <20181108175246.13416-1-richard.henderson@linaro.org>
+	<20181108175246.13416-3-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Nov 2018 11:37:50 +0000
+Message-ID: <CAFEAcA_WJMAsHWx+OTO+j0eTsHodpXkyxLv6cAdXxgjsCmTYhw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-net: support RSC v4/v6 tcp traffic
- for Windows HCK
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] target/arm: Fill in ARMISARegisters
+ for kvm64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,50 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-devel@nongnu.org, Yan Vugenfirer <yan@daynix.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Mon, Nov 12, 2018 at 11:26 AM Jason Wang <jasowang@redhat.com> wrote:
+On 8 November 2018 at 17:52, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
 
+>      /* Old kernels may not know about the PREFERRED_TARGET ioctl: however
+>       * we know these will only support creating one kind of guest CPU,
+>       * which is its preferred CPU type. Fortunately these old kernels
+> @@ -474,8 +497,71 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>      ahcf->target = init.target;
+>      ahcf->dtb_compatible = "arm,arm-v8";
 >
-> On 2018/11/12 =E4=B8=8B=E5=8D=884:57, Yuri Benditovich wrote:
-> >
-> > On Mon, Nov 12, 2018 at 4:54 AM Michael S. Tsirkin <mst@redhat.com
-> > <mailto:mst@redhat.com>> wrote:
-> >
-> >     On Sun, Nov 11, 2018 at 12:18:54PM +0200, Yuri Benditovich wrote:
-> >     >     > @@ -66,12 +143,16 @@ typedef struct VirtIONet {
-> >     >     >      VirtIONetQueue *vqs;
-> >     >     >      VirtQueue *ctrl_vq;
-> >     >     >      NICState *nic;
-> >     >     > +    QTAILQ_HEAD(, NetRscChain) rsc_chains;
-> >     >
-> >     >     what exactly happens with these chains on migration?
-> >     >
-> >     >
-> >     > This feature (software implementation of RSC in QEMU) is
-> >     intended to be used in
-> >     > the environment of certification tests which never uses migration=
-.
-> >
-> >     Should this feature disable migration then?
-> >
-> >
-> > IMO, this should not. But if you find it mandatory, please respond and
-> > I will add the migration blocker.
->
->
-> So if my understanding is correct, it's safe to do nothing even if we
-> allow migration for RSC?
->
+> +    err = read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64pfr0,
+> +                         ARM64_SYS_REG(3, 0, 0, 4, 0));
+> +    if (unlikely(err < 0)) {
+> +        /*
+> +         * Before v4.15, the kernel only exposed a limited number of system
+> +         * registers, not including any of the interesting AArch64 ID regs.
+> +         * For the most part we could leave these fields as zero with minimal
+> +         * effect, since this does not affect the values seen by the guest.
 
-This does not create any unrecoverable failure (assertion, BSOD), although
-some data (coalesced parts of packets not delivered yet to guest) will be
-lost.
+These older kernels do implement reading of id_isar0 through
+id_isar5, though -- we could read and use those values rather than
+leaving them zero.
 
+> +         *
+> +         * However, it could cause problems down the line for QEMU,
+> +         * so provide a minimal v8.0 default.
+> +         *
+> +         * ??? Could read MIDR and use knowledge from cpu64.c.
+> +         * ??? Could map a page of memory into our temp guest and
+> +         *     run the tiniest of hand-crafted kernels to extract
+> +         *     the values seen by the guest.
+> +         * ??? Either of these sounds like too much effort just
+> +         *     to work around running a modern host kernel.
+> +         */
+> +        ahcf->isar.id_aa64pfr0 = 0x00000011; /* EL1&0, AArch64 only */
+> +        err = 0;
 
->
-> Thanks
->
->
->
+Doesn't this code path leave everything except id_aa64pfr0 as
+zero, thus leaving us with the "could cause problems down the
+line" situation ?
+
+thanks
+-- PMM
