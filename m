@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gM8Nk-000801-B4
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:19:45 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gM8U6-0006np-72
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:26:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gM8Nc-0005k0-IV
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:19:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54802)
+	(envelope-from <jasowang@redhat.com>) id 1gM8U1-0006Sb-Ty
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:26:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34140)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gM8NS-0005ZO-8w
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:19:28 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 253CF30832E3
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 09:19:23 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181110111623.31356-1-marcandre.lureau@redhat.com>
-Date: Mon, 12 Nov 2018 10:19:18 +0100
-In-Reply-To: <20181110111623.31356-1-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Sat, 10 Nov 2018 15:16:23 +0400")
-Message-ID: <871s7qfyax.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gM8U1-0006Cn-CK
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:26:13 -0500
+References: <20181109145827.23076-1-yuri.benditovich@daynix.com>
+	<20181109125947-mutt-send-email-mst@kernel.org>
+	<CAOEp5OdXFYYDB_7vNFsrtf=iwpL+ys9Hf_0gR-JXJ+wLnmDw5g@mail.gmail.com>
+	<20181111215232-mutt-send-email-mst@kernel.org>
+	<CAOEp5Oe_TFTpQ_yBGJ-OyCw_Zne7bF0nUGV8XpG+4Fd+TJ7i8g@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b800852b-e81e-459c-c6e1-15d4c99fc0eb@redhat.com>
+Date: Mon, 12 Nov 2018 17:25:59 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAOEp5Oe_TFTpQ_yBGJ-OyCw_Zne7bF0nUGV8XpG+4Fd+TJ7i8g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] edid: silence a stringop-overflow warning
+Subject: Re: [Qemu-devel] [PATCH] virtio-net: support RSC v4/v6 tcp traffic
+ for Windows HCK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,44 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+To: Yuri Benditovich <yuri.benditovich@daynix.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-devel@nongnu.org, Yan Vugenfirer <yan@daynix.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> Simplify the code that doesn't need strncpy() since length of string
-> is already computed.
+On 2018/11/12 =E4=B8=8B=E5=8D=884:57, Yuri Benditovich wrote:
 >
-> /home/elmarco/src/qemu/hw/display/edid-generate.c: In function 'edid_desc=
-_text':
-> /home/elmarco/src/qemu/hw/display/edid-generate.c:168:5: error: 'strncpy'=
- specified bound depends on the length of the source argument [-Werror=3Dst=
-ringop-overflow=3D]
->      strncpy((char *)(desc + 5), text, len);
->      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> /home/elmarco/src/qemu/hw/display/edid-generate.c:164:11: note: length co=
-mputed here
->      len =3D strlen(text);
->            ^~~~~~~~~~~~
-> cc1: all warnings being treated as errors
+> On Mon, Nov 12, 2018 at 4:54 AM Michael S. Tsirkin <mst@redhat.com=20
+> <mailto:mst@redhat.com>> wrote:
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/display/edid-generate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>     On Sun, Nov 11, 2018 at 12:18:54PM +0200, Yuri Benditovich wrote:
+>     >=C2=A0 =C2=A0 =C2=A0> @@ -66,12 +143,16 @@ typedef struct VirtIONe=
+t {
+>     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 VirtIONetQueue *vqs;
+>     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 VirtQueue *ctrl_vq;
+>     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 NICState *nic;
+>     >=C2=A0 =C2=A0 =C2=A0> +=C2=A0 =C2=A0 QTAILQ_HEAD(, NetRscChain) rs=
+c_chains;
+>     >
+>     >=C2=A0 =C2=A0 =C2=A0what exactly happens with these chains on migr=
+ation?
+>     >
+>     >
+>     > This feature (software implementation of RSC in QEMU) is
+>     intended to be used in
+>     > the environment of certification tests which never uses migration=
+.
 >
-> diff --git a/hw/display/edid-generate.c b/hw/display/edid-generate.c
-> index bdf5e1d4d4..77d9127344 100644
-> --- a/hw/display/edid-generate.c
-> +++ b/hw/display/edid-generate.c
-> @@ -165,7 +165,7 @@ static void edid_desc_text(uint8_t *desc, uint8_t typ=
-e,
->      if (len > 12) {
->          len =3D 12;
->      }
-> -    strncpy((char *)(desc + 5), text, len);
-> +    memcpy(desc + 5, text, len);
->      desc[5 + len] =3D '\n';
->  }
+>     Should this feature disable migration then?
+>
+>
+> IMO, this should not. But if you find it mandatory, please respond and=20
+> I will add the migration blocker.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+So if my understanding is correct, it's safe to do nothing even if we=20
+allow migration for RSC?
+
+Thanks
