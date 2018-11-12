@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gMCsg-0007hk-9C
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:07:59 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gMCuc-0002cx-76
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:09:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gMCsX-0004me-Pt
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:07:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43894)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gMCsU-0004Gw-S3
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:07:48 -0500
-References: <20181023152306.3123-1-david@redhat.com>
-	<20181023152306.3123-8-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <6dc75c61-979b-e293-41a5-8bfe39515d92@redhat.com>
-Date: Mon, 12 Nov 2018 15:07:20 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1gMCuX-0007eM-75
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:09:58 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39641)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gMCuW-0007dR-MY
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:09:53 -0500
+Received: by mail-wm1-x341.google.com with SMTP id u13-v6so8272320wmc.4
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 06:09:52 -0800 (PST)
+References: <20181108175246.13416-1-richard.henderson@linaro.org>
+	<20181108175246.13416-3-richard.henderson@linaro.org>
+	<CAFEAcA_WJMAsHWx+OTO+j0eTsHodpXkyxLv6cAdXxgjsCmTYhw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6ace0700-23b9-d004-a5d9-6ab1bdb90835@linaro.org>
+Date: Mon, 12 Nov 2018 15:09:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181023152306.3123-8-david@redhat.com>
+In-Reply-To: <CAFEAcA_WJMAsHWx+OTO+j0eTsHodpXkyxLv6cAdXxgjsCmTYhw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] memory-device: rewrite address
- assignment using ranges
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] target/arm: Fill in ARMISARegisters
+ for kvm64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,142 +33,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 23.10.18 17:23, David Hildenbrand wrote:
-> Let's rewrite it properly using ranges. This fixes certain overflows that
-> are right now possible. E.g.
+On 11/12/18 12:37 PM, Peter Maydell wrote:
+> On 8 November 2018 at 17:52, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
 > 
-> qemu-system-x86_64 -m 4G,slots=20,maxmem=40G -M pc \
->     -object memory-backend-file,id=mem1,share,mem-path=/dev/zero,size=2G
->     -device pc-dimm,memdev=mem1,id=dimm1,addr=-0x40000000
+>>      /* Old kernels may not know about the PREFERRED_TARGET ioctl: however
+>>       * we know these will only support creating one kind of guest CPU,
+>>       * which is its preferred CPU type. Fortunately these old kernels
+>> @@ -474,8 +497,71 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>>      ahcf->target = init.target;
+>>      ahcf->dtb_compatible = "arm,arm-v8";
+>>
+>> +    err = read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64pfr0,
+>> +                         ARM64_SYS_REG(3, 0, 0, 4, 0));
+>> +    if (unlikely(err < 0)) {
+>> +        /*
+>> +         * Before v4.15, the kernel only exposed a limited number of system
+>> +         * registers, not including any of the interesting AArch64 ID regs.
+>> +         * For the most part we could leave these fields as zero with minimal
+>> +         * effect, since this does not affect the values seen by the guest.
 > 
-> Now properly reports an error instead of succeeding.
-> 
-> "can't add memory device [0xffffffffc0000000:0x80000000], range overflow"
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/mem/memory-device.c | 53 ++++++++++++++++++++++++------------------
->  1 file changed, 30 insertions(+), 23 deletions(-)
-> 
-> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-> index 8be63c8032..2fb6fc2145 100644
-> --- a/hw/mem/memory-device.c
-> +++ b/hw/mem/memory-device.c
-> @@ -100,9 +100,8 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->                                              uint64_t align, uint64_t size,
->                                              Error **errp)
->  {
-> -    uint64_t address_space_start, address_space_end;
->      GSList *list = NULL, *item;
-> -    uint64_t new_addr = 0;
-> +    Range as, new = range_empty;
->  
->      if (!ms->device_memory) {
->          error_setg(errp, "memory devices (e.g. for memory hotplug) are not "
-> @@ -115,13 +114,11 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->                           "enabled, please specify the maxmem option");
->          return 0;
->      }
-> -    address_space_start = ms->device_memory->base;
-> -    address_space_end = address_space_start +
-> -                        memory_region_size(&ms->device_memory->mr);
-> -    g_assert(address_space_end >= address_space_start);
-> +    range_init_nofail(&as, ms->device_memory->base,
-> +                      memory_region_size(&ms->device_memory->mr));
->  
-> -    /* address_space_start indicates the maximum alignment we expect */
-> -    if (!QEMU_IS_ALIGNED(address_space_start, align)) {
-> +    /* start of address space indicates the maximum alignment we expect */
-> +    if (!QEMU_IS_ALIGNED(range_lob(&as), align)) {
->          error_setg(errp, "the alignment (0x%" PRIx64 ") is not supported",
->                     align);
->          return 0;
-> @@ -145,20 +142,24 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->      }
->  
->      if (hint) {
-> -        new_addr = *hint;
-> -        if (new_addr < address_space_start) {
-> +        if (range_init(&new, *hint, size)) {
->              error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
-> -                       "] before 0x%" PRIx64, new_addr, size,
-> -                       address_space_start);
-> +                       "], range overflow", *hint, size);
->              return 0;
-> -        } else if ((new_addr + size) > address_space_end) {
-> +        }
-> +        if (!range_contains_range(&as, &new)) {
->              error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
-> -                       "] beyond 0x%" PRIx64, new_addr, size,
-> -                       address_space_end);
-> +                       "], usable range for memory devices [0x%" PRIx64 ":0x%"
-> +                       PRIx64 "]", range_lob(&new), range_size(&new),
-> +                       range_lob(&as), range_size(&as));
->              return 0;
->          }
->      } else {
-> -        new_addr = address_space_start;
-> +        if (range_init(&new, range_lob(&as), size)) {
-> +            error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
-> +                       "], range overflow", *hint, size);
-> +            return 0;
-> +        }
->      }
->  
->      /* find address range that will fit new memory device */
-> @@ -166,30 +167,36 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->      for (item = list; item; item = g_slist_next(item)) {
->          const MemoryDeviceState *md = item->data;
->          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(OBJECT(md));
-> -        uint64_t md_size, md_addr;
-> +        uint64_t next_addr;
-> +        Range tmp;
->  
-> -        md_addr = mdc->get_addr(md);
-> -        md_size = memory_device_get_region_size(md, &error_abort);
-> +        range_init_nofail(&tmp, mdc->get_addr(md),
-> +                          memory_device_get_region_size(md, &error_abort));
->  
-> -        if (ranges_overlap(md_addr, md_size, new_addr, size)) {
-> +        if (range_overlaps_range(&tmp, &new)) {
->              if (hint) {
->                  const DeviceState *d = DEVICE(md);
->                  error_setg(errp, "address range conflicts with memory device"
->                             " id='%s'", d->id ? d->id : "(unnamed)");
->                  goto out;
->              }
-> -            new_addr = QEMU_ALIGN_UP(md_addr + md_size, align);
-> +
-> +            next_addr = QEMU_ALIGN_UP(range_upb(&tmp) + 1, align);
-> +            if (range_init(&new, next_addr, range_size(&new))) {
-> +                range_make_empty(&new);
-> +                break;
-> +            }
->          }
->      }
->  
-> -    if (new_addr + size > address_space_end) {
-> +    if (!range_contains_range(&as, &new)) {
->          error_setg(errp, "could not find position in guest address space for "
->                     "memory device - memory fragmented due to alignments");
->          goto out;
->      }
->  out:
->      g_slist_free(list);
-> -    return new_addr;
-> +    return range_lob(&new);
->  }
->  
->  MemoryDeviceInfoList *qmp_memory_device_list(void)
-> 
+> These older kernels do implement reading of id_isar0 through
+> id_isar5, though -- we could read and use those values rather than
+> leaving them zero.
 
-Ping, anybody has some time to review this?
+But without id_aa64pfr0, we don't know if id_isar0 et al have UNKNOWN values
+due to aa32 mode not being present.  E.g. run a 4.8 kernel on a thunderx1 cpu.
 
--- 
+>> +        ahcf->isar.id_aa64pfr0 = 0x00000011; /* EL1&0, AArch64 only */
+>> +        err = 0;
+> 
+> Doesn't this code path leave everything except id_aa64pfr0 as
+> zero, thus leaving us with the "could cause problems down the
+> line" situation ?
 
-Thanks,
+The other id_aa64* register fields are all extensions to v8.0, so they should
+be zero.  I am of course assuming that AdvSIMD is present, otherwise qemu
+itself probably have failed before now.
 
-David / dhildenb
+
+r~
