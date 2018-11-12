@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gM4ux-0002El-1F
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 00:37:47 -0500
+	(envelope-from <hpa@zytor.com>) id 1gM5Ia-0006Fs-GW
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 01:02:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gM4uq-0002bq-U7
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 00:37:46 -0500
-Received: from mail-eopbgr680108.outbound.protection.outlook.com
-	([40.107.68.108]:2496
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	(envelope-from <hpa@zytor.com>) id 1gM5IX-0005GP-5d
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 01:02:12 -0500
+Received: from terminus.zytor.com ([198.137.202.136]:50913 helo=mail.zytor.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gM4uq-0002al-B2
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 00:37:40 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 12 Nov 2018 05:37:33 +0000
-Message-ID: <BN6PR2201MB1251ADAEA3C596FD3F1AB3E6C6C10@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <20181111233622.8976-1-f4bug@amsat.org>,
-	<20181111233622.8976-9-f4bug@amsat.org>
-In-Reply-To: <20181111233622.8976-9-f4bug@amsat.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <hpa@zytor.com>) id 1gM5IW-00052J-S5
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 01:02:09 -0500
+References: <1541674784-25936-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1541674784-25936-2-git-send-email-lizhijian@cn.fujitsu.com>
+	<CAFEAcA_47wyar3WNhuBmNPdr02RHx-wn_TeyFaajpjzvzG8j5Q@mail.gmail.com>
+	<c50d103e-95c3-c44c-d852-b6d7f8114b3a@cn.fujitsu.com>
+	<20181109072015.GA86700@gmail.com>
+	<38905d35-29af-b522-1629-b13e98a47a42@intel.com>
+	<d30b404d-624e-0497-879a-2d5df2eb9f31@suse.com>
+	<b7b608dc-1743-5e1f-3b88-94d784c4cab2@intel.com>
+	<d9c293bd-b43f-999c-55f1-3b90a6020065@zytor.com>
+	<20181112045624.GA28219@gmail.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Message-ID: <fcf1d6b5-e64f-3aea-f794-99237e1988cf@zytor.com>
+Date: Sun, 11 Nov 2018 22:00:42 -0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 08/11] target/mips: Add a decodetree
- stub
+In-Reply-To: <20181112045624.GA28219@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC/PoC PATCH 1/3] i386: set initrd_max to 4G - 1
+ to allow up to 4G initrd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,108 +37,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peer Adelt <peer.adelt@hni.uni-paderborn.de>, Richard Henderson <rth@twiddle.net>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Ingo Molnar <mingo@kernel.org>
+Cc: Li Zhijian <zhijianx.li@intel.com>, Juergen Gross <jgross@suse.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Maydell <peter.maydell@linaro.org>, x86@kernel.org, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de, QEMU Developers <qemu-devel@nongnu.org>, Philip Li <philip.li@intel.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Kees Cook <keescook@chromium.org>
 
-> Subject: [RFC PATCH 08/11] target/mips: Add a decodetree stub
+On 11/11/18 8:56 PM, Ingo Molnar wrote:
+> 
+>> Also note that the ext_ramdisk_image and ext_ramdisk_size are part of
+>> struct boot_params as opposed to struct setup_header, which means that
+>> they are not supported when entering via the 16-bit BIOS entry point,
+>> and I am willing to bet that there will be, ahem, "strangeness" if
+>> entered via the 32-bit entry point if at least the command line is
+>> loaded above the 4 GB mark; the initrd should be fine, though.
+>>
+>> This is obviosly not an issue in EFI environments, where we enter
+>> through the EFI handover entry point.
+>>
+>> The main reason these were not added to struct setup_header is that
+>> there are only 24 bytes left in that header and so space is highly
+>> precious. One way to deal with that if we really, really need to would
+>> be to add an initrd/initramfs type of setup_data.
+> 
+> Is there no way to extend that header by making an extended header part 
+> of the payload?
+> 
+> IIRC that header is small and fixed size to be part of a single sector at 
+> the very beginning of boot images, but accessing any extended header bits 
+> from the payload section shouldn't really be an issue for a modern 
+> bootloader to handle, right?
+> 
+> Such an extended header could use a more modern (self-extending) ABI as 
+> well.
+> 
 
-There is no plan to use decodetree for MIPS target. MIPS decoding engine is=
- mostly stable mature code that was well tested over many years, and there =
-is no point in introducing such drastic change to the code that works.
+Yes, although I don't really think it is as much of an issue as it seems at
+this point.
 
-Thanks,
-Aleksandar
+The limit comes from having used a one-byte jump instruction at the beginning;
+however, these days that limit is functionally walled.
 
-________________________________________
-From: Philippe Mathieu-Daud=E9 <philippe.mathieu.daude@gmail.com> on behalf=
- of Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-Sent: Monday, November 12, 2018 12:36:19 AM
-To: Bastian Koppelmann; Peer Adelt; Richard Henderson
-Cc: Philippe Mathieu-Daud=E9; qemu-devel@nongnu.org; Aurelien Jarno; Aleksa=
-ndar Markovic
-Subject: [RFC PATCH 08/11] target/mips: Add a decodetree stub
+It is of course possible to address this if it should become necessary,
+however, the current protocol has lasted for 23 years so far and we haven't
+run out yet, even with occasional missteps. As such, I don't think we are in a
+huge hurry to address this particular aspect.
 
-Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
----
- target/mips/Makefile.objs   |  8 ++++++++
- target/mips/insns.decode    |  2 ++
- target/mips/translate.c     |  7 +++++++
- target/mips/translate.inc.c | 13 +++++++++++++
- 4 files changed, 30 insertions(+)
- create mode 100644 target/mips/insns.decode
- create mode 100644 target/mips/translate.inc.c
+In part as a result of this exchange I have spent some time thinking about the
+boot protocol and its dependencies, and there is, in fact, a much more serious
+problem that needs to be addressed: it is not currently possible in a
+forward-compatible way to map all data areas that may be occupied by
+bootloader-provided data. The kernel proper has an advantage here, in that the
+kernel will by definition always be the "owner of the protocol" (anything the
+kernel doesn't know how to map won't be used by the kernel anyway), but it
+really isn't a good situation. So I'm currently trying to think up a way to
+make that possible.
 
-diff --git a/target/mips/Makefile.objs b/target/mips/Makefile.objs
-index 651f36f517..3510835d57 100644
---- a/target/mips/Makefile.objs
-+++ b/target/mips/Makefile.objs
-@@ -2,3 +2,11 @@ obj-y +=3D translate.o dsp_helper.o op_helper.o lmi_helper=
-.o helper.o cpu.o
- obj-y +=3D gdbstub.o msa_helper.o mips-semi.o
- obj-$(CONFIG_SOFTMMU) +=3D machine.o cp0_timer.o
- obj-$(CONFIG_KVM) +=3D kvm.o
-+
-+DECODETREE =3D $(SRC_PATH)/scripts/decodetree.py
-+
-+target/mips/decode.inc.c: $(SRC_PATH)/target/mips/insns.decode $(DECODETRE=
-E)
-+       $(call quiet-command,\
-+         $(PYTHON) $(DECODETREE) -o $@ $<, "GEN", $(TARGET_DIR)$@)
-+
-+target/mips/translate.o: target/mips/decode.inc.c
-diff --git a/target/mips/insns.decode b/target/mips/insns.decode
-new file mode 100644
-index 0000000000..7fbf21cbb9
---- /dev/null
-+++ b/target/mips/insns.decode
-@@ -0,0 +1,2 @@
-+# MIPS32/MIPS64 Instruction Set
-+#
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e726f3ec00..560325c563 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -27848,6 +27848,8 @@ static void gen_msa(CPUMIPSState *env, DisasContext=
- *ctx)
-
- }
-
-+#include "translate.inc.c"
-+
- static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
- {
-     int32_t offset;
-@@ -27872,6 +27874,11 @@ static void decode_opc(CPUMIPSState *env, DisasCon=
-text *ctx)
-         gen_set_label(l1);
-     }
-
-+    /* Transition to the auto-generated decoder.  */
-+    if (decode(ctx, ctx->opcode)) {
-+        return;
-+    }
-+
-     op =3D MASK_OP_MAJOR(ctx->opcode);
-     rs =3D (ctx->opcode >> 21) & 0x1f;
-     rt =3D (ctx->opcode >> 16) & 0x1f;
-diff --git a/target/mips/translate.inc.c b/target/mips/translate.inc.c
-new file mode 100644
-index 0000000000..69fe78ac89
---- /dev/null
-+++ b/target/mips/translate.inc.c
-@@ -0,0 +1,13 @@
-+/*
-+ *  MIPS emulation for QEMU - MIPS32 translation routines
-+ *
-+ *  Copyright (c) 2004-2005 Jocelyn Mayer
-+ *  Copyright (c) 2006 Marius Groeger (FPU operations)
-+ *  Copyright (c) 2006 Thiemo Seufer (MIPS32R2 support)
-+ *  Copyright (c) 2018 Philippe Mathieu-Daud=E9
-+ *
-+ * This code is licensed under the GNU GPLv2 and later.
-+ */
-+
-+/* Include the auto-generated decoder.  */
-+#include "decode.inc.c"
---
-2.17.2
+	-hpa
