@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gM0A3-0004jO-M5
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 19:33:04 -0500
+	(envelope-from <xiezhide@huawei.com>) id 1gM0ma-0000zz-Na
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 20:12:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gM0A3-0000Q7-0t
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 19:33:03 -0500
+	(envelope-from <xiezhide@huawei.com>) id 1gM0mX-0004qD-GX
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 20:12:52 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2287 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gM0mX-0004kx-1J
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 20:12:49 -0500
+From: xiezhide <xiezhide@huawei.com>
+Date: Mon, 12 Nov 2018 01:12:33 +0000
+Message-ID: <A02D6AA901860840B46E751C5E9E38B43CC96A40@DGGEML532-MBX.china.huawei.com>
+References: <A02D6AA901860840B46E751C5E9E38B42AFDB15F@DGGEML532-MBX.china.huawei.com>
+In-Reply-To: <A02D6AA901860840B46E751C5E9E38B42AFDB15F@DGGEML532-MBX.china.huawei.com>
+Content-Language: en-US
 MIME-Version: 1.0
-References: <20181109173553.22341-1-peter.maydell@linaro.org>
-In-Reply-To: <20181109173553.22341-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 12 Nov 2018 01:32:43 +0100
-Message-ID: <CAAdtpL4UorO9DbcBWL07cLzvgiBb616u8ikbxq_pwM0884AZQg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/2] Fix the last Hyp mode bug
- and turn it on for A7, A15
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-9p:  fix coding style issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, adam.lackorzynski@kernkonzept.com, Patch Tracking <patches@linaro.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "groug@kaod.org" <groug@kaod.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "berto@igalia.com" <berto@igalia.com>"dgilbert@redhat.com" <dgilbert@redhat.com>"armbru@redhat.com" <armbru@redhat.com>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>, "eblake@redhat.com" <eblake@redhat.com>
 
-Hi Peter,
+fix two coding style issue
 
-On Fri, Nov 9, 2018 at 6:36 PM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> This patchset fixes the last serious bug in our implementation
-> of Hyp mode (aka EL2 for AArch32), and turns the feature bit
-> on for the Cortex-A7 and Cortex-A15 CPUs.
->
-> The bug is that Hyp mode is an exception to the previous
-> general rule that every AArch32 mode (except SYS, which
-> always shares with USR) has its own banked r13, r14 and
-> SPSR. Instead Hyp has a banked r13 and SPSR, but r14 is
-> shared with USR and SYS. We were accidentally implementing
-> it as banked, which results in remarkably nonobvious
-> failure modes.
->
-> With this fix, I can boot an AArch32 guest that uses KVM to
-> boot an AArch32 nested guest, and I can also boot an L4Re/
-> Fiasco guest successfully.
+Signed-off-by: x00390961 <xiezhide@huawei.com<mailto:xiezhide@huawei.com>>
+---
+ fsdev/qemu-fsdev-throttle.c      | 2 +-
+ include/qemu/throttle-options.h   | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-Nice!
-More acceptance tests to add :)
-
->
-> Not entirely sure what to do about this for 3.1 -- maybe
-> put in the bugfix patch but hold off on actually setting
-> the feature bit til 4.0?
-
-The bugfix surely fits.
-
-Do you think enabling the feature isn't well tested and might trigger
-unexpected side effects?
-It is certainly not tested... except by you. But if you include it, it
-might be more tested :)
-
->
-> thanks
-> -- PMM
->
-> Peter Maydell (2):
->   target/arm: Hyp mode R14 is shared with User and System
->   target/arm/cpu: Give Cortex-A15 and -A7 the EL2 feature
->
->  target/arm/internals.h | 16 ++++++++++++++++
->  target/arm/cpu.c       |  2 ++
->  target/arm/helper.c    | 29 +++++++++++++++--------------
->  target/arm/kvm32.c     |  4 ++--
->  target/arm/op_helper.c |  2 +-
->  5 files changed, 36 insertions(+), 17 deletions(-)
->
-> --
-> 2.19.1
->
->
+diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
+index 7d313f2..fa2b0c8 100644
+--- a/fsdev/qemu-fsdev-throttle.c
++++ b/fsdev/qemu-fsdev-throttle.c
+@@ -116,7 +116,7 @@ void fsdev_get_io_throttle(FsThrottle *fst, FsdevIOThro=
+ttle **fs9pcfg,
+     ThrottleLimits *tlimits;
+     FsdevIOThrottle *fscfg =3D g_malloc(sizeof(*fscfg));
+     tlimits =3D qapi_FsdevIOThrottle_base(fscfg);
+-     fscfg->has_id =3D true;
++    fscfg->has_id =3D true;
+     fscfg->id =3D g_strdup(fsdevice);
+     throttle_config_to_limits(&cfg, tlimits);
+     *fs9pcfg =3D fscfg;
+diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-option=
+s.h
+index 7134690..3eb1825 100644
+--- a/include/qemu/throttle-options.h
++++ b/include/qemu/throttle-options.h
+@@ -111,6 +111,5 @@
+             .type =3D QEMU_OPT_NUMBER,\
+             .help =3D "when limiting by iops max size of an I/O in bytes",=
+\
+         }
+-
+     void throttle_parse_options(ThrottleConfig *, QemuOpts *);
+ #endif
+--
+1.8.3.1
