@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMCZn-0000oe-Ew
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:48:28 -0500
+	(envelope-from <dmitry.fleytman@gmail.com>) id 1gMCiD-0005rr-5o
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:57:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMCZm-0002S9-KF
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:48:27 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:46588)
+	(envelope-from <dmitry.fleytman@gmail.com>) id 1gMCiB-0006wh-Qk
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:57:09 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46770)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gMCZm-0002Ry-Du
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:48:26 -0500
-Received: by mail-oi1-x244.google.com with SMTP id e19-v6so7151574oii.13
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 05:48:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <dmitry.fleytman@gmail.com>)
+	id 1gMCiB-0006wH-H8
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:57:07 -0500
+Received: by mail-ot1-x342.google.com with SMTP id w25so7284758otm.13
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 05:57:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181108111531.30671-1-stefanha@redhat.com>
-References: <20181108111531.30671-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Nov 2018 13:48:04 +0000
-Message-ID: <CAFEAcA8HysvgHh4RUOHQLJ0f+Y+1eSsSDjyJ1HzRS7KtLRPctA@mail.gmail.com>
+References: <20181108160818.5485-1-yuval.shaia@oracle.com>
+	<20181108160818.5485-13-yuval.shaia@oracle.com>
+In-Reply-To: <20181108160818.5485-13-yuval.shaia@oracle.com>
+From: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+Date: Mon, 12 Nov 2018 15:56:51 +0200
+Message-ID: <CAFD1vQHxCOqFvx3YA=iJaW39yRfWKwOL1jNgSnyNQjgb9=K4ug@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] Use 'https://' instead of 'git://'
+Subject: Re: [Qemu-devel] [PATCH v2 12/22] vmxnet3: Move some definitions to
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +30,323 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Daniel Berrange <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Jeff Cody <jcody@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
+To: yuval.shaia@oracle.com
+Cc: marcel.apfelbaum@gmail.com, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, shamir.rabinovitch@oracle.com
 
-On 8 November 2018 at 11:15, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> v4:
->  * Once more, with feeling!  Fix 'https//' in get_maintainer.pl [Philippe]
-> v3:
->  * Fix broken openhackware URL [Eric]
->  * Convert a few remaining URLs [Eric]
-> v2:
->  * Use HTTPS for repo.or.cz [Eric]
+On Thu, Nov 8, 2018 at 6:09 PM Yuval Shaia <yuval.shaia@oracle.com> wrote:
 >
-> Jeff Cody has enabled git smart HTTP support on qemu.org.  From now on HTTPS is
-> the preferred protocol because it adds some protection against
-> man-in-the-middle when cloning a repo.
+> pvrdma setup requires vmxnet3 device on PCI function 0 and PVRDMA device
+> on PCI function 1.
+> pvrdma device needs to access vmxnet3 device object for several reasons:
+> 1. Make sure PCI function 0 is vmxnet3.
+> 2. To monitor vmxnet3 device state.
+> 3. To configure node_guid accoring to vmxnet3 device's MAC address.
 >
-> This patch series updates git:// URLs and changes them to https://.  The https:// URL format is:
+> To be able to access vmxnet3 device the definition of VMXNET3State is
+> moved to a new header file.
 >
->   https://git.qemu.org/git/<project>.git
->
-> The old git:// URL format was:
->
->   git://git.qemu.org/<project>.git
->
-> I have also updated git://github.com/ and repo.or.cz URLs because they offer HTTPS.
->
-> I have tested that submodules continue to work after the change to .gitmodules.
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 
-Applied to master, thanks.
+Reviewed-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
 
--- PMM
+> ---
+>  hw/net/vmxnet3.c      | 116 +-----------------------------------
+>  hw/net/vmxnet3_defs.h | 133 ++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 134 insertions(+), 115 deletions(-)
+>  create mode 100644 hw/net/vmxnet3_defs.h
+>
+> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+> index 3648630386..54746a4030 100644
+> --- a/hw/net/vmxnet3.c
+> +++ b/hw/net/vmxnet3.c
+> @@ -18,7 +18,6 @@
+>  #include "qemu/osdep.h"
+>  #include "hw/hw.h"
+>  #include "hw/pci/pci.h"
+> -#include "net/net.h"
+>  #include "net/tap.h"
+>  #include "net/checksum.h"
+>  #include "sysemu/sysemu.h"
+> @@ -29,6 +28,7 @@
+>  #include "migration/register.h"
+>
+>  #include "vmxnet3.h"
+> +#include "vmxnet3_defs.h"
+>  #include "vmxnet_debug.h"
+>  #include "vmware_utils.h"
+>  #include "net_tx_pkt.h"
+> @@ -131,23 +131,11 @@ typedef struct VMXNET3Class {
+>      DeviceRealize parent_dc_realize;
+>  } VMXNET3Class;
+>
+> -#define TYPE_VMXNET3 "vmxnet3"
+> -#define VMXNET3(obj) OBJECT_CHECK(VMXNET3State, (obj), TYPE_VMXNET3)
+> -
+>  #define VMXNET3_DEVICE_CLASS(klass) \
+>      OBJECT_CLASS_CHECK(VMXNET3Class, (klass), TYPE_VMXNET3)
+>  #define VMXNET3_DEVICE_GET_CLASS(obj) \
+>      OBJECT_GET_CLASS(VMXNET3Class, (obj), TYPE_VMXNET3)
+>
+> -/* Cyclic ring abstraction */
+> -typedef struct {
+> -    hwaddr pa;
+> -    uint32_t size;
+> -    uint32_t cell_size;
+> -    uint32_t next;
+> -    uint8_t gen;
+> -} Vmxnet3Ring;
+> -
+>  static inline void vmxnet3_ring_init(PCIDevice *d,
+>                                      Vmxnet3Ring *ring,
+>                                       hwaddr pa,
+> @@ -245,108 +233,6 @@ vmxnet3_dump_rx_descr(struct Vmxnet3_RxDesc *descr)
+>                descr->rsvd, descr->dtype, descr->ext1, descr->btype);
+>  }
+>
+> -/* Device state and helper functions */
+> -#define VMXNET3_RX_RINGS_PER_QUEUE (2)
+> -
+> -typedef struct {
+> -    Vmxnet3Ring tx_ring;
+> -    Vmxnet3Ring comp_ring;
+> -
+> -    uint8_t intr_idx;
+> -    hwaddr tx_stats_pa;
+> -    struct UPT1_TxStats txq_stats;
+> -} Vmxnet3TxqDescr;
+> -
+> -typedef struct {
+> -    Vmxnet3Ring rx_ring[VMXNET3_RX_RINGS_PER_QUEUE];
+> -    Vmxnet3Ring comp_ring;
+> -    uint8_t intr_idx;
+> -    hwaddr rx_stats_pa;
+> -    struct UPT1_RxStats rxq_stats;
+> -} Vmxnet3RxqDescr;
+> -
+> -typedef struct {
+> -    bool is_masked;
+> -    bool is_pending;
+> -    bool is_asserted;
+> -} Vmxnet3IntState;
+> -
+> -typedef struct {
+> -        PCIDevice parent_obj;
+> -        NICState *nic;
+> -        NICConf conf;
+> -        MemoryRegion bar0;
+> -        MemoryRegion bar1;
+> -        MemoryRegion msix_bar;
+> -
+> -        Vmxnet3RxqDescr rxq_descr[VMXNET3_DEVICE_MAX_RX_QUEUES];
+> -        Vmxnet3TxqDescr txq_descr[VMXNET3_DEVICE_MAX_TX_QUEUES];
+> -
+> -        /* Whether MSI-X support was installed successfully */
+> -        bool msix_used;
+> -        hwaddr drv_shmem;
+> -        hwaddr temp_shared_guest_driver_memory;
+> -
+> -        uint8_t txq_num;
+> -
+> -        /* This boolean tells whether RX packet being indicated has to */
+> -        /* be split into head and body chunks from different RX rings  */
+> -        bool rx_packets_compound;
+> -
+> -        bool rx_vlan_stripping;
+> -        bool lro_supported;
+> -
+> -        uint8_t rxq_num;
+> -
+> -        /* Network MTU */
+> -        uint32_t mtu;
+> -
+> -        /* Maximum number of fragments for indicated TX packets */
+> -        uint32_t max_tx_frags;
+> -
+> -        /* Maximum number of fragments for indicated RX packets */
+> -        uint16_t max_rx_frags;
+> -
+> -        /* Index for events interrupt */
+> -        uint8_t event_int_idx;
+> -
+> -        /* Whether automatic interrupts masking enabled */
+> -        bool auto_int_masking;
+> -
+> -        bool peer_has_vhdr;
+> -
+> -        /* TX packets to QEMU interface */
+> -        struct NetTxPkt *tx_pkt;
+> -        uint32_t offload_mode;
+> -        uint32_t cso_or_gso_size;
+> -        uint16_t tci;
+> -        bool needs_vlan;
+> -
+> -        struct NetRxPkt *rx_pkt;
+> -
+> -        bool tx_sop;
+> -        bool skip_current_tx_pkt;
+> -
+> -        uint32_t device_active;
+> -        uint32_t last_command;
+> -
+> -        uint32_t link_status_and_speed;
+> -
+> -        Vmxnet3IntState interrupt_states[VMXNET3_MAX_INTRS];
+> -
+> -        uint32_t temp_mac;   /* To store the low part first */
+> -
+> -        MACAddr perm_mac;
+> -        uint32_t vlan_table[VMXNET3_VFT_SIZE];
+> -        uint32_t rx_mode;
+> -        MACAddr *mcast_list;
+> -        uint32_t mcast_list_len;
+> -        uint32_t mcast_list_buff_size; /* needed for live migration. */
+> -
+> -        /* Compatibility flags for migration */
+> -        uint32_t compat_flags;
+> -} VMXNET3State;
+> -
+>  /* Interrupt management */
+>
+>  /*
+> diff --git a/hw/net/vmxnet3_defs.h b/hw/net/vmxnet3_defs.h
+> new file mode 100644
+> index 0000000000..6c19d29b12
+> --- /dev/null
+> +++ b/hw/net/vmxnet3_defs.h
+> @@ -0,0 +1,133 @@
+> +/*
+> + * QEMU VMWARE VMXNET3 paravirtual NIC
+> + *
+> + * Copyright (c) 2012 Ravello Systems LTD (http://ravellosystems.com)
+> + *
+> + * Developed by Daynix Computing LTD (http://www.daynix.com)
+> + *
+> + * Authors:
+> + * Dmitry Fleytman <dmitry@daynix.com>
+> + * Tamir Shomer <tamirs@daynix.com>
+> + * Yan Vugenfirer <yan@daynix.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "net/net.h"
+> +#include "hw/net/vmxnet3.h"
+> +
+> +#define TYPE_VMXNET3 "vmxnet3"
+> +#define VMXNET3(obj) OBJECT_CHECK(VMXNET3State, (obj), TYPE_VMXNET3)
+> +
+> +/* Device state and helper functions */
+> +#define VMXNET3_RX_RINGS_PER_QUEUE (2)
+> +
+> +/* Cyclic ring abstraction */
+> +typedef struct {
+> +    hwaddr pa;
+> +    uint32_t size;
+> +    uint32_t cell_size;
+> +    uint32_t next;
+> +    uint8_t gen;
+> +} Vmxnet3Ring;
+> +
+> +typedef struct {
+> +    Vmxnet3Ring tx_ring;
+> +    Vmxnet3Ring comp_ring;
+> +
+> +    uint8_t intr_idx;
+> +    hwaddr tx_stats_pa;
+> +    struct UPT1_TxStats txq_stats;
+> +} Vmxnet3TxqDescr;
+> +
+> +typedef struct {
+> +    Vmxnet3Ring rx_ring[VMXNET3_RX_RINGS_PER_QUEUE];
+> +    Vmxnet3Ring comp_ring;
+> +    uint8_t intr_idx;
+> +    hwaddr rx_stats_pa;
+> +    struct UPT1_RxStats rxq_stats;
+> +} Vmxnet3RxqDescr;
+> +
+> +typedef struct {
+> +    bool is_masked;
+> +    bool is_pending;
+> +    bool is_asserted;
+> +} Vmxnet3IntState;
+> +
+> +typedef struct {
+> +        PCIDevice parent_obj;
+> +        NICState *nic;
+> +        NICConf conf;
+> +        MemoryRegion bar0;
+> +        MemoryRegion bar1;
+> +        MemoryRegion msix_bar;
+> +
+> +        Vmxnet3RxqDescr rxq_descr[VMXNET3_DEVICE_MAX_RX_QUEUES];
+> +        Vmxnet3TxqDescr txq_descr[VMXNET3_DEVICE_MAX_TX_QUEUES];
+> +
+> +        /* Whether MSI-X support was installed successfully */
+> +        bool msix_used;
+> +        hwaddr drv_shmem;
+> +        hwaddr temp_shared_guest_driver_memory;
+> +
+> +        uint8_t txq_num;
+> +
+> +        /* This boolean tells whether RX packet being indicated has to */
+> +        /* be split into head and body chunks from different RX rings  */
+> +        bool rx_packets_compound;
+> +
+> +        bool rx_vlan_stripping;
+> +        bool lro_supported;
+> +
+> +        uint8_t rxq_num;
+> +
+> +        /* Network MTU */
+> +        uint32_t mtu;
+> +
+> +        /* Maximum number of fragments for indicated TX packets */
+> +        uint32_t max_tx_frags;
+> +
+> +        /* Maximum number of fragments for indicated RX packets */
+> +        uint16_t max_rx_frags;
+> +
+> +        /* Index for events interrupt */
+> +        uint8_t event_int_idx;
+> +
+> +        /* Whether automatic interrupts masking enabled */
+> +        bool auto_int_masking;
+> +
+> +        bool peer_has_vhdr;
+> +
+> +        /* TX packets to QEMU interface */
+> +        struct NetTxPkt *tx_pkt;
+> +        uint32_t offload_mode;
+> +        uint32_t cso_or_gso_size;
+> +        uint16_t tci;
+> +        bool needs_vlan;
+> +
+> +        struct NetRxPkt *rx_pkt;
+> +
+> +        bool tx_sop;
+> +        bool skip_current_tx_pkt;
+> +
+> +        uint32_t device_active;
+> +        uint32_t last_command;
+> +
+> +        uint32_t link_status_and_speed;
+> +
+> +        Vmxnet3IntState interrupt_states[VMXNET3_MAX_INTRS];
+> +
+> +        uint32_t temp_mac;   /* To store the low part first */
+> +
+> +        MACAddr perm_mac;
+> +        uint32_t vlan_table[VMXNET3_VFT_SIZE];
+> +        uint32_t rx_mode;
+> +        MACAddr *mcast_list;
+> +        uint32_t mcast_list_len;
+> +        uint32_t mcast_list_buff_size; /* needed for live migration. */
+> +
+> +        /* Compatibility flags for migration */
+> +        uint32_t compat_flags;
+> +} VMXNET3State;
+> --
+> 2.17.2
+>
