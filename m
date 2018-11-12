@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gMCmy-0000yK-2w
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:02:05 -0500
+	(envelope-from <berto@igalia.com>) id 1gMCn0-00010g-36
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:02:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gMCmw-0001ih-6w
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:02:03 -0500
+	(envelope-from <berto@igalia.com>) id 1gMCmw-0001im-6q
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:02:05 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon, 12 Nov 2018 16:00:39 +0200
-Message-Id: <35768d725ca22f3599157e70d17960f998ac9a56.1542031058.git.berto@igalia.com>
+Date: Mon, 12 Nov 2018 16:00:33 +0200
+Message-Id: <d0c8a038da9c15e829ca99712ce79dc917d314bb.1542031058.git.berto@igalia.com>
 In-Reply-To: <cover.1542031058.git.berto@igalia.com>
 References: <cover.1542031058.git.berto@igalia.com>
 In-Reply-To: <cover.1542031058.git.berto@igalia.com>
 References: <cover.1542031058.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v5 07/16] block: Use
- bdrv_reopen_set_read_only() in external_snapshot_commit()
+Subject: [Qemu-devel] [PATCH v5 01/16] block: Add bdrv_reopen_set_read_only()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +24,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This patch replaces the bdrv_reopen() call that set and remove the
-BDRV_O_RDWR flag with the new bdrv_reopen_set_read_only() function.
+Most callers of bdrv_reopen() only use it to switch a BlockDriverState
+between read-only and read-write, so this patch adds a new function
+that does just that.
+
+We also want to get rid of the flags parameter in the bdrv_reopen()
+API, so this function sets the "read-only" option and passes the
+original flags (which will then be updated in bdrv_reopen_prepare()).
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- blockdev.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ block.c               | 17 +++++++++++++++++
+ include/block/block.h |  2 ++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/blockdev.c b/blockdev.c
-index 20d1d84bab..112bc62ae5 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1703,8 +1703,7 @@ static void external_snapshot_commit(BlkActionState *common)
-      * bdrv_reopen_multiple() across all the entries at once, because we
-      * don't want to abort all of them if one of them fails the reopen */
-     if (!atomic_read(&state->old_bs->copy_on_read)) {
--        bdrv_reopen(state->old_bs, state->old_bs->open_flags & ~BDRV_O_RDWR,
--                    NULL);
-+        bdrv_reopen_set_read_only(state->old_bs, true, NULL);
-     }
+diff --git a/block.c b/block.c
+index fd67e14dfa..4e82c71ba4 100644
+--- a/block.c
++++ b/block.c
+@@ -3127,6 +3127,23 @@ int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp)
+     return ret;
+ }
  
-     aio_context_release(aio_context);
++int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
++                              Error **errp)
++{
++    int ret;
++    BlockReopenQueue *queue;
++    QDict *opts = qdict_new();
++
++    qdict_put_bool(opts, BDRV_OPT_READ_ONLY, read_only);
++
++    bdrv_subtree_drained_begin(bs);
++    queue = bdrv_reopen_queue(NULL, bs, opts, bdrv_get_flags(bs));
++    ret = bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, errp);
++    bdrv_subtree_drained_end(bs);
++
++    return ret;
++}
++
+ static BlockReopenQueueEntry *find_parent_in_reopen_queue(BlockReopenQueue *q,
+                                                           BdrvChild *c)
+ {
+diff --git a/include/block/block.h b/include/block/block.h
+index 7f5453b45b..382e6643fc 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -303,6 +303,8 @@ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
+                                     QDict *options, int flags);
+ int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **errp);
+ int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp);
++int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
++                              Error **errp);
+ int bdrv_reopen_prepare(BDRVReopenState *reopen_state,
+                         BlockReopenQueue *queue, Error **errp);
+ void bdrv_reopen_commit(BDRVReopenState *reopen_state);
 -- 
 2.11.0
