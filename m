@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gMA6j-0004Qo-Jw
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 06:10:23 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gMAAB-0007hA-QN
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 06:13:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gMA6i-0003jU-MP
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 06:10:17 -0500
-Date: Mon, 12 Nov 2018 12:10:07 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20181112111007.GD1148@toto>
-References: <20181109173553.22341-1-peter.maydell@linaro.org>
-	<20181109173553.22341-3-peter.maydell@linaro.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1gMAA7-0005pY-NY
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 06:13:51 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39615)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gMAA7-0005o9-CY
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 06:13:47 -0500
+Received: by mail-wm1-x343.google.com with SMTP id u13-v6so7728103wmc.4
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 03:13:46 -0800 (PST)
+References: <20181110121711.15257-1-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181110121711.15257-1-richard.henderson@linaro.org>
+Date: Mon, 12 Nov 2018 11:13:44 +0000
+Message-ID: <87muqeeefr.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181109173553.22341-3-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/arm/cpu: Give Cortex-A15 and
- -A7 the EL2 feature
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-3.1] target/arm: Fix typo in
+ tlbi_aa64_vmalle1_write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Adam Lackorzynski <adam.lackorzynski@kernkonzept.com>
+To: qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Fri, Nov 09, 2018 at 05:35:53PM +0000, Peter Maydell wrote:
-> The Cortex-A15 and Cortex-A7 both have EL2; now we've implemented
-> it properly we can enable the feature bit.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Richard Henderson <richard.henderson@linaro.org> writes:
 
+> This would cause an infinite recursion or loop.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+I feel the title undersells the importance of the fix ;-)
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  target/arm/cpu.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 784a4c2dfcc..b7185234d85 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1587,6 +1587,7 @@ static void cortex_a7_initfn(Object *obj)
->      set_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER);
->      set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
->      set_feature(&cpu->env, ARM_FEATURE_CBAR_RO);
-> +    set_feature(&cpu->env, ARM_FEATURE_EL2);
->      set_feature(&cpu->env, ARM_FEATURE_EL3);
->      cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A7;
->      cpu->midr = 0x410fc075;
-> @@ -1633,6 +1634,7 @@ static void cortex_a15_initfn(Object *obj)
->      set_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER);
->      set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
->      set_feature(&cpu->env, ARM_FEATURE_CBAR_RO);
-> +    set_feature(&cpu->env, ARM_FEATURE_EL2);
->      set_feature(&cpu->env, ARM_FEATURE_EL3);
->      cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A15;
->      cpu->midr = 0x412fc0f1;
-> -- 
-> 2.19.1
-> 
+>  target/arm/helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 96301930cc..a327988c66 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -3155,7 +3155,7 @@ static void tlbi_aa64_vmalle1_write(CPUARMState *en=
+v, const ARMCPRegInfo *ri,
+>      CPUState *cs =3D ENV_GET_CPU(env);
+>
+>      if (tlb_force_broadcast(env)) {
+> -        tlbi_aa64_vmalle1_write(env, NULL, value);
+> +        tlbi_aa64_vmalle1is_write(env, NULL, value);
+>          return;
+>      }
+
+
+--
+Alex Benn=C3=A9e
