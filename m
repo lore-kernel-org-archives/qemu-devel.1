@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gM91a-0001iP-SE
+	(envelope-from <groug@kaod.org>) id 1gM91V-0001fp-M3
 	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:00:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gM91V-0000Vp-Q4
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:00:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57172)
+	(envelope-from <groug@kaod.org>) id 1gM91J-0000Rs-Pe
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:00:45 -0500
+Received: from 11.mo6.mail-out.ovh.net ([188.165.38.119]:45324)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gM91S-0000RT-QH
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:00:49 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 12 Nov 2018 11:00:30 +0100
-Message-Id: <1542016830-19189-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] bt: Mark the bluetooth subsystem as deprecated
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gM91C-0000PD-GB
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:00:34 -0500
+Received: from player795.ha.ovh.net (unknown [10.109.159.132])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id DFBAA197FF8
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 11:00:25 +0100 (CET)
+Date: Mon, 12 Nov 2018 11:00:21 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181112110021.734d25d5@bahia.lan>
+In-Reply-To: <CACcO5F4FBW9QiaTA1w61z5pwt6Z3F1n73=rL4Af=6-K5zq0-EQ@mail.gmail.com>
+References: <154155007870.439125.16160474206652257208.stgit@bahia.lan>
+	<CACcO5F4FBW9QiaTA1w61z5pwt6Z3F1n73=rL4Af=6-K5zq0-EQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] 9p: write lock path in v9fs_co_open2()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,76 +30,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-Cc: libvir-list@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Andrzej Zaborowski <andrew.zaborowski@intel.com>
+To: zhibin hu <noirfate@gmail.com>
+Cc: qemu-devel@nongnu.org, prasad@redhat.com
 
-It has been unmaintained since years, and there were only trivial or
-tree-wide changes to the related files since many years, so the
-code is likely very bitrotten and broken. For example the following
-segfaults as soon as as you press a key:
+On Mon, 12 Nov 2018 16:28:28 +0800
+zhibin hu <noirfate@gmail.com> wrote:
 
- qemu-system-x86_64 -usb -device usb-bt-dongle -bt hci -bt device:keyboard
+> hi,
+> 
+> i use this patch with qemu 3.0.0 and it seems not fix completely.
+> 
+> [root@localhost ~]# ./qemu-system-x86_64 -snapshot -m 1024 -smp 2
+> -enable-kvm -net nic,model=e1000 -net
+> tap,helper=/usr/libexec/qemu-bridge-helper -hda
+> /var/lib/libvirt/images/test.qcow2 -fsdev
+> local,id=test_dev,path=/tmp,security_model=none -device
+> virtio-9p-pci,fsdev=test_dev,mount_tag=test_mount -vnc 0.0.0.0:1
+> ==5014==WARNING: ASan doesn't fully support makecontext/swapcontext
+> functions and may produce false positives in some cases!
+> =================================================================
+> ==5014==ERROR: AddressSanitizer: heap-use-after-free on address
+> 0x60200014fc50 at pc 0x7f90c908697d bp 0x7f9053444970 sp 0x7f9053444118
+> READ of size 2 at 0x60200014fc50 thread T17
+>     #0 0x7f90c908697c  (/lib64/libasan.so.5+0x9997c)
+>     #1 0x7f90c8452693 in g_path_get_basename
+> (/lib64/libglib-2.0.so.0+0x39693)
+>     #2 0x559c1b78eb56 in local_lstat hw/9pfs/9p-local.c:182
+>     #3 0x559c1b799628 in v9fs_co_lstat hw/9pfs/cofile.c:53
+>     #4 0x559c1b777ee1 in fid_to_qid hw/9pfs/9p.c:598
+>     #5 0x559c1b77aeae in v9fs_attach hw/9pfs/9p.c:1017
+>     #6 0x559c1c145976 in coroutine_trampoline util/coroutine-ucontext.c:116
+>     #7 0x7f90bd6855ff in __correctly_grouped_prefixwc
+> (/lib64/libc.so.6+0x4c5ff)
+> 
+> 0x60200014fc50 is located 0 bytes inside of 2-byte region
+> [0x60200014fc50,0x60200014fc52)
+> freed by thread T0 here:
+>     #0 0x7f90c90db880 in __interceptor_free (/lib64/libasan.so.5+0xee880)
+>     #1 0x7f90c846b4d1 in g_free (/lib64/libglib-2.0.so.0+0x524d1)
+>     #2 0x559c1b775ce4 in v9fs_path_copy hw/9pfs/9p.c:195
+>     #3 0x559c1b78425d in v9fs_create hw/9pfs/9p.c:2297
 
-Since we are not aware of anybody using bluetooth with the current
-version of QEMU, let's mark the subsystem as deprecated, with a special
-request for the users to write to the qemu-devel mailing list in case
-they still use it (so we could revert the deprecation status in that
-case).
+Ah, so we have a similar issue when creating files with the older
+9p2000 and 9p2000.u protocols... I'll try to come up with a fix.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- qemu-deprecated.texi | 7 +++++++
- qemu-options.hx      | 4 ++++
- vl.c                 | 4 ++++
- 3 files changed, 15 insertions(+)
+Cheers,
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 5d2d7a3..cb4291f 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -128,6 +128,13 @@ The @option{[hub_id name]} parameter tuple of the 'hostfwd_add' and
- The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
- or ``ivshmem-doorbell`` device types.
- 
-+@subsection bluetooth (since 3.1)
-+
-+The bluetooth subsystem is unmaintained since many years and likely bitrotten
-+quite a bit. It will be removed without replacement unless some users speaks
-+up at the @email{qemu-devel@@nongnu.org} mailing list with information about
-+their usecases.
-+
- @section System emulator machines
- 
- @subsection pc-0.10 and pc-0.11 (since 3.0)
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 38c7a97..ee379b3 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2772,6 +2772,10 @@ logic.  The Transport Layer is decided by the machine type.  Currently
- the machines @code{n800} and @code{n810} have one HCI and all other
- machines have none.
- 
-+Note: This option and the whole bluetooth subsystem is considered as deprecated.
-+If you still use it, please send a mail to @email{qemu-devel@@nongnu.org} where
-+you describe your usecase.
-+
- @anchor{bt-hcis}
- The following three types are recognized:
- 
-diff --git a/vl.c b/vl.c
-index 55bab00..fa25d1a 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3269,6 +3269,10 @@ int main(int argc, char **argv, char **envp)
-                 break;
- #endif
-             case QEMU_OPTION_bt:
-+                warn_report("The bluetooth subsystem is deprecated and will "
-+                            "be removed soon. If the bluetooth subsystem is "
-+                            "still useful for you, please send a mail to "
-+                            "qemu-devel@nongnu.org with your usecase.");
-                 add_device_config(DEV_BT, optarg);
-                 break;
-             case QEMU_OPTION_audio_help:
--- 
-1.8.3.1
+--
+Greg
+
+>     #4 0x559c1c145976 in coroutine_trampoline util/coroutine-ucontext.c:116
+>     #5 0x7f90bd6855ff in __correctly_grouped_prefixwc
+> (/lib64/libc.so.6+0x4c5ff)
+> 
+> previously allocated by thread T4 here:
+>     #0 0x7f90c90dbc48 in malloc (/lib64/libasan.so.5+0xeec48)
+>     #1 0x7f90bd743c37 in __GI___vasprintf_chk (/lib64/libc.so.6+0x10ac37)
+> 
+> Thread T17 created by T16 here:
+>     #0 0x7f90c9038443 in pthread_create (/lib64/libasan.so.5+0x4b443)
+>     #1 0x559c1c10461e in qemu_thread_create util/qemu-thread-posix.c:534
+>     #2 0x559c1c0f2be4 in do_spawn_thread util/thread-pool.c:135
+>     #3 0x559c1c0f2498 in worker_thread util/thread-pool.c:83
+>     #4 0x559c1c1043e0 in qemu_thread_start util/qemu-thread-posix.c:504
+>     #5 0x7f90bd9ff593 in start_thread (/lib64/libpthread.so.0+0x7593)
+> 
+> Thread T16 created by T0 here:
+>     #0 0x7f90c9038443 in pthread_create (/lib64/libasan.so.5+0x4b443)
+>     #1 0x559c1c10461e in qemu_thread_create util/qemu-thread-posix.c:534
+>     #2 0x559c1c0f2be4 in do_spawn_thread util/thread-pool.c:135
+>     #3 0x559c1c0f2c73 in spawn_thread_bh_fn util/thread-pool.c:143
+>     #4 0x559c1c0ef4d0 in aio_bh_call util/async.c:90
+>     #5 0x559c1c0ef787 in aio_bh_poll util/async.c:118
+>     #6 0x559c1c0fb5bd in aio_dispatch util/aio-posix.c:436
+>     #7 0x559c1c0f026f in aio_ctx_dispatch util/async.c:261
+>     #8 0x7f90c84658ac in g_main_context_dispatch
+> (/lib64/libglib-2.0.so.0+0x4c8ac)
+> 
+> Thread T4 created by T0 here:
+>     #0 0x7f90c9038443 in pthread_create (/lib64/libasan.so.5+0x4b443)
+>     #1 0x559c1c10461e in qemu_thread_create util/qemu-thread-posix.c:534
+>     #2 0x559c1b2e7258 in qemu_kvm_start_vcpu /root/qemu-3.0.0/cpus.c:1935
+>     #3 0x559c1b2e7a0b in qemu_init_vcpu /root/qemu-3.0.0/cpus.c:2001
+>     #4 0x559c1b583f0c in x86_cpu_realizefn
+> /root/qemu-3.0.0/target/i386/cpu.c:4996
+>     #5 0x559c1b87f1e8 in device_set_realized hw/core/qdev.c:826
+>     #6 0x559c1bde6e62 in property_set_bool qom/object.c:1984
+>     #7 0x559c1bde2b0e in object_property_set qom/object.c:1176
+>     #8 0x559c1bde9b00 in object_property_set_qobject qom/qom-qobject.c:27
+>     #9 0x559c1bde2e2b in object_property_set_bool qom/object.c:1242
+>     #10 0x559c1b4f2452 in pc_new_cpu /root/qemu-3.0.0/hw/i386/pc.c:1107
+>     #11 0x559c1b4f2993 in pc_cpus_init /root/qemu-3.0.0/hw/i386/pc.c:1155
+>     #12 0x559c1b4fc9cb in pc_init1 /root/qemu-3.0.0/hw/i386/pc_piix.c:153
+>     #13 0x559c1b4fe81d in pc_init_v3_0
+> /root/qemu-3.0.0/hw/i386/pc_piix.c:438
+>     #14 0x559c1b890f29 in machine_run_board_init hw/core/machine.c:830
+>     #15 0x559c1b6d246e in main /root/qemu-3.0.0/vl.c:4516
+>     #16 0x7f90bd65c11a in __libc_start_main (/lib64/libc.so.6+0x2311a)
+> 
+> SUMMARY: AddressSanitizer: heap-use-after-free
+> (/lib64/libasan.so.5+0x9997c)
+> Shadow bytes around the buggy address:
+>   0x0c0480021f30: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+>   0x0c0480021f40: fa fa fd fa fa fa fd fd fa fa fa fa fa fa fa fa
+>   0x0c0480021f50: fa fa fa fa fa fa fa fa fa fa fd fa fa fa fd fd
+>   0x0c0480021f60: fa fa fd fa fa fa fa fa fa fa fd fa fa fa fa fa
+>   0x0c0480021f70: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fd fa
+> =>0x0c0480021f80: fa fa fa fa fa fa fd fa fa fa[fd]fa fa fa fd fa  
+>   0x0c0480021f90: fa fa fd fd fa fa fd fa fa fa fa fa fa fa fd fa
+>   0x0c0480021fa0: fa fa fd fa fa fa fd fa fa fa fd fa fa fa fa fa
+>   0x0c0480021fb0: fa fa fd fa fa fa fa fa fa fa fa fa fa fa fd fd
+>   0x0c0480021fc0: fa fa fd fa fa fa fa fa fa fa fa fa fa fa fd fa
+>   0x0c0480021fd0: fa fa fd fa fa fa fd fa fa fa fa fa fa fa fd fa
+> Shadow byte legend (one shadow byte represents 8 application bytes):
+>   Addressable:           00
+>   Partially addressable: 01 02 03 04 05 06 07
+>   Heap left redzone:       fa
+>   Freed heap region:       fd
+>   Stack left redzone:      f1
+>   Stack mid redzone:       f2
+>   Stack right redzone:     f3
+>   Stack after return:      f5
+>   Stack use after scope:   f8
+>   Global redzone:          f9
+>   Global init order:       f6
+>   Poisoned by user:        f7
+>   Container overflow:      fc
+>   Array cookie:            ac
+>   Intra object redzone:    bb
+>   ASan internal:           fe
+>   Left alloca redzone:     ca
+>   Right alloca redzone:    cb
+> ==5014==ABORTING
+> 
+> thanks.
+> 
+> On Wed, Nov 7, 2018 at 8:21 AM Greg Kurz <groug@kaod.org> wrote:
+> 
+> > The assumption that the fid cannot be used by any other operation is
+> > wrong. At least, nothing prevents a misbehaving client to create a
+> > file with a given fid, and to pass this fid to some other operation
+> > at the same time (ie, without waiting for the response to the creation
+> > request). The call to v9fs_path_copy() performed by the worker thread
+> > after the file was created can race with any access to the fid path
+> > performed by some other thread. This causes use-after-free issues that
+> > can be detected by ASAN with a custom 9p client.
+> >
+> > Unlike other operations that only read the fid path, v9fs_co_open2()
+> > does modify it. It should hence take the write lock.
+> >
+> > Cc: P J P <ppandit@redhat.com>
+> > Reported-by: zhibin hu <noirfate@gmail.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/9pfs/cofile.c |    6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/hw/9pfs/cofile.c b/hw/9pfs/cofile.c
+> > index 88791bc327ac..9c22837cda32 100644
+> > --- a/hw/9pfs/cofile.c
+> > +++ b/hw/9pfs/cofile.c
+> > @@ -140,10 +140,10 @@ int coroutine_fn v9fs_co_open2(V9fsPDU *pdu,
+> > V9fsFidState *fidp,
+> >      cred.fc_gid = gid;
+> >      /*
+> >       * Hold the directory fid lock so that directory path name
+> > -     * don't change. Read lock is fine because this fid cannot
+> > -     * be used by any other operation.
+> > +     * don't change. Take the write lock to be sure this fid
+> > +     * cannot be used by another operation.
+> >       */
+> > -    v9fs_path_read_lock(s);
+> > +    v9fs_path_write_lock(s);
+> >      v9fs_co_run_in_worker(
+> >          {
+> >              err = s->ops->open2(&s->ctx, &fidp->path,
+> >
+> >  
