@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1gMGZZ-0004RW-4m
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 13:04:36 -0500
+	(envelope-from <bounces@canonical.com>) id 1gMH42-0002k8-IY
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 13:35:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1gMGZG-0007b2-IZ
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 13:04:22 -0500
-References: <20181111094023.18038-1-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <3a19b90b-71aa-36b2-4e30-867d29ac5683@reactos.org>
-Date: Mon, 12 Nov 2018 19:03:43 +0100
+	(envelope-from <bounces@canonical.com>) id 1gMH3v-0001S2-Ss
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 13:35:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57470)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gMH3o-0001Ec-8K
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 13:35:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gMH3b-0001h8-8f
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 18:35:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 401962E8075
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 18:35:31 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181111094023.18038-1-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1] fdc: fix segfault in
- fdctrl_stop_transfer() when DMA is disabled
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 12 Nov 2018 18:26:37 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1802150 <1802150@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154161401577.19796.10798182190360171804.malonedeb@gac.canonical.com>
+Message-Id: <154204719764.2327.17412754718199087172.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1802150] Re: Guest undefined when destroyed on
+ host after migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +37,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, martin@duskware.de
+To: qemu-devel@nongnu.org
 
-Le 11/11/2018 à 10:40, Mark Cave-Ayland a écrit :
-> Commit c8a35f1cf0f "fdc: use IsaDma interface instead of global DMA_*
-> functions" accidentally introduced a segfault in fdctrl_stop_transfer() for
-> non-DMA transfers.
-> 
-> If fdctrl->dma_chann has not been configured then the fdctrl->dma interface
-> reference isn't initialised during isabus_fdc_realize(). Unfortunately
-> fdctrl_stop_transfer() unconditionally references the DMA interface when
-> finishing the transfer causing a NULL pointer dereference.
-> 
-> Fix the issue by adding a check in fdctrl_stop_transfer() so that the DMA
-> interface reference and release method is only invoked if fdctrl->dma_chann
-> has been set.
-> 
-> (This issue was discovered by Martin testing a recent change in the NetBSD
-> installer under qemu-system-sparc)
-> 
-> Reported-by: Martin Husemann <martin@duskware.de>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Also, can you please include the libvirt logs for the VM, they're
+typically in /var/log/libvirt/VMNAME.log
 
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1802150
+
+Title:
+  Guest undefined when destroyed on host after migration
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  After a live migration, guest VMs are being undefined from the host
+  they were migrated to after shutdown. I have experienced this at two
+  (2) separate locations on more than one hardware configuration.  This
+  happens when utilizing virt-manager to view current allocations on
+  hosts, and virsh on the CLI to migrate guests.  When the guest is
+  migrated from one host to another, no errors are thrown, and only lose
+  1 packet from infinite ping. Shutting guest down *from* the guest OS
+  results in the Guest VM being undefined on the residing host, and XML
+  config lost.  If needed, I can provide a recorded session of this
+  happening.
+
+  Thanks,
+    Dan
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1802150/+subscriptions
