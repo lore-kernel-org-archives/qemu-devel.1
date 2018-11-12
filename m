@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gMF3d-0002dD-5Z
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:27:29 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gMF86-0004eM-3g
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:32:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gMF3H-0004XI-60
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:27:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47368)
+	(envelope-from <ehabkost@redhat.com>) id 1gMF7v-0002Qa-BK
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:31:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52502)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gMF3G-0004TB-F9
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:27:02 -0500
-References: <A02D6AA901860840B46E751C5E9E38B42AFDB150@DGGEML532-MBX.china.huawei.com>
-	<A02D6AA901860840B46E751C5E9E38B43CC96A3B@DGGEML532-MBX.china.huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a6c3c3a4-e82a-ce67-da68-c8d03a77a289@redhat.com>
-Date: Mon, 12 Nov 2018 10:26:51 -0600
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gMF7u-00020S-Jv
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:31:51 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4CA4E83F44
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 16:31:47 +0000 (UTC)
+Date: Mon, 12 Nov 2018 14:31:40 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181112163140.GM12503@habkost.net>
+References: <20181109195800.19071-1-wainersm@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <A02D6AA901860840B46E751C5E9E38B43CC96A3B@DGGEML532-MBX.china.huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] virtio-9p: qmp interface to set/query
- io throttle for fsdev devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181109195800.19071-1-wainersm@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Acceptance test: add coverage tests for
+ -smp option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,258 +33,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xiezhide <xiezhide@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "groug@kaod.org" <groug@kaod.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: qemu-devel@nongnu.org, crosa@redhat.com, philmd@redhat.com, ccarrara@redhat.com
 
-On 11/11/18 7:12 PM, xiezhide wrote:
-> This patch provide qmp interface to set/query io throttle for fsdev devices.
-
-This patch is titled 1/2, but not threaded to a 0/2 or 2/2 patch. 
-Remember that proper threading aids reviewers.
-
+On Fri, Nov 09, 2018 at 02:58:00PM -0500, Wainer dos Santos Moschetta wrote:
+> This adds tests for SMP option, by passing -smp with
+> various combinations of cpus, cores, threads, and sockets
+> values it checks that invalid topologies are not accepted
+> as well as missing values are correctly calculated.
 > 
-> This patch include following work:
-> 1. port Pradeep Jagadeesh's patches, details please review
->   http://lists.gnu.org/archive/html/qemu-devel/2017-10/msg00173.html
-> 2. fix two issue:
-> (1). qmp set io throttle code dump when qemu start CLI not include io throttle params
-> (2). issue Berto comment at: http://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03150.html
-> 3. resolve back-compat issue Eric comment at: http://lists.gnu.org/archive/html/qemu-devel/2017-10/msg03149.html
-> 
-> Signed-off-by: x00390961 <xiezhide@huawei.com<mailto:xiezhide@huawei.com>>
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+
+The test code looks nice to me, but: how exactly do you expect
+this to be executed?
+
+Do we have a test runner or multiplexer configuration already
+able to generate the cores/threads/sockets/cpus parameters?
+
+
 > ---
-> Makefile                                             |  20 +++-
-> Makefile.objs                                    |   8 ++
-> block/throttle.c                                |   6 +-
-
-Indentation is really weird here. Are you using 'git send-email' 
-directly, or did you do some copy-and-paste that corrupted whitespace?
-
-> util/throttle.c                                      | 224 ++++++++++++++++++++++++++--------------
-> 22 files changed, 640 insertions(+), 354 deletions(-)
-> create mode 100644 qapi/fsdev.json
-> create mode 100644 qapi/tlimits.json
-
-That's a rather big patch to review - you're refactoring existing code 
-AND adding new code in the same patch. Can you break it into smaller 
-pieces, to aid reviewers?
-
-> +++ b/Makefile
-> @@ -94,6 +94,7 @@ GENERATED_FILES += qapi/qapi-types-block-core.h qapi/qapi-types-block-core.c
-> GENERATED_FILES += qapi/qapi-types-block.h qapi/qapi-types-block.c
-> GENERATED_FILES += qapi/qapi-types-char.h qapi/qapi-types-char.c
-> GENERATED_FILES += qapi/qapi-types-common.h qapi/qapi-types-common.c
-> +GENERATED_FILES += qapi/qapi-types-tlimits.h qapi/qapi-types-tlimits.c
-
-Corrupt patch - where's the leading blank on unchanged context lines?
-
-
-> +++ b/qapi/block-core.json
-> @@ -8,6 +8,7 @@
-> { 'include': 'crypto.json' }
-> { 'include': 'job.json' }
-> { 'include': 'sockets.json' }
-> +{ 'include': 'tlimits.json' }
+>  tests/acceptance/smp_option_coverage.py | 218 ++++++++++++++++++++++++
+>  1 file changed, 218 insertions(+)
+>  create mode 100644 tests/acceptance/smp_option_coverage.py
 > 
->   ##
-> # @SnapshotInfo:
-> @@ -2150,130 +2151,13 @@
-> #
-> # @id: The name or QOM path of the guest device (since: 2.8)
-> #
-
-> -# @iops_size: an I/O size in bytes (Since 1.7)
-> -#
-> # @group: throttle group name (Since 2.4)
-> #
-> # Since: 1.1
-> ##
-> { 'struct': 'BlockIOThrottle',
-> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
-> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
-> -            '*bps_max': 'int', '*bps_rd_max': 'int',
-> -            '*bps_wr_max': 'int', '*iops_max': 'int',
-> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
-> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
-> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
-> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
-> -            '*iops_size': 'int', '*group': 'str' } }
-> -
-> -##
-> -# @ThrottleLimits:
-
-> -#
-> -# Since: 2.11
-> -##
-> -{ 'struct': 'ThrottleLimits',
-> -  'data': { '*iops-total' : 'int', '*iops-total-max' : 'int',
-> -            '*iops-total-max-length' : 'int', '*iops-read' : 'int',
-> -            '*iops-read-max' : 'int', '*iops-read-max-length' : 'int',
-> -            '*iops-write' : 'int', '*iops-write-max' : 'int',
-> -            '*iops-write-max-length' : 'int', '*bps-total' : 'int',
-> -            '*bps-total-max' : 'int', '*bps-total-max-length' : 'int',
-> -            '*bps-read' : 'int', '*bps-read-max' : 'int',
-> -            '*bps-read-max-length' : 'int', '*bps-write' : 'int',
-> -            '*bps-write-max' : 'int', '*bps-write-max-length' : 'int',
-> -            '*iops-size' : 'int' } }
-> +  'base': 'ThrottleLimits',
-> +  'data': { '*device': 'str', '*id': 'str', '*group': 'str' } }
-
-Okay, so it looks like you are moving throttle limits to a new file?
-
-> 
->   ##
-> # @block-stream:
-> diff --git a/qapi/fsdev.json b/qapi/fsdev.json
+> diff --git a/tests/acceptance/smp_option_coverage.py b/tests/acceptance/smp_option_coverage.py
 > new file mode 100644
-> index 0000000..2df8ec1
+> index 0000000000..ab68d1a67d
 > --- /dev/null
-> +++ b/qapi/fsdev.json
-> @@ -0,0 +1,96 @@
-> +# -*- Mode: Python -*-
+> +++ b/tests/acceptance/smp_option_coverage.py
+> @@ -0,0 +1,218 @@
+> +# QEMU -smp option coverage test.
+> +#
+> +# Copyright (c) 2018 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Wainer dos Santos Moschetta <wainersm@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
 > +
-> +##
-> +# == QAPI fsdev definitions
-> +##
+> +from functools import reduce
+> +from avocado.utils.process import run
 > +
-> +{ 'include': 'tlimits.json' }
+> +from avocado_qemu import Test
 > +
-> +##
-> +# @FsdevIOThrottle:
-> +#
-> +# A set of parameters describing fsdev throttling.
-> +#
-> +# @id: device id
-> +#
-> +# Since: 2.11
-
-Is 2.11 the correct release? Perhaps so, if this struct is being reused 
-by existing code, and you just refactored to move it to a new file.
-
-
-> +##
-> +{ 'struct': 'FsdevIOThrottle',
-> +  'base': 'ThrottleLimits',
-> +  'data': { '*id': 'str' } }
 > +
-> +##
-> +# @fsdev-set-io-throttle:
-> +#
-> +# Change I/O limits for a 9p/fsdev device.
-> +#
-> +# I/O limits can be enabled by setting throttle value to non-zero number.
-> +#
-> +# I/O limits can be disabled by setting all throttle values to 0.
-> +#
-> +# Returns: Nothing on success
-> +#          If @device is not a valid fsdev device, GenericError
-> +#
-> +# Since: 2.11
-
-However, isn't this a new command?  If that's the case, you definitely 
-don't want 2.11 here; you've missed 3.1, and the next release will be 
-4.0 (although there are still threads mentioning 3.2).
-
-> +++ b/qapi/tlimits.json
-> @@ -0,0 +1,89 @@
-> +# -*- Mode: Python -*-
+> +class SmpOption(Test):
+> +    """
+> +    Launches QEMU with various cpus, cores, threads, sockets, and maxcpus
+> +    combination through -smp option, to check it does not accept invalid SMP
+> +    topologies as well as it is able to calculate correctly any missing values.
 > +
-> +##
-> +# == Throttle limits (VM unrelated)
-
-What does 'VM unrelated' mean?
-
-> +##
+> +    :avocado: enable
+> +    :avocado: tags=slow,coverage
+> +    """
+> +    def setUp(self):
+> +        super().setUp()
+> +        self.cores = self.params.get('cores', default=2)
+> +        self.threads = self.params.get('threads', default=2)
+> +        self.sockets = self.params.get('sockets', default=2)
+> +        self.cpus = self.params.get('cpus', default=8)
 > +
-> +##
-> +# @ThrottleLimits:
-> +#
-> +# Limit parameters for throttling.
-> +# Since some limit combinations are illegal, limits should always be set in one
-> +# transaction. All fields are optional. When setting limits, if a field is
-> +# missing the current value is not changed.
-> +#
-> +# @bps: total throughput limit in bytes per second
-> +#
-> +# @bps_rd: read throughput limit in bytes per second
-> +#
-> +# @bps_wr: write throughput limit in bytes per second
-> +#
-> +# @iops: total I/O operations per second
-> +#
-> +# @iops_rd: read I/O operations per second
-> +#
-> +# @iops_wr: write I/O operations per second
-> +#
-> +# @bps_max: total throughput limit during bursts,
-> +#                     in bytes (Since 1.7)
-> +#
-> +# @bps_rd_max: read throughput limit during bursts,
-> +#                        in bytes (Since 1.7)
-> +#
-> +# @bps_wr_max: write throughput limit during bursts,
-> +#                        in bytes (Since 1.7)
-> +#
-> +# @iops_max: total I/O operations per second during bursts,
-> +#                      in bytes (Since 1.7)
-> +#
-> +# @iops_rd_max: read I/O operations per second during bursts,
-> +#                         in bytes (Since 1.7)
-> +#
-> +# @iops_wr_max: write I/O operations per second during bursts,
-> +#                         in bytes (Since 1.7)
-> +#
-> +# @bps_max_length: maximum length of the @bps_max burst
-> +#                            period, in seconds. It must only
-> +#                            be set if @bps_max is set as well.
-> +#                            Defaults to 1. (Since 2.6)
-> +#
-> +# @bps_rd_max_length: maximum length of the @bps_rd_max
-> +#                               burst period, in seconds. It must only
-> +#                               be set if @bps_rd_max is set as well.
-> +#                               Defaults to 1. (Since 2.6)
-> +#
-> +# @bps_wr_max_length: maximum length of the @bps_wr_max
-> +#                               burst period, in seconds. It must only
-> +#                               be set if @bps_wr_max is set as well.
-> +#                               Defaults to 1. (Since 2.6)
-> +#
-> +# @iops_max_length: maximum length of the @iops burst
-> +#                             period, in seconds. It must only
-> +#                             be set if @iops_max is set as well.
-> +#                             Defaults to 1. (Since 2.6)
-> +#
-> +# @iops_rd_max_length: maximum length of the @iops_rd_max
-> +#                                burst period, in seconds. It must only
-> +#                                be set if @iops_rd_max is set as well.
-> +#                                Defaults to 1. (Since 2.6)
-> +#
-> +# @iops_wr_max_length: maximum length of the @iops_wr_max
-> +#                                burst period, in seconds. It must only
-> +#                                be set if @iops_wr_max is set as well.
-> +#                                Defaults to 1. (Since 2.6)
-> +#
-> +# @iops_size: an I/O size in bytes (Since 1.7)
-> +#
-> +# Since: 2.11
-> +#
-> +##
-> +{ 'struct': 'ThrottleLimits',
-> +  'data': { '*bps': 'int', '*bps_rd': 'int',
-> +            '*bps_wr': 'int', '*iops': 'int', '*iops_rd': 'int', '*iops_wr': 'int',
-> +            '*bps_max': 'int', '*bps_rd_max': 'int',
-> +            '*bps_wr_max': 'int', '*iops_max': 'int',
-> +            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
-> +            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
-> +            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
-> +            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
-> +            '*iops_size': 'int' } }
-> diff --git a/qmp.c b/qmp.c
-> index e7c0a2f..18b1f0f 100644
-> --- a/qmp.c
-
+> +    def get_smp_topology(self):
+> +        """
+> +        Returns a dict with the id of cores, threads and sockets.
+> +        """
+> +        res = self.vm.qmp('query-hotpluggable-cpus')['return']
+> +        cpus = [x['props'] for x in res]
+> +
+> +        return reduce(lambda x, y: {'core-id': x['core-id'].union([y['core-id']]),
+> +                                    'thread-id': x['thread-id'].union([y['thread-id']]),
+> +                                    'socket-id': x['socket-id'].union([y['socket-id']])},
+> +                      cpus, {'core-id': set(), 'thread-id': set(), 'socket-id': set()})
+> +
+> +    @staticmethod
+> +    def build_option(**kwargs):
+> +        """
+> +        Builds string for the -smp option.
+> +        Use cpus, cores, threads, sockets, maxcpus keys.
+> +        """
+> +        option_list = []
+> +        if kwargs.get('cpus', None) is not None:
+> +            option_list.append(str(kwargs.get('cpus')))
+> +        for key, val in kwargs.items():
+> +            if key == 'cpus':
+> +                continue
+> +            option_list.append('%s=%s' % (key, val))
+> +
+> +        return ",".join(option_list)
+> +
+> +    def launch_and_check(self, expect_cores=1, expect_threads=1,
+> +                         expect_sockets=1, **kwargs):
+> +        """
+> +        Launches VM and check its SMP topology was correctly set.
+> +        Use cpus, cores, threads, sockets, and maxcpus keys to specify the
+> +        topology.
+> +        """
+> +        option = self.build_option(**{key: val for key, val in kwargs.items()
+> +                                      if key in ['cpus', 'cores', 'threads',
+> +                                                 'sockets', 'maxcpus']})
+> +        self.vm.add_args('-smp', option)
+> +        self.vm.launch()
+> +        smp = self.get_smp_topology()
+> +        self.assertEqual(smp['core-id'], set(range(0, expect_cores)))
+> +        self.assertEqual(smp['thread-id'], set(range(0, expect_threads)))
+> +        self.assertEqual(smp['socket-id'], set(range(0, expect_sockets)))
+> +
+> +    def launch_and_check_fail(self, **kwargs):
+> +        """
+> +        Launches VM and check the process exits with expected error code, for
+> +        cases where the topology is expected not valid.
+> +        """
+> +        option = self.build_option(**kwargs)
+> +        res = run("%s -smp %s" % (self.qemu_bin, option), timeout=10,
+> +                  ignore_status=True)
+> +        self.assertNotEqual(res.exit_status, 0)
+> +
+> +    # Passing cpus and maxcpus only.
+> +    #
+> +
+> +    def test_cpus_eq_maxcpus(self):
+> +        self.launch_and_check(cpus=self.cpus,
+> +                              maxcpus=self.cpus,
+> +                              expect_sockets=self.cpus)
+> +
+> +    def test_cpus_lt_maxcpus(self):
+> +        maxcpus = self.cpus * 2
+> +        self.launch_and_check(cpus=self.cpus,
+> +                              maxcpus=maxcpus,
+> +                              expect_sockets=maxcpus)
+> +
+> +    def test_cpus_gt_maxcpus(self):
+> +        self.launch_and_check_fail(cpus=self.cpus,
+> +                                   maxcpus=self.cpus // 2)
+> +
+> +    # Passing a combination of cores, threads and sockets only.
+> +    #
+> +
+> +    def test_no_cores_no_threads_no_sockets(self):
+> +        self.launch_and_check(cpus=self.cpus,
+> +                              expect_sockets=self.cpus)
+> +
+> +    def test_no_cores_no_threads_sockets(self):
+> +        self.launch_and_check(sockets=self.sockets,
+> +                              expect_sockets=self.sockets)
+> +
+> +    def test_no_cores_threads_no_sockets(self):
+> +        self.launch_and_check(threads=self.threads,
+> +                              expect_threads=self.threads)
+> +
+> +    def test_no_cores_threads_sockets(self):
+> +        self.launch_and_check(threads=self.threads,
+> +                              sockets=self.sockets,
+> +                              expect_threads=self.threads,
+> +                              expect_sockets=self.sockets)
+> +
+> +    def test_cores_no_threads_no_sockets(self):
+> +        self.launch_and_check(cores=self.cores,
+> +                              expect_cores=self.cores)
+> +
+> +    def test_cores_no_threads_sockets(self):
+> +        self.launch_and_check(cores=self.cores,
+> +                              sockets=self.sockets,
+> +                              expect_cores=self.cores,
+> +                              expect_sockets=self.sockets)
+> +
+> +    def test_cores_threads_no_sockets(self):
+> +        self.launch_and_check(cores=self.cores,
+> +                              threads=self.threads,
+> +                              expect_cores=self.cores,
+> +                              expect_threads=self.threads)
+> +
+> +    def test_cores_threads_sockets(self):
+> +        self.launch_and_check(cores=self.cores,
+> +                              threads=self.threads,
+> +                              sockets=self.sockets,
+> +                              expect_cores=self.cores,
+> +                              expect_threads=self.threads,
+> +                              expect_sockets=self.sockets)
+> +
+> +    # Passing cpus always and a combination of cores, threads and sockets.
+> +    #
+> +
+> +    def test_cpus_no_cores_no_threads_sockets(self):
+> +        self.launch_and_check(cpus=self.cpus,
+> +                              sockets=self.sockets,
+> +                              expect_cores=self.cpus // self.sockets,
+> +                              expect_sockets=self.sockets)
+> +
+> +    def test_cpus_no_cores_threads_no_sockets(self):
+> +        self.launch_and_check(cpus=self.cpus,
+> +                              threads=self.threads,
+> +                              expect_threads=self.threads,
+> +                              expect_sockets=self.cpus // self.threads)
+> +
+> +    def test_cpus_no_cores_threads_sockets(self):
+> +        self.launch_and_check(cpus=self.cpus,
+> +                              threads=self.threads,
+> +                              sockets=self.sockets,
+> +                              expect_threads=self.threads,
+> +                              expect_sockets=self.sockets,
+> +                              expect_cores=self.cpus // (self.threads * self.sockets))
+> +
+> +    def test_cpus_cores_no_threads_no_sockets(self):
+> +        self.launch_and_check(cpus=self.cpus,
+> +                              cores=self.cores,
+> +                              expect_cores=self.cores,
+> +                              expect_sockets=self.cpus // self.cores)
+> +
+> +    def test_cpus_cores_no_threads_sockets(self):
+> +        self.launch_and_check(cpus=self.cpus,
+> +                              cores=self.cores,
+> +                              sockets=self.sockets,
+> +                              expect_cores=self.cores,
+> +                              expect_sockets=self.sockets,
+> +                              expect_threads=self.cpus // (self.cores * self.sockets))
+> +
+> +    def test_cpus_cores_threads_no_sockets(self):
+> +        self.launch_and_check(cpus=self.cpus,
+> +                              cores=self.cores,
+> +                              threads=self.threads,
+> +                              expect_cores=self.cores,
+> +                              expect_threads=self.threads,
+> +                              expect_sockets=self.cpus // (self.cores * self.threads))
+> +
+> +    def test_cpus_cores_threads_sockets(self):
+> +        self.launch_and_check(cpus=self.cores * self.threads * self.sockets,
+> +                              cores=self.cores,
+> +                              threads=self.threads,
+> +                              sockets=self.sockets,
+> +                              expect_cores=self.cores,
+> +                              expect_threads=self.threads,
+> +                              expect_sockets=self.sockets)
+> +
+> +    # Passing cpus less (or greater) than cores, threads and sockets.
+> +    #
+> +
+> +    def test_cpus_lt_cores_threads_sockets(self):
+> +        self.launch_and_check_fail(cpus=(self.cores * self.threads * self.sockets) // 2,
+> +                                   cores=self.cores,
+> +                                   threads=self.threads,
+> +                                   sockets=self.sockets,)
+> +
+> +    def test_cpus_gt_cores_threads_sockets(self):
+> +        self.launch_and_check_fail(cpus=self.cores * self.threads * self.sockets * 2,
+> +                                   cores=self.cores,
+> +                                   threads=self.threads,
+> +                                   sockets=self.sockets)
+> -- 
+> 2.17.2
+> 
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eduardo
