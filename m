@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gMJU5-0003Lv-Pt
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:11:02 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gMJy3-0004RO-5A
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:41:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gMJU2-0003C7-Lx
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:11:01 -0500
-Received: from mail-wr1-f50.google.com ([209.85.221.50]:39309)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gMJU1-00032T-Fh
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:10:57 -0500
-Received: by mail-wr1-f50.google.com with SMTP id b13so10899469wrx.6
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 13:10:53 -0800 (PST)
-From: Laurent Vivier <lvivier@redhat.com>
-References: <20180629145347.652-1-peter.maydell@linaro.org>
-	<20180629145347.652-41-peter.maydell@linaro.org>
-Message-ID: <e8d62bcd-f8a9-2a6a-7765-0cf69cc8c1b5@redhat.com>
-Date: Mon, 12 Nov 2018 22:10:49 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1gMJxz-0001xN-4y
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:41:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38960)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gMJxy-0001fN-Ot
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:41:54 -0500
+Date: Mon, 12 Nov 2018 19:41:14 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181112214114.GV12503@habkost.net>
+References: <20181111233622.8976-1-f4bug@amsat.org>
+	<20181111233622.8976-6-f4bug@amsat.org>
+	<20181112170351.GU12503@habkost.net>
+	<CAAdtpL4234FKt685azMs_iWYNGzvhp8Mo6dJsah_Sq=JWJUaJA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180629145347.652-41-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 40/55] target/arm: Enable SVE for
- aarch64-linux-user
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAAdtpL4234FKt685azMs_iWYNGzvhp8Mo6dJsah_Sq=JWJUaJA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 05/11] decodetree: Force Python to
+ print unsigned values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +31,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, peer.adelt@hni.uni-paderborn.de, Richard Henderson <rth@twiddle.net>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
 
-On 29/06/2018 16:53, Peter Maydell wrote:
-> From: Richard Henderson <richard.henderson@linaro.org>
-> 
-> Enable ARM_FEATURE_SVE for the generic "max" cpu.
-> 
-> Tested-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> Message-id: 20180627043328.11531-35-richard.henderson@linaro.org
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  linux-user/elfload.c | 1 +
->  target/arm/cpu.c     | 7 +++++++
->  target/arm/cpu64.c   | 1 +
->  3 files changed, 9 insertions(+)
-> 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 13bc78d0c86..d1231ad07a3 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -584,6 +584,7 @@ static uint32_t get_elf_hwcap(void)
->      GET_FEATURE(ARM_FEATURE_V8_ATOMICS, ARM_HWCAP_A64_ATOMICS);
->      GET_FEATURE(ARM_FEATURE_V8_RDM, ARM_HWCAP_A64_ASIMDRDM);
->      GET_FEATURE(ARM_FEATURE_V8_FCMA, ARM_HWCAP_A64_FCMA);
-> +    GET_FEATURE(ARM_FEATURE_SVE, ARM_HWCAP_A64_SVE);
->  #undef GET_FEATURE
->  
->      return hwcaps;
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 2ae4fffafb9..6dcc552e143 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -164,6 +164,13 @@ static void arm_cpu_reset(CPUState *s)
->          env->cp15.sctlr_el[1] |= SCTLR_UCT | SCTLR_UCI | SCTLR_DZE;
->          /* and to the FP/Neon instructions */
->          env->cp15.cpacr_el1 = deposit64(env->cp15.cpacr_el1, 20, 2, 3);
-> +        /* and to the SVE instructions */
-> +        env->cp15.cpacr_el1 = deposit64(env->cp15.cpacr_el1, 16, 2, 3);
-> +        env->cp15.cptr_el[3] |= CPTR_EZ;
-> +        /* with maximum vector length */
-> +        env->vfp.zcr_el[1] = ARM_MAX_VQ - 1;
-> +        env->vfp.zcr_el[2] = ARM_MAX_VQ - 1;
-> +        env->vfp.zcr_el[3] = ARM_MAX_VQ - 1;
->  #else
->          /* Reset into the highest available EL */
->          if (arm_feature(env, ARM_FEATURE_EL3)) {
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index c50dcd4077d..0360d7efc5e 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -252,6 +252,7 @@ static void aarch64_max_initfn(Object *obj)
->          set_feature(&cpu->env, ARM_FEATURE_V8_RDM);
->          set_feature(&cpu->env, ARM_FEATURE_V8_FP16);
->          set_feature(&cpu->env, ARM_FEATURE_V8_FCMA);
-> +        set_feature(&cpu->env, ARM_FEATURE_SVE);
->          /* For usermode -cpu max we can use a larger and more efficient DCZ
->           * blocksize since we don't have to follow what the hardware does.
->           */
-> 
+On Mon, Nov 12, 2018 at 07:52:28PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> On Mon, Nov 12, 2018 at 6:03 PM Eduardo Habkost <ehabkost@redhat.com> w=
+rote:
+> > On Mon, Nov 12, 2018 at 12:36:16AM +0100, Philippe Mathieu-Daud=E9 wr=
+ote:
+> > > Python internal representation is signed, so unsigned values
+> > > bigger than 31-bit are interpreted as signed (and printed with
+> > > a '-' signed).
+> > > Mask out to force unsigned values.
+> >
+> > I don't understand this commit description. Python surely
+> > supports integers larger than 2^31, and its internal
+> > representation shouldn't matter at all:
+> >
+> >   >>> '0x{0:08x}'.format(0xffffffffffffffffffffffffffffffffffffffffff=
+ffffffffffffffffffffffffffffffffffffffff)
+> >   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff=
+ffffffffffffffffff'
+> >
+> > Can you explain how the code ends up with a negative value in the
+> > `self.thismask` or `b` variables?  If `self.subs` contains
+> > negative values, this is likely to break other parts of the code.
+>=20
+> I guess I misunderstood the error, thus the description is invalid.
+>=20
+> >
+> > >
+> > > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > > ---
+> > > TODO: display error encountered:
+> > >
+> > >    case 0x-1:
+> > >        ....
+> >
+> > How can I reproduce it?
+>=20
+> $ scripts/decodetree.py /dev/null
+>=20
+>     switch (insn & 0x-0000001) {
+>     }
+>=20
+> main() ->
+>   build_tree(patterns, 0, outermask =3D 0) ->
+>        innermask =3D ~outermask # =3D -1
+>       Tree(fullmask, innermask =3D -1) ->
+>         __init__(self, fm, tm =3D -1) ->
+>           self.thismask =3D tm # -1
+>   t.output_code(4, False, 0, 0) ->
+>     sh =3D is_contiguous(self.thismask) # -1
+>         output(ind, 'switch (', str_switch(self.thismask), ') {\n')
+>=20
+>         with:
+>=20
+>             def str_switch(b):
+>                 return 'insn & 0x{0:08x}'.format(b)
+>=20
+> So the fix is rather:
+>=20
+> -- >8 --
+> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+> @@ -916,7 +916,7 @@ class Tree:
+>=20
+> def build_tree(pats, outerbits, outermask):
+>      # Find the intersection of all remaining fixedmask.
+> -    innermask =3D ~outermask
+> +    innermask =3D ~outermask & insnmask
+>      for i in pats:
+>          innermask &=3D i.fixedmask
 
-Running some tests for my pull request, I've found this commit breaks
-ltp-full-20180515 sigaltstack01 tests with ubuntu arm64/trusty.
+Nice.  Thanks for the explanation.
 
-sigaltstack01  274  TBROK  :  tst_sig.c:233: unexpected signal
-SIGIOT/SIGABRT(6) received (pid = 15241).
-*** Error in `/opt/ltp/testcases/bin/sigaltstack01': free(): invalid
-pointer: 0x000000000042a010 ***
+This really seems to be the only place in the code where the bit
+operations may generate a negative number.  All remaining usage
+of the ~ operator in the code is already inside & expressions
+that will ensure the result is positive.
 
-Thanks,
-Laurent
+To the alternative fix above:
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+--=20
+Eduardo
