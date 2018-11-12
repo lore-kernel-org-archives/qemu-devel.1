@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMFfF-0000HP-4Q
+	(envelope-from <kwolf@redhat.com>) id 1gMFfF-0000HL-29
 	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMFfE-0006n4-Bz
+	(envelope-from <kwolf@redhat.com>) id 1gMFfE-0006n9-Cj
 	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:17 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 12 Nov 2018 18:05:52 +0100
-Message-Id: <20181112170603.23986-4-kwolf@redhat.com>
+Date: Mon, 12 Nov 2018 18:05:51 +0100
+Message-Id: <20181112170603.23986-3-kwolf@redhat.com>
 In-Reply-To: <20181112170603.23986-1-kwolf@redhat.com>
 References: <20181112170603.23986-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/14] blockdev: Consistently use
- snapshot_node_name in external_snapshot_prepare()
+Subject: [Qemu-devel] [PULL 02/14] blockdev: handle error on block latency
+ histogram set error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +25,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: zhenwei pi <pizhenwei@bytedance.com>
 
-In the function external_snapshot_prepare() we have a
-BlockdevSnapshotSync struct, which has the usual combination
-of has_snapshot_node_name and snapshot_node_name fields for an
-optional field. We set up a local variable
-        const char *snapshot_node_name =3D
-            s->has_snapshot_node_name ? s->snapshot_node_name : NULL;
+Function block_latency_histogram_set may return error, but qapi ignore th=
+is.
+This can be reproduced easily by qmp command:
+virsh qemu-monitor-command INSTANCE '{"execute":"x-block-latency-histogra=
+m-set",
+"arguments":{"device":"drive-virtio-disk1","boundaries":[10,200,40]}}'
+In fact this command does not work, but we still get success result.
 
-and then mostly use "if (!snapshot_node_name)" for checking
-whether we have a snapshot node name. The exception is that in
-one place we check s->has_snapshot_node_name instead. This
-confuses Coverity (CID 1396473), which thinks it might be
-possible to get here with s->has_snapshot_node_name true but
-snapshot_node_name NULL, and warns that the call to
-qdict_put_str() will segfault in that case.
+qmp_x_block_latency_histogram_set is a batch setting API, report error AS=
+AP.
 
-Make the code consistent and unconfuse Coverity by using
-the same check for this conditional that we do in the rest
-of the surrounding code.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- blockdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ blockdev.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
 diff --git a/blockdev.c b/blockdev.c
-index 9310ff3e7c..81f95d920b 100644
+index e5b5eb46e2..9310ff3e7c 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -1640,7 +1640,7 @@ static void external_snapshot_prepare(BlkActionStat=
-e *common,
-         }
+@@ -4413,6 +4413,7 @@ void qmp_x_block_latency_histogram_set(
+ {
+     BlockBackend *blk =3D blk_by_name(device);
+     BlockAcctStats *stats;
++    int ret;
 =20
-         options =3D qdict_new();
--        if (s->has_snapshot_node_name) {
-+        if (snapshot_node_name) {
-             qdict_put_str(options, "node-name", snapshot_node_name);
-         }
-         qdict_put_str(options, "driver", format);
+     if (!blk) {
+         error_setg(errp, "Device '%s' not found", device);
+@@ -4428,21 +4429,33 @@ void qmp_x_block_latency_histogram_set(
+     }
+=20
+     if (has_boundaries || has_boundaries_read) {
+-        block_latency_histogram_set(
++        ret =3D block_latency_histogram_set(
+             stats, BLOCK_ACCT_READ,
+             has_boundaries_read ? boundaries_read : boundaries);
++        if (ret) {
++            error_setg(errp, "Device '%s' set read boundaries fail", dev=
+ice);
++            return;
++        }
+     }
+=20
+     if (has_boundaries || has_boundaries_write) {
+-        block_latency_histogram_set(
++        ret =3D block_latency_histogram_set(
+             stats, BLOCK_ACCT_WRITE,
+             has_boundaries_write ? boundaries_write : boundaries);
++        if (ret) {
++            error_setg(errp, "Device '%s' set write boundaries fail", de=
+vice);
++            return;
++        }
+     }
+=20
+     if (has_boundaries || has_boundaries_flush) {
+-        block_latency_histogram_set(
++        ret =3D block_latency_histogram_set(
+             stats, BLOCK_ACCT_FLUSH,
+             has_boundaries_flush ? boundaries_flush : boundaries);
++        if (ret) {
++            error_setg(errp, "Device '%s' set flush boundaries fail", de=
+vice);
++            return;
++        }
+     }
+ }
+=20
 --=20
 2.19.1
