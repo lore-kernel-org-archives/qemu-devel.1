@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMFUH-0005VV-RY
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:54:58 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gMFd6-0007ct-6d
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:04:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMFUF-0004dX-Qy
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:54:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50564)
+	(envelope-from <ehabkost@redhat.com>) id 1gMFcy-0005eF-Cs
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:04:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:62362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMFUD-0004UI-Qq
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:54:54 -0500
-Date: Mon, 12 Nov 2018 16:54:37 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181112165437.GW3602@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <CALMp9eQ5zWxb2N9fyYz=WcQshwk0L6qQ4D6L6+p_dzMo4H=txA@mail.gmail.com>
-	<20181102034649.43559-1-liran.alon@oracle.com>
-	<12c26c34-8dd1-a442-7826-86b93ff978f8@redhat.com>
-	<20181102165409.GF21191@redhat.com>
-	<f58da4e8-aa40-2659-8db6-42c2b47f5b2f@redhat.com>
-	<20181112161829.GU3602@redhat.com> <20181112165053.GF2293@work-vm>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gMFcy-0005dq-4W
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:03:56 -0500
+Date: Mon, 12 Nov 2018 15:03:51 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181112170351.GU12503@habkost.net>
+References: <20181111233622.8976-1-f4bug@amsat.org>
+	<20181111233622.8976-6-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20181112165053.GF2293@work-vm>
+In-Reply-To: <20181111233622.8976-6-f4bug@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
- save and restore nested state
+Subject: Re: [Qemu-devel] [RFC PATCH 05/11] decodetree: Force Python to
+ print unsigned values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Liran Alon <liran.alon@oracle.com>, jmattson@google.com, ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peer Adelt <peer.adelt@hni.uni-paderborn.de>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
 
-On Mon, Nov 12, 2018 at 04:50:54PM +0000, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > On Sun, Nov 04, 2018 at 11:19:57PM +0100, Paolo Bonzini wrote:
-> > > On 02/11/2018 17:54, Daniel P. Berrang=C3=A9 wrote:
-> > > > We have usually followed a rule that new machine types must not
-> > > > affect runability of a VM on a host. IOW new machine types should
-> > > > not introduce dependancies on specific kernels, or hardware featu=
-res
-> > > > such as CPU flags.
-> > >=20
-> > > > Anything that requires a new kernel feature thus ought to be an
-> > > > opt-in config tunable on the CLI, separate from machine type
-> > > > choice.
-> > >=20
-> > > Unless someone tinkered with the module parameters, they could not =
-even
-> > > use nested virtualization before 4.20.  So for everyone else, "-cpu
-> > > ...,+vmx" does count as an "opt-in config tunable on the CLI" that
-> > > requires 4.20.
-> > >
-> > > For those that did tinker with module parameters, we can grandfathe=
-r in
-> > > the old machine types, so that they can use nested virtualization w=
-ith
-> > > no live migration support.  For those that did not, however, I don'=
-t
-> > > think it makes sense to say "oh by the way I really want to be able=
- to
-> > > migrate this VM" on the command line, or even worse on the monitor.
-> >=20
-> > IIUC, 4.20 is only required from POV of migration state. Is it thus
-> > possible to just register a migration blocker if QEMU is launched
-> > on a host with kernel < 4.20.
-> >=20
-> > Migration has always been busted historically, so those people using
-> > nested VMX already won't be hurt by not having ability to live migrat=
-e
-> > their VM, but could otherwise continue using them without being force=
-d
-> > to upgrade their kernel to fix a feature they're not even using.
+On Mon, Nov 12, 2018 at 12:36:16AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Python internal representation is signed, so unsigned values
+> bigger than 31-bit are interpreted as signed (and printed with
+> a '-' signed).
+> Mask out to force unsigned values.
+
+I don't understand this commit description. Python surely
+supports integers larger than 2^31, and its internal
+representation shouldn't matter at all:
+
+  >>> '0x{0:08x}'.format(0xffffffffffffffffffffffffffffffffffffffffffffff=
+ffffffffffffffffffffffffffffffffffff)
+  '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff=
+ffffffffffffff'
+
+Can you explain how the code ends up with a negative value in the
+`self.thismask` or `b` variables?  If `self.subs` contains
+negative values, this is likely to break other parts of the code.
+
 >=20
-> Yes, although I am a bit worried we might have a population of users
-> that:
->    a) Have enabled nesting
->    b) Run VMs with vmx enabled
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+> TODO: display error encountered:
+>=20
+>    case 0x-1:
+>        ....
 
+How can I reproduce it?
 
->    c) Don't normally actually run nested guests
->    d) Currently happily migrate.
+> ---
+>  scripts/decodetree.py | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+> index 5dea15e7a5..08aa52d544 100755
+> --- a/scripts/decodetree.py
+> +++ b/scripts/decodetree.py
+> @@ -900,12 +900,12 @@ class Tree:
+>              def str_case(b):
+>                  return '0x{0:08x}'.format(b)
+> =20
+> -        output(ind, 'switch (', str_switch(self.thismask), ') {\n')
+> +        output(ind, 'switch (', str_switch(self.thismask & insnmask), =
+') {\n')
+>          for b, s in sorted(self.subs):
+>              assert (self.thismask & ~s.fixedmask) =3D=3D 0
+>              innermask =3D outermask | self.thismask
+>              innerbits =3D outerbits | b
+> -            output(ind, 'case ', str_case(b), ':\n')
+> +            output(ind, 'case ', str_case(b & insnmask), ':\n')
+>              output(ind, '    /* ',
+>                     str_match_bits(innerbits, innermask), ' */\n')
+>              s.output_code(i + 4, extracted, innerbits, innermask)
+> --=20
+> 2.17.2
+>=20
 
-True, and (b) would include anyone using libvirt's  host-model CPU. So if
-you enabled nesting, have host-model for all guests, but only use nesting
-in one of the guests, you'd be doomed.
-
-Is it possible for QEMU to determine if there are nested guests running o=
-r
-not and conditionally block migration appropriately to ensure safety ?
-
-
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Eduardo
