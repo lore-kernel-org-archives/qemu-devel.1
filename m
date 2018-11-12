@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gMJ9a-0003MC-Eh
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:49:51 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gMJ9c-0003MT-7X
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:49:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gMJ9X-00084m-I2
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:49:50 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:37863)
+	(envelope-from <laurent@vivier.eu>) id 1gMJ9Z-00087C-Fl
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:49:52 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:35453)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gMJ9X-00082J-6I
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:49:47 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gMJ9Z-00085R-2m
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:49:49 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 12 Nov 2018 21:49:25 +0100
-Message-Id: <20181112204929.12625-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 0/4] Linux user for 3.1 patches
+Date: Mon, 12 Nov 2018 21:49:29 +0100
+Message-Id: <20181112204929.12625-5-laurent@vivier.eu>
+In-Reply-To: <20181112204929.12625-1-laurent@vivier.eu>
+References: <20181112204929.12625-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 4/4] linux-user: Add support for SO_REUSEPORT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,58 +24,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Yunqiang Su <ysu@wavecomp.com>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-The following changes since commit b4c0595446cda9252d2c7bc84f3c02f3e591935a:
+From: Yunqiang Su <ysu@wavecomp.com>
 
-  docker: use HTTPS git URL for virglrenderer (2018-11-12 11:26:02 +0000)
+Add support for SO_REUSEPORT, including strace support. SO_REUSEPORT
+was introduced relatively recently, since Linux 3.9, so use
+'#if defined SO_REUSEPORT'.
 
-are available in the Git repository at:
+Signed-off-by: Yunqiang Su <ysu@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <1540904108-30873-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/strace.c  |  3 +++
+ linux-user/syscall.c | 10 ++++++++++
+ 2 files changed, 13 insertions(+)
 
-  git://github.com/vivier/qemu.git tags/linux-user-for-3.1-pull-request
-
-for you to fetch changes up to 113a9dd73f6377941e0a4bfd7aea5370728b1c28:
-
-  linux-user: Add support for SO_REUSEPORT (2018-11-12 16:38:26 +0100)
-
-----------------------------------------------------------------
-- gdb signal handling fix
-- add SO_REUSEPORT
-- remove dead-code
-
-----------------------------------------------------------------
-
-Peter Maydell (3):
-  linux-user: Remove dead error-checking code
-  linux-user: Don't call gdb_handlesig() before queue_signal()
-  linux-user: Clean up nios2 main loop signal handling
-
-Yunqiang Su (1):
-  linux-user: Add support for SO_REUSEPORT
-
- linux-user/aarch64/cpu_loop.c    | 13 +++++--------
- linux-user/alpha/cpu_loop.c      | 12 ++++--------
- linux-user/arm/cpu_loop.c        | 16 ++++------------
- linux-user/cris/cpu_loop.c       | 16 ++++------------
- linux-user/hppa/cpu_loop.c       | 11 ++++-------
- linux-user/i386/cpu_loop.c       | 16 ++++------------
- linux-user/m68k/cpu_loop.c       | 16 ++++------------
- linux-user/m68k/signal.c         |  3 ---
- linux-user/microblaze/cpu_loop.c | 16 ++++------------
- linux-user/mips/cpu_loop.c       | 16 ++++------------
- linux-user/nios2/cpu_loop.c      | 17 ++++++-----------
- linux-user/openrisc/cpu_loop.c   | 11 ++++-------
- linux-user/ppc/cpu_loop.c        | 15 +++++----------
- linux-user/riscv/cpu_loop.c      |  2 +-
- linux-user/s390x/cpu_loop.c      |  9 +++------
- linux-user/sh4/cpu_loop.c        | 17 ++++-------------
- linux-user/sh4/signal.c          |  4 ----
- linux-user/sparc/cpu_loop.c      | 16 ++++------------
- linux-user/sparc/signal.c        |  2 --
- linux-user/strace.c              |  3 +++
- linux-user/syscall.c             | 10 ++++++++++
- linux-user/xtensa/cpu_loop.c     | 11 ++++-------
- 22 files changed, 81 insertions(+), 171 deletions(-)
-
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 33f4a506a2..d1d14945f9 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -1742,6 +1742,9 @@ print_optint:
+         case TARGET_SO_REUSEADDR:
+             gemu_log("SO_REUSEADDR,");
+             goto print_optint;
++        case TARGET_SO_REUSEPORT:
++            gemu_log("SO_REUSEPORT,");
++            goto print_optint;
+         case TARGET_SO_TYPE:
+             gemu_log("SO_TYPE,");
+             goto print_optint;
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 810a58b704..5c166928a4 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -2061,6 +2061,11 @@ set_timeout:
+         case TARGET_SO_REUSEADDR:
+ 		optname = SO_REUSEADDR;
+ 		break;
++#ifdef SO_REUSEPORT
++        case TARGET_SO_REUSEPORT:
++                optname = SO_REUSEPORT;
++                break;
++#endif
+         case TARGET_SO_TYPE:
+ 		optname = SO_TYPE;
+ 		break;
+@@ -2222,6 +2227,11 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+         case TARGET_SO_REUSEADDR:
+             optname = SO_REUSEADDR;
+             goto int_case;
++#ifdef SO_REUSEPORT
++        case TARGET_SO_REUSEPORT:
++            optname = SO_REUSEPORT;
++            goto int_case;
++#endif
+         case TARGET_SO_TYPE:
+             optname = SO_TYPE;
+             goto int_case;
 -- 
 2.17.2
