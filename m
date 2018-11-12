@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMDWG-0000oe-LP
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:48:53 -0500
+	(envelope-from <berrange@redhat.com>) id 1gMDWK-0000r9-Qx
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:48:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMDWF-0005Sc-Vk
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:48:52 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35954)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gMDWF-0005SJ-PA
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:48:51 -0500
-Received: by mail-oi1-x242.google.com with SMTP id r127-v6so7353019oie.3
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 06:48:51 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1gMDWJ-0005U9-Qb
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:48:56 -0500
+Date: Mon, 12 Nov 2018 14:48:45 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181112144845.GQ3602@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181005145202.8005-1-berto@igalia.com>
+	<w51h8gmbbhi.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <f9dc1589-b939-3d34-2275-9cf279dfe57d@vivier.eu>
-References: <20181019174958.26616-1-peter.maydell@linaro.org>
-	<CAFEAcA_NV69qFLi07QxJR=pjPG0+vjOmXY_J1NpnzUz-qc6ZiQ@mail.gmail.com>
-	<f9dc1589-b939-3d34-2275-9cf279dfe57d@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Nov 2018 14:48:30 +0000
-Message-ID: <CAFEAcA8HyA7mPAFcj4+F92uSQJui+cH407PaAmyS30yvs=6ERg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user: Don't call gdb_handlesig
- unnecessarily
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <w51h8gmbbhi.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] crypto: Fix defaults in
+ QCryptoBlockCreateOptionsLUKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,17 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marek Vasut <marex@denx.de>, Riku Voipio <riku.voipio@iki.fi>, Chris Wulff <crwulff@gmail.com>, "patches@linaro.org" <patches@linaro.org>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 12 November 2018 at 14:46, Laurent Vivier <laurent@vivier.eu> wrote:
-> On 12/11/2018 15:39, Peter Maydell wrote:
->> Ping? This got reviewed but hasn't made it to master...
->
-> Do you want it in 3.1 too?
+On Mon, Nov 12, 2018 at 03:45:45PM +0100, Alberto Garcia wrote:
+> ping
 
-Well, it is a bugfix, and we haven't rolled rc1 yet, so I would
-default to yes, unless you'd rather defer it to 4.0.
+Sorry, I should have said I queued this patch when adding my previous R-b.
 
-thanks
--- PMM
+> On Fri 05 Oct 2018 04:52:02 PM CEST, Alberto Garcia wrote:
+> > The values specified in the documentation don't match the actual
+> > defaults set in qcrypto_block_luks_create().
+> >
+> > Signed-off-by: Alberto Garcia <berto@igalia.com>
+> > ---
+> >  qapi/crypto.json | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/qapi/crypto.json b/qapi/crypto.json
+> > index a51b434412..b2a4cff683 100644
+> > --- a/qapi/crypto.json
+> > +++ b/qapi/crypto.json
+> > @@ -181,11 +181,11 @@
+> >  # The options that apply to LUKS encryption format initialization
+> >  #
+> >  # @cipher-alg: the cipher algorithm for data encryption
+> > -#              Currently defaults to 'aes'.
+> > +#              Currently defaults to 'aes-256'.
+> >  # @cipher-mode: the cipher mode for data encryption
+> > -#               Currently defaults to 'cbc'
+> > +#               Currently defaults to 'xts'
+> >  # @ivgen-alg: the initialization vector generator
+> > -#             Currently defaults to 'essiv'
+> > +#             Currently defaults to 'plain64'
+> >  # @ivgen-hash-alg: the initialization vector generator hash
+> >  #                  Currently defaults to 'sha256'
+> >  # @hash-alg: the master key hash algorithm
+> > -- 
+> > 2.11.0
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
