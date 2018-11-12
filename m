@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gM8DC-0002cS-7g
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:08:55 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gM8GU-0003xj-N0
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:12:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gM8D0-0002cI-GV
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:08:44 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181031003120.26771-1-ehabkost@redhat.com>
-	<20181031003120.26771-12-ehabkost@redhat.com>
-	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
-	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
-	<20181106141302.GP12503@habkost.net>
-	<87efbxxw1c.fsf@dusky.pond.sub.org>
-	<8ecdbb0e-aaf8-ddc5-6442-87977585d9d8@redhat.com>
-	<87y3a4ot3g.fsf@dusky.pond.sub.org>
-	<CAAdtpL7Z3EpyD33t0rXS=UGUS2kCnC_f4EzQyOOt9CR_VHOSsg@mail.gmail.com>
-	<8736sboi33.fsf@dusky.pond.sub.org>
-	<1b819b85-b713-379e-735a-65bf7d8d5239@redhat.com>
-Date: Mon, 12 Nov 2018 10:07:54 +0100
-In-Reply-To: <1b819b85-b713-379e-735a-65bf7d8d5239@redhat.com> (Max Reitz's
-	message of "Fri, 9 Nov 2018 18:58:56 +0100")
-Message-ID: <87d0rafytx.fsf@dusky.pond.sub.org>
+	(envelope-from <kraxel@redhat.com>) id 1gM8GP-0005Sl-9o
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:12:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41392)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gM8GP-0005Mc-16
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:12:09 -0500
+Date: Mon, 12 Nov 2018 10:12:05 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181112091205.brrcxxzzvfthyqhk@sirius.home.kraxel.org>
+References: <20181109142032.1628-1-kraxel@redhat.com>
+	<9b2c9e91-8904-1200-f491-4ee1d6ed42e3@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <9b2c9e91-8904-1200-f491-4ee1d6ed42e3@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Fix Python 3 detection
- on older GNU make versions
+Subject: Re: [Qemu-devel] [PATCH v2] pulseaudio: process audio data in
+ smaller chunks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,79 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Martin Schrodt <martin@schrodt.org>, Max Ehrlich <maxehr@umiacs.umd.edu>
 
-Max Reitz <mreitz@redhat.com> writes:
+On Sat, Nov 10, 2018 at 08:36:39PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Hi Gerd,
+>=20
+> On 11/9/18 3:20 PM, Gerd Hoffmann wrote:
+> > The rate of pulseaudio absorbing the audio stream is used to control =
+the
+> > the rate of the guests audio stream.  When the emulated hardware uses
+> > small chunks (like intel-hda does) we need small chunks on the audio
+> > backend side too, otherwise that feedback loop doesn't work very well=
+.
+>=20
+> Shouldn't this be user-configurable?
 
-> On 08.11.18 13:43, Markus Armbruster wrote:
->> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->>=20
->>> Hi Markus,
->>>
->>>
->>> Le jeu. 8 nov. 2018 09:46, Markus Armbruster <armbru@redhat.com> a =C3=
-=A9crit :
->>>
->>>> Cleber Rosa <crosa@redhat.com> writes:
->>>>
->>>>> On 11/7/18 1:05 AM, Markus Armbruster wrote:
->> [...]
->>>>>> PEP 394 recommends software distributions install Python 3 into the
->>>>>> default path as python3, and users use that instead of python, except
->>>>>> for programs that are source compatible with both 2 and 3.  So, is
->>>>>> finding out whether python is a Python 3 really appropriate?  Why ca=
-n't
->>>>>> we just use python3 and be done with it?
->>>>>>
->>>>>
->>>>> I mentioned that before, when you pointed out the issue you fix here,
->>>>> that configure may be the best place to get the Python version (not o=
-nly
->>>>> the major version) and make it available elsewhere.  Even if not used
->>>>> for other purposes, it is IMO important information to show on the
->>>>> resulting "configure" output.
->>>>>
->>>>> I'm sending patches to do that in a few.
->>>>>
->>>>>> If we can't: isn't this a configure problem?
->>>>>>
->>>>>
->>>>> I believe adhering to PEP394 is a good thing, but even that document
->>>>> recognizes that the real world is not a perfect place: "however, end
->>>>> users should be aware that python refers to python3 on at least Arch
->>>>> Linux".  And it only covers *nix systems, so if we hope to care for
->>>>> non-*nix systems, we have to check the Python version manually.
->>>>>
->>>>> So, I guess the safest approach from QEMU's side is to check for the
->>>>> version indeed.
->>>>
->>>> If somebody can point to a system people still use where python3 doesn=
-'t
->>>> get you a Python 3, but python does, catering for such (crappy) systems
->>>> in configure makes sense.  Until then, it's a waste of brain waves and
->>>> configure run time.
->>>>
->>>> PEP 394 mentions Arch Linux.  It's been seven years.  What's the most
->>>> recent version of Arch Linux that's still crappy in this regard?
->>>>
->>>
->>> Arch doesn't provide python2 by default, thus python points to python3.
->>=20
->> That's non-crappy as long as python3 also exists, as PEP 394 recommends.
->> Does it?
->
-> Sure it does.
->
-> Arch is just problematic in how it handles "python" itself.  I don't
-> think there is any system that has Python 3 but no "python3".
+Why?
 
-Bottom line: we can safely assume that a host that has Python 3 provides
-it as python3.
-
-Corollary:
-
-* When python3 doesn't exist, checking whether python is Python 3 is
-  futile.
-
-* Checking whether python3 really is Python 3 is silly.
+cheers,
+  Gerd
