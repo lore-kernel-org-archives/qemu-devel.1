@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMHZq-0005Jc-Hp
+	(envelope-from <thuth@redhat.com>) id 1gMHZq-0005JY-HJ
 	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 14:08:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMHZo-00049C-0t
+	(envelope-from <thuth@redhat.com>) id 1gMHZo-00049T-Be
 	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 14:08:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38876)
+Received: from mx1.redhat.com ([209.132.183.28]:37308)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gMHZn-00041k-PZ
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 14:08:47 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gMHZo-000418-1P
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 14:08:48 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 12 Nov 2018 20:08:10 +0100
-Message-Id: <1542049690-12826-8-git-send-email-thuth@redhat.com>
+Date: Mon, 12 Nov 2018 20:08:09 +0100
+Message-Id: <1542049690-12826-7-git-send-email-thuth@redhat.com>
 In-Reply-To: <1542049690-12826-1-git-send-email-thuth@redhat.com>
 References: <1542049690-12826-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH for-3.2 7/7] tests/boot-serial: Get rid of
- global_qtest variable
+Subject: [Qemu-devel] [PATCH for-3.2 6/7] tests/vmgenid: Make test
+ independent of global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +27,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>
 
-The test does not use any of the functions that require global_qtest,
-so we can simply get rid of this global variable here.
+The biggest part has already been done in the previous patch, we now
+only have to replace some few qmp() and readb() calls with the
+corresponding qtest_*() functions to get there.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/boot-serial-test.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ tests/vmgenid-test.c | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
 
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index 8ec6aed..f085165 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -161,6 +161,7 @@ static void test_machine(const void *data)
-     char codetmp[] = "/tmp/qtest-boot-serial-cXXXXXX";
-     const char *codeparam = "";
-     const uint8_t *code = NULL;
-+    QTestState *qts;
-     int ser_fd;
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index c9c4f8c..84449ce 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -95,17 +95,17 @@ static uint32_t acpi_find_vgia(QTestState *qts)
+     return guid_offset;
+ }
  
-     ser_fd = mkstemp(serialtmp);
-@@ -189,11 +190,11 @@ static void test_machine(const void *data)
-      * Make sure that this test uses tcg if available: It is used as a
-      * fast-enough smoketest for that.
-      */
--    global_qtest = qtest_initf("%s %s -M %s,accel=tcg:kvm "
--                               "-chardev file,id=serial0,path=%s "
--                               "-no-shutdown -serial chardev:serial0 %s",
--                               codeparam, code ? codetmp : "",
--                               test->machine, serialtmp, test->extra);
-+    qts = qtest_initf("%s %s -M %s,accel=tcg:kvm -no-shutdown "
-+                      "-chardev file,id=serial0,path=%s "
-+                      " -serial chardev:serial0 %s",
-+                      codeparam, code ? codetmp : "", test->machine,
-+                      serialtmp, test->extra);
-     if (code) {
-         unlink(codetmp);
+-static void read_guid_from_memory(QemuUUID *guid)
++static void read_guid_from_memory(QTestState *qts, QemuUUID *guid)
+ {
+     uint32_t vmgenid_addr;
+     int i;
+ 
+-    vmgenid_addr = acpi_find_vgia(global_qtest);
++    vmgenid_addr = acpi_find_vgia(qts);
+     g_assert(vmgenid_addr);
+ 
+     /* Read the GUID directly from guest memory */
+     for (i = 0; i < 16; i++) {
+-        guid->data[i] = readb(vmgenid_addr + i);
++        guid->data[i] = qtest_readb(qts, vmgenid_addr + i);
      }
-@@ -204,7 +205,7 @@ static void test_machine(const void *data)
-     }
-     unlink(serialtmp);
+     /* The GUID is in little-endian format in the guest, while QEMU
+      * uses big-endian.  Swap after reading.
+@@ -113,12 +113,12 @@ static void read_guid_from_memory(QemuUUID *guid)
+     qemu_uuid_bswap(guid);
+ }
+ 
+-static void read_guid_from_monitor(QemuUUID *guid)
++static void read_guid_from_monitor(QTestState *qts, QemuUUID *guid)
+ {
+     QDict *rsp, *rsp_ret;
+     const char *guid_str;
+ 
+-    rsp = qmp("{ 'execute': 'query-vm-generation-id' }");
++    rsp = qtest_qmp(qts, "{ 'execute': 'query-vm-generation-id' }");
+     if (qdict_haskey(rsp, "return")) {
+         rsp_ret = qdict_get_qdict(rsp, "return");
+         g_assert(qdict_haskey(rsp_ret, "guid"));
+@@ -139,45 +139,48 @@ static char disk[] = "tests/vmgenid-test-disk-XXXXXX";
+ static void vmgenid_set_guid_test(void)
+ {
+     QemuUUID expected, measured;
++    QTestState *qts;
+ 
+     g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
+ 
+-    global_qtest = qtest_initf(GUID_CMD(VGID_GUID));
++    qts = qtest_initf(GUID_CMD(VGID_GUID));
+ 
+     /* Read the GUID from accessing guest memory */
+-    read_guid_from_memory(&measured);
++    read_guid_from_memory(qts, &measured);
+     g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
  
 -    qtest_quit(global_qtest);
 +    qtest_quit(qts);
- 
-     close(ser_fd);
  }
+ 
+ static void vmgenid_set_guid_auto_test(void)
+ {
+     QemuUUID measured;
++    QTestState *qts;
+ 
+-    global_qtest = qtest_initf(GUID_CMD("auto"));
++    qts = qtest_initf(GUID_CMD("auto"));
+ 
+-    read_guid_from_memory(&measured);
++    read_guid_from_memory(qts, &measured);
+ 
+     /* Just check that the GUID is non-null */
+     g_assert(!qemu_uuid_is_null(&measured));
+ 
+-    qtest_quit(global_qtest);
++    qtest_quit(qts);
+ }
+ 
+ static void vmgenid_query_monitor_test(void)
+ {
+     QemuUUID expected, measured;
++    QTestState *qts;
+ 
+     g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
+ 
+-    global_qtest = qtest_initf(GUID_CMD(VGID_GUID));
++    qts = qtest_initf(GUID_CMD(VGID_GUID));
+ 
+     /* Read the GUID via the monitor */
+-    read_guid_from_monitor(&measured);
++    read_guid_from_monitor(qts, &measured);
+     g_assert(memcmp(measured.data, expected.data, sizeof(measured.data)) == 0);
+ 
+-    qtest_quit(global_qtest);
++    qtest_quit(qts);
+ }
+ 
+ int main(int argc, char **argv)
 -- 
 1.8.3.1
