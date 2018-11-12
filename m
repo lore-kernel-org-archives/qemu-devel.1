@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gM2aA-0004hg-RI
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:08:11 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gM2ls-0001tF-FA
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:20:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gM2a7-0007Yx-MR
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:08:10 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34678)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1gM2a7-0007VN-FM
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:08:07 -0500
-Received: by mail-pf1-x442.google.com with SMTP id y18-v6so3585354pfn.1
-	for <qemu-devel@nongnu.org>; Sun, 11 Nov 2018 19:08:07 -0800 (PST)
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-References: <20181106122025.3487-1-xiaoguangrong@tencent.com>
-Message-ID: <2c351ac2-ad51-13de-6aea-ffc014edeffe@gmail.com>
-Date: Mon, 12 Nov 2018 11:07:59 +0800
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gM2lr-0001ec-7o
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 22:20:16 -0500
+From: Peng Hao <peng.hao2@zte.com.cn>
+Date: Mon, 12 Nov 2018 19:42:16 +0800
+Message-Id: <1542022940-46849-3-git-send-email-peng.hao2@zte.com.cn>
+In-Reply-To: <1542022940-46849-1-git-send-email-peng.hao2@zte.com.cn>
+References: <1542022940-46849-1-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <20181106122025.3487-1-xiaoguangrong@tencent.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] migration: improve multithreads
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH V6 2/6]  hw/misc/pvpanic: Cosmetic renaming
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +22,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Hi,
+To ease the MMIO device addition in the next patch, rename:
+- ISA=5FPVPANIC=5FDEVICE -> PVPANIC (this just returns a generic Object),
+- ISADevice parent=5Fobj -> isadev,
+- MemoryRegion io -> mr.
 
-Ping...
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/misc/pvpanic.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-On 11/6/18 8:20 PM, guangrong.xiao@gmail.com wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> 
-> Changelog in v2:
-> These changes are based on Paolo's suggestion:
-> 1) rename the lockless multithreads model to threaded workqueue
-> 2) hugely improve the internal design, that make all the request be
->     a large array, properly partition it, assign requests to threads
->     respectively and use bitmaps to sync up threads and the submitter,
->     after that ptr_ring and spinlock are dropped
-> 3) introduce event wait for the submitter
-> 
-> These changes are based on Emilio's review:
-> 4) make more detailed description for threaded workqueue
-> 5) add a benchmark for threaded workqueue
-> 
-> The previous version can be found at
-> 	https://marc.info/?l=kvm&m=153968821910007&w=2
-> 
-> There's the simple performance measurement comparing these two versions,
-> the environment is the same as we listed in the previous version.
-> 
-> Use 8 threads to compress the data in the source QEMU
-> - with compress-wait-thread = off
-> 
-> 
->        total time        busy-ratio
-> --------------------------------------------------
-> v1    125066            0.38
-> v2    120444            0.35
-> 
-> - with compress-wait-thread = on
->           total time    busy-ratio
-> --------------------------------------------------
-> v1    164426            0
-> v2    142609            0
-> 
-> The v2 win slightly.
-> 
-> Xiao Guangrong (5):
->    bitops: introduce change_bit_atomic
->    util: introduce threaded workqueue
->    migration: use threaded workqueue for compression
->    migration: use threaded workqueue for decompression
->    tests: add threaded-workqueue-bench
-> 
->   include/qemu/bitops.h             |  13 +
->   include/qemu/threaded-workqueue.h |  94 +++++++
->   migration/ram.c                   | 538 ++++++++++++++------------------------
->   tests/Makefile.include            |   5 +-
->   tests/threaded-workqueue-bench.c  | 256 ++++++++++++++++++
->   util/Makefile.objs                |   1 +
->   util/threaded-workqueue.c         | 466 +++++++++++++++++++++++++++++++++
->   7 files changed, 1030 insertions(+), 343 deletions(-)
->   create mode 100644 include/qemu/threaded-workqueue.h
->   create mode 100644 tests/threaded-workqueue-bench.c
->   create mode 100644 util/threaded-workqueue.c
-> 
+diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
+index 9d8961b..dd3aef2 100644
+--- a/hw/misc/pvpanic.c
++++ b/hw/misc/pvpanic.c
+@@ -25,7 +25,7 @@
+ /* The pv event value */
+ #define PVPANIC=5FPANICKED        (1 << PVPANIC=5FF=5FPANICKED)
+=20
+-#define ISA=5FPVPANIC=5FDEVICE(obj)    \
++#define PVPANIC(obj)    \
+     OBJECT=5FCHECK(PVPanicState, (obj), TYPE=5FPVPANIC)
+=20
+ static void handle=5Fevent(int event)
+@@ -46,9 +46,11 @@ static void handle=5Fevent(int event)
+ #include "hw/isa/isa.h"
+=20
+ typedef struct PVPanicState {
+-    ISADevice parent=5Fobj;
++    /* private */
++    ISADevice isadev;
+=20
+-    MemoryRegion io;
++    /* public */
++    MemoryRegion mr;
+     uint16=5Ft ioport;
+ } PVPanicState;
+=20
+@@ -75,15 +77,15 @@ static const MemoryRegionOps pvpanic=5Fops =3D {
+=20
+ static void pvpanic=5Fisa=5Finitfn(Object *obj)
+ {
+-    PVPanicState *s =3D ISA=5FPVPANIC=5FDEVICE(obj);
++    PVPanicState *s =3D PVPANIC(obj);
+=20
+-    memory=5Fregion=5Finit=5Fio(&s->io, OBJECT(s), &pvpanic=5Fops, s, "pvp=
+anic", 1);
++    memory=5Fregion=5Finit=5Fio(&s->mr, OBJECT(s), &pvpanic=5Fops, s, "pvp=
+anic", 1);
+ }
+=20
+ static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev, Error **errp)
+ {
+     ISADevice *d =3D ISA=5FDEVICE(dev);
+-    PVPanicState *s =3D ISA=5FPVPANIC=5FDEVICE(dev);
++    PVPanicState *s =3D PVPANIC(dev);
+     FWCfgState *fw=5Fcfg =3D fw=5Fcfg=5Ffind();
+     uint16=5Ft *pvpanic=5Fport;
+=20
+@@ -96,7 +98,7 @@ static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev, E=
+rror **errp)
+     fw=5Fcfg=5Fadd=5Ffile(fw=5Fcfg, "etc/pvpanic-port", pvpanic=5Fport,
+                     sizeof(*pvpanic=5Fport));
+=20
+-    isa=5Fregister=5Fioport(d, &s->io, s->ioport);
++    isa=5Fregister=5Fioport(d, &s->mr, s->ioport);
+ }
+=20
+ static Property pvpanic=5Fisa=5Fproperties[] =3D {
+--=20
+1.8.3.1
