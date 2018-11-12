@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMFfr-0000mr-7G
+	(envelope-from <kwolf@redhat.com>) id 1gMFfr-0000nF-LF
 	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMFfp-0007Jc-SG
+	(envelope-from <kwolf@redhat.com>) id 1gMFfq-0007KE-9n
 	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:55 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 12 Nov 2018 18:05:58 +0100
-Message-Id: <20181112170603.23986-10-kwolf@redhat.com>
+Date: Mon, 12 Nov 2018 18:06:02 +0100
+Message-Id: <20181112170603.23986-14-kwolf@redhat.com>
 In-Reply-To: <20181112170603.23986-1-kwolf@redhat.com>
 References: <20181112170603.23986-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 09/14] block: Make more block drivers
- compile-time configurable
+Subject: [Qemu-devel] [PULL 13/14] block: Fix potential Null pointer
+ dereferences in vvfat.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,211 +25,153 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Jeff Cody <jcody@redhat.com>
+From: Liam Merwick <Liam.Merwick@oracle.com>
 
-This adds configure options to control the following block drivers:
+The calls to find_mapping_for_cluster() may return NULL but it
+isn't always checked for before dereferencing the value returned.
+Additionally, add some asserts to cover cases where NULL can't
+be returned but which might not be obvious at first glance.
 
-* Bochs
-* Cloop
-* Dmg
-* Qcow (V1)
-* Vdi
-* Vvfat
-* qed
-* parallels
-* sheepdog
-
-Each of these defaults to being enabled.
-
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-id: 20181107063644.2254-1-armbru@redhat.com
+Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+Message-id: 1541453919-25973-5-git-send-email-Liam.Merwick@oracle.com
+[mreitz: Dropped superfluous check of "mapping" following an assertion
+         that it is not NULL, and fixed some indentation]
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- configure           | 91 +++++++++++++++++++++++++++++++++++++++++++++
- block/Makefile.objs | 22 ++++++++---
- 2 files changed, 107 insertions(+), 6 deletions(-)
+ block/vvfat.c | 46 ++++++++++++++++++++++++++++++----------------
+ 1 file changed, 30 insertions(+), 16 deletions(-)
 
-diff --git a/configure b/configure
-index 74e313a810..5b1d83ea26 100755
---- a/configure
-+++ b/configure
-@@ -470,6 +470,15 @@ tcmalloc=3D"no"
- jemalloc=3D"no"
- replication=3D"yes"
- vxhs=3D""
-+bochs=3D"yes"
-+cloop=3D"yes"
-+dmg=3D"yes"
-+qcow1=3D"yes"
-+vdi=3D"yes"
-+vvfat=3D"yes"
-+qed=3D"yes"
-+parallels=3D"yes"
-+sheepdog=3D"yes"
- libxml2=3D""
- docker=3D"no"
- debug_mutex=3D"no"
-@@ -1416,6 +1425,42 @@ for opt do
-   ;;
-   --enable-vxhs) vxhs=3D"yes"
-   ;;
-+  --disable-bochs) bochs=3D"no"
-+  ;;
-+  --enable-bochs) bochs=3D"yes"
-+  ;;
-+  --disable-cloop) cloop=3D"no"
-+  ;;
-+  --enable-cloop) cloop=3D"yes"
-+  ;;
-+  --disable-dmg) dmg=3D"no"
-+  ;;
-+  --enable-dmg) dmg=3D"yes"
-+  ;;
-+  --disable-qcow1) qcow1=3D"no"
-+  ;;
-+  --enable-qcow1) qcow1=3D"yes"
-+  ;;
-+  --disable-vdi) vdi=3D"no"
-+  ;;
-+  --enable-vdi) vdi=3D"yes"
-+  ;;
-+  --disable-vvfat) vvfat=3D"no"
-+  ;;
-+  --enable-vvfat) vvfat=3D"yes"
-+  ;;
-+  --disable-qed) qed=3D"no"
-+  ;;
-+  --enable-qed) qed=3D"yes"
-+  ;;
-+  --disable-parallels) parallels=3D"no"
-+  ;;
-+  --enable-parallels) parallels=3D"yes"
-+  ;;
-+  --disable-sheepdog) sheepdog=3D"no"
-+  ;;
-+  --enable-sheepdog) sheepdog=3D"yes"
-+  ;;
-   --disable-vhost-user) vhost_user=3D"no"
-   ;;
-   --enable-vhost-user)
-@@ -1718,6 +1763,15 @@ disabled with --disable-FEATURE, default is enable=
-d if available:
-   qom-cast-debug  cast debugging support
-   tools           build qemu-io, qemu-nbd and qemu-image tools
-   vxhs            Veritas HyperScale vDisk backend support
-+  bochs           bochs image format support
-+  cloop           cloop image format support
-+  dmg             dmg image format support
-+  qcow1           qcow v1 image format support
-+  vdi             vdi image format support
-+  vvfat           vvfat image format support
-+  qed             qed image format support
-+  parallels       parallels image format support
-+  sheepdog        sheepdog block driver support
-   crypto-afalg    Linux AF_ALG crypto backend driver
-   vhost-user      vhost-user support
-   capstone        capstone disassembler support
-@@ -6043,6 +6097,15 @@ echo "jemalloc support  $jemalloc"
- echo "avx2 optimization $avx2_opt"
- echo "replication support $replication"
- echo "VxHS block device $vxhs"
-+echo "bochs support     $bochs"
-+echo "cloop support     $cloop"
-+echo "dmg support       $dmg"
-+echo "qcow v1 support   $qcow1"
-+echo "vdi support       $vdi"
-+echo "vvfat support     $vvfat"
-+echo "qed support       $qed"
-+echo "parallels support $parallels"
-+echo "sheepdog support  $sheepdog"
- echo "capstone          $capstone"
- echo "docker            $docker"
- echo "libpmem support   $libpmem"
-@@ -6799,6 +6862,34 @@ if test "$libpmem" =3D "yes" ; then
-   echo "CONFIG_LIBPMEM=3Dy" >> $config_host_mak
- fi
+diff --git a/block/vvfat.c b/block/vvfat.c
+index e4df255d58..1de5de1db4 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -100,30 +100,26 @@ static inline void array_free(array_t* array)
+ /* does not automatically grow */
+ static inline void* array_get(array_t* array,unsigned int index) {
+     assert(index < array->next);
++    assert(array->pointer);
+     return array->pointer + index * array->item_size;
+ }
 =20
-+if test "$bochs" =3D "yes" ; then
-+  echo "CONFIG_BOCHS=3Dy" >> $config_host_mak
-+fi
-+if test "$cloop" =3D "yes" ; then
-+  echo "CONFIG_CLOOP=3Dy" >> $config_host_mak
-+fi
-+if test "$dmg" =3D "yes" ; then
-+  echo "CONFIG_DMG=3Dy" >> $config_host_mak
-+fi
-+if test "$qcow1" =3D "yes" ; then
-+  echo "CONFIG_QCOW1=3Dy" >> $config_host_mak
-+fi
-+if test "$vdi" =3D "yes" ; then
-+  echo "CONFIG_VDI=3Dy" >> $config_host_mak
-+fi
-+if test "$vvfat" =3D "yes" ; then
-+  echo "CONFIG_VVFAT=3Dy" >> $config_host_mak
-+fi
-+if test "$qed" =3D "yes" ; then
-+  echo "CONFIG_QED=3Dy" >> $config_host_mak
-+fi
-+if test "$parallels" =3D "yes" ; then
-+  echo "CONFIG_PARALLELS=3Dy" >> $config_host_mak
-+fi
-+if test "$sheepdog" =3D "yes" ; then
-+  echo "CONFIG_SHEEPDOG=3Dy" >> $config_host_mak
-+fi
-+
- if test "$tcg_interpreter" =3D "yes"; then
-   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
- elif test "$ARCH" =3D "sparc64" ; then
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index c8337bf186..46d585cfd0 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -1,10 +1,18 @@
--block-obj-y +=3D raw-format.o qcow.o vdi.o vmdk.o cloop.o bochs.o vpc.o =
-vvfat.o dmg.o
-+block-obj-y +=3D raw-format.o vmdk.o vpc.o
-+block-obj-$(CONFIG_QCOW1) +=3D qcow.o
-+block-obj-$(CONFIG_VDI) +=3D vdi.o
-+block-obj-$(CONFIG_CLOOP) +=3D cloop.o
-+block-obj-$(CONFIG_BOCHS) +=3D bochs.o
-+block-obj-$(CONFIG_VVFAT) +=3D vvfat.o
-+block-obj-$(CONFIG_DMG) +=3D dmg.o
-+
- block-obj-y +=3D qcow2.o qcow2-refcount.o qcow2-cluster.o qcow2-snapshot=
-.o qcow2-cache.o qcow2-bitmap.o
--block-obj-y +=3D qed.o qed-l2-cache.o qed-table.o qed-cluster.o
--block-obj-y +=3D qed-check.o
-+block-obj-$(CONFIG_QED) +=3D qed.o qed-l2-cache.o qed-table.o qed-cluste=
-r.o
-+block-obj-$(CONFIG_QED) +=3D qed-check.o
- block-obj-y +=3D vhdx.o vhdx-endian.o vhdx-log.o
- block-obj-y +=3D quorum.o
--block-obj-y +=3D parallels.o blkdebug.o blkverify.o blkreplay.o
-+block-obj-y +=3D blkdebug.o blkverify.o blkreplay.o
-+block-obj-$(CONFIG_PARALLELS) +=3D parallels.o
- block-obj-y +=3D blklogwrites.o
- block-obj-y +=3D block-backend.o snapshot.o qapi.o
- block-obj-$(CONFIG_WIN32) +=3D file-win32.o win32-aio.o
-@@ -14,7 +22,8 @@ block-obj-y +=3D null.o mirror.o commit.o io.o create.o
- block-obj-y +=3D throttle-groups.o
- block-obj-$(CONFIG_LINUX) +=3D nvme.o
+-static inline int array_ensure_allocated(array_t* array, int index)
++static inline void array_ensure_allocated(array_t *array, int index)
+ {
+     if((index + 1) * array->item_size > array->size) {
+         int new_size =3D (index + 32) * array->item_size;
+         array->pointer =3D g_realloc(array->pointer, new_size);
+-        if (!array->pointer)
+-            return -1;
++        assert(array->pointer);
+         memset(array->pointer + array->size, 0, new_size - array->size);
+         array->size =3D new_size;
+         array->next =3D index + 1;
+     }
+-
+-    return 0;
+ }
 =20
--block-obj-y +=3D nbd.o nbd-client.o sheepdog.o
-+block-obj-y +=3D nbd.o nbd-client.o
-+block-obj-$(CONFIG_SHEEPDOG) +=3D sheepdog.o
- block-obj-$(CONFIG_LIBISCSI) +=3D iscsi.o
- block-obj-$(if $(CONFIG_LIBISCSI),y,n) +=3D iscsi-opts.o
- block-obj-$(CONFIG_LIBNFS) +=3D nfs.o
-@@ -45,7 +54,8 @@ gluster.o-libs     :=3D $(GLUSTERFS_LIBS)
- vxhs.o-libs        :=3D $(VXHS_LIBS)
- ssh.o-cflags       :=3D $(LIBSSH2_CFLAGS)
- ssh.o-libs         :=3D $(LIBSSH2_LIBS)
--block-obj-$(if $(CONFIG_BZIP2),m,n) +=3D dmg-bz2.o
-+block-obj-dmg-bz2-$(CONFIG_BZIP2) +=3D dmg-bz2.o
-+block-obj-$(if $(CONFIG_DMG),m,n) +=3D $(block-obj-dmg-bz2-y)
- dmg-bz2.o-libs     :=3D $(BZIP2_LIBS)
- qcow.o-libs        :=3D -lz
- linux-aio.o-libs   :=3D -laio
+ static inline void* array_get_next(array_t* array) {
+     unsigned int next =3D array->next;
+=20
+-    if (array_ensure_allocated(array, next) < 0)
+-        return NULL;
+-
++    array_ensure_allocated(array, next);
+     array->next =3D next + 1;
+     return array_get(array, next);
+ }
+@@ -2422,16 +2418,13 @@ static int commit_direntries(BDRVVVFATState* s,
+     direntry_t* direntry =3D array_get(&(s->directory), dir_index);
+     uint32_t first_cluster =3D dir_index =3D=3D 0 ? 0 : begin_of_direntr=
+y(direntry);
+     mapping_t* mapping =3D find_mapping_for_cluster(s, first_cluster);
+-
+     int factor =3D 0x10 * s->sectors_per_cluster;
+     int old_cluster_count, new_cluster_count;
+-    int current_dir_index =3D mapping->info.dir.first_dir_index;
+-    int first_dir_index =3D current_dir_index;
++    int current_dir_index;
++    int first_dir_index;
+     int ret, i;
+     uint32_t c;
+=20
+-DLOG(fprintf(stderr, "commit_direntries for %s, parent_mapping_index %d\=
+n", mapping->path, parent_mapping_index));
+-
+     assert(direntry);
+     assert(mapping);
+     assert(mapping->begin =3D=3D first_cluster);
+@@ -2439,6 +2432,11 @@ DLOG(fprintf(stderr, "commit_direntries for %s, pa=
+rent_mapping_index %d\n", mapp
+     assert(mapping->mode & MODE_DIRECTORY);
+     assert(dir_index =3D=3D 0 || is_directory(direntry));
+=20
++    DLOG(fprintf(stderr, "commit_direntries for %s, parent_mapping_index=
+ %d\n",
++                 mapping->path, parent_mapping_index));
++
++    current_dir_index =3D mapping->info.dir.first_dir_index;
++    first_dir_index =3D current_dir_index;
+     mapping->info.dir.parent_mapping_index =3D parent_mapping_index;
+=20
+     if (first_cluster =3D=3D 0) {
+@@ -2488,6 +2486,9 @@ DLOG(fprintf(stderr, "commit_direntries for %s, par=
+ent_mapping_index %d\n", mapp
+         direntry =3D array_get(&(s->directory), first_dir_index + i);
+         if (is_directory(direntry) && !is_dot(direntry)) {
+             mapping =3D find_mapping_for_cluster(s, first_cluster);
++            if (mapping =3D=3D NULL) {
++                return -1;
++            }
+             assert(mapping->mode & MODE_DIRECTORY);
+             ret =3D commit_direntries(s, first_dir_index + i,
+                 array_index(&(s->mapping), mapping));
+@@ -2516,6 +2517,10 @@ static int commit_one_file(BDRVVVFATState* s,
+     assert(offset < size);
+     assert((offset % s->cluster_size) =3D=3D 0);
+=20
++    if (mapping =3D=3D NULL) {
++        return -1;
++    }
++
+     for (i =3D s->cluster_size; i < offset; i +=3D s->cluster_size)
+         c =3D modified_fat_get(s, c);
+=20
+@@ -2662,8 +2667,12 @@ static int handle_renames_and_mkdirs(BDRVVVFATStat=
+e* s)
+         if (commit->action =3D=3D ACTION_RENAME) {
+             mapping_t* mapping =3D find_mapping_for_cluster(s,
+                     commit->param.rename.cluster);
+-            char* old_path =3D mapping->path;
++            char *old_path;
+=20
++            if (mapping =3D=3D NULL) {
++                return -1;
++            }
++            old_path =3D mapping->path;
+             assert(commit->path);
+             mapping->path =3D commit->path;
+             if (rename(old_path, mapping->path))
+@@ -2684,10 +2693,15 @@ static int handle_renames_and_mkdirs(BDRVVVFATSta=
+te* s)
+                         direntry_t* d =3D direntry + i;
+=20
+                         if (is_file(d) || (is_directory(d) && !is_dot(d)=
+)) {
++                            int l;
++                            char *new_path;
+                             mapping_t* m =3D find_mapping_for_cluster(s,
+                                     begin_of_direntry(d));
+-                            int l =3D strlen(m->path);
+-                            char* new_path =3D g_malloc(l + diff + 1);
++                            if (m =3D=3D NULL) {
++                                return -1;
++                            }
++                            l =3D strlen(m->path);
++                            new_path =3D g_malloc(l + diff + 1);
+=20
+                             assert(!strncmp(m->path, mapping->path, l2))=
+;
+=20
 --=20
 2.19.1
