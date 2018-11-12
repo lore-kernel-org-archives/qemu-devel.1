@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gM9AJ-0008Ct-Gq
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:09:56 -0500
+	(envelope-from <groug@kaod.org>) id 1gM9EU-0002k6-0D
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:14:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gM9AF-0003gi-46
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:09:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43150)
+	(envelope-from <groug@kaod.org>) id 1gM9EO-00065X-S7
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:14:13 -0500
+Received: from 11.mo4.mail-out.ovh.net ([46.105.34.195]:53255)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1gM9AE-0003f1-Mq
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:09:51 -0500
-Date: Mon, 12 Nov 2018 11:09:39 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20181112100939.vro42goghcv7v6l2@kamzik.brq.redhat.com>
-References: <1540290099-146109-1-git-send-email-mjaggi@caviumnetworks.com>
-	<4bbb4e76-b714-eafe-f95b-aca1a258e9fe@caviumnetworks.com>
-	<86o9avetgz.wl-marc.zyngier@arm.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gM9EO-00064D-B9
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:14:08 -0500
+Received: from player758.ha.ovh.net (unknown [10.109.143.18])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3A3A01BFE42
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 11:14:05 +0100 (CET)
+Date: Mon, 12 Nov 2018 11:13:57 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181112111357.5f60be3c@bahia.lan>
+In-Reply-To: <A02D6AA901860840B46E751C5E9E38B43CC96A5B@DGGEML532-MBX.china.huawei.com>
+References: <A02D6AA901860840B46E751C5E9E38B42AFDB13F@DGGEML532-MBX.china.huawei.com>
+	<A02D6AA901860840B46E751C5E9E38B43CC96A5B@DGGEML532-MBX.china.huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86o9avetgz.wl-marc.zyngier@arm.com>
-Subject: Re: [Qemu-devel] [RFC] [PATCH] kvm: arm: Introduce error code
- KVM_EINVARIANT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] virtio-9p: qmp interface for set/query
+ io throttle for fsdev devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +31,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Manish Jaggi <mjaggi@caviumnetworks.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "Nair, Jayachandran" <Jayachandran.Nair@cavium.com>, Christoffer Dall <christoffer.dall@arm.com>, "quintela@redhat.com" <quintela@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "Jaggi, Manish" <Manish.Jaggi@cavium.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "Nowicki, Tomasz" <Tomasz.Nowicki@cavium.com>
+To: xiezhide <xiezhide@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>
 
-On Sun, Nov 11, 2018 at 11:36:44AM +0000, Marc Zyngier wrote:
-> On Sat, 10 Nov 2018 22:18:47 +0000,
-> Manish Jaggi <mjaggi@caviumnetworks.com> wrote:
-> > 
-> > 
-> > CCing a larger audience.
-> > Please review.
-> > 
-> > On 10/23/2018 03:51 PM, Jaggi, Manish wrote:
-> > > From: Manish Jaggi <manish.jaggi@cavium.com>
-> > >
-> > > This patch introduces an error code KVM_EINVARIANT which is returned
-> > > by KVM when userland tries to set an invariant register.
-> > >
-> > > The need for this error code is in VM Migration for arm64.
-> > > ARM64 systems use mainly -machine virt -cpu host as parameter to qemu.
-> > > Migration requires both Source and destination machines to have same
-> > > physical cpu. There are cases where the overall architecture of CPU is
-> > > same but the next version of the chip with some bug fixes which have no
-> > > effect on qemu operation. In such cases invariant registers like MIDR
-> > > have a different value.
-> > > Currently Migration fails in such cases.
-> > >
-> > > Rather than sending a EINVAL, a specifc error code will help
-> > > userland program the guest invariant register by querying the migrated
-> > > host machines invariant registers.
+On Mon, 12 Nov 2018 01:14:55 +0000
+xiezhide <xiezhide@huawei.com> wrote:
+
+> These patches provide the qmp interface, to set/query the io throttle
+> status of the all fsdev devices that are present in a vm.
+> Some of the patches also remove the
+> duplicate code that was present in block and fsdev files.
 > 
-> But failing migration is a good thing, right? How do you expect that
-> the guest will be happy to see a new CPU revision right in the middle
-> of its execution? Do you also propose that QEMU starts doing that for
-> big-little systems? After all, if ignoring the differences in some
-> registers is harmless for migration, surely that should be the case in
-> a single system, right?
-> 
-> > >
-> > > Qemu will have a parameter -hostinvariant along with checking of this
-> > > error code. So it can be safely assumed that the feature is opt-in
-> 
-> You're changing the ABI without any buy in from userspace, which is
-> not acceptable.
-> 
-> As it stands, this patch creates a number of issues without solving
-> any. Things to think about:
-> 
-> - How does errata management works when migrating to a different
->   system?
-> - big-little, as mentioned above
-> - Are all invariant registers equal? A different MIDR has the same
->   effect as a different MMFR0?
-> 
-> Instead of papering over architectural constants i a system, how about
-> allowing the relevant ID registers to be overloaded when not
-> incompatible?
+> Zhide Xie (2):
+>   fsdev-qmp: qmp interface for set/query io throttle for fsdev devices.
+>   fsdev-qmp: fix coding style issue
 > 
 
-In QEMU, I think we need nail down how we define '-cpu host' for kvmarm.
-IMO, '-cpu host' is what libvirt calls "host-passthrough"[*], and indeed
-migrating a guest using host-passthrough is super risky. You need to
-know what you're doing, and likely what you'll want to do is migrate to
-an _identical_ host. We should start looking at building cpu models to
-better support migration, but errata complicates that. However, for the
-sake of argument, let's assume we solved those problems and completed the
-implementation of cpu models - so we would no longer be using '-cpu host'
-for a "typical" config. So what would '-cpu host' mean? It appears the
-current semantics are "source host passthrough", similar to
-"host-model"[*]. Rather than "whatever host I'm running on host
-passthrough", which is what I think we want and what this patch and the
-QEMU counterpart changes seem to be aiming at implementing. Anyway,
-whichever of those two semantics we choose for '-cpu host', the user will
-still need to know what they're doing and to assume the risks. Without
-cpu models, I'm not even sure discussing migration safety makes sense.
+Hi Zhide Xie,
 
-(Yeah, I know I ignored big-little. IMO, big-little is an upper layer
-problem, as it should just be a vcpu thread to cpu set affinity
-assignment issue.)
+This series seems to have some formatting issues, like the broken
+indention in the diffstat below for example. Also, no message
+threading, weird Sob lines:
 
-Thanks,
-drew
+Signed-off-by: x00390961 <xiezhide@huawei.com<mailto:xiezhide@huawei.com>>
 
-[*] https://wiki.openstack.org/wiki/LibvirtXMLCPUModel
+and finally I couldn't even apply patch 1:
+
+$ pwclient git-am 996225 
+Applying patch #996225 using 'git am'
+Description: [1/2] virtio-9p: qmp interface to set/query io throttle for fsdev devices
+Applying: virtio-9p: qmp interface to set/query io throttle for fsdev devices
+
+error: corrupt patch at line 36 <== this confirms that the patch has formatting issues.
+
+Patch failed at 0001 virtio-9p: qmp interface to set/query io throttle for fsdev devices
+Use 'git am --show-current-patch' to see the failed patch
+When you have resolved this problem, run "git am --continue".
+If you prefer to skip this patch, run "git am --skip" instead.
+To restore the original branch and stop patching, run "git am --abort".
+'git am' failed with exit status 128
+
+
+Not sure what mail client was used to send this (I don't see any indication
+in the mail headers), but if it's not the case already, I suggest you use
+git format-patch and git send-email.
+
+I don't have much time, so I'll wait for the well-formatted v2 before
+starting review :-)
+
+> Makefile                                                |  20 +++-
+> Makefile.objs                                       |   8 ++
+> block/throttle.c                                   |   6 +-
+> blockdev.c                                             |  96 +----------------
+> fsdev/qemu-fsdev-dummy.c            |  11 ++
+> fsdev/qemu-fsdev-throttle.c            | 144 +++++++++++++++++---------
+> fsdev/qemu-fsdev-throttle.h           |   6 +-
+> fsdev/qemu-fsdev.c                            |  29 ++++++
+> hmp-commands-info.hx                     |  15 +++
+> hmp-commands.hx                             |  15 +++
+> hmp.c                                                     |  83 +++++++++++++--
+> hmp.h                                                     |   4 +
+> include/qemu/throttle-options.h    |   3 +-
+> include/qemu/throttle.h                   |   4 +-
+> include/qemu/typedefs.h                  |   1 +
+> monitor.c                                               |   4 +
+> qapi/block-core.json                           | 122 +---------------------
+> qapi/fsdev.json                                     |  96 +++++++++++++++++
+> qapi/qapi-schema.json                       |   1 +
+> qapi/tlimits.json                                   |  89 ++++++++++++++++
+> qmp.c                                                      |  12 +++
+> util/throttle.c                                        | 224 ++++++++++++++++++++++++++--------------
+> 22 files changed, 639 insertions(+), 354 deletions(-)
+> create mode 100644 qapi/fsdev.json
+> create mode 100644 qapi/tlimits.json
+> 
+
+
+> --
+> 1.8.3.1
