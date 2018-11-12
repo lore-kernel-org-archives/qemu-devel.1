@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMFfO-0000Qo-62
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:26 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gMFfb-0000XI-3r
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMFfF-0006o2-9w
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:20 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gMFfS-00070C-KI
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:38 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 12 Nov 2018 18:05:53 +0100
-Message-Id: <20181112170603.23986-5-kwolf@redhat.com>
+Date: Mon, 12 Nov 2018 18:05:54 +0100
+Message-Id: <20181112170603.23986-6-kwolf@redhat.com>
 In-Reply-To: <20181112170603.23986-1-kwolf@redhat.com>
 References: <20181112170603.23986-1-kwolf@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 04/14] nvme: don't unref ctrl_mem when device
- unrealized
+Subject: [Qemu-devel] [PULL 05/14] nvme: free cmbuf in nvme_exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +27,28 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Li Qiang <liq3ea@gmail.com>
 
-Currently, when hotplug/unhotplug nvme device, it will cause an
-assert in object.c. Following is the backtrack:
-
-ERROR:qom/object.c:981:object_unref: assertion failed: (obj->ref > 0)
-
-Thread 2 "qemu-system-x86" received signal SIGABRT, Aborted.
-[Switching to Thread 0x7fffcbd32700 (LWP 18844)]
-0x00007fffdb9e4fff in raise () from /lib/x86_64-linux-gnu/libc.so.6
-(gdb) bt
-/lib/x86_64-linux-gnu/libglib-2.0.so.0
-/lib/x86_64-linux-gnu/libglib-2.0.so.0
-qom/object.c:981
-/home/liqiang02/qemu-upstream/qemu/memory.c:1732
-/home/liqiang02/qemu-upstream/qemu/memory.c:285
-util/qemu-thread-posix.c:504
-/lib/x86_64-linux-gnu/libpthread.so.0
-
-This is caused by memory_region_unref in nvme_exit.
-
-Remove it to make the PCIdevice refcount correct.
+This avoid a memory leak in unhotplug nvme device.
 
 Signed-off-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- hw/block/nvme.c | 3 ---
- 1 file changed, 3 deletions(-)
+ hw/block/nvme.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index fc7dacb816..359a06d0ad 100644
+index 359a06d0ad..09d7c90259 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -1331,9 +1331,6 @@ static void nvme_exit(PCIDevice *pci_dev)
-     g_free(n->namespaces);
+@@ -1332,6 +1332,9 @@ static void nvme_exit(PCIDevice *pci_dev)
      g_free(n->cq);
      g_free(n->sq);
--    if (n->cmbsz) {
--        memory_region_unref(&n->ctrl_mem);
--    }
 =20
++    if (n->cmb_size_mb) {
++        g_free(n->cmbuf);
++    }
      msix_uninit_exclusive_bar(pci_dev);
  }
+=20
 --=20
 2.19.1
