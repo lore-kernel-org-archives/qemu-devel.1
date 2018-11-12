@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gM91V-0001fp-M3
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:00:55 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gM95x-0005LK-M8
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:05:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gM91J-0000Rs-Pe
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:00:45 -0500
-Received: from 11.mo6.mail-out.ovh.net ([188.165.38.119]:45324)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gM91C-0000PD-GB
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:00:34 -0500
-Received: from player795.ha.ovh.net (unknown [10.109.159.132])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id DFBAA197FF8
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 11:00:25 +0100 (CET)
-Date: Mon, 12 Nov 2018 11:00:21 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181112110021.734d25d5@bahia.lan>
-In-Reply-To: <CACcO5F4FBW9QiaTA1w61z5pwt6Z3F1n73=rL4Af=6-K5zq0-EQ@mail.gmail.com>
-References: <154155007870.439125.16160474206652257208.stgit@bahia.lan>
-	<CACcO5F4FBW9QiaTA1w61z5pwt6Z3F1n73=rL4Af=6-K5zq0-EQ@mail.gmail.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1gM95n-0001wK-SY
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:05:21 -0500
+Received: from mail-eopbgr730120.outbound.protection.outlook.com
+	([40.107.73.120]:63582
+	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gM95f-0001oG-FK
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:05:09 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 12 Nov 2018 10:04:58 +0000
+Message-ID: <CY4PR2201MB12548AC0153261DF7E3BABECC6C10@CY4PR2201MB1254.namprd22.prod.outlook.com>
+References: <20181111233622.8976-1-f4bug@amsat.org>
+	<20181111233622.8976-9-f4bug@amsat.org>
+	<BN6PR2201MB1251ADAEA3C596FD3F1AB3E6C6C10@BN6PR2201MB1251.namprd22.prod.outlook.com>,
+	<ad3bd757-861d-2086-94e5-64779cd0affb@linaro.org>
+In-Reply-To: <ad3bd757-861d-2086-94e5-64779cd0affb@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] 9p: write lock path in v9fs_co_open2()
+Subject: Re: [Qemu-devel] [RFC PATCH 08/11] target/mips: Add a decodetree
+ stub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,180 +34,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhibin hu <noirfate@gmail.com>
-Cc: qemu-devel@nongnu.org, prasad@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peer Adelt <peer.adelt@hni.uni-paderborn.de>, Richard Henderson <rth@twiddle.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Mon, 12 Nov 2018 16:28:28 +0800
-zhibin hu <noirfate@gmail.com> wrote:
+Hello, Richard.
 
-> hi,
-> 
-> i use this patch with qemu 3.0.0 and it seems not fix completely.
-> 
-> [root@localhost ~]# ./qemu-system-x86_64 -snapshot -m 1024 -smp 2
-> -enable-kvm -net nic,model=e1000 -net
-> tap,helper=/usr/libexec/qemu-bridge-helper -hda
-> /var/lib/libvirt/images/test.qcow2 -fsdev
-> local,id=test_dev,path=/tmp,security_model=none -device
-> virtio-9p-pci,fsdev=test_dev,mount_tag=test_mount -vnc 0.0.0.0:1
-> ==5014==WARNING: ASan doesn't fully support makecontext/swapcontext
-> functions and may produce false positives in some cases!
-> =================================================================
-> ==5014==ERROR: AddressSanitizer: heap-use-after-free on address
-> 0x60200014fc50 at pc 0x7f90c908697d bp 0x7f9053444970 sp 0x7f9053444118
-> READ of size 2 at 0x60200014fc50 thread T17
->     #0 0x7f90c908697c  (/lib64/libasan.so.5+0x9997c)
->     #1 0x7f90c8452693 in g_path_get_basename
-> (/lib64/libglib-2.0.so.0+0x39693)
->     #2 0x559c1b78eb56 in local_lstat hw/9pfs/9p-local.c:182
->     #3 0x559c1b799628 in v9fs_co_lstat hw/9pfs/cofile.c:53
->     #4 0x559c1b777ee1 in fid_to_qid hw/9pfs/9p.c:598
->     #5 0x559c1b77aeae in v9fs_attach hw/9pfs/9p.c:1017
->     #6 0x559c1c145976 in coroutine_trampoline util/coroutine-ucontext.c:116
->     #7 0x7f90bd6855ff in __correctly_grouped_prefixwc
-> (/lib64/libc.so.6+0x4c5ff)
-> 
-> 0x60200014fc50 is located 0 bytes inside of 2-byte region
-> [0x60200014fc50,0x60200014fc52)
-> freed by thread T0 here:
->     #0 0x7f90c90db880 in __interceptor_free (/lib64/libasan.so.5+0xee880)
->     #1 0x7f90c846b4d1 in g_free (/lib64/libglib-2.0.so.0+0x524d1)
->     #2 0x559c1b775ce4 in v9fs_path_copy hw/9pfs/9p.c:195
->     #3 0x559c1b78425d in v9fs_create hw/9pfs/9p.c:2297
+I am a little taken aback by your tone. I hope we can communicate in much f=
+riendlier maner, as we used to do.
 
-Ah, so we have a similar issue when creating files with the older
-9p2000 and 9p2000.u protocols... I'll try to come up with a fix.
+>You have just this year added yet another encoding scheme for nanomips. Yo=
+ur statement "well tested over many years" is a bit of a stretch.
 
-Cheers,
+I wrote "mostly stable mature", not "all stable mature".
 
---
-Greg
+>If you do not wish to work on this, that's your prerogative.  But I don't =
+think
+you should be arbitrarily shutting down experimentation on this line before=
+ it
+has a chance to show results.
 
->     #4 0x559c1c145976 in coroutine_trampoline util/coroutine-ucontext.c:116
->     #5 0x7f90bd6855ff in __correctly_grouped_prefixwc
-> (/lib64/libc.so.6+0x4c5ff)
-> 
-> previously allocated by thread T4 here:
->     #0 0x7f90c90dbc48 in malloc (/lib64/libasan.so.5+0xeec48)
->     #1 0x7f90bd743c37 in __GI___vasprintf_chk (/lib64/libc.so.6+0x10ac37)
-> 
-> Thread T17 created by T16 here:
->     #0 0x7f90c9038443 in pthread_create (/lib64/libasan.so.5+0x4b443)
->     #1 0x559c1c10461e in qemu_thread_create util/qemu-thread-posix.c:534
->     #2 0x559c1c0f2be4 in do_spawn_thread util/thread-pool.c:135
->     #3 0x559c1c0f2498 in worker_thread util/thread-pool.c:83
->     #4 0x559c1c1043e0 in qemu_thread_start util/qemu-thread-posix.c:504
->     #5 0x7f90bd9ff593 in start_thread (/lib64/libpthread.so.0+0x7593)
-> 
-> Thread T16 created by T0 here:
->     #0 0x7f90c9038443 in pthread_create (/lib64/libasan.so.5+0x4b443)
->     #1 0x559c1c10461e in qemu_thread_create util/qemu-thread-posix.c:534
->     #2 0x559c1c0f2be4 in do_spawn_thread util/thread-pool.c:135
->     #3 0x559c1c0f2c73 in spawn_thread_bh_fn util/thread-pool.c:143
->     #4 0x559c1c0ef4d0 in aio_bh_call util/async.c:90
->     #5 0x559c1c0ef787 in aio_bh_poll util/async.c:118
->     #6 0x559c1c0fb5bd in aio_dispatch util/aio-posix.c:436
->     #7 0x559c1c0f026f in aio_ctx_dispatch util/async.c:261
->     #8 0x7f90c84658ac in g_main_context_dispatch
-> (/lib64/libglib-2.0.so.0+0x4c8ac)
-> 
-> Thread T4 created by T0 here:
->     #0 0x7f90c9038443 in pthread_create (/lib64/libasan.so.5+0x4b443)
->     #1 0x559c1c10461e in qemu_thread_create util/qemu-thread-posix.c:534
->     #2 0x559c1b2e7258 in qemu_kvm_start_vcpu /root/qemu-3.0.0/cpus.c:1935
->     #3 0x559c1b2e7a0b in qemu_init_vcpu /root/qemu-3.0.0/cpus.c:2001
->     #4 0x559c1b583f0c in x86_cpu_realizefn
-> /root/qemu-3.0.0/target/i386/cpu.c:4996
->     #5 0x559c1b87f1e8 in device_set_realized hw/core/qdev.c:826
->     #6 0x559c1bde6e62 in property_set_bool qom/object.c:1984
->     #7 0x559c1bde2b0e in object_property_set qom/object.c:1176
->     #8 0x559c1bde9b00 in object_property_set_qobject qom/qom-qobject.c:27
->     #9 0x559c1bde2e2b in object_property_set_bool qom/object.c:1242
->     #10 0x559c1b4f2452 in pc_new_cpu /root/qemu-3.0.0/hw/i386/pc.c:1107
->     #11 0x559c1b4f2993 in pc_cpus_init /root/qemu-3.0.0/hw/i386/pc.c:1155
->     #12 0x559c1b4fc9cb in pc_init1 /root/qemu-3.0.0/hw/i386/pc_piix.c:153
->     #13 0x559c1b4fe81d in pc_init_v3_0
-> /root/qemu-3.0.0/hw/i386/pc_piix.c:438
->     #14 0x559c1b890f29 in machine_run_board_init hw/core/machine.c:830
->     #15 0x559c1b6d246e in main /root/qemu-3.0.0/vl.c:4516
->     #16 0x7f90bd65c11a in __libc_start_main (/lib64/libc.so.6+0x2311a)
-> 
-> SUMMARY: AddressSanitizer: heap-use-after-free
-> (/lib64/libasan.so.5+0x9997c)
-> Shadow bytes around the buggy address:
->   0x0c0480021f30: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
->   0x0c0480021f40: fa fa fd fa fa fa fd fd fa fa fa fa fa fa fa fa
->   0x0c0480021f50: fa fa fa fa fa fa fa fa fa fa fd fa fa fa fd fd
->   0x0c0480021f60: fa fa fd fa fa fa fa fa fa fa fd fa fa fa fa fa
->   0x0c0480021f70: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fd fa
-> =>0x0c0480021f80: fa fa fa fa fa fa fd fa fa fa[fd]fa fa fa fd fa  
->   0x0c0480021f90: fa fa fd fd fa fa fd fa fa fa fa fa fa fa fd fa
->   0x0c0480021fa0: fa fa fd fa fa fa fd fa fa fa fd fa fa fa fa fa
->   0x0c0480021fb0: fa fa fd fa fa fa fa fa fa fa fa fa fa fa fd fd
->   0x0c0480021fc0: fa fa fd fa fa fa fa fa fa fa fa fa fa fa fd fa
->   0x0c0480021fd0: fa fa fd fa fa fa fd fa fa fa fa fa fa fa fd fa
-> Shadow byte legend (one shadow byte represents 8 application bytes):
->   Addressable:           00
->   Partially addressable: 01 02 03 04 05 06 07
->   Heap left redzone:       fa
->   Freed heap region:       fd
->   Stack left redzone:      f1
->   Stack mid redzone:       f2
->   Stack right redzone:     f3
->   Stack after return:      f5
->   Stack use after scope:   f8
->   Global redzone:          f9
->   Global init order:       f6
->   Poisoned by user:        f7
->   Container overflow:      fc
->   Array cookie:            ac
->   Intra object redzone:    bb
->   ASan internal:           fe
->   Left alloca redzone:     ca
->   Right alloca redzone:    cb
-> ==5014==ABORTING
-> 
-> thanks.
-> 
-> On Wed, Nov 7, 2018 at 8:21 AM Greg Kurz <groug@kaod.org> wrote:
-> 
-> > The assumption that the fid cannot be used by any other operation is
-> > wrong. At least, nothing prevents a misbehaving client to create a
-> > file with a given fid, and to pass this fid to some other operation
-> > at the same time (ie, without waiting for the response to the creation
-> > request). The call to v9fs_path_copy() performed by the worker thread
-> > after the file was created can race with any access to the fid path
-> > performed by some other thread. This causes use-after-free issues that
-> > can be detected by ASAN with a custom 9p client.
-> >
-> > Unlike other operations that only read the fid path, v9fs_co_open2()
-> > does modify it. It should hence take the write lock.
-> >
-> > Cc: P J P <ppandit@redhat.com>
-> > Reported-by: zhibin hu <noirfate@gmail.com>
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/9pfs/cofile.c |    6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/hw/9pfs/cofile.c b/hw/9pfs/cofile.c
-> > index 88791bc327ac..9c22837cda32 100644
-> > --- a/hw/9pfs/cofile.c
-> > +++ b/hw/9pfs/cofile.c
-> > @@ -140,10 +140,10 @@ int coroutine_fn v9fs_co_open2(V9fsPDU *pdu,
-> > V9fsFidState *fidp,
-> >      cred.fc_gid = gid;
-> >      /*
-> >       * Hold the directory fid lock so that directory path name
-> > -     * don't change. Read lock is fine because this fid cannot
-> > -     * be used by any other operation.
-> > +     * don't change. Take the write lock to be sure this fid
-> > +     * cannot be used by another operation.
-> >       */
-> > -    v9fs_path_read_lock(s);
-> > +    v9fs_path_write_lock(s);
-> >      v9fs_co_run_in_worker(
-> >          {
-> >              err = s->ops->open2(&s->ctx, &fidp->path,
-> >
-> >  
+I am not preventing anyone from experimenting. I just want to warn Philippe=
+ about high-level view that the code in question, although not the nicest, =
+works, and is planned to be maintained with minimal changes. The focus of M=
+IPS target is on adding new architectures and ASEs, and (I correct myself) =
+it could be that decodetree would kick in in such cases - but not for matur=
+e code driving older architectures. It just doesn't make enough sense.
+
+Thanks,
+Aleksandar
+
+________________________________________
+From: Richard Henderson <richard.henderson@linaro.org>
+Sent: Monday, November 12, 2018 9:58:05 AM
+To: Aleksandar Markovic; Philippe Mathieu-Daud=E9; Bastian Koppelmann; Peer=
+ Adelt; Richard Henderson
+Cc: qemu-devel@nongnu.org; Aurelien Jarno
+Subject: Re: [Qemu-devel] [RFC PATCH 08/11] target/mips: Add a decodetree s=
+tub
+
+On 11/12/18 6:37 AM, Aleksandar Markovic wrote:
+>> Subject: [RFC PATCH 08/11] target/mips: Add a decodetree stub
+>
+> There is no plan to use decodetree for MIPS target. MIPS decoding engine =
+is
+> mostly stable mature code that was well tested over many years, and there=
+ is no
+> point in introducing such drastic change to the code that works.
+
+This attitude is unnecessarily obstructionist.
+
+The reorganization of the instruction implementation that is implied by a
+transition to decodetree is exactly what you and I talked about some months=
+ ago.
+
+The ability to use multiple decodetree parsers to vector directly to the
+instruction implementations would help unify code across multiple encoding
+schemes.  (There 4 now: mips, mips16, micromips, nanomips; and mipsr6 is
+different enough that it could be considered a 5th encoding.)
+
+In a sample transition of 10 insns that Phillipe sent me via private email =
+this
+weekend, I noticed an existing bug in MULT{,U} that fails to enforce rd =3D=
+=3D 0 on
+cpus that have only one accumulator -- any bets there are no more to be fou=
+nd?
+ You have just this year added yet another encoding scheme for nanomips.  Y=
+our
+statement "well tested over many years" is a bit of a stretch.
+
+If you do not wish to work on this, that's your prerogative.  But I don't t=
+hink
+you should be arbitrarily shutting down experimentation on this line before=
+ it
+has a chance to show results.
+
+
+r~
