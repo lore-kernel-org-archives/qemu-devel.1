@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gMGQl-0002Zs-KL
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:55:34 -0500
+	(envelope-from <groug@kaod.org>) id 1gMGR1-0002xO-Ur
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:55:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gMGJF-0002Vs-ER
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:47:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42418)
+	(envelope-from <groug@kaod.org>) id 1gMGQY-00083v-M8
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:55:25 -0500
+Received: from 7.mo4.mail-out.ovh.net ([178.33.253.54]:38280)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gMGJF-0002Sw-2P
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:47:37 -0500
-Date: Mon, 12 Nov 2018 17:47:20 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181112174719.GI2293@work-vm>
-References: <20181107155405.24013-1-minyard@acm.org>
-	<20181107155405.24013-2-minyard@acm.org>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gMGQY-0007wL-9D
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:55:10 -0500
+Received: from player778.ha.ovh.net (unknown [10.109.143.3])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 459F81BFD82
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 18:55:07 +0100 (CET)
+Date: Mon, 12 Nov 2018 18:54:59 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181112185459.55d27dc9@bahia.lan>
+In-Reply-To: <A02D6AA901860840B46E751C5E9E38B43CC96A40@DGGEML532-MBX.china.huawei.com>
+References: <A02D6AA901860840B46E751C5E9E38B42AFDB15F@DGGEML532-MBX.china.huawei.com>
+	<A02D6AA901860840B46E751C5E9E38B43CC96A40@DGGEML532-MBX.china.huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181107155405.24013-2-minyard@acm.org>
-Subject: Re: [Qemu-devel] [PATCH 1/3] i2c:pm_smbus: Fix state transfer
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-9p:  fix coding style issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: minyard@acm.org
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: xiezhide <xiezhide@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "berto@igalia.com" <berto@igalia.com>, "armbru@redhat.com" <armbru@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>
 
-* minyard@acm.org (minyard@acm.org) wrote:
-> From: Corey Minyard <cminyard@mvista.com>
+On Mon, 12 Nov 2018 01:12:33 +0000
+xiezhide <xiezhide@huawei.com> wrote:
+
+> fix two coding style issue
 > 
-> Transfer the state information for the SMBus registers and
-> internal data so it will work on a VM transfer.
 
-Weren't the comments from August were that we'd prefer to see this in
-a subsection so we didn't break migration compatibility.
+These coding style issues seem to come from patch 1... It is weird to
+introduce coding style nits and to fix them afterwards. Just avoid
+them in the first place (./scripts/checkpatch.pl is your friend).
 
-Dave
-
-> Signed-off-by: Corey Minyard <cminyard@mvista.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: x00390961 <xiezhide@huawei.com<mailto:xiezhide@huawei.com>>
 > ---
->  hw/acpi/piix4.c           |  3 ++-
->  hw/i2c/pm_smbus.c         | 20 ++++++++++++++++++++
->  hw/i2c/smbus_ich9.c       |  5 +++--
->  include/hw/i2c/pm_smbus.h |  2 ++
->  4 files changed, 27 insertions(+), 3 deletions(-)
+>  fsdev/qemu-fsdev-throttle.c      | 2 +-
+>  include/qemu/throttle-options.h   | 1 -
+>  2 files changed, 1 insertion(+), 2 deletions(-)
 > 
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index e330f24c71..313305f5a0 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -309,7 +309,7 @@ static const VMStateDescription vmstate_cpuhp_state = {
->   */
->  static const VMStateDescription vmstate_acpi = {
->      .name = "piix4_pm",
-> -    .version_id = 3,
-> +    .version_id = 4,
->      .minimum_version_id = 3,
->      .minimum_version_id_old = 1,
->      .load_state_old = acpi_load_old,
-> @@ -320,6 +320,7 @@ static const VMStateDescription vmstate_acpi = {
->          VMSTATE_UINT16(ar.pm1.evt.en, PIIX4PMState),
->          VMSTATE_UINT16(ar.pm1.cnt.cnt, PIIX4PMState),
->          VMSTATE_STRUCT(apm, PIIX4PMState, 0, vmstate_apm, APMState),
-> +        VMSTATE_STRUCT(smb, PIIX4PMState, 4, pmsmb_vmstate, PMSMBus),
->          VMSTATE_TIMER_PTR(ar.tmr.timer, PIIX4PMState),
->          VMSTATE_INT64(ar.tmr.overflow_time, PIIX4PMState),
->          VMSTATE_STRUCT(ar.gpe, PIIX4PMState, 2, vmstate_gpe, ACPIGPE),
-> diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-> index 685a2378ed..4d021bb017 100644
-> --- a/hw/i2c/pm_smbus.c
-> +++ b/hw/i2c/pm_smbus.c
-> @@ -402,6 +402,26 @@ static const MemoryRegionOps pm_smbus_ops = {
->      .endianness = DEVICE_LITTLE_ENDIAN,
->  };
->  
-> +const VMStateDescription pmsmb_vmstate = {
-> +    .name = "pmsmb",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT8(smb_stat, PMSMBus),
-> +        VMSTATE_UINT8(smb_ctl, PMSMBus),
-> +        VMSTATE_UINT8(smb_cmd, PMSMBus),
-> +        VMSTATE_UINT8(smb_addr, PMSMBus),
-> +        VMSTATE_UINT8(smb_data0, PMSMBus),
-> +        VMSTATE_UINT8(smb_data1, PMSMBus),
-> +        VMSTATE_UINT32(smb_index, PMSMBus),
-> +        VMSTATE_UINT8_ARRAY(smb_data, PMSMBus, PM_SMBUS_MAX_MSG_SIZE),
-> +        VMSTATE_UINT8(smb_auxctl, PMSMBus),
-> +        VMSTATE_BOOL(i2c_enable, PMSMBus),
-> +        VMSTATE_BOOL(op_done, PMSMBus),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk)
->  {
->      smb->op_done = true;
-> diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
-> index 2a8b49e02f..4202b71da5 100644
-> --- a/hw/i2c/smbus_ich9.c
-> +++ b/hw/i2c/smbus_ich9.c
-> @@ -47,10 +47,11 @@ typedef struct ICH9SMBState {
->  
->  static const VMStateDescription vmstate_ich9_smbus = {
->      .name = "ich9_smb",
-> -    .version_id = 1,
-> +    .version_id = 2,
->      .minimum_version_id = 1,
->      .fields = (VMStateField[]) {
-> -        VMSTATE_PCI_DEVICE(dev, struct ICH9SMBState),
-> +        VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
-> +        VMSTATE_STRUCT(smb, ICH9SMBState, 2, pmsmb_vmstate, PMSMBus),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
-> index 060d3c6ac0..471345eaa2 100644
-> --- a/include/hw/i2c/pm_smbus.h
-> +++ b/include/hw/i2c/pm_smbus.h
-> @@ -35,4 +35,6 @@ typedef struct PMSMBus {
->  
->  void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk);
->  
-> +extern const VMStateDescription pmsmb_vmstate;
-> +
->  #endif /* PM_SMBUS_H */
-> -- 
-> 2.17.1
+> diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
+> index 7d313f2..fa2b0c8 100644
+> --- a/fsdev/qemu-fsdev-throttle.c
+> +++ b/fsdev/qemu-fsdev-throttle.c
+> @@ -116,7 +116,7 @@ void fsdev_get_io_throttle(FsThrottle *fst, FsdevIOThrottle **fs9pcfg,
+>      ThrottleLimits *tlimits;
+>      FsdevIOThrottle *fscfg = g_malloc(sizeof(*fscfg));
+>      tlimits = qapi_FsdevIOThrottle_base(fscfg);
+> -     fscfg->has_id = true;
+> +    fscfg->has_id = true;
+>      fscfg->id = g_strdup(fsdevice);
+>      throttle_config_to_limits(&cfg, tlimits);
+>      *fs9pcfg = fscfg;
+> diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-options.h
+> index 7134690..3eb1825 100644
+> --- a/include/qemu/throttle-options.h
+> +++ b/include/qemu/throttle-options.h
+> @@ -111,6 +111,5 @@
+>              .type = QEMU_OPT_NUMBER,\
+>              .help = "when limiting by iops max size of an I/O in bytes",\
+>          }
+> -
+
+I'd rather keep this blank line for better readability.
+
+>      void throttle_parse_options(ThrottleConfig *, QemuOpts *);
+>  #endif
+> --
+> 1.8.3.1
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
