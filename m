@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gME9y-0006JQ-9q
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 10:29:55 -0500
+	(envelope-from <berrange@redhat.com>) id 1gMEC0-00072I-8G
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 10:32:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gME9t-00008U-8I
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 10:29:54 -0500
-Received: from mail-eopbgr780105.outbound.protection.outlook.com
-	([40.107.78.105]:21568
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gME9s-0008QH-8B
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 10:29:48 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 12 Nov 2018 15:29:27 +0000
-Message-ID: <BN6PR2201MB12514AA001E055E5B1B9738FC6C10@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1540300056-7935-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1540300056-7935-4-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<33595f9c-b463-d3c1-dcad-ec0aae1c67af@vivier.eu>
-In-Reply-To: <33595f9c-b463-d3c1-dcad-ec0aae1c67af@vivier.eu>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <berrange@redhat.com>) id 1gMEBx-00020y-H2
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 10:32:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMEBx-00020C-1w
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 10:31:57 -0500
+Date: Mon, 12 Nov 2018 15:31:49 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181112153149.GS3602@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <7b5279e8946325b7f3c22a4a51ab02777202ce77.1541573846.git.artem.k.pisarenko@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] linux-user: Add support for
- SO_REUSEPORT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <7b5279e8946325b7f3c22a4a51ab02777202ce77.1541573846.git.artem.k.pisarenko@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] netdev: fix socket backend implementation
+ and docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Rikalo <arikalo@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, Yunqiang Su <ysu@wavecomp.com>
+To: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Hi, Laurent. Is there any chance that from this series this patch only make=
-s into 3.1? One can argue that this is a bug fix, but it is your call.
-
-Thanks, Aleksandar
-
-________________________________________
-From: Laurent Vivier <laurent@vivier.eu>
-Sent: Tuesday, October 23, 2018 7:49:38 PM
-To: Aleksandar Markovic; qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net; Aleksandar Rikalo; Aleksandar Markovic; Stefan Ma=
-rkovic; Petar Jovanovic; riku.voipio@iki.fi; Yunqiang Su
-Subject: Re: [PATCH v2 3/3] linux-user: Add support for SO_REUSEPORT
-
-On 23/10/2018 14:07, Aleksandar Markovic wrote:
-> From: Yunqiang Su <ysu@wavecomp.com>
->
-> Add support for SO_REUSEPORT, including strace support. SO_REUSEPORT
-> was introduced relatively recently, since Linux 3.9, so use
-> '#if defined SO_REUSEPORT'.
->
-> Signed-off-by: Yunqiang Su <ysu@wavecomp.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Wed, Nov 07, 2018 at 12:57:30PM +0600, Artem Pisarenko wrote:
+> Changes:
+> - user documentation and QAPI 'NetdevSocketOptions' comments updated
+> to match current implementation ('udp' type description added, 'fd'
+> option separated to exclusive type and described, 'localaddr'-related
+> description for 'mcast' type fixed, hostname parts in "[host]:port"
+> options updated to match optional/required syntax, various fixes and
+> improvements in options breakdown and wording);
+> - 'fd' type backend: requirement for socket handle being already
+> binded and connected made explicit and documented;
+> - 'fd' type backend: fix broken SOCK_DGRAM support;
+> - 'fd' type backend: removed multicast support and cleaned up broken
+> workaround for it (never called);
+> - fix possible broken multicasting in win32 platform;
+> - fix parsing of "[host]:port" options (added error handling for cases
+> where "host" part is documented as required but isn't provided);
+> - some error messages improved;
+> - other small fixes and refactoring in code.
+> 
+> Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
 > ---
->  linux-user/strace.c  |  3 +++
->  linux-user/syscall.c | 10 ++++++++++
->  2 files changed, 13 insertions(+)
+> 
+> Notes:
+>     (Since these changes are closely related, I've combined them in one patch.)
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+This is really not a desirable thing todo. While you are changing 
+one area of code, but you've got a number of independent bugs
+or improvements you are making. These should be done as a patch
+series, one distinct fix/change per patch. Refactoring should
+especially always be done separately from any functional changes
+to reviewers can clearly see no accidental behaviour changes are
+introduced by the refactoring.
+
+
+> diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+> index 8140fea..3fad004 100644
+> --- a/include/qemu/sockets.h
+> +++ b/include/qemu/sockets.h
+> @@ -46,7 +46,7 @@ void socket_listen_cleanup(int fd, Error **errp);
+>  int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
+>  
+>  /* Old, ipv4 only bits.  Don't use for new code. */
+> -int parse_host_port(struct sockaddr_in *saddr, const char *str,
+> +int parse_host_port(struct sockaddr_in *saddr, const char *str, bool h_addr_opt,
+>                      Error **errp);
+
+Incidentally this method should not even be part of this header
+files.  qemu/sockets.h is for code that lives in util/qemu-sockets.c
+
+The parse_host_port declaration and impl should better live in
+net/util.{c,h}, so I'd recommend moving that as the first patch
+in a series.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
