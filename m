@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gMCmb-0000di-UW
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:01:47 -0500
+	(envelope-from <berto@igalia.com>) id 1gMCmo-0000nK-LF
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:01:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gMCmF-0001Hp-DX
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:01:29 -0500
+	(envelope-from <berto@igalia.com>) id 1gMCmg-0001cJ-JB
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:01:52 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon, 12 Nov 2018 16:00:44 +0200
-Message-Id: <88b5215904c3459d3bede40cdfe9f379171ec25e.1542031058.git.berto@igalia.com>
+Date: Mon, 12 Nov 2018 16:00:46 +0200
+Message-Id: <45483ddb0e71df083616ff0b2a1f39c4e853925b.1542031058.git.berto@igalia.com>
 In-Reply-To: <cover.1542031058.git.berto@igalia.com>
 References: <cover.1542031058.git.berto@igalia.com>
 In-Reply-To: <cover.1542031058.git.berto@igalia.com>
 References: <cover.1542031058.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v5 12/16] block: Remove flags parameter from
- bdrv_reopen_queue()
+Subject: [Qemu-devel] [PATCH v5 14/16] block: Remove assertions from
+ update_flags_from_options()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,94 +25,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Now that all callers are passing all flag changes as QDict options,
-the flags parameter is no longer necessary, so we can get rid of it.
+This function takes four options (cache.direct, cache.no-flush,
+read-only and auto-read-only) from a QemuOpts object and updates the
+flags accordingly.
+
+If any of those options is not set (because it was missing from the
+original QDict or because it had an invalid value) then the function
+aborts with a failed assertion:
+
+   $ qemu-io -c 'reopen -o read-only=foo' hd.qcow2
+   block.c:1126: update_flags_from_options: Assertion `qemu_opt_find(opts, BDRV_OPT_CACHE_DIRECT)' failed.
+   Aborted
+
+This assertion is unnecessary, and it forces any caller of
+bdrv_reopen() to pass all the aforementioned four options. This may
+have made sense in order to remove ambiguity when bdrv_reopen() was
+taking both flags and options, but that's not the case anymore.
+
+It's also unnecessary if we want to validate the option values,
+because bdrv_reopen_prepare() already takes care of that, as we can
+see if we remove the assertions:
+
+   $ qemu-io -c 'reopen -o read-only=foo' hd.qcow2
+   Parameter 'read-only' expects 'on' or 'off'
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c               | 5 +++--
- block/replication.c   | 6 ++----
- include/block/block.h | 3 +--
- qemu-io-cmds.c        | 2 +-
- 4 files changed, 7 insertions(+), 9 deletions(-)
+ block.c                    | 4 ----
+ tests/qemu-iotests/133     | 9 +++++++++
+ tests/qemu-iotests/133.out | 7 +++++++
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
 diff --git a/block.c b/block.c
-index 31de7b2299..8b401e1cf4 100644
+index 8bc808d6f3..68f1e3b45e 100644
 --- a/block.c
 +++ b/block.c
-@@ -3041,8 +3041,9 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
- 
- BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
-                                     BlockDriverState *bs,
--                                    QDict *options, int flags)
-+                                    QDict *options)
+@@ -1139,24 +1139,20 @@ static void update_flags_from_options(int *flags, QemuOpts *opts)
  {
-+    int flags = bdrv_get_flags(bs);
-     return bdrv_reopen_queue_child(bs_queue, bs, options, flags,
-                                    NULL, NULL, 0);
- }
-@@ -3116,7 +3117,7 @@ int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-     qdict_put_bool(opts, BDRV_OPT_READ_ONLY, read_only);
+     *flags &= ~BDRV_O_CACHE_MASK;
  
-     bdrv_subtree_drained_begin(bs);
--    queue = bdrv_reopen_queue(NULL, bs, opts, bdrv_get_flags(bs));
-+    queue = bdrv_reopen_queue(NULL, bs, opts);
-     ret = bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, errp);
-     bdrv_subtree_drained_end(bs);
- 
-diff --git a/block/replication.c b/block/replication.c
-index 481a225924..fdbfe47fa4 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -393,19 +393,17 @@ static void reopen_backing_file(BlockDriverState *bs, bool writable,
-     bdrv_subtree_drained_begin(s->secondary_disk->bs);
- 
-     if (s->orig_hidden_read_only) {
--        int flags = bdrv_get_flags(s->hidden_disk->bs);
-         QDict *opts = qdict_new();
-         qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
-         reopen_queue = bdrv_reopen_queue(reopen_queue, s->hidden_disk->bs,
--                                         opts, flags);
-+                                         opts);
+-    assert(qemu_opt_find(opts, BDRV_OPT_CACHE_NO_FLUSH));
+     if (qemu_opt_get_bool_del(opts, BDRV_OPT_CACHE_NO_FLUSH, false)) {
+         *flags |= BDRV_O_NO_FLUSH;
      }
  
-     if (s->orig_secondary_read_only) {
--        int flags = bdrv_get_flags(s->secondary_disk->bs);
-         QDict *opts = qdict_new();
-         qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
-         reopen_queue = bdrv_reopen_queue(reopen_queue, s->secondary_disk->bs,
--                                         opts, flags);
-+                                         opts);
+-    assert(qemu_opt_find(opts, BDRV_OPT_CACHE_DIRECT));
+     if (qemu_opt_get_bool_del(opts, BDRV_OPT_CACHE_DIRECT, false)) {
+         *flags |= BDRV_O_NOCACHE;
      }
  
-     if (reopen_queue) {
-diff --git a/include/block/block.h b/include/block/block.h
-index de72c7a093..f70a843b72 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -299,8 +299,7 @@ BlockDriverState *bdrv_open(const char *filename, const char *reference,
- BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
-                                        int flags, Error **errp);
- BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
--                                    BlockDriverState *bs,
--                                    QDict *options, int flags);
-+                                    BlockDriverState *bs, QDict *options);
- int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **errp);
- int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-                               Error **errp);
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index c9ae09d574..2c39124036 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -2075,7 +2075,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
+     *flags &= ~BDRV_O_RDWR;
+ 
+-    assert(qemu_opt_find(opts, BDRV_OPT_READ_ONLY));
+     if (!qemu_opt_get_bool_del(opts, BDRV_OPT_READ_ONLY, false)) {
+         *flags |= BDRV_O_RDWR;
      }
  
-     bdrv_subtree_drained_begin(bs);
--    brq = bdrv_reopen_queue(NULL, bs, opts, flags);
-+    brq = bdrv_reopen_queue(NULL, bs, opts);
-     bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, &local_err);
-     bdrv_subtree_drained_end(bs);
- 
+-    assert(qemu_opt_find(opts, BDRV_OPT_AUTO_READ_ONLY));
+     if (qemu_opt_get_bool_del(opts, BDRV_OPT_AUTO_READ_ONLY, false)) {
+         *flags |= BDRV_O_AUTO_RDONLY;
+     }
+diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
+index 14e6b3b972..243b1eba50 100755
+--- a/tests/qemu-iotests/133
++++ b/tests/qemu-iotests/133
+@@ -101,6 +101,15 @@ $QEMU_IO -c 'reopen -w -o read-only=on' $TEST_IMG
+ $QEMU_IO -c 'reopen -c none -o cache.direct=on' $TEST_IMG
+ $QEMU_IO -c 'reopen -c writeback -o cache.direct=on' $TEST_IMG
+ $QEMU_IO -c 'reopen -c directsync -o cache.no-flush=on' $TEST_IMG
++
++echo
++echo "=== Check that invalid options are handled correctly ==="
++echo
++
++$QEMU_IO -c 'reopen -o read-only=foo' $TEST_IMG
++$QEMU_IO -c 'reopen -o cache.no-flush=bar' $TEST_IMG
++$QEMU_IO -c 'reopen -o cache.direct=baz' $TEST_IMG
++$QEMU_IO -c 'reopen -o auto-read-only=qux' $TEST_IMG
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/133.out b/tests/qemu-iotests/133.out
+index 48a9d087f0..414c7fa27f 100644
+--- a/tests/qemu-iotests/133.out
++++ b/tests/qemu-iotests/133.out
+@@ -32,4 +32,11 @@ Cannot set both -r/-w and 'read-only'
+ Cannot set both -c and the cache options
+ Cannot set both -c and the cache options
+ Cannot set both -c and the cache options
++
++=== Check that invalid options are handled correctly ===
++
++Parameter 'read-only' expects 'on' or 'off'
++Parameter 'cache.no-flush' expects 'on' or 'off'
++Parameter 'cache.direct' expects 'on' or 'off'
++Parameter 'auto-read-only' expects 'on' or 'off'
+ *** done
 -- 
 2.11.0
