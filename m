@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gM8eI-0004xz-EU
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:36:51 -0500
+	(envelope-from <philmd@redhat.com>) id 1gM8yz-00084Z-Pc
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:58:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gM8eF-000780-6y
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:36:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33502)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gM8eE-00075e-TP
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:36:47 -0500
-Date: Mon, 12 Nov 2018 17:36:38 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181112093638.GG20675@xz-x1>
-References: <1541764187-10732-1-git-send-email-yu.c.zhang@linux.intel.com>
-	<1541764187-10732-4-git-send-email-yu.c.zhang@linux.intel.com>
-	<20181112085121.GD20675@xz-x1>
-	<20181112092548.4rnr56lw6zgzmfwh@linux.intel.com>
+	(envelope-from <philmd@redhat.com>) id 1gM8si-0005a7-7J
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:51:47 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:55833)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gM8sg-0005ZB-99
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:51:42 -0500
+Received: by mail-wm1-f68.google.com with SMTP id i73-v6so2463138wmd.5
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 01:51:39 -0800 (PST)
+References: <20181109142032.1628-1-kraxel@redhat.com>
+	<9b2c9e91-8904-1200-f491-4ee1d6ed42e3@amsat.org>
+	<20181112091205.brrcxxzzvfthyqhk@sirius.home.kraxel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c21b1cba-3dee-d7d8-24b3-8d04fb0a9265@redhat.com>
+Date: Mon, 12 Nov 2018 10:51:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181112092548.4rnr56lw6zgzmfwh@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v1 3/3] intel-iommu: search iotlb for
- levels supported by the address width.
+In-Reply-To: <20181112091205.brrcxxzzvfthyqhk@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] pulseaudio: process audio data in
+ smaller chunks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Martin Schrodt <martin@schrodt.org>, Max Ehrlich <maxehr@umiacs.umd.edu>, qemu-devel@nongnu.org
 
-On Mon, Nov 12, 2018 at 05:25:48PM +0800, Yu Zhang wrote:
-> On Mon, Nov 12, 2018 at 04:51:22PM +0800, Peter Xu wrote:
-> > On Fri, Nov 09, 2018 at 07:49:47PM +0800, Yu Zhang wrote:
-> > > This patch updates vtd_lookup_iotlb() to search cached mappings only
-> > > for all page levels supported by address width of current vIOMMU. Also,
-> > > to cover 57-bit width, the shift of source id(VTD_IOTLB_SID_SHIFT) and
-> > > of page level(VTD_IOTLB_LVL_SHIFT) are enlarged by 9 - the stride of
-> > > one paging structure level.
-> > > 
-> > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > ---
-> > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com> 
-> > > Cc: Richard Henderson <rth@twiddle.net> 
-> > > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > > Cc: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  hw/i386/intel_iommu.c          | 5 +++--
-> > >  hw/i386/intel_iommu_internal.h | 7 ++-----
-> > >  2 files changed, 5 insertions(+), 7 deletions(-)
-> > > 
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > index 9cdf755..ce7e17e 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -254,11 +254,12 @@ static uint64_t vtd_get_iotlb_gfn(hwaddr addr, uint32_t level)
-> > >  static VTDIOTLBEntry *vtd_lookup_iotlb(IntelIOMMUState *s, uint16_t source_id,
-> > >                                         hwaddr addr)
-> > >  {
-> > > -    VTDIOTLBEntry *entry;
-> > > +    VTDIOTLBEntry *entry = NULL;
-> > >      uint64_t key;
-> > >      int level;
-> > > +    int max_level = (s->aw_bits - VTD_PAGE_SHIFT_4K) / VTD_SL_LEVEL_BITS;
-> > >  
-> > > -    for (level = VTD_SL_PT_LEVEL; level < VTD_SL_PML4_LEVEL; level++) {
-> > > +    for (level = VTD_SL_PT_LEVEL; level < max_level; level++) {
-> > 
-> > My understanding of current IOTLB is that it only caches the last
-> > level of mapping, say:
-> > 
-> >   - level 1: 4K page
-> >   - level 2: 2M page
-> >   - level 3: 1G page
-> > 
-> > So we don't check against level=4 even if x-aw-bits=48 is specified.
-> > 
-> > Here does it mean that we're going to have... 512G iommu huge pages?
-> > 
+On 12/11/18 10:12, Gerd Hoffmann wrote:
+> On Sat, Nov 10, 2018 at 08:36:39PM +0100, Philippe Mathieu-Daudé wrote:
+>> Hi Gerd,
+>>
+>> On 11/9/18 3:20 PM, Gerd Hoffmann wrote:
+>>> The rate of pulseaudio absorbing the audio stream is used to control the
+>>> the rate of the guests audio stream.  When the emulated hardware uses
+>>> small chunks (like intel-hda does) we need small chunks on the audio
+>>> backend side too, otherwise that feedback loop doesn't work very well.
+>>
+>> Shouldn't this be user-configurable?
 > 
-> No. My bad, I misunderstood this routine. And now I believe we do not
-> need this patch. :-)
+> Why?
 
-Yeah good to confirm that :-)
-
-Regards,
-
--- 
-Peter Xu
+When emulated hardware is not intel-hda?
