@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dmitry.fleytman@gmail.com>) id 1gMCiD-0005rr-5o
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:57:10 -0500
+	(envelope-from <berto@igalia.com>) id 1gMCmK-0000Tf-4B
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:01:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dmitry.fleytman@gmail.com>) id 1gMCiB-0006wh-Qk
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:57:09 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46770)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dmitry.fleytman@gmail.com>)
-	id 1gMCiB-0006wH-H8
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:57:07 -0500
-Received: by mail-ot1-x342.google.com with SMTP id w25so7284758otm.13
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 05:57:07 -0800 (PST)
-MIME-Version: 1.0
-References: <20181108160818.5485-1-yuval.shaia@oracle.com>
-	<20181108160818.5485-13-yuval.shaia@oracle.com>
-In-Reply-To: <20181108160818.5485-13-yuval.shaia@oracle.com>
-From: Dmitry Fleytman <dmitry.fleytman@gmail.com>
-Date: Mon, 12 Nov 2018 15:56:51 +0200
-Message-ID: <CAFD1vQHxCOqFvx3YA=iJaW39yRfWKwOL1jNgSnyNQjgb9=K4ug@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 12/22] vmxnet3: Move some definitions to
- header file
+	(envelope-from <berto@igalia.com>) id 1gMCmF-0001He-Br
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:01:23 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Mon, 12 Nov 2018 16:00:37 +0200
+Message-Id: <ab8395c8926892311948dcfd3f88c598dd74797b.1542031058.git.berto@igalia.com>
+In-Reply-To: <cover.1542031058.git.berto@igalia.com>
+References: <cover.1542031058.git.berto@igalia.com>
+In-Reply-To: <cover.1542031058.git.berto@igalia.com>
+References: <cover.1542031058.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v5 05/16] block: Use
+ bdrv_reopen_set_read_only() in stream_start/complete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,323 +22,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuval.shaia@oracle.com
-Cc: marcel.apfelbaum@gmail.com, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, shamir.rabinovitch@oracle.com
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Thu, Nov 8, 2018 at 6:09 PM Yuval Shaia <yuval.shaia@oracle.com> wrote:
->
-> pvrdma setup requires vmxnet3 device on PCI function 0 and PVRDMA device
-> on PCI function 1.
-> pvrdma device needs to access vmxnet3 device object for several reasons:
-> 1. Make sure PCI function 0 is vmxnet3.
-> 2. To monitor vmxnet3 device state.
-> 3. To configure node_guid accoring to vmxnet3 device's MAC address.
->
-> To be able to access vmxnet3 device the definition of VMXNET3State is
-> moved to a new header file.
->
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+This patch replaces the bdrv_reopen() calls that set and remove the
+BDRV_O_RDWR flag with the new bdrv_reopen_set_read_only() function.
 
-Reviewed-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/stream.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-> ---
->  hw/net/vmxnet3.c      | 116 +-----------------------------------
->  hw/net/vmxnet3_defs.h | 133 ++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 134 insertions(+), 115 deletions(-)
->  create mode 100644 hw/net/vmxnet3_defs.h
->
-> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-> index 3648630386..54746a4030 100644
-> --- a/hw/net/vmxnet3.c
-> +++ b/hw/net/vmxnet3.c
-> @@ -18,7 +18,6 @@
->  #include "qemu/osdep.h"
->  #include "hw/hw.h"
->  #include "hw/pci/pci.h"
-> -#include "net/net.h"
->  #include "net/tap.h"
->  #include "net/checksum.h"
->  #include "sysemu/sysemu.h"
-> @@ -29,6 +28,7 @@
->  #include "migration/register.h"
->
->  #include "vmxnet3.h"
-> +#include "vmxnet3_defs.h"
->  #include "vmxnet_debug.h"
->  #include "vmware_utils.h"
->  #include "net_tx_pkt.h"
-> @@ -131,23 +131,11 @@ typedef struct VMXNET3Class {
->      DeviceRealize parent_dc_realize;
->  } VMXNET3Class;
->
-> -#define TYPE_VMXNET3 "vmxnet3"
-> -#define VMXNET3(obj) OBJECT_CHECK(VMXNET3State, (obj), TYPE_VMXNET3)
-> -
->  #define VMXNET3_DEVICE_CLASS(klass) \
->      OBJECT_CLASS_CHECK(VMXNET3Class, (klass), TYPE_VMXNET3)
->  #define VMXNET3_DEVICE_GET_CLASS(obj) \
->      OBJECT_GET_CLASS(VMXNET3Class, (obj), TYPE_VMXNET3)
->
-> -/* Cyclic ring abstraction */
-> -typedef struct {
-> -    hwaddr pa;
-> -    uint32_t size;
-> -    uint32_t cell_size;
-> -    uint32_t next;
-> -    uint8_t gen;
-> -} Vmxnet3Ring;
-> -
->  static inline void vmxnet3_ring_init(PCIDevice *d,
->                                      Vmxnet3Ring *ring,
->                                       hwaddr pa,
-> @@ -245,108 +233,6 @@ vmxnet3_dump_rx_descr(struct Vmxnet3_RxDesc *descr)
->                descr->rsvd, descr->dtype, descr->ext1, descr->btype);
->  }
->
-> -/* Device state and helper functions */
-> -#define VMXNET3_RX_RINGS_PER_QUEUE (2)
-> -
-> -typedef struct {
-> -    Vmxnet3Ring tx_ring;
-> -    Vmxnet3Ring comp_ring;
-> -
-> -    uint8_t intr_idx;
-> -    hwaddr tx_stats_pa;
-> -    struct UPT1_TxStats txq_stats;
-> -} Vmxnet3TxqDescr;
-> -
-> -typedef struct {
-> -    Vmxnet3Ring rx_ring[VMXNET3_RX_RINGS_PER_QUEUE];
-> -    Vmxnet3Ring comp_ring;
-> -    uint8_t intr_idx;
-> -    hwaddr rx_stats_pa;
-> -    struct UPT1_RxStats rxq_stats;
-> -} Vmxnet3RxqDescr;
-> -
-> -typedef struct {
-> -    bool is_masked;
-> -    bool is_pending;
-> -    bool is_asserted;
-> -} Vmxnet3IntState;
-> -
-> -typedef struct {
-> -        PCIDevice parent_obj;
-> -        NICState *nic;
-> -        NICConf conf;
-> -        MemoryRegion bar0;
-> -        MemoryRegion bar1;
-> -        MemoryRegion msix_bar;
-> -
-> -        Vmxnet3RxqDescr rxq_descr[VMXNET3_DEVICE_MAX_RX_QUEUES];
-> -        Vmxnet3TxqDescr txq_descr[VMXNET3_DEVICE_MAX_TX_QUEUES];
-> -
-> -        /* Whether MSI-X support was installed successfully */
-> -        bool msix_used;
-> -        hwaddr drv_shmem;
-> -        hwaddr temp_shared_guest_driver_memory;
-> -
-> -        uint8_t txq_num;
-> -
-> -        /* This boolean tells whether RX packet being indicated has to */
-> -        /* be split into head and body chunks from different RX rings  */
-> -        bool rx_packets_compound;
-> -
-> -        bool rx_vlan_stripping;
-> -        bool lro_supported;
-> -
-> -        uint8_t rxq_num;
-> -
-> -        /* Network MTU */
-> -        uint32_t mtu;
-> -
-> -        /* Maximum number of fragments for indicated TX packets */
-> -        uint32_t max_tx_frags;
-> -
-> -        /* Maximum number of fragments for indicated RX packets */
-> -        uint16_t max_rx_frags;
-> -
-> -        /* Index for events interrupt */
-> -        uint8_t event_int_idx;
-> -
-> -        /* Whether automatic interrupts masking enabled */
-> -        bool auto_int_masking;
-> -
-> -        bool peer_has_vhdr;
-> -
-> -        /* TX packets to QEMU interface */
-> -        struct NetTxPkt *tx_pkt;
-> -        uint32_t offload_mode;
-> -        uint32_t cso_or_gso_size;
-> -        uint16_t tci;
-> -        bool needs_vlan;
-> -
-> -        struct NetRxPkt *rx_pkt;
-> -
-> -        bool tx_sop;
-> -        bool skip_current_tx_pkt;
-> -
-> -        uint32_t device_active;
-> -        uint32_t last_command;
-> -
-> -        uint32_t link_status_and_speed;
-> -
-> -        Vmxnet3IntState interrupt_states[VMXNET3_MAX_INTRS];
-> -
-> -        uint32_t temp_mac;   /* To store the low part first */
-> -
-> -        MACAddr perm_mac;
-> -        uint32_t vlan_table[VMXNET3_VFT_SIZE];
-> -        uint32_t rx_mode;
-> -        MACAddr *mcast_list;
-> -        uint32_t mcast_list_len;
-> -        uint32_t mcast_list_buff_size; /* needed for live migration. */
-> -
-> -        /* Compatibility flags for migration */
-> -        uint32_t compat_flags;
-> -} VMXNET3State;
-> -
->  /* Interrupt management */
->
->  /*
-> diff --git a/hw/net/vmxnet3_defs.h b/hw/net/vmxnet3_defs.h
-> new file mode 100644
-> index 0000000000..6c19d29b12
-> --- /dev/null
-> +++ b/hw/net/vmxnet3_defs.h
-> @@ -0,0 +1,133 @@
-> +/*
-> + * QEMU VMWARE VMXNET3 paravirtual NIC
-> + *
-> + * Copyright (c) 2012 Ravello Systems LTD (http://ravellosystems.com)
-> + *
-> + * Developed by Daynix Computing LTD (http://www.daynix.com)
-> + *
-> + * Authors:
-> + * Dmitry Fleytman <dmitry@daynix.com>
-> + * Tamir Shomer <tamirs@daynix.com>
-> + * Yan Vugenfirer <yan@daynix.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#include "net/net.h"
-> +#include "hw/net/vmxnet3.h"
-> +
-> +#define TYPE_VMXNET3 "vmxnet3"
-> +#define VMXNET3(obj) OBJECT_CHECK(VMXNET3State, (obj), TYPE_VMXNET3)
-> +
-> +/* Device state and helper functions */
-> +#define VMXNET3_RX_RINGS_PER_QUEUE (2)
-> +
-> +/* Cyclic ring abstraction */
-> +typedef struct {
-> +    hwaddr pa;
-> +    uint32_t size;
-> +    uint32_t cell_size;
-> +    uint32_t next;
-> +    uint8_t gen;
-> +} Vmxnet3Ring;
-> +
-> +typedef struct {
-> +    Vmxnet3Ring tx_ring;
-> +    Vmxnet3Ring comp_ring;
-> +
-> +    uint8_t intr_idx;
-> +    hwaddr tx_stats_pa;
-> +    struct UPT1_TxStats txq_stats;
-> +} Vmxnet3TxqDescr;
-> +
-> +typedef struct {
-> +    Vmxnet3Ring rx_ring[VMXNET3_RX_RINGS_PER_QUEUE];
-> +    Vmxnet3Ring comp_ring;
-> +    uint8_t intr_idx;
-> +    hwaddr rx_stats_pa;
-> +    struct UPT1_RxStats rxq_stats;
-> +} Vmxnet3RxqDescr;
-> +
-> +typedef struct {
-> +    bool is_masked;
-> +    bool is_pending;
-> +    bool is_asserted;
-> +} Vmxnet3IntState;
-> +
-> +typedef struct {
-> +        PCIDevice parent_obj;
-> +        NICState *nic;
-> +        NICConf conf;
-> +        MemoryRegion bar0;
-> +        MemoryRegion bar1;
-> +        MemoryRegion msix_bar;
-> +
-> +        Vmxnet3RxqDescr rxq_descr[VMXNET3_DEVICE_MAX_RX_QUEUES];
-> +        Vmxnet3TxqDescr txq_descr[VMXNET3_DEVICE_MAX_TX_QUEUES];
-> +
-> +        /* Whether MSI-X support was installed successfully */
-> +        bool msix_used;
-> +        hwaddr drv_shmem;
-> +        hwaddr temp_shared_guest_driver_memory;
-> +
-> +        uint8_t txq_num;
-> +
-> +        /* This boolean tells whether RX packet being indicated has to */
-> +        /* be split into head and body chunks from different RX rings  */
-> +        bool rx_packets_compound;
-> +
-> +        bool rx_vlan_stripping;
-> +        bool lro_supported;
-> +
-> +        uint8_t rxq_num;
-> +
-> +        /* Network MTU */
-> +        uint32_t mtu;
-> +
-> +        /* Maximum number of fragments for indicated TX packets */
-> +        uint32_t max_tx_frags;
-> +
-> +        /* Maximum number of fragments for indicated RX packets */
-> +        uint16_t max_rx_frags;
-> +
-> +        /* Index for events interrupt */
-> +        uint8_t event_int_idx;
-> +
-> +        /* Whether automatic interrupts masking enabled */
-> +        bool auto_int_masking;
-> +
-> +        bool peer_has_vhdr;
-> +
-> +        /* TX packets to QEMU interface */
-> +        struct NetTxPkt *tx_pkt;
-> +        uint32_t offload_mode;
-> +        uint32_t cso_or_gso_size;
-> +        uint16_t tci;
-> +        bool needs_vlan;
-> +
-> +        struct NetRxPkt *rx_pkt;
-> +
-> +        bool tx_sop;
-> +        bool skip_current_tx_pkt;
-> +
-> +        uint32_t device_active;
-> +        uint32_t last_command;
-> +
-> +        uint32_t link_status_and_speed;
-> +
-> +        Vmxnet3IntState interrupt_states[VMXNET3_MAX_INTRS];
-> +
-> +        uint32_t temp_mac;   /* To store the low part first */
-> +
-> +        MACAddr perm_mac;
-> +        uint32_t vlan_table[VMXNET3_VFT_SIZE];
-> +        uint32_t rx_mode;
-> +        MACAddr *mcast_list;
-> +        uint32_t mcast_list_len;
-> +        uint32_t mcast_list_buff_size; /* needed for live migration. */
-> +
-> +        /* Compatibility flags for migration */
-> +        uint32_t compat_flags;
-> +} VMXNET3State;
-> --
-> 2.17.2
->
+diff --git a/block/stream.c b/block/stream.c
+index 81a7ec8ece..262d280ccd 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -34,7 +34,7 @@ typedef struct StreamBlockJob {
+     BlockDriverState *base;
+     BlockdevOnError on_error;
+     char *backing_file_str;
+-    int bs_flags;
++    bool bs_read_only;
+ } StreamBlockJob;
+ 
+ static int coroutine_fn stream_populate(BlockBackend *blk,
+@@ -89,10 +89,10 @@ static void stream_clean(Job *job)
+     BlockDriverState *bs = blk_bs(bjob->blk);
+ 
+     /* Reopen the image back in read-only mode if necessary */
+-    if (s->bs_flags != bdrv_get_flags(bs)) {
++    if (s->bs_read_only) {
+         /* Give up write permissions before making it read-only */
+         blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
+-        bdrv_reopen(bs, s->bs_flags, NULL);
++        bdrv_reopen_set_read_only(bs, true, NULL);
+     }
+ 
+     g_free(s->backing_file_str);
+@@ -226,12 +226,12 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+ {
+     StreamBlockJob *s;
+     BlockDriverState *iter;
+-    int orig_bs_flags;
++    int bs_read_only;
+ 
+     /* Make sure that the image is opened in read-write mode */
+-    orig_bs_flags = bdrv_get_flags(bs);
+-    if (!(orig_bs_flags & BDRV_O_RDWR)) {
+-        if (bdrv_reopen(bs, orig_bs_flags | BDRV_O_RDWR, errp) != 0) {
++    bs_read_only = bdrv_is_read_only(bs);
++    if (bs_read_only) {
++        if (bdrv_reopen_set_read_only(bs, false, errp) != 0) {
+             return;
+         }
+     }
+@@ -261,7 +261,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+ 
+     s->base = base;
+     s->backing_file_str = g_strdup(backing_file_str);
+-    s->bs_flags = orig_bs_flags;
++    s->bs_read_only = bs_read_only;
+ 
+     s->on_error = on_error;
+     trace_stream_start(bs, base, s);
+@@ -269,7 +269,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+     return;
+ 
+ fail:
+-    if (orig_bs_flags != bdrv_get_flags(bs)) {
+-        bdrv_reopen(bs, orig_bs_flags, NULL);
++    if (bs_read_only) {
++        bdrv_reopen_set_read_only(bs, true, NULL);
+     }
+ }
+-- 
+2.11.0
