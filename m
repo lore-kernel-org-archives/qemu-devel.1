@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpa@zytor.com>) id 1gM5qI-0007Iv-Q1
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 01:37:03 -0500
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gM694-0000mC-Jj
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 01:56:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpa@zytor.com>) id 1gM5qD-0003FZ-PM
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 01:37:02 -0500
-Received: from terminus.zytor.com ([198.137.202.136]:45753 helo=mail.zytor.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hpa@zytor.com>) id 1gM5qD-00039e-96
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 01:36:57 -0500
-References: <1541674784-25936-2-git-send-email-lizhijian@cn.fujitsu.com>
-	<CAFEAcA_47wyar3WNhuBmNPdr02RHx-wn_TeyFaajpjzvzG8j5Q@mail.gmail.com>
-	<c50d103e-95c3-c44c-d852-b6d7f8114b3a@cn.fujitsu.com>
-	<20181109072015.GA86700@gmail.com>
-	<38905d35-29af-b522-1629-b13e98a47a42@intel.com>
-	<d30b404d-624e-0497-879a-2d5df2eb9f31@suse.com>
-	<b7b608dc-1743-5e1f-3b88-94d784c4cab2@intel.com>
-	<d9c293bd-b43f-999c-55f1-3b90a6020065@zytor.com>
-	<20181112045624.GA28219@gmail.com>
-	<fcf1d6b5-e64f-3aea-f794-99237e1988cf@zytor.com>
-	<20181112061940.GA61749@gmail.com>
-From: "H. Peter Anvin" <hpa@zytor.com>
-Message-ID: <766e1f84-b8c0-db95-45d3-e624c8d61519@zytor.com>
-Date: Sun, 11 Nov 2018 22:36:27 -0800
-MIME-Version: 1.0
-In-Reply-To: <20181112061940.GA61749@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC/PoC PATCH 1/3] i386: set initrd_max to 4G - 1
- to allow up to 4G initrd
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gM68G-00064L-KD
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 01:55:42 -0500
+Received: from mga09.intel.com ([134.134.136.24]:11414)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lizhijian@cn.fujitsu.com>)
+	id 1gM68F-0005pi-VS
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 01:55:36 -0500
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
+Date: Mon, 12 Nov 2018 15:45:30 +0800
+Message-Id: <1542008730-6375-3-git-send-email-lizhijian@cn.fujitsu.com>
+In-Reply-To: <1542008730-6375-2-git-send-email-lizhijian@cn.fujitsu.com>
+References: <1542008730-6375-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1542008730-6375-2-git-send-email-lizhijian@cn.fujitsu.com>
+Subject: [Qemu-devel] [PATCH 3/3] x86: allow load initrd below 4G for recent
+ linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,16 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: Li Zhijian <zhijianx.li@intel.com>, Juergen Gross <jgross@suse.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Maydell <peter.maydell@linaro.org>, x86@kernel.org, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de, QEMU Developers <qemu-devel@nongnu.org>, Philip Li <philip.li@intel.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Kees Cook <keescook@chromium.org>
+To: qemu-devel@nongnu.org
+Cc: zhijianx.li@intel.com, philip.li@intel.com, Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-On 11/11/18 10:19 PM, Ingo Molnar wrote:
-> 
-> I might be a bit dense early in the morning, but could you elaborate? 
-> What do you mean by mapping all data areas?
-> 
+a new field xloadflags was added to recent x86 linux, and BIT 1:
+XLF_CAN_BE_LOADED_ABOVE_4G is used to tell bootload that where initrd can be
+loaded saftly.
 
-Heh. I need to pack for LPC and get some sleep before my flight lest I'll be
-denser than depleted uranium; I'll write an explanation tomorrow.
+Current QEMU always load initrd below below_4g_mem_size which always
+less than 4G, so here limit initrd_max to 4G - 1 simply is enough if
+this bit is set.
 
-	-hpa
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+---
+ hw/i386/pc.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f095725..5e2f83c 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -92,6 +92,7 @@
+ #define FW_CFG_HPET (FW_CFG_ARCH_LOCAL + 4)
+ 
+ #define E820_NR_ENTRIES		16
++#define XLF_CAN_BE_LOADED_ABOVE_4G_MASK (1 << 1)
+ 
+ struct e820_entry {
+     uint64_t address;
+@@ -916,6 +917,17 @@ static void load_linux(PCMachineState *pcms,
+     } else {
+         initrd_max = 0x37ffffff;
+     }
++    if (protocol >= 0x20c) {
++        unsigned int xloadflags = lduw_p(header+0x236);
++        if (xloadflags & XLF_CAN_BE_LOADED_ABOVE_4G_MASK) {
++                /*
++                 * Although kernel allow initrd loading to above 4G, here we
++                 * limit initrd_max to 4G -1 due to current QEMU always loads
++                 * initrd below pcms->below_4g_mem_size
++                 */
++                initrd_max = UINT32_MAX;
++        }
++    }
+ 
+     if (initrd_max >= pcms->below_4g_mem_size - pcmc->acpi_data_size) {
+         initrd_max = pcms->below_4g_mem_size - pcmc->acpi_data_size - 1;
+-- 
+2.7.4
