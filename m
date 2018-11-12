@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gMCmX-0000bV-SI
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:01:40 -0500
+	(envelope-from <berto@igalia.com>) id 1gMCmX-0000bU-SA
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:01:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gMCmH-0001J3-K5
+	(envelope-from <berto@igalia.com>) id 1gMCmF-0001HV-8V
 	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:01:27 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon, 12 Nov 2018 16:00:38 +0200
-Message-Id: <9b45afb391dc41271165ca9faf3905dbaaefbf76.1542031058.git.berto@igalia.com>
+Date: Mon, 12 Nov 2018 16:00:48 +0200
+Message-Id: <f5838d48e26e6a0c22e00b4c2e0fbb089709be20.1542031058.git.berto@igalia.com>
 In-Reply-To: <cover.1542031058.git.berto@igalia.com>
 References: <cover.1542031058.git.berto@igalia.com>
 In-Reply-To: <cover.1542031058.git.berto@igalia.com>
 References: <cover.1542031058.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v5 06/16] block: Use
- bdrv_reopen_set_read_only() in qmp_change_backing_file()
+Subject: [Qemu-devel] [PATCH v5 16/16] block: Fix update of
+ BDRV_O_AUTO_RDONLY in update_flags_from_options()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +25,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This patch replaces the bdrv_reopen() calls that set and remove the
-BDRV_O_RDWR flag with the new bdrv_reopen_set_read_only() function.
+Commit e35bdc123a4ace9f4d3fcca added the auto-read-only option and the
+code to update its corresponding flag in update_flags_from_options(),
+but forgot to clear the flag if auto-read-only is false.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reported-by: Max Reitz <mreitz@redhat.com>
 ---
- blockdev.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ block.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index e5b5eb46e2..20d1d84bab 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -4100,7 +4100,6 @@ void qmp_change_backing_file(const char *device,
-     BlockDriverState *image_bs = NULL;
-     Error *local_err = NULL;
-     bool ro;
--    int open_flags;
-     int ret;
+diff --git a/block.c b/block.c
+index 03277b3d19..e1a969e331 100644
+--- a/block.c
++++ b/block.c
+@@ -1137,7 +1137,7 @@ static int bdrv_open_flags(BlockDriverState *bs, int flags)
  
-     bs = qmp_get_root_bs(device, errp);
-@@ -4142,13 +4141,10 @@ void qmp_change_backing_file(const char *device,
+ static void update_flags_from_options(int *flags, QemuOpts *opts)
+ {
+-    *flags &= ~BDRV_O_CACHE_MASK;
++    *flags &= ~(BDRV_O_CACHE_MASK | BDRV_O_RDWR | BDRV_O_AUTO_RDONLY);
+ 
+     if (qemu_opt_get_bool_del(opts, BDRV_OPT_CACHE_NO_FLUSH, false)) {
+         *flags |= BDRV_O_NO_FLUSH;
+@@ -1147,8 +1147,6 @@ static void update_flags_from_options(int *flags, QemuOpts *opts)
+         *flags |= BDRV_O_NOCACHE;
      }
  
-     /* if not r/w, reopen to make r/w */
--    open_flags = image_bs->open_flags;
-     ro = bdrv_is_read_only(image_bs);
- 
-     if (ro) {
--        bdrv_reopen(image_bs, open_flags | BDRV_O_RDWR, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        if (bdrv_reopen_set_read_only(image_bs, false, errp) != 0) {
-             goto out;
-         }
+-    *flags &= ~BDRV_O_RDWR;
+-
+     if (!qemu_opt_get_bool_del(opts, BDRV_OPT_READ_ONLY, false)) {
+         *flags |= BDRV_O_RDWR;
      }
-@@ -4164,7 +4160,7 @@ void qmp_change_backing_file(const char *device,
-     }
- 
-     if (ro) {
--        bdrv_reopen(image_bs, open_flags, &local_err);
-+        bdrv_reopen_set_read_only(image_bs, true, &local_err);
-         error_propagate(errp, local_err);
-     }
- 
 -- 
 2.11.0
