@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMDQQ-000372-35
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:42:51 -0500
+	(envelope-from <berto@igalia.com>) id 1gMDTY-0005gX-PD
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:46:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMDQP-0004dC-2l
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:42:50 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45528)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gMDQO-0004NO-Mm
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:42:48 -0500
-Received: by mail-oi1-x243.google.com with SMTP id p144-v6so7307967oic.12
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 06:42:37 -0800 (PST)
+	(envelope-from <berto@igalia.com>) id 1gMDTT-00085H-St
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 09:46:04 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181005145202.8005-1-berto@igalia.com>
+References: <20181005145202.8005-1-berto@igalia.com>
+Date: Mon, 12 Nov 2018 15:45:45 +0100
+Message-ID: <w51h8gmbbhi.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_PZ6XDz70tbRJM8dJZQYUg=F23cmmXpc=PZC5=eP17Ew@mail.gmail.com>
-References: <20181016175236.5840-1-peter.maydell@linaro.org>
-	<CAFEAcA_PZ6XDz70tbRJM8dJZQYUg=F23cmmXpc=PZC5=eP17Ew@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Nov 2018 14:42:16 +0000
-Message-ID: <CAFEAcA8iks-LCd2zqK_6Zvh9Z4rNCO1kjmP3Q5=pdXdxxtXCYg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/acpi/nvdimm: Don't take address of
- fields in packed structs
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] crypto: Fix defaults in
+ QCryptoBlockCreateOptionsLUKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +22,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
 
-Since nobody responded to my ping of a week ago I propose to just
-apply this to master...
+ping
 
-thanks
--- PMM
-
-On 5 November 2018 at 14:40, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Ping? This patch got reviewed but does not seem to have
-> made it into anybody's tree.
+On Fri 05 Oct 2018 04:52:02 PM CEST, Alberto Garcia wrote:
+> The values specified in the documentation don't match the actual
+> defaults set in qcrypto_block_luks_create().
 >
-> thanks
-> -- PMM
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  qapi/crypto.json | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
-> On 16 October 2018 at 18:52, Peter Maydell <peter.maydell@linaro.org> wrote:
->> Taking the address of a field in a packed struct is a bad idea, because
->> it might not be actually aligned enough for that pointer type (and
->> thus cause a crash on dereference on some host architectures). Newer
->> versions of clang warn about this. Avoid the bug by not using the
->> "modify in place" byte swapping functions.
->>
->> Patch produced with scripts/coccinelle/inplace-byteswaps.cocci.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> Automatically generated patch, tested with "make check" only.
->>
->>  hw/acpi/nvdimm.c | 16 ++++++++--------
->>  1 file changed, 8 insertions(+), 8 deletions(-)
->>
->> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
->> index 27eeb6609f5..e53b2cb6819 100644
->> --- a/hw/acpi/nvdimm.c
->> +++ b/hw/acpi/nvdimm.c
->> @@ -581,7 +581,7 @@ static void nvdimm_dsm_func_read_fit(AcpiNVDIMMState *state, NvdimmDsmIn *in,
->>      int size;
->>
->>      read_fit = (NvdimmFuncReadFITIn *)in->arg3;
->> -    le32_to_cpus(&read_fit->offset);
->> +    read_fit->offset = le32_to_cpu(read_fit->offset);
->>
->>      fit = fit_buf->fit;
->>
->> @@ -742,8 +742,8 @@ static void nvdimm_dsm_get_label_data(NVDIMMDevice *nvdimm, NvdimmDsmIn *in,
->>      int size;
->>
->>      get_label_data = (NvdimmFuncGetLabelDataIn *)in->arg3;
->> -    le32_to_cpus(&get_label_data->offset);
->> -    le32_to_cpus(&get_label_data->length);
->> +    get_label_data->offset = le32_to_cpu(get_label_data->offset);
->> +    get_label_data->length = le32_to_cpu(get_label_data->length);
->>
->>      nvdimm_debug("Read Label Data: offset %#x length %#x.\n",
->>                   get_label_data->offset, get_label_data->length);
->> @@ -781,8 +781,8 @@ static void nvdimm_dsm_set_label_data(NVDIMMDevice *nvdimm, NvdimmDsmIn *in,
->>
->>      set_label_data = (NvdimmFuncSetLabelDataIn *)in->arg3;
->>
->> -    le32_to_cpus(&set_label_data->offset);
->> -    le32_to_cpus(&set_label_data->length);
->> +    set_label_data->offset = le32_to_cpu(set_label_data->offset);
->> +    set_label_data->length = le32_to_cpu(set_label_data->length);
->>
->>      nvdimm_debug("Write Label Data: offset %#x length %#x.\n",
->>                   set_label_data->offset, set_label_data->length);
->> @@ -877,9 +877,9 @@ nvdimm_dsm_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
->>      in = g_new(NvdimmDsmIn, 1);
->>      cpu_physical_memory_read(dsm_mem_addr, in, sizeof(*in));
->>
->> -    le32_to_cpus(&in->revision);
->> -    le32_to_cpus(&in->function);
->> -    le32_to_cpus(&in->handle);
->> +    in->revision = le32_to_cpu(in->revision);
->> +    in->function = le32_to_cpu(in->function);
->> +    in->handle = le32_to_cpu(in->handle);
->>
->>      nvdimm_debug("Revision %#x Handler %#x Function %#x.\n", in->revision,
->>                   in->handle, in->function);
->> --
+> diff --git a/qapi/crypto.json b/qapi/crypto.json
+> index a51b434412..b2a4cff683 100644
+> --- a/qapi/crypto.json
+> +++ b/qapi/crypto.json
+> @@ -181,11 +181,11 @@
+>  # The options that apply to LUKS encryption format initialization
+>  #
+>  # @cipher-alg: the cipher algorithm for data encryption
+> -#              Currently defaults to 'aes'.
+> +#              Currently defaults to 'aes-256'.
+>  # @cipher-mode: the cipher mode for data encryption
+> -#               Currently defaults to 'cbc'
+> +#               Currently defaults to 'xts'
+>  # @ivgen-alg: the initialization vector generator
+> -#             Currently defaults to 'essiv'
+> +#             Currently defaults to 'plain64'
+>  # @ivgen-hash-alg: the initialization vector generator hash
+>  #                  Currently defaults to 'sha256'
+>  # @hash-alg: the master key hash algorithm
+> -- 
+> 2.11.0
