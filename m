@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gMJy3-0004RO-5A
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:41:59 -0500
+	(envelope-from <contrib@steffen-goertz.de>) id 1gMJyj-0005js-KG
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:42:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gMJxz-0001xN-4y
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:41:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38960)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gMJxy-0001fN-Ot
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:41:54 -0500
-Date: Mon, 12 Nov 2018 19:41:14 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181112214114.GV12503@habkost.net>
-References: <20181111233622.8976-1-f4bug@amsat.org>
-	<20181111233622.8976-6-f4bug@amsat.org>
-	<20181112170351.GU12503@habkost.net>
-	<CAAdtpL4234FKt685azMs_iWYNGzvhp8Mo6dJsah_Sq=JWJUaJA@mail.gmail.com>
+	(envelope-from <contrib@steffen-goertz.de>) id 1gMJyh-0002ZO-RK
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:42:41 -0500
+Received: from steffen-goertz.de ([88.198.119.201]:35460)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <contrib@steffen-goertz.de>) id 1gMJyf-0002Vl-JT
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 16:42:39 -0500
+From: =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>
+Date: Mon, 12 Nov 2018 16:42:11 -0500
+Message-Id: <20181112214224.31560-2-contrib@steffen-goertz.de>
+In-Reply-To: <20181112214224.31560-1-contrib@steffen-goertz.de>
+References: <20181112214224.31560-1-contrib@steffen-goertz.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAAdtpL4234FKt685azMs_iWYNGzvhp8Mo6dJsah_Sq=JWJUaJA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 05/11] decodetree: Force Python to
- print unsigned values
+Subject: [Qemu-devel] [PATCH v5 01/14] qtest: Add set_irq_in command to set
+ IRQ/GPIO level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +27,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, peer.adelt@hni.uni-paderborn.de, Richard Henderson <rth@twiddle.net>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Nov 12, 2018 at 07:52:28PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On Mon, Nov 12, 2018 at 6:03 PM Eduardo Habkost <ehabkost@redhat.com> w=
-rote:
-> > On Mon, Nov 12, 2018 at 12:36:16AM +0100, Philippe Mathieu-Daud=E9 wr=
-ote:
-> > > Python internal representation is signed, so unsigned values
-> > > bigger than 31-bit are interpreted as signed (and printed with
-> > > a '-' signed).
-> > > Mask out to force unsigned values.
-> >
-> > I don't understand this commit description. Python surely
-> > supports integers larger than 2^31, and its internal
-> > representation shouldn't matter at all:
-> >
-> >   >>> '0x{0:08x}'.format(0xffffffffffffffffffffffffffffffffffffffffff=
-ffffffffffffffffffffffffffffffffffffffff)
-> >   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff=
-ffffffffffffffffff'
-> >
-> > Can you explain how the code ends up with a negative value in the
-> > `self.thismask` or `b` variables?  If `self.subs` contains
-> > negative values, this is likely to break other parts of the code.
->=20
-> I guess I misunderstood the error, thus the description is invalid.
->=20
-> >
-> > >
-> > > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> > > ---
-> > > TODO: display error encountered:
-> > >
-> > >    case 0x-1:
-> > >        ....
-> >
-> > How can I reproduce it?
->=20
-> $ scripts/decodetree.py /dev/null
->=20
->     switch (insn & 0x-0000001) {
->     }
->=20
-> main() ->
->   build_tree(patterns, 0, outermask =3D 0) ->
->        innermask =3D ~outermask # =3D -1
->       Tree(fullmask, innermask =3D -1) ->
->         __init__(self, fm, tm =3D -1) ->
->           self.thismask =3D tm # -1
->   t.output_code(4, False, 0, 0) ->
->     sh =3D is_contiguous(self.thismask) # -1
->         output(ind, 'switch (', str_switch(self.thismask), ') {\n')
->=20
->         with:
->=20
->             def str_switch(b):
->                 return 'insn & 0x{0:08x}'.format(b)
->=20
-> So the fix is rather:
->=20
-> -- >8 --
-> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-> @@ -916,7 +916,7 @@ class Tree:
->=20
-> def build_tree(pats, outerbits, outermask):
->      # Find the intersection of all remaining fixedmask.
-> -    innermask =3D ~outermask
-> +    innermask =3D ~outermask & insnmask
->      for i in pats:
->          innermask &=3D i.fixedmask
+Adds a new qtest command "set_irq_in" which allows
+to set qemu gpio lines to a given level.
 
-Nice.  Thanks for the explanation.
+Based on https://lists.gnu.org/archive/html/qemu-devel/2012-12/msg02363.h=
+tml
+which never got merged.
 
-This really seems to be the only place in the code where the bit
-operations may generate a negative number.  All remaining usage
-of the ~ operator in the code is already inside & expressions
-that will ensure the result is positive.
+Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
+Originally-by: Matthew Ogilvie <mmogilvi_qemu@miniinfo.net>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ qtest.c          | 43 +++++++++++++++++++++++++++++++++++++++++++
+ tests/libqtest.c | 10 ++++++++++
+ tests/libqtest.h | 13 +++++++++++++
+ 3 files changed, 66 insertions(+)
 
-To the alternative fix above:
-
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
+diff --git a/qtest.c b/qtest.c
+index 69b9e9962b..451696b5da 100644
+--- a/qtest.c
++++ b/qtest.c
+@@ -164,6 +164,17 @@ static bool qtest_opened;
+  * where NUM is an IRQ number.  For the PC, interrupts can be intercepte=
+d
+  * simply with "irq_intercept_in ioapic" (note that IRQ0 comes out with
+  * NUM=3D0 even though it is remapped to GSI 2).
++ *
++ * Setting interrupt level:
++ *
++ *  > set_irq_in QOM-PATH NAME NUM LEVEL
++ *  < OK
++ *
++ *  where NAME is the name of the irq/gpio list, NUM is an IRQ number an=
+d
++ *  LEVEL is an signed integer IRQ level.
++ *
++ * Forcibly set the given interrupt pin to the given level.
++ *
+  */
+=20
+ static int hex2nib(char ch)
+@@ -326,7 +337,39 @@ static void qtest_process_command(CharBackend *chr, =
+gchar **words)
+         irq_intercept_dev =3D dev;
+         qtest_send_prefix(chr);
+         qtest_send(chr, "OK\n");
++    } else if (strcmp(words[0], "set_irq_in") =3D=3D 0) {
++        DeviceState *dev;
++        qemu_irq irq;
++        char *name;
++        int ret;
++        int num;
++        int level;
+=20
++        g_assert(words[1] && words[2] && words[3] && words[4]);
++
++        dev =3D DEVICE(object_resolve_path(words[1], NULL));
++        if (!dev) {
++            qtest_send_prefix(chr);
++            qtest_send(chr, "FAIL Unknown device\n");
++            return;
++        }
++
++        if (strcmp(words[2], "unnamed-gpio-in") =3D=3D 0) {
++            name =3D NULL;
++        } else {
++            name =3D words[2];
++        }
++
++        ret =3D qemu_strtoi(words[3], NULL, 0, &num);
++        g_assert(!ret);
++        ret =3D qemu_strtoi(words[4], NULL, 0, &level);
++        g_assert(!ret);
++
++        irq =3D qdev_get_gpio_in_named(dev, name, num);
++
++        qemu_set_irq(irq, level);
++        qtest_send_prefix(chr);
++        qtest_send(chr, "OK\n");
+     } else if (strcmp(words[0], "outb") =3D=3D 0 ||
+                strcmp(words[0], "outw") =3D=3D 0 ||
+                strcmp(words[0], "outl") =3D=3D 0) {
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 44ce118cfc..1cbde0d91a 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -732,6 +732,16 @@ void qtest_irq_intercept_in(QTestState *s, const cha=
+r *qom_path)
+     qtest_rsp(s, 0);
+ }
+=20
++void qtest_set_irq_in(QTestState *s, const char *qom_path, const char *n=
+ame,
++                      int num, int level)
++{
++    if (!name) {
++        name =3D "unnamed-gpio-in";
++    }
++    qtest_sendf(s, "set_irq_in %s %s %d %d\n", qom_path, name, num, leve=
+l);
++    qtest_rsp(s, 0);
++}
++
+ static void qtest_out(QTestState *s, const char *cmd, uint16_t addr, uin=
+t32_t value)
+ {
+     qtest_sendf(s, "%s 0x%x 0x%x\n", cmd, addr, value);
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index ed88ff99d5..ab99c5dd85 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -232,6 +232,19 @@ void qtest_irq_intercept_in(QTestState *s, const cha=
+r *string);
+  */
+ void qtest_irq_intercept_out(QTestState *s, const char *string);
+=20
++/**
++ * qtest_set_irq_in:
++ * @s: QTestState instance to operate on.
++ * @string: QOM path of a device
++ * @name: IRQ name
++ * @irq: IRQ number
++ * @level: IRQ level
++ *
++ * Force given device/irq GPIO-in pin to the given level.
++ */
++void qtest_set_irq_in(QTestState *s, const char *string, const char *nam=
+e,
++                      int irq, int level);
++
+ /**
+  * qtest_outb:
+  * @s: #QTestState instance to operate on.
 --=20
-Eduardo
+2.19.1
