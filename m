@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gM8JG-0005IE-UD
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:15:08 -0500
+	(envelope-from <armbru@redhat.com>) id 1gM8KZ-00060Y-4f
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:16:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gM8JC-0007z0-0W
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:15:06 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36706)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gM8JB-0007xC-Fo
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:15:01 -0500
-Received: by mail-wm1-x341.google.com with SMTP id v70-v6so6932938wmd.1
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 01:15:01 -0800 (PST)
-References: <20181111233622.8976-1-f4bug@amsat.org>
-	<20181111233622.8976-12-f4bug@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c34eda41-8c27-6c61-a53f-eae06da63fd9@linaro.org>
-Date: Mon, 12 Nov 2018 10:14:56 +0100
+	(envelope-from <armbru@redhat.com>) id 1gM8KH-0001n8-I2
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:16:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34544)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gM8KH-0001hc-8A
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:16:09 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181109141447.13101-1-kraxel@redhat.com>
+	<CAFEAcA89pAYe1ZQZDUHO33aP1jT7vfdsjJ4=aN7-c_fPSeYWgQ@mail.gmail.com>
+Date: Mon, 12 Nov 2018 10:16:05 +0100
+In-Reply-To: <CAFEAcA89pAYe1ZQZDUHO33aP1jT7vfdsjJ4=aN7-c_fPSeYWgQ@mail.gmail.com>
+	(Peter Maydell's message of "Fri, 9 Nov 2018 19:02:13 +0000")
+Message-ID: <875zx2fyga.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181111233622.8976-12-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 11/11] target/mips: Port MIPS64
- DCL[Z/O] to decodetree
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] hw/bt: drop bluetooth keyboard emulation.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,27 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peer Adelt <peer.adelt@hni.uni-paderborn.de>, Richard Henderson <rth@twiddle.net>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 11/12/18 12:36 AM, Philippe Mathieu-Daudé wrote:
-> +dclz            011100 ..... ..... ..... ..... 100100   @rs_rt_rd   ?ctx->insn_flags&ISA_MIPS64
-> +dclo            011100 ..... ..... ..... ..... 100101   @rs_rt_rd   ?ctx->insn_flags&ISA_MIPS64
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-This syntax I do not like.  I preferred your other form,
+> On 9 November 2018 at 14:14, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>> Broken (segfaultson first keypress) and appearently unused.
+>>
+>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-  >isa(ISA_MIPS64)
+Please show the reproducer in the commit message.  Stack backtrace
+wouldn't hurt.
 
-which, with a change to return false as I suggested, would
-have the same effect.
+>> ---
+>>  include/hw/bt.h     |   3 -
+>>  hw/bt/hid.c         | 554 ----------------------------------------------------
+>>  vl.c                |  34 +---
+>>  hw/bt/Makefile.objs |   3 +-
+>>  qemu-options.hx     |   9 -
+>>  5 files changed, 2 insertions(+), 601 deletions(-)
+>>  delete mode 100644 hw/bt/hid.c
+>
+> Are we definitely happy that all the use cases for
+> this code segfault, not just the one you tested ?
 
-As an aside, you could do
+Are there any others?
 
-#define check_isa(ctx, which)  ((ctx)->insn_flags & ISA_##which)
+> Does it cost us much to mark this deprecated in 3.1
+> and drop it in 4.0 ?
 
-to reduce the decode markup to
+The cost is offering a known-to-be-broken option to users.
 
-  >isa(MIPS64)
-
-
-r~
+The other half of the tradeoff: what would it gain us?
