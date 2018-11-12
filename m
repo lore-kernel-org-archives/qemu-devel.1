@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMHZq-0005Ji-KL
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 14:08:51 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gMHxX-0002yV-KA
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 14:33:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMHZo-00049L-73
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 14:08:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36444)
+	(envelope-from <pbonzini@redhat.com>) id 1gMHxS-0001fS-NT
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 14:33:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55668)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gMHZn-0003yL-Sk
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 14:08:48 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 12 Nov 2018 20:08:07 +0100
-Message-Id: <1542049690-12826-5-git-send-email-thuth@redhat.com>
-In-Reply-To: <1542049690-12826-1-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gMHxS-0001ec-EW
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 14:33:14 -0500
 References: <1542049690-12826-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH for-3.2 4/7] ivshmem-test: Drop dependence on
- global_qtest
+	<1542049690-12826-3-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <84f888a7-a34d-16ee-aed3-5a95d5122591@redhat.com>
+Date: Mon, 12 Nov 2018 20:33:03 +0100
+MIME-Version: 1.0
+In-Reply-To: <1542049690-12826-3-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.2 2/7] tests/libqos/pci: Make PCI
+ access functions independent of global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,107 +29,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>
+To: Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Ben Warren <ben@skyportsystems.com>
 
-From: Eric Blake <eblake@redhat.com>
+On 12/11/2018 20:08, Thomas Huth wrote:
+> QPCIBus already tracks QTestState, so use that state instead of an
+> implicit reliance on global_qtest.
+> 
+> Based on an earlier patch ("libqos: Use explicit QTestState for pci
+> operations") from Eric Blake.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Managing parallel connections to two different monitors via
-the implicit global_qtest makes it hard to copy-and-paste code
-to tests that are not aware of the implicit state.  Since we
-have already fixed qpci to avoid global_qtest, we can now
-simplify by not using global_qtest anywhere in ivshmem-test.
+This will be converted to qgraph, so I think this patch can be dropped.
+ I'll send the qgraph patches tomorrow.
 
-We can assert that the conversion is correct by checking that
-global_qtest remains NULL throughout the test (a later patch
-that changes global_qtest to not be a public global variable
-will drop the assertions).
+Paolo
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-[thuth: Dropped the changes to test_ivshmem_hotplug() - will be fixed later]
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/ivshmem-test.c | 18 +-----------------
- 1 file changed, 1 insertion(+), 17 deletions(-)
-
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index c37b196..089e268 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -71,13 +71,10 @@ static const char* reg2str(enum Reg reg) {
- static inline unsigned in_reg(IVState *s, enum Reg reg)
- {
-     const char *name = reg2str(reg);
--    QTestState *qtest = global_qtest;
-     unsigned res;
- 
--    global_qtest = s->qs->qts;
-     res = qpci_io_readl(s->dev, s->reg_bar, reg);
-     g_test_message("*%s -> %x\n", name, res);
--    global_qtest = qtest;
- 
-     return res;
- }
-@@ -85,35 +82,25 @@ static inline unsigned in_reg(IVState *s, enum Reg reg)
- static inline void out_reg(IVState *s, enum Reg reg, unsigned v)
- {
-     const char *name = reg2str(reg);
--    QTestState *qtest = global_qtest;
- 
--    global_qtest = s->qs->qts;
-     g_test_message("%x -> *%s\n", v, name);
-     qpci_io_writel(s->dev, s->reg_bar, reg, v);
--    global_qtest = qtest;
- }
- 
- static inline void read_mem(IVState *s, uint64_t off, void *buf, size_t len)
- {
--    QTestState *qtest = global_qtest;
--
--    global_qtest = s->qs->qts;
-     qpci_memread(s->dev, s->mem_bar, off, buf, len);
--    global_qtest = qtest;
- }
- 
- static inline void write_mem(IVState *s, uint64_t off,
-                              const void *buf, size_t len)
- {
--    QTestState *qtest = global_qtest;
--
--    global_qtest = s->qs->qts;
-     qpci_memwrite(s->dev, s->mem_bar, off, buf, len);
--    global_qtest = qtest;
- }
- 
- static void cleanup_vm(IVState *s)
- {
-+    assert(!global_qtest);
-     g_free(s->dev);
-     qtest_shutdown(s->qs);
- }
-@@ -131,7 +118,6 @@ static void setup_vm_cmd(IVState *s, const char *cmd, bool msix)
-         g_printerr("ivshmem-test tests are only available on x86 or ppc64\n");
-         exit(EXIT_FAILURE);
-     }
--    global_qtest = s->qs->qts;
-     s->dev = get_device(s->qs->pcibus);
- 
-     s->reg_bar = qpci_iomap(s->dev, 0, &barsize);
-@@ -354,7 +340,6 @@ static void test_ivshmem_server(bool msi)
-     g_assert_cmpint(vm1, !=, vm2);
- 
-     /* check number of MSI-X vectors */
--    global_qtest = s1->qs->qts;
-     if (msi) {
-         ret = qpci_msix_table_size(s1->dev);
-         g_assert_cmpuint(ret, ==, nvectors);
-@@ -377,7 +362,6 @@ static void test_ivshmem_server(bool msi)
-     g_assert_cmpuint(ret, !=, 0);
- 
-     /* ping vm1 -> vm2 on vector 1 */
--    global_qtest = s2->qs->qts;
-     if (msi) {
-         ret = qpci_msix_pending(s2->dev, 1);
-         g_assert_cmpuint(ret, ==, 0);
--- 
-1.8.3.1
+> ---
+>  tests/libqos/pci-pc.c    | 47 ++++++++++++++++++++++++-----------------------
+>  tests/libqos/pci-spapr.c | 20 ++++++++++----------
+>  2 files changed, 34 insertions(+), 33 deletions(-)
+> 
+> diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+> index 585f528..a4fc02b 100644
+> --- a/tests/libqos/pci-pc.c
+> +++ b/tests/libqos/pci-pc.c
+> @@ -29,90 +29,91 @@ typedef struct QPCIBusPC
+>  
+>  static uint8_t qpci_pc_pio_readb(QPCIBus *bus, uint32_t addr)
+>  {
+> -    return inb(addr);
+> +    return qtest_inb(bus->qts, addr);
+>  }
+>  
+>  static void qpci_pc_pio_writeb(QPCIBus *bus, uint32_t addr, uint8_t val)
+>  {
+> -    outb(addr, val);
+> +    qtest_outb(bus->qts, addr, val);
+>  }
+>  
+>  static uint16_t qpci_pc_pio_readw(QPCIBus *bus, uint32_t addr)
+>  {
+> -    return inw(addr);
+> +    return qtest_inw(bus->qts, addr);
+>  }
+>  
+>  static void qpci_pc_pio_writew(QPCIBus *bus, uint32_t addr, uint16_t val)
+>  {
+> -    outw(addr, val);
+> +    qtest_outw(bus->qts, addr, val);
+>  }
+>  
+>  static uint32_t qpci_pc_pio_readl(QPCIBus *bus, uint32_t addr)
+>  {
+> -    return inl(addr);
+> +    return qtest_inl(bus->qts, addr);
+>  }
+>  
+>  static void qpci_pc_pio_writel(QPCIBus *bus, uint32_t addr, uint32_t val)
+>  {
+> -    outl(addr, val);
+> +    qtest_outl(bus->qts, addr, val);
+>  }
+>  
+>  static uint64_t qpci_pc_pio_readq(QPCIBus *bus, uint32_t addr)
+>  {
+> -    return (uint64_t)inl(addr) + ((uint64_t)inl(addr + 4) << 32);
+> +    return (uint64_t)qtest_inl(bus->qts, addr) +
+> +        ((uint64_t)qtest_inl(bus->qts, addr + 4) << 32);
+>  }
+>  
+>  static void qpci_pc_pio_writeq(QPCIBus *bus, uint32_t addr, uint64_t val)
+>  {
+> -    outl(addr, val & 0xffffffff);
+> -    outl(addr + 4, val >> 32);
+> +    qtest_outl(bus->qts, addr, val & 0xffffffff);
+> +    qtest_outl(bus->qts, addr + 4, val >> 32);
+>  }
+>  
+>  static void qpci_pc_memread(QPCIBus *bus, uint32_t addr, void *buf, size_t len)
+>  {
+> -    memread(addr, buf, len);
+> +    qtest_memread(bus->qts, addr, buf, len);
+>  }
+>  
+>  static void qpci_pc_memwrite(QPCIBus *bus, uint32_t addr,
+>                               const void *buf, size_t len)
+>  {
+> -    memwrite(addr, buf, len);
+> +    qtest_memwrite(bus->qts, addr, buf, len);
+>  }
+>  
+>  static uint8_t qpci_pc_config_readb(QPCIBus *bus, int devfn, uint8_t offset)
+>  {
+> -    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+> -    return inb(0xcfc);
+> +    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+> +    return qtest_inb(bus->qts, 0xcfc);
+>  }
+>  
+>  static uint16_t qpci_pc_config_readw(QPCIBus *bus, int devfn, uint8_t offset)
+>  {
+> -    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+> -    return inw(0xcfc);
+> +    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+> +    return qtest_inw(bus->qts, 0xcfc);
+>  }
+>  
+>  static uint32_t qpci_pc_config_readl(QPCIBus *bus, int devfn, uint8_t offset)
+>  {
+> -    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+> -    return inl(0xcfc);
+> +    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+> +    return qtest_inl(bus->qts, 0xcfc);
+>  }
+>  
+>  static void qpci_pc_config_writeb(QPCIBus *bus, int devfn, uint8_t offset, uint8_t value)
+>  {
+> -    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+> -    outb(0xcfc, value);
+> +    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+> +    qtest_outb(bus->qts, 0xcfc, value);
+>  }
+>  
+>  static void qpci_pc_config_writew(QPCIBus *bus, int devfn, uint8_t offset, uint16_t value)
+>  {
+> -    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+> -    outw(0xcfc, value);
+> +    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+> +    qtest_outw(bus->qts, 0xcfc, value);
+>  }
+>  
+>  static void qpci_pc_config_writel(QPCIBus *bus, int devfn, uint8_t offset, uint32_t value)
+>  {
+> -    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+> -    outl(0xcfc, value);
+> +    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+> +    qtest_outl(bus->qts, 0xcfc, value);
+>  }
+>  
+>  QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
+> diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
+> index c0f7e6d..4c29889 100644
+> --- a/tests/libqos/pci-spapr.c
+> +++ b/tests/libqos/pci-spapr.c
+> @@ -45,63 +45,63 @@ typedef struct QPCIBusSPAPR {
+>  static uint8_t qpci_spapr_pio_readb(QPCIBus *bus, uint32_t addr)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+> -    return readb(s->pio_cpu_base + addr);
+> +    return qtest_readb(bus->qts, s->pio_cpu_base + addr);
+>  }
+>  
+>  static void qpci_spapr_pio_writeb(QPCIBus *bus, uint32_t addr, uint8_t val)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+> -    writeb(s->pio_cpu_base + addr, val);
+> +    qtest_writeb(bus->qts, s->pio_cpu_base + addr, val);
+>  }
+>  
+>  static uint16_t qpci_spapr_pio_readw(QPCIBus *bus, uint32_t addr)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+> -    return bswap16(readw(s->pio_cpu_base + addr));
+> +    return bswap16(qtest_readw(bus->qts, s->pio_cpu_base + addr));
+>  }
+>  
+>  static void qpci_spapr_pio_writew(QPCIBus *bus, uint32_t addr, uint16_t val)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+> -    writew(s->pio_cpu_base + addr, bswap16(val));
+> +    qtest_writew(bus->qts, s->pio_cpu_base + addr, bswap16(val));
+>  }
+>  
+>  static uint32_t qpci_spapr_pio_readl(QPCIBus *bus, uint32_t addr)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+> -    return bswap32(readl(s->pio_cpu_base + addr));
+> +    return bswap32(qtest_readl(bus->qts, s->pio_cpu_base + addr));
+>  }
+>  
+>  static void qpci_spapr_pio_writel(QPCIBus *bus, uint32_t addr, uint32_t val)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+> -    writel(s->pio_cpu_base + addr, bswap32(val));
+> +    qtest_writel(bus->qts, s->pio_cpu_base + addr, bswap32(val));
+>  }
+>  
+>  static uint64_t qpci_spapr_pio_readq(QPCIBus *bus, uint32_t addr)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+> -    return bswap64(readq(s->pio_cpu_base + addr));
+> +    return bswap64(qtest_readq(bus->qts, s->pio_cpu_base + addr));
+>  }
+>  
+>  static void qpci_spapr_pio_writeq(QPCIBus *bus, uint32_t addr, uint64_t val)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+> -    writeq(s->pio_cpu_base + addr, bswap64(val));
+> +    qtest_writeq(bus->qts, s->pio_cpu_base + addr, bswap64(val));
+>  }
+>  
+>  static void qpci_spapr_memread(QPCIBus *bus, uint32_t addr,
+>                                 void *buf, size_t len)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+> -    memread(s->mmio32_cpu_base + addr, buf, len);
+> +    qtest_memread(bus->qts, s->mmio32_cpu_base + addr, buf, len);
+>  }
+>  
+>  static void qpci_spapr_memwrite(QPCIBus *bus, uint32_t addr,
+>                                  const void *buf, size_t len)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+> -    memwrite(s->mmio32_cpu_base + addr, buf, len);
+> +    qtest_memwrite(bus->qts, s->mmio32_cpu_base + addr, buf, len);
+>  }
+>  
+>  static uint8_t qpci_spapr_config_readb(QPCIBus *bus, int devfn, uint8_t offset)
+> 
