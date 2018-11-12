@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50538)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=847f9958e=marcolso@amazon.com>)
-	id 1gM6Ja-00084o-1k
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 02:07:21 -0500
+	id 1gM6Jd-00085E-8R
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 02:07:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=847f9958e=marcolso@amazon.com>)
-	id 1gM6JX-000449-8d
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 02:07:17 -0500
+	id 1gM6JZ-0004DZ-Hl
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 02:07:18 -0500
 From: Marc Olson <marcolso@amazon.com>
-Date: Sun, 11 Nov 2018 23:06:37 -0800
-Message-Id: <1542006398-30037-2-git-send-email-marcolso@amazon.com>
-In-Reply-To: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
-References: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] blkdebug: Extend rule check for
- additional types
+Date: Sun, 11 Nov 2018 23:06:36 -0800
+Message-Id: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
+Subject: [Qemu-devel] [PATCH v3 1/3] blkdebug: fix one shot rule processing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,119 +22,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: jsnow@redhat.com, qemu-block@nongnu.org, Marc Olson <marcolso@amazon.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Break out the more common parts of the BlkdebugRule struct, and make
-rule_check() more explicit about operating only on error injection types
-so that additional rule types can be added in the future.
+If 'once' is specified, the rule should execute just once, regardless if
+it is supposed to return an error or not. Take the example where you
+want the first IO to an LBA to succeed, but subsequent IOs to fail. You
+could either use state transitions, or create two rules, one with
+error = 0 and once set to true, and one with a non-zero error.
 
 Signed-off-by: Marc Olson <marcolso@amazon.com>
 ---
- block/blkdebug.c | 59 +++++++++++++++++++++++++++++---------------------------
- 1 file changed, 31 insertions(+), 28 deletions(-)
+ block/blkdebug.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 327049b..7739849 100644
+index 0759452..327049b 100644
 --- a/block/blkdebug.c
 +++ b/block/blkdebug.c
-@@ -73,13 +73,13 @@ typedef struct BlkdebugRule {
-     BlkdebugEvent event;
-     int action;
-     int state;
-+    int once;
-+    int64_t offset;
-     union {
-         struct {
-             int error;
-             int immediately;
--            int once;
--            int64_t offset;
--        } inject;
-+        } inject_error;
-         struct {
-             int new_state;
-         } set_state;
-@@ -182,16 +182,16 @@ static int add_rule(void *opaque, QemuOpts *opts, Error **errp)
-         .state  = qemu_opt_get_number(opts, "state", 0),
-     };
- 
-+    rule->once = qemu_opt_get_bool(opts, "once", 0);
-+    sector = qemu_opt_get_number(opts, "sector", -1);
-+    rule->offset = sector == -1 ? -1 : sector * BDRV_SECTOR_SIZE;
-+
-     /* Parse action-specific options */
-     switch (d->action) {
-     case ACTION_INJECT_ERROR:
--        rule->options.inject.error = qemu_opt_get_number(opts, "errno", EIO);
--        rule->options.inject.once  = qemu_opt_get_bool(opts, "once", 0);
--        rule->options.inject.immediately =
-+        rule->options.inject_error.error = qemu_opt_get_number(opts, "errno", EIO);
-+        rule->options.inject_error.immediately =
-             qemu_opt_get_bool(opts, "immediately", 0);
--        sector = qemu_opt_get_number(opts, "sector", -1);
--        rule->options.inject.offset =
--            sector == -1 ? -1 : sector * BDRV_SECTOR_SIZE;
-         break;
- 
-     case ACTION_SET_STATE:
-@@ -474,38 +474,41 @@ static int rule_check(BlockDriverState *bs, uint64_t offset, uint64_t bytes)
- {
-     BDRVBlkdebugState *s = bs->opaque;
-     BlkdebugRule *rule = NULL;
-+    BlkdebugRule *error_rule = NULL;
-     int error;
-     bool immediately;
-+    int ret = 0;
- 
-     QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
--        uint64_t inject_offset = rule->options.inject.offset;
--
--        if (inject_offset == -1 ||
--            (bytes && inject_offset >= offset &&
--             inject_offset < offset + bytes))
-+        if (rule->offset == -1 ||
-+            (bytes && rule->offset >= offset &&
-+             rule->offset < offset + bytes))
-         {
--            break;
-+            if (rule->action == ACTION_INJECT_ERROR) {
-+                error_rule = rule;
-+                break;
-+            }
+@@ -488,7 +488,7 @@ static int rule_check(BlockDriverState *bs, uint64_t offset, uint64_t bytes)
          }
      }
  
--    if (!rule) {
--        return 0;
--    }
-+    if (error_rule) {
-+        immediately = error_rule->options.inject_error.immediately;
-+        error = error_rule->options.inject_error.error;
- 
--    immediately = rule->options.inject.immediately;
--    error = rule->options.inject.error;
-+        if (error_rule->once) {
-+            QSIMPLEQ_REMOVE(&s->active_rules, error_rule, BlkdebugRule, active_next);
-+            remove_rule(error_rule);
-+        }
- 
--    if (rule->options.inject.once) {
--        QSIMPLEQ_REMOVE(&s->active_rules, rule, BlkdebugRule, active_next);
--        remove_rule(rule);
--    }
-+        if (error && !immediately) {
-+            aio_co_schedule(qemu_get_current_aio_context(), qemu_coroutine_self());
-+            qemu_coroutine_yield();
-+        }
- 
--    if (error && !immediately) {
--        aio_co_schedule(qemu_get_current_aio_context(), qemu_coroutine_self());
--        qemu_coroutine_yield();
-+        ret = -error;
+-    if (!rule || !rule->options.inject.error) {
++    if (!rule) {
+         return 0;
      }
  
--    return -error;
-+    return ret;
- }
+@@ -500,7 +500,7 @@ static int rule_check(BlockDriverState *bs, uint64_t offset, uint64_t bytes)
+         remove_rule(rule);
+     }
  
- static int coroutine_fn
+-    if (!immediately) {
++    if (error && !immediately) {
+         aio_co_schedule(qemu_get_current_aio_context(), qemu_coroutine_self());
+         qemu_coroutine_yield();
+     }
 -- 
 2.7.4
