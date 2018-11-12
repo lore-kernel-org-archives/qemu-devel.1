@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gMEdn-000089-Mg
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:00:49 -0500
+	(envelope-from <berrange@redhat.com>) id 1gMEfJ-0001BK-DW
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:02:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gMEdj-0002W0-59
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:00:43 -0500
-Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:34173)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gMEdh-0002Sx-28
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:00:37 -0500
-Received: by mail-it1-x141.google.com with SMTP id t189-v6so11072129itf.1
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 08:00:31 -0800 (PST)
-References: <20181108175246.13416-1-richard.henderson@linaro.org>
-	<20181108175246.13416-3-richard.henderson@linaro.org>
-	<CAFEAcA_WJMAsHWx+OTO+j0eTsHodpXkyxLv6cAdXxgjsCmTYhw@mail.gmail.com>
-	<6ace0700-23b9-d004-a5d9-6ab1bdb90835@linaro.org>
-	<CAFEAcA-3yT-Tw_Q6fiioyxTF8oEJ0r+ZTKdYCg4inYgtdwcxRA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8f544b44-6400-8f85-3600-78347feb1575@linaro.org>
-Date: Mon, 12 Nov 2018 17:00:20 +0100
+	(envelope-from <berrange@redhat.com>) id 1gMEfD-0003Hy-De
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:02:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55558)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMEf9-0002xW-Oy
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 11:02:09 -0500
+Date: Mon, 12 Nov 2018 16:01:24 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181112160124.GT3602@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181107151311.1058-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-3yT-Tw_Q6fiioyxTF8oEJ0r+ZTKdYCg4inYgtdwcxRA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] target/arm: Fill in ARMISARegisters
- for kvm64
+Content-Disposition: inline
+In-Reply-To: <20181107151311.1058-1-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v2] vhost-user: define conventions
+ for vhost-user backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,18 +29,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, Gonglei <arei.gonglei@huawei.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
 
-On 11/12/18 3:34 PM, Peter Maydell wrote:
->> The other id_aa64* register fields are all extensions to v8.0, so they should
->> be zero.  I am of course assuming that AdvSIMD is present, otherwise qemu
->> itself probably have failed before now.
-> 
-> You don't set the id_isar* to say "AdvSIMD present" (or "VFP present"), though.
+On Wed, Nov 07, 2018 at 07:13:11PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> As discussed during "[PATCH v4 00/29] vhost-user for input & GPU"
+> review, let's define a common set of backend conventions to help with
+> management layer implementation, and interoperability.
+>=20
+> v2:
+>  - use a vhost-user.json schema to discover backends and describe
+>    capability format
+>  - drop --pidfile
+>  - add some notes about daemonizing & stdin/out/err
+>=20
+> Cc: libvir-list@redhat.com
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Cc: Changpeng Liu <changpeng.liu@intel.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Felipe Franciosi <felipe@nutanix.com>
+> Cc: Gonglei <arei.gonglei@huawei.com>
+> Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Victor Kaplansky <victork@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  MAINTAINERS                  |   1 +
+>  docs/interop/vhost-user.json | 219 +++++++++++++++++++++++++++++++++++
+>  docs/interop/vhost-user.txt  | 101 +++++++++++++++-
+>  3 files changed, 319 insertions(+), 2 deletions(-)
+>  create mode 100644 docs/interop/vhost-user.json
 
-Those two are almost unique in that they are signed fields.  So 0 indicates
-present and -1 indicates not present (and 1 indicates fp16 support).
 
+> diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.jso=
+n
+> new file mode 100644
+> index 0000000000..91b5bf499e
+> --- /dev/null
+> +++ b/docs/interop/vhost-user.json
+> @@ -0,0 +1,219 @@
+> +# -*- Mode: Python -*-
+> +#
+> +# Copyright (C) 2018 Red Hat, Inc.
+> +#
+> +# Authors:
+> +#  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later. See the COPYING file in the top-level directory.
+> +
+> +##
+> +# =3D vhost user backend discovery & capabilities
+> +##
+> +
+> +##
+> +# @VHostUserBackendType:
+> +#
+> +# List the various vhost user backend types.
+> +#
+> +# @net: virtio net
+> +# @block: virtio block
+> +# @console: virtio console
+> +# @rng: virtio rng
+> +# @balloon: virtio balloon
+> +# @rpmsg: virtio remote processor messaging
+> +# @scsi: virtio scsi
+> +# @9p: 9p virtio console
+> +# @rproc-serial: virtio remoteproc serial link
+> +# @caif: virtio caif
+> +# @gpu: virtio gpu
+> +# @input: virtio input
+> +# @vsock: virtio vsock transport
+> +# @crypto: virtio crypto
 
-r~
+Is it possible to actually use an external backend process with
+all these yet ?  If not, perhaps we should only start with the
+backends that will be usable immediately ?
+
+> +#
+> +# Since: 3.2
+> +##
+> +{
+> +  'enum': 'VHostUserBackendType',
+> +  'data': [ 'net', 'block', 'console', 'rng', 'balloon', 'rpmsg',
+> +            'scsi', '9p', 'rproc-serial', 'caif', 'gpu', 'input', 'vso=
+ck',
+> +            'crypto' ]
+> +}
+
+Regardless of the answer to the above question,
+
+  Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
