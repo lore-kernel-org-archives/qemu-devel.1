@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMBls-0001Wi-R8
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 07:56:53 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gMC2d-0003Q7-VG
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:14:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMBlq-0002lu-SG
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 07:56:52 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35757)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gMBlq-0002de-Jd
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 07:56:50 -0500
-Received: by mail-ot1-x342.google.com with SMTP id 81so7870303otj.2
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 04:56:27 -0800 (PST)
+	(envelope-from <kraxel@redhat.com>) id 1gMC2a-0007lL-Qg
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:14:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35108)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gMC2a-0007kk-KQ
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 08:14:08 -0500
+Date: Mon, 12 Nov 2018 14:14:02 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181112131402.kxoi724a2iw6kwsj@sirius.home.kraxel.org>
+References: <1542016830-19189-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181109152119.9242-1-alex.bennee@linaro.org>
-References: <20181109152119.9242-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Nov 2018 12:56:06 +0000
-Message-ID: <CAFEAcA9AEzCseAt8gxx_3jKpi1R=UPS+YGzik_KbcusvhRBXTA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] KVM Guest Debug fixes (plus TCG EL2
- debug tweaks)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1542016830-19189-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] bt: Mark the bluetooth subsystem as
+ deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andrzej Zaborowski <balrogg@gmail.com>, Andrzej Zaborowski <andrew.zaborowski@intel.com>
 
-On 9 November 2018 at 15:21, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
-> Hi,
->
-> I missed a fix I'd applied locally from v2 so this is a resend with
-> some additional tags, some changes suggested by rth and one more fix
-> for the test case.
->
-> So these are fixes for guest debug when running under KVM. While
-> re-spinning these I came across an anomaly which pointed to a kernel bug
-> that caused the 1st single-step to fail. This is being discussed at on
-> the kvm-arm list:
->
->   Subject: [RFC PATCH] KVM: arm64: don't single-step for non-emulated fau=
-lts
->   Date: Wed, 7 Nov 2018 17:10:31 +0000
->   Message-Id: <20181107171031.22573-1-alex.bennee@linaro.org>
->
-> It looks like there will be another patch series on its way to address
-> this.
->
-> As debugging HYP mode code is next to impossible on real hardware I
-> tried re-creating the single-step bug under TCG. As a result I ran into
-> some debug and EL2 cases that failed. The final two patches are some
-> fixes but I'm still seeing some weird behaviour although it is currently
-> obscured by timer interrupts constantly firing as I enter the to be
-> single-stepped guest EL1 instruction so they can probably be skipped for
-> 3.1.
->
-> The following patches still need review:
->  0001/target arm64 properly handle DBGVR RESS bits.patch
->  0005/tests guest debug don t use symbol resolution for.patch
->  0007/arm fix aa64_generate_debug_exceptions to work wi.patch
+On Mon, Nov 12, 2018 at 11:00:30AM +0100, Thomas Huth wrote:
+> It has been unmaintained since years, and there were only trivial or
+> tree-wide changes to the related files since many years, so the
+> code is likely very bitrotten and broken. For example the following
+> segfaults as soon as as you press a key:
+> 
+>  qemu-system-x86_64 -usb -device usb-bt-dongle -bt hci -bt device:keyboard
+> 
+> Since we are not aware of anybody using bluetooth with the current
+> version of QEMU, let's mark the subsystem as deprecated, with a special
+> request for the users to write to the qemu-devel mailing list in case
+> they still use it (so we could revert the deprecation status in that
+> case).
 
-Richard had a review comment on 5, so I'm applying 1-4 and 6-7 to
-target-arm.next and will let you respin 5.
+I think that settles the bluetooth debate for now.  We deprecate it,
+wait for feedback, possibly un-deprecate (parts of) the code.  Next
+year we'll actually remove the unused code.
 
-thanks
--- PMM
+Patch queued for 3.1.
+
+thanks,
+  Gerd
