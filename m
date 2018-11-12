@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gMFo5-0001t1-0A
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:15:25 -0500
+	(envelope-from <bounces@canonical.com>) id 1gMFoa-0002GQ-So
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:15:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gMFny-0000uD-Lx
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:15:24 -0500
-Date: Mon, 12 Nov 2018 18:14:54 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181112181454.13efd2af.cohuck@redhat.com>
-In-Reply-To: <20181105110313.29312-1-david@redhat.com>
-References: <20181105110313.29312-1-david@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gMFoV-0001Ar-VZ
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:15:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38318)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gMFoV-00017L-OR
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:15:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gMFoN-0000Sb-25
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 17:15:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0D9F22E8048
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 17:15:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/4] s390x/zpci: some hotplug handler
- cleanups
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 12 Nov 2018 17:08:08 -0000
+From: inactive <1802684@bugs.launchpad.net>
+Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
+Message-Id: <154204248888.1701.1294014984399029306.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +36,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, =Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Mon,  5 Nov 2018 12:03:09 +0100
-David Hildenbrand <david@redhat.com> wrote:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg01941.html
+thread
 
-> The hotplug code needs more love, but let's do some obvious cleanups
-> first. In the future, we want to propery make use of unplug_request() +
-> unplug(), instead of routing everything (especially two separate but
-> linked) devices via a single unplug call. Also, we want to move all
-> errors in plug() into the pre_plug() handler, but this will require
-> general PCI refactorings (moving stuff from realize() to the pre_plug/plug
-> handler).
-> 
-> This series is based on "[PATCH v2 00/10] pci: hotplug handler reworks",
-> which contains one cleanup for s390x.
-> 
-> David Hildenbrand (4):
->   s390x/zpci: drop msix.available
+-- =
 
-queued to s390-next
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1802684
 
->   s390x/zpci: use hotplug_dev instead of looking up the host bridge
+Title:
+  QEMU gui crashes on macOS Mojave
 
-Do we have consensus on that one yet? I can take it or leave it :)
+Status in QEMU:
+  New
 
->   s390x/zpci: move some hotplug checks to the pre_plug handler
+Bug description:
+  QEMU release 3.0.0 as well as a recent head build
 
-depends on the handler rework
+  /usr/local/Cellar/qemu/HEAD-03c1ca1 (147 files, 257.2MB)
+    Built from source on 2018-11-06 at 13:41:32 with: --with-gtk+3 --with-s=
+dl2 --with-libusb
+  /usr/local/Cellar/qemu/3.0.0 (137 files, 261.6MB) *
+    Poured from bottle on 2018-11-10 at 22:58:32 with: --with-gtk+3 --with-=
+libusb --with-sdl2
 
->   s390x/zpci: properly fail if the zPCI device cannot be created
+  Crashes when attempting to use any gui interface (tried SDL and
+  default Cocoa):
 
-Waiting for a fixed patch... can queue to s390-fixes if it arrives
-soon(tm).
+  2018-11-10 22:58:41.799 qemu-system-aarch64[42982:1102466] *** Terminatin=
+g app due to uncaught exception 'NSInternalInconsistencyException', reason:=
+ 'NSWindow drag regions should only be invalidated on the Main Thread!'
+  *** First throw call stack:
+  (
+  	0   CoreFoundation                      0x00007fff3ea96ecd __exceptionPr=
+eprocess + 256
+  	1   libobjc.A.dylib                     0x00007fff6ab49720 objc_exceptio=
+n_throw + 48
+  	2   CoreFoundation                      0x00007fff3eab095d -[NSException=
+ raise] + 9
+  	3   AppKit                              0x00007fff3bfb13fa -[NSWindow(NS=
+Window_Theme) _postWindowNeedsToResetDragMarginsUnlessPostingDisabled] + 324
+  	4   AppKit                              0x00007fff3bfb6850 -[NSView setF=
+rameSize:] + 2082
+  	5   AppKit                              0x00007fff3c02747d -[NSVisualEff=
+ectView setFrameSize:] + 171
+  	6   AppKit                              0x00007fff3c0811b1 -[NSTitlebarV=
+iew setFrameSize:] + 84
+  	7   AppKit                              0x00007fff3bfb5859 -[NSView setF=
+rame:] + 478
+  	8   AppKit                              0x00007fff3c081154 -[NSTitlebarV=
+iew resizeWithOldSuperviewSize:] + 100
+  	9   AppKit                              0x00007fff3bfbc95e -[NSView resi=
+zeSubviewsWithOldSize:] + 502
+  	10  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
+rameSize:] + 1707
+  	11  AppKit                              0x00007fff3c9773c0 -[NSTitlebarC=
+ontainerView setFrameSize:] + 142
+  	12  AppKit                              0x00007fff3bfb5859 -[NSView setF=
+rame:] + 478
+  	13  AppKit                              0x00007fff3bfbcdb5 -[NSView resi=
+zeWithOldSuperviewSize:] + 776
+  	14  AppKit                              0x00007fff3bfbc95e -[NSView resi=
+zeSubviewsWithOldSize:] + 502
+  	15  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
+rameSize:] + 1707
+  	16  AppKit                              0x00007fff3c024570 -[NSThemeFram=
+e setFrameSize:] + 495
+  	17  AppKit                              0x00007fff3c011223 -[NSWindow _s=
+etFrame:updateBorderViewSize:] + 966
+  	18  AppKit                              0x00007fff3c010b46 -[NSWindow _o=
+ldPlaceWindow:] + 547
+  	19  AppKit                              0x00007fff3c010151 -[NSWindow _s=
+etFrameCommon:display:stashSize:] + 3006
+  	20  AppKit                              0x00007fff3c00f57d -[NSWindow _s=
+etFrame:display:allowImplicitAnimation:stashSize:] + 192
+  	21  AppKit                              0x00007fff3c019ff8 -[NSWindow se=
+tFrame:display:animate:] + 567
+  	22  qemu-system-aarch64                 0x000000010b7b2abf qemu-system-a=
+arch64 + 3668671
+  	23  qemu-system-aarch64                 0x000000010b7b6356 qemu-system-a=
+arch64 + 3683158
+  	24  qemu-system-aarch64                 0x000000010b7ad836 qemu-system-a=
+arch64 + 3647542
+  	25  qemu-system-aarch64                 0x000000010b4ce769 qemu-system-a=
+arch64 + 636777
+  	26  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
+arch64 + 347172
+  	27  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
+arch64 + 346645
+  	28  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
+arch64 + 346353
+  	29  qemu-system-aarch64                 0x000000010b4414aa qemu-system-a=
+arch64 + 58538
+  	30  qemu-system-aarch64                 0x000000010b4f78c3 qemu-system-a=
+arch64 + 805059
+  	31  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
+arch64 + 347172
+  	32  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
+arch64 + 346645
+  	33  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
+arch64 + 346353
+  	34  qemu-system-aarch64                 0x000000010b4b8f57 qemu-system-a=
+arch64 + 548695
+  	35  qemu-system-aarch64                 0x000000010b49c3af qemu-system-a=
+arch64 + 431023
+  	36  ???                                 0x00000001117891f3 0x0 + 4588081=
+651
+  )
+  libc++abi.dylib: terminating with uncaught exception of type NSException
+  fish: 'qemu-system-aarch64 -M raspi3 -=E2=80=A6' terminated by signal SIG=
+ABRT (Abort)
 
-> 
->  hw/s390x/s390-pci-bus.c | 74 ++++++++++++++++++++++++++---------------
->  hw/s390x/s390-pci-bus.h |  1 -
->  2 files changed, 47 insertions(+), 28 deletions(-)
-> 
+  =
+
+  macOS Mojave 10.14.2 Beta (18C38b)
+  Qemu in the same configuration used to work in High Sierra, started crash=
+ing only after upgrade to Mojave.
+
+  Command line:
+  `qemu-system-aarch64 -M raspi3 -d in_asm -serial stdio -kernel $1.bin`
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1802684/+subscriptions
