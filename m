@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gMFd6-0007ct-6d
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:04:05 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gMFfD-0000FI-7E
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gMFcy-0005eF-Cs
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:04:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:62362)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gMFcy-0005dq-4W
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:03:56 -0500
-Date: Mon, 12 Nov 2018 15:03:51 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181112170351.GU12503@habkost.net>
-References: <20181111233622.8976-1-f4bug@amsat.org>
-	<20181111233622.8976-6-f4bug@amsat.org>
+	(envelope-from <kwolf@redhat.com>) id 1gMFfC-0006lN-2d
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:15 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Mon, 12 Nov 2018 18:05:49 +0100
+Message-Id: <20181112170603.23986-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181111233622.8976-6-f4bug@amsat.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 05/11] decodetree: Force Python to
- print unsigned values
+Subject: [Qemu-devel] [PULL 00/14] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +20,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peer Adelt <peer.adelt@hni.uni-paderborn.de>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On Mon, Nov 12, 2018 at 12:36:16AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Python internal representation is signed, so unsigned values
-> bigger than 31-bit are interpreted as signed (and printed with
-> a '-' signed).
-> Mask out to force unsigned values.
+The following changes since commit 5704c36d25ee84e7129722cb0db53df9faefe9=
+43:
 
-I don't understand this commit description. Python surely
-supports integers larger than 2^31, and its internal
-representation shouldn't matter at all:
+  Merge remote-tracking branch 'remotes/kraxel/tags/fixes-31-20181112-pul=
+l-request' into staging (2018-11-12 15:55:40 +0000)
 
-  >>> '0x{0:08x}'.format(0xffffffffffffffffffffffffffffffffffffffffffffff=
-ffffffffffffffffffffffffffffffffffff)
-  '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff=
-ffffffffffffff'
+are available in the Git repository at:
 
-Can you explain how the code ends up with a negative value in the
-`self.thismask` or `b` variables?  If `self.subs` contains
-negative values, this is likely to break other parts of the code.
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
-> TODO: display error encountered:
->=20
->    case 0x-1:
->        ....
+for you to fetch changes up to 1a42e5d8298d1b0f90d2254e7d559391dd3a45ca:
 
-How can I reproduce it?
+  Merge remote-tracking branch 'mreitz/tags/pull-block-2018-11-12' into q=
+ueue-block (2018-11-12 17:57:32 +0100)
 
-> ---
->  scripts/decodetree.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-> index 5dea15e7a5..08aa52d544 100755
-> --- a/scripts/decodetree.py
-> +++ b/scripts/decodetree.py
-> @@ -900,12 +900,12 @@ class Tree:
->              def str_case(b):
->                  return '0x{0:08x}'.format(b)
-> =20
-> -        output(ind, 'switch (', str_switch(self.thismask), ') {\n')
-> +        output(ind, 'switch (', str_switch(self.thismask & insnmask), =
-') {\n')
->          for b, s in sorted(self.subs):
->              assert (self.thismask & ~s.fixedmask) =3D=3D 0
->              innermask =3D outermask | self.thismask
->              innerbits =3D outerbits | b
-> -            output(ind, 'case ', str_case(b), ':\n')
-> +            output(ind, 'case ', str_case(b & insnmask), ':\n')
->              output(ind, '    /* ',
->                     str_match_bits(innerbits, innermask), ' */\n')
->              s.output_code(i + 4, extracted, innerbits, innermask)
-> --=20
-> 2.17.2
->=20
+----------------------------------------------------------------
+Block layer patches:
 
---=20
-Eduardo
+- file-posix: Don't waste a file descriptor for locking, don't lock the
+  same bit multiple times
+- nvme: Fix double free and memory leak
+- Misc error handling fixes
+- Added NULL checks found by static analysis
+- Allow more block drivers to not be included in the qemu build
+
+----------------------------------------------------------------
+Fam Zheng (4):
+      file-posix: Use error API properly
+      file-posix: Skip effectiveless OFD lock operations
+      file-posix: Drop s->lock_fd
+      tests: Add unit tests for image locking
+
+Jeff Cody (1):
+      block: Make more block drivers compile-time configurable
+
+Kevin Wolf (1):
+      Merge remote-tracking branch 'mreitz/tags/pull-block-2018-11-12' in=
+to queue-block
+
+Li Qiang (2):
+      nvme: don't unref ctrl_mem when device unrealized
+      nvme: free cmbuf in nvme_exit
+
+Liam Merwick (5):
+      job: Fix off-by-one assert checks for JobSTT and JobVerbTable
+      block: Null pointer dereference in blk_root_get_parent_desc()
+      qemu-img: assert block_job_get() does not return NULL in img_commit=
+()
+      block: Fix potential Null pointer dereferences in vvfat.c
+      qcow2: Read outside array bounds in qcow2_pre_write_overlap_check()
+
+Peter Maydell (1):
+      blockdev: Consistently use snapshot_node_name in external_snapshot_=
+prepare()
+
+zhenwei pi (1):
+      blockdev: handle error on block latency histogram set error
+
+ configure                  |  91 ++++++++++++++++++++++++++
+ block/block-backend.c      |   3 +-
+ block/file-posix.c         | 122 ++++++++++++++++++++---------------
+ block/qcow2-refcount.c     |  18 +++---
+ block/vvfat.c              |  46 ++++++++-----
+ blockdev.c                 |  21 ++++--
+ hw/block/nvme.c            |   6 +-
+ job.c                      |   4 +-
+ qemu-img.c                 |   1 +
+ tests/test-image-locking.c | 157 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ block/Makefile.objs        |  22 +++++--
+ tests/Makefile.include     |   2 +
+ 12 files changed, 400 insertions(+), 93 deletions(-)
+ create mode 100644 tests/test-image-locking.c
