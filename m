@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gMG1E-0004ay-TR
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:29:04 -0500
+	(envelope-from <david@redhat.com>) id 1gMG6v-0007fH-Kd
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:34:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gMG1B-0003uH-12
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:29:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47318)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gMG1A-0003tl-OC
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:28:56 -0500
-Date: Mon, 12 Nov 2018 17:28:42 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181112172842.GG2293@work-vm>
-References: <20181107155405.24013-1-minyard@acm.org>
-	<20181107155405.24013-4-minyard@acm.org>
-	<CAFEAcA9hp0VzN484uugfc4kzh3pSDMn3PU+ozfc_XPT5P-QsBw@mail.gmail.com>
-	<25d95354-e536-dff6-0936-7e8d951108a5@mvista.com>
-	<CAFEAcA9D4=KgmGqJbUceD_bxO11CBTDH7G3-54kn25nfi1XPJA@mail.gmail.com>
+	(envelope-from <david@redhat.com>) id 1gMG6s-0007Do-Eh
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:34:53 -0500
+References: <20181105110313.29312-1-david@redhat.com>
+	<20181112181454.13efd2af.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8aaa3434-cb48-6adf-d716-c391eb3123f5@redhat.com>
+Date: Mon, 12 Nov 2018 18:34:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9D4=KgmGqJbUceD_bxO11CBTDH7G3-54kn25nfi1XPJA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] i2c: Add vmstate handling to the smbus
- eeprom
+In-Reply-To: <20181112181454.13efd2af.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/4] s390x/zpci: some hotplug handler
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Corey Minyard <cminyard@mvista.com>, Corey Minyard <minyard@acm.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, =Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 8 November 2018 at 17:58, Corey Minyard <cminyard@mvista.com> wrote:
-> > On 11/8/18 8:08 AM, Peter Maydell wrote:
-> >> This doesn't do anything for migration of the actual data contents.
-> >> The current users of this device (hw/arm/aspeed.c and the
-> >> smbus_eeprom_init() function) doesn't do anything
-> >> to migrate the contents. For that matter, "user of the device
-> >> passes a pointer to a random lump of memory via a device property"
-> >> is a bit funky as an interface. The device should allocate its
-> >> own memory and migrate it, and the user should just pass the
-> >> initial required contents (default being "zero-initialize",
-> >> which is what everybody except the mips_fulong2e, mips_malta
-> >> and sam460ex want).
+On 12.11.18 18:14, Cornelia Huck wrote:
+> On Mon,  5 Nov 2018 12:03:09 +0100
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> > I debated on this, and it depends on what the eeprom is used for.  If
-> > it's a DRAM eeprom, it shouldn't need to be transferred.
+>> The hotplug code needs more love, but let's do some obvious cleanups
+>> first. In the future, we want to propery make use of unplug_request() +
+>> unplug(), instead of routing everything (especially two separate but
+>> linked) devices via a single unplug call. Also, we want to move all
+>> errors in plug() into the pre_plug() handler, but this will require
+>> general PCI refactorings (moving stuff from realize() to the pre_plug/plug
+>> handler).
+>>
+>> This series is based on "[PATCH v2 00/10] pci: hotplug handler reworks",
+>> which contains one cleanup for s390x.
+>>
+>> David Hildenbrand (4):
+>>   s390x/zpci: drop msix.available
 > 
-> It's guest-visible data; the guest can write it and read it back.
-> So it needs to be migrated. Otherwise behaviour after migration
-> will not be the same as if the guest had never migrated.
+> queued to s390-next
 > 
-> >> Does this also break migration from an old QEMU to a new one?
-> >> (For Aspeed that's probably ok, but we should flag it up in the
-> >> commit message if so. x86 uses need care...)
-> >>
-> > There is no transfer before, so I don't see why it would break anything.
-> > Am I missing something?
+>>   s390x/zpci: use hotplug_dev instead of looking up the host bridge
 > 
-> I forget what the behaviour is where the source QEMU didn't
-> have a vmstate at all but the destination QEMU does expect
-> one. David can remind me...
+> Do we have consensus on that one yet? I can take it or leave it :)
+> 
+>>   s390x/zpci: move some hotplug checks to the pre_plug handler
+> 
+> depends on the handler rework
 
-If it's a separate device then you tend to get away with it - there's no
-check that all devices receive their state, so it should work.
-This does break backwards migration though - migrating to an older
-qemu with the existing machine type will complain it's received a 
-device which it doesn't understand.
-You should be able to add a .needed to the device
-so it's only sent for new machine types.
-(Which is what I said in August, when I also asked about the data)
+I can pull that one out from the general handler rework (still need
+review either way so it could take a while).
 
-Dave
+> 
+>>   s390x/zpci: properly fail if the zPCI device cannot be created
+> 
+> Waiting for a fixed patch... can queue to s390-fixes if it arrives
+> soon(tm).
 
-> thanks
-> - PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks!
+
+Shall I resend all or only this one?
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
