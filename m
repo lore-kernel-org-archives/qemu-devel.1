@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christoffer.dall@arm.com>) id 1gM8BE-0007rB-ND
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:06:49 -0500
+	(envelope-from <armbru@redhat.com>) id 1gM8DC-0002cS-7g
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:08:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <christoffer.dall@arm.com>) id 1gM8BA-0001Gz-4J
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:06:48 -0500
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:39532
-	helo=foss.arm.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <christoffer.dall@arm.com>) id 1gM8B9-0001EY-Lx
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:06:43 -0500
-Date: Mon, 12 Nov 2018 10:06:35 +0100
-From: Christoffer Dall <christoffer.dall@arm.com>
-Message-ID: <20181112090635.GA11669@C02W217FHV2R.local>
-References: <1540290099-146109-1-git-send-email-mjaggi@caviumnetworks.com>
-	<4bbb4e76-b714-eafe-f95b-aca1a258e9fe@caviumnetworks.com>
+	(envelope-from <armbru@redhat.com>) id 1gM8D0-0002cI-GV
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 04:08:44 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181031003120.26771-1-ehabkost@redhat.com>
+	<20181031003120.26771-12-ehabkost@redhat.com>
+	<CAFEAcA_ScL828ya7P_5=HMx=vbxo=jK4047nAbmb9Ep=6r=2og@mail.gmail.com>
+	<f1bd429f-198a-ee27-9184-636692332816@redhat.com>
+	<20181106141302.GP12503@habkost.net>
+	<87efbxxw1c.fsf@dusky.pond.sub.org>
+	<8ecdbb0e-aaf8-ddc5-6442-87977585d9d8@redhat.com>
+	<87y3a4ot3g.fsf@dusky.pond.sub.org>
+	<CAAdtpL7Z3EpyD33t0rXS=UGUS2kCnC_f4EzQyOOt9CR_VHOSsg@mail.gmail.com>
+	<8736sboi33.fsf@dusky.pond.sub.org>
+	<1b819b85-b713-379e-735a-65bf7d8d5239@redhat.com>
+Date: Mon, 12 Nov 2018 10:07:54 +0100
+In-Reply-To: <1b819b85-b713-379e-735a-65bf7d8d5239@redhat.com> (Max Reitz's
+	message of "Fri, 9 Nov 2018 18:58:56 +0100")
+Message-ID: <87d0rafytx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4bbb4e76-b714-eafe-f95b-aca1a258e9fe@caviumnetworks.com>
-Subject: Re: [Qemu-devel] [RFC] [PATCH] kvm: arm: Introduce error code
- KVM_EINVARIANT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Fix Python 3 detection
+ on older GNU make versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +34,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manish Jaggi <mjaggi@caviumnetworks.com>
-Cc: "Jaggi, Manish" <Manish.Jaggi@cavium.com>, "quintela@redhat.com" <quintela@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "Nair, Jayachandran" <Jayachandran.Nair@cavium.com>, "Nowicki, Tomasz" <Tomasz.Nowicki@cavium.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hi Manish,
+Max Reitz <mreitz@redhat.com> writes:
 
-On Sat, Nov 10, 2018 at 10:18:47PM +0000, Manish Jaggi wrote:
-> 
-> CCing a larger audience.
-> Please review.
-> 
-> On 10/23/2018 03:51 PM, Jaggi, Manish wrote:
-> > From: Manish Jaggi <manish.jaggi@cavium.com>
-> >
-> > This patch introduces an error code KVM_EINVARIANT which is returned
-> > by KVM when userland tries to set an invariant register.
-> >
-> > The need for this error code is in VM Migration for arm64.
-> > ARM64 systems use mainly -machine virt -cpu host as parameter to qemu.
-> > Migration requires both Source and destination machines to have same
-> > physical cpu. There are cases where the overall architecture of CPU is
-> > same but the next version of the chip with some bug fixes which have no
-> > effect on qemu operation. In such cases invariant registers like MIDR
-> > have a different value.
-> > Currently Migration fails in such cases.
-> >
-> > Rather than sending a EINVAL, a specifc error code will help
-> > userland program the guest invariant register by querying the migrated
-> > host machines invariant registers.
-> >
-> > Qemu will have a parameter -hostinvariant along with checking of this
-> > error code. So it can be safely assumed that the feature is opt-in
-> >
-> > Corresponding Qemu patchset can be found at :
-> > https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg05048.html
-> >
-> >
-> > Signed-off-by: Manish Jaggi <manish.jaggi@cavium.com>
-> > ---
-> >   arch/arm64/kvm/sys_regs.c     | 9 ++++-----
-> >   include/uapi/linux/kvm_para.h | 1 +
-> >   2 files changed, 5 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 22fbbdb..78ffc02 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1111,7 +1111,7 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
-> >   
-> >   	/* This is what we mean by invariant: you can't change it. */
-> >   	if (val != read_id_reg(rd, raz))
-> > -		return -EINVAL;
-> > +		return -KVM_EINVARIANT;
-> >   
-> >   	return 0;
-> >   }
-> > @@ -2254,9 +2254,8 @@ static int set_invariant_sys_reg(u64 id, void __user *uaddr)
-> >   		return err;
-> >   
-> >   	/* This is what we mean by invariant: you can't change it. */
-> > -	if (r->val != val)
-> > -		return -EINVAL;
-> > -
-> > +	if (r->val != val)	
-> > +		return -KVM_EINVARIANT;
-> >   	return 0;
-> >   }
-> >   
-> > @@ -2335,7 +2334,7 @@ static int demux_c15_set(u64 id, void __user *uaddr)
-> >   
-> >   		/* This is also invariant: you can't change it. */
-> >   		if (newval != get_ccsidr(val))
-> > -			return -EINVAL;
-> > +			return -KVM_EINVARIANT;
-> >   		return 0;
-> >   	default:
-> >   		return -ENOENT;
-> > diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
-> > index 6c0ce49..4358669 100644
-> > --- a/include/uapi/linux/kvm_para.h
-> > +++ b/include/uapi/linux/kvm_para.h
-> > @@ -17,6 +17,7 @@
-> >   #define KVM_E2BIG		E2BIG
-> >   #define KVM_EPERM		EPERM
-> >   #define KVM_EOPNOTSUPP		95
-> > +#define KVM_EINVARIANT          96
-> >   
-> >   #define KVM_HC_VAPIC_POLL_IRQ		1
-> >   #define KVM_HC_MMU_OP			2
-> 
+> On 08.11.18 13:43, Markus Armbruster wrote:
+>> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+>>=20
+>>> Hi Markus,
+>>>
+>>>
+>>> Le jeu. 8 nov. 2018 09:46, Markus Armbruster <armbru@redhat.com> a =C3=
+=A9crit :
+>>>
+>>>> Cleber Rosa <crosa@redhat.com> writes:
+>>>>
+>>>>> On 11/7/18 1:05 AM, Markus Armbruster wrote:
+>> [...]
+>>>>>> PEP 394 recommends software distributions install Python 3 into the
+>>>>>> default path as python3, and users use that instead of python, except
+>>>>>> for programs that are source compatible with both 2 and 3.  So, is
+>>>>>> finding out whether python is a Python 3 really appropriate?  Why ca=
+n't
+>>>>>> we just use python3 and be done with it?
+>>>>>>
+>>>>>
+>>>>> I mentioned that before, when you pointed out the issue you fix here,
+>>>>> that configure may be the best place to get the Python version (not o=
+nly
+>>>>> the major version) and make it available elsewhere.  Even if not used
+>>>>> for other purposes, it is IMO important information to show on the
+>>>>> resulting "configure" output.
+>>>>>
+>>>>> I'm sending patches to do that in a few.
+>>>>>
+>>>>>> If we can't: isn't this a configure problem?
+>>>>>>
+>>>>>
+>>>>> I believe adhering to PEP394 is a good thing, but even that document
+>>>>> recognizes that the real world is not a perfect place: "however, end
+>>>>> users should be aware that python refers to python3 on at least Arch
+>>>>> Linux".  And it only covers *nix systems, so if we hope to care for
+>>>>> non-*nix systems, we have to check the Python version manually.
+>>>>>
+>>>>> So, I guess the safest approach from QEMU's side is to check for the
+>>>>> version indeed.
+>>>>
+>>>> If somebody can point to a system people still use where python3 doesn=
+'t
+>>>> get you a Python 3, but python does, catering for such (crappy) systems
+>>>> in configure makes sense.  Until then, it's a waste of brain waves and
+>>>> configure run time.
+>>>>
+>>>> PEP 394 mentions Arch Linux.  It's been seven years.  What's the most
+>>>> recent version of Arch Linux that's still crappy in this regard?
+>>>>
+>>>
+>>> Arch doesn't provide python2 by default, thus python points to python3.
+>>=20
+>> That's non-crappy as long as python3 also exists, as PEP 394 recommends.
+>> Does it?
+>
+> Sure it does.
+>
+> Arch is just problematic in how it handles "python" itself.  I don't
+> think there is any system that has Python 3 but no "python3".
 
-Eh, unless I'm severely missing something, I think you're confusing how
-these error codes are used.
+Bottom line: we can safely assume that a host that has Python 3 provides
+it as python3.
 
-The error codes in include/uapi/linux/kvm_para.h are for hypercalls from
-guests, not return values to userspace.  For the latter, we don't
-have a habit of inventing new constants for something subsystem
-specific, but instead we use the existing error codes which can be
-understood by userspace software.
+Corollary:
 
-What's more, changing an error code is an ABI change and not something
-you can just do at will.  If we are overloading EINVAL with the
-KVM_SET_ONE_REG syscall (are we?), then you need to find some way to
-communicate the additional information you need to userspace without
-interfering with legacy userspace software's interaction with the
-kernel.
+* When python3 doesn't exist, checking whether python is Python 3 is
+  futile.
 
-
-Thanks,
-
-    Christoffer
+* Checking whether python3 really is Python 3 is silly.
