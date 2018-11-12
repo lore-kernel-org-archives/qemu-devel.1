@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1gM9su-0003E4-AM
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:56:00 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gM9v6-0005x0-UN
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:58:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1gM9sm-0000r0-2S
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:55:59 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52327)
+	(envelope-from <peter.maydell@linaro.org>) id 1gM9v6-0003XT-1u
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:58:16 -0500
+Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:46815)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1gM9sj-0000iB-IE
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:55:51 -0500
-Received: by mail-wm1-x341.google.com with SMTP id r11-v6so7984073wmb.2
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 02:55:45 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20181111233622.8976-1-f4bug@amsat.org>
-	<20181111233622.8976-9-f4bug@amsat.org>
-	<BN6PR2201MB1251ADAEA3C596FD3F1AB3E6C6C10@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<ad3bd757-861d-2086-94e5-64779cd0affb@linaro.org>
-	<CY4PR2201MB12548AC0153261DF7E3BABECC6C10@CY4PR2201MB1254.namprd22.prod.outlook.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <725979ee-296e-61c1-c2c8-53370616f709@twiddle.net>
-Date: Mon, 12 Nov 2018 11:55:39 +0100
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gM9v5-0003WA-AO
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 05:58:15 -0500
+Received: by mail-oi1-x22f.google.com with SMTP id e19-v6so6764326oii.13
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 02:58:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CY4PR2201MB12548AC0153261DF7E3BABECC6C10@CY4PR2201MB1254.namprd22.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 08/11] target/mips: Add a decodetree
- stub
+In-Reply-To: <a92fc500-6c7c-d995-744d-cf7e36d76e0b@ilande.co.uk>
+References: <CAFEAcA9pvsNML+=2jwygO4ciJWr0GmWHznJ-Lb1bcOsWhYjo4A@mail.gmail.com>
+	<8a4b7981-cc1f-d2a7-2d92-9bf54a4bb42a@ilande.co.uk>
+	<CAFEAcA_L_L-NiqS98P9n4LShHyBBujNrkQXThEgQ0C7nVC86cQ@mail.gmail.com>
+	<a92fc500-6c7c-d995-744d-cf7e36d76e0b@ilande.co.uk>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 12 Nov 2018 10:57:48 +0000
+Message-ID: <CAFEAcA-GqB-ZsFW2x+_j6XaaHY7L4m+2gSrD2JRQ7PJ2VANoYg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] List of files containing devices which have not
+ been QOMified
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,22 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peer Adelt <peer.adelt@hni.uni-paderborn.de>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 11/12/18 11:04 AM, Aleksandar Markovic wrote:
-> Hello, Richard.
-> 
-> I am a little taken aback by your tone. I hope we can communicate in much friendlier maner, as we used to do.
+On 10 November 2018 at 15:20, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> On 09/11/2018 10:31, Peter Maydell wrote:
+>> I think the code I saw that looked like a non-QOMified
+>> device was cpu_timer_create().
 
-I too was put off by your tone.  Beginning with "there is no plan" and
-continuing with "there is no point" is a curt reply.  It is off-putting to
-someone attempting to contribute, and I felt it was unwarranted.
+> Ah okay. The above timers are certainly internal CPU timers rather than external, so
+> should they still be QOMified? How are timers modelled for other CPUs?
 
-> I am not preventing anyone from experimenting. I just want to warn Philippe about high-level view that the code in question, although not the nicest, works, and is planned to be maintained with minimal changes. The focus of MIPS target is on adding new architectures and ASEs, and (I correct myself) it could be that decodetree would kick in in such cases - but not for mature code driving older architectures. It just doesn't make enough sense.
+So, a couple of caveats first:
+ * I haven't really looked at the sparc code
+ * as I mentioned elsewhere in this thread, I'm not sure this is
+   necessarily our most-important cleanup/refactoring
 
-I think this is a mistake.  The legacy code is quite tangled.  It *should* have
-an overhaul.  If someone is willing to do that work, fantastic.
+There are a couple of "QOM-style" ways I know of to do cpu timers:
 
+(1) the Arm Cortex-A9/A15 have some timers that are part of the cpu
+in the sense that they're always there in hardware, but they're just
+memory-mapped devices at a known address. We model these as
+the usual sort of standalone QOM device, with a convenience
+container object in hw/cpu/ that instantiates the various devices
+and wires things up.
 
-r~
+(2) the newer Arm "generic timers" are more closely coupled to the
+CPU, because they're programmed via system registers. These we
+actually model as part of the CPU object itself, with the code all
+in target/arm. The CPU object then exposes outbound GPIO lines
+which are the interrupt signals for the timers, and which the board
+or SoC code wires up to the interrupt controller.
+
+So it depends on how closely coupled the sparc cpu timers are to
+the cpu, I think.
+
+thanks
+-- PMM
