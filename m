@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37237)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLztV-0001jI-I0
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 19:15:58 -0500
+	id 1gLzvG-0003Md-5d
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 19:17:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gLztU-0004Rh-HK
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 19:15:57 -0500
+	id 1gLzvC-00078u-3d
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 19:17:45 -0500
 MIME-Version: 1.0
-References: <20181109134731.11605-1-peter.maydell@linaro.org>
-	<20181109134731.11605-2-peter.maydell@linaro.org>
-In-Reply-To: <20181109134731.11605-2-peter.maydell@linaro.org>
+References: <20181106164118.16184-1-peter.maydell@linaro.org>
+In-Reply-To: <20181106164118.16184-1-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 12 Nov 2018 01:15:29 +0100
-Message-ID: <CAAdtpL4TJonY7ko9V9ggNut--evB9s6YkrfNJJtj73ZUOxZ3gA@mail.gmail.com>
+Date: Mon, 12 Nov 2018 01:17:06 +0100
+Message-ID: <CAAdtpL5vyvWOdh0FCgaJAmCgKhf0SLEU8jFo+2_qzAFh-26AoQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-v3.1 1/3] Revert
- "target/arm: Implement HCR.VI and VF"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-3.1] target/arm: Remove
+ antique TODO comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,24 +26,14 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, adam.lackorzynski@kernkonzept.com, Patch Tracking <patches@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-On Fri, Nov 9, 2018 at 2:48 PM Peter Maydell <peter.maydell@linaro.org> wro=
+On Tue, Nov 6, 2018 at 5:41 PM Peter Maydell <peter.maydell@linaro.org> wro=
 te:
 >
-> This reverts commit 8a0fc3a29fc2315325400c738f807d0d4ae0ab7f.
->
-> The implementation of HCR.VI and VF in that commit is not
-> correct -- they do not track the overall "is there a pending
-> VIRQ or VFIQ" status, but whether there is a pending interrupt
-> due to "this mechanism", ie the hypervisor having set the VI/VF
-> bits. The overall pending state for VIRQ and VFIQ is effectively
-> the logical OR of the inbound lines from the GIC with the
-> VI and VF bits. Commit 8a0fc3a29fc231 would result in pending
-> VIRQ/VFIQ possibly being lost when the hypervisor wrote to HCR.
->
-> As a preliminary to implementing the HCR.VI/VF feature properly,
-> revert the broken one entirely.
+> Remove a TODO comment about implementing the vectored interrupt
+> controller. We have had an implementation of that for a decade;
+> it's in hw/intc/pl190.c.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
@@ -76,101 +65,22 @@ te:
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 > ---
->  target/arm/helper.c | 47 ++++-----------------------------------------
->  1 file changed, 4 insertions(+), 43 deletions(-)
+>  target/arm/helper.c | 1 -
+>  1 file changed, 1 deletion(-)
 >
 > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 851ea9aa977..f3878f505b7 100644
+> index ec56becc394..851ea9aa977 100644
 > --- a/target/arm/helper.c
 > +++ b/target/arm/helper.c
-> @@ -3931,7 +3931,6 @@ static const ARMCPRegInfo el3_no_el2_v8_cp_reginfo[=
-] =3D {
->  static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t=
- value)
->  {
->      ARMCPU *cpu =3D arm_env_get_cpu(env);
-> -    CPUState *cs =3D ENV_GET_CPU(env);
->      uint64_t valid_mask =3D HCR_MASK;
+> @@ -8378,7 +8378,6 @@ static void arm_cpu_do_interrupt_aarch32(CPUState *=
+cs)
+>          return;
+>      }
 >
->      if (arm_feature(env, ARM_FEATURE_EL3)) {
-> @@ -3950,28 +3949,6 @@ static void hcr_write(CPUARMState *env, const ARMC=
-PRegInfo *ri, uint64_t value)
->      /* Clear RES0 bits.  */
->      value &=3D valid_mask;
->
-> -    /*
-> -     * VI and VF are kept in cs->interrupt_request. Modifying that
-> -     * requires that we have the iothread lock, which is done by
-> -     * marking the reginfo structs as ARM_CP_IO.
-> -     * Note that if a write to HCR pends a VIRQ or VFIQ it is never
-> -     * possible for it to be taken immediately, because VIRQ and
-> -     * VFIQ are masked unless running at EL0 or EL1, and HCR
-> -     * can only be written at EL2.
-> -     */
-> -    g_assert(qemu_mutex_iothread_locked());
-> -    if (value & HCR_VI) {
-> -        cs->interrupt_request |=3D CPU_INTERRUPT_VIRQ;
-> -    } else {
-> -        cs->interrupt_request &=3D ~CPU_INTERRUPT_VIRQ;
-> -    }
-> -    if (value & HCR_VF) {
-> -        cs->interrupt_request |=3D CPU_INTERRUPT_VFIQ;
-> -    } else {
-> -        cs->interrupt_request &=3D ~CPU_INTERRUPT_VFIQ;
-> -    }
-> -    value &=3D ~(HCR_VI | HCR_VF);
-> -
->      /* These bits change the MMU setup:
->       * HCR_VM enables stage 2 translation
->       * HCR_PTW forbids certain page-table setups
-> @@ -3999,32 +3976,16 @@ static void hcr_writelow(CPUARMState *env, const =
-ARMCPRegInfo *ri,
->      hcr_write(env, NULL, value);
->  }
->
-> -static uint64_t hcr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-> -{
-> -    /* The VI and VF bits live in cs->interrupt_request */
-> -    uint64_t ret =3D env->cp15.hcr_el2 & ~(HCR_VI | HCR_VF);
-> -    CPUState *cs =3D ENV_GET_CPU(env);
-> -
-> -    if (cs->interrupt_request & CPU_INTERRUPT_VIRQ) {
-> -        ret |=3D HCR_VI;
-> -    }
-> -    if (cs->interrupt_request & CPU_INTERRUPT_VFIQ) {
-> -        ret |=3D HCR_VF;
-> -    }
-> -    return ret;
-> -}
-> -
->  static const ARMCPRegInfo el2_cp_reginfo[] =3D {
->      { .name =3D "HCR_EL2", .state =3D ARM_CP_STATE_AA64,
-> -      .type =3D ARM_CP_IO,
->        .opc0 =3D 3, .opc1 =3D 4, .crn =3D 1, .crm =3D 1, .opc2 =3D 0,
->        .access =3D PL2_RW, .fieldoffset =3D offsetof(CPUARMState, cp15.hc=
-r_el2),
-> -      .writefn =3D hcr_write, .readfn =3D hcr_read },
-> +      .writefn =3D hcr_write },
->      { .name =3D "HCR", .state =3D ARM_CP_STATE_AA32,
-> -      .type =3D ARM_CP_ALIAS | ARM_CP_IO,
-> +      .type =3D ARM_CP_ALIAS,
->        .cp =3D 15, .opc1 =3D 4, .crn =3D 1, .crm =3D 1, .opc2 =3D 0,
->        .access =3D PL2_RW, .fieldoffset =3D offsetof(CPUARMState, cp15.hc=
-r_el2),
-> -      .writefn =3D hcr_writelow, .readfn =3D hcr_read },
-> +      .writefn =3D hcr_writelow },
->      { .name =3D "ELR_EL2", .state =3D ARM_CP_STATE_AA64,
->        .type =3D ARM_CP_ALIAS,
->        .opc0 =3D 3, .opc1 =3D 4, .crn =3D 4, .crm =3D 0, .opc2 =3D 1,
-> @@ -4261,7 +4222,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] =3D {
->
->  static const ARMCPRegInfo el2_v8_cp_reginfo[] =3D {
->      { .name =3D "HCR2", .state =3D ARM_CP_STATE_AA32,
-> -      .type =3D ARM_CP_ALIAS | ARM_CP_IO,
-> +      .type =3D ARM_CP_ALIAS,
->        .cp =3D 15, .opc1 =3D 4, .crn =3D 1, .crm =3D 1, .opc2 =3D 4,
->        .access =3D PL2_RW,
->        .fieldoffset =3D offsetofhigh32(CPUARMState, cp15.hcr_el2),
+> -    /* TODO: Vectored interrupt controller.  */
+>      switch (cs->exception_index) {
+>      case EXCP_UDEF:
+>          new_mode =3D ARM_CPU_MODE_UND;
 > --
 > 2.19.1
 >
