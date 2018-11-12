@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gMJA3-0003j3-4c
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:50:20 -0500
+	(envelope-from <mst@redhat.com>) id 1gMJD7-0006NM-Q6
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:53:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gMJA0-0000Hs-CY
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:50:19 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:46453)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1gMJA0-0000Gv-1L
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:50:16 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 12 Nov 2018 21:49:27 +0100
-Message-Id: <20181112204929.12625-3-laurent@vivier.eu>
-In-Reply-To: <20181112204929.12625-1-laurent@vivier.eu>
-References: <20181112204929.12625-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 2/4] linux-user: Don't call gdb_handlesig()
- before queue_signal()
+	(envelope-from <mst@redhat.com>) id 1gMJCz-0005yL-8O
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:53:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gMJCz-0005y0-08
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 15:53:21 -0500
+Date: Mon, 12 Nov 2018 15:53:16 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181112155208-mutt-send-email-mst@kernel.org>
+References: <20181109145827.23076-1-yuri.benditovich@daynix.com>
+	<20181109125947-mutt-send-email-mst@kernel.org>
+	<CAOEp5OdXFYYDB_7vNFsrtf=iwpL+ys9Hf_0gR-JXJ+wLnmDw5g@mail.gmail.com>
+	<20181111215232-mutt-send-email-mst@kernel.org>
+	<CAOEp5Oe_TFTpQ_yBGJ-OyCw_Zne7bF0nUGV8XpG+4Fd+TJ7i8g@mail.gmail.com>
+	<b800852b-e81e-459c-c6e1-15d4c99fc0eb@redhat.com>
+	<CAOEp5OeNpxdmuNqSTr8C2NZ=oSOY6S4TO3Y5PY+1dKDbap4zDw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAOEp5OeNpxdmuNqSTr8C2NZ=oSOY6S4TO3Y5PY+1dKDbap4zDw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-net: support RSC v4/v6 tcp traffic
+ for Windows HCK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,456 +34,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Cc: Jason Wang <jasowang@redhat.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-devel@nongnu.org, Yan Vugenfirer <yan@daynix.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+On Mon, Nov 12, 2018 at 01:31:36PM +0200, Yuri Benditovich wrote:
+>=20
+>=20
+> On Mon, Nov 12, 2018 at 11:26 AM Jason Wang <jasowang@redhat.com> wrote=
+:
+>=20
+>=20
+>     On 2018/11/12 =E4=B8=8B=E5=8D=884:57, Yuri Benditovich wrote:
+>     >
+>     > On Mon, Nov 12, 2018 at 4:54 AM Michael S. Tsirkin <mst@redhat.co=
+m
+>     > <mailto:mst@redhat.com>> wrote:
+>     >
+>     >=C2=A0 =C2=A0 =C2=A0On Sun, Nov 11, 2018 at 12:18:54PM +0200, Yuri=
+ Benditovich wrote:
+>     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> @@ -66,12 +143,16 @@ ty=
+pedef struct VirtIONet {
+>     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 Vir=
+tIONetQueue *vqs;
+>     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 Vir=
+tQueue *ctrl_vq;
+>     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0 NIC=
+State *nic;
+>     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0> +=C2=A0 =C2=A0 QTAILQ_H=
+EAD(, NetRscChain) rsc_chains;
+>     >=C2=A0 =C2=A0 =C2=A0>
+>     >=C2=A0 =C2=A0 =C2=A0>=C2=A0 =C2=A0 =C2=A0what exactly happens with=
+ these chains on migration?
+>     >=C2=A0 =C2=A0 =C2=A0>
+>     >=C2=A0 =C2=A0 =C2=A0>
+>     >=C2=A0 =C2=A0 =C2=A0> This feature (software implementation of RSC=
+ in QEMU) is
+>     >=C2=A0 =C2=A0 =C2=A0intended to be used in
+>     >=C2=A0 =C2=A0 =C2=A0> the environment of certification tests which=
+ never uses migration.
+>     >
+>     >=C2=A0 =C2=A0 =C2=A0Should this feature disable migration then?
+>     >
+>     >
+>     > IMO, this should not. But if you find it mandatory, please respon=
+d and
+>     > I will add the migration blocker.
+>=20
+>=20
+>     So if my understanding is correct, it's safe to do nothing even if =
+we
+>     allow migration for RSC?
+>=20
+>=20
+> This does not create any unrecoverable failure (assertion, BSOD), altho=
+ugh
+> some data (coalesced parts of packets not delivered yet to guest) will =
+be lost.
 
-The CPU main-loop routines for linux-user generally
-call gdb_handlesig() when they're about to queue a
-SIGTRAP signal. This is wrong, because queue_signal()
-will cause us to pend a signal, and process_pending_signals()
-will then call gdb_handlesig() itself. So the effect is that
-we notify gdb of the SIGTRAP, and then if gdb says "OK,
-continue with signal X" we will incorrectly notify
-gdb of the signal X as well. We don't do this double-notify
-for anything else, only SIGTRAP.
+If guest has no way to detect none of these packets were ever
+received by card, then I guess it's fine. Needs a
+comment in case we start caring about packet loss around
+migration.
 
-Remove this unnecessary and incorrect code from all
-the targets except for nios2 (whose main loop is
-doing something different and broken, and will be handled
-in a separate patch).
-
-This bug only manifests if the user responds to the reported
-SIGTRAP using "signal SIGFOO" rather than "continue"; since
-the latter is the overwhelmingly common thing to do after a
-breakpoint most people won't have hit this.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20181019174958.26616-2-peter.maydell@linaro.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/aarch64/cpu_loop.c    | 13 +++++--------
- linux-user/alpha/cpu_loop.c      | 12 ++++--------
- linux-user/arm/cpu_loop.c        | 16 ++++------------
- linux-user/cris/cpu_loop.c       | 16 ++++------------
- linux-user/hppa/cpu_loop.c       | 11 ++++-------
- linux-user/i386/cpu_loop.c       | 16 ++++------------
- linux-user/m68k/cpu_loop.c       | 16 ++++------------
- linux-user/microblaze/cpu_loop.c | 16 ++++------------
- linux-user/mips/cpu_loop.c       | 16 ++++------------
- linux-user/openrisc/cpu_loop.c   | 11 ++++-------
- linux-user/ppc/cpu_loop.c        | 15 +++++----------
- linux-user/riscv/cpu_loop.c      |  2 +-
- linux-user/s390x/cpu_loop.c      |  9 +++------
- linux-user/sh4/cpu_loop.c        | 17 ++++-------------
- linux-user/sparc/cpu_loop.c      | 16 ++++------------
- linux-user/xtensa/cpu_loop.c     | 11 ++++-------
- 16 files changed, 62 insertions(+), 151 deletions(-)
-
-diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
-index c97a646546..65d815f030 100644
---- a/linux-user/aarch64/cpu_loop.c
-+++ b/linux-user/aarch64/cpu_loop.c
-@@ -73,7 +73,7 @@
- void cpu_loop(CPUARMState *env)
- {
-     CPUState *cs = CPU(arm_env_get_cpu(env));
--    int trapnr, sig;
-+    int trapnr;
-     abi_long ret;
-     target_siginfo_t info;
- 
-@@ -121,13 +121,10 @@ void cpu_loop(CPUARMState *env)
-             break;
-         case EXCP_DEBUG:
-         case EXCP_BKPT:
--            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (sig) {
--                info.si_signo = sig;
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_SEMIHOST:
-             env->xregs[0] = do_arm_semihosting(env);
-diff --git a/linux-user/alpha/cpu_loop.c b/linux-user/alpha/cpu_loop.c
-index c1a98c8cbf..824b6d6658 100644
---- a/linux-user/alpha/cpu_loop.c
-+++ b/linux-user/alpha/cpu_loop.c
-@@ -179,14 +179,10 @@ void cpu_loop(CPUAlphaState *env)
-             }
-             break;
-         case EXCP_DEBUG:
--            info.si_signo = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (info.si_signo) {
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            } else {
--                arch_interrupt = false;
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_INTERRUPT:
-             /* Just indicate that signals should be handled asap.  */
-diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
-index 26928fbbb2..ee68aa60bf 100644
---- a/linux-user/arm/cpu_loop.c
-+++ b/linux-user/arm/cpu_loop.c
-@@ -397,18 +397,10 @@ void cpu_loop(CPUARMState *env)
-             break;
-         case EXCP_DEBUG:
-         excp_debug:
--            {
--                int sig;
--
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig)
--                  {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                  }
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_KERNEL_TRAP:
-             if (do_kernel_trap(env))
-diff --git a/linux-user/cris/cpu_loop.c b/linux-user/cris/cpu_loop.c
-index 37bdcfa8cc..dacf604c7d 100644
---- a/linux-user/cris/cpu_loop.c
-+++ b/linux-user/cris/cpu_loop.c
-@@ -64,18 +64,10 @@ void cpu_loop(CPUCRISState *env)
-             }
-             break;
-         case EXCP_DEBUG:
--            {
--                int sig;
--
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig)
--                  {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                  }
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_ATOMIC:
-             cpu_exec_step_atomic(cs);
-diff --git a/linux-user/hppa/cpu_loop.c b/linux-user/hppa/cpu_loop.c
-index 0301c766c6..880955fdef 100644
---- a/linux-user/hppa/cpu_loop.c
-+++ b/linux-user/hppa/cpu_loop.c
-@@ -182,13 +182,10 @@ void cpu_loop(CPUHPPAState *env)
-             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_DEBUG:
--            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (trapnr) {
--                info.si_signo = trapnr;
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_INTERRUPT:
-             /* just indicate that signals should be handled asap */
-diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
-index 2374abfd0b..51cfa006c9 100644
---- a/linux-user/i386/cpu_loop.c
-+++ b/linux-user/i386/cpu_loop.c
-@@ -225,18 +225,10 @@ void cpu_loop(CPUX86State *env)
-             /* just indicate that signals should be handled asap */
-             break;
-         case EXCP_DEBUG:
--            {
--                int sig;
--
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig)
--                  {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                  }
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_ATOMIC:
-             cpu_exec_step_atomic(cs);
-diff --git a/linux-user/m68k/cpu_loop.c b/linux-user/m68k/cpu_loop.c
-index 30c3332af4..bfb41bbcc5 100644
---- a/linux-user/m68k/cpu_loop.c
-+++ b/linux-user/m68k/cpu_loop.c
-@@ -112,18 +112,10 @@ void cpu_loop(CPUM68KState *env)
-             }
-             break;
-         case EXCP_DEBUG:
--            {
--                int sig;
--
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig)
--                  {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                  }
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_ATOMIC:
-             cpu_exec_step_atomic(cs);
-diff --git a/linux-user/microblaze/cpu_loop.c b/linux-user/microblaze/cpu_loop.c
-index 2af93eb39a..c2190e15fd 100644
---- a/linux-user/microblaze/cpu_loop.c
-+++ b/linux-user/microblaze/cpu_loop.c
-@@ -113,18 +113,10 @@ void cpu_loop(CPUMBState *env)
-             }
-             break;
-         case EXCP_DEBUG:
--            {
--                int sig;
--
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig)
--                  {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                  }
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_ATOMIC:
-             cpu_exec_step_atomic(cs);
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 97e495747f..d0f62ec9b6 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -592,18 +592,10 @@ done_syscall:
-             /* just indicate that signals should be handled asap */
-             break;
-         case EXCP_DEBUG:
--            {
--                int sig;
--
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig)
--                  {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                  }
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_SC:
-             if (do_store_exclusive(env)) {
-diff --git a/linux-user/openrisc/cpu_loop.c b/linux-user/openrisc/cpu_loop.c
-index 6c6ea871e1..f496e4b48a 100644
---- a/linux-user/openrisc/cpu_loop.c
-+++ b/linux-user/openrisc/cpu_loop.c
-@@ -85,13 +85,10 @@ void cpu_loop(CPUOpenRISCState *env)
-             /* We processed the pending cpu work above.  */
-             break;
-         case EXCP_DEBUG:
--            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (trapnr) {
--                info.si_signo = trapnr;
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_ATOMIC:
-             cpu_exec_step_atomic(cs);
-diff --git a/linux-user/ppc/cpu_loop.c b/linux-user/ppc/cpu_loop.c
-index 133a87f349..801f5ace29 100644
---- a/linux-user/ppc/cpu_loop.c
-+++ b/linux-user/ppc/cpu_loop.c
-@@ -69,7 +69,7 @@ void cpu_loop(CPUPPCState *env)
- {
-     CPUState *cs = CPU(ppc_env_get_cpu(env));
-     target_siginfo_t info;
--    int trapnr, sig;
-+    int trapnr;
-     target_ulong ret;
- 
-     for(;;) {
-@@ -449,15 +449,10 @@ void cpu_loop(CPUPPCState *env)
-             env->gpr[3] = ret;
-             break;
-         case EXCP_DEBUG:
--            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (sig) {
--                info.si_signo = sig;
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--            } else {
--                arch_interrupt = false;
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_INTERRUPT:
-             /* just indicate that signals should be handled asap */
-diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
-index f137d39d7e..4cf3e94632 100644
---- a/linux-user/riscv/cpu_loop.c
-+++ b/linux-user/riscv/cpu_loop.c
-@@ -88,7 +88,7 @@ void cpu_loop(CPURISCVState *env)
-             break;
-         case EXCP_DEBUG:
-         gdbstep:
--            signum = gdb_handlesig(cs, TARGET_SIGTRAP);
-+            signum = TARGET_SIGTRAP;
-             sigcode = TARGET_TRAP_BRKPT;
-             break;
-         default:
-diff --git a/linux-user/s390x/cpu_loop.c b/linux-user/s390x/cpu_loop.c
-index 99f5f1594f..51b5412ea2 100644
---- a/linux-user/s390x/cpu_loop.c
-+++ b/linux-user/s390x/cpu_loop.c
-@@ -61,12 +61,9 @@ void cpu_loop(CPUS390XState *env)
-             break;
- 
-         case EXCP_DEBUG:
--            sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (sig) {
--                n = TARGET_TRAP_BRKPT;
--                goto do_signal_pc;
--            }
--            break;
-+            sig = TARGET_SIGTRAP;
-+            n = TARGET_TRAP_BRKPT;
-+            goto do_signal_pc;
-         case EXCP_PGM:
-             n = env->int_pgm_code;
-             switch (n) {
-diff --git a/linux-user/sh4/cpu_loop.c b/linux-user/sh4/cpu_loop.c
-index fdd348170b..47e54b9b61 100644
---- a/linux-user/sh4/cpu_loop.c
-+++ b/linux-user/sh4/cpu_loop.c
-@@ -57,19 +57,10 @@ void cpu_loop(CPUSH4State *env)
-             /* just indicate that signals should be handled asap */
-             break;
-         case EXCP_DEBUG:
--            {
--                int sig;
--
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig) {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                } else {
--                    arch_interrupt = false;
--                }
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case 0xa0:
-         case 0xc0:
-diff --git a/linux-user/sparc/cpu_loop.c b/linux-user/sparc/cpu_loop.c
-index 91f714afc6..7d5b337b97 100644
---- a/linux-user/sparc/cpu_loop.c
-+++ b/linux-user/sparc/cpu_loop.c
-@@ -268,18 +268,10 @@ void cpu_loop (CPUSPARCState *env)
-             }
-             break;
-         case EXCP_DEBUG:
--            {
--                int sig;
--
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
--                if (sig)
--                  {
--                    info.si_signo = sig;
--                    info.si_errno = 0;
--                    info.si_code = TARGET_TRAP_BRKPT;
--                    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
--                  }
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXCP_ATOMIC:
-             cpu_exec_step_atomic(cs);
-diff --git a/linux-user/xtensa/cpu_loop.c b/linux-user/xtensa/cpu_loop.c
-index d142988ebe..bee78edb8a 100644
---- a/linux-user/xtensa/cpu_loop.c
-+++ b/linux-user/xtensa/cpu_loop.c
-@@ -239,13 +239,10 @@ void cpu_loop(CPUXtensaState *env)
-             }
-             break;
-         case EXCP_DEBUG:
--            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
--            if (trapnr) {
--                info.si_signo = trapnr;
--                info.si_errno = 0;
--                info.si_code = TARGET_TRAP_BRKPT;
--                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
--            }
-+            info.si_signo = TARGET_SIGTRAP;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_TRAP_BRKPT;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-             break;
-         case EXC_DEBUG:
-         default:
--- 
-2.17.2
+>=20
+>=20
+>     Thanks
+>=20
+>=20
+>=20
