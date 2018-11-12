@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gM0of-0003RK-TR
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 20:15:02 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gM1nX-0001eS-97
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 21:17:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gM0oe-0005Yd-TF
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 20:15:01 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2344 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gM0od-0005Wm-W5
-	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 20:15:00 -0500
-From: xiezhide <xiezhide@huawei.com>
-Date: Mon, 12 Nov 2018 01:14:55 +0000
-Message-ID: <A02D6AA901860840B46E751C5E9E38B43CC96A5B@DGGEML532-MBX.china.huawei.com>
-References: <A02D6AA901860840B46E751C5E9E38B42AFDB13F@DGGEML532-MBX.china.huawei.com>
-In-Reply-To: <A02D6AA901860840B46E751C5E9E38B42AFDB13F@DGGEML532-MBX.china.huawei.com>
-Content-Language: en-US
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gM1nT-0007Nn-5h
+	for qemu-devel@nongnu.org; Sun, 11 Nov 2018 21:17:54 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+References: <20181031213550.4544-1-jcmvbkbc@gmail.com>
+	<13f47aff-593a-e35e-959b-4ddd9f6c6121@linaro.org>
+	<CAAdtpL4r52iMNzUtKEDvdwOVomGEfL9paPNGMyj=VG23sFQOSw@mail.gmail.com>
+In-Reply-To: <CAAdtpL4r52iMNzUtKEDvdwOVomGEfL9paPNGMyj=VG23sFQOSw@mail.gmail.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Sun, 11 Nov 2018 18:17:31 -0800
+Message-ID: <CAMo8BfKwa22e9Dud0DKqRrOQFU43_TBMCMVMhnzCDASLQrma0Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/2] virtio-9p: qmp interface for set/query io
- throttle for fsdev devices
+Subject: Re: [Qemu-devel] [PATCH] target/xtensa: drop num_[core_]regs from
+ dc232b/dc233c configs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "groug@kaod.org" <groug@kaod.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "berto@igalia.com" <berto@igalia.com>"dgilbert@redhat.com" <dgilbert@redhat.com>"armbru@redhat.com" <armbru@redhat.com>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-These patches provide the qmp interface, to set/query the io throttle
-status of the all fsdev devices that are present in a vm.
-Some of the patches also remove the
-duplicate code that was present in block and fsdev files.
+On Sun, Nov 11, 2018 at 3:53 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> Hi Max,
+>
+> On Thu, Nov 1, 2018 at 12:02 AM Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+> >
+> > On 10/31/18 9:35 PM, Max Filippov wrote:
+> > > gdb_regmap::num_core_regs field is initialized incorrectly in the dc2=
+32b
+> > > and dc233c configurations. As a result the following message is
+> > > displayed when attaching to an xtensa linux-user process:
+> > >
+> > >   "Register 105 is not available",
+> > >
+> > > and gdb is unable to control the inferior.
+> > >
+> > > Now that xtensa_count_regs does the right thing, remove manual
+> > > initialization of these fields from the affected configurations and l=
+et
+> > > xtensa_finalize_config initialize them.
+> > >
+> > > Cc: qemu-stable@nongnu.org
+> > > Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+> > > ---
+> > >  target/xtensa/core-dc232b.c | 2 --
+> > >  target/xtensa/core-dc233c.c | 2 --
+> > >  2 files changed, 4 deletions(-)
+> >
+> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>
+> Can we include this patch for the 3.2 release?
 
-Zhide Xie (2):
-  fsdev-qmp: qmp interface for set/query io throttle for fsdev devices.
-  fsdev-qmp: fix coding style issue
+I've found that this version is wrong (register lists are not
+terminated for these
+two cores), so I sent v2. After that I've found that it's still wrong,
+i.e. the register
+105 is still not available with v2. I dug a bit deeper and it looks
+like register
+handling should probably be the same for both system and linux-user cases.
+I'll post v3 after some more testing in a few days.
 
-Makefile                                                |  20 +++-
-Makefile.objs                                       |   8 ++
-block/throttle.c                                   |   6 +-
-blockdev.c                                             |  96 +-------------=
----
-fsdev/qemu-fsdev-dummy.c            |  11 ++
-fsdev/qemu-fsdev-throttle.c            | 144 +++++++++++++++++---------
-fsdev/qemu-fsdev-throttle.h           |   6 +-
-fsdev/qemu-fsdev.c                            |  29 ++++++
-hmp-commands-info.hx                     |  15 +++
-hmp-commands.hx                             |  15 +++
-hmp.c                                                     |  83 +++++++++++=
-++--
-hmp.h                                                     |   4 +
-include/qemu/throttle-options.h    |   3 +-
-include/qemu/throttle.h                   |   4 +-
-include/qemu/typedefs.h                  |   1 +
-monitor.c                                               |   4 +
-qapi/block-core.json                           | 122 +---------------------
-qapi/fsdev.json                                     |  96 +++++++++++++++++
-qapi/qapi-schema.json                       |   1 +
-qapi/tlimits.json                                   |  89 ++++++++++++++++
-qmp.c                                                      |  12 +++
-util/throttle.c                                        | 224 ++++++++++++++=
-++++++++++++--------------
-22 files changed, 639 insertions(+), 354 deletions(-)
-create mode 100644 qapi/fsdev.json
-create mode 100644 qapi/tlimits.json
-
---
-1.8.3.1
+--=20
+Thanks.
+-- Max
