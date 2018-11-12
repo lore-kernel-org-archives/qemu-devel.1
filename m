@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMFfq-0000m6-No
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gMFfs-0000nl-1a
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:07:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMFfp-0007JO-Kx
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:54 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gMFfq-0007Jp-2S
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 12:06:55 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 12 Nov 2018 18:05:56 +0100
-Message-Id: <20181112170603.23986-8-kwolf@redhat.com>
+Date: Mon, 12 Nov 2018 18:05:57 +0100
+Message-Id: <20181112170603.23986-9-kwolf@redhat.com>
 In-Reply-To: <20181112170603.23986-1-kwolf@redhat.com>
 References: <20181112170603.23986-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/14] file-posix: Drop s->lock_fd
+Subject: [Qemu-devel] [PULL 08/14] tests: Add unit tests for image locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,130 +26,220 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Fam Zheng <famz@redhat.com>
 
-The lock_fd field is not strictly necessary because transferring locked
-bytes from old fd to the new one shouldn't fail anyway. This spares the
-user one fd per image.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 37 +++++++++++++------------------------
- 1 file changed, 13 insertions(+), 24 deletions(-)
+ tests/test-image-locking.c | 157 +++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include     |   2 +
+ 2 files changed, 159 insertions(+)
+ create mode 100644 tests/test-image-locking.c
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 1b4ff8de00..58c86a01ea 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -142,7 +142,6 @@ do { \
-=20
- typedef struct BDRVRawState {
-     int fd;
--    int lock_fd;
-     bool use_lock;
-     int type;
-     int open_flags;
-@@ -153,7 +152,7 @@ typedef struct BDRVRawState {
-     uint64_t shared_perm;
-=20
-     /* The perms bits whose corresponding bytes are already locked in
--     * s->lock_fd. */
-+     * s->fd. */
-     uint64_t locked_perm;
-     uint64_t locked_shared_perm;
-=20
-@@ -551,18 +550,6 @@ static int raw_open_common(BlockDriverState *bs, QDi=
-ct *options,
-     }
-     s->fd =3D fd;
-=20
--    s->lock_fd =3D -1;
--    if (s->use_lock) {
--        fd =3D qemu_open(filename, s->open_flags);
--        if (fd < 0) {
--            ret =3D -errno;
--            error_setg_errno(errp, errno, "Could not open '%s' for locki=
-ng",
--                             filename);
--            qemu_close(s->fd);
--            goto fail;
--        }
--        s->lock_fd =3D fd;
--    }
-     s->perm =3D 0;
-     s->shared_perm =3D BLK_PERM_ALL;
-=20
-@@ -823,15 +810,13 @@ static int raw_handle_perm_lock(BlockDriverState *b=
-s,
-         return 0;
-     }
-=20
--    assert(s->lock_fd > 0);
--
-     switch (op) {
-     case RAW_PL_PREPARE:
--        ret =3D raw_apply_lock_bytes(s, s->lock_fd, s->perm | new_perm,
-+        ret =3D raw_apply_lock_bytes(s, s->fd, s->perm | new_perm,
-                                    ~s->shared_perm | ~new_shared,
-                                    false, errp);
-         if (!ret) {
--            ret =3D raw_check_lock_bytes(s->lock_fd, new_perm, new_share=
-d, errp);
-+            ret =3D raw_check_lock_bytes(s->fd, new_perm, new_shared, er=
-rp);
-             if (!ret) {
-                 return 0;
-             }
-@@ -842,7 +827,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-         op =3D RAW_PL_ABORT;
-         /* fall through to unlock bytes. */
-     case RAW_PL_ABORT:
--        raw_apply_lock_bytes(s, s->lock_fd, s->perm, ~s->shared_perm,
-+        raw_apply_lock_bytes(s, s->fd, s->perm, ~s->shared_perm,
-                              true, &local_err);
-         if (local_err) {
-             /* Theoretically the above call only unlocks bytes and it ca=
-nnot
-@@ -852,7 +837,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-         }
-         break;
-     case RAW_PL_COMMIT:
--        raw_apply_lock_bytes(s, s->lock_fd, new_perm, ~new_shared,
-+        raw_apply_lock_bytes(s, s->fd, new_perm, ~new_shared,
-                              true, &local_err);
-         if (local_err) {
-             /* Theoretically the above call only unlocks bytes and it ca=
-nnot
-@@ -967,10 +952,18 @@ static void raw_reopen_commit(BDRVReopenState *stat=
-e)
- {
-     BDRVRawReopenState *rs =3D state->opaque;
-     BDRVRawState *s =3D state->bs->opaque;
+diff --git a/tests/test-image-locking.c b/tests/test-image-locking.c
+new file mode 100644
+index 0000000000..7614cbf90c
+--- /dev/null
++++ b/tests/test-image-locking.c
+@@ -0,0 +1,157 @@
++/*
++ * Image locking tests
++ *
++ * Copyright (c) 2018 Red Hat Inc.
++ *
++ * Author: Fam Zheng <famz@redhat.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block.h"
++#include "sysemu/block-backend.h"
++#include "qapi/error.h"
++#include "qapi/qmp/qdict.h"
++
++static BlockBackend *open_image(const char *path,
++                                uint64_t perm, uint64_t shared_perm,
++                                Error **errp)
++{
 +    Error *local_err =3D NULL;
-=20
-     s->check_cache_dropped =3D rs->check_cache_dropped;
-     s->open_flags =3D rs->open_flags;
-=20
-+    /* Copy locks to the new fd before closing the old one. */
-+    raw_apply_lock_bytes(NULL, rs->fd, s->locked_perm,
-+                         ~s->locked_shared_perm, false, &local_err);
-+    if (local_err) {
-+        /* shouldn't fail in a sane host, but report it just in case. */
-+        error_report_err(local_err);
++    BlockBackend *blk;
++    QDict *options =3D qdict_new();
++
++    qdict_put_str(options, "driver", "raw");
++    blk =3D blk_new_open(path, NULL, options, BDRV_O_RDWR, &local_err);
++    if (blk) {
++        g_assert_null(local_err);
++        if (blk_set_perm(blk, perm, shared_perm, errp)) {
++            blk_unref(blk);
++            blk =3D NULL;
++        }
++    } else {
++        error_propagate(errp, local_err);
 +    }
-     qemu_close(s->fd);
-     s->fd =3D rs->fd;
-=20
-@@ -1963,10 +1956,6 @@ static void raw_close(BlockDriverState *bs)
-         qemu_close(s->fd);
-         s->fd =3D -1;
-     }
--    if (s->lock_fd >=3D 0) {
--        qemu_close(s->lock_fd);
--        s->lock_fd =3D -1;
--    }
- }
-=20
- /**
++    return blk;
++}
++
++static void check_locked_bytes(int fd, uint64_t perm_locks,
++                               uint64_t shared_perm_locks)
++{
++    int i;
++
++    if (!perm_locks && !shared_perm_locks) {
++        g_assert(!qemu_lock_fd_test(fd, 0, 0, true));
++        return;
++    }
++    for (i =3D 0; (1ULL << i) <=3D BLK_PERM_ALL; i++) {
++        uint64_t bit =3D (1ULL << i);
++        bool perm_expected =3D !!(bit & perm_locks);
++        bool shared_perm_expected =3D !!(bit & shared_perm_locks);
++        g_assert_cmpint(perm_expected, =3D=3D,
++                        !!qemu_lock_fd_test(fd, 100 + i, 1, true));
++        g_assert_cmpint(shared_perm_expected, =3D=3D,
++                        !!qemu_lock_fd_test(fd, 200 + i, 1, true));
++    }
++}
++
++static void test_image_locking_basic(void)
++{
++    BlockBackend *blk1, *blk2, *blk3;
++    char img_path[] =3D "/tmp/qtest.XXXXXX";
++    uint64_t perm, shared_perm;
++
++    int fd =3D mkstemp(img_path);
++    assert(fd >=3D 0);
++
++    perm =3D BLK_PERM_WRITE | BLK_PERM_CONSISTENT_READ;
++    shared_perm =3D BLK_PERM_ALL;
++    blk1 =3D open_image(img_path, perm, shared_perm, &error_abort);
++    g_assert(blk1);
++
++    check_locked_bytes(fd, perm, ~shared_perm);
++
++    /* compatible perm between blk1 and blk2 */
++    blk2 =3D open_image(img_path, perm | BLK_PERM_RESIZE, shared_perm, N=
+ULL);
++    g_assert(blk2);
++    check_locked_bytes(fd, perm | BLK_PERM_RESIZE, ~shared_perm);
++
++    /* incompatible perm with already open blk1 and blk2 */
++    blk3 =3D open_image(img_path, perm, BLK_PERM_WRITE_UNCHANGED, NULL);
++    g_assert_null(blk3);
++
++    blk_unref(blk2);
++
++    /* Check that extra bytes in blk2 are correctly unlocked */
++    check_locked_bytes(fd, perm, ~shared_perm);
++
++    blk_unref(blk1);
++
++    /* Image is unused, no lock there */
++    check_locked_bytes(fd, 0, 0);
++    blk3 =3D open_image(img_path, perm, BLK_PERM_WRITE_UNCHANGED, &error=
+_abort);
++    g_assert(blk3);
++    blk_unref(blk3);
++    close(fd);
++    unlink(img_path);
++}
++
++static void test_set_perm_abort(void)
++{
++    BlockBackend *blk1, *blk2;
++    char img_path[] =3D "/tmp/qtest.XXXXXX";
++    uint64_t perm, shared_perm;
++    int r;
++    int fd =3D mkstemp(img_path);
++    assert(fd >=3D 0);
++
++    perm =3D BLK_PERM_WRITE | BLK_PERM_CONSISTENT_READ;
++    shared_perm =3D BLK_PERM_ALL;
++    blk1 =3D open_image(img_path, perm, shared_perm, &error_abort);
++    g_assert(blk1);
++
++    blk2 =3D open_image(img_path, perm, shared_perm, &error_abort);
++    g_assert(blk2);
++
++    check_locked_bytes(fd, perm, ~shared_perm);
++
++    /* A failed blk_set_perm mustn't change perm status (locked bytes) *=
+/
++    r =3D blk_set_perm(blk2, perm | BLK_PERM_RESIZE, BLK_PERM_WRITE_UNCH=
+ANGED,
++                     NULL);
++    g_assert_cmpint(r, !=3D, 0);
++    check_locked_bytes(fd, perm, ~shared_perm);
++    blk_unref(blk1);
++    blk_unref(blk2);
++}
++
++int main(int argc, char **argv)
++{
++    bdrv_init();
++    qemu_init_main_loop(&error_abort);
++
++    g_test_init(&argc, &argv, NULL);
++
++    if (qemu_has_ofd_lock()) {
++        g_test_add_func("/image-locking/basic", test_image_locking_basic=
+);
++        g_test_add_func("/image-locking/set-perm-abort", test_set_perm_a=
+bort);
++    }
++
++    return g_test_run();
++}
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 074eece558..613242bc6e 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -70,6 +70,7 @@ check-unit-y +=3D tests/test-bdrv-drain$(EXESUF)
+ check-unit-y +=3D tests/test-blockjob$(EXESUF)
+ check-unit-y +=3D tests/test-blockjob-txn$(EXESUF)
+ check-unit-y +=3D tests/test-block-backend$(EXESUF)
++check-unit-y +=3D tests/test-image-locking$(EXESUF)
+ check-unit-y +=3D tests/test-x86-cpuid$(EXESUF)
+ # all code tested by test-x86-cpuid is inside topology.h
+ ifeq ($(CONFIG_SOFTMMU),y)
+@@ -537,6 +538,7 @@ tests/test-bdrv-drain$(EXESUF): tests/test-bdrv-drain=
+.o $(test-block-obj-y) $(te
+ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) =
+$(test-util-obj-y)
+ tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block=
+-obj-y) $(test-util-obj-y)
+ tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-blo=
+ck-obj-y) $(test-util-obj-y)
++tests/test-image-locking$(EXESUF): tests/test-image-locking.o $(test-blo=
+ck-obj-y) $(test-util-obj-y)
+ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-o=
+bj-y)
+ tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+ tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(t=
+est-crypto-obj-y)
 --=20
 2.19.1
