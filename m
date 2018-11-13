@@ -1,22 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSwA-0005ae-8f
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:40 -0500
+	(envelope-from <liam.merwick@oracle.com>) id 1gMTNJ-00038Q-3h
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:44:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSw3-0005Ib-2B
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:38 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:45080)
+	(envelope-from <liam.merwick@oracle.com>) id 1gMTNF-0004vm-Nh
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:44:41 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:37540)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gMSvz-0005CV-4K
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:29 -0500
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Tue, 13 Nov 2018 09:13:36 +0200
-Message-Id: <20181113071336.6242-48-yuval.shaia@oracle.com>
-In-Reply-To: <20181113071336.6242-1-yuval.shaia@oracle.com>
-References: <20181113071336.6242-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v3 23/23] docs: Update pvrdma device
- documentation
+	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+	id 1gMTNF-0004ty-DL
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:44:37 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+	by userp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id
+	wAD7hXEh100363
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:44:35 GMT
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+	by userp2130.oracle.com with ESMTP id 2nnwg18qn2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:44:35 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+	by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id wAD7iYFR020151
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK) for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:44:34 GMT
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+	by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wAD7iYm0023227
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:44:34 GMT
+References: <20181113070320.16147-1-kraxel@redhat.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <b96361ca-19a9-87e0-02cf-3682a2889514@oracle.com>
+Date: Tue, 13 Nov 2018 07:44:32 +0000
+MIME-Version: 1.0
+In-Reply-To: <20181113070320.16147-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] slirp: add tftp tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,147 +43,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
+To: qemu-devel@nongnu.org
 
-Interface with the device is changed with the addition of support for
-MAD packets.
-Adjust documentation accordingly.
 
-While there fix a minor mistake which may lead to think that there is a
-relation between using RXE on host and the compatibility with bare-metal
-peers.
+On 13/11/2018 07:03, Gerd Hoffmann wrote:
+> Useful when debugging pxeboot, to see what the guest tries to do.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
----
- docs/pvrdma.txt | 103 +++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 84 insertions(+), 19 deletions(-)
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
 
-diff --git a/docs/pvrdma.txt b/docs/pvrdma.txt
-index 5599318159..9e8d1674b7 100644
---- a/docs/pvrdma.txt
-+++ b/docs/pvrdma.txt
-@@ -9,8 +9,9 @@ It works with its Linux Kernel driver AS IS, no need for any special guest
- modifications.
- 
- While it complies with the VMware device, it can also communicate with bare
--metal RDMA-enabled machines and does not require an RDMA HCA in the host, it
--can work with Soft-RoCE (rxe).
-+metal RDMA-enabled machines as peers.
-+
-+It does not require an RDMA HCA in the host, it can work with Soft-RoCE (rxe).
- 
- It does not require the whole guest RAM to be pinned allowing memory
- over-commit and, even if not implemented yet, migration support will be
-@@ -78,29 +79,93 @@ the required RDMA libraries.
- 
- 3. Usage
- ========
-+
-+
-+3.1 VM Memory settings
-+======================
- Currently the device is working only with memory backed RAM
- and it must be mark as "shared":
-    -m 1G \
-    -object memory-backend-ram,id=mb1,size=1G,share \
-    -numa node,memdev=mb1 \
- 
--The pvrdma device is composed of two functions:
-- - Function 0 is a vmxnet Ethernet Device which is redundant in Guest
--   but is required to pass the ibdevice GID using its MAC.
--   Examples:
--     For an rxe backend using eth0 interface it will use its mac:
--       -device vmxnet3,addr=<slot>.0,multifunction=on,mac=<eth0 MAC>
--     For an SRIOV VF, we take the Ethernet Interface exposed by it:
--       -device vmxnet3,multifunction=on,mac=<RoCE eth MAC>
-- - Function 1 is the actual device:
--       -device pvrdma,addr=<slot>.1,backend-dev=<ibdevice>,backend-gid-idx=<gid>,backend-port=<port>
--   where the ibdevice can be rxe or RDMA VF (e.g. mlx5_4)
-- Note: Pay special attention that the GID at backend-gid-idx matches vmxnet's MAC.
-- The rules of conversion are part of the RoCE spec, but since manual conversion
-- is not required, spotting problems is not hard:
--    Example: GID: fe80:0000:0000:0000:7efe:90ff:fecb:743a
--             MAC: 7c:fe:90:cb:74:3a
--    Note the difference between the first byte of the MAC and the GID.
-+
-+3.2 MAD Multiplexer
-+===================
-+MAD Multiplexer is a service that exposes MAD-like interface for VMs in
-+order to overcome the limitation where only single entity can register with
-+MAD layer to send and receive RDMA-CM MAD packets.
-+
-+To build rdmacm-mux run
-+# make rdmacm-mux
-+
-+The program accepts 3 command line arguments and exposes a UNIX socket to
-+be used to relay control and data messages to and from the service.
-+-s unix-socket-path   Path to unix socket to listen on
-+                      (default /var/run/rdmacm-mux)
-+-d rdma-device-name   Name of RDMA device to register with
-+                      (default rxe0)
-+-p rdma-device-port   Port number of RDMA device to register with
-+                      (default 1)
-+The final UNIX socket file name is a concatenation of the 3 arguments so
-+for example for device name mlx5_0 and port 2 the file
-+/var/run/rdmacm-mux-mlx5_0-2 will be created.
-+
-+Please refer to contrib/rdmacm-mux for more details.
-+
-+
-+3.3 PCI devices settings
-+========================
-+RoCE device exposes two functions - Ethernet and RDMA.
-+To support it, pvrdma device is composed of two PCI functions, an Ethernet
-+device of type vmxnet3 on PCI slot 0 and a pvrdma device on PCI slot 1. The
-+Ethernet function can be used for other Ethernet purposes such as IP.
-+
-+
-+3.4 Device parameters
-+=====================
-+- netdev: Specifies the Ethernet device on host. For Soft-RoCE (rxe) this
-+  would be the Ethernet device used to create it. For any other physical
-+  RoCE device this would be the netdev name of the device.
-+- ibdev: The IB device name on host for example rxe0, mlx5_0 etc.
-+- mad-chardev: The name of the MAD multiplexer char device.
-+- ibport: In case of multi-port device (such as Mellanox's HCA) this
-+  specify the port to use. If not set 1 will be used.
-+- dev-caps-max-mr-size: The maximum size of MR.
-+- dev-caps-max-qp: Maximum number of QPs.
-+- dev-caps-max-sge: Maximum number of SGE elements in WR.
-+- dev-caps-max-cq: Maximum number of CQs.
-+- dev-caps-max-mr: Maximum number of MRs.
-+- dev-caps-max-pd: Maximum number of PDs.
-+- dev-caps-max-ah: Maximum number of AHs.
-+
-+Notes:
-+- The first 3 parameters are mandatory settings, the rest have their
-+  defaults.
-+- The last 8 parameters (the ones that prefixed by dev-caps) defines the top
-+  limits but the final values are adjusted by the backend device limitations.
-+
-+3.5 Example
-+===========
-+Define bridge device with vmxnet3 network backend:
-+<interface type='bridge'>
-+  <mac address='56:b4:44:e9:62:dc'/>
-+  <source bridge='bridge1'/>
-+  <model type='vmxnet3'/>
-+  <address type='pci' domain='0x0000' bus='0x00' slot='0x10' function='0x0' multifunction='on'/>
-+</interface>
-+
-+Define pvrdma device:
-+<qemu:commandline>
-+  <qemu:arg value='-object'/>
-+  <qemu:arg value='memory-backend-ram,id=mb1,size=1G,share'/>
-+  <qemu:arg value='-numa'/>
-+  <qemu:arg value='node,memdev=mb1'/>
-+  <qemu:arg value='-chardev'/>
-+  <qemu:arg value='socket,path=/var/run/rdmacm-mux-rxe0-1,id=mads'/>
-+  <qemu:arg value='-device'/>
-+  <qemu:arg value='pvrdma,addr=10.1,ibdev=rxe0,netdev=bridge0,mad-chardev=mads'/>
-+</qemu:commandline>
- 
- 
- 
--- 
-2.17.2
+
+> ---
+>   Makefile.objs      | 1 +
+>   slirp/tftp.c       | 3 +++
+>   slirp/trace-events | 5 +++++
+>   3 files changed, 9 insertions(+)
+>   create mode 100644 slirp/trace-events
+> 
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 1e1ff387d7..31852eaf8f 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -251,6 +251,7 @@ trace-events-subdirs += net
+>   trace-events-subdirs += qapi
+>   trace-events-subdirs += qom
+>   trace-events-subdirs += scsi
+> +trace-events-subdirs += slirp
+>   trace-events-subdirs += target/arm
+>   trace-events-subdirs += target/i386
+>   trace-events-subdirs += target/mips
+> diff --git a/slirp/tftp.c b/slirp/tftp.c
+> index a9bc4bb1b6..735b57aa55 100644
+> --- a/slirp/tftp.c
+> +++ b/slirp/tftp.c
+> @@ -26,6 +26,7 @@
+>   #include "slirp.h"
+>   #include "qemu-common.h"
+>   #include "qemu/cutils.h"
+> +#include "trace.h"
+>   
+>   static inline int tftp_session_in_use(struct tftp_session *spt)
+>   {
+> @@ -204,6 +205,7 @@ static void tftp_send_error(struct tftp_session *spt,
+>     struct mbuf *m;
+>     struct tftp_t *tp;
+>   
+> +  trace_slirp_tftp_error(msg);
+>     m = m_get(spt->slirp);
+>   
+>     if (!m) {
+> @@ -323,6 +325,7 @@ static void tftp_handle_rrq(Slirp *slirp, struct sockaddr_storage *srcsas,
+>         break;
+>       }
+>     }
+> +  trace_slirp_tftp_rrq(req_fname);
+>   
+>     /* check mode */
+>     if ((pktlen - k) < 6) {
+> diff --git a/slirp/trace-events b/slirp/trace-events
+> new file mode 100644
+> index 0000000000..ff8f656e8c
+> --- /dev/null
+> +++ b/slirp/trace-events
+> @@ -0,0 +1,5 @@
+> +# See docs/devel/tracing.txt for syntax documentation.
+> +
+> +# slirp/tftp.c
+> +slirp_tftp_rrq(const char *file) "file: %s"
+> +slirp_tftp_error(const char *file) "msg: %s"
+> 
