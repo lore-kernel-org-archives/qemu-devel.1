@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gMddf-0005AT-7e
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:42:18 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gMddn-0004wU-7c
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:42:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gMdPo-0003Ce-3G
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:27:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gMdPA-0002pG-QJ
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:27:17 -0500
 References: <1541121763-3277-1-git-send-email-liq3ea@gmail.com>
-	<CAKXe6SL=6m5u1utFoJCG65ucuBeGTiuu8rA9wEj_X-tO1jHzEA@mail.gmail.com>
-	<20181113101704.GB4830@localhost.localdomain>
+	<20181102154019.GB26292@localhost.localdomain>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2db2eb88-bc7c-d3c0-93ca-43d6a2f79b0a@redhat.com>
-Date: Tue, 13 Nov 2018 19:27:45 +0100
+Message-ID: <104e542e-4678-13bf-4378-e378dede71ba@redhat.com>
+Date: Tue, 13 Nov 2018 19:26:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181113101704.GB4830@localhost.localdomain>
+In-Reply-To: <20181102154019.GB26292@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -25,22 +24,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Li Qiang <liq3ea@gmail.com>
-Cc: keith.busch@intel.com, mreitz@redhat.com, P J P <ppandit@redhat.com>, qemu-block@nongnu.org, Qemu Developers <qemu-devel@nongnu.org>
+To: Keith Busch <keith.busch@intel.com>, Li Qiang <liq3ea@gmail.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com, ppandit@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On 13/11/2018 11:17, Kevin Wolf wrote:
-> Am 13.11.2018 um 02:45 hat Li Qiang geschrieben:
->> Ping.... what't the status of this patch.
->>
->> I see Kevin's new pr doesn't contain this patch.
-> 
-> Oh, I thought you said that you wanted to fix this at a higher level so
-> that the problem is caught before even getting into nvme code? If you
-> don't, I can apply the patch for my next pull request.
+On 02/11/2018 16:40, Keith Busch wrote:
+> Hey, so why is this memory region access even considered valid if the
+> request is out of range from what NVMe had registered for its
+> MemoryRegion? Wouldn't it be better to not call the mr->ops->read/write
+> if it's out of bounds? Otherwise every MemoryRegion needs to duplicate
+> the same check, right?
 
-As far as I know the bug doesn't exist.  Li Qiang, if you have a
-reproducer please send it.
+Because some crazy devices have misaligned registers.
 
-Prasad, please revoke the CVE.
+But actually this is not a problem because NVMe doesn't set
+ops->impl.unaligned to true, so indeed no change is needed.
 
 Paolo
+
+> Would something like the following work (minimally tested)?
