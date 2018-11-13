@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gMNir-0005w4-U9
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 20:42:34 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1gMNmy-0007JX-8w
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 20:46:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gMNim-0002Zo-RJ
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 20:42:32 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41672)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gMNim-0002ZW-KO
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 20:42:28 -0500
-Received: by mail-pf1-x444.google.com with SMTP id e22-v6so5178777pfn.8
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 17:42:28 -0800 (PST)
+	(envelope-from <liq3ea@gmail.com>) id 1gMNmx-00056y-IM
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 20:46:48 -0500
+MIME-Version: 1.0
+References: <1541121763-3277-1-git-send-email-liq3ea@gmail.com>
+In-Reply-To: <1541121763-3277-1-git-send-email-liq3ea@gmail.com>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 12 Nov 2018 17:42:21 -0800
-Message-Id: <1542073341-2843-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH] memory: check write/read_with_attrs in memory
- dispatch
+Date: Tue, 13 Nov 2018 09:45:40 +0800
+Message-ID: <CAKXe6SL=6m5u1utFoJCG65ucuBeGTiuu8rA9wEj_X-tO1jHzEA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] nvme: fix oob access issue(CVE-2018-16847)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +22,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, peter.maydell@linaro.org, marcandre.lureau@gmail.com, ppandit@redhat.com
-Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
+To: keith.busch@intel.com, kwolf@redhat.com, mreitz@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, P J P <ppandit@redhat.com>, qemu-block@nongnu.org, Qemu Developers <qemu-devel@nongnu.org>
 
-This can avoid the NULL-deref if the rm doesn't has a
-read/write nor write/read_with_attrs callback.
+Ping.... what't the status of this patch.
 
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
----
- memory.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+I see Kevin's new pr doesn't contain this patch.
 
-diff --git a/memory.c b/memory.c
-index d14c6dec1d..3baf5857b9 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1377,13 +1377,15 @@ static MemTxResult memory_region_dispatch_read1(MemoryRegion *mr,
-                                          mr->ops->impl.max_access_size,
-                                          memory_region_read_accessor,
-                                          mr, attrs);
--    } else {
-+    } else if (mr->ops->read_with_attrs) {
-         return access_with_adjusted_size(addr, pval, size,
-                                          mr->ops->impl.min_access_size,
-                                          mr->ops->impl.max_access_size,
-                                          memory_region_read_with_attrs_accessor,
-                                          mr, attrs);
-     }
-+
-+    return MEMTX_DECODE_ERROR;
- }
- 
- MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
-@@ -1454,7 +1456,7 @@ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
-                                          mr->ops->impl.max_access_size,
-                                          memory_region_write_accessor, mr,
-                                          attrs);
--    } else {
-+    } else if (mr->ops->write_with_attrs) {
-         return
-             access_with_adjusted_size(addr, &data, size,
-                                       mr->ops->impl.min_access_size,
-@@ -1462,6 +1464,8 @@ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
-                                       memory_region_write_with_attrs_accessor,
-                                       mr, attrs);
-     }
-+
-+    return MEMTX_DECODE_ERROR;
- }
- 
- void memory_region_init_io(MemoryRegion *mr,
--- 
-2.11.0
+Thanks,
+Li Qiang
+
+Li Qiang <liq3ea@gmail.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=882=E6=97=A5=E5=
+=91=A8=E4=BA=94 =E4=B8=8A=E5=8D=889:22=E5=86=99=E9=81=93=EF=BC=9A
+
+> Currently, the nvme_cmb_ops mr doesn't check the addr and size.
+> This can lead an oob access issue. This is triggerable in the guest.
+> Add check to avoid this issue.
+>
+> Fixes CVE-2018-16847.
+>
+> Reported-by: Li Qiang <liq3ea@gmail.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> ---
+>  hw/block/nvme.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index fc7dacb..d097add 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -1175,6 +1175,10 @@ static void nvme_cmb_write(void *opaque, hwaddr
+> addr, uint64_t data,
+>      unsigned size)
+>  {
+>      NvmeCtrl *n =3D (NvmeCtrl *)opaque;
+> +
+> +    if (addr + size > NVME_CMBSZ_GETSIZE(n->bar.cmbsz)) {
+> +        return;
+> +    }
+>      memcpy(&n->cmbuf[addr], &data, size);
+>  }
+>
+> @@ -1183,6 +1187,9 @@ static uint64_t nvme_cmb_read(void *opaque, hwaddr
+> addr, unsigned size)
+>      uint64_t val;
+>      NvmeCtrl *n =3D (NvmeCtrl *)opaque;
+>
+> +    if (addr + size > NVME_CMBSZ_GETSIZE(n->bar.cmbsz)) {
+> +        return 0;
+> +    }
+>      memcpy(&val, &n->cmbuf[addr], size);
+>      return val;
+>  }
+> --
+> 1.8.3.1
+>
+>
