@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gMMFY-0000Zj-Cz
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 19:08:15 -0500
+	(envelope-from <liran.alon@oracle.com>) id 1gMMGp-00021e-GD
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 19:09:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gMM5m-0002VQ-26
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 18:58:10 -0500
-Received: from eddie.linux-mips.org ([148.251.95.138]:33768
-	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gMM5l-0002Uo-Oy
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 18:58:05 -0500
-Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
-	with ESMTP id S23991783AbeKLX4i7iNT6 (ORCPT
-	<rfc822;qemu-devel@nongnu.org>); Tue, 13 Nov 2018 00:56:38 +0100
-Date: Mon, 12 Nov 2018 23:56:38 +0000 (GMT)
-Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
-From: "Maciej W. Rozycki" <macro@linux-mips.org>
-In-Reply-To: <alpine.LFD.2.21.1811091618230.27920@eddie.linux-mips.org>
-Message-ID: <alpine.LFD.2.21.1811122327290.9637@eddie.linux-mips.org>
-References: <cover.1541701393.git.noring@nocrew.org>
-	<39b6a168-22ef-21cc-ae2a-0ce1c3dac5a5@vivier.eu>
-	<alpine.LFD.2.21.1811091403450.27920@eddie.linux-mips.org>
-	<8aee2864-4fb1-73e8-42d0-44598e663ac2@vivier.eu>
-	<alpine.LFD.2.21.1811091618230.27920@eddie.linux-mips.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user/mips: Support the n32 ABI
- for the R5900
+	(envelope-from <liran.alon@oracle.com>) id 1gMMGl-0007yZ-JH
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 19:09:31 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:56448)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+	id 1gMMGl-0007xb-8Z
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 19:09:27 -0500
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+From: Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <CALMp9eQEJfh=yiwmiUGawPKu1kSwLbLadHh0a=X+4p1Q6vAtHA@mail.gmail.com>
+Date: Tue, 13 Nov 2018 02:09:19 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <75DDE1E8-2CA7-4545-B5C7-7F0A7B5D95DD@oracle.com>
+References: <CALMp9eQ5zWxb2N9fyYz=WcQshwk0L6qQ4D6L6+p_dzMo4H=txA@mail.gmail.com>
+	<20181102034649.43559-1-liran.alon@oracle.com>
+	<12c26c34-8dd1-a442-7826-86b93ff978f8@redhat.com>
+	<20181102165409.GF21191@redhat.com>
+	<f58da4e8-aa40-2659-8db6-42c2b47f5b2f@redhat.com>
+	<20181112161829.GU3602@redhat.com> <20181112165053.GF2293@work-vm>
+	<20181112165437.GW3602@redhat.com>
+	<04AB82C1-F0AC-4BDB-A132-D39A49EA0A9A@oracle.com>
+	<CALMp9eQEJfh=yiwmiUGawPKu1kSwLbLadHh0a=X+4p1Q6vAtHA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
+ save and restore nested state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,50 +37,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Fredrik Noring <noring@nocrew.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
+To: Jim Mattson <jmattson@google.com>
+Cc: =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm list <kvm@vger.kernel.org>, mtosatti@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
 
-On Fri, 9 Nov 2018, Maciej W. Rozycki wrote:
 
-> > Some readelf results:
-> > 
-> > mips64el/stretch
-> > 
-> >   Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
-> >   Class:   ELF64
-> >   Flags:   0x80000007, noreorder, pic, cpic, mips64r2
-> 
->  Hmm, that's weird -- what executable did you check?  There may be some 
-> that are n64, or maybe they've switched (which I would applaud, FWIW).  I 
-> remember seeing mostly n32, with minimal support for n64, but that was a 
-> while ago -- jessie or suchlike, I believe.  Using MIPS64r2 as the base 
-> ISA also looks new to me, that used to be plain MIPS III, and some of 
-> Debian's MIPS build systems used to be either MIPS III (Lemote Loongson) 
-> or MIPS64r1 (Broadcom SiByte).
 
- OK, I definitely got this confused.  I did some checking and jessie 
-didn't even have a 64-bit MIPS port.  I got their build systems right 
-though, and the kernel is 64-bit for systems that support it.
+> On 13 Nov 2018, at 2:07, Jim Mattson <jmattson@google.com> wrote:
+>=20
+> On Mon, Nov 12, 2018 at 4:00 PM, Liran Alon <liran.alon@oracle.com> =
+wrote:
+>>=20
+>>=20
+>>> On 12 Nov 2018, at 18:54, Daniel P. Berrang=C3=A9 =
+<berrange@redhat.com> wrote:
+>>>=20
+>>> On Mon, Nov 12, 2018 at 04:50:54PM +0000, Dr. David Alan Gilbert =
+wrote:
+>>>> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+>>>>> On Sun, Nov 04, 2018 at 11:19:57PM +0100, Paolo Bonzini wrote:
+>>>>>> On 02/11/2018 17:54, Daniel P. Berrang=C3=A9 wrote:
+>>>>>>> We have usually followed a rule that new machine types must not
+>>>>>>> affect runability of a VM on a host. IOW new machine types =
+should
+>>>>>>> not introduce dependancies on specific kernels, or hardware =
+features
+>>>>>>> such as CPU flags.
+>>>>>>=20
+>>>>>>> Anything that requires a new kernel feature thus ought to be an
+>>>>>>> opt-in config tunable on the CLI, separate from machine type
+>>>>>>> choice.
+>>>>>>=20
+>>>>>> Unless someone tinkered with the module parameters, they could =
+not even
+>>>>>> use nested virtualization before 4.20.  So for everyone else, =
+"-cpu
+>>>>>> ...,+vmx" does count as an "opt-in config tunable on the CLI" =
+that
+>>>>>> requires 4.20.
+>>>>>>=20
+>>>>>> For those that did tinker with module parameters, we can =
+grandfather in
+>>>>>> the old machine types, so that they can use nested virtualization =
+with
+>>>>>> no live migration support.  For those that did not, however, I =
+don't
+>>>>>> think it makes sense to say "oh by the way I really want to be =
+able to
+>>>>>> migrate this VM" on the command line, or even worse on the =
+monitor.
+>>>>>=20
+>>>>> IIUC, 4.20 is only required from POV of migration state. Is it =
+thus
+>>>>> possible to just register a migration blocker if QEMU is launched
+>>>>> on a host with kernel < 4.20.
+>>>>>=20
+>>>>> Migration has always been busted historically, so those people =
+using
+>>>>> nested VMX already won't be hurt by not having ability to live =
+migrate
+>>>>> their VM, but could otherwise continue using them without being =
+forced
+>>>>> to upgrade their kernel to fix a feature they're not even using.
+>>>>=20
+>>>> Yes, although I am a bit worried we might have a population of =
+users
+>>>> that:
+>>>>  a) Have enabled nesting
+>>>>  b) Run VMs with vmx enabled
+>>>=20
+>>>=20
+>>>>  c) Don't normally actually run nested guests
+>>>>  d) Currently happily migrate.
+>>>=20
+>>> True, and (b) would include anyone using libvirt's  host-model CPU. =
+So if
+>>> you enabled nesting, have host-model for all guests, but only use =
+nesting
+>>> in one of the guests, you'd be doomed.
+>>>=20
+>>> Is it possible for QEMU to determine if there are nested guests =
+running or
+>>> not and conditionally block migration appropriately to ensure safety =
+?
+>>=20
+>>=20
+>> Only if kernel supports KVM_CAP_NESTED_STATE.
+>> See my reply to Dave in this thread.
+>=20
+> You could still allow migration if CR4.VMXE is clear.
 
-> > Any binaries that need qemu-mipsn32 or qemu-mipsn32el?
-> 
->  I'd expect at least the n32 dynamic loader (along with libc and some 
-> other essential DSOs) to be present with MIPS64 Debian.  Traditionally, 
-> under the FHS rules, it would be installed as /lib32/ld.so.1 (with the o32 
-> one as /lib/ld.so.1 and the n64 as /lib64/ld.so.1), but Debian uses their 
-> own multiarch filesystem layout standard, and offhand I don't remember 
-> what the paths are defined to there.
+Agreed. Nice addition :)
 
- So with jessie you can install the `libc6-dev-mipsn32' package, which 
-will get you n32 glibc development libraries and will pull the 
-complementing n32 dynamic loader (at /lib32/ld.so.1 actually) and n32 
-glibc shared libraries as well.
-
- Unfortunately multilib support files, such as the CRT files, seem to be 
-missing from GCC for n32 or I cannot find them.  Otherwise you would be 
-able to compile and link n32 binaries just by calling `gcc -mabi=n32'.  
-Still the dynamic loader is directly runnable, as I noted above.
-
- HTH,
-
-  Maciej
+Thanks,
+-Liran
