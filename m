@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gMcNB-0003CT-NF
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:21:12 -0500
+	(envelope-from <berrange@redhat.com>) id 1gMcVl-0000wK-CI
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:30:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gMcN8-0002Mh-Cj
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:21:09 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47244)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gMcN5-00025i-NC
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:21:06 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gMcMn-0003tS-Jz
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 17:20:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9139A2E8078
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 17:20:45 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1gMcVf-0002XJ-Ji
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:29:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60714)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMcVf-0002SN-7N
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:29:55 -0500
+Date: Tue, 13 Nov 2018 17:29:30 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181113172930.GL14591@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181019133835.16494-1-berrange@redhat.com>
+	<20181019133835.16494-9-berrange@redhat.com>
+	<CAJ+F1C+Wcp5jueeP-smg88sbc5KssULKKG7gF6kEXYGtqdANKw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1C+Wcp5jueeP-smg88sbc5KssULKKG7gF6kEXYGtqdANKw@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 13 Nov 2018 17:04:19 -0000
-From: Alberto Ortega <1803160@bugs.launchpad.net>
-Reply-To: Bug 1803160 <1803160@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154212865934.10800.13528910091420823354.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1803160] [NEW] qemu-3.1.0-rc0: tcg.c crash in
- temp_load
+Subject: Re: [Qemu-devel] [PATCH v6 08/11] authz: add QAuthZList object type
+ for an access control list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,256 +31,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, philmd@redhat.com
 
-Public bug reported:
+On Thu, Nov 08, 2018 at 02:23:43AM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Fri, Oct 19, 2018 at 5:45 PM Daniel P. Berrang=C3=A9 <berrange@redha=
+t.com> wrote
+> > ---
+> >  Makefile                |   7 +-
+> >  Makefile.objs           |   4 +
+> >  qapi/authz.json         |  58 ++++++++
+> >  qapi/qapi-schema.json   |   1 +
+> >  include/authz/list.h    | 106 ++++++++++++++
+> >  authz/list.c            | 309 ++++++++++++++++++++++++++++++++++++++=
+++
+> >  tests/test-authz-list.c | 171 ++++++++++++++++++++++
+> >  .gitignore              |   4 +
+> >  MAINTAINERS             |   1 +
+> >  authz/Makefile.objs     |   1 +
+> >  authz/trace-events      |   4 +
+> >  tests/Makefile.include  |   4 +
+> >  12 files changed, 669 insertions(+), 1 deletion(-)
+> >  create mode 100644 qapi/authz.json
+> >  create mode 100644 include/authz/list.h
+> >  create mode 100644 authz/list.c
+> >  create mode 100644 tests/test-authz-list.c
+> >
 
-QEMU version:
--------------
+> > diff --git a/qapi/authz.json b/qapi/authz.json
+> > new file mode 100644
+> > index 0000000000..607839c627
+> > --- /dev/null
+> > +++ b/qapi/authz.json
+> > @@ -0,0 +1,58 @@
+> > +# -*- Mode: Python -*-
+> > +#
+> > +# QAPI authz definitions
+> > +
+> > +##
+> > +# @QAuthZListPolicy:
+> > +#
+> > +# The authorization policy result
+> > +#
+> > +# @deny: deny access
+> > +# @allow: allow access
+> > +#
+> > +# Since: 3.0
+>=20
+> obviously, you'll have to update to 3.2
 
-qemu-3.1.0-rc0 compiled from sources (earlier versions also affected)
+4.0 in fact since we bump at the start of each year
 
-Summary:
---------
 
-TCG crashes in i386 and x86_64 when it tries to execute some specific
-illegal instructions. When running full OS emulation, both the guest
-system and QEMU crash.
+> > +##
+> > +# @QAuthZListRuleListHack:
+> > +#
+> > +# Not exposed via QMP; hack to generate QAuthZListRuleList
+> > +# for use internally by the code.
+>=20
+> Well, this will probably end in the documentation (it's already in the
+> .json, which is one source of documentation ;).
+>=20
+> What about adding a 'gen-list' field, or a 'pragma' listing the
+> structs that should have list code generated?
 
-The issue has been reproduced in two scenarios:
+I'll leave that for future motivated contributors, as I'm just
+following pre-existing best practice here.
 
-Ubuntu x64 host running Debian x86 guest with the following command
-line: qemu-system-x86_64 -m 4G debian.qcow
 
-When the attached ELF file is executed inside the guest, QEMU crashes.
+> > +static bool qauthz_list_is_allowed(QAuthZ *authz,
+> > +                                   const char *identity,
+> > +                                   Error **errp)
+> > +{
+> > +    QAuthZList *lauthz =3D QAUTHZ_LIST(authz);
+> > +    QAuthZListRuleList *rules =3D lauthz->rules;
+> > +
+> > +    while (rules) {
+> > +        QAuthZListRule *rule =3D rules->value;
+> > +        QAuthZListFormat format =3D rule->has_format ? rule->format =
+:
+> > +            QAUTHZ_LIST_FORMAT_EXACT;
+> > +
+> > +        trace_qauthz_list_check_rule(authz, rule->match, identity,
+> > +                                     format, rule->policy);
+> > +        switch (format) {
+> > +        case QAUTHZ_LIST_FORMAT_EXACT:
+> > +            if (strcmp(rule->match, identity) =3D=3D 0) {
+>=20
+> g_str_equal() ?
 
-It can also be reproduced from the command line:
+Yes.
 
-$ qemu-i386 tcg_crash.elf
-/home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863: tcg fatal error
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-zsh: segmentation fault (core dumped)  ../qemu-3.1.0-rc0/build/i386-linux-u=
-ser/qemu-i386 tcg_crash.elf
+>=20
+> > +                return rule->policy =3D=3D QAUTHZ_LIST_POLICY_ALLOW;
+> > +            }
+> > +            break;
+> > +#ifdef CONFIG_FNMATCH
+> > +        case QAUTHZ_LIST_FORMAT_GLOB:
+> > +            if (fnmatch(rule->match, identity, 0) =3D=3D 0) {
+>=20
+> Would GPatternSpec be a good alternative?
 
-GDB backtrace:
+Excellent, I didn't know about it
 
-(gdb) bt
-#0  0x0000000060206488 in raise ()
-#1  0x0000000060206b8a in abort ()
-#2  0x0000000060007016 in temp_load (s=3Ds@entry=3D0x607a2780 <tcg_init_ctx=
->, ts=3Dts@entry=3D0x607a3178 <tcg_init_ctx+2552>, desired_regs=3D<optimize=
-d out>, allocated_regs=3Dallocated_regs@entry=3D16400)
-=C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c=
-:2863
-#3  0x000000006000a4d9 in tcg_reg_alloc_op (op=3D0x62808c20, s=3D<optimized=
- out>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3070
-#4  tcg_gen_code (s=3D<optimized out>, tb=3Dtb@entry=3D0x607ac040 <static_c=
-ode_gen_buffer+4144>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3=
-598
-#5  0x000000006003ef9a in tb_gen_code (cpu=3Dcpu@entry=3D0x627e0010, pc=3Dp=
-c@entry=3D134512724, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=3D419=
-4483, cflags=3Dcflags@entry=3D0)
-=C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg=
-/translate-all.c:1752
-#6  0x000000006003d979 in tb_find (cf_mask=3D0, tb_exit=3D0, last_tb=3D0x0,=
- cpu=3D0x0) at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/cpu-exec.c:=
-404
-#7  cpu_exec (cpu=3Dcpu@entry=3D0x627e0010) at /home/alberto/Documents/qemu=
--3.1.0-rc0/accel/tcg/cpu-exec.c:724
-#8  0x000000006006e1a0 in cpu_loop (env=3Denv@entry=3D0x627e82c0) at /home/=
-alberto/Documents/qemu-3.1.0-rc0/linux-user/i386/cpu_loop.c:93
-#9  0x00000000600037c5 in main (argc=3D2, argv=3D0x7fffffffdd28, envp=3D<op=
-timized out>) at /home/alberto/Documents/qemu-3.1.0-rc0/linux-user/main.c:8=
-19
-(gdb)
+> > +                return rule->policy =3D=3D QAUTHZ_LIST_POLICY_ALLOW;
+> > +            }
+> > +            break;
+> > +#else
+> > +            return false;
+> > +#endif
+> > +        default:
+>=20
+>=20
+> No g_warn_if_reached() ?Then perhaps add a comment why.
 
-Testcase:
----------
+I guess we could.
 
-Find ELF file attached.
+> > +ssize_t qauthz_list_delete_rule(QAuthZList *auth, const char *match)
+> > +{
+> > +    QAuthZListRule *rule;
+> > +    QAuthZListRuleList *rules, *prev;
+> > +    size_t i =3D 0;
+> > +
+> > +    prev =3D NULL;
+> > +    rules =3D auth->rules;
+> > +    while (rules) {
+> > +        rule =3D rules->value;
+> > +        if (g_str_equal(rule->match, match)) {
+> > +            if (prev) {
+> > +                prev->next =3D rules->next;
+> > +            } else {
+> > +                auth->rules =3D rules->next;
+> > +            }
+> > +            rules->next =3D NULL;
+> > +            qapi_free_QAuthZListRuleList(rules);
+> > +            return i;
+>=20
+> What's the point in returning the old index? Maybe true/false along
+> with an Error would be more convenient?
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+It is required for the conversion of the existing acl_remove API
+in the HMP monitor.
 
-** Attachment added: "tcg_crash.elf"
-   https://bugs.launchpad.net/bugs/1803160/+attachment/5212335/+files/tcg_c=
-rash.elf
 
-** Description changed:
-
-  QEMU version:
-  -------------
-  =
-
-  qemu-3.1.0-rc0 compiled from sources (earlier versions also affected)
-  =
-
-  Summary:
-  --------
-  =
-
-  TCG crashes in i386 and x86_64 when it tries to execute some specific
-  illegal instructions. When running full OS emulation, both the guest
-  system and QEMU crash.
-  =
-
-  The issue has been reproduced in two scenarios:
-  =
-
-  Ubuntu x64 host running Debian x86 guest with the following command
-  line: qemu-system-x86_64 -m 4G debian.qcow
-  =
-
-  When the attached ELF file is executed inside the guest, QEMU crashes.
-  =
-
-  It can also be reproduced from the command line:
-  =
-
-  $ qemu-i386 tcg_crash.elf
-  /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863: tcg fatal error
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  zsh: segmentation fault (core dumped)  ../qemu-3.1.0-rc0/build/i386-linux=
--user/qemu-i386 tcg_crash.elf
-  =
-
-  GDB backtrace:
-  =
-
-  (gdb) bt
-  #0  0x0000000060206488 in raise ()
-  #1  0x0000000060206b8a in abort ()
-  #2  0x0000000060007016 in temp_load (s=3Ds@entry=3D0x607a2780 <tcg_init_c=
-tx>, ts=3Dts@entry=3D0x607a3178 <tcg_init_ctx+2552>, desired_regs=3D<optimi=
-zed out>, allocated_regs=3Dallocated_regs@entry=3D16400)
--     at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863
-+ =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg=
-.c:2863
-  #3  0x000000006000a4d9 in tcg_reg_alloc_op (op=3D0x62808c20, s=3D<optimiz=
-ed out>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3070
-  #4  tcg_gen_code (s=3D<optimized out>, tb=3Dtb@entry=3D0x607ac040 <static=
-_code_gen_buffer+4144>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c=
-:3598
-  #5  0x000000006003ef9a in tb_gen_code (cpu=3Dcpu@entry=3D0x627e0010, pc=
-=3Dpc@entry=3D134512724, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=
-=3D4194483, cflags=3Dcflags@entry=3D0)
--     at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/translate-all.c:1=
-752
-+ =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/accel/t=
-cg/translate-all.c:1752
-  #6  0x000000006003d979 in tb_find (cf_mask=3D0, tb_exit=3D0, last_tb=3D0x=
-0, cpu=3D0x0) at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/cpu-exec.=
-c:404
-  #7  cpu_exec (cpu=3Dcpu@entry=3D0x627e0010) at /home/alberto/Documents/qe=
-mu-3.1.0-rc0/accel/tcg/cpu-exec.c:724
-  #8  0x000000006006e1a0 in cpu_loop (env=3Denv@entry=3D0x627e82c0) at /hom=
-e/alberto/Documents/qemu-3.1.0-rc0/linux-user/i386/cpu_loop.c:93
-  #9  0x00000000600037c5 in main (argc=3D2, argv=3D0x7fffffffdd28, envp=3D<=
-optimized out>) at /home/alberto/Documents/qemu-3.1.0-rc0/linux-user/main.c=
-:819
-  (gdb)
-  =
-
-  Testcase:
-  ---------
-  =
-
-- Find ELF file attached, and also in the following hexdump:
-- =
-
-- $ hexdump -C tcg_crash.elf
-- 00000000  7f 45 4c 46 01 01 01 00  00 00 00 00 00 00 00 00  |.ELF........=
-....|
-- 00000010  02 00 03 00 01 00 00 00  54 80 04 08 34 00 00 00  |........T...=
-4...|
-- 00000020  00 00 00 00 00 00 00 00  34 00 20 00 01 00 00 00  |........4. .=
-....|
-- 00000030  00 00 00 00 01 00 00 00  00 00 00 00 00 80 04 08  |............=
-....|
-- 00000040  00 80 04 08 64 00 00 00  64 00 00 00 05 00 00 00  |....d...d...=
-....|
-- 00000050  00 10 00 00 d2 dc a8 45  31 ca f0 35 d9 4d 8f 18  |.......E1..5=
-.M..|
-- 00000060  05 2e 6f 9f                                       |..o.|
-+ Find ELF file attached.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1803160
-
-Title:
-  qemu-3.1.0-rc0: tcg.c crash in temp_load
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU version:
-  -------------
-
-  qemu-3.1.0-rc0 compiled from sources (earlier versions also affected)
-
-  Summary:
-  --------
-
-  TCG crashes in i386 and x86_64 when it tries to execute some specific
-  illegal instructions. When running full OS emulation, both the guest
-  system and QEMU crash.
-
-  The issue has been reproduced in two scenarios:
-
-  Ubuntu x64 host running Debian x86 guest with the following command
-  line: qemu-system-x86_64 -m 4G debian.qcow
-
-  When the attached ELF file is executed inside the guest, QEMU crashes.
-
-  It can also be reproduced from the command line:
-
-  $ qemu-i386 tcg_crash.elf
-  /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863: tcg fatal error
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  zsh: segmentation fault (core dumped)  ../qemu-3.1.0-rc0/build/i386-linux=
--user/qemu-i386 tcg_crash.elf
-
-  GDB backtrace:
-
-  (gdb) bt
-  #0  0x0000000060206488 in raise ()
-  #1  0x0000000060206b8a in abort ()
-  #2  0x0000000060007016 in temp_load (s=3Ds@entry=3D0x607a2780 <tcg_init_c=
-tx>, ts=3Dts@entry=3D0x607a3178 <tcg_init_ctx+2552>, desired_regs=3D<optimi=
-zed out>, allocated_regs=3Dallocated_regs@entry=3D16400)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg=
-.c:2863
-  #3  0x000000006000a4d9 in tcg_reg_alloc_op (op=3D0x62808c20, s=3D<optimiz=
-ed out>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3070
-  #4  tcg_gen_code (s=3D<optimized out>, tb=3Dtb@entry=3D0x607ac040 <static=
-_code_gen_buffer+4144>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c=
-:3598
-  #5  0x000000006003ef9a in tb_gen_code (cpu=3Dcpu@entry=3D0x627e0010, pc=
-=3Dpc@entry=3D134512724, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=
-=3D4194483, cflags=3Dcflags@entry=3D0)
-  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/accel/t=
-cg/translate-all.c:1752
-  #6  0x000000006003d979 in tb_find (cf_mask=3D0, tb_exit=3D0, last_tb=3D0x=
-0, cpu=3D0x0) at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/cpu-exec.=
-c:404
-  #7  cpu_exec (cpu=3Dcpu@entry=3D0x627e0010) at /home/alberto/Documents/qe=
-mu-3.1.0-rc0/accel/tcg/cpu-exec.c:724
-  #8  0x000000006006e1a0 in cpu_loop (env=3Denv@entry=3D0x627e82c0) at /hom=
-e/alberto/Documents/qemu-3.1.0-rc0/linux-user/i386/cpu_loop.c:93
-  #9  0x00000000600037c5 in main (argc=3D2, argv=3D0x7fffffffdd28, envp=3D<=
-optimized out>) at /home/alberto/Documents/qemu-3.1.0-rc0/linux-user/main.c=
-:819
-  (gdb)
-
-  Testcase:
-  ---------
-
-  Find ELF file attached.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1803160/+subscriptions
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
