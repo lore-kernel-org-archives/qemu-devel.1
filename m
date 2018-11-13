@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvK-0004xq-DU
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:15:49 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvI-0004wN-S9
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:15:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvH-0004QQ-97
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:15:46 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:44478)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvH-0004QI-7E
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:15:44 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:44390)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gMSvG-0004Ne-RA
+	id 1gMSvG-0004J7-PM
 	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:15:43 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Tue, 13 Nov 2018 09:13:22 +0200
-Message-Id: <20181113071336.6242-34-yuval.shaia@oracle.com>
+Date: Tue, 13 Nov 2018 09:13:19 +0200
+Message-Id: <20181113071336.6242-31-yuval.shaia@oracle.com>
 In-Reply-To: <20181113071336.6242-1-yuval.shaia@oracle.com>
 References: <20181113071336.6242-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v3 09/23] hw/pvrdma: Set the correct opcode for
- send completion
+Subject: [Qemu-devel] [PATCH v3 06/23] hw/pvrdma: Make function reset_device
+ return void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,26 +27,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-opcode for WC should be set by the device and not taken from work
-element.
+This function cannot fail - fix it to return void
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/vmw/pvrdma_qp_ops.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/rdma/vmw/pvrdma_main.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-index 7b0f440fda..3388be1926 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.c
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-@@ -154,7 +154,7 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
-         comp_ctx->cq_handle = qp->send_cq_handle;
-         comp_ctx->cqe.wr_id = wqe->hdr.wr_id;
-         comp_ctx->cqe.qp = qp_handle;
--        comp_ctx->cqe.opcode = wqe->hdr.opcode;
-+        comp_ctx->cqe.opcode = IBV_WC_SEND;
+diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+index 6c8c0154fa..fc2abd34af 100644
+--- a/hw/rdma/vmw/pvrdma_main.c
++++ b/hw/rdma/vmw/pvrdma_main.c
+@@ -369,13 +369,11 @@ static int unquiesce_device(PVRDMADev *dev)
+     return 0;
+ }
  
-         rdma_backend_post_send(&dev->backend_dev, &qp->backend_qp, qp->qp_type,
-                                (struct ibv_sge *)&wqe->sge[0], wqe->hdr.num_sge,
+-static int reset_device(PVRDMADev *dev)
++static void reset_device(PVRDMADev *dev)
+ {
+     pvrdma_stop(dev);
+ 
+     pr_dbg("Device reset complete\n");
+-
+-    return 0;
+ }
+ 
+ static uint64_t regs_read(void *opaque, hwaddr addr, unsigned size)
 -- 
 2.17.2
