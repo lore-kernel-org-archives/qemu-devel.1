@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1gMXfX-0007uh-93
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:49 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gMXmS-0003dL-GH
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:26:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1gMXfV-0004GO-Dn
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:46 -0500
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <87eb5ae8-5008-b93f-6072-add50367b105@tuxfamily.org>
-Date: Tue, 13 Nov 2018 13:19:30 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gMXmO-0000ei-Ge
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:26:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57028)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gMXmM-0000UV-OS
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:26:51 -0500
+Date: Tue, 13 Nov 2018 13:26:14 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181113132614.3abdaa12@redhat.com>
+In-Reply-To: <20181023152306.3123-8-david@redhat.com>
+References: <20181023152306.3123-1-david@redhat.com>
+	<20181023152306.3123-8-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] QEMU Advent Calendar 2018 - Help wanted
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] memory-device: rewrite address
+ assignment using ranges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,72 +28,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, qemu-discuss@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Kashyap Chamarthy <kashyapc@fedoraproject.org>, Richard Jansson <richard.j.jansson@gmail.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
+	. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+
+On Tue, 23 Oct 2018 17:23:06 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> Let's rewrite it properly using ranges. This fixes certain overflows that
+> are right now possible. E.g.
+> 
+> qemu-system-x86_64 -m 4G,slots=20,maxmem=40G -M pc \
+>     -object memory-backend-file,id=mem1,share,mem-path=/dev/zero,size=2G
+>     -device pc-dimm,memdev=mem1,id=dimm1,addr=-0x40000000
+> 
+> Now properly reports an error instead of succeeding.
+s/error/error out/
+
+> 
+> "can't add memory device [0xffffffffc0000000:0x80000000], range overflow"
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/mem/memory-device.c | 53 ++++++++++++++++++++++++------------------
+>  1 file changed, 30 insertions(+), 23 deletions(-)
+> 
+> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> index 8be63c8032..2fb6fc2145 100644
+> --- a/hw/mem/memory-device.c
+> +++ b/hw/mem/memory-device.c
+> @@ -100,9 +100,8 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>                                              uint64_t align, uint64_t size,
+>                                              Error **errp)
+>  {
+> -    uint64_t address_space_start, address_space_end;
+>      GSList *list = NULL, *item;
+> -    uint64_t new_addr = 0;
+> +    Range as, new = range_empty;
+>  
+>      if (!ms->device_memory) {
+>          error_setg(errp, "memory devices (e.g. for memory hotplug) are not "
+> @@ -115,13 +114,11 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>                           "enabled, please specify the maxmem option");
+>          return 0;
+>      }
+> -    address_space_start = ms->device_memory->base;
+> -    address_space_end = address_space_start +
+> -                        memory_region_size(&ms->device_memory->mr);
+> -    g_assert(address_space_end >= address_space_start);
+> +    range_init_nofail(&as, ms->device_memory->base,
+> +                      memory_region_size(&ms->device_memory->mr));
+>  
+> -    /* address_space_start indicates the maximum alignment we expect */
+> -    if (!QEMU_IS_ALIGNED(address_space_start, align)) {
+> +    /* start of address space indicates the maximum alignment we expect */
+> +    if (!QEMU_IS_ALIGNED(range_lob(&as), align)) {
+>          error_setg(errp, "the alignment (0x%" PRIx64 ") is not supported",
+>                     align);
+>          return 0;
+> @@ -145,20 +142,24 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>      }
+>  
+>      if (hint) {
+> -        new_addr = *hint;
+> -        if (new_addr < address_space_start) {
+> +        if (range_init(&new, *hint, size)) {
+>              error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
+> -                       "] before 0x%" PRIx64, new_addr, size,
+> -                       address_space_start);
+> +                       "], range overflow", *hint, size);
+>              return 0;
+> -        } else if ((new_addr + size) > address_space_end) {
+> +        }
+> +        if (!range_contains_range(&as, &new)) {
+>              error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
+> -                       "] beyond 0x%" PRIx64, new_addr, size,
+> -                       address_space_end);
+> +                       "], usable range for memory devices [0x%" PRIx64 ":0x%"
+> +                       PRIx64 "]", range_lob(&new), range_size(&new),
+> +                       range_lob(&as), range_size(&as));
+>              return 0;
+>          }
+>      } else {
+> -        new_addr = address_space_start;
+> +        if (range_init(&new, range_lob(&as), size)) {
+> +            error_setg(errp, "can't add memory device [0x%" PRIx64 ":0x%" PRIx64
+> +                       "], range overflow", *hint, size);
+maybe replace "range overflow" with "too big" or something else more user friendly 
+
+> +            return 0;
+> +        }
+>      }
+>  
+>      /* find address range that will fit new memory device */
+> @@ -166,30 +167,36 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>      for (item = list; item; item = g_slist_next(item)) {
+>          const MemoryDeviceState *md = item->data;
+>          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(OBJECT(md));
+> -        uint64_t md_size, md_addr;
+> +        uint64_t next_addr;
+> +        Range tmp;
+>  
+> -        md_addr = mdc->get_addr(md);
+> -        md_size = memory_device_get_region_size(md, &error_abort);
+> +        range_init_nofail(&tmp, mdc->get_addr(md),
+> +                          memory_device_get_region_size(md, &error_abort));
+>  
+> -        if (ranges_overlap(md_addr, md_size, new_addr, size)) {
+> +        if (range_overlaps_range(&tmp, &new)) {
+>              if (hint) {
+>                  const DeviceState *d = DEVICE(md);
+>                  error_setg(errp, "address range conflicts with memory device"
+>                             " id='%s'", d->id ? d->id : "(unnamed)");
+>                  goto out;
+>              }
+> -            new_addr = QEMU_ALIGN_UP(md_addr + md_size, align);
+> +
+> +            next_addr = QEMU_ALIGN_UP(range_upb(&tmp) + 1, align);
+                                         ^^^^^^^^^^^^^^^^^^^
+this theoretically could overflow and already past 'as' check so it would
+return an invalid address without erroring out.
+
+But in practice we don't have memory device container ending right on 64bit
+limit, so it's not really an issue.
 
 
- Hi all!
+> +            if (range_init(&new, next_addr, range_size(&new))) {
+> +                range_make_empty(&new);
+> +                break;
+> +            }
+>          }
+>      }
+>  
+> -    if (new_addr + size > address_space_end) {
+> +    if (!range_contains_range(&as, &new)) {
+>          error_setg(errp, "could not find position in guest address space for "
+>                     "memory device - memory fragmented due to alignments");
+>          goto out;
+>      }
+>  out:
+>      g_slist_free(list);
+> -    return new_addr;
+> +    return range_lob(&new);
+>  }
+>  
+>  MemoryDeviceInfoList *qmp_memory_device_list(void)
 
-This year, we are celebrating the 15th anniversary of QEMU [1] - to do
-so, we would like to perform another edition of the QEMU Advent Calendar.
-
-If you didn't see the previous QEMU Advent Calendars yet, please visit
-the website and have a look at the editions from 2014 and 2016 (which
-can be selected in the menu at the top):
-
-  https://www.qemu-advent-calendar.org/
-
-This year, too, the QEMU Advent Calendar 2018 will be a website that
-reveals a new disk image for download each day in December until the
-holiday season starts. Launching the disk image under QEMU will bring up
-a nice surprise!
-
-But to be able to make this happen, we need help from people who
-- have ideas for disk images
-- would like to prepare one or more disk images.
-Ideally, you have an idea for a disk image and also prepare it yourself.
-But we also are glad to get just the ideas, or help from people who
-would like to prepare a disk image with the idea from somebody else!
-
-Possible ideas (others are welcome of course, too):
-- Showcase a new feature that has been added to QEMU recently
-- Package your favorite freeware DOS game from your childhood
-  (must be freely redistributable, so e.g. use FreeDOS as OS)
-- Know a fancy new or old freely available Operating System which
-  we did not feature in the previous advent calendars yet?
-- Any cool self-made firmware or extensions to existing firmware
-  that runs in QEMU.
-- It would also be great to get some more images for non-x86 targets,
-  so if you know something usable, please speak up!
-
-Disk image requirements:
- * We need 24 disk images (for the first 24 days of December)
- * Content must be freely redistributable (i.e. no proprietary
-   license that prevents distribution). For GPL based software,
-   you need to provide the source code, too.
- * Provide a name and a short description of the disk image
-   (e.g. with hints on what to try)
- * Provide a ./run shell script that prints out the name and
-   description/hints and launches QEMU
- * Provide a screenshot/image/logo for the website
-   (preferred resolution of the image is 320x240)
- * Size should be ideally under 100 MB per disk image
-   (but if some few images are bigger, that should be OK, too)
-
-Are you interested in participating? Then please reply to this email
-(off-list if you do not want to spoil your idea for disk images).
-
-Or do you have questions? Then feel free to reply or ask on the #qemu
-channel on irc.oftc.net, too.
-
- Thomas
-
-
-PS: The QEMU Advent Calendar 2018 is a secular calendar (not
-religious). The idea is to create a fun experience for the QEMU
-community which can be shared with everyone, and to celebrate the 15th
-anniversary of QEMU. You don't need to celebrate Christmas or another
-religious festival to participate!
-
-[1] According to the following mail, QEMU 0.1 was announced in March
-2003: https://www.winehq.org/pipermail/wine-devel/2003-March/015577.html
+beside minor notes patch looks good
