@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gMXz9-0007XF-Ha
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:40:04 -0500
+	(envelope-from <david@redhat.com>) id 1gMY0y-0008EG-9N
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:41:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gMXz6-0003Vv-CA
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:40:03 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2292 helo=huawei.com)
+	(envelope-from <david@redhat.com>) id 1gMY0v-0004XX-2l
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:41:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gMXz5-0003Sd-11
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:40:00 -0500
-From: xiezhide <xiezhide@huawei.com>
-Date: Tue, 13 Nov 2018 12:39:49 +0000
-Message-ID: <A02D6AA901860840B46E751C5E9E38B43CC9709D@DGGEML532-MBX.china.huawei.com>
-References: <A02D6AA901860840B46E751C5E9E38B43CC96FA1@DGGEML532-MBX.china.huawei.com>
-	<20181113112855.4f3984f8@bahia.lan>
-	<A02D6AA901860840B46E751C5E9E38B43CC97027@DGGEML532-MBX.china.huawei.com>
-	<20181113130347.12013ef4@bahia.lan>
-In-Reply-To: <20181113130347.12013ef4@bahia.lan>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gMY0u-0004Ep-Q0
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:41:52 -0500
+References: <20181023152306.3123-1-david@redhat.com>
+	<20181023152306.3123-8-david@redhat.com>
+	<20181113132614.3abdaa12@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <9ba9e9af-d544-bc1b-4def-a876917116ee@redhat.com>
+Date: Tue, 13 Nov 2018 13:41:07 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v1 0/3] fsdev-throttle-qmp: refactor code
- for qmp interface
+In-Reply-To: <20181113132614.3abdaa12@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 7/7] memory-device: rewrite address
+ assignment using ranges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +30,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-U3VyZS4NCg0KV2l0aCBnaXQgZ2l0IHNlbmQtZW1haWwsIHNlZW1zIHdvcmtpbmcgbm93LCB0aHJl
-YWRzIHNob3dpbmcsIHBsZWFzZSBoYXZlIGEgY2hlY2ssIHRoYW5rczoNCg0KW1FlbXUtZGV2ZWxd
-IFtQQVRDSCB2MiAxLzNdIGZzZGV2LXRocm90dGxlLXFtcDogcmVmYWN0b3IgY29kZSBmb3IgcW1w
-IGludGVyZmFjZSBmb3IgaW8gdGhyb3R0bGluZw0KW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAyLzNd
-IGZzZGV2LXRocm90dGxlLXFtcDogcW1wIGludGVyZmFjZSBmb3IgZnNkZXYgaW8gdGhyb3R0bGlu
-Zw0KW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAzLzNdIGZzZGV2LXRocm90dGxlLXFtcDogaG1wIGlu
-dGVyZmFjZSBmb3IgZnNkZXYgaW8gdGhyb3R0bGluZw0KDQpUaGFua3MNCktpZGQNCg0KLS0tLS1P
-cmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEdyZWcgS3VyeiBbbWFpbHRvOmdyb3VnQGthb2Qu
-b3JnXSANClNlbnQ6IDIwMTjlubQxMeaciDEz5pelIDIwOjA0DQpUbzogeGllemhpZGUgPHhpZXpo
-aWRlQGh1YXdlaS5jb20+DQpDYzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBFcmljIEJsYWtlIDxl
-Ymxha2VAcmVkaGF0LmNvbT47IGFybWJydUByZWRoYXQuY29tOyBkZ2lsYmVydEByZWRoYXQuY29t
-OyBiZXJ0b0BpZ2FsaWEuY29tOyBhbmVlc2gua3VtYXJAbGludXgudm5ldC5pYm0uY29tDQpTdWJq
-ZWN0OiBSZTogW1FlbXUtZGV2ZWxdW1BBVENIIHYxIDAvM10gZnNkZXYtdGhyb3R0bGUtcW1wOiBy
-ZWZhY3RvciBjb2RlIGZvciBxbXAgaW50ZXJmYWNlDQoNCk9uIFR1ZSwgMTMgTm92IDIwMTggMTE6
-MTc6MTkgKzAwMDANCnhpZXpoaWRlIDx4aWV6aGlkZUBodWF3ZWkuY29tPiB3cm90ZToNCg0KPiBG
-b2xsb3dpbmcgaXMgdGhlIHRoZSBwYXRjaCBoZWFkZXIsICB1c2VyIG5hbWUgYW5kIG1haWwgYXJl
-IHRoZSBzYW1lIGF0IEZyb20gYW5kIFNpZ25lZC1vZmYtYnkgOg0KPiANCg0KRnJvbSBhbmQgU2ln
-bmVkLW9mZi1ieSBhcmUgdGhlIHNhbWUgaW5kZWVkIGJ1dCB4MDAzOTA5NjEgZG9lc24ndCBsb29r
-IGxpa2UgYSB2YWxpZCBuYW1lLg0KDQpZb3Ugc2hvdWxkIHJlYWQgdGhlIGZvbGxvd2luZyBwYWdl
-LiBJdCBleHBsYWlucyBldmVyeXRoaW5nIHlvdSBuZWVkIHRvIGtub3cgaW4gb3JkZXIgdG8gc2Vu
-ZCB1c2VmdWwgY29udHJpYnV0aW9ucy4NCg0KaHR0cHM6Ly93aWtpLnFlbXUub3JnL0NvbnRyaWJ1
-dGUvU3VibWl0QVBhdGNoDQoNCkFib3V0IFNpZ25lZC1vZmYtYnk6DQoNCmh0dHBzOi8vd2lraS5x
-ZW11Lm9yZy9Db250cmlidXRlL1N1Ym1pdEFQYXRjaCNQYXRjaF9lbWFpbHNfbXVzdF9pbmNsdWRl
-X2FfU2lnbmVkLW9mZi1ieTpfbGluZQ0KDQoiUGxlYXNlIHVzZSB5b3VyIHJlYWwgbmFtZSB0byBz
-aWduIGEgcGF0Y2ggKG5vdCBhbiBhbGlhcyBvciBhY3JvbnltKS4iDQoNCkNoZWVycywNCg0KLS0N
-CkdyZWcNCg0KPiAtLS0tLS0tLS0tLS0tLS0tLS0tDQo+IEZyb20gNDU3ZjMxNjhlY2EyZDA0MWJi
-ZmNhZDgyMmFkOTAwNGUyOWEzODQwYyBNb24gU2VwIDE3IDAwOjAwOjAwIDIwMDENCj4gRnJvbTog
-eDAwMzkwOTYxIDx4aWV6aGlkZUBodWF3ZWkuY29tPg0KPiBEYXRlOiBXZWQsIDE0IE5vdiAyMDE4
-IDAxOjAzOjQ5ICswODAwDQo+IFN1YmplY3Q6IFtQQVRDSCAxLzNdIGZzZGV2LXRocm90dGxlLXFt
-cDogcmVmYWN0b3IgY29kZSBmb3IgcW1wIA0KPiBpbnRlcmZhY2UgZm9yICBpbyB0aHJvdHRsaW5n
-DQo+IA0KPiBUaGlzIHBhdGNoIGluY2x1ZGVzIHR3byBwYXJ0czoNCj4gMS4gZmFjdG9yIG91dCB0
-aHJvdHRsZSBjb2RlIHRvIHJldXNlIGNvZGUgMi4gdXNlIFRocm90dGxlTGltaXRzIA0KPiBzdHJ1
-Y3R1cmUNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IHgwMDM5MDk2MSA8eGllemhpZGVAaHVhd2VpLmNv
-bT4NCj4gDQo+IA0KPiBBbnl3YXksIGxldCBtZSB0cnkgZ2l0IHNlbmQtZW1haWwNCj4gDQo+IFRo
-YW5rcw0KPiBLaWRkDQo+IA0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBH
-cmVnIEt1cnogW21haWx0bzpncm91Z0BrYW9kLm9yZ10NCj4gU2VudDogMjAxOOW5tDEx5pyIMTPm
-l6UgMTg6MjkNCj4gVG86IHhpZXpoaWRlIDx4aWV6aGlkZUBodWF3ZWkuY29tPg0KPiBDYzogcWVt
-dS1kZXZlbEBub25nbnUub3JnOyBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT47IA0KPiBh
-cm1icnVAcmVkaGF0LmNvbTsgZGdpbGJlcnRAcmVkaGF0LmNvbTsgYmVydG9AaWdhbGlhLmNvbTsg
-DQo+IGFuZWVzaC5rdW1hckBsaW51eC52bmV0LmlibS5jb20NCj4gU3ViamVjdDogUmU6IFtRZW11
-LWRldmVsXVtQQVRDSCB2MSAwLzNdIGZzZGV2LXRocm90dGxlLXFtcDogcmVmYWN0b3IgDQo+IGNv
-ZGUgZm9yIHFtcCBpbnRlcmZhY2UNCj4gDQo+IEhpIEtpZGQsDQo+IA0KPiBUaGlzIHBvc3Rpbmcg
-aXMgc3RpbGwgYnJva2VuOiBubyB0aHJlYWRpbmcgYW5kIG1pc3NpbmcgbGVhZGluZyBibGFua3Mg
-b24gdW5jaGFuZ2VkIGxpbmVzLiBBbHNvIGlzIHgwMDM5MDk2MSByZWFsbHkgeW91ciBuYW1lIG9m
-IGNob2ljZSA/DQo+IA0KPiBJbiBzb21lIG90aGVyIG1haWwsIHlvdSBtZW50aW9uZWQgY29weS1w
-YXN0ZSB0byBhbiBvdXRsb29rIG1haWwgY2xpZW50Li4uDQo+IHBsZWFzZSBkb24ndCBkbyB0aGF0
-IHRvIHBvc3Qgc2VyaWVzLiBVc2UgZ2l0IGZvcm1hdC1wYXRjaCBhbmQgZ2l0IHNlbmQtZW1haWwg
-aW5zdGVhZCBhbmQgeW91J2xsIGdldCB0aGUgZm9ybWF0dGluZyBhbmQgdGhyZWFkaW5nIHJpZ2h0
-Lg0KPiANCj4gQ2hlZXJzLA0KPiANCj4gLS0NCj4gR3JlZw0KPiANCj4gT24gVHVlLCAxMyBOb3Yg
-MjAxOCAwOTo1OTo1NCArMDAwMA0KPiB4aWV6aGlkZSA8eGllemhpZGVAaHVhd2VpLmNvbT4gd3Jv
-dGU6DQo+IA0KPiA+IFRoaXMgcGF0Y2hlcyBwcm92aWRlIHFtcCBpbnRlcmZhY2UgdG8gcXVlcnkv
-c2V0IGlvIHRocm90dGxlIHBhcmFtZXRlcnMgb2YgYSBmc2Rldi4NCj4gPiBTb21lIG9mIHBhdGNo
-ZXMgYWxzbyByZWZhY3RvciB0aGUgY29kZSBhbmQgc3RydWN0dXJlIHRoYXQgd2FzIHByZXNlbnQg
-aW4gYmxvY2sgYW5kIGZzZGV2IGZpbGVzLg0KPiA+IA0KPiA+IHgwMDM5MDk2MSAoMyk6DQo+ID4g
-ICBmc2Rldi10aHJvdHRsZS1xbXA6IHJlZmFjdG9yIGNvZGUgZm9yIHFtcCBpbnRlcmZhY2UgZm9y
-IGlvIHRocm90dGxpbmcNCj4gPiAgIGZzZGV2LXRocm90dGxlLXFtcDogcW1wIGludGVyZmFjZSBm
-b3IgZnNkZXYgaW8gdGhyb3R0bGluZw0KPiA+ICAgZnNkZXYtdGhyb3R0bGUtcW1wOiBobXAgaW50
-ZXJmYWNlIGZvciBmc2RldiBpbyB0aHJvdHRsaW5nDQo+ID4gDQo+ID4gIE1ha2VmaWxlICAgICAg
-ICAgICAgICAgICAgICAgICAgfCAgMjAgKysrLQ0KPiA+ICBNYWtlZmlsZS5vYmpzICAgICAgICAg
-ICAgICAgICAgIHwgICA4ICsrDQo+ID4gIGJsb2NrL3Rocm90dGxlLmMgICAgICAgICAgICAgICAg
-fCAgIDYgKy0NCj4gPiAgYmxvY2tkZXYuYyAgICAgICAgICAgICAgICAgICAgICB8ICA5NiArLS0t
-LS0tLS0tLS0tLS0tLQ0KPiA+ICBmc2Rldi9xZW11LWZzZGV2LWR1bW15LmMgICAgICAgIHwgIDEx
-ICsrDQo+ID4gIGZzZGV2L3FlbXUtZnNkZXYtdGhyb3R0bGUuYyAgICAgfCAxNDQgKysrKysrKysr
-KysrKysrKystLS0tLS0tLS0NCj4gPiAgZnNkZXYvcWVtdS1mc2Rldi10aHJvdHRsZS5oICAgICB8
-ICAgNiArLQ0KPiA+ICBmc2Rldi9xZW11LWZzZGV2LmMgICAgICAgICAgICAgIHwgIDI5ICsrKysr
-Kw0KPiA+ICBobXAtY29tbWFuZHMtaW5mby5oeCAgICAgICAgICAgIHwgIDE1ICsrKw0KPiA+ICBo
-bXAtY29tbWFuZHMuaHggICAgICAgICAgICAgICAgIHwgIDE1ICsrKw0KPiA+ICBobXAuYyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIHwgIDgzICsrKysrKysrKysrKystLQ0KPiA+ICBobXAuaCAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA0ICsNCj4gPiAgaW5jbHVkZS9xZW11L3Rocm90
-dGxlLW9wdGlvbnMuaCB8ICAgMyArLQ0KPiA+ICBpbmNsdWRlL3FlbXUvdGhyb3R0bGUuaCAgICAg
-ICAgIHwgICA0ICstDQo+ID4gIGluY2x1ZGUvcWVtdS90eXBlZGVmcy5oICAgICAgICAgfCAgIDEg
-Kw0KPiA+ICBtb25pdG9yLmMgICAgICAgICAgICAgICAgICAgICAgIHwgIDQxICsrKystLS0tDQo+
-ID4gIHFhcGkvYmxvY2stY29yZS5qc29uICAgICAgICAgICAgfCAxMjIgKy0tLS0tLS0tLS0tLS0t
-LS0tLS0tLQ0KPiA+ICBxYXBpL2ZzZGV2Lmpzb24gICAgICAgICAgICAgICAgIHwgIDk2ICsrKysr
-KysrKysrKysrKysrDQo+ID4gIHFhcGkvcWFwaS1zY2hlbWEuanNvbiAgICAgICAgICAgfCAgIDEg
-Kw0KPiA+ICBxYXBpL3RsaW1pdHMuanNvbiAgICAgICAgICAgICAgIHwgIDg5ICsrKysrKysrKysr
-KysrKysNCj4gPiAgcW1wLmMgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAxMiArKysNCj4g
-PiAgdXRpbC90aHJvdHRsZS5jICAgICAgICAgICAgICAgICB8IDIyNCArKysrKysrKysrKysrKysr
-KysrKysrKysrKy0tLS0tLS0tLS0tLS0tDQo+ID4gIDIyIGZpbGVzIGNoYW5nZWQsIDY1NCBpbnNl
-cnRpb25zKCspLCAzNzYgZGVsZXRpb25zKC0pICBjcmVhdGUgbW9kZQ0KPiA+IDEwMDY0NCBxYXBp
-L2ZzZGV2Lmpzb24gIGNyZWF0ZSBtb2RlIDEwMDY0NCBxYXBpL3RsaW1pdHMuanNvbg0KPiA+IA0K
-PiA+IHYwIC0+IHYxOg0KPiA+ICBBZGRyZXNzZWQgY29tbWVudHMgZnJvbSBFcmljIEJsYWtlIGFu
-ZCBHcmVnIEt1cnouDQo+ID4gIEZpeCBwYXRjaCBjb3JydXB0IGlzc3VlIGR1ZSB0byBlbWFpbCBj
-bGllbnQgY2hhbmdlIHRoZSBwYXRjaCBmb3JtYXQgDQo+ID4gd2l0aCBjb3B5LXRvLXBhc3RlciAg
-QnJlYWsgcGF0Y2ggdG8gcGF0Y2hlcw0KPiA+IA0KPiA+IC0tDQo+ID4gMS44LjMuMQ0KPiA+ICAg
-DQo+IA0KDQo=
+On 13.11.18 13:26, Igor Mammedov wrote:
+> On Tue, 23 Oct 2018 17:23:06 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> Let's rewrite it properly using ranges. This fixes certain overflows t=
+hat
+>> are right now possible. E.g.
+>>
+>> qemu-system-x86_64 -m 4G,slots=3D20,maxmem=3D40G -M pc \
+>>     -object memory-backend-file,id=3Dmem1,share,mem-path=3D/dev/zero,s=
+ize=3D2G
+>>     -device pc-dimm,memdev=3Dmem1,id=3Ddimm1,addr=3D-0x40000000
+>>
+>> Now properly reports an error instead of succeeding.
+> s/error/error out/
+
+Thanks, fixed.
+
+>=20
+>>
+>> "can't add memory device [0xffffffffc0000000:0x80000000], range overfl=
+ow"
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/mem/memory-device.c | 53 ++++++++++++++++++++++++-----------------=
+-
+>>  1 file changed, 30 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+>> index 8be63c8032..2fb6fc2145 100644
+>> --- a/hw/mem/memory-device.c
+>> +++ b/hw/mem/memory-device.c
+>> @@ -100,9 +100,8 @@ static uint64_t memory_device_get_free_addr(Machin=
+eState *ms,
+>>                                              uint64_t align, uint64_t =
+size,
+>>                                              Error **errp)
+>>  {
+>> -    uint64_t address_space_start, address_space_end;
+>>      GSList *list =3D NULL, *item;
+>> -    uint64_t new_addr =3D 0;
+>> +    Range as, new =3D range_empty;
+>> =20
+>>      if (!ms->device_memory) {
+>>          error_setg(errp, "memory devices (e.g. for memory hotplug) ar=
+e not "
+>> @@ -115,13 +114,11 @@ static uint64_t memory_device_get_free_addr(Mach=
+ineState *ms,
+>>                           "enabled, please specify the maxmem option")=
+;
+>>          return 0;
+>>      }
+>> -    address_space_start =3D ms->device_memory->base;
+>> -    address_space_end =3D address_space_start +
+>> -                        memory_region_size(&ms->device_memory->mr);
+>> -    g_assert(address_space_end >=3D address_space_start);
+>> +    range_init_nofail(&as, ms->device_memory->base,
+>> +                      memory_region_size(&ms->device_memory->mr));
+>> =20
+>> -    /* address_space_start indicates the maximum alignment we expect =
+*/
+>> -    if (!QEMU_IS_ALIGNED(address_space_start, align)) {
+>> +    /* start of address space indicates the maximum alignment we expe=
+ct */
+>> +    if (!QEMU_IS_ALIGNED(range_lob(&as), align)) {
+>>          error_setg(errp, "the alignment (0x%" PRIx64 ") is not suppor=
+ted",
+>>                     align);
+>>          return 0;
+>> @@ -145,20 +142,24 @@ static uint64_t memory_device_get_free_addr(Mach=
+ineState *ms,
+>>      }
+>> =20
+>>      if (hint) {
+>> -        new_addr =3D *hint;
+>> -        if (new_addr < address_space_start) {
+>> +        if (range_init(&new, *hint, size)) {
+>>              error_setg(errp, "can't add memory device [0x%" PRIx64 ":=
+0x%" PRIx64
+>> -                       "] before 0x%" PRIx64, new_addr, size,
+>> -                       address_space_start);
+>> +                       "], range overflow", *hint, size);
+>>              return 0;
+>> -        } else if ((new_addr + size) > address_space_end) {
+>> +        }
+>> +        if (!range_contains_range(&as, &new)) {
+>>              error_setg(errp, "can't add memory device [0x%" PRIx64 ":=
+0x%" PRIx64
+>> -                       "] beyond 0x%" PRIx64, new_addr, size,
+>> -                       address_space_end);
+>> +                       "], usable range for memory devices [0x%" PRIx=
+64 ":0x%"
+>> +                       PRIx64 "]", range_lob(&new), range_size(&new),
+>> +                       range_lob(&as), range_size(&as));
+>>              return 0;
+>>          }
+>>      } else {
+>> -        new_addr =3D address_space_start;
+>> +        if (range_init(&new, range_lob(&as), size)) {
+>> +            error_setg(errp, "can't add memory device [0x%" PRIx64 ":=
+0x%" PRIx64
+>> +                       "], range overflow", *hint, size);
+> maybe replace "range overflow" with "too big" or something else more us=
+er friendly=20
+
+I guess I'll use the same error message for these two cases
+
+"can't add memory device [...], usable range for memory devices [...]"
+
+That will include the "range overflow" scenario when a hint was given.
+
+>=20
+>> +            return 0;
+>> +        }
+>>      }
+>> =20
+>>      /* find address range that will fit new memory device */
+>> @@ -166,30 +167,36 @@ static uint64_t memory_device_get_free_addr(Mach=
+ineState *ms,
+>>      for (item =3D list; item; item =3D g_slist_next(item)) {
+>>          const MemoryDeviceState *md =3D item->data;
+>>          const MemoryDeviceClass *mdc =3D MEMORY_DEVICE_GET_CLASS(OBJE=
+CT(md));
+>> -        uint64_t md_size, md_addr;
+>> +        uint64_t next_addr;
+>> +        Range tmp;
+>> =20
+>> -        md_addr =3D mdc->get_addr(md);
+>> -        md_size =3D memory_device_get_region_size(md, &error_abort);
+>> +        range_init_nofail(&tmp, mdc->get_addr(md),
+>> +                          memory_device_get_region_size(md, &error_ab=
+ort));
+>> =20
+>> -        if (ranges_overlap(md_addr, md_size, new_addr, size)) {
+>> +        if (range_overlaps_range(&tmp, &new)) {
+>>              if (hint) {
+>>                  const DeviceState *d =3D DEVICE(md);
+>>                  error_setg(errp, "address range conflicts with memory=
+ device"
+>>                             " id=3D'%s'", d->id ? d->id : "(unnamed)")=
+;
+>>                  goto out;
+>>              }
+>> -            new_addr =3D QEMU_ALIGN_UP(md_addr + md_size, align);
+>> +
+>> +            next_addr =3D QEMU_ALIGN_UP(range_upb(&tmp) + 1, align);
+>                                          ^^^^^^^^^^^^^^^^^^^
+> this theoretically could overflow and already past 'as' check so it wou=
+ld
+> return an invalid address without erroring out.
+>=20
+> But in practice we don't have memory device container ending right on 6=
+4bit
+> limit, so it's not really an issue.
+
+I'll add a simple check for "!next_addr".
+
+>=20
+>=20
+>> +            if (range_init(&new, next_addr, range_size(&new))) {
+>> +                range_make_empty(&new);
+>> +                break;
+>> +            }
+>>          }
+>>      }
+>> =20
+>> -    if (new_addr + size > address_space_end) {
+>> +    if (!range_contains_range(&as, &new)) {
+>>          error_setg(errp, "could not find position in guest address sp=
+ace for "
+>>                     "memory device - memory fragmented due to alignmen=
+ts");
+>>          goto out;
+>>      }
+>>  out:
+>>      g_slist_free(list);
+>> -    return new_addr;
+>> +    return range_lob(&new);
+>>  }
+>> =20
+>>  MemoryDeviceInfoList *qmp_memory_device_list(void)
+>=20
+> beside minor notes patch looks good
+>=20
+
+Thanks!
+
+--=20
+
+Thanks,
+
+David / dhildenb
