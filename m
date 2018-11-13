@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMcDv-0003SB-2S
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:11:36 -0500
+	(envelope-from <bounces@canonical.com>) id 1gMcNB-0003CT-NF
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:21:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMcDp-00048A-3y
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:11:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48740)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMcDo-00041X-Re
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:11:29 -0500
-Date: Tue, 13 Nov 2018 17:11:12 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181113171112.GK14591@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181019133835.16494-1-berrange@redhat.com>
-	<20181019133835.16494-8-berrange@redhat.com>
-	<CAJ+F1CLMtVnKjDJhm29Jx56FLVjeacvjA=8CvteimiYFg05SvA@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1gMcN8-0002Mh-Cj
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:21:09 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47244)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gMcN5-00025i-NC
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:21:06 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gMcMn-0003tS-Jz
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 17:20:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9139A2E8078
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 17:20:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CLMtVnKjDJhm29Jx56FLVjeacvjA=8CvteimiYFg05SvA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 07/11] authz: add QAuthZSimple object
- type for easy whitelist auth checks
+Date: Tue, 13 Nov 2018 17:04:19 -0000
+From: Alberto Ortega <1803160@bugs.launchpad.net>
+Reply-To: Bug 1803160 <1803160@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154212865934.10800.13528910091420823354.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1803160] [NEW] qemu-3.1.0-rc0: tcg.c crash in
+ temp_load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +36,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, philmd@redhat.com
+To: qemu-devel@nongnu.org
 
-On Thu, Nov 08, 2018 at 02:23:48AM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> On Fri, Oct 19, 2018 at 5:49 PM Daniel P. Berrang=C3=A9 <berrange@redha=
-t.com> wrote:
-> >
-> > In many cases a single VM will just need to whilelist a single identi=
-ty
-> > as the allowed user of network services. This is especially the case =
-for
-> > TLS live migration (optionally with NBD storage) where we just need t=
-o
-> > whitelist the x509 certificate distinguished name of the source QEMU
-> > host.
-> >
-> > Via QMP this can be configured with:
-> >
-> >   {
-> >     "execute": "object-add",
-> >     "arguments": {
-> >       "qom-type": "authz-simple",
-> >       "id": "authz0",
-> >       "parameters": {
-> >         "identity": "fred"
-> >       }
-> >     }
-> >   }
-> >
-> > Or via the command line
-> >
-> >   -object authz-simple,id=3Dauthz0,identity=3Dfred
-> >
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->=20
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> (a test would be trivial)
+Public bug reported:
 
-Yes, will add one
+QEMU version:
+-------------
 
+qemu-3.1.0-rc0 compiled from sources (earlier versions also affected)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Summary:
+--------
+
+TCG crashes in i386 and x86_64 when it tries to execute some specific
+illegal instructions. When running full OS emulation, both the guest
+system and QEMU crash.
+
+The issue has been reproduced in two scenarios:
+
+Ubuntu x64 host running Debian x86 guest with the following command
+line: qemu-system-x86_64 -m 4G debian.qcow
+
+When the attached ELF file is executed inside the guest, QEMU crashes.
+
+It can also be reproduced from the command line:
+
+$ qemu-i386 tcg_crash.elf
+/home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863: tcg fatal error
+qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+zsh: segmentation fault (core dumped)  ../qemu-3.1.0-rc0/build/i386-linux-u=
+ser/qemu-i386 tcg_crash.elf
+
+GDB backtrace:
+
+(gdb) bt
+#0  0x0000000060206488 in raise ()
+#1  0x0000000060206b8a in abort ()
+#2  0x0000000060007016 in temp_load (s=3Ds@entry=3D0x607a2780 <tcg_init_ctx=
+>, ts=3Dts@entry=3D0x607a3178 <tcg_init_ctx+2552>, desired_regs=3D<optimize=
+d out>, allocated_regs=3Dallocated_regs@entry=3D16400)
+=C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c=
+:2863
+#3  0x000000006000a4d9 in tcg_reg_alloc_op (op=3D0x62808c20, s=3D<optimized=
+ out>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3070
+#4  tcg_gen_code (s=3D<optimized out>, tb=3Dtb@entry=3D0x607ac040 <static_c=
+ode_gen_buffer+4144>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3=
+598
+#5  0x000000006003ef9a in tb_gen_code (cpu=3Dcpu@entry=3D0x627e0010, pc=3Dp=
+c@entry=3D134512724, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=3D419=
+4483, cflags=3Dcflags@entry=3D0)
+=C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg=
+/translate-all.c:1752
+#6  0x000000006003d979 in tb_find (cf_mask=3D0, tb_exit=3D0, last_tb=3D0x0,=
+ cpu=3D0x0) at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/cpu-exec.c:=
+404
+#7  cpu_exec (cpu=3Dcpu@entry=3D0x627e0010) at /home/alberto/Documents/qemu=
+-3.1.0-rc0/accel/tcg/cpu-exec.c:724
+#8  0x000000006006e1a0 in cpu_loop (env=3Denv@entry=3D0x627e82c0) at /home/=
+alberto/Documents/qemu-3.1.0-rc0/linux-user/i386/cpu_loop.c:93
+#9  0x00000000600037c5 in main (argc=3D2, argv=3D0x7fffffffdd28, envp=3D<op=
+timized out>) at /home/alberto/Documents/qemu-3.1.0-rc0/linux-user/main.c:8=
+19
+(gdb)
+
+Testcase:
+---------
+
+Find ELF file attached.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "tcg_crash.elf"
+   https://bugs.launchpad.net/bugs/1803160/+attachment/5212335/+files/tcg_c=
+rash.elf
+
+** Description changed:
+
+  QEMU version:
+  -------------
+  =
+
+  qemu-3.1.0-rc0 compiled from sources (earlier versions also affected)
+  =
+
+  Summary:
+  --------
+  =
+
+  TCG crashes in i386 and x86_64 when it tries to execute some specific
+  illegal instructions. When running full OS emulation, both the guest
+  system and QEMU crash.
+  =
+
+  The issue has been reproduced in two scenarios:
+  =
+
+  Ubuntu x64 host running Debian x86 guest with the following command
+  line: qemu-system-x86_64 -m 4G debian.qcow
+  =
+
+  When the attached ELF file is executed inside the guest, QEMU crashes.
+  =
+
+  It can also be reproduced from the command line:
+  =
+
+  $ qemu-i386 tcg_crash.elf
+  /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863: tcg fatal error
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  zsh: segmentation fault (core dumped)  ../qemu-3.1.0-rc0/build/i386-linux=
+-user/qemu-i386 tcg_crash.elf
+  =
+
+  GDB backtrace:
+  =
+
+  (gdb) bt
+  #0  0x0000000060206488 in raise ()
+  #1  0x0000000060206b8a in abort ()
+  #2  0x0000000060007016 in temp_load (s=3Ds@entry=3D0x607a2780 <tcg_init_c=
+tx>, ts=3Dts@entry=3D0x607a3178 <tcg_init_ctx+2552>, desired_regs=3D<optimi=
+zed out>, allocated_regs=3Dallocated_regs@entry=3D16400)
+-     at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863
++ =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg=
+.c:2863
+  #3  0x000000006000a4d9 in tcg_reg_alloc_op (op=3D0x62808c20, s=3D<optimiz=
+ed out>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3070
+  #4  tcg_gen_code (s=3D<optimized out>, tb=3Dtb@entry=3D0x607ac040 <static=
+_code_gen_buffer+4144>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c=
+:3598
+  #5  0x000000006003ef9a in tb_gen_code (cpu=3Dcpu@entry=3D0x627e0010, pc=
+=3Dpc@entry=3D134512724, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=
+=3D4194483, cflags=3Dcflags@entry=3D0)
+-     at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/translate-all.c:1=
+752
++ =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/accel/t=
+cg/translate-all.c:1752
+  #6  0x000000006003d979 in tb_find (cf_mask=3D0, tb_exit=3D0, last_tb=3D0x=
+0, cpu=3D0x0) at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/cpu-exec.=
+c:404
+  #7  cpu_exec (cpu=3Dcpu@entry=3D0x627e0010) at /home/alberto/Documents/qe=
+mu-3.1.0-rc0/accel/tcg/cpu-exec.c:724
+  #8  0x000000006006e1a0 in cpu_loop (env=3Denv@entry=3D0x627e82c0) at /hom=
+e/alberto/Documents/qemu-3.1.0-rc0/linux-user/i386/cpu_loop.c:93
+  #9  0x00000000600037c5 in main (argc=3D2, argv=3D0x7fffffffdd28, envp=3D<=
+optimized out>) at /home/alberto/Documents/qemu-3.1.0-rc0/linux-user/main.c=
+:819
+  (gdb)
+  =
+
+  Testcase:
+  ---------
+  =
+
+- Find ELF file attached, and also in the following hexdump:
+- =
+
+- $ hexdump -C tcg_crash.elf
+- 00000000  7f 45 4c 46 01 01 01 00  00 00 00 00 00 00 00 00  |.ELF........=
+....|
+- 00000010  02 00 03 00 01 00 00 00  54 80 04 08 34 00 00 00  |........T...=
+4...|
+- 00000020  00 00 00 00 00 00 00 00  34 00 20 00 01 00 00 00  |........4. .=
+....|
+- 00000030  00 00 00 00 01 00 00 00  00 00 00 00 00 80 04 08  |............=
+....|
+- 00000040  00 80 04 08 64 00 00 00  64 00 00 00 05 00 00 00  |....d...d...=
+....|
+- 00000050  00 10 00 00 d2 dc a8 45  31 ca f0 35 d9 4d 8f 18  |.......E1..5=
+.M..|
+- 00000060  05 2e 6f 9f                                       |..o.|
++ Find ELF file attached.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1803160
+
+Title:
+  qemu-3.1.0-rc0: tcg.c crash in temp_load
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU version:
+  -------------
+
+  qemu-3.1.0-rc0 compiled from sources (earlier versions also affected)
+
+  Summary:
+  --------
+
+  TCG crashes in i386 and x86_64 when it tries to execute some specific
+  illegal instructions. When running full OS emulation, both the guest
+  system and QEMU crash.
+
+  The issue has been reproduced in two scenarios:
+
+  Ubuntu x64 host running Debian x86 guest with the following command
+  line: qemu-system-x86_64 -m 4G debian.qcow
+
+  When the attached ELF file is executed inside the guest, QEMU crashes.
+
+  It can also be reproduced from the command line:
+
+  $ qemu-i386 tcg_crash.elf
+  /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:2863: tcg fatal error
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  zsh: segmentation fault (core dumped)  ../qemu-3.1.0-rc0/build/i386-linux=
+-user/qemu-i386 tcg_crash.elf
+
+  GDB backtrace:
+
+  (gdb) bt
+  #0  0x0000000060206488 in raise ()
+  #1  0x0000000060206b8a in abort ()
+  #2  0x0000000060007016 in temp_load (s=3Ds@entry=3D0x607a2780 <tcg_init_c=
+tx>, ts=3Dts@entry=3D0x607a3178 <tcg_init_ctx+2552>, desired_regs=3D<optimi=
+zed out>, allocated_regs=3Dallocated_regs@entry=3D16400)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg=
+.c:2863
+  #3  0x000000006000a4d9 in tcg_reg_alloc_op (op=3D0x62808c20, s=3D<optimiz=
+ed out>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c:3070
+  #4  tcg_gen_code (s=3D<optimized out>, tb=3Dtb@entry=3D0x607ac040 <static=
+_code_gen_buffer+4144>) at /home/alberto/Documents/qemu-3.1.0-rc0/tcg/tcg.c=
+:3598
+  #5  0x000000006003ef9a in tb_gen_code (cpu=3Dcpu@entry=3D0x627e0010, pc=
+=3Dpc@entry=3D134512724, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=
+=3D4194483, cflags=3Dcflags@entry=3D0)
+  =C2=A0=C2=A0=C2=A0=C2=A0at /home/alberto/Documents/qemu-3.1.0-rc0/accel/t=
+cg/translate-all.c:1752
+  #6  0x000000006003d979 in tb_find (cf_mask=3D0, tb_exit=3D0, last_tb=3D0x=
+0, cpu=3D0x0) at /home/alberto/Documents/qemu-3.1.0-rc0/accel/tcg/cpu-exec.=
+c:404
+  #7  cpu_exec (cpu=3Dcpu@entry=3D0x627e0010) at /home/alberto/Documents/qe=
+mu-3.1.0-rc0/accel/tcg/cpu-exec.c:724
+  #8  0x000000006006e1a0 in cpu_loop (env=3Denv@entry=3D0x627e82c0) at /hom=
+e/alberto/Documents/qemu-3.1.0-rc0/linux-user/i386/cpu_loop.c:93
+  #9  0x00000000600037c5 in main (argc=3D2, argv=3D0x7fffffffdd28, envp=3D<=
+optimized out>) at /home/alberto/Documents/qemu-3.1.0-rc0/linux-user/main.c=
+:819
+  (gdb)
+
+  Testcase:
+  ---------
+
+  Find ELF file attached.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1803160/+subscriptions
