@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvq-0005Op-Px
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:22 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvu-0005Qk-Ow
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvo-000551-61
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:18 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:44968)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvr-00057P-0V
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:22 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:60938)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gMSvn-00054G-TM
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:16 -0500
+	id 1gMSvq-00056l-N0
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:18 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Tue, 13 Nov 2018 09:13:33 +0200
-Message-Id: <20181113071336.6242-45-yuval.shaia@oracle.com>
+Date: Tue, 13 Nov 2018 09:13:34 +0200
+Message-Id: <20181113071336.6242-46-yuval.shaia@oracle.com>
 In-Reply-To: <20181113071336.6242-1-yuval.shaia@oracle.com>
 References: <20181113071336.6242-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v3 20/23] hw/pvrdma: Clean device's resource
- when system is shutdown
+Subject: [Qemu-devel] [PATCH v3 21/23] hw/rdma: Do not use
+ bitmap_zero_extend to free bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +27,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-In order to clean some external resources such as GIDs, QPs etc,
-register to receive notification when VM is shutdown.
+bitmap_zero_extend is designed to work for extending, not for
+shrinking.
+Using g_free instead.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 ---
- hw/rdma/vmw/pvrdma.h      |  2 ++
- hw/rdma/vmw/pvrdma_main.c | 12 ++++++++++++
- 2 files changed, 14 insertions(+)
+ hw/rdma/rdma_rm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-index 10a3c4fb7c..ffae36986e 100644
---- a/hw/rdma/vmw/pvrdma.h
-+++ b/hw/rdma/vmw/pvrdma.h
-@@ -17,6 +17,7 @@
- #define PVRDMA_PVRDMA_H
- 
- #include "qemu/units.h"
-+#include "qemu/notify.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/msix.h"
- #include "chardev/char-fe.h"
-@@ -87,6 +88,7 @@ typedef struct PVRDMADev {
-     RdmaDeviceResources rdma_dev_res;
-     CharBackend mad_chr;
-     VMXNET3State *func0;
-+    Notifier shutdown_notifier;
- } PVRDMADev;
- #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
- 
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 95e9322b7c..45a59cddf9 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -24,6 +24,7 @@
- #include "hw/qdev-properties.h"
- #include "cpu.h"
- #include "trace.h"
-+#include "sysemu/sysemu.h"
- 
- #include "../rdma_rm.h"
- #include "../rdma_backend.h"
-@@ -559,6 +560,14 @@ static int pvrdma_check_ram_shared(Object *obj, void *opaque)
-     return 0;
+diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+index 0a5ab8935a..35a96d9a64 100644
+--- a/hw/rdma/rdma_rm.c
++++ b/hw/rdma/rdma_rm.c
+@@ -43,7 +43,7 @@ static inline void res_tbl_free(RdmaRmResTbl *tbl)
+ {
+     qemu_mutex_destroy(&tbl->lock);
+     g_free(tbl->tbl);
+-    bitmap_zero_extend(tbl->bitmap, tbl->tbl_sz, 0);
++    g_free(tbl->bitmap);
  }
  
-+static void pvrdma_shutdown_notifier(Notifier *n, void *opaque)
-+{
-+    PVRDMADev *dev = container_of(n, PVRDMADev, shutdown_notifier);
-+    PCIDevice *pci_dev = PCI_DEVICE(dev);
-+
-+    pvrdma_fini(pci_dev);
-+}
-+
- static void pvrdma_realize(PCIDevice *pdev, Error **errp)
- {
-     int rc;
-@@ -623,6 +632,9 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
-         goto out;
-     }
- 
-+    dev->shutdown_notifier.notify = pvrdma_shutdown_notifier;
-+    qemu_register_shutdown_notifier(&dev->shutdown_notifier);
-+
- out:
-     if (rc) {
-         error_append_hint(errp, "Device fail to load\n");
+ static inline void *res_tbl_get(RdmaRmResTbl *tbl, uint32_t handle)
 -- 
 2.17.2
