@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gMej8-00085Y-Eq
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 14:51:59 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gMf1Y-0004bo-CV
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 15:11:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gMej3-0003O5-Ox
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 14:51:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41318)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gMej3-0003Co-Ae
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 14:51:53 -0500
-References: <20181113184641.4492-1-peter.maydell@linaro.org>
-	<20181113184641.4492-2-peter.maydell@linaro.org>
-	<b332dd35-0cec-7687-7b68-118e560964a1@redhat.com>
-	<CAFEAcA-Fw2niH-XevrqTacouNcM=+xbT3qAqyyuQi+8oK_Xkig@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <dcbe49b4-4e16-b21c-ef5b-93cd55ae54c7@redhat.com>
-Date: Tue, 13 Nov 2018 13:51:33 -0600
+	(envelope-from <alistair23@gmail.com>) id 1gMf1X-0000W1-4J
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 15:11:00 -0500
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:43811)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1gMf1W-0000Vf-TI
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 15:10:59 -0500
+Received: by mail-lf1-x141.google.com with SMTP id u18so9796423lff.10
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 12:10:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-Fw2niH-XevrqTacouNcM=+xbT3qAqyyuQi+8oK_Xkig@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] scripts/run-coverity-scan: Script to
- run Coverity Scan build
+References: <20181108134139.31666-1-peter.maydell@linaro.org>
+In-Reply-To: <20181108134139.31666-1-peter.maydell@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 13 Nov 2018 12:10:26 -0800
+Message-ID: <CAKmqyKMaW0Ye5E_PMZXpnUpYZRGdwCBEOf9Qr_bzJpPR=-_p2A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: list myself as maintainer for
+ various Arm boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,80 +31,214 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, "patches@linaro.org" <patches@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Rob Herring <robh@kernel.org>, Thomas Huth <thuth@redhat.com>, Patch Tracking <patches@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Markus Armbruster <armbru@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Antony Pavlov <antonynpavlov@gmail.com>, philmd@redhat.com
 
-On 11/13/18 1:21 PM, Peter Maydell wrote:
+On Thu, Nov 8, 2018 at 5:41 AM Peter Maydell <peter.maydell@linaro.org> wro=
+te:
+>
+> In practice for most of the more-or-less orphan Arm board models,
+> I will review patches and put them in via the target-arm tree.
+> So list myself as an "Odd Fixes" status maintainer for them.
+>
+> This commit downgrades these boards to "Odd Fixes":
+>  * Allwinner-A10
+>  * Exynos
+>  * Calxeda Highbank
+>  * Canon DIGIC
+>  * Musicpal
+>  * nSeries
+>  * Palm
+>  * PXA2xx
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Thomas Huth sent a patch which only addressed collie, but
+> let's be consistent.
+>
+> The set of downgrades to odd-fixes is based mostly on my
+> subjective impression of whether anybody has made any changes
+> to the board models over the last year or so, so it's quite
+> possible I've forgotten that one of them is in better shape
+> maintainer-activity-wise. If the maintainers for those boards
+> disagree (cc'd) I'm happy to re-upgrade them to Maintained.
+>
+> Arguably it would be nice to have a letter prefix for "this
+> is the person who will deal with getting the patch into the
+> tree, but somebody else will be the primary maintainer for
+> patch review" -- that's the situation for the maintained/
+> active boards like ASpeed.
+> ---
+>  MAINTAINERS | 36 +++++++++++++++++++++++++++---------
+>  1 file changed, 27 insertions(+), 9 deletions(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0d68e4bc5eb..4443105686d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -436,8 +436,9 @@ ARM Machines
+>  ------------
+>  Allwinner-a10
+>  M: Beniamino Galvani <b.galvani@gmail.com>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+> -S: Maintained
+> +S: Odd Fixes
+>  F: hw/*/allwinner*
+>  F: include/hw/*/allwinner*
+>  F: hw/arm/cubieboard.c
+> @@ -496,27 +497,31 @@ F: tests/test-arm-mptimer.c
+>
+>  Exynos
+>  M: Igor Mitsyanko <i.mitsyanko@gmail.com>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+> -S: Maintained
+> +S: Odd Fixes
+>  F: hw/*/exynos*
+>  F: include/hw/arm/exynos4210.h
+>
+>  Calxeda Highbank
+>  M: Rob Herring <robh@kernel.org>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+> -S: Maintained
+> +S: Odd Fixes
+>  F: hw/arm/highbank.c
+>  F: hw/net/xgmac.c
+>
+>  Canon DIGIC
+>  M: Antony Pavlov <antonynpavlov@gmail.com>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+> -S: Maintained
+> +S: Odd Fixes
+>  F: include/hw/arm/digic.h
+>  F: hw/*/digic*
+>
+>  Gumstix
+>  M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-devel@nongnu.org
+>  L: qemu-arm@nongnu.org
+>  S: Odd Fixes
+> @@ -524,8 +529,9 @@ F: hw/arm/gumstix.c
+>
+>  i.MX31
+>  M: Peter Chubb <peter.chubb@nicta.com.au>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+> -S: Odd fixes
+> +S: Odd Fixes
+>  F: hw/*/imx*
+>  F: include/hw/*/imx*
+>  F: hw/arm/kzm.c
+> @@ -555,20 +561,23 @@ F: include/hw/misc/iotkit-sysinfo.h
+>
+>  Musicpal
+>  M: Jan Kiszka <jan.kiszka@web.de>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+> -S: Maintained
+> +S: Odd Fixes
+>  F: hw/arm/musicpal.c
+>
+>  nSeries
+>  M: Andrzej Zaborowski <balrogg@gmail.com>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+> -S: Maintained
+> +S: Odd Fixes
+>  F: hw/arm/nseries.c
+>
+>  Palm
+>  M: Andrzej Zaborowski <balrogg@gmail.com>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+> -S: Maintained
+> +S: Odd Fixes
+>  F: hw/arm/palm.c
+>
+>  Real View
+> @@ -582,8 +591,9 @@ F: include/hw/intc/realview_gic.h
+>
+>  PXA2XX
+>  M: Andrzej Zaborowski <balrogg@gmail.com>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+> -S: Maintained
+> +S: Odd Fixes
+>  F: hw/arm/mainstone.c
+>  F: hw/arm/spitz.c
+>  F: hw/arm/tosa.c
+> @@ -608,6 +618,7 @@ F: hw/misc/arm_sysctl.c
+>  Xilinx Zynq
+>  M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+>  M: Alistair Francis <alistair@alistair23.me>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+>  S: Maintained
+>  F: hw/*/xilinx_*
+> @@ -619,6 +630,7 @@ X: hw/ssi/xilinx_*
+>  Xilinx ZynqMP
+>  M: Alistair Francis <alistair@alistair23.me>
+>  M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+>  S: Maintained
+>  F: hw/*/xlnx*.c
+> @@ -632,6 +644,7 @@ F: hw/arm/virt-acpi-build.c
+>
+>  STM32F205
+>  M: Alistair Francis <alistair@alistair23.me>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  S: Maintained
+>  F: hw/arm/stm32f205_soc.c
+>  F: hw/misc/stm32f2xx_syscfg.c
+> @@ -643,11 +656,13 @@ F: include/hw/*/stm32*.h
+>
+>  Netduino 2
+>  M: Alistair Francis <alistair@alistair23.me>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  S: Maintained
+>  F: hw/arm/netduino2.c
 
->>
->> set -e...
->>
->>> +check_upload_permissions() {
->>
->>
->> ...and shell functions do NOT intuitively do what you would think. It's
->> almost always better to use explicit error checking than to rely on set -e
->> as a crutch, because then you don't get surprises.
-> 
-> I think we had this conversation with last year's version
-> of this script too :-)  As you say, the use of functions
-> makes it maybe better to use explicit error checking -- but
-> is there a standard syntax for that that doesn't make
-> basic
->   foo
->   bar
->   baz
-> "do these things in order" code look weird and require special care?
-> At least with set -e you do get error checking, whereas scripts without
-> it tend to just plough on regardless (look at configure, which doesn't
-> use set -e but doesn't have explicit checking either).
+These two and the Xilinx boards seem a little out of place in this
+patch. I agree they probably aren't maintained as well as they should
+be, but the patch talks about orphaned boards and these four all have
+active QEMU maintainers listed.
 
-I've seen both:
+Alistair
 
-foo &&
-bar &&
-baz
-
-and
-
-foo || fail
-bar || fail
-baz || fail
-
-for some variation of a 'fail' function.  But yeah, once you start 
-having to worry about checking everything yourself (or realizing which 
-lines don't need checking), you find out how much of a crutch 'set -e' 
-tries to be, and then wonder how it ever worked (for the number of cases 
-where 'set -e' does not actually catch failure, and cannot be re-enabled 
-in smaller scopes).
-
->>> +TOOLBIN="$(cd "$COVERITY_TOOL_BASE" && echo
->>> $(pwd)/coverity_tool/cov-analysis-*/bin)"
->>
->>
->> If $CDPATH is set and $COVERITY_TOOL_BASE does not contain /, this could
->> result in garbage being prepended to TOOLBIN as output from the 'cd'. Also,
->> $PWD is nicer than $(pwd); but are you sure the glob in cov-analysis-* won't
->> select too many files?
-> 
-> The glob is not great, but it is necessary to make the script
-> robust over new versions of the tools, which put the version
-> number in the cov-analysis-whatever directory name. If
-> we do ever get more than one file then the "test -x" below
-> will fail, and we'll be able to investigate and fix up the script.
-
-Yeah, I think you're okay on that front.
-
-> 
-> CDPATH sounds like a horrific misfeature designed for breaking
-> scripts, so I'm not very interested in trying to work around it.
-> We don't seem to worry about this in configure either.
-> (I suppose we could just unset it at the start of the script.)
-
-Autoconf 'configure' scripts do just that (unset CDPATH up front).  If 
-someone ever complains that it actually broke for them, we'll make the 
-fix; until then, I can live with the risk.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>
+>  SmartFusion2
+>  M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  S: Maintained
+>  F: hw/arm/msf2-soc.c
+>  F: hw/misc/msf2-sysreg.c
+> @@ -660,11 +675,13 @@ F: include/hw/ssi/mss-spi.h
+>
+>  Emcraft M2S-FG484
+>  M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  S: Maintained
+>  F: hw/arm/msf2-som.c
+>
+>  ASPEED BMCs
+>  M: C=C3=A9dric Le Goater <clg@kaod.org>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  R: Andrew Jeffery <andrew@aj.id.au>
+>  R: Joel Stanley <joel@jms.id.au>
+>  L: qemu-arm@nongnu.org
+> @@ -676,6 +693,7 @@ F: include/hw/net/ftgmac100.h
+>
+>  NRF51
+>  M: Joel Stanley <joel@jms.id.au>
+> +M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+>  S: Maintained
+>  F: hw/arm/nrf51_soc.c
+> --
+> 2.19.1
+>
+>
