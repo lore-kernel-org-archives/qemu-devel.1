@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gMUGy-0002rc-5f
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 03:42:16 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gMUGx-00033B-VW
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 03:42:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gMU6P-00058x-8c
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 03:31:20 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gMU6s-0006H3-51
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 03:31:49 -0500
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Tue, 13 Nov 2018 19:30:59 +1100
-Message-Id: <20181113083104.2692-3-aik@ozlabs.ru>
+Date: Tue, 13 Nov 2018 19:31:04 +1100
+Message-Id: <20181113083104.2692-8-aik@ozlabs.ru>
 In-Reply-To: <20181113083104.2692-1-aik@ozlabs.ru>
 References: <20181113083104.2692-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu RFC 2/7] linux-header: Update for new
- capabilities
+Subject: [Qemu-devel] [PATCH qemu RFC 7/7] spapr: Add NVLink2 pass through
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,335 +23,628 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alistair Popple <alistair@popple.id.au>, Reza Arbab <arbab@linux.ibm.com>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, =?UTF-8?q?Leonardo=20Augusto=20Guimar=C3=A3es=20Garcia?= <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Oliver O'Halloran <oohall@gmail.com>
 
-This pulls new NVIDIA V100 and NPU VFIO region types.
+The NVIDIA V100 GPU comes with some on-board RAM which is mapped into
+the host memory space and accessible as normal RAM via NVLink bus.
+The VFIO-PCI driver implements special regions for such GPU and emulated
+NVLink bridge (below referred as NPU). The POWER9 CPU also provides
+address translation services which includes TLB invalidation register
+exposes via the NVLink bridge; the feature is called "ATSD".
 
-The kernel changes are not in upstream yet so this does not have a tag.
+This adds a quirk to VFIO to map the memory and create an MR; the new MR
+is stored in a GPU as a QOM link. The sPAPR PCI uses this to get the MR
+and map it to the system address space. Another quirk does the same for
+ATSD.
+
+This adds 3 additional steps to the FDT builder in spapr-pci:
+1. Search for specific GPUs and NPUs, collects findings in sPAPRPHBState;
+2. Adds several properties in the DT: "ibm,npu", "ibm,gpu", "memory-block",
+and some other. These are required by the guest platform and GPU driver;
+this also adds a new made-up compatible type for a PHB to signal
+a modified guest that this particular PHB needs the default DMA window
+removed as these GPUs have limited DMA mask size (way lower than usual 59);
+3. Adds new memory blocks with one addition - they have
+"linux,memory-usable" property configured in the way which prevents
+the guest from onlining it automatically as it needs to be deferred till
+the guest GPU driver trains NVLink.
+
+A couple of notes:
+- this changes the FDT rendeder as doing 1-2-3 from sPAPRPHBClass::realize
+impossible - devices are not yet attached;
+- this does not add VFIO quirk MRs to the system address space as
+the address is selected in sPAPRPHBState, similar to MMIO.
+
+This puts new memory nodes in a separate NUMA node to replicate the host
+system setup as close as possible (the GPU driver relies on this too).
+
+This adds fake NPU nodes to make the guest platform code work,
+specifically "ibm,npu-link-index".
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- include/standard-headers/drm/drm_fourcc.h     | 48 ++++++++++++
- include/standard-headers/linux/ethtool.h      | 15 +---
- .../linux/input-event-codes.h                 | 18 +++++
- include/standard-headers/linux/pci_regs.h     |  1 +
- linux-headers/asm-arm/unistd-common.h         |  1 +
- linux-headers/asm-arm64/unistd.h              |  1 +
- linux-headers/asm-generic/unistd.h            |  2 +
- linux-headers/linux/kvm.h                     | 10 +++
- linux-headers/linux/vfio.h                    | 76 +++++++++++++++++++
- 9 files changed, 160 insertions(+), 12 deletions(-)
+ hw/vfio/pci.h               |   2 +
+ include/hw/pci-host/spapr.h |  28 ++++
+ include/hw/ppc/spapr.h      |   3 +-
+ hw/ppc/spapr.c              |  14 +-
+ hw/ppc/spapr_pci.c          | 256 +++++++++++++++++++++++++++++++++++-
+ hw/vfio/pci-quirks.c        |  93 +++++++++++++
+ hw/vfio/pci.c               |  14 ++
+ hw/vfio/trace-events        |   3 +
+ 8 files changed, 408 insertions(+), 5 deletions(-)
 
-diff --git a/include/standard-headers/drm/drm_fourcc.h b/include/standard-headers/drm/drm_fourcc.h
-index b53f8d7..bd0248a 100644
---- a/include/standard-headers/drm/drm_fourcc.h
-+++ b/include/standard-headers/drm/drm_fourcc.h
-@@ -29,11 +29,50 @@
- extern "C" {
- #endif
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index f4c5fb6..b8954cc 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -195,6 +195,8 @@ int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp);
+ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
+                                struct vfio_region_info *info,
+                                Error **errp);
++int vfio_pci_nvlink2_ram_init(VFIOPCIDevice *vdev, Error **errp);
++int vfio_pci_npu2_atsd_init(VFIOPCIDevice *vdev, Error **errp);
  
-+/**
-+ * DOC: overview
-+ *
-+ * In the DRM subsystem, framebuffer pixel formats are described using the
-+ * fourcc codes defined in `include/uapi/drm/drm_fourcc.h`. In addition to the
-+ * fourcc code, a Format Modifier may optionally be provided, in order to
-+ * further describe the buffer's format - for example tiling or compression.
-+ *
-+ * Format Modifiers
-+ * ----------------
-+ *
-+ * Format modifiers are used in conjunction with a fourcc code, forming a
-+ * unique fourcc:modifier pair. This format:modifier pair must fully define the
-+ * format and data layout of the buffer, and should be the only way to describe
-+ * that particular buffer.
-+ *
-+ * Having multiple fourcc:modifier pairs which describe the same layout should
-+ * be avoided, as such aliases run the risk of different drivers exposing
-+ * different names for the same data format, forcing userspace to understand
-+ * that they are aliases.
-+ *
-+ * Format modifiers may change any property of the buffer, including the number
-+ * of planes and/or the required allocation size. Format modifiers are
-+ * vendor-namespaced, and as such the relationship between a fourcc code and a
-+ * modifier is specific to the modifer being used. For example, some modifiers
-+ * may preserve meaning - such as number of planes - from the fourcc code,
-+ * whereas others may not.
-+ *
-+ * Vendors should document their modifier usage in as much detail as
-+ * possible, to ensure maximum compatibility across devices, drivers and
-+ * applications.
-+ *
-+ * The authoritative list of format modifier codes is found in
-+ * `include/uapi/drm/drm_fourcc.h`
-+ */
+ void vfio_display_reset(VFIOPCIDevice *vdev);
+ int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
+diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+index 7c66c38..1f8ebf3 100644
+--- a/include/hw/pci-host/spapr.h
++++ b/include/hw/pci-host/spapr.h
+@@ -87,6 +87,24 @@ struct sPAPRPHBState {
+     uint32_t mig_liobn;
+     hwaddr mig_mem_win_addr, mig_mem_win_size;
+     hwaddr mig_io_win_addr, mig_io_win_size;
++    hwaddr nv2_gpa_win_addr;
++    hwaddr nv2_atsd_win_addr;
 +
- #define fourcc_code(a, b, c, d) ((uint32_t)(a) | ((uint32_t)(b) << 8) | \
- 				 ((uint32_t)(c) << 16) | ((uint32_t)(d) << 24))
++    struct spapr_phb_pci_nvgpu_config {
++        uint64_t nv2_ram;
++        uint64_t nv2_atsd;
++        int num;
++        struct {
++            int links;
++            uint64_t tgt;
++            uint64_t gpa;
++            PCIDevice *gpdev;
++            uint64_t atsd[3];
++            PCIDevice *npdev[3];
++        } gpus[6];
++        uint64_t atsd[64]; /* Big Endian (BE), ready for the DT */
++        int atsd_num;
++    } nvgpus;
+ };
  
- #define DRM_FORMAT_BIG_ENDIAN (1<<31) /* format is big endian instead of little endian */
+ #define SPAPR_PCI_MEM_WIN_BUS_OFFSET 0x80000000ULL
+@@ -104,6 +122,16 @@ struct sPAPRPHBState {
  
-+/* Reserve 0 for the invalid format specifier */
-+#define DRM_FORMAT_INVALID	0
+ #define SPAPR_PCI_MSI_WINDOW         0x40000000000ULL
+ 
++#define PHANDLE_PCIDEV(phb, pdev)    (0x12000000 | \
++                                     (((phb)->index) << 16) | ((pdev)->devfn))
++#define PHANDLE_GPURAM(phb, n)       (0x110000FF | ((n) << 8) | \
++                                     (((phb)->index) << 16))
++#define GPURAM_ASSOCIATIVITY(phb, n) (255 - ((phb)->index * 3 + (n)))
++#define SPAPR_PCI_NV2RAM64_WIN_BASE  0x10000000000ULL /* 1 TiB */
++#define SPAPR_PCI_NV2RAM64_WIN_SIZE  0x02000000000ULL
++#define PHANDLE_NVLINK(phb, gn, nn)  (0x00130000 | (((phb)->index) << 8) | \
++                                     ((gn) << 4) | (nn))
 +
- /* color index */
- #define DRM_FORMAT_C8		fourcc_code('C', '8', ' ', ' ') /* [7:0] C */
- 
-@@ -298,6 +337,15 @@ extern "C" {
-  */
- #define DRM_FORMAT_MOD_SAMSUNG_64_32_TILE	fourcc_mod_code(SAMSUNG, 1)
- 
-+/*
-+ * Tiled, 16 (pixels) x 16 (lines) - sized macroblocks
-+ *
-+ * This is a simple tiled layout using tiles of 16x16 pixels in a row-major
-+ * layout. For YCbCr formats Cb/Cr components are taken in such a way that
-+ * they correspond to their 16x16 luma block.
-+ */
-+#define DRM_FORMAT_MOD_SAMSUNG_16_16_TILE	fourcc_mod_code(SAMSUNG, 2)
+ static inline qemu_irq spapr_phb_lsi_qirq(struct sPAPRPHBState *phb, int pin)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index f5dcaf4..0ceca47 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -108,7 +108,8 @@ struct sPAPRMachineClass {
+     void (*phb_placement)(sPAPRMachineState *spapr, uint32_t index,
+                           uint64_t *buid, hwaddr *pio, 
+                           hwaddr *mmio32, hwaddr *mmio64,
+-                          unsigned n_dma, uint32_t *liobns, Error **errp);
++                          unsigned n_dma, uint32_t *liobns, hwaddr *nv2gpa,
++                          hwaddr *nv2atsd, Error **errp);
+     sPAPRResizeHPT resize_hpt_default;
+     sPAPRCapabilities default_caps;
+     sPAPRIrq *irq;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 38a8218..760b0b5 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3723,7 +3723,8 @@ static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
+ static void spapr_phb_placement(sPAPRMachineState *spapr, uint32_t index,
+                                 uint64_t *buid, hwaddr *pio,
+                                 hwaddr *mmio32, hwaddr *mmio64,
+-                                unsigned n_dma, uint32_t *liobns, Error **errp)
++                                unsigned n_dma, uint32_t *liobns,
++                                hwaddr *nv2gpa, hwaddr *nv2atsd, Error **errp)
+ {
+     /*
+      * New-style PHB window placement.
+@@ -3770,6 +3771,11 @@ static void spapr_phb_placement(sPAPRMachineState *spapr, uint32_t index,
+     *pio = SPAPR_PCI_BASE + index * SPAPR_PCI_IO_WIN_SIZE;
+     *mmio32 = SPAPR_PCI_BASE + (index + 1) * SPAPR_PCI_MEM32_WIN_SIZE;
+     *mmio64 = SPAPR_PCI_BASE + (index + 1) * SPAPR_PCI_MEM64_WIN_SIZE;
 +
- /*
-  * Qualcomm Compressed Format
-  *
-diff --git a/include/standard-headers/linux/ethtool.h b/include/standard-headers/linux/ethtool.h
-index 57ffcb5..6ec5aeb 100644
---- a/include/standard-headers/linux/ethtool.h
-+++ b/include/standard-headers/linux/ethtool.h
-@@ -91,10 +91,6 @@
-  * %ETHTOOL_GSET to get the current values before making specific
-  * changes and then applying them with %ETHTOOL_SSET.
-  *
-- * Drivers that implement set_settings() should validate all fields
-- * other than @cmd that are not described as read-only or deprecated,
-- * and must ignore all fields described as read-only.
-- *
-  * Deprecated fields should be ignored by both users and drivers.
-  */
- struct ethtool_cmd {
-@@ -1800,14 +1796,9 @@ enum ethtool_reset_flags {
-  * rejected.
-  *
-  * Deprecated %ethtool_cmd fields transceiver, maxtxpkt and maxrxpkt
-- * are not available in %ethtool_link_settings. Until all drivers are
-- * converted to ignore them or to the new %ethtool_link_settings API,
-- * for both queries and changes, users should always try
-- * %ETHTOOL_GLINKSETTINGS first, and if it fails with -ENOTSUPP stick
-- * only to %ETHTOOL_GSET and %ETHTOOL_SSET consistently. If it
-- * succeeds, then users should stick to %ETHTOOL_GLINKSETTINGS and
-- * %ETHTOOL_SLINKSETTINGS (which would support drivers implementing
-- * either %ethtool_cmd or %ethtool_link_settings).
-+ * are not available in %ethtool_link_settings. These fields will be
-+ * always set to zero in %ETHTOOL_GSET reply and %ETHTOOL_SSET will
-+ * fail if any of them is set to non-zero value.
-  *
-  * Users should assume that all fields not marked read-only are
-  * writable and subject to validation by the driver.  They should use
-diff --git a/include/standard-headers/linux/input-event-codes.h b/include/standard-headers/linux/input-event-codes.h
-index 9e6a8ba..792b8df 100644
---- a/include/standard-headers/linux/input-event-codes.h
-+++ b/include/standard-headers/linux/input-event-codes.h
-@@ -708,6 +708,15 @@
- #define REL_DIAL		0x07
- #define REL_WHEEL		0x08
- #define REL_MISC		0x09
-+/*
-+ * 0x0a is reserved and should not be used in input drivers.
-+ * It was used by HID as REL_MISC+1 and userspace needs to detect if
-+ * the next REL_* event is correct or is just REL_MISC + n.
-+ * We define here REL_RESERVED so userspace can rely on it and detect
-+ * the situation described above.
-+ */
-+#define REL_RESERVED		0x0a
-+#define REL_WHEEL_HI_RES	0x0b
- #define REL_MAX			0x0f
- #define REL_CNT			(REL_MAX+1)
- 
-@@ -744,6 +753,15 @@
- 
- #define ABS_MISC		0x28
- 
-+/*
-+ * 0x2e is reserved and should not be used in input drivers.
-+ * It was used by HID as ABS_MISC+6 and userspace needs to detect if
-+ * the next ABS_* event is correct or is just ABS_MISC + n.
-+ * We define here ABS_RESERVED so userspace can rely on it and detect
-+ * the situation described above.
-+ */
-+#define ABS_RESERVED		0x2e
++    *nv2gpa = SPAPR_PCI_NV2RAM64_WIN_BASE +
++        (index + 1) * SPAPR_PCI_NV2RAM64_WIN_SIZE;
 +
- #define ABS_MT_SLOT		0x2f	/* MT slot being modified */
- #define ABS_MT_TOUCH_MAJOR	0x30	/* Major axis of touching ellipse */
- #define ABS_MT_TOUCH_MINOR	0x31	/* Minor axis (omit if circular) */
-diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
-index ee556cc..e1e9888 100644
---- a/include/standard-headers/linux/pci_regs.h
-+++ b/include/standard-headers/linux/pci_regs.h
-@@ -52,6 +52,7 @@
- #define  PCI_COMMAND_INTX_DISABLE 0x400 /* INTx Emulation Disable */
++    *nv2atsd = SPAPR_PCI_BASE + (index + 8192) * 0x10000;
+ }
  
- #define PCI_STATUS		0x06	/* 16 bits */
-+#define  PCI_STATUS_IMM_READY	0x01	/* Immediate Readiness */
- #define  PCI_STATUS_INTERRUPT	0x08	/* Interrupt status */
- #define  PCI_STATUS_CAP_LIST	0x10	/* Support Capability List */
- #define  PCI_STATUS_66MHZ	0x20	/* Support 66 MHz PCI 2.1 bus */
-diff --git a/linux-headers/asm-arm/unistd-common.h b/linux-headers/asm-arm/unistd-common.h
-index 60c2d93..8c84bcf 100644
---- a/linux-headers/asm-arm/unistd-common.h
-+++ b/linux-headers/asm-arm/unistd-common.h
-@@ -355,5 +355,6 @@
- #define __NR_pkey_free (__NR_SYSCALL_BASE + 396)
- #define __NR_statx (__NR_SYSCALL_BASE + 397)
- #define __NR_rseq (__NR_SYSCALL_BASE + 398)
-+#define __NR_io_pgetevents (__NR_SYSCALL_BASE + 399)
- 
- #endif /* _ASM_ARM_UNISTD_COMMON_H */
-diff --git a/linux-headers/asm-arm64/unistd.h b/linux-headers/asm-arm64/unistd.h
-index 5072cbd..dae1584 100644
---- a/linux-headers/asm-arm64/unistd.h
-+++ b/linux-headers/asm-arm64/unistd.h
-@@ -16,5 +16,6 @@
-  */
- 
- #define __ARCH_WANT_RENAMEAT
-+#define __ARCH_WANT_NEW_STAT
- 
- #include <asm-generic/unistd.h>
-diff --git a/linux-headers/asm-generic/unistd.h b/linux-headers/asm-generic/unistd.h
-index df4bedb..538546e 100644
---- a/linux-headers/asm-generic/unistd.h
-+++ b/linux-headers/asm-generic/unistd.h
-@@ -242,10 +242,12 @@ __SYSCALL(__NR_tee, sys_tee)
- /* fs/stat.c */
- #define __NR_readlinkat 78
- __SYSCALL(__NR_readlinkat, sys_readlinkat)
-+#if defined(__ARCH_WANT_NEW_STAT) || defined(__ARCH_WANT_STAT64)
- #define __NR3264_fstatat 79
- __SC_3264(__NR3264_fstatat, sys_fstatat64, sys_newfstatat)
- #define __NR3264_fstat 80
- __SC_3264(__NR3264_fstat, sys_fstat64, sys_newfstat)
-+#endif
- 
- /* fs/sync.c */
- #define __NR_sync 81
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index f11a7eb..95481af 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -757,6 +757,15 @@ struct kvm_ppc_resize_hpt {
- 
- #define KVM_S390_SIE_PAGE_OFFSET 1
- 
-+/*
-+ * On arm64, machine type can be used to request the physical
-+ * address size for the VM. Bits[7-0] are reserved for the guest
-+ * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
-+ * value 0 implies the default IPA size, 40bits.
-+ */
-+#define KVM_VM_TYPE_ARM_IPA_SIZE_MASK	0xffULL
-+#define KVM_VM_TYPE_ARM_IPA_SIZE(x)		\
-+	((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
- /*
-  * ioctls for /dev/kvm fds:
-  */
-@@ -965,6 +974,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_COALESCED_PIO 162
- #define KVM_CAP_HYPERV_ENLIGHTENED_VMCS 163
- #define KVM_CAP_EXCEPTION_PAYLOAD 164
-+#define KVM_CAP_ARM_VM_IPA_SIZE 165
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index ceb6453..fea9390 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -303,6 +303,70 @@ struct vfio_region_info_cap_type {
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
- 
-+#define VFIO_REGION_TYPE_GFX                    (1)
-+#define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
+ static ICSState *spapr_ics_get(XICSFabric *dev, int irq)
+@@ -4182,7 +4188,8 @@ DEFINE_SPAPR_MACHINE(2_8, "2.8", false);
+ static void phb_placement_2_7(sPAPRMachineState *spapr, uint32_t index,
+                               uint64_t *buid, hwaddr *pio,
+                               hwaddr *mmio32, hwaddr *mmio64,
+-                              unsigned n_dma, uint32_t *liobns, Error **errp)
++                              unsigned n_dma, uint32_t *liobns,
++                              hwaddr *nv2_gpa, hwaddr *nv2atsd, Error **errp)
+ {
+     /* Legacy PHB placement for pseries-2.7 and earlier machine types */
+     const uint64_t base_buid = 0x800000020000000ULL;
+@@ -4226,6 +4233,9 @@ static void phb_placement_2_7(sPAPRMachineState *spapr, uint32_t index,
+      * fallback behaviour of automatically splitting a large "32-bit"
+      * window into contiguous 32-bit and 64-bit windows
+      */
 +
-+/**
-+ * struct vfio_region_gfx_edid - EDID region layout.
-+ *
-+ * Set display link state and EDID blob.
-+ *
-+ * The EDID blob has monitor information such as brand, name, serial
-+ * number, physical size, supported video modes and more.
-+ *
-+ * This special region allows userspace (typically qemu) set a virtual
-+ * EDID for the virtual monitor, which allows a flexible display
-+ * configuration.
-+ *
-+ * For the edid blob spec look here:
-+ *    https://en.wikipedia.org/wiki/Extended_Display_Identification_Data
-+ *
-+ * On linux systems you can find the EDID blob in sysfs:
-+ *    /sys/class/drm/${card}/${connector}/edid
-+ *
-+ * You can use the edid-decode ulility (comes with xorg-x11-utils) to
-+ * decode the EDID blob.
-+ *
-+ * @edid_offset: location of the edid blob, relative to the
-+ *               start of the region (readonly).
-+ * @edid_max_size: max size of the edid blob (readonly).
-+ * @edid_size: actual edid size (read/write).
-+ * @link_state: display link state (read/write).
-+ * VFIO_DEVICE_GFX_LINK_STATE_UP: Monitor is turned on.
-+ * VFIO_DEVICE_GFX_LINK_STATE_DOWN: Monitor is turned off.
-+ * @max_xres: max display width (0 == no limitation, readonly).
-+ * @max_yres: max display height (0 == no limitation, readonly).
-+ *
-+ * EDID update protocol:
-+ *   (1) set link-state to down.
-+ *   (2) update edid blob and size.
-+ *   (3) set link-state to up.
-+ */
-+struct vfio_region_gfx_edid {
-+	__u32 edid_offset;
-+	__u32 edid_max_size;
-+	__u32 edid_size;
-+	__u32 max_xres;
-+	__u32 max_yres;
-+	__u32 link_state;
-+#define VFIO_DEVICE_GFX_LINK_STATE_UP    1
-+#define VFIO_DEVICE_GFX_LINK_STATE_DOWN  2
-+};
-+
-+/* 10de vendor sub-type
-+ *
-+ * NVIDIA GPU NVlink2 RAM is coherent RAM mapped onto the host address space.
-+ */
-+#define VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM	(1)
-+
-+/*
-+ * 1014 vendor sub-type
-+ *
-+ * IBM NPU NVlink2 ATSD (Address Translation Shootdown) register of NPU
-+ * to do TLB invalidation on a GPU.
-+ */
-+#define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
-+
- /*
-  * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
-  * which allows direct access to non-MSIX registers which happened to be within
-@@ -313,6 +377,18 @@ struct vfio_region_info_cap_type {
-  */
- #define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
++    *nv2_gpa = 0;
++    *nv2atsd = 0;
+ }
  
-+/*
-+ * Capability with compressed real address (aka SSA - small system address)
-+ * where GPU RAM is mapped on a system bus. Used by a GPU for DMA routing.
-+ */
-+#define VFIO_REGION_INFO_CAP_NPU2		4
+ static void spapr_machine_2_7_instance_options(MachineState *machine)
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 58afa46..417ea1d 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1249,6 +1249,7 @@ static uint32_t spapr_phb_get_pci_drc_index(sPAPRPHBState *phb,
+ static void spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
+                                        sPAPRPHBState *sphb)
+ {
++    int i, j;
+     ResourceProps rp;
+     bool is_bridge = false;
+     int pci_status;
+@@ -1349,6 +1350,56 @@ static void spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
+     if (sphb->pcie_ecs && pci_is_express(dev)) {
+         _FDT(fdt_setprop_cell(fdt, offset, "ibm,pci-config-space-type", 0x1));
+     }
 +
-+struct vfio_region_info_cap_npu2 {
-+	struct vfio_info_cap_header header;
-+	__u64 tgt;
-+	/* size is defined in VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM */
-+};
++    for (i = 0; i < sphb->nvgpus.num; ++i) {
++        PCIDevice *gpdev = sphb->nvgpus.gpus[i].gpdev;
 +
- /**
-  * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
-  *				    struct vfio_irq_info)
++        if (dev == gpdev) {
++            uint32_t npus[sphb->nvgpus.gpus[i].links];
++
++            for (j = 0; j < sphb->nvgpus.gpus[i].links; ++j) {
++                PCIDevice *npdev = sphb->nvgpus.gpus[i].npdev[j];
++
++                npus[j] = cpu_to_be32(PHANDLE_PCIDEV(sphb, npdev));
++            }
++            _FDT(fdt_setprop(fdt, offset, "ibm,npu", npus,
++                             j * sizeof(npus[0])));
++            _FDT((fdt_setprop_cell(fdt, offset, "phandle",
++                                   PHANDLE_PCIDEV(sphb, dev))));
++        } else {
++            for (j = 0; j < sphb->nvgpus.gpus[i].links; ++j) {
++                if (dev != sphb->nvgpus.gpus[i].npdev[j]) {
++                    continue;
++                }
++
++                _FDT((fdt_setprop_cell(fdt, offset, "phandle",
++                                       PHANDLE_PCIDEV(sphb, dev))));
++
++                _FDT(fdt_setprop_cell(fdt, offset, "ibm,gpu",
++                                      PHANDLE_PCIDEV(sphb, gpdev)));
++
++                _FDT((fdt_setprop_cell(fdt, offset, "ibm,nvlink",
++                                       PHANDLE_NVLINK(sphb, i, j))));
++
++                /*
++                 * If we ever want to emulate GPU RAM at the same location as on
++                 * the host - here is the encoding GPA->TGT:
++                 *
++                 * gta  = ((sphb->nv2_gpa >> 42) & 0x1) << 42;
++                 * gta |= ((sphb->nv2_gpa >> 45) & 0x3) << 43;
++                 * gta |= ((sphb->nv2_gpa >> 49) & 0x3) << 45;
++                 * gta |= sphb->nv2_gpa & ((1UL << 43) - 1);
++                 */
++                _FDT(fdt_setprop_cell(fdt, offset, "memory-region",
++                                      PHANDLE_GPURAM(sphb, i)));
++                _FDT(fdt_setprop_u64(fdt, offset, "ibm,device-tgt-addr",
++                                     sphb->nvgpus.gpus[i].tgt));
++                /* _FDT(fdt_setprop_cell(fdt, offset, "ibm,nvlink", 0x164)); */
++                /* Unknown magic value of 9 */
++                _FDT(fdt_setprop_cell(fdt, offset, "ibm,nvlink-speed", 9));
++            }
++        }
++    }
+ }
+ 
+ /* create OF node for pci device and required OF DT properties */
+@@ -1582,7 +1633,9 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+         smc->phb_placement(spapr, sphb->index,
+                            &sphb->buid, &sphb->io_win_addr,
+                            &sphb->mem_win_addr, &sphb->mem64_win_addr,
+-                           windows_supported, sphb->dma_liobn, &local_err);
++                           windows_supported, sphb->dma_liobn,
++                           &sphb->nv2_gpa_win_addr,
++                           &sphb->nv2_atsd_win_addr, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
+@@ -1829,6 +1882,8 @@ static Property spapr_phb_properties[] = {
+                      pre_2_8_migration, false),
+     DEFINE_PROP_BOOL("pcie-extended-configuration-space", sPAPRPHBState,
+                      pcie_ecs, true),
++    DEFINE_PROP_UINT64("gpa", sPAPRPHBState, nv2_gpa_win_addr, 0),
++    DEFINE_PROP_UINT64("atsd", sPAPRPHBState, nv2_atsd_win_addr, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -2068,6 +2123,73 @@ static void spapr_phb_pci_enumerate(sPAPRPHBState *phb)
+ 
+ }
+ 
++static void spapr_phb_pci_find_nvgpu(PCIBus *bus, PCIDevice *pdev, void *opaque)
++{
++    struct spapr_phb_pci_nvgpu_config *nvgpus = opaque;
++    PCIBus *sec_bus;
++    Object *mr_gpu, *mr_npu;
++    uint64_t tgt = 0, gpa, atsd;
++    int i;
++
++    mr_gpu = object_property_get_link(OBJECT(pdev), "nvlink2-mr[0]", NULL);
++    mr_npu = object_property_get_link(OBJECT(pdev), "nvlink2-atsd-mr[0]", NULL);
++    if (mr_gpu) {
++        tgt = object_property_get_uint(mr_gpu, "tgt", NULL);
++        gpa = nvgpus->nv2_ram;
++        nvgpus->nv2_ram += memory_region_size(MEMORY_REGION(mr_gpu));
++    } else if (mr_npu) {
++        tgt = object_property_get_uint(mr_npu, "tgt", NULL);
++        atsd = nvgpus->nv2_atsd;
++        nvgpus->atsd[nvgpus->atsd_num] = cpu_to_be64(atsd);
++        ++nvgpus->atsd_num;
++        nvgpus->nv2_atsd += memory_region_size(MEMORY_REGION(mr_npu));
++    }
++
++    if (tgt) {
++        for (i = 0; i < nvgpus->num; ++i) {
++            if (nvgpus->gpus[i].tgt == tgt) {
++                break;
++            }
++        }
++
++        if (i == nvgpus->num) {
++            if (nvgpus->num == ARRAY_SIZE(nvgpus->gpus)) {
++                return;
++            }
++            ++nvgpus->num;
++        }
++
++        nvgpus->gpus[i].tgt = tgt;
++        if (mr_gpu) {
++            g_assert(!nvgpus->gpus[i].gpdev);
++            nvgpus->gpus[i].gpdev = pdev;
++            nvgpus->gpus[i].gpa = gpa;
++        } else {
++            int j = nvgpus->gpus[i].links;
++
++            ++nvgpus->gpus[i].links;
++
++            g_assert(mr_npu);
++            g_assert(!nvgpus->gpus[i].npdev[j]);
++            nvgpus->gpus[i].npdev[j] = pdev;
++            nvgpus->gpus[i].atsd[j] = atsd;
++        }
++    }
++
++    if ((pci_default_read_config(pdev, PCI_HEADER_TYPE, 1) !=
++         PCI_HEADER_TYPE_BRIDGE)) {
++        return;
++    }
++
++    sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
++    if (!sec_bus) {
++        return;
++    }
++
++    pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
++                        spapr_phb_pci_find_nvgpu, opaque);
++}
++
+ int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, void *fdt,
+                           uint32_t nr_msis)
+ {
+@@ -2127,7 +2249,7 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, void *fdt,
+ 
+     /* Write PHB properties */
+     _FDT(fdt_setprop_string(fdt, bus_off, "device_type", "pci"));
+-    _FDT(fdt_setprop_string(fdt, bus_off, "compatible", "IBM,Logical_PHB"));
++
+     _FDT(fdt_setprop_cell(fdt, bus_off, "#address-cells", 0x3));
+     _FDT(fdt_setprop_cell(fdt, bus_off, "#size-cells", 0x2));
+     _FDT(fdt_setprop_cell(fdt, bus_off, "#interrupt-cells", 0x1));
+@@ -2186,6 +2308,45 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, void *fdt,
+     spapr_phb_pci_enumerate(phb);
+     _FDT(fdt_setprop_cell(fdt, bus_off, "qemu,phb-enumerated", 0x1));
+ 
++    for (i = 0; i < phb->nvgpus.num; ++i) {
++        PCIDevice *gpdev = phb->nvgpus.gpus[i].gpdev;
++        Object *nvlink2_mrobj = object_property_get_link(OBJECT(gpdev),
++                                                         "nvlink2-mr[0]", NULL);
++        MemoryRegion *mr = MEMORY_REGION(nvlink2_mrobj);
++
++        memory_region_del_subregion(get_system_memory(), mr);
++
++        for (j = 0; j < phb->nvgpus.gpus[i].links; ++j) {
++            PCIDevice *npdev = phb->nvgpus.gpus[i].npdev[j];
++            Object *nvlink2_mrobj;
++            nvlink2_mrobj = object_property_get_link(OBJECT(npdev),
++                                                     "nvlink2-atsd-mr[0]",
++                                                     NULL);
++            if (nvlink2_mrobj) {
++                MemoryRegion *mr = MEMORY_REGION(nvlink2_mrobj);
++                memory_region_del_subregion(get_system_memory(), mr);
++            }
++        }
++    }
++
++    memset(&phb->nvgpus, 0, sizeof(phb->nvgpus));
++    phb->nvgpus.nv2_ram = phb->nv2_gpa_win_addr;
++    phb->nvgpus.nv2_atsd = phb->nv2_atsd_win_addr;
++    pci_for_each_device(bus, pci_bus_num(bus),
++                        spapr_phb_pci_find_nvgpu, &phb->nvgpus);
++    if (phb->nvgpus.num) {
++        const char compat_npu[] = "IBM,Logical_PHB\x00IBM,npu-vphb";
++
++        /* 1 GPU and at least one NVLink2 */
++        _FDT(fdt_setprop(fdt, bus_off, "compatible", compat_npu,
++                         sizeof(compat_npu)));
++        _FDT((fdt_setprop(fdt, bus_off, "ibm,mmio-atsd", phb->nvgpus.atsd,
++                          phb->nvgpus.atsd_num *
++                          sizeof(phb->nvgpus.atsd[0]))));
++    } else {
++        _FDT(fdt_setprop_string(fdt, bus_off, "compatible", "IBM,Logical_PHB"));
++    }
++
+     /* Populate tree nodes with PCI devices attached */
+     s_fdt.fdt = fdt;
+     s_fdt.node_off = bus_off;
+@@ -2200,6 +2361,97 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, void *fdt,
+         return ret;
+     }
+ 
++    /* NVLink: Add memory nodes; map GPU RAM and ATSD */
++    for (i = 0; i < phb->nvgpus.num; ++i) {
++        PCIDevice *gpdev = phb->nvgpus.gpus[i].gpdev;
++        Object *nvlink2_mrobj = object_property_get_link(OBJECT(gpdev),
++                                                         "nvlink2-mr[0]", NULL);
++        char *mem_name;
++        int off;
++        /* For some reason NVLink2 wants a separate NUMA node for its RAM */
++        uint32_t at = cpu_to_be32(GPURAM_ASSOCIATIVITY(phb, i));
++        uint32_t associativity[] = { cpu_to_be32(0x4), at, at, at, at };
++        uint64_t nv2_size = object_property_get_uint(nvlink2_mrobj,
++                                                     "size", NULL);
++        uint64_t mem_reg_property[2] = {
++            cpu_to_be64(phb->nvgpus.gpus[i].gpa), cpu_to_be64(nv2_size) };
++
++        mem_name = g_strdup_printf("memory@" TARGET_FMT_lx,
++                                   phb->nvgpus.gpus[i].gpa);
++        off = fdt_add_subnode(fdt, 0, mem_name);
++        _FDT(off);
++        _FDT((fdt_setprop_string(fdt, off, "device_type", "memory")));
++        _FDT((fdt_setprop(fdt, off, "reg", mem_reg_property,
++                          sizeof(mem_reg_property))));
++        _FDT((fdt_setprop(fdt, off, "ibm,associativity", associativity,
++                          sizeof(associativity))));
++
++        _FDT((fdt_setprop_string(fdt, off, "compatible",
++                                 "ibm,coherent-device-memory")));
++        mem_reg_property[1] = 0;
++        _FDT((fdt_setprop(fdt, off, "linux,usable-memory", mem_reg_property,
++                          sizeof(mem_reg_property))));
++        /*_FDT((fdt_setprop_cell(fdt, off, "ibm,chip-id", phb->index))); */
++        _FDT((fdt_setprop_cell(fdt, off, "phandle", PHANDLE_GPURAM(phb, i))));
++
++        g_free(mem_name);
++    }
++
++    /* NVLink: Add fake NPU Links for NPU bridge's "ibm,nvlink" property */
++    if (phb->nvgpus.num) {
++        char *npuname = g_strdup_printf("npuphb%d", phb->index);
++        int npuoff = fdt_add_subnode(fdt, 0, npuname);
++        int linkidx = 0;
++
++        _FDT(npuoff);
++        _FDT(fdt_setprop_cell(fdt, npuoff, "#address-cells", 1));
++        _FDT(fdt_setprop_cell(fdt, npuoff, "#size-cells", 0));
++        _FDT((fdt_setprop_string(fdt, npuoff, "compatible", "ibm,power9-npu")));
++        g_free(npuname);
++
++        for (i = 0; i < phb->nvgpus.num; ++i) {
++            for (j = 0; j < phb->nvgpus.gpus[i].links; ++j) {
++                char *linkname = g_strdup_printf("link@%d", linkidx);
++                int off = fdt_add_subnode(fdt, npuoff, linkname);
++
++                _FDT(off);
++                _FDT((fdt_setprop_cell(fdt, off, "reg", linkidx)));
++                _FDT((fdt_setprop_string(fdt, off, "compatible",
++                                         "ibm,npu-link")));
++                _FDT((fdt_setprop_cell(fdt, off, "phandle",
++                                       PHANDLE_NVLINK(phb, i, j))));
++                _FDT((fdt_setprop_cell(fdt, off, "ibm,npu-link-index",
++                                       linkidx)));
++                g_free(linkname);
++                ++linkidx;
++            }
++        }
++    }
++
++    for (i = 0; i < phb->nvgpus.num; ++i) {
++        PCIDevice *gpdev = phb->nvgpus.gpus[i].gpdev;
++        Object *nvlink2_mrobj = object_property_get_link(OBJECT(gpdev),
++                                                         "nvlink2-mr[0]", NULL);
++        MemoryRegion *mr = MEMORY_REGION(nvlink2_mrobj);
++
++        memory_region_add_subregion(get_system_memory(),
++                                    phb->nvgpus.gpus[i].gpa, mr);
++
++        for (j = 0; j < phb->nvgpus.gpus[i].links; ++j) {
++            PCIDevice *npdev = phb->nvgpus.gpus[i].npdev[j];
++            Object *nvlink2_mrobj;
++            nvlink2_mrobj = object_property_get_link(OBJECT(npdev),
++                                                     "nvlink2-atsd-mr[0]",
++                                                     NULL);
++            if (nvlink2_mrobj) {
++                MemoryRegion *mr = MEMORY_REGION(nvlink2_mrobj);
++                memory_region_add_subregion(get_system_memory(),
++                                            phb->nvgpus.gpus[i].atsd[j],
++                                            mr);
++            }
++        }
++    }
++
+     return 0;
+ }
+ 
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index 2796837..e655dbc 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -2206,3 +2206,96 @@ int vfio_add_virt_caps(VFIOPCIDevice *vdev, Error **errp)
+ 
+     return 0;
+ }
++
++static void vfio_pci_npu2_atsd_get_tgt(Object *obj, Visitor *v,
++                                       const char *name,
++                                       void *opaque, Error **errp)
++{
++    uint64_t tgt = (uint64_t) opaque;
++    visit_type_uint64(v, name, &tgt, errp);
++}
++
++int vfio_pci_nvlink2_ram_init(VFIOPCIDevice *vdev, Error **errp)
++{
++    int ret;
++    void *p;
++    struct vfio_region_info *nv2region = NULL;
++    struct vfio_info_cap_header *hdr;
++    struct vfio_region_info_cap_npu2 *cap;
++    MemoryRegion *nv2mr = g_malloc0(sizeof(*nv2mr));
++
++    ret = vfio_get_dev_region_info(&vdev->vbasedev,
++                                   VFIO_REGION_TYPE_PCI_VENDOR_TYPE |
++                                   PCI_VENDOR_ID_NVIDIA,
++                                   VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM,
++                                   &nv2region);
++    if (ret) {
++        return ret;
++    }
++
++    p = mmap(NULL, nv2region->size, PROT_READ | PROT_WRITE | PROT_EXEC,
++             MAP_SHARED, vdev->vbasedev.fd, nv2region->offset);
++
++    if (!p) {
++        return -errno;
++    }
++
++    memory_region_init_ram_ptr(nv2mr, OBJECT(vdev), "nvlink2-mr",
++                               nv2region->size, p);
++
++    hdr = vfio_get_region_info_cap(nv2region, VFIO_REGION_INFO_CAP_NPU2);
++    cap = (struct vfio_region_info_cap_npu2 *) hdr;
++
++    object_property_add(OBJECT(nv2mr), "tgt", "uint64",
++                        vfio_pci_npu2_atsd_get_tgt, NULL, NULL,
++                        (void *) cap->tgt, NULL);
++    trace_vfio_pci_nvidia_gpu_ram_setup_quirk(vdev->vbasedev.name, cap->tgt,
++                                              nv2region->size);
++    g_free(nv2region);
++
++    return 0;
++}
++
++int vfio_pci_npu2_atsd_init(VFIOPCIDevice *vdev, Error **errp)
++{
++    int ret;
++    void *p;
++    struct vfio_region_info *atsd_region = NULL;
++    struct vfio_info_cap_header *hdr;
++    struct vfio_region_info_cap_npu2 *cap;
++    MemoryRegion *atsd_mr = g_malloc0(sizeof(*atsd_mr));
++
++    ret = vfio_get_dev_region_info(&vdev->vbasedev,
++                                   VFIO_REGION_TYPE_PCI_VENDOR_TYPE |
++                                   PCI_VENDOR_ID_IBM,
++                                   VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD,
++                                   &atsd_region);
++    if (ret) {
++        return ret;
++    }
++
++    p = mmap(NULL, atsd_region->size, PROT_READ | PROT_WRITE | PROT_EXEC,
++             MAP_SHARED, vdev->vbasedev.fd, atsd_region->offset);
++
++    if (!p) {
++        return -errno;
++    }
++
++    memory_region_init_ram_device_ptr(atsd_mr, OBJECT(vdev),
++                                      "nvlink2-atsd-mr",
++                                      atsd_region->size,
++                                      p);
++
++    hdr = vfio_get_region_info_cap(atsd_region, VFIO_REGION_INFO_CAP_NPU2);
++    cap = (struct vfio_region_info_cap_npu2 *) hdr;
++
++    object_property_add(OBJECT(atsd_mr), "tgt", "uint64",
++                        vfio_pci_npu2_atsd_get_tgt, NULL, NULL,
++                        (void *) cap->tgt, NULL);
++
++    trace_vfio_pci_npu2_setup_quirk(vdev->vbasedev.name, cap->tgt,
++                                    atsd_region->size);
++    g_free(atsd_region);
++
++    return 0;
++}
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 7848b28..d7de202 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -3074,6 +3074,20 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         goto out_teardown;
+     }
+ 
++    if (vdev->vendor_id == PCI_VENDOR_ID_NVIDIA && vdev->device_id == 0x1db1) {
++        ret = vfio_pci_nvlink2_ram_init(vdev, errp);
++        if (ret) {
++            error_report("Failed to setup GPU RAM");
++        }
++    }
++
++    if (vdev->vendor_id == PCI_VENDOR_ID_IBM && vdev->device_id == 0x04ea) {
++        ret = vfio_pci_npu2_atsd_init(vdev, errp);
++        if (ret) {
++            error_report("Failed to setup ATSD");
++        }
++    }
++
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
+     vfio_setup_resetfn_quirk(vdev);
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index adfa75e..7595009 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -88,6 +88,9 @@ vfio_pci_igd_opregion_enabled(const char *name) "%s"
+ vfio_pci_igd_host_bridge_enabled(const char *name) "%s"
+ vfio_pci_igd_lpc_bridge_enabled(const char *name) "%s"
+ 
++vfio_pci_nvidia_gpu_ram_setup_quirk(const char *name, uint64_t tgt, uint64_t size) "%s tgt=0x%"PRIx64" size=0x%"PRIx64
++vfio_pci_npu2_setup_quirk(const char *name, uint64_t tgt, uint64_t size) "%s tgt=0x%"PRIx64" size=0x%"PRIx64
++
+ # hw/vfio/common.c
+ vfio_region_write(const char *name, int index, uint64_t addr, uint64_t data, unsigned size) " (%s:region%d+0x%"PRIx64", 0x%"PRIx64 ", %d)"
+ vfio_region_read(char *name, int index, uint64_t addr, unsigned size, uint64_t data) " (%s:region%d+0x%"PRIx64", %d) = 0x%"PRIx64
 -- 
 2.17.1
