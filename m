@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gMVS2-0003V6-Sz
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:57:46 -0500
+	(envelope-from <xiezhide@huawei.com>) id 1gMVUf-0004Z6-5P
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 05:00:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gMVRp-0002ap-NB
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:57:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54846)
+	(envelope-from <xiezhide@huawei.com>) id 1gMVUT-00042F-7k
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 05:00:20 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2288 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gMVRp-0002Z7-5o
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:57:29 -0500
-References: <20180629145347.652-1-peter.maydell@linaro.org>
-	<20180629145347.652-41-peter.maydell@linaro.org>
-	<e8d62bcd-f8a9-2a6a-7765-0cf69cc8c1b5@redhat.com>
-	<0840beac-a764-2fa9-98e3-da10f1f7d6bc@linaro.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <30881914-68f3-607d-b2ae-681f5621195e@redhat.com>
-Date: Tue, 13 Nov 2018 10:57:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <0840beac-a764-2fa9-98e3-da10f1f7d6bc@linaro.org>
-Content-Type: text/plain; charset=utf-8
+	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gMVUS-0003zq-HG
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 05:00:13 -0500
+From: xiezhide <xiezhide@huawei.com>
+Date: Tue, 13 Nov 2018 09:59:54 +0000
+Message-ID: <A02D6AA901860840B46E751C5E9E38B43CC96FA1@DGGEML532-MBX.china.huawei.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 40/55] target/arm: Enable SVE for
- aarch64-linux-user
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v1 0/3] fsdev-throttle-qmp: refactor code for
+ qmp interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "groug@kaod.org" <groug@kaod.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>
 
-On 13/11/2018 10:49, Richard Henderson wrote:
-> On 11/12/18 10:10 PM, Laurent Vivier wrote:
->> Running some tests for my pull request, I've found this commit breaks
->> ltp-full-20180515 sigaltstack01 tests with ubuntu arm64/trusty.
->>
->> sigaltstack01  274  TBROK  :  tst_sig.c:233: unexpected signal
->> SIGIOT/SIGABRT(6) received (pid = 15241).
->> *** Error in `/opt/ltp/testcases/bin/sigaltstack01': free(): invalid
->> pointer: 0x000000000042a010 ***
-> 
-> How exactly does one reproduce this failure?
-> 
-> $ ~/qemu/bld/aarch64-linux-user/qemu-aarch64 -cpu max
-> ./testcases/kernel/syscalls/sigaltstack/sigaltstack01
-> sigaltstack01    1  TPASS  :  Functionality of sigaltstack() successful
+This patches provide qmp interface to query/set io throttle parameters of a=
+ fsdev.
+Some of patches also refactor the code and structure that was present in bl=
+ock and fsdev files.
 
-For me it happens only with Ubuntu trusty:
+x00390961 (3):
+  fsdev-throttle-qmp: refactor code for qmp interface for io throttling
+  fsdev-throttle-qmp: qmp interface for fsdev io throttling
+  fsdev-throttle-qmp: hmp interface for fsdev io throttling
 
-sudo chroot chroot/arm64/trusty /opt/ltp/testcases/bin/sigaltstack01
+ Makefile                        |  20 +++-
+ Makefile.objs                   |   8 ++
+ block/throttle.c                |   6 +-
+ blockdev.c                      |  96 +----------------
+ fsdev/qemu-fsdev-dummy.c        |  11 ++
+ fsdev/qemu-fsdev-throttle.c     | 144 +++++++++++++++++---------
+ fsdev/qemu-fsdev-throttle.h     |   6 +-
+ fsdev/qemu-fsdev.c              |  29 ++++++
+ hmp-commands-info.hx            |  15 +++
+ hmp-commands.hx                 |  15 +++
+ hmp.c                           |  83 +++++++++++++--
+ hmp.h                           |   4 +
+ include/qemu/throttle-options.h |   3 +-
+ include/qemu/throttle.h         |   4 +-
+ include/qemu/typedefs.h         |   1 +
+ monitor.c                       |  41 ++++----
+ qapi/block-core.json            | 122 +---------------------
+ qapi/fsdev.json                 |  96 +++++++++++++++++
+ qapi/qapi-schema.json           |   1 +
+ qapi/tlimits.json               |  89 ++++++++++++++++
+ qmp.c                           |  12 +++
+ util/throttle.c                 | 224 ++++++++++++++++++++++++++----------=
+----
+ 22 files changed, 654 insertions(+), 376 deletions(-)
+ create mode 100644 qapi/fsdev.json
+ create mode 100644 qapi/tlimits.json
 
-Thanks,
-Laurent
+v0 -> v1:
+ Addressed comments from Eric Blake and Greg Kurz.
+ Fix patch corrupt issue due to email client change the patch format with c=
+opy-to-paster
+ Break patch to patches
+
+--
+1.8.3.1
