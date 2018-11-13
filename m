@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMc9c-0006HH-5A
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:07:09 -0500
+	(envelope-from <philmd@redhat.com>) id 1gMc9f-0006SB-Nt
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:07:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMc4K-0003EN-Pz
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:01:45 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44257)
+	(envelope-from <philmd@redhat.com>) id 1gMc3b-0002dB-3w
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:00:59 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:50658)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gMc4K-00037j-EN
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:01:40 -0500
-Received: by mail-oi1-x241.google.com with SMTP id p82-v6so10914559oih.11
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 09:01:32 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20181113165247.4806-3-sameo@linux.intel.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gMc3a-000208-Sg
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:00:55 -0500
+Received: by mail-wm1-f66.google.com with SMTP id 124-v6so12779089wmw.0
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 09:00:24 -0800 (PST)
 References: <20181113165247.4806-1-sameo@linux.intel.com>
-	<20181113165247.4806-3-sameo@linux.intel.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Nov 2018 17:01:11 +0000
-Message-ID: <CAFEAcA-R51dyV7gtS+q-eLNn5LBJbSMKtQu4-N3p0c4mJrU8DA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/13] target: arm: Remove unused headers
+	<20181113165247.4806-2-sameo@linux.intel.com>
+	<CAFEAcA-npVS1Q0=or=p-kjP0Nf4h1n+qUL7y8+yYCdtuHa7Fxg@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <60aa686a-89b3-4b98-604a-0168fa8419c0@redhat.com>
+Date: Tue, 13 Nov 2018 18:00:16 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-npVS1Q0=or=p-kjP0Nf4h1n+qUL7y8+yYCdtuHa7Fxg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 01/13] target: arm: Add copyright
+ boilerplate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 13 November 2018 at 16:52, Samuel Ortiz <sameo@linux.intel.com> wrote:
-> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Robert Bradford <robert.bradford@intel.com>
-> Reviewed-by: Samuel Ortiz <sameo@linux.intel.com>
-> ---
->  target/arm/helper.c | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 3d4e9c5c8a..27d9285e1e 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -12,13 +12,10 @@
->  #include "internals.h"
->  #include "exec/gdbstub.h"
->  #include "exec/helper-proto.h"
-> -#include "qemu/host-utils.h"
+On 13/11/18 17:58, Peter Maydell wrote:
+> On 13 November 2018 at 16:52, Samuel Ortiz <sameo@linux.intel.com> wrote:
+>> From: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Reviewed-by: Robert Bradford <robert.bradford@intel.com>
+>> Reviewed-by: Samuel Ortiz <sameo@linux.intel.com>
+>> ---
+>>   target/arm/helper.c | 7 +++++++
+>>   1 file changed, 7 insertions(+)
+>>
+>> diff --git a/target/arm/helper.c b/target/arm/helper.c
+>> index 0da1424f72..3d4e9c5c8a 100644
+>> --- a/target/arm/helper.c
+>> +++ b/target/arm/helper.c
+>> @@ -1,3 +1,10 @@
+>> +/*
+>> + * ARM generic helpers.
+>> + *
+>> + * This code is licensed under the GNU GPL v2.
+>> + *
+>> + * SPDX-License-Identifier: GPL-2.0-or-later
+>> + */
+> 
+> The human readable text says "v2", but the SPDX tag says
+> "v2 or later". Which is right? (The top level LICENSE file says
+> source files with no specific license are 2-or-later).
 
-This is for muldiv64().
-
->  #include "sysemu/arch_init.h"
->  #include "sysemu/sysemu.h"
-> -#include "qemu/bitops.h"
-
-This is for extract32() and friends.
-
->  #include "qemu/crc32c.h"
->  #include "exec/exec-all.h"
-> -#include "exec/cpu_ldst.h"
-
-This is for cpu_stl_data().
-
->  #include "arm_ldst.h"
->  #include <zlib.h> /* For crc32 */
->  #include "exec/semihost.h"
-
-thanks
--- PMM
+Sorry, the human failed, the machine is right.
