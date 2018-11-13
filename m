@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gMOB7-0002U1-Fy
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 21:11:46 -0500
+	(envelope-from <flukshun@gmail.com>) id 1gMOwz-0007lG-8W
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 22:01:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gMOB4-0004dx-Bo
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 21:11:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39592)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gMOB4-0004do-5b
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 21:11:42 -0500
-Date: Tue, 13 Nov 2018 00:11:34 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181113021134.GB12503@habkost.net>
-References: <20181109182153.5390-1-wainersm@redhat.com>
+	(envelope-from <flukshun@gmail.com>) id 1gMOwx-0005QF-1W
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 22:01:13 -0500
+Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:37280)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gMOww-0005L9-IU
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 22:01:10 -0500
+Received: by mail-oi1-x22c.google.com with SMTP id w66-v6so9068256oiw.4
+	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 19:01:10 -0800 (PST)
+Sender: fluxion <flukshun@gmail.com>
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Mon, 12 Nov 2018 21:00:47 -0600
+Message-Id: <20181113030047.11711-3-mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20181113030047.11711-1-mdroth@linux.vnet.ibm.com>
+References: <20181113030047.11711-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181109182153.5390-1-wainersm@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] Acceptance tests: add Linux initrd
- checking test
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL for-3.1 2/2] qga: Add multiple include guard to
+ guest-agent-core.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Cc: qemu-devel@nongnu.org, crosa@redhat.com, philmd@redhat.com, lizhijian@cn.fujitsu.com, ccarrara@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Fri, Nov 09, 2018 at 01:21:53PM -0500, Wainer dos Santos Moschetta wro=
-te:
-> QEMU used to exits with a not accurate error message when
-> an initrd > 2GiB was passed. That was fixed on patch:
->=20
-> 	commit f3839fda5771596152b75dd1e1a6d050e6e6e380
-> 	Author: Li Zhijian <lizhijian@cn.fujitsu.com>
-> 	Date:   Thu Sep 13 18:07:13 2018 +0800
->=20
->     	change get_image_size return type to int64_t
->=20
-> This change adds a regression test for that fix. It starts
-> QEMU with a 2GiB dummy initrd, and check it evaluates the file
-> size correctly and prints accurate message.
->=20
-> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Queued for 4.0, thanks!
+The guest-agent-core.h header was missing the usual guards
+against multiple inclusion; add them.
 
---=20
-Eduardo
+(Spotted by lgtm.com's static analyzer.)
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ qga/guest-agent-core.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/qga/guest-agent-core.h b/qga/guest-agent-core.h
+index 6f4d214cb9..60eae16f27 100644
+--- a/qga/guest-agent-core.h
++++ b/qga/guest-agent-core.h
+@@ -10,6 +10,9 @@
+  * This work is licensed under the terms of the GNU GPL, version 2 or later.
+  * See the COPYING file in the top-level directory.
+  */
++#ifndef GUEST_AGENT_CORE_H
++#define GUEST_AGENT_CORE_H
++
+ #include "qapi/qmp/dispatch.h"
+ #include "qemu-common.h"
+ #include "qga-qapi-types.h"
+@@ -46,3 +49,5 @@ int ga_parse_whence(GuestFileWhence *whence, Error **errp);
+ #ifndef _WIN32
+ void reopen_fd_to_null(int fd);
+ #endif
++
++#endif /* GUEST_AGENT_CORE_H */
+-- 
+2.17.1
