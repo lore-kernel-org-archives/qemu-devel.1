@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gMar5-0002cT-Nv
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:56 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gMar7-0002di-2R
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gMar2-0002Vo-A2
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:54 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54930)
+	(envelope-from <richard.henderson@linaro.org>) id 1gMar6-0002Xm-5l
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:56 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51264)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gMar1-0002Cp-9U
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:52 -0500
-Received: by mail-wm1-x343.google.com with SMTP id r63-v6so12460837wma.4
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:43:18 -0800 (PST)
+	id 1gMar5-0002C5-TC
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:56 -0500
+Received: by mail-wm1-x342.google.com with SMTP id w7-v6so12402582wmc.1
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:43:17 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 13 Nov 2018 16:42:23 +0100
-Message-Id: <20181113154226.14396-2-richard.henderson@linaro.org>
-In-Reply-To: <20181113154226.14396-1-richard.henderson@linaro.org>
-References: <20181113154226.14396-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4 1/4] target/arm: Install ARMISARegisters
- from kvm host
+Date: Tue, 13 Nov 2018 16:42:22 +0100
+Message-Id: <20181113154226.14396-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v4 0/4] target/arm: KVM vs ARMISARegisters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +27,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-The ID registers are replacing (some of) the feature bits.
-We need (some of) these values to determine the set of data
-to be handled during migration.
+My previous patch set for replacing feature bits with id registers
+failed to consider that these id registers are beginning to control
+migration, and thus we must fill them in for KVM as well.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/kvm_arm.h | 1 +
- target/arm/kvm.c     | 1 +
- 2 files changed, 2 insertions(+)
+Thus, we want to initialize these values within CPU from the host.
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 21c0129da2..6393455b1d 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -183,6 +183,7 @@ void kvm_arm_destroy_scratch_host_vcpu(int *fdarray);
-  * by asking the host kernel)
-  */
- typedef struct ARMHostCPUFeatures {
-+    ARMISARegisters isar;
-     uint64_t features;
-     uint32_t target;
-     const char *dtb_compatible;
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 09a86e2820..44dd0ce6ce 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -158,6 +158,7 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
- 
-     cpu->kvm_target = arm_host_cpu_features.target;
-     cpu->dtb_compatible = arm_host_cpu_features.dtb_compatible;
-+    cpu->isar = arm_host_cpu_features.isar;
-     env->features = arm_host_cpu_features.features;
- }
- 
+
+Changes, v3->v4:
+  * Drop THUMB2EE patch; will revisit next development cycle.
+  * Fix aa32 id_isar6 read on old kernels (pmm).
+
+Changes, v2->v3:
+  * Work around sysreg read failures from old host kernels.
+
+Changes, v1->v2:
+  * Remove assert that AArch32 sysreg <= UINT32_MAX.
+  * Remove unused local variable.
+  * Add commentary for AArch32 sysregs vs missing AArch32 support.
+
+
+r~
+
+
+Richard Henderson (4):
+  target/arm: Install ARMISARegisters from kvm host
+  target/arm: Fill in ARMISARegisters for kvm64
+  target/arm: Introduce read_sys_reg32 for kvm32
+  target/arm: Fill in ARMISARegisters for kvm32
+
+ target/arm/kvm_arm.h |  1 +
+ target/arm/kvm.c     |  1 +
+ target/arm/kvm32.c   | 77 ++++++++++++++++++++++++++++----------------
+ target/arm/kvm64.c   | 62 +++++++++++++++++++++++++++++++++--
+ 4 files changed, 111 insertions(+), 30 deletions(-)
+
 -- 
 2.17.2
