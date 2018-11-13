@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMdDh-0003DU-RK
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:15:26 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gMdEC-0003DO-UV
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:15:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMd6q-0005ap-Hg
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:08:21 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41634)
+	(envelope-from <richard.henderson@linaro.org>) id 1gMd1c-00081D-Ct
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:02:57 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46347)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gMd6q-0005aP-2m
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:08:20 -0500
-Received: by mail-oi1-x242.google.com with SMTP id g188-v6so11145984oif.8
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 10:08:20 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <37b5f17e-50cd-6980-2d42-4e7f4ede2597@redhat.com>
-References: <20181113165247.4806-1-sameo@linux.intel.com>
-	<20181113165247.4806-3-sameo@linux.intel.com>
-	<CAFEAcA-R51dyV7gtS+q-eLNn5LBJbSMKtQu4-N3p0c4mJrU8DA@mail.gmail.com>
-	<37b5f17e-50cd-6980-2d42-4e7f4ede2597@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Nov 2018 18:07:58 +0000
-Message-ID: <CAFEAcA_O5x3QuTnKkupur=iwQaEg-i1z2mWoNCiZt_zM5xi-XA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/13] target: arm: Remove unused headers
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gMd1c-0007xe-4L
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:02:56 -0500
+Received: by mail-wr1-x442.google.com with SMTP id l9so1486128wrt.13
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 10:02:51 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 13 Nov 2018 19:01:52 +0100
+Message-Id: <20181113180154.17903-3-richard.henderson@linaro.org>
+In-Reply-To: <20181113180154.17903-1-richard.henderson@linaro.org>
+References: <20181113180154.17903-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v5 2/4] target/arm: Fill in ARMISARegisters for
+ kvm64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +27,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-On 13 November 2018 at 18:02, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
-> On 13/11/18 18:01, Peter Maydell wrote:
->>
->> On 13 November 2018 at 16:52, Samuel Ortiz <sameo@linux.intel.com> wrote=
-:
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/kvm64.c | 90 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 88 insertions(+), 2 deletions(-)
 
->>> --- a/target/arm/helper.c
->>> +++ b/target/arm/helper.c
->>> @@ -12,13 +12,10 @@
->>>   #include "internals.h"
->>>   #include "exec/gdbstub.h"
->>>   #include "exec/helper-proto.h"
->>> -#include "qemu/host-utils.h"
->>
->>
->> This is for muldiv64().
->
->
-> But it is already included by "cpu.h" -> "exec/cpu-defs.h"
-
-> So they are not "unused" but "unnecessary".
->
-> I thought this would be better to clean this once, before Samuel split.
-
-Generally I think that if a .c file directly uses function X declared in
-header Y it should #include Y, even if it happens that it already includes
-other header Z that includes Y. Otherwise if we refactor Z later such
-that it no longer needs to include Y, it will break compilation of the .c
-file. (That is, Z including Y is a detail of the implementation of Z,
-not a guarantee made by Z to its users.)
-
-The exception here is where the header guarantees that it's going
-to include certain other things (which is the case for eg our osdep.h).
-
-thanks
--- PMM
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 46fbe6d8ff..0a502091e7 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -456,17 +456,40 @@ static inline void unset_feature(uint64_t *features, int feature)
+     *features &= ~(1ULL << feature);
+ }
+ 
++static int read_sys_reg32(int fd, uint32_t *pret, uint64_t id)
++{
++    uint64_t ret;
++    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)&ret };
++    int err;
++
++    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U64);
++    err = ioctl(fd, KVM_GET_ONE_REG, &idreg);
++    if (err < 0) {
++        return -1;
++    }
++    *pret = ret;
++    return 0;
++}
++
++static int read_sys_reg64(int fd, uint64_t *pret, uint64_t id)
++{
++    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)pret };
++
++    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U64);
++    return ioctl(fd, KVM_GET_ONE_REG, &idreg);
++}
++
+ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+ {
+     /* Identify the feature bits corresponding to the host CPU, and
+      * fill out the ARMHostCPUClass fields accordingly. To do this
+      * we have to create a scratch VM, create a single CPU inside it,
+      * and then query that CPU for the relevant ID registers.
+-     * For AArch64 we currently don't care about ID registers at
+-     * all; we just want to know the CPU type.
+      */
+     int fdarray[3];
+     uint64_t features = 0;
++    int err;
++
+     /* Old kernels may not know about the PREFERRED_TARGET ioctl: however
+      * we know these will only support creating one kind of guest CPU,
+      * which is its preferred CPU type. Fortunately these old kernels
+@@ -487,8 +510,71 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+     ahcf->target = init.target;
+     ahcf->dtb_compatible = "arm,arm-v8";
+ 
++    err = read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64pfr0,
++                         ARM64_SYS_REG(3, 0, 0, 4, 0));
++    if (unlikely(err < 0)) {
++        /*
++         * Before v4.15, the kernel only exposed a limited number of system
++         * registers, not including any of the interesting AArch64 ID regs.
++         * For the most part we could leave these fields as zero with minimal
++         * effect, since this does not affect the values seen by the guest.
++         *
++         * However, it could cause problems down the line for QEMU,
++         * so provide a minimal v8.0 default.
++         *
++         * ??? Could read MIDR and use knowledge from cpu64.c.
++         * ??? Could map a page of memory into our temp guest and
++         *     run the tiniest of hand-crafted kernels to extract
++         *     the values seen by the guest.
++         * ??? Either of these sounds like too much effort just
++         *     to work around running a modern host kernel.
++         */
++        ahcf->isar.id_aa64pfr0 = 0x00000011; /* EL1&0, AArch64 only */
++        err = 0;
++    } else {
++        err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64pfr1,
++                              ARM64_SYS_REG(3, 0, 0, 4, 1));
++        err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64isar0,
++                              ARM64_SYS_REG(3, 0, 0, 6, 0));
++        err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64isar1,
++                              ARM64_SYS_REG(3, 0, 0, 6, 1));
++
++        /*
++         * Note that if AArch32 support is not present in the host,
++         * the AArch32 sysregs are present to be read, but will
++         * return UNKNOWN values.  This is neither better nor worse
++         * than skipping the reads and leaving 0, as we must avoid
++         * considering the values in every case.
++         */
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar0,
++                              ARM64_SYS_REG(3, 0, 0, 2, 0));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar1,
++                              ARM64_SYS_REG(3, 0, 0, 2, 1));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar2,
++                              ARM64_SYS_REG(3, 0, 0, 2, 2));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar3,
++                              ARM64_SYS_REG(3, 0, 0, 2, 3));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar4,
++                              ARM64_SYS_REG(3, 0, 0, 2, 4));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar5,
++                              ARM64_SYS_REG(3, 0, 0, 2, 5));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar6,
++                              ARM64_SYS_REG(3, 0, 0, 2, 7));
++
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr0,
++                              ARM64_SYS_REG(3, 0, 0, 3, 0));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr1,
++                              ARM64_SYS_REG(3, 0, 0, 3, 1));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr2,
++                              ARM64_SYS_REG(3, 0, 0, 3, 2));
++    }
++
+     kvm_arm_destroy_scratch_host_vcpu(fdarray);
+ 
++    if (err < 0) {
++        return false;
++    }
++
+    /* We can assume any KVM supporting CPU is at least a v8
+      * with VFPv4+Neon; this in turn implies most of the other
+      * feature bits.
+-- 
+2.17.2
