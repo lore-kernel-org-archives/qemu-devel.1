@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gMXfO-0007qI-Sc
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:41 -0500
+	(envelope-from <th.huth@gmail.com>) id 1gMXfX-0007uh-93
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gMXfK-0004DM-Il
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:38 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:39630 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gMXfC-00047M-TF
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:28 -0500
-From: xiezhide <xiezhide@huawei.com>
-Date: Tue, 13 Nov 2018 20:13:34 +0800
-Message-ID: <45c01b28096e128895c07c606b4a8f2ac92e380d.1542110461.git.xiezhide@huawei.com>
-In-Reply-To: <cover.1542110461.git.xiezhide@huawei.com>
-References: <cover.1542110461.git.xiezhide@huawei.com>
+	(envelope-from <th.huth@gmail.com>) id 1gMXfV-0004GO-Dn
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:46 -0500
+From: Thomas Huth <huth@tuxfamily.org>
+Message-ID: <87eb5ae8-5008-b93f-6072-add50367b105@tuxfamily.org>
+Date: Tue, 13 Nov 2018 13:19:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 3/3] fsdev-throttle-qmp: hmp interface for
- fsdev io throttling
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] QEMU Advent Calendar 2018 - Help wanted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,201 +21,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, eblake@redhat.com, armbru@redhat.com, berto@igalia.com, zengcanfu@huawei.com, jinxuefeng@huawei.com, johnny.chenyi@huawei.com
+To: QEMU Developers <qemu-devel@nongnu.org>, qemu-discuss@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Kashyap Chamarthy <kashyapc@fedoraproject.org>, Richard Jansson <richard.j.jansson@gmail.com>
 
-introduces io throttling hmp interfaces for the fsdev devices
 
-Signed-off-by: xiezhide <xiezhide@huawei.com>
----
- hmp-commands-info.hx | 15 ++++++++++
- hmp-commands.hx      | 15 ++++++++++
- hmp.c                | 83 +++++++++++++++++++++++++++++++++++++++++++++++-----
- hmp.h                |  4 +++
- 4 files changed, 109 insertions(+), 8 deletions(-)
+ Hi all!
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index cbee8b9..eaf0ff5 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -100,6 +100,21 @@ STEXI
- Show progress of ongoing block device operations.
- ETEXI
- 
-+#if defined(CONFIG_VIRTFS)
-+     {
-+        .name       = "fsdev_iothrottle",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "show fsdev iothrottle information",
-+        .cmd        = hmp_info_fsdev_iothrottle,
-+    },
-+#endif
-+STEXI
-+@item info fsdev_iothrottle
-+@findex fsdev_iothrottle
-+Show fsdev device throttle info.
-+ETEXI
-+
-     {
-         .name       = "registers",
-         .args_type  = "cpustate_all:-a",
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index db0c681..40ca7fe 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1716,6 +1716,21 @@ Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_
- @var{device} can be a block device name, a qdev ID or a QOM path.
- ETEXI
- 
-+#if defined(CONFIG_VIRTFS)
-+     {
-+        .name       = "fsdev_set_io_throttle",
-+        .args_type  = "device:B,bps:l,bps_rd:l,bps_wr:l,iops:l,iops_rd:l,iops_wr:l",
-+        .params     = "device bps bps_rd bps_wr iops iops_rd iops_wr",
-+        .help       = "change I/O throttle limits for a fs devices",
-+        .cmd        = hmp_fsdev_set_io_throttle,
-+    },
-+#endif
-+STEXI
-+@item fsdev_set_io_throttle @var{device} @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
-+@findex fsdev_set_io_throttle
-+Change I/O throttle limits for a fs devices to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
-+ETEXI
-+
-     {
-         .name       = "set_password",
-         .args_type  = "protocol:s,password:s,connected:s?",
-diff --git a/hmp.c b/hmp.c
-index 7828f93..4cc4146 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -38,6 +38,7 @@
- #include "qapi/qapi-commands-run-state.h"
- #include "qapi/qapi-commands-tpm.h"
- #include "qapi/qapi-commands-ui.h"
-+#include "qapi/qapi-commands-fsdev.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qerror.h"
- #include "qapi/string-input-visitor.h"
-@@ -1886,18 +1887,23 @@ void hmp_change(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
- }
- 
-+static void hmp_initialize_throttle_limits(ThrottleLimits *iot,
-+                                           const QDict *qdict)
-+{
-+    iot->bps = qdict_get_int(qdict, "bps");
-+    iot->bps_rd = qdict_get_int(qdict, "bps_rd");
-+    iot->bps_wr = qdict_get_int(qdict, "bps_wr");
-+    iot->iops = qdict_get_int(qdict, "iops");
-+    iot->iops_rd = qdict_get_int(qdict, "iops_rd");
-+    iot->iops_wr = qdict_get_int(qdict, "iops_wr");
-+}
-+
- void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
-+    ThrottleLimits *tlimits;
-     char *device = (char *) qdict_get_str(qdict, "device");
--    BlockIOThrottle throttle = {
--        .bps = qdict_get_int(qdict, "bps"),
--        .bps_rd = qdict_get_int(qdict, "bps_rd"),
--        .bps_wr = qdict_get_int(qdict, "bps_wr"),
--        .iops = qdict_get_int(qdict, "iops"),
--        .iops_rd = qdict_get_int(qdict, "iops_rd"),
--        .iops_wr = qdict_get_int(qdict, "iops_wr"),
--    };
-+    BlockIOThrottle throttle = {0};
- 
-     /* qmp_block_set_io_throttle has separate parameters for the
-      * (deprecated) block device name and the qdev ID but the HMP
-@@ -1910,10 +1916,71 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
-         throttle.id = device;
-     }
- 
-+    tlimits = qapi_BlockIOThrottle_base(&throttle);
-+    hmp_initialize_throttle_limits(tlimits, qdict);
-     qmp_block_set_io_throttle(&throttle, &err);
-     hmp_handle_error(mon, &err);
- }
- 
-+#ifdef CONFIG_VIRTFS
-+void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+    ThrottleLimits *tlimits;
-+    FsdevIOThrottle throttle = {
-+        .has_id = true,
-+        .id = (char *) qdict_get_str(qdict, "device"),
-+    };
-+
-+    tlimits = qapi_FsdevIOThrottle_base(&throttle);
-+    hmp_initialize_throttle_limits(tlimits, qdict);
-+    qmp_fsdev_set_io_throttle(&throttle, &err);
-+    hmp_handle_error(mon, &err);
-+}
-+
-+static void print_fsdev_throttle_config(Monitor *mon, FsdevIOThrottle *fscfg)
-+{
-+    monitor_printf(mon, "%s", fscfg->id);
-+    monitor_printf(mon, "    I/O throttling:"
-+                   " bps=%" PRId64
-+                   " bps_rd=%" PRId64  " bps_wr=%" PRId64
-+                   " bps_max=%" PRId64
-+                   " bps_rd_max=%" PRId64
-+                   " bps_wr_max=%" PRId64
-+                   " iops=%" PRId64 " iops_rd=%" PRId64
-+                   " iops_wr=%" PRId64
-+                   " iops_max=%" PRId64
-+                   " iops_rd_max=%" PRId64
-+                   " iops_wr_max=%" PRId64
-+                   " iops_size=%" PRId64
-+                   "\n",
-+                   fscfg->bps,
-+                   fscfg->bps_rd,
-+                   fscfg->bps_wr,
-+                   fscfg->bps_max,
-+                   fscfg->bps_rd_max,
-+                   fscfg->bps_wr_max,
-+                   fscfg->iops,
-+                   fscfg->iops_rd,
-+                   fscfg->iops_wr,
-+                   fscfg->iops_max,
-+                   fscfg->iops_rd_max,
-+                   fscfg->iops_wr_max,
-+                   fscfg->iops_size);
-+}
-+
-+void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict)
-+{
-+    FsdevIOThrottleList *fsdev_list, *info;
-+    fsdev_list = qmp_query_fsdev_io_throttle(NULL);
-+
-+    for (info = fsdev_list; info; info = info->next) {
-+        print_fsdev_throttle_config(mon, info->value);
-+    }
-+    qapi_free_FsdevIOThrottleList(fsdev_list);
-+}
-+#endif
-+
- void hmp_block_stream(Monitor *mon, const QDict *qdict)
- {
-     Error *error = NULL;
-diff --git a/hmp.h b/hmp.h
-index 5f1addc..9330e11 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -91,6 +91,10 @@ void hmp_block_job_cancel(Monitor *mon, const QDict *qdict);
- void hmp_block_job_pause(Monitor *mon, const QDict *qdict);
- void hmp_block_job_resume(Monitor *mon, const QDict *qdict);
- void hmp_block_job_complete(Monitor *mon, const QDict *qdict);
-+#ifdef CONFIG_VIRTFS
-+void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict);
-+void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict);
-+#endif
- void hmp_migrate(Monitor *mon, const QDict *qdict);
- void hmp_device_add(Monitor *mon, const QDict *qdict);
- void hmp_device_del(Monitor *mon, const QDict *qdict);
--- 
-2.7.4
+This year, we are celebrating the 15th anniversary of QEMU [1] - to do
+so, we would like to perform another edition of the QEMU Advent Calendar.
+
+If you didn't see the previous QEMU Advent Calendars yet, please visit
+the website and have a look at the editions from 2014 and 2016 (which
+can be selected in the menu at the top):
+
+  https://www.qemu-advent-calendar.org/
+
+This year, too, the QEMU Advent Calendar 2018 will be a website that
+reveals a new disk image for download each day in December until the
+holiday season starts. Launching the disk image under QEMU will bring up
+a nice surprise!
+
+But to be able to make this happen, we need help from people who
+- have ideas for disk images
+- would like to prepare one or more disk images.
+Ideally, you have an idea for a disk image and also prepare it yourself.
+But we also are glad to get just the ideas, or help from people who
+would like to prepare a disk image with the idea from somebody else!
+
+Possible ideas (others are welcome of course, too):
+- Showcase a new feature that has been added to QEMU recently
+- Package your favorite freeware DOS game from your childhood
+  (must be freely redistributable, so e.g. use FreeDOS as OS)
+- Know a fancy new or old freely available Operating System which
+  we did not feature in the previous advent calendars yet?
+- Any cool self-made firmware or extensions to existing firmware
+  that runs in QEMU.
+- It would also be great to get some more images for non-x86 targets,
+  so if you know something usable, please speak up!
+
+Disk image requirements:
+ * We need 24 disk images (for the first 24 days of December)
+ * Content must be freely redistributable (i.e. no proprietary
+   license that prevents distribution). For GPL based software,
+   you need to provide the source code, too.
+ * Provide a name and a short description of the disk image
+   (e.g. with hints on what to try)
+ * Provide a ./run shell script that prints out the name and
+   description/hints and launches QEMU
+ * Provide a screenshot/image/logo for the website
+   (preferred resolution of the image is 320x240)
+ * Size should be ideally under 100 MB per disk image
+   (but if some few images are bigger, that should be OK, too)
+
+Are you interested in participating? Then please reply to this email
+(off-list if you do not want to spoil your idea for disk images).
+
+Or do you have questions? Then feel free to reply or ask on the #qemu
+channel on irc.oftc.net, too.
+
+ Thomas
+
+
+PS: The QEMU Advent Calendar 2018 is a secular calendar (not
+religious). The idea is to create a fun experience for the QEMU
+community which can be shared with everyone, and to celebrate the 15th
+anniversary of QEMU. You don't need to celebrate Christmas or another
+religious festival to participate!
+
+[1] According to the following mail, QEMU 0.1 was announced in March
+2003: https://www.winehq.org/pipermail/wine-devel/2003-March/015577.html
