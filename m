@@ -1,40 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gMTNJ-00038Q-3h
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:44:42 -0500
+	(envelope-from <groug@kaod.org>) id 1gMTfv-0004OD-VJ
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 03:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gMTNF-0004vm-Nh
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:44:41 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:37540)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1gMTNF-0004ty-DL
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:44:37 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-	by userp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id
-	wAD7hXEh100363
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:44:35 GMT
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-	by userp2130.oracle.com with ESMTP id 2nnwg18qn2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:44:35 +0000
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-	by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id wAD7iYFR020151
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK) for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:44:34 GMT
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-	by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wAD7iYm0023227
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:44:34 GMT
-References: <20181113070320.16147-1-kraxel@redhat.com>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <b96361ca-19a9-87e0-02cf-3682a2889514@oracle.com>
-Date: Tue, 13 Nov 2018 07:44:32 +0000
+	(envelope-from <groug@kaod.org>) id 1gMTff-00006V-SF
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 03:03:46 -0500
+Received: from 2.mo1.mail-out.ovh.net ([178.32.119.250]:50177)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gMTfd-00089W-FD
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 03:03:37 -0500
+Received: from player691.ha.ovh.net (unknown [10.109.160.40])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 4406614247B
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 09:03:24 +0100 (CET)
+Date: Tue, 13 Nov 2018 09:03:20 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181113090320.5c8a3032@bahia.lan>
+In-Reply-To: <CACcO5F4nx051=TAssH-Br2UopS0OkzW5F3nws412ZhXpnGtHYA@mail.gmail.com>
+References: <154155007870.439125.16160474206652257208.stgit@bahia.lan>
+	<CACcO5F4FBW9QiaTA1w61z5pwt6Z3F1n73=rL4Af=6-K5zq0-EQ@mail.gmail.com>
+	<20181112110021.734d25d5@bahia.lan>
+	<CACcO5F6YsaQX80cn-wxcreDNRcKKKqEaT65Ax4AaBCKMwC2JNw@mail.gmail.com>
+	<20181112121929.1344f12d@bahia.lan>
+	<20181112153911.08842765@bahia.lan>
+	<CACcO5F4nx051=TAssH-Br2UopS0OkzW5F3nws412ZhXpnGtHYA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20181113070320.16147-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] slirp: add tftp tracing
+Subject: Re: [Qemu-devel] [PATCH] 9p: write lock path in v9fs_co_open2()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,73 +35,390 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: zhibin hu <noirfate@gmail.com>
+Cc: qemu-devel@nongnu.org, prasad@redhat.com
 
+On Tue, 13 Nov 2018 11:35:23 +0800
+zhibin hu <noirfate@gmail.com> wrote:
 
-On 13/11/2018 07:03, Gerd Hoffmann wrote:
-> Useful when debugging pxeboot, to see what the guest tries to do.
+> Sorry, i have no time to make poc recently.
 > 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+The crash log below seems to indicate you have at least one involving the
+CREATE and MKNOD commands, but never mind :)
 
-
-> ---
->   Makefile.objs      | 1 +
->   slirp/tftp.c       | 3 +++
->   slirp/trace-events | 5 +++++
->   3 files changed, 9 insertions(+)
->   create mode 100644 slirp/trace-events
+> IMHO, the implementation of v9fs_path_copy is not secure, it first free the
+> original value and than copy the new value, there is a race.
 > 
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 1e1ff387d7..31852eaf8f 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -251,6 +251,7 @@ trace-events-subdirs += net
->   trace-events-subdirs += qapi
->   trace-events-subdirs += qom
->   trace-events-subdirs += scsi
-> +trace-events-subdirs += slirp
->   trace-events-subdirs += target/arm
->   trace-events-subdirs += target/i386
->   trace-events-subdirs += target/mips
-> diff --git a/slirp/tftp.c b/slirp/tftp.c
-> index a9bc4bb1b6..735b57aa55 100644
-> --- a/slirp/tftp.c
-> +++ b/slirp/tftp.c
-> @@ -26,6 +26,7 @@
->   #include "slirp.h"
->   #include "qemu-common.h"
->   #include "qemu/cutils.h"
-> +#include "trace.h"
->   
->   static inline int tftp_session_in_use(struct tftp_session *spt)
->   {
-> @@ -204,6 +205,7 @@ static void tftp_send_error(struct tftp_session *spt,
->     struct mbuf *m;
->     struct tftp_t *tp;
->   
-> +  trace_slirp_tftp_error(msg);
->     m = m_get(spt->slirp);
->   
->     if (!m) {
-> @@ -323,6 +325,7 @@ static void tftp_handle_rrq(Slirp *slirp, struct sockaddr_storage *srcsas,
->         break;
->       }
->     }
-> +  trace_slirp_tftp_rrq(req_fname);
->   
->     /* check mode */
->     if ((pktlen - k) < 6) {
-> diff --git a/slirp/trace-events b/slirp/trace-events
-> new file mode 100644
-> index 0000000000..ff8f656e8c
-> --- /dev/null
-> +++ b/slirp/trace-events
-> @@ -0,0 +1,5 @@
-> +# See docs/devel/tracing.txt for syntax documentation.
-> +
-> +# slirp/tftp.c
-> +slirp_tftp_rrq(const char *file) "file: %s"
-> +slirp_tftp_error(const char *file) "msg: %s"
+
+There is a race if the first argument to v9fs_path_copy() is shared between
+threads, which may be the case if it's a fid path.
+
+> So each caller must ensure the synchronization, maybe more locks are needed.
 > 
+
+Yeah.
+
+> thanks.
+> 
+> 
+> On Mon, Nov 12, 2018 at 10:39 PM Greg Kurz <groug@kaod.org> wrote:
+> 
+> > On Mon, 12 Nov 2018 12:19:29 +0100
+> > Greg Kurz <groug@kaod.org> wrote:
+> >
+> > > On Mon, 12 Nov 2018 19:05:59 +0800
+> > > zhibin hu <noirfate@gmail.com> wrote:
+> > >
+> > > > yes, and this :
+> > > >
+> > >
+> > > Yeah, all call sites of v9fs_path_copy() in v9fs_create() are called in
+> > the
+> > > context of the main thread. They may race with any other access to the
+> > fid
+> > > path performed by some other command in the context of a worker thread.
+> > My
+> > > first guess is that v9fs_create() should take the write lock before
+> > writing
+> > > to the fid path.
+> > >
+> >
+> > I think this call to v9fs_path_copy() in v9fs_walk() can also race:
+> >
+> >     if (fid == newfid) {
+> >         if (fidp->fid_type != P9_FID_NONE) {
+> >             err = -EINVAL;
+> >             goto out;
+> >         }
+> >         v9fs_path_copy(&fidp->path, &path);
+> >     } else {
+> >
+> >
+> > Worse, since v9fs_co_open2() may overwrite the fid path from a worker
+> > thread, it seems that some more code might require to run with the read
+> > lock taken...
+> >
+> > > BTW, if you could share all the reproducers you already have for these
+> > > heap-use-after-free issues, it would be appreciated, and probably speed
+> > > up the fixing.
+> > >
+> > > > ==6094==ERROR: AddressSanitizer: heap-use-after-free on address
+> > > > 0x6020000e6751 at pc 0x562a8dc492b8 bp 0x7f6805d2fa10 sp 0x7f6805d2fa00
+> > > > READ of size 1 at 0x6020000e6751 thread T21
+> > > >     #0 0x562a8dc492b7 in local_open_nofollow hw/9pfs/9p-local.c:59
+> > > >     #1 0x562a8dc49361 in local_opendir_nofollow hw/9pfs/9p-local.c:92
+> > > >     #2 0x562a8dc4bd6e in local_mknod hw/9pfs/9p-local.c:662
+> > > >     #3 0x562a8dc521de in v9fs_co_mknod hw/9pfs/cofs.c:200
+> > > >     #4 0x562a8dc4413e in v9fs_mknod hw/9pfs/9p.c:3044
+> > > >     #5 0x562a8e600976 in coroutine_trampoline
+> > util/coroutine-ucontext.c:116
+> > > >     #6 0x7f68713635ff in __correctly_grouped_prefixwc
+> > > > (/lib64/libc.so.6+0x4c5ff)
+> > > >
+> > > > 0x6020000e6751 is located 1 bytes inside of 2-byte region
+> > > > [0x6020000e6750,0x6020000e6752)
+> > > > freed by thread T0 here:
+> > > >     #0 0x7f687cdb9880 in __interceptor_free
+> > (/lib64/libasan.so.5+0xee880)
+> > > >     #1 0x7f687c1494d1 in g_free (/lib64/libglib-2.0.so.0+0x524d1)
+> > > >     #2 0x562a8dc30ce4 in v9fs_path_copy hw/9pfs/9p.c:195
+> > > >     #3 0x562a8dc3f0f3 in v9fs_create hw/9pfs/9p.c:2286
+> > > >     #4 0x562a8e600976 in coroutine_trampoline
+> > util/coroutine-ucontext.c:116
+> > > >     #5 0x7f68713635ff in __correctly_grouped_prefixwc
+> > > > (/lib64/libc.so.6+0x4c5ff)
+> > > >
+> > > > previously allocated by thread T5 here:
+> > > >     #0 0x7f687cdb9c48 in malloc (/lib64/libasan.so.5+0xeec48)
+> > > >     #1 0x7f6871421c37 in __GI___vasprintf_chk
+> > (/lib64/libc.so.6+0x10ac37)
+> > > >
+> > > > Thread T21 created by T0 here:
+> > > >     #0 0x7f687cd16443 in pthread_create (/lib64/libasan.so.5+0x4b443)
+> > > >     #1 0x562a8e5bf61e in qemu_thread_create
+> > util/qemu-thread-posix.c:534
+> > > >     #2 0x562a8e5adbe4 in do_spawn_thread util/thread-pool.c:135
+> > > >     #3 0x562a8e5adc73 in spawn_thread_bh_fn util/thread-pool.c:143
+> > > >     #4 0x562a8e5aa4d0 in aio_bh_call util/async.c:90
+> > > >     #5 0x562a8e5aa787 in aio_bh_poll util/async.c:118
+> > > >     #6 0x562a8e5b65bd in aio_dispatch util/aio-posix.c:436
+> > > >     #7 0x562a8e5ab26f in aio_ctx_dispatch util/async.c:261
+> > > >     #8 0x7f687c1438ac in g_main_context_dispatch
+> > > > (/lib64/libglib-2.0.so.0+0x4c8ac)
+> > > >
+> > > > Thread T5 created by T0 here:
+> > > >     #0 0x7f687cd16443 in pthread_create (/lib64/libasan.so.5+0x4b443)
+> > > >     #1 0x562a8e5bf61e in qemu_thread_create
+> > util/qemu-thread-posix.c:534
+> > > >     #2 0x562a8d7a2258 in qemu_kvm_start_vcpu
+> > /root/qemu-3.0.0/cpus.c:1935
+> > > >     #3 0x562a8d7a2a0b in qemu_init_vcpu /root/qemu-3.0.0/cpus.c:2001
+> > > >     #4 0x562a8da3ef0c in x86_cpu_realizefn
+> > > > /root/qemu-3.0.0/target/i386/cpu.c:4996
+> > > >     #5 0x562a8dd3a1e8 in device_set_realized hw/core/qdev.c:826
+> > > >     #6 0x562a8e2a1e62 in property_set_bool qom/object.c:1984
+> > > >     #7 0x562a8e29db0e in object_property_set qom/object.c:1176
+> > > >     #8 0x562a8e2a4b00 in object_property_set_qobject
+> > qom/qom-qobject.c:27
+> > > >     #9 0x562a8e29de2b in object_property_set_bool qom/object.c:1242
+> > > >     #10 0x562a8d9ad452 in pc_new_cpu /root/qemu-3.0.0/hw/i386/pc.c:1107
+> > > >     #11 0x562a8d9ad993 in pc_cpus_init
+> > /root/qemu-3.0.0/hw/i386/pc.c:1155
+> > > >     #12 0x562a8d9b79cb in pc_init1
+> > /root/qemu-3.0.0/hw/i386/pc_piix.c:153
+> > > >     #13 0x562a8d9b981d in pc_init_v3_0
+> > > > /root/qemu-3.0.0/hw/i386/pc_piix.c:438
+> > > >     #14 0x562a8dd4bf29 in machine_run_board_init hw/core/machine.c:830
+> > > >     #15 0x562a8db8d46e in main /root/qemu-3.0.0/vl.c:4516
+> > > >     #16 0x7f687133a11a in __libc_start_main (/lib64/libc.so.6+0x2311a)
+> > > >
+> > > > SUMMARY: AddressSanitizer: heap-use-after-free hw/9pfs/9p-local.c:59 in
+> > > > local_open_nofollow
+> > > > Shadow bytes around the buggy address:
+> > > >   0x0c0480014c90: fa fa fd fa fa fa fa fa fa fa fa fa fa fa fa fa
+> > > >   0x0c0480014ca0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+> > > >   0x0c0480014cb0: fa fa fa fa fa fa fd fd fa fa fd fa fa fa fd fa
+> > > >   0x0c0480014cc0: fa fa fa fa fa fa fa fa fa fa fd fd fa fa fd fa
+> > > >   0x0c0480014cd0: fa fa fa fa fa fa fa fa fa fa fd fa fa fa fd fd
+> > > > =>0x0c0480014ce0: fa fa fa fa fa fa fd fa fa fa[fd]fa fa fa fa fa
+> > > >   0x0c0480014cf0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fd fd
+> > > >   0x0c0480014d00: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+> > > >   0x0c0480014d10: fa fa fd fa fa fa fd fd fa fa fa fa fa fa fa fa
+> > > >   0x0c0480014d20: fa fa fa fa fa fa fd fa fa fa fa fa fa fa fd fa
+> > > >   0x0c0480014d30: fa fa fa fa fa fa fd fd fa fa fa fa fa fa fa fa
+> > > > Shadow byte legend (one shadow byte represents 8 application bytes):
+> > > >   Addressable:           00
+> > > >   Partially addressable: 01 02 03 04 05 06 07
+> > > >   Heap left redzone:       fa
+> > > >   Freed heap region:       fd
+> > > >   Stack left redzone:      f1
+> > > >   Stack mid redzone:       f2
+> > > >   Stack right redzone:     f3
+> > > >   Stack after return:      f5
+> > > >   Stack use after scope:   f8
+> > > >   Global redzone:          f9
+> > > >   Global init order:       f6
+> > > >   Poisoned by user:        f7
+> > > >   Container overflow:      fc
+> > > >   Array cookie:            ac
+> > > >   Intra object redzone:    bb
+> > > >   ASan internal:           fe
+> > > >   Left alloca redzone:     ca
+> > > >   Right alloca redzone:    cb
+> > > > ==6094==ABORTING
+> > > >
+> > > > thanks.
+> > > >
+> > > > On Mon, Nov 12, 2018 at 6:00 PM Greg Kurz <groug@kaod.org> wrote:
+> > > >
+> > > > > On Mon, 12 Nov 2018 16:28:28 +0800
+> > > > > zhibin hu <noirfate@gmail.com> wrote:
+> > > > >
+> > > > > > hi,
+> > > > > >
+> > > > > > i use this patch with qemu 3.0.0 and it seems not fix completely.
+> > > > > >
+> > > > > > [root@localhost ~]# ./qemu-system-x86_64 -snapshot -m 1024 -smp 2
+> > > > > > -enable-kvm -net nic,model=e1000 -net
+> > > > > > tap,helper=/usr/libexec/qemu-bridge-helper -hda
+> > > > > > /var/lib/libvirt/images/test.qcow2 -fsdev
+> > > > > > local,id=test_dev,path=/tmp,security_model=none -device
+> > > > > > virtio-9p-pci,fsdev=test_dev,mount_tag=test_mount -vnc 0.0.0.0:1
+> > > > > > ==5014==WARNING: ASan doesn't fully support makecontext/swapcontext
+> > > > > > functions and may produce false positives in some cases!
+> > > > > > =================================================================
+> > > > > > ==5014==ERROR: AddressSanitizer: heap-use-after-free on address
+> > > > > > 0x60200014fc50 at pc 0x7f90c908697d bp 0x7f9053444970 sp
+> > 0x7f9053444118
+> > > > > > READ of size 2 at 0x60200014fc50 thread T17
+> > > > > >     #0 0x7f90c908697c  (/lib64/libasan.so.5+0x9997c)
+> > > > > >     #1 0x7f90c8452693 in g_path_get_basename
+> > > > > > (/lib64/libglib-2.0.so.0+0x39693)
+> > > > > >     #2 0x559c1b78eb56 in local_lstat hw/9pfs/9p-local.c:182
+> > > > > >     #3 0x559c1b799628 in v9fs_co_lstat hw/9pfs/cofile.c:53
+> > > > > >     #4 0x559c1b777ee1 in fid_to_qid hw/9pfs/9p.c:598
+> > > > > >     #5 0x559c1b77aeae in v9fs_attach hw/9pfs/9p.c:1017
+> > > > > >     #6 0x559c1c145976 in coroutine_trampoline
+> > > > > util/coroutine-ucontext.c:116
+> > > > > >     #7 0x7f90bd6855ff in __correctly_grouped_prefixwc
+> > > > > > (/lib64/libc.so.6+0x4c5ff)
+> > > > > >
+> > > > > > 0x60200014fc50 is located 0 bytes inside of 2-byte region
+> > > > > > [0x60200014fc50,0x60200014fc52)
+> > > > > > freed by thread T0 here:
+> > > > > >     #0 0x7f90c90db880 in __interceptor_free
+> > (/lib64/libasan.so.5+0xee880)
+> > > > > >     #1 0x7f90c846b4d1 in g_free (/lib64/libglib-2.0.so.0+0x524d1)
+> > > > > >     #2 0x559c1b775ce4 in v9fs_path_copy hw/9pfs/9p.c:195
+> > > > > >     #3 0x559c1b78425d in v9fs_create hw/9pfs/9p.c:2297
+> > > > >
+> > > > > Ah, so we have a similar issue when creating files with the older
+> > > > > 9p2000 and 9p2000.u protocols... I'll try to come up with a fix.
+> > > > >
+> > > > > Cheers,
+> > > > >
+> > > > > --
+> > > > > Greg
+> > > > >
+> > > > > >     #4 0x559c1c145976 in coroutine_trampoline
+> > > > > util/coroutine-ucontext.c:116
+> > > > > >     #5 0x7f90bd6855ff in __correctly_grouped_prefixwc
+> > > > > > (/lib64/libc.so.6+0x4c5ff)
+> > > > > >
+> > > > > > previously allocated by thread T4 here:
+> > > > > >     #0 0x7f90c90dbc48 in malloc (/lib64/libasan.so.5+0xeec48)
+> > > > > >     #1 0x7f90bd743c37 in __GI___vasprintf_chk
+> > (/lib64/libc.so.6+0x10ac37)
+> > > > > >
+> > > > > > Thread T17 created by T16 here:
+> > > > > >     #0 0x7f90c9038443 in pthread_create
+> > (/lib64/libasan.so.5+0x4b443)
+> > > > > >     #1 0x559c1c10461e in qemu_thread_create
+> > util/qemu-thread-posix.c:534
+> > > > > >     #2 0x559c1c0f2be4 in do_spawn_thread util/thread-pool.c:135
+> > > > > >     #3 0x559c1c0f2498 in worker_thread util/thread-pool.c:83
+> > > > > >     #4 0x559c1c1043e0 in qemu_thread_start
+> > util/qemu-thread-posix.c:504
+> > > > > >     #5 0x7f90bd9ff593 in start_thread
+> > (/lib64/libpthread.so.0+0x7593)
+> > > > > >
+> > > > > > Thread T16 created by T0 here:
+> > > > > >     #0 0x7f90c9038443 in pthread_create
+> > (/lib64/libasan.so.5+0x4b443)
+> > > > > >     #1 0x559c1c10461e in qemu_thread_create
+> > util/qemu-thread-posix.c:534
+> > > > > >     #2 0x559c1c0f2be4 in do_spawn_thread util/thread-pool.c:135
+> > > > > >     #3 0x559c1c0f2c73 in spawn_thread_bh_fn util/thread-pool.c:143
+> > > > > >     #4 0x559c1c0ef4d0 in aio_bh_call util/async.c:90
+> > > > > >     #5 0x559c1c0ef787 in aio_bh_poll util/async.c:118
+> > > > > >     #6 0x559c1c0fb5bd in aio_dispatch util/aio-posix.c:436
+> > > > > >     #7 0x559c1c0f026f in aio_ctx_dispatch util/async.c:261
+> > > > > >     #8 0x7f90c84658ac in g_main_context_dispatch
+> > > > > > (/lib64/libglib-2.0.so.0+0x4c8ac)
+> > > > > >
+> > > > > > Thread T4 created by T0 here:
+> > > > > >     #0 0x7f90c9038443 in pthread_create
+> > (/lib64/libasan.so.5+0x4b443)
+> > > > > >     #1 0x559c1c10461e in qemu_thread_create
+> > util/qemu-thread-posix.c:534
+> > > > > >     #2 0x559c1b2e7258 in qemu_kvm_start_vcpu
+> > /root/qemu-3.0.0/cpus.c:1935
+> > > > > >     #3 0x559c1b2e7a0b in qemu_init_vcpu
+> > /root/qemu-3.0.0/cpus.c:2001
+> > > > > >     #4 0x559c1b583f0c in x86_cpu_realizefn
+> > > > > > /root/qemu-3.0.0/target/i386/cpu.c:4996
+> > > > > >     #5 0x559c1b87f1e8 in device_set_realized hw/core/qdev.c:826
+> > > > > >     #6 0x559c1bde6e62 in property_set_bool qom/object.c:1984
+> > > > > >     #7 0x559c1bde2b0e in object_property_set qom/object.c:1176
+> > > > > >     #8 0x559c1bde9b00 in object_property_set_qobject
+> > qom/qom-qobject.c:27
+> > > > > >     #9 0x559c1bde2e2b in object_property_set_bool qom/object.c:1242
+> > > > > >     #10 0x559c1b4f2452 in pc_new_cpu
+> > /root/qemu-3.0.0/hw/i386/pc.c:1107
+> > > > > >     #11 0x559c1b4f2993 in pc_cpus_init
+> > /root/qemu-3.0.0/hw/i386/pc.c:1155
+> > > > > >     #12 0x559c1b4fc9cb in pc_init1
+> > /root/qemu-3.0.0/hw/i386/pc_piix.c:153
+> > > > > >     #13 0x559c1b4fe81d in pc_init_v3_0
+> > > > > > /root/qemu-3.0.0/hw/i386/pc_piix.c:438
+> > > > > >     #14 0x559c1b890f29 in machine_run_board_init
+> > hw/core/machine.c:830
+> > > > > >     #15 0x559c1b6d246e in main /root/qemu-3.0.0/vl.c:4516
+> > > > > >     #16 0x7f90bd65c11a in __libc_start_main
+> > (/lib64/libc.so.6+0x2311a)
+> > > > > >
+> > > > > > SUMMARY: AddressSanitizer: heap-use-after-free
+> > > > > > (/lib64/libasan.so.5+0x9997c)
+> > > > > > Shadow bytes around the buggy address:
+> > > > > >   0x0c0480021f30: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+> > > > > >   0x0c0480021f40: fa fa fd fa fa fa fd fd fa fa fa fa fa fa fa fa
+> > > > > >   0x0c0480021f50: fa fa fa fa fa fa fa fa fa fa fd fa fa fa fd fd
+> > > > > >   0x0c0480021f60: fa fa fd fa fa fa fa fa fa fa fd fa fa fa fa fa
+> > > > > >   0x0c0480021f70: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fd fa
+> > > > > > =>0x0c0480021f80: fa fa fa fa fa fa fd fa fa fa[fd]fa fa fa fd fa
+> > > > > >   0x0c0480021f90: fa fa fd fd fa fa fd fa fa fa fa fa fa fa fd fa
+> > > > > >   0x0c0480021fa0: fa fa fd fa fa fa fd fa fa fa fd fa fa fa fa fa
+> > > > > >   0x0c0480021fb0: fa fa fd fa fa fa fa fa fa fa fa fa fa fa fd fd
+> > > > > >   0x0c0480021fc0: fa fa fd fa fa fa fa fa fa fa fa fa fa fa fd fa
+> > > > > >   0x0c0480021fd0: fa fa fd fa fa fa fd fa fa fa fa fa fa fa fd fa
+> > > > > > Shadow byte legend (one shadow byte represents 8 application
+> > bytes):
+> > > > > >   Addressable:           00
+> > > > > >   Partially addressable: 01 02 03 04 05 06 07
+> > > > > >   Heap left redzone:       fa
+> > > > > >   Freed heap region:       fd
+> > > > > >   Stack left redzone:      f1
+> > > > > >   Stack mid redzone:       f2
+> > > > > >   Stack right redzone:     f3
+> > > > > >   Stack after return:      f5
+> > > > > >   Stack use after scope:   f8
+> > > > > >   Global redzone:          f9
+> > > > > >   Global init order:       f6
+> > > > > >   Poisoned by user:        f7
+> > > > > >   Container overflow:      fc
+> > > > > >   Array cookie:            ac
+> > > > > >   Intra object redzone:    bb
+> > > > > >   ASan internal:           fe
+> > > > > >   Left alloca redzone:     ca
+> > > > > >   Right alloca redzone:    cb
+> > > > > > ==5014==ABORTING
+> > > > > >
+> > > > > > thanks.
+> > > > > >
+> > > > > > On Wed, Nov 7, 2018 at 8:21 AM Greg Kurz <groug@kaod.org> wrote:
+> > > > > >
+> > > > > > > The assumption that the fid cannot be used by any other
+> > operation is
+> > > > > > > wrong. At least, nothing prevents a misbehaving client to create
+> > a
+> > > > > > > file with a given fid, and to pass this fid to some other
+> > operation
+> > > > > > > at the same time (ie, without waiting for the response to the
+> > creation
+> > > > > > > request). The call to v9fs_path_copy() performed by the worker
+> > thread
+> > > > > > > after the file was created can race with any access to the fid
+> > path
+> > > > > > > performed by some other thread. This causes use-after-free
+> > issues that
+> > > > > > > can be detected by ASAN with a custom 9p client.
+> > > > > > >
+> > > > > > > Unlike other operations that only read the fid path,
+> > v9fs_co_open2()
+> > > > > > > does modify it. It should hence take the write lock.
+> > > > > > >
+> > > > > > > Cc: P J P <ppandit@redhat.com>
+> > > > > > > Reported-by: zhibin hu <noirfate@gmail.com>
+> > > > > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > > > > ---
+> > > > > > >  hw/9pfs/cofile.c |    6 +++---
+> > > > > > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/hw/9pfs/cofile.c b/hw/9pfs/cofile.c
+> > > > > > > index 88791bc327ac..9c22837cda32 100644
+> > > > > > > --- a/hw/9pfs/cofile.c
+> > > > > > > +++ b/hw/9pfs/cofile.c
+> > > > > > > @@ -140,10 +140,10 @@ int coroutine_fn v9fs_co_open2(V9fsPDU
+> > *pdu,
+> > > > > > > V9fsFidState *fidp,
+> > > > > > >      cred.fc_gid = gid;
+> > > > > > >      /*
+> > > > > > >       * Hold the directory fid lock so that directory path name
+> > > > > > > -     * don't change. Read lock is fine because this fid cannot
+> > > > > > > -     * be used by any other operation.
+> > > > > > > +     * don't change. Take the write lock to be sure this fid
+> > > > > > > +     * cannot be used by another operation.
+> > > > > > >       */
+> > > > > > > -    v9fs_path_read_lock(s);
+> > > > > > > +    v9fs_path_write_lock(s);
+> > > > > > >      v9fs_co_run_in_worker(
+> > > > > > >          {
+> > > > > > >              err = s->ops->open2(&s->ctx, &fidp->path,
+> > > > > > >
+> > > > > > >
+> > > > >
+> > > > >
+> > >
+> >
+> >
