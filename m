@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gMW5l-0000rn-I8
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 05:38:46 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gMWU4-00063B-MP
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 06:03:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gMW5h-0006bf-99
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 05:38:45 -0500
-Date: Tue, 13 Nov 2018 11:38:24 +0100
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gMWIw-0000LO-Sk
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 05:52:26 -0500
+Date: Tue, 13 Nov 2018 11:52:16 +0100
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20181113103824.GF1148@toto>
+Message-ID: <20181113105216.GG1148@toto>
 References: <20181110081147.4027-1-luc.michel@greensocs.com>
-	<20181110081147.4027-2-luc.michel@greensocs.com>
+	<20181110081147.4027-3-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181110081147.4027-2-luc.michel@greensocs.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 01/16] hw/cpu: introduce CPU
- clusters
+In-Reply-To: <20181110081147.4027-3-luc.michel@greensocs.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 02/16] gdbstub: introduce GDB
+ processes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,167 +27,212 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Luc Michel <luc.michel@greensocs.com>
 Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, alistair@alistair23.me, mark.burton@greensocs.com, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
 
-On Sat, Nov 10, 2018 at 09:11:32AM +0100, Luc Michel wrote:
-> This commit adds the cpu-cluster type. It aims at gathering CPUs from
-> the same cluster in a machine.
+On Sat, Nov 10, 2018 at 09:11:33AM +0100, Luc Michel wrote:
+> Add a structure GDBProcess that represent processes from the GDB
+> semantic point of view.
 > 
-> For now it only has a `cluster-id` property.
+> CPUs can be split into different processes, by grouping them under
+> different cpu-cluster objects.  Each occurrence of a cpu-cluster object
+> implies the existence of the corresponding process in the GDB stub. The
+> GDB process ID is derived from the corresponding cluster ID as follows:
+> 
+>   GDB PID = cluster ID + 1
+> 
+> This is because PIDs -1 and 0 are reserved in GDB and cannot be used by
+> processes.
+> 
+> When no such container are found, all the CPUs are put in a unique GDB
+> process (create_unique_process()). This is also the case when compiled
+> in user mode, where multi-processes do not make much sense for now.
 > 
 > Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Acked-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  gdbstub.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 76 insertions(+)
+> 
+> diff --git a/gdbstub.c b/gdbstub.c
+> index c4e4f9f082..0d70b89598 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -27,10 +27,11 @@
+>  #include "monitor/monitor.h"
+>  #include "chardev/char.h"
+>  #include "chardev/char-fe.h"
+>  #include "sysemu/sysemu.h"
+>  #include "exec/gdbstub.h"
+> +#include "hw/cpu/cluster.h"
+>  #endif
+>  
+>  #define MAX_PACKET_LENGTH 4096
+>  
+>  #include "qemu/sockets.h"
+> @@ -294,10 +295,15 @@ typedef struct GDBRegisterState {
+>      gdb_reg_cb set_reg;
+>      const char *xml;
+>      struct GDBRegisterState *next;
+>  } GDBRegisterState;
+>  
+> +typedef struct GDBProcess {
+> +    uint32_t pid;
+> +    bool attached;
+> +} GDBProcess;
+> +
+>  enum RSState {
+>      RS_INACTIVE,
+>      RS_IDLE,
+>      RS_GETLINE,
+>      RS_GETLINE_ESC,
+> @@ -322,10 +328,13 @@ typedef struct GDBState {
+>      int running_state;
+>  #else
+>      CharBackend chr;
+>      Chardev *mon_chr;
+>  #endif
+> +    bool multiprocess;
+> +    GDBProcess *processes;
+> +    int process_num;
+>      char syscall_buf[256];
+>      gdb_syscall_complete_cb current_syscall_cb;
+>  } GDBState;
+>  
+>  /* By default use no IRQs and no timers while single stepping so as to
+> @@ -1749,10 +1758,24 @@ void gdb_exit(CPUArchState *env, int code)
+>  #ifndef CONFIG_USER_ONLY
+>    qemu_chr_fe_deinit(&s->chr, true);
+>  #endif
+>  }
+>  
+> +/*
+> + * Create a unique process containing all the CPUs.
+> + */
+> +static void create_unique_process(GDBState *s)
+> +{
+> +    GDBProcess *process;
+> +
+> +    s->processes = g_malloc0(sizeof(GDBProcess));
+> +    s->process_num = 1;
+> +    process = &s->processes[0];
+> +
+> +    process->pid = 1;
+> +}
+> +
+>  #ifdef CONFIG_USER_ONLY
+>  int
+>  gdb_handlesig(CPUState *cpu, int sig)
+>  {
+>      GDBState *s;
+> @@ -1846,10 +1869,11 @@ static bool gdb_accept(void)
+>      }
+>  
+>      s = g_malloc0(sizeof(GDBState));
+>      s->c_cpu = first_cpu;
+>      s->g_cpu = first_cpu;
+> +    create_unique_process(s);
+>      s->fd = fd;
+>      gdb_has_xml = false;
+>  
+>      gdbserver_state = s;
+>      return true;
+> @@ -2002,10 +2026,58 @@ static const TypeInfo char_gdb_type_info = {
+>      .name = TYPE_CHARDEV_GDB,
+>      .parent = TYPE_CHARDEV,
+>      .class_init = char_gdb_class_init,
+>  };
+>  
+> +static int find_cpu_clusters(Object *child, void *opaque)
+> +{
+> +    if (object_dynamic_cast(child, TYPE_CPU_CLUSTER)) {
+> +        GDBState *s = (GDBState *) opaque;
+> +        CPUClusterState *cluster = CPU_CLUSTER(child);
+> +        GDBProcess *process;
+> +
+> +        s->processes = g_renew(GDBProcess, s->processes, ++s->process_num);
+> +
+> +        process = &s->processes[s->process_num - 1];
+> +
+> +        /* GDB process IDs -1 and 0 are reserved */
+> +        process->pid = cluster->cluster_id + 1;
 
+This may be theoretical but since both pid and cluster_id are uint32_t
+you may end up with 0 here.
+
+You may want to limit cluster_id's to something like the range 0 - INT32_MAX.
+
+
+
+> +        process->attached = false;
+> +        return 0;
+> +    }
+> +
+> +    return object_child_foreach(child, find_cpu_clusters, opaque);
+> +}
+> +
+> +static int pid_order(const void *a, const void *b)
+> +{
+> +    GDBProcess *pa = (GDBProcess *) a;
+> +    GDBProcess *pb = (GDBProcess *) b;
+> +
+> +    return pa->pid - pb->pid;
+
+Similarly here, is this safe?
+e.g:
+pa->pid = 1
+pb->pid = 0x80000002
+
+
+Otherwise:
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 
-> ---
->  include/hw/cpu/cluster.h | 38 ++++++++++++++++++++++++++
->  hw/cpu/cluster.c         | 59 ++++++++++++++++++++++++++++++++++++++++
->  MAINTAINERS              |  2 ++
->  hw/cpu/Makefile.objs     |  2 +-
->  4 files changed, 100 insertions(+), 1 deletion(-)
->  create mode 100644 include/hw/cpu/cluster.h
->  create mode 100644 hw/cpu/cluster.c
-> 
-> diff --git a/include/hw/cpu/cluster.h b/include/hw/cpu/cluster.h
-> new file mode 100644
-> index 0000000000..11f50d5f6b
-> --- /dev/null
-> +++ b/include/hw/cpu/cluster.h
-> @@ -0,0 +1,38 @@
-> +/*
-> + * QEMU CPU cluster
-> + *
-> + * Copyright (c) 2018 GreenSocs SAS
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License
-> + * as published by the Free Software Foundation; either version 2
-> + * of the License, or (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see
-> + * <http://www.gnu.org/licenses/gpl-2.0.html>
-> + */
-> +#ifndef HW_CPU_CLUSTER_H
-> +#define HW_CPU_CLUSTER_H
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/qdev.h"
-> +
-> +#define TYPE_CPU_CLUSTER "cpu-cluster"
-> +#define CPU_CLUSTER(obj) \
-> +    OBJECT_CHECK(CPUClusterState, (obj), TYPE_CPU_CLUSTER)
-> +
-> +typedef struct CPUClusterState {
-> +    /*< private >*/
-> +    DeviceState parent_obj;
-> +
-> +    /*< public >*/
-> +    uint32_t cluster_id;
-> +} CPUClusterState;
-> +
-> +#endif
-> diff --git a/hw/cpu/cluster.c b/hw/cpu/cluster.c
-> new file mode 100644
-> index 0000000000..e0ffd76152
-> --- /dev/null
-> +++ b/hw/cpu/cluster.c
-> @@ -0,0 +1,59 @@
-> +/*
-> + * QEMU CPU cluster
-> + *
-> + * Copyright (c) 2018 GreenSocs SAS
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License
-> + * as published by the Free Software Foundation; either version 2
-> + * of the License, or (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see
-> + * <http://www.gnu.org/licenses/gpl-2.0.html>
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/cpu/cluster.h"
-> +#include "qapi/error.h"
-> +#include "qemu/module.h"
-> +
-> +static void cpu_cluster_init(Object *obj)
-> +{
-> +    static uint32_t cluster_id_auto_increment;
-> +    CPUClusterState *cluster = CPU_CLUSTER(obj);
-> +
-> +    cluster->cluster_id = cluster_id_auto_increment++;
+
 > +}
 > +
-> +static Property cpu_cluster_properties[] = {
-> +    DEFINE_PROP_UINT32("cluster-id", CPUClusterState, cluster_id, 0),
-> +    DEFINE_PROP_END_OF_LIST()
-> +};
-> +
-> +static void cpu_cluster_class_init(ObjectClass *klass, void *data)
+> +static void create_processes(GDBState *s)
 > +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    object_child_foreach(object_get_root(), find_cpu_clusters, s);
 > +
-> +    dc->props = cpu_cluster_properties;
+> +    if (!s->processes) {
+> +        /* No CPU cluster specified by the machine */
+> +        create_unique_process(s);
+> +    } else {
+> +        /* Sort by PID */
+> +        qsort(s->processes, s->process_num, sizeof(s->processes[0]), pid_order);
+> +    }
 > +}
 > +
-> +static const TypeInfo cpu_cluster_type_info = {
-> +    .name = TYPE_CPU_CLUSTER,
-> +    .parent = TYPE_DEVICE,
-> +    .instance_size = sizeof(CPUClusterState),
-> +    .instance_init = cpu_cluster_init,
-> +    .class_init = cpu_cluster_class_init,
-> +};
-> +
-> +static void cpu_cluster_register_types(void)
+> +static void cleanup_processes(GDBState *s)
 > +{
-> +    type_register_static(&cpu_cluster_type_info);
+> +    g_free(s->processes);
+> +    s->process_num = 0;
+> +    s->processes = NULL;
 > +}
 > +
-> +type_init(cpu_cluster_register_types)
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 126fe0be7e..8e20b0e672 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1022,11 +1022,13 @@ Machine core
->  M: Eduardo Habkost <ehabkost@redhat.com>
->  M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->  S: Supported
->  F: hw/core/machine.c
->  F: hw/core/null-machine.c
-> +F: hw/cpu/cluster.c
->  F: include/hw/boards.h
-> +F: include/hw/cpu/cluster.h
->  T: git git://github.com/ehabkost/qemu.git machine-next
+>  int gdbserver_start(const char *device)
+>  {
+>      trace_gdbstub_op_start(device);
 >  
->  Xtensa Machines
->  ---------------
->  sim
-> diff --git a/hw/cpu/Makefile.objs b/hw/cpu/Makefile.objs
-> index cd52d20b65..8db9e8a7b3 100644
-> --- a/hw/cpu/Makefile.objs
-> +++ b/hw/cpu/Makefile.objs
-> @@ -1,5 +1,5 @@
->  obj-$(CONFIG_ARM11MPCORE) += arm11mpcore.o
->  obj-$(CONFIG_REALVIEW) += realview_mpcore.o
->  obj-$(CONFIG_A9MPCORE) += a9mpcore.o
->  obj-$(CONFIG_A15MPCORE) += a15mpcore.o
-> -common-obj-y += core.o
-> +common-obj-y += core.o cluster.o
+>      GDBState *s;
+> @@ -2058,15 +2130,19 @@ int gdbserver_start(const char *device)
+>                                     NULL, &error_abort);
+>          monitor_init(mon_chr, 0);
+>      } else {
+>          qemu_chr_fe_deinit(&s->chr, true);
+>          mon_chr = s->mon_chr;
+> +        cleanup_processes(s);
+>          memset(s, 0, sizeof(GDBState));
+>          s->mon_chr = mon_chr;
+>      }
+>      s->c_cpu = first_cpu;
+>      s->g_cpu = first_cpu;
+> +
+> +    create_processes(s);
+> +
+>      if (chr) {
+>          qemu_chr_fe_init(&s->chr, chr, &error_abort);
+>          qemu_chr_fe_set_handlers(&s->chr, gdb_chr_can_receive, gdb_chr_receive,
+>                                   gdb_chr_event, NULL, NULL, NULL, true);
+>      }
 > -- 
 > 2.19.1
 > 
