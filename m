@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gMWWw-00085U-Nw
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 06:06:55 -0500
+	(envelope-from <xiezhide@huawei.com>) id 1gMWhW-0001Jl-Hj
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 06:17:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gMWWl-0008Bk-UB
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 06:06:46 -0500
-Date: Tue, 13 Nov 2018 12:06:36 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20181113110636.GH1148@toto>
-References: <20181110081147.4027-1-luc.michel@greensocs.com>
-	<20181110081147.4027-4-luc.michel@greensocs.com>
+	(envelope-from <xiezhide@huawei.com>) id 1gMWhM-00077r-EY
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 06:17:41 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2347 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gMWhC-00073b-J4
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 06:17:28 -0500
+From: xiezhide <xiezhide@huawei.com>
+Date: Tue, 13 Nov 2018 11:17:19 +0000
+Message-ID: <A02D6AA901860840B46E751C5E9E38B43CC97027@DGGEML532-MBX.china.huawei.com>
+References: <A02D6AA901860840B46E751C5E9E38B43CC96FA1@DGGEML532-MBX.china.huawei.com>
+	<20181113112855.4f3984f8@bahia.lan>
+In-Reply-To: <20181113112855.4f3984f8@bahia.lan>
+Content-Language: en-US
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181110081147.4027-4-luc.michel@greensocs.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 03/16] gdbstub: add
- multiprocess support to '?' packets
+Subject: Re: [Qemu-devel] [PATCH v1 0/3] fsdev-throttle-qmp: refactor code
+ for qmp interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,152 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, alistair@alistair23.me, mark.burton@greensocs.com, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>
 
-On Sat, Nov 10, 2018 at 09:11:34AM +0100, Luc Michel wrote:
-> The gdb_get_cpu_pid() function does the PID lookup for the given CPU. It
-> checks if the CPU is a direct child of a CPU cluster. If it is, the
-> returned PID is the cluster ID plus one (cluster IDs start at 0, GDB
-> PIDs at 1). When the CPU is not a child of such a container, the PID of
-> the first process is returned.
-> 
-> The gdb_fmt_thread_id() function generates the string to be used to identify
-> a given thread, in a response packet for the peer. This function
-> supports generating thread IDs when multiprocess mode is enabled (in the
-> form `p<pid>.<tid>').
-> 
-> Use them in the reply to a '?' request.
-> 
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-> Acked-by: Alistair Francis <alistair.francis@wdc.com>
-
-
-This is also theoretical but:
-When looking at this, it seems like you could have lazily created
-the s->processes array entries (if you find a cluster but the
-no valid entry in s->processes). Then we could perhaps eliminate the
-scan of all objects at startup and also support CPU/Cluster hotplug.
-
-Anyway, this looks good to me!
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Cheers,
-Edgar
-
-
-> ---
->  gdbstub.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 58 insertions(+), 2 deletions(-)
-> 
-> diff --git a/gdbstub.c b/gdbstub.c
-> index 0d70b89598..d26bad4b67 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -638,10 +638,52 @@ static int memtox(char *buf, const char *mem, int len)
->          }
->      }
->      return p - buf;
->  }
->  
-> +static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
-> +{
-> +#ifndef CONFIG_USER_ONLY
-> +    gchar *path, *name;
-> +    Object *obj;
-> +    CPUClusterState *cluster;
-> +    uint32_t ret;
-> +
-> +    path = object_get_canonical_path(OBJECT(cpu));
-> +    name = object_get_canonical_path_component(OBJECT(cpu));
-> +
-> +    if (path == NULL) {
-> +        ret = s->processes[0].pid;
-> +        goto out;
-> +    }
-> +
-> +    /*
-> +     * Retrieve the CPU parent path by removing the last '/' and the CPU name
-> +     * from the CPU canonical path. */
-> +    path[strlen(path) - strlen(name) - 1] = '\0';
-> +
-> +    obj = object_resolve_path_type(path, TYPE_CPU_CLUSTER, NULL);
-> +
-> +    if (obj == NULL) {
-> +        ret = s->processes[0].pid;
-> +        goto out;
-> +    }
-> +
-> +    cluster = CPU_CLUSTER(obj);
-> +    ret = cluster->cluster_id + 1;
-> +
-> +out:
-> +    g_free(name);
-> +    g_free(path);
-> +
-> +    return ret;
-> +
-> +#else
-> +    return s->processes[0].pid;
-> +#endif
-> +}
-> +
->  static const char *get_feature_xml(const char *p, const char **newp,
->                                     CPUClass *cc)
->  {
->      size_t len;
->      int i;
-> @@ -907,10 +949,23 @@ static CPUState *find_cpu(uint32_t thread_id)
->      }
->  
->      return NULL;
->  }
->  
-> +static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
-> +                           char *buf, size_t buf_size)
-> +{
-> +    if (s->multiprocess) {
-> +        snprintf(buf, buf_size, "p%02x.%02x",
-> +                 gdb_get_cpu_pid(s, cpu), cpu_gdb_index(cpu));
-> +    } else {
-> +        snprintf(buf, buf_size, "%02x", cpu_gdb_index(cpu));
-> +    }
-> +
-> +    return buf;
-> +}
-> +
->  static int is_query_packet(const char *p, const char *query, char separator)
->  {
->      unsigned int query_len = strlen(query);
->  
->      return strncmp(p, query, query_len) == 0 &&
-> @@ -1018,22 +1073,23 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
->      const char *p;
->      uint32_t thread;
->      int ch, reg_size, type, res;
->      uint8_t mem_buf[MAX_PACKET_LENGTH];
->      char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-> +    char thread_id[16];
->      uint8_t *registers;
->      target_ulong addr, len;
->  
->      trace_gdbstub_io_command(line_buf);
->  
->      p = line_buf;
->      ch = *p++;
->      switch(ch) {
->      case '?':
->          /* TODO: Make this return the correct value for user-mode.  */
-> -        snprintf(buf, sizeof(buf), "T%02xthread:%02x;", GDB_SIGNAL_TRAP,
-> -                 cpu_gdb_index(s->c_cpu));
-> +        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
-> +                 gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread_id)));
->          put_packet(s, buf);
->          /* Remove all the breakpoints when this query is issued,
->           * because gdb is doing and initial connect and the state
->           * should be cleaned up.
->           */
-> -- 
-> 2.19.1
-> 
-> 
+DQpGb2xsb3dpbmcgaXMgdGhlIHRoZSBwYXRjaCBoZWFkZXIsICB1c2VyIG5hbWUgYW5kIG1haWwg
+YXJlIHRoZSBzYW1lIGF0IEZyb20gYW5kIFNpZ25lZC1vZmYtYnkgOg0KDQotLS0tLS0tLS0tLS0t
+LS0tLS0tDQpGcm9tIDQ1N2YzMTY4ZWNhMmQwNDFiYmZjYWQ4MjJhZDkwMDRlMjlhMzg0MGMgTW9u
+IFNlcCAxNyAwMDowMDowMCAyMDAxDQpGcm9tOiB4MDAzOTA5NjEgPHhpZXpoaWRlQGh1YXdlaS5j
+b20+DQpEYXRlOiBXZWQsIDE0IE5vdiAyMDE4IDAxOjAzOjQ5ICswODAwDQpTdWJqZWN0OiBbUEFU
+Q0ggMS8zXSBmc2Rldi10aHJvdHRsZS1xbXA6IHJlZmFjdG9yIGNvZGUgZm9yIHFtcCBpbnRlcmZh
+Y2UgZm9yDQogaW8gdGhyb3R0bGluZw0KDQpUaGlzIHBhdGNoIGluY2x1ZGVzIHR3byBwYXJ0czoN
+CjEuIGZhY3RvciBvdXQgdGhyb3R0bGUgY29kZSB0byByZXVzZSBjb2RlDQoyLiB1c2UgVGhyb3R0
+bGVMaW1pdHMgc3RydWN0dXJlDQoNClNpZ25lZC1vZmYtYnk6IHgwMDM5MDk2MSA8eGllemhpZGVA
+aHVhd2VpLmNvbT4NCg0KDQpBbnl3YXksIGxldCBtZSB0cnkgZ2l0IHNlbmQtZW1haWwNCg0KVGhh
+bmtzDQpLaWRkDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBHcmVnIEt1cnog
+W21haWx0bzpncm91Z0BrYW9kLm9yZ10gDQpTZW50OiAyMDE4xOoxMdTCMTPI1SAxODoyOQ0KVG86
+IHhpZXpoaWRlIDx4aWV6aGlkZUBodWF3ZWkuY29tPg0KQ2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9y
+ZzsgRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+OyBhcm1icnVAcmVkaGF0LmNvbTsgZGdp
+bGJlcnRAcmVkaGF0LmNvbTsgYmVydG9AaWdhbGlhLmNvbTsgYW5lZXNoLmt1bWFyQGxpbnV4LnZu
+ZXQuaWJtLmNvbQ0KU3ViamVjdDogUmU6IFtRZW11LWRldmVsXVtQQVRDSCB2MSAwLzNdIGZzZGV2
+LXRocm90dGxlLXFtcDogcmVmYWN0b3IgY29kZSBmb3IgcW1wIGludGVyZmFjZQ0KDQpIaSBLaWRk
+LA0KDQpUaGlzIHBvc3RpbmcgaXMgc3RpbGwgYnJva2VuOiBubyB0aHJlYWRpbmcgYW5kIG1pc3Np
+bmcgbGVhZGluZyBibGFua3Mgb24gdW5jaGFuZ2VkIGxpbmVzLiBBbHNvIGlzIHgwMDM5MDk2MSBy
+ZWFsbHkgeW91ciBuYW1lIG9mIGNob2ljZSA/DQoNCkluIHNvbWUgb3RoZXIgbWFpbCwgeW91IG1l
+bnRpb25lZCBjb3B5LXBhc3RlIHRvIGFuIG91dGxvb2sgbWFpbCBjbGllbnQuLi4NCnBsZWFzZSBk
+b24ndCBkbyB0aGF0IHRvIHBvc3Qgc2VyaWVzLiBVc2UgZ2l0IGZvcm1hdC1wYXRjaCBhbmQgZ2l0
+IHNlbmQtZW1haWwgaW5zdGVhZCBhbmQgeW91J2xsIGdldCB0aGUgZm9ybWF0dGluZyBhbmQgdGhy
+ZWFkaW5nIHJpZ2h0Lg0KDQpDaGVlcnMsDQoNCi0tDQpHcmVnDQoNCk9uIFR1ZSwgMTMgTm92IDIw
+MTggMDk6NTk6NTQgKzAwMDANCnhpZXpoaWRlIDx4aWV6aGlkZUBodWF3ZWkuY29tPiB3cm90ZToN
+Cg0KPiBUaGlzIHBhdGNoZXMgcHJvdmlkZSBxbXAgaW50ZXJmYWNlIHRvIHF1ZXJ5L3NldCBpbyB0
+aHJvdHRsZSBwYXJhbWV0ZXJzIG9mIGEgZnNkZXYuDQo+IFNvbWUgb2YgcGF0Y2hlcyBhbHNvIHJl
+ZmFjdG9yIHRoZSBjb2RlIGFuZCBzdHJ1Y3R1cmUgdGhhdCB3YXMgcHJlc2VudCBpbiBibG9jayBh
+bmQgZnNkZXYgZmlsZXMuDQo+IA0KPiB4MDAzOTA5NjEgKDMpOg0KPiAgIGZzZGV2LXRocm90dGxl
+LXFtcDogcmVmYWN0b3IgY29kZSBmb3IgcW1wIGludGVyZmFjZSBmb3IgaW8gdGhyb3R0bGluZw0K
+PiAgIGZzZGV2LXRocm90dGxlLXFtcDogcW1wIGludGVyZmFjZSBmb3IgZnNkZXYgaW8gdGhyb3R0
+bGluZw0KPiAgIGZzZGV2LXRocm90dGxlLXFtcDogaG1wIGludGVyZmFjZSBmb3IgZnNkZXYgaW8g
+dGhyb3R0bGluZw0KPiANCj4gIE1ha2VmaWxlICAgICAgICAgICAgICAgICAgICAgICAgfCAgMjAg
+KysrLQ0KPiAgTWFrZWZpbGUub2JqcyAgICAgICAgICAgICAgICAgICB8ICAgOCArKw0KPiAgYmxv
+Y2svdGhyb3R0bGUuYyAgICAgICAgICAgICAgICB8ICAgNiArLQ0KPiAgYmxvY2tkZXYuYyAgICAg
+ICAgICAgICAgICAgICAgICB8ICA5NiArLS0tLS0tLS0tLS0tLS0tLQ0KPiAgZnNkZXYvcWVtdS1m
+c2Rldi1kdW1teS5jICAgICAgICB8ICAxMSArKw0KPiAgZnNkZXYvcWVtdS1mc2Rldi10aHJvdHRs
+ZS5jICAgICB8IDE0NCArKysrKysrKysrKysrKysrKy0tLS0tLS0tLQ0KPiAgZnNkZXYvcWVtdS1m
+c2Rldi10aHJvdHRsZS5oICAgICB8ICAgNiArLQ0KPiAgZnNkZXYvcWVtdS1mc2Rldi5jICAgICAg
+ICAgICAgICB8ICAyOSArKysrKysNCj4gIGhtcC1jb21tYW5kcy1pbmZvLmh4ICAgICAgICAgICAg
+fCAgMTUgKysrDQo+ICBobXAtY29tbWFuZHMuaHggICAgICAgICAgICAgICAgIHwgIDE1ICsrKw0K
+PiAgaG1wLmMgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA4MyArKysrKysrKysrKysrLS0N
+Cj4gIGhtcC5oICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDQgKw0KPiAgaW5jbHVkZS9x
+ZW11L3Rocm90dGxlLW9wdGlvbnMuaCB8ICAgMyArLQ0KPiAgaW5jbHVkZS9xZW11L3Rocm90dGxl
+LmggICAgICAgICB8ICAgNCArLQ0KPiAgaW5jbHVkZS9xZW11L3R5cGVkZWZzLmggICAgICAgICB8
+ICAgMSArDQo+ICBtb25pdG9yLmMgICAgICAgICAgICAgICAgICAgICAgIHwgIDQxICsrKystLS0t
+DQo+ICBxYXBpL2Jsb2NrLWNvcmUuanNvbiAgICAgICAgICAgIHwgMTIyICstLS0tLS0tLS0tLS0t
+LS0tLS0tLS0NCj4gIHFhcGkvZnNkZXYuanNvbiAgICAgICAgICAgICAgICAgfCAgOTYgKysrKysr
+KysrKysrKysrKysNCj4gIHFhcGkvcWFwaS1zY2hlbWEuanNvbiAgICAgICAgICAgfCAgIDEgKw0K
+PiAgcWFwaS90bGltaXRzLmpzb24gICAgICAgICAgICAgICB8ICA4OSArKysrKysrKysrKysrKysr
+DQo+ICBxbXAuYyAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEyICsrKw0KPiAgdXRpbC90
+aHJvdHRsZS5jICAgICAgICAgICAgICAgICB8IDIyNCArKysrKysrKysrKysrKysrKysrKysrKysr
+Ky0tLS0tLS0tLS0tLS0tDQo+ICAyMiBmaWxlcyBjaGFuZ2VkLCA2NTQgaW5zZXJ0aW9ucygrKSwg
+Mzc2IGRlbGV0aW9ucygtKSAgY3JlYXRlIG1vZGUgDQo+IDEwMDY0NCBxYXBpL2ZzZGV2Lmpzb24g
+IGNyZWF0ZSBtb2RlIDEwMDY0NCBxYXBpL3RsaW1pdHMuanNvbg0KPiANCj4gdjAgLT4gdjE6DQo+
+ICBBZGRyZXNzZWQgY29tbWVudHMgZnJvbSBFcmljIEJsYWtlIGFuZCBHcmVnIEt1cnouDQo+ICBG
+aXggcGF0Y2ggY29ycnVwdCBpc3N1ZSBkdWUgdG8gZW1haWwgY2xpZW50IGNoYW5nZSB0aGUgcGF0
+Y2ggZm9ybWF0IA0KPiB3aXRoIGNvcHktdG8tcGFzdGVyICBCcmVhayBwYXRjaCB0byBwYXRjaGVz
+DQo+IA0KPiAtLQ0KPiAxLjguMy4xDQo+IA0KDQo=
