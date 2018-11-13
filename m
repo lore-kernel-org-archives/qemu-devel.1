@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gMaqy-0002Wf-0A
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:48 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gMar5-0002cT-Nv
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gMaqr-0002RE-LL
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:44 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36548)
+	(envelope-from <richard.henderson@linaro.org>) id 1gMar2-0002Vo-A2
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:54 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54930)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gMaqg-0002EZ-M3
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:32 -0500
-Received: by mail-wm1-x343.google.com with SMTP id s11so2531331wmh.1
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:43:21 -0800 (PST)
+	id 1gMar1-0002Cp-9U
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 10:43:52 -0500
+Received: by mail-wm1-x343.google.com with SMTP id r63-v6so12460837wma.4
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 07:43:18 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 13 Nov 2018 16:42:25 +0100
-Message-Id: <20181113154226.14396-4-richard.henderson@linaro.org>
+Date: Tue, 13 Nov 2018 16:42:23 +0100
+Message-Id: <20181113154226.14396-2-richard.henderson@linaro.org>
 In-Reply-To: <20181113154226.14396-1-richard.henderson@linaro.org>
 References: <20181113154226.14396-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4 3/4] target/arm: Introduce read_sys_reg32
- for kvm32
+Subject: [Qemu-devel] [PATCH v4 1/4] target/arm: Install ARMISARegisters
+ from kvm host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +30,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-Assert that the value to be written is the correct size.
-No change in functionality here, just mirroring the same
-function from kvm64.
+The ID registers are replacing (some of) the feature bits.
+We need (some of) these values to determine the set of data
+to be handled during migration.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/kvm32.c | 41 ++++++++++++++++-------------------------
- 1 file changed, 16 insertions(+), 25 deletions(-)
+ target/arm/kvm_arm.h | 1 +
+ target/arm/kvm.c     | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index cb3fb73a96..bc0badf53d 100644
---- a/target/arm/kvm32.c
-+++ b/target/arm/kvm32.c
-@@ -28,6 +28,14 @@ static inline void set_feature(uint64_t *features, int feature)
-     *features |= 1ULL << feature;
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index 21c0129da2..6393455b1d 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -183,6 +183,7 @@ void kvm_arm_destroy_scratch_host_vcpu(int *fdarray);
+  * by asking the host kernel)
+  */
+ typedef struct ARMHostCPUFeatures {
++    ARMISARegisters isar;
+     uint64_t features;
+     uint32_t target;
+     const char *dtb_compatible;
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 09a86e2820..44dd0ce6ce 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -158,6 +158,7 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+ 
+     cpu->kvm_target = arm_host_cpu_features.target;
+     cpu->dtb_compatible = arm_host_cpu_features.dtb_compatible;
++    cpu->isar = arm_host_cpu_features.isar;
+     env->features = arm_host_cpu_features.features;
  }
- 
-+static int read_sys_reg32(int fd, uint32_t *pret, uint64_t id)
-+{
-+    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)pret };
-+
-+    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U32);
-+    return ioctl(fd, KVM_GET_ONE_REG, &idreg);
-+}
-+
- bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
- {
-     /* Identify the feature bits corresponding to the host CPU, and
-@@ -35,9 +43,10 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-      * we have to create a scratch VM, create a single CPU inside it,
-      * and then query that CPU for the relevant ID registers.
-      */
--    int i, ret, fdarray[3];
-+    int err = 0, fdarray[3];
-     uint32_t midr, id_pfr0, mvfr1;
-     uint64_t features = 0;
-+
-     /* Old kernels may not know about the PREFERRED_TARGET ioctl: however
-      * we know these will only support creating one kind of guest CPU,
-      * which is its preferred CPU type.
-@@ -47,23 +56,6 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-         QEMU_KVM_ARM_TARGET_NONE
-     };
-     struct kvm_vcpu_init init;
--    struct kvm_one_reg idregs[] = {
--        {
--            .id = KVM_REG_ARM | KVM_REG_SIZE_U32
--            | ENCODE_CP_REG(15, 0, 0, 0, 0, 0, 0),
--            .addr = (uintptr_t)&midr,
--        },
--        {
--            .id = KVM_REG_ARM | KVM_REG_SIZE_U32
--            | ENCODE_CP_REG(15, 0, 0, 0, 1, 0, 0),
--            .addr = (uintptr_t)&id_pfr0,
--        },
--        {
--            .id = KVM_REG_ARM | KVM_REG_SIZE_U32
--            | KVM_REG_ARM_VFP | KVM_REG_ARM_VFP_MVFR1,
--            .addr = (uintptr_t)&mvfr1,
--        },
--    };
- 
-     if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
-         return false;
-@@ -77,16 +69,15 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-      */
-     ahcf->dtb_compatible = "arm,arm-v7";
- 
--    for (i = 0; i < ARRAY_SIZE(idregs); i++) {
--        ret = ioctl(fdarray[2], KVM_GET_ONE_REG, &idregs[i]);
--        if (ret) {
--            break;
--        }
--    }
-+    err |= read_sys_reg32(fdarray[2], &midr, ARM_CP15_REG32(0, 0, 0, 0));
-+    err |= read_sys_reg32(fdarray[2], &id_pfr0, ARM_CP15_REG32(0, 0, 1, 0));
-+    err |= read_sys_reg32(fdarray[2], &mvfr1,
-+                          KVM_REG_ARM | KVM_REG_SIZE_U32 |
-+                          KVM_REG_ARM_VFP | KVM_REG_ARM_VFP_MVFR1);
- 
-     kvm_arm_destroy_scratch_host_vcpu(fdarray);
- 
--    if (ret) {
-+    if (err < 0) {
-         return false;
-     }
  
 -- 
 2.17.2
