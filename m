@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gMcAl-0007X5-V4
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:08:21 -0500
+	(envelope-from <danielhb413@gmail.com>) id 1gMcB7-0007Wl-HO
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:08:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gMbwZ-0003uE-QZ
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:53:41 -0500
-From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Tue, 13 Nov 2018 17:52:36 +0100
-Message-Id: <20181113165247.4806-3-sameo@linux.intel.com>
-In-Reply-To: <20181113165247.4806-1-sameo@linux.intel.com>
-References: <20181113165247.4806-1-sameo@linux.intel.com>
+	(envelope-from <danielhb413@gmail.com>) id 1gMbt5-0001ec-7B
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:50:07 -0500
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:33042)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1gMbt5-0001e9-24
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:50:03 -0500
+Received: by mail-qk1-x741.google.com with SMTP id o89so20569415qko.0
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 08:50:03 -0800 (PST)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+References: <20181113160908.12706-1-danielhb413@gmail.com>
+	<7274afaf-06ad-c93f-370a-151f1605cabb@redhat.com>
+	<914ac120-dcd1-06ac-7a97-5cc73b759cb0@gmail.com>
+Message-ID: <1ff5be0e-0023-2b78-0b4b-19cd23ec6fe3@gmail.com>
+Date: Tue, 13 Nov 2018 14:49:58 -0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <914ac120-dcd1-06ac-7a97-5cc73b759cb0@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 02/13] target: arm: Remove unused headers
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/1] qga: update docs with systemd suspend
+ support info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,35 +33,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, richard.henderson@linaro.org, qemu-arm@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Robert Bradford <robert.bradford@intel.com>
-Reviewed-by: Samuel Ortiz <sameo@linux.intel.com>
----
- target/arm/helper.c | 3 ---
- 1 file changed, 3 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 3d4e9c5c8a..27d9285e1e 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -12,13 +12,10 @@
- #include "internals.h"
- #include "exec/gdbstub.h"
- #include "exec/helper-proto.h"
--#include "qemu/host-utils.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/sysemu.h"
--#include "qemu/bitops.h"
- #include "qemu/crc32c.h"
- #include "exec/exec-all.h"
--#include "exec/cpu_ldst.h"
- #include "arm_ldst.h"
- #include <zlib.h> /* For crc32 */
- #include "exec/semihost.h"
--- 
-2.19.1
+On 11/13/18 2:39 PM, Daniel Henrique Barboza wrote:
+>
+>
+> On 11/13/18 2:32 PM, Eric Blake wrote:
+>> On 11/13/18 10:09 AM, Daniel Henrique Barboza wrote:
+>>> Commit 067927d62e ("qga: systemd hibernate/suspend/hybrid-sleep
+>>> support") failed to update qapi-schema.json after adding systemd
+>>> hibernate/suspend/hybrid-sleep capabilities to guest-suspend-* QGA
+>>> commands.
+>>>
+>>> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+>>> ---
+>>>   qga/qapi-schema.json | 37 ++++++++++++++++++++++++++-----------
+>>>   1 file changed, 26 insertions(+), 11 deletions(-)
+>>
+>>> +++ b/qga/qapi-schema.json
+>>> @@ -532,12 +532,16 @@
+>>>   #
+>>>   # Suspend guest to disk.
+>>>   #
+>>> -# This command tries to execute the scripts provided by the 
+>>> pm-utils package.
+>>> -# If it's not available, the suspend operation will be performed by 
+>>> manually
+>>> -# writing to a sysfs file.
+>>> +# This command attempts to suspend the guest using three 
+>>> strategies, in this
+>>> +# order:
+>>>   #
+>>> -# For the best results it's strongly recommended to have the pm-utils
+>>> -# package installed in the guest.
+>>> +# - systemd hibernate
+>>> +# - pm-utils (via pm-hibernate)
+>>> +# - manual write into sysfs
+>>> +#
+>>> +# If the guest does not have systemd hibernate support, the scripts 
+>>> in pm-utils
+>>> +# package are executed, in case pm-utils is available. Manual write 
+>>> in sysfs
+>>> +# is a last resort.
+>>
+>> Does this paragraph add any information compared to the earlier list?
+>
+> Perhaps we can remove the paragraph and add "if available" remarks in 
+> the listing?
+> Like:
+>
+> +# - systemd hibernate, if supported
+> +# - pm-utils (via pm-hibernate), if pm-utils is installed
+> +# - manual write into sysfs as a last resort
+>
+> Same for the other 2 cases below.
+
+Actually, nevermind. Removing the extra paragraph and keeping the list as is
+seems cleaner. One can easily assume that, in the lack of guest support of
+systemd hibernate, the command will try the next option. Same thing
+with pm-utils.
+
+>
+>>
+>>>   #
+>>>   # This command does NOT return a response on success. There is a 
+>>> high chance
+>>>   # the command succeeded if the VM exits with a zero exit status 
+>>> or, when
+>>> @@ -560,12 +564,16 @@
+>>>   #
+>>>   # Suspend guest to ram.
+>>>   #
+>>> -# This command tries to execute the scripts provided by the 
+>>> pm-utils package.
+>>> -# If it's not available, the suspend operation will be performed by 
+>>> manually
+>>> -# writing to a sysfs file.
+>>> +# This command attempts to suspend the guest using three 
+>>> strategies, in this
+>>> +# order:
+>>> +#
+>>> +# - systemd suspend
+>>> +# - pm-utils (via pm-suspend)
+>>> +# - manual write into sysfs
+>>>   #
+>>> -# For the best results it's strongly recommended to have the pm-utils
+>>> -# package installed in the guest.
+>>> +# If the guest does not have systemd suspend support, the scripts 
+>>> in pm-utils
+>>> +# package are executed, in case pm-utils is available. Manual write 
+>>> in sysfs
+>>> +# is a last resort.
+>>
+>> Likewise.
+>>
+>>>   #
+>>>   # IMPORTANT: guest-suspend-ram requires QEMU to support the 
+>>> 'system_wakeup'
+>>>   # command.  Thus, it's *required* to query QEMU for the presence 
+>>> of the
+>>> @@ -592,7 +600,14 @@
+>>>   #
+>>>   # Save guest state to disk and suspend to ram.
+>>>   #
+>>> -# This command requires the pm-utils package to be installed in the 
+>>> guest.
+>>> +# This command attempts to suspend the guest using three 
+>>> strategies, in this
+>>> +# order:
+>>> +#
+>>> +# - systemd hybrid-sleep
+>>> +# - pm-utils (via pm-suspend-hybrid)
+>>> +#
+>>> +# If the guest does not have systemd hybrid-sleep support, the 
+>>> scripts in
+>>> +# pm-utils package are executed, in case pm-utils is available.
+>>
+>> "using three strategies" but a list of only 2 seems odd.
+>>
+>
+> Copy/paste busted!
