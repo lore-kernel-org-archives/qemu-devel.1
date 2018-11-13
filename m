@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMVKS-0000eD-F1
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:49:53 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gMVKW-0000ev-57
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:49:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMVKR-0005QN-FK
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:49:52 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:37756)
+	(envelope-from <richard.henderson@linaro.org>) id 1gMVKR-0005Qi-Tj
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:49:56 -0500
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:56019)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gMVKR-0005PO-0Y
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gMVKR-0005Oc-JD
 	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:49:51 -0500
-Received: by mail-ot1-x341.google.com with SMTP id 40so10754240oth.4
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 01:49:48 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id i73-v6so5897283wmd.5
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 01:49:44 -0800 (PST)
+References: <20180629145347.652-1-peter.maydell@linaro.org>
+	<20180629145347.652-41-peter.maydell@linaro.org>
+	<e8d62bcd-f8a9-2a6a-7765-0cf69cc8c1b5@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <0840beac-a764-2fa9-98e3-da10f1f7d6bc@linaro.org>
+Date: Tue, 13 Nov 2018 10:49:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <1542073341-2843-1-git-send-email-liq3ea@gmail.com>
-References: <1542073341-2843-1-git-send-email-liq3ea@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Nov 2018 09:49:28 +0000
-Message-ID: <CAFEAcA-GU85D_7kopc2s7GmTExsqSda0j73v2ecafr_FGKYBLw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] memory: check write/read_with_attrs in
- memory dispatch
+In-Reply-To: <e8d62bcd-f8a9-2a6a-7765-0cf69cc8c1b5@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 40/55] target/arm: Enable SVE for
+ aarch64-linux-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +33,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, P J P <ppandit@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 13 November 2018 at 01:42, Li Qiang <liq3ea@gmail.com> wrote:
-> This can avoid the NULL-deref if the rm doesn't has a
-> read/write nor write/read_with_attrs callback.
->
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> ---
->  memory.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+On 11/12/18 10:10 PM, Laurent Vivier wrote:
+> Running some tests for my pull request, I've found this commit breaks
+> ltp-full-20180515 sigaltstack01 tests with ubuntu arm64/trusty.
+> 
+> sigaltstack01  274  TBROK  :  tst_sig.c:233: unexpected signal
+> SIGIOT/SIGABRT(6) received (pid = 15241).
+> *** Error in `/opt/ltp/testcases/bin/sigaltstack01': free(): invalid
+> pointer: 0x000000000042a010 ***
 
-Alternative approach -- assert that every MemoryRegionOps has
-pointers to callbacks in it, when it is registered in memory_region_init_io()
-and memory_region_init_rom_device_nomigrate().
+How exactly does one reproduce this failure?
 
-I don't have a strong opinion on which is better, but I guess
-I slightly favour requiring devices to be specific about what
-their read/write behaviour is.
+$ ~/qemu/bld/aarch64-linux-user/qemu-aarch64 -cpu max
+./testcases/kernel/syscalls/sigaltstack/sigaltstack01
+sigaltstack01    1  TPASS  :  Functionality of sigaltstack() successful
 
-Do we have many devices that legitimately only want to implement
-one of read and write, not both ?
 
-thanks
--- PMM
+r~
