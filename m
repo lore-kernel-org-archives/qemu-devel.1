@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gMi87-0006JD-OK
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 18:30:00 -0500
+	(envelope-from <prvs=848a82f1d=marcolso@amazon.com>)
+	id 1gMiCv-0007yd-9b
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 18:34:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gMi84-0004C4-Kw
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 18:29:59 -0500
-Date: Wed, 14 Nov 2018 00:29:18 +0100
-From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181113232918.GE23562@caravaggio.hotspot.internet-for-guests.com>
-References: <20181113165247.4806-1-sameo@linux.intel.com>
-	<20181113165247.4806-2-sameo@linux.intel.com>
-	<CAFEAcA-npVS1Q0=or=p-kjP0Nf4h1n+qUL7y8+yYCdtuHa7Fxg@mail.gmail.com>
+	(envelope-from <prvs=848a82f1d=marcolso@amazon.com>)
+	id 1gMiCs-0006dd-4V
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 18:34:57 -0500
+References: <1542006398-30037-1-git-send-email-marcolso@amazon.com>
+	<1542006398-30037-2-git-send-email-marcolso@amazon.com>
+	<94e0cf20-1a15-e4d0-cc68-cc7247067914@redhat.com>
+From: Marc Olson <marcolso@amazon.com>
+Message-ID: <5d567a8f-ccde-96b2-1650-4fd9723e1fb9@amazon.com>
+Date: Tue, 13 Nov 2018 15:34:46 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFEAcA-npVS1Q0=or=p-kjP0Nf4h1n+qUL7y8+yYCdtuHa7Fxg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 01/13] target: arm: Add copyright
- boilerplate
+In-Reply-To: <94e0cf20-1a15-e4d0-cc68-cc7247067914@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] blkdebug: Extend rule check for
+ additional types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +28,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Tue, Nov 13, 2018 at 04:58:40PM +0000, Peter Maydell wrote:
-> On 13 November 2018 at 16:52, Samuel Ortiz <sameo@linux.intel.com> wrote:
-> > From: Philippe Mathieu-Daudé <philmd@redhat.com>
-> >
-> > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> > Reviewed-by: Robert Bradford <robert.bradford@intel.com>
-> > Reviewed-by: Samuel Ortiz <sameo@linux.intel.com>
-> > ---
-> >  target/arm/helper.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> >
-> > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> > index 0da1424f72..3d4e9c5c8a 100644
-> > --- a/target/arm/helper.c
-> > +++ b/target/arm/helper.c
-> > @@ -1,3 +1,10 @@
-> > +/*
-> > + * ARM generic helpers.
-> > + *
-> > + * This code is licensed under the GNU GPL v2.
-> > + *
-> > + * SPDX-License-Identifier: GPL-2.0-or-later
-> > + */
-> 
-> The human readable text says "v2", but the SPDX tag says
-> "v2 or later". Which is right? (The top level LICENSE file says
-> source files with no specific license are 2-or-later).
-Fixed in my
-https://github.com/intel/nemu/tree/topic/upstream/arm-tcg-disable
-branch, thanks.
+On 11/13/18 3:22 PM, John Snow wrote:
+>
+> On 11/12/18 2:06 AM, Marc Olson via Qemu-devel wrote:
+>> Break out the more common parts of the BlkdebugRule struct, and make
+>> rule_check() more explicit about operating only on error injection types
+>> so that additional rule types can be added in the future.
+>>
+>> Signed-off-by: Marc Olson <marcolso@amazon.com>
+>> ---
+>>   block/blkdebug.c | 59 +++++++++++++++++++++++++++++---------------------------
+>>   1 file changed, 31 insertions(+), 28 deletions(-)
+>>
+>> diff --git a/block/blkdebug.c b/block/blkdebug.c
+>> index 327049b..7739849 100644
+>> --- a/block/blkdebug.c
+>> +++ b/block/blkdebug.c
+>> @@ -73,13 +73,13 @@ typedef struct BlkdebugRule {
+>>       BlkdebugEvent event;
+>>       int action;
+>>       int state;
+>> +    int once;
+>> +    int64_t offset;
+>>       union {
+>>           struct {
+>>               int error;
+>>               int immediately;
+>> -            int once;
+>> -            int64_t offset;
+>> -        } inject;
+>> +        } inject_error;
+> ...pulling out "once" and "offset" from inject_error (renamed inject) to
+> shared properties. Fine, though this looks like it could use more love.
+> Not your doing.
+>
+> This adds new dead fields for set_state and suspend which will now work,
+> but hopefully not do anything.
 
-Cheers,
-Samuel.
+
+I think set_state was already there?
+
+>
+>>           struct {
+>>               int new_state;
+>>           } set_state;
+>> @@ -182,16 +182,16 @@ static int add_rule(void *opaque, QemuOpts *opts, Error **errp)
+>>           .state  = qemu_opt_get_number(opts, "state", 0),
+>>       };
+>>   
+>> +    rule->once = qemu_opt_get_bool(opts, "once", 0);
+>> +    sector = qemu_opt_get_number(opts, "sector", -1);
+>> +    rule->offset = sector == -1 ? -1 : sector * BDRV_SECTOR_SIZE;
+>> +
+>>       /* Parse action-specific options */
+>>       switch (d->action) {
+>>       case ACTION_INJECT_ERROR:
+>> -        rule->options.inject.error = qemu_opt_get_number(opts, "errno", EIO);
+>> -        rule->options.inject.once  = qemu_opt_get_bool(opts, "once", 0);
+>> -        rule->options.inject.immediately =
+>> +        rule->options.inject_error.error = qemu_opt_get_number(opts, "errno", EIO);
+>> +        rule->options.inject_error.immediately =
+>>               qemu_opt_get_bool(opts, "immediately", 0);
+>> -        sector = qemu_opt_get_number(opts, "sector", -1);
+>> -        rule->options.inject.offset =
+>> -            sector == -1 ? -1 : sector * BDRV_SECTOR_SIZE;
+>>           break;
+>>   
+>>       case ACTION_SET_STATE:
+>> @@ -474,38 +474,41 @@ static int rule_check(BlockDriverState *bs, uint64_t offset, uint64_t bytes)
+>>   {
+>>       BDRVBlkdebugState *s = bs->opaque;
+>>       BlkdebugRule *rule = NULL;
+>> +    BlkdebugRule *error_rule = NULL;
+>>       int error;
+>>       bool immediately;
+>> +    int ret = 0;
+>>   
+>>       QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
+>> -        uint64_t inject_offset = rule->options.inject.offset;
+>> -
+>> -        if (inject_offset == -1 ||
+>> -            (bytes && inject_offset >= offset &&
+>> -             inject_offset < offset + bytes))
+>> +        if (rule->offset == -1 ||
+>> +            (bytes && rule->offset >= offset &&
+>> +             rule->offset < offset + bytes))
+>>           {
+>> -            break;
+>> +            if (rule->action == ACTION_INJECT_ERROR) {
+>> +                error_rule = rule;
+>> +                break;
+>> +            }
+>>           }
+>>       }
+>>   
+>> -    if (!rule) {
+>> -        return 0;
+>> -    }
+>> +    if (error_rule) {
+>> +        immediately = error_rule->options.inject_error.immediately;
+>> +        error = error_rule->options.inject_error.error;
+>>   
+>> -    immediately = rule->options.inject.immediately;
+>> -    error = rule->options.inject.error;
+>> +        if (error_rule->once) {
+>> +            QSIMPLEQ_REMOVE(&s->active_rules, error_rule, BlkdebugRule, active_next);
+>> +            remove_rule(error_rule);
+>> +        }
+>>   
+>> -    if (rule->options.inject.once) {
+>> -        QSIMPLEQ_REMOVE(&s->active_rules, rule, BlkdebugRule, active_next);
+>> -        remove_rule(rule);
+>> -    }
+>> +        if (error && !immediately) {
+>> +            aio_co_schedule(qemu_get_current_aio_context(), qemu_coroutine_self());
+>> +            qemu_coroutine_yield();
+>> +        }
+>>   
+>> -    if (error && !immediately) {
+>> -        aio_co_schedule(qemu_get_current_aio_context(), qemu_coroutine_self());
+>> -        qemu_coroutine_yield();
+>> +        ret = -error;
+>>       }
+> Bit messy as a diff, but it seems to check out. As a bonus we now
+> actually check the tag of the rules we're iterating through, so that
+> seems like an improvement.
+
+
+Unfortunately git made a bit of a mess out of the diff.
+
+>
+> Reviewed-By: John Snow <jsnow@redhat.com>
+>
+>>   
+>> -    return -error;
+>> +    return ret;
+>>   }
+>>   
+>>   static int coroutine_fn
+>>
