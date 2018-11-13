@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMXen-0007On-9X
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:02 -0500
+	(envelope-from <xiezhide@huawei.com>) id 1gMXey-0007XG-7E
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMXel-00042V-U7
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:01 -0500
-Date: Tue, 13 Nov 2018 13:18:36 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181113121836.GC4830@localhost.localdomain>
-References: <20181109221213.7310-1-crosa@redhat.com>
-	<20181112104953.GB11580@linux.fritz.box>
-	<f1c27ed2-9aba-edaf-2c49-ff565a0847ce@redhat.com>
-	<20181112160025.GE11580@linux.fritz.box>
-	<b51dd4e4-e814-db42-86be-698c0d87f8ef@redhat.com>
+	(envelope-from <xiezhide@huawei.com>) id 1gMXeu-00043z-1X
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:12 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2667 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gMXeq-00042r-Kn
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:19:07 -0500
+From: xiezhide <xiezhide@huawei.com>
+Date: Tue, 13 Nov 2018 20:13:18 +0800
+Message-ID: <4c5dd2cf9d0d77fc44cc9d057a6b3496eed4f86b.1542110461.git.xiezhide@huawei.com>
+In-Reply-To: <cover.1542110461.git.xiezhide@huawei.com>
+References: <cover.1542110461.git.xiezhide@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b51dd4e4-e814-db42-86be-698c0d87f8ef@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] Acceptance tests for qemu-img
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 2/3] fsdev-throttle-qmp: qmp interface for
+ fsdev io throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,181 +26,520 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, eblake@redhat.com, armbru@redhat.com, berto@igalia.com, zengcanfu@huawei.com, jinxuefeng@huawei.com, johnny.chenyi@huawei.com
 
-Am 12.11.2018 um 18:36 hat Cleber Rosa geschrieben:
-> I hope you don't blame me for trying to have the advantage of the
-> counter answer. :)
+provides two interfaces:
+1. set the IO limits for the required fsdev device
+2. query info of all the fsdev devices.
 
-Thanks for being so honest, but do you actually need this advantage when
-you have good technical arguments in favour of your proposal?
+Signed-off-by: xiezhide <xiezhide@huawei.com>
+---
+ fsdev/qemu-fsdev-dummy.c    |  11 ++++
+ fsdev/qemu-fsdev-throttle.c | 144 +++++++++++++++++++++++++++++---------------
+ fsdev/qemu-fsdev-throttle.h |   6 +-
+ fsdev/qemu-fsdev.c          |  29 +++++++++
+ monitor.c                   |  41 ++++++-------
+ qapi/fsdev.json             |  78 +++++++++++++++++++++++-
+ qapi/tlimits.json           |   2 +-
+ qmp.c                       |  12 ++++
+ 8 files changed, 249 insertions(+), 74 deletions(-)
 
-> >> And run all tests related to snapshot.  This is one of the reasons for
-> >> maybe allowing the type of test proposed here to live under
-> >> "tests/acceptance".  Others include:
-> >>
-> >>  * No numbering conflicts when naming tests
-> >>  * More descriptive tests names and metadata
-> > 
-> > Test numbering and metadata - sure, we can change that in qemu-iotests.
-> > Should be a lot easier than adding a whole new second infrastructure for
-> > block tests.
-> > 
-> 
-> My impression is that the "infrastructure for block tests" is not that
-> different from the infrastructure needed by other tests, specially other
-> QEMU tests.  The point I'm trying to make here is that, adding a feature
-> such as metadata parsing/selection to tests looks much more like a *test
-> infrastructure* issue than a "block test" issue, right?
-
-It depends on what you include in "infrastructure". qemu-iotests
-has some functionality that is probably common to all test frameworks.
-But it also has some functionality that is very specific to QEMU and the
-block layer.
-
-As a rough guideline, anything that ./check does outside the actual test
-case is probably mostly generic; anything that is included in the test
-case files (such as most common.* files and iotests.py) are domain
-specific.
-
-So yes, there are parts of qemu-iotests that could be covered by another
-tool, and probably better, but there are also parts worth of keeping.
-
-> >>  * No "context switch" for people also writing acceptance tests
-> > 
-> > There are no people writing "acceptance tests" for the block layer yet.
-> > The context switch comes only with your patches, since you are
-> > introducing a second competing framework for the same task, without even
-> > giving a clear path of how to integrate or convert the existing tests so
-> > we could get back to a unified world.
-> > 
-> 
-> You're absolutely right, and it's quite obvious that there's no one
-> writing "acceptance tests" for the block layer yet.  There's a subtle
-> but important difference here though: this initiative is trying to allow
-> people to write tests generic enough, for various QEMU subsystems
-> (that's why maybe it's badly named as "acceptance").  It's really about
-> trying to avoid context switches that may occur when developers and
-> maintainers from those various subsystems (hopefully) start to write and
-> review tests.
-> 
-> So no, this is not an attempt to cause disruption, fragmentation and
-> separate worlds.  It's quite the contrary.  And please excuse me from
-> not writing a "how to migrate qemu-iotests" --  I don't even want to
-> think about that if the block layer maintainers do not see any value in
-> that.
-
-[ Insert that "how standards proliferate" xkcd here ]
-
-I see value in having a unified test infrastructure. However, I don't
-think committing a new Hello World grade qemu-img test case using
-different tooling than the rest of the qemu-img test cases is
-contributing much to this goal.
-
-We have so many unfinished conversions inside QEMU, and this looks like
-the approach you would take to add another one.
-
-> If you believe that handing off some of the infrastructure problems that
-> qemu-iotests have to a common tool, and that it may be a good idea to
-> have qemu-iotests become more like "qemu tests that happen to exercise
-> the block layer", then we can push such an initiative forward.
-
-Fine with me. But let's push it forward in a different way then.
-
-My primary concern is not being able to write new tests in a new
-environment. Consistency between block tests is more important to me
-than consistency of new block tests with tests for other parts of QEMU.
-So my primary concern is how to make the existing roughly 232 test cases
-in qemu-iotests compatible with the way the other parts use.
-
-And in fact, as those other parts don't exist yet (other than simple
-examples), maybe it would actually be worth discussing whether they
-shouldn't use the same structure and tooling as qemu-iotests (which can
-obviously be improved at the same time, but my point is about being in
-sync) instead of setting a new standard without considering the existing
-test cases and then trying to move qemu-iotests to it.
-
-> > Are those utility APIs actually worth losing the existing iotests.py
-> > functions that provide stuff that is pretty specific to the QEMU and the
-> > block layer?
-> 
-> There's no reason to lose iotests.py.  Even the current acceptance tests
-> are based on the principle of reusing the code that a lot of the iotests
-> use (scripts/qemu.py and scripts/qmp/*).
-> 
-> What I'm aiming for is that QEMU developers can write *tests*, and have
-> a simple (and hopefully a common) way of running them.
-
-We already do write tests. It's not like you're starting from zero, even
-if your approach is as if you did.
-
-Anyway, one specific concern about the "simple way" I have is that we're
-adding a hard dependency on an external package (Avocado) that isn't
-usually installed anyway on developer machines. Maintainers will of
-course just install it. But will this reduce the amount of tests that
-contributors run, and increase the amount of untested patches on the
-mailing list?
-
-Maybe we can keep a simple in-tree runner like ./check that doesn't have
-any external dependencies and runs all of those tests that don't make
-use of Avocado utility functions etc.? And you'd use Avocado when you
-want to run all tests or use advanced test harness options.
-
-> > 1. Why is a change to something completely new useful and worth the
-> >    effort? We don't generally rewrite QEMU or the kernel if some parts
-> >    of it are ugly. We incrementally improve it instead. Exceptions need
-> >    good justification because rewrites come with costs, especially if
-> >    they can't offer feature parity.
-> > 
-> 
-> I'll tell you a "shocking secret" (please take that with a grain of
-> salt): I have no use case myself for any of the QEMU tests.  I don't
-> rely on them.  No QEMU test make a difference in my work.  That's why I
-> may miss some of the obvious points, but at the same time, maybe I can
-> look at things from a different perspective.
-> 
-> Because incrementally improving the *overall* testing of QEMU is indeed
-> one of my goals, this RFC was a "provocation" for change.  Had I written
-> a Python script with a very similar content, named it "233", we'd have
-> missed this discussion.
-
-I would still have had input for you, which I will now put here, because
-I want to make sure that way we would write the test case will actually
-be well supported (having to care about this would be avoided if we
-started from "use the qemu-iotests test harness for everything" and then
-incrementally improved it to make it suit better for other cases and to
-make it usable from Avocado - in fact, the existing acceptance tests
-could trivially fit in there without any necessary changes to the
-harness).
-
-So for a long time, the only Python test cases we had looked much like
-your test case: Just run some code with lots of asserts in it, and at
-the end print something like "42 test cases passed"; this or an
-exception stack trace is the only output you get. Turns out that this is
-really hard to debug when a test case starts to fail.
-
-Our shell based test cases, on the other hand, have always printed the
-output and then we diffed it against a reference output. When it fails,
-you usually can see immediately what happens. The lesson we learned is
-that most of our newer Python test cases are much more verbose and make
-more use of diffing aginst a reference output instead of asserting. This
-is what your qemu-img test should probably do as well.
-
-And in fact, if it doesn't involve interacting with QMP in complex ways
-that actually need some programming to deal with the return values of
-the monitor, we wouldn't even write it in Python, but just in bash.
-
-> > 2. How do we migrate the existing tests to the new infrastructure to
-> >    avoid fragmentation?
-> 
-> Again, I haven't even thought of proposing that.  This is so dependent
-> on so many other aspects, including this initial feeling and feedback
-> from the maintainers.
-
-But this is the most important point if we don't want to cause
-fragmentation of the tests!
-
-The answer to it decides whether doing any of this makes sense.
-
-Kevin
+diff --git a/fsdev/qemu-fsdev-dummy.c b/fsdev/qemu-fsdev-dummy.c
+index 489cd29..9a90960 100644
+--- a/fsdev/qemu-fsdev-dummy.c
++++ b/fsdev/qemu-fsdev-dummy.c
+@@ -14,8 +14,19 @@
+ #include "qemu-fsdev.h"
+ #include "qemu/config-file.h"
+ #include "qemu/module.h"
++#include "qapi/qapi-commands-fsdev.h"
+ 
+ int qemu_fsdev_add(QemuOpts *opts, Error **errp)
+ {
+     return 0;
+ }
++
++void qmp_fsdev_set_io_throttle(FsdevIOThrottle *arg, Error **errp)
++{
++    return;
++}
++
++FsdevIOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
++{
++    return NULL;
++}
+diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
+index cfd8641..fa2b0c8 100644
+--- a/fsdev/qemu-fsdev-throttle.c
++++ b/fsdev/qemu-fsdev-throttle.c
+@@ -17,6 +17,8 @@
+ #include "qemu-fsdev-throttle.h"
+ #include "qemu/iov.h"
+ #include "qemu/option.h"
++#include "qemu/main-loop.h"
++#include "qemu/throttle-options.h"
+ 
+ static void fsdev_throttle_read_timer_cb(void *opaque)
+ {
+@@ -30,50 +32,99 @@ static void fsdev_throttle_write_timer_cb(void *opaque)
+     qemu_co_enter_next(&fst->throttled_reqs[true], NULL);
+ }
+ 
++typedef struct {
++    FsThrottle *fst;
++    bool is_write;
++} RestartData;
++
++static bool coroutine_fn throttle_co_restart_queue(FsThrottle *fst,
++                                                   bool is_write)
++{
++    return qemu_co_queue_next(&fst->throttled_reqs[is_write]);
++}
++
++static void schedule_next_request(FsThrottle *fst, bool is_write)
++{
++    bool must_wait = throttle_schedule_timer(&fst->ts, &fst->tt, is_write);
++    if (!must_wait) {
++        if (qemu_in_coroutine() &&
++            throttle_co_restart_queue(fst, is_write)) {
++            return;
++        } else {
++            int64_t now = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
++            timer_mod(fst->tt.timers[is_write], now);
++        }
++    }
++}
++
++static void coroutine_fn throttle_restart_queue_entry(void *opaque)
++{
++    RestartData *data = opaque;
++    bool is_write = data->is_write;
++    bool empty_queue = !throttle_co_restart_queue(data->fst, is_write);
++    if (empty_queue) {
++        schedule_next_request(data->fst, is_write);
++    }
++}
++
++static void throttle_restart_queues(FsThrottle *fst)
++{
++    Coroutine *co;
++    RestartData rd = {
++        .fst = fst,
++        .is_write = true
++    };
++     co = qemu_coroutine_create(throttle_restart_queue_entry, &rd);
++    aio_co_enter(fst->ctx, co);
++     rd.is_write = false;
++     co = qemu_coroutine_create(throttle_restart_queue_entry, &rd);
++    aio_co_enter(fst->ctx, co);
++}
++
++static void coroutine_fn fsdev_throttle_config(FsThrottle *fst)
++{
++    if (throttle_enabled(&fst->cfg)) {
++        throttle_config(&fst->ts, QEMU_CLOCK_REALTIME, &fst->cfg);
++    } else {
++        throttle_restart_queues(fst);
++    }
++}
++
++void fsdev_set_io_throttle(FsdevIOThrottle *arg, FsThrottle *fst, Error **errp)
++{
++    ThrottleConfig cfg;
++    ThrottleLimits *tlimits;
++
++    throttle_get_config(&fst->ts, &cfg);
++    tlimits = qapi_FsdevIOThrottle_base(arg);
++    throttle_limits_to_config(tlimits, &cfg, errp);
++
++    if (*errp == NULL) {
++        fst->cfg = cfg;
++        if (!throttle_timers_are_initialized(&fst->tt)) {
++            fsdev_throttle_init(fst);
++        } else {
++            fsdev_throttle_config(fst);
++        }
++    }
++}
++
++void fsdev_get_io_throttle(FsThrottle *fst, FsdevIOThrottle **fs9pcfg,
++                           char *fsdevice)
++{
++    ThrottleConfig cfg = fst->cfg;
++    ThrottleLimits *tlimits;
++    FsdevIOThrottle *fscfg = g_malloc(sizeof(*fscfg));
++    tlimits = qapi_FsdevIOThrottle_base(fscfg);
++    fscfg->has_id = true;
++    fscfg->id = g_strdup(fsdevice);
++    throttle_config_to_limits(&cfg, tlimits);
++    *fs9pcfg = fscfg;
++}
++
+ void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **errp)
+ {
+-    throttle_config_init(&fst->cfg);
+-    fst->cfg.buckets[THROTTLE_BPS_TOTAL].avg =
+-        qemu_opt_get_number(opts, "throttling.bps-total", 0);
+-    fst->cfg.buckets[THROTTLE_BPS_READ].avg  =
+-        qemu_opt_get_number(opts, "throttling.bps-read", 0);
+-    fst->cfg.buckets[THROTTLE_BPS_WRITE].avg =
+-        qemu_opt_get_number(opts, "throttling.bps-write", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_TOTAL].avg =
+-        qemu_opt_get_number(opts, "throttling.iops-total", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_READ].avg =
+-        qemu_opt_get_number(opts, "throttling.iops-read", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_WRITE].avg =
+-        qemu_opt_get_number(opts, "throttling.iops-write", 0);
+-
+-    fst->cfg.buckets[THROTTLE_BPS_TOTAL].max =
+-        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+-    fst->cfg.buckets[THROTTLE_BPS_READ].max  =
+-        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+-    fst->cfg.buckets[THROTTLE_BPS_WRITE].max =
+-        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_TOTAL].max =
+-        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_READ].max =
+-        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_WRITE].max =
+-        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+-
+-    fst->cfg.buckets[THROTTLE_BPS_TOTAL].burst_length =
+-        qemu_opt_get_number(opts, "throttling.bps-total-max-length", 1);
+-    fst->cfg.buckets[THROTTLE_BPS_READ].burst_length  =
+-        qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
+-    fst->cfg.buckets[THROTTLE_BPS_WRITE].burst_length =
+-        qemu_opt_get_number(opts, "throttling.bps-write-max-length", 1);
+-    fst->cfg.buckets[THROTTLE_OPS_TOTAL].burst_length =
+-        qemu_opt_get_number(opts, "throttling.iops-total-max-length", 1);
+-    fst->cfg.buckets[THROTTLE_OPS_READ].burst_length =
+-        qemu_opt_get_number(opts, "throttling.iops-read-max-length", 1);
+-    fst->cfg.buckets[THROTTLE_OPS_WRITE].burst_length =
+-        qemu_opt_get_number(opts, "throttling.iops-write-max-length", 1);
+-    fst->cfg.op_size =
+-        qemu_opt_get_number(opts, "throttling.iops-size", 0);
+-
++    throttle_parse_options(&fst->cfg, opts);
+     throttle_is_valid(&fst->cfg, errp);
+ }
+ 
+@@ -81,8 +132,9 @@ void fsdev_throttle_init(FsThrottle *fst)
+ {
+     if (throttle_enabled(&fst->cfg)) {
+         throttle_init(&fst->ts);
++        fst->ctx = qemu_get_aio_context();
+         throttle_timers_init(&fst->tt,
+-                             qemu_get_aio_context(),
++                             fst->ctx,
+                              QEMU_CLOCK_REALTIME,
+                              fsdev_throttle_read_timer_cb,
+                              fsdev_throttle_write_timer_cb,
+@@ -103,11 +155,7 @@ void coroutine_fn fsdev_co_throttle_request(FsThrottle *fst, bool is_write,
+         }
+ 
+         throttle_account(&fst->ts, is_write, iov_size(iov, iovcnt));
+-
+-        if (!qemu_co_queue_empty(&fst->throttled_reqs[is_write]) &&
+-            !throttle_schedule_timer(&fst->ts, &fst->tt, is_write)) {
+-            qemu_co_queue_next(&fst->throttled_reqs[is_write]);
+-        }
++        schedule_next_request(fst, is_write);
+     }
+ }
+ 
+diff --git a/fsdev/qemu-fsdev-throttle.h b/fsdev/qemu-fsdev-throttle.h
+index 4e83bda..7107769 100644
+--- a/fsdev/qemu-fsdev-throttle.h
++++ b/fsdev/qemu-fsdev-throttle.h
+@@ -15,15 +15,15 @@
+ #ifndef _FSDEV_THROTTLE_H
+ #define _FSDEV_THROTTLE_H
+ 
+-#include "block/aio.h"
+-#include "qemu/main-loop.h"
+ #include "qemu/coroutine.h"
+ #include "qemu/throttle.h"
++#include "qapi/qapi-types-fsdev.h"
+ 
+ typedef struct FsThrottle {
+     ThrottleState ts;
+     ThrottleTimers tt;
+     ThrottleConfig cfg;
++    AioContext *ctx;
+     CoQueue      throttled_reqs[2];
+ } FsThrottle;
+ 
+@@ -35,4 +35,6 @@ void coroutine_fn fsdev_co_throttle_request(FsThrottle *, bool ,
+                                             struct iovec *, int);
+ 
+ void fsdev_throttle_cleanup(FsThrottle *);
++void fsdev_set_io_throttle(FsdevIOThrottle *, FsThrottle *, Error **errp);
++void fsdev_get_io_throttle(FsThrottle *, FsdevIOThrottle **iothp, char *);
+ #endif /* _FSDEV_THROTTLE_H */
+diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
+index 7a3b87c..609d8fc 100644
+--- a/fsdev/qemu-fsdev.c
++++ b/fsdev/qemu-fsdev.c
+@@ -17,6 +17,7 @@
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
++#include "qapi/qapi-commands-fsdev.h"
+ 
+ static QTAILQ_HEAD(FsDriverEntry_head, FsDriverListEntry) fsdriver_entries =
+     QTAILQ_HEAD_INITIALIZER(fsdriver_entries);
+@@ -99,3 +100,31 @@ FsDriverEntry *get_fsdev_fsentry(char *id)
+     }
+     return NULL;
+ }
++
++void qmp_fsdev_set_io_throttle(FsdevIOThrottle *arg, Error **errp)
++{
++    FsDriverEntry *fse;
++
++    fse = get_fsdev_fsentry(arg->has_id ? arg->id : NULL);
++    if (!fse) {
++        error_setg(errp, "Not a valid fsdev device");
++        return;
++    }
++
++    fsdev_set_io_throttle(arg, &fse->fst, errp);
++}
++
++FsdevIOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
++{
++    FsdevIOThrottleList *head = NULL, *p_next;
++    struct FsDriverListEntry *fsle;
++
++    QTAILQ_FOREACH(fsle, &fsdriver_entries, next) {
++        p_next = g_new0(FsdevIOThrottleList, 1);
++        fsdev_get_io_throttle(&fsle->fse.fst, &p_next->value,
++                              fsle->fse.fsdev_id);
++        p_next->next = head;
++        head = p_next;
++    }
++    return head;
++}
+diff --git a/monitor.c b/monitor.c
+index d39390c..bbf531b 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -708,14 +708,9 @@ static void monitor_qapi_event_init(void)
+ 
+ static void handle_hmp_command(Monitor *mon, const char *cmdline);
+ 
+-static void monitor_iothread_init(void);
+-
+ static void monitor_data_init(Monitor *mon, bool skip_flush,
+                               bool use_io_thread)
+ {
+-    if (use_io_thread && !mon_iothread) {
+-        monitor_iothread_init();
+-    }
+     memset(mon, 0, sizeof(Monitor));
+     qemu_mutex_init(&mon->mon_lock);
+     qemu_mutex_init(&mon->qmp.qmp_queue_lock);
+@@ -1174,6 +1169,10 @@ static void qmp_unregister_commands_hack(void)
+     && !defined(TARGET_S390X)
+     qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
+ #endif
++#ifndef CONFIG_VIRTFS
++    qmp_unregister_command(&qmp_commands, "fsdev-set-io-throttle");
++    qmp_unregister_command(&qmp_commands, "query-fsdev-io-throttle");
++#endif
+ }
+ 
+ static void monitor_init_qmp_commands(void)
+@@ -4297,7 +4296,7 @@ int monitor_suspend(Monitor *mon)
+ 
+     atomic_inc(&mon->suspend_cnt);
+ 
+-    if (monitor_is_qmp(mon) && mon->use_io_thread) {
++    if (monitor_is_qmp(mon)) {
+         /*
+          * Kick I/O thread to make sure this takes effect.  It'll be
+          * evaluated again in prepare() of the watch object.
+@@ -4466,15 +4465,6 @@ static AioContext *monitor_get_aio_context(void)
+ static void monitor_iothread_init(void)
+ {
+     mon_iothread = iothread_create("mon_iothread", &error_abort);
+-}
+-
+-void monitor_init_globals(void)
+-{
+-    monitor_init_qmp_commands();
+-    monitor_qapi_event_init();
+-    sortcmdlist();
+-    qemu_mutex_init(&monitor_lock);
+-    qemu_mutex_init(&mon_fdsets_lock);
+ 
+     /*
+      * The dispatcher BH must run in the main loop thread, since we
+@@ -4486,6 +4476,16 @@ void monitor_init_globals(void)
+                                    NULL);
+ }
+ 
++void monitor_init_globals(void)
++{
++    monitor_init_qmp_commands();
++    monitor_qapi_event_init();
++    sortcmdlist();
++    qemu_mutex_init(&monitor_lock);
++    qemu_mutex_init(&mon_fdsets_lock);
++    monitor_iothread_init();
++}
++
+ /* These functions just adapt the readline interface in a typesafe way.  We
+  * could cast function pointers but that discards compiler checks.
+  */
+@@ -4628,9 +4628,7 @@ void monitor_cleanup(void)
+      * we need to unregister from chardev below in
+      * monitor_data_destroy(), and chardev is not thread-safe yet
+      */
+-    if (mon_iothread) {
+-        iothread_stop(mon_iothread);
+-    }
++    iothread_stop(mon_iothread);
+ 
+     /* Flush output buffers and destroy monitors */
+     qemu_mutex_lock(&monitor_lock);
+@@ -4645,10 +4643,9 @@ void monitor_cleanup(void)
+     /* QEMUBHs needs to be deleted before destroying the I/O thread */
+     qemu_bh_delete(qmp_dispatcher_bh);
+     qmp_dispatcher_bh = NULL;
+-    if (mon_iothread) {
+-        iothread_destroy(mon_iothread);
+-        mon_iothread = NULL;
+-    }
++
++    iothread_destroy(mon_iothread);
++    mon_iothread = NULL;
+ }
+ 
+ QemuOptsList qemu_mon_opts = {
+diff --git a/qapi/fsdev.json b/qapi/fsdev.json
+index c5559bb..32356b9 100644
+--- a/qapi/fsdev.json
++++ b/qapi/fsdev.json
+@@ -13,8 +13,84 @@
+ #
+ # @id: device id
+ #
+-# Since: 3.2
++# Since: 4.0
+ ##
+ { 'struct': 'FsdevIOThrottle',
+   'base': 'ThrottleLimits',
+   'data': { '*id': 'str' } }
++
++##
++# @fsdev-set-io-throttle:
++#
++# Change I/O limits for a 9p/fsdev device.
++#
++# I/O limits can be enabled by setting throttle value to non-zero number.
++#
++# I/O limits can be disabled by setting all throttle values to 0.
++#
++# Returns: Nothing on success
++#          If @device is not a valid fsdev device, GenericError
++#
++# Since: 4.0
++#
++# Example:
++#
++# -> { "execute": "fsdev-set-io-throttle",
++#      "arguments": { "id": "id0-1-0",
++#                     "bps": 1000000,
++#                     "bps_rd": 0,
++#                     "bps_wr": 0,
++#                     "iops": 0,
++#                     "iops_rd": 0,
++#                     "iops_wr": 0,
++#                     "bps_max": 8000000,
++#                     "bps_rd_max": 0,
++#                     "bps_wr_max": 0,
++#                     "iops_max": 0,
++#                     "iops_rd_max": 0,
++#                     "iops_wr_max": 0,
++#                     "bps_max_length": 60,
++#                     "iops_size": 0 } }
++# <- { "returns": {} }
++##
++{ 'command': 'fsdev-set-io-throttle', 'boxed': true,
++  'data': 'FsdevIOThrottle' }
++##
++# @query-fsdev-io-throttle:
++#
++# Returns: a list of @IOThrottle describing I/O throttle
++#          values of each fsdev device
++#
++# Since: 4.0
++#
++# Example:
++#
++# -> { "Execute": "query-fsdev-io-throttle" }
++# <- { "returns" : [
++#          {
++#              "id": "id0-hd0",
++#              "bps":1000000,
++#              "bps_rd":0,
++#              "bps_wr":0,
++#              "iops":1000000,
++#              "iops_rd":0,
++#              "iops_wr":0,
++#              "bps_max": 8000000,
++#              "bps_rd_max": 0,
++#              "bps_wr_max": 0,
++#              "iops_max": 0,
++#              "iops_rd_max": 0,
++#              "iops_wr_max": 0,
++#              "bps_max_length": 0,
++#              "bps_rd_max_length": 0,
++#              "bps_wr_max_length": 0,
++#              "iops_max_length": 0,
++#              "iops_rd_max_length": 0,
++#              "iops_wr_max_length": 0,
++#              "iops_size": 0
++#            }
++#          ]
++#      }
++#
++##
++{ 'command': 'query-fsdev-io-throttle', 'returns': [ 'FsdevIOThrottle' ] }
+diff --git a/qapi/tlimits.json b/qapi/tlimits.json
+index 1916726..6bcbaf6 100644
+--- a/qapi/tlimits.json
++++ b/qapi/tlimits.json
+@@ -74,7 +74,7 @@
+ #
+ # @iops_size: an I/O size in bytes (Since 1.7)
+ #
+-# Since: 3.2
++# Since: 4.0
+ #
+ ##
+ { 'struct': 'ThrottleLimits',
+diff --git a/qmp.c b/qmp.c
+index e7c0a2f..18b1f0f 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -737,3 +737,15 @@ MemoryInfo *qmp_query_memory_size_summary(Error **errp)
+ 
+     return mem_info;
+ }
++
++#if defined(_WIN64) || defined(_WIN32) || defined(__FreeBSD__)
++void qmp_fsdev_set_io_throttle(FsdevIOThrottle *arg, Error **errp)
++{
++    return;
++}
++
++FsdevIOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
++{
++    return NULL;
++}
++#endif
+-- 
+2.7.4
