@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gMbFO-0004Is-0w
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:09:07 -0500
+	(envelope-from <danielhb413@gmail.com>) id 1gMbFx-0004cY-Ns
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:09:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gMbFI-0007UH-0V
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:09:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39458)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gMbFH-0007RB-PY
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:08:55 -0500
-References: <20181109182153.5390-1-wainersm@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <dbde7c87-b0b2-becc-0176-609befb40e1a@redhat.com>
-Date: Tue, 13 Nov 2018 10:08:40 -0600
+	(envelope-from <danielhb413@gmail.com>) id 1gMbFp-0007l4-Rz
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:09:37 -0500
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:40970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1gMbFk-0007g4-Ek
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:09:26 -0500
+Received: by mail-qk1-x741.google.com with SMTP id 189so20287394qkj.8
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 08:09:19 -0800 (PST)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Date: Tue, 13 Nov 2018 14:09:08 -0200
+Message-Id: <20181113160908.12706-1-danielhb413@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20181109182153.5390-1-wainersm@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] Acceptance tests: add Linux initrd
- checking test
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 1/1] qga: update docs with systemd suspend
+ support info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-Cc: crosa@redhat.com, philmd@redhat.com, ehabkost@redhat.com, lizhijian@cn.fujitsu.com, ccarrara@redhat.com
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-On 11/9/18 12:21 PM, Wainer dos Santos Moschetta wrote:
-> QEMU used to exits with a not accurate error message when
+Commit 067927d62e ("qga: systemd hibernate/suspend/hybrid-sleep
+support") failed to update qapi-schema.json after adding systemd
+hibernate/suspend/hybrid-sleep capabilities to guest-suspend-* QGA
+commands.
 
-s/exits/exit/
-s/a not accurate/an inaccurate/
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+---
+ qga/qapi-schema.json | 37 ++++++++++++++++++++++++++-----------
+ 1 file changed, 26 insertions(+), 11 deletions(-)
 
-> an initrd > 2GiB was passed. That was fixed on patch:
->=20
-> 	commit f3839fda5771596152b75dd1e1a6d050e6e6e380
-> 	Author: Li Zhijian <lizhijian@cn.fujitsu.com>
-> 	Date:   Thu Sep 13 18:07:13 2018 +0800
->=20
->      	change get_image_size return type to int64_t
->=20
-> This change adds a regression test for that fix. It starts
-> QEMU with a 2GiB dummy initrd, and check it evaluates the file
-
-s/check/checks that/
-
-> size correctly and prints accurate message.
-
-s/accurate/an accurate/
-
->=20
-> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index c6725b3ec8..74b1bdbc76 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -532,12 +532,16 @@
+ #
+ # Suspend guest to disk.
+ #
+-# This command tries to execute the scripts provided by the pm-utils package.
+-# If it's not available, the suspend operation will be performed by manually
+-# writing to a sysfs file.
++# This command attempts to suspend the guest using three strategies, in this
++# order:
+ #
+-# For the best results it's strongly recommended to have the pm-utils
+-# package installed in the guest.
++# - systemd hibernate
++# - pm-utils (via pm-hibernate)
++# - manual write into sysfs
++#
++# If the guest does not have systemd hibernate support, the scripts in pm-utils
++# package are executed, in case pm-utils is available. Manual write in sysfs
++# is a last resort.
+ #
+ # This command does NOT return a response on success. There is a high chance
+ # the command succeeded if the VM exits with a zero exit status or, when
+@@ -560,12 +564,16 @@
+ #
+ # Suspend guest to ram.
+ #
+-# This command tries to execute the scripts provided by the pm-utils package.
+-# If it's not available, the suspend operation will be performed by manually
+-# writing to a sysfs file.
++# This command attempts to suspend the guest using three strategies, in this
++# order:
++#
++# - systemd suspend
++# - pm-utils (via pm-suspend)
++# - manual write into sysfs
+ #
+-# For the best results it's strongly recommended to have the pm-utils
+-# package installed in the guest.
++# If the guest does not have systemd suspend support, the scripts in pm-utils
++# package are executed, in case pm-utils is available. Manual write in sysfs
++# is a last resort.
+ #
+ # IMPORTANT: guest-suspend-ram requires QEMU to support the 'system_wakeup'
+ # command.  Thus, it's *required* to query QEMU for the presence of the
+@@ -592,7 +600,14 @@
+ #
+ # Save guest state to disk and suspend to ram.
+ #
+-# This command requires the pm-utils package to be installed in the guest.
++# This command attempts to suspend the guest using three strategies, in this
++# order:
++#
++# - systemd hybrid-sleep
++# - pm-utils (via pm-suspend-hybrid)
++#
++# If the guest does not have systemd hybrid-sleep support, the scripts in
++# pm-utils package are executed, in case pm-utils is available.
+ #
+ # IMPORTANT: guest-suspend-hybrid requires QEMU to support the 'system_wakeup'
+ # command.  Thus, it's *required* to query QEMU for the presence of the
+-- 
+2.19.1
