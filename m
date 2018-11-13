@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gMUm9-0006Tv-Nd
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:14:30 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gMV66-0004gu-68
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:35:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gMUZC-0007fd-Ur
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:01:07 -0500
-Resent-Message-Id: <E1gMUZC-0007fd-Ur@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gMUZC-0007ew-No
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:01:02 -0500
-Message-ID: <154209961449.4241.1134350028455569961@015909e0f939>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20181112214503.22941-1-richard.henderson@linaro.org>
+	(envelope-from <cohuck@redhat.com>) id 1gMV5x-0002V9-3n
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:35:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40013)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gMV5w-0002QY-Tg
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 04:34:53 -0500
+Date: Tue, 13 Nov 2018 10:34:46 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181113103446.454fad01.cohuck@redhat.com>
+In-Reply-To: <20181113071336.6242-20-yuval.shaia@oracle.com>
+References: <20181113071336.6242-1-yuval.shaia@oracle.com>
+	<20181113071336.6242-20-yuval.shaia@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 13 Nov 2018 01:00:15 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH for-4.0 00/17] tcg: Move softmmu out-of-line
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 19/23] vl: Introduce shutdown_notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +27,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgxMTEyMjE0NTAzLjIyOTQxLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIGZvci00LjAgMDAvMTddIHRjZzogTW92
-ZSBzb2Z0bW11IG91dC1vZi1saW5lCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
-IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-YWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
-ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
-QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
-ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
-LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
-ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0
-dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAg
-ICAgICAgICBwYXRjaGV3LzIwMTgxMTEzMDgzMTA0LjI2OTItMS1haWtAb3psYWJzLnJ1IC0+IHBh
-dGNoZXcvMjAxODExMTMwODMxMDQuMjY5Mi0xLWFpa0BvemxhYnMucnUKU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0JwplNjliMTk2Yjg2IHRjZy9hcm06IFVzZSBUQ0dfVEFSR0VUX05FRURf
-TERTVF9PT0xfTEFCRUxTCjZmZDMwZDE0NWUgdGNnL2FybTogRm9yY2UgcWVtdV9sZC9zdCBhcmd1
-bWVudHMgaW50byBmaXhlZCByZWdpc3RlcnMKYmIxZDdiN2EyYSB0Y2cvYXJtOiBSZWR1Y2UgdGhl
-IG51bWJlciBvZiB0ZW1wcyBmb3IgdGNnX291dF90bGJfcmVhZAo1OGFkNWUxNzA3IHRjZy9hcm06
-IEFkZCBjb25zdHJhaW50cyBmb3IgUjAtUjUKMGFlMmE2ZmUzMSB0Y2cvYXJtOiBQYXJhbWV0ZXJp
-emUgdGhlIHRlbXBzIGZvciB0Y2dfb3V0X3RsYl9yZWFkCmQ5Y2M3MDBjYTkgdGNnL2FhcmNoNjQ6
-IFVzZSBUQ0dfVEFSR0VUX05FRURfTERTVF9PT0xfTEFCRUxTCjgxZDA4OGNmMDkgdGNnL2FhcmNo
-NjQ6IFVzZSBCIG5vdCBCTCBmb3IgdGNnX291dF9nb3RvX2xvbmcKOWI0MjU0ODk4ZCB0Y2cvYWFy
-Y2g2NDogUGFyYW1ldGVyaXplIHRoZSB0ZW1wIGZvciB0Y2dfb3V0X2dvdG9fbG9uZwo4OGY2NjAz
-OGYyIHRjZy9hYXJjaDY0OiBQYXJhbWV0ZXJpemUgdGhlIHRlbXBzIGZvciB0Y2dfb3V0X3RsYl9y
-ZWFkCjcwODcwZGEwNGIgdGNnL2FhcmNoNjQ6IEFkZCBjb25zdHJhaW50cyBmb3IgeDAsIHgxLCB4
-MgpjMTNiYzMwZmUyIHRjZy9pMzg2OiBVc2UgVENHX1RBUkdFVF9ORUVEX0xEU1RfT09MX0xBQkVM
-UwpmODllOGNjOTY4IHRjZzogQWRkIFRDR19UQVJHRVRfTkVFRF9MRFNUX09PTF9MQUJFTFMKNjFh
-YTE5MTNmNiB0Y2c6IFJldHVybiBzdWNjZXNzIGZyb20gcGF0Y2hfcmVsb2MKMjk5Y2QyZjJkYyB0
-Y2cvaTM4NjogRm9yY2UgcWVtdV9sZC9zdCBhcmd1bWVudHMgaW50byBmaXhlZCByZWdpc3RlcnMK
-Mjk5OTlmNWY0MCB0Y2cvaTM4NjogQ2hhbmdlIFRDR19SRUdfTFswMV0gdG8gbm90IG92ZXJsYXAg
-ZnVuY3Rpb24gYXJndW1lbnRzCjhjNmVmZDA3NWYgdGNnL2kzODY6IFJldHVybiBhIGJhc2UgcmVn
-aXN0ZXIgZnJvbSB0Y2dfb3V0X3RsYl9sb2FkCjhjODJiYTRhMGUgdGNnL2kzODY6IEFkZCBjb25z
-dHJhaW50cyBmb3IgcjggYW5kIHI5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
-SCAxLzE3OiB0Y2cvaTM4NjogQWRkIGNvbnN0cmFpbnRzIGZvciByOCBhbmQgcjkuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMi8xNzogdGNnL2kzODY6IFJldHVybiBhIGJhc2UgcmVnaXN0ZXIgZnJvbSB0Y2df
-b3V0X3RsYl9sb2FkLi4uCkNoZWNraW5nIFBBVENIIDMvMTc6IHRjZy9pMzg2OiBDaGFuZ2UgVENH
-X1JFR19MWzAxXSB0byBub3Qgb3ZlcmxhcCBmdW5jdGlvbiBhcmd1bWVudHMuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNC8xNzogdGNnL2kzODY6IEZvcmNlIHFlbXVfbGQvc3QgYXJndW1lbnRzIGludG8gZml4
-ZWQgcmVnaXN0ZXJzLi4uCkNoZWNraW5nIFBBVENIIDUvMTc6IHRjZzogUmV0dXJuIHN1Y2Nlc3Mg
-ZnJvbSBwYXRjaF9yZWxvYy4uLgpDaGVja2luZyBQQVRDSCA2LzE3OiB0Y2c6IEFkZCBUQ0dfVEFS
-R0VUX05FRURfTERTVF9PT0xfTEFCRUxTLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxl
-dGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzEzOiAKbmV3IGZp
-bGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQ4IGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFU
-Q0ggNy8xNzogdGNnL2kzODY6IFVzZSBUQ0dfVEFSR0VUX05FRURfTERTVF9PT0xfTEFCRUxTLi4u
-CkNoZWNraW5nIFBBVENIIDgvMTc6IHRjZy9hYXJjaDY0OiBBZGQgY29uc3RyYWludHMgZm9yIHgw
-LCB4MSwgeDIuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xNzogdGNnL2FhcmNoNjQ6IFBhcmFtZXRlcml6
-ZSB0aGUgdGVtcHMgZm9yIHRjZ19vdXRfdGxiX3JlYWQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTc6
-IHRjZy9hYXJjaDY0OiBQYXJhbWV0ZXJpemUgdGhlIHRlbXAgZm9yIHRjZ19vdXRfZ290b19sb25n
-Li4uCkNoZWNraW5nIFBBVENIIDExLzE3OiB0Y2cvYWFyY2g2NDogVXNlIEIgbm90IEJMIGZvciB0
-Y2dfb3V0X2dvdG9fbG9uZy4uLgpDaGVja2luZyBQQVRDSCAxMi8xNzogdGNnL2FhcmNoNjQ6IFVz
-ZSBUQ0dfVEFSR0VUX05FRURfTERTVF9PT0xfTEFCRUxTLi4uCkNoZWNraW5nIFBBVENIIDEzLzE3
-OiB0Y2cvYXJtOiBQYXJhbWV0ZXJpemUgdGhlIHRlbXBzIGZvciB0Y2dfb3V0X3RsYl9yZWFkLi4u
-CkNoZWNraW5nIFBBVENIIDE0LzE3OiB0Y2cvYXJtOiBBZGQgY29uc3RyYWludHMgZm9yIFIwLVI1
-Li4uCkNoZWNraW5nIFBBVENIIDE1LzE3OiB0Y2cvYXJtOiBSZWR1Y2UgdGhlIG51bWJlciBvZiB0
-ZW1wcyBmb3IgdGNnX291dF90bGJfcmVhZC4uLgpDaGVja2luZyBQQVRDSCAxNi8xNzogdGNnL2Fy
-bTogRm9yY2UgcWVtdV9sZC9zdCBhcmd1bWVudHMgaW50byBmaXhlZCByZWdpc3RlcnMuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMTcvMTc6IHRjZy9hcm06IFVzZSBUQ0dfVEFSR0VUX05FRURfTERTVF9PT0xf
-TEFCRUxTLi4uCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMx
-Njg6IEZJTEU6IHRjZy9hcm0vdGNnLXRhcmdldC5pbmMuYzoxNDg1OgorICAgIFRDR1JlZyBhZGRy
-bG8gX19hdHRyaWJ1dGVfXygodW51c2VkKSk7CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZv
-aWRlZCBpbiAuYyBmaWxlcwojMTY5OiBGSUxFOiB0Y2cvYXJtL3RjZy10YXJnZXQuaW5jLmM6MTQ4
-NjoKKyAgICBUQ0dSZWcgYWRkcmhpIF9fYXR0cmlidXRlX18oKHVudXNlZCkpOwoKRVJST1I6IGV4
-dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzE3MDogRklMRTogdGNnL2FybS90
-Y2ctdGFyZ2V0LmluYy5jOjE0ODc6CisgICAgVENHUmVnIGRhdGFsbyBfX2F0dHJpYnV0ZV9fKCh1
-bnVzZWQpKTsKCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMx
-NzE6IEZJTEU6IHRjZy9hcm0vdGNnLXRhcmdldC5pbmMuYzoxNDg4OgorICAgIFRDR1JlZyBkYXRh
-aGkgX19hdHRyaWJ1dGVfXygodW51c2VkKSk7CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZv
-aWRlZCBpbiAuYyBmaWxlcwojMjMzOiBGSUxFOiB0Y2cvYXJtL3RjZy10YXJnZXQuaW5jLmM6MTYw
-MzoKKyAgICBUQ0dSZWcgYWRkcmxvIF9fYXR0cmlidXRlX18oKHVudXNlZCkpOwoKRVJST1I6IGV4
-dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzIzNDogRklMRTogdGNnL2FybS90
-Y2ctdGFyZ2V0LmluYy5jOjE2MDQ6CisgICAgVENHUmVnIGFkZHJoaSBfX2F0dHJpYnV0ZV9fKCh1
-bnVzZWQpKTsKCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMy
-MzU6IEZJTEU6IHRjZy9hcm0vdGNnLXRhcmdldC5pbmMuYzoxNjA1OgorICAgIFRDR1JlZyBkYXRh
-bG8gX19hdHRyaWJ1dGVfXygodW51c2VkKSk7CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZv
-aWRlZCBpbiAuYyBmaWxlcwojMjM2OiBGSUxFOiB0Y2cvYXJtL3RjZy10YXJnZXQuaW5jLmM6MTYw
-NjoKKyAgICBUQ0dSZWcgZGF0YWhpIF9fYXR0cmlidXRlX18oKHVudXNlZCkpOwoKdG90YWw6IDgg
-ZXJyb3JzLCAwIHdhcm5pbmdzLCAzNzMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Tue, 13 Nov 2018 09:13:08 +0200
+Yuval Shaia <yuval.shaia@oracle.com> wrote:
+
+> Notifier will be used for signaling shutdown event to inform system is
+> shutdown. This will allow devices and other component to run some
+> cleanup code needed before VM is shutdown.
+> 
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> ---
+>  include/sysemu/sysemu.h |  1 +
+>  vl.c                    | 15 ++++++++++++++-
+>  2 files changed, 15 insertions(+), 1 deletion(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
