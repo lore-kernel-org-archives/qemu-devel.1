@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gMcAl-0006qZ-Fl
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:08:25 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gMcAl-0007X5-V4
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 12:08:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gMbwf-0003wM-KJ
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:53:51 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gMbwZ-0003uE-QZ
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:53:41 -0500
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Tue, 13 Nov 2018 17:52:34 +0100
-Message-Id: <20181113165247.4806-1-sameo@linux.intel.com>
+Date: Tue, 13 Nov 2018 17:52:36 +0100
+Message-Id: <20181113165247.4806-3-sameo@linux.intel.com>
+In-Reply-To: <20181113165247.4806-1-sameo@linux.intel.com>
+References: <20181113165247.4806-1-sameo@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 00/13] Support disabling TCG on ARM
+Subject: [Qemu-devel] [PATCH 02/13] target: arm: Remove unused headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,54 +23,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, richard.henderson@linaro.org, qemu-arm@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, richard.henderson@linaro.org, qemu-arm@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-This patchset allows for building and running ARM targets with TCG
-disabled. It splits the target/arm/helper.c file into logical TCG and
-non TCG dependent files so that one can build and run QEMU binaries with
-or without TCG enabled.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The rationale behind this work comes from the NEMU project where we're
-trying to only support x86 and ARM 64-bit architectures, without
-including the TCG code base. We can only do so if we can build and run
-ARM binaries with TCG disabled.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Robert Bradford <robert.bradford@intel.com>
+Reviewed-by: Samuel Ortiz <sameo@linux.intel.com>
+---
+ target/arm/helper.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-The patches are also available here:
-https://github.com/intel/nemu/tree/topic/upstream/arm-tcg-disable
-
-Philippe Mathieu-Daudé (2):
-  target: arm: Add copyright boilerplate
-  target: arm: Remove unused headers
-
-Samuel Ortiz (11):
-  target: arm: Move all v7m helpers into their own file
-  target: arm: Move all interrupt and exception handlers into their own
-    file
-  target: arm: Move the DC ZVA helper into op_helper
-  target: arm: Make ARM TLB filling routine static
-  target: arm: Remove the LDST headers
-  target: arm: Move all VFP helpers into their own file
-  target: arm: Move CPU state dumping routines to helper.c
-  target: arm: Move watchpoints APIs to helper.c
-  target: arm: Define TCG dependent functions when TCG is enabled
-  target: arm: Makefile cleanup
-  target: arm: Do not build TCG objects when TCG is off
-
- target/arm/internals.h     |   60 +-
- target/arm/translate.h     |    7 -
- target/arm/cpu.c           |    8 +-
- target/arm/excp_helper.c   |  550 +++
- target/arm/helper.c        | 8467 ++++++++++++------------------------
- target/arm/m_helper.c      | 1892 ++++++++
- target/arm/op_helper.c     |  326 +-
- target/arm/translate-a64.c |  125 -
- target/arm/translate.c     |   87 -
- target/arm/vfp_helper.c    |  893 ++++
- target/arm/Makefile.objs   |   19 +-
- 11 files changed, 6262 insertions(+), 6172 deletions(-)
- create mode 100644 target/arm/excp_helper.c
- create mode 100644 target/arm/m_helper.c
- create mode 100644 target/arm/vfp_helper.c
-
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 3d4e9c5c8a..27d9285e1e 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -12,13 +12,10 @@
+ #include "internals.h"
+ #include "exec/gdbstub.h"
+ #include "exec/helper-proto.h"
+-#include "qemu/host-utils.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/sysemu.h"
+-#include "qemu/bitops.h"
+ #include "qemu/crc32c.h"
+ #include "exec/exec-all.h"
+-#include "exec/cpu_ldst.h"
+ #include "arm_ldst.h"
+ #include <zlib.h> /* For crc32 */
+ #include "exec/semihost.h"
 -- 
 2.19.1
