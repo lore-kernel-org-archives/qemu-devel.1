@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gMdE9-0003hp-21
+	(envelope-from <richard.henderson@linaro.org>) id 1gMdEC-0003Dk-VS
 	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:15:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gMd1g-00084D-Fo
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:03:03 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:54051)
+	(envelope-from <richard.henderson@linaro.org>) id 1gMd1c-00081a-Ee
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:02:57 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40738)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gMd1g-00083g-8z
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:03:00 -0500
-Received: by mail-wm1-f67.google.com with SMTP id f10-v6so12869906wme.3
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 10:03:00 -0800 (PST)
-References: <20181113165247.4806-1-sameo@linux.intel.com>
-	<20181113165247.4806-3-sameo@linux.intel.com>
-	<CAFEAcA-R51dyV7gtS+q-eLNn5LBJbSMKtQu4-N3p0c4mJrU8DA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <37b5f17e-50cd-6980-2d42-4e7f4ede2597@redhat.com>
-Date: Tue, 13 Nov 2018 19:02:57 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-R51dyV7gtS+q-eLNn5LBJbSMKtQu4-N3p0c4mJrU8DA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/13] target: arm: Remove unused headers
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gMd1c-0007yr-6M
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:02:56 -0500
+Received: by mail-wr1-x444.google.com with SMTP id p4so5186939wrt.7
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 10:02:54 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 13 Nov 2018 19:01:53 +0100
+Message-Id: <20181113180154.17903-4-richard.henderson@linaro.org>
+In-Reply-To: <20181113180154.17903-1-richard.henderson@linaro.org>
+References: <20181113180154.17903-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v5 3/4] target/arm: Introduce read_sys_reg32
+ for kvm32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +27,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-On 13/11/18 18:01, Peter Maydell wrote:
-> On 13 November 2018 at 16:52, Samuel Ortiz <sameo@linux.intel.com> wrote:
->> From: Philippe Mathieu-Daudé <philmd@redhat.com>
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Reviewed-by: Robert Bradford <robert.bradford@intel.com>
->> Reviewed-by: Samuel Ortiz <sameo@linux.intel.com>
->> ---
->>   target/arm/helper.c | 3 ---
->>   1 file changed, 3 deletions(-)
->>
->> diff --git a/target/arm/helper.c b/target/arm/helper.c
->> index 3d4e9c5c8a..27d9285e1e 100644
->> --- a/target/arm/helper.c
->> +++ b/target/arm/helper.c
->> @@ -12,13 +12,10 @@
->>   #include "internals.h"
->>   #include "exec/gdbstub.h"
->>   #include "exec/helper-proto.h"
->> -#include "qemu/host-utils.h"
-> 
-> This is for muldiv64().
+Assert that the value to be written is the correct size.
+No change in functionality here, just mirroring the same
+function from kvm64.
 
-But it is already included by "cpu.h" -> "exec/cpu-defs.h"
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/kvm32.c | 41 ++++++++++++++++-------------------------
+ 1 file changed, 16 insertions(+), 25 deletions(-)
 
-> 
->>   #include "sysemu/arch_init.h"
->>   #include "sysemu/sysemu.h"
->> -#include "qemu/bitops.h"
-
-"cpu.h" -> "cpu-qom.h" -> "qom/cpu.h" -> "qemu/bitmap.h"
-
-> 
-> This is for extract32() and friends.
-> 
->>   #include "qemu/crc32c.h"
->>   #include "exec/exec-all.h"
->> -#include "exec/cpu_ldst.h"
-> 
-> This is for cpu_stl_data().
-
-Included by "arm_ldst.h"
-
-> 
->>   #include "arm_ldst.h"
->>   #include <zlib.h> /* For crc32 */
->>   #include "exec/semihost.h"
-
-So they are not "unused" but "unnecessary".
-
-I thought this would be better to clean this once, before Samuel split.
-
-Samuel: please drop this patch from your series.
-
-Thanks,
-
-Phil.
+diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+index cb3fb73a96..bc0badf53d 100644
+--- a/target/arm/kvm32.c
++++ b/target/arm/kvm32.c
+@@ -28,6 +28,14 @@ static inline void set_feature(uint64_t *features, int feature)
+     *features |= 1ULL << feature;
+ }
+ 
++static int read_sys_reg32(int fd, uint32_t *pret, uint64_t id)
++{
++    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)pret };
++
++    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U32);
++    return ioctl(fd, KVM_GET_ONE_REG, &idreg);
++}
++
+ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+ {
+     /* Identify the feature bits corresponding to the host CPU, and
+@@ -35,9 +43,10 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+      * we have to create a scratch VM, create a single CPU inside it,
+      * and then query that CPU for the relevant ID registers.
+      */
+-    int i, ret, fdarray[3];
++    int err = 0, fdarray[3];
+     uint32_t midr, id_pfr0, mvfr1;
+     uint64_t features = 0;
++
+     /* Old kernels may not know about the PREFERRED_TARGET ioctl: however
+      * we know these will only support creating one kind of guest CPU,
+      * which is its preferred CPU type.
+@@ -47,23 +56,6 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+         QEMU_KVM_ARM_TARGET_NONE
+     };
+     struct kvm_vcpu_init init;
+-    struct kvm_one_reg idregs[] = {
+-        {
+-            .id = KVM_REG_ARM | KVM_REG_SIZE_U32
+-            | ENCODE_CP_REG(15, 0, 0, 0, 0, 0, 0),
+-            .addr = (uintptr_t)&midr,
+-        },
+-        {
+-            .id = KVM_REG_ARM | KVM_REG_SIZE_U32
+-            | ENCODE_CP_REG(15, 0, 0, 0, 1, 0, 0),
+-            .addr = (uintptr_t)&id_pfr0,
+-        },
+-        {
+-            .id = KVM_REG_ARM | KVM_REG_SIZE_U32
+-            | KVM_REG_ARM_VFP | KVM_REG_ARM_VFP_MVFR1,
+-            .addr = (uintptr_t)&mvfr1,
+-        },
+-    };
+ 
+     if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
+         return false;
+@@ -77,16 +69,15 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+      */
+     ahcf->dtb_compatible = "arm,arm-v7";
+ 
+-    for (i = 0; i < ARRAY_SIZE(idregs); i++) {
+-        ret = ioctl(fdarray[2], KVM_GET_ONE_REG, &idregs[i]);
+-        if (ret) {
+-            break;
+-        }
+-    }
++    err |= read_sys_reg32(fdarray[2], &midr, ARM_CP15_REG32(0, 0, 0, 0));
++    err |= read_sys_reg32(fdarray[2], &id_pfr0, ARM_CP15_REG32(0, 0, 1, 0));
++    err |= read_sys_reg32(fdarray[2], &mvfr1,
++                          KVM_REG_ARM | KVM_REG_SIZE_U32 |
++                          KVM_REG_ARM_VFP | KVM_REG_ARM_VFP_MVFR1);
+ 
+     kvm_arm_destroy_scratch_host_vcpu(fdarray);
+ 
+-    if (ret) {
++    if (err < 0) {
+         return false;
+     }
+ 
+-- 
+2.17.2
