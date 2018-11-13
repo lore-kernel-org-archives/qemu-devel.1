@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSuS-0004BQ-Kb
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:14:54 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gMSuU-0004Cx-6K
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:14:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSuP-0003FB-SI
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:14:52 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:44876)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gMSuR-0003Hp-9I
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:14:54 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:45014)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gMSuP-0002yf-HD
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:14:49 -0500
+	id 1gMSuQ-0003GI-VN
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:14:51 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Tue, 13 Nov 2018 09:12:59 +0200
-Message-Id: <20181113071336.6242-11-yuval.shaia@oracle.com>
+Date: Tue, 13 Nov 2018 09:13:05 +0200
+Message-Id: <20181113071336.6242-17-yuval.shaia@oracle.com>
 In-Reply-To: <20181113071336.6242-1-yuval.shaia@oracle.com>
 References: <20181113071336.6242-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v3 10/23] json: Define new QMP message for
- pvrdma
+Subject: [Qemu-devel] [PATCH v3 16/23] hw/pvrdma: Fill all CQE fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,138 +26,283 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-pvrdma requires that the same GID attached to it will be attached to the
-backend device in the host.
-
-A new QMP messages is defined so pvrdma device can broadcast any change
-made to its GID table. This event is captured by libvirt which in turn
-will update the GID table in the backend device.
+Add ability to pass specific WC attributes to CQE such as GRH_BIT flag.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 ---
- MAINTAINERS           |  1 +
- Makefile              |  3 ++-
- Makefile.objs         |  4 ++++
- qapi/qapi-schema.json |  1 +
- qapi/rdma.json        | 38 ++++++++++++++++++++++++++++++++++++++
- 5 files changed, 46 insertions(+), 1 deletion(-)
- create mode 100644 qapi/rdma.json
+ hw/rdma/rdma_backend.c      | 59 +++++++++++++++++++++++--------------
+ hw/rdma/rdma_backend.h      |  4 +--
+ hw/rdma/vmw/pvrdma_qp_ops.c | 31 +++++++++++--------
+ 3 files changed, 58 insertions(+), 36 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e087d58ac6..a149f68a8f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2232,6 +2232,7 @@ F: hw/rdma/*
- F: hw/rdma/vmw/*
- F: docs/pvrdma.txt
- F: contrib/rdmacm-mux/*
-+F: qapi/rdma.json
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+index 5675504165..e453bda8f9 100644
+--- a/hw/rdma/rdma_backend.c
++++ b/hw/rdma/rdma_backend.c
+@@ -59,13 +59,24 @@ struct backend_umad {
+     char mad[RDMA_MAX_PRIVATE_DATA];
+ };
  
- Build and test automation
- -------------------------
-diff --git a/Makefile b/Makefile
-index 94072776ff..db4ce60ee5 100644
---- a/Makefile
-+++ b/Makefile
-@@ -599,7 +599,8 @@ qapi-modules = $(SRC_PATH)/qapi/qapi-schema.json $(SRC_PATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/tpm.json \
-                $(SRC_PATH)/qapi/trace.json \
-                $(SRC_PATH)/qapi/transaction.json \
--               $(SRC_PATH)/qapi/ui.json
-+               $(SRC_PATH)/qapi/ui.json \
-+               $(SRC_PATH)/qapi/rdma.json
+-static void (*comp_handler)(int status, unsigned int vendor_err, void *ctx);
++static void (*comp_handler)(void *ctx, struct ibv_wc *wc);
  
- qapi/qapi-builtin-types.c qapi/qapi-builtin-types.h \
- qapi/qapi-types.c qapi/qapi-types.h \
-diff --git a/Makefile.objs b/Makefile.objs
-index cc7df3ad80..76d8028f2f 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -21,6 +21,7 @@ util-obj-y += qapi/qapi-types-tpm.o
- util-obj-y += qapi/qapi-types-trace.o
- util-obj-y += qapi/qapi-types-transaction.o
- util-obj-y += qapi/qapi-types-ui.o
-+util-obj-y += qapi/qapi-types-rdma.o
- util-obj-y += qapi/qapi-builtin-visit.o
- util-obj-y += qapi/qapi-visit.o
- util-obj-y += qapi/qapi-visit-block-core.o
-@@ -40,6 +41,7 @@ util-obj-y += qapi/qapi-visit-tpm.o
- util-obj-y += qapi/qapi-visit-trace.o
- util-obj-y += qapi/qapi-visit-transaction.o
- util-obj-y += qapi/qapi-visit-ui.o
-+util-obj-y += qapi/qapi-visit-rdma.o
- util-obj-y += qapi/qapi-events.o
- util-obj-y += qapi/qapi-events-block-core.o
- util-obj-y += qapi/qapi-events-block.o
-@@ -58,6 +60,7 @@ util-obj-y += qapi/qapi-events-tpm.o
- util-obj-y += qapi/qapi-events-trace.o
- util-obj-y += qapi/qapi-events-transaction.o
- util-obj-y += qapi/qapi-events-ui.o
-+util-obj-y += qapi/qapi-events-rdma.o
- util-obj-y += qapi/qapi-introspect.o
+-static void dummy_comp_handler(int status, unsigned int vendor_err, void *ctx)
++static void dummy_comp_handler(void *ctx, struct ibv_wc *wc)
+ {
+     pr_err("No completion handler is registered\n");
+ }
  
- chardev-obj-y = chardev/
-@@ -155,6 +158,7 @@ common-obj-y += qapi/qapi-commands-tpm.o
- common-obj-y += qapi/qapi-commands-trace.o
- common-obj-y += qapi/qapi-commands-transaction.o
- common-obj-y += qapi/qapi-commands-ui.o
-+common-obj-y += qapi/qapi-commands-rdma.o
- common-obj-y += qapi/qapi-introspect.o
- common-obj-y += qmp.o hmp.o
- endif
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index 65b6dc2f6f..a650d80f83 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -94,3 +94,4 @@
- { 'include': 'trace.json' }
- { 'include': 'introspect.json' }
- { 'include': 'misc.json' }
-+{ 'include': 'rdma.json' }
-diff --git a/qapi/rdma.json b/qapi/rdma.json
-new file mode 100644
-index 0000000000..804c68ab36
---- /dev/null
-+++ b/qapi/rdma.json
-@@ -0,0 +1,38 @@
-+# -*- Mode: Python -*-
-+#
++static inline void complete_work(enum ibv_wc_status status, uint32_t vendor_err,
++                                 void *ctx)
++{
++    struct ibv_wc wc = {0};
 +
-+##
-+# = RDMA device
-+##
++    wc.status = status;
++    wc.vendor_err = vendor_err;
 +
-+##
-+# @RDMA_GID_STATUS_CHANGED:
-+#
-+# Emitted when guest driver adds/deletes GID to/from device
-+#
-+# @netdev: RoCE Network Device name - char *
-+#
-+# @gid-status: Add or delete indication - bool
-+#
-+# @subnet-prefix: Subnet Prefix - uint64
-+#
-+# @interface-id : Interface ID - uint64
-+#
-+# Since: 3.2
-+#
-+# Example:
-+#
-+# <- {"timestamp": {"seconds": 1541579657, "microseconds": 986760},
-+#     "event": "RDMA_GID_STATUS_CHANGED",
-+#     "data":
-+#         {"netdev": "bridge0",
-+#         "interface-id": 15880512517475447892,
-+#         "gid-status": true,
-+#         "subnet-prefix": 33022}}
-+#
-+##
-+{ 'event': 'RDMA_GID_STATUS_CHANGED',
-+  'data': { 'netdev'        : 'str',
-+            'gid-status'    : 'bool',
-+            'subnet-prefix' : 'uint64',
-+            'interface-id'  : 'uint64' } }
++    comp_handler(ctx, &wc);
++}
++
+ static void poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+ {
+     int i, ne;
+@@ -90,7 +101,7 @@ static void poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+             }
+             pr_dbg("Processing %s CQE\n", bctx->is_tx_req ? "send" : "recv");
+ 
+-            comp_handler(wc[i].status, wc[i].vendor_err, bctx->up_ctx);
++            comp_handler(bctx->up_ctx, &wc[i]);
+ 
+             rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+             g_free(bctx);
+@@ -184,8 +195,8 @@ static void start_comp_thread(RdmaBackendDev *backend_dev)
+                        comp_handler_thread, backend_dev, QEMU_THREAD_DETACHED);
+ }
+ 
+-void rdma_backend_register_comp_handler(void (*handler)(int status,
+-                                        unsigned int vendor_err, void *ctx))
++void rdma_backend_register_comp_handler(void (*handler)(void *ctx,
++                                                         struct ibv_wc *wc))
+ {
+     comp_handler = handler;
+ }
+@@ -369,14 +380,14 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+     if (!qp->ibqp) { /* This field does not get initialized for QP0 and QP1 */
+         if (qp_type == IBV_QPT_SMI) {
+             pr_dbg("QP0 unsupported\n");
+-            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
++            complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
+         } else if (qp_type == IBV_QPT_GSI) {
+             pr_dbg("QP1\n");
+             rc = mad_send(backend_dev, sgid_idx, sgid, sge, num_sge);
+             if (rc) {
+-                comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ctx);
++                complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ctx);
+             } else {
+-                comp_handler(IBV_WC_SUCCESS, 0, ctx);
++                complete_work(IBV_WC_SUCCESS, 0, ctx);
+             }
+         }
+         return;
+@@ -385,7 +396,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+     pr_dbg("num_sge=%d\n", num_sge);
+     if (!num_sge) {
+         pr_dbg("num_sge=0\n");
+-        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
++        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
+         return;
+     }
+ 
+@@ -396,21 +407,21 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+     rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
+     if (unlikely(rc)) {
+         pr_dbg("Failed to allocate cqe_ctx\n");
+-        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
++        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
+         goto out_free_bctx;
+     }
+ 
+     rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge);
+     if (rc) {
+         pr_dbg("Error: Failed to build host SGE array\n");
+-        comp_handler(IBV_WC_GENERAL_ERR, rc, ctx);
++        complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+         goto out_dealloc_cqe_ctx;
+     }
+ 
+     if (qp_type == IBV_QPT_UD) {
+         wr.wr.ud.ah = create_ah(backend_dev, qp->ibpd, sgid_idx, dgid);
+         if (!wr.wr.ud.ah) {
+-            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
++            complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+             goto out_dealloc_cqe_ctx;
+         }
+         wr.wr.ud.remote_qpn = dqpn;
+@@ -428,7 +439,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
+     if (rc) {
+         pr_dbg("Fail (%d, %d) to post send WQE to qpn %d\n", rc, errno,
+                 qp->ibqp->qp_num);
+-        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
++        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+         goto out_dealloc_cqe_ctx;
+     }
+ 
+@@ -497,13 +508,13 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+     if (!qp->ibqp) { /* This field does not get initialized for QP0 and QP1 */
+         if (qp_type == IBV_QPT_SMI) {
+             pr_dbg("QP0 unsupported\n");
+-            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
++            complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
+         }
+         if (qp_type == IBV_QPT_GSI) {
+             pr_dbg("QP1\n");
+             rc = save_mad_recv_buffer(backend_dev, sge, num_sge, ctx);
+             if (rc) {
+-                comp_handler(IBV_WC_GENERAL_ERR, rc, ctx);
++                complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+             }
+         }
+         return;
+@@ -512,7 +523,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+     pr_dbg("num_sge=%d\n", num_sge);
+     if (!num_sge) {
+         pr_dbg("num_sge=0\n");
+-        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
++        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
+         return;
+     }
+ 
+@@ -523,14 +534,14 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+     rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
+     if (unlikely(rc)) {
+         pr_dbg("Failed to allocate cqe_ctx\n");
+-        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
++        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
+         goto out_free_bctx;
+     }
+ 
+     rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge);
+     if (rc) {
+         pr_dbg("Error: Failed to build host SGE array\n");
+-        comp_handler(IBV_WC_GENERAL_ERR, rc, ctx);
++        complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
+         goto out_dealloc_cqe_ctx;
+     }
+ 
+@@ -542,7 +553,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
+     if (rc) {
+         pr_dbg("Fail (%d, %d) to post recv WQE to qpn %d\n", rc, errno,
+                 qp->ibqp->qp_num);
+-        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
++        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
+         goto out_dealloc_cqe_ctx;
+     }
+ 
+@@ -926,9 +937,10 @@ static void mad_read(void *opaque, const uint8_t *buf, int size)
+     mad = rdma_pci_dma_map(backend_dev->dev, bctx->sge.addr,
+                            bctx->sge.length);
+     if (!mad || bctx->sge.length < msg->umad_len + MAD_HDR_SIZE) {
+-        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_MAD_BUFF,
+-                     bctx->up_ctx);
++        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_MAD_BUFF,
++                      bctx->up_ctx);
+     } else {
++        struct ibv_wc wc = {0};
+         pr_dbg_buf("mad", msg->umad.mad, msg->umad_len);
+         memset(mad, 0, bctx->sge.length);
+         build_mad_hdr((struct ibv_grh *)mad,
+@@ -937,7 +949,10 @@ static void mad_read(void *opaque, const uint8_t *buf, int size)
+         memcpy(&mad[MAD_HDR_SIZE], msg->umad.mad, msg->umad_len);
+         rdma_pci_dma_unmap(backend_dev->dev, mad, bctx->sge.length);
+ 
+-        comp_handler(IBV_WC_SUCCESS, 0, bctx->up_ctx);
++        wc.byte_len = msg->umad_len;
++        wc.status = IBV_WC_SUCCESS;
++        wc.wc_flags = IBV_WC_GRH;
++        comp_handler(bctx->up_ctx, &wc);
+     }
+ 
+     g_free(bctx);
+diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
+index 59ad2b874b..8cae40f827 100644
+--- a/hw/rdma/rdma_backend.h
++++ b/hw/rdma/rdma_backend.h
+@@ -57,8 +57,8 @@ int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
+                                union ibv_gid *gid);
+ void rdma_backend_start(RdmaBackendDev *backend_dev);
+ void rdma_backend_stop(RdmaBackendDev *backend_dev);
+-void rdma_backend_register_comp_handler(void (*handler)(int status,
+-                                        unsigned int vendor_err, void *ctx));
++void rdma_backend_register_comp_handler(void (*handler)(void *ctx,
++                                                        struct ibv_wc *wc));
+ void rdma_backend_unregister_comp_handler(void);
+ 
+ int rdma_backend_query_port(RdmaBackendDev *backend_dev,
+diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
+index 2130824098..300471a4c9 100644
+--- a/hw/rdma/vmw/pvrdma_qp_ops.c
++++ b/hw/rdma/vmw/pvrdma_qp_ops.c
+@@ -47,7 +47,7 @@ typedef struct PvrdmaRqWqe {
+  * 3. Interrupt host
+  */
+ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
+-                           struct pvrdma_cqe *cqe)
++                           struct pvrdma_cqe *cqe, struct ibv_wc *wc)
+ {
+     struct pvrdma_cqe *cqe1;
+     struct pvrdma_cqne *cqne;
+@@ -66,6 +66,7 @@ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
+     pr_dbg("Writing CQE\n");
+     cqe1 = pvrdma_ring_next_elem_write(ring);
+     if (unlikely(!cqe1)) {
++        pr_dbg("No CQEs in ring\n");
+         return -EINVAL;
+     }
+ 
+@@ -73,8 +74,20 @@ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
+     cqe1->wr_id = cqe->wr_id;
+     cqe1->qp = cqe->qp;
+     cqe1->opcode = cqe->opcode;
+-    cqe1->status = cqe->status;
+-    cqe1->vendor_err = cqe->vendor_err;
++    cqe1->status = wc->status;
++    cqe1->byte_len = wc->byte_len;
++    cqe1->src_qp = wc->src_qp;
++    cqe1->wc_flags = wc->wc_flags;
++    cqe1->vendor_err = wc->vendor_err;
++
++    pr_dbg("wr_id=%" PRIx64 "\n", cqe1->wr_id);
++    pr_dbg("qp=0x%lx\n", cqe1->qp);
++    pr_dbg("opcode=%d\n", cqe1->opcode);
++    pr_dbg("status=%d\n", cqe1->status);
++    pr_dbg("byte_len=%d\n", cqe1->byte_len);
++    pr_dbg("src_qp=%d\n", cqe1->src_qp);
++    pr_dbg("wc_flags=%d\n", cqe1->wc_flags);
++    pr_dbg("vendor_err=%d\n", cqe1->vendor_err);
+ 
+     pvrdma_ring_write_inc(ring);
+ 
+@@ -99,18 +112,12 @@ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
+     return 0;
+ }
+ 
+-static void pvrdma_qp_ops_comp_handler(int status, unsigned int vendor_err,
+-                                       void *ctx)
++static void pvrdma_qp_ops_comp_handler(void *ctx, struct ibv_wc *wc)
+ {
+     CompHandlerCtx *comp_ctx = (CompHandlerCtx *)ctx;
+ 
+-    pr_dbg("cq_handle=%d\n", comp_ctx->cq_handle);
+-    pr_dbg("wr_id=%" PRIx64 "\n", comp_ctx->cqe.wr_id);
+-    pr_dbg("status=%d\n", status);
+-    pr_dbg("vendor_err=0x%x\n", vendor_err);
+-    comp_ctx->cqe.status = status;
+-    comp_ctx->cqe.vendor_err = vendor_err;
+-    pvrdma_post_cqe(comp_ctx->dev, comp_ctx->cq_handle, &comp_ctx->cqe);
++    pvrdma_post_cqe(comp_ctx->dev, comp_ctx->cq_handle, &comp_ctx->cqe, wc);
++
+     g_free(ctx);
+ }
+ 
 -- 
 2.17.2
