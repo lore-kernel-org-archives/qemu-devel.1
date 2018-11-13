@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvc-0005CX-1h
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:07 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvk-0005IC-EU
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvY-0004qi-AG
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:03 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:44704)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gMSvh-0004yh-QX
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:12 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:45974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gMSvU-0004g9-AE
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:15:58 -0500
+	id 1gMSve-0004qJ-0r
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:16:07 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Tue, 13 Nov 2018 09:13:26 +0200
-Message-Id: <20181113071336.6242-38-yuval.shaia@oracle.com>
+Date: Tue, 13 Nov 2018 09:13:28 +0200
+Message-Id: <20181113071336.6242-40-yuval.shaia@oracle.com>
 In-Reply-To: <20181113071336.6242-1-yuval.shaia@oracle.com>
 References: <20181113071336.6242-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v3 13/23] hw/pvrdma: Make sure PCI function 0
- is vmxnet3
+Subject: [Qemu-devel] [PATCH v3 15/23] hw/pvrdma: Make device state depend
+ on Ethernet function state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +27,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-Guest driver enforces it, we should also.
+User should be able to control the device by changing Ethernet function
+state so if user runs 'ifconfig ens3 down' the PVRDMA function should be
+down as well.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 ---
- hw/rdma/vmw/pvrdma.h      | 2 ++
- hw/rdma/vmw/pvrdma_main.c | 3 +++
- 2 files changed, 5 insertions(+)
+ hw/rdma/vmw/pvrdma_cmd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-index b019cb843a..10a3c4fb7c 100644
---- a/hw/rdma/vmw/pvrdma.h
-+++ b/hw/rdma/vmw/pvrdma.h
-@@ -20,6 +20,7 @@
- #include "hw/pci/pci.h"
- #include "hw/pci/msix.h"
- #include "chardev/char-fe.h"
-+#include "hw/net/vmxnet3_defs.h"
+diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+index 2979582fac..0d3c818c20 100644
+--- a/hw/rdma/vmw/pvrdma_cmd.c
++++ b/hw/rdma/vmw/pvrdma_cmd.c
+@@ -139,7 +139,8 @@ static int query_port(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     resp->hdr.ack = PVRDMA_CMD_QUERY_PORT_RESP;
+     resp->hdr.err = 0;
  
- #include "../rdma_backend_defs.h"
- #include "../rdma_rm_defs.h"
-@@ -85,6 +86,7 @@ typedef struct PVRDMADev {
-     RdmaBackendDev backend_dev;
-     RdmaDeviceResources rdma_dev_res;
-     CharBackend mad_chr;
-+    VMXNET3State *func0;
- } PVRDMADev;
- #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
- 
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index ac8c092db0..fa6468d221 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -576,6 +576,9 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
-         return;
-     }
- 
-+    /* Break if not vmxnet3 device in slot 0 */
-+    dev->func0 = VMXNET3(pci_get_function_0(pdev));
-+
-     memdev_root = object_resolve_path("/objects", NULL);
-     if (memdev_root) {
-         object_child_foreach(memdev_root, pvrdma_check_ram_shared, &ram_shared);
+-    resp->attrs.state = attrs.state;
++    resp->attrs.state = dev->func0->device_active ? attrs.state :
++                                                    PVRDMA_PORT_DOWN;
+     resp->attrs.max_mtu = attrs.max_mtu;
+     resp->attrs.active_mtu = attrs.active_mtu;
+     resp->attrs.phys_state = attrs.phys_state;
 -- 
 2.17.2
