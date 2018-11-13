@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gMOwz-0007lH-8z
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 22:01:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1gMPKi-0004v2-S6
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 22:25:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1gMOwu-0005Fn-7t
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 22:01:13 -0500
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:46006)
+	(envelope-from <bounces@canonical.com>) id 1gMPKd-0001gH-SI
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 22:25:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39550)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1gMOwt-0005ED-AV
-	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 22:01:08 -0500
-Received: by mail-oi1-x22f.google.com with SMTP id b141so50426oii.12
-	for <qemu-devel@nongnu.org>; Mon, 12 Nov 2018 19:01:05 -0800 (PST)
-Sender: fluxion <flukshun@gmail.com>
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 12 Nov 2018 21:00:45 -0600
-Message-Id: <20181113030047.11711-1-mdroth@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gMPKd-0001fk-Ki
+	for qemu-devel@nongnu.org; Mon, 12 Nov 2018 22:25:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gMPKc-0004hj-Ar
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 03:25:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 50F8B2E80C9
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 03:25:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL for-3.1 0/2] qemu-ga patch queue for 3.1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Nov 2018 03:15:55 -0000
+From: Chen Zhang <1802915@bugs.launchpad.net>
+Reply-To: Bug 1802915 <1802915@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154202828346.10437.1411488850787353605.malonedeb@wampee.canonical.com>
+Message-Id: <154207895551.2749.13938470931805098780.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1802915] Re: GTK display refresh rate is throttled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +37,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
 
-The following changes since commit 160e5c22e55b3f775c2003dfc626fa872ee4a7a1:
+** Description changed:
 
-  Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into staging (2018-11-09 10:54:10 +0000)
+  Guest OS running with GL enabled GTK display shows a reduced refresh
+  rate, e.g. moving cursor around with iGVT-g DMA Buf.
+  =
 
-are available in the Git repository at:
+- It seems that a default refresh interval GUI_REFRESH_INTERVAL_DEFAULT
++ Apparently, a default refresh interval GUI_REFRESH_INTERVAL_DEFAULT
+  (30ms) is defined in include/ui/console.h, throttling the display
+  refresh rate at 33Hz.
+  =
 
-  git://github.com/mdroth/qemu.git tags/qga-pull-2018-11-12-tag
+- To correct this throttle issue, a shorter interval should be applied to
+- display change listener or the default value should be used.
++ To correct this throttle issue, a shorter interval (16 or 17
++ milliseconds) should be applied to display change listener or the
++ default value should be modified.
 
-for you to fetch changes up to 61baac2fdb7ad3891fb00bbd3c9e8b8ca87f0f62:
+-- =
 
-  qga: Add multiple include guard to guest-agent-core.h (2018-11-09 07:55:13 -0600)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1802915
 
-----------------------------------------------------------------
-qemu-ga patch queue for 3.1.0
+Title:
+  GTK display refresh rate is throttled
 
-* add missing #include guards for guest-agent-core.h
-* fix leaks introduced with recent win32 enablement of disk info in
-  guest-get-fsinfo
+Status in QEMU:
+  New
 
-----------------------------------------------------------------
-Marc-André Lureau (1):
-      qga-win: fix leaks of build_guest_disk_info()
+Bug description:
+  Guest OS running with GL enabled GTK display shows a reduced refresh
+  rate, e.g. moving cursor around with iGVT-g DMA Buf.
 
-Peter Maydell (1):
-      qga: Add multiple include guard to guest-agent-core.h
+  Apparently, a default refresh interval GUI_REFRESH_INTERVAL_DEFAULT
+  (30ms) is defined in include/ui/console.h, throttling the display
+  refresh rate at 33Hz.
 
- qga/commands-win32.c   | 5 ++++-
- qga/guest-agent-core.h | 5 +++++
- 2 files changed, 9 insertions(+), 1 deletion(-)
+  To correct this throttle issue, a shorter interval (16 or 17
+  milliseconds) should be applied to display change listener or the
+  default value should be modified.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1802915/+subscriptions
