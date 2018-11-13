@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gMbcW-0008CL-TW
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:32:57 -0500
+	(envelope-from <philmd@redhat.com>) id 1gMbdh-0000O4-JP
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:34:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gMbcT-0007iA-94
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:32:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58940)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gMbcS-0007c5-W5
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:32:53 -0500
-References: <20181113160908.12706-1-danielhb413@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7274afaf-06ad-c93f-370a-151f1605cabb@redhat.com>
-Date: Tue, 13 Nov 2018 10:32:39 -0600
+	(envelope-from <philmd@redhat.com>) id 1gMbdc-00089d-UB
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:34:08 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:38724)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gMbdc-000896-Nu
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 11:34:04 -0500
+Received: by mail-wm1-f66.google.com with SMTP id f2-v6so12017729wme.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 08:34:04 -0800 (PST)
+References: <151f5fb1-98d4-5414-aad0-f6c7d704686a@redhat.com>
+	<1542121904-17330-1-git-send-email-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <08b5a780-0e86-58ed-d864-a2cb6d6ae0af@redhat.com>
+Date: Tue, 13 Nov 2018 17:34:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181113160908.12706-1-danielhb413@gmail.com>
+In-Reply-To: <1542121904-17330-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] qga: update docs with systemd suspend
- support info
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] tests/ide: Free pcibus when finishing a
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
-On 11/13/18 10:09 AM, Daniel Henrique Barboza wrote:
-> Commit 067927d62e ("qga: systemd hibernate/suspend/hybrid-sleep
-> support") failed to update qapi-schema.json after adding systemd
-> hibernate/suspend/hybrid-sleep capabilities to guest-suspend-* QGA
-> commands.
+On 13/11/18 16:11, Thomas Huth wrote:
+> Once a test has finished, the pcibus structure should be freed, to
+> avoid leaking memory and to make sure that the structure is properly
+> re-initialized when the next test starts.
 > 
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->   qga/qapi-schema.json | 37 ++++++++++++++++++++++++++-----------
->   1 file changed, 26 insertions(+), 11 deletions(-)
+>   tests/ide-test.c | 4 ++++
+>   1 file changed, 4 insertions(+)
+> 
+> diff --git a/tests/ide-test.c b/tests/ide-test.c
+> index 33cef61..f0280e6 100644
+> --- a/tests/ide-test.c
+> +++ b/tests/ide-test.c
+> @@ -142,6 +142,10 @@ static void ide_test_start(const char *cmdline_fmt, ...)
+>   
+>   static void ide_test_quit(void)
+>   {
+> +    if (pcibus) {
 
-> +++ b/qga/qapi-schema.json
-> @@ -532,12 +532,16 @@
->   #
->   # Suspend guest to disk.
->   #
-> -# This command tries to execute the scripts provided by the pm-utils package.
-> -# If it's not available, the suspend operation will be performed by manually
-> -# writing to a sysfs file.
-> +# This command attempts to suspend the guest using three strategies, in this
-> +# order:
->   #
-> -# For the best results it's strongly recommended to have the pm-utils
-> -# package installed in the guest.
-> +# - systemd hibernate
-> +# - pm-utils (via pm-hibernate)
-> +# - manual write into sysfs
-> +#
-> +# If the guest does not have systemd hibernate support, the scripts in pm-utils
-> +# package are executed, in case pm-utils is available. Manual write in sysfs
-> +# is a last resort.
+This check would be cleaner in qpci_free_pc().
 
-Does this paragraph add any information compared to the earlier list?
+> +        qpci_free_pc(pcibus);
+> +        pcibus = NULL;
 
->   #
->   # This command does NOT return a response on success. There is a high chance
->   # the command succeeded if the VM exits with a zero exit status or, when
-> @@ -560,12 +564,16 @@
->   #
->   # Suspend guest to ram.
->   #
-> -# This command tries to execute the scripts provided by the pm-utils package.
-> -# If it's not available, the suspend operation will be performed by manually
-> -# writing to a sysfs file.
-> +# This command attempts to suspend the guest using three strategies, in this
-> +# order:
-> +#
-> +# - systemd suspend
-> +# - pm-utils (via pm-suspend)
-> +# - manual write into sysfs
->   #
-> -# For the best results it's strongly recommended to have the pm-utils
-> -# package installed in the guest.
-> +# If the guest does not have systemd suspend support, the scripts in pm-utils
-> +# package are executed, in case pm-utils is available. Manual write in sysfs
-> +# is a last resort.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Likewise.
-
->   #
->   # IMPORTANT: guest-suspend-ram requires QEMU to support the 'system_wakeup'
->   # command.  Thus, it's *required* to query QEMU for the presence of the
-> @@ -592,7 +600,14 @@
->   #
->   # Save guest state to disk and suspend to ram.
->   #
-> -# This command requires the pm-utils package to be installed in the guest.
-> +# This command attempts to suspend the guest using three strategies, in this
-> +# order:
-> +#
-> +# - systemd hybrid-sleep
-> +# - pm-utils (via pm-suspend-hybrid)
-> +#
-> +# If the guest does not have systemd hybrid-sleep support, the scripts in
-> +# pm-utils package are executed, in case pm-utils is available.
-
-"using three strategies" but a list of only 2 seems odd.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> +    }
+>       pc_alloc_uninit(guest_malloc);
+>       guest_malloc = NULL;
+>       qtest_end();
+> 
