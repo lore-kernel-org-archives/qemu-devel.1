@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gMYjN-0007pC-5o
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 08:27:52 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gMYrx-0002Ec-CK
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 08:36:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gMYjL-0003tw-05
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 08:27:48 -0500
-Date: Tue, 13 Nov 2018 11:26:53 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181113132653.GG12503@habkost.net>
-References: <20181109221213.7310-1-crosa@redhat.com>
-	<20181112104953.GB11580@linux.fritz.box>
-	<f1c27ed2-9aba-edaf-2c49-ff565a0847ce@redhat.com>
-	<20181112160025.GE11580@linux.fritz.box>
-	<b51dd4e4-e814-db42-86be-698c0d87f8ef@redhat.com>
-	<20181113121836.GC4830@localhost.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1gMYru-00030X-Ur
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 08:36:41 -0500
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:35302)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gMYru-0002si-I0
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 08:36:38 -0500
+Received: by mail-ot1-x336.google.com with SMTP id 81so11315880otj.2
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 05:36:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181113121836.GC4830@localhost.localdomain>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] Acceptance tests for qemu-img
+In-Reply-To: <20181113030047.11711-1-mdroth@linux.vnet.ibm.com>
+References: <20181113030047.11711-1-mdroth@linux.vnet.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Nov 2018 13:36:17 +0000
+Message-ID: <CAFEAcA-RuqQexEVpS5vD4wSN6Av2XG=chxdaxAq-n4teRF=qLA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL for-3.1 0/2] qemu-ga patch queue for 3.1.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Nov 13, 2018 at 01:18:36PM +0100, Kevin Wolf wrote:
-[...]
-> Anyway, one specific concern about the "simple way" I have is that we're
-> adding a hard dependency on an external package (Avocado) that isn't
-> usually installed anyway on developer machines. Maintainers will of
-> course just install it. But will this reduce the amount of tests that
-> contributors run, and increase the amount of untested patches on the
-> mailing list?
-> 
-> Maybe we can keep a simple in-tree runner like ./check that doesn't have
-> any external dependencies and runs all of those tests that don't make
-> use of Avocado utility functions etc.? And you'd use Avocado when you
-> want to run all tests or use advanced test harness options.
+On 13 November 2018 at 03:00, Michael Roth <mdroth@linux.vnet.ibm.com> wrot=
+e:
+> The following changes since commit 160e5c22e55b3f775c2003dfc626fa872ee4a7=
+a1:
+>
+>   Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into sta=
+ging (2018-11-09 10:54:10 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/mdroth/qemu.git tags/qga-pull-2018-11-12-tag
+>
+> for you to fetch changes up to 61baac2fdb7ad3891fb00bbd3c9e8b8ca87f0f62:
+>
+>   qga: Add multiple include guard to guest-agent-core.h (2018-11-09 07:55=
+:13 -0600)
+>
+> ----------------------------------------------------------------
+> qemu-ga patch queue for 3.1.0
+>
+> * add missing #include guards for guest-agent-core.h
+> * fix leaks introduced with recent win32 enablement of disk info in
+>   guest-get-fsinfo
+>
+> ----------------------------------------------------------------
+> Marc-Andr=C3=A9 Lureau (1):
+>       qga-win: fix leaks of build_guest_disk_info()
+>
+> Peter Maydell (1):
+>       qga: Add multiple include guard to guest-agent-core.h
 
-What problems you are trying to address here, exactly?
+Applied, thanks.
 
-If you don't have Avocado installed in your system, all you need
-is Python 3, an internet connection, and the ability to type
-"make check-acceptance" on your keyboard.
-
--- 
-Eduardo
+-- PMM
