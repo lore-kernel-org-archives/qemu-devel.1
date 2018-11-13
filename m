@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gMXTC-00047D-9q
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:07:03 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1gMXYH-0005Ap-Uc
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:12:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gMXT7-0004Tl-3Z
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:07:02 -0500
-References: <20181105110313.29312-1-david@redhat.com>
-	<20181112181454.13efd2af.cohuck@redhat.com>
-	<8aaa3434-cb48-6adf-d716-c391eb3123f5@redhat.com>
-	<20181113100313.307711b0.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <84c46d77-4ebc-0754-de83-751aa7ed32dc@redhat.com>
-Date: Tue, 13 Nov 2018 13:06:47 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181113100313.307711b0.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 0/4] s390x/zpci: some
- hotplug handler cleanups
+	(envelope-from <programmingkidx@gmail.com>) id 1gMXYD-0006vE-8O
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:12:17 -0500
+Received: from mail-io1-xd31.google.com ([2607:f8b0:4864:20::d31]:34718)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1gMXYC-0006ub-9u
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:12:12 -0500
+Received: by mail-io1-xd31.google.com with SMTP id f6so5690086iob.1
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 04:12:11 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <mailman.21030.1541972152.1282.qemu-devel@nongnu.org>
+Date: Tue, 13 Nov 2018 07:12:06 -0500
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4D9A31B6-6136-4ABD-B88D-722BA2D99528@gmail.com>
+References: <mailman.21030.1541972152.1282.qemu-devel@nongnu.org>
+Subject: Re: [Qemu-devel] [PATCH] Fix for crashes and non-responsive UI on
+ macOS Mojave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Collin Walling <walling@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: QEMU Developers <qemu-devel@nongnu.org>, Berkus Decker <berkus@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On 13.11.18 10:03, Cornelia Huck wrote:
-> On Mon, 12 Nov 2018 18:34:34 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 12.11.18 18:14, Cornelia Huck wrote:
->>> On Mon,  5 Nov 2018 12:03:09 +0100
->>> David Hildenbrand <david@redhat.com> wrote:
->>>   
->>>> The hotplug code needs more love, but let's do some obvious cleanups
->>>> first. In the future, we want to propery make use of unplug_request() +
->>>> unplug(), instead of routing everything (especially two separate but
->>>> linked) devices via a single unplug call. Also, we want to move all
->>>> errors in plug() into the pre_plug() handler, but this will require
->>>> general PCI refactorings (moving stuff from realize() to the pre_plug/plug
->>>> handler).
->>>>
->>>> This series is based on "[PATCH v2 00/10] pci: hotplug handler reworks",
->>>> which contains one cleanup for s390x.
->>>>
->>>> David Hildenbrand (4):
->>>>   s390x/zpci: drop msix.available  
->>>
->>> queued to s390-next
->>>   
->>>>   s390x/zpci: use hotplug_dev instead of looking up the host bridge  
->>>
->>> Do we have consensus on that one yet? I can take it or leave it :)
->>>   
->>>>   s390x/zpci: move some hotplug checks to the pre_plug handler  
->>>
->>> depends on the handler rework  
->>
->> I can pull that one out from the general handler rework (still need
->> review either way so it could take a while).
-> 
-> It's 4.0 material anyway, so no need to hurry.
-> 
->>
->>>   
->>>>   s390x/zpci: properly fail if the zPCI device cannot be created  
->>>
->>> Waiting for a fixed patch... can queue to s390-fixes if it arrives
->>> soon(tm).  
->>
->> Thanks!
->>
->> Shall I resend all or only this one?
-> 
-> The last one would be great, as I think it's still 3.1 material.
-> 
 
-Alrighty, so I'll resend (after testing this time ;) ) the last patch.
+> On Nov 11, 2018, at 4:35 PM, qemu-devel-request@nongnu.org wrote:
+>=20
+> It seems that Cocoa checks are stricter on Mojave and some callbacks =
+that worked from non-GUI thread on High Sierra are no longer working.
+>=20
+> The fixes included here are:
+>=20
+> * Deferring qemu_main() to another thread so that the actual main =
+thread is reserved for the Cocoa UI; it also removes blocking from =
+applicationDidFinishLoading: delegate. I beleive this alone caused =
+complete UI blockage on Mojave.
+> * Deferring UI-related updates in callbacks to the UI thread using =
+invokeOnMainThread helper function. This function uses =
+DDInvocationGrabber object courtesy of Dave Dribin, licensed under MIT =
+license.
+> Here?s relevant blog post for his code: =
+https://www.dribin.org/dave/blog/archives/2008/05/22/invoke_on_main_thread=
+/
+>=20
+> NSInvocation is used here instead of plain =
+performSelectorOnMainThread:withObject:waitUntilDone: because we want to =
+be able to pass non-id types to the handlers.
 
--- 
+Couldn't we use [NSValue valueWithPointer:] to pass the struct instance =
+to performSelectorOnMainThread:withObject:waitUntilDone:?
 
-Thanks,
+=
+https://developer.apple.com/documentation/foundation/nsvalue/1415975-value=
+withpointer?language=3Dobjc
 
-David / dhildenb
+> These changes are ought to work on OSX 10.6, although I don?t have a =
+machine handy to test it.
+
+I have Mac OS 10.6 available for testing. I just don't think all this =
+code is necessary to fix this issue. Hopefully I will have the time =
+later today to investigate this issue some more.
