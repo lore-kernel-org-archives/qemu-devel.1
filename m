@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gMXxJ-0006vu-BM
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:38:10 -0500
+	(envelope-from <xiezhide@huawei.com>) id 1gMXz9-0007XF-Ha
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:40:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gMXxG-0002PA-6j
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:38:09 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:41489)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gMXxG-0002Nz-0P
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:38:06 -0500
-Received: by mail-wr1-f67.google.com with SMTP id v18-v6so13134937wrt.8
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 04:38:04 -0800 (PST)
-References: <20181113070320.16147-1-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <bea636d4-9f0c-de1f-ac70-3ce4a2245033@redhat.com>
-Date: Tue, 13 Nov 2018 13:38:01 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181113070320.16147-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <xiezhide@huawei.com>) id 1gMXz6-0003Vv-CA
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:40:03 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2292 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gMXz5-0003Sd-11
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 07:40:00 -0500
+From: xiezhide <xiezhide@huawei.com>
+Date: Tue, 13 Nov 2018 12:39:49 +0000
+Message-ID: <A02D6AA901860840B46E751C5E9E38B43CC9709D@DGGEML532-MBX.china.huawei.com>
+References: <A02D6AA901860840B46E751C5E9E38B43CC96FA1@DGGEML532-MBX.china.huawei.com>
+	<20181113112855.4f3984f8@bahia.lan>
+	<A02D6AA901860840B46E751C5E9E38B43CC97027@DGGEML532-MBX.china.huawei.com>
+	<20181113130347.12013ef4@bahia.lan>
+In-Reply-To: <20181113130347.12013ef4@bahia.lan>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] slirp: add tftp tracing
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v1 0/3] fsdev-throttle-qmp: refactor code
+ for qmp interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +31,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "berto@igalia.com" <berto@igalia.com>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>
 
-On 13/11/18 8:03, Gerd Hoffmann wrote:
-> Useful when debugging pxeboot, to see what the guest tries to do.
-
-Good idea!
-
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->   Makefile.objs      | 1 +
->   slirp/tftp.c       | 3 +++
->   slirp/trace-events | 5 +++++
->   3 files changed, 9 insertions(+)
->   create mode 100644 slirp/trace-events
-> 
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 1e1ff387d7..31852eaf8f 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -251,6 +251,7 @@ trace-events-subdirs += net
->   trace-events-subdirs += qapi
->   trace-events-subdirs += qom
->   trace-events-subdirs += scsi
-> +trace-events-subdirs += slirp
->   trace-events-subdirs += target/arm
->   trace-events-subdirs += target/i386
->   trace-events-subdirs += target/mips
-> diff --git a/slirp/tftp.c b/slirp/tftp.c
-> index a9bc4bb1b6..735b57aa55 100644
-> --- a/slirp/tftp.c
-> +++ b/slirp/tftp.c
-> @@ -26,6 +26,7 @@
->   #include "slirp.h"
->   #include "qemu-common.h"
->   #include "qemu/cutils.h"
-> +#include "trace.h"
->   
->   static inline int tftp_session_in_use(struct tftp_session *spt)
->   {
-> @@ -204,6 +205,7 @@ static void tftp_send_error(struct tftp_session *spt,
->     struct mbuf *m;
->     struct tftp_t *tp;
->   
-> +  trace_slirp_tftp_error(msg);
->     m = m_get(spt->slirp);
->   
->     if (!m) {
-> @@ -323,6 +325,7 @@ static void tftp_handle_rrq(Slirp *slirp, struct sockaddr_storage *srcsas,
->         break;
->       }
->     }
-> +  trace_slirp_tftp_rrq(req_fname);
->   
->     /* check mode */
->     if ((pktlen - k) < 6) {
-> diff --git a/slirp/trace-events b/slirp/trace-events
-> new file mode 100644
-> index 0000000000..ff8f656e8c
-> --- /dev/null
-> +++ b/slirp/trace-events
-> @@ -0,0 +1,5 @@
-> +# See docs/devel/tracing.txt for syntax documentation.
-> +
-> +# slirp/tftp.c
-> +slirp_tftp_rrq(const char *file) "file: %s"
-> +slirp_tftp_error(const char *file) "msg: %s"
-> 
+U3VyZS4NCg0KV2l0aCBnaXQgZ2l0IHNlbmQtZW1haWwsIHNlZW1zIHdvcmtpbmcgbm93LCB0aHJl
+YWRzIHNob3dpbmcsIHBsZWFzZSBoYXZlIGEgY2hlY2ssIHRoYW5rczoNCg0KW1FlbXUtZGV2ZWxd
+IFtQQVRDSCB2MiAxLzNdIGZzZGV2LXRocm90dGxlLXFtcDogcmVmYWN0b3IgY29kZSBmb3IgcW1w
+IGludGVyZmFjZSBmb3IgaW8gdGhyb3R0bGluZw0KW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAyLzNd
+IGZzZGV2LXRocm90dGxlLXFtcDogcW1wIGludGVyZmFjZSBmb3IgZnNkZXYgaW8gdGhyb3R0bGlu
+Zw0KW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAzLzNdIGZzZGV2LXRocm90dGxlLXFtcDogaG1wIGlu
+dGVyZmFjZSBmb3IgZnNkZXYgaW8gdGhyb3R0bGluZw0KDQpUaGFua3MNCktpZGQNCg0KLS0tLS1P
+cmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEdyZWcgS3VyeiBbbWFpbHRvOmdyb3VnQGthb2Qu
+b3JnXSANClNlbnQ6IDIwMTjlubQxMeaciDEz5pelIDIwOjA0DQpUbzogeGllemhpZGUgPHhpZXpo
+aWRlQGh1YXdlaS5jb20+DQpDYzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBFcmljIEJsYWtlIDxl
+Ymxha2VAcmVkaGF0LmNvbT47IGFybWJydUByZWRoYXQuY29tOyBkZ2lsYmVydEByZWRoYXQuY29t
+OyBiZXJ0b0BpZ2FsaWEuY29tOyBhbmVlc2gua3VtYXJAbGludXgudm5ldC5pYm0uY29tDQpTdWJq
+ZWN0OiBSZTogW1FlbXUtZGV2ZWxdW1BBVENIIHYxIDAvM10gZnNkZXYtdGhyb3R0bGUtcW1wOiBy
+ZWZhY3RvciBjb2RlIGZvciBxbXAgaW50ZXJmYWNlDQoNCk9uIFR1ZSwgMTMgTm92IDIwMTggMTE6
+MTc6MTkgKzAwMDANCnhpZXpoaWRlIDx4aWV6aGlkZUBodWF3ZWkuY29tPiB3cm90ZToNCg0KPiBG
+b2xsb3dpbmcgaXMgdGhlIHRoZSBwYXRjaCBoZWFkZXIsICB1c2VyIG5hbWUgYW5kIG1haWwgYXJl
+IHRoZSBzYW1lIGF0IEZyb20gYW5kIFNpZ25lZC1vZmYtYnkgOg0KPiANCg0KRnJvbSBhbmQgU2ln
+bmVkLW9mZi1ieSBhcmUgdGhlIHNhbWUgaW5kZWVkIGJ1dCB4MDAzOTA5NjEgZG9lc24ndCBsb29r
+IGxpa2UgYSB2YWxpZCBuYW1lLg0KDQpZb3Ugc2hvdWxkIHJlYWQgdGhlIGZvbGxvd2luZyBwYWdl
+LiBJdCBleHBsYWlucyBldmVyeXRoaW5nIHlvdSBuZWVkIHRvIGtub3cgaW4gb3JkZXIgdG8gc2Vu
+ZCB1c2VmdWwgY29udHJpYnV0aW9ucy4NCg0KaHR0cHM6Ly93aWtpLnFlbXUub3JnL0NvbnRyaWJ1
+dGUvU3VibWl0QVBhdGNoDQoNCkFib3V0IFNpZ25lZC1vZmYtYnk6DQoNCmh0dHBzOi8vd2lraS5x
+ZW11Lm9yZy9Db250cmlidXRlL1N1Ym1pdEFQYXRjaCNQYXRjaF9lbWFpbHNfbXVzdF9pbmNsdWRl
+X2FfU2lnbmVkLW9mZi1ieTpfbGluZQ0KDQoiUGxlYXNlIHVzZSB5b3VyIHJlYWwgbmFtZSB0byBz
+aWduIGEgcGF0Y2ggKG5vdCBhbiBhbGlhcyBvciBhY3JvbnltKS4iDQoNCkNoZWVycywNCg0KLS0N
+CkdyZWcNCg0KPiAtLS0tLS0tLS0tLS0tLS0tLS0tDQo+IEZyb20gNDU3ZjMxNjhlY2EyZDA0MWJi
+ZmNhZDgyMmFkOTAwNGUyOWEzODQwYyBNb24gU2VwIDE3IDAwOjAwOjAwIDIwMDENCj4gRnJvbTog
+eDAwMzkwOTYxIDx4aWV6aGlkZUBodWF3ZWkuY29tPg0KPiBEYXRlOiBXZWQsIDE0IE5vdiAyMDE4
+IDAxOjAzOjQ5ICswODAwDQo+IFN1YmplY3Q6IFtQQVRDSCAxLzNdIGZzZGV2LXRocm90dGxlLXFt
+cDogcmVmYWN0b3IgY29kZSBmb3IgcW1wIA0KPiBpbnRlcmZhY2UgZm9yICBpbyB0aHJvdHRsaW5n
+DQo+IA0KPiBUaGlzIHBhdGNoIGluY2x1ZGVzIHR3byBwYXJ0czoNCj4gMS4gZmFjdG9yIG91dCB0
+aHJvdHRsZSBjb2RlIHRvIHJldXNlIGNvZGUgMi4gdXNlIFRocm90dGxlTGltaXRzIA0KPiBzdHJ1
+Y3R1cmUNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IHgwMDM5MDk2MSA8eGllemhpZGVAaHVhd2VpLmNv
+bT4NCj4gDQo+IA0KPiBBbnl3YXksIGxldCBtZSB0cnkgZ2l0IHNlbmQtZW1haWwNCj4gDQo+IFRo
+YW5rcw0KPiBLaWRkDQo+IA0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBH
+cmVnIEt1cnogW21haWx0bzpncm91Z0BrYW9kLm9yZ10NCj4gU2VudDogMjAxOOW5tDEx5pyIMTPm
+l6UgMTg6MjkNCj4gVG86IHhpZXpoaWRlIDx4aWV6aGlkZUBodWF3ZWkuY29tPg0KPiBDYzogcWVt
+dS1kZXZlbEBub25nbnUub3JnOyBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT47IA0KPiBh
+cm1icnVAcmVkaGF0LmNvbTsgZGdpbGJlcnRAcmVkaGF0LmNvbTsgYmVydG9AaWdhbGlhLmNvbTsg
+DQo+IGFuZWVzaC5rdW1hckBsaW51eC52bmV0LmlibS5jb20NCj4gU3ViamVjdDogUmU6IFtRZW11
+LWRldmVsXVtQQVRDSCB2MSAwLzNdIGZzZGV2LXRocm90dGxlLXFtcDogcmVmYWN0b3IgDQo+IGNv
+ZGUgZm9yIHFtcCBpbnRlcmZhY2UNCj4gDQo+IEhpIEtpZGQsDQo+IA0KPiBUaGlzIHBvc3Rpbmcg
+aXMgc3RpbGwgYnJva2VuOiBubyB0aHJlYWRpbmcgYW5kIG1pc3NpbmcgbGVhZGluZyBibGFua3Mg
+b24gdW5jaGFuZ2VkIGxpbmVzLiBBbHNvIGlzIHgwMDM5MDk2MSByZWFsbHkgeW91ciBuYW1lIG9m
+IGNob2ljZSA/DQo+IA0KPiBJbiBzb21lIG90aGVyIG1haWwsIHlvdSBtZW50aW9uZWQgY29weS1w
+YXN0ZSB0byBhbiBvdXRsb29rIG1haWwgY2xpZW50Li4uDQo+IHBsZWFzZSBkb24ndCBkbyB0aGF0
+IHRvIHBvc3Qgc2VyaWVzLiBVc2UgZ2l0IGZvcm1hdC1wYXRjaCBhbmQgZ2l0IHNlbmQtZW1haWwg
+aW5zdGVhZCBhbmQgeW91J2xsIGdldCB0aGUgZm9ybWF0dGluZyBhbmQgdGhyZWFkaW5nIHJpZ2h0
+Lg0KPiANCj4gQ2hlZXJzLA0KPiANCj4gLS0NCj4gR3JlZw0KPiANCj4gT24gVHVlLCAxMyBOb3Yg
+MjAxOCAwOTo1OTo1NCArMDAwMA0KPiB4aWV6aGlkZSA8eGllemhpZGVAaHVhd2VpLmNvbT4gd3Jv
+dGU6DQo+IA0KPiA+IFRoaXMgcGF0Y2hlcyBwcm92aWRlIHFtcCBpbnRlcmZhY2UgdG8gcXVlcnkv
+c2V0IGlvIHRocm90dGxlIHBhcmFtZXRlcnMgb2YgYSBmc2Rldi4NCj4gPiBTb21lIG9mIHBhdGNo
+ZXMgYWxzbyByZWZhY3RvciB0aGUgY29kZSBhbmQgc3RydWN0dXJlIHRoYXQgd2FzIHByZXNlbnQg
+aW4gYmxvY2sgYW5kIGZzZGV2IGZpbGVzLg0KPiA+IA0KPiA+IHgwMDM5MDk2MSAoMyk6DQo+ID4g
+ICBmc2Rldi10aHJvdHRsZS1xbXA6IHJlZmFjdG9yIGNvZGUgZm9yIHFtcCBpbnRlcmZhY2UgZm9y
+IGlvIHRocm90dGxpbmcNCj4gPiAgIGZzZGV2LXRocm90dGxlLXFtcDogcW1wIGludGVyZmFjZSBm
+b3IgZnNkZXYgaW8gdGhyb3R0bGluZw0KPiA+ICAgZnNkZXYtdGhyb3R0bGUtcW1wOiBobXAgaW50
+ZXJmYWNlIGZvciBmc2RldiBpbyB0aHJvdHRsaW5nDQo+ID4gDQo+ID4gIE1ha2VmaWxlICAgICAg
+ICAgICAgICAgICAgICAgICAgfCAgMjAgKysrLQ0KPiA+ICBNYWtlZmlsZS5vYmpzICAgICAgICAg
+ICAgICAgICAgIHwgICA4ICsrDQo+ID4gIGJsb2NrL3Rocm90dGxlLmMgICAgICAgICAgICAgICAg
+fCAgIDYgKy0NCj4gPiAgYmxvY2tkZXYuYyAgICAgICAgICAgICAgICAgICAgICB8ICA5NiArLS0t
+LS0tLS0tLS0tLS0tLQ0KPiA+ICBmc2Rldi9xZW11LWZzZGV2LWR1bW15LmMgICAgICAgIHwgIDEx
+ICsrDQo+ID4gIGZzZGV2L3FlbXUtZnNkZXYtdGhyb3R0bGUuYyAgICAgfCAxNDQgKysrKysrKysr
+KysrKysrKystLS0tLS0tLS0NCj4gPiAgZnNkZXYvcWVtdS1mc2Rldi10aHJvdHRsZS5oICAgICB8
+ICAgNiArLQ0KPiA+ICBmc2Rldi9xZW11LWZzZGV2LmMgICAgICAgICAgICAgIHwgIDI5ICsrKysr
+Kw0KPiA+ICBobXAtY29tbWFuZHMtaW5mby5oeCAgICAgICAgICAgIHwgIDE1ICsrKw0KPiA+ICBo
+bXAtY29tbWFuZHMuaHggICAgICAgICAgICAgICAgIHwgIDE1ICsrKw0KPiA+ICBobXAuYyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHwgIDgzICsrKysrKysrKysrKystLQ0KPiA+ICBobXAuaCAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA0ICsNCj4gPiAgaW5jbHVkZS9xZW11L3Rocm90
+dGxlLW9wdGlvbnMuaCB8ICAgMyArLQ0KPiA+ICBpbmNsdWRlL3FlbXUvdGhyb3R0bGUuaCAgICAg
+ICAgIHwgICA0ICstDQo+ID4gIGluY2x1ZGUvcWVtdS90eXBlZGVmcy5oICAgICAgICAgfCAgIDEg
+Kw0KPiA+ICBtb25pdG9yLmMgICAgICAgICAgICAgICAgICAgICAgIHwgIDQxICsrKystLS0tDQo+
+ID4gIHFhcGkvYmxvY2stY29yZS5qc29uICAgICAgICAgICAgfCAxMjIgKy0tLS0tLS0tLS0tLS0t
+LS0tLS0tLQ0KPiA+ICBxYXBpL2ZzZGV2Lmpzb24gICAgICAgICAgICAgICAgIHwgIDk2ICsrKysr
+KysrKysrKysrKysrDQo+ID4gIHFhcGkvcWFwaS1zY2hlbWEuanNvbiAgICAgICAgICAgfCAgIDEg
+Kw0KPiA+ICBxYXBpL3RsaW1pdHMuanNvbiAgICAgICAgICAgICAgIHwgIDg5ICsrKysrKysrKysr
+KysrKysNCj4gPiAgcW1wLmMgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAxMiArKysNCj4g
+PiAgdXRpbC90aHJvdHRsZS5jICAgICAgICAgICAgICAgICB8IDIyNCArKysrKysrKysrKysrKysr
+KysrKysrKysrKy0tLS0tLS0tLS0tLS0tDQo+ID4gIDIyIGZpbGVzIGNoYW5nZWQsIDY1NCBpbnNl
+cnRpb25zKCspLCAzNzYgZGVsZXRpb25zKC0pICBjcmVhdGUgbW9kZQ0KPiA+IDEwMDY0NCBxYXBp
+L2ZzZGV2Lmpzb24gIGNyZWF0ZSBtb2RlIDEwMDY0NCBxYXBpL3RsaW1pdHMuanNvbg0KPiA+IA0K
+PiA+IHYwIC0+IHYxOg0KPiA+ICBBZGRyZXNzZWQgY29tbWVudHMgZnJvbSBFcmljIEJsYWtlIGFu
+ZCBHcmVnIEt1cnouDQo+ID4gIEZpeCBwYXRjaCBjb3JydXB0IGlzc3VlIGR1ZSB0byBlbWFpbCBj
+bGllbnQgY2hhbmdlIHRoZSBwYXRjaCBmb3JtYXQgDQo+ID4gd2l0aCBjb3B5LXRvLXBhc3RlciAg
+QnJlYWsgcGF0Y2ggdG8gcGF0Y2hlcw0KPiA+IA0KPiA+IC0tDQo+ID4gMS44LjMuMQ0KPiA+ICAg
+DQo+IA0KDQo=
