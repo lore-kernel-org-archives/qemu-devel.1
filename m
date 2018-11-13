@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSuS-0004BT-MD
+	(envelope-from <yuval.shaia@oracle.com>) id 1gMSuS-0004BX-Ms
 	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:14:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gMSuP-0003FT-UZ
+	(envelope-from <yuval.shaia@oracle.com>) id 1gMSuQ-0003Fo-4I
 	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:14:52 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:43778)
+Received: from userp2120.oracle.com ([156.151.31.85]:44964)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gMSuP-00037g-KE
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:14:49 -0500
+	id 1gMSuP-0003BN-Qw
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 02:14:50 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Tue, 13 Nov 2018 09:13:03 +0200
-Message-Id: <20181113071336.6242-15-yuval.shaia@oracle.com>
+Date: Tue, 13 Nov 2018 09:13:02 +0200
+Message-Id: <20181113071336.6242-14-yuval.shaia@oracle.com>
 In-Reply-To: <20181113071336.6242-1-yuval.shaia@oracle.com>
 References: <20181113071336.6242-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v3 14/23] hw/rdma: Initialize node_guid from
- vmxnet3 mac address
+Subject: [Qemu-devel] [PATCH v3 13/23] hw/pvrdma: Make sure PCI function 0
+ is vmxnet3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +27,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-node_guid should be set once device is load.
-Make node_guid be GID format (32 bit) of PCI function 0 vmxnet3 device's
-MAC.
-
-A new function was added to do the conversion.
-So for example the MAC 56:b6:44:e9:62:dc will be converted to GID
-54b6:44ff:fee9:62dc.
+Guest driver enforces it, we should also.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 ---
- hw/rdma/rdma_utils.h      |  9 +++++++++
- hw/rdma/vmw/pvrdma_cmd.c  | 10 ----------
- hw/rdma/vmw/pvrdma_main.c |  5 ++++-
- 3 files changed, 13 insertions(+), 11 deletions(-)
+ hw/rdma/vmw/pvrdma.h      | 2 ++
+ hw/rdma/vmw/pvrdma_main.c | 3 +++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
-index 989db249ef..202abb3366 100644
---- a/hw/rdma/rdma_utils.h
-+++ b/hw/rdma/rdma_utils.h
-@@ -63,4 +63,13 @@ extern unsigned long pr_dbg_cnt;
- void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
- void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
+diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
+index b019cb843a..10a3c4fb7c 100644
+--- a/hw/rdma/vmw/pvrdma.h
++++ b/hw/rdma/vmw/pvrdma.h
+@@ -20,6 +20,7 @@
+ #include "hw/pci/pci.h"
+ #include "hw/pci/msix.h"
+ #include "chardev/char-fe.h"
++#include "hw/net/vmxnet3_defs.h"
  
-+static inline void addrconf_addr_eui48(uint8_t *eui, const char *addr)
-+{
-+    memcpy(eui, addr, 3);
-+    eui[3] = 0xFF;
-+    eui[4] = 0xFE;
-+    memcpy(eui + 5, addr + 3, 3);
-+    eui[0] ^= 2;
-+}
-+
- #endif
-diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-index a334f6205e..2979582fac 100644
---- a/hw/rdma/vmw/pvrdma_cmd.c
-+++ b/hw/rdma/vmw/pvrdma_cmd.c
-@@ -592,16 +592,6 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
-         return -EINVAL;
-     }
- 
--    /* TODO: Since drivers stores node_guid at load_dsr phase then this
--     * assignment is not relevant, i need to figure out a way how to
--     * retrieve MAC of our netdev */
--    if (!cmd->index) {
--        dev->node_guid =
--            dev->rdma_dev_res.ports[0].gid_tbl[0].gid.global.interface_id;
--        pr_dbg("dev->node_guid=0x%llx\n",
--               (long long unsigned int)be64_to_cpu(dev->node_guid));
--    }
--
-     return 0;
- }
+ #include "../rdma_backend_defs.h"
+ #include "../rdma_rm_defs.h"
+@@ -85,6 +86,7 @@ typedef struct PVRDMADev {
+     RdmaBackendDev backend_dev;
+     RdmaDeviceResources rdma_dev_res;
+     CharBackend mad_chr;
++    VMXNET3State *func0;
+ } PVRDMADev;
+ #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
  
 diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index fa6468d221..95e9322b7c 100644
+index ac8c092db0..fa6468d221 100644
 --- a/hw/rdma/vmw/pvrdma_main.c
 +++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -264,7 +264,7 @@ static void init_dsr_dev_caps(PVRDMADev *dev)
-     dsr->caps.sys_image_guid = 0;
-     pr_dbg("sys_image_guid=%" PRIx64 "\n", dsr->caps.sys_image_guid);
+@@ -576,6 +576,9 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+         return;
+     }
  
--    dsr->caps.node_guid = cpu_to_be64(dev->node_guid);
-+    dsr->caps.node_guid = dev->node_guid;
-     pr_dbg("node_guid=%" PRIx64 "\n", be64_to_cpu(dsr->caps.node_guid));
- 
-     dsr->caps.phys_port_cnt = MAX_PORTS;
-@@ -579,6 +579,9 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
-     /* Break if not vmxnet3 device in slot 0 */
-     dev->func0 = VMXNET3(pci_get_function_0(pdev));
- 
-+    addrconf_addr_eui48((unsigned char *)&dev->node_guid,
-+                        (const char *)&dev->func0->conf.macaddr.a);
++    /* Break if not vmxnet3 device in slot 0 */
++    dev->func0 = VMXNET3(pci_get_function_0(pdev));
 +
      memdev_root = object_resolve_path("/objects", NULL);
      if (memdev_root) {
