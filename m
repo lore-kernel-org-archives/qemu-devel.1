@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gMdEC-0003DO-UV
+	(envelope-from <richard.henderson@linaro.org>) id 1gMdE9-0003DL-On
 	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:15:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gMd1c-00081D-Ct
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:02:57 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46347)
+	(envelope-from <richard.henderson@linaro.org>) id 1gMd1g-00084Z-SJ
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:03:01 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54105)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gMd1c-0007xe-4L
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:02:56 -0500
-Received: by mail-wr1-x442.google.com with SMTP id l9so1486128wrt.13
-	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 10:02:51 -0800 (PST)
+	id 1gMd1g-00083z-Lz
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 13:03:00 -0500
+Received: by mail-wm1-x343.google.com with SMTP id f10-v6so12869926wme.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 10:03:00 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 13 Nov 2018 19:01:52 +0100
-Message-Id: <20181113180154.17903-3-richard.henderson@linaro.org>
+Date: Tue, 13 Nov 2018 19:01:54 +0100
+Message-Id: <20181113180154.17903-5-richard.henderson@linaro.org>
 In-Reply-To: <20181113180154.17903-1-richard.henderson@linaro.org>
 References: <20181113180154.17903-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 2/4] target/arm: Fill in ARMISARegisters for
- kvm64
+Subject: [Qemu-devel] [PATCH v5 4/4] target/arm: Fill in ARMISARegisters for
+ kvm32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,127 +32,79 @@ Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/kvm64.c | 90 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 88 insertions(+), 2 deletions(-)
+ target/arm/kvm32.c | 40 +++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 35 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 46fbe6d8ff..0a502091e7 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -456,17 +456,40 @@ static inline void unset_feature(uint64_t *features, int feature)
-     *features &= ~(1ULL << feature);
- }
- 
-+static int read_sys_reg32(int fd, uint32_t *pret, uint64_t id)
-+{
-+    uint64_t ret;
-+    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)&ret };
-+    int err;
-+
-+    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U64);
-+    err = ioctl(fd, KVM_GET_ONE_REG, &idreg);
-+    if (err < 0) {
-+        return -1;
-+    }
-+    *pret = ret;
-+    return 0;
-+}
-+
-+static int read_sys_reg64(int fd, uint64_t *pret, uint64_t id)
-+{
-+    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)pret };
-+
-+    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U64);
-+    return ioctl(fd, KVM_GET_ONE_REG, &idreg);
-+}
-+
- bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
- {
-     /* Identify the feature bits corresponding to the host CPU, and
-      * fill out the ARMHostCPUClass fields accordingly. To do this
-      * we have to create a scratch VM, create a single CPU inside it,
+diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+index bc0badf53d..bd51eb43c8 100644
+--- a/target/arm/kvm32.c
++++ b/target/arm/kvm32.c
+@@ -44,7 +44,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
       * and then query that CPU for the relevant ID registers.
--     * For AArch64 we currently don't care about ID registers at
--     * all; we just want to know the CPU type.
       */
-     int fdarray[3];
+     int err = 0, fdarray[3];
+-    uint32_t midr, id_pfr0, mvfr1;
++    uint32_t midr, id_pfr0;
      uint64_t features = 0;
-+    int err;
-+
-     /* Old kernels may not know about the PREFERRED_TARGET ioctl: however
-      * we know these will only support creating one kind of guest CPU,
-      * which is its preferred CPU type. Fortunately these old kernels
-@@ -487,8 +510,71 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-     ahcf->target = init.target;
-     ahcf->dtb_compatible = "arm,arm-v8";
  
-+    err = read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64pfr0,
-+                         ARM64_SYS_REG(3, 0, 0, 4, 0));
-+    if (unlikely(err < 0)) {
-+        /*
-+         * Before v4.15, the kernel only exposed a limited number of system
-+         * registers, not including any of the interesting AArch64 ID regs.
-+         * For the most part we could leave these fields as zero with minimal
-+         * effect, since this does not affect the values seen by the guest.
-+         *
-+         * However, it could cause problems down the line for QEMU,
-+         * so provide a minimal v8.0 default.
-+         *
-+         * ??? Could read MIDR and use knowledge from cpu64.c.
-+         * ??? Could map a page of memory into our temp guest and
-+         *     run the tiniest of hand-crafted kernels to extract
-+         *     the values seen by the guest.
-+         * ??? Either of these sounds like too much effort just
-+         *     to work around running a modern host kernel.
-+         */
-+        ahcf->isar.id_aa64pfr0 = 0x00000011; /* EL1&0, AArch64 only */
-+        err = 0;
-+    } else {
-+        err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64pfr1,
-+                              ARM64_SYS_REG(3, 0, 0, 4, 1));
-+        err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64isar0,
-+                              ARM64_SYS_REG(3, 0, 0, 6, 0));
-+        err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64isar1,
-+                              ARM64_SYS_REG(3, 0, 0, 6, 1));
+     /* Old kernels may not know about the PREFERRED_TARGET ioctl: however
+@@ -71,9 +71,39 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+ 
+     err |= read_sys_reg32(fdarray[2], &midr, ARM_CP15_REG32(0, 0, 0, 0));
+     err |= read_sys_reg32(fdarray[2], &id_pfr0, ARM_CP15_REG32(0, 0, 1, 0));
+-    err |= read_sys_reg32(fdarray[2], &mvfr1,
 +
++    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar0,
++                          ARM_CP15_REG32(0, 0, 2, 0));
++    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar1,
++                          ARM_CP15_REG32(0, 0, 2, 1));
++    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar2,
++                          ARM_CP15_REG32(0, 0, 2, 2));
++    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar3,
++                          ARM_CP15_REG32(0, 0, 2, 3));
++    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar4,
++                          ARM_CP15_REG32(0, 0, 2, 4));
++    err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar5,
++                          ARM_CP15_REG32(0, 0, 2, 5));
++    if (read_sys_reg32(fdarray[2], &ahcf->isar.id_isar6,
++                       ARM_CP15_REG32(0, 0, 2, 7))) {
 +        /*
-+         * Note that if AArch32 support is not present in the host,
-+         * the AArch32 sysregs are present to be read, but will
-+         * return UNKNOWN values.  This is neither better nor worse
-+         * than skipping the reads and leaving 0, as we must avoid
-+         * considering the values in every case.
++         * Older kernels don't support reading ID_ISAR6. This register was
++         * only introduced in ARMv8, so we can assume that it is zero on a
++         * CPU that a kernel this old is running on.
 +         */
-+        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar0,
-+                              ARM64_SYS_REG(3, 0, 0, 2, 0));
-+        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar1,
-+                              ARM64_SYS_REG(3, 0, 0, 2, 1));
-+        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar2,
-+                              ARM64_SYS_REG(3, 0, 0, 2, 2));
-+        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar3,
-+                              ARM64_SYS_REG(3, 0, 0, 2, 3));
-+        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar4,
-+                              ARM64_SYS_REG(3, 0, 0, 2, 4));
-+        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar5,
-+                              ARM64_SYS_REG(3, 0, 0, 2, 5));
-+        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar6,
-+                              ARM64_SYS_REG(3, 0, 0, 2, 7));
-+
-+        err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr0,
-+                              ARM64_SYS_REG(3, 0, 0, 3, 0));
-+        err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr1,
-+                              ARM64_SYS_REG(3, 0, 0, 3, 1));
-+        err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr2,
-+                              ARM64_SYS_REG(3, 0, 0, 3, 2));
++        ahcf->isar.id_isar6 = 0;
 +    }
 +
++    err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr0,
++                          KVM_REG_ARM | KVM_REG_SIZE_U32 |
++                          KVM_REG_ARM_VFP | KVM_REG_ARM_VFP_MVFR0);
++    err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr1,
+                           KVM_REG_ARM | KVM_REG_SIZE_U32 |
+                           KVM_REG_ARM_VFP | KVM_REG_ARM_VFP_MVFR1);
++    /*
++     * FIXME: There is not yet a way to read MVFR2.
++     * Fortunately there is not yet anything in there that affects migration.
++     */
+ 
      kvm_arm_destroy_scratch_host_vcpu(fdarray);
  
-+    if (err < 0) {
-+        return false;
-+    }
-+
-    /* We can assume any KVM supporting CPU is at least a v8
-      * with VFPv4+Neon; this in turn implies most of the other
-      * feature bits.
+@@ -95,13 +125,13 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+     if (extract32(id_pfr0, 12, 4) == 1) {
+         set_feature(&features, ARM_FEATURE_THUMB2EE);
+     }
+-    if (extract32(mvfr1, 20, 4) == 1) {
++    if (extract32(ahcf->isar.mvfr1, 20, 4) == 1) {
+         set_feature(&features, ARM_FEATURE_VFP_FP16);
+     }
+-    if (extract32(mvfr1, 12, 4) == 1) {
++    if (extract32(ahcf->isar.mvfr1, 12, 4) == 1) {
+         set_feature(&features, ARM_FEATURE_NEON);
+     }
+-    if (extract32(mvfr1, 28, 4) == 1) {
++    if (extract32(ahcf->isar.mvfr1, 28, 4) == 1) {
+         /* FMAC support implies VFPv4 */
+         set_feature(&features, ARM_FEATURE_VFP4);
+     }
 -- 
 2.17.2
