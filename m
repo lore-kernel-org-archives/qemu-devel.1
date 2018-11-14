@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMvd1-00040b-Hr
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:54:48 -0500
+	(envelope-from <berto@igalia.com>) id 1gMvdD-0004B1-99
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:55:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMvd0-0007lK-99
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:54:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48678)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMvd0-0007hJ-12
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:54:46 -0500
-Date: Wed, 14 Nov 2018 13:54:33 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181114135433.GB19298@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
-	<20181114123643.24091-24-marcandre.lureau@redhat.com>
+	(envelope-from <berto@igalia.com>) id 1gMvd8-0007vK-E1
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:54:59 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181011072135.588-3-famz@redhat.com>
+References: <20181011072135.588-1-famz@redhat.com>
+	<20181011072135.588-3-famz@redhat.com>
+Date: Wed, 14 Nov 2018 14:54:51 +0100
+Message-ID: <w51tvkjkbmc.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181114123643.24091-24-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 23/41] slirp: remove unused
- HAVE_INET_ATON
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 2/3] file-posix: Drop
+ s->lock_fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +23,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed, Nov 14, 2018 at 04:36:25PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  slirp/slirp_config.h | 6 ------
->  1 file changed, 6 deletions(-)
+On Thu 11 Oct 2018 09:21:34 AM CEST, Fam Zheng wrote:
+> The lock_fd field is not strictly necessary because transferring locked
+> bytes from old fd to the new one shouldn't fail anyway. This spares the
+> user one fd per image.
+>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+One of my tests (not published yet) starts to fail after this
+patch. Here's how you can reproduce the error:
 
+$ qemu-img create -f qcow2 hd.qcow2 4G
+$ qemu-system-x86_64 -qmp stdio
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+{ "execute": "qmp_capabilities" }
+{ "execute": "blockdev-add", "arguments": {"driver": "qcow2", "node-name": "hd0", "file": {"driver": "file", "filename": "hd.qcow2", "locking": "on" }}}
+{ "execute": "human-monitor-command", "arguments": {"command-line": "qemu-io hd0 \"reopen -o file.locking=on\""}}
+{ "execute": "human-monitor-command", "arguments": {"command-line": "qemu-io hd0 \"reopen -o file.locking=off\""}}
+{ "execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
+{ "execute": "blockdev-add", "arguments": {"driver": "qcow2", "node-name": "hd0", "file": {"driver": "file", "filename": "hd.qcow2"}}}
+
+{"error": {"class": "GenericError", "desc": "Failed to get \"consistent read\" lock"}}
+
+Berto
