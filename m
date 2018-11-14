@@ -1,36 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gMyJk-0008HR-QF
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:47:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gMyN0-0002Wq-9l
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:50:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gMyJf-0007hk-N0
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:47:04 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41328)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1gMyJf-0006NO-EJ
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:46:59 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wAEGjrPi005479
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 11:46:09 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2nrpnnjr2d-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 11:46:02 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Nov 2018 16:44:55 -0000
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Nov 2018 10:44:38 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1gMyMy-0002Eh-CF
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:50:26 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38229)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gMyMw-0001rD-Hw
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:50:24 -0500
+Received: by mail-oi1-x242.google.com with SMTP id a77so8232782oii.5
+	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 08:50:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20181114164438.6412-1-mdroth@linux.vnet.ibm.com>
+In-Reply-To: <c0601dcb-142f-3033-b11f-1b951aaf0e3f@redhat.com>
+References: <20181114132931.22624-1-marcandre.lureau@redhat.com>
+	<16b78816-f2cc-a1e5-0d21-906fc2dbaa3d@redhat.com>
+	<a2d9a2fd-2c1a-66e3-86ba-17da9f564e79@redhat.com>
+	<c0601dcb-142f-3033-b11f-1b951aaf0e3f@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 14 Nov 2018 16:49:51 +0000
+Message-ID: <CAFEAcA85vaAoo9wJLC25kF00MyPrAoTu_TSZ8NXxym8q7EhArQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.1 v2] build: qga: add macro to force use
- of native mingw32 assert()
+Subject: Re: [Qemu-devel] [PATCH] vmstate: constify VMStateField
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,83 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, "open list:S390" <qemu-s390x@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-When building qemu-ga for w32 with VSS support, some parts of qemu-ga
-are not linked against glib, specifically the C++ bits used to
-create the VSS provider DLL. With 3ebee3b191e, we now define assert()
-as g_assert() for all mingw32 builds via osdep.h, which results in the
-following build breakage:
+On 14 November 2018 at 16:39, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+> Hi Thomas,
+>
+> On 14/11/18 17:29, Thomas Huth wrote:
+>> Please don't. For rationale, see:
+>> https://www.kernel.org/doc/html/v4.19/process/coding-style.html#typedefs
+>
+>
+> Thanks for the pointer, I am interested in understanding why not do that.
+> However in the link you pasted I don't see a rational about enforcing
+> constness, I understand that since this case doesn't match the 5 rules, w=
+e
+> should use 'struct VMStateField' directly and remove the typedef.
 
-  x86_64-w64-mingw32-g++ -o qga/vss-win32/qga-vss.dll qga/vss-win32/reque=
-ster.o qga/vss-win32/provider.o qga/vss-win32/install.o /home/mdroth/w/qe=
-mu4.git/qga/vss-win32/qga-vss.def  -shared -Wl,--add-stdcall-alias,--enab=
-le-stdcall-fixup -lole32 -loleaut32 -lshlwapi -luuid -static
-  qga/vss-win32/requester.o: In function `requester_freeze':
-  /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:284: undefined ref=
-erence to `g_assertion_message_expr'
-  qga/vss-win32/requester.o: In function `requester_thaw':
-  /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:508: undefined ref=
-erence to `g_assertion_message_expr'
-  /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:509: undefined ref=
-erence to `g_assertion_message_expr'
-  collect2: error: ld returned 1 exit status
-  make: *** [/home/mdroth/w/qemu4.git/qga/vss-win32/Makefile.objs:10: qga=
-/vss-win32/qga-vss.dll] Error 1
-  make: *** Waiting for unfinished jobs....
+QEMU's coding style is not the kernel's. In the kernel, yes,
+they prefer "struct foo". In QEMU we generally prefer to use
+a typedef for most structs.
 
-Fix this by introducing a USE_NATIVE_MINGW32_ASSERT macro that can
-be defined prior to inclusion of osdep.h for build targets that
-don't link against glib.
-
-Cc: Richard Henderson <richard.henderson@linaro.org>
-Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
-v2:
- * define USE_NATIVE_MINGW32_ASSERT via build recipe and avoid moving
-   #include's before osdep.h (Philippe)
----
- include/qemu/osdep.h        | 2 +-
- qga/vss-win32/Makefile.objs | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 3bf48bcdec..59364bfeb0 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -129,7 +129,7 @@ extern int daemon(int, int);
-  * code that is unreachable when features are disabled.
-  * All supported versions of Glib's g_assert() satisfy this requirement.
-  */
--#ifdef __MINGW32__
-+#if defined(__MINGW32__) && !defined(USE_NATIVE_MINGW32_ASSERT)
- #undef assert
- #define assert(x)  g_assert(x)
- #endif
-diff --git a/qga/vss-win32/Makefile.objs b/qga/vss-win32/Makefile.objs
-index 23d08da225..5773bfd868 100644
---- a/qga/vss-win32/Makefile.objs
-+++ b/qga/vss-win32/Makefile.objs
-@@ -3,7 +3,7 @@
- qga-vss-dll-obj-y +=3D requester.o provider.o install.o
-=20
- obj-qga-vss-dll-obj-y =3D $(addprefix $(obj)/, $(qga-vss-dll-obj-y))
--$(obj-qga-vss-dll-obj-y): QEMU_CXXFLAGS =3D $(filter-out -Wstrict-protot=
-ypes -Wmissing-prototypes -Wnested-externs -Wold-style-declaration -Wold-=
-style-definition -Wredundant-decls -fstack-protector-all -fstack-protecto=
-r-strong, $(QEMU_CFLAGS)) -Wno-unknown-pragmas -Wno-delete-non-virtual-dt=
-or
-+$(obj-qga-vss-dll-obj-y): QEMU_CXXFLAGS =3D $(filter-out -Wstrict-protot=
-ypes -Wmissing-prototypes -Wnested-externs -Wold-style-declaration -Wold-=
-style-definition -Wredundant-decls -fstack-protector-all -fstack-protecto=
-r-strong, $(QEMU_CFLAGS)) -Wno-unknown-pragmas -Wno-delete-non-virtual-dt=
-or -DUSE_NATIVE_MINGW32_ASSERT
-=20
- $(obj)/qga-vss.dll: LDFLAGS =3D -shared -Wl,--add-stdcall-alias,--enable=
--stdcall-fixup -lole32 -loleaut32 -lshlwapi -luuid -static
- $(obj)/qga-vss.dll: $(obj-qga-vss-dll-obj-y) $(SRC_PATH)/$(obj)/qga-vss.=
-def
---=20
-2.17.1
+thanks
+-- PMM
