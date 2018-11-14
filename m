@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuSg-0001cQ-1u
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:40:02 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuSg-0001cR-1v
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:40:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuSZ-00029O-7l
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuSa-0002AJ-PT
 	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:40:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35056)
+Received: from mx1.redhat.com ([209.132.183.28]:45476)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gMuSX-0001n8-Ct
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:39:55 -0500
+	id 1gMuSa-0001t3-I4
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:39:56 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 14 Nov 2018 16:36:14 +0400
-Message-Id: <20181114123643.24091-13-marcandre.lureau@redhat.com>
+Date: Wed, 14 Nov 2018 16:36:15 +0400
+Message-Id: <20181114123643.24091-14-marcandre.lureau@redhat.com>
 In-Reply-To: <20181114123643.24091-1-marcandre.lureau@redhat.com>
 References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.2 12/41] slirp: remove the disabled
- readv()/writev() code path
+Subject: [Qemu-devel] [PATCH for-3.2 13/41] slirp: remove HAVE_SYS_SIGNAL_H
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +30,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: samuel.thibault@ens-lyon.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The soread() function may be used on datagram sockets, and would
-provide different behaviour if HAVE_READV was set, on empty datagrams.
-This looks like a minor optimization, that never has been a strong
-goal for slirp.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/slirp_config.h |  3 ---
- slirp/socket.c       | 15 ---------------
- 2 files changed, 18 deletions(-)
+ slirp/slirp.h        | 3 ---
+ slirp/slirp_config.h | 3 ---
+ 2 files changed, 6 deletions(-)
 
+diff --git a/slirp/slirp.h b/slirp/slirp.h
+index e5abf1c594..1dbe39bc9a 100644
+--- a/slirp/slirp.h
++++ b/slirp/slirp.h
+@@ -35,9 +35,6 @@ typedef char *caddr_t;
+ #ifndef NO_UNIX_SOCKETS
+ #include <sys/un.h>
+ #endif
+-#ifdef HAVE_SYS_SIGNAL_H
+-# include <sys/signal.h>
+-#endif
+ #ifndef _WIN32
+ #include <sys/socket.h>
+ #endif
 diff --git a/slirp/slirp_config.h b/slirp/slirp_config.h
-index f0cc1c781b..3ce64e088e 100644
+index 3ce64e088e..2605c4222b 100644
 --- a/slirp/slirp_config.h
 +++ b/slirp/slirp_config.h
-@@ -29,9 +29,6 @@
- /* Define if the machine is big endian */
- //#undef HOST_WORDS_BIGENDIAN
+@@ -50,9 +50,6 @@
+ #define HAVE_ARPA_INET_H
+ #endif
 =20
--/* Define if you have readv */
--#undef HAVE_READV
+-/* Define if you have sys/signal.h */
+-#undef HAVE_SYS_SIGNAL_H
 -
- /* Define if iovec needs to be declared */
- #undef DECLARE_IOVEC
- #ifdef _WIN32
-diff --git a/slirp/socket.c b/slirp/socket.c
-index 041ec5061a..7012c7c07d 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -187,12 +187,7 @@ soread(struct socket *so)
- 	 */
- 	sopreprbuf(so, iov, &n);
+ /* Define if you have sys/stropts.h */
+ #undef HAVE_SYS_STROPTS_H
 =20
--#ifdef HAVE_READV
--	nn =3D readv(so->s, (struct iovec *)iov, n);
--	DEBUG_MISC((dfd, " ... read nn =3D %d bytes\n", nn));
--#else
- 	nn =3D qemu_recv(so->s, iov[0].iov_base, iov[0].iov_len,0);
--#endif
- 	if (nn <=3D 0) {
- 		if (nn < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN))
- 			return 0;
-@@ -226,7 +221,6 @@ soread(struct socket *so)
- 		}
- 	}
-=20
--#ifndef HAVE_READV
- 	/*
- 	 * If there was no error, try and read the second time round
- 	 * We read again if n =3D 2 (ie, there's another part of the buffer)
-@@ -244,7 +238,6 @@ soread(struct socket *so)
-         }
-=20
- 	DEBUG_MISC((dfd, " ... read nn =3D %d bytes\n", nn));
--#endif
-=20
- 	/* Update fields */
- 	sb->sb_cc +=3D nn;
-@@ -452,13 +445,7 @@ sowrite(struct socket *so)
- 	}
- 	/* Check if there's urgent data to send, and if so, send it */
-=20
--#ifdef HAVE_READV
--	nn =3D writev(so->s, (const struct iovec *)iov, n);
--
--	DEBUG_MISC((dfd, "  ... wrote nn =3D %d bytes\n", nn));
--#else
- 	nn =3D slirp_send(so, iov[0].iov_base, iov[0].iov_len,0);
--#endif
- 	/* This should never happen, but people tell me it does *shrug* */
- 	if (nn < 0 && (errno =3D=3D EAGAIN || errno =3D=3D EINTR))
- 		return 0;
-@@ -467,7 +454,6 @@ sowrite(struct socket *so)
- 		goto err_disconnected;
- 	}
-=20
--#ifndef HAVE_READV
- 	if (n =3D=3D 2 && nn =3D=3D iov[0].iov_len) {
-             int ret;
-             ret =3D slirp_send(so, iov[1].iov_base, iov[1].iov_len,0);
-@@ -475,7 +461,6 @@ sowrite(struct socket *so)
-                 nn +=3D ret;
-         }
-         DEBUG_MISC((dfd, "  ... wrote nn =3D %d bytes\n", nn));
--#endif
-=20
- 	/* Update sbuf */
- 	sb->sb_cc -=3D nn;
 --=20
 2.19.1.708.g4ede3d42df
