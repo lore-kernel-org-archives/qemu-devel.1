@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:57754)
+Received: from eggs.gnu.org ([208.118.235.92]:58981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gMtns-0006dD-0j
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:57:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1gMtr1-0000Cu-BK
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:01:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gMtnn-0000w2-B6
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:57:51 -0500
-Resent-Message-Id: <E1gMtnn-0000w2-B6@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gMtnk-0000oL-LF
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:57:47 -0500
-In-Reply-To: <20181113165247.4806-1-sameo@linux.intel.com>
-Message-ID: <154219661365.21.17247497011778008576@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <thuth@redhat.com>) id 1gMtqv-0002rh-Af
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:01:07 -0500
+References: <1542184999-11145-1-git-send-email-thuth@redhat.com>
+	<3ba66e6c-2eeb-2352-252b-75487ad91916@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <93d68204-145c-28ce-e6d0-4a67d3c55b00@redhat.com>
+Date: Wed, 14 Nov 2018 13:00:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 14 Nov 2018 03:56:55 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/13] Support disabling TCG on ARM
+In-Reply-To: <3ba66e6c-2eeb-2352-252b-75487ad91916@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add entries for missing ARM
+ boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sameo@linux.intel.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org, richard.henderson@linaro.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-devel@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Jean-Christophe Dubois <jcd@tribudubois.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-ODExMTMxNjUyNDcuNDgwNi0xLXNhbWVvQGxpbnV4LmludGVsLmNvbQpUeXBlOiBzZXJpZXMKU3Vi
-amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xM10gU3VwcG9ydCBkaXNhYmxpbmcgVENHIG9u
-IEFSTQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49
-MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
-YW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZv
-ciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAk
-KGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0t
-Zm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVu
-CiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25l
-CgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
-YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
-ICd0ZXN0JwozYWY4NjhjIHRhcmdldDogYXJtOiBEbyBub3QgYnVpbGQgVENHIG9iamVjdHMgd2hl
-biBUQ0cgaXMgb2ZmCmNiOTIyZGUgdGFyZ2V0OiBhcm06IE1ha2VmaWxlIGNsZWFudXAKNDRmZmE1
-ZSB0YXJnZXQ6IGFybTogRGVmaW5lIFRDRyBkZXBlbmRlbnQgZnVuY3Rpb25zIHdoZW4gVENHIGlz
-IGVuYWJsZWQKYjY4NzQzYSB0YXJnZXQ6IGFybTogTW92ZSB3YXRjaHBvaW50cyBBUElzIHRvIGhl
-bHBlci5jCjllMjAyOGQgdGFyZ2V0OiBhcm06IE1vdmUgQ1BVIHN0YXRlIGR1bXBpbmcgcm91dGlu
-ZXMgdG8gaGVscGVyLmMKM2E1MmUzMyB0YXJnZXQ6IGFybTogTW92ZSBhbGwgVkZQIGhlbHBlcnMg
-aW50byB0aGVpciBvd24gZmlsZQpjMzlhNDM0IHRhcmdldDogYXJtOiBSZW1vdmUgdGhlIExEU1Qg
-aGVhZGVycwo5MGQ5NzE1IHRhcmdldDogYXJtOiBNYWtlIEFSTSBUTEIgZmlsbGluZyByb3V0aW5l
-IHN0YXRpYwpmNzI2YjQxIHRhcmdldDogYXJtOiBNb3ZlIHRoZSBEQyBaVkEgaGVscGVyIGludG8g
-b3BfaGVscGVyCmZmYzQ0OWIgdGFyZ2V0OiBhcm06IE1vdmUgYWxsIGludGVycnVwdCBhbmQgZXhj
-ZXB0aW9uIGhhbmRsZXJzIGludG8gdGhlaXIgb3duIGZpbGUKYjc2ZjE2NyB0YXJnZXQ6IGFybTog
-TW92ZSBhbGwgdjdtIGhlbHBlcnMgaW50byB0aGVpciBvd24gZmlsZQo4ZjAxMGVjIHRhcmdldDog
-YXJtOiBSZW1vdmUgdW51c2VkIGhlYWRlcnMKZGZiM2Y2NCB0YXJnZXQ6IGFybTogQWRkIGNvcHly
-aWdodCBib2lsZXJwbGF0ZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8x
-MzogdGFyZ2V0OiBhcm06IEFkZCBjb3B5cmlnaHQgYm9pbGVycGxhdGUuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMi8xMzogdGFyZ2V0OiBhcm06IFJlbW92ZSB1bnVzZWQgaGVhZGVycy4uLgpDaGVja2luZyBQ
-QVRDSCAzLzEzOiB0YXJnZXQ6IGFybTogTW92ZSBhbGwgdjdtIGhlbHBlcnMgaW50byB0aGVpciBv
-d24gZmlsZS4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMTY1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDAwMiBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvMTM6IHRhcmdl
-dDogYXJtOiBNb3ZlIGFsbCBpbnRlcnJ1cHQgYW5kIGV4Y2VwdGlvbiBoYW5kbGVycyBpbnRvIHRo
-ZWlyIG93biBmaWxlLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
-IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzMyOiAKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTA5NSBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDUvMTM6IHRh
-cmdldDogYXJtOiBNb3ZlIHRoZSBEQyBaVkEgaGVscGVyIGludG8gb3BfaGVscGVyLi4uCkNoZWNr
-aW5nIFBBVENIIDYvMTM6IHRhcmdldDogYXJtOiBNYWtlIEFSTSBUTEIgZmlsbGluZyByb3V0aW5l
-IHN0YXRpYy4uLgpDaGVja2luZyBQQVRDSCA3LzEzOiB0YXJnZXQ6IGFybTogUmVtb3ZlIHRoZSBM
-RFNUIGhlYWRlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMzogdGFyZ2V0OiBhcm06IE1vdmUgYWxs
-IFZGUCBoZWxwZXJzIGludG8gdGhlaXIgb3duIGZpbGUuLi4KV0FSTklORzogYWRkZWQsIG1vdmVk
-IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojOTE2
-OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0
-ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUgbG9vcAojOTM1OiBGSUxF
-OiB0YXJnZXQvYXJtL3ZmcF9oZWxwZXIuYzoxNToKKyNkZWZpbmUgVkZQX0JJTk9QKG5hbWUpICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKK2Zsb2F0MzIg
-VkZQX0hFTFBFUihuYW1lLCBzKShmbG9hdDMyIGEsIGZsb2F0MzIgYiwgdm9pZCAqZnBzdHApICAg
-ICAgICAgIFwKK3sgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICBmbG9hdF9zdGF0dXMgKmZwc3QgPSBmcHN0
-cDsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICByZXR1cm4g
-ZmxvYXQzMl8gIyMgbmFtZShhLCBiLCBmcHN0KTsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIFwKK30gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIFwKK2Zsb2F0NjQgVkZQX0hFTFBFUihuYW1lLCBkKShmbG9h
-dDY0IGEsIGZsb2F0NjQgYiwgdm9pZCAqZnBzdHApICAgICAgICAgIFwKK3sgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IFwKKyAgICBmbG9hdF9zdGF0dXMgKmZwc3QgPSBmcHN0cDsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIFwKKyAgICByZXR1cm4gZmxvYXQ2NF8gIyMgbmFtZShhLCBiLCBm
-cHN0KTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKK30KCkVSUk9SOiBzcGFjZSBw
-cm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojMTA0ODogRklMRTog
-dGFyZ2V0L2FybS92ZnBfaGVscGVyLmM6MTI4OgorICAgIENPTlZfRlRPSSh2ZnBfdG8jI25hbWUj
-I3AsIGZ0eXBlLCBmc3osIHNpZ24sICkgICAgICAgICAgICAgICAgICAgICAgXAoKRVJST1I6IHNw
-YWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMxMDUxOiBG
-SUxFOiB0YXJnZXQvYXJtL3ZmcF9oZWxwZXIuYzoxMzE6CitGTE9BVF9DT05WUyhzaSwgaCwgdWlu
-dDMyX3QsIDE2LCApCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBw
-YXJlbnRoZXNpcyAnKScKIzEwNTI6IEZJTEU6IHRhcmdldC9hcm0vdmZwX2hlbHBlci5jOjEzMjoK
-K0ZMT0FUX0NPTlZTKHNpLCBzLCBmbG9hdDMyLCAzMiwgKQoKRVJST1I6IHNwYWNlIHByb2hpYml0
-ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMxMDUzOiBGSUxFOiB0YXJnZXQv
-YXJtL3ZmcF9oZWxwZXIuYzoxMzM6CitGTE9BVF9DT05WUyhzaSwgZCwgZmxvYXQ2NCwgNjQsICkK
-CkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcp
-JwojMTA5NTogRklMRTogdGFyZ2V0L2FybS92ZnBfaGVscGVyLmM6MTc1OgorICAgICAgICAgICAg
-ICAgICAgICAgICAgIGdldF9mbG9hdF9yb3VuZGluZ19tb2RlKGZwc3QpLCApCgpFUlJPUjogc3Bh
-Y2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzExMDA6IEZJ
-TEU6IHRhcmdldC9hcm0vdmZwX2hlbHBlci5jOjE4MDoKKyAgICAgICAgICAgICAgICAgICAgICAg
-ICBnZXRfZmxvYXRfcm91bmRpbmdfbW9kZShmcHN0KSwgKQoKdG90YWw6IDcgZXJyb3JzLCAxIHdh
-cm5pbmdzLCAxNzc4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDkvMTM6IHRhcmdldDogYXJtOiBNb3ZlIENQVSBzdGF0
-ZSBkdW1waW5nIHJvdXRpbmVzIHRvIGhlbHBlci5jLi4uCkNoZWNraW5nIFBBVENIIDEwLzEzOiB0
-YXJnZXQ6IGFybTogTW92ZSB3YXRjaHBvaW50cyBBUElzIHRvIGhlbHBlci5jLi4uCkNoZWNraW5n
-IFBBVENIIDExLzEzOiB0YXJnZXQ6IGFybTogRGVmaW5lIFRDRyBkZXBlbmRlbnQgZnVuY3Rpb25z
-IHdoZW4gVENHIGlzIGVuYWJsZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMTM6IHRhcmdldDogYXJt
-OiBNYWtlZmlsZSBjbGVhbnVwLi4uCkNoZWNraW5nIFBBVENIIDEzLzEzOiB0YXJnZXQ6IGFybTog
-RG8gbm90IGJ1aWxkIFRDRyBvYmplY3RzIHdoZW4gVENHIGlzIG9mZi4uLgo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 2018-11-14 12:57, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Thomas,
+>=20
+> On 14/11/18 9:43, Thomas Huth wrote:
+>> Add entries for the boards "mcimx6ul-evk", "mcimx7d-sabre", "raspi2",
+>> "raspi3", "sabrelite", "vexpress-a15", "vexpress-a9" and "virt".
+>> While we're at it, also adjust the "i.MX31" section a little bit,
+>> so that the wildcards there do not match anymore for unrelated files
+>> (e.g. the new hw/misc/imx6ul_ccm.c file).
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>> =C2=A0 MAINTAINERS | 70
+>> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+>> =C2=A0 1 file changed, 65 insertions(+), 5 deletions(-)
+[...]
+>> @@ -604,6 +651,12 @@ L: qemu-arm@nongnu.org
+>> =C2=A0 S: Maintained
+>> =C2=A0 F: hw/*/stellaris*
+>> =C2=A0 +Versatile Express
+>> +M: Peter Maydell <peter.maydell@linaro.org>
+>> +L: qemu-arm@nongnu.org
+>> +S: Maintained
+>=20
+> Shouldn't this be 'Supported?'
+> "Someone is actually paid to look after this."
+
+Not sure whether Peter is paid for looking after the Versatile Express
+board??
+
+>> +F: hw/arm/vexpress.c
+>> +
+>> =C2=A0 Versatile PB
+>> =C2=A0 M: Peter Maydell <peter.maydell@linaro.org>
+>> =C2=A0 L: qemu-arm@nongnu.org
+>> @@ -611,6 +664,13 @@ S: Maintained
+>> =C2=A0 F: hw/*/versatile*
+>> =C2=A0 F: hw/misc/arm_sysctl.c
+>> =C2=A0 +Virt
+>> +M: Peter Maydell <peter.maydell@linaro.org>
+>> +L: qemu-arm@nongnu.org
+>> +S: Maintained
+>=20
+> This one is certainly 'Supported'.
+
+Maybe ... Peter could you adjust this when picking up the patch?
+
+ Thanks,
+  Thomas
