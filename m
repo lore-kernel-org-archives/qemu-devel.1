@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gMrw7-0007GJ-TH
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:58:17 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gMsCD-0004OZ-DO
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 05:14:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gMrw3-0005ag-Vi
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:58:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54906)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1gMrw3-0005a3-Nq
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:58:11 -0500
-Date: Wed, 14 Nov 2018 17:58:07 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20181114095807.GB22784@magic>
-References: <20181031025712.18602-1-famz@redhat.com>
-	<4f6eb24d-fe13-cbf3-907e-6b3e566e33f4@comstyle.com>
+	(envelope-from <luc.michel@greensocs.com>) id 1gMsCC-0000tq-0i
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 05:14:53 -0500
+References: <20181110081147.4027-1-luc.michel@greensocs.com>
+	<20181110081147.4027-3-luc.michel@greensocs.com>
+	<20181113105216.GG1148@toto>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <2785510b-5db5-7ded-2404-7d5653a98764@greensocs.com>
+Date: Wed, 14 Nov 2018 11:14:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4f6eb24d-fe13-cbf3-907e-6b3e566e33f4@comstyle.com>
-Subject: Re: [Qemu-devel] [PATCH v4] tests: vm: auto_install OpenBSD
+In-Reply-To: <20181113105216.GG1148@toto>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 02/16] gdbstub: introduce GDB
+ processes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,162 +26,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brad Smith <brad@comstyle.com>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, alistair@alistair23.me, mark.burton@greensocs.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
 
-On Sun, 11/11 18:20, Brad Smith wrote:
-> ping.
+Hi Edgar,
 
-Queued. Will send a pull request soon.
+On 11/13/18 11:52 AM, Edgar E. Iglesias wrote:
+> On Sat, Nov 10, 2018 at 09:11:33AM +0100, Luc Michel wrote:
+>> Add a structure GDBProcess that represent processes from the GDB
+>> semantic point of view.
+>>
+>> CPUs can be split into different processes, by grouping them under
+>> different cpu-cluster objects.  Each occurrence of a cpu-cluster objec=
+t
+>> implies the existence of the corresponding process in the GDB stub. Th=
+e
+>> GDB process ID is derived from the corresponding cluster ID as follows=
+:
+>>
+>>   GDB PID =3D cluster ID + 1
+>>
+>> This is because PIDs -1 and 0 are reserved in GDB and cannot be used b=
+y
+>> processes.
+>>
+>> When no such container are found, all the CPUs are put in a unique GDB
+>> process (create_unique_process()). This is also the case when compiled
+>> in user mode, where multi-processes do not make much sense for now.
+>>
+>> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+>> Acked-by: Alistair Francis <alistair.francis@wdc.com>
+>> ---
+>>  gdbstub.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++++++=
++
+>>  1 file changed, 76 insertions(+)
+>>
+>> diff --git a/gdbstub.c b/gdbstub.c
+>> index c4e4f9f082..0d70b89598 100644
+>> --- a/gdbstub.c
+>> +++ b/gdbstub.c
+>> @@ -27,10 +27,11 @@
+>>  #include "monitor/monitor.h"
+>>  #include "chardev/char.h"
+>>  #include "chardev/char-fe.h"
+>>  #include "sysemu/sysemu.h"
+>>  #include "exec/gdbstub.h"
+>> +#include "hw/cpu/cluster.h"
+>>  #endif
+>> =20
+>>  #define MAX_PACKET_LENGTH 4096
+>> =20
+>>  #include "qemu/sockets.h"
+>> @@ -294,10 +295,15 @@ typedef struct GDBRegisterState {
+>>      gdb_reg_cb set_reg;
+>>      const char *xml;
+>>      struct GDBRegisterState *next;
+>>  } GDBRegisterState;
+>> =20
+>> +typedef struct GDBProcess {
+>> +    uint32_t pid;
+>> +    bool attached;
+>> +} GDBProcess;
+>> +
+>>  enum RSState {
+>>      RS_INACTIVE,
+>>      RS_IDLE,
+>>      RS_GETLINE,
+>>      RS_GETLINE_ESC,
+>> @@ -322,10 +328,13 @@ typedef struct GDBState {
+>>      int running_state;
+>>  #else
+>>      CharBackend chr;
+>>      Chardev *mon_chr;
+>>  #endif
+>> +    bool multiprocess;
+>> +    GDBProcess *processes;
+>> +    int process_num;
+>>      char syscall_buf[256];
+>>      gdb_syscall_complete_cb current_syscall_cb;
+>>  } GDBState;
+>> =20
+>>  /* By default use no IRQs and no timers while single stepping so as t=
+o
+>> @@ -1749,10 +1758,24 @@ void gdb_exit(CPUArchState *env, int code)
+>>  #ifndef CONFIG_USER_ONLY
+>>    qemu_chr_fe_deinit(&s->chr, true);
+>>  #endif
+>>  }
+>> =20
+>> +/*
+>> + * Create a unique process containing all the CPUs.
+>> + */
+>> +static void create_unique_process(GDBState *s)
+>> +{
+>> +    GDBProcess *process;
+>> +
+>> +    s->processes =3D g_malloc0(sizeof(GDBProcess));
+>> +    s->process_num =3D 1;
+>> +    process =3D &s->processes[0];
+>> +
+>> +    process->pid =3D 1;
+>> +}
+>> +
+>>  #ifdef CONFIG_USER_ONLY
+>>  int
+>>  gdb_handlesig(CPUState *cpu, int sig)
+>>  {
+>>      GDBState *s;
+>> @@ -1846,10 +1869,11 @@ static bool gdb_accept(void)
+>>      }
+>> =20
+>>      s =3D g_malloc0(sizeof(GDBState));
+>>      s->c_cpu =3D first_cpu;
+>>      s->g_cpu =3D first_cpu;
+>> +    create_unique_process(s);
+>>      s->fd =3D fd;
+>>      gdb_has_xml =3D false;
+>> =20
+>>      gdbserver_state =3D s;
+>>      return true;
+>> @@ -2002,10 +2026,58 @@ static const TypeInfo char_gdb_type_info =3D {
+>>      .name =3D TYPE_CHARDEV_GDB,
+>>      .parent =3D TYPE_CHARDEV,
+>>      .class_init =3D char_gdb_class_init,
+>>  };
+>> =20
+>> +static int find_cpu_clusters(Object *child, void *opaque)
+>> +{
+>> +    if (object_dynamic_cast(child, TYPE_CPU_CLUSTER)) {
+>> +        GDBState *s =3D (GDBState *) opaque;
+>> +        CPUClusterState *cluster =3D CPU_CLUSTER(child);
+>> +        GDBProcess *process;
+>> +
+>> +        s->processes =3D g_renew(GDBProcess, s->processes, ++s->proce=
+ss_num);
+>> +
+>> +        process =3D &s->processes[s->process_num - 1];
+>> +
+>> +        /* GDB process IDs -1 and 0 are reserved */
+>> +        process->pid =3D cluster->cluster_id + 1;
+>=20
+> This may be theoretical but since both pid and cluster_id are uint32_t
+> you may end up with 0 here.
+>=20
+> You may want to limit cluster_id's to something like the range 0 - INT3=
+2_MAX.
+That would be an efficient solution to workaround this problem. However
+it seems a bit artificial to limit the cluster_id range in the "generic"
+CPU_CLUSTER class, just for the GDB stub code to work correctly.
 
-Fam
+Another solution could be to add a `gdb_pid' property to the CPU_CLUSTER
+type, that would automatically be set to `cpu_cluster + 1' during
+realization (and customized by the platform if needed). That way, value
+0 could be explicitly forbidden in the CPU_CLUSTER API. However, Peter
+was not a big fan of having explicit GDB stuff in the platform.
 
-> 
-> On 10/30/2018 10:57 PM, Fam Zheng wrote:
-> > Upgrade OpenBSD to 6.4 using auto_install. Especially, drop SDL1,
-> > include SDL2.
-> > 
-> > Also do the build in $HOME since both /var/tmp and /tmp are tmpfs with
-> > limited capacities.
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > 
-> > ---
-> > 
-> > v4: Use 6.4. [Brad]
-> > ---
-> >   tests/vm/basevm.py |  6 ++--
-> >   tests/vm/openbsd   | 85 +++++++++++++++++++++++++++++++++++++++-------
-> >   2 files changed, 76 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> > index 5caf77d6b8..6fb446d4c5 100755
-> > --- a/tests/vm/basevm.py
-> > +++ b/tests/vm/basevm.py
-> > @@ -68,8 +68,6 @@ class BaseVM(object):
-> >           self._args = [ \
-> >               "-nodefaults", "-m", "4G",
-> >               "-cpu", "max",
-> > -            "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22",
-> > -            "-device", "virtio-net-pci,netdev=vnet",
-> >               "-vnc", "127.0.0.1:0,to=20",
-> >               "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
-> >           if vcpus and vcpus > 1:
-> > @@ -146,8 +144,10 @@ class BaseVM(object):
-> >                               "-device",
-> >                               "virtio-blk,drive=%s,serial=%s,bootindex=1" % (name, name)]
-> > -    def boot(self, img, extra_args=[]):
-> > +    def boot(self, img, extra_args=[], extra_usernet_args=""):
-> >           args = self._args + [
-> > +            "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22" + extra_usernet_args,
-> > +            "-device", "virtio-net-pci,netdev=vnet",
-> >               "-device", "VGA",
-> >               "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
-> >               "-device", "virtio-blk,drive=drive0,bootindex=0"]
-> > diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-> > index cfe0572c59..99a7e98d80 100755
-> > --- a/tests/vm/openbsd
-> > +++ b/tests/vm/openbsd
-> > @@ -14,6 +14,9 @@
-> >   import os
-> >   import sys
-> >   import subprocess
-> > +import time
-> > +import atexit
-> > +import tempfile
-> >   import basevm
-> >   class OpenBSDVM(basevm.BaseVM):
-> > @@ -21,25 +24,83 @@ class OpenBSDVM(basevm.BaseVM):
-> >       arch = "x86_64"
-> >       BUILD_SCRIPT = """
-> >           set -e;
-> > -        rm -rf /var/tmp/qemu-test.*
-> > -        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-> > +        rm -rf $HOME/qemu-test.*
-> > +        cd $(mktemp -d $HOME/qemu-test.XXXXXX);
-> >           tar -xf /dev/rsd1c;
-> > -        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
-> > +        ./configure {configure_opts};
-> >           gmake --output-sync -j{jobs} {verbose};
-> >           # XXX: "gmake check" seems to always hang or fail
-> >           #gmake --output-sync -j{jobs} check {verbose};
-> >       """
-> > +    def _install_os(self, img):
-> > +        tmpdir = tempfile.mkdtemp()
-> > +        pxeboot = self._download_with_cache("https://fastly.cdn.openbsd.org/pub/OpenBSD/6.4/amd64/pxeboot",
-> > +                sha256sum="d87ab39d941ff926d693943a927585945456ccedb76ea504a251b4b93cd4c266")
-> > +        bsd_rd = self._download_with_cache("https://fastly.cdn.openbsd.org/pub/OpenBSD/6.4/amd64/bsd.rd",
-> > +                sha256sum="89505c683cbcd75582fe475e847ed53d89e2b8180c3e3d61f4eb4b76b5e11f5c")
-> > +        install = self._download_with_cache("https://fastly.cdn.openbsd.org/pub/OpenBSD/6.4/amd64/install64.iso",
-> > +                sha256sum='81833b79e23dc0f961ac5fb34484bca66386deb3181ddb8236870fa4f488cdd2')
-> > +        subprocess.check_call(["qemu-img", "create", img, "32G"])
-> > +        subprocess.check_call(["cp", pxeboot, os.path.join(tmpdir, "auto_install")])
-> > +        subprocess.check_call(["cp", bsd_rd, os.path.join(tmpdir, "bsd")])
-> > +
-> > +        self._gen_install_conf(tmpdir)
-> > +        # BOOTP filename being auto_install makes sure OpenBSD installer
-> > +        # not prompt for "auto install mode"
-> > +        usernet_args = ",tftp=%s,bootfile=/auto_install" % tmpdir
-> > +        usernet_args += ",tftp-server-name=10.0.2.4"
-> > +        usernet_args += ",guestfwd=tcp:10.0.2.4:80-cmd:cat %s" % \
-> > +            os.path.join(tmpdir, "install.conf")
-> > +        self.boot(img,
-> > +                  extra_args=["-boot", "once=n", "-no-reboot",
-> > +                              "-cdrom", install],
-> > +                  extra_usernet_args=usernet_args)
-> > +        self.wait()
-> > +
-> > +    def _gen_install_conf(self, tmpdir):
-> > +        contents = """\
-> > +HTTP/1.0 200 OK
-> > +
-> > +System hostname = qemu-openbsd
-> > +Password for root = qemupass
-> > +Public ssh key for root = {pub_key}
-> > +Allow root ssh login = yes
-> > +Network interfaces = vio0
-> > +IPv4 address for vio0 = dhcp
-> > +Setup a user = qemu
-> > +Password for user = qemupass
-> > +Public ssh key for user = {pub_key}
-> > +What timezone are you in = US/Eastern
-> > +Server = fastly.cdn.openbsd.org
-> > +Use http = yes
-> > +Default IPv4 route = 10.0.2.2
-> > +Location of sets = cd0
-> > +Set name(s) = all
-> > +Continue without verification = yes
-> > +""".format(pub_key=basevm.SSH_PUB_KEY)
-> > +        with open(os.path.join(tmpdir, "install.conf"), "w") as f:
-> > +            f.write(contents)
-> > +
-> >       def build_image(self, img):
-> > -        cimg = self._download_with_cache("http://download.patchew.org/openbsd-6.1-amd64.img.xz",
-> > -                sha256sum='8c6cedc483e602cfee5e04f0406c64eb99138495e8ca580bc0293bcf0640c1bf')
-> > -        img_tmp_xz = img + ".tmp.xz"
-> > -        img_tmp = img + ".tmp"
-> > -        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
-> > -        subprocess.check_call(["xz", "-df", img_tmp_xz])
-> > -        if os.path.exists(img):
-> > -            os.remove(img)
-> > -        os.rename(img_tmp, img)
-> > +
-> > +        self._install_os(img + ".tmp")
-> > +
-> > +        self.boot(img + ".tmp")
-> > +        self.wait_ssh()
-> > +
-> > +        self.ssh_root("usermod -G operator qemu")
-> > +        self.ssh_root("echo https://fastly.cdn.openbsd.org/pub/OpenBSD > /etc/installurl")
-> > +        for pkg in ["git", "gmake", "glib2", "bison", "sdl2"]:
-> > +            self.ssh_root("pkg_add " + pkg)
-> > +        self.ssh_root("ln -sf /usr/local/bin/python2.7 /usr/local/bin/python")
-> > +        self.ssh_root("ln -sf /usr/local/bin/python2.7-2to3 /usr/local/bin/2to3")
-> > +        self.ssh_root("ln -sf /usr/local/bin/python2.7-config /usr/local/bin/python-config")
-> > +        self.ssh_root("ln -sf /usr/local/bin/pydoc2.7 /usr/local/bin/pydoc")
-> > +        self.ssh_root("shutdown -p now")
-> > +        self.wait()
-> > +
-> > +        subprocess.check_call(["mv", img + ".tmp", img])
-> >   if __name__ == "__main__":
-> >       sys.exit(basevm.main(OpenBSDVM))
+If somebody comes with a good compromise, I can change this. Otherwise
+if we want to be extra safe, maybe we can simply assert that cluster_id
+UINT32_MAX is not used in GDB stub.
+
+(snip)
+>> +static int pid_order(const void *a, const void *b)
+>> +{
+>> +    GDBProcess *pa =3D (GDBProcess *) a;
+>> +    GDBProcess *pb =3D (GDBProcess *) b;
+>> +
+>> +    return pa->pid - pb->pid;
+>=20
+> Similarly here, is this safe?
+> e.g:
+> pa->pid =3D 1
+> pb->pid =3D 0x80000002
+To make it safe, I think we can do explicit comparisons:
+
+if (pa->pid < pb->pid) {
+    return -1;
+} else if (pa->pid > pb->pid) {
+    return 1;
+} else {
+    return 0;
+}
+
+
+Thanks,
+Luc
+
+>=20
+>=20
+> Otherwise:
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>=20
+>=20
+>=20
+>> +}
+>> +
+>> +static void create_processes(GDBState *s)
+>> +{
+>> +    object_child_foreach(object_get_root(), find_cpu_clusters, s);
+>> +
+>> +    if (!s->processes) {
+>> +        /* No CPU cluster specified by the machine */
+>> +        create_unique_process(s);
+>> +    } else {
+>> +        /* Sort by PID */
+>> +        qsort(s->processes, s->process_num, sizeof(s->processes[0]), =
+pid_order);
+>> +    }
+>> +}
+>> +
+>> +static void cleanup_processes(GDBState *s)
+>> +{
+>> +    g_free(s->processes);
+>> +    s->process_num =3D 0;
+>> +    s->processes =3D NULL;
+>> +}
+>> +
+>>  int gdbserver_start(const char *device)
+>>  {
+>>      trace_gdbstub_op_start(device);
+>> =20
+>>      GDBState *s;
+>> @@ -2058,15 +2130,19 @@ int gdbserver_start(const char *device)
+>>                                     NULL, &error_abort);
+>>          monitor_init(mon_chr, 0);
+>>      } else {
+>>          qemu_chr_fe_deinit(&s->chr, true);
+>>          mon_chr =3D s->mon_chr;
+>> +        cleanup_processes(s);
+>>          memset(s, 0, sizeof(GDBState));
+>>          s->mon_chr =3D mon_chr;
+>>      }
+>>      s->c_cpu =3D first_cpu;
+>>      s->g_cpu =3D first_cpu;
+>> +
+>> +    create_processes(s);
+>> +
+>>      if (chr) {
+>>          qemu_chr_fe_init(&s->chr, chr, &error_abort);
+>>          qemu_chr_fe_set_handlers(&s->chr, gdb_chr_can_receive, gdb_ch=
+r_receive,
+>>                                   gdb_chr_event, NULL, NULL, NULL, tru=
+e);
+>>      }
+>> --=20
+>> 2.19.1
+>>
+>>
