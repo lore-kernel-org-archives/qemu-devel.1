@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gMtNP-00077m-Jr
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:30:32 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gMtVg-0000U4-Jz
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:39:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gMtNI-0003iQ-Ta
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:30:31 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40381)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gMtVd-0000fq-Gp
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:39:04 -0500
+Received: from mail-yb1-f196.google.com ([209.85.219.196]:46536)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gMtNI-0003dp-Fn
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:30:24 -0500
-Received: by mail-wm1-x344.google.com with SMTP id q26so4373204wmf.5
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 03:30:21 -0800 (PST)
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-2-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025172057.20414-2-cota@braap.org>
-Date: Wed, 14 Nov 2018 11:30:19 +0000
-Message-ID: <877ehfew1g.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gMtVd-0000fL-Ca
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:39:01 -0500
+Received: by mail-yb1-f196.google.com with SMTP id i17-v6so6722087ybp.13
+	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 03:39:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 01/48] cpu: introduce run_on_cpu_no_bql
+References: <CAErn8fSCPZ1YKnf0OWq98S3-GFK9-3=uWgwfMO5Hut7PiDpcrw@mail.gmail.com>
+In-Reply-To: <CAErn8fSCPZ1YKnf0OWq98S3-GFK9-3=uWgwfMO5Hut7PiDpcrw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 14 Nov 2018 12:38:49 +0100
+Message-ID: <CAAdtpL7mr=HBxtYtxce-i5d+6qCNc0NvHN3F22DTQLy3J=AUsQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] Corrected memory regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
+To: skintigh@gmail.com
+Cc: Alistair Francis <alistair@alistair23.me>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
+Hi Seth,
 
-Emilio G. Cota <cota@braap.org> writes:
-
-> This allows us to queue synchronous CPU work without the BQL.
+On Wed, Nov 14, 2018 at 8:25 AM Seth K <skintigh@gmail.com> wrote:
 >
-> Will gain a user soon.
+> I corrected these 2 memory regions based on specifications from the chip
+> manufacturer. The existing ranges seem to overlap and and cause odd
+> behavior and/or crashes when trying to set up multiple UARTs,
+> I also played with changing MAX_SERIAL_PORTS to 8 to match the hardware,
+> but I did not include that in this patch as I never fully tested its
+> effects.
+> This is my first patch, I hope I did it correctly,
+> Seth Kintigh
 
-This is also in the cpu-lock series right?
+Welcome to QEMU, and thanks for your patch :)
 
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+I checked the DocID15818 (Rev 15) datasheet for this chip and your
+patch is technically correct.
+
+I suggest the patch title as "hw/arm/stm32f205: Fix the UART and Timer
+region size" (note: use present rather than past).
+
+However for the legal stuff, the QEMU project states all patches "must
+include a Signed-off-by: line".
+Please have a look at the following page which explains everything you
+need to know in order to send useful contributions:
+https://wiki.qemu.org/Contribute/SubmitAPatch#Patch_emails_must_include_a_Signed-off-by:_line
+
 > ---
->  include/qom/cpu.h | 13 +++++++++++++
->  cpus-common.c     | 28 ++++++++++++++++++++++------
->  2 files changed, 35 insertions(+), 6 deletions(-)
+
+Note than the commit message stay in the repository history forever.
+You can add information not related to the patch below the previous
+"---" line, it will be cut out when your patch is applied to the
+repository.
+Here would go your "This is my first patch, I hope I did it correctly"
+and signature.
+
+Regards,
+
+Phil.
+
+>  hw/char/stm32f2xx_usart.c  | 2 +-
+>  hw/timer/stm32f2xx_timer.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index 204bc94056..863aa2bff1 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -877,6 +877,19 @@ bool cpu_is_stopped(CPUState *cpu);
->   */
->  void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data dat=
-a);
+> diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
+> index 032b5fda13..f3363a2952 100644
+> --- a/hw/char/stm32f2xx_usart.c
+> +++ b/hw/char/stm32f2xx_usart.c
+> @@ -202,7 +202,7 @@ static void stm32f2xx_usart_init(Object *obj)
+>      sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
 >
-> +/**
-> + * run_on_cpu_no_bql
-> + * @cpu: The vCPU to run on.
-> + * @func: The function to be executed.
-> + * @data: Data to pass to the function.
-> + *
-> + * Schedules the function @func for execution on the vCPU @cpu.
-> + * This function is run outside the BQL.
-> + * See also: run_on_cpu()
-> + */
-> +void run_on_cpu_no_bql(CPUState *cpu, run_on_cpu_func func,
-> +                       run_on_cpu_data data);
-> +
->  /**
->   * async_run_on_cpu:
->   * @cpu: The vCPU to run on.
-> diff --git a/cpus-common.c b/cpus-common.c
-> index cffb2b71ac..b478fc8741 100644
-> --- a/cpus-common.c
-> +++ b/cpus-common.c
-> @@ -144,7 +144,8 @@ static void queue_work_on_cpu(CPUState *cpu, struct q=
-emu_work_item *wi)
->      cpu_mutex_unlock(cpu);
+>      memory_region_init_io(&s->mmio, obj, &stm32f2xx_usart_ops, s,
+> -                          TYPE_STM32F2XX_USART, 0x2000);
+> +                          TYPE_STM32F2XX_USART, 0x400);
+>      sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
 >  }
 >
-> -void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data dat=
-a)
-> +static void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
-> +                          run_on_cpu_data data, bool bql)
->  {
->      struct qemu_work_item wi;
->      bool has_bql =3D qemu_mutex_iothread_locked();
-> @@ -152,12 +153,16 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func=
-, run_on_cpu_data data)
->      g_assert(no_cpu_mutex_locked());
+> diff --git a/hw/timer/stm32f2xx_timer.c b/hw/timer/stm32f2xx_timer.c
+> index 58fc7b1188..ae744d1642 100644
+> --- a/hw/timer/stm32f2xx_timer.c
+> +++ b/hw/timer/stm32f2xx_timer.c
+> @@ -308,7 +308,7 @@ static void stm32f2xx_timer_init(Object *obj)
+>      sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
 >
->      if (qemu_cpu_is_self(cpu)) {
-> -        if (has_bql) {
-> -            func(cpu, data);
-> +        if (bql) {
-> +            if (has_bql) {
-> +                func(cpu, data);
-> +            } else {
-> +                qemu_mutex_lock_iothread();
-> +                func(cpu, data);
-> +                qemu_mutex_unlock_iothread();
-> +            }
->          } else {
-> -            qemu_mutex_lock_iothread();
->              func(cpu, data);
-> -            qemu_mutex_unlock_iothread();
->          }
->          return;
->      }
-> @@ -172,7 +177,7 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, =
-run_on_cpu_data data)
->      wi.done =3D false;
->      wi.free =3D false;
->      wi.exclusive =3D false;
-> -    wi.bql =3D true;
-> +    wi.bql =3D bql;
+>      memory_region_init_io(&s->iomem, obj, &stm32f2xx_timer_ops, s,
+> -                          "stm32f2xx_timer", 0x4000);
+> +                          "stm32f2xx_timer", 0x400);
+>      sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
 >
->      cpu_mutex_lock(cpu);
->      queue_work_on_cpu_locked(cpu, &wi);
-> @@ -189,6 +194,17 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func,=
- run_on_cpu_data data)
->      }
->  }
->
-> +void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data dat=
-a)
-> +{
-> +    do_run_on_cpu(cpu, func, data, true);
-> +}
-> +
-> +void
-> +run_on_cpu_no_bql(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data d=
-ata)
-> +{
-> +    do_run_on_cpu(cpu, func, data, false);
-> +}
-> +
->  void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_da=
-ta data)
->  {
->      struct qemu_work_item *wi;
-
-
---
-Alex Benn=C3=A9e
+>      s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, stm32f2xx_timer_interrupt,
+> s);
+> --
+> 2.11.0
