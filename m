@@ -1,43 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gMyXF-0000cG-2Y
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 12:01:06 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gMyXm-0000zE-Dy
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 12:01:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gMyXA-0001Tm-TT
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 12:01:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40566)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1gMyXA-0001Rn-Lr
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 12:00:56 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wAEGwZ7W054556
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 12:00:55 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2nrqm98cm2-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 12:00:54 -0500
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 14 Nov 2018 17:00:51 -0000
-References: <20181114132931.22624-1-marcandre.lureau@redhat.com>
-	<16b78816-f2cc-a1e5-0d21-906fc2dbaa3d@redhat.com>
-	<a2d9a2fd-2c1a-66e3-86ba-17da9f564e79@redhat.com>
-	<c0601dcb-142f-3033-b11f-1b951aaf0e3f@redhat.com>
-	<CAFEAcA85vaAoo9wJLC25kF00MyPrAoTu_TSZ8NXxym8q7EhArQ@mail.gmail.com>
-	<3784d1ce-045a-59aa-bde2-7590f51196f0@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 14 Nov 2018 18:00:42 +0100
-In-Reply-To: <3784d1ce-045a-59aa-bde2-7590f51196f0@redhat.com>
-Content-Language: en-US
-Message-Id: <810a54c6-62ae-8e06-59a9-91a638addbcc@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: Quoted-printable
+	(envelope-from <alex.bennee@linaro.org>) id 1gMyXU-0001iw-Cs
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 12:01:24 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38449)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gMyXT-0001iL-RX
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 12:01:16 -0500
+Received: by mail-wm1-x344.google.com with SMTP id f2-v6so15379038wme.3
+	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 09:01:15 -0800 (PST)
+References: <20181025172057.20414-1-cota@braap.org>
+	<20181025172057.20414-10-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181025172057.20414-10-cota@braap.org>
+Date: Wed, 14 Nov 2018 17:01:13 +0000
+Message-ID: <87pnv7d25i.fsf@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] vmstate: constify VMStateField
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 09/48] tcg: reset runtime helpers when
+ flushing the code cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,40 +31,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, "open list:S390" <qemu-s390x@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
 
 
+Emilio G. Cota <cota@braap.org> writes:
 
-On 11/14/2018 05:56 PM, Thomas Huth wrote:
-> On 2018-11-14 17:49, Peter Maydell wrote:
->> On 14 November 2018 at 16:39, Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
-.com> wrote:
->>> Hi Thomas,
->>>
->>> On 14/11/18 17:29, Thomas Huth wrote:
->>>> Please don't. For rationale, see:
->>>> https://www.kernel.org/doc/html/v4.19/process/coding-style.html#typede=
-fs
->>>
->>>
->>> Thanks for the pointer, I am interested in understanding why not do tha=
-t.
->>> However in the link you pasted I don't see a rational about enforcing
->>> constness, I understand that since this case doesn't match the 5 rules,=
- we
->>> should use 'struct VMStateField' directly and remove the typedef.
->>
->> QEMU's coding style is not the kernel's. In the kernel, yes,
->> they prefer "struct foo". In QEMU we generally prefer to use
->> a typedef for most structs.
->=20
-> Yes - my point was simply: Let's do not start to hide more things beside
-> "struct" in a typedef. If I look at QEMU source code containing just a
-> "VMStateField", I expect it to be a shortcut for "struct VMStateField".
-> I'd never expect that it also contains the "const" attribute. I'm pretty
-> sure that this would cause some confusion in the future otherwise.
+> In preparation for adding plugin support. One of the clean-up
+> actions when uninstalling plugins will be to flush the code
+> cache. We'll also have to clear the runtime helpers, since
+> some of those runtime helpers may belong to the plugin
+> being uninstalled.
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  tcg/tcg.h                 |  1 +
+>  accel/tcg/translate-all.c |  1 +
+>  tcg/tcg.c                 | 21 +++++++++++++++++++++
+>  3 files changed, 23 insertions(+)
+>
+> diff --git a/tcg/tcg.h b/tcg/tcg.h
+> index 3fa434d891..2c378415d2 100644
+> --- a/tcg/tcg.h
+> +++ b/tcg/tcg.h
+> @@ -1079,6 +1079,7 @@ bool tcg_op_supported(TCGOpcode op);
+>  void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args);
+>  void tcg_gen_runtime_helper(const TCGHelperInfo *orig, TCGTemp *ret, int=
+ nargs,
+>                              TCGTemp **args);
+> +void tcg_reset_runtime_helpers(void);
 
-I agree. typedefing a struct is one thing, typedefing qualifiers in (like c=
-onst)
-is getting really unexpected.=20
+I know tcg.h doesn't have and API doc blocks but perhaps we should
+start?
+
+  /**
+   * tcg_reset_runtime_helpers:
+   *
+   * Remove all runtime registered helpers. Should only be called from a
+   * quiescent system while flushing old code.
+   */
+
+>
+>  TCGOp *tcg_emit_op(TCGOpcode opc);
+>  void tcg_op_remove(TCGContext *s, TCGOp *op);
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 038d82fdb5..c8b3e0a491 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1255,6 +1255,7 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_d=
+ata tb_flush_count)
+>
+>      qht_reset_size(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
+>      page_flush_tb();
+> +    tcg_reset_runtime_helpers();
+>
+>      tcg_region_reset_all();
+>      /* XXX: flush processor icache at this point if cache flush is
+> diff --git a/tcg/tcg.c b/tcg/tcg.c
+> index 87e02da740..a6824145b0 100644
+> --- a/tcg/tcg.c
+> +++ b/tcg/tcg.c
+> @@ -874,6 +874,7 @@ static const TCGHelperInfo all_helpers[] =3D {
+>  #include "exec/helper-tcg.h"
+>  };
+>  static struct qht helper_table;
+> +static struct qht runtime_helper_table;
+>  static bool helper_table_inited;
+>
+>  static int indirect_reg_alloc_order[ARRAY_SIZE(tcg_target_reg_alloc_orde=
+r)];
+> @@ -913,6 +914,22 @@ static void tcg_helper_insert(const TCGHelperInfo *i=
+nfo)
+>      g_assert(inserted);
+>  }
+>
+> +static void
+> +rm_from_helper_table_and_free(void *p, uint32_t h, void *userp)
+> +{
+> +    bool success;
+> +
+> +    success =3D qht_remove(&helper_table, p, h);
+> +    g_assert(success);
+> +    g_free(p);
+> +}
+> +
+> +void tcg_reset_runtime_helpers(void)
+> +{
+> +    qht_iter(&runtime_helper_table, rm_from_helper_table_and_free, NULL);
+> +    qht_reset(&runtime_helper_table);
+> +}
+> +
+>  void tcg_context_init(TCGContext *s)
+>  {
+>      int op, total_args, n, i;
+> @@ -948,6 +965,7 @@ void tcg_context_init(TCGContext *s)
+>      /* Register helpers.  */
+>      qht_init(&helper_table, tcg_helper_cmp, ARRAY_SIZE(all_helpers),
+>               QHT_MODE_AUTO_RESIZE);
+> +    qht_init(&runtime_helper_table, tcg_helper_cmp, 1, QHT_MODE_AUTO_RES=
+IZE);
+>
+>      for (i =3D 0; i < ARRAY_SIZE(all_helpers); ++i) {
+>          tcg_helper_insert(&all_helpers[i]);
+> @@ -1847,6 +1865,9 @@ void tcg_gen_runtime_helper(const TCGHelperInfo *or=
+ig, TCGTemp *ret, int nargs,
+>          if (unlikely(existing)) {
+>              g_free(info);
+>              info =3D existing;
+> +        } else {
+> +            qht_insert(&runtime_helper_table, info, hash, &existing);
+> +            g_assert(existing =3D=3D NULL);
+>          }
+>      }
+>      do_tcg_gen_callN(info, ret, nargs, args);
+
+Otherwise:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--
+Alex Benn=C3=A9e
