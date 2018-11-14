@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gMwiu-0002iH-BZ
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:04:57 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gMwoe-0004vf-Qq
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:10:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gMwiq-0003nb-9K
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:04:56 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:56228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gMwio-0003f2-8q
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:04:50 -0500
-Received: by mail-wm1-x343.google.com with SMTP id i73-v6so10505924wmd.5
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 07:04:48 -0800 (PST)
-References: <20181114130428.32326-1-asanchez@kryptoslogic.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181114130428.32326-1-asanchez@kryptoslogic.com>
-Date: Wed, 14 Nov 2018 15:04:44 +0000
-Message-ID: <87y39vd7jn.fsf@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1gMwob-0004Zf-HC
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:10:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34548)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gMwob-0004XN-9B
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:10:49 -0500
+Date: Wed, 14 Nov 2018 15:10:43 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181114151042.GA2391@work-vm>
+References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
+	<871s7nstle.fsf@dusky.pond.sub.org>
+	<e935a267-a5ae-4dd4-a1a7-064c084671ab@redhat.com>
+	<874lcjra28.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <874lcjra28.fsf@dusky.pond.sub.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hax: Support for Linux hosts
+Subject: Re: [Qemu-devel] [PATCH for-3.2 00/41] RFC: slirp: make it again a
+ standalone project
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +31,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexandro Sanchez Bach <asanchez@kryptoslogic.com>, Eduardo Habkost <ehabkost@redhat.com>, yu.ning@intel.com, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, renzo@cs.unibo.it, Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org, rjones@redhat.com, stefanha@redhat.com, samuel.thibault@ens-lyon.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Thomas Huth <thuth@redhat.com> writes:
+>=20
+> > On 2018-11-14 13:59, Markus Armbruster wrote:
+> >> Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com> writes:
+> >>=20
+> >>> Hi,
+> >>>
+> >>> Based-on: https://people.debian.org/~sthibault/qemu.git/ slirp bran=
+ch
+> >>>
+> >>> This series goal is to allow building libslirp as an independent li=
+brary.
+> >>>
+> >>> While looking at making SLIRP a seperate running process, I thought
+> >>> that having an independent library from QEMU would be a first step.
+> >>>
+> >>> There has been some attempts to make slirp a seperate project in th=
+e past.
+> >>> (https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01092.htm=
+l)
+> >>> Unfortunately, they forked from QEMU and didn't provide enough
+> >>> compatibility for QEMU to make use of it (in particular, vmstate
+> >>> handling was removed, they lost git history etc). Furthermore, they
+> >>> are not maintained as far as I can see.
+> >>>
+> >>> I would propose to make slirp a seperate project, that can initiall=
+y
+> >>> be used by QEMU as a submodule, keeping Makefile.objs until a prope=
+r
+> >>> shared library with stability guarantees etc is ready..
+> >>>
+> >>> The subproject could created by preserving git tags, and cleaning u=
+p the code style, this way:
+> >>>
+> >>> git filter-branch --tree-filter "if ls * 1> /dev/null 2>&1; then cl=
+ang-format -i * /dev/null; fi " -f --subdirectory-filter "slirp" --prune-=
+empty --tag-name-filter cat -- --all
+> >>> (my clang-format https://gist.github.com/elmarco/cb20c8d92007df0e2f=
+b8a2404678ac73)
+> >>>
+> >>> What do you think?
+> >>=20
+> >> Has the slirp code been improved to be generally useful?  I still go=
+t it
+> >> filed under "friends don't let friends use that, except for testing"=
+...
+> >
+> > The slirp code is already used in a lot of other projects:
+>=20
+> The issue I have with SLIRP isn't that it solves a useless problem (au
+> contraire!), it's that it's a useless solution.  Okay, that's an unfair
+> exaggeration, it's not useless, I just wouldn't trust it in production,
+> unless it has improved significantly since I last looked at it.
 
-Alexandro Sanchez Bach <asanchez@kryptoslogic.com> writes:
+It's now used as a critical part of 'rootless-containers' - i.e. running
+containers with no priviledges; see:
+https://github.com/rootless-containers/slirp4netns/
 
-> Intel HAXM supports now 32-bit and 64-bit Linux hosts. This patch includes
-> the corresponding userland changes.
->
-> Since the Darwin userland backend is POSIX-compliant, the hax-darwin.{c,h}
-> files have been renamed to hax-posix.{c,h}. This prefix is consistent with
-> the naming used in the rest of QEMU.
->
-> Signed-off-by: Alexandro Sanchez Bach <asanchez@kryptoslogic.com>
-> ---
->  target/i386/Makefile.objs                 |  5 ++++-
->  target/i386/hax-i386.h                    | 10 +++++++++-
->  target/i386/{hax-darwin.c =3D> hax-posix.c} |  0
->  target/i386/{hax-darwin.h =3D> hax-posix.h} |  0
->  4 files changed, 13 insertions(+), 2 deletions(-)
->  rename target/i386/{hax-darwin.c =3D> hax-posix.c} (100%)
->  rename target/i386/{hax-darwin.h =3D> hax-posix.h} (100%)
->
-> diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
-> index 04678f5503..be36d31d23 100644
-> --- a/target/i386/Makefile.objs
-> +++ b/target/i386/Makefile.objs
-> @@ -12,8 +12,11 @@ obj-$(call lnot,$(CONFIG_SEV)) +=3D sev-stub.o
->  ifdef CONFIG_WIN32
->  obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-windows.o
->  endif
-> +ifdef CONFIG_LINUX
-> +obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-posix.o
-> +endif
->  ifdef CONFIG_DARWIN
-> -obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-darwin.o
-> +obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-posix.o
+Dave
 
-This is starting to get repetitive, perhaps:
-
-  obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o
-  ifneq ($(CONFIG_LINUX)$(CONFIG_DARWIN),)
-  obj-$(CONFIG_HAX) +=3D hax-posix.o
-  endif
-  ifdef CONFIG_WIN32
-  obj-$(CONFIG_HAX) +=3D hax-windows.o
-  endif
-
-Would be better?
-
->  obj-$(CONFIG_HVF) +=3D hvf/
->  endif
->  obj-$(CONFIG_WHPX) +=3D whpx-all.o
-> diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
-> index 6abc156f88..f87a64c9df 100644
-> --- a/target/i386/hax-i386.h
-> +++ b/target/i386/hax-i386.h
-> @@ -20,6 +20,10 @@
->  typedef int hax_fd;
->  #endif
->
-> +#ifdef CONFIG_LINUX
-> +typedef int hax_fd;
-> +#endif
-
-Again this could be merged with the other POSIX like above.
-
-> +
->  #ifdef CONFIG_WIN32
->  typedef HANDLE hax_fd;
->  #endif
-> @@ -83,7 +87,11 @@ void hax_memory_init(void);
->
->
->  #ifdef CONFIG_DARWIN
-> -#include "target/i386/hax-darwin.h"
-> +#include "target/i386/hax-posix.h"
-> +#endif
-> +
-> +#ifdef CONFIG_LINUX
-> +#include "target/i386/hax-posix.h"
->  #endif
-
-And here.
-
-In fact looking at my config-host.mak we have a CONFIG_POSIX so you
-could use that.
-
->
->  #ifdef CONFIG_WIN32
-> diff --git a/target/i386/hax-darwin.c b/target/i386/hax-posix.c
-> similarity index 100%
-> rename from target/i386/hax-darwin.c
-> rename to target/i386/hax-posix.c
-> diff --git a/target/i386/hax-darwin.h b/target/i386/hax-posix.h
-> similarity index 100%
-> rename from target/i386/hax-darwin.h
-> rename to target/i386/hax-posix.h
-
-
+> > - WinUAE
+> >   (https://github.com/tonioni/WinUAE/tree/master/slirp)
+> >
+> > - Previous
+> >   (https://sourceforge.net/p/previous/code/HEAD/tree/trunk/src/slirp/=
+)
+> >
+> > - BasiliskII
+> >   (https://github.com/cebix/macemu/tree/master/BasiliskII/src/slirp)
+> >
+> > - Bochs
+> >
+> > (https://sourceforge.net/p/bochs/code/HEAD/tree/trunk/bochs/iodev/net=
+work/slirp/)
+> >
+> > ... and likely many more. AFAIK they all (or at least most) have been
+> > forked from the QEMU code at one point in time and diverged, i.e. the=
+y
+> > likely missed the bug fixes and new features that have been added in
+> > QEMU (like IPv6). So yes, IMHO it makes a lot of sense to try to make=
+ a
+> > separate library out of the slirp code again, especially if we could
+> > convince the other projects to use it, too, and to collaborate on tha=
+t
+> > version.
+>=20
+> No objections to spinning it out, as long as it comes with a fair
+> assessment of its limitations.
+>=20
+> Turning it into a proper project might even improve its chances to
+> get improved towards production quality, compared to its current
+> existence as a corner of QEMU next to nobody wants to touch.
+>=20
 --
-Alex Benn=C3=A9e
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
