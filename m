@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1gMqa6-0008Uk-Rp
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:31:30 -0500
+	(envelope-from <xiezhide@huawei.com>) id 1gMqav-0000SZ-TZ
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:32:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1gMqa1-0007LD-Nn
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:31:26 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34866)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
-	id 1gMqa1-0007Fo-A1
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:31:21 -0500
-Received: by mail-wm1-x343.google.com with SMTP id t15-v6so13922135wmt.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 00:31:20 -0800 (PST)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Wed, 14 Nov 2018 10:31:09 +0200
-Message-Id: <20181114083109.13181-1-yuri.benditovich@daynix.com>
-Subject: [Qemu-devel] [PATCH v3] virtio-net: support RSC v4/v6 tcp traffic
- for Windows HCK
+	(envelope-from <xiezhide@huawei.com>) id 1gMqaq-0007ny-57
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:32:17 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2293 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gMqao-0007l8-M8
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:32:12 -0500
+From: xiezhide <xiezhide@huawei.com>
+Date: Wed, 14 Nov 2018 08:31:59 +0000
+Message-ID: <A02D6AA901860840B46E751C5E9E38B43CC97202@DGGEML532-MBX.china.huawei.com>
+References: <cover.1542110461.git.xiezhide@huawei.com>
+	<457f3168eca2d041bbfcad822ad9004e29a3840c.1542110461.git.xiezhide@huawei.com>
+	<e14ebd78-b622-fc98-7317-c6ce63be8f60@redhat.com>
+In-Reply-To: <e14ebd78-b622-fc98-7317-c6ce63be8f60@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] fsdev-throttle-qmp: refactor code
+ for qmp interface for io throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,955 +30,250 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, jasowang@redhat.com, dmitry.fleytman@gmail.com, qemu-devel@nongnu.org
-Cc: yan@daynix.com
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "groug@kaod.org" <groug@kaod.org>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>, "armbru@redhat.com" <armbru@redhat.com>, "berto@igalia.com" <berto@igalia.com>, zengcanfu 00215970 <zengcanfu@huawei.com>, Jinxuefeng <jinxuefeng@huawei.com>, "Chenhui (Felix, Euler)" <chenhui.rtos@huawei.com>
 
-This commit adds implementation of RX packets
-coalescing, compatible with requirements of Windows
-Hardware compatibility kit.
-
-The device enables feature VIRTIO_NET_F_RSC_EXT in
-host features if it supports extended RSC functionality
-as defined in the specification.
-This feature requires at least one of VIRTIO_NET_F_GUEST_TSO4,
-VIRTIO_NET_F_GUEST_TSO6. Windows guest driver acks
-this feature only if VIRTIO_NET_F_CTRL_GUEST_OFFLOADS
-is also present.
-
-If the guest driver acks VIRTIO_NET_F_RSC_EXT feature,
-the device coalesces TCPv4 and TCPv6 packets (if
-respective VIRTIO_NET_F_GUEST_TSO feature is on,
-populates extended RSC information in virtio header
-and sets VIRTIO_NET_HDR_F_RSC_INFO bit in header flags.
-The device does not recalculate checksums in the coalesced
-packet, so they are not valid.
-
-In this case:
-All the data packets in a tcp connection are cached
-to a single buffer in every receive interval, and will
-be sent out via a timer, the 'virtio_net_rsc_timeout'
-controls the interval, this value may impact the
-performance and response time of tcp connection,
-50000(50us) is an experience value to gain a performance
-improvement, since the whql test sends packets every 100us,
-so '300000(300us)' passes the test case, it is the default
-value as well, tune it via the command line parameter
-'rsc_interval' within 'virtio-net-pci' device, for example,
-to launch a guest with interval set as '500000':
-
-'virtio-net-pci,netdev=hostnet1,bus=pci.0,id=net1,mac=00,
-guest_rsc_ext=on,rsc_interval=500000'
-
-The timer will only be triggered if the packets pool is not empty,
-and it'll drain off all the cached packets.
-
-'NetRscChain' is used to save the segments of IPv4/6 in a
-VirtIONet device.
-
-A new segment becomes a 'Candidate' as well as it passed sanity check,
-the main handler of TCP includes TCP window update, duplicated
-ACK check and the real data coalescing.
-
-An 'Candidate' segment means:
-1. Segment is within current window and the sequence is the expected one.
-2. 'ACK' of the segment is in the valid window.
-
-Sanity check includes:
-1. Incorrect version in IP header
-2. An IP options or IP fragment
-3. Not a TCP packet
-4. Sanity size check to prevent buffer overflow attack.
-5. An ECN packet
-
-Even though, there might more cases should be considered such as
-ip identification other flags, while it breaks the test because
-windows set it to the same even it's not a fragment.
-
-Normally it includes 2 typical ways to handle a TCP control flag,
-'bypass' and 'finalize', 'bypass' means should be sent out directly,
-while 'finalize' means the packets should also be bypassed, but this
-should be done after search for the same connection packets in the
-pool and drain all of them out, this is to avoid out of order fragment.
-
-All the 'SYN' packets will be bypassed since this always begin a new'
-connection, other flags such 'URG/FIN/RST/CWR/ECE' will trigger a
-finalization, because this normally happens upon a connection is going
-to be closed, an 'URG' packet also finalize current coalescing unit.
-
-Statistics can be used to monitor the basic coalescing status, the
-'out of order' and 'out of window' means how many retransmitting packets,
-thus describe the performance intuitively.
-
-Difference between ip v4 and v6 processing:
- Fragment length in ipv4 header includes itself, while it's not
- included for ipv6, thus means ipv6 can carry a real 65535 payload.
-
-Note that main goal of implementing this feature in software
-is to create reference setup for certification tests. In such
-setups guest migration is not required, so the coalesced packets
-not yet delivered to the guest will be lost in case of migration.
-
-Signed-off-by: Wei Xu <wexu@redhat.com>
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- hw/net/virtio-net.c            | 667 ++++++++++++++++++++++++++++++++-
- include/hw/virtio/virtio-net.h |  83 ++++
- include/net/eth.h              |   2 +
- 3 files changed, 751 insertions(+), 1 deletion(-)
-
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 385b1a03e9..5a3952f84b 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -41,6 +41,47 @@
- #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
- #define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
- 
-+#define VIRTIO_NET_IP4_ADDR_SIZE   8        /* ipv4 saddr + daddr */
-+
-+#define VIRTIO_NET_TCP_FLAG         0x3F
-+#define VIRTIO_NET_TCP_HDR_LENGTH   0xF000
-+
-+/* IPv4 max payload, 16 bits in the header */
-+#define VIRTIO_NET_MAX_IP4_PAYLOAD (65535 - sizeof(struct ip_header))
-+#define VIRTIO_NET_MAX_TCP_PAYLOAD 65535
-+
-+/* header length value in ip header without option */
-+#define VIRTIO_NET_IP4_HEADER_LENGTH 5
-+
-+#define VIRTIO_NET_IP6_ADDR_SIZE   32      /* ipv6 saddr + daddr */
-+#define VIRTIO_NET_MAX_IP6_PAYLOAD VIRTIO_NET_MAX_TCP_PAYLOAD
-+
-+/* Purge coalesced packets timer interval, This value affects the performance
-+   a lot, and should be tuned carefully, '300000'(300us) is the recommended
-+   value to pass the WHQL test, '50000' can gain 2x netperf throughput with
-+   tso/gso/gro 'off'. */
-+#define VIRTIO_NET_RSC_DEFAULT_INTERVAL 300000
-+
-+/* temporary until standard header include it */
-+#if !defined(VIRTIO_NET_HDR_F_RSC_INFO)
-+
-+#define VIRTIO_NET_HDR_F_RSC_INFO  4 /* rsc_ext data in csum_ fields */
-+#define VIRTIO_NET_F_RSC_EXT       38
-+
-+static inline __virtio16 *virtio_net_rsc_ext_num_packets(
-+    struct virtio_net_hdr *hdr)
-+{
-+    return &hdr->csum_start;
-+}
-+
-+static inline __virtio16 *virtio_net_rsc_ext_num_dupacks(
-+    struct virtio_net_hdr *hdr)
-+{
-+    return &hdr->csum_offset;
-+}
-+
-+#endif
-+
- /*
-  * Calculate the number of bytes up to and including the given 'field' of
-  * 'container'.
-@@ -628,6 +669,7 @@ static uint64_t virtio_net_get_features(VirtIODevice *vdev, uint64_t features,
-     if (!get_vhost_net(nc->peer)) {
-         return features;
-     }
-+
-     features = vhost_net_get_features(get_vhost_net(nc->peer), features);
-     vdev->backend_features = features;
- 
-@@ -701,6 +743,11 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
-                                virtio_has_feature(features,
-                                                   VIRTIO_F_VERSION_1));
- 
-+    n->rsc4_enabled = virtio_has_feature(features, VIRTIO_NET_F_RSC_EXT) &&
-+        virtio_has_feature(features, VIRTIO_NET_F_GUEST_TSO4);
-+    n->rsc6_enabled = virtio_has_feature(features, VIRTIO_NET_F_RSC_EXT) &&
-+        virtio_has_feature(features, VIRTIO_NET_F_GUEST_TSO6);
-+
-     if (n->has_vnet_hdr) {
-         n->curr_guest_offloads =
-             virtio_net_guest_offloads_by_features(features);
-@@ -781,6 +828,12 @@ static int virtio_net_handle_offloads(VirtIONet *n, uint8_t cmd,
-             return VIRTIO_NET_ERR;
-         }
- 
-+        n->rsc4_enabled = virtio_has_feature(offloads, VIRTIO_NET_F_RSC_EXT) &&
-+            virtio_has_feature(offloads, VIRTIO_NET_F_GUEST_TSO4);
-+        n->rsc6_enabled = virtio_has_feature(offloads, VIRTIO_NET_F_RSC_EXT) &&
-+            virtio_has_feature(offloads, VIRTIO_NET_F_GUEST_TSO6);
-+        virtio_clear_feature(&offloads, VIRTIO_NET_F_RSC_EXT);
-+
-         supported_offloads = virtio_net_supported_guest_offloads(n);
-         if (offloads & ~supported_offloads) {
-             return VIRTIO_NET_ERR;
-@@ -1292,7 +1345,7 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-     return size;
- }
- 
--static ssize_t virtio_net_receive(NetClientState *nc, const uint8_t *buf,
-+static ssize_t virtio_net_do_receive(NetClientState *nc, const uint8_t *buf,
-                                   size_t size)
- {
-     ssize_t r;
-@@ -1303,6 +1356,612 @@ static ssize_t virtio_net_receive(NetClientState *nc, const uint8_t *buf,
-     return r;
- }
- 
-+static void virtio_net_rsc_extract_unit4(VirtioNetRscChain *chain,
-+                                         const uint8_t *buf,
-+                                         VirtioNetRscUnit *unit)
-+{
-+    uint16_t ip_hdrlen;
-+    struct ip_header *ip;
-+
-+    ip = (struct ip_header *)(buf + chain->n->guest_hdr_len
-+                              + sizeof(struct eth_header));
-+    unit->ip = (void *)ip;
-+    ip_hdrlen = (ip->ip_ver_len & 0xF) << 2;
-+    unit->ip_plen = &ip->ip_len;
-+    unit->tcp = (struct tcp_header *)(((uint8_t *)unit->ip) + ip_hdrlen);
-+    unit->tcp_hdrlen = (htons(unit->tcp->th_offset_flags) & 0xF000) >> 10;
-+    unit->payload = htons(*unit->ip_plen) - ip_hdrlen - unit->tcp_hdrlen;
-+}
-+
-+static void virtio_net_rsc_extract_unit6(VirtioNetRscChain *chain,
-+                                         const uint8_t *buf,
-+                                         VirtioNetRscUnit *unit)
-+{
-+    struct ip6_header *ip6;
-+
-+    ip6 = (struct ip6_header *)(buf + chain->n->guest_hdr_len
-+                                 + sizeof(struct eth_header));
-+    unit->ip = ip6;
-+    unit->ip_plen = &(ip6->ip6_ctlun.ip6_un1.ip6_un1_plen);
-+    unit->tcp = (struct tcp_header *)(((uint8_t *)unit->ip)\
-+                                        + sizeof(struct ip6_header));
-+    unit->tcp_hdrlen = (htons(unit->tcp->th_offset_flags) & 0xF000) >> 10;
-+
-+    /* There is a difference between payload lenght in ipv4 and v6,
-+       ip header is excluded in ipv6 */
-+    unit->payload = htons(*unit->ip_plen) - unit->tcp_hdrlen;
-+}
-+
-+static size_t virtio_net_rsc_drain_seg(VirtioNetRscChain *chain,
-+                                       VirtioNetRscSeg *seg)
-+{
-+    int ret;
-+    struct virtio_net_hdr *h;
-+
-+    h = (struct virtio_net_hdr *)seg->buf;
-+    h->flags = 0;
-+    h->gso_type = VIRTIO_NET_HDR_GSO_NONE;
-+
-+    if (seg->is_coalesced) {
-+        *virtio_net_rsc_ext_num_packets(h) = seg->packets;
-+        *virtio_net_rsc_ext_num_dupacks(h) = seg->dup_ack;
-+        h->flags = VIRTIO_NET_HDR_F_RSC_INFO;
-+        if (chain->proto == ETH_P_IP) {
-+            h->gso_type = VIRTIO_NET_HDR_GSO_TCPV4;
-+        } else {
-+            h->gso_type = VIRTIO_NET_HDR_GSO_TCPV6;
-+        }
-+    }
-+
-+    ret = virtio_net_do_receive(seg->nc, seg->buf, seg->size);
-+    QTAILQ_REMOVE(&chain->buffers, seg, next);
-+    g_free(seg->buf);
-+    g_free(seg);
-+
-+    return ret;
-+}
-+
-+static void virtio_net_rsc_purge(void *opq)
-+{
-+    VirtioNetRscSeg *seg, *rn;
-+    VirtioNetRscChain *chain = (VirtioNetRscChain *)opq;
-+
-+    QTAILQ_FOREACH_SAFE(seg, &chain->buffers, next, rn) {
-+        if (virtio_net_rsc_drain_seg(chain, seg) == 0) {
-+            chain->stat.purge_failed++;
-+            continue;
-+        }
-+    }
-+
-+    chain->stat.timer++;
-+    if (!QTAILQ_EMPTY(&chain->buffers)) {
-+        timer_mod(chain->drain_timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_HOST) + chain->n->rsc_timeout);
-+    }
-+}
-+
-+static void virtio_net_rsc_cleanup(VirtIONet *n)
-+{
-+    VirtioNetRscChain *chain, *rn_chain;
-+    VirtioNetRscSeg *seg, *rn_seg;
-+
-+    QTAILQ_FOREACH_SAFE(chain, &n->rsc_chains, next, rn_chain) {
-+        QTAILQ_FOREACH_SAFE(seg, &chain->buffers, next, rn_seg) {
-+            QTAILQ_REMOVE(&chain->buffers, seg, next);
-+            g_free(seg->buf);
-+            g_free(seg);
-+        }
-+
-+        timer_del(chain->drain_timer);
-+        timer_free(chain->drain_timer);
-+        QTAILQ_REMOVE(&n->rsc_chains, chain, next);
-+        g_free(chain);
-+    }
-+}
-+
-+static void virtio_net_rsc_cache_buf(VirtioNetRscChain *chain,
-+                                     NetClientState *nc,
-+                                     const uint8_t *buf, size_t size)
-+{
-+    uint16_t hdr_len;
-+    VirtioNetRscSeg *seg;
-+
-+    hdr_len = chain->n->guest_hdr_len;
-+    seg = g_malloc(sizeof(VirtioNetRscSeg));
-+    seg->buf = g_malloc(hdr_len + sizeof(struct eth_header)
-+        + sizeof(struct ip6_header) + VIRTIO_NET_MAX_TCP_PAYLOAD);
-+    memcpy(seg->buf, buf, size);
-+    seg->size = size;
-+    seg->packets = 1;
-+    seg->dup_ack = 0;
-+    seg->is_coalesced = 0;
-+    seg->nc = nc;
-+
-+    QTAILQ_INSERT_TAIL(&chain->buffers, seg, next);
-+    chain->stat.cache++;
-+
-+    switch (chain->proto) {
-+    case ETH_P_IP:
-+        virtio_net_rsc_extract_unit4(chain, seg->buf, &seg->unit);
-+        break;
-+    case ETH_P_IPV6:
-+        virtio_net_rsc_extract_unit6(chain, seg->buf, &seg->unit);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
-+static int32_t virtio_net_rsc_handle_ack(VirtioNetRscChain *chain,
-+                                         VirtioNetRscSeg *seg,
-+                                         const uint8_t *buf,
-+                                         struct tcp_header *n_tcp,
-+                                         struct tcp_header *o_tcp)
-+{
-+    uint32_t nack, oack;
-+    uint16_t nwin, owin;
-+
-+    nack = htonl(n_tcp->th_ack);
-+    nwin = htons(n_tcp->th_win);
-+    oack = htonl(o_tcp->th_ack);
-+    owin = htons(o_tcp->th_win);
-+
-+    if ((nack - oack) >= VIRTIO_NET_MAX_TCP_PAYLOAD) {
-+        chain->stat.ack_out_of_win++;
-+        return RSC_FINAL;
-+    } else if (nack == oack) {
-+        /* duplicated ack or window probe */
-+        if (nwin == owin) {
-+            /* duplicated ack, add dup ack count due to whql test up to 1 */
-+            chain->stat.dup_ack++;
-+            return RSC_FINAL;
-+        } else {
-+            /* Coalesce window update */
-+            o_tcp->th_win = n_tcp->th_win;
-+            chain->stat.win_update++;
-+            return RSC_COALESCE;
-+        }
-+    } else {
-+        /* pure ack, go to 'C', finalize*/
-+        chain->stat.pure_ack++;
-+        return RSC_FINAL;
-+    }
-+}
-+
-+static int32_t virtio_net_rsc_coalesce_data(VirtioNetRscChain *chain,
-+                                            VirtioNetRscSeg *seg,
-+                                            const uint8_t *buf,
-+                                            VirtioNetRscUnit *n_unit)
-+{
-+    void *data;
-+    uint16_t o_ip_len;
-+    uint32_t nseq, oseq;
-+    VirtioNetRscUnit *o_unit;
-+
-+    o_unit = &seg->unit;
-+    o_ip_len = htons(*o_unit->ip_plen);
-+    nseq = htonl(n_unit->tcp->th_seq);
-+    oseq = htonl(o_unit->tcp->th_seq);
-+
-+    /* out of order or retransmitted. */
-+    if ((nseq - oseq) > VIRTIO_NET_MAX_TCP_PAYLOAD) {
-+        chain->stat.data_out_of_win++;
-+        return RSC_FINAL;
-+    }
-+
-+    data = ((uint8_t *)n_unit->tcp) + n_unit->tcp_hdrlen;
-+    if (nseq == oseq) {
-+        if ((o_unit->payload == 0) && n_unit->payload) {
-+            /* From no payload to payload, normal case, not a dup ack or etc */
-+            chain->stat.data_after_pure_ack++;
-+            goto coalesce;
-+        } else {
-+            return virtio_net_rsc_handle_ack(chain, seg, buf,
-+                                             n_unit->tcp, o_unit->tcp);
-+        }
-+    } else if ((nseq - oseq) != o_unit->payload) {
-+        /* Not a consistent packet, out of order */
-+        chain->stat.data_out_of_order++;
-+        return RSC_FINAL;
-+    } else {
-+coalesce:
-+        if ((o_ip_len + n_unit->payload) > chain->max_payload) {
-+            chain->stat.over_size++;
-+            return RSC_FINAL;
-+        }
-+
-+        /* Here comes the right data, the payload length in v4/v6 is different,
-+           so use the field value to update and record the new data len */
-+        o_unit->payload += n_unit->payload; /* update new data len */
-+
-+        /* update field in ip header */
-+        *o_unit->ip_plen = htons(o_ip_len + n_unit->payload);
-+
-+        /* Bring 'PUSH' big, the whql test guide says 'PUSH' can be coalesced
-+           for windows guest, while this may change the behavior for linux
-+           guest (only if it uses RSC feature). */
-+        o_unit->tcp->th_offset_flags = n_unit->tcp->th_offset_flags;
-+
-+        o_unit->tcp->th_ack = n_unit->tcp->th_ack;
-+        o_unit->tcp->th_win = n_unit->tcp->th_win;
-+
-+        memmove(seg->buf + seg->size, data, n_unit->payload);
-+        seg->size += n_unit->payload;
-+        seg->packets++;
-+        chain->stat.coalesced++;
-+        return RSC_COALESCE;
-+    }
-+}
-+
-+static int32_t virtio_net_rsc_coalesce4(VirtioNetRscChain *chain,
-+                                        VirtioNetRscSeg *seg,
-+                                        const uint8_t *buf, size_t size,
-+                                        VirtioNetRscUnit *unit)
-+{
-+    struct ip_header *ip1, *ip2;
-+
-+    ip1 = (struct ip_header *)(unit->ip);
-+    ip2 = (struct ip_header *)(seg->unit.ip);
-+    if ((ip1->ip_src ^ ip2->ip_src) || (ip1->ip_dst ^ ip2->ip_dst)
-+        || (unit->tcp->th_sport ^ seg->unit.tcp->th_sport)
-+        || (unit->tcp->th_dport ^ seg->unit.tcp->th_dport)) {
-+        chain->stat.no_match++;
-+        return RSC_NO_MATCH;
-+    }
-+
-+    return virtio_net_rsc_coalesce_data(chain, seg, buf, unit);
-+}
-+
-+static int32_t virtio_net_rsc_coalesce6(VirtioNetRscChain *chain,
-+                                        VirtioNetRscSeg *seg,
-+                                        const uint8_t *buf, size_t size,
-+                                        VirtioNetRscUnit *unit)
-+{
-+    struct ip6_header *ip1, *ip2;
-+
-+    ip1 = (struct ip6_header *)(unit->ip);
-+    ip2 = (struct ip6_header *)(seg->unit.ip);
-+    if (memcmp(&ip1->ip6_src, &ip2->ip6_src, sizeof(struct in6_address))
-+        || memcmp(&ip1->ip6_dst, &ip2->ip6_dst, sizeof(struct in6_address))
-+        || (unit->tcp->th_sport ^ seg->unit.tcp->th_sport)
-+        || (unit->tcp->th_dport ^ seg->unit.tcp->th_dport)) {
-+            chain->stat.no_match++;
-+            return RSC_NO_MATCH;
-+    }
-+
-+    return virtio_net_rsc_coalesce_data(chain, seg, buf, unit);
-+}
-+
-+/* Packets with 'SYN' should bypass, other flag should be sent after drain
-+ * to prevent out of order */
-+static int virtio_net_rsc_tcp_ctrl_check(VirtioNetRscChain *chain,
-+                                         struct tcp_header *tcp)
-+{
-+    uint16_t tcp_hdr;
-+    uint16_t tcp_flag;
-+
-+    tcp_flag = htons(tcp->th_offset_flags);
-+    tcp_hdr = (tcp_flag & VIRTIO_NET_TCP_HDR_LENGTH) >> 10;
-+    tcp_flag &= VIRTIO_NET_TCP_FLAG;
-+    tcp_flag = htons(tcp->th_offset_flags) & 0x3F;
-+    if (tcp_flag & TH_SYN) {
-+        chain->stat.tcp_syn++;
-+        return RSC_BYPASS;
-+    }
-+
-+    if (tcp_flag & (TH_FIN | TH_URG | TH_RST | TH_ECE | TH_CWR)) {
-+        chain->stat.tcp_ctrl_drain++;
-+        return RSC_FINAL;
-+    }
-+
-+    if (tcp_hdr > sizeof(struct tcp_header)) {
-+        chain->stat.tcp_all_opt++;
-+        return RSC_FINAL;
-+    }
-+
-+    return RSC_CANDIDATE;
-+}
-+
-+static size_t virtio_net_rsc_do_coalesce(VirtioNetRscChain *chain,
-+                                         NetClientState *nc,
-+                                         const uint8_t *buf, size_t size,
-+                                         VirtioNetRscUnit *unit)
-+{
-+    int ret;
-+    VirtioNetRscSeg *seg, *nseg;
-+
-+    if (QTAILQ_EMPTY(&chain->buffers)) {
-+        chain->stat.empty_cache++;
-+        virtio_net_rsc_cache_buf(chain, nc, buf, size);
-+        timer_mod(chain->drain_timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_HOST) + chain->n->rsc_timeout);
-+        return size;
-+    }
-+
-+    QTAILQ_FOREACH_SAFE(seg, &chain->buffers, next, nseg) {
-+        if (chain->proto == ETH_P_IP) {
-+            ret = virtio_net_rsc_coalesce4(chain, seg, buf, size, unit);
-+        } else {
-+            ret = virtio_net_rsc_coalesce6(chain, seg, buf, size, unit);
-+        }
-+
-+        if (ret == RSC_FINAL) {
-+            if (virtio_net_rsc_drain_seg(chain, seg) == 0) {
-+                /* Send failed */
-+                chain->stat.final_failed++;
-+                return 0;
-+            }
-+
-+            /* Send current packet */
-+            return virtio_net_do_receive(nc, buf, size);
-+        } else if (ret == RSC_NO_MATCH) {
-+            continue;
-+        } else {
-+            /* Coalesced, mark coalesced flag to tell calc cksum for ipv4 */
-+            seg->is_coalesced = 1;
-+            return size;
-+        }
-+    }
-+
-+    chain->stat.no_match_cache++;
-+    virtio_net_rsc_cache_buf(chain, nc, buf, size);
-+    return size;
-+}
-+
-+/* Drain a connection data, this is to avoid out of order segments */
-+static size_t virtio_net_rsc_drain_flow(VirtioNetRscChain *chain,
-+                                        NetClientState *nc,
-+                                        const uint8_t *buf, size_t size,
-+                                        uint16_t ip_start, uint16_t ip_size,
-+                                        uint16_t tcp_port)
-+{
-+    VirtioNetRscSeg *seg, *nseg;
-+    uint32_t ppair1, ppair2;
-+
-+    ppair1 = *(uint32_t *)(buf + tcp_port);
-+    QTAILQ_FOREACH_SAFE(seg, &chain->buffers, next, nseg) {
-+        ppair2 = *(uint32_t *)(seg->buf + tcp_port);
-+        if (memcmp(buf + ip_start, seg->buf + ip_start, ip_size)
-+            || (ppair1 != ppair2)) {
-+            continue;
-+        }
-+        if (virtio_net_rsc_drain_seg(chain, seg) == 0) {
-+            chain->stat.drain_failed++;
-+        }
-+
-+        break;
-+    }
-+
-+    return virtio_net_do_receive(nc, buf, size);
-+}
-+
-+static int32_t virtio_net_rsc_sanity_check4(VirtioNetRscChain *chain,
-+                                            struct ip_header *ip,
-+                                            const uint8_t *buf, size_t size)
-+{
-+    uint16_t ip_len;
-+
-+    /* Not an ipv4 packet */
-+    if (((ip->ip_ver_len & 0xF0) >> 4) != IP_HEADER_VERSION_4) {
-+        chain->stat.ip_option++;
-+        return RSC_BYPASS;
-+    }
-+
-+    /* Don't handle packets with ip option */
-+    if ((ip->ip_ver_len & 0xF) != VIRTIO_NET_IP4_HEADER_LENGTH) {
-+        chain->stat.ip_option++;
-+        return RSC_BYPASS;
-+    }
-+
-+    if (ip->ip_p != IPPROTO_TCP) {
-+        chain->stat.bypass_not_tcp++;
-+        return RSC_BYPASS;
-+    }
-+
-+    /* Don't handle packets with ip fragment */
-+    if (!(htons(ip->ip_off) & IP_DF)) {
-+        chain->stat.ip_frag++;
-+        return RSC_BYPASS;
-+    }
-+
-+    /* Don't handle packets with ecn flag */
-+    if (IPTOS_ECN(ip->ip_tos)) {
-+        chain->stat.ip_ecn++;
-+        return RSC_BYPASS;
-+    }
-+
-+    ip_len = htons(ip->ip_len);
-+    if (ip_len < (sizeof(struct ip_header) + sizeof(struct tcp_header))
-+        || ip_len > (size - chain->n->guest_hdr_len -
-+                     sizeof(struct eth_header))) {
-+        chain->stat.ip_hacked++;
-+        return RSC_BYPASS;
-+    }
-+
-+    return RSC_CANDIDATE;
-+}
-+
-+static size_t virtio_net_rsc_receive4(VirtioNetRscChain *chain,
-+                                      NetClientState *nc,
-+                                      const uint8_t *buf, size_t size)
-+{
-+    int32_t ret;
-+    uint16_t hdr_len;
-+    VirtioNetRscUnit unit;
-+
-+    hdr_len = ((VirtIONet *)(chain->n))->guest_hdr_len;
-+
-+    if (size < (hdr_len + sizeof(struct eth_header) + sizeof(struct ip_header)
-+        + sizeof(struct tcp_header))) {
-+        chain->stat.bypass_not_tcp++;
-+        return virtio_net_do_receive(nc, buf, size);
-+    }
-+
-+    virtio_net_rsc_extract_unit4(chain, buf, &unit);
-+    if (virtio_net_rsc_sanity_check4(chain, unit.ip, buf, size)
-+        != RSC_CANDIDATE) {
-+        return virtio_net_do_receive(nc, buf, size);
-+    }
-+
-+    ret = virtio_net_rsc_tcp_ctrl_check(chain, unit.tcp);
-+    if (ret == RSC_BYPASS) {
-+        return virtio_net_do_receive(nc, buf, size);
-+    } else if (ret == RSC_FINAL) {
-+        return virtio_net_rsc_drain_flow(chain, nc, buf, size,
-+                ((hdr_len + sizeof(struct eth_header)) + 12),
-+                VIRTIO_NET_IP4_ADDR_SIZE,
-+                hdr_len + sizeof(struct eth_header) + sizeof(struct ip_header));
-+    }
-+
-+    return virtio_net_rsc_do_coalesce(chain, nc, buf, size, &unit);
-+}
-+
-+static int32_t virtio_net_rsc_sanity_check6(VirtioNetRscChain *chain,
-+                                            struct ip6_header *ip6,
-+                                            const uint8_t *buf, size_t size)
-+{
-+    uint16_t ip_len;
-+
-+    if (((ip6->ip6_ctlun.ip6_un1.ip6_un1_flow & 0xF0) >> 4)
-+        != IP_HEADER_VERSION_6) {
-+        return RSC_BYPASS;
-+    }
-+
-+    /* Both option and protocol is checked in this */
-+    if (ip6->ip6_ctlun.ip6_un1.ip6_un1_nxt != IPPROTO_TCP) {
-+        chain->stat.bypass_not_tcp++;
-+        return RSC_BYPASS;
-+    }
-+
-+    ip_len = htons(ip6->ip6_ctlun.ip6_un1.ip6_un1_plen);
-+    if (ip_len < sizeof(struct tcp_header) ||
-+        ip_len > (size - chain->n->guest_hdr_len - sizeof(struct eth_header)
-+                  - sizeof(struct ip6_header))) {
-+        chain->stat.ip_hacked++;
-+        return RSC_BYPASS;
-+    }
-+
-+    /* Don't handle packets with ecn flag */
-+    if (IP6_ECN(ip6->ip6_ctlun.ip6_un3.ip6_un3_ecn)) {
-+        chain->stat.ip_ecn++;
-+        return RSC_BYPASS;
-+    }
-+
-+    return RSC_CANDIDATE;
-+}
-+
-+static size_t virtio_net_rsc_receive6(void *opq, NetClientState *nc,
-+                                      const uint8_t *buf, size_t size)
-+{
-+    int32_t ret;
-+    uint16_t hdr_len;
-+    VirtioNetRscChain *chain;
-+    VirtioNetRscUnit unit;
-+
-+    chain = (VirtioNetRscChain *)opq;
-+    hdr_len = ((VirtIONet *)(chain->n))->guest_hdr_len;
-+
-+    if (size < (hdr_len + sizeof(struct eth_header) + sizeof(struct ip6_header)
-+        + sizeof(tcp_header))) {
-+        return virtio_net_do_receive(nc, buf, size);
-+    }
-+
-+    virtio_net_rsc_extract_unit6(chain, buf, &unit);
-+    if (RSC_CANDIDATE != virtio_net_rsc_sanity_check6(chain,
-+                                                 unit.ip, buf, size)) {
-+        return virtio_net_do_receive(nc, buf, size);
-+    }
-+
-+    ret = virtio_net_rsc_tcp_ctrl_check(chain, unit.tcp);
-+    if (ret == RSC_BYPASS) {
-+        return virtio_net_do_receive(nc, buf, size);
-+    } else if (ret == RSC_FINAL) {
-+        return virtio_net_rsc_drain_flow(chain, nc, buf, size,
-+                ((hdr_len + sizeof(struct eth_header)) + 8),
-+                VIRTIO_NET_IP6_ADDR_SIZE,
-+                hdr_len + sizeof(struct eth_header)
-+                + sizeof(struct ip6_header));
-+    }
-+
-+    return virtio_net_rsc_do_coalesce(chain, nc, buf, size, &unit);
-+}
-+
-+static VirtioNetRscChain *virtio_net_rsc_lookup_chain(VirtIONet *n,
-+                                                      NetClientState *nc,
-+                                                      uint16_t proto)
-+{
-+    VirtioNetRscChain *chain;
-+
-+    if ((proto != (uint16_t)ETH_P_IP) && (proto != (uint16_t)ETH_P_IPV6)) {
-+        return NULL;
-+    }
-+
-+    QTAILQ_FOREACH(chain, &n->rsc_chains, next) {
-+        if (chain->proto == proto) {
-+            return chain;
-+        }
-+    }
-+
-+    chain = g_malloc(sizeof(*chain));
-+    chain->n = n;
-+    chain->proto = proto;
-+    if (proto == (uint16_t)ETH_P_IP) {
-+        chain->max_payload = VIRTIO_NET_MAX_IP4_PAYLOAD;
-+        chain->gso_type = VIRTIO_NET_HDR_GSO_TCPV4;
-+    } else {
-+        chain->max_payload = VIRTIO_NET_MAX_IP6_PAYLOAD;
-+        chain->gso_type = VIRTIO_NET_HDR_GSO_TCPV6;
-+    }
-+    chain->drain_timer = timer_new_ns(QEMU_CLOCK_HOST,
-+                                      virtio_net_rsc_purge, chain);
-+    memset(&chain->stat, 0, sizeof(chain->stat));
-+
-+    QTAILQ_INIT(&chain->buffers);
-+    QTAILQ_INSERT_TAIL(&n->rsc_chains, chain, next);
-+
-+    return chain;
-+}
-+
-+static ssize_t virtio_net_rsc_receive(NetClientState *nc,
-+                                      const uint8_t *buf,
-+                                      size_t size)
-+{
-+    uint16_t proto;
-+    VirtioNetRscChain *chain;
-+    struct eth_header *eth;
-+    VirtIONet *n;
-+
-+    n = qemu_get_nic_opaque(nc);
-+    if (size < (n->host_hdr_len + sizeof(struct eth_header))) {
-+        return virtio_net_do_receive(nc, buf, size);
-+    }
-+
-+    eth = (struct eth_header *)(buf + n->guest_hdr_len);
-+    proto = htons(eth->h_proto);
-+
-+    chain = virtio_net_rsc_lookup_chain(n, nc, proto);
-+    if (chain) {
-+        chain->stat.received++;
-+        if (proto == (uint16_t)ETH_P_IP && n->rsc4_enabled) {
-+            return virtio_net_rsc_receive4(chain, nc, buf, size);
-+        } else if (proto == (uint16_t)ETH_P_IPV6 && n->rsc6_enabled) {
-+            return virtio_net_rsc_receive6(chain, nc, buf, size);
-+        }
-+    }
-+    return virtio_net_do_receive(nc, buf, size);
-+}
-+
-+static ssize_t virtio_net_receive(NetClientState *nc, const uint8_t *buf,
-+                                  size_t size)
-+{
-+    VirtIONet *n = qemu_get_nic_opaque(nc);
-+    if ((n->rsc4_enabled || n->rsc6_enabled)) {
-+        return virtio_net_rsc_receive(nc, buf, size);
-+    } else {
-+        return virtio_net_do_receive(nc, buf, size);
-+    }
-+}
-+
- static int32_t virtio_net_flush_tx(VirtIONetQueue *q);
- 
- static void virtio_net_tx_complete(NetClientState *nc, ssize_t len)
-@@ -2075,6 +2734,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
-     nc = qemu_get_queue(n->nic);
-     nc->rxfilter_notify_enabled = 1;
- 
-+    QTAILQ_INIT(&n->rsc_chains);
-     n->qdev = dev;
- }
- 
-@@ -2104,6 +2764,7 @@ static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
-     timer_free(n->announce_timer);
-     g_free(n->vqs);
-     qemu_del_nic(n->nic);
-+    virtio_net_rsc_cleanup(n);
-     virtio_cleanup(vdev);
- }
- 
-@@ -2184,6 +2845,10 @@ static Property virtio_net_properties[] = {
-     DEFINE_PROP_BIT64("ctrl_guest_offloads", VirtIONet, host_features,
-                     VIRTIO_NET_F_CTRL_GUEST_OFFLOADS, true),
-     DEFINE_PROP_BIT64("mq", VirtIONet, host_features, VIRTIO_NET_F_MQ, false),
-+    DEFINE_PROP_BIT64("guest_rsc_ext", VirtIONet, host_features,
-+                    VIRTIO_NET_F_RSC_EXT, false),
-+    DEFINE_PROP_UINT32("rsc_interval", VirtIONet, rsc_timeout,
-+                       VIRTIO_NET_RSC_DEFAULT_INTERVAL),
-     DEFINE_NIC_PROPERTIES(VirtIONet, nic_conf),
-     DEFINE_PROP_UINT32("x-txtimer", VirtIONet, net_conf.txtimer,
-                        TX_TIMER_INTERVAL),
-diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-index 4d7f3c82ca..c7ec1a755f 100644
---- a/include/hw/virtio/virtio-net.h
-+++ b/include/hw/virtio/virtio-net.h
-@@ -44,6 +44,83 @@ typedef struct virtio_net_conf
-     uint8_t duplex;
- } virtio_net_conf;
- 
-+/* Coalesced packets type & status */
-+typedef enum {
-+    RSC_COALESCE,           /* Data been coalesced */
-+    RSC_FINAL,              /* Will terminate current connection */
-+    RSC_NO_MATCH,           /* No matched in the buffer pool */
-+    RSC_BYPASS,             /* Packet to be bypass, not tcp, tcp ctrl, etc */
-+    RSC_CANDIDATE                /* Data want to be coalesced */
-+} CoalesceStatus;
-+
-+typedef struct VirtioNetRscStat {
-+    uint32_t received;
-+    uint32_t coalesced;
-+    uint32_t over_size;
-+    uint32_t cache;
-+    uint32_t empty_cache;
-+    uint32_t no_match_cache;
-+    uint32_t win_update;
-+    uint32_t no_match;
-+    uint32_t tcp_syn;
-+    uint32_t tcp_ctrl_drain;
-+    uint32_t dup_ack;
-+    uint32_t dup_ack1;
-+    uint32_t dup_ack2;
-+    uint32_t pure_ack;
-+    uint32_t ack_out_of_win;
-+    uint32_t data_out_of_win;
-+    uint32_t data_out_of_order;
-+    uint32_t data_after_pure_ack;
-+    uint32_t bypass_not_tcp;
-+    uint32_t tcp_option;
-+    uint32_t tcp_all_opt;
-+    uint32_t ip_frag;
-+    uint32_t ip_ecn;
-+    uint32_t ip_hacked;
-+    uint32_t ip_option;
-+    uint32_t purge_failed;
-+    uint32_t drain_failed;
-+    uint32_t final_failed;
-+    int64_t  timer;
-+} VirtioNetRscStat;
-+
-+/* Rsc unit general info used to checking if can coalescing */
-+typedef struct VirtioNetRscUnit {
-+    void *ip;   /* ip header */
-+    uint16_t *ip_plen;      /* data len pointer in ip header field */
-+    struct tcp_header *tcp; /* tcp header */
-+    uint16_t tcp_hdrlen;    /* tcp header len */
-+    uint16_t payload;       /* pure payload without virtio/eth/ip/tcp */
-+} VirtioNetRscUnit;
-+
-+/* Coalesced segmant */
-+typedef struct VirtioNetRscSeg {
-+    QTAILQ_ENTRY(VirtioNetRscSeg) next;
-+    void *buf;
-+    size_t size;
-+    uint16_t packets;
-+    uint16_t dup_ack;
-+    bool is_coalesced;      /* need recal ipv4 header checksum, mark here */
-+    VirtioNetRscUnit unit;
-+    NetClientState *nc;
-+} VirtioNetRscSeg;
-+
-+struct VirtIONet;
-+typedef struct VirtIONet VirtIONet;
-+
-+/* Chain is divided by protocol(ipv4/v6) and NetClientInfo */
-+typedef struct VirtioNetRscChain {
-+    QTAILQ_ENTRY(VirtioNetRscChain) next;
-+    VirtIONet *n;                            /* VirtIONet */
-+    uint16_t proto;
-+    uint8_t  gso_type;
-+    uint16_t max_payload;
-+    QEMUTimer *drain_timer;
-+    QTAILQ_HEAD(, VirtioNetRscSeg) buffers;
-+    VirtioNetRscStat stat;
-+} VirtioNetRscChain;
-+
- /* Maximum packet size we can receive from tap device: header + 64k */
- #define VIRTIO_NET_MAX_BUFSIZE (sizeof(struct virtio_net_hdr) + (64 * KiB))
- 
-@@ -66,12 +143,18 @@ typedef struct VirtIONet {
-     VirtIONetQueue *vqs;
-     VirtQueue *ctrl_vq;
-     NICState *nic;
-+    /* RSC Chains - temporary storage of coalesced data,
-+       all these data are lost in case of migration */
-+    QTAILQ_HEAD(, VirtioNetRscChain) rsc_chains;
-     uint32_t tx_timeout;
-     int32_t tx_burst;
-     uint32_t has_vnet_hdr;
-     size_t host_hdr_len;
-     size_t guest_hdr_len;
-     uint64_t host_features;
-+    uint32_t rsc_timeout;
-+    uint8_t rsc4_enabled;
-+    uint8_t rsc6_enabled;
-     uint8_t has_ufo;
-     uint32_t mergeable_rx_bufs;
-     uint8_t promisc;
-diff --git a/include/net/eth.h b/include/net/eth.h
-index e6dc8a7ba0..7f45c678e7 100644
---- a/include/net/eth.h
-+++ b/include/net/eth.h
-@@ -177,6 +177,8 @@ struct tcp_hdr {
- #define TH_PUSH 0x08
- #define TH_ACK  0x10
- #define TH_URG  0x20
-+#define TH_ECE  0x40
-+#define TH_CWR  0x80
-     u_short th_win;      /* window */
-     u_short th_sum;      /* checksum */
-     u_short th_urp;      /* urgent pointer */
--- 
-2.17.1
+DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBFcmljIEJsYWtlIFttYWlsdG86
+ZWJsYWtlQHJlZGhhdC5jb21dIA0KU2VudDogMjAxOOW5tDEx5pyIMTTml6UgNzoyNQ0KVG86IHhp
+ZXpoaWRlIDx4aWV6aGlkZUBodWF3ZWkuY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3JnDQpDYzog
+Z3JvdWdAa2FvZC5vcmc7IGFuZWVzaC5rdW1hckBsaW51eC52bmV0LmlibS5jb207IGFybWJydUBy
+ZWRoYXQuY29tOyBiZXJ0b0BpZ2FsaWEuY29tOyB6ZW5nY2FuZnUgMDAyMTU5NzAgPHplbmdjYW5m
+dUBodWF3ZWkuY29tPjsgSmlueHVlZmVuZyA8amlueHVlZmVuZ0BodWF3ZWkuY29tPjsgQ2hlbnlp
+IChqb2hubnksIFJUT1MpIDxqb2hubnkuY2hlbnlpQGh1YXdlaS5jb20+DQpTdWJqZWN0OiBSZTog
+W1BBVENIIHYyIDEvM10gZnNkZXYtdGhyb3R0bGUtcW1wOiByZWZhY3RvciBjb2RlIGZvciBxbXAg
+aW50ZXJmYWNlIGZvciBpbyB0aHJvdHRsaW5nDQoNCk9uIDExLzEzLzE4IDY6MTIgQU0sIHhpZXpo
+aWRlIHdyb3RlOg0KPiBUaGlzIHBhdGNoIGluY2x1ZGVzIHR3byBwYXJ0czoNCj4gMS4gZmFjdG9y
+IG91dCB0aHJvdHRsZSBjb2RlIHRvIHJldXNlIGNvZGUgMi4gdXNlIFRocm90dGxlTGltaXRzIA0K
+PiBzdHJ1Y3R1cmUNCg0KQW55IHRpbWUgeW91ciBwYXRjaCBtZW50aW9ucyB0d28gaW5kZXBlbmRl
+bnQgdGhpbmdzLCB5b3UgaGF2ZSB0byBhc2sgaWYgdGhhdCBjYW4gYmUgdHdvIGluZGVwZW5kZW50
+IHBhdGNoZXMuICBJdCdzIGZpbmUgaWYgdGhleSBhcmUgdG8gaW50ZXJ0d2luZWQgdG8gc2VwYXJh
+dGUsIGJ1dCBnaXZpbmcgbW9yZSBqdXN0aWZpY2F0aW9uIG5ldmVyIGh1cnRzLg0KDQoNCj4gDQo+
+IFNpZ25lZC1vZmYtYnk6IHhpZXpoaWRlIDx4aWV6aGlkZUBodWF3ZWkuY29tPg0KPiAtLS0NCj4g
+ICBNYWtlZmlsZSAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIwICsrKy0NCj4gICBNYWtlZmls
+ZS5vYmpzICAgICAgICAgICAgICAgICAgIHwgICA4ICsrDQo+ICAgYmxvY2svdGhyb3R0bGUuYyAg
+ICAgICAgICAgICAgICB8ICAgNiArLQ0KPiAgIGJsb2NrZGV2LmMgICAgICAgICAgICAgICAgICAg
+ICAgfCAgOTYgKy0tLS0tLS0tLS0tLS0tLS0NCj4gICBpbmNsdWRlL3FlbXUvdGhyb3R0bGUtb3B0
+aW9ucy5oIHwgICAzICstDQo+ICAgaW5jbHVkZS9xZW11L3Rocm90dGxlLmggICAgICAgICB8ICAg
+NCArLQ0KPiAgIGluY2x1ZGUvcWVtdS90eXBlZGVmcy5oICAgICAgICAgfCAgIDEgKw0KPiAgIHFh
+cGkvYmxvY2stY29yZS5qc29uICAgICAgICAgICAgfCAxMjIgKy0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQ0KPiAgIHFhcGkvZnNkZXYuanNvbiAgICAgICAgICAgICAgICAgfCAgMjAgKysrKw0KPiAgIHFh
+cGkvcWFwaS1zY2hlbWEuanNvbiAgICAgICAgICAgfCAgIDEgKw0KPiAgIHFhcGkvdGxpbWl0cy5q
+c29uICAgICAgICAgICAgICAgfCAgODkgKysrKysrKysrKysrKysrKw0KPiAgIHV0aWwvdGhyb3R0
+bGUuYyAgICAgICAgICAgICAgICAgfCAyMjQgKysrKysrKysrKysrKysrKysrKysrKysrKystLS0t
+LS0tLS0tLS0tLQ0KPiAgIDEyIGZpbGVzIGNoYW5nZWQsIDI5OCBpbnNlcnRpb25zKCspLCAyOTYg
+ZGVsZXRpb25zKC0pDQo+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IHFhcGkvZnNkZXYuanNvbg0KPiAg
+IGNyZWF0ZSBtb2RlIDEwMDY0NCBxYXBpL3RsaW1pdHMuanNvbg0KDQpTdGlsbCBmZWVscyBiaWc7
+IEkgZG9uJ3Qga25vdyBpZiBpdCBjYW4gYmUgZWFzaWx5IHNwbGl0IGludG8gZWFzaWVyLXRvLW1h
+bmFnZSBwYXRjaGVzLCBidXQgaXQgbWF5IGJlIHdvcnRoIHRoZSBlZmZvcnQuICBGb3IgZXhhbXBs
+ZSwgd2h5IGFyZSB5b3UgYWRkaW5nIGJvdGggZnNkZXYuanNvbiBBTkQgdGxpbWl0cy5qc29uIGlu
+IHRoZSBzYW1lIHBhdGNoPw0KDQotLS0tLVNwbGl0IHRoaXMgcGF0Y2ggaW50byB0d28gcGF0Y2hl
+cywgb25lIGZvciBmYWN0b3IgcGFyYW1ldGVyIHBhcnNlIGNvZGUsIGFuZCBhbm90aGVyIG9uZSBm
+b3IgbW92ZSBUaHJvdHRsZUxpbWl0IHN0cnVjdCB0byBhIG5ldyBmaWxlDQoNCj4gDQo+IGRpZmYg
+LS1naXQgYS9NYWtlZmlsZSBiL01ha2VmaWxlDQo+IGluZGV4IGYyOTQ3MTguLjlhZTI0NjAgMTAw
+NjQ0DQo+IC0tLSBhL01ha2VmaWxlDQo+ICsrKyBiL01ha2VmaWxlDQo+IEBAIC05NCw2ICs5NCw3
+IEBAIEdFTkVSQVRFRF9GSUxFUyArPSBxYXBpL3FhcGktdHlwZXMtYmxvY2stY29yZS5oIHFhcGkv
+cWFwaS10eXBlcy1ibG9jay1jb3JlLmMNCj4gICBHRU5FUkFURURfRklMRVMgKz0gcWFwaS9xYXBp
+LXR5cGVzLWJsb2NrLmggcWFwaS9xYXBpLXR5cGVzLWJsb2NrLmMNCj4gICBHRU5FUkFURURfRklM
+RVMgKz0gcWFwaS9xYXBpLXR5cGVzLWNoYXIuaCBxYXBpL3FhcGktdHlwZXMtY2hhci5jDQo+ICAg
+R0VORVJBVEVEX0ZJTEVTICs9IHFhcGkvcWFwaS10eXBlcy1jb21tb24uaCBxYXBpL3FhcGktdHlw
+ZXMtY29tbW9uLmMNCj4gK0dFTkVSQVRFRF9GSUxFUyArPSBxYXBpL3FhcGktdHlwZXMtdGxpbWl0
+cy5oIA0KPiArcWFwaS9xYXBpLXR5cGVzLXRsaW1pdHMuYw0KPiAgIEdFTkVSQVRFRF9GSUxFUyAr
+PSBxYXBpL3FhcGktdHlwZXMtY3J5cHRvLmggcWFwaS9xYXBpLXR5cGVzLWNyeXB0by5jDQo+ICAg
+R0VORVJBVEVEX0ZJTEVTICs9IHFhcGkvcWFwaS10eXBlcy1pbnRyb3NwZWN0LmggcWFwaS9xYXBp
+LXR5cGVzLWludHJvc3BlY3QuYw0KPiAgIEdFTkVSQVRFRF9GSUxFUyArPSBxYXBpL3FhcGktdHlw
+ZXMtam9iLmggcWFwaS9xYXBpLXR5cGVzLWpvYi5jDQoNCltIbW0gLSBhZ2VzIGFnbywgSSB0aHJl
+YXRlbmVkIHRvIHJlZmFjdG9yIHRoaXMgc28gdGhlcmUgd2FzIGEgbG90IGxlc3MgbWFudWFsIGR1
+cGxpY2F0aW9uIHdoZW4gYWRkaW5nIGEgbmV3IGZpbGUuIEkgc2hvdWxkIHJldHVybiB0byB0aGF0
+IHRocmVhZF0NCg0KLS0tLS0tU291bmRzIGdvb2QsICBhIGxpdHRsZSBjb21wbGljYXRlZCB0byBh
+ZGQgYSBuZXcgZmlsZSBhdCBwcmVzZW50DQoNClBsZWFzZSBrZWVwIHRoaXMgbGlzdCBxdWFzaS1z
+b3J0ZWQgKHRsaW1pdHMgZG9lcyBOT1QgZmFsbCBiZXR3ZWVuIGNvbW1vbiBhbmQgY3J5cHRvLCBi
+dXQgbGF0ZXIgaW4gdGhlIGxpc3QpLg0KDQo+IEBAIC0xMDcsMTIgKzEwOCwxNCBAQCBHRU5FUkFU
+RURfRklMRVMgKz0gcWFwaS9xYXBpLXR5cGVzLXRwbS5oIHFhcGkvcWFwaS10eXBlcy10cG0uYw0K
+PiAgIEdFTkVSQVRFRF9GSUxFUyArPSBxYXBpL3FhcGktdHlwZXMtdHJhY2UuaCBxYXBpL3FhcGkt
+dHlwZXMtdHJhY2UuYw0KPiAgIEdFTkVSQVRFRF9GSUxFUyArPSBxYXBpL3FhcGktdHlwZXMtdHJh
+bnNhY3Rpb24uaCBxYXBpL3FhcGktdHlwZXMtdHJhbnNhY3Rpb24uYw0KPiAgIEdFTkVSQVRFRF9G
+SUxFUyArPSBxYXBpL3FhcGktdHlwZXMtdWkuaCBxYXBpL3FhcGktdHlwZXMtdWkuYw0KPiArR0VO
+RVJBVEVEX0ZJTEVTICs9IHFhcGkvcWFwaS10eXBlcy1mc2Rldi5oIHFhcGkvcWFwaS10eXBlcy1m
+c2Rldi5jDQoNCkxpa2V3aXNlLCBmc2RldiBzaG91bGQgYXBwZWFyIGVhcmxpZXIsIHdheSBiZWZv
+cmUgdWkuDQoNCg0KPiBAQCAtNTk4LDcgKzYwNiw5IEBAIHFhcGktbW9kdWxlcyA9ICQoU1JDX1BB
+VEgpL3FhcGkvcWFwaS1zY2hlbWEuanNvbiAkKFNSQ19QQVRIKS9xYXBpL2NvbW1vbi5qc29uIFwN
+Cj4gICAgICAgICAgICAgICAgICAkKFNSQ19QQVRIKS9xYXBpL3RwbS5qc29uIFwNCj4gICAgICAg
+ICAgICAgICAgICAkKFNSQ19QQVRIKS9xYXBpL3RyYWNlLmpzb24gXA0KPiAgICAgICAgICAgICAg
+ICAgICQoU1JDX1BBVEgpL3FhcGkvdHJhbnNhY3Rpb24uanNvbiBcDQo+IC0gICAgICAgICAgICAg
+ICAkKFNSQ19QQVRIKS9xYXBpL3VpLmpzb24NCj4gKyAgICAgICAgICAgICAgICQoU1JDX1BBVEgp
+L3FhcGkvdWkuanNvbiBcDQo+ICsgICAgICAgICAgICAgICAkKFNSQ19QQVRIKS9xYXBpL2ZzZGV2
+Lmpzb24gXA0KPiArICAgICAgICAgICAgICAgJChTUkNfUEFUSCkvcWFwaS90bGltaXRzLmpzb24N
+Cg0KQW5vdGhlciBzb3J0ZWQgbGlzdCB0aGF0IHlvdSBtYW5hZ2VkIHRvIHNjcmFtYmxlLg0KDQo+
+ICsrKyBiL01ha2VmaWxlLm9ianMNCj4gQEAgLTgsNiArOCw3IEBAIHV0aWwtb2JqLXkgKz0gcWFw
+aS9xYXBpLXR5cGVzLWJsb2NrLWNvcmUubw0KPiAgIHV0aWwtb2JqLXkgKz0gcWFwaS9xYXBpLXR5
+cGVzLWJsb2NrLm8NCj4gICB1dGlsLW9iai15ICs9IHFhcGkvcWFwaS10eXBlcy1jaGFyLm8NCj4g
+ICB1dGlsLW9iai15ICs9IHFhcGkvcWFwaS10eXBlcy1jb21tb24ubw0KPiArdXRpbC1vYmoteSAr
+PSBxYXBpL3FhcGktdHlwZXMtdGxpbWl0cy5vDQo+ICAgdXRpbC1vYmoteSArPSBxYXBpL3FhcGkt
+dHlwZXMtY3J5cHRvLm8NCg0KQW5kIG1vcmUgaW5zdGFuY2VzIG9mIHBvb3Igc29ydGluZy4NCg0K
+PiArKysgYi9ibG9jay90aHJvdHRsZS5jDQo+IEBAIC00MSw3ICs0MSw3IEBAIHN0YXRpYyBRZW11
+T3B0c0xpc3QgdGhyb3R0bGVfb3B0cyA9IHsNCj4gICAgKiBAZ3JvdXAgYW5kIG11c3QgYmUgZnJl
+ZWQgYnkgdGhlIGNhbGxlci4NCj4gICAgKiBJZiB0aGVyZSdzIGFuIGVycm9yIHRoZW4gQGdyb3Vw
+IHJlbWFpbnMgdW5tb2RpZmllZC4NCj4gICAgKi8NCj4gLXN0YXRpYyBpbnQgdGhyb3R0bGVfcGFy
+c2Vfb3B0aW9ucyhRRGljdCAqb3B0aW9ucywgY2hhciAqKmdyb3VwLCBFcnJvciANCj4gKiplcnJw
+KQ0KPiArc3RhdGljIGludCB0aHJvdHRsZV9wYXJzZV9ncm91cChRRGljdCAqb3B0aW9ucywgY2hh
+ciAqKmdyb3VwLCBFcnJvciANCj4gKyoqZXJycCkNCg0KV2h5IHRoZSBmdW5jdGlvbiByZW5hbWU/
+IENhbiB0aGF0IGJlIGl0cyBvd24gcGF0Y2g/DQotLS0tLVRvIHZvaWQgZnVuY3Rpb24gbmFtZSBj
+b25mbGljdCwgd2UgdXNlIHRocm90dGxlX3BhcnNlX29wdGlvbnMgZnVuY3Rpb24gZm9yIGNvbW1v
+biBwdXJwb3NlDQoNCj4gKysrIGIvYmxvY2tkZXYuYw0KPiBAQCAtNDAwLDQ4ICs0MDAsNyBAQCBz
+dGF0aWMgdm9pZCBleHRyYWN0X2NvbW1vbl9ibG9ja2Rldl9vcHRpb25zKFFlbXVPcHRzICpvcHRz
+LCBpbnQgKmJkcnZfZmxhZ3MsDQo+ICAgICAgIH0NCj4gICANCj4gICAgICAgaWYgKHRocm90dGxl
+X2NmZykgew0KPiAtICAgICAgICB0aHJvdHRsZV9jb25maWdfaW5pdCh0aHJvdHRsZV9jZmcpOw0K
+PiAtICAgICAgICB0aHJvdHRsZV9jZmctPmJ1Y2tldHNbVEhST1RUTEVfQlBTX1RPVEFMXS5hdmcg
+PQ0KPiAtICAgICAgICAgICAgcWVtdV9vcHRfZ2V0X251bWJlcihvcHRzLCAidGhyb3R0bGluZy5i
+cHMtdG90YWwiLCAwKTsNCg0KPiAtICAgICAgICB0aHJvdHRsZV9jZmctPm9wX3NpemUgPQ0KPiAt
+ICAgICAgICAgICAgcWVtdV9vcHRfZ2V0X251bWJlcihvcHRzLCAidGhyb3R0bGluZy5pb3BzLXNp
+emUiLCAwKTsNCj4gKyAgICAgICAgdGhyb3R0bGVfcGFyc2Vfb3B0aW9ucyh0aHJvdHRsZV9jZmcs
+IG9wdHMpOw0KDQpPa2F5LCBoZXJlLCBpdCBsb29rcyBsaWtlIHlvdSBhcmUgZG9pbmcgYSBjb2Rl
+IG1vdGlvbiByZWZhY3RvciAtIHRha2luZyBsb3RzIG9mIGxpbmVzIG9mIGNvZGUsIGFuZCBwdXR0
+aW5nIHRoZW0gaW4gYSBuZXcgZnVuY3Rpb24gdGhyb3R0bGVfcGFyc2Vfb3B0aW9ucy4gIElmIHRo
+YXQncyBhbGwgdGhlIHBhdGNoIGRvZXMsIGdyZWF0OyBidXQgd2hlbiBpdCBzdGFydHMgdG8gbWl4
+IGluIG90aGVyIHRoaW5ncywgaXQgaXMgaGFyZCB0byByZXZpZXcuDQoNCj4gICANCj4gICAgICAg
+ICAgIGlmICghdGhyb3R0bGVfaXNfdmFsaWQodGhyb3R0bGVfY2ZnLCBlcnJwKSkgew0KPiAgICAg
+ICAgICAgICAgIHJldHVybjsNCj4gQEAgLTI3MjUsNiArMjY4NCw3IEBAIHZvaWQgcW1wX2Jsb2Nr
+X3NldF9pb190aHJvdHRsZShCbG9ja0lPVGhyb3R0bGUgKmFyZywgRXJyb3IgKiplcnJwKQ0KPiAg
+ICAgICBCbG9ja0RyaXZlclN0YXRlICpiczsNCj4gICAgICAgQmxvY2tCYWNrZW5kICpibGs7DQo+
+ICAgICAgIEFpb0NvbnRleHQgKmFpb19jb250ZXh0Ow0KPiArICAgIFRocm90dGxlTGltaXRzICp0
+bGltaXRzOw0KDQpEbyB5b3UgbmVlZCB0aGlzIG5ldyB2YXJpYWJsZSwgb3IuLi4NCg0KPiBAQCAt
+Mjc0Miw1NiArMjcwMiw4IEBAIHZvaWQgcW1wX2Jsb2NrX3NldF9pb190aHJvdHRsZShCbG9ja0lP
+VGhyb3R0bGUgKmFyZywgRXJyb3IgKiplcnJwKQ0KPiAgICAgICAgICAgZ290byBvdXQ7DQo+ICAg
+ICAgIH0NCj4gICANCj4gLSAgICB0aHJvdHRsZV9jb25maWdfaW5pdCgmY2ZnKTsNCj4gLSAgICBj
+ZmcuYnVja2V0c1tUSFJPVFRMRV9CUFNfVE9UQUxdLmF2ZyA9IGFyZy0+YnBzOw0KPiAtICAgIGNm
+Zy5idWNrZXRzW1RIUk9UVExFX0JQU19SRUFEXS5hdmcgID0gYXJnLT5icHNfcmQ7DQo+IC0gICAg
+Y2ZnLmJ1Y2tldHNbVEhST1RUTEVfQlBTX1dSSVRFXS5hdmcgPSBhcmctPmJwc193cjsNCj4gLQ0K
+PiAtICAgIGNmZy5idWNrZXRzW1RIUk9UVExFX09QU19UT1RBTF0uYXZnID0gYXJnLT5pb3BzOw0K
+PiAtICAgIGNmZy5idWNrZXRzW1RIUk9UVExFX09QU19SRUFEXS5hdmcgID0gYXJnLT5pb3BzX3Jk
+Ow0KPiAtICAgIGNmZy5idWNrZXRzW1RIUk9UVExFX09QU19XUklURV0uYXZnID0gYXJnLT5pb3Bz
+X3dyOw0KPiAtDQo+IC0gICAgaWYgKGFyZy0+aGFzX2Jwc19tYXgpIHsNCj4gLSAgICAgICAgY2Zn
+LmJ1Y2tldHNbVEhST1RUTEVfQlBTX1RPVEFMXS5tYXggPSBhcmctPmJwc19tYXg7DQo+IC0gICAg
+fQ0KDQo+IC0gICAgaWYgKGFyZy0+aGFzX2lvcHNfc2l6ZSkgew0KPiAtICAgICAgICBjZmcub3Bf
+c2l6ZSA9IGFyZy0+aW9wc19zaXplOw0KPiAtICAgIH0NCj4gKyAgICB0bGltaXRzID0gcWFwaV9C
+bG9ja0lPVGhyb3R0bGVfYmFzZShhcmcpOw0KPiArICAgIHRocm90dGxlX2xpbWl0c190b19jb25m
+aWcodGxpbWl0cywgJmNmZywgZXJycCk7DQoNCi4uLmNhbiB5b3UganVzdCBjYWxsDQp0aHJvdHRs
+ZV9saW1pdHNfdG9fY29uZmlnKHFhcGlfQmxvY2tJT1Rocm90dGxlX2Jhc2UoYXJnKSwgLi4uKQ0K
+DQotLS0tLS1ncmVhdCwgbW9yZSBzaW1wbGUgYW5kIHJlYWRhYmxlDQoNCj4gICANCj4gICAgICAg
+aWYgKCF0aHJvdHRsZV9pc192YWxpZCgmY2ZnLCBlcnJwKSkgew0KPiAgICAgICAgICAgZ290byBv
+dXQ7DQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3FlbXUvdGhyb3R0bGUtb3B0aW9ucy5oIA0KPiBi
+L2luY2x1ZGUvcWVtdS90aHJvdHRsZS1vcHRpb25zLmggaW5kZXggMzUyOGE4Zi4uM2ViMTgyNSAx
+MDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9xZW11L3Rocm90dGxlLW9wdGlvbnMuaA0KPiArKysgYi9p
+bmNsdWRlL3FlbXUvdGhyb3R0bGUtb3B0aW9ucy5oDQo+IEBAIC05LDYgKzksNyBAQA0KPiAgICAq
+Lw0KPiAgICNpZm5kZWYgVEhST1RUTEVfT1BUSU9OU19IDQo+ICAgI2RlZmluZSBUSFJPVFRMRV9P
+UFRJT05TX0gNCj4gKyNpbmNsdWRlICJ0eXBlZGVmcy5oIg0KDQpVbm5lY2Vzc2FyeSBpbmNsdWRl
+LiBZb3UgYWxyZWFkeSBnZXQgdGhpcyBmaWxlIGluY2x1ZGVkIGJ5IHZpcnR1ZSBvZiBldmVyeSAu
+YyBmaWxlIHVzaW5nIG9zZGVwLmguDQoNCj4gICANCj4gICAjZGVmaW5lIFFFTVVfT1BUX0lPUFNf
+VE9UQUwgImlvcHMtdG90YWwiDQo+ICAgI2RlZmluZSBRRU1VX09QVF9JT1BTX1RPVEFMX01BWCAi
+aW9wcy10b3RhbC1tYXgiDQo+IEBAIC0xMTAsNSArMTExLDUgQEANCj4gICAgICAgICAgICAgICAu
+dHlwZSA9IFFFTVVfT1BUX05VTUJFUixcDQo+ICAgICAgICAgICAgICAgLmhlbHAgPSAid2hlbiBs
+aW1pdGluZyBieSBpb3BzIG1heCBzaXplIG9mIGFuIEkvTyBpbiBieXRlcyIsXA0KPiAgICAgICAg
+ICAgfQ0KPiAtDQo+ICsgICAgdm9pZCB0aHJvdHRsZV9wYXJzZV9vcHRpb25zKFRocm90dGxlQ29u
+ZmlnICosIFFlbXVPcHRzICopOw0KPiAgICNlbmRpZg0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9x
+ZW11L3Rocm90dGxlLmggYi9pbmNsdWRlL3FlbXUvdGhyb3R0bGUuaCBpbmRleCANCj4gYWJlYjg4
+Ni4uZjM3OWQ5MSAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9xZW11L3Rocm90dGxlLmgNCj4gKysr
+IGIvaW5jbHVkZS9xZW11L3Rocm90dGxlLmgNCj4gQEAgLTkwLDEwICs5MCwxMCBAQCB0eXBlZGVm
+IHN0cnVjdCBMZWFreUJ1Y2tldCB7DQo+ICAgICogSG93ZXZlciBpdCBhbGxvd3MgdG8ga2VlcCB0
+aGUgY29kZSBjbGVhbiBhbmQgdGhlIGJ1Y2tldCBmaWVsZCBpcyByZXNldCB0bw0KPiAgICAqIHpl
+cm8gYXQgdGhlIHJpZ2h0IHRpbWUuDQo+ICAgICovDQo+IC10eXBlZGVmIHN0cnVjdCBUaHJvdHRs
+ZUNvbmZpZyB7DQo+ICtzdHJ1Y3QgVGhyb3R0bGVDb25maWcgew0KPiAgICAgICBMZWFreUJ1Y2tl
+dCBidWNrZXRzW0JVQ0tFVFNfQ09VTlRdOyAvKiBsZWFreSBidWNrZXRzICovDQo+ICAgICAgIHVp
+bnQ2NF90IG9wX3NpemU7ICAgICAgICAgLyogc2l6ZSBvZiBhbiBvcGVyYXRpb24gaW4gYnl0ZXMg
+Ki8NCj4gLX0gVGhyb3R0bGVDb25maWc7DQo+ICt9Ow0KPiAgIA0KPiAgIHR5cGVkZWYgc3RydWN0
+IFRocm90dGxlU3RhdGUgew0KPiAgICAgICBUaHJvdHRsZUNvbmZpZyBjZmc7ICAgICAgIC8qIGNv
+bmZpZ3VyYXRpb24gKi8NCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvcWVtdS90eXBlZGVmcy5oIGIv
+aW5jbHVkZS9xZW11L3R5cGVkZWZzLmggaW5kZXggDQo+IDNlYzBlMTMuLjFkMzM1YWEgMTAwNjQ0
+DQo+IC0tLSBhL2luY2x1ZGUvcWVtdS90eXBlZGVmcy5oDQo+ICsrKyBiL2luY2x1ZGUvcWVtdS90
+eXBlZGVmcy5oDQo+IEBAIC0xMTMsNiArMTEzLDcgQEAgdHlwZWRlZiBzdHJ1Y3QgdVdpcmVTbGF2
+ZSB1V2lyZVNsYXZlOw0KPiAgIHR5cGVkZWYgc3RydWN0IFZpcnRJT0RldmljZSBWaXJ0SU9EZXZp
+Y2U7DQo+ICAgdHlwZWRlZiBzdHJ1Y3QgVmlzaXRvciBWaXNpdG9yOw0KPiAgIHR5cGVkZWYgc3Ry
+dWN0IG5vZGVfaW5mbyBOb2RlSW5mbzsNCj4gK3R5cGVkZWYgc3RydWN0IFRocm90dGxlQ29uZmln
+IFRocm90dGxlQ29uZmlnOw0KDQpBbm90aGVyIHNvcnRlZCBsaXN0IHRoYXQgeW91IHNjcmFtYmxl
+ZC4NCg0KPiAgIHR5cGVkZWYgdm9pZCBTYXZlU3RhdGVIYW5kbGVyKFFFTVVGaWxlICpmLCB2b2lk
+ICpvcGFxdWUpOw0KPiAgIHR5cGVkZWYgaW50IExvYWRTdGF0ZUhhbmRsZXIoUUVNVUZpbGUgKmYs
+IHZvaWQgKm9wYXF1ZSwgaW50IA0KPiB2ZXJzaW9uX2lkKTsNCj4gICANCj4gZGlmZiAtLWdpdCBh
+L3FhcGkvYmxvY2stY29yZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24gaW5kZXggDQo+IGQ0
+ZmU3MTAuLjA1Mjk2YjAgMTAwNjQ0DQo+IC0tLSBhL3FhcGkvYmxvY2stY29yZS5qc29uDQo+ICsr
+KyBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+IEBAIC04LDYgKzgsNyBAQA0KPiAgIHsgJ2luY2x1
+ZGUnOiAnY3J5cHRvLmpzb24nIH0NCj4gICB7ICdpbmNsdWRlJzogJ2pvYi5qc29uJyB9DQo+ICAg
+eyAnaW5jbHVkZSc6ICdzb2NrZXRzLmpzb24nIH0NCj4gK3sgJ2luY2x1ZGUnOiAndGxpbWl0cy5q
+c29uJyB9DQoNCkhlcmUsIHlvdSdyZSBtb3ZpbmcgY29kZSBvdXQgdG8gdGhlIG5ldyB0bGltaXRz
+Lmpzb24uDQoNCg0KPiBpbmRleCAwMDAwMDAwLi5jNTU1OWJiDQo+IC0tLSAvZGV2L251bGwNCj4g
+KysrIGIvcWFwaS9mc2Rldi5qc29uDQo+IEBAIC0wLDAgKzEsMjAgQEANCj4gKyMgLSotIE1vZGU6
+IFB5dGhvbiAtKi0NCj4gKw0KPiArIyMNCj4gKyMgPT0gUUFQSSBmc2RldiBkZWZpbml0aW9ucw0K
+PiArIyMNCj4gKw0KPiAreyAnaW5jbHVkZSc6ICd0bGltaXRzLmpzb24nIH0NCj4gKw0KPiArIyMN
+Cj4gKyMgQEZzZGV2SU9UaHJvdHRsZToNCj4gKyMNCj4gKyMgQSBzZXQgb2YgcGFyYW1ldGVycyBk
+ZXNjcmliaW5nIGZzZGV2IHRocm90dGxpbmcuDQo+ICsjDQo+ICsjIEBpZDogZGV2aWNlIGlkDQo+
+ICsjDQo+ICsjIFNpbmNlOiAzLjINCj4gKyMjDQo+ICt7ICdzdHJ1Y3QnOiAnRnNkZXZJT1Rocm90
+dGxlJywNCj4gKyAgJ2Jhc2UnOiAnVGhyb3R0bGVMaW1pdHMnLA0KPiArICAnZGF0YSc6IHsgJypp
+ZCc6ICdzdHInIH0gfQ0KDQpIZXJlLCB5b3UgYXBwZWFyIHRvIGJlIGFkZGluZyBhIGJyYW5kIG5l
+dyBzdHJ1Y3QuICBTZXBhcmF0ZSBwYXRjaCwgcGxlYXNlLg0KDQotLS0tLVRoaXMgc3RydWN0IHVz
+ZSBmb3IgZnNkZXYgdGhyb3R0bGUgcW1wIGludGVyZmFjZSwgaW4gbmV3IHZlcnNpb24gc3BsaXQg
+aXQgdG8gYSBzZXBhcmF0ZSBwYXRjaA0KDQo+IGRpZmYgLS1naXQgYS9xYXBpL3FhcGktc2NoZW1h
+Lmpzb24gYi9xYXBpL3FhcGktc2NoZW1hLmpzb24gaW5kZXggDQo+IDY1YjZkYzIuLmY2NTNlN2Qg
+MTAwNjQ0DQo+IC0tLSBhL3FhcGkvcWFwaS1zY2hlbWEuanNvbg0KPiArKysgYi9xYXBpL3FhcGkt
+c2NoZW1hLmpzb24NCj4gQEAgLTk0LDMgKzk0LDQgQEANCj4gICB7ICdpbmNsdWRlJzogJ3RyYWNl
+Lmpzb24nIH0NCj4gICB7ICdpbmNsdWRlJzogJ2ludHJvc3BlY3QuanNvbicgfQ0KPiAgIHsgJ2lu
+Y2x1ZGUnOiAnbWlzYy5qc29uJyB9DQo+ICt7ICdpbmNsdWRlJzogJ2ZzZGV2Lmpzb24nIH0NCg0K
+U2hvdWxkbid0IHRoaXMgaW5jbHVkZSBib3RoIGZzZGV2Lmpzb24gYW5kIHRsaW1pdHMuanNvbiAo
+b24gdGhlIGdyb3VuZHMgdGhhdCB3ZSBpbmNsdWRlIGV2ZXJ0aGluZyBoZXJlLCBldmVuIGlmIG90
+aGVyIGZpbGVzIGFsc28gcmVwZWF0IHRoZSBpbmNsdXNpb25zIHRoYXQgdGhleSBuZWVkIGZvciBz
+dGFuZGFsb25lIHVzZSk/DQoNCj4gZGlmZiAtLWdpdCBhL3FhcGkvdGxpbWl0cy5qc29uIGIvcWFw
+aS90bGltaXRzLmpzb24gbmV3IGZpbGUgbW9kZSANCj4gMTAwNjQ0IGluZGV4IDAwMDAwMDAuLjE5
+MTY3MjYNCj4gLS0tIC9kZXYvbnVsbA0KPiArKysgYi9xYXBpL3RsaW1pdHMuanNvbg0KPiBAQCAt
+MCwwICsxLDg5IEBADQo+ICsjIC0qLSBNb2RlOiBQeXRob24gLSotDQo+ICsNCj4gKyMjDQo+ICsj
+ID09IFRocm90dGxlIGxpbWl0cw0KPiArIyMNCj4gKw0KDQo+ICsjDQo+ICsjIFNpbmNlOiAzLjIN
+Cg0KT2gsIGFuZCBJJ3ZlIGJlZW4gcmVtaW5kZWQgdGhhdCB0aGVyZSB3aWxsIGJlIG5vIDMuMiBy
+ZWxlYXNlOyB0aGUgbmV4dCByZWxlYXNlIGlzIDQuMC4NCg0KPiArIw0KPiArIyMNCj4gK3sgJ3N0
+cnVjdCc6ICdUaHJvdHRsZUxpbWl0cycsDQo+ICsgICdkYXRhJzogeyAnKmJwcyc6ICdpbnQnLCAn
+KmJwc19yZCc6ICdpbnQnLA0KPiArICAgICAgICAgICAgJypicHNfd3InOiAnaW50JywgJyppb3Bz
+JzogJ2ludCcsICcqaW9wc19yZCc6ICdpbnQnLCAnKmlvcHNfd3InOiAnaW50JywNCj4gKyAgICAg
+ICAgICAgICcqYnBzX21heCc6ICdpbnQnLCAnKmJwc19yZF9tYXgnOiAnaW50JywNCj4gKyAgICAg
+ICAgICAgICcqYnBzX3dyX21heCc6ICdpbnQnLCAnKmlvcHNfbWF4JzogJ2ludCcsDQo+ICsgICAg
+ICAgICAgICAnKmlvcHNfcmRfbWF4JzogJ2ludCcsICcqaW9wc193cl9tYXgnOiAnaW50JywNCj4g
+KyAgICAgICAgICAgICcqYnBzX21heF9sZW5ndGgnOiAnaW50JywgJypicHNfcmRfbWF4X2xlbmd0
+aCc6ICdpbnQnLA0KPiArICAgICAgICAgICAgJypicHNfd3JfbWF4X2xlbmd0aCc6ICdpbnQnLCAn
+KmlvcHNfbWF4X2xlbmd0aCc6ICdpbnQnLA0KPiArICAgICAgICAgICAgJyppb3BzX3JkX21heF9s
+ZW5ndGgnOiAnaW50JywgJyppb3BzX3dyX21heF9sZW5ndGgnOiAnaW50JywNCj4gKyAgICAgICAg
+ICAgICcqaW9wc19zaXplJzogJ2ludCcgfSB9DQo+IGRpZmYgLS1naXQgYS91dGlsL3Rocm90dGxl
+LmMgYi91dGlsL3Rocm90dGxlLmMgaW5kZXggYjM4ZTc0Mi4uY2VhMzBmNSANCj4gMTAwNjQ0DQo+
+IC0tLSBhL3V0aWwvdGhyb3R0bGUuYw0KDQo+IEBAIC01OTYsNDMgKzU5OCwxMDkgQEAgdm9pZCB0
+aHJvdHRsZV9saW1pdHNfdG9fY29uZmlnKFRocm90dGxlTGltaXRzICphcmcsIFRocm90dGxlQ29u
+ZmlnICpjZmcsDQo+ICAgICovDQo+ICAgdm9pZCB0aHJvdHRsZV9jb25maWdfdG9fbGltaXRzKFRo
+cm90dGxlQ29uZmlnICpjZmcsIFRocm90dGxlTGltaXRzICp2YXIpDQo+ICAgew0KPiAtICAgIHZh
+ci0+YnBzX3RvdGFsICAgICAgICAgICAgICAgPSBjZmctPmJ1Y2tldHNbVEhST1RUTEVfQlBTX1RP
+VEFMXS5hdmc7DQo+IC0gICAgdmFyLT5icHNfcmVhZCAgICAgICAgICAgICAgICA9IGNmZy0+YnVj
+a2V0c1tUSFJPVFRMRV9CUFNfUkVBRF0uYXZnOw0KPiAtICAgIHZhci0+YnBzX3dyaXRlICAgICAg
+ICAgICAgICAgPSBjZmctPmJ1Y2tldHNbVEhST1RUTEVfQlBTX1dSSVRFXS5hdmc7DQo+IC0gICAg
+dmFyLT5pb3BzX3RvdGFsICAgICAgICAgICAgICA9IGNmZy0+YnVja2V0c1tUSFJPVFRMRV9PUFNf
+VE9UQUxdLmF2ZzsNCj4gLSAgICB2YXItPmlvcHNfcmVhZCAgICAgICAgICAgICAgID0gY2ZnLT5i
+dWNrZXRzW1RIUk9UVExFX09QU19SRUFEXS5hdmc7DQo+IC0gICAgdmFyLT5pb3BzX3dyaXRlICAg
+ICAgICAgICAgICA9IGNmZy0+YnVja2V0c1tUSFJPVFRMRV9PUFNfV1JJVEVdLmF2ZzsNCj4gLSAg
+ICB2YXItPmJwc190b3RhbF9tYXggICAgICAgICAgID0gY2ZnLT5idWNrZXRzW1RIUk9UVExFX0JQ
+U19UT1RBTF0ubWF4Ow0KPiAtICAgIHZhci0+YnBzX3JlYWRfbWF4ICAgICAgICAgICAgPSBjZmct
+PmJ1Y2tldHNbVEhST1RUTEVfQlBTX1JFQURdLm1heDsNCj4gLSAgICB2YXItPmJwc193cml0ZV9t
+YXggICAgICAgICAgID0gY2ZnLT5idWNrZXRzW1RIUk9UVExFX0JQU19XUklURV0ubWF4Ow0KPiAt
+ICAgIHZhci0+aW9wc190b3RhbF9tYXggICAgICAgICAgPSBjZmctPmJ1Y2tldHNbVEhST1RUTEVf
+T1BTX1RPVEFMXS5tYXg7DQo+IC0gICAgdmFyLT5pb3BzX3JlYWRfbWF4ICAgICAgICAgICA9IGNm
+Zy0+YnVja2V0c1tUSFJPVFRMRV9PUFNfUkVBRF0ubWF4Ow0KPiAtICAgIHZhci0+aW9wc193cml0
+ZV9tYXggICAgICAgICAgPSBjZmctPmJ1Y2tldHNbVEhST1RUTEVfT1BTX1dSSVRFXS5tYXg7DQo+
+IC0gICAgdmFyLT5icHNfdG90YWxfbWF4X2xlbmd0aCAgICA9IGNmZy0+YnVja2V0c1tUSFJPVFRM
+RV9CUFNfVE9UQUxdLmJ1cnN0X2xlbmd0aDsNCj4gLSAgICB2YXItPmJwc19yZWFkX21heF9sZW5n
+dGggICAgID0gY2ZnLT5idWNrZXRzW1RIUk9UVExFX0JQU19SRUFEXS5idXJzdF9sZW5ndGg7DQo+
+IC0gICAgdmFyLT5icHNfd3JpdGVfbWF4X2xlbmd0aCAgICA9IGNmZy0+YnVja2V0c1tUSFJPVFRM
+RV9CUFNfV1JJVEVdLmJ1cnN0X2xlbmd0aDsNCj4gLSAgICB2YXItPmlvcHNfdG90YWxfbWF4X2xl
+bmd0aCAgID0gY2ZnLT5idWNrZXRzW1RIUk9UVExFX09QU19UT1RBTF0uYnVyc3RfbGVuZ3RoOw0K
+PiAtICAgIHZhci0+aW9wc19yZWFkX21heF9sZW5ndGggICAgPSBjZmctPmJ1Y2tldHNbVEhST1RU
+TEVfT1BTX1JFQURdLmJ1cnN0X2xlbmd0aDsNCj4gLSAgICB2YXItPmlvcHNfd3JpdGVfbWF4X2xl
+bmd0aCAgID0gY2ZnLT5idWNrZXRzW1RIUk9UVExFX09QU19XUklURV0uYnVyc3RfbGVuZ3RoOw0K
+PiArICAgIHZhci0+YnBzICAgICAgICAgICAgICAgPSBjZmctPmJ1Y2tldHNbVEhST1RUTEVfQlBT
+X1RPVEFMXS5hdmc7DQo+ICsgICAgdmFyLT5icHNfcmQgICAgICAgICAgICAgICAgPSBjZmctPmJ1
+Y2tldHNbVEhST1RUTEVfQlBTX1JFQURdLmF2ZzsNCj4gKyAgICB2YXItPmJwc193ciAgICAgICAg
+ICAgICAgID0gY2ZnLT5idWNrZXRzW1RIUk9UVExFX0JQU19XUklURV0uYXZnOw0KPiArICAgIHZh
+ci0+aW9wcyAgICAgICAgICAgICAgPSBjZmctPmJ1Y2tldHNbVEhST1RUTEVfT1BTX1RPVEFMXS5h
+dmc7DQoNCldoeSBpcyB0aGUgYWxpZ25tZW50IGFsbCBtZXNzZWQgdXA/ICBFaXRoZXIga2VlcCB0
+aGUgJz0nIGFsaWduZWQsIG9yIGdldCByaWQgb2YgdGhlIHZhcmlhYmxlIHNwYWNpbmcuDQoNCi0t
+LS0tLWZpeCBpbiB2Mw0KDQotLQ0KRXJpYyBCbGFrZSwgUHJpbmNpcGFsIFNvZnR3YXJlIEVuZ2lu
+ZWVyDQpSZWQgSGF0LCBJbmMuICAgICAgICAgICArMS05MTktMzAxLTMyNjYNClZpcnR1YWxpemF0
+aW9uOiAgcWVtdS5vcmcgfCBsaWJ2aXJ0Lm9yZw0K
