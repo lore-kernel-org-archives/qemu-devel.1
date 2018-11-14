@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1gN0Zk-00046s-JU
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 14:11:46 -0500
+	(envelope-from <zhangckid@gmail.com>) id 1gN0eV-0005SM-MM
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 14:16:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1gN0Zf-0004aw-Ce
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 14:11:44 -0500
-Received: from mga03.intel.com ([134.134.136.65]:22530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1gN0ZX-0004Nm-6j
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 14:11:36 -0500
-From: Zhang Chen <chen.zhang@intel.com >
-Date: Thu, 15 Nov 2018 03:09:12 +0800
-Message-Id: <20181114190912.7242-1-chen.zhang@intel.com>
-Subject: [Qemu-devel] [PATCH] migration/migration.c: Add COLO dependency
- checks
+	(envelope-from <zhangckid@gmail.com>) id 1gN0eU-0007YE-Vd
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 14:16:39 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:37657)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1gN0eU-0007Xj-PO
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 14:16:38 -0500
+Received: by mail-wr1-x435.google.com with SMTP id j10so4330893wru.4
+	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 11:16:38 -0800 (PST)
+MIME-Version: 1.0
+References: <20181101021226.6353-1-zhangckid@gmail.com>
+	<20181114104720.GB3955@xz-x1>
+	<74cca5d1-d2b4-6b44-32fe-332136b8b171@redhat.com>
+	<CAFEAcA8SeZfsihEeD0Rvoxtf-9iKjR_dtrXQLy=6MVzM0ZAD0A@mail.gmail.com>
+In-Reply-To: <CAFEAcA8SeZfsihEeD0Rvoxtf-9iKjR_dtrXQLy=6MVzM0ZAD0A@mail.gmail.com>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Thu, 15 Nov 2018 03:16:25 +0800
+Message-ID: <CAK3tnvK_QinKras3ojAWksVu3otwKZcwAPrhQDmxQq___A2iGA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V2] migration/colo.c: Fix compilation issue
+ when disable replication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
-Cc: Zhang Chen <chen.zhang@intel.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, peterx@redhat.com, qemu-devel@nongnu.org, "zhang.zhanghailiang@huawei.com" <zhang.zhanghailiang@huawei.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, f4bug@amsat.org
 
-From: Zhang Chen <chen.zhang@intel.com>
+On Wed, Nov 14, 2018 at 7:17 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-Current COLO mode(independent disk mode) need replication module work
-together. Suggested by Dr. David Alan Gilbert <dgilbert@redhat.com>.
+> On 14 November 2018 at 11:06, Thomas Huth <thuth@redhat.com> wrote:
+> > On 2018-11-14 11:47, Peter Xu wrote:
+> >> On Thu, Nov 01, 2018 at 10:12:26AM +0800, Zhang Chen wrote:
+> >>> This compilation issue will occur when user use --disable-replication
+> >>> to config Qemu.
+> >>>
+> >>> Reported-by: Thomas Huth <thuth@redhat.com>
+> >>> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> >>
+> >> Hi,
+> >>
+> >> How's the status of this patch?  Are we gonna merge it for 3.1?
+> >>
+> >> I just posted a similar one without knowing this (until Dave pointed
+> >> it out).  IMHO it can be a good candidate for 3.1.
+> >
+> > Maybe Peter Maydell could apply this directly to the repo as a built fix?
+>
+> I'd rather it just went through the migration tree, really...
+> it isn't actually breaking any of our travis jobs or other CI.
+>
+>
+Hi Dave,
 
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
----
- migration/migration.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+What do you think about peter's comments?
 
-diff --git a/migration/migration.c b/migration/migration.c
-index b261c1e4ce..49ffb9997a 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -918,6 +918,15 @@ static bool migrate_caps_check(bool *cap_list,
-     }
- #endif
- 
-+#ifndef CONFIG_REPLICATION
-+    if (cap_list[MIGRATION_CAPABILITY_X_COLO]) {
-+        error_setg(errp, "QEMU compiled without replication module"
-+                   " can't enable COLO");
-+        error_append_hint(errp, "Please enable replication before COLO.\n");
-+        return false;
-+    }
-+#endif
-+
-     if (cap_list[MIGRATION_CAPABILITY_POSTCOPY_RAM]) {
-         if (cap_list[MIGRATION_CAPABILITY_COMPRESS]) {
-             /* The decompression threads asynchronously write into RAM
--- 
-2.17.GIT
+Thanks
+Zhang Chen
+
+
+> thanks
+> -- PMM
+>
