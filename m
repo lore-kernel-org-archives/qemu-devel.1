@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gMwVR-0005mE-2w
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:51:01 -0500
+	(envelope-from <berto@igalia.com>) id 1gMwdl-0001lQ-GN
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:59:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1gMwVQ-0007Lf-CT
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:51:01 -0500
-References: <20181114125546.4319-1-kwolf@redhat.com>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <9afd325c-5af6-e154-936e-61557d85822a@oracle.com>
-Date: Wed, 14 Nov 2018 14:50:47 +0000
-MIME-Version: 1.0
-In-Reply-To: <20181114125546.4319-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vvfat: Fix memory leak
+	(envelope-from <berto@igalia.com>) id 1gMwdh-0002nL-En
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:59:37 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Wed, 14 Nov 2018 16:58:57 +0200
+Message-Id: <20181114145857.19720-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH v2] qcow2: Assert that refcount block offsets
+ fit in the refcount table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +18,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
+Refcount table entries have a field to store the offset of the
+refcount block. The rest of the bits of the entry are currently
+reserved.
 
+The offset is always taken from the entry using REFT_OFFSET_MASK to
+ensure that we only use the bits that belong to that field.
 
-On 14/11/2018 12:55, Kevin Wolf wrote:
-> Don't leak 'cluster' in the mapping == NULL case. Found by Coverity
-> (CID 1055918).
-> 
-> Fixes: 8d9401c2791ee2d2805b741b1ee3006041edcd3e
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+While that mask is used every time we read from the refcount table, it
+is never used when we write to it. Due to the other constraints of the
+qcow2 format QEMU can never produce refcount block offsets that don't
+fit in that field so any such offset when allocating a refcount block
+would indicate a bug in QEMU.
 
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+v2: Add missing Signed-off-by: line
+---
+ block/qcow2-refcount.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Thanks.
-
-> ---
->   block/vvfat.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/vvfat.c b/block/vvfat.c
-> index 1de5de1db4..b7b61ea8b7 100644
-> --- a/block/vvfat.c
-> +++ b/block/vvfat.c
-> @@ -2510,7 +2510,7 @@ static int commit_one_file(BDRVVVFATState* s,
->       uint32_t first_cluster = c;
->       mapping_t* mapping = find_mapping_for_cluster(s, c);
->       uint32_t size = filesize_of_direntry(direntry);
-> -    char* cluster = g_malloc(s->cluster_size);
-> +    char *cluster;
->       uint32_t i;
->       int fd = 0;
->   
-> @@ -2528,17 +2528,17 @@ static int commit_one_file(BDRVVVFATState* s,
->       if (fd < 0) {
->           fprintf(stderr, "Could not open %s... (%s, %d)\n", mapping->path,
->                   strerror(errno), errno);
-> -        g_free(cluster);
->           return fd;
->       }
->       if (offset > 0) {
->           if (lseek(fd, offset, SEEK_SET) != offset) {
->               qemu_close(fd);
-> -            g_free(cluster);
->               return -3;
->           }
->       }
->   
-> +    cluster = g_malloc(s->cluster_size);
-> +
->       while (offset < size) {
->           uint32_t c1;
->           int rest_size = (size - offset > s->cluster_size ?
-> 
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 46082aeac1..31a2e1f845 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -367,6 +367,9 @@ static int alloc_refcount_block(BlockDriverState *bs,
+         return new_block;
+     }
+ 
++    /* The offset must fit in the offset field of the refcount table entry */
++    assert((new_block & REFT_OFFSET_MASK) == new_block);
++
+     /* If we're allocating the block at offset 0 then something is wrong */
+     if (new_block == 0) {
+         qcow2_signal_corruption(bs, true, -1, -1, "Preventing invalid "
+-- 
+2.11.0
