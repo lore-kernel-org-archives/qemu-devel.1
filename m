@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMqlx-0003sB-I4
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:43:42 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gMqmB-000409-3A
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:43:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMqls-0006dl-1y
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:43:39 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 14 Nov 2018 09:43:19 +0100
-Message-Id: <1542184999-11145-1-git-send-email-thuth@redhat.com>
+	(envelope-from <luc.michel@greensocs.com>) id 1gMqm9-0006mh-RX
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:43:55 -0500
+References: <20181110081147.4027-1-luc.michel@greensocs.com>
+	<20181110081147.4027-4-luc.michel@greensocs.com>
+	<20181113110636.GH1148@toto>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <a67ef945-2466-155c-0f16-0a1b3b74c9fc@greensocs.com>
+Date: Wed, 14 Nov 2018 09:43:27 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20181113110636.GH1148@toto>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] MAINTAINERS: Add entries for missing ARM boards
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 03/16] gdbstub: add
+ multiprocess support to '?' packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,139 +26,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>, Jean-Christophe Dubois <jcd@tribudubois.net>, Andrey Smirnov <andrew.smirnov@gmail.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, alistair@alistair23.me, mark.burton@greensocs.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
 
-Add entries for the boards "mcimx6ul-evk", "mcimx7d-sabre", "raspi2",
-"raspi3", "sabrelite", "vexpress-a15", "vexpress-a9" and "virt".
-While we're at it, also adjust the "i.MX31" section a little bit,
-so that the wildcards there do not match anymore for unrelated files
-(e.g. the new hw/misc/imx6ul_ccm.c file).
+Hi Edgar,
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- MAINTAINERS | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-+-----
- 1 file changed, 65 insertions(+), 5 deletions(-)
+On 11/13/18 12:06 PM, Edgar E. Iglesias wrote:
+> On Sat, Nov 10, 2018 at 09:11:34AM +0100, Luc Michel wrote:
+>> The gdb_get_cpu_pid() function does the PID lookup for the given CPU. =
+It
+>> checks if the CPU is a direct child of a CPU cluster. If it is, the
+>> returned PID is the cluster ID plus one (cluster IDs start at 0, GDB
+>> PIDs at 1). When the CPU is not a child of such a container, the PID o=
+f
+>> the first process is returned.
+>>
+>> The gdb_fmt_thread_id() function generates the string to be used to id=
+entify
+>> a given thread, in a response packet for the peer. This function
+>> supports generating thread IDs when multiprocess mode is enabled (in t=
+he
+>> form `p<pid>.<tid>').
+>>
+>> Use them in the reply to a '?' request.
+>>
+>> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+>> Acked-by: Alistair Francis <alistair.francis@wdc.com>
+>=20
+>=20
+> This is also theoretical but:
+> When looking at this, it seems like you could have lazily created
+> the s->processes array entries (if you find a cluster but the
+> no valid entry in s->processes). Then we could perhaps eliminate the
+> scan of all objects at startup and also support CPU/Cluster hotplug.
+Yes you are right, this could be an improvement to this series to add
+cluster hotplug support (CPU hotplug is actually supported). It's a
+little bit tricky though since we would have to maintain the
+s->processes array and properly signal to GDB when a process dies.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4b8db61..dd8ac65 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -521,14 +521,15 @@ L: qemu-arm@nongnu.org
- S: Odd Fixes
- F: hw/arm/gumstix.c
-=20
--i.MX31
-+i.MX31 (kzm)
- M: Peter Chubb <peter.chubb@nicta.com.au>
- L: qemu-arm@nongnu.org
--S: Odd fixes
--F: hw/*/imx*
--F: include/hw/*/imx*
-+S: Odd Fixes
- F: hw/arm/kzm.c
--F: include/hw/arm/fsl-imx31.h
-+F: hw/*/imx_*
-+F: hw/*/*imx31*
-+F: include/hw/*/imx_*
-+F: include/hw/*/*imx31*
-=20
- Integrator CP
- M: Peter Maydell <peter.maydell@linaro.org>
-@@ -537,6 +538,28 @@ S: Maintained
- F: hw/arm/integratorcp.c
- F: hw/misc/arm_integrator_debug.c
-=20
-+MCIMX6UL EVK / i.MX6ul
-+M: Peter Maydell <peter.maydell@linaro.org>
-+R: Jean-Christophe Dubois <jcd@tribudubois.net>
-+L: qemu-arm@nongnu.org
-+S: Odd Fixes
-+F: hw/arm/mcimx6ul-evk.c
-+F: hw/arm/fsl-imx6ul.c
-+F: hw/misc/imx6ul_ccm.c
-+F: include/hw/arm/fsl-imx6ul.h
-+F: include/hw/misc/imx6ul_ccm.h
-+
-+MCIMX7D SABRE / i.MX7
-+M: Peter Maydell <peter.maydell@linaro.org>
-+R: Andrey Smirnov <andrew.smirnov@gmail.com>
-+L: qemu-arm@nongnu.org
-+S: Odd Fixes
-+F: hw/arm/mcimx7d-sabre.c
-+F: hw/arm/fsl-imx7.c
-+F: include/hw/arm/fsl-imx7.h
-+F: hw/pci-host/designware.c
-+F: include/hw/pci-host/designware.h
-+
- MPS2
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
-@@ -570,6 +593,17 @@ L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/arm/palm.c
-=20
-+Raspberry Pi
-+M: Peter Maydell <peter.maydell@linaro.org>
-+R: Andrew Baumann <Andrew.Baumann@microsoft.com>
-+R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-+L: qemu-arm@nongnu.org
-+S: Odd Fixes
-+F: hw/arm/raspi_platform.h
-+F: hw/*/bcm283*
-+F: include/hw/arm/raspi*
-+F: include/hw/*/bcm283*
-+
- Real View
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
-@@ -591,6 +625,19 @@ F: hw/*/pxa2xx*
- F: hw/misc/mst_fpga.c
- F: include/hw/arm/pxa.h
-=20
-+SABRELITE / i.MX6
-+M: Peter Maydell <peter.maydell@linaro.org>
-+R: Jean-Christophe Dubois <jcd@tribudubois.net>
-+L: qemu-arm@nongnu.org
-+S: Odd Fixes
-+F: hw/arm/sabrelite.c
-+F: hw/arm/fsl-imx6.c
-+F: hw/misc/imx6_src.c
-+F: hw/ssi/imx_spi.c
-+F: include/hw/arm/fsl-imx6.h
-+F: include/hw/misc/imx6_src.h
-+F: include/hw/ssi/imx_spi.h
-+
- Sharp SL-5500 (Collie) PDA
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
-@@ -604,6 +651,12 @@ L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/*/stellaris*
-=20
-+Versatile Express
-+M: Peter Maydell <peter.maydell@linaro.org>
-+L: qemu-arm@nongnu.org
-+S: Maintained
-+F: hw/arm/vexpress.c
-+
- Versatile PB
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
-@@ -611,6 +664,13 @@ S: Maintained
- F: hw/*/versatile*
- F: hw/misc/arm_sysctl.c
-=20
-+Virt
-+M: Peter Maydell <peter.maydell@linaro.org>
-+L: qemu-arm@nongnu.org
-+S: Maintained
-+F: hw/arm/virt*
-+F: include/hw/arm/virt.h
-+
- Xilinx Zynq
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- M: Alistair Francis <alistair@alistair23.me>
---=20
-1.8.3.1
+Cheers,
+Luc
+
+>=20
+> Anyway, this looks good to me!
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>=20
+> Cheers,
+> Edgar
+>=20
+>=20
+>> ---
+>>  gdbstub.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++-=
+-
+>>  1 file changed, 58 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/gdbstub.c b/gdbstub.c
+>> index 0d70b89598..d26bad4b67 100644
+>> --- a/gdbstub.c
+>> +++ b/gdbstub.c
+>> @@ -638,10 +638,52 @@ static int memtox(char *buf, const char *mem, in=
+t len)
+>>          }
+>>      }
+>>      return p - buf;
+>>  }
+>> =20
+>> +static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
+>> +{
+>> +#ifndef CONFIG_USER_ONLY
+>> +    gchar *path, *name;
+>> +    Object *obj;
+>> +    CPUClusterState *cluster;
+>> +    uint32_t ret;
+>> +
+>> +    path =3D object_get_canonical_path(OBJECT(cpu));
+>> +    name =3D object_get_canonical_path_component(OBJECT(cpu));
+>> +
+>> +    if (path =3D=3D NULL) {
+>> +        ret =3D s->processes[0].pid;
+>> +        goto out;
+>> +    }
+>> +
+>> +    /*
+>> +     * Retrieve the CPU parent path by removing the last '/' and the =
+CPU name
+>> +     * from the CPU canonical path. */
+>> +    path[strlen(path) - strlen(name) - 1] =3D '\0';
+>> +
+>> +    obj =3D object_resolve_path_type(path, TYPE_CPU_CLUSTER, NULL);
+>> +
+>> +    if (obj =3D=3D NULL) {
+>> +        ret =3D s->processes[0].pid;
+>> +        goto out;
+>> +    }
+>> +
+>> +    cluster =3D CPU_CLUSTER(obj);
+>> +    ret =3D cluster->cluster_id + 1;
+>> +
+>> +out:
+>> +    g_free(name);
+>> +    g_free(path);
+>> +
+>> +    return ret;
+>> +
+>> +#else
+>> +    return s->processes[0].pid;
+>> +#endif
+>> +}
+>> +
+>>  static const char *get_feature_xml(const char *p, const char **newp,
+>>                                     CPUClass *cc)
+>>  {
+>>      size_t len;
+>>      int i;
+>> @@ -907,10 +949,23 @@ static CPUState *find_cpu(uint32_t thread_id)
+>>      }
+>> =20
+>>      return NULL;
+>>  }
+>> =20
+>> +static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
+>> +                           char *buf, size_t buf_size)
+>> +{
+>> +    if (s->multiprocess) {
+>> +        snprintf(buf, buf_size, "p%02x.%02x",
+>> +                 gdb_get_cpu_pid(s, cpu), cpu_gdb_index(cpu));
+>> +    } else {
+>> +        snprintf(buf, buf_size, "%02x", cpu_gdb_index(cpu));
+>> +    }
+>> +
+>> +    return buf;
+>> +}
+>> +
+>>  static int is_query_packet(const char *p, const char *query, char sep=
+arator)
+>>  {
+>>      unsigned int query_len =3D strlen(query);
+>> =20
+>>      return strncmp(p, query, query_len) =3D=3D 0 &&
+>> @@ -1018,22 +1073,23 @@ static int gdb_handle_packet(GDBState *s, cons=
+t char *line_buf)
+>>      const char *p;
+>>      uint32_t thread;
+>>      int ch, reg_size, type, res;
+>>      uint8_t mem_buf[MAX_PACKET_LENGTH];
+>>      char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+>> +    char thread_id[16];
+>>      uint8_t *registers;
+>>      target_ulong addr, len;
+>> =20
+>>      trace_gdbstub_io_command(line_buf);
+>> =20
+>>      p =3D line_buf;
+>>      ch =3D *p++;
+>>      switch(ch) {
+>>      case '?':
+>>          /* TODO: Make this return the correct value for user-mode.  *=
+/
+>> -        snprintf(buf, sizeof(buf), "T%02xthread:%02x;", GDB_SIGNAL_TR=
+AP,
+>> -                 cpu_gdb_index(s->c_cpu));
+>> +        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP=
+,
+>> +                 gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thr=
+ead_id)));
+>>          put_packet(s, buf);
+>>          /* Remove all the breakpoints when this query is issued,
+>>           * because gdb is doing and initial connect and the state
+>>           * should be cleaned up.
+>>           */
+>> --=20
+>> 2.19.1
+>>
+>>
