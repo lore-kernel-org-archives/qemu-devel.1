@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gN1Cx-0001Cd-By
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 14:52:17 -0500
+	(envelope-from <david@redhat.com>) id 1gN1HM-0002y7-Uu
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 14:56:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gN1Cv-0005VA-EB
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 14:52:15 -0500
-References: <20180809223117.7846-1-mreitz@redhat.com>
-	<20180809223117.7846-4-mreitz@redhat.com>
-	<e855b03b-67e0-d822-d9fe-dedc1456011e@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f5d4e779-26c3-fd93-cae9-7d202242fd8c@redhat.com>
-Date: Wed, 14 Nov 2018 20:52:02 +0100
+	(envelope-from <david@redhat.com>) id 1gN1HE-0001Nc-TJ
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 14:56:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gN1H9-0001Id-4z
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 14:56:37 -0500
+References: <20181109110221.10553-1-david@redhat.com>
+	<20181109110221.10553-4-david@redhat.com>
+	<874lcjmue4.fsf@dusky.pond.sub.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <2ba6fbb2-d2cb-a4b3-61f5-385b08f822bd@redhat.com>
+Date: Wed, 14 Nov 2018 20:56:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <e855b03b-67e0-d822-d9fe-dedc1456011e@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Lx4qq5xfb3Y79rAWNMiNALBDq3YOY5MKa"
-Subject: Re: [Qemu-devel] [PATCH v2 03/11] block: Filtered children access
- functions
+In-Reply-To: <874lcjmue4.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC 3/6] qapi: rewrite string-input-visitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,565 +29,499 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Lx4qq5xfb3Y79rAWNMiNALBDq3YOY5MKa
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <f5d4e779-26c3-fd93-cae9-7d202242fd8c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 03/11] block: Filtered children access
- functions
-References: <20180809223117.7846-1-mreitz@redhat.com>
- <20180809223117.7846-4-mreitz@redhat.com>
- <e855b03b-67e0-d822-d9fe-dedc1456011e@redhat.com>
-In-Reply-To: <e855b03b-67e0-d822-d9fe-dedc1456011e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 12.11.18 23:17, Eric Blake wrote:
-> On 8/9/18 5:31 PM, Max Reitz wrote:
->> What bs->file and bs->backing mean depends on the node.=C2=A0 For filt=
-er
->> nodes, both signify a node that will eventually receive all R/W
->> accesses.=C2=A0 For format nodes, bs->file contains metadata and data,=
- and
->> bs->backing will not receive writes -- instead, writes are COWed to
->> bs->file.=C2=A0 Usually.
->>
->> In any case, it is not trivial to guess what a child means exactly wit=
-h
->> our currently limited form of expression.=C2=A0 It is better to introd=
-uce
->> some functions that actually guarantee a meaning:
->>
->> - bdrv_filtered_cow_child() will return the child that receives reques=
-ts
->> =C2=A0=C2=A0 filtered through COW.=C2=A0 That is, reads may or may not=
- be forwarded
->> =C2=A0=C2=A0 (depending on the overlay's allocation status), but write=
-s never go to
->> =C2=A0=C2=A0 this child.
->>
->> - bdrv_filtered_rw_child() will return the child that receives request=
-s
->> =C2=A0=C2=A0 filtered through some very plain process.=C2=A0 Reads and=
- writes issued to
->> =C2=A0=C2=A0 the parent will go to the child as well (although timing,=
- etc. may be
->> =C2=A0=C2=A0 modified).
->>
->> - All drivers but quorum (but quorum is pretty opaque to the general
->> =C2=A0=C2=A0 block layer anyway) always only have one of these childre=
-n: All read
->> =C2=A0=C2=A0 requests must be served from the filtered_rw_child (if it=
- exists), so
->> =C2=A0=C2=A0 if there was a filtered_cow_child in addition, it would n=
-ot receive
->> =C2=A0=C2=A0 any requests at all.
->> =C2=A0=C2=A0 (The closest here is mirror, where all requests are passe=
-d on to the
->> =C2=A0=C2=A0 source, but with write-blocking, write requests are "COWe=
-d" to the
->> =C2=A0=C2=A0 target.=C2=A0 But that just means that the target is a sp=
-ecial child that
->> =C2=A0=C2=A0 cannot be introspected by the generic block layer functio=
-ns, and that
->> =C2=A0=C2=A0 source is a filtered_rw_child.)
->> =C2=A0=C2=A0 Therefore, we can also add bdrv_filtered_child() which re=
-turns that
->> =C2=A0=C2=A0 one child (or NULL, if there is no filtered child).
->>
->> Also, many places in the current block layer should be skipping filter=
-s
->> (all filters or just the ones added implicitly, it depends) when going=
-
->> through a block node chain.=C2=A0 They do not do that currently, but t=
-his
->> patch makes them.
+On 14.11.18 18:38, Markus Armbruster wrote:
+> David Hildenbrand <david@redhat.com> writes:
 >=20
-> The description makes sense; now on to the code.
+>> The input visitor has some problems right now, especially
+>> - unsigned type "Range" is used to process signed ranges, resulting in
+>>   inconsistent behavior and ugly/magical code
+>> - uint64_t are parsed like int64_t, so big uint64_t values are not
+>>   supported and error messages are misleading
+>> - lists/ranges of int64_t are accepted although no list is parsed and
+>>   we should rather report an error
+>> - lists/ranges are preparsed using int64_t, making it hard to
+>>   implement uint64_t values or uint64_t lists
+>> - types that don't support lists don't bail out
 >=20
+> Known weirdness: empty list is invalid (test-string-input-visitor.c
+> demonstates).  Your patch doesn't change that (or else it would update
+> the test).  Should it be changed?
+>=20
+
+I don't change the test, so the old behavior still works.
+(empty string -> error)
+
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> So let's rewrite it by getting rid of usage of the type "Range" and
+>> properly supporting lists of int64_t and uint64_t (including ranges of
+>> both types), fixing the above mentioned issues.
+>>
+>> Lists of other types are not supported and will properly report an
+>> error. Virtual walks are now supported.
+>>
+>> Tests have to be fixed up:
+>> - Two BUGs were hardcoded that are fixed now
+>> - The string-input-visitor now actually returns a parsed list and not
+>>   an ordered set.
+>>
+>> While at it, do some smaller style changes (e.g. use g_assert).
+>=20
+> Please don't replace assert() by g_assert() in files that consistently
+> use assert() now.
+
+Alright, will use assert() and don't replace. (I thought g_assert() was
+the new fancy thing to do it in QEMU).
+
+>=20
+> In my opinion, g_assert() is one of the cases where GLib pointlessly
+> reinvents wheels that have been carrying load since forever.
+>=20
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
 >> ---
->> =C2=A0 qapi/block-core.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 4 +
->> =C2=A0 include/block/block.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0=C2=A0 1 +
->> =C2=A0 include/block/block_int.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 33 +++++-
->> =C2=A0 block.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 184 ++++++++++++++++++++++++++++-----
->> =C2=A0 block/backup.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 8 +-
->> =C2=A0 block/block-backend.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 16 ++-
->> =C2=A0 block/commit.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 36 ++++---
->> =C2=A0 block/io.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 27 ++---
->> =C2=A0 block/mirror.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 37 ++++---
->> =C2=A0 block/qapi.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 26 ++--=
+>>  include/qapi/string-input-visitor.h |   3 +-
+>>  qapi/string-input-visitor.c         | 436 +++++++++++++++++----------=
 -
->> =C2=A0 block/stream.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 15 ++-
->> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 84 ++++++++++++---
->> =C2=A0 migration/block-dirty-bitmap.c |=C2=A0=C2=A0 4 +-
->> =C2=A0 nbd/server.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 8=
- +-
->> =C2=A0 qemu-img.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 12 ++-
->> =C2=A0 15 files changed, 363 insertions(+), 132 deletions(-)
+>>  tests/test-string-input-visitor.c   |  18 +-
+>>  3 files changed, 264 insertions(+), 193 deletions(-)
 >>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index f20efc97f7..a71df88eb2 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -2248,6 +2248,10 @@
->> =C2=A0 # On successful completion the image file is updated to drop th=
-e
->> backing file
->> =C2=A0 # and the BLOCK_JOB_COMPLETED event is emitted.
+>> diff --git a/include/qapi/string-input-visitor.h b/include/qapi/string=
+-input-visitor.h
+>> index 33551340e3..2c40f7f5a6 100644
+>> --- a/include/qapi/string-input-visitor.h
+>> +++ b/include/qapi/string-input-visitor.h
+>> @@ -19,8 +19,7 @@ typedef struct StringInputVisitor StringInputVisitor=
+;
+>> =20
+>>  /*
+>>   * The string input visitor does not implement support for visiting
+>> - * QAPI structs, alternates, null, or arbitrary QTypes.  It also
+>> - * requires a non-null list argument to visit_start_list().
+>> + * QAPI structs, alternates, null, or arbitrary QTypes.
 >=20
-> Context: this is part of block-stream.
+> Preexisting: neglects to spell out the list limitations, i.e. can do
+> only flat lists of integers.  Care do fix that, too?
+
+Added "Only flat lists of integers (int64/uint64) are supported."
+
 >=20
->> =C2=A0 #
->> +# In case @device is a filter node, block-stream modifies the first
->> non-filter
->> +# overlay node below it to point to base's backing node (or NULL if
->> @base was
->> +# not specified) instead of modifying @device itself.
->=20
-> That is, if we have:
->=20
-> base <- filter1 <- active <- filter2
->=20
-> and request a block-stream with "top":"filter2", it is no different in
-> effect than if we had requested "top":"active", since filter nodes can'=
-t
-> be stream targets.=C2=A0 Makes sense.
->=20
-> What happens if we request "base":"filter1"? Do we want to require base=
-
-> to be a non-filter node?
-
-Well, then you get this after streaming:
-
-base <- active <- filter2
-
-There is no good reason why you'd stream to remove filters (just doing a
-reopen should be enough), but why not.  We can make the backing pointer
-point to any child, so it doesn't matter what the child is.  The problem
-is that we can only write backing file strings into actual COW overlay
-nodes, so it does matter what the parent is.
-
->> +++ b/include/block/block_int.h
->> @@ -91,6 +91,7 @@ struct BlockDriver {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * certain callbacks that refer to=
- data (see block.c) to their
->> bs->file if
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * the driver doesn't implement th=
-em. Drivers that do not wish
->> to forward
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * must implement them and return =
--ENOTSUP.
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * Note that filters are not allowed to modif=
-y data.
->=20
-> They can modify offsets and timing, but not data?=C2=A0 Even if it is a=
-n
-> encryption filter?=C2=A0 I'm trying to figure out if LUKS behaves like =
-a filter.
-
-It doesn't.  It's a format.
-
-First of all, LUKS has metadata, so it definitely is a format.
-
-Second, even if it didn't, I think it is a very, very useful convention
-to declare filters as things that do not modify data.  If a block driver
-does modify data, there is absolutely no point in handling it any
-different than a normal format driver.
-
->> +++ b/block.c
->> @@ -532,11 +532,12 @@ int bdrv_create_file(const char *filename,
->> QemuOpts *opts, Error **errp)
->> =C2=A0 int bdrv_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz=
-)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriver *drv =3D bs->drv;
->> +=C2=A0=C2=A0=C2=A0 BlockDriverState *filtered =3D bdrv_filtered_rw_bs=
-(bs);
->=20
-> Is it worth a micro-optimization of not calling this...
->=20
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (drv && drv->bdrv_probe_block=
-sizes) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return drv->bdr=
-v_probe_blocksizes(bs, bsz);
->=20
-> ...until after checking drv->bdrv_probe_blocksizes?
-
-I don't know? :-)
-
-I wouldn't think so, as bdrv_filtered_rw_bs() is just so simple.
-
->> -=C2=A0=C2=A0=C2=A0 } else if (drv && drv->is_filter && bs->file) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return bdrv_probe_blocksiz=
-es(bs->file->bs, bsz);
->> +=C2=A0=C2=A0=C2=A0 } else if (filtered) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return bdrv_probe_blocksiz=
-es(filtered, bsz);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->=20
-> But I don't mind if you leave it as written.
->=20
-> Is blkdebug a filter, or something else?
-
-I would have said it's a filter.
-
-> That's a case of something
-> that DOES change block sizes in relation to the child that it is
-> filtering.=C2=A0 If we have qcow2 -> blkdebug -> file, and the qcow2 fo=
-rmat
-> layer wants to know the blocksizes of its child, does it really always
-> want the sizes of 'file' rather than the (possibly changed) sizes of
-> 'blkdebug'?
-
-Hm.  See, that's why this series is so difficult, because all these
-questions keep popping up. :-)
-
-This is a very good question indeed.  I think for all filters but
-blkdebug it makes sense to just pass this through to the filtered child,
-because this should fundamentally go down to the protocol layer anyway.
-
-However, when looking at who uses this function at all, it appears that
-this is just used for guest device configuration (so the guest device's
-cluster size matches the hosts).  qcow2 doesn't support this at all, so
-if you use qcow2, you'll just get the default of BDRV_SECTOR_SIZE.  If
-you want to override the auto-detection, you can set a device-level
-option.  So I don't think we need support in blkdebug to emulate a
-different block size, because of two reasons:
-
-First, it wouldn't be a test of the block layer, because the block layer
-really doesn't care about this (internally).
-
-So second, it would only be a test of a guest.  But if you want to test
-that, you can always just set the device-level option.
-
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -ENOTSUP;
->> @@ -551,11 +552,12 @@ int bdrv_probe_blocksizes(BlockDriverState *bs,
->> BlockSizes *bsz)
->> =C2=A0 int bdrv_probe_geometry(BlockDriverState *bs, HDGeometry *geo)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriver *drv =3D bs->drv;
->> +=C2=A0=C2=A0=C2=A0 BlockDriverState *filtered =3D bdrv_filtered_rw_bs=
-(bs);
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (drv && drv->bdrv_probe_geome=
-try) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return drv->bdr=
-v_probe_geometry(bs, geo);
->> -=C2=A0=C2=A0=C2=A0 } else if (drv && drv->is_filter && bs->file) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return bdrv_probe_geometry=
-(bs->file->bs, geo);
->> +=C2=A0=C2=A0=C2=A0 } else if (filtered) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return bdrv_probe_geometry=
-(filtered, geo);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->=20
-> At least you're consistent on skipping filters.
-
-I tried my best to come up with something that makes sense.  Sometimes
-it made me nearly go insane.
-
->> @@ -4068,7 +4074,19 @@ BlockDriverState *bdrv_lookup_bs(const char
->> *device,
->> =C2=A0 bool bdrv_chain_contains(BlockDriverState *top, BlockDriverStat=
-e *base)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (top && top !=3D base) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 top =3D backing_bs(top);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 top =3D bdrv_filtered_bs(t=
-op);
->> +=C2=A0=C2=A0=C2=A0 }
+>>   */
+>>  Visitor *string_input_visitor_new(const char *str);
+>> =20
+>> diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+>> index dee708d384..16da47409e 100644
+>> --- a/qapi/string-input-visitor.c
+>> +++ b/qapi/string-input-visitor.c
+>> @@ -4,10 +4,10 @@
+>>   * Copyright Red Hat, Inc. 2012-2016
+>>   *
+>>   * Author: Paolo Bonzini <pbonzini@redhat.com>
+>> + *         David Hildenbrand <david@redhat.com>
+>>   *
+>>   * This work is licensed under the terms of the GNU LGPL, version 2.1=
+ or later.
+>>   * See the COPYING.LIB file in the top-level directory.
+>> - *
+>>   */
+>> =20
+>>  #include "qemu/osdep.h"
+>> @@ -18,21 +18,39 @@
+>>  #include "qapi/qmp/qerror.h"
+>>  #include "qapi/qmp/qnull.h"
+>>  #include "qemu/option.h"
+>> -#include "qemu/queue.h"
+>> -#include "qemu/range.h"
+>>  #include "qemu/cutils.h"
+>> =20
+>> +typedef enum ListMode {
+>> +    /* no list parsing active / no list expected */
+>> +    LM_NONE,
+>> +    /* we have an unparsed string remaining */
+>> +    LM_UNPARSED,
+>> +    /* we have an unfinished int64 range */
+>> +    LM_INT64_RANGE,
+>> +    /* we have an unfinished uint64 range */
+>> +    LM_UINT64_RANGE,
+>> +    /* we have parsed the string completely and no range is remaining=
+ */
+>> +    LM_END,
+>> +} ListMode;
 >> +
->> +=C2=A0=C2=A0=C2=A0 return top !=3D NULL;
->> +}
->> +
->> +/* Same as bdrv_chain_contains(), but skip implicitly added R/W filte=
-r
->> + * nodes and do not move past explicitly added R/W filters. */
->> +bool bdrv_legacy_chain_contains(BlockDriverState *top,
->> BlockDriverState *base)
->> +{
->> +=C2=A0=C2=A0=C2=A0 top =3D bdrv_skip_implicit_filters(top);
->> +=C2=A0=C2=A0=C2=A0 while (top && top !=3D base) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 top =3D bdrv_skip_implicit=
-_filters(bdrv_filtered_cow_bs(top));
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +typedef union RangeLimit {
+>> +    int64_t i64;
+>> +    uint64_t u64;
+>> +} RangeLimit;
+>> =20
+>>  struct StringInputVisitor
+>>  {
+>>      Visitor visitor;
+>> =20
+>> -    GList *ranges;
+>> -    GList *cur_range;
+>> -    int64_t cur;
+>> +    /* Porperties related to list processing */
 >=20
-> Is there a goal of getting rid of bdrv_legacy_chain_contains() in the
-> future?=C2=A0 If so, should the commit message and/or code comments men=
-tion
-> that?
-
-The only thing that's using it is qmp_block_commit.  I think the
-long-term goal is to get rid of the commit job and replace it by
-blockdev-copy, which would make the use of that function moot, but I
-suppose we have to keep it around as long as block-commit is there.
-
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return top !=3D NULL;
->> @@ -4140,20 +4158,24 @@ int bdrv_has_zero_init_1(BlockDriverState *bs)=
-
->> =C2=A0 =C2=A0 int bdrv_has_zero_init(BlockDriverState *bs)
->> =C2=A0 {
->> +=C2=A0=C2=A0=C2=A0 BlockDriverState *filtered;
->> +
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!bs->drv) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* If BS is a copy on write imag=
-e, it is initialized to
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 the contents of the b=
-ase image, which may not be zeroes.=C2=A0 */
->> -=C2=A0=C2=A0=C2=A0 if (bs->backing) {
->> +=C2=A0=C2=A0=C2=A0 if (bdrv_filtered_cow_child(bs)) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+> "Properties"
 >=20
-> Not for this patch, but should we ask the filtered_cow_child if it is
-> known to be all-zero content before blindly returning 0 here? Some
-> children may be able to efficiently report if they have all-zero conten=
-t
-> [for example, see the recent thread about NBD performace drop due to
-> explicitly zeroing the remote device, which could be skipped if it is
-> known that the remote device started life uninitialized]
-
-The question is, why would you have an empty backing file?
-
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bs->drv->bdrv_has_zero_init) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return bs->drv-=
->bdrv_has_zero_init(bs);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> -=C2=A0=C2=A0=C2=A0 if (bs->file && bs->drv->is_filter) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return bdrv_has_zero_init(=
-bs->file->bs);
->> +
->> +=C2=A0=C2=A0=C2=A0 filtered =3D bdrv_filtered_rw_bs(bs);
->> +=C2=A0=C2=A0=C2=A0 if (filtered) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return bdrv_has_zero_init(=
-filtered);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> Suggest
 >=20
-> You argued earlier that a filter can't change contents - but is that
-> just guest-visible contents? If LUKS is a filter node, then a file that=
+>        /* List parsing state */
 
-> is zero-initialized is NOT zero-initialized after passing through LUKS
-> encryption (decrypting the zeros returns garbage; conversely, writing
-> zeros into LUKS results in random-looking bits in the file).=C2=A0 I gu=
-ess
-> I'm leaning more and more towards LUKS is not a filter, but a format.
-
-Yeah.  I think it's just not useful to consider LUKS a filter, because
-if filters can change data -- then what good is having the "filter"
-category?
-
->> @@ -4198,8 +4220,9 @@ int bdrv_get_info(BlockDriverState *bs,
->> BlockDriverInfo *bdi)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -ENOMEDI=
-UM;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!drv->bdrv_get_info) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bs->file && drv->is_fi=
-lter) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
-turn bdrv_get_info(bs->file->bs, bdi);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriverState *filtered=
- =3D bdrv_filtered_rw_bs(bs);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (filtered) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
-turn bdrv_get_info(filtered, bdi);
->=20
-> Is this right for blkdebug?
-
-I think it is.  If it wants to intercept this function, it's free to
-implement .bdrv_get_info.
-
-The alternative is returning -ENOTSUP, and I don't see how that's any
-better than passing data through from the child.
-
->> @@ -5487,3 +5519,105 @@ bool
->> bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name=
-,
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return drv->bdrv_can_store_new_d=
-irty_bitmap(bs, name,
->> granularity, errp);
->> =C2=A0 }
->> +
->> +/*
->> + * Return the child that @bs acts as an overlay for, and from which
->> data may be
->> + * copied in COW or COR operations.=C2=A0 Usually this is the backing=
- file.
->> + */
->> +BdrvChild *bdrv_filtered_cow_child(BlockDriverState *bs)
->> +{
->> +=C2=A0=C2=A0=C2=A0 if (!bs || !bs->drv) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 if (bs->drv->is_filter) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->> +=C2=A0=C2=A0=C2=A0 }
->=20
-> Here, filters end the search...
-
-Yes, because COW parents have is_filter =3D=3D false...
-
->> +
->> +=C2=A0=C2=A0=C2=A0 return bs->backing;
->> +}
->> +
->> +/*
->> + * If @bs acts as a pass-through filter for one of its children,
->> + * return that child.=C2=A0 "Pass-through" means that write operation=
-s to
->> + * @bs are forwarded to that child instead of triggering COW.
->> + */
->> +BdrvChild *bdrv_filtered_rw_child(BlockDriverState *bs)
->> +{
->> +=C2=A0=C2=A0=C2=A0 if (!bs || !bs->drv) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 if (!bs->drv->is_filter) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->> +=C2=A0=C2=A0=C2=A0 }
->=20
-> ...while here, non-filters end the search. I think I follow your
-> semantics (we were abusing bs->backing for filters, and your code is no=
-w
-> trying to distinguish what was really meant)
-
-=2E..while R/W filter parents have is_filter =3D=3D true.  So that's why =
-it's
-the opposite.
-
->> +
->> +=C2=A0=C2=A0=C2=A0 return bs->backing ?: bs->file;
->> +}
->> +
->> +/*
->> + * Return any filtered child, independently on how it reacts to write=
+Yes, will use that.
 
 >=20
-> s/on/of/
+>> +    ListMode lm;
+>> +    RangeLimit rangeNext;
+>> +    RangeLimit rangeEnd;
+>=20
+> RangeLimit is a good name for rangeEnd, but not so hot for rangeNext.
+> Naming is hard.
 
-Indeed.
+Initially I had two unnamed unions to not have to give a name ;)
 
->> + * accesses and whether data is copied onto this BDS through COR.
->> + */
+RangeElement ? Will use that for now.
+
+>=20
+>> +    const char *unparsed_string;
+>> +    void *list;
+>=20
+> You drop /* Only needed for sanity checking the caller */.
+> Double-checking: is that not true anymore?
+
+I consider such comments bad as they can easily become outdated (and
+IMHO don't help anybody). But I can leave it here, don't really care.
 
 [...]
 
->> +++ b/block/io.c
->> @@ -120,6 +120,7 @@ static void bdrv_merge_limits(BlockLimits *dst,
->> const BlockLimits *src)
->> =C2=A0 void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriver *drv =3D bs->drv;
->> +=C2=A0=C2=A0=C2=A0 BlockDriverState *cow_bs =3D bdrv_filtered_cow_bs(=
-bs);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memset(&bs->bl, 0, sizeof(bs->bl=
-));
->> @@ -148,13 +149,13 @@ void bdrv_refresh_limits(BlockDriverState *bs,
->> Error **errp)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs->bl.max_iov =
-=3D IOV_MAX;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (bs->backing) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_refresh_limits(bs->ba=
-cking->bs, &local_err);
->> +=C2=A0=C2=A0=C2=A0 if (cow_bs) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_refresh_limits(cow_bs=
-, &local_err);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (local_err) =
-{
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 error_propagate(errp, local_err);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 return;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_merge_limits(&bs->bl,=
- &bs->backing->bs->bl);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_merge_limits(&bs->bl,=
- &cow_bs->bl);
+>> +        error_setg(errp, "Already processing a list.");
 >=20
-> Is this doing the right things with blkdebug?
+> Drop the period, please.  error_setg()'s contract stipulates:
+>=20
+>  * The resulting message should be a single phrase, with no newline or
+>  * trailing punctuation.
+>=20
+> More of the same below.
 
-First, blkdebug doesn't have a COW child, does it?
+All dots dropped :)
 
-Second, we still always invoke the driver's implementation (if there is
-one).  All of the code at the beginning of the function just chooses
-some defaults.  So blkdebug can still override everything.
+[...]
+>>  static GenericList *next_list(Visitor *v, GenericList *tail, size_t s=
+ize)
+>>  {
+>>      StringInputVisitor *siv =3D to_siv(v);
+>> -    Range *r;
+>> -
+>> -    if (!siv->ranges || !siv->cur_range) {
+>> -        return NULL;
+>> -    }
+>> =20
+>> -    r =3D siv->cur_range->data;
+>> -    if (!r) {
+>> +    switch (siv->lm) {
+>> +    case LM_NONE:
+>> +    case LM_END:
+>> +        /* we have reached the end of the list already or have no lis=
+t */
+>>          return NULL;
+>=20
+> Hmm.  Is there a way to reach case LM_NONE other than a programming
+> error?  If no, we should abort then.  To do so, fold LM_NONE into the
+> default case below.
 
-But there is indeed something wrong here.  And that is: What is with R/W
-filter drivers that use bs->backing?  After this patch, they won't get
-any defaults.
+Alright, all programming errors will be encoded as asserts.
 
-So I think the change that is needed is:
-- The bs->file branch should be transformed into a bdrv_storage_bs()
-  branch (this is done by the next patch already, good)
-- The bs->backing branch should be transformed into a bdrv_filtered_bs()
-  branch
+>=20
+>> -    }
+>> -
+>> -    if (!range_contains(r, siv->cur)) {
+>> -        siv->cur_range =3D g_list_next(siv->cur_range);
+>> -        if (!siv->cur_range) {
+>> -            return NULL;
+>> -        }
+>> -        r =3D siv->cur_range->data;
+>> -        if (!r) {
+>> -            return NULL;
+>> -        }
+>> -        siv->cur =3D range_lob(r);
+>> +    case LM_INT64_RANGE:
+>> +    case LM_UINT64_RANGE:
+>> +    case LM_UNPARSED:
+>> +        /* we have an unparsed string or something left in a range */
+>> +        break;
+>> +    default:
+>> +        g_assert_not_reached();
+>=20
+> abort() suffices, and is more consistent with the rest of qapi/.
 
-Then we have the following cases:
-- R/W filters will go into the second branch rather than the first, but
-  that's OK, because the code is the same anyway.
-  (But all filters that used bs->backing already did go into the second
-  branch, so...)
-- COW nodes (with both a storage child and a filtered child) will
-  continue to go into both branches and get a joined result.
-- Non-COW format nodes will continue to go into the first branch.
+Right, qapi is special ;)
 
-Before we have bs_storage_bs() (that is, before the next patch), I think
-it's OK to make filter nodes that use bs->file go into both branches
-(because bs->file is set for them, so they'll go into the first branch,
-and then, as filters, they'll go into the second branch).
+Will use s/g_assert/assert/
+s/g_assert_not_reached/abort/
 
+>=20
+>>      }
+>> =20
+>>      tail->next =3D g_malloc0(size);
+>> @@ -179,88 +109,216 @@ static GenericList *next_list(Visitor *v, Gener=
+icList *tail, size_t size)
+>>  static void check_list(Visitor *v, Error **errp)
+>>  {
+>>      const StringInputVisitor *siv =3D to_siv(v);
+>> -    Range *r;
+>> -    GList *cur_range;
+>> =20
+>> -    if (!siv->ranges || !siv->cur_range) {
+>> +    switch (siv->lm) {
+>> +    case LM_NONE:
+>> +        error_setg(errp, "Not processing a list.");
+>=20
+> Same question as for next_list().
 
-So I think all that's needed is s/cow_bs/filtered_bs/ and
-s/bdrv_filtered_cow_bs/bdrv_filtered_bs/.
+abort() it is :) -> default case
 
-Max
+>=20
+>> +    case LM_INT64_RANGE:
+>> +    case LM_UINT64_RANGE:
+>> +    case LM_UNPARSED:
+>> +        error_setg(errp, "There are elements remaining in the list.")=
+;
+>=20
+> Hmm.  qobject_input_check_list() reports "Only %u list elements expecte=
+d
+> in %s" here.  Looks unintuitive, until you remember how it's normally
+> used: to parse user input.  The error gets reported when the parsing
+> didn't consume the whole list.  Can only happen with a virtual walk.
+> And when it happens, the issue to report is "you provided a longer list
+> than I can accept".  qobject_input_check_list() does exactly that.  You=
+r
+> message is less clear.
 
+We don't keep track of element count (and I don't like adding it just to
+print a error message).
 
---Lx4qq5xfb3Y79rAWNMiNALBDq3YOY5MKa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+What about "Less list elements expected"? That at least matches the
+other error.
 
------BEGIN PGP SIGNATURE-----
+>=20
+>>          return;
+>> -    }
+>> -
+>> -    r =3D siv->cur_range->data;
+>> -    if (!r) {
+>> +    case LM_END:
+>>          return;
+>> +    default:
+>> +        g_assert_not_reached();
+>>      }
+>> -
+>> -    if (!range_contains(r, siv->cur)) {
+>> -        cur_range =3D g_list_next(siv->cur_range);
+>> -        if (!cur_range) {
+>> -            return;
+>> -        }
+>> -        r =3D cur_range->data;
+>> -        if (!r) {
+>> -            return;
+>> -        }
+>> -    }
+>> -
+>> -    error_setg(errp, "Range contains too many values");
+>>  }
+>> =20
+>>  static void end_list(Visitor *v, void **obj)
+>>  {
+>>      StringInputVisitor *siv =3D to_siv(v);
+>> =20
+>> -    assert(siv->list =3D=3D obj);
+>=20
+> I suspect state LM_NONE is also a programming error here.  If that's
+> correct, let's assert(siv->lm !=3D LM_NONE).
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvsfOIACgkQ9AfbAGHV
-z0A9PAf/TkvZqORgV7zJAwLQfmM3G4kwmF23sKNLMoU1/7cnS1QTAy6L5NvOSpfR
-Bor2UIsuCKKFP+Wp5fFoYGQwY1w/IO64Fnrm8h4qz9hcgZ3UxyKdxgjqgnzWVakw
-hYr5RFCknNq/cbOjNx/4XkGHNKEQvTPbd0UiI2qsRvElngZ20jMTYnma/JaOjbna
-/0M8i0WxuK5BcO5Xb2ei94QtUPEP/8amvkZLbiE7jBvaxSO0+hi0c1uFmL3y9aZf
-7E8VIsY5lcd9bL+wKlLR3JL7o5UbjT0G/inuf72OPlongW8k3D3AaxrG5PgFKrlx
-v43uZo6hAQ5xJJTFOZYeiPiCHcOVkw==
-=ug9d
------END PGP SIGNATURE-----
+Indeed, added.
 
---Lx4qq5xfb3Y79rAWNMiNALBDq3YOY5MKa--
+[...]
+>> +        if (siv->rangeNext.i64 > siv->rangeEnd.i64 || *obj =3D=3D INT=
+64_MAX) {
+>> +            /* end of range, check if there is more to parse */
+>> +            if (siv->unparsed_string[0]) {
+>> +                siv->lm =3D LM_UNPARSED;
+>> +            } else {
+>> +                siv->lm =3D LM_END;
+>> +            }
+>>          }
+>=20
+> Are you sure this is kosher?
+>=20
+> if siv->rangeNext.i64 and siv->rangeEnd are both initially INT64_MAX,
+> siv->rangeNext++ wraps around to INT64_MIN.  Except when the compiler
+> exploits undefined behavior.
+
+*obj =3D=3D INT64_MAX checks exactly that
+
+(it is the old value of siv->rangeNext.i64 before a possible wraparound).
+
+BTW I added a test case for exactly that as I had the BUG you described
+in the code ;)
+
+[...]
+>> +        return;
+>> +    case LM_UNPARSED:
+>> +        if (try_parse_int64_list_entry(siv, obj)) {
+>> +            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? nam=
+e : "null",
+>> +                       "list of int64 values or ranges");
+>> +        }
+>=20
+> I figure I'd make try_parse_int64_list_entry() just parse, and on
+> success fall through to case LM_INT64_RANGE.  But your solution works,
+> too.
+
+Then we would have to represent even single values as ranges, which is
+something I'd like to avoid.
+
+>=20
+>> +        return;
+>> +    case LM_END:
+>> +        error_setg(errp, "No more elements in the list.");
+>=20
+> This is the buddy of check_list() case LM_UNPARSED etc.  There, input
+> provides more list members than we expect.  Here, input provides less.
+> Again, the error is less clear than the one the QObject input visitor
+> reports: "Parameter '%s' is missing".
+>=20
+> Same for the unsigned copy below.
+
+Will also use "Less list elements expected".
+
+"Parameter '%s' is missing" does not really apply to list elements
+without a name. We can discuss when I resend.
+
+>=20
+>> +        return;
+>> +    default:
+>> +        error_setg(errp, "Lists don't support mixed types.");
+>=20
+> Is this a programming error?
+>=20
+> Same for the unsigned copy below.
+
+abort() it is.
+
+[...]
+>> +
+>> +        if (siv->rangeNext.u64 > siv->rangeEnd.u64 || *obj =3D=3D UIN=
+T64_MAX) {
+>> +            /* end of range, check if there is more to parse */
+>> +            if (siv->unparsed_string[0]) {
+>> +                siv->lm =3D LM_UNPARSED;
+>> +            } else {
+>> +                siv->lm =3D LM_END;
+>> +            }
+>> +        }
+>=20
+> Unsigned wraps around fine.  But when you fix the signed code, you
+> should probably keep this unsigned code as similar as practical.
+
+Again, *obj =3D=3D UINT64_MAX checks this.
+
+>=20
+>> +        return;
+>> +    case LM_UNPARSED:
+>> +        if (try_parse_uint64_list_entry(siv, obj)) {
+>> +            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? nam=
+e : "null",
+>> +                       "list of uint64 values or ranges");
+>> +        }
+>> +        return;
+>> +    case LM_END:
+>> +        error_setg(errp, "No more elements in the list.");
+>> +        return;
+>> +    default:
+>> +        error_setg(errp, "Lists don't support mixed types.");
+>> +        return;
+>>      }
+>>  }
+>> =20
+>> @@ -271,6 +329,11 @@ static void parse_type_size(Visitor *v, const cha=
+r *name, uint64_t *obj,
+>>      Error *err =3D NULL;
+>>      uint64_t val;
+>> =20
+>> +    if (siv->lm !=3D LM_NONE) {
+>> +        error_setg(errp, "Lists not supported for type \"size\"");
+>> +        return;
+>> +    }
+>> +
+>=20
+> Programming error?  More of the same below.
+
+assert() it is.
+
+[...]
+>>      visit_type_uint64List(v, NULL, &res, &error_abort);
+>>      tail =3D res;
+>>      for (i =3D 0; i < n; i++) {
+>> @@ -117,10 +107,10 @@ static void check_ulist(Visitor *v, uint64_t *ex=
+pected, size_t n)
+>>  static void test_visitor_in_intList(TestInputVisitorData *data,
+>>                                      const void *unused)
+>>  {
+>> -    /* Note: the visitor *sorts* ranges *unsigned* */
+>> -    int64_t expect1[] =3D { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20 };
+>> +    int64_t expect1[] =3D { 1, 2, 0, 2, 3, 4, 20, 5, 6, 7, 8, 9, 1, 2=
+, 3, 4, 5,
+>=20
+> Please wrap this line a bit earlier.
+
+Will do.
+
+>=20
+>> +                          6, 7, 8 };
+>>      int64_t expect2[] =3D { 32767, -32768, -32767 };
+>> -    int64_t expect3[] =3D { INT64_MAX, INT64_MIN };
+>> +    int64_t expect3[] =3D { INT64_MIN, INT64_MAX };
+>=20
+> Did you mean to change this line?
+>=20
+
+Yes, we don't sort the list anymore.
+
+>>      uint64_t expect4[] =3D { UINT64_MAX };
+>>      Error *err =3D NULL;
+>>      int64List *res =3D NULL;
+>> @@ -189,7 +179,7 @@ static void test_visitor_in_intList(TestInputVisit=
+orData *data,
+>>      visit_type_int64(v, NULL, &tail->value, &err);
+>>      g_assert_cmpint(tail->value, =3D=3D, 0);
+>>      visit_type_int64(v, NULL, &val, &err);
+>> -    g_assert_cmpint(val, =3D=3D, 1); /* BUG */
+>> +    error_free_or_abort(&err);
+>=20
+> Which of the problems listed in commit message is this?
+
+I guess the not mentioned "visiting beyond the end of a list is not
+handled properly" bug (most probably due to old range handling). Will
+add it to the description,
+
+>=20
+>>      visit_check_list(v, &error_abort);
+>>      visit_end_list(v, (void **)&res);
+>=20
+> Please don't let my review comments discourage you!  This is so much
+> better than the code we have now, and feels pretty close to ready.
+> Thanks a lot!
+>=20
+
+I appreciate people reviewing my code :) So don't worry, I'll do
+requested changes and resend, then we'll see what we are still missing.
+
+BTW: I'll add support for single-element ranges (1-1) as the previous
+code seemed to accepted that.
+
+--=20
+
+Thanks,
+
+David / dhildenb
