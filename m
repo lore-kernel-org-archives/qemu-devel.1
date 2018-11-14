@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1gMrfp-0003Nk-Gl
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:41:27 -0500
+	(envelope-from <famz@redhat.com>) id 1gMrw7-0007GJ-TH
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:58:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1gMrfl-0006WQ-9Z
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:41:25 -0500
-Received: from st13p11im-asmtp004.me.com ([17.164.40.219]:38840)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1gMrfl-0006W8-3w
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:41:21 -0500
-Received: from process-dkim-sign-daemon.st13p11im-asmtp004.me.com by
-	st13p11im-asmtp004.me.com
-	(Oracle Communications Messaging Server 8.0.2.2.20180531 64bit (built
-	May 31 2018)) id <0PI600E00G6LRA00@st13p11im-asmtp004.me.com> for
-	qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:41:07 +0000 (GMT)
-From: Chen Zhang <tgfbeta@me.com>
-Message-id: <9F7BCFFB-FCD5-4B6D-8536-E85D16D1A691@me.com>
-MIME-version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
-Date: Wed, 14 Nov 2018 17:40:57 +0800
-In-reply-to: <0EE77C7B-02AF-4666-90D3-53BF09585EBD@me.com>
-References: <20181113090249.15658-1-kraxel@redhat.com>
-	<0EE77C7B-02AF-4666-90D3-53BF09585EBD@me.com>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] gtk: sync guest display updates to host
- display refresh
+	(envelope-from <famz@redhat.com>) id 1gMrw3-0005ag-Vi
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:58:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1gMrw3-0005a3-Nq
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:58:11 -0500
+Date: Wed, 14 Nov 2018 17:58:07 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20181114095807.GB22784@magic>
+References: <20181031025712.18602-1-famz@redhat.com>
+	<4f6eb24d-fe13-cbf3-907e-6b3e566e33f4@comstyle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4f6eb24d-fe13-cbf3-907e-6b3e566e33f4@comstyle.com>
+Subject: Re: [Qemu-devel] [PATCH v4] tests: vm: auto_install OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,128 +27,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, tgfbeta@me.com
+To: Brad Smith <brad@comstyle.com>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-Additionally, the aforementioned patch performs OK for non-vfio OpenGL =
-enabled GTK displays, and fails DMA Buf iGVT-g display only, so far as I =
-could tell.
+On Sun, 11/11 18:20, Brad Smith wrote:
+> ping.
 
-Perhaps a change like the following is better?
+Queued. Will send a pull request soon.
 
- static gboolean gd_frame_tick(GtkWidget *widget,
-                               GdkFrameClock *frame_clock,
-                               gpointer opaque)
- {
-     VirtualConsole *vc =3D opaque;
--
--    vc->gfx.dcl.ops->dpy_refresh(&vc->gfx.dcl);
-+    gint64 interval;
-+    gdk_frame_clock_get_refresh_info(frame_clock,
-+            0,
-+            &interval,
-+            NULL);
-+    interval /=3D 1000;
-+    if (vc->gfx.dcl.update_interval !=3D interval) {
-+        update_displaychangelistener(&vc->gfx.dcl, interval);
-+    }
-     return G_SOURCE_CONTINUE;
- }
+Fam
 
-
-> On Nov 14, 2018, at 11:10 AM, Chen Zhang <tgfbeta@me.com> wrote:
->=20
-> Hi,
->=20
-> I have briefly tested this patch. Unfortunately, it apparently caused =
-deteriorated performance on a previously working Windows 10 guest with =
-DMA Buf.
->=20
-> The patched qemu not only clogged up graphics drawing, but also =
-obstructed the guest OS. The boot time and latency for guest operations =
-(e.g. clicking Start menu in guest) dramatically increased. My best =
-guess would be that GTK update events messed up with some polling in =
-main_loop_wait(false), leading to blocked IO, or conversely the GUI =
-being blocked by IO.
->=20
-> Best regards,
->=20
-> --
-> P.S:
->=20
-> The arguments for qemu:
->=20
-> /tmp/qemu-system-x86_64 -nodefaults -machine =
-pc,accel=3Dkvm,usb=3Doff,kernel_irqchip=3Don \
->  -vga none -display gtk,gl=3Don  -rtc base=3Dlocaltime \
->  -device =
-vfio-pci,sysfsdev=3D/sys/bus/pci/devices/0000:00:02.0/{UUID-FOR-MDEV},x-ig=
-d-opregion=3Don,display=3Don,rombar=3D0 \
->  -m 3000 -realtime mlock=3Doff -smp 3,sockets=3D1,cores=3D1 \
->  -drive file=3D/home/user/disk.img,format=3Dqcow2,media=3Ddisk,if=3Dide =
-\
->  -usb -device qemu-xhci,id=3Dxhci -device usb-tablet,bus=3Dxhci.0 \
->  -cpu host -monitor stdio
->=20
-> The host runs a Ubuntu 18.04 desktop.
->=20
->> On Nov 13, 2018, at 5:02 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
->>=20
->> Reduce console refresh timer to idle refresh rate.  Register a frame
->> tick callback (called by gtk on each display frame) and use that to =
-kick
->> display updates instead.
->>=20
->> That should sync qemu refresh rate to display refresh rate.  It'll =
-also
->> stop updating the qemu display in case the qemu is not visible (gtk
->> stops calling the frame tick callback then).
->>=20
->> Buglink: https://bugs.launchpad.net/bugs/1802915
->> Suggested-by: Chen Zhang <tgfbeta@me.com>
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->> ---
->> ui/gtk.c | 16 ++++++++++++++++
->> 1 file changed, 16 insertions(+)
->>=20
->> diff --git a/ui/gtk.c b/ui/gtk.c
->> index 579990b865..8f79dfe42c 100644
->> --- a/ui/gtk.c
->> +++ b/ui/gtk.c
->> @@ -1661,6 +1661,16 @@ static gboolean gd_configure(GtkWidget =
-*widget,
->>    return FALSE;
->> }
->>=20
->> +static gboolean gd_frame_tick(GtkWidget *widget,
->> +                              GdkFrameClock *frame_clock,
->> +                              gpointer opaque)
->> +{
->> +    VirtualConsole *vc =3D opaque;
->> +
->> +    vc->gfx.dcl.ops->dpy_refresh(&vc->gfx.dcl);
->> +    return G_SOURCE_CONTINUE;
->> +}
->> +
->> /** Virtual Console Callbacks **/
->>=20
->> static GSList *gd_vc_menu_init(GtkDisplayState *s, VirtualConsole =
-*vc,
->> @@ -1911,6 +1921,12 @@ static void =
-gd_connect_vc_gfx_signals(VirtualConsole *vc)
->>                         G_CALLBACK(gd_focus_out_event), vc);
->>        g_signal_connect(vc->gfx.drawing_area, "configure-event",
->>                         G_CALLBACK(gd_configure), vc);
->> +        if (1 /* make that a config option ??? */) {
->> +            update_displaychangelistener(&vc->gfx.dcl,
->> +                                         GUI_REFRESH_INTERVAL_IDLE);
->> +            gtk_widget_add_tick_callback(vc->gfx.drawing_area,
->> +                                         gd_frame_tick, vc, NULL);
->> +        }
->>    } else {
->>        g_signal_connect(vc->gfx.drawing_area, "key-press-event",
->>                         G_CALLBACK(gd_text_key_down), vc);
->> --=20
->> 2.9.3
->>=20
->=20
+> 
+> On 10/30/2018 10:57 PM, Fam Zheng wrote:
+> > Upgrade OpenBSD to 6.4 using auto_install. Especially, drop SDL1,
+> > include SDL2.
+> > 
+> > Also do the build in $HOME since both /var/tmp and /tmp are tmpfs with
+> > limited capacities.
+> > 
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > 
+> > ---
+> > 
+> > v4: Use 6.4. [Brad]
+> > ---
+> >   tests/vm/basevm.py |  6 ++--
+> >   tests/vm/openbsd   | 85 +++++++++++++++++++++++++++++++++++++++-------
+> >   2 files changed, 76 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> > index 5caf77d6b8..6fb446d4c5 100755
+> > --- a/tests/vm/basevm.py
+> > +++ b/tests/vm/basevm.py
+> > @@ -68,8 +68,6 @@ class BaseVM(object):
+> >           self._args = [ \
+> >               "-nodefaults", "-m", "4G",
+> >               "-cpu", "max",
+> > -            "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22",
+> > -            "-device", "virtio-net-pci,netdev=vnet",
+> >               "-vnc", "127.0.0.1:0,to=20",
+> >               "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
+> >           if vcpus and vcpus > 1:
+> > @@ -146,8 +144,10 @@ class BaseVM(object):
+> >                               "-device",
+> >                               "virtio-blk,drive=%s,serial=%s,bootindex=1" % (name, name)]
+> > -    def boot(self, img, extra_args=[]):
+> > +    def boot(self, img, extra_args=[], extra_usernet_args=""):
+> >           args = self._args + [
+> > +            "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22" + extra_usernet_args,
+> > +            "-device", "virtio-net-pci,netdev=vnet",
+> >               "-device", "VGA",
+> >               "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
+> >               "-device", "virtio-blk,drive=drive0,bootindex=0"]
+> > diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+> > index cfe0572c59..99a7e98d80 100755
+> > --- a/tests/vm/openbsd
+> > +++ b/tests/vm/openbsd
+> > @@ -14,6 +14,9 @@
+> >   import os
+> >   import sys
+> >   import subprocess
+> > +import time
+> > +import atexit
+> > +import tempfile
+> >   import basevm
+> >   class OpenBSDVM(basevm.BaseVM):
+> > @@ -21,25 +24,83 @@ class OpenBSDVM(basevm.BaseVM):
+> >       arch = "x86_64"
+> >       BUILD_SCRIPT = """
+> >           set -e;
+> > -        rm -rf /var/tmp/qemu-test.*
+> > -        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+> > +        rm -rf $HOME/qemu-test.*
+> > +        cd $(mktemp -d $HOME/qemu-test.XXXXXX);
+> >           tar -xf /dev/rsd1c;
+> > -        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
+> > +        ./configure {configure_opts};
+> >           gmake --output-sync -j{jobs} {verbose};
+> >           # XXX: "gmake check" seems to always hang or fail
+> >           #gmake --output-sync -j{jobs} check {verbose};
+> >       """
+> > +    def _install_os(self, img):
+> > +        tmpdir = tempfile.mkdtemp()
+> > +        pxeboot = self._download_with_cache("https://fastly.cdn.openbsd.org/pub/OpenBSD/6.4/amd64/pxeboot",
+> > +                sha256sum="d87ab39d941ff926d693943a927585945456ccedb76ea504a251b4b93cd4c266")
+> > +        bsd_rd = self._download_with_cache("https://fastly.cdn.openbsd.org/pub/OpenBSD/6.4/amd64/bsd.rd",
+> > +                sha256sum="89505c683cbcd75582fe475e847ed53d89e2b8180c3e3d61f4eb4b76b5e11f5c")
+> > +        install = self._download_with_cache("https://fastly.cdn.openbsd.org/pub/OpenBSD/6.4/amd64/install64.iso",
+> > +                sha256sum='81833b79e23dc0f961ac5fb34484bca66386deb3181ddb8236870fa4f488cdd2')
+> > +        subprocess.check_call(["qemu-img", "create", img, "32G"])
+> > +        subprocess.check_call(["cp", pxeboot, os.path.join(tmpdir, "auto_install")])
+> > +        subprocess.check_call(["cp", bsd_rd, os.path.join(tmpdir, "bsd")])
+> > +
+> > +        self._gen_install_conf(tmpdir)
+> > +        # BOOTP filename being auto_install makes sure OpenBSD installer
+> > +        # not prompt for "auto install mode"
+> > +        usernet_args = ",tftp=%s,bootfile=/auto_install" % tmpdir
+> > +        usernet_args += ",tftp-server-name=10.0.2.4"
+> > +        usernet_args += ",guestfwd=tcp:10.0.2.4:80-cmd:cat %s" % \
+> > +            os.path.join(tmpdir, "install.conf")
+> > +        self.boot(img,
+> > +                  extra_args=["-boot", "once=n", "-no-reboot",
+> > +                              "-cdrom", install],
+> > +                  extra_usernet_args=usernet_args)
+> > +        self.wait()
+> > +
+> > +    def _gen_install_conf(self, tmpdir):
+> > +        contents = """\
+> > +HTTP/1.0 200 OK
+> > +
+> > +System hostname = qemu-openbsd
+> > +Password for root = qemupass
+> > +Public ssh key for root = {pub_key}
+> > +Allow root ssh login = yes
+> > +Network interfaces = vio0
+> > +IPv4 address for vio0 = dhcp
+> > +Setup a user = qemu
+> > +Password for user = qemupass
+> > +Public ssh key for user = {pub_key}
+> > +What timezone are you in = US/Eastern
+> > +Server = fastly.cdn.openbsd.org
+> > +Use http = yes
+> > +Default IPv4 route = 10.0.2.2
+> > +Location of sets = cd0
+> > +Set name(s) = all
+> > +Continue without verification = yes
+> > +""".format(pub_key=basevm.SSH_PUB_KEY)
+> > +        with open(os.path.join(tmpdir, "install.conf"), "w") as f:
+> > +            f.write(contents)
+> > +
+> >       def build_image(self, img):
+> > -        cimg = self._download_with_cache("http://download.patchew.org/openbsd-6.1-amd64.img.xz",
+> > -                sha256sum='8c6cedc483e602cfee5e04f0406c64eb99138495e8ca580bc0293bcf0640c1bf')
+> > -        img_tmp_xz = img + ".tmp.xz"
+> > -        img_tmp = img + ".tmp"
+> > -        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+> > -        subprocess.check_call(["xz", "-df", img_tmp_xz])
+> > -        if os.path.exists(img):
+> > -            os.remove(img)
+> > -        os.rename(img_tmp, img)
+> > +
+> > +        self._install_os(img + ".tmp")
+> > +
+> > +        self.boot(img + ".tmp")
+> > +        self.wait_ssh()
+> > +
+> > +        self.ssh_root("usermod -G operator qemu")
+> > +        self.ssh_root("echo https://fastly.cdn.openbsd.org/pub/OpenBSD > /etc/installurl")
+> > +        for pkg in ["git", "gmake", "glib2", "bison", "sdl2"]:
+> > +            self.ssh_root("pkg_add " + pkg)
+> > +        self.ssh_root("ln -sf /usr/local/bin/python2.7 /usr/local/bin/python")
+> > +        self.ssh_root("ln -sf /usr/local/bin/python2.7-2to3 /usr/local/bin/2to3")
+> > +        self.ssh_root("ln -sf /usr/local/bin/python2.7-config /usr/local/bin/python-config")
+> > +        self.ssh_root("ln -sf /usr/local/bin/pydoc2.7 /usr/local/bin/pydoc")
+> > +        self.ssh_root("shutdown -p now")
+> > +        self.wait()
+> > +
+> > +        subprocess.check_call(["mv", img + ".tmp", img])
+> >   if __name__ == "__main__":
+> >       sys.exit(basevm.main(OpenBSDVM))
