@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gMwqh-0005hy-Ok
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:13:03 -0500
+	(envelope-from <rjones@redhat.com>) id 1gMwsJ-0006rc-4k
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:14:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gMwqe-0007BR-Em
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:12:59 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:51670)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gMwqe-00079z-7U
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:12:56 -0500
-Received: by mail-wm1-f65.google.com with SMTP id w7-v6so15790638wmc.1
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 07:12:56 -0800 (PST)
-References: <20180420104743.7396-1-kraxel@redhat.com>
-	<3f72757a-4b4c-9241-dd8f-561886cf3295@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a17f8629-e628-3b3d-f964-98bcb9b218f3@redhat.com>
-Date: Wed, 14 Nov 2018 16:12:52 +0100
+	(envelope-from <rjones@redhat.com>) id 1gMwsH-0000xD-DT
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:14:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1gMwsH-0000uD-64
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 10:14:37 -0500
+Date: Wed, 14 Nov 2018 15:14:27 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20181114151427.GJ27120@redhat.com>
+References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
+	<871s7nstle.fsf@dusky.pond.sub.org>
+	<e935a267-a5ae-4dd4-a1a7-064c084671ab@redhat.com>
+	<874lcjra28.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <3f72757a-4b4c-9241-dd8f-561886cf3295@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] simple firmware.json test tool
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <874lcjra28.fsf@dusky.pond.sub.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 00/41] RFC: slirp: make it again a
+ standalone project
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,152 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, renzo@cs.unibo.it, Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org, stefanha@redhat.com, samuel.thibault@ens-lyon.org
 
-Hi Gerd,
+On Wed, Nov 14, 2018 at 03:46:39PM +0100, Markus Armbruster wrote:
+> The issue I have with SLIRP isn't that it solves a useless problem (au
+> contraire!), it's that it's a useless solution.  Okay, that's an unfair
+> exaggeration, it's not useless, I just wouldn't trust it in production,
+> unless it has improved significantly since I last looked at it.
 
-On 20/4/18 17:38, Laszlo Ersek wrote:
-> On 04/20/18 12:47, Gerd Hoffmann wrote:
->> applies on top of the firmware.json v2 series.
->> ---
->>   configure       |  2 +-
->>   Makefile        |  2 ++
->>   qemu-firmware.c | 81 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>   3 files changed, 84 insertions(+), 1 deletion(-)
->>   create mode 100644 qemu-firmware.c
->>
->> diff --git a/configure b/configure
->> index 0a19b033bc..753f80147b 100755
->> --- a/configure
->> +++ b/configure
->> @@ -5495,7 +5495,7 @@ fi
->>   
->>   tools=""
->>   if test "$want_tools" = "yes" ; then
->> -  tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
->> +  tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) qemu-firmware\$(EXESUF) $tools"
->>     if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
->>       tools="qemu-nbd\$(EXESUF) $tools"
->>     fi
->> diff --git a/Makefile b/Makefile
->> index 32034abe15..4d6e627113 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -543,6 +543,8 @@ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
->>   
->>   qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
->>   
->> +qemu-firmware$(EXESUF): qemu-firmware.o $(COMMON_LDADDS)
->> +
->>   fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
->>   fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
->>   
->> diff --git a/qemu-firmware.c b/qemu-firmware.c
->> new file mode 100644
->> index 0000000000..792f0fec8f
->> --- /dev/null
->> +++ b/qemu-firmware.c
->> @@ -0,0 +1,81 @@
->> +#include "qemu/osdep.h"
->> +#include "qemu-common.h"
->> +#include "qemu/error-report.h"
->> +
->> +#include "qapi/error.h"
->> +#include "qapi/qapi-types-firmware.h"
->> +#include "qapi/qapi-visit-firmware.h"
->> +#include "qapi/qobject-input-visitor.h"
->> +
->> +int main(int argc, char *argv[])
->> +{
->> +    Error *err = NULL;
->> +    FirmwareMappingFlash *flash;
->> +    Firmware *fw;
->> +    Visitor *v;
->> +    int fd, size, rc;
->> +    char *buf;
->> +
->> +    if (argc != 2) {
->> +        fprintf(stderr, "usage: qemu-firmware <firmware-desc.json>\n");
->> +        exit(1);
->> +    }
->> +
->> +    /* read file */
->> +    fd = open(argv[1], O_RDONLY);
->> +    if (fd < 0) {
->> +        fprintf(stderr, "open %s: %s\n", argv[1], strerror(errno));
->> +        exit(1);
->> +    }
->> +    size = lseek(fd, 0, SEEK_END);
->> +    if (size < 0) {
->> +        perror("lseek");
->> +        exit(1);
->> +    }
->> +    lseek(fd, 0, SEEK_SET);
->> +    buf = malloc(size+1);
->> +    rc = read(fd, buf, size);
->> +    if (rc != size) {
->> +        fprintf(stderr, "file read error\n");
->> +        exit(1);
->> +    }
->> +    buf[size] = 0;
->> +    close(fd);
->> +
->> +    /* parse file */
->> +    v = qobject_input_visitor_new_str(buf, "", &err);
->> +    if (!v) {
->> +        error_report_err(err);
->> +        exit(1);
->> +    }
->> +    visit_type_Firmware(v, NULL, &fw, &error_fatal);
->> +    visit_free(v);
->> +
->> +    /* print cmdline */
->> +    switch (fw->mapping->device) {
->> +    case FIRMWARE_DEVICE_FLASH:
->> +        /*
->> +         * FIXME: nvram should be a per-guest copy.
->> +         *        How to handle that best here?
->> +         */
-> 
-> Perhaps print a few shell commands first? Such as:
-> 
->    (
->      VARSTORE=$(mktemp)
->      trap 'rm -f -- "$VARSTORE"' EXIT
->      cat -- '[VARSTORE_TEMPLATE]' >> "$VARSTORE"
->      qemu ...
->    )
-> 
-> It really does take separate actions, just like when you create a new
-> disk image with "qemu-img".
-> 
-> Thanks,
-> Laszlo
-> 
->> +        flash = &fw->mapping->u.flash;
->> +        printf("-drive if=pflash,index=0,format=%s,file=%s\n",
->> +               BlockdevDriver_str(flash->executable->format),
->> +               flash->executable->pathname);
->> +        printf("-drive if=pflash,index=1,format=%s,file=%s\n",
->> +               BlockdevDriver_str(flash->nvram_template->format),
->> +               flash->nvram_template->pathname);
->> +        break;
->> +    case FIRMWARE_DEVICE_MEMORY:
->> +        printf("-bios %s\n", fw->mapping->u.memory.pathname);
->> +        break;
->> +    case FIRMWARE_DEVICE_KERNEL:
->> +        printf("-kernel %s\n", fw->mapping->u.kernel.pathname);
->> +        break;
->> +    default:
->> +        fprintf(stderr, "TODO\n");
->> +        break;
->> +    }
->> +
->> +    exit(0);
->> +}
+It's used by virt-builder, virt-customize, virt-v2v, etc., in some
+cases in production.  Of course those uses are not completely general
+purpose (it'll be things like running very specific, known =E2=80=98yum i=
+nstall=E2=80=99
+commands from the guest), and we test it quite a bit.
 
-Any plan to respin this patch?
+Rich.
 
-Thanks,
-
-Phil.
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-top is 'top' for virtual machines.  Tiny program with many
+powerful monitoring features, net stats, disk stats, logging, etc.
+http://people.redhat.com/~rjones/virt-top
