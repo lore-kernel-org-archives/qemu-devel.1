@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gMqmB-000409-3A
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:43:56 -0500
+	(envelope-from <bounces@canonical.com>) id 1gMrR8-0003u0-7u
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:26:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gMqm9-0006mh-RX
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:43:55 -0500
-References: <20181110081147.4027-1-luc.michel@greensocs.com>
-	<20181110081147.4027-4-luc.michel@greensocs.com>
-	<20181113110636.GH1148@toto>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <a67ef945-2466-155c-0f16-0a1b3b74c9fc@greensocs.com>
-Date: Wed, 14 Nov 2018 09:43:27 +0100
+	(envelope-from <bounces@canonical.com>) id 1gMrR5-0000BR-45
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:26:14 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51850)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gMrR4-0000Ap-US
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 04:26:11 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gMrR3-0003Xa-En
+	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 09:26:09 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6D6572E80C8
+	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 09:26:09 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181113110636.GH1148@toto>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 03/16] gdbstub: add
- multiprocess support to '?' packets
+Date: Wed, 14 Nov 2018 09:19:08 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1802150 <1802150@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154161401577.19796.10798182190360171804.malonedeb@gac.canonical.com>
+Message-Id: <154218714896.2711.1450615526322833749.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1802150] Re: Guest undefined when destroyed on
+ host after migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,176 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, alistair@alistair23.me, mark.burton@greensocs.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
 
-Hi Edgar,
+Dan:
+  Rereading your description I think this might be worth discussing on the =
+libvirt mailing list/bug trackers instead.
+  I *think* what you're saying is the migration works fine, the only proble=
+m is that after you shutdown the VM it disappears.
+  My understanding (although I'm more qemu than libvirt) is that you need t=
+o pass --persistent to the virsh migrate   command to get it to stick on th=
+e destination.  However, I'd expected that without --persistent it would ha=
+ve still existed on the source after shutdown.
 
-On 11/13/18 12:06 PM, Edgar E. Iglesias wrote:
-> On Sat, Nov 10, 2018 at 09:11:34AM +0100, Luc Michel wrote:
->> The gdb_get_cpu_pid() function does the PID lookup for the given CPU. =
-It
->> checks if the CPU is a direct child of a CPU cluster. If it is, the
->> returned PID is the cluster ID plus one (cluster IDs start at 0, GDB
->> PIDs at 1). When the CPU is not a child of such a container, the PID o=
-f
->> the first process is returned.
->>
->> The gdb_fmt_thread_id() function generates the string to be used to id=
-entify
->> a given thread, in a response packet for the peer. This function
->> supports generating thread IDs when multiprocess mode is enabled (in t=
-he
->> form `p<pid>.<tid>').
->>
->> Use them in the reply to a '?' request.
->>
->> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
->> Acked-by: Alistair Francis <alistair.francis@wdc.com>
->=20
->=20
-> This is also theoretical but:
-> When looking at this, it seems like you could have lazily created
-> the s->processes array entries (if you find a cluster but the
-> no valid entry in s->processes). Then we could perhaps eliminate the
-> scan of all objects at startup and also support CPU/Cluster hotplug.
-Yes you are right, this could be an improvement to this series to add
-cluster hotplug support (CPU hotplug is actually supported). It's a
-little bit tricky though since we would have to maintain the
-s->processes array and properly signal to GDB when a process dies.
+  Given that big long VM name, is it being managed by some higher level
+thing rather than directly?
 
-Cheers,
-Luc
+-- =
 
->=20
-> Anyway, this looks good to me!
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
->=20
-> Cheers,
-> Edgar
->=20
->=20
->> ---
->>  gdbstub.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++-=
--
->>  1 file changed, 58 insertions(+), 2 deletions(-)
->>
->> diff --git a/gdbstub.c b/gdbstub.c
->> index 0d70b89598..d26bad4b67 100644
->> --- a/gdbstub.c
->> +++ b/gdbstub.c
->> @@ -638,10 +638,52 @@ static int memtox(char *buf, const char *mem, in=
-t len)
->>          }
->>      }
->>      return p - buf;
->>  }
->> =20
->> +static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
->> +{
->> +#ifndef CONFIG_USER_ONLY
->> +    gchar *path, *name;
->> +    Object *obj;
->> +    CPUClusterState *cluster;
->> +    uint32_t ret;
->> +
->> +    path =3D object_get_canonical_path(OBJECT(cpu));
->> +    name =3D object_get_canonical_path_component(OBJECT(cpu));
->> +
->> +    if (path =3D=3D NULL) {
->> +        ret =3D s->processes[0].pid;
->> +        goto out;
->> +    }
->> +
->> +    /*
->> +     * Retrieve the CPU parent path by removing the last '/' and the =
-CPU name
->> +     * from the CPU canonical path. */
->> +    path[strlen(path) - strlen(name) - 1] =3D '\0';
->> +
->> +    obj =3D object_resolve_path_type(path, TYPE_CPU_CLUSTER, NULL);
->> +
->> +    if (obj =3D=3D NULL) {
->> +        ret =3D s->processes[0].pid;
->> +        goto out;
->> +    }
->> +
->> +    cluster =3D CPU_CLUSTER(obj);
->> +    ret =3D cluster->cluster_id + 1;
->> +
->> +out:
->> +    g_free(name);
->> +    g_free(path);
->> +
->> +    return ret;
->> +
->> +#else
->> +    return s->processes[0].pid;
->> +#endif
->> +}
->> +
->>  static const char *get_feature_xml(const char *p, const char **newp,
->>                                     CPUClass *cc)
->>  {
->>      size_t len;
->>      int i;
->> @@ -907,10 +949,23 @@ static CPUState *find_cpu(uint32_t thread_id)
->>      }
->> =20
->>      return NULL;
->>  }
->> =20
->> +static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
->> +                           char *buf, size_t buf_size)
->> +{
->> +    if (s->multiprocess) {
->> +        snprintf(buf, buf_size, "p%02x.%02x",
->> +                 gdb_get_cpu_pid(s, cpu), cpu_gdb_index(cpu));
->> +    } else {
->> +        snprintf(buf, buf_size, "%02x", cpu_gdb_index(cpu));
->> +    }
->> +
->> +    return buf;
->> +}
->> +
->>  static int is_query_packet(const char *p, const char *query, char sep=
-arator)
->>  {
->>      unsigned int query_len =3D strlen(query);
->> =20
->>      return strncmp(p, query, query_len) =3D=3D 0 &&
->> @@ -1018,22 +1073,23 @@ static int gdb_handle_packet(GDBState *s, cons=
-t char *line_buf)
->>      const char *p;
->>      uint32_t thread;
->>      int ch, reg_size, type, res;
->>      uint8_t mem_buf[MAX_PACKET_LENGTH];
->>      char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
->> +    char thread_id[16];
->>      uint8_t *registers;
->>      target_ulong addr, len;
->> =20
->>      trace_gdbstub_io_command(line_buf);
->> =20
->>      p =3D line_buf;
->>      ch =3D *p++;
->>      switch(ch) {
->>      case '?':
->>          /* TODO: Make this return the correct value for user-mode.  *=
-/
->> -        snprintf(buf, sizeof(buf), "T%02xthread:%02x;", GDB_SIGNAL_TR=
-AP,
->> -                 cpu_gdb_index(s->c_cpu));
->> +        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP=
-,
->> +                 gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thr=
-ead_id)));
->>          put_packet(s, buf);
->>          /* Remove all the breakpoints when this query is issued,
->>           * because gdb is doing and initial connect and the state
->>           * should be cleaned up.
->>           */
->> --=20
->> 2.19.1
->>
->>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1802150
+
+Title:
+  Guest undefined when destroyed on host after migration
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  After a live migration, guest VMs are being undefined from the host
+  they were migrated to after shutdown. I have experienced this at two
+  (2) separate locations on more than one hardware configuration.  This
+  happens when utilizing virt-manager to view current allocations on
+  hosts, and virsh on the CLI to migrate guests.  When the guest is
+  migrated from one host to another, no errors are thrown, and only lose
+  1 packet from infinite ping. Shutting guest down *from* the guest OS
+  results in the Guest VM being undefined on the residing host, and XML
+  config lost.  If needed, I can provide a recorded session of this
+  happening.
+
+  Thanks,
+    Dan
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1802150/+subscriptions
