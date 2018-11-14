@@ -1,39 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gMyND-0002fe-TS
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:50:44 -0500
+	(envelope-from <thuth@redhat.com>) id 1gMyPH-00046Y-9o
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:52:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gMyN0-0002IZ-7b
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:50:32 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51642
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1gMyMw-0001un-Hx
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:50:24 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wAEGi6JV049659
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 11:50:17 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2nrp86med4-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 11:50:17 -0500
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Nov 2018 16:50:16 -0000
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <thuth@redhat.com>) id 1gMyPC-0005Wf-7h
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:52:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42726)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gMyPC-0005WP-0S
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:52:42 -0500
+References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
+	<871s7nstle.fsf@dusky.pond.sub.org>
+	<e935a267-a5ae-4dd4-a1a7-064c084671ab@redhat.com>
+	<874lcjra28.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0e7341c4-364f-187a-4136-abc607d989df@redhat.com>
+Date: Wed, 14 Nov 2018 17:52:33 +0100
 MIME-Version: 1.0
+In-Reply-To: <874lcjra28.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20181113165539.14376-1-danielhb413@gmail.com>
-References: <20181113165539.14376-1-danielhb413@gmail.com>
-Date: Wed, 14 Nov 2018 10:50:06 -0600
-Message-Id: <154221420629.30771.4049415289221436454@sif>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] qga: update docs with systemd
- suspend support info
+Subject: Re: [Qemu-devel] [PATCH for-3.2 00/41] RFC: slirp: make it again a
+ standalone project
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,89 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
-Cc: eblake@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: renzo@cs.unibo.it, Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org, rjones@redhat.com, stefanha@redhat.com, samuel.thibault@ens-lyon.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-Quoting Daniel Henrique Barboza (2018-11-13 10:55:39)
-> Commit 067927d62e ("qga: systemd hibernate/suspend/hybrid-sleep
-> support") failed to update qapi-schema.json after adding systemd
-> hibernate/suspend/hybrid-sleep capabilities to guest-suspend-* QGA
-> commands.
-> =
-
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-
-Thanks, applied to qga tree:
-  https://github.com/mdroth/qemu/commits/qga
-
-> ---
->  qga/qapi-schema.json | 25 ++++++++++++++-----------
->  1 file changed, 14 insertions(+), 11 deletions(-)
-> =
-
-> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> index c6725b3ec8..61f66fc461 100644
-> --- a/qga/qapi-schema.json
-> +++ b/qga/qapi-schema.json
-> @@ -532,12 +532,12 @@
->  #
->  # Suspend guest to disk.
->  #
-> -# This command tries to execute the scripts provided by the pm-utils pac=
-kage.
-> -# If it's not available, the suspend operation will be performed by manu=
-ally
-> -# writing to a sysfs file.
-> +# This command attempts to suspend the guest using three strategies, in =
-this
-> +# order:
->  #
-> -# For the best results it's strongly recommended to have the pm-utils
-> -# package installed in the guest.
-> +# - systemd hibernate
-> +# - pm-utils (via pm-hibernate)
-> +# - manual write into sysfs
->  #
->  # This command does NOT return a response on success. There is a high ch=
-ance
->  # the command succeeded if the VM exits with a zero exit status or, when
-> @@ -560,12 +560,12 @@
->  #
->  # Suspend guest to ram.
->  #
-> -# This command tries to execute the scripts provided by the pm-utils pac=
-kage.
-> -# If it's not available, the suspend operation will be performed by manu=
-ally
-> -# writing to a sysfs file.
-> +# This command attempts to suspend the guest using three strategies, in =
-this
-> +# order:
->  #
-> -# For the best results it's strongly recommended to have the pm-utils
-> -# package installed in the guest.
-> +# - systemd suspend
-> +# - pm-utils (via pm-suspend)
-> +# - manual write into sysfs
->  #
->  # IMPORTANT: guest-suspend-ram requires QEMU to support the 'system_wake=
-up'
->  # command.  Thus, it's *required* to query QEMU for the presence of the
-> @@ -592,7 +592,10 @@
->  #
->  # Save guest state to disk and suspend to ram.
->  #
-> -# This command requires the pm-utils package to be installed in the gues=
-t.
-> +# This command attempts to suspend the guest by executing, in this order:
-> +#
-> +# - systemd hybrid-sleep
-> +# - pm-utils (via pm-suspend-hybrid)
->  #
->  # IMPORTANT: guest-suspend-hybrid requires QEMU to support the 'system_w=
-akeup'
->  # command.  Thus, it's *required* to query QEMU for the presence of the
-> -- =
-
-> 2.19.1
+On 2018-11-14 15:46, Markus Armbruster wrote:
+> Thomas Huth <thuth@redhat.com> writes:
 >=20
+>> On 2018-11-14 13:59, Markus Armbruster wrote:
+>>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>>
+>>>> Hi,
+>>>>
+>>>> Based-on: https://people.debian.org/~sthibault/qemu.git/ slirp branc=
+h
+>>>>
+>>>> This series goal is to allow building libslirp as an independent lib=
+rary.
+>>>>
+>>>> While looking at making SLIRP a seperate running process, I thought
+>>>> that having an independent library from QEMU would be a first step.
+>>>>
+>>>> There has been some attempts to make slirp a seperate project in the=
+ past.
+>>>> (https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01092.html=
+)
+>>>> Unfortunately, they forked from QEMU and didn't provide enough
+>>>> compatibility for QEMU to make use of it (in particular, vmstate
+>>>> handling was removed, they lost git history etc). Furthermore, they
+>>>> are not maintained as far as I can see.
+>>>>
+>>>> I would propose to make slirp a seperate project, that can initially
+>>>> be used by QEMU as a submodule, keeping Makefile.objs until a proper
+>>>> shared library with stability guarantees etc is ready..
+>>>>
+>>>> The subproject could created by preserving git tags, and cleaning up=
+ the code style, this way:
+>>>>
+>>>> git filter-branch --tree-filter "if ls * 1> /dev/null 2>&1; then cla=
+ng-format -i * /dev/null; fi " -f --subdirectory-filter "slirp" --prune-e=
+mpty --tag-name-filter cat -- --all
+>>>> (my clang-format https://gist.github.com/elmarco/cb20c8d92007df0e2fb=
+8a2404678ac73)
+>>>>
+>>>> What do you think?
+>>>
+>>> Has the slirp code been improved to be generally useful?  I still got=
+ it
+>>> filed under "friends don't let friends use that, except for testing".=
+..
+>>
+>> The slirp code is already used in a lot of other projects:
+>=20
+> The issue I have with SLIRP isn't that it solves a useless problem (au
+> contraire!), it's that it's a useless solution.
+
+Ouch, that was completely arrogant and inappropriate. It's far away from
+being useless, and Samuel is doing a very good job in picking up all the
+patches and fixes that have been posted in the past months. Have you had
+a look at the changelog at all before you wrote that sentence?
+
+> Okay, that's an unfair
+> exaggeration, it's not useless, I just wouldn't trust it in production,
+> unless it has improved significantly since I last looked at it.
+
+Nobody said that the slirp code would suddenly be perfect, but if it's
+getting even more traction and attention as a separate library (since
+other projects might contribute their fixes back "upstream" in that
+case), it could really get a solid building block for a lot of emulators
+and similar software.
+
+ Thomas
