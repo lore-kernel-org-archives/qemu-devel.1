@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gMoKN-0003xA-Vb
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 01:07:05 -0500
+	(envelope-from <peterx@redhat.com>) id 1gMokJ-0001sU-Io
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 01:33:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.c.zhang@linux.intel.com>) id 1gMoKL-0007cg-L7
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 01:07:03 -0500
-Received: from mga07.intel.com ([134.134.136.100]:25615)
+	(envelope-from <peterx@redhat.com>) id 1gMokG-0004PR-1P
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 01:33:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36148)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.c.zhang@linux.intel.com>)
-	id 1gMoKL-0007bU-Cp
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 01:07:01 -0500
-From: Yu Zhang <yu.c.zhang@linux.intel.com>
-Date: Wed, 14 Nov 2018 14:04:43 +0800
-Message-Id: <1542175484-2742-3-git-send-email-yu.c.zhang@linux.intel.com>
-In-Reply-To: <1542175484-2742-1-git-send-email-yu.c.zhang@linux.intel.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gMokF-0004NQ-NK
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 01:33:47 -0500
+Date: Wed, 14 Nov 2018 14:33:40 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20181114063340.GD6846@xz-x1>
 References: <1542175484-2742-1-git-send-email-yu.c.zhang@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] intel-iommu: extend VTD emulation to
- allow 57-bit IOVA address width.
+	<1542175484-2742-2-git-send-email-yu.c.zhang@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1542175484-2742-2-git-send-email-yu.c.zhang@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] intel-iommu: differentiate host
+ address width from IOVA address width.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,173 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-A 5-level paging capable VM may choose to use 57-bit IOVA address width.
-E.g. guest applications may prefer to use its VA as IOVA when performing
-VFIO map/unmap operations, to avoid the burden of managing the IOVA space.
+On Wed, Nov 14, 2018 at 02:04:42PM +0800, Yu Zhang wrote:
+> Currently, vIOMMU is using the value of IOVA address width, instead of
+> the host address width(HAW) to calculate the number of reserved bits in
+> data structures such as root entries, context entries, and entries of
+> DMA paging structures etc.
+> 
+> However values of IOVA address width and of the HAW may not equal. For
+> example, a 48-bit IOVA can only be mapped to host addresses no wider than
+> 46 bits. Using 48, instead of 46 to calculate the reserved bit may result
+> in an invalid IOVA being accepted.
+> 
+> To fix this, a new field - haw_bits is introduced in struct IntelIOMMUState,
+> whose value is initialized based on the maximum physical address set to
+> guest CPU. Also, definitions such as VTD_HOST_AW_39/48BIT etc. are renamed
+> to clarify.
+> 
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
 
-This patch extends the current vIOMMU logic to cover the extended address
-width. When creating a VM with 5-level paging feature, one can choose to
-create a virtual VTD with 5-level paging capability, with configurations
-like "-device intel-iommu,x-aw-bits=57".
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
----
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>
----
- hw/i386/intel_iommu.c          | 53 ++++++++++++++++++++++++++++++++----------
- hw/i386/intel_iommu_internal.h |  6 +++++
- include/hw/i386/intel_iommu.h  |  1 +
- 3 files changed, 48 insertions(+), 12 deletions(-)
-
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 0e88c63..871110c 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -664,16 +664,16 @@ static inline bool vtd_iova_range_check(uint64_t iova, VTDContextEntry *ce,
- 
- /*
-  * Rsvd field masks for spte:
-- *     Index [1] to [4] 4k pages
-- *     Index [5] to [8] large pages
-+ *     Index [1] to [5] 4k pages
-+ *     Index [6] to [10] large pages
-  */
--static uint64_t vtd_paging_entry_rsvd_field[9];
-+static uint64_t vtd_paging_entry_rsvd_field[11];
- 
- static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, uint32_t level)
- {
-     if (slpte & VTD_SL_PT_PAGE_SIZE_MASK) {
-         /* Maybe large page */
--        return slpte & vtd_paging_entry_rsvd_field[level + 4];
-+        return slpte & vtd_paging_entry_rsvd_field[level + 5];
-     } else {
-         return slpte & vtd_paging_entry_rsvd_field[level];
-     }
-@@ -3127,6 +3127,8 @@ static void vtd_init(IntelIOMMUState *s)
-              VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
-     if (s->aw_bits == VTD_AW_48BIT) {
-         s->cap |= VTD_CAP_SAGAW_48bit;
-+    } else if (s->aw_bits == VTD_AW_57BIT) {
-+        s->cap |= VTD_CAP_SAGAW_57bit | VTD_CAP_SAGAW_48bit;
-     }
-     s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
-     s->haw_bits = cpu->phys_bits;
-@@ -3139,10 +3141,12 @@ static void vtd_init(IntelIOMMUState *s)
-     vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->haw_bits);
-     vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->haw_bits);
-     vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->haw_bits);
--    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
--    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
--    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
--    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
-+    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_PAGE_L5_RSVD_MASK(s->haw_bits);
-+    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->haw_bits);
-+    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->haw_bits);
-+    vtd_paging_entry_rsvd_field[8] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->haw_bits);
-+    vtd_paging_entry_rsvd_field[9] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->haw_bits);
-+    vtd_paging_entry_rsvd_field[10] = VTD_SPTE_LPAGE_L5_RSVD_MASK(s->haw_bits);
- 
-     if (x86_iommu->intr_supported) {
-         s->ecap |= VTD_ECAP_IR | VTD_ECAP_MHMV;
-@@ -3241,6 +3245,23 @@ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
-     return &vtd_as->as;
- }
- 
-+static bool host_has_la57(void)
-+{
-+    uint32_t ecx, unused;
-+
-+    host_cpuid(7, 0, &unused, &unused, &ecx, &unused);
-+    return ecx & CPUID_7_0_ECX_LA57;
-+}
-+
-+static bool guest_has_la57(void)
-+{
-+    CPUState *cs = first_cpu;
-+    X86CPU *cpu = X86_CPU(cs);
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_LA57;
-+}
-+
- static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
- {
-     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
-@@ -3267,11 +3288,19 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-         }
-     }
- 
--    /* Currently only address widths supported are 39 and 48 bits */
-+    /* Currently address widths supported are 39, 48, and 57 bits */
-     if ((s->aw_bits != VTD_AW_39BIT) &&
--        (s->aw_bits != VTD_AW_48BIT)) {
--        error_setg(errp, "Supported values for x-aw-bits are: %d, %d",
--                   VTD_AW_39BIT, VTD_AW_48BIT);
-+        (s->aw_bits != VTD_AW_48BIT) &&
-+        (s->aw_bits != VTD_AW_57BIT)) {
-+        error_setg(errp, "Supported values for x-aw-bits are: %d, %d, %d",
-+                   VTD_AW_39BIT, VTD_AW_48BIT, VTD_AW_57BIT);
-+        return false;
-+    }
-+
-+    if ((s->aw_bits == VTD_AW_57BIT) &&
-+        !(host_has_la57() && guest_has_la57())) {
-+        error_setg(errp, "Do not support 57-bit DMA address, unless both "
-+                         "host and guest are capable of 5-level paging");
-         return false;
-     }
- 
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index d084099..a7ef24b 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -212,6 +212,8 @@
- #define VTD_CAP_SAGAW_39bit         (0x2ULL << VTD_CAP_SAGAW_SHIFT)
-  /* 48-bit AGAW, 4-level page-table */
- #define VTD_CAP_SAGAW_48bit         (0x4ULL << VTD_CAP_SAGAW_SHIFT)
-+ /* 57-bit AGAW, 5-level page-table */
-+#define VTD_CAP_SAGAW_57bit         (0x8ULL << VTD_CAP_SAGAW_SHIFT)
- 
- /* IQT_REG */
- #define VTD_IQT_QT(val)             (((val) >> 4) & 0x7fffULL)
-@@ -379,6 +381,8 @@ typedef union VTDInvDesc VTDInvDesc;
-         (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
- #define VTD_SPTE_PAGE_L4_RSVD_MASK(aw) \
-         (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-+#define VTD_SPTE_PAGE_L5_RSVD_MASK(aw) \
-+        (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
- #define VTD_SPTE_LPAGE_L1_RSVD_MASK(aw) \
-         (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
- #define VTD_SPTE_LPAGE_L2_RSVD_MASK(aw) \
-@@ -387,6 +391,8 @@ typedef union VTDInvDesc VTDInvDesc;
-         (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
- #define VTD_SPTE_LPAGE_L4_RSVD_MASK(aw) \
-         (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-+#define VTD_SPTE_LPAGE_L5_RSVD_MASK(aw) \
-+        (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
- 
- /* Information about page-selective IOTLB invalidate */
- struct VTDIOTLBPageInvInfo {
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 820451c..7474c4f 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -49,6 +49,7 @@
- #define DMAR_REG_SIZE               0x230
- #define VTD_AW_39BIT                39
- #define VTD_AW_48BIT                48
-+#define VTD_AW_57BIT                57
- #define VTD_ADDRESS_WIDTH           VTD_AW_39BIT
- #define VTD_HAW_MASK(aw)            ((1ULL << (aw)) - 1)
- 
 -- 
-1.9.1
+Peter Xu
