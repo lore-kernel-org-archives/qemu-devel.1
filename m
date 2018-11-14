@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMvar-0002G2-MY
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:52:36 -0500
+	(envelope-from <berrange@redhat.com>) id 1gMvcF-0003LS-64
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:54:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMvam-0005PD-1t
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:52:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34300)
+	(envelope-from <berrange@redhat.com>) id 1gMvcD-0006nW-7w
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:53:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36110)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMval-0005MZ-4Q
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:52:27 -0500
-Date: Wed, 14 Nov 2018 13:52:12 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMvcB-0006bZ-A4
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:53:56 -0500
+Date: Wed, 14 Nov 2018 13:53:31 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181114135212.GZ19298@redhat.com>
+Message-ID: <20181114135331.GA19298@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
-	<20181114123643.24091-22-marcandre.lureau@redhat.com>
+	<20181114123643.24091-23-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20181114123643.24091-22-marcandre.lureau@redhat.com>
+In-Reply-To: <20181114123643.24091-23-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 21/41] slirp: remove
- HAVE_SYS_FILIO_H
+Subject: Re: [Qemu-devel] [PATCH for-3.2 22/41] slirp: remove unused
+ DECLARE_IOVEC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,12 +33,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it
 
-On Wed, Nov 14, 2018 at 04:36:23PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+On Wed, Nov 14, 2018 at 04:36:24PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> It's actually qemu configure CONFIG_IOVEC that is being used.
+
+That makes it sound like slirp is using CONFIG_IOVEC, but AFAICT
+that's only used by QEMU's osdep code.
+
+>=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  slirp/slirp.h        | 2 +-
 >  slirp/slirp_config.h | 6 ------
->  2 files changed, 1 insertion(+), 7 deletions(-)
+>  1 file changed, 6 deletions(-)
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
