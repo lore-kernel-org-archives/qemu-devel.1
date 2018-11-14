@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMvaA-0001kB-1I
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:51:50 -0500
+	(envelope-from <berrange@redhat.com>) id 1gMvar-0002G2-MY
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:52:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMva6-0004pM-AV
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:51:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46152)
+	(envelope-from <berrange@redhat.com>) id 1gMvam-0005PD-1t
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:52:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34300)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMva6-0004oP-50
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:51:46 -0500
-Date: Wed, 14 Nov 2018 13:51:29 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMval-0005MZ-4Q
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 08:52:27 -0500
+Date: Wed, 14 Nov 2018 13:52:12 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181114135129.GY19298@redhat.com>
+Message-ID: <20181114135212.GZ19298@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
-	<20181114123643.24091-21-marcandre.lureau@redhat.com>
+	<20181114123643.24091-22-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20181114123643.24091-21-marcandre.lureau@redhat.com>
+In-Reply-To: <20181114123643.24091-22-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 20/41] slirp: remove
- HAVE_SYS_IOCTL_H
+Subject: Re: [Qemu-devel] [PATCH for-3.2 21/41] slirp: remove
+ HAVE_SYS_FILIO_H
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,7 +33,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it
 
-On Wed, Nov 14, 2018 at 04:36:22PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+On Wed, Nov 14, 2018 at 04:36:23PM +0400, Marc-Andr=C3=A9 Lureau wrote:
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
 >  slirp/slirp.h        | 2 +-
