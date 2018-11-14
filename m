@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gMvwX-0007Sm-FD
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:14:58 -0500
+	(envelope-from <berrange@redhat.com>) id 1gMvxZ-00085d-52
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:16:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gMvwT-00030l-DN
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:14:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52640)
+	(envelope-from <berrange@redhat.com>) id 1gMvxW-0004JU-Pt
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:16:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38390)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gMvwT-000308-7w
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:14:53 -0500
-References: <154219299016.19470.9372139354280787961.stgit@wayrath>
-	<154219301447.19470.4834273682384554888.stgit@wayrath>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ee022ac8-a83b-53c0-46d5-f2641a546240@redhat.com>
-Date: Wed, 14 Nov 2018 08:14:46 -0600
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMvxU-0004Gb-Rg
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:15:58 -0500
+Date: Wed, 14 Nov 2018 14:15:15 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181114141515.GI19298@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
+	<20181114123643.24091-38-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <154219301447.19470.4834273682384554888.stgit@wayrath>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/3] i386: add properties for
- customizing L2 and L3 caches size
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181114123643.24091-38-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 37/41] slirp: replace ARRAY_SIZE
+ with G_N_ELEMENTS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dario Faggioli <dfaggioli@suse.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it
 
-On 11/14/18 4:56 AM, Dario Faggioli wrote:
-> Make it possible to specify a custom size for the L2 and
-> L3 caches, from the command line.
-> 
-> This can be useful in cases where applications or libraries
-> check, within the guest, the cache size and behave differently
-> depending on what they actually see.
-> 
-> Signed-off-by: Dario Faggioli <dfaggioli@suse.com>
-> ---
-> I am not entirely sure I got the include/hw/i386 bits right (i.e.,
-> whether I should include the new properties in PC_COMPAT_3_0 and, if
-> yes, if the stanzas are correct). I'll dig further (and accept any
-> help/advice :-D )
-> ---
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->   0 files changed
+On Wed, Nov 14, 2018 at 04:36:39PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> Do not require QEMU macro.
 
-That's an odd diffstat. Why is git not giving you the normal diffstat 
-with an actual summary of files changed?
+As with the endian thing, we should really purge ARRAY_SIZE from
+the entire QEMU codebase and just defer to glib. ARRAY_SIZE made
+sense before glib was a hard dep in QEMU, but there's no reason
+beyond bike shed colour choice to preserve it now.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I'm fine with this patch being targetted to slirp to avoid getting
+dragged into a broader discussion, but I'd encourage the global
+cleanup. I've personally used G_N_ELEMENTS in all QEMU code I've
+been writing since its more familiar from glib than a QEMU
+specific macro name.
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
