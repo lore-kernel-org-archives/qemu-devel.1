@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dongli.zhang@oracle.com>) id 1gMvlG-0001iv-7i
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:03:23 -0500
+	(envelope-from <berrange@redhat.com>) id 1gMvmu-0002Rb-2y
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:05:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dongli.zhang@oracle.com>) id 1gMvlE-0007Eo-7v
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:03:18 -0500
-References: <1541520556-8334-1-git-send-email-dongli.zhang@oracle.com>
-From: Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <b1ba5a44-69e9-8e1f-6ecd-8effb46861b1@oracle.com>
-Date: Wed, 14 Nov 2018 22:02:54 +0800
+	(envelope-from <berrange@redhat.com>) id 1gMvmp-0000Ve-Lx
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:05:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50462)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMvmp-0000U2-CZ
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 09:04:55 -0500
+Date: Wed, 14 Nov 2018 14:04:38 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181114140438.GD19298@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
+	<20181114123643.24091-30-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1541520556-8334-1-git-send-email-dongli.zhang@oracle.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] virtio-blk: rename iov to out_iov in
- virtio_blk_handle_request()
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181114123643.24091-30-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 29/41] slirp: improve a bit the
+ debug macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +30,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, mst@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it
 
-Ping?
-
-Thanks!
-
-Dongli Zhang
-
-On 11/07/2018 12:09 AM, Dongli Zhang wrote:
-> In virtio_blk_handle_request(), in_iov is used for input header while iov
-> is used for output header. Rename iov to out_iov to pair output header's
-> name with in_iov to avoid confusing people when reading source code.
-> 
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+On Wed, Nov 14, 2018 at 04:36:31PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> Let them accept multiple arguments. Simplify the inner argument
+> handling of DEBUG_ARGS/DEBUG_MISC_DEBUG_ERROR.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  hw/block/virtio-blk.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 83cf5c0..fb0d74d 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -482,7 +482,7 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
->  {
->      uint32_t type;
->      struct iovec *in_iov = req->elem.in_sg;
-> -    struct iovec *iov = req->elem.out_sg;
-> +    struct iovec *out_iov = req->elem.out_sg;
->      unsigned in_num = req->elem.in_num;
->      unsigned out_num = req->elem.out_num;
->      VirtIOBlock *s = req->dev;
-> @@ -493,13 +493,13 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
->          return -1;
->      }
->  
-> -    if (unlikely(iov_to_buf(iov, out_num, 0, &req->out,
-> +    if (unlikely(iov_to_buf(out_iov, out_num, 0, &req->out,
->                              sizeof(req->out)) != sizeof(req->out))) {
->          virtio_error(vdev, "virtio-blk request outhdr too short");
->          return -1;
->      }
->  
-> -    iov_discard_front(&iov, &out_num, sizeof(req->out));
-> +    iov_discard_front(&out_iov, &out_num, sizeof(req->out));
->  
->      if (in_iov[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr)) {
->          virtio_error(vdev, "virtio-blk request inhdr too short");
-> @@ -526,7 +526,7 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
->                                         &req->out.sector);
->  
->          if (is_write) {
-> -            qemu_iovec_init_external(&req->qiov, iov, out_num);
-> +            qemu_iovec_init_external(&req->qiov, out_iov, out_num);
->              trace_virtio_blk_handle_write(vdev, req, req->sector_num,
->                                            req->qiov.size / BDRV_SECTOR_SIZE);
->          } else {
-> 
+>  slirp/debug.h      | 47 ++++++++++++++++++++++++++++++++++++----------
+>  slirp/arp_table.c  | 12 ++++++------
+>  slirp/bootp.c      |  3 +--
+>  slirp/cksum.c      |  4 ++--
+>  slirp/dhcpv6.c     | 11 +++++------
+>  slirp/ip6_icmp.c   |  2 +-
+>  slirp/ip_icmp.c    | 18 +++++++++---------
+>  slirp/mbuf.c       |  2 +-
+>  slirp/ndp_table.c  | 18 +++++++++---------
+>  slirp/slirp.c      | 12 ++++++------
+>  slirp/socket.c     | 32 +++++++++++++++----------------
+>  slirp/tcp_input.c  | 15 +++++++--------
+>  slirp/tcp_output.c |  2 +-
+>  slirp/tcp_subr.c   |  4 ++--
+>  slirp/udp.c        |  6 +++---
+>  slirp/udp6.c       |  6 +++---
+>  16 files changed, 109 insertions(+), 85 deletions(-)
+>=20
+> diff --git a/slirp/debug.h b/slirp/debug.h
+> index 6cfa61edb3..ca3a4b04da 100644
+> --- a/slirp/debug.h
+> +++ b/slirp/debug.h
+> @@ -17,18 +17,45 @@
+> =20
+>  extern int slirp_debug;
+> =20
+> -#define DEBUG_CALL(x) if (slirp_debug & DBG_CALL) { fprintf(dfd, "%s..=
+.\n", x); fflush(dfd); }
+> -#define DEBUG_ARG(x, y) if (slirp_debug & DBG_CALL) { fputc(' ', dfd);=
+ fprintf(dfd, x, y); fputc('\n', dfd); fflush(dfd); }
+> -#define DEBUG_ARGS(x) if (slirp_debug & DBG_CALL) { fprintf x ; fflush=
+(dfd); }
+> -#define DEBUG_MISC(x) if (slirp_debug & DBG_MISC) { fprintf x ; fflush=
+(dfd); }
+> -#define DEBUG_ERROR(x) if (slirp_debug & DBG_ERROR) {fprintf x ; fflus=
+h(dfd); }
+> +#define DEBUG_CALL(fmt, ...) do {               \
+> +    if (slirp_debug & DBG_CALL) {               \
+> +        fprintf(dfd, fmt, ##__VA_ARGS__);       \
+> +        fprintf(dfd, "...\n");                  \
+> +        fflush(dfd);                            \
+> +    }                                           \
+> +} while (0)
+> +
+> +#define DEBUG_ARG(fmt, ...) do {                \
+> +    if (slirp_debug & DBG_CALL) {               \
+> +        fputc(' ', dfd);                        \
+> +        fprintf(dfd, fmt, ##__VA_ARGS__);       \
+> +        fputc('\n', dfd);                       \
+> +        fflush(dfd);                            \
+> +    }                                           \
+> +} while (0)
+> +
+> +#define DEBUG_ARGS(fmt, ...) DEBUG_ARG(fmt, ##__VA_ARGS__)
+> +
+> +#define DEBUG_MISC(fmt, ...) do {               \
+> +    if (slirp_debug & DBG_MISC) {               \
+> +        fprintf(dfd, fmt, ##__VA_ARGS__);       \
+> +        fflush(dfd);                            \
+> +    }                                           \
+> +} while (0)
+> +
+> +#define DEBUG_ERROR(fmt, ...) do {              \
+> +    if (slirp_debug & DBG_ERROR) {              \
+> +        fprintf(dfd, fmt, ##__VA_ARGS__);       \
+> +        fflush(dfd);                            \
+> +    }                                           \
+> +} while (0)
+
+I tend to think it would be nicer to change these to
+use  g_debug, and #define G_LOG_DOMAIN  "libslirp" in
+the .c files.
+
+This would allow apps to intercept the debug messages
+via a custom log handler.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
