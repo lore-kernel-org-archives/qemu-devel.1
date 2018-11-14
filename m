@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gMsL1-0000N8-Lg
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 05:24:00 -0500
+	(envelope-from <edgari@xilinx.com>) id 1gMsOo-0001vU-OI
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 05:27:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gMsKw-0002ER-Vz
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 05:23:59 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51078)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gMsKw-0002Df-JL
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 05:23:54 -0500
-Received: by mail-wm1-x341.google.com with SMTP id 124-v6so14963600wmw.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 02:23:54 -0800 (PST)
-References: <20181113175437.26492-1-laurent@vivier.eu>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181113175437.26492-1-laurent@vivier.eu>
-Date: Wed, 14 Nov 2018 10:23:51 +0000
-Message-ID: <87a7mcdkjs.fsf@linaro.org>
+	(envelope-from <edgari@xilinx.com>) id 1gMsOn-0004L3-Ed
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 05:27:54 -0500
+Date: Wed, 14 Nov 2018 11:27:23 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20181114102723.GC7447@toto>
+References: <20181110081147.4027-1-luc.michel@greensocs.com>
+	<20181110081147.4027-4-luc.michel@greensocs.com>
+	<20181113110636.GH1148@toto>
+	<a67ef945-2466-155c-0f16-0a1b3b74c9fc@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests/tcg/multiarch: fix 32bit linux-test
- on 64bit host
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <a67ef945-2466-155c-0f16-0a1b3b74c9fc@greensocs.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v5 03/16] gdbstub: add
+ multiprocess support to '?' packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +26,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Luc Michel <luc.michel@greensocs.com>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, alistair@alistair23.me, mark.burton@greensocs.com, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
+
+On Wed, Nov 14, 2018 at 09:43:27AM +0100, Luc Michel wrote:
+> Hi Edgar,
+> 
+> On 11/13/18 12:06 PM, Edgar E. Iglesias wrote:
+> > On Sat, Nov 10, 2018 at 09:11:34AM +0100, Luc Michel wrote:
+> >> The gdb_get_cpu_pid() function does the PID lookup for the given CPU. It
+> >> checks if the CPU is a direct child of a CPU cluster. If it is, the
+> >> returned PID is the cluster ID plus one (cluster IDs start at 0, GDB
+> >> PIDs at 1). When the CPU is not a child of such a container, the PID of
+> >> the first process is returned.
+> >>
+> >> The gdb_fmt_thread_id() function generates the string to be used to identify
+> >> a given thread, in a response packet for the peer. This function
+> >> supports generating thread IDs when multiprocess mode is enabled (in the
+> >> form `p<pid>.<tid>').
+> >>
+> >> Use them in the reply to a '?' request.
+> >>
+> >> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> >> Acked-by: Alistair Francis <alistair.francis@wdc.com>
+> > 
+> > 
+> > This is also theoretical but:
+> > When looking at this, it seems like you could have lazily created
+> > the s->processes array entries (if you find a cluster but the
+> > no valid entry in s->processes). Then we could perhaps eliminate the
+> > scan of all objects at startup and also support CPU/Cluster hotplug.
+> Yes you are right, this could be an improvement to this series to add
+> cluster hotplug support (CPU hotplug is actually supported). It's a
+> little bit tricky though since we would have to maintain the
+> s->processes array and properly signal to GDB when a process dies.
+
+Hi Luc,
+
+IMO, support for hotplugging could be added incrementally with follow-up work.
+I wonder if the GDB stub would handle it today, without your patches?
+
+Cheers,
+Edgar
 
 
-Laurent Vivier <laurent@vivier.eu> writes:
-
-> Fix:
->
->   TEST    linux-test on i386
->   .../tests/tcg/multiarch/linux-test.c:201: readdir
->
-> readdir() calls getdents64() to have the list of the entries in a
-> directory, and getdents64() can return 64bit d_off values (with ext4,
-> for instance) that will not fit in the 32bit d_off field of the
-> readdir() dirent structure.
->
-> To avoid that, use readdir64() to use a 64bit d_off field too.
->
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-
-I guess the only remaining question is do we want to defend the other
-case or just say it's not supported and all binaries are expected to use
-modern-ish libcs with getdents64?
-
-Anyway:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-I'm preparing a pull-req with a travis patch, would you like me to
-include this as well?
-
-
-> ---
->  tests/tcg/multiarch/linux-test.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux=
--test.c
-> index e80eccc0ce..fa4243fc04 100644
-> --- a/tests/tcg/multiarch/linux-test.c
-> +++ b/tests/tcg/multiarch/linux-test.c
-> @@ -83,7 +83,7 @@ static void test_file(void)
->      struct utimbuf tbuf;
->      struct iovec vecs[2];
->      DIR *dir;
-> -    struct dirent *de;
-> +    struct dirent64 *de;
->      /* TODO: make common tempdir creation for tcg tests */
->      char template[] =3D "/tmp/linux-test-XXXXXX";
->      char *tmpdir =3D mkdtemp(template);
-> @@ -186,7 +186,7 @@ static void test_file(void)
->          error("opendir");
->      len =3D 0;
->      for(;;) {
-> -        de =3D readdir(dir);
-> +        de =3D readdir64(dir);
->          if (!de)
->              break;
->          if (strcmp(de->d_name, ".") !=3D 0 &&
-
-
---
-Alex Benn=C3=A9e
+> 
+> Cheers,
+> Luc
+> 
+> > 
+> > Anyway, this looks good to me!
+> > Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > 
+> > Cheers,
+> > Edgar
+> > 
+> > 
+> >> ---
+> >>  gdbstub.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+> >>  1 file changed, 58 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/gdbstub.c b/gdbstub.c
+> >> index 0d70b89598..d26bad4b67 100644
+> >> --- a/gdbstub.c
+> >> +++ b/gdbstub.c
+> >> @@ -638,10 +638,52 @@ static int memtox(char *buf, const char *mem, int len)
+> >>          }
+> >>      }
+> >>      return p - buf;
+> >>  }
+> >>  
+> >> +static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
+> >> +{
+> >> +#ifndef CONFIG_USER_ONLY
+> >> +    gchar *path, *name;
+> >> +    Object *obj;
+> >> +    CPUClusterState *cluster;
+> >> +    uint32_t ret;
+> >> +
+> >> +    path = object_get_canonical_path(OBJECT(cpu));
+> >> +    name = object_get_canonical_path_component(OBJECT(cpu));
+> >> +
+> >> +    if (path == NULL) {
+> >> +        ret = s->processes[0].pid;
+> >> +        goto out;
+> >> +    }
+> >> +
+> >> +    /*
+> >> +     * Retrieve the CPU parent path by removing the last '/' and the CPU name
+> >> +     * from the CPU canonical path. */
+> >> +    path[strlen(path) - strlen(name) - 1] = '\0';
+> >> +
+> >> +    obj = object_resolve_path_type(path, TYPE_CPU_CLUSTER, NULL);
+> >> +
+> >> +    if (obj == NULL) {
+> >> +        ret = s->processes[0].pid;
+> >> +        goto out;
+> >> +    }
+> >> +
+> >> +    cluster = CPU_CLUSTER(obj);
+> >> +    ret = cluster->cluster_id + 1;
+> >> +
+> >> +out:
+> >> +    g_free(name);
+> >> +    g_free(path);
+> >> +
+> >> +    return ret;
+> >> +
+> >> +#else
+> >> +    return s->processes[0].pid;
+> >> +#endif
+> >> +}
+> >> +
+> >>  static const char *get_feature_xml(const char *p, const char **newp,
+> >>                                     CPUClass *cc)
+> >>  {
+> >>      size_t len;
+> >>      int i;
+> >> @@ -907,10 +949,23 @@ static CPUState *find_cpu(uint32_t thread_id)
+> >>      }
+> >>  
+> >>      return NULL;
+> >>  }
+> >>  
+> >> +static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
+> >> +                           char *buf, size_t buf_size)
+> >> +{
+> >> +    if (s->multiprocess) {
+> >> +        snprintf(buf, buf_size, "p%02x.%02x",
+> >> +                 gdb_get_cpu_pid(s, cpu), cpu_gdb_index(cpu));
+> >> +    } else {
+> >> +        snprintf(buf, buf_size, "%02x", cpu_gdb_index(cpu));
+> >> +    }
+> >> +
+> >> +    return buf;
+> >> +}
+> >> +
+> >>  static int is_query_packet(const char *p, const char *query, char separator)
+> >>  {
+> >>      unsigned int query_len = strlen(query);
+> >>  
+> >>      return strncmp(p, query, query_len) == 0 &&
+> >> @@ -1018,22 +1073,23 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+> >>      const char *p;
+> >>      uint32_t thread;
+> >>      int ch, reg_size, type, res;
+> >>      uint8_t mem_buf[MAX_PACKET_LENGTH];
+> >>      char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+> >> +    char thread_id[16];
+> >>      uint8_t *registers;
+> >>      target_ulong addr, len;
+> >>  
+> >>      trace_gdbstub_io_command(line_buf);
+> >>  
+> >>      p = line_buf;
+> >>      ch = *p++;
+> >>      switch(ch) {
+> >>      case '?':
+> >>          /* TODO: Make this return the correct value for user-mode.  */
+> >> -        snprintf(buf, sizeof(buf), "T%02xthread:%02x;", GDB_SIGNAL_TRAP,
+> >> -                 cpu_gdb_index(s->c_cpu));
+> >> +        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
+> >> +                 gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread_id)));
+> >>          put_packet(s, buf);
+> >>          /* Remove all the breakpoints when this query is issued,
+> >>           * because gdb is doing and initial connect and the state
+> >>           * should be cleaned up.
+> >>           */
+> >> -- 
+> >> 2.19.1
+> >>
+> >>
