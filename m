@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMy3D-0000JE-J9
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:30:00 -0500
+	(envelope-from <philmd@redhat.com>) id 1gMyCy-00048t-Kb
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:40:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMy3C-00070l-No
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:29:59 -0500
+	(envelope-from <philmd@redhat.com>) id 1gMyCr-0002zP-GF
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:40:04 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46282)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gMyCr-0002xL-88
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:39:57 -0500
+Received: by mail-wr1-f68.google.com with SMTP id l9so5144097wrt.13
+	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 08:39:55 -0800 (PST)
 References: <20181114132931.22624-1-marcandre.lureau@redhat.com>
 	<16b78816-f2cc-a1e5-0d21-906fc2dbaa3d@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a2d9a2fd-2c1a-66e3-86ba-17da9f564e79@redhat.com>
-Date: Wed, 14 Nov 2018 17:29:42 +0100
+	<a2d9a2fd-2c1a-66e3-86ba-17da9f564e79@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c0601dcb-142f-3033-b11f-1b951aaf0e3f@redhat.com>
+Date: Wed, 14 Nov 2018 17:39:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <16b78816-f2cc-a1e5-0d21-906fc2dbaa3d@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <a2d9a2fd-2c1a-66e3-86ba-17da9f564e79@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PATCH] vmstate: constify VMStateField
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,76 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Cornelia Huck <cohuck@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, dgilbert@redhat.com, quintela@redhat.com, "open list:S390" <qemu-s390x@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>, Paolo Bonzini <pbonzini@redhat.com>, Stafford Horne <shorne@gmail.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 2018-11-14 16:32, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Marc-Andr=C3=A9,
->=20
-> On 14/11/18 14:29, Marc-Andr=C3=A9 Lureau wrote:
->> Because they are supposed to remain const.
+Hi Thomas,
+
+On 14/11/18 17:29, Thomas Huth wrote:
+> On 2018-11-14 16:32, Philippe Mathieu-Daudé wrote:
 >>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> What about enforcing the constness in the typedef?
+>>
+>> -- >8 --
+>> @@ -32 +32 @@ typedef struct VMStateDescription VMStateDescription;
+>> -typedef struct VMStateField VMStateField;
+>> +typedef const struct VMStateField VMStateField;
 >> ---
->> =C2=A0 include/migration/vmstate.h |=C2=A0=C2=A0 6 +-
->> =C2=A0 hw/display/virtio-gpu.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 4=
- +-
->> =C2=A0 hw/intc/s390_flic_kvm.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 4=
- +-
->> =C2=A0 hw/nvram/eeprom93xx.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
-=C2=A0 6 +-
->> =C2=A0 hw/nvram/fw_cfg.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0=C2=A0 6 +-
->> =C2=A0 hw/pci/msix.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 4 +-
->> =C2=A0 hw/pci/pci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 8 +--
->> =C2=A0 hw/pci/shpc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 7 ++-
->> =C2=A0 hw/scsi/scsi-bus.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 |=C2=A0=C2=A0 4 +-
->> =C2=A0 hw/timer/twl92230.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0=C2=A0 4 +-
->> =C2=A0 hw/usb/redirect.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 12 ++--
->> =C2=A0 hw/virtio/virtio.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 |=C2=A0=C2=A0 8 +--
->> =C2=A0 migration/savevm.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 |=C2=A0=C2=A0 7 ++-
->> =C2=A0 migration/vmstate-types.c=C2=A0=C2=A0 | 119 +++++++++++++++++++=
-+----------------
->> =C2=A0 migration/vmstate.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0 31 +++++-----
->> =C2=A0 target/alpha/machine.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=
-=A0 5 +-
->> =C2=A0 target/arm/machine.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0 12 ++--
->> =C2=A0 target/hppa/machine.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 10 +--
->> =C2=A0 target/mips/machine.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 14 +++--
->> =C2=A0 target/openrisc/machine.c=C2=A0=C2=A0 |=C2=A0=C2=A0 5 +-
->> =C2=A0 target/ppc/machine.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0 14 +++--
->> =C2=A0 target/sparc/machine.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=
-=A0 7 ++-
->> =C2=A0 22 files changed, 162 insertions(+), 135 deletions(-)
->>
->> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
->> index 2b501d0466..61bef3ef5c 100644
->> --- a/include/migration/vmstate.h
->> +++ b/include/migration/vmstate.h
->> @@ -40,8 +40,8 @@ typedef struct VMStateField VMStateField;
->=20
-> What about enforcing the constness in the typedef?
->=20
-> -- >8 --
-> @@ -32 +32 @@ typedef struct VMStateDescription VMStateDescription;
-> -typedef struct VMStateField VMStateField;
-> +typedef const struct VMStateField VMStateField;
-> ---
+> 
+> Please don't. For rationale, see:
+> https://www.kernel.org/doc/html/v4.19/process/coding-style.html#typedefs
 
-Please don't. For rationale, see:
-https://www.kernel.org/doc/html/v4.19/process/coding-style.html#typedefs
-
- Thomas
+Thanks for the pointer, I am interested in understanding why not do 
+that. However in the link you pasted I don't see a rational about 
+enforcing constness, I understand that since this case doesn't match the 
+5 rules, we should use 'struct VMStateField' directly and remove the 
+typedef.
