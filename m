@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:59397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gMttH-0000zH-Dj
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:03:28 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuPm-0007bK-Cr
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:37:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gMttB-0003vP-EW
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:03:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35254)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuPj-0000aM-5M
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:37:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34620)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gMtt7-0003tp-RR
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:03:19 -0500
-References: <20181113184641.4492-1-peter.maydell@linaro.org>
-	<20181113184641.4492-3-peter.maydell@linaro.org>
-	<163db126-4441-3e4a-2dd0-1334c6ef4fb9@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1a2e6935-d76b-ca8f-1e9f-63454dc1b7dc@redhat.com>
-Date: Wed, 14 Nov 2018 13:02:55 +0100
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gMuPi-0000ZC-Tf
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:36:59 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 14 Nov 2018 16:36:02 +0400
+Message-Id: <20181114123643.24091-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <163db126-4441-3e4a-2dd0-1334c6ef4fb9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] scripts/coverity-scan: Add Docker
- support
+Subject: [Qemu-devel] [PATCH for-3.2 00/41] RFC: slirp: make it again a
+ standalone project
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +26,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, patches@linaro.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: samuel.thibault@ens-lyon.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 13/11/2018 20:37, Philippe Mathieu-Daud=C3=A9 wrote:
-> Calling "make docket-image-fedora" you can reduce this script to:
->=20
-> -- >8 --
-> FROM qemu:fedora
-> ENV PACKAGES \
-> =C2=A0=C2=A0=C2=A0 $PACKAGES \
-> =C2=A0=C2=A0=C2=A0 alsa-lib-devel \
-> =C2=A0=C2=A0=C2=A0 curl \
-> =C2=A0=C2=A0=C2=A0 cyrus-sasl-devel \
-> =C2=A0=C2=A0=C2=A0 libepoxy-devel \
-> =C2=A0=C2=A0=C2=A0 libgbm-devel \
-> =C2=A0=C2=A0=C2=A0 libiscsi-devel \
-> =C2=A0=C2=A0=C2=A0 libnfs-devel \
-> =C2=A0=C2=A0=C2=A0 libseccomp-devel \
-> =C2=A0=C2=A0=C2=A0 libudev-devel \
-> =C2=A0=C2=A0=C2=A0 pulseaudio-libs-devel \
-> =C2=A0=C2=A0=C2=A0 rdma-core-devel \
-> =C2=A0=C2=A0=C2=A0 wget \
-> =C2=A0=C2=A0=C2=A0 xfsprogs-devel
+Hi,
 
-... these can actually be moved to
-tests/docker/dockerfiles/fedora.docker, improving the coverage...
->=20
-> RUN dnf install -y $PACKAGES
-> RUN rpm -q $PACKAGES | sort > /packages.txt
+Based-on: https://people.debian.org/~sthibault/qemu.git/ slirp branch
 
-... and removing the need for these two.
+This series goal is to allow building libslirp as an independent library.
 
-> ENV COVERITY_TOOL_BASE=3D/coverity-tools
-> COPY run-coverity-scan run-coverity-scan
-> RUN --mount=3Dtype=3Dsecret,id=3Dcoverity.token,required ./run-coverity=
--scan
-> --update-tools-only --tokenfile /run/secrets/coverity.token
+While looking at making SLIRP a seperate running process, I thought
+that having an independent library from QEMU would be a first step.
 
-If the tokenfile is not needed when updating the tools, you could also
-move the Dockerfile to tests/docker/dockerfiles/fedora-coverity.docker
-and just do "make docker-image-fedora-coverity"
+There has been some attempts to make slirp a seperate project in the past=
+.
+(https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01092.html)
+Unfortunately, they forked from QEMU and didn't provide enough
+compatibility for QEMU to make use of it (in particular, vmstate
+handling was removed, they lost git history etc). Furthermore, they
+are not maintained as far as I can see.
 
-> +    # TODO: how do you get 'docker build' to print the output of the
-> +    # commands it is running to its stdout? This would be useful for d=
-ebug.
+I would propose to make slirp a seperate project, that can initially
+be used by QEMU as a submodule, keeping Makefile.objs until a proper
+shared library with stability guarantees etc is ready..
 
-With make docker-image-*, you can just pass V=3D1.
+The subproject could created by preserving git tags, and cleaning up the =
+code style, this way:
 
-Paolo
+git filter-branch --tree-filter "if ls * 1> /dev/null 2>&1; then clang-fo=
+rmat -i * /dev/null; fi " -f --subdirectory-filter "slirp" --prune-empty =
+--tag-name-filter cat -- --all
+(my clang-format https://gist.github.com/elmarco/cb20c8d92007df0e2fb8a240=
+4678ac73)
+
+What do you think?
+
+Marc-Andr=C3=A9 Lureau (41):
+  slirp: move socket pair creation in helper function
+  glib-compat: add g_spawn_async_with_fds() fallback
+  slirp: simplify fork_exec()
+  slirp: remove unused M_TRAILINGSPACE
+  slirp: use a callback structure to interface with qemu
+  slirp: add a callback for qemu_chr_fe_write_all()
+  slirp: add clock_get_ns() callback
+  slirp: add callbacks for timer
+  slirp: add a set_nonblock() callback
+  slirp: remove PROBE_CONN dead-code
+  slirp: remove FULL_BOLT
+  slirp: remove the disabled readv()/writev() code path
+  slirp: remove HAVE_SYS_SIGNAL_H
+  slirp: remove unused HAVE_SYS_BITYPES_H
+  slirp: remove NO_UNIX_SOCKETS
+  slirp: remove unused HAVE_SYS_STROPTS_H
+  slirp: remove unused HAVE_ARPA_INET_H
+  slirp: remove unused HAVE_SYS_WAIT_H
+  slirp: remove unused HAVE_SYS_SELECT_H
+  slirp: remove HAVE_SYS_IOCTL_H
+  slirp: remove HAVE_SYS_FILIO_H
+  slirp: remove unused DECLARE_IOVEC
+  slirp: remove unused HAVE_INET_ATON
+  slirp: replace HOST_WORDS_BIGENDIAN with glib equivalent
+  slirp: replace SIZEOF_CHAR_P with glib equivalent
+  slirp: replace compile time DO_KEEPALIVE
+  slirp: remove unused global slirp_instance
+  slirp: replace error_report() with g_critical()
+  slirp: improve a bit the debug macros
+  slirp: replace trace functions with DEBUG calls
+  slirp: add a callback to log guest errors
+  slirp: remove unused sbflush()
+  slirp: replace qemu_notify_event() with a callback
+  slirp: remove #if notdef dead code
+  slirp: NULL is defined by glib (at least)
+  slirp: remove dead TCP_ACK_HACK code
+  slirp: replace ARRAY_SIZE with G_N_ELEMENTS
+  net: do not depend on slirp internals
+  slirp: move QEMU state saving to a separate unit
+  slirp: replace remaining QEMU dependency
+  build-sys: add a basic meson build
+
+ include/glib-compat.h |  56 ++++++
+ net/colo.h            |   3 +-
+ net/util.h            |  55 +++++
+ slirp/debug.h         |  47 ++++-
+ slirp/ip.h            |  24 ++-
+ slirp/ip6.h           |   8 +-
+ slirp/ip6_icmp.h      |  22 +-
+ slirp/libslirp.h      |  35 +++-
+ slirp/main.h          |   4 -
+ slirp/mbuf.h          |   1 -
+ slirp/qtailq.h        | 218 ++++++++++++++++++++
+ slirp/sbuf.h          |   3 +-
+ slirp/slirp.h         |  58 ++----
+ slirp/slirp_config.h  |  86 --------
+ slirp/socket.h        |   1 +
+ slirp/state.h         |   9 +
+ slirp/tcp.h           |   4 +-
+ slirp/util.h          | 145 +++++++++++++
+ net/colo-compare.c    |   1 +
+ net/colo.c            |   1 +
+ net/filter-rewriter.c |   1 +
+ net/slirp.c           |  65 +++++-
+ slirp/arp_table.c     |  13 +-
+ slirp/bootp.c         |   4 +-
+ slirp/cksum.c         |   5 +-
+ slirp/dhcpv6.c        |  19 +-
+ slirp/dnssearch.c     |   1 -
+ slirp/if.c            |   6 +-
+ slirp/ip6_icmp.c      |  34 ++--
+ slirp/ip6_input.c     |   1 -
+ slirp/ip6_output.c    |   2 -
+ slirp/ip_icmp.c       |  25 ++-
+ slirp/ip_input.c      | 201 ------------------
+ slirp/ip_output.c     |   1 -
+ slirp/mbuf.c          |   3 +-
+ slirp/misc.c          | 188 +++++++++--------
+ slirp/ncsi.c          |   5 +-
+ slirp/ndp_table.c     |  20 +-
+ slirp/sbuf.c          |   8 +-
+ slirp/slirp.c         | 458 +++---------------------------------------
+ slirp/socket.c        |  72 +++----
+ slirp/state.c         | 394 ++++++++++++++++++++++++++++++++++++
+ slirp/tcp_input.c     |  86 ++------
+ slirp/tcp_output.c    |   3 +-
+ slirp/tcp_subr.c      |  21 +-
+ slirp/tcp_timer.c     |   3 +-
+ slirp/tftp.c          |  18 +-
+ slirp/udp.c           |  13 +-
+ slirp/udp6.c          |   8 +-
+ slirp/util.c          | 176 ++++++++++++++++
+ stubs/slirp.c         |   2 +-
+ Makefile.objs         |   1 -
+ slirp/Makefile.objs   |   4 +-
+ slirp/meson.build     |  48 +++++
+ slirp/trace-events    |   5 -
+ 55 files changed, 1547 insertions(+), 1148 deletions(-)
+ create mode 100644 slirp/qtailq.h
+ delete mode 100644 slirp/slirp_config.h
+ create mode 100644 slirp/state.h
+ create mode 100644 slirp/util.h
+ create mode 100644 slirp/state.c
+ create mode 100644 slirp/util.c
+ create mode 100644 slirp/meson.build
+ delete mode 100644 slirp/trace-events
+
+--=20
+2.19.1.708.g4ede3d42df
