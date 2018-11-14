@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMui8-0006Tt-Bj
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:56:01 -0500
+	(envelope-from <armbru@redhat.com>) id 1gMulv-0001lv-Ad
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:59:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gMui6-00075H-Hf
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:56:00 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 14 Nov 2018 13:55:46 +0100
-Message-Id: <20181114125546.4319-1-kwolf@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1gMulu-0002FY-9D
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:59:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56206)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gMuls-00027J-7Z
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:59:54 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
+Date: Wed, 14 Nov 2018 13:59:25 +0100
+In-Reply-To: <20181114123643.24091-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 14 Nov 2018 16:36:02 +0400")
+Message-ID: <871s7nstle.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] vvfat: Fix memory leak
+Subject: Re: [Qemu-devel] [PATCH for-3.2 00/41] RFC: slirp: make it again a
+ standalone project
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,51 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, Liam.Merwick@oracle.com, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it
 
-Don't leak 'cluster' in the mapping =3D=3D NULL case. Found by Coverity
-(CID 1055918).
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Fixes: 8d9401c2791ee2d2805b741b1ee3006041edcd3e
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/vvfat.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> Hi,
+>
+> Based-on: https://people.debian.org/~sthibault/qemu.git/ slirp branch
+>
+> This series goal is to allow building libslirp as an independent library.
+>
+> While looking at making SLIRP a seperate running process, I thought
+> that having an independent library from QEMU would be a first step.
+>
+> There has been some attempts to make slirp a seperate project in the past.
+> (https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01092.html)
+> Unfortunately, they forked from QEMU and didn't provide enough
+> compatibility for QEMU to make use of it (in particular, vmstate
+> handling was removed, they lost git history etc). Furthermore, they
+> are not maintained as far as I can see.
+>
+> I would propose to make slirp a seperate project, that can initially
+> be used by QEMU as a submodule, keeping Makefile.objs until a proper
+> shared library with stability guarantees etc is ready..
+>
+> The subproject could created by preserving git tags, and cleaning up the =
+code style, this way:
+>
+> git filter-branch --tree-filter "if ls * 1> /dev/null 2>&1; then clang-fo=
+rmat -i * /dev/null; fi " -f --subdirectory-filter "slirp" --prune-empty --=
+tag-name-filter cat -- --all
+> (my clang-format https://gist.github.com/elmarco/cb20c8d92007df0e2fb8a240=
+4678ac73)
+>
+> What do you think?
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 1de5de1db4..b7b61ea8b7 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -2510,7 +2510,7 @@ static int commit_one_file(BDRVVVFATState* s,
-     uint32_t first_cluster =3D c;
-     mapping_t* mapping =3D find_mapping_for_cluster(s, c);
-     uint32_t size =3D filesize_of_direntry(direntry);
--    char* cluster =3D g_malloc(s->cluster_size);
-+    char *cluster;
-     uint32_t i;
-     int fd =3D 0;
-=20
-@@ -2528,17 +2528,17 @@ static int commit_one_file(BDRVVVFATState* s,
-     if (fd < 0) {
-         fprintf(stderr, "Could not open %s... (%s, %d)\n", mapping->path=
-,
-                 strerror(errno), errno);
--        g_free(cluster);
-         return fd;
-     }
-     if (offset > 0) {
-         if (lseek(fd, offset, SEEK_SET) !=3D offset) {
-             qemu_close(fd);
--            g_free(cluster);
-             return -3;
-         }
-     }
-=20
-+    cluster =3D g_malloc(s->cluster_size);
-+
-     while (offset < size) {
-         uint32_t c1;
-         int rest_size =3D (size - offset > s->cluster_size ?
---=20
-2.19.1
+Has the slirp code been improved to be generally useful?  I still got it
+filed under "friends don't let friends use that, except for testing"...
