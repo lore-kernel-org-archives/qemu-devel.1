@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gMjj1-0004MC-Sc
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 20:12:14 -0500
+	(envelope-from <cota@braap.org>) id 1gMjj9-0004Lw-AR
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 20:12:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gMjYq-00071N-Bm
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 20:01:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41434)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gMjYm-0006yr-9B
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 20:01:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gMjYh-0000RL-By
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 01:01:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0CCA62E807D
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 01:01:31 +0000 (UTC)
+	(envelope-from <cota@braap.org>) id 1gMjXU-0004J1-Sy
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 20:00:23 -0500
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:49135)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gMjXU-0004Ix-KG
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 20:00:16 -0500
+Date: Tue, 13 Nov 2018 20:00:14 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181114010014.GA19024@flamenco>
+References: <20181112214503.22941-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Nov 2018 00:45:33 -0000
-From: Dan Midthun <dan.midthun@gmail.com>
-Reply-To: Bug 1802150 <1802150@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154161401577.19796.10798182190360171804.malonedeb@gac.canonical.com>
-	<154204719764.2327.17412754718199087172.malone@soybean.canonical.com>
-Message-Id: <2c18403c-40c0-d0d6-3881-d73b08c4dc62@gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1802150] Re: Guest undefined when destroyed
- on host after migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181112214503.22941-1-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 00/17] tcg: Move softmmu out-of-line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,46 +26,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-The logs for the VM that gets undefined are no longer available.
+On Mon, Nov 12, 2018 at 22:44:46 +0100, Richard Henderson wrote:
+> Based on an idea forwarded by Emilio, which suggests a 5-6%
+> speed gain is possible.  I have not spent too much time
+> measuring this, as the code size gains are significant.
 
+Nice!
+
+> I believe that I posted an x86_64-only patch some time ago,
+> but this now includes i386, aarch64 and arm32.  In late
+> testing I do some failures on i386, for sparc guest.  I'll
+> follow up on that later.
+
+The following might be related: I'm seeing segfaults with -smp 8
+and beyond when doing bootup+shutdown of an aarch64 guest on
+an x86-64 host. smp -1 is stable AFAICT. The first commit that
+shows these crashes is "tcg/i386: Use TCG_TARGET_NEED_LDST_OOL_LABELS",
+that is f7ec49a51c8 in your tcg-tlb-x86 github branch.
 
 Thanks,
- =C2=A0 Dan
 
-
-On 11/12/2018 01:26 PM, Dr. David Alan Gilbert wrote:
-> Also, can you please include the libvirt logs for the VM, they're
-> typically in /var/log/libvirt/VMNAME.log
->
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1802150
-
-Title:
-  Guest undefined when destroyed on host after migration
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  After a live migration, guest VMs are being undefined from the host
-  they were migrated to after shutdown. I have experienced this at two
-  (2) separate locations on more than one hardware configuration.  This
-  happens when utilizing virt-manager to view current allocations on
-  hosts, and virsh on the CLI to migrate guests.  When the guest is
-  migrated from one host to another, no errors are thrown, and only lose
-  1 packet from infinite ping. Shutting guest down *from* the guest OS
-  results in the Guest VM being undefined on the residing host, and XML
-  config lost.  If needed, I can provide a recorded session of this
-  happening.
-
-  Thanks,
-    Dan
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1802150/+subscriptions
+		Emilio
