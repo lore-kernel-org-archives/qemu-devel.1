@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMtAV-0001xy-00
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:17:11 -0500
+	(envelope-from <pmathieu@redhat.com>) id 1gMtGy-0003ub-96
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:23:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gMtAU-0002bx-35
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:17:11 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33062)
+	(envelope-from <pmathieu@redhat.com>) id 1gMtGt-0006Bx-GK
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:23:52 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:39340)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gMtAT-0002bN-VF
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:17:10 -0500
-Received: by mail-oi1-x242.google.com with SMTP id c206so7685383oib.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 03:17:09 -0800 (PST)
+	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1gMtGt-0006B6-98
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:23:47 -0500
+Received: by mail-wr1-f66.google.com with SMTP id b13so16830850wrx.6
+	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 03:23:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <74cca5d1-d2b4-6b44-32fe-332136b8b171@redhat.com>
-References: <20181101021226.6353-1-zhangckid@gmail.com>
-	<20181114104720.GB3955@xz-x1>
-	<74cca5d1-d2b4-6b44-32fe-332136b8b171@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 14 Nov 2018 11:16:48 +0000
-Message-ID: <CAFEAcA8SeZfsihEeD0Rvoxtf-9iKjR_dtrXQLy=6MVzM0ZAD0A@mail.gmail.com>
+References: <20181108134139.31666-1-peter.maydell@linaro.org>
+	<CAKmqyKMaW0Ye5E_PMZXpnUpYZRGdwCBEOf9Qr_bzJpPR=-_p2A@mail.gmail.com>
+	<CAFEAcA-tct9gOM-mShPXhaZvMK1o14K4dcK-QbNxR5r36_DM2g@mail.gmail.com>
+In-Reply-To: <CAFEAcA-tct9gOM-mShPXhaZvMK1o14K4dcK-QbNxR5r36_DM2g@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Wed, 14 Nov 2018 12:23:34 +0100
+Message-ID: <CAP+75-X9TcSQxtTKvRqp4vAGG--139Qb8tQdmQHwP+Pw3=6UrQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V2] migration/colo.c: Fix compilation issue
- when disable replication
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: list myself as maintainer for
+ various Arm boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Zhang Chen <zhangckid@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: alistair23@gmail.com, QEMU Developers <qemu-devel@nongnu.org>, Rob Herring <robh@kernel.org>, Thomas Huth <thuth@redhat.com>, patches@linaro.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, Markus Armbruster <armbru@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Antony Pavlov <antonynpavlov@gmail.com>
 
-On 14 November 2018 at 11:06, Thomas Huth <thuth@redhat.com> wrote:
-> On 2018-11-14 11:47, Peter Xu wrote:
->> On Thu, Nov 01, 2018 at 10:12:26AM +0800, Zhang Chen wrote:
->>> This compilation issue will occur when user use --disable-replication
->>> to config Qemu.
->>>
->>> Reported-by: Thomas Huth <thuth@redhat.com>
->>> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
->>
->> Hi,
->>
->> How's the status of this patch?  Are we gonna merge it for 3.1?
->>
->> I just posted a similar one without knowing this (until Dave pointed
->> it out).  IMHO it can be a good candidate for 3.1.
+On Wed, Nov 14, 2018 at 12:13 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 13 November 2018 at 20:10, Alistair Francis <alistair23@gmail.com> wrote:
+> > These two and the Xilinx boards seem a little out of place in this
+> > patch. I agree they probably aren't maintained as well as they should
+> > be, but the patch talks about orphaned boards and these four all have
+> > active QEMU maintainers listed.
 >
-> Maybe Peter Maydell could apply this directly to the repo as a built fix?
+> Yeah, I was planning to improve the commit message,
+> something along the lines of an extra para:
+>
+> "The Xilinx boards are maintained, but patches to
+> them go via the target-arm tree, so add myself as a
+> maintainer there too."
+>
+> Really this is because we're overloading "maintainer"
+> to mean both "this person cares about and is the
+> primary reviewer and yes/no decision for them" and
+> also "this person is responsible for getting the
+> patches into the tree". Perhaps we should instead
+> define a new letter tag for the latter ?
 
-I'd rather it just went through the migration tree, really...
-it isn't actually breaking any of our travis jobs or other CI.
-
-thanks
--- PMM
+What about changing the 'M:' tag description to the one you just suggested?
