@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gMlPE-0006DM-Fq
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 21:59:53 -0500
+	(envelope-from <mjc@sifive.com>) id 1gMlVf-0007QP-HT
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 22:06:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gMlPA-0005Od-4Z
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 21:59:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50714)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gMlP9-0005Kj-1W
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 21:59:48 -0500
-References: <1539919345-10703-1-git-send-email-jasowang@redhat.com>
-	<1539919345-10703-25-git-send-email-jasowang@redhat.com>
-	<20181113154133.GA9113@dimastep-nix>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <60759e6b-b125-a7ce-b5d1-78ef5bb3f8a0@redhat.com>
-Date: Wed, 14 Nov 2018 10:59:32 +0800
+	(envelope-from <mjc@sifive.com>) id 1gMlVd-0001vs-S8
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 22:06:31 -0500
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:33208)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1gMlVc-0001ta-SF
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 22:06:29 -0500
+Received: by mail-ot1-x32b.google.com with SMTP id i20so7000156otl.0
+	for <qemu-devel@nongnu.org>; Tue, 13 Nov 2018 19:06:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181113154133.GA9113@dimastep-nix>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL V2 24/26] net: ignore packet size greater
- than INT_MAX
+References: <20181113235045.14155-1-palmer@sifive.com>
+In-Reply-To: <20181113235045.14155-1-palmer@sifive.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Wed, 14 Nov 2018 16:06:09 +1300
+Message-ID: <CAHNT7NsWzvX8k1Ed9Re_vTL-87r2bh4wzjQSLGJ4=fpgDYyhow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PR RFC] RISC-V Patches for 3.1-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +27,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dima Stepanov <dimastep@yandex-team.ru>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Palmer Dabbelt <palmer@sifive.com>
+Cc: qemu-riscv@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
 
+On Wed, Nov 14, 2018 at 12:52 PM Palmer Dabbelt <palmer@sifive.com> wrote:
 
-On 2018/11/13 =E4=B8=8B=E5=8D=8811:41, Dima Stepanov wrote:
-> Hi Jason,
+> The following changes since commit
+> cb968d275c145467c8b385a3618a207ec111eab1:
 >
-> I know that this patch has been already merged to stable, but i have a
-> question:
+>   Update version for v3.1.0-rc1 release (2018-11-13 18:16:14 +0000)
 >
-> On Fri, Oct 19, 2018 at 11:22:23AM +0800, Jason Wang wrote:
->> There should not be a reason for passing a packet size greater than
->> INT_MAX. It's usually a hint of bug somewhere, so ignore packet size
->> greater than INT_MAX in qemu_deliver_packet_iov()
->>
->> CC:qemu-stable@nongnu.org
->> Reported-by: Daniel Shapira<daniel@twistlock.com>
->> Reviewed-by: Michael S. Tsirkin<mst@redhat.com>
->> Signed-off-by: Jason Wang<jasowang@redhat.com>
->> ---
->>   net/net.c | 7 ++++++-
->>   1 file changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/net.c b/net/net.c
->> index c66847e..07c194a 100644
->> --- a/net/net.c
->> +++ b/net/net.c
->> @@ -712,10 +712,15 @@ ssize_t qemu_deliver_packet_iov(NetClientState *=
-sender,
->>                                   void *opaque)
->>   {
->>       NetClientState *nc =3D opaque;
->> +    size_t size =3D iov_size(iov, iovcnt);
->>       int ret;
->>  =20
->> +    if (size > INT_MAX) {
->> +        return size;
-> Is it okay that the function returns ssize_t (signed), but the type of =
-the
-> size variable is size_t (unsigned)? For now the top level routine check=
-s
-> the return value only for 0, but anyway we can return negative value
-> here instead of positive. What do you think?
+> are available in the Git repository at:
 >
-> Regards, Dima.
+>   git://github.com/riscv/riscv-qemu.git tags/riscv-for-master-3.1-rc2
+>
+> for you to fetch changes up to 3502dc824a7b0218abb49f4350e80a49829748cf:
+>
+>   RISC-V: Respect fences for user-only emulators (2018-11-13 15:12:15
+> -0800)
+>
+> ----------------------------------------------------------------
+> RISC-V Patches for 3.1-rc2
+>
+> This pull request contains four patches that aren't really related to
+> each other aside from all being bug fixes that I think should go in for
+> 3.1.0:
 >
 
-Any non zero value should be ok here. Actually I think because of the=20
-conversion from size_t to ssize_t, caller actually see negative value?
+Here's I again. I guess its a somewhat arbitrary set of fixes. Although one
+could say the same about the set of fixes in the github repo.
 
-Thanks
+At least you don't have review feedback asking you split a patch up to make
+it easier to review, after its already been reviewed (what I would call
+"make work").
+
+No objections from me. We just have to get these patches into the other
+tree which also has RISC-V bug fixes (but I don't have an opinion about
+which bugs are more or less critical). There will be some minor merge
+conflicts because the RISC-V tree has writable misa suppoer. I'm planning
+to rebase at 3.1.0, just so we don't trample on each other. It's probably
+going to be quite a lot of work to get the patches in that tree here
+because my patches tend to attract a lot of pedantic feedback. i.e. !! to
+normalize a scalar into a bool and ~ to broadcast bit 1 e.g. C bitwise
+logic that you find frequently in spike; has to be dumbed down into macro
+wrappers. Feedback. These changes to keep people happy are the reason why
+we broke things for folk like changing gp$ to __globalPointer$ (in
+GCC/binutils). Suddendly all earlier asm is broken because someone wants to
+give feedback about how RISC-V should be; someone who does not need to bear
+the burden of those changes.
+
+Change simply because we can make you change stuff to break things for
+RISC-V users because we think those changes are a good idea. Don't get me
+wrong. We get good feedback (in QEMU, mostly from RIchard Henderson), but
+its not always the case. VSPILL/VFILL and vaddsz sp is a good idea. I need
+to find that email of Richard's on the GCC list and forward it to Krste. I
+hope the feedback makes it to folk working on the Vector spec because as
+far as I can tell it is a good idea.
+
+Apologies for the cynicism. I'll get over it.
+
+* The second half of Alistair's memory leak patch set that I missed last
+>   week.
+> * A fix to make fclass.d availiable only on RV64IFD systems (without
+>   this it's availiable on RV32IFD systems, truncating the result).
+> * A fix to make sfence.vm availiable only in priv-1.9.1, and sfence.vma
+>   only availiable in priv-1.10.
+> * A change to respect fences in user-mode emulators, which were
+>   previously treated as NOPs.
+>
+> As usual, this builds and boot Linux for me.  I don't think I have
+> anything else planned for 3.1.0, but I may be wrong as things are a bit
+> hectic this week.
+>
+> ----------------------------------------------------------------
+> Alistair Francis (1):
+>       hw/riscv/virt: Free the test device tree node name
+>
+> Bastian Koppelmann (2):
+>       target/riscv: Fix FCLASS_D being treated as RV64 only
+>       target/riscv: Fix sfence.vm/a both available in any priv version
+>
+> Palmer Dabbelt (1):
+>       RISC-V: Respect fences for user-only emulators
+>
+>  hw/riscv/virt.c          |  1 +
+>  target/riscv/translate.c | 24 ++++++++++++++++--------
+>  2 files changed, 17 insertions(+), 8 deletions(-)
+>
+>
+>
