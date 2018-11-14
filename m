@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1gMlbB-0000ei-VZ
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 22:12:15 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gMm8H-0006CB-UZ
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 22:46:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1gMlb8-0003No-0z
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 22:12:13 -0500
-Received: from st13p11im-asmtp004.me.com ([17.164.40.219]:54095)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1gMlb7-0003DL-SZ
-	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 22:12:09 -0500
-Received: from process-dkim-sign-daemon.st13p11im-asmtp004.me.com by
-	st13p11im-asmtp004.me.com
-	(Oracle Communications Messaging Server 8.0.2.2.20180531 64bit (built
-	May 31 2018)) id <0PI500H00XYVWY00@st13p11im-asmtp004.me.com> for
-	qemu-devel@nongnu.org; Wed, 14 Nov 2018 03:11:07 +0000 (GMT)
-Content-type: text/plain; charset=us-ascii
-MIME-version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
-From: Chen Zhang <tgfbeta@me.com>
-In-reply-to: <20181113090249.15658-1-kraxel@redhat.com>
-Date: Wed, 14 Nov 2018 11:10:57 +0800
-Content-transfer-encoding: quoted-printable
-Message-id: <0EE77C7B-02AF-4666-90D3-53BF09585EBD@me.com>
-References: <20181113090249.15658-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] gtk: sync guest display updates to host
- display refresh
+	(envelope-from <jasowang@redhat.com>) id 1gMm8C-0000FY-5L
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 22:46:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41366)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gMm8B-0000F8-T6
+	for qemu-devel@nongnu.org; Tue, 13 Nov 2018 22:46:20 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C36C380F91
+	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 03:46:18 +0000 (UTC)
+References: <20181109195653.11867-1-marcandre.lureau@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <dcc8d960-e970-b8b9-f17c-8cba0c871d0b@redhat.com>
+Date: Wed, 14 Nov 2018 11:46:14 +0800
+MIME-Version: 1.0
+In-Reply-To: <20181109195653.11867-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] RFC: net/socket: learn to talk with a unix
+ dgram socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,97 +34,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, tgfbeta@me.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: rjones@redhat.com
 
-Hi,
 
-I have briefly tested this patch. Unfortunately, it apparently caused =
-deteriorated performance on a previously working Windows 10 guest with =
-DMA Buf.
+On 2018/11/10 =E4=B8=8A=E5=8D=883:56, Marc-Andr=C3=A9 Lureau wrote:
+> -net socket has a fd argument, and may be passed pre-opened sockets.
+>
+> TCP sockets use framing.
+> UDP sockets have datagram boundaries.
+>
+> When given a unix dgram socket, it will be able to read from it, but
+> will attempt to send on the dgram_dst, which is unset. The other end
+> will not receive the data.
+>
+> Let's teach -net socket to recognize a UNIX DGRAM socket, and use the
+> regular send() command (without dgram_dst).
+>
+> This makes running slirp out-of-process possible that
+> way (python pseudo-code):
+>
+> a, b =3D socket.socketpair(socket.AF_UNIX, socket.SOCK_DGRAM)
+>
+> subprocess.Popen('qemu -net socket,fd=3D%d -net user' % a.fileno(), she=
+ll=3DTrue)
+> subprocess.Popen('qemu ... -net nic -net socket,fd=3D%d' % b.fileno(), =
+shell=3DTrue)
+>
+> (to make slirp a seperate project altogether, we would have to have
+> some compatibility code and/or deprecate various options & HMP
+> commands for dynamic port forwarding etc - but this looks like a
+> reachable goal)
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The patched qemu not only clogged up graphics drawing, but also =
-obstructed the guest OS. The boot time and latency for guest operations =
-(e.g. clicking Start menu in guest) dramatically increased. My best =
-guess would be that GTK update events messed up with some polling in =
-main_loop_wait(false), leading to blocked IO, or conversely the GUI =
-being blocked by IO.
 
-Best regards,
+I believe instead of supporting unnamed sockets, we should also support=20
+named one through cli?
 
---
-P.S:
 
-The arguments for qemu:
-
-/tmp/qemu-system-x86_64 -nodefaults -machine =
-pc,accel=3Dkvm,usb=3Doff,kernel_irqchip=3Don \
-  -vga none -display gtk,gl=3Don  -rtc base=3Dlocaltime \
-  -device =
-vfio-pci,sysfsdev=3D/sys/bus/pci/devices/0000:00:02.0/{UUID-FOR-MDEV},x-ig=
-d-opregion=3Don,display=3Don,rombar=3D0 \
-  -m 3000 -realtime mlock=3Doff -smp 3,sockets=3D1,cores=3D1 \
-  -drive file=3D/home/user/disk.img,format=3Dqcow2,media=3Ddisk,if=3Dide =
-\
-  -usb -device qemu-xhci,id=3Dxhci -device usb-tablet,bus=3Dxhci.0 \
-  -cpu host -monitor stdio
-
-The host runs a Ubuntu 18.04 desktop.
-
-> On Nov 13, 2018, at 5:02 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
->=20
-> Reduce console refresh timer to idle refresh rate.  Register a frame
-> tick callback (called by gtk on each display frame) and use that to =
-kick
-> display updates instead.
->=20
-> That should sync qemu refresh rate to display refresh rate.  It'll =
-also
-> stop updating the qemu display in case the qemu is not visible (gtk
-> stops calling the frame tick callback then).
->=20
-> Buglink: https://bugs.launchpad.net/bugs/1802915
-> Suggested-by: Chen Zhang <tgfbeta@me.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
-> ui/gtk.c | 16 ++++++++++++++++
-> 1 file changed, 16 insertions(+)
->=20
-> diff --git a/ui/gtk.c b/ui/gtk.c
-> index 579990b865..8f79dfe42c 100644
-> --- a/ui/gtk.c
-> +++ b/ui/gtk.c
-> @@ -1661,6 +1661,16 @@ static gboolean gd_configure(GtkWidget *widget,
->     return FALSE;
-> }
->=20
-> +static gboolean gd_frame_tick(GtkWidget *widget,
-> +                              GdkFrameClock *frame_clock,
-> +                              gpointer opaque)
-> +{
-> +    VirtualConsole *vc =3D opaque;
-> +
-> +    vc->gfx.dcl.ops->dpy_refresh(&vc->gfx.dcl);
-> +    return G_SOURCE_CONTINUE;
-> +}
-> +
-> /** Virtual Console Callbacks **/
->=20
-> static GSList *gd_vc_menu_init(GtkDisplayState *s, VirtualConsole *vc,
-> @@ -1911,6 +1921,12 @@ static void =
-gd_connect_vc_gfx_signals(VirtualConsole *vc)
->                          G_CALLBACK(gd_focus_out_event), vc);
->         g_signal_connect(vc->gfx.drawing_area, "configure-event",
->                          G_CALLBACK(gd_configure), vc);
-> +        if (1 /* make that a config option ??? */) {
-> +            update_displaychangelistener(&vc->gfx.dcl,
-> +                                         GUI_REFRESH_INTERVAL_IDLE);
-> +            gtk_widget_add_tick_callback(vc->gfx.drawing_area,
-> +                                         gd_frame_tick, vc, NULL);
+>   net/socket.c | 25 +++++++++++++++++++++----
+>   1 file changed, 21 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index 7095eb749f..8a9c30892d 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -119,9 +119,13 @@ static ssize_t net_socket_receive_dgram(NetClientS=
+tate *nc, const uint8_t *buf,
+>       ssize_t ret;
+>  =20
+>       do {
+> -        ret =3D qemu_sendto(s->fd, buf, size, 0,
+> -                          (struct sockaddr *)&s->dgram_dst,
+> -                          sizeof(s->dgram_dst));
+> +        if (s->dgram_dst.sin_family !=3D AF_UNIX) {
+> +            ret =3D qemu_sendto(s->fd, buf, size, 0,
+> +                              (struct sockaddr *)&s->dgram_dst,
+> +                              sizeof(s->dgram_dst));
+> +        } else {
+> +            ret =3D send(s->fd, buf, size, 0);
 > +        }
->     } else {
->         g_signal_connect(vc->gfx.drawing_area, "key-press-event",
->                          G_CALLBACK(gd_text_key_down), vc);
-> --=20
-> 2.9.3
->=20
+
+
+Any reason that send is a must here? send(2) said:
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 call
+
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 send(sockfd=
+, buf, len, flags);
+
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 is equivalent to
+
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sendto(sock=
+fd, buf, len, flags, NULL, 0);
+
+
+Thanks
+
+
+>       } while (ret =3D=3D -1 && errno =3D=3D EINTR);
+>  =20
+>       if (ret =3D=3D -1 && errno =3D=3D EAGAIN) {
+> @@ -322,6 +326,15 @@ static NetSocketState *net_socket_fd_init_dgram(Ne=
+tClientState *peer,
+>       int newfd;
+>       NetClientState *nc;
+>       NetSocketState *s;
+> +    SocketAddress *sa;
+> +    SocketAddressType sa_type;
+> +
+> +    sa =3D socket_local_address(fd, errp);
+> +    if (!sa) {
+> +        return NULL;
+> +    }
+> +    sa_type =3D sa->type;
+> +    qapi_free_SocketAddress(sa);
+>  =20
+>       /* fd passed: multicast: "learn" dgram_dst address from bound add=
+ress and save it
+>        * Because this may be "shared" socket from a "master" process, d=
+atagrams would be recv()
+> @@ -365,8 +378,12 @@ static NetSocketState *net_socket_fd_init_dgram(Ne=
+tClientState *peer,
+>                    "socket: fd=3D%d (cloned mcast=3D%s:%d)",
+>                    fd, inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port)=
+);
+>       } else {
+> +        if (sa_type =3D=3D SOCKET_ADDRESS_TYPE_UNIX) {
+> +            s->dgram_dst.sin_family =3D AF_UNIX;
+> +        }
+> +
+>           snprintf(nc->info_str, sizeof(nc->info_str),
+> -                 "socket: fd=3D%d", fd);
+> +                 "socket: fd=3D%d %s", fd, SocketAddressType_str(sa_ty=
+pe));
+>       }
+>  =20
+>       return s;
