@@ -1,28 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMyId-0007Z4-UM
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:45:57 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gMyJk-0008HR-QF
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:47:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gMyIZ-0006AU-6C
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:45:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34820)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gMyIY-00063o-UB
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:45:51 -0500
-Date: Wed, 14 Nov 2018 16:45:37 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181114164537.GR19298@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181019133835.16494-1-berrange@redhat.com>
-	<20181019133835.16494-12-berrange@redhat.com>
-	<CAJ+F1CLUOjdBO+5cTWUfNdLtCeFB_BUSHL5FOF2+6S_+gE_U4g@mail.gmail.com>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gMyJf-0007hk-N0
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:47:04 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41328)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1gMyJf-0006NO-EJ
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 11:46:59 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wAEGjrPi005479
+	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 11:46:09 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2nrpnnjr2d-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 14 Nov 2018 11:46:02 -0500
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Wed, 14 Nov 2018 16:44:55 -0000
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Wed, 14 Nov 2018 10:44:38 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CLUOjdBO+5cTWUfNdLtCeFB_BUSHL5FOF2+6S_+gE_U4g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20181114164438.6412-1-mdroth@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 11/11] authz: delete existing ACL
- implementation
+Subject: [Qemu-devel] [PATCH for-3.1 v2] build: qga: add macro to force use
+ of native mingw32 assert()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +39,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, philmd@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On Thu, Nov 08, 2018 at 12:15:54PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Fri, Oct 19, 2018 at 5:51 PM Daniel P. Berrang=C3=A9 <berrange@redha=
-t.com> wrote:
-> >
-> > From: "Daniel P. Berrange" <berrange@redhat.com>
-> >
-> > The 'qemu_acl' type was a previous non-QOM based attempt to provide a=
-n
-> > authorization facility in QEMU. Because it is non-QOM based it cannot=
- be
-> > created via the command line and requires special monitor commands to
-> > manipulate it.
-> >
-> > The new QAuthZ subclasses provide a superset of the functionality in
-> > qemu_acl, so the latter can now be deleted. The HMP 'acl_*' monitor
-> > commands are converted to use the new QAuthZSimple data type instead
-> > in order to provide temporary backwards compatibility.
-> >
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > +    monitor_printf(mon, "policy: %s\n",
-> > +                   QAuthZListPolicy_lookup.array[auth->policy]);
->=20
-> please use QAuthZListPolicy_str()
->=20
-> > +
-> > +    rules =3D auth->rules;
-> > +    while (rules) {
-> > +        QAuthZListRule *rule =3D rules->value;
-> > +        i++;
-> > +        monitor_printf(mon, "%zu: %s %s\n", i,
-> > +                       QAuthZListPolicy_lookup.array[rule->policy],
->=20
-> QAuthZListPolicy_str
+When building qemu-ga for w32 with VSS support, some parts of qemu-ga
+are not linked against glib, specifically the C++ bits used to
+create the VSS provider DLL. With 3ebee3b191e, we now define assert()
+as g_assert() for all mingw32 builds via osdep.h, which results in the
+following build breakage:
 
-Yes.
+  x86_64-w64-mingw32-g++ -o qga/vss-win32/qga-vss.dll qga/vss-win32/reque=
+ster.o qga/vss-win32/provider.o qga/vss-win32/install.o /home/mdroth/w/qe=
+mu4.git/qga/vss-win32/qga-vss.def  -shared -Wl,--add-stdcall-alias,--enab=
+le-stdcall-fixup -lole32 -loleaut32 -lshlwapi -luuid -static
+  qga/vss-win32/requester.o: In function `requester_freeze':
+  /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:284: undefined ref=
+erence to `g_assertion_message_expr'
+  qga/vss-win32/requester.o: In function `requester_thaw':
+  /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:508: undefined ref=
+erence to `g_assertion_message_expr'
+  /home/mdroth/w/qemu4.git/qga/vss-win32/requester.cpp:509: undefined ref=
+erence to `g_assertion_message_expr'
+  collect2: error: ld returned 1 exit status
+  make: *** [/home/mdroth/w/qemu4.git/qga/vss-win32/Makefile.objs:10: qga=
+/vss-win32/qga-vss.dll] Error 1
+  make: *** Waiting for unfinished jobs....
 
+Fix this by introducing a USE_NATIVE_MINGW32_ASSERT macro that can
+be defined prior to inclusion of osdep.h for build targets that
+don't link against glib.
 
-> > @@ -163,12 +165,19 @@ static int vnc_auth_sasl_check_access(VncState =
-*vs)
-> >      vs->sasl.username =3D g_strdup((const char*)val);
-> >      trace_vnc_auth_sasl_username(vs, vs->sasl.username);
-> >
-> > -    if (vs->vd->sasl.acl =3D=3D NULL) {
-> > +    if (vs->vd->sasl.authzid =3D=3D NULL) {
-> >          trace_vnc_auth_sasl_acl(vs, 1);
-> >          return 0;
-> >      }
-> >
-> > -    allow =3D qemu_acl_party_is_allowed(vs->vd->sasl.acl, vs->sasl.u=
-sername);
-> > +    allow =3D qauthz_is_allowed_by_id(vs->vd->sasl.authzid,
-> > +                                    vs->sasl.username, &err);
->=20
-> Why not use qauthz_is_allowed() with .authz ?
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+v2:
+ * define USE_NATIVE_MINGW32_ASSERT via build recipe and avoid moving
+   #include's before osdep.h (Philippe)
+---
+ include/qemu/osdep.h        | 2 +-
+ qga/vss-win32/Makefile.objs | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-The .authz object is only non-NULL when using the legacy "-vnc ..,acl"
-flag syntax. When using the modern syntax (introduced by the followup
-series mentioned in the cover letter) we want to resolve "authzid"
-every time. This allows the user to safely delete & recreate the
-authorization objects on the fly.
-
-
-Regards,
-Daniel
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 3bf48bcdec..59364bfeb0 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -129,7 +129,7 @@ extern int daemon(int, int);
+  * code that is unreachable when features are disabled.
+  * All supported versions of Glib's g_assert() satisfy this requirement.
+  */
+-#ifdef __MINGW32__
++#if defined(__MINGW32__) && !defined(USE_NATIVE_MINGW32_ASSERT)
+ #undef assert
+ #define assert(x)  g_assert(x)
+ #endif
+diff --git a/qga/vss-win32/Makefile.objs b/qga/vss-win32/Makefile.objs
+index 23d08da225..5773bfd868 100644
+--- a/qga/vss-win32/Makefile.objs
++++ b/qga/vss-win32/Makefile.objs
+@@ -3,7 +3,7 @@
+ qga-vss-dll-obj-y +=3D requester.o provider.o install.o
+=20
+ obj-qga-vss-dll-obj-y =3D $(addprefix $(obj)/, $(qga-vss-dll-obj-y))
+-$(obj-qga-vss-dll-obj-y): QEMU_CXXFLAGS =3D $(filter-out -Wstrict-protot=
+ypes -Wmissing-prototypes -Wnested-externs -Wold-style-declaration -Wold-=
+style-definition -Wredundant-decls -fstack-protector-all -fstack-protecto=
+r-strong, $(QEMU_CFLAGS)) -Wno-unknown-pragmas -Wno-delete-non-virtual-dt=
+or
++$(obj-qga-vss-dll-obj-y): QEMU_CXXFLAGS =3D $(filter-out -Wstrict-protot=
+ypes -Wmissing-prototypes -Wnested-externs -Wold-style-declaration -Wold-=
+style-definition -Wredundant-decls -fstack-protector-all -fstack-protecto=
+r-strong, $(QEMU_CFLAGS)) -Wno-unknown-pragmas -Wno-delete-non-virtual-dt=
+or -DUSE_NATIVE_MINGW32_ASSERT
+=20
+ $(obj)/qga-vss.dll: LDFLAGS =3D -shared -Wl,--add-stdcall-alias,--enable=
+-stdcall-fixup -lole32 -loleaut32 -lshlwapi -luuid -static
+ $(obj)/qga-vss.dll: $(obj-qga-vss-dll-obj-y) $(SRC_PATH)/$(obj)/qga-vss.=
+def
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+2.17.1
