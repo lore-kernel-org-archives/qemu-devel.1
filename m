@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuVZ-0004Nl-5F
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:43:02 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuVa-0004Ox-Ep
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:43:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuVU-00047W-5U
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:43:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57704)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuVZ-0004AB-8L
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:43:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35492)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gMuVT-00046v-UH
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:42:56 -0500
+	id 1gMuVZ-00049X-0a
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:43:01 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 14 Nov 2018 16:36:35 +0400
-Message-Id: <20181114123643.24091-34-marcandre.lureau@redhat.com>
+Date: Wed, 14 Nov 2018 16:36:36 +0400
+Message-Id: <20181114123643.24091-35-marcandre.lureau@redhat.com>
 In-Reply-To: <20181114123643.24091-1-marcandre.lureau@redhat.com>
 References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.2 33/41] slirp: replace
- qemu_notify_event() with a callback
+Subject: [Qemu-devel] [PATCH for-3.2 34/41] slirp: remove #if notdef dead
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,135 +31,273 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: samuel.thibault@ens-lyon.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Use a "slirp socket" helper function to call the callback when
-sbdrop() returns true.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/libslirp.h  | 1 +
- slirp/sbuf.h      | 2 +-
- slirp/socket.h    | 1 +
- net/slirp.c       | 1 +
- slirp/sbuf.c      | 6 ++++--
- slirp/socket.c    | 7 +++++++
- slirp/tcp_input.c | 6 +++---
- 7 files changed, 18 insertions(+), 6 deletions(-)
+ slirp/ip_input.c  | 200 ----------------------------------------------
+ slirp/tcp_input.c |  39 ---------
+ 2 files changed, 239 deletions(-)
 
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index c7582e6516..7d04404340 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -22,6 +22,7 @@ typedef struct SlirpCb {
-     void (*timer_mod)(void *timer, int64_t expire_timer);
-     void (*set_nonblock)(int fd);
-     void (*guest_error)(const char *msg);
-+    void (*notify)(void);
- } SlirpCb;
-=20
-=20
-diff --git a/slirp/sbuf.h b/slirp/sbuf.h
-index 644c201341..1cb9a42834 100644
---- a/slirp/sbuf.h
-+++ b/slirp/sbuf.h
-@@ -21,7 +21,7 @@ struct sbuf {
- };
-=20
- void sbfree(struct sbuf *);
--void sbdrop(struct sbuf *, int);
-+bool sbdrop(struct sbuf *, int);
- void sbreserve(struct sbuf *, int);
- void sbappend(struct socket *, struct mbuf *);
- void sbcopy(struct sbuf *, int, int, char *);
-diff --git a/slirp/socket.h b/slirp/socket.h
-index 930ed95972..79b6fbd4c1 100644
---- a/slirp/socket.h
-+++ b/slirp/socket.h
-@@ -154,6 +154,7 @@ int soreadbuf(struct socket *so, const char *buf, int=
- size);
- void sotranslate_out(struct socket *, struct sockaddr_storage *);
- void sotranslate_in(struct socket *, struct sockaddr_storage *);
- void sotranslate_accept(struct socket *);
-+void sodrop(struct socket *, int num);
-=20
-=20
- #endif /* SLIRP_SOCKET_H */
-diff --git a/net/slirp.c b/net/slirp.c
-index b36092c948..4c39878933 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -198,6 +198,7 @@ static SlirpCb slirp_cb =3D {
-     .timer_mod =3D net_slirp_timer_mod,
-     .set_nonblock =3D qemu_set_nonblock,
-     .guest_error =3D net_slirp_guest_error,
-+    .notify =3D qemu_notify_event,
- };
-=20
- static int net_slirp_init(NetClientState *peer, const char *model,
-diff --git a/slirp/sbuf.c b/slirp/sbuf.c
-index 912f235f65..17f28e97a6 100644
---- a/slirp/sbuf.c
-+++ b/slirp/sbuf.c
-@@ -17,7 +17,7 @@ sbfree(struct sbuf *sb)
- 	free(sb->sb_data);
- }
-=20
--void
-+bool
- sbdrop(struct sbuf *sb, int num)
- {
-     int limit =3D sb->sb_datalen / 2;
-@@ -34,8 +34,10 @@ sbdrop(struct sbuf *sb, int num)
- 		sb->sb_rptr -=3D sb->sb_datalen;
-=20
-     if (sb->sb_cc < limit && sb->sb_cc + num >=3D limit) {
--        qemu_notify_event();
-+        return true;
-     }
-+
-+    return false;
- }
-=20
- void
-diff --git a/slirp/socket.c b/slirp/socket.c
-index 677fd20c9d..2b1b5052c4 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -928,3 +928,10 @@ void sotranslate_accept(struct socket *so)
-         break;
+diff --git a/slirp/ip_input.c b/slirp/ip_input.c
+index 348e1dca5a..6831526320 100644
+--- a/slirp/ip_input.c
++++ b/slirp/ip_input.c
+@@ -447,206 +447,6 @@ ip_slowtimo(Slirp *slirp)
      }
  }
-+
-+void sodrop(struct socket *s, int num)
-+{
-+    if (sbdrop(&s->so_snd, num)) {
-+        s->slirp->cb->notify();
-+    }
-+}
+=20
+-/*
+- * Do option processing on a datagram,
+- * possibly discarding it if bad options are encountered,
+- * or forwarding it if source-routed.
+- * Returns 1 if packet has been forwarded/freed,
+- * 0 if the packet should be processed further.
+- */
+-
+-#ifdef notdef
+-
+-int
+-ip_dooptions(m)
+-	struct mbuf *m;
+-{
+-	register struct ip *ip =3D mtod(m, struct ip *);
+-	register u_char *cp;
+-	register struct ip_timestamp *ipt;
+-	register struct in_ifaddr *ia;
+-	int opt, optlen, cnt, off, code, type, forward =3D 0;
+-	struct in_addr *sin, dst;
+-typedef uint32_t n_time;
+-	n_time ntime;
+-
+-	dst =3D ip->ip_dst;
+-	cp =3D (u_char *)(ip + 1);
+-	cnt =3D (ip->ip_hl << 2) - sizeof (struct ip);
+-	for (; cnt > 0; cnt -=3D optlen, cp +=3D optlen) {
+-		opt =3D cp[IPOPT_OPTVAL];
+-		if (opt =3D=3D IPOPT_EOL)
+-			break;
+-		if (opt =3D=3D IPOPT_NOP)
+-			optlen =3D 1;
+-		else {
+-			optlen =3D cp[IPOPT_OLEN];
+-			if (optlen <=3D 0 || optlen > cnt) {
+-				code =3D &cp[IPOPT_OLEN] - (u_char *)ip;
+-				goto bad;
+-			}
+-		}
+-		switch (opt) {
+-
+-		default:
+-			break;
+-
+-		/*
+-		 * Source routing with record.
+-		 * Find interface with current destination address.
+-		 * If none on this machine then drop if strictly routed,
+-		 * or do nothing if loosely routed.
+-		 * Record interface address and bring up next address
+-		 * component.  If strictly routed make sure next
+-		 * address is on directly accessible net.
+-		 */
+-		case IPOPT_LSRR:
+-		case IPOPT_SSRR:
+-			if ((off =3D cp[IPOPT_OFFSET]) < IPOPT_MINOFF) {
+-				code =3D &cp[IPOPT_OFFSET] - (u_char *)ip;
+-				goto bad;
+-			}
+-			ipaddr.sin_addr =3D ip->ip_dst;
+-			ia =3D (struct in_ifaddr *)
+-				ifa_ifwithaddr((struct sockaddr *)&ipaddr);
+-			if (ia =3D=3D 0) {
+-				if (opt =3D=3D IPOPT_SSRR) {
+-					type =3D ICMP_UNREACH;
+-					code =3D ICMP_UNREACH_SRCFAIL;
+-					goto bad;
+-				}
+-				/*
+-				 * Loose routing, and not at next destination
+-				 * yet; nothing to do except forward.
+-				 */
+-				break;
+-			}
+-                        off--; /* 0 origin */
+-			if (off > optlen - sizeof(struct in_addr)) {
+-				/*
+-				 * End of source route.  Should be for us.
+-				 */
+-				save_rte(cp, ip->ip_src);
+-				break;
+-			}
+-			/*
+-			 * locate outgoing interface
+-			 */
+-			bcopy((caddr_t)(cp + off), (caddr_t)&ipaddr.sin_addr,
+-			    sizeof(ipaddr.sin_addr));
+-			if (opt =3D=3D IPOPT_SSRR) {
+-#define	INA	struct in_ifaddr *
+-#define	SA	struct sockaddr *
+- 			    if ((ia =3D (INA)ifa_ifwithdstaddr((SA)&ipaddr)) =3D=3D 0)
+-				ia =3D (INA)ifa_ifwithnet((SA)&ipaddr);
+-			} else
+-				ia =3D ip_rtaddr(ipaddr.sin_addr);
+-			if (ia =3D=3D 0) {
+-				type =3D ICMP_UNREACH;
+-				code =3D ICMP_UNREACH_SRCFAIL;
+-				goto bad;
+-			}
+-			ip->ip_dst =3D ipaddr.sin_addr;
+-			bcopy((caddr_t)&(IA_SIN(ia)->sin_addr),
+-			    (caddr_t)(cp + off), sizeof(struct in_addr));
+-			cp[IPOPT_OFFSET] +=3D sizeof(struct in_addr);
+-			/*
+-			 * Let ip_intr's mcast routing check handle mcast pkts
+-			 */
+-			forward =3D !IN_MULTICAST(ntohl(ip->ip_dst.s_addr));
+-			break;
+-
+-		case IPOPT_RR:
+-			if ((off =3D cp[IPOPT_OFFSET]) < IPOPT_MINOFF) {
+-				code =3D &cp[IPOPT_OFFSET] - (u_char *)ip;
+-				goto bad;
+-			}
+-			/*
+-			 * If no space remains, ignore.
+-			 */
+-                        off--; /* 0 origin */
+-			if (off > optlen - sizeof(struct in_addr))
+-				break;
+-			bcopy((caddr_t)(&ip->ip_dst), (caddr_t)&ipaddr.sin_addr,
+-			    sizeof(ipaddr.sin_addr));
+-			/*
+-			 * locate outgoing interface; if we're the destination,
+-			 * use the incoming interface (should be same).
+-			 */
+-			if ((ia =3D (INA)ifa_ifwithaddr((SA)&ipaddr)) =3D=3D 0 &&
+-			    (ia =3D ip_rtaddr(ipaddr.sin_addr)) =3D=3D 0) {
+-				type =3D ICMP_UNREACH;
+-				code =3D ICMP_UNREACH_HOST;
+-				goto bad;
+-			}
+-			bcopy((caddr_t)&(IA_SIN(ia)->sin_addr),
+-			    (caddr_t)(cp + off), sizeof(struct in_addr));
+-			cp[IPOPT_OFFSET] +=3D sizeof(struct in_addr);
+-			break;
+-
+-		case IPOPT_TS:
+-			code =3D cp - (u_char *)ip;
+-			ipt =3D (struct ip_timestamp *)cp;
+-			if (ipt->ipt_len < 5)
+-				goto bad;
+-			if (ipt->ipt_ptr > ipt->ipt_len - sizeof (int32_t)) {
+-				if (++ipt->ipt_oflw =3D=3D 0)
+-					goto bad;
+-				break;
+-			}
+-			sin =3D (struct in_addr *)(cp + ipt->ipt_ptr - 1);
+-			switch (ipt->ipt_flg) {
+-
+-			case IPOPT_TS_TSONLY:
+-				break;
+-
+-			case IPOPT_TS_TSANDADDR:
+-				if (ipt->ipt_ptr + sizeof(n_time) +
+-				    sizeof(struct in_addr) > ipt->ipt_len)
+-					goto bad;
+-				ipaddr.sin_addr =3D dst;
+-				ia =3D (INA)ifaof_ i f p foraddr((SA)&ipaddr,
+-							    m->m_pkthdr.rcvif);
+-				if (ia =3D=3D 0)
+-					continue;
+-				bcopy((caddr_t)&IA_SIN(ia)->sin_addr,
+-				    (caddr_t)sin, sizeof(struct in_addr));
+-				ipt->ipt_ptr +=3D sizeof(struct in_addr);
+-				break;
+-
+-			case IPOPT_TS_PRESPEC:
+-				if (ipt->ipt_ptr + sizeof(n_time) +
+-				    sizeof(struct in_addr) > ipt->ipt_len)
+-					goto bad;
+-				bcopy((caddr_t)sin, (caddr_t)&ipaddr.sin_addr,
+-				    sizeof(struct in_addr));
+-				if (ifa_ifwithaddr((SA)&ipaddr) =3D=3D 0)
+-					continue;
+-				ipt->ipt_ptr +=3D sizeof(struct in_addr);
+-				break;
+-
+-			default:
+-				goto bad;
+-			}
+-			ntime =3D iptime();
+-			bcopy((caddr_t)&ntime, (caddr_t)cp + ipt->ipt_ptr - 1,
+-			    sizeof(n_time));
+-			ipt->ipt_ptr +=3D sizeof(n_time);
+-		}
+-	}
+-	if (forward) {
+-		ip_forward(m, 1);
+-		return (1);
+-	}
+-	return (0);
+-bad:
+-	icmp_send_error(m, type, code, 0, 0);
+-
+-	return (1);
+-}
+-
+-#endif /* notdef */
+-
+ /*
+  * Strip out IP options, at higher
+  * level protocol in the kernel.
 diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
-index e33fb83df5..456d5829e7 100644
+index 456d5829e7..de4ef92aba 100644
 --- a/slirp/tcp_input.c
 +++ b/slirp/tcp_input.c
-@@ -527,7 +527,7 @@ findso:
- 				    SEQ_GT(ti->ti_ack, tp->t_rtseq))
- 					tcp_xmit_timer(tp, tp->t_rtt);
- 				acked =3D ti->ti_ack - tp->snd_una;
--				sbdrop(&so->so_snd, acked);
-+				sodrop(so, acked);
- 				tp->snd_una =3D ti->ti_ack;
- 				m_free(m);
+@@ -1441,45 +1441,6 @@ tcp_dooptions(struct tcpcb *tp, u_char *cp, int cn=
+t, struct tcpiphdr *ti)
+ 	}
+ }
 =20
-@@ -1140,10 +1140,10 @@ trimthenstep6:
- 		}
- 		if (acked > so->so_snd.sb_cc) {
- 			tp->snd_wnd -=3D so->so_snd.sb_cc;
--			sbdrop(&so->so_snd, (int )so->so_snd.sb_cc);
-+			sodrop(so, (int)so->so_snd.sb_cc);
- 			ourfinisacked =3D 1;
- 		} else {
--			sbdrop(&so->so_snd, acked);
-+			sodrop(so, acked);
- 			tp->snd_wnd -=3D acked;
- 			ourfinisacked =3D 0;
- 		}
+-
+-/*
+- * Pull out of band byte out of a segment so
+- * it doesn't appear in the user's data queue.
+- * It is still reflected in the segment length for
+- * sequencing purposes.
+- */
+-
+-#ifdef notdef
+-
+-void
+-tcp_pulloutofband(so, ti, m)
+-	struct socket *so;
+-	struct tcpiphdr *ti;
+-	register struct mbuf *m;
+-{
+-	int cnt =3D ti->ti_urp - 1;
+-
+-	while (cnt >=3D 0) {
+-		if (m->m_len > cnt) {
+-			char *cp =3D mtod(m, caddr_t) + cnt;
+-			struct tcpcb *tp =3D sototcpcb(so);
+-
+-			tp->t_iobc =3D *cp;
+-			tp->t_oobflags |=3D TCPOOB_HAVEDATA;
+-			memcpy(sp, cp+1, (unsigned)(m->m_len - cnt - 1));
+-			m->m_len--;
+-			return;
+-		}
+-		cnt -=3D m->m_len;
+-		m =3D m->m_next; /* XXX WRONG! Fix it! */
+-		if (m =3D=3D 0)
+-			break;
+-	}
+-	panic("tcp_pulloutofband");
+-}
+-
+-#endif /* notdef */
+-
+ /*
+  * Collect new round-trip time estimate
+  * and update averages and current timeout.
 --=20
 2.19.1.708.g4ede3d42df
