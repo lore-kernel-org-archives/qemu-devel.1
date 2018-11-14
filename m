@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuPy-0007fc-4m
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:37:15 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuQL-0007uK-TC
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:37:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuPu-0000fJ-UH
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:37:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34112)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gMuQC-0000mw-Ke
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:37:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gMuPu-0000en-Mk
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:37:10 -0500
+	id 1gMuQ6-0000jq-5V
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 07:37:22 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 14 Nov 2018 16:36:03 +0400
-Message-Id: <20181114123643.24091-2-marcandre.lureau@redhat.com>
+Date: Wed, 14 Nov 2018 16:36:04 +0400
+Message-Id: <20181114123643.24091-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20181114123643.24091-1-marcandre.lureau@redhat.com>
 References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.2 01/41] slirp: move socket pair creation
- in helper function
+Subject: [Qemu-devel] [PATCH for-3.2 02/41] glib-compat: add
+ g_spawn_async_with_fds() fallback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,205 +31,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: samuel.thibault@ens-lyon.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Originally, the patch was fixing a bunch of issues, but Peter beat me
-to it with earlier commit "slirp: fork_exec(): create and connect
-child socket before fork()".
-
-Factor out socket pair creation, to simplify the fork_exec() code.
-Use the name socketpair_with_oob() since the code is actually similar
-to what socketpair() would do, except that it uses TCP sockets, for
-SLIRP to be able to call send with MSG_OOB (since SO_OOBINLINE is set,
-this could probably be faked instead on regular unix sockets though).
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/misc.c | 142 +++++++++++++++++++++++++--------------------------
- 1 file changed, 71 insertions(+), 71 deletions(-)
+ include/glib-compat.h | 56 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
-diff --git a/slirp/misc.c b/slirp/misc.c
-index 4840187750..7362e14339 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -73,85 +73,92 @@ fork_exec(struct socket *so, const char *ex)
+diff --git a/include/glib-compat.h b/include/glib-compat.h
+index fdf95a255d..8a078c5288 100644
+--- a/include/glib-compat.h
++++ b/include/glib-compat.h
+@@ -83,6 +83,62 @@ static inline gboolean g_strv_contains_qemu(const gcha=
+r *const *strv,
+ }
+ #define g_strv_contains(a, b) g_strv_contains_qemu(a, b)
 =20
- #else
-=20
--/*
-- * XXX This is ugly
-- * We create and bind a socket, then fork off to another
-- * process, which connects to this socket, after which we
-- * exec the wanted program.  If something (strange) happens,
-- * the accept() call could block us forever.
-- */
-+static int
-+slirp_socketpair_with_oob(int sv[2])
++#if !GLIB_CHECK_VERSION(2, 58, 0)
++typedef struct QemuGSpawnFds {
++    GSpawnChildSetupFunc child_setup;
++    gpointer user_data;
++    gint stdin_fd;
++    gint stdout_fd;
++    gint stderr_fd;
++} QemuGSpawnFds;
++
++static inline void
++qemu_gspawn_fds_setup(gpointer user_data)
 +{
-+    struct sockaddr_in addr =3D {
-+        .sin_family =3D AF_INET,
-+        .sin_port =3D 0,
-+        .sin_addr.s_addr =3D INADDR_ANY,
++    QemuGSpawnFds *q =3D (QemuGSpawnFds *)user_data;
++
++    dup2(q->stdin_fd, 0);
++    dup2(q->stdout_fd, 1);
++    dup2(q->stderr_fd, 2);
++    q->child_setup(q->user_data);
++}
++#endif
++
++static inline gboolean
++g_spawn_async_with_fds_qemu(const gchar *working_directory,
++                            gchar **argv,
++                            gchar **envp,
++                            GSpawnFlags flags,
++                            GSpawnChildSetupFunc child_setup,
++                            gpointer user_data,
++                            GPid *child_pid,
++                            gint stdin_fd,
++                            gint stdout_fd,
++                            gint stderr_fd,
++                            GError **error)
++{
++#if GLIB_CHECK_VERSION(2, 58, 0)
++    return g_spawn_async_with_fds(working_directory, argv, envp, flags,
++                                  child_setup, user_data,
++                                  child_pid, stdin_fd, stdout_fd, stderr=
+_fd,
++                                  error);
++#else
++    QemuGSpawnFds setup =3D {
++        .child_setup =3D child_setup,
++        .user_data =3D user_data,
++        .stdin_fd =3D stdin_fd,
++        .stdout_fd =3D stdout_fd,
++        .stderr_fd =3D stderr_fd,
 +    };
-+    socklen_t addrlen =3D sizeof(addr);
-+    int ret, s;
 +
-+    sv[1] =3D -1;
-+    s =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
-+    if (s < 0 || bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
-+        listen(s, 1) < 0 ||
-+        getsockname(s, (struct sockaddr *)&addr, &addrlen) < 0) {
-+        goto err;
-+    }
-+
-+    sv[1] =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
-+    if (sv[1] < 0) {
-+        goto err;
-+    }
-+    /*
-+     * This connect won't block because we've already listen()ed on
-+     * the server end (even though we won't accept() the connection
-+     * until later on).
-+     */
-+    do {
-+        ret =3D connect(sv[1], (struct sockaddr *)&addr, addrlen);
-+    } while (ret < 0 && errno =3D=3D EINTR);
-+    if (ret < 0) {
-+        goto err;
-+    }
-+
-+    do {
-+        sv[0] =3D accept(s, (struct sockaddr *)&addr, &addrlen);
-+    } while (sv[0] < 0 && errno =3D=3D EINTR);
-+    if (sv[0] < 0) {
-+        goto err;
-+    }
-+
-+    closesocket(s);
-+    return 0;
-+
-+err:
-+    error_report("Error: slirp_socketpair(): %s", strerror(errno));
-+    if (s >=3D 0) {
-+        closesocket(s);
-+    }
-+    if (sv[1] >=3D 0) {
-+        closesocket(sv[1]);
-+    }
-+    return -1;
++    return g_spawn_async(working_directory, argv, envp, flags,
++                         qemu_gspawn_fds_setup, &setup,
++                         child_pid, error);
++#endif
 +}
 +
- int
- fork_exec(struct socket *so, const char *ex)
- {
--        int s, cs;
--        struct sockaddr_in addr, csaddr;
--	socklen_t addrlen =3D sizeof(addr);
--        socklen_t csaddrlen =3D sizeof(csaddr);
--	int opt;
- 	char **argv;
--	int ret;
-+	int opt, c, sp[2];
- 	pid_t pid;
++#define g_spawn_async_with_fds(wd, argv, env, f, c, d, p, ifd, ofd, efd,=
+ err) \
++    g_spawn_async_with_fds_qemu(wd, argv, env, f, c, d, p, ifd, ofd, efd=
+, err)
 =20
- 	DEBUG_CALL("fork_exec");
- 	DEBUG_ARG("so =3D %p", so);
- 	DEBUG_ARG("ex =3D %p", ex);
-=20
--    addr.sin_family =3D AF_INET;
--    addr.sin_port =3D 0;
--    addr.sin_addr.s_addr =3D INADDR_ANY;
--
--    s =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
--    if (s < 0 || bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
--        listen(s, 1) < 0) {
--        error_report("Error: inet socket: %s", strerror(errno));
--        if (s >=3D 0) {
--            closesocket(s);
--        }
-+    if (slirp_socketpair_with_oob(sp) < 0) {
-         return 0;
-     }
-=20
--        if (getsockname(s, (struct sockaddr *)&csaddr, &csaddrlen) < 0) =
-{
--            closesocket(s);
--            return 0;
--        }
--        cs =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
--        if (cs < 0) {
--            closesocket(s);
--            return 0;
--        }
--        csaddr.sin_addr =3D loopback_addr;
--        /*
--         * This connect won't block because we've already listen()ed on
--         * the server end (even though we won't accept() the connection
--         * until later on).
--         */
--        do {
--            ret =3D connect(cs, (struct sockaddr *)&csaddr, csaddrlen);
--        } while (ret < 0 && errno =3D=3D EINTR);
--        if (ret < 0) {
--            closesocket(s);
--            closesocket(cs);
--            return 0;
--        }
--
- 	pid =3D fork();
- 	switch(pid) {
- 	 case -1:
- 		error_report("Error: fork failed: %s", strerror(errno));
--                closesocket(cs);
--		close(s);
-+		closesocket(sp[0]);
-+		closesocket(sp[1]);
- 		return 0;
-=20
- 	 case 0:
--                setsid();
--
--		/* Set the DISPLAY */
--                close(s);
--                dup2(cs, 0);
--                dup2(cs, 1);
--                dup2(cs, 2);
--		for (s =3D getdtablesize() - 1; s >=3D 3; s--)
--		   close(s);
-+		setsid();
-+		dup2(sp[1], 0);
-+		dup2(sp[1], 1);
-+		dup2(sp[1], 2);
-+		for (c =3D getdtablesize() - 1; c >=3D 3; c--)
-+		   close(c);
-=20
-                 argv =3D g_strsplit(ex, " ", -1);
- 		execvp(argv[0], (char **)argv);
-@@ -163,19 +170,12 @@ fork_exec(struct socket *so, const char *ex)
- 		exit(1);
-=20
- 	 default:
-+		so->s =3D sp[0];
-+		closesocket(sp[1]);
- 		qemu_add_child_watch(pid);
--                closesocket(cs);
--                /*
--                 * This should never block, because we already connect()=
-ed
--                 * on the child end before we forked.
--                 */
--                do {
--                    so->s =3D accept(s, (struct sockaddr *)&addr, &addrl=
-en);
--                } while (so->s < 0 && errno =3D=3D EINTR);
--                closesocket(s);
--                socket_set_fast_reuse(so->s);
--                opt =3D 1;
--                qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, s=
-izeof(int));
-+		socket_set_fast_reuse(so->s);
-+		opt =3D 1;
-+		qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
- 		qemu_set_nonblock(so->s);
- 		return 1;
- 	}
+ #if defined(_WIN32) && !GLIB_CHECK_VERSION(2, 50, 0)
+ /*
 --=20
 2.19.1.708.g4ede3d42df
