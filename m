@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMt07-0006fJ-IU
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:06:28 -0500
+	(envelope-from <dfaggioli@suse.com>) id 1gMt2W-0007LA-JG
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:08:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMt02-0003k5-E5
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:06:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37652)
+	(envelope-from <dfaggioli@suse.com>) id 1gMt2R-0004fd-P2
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:08:56 -0500
+Received: from smtp.nue.novell.com ([195.135.221.5]:35010)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gMt02-0003jW-5l
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:06:22 -0500
-References: <20181101021226.6353-1-zhangckid@gmail.com>
-	<20181114104720.GB3955@xz-x1>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <74cca5d1-d2b4-6b44-32fe-332136b8b171@redhat.com>
-Date: Wed, 14 Nov 2018 12:06:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181114104720.GB3955@xz-x1>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V2] migration/colo.c: Fix compilation issue
- when disable replication
+	(Exim 4.71) (envelope-from <dfaggioli@suse.com>) id 1gMt2R-0004co-FF
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 06:08:51 -0500
+Message-ID: <cce56aa63fe36bca59f1f6a6872d43ea11435f25.camel@suse.com>
+From: Dario Faggioli <dfaggioli@suse.com>
+Date: Wed, 14 Nov 2018 12:08:42 +0100
+In-Reply-To: <154219299016.19470.9372139354280787961.stgit@wayrath>
+References: <154219299016.19470.9372139354280787961.stgit@wayrath>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+	protocol="application/pgp-signature"; boundary="=-IjF3I1mleClamsq28G2o"
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] Series short description
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,169 +26,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Zhang Chen <zhangckid@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-
-On 2018-11-14 11:47, Peter Xu wrote:
-> On Thu, Nov 01, 2018 at 10:12:26AM +0800, Zhang Chen wrote:
->> This compilation issue will occur when user use --disable-replication
->> to config Qemu.
->>
->> Reported-by: Thomas Huth <thuth@redhat.com>
->> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
->=20
-> Hi,
->=20
-> How's the status of this patch?  Are we gonna merge it for 3.1?
->=20
-> I just posted a similar one without knowing this (until Dave pointed
-> it out).  IMHO it can be a good candidate for 3.1.
-
-Maybe Peter Maydell could apply this directly to the repo as a built fix?
-
-And maybe one of our docker wizards could add a test to check
-compilation with everything disabled a la:
-
-./configure --enable-werror --disable-tcg --disable-slirp \
-  --disable-libxml2 --disable-capstone --disable-live-block-migration \
-  --disable-glusterfs --disable-replication --disable-coroutine-pool \
-  --disable-smartcard --disable-guest-agent --disable-curses \
-  --disable-curl --disable-tpm --disable-qom-cast-debug \
-  --disable-spice --disable-vhost-vsock  --disable-vhost-net \
-  --disable-vhost-crypto --disable-vhost-user
-
-?
-
-I don't use docker (yet), but I've had this in my gitlab ci patch,
-that's how I noticed this problem (see
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg559990.html)
-
- Thomas
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
 
->=20
->> ---
->>  migration/colo.c | 28 +++++++++++++++++++++++++++-
->>  1 file changed, 27 insertions(+), 1 deletion(-)
->>
->> diff --git a/migration/colo.c b/migration/colo.c
->> index 956ac236b7..fcff04c78c 100644
->> --- a/migration/colo.c
->> +++ b/migration/colo.c
->> @@ -59,6 +59,8 @@ static bool colo_runstate_is_stopped(void)
->> =20
->>  static void secondary_vm_do_failover(void)
->>  {
->> +/* COLO needs enable block-replication */
->> +#ifdef CONFIG_REPLICATION
->>      int old_state;
->>      MigrationIncomingState *mis =3D migration_incoming_get_current();
->>      Error *local_err =3D NULL;
->> @@ -121,10 +123,14 @@ static void secondary_vm_do_failover(void)
->>      if (mis->migration_incoming_co) {
->>          qemu_coroutine_enter(mis->migration_incoming_co);
->>      }
->> +#else
->> +    abort();
->> +#endif
->>  }
->> =20
->>  static void primary_vm_do_failover(void)
->>  {
->> +#ifdef CONFIG_REPLICATION
->>      MigrationState *s =3D migrate_get_current();
->>      int old_state;
->>      Error *local_err =3D NULL;
->> @@ -165,6 +171,9 @@ static void primary_vm_do_failover(void)
->> =20
->>      /* Notify COLO thread that failover work is finished */
->>      qemu_sem_post(&s->colo_exit_sem);
->> +#else
->> +    abort();
->> +#endif
->>  }
->> =20
->>  COLOMode get_colo_mode(void)
->> @@ -415,11 +424,16 @@ static int colo_do_checkpoint_transaction(Migrat=
-ionState *s,
->>      /* Disable block migration */
->>      migrate_set_block_enabled(false, &local_err);
->>      qemu_mutex_lock_iothread();
->> +
->> +#ifdef CONFIG_REPLICATION
->>      replication_do_checkpoint_all(&local_err);
->>      if (local_err) {
->>          qemu_mutex_unlock_iothread();
->>          goto out;
->>      }
->> +#else
->> +        abort();
->> +#endif
->> =20
->>      colo_send_message(s->to_dst_file, COLO_MESSAGE_VMSTATE_SEND, &loc=
-al_err);
->>      if (local_err) {
->> @@ -523,11 +537,15 @@ static void colo_process_checkpoint(MigrationSta=
-te *s)
->>      object_unref(OBJECT(bioc));
->> =20
->>      qemu_mutex_lock_iothread();
->> +#ifdef CONFIG_REPLICATION
->>      replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
->>      if (local_err) {
->>          qemu_mutex_unlock_iothread();
->>          goto out;
->>      }
->> +#else
->> +        abort();
->> +#endif
->> =20
->>      vm_start();
->>      qemu_mutex_unlock_iothread();
->> @@ -690,11 +708,15 @@ void *colo_process_incoming_thread(void *opaque)
->>      object_unref(OBJECT(bioc));
->> =20
->>      qemu_mutex_lock_iothread();
->> +#ifdef CONFIG_REPLICATION
->>      replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
->>      if (local_err) {
->>          qemu_mutex_unlock_iothread();
->>          goto out;
->>      }
->> +#else
->> +        abort();
->> +#endif
->>      vm_start();
->>      trace_colo_vm_state_change("stop", "run");
->>      qemu_mutex_unlock_iothread();
->> @@ -785,18 +807,22 @@ void *colo_process_incoming_thread(void *opaque)
->>              goto out;
->>          }
->> =20
->> +#ifdef CONFIG_REPLICATION
->>          replication_get_error_all(&local_err);
->>          if (local_err) {
->>              qemu_mutex_unlock_iothread();
->>              goto out;
->>          }
->> +
->>          /* discard colo disk buffer */
->>          replication_do_checkpoint_all(&local_err);
->>          if (local_err) {
->>              qemu_mutex_unlock_iothread();
->>              goto out;
->>          }
->> -
->> +#else
->> +        abort();
->> +#endif
->>          /* Notify all filters of all NIC to do checkpoint */
->>          colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
->> =20
->> --=20
->> 2.17.1
->>
->>
->=20
-> Regards,
->=20
+--=-IjF3I1mleClamsq28G2o
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Wow... Mmm, not sure what went wrong... Anyway, this is the cover
+letter I thought I had sent. Sorry :-/
+--
+Hello everyone,
+
+This is Dario, from SUSE, and this is the first time I touch QEMU. :-D
+
+So, basically, while playing with an AMD EPYC box, we came across a weird
+performance regression between host and guest. It was happening with the
+STREAM benchmark, and we tracked it down to non-temporal stores _not_ being
+used, inside the guest.
+
+More specifically, this was because the glibc version we were dealing with =
+had
+heuristics for deciding whether or not to use NT instructions. Basically, i=
+t
+was checking is how big the L2 and L3 caches are, as compared to how many
+threads are actually sharing such caches.
+
+Currently, as far as cache layout and size are concerned, we only have the
+following options:
+- no L3 cache,
+- emulated L3 cache, which means the default cache layout for the chosen CP=
+U
+  is used,
+- host L3 cache info, which means the cache layout of the host is used.
+
+Now, in our case, 'host-cache-info' made sense, because we were pinning vcp=
+us
+as well as doing other optimizations. However, as the VM had _less_ vcpus t=
+han
+the host had pcpus, the result of the heuristics was to avoid non-temporal
+stores, causing the unexpectedly high drop in performance. And, as you can
+imagine, we could not fix things by using 'l3-cache=3Don' either.
+
+This made us think this could be a general problem, and not only an issue f=
+or
+our benchmarks, and here it comes this series. :-)
+
+Basically, while we can, of course, control the number of vcpus a guest has
+already --as well as how they are arranged within the guest topology-- we c=
+an't
+control how big are the caches the guest sees. And this is what this series
+tries to implement: giving the user the ability to tweak the actual size of=
+ the
+L2 and L3 caches, to deal with all those cases when the guest OS or userspa=
+ce
+do check that, and behave differently depending on what they see.
+
+Yes, this is not at all that common, but happens, and hece the feature can
+be considered useful, IMO. And yes, it is definitely something meant for th=
+ose
+cases where one is carefully tuning and highly optimizing, with things like
+vcpu pinning, etc.
+
+I've tested with many CPU models, and the cahce info from inside the guest
+looks consistent. I haven't re-run the benchmarks that triggered all this w=
+ork,
+as I don't have the proper hardware handy right now, but I'm planning to
+(although, as said, this looks like a general problem to me).
+
+I've got libvirt patches for exposing these new properties in the works, bu=
+t
+of course they only make sense if/when this series is accepted.
+
+As I said, it's my first submission, and it's RFC because there are a coupl=
+e
+of things that I'm not sure I got right (details in the single patches).
+
+Any comment or advice more than welcome. :-)
+
+Thanks and Regards,
+Dario
+---
+Dario Faggioli (3):
+      i386: add properties for customizing L2 and L3 cache sizes
+      i386: custom cache size in CPUID2 and CPUID4 descriptors
+      i386: custom cache size in AMD's CPUID descriptors too
+
+ include/hw/i386/pc.h |    8 ++++++++
+ target/i386/cpu.c    |   50 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ target/i386/cpu.h    |    3 +++
+ 3 files changed, 61 insertions(+)
+
+--=20
+<<This happens because I choose it to happen!>> (Raistlin Majere)
+-----------------------------------------------------------------
+Dario Faggioli, Ph.D, http://about.me/dario.faggioli
+Software Engineer @ SUSE https://www.suse.com/
+
+--=-IjF3I1mleClamsq28G2o
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEES5ssOj3Vhr0WPnOLFkJ4iaW4c+4FAlvsAjoACgkQFkJ4iaW4
+c+4dohAAh0JWKGNW+abaM3GHFdWMiWNVMvHSM1YafbipRqg37rMIzrJ4ua7MdrFz
+7FRvXrLISs60J/ijE/eES4/uYFWku/3AgvzHsppiBnRgqPeNd7+eFcvy2RcLaBgf
+RgRPo23u/gwhx/9jGXKmfHKdMseREDyOzf5wNs+OACWOzUERFgFgr7Z2oF4h4C8c
+g7uI9xTu/q/VuGWiw31quKUbGsxFASunmXkQQmihk1WhGD4BPDxSXrxcWmEPHzIb
+TjlovcAQTFoJZKpH1Uksr/dpbfTJoZsoDdTmwOeDxpaffE/2+AjDnGPEamz4/EOB
+DfBdcyvr/9xO6mwpIpWCS06mgx01maeYZWx1IrNSZiCiEFFqIps2dliNcMse27kr
+4wLdUAhdNMDbXaihmH2wMSyegdm1CtxEFrO+PrO+qiz61Ho1EqYDwfT3fQRdLP+5
+FSsFcUgWj5stblgFe6kcv0GPZov0c0ivivB1CE45a3Tjwi/Nl7Dos2A9jNjGqs3D
+SgW1TZodRDtFOuRt6oM0/hNtaW2QLCzdnlNdyj/GYZV3ERK17VOLroqeZ2K3IEx1
+dkRS7wTuHNIcaxN4inl4OUs3frWNmMQD0dSXVspp/bOi/coVkA0E7wd7F7bBU7ry
++5LB1KzLQ4WqJr67vlV86n+pc/65VC7AGz2ersomEb82EivN29I=
+=f5xO
+-----END PGP SIGNATURE-----
+
+--=-IjF3I1mleClamsq28G2o--
