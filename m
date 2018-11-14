@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMyos-0001vo-0n
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 12:19:14 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gMyu4-0004DH-NS
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 12:24:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gMyor-00032B-3k
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 12:19:14 -0500
-References: <20180710160013.26559-1-peter.maydell@linaro.org>
-	<20180710160013.26559-6-peter.maydell@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3ac12d41-2095-f0ad-db1b-0e3ceea8f44e@redhat.com>
-Date: Wed, 14 Nov 2018 18:19:00 +0100
+	(envelope-from <mreitz@redhat.com>) id 1gMytx-0005vq-LZ
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 12:24:35 -0500
+References: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
+	<w511s7p9fkk.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <462138b3-e9e7-29e5-da55-d0ebd626aee7@redhat.com>
+Date: Wed, 14 Nov 2018 18:24:10 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180710160013.26559-6-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] accel/tcg: Return -1 for execution
- from MMIO regions in get_page_addr_code()
+In-Reply-To: <w511s7p9fkk.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2d6aeaDDfuRk3QLAWsG1ZWaES3fAjziyV"
+Subject: Re: [Qemu-devel] KVM Forum block no[td]es
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,116 +24,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, KONRAD Frederic <frederic.konrad@adacore.com>, "Emilio G . Cota" <cota@braap.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Alberto Garcia <berto@igalia.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On 2018-07-10 18:00, Peter Maydell wrote:
-> Now that all the callers can handle get_page_addr_code() returning -1,
-> remove all the code which tries to handle execution from MMIO regions
-> or small-MMU-region RAM areas. This will mean that we can correctly
-> execute from these areas, rather than ending up either aborting QEMU
-> or delivering an incorrect guest exception.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2d6aeaDDfuRk3QLAWsG1ZWaES3fAjziyV
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <462138b3-e9e7-29e5-da55-d0ebd626aee7@redhat.com>
+Subject: Re: KVM Forum block no[td]es
+References: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
+ <w511s7p9fkk.fsf@maestria.local.igalia.com>
+In-Reply-To: <w511s7p9fkk.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 13.11.18 16:12, Alberto Garcia wrote:
+> On Sun 11 Nov 2018 11:25:00 PM CET, Max Reitz wrote:
 >=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  accel/tcg/cputlb.c | 95 +++++-----------------------------------------
->  1 file changed, 10 insertions(+), 85 deletions(-)
+>> Permission system
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> GRAPH_MOD
+>> ---------
+>>
+>> We need some way for the commit job to prevent graph changes on its
+>> chain while it is running.  Our current blocker doesn=E2=80=99t do the=
+ job,
+>> however.  What to do?
+>>
+>> - We have no idea how to make a *permission* work.  Maybe the biggest
+>>   problem is that it just doesn=E2=80=99t work as a permission, becaus=
+e the
+>>   commit job doesn=E2=80=99t own the BdrvChildren that would need to b=
+e
+>>   blocked (namely the @backing BdrvChild).
 >=20
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index c491703f15f..abb0225dc79 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -741,39 +741,6 @@ void tlb_set_page(CPUState *cpu, target_ulong vadd=
-r,
->                              prot, mmu_idx, size);
->  }
-> =20
-> -static void report_bad_exec(CPUState *cpu, target_ulong addr)
-> -{
-> -    /* Accidentally executing outside RAM or ROM is quite common for
-> -     * several user-error situations, so report it in a way that
-> -     * makes it clear that this isn't a QEMU bug and provide suggestio=
-ns
-> -     * about what a user could do to fix things.
-> -     */
-> -    error_report("Trying to execute code outside RAM or ROM at 0x"
-> -                 TARGET_FMT_lx, addr);
-> -    error_printf("This usually means one of the following happened:\n\=
-n"
-> -                 "(1) You told QEMU to execute a kernel for the wrong =
-machine "
-> -                 "type, and it crashed on startup (eg trying to run a =
-"
-> -                 "raspberry pi kernel on a versatilepb QEMU machine)\n=
-"
-> -                 "(2) You didn't give QEMU a kernel or BIOS filename a=
-t all, "
-> -                 "and QEMU executed a ROM full of no-op instructions u=
-ntil "
-> -                 "it fell off the end\n"
-> -                 "(3) Your guest kernel has a bug and crashed by jumpi=
-ng "
-> -                 "off into nowhere\n\n"
-> -                 "This is almost always one of the first two, so check=
- your "
-> -                 "command line and that you are using the right type o=
-f kernel "
-> -                 "for this machine.\n"
-> -                 "If you think option (3) is likely then you can try d=
-ebugging "
-> -                 "your guest with the -d debug options; in particular =
-"
-> -                 "-d guest_errors will cause the log to include a dump=
- of the "
-> -                 "guest register state at this point.\n\n"
-> -                 "Execution cannot continue; stopping here.\n\n");
+> What I'm doing at the moment in my blockdev-reopen series is check
+> whether all parents of the node I want to change share the GRAPH_MOD
+> permission. If any of them doesn't then the operation fails.
+>=20
+> This can be checked by calling bdrv_get_cumulative_perm() or simply
+> bdrv_check_update_perm(..., BLK_PERM_GRAPH_MOD, ...).
 
- Hi Peter!
+Sure.
 
-Looks like this patch now causes QEMU to segfault instead of printing the
-above error message in certain cases, e.g.:
+> It solves the problem because e.g. the stream block job only allows
+> BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED, so no graph
+> modifications allowed.
 
-$ gdb --args aarch64-softmmu/qemu-system-aarch64 -M n800
-[...]
-(gdb) r
-Starting program: aarch64-softmmu/qemu-system-aarch64 -M n800
-[...]
-Program received signal SIGSEGV, Segmentation fault.
-[...]
-(gdb) bt
-#0  0x0000555555addc68 in onenand_read (opaque=3D0x555557600600, addr=3D9=
-8304, size=3D4) at hw/block/onenand.c:612
-#1  0x00005555558b175c in memory_region_read_accessor (mr=3D0x555557600b8=
-0, addr=3D98304, value=3D0x7fffdbffe360, size=3D4, shift=3D0, mask=3D4294=
-967295, attrs=3D...)
-    at memory.c:440
-#2  0x00005555558ae669 in access_with_adjusted_size (addr=3Daddr@entry=3D=
-98304, value=3Dvalue@entry=3D0x7fffdbffe360, size=3Dsize@entry=3D4, acces=
-s_size_min=3D<optimized out>, access_size_max=3D<optimized out>, access_f=
-n=3Daccess_fn@entry=3D0x5555558b1720 <memory_region_read_accessor>, mr=3D=
-mr@entry=3D0x555557600b80, attrs=3Dattrs@entry=3D...) at memory.c:570
-#3  0x00005555558b3016 in memory_region_dispatch_read (attrs=3D..., size=3D=
-4, pval=3D0x7fffdbffe360, addr=3D98304, mr=3D0x555557600b80) at memory.c:=
-1375
-#4  0x00005555558b3016 in memory_region_dispatch_read (mr=3D0x555557600b8=
-0, addr=3Daddr@entry=3D98304, pval=3Dpval@entry=3D0x7fffdbffe360, size=3D=
-size@entry=3D4, attrs=3D...)
-    at memory.c:1402
-#5  0x000055555583cb23 in io_readx (env=3Denv@entry=3D0x555556b58a30, iot=
-lbentry=3Diotlbentry@entry=3D0x555556b6d6b0, mmu_idx=3Dmmu_idx@entry=3D1,=
- addr=3Daddr@entry=3D98304, retaddr=3Dretaddr@entry=3D0, recheck=3D<optim=
-ized out>, access_type=3Daccess_type@entry=3DMMU_INST_FETCH, size=3Dsize@=
-entry=3D4) at accel/tcg/cputlb.c:729
-#6  0x00005555558d79cd in helper_le_ldl_cmmu (access_type=3DMMU_INST_FETC=
-H, recheck=3D<optimized out>, retaddr=3D0, addr=3D98304, index=3D96, mmu_=
-idx=3D1, env=3D0x555556b58a30)
-    at accel/tcg/softmmu_template.h:106
-#7  0x00005555558d79cd in helper_le_ldl_cmmu (env=3Denv@entry=3D0x555556b=
-58a30, addr=3Daddr@entry=3D98304, oi=3D33, retaddr=3Dretaddr@entry=3D0)
-    at accel/tcg/softmmu_template.h:144
-#8  0x00005555559d2595 in arm_tr_translate_insn (retaddr=3D0, ptr=3D98304=
-, env=3D0x555556b58a30) at include/exec/cpu_ldst_template.h:102
+But the problem is that the commit job needs to unshare the permission
+on all backing links between base and top, so none of the backing links
+can be broken.  But it cannot do that because those backing links do not
+belong to it (but to the respective overlay nodes).
 
-Any clue what's going on here?
+>>   (We never quite knew what =E2=80=9Ctaking the GRAPH_PERMISSION=E2=80=
+=9D or
+>>   =E2=80=9Cunsharing the GRPAH_MOD permission=E2=80=9D was supposed to=
+ mean.  Figuring
+>>   that out always took like half an our in any face-to-face meeting,
+>>   and then we decided it was pretty much useless for any case we had
+>>   at hand.)
+>=20
+> Yeah it's a bit unclear. It can mean "none of this node's children can
+> be replaced / removed", which is what I'm using it for at the moment.
 
- Thomas
+Yes, but that's just not useful.  I don't think we have any case where
+something would be annoyed by having its immediate child replaced (other
+than the visible data changing, potentially).  Usually when we say
+something (e.g. a block job) wants to prevent graph modification, it's
+about changing edges that exist independently of the job (such as a
+backing chain).
+
+>> Reopen
+>> ------
+>>
+>> How should permissions be handled while the reopen is under way?
+>> Maybe we should take the union of @perm before and after, and the
+>> intersection of @shared before and after?
+>=20
+> Do you have an example of a case in which you're reopening a node and
+> the change of permissions causes a problem?
+
+I do not.  So currently we switch from the permissions before to the
+ones after, right?  Which should be safe because that switch is a
+transaction that is integrated into reopen.
+
+However, I suppose it's possible the protocol layer gives us some issues
+again.  It cannot switch the locks before commit, but committing may
+fail.  What to do then?
+
+It would be safer if we took the union/intersection in
+bdrv_reopen_prepare() and then released the unnecessary flags in
+bdrv_reopen_commit().  We can still get errors (as discussed), but those
+can be safely ignored.  (They're just annoying, but not harmful.)
+
+>> - Is it possible that changing an option may require taking an
+>>   intermediate permission that is required neither before nor after
+>>   the reopen process?
+>>   Changing a child link comes to mind (like changing a child from one
+>>   BDS to another, where the visible data changes, which would mean we
+>>   may want to e.g. unshare CONSISTENT_READ during the reopen).
+>>   However:
+>>   1. It is unfeasible to unshare that for all child changes.
+>>      Effectively everything requires CONSISTENT_READ, and for good
+>>      reason.
+>>   2. Why would a user even change a BDS to something of a different
+>>      content?
+>>   3. Anything that currently allows you to change a child node assumes=
+
+>>      that the user always changes it to something of the same content
+>>      (some take extra care to verify this, like mirror, which makes
+>>      sure that @replaces and the target are connected, and there are
+>>      only filter nodes in between).
+>=20
+> I don't think the user wants to change a BDS to something of a differen=
+t
+> content, but it may happen that QEMU doesn't have a way to verify
+> whether the content is the same or not.
+>=20
+> I think we have one such case already with 'blockdev-snapshot', in whic=
+h
+> you add a BDS with blockdev-add and then add its contents on top of an
+> existing BDS.
+
+Yeah.  The new overlay is expected to be empty so when you replace the
+now-snapshot with it, the parent nodes don't see any change.  If it's
+not empty...  Well, your problem.
+
+Max
+
+
+--2d6aeaDDfuRk3QLAWsG1ZWaES3fAjziyV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvsWjsACgkQ9AfbAGHV
+z0Au8ggAu02EDTgj+5W+iV/44UnnEXdePcykMzqdm1vaQ0IE0uwPa9THln8U0ram
+QcvAYcjWCv7/mRz1FgChlJRqoNpDiErSpLLm5JbEx2ZwSt6cxHOCfxkuuslvWoEP
+5ieTlI1BaLOsDVCKahqYeUFHjhjT5S0dz+opC2ISltUL5HrIMKLbTUj4PzamhSJm
+FJNTEPgaXx5mxUWO9wbMBawFZjEWn/a8p1Yc4TlGAwd/m9yAGqiaCkfSH9uqTvM/
+YlP63MkF7Xr3linptIMprLepKvComFYnYytsvwwxQxCF9Bt5rD3qfmOgtZyV4h3e
+/6vU36XEIL9EayqcggRwBzSBY6AMVg==
+=AsO1
+-----END PGP SIGNATURE-----
+
+--2d6aeaDDfuRk3QLAWsG1ZWaES3fAjziyV--
