@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gNGdc-0002CN-Sr
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 07:20:49 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gNGmM-00046w-BK
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 07:29:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gNGdb-0006Am-BK
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 07:20:48 -0500
-Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:39222)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gNGmA-0003mQ-Af
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 07:29:50 -0500
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:34134)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gNGdb-0006Ac-63
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 07:20:47 -0500
-Received: by mail-it1-x144.google.com with SMTP id m15so28916372itl.4
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 04:20:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gNGmA-0003jF-2U
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 07:29:38 -0500
+Received: by mail-wr1-x429.google.com with SMTP id j26-v6so21030994wre.1
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 04:29:37 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 15 Nov 2018 13:29:30 +0100
+Message-Id: <20181115122930.25732-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <1541051971-28584-1-git-send-email-liq3ea@gmail.com>
-In-Reply-To: <1541051971-28584-1-git-send-email-liq3ea@gmail.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 15 Nov 2018 20:20:09 +0800
-Message-ID: <CAKXe6S+tdUiWdWLut6Wx9tGvnFVYhC0oDZjLYtcGZuBjExeOyg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vl: Improve error message when we can't
- load fw_cfg from file
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for-3.1?] qtest: log QEMU command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, philmd@redhat.com
-Cc: Qemu Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, lvivier@redhat.com
 
-Ping....
+Record the command line that was used to start QEMU.  This can be
+useful for debugging.
 
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/libqtest.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-Li Qiang <liq3ea@gmail.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=881=E6=97=A5=E5=
-=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=881:59=E5=86=99=E9=81=93=EF=BC=9A
-
-> parse_fw_cfg() reports "can't load" without further details.  Get
-> the details from g_file_get_contents(), and include them in the
-> error message.
->
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> ---
->  vl.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/vl.c b/vl.c
-> index 1fcacc5..f0bd899 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2244,8 +2244,10 @@ static int parse_fw_cfg(void *opaque, QemuOpts
-> *opts, Error **errp)
->          size =3D strlen(str); /* NUL terminator NOT included in fw_cfg b=
-lob
-> */
->          buf =3D g_memdup(str, size);
->      } else {
-> -        if (!g_file_get_contents(file, &buf, &size, NULL)) {
-> -            error_setg(errp, "can't load %s", file);
-> +        GError *err =3D NULL;
-> +        if (!g_file_get_contents(file, &buf, &size, &err)) {
-> +            error_setg(errp, "can't load %s: %s", file, err->message);
-> +            g_error_free(err);
->              return -1;
->          }
->      }
-> --
-> 1.8.3.1
->
->
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 44ce118cfc..f6e061da44 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -215,24 +215,28 @@ QTestState *qtest_init_without_qmp_handshake(bool use_oob,
+ 
+     qtest_add_abrt_handler(kill_qemu_hook_func, s);
+ 
++    command = g_strdup_printf("exec %s "
++                              "-qtest unix:%s,nowait "
++                              "-qtest-log %s "
++                              "-chardev socket,path=%s,nowait,id=char0 "
++                              "-mon chardev=char0,mode=control%s "
++                              "-machine accel=qtest "
++                              "-display none "
++                              "%s", qemu_binary, socket_path,
++                              getenv("QTEST_LOG") ? "/dev/fd/2" : "/dev/null",
++                              qmp_socket_path, use_oob ? ",x-oob=on" : "",
++                              extra_args ?: "");
++
++    g_test_message("starting QEMU: %s\n", command);
++
+     s->qemu_pid = fork();
+     if (s->qemu_pid == 0) {
+         setenv("QEMU_AUDIO_DRV", "none", true);
+-        command = g_strdup_printf("exec %s "
+-                                  "-qtest unix:%s,nowait "
+-                                  "-qtest-log %s "
+-                                  "-chardev socket,path=%s,nowait,id=char0 "
+-                                  "-mon chardev=char0,mode=control%s "
+-                                  "-machine accel=qtest "
+-                                  "-display none "
+-                                  "%s", qemu_binary, socket_path,
+-                                  getenv("QTEST_LOG") ? "/dev/fd/2" : "/dev/null",
+-                                  qmp_socket_path, use_oob ? ",x-oob=on" : "",
+-                                  extra_args ?: "");
+         execlp("/bin/sh", "sh", "-c", command, NULL);
+         exit(1);
+     }
+ 
++    g_free(command);
+     s->fd = socket_accept(sock);
+     if (s->fd >= 0) {
+         s->qmp_fd = socket_accept(qmpsock);
+-- 
+2.19.1
