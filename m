@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gN8Yk-000653-DM
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 22:43:16 -0500
+	(envelope-from <peterx@redhat.com>) id 1gN8jy-00089E-7x
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 22:54:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gN8Yh-00068l-Pt
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 22:43:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56652)
+	(envelope-from <peterx@redhat.com>) id 1gN8jv-00037G-KG
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 22:54:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40692)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gN8Yg-00067y-EW
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 22:43:11 -0500
-Date: Thu, 15 Nov 2018 11:43:02 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gN8jv-00036q-FB
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 22:54:47 -0500
+Date: Thu, 15 Nov 2018 11:54:41 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181115034302.GB27915@xz-x1>
-References: <20181101021226.6353-1-zhangckid@gmail.com>
-	<20181114104720.GB3955@xz-x1>
-	<74cca5d1-d2b4-6b44-32fe-332136b8b171@redhat.com>
-	<CAFEAcA8SeZfsihEeD0Rvoxtf-9iKjR_dtrXQLy=6MVzM0ZAD0A@mail.gmail.com>
-	<CAK3tnvK_QinKras3ojAWksVu3otwKZcwAPrhQDmxQq___A2iGA@mail.gmail.com>
+Message-ID: <20181115035441.GC27915@xz-x1>
+References: <20181114190912.7242-1-chen.zhang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAK3tnvK_QinKras3ojAWksVu3otwKZcwAPrhQDmxQq___A2iGA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH V2] migration/colo.c: Fix compilation issue
- when disable replication
+In-Reply-To: <20181114190912.7242-1-chen.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH] migration/migration.c: Add COLO dependency
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +27,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "zhang.zhanghailiang@huawei.com" <zhang.zhanghailiang@huawei.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, f4bug@amsat.org
+To: Zhang Chen <chen.zhang@intel.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
 
-On Thu, Nov 15, 2018 at 03:16:25AM +0800, Zhang Chen wrote:
-> On Wed, Nov 14, 2018 at 7:17 PM Peter Maydell <peter.maydell@linaro.org>
-> wrote:
+On Thu, Nov 15, 2018 at 03:09:12AM +0800, Zhang Chen wrote:
+> From: Zhang Chen <chen.zhang@intel.com>
 > 
-> > On 14 November 2018 at 11:06, Thomas Huth <thuth@redhat.com> wrote:
-> > > On 2018-11-14 11:47, Peter Xu wrote:
-> > >> On Thu, Nov 01, 2018 at 10:12:26AM +0800, Zhang Chen wrote:
-> > >>> This compilation issue will occur when user use --disable-replication
-> > >>> to config Qemu.
-> > >>>
-> > >>> Reported-by: Thomas Huth <thuth@redhat.com>
-> > >>> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > >>
-> > >> Hi,
-> > >>
-> > >> How's the status of this patch?  Are we gonna merge it for 3.1?
-> > >>
-> > >> I just posted a similar one without knowing this (until Dave pointed
-> > >> it out).  IMHO it can be a good candidate for 3.1.
-> > >
-> > > Maybe Peter Maydell could apply this directly to the repo as a built fix?
-> >
-> > I'd rather it just went through the migration tree, really...
-> > it isn't actually breaking any of our travis jobs or other CI.
-> >
-> >
-> Hi Dave,
+> Current COLO mode(independent disk mode) need replication module work
+> together. Suggested by Dr. David Alan Gilbert <dgilbert@redhat.com>.
 > 
-> What do you think about peter's comments?
+> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 
-AFAIK Juan has queued the v2 of the patch into the next migration
-pull, so it'll reach 3.1 soon if nothing goes wrong.  Thanks,
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+Regards,
 
 -- 
 Peter Xu
