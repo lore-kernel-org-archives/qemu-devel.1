@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gNFBu-00021F-T3
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:48:10 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gNFFC-0003Dq-8u
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:51:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gNFBn-0004df-47
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:48:02 -0500
-Date: Thu, 15 Nov 2018 10:47:02 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181115104702.GL10900@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181009132330.7549-1-berrange@redhat.com>
-	<20181009132330.7549-2-berrange@redhat.com>
-	<1baede2d-7113-be2c-62dd-9f5ce6425bb1@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gNFF8-0006X6-Ts
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:51:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59858)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gNFF8-0006W9-H9
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:51:26 -0500
+Date: Thu, 15 Nov 2018 11:50:56 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181115115056.65cf3659.cohuck@redhat.com>
+In-Reply-To: <20181115100559.GE10900@redhat.com>
+References: <20181114233831.10374-1-ehabkost@redhat.com>
+	<20181115100559.GE10900@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1baede2d-7113-be2c-62dd-9f5ce6425bb1@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] qemu-nbd: add support for
- authorization of TLS clients
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] virtio: Provide
+ version-specific variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,93 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Andrea Bolognani <abologna@redhat.com>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-On Mon, Nov 05, 2018 at 04:41:09PM -0600, Eric Blake wrote:
-> On 10/9/18 8:23 AM, Daniel P. Berrang=C3=A9 wrote:
-> > From: "Daniel P. Berrange" <berrange@redhat.com>
-> >=20
-> > Currently any client which can complete the TLS handshake is able to =
-use
-> > the NBD server. The server admin can turn on the 'verify-peer' option
-> > for the x509 creds to require the client to provide a x509 certificat=
-e.
-> > This means the client will have to acquire a certificate from the CA
-> > before they are permitted to use the NBD server. This is still a fair=
-ly
-> > low bar to cross.
-> >=20
-> > This adds a '--tls-authz OBJECT-ID' option to the qemu-nbd command wh=
-ich
-> > takes the ID of a previously added 'QAuthZ' object instance. This wil=
-l
-> > be used to validate the client's x509 distinguished name. Clients
-> > failing the authorization check will not be permitted to use the NBD
-> > server.
-> >=20
-> > For example to setup authorization that only allows connection from a=
- client
-> > whose x509 certificate distinguished name is
-> >=20
-> >     CN=3Dlaptop.example.com,O=3DExample Org,L=3DLondon,ST=3DLondon,C=3D=
-GB
-> >=20
-> > use:
-> >=20
-> >    qemu-nbd --object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/qe=
-mutls,\
-> >                      endpoint=3Dserver,verify-peer=3Dyes \
-> >             --object authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.e=
-xample.com,,\
-> >                      O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB=
- \
->=20
-> Missing shell quoting around the space in 'Example Org'. It's also fair=
-ly
-> obvious that actual shell commands can't have leading space between
-> \-newline line continuations.
->=20
-> >             --tls-creds tls0 \
-> >             --tls-authz authz0
-> > 	   ....other qemu-nbd args...
-> >=20
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >   include/block/nbd.h |  2 +-
-> >   nbd/server.c        | 10 +++++-----
-> >   qemu-nbd.c          | 13 ++++++++++++-
-> >   qemu-nbd.texi       |  4 ++++
-> >   4 files changed, 22 insertions(+), 7 deletions(-)
-> >=20
->=20
-> > +++ b/qemu-nbd.c
-> > @@ -52,6 +52,7 @@
-> >   #define QEMU_NBD_OPT_TLSCREDS      261
-> >   #define QEMU_NBD_OPT_IMAGE_OPTS    262
-> >   #define QEMU_NBD_OPT_FORK          263
-> > +#define QEMU_NBD_OPT_TLSAUTHZ      264
->=20
-> > @@ -532,6 +534,7 @@ int main(int argc, char **argv)
-> >           { "image-opts", no_argument, NULL, QEMU_NBD_OPT_IMAGE_OPTS =
-},
-> >           { "trace", required_argument, NULL, 'T' },
-> >           { "fork", no_argument, NULL, QEMU_NBD_OPT_FORK },
-> > +        { "tls-authz", no_argument, NULL, QEMU_NBD_OPT_TLSAUTHZ },
-> >           { NULL, 0, NULL, 0 }
-> >       };
->=20
-> Missing a change to qemu-nbd --help to describe the new option.
+On Thu, 15 Nov 2018 10:05:59 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-Yes, and it should be 'required_argument' too, not 'no_argument'.
+> On Wed, Nov 14, 2018 at 09:38:31PM -0200, Eduardo Habkost wrote:
+> > Many of the current virtio-*-pci device types actually represent
+> > 3 different types of devices:
+> > * virtio 1.0 non-transitional devices
+> > * virtio 1.0 transitional devices
+> > * virtio 0.9 ("legacy device" in virtio 1.0 terminology)
+> >=20
+> > That would be just an annoyance if it didn't break our device/bus
+> > compatibility QMP interfaces.  With this multi-purpose device
+> > type, there's no way to tell management software that
+> > transitional devices and legacy devices require a Conventional
+> > PCI bus.
+> >=20
+> > The multi-purpose device types would also prevent us from telling
+> > management software what's the PCI vendor/device ID for them,
+> > because their PCI IDs change at runtime depending on the bus
+> > where they were plugged.
+> >=20
+> > This patch adds separate device types for each of those virtio
+> > device flavors:
+> >=20
+> > - virtio-*-pci: the existing multi-purpose device types
+> >   - Configurable using `disable-legacy` and `disable-modern`
+> >     properties
+> >   - Legacy driver support is automatically enabled/disabled
+> >     depending on the bus where it is plugged
+> >   - Supports Conventional PCI and PCI Express buses
+> >     (but Conventional PCI is incompatible with
+> >     disable-legacy=3Doff)
+> >   - Changes PCI vendor/device IDs at runtime
+> > - virtio-*-pci-transitional: virtio-1.0 device supporting legacy drivers
 
+It's a virtio-1 (not 1.0) device. Otherwise, I like this terminology
+better.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> >   - Supports Conventional PCI buses only, because
+> >     it has a PIO BAR =20
+>=20
+> Am I right in thinking that this is basically identical
+> to virtio-*-pci, aside from only being valid for PCI
+> buses ?
+>=20
+> IOW, libvirt can expose this device even if QEMU does
+> not support it, by simply using the existing device
+> type and only ever placing it in a PCI bus ?
+>=20
+> If libvirt did this compatibility approach, can you
+> confirm this would be live migration state compatible.
+>=20
+> ie can live migrate virtio-*-pci -> virtio-*-pci-transitional,
+> provided only PCI bus was used.
+
+It also needs to make sure that neither disable-legacy nor
+disable-modern is set. Then this would have a compatible state AFAICS.
+
+>=20
+> > - virtio-*-pci-non-transitional: modern-only
+> >   - Supports both Conventional PCI and PCI Express buses =20
+>=20
+> IIUC, libvirt can again provide compatibility with old
+> QEMU by simply using the existing device type and setting
+> disable-legacy ?  Can you confirm this would be live
+> migration compatible
+>=20
+>   virtio-*-pci + disable-legacy -> virtio-*pci-non-transitional
+
+I think yes.
+
+[Out of curiosity, libvirt does not do anything with virtio-ccw's max
+revision attribute, does it? QEMU uses this on a machine-type level for
+compat handling, but I don't think it is useful beyond that.
+Fortunately, virtio-ccw does not have complications like the
+PCI/PCI-Express bus dependency.]
