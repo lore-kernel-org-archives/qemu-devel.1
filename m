@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gNEAn-0007Qy-S3
+	(envelope-from <luc.michel@greensocs.com>) id 1gNEAo-0007Re-GD
 	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:42:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gNEAm-0004nm-W3
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:42:53 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gNEAn-0004oT-NF
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:42:54 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Thu, 15 Nov 2018 10:42:00 +0100
-Message-Id: <20181115094207.22846-10-luc.michel@greensocs.com>
+Date: Thu, 15 Nov 2018 10:42:05 +0100
+Message-Id: <20181115094207.22846-15-luc.michel@greensocs.com>
 In-Reply-To: <20181115094207.22846-1-luc.michel@greensocs.com>
 References: <20181115094207.22846-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 09/16] gdbstub: add multiprocess support to
- gdb_vm_state_change()
+Subject: [Qemu-devel] [PATCH v6 14/16] gdbstub: gdb_set_stop_cpu: ignore
+ request when process is not attached
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,82 +25,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Add support for multiprocess extension in gdb_vm_state_change()
-function.
+When gdb_set_stop_cpu() is called with a CPU associated to a process
+currently not attached by the GDB client, return without modifying the
+stop CPU. Otherwise, GDB gets confused if it receives packets with a
+thread-id it does not know about.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- gdbstub.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ gdbstub.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 4cbc81ae5b..5df9929f92 100644
+index 59eed3b878..89819a6a72 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1713,10 +1713,11 @@ void gdb_set_stop_cpu(CPUState *cpu)
- static void gdb_vm_state_change(void *opaque, int running, RunState stat=
-e)
- {
-     GDBState *s =3D gdbserver_state;
-     CPUState *cpu =3D s->c_cpu;
-     char buf[256];
-+    char thread_id[16];
-     const char *type;
-     int ret;
+@@ -1787,10 +1787,19 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+     return RS_IDLE;
+ }
 =20
-     if (running || s->state =3D=3D RS_INACTIVE) {
-         return;
-@@ -1724,10 +1725,18 @@ static void gdb_vm_state_change(void *opaque, int=
- running, RunState state)
-     /* Is there a GDB syscall waiting to be sent?  */
-     if (s->current_syscall_cb) {
-         put_packet(s, s->syscall_buf);
-         return;
-     }
+ void gdb_set_stop_cpu(CPUState *cpu)
+ {
++    GDBProcess *p =3D gdb_get_cpu_process(gdbserver_state, cpu);
 +
-+    if (cpu =3D=3D NULL) {
-+        /* No process attached */
++    if (!p->attached) {
++        /* Having a stop CPU corresponding to a process that is not atta=
+ched
++         * confuses GDB. So we ignore the request.
++         */
 +        return;
 +    }
 +
-+    gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_id));
-+
-     switch (state) {
-     case RUN_STATE_DEBUG:
-         if (cpu->watchpoint_hit) {
-             switch (cpu->watchpoint_hit->flags & BP_MEM_ACCESS) {
-             case BP_MEM_READ:
-@@ -1741,12 +1750,12 @@ static void gdb_vm_state_change(void *opaque, int=
- running, RunState state)
-                 break;
-             }
-             trace_gdbstub_hit_watchpoint(type, cpu_gdb_index(cpu),
-                     (target_ulong)cpu->watchpoint_hit->vaddr);
-             snprintf(buf, sizeof(buf),
--                     "T%02xthread:%02x;%swatch:" TARGET_FMT_lx ";",
--                     GDB_SIGNAL_TRAP, cpu_gdb_index(cpu), type,
-+                     "T%02xthread:%s;%swatch:" TARGET_FMT_lx ";",
-+                     GDB_SIGNAL_TRAP, thread_id, type,
-                      (target_ulong)cpu->watchpoint_hit->vaddr);
-             cpu->watchpoint_hit =3D NULL;
-             goto send_packet;
-         } else {
-             trace_gdbstub_hit_break();
-@@ -1784,11 +1793,11 @@ static void gdb_vm_state_change(void *opaque, int=
- running, RunState state)
-         trace_gdbstub_hit_unknown(state);
-         ret =3D GDB_SIGNAL_UNKNOWN;
-         break;
-     }
-     gdb_set_stop_cpu(cpu);
--    snprintf(buf, sizeof(buf), "T%02xthread:%02x;", ret, cpu_gdb_index(c=
-pu));
-+    snprintf(buf, sizeof(buf), "T%02xthread:%s;", ret, thread_id);
+     gdbserver_state->c_cpu =3D cpu;
+     gdbserver_state->g_cpu =3D cpu;
+ }
 =20
- send_packet:
-     put_packet(s, buf);
-=20
-     /* disable single step if it was enabled */
+ #ifndef CONFIG_USER_ONLY
 --=20
 2.19.1
