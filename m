@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gNIHS-0005zU-EJ
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:06:06 -0500
+	(envelope-from <simon@ruderich.org>) id 1gNIIu-00070Z-HB
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:07:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gNIHM-0004fj-ME
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:06:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37106)
+	(envelope-from <simon@ruderich.org>) id 1gNIIq-0005Kl-Mb
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:07:32 -0500
+Received: from zucker2.schokokeks.org ([178.63.68.90]:51259)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gNIHM-0004SJ-F4
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:05:56 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Thu, 15 Nov 2018 15:05:01 +0100
-Message-Id: <20181115140501.7872-10-david@redhat.com>
-In-Reply-To: <20181115140501.7872-1-david@redhat.com>
-References: <20181115140501.7872-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 9/9] test-string-input-visitor: add range
- overflow tests
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1gNIIp-0005HN-VL
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:07:28 -0500
+From: Simon Ruderich <simon@ruderich.org>
+Date: Thu, 15 Nov 2018 15:07:15 +0100
+Message-Id: <97aeb6f8fac7324729c574bc7cc984184f7d2af6.1542290622.git.simon@ruderich.org>
+In-Reply-To: <cover.1542290622.git.simon@ruderich.org>
+References: <cover.1542290622.git.simon@ruderich.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v8 4/7] hmp: use l for size argument in
+ memsave/pmemsave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +28,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: David Alan Gilbert <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Simon Ruderich <simon@ruderich.org>
 
-Let's make sure that the range handling code can properly deal with
-ranges that end at the biggest possible number.
+i is only 32-bit. To prevent possible truncation when dumping large
+memory regions use l which is target long.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Simon Ruderich <simon@ruderich.org>
 ---
- tests/test-string-input-visitor.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ hmp-commands.hx | 4 ++--
+ hmp.c           | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-index d2ec453252..86b1f9d593 100644
---- a/tests/test-string-input-visitor.c
-+++ b/tests/test-string-input-visitor.c
-@@ -112,6 +112,7 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     int64_t expect2[] = { 32767, -32768, -32767 };
-     int64_t expect3[] = { INT64_MIN, INT64_MAX };
-     int64_t expect4[] = { 1 };
-+    int64_t expect5[] = { INT64_MAX - 2,  INT64_MAX - 1, INT64_MAX };
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index db0c681f74..ff96c3ad24 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -833,7 +833,7 @@ ETEXI
+ 
+     {
+         .name       = "memsave",
+-        .args_type  = "val:l,size:i,filename:s",
++        .args_type  = "val:l,size:l,filename:s",
+         .params     = "addr size file",
+         .help       = "save to disk virtual memory dump starting at 'addr' of size 'size'",
+         .cmd        = hmp_memsave,
+@@ -847,7 +847,7 @@ ETEXI
+ 
+     {
+         .name       = "pmemsave",
+-        .args_type  = "val:l,size:i,filename:s",
++        .args_type  = "val:l,size:l,filename:s",
+         .params     = "addr size file",
+         .help       = "save to disk physical memory dump starting at 'addr' of size 'size'",
+         .cmd        = hmp_pmemsave,
+diff --git a/hmp.c b/hmp.c
+index 7828f93a39..42a5d163cd 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1143,7 +1143,7 @@ void hmp_cpu(Monitor *mon, const QDict *qdict)
+ 
+ void hmp_memsave(Monitor *mon, const QDict *qdict)
+ {
+-    uint32_t size = qdict_get_int(qdict, "size");
++    uint64_t size = qdict_get_int(qdict, "size");
+     const char *filename = qdict_get_str(qdict, "filename");
+     uint64_t addr = qdict_get_int(qdict, "val");
      Error *err = NULL;
-     int64List *res = NULL;
-     Visitor *v;
-@@ -132,6 +133,10 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     v = visitor_input_test_init(data, "1-1");
-     check_ilist(v, expect4, ARRAY_SIZE(expect4));
+@@ -1160,7 +1160,7 @@ void hmp_memsave(Monitor *mon, const QDict *qdict)
  
-+    v = visitor_input_test_init(data,
-+                                "9223372036854775805-9223372036854775807");
-+    check_ilist(v, expect5, ARRAY_SIZE(expect5));
-+
-     /* Value too large */
- 
-     v = visitor_input_test_init(data, "9223372036854775808");
-@@ -197,6 +202,7 @@ static void test_visitor_in_uintList(TestInputVisitorData *data,
-     uint64_t expect3[] = { INT64_MIN, INT64_MAX };
-     uint64_t expect4[] = { 1 };
-     uint64_t expect5[] = { UINT64_MAX };
-+    uint64_t expect6[] = { UINT64_MAX - 2,  UINT64_MAX - 1, UINT64_MAX };
+ void hmp_pmemsave(Monitor *mon, const QDict *qdict)
+ {
+-    uint32_t size = qdict_get_int(qdict, "size");
++    uint64_t size = qdict_get_int(qdict, "size");
+     const char *filename = qdict_get_str(qdict, "filename");
+     uint64_t addr = qdict_get_int(qdict, "val");
      Error *err = NULL;
-     uint64List *res = NULL;
-     Visitor *v;
-@@ -220,6 +226,10 @@ static void test_visitor_in_uintList(TestInputVisitorData *data,
-     v = visitor_input_test_init(data, "18446744073709551615");
-     check_ulist(v, expect5, ARRAY_SIZE(expect5));
- 
-+    v = visitor_input_test_init(data,
-+                                "18446744073709551613-18446744073709551615");
-+    check_ulist(v, expect6, ARRAY_SIZE(expect6));
-+
-     /* Value too large */
- 
-     v = visitor_input_test_init(data, "18446744073709551616");
 -- 
-2.17.2
+2.19.1
