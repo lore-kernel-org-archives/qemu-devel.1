@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gNEYz-0001ya-CY
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:07:56 -0500
+	(envelope-from <berrange@redhat.com>) id 1gNEcL-0004O6-Qf
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:11:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gNEYv-0003GO-Nq
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:07:53 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:34255)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gNEYv-00034i-Dr
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:07:49 -0500
-Received: by mail-wm1-f68.google.com with SMTP id f1-v6so15431630wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 02:07:28 -0800 (PST)
-References: <1542261954-4060-1-git-send-email-liq3ea@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a71c8807-6a4d-2dca-6f82-c9a93721d1fb@redhat.com>
-Date: Thu, 15 Nov 2018 11:07:25 +0100
+	(envelope-from <berrange@redhat.com>) id 1gNEcK-0005ib-Vt
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:11:21 -0500
+Date: Thu, 15 Nov 2018 10:11:12 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181115101112.GF10900@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181115035659.85245-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <1542261954-4060-1-git-send-email-liq3ea@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] target: hax: replace g_malloc with
- g_malloc0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181115035659.85245-1-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu] configure/fdt: Use more strict test
+ for libfdt version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, laurent@vivier.eu
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 15/11/18 7:05, Li Qiang wrote:
-> And also the g_malloc doesn't need check return value,
-> remove it.
+On Thu, Nov 15, 2018 at 02:56:59PM +1100, Alexey Kardashevskiy wrote:
+> The libfdt installed in the system is preferred to the dtc submodule by
+> default. The recent libfdt update added a new symbol - fdt_check_full -
+> and this breaks compile if there is an older libfdt installed in
+> the system.
+
+Unless I'm missing something, QEMU doesn't use the fdt_check_full symbol,
+so why would the lack of this symbol cause a compile failure. 
+
+It should be fine if the dtc submodule contains a newer libfdt than the
+host system. As long as QEMU doesn't actually need any of the APIs in
+the newer libfdt we should be able to continue using the older system
+version if it is present.
+
+Could you elaborate on what build problems you are having.
+
+> This changes the test to force ./configure into using newer libfdt.
+
+I'm not convinced we want todo that.
+
 > 
-> Cc: qemu-trivial@nongnu.org
-> 
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > ---
->   target/i386/hax-all.c | 15 +++------------
->   1 file changed, 3 insertions(+), 12 deletions(-)
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-> index d2e512856b..a460c605af 100644
-> --- a/target/i386/hax-all.c
-> +++ b/target/i386/hax-all.c
-> @@ -154,13 +154,7 @@ int hax_vcpu_create(int id)
->           return 0;
->       }
->   
-> -    vcpu = g_malloc(sizeof(struct hax_vcpu_state));
-> -    if (!vcpu) {
-> -        fprintf(stderr, "Failed to alloc vcpu state\n");
-> -        return -ENOMEM;
-> -    }
-> -
-> -    memset(vcpu, 0, sizeof(struct hax_vcpu_state));
-> +    vcpu = g_malloc0(sizeof(struct hax_vcpu_state));
+> diff --git a/configure b/configure
+> index 74e313a..7e16a6c 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3826,7 +3826,7 @@ if test "$fdt" != "no" ; then
+>    cat > $TMPC << EOF
+>  #include <libfdt.h>
+>  #include <libfdt_env.h>
+> -int main(void) { fdt_first_subnode(0, 0); return 0; }
+> +int main(void) { fdt_check_full(NULL, 0); return 0; }
+>  EOF
+>    if compile_prog "" "$fdt_libs" ; then
+>      # system DTC is good - use it
 
-Can you use the g_new form?
-
-        vcpu = g_new0(struct hax_vcpu_state, 1);
-
->   
->       ret = hax_host_create_vcpu(hax_global.vm->fd, id);
->       if (ret) {
-> @@ -250,11 +244,8 @@ struct hax_vm *hax_vm_create(struct hax_state *hax)
->           return hax->vm;
->       }
->   
-> -    vm = g_malloc(sizeof(struct hax_vm));
-> -    if (!vm) {
-> -        return NULL;
-> -    }
-> -    memset(vm, 0, sizeof(struct hax_vm));
-> +    vm = g_malloc0(sizeof(struct hax_vm));
-
-Ditto.
-
-> +
->       ret = hax_host_create_vm(hax, &vm_id);
->       if (ret) {
->           fprintf(stderr, "Failed to create vm %x\n", ret);
-> 
-
-This patch as it or using g_new0:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
