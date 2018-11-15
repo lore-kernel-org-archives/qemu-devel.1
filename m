@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gN7tj-0004LX-SM
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 22:00:52 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1gN87t-0008ID-2r
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 22:15:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gN7tb-00077W-6x
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 22:00:49 -0500
-References: <20181005234023.8104-1-mreitz@redhat.com>
-	<20181005234023.8104-2-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <03a28fa3-8509-9d91-f852-baabd526bc30@redhat.com>
-Date: Wed, 14 Nov 2018 21:00:21 -0600
+	(envelope-from <liq3ea@gmail.com>) id 1gN87s-0006iO-7u
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 22:15:29 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181005234023.8104-2-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 01/31] block: Use
- bdrv_refresh_filename() to pull
+References: <1541121763-3277-1-git-send-email-liq3ea@gmail.com>
+	<CAKXe6SL=6m5u1utFoJCG65ucuBeGTiuu8rA9wEj_X-tO1jHzEA@mail.gmail.com>
+	<20181113101704.GB4830@localhost.localdomain>
+	<2db2eb88-bc7c-d3c0-93ca-43d6a2f79b0a@redhat.com>
+	<CAKXe6S+e8zBgYU8DnU2tUqQm2C1w14pgqg55YmxwPn1UUW3E7g@mail.gmail.com>
+	<9e733597-36bf-0b64-892f-1b35e67a632c@redhat.com>
+In-Reply-To: <9e733597-36bf-0b64-892f-1b35e67a632c@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 15 Nov 2018 11:14:49 +0800
+Message-ID: <CAKXe6S+Atz0M9NgUEuuN-2e5XDUyGMA0Ser7kipy1yfvuLguSA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] nvme: fix oob access issue(CVE-2018-16847)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, keith.busch@intel.com, mreitz@redhat.com, P J P <ppandit@redhat.com>, qemu-block@nongnu.org, Qemu Developers <qemu-devel@nongnu.org>
 
-On 10/5/18 6:39 PM, Max Reitz wrote:
-> Before this patch, bdrv_refresh_filename() is used in a pushing manner:
-> Whenever the BDS graph is modified, the parents of the modified edges
-> are supposed to be updated (recursively upwards).  However, that is
-> nonviable, considering that we want child changes not to concern
-> parents.
-> 
+Paolo Bonzini <pbonzini@redhat.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=8814=E6=
+=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8811:44=E5=86=99=E9=81=93=EF=BC=9A
 
->   include/block/block.h |  1 -
->   block.c               | 31 +++++++++++++++----------------
->   block/qapi.c          |  4 ++++
->   block/raw-format.c    |  1 +
->   block/replication.c   |  2 --
->   block/vhdx-log.c      |  1 +
->   block/vmdk.c          |  6 ++++++
->   block/vpc.c           |  4 +++-
->   blockdev.c            |  8 ++++++++
->   9 files changed, 38 insertions(+), 20 deletions(-)
-> 
+> On 14/11/2018 02:38, Li Qiang wrote:
+> >
+> >
+> > Paolo Bonzini <pbonzini@redhat.com <mailto:pbonzini@redhat.com>> =E4=BA=
+=8E2018
+> > =E5=B9=B411=E6=9C=8814=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=882:2=
+7=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> >     On 13/11/2018 11:17, Kevin Wolf wrote:
+> >     > Am 13.11.2018 um 02:45 hat Li Qiang geschrieben:
+> >     >> Ping.... what't the status of this patch.
+> >     >>
+> >     >> I see Kevin's new pr doesn't contain this patch.
+> >     >
+> >     > Oh, I thought you said that you wanted to fix this at a higher
+> >     level so
+> >     > that the problem is caught before even getting into nvme code? If
+> you
+> >     > don't, I can apply the patch for my next pull request.
+> >
+> >     As far as I know the bug doesn't exist.  Li Qiang, if you have a
+> >     reproducer please send it.
+> >
+> >
+> > Hello Paolo,
+> > Though I've send the debug information and ASAN output in the mail to
+> > secalert@redhat.com <mailto:secalert@redhat.com>, I'm glad provide here=
+.
+> > This is for read, I think the write the same but as the PoC is in
+> > userspace, the mmap can only map the exact size of the MMIO,
+> > So we can only write within the area. But if we using a module we can
+> > write the out of MMIO I think
+> > The nvme device's parameter should set as 'cmb_size_mb=3D2' and the PCI
+> > address may differ in your system.
+>
+> Ok, thanks.  I've created a reproducer using qtest (though I have to run
+> now and cannot post it properly).
+>
+> The patch for the fix is simply:
+>
+>
+So do you send this or me?
 
-> +++ b/block/vpc.c
-> @@ -284,9 +284,11 @@ static int vpc_open(BlockDriverState *bs, QDict *options, int flags,
->   
->       checksum = be32_to_cpu(footer->checksum);
->       footer->checksum = 0;
-> -    if (vpc_checksum(s->footer_buf, HEADER_SIZE) != checksum)
-> +    if (vpc_checksum(s->footer_buf, HEADER_SIZE) != checksum) {
-> +        bdrv_refresh_filename(bs);
->           fprintf(stderr, "block-vpc: The header checksum of '%s' is "
->               "incorrect.\n", bs->filename);
-> +    }
 
-In the intervening month, this now conflicts. I'm guessing we'll see a 
-v12 targeted for 4.0, since your other series on "block: Deal with 
-filters" depends on this one?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index fc7dacb816..6385033af3 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -1192,7 +1192,7 @@ static const MemoryRegionOps nvme_cmb_ops =3D {
+>      .write =3D nvme_cmb_write,
+>      .endianness =3D DEVICE_LITTLE_ENDIAN,
+>      .impl =3D {
+> -        .min_access_size =3D 2,
+> +        .min_access_size =3D 1,
+>          .max_access_size =3D 8,
+>      },
+>  };
+>
+>
+
+> The memory subsystem _is_ recognizing the out-of-bounds 32-bit access,
+>
+
+Thanks, this strengthen my understanding of memory subsystem.
+
+Thanks,
+Li Qiang
+
+
+> but because min_access_size=3D2 it sends down a write at offset 2097151
+> and size 2.
+
+
+> Paolo
+>
