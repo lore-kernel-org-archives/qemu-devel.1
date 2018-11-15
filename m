@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47767)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQEj-0006Sk-3Z
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:35:45 -0500
+	id 1gNQEl-0006Uc-4g
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:35:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQEf-0004JF-Qj
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:35:44 -0500
+	id 1gNQEh-0004KI-QO
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:35:47 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 15 Nov 2018 22:35:33 +0000
-Message-ID: <1fe9630dd4ad73b8581684cd0ed6d5fa2918390f.1542321076.git.alistair.francis@wdc.com>
+Date: Thu, 15 Nov 2018 22:35:23 +0000
+Message-ID: <94fae434261439eed18b5ecffd2e8c959f80cdc0.1542321076.git.alistair.francis@wdc.com>
 References: <cover.1542321076.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1542321076.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [RFC v1 11/23] riscv: tcg-target: Add the relocation
- functions
+Subject: [Qemu-devel] [RFC v1 10/23] riscv: tcg-target: Add the instruction
+ emitters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +32,56 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- tcg/riscv/tcg-target.inc.c | 51 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ tcg/riscv/tcg-target.inc.c | 40 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-index d402e48cbf..475feca906 100644
+index 5319f7ade5..d402e48cbf 100644
 --- a/tcg/riscv/tcg-target.inc.c
 +++ b/tcg/riscv/tcg-target.inc.c
-@@ -371,6 +371,57 @@ static void tcg_out_opc_jump(TCGContext *s, RISCVInsn =
-opc,
-     tcg_out32(s, encode_uj(opc, rd, imm));
+@@ -331,6 +331,46 @@ static int32_t encode_uj(RISCVInsn opc, TCGReg rd, uin=
+t32_t imm)
+     return opc | (rd & 0x1f) << 7 | encode_ujimm12(imm);
  }
 =20
 +/*
-+ * Relocations
++ * RISC-V instruction emitters
 + */
 +
-+static void reloc_sbimm12(tcg_insn_unit *code_ptr, tcg_insn_unit *target)
++static void tcg_out_opc_reg(TCGContext *s, RISCVInsn opc,
++                            TCGReg rd, TCGReg rs1, TCGReg rs2)
 +{
-+    intptr_t offset =3D (intptr_t)target - (intptr_t)code_ptr;
-+    tcg_debug_assert(offset =3D=3D sextract32(offset, 1, 12) << 1);
-+
-+    code_ptr[0] |=3D encode_sbimm12(offset);
++    tcg_out32(s, encode_r(opc, rd, rs1, rs2));
 +}
 +
-+static void reloc_jimm20(tcg_insn_unit *code_ptr, tcg_insn_unit *target)
++static void tcg_out_opc_imm(TCGContext *s, RISCVInsn opc,
++                            TCGReg rd, TCGReg rs1, TCGArg imm)
 +{
-+    intptr_t offset =3D (intptr_t)target - (intptr_t)code_ptr;
-+    tcg_debug_assert(offset =3D=3D sextract32(offset, 1, 20) << 1);
-+
-+    code_ptr[0] |=3D encode_ujimm12(offset);
++    tcg_out32(s, encode_i(opc, rd, rs1, imm));
 +}
 +
-+static void reloc_call(tcg_insn_unit *code_ptr, tcg_insn_unit *target)
++static void tcg_out_opc_store(TCGContext *s, RISCVInsn opc,
++                              TCGReg rs1, TCGReg rs2, uint32_t imm)
 +{
-+    intptr_t offset =3D (intptr_t)target - (intptr_t)code_ptr;
-+    tcg_debug_assert(offset =3D=3D (int32_t)offset);
-+
-+    int32_t hi20 =3D ((offset + 0x800) >> 12) << 12;
-+    int32_t lo12 =3D offset - hi20;
-+
-+    code_ptr[0] |=3D encode_uimm20(hi20);
-+    code_ptr[1] |=3D encode_imm12(lo12);
++    tcg_out32(s, encode_s(opc, rs1, rs2, imm));
 +}
 +
-+static void patch_reloc(tcg_insn_unit *code_ptr, int type,
-+                        intptr_t value, intptr_t addend)
++static void tcg_out_opc_branch(TCGContext *s, RISCVInsn opc,
++                               TCGReg rs1, TCGReg rs2, uint32_t imm)
 +{
-+    tcg_debug_assert(addend =3D=3D 0);
-+    switch (type) {
-+    case R_RISCV_BRANCH:
-+        reloc_sbimm12(code_ptr, (tcg_insn_unit *)value);
-+        break;
-+    case R_RISCV_JAL:
-+        reloc_jimm20(code_ptr, (tcg_insn_unit *)value);
-+        break;
-+    case R_RISCV_CALL:
-+        reloc_call(code_ptr, (tcg_insn_unit *)value);
-+        break;
-+    default:
-+        tcg_abort();
-+    }
++    tcg_out32(s, encode_sb(opc, rs1, rs2, imm));
++}
++
++static void tcg_out_opc_upper(TCGContext *s, RISCVInsn opc,
++                              TCGReg rd, uint32_t imm)
++{
++    tcg_out32(s, encode_u(opc, rd, imm));
++}
++
++static void tcg_out_opc_jump(TCGContext *s, RISCVInsn opc,
++                             TCGReg rd, uint32_t imm)
++{
++    tcg_out32(s, encode_uj(opc, rd, imm));
 +}
 +
  void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
