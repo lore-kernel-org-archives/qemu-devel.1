@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <simon@ruderich.org>) id 1gNHbe-00038R-KE
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:22:51 -0500
+	(envelope-from <simon@ruderich.org>) id 1gNHbi-0003Ca-Ej
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:22:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <simon@ruderich.org>) id 1gNHbd-0006yG-NH
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:22:50 -0500
-Received: from zucker2.schokokeks.org ([178.63.68.90]:34357)
+	(envelope-from <simon@ruderich.org>) id 1gNHbd-0006y9-Md
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:22:54 -0500
+Received: from zucker2.schokokeks.org ([178.63.68.90]:51727)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1gNHbb-0006tx-Qn
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1gNHbb-0006tV-QA
 	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:22:49 -0500
 From: Simon Ruderich <simon@ruderich.org>
-Date: Thu, 15 Nov 2018 14:22:40 +0100
-Message-Id: <67e889e814ebdff93fb6648fdf1f873641f8f676.1542287931.git.simon@ruderich.org>
+Date: Thu, 15 Nov 2018 14:22:39 +0100
+Message-Id: <4e25c4e14e76cee9a1b0d062f2623426e2a0e0bb.1542287931.git.simon@ruderich.org>
 In-Reply-To: <cover.1542287931.git.simon@ruderich.org>
 References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
 	<cover.1542287931.git.simon@ruderich.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v7 7/7] hmp: add pmemload command
+Subject: [Qemu-devel] [PATCH v7 6/7] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,77 +37,117 @@ Adapted patch from Baojun Wang [1] with the following commit message:
     have a command to load guest physical memory, we can use cross gdb
     to do some target debug which gdb cannot do directly.
 
-This patch contains only the hmp changes of the original patch.
+This patch contains only the qmp changes of the original patch.
+
+pmemload is necessary to directly write physical memory which is not
+possible with gdb alone as it uses only logical addresses.
+
+The QAPI for pmemload uses "val" as parameter name for the physical
+address. This name is not very descriptive but is consistent with the
+existing pmemsave. Changing the parameter name of pmemsave is not
+possible without breaking the existing API.
 
 [1]: https://lists.gnu.org/archive/html/qemu-trivial/2014-04/msg00074.html
 
 Based-on-patch-by: Baojun Wang <wangbj@gmail.com>
 Signed-off-by: Simon Ruderich <simon@ruderich.org>
 ---
- hmp-commands.hx | 14 ++++++++++++++
- hmp.c           | 12 ++++++++++++
- hmp.h           |  1 +
- 3 files changed, 27 insertions(+)
+ cpus.c         | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/misc.json | 20 ++++++++++++++++++++
+ 2 files changed, 71 insertions(+)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 2404a5210d..baadbb3a69 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -857,6 +857,20 @@ STEXI
- @item pmemsave @var{addr} @var{size} @var{file}
- @findex pmemsave
- save to disk physical memory dump starting at @var{addr} of size @var{size}.
-+ETEXI
-+
-+    {
-+        .name       = "pmemload",
-+        .args_type  = "val:l,size:l,offset:l,filename:F",
-+        .params     = "addr size offset file",
-+        .help       = "load from disk physical memory dump starting at 'addr' of size 'size' at file offset 'offset'",
-+        .cmd        = hmp_pmemload,
-+    },
-+
-+STEXI
-+@item pmemload @var{addr} @var{size} @var{offset} @var{file}
-+@findex pmemload
-+load from disk physical memory dump starting at @var{addr} of size @var{size} at file offset @var{offset}.
- ETEXI
- 
-     {
-diff --git a/hmp.c b/hmp.c
-index 42a5d163cd..c2a77fc390 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1169,6 +1169,18 @@ void hmp_pmemsave(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
+diff --git a/cpus.c b/cpus.c
+index ee54595733..a12076dc68 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -2445,6 +2445,57 @@ exit:
+     qemu_close(fd);
  }
  
-+void hmp_pmemload(Monitor *mon, const QDict *qdict)
++void qmp_pmemload(int64_t addr, const char *filename,
++                  bool has_size, int64_t size,
++                  bool has_offset, int64_t offset,
++                  Error **errp)
 +{
-+    uint64_t size = qdict_get_int(qdict, "size");
-+    uint64_t offset = qdict_get_int(qdict, "offset");
-+    const char *filename = qdict_get_str(qdict, "filename");
-+    uint64_t addr = qdict_get_int(qdict, "val");
-+    Error *err = NULL;
++    int fd;
++    size_t l;
++    ssize_t r;
++    uint8_t buf[1024];
 +
-+    qmp_pmemload(addr, filename, true, size, true, offset, &err);
-+    hmp_handle_error(mon, &err);
++    fd = qemu_open(filename, O_RDONLY | O_BINARY);
++    if (fd < 0) {
++        error_setg_file_open(errp, errno, filename);
++        return;
++    }
++    if (has_offset && offset > 0) {
++        if (lseek(fd, offset, SEEK_SET) != offset) {
++            error_setg_errno(errp, errno,
++                             "could not seek to offset %" PRIx64, offset);
++            goto exit;
++        }
++    }
++    if (!has_size) {
++        struct stat s;
++        if (fstat(fd, &s)) {
++            error_setg_errno(errp, errno, "could not fstat fd to get size");
++            goto exit;
++        }
++        size = s.st_size;
++    }
++
++    while (size != 0) {
++        l = sizeof(buf);
++        if (l > size) {
++            l = size;
++        }
++        r = read(fd, buf, l);
++        if (r <= 0) {
++            error_setg(errp, QERR_IO_ERROR);
++            goto exit;
++        }
++        l = r; /* in case of short read */
++        cpu_physical_memory_write(addr, buf, l);
++        addr += l;
++        size -= l;
++    }
++
++exit:
++    qemu_close(fd);
 +}
 +
- void hmp_ringbuf_write(Monitor *mon, const QDict *qdict)
+ void qmp_inject_nmi(Error **errp)
  {
-     const char *chardev = qdict_get_str(qdict, "device");
-diff --git a/hmp.h b/hmp.h
-index 5f1addcca2..6503146a8c 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -49,6 +49,7 @@ void hmp_exit_preconfig(Monitor *mon, const QDict *qdict);
- void hmp_cpu(Monitor *mon, const QDict *qdict);
- void hmp_memsave(Monitor *mon, const QDict *qdict);
- void hmp_pmemsave(Monitor *mon, const QDict *qdict);
-+void hmp_pmemload(Monitor *mon, const QDict *qdict);
- void hmp_ringbuf_write(Monitor *mon, const QDict *qdict);
- void hmp_ringbuf_read(Monitor *mon, const QDict *qdict);
- void hmp_cont(Monitor *mon, const QDict *qdict);
+     nmi_monitor_handle(monitor_get_cpu_index(), errp);
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 6c1c5c0a37..6eb9d29339 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -1186,6 +1186,26 @@
+ { 'command': 'pmemsave',
+   'data': {'val': 'int', 'size': 'int', 'filename': 'str'} }
+ 
++##
++# @pmemload:
++#
++# Load a portion of guest physical memory from a file.
++#
++# @val: the physical address of the guest to start from
++#
++# @filename: the file to load the memory from as binary data
++#
++# @size: the size of memory region to load (defaults to whole file)
++#
++# @offset: the offset in the file to start from (defaults to 0)
++#
++# Returns: Nothing on success
++#
++# Since: 3.1
++##
++{ 'command': 'pmemload',
++  'data': {'val': 'int', 'filename': 'str', '*size': 'int', '*offset': 'int'} }
++
+ ##
+ # @cont:
+ #
 -- 
 2.19.1
