@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQGK-0007tB-Uq
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:37:28 -0500
+	(envelope-from <eblake@redhat.com>) id 1gNQGu-0008Rh-OV
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:38:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQGD-00051l-Mh
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:37:22 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 15 Nov 2018 22:37:13 +0000
-Message-ID: <84be65cc6caa8421b04ac381f4623e21f80ee39f.1542321076.git.alistair.francis@wdc.com>
-References: <cover.1542321076.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1542321076.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1gNQGq-00059D-RF
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:38:00 -0500
+References: <20181115215449.1300769-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b600b483-0e46-5c2e-f52b-2f330ebaa5a7@redhat.com>
+Date: Thu, 15 Nov 2018 16:37:36 -0600
 MIME-Version: 1.0
-Subject: [Qemu-devel] [RFC v1 22/23] dias: Add RISC-V support
+In-Reply-To: <20181115215449.1300769-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qapi: Reduce Makefile boilerplate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +23,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, armbru@redhat.com, xiezhide@huawei.com, Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
----
- disas.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+On 11/15/18 3:54 PM, Eric Blake wrote:
+> Adding a new qapi module had some rather tedious repetition to
+> wire it into Makefile. Add some indirection by taking advantage
+> of GNU Make string processing to expand a list of module names
+> into all the required artifacts, so that future additions of a
+> new module need only touch the list of module names.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> I finally found time to follow through with my threats to make it
+> MUCH easier to add a new qapi/FOO.json file.
+> 
+> Should be no semantic change, but as it is not fixing an actual
+> bug, I don't care if it goes in 3.1 or 4.0.
+> 
+>   Makefile | 194 +++++++------------------------------------------------
+>   1 file changed, 25 insertions(+), 169 deletions(-)
 
-diff --git a/disas.c b/disas.c
-index 5325b7e6be..82a408f272 100644
---- a/disas.c
-+++ b/disas.c
-@@ -522,8 +522,14 @@ void disas(FILE *out, void *code, unsigned long size)
- # ifdef _ARCH_PPC64
-     s.info.cap_mode =3D CS_MODE_64;
- # endif
--#elif defined(__riscv__)
--    print_insn =3D print_insn_riscv;
-+#elif defined(__riscv) && defined(CONFIG_RISCV_DIS)
-+#if defined(_ILP32)
-+    print_insn =3D print_insn_riscv32;
-+#elif defined(_LP64)
-+    print_insn =3D print_insn_riscv64;
-+#else
-+#error unsupported RISC-V ABI
-+#endif
- #elif defined(__aarch64__) && defined(CONFIG_ARM_A64_DIS)
-     print_insn =3D print_insn_arm_a64;
-     s.info.cap_arch =3D CS_ARCH_ARM64;
---=20
-2.19.1
+I'm trying to do the same thing to Makefile.objs, but when I use:
+
+common-obj-y += $(QAPI_MODULES:%=qapi/qapi-commands-%.o)
+
+or the longer $(patsubst %,qapi,qapi-commands-%.o,$(QAPI_MODULES))
+
+both before and after the change, 'make print-common-obj-y | grep qapi' 
+returns identical content, but after the change, the linker fails with:
+
+   LINK    x86_64-softmmu/qemu-system-x86_64
+monitor.o: In function `monitor_init_qmp_commands':
+/home/eblake/qemu/monitor.c:1200: undefined reference to 
+`qmp_marshal_qmp_capabilities'
+monitor.o: In function `qmp_greeting':
+/home/eblake/qemu/monitor.c:4342: undefined reference to 
+`qmp_marshal_query_version'
+../qapi/qapi-commands.o: In function `qmp_init_marshal':
+/home/eblake/qemu/qapi/qapi-commands.c:30: undefined reference to 
+`qmp_marshal_query_status'
+...
+
+So something about variable expansions is NOT playing nicely with our
+
+dummy := $(call unnest-vars,, \
+                 stub-obj-y \
+                 chardev-obj-y \
+...
+                 common-obj-y \
+
+that builds up the set of files the linker needs to see.  But I have 
+_no_ idea what is going wrong that makes unnest-vars unable to see 
+through a variable expansion of .o files.  Ideas on how to compress 
+Makefile.objs to avoid the redundancy would be appreciated.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
