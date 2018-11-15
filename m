@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gNF4C-00031J-Re
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:40:10 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gNF5B-0003hd-Qa
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:41:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gNF48-0008Up-O1
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:40:08 -0500
-Date: Thu, 15 Nov 2018 10:39:55 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181115103955.GK10900@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181115035659.85245-1-aik@ozlabs.ru>
-	<20181115101112.GF10900@redhat.com>
-	<20181115103308.GI2547@umbus.fritz.box>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181115103308.GI2547@umbus.fritz.box>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu] configure/fdt: Use more strict test
- for libfdt version
+	(envelope-from <wei.w.wang@intel.com>) id 1gNF56-0000os-Mk
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:41:09 -0500
+Received: from mga03.intel.com ([134.134.136.65]:14567)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1gNF56-0000oM-F2
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:41:04 -0500
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Thu, 15 Nov 2018 18:07:56 +0800
+Message-Id: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v9 0/8] virtio-balloon: free page hint support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +22,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com
+Cc: peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com, wei.w.wang@intel.com
 
-On Thu, Nov 15, 2018 at 09:33:08PM +1100, David Gibson wrote:
-> On Thu, Nov 15, 2018 at 10:11:12AM +0000, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Thu, Nov 15, 2018 at 02:56:59PM +1100, Alexey Kardashevskiy wrote:
-> > > The libfdt installed in the system is preferred to the dtc submodul=
-e by
-> > > default. The recent libfdt update added a new symbol - fdt_check_fu=
-ll -
-> > > and this breaks compile if there is an older libfdt installed in
-> > > the system.
-> >=20
-> > Unless I'm missing something, QEMU doesn't use the fdt_check_full sym=
-bol,
-> > so why would the lack of this symbol cause a compile failure.=20
-> >=20
-> > It should be fine if the dtc submodule contains a newer libfdt than t=
-he
-> > host system. As long as QEMU doesn't actually need any of the APIs in
-> > the newer libfdt we should be able to continue using the older system
-> > version if it is present.
-> >=20
-> > Could you elaborate on what build problems you are having.
-> >=20
-> > > This changes the test to force ./configure into using newer libfdt.
-> >=20
-> > I'm not convinced we want todo that.
->=20
-> So I think the point here is that Alexey has some other outstanding
-> patches that will use fdt_check_full().  The commit message needs to
-> make that clear though.  Or else include this patch in that series.
+This is the deivce part implementation to add a new feature,
+VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
+receives the guest free page hints from the driver and clears the
+corresponding bits in the dirty bitmap, so that those free pages are
+not sent by the migration thread to the destination.
 
-If they're not merged yet, this patch should be squashed into whichever
-of those patches first introduces the need for fdt_check_full(), so that
-series remains fully  git bisectable.
+*Tests
+1 Test Environment
+    Host: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
+    Migration setup: migrate_set_speed 100G, migrate_set_downtime 400ms
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+2 Test Results (results are averaged over several repeated runs)
+    2.1 Guest setup: 8G RAM, 4 vCPU
+        2.1.1 Idle guest live migration time
+            Optimization v.s. Legacy = 620ms vs 2970ms
+            --> ~79% reduction
+        2.1.2 Guest live migration with Linux compilation workload
+          (i.e. make bzImage -j4) running
+          1) Live Migration Time:
+             Optimization v.s. Legacy = 2273ms v.s. 4502ms
+             --> ~50% reduction
+          2) Linux Compilation Time:
+             Optimization v.s. Legacy = 8min42s v.s. 8min43s
+             --> no obvious difference
+
+    2.2 Guest setup: 128G RAM, 4 vCPU
+        2.2.1 Idle guest live migration time
+            Optimization v.s. Legacy = 5294ms vs 41651ms
+            --> ~87% reduction
+        2.2.2 Guest live migration with Linux compilation workload
+          1) Live Migration Time:
+            Optimization v.s. Legacy = 8816ms v.s. 54201ms
+            --> 84% reduction
+          2) Linux Compilation Time:
+             Optimization v.s. Legacy = 8min30s v.s. 8min36s
+             --> no obvious difference
+
+ChangeLog:
+v8->v9:
+bitmap:
+    - fix bitmap_count_one to handle the nbits=0 case
+migration:
+    - replace the ram save notifier chain with a more general precopy
+      notifier chain, which is similar to the postcopy notifier chain.
+    - Avoid exposing the RAMState struct, and add a function,
+      precopy_disable_bulk_stage, to let the virtio-balloon notifier
+      callback to disable the bulk stage flag.
+virtio-balloon:
+    - Remove VIRTIO_BALLOON_F_PAGE_POISON from this series as it is not
+      a limit to the free page optimization now. Plan to add the device
+      support for VIRTIO_BALLOON_F_PAGE_POISON in another patch later.
+
+Previous changelog:
+https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg01908.html
+
+Wei Wang (8):
+  bitmap: fix bitmap_count_one
+  bitmap: bitmap_count_one_with_offset
+  migration: use bitmap_mutex in migration_bitmap_clear_dirty
+  migration: API to clear bits of guest free pages from the dirty bitmap
+  migration/ram.c: add a notifier chain for precopy
+  migration/ram.c: add a function to disable the bulk stage
+  migration: move migrate_postcopy() to include/migration/misc.h
+  virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT
+
+ hw/virtio/virtio-balloon.c                      | 255 ++++++++++++++++++++++++
+ include/hw/virtio/virtio-balloon.h              |  28 ++-
+ include/migration/misc.h                        |  16 ++
+ include/qemu/bitmap.h                           |  17 ++
+ include/standard-headers/linux/virtio_balloon.h |   5 +
+ migration/migration.h                           |   2 -
+ migration/ram.c                                 |  91 +++++++++
+ vl.c                                            |   1 +
+ 8 files changed, 412 insertions(+), 3 deletions(-)
+
+-- 
+1.8.3.1
