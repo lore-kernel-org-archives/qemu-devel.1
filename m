@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gNEAi-0007Ic-5T
+	(envelope-from <luc.michel@greensocs.com>) id 1gNEAi-0007J7-Ll
 	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:42:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gNEAb-0004cQ-Qc
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:42:44 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gNEAc-0004cj-4v
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:42:45 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Thu, 15 Nov 2018 10:41:53 +0100
-Message-Id: <20181115094207.22846-3-luc.michel@greensocs.com>
-In-Reply-To: <20181115094207.22846-1-luc.michel@greensocs.com>
-References: <20181115094207.22846-1-luc.michel@greensocs.com>
+Date: Thu, 15 Nov 2018 10:41:51 +0100
+Message-Id: <20181115094207.22846-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 02/16] gdbstub: introduce GDB processes
+Subject: [Qemu-devel] [PATCH v6 00/16] gdbstub: support for the multiprocess
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,207 +24,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Add a structure GDBProcess that represent processes from the GDB
-semantic point of view.
+changes since v5:
+  - patch 1    Rebased on top of master
 
-CPUs can be split into different processes, by grouping them under
-different cpu-cluster objects.  Each occurrence of a cpu-cluster object
-implies the existence of the corresponding process in the GDB stub. The
-GDB process ID is derived from the corresponding cluster ID as follows:
+  - patch 2    Cluster ID handling hardening to ensure uint32_t overflow
+               won't cause PID 0 to be used [Edgar]
 
-  GDB PID =3D cluster ID + 1
+  - patch 2    Fix the GDB process ordering function to avoid uint32_t
+               overflow when comparing two cluster_ids [Edgar]
 
-This is because PIDs -1 and 0 are reserved in GDB and cannot be used by
-processes.
+changes since v4:
+  - patch 1    add cpu_cluster.[ch] files into MAINTAINERS Machine core
+               section (thanks Eduardo!) [Philippe, Eduardo]
 
-When no such container are found, all the CPUs are put in a unique GDB
-process (create_unique_process()). This is also the case when compiled
-in user mode, where multi-processes do not make much sense for now.
+  - patch 1    revert to uint32_t for cluster IDs [Philippe]
 
-Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- gdbstub.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 87 insertions(+)
+  - patch 1    fixed a coding style issue [patchew]
 
-diff --git a/gdbstub.c b/gdbstub.c
-index c4e4f9f082..26f5a7449a 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -27,10 +27,11 @@
- #include "monitor/monitor.h"
- #include "chardev/char.h"
- #include "chardev/char-fe.h"
- #include "sysemu/sysemu.h"
- #include "exec/gdbstub.h"
-+#include "hw/cpu/cluster.h"
- #endif
-=20
- #define MAX_PACKET_LENGTH 4096
-=20
- #include "qemu/sockets.h"
-@@ -294,10 +295,15 @@ typedef struct GDBRegisterState {
-     gdb_reg_cb set_reg;
-     const char *xml;
-     struct GDBRegisterState *next;
- } GDBRegisterState;
-=20
-+typedef struct GDBProcess {
-+    uint32_t pid;
-+    bool attached;
-+} GDBProcess;
-+
- enum RSState {
-     RS_INACTIVE,
-     RS_IDLE,
-     RS_GETLINE,
-     RS_GETLINE_ESC,
-@@ -322,10 +328,13 @@ typedef struct GDBState {
-     int running_state;
- #else
-     CharBackend chr;
-     Chardev *mon_chr;
- #endif
-+    bool multiprocess;
-+    GDBProcess *processes;
-+    int process_num;
-     char syscall_buf[256];
-     gdb_syscall_complete_cb current_syscall_cb;
- } GDBState;
-=20
- /* By default use no IRQs and no timers while single stepping so as to
-@@ -1749,10 +1758,24 @@ void gdb_exit(CPUArchState *env, int code)
- #ifndef CONFIG_USER_ONLY
-   qemu_chr_fe_deinit(&s->chr, true);
- #endif
- }
-=20
-+/*
-+ * Create a unique process containing all the CPUs.
-+ */
-+static void create_unique_process(GDBState *s)
-+{
-+    GDBProcess *process;
-+
-+    s->processes =3D g_malloc0(sizeof(GDBProcess));
-+    s->process_num =3D 1;
-+    process =3D &s->processes[0];
-+
-+    process->pid =3D 1;
-+}
-+
- #ifdef CONFIG_USER_ONLY
- int
- gdb_handlesig(CPUState *cpu, int sig)
- {
-     GDBState *s;
-@@ -1846,10 +1869,11 @@ static bool gdb_accept(void)
-     }
-=20
-     s =3D g_malloc0(sizeof(GDBState));
-     s->c_cpu =3D first_cpu;
-     s->g_cpu =3D first_cpu;
-+    create_unique_process(s);
-     s->fd =3D fd;
-     gdb_has_xml =3D false;
-=20
-     gdbserver_state =3D s;
-     return true;
-@@ -2002,10 +2026,69 @@ static const TypeInfo char_gdb_type_info =3D {
-     .name =3D TYPE_CHARDEV_GDB,
-     .parent =3D TYPE_CHARDEV,
-     .class_init =3D char_gdb_class_init,
- };
-=20
-+static int find_cpu_clusters(Object *child, void *opaque)
-+{
-+    if (object_dynamic_cast(child, TYPE_CPU_CLUSTER)) {
-+        GDBState *s =3D (GDBState *) opaque;
-+        CPUClusterState *cluster =3D CPU_CLUSTER(child);
-+        GDBProcess *process;
-+
-+        s->processes =3D g_renew(GDBProcess, s->processes, ++s->process_=
-num);
-+
-+        process =3D &s->processes[s->process_num - 1];
-+
-+        /*
-+         * GDB process IDs -1 and 0 are reserved. To avoid subtle errors=
- at
-+         * runtime, we enforce here that the machine does not use a clus=
-ter ID
-+         * that would lead to PID 0. */
-+        assert(process->pid !=3D UINT32_MAX);
-+        process->pid =3D cluster->cluster_id + 1;
-+        process->attached =3D false;
-+
-+        return 0;
-+    }
-+
-+    return object_child_foreach(child, find_cpu_clusters, opaque);
-+}
-+
-+static int pid_order(const void *a, const void *b)
-+{
-+    GDBProcess *pa =3D (GDBProcess *) a;
-+    GDBProcess *pb =3D (GDBProcess *) b;
-+
-+    if (pa->pid < pb->pid) {
-+        return -1;
-+    } else if (pa->pid > pb->pid) {
-+        return 1;
-+    } else {
-+        return 0;
-+    }
-+}
-+
-+static void create_processes(GDBState *s)
-+{
-+    object_child_foreach(object_get_root(), find_cpu_clusters, s);
-+
-+    if (!s->processes) {
-+        /* No CPU cluster specified by the machine */
-+        create_unique_process(s);
-+    } else {
-+        /* Sort by PID */
-+        qsort(s->processes, s->process_num, sizeof(s->processes[0]), pid=
-_order);
-+    }
-+}
-+
-+static void cleanup_processes(GDBState *s)
-+{
-+    g_free(s->processes);
-+    s->process_num =3D 0;
-+    s->processes =3D NULL;
-+}
-+
- int gdbserver_start(const char *device)
- {
-     trace_gdbstub_op_start(device);
-=20
-     GDBState *s;
-@@ -2058,15 +2141,19 @@ int gdbserver_start(const char *device)
-                                    NULL, &error_abort);
-         monitor_init(mon_chr, 0);
-     } else {
-         qemu_chr_fe_deinit(&s->chr, true);
-         mon_chr =3D s->mon_chr;
-+        cleanup_processes(s);
-         memset(s, 0, sizeof(GDBState));
-         s->mon_chr =3D mon_chr;
-     }
-     s->c_cpu =3D first_cpu;
-     s->g_cpu =3D first_cpu;
-+
-+    create_processes(s);
-+
-     if (chr) {
-         qemu_chr_fe_init(&s->chr, chr, &error_abort);
-         qemu_chr_fe_set_handlers(&s->chr, gdb_chr_can_receive, gdb_chr_r=
-eceive,
-                                  gdb_chr_event, NULL, NULL, NULL, true);
-     }
---=20
+changes since v3:
+  - patch 1    cpu_cluster.h: remove QEMU_ from the multiple includes
+               guard #ifdef/#define [Alistair]
+
+  - patch 1    cpu_cluster.c: include osdep.h first [Alistair]
+
+  - patch 1    use uint64_t for cluster ID for prosperity :) [Philippe]
+
+  - patch 1    auto-assign a cluster ID to newly created clusters [Philip=
+pe]
+
+  - patch 2    fix mid-code variable declaration [Alistair]
+
+  - patch 3    add a comment in gdb_get_cpu_pid() when retrieving CPU
+               parent canonical path [Alistair]
+
+  - patch 14   fix a typo in the commit message [Alistair]
+
+changes since v2:
+  - patch 1    introducing the cpu-cluster type. I didn't opt for an
+               Interface, but I can add one if you think it's necessary.
+               For now this class inherits from Device and has a
+               cluster-id property, used by the GDB stub to compute a
+               PID.
+
+  - patch 2    removed GDB group related code as it has been replaced
+               with CPU clusters
+
+  - patch 2/8  moved GDBProcess target_xml field introduction into patch
+               8 [Philippe]
+
+  - patch 3    gdb_get_cpu_pid() now search for CPU being a child of a
+               cpu-cluster object. Use the cluster-id to compute the PID.
+
+  - patch 4    gdb_get_process() does not rely on s->processes array
+               indices anymore as PIDs can now be sparse. Instead, iterat=
+e
+               over the array to find the process.
+
+  - patch 3/4  removed Reviewed-by tags because of substantial changes.
+
+  - patch 4/7  read_thread_id() hardening [Philippe]
+
+  - patch 12   safer vAttach packet parsing [Phillipe]
+
+  - patch 16   put APUs and RPUs in different clusters instead of GDB
+               groups
+
+changes since v1:
+  - rename qemu_get_thread_id() to gdb_fmt_thread_id() [Philippe]
+  - check qemu_strtoul() return value for 'D' packets [Philippe]
+
+
+This series adds support for the multiprocess extension of the GDB
+remote protocol in the QEMU GDB stub.
+
+This extension is useful to split QEMU emulated CPUs in different
+processes from the point of view of the GDB client. It adds the
+possibility to debug different kind of processors (e.g. an AArch64 and
+an ARMv7 CPU) at the same time (it is not possible otherwise since GDB
+expects an SMP view at the thread granularity.
+
+CPUs are grouped using specially named QOM containers. CPUs that are
+children of such a container are grouped under the same GDB process.
+
+The last patch groups the CPUs of different model in the zynqmp machines
+into separate processes.
+
+To test this patchset, you can use the following commands:
+
+(Note that this requires a recent enough GDB, I think GDB 7.2 is OK.
+Also, it must be compiled to support both ARM and AArch64 architectures)
+
+Run QEMU: (-smp 6 in xlnx-zcu102 enables both cortex-a53 and cortex-r5
+CPUs)
+
+qemu-system-aarch64 -M xlnx-zcu102 -gdb tcp::1234 -S -smp 6
+
+Run the following commands in GDB:
+
+target extended :1234
+add-inferior
+inferior 2
+attach 2
+info threads
+
+I want to thanks the Xilinx's QEMU team who sponsored this work for
+their collaboration and their prototype implementation.
+
+Luc Michel (16):
+  hw/cpu: introduce CPU clusters
+  gdbstub: introduce GDB processes
+  gdbstub: add multiprocess support to '?' packets
+  gdbstub: add multiprocess support to 'H' and 'T' packets
+  gdbstub: add multiprocess support to vCont packets
+  gdbstub: add multiprocess support to 'sC' packets
+  gdbstub: add multiprocess support to (f|s)ThreadInfo and
+    ThreadExtraInfo
+  gdbstub: add multiprocess support to Xfer:features:read:
+  gdbstub: add multiprocess support to gdb_vm_state_change()
+  gdbstub: add multiprocess support to 'D' packets
+  gdbstub: add support for extended mode packet
+  gdbstub: add support for vAttach packets
+  gdbstub: processes initialization on new peer connection
+  gdbstub: gdb_set_stop_cpu: ignore request when process is not attached
+  gdbstub: add multiprocess extension support
+  arm/xlnx-zynqmp: put APUs and RPUs in separate CPU clusters
+
+ include/hw/arm/xlnx-zynqmp.h |   3 +
+ include/hw/cpu/cluster.h     |  38 +++
+ gdbstub.c                    | 643 ++++++++++++++++++++++++++++++-----
+ hw/arm/xlnx-zynqmp.c         |  21 +-
+ hw/cpu/cluster.c             |  59 ++++
+ MAINTAINERS                  |   2 +
+ hw/cpu/Makefile.objs         |   2 +-
+ 7 files changed, 687 insertions(+), 81 deletions(-)
+ create mode 100644 include/hw/cpu/cluster.h
+ create mode 100644 hw/cpu/cluster.c
+
+--
 2.19.1
