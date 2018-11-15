@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gNNGL-0003YY-M8
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:25 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gNNGP-0003Zq-Nf
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gNNGB-00082p-L6
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:13 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34285)
+	(envelope-from <tcminyard@gmail.com>) id 1gNNGF-00084G-Fi
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:15 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35206)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gNNG9-00081b-RQ
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:03 -0500
-Received: by mail-oi1-x243.google.com with SMTP id a202-v6so9591528oib.1
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 11:25:00 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gNNGD-00082W-Gl
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:05 -0500
+Received: by mail-ot1-x343.google.com with SMTP id 81so19101039otj.2
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 11:25:02 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu, 15 Nov 2018 13:24:43 -0600
-Message-Id: <20181115192446.17187-10-minyard@acm.org>
+Date: Thu, 15 Nov 2018 13:24:45 -0600
+Message-Id: <20181115192446.17187-12-minyard@acm.org>
 In-Reply-To: <20181115192446.17187-1-minyard@acm.org>
 References: <20181115192446.17187-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v2 09/12] i2c: Add normal type name and cast to
- smbus_eeprom.c
+Subject: [Qemu-devel] [PATCH v2 11/12] i2c: Add vmstate handling to the
+ smbus eeprom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +28,115 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, minyard@acm.org, Corey Minyard <cminyard@mvista.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, minyard@acm.org, Corey Minyard <cminyard@mvista.com>, Peter Maydell <peter.maydell@linaro.org>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-Create a type name and a cast macro and use those through the
-code.
+Transfer the state of the EEPROM on a migration.  This way the
+data remains consistent on migration.
+
+This required moving the actual data to a separate array and
+using the data provided in the init function as a separate
+initialization array, since a pointer property has to be a
+void * and the array needs to be uint8_t[].
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/i2c/smbus_eeprom.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ hw/i2c/smbus_eeprom.c | 34 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
 diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index 4d25222e23..8d4eed129f 100644
+index 8e9b734c09..942057dc10 100644
 --- a/hw/i2c/smbus_eeprom.c
 +++ b/hw/i2c/smbus_eeprom.c
-@@ -30,6 +30,11 @@
+@@ -24,6 +24,7 @@
  
- //#define DEBUG
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
++#include "hw/boards.h"
+ #include "hw/i2c/i2c.h"
+ #include "hw/i2c/smbus_slave.h"
+ #include "hw/i2c/smbus_eeprom.h"
+@@ -39,8 +40,10 @@
  
-+#define TYPE_SMBUS_EEPROM "smbus-eeprom"
-+
-+#define SMBUS_EEPROM(obj) \
-+    OBJECT_CHECK(SMBusEEPROMDevice, (obj), TYPE_SMBUS_EEPROM)
-+
  typedef struct SMBusEEPROMDevice {
      SMBusDevice smbusdev;
-     void *data;
-@@ -38,7 +43,7 @@ typedef struct SMBusEEPROMDevice {
+-    void *data;
++    uint8_t data[SMBUS_EEPROM_SIZE];
++    void *init_data;
+     uint8_t offset;
++    bool accessed;
+ } SMBusEEPROMDevice;
  
  static uint8_t eeprom_receive_byte(SMBusDevice *dev)
- {
--    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
-+    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+@@ -49,6 +52,7 @@ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
      uint8_t *data = eeprom->data;
      uint8_t val = data[eeprom->offset++];
  
-@@ -51,7 +56,7 @@ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
- 
- static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
- {
--    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
-+    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
++    eeprom->accessed = true;
+ #ifdef DEBUG
+     printf("eeprom_receive_byte: addr=0x%02x val=0x%02x\n",
+            dev->i2c.address, val);
+@@ -61,6 +65,7 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+     SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
      uint8_t *data = eeprom->data;
  
++    eeprom->accessed = true;
  #ifdef DEBUG
-@@ -73,7 +78,7 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+     printf("eeprom_write_byte: addr=0x%02x cmd=0x%02x val=0x%02x\n",
+            dev->i2c.address, cmd, buf[0]);
+@@ -78,15 +83,39 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+     return 0;
+ }
  
++static bool smbus_eeprom_vmstate_needed(void *opaque)
++{
++    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
++    SMBusEEPROMDevice *eeprom = opaque;
++
++    return (eeprom->accessed || smbus_vmstate_needed(&eeprom->smbusdev)) &&
++        !mc->smbus_no_migration_support;
++}
++
++static const VMStateDescription vmstate_smbus_eeprom = {
++    .name = "smbus-eeprom",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = smbus_eeprom_vmstate_needed,
++    .fields      = (VMStateField[]) {
++        VMSTATE_SMBUS_DEVICE(smbusdev, SMBusEEPROMDevice),
++        VMSTATE_UINT8_ARRAY(data, SMBusEEPROMDevice, SMBUS_EEPROM_SIZE),
++        VMSTATE_UINT8(offset, SMBusEEPROMDevice),
++        VMSTATE_BOOL(accessed, SMBusEEPROMDevice),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
  static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
  {
--    SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *)dev;
-+    SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+     SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
  
++    memcpy(eeprom->data, eeprom->init_data, SMBUS_EEPROM_SIZE);
      eeprom->offset = 0;
  }
-@@ -97,7 +102,7 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+ 
+ static Property smbus_eeprom_properties[] = {
+-    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, data),
++    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -99,6 +128,7 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+     sc->receive_byte = eeprom_receive_byte;
+     sc->write_data = eeprom_write_data;
+     dc->props = smbus_eeprom_properties;
++    dc->vmsd = &vmstate_smbus_eeprom;
+     /* Reason: pointer property "data" */
+     dc->user_creatable = false;
  }
- 
- static const TypeInfo smbus_eeprom_info = {
--    .name          = "smbus-eeprom",
-+    .name          = TYPE_SMBUS_EEPROM,
-     .parent        = TYPE_SMBUS_DEVICE,
-     .instance_size = sizeof(SMBusEEPROMDevice),
-     .class_init    = smbus_eeprom_class_initfn,
-@@ -114,7 +119,7 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t address, uint8_t *eeprom_buf)
- {
-     DeviceState *dev;
- 
--    dev = qdev_create((BusState *) smbus, "smbus-eeprom");
-+    dev = qdev_create((BusState *) smbus, TYPE_SMBUS_EEPROM);
-     qdev_prop_set_uint8(dev, "address", address);
-     qdev_prop_set_ptr(dev, "data", eeprom_buf);
-     qdev_init_nofail(dev);
 -- 
 2.17.1
