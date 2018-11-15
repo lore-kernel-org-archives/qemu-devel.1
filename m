@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNHq8-00052F-W7
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:37:50 -0500
+	(envelope-from <eblake@redhat.com>) id 1gNHxm-0007oU-JH
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:45:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNHpw-0006hW-9G
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:37:41 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40372)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNHpp-0006f9-Bo
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:37:30 -0500
-Received: by mail-ot1-x344.google.com with SMTP id s5so18015008oth.7
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 05:37:25 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1gNHxh-00014N-Lz
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:45:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33708)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gNHxh-00013p-GU
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:45:37 -0500
+References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
+	<cover.1542287931.git.simon@ruderich.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6aa4b882-7b25-28cf-2807-2817b4e58f86@redhat.com>
+Date: Thu, 15 Nov 2018 07:45:29 -0600
 MIME-Version: 1.0
-In-Reply-To: <a27227e9-d1b0-2e79-90ff-380bdd64119e@vivier.eu>
-References: <20181115114616.26265-1-peter.maydell@linaro.org>
-	<a27227e9-d1b0-2e79-90ff-380bdd64119e@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Nov 2018 13:37:04 +0000
-Message-ID: <CAFEAcA8AnA4bAKRpELtUm+XO9KM8k1G-kRbeO22ZA9u7h38GQQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.1] linux-user/sparc/signal.c: Remove
- dead code
+In-Reply-To: <cover.1542287931.git.simon@ruderich.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 0/7] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
+To: Simon Ruderich <simon@ruderich.org>, qemu-devel@nongnu.org
+Cc: David Alan Gilbert <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>
 
-On 15 November 2018 at 11:59, Laurent Vivier <laurent@vivier.eu> wrote:
-> On 15/11/2018 12:46, Peter Maydell wrote:
->> Coverity complains (CID 1390847) about some dead code in
->> do_sigreturn(). This is an if (err) clause that can never be
->> true, copied from the kernel (where __get_user returns an error).
->> The one code path that could report an error is in the
->> currently commented-out pseudocode for handling FPU register
->> restoring, so move the if into that comment (and fix the
->> broken indent in the comment in the process).
->>
->> (The new position for the error check is also the semantically
->> correct one -- we should not restore the signal mask from
->> the signal frame if we get an error here, so the check must
->> be done before set_sigmask(), not after.)
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  linux-user/sparc/signal.c | 16 ++++++++--------
->>  1 file changed, 8 insertions(+), 8 deletions(-)
->>
->
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
->
-> Do you apply it directly to the master or do you want a linux-user pull
-> request?
+On 11/15/18 7:22 AM, Simon Ruderich wrote:
+> Hello again,
+> 
+> Please ignore v6, I forgot one patch. I hope I got it right this
+> time.
 
-Applied to master, thanks.
+Our automated tooling doesn't spot patches sent in reply to an earlier 
+series; you may want to repost v7 as a new top-level thread (not 
+in-reply-to any earlier message) to makes sure it gets seen by patchew.
 
--- PMM
+> 
+> As I got no replies to my last mails, here again the full patch
+> set (rebased on current master) in the hope to get this merged.
+> The first few patches are cleanup, the last two patches add the
+> pmemload feature. Only 5/6 requires an ack (although all
+> mentioned issues should be fixed), all other patches were already
+> reviewed in the last round.
+> 
+> If there's anything else I can do to get this merged, please tell
+> me.
+> 
+> Regards
+> Simon Ruderich
+> 
+> Simon Ruderich (7):
+>    cpus: correct coding style in qmp_memsave/qmp_pmemsave
+>    cpus: convert qmp_memsave/qmp_pmemsave to use qemu_open
+>    cpus: use size_t in qmp_memsave/qmp_pmemsave
+>    hmp: use l for size argument in memsave/pmemsave
+>    hmp: use F for filename arguments in memsave/pmemsave
+>    qmp: add pmemload command
+>    hmp: add pmemload command
+> 
+>   cpus.c          | 81 ++++++++++++++++++++++++++++++++++++++++---------
+>   hmp-commands.hx | 18 +++++++++--
+>   hmp.c           | 16 ++++++++--
+>   hmp.h           |  1 +
+>   qapi/misc.json  | 20 ++++++++++++
+>   5 files changed, 118 insertions(+), 18 deletions(-)
+> 
+> No changes between v6 and v7, but v6 missed one patch.
+> 
+> Diff between v5 and v7:
+> 
+>      --- a/qapi/misc.json
+>      +++ b/qapi/misc.json
+>      @@ -1201,7 +1201,7 @@
+>      #
+>      # Returns: Nothing on success
+>      #
+>      -# Since: 3.1
+>      +# Since: 3.2
+
+Except the next release will be named 4.0, not 3.2 :)  (It's okay, 
+there's a lot of mentions of 3.2 floating on the list right now, and 
+we'll probably have to do a global search-and-replace at some point once 
+we are into the new year)
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
