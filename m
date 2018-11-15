@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gNIkQ-0005Wx-0w
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:35:58 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gNIkR-0005YN-7v
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:36:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gNIkP-0005zY-9R
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:35:57 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gNIkQ-00060K-HG
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:35:59 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Nov 2018 14:35:34 +0000
-Message-Id: <20181115143535.5885-2-peter.maydell@linaro.org>
-In-Reply-To: <20181115143535.5885-1-peter.maydell@linaro.org>
-References: <20181115143535.5885-1-peter.maydell@linaro.org>
+Date: Thu, 15 Nov 2018 14:35:33 +0000
+Message-Id: <20181115143535.5885-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for-3.1 1/2] hw/block/onenand: Fix off-by-one
- error allowing out-of-bounds read
+Subject: [Qemu-devel] [PATCH for-3.1 0/2] hw/block/onenand: fix
+ out-of-bounds read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +25,31 @@ Cc: patches@linaro.org, Thomas Huth <thuth@redhat.com>, Richard Henderson <richa
 
 An off-by-one error in a switch case in onenand_read() allowed
 a misbehaving guest to read off the end of a block of memory.
+This bug was revealed now that QEMU supports execution from
+device memory: if started with no guest image loaded,
+"qemu-system-arm -M n800" will now try to execute by reading
+from this device's registers until it gets to the offset
+triggering the segfault. Previously it would have run into
+the "can't execute from device memory" assert first.
 
+As a followup, patch 2 fixes some reporting so that we don't
+trigger a hw_error() for reads of unimplemented registers.
+With the two patches, execution now successfully results in
+QEMU emulating the guest being off in the weeds...
+    
 NB: the onenand device is used only by the "n800" and "n810"
-machines, which are usable only with TCG, not KVM, so this is
-not a security issue.
+machines, which are usable only with TCG, not KVM, so the
+segfault is not a security issue.
 
-Reported-by: Thomas Huth <thuth@redhat.com>
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-I tweaked RTH's suggested fix to use an 0xbffe offset so
-we don't overrun on an access to 0xbfff either.
+thanks
+-- PMM
 
- hw/block/onenand.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Peter Maydell (2):
+  hw/block/onenand: Fix off-by-one error allowing out-of-bounds read
+  hw/block/onenand: use qemu_log_mask() for reporting
 
-diff --git a/hw/block/onenand.c b/hw/block/onenand.c
-index 0cb8d7fa135..49ef68c9b14 100644
---- a/hw/block/onenand.c
-+++ b/hw/block/onenand.c
-@@ -608,7 +608,7 @@ static uint64_t onenand_read(void *opaque, hwaddr addr,
-     int offset = addr >> s->shift;
- 
-     switch (offset) {
--    case 0x0000 ... 0xc000:
-+    case 0x0000 ... 0xbffe:
-         return lduw_le_p(s->boot[0] + addr);
- 
-     case 0xf000:	/* Manufacturer ID */
+ hw/block/onenand.c | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
+
 -- 
 2.19.1
