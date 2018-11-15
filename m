@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNKRn-0004nx-MS
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:24:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gNKRt-0004rM-8V
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:24:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNKRm-0004DB-Oz
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:24:51 -0500
-References: <20181113230319.1008531-1-eblake@redhat.com>
-	<20181113230319.1008531-2-eblake@redhat.com>
-	<w51bm6qgyjo.fsf@maestria.local.igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b60f4624-17d6-c4f9-d6c8-124184470f40@redhat.com>
-Date: Thu, 15 Nov 2018 10:24:37 -0600
+	(envelope-from <kwolf@redhat.com>) id 1gNKRs-0004GP-Dz
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:24:57 -0500
+Date: Thu, 15 Nov 2018 17:24:28 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181115162428.GF12677@localhost.localdomain>
+References: <20181115020334.1189829-1-eblake@redhat.com>
+	<20181115020334.1189829-14-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <w51bm6qgyjo.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] qcow2: Document some maximum size
- constraints
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181115020334.1189829-14-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 13/13] block: Enforce non-zero
+ bl.max_transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 11/15/18 9:17 AM, Alberto Garcia wrote:
-> On Wed 14 Nov 2018 12:03:17 AM CET, Eric Blake wrote:
->> @@ -427,7 +451,9 @@ Standard Cluster Descriptor:
->>   Compressed Clusters Descriptor (x = 62 - (cluster_bits - 8)):
->>
->>       Bit  0 - x-1:   Host cluster offset. This is usually _not_ aligned to a
->> -                    cluster or sector boundary!
->> +                    cluster or sector boundary!  If cluster_bits is
->> +                    small enough that this field includes bits beyond
->> +                    55, those upper bits must be set to 0.
+Am 15.11.2018 um 03:03 hat Eric Blake geschrieben:
+> The raw format driver and the filter drivers default to picking
+> up the same limits as what they wrap, and I've audited that they
+> are otherwise simple enough in their passthrough to be 64-bit
+> clean; it's not worth changing their .bdrv_refresh_limits to
+> advertise anything different.  Previous patches changed all
+> remaining byte-based format and protocol drivers to supply an
+> explicit max_transfer consistent with an audit (or lack thereof)
+> of their code.  And for drivers still using sector-based
+> callbacks (gluster, iscsi, parallels, qed, replication, sheepdog,
+> ssh, vhdx), we can easily supply a 2G default limit while waiting
+> for a later per-driver conversion and auditing while moving to
+> byte-based callbacks.
 > 
-> While I think that it's good to have a 56 bits upper limit for both
-> compressed and uncompressed clusters, I'm wondering: is it theoretically
-> possible to have data clusters above 64PB if they're all compressed?
+> With that, we can assert that max_transfer is now always set (either
+> by sector-based default, by merge with a backing layer, or by
+> explicit settings), and enforce that it be non-zero by the end
+> of bdrv_refresh_limits().  This in turn lets us simplify portions
+> of the block layer to use MIN() instead of MIN_NON_ZERO(), while
+> still fragmenting things to no larger than 2G chunks.  Also, we no
+> longer need to rewrite the driver's bl.max_transfer to a value below
+> 2G.  There should be no semantic change from this patch, although
+> it does open the door if a future patch wants to let the block layer
+> choose a larger value than 2G while still honoring bl.max_transfer
+> for fragmentation.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> [hmm - in sending this email, I realize that I didn't specifically
+> check whether quorum always picks up a sane limit from its children,
+> since it is byte-based but lacks a .bdrv_refresh_limits]
+> 
+>  include/block/block_int.h | 10 +++++-----
+>  block/io.c                | 25 ++++++++++++-------------
+>  2 files changed, 17 insertions(+), 18 deletions(-)
+> 
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index b19d94dac5f..410553bb0cc 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -548,11 +548,11 @@ typedef struct BlockLimits {
+>      uint32_t opt_transfer;
+> 
+>      /* Maximal transfer length in bytes.  Need not be power of 2, but
+> -     * must be multiple of opt_transfer and bl.request_alignment, or 0
+> -     * for no 32-bit limit.  The block layer fragments all actions
+> -     * below 2G, so setting this value to anything larger than INT_MAX
+> -     * implies that the driver has been audited for 64-bit
+> -     * cleanness. */
+> +     * must be larger than opt_transfer and request_alignment (the
+> +     * block layer rounds it down as needed).  The block layer
+> +     * fragments all actions below 2G, so setting this value to
+> +     * anything larger than INT_MAX implies that the driver has been
+> +     * audited for 64-bit cleanness. */
+>      uint64_t max_transfer;
+> 
+>      /* memory alignment, in bytes so that no bounce buffer is needed */
+> diff --git a/block/io.c b/block/io.c
+> index 4911a1123eb..0024be0bf31 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -129,6 +129,9 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+>      /* Default alignment based on whether driver has byte interface */
+>      bs->bl.request_alignment = (drv->bdrv_co_preadv ||
+>                                  drv->bdrv_aio_preadv) ? 1 : 512;
+> +    /* Default cap at 2G for drivers without byte interface */
+> +    if (bs->bl.request_alignment == 1)
+> +        bs->bl.max_transfer = BDRV_REQUEST_MAX_BYTES;
 
-The question is only applicable for cluster sizes of 8k and smaller. 
-With an 8k cluster image and the qcow2.h limit of a 32MiB L1 table (4096 
-clusters, each of which holds 1024 L2 entries, and each L2 table holds 
-1024 cluster entries), you can have up to 4k * 1k * 1k * 8k == 32T of 
-guest size.  You'd need a LOT of metadata (for example, over 2000 
-internal snapshots) before the host file would reach 64PB to even need 
-to store compressed clusters at a host offset that large.  At the same 
-time, qemu would limit you to an 8MiB refcount table (1024 clusters, 
-each of which holds 1024 refblocks, which in turn hold a default of 4096 
-refcounts, but with a refcount_order of 0 could hold 64k refcounts), 
-which results in qemu allowing your maximum host offset to be 1k * 1k * 
-64k * 8k == 512T, which means qemu will refuse to generate or open such 
-an image in the first place.  So if you have an image that tries to 
-store a compressed data cluster above host offset 64PB, qemu is unable 
-to process that image.
+Missing braces, and comment and code don't match (the comment suggests
+that the condition should be != 1).
 
-But your question does mean this other part of my patch:
-
- >
- >            24 - 31:   size
- > -                    Virtual disk size in bytes
- > +                    Virtual disk size in bytes.
- > +
- > +                    Note: with a 2 MB cluster size, the maximum
- > +                    virtual size is 2 EB (61 bits) for a fully sparse
- > +                    file; however, L1/L2 table layouts limit an image
- > +                    to no more than 64 PB (56 bits) of populated
- > +                    clusters, and an image may hit other limits first
- > +                    (such as a file system's maximum size).  With a
- > +                    512 byte cluster size, the maximum virtual size
- > +                    drops to 128 GB (37 bits).
-
-is misleading.  Elsewhere, we mention for cluster_bits:
-
-                     Note: qemu as of today has an implementation limit 
-of 2 MB
-                     as the maximum cluster size and won't be able to 
-open images
-                     with larger cluster sizes.
-
-and looking at the code in qcow2.h, the 2EB limits on maximum virtual 
-size is NOT an inherent limit in the qcow2 file format, but rather a 
-result of qemu's implementation refusing to size the L1 table larger 
-than 32MiB.  If you allow a larger L1 table, you can get to larger 
-virtual addresses.  So I need to fix this patch [again] to add in 
-wording about this being a qemu limit.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Kevin
