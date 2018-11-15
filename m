@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNImM-00077N-4e
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:37:58 -0500
+	(envelope-from <david@redhat.com>) id 1gNIp8-000187-VU
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:41:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNImH-0006rQ-W7
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:37:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32832)
+	(envelope-from <david@redhat.com>) id 1gNIon-0008OX-At
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:40:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46742)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gNImH-0006ob-NO
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:37:53 -0500
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gNIoH-0007kT-4T
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:40:26 -0500
 References: <20181115140501.7872-1-david@redhat.com>
 	<20181115140501.7872-4-david@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <df8717ca-a000-c722-ef20-0f19213c4b08@redhat.com>
-Date: Thu, 15 Nov 2018 08:37:46 -0600
+	<df8717ca-a000-c722-ef20-0f19213c4b08@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <42c4e755-9a06-2457-d821-5ed7c5f6f2e3@redhat.com>
+Date: Thu, 15 Nov 2018 15:39:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181115140501.7872-4-david@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <df8717ca-a000-c722-ef20-0f19213c4b08@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v1 3/9] qapi: use qemu_strtod_finite() in
@@ -29,23 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 11/15/18 8:04 AM, David Hildenbrand wrote:
-> Let's use the new function. "NaN" and "inf" are now properly rejected.
+On 15.11.18 15:37, Eric Blake wrote:
+> On 11/15/18 8:04 AM, David Hildenbrand wrote:
+>> Let's use the new function. "NaN" and "inf" are now properly rejected.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>   qapi/string-input-visitor.c | 6 ++----
+>>   1 file changed, 2 insertions(+), 4 deletions(-)
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->   qapi/string-input-visitor.c | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> Should there be any added test coverage in this patch, or is it later in 
+> the series?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Nope not yet, but can add.
 
-Should there be any added test coverage in this patch, or is it later in 
-the series?
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+
+Thanks,
+
+David / dhildenb
