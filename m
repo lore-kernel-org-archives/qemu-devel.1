@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNEx2-0006a3-EH
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:32:46 -0500
+	(envelope-from <berrange@redhat.com>) id 1gNEx2-0006a4-Gs
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNEx0-00043z-9Y
+	(envelope-from <berrange@redhat.com>) id 1gNEwy-00042x-8c
 	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:32:44 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41591)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNEwy-00041D-3Q
+Received: from mx1.redhat.com ([209.132.183.28]:56160)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gNEwy-00040G-2Y
 	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:32:40 -0500
-Received: by mail-ot1-x341.google.com with SMTP id u16so17301487otk.8
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 02:32:37 -0800 (PST)
+Date: Thu, 15 Nov 2018 10:32:20 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181115103220.GH10900@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181019133835.16494-1-berrange@redhat.com>
+	<20181019133835.16494-11-berrange@redhat.com>
+	<CAJ+F1CKVcjqTahNUW144Uhnh48=yAghdhBscFWh_f3HQWThWRg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <159ef9c8-e0b2-6183-b33c-6925fb6574dc@redhat.com>
-References: <20181031005015.5433-1-zhangckid@gmail.com>
-	<159ef9c8-e0b2-6183-b33c-6925fb6574dc@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Nov 2018 10:32:16 +0000
-Message-ID: <CAFEAcA99FxTp6G8+vG-YsjWA5LAye1T3j4_h=5_uM6WbZaW2QA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CKVcjqTahNUW144Uhnh48=yAghdhBscFWh_f3HQWThWRg@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V2] net/filter-rewriter.c: Fix coverity
- static analysis issue
+Subject: Re: [Qemu-devel] [PATCH v6 10/11] authz: add QAuthZPAM object type
+ for authorizing using PAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangckid@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Zhang Chen <chen.zhang@intel.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, philmd@redhat.com
 
-On 2 November 2018 at 02:21, Jason Wang <jasowang@redhat.com> wrote:
->
-> On 2018/10/31 =E4=B8=8A=E5=8D=888:50, Zhang Chen wrote:
->>
->> The original code just follow the TCP state diagram,
->> but in this case, we can skip the TCPS_TIME_WAIT state to simplify
->> the implementation.
->>
->> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
->> ---
->>   net/filter-rewriter.c | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
->> index bb8f4d93b1..2e26839bc2 100644
->> --- a/net/filter-rewriter.c
->> +++ b/net/filter-rewriter.c
->> @@ -155,12 +155,13 @@ static int handle_primary_tcp_pkt(RewriterState *r=
-f,
->>            * Active close step 2.
->>            */
->>           if (conn->tcp_state =3D=3D TCPS_FIN_WAIT_1) {
->> -            conn->tcp_state =3D TCPS_TIME_WAIT;
->>               /*
->>                * For simplify implementation, we needn't wait 2MSL time
->>                * in filter rewriter. Because guest kernel will track the
->>                * TCP status and wait 2MSL time, if client resend the FIN
->>                * packet, guest will apply the last ACK too.
->> +             * So, we skip the TCPS_TIME_WAIT state here and go straigh=
-t
->> +             * to TCPS_CLOSED state.
->>                */
->>               conn->tcp_state =3D TCPS_CLOSED;
->>               g_hash_table_remove(rf->connection_track_table, key);
->
->
->
-> Applied.
+On Thu, Nov 08, 2018 at 02:23:18AM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Fri, Oct 19, 2018 at 5:47 PM Daniel P. Berrang=C3=A9 <berrange@redha=
+t.com> wrote:
+> > diff --git a/qemu-options.hx b/qemu-options.hx
+> > index a1c3e0e59c..a9654b8115 100644
+> > --- a/qemu-options.hx
+> > +++ b/qemu-options.hx
+> > @@ -4447,6 +4447,41 @@ would look like:
+> >       ...
+> >  @end example
+> >
+> > +@item -object authz-pam,id=3D@var{id},service=3D@var{string}
+> > +
+> > +Create an authorization object that will control access to network s=
+ervices.
+> > +
+> > +The @option{service} parameter provides the name of a PAM service to=
+ use
+> > +for authorization. It requires that a file @code{/etc/pam.d/@var{ser=
+vice}}
+> > +exist to provide the configuration for the @code{account} subsystem.
+> > +
+> > +An example authorization object to validate a TLS x509 distinguished
+> > +name would look like:
+> > +
+> > +@example
+> > + # $QEMU \
+> > +     ...
+> > +     -object authz-simple,id=3Dauth0,service=3Dqemu-vnc
+>=20
+> oops, wrong example,
 
-Ping -- this doesn't seem to have made it into master?
+Heh, fixed.
 
-thanks
--- PMM
+>=20
+> other than that,
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
