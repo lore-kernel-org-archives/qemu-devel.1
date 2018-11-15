@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gNF5B-0003hW-KW
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:41:11 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gNF5D-0003is-U4
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:41:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gNF57-0000pA-BR
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:41:09 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gNF59-0000pt-Bw
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:41:11 -0500
 Received: from mga03.intel.com ([134.134.136.65]:14567)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1gNF57-0000oM-2h
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:41:05 -0500
+	id 1gNF59-0000oM-3F
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:41:07 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Thu, 15 Nov 2018 18:07:57 +0800
-Message-Id: <1542276484-25508-2-git-send-email-wei.w.wang@intel.com>
+Date: Thu, 15 Nov 2018 18:07:58 +0800
+Message-Id: <1542276484-25508-3-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
 References: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v9 1/8] bitmap: fix bitmap_count_one
+Subject: [Qemu-devel] [PATCH v9 2/8] bitmap: bitmap_count_one_with_offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +27,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com
 Cc: peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com, wei.w.wang@intel.com
 
-BITMAP_LAST_WORD_MASK(nbits) returns 0xffffffff when "nbits=0", which
-makes bitmap_count_one fail to handle the "nbits=0" case. It appears to be
-preferred to remain BITMAP_LAST_WORD_MASK identical to the kernel
-implementation that it is ported from.
+Count the number of 1s in a bitmap starting from an offset.
 
-So this patch fixes bitmap_count_one to handle the nbits=0 case.
-
-Inital Discussion Link:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg554316.html
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-CC: Juan Quintela <quintela@redhat.com>
 CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-CC: Peter Xu <peterx@redhat.com>
+CC: Juan Quintela <quintela@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/qemu/bitmap.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/qemu/bitmap.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-index 509eedd..679f1bd 100644
+index 679f1bd..5c31334 100644
 --- a/include/qemu/bitmap.h
 +++ b/include/qemu/bitmap.h
-@@ -221,6 +221,10 @@ static inline int bitmap_intersects(const unsigned long *src1,
+@@ -232,6 +232,19 @@ static inline long bitmap_count_one(const unsigned long *bitmap, long nbits)
+     }
+ }
  
- static inline long bitmap_count_one(const unsigned long *bitmap, long nbits)
- {
-+    if (unlikely(!nbits)) {
-+        return 0;
-+    }
++static inline long bitmap_count_one_with_offset(const unsigned long *bitmap,
++                                                long offset, long nbits)
++{
++    long aligned_offset = QEMU_ALIGN_DOWN(offset, BITS_PER_LONG);
++    long redundant_bits = offset - aligned_offset;
++    long bits_to_count = nbits + redundant_bits;
++    const unsigned long *bitmap_start = bitmap +
++                                        aligned_offset / BITS_PER_LONG;
 +
-     if (small_nbits(nbits)) {
-         return ctpopl(*bitmap & BITMAP_LAST_WORD_MASK(nbits));
-     } else {
++    return bitmap_count_one(bitmap_start, bits_to_count) -
++           bitmap_count_one(bitmap_start, redundant_bits);
++}
++
+ void bitmap_set(unsigned long *map, long i, long len);
+ void bitmap_set_atomic(unsigned long *map, long i, long len);
+ void bitmap_clear(unsigned long *map, long start, long nr);
 -- 
 1.8.3.1
