@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gNIGg-0005YL-6S
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:05:15 -0500
+	(envelope-from <david@redhat.com>) id 1gNIGi-0005YT-Ik
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:05:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gNIGc-0004HU-7A
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:05:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39756)
+	(envelope-from <david@redhat.com>) id 1gNIGd-0004If-RF
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:05:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:3848)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gNIGc-0004GY-2N
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:05:10 -0500
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gNIGd-0004I9-MN
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:05:11 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Thu, 15 Nov 2018 15:04:52 +0100
-Message-Id: <20181115140501.7872-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 0/9] qapi: rewrite string-input-visitor
+Date: Thu, 15 Nov 2018 15:04:53 +0100
+Message-Id: <20181115140501.7872-2-david@redhat.com>
+In-Reply-To: <20181115140501.7872-1-david@redhat.com>
+References: <20181115140501.7872-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 1/9] cutils: add qemu_strtod() and
+ qemu_strtod_finite()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,56 +27,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Rewrite string-input-visitor to be (hopefully) less ugly. Support
-int and uint lists (including ranges, but not implemented via type
-"Range").
+Let's provide a wrapper for strtod().
 
-Virtual walks are now supported and more errors are cought (and some bugs
-fixed). Fix and extend the tests. Parsing of uint64_t is now properly
-supported.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ include/qemu/cutils.h |  2 ++
+ util/cutils.c         | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
 
-Importantly, when parsing a list we now return the list and not an
-ordered set (we are not an ordered set parser after all). Whoever needs
-that can add it on top. As far as I can see, current code can deal with
-it but I'll have to look at the details.
-
-While at it, introduce and use qemu_strtod() and qemu_strtod_finite().
-However don't convert monitor.c as that seems to be too broken for me
-(it ignores both conversion errors and range errors, and there is an
-actual unit test in which conversion is expected to fail).
-
-RFC - v1:
-- Too much to name it all, just some highlights
-- Pull some tests before the rework
-- Introduce qemu_strtod_finite() and use it in more places
-- More tests
-- "qapi: rewrite string-input-visitor"
--- programming error -> assert
--- g_assert() -> assert(), g_assert_not_reached() -> abort()
--- Accept single-element ranges "1-1"
--- Split parsing and returning the next range element
--- Minor style fixes
-
-David Hildenbrand (9):
-  cutils: add qemu_strtod() and qemu_strtod_finite()
-  cutils: use qemu_strtod_finite() in do_strtosz()
-  qapi: use qemu_strtod_finite() in string-input-visitor
-  qapi: use qemu_strtod_finite() in qobject-input-visitor
-  test-string-input-visitor: add more tests
-  qapi: rewrite string-input-visitor
-  test-string-input-visitor: use virtual walk
-  test-string-input-visitor: split off uint64 list tests
-  test-string-input-visitor: add range overflow tests
-
- include/qapi/string-input-visitor.h |   4 +-
- include/qemu/cutils.h               |   8 +-
- monitor.c                           |   2 +-
- qapi/qobject-input-visitor.c        |   9 +-
- qapi/string-input-visitor.c         | 418 ++++++++++++++++------------
- tests/test-cutils.c                 |  14 +-
- tests/test-string-input-visitor.c   | 172 +++++++++---
- util/cutils.c                       |  52 +++-
- 8 files changed, 432 insertions(+), 247 deletions(-)
-
+diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+index 7071bfe2d4..756b41c193 100644
+--- a/include/qemu/cutils.h
++++ b/include/qemu/cutils.h
+@@ -146,6 +146,8 @@ int qemu_strtoi64(const char *nptr, const char **endptr, int base,
+                   int64_t *result);
+ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+                   uint64_t *result);
++int qemu_strtod(const char *nptr, const char **endptr, double *result);
++int qemu_strtod_finite(const char *nptr, const char **endptr, double *result);
+ 
+ int parse_uint(const char *s, unsigned long long *value, char **endptr,
+                int base);
+diff --git a/util/cutils.c b/util/cutils.c
+index 698bd315bd..7868a683e8 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -544,6 +544,44 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+     return check_strtox_error(nptr, ep, endptr, errno);
+ }
+ 
++/**
++ * Convert string @nptr to a double.
++ *
++ * Works like qemu_strtoul(), except it stores +/-HUGE_VAL on
++ * overflow/underflow.
++ */
++int qemu_strtod(const char *nptr, const char **endptr, double *result)
++{
++    char *ep;
++
++    if (!nptr) {
++        if (endptr) {
++            *endptr = nptr;
++        }
++        return -EINVAL;
++    }
++
++    errno = 0;
++    *result = strtod(nptr, &ep);
++    return check_strtox_error(nptr, ep, endptr, errno);
++}
++
++/**
++ * Convert string @nptr to a finite double.
++ *
++ * Works like qemu_strtoul(), except it stores +/-HUGE_VAL on
++ * overflow/underflow. "NaN" or "inf" are rejcted with -EINVAL.
++ */
++int qemu_strtod_finite(const char *nptr, const char **endptr, double *result)
++{
++    int ret = qemu_strtod(nptr, endptr, result);
++
++    if (!ret && !isfinite(*result)) {
++        return -EINVAL;
++    }
++    return ret;
++}
++
+ /**
+  * Searches for the first occurrence of 'c' in 's', and returns a pointer
+  * to the trailing null byte if none was found.
 -- 
 2.17.2
