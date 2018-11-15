@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gNKRt-0004rM-8V
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:24:58 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gNKUL-0006KE-2N
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:27:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gNKRs-0004GP-Dz
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:24:57 -0500
-Date: Thu, 15 Nov 2018 17:24:28 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181115162428.GF12677@localhost.localdomain>
-References: <20181115020334.1189829-1-eblake@redhat.com>
-	<20181115020334.1189829-14-eblake@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gNKUF-0005Q8-Ty
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:27:29 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38959)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gNKUD-0005Oq-Di
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:27:23 -0500
+Received: by mail-wr1-x444.google.com with SMTP id b13so21853251wrx.6
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 08:27:19 -0800 (PST)
+References: <20181115143535.5885-1-peter.maydell@linaro.org>
+	<20181115143535.5885-2-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ee5b3393-fc6f-5ed3-194a-4b3ad91623ea@linaro.org>
+Date: Thu, 15 Nov 2018 17:27:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181115020334.1189829-14-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 13/13] block: Enforce non-zero
- bl.max_transfer
+In-Reply-To: <20181115143535.5885-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1 1/2] hw/block/onenand: Fix
+ off-by-one error allowing out-of-bounds read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Thomas Huth <thuth@redhat.com>
 
-Am 15.11.2018 um 03:03 hat Eric Blake geschrieben:
-> The raw format driver and the filter drivers default to picking
-> up the same limits as what they wrap, and I've audited that they
-> are otherwise simple enough in their passthrough to be 64-bit
-> clean; it's not worth changing their .bdrv_refresh_limits to
-> advertise anything different.  Previous patches changed all
-> remaining byte-based format and protocol drivers to supply an
-> explicit max_transfer consistent with an audit (or lack thereof)
-> of their code.  And for drivers still using sector-based
-> callbacks (gluster, iscsi, parallels, qed, replication, sheepdog,
-> ssh, vhdx), we can easily supply a 2G default limit while waiting
-> for a later per-driver conversion and auditing while moving to
-> byte-based callbacks.
+On 11/15/18 3:35 PM, Peter Maydell wrote:
+> An off-by-one error in a switch case in onenand_read() allowed
+> a misbehaving guest to read off the end of a block of memory.
 > 
-> With that, we can assert that max_transfer is now always set (either
-> by sector-based default, by merge with a backing layer, or by
-> explicit settings), and enforce that it be non-zero by the end
-> of bdrv_refresh_limits().  This in turn lets us simplify portions
-> of the block layer to use MIN() instead of MIN_NON_ZERO(), while
-> still fragmenting things to no larger than 2G chunks.  Also, we no
-> longer need to rewrite the driver's bl.max_transfer to a value below
-> 2G.  There should be no semantic change from this patch, although
-> it does open the door if a future patch wants to let the block layer
-> choose a larger value than 2G while still honoring bl.max_transfer
-> for fragmentation.
+> NB: the onenand device is used only by the "n800" and "n810"
+> machines, which are usable only with TCG, not KVM, so this is
+> not a security issue.
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
+> I tweaked RTH's suggested fix to use an 0xbffe offset so
+> we don't overrun on an access to 0xbfff either.
 > 
-> [hmm - in sending this email, I realize that I didn't specifically
-> check whether quorum always picks up a sane limit from its children,
-> since it is byte-based but lacks a .bdrv_refresh_limits]
-> 
->  include/block/block_int.h | 10 +++++-----
->  block/io.c                | 25 ++++++++++++-------------
->  2 files changed, 17 insertions(+), 18 deletions(-)
-> 
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index b19d94dac5f..410553bb0cc 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -548,11 +548,11 @@ typedef struct BlockLimits {
->      uint32_t opt_transfer;
-> 
->      /* Maximal transfer length in bytes.  Need not be power of 2, but
-> -     * must be multiple of opt_transfer and bl.request_alignment, or 0
-> -     * for no 32-bit limit.  The block layer fragments all actions
-> -     * below 2G, so setting this value to anything larger than INT_MAX
-> -     * implies that the driver has been audited for 64-bit
-> -     * cleanness. */
-> +     * must be larger than opt_transfer and request_alignment (the
-> +     * block layer rounds it down as needed).  The block layer
-> +     * fragments all actions below 2G, so setting this value to
-> +     * anything larger than INT_MAX implies that the driver has been
-> +     * audited for 64-bit cleanness. */
->      uint64_t max_transfer;
-> 
->      /* memory alignment, in bytes so that no bounce buffer is needed */
-> diff --git a/block/io.c b/block/io.c
-> index 4911a1123eb..0024be0bf31 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -129,6 +129,9 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
->      /* Default alignment based on whether driver has byte interface */
->      bs->bl.request_alignment = (drv->bdrv_co_preadv ||
->                                  drv->bdrv_aio_preadv) ? 1 : 512;
-> +    /* Default cap at 2G for drivers without byte interface */
-> +    if (bs->bl.request_alignment == 1)
-> +        bs->bl.max_transfer = BDRV_REQUEST_MAX_BYTES;
+>  hw/block/onenand.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Missing braces, and comment and code don't match (the comment suggests
-that the condition should be != 1).
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Kevin
+
+r~
