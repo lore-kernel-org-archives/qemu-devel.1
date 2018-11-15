@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gNIgY-0002SV-Sm
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:32:00 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gNIgY-0002ST-Sk
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:32:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gNIgU-00045J-TC
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gNIgW-00046P-RS
 	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:31:58 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37210)
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38382)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gNIgU-0003x7-MT
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:31:54 -0500
-Received: by mail-wr1-x441.google.com with SMTP id j10so7230789wru.4
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 06:31:36 -0800 (PST)
+	id 1gNIgU-0003sQ-TS
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:31:55 -0500
+Received: by mail-wr1-x442.google.com with SMTP id e3-v6so21469325wrs.5
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 06:31:31 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 15 Nov 2018 15:31:22 +0100
-Message-Id: <20181115143124.19234-9-pbonzini@redhat.com>
+Date: Thu, 15 Nov 2018 15:31:18 +0100
+Message-Id: <20181115143124.19234-5-pbonzini@redhat.com>
 In-Reply-To: <20181115143124.19234-1-pbonzini@redhat.com>
 References: <20181115143124.19234-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 08/10] vhost-user-test: create a main loop per
- TestServer
+Subject: [Qemu-devel] [PATCH 04/10] vhost-user: support cross-endian vnet
+ headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,106 +33,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: lvivier@redhat.com, mst@redhat.com, jasowang@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-This makes the tests more independent and removes the need to defer test_server_free
-via an idle event source.
+vhost-user already has a way to communicate the endianness of the guest
+via the vring endianness messages.  The vring endianness always matches
+the vnet header endianness so there is no need to do anything else in
+the backend.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/vhost-user-test.c | 38 ++++++++++++++++----------------------
- 1 file changed, 16 insertions(+), 22 deletions(-)
+ net/vhost-user.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index c3a8af3d85..93d5157b13 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -143,6 +143,8 @@ typedef struct TestServer {
-     int fds_num;
-     int fds[VHOST_MEMORY_MAX_NREGIONS];
-     VhostUserMemory memory;
-+    GMainLoop *loop;
-+    GThread *thread;
-     GMutex data_mutex;
-     GCond data_cond;
-     int log_fd;
-@@ -490,6 +492,10 @@ static TestServer *test_server_new(const gchar *name)
- {
-     TestServer *server = g_new0(TestServer, 1);
- 
-+    server->loop = g_main_loop_new(NULL, FALSE);
-+    /* run the main loop thread so the chardev may operate */
-+    server->thread = g_thread_new(NULL, thread_function, server->loop);
-+
-     server->socket_path = g_strdup_printf("%s/%s.sock", tmpfs, name);
-     server->mig_path = g_strdup_printf("%s/%s.mig", tmpfs, name);
-     server->chr_name = g_strdup_printf("chr-%s", name);
-@@ -533,9 +539,18 @@ static void test_server_listen(TestServer *server)
-     test_server_create_chr(server, ",server,nowait");
+diff --git a/net/vhost-user.c b/net/vhost-user.c
+index a39f9c9974..cd9659df87 100644
+--- a/net/vhost-user.c
++++ b/net/vhost-user.c
+@@ -172,6 +172,17 @@ static void net_vhost_user_cleanup(NetClientState *nc)
+     qemu_purge_queued_packets(nc);
  }
  
--static gboolean _test_server_free(TestServer *server)
-+static void test_server_free(TestServer *server)
- {
-     int i;
-+    int ret;
++static int vhost_user_set_vnet_endianness(NetClientState *nc,
++                                          bool enable)
++{
++    /* Nothing to do.  If the server supports
++     * VHOST_USER_PROTOCOL_F_CROSS_ENDIAN, it will get the
++     * vnet header endianness from there.  If it doesn't, negotiation
++     * fails.
++     */
++    return 0;
++}
 +
-+    /* finish the helper thread and dispatch pending sources */
-+    g_main_loop_quit(server->loop);
-+    g_thread_join(server->thread);
-+    while (g_main_context_pending(NULL)) {
-+        g_main_context_iteration (NULL, TRUE);
-+    }
-+    g_main_loop_unref(server->loop);
+ static bool vhost_user_has_vnet_hdr(NetClientState *nc)
+ {
+     assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_USER);
+@@ -193,6 +204,8 @@ static NetClientInfo net_vhost_user_info = {
+         .cleanup = net_vhost_user_cleanup,
+         .has_vnet_hdr = vhost_user_has_vnet_hdr,
+         .has_ufo = vhost_user_has_ufo,
++        .set_vnet_be = vhost_user_set_vnet_endianness,
++        .set_vnet_le = vhost_user_set_vnet_endianness,
+ };
  
-     qemu_chr_fe_deinit(&server->chr, true);
- 
-@@ -558,13 +573,6 @@ static gboolean _test_server_free(TestServer *server)
-     qpci_free_pc(server->bus);
- 
-     g_free(server);
--
--    return FALSE;
--}
--
--static void test_server_free(TestServer *server)
--{
--    g_idle_add((GSourceFunc)_test_server_free, server);
- }
- 
- static void wait_for_log_fd(TestServer *s)
-@@ -969,8 +977,6 @@ int main(int argc, char **argv)
-     const char *hugefs;
-     int ret;
-     char template[] = "/tmp/vhost-test-XXXXXX";
--    GMainLoop *loop;
--    GThread *thread;
- 
-     g_test_init(&argc, &argv, NULL);
- 
-@@ -991,10 +997,6 @@ int main(int argc, char **argv)
-         root = tmpfs;
-     }
- 
--    loop = g_main_loop_new(NULL, FALSE);
--    /* run the main loop thread so the chardev may operate */
--    thread = g_thread_new(NULL, thread_function, loop);
--
-     if (qemu_memfd_check(0)) {
-         qtest_add_data_func("/vhost-user/read-guest-mem/memfd",
-                             GINT_TO_POINTER(TEST_MEMFD_YES),
-@@ -1022,14 +1024,6 @@ int main(int argc, char **argv)
- 
-     /* cleanup */
- 
--    /* finish the helper thread and dispatch pending sources */
--    g_main_loop_quit(loop);
--    g_thread_join(thread);
--    while (g_main_context_pending(NULL)) {
--        g_main_context_iteration (NULL, TRUE);
--    }
--    g_main_loop_unref(loop);
--
-     ret = rmdir(tmpfs);
-     if (ret != 0) {
-         g_test_message("unable to rmdir: path (%s): %s\n",
+ static gboolean net_vhost_user_watch(GIOChannel *chan, GIOCondition cond,
 -- 
 2.19.1
