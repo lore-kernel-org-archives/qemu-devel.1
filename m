@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNMXx-00037Q-J2
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:39:22 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gNMad-0003r9-5T
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:42:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNMXw-0000Yk-WC
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:39:21 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41520)
+	(envelope-from <pbonzini@redhat.com>) id 1gNMaW-0001iy-Ts
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:42:06 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38591)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNMXw-0000YS-Pw
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:39:20 -0500
-Received: by mail-oi1-x241.google.com with SMTP id g188-v6so17586396oif.8
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 10:39:20 -0800 (PST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gNMaW-0001X9-Gi
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:42:00 -0500
+Received: by mail-wm1-f68.google.com with SMTP id f2-v6so18881173wme.3
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 10:41:32 -0800 (PST)
+References: <20181115143124.19234-1-pbonzini@redhat.com>
+	<20181115143124.19234-10-pbonzini@redhat.com>
+	<cc305bf4-fe14-89c0-79f3-a2051086e5f0@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <eada6127-bfc8-6cc5-08ff-77a0e10c5bad@redhat.com>
+Date: Thu, 15 Nov 2018 19:41:28 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181029155339.15280-5-richard.henderson@linaro.org>
-References: <20181029155339.15280-1-richard.henderson@linaro.org>
-	<20181029155339.15280-5-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Nov 2018 18:38:59 +0000
-Message-ID: <CAFEAcA_am7SANb_iVGJmZPfN-my501+da_ohWVvoPu392oOo9Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 4/4] target/arm: Install ASIDs for EL2
+In-Reply-To: <cc305bf4-fe14-89c0-79f3-a2051086e5f0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 09/10] vhost-user-test: small changes to
+ init_hugepagefs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,19 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, jasowang@redhat.com, mst@redhat.com
 
-On 29 October 2018 at 15:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> The VMID is the ASID for the 2nd stage page lookup.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper.c | 26 ++++++++++++++++----------
->  1 file changed, 16 insertions(+), 10 deletions(-)
+On 15/11/2018 15:55, Philippe Mathieu-Daudé wrote:
+>>
+>>       if (access(path, R_OK | W_OK | X_OK)) {
+>>           g_test_message("access on path (%s): %s\n", path,
+>> strerror(errno));
+>> +        abort();
+>>           return NULL;
+> 
+> Can we remove the 'return NULL's now?
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+I can remove them, but later on the aborts will become g_test_fail and
+the test will continue without hugepagefs.
 
-thanks
--- PMM
+Paolo
