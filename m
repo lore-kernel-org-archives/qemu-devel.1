@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <simon@ruderich.org>) id 1gNIIu-00070i-LE
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:07:33 -0500
+	(envelope-from <simon@ruderich.org>) id 1gNIIw-00072o-MT
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:07:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <simon@ruderich.org>) id 1gNIIo-0005Je-PD
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:07:32 -0500
+	(envelope-from <simon@ruderich.org>) id 1gNIIv-0005N9-83
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:07:34 -0500
 Received: from zucker2.schokokeks.org ([178.63.68.90]:51259)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1gNIIm-0005HN-MY
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:07:26 -0500
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1gNIIu-0005HN-FE
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:07:32 -0500
 From: Simon Ruderich <simon@ruderich.org>
-Date: Thu, 15 Nov 2018 15:07:13 +0100
-Message-Id: <120f15243e77b223b96ef65fe15ff4e1b31be9ca.1542290622.git.simon@ruderich.org>
+Date: Thu, 15 Nov 2018 15:07:17 +0100
+Message-Id: <0e061333411f8e64a6e53f14c4c067e5e3e1c91e.1542290622.git.simon@ruderich.org>
 In-Reply-To: <cover.1542290622.git.simon@ruderich.org>
 References: <cover.1542290622.git.simon@ruderich.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v8 2/7] cpus: convert qmp_memsave/qmp_pmemsave
- to use qemu_open
+Subject: [Qemu-devel] [PATCH v8 6/7] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +29,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: David Alan Gilbert <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Simon Ruderich <simon@ruderich.org>
 
-qemu_open() allow passing file descriptors to qemu which is used in
-restricted environments like libvirt where open() is prohibited.
+Adapted patch from Baojun Wang [1] with the following commit message:
 
-Suggested-by: Eric Blake <eblake@redhat.com>
+    I found this could be useful to have qemu-softmmu as a cross
+    debugger (launch with -s -S command line option), then if we can
+    have a command to load guest physical memory, we can use cross gdb
+    to do some target debug which gdb cannot do directly.
+
+This patch contains only the qmp changes of the original patch.
+
+pmemload is necessary to directly write physical memory which is not
+possible with gdb alone as it uses only logical addresses.
+
+The QAPI for pmemload uses "val" as parameter name for the physical
+address. This name is not very descriptive but is consistent with the
+existing pmemsave. Changing the parameter name of pmemsave is not
+possible without breaking the existing API.
+
+[1]: https://lists.gnu.org/archive/html/qemu-trivial/2014-04/msg00074.html
+
+Based-on-patch-by: Baojun Wang <wangbj@gmail.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Simon Ruderich <simon@ruderich.org>
 ---
- cpus.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ cpus.c         | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/misc.json | 20 ++++++++++++++++++
+ 2 files changed, 75 insertions(+)
 
 diff --git a/cpus.c b/cpus.c
-index e67efbb58b..c0d796f441 100644
+index ee54595733..b80f331596 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -2369,7 +2369,7 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
- void qmp_memsave(int64_t addr, int64_t size, const char *filename,
-                  bool has_cpu, int64_t cpu_index, Error **errp)
- {
--    FILE *f;
-+    int fd;
-     uint32_t l;
-     CPUState *cpu;
-     uint8_t buf[1024];
-@@ -2386,8 +2386,8 @@ void qmp_memsave(int64_t addr, int64_t size, const char *filename,
-         return;
-     }
- 
--    f = fopen(filename, "wb");
--    if (!f) {
-+    fd = qemu_open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0600);
-+    if (fd < 0) {
-         error_setg_file_open(errp, errno, filename);
-         return;
-     }
-@@ -2402,7 +2402,7 @@ void qmp_memsave(int64_t addr, int64_t size, const char *filename,
-                              " specified", orig_addr, orig_size);
-             goto exit;
-         }
--        if (fwrite(buf, 1, l, f) != l) {
-+        if (qemu_write_full(fd, buf, l) != l) {
-             error_setg(errp, QERR_IO_ERROR);
-             goto exit;
-         }
-@@ -2411,18 +2411,18 @@ void qmp_memsave(int64_t addr, int64_t size, const char *filename,
-     }
- 
- exit:
--    fclose(f);
-+    qemu_close(fd);
+@@ -2445,6 +2445,61 @@ exit:
+     qemu_close(fd);
  }
  
- void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
-                   Error **errp)
- {
--    FILE *f;
++void qmp_pmemload(int64_t addr, const char *filename,
++                  bool has_size, int64_t size,
++                  bool has_offset, int64_t offset,
++                  Error **errp)
++{
 +    int fd;
-     uint32_t l;
-     uint8_t buf[1024];
- 
--    f = fopen(filename, "wb");
--    if (!f) {
-+    fd = qemu_open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0600);
++    size_t l;
++    ssize_t r;
++    uint8_t buf[1024];
++
++    fd = qemu_open(filename, O_RDONLY | O_BINARY);
 +    if (fd < 0) {
-         error_setg_file_open(errp, errno, filename);
-         return;
-     }
-@@ -2433,7 +2433,7 @@ void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
-             l = size;
-         }
-         cpu_physical_memory_read(addr, buf, l);
--        if (fwrite(buf, 1, l, f) != l) {
-+        if (qemu_write_full(fd, buf, l) != l) {
-             error_setg(errp, QERR_IO_ERROR);
-             goto exit;
-         }
-@@ -2442,7 +2442,7 @@ void qmp_pmemsave(int64_t addr, int64_t size, const char *filename,
-     }
- 
- exit:
--    fclose(f);
++        error_setg_file_open(errp, errno, filename);
++        return;
++    }
++    if (has_offset && offset > 0) {
++        if (lseek(fd, offset, SEEK_SET) != offset) {
++            error_setg_errno(errp, errno,
++                             "could not seek to offset %" PRIx64, offset);
++            goto exit;
++        }
++    }
++    if (!has_size) {
++        struct stat s;
++        if (fstat(fd, &s)) {
++            error_setg_errno(errp, errno, "could not fstat fd to get size");
++            goto exit;
++        }
++        if (S_ISCHR(s.st_mode) || S_ISBLK(s.st_mode)) {
++            error_setg(errp, "pmemload doesn't support char/block devices");
++            goto exit;
++        }
++        size = s.st_size;
++    }
++
++    while (size != 0) {
++        l = sizeof(buf);
++        if (l > size) {
++            l = size;
++        }
++        r = read(fd, buf, l);
++        if (r <= 0) {
++            error_setg(errp, QERR_IO_ERROR);
++            goto exit;
++        }
++        l = r; /* in case of short read */
++        cpu_physical_memory_write(addr, buf, l);
++        addr += l;
++        size -= l;
++    }
++
++exit:
 +    qemu_close(fd);
- }
- 
++}
++
  void qmp_inject_nmi(Error **errp)
+ {
+     nmi_monitor_handle(monitor_get_cpu_index(), errp);
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 6c1c5c0a37..e4f39e31e5 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -1186,6 +1186,26 @@
+ { 'command': 'pmemsave',
+   'data': {'val': 'int', 'size': 'int', 'filename': 'str'} }
+ 
++##
++# @pmemload:
++#
++# Load a portion of guest physical memory from a file.
++#
++# @val: the physical address of the guest to start from
++#
++# @filename: the file to load the memory from as binary data
++#
++# @size: the size of memory region to load (defaults to whole file)
++#
++# @offset: the offset in the file to start from (defaults to 0)
++#
++# Returns: Nothing on success
++#
++# Since: 4.0
++##
++{ 'command': 'pmemload',
++  'data': {'val': 'int', 'filename': 'str', '*size': 'int', '*offset': 'int'} }
++
+ ##
+ # @cont:
+ #
 -- 
 2.19.1
