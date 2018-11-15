@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNKV5-0007G6-9U
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:28:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gNKVH-0007P1-Gs
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:28:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNKV4-00062e-Gt
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:28:15 -0500
-References: <20181115020334.1189829-1-eblake@redhat.com>
-	<20181115020334.1189829-6-eblake@redhat.com>
-	<20181115154529.GC12677@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2e484653-79f0-ee5d-9e92-1171f886b3e1@redhat.com>
-Date: Thu, 15 Nov 2018 10:28:05 -0600
+	(envelope-from <richard.henderson@linaro.org>) id 1gNKVC-00066f-6t
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:28:27 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53043)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gNKVC-00065j-0E
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:28:22 -0500
+Received: by mail-wm1-x341.google.com with SMTP id r11-v6so19374439wmb.2
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 08:28:21 -0800 (PST)
+References: <20181115143535.5885-1-peter.maydell@linaro.org>
+	<20181115143535.5885-3-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9a177b12-9618-a108-08bb-b78e71bc7b3d@linaro.org>
+Date: Thu, 15 Nov 2018 17:28:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181115154529.GC12677@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181115143535.5885-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/13] block: Switch to 64-bit
- bl.max_transfer
+Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] hw/block/onenand: use
+ qemu_log_mask() for reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Thomas Huth <thuth@redhat.com>
 
-On 11/15/18 9:45 AM, Kevin Wolf wrote:
-> Am 15.11.2018 um 03:03 hat Eric Blake geschrieben:
->> This change has no semantic impact: all drivers either leave the
->> value at 0 (no inherent 32-bit limit is still translated into
->> fragmentation below 2G; see the previous patch for that audit), or
->> set it to a value less than 2G.  However, switching to a larger
->> type and enforcing the 2G cap at the block layer makes it easier
->> to audit specific drivers for their robustness to larger sizing,
->> by letting them specify a value larger than INT_MAX if they have
->> been audited to be 64-bit clean.
->>
-
->> +++ b/block/io.c
->> @@ -159,6 +159,13 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
->>       if (drv->bdrv_refresh_limits) {
->>           drv->bdrv_refresh_limits(bs, errp);
->>       }
->> +
->> +    /* Clamp max_transfer to 2G */
->> +    if (bs->bl.max_transfer > UINT32_MAX) {
+On 11/15/18 3:35 PM, Peter Maydell wrote:
+> Update the onenand device to use qemu_log_mask() for reporting
+> guest errors and unimplemented features, rather than plain
+> fprintf() and hw_error().
 > 
-> UINT32_MAX is 4G, not 2G.
+> (We leave the hw_error() in onenand_reset(), as that is
+> triggered by a failure to read the underlying block device
+> for the bootRAM, not by guest action.)
 > 
-> Would it make more sense to make BDRV_REQUEST_MAX_BYTES the maximum
-> anyway?
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/block/onenand.c | 22 +++++++++++++---------
+>  1 file changed, 13 insertions(+), 9 deletions(-)
 
-D'oh.  Yes, that's what I intended, possibly by spelling it INT_MAX (the 
-fact that the 'if' goes away in patch 13 is not an excuse for sloppy 
-coding in the meantime).
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> Allowing higher (but not too high) explicit values than what we
-> clamp to feels a bit odd.
-> 
-> BDRV_REQUEST_MAX_BYTES is probably also what drivers really expect
-> today.
 
-Correct.  Well, at least the unaudited drivers (the rest of this series 
-audits a few drivers that can handle larger byte values).
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+r~
