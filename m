@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gNQi5-0004ve-6K
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 18:06:05 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gNQrh-0007YL-NR
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 18:16:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gNQhy-0002RG-2r
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 18:06:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59012)
+	(envelope-from <pbonzini@redhat.com>) id 1gNQre-00075z-GP
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 18:16:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34128)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gNQhx-0002Qz-UK
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 18:05:58 -0500
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 16 Nov 2018 00:05:45 +0100
-Message-Id: <20181115230546.27375-1-philmd@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gNQre-00073o-6p
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 18:15:58 -0500
+References: <20181114114400.15577-1-pbonzini@redhat.com>
+	<20181114194208.GA500@flamenco>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7648aa01-5458-bef1-9b65-f6ef83287e63@redhat.com>
+Date: Fri, 16 Nov 2018 00:15:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] hw/i2c/smbus_eeprom: Create at most
- SMBUS_EEPROM_MAX EEPROMs on a SMBus
+In-Reply-To: <20181114194208.GA500@flamenco>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] cpus: run work items for all vCPUs if
+ single-threaded
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <cminyard@mvista.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, alex.bennee@linaro.org
 
-Calling smbus_eeprom_init() with more than 8 EEPROMs would lead to a
-heap overflow.
-Replace the '8' magic number by a definition, and check no more than
-this number are created.
+On 14/11/2018 20:42, Emilio G. Cota wrote:
+> On Wed, Nov 14, 2018 at 12:44:00 +0100, Paolo Bonzini wrote:
+>> This avoids the following deadlock:
+>>
+>> 1) a thread calls run_on_cpu for CPU 2 from a timer, and single_tcg_halt_cond
+>> is signaled
+>>
+>> 2) CPU 1 is running and exits.  It finds no work item and enters CPU 2
+>>
+>> 3) because the I/O thread is stuck in run_on_cpu, the round-robin kick
+>> timer never triggers, and CPU 2 never runs the work item
+>>
+>> 4) run_on_cpu never completes
+> 
+> I'm having trouble understanding (2)->(3).
+> 
+> When the vCPU thread enters CPU 2, shouldn't it detect that work is
+> pending? As in:
+> 
+> 	/* assume cpu == cpu2 in the example above */
+> 	while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
+> 
+> Both cpu->queued_work_first and cpu->exit_request will be set for cpu2.
+> 
+> I can see though how with an additional CPU the deadlock
+> could happen. For example, the I/O thread does run_on_cpu(cpu3),
+> which kicks cpu1 (i.e. the tcg_current_rr_cpu) and cpu3, but not cpu2.
+> Then cpu1 exits, and cpu2 starts executing; unless cpu2 exits on its
+> own volition, it will run forever.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Based-on: 20181115192446.17187-1-minyard@acm.org
-"RFC v2: Fix/add vmstate handling in some I2C code"
----
- hw/i2c/smbus_eeprom.c         | 13 +++++++++++--
- include/hw/i2c/smbus_eeprom.h |  4 +++-
- 2 files changed, 14 insertions(+), 3 deletions(-)
+Yes, the thread must call run_on_cpu for CPU *3* from a timer.
 
-diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index d0a8d63869..de3a492df4 100644
---- a/hw/i2c/smbus_eeprom.c
-+++ b/hw/i2c/smbus_eeprom.c
-@@ -23,6 +23,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/boards.h"
- #include "hw/i2c/i2c.h"
-@@ -163,12 +164,20 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t a=
-ddress, uint8_t *eeprom_buf)
-     qdev_init_nofail(dev);
- }
-=20
--void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
-+void smbus_eeprom_init(I2CBus *smbus, unsigned int nb_eeprom,
-                        const uint8_t *eeprom_spd, int eeprom_spd_size)
- {
-     int i;
-+    uint8_t *eeprom_buf;
-+
-+    if (nb_eeprom > SMBUS_EEPROM_MAX) {
-+        error_report("At most %u EEPROM are supported on a SMBus.",
-+                     SMBUS_EEPROM_MAX);
-+        exit(1);
-+    }
-+
-      /* XXX: make this persistent */
--    uint8_t *eeprom_buf =3D g_malloc0(8 * SMBUS_EEPROM_SIZE);
-+    eeprom_buf =3D g_malloc0(nb_eeprom * SMBUS_EEPROM_SIZE);
-     if (eeprom_spd_size > 0) {
-         memcpy(eeprom_buf, eeprom_spd, eeprom_spd_size);
-     }
-diff --git a/include/hw/i2c/smbus_eeprom.h b/include/hw/i2c/smbus_eeprom.=
-h
-index 2f56e5dc4e..cc9d1cdba9 100644
---- a/include/hw/i2c/smbus_eeprom.h
-+++ b/include/hw/i2c/smbus_eeprom.h
-@@ -4,8 +4,10 @@
-=20
- #include "hw/i2c/i2c.h"
-=20
-+#define SMBUS_EEPROM_MAX 8
-+
- void smbus_eeprom_init_one(I2CBus *bus, uint8_t address, uint8_t *eeprom=
-_buf);
--void smbus_eeprom_init(I2CBus *bus, int nb_eeprom,
-+void smbus_eeprom_init(I2CBus *bus, unsigned int nb_eeprom,
-                        const uint8_t *eeprom_spd, int size);
-=20
- #endif
---=20
-2.17.2
+Paolo
