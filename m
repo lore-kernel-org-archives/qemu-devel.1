@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gN71D-0002hN-UE
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 21:04:33 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gN7FT-0004Dq-H5
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 21:19:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gN718-0005pS-OF
-	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 21:04:31 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Wed, 14 Nov 2018 20:03:34 -0600
-Message-Id: <20181115020334.1189829-14-eblake@redhat.com>
-In-Reply-To: <20181115020334.1189829-1-eblake@redhat.com>
-References: <20181115020334.1189829-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 13/13] block: Enforce non-zero
- bl.max_transfer
+	(envelope-from <no-reply@patchew.org>) id 1gN7FM-0005LB-Fg
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 21:19:13 -0500
+Resent-Message-Id: <E1gN7FM-0005LB-Fg@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21338)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gN7FM-0005KE-7i
+	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 21:19:08 -0500
+In-Reply-To: <154222737752.9288.484557356059052047.stgit@gimli.home>
+Message-ID: <154224832124.21.588857991620069142@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 14 Nov 2018 18:18:42 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC for-3.2 PATCH 0/7] pcie: Enhanced link speed
+ and width support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,136 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: alex.williamson@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, geoff@hostfission.com, mst@redhat.com
 
-The raw format driver and the filter drivers default to picking
-up the same limits as what they wrap, and I've audited that they
-are otherwise simple enough in their passthrough to be 64-bit
-clean; it's not worth changing their .bdrv_refresh_limits to
-advertise anything different.  Previous patches changed all
-remaining byte-based format and protocol drivers to supply an
-explicit max_transfer consistent with an audit (or lack thereof)
-of their code.  And for drivers still using sector-based
-callbacks (gluster, iscsi, parallels, qed, replication, sheepdog,
-ssh, vhdx), we can easily supply a 2G default limit while waiting
-for a later per-driver conversion and auditing while moving to
-byte-based callbacks.
-
-With that, we can assert that max_transfer is now always set (either
-by sector-based default, by merge with a backing layer, or by
-explicit settings), and enforce that it be non-zero by the end
-of bdrv_refresh_limits().  This in turn lets us simplify portions
-of the block layer to use MIN() instead of MIN_NON_ZERO(), while
-still fragmenting things to no larger than 2G chunks.  Also, we no
-longer need to rewrite the driver's bl.max_transfer to a value below
-2G.  There should be no semantic change from this patch, although
-it does open the door if a future patch wants to let the block layer
-choose a larger value than 2G while still honoring bl.max_transfer
-for fragmentation.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
-
-[hmm - in sending this email, I realize that I didn't specifically
-check whether quorum always picks up a sane limit from its children,
-since it is byte-based but lacks a .bdrv_refresh_limits]
-
- include/block/block_int.h | 10 +++++-----
- block/io.c                | 25 ++++++++++++-------------
- 2 files changed, 17 insertions(+), 18 deletions(-)
-
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index b19d94dac5f..410553bb0cc 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -548,11 +548,11 @@ typedef struct BlockLimits {
-     uint32_t opt_transfer;
-
-     /* Maximal transfer length in bytes.  Need not be power of 2, but
--     * must be multiple of opt_transfer and bl.request_alignment, or 0
--     * for no 32-bit limit.  The block layer fragments all actions
--     * below 2G, so setting this value to anything larger than INT_MAX
--     * implies that the driver has been audited for 64-bit
--     * cleanness. */
-+     * must be larger than opt_transfer and request_alignment (the
-+     * block layer rounds it down as needed).  The block layer
-+     * fragments all actions below 2G, so setting this value to
-+     * anything larger than INT_MAX implies that the driver has been
-+     * audited for 64-bit cleanness. */
-     uint64_t max_transfer;
-
-     /* memory alignment, in bytes so that no bounce buffer is needed */
-diff --git a/block/io.c b/block/io.c
-index 4911a1123eb..0024be0bf31 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -129,6 +129,9 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
-     /* Default alignment based on whether driver has byte interface */
-     bs->bl.request_alignment = (drv->bdrv_co_preadv ||
-                                 drv->bdrv_aio_preadv) ? 1 : 512;
-+    /* Default cap at 2G for drivers without byte interface */
-+    if (bs->bl.request_alignment == 1)
-+        bs->bl.max_transfer = BDRV_REQUEST_MAX_BYTES;
-
-     /* Take some limits from the children as a default */
-     if (bs->file) {
-@@ -160,12 +163,11 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
-         drv->bdrv_refresh_limits(bs, errp);
-     }
-
--    /* Clamp max_transfer to 2G */
--    if (bs->bl.max_transfer > UINT32_MAX) {
--        bs->bl.max_transfer = QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
--                                              MAX(bs->bl.opt_transfer,
--                                                  bs->bl.request_alignment));
--    }
-+    /* Check that we got a maximum cap, and round it down as needed */
-+    assert(bs->bl.max_transfer);
-+    bs->bl.max_transfer = QEMU_ALIGN_DOWN(bs->bl.max_transfer,
-+                                          MAX(bs->bl.opt_transfer,
-+                                              bs->bl.request_alignment));
- }
-
- /**
-@@ -1145,8 +1147,7 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
-     int64_t cluster_bytes;
-     size_t skip_bytes;
-     int ret;
--    int max_transfer = MIN_NON_ZERO(bs->bl.max_transfer,
--                                    BDRV_REQUEST_MAX_BYTES);
-+    int max_transfer = MIN(bs->bl.max_transfer, BDRV_REQUEST_MAX_BYTES);
-     unsigned int progress = 0;
-
-     if (!drv) {
-@@ -1286,8 +1287,7 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
-     assert((bytes & (align - 1)) == 0);
-     assert(!qiov || bytes == qiov->size);
-     assert((bs->open_flags & BDRV_O_NO_IO) == 0);
--    max_transfer = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
--                                   align);
-+    max_transfer = QEMU_ALIGN_DOWN(MIN(bs->bl.max_transfer, INT_MAX), align);
-
-     /* TODO: We would need a per-BDS .supported_read_flags and
-      * potential fallback support, if we ever implement any read flags
-@@ -1460,7 +1460,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
-     int max_write_zeroes = MIN_NON_ZERO(bs->bl.max_pwrite_zeroes, INT_MAX);
-     int alignment = MAX(bs->bl.pwrite_zeroes_alignment,
-                         bs->bl.request_alignment);
--    int max_transfer = MIN_NON_ZERO(bs->bl.max_transfer, MAX_BOUNCE_BUFFER);
-+    int max_transfer = MIN(bs->bl.max_transfer, MAX_BOUNCE_BUFFER);
-
-     if (!drv) {
-         return -ENOMEDIUM;
-@@ -1668,8 +1668,7 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     assert((offset & (align - 1)) == 0);
-     assert((bytes & (align - 1)) == 0);
-     assert(!qiov || bytes == qiov->size);
--    max_transfer = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
--                                   align);
-+    max_transfer = QEMU_ALIGN_DOWN(MIN(bs->bl.max_transfer, INT_MAX), align);
-
-     ret = bdrv_co_write_req_prepare(child, offset, bytes, req, flags);
-
--- 
-2.17.2
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTU0
+MjIyNzM3NzUyLjkyODguNDg0NTU3MzU2MDU5MDUyMDQ3LnN0Z2l0QGdpbWxpLmhvbWUKVHlwZTog
+c2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIGZvci0zLjIgUEFUQ0ggMC83XSBwY2ll
+OiBFbmhhbmNlZCBsaW5rIHNwZWVkIGFuZCB3aWR0aCBzdXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9u
+ZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9n
+IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAg
+ICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0
+PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Njcmlw
+dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAg
+ICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVT
+VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
+ZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmE1OTJmNTIgdmZpby9w
+Y2k6IFJlbW92ZSBQQ0llIExpbmsgU3RhdHVzIGVtdWxhdGlvbgplZTQ2NmVhIHBjaWU6IEFsbG93
+IGdlbmVyaWMgUENJZSByb290IHBvcnQgdG8gc3BlY2lmeSBsaW5rIHNwZWVkIGFuZCB3aWR0aAo3
+ZDI0MmJkIHBjaWU6IEZpbGwgUENJRVNsb3QgbGluayBmaWVsZHMgdG8gc3VwcG9ydCBoaWdoZXIg
+c3BlZWRzIGFuZCB3aWR0aHMKMjRhODU2OCBwY2llOiBBZGQgbGluayBzcGVlZCBhbmQgd2lkdGgg
+ZmllbGRzIHRvIFBDSUVTbG90CjgyNmM0MDQgcWFwaTogRGVmaW5lIFBDSWUgbGluayBzcGVlZCBh
+bmQgd2lkdGggcHJvcGVydGllcwpkZDY3ZDJlIHBjaTogU3luYyBQQ0llIGRvd25zdHJlYW0gcG9y
+dCBMTktTVEEgb24gcmVhZAo5YWVhMDMwIHBjaWU6IENyZWF0ZSBlbnVtcyBmb3IgbGluayBzcGVl
+ZCBhbmQgd2lkdGgKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNzogcGNp
+ZTogQ3JlYXRlIGVudW1zIGZvciBsaW5rIHNwZWVkIGFuZCB3aWR0aC4uLgpDaGVja2luZyBQQVRD
+SCAyLzc6IHBjaTogU3luYyBQQ0llIGRvd25zdHJlYW0gcG9ydCBMTktTVEEgb24gcmVhZC4uLgpF
+UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MTogRklMRTogaHcvcGNp
+L3BjaS5jOjEzNTg6CiteSXBjaWVfc3luY19icmlkZ2VfbG5rKGQpOyQKCnRvdGFsOiAxIGVycm9y
+cywgMCB3YXJuaW5ncywgODEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
+YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
+b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
+IE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy83OiBxYXBpOiBEZWZpbmUgUENJZSBsaW5r
+IHNwZWVkIGFuZCB3aWR0aCBwcm9wZXJ0aWVzLi4uCkNoZWNraW5nIFBBVENIIDQvNzogcGNpZTog
+QWRkIGxpbmsgc3BlZWQgYW5kIHdpZHRoIGZpZWxkcyB0byBQQ0lFU2xvdC4uLgpDaGVja2luZyBQ
+QVRDSCA1Lzc6IHBjaWU6IEZpbGwgUENJRVNsb3QgbGluayBmaWVsZHMgdG8gc3VwcG9ydCBoaWdo
+ZXIgc3BlZWRzIGFuZCB3aWR0aHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNi83OiBwY2llOiBBbGxvdyBn
+ZW5lcmljIFBDSWUgcm9vdCBwb3J0IHRvIHNwZWNpZnkgbGluayBzcGVlZCBhbmQgd2lkdGguLi4K
+Q2hlY2tpbmcgUEFUQ0ggNy83OiB2ZmlvL3BjaTogUmVtb3ZlIFBDSWUgTGluayBTdGF0dXMgZW11
+bGF0aW9uLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
+ZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
+cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
+ZXZlbEByZWRoYXQuY29t
