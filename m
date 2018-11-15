@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gNEBG-0007r5-If
+	(envelope-from <luc.michel@greensocs.com>) id 1gNEBG-0007r7-J9
 	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:43:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gNEBE-00053L-3z
+	(envelope-from <luc.michel@greensocs.com>) id 1gNEBE-00053Q-8i
 	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:43:22 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Thu, 15 Nov 2018 10:42:02 +0100
-Message-Id: <20181115094207.22846-12-luc.michel@greensocs.com>
+Date: Thu, 15 Nov 2018 10:41:58 +0100
+Message-Id: <20181115094207.22846-8-luc.michel@greensocs.com>
 In-Reply-To: <20181115094207.22846-1-luc.michel@greensocs.com>
 References: <20181115094207.22846-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 11/16] gdbstub: add support for extended
- mode packet
+Subject: [Qemu-devel] [PATCH v6 07/16] gdbstub: add multiprocess support to
+ (f|s)ThreadInfo and ThreadExtraInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +26,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Add support for the '!' extended mode packet. This is required for the
-multiprocess extension.
+Change the thread info related packets handling to support multiprocess
+extension.
+
+Add the CPUs class name in the extra info to help differentiate
+them in multiprocess mode.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- gdbstub.c | 3 +++
- 1 file changed, 3 insertions(+)
+ gdbstub.c | 35 +++++++++++++++++++++++++----------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index eec1cf0d09..ada53ac559 100644
+index d19b0137e8..292dee8914 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1294,10 +1294,13 @@ static int gdb_handle_packet(GDBState *s, const c=
+@@ -1260,11 +1260,10 @@ out:
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
+     CPUClass *cc;
+     const char *p;
+-    uint32_t thread;
+     uint32_t pid, tid;
+     int ch, reg_size, type, res;
+     uint8_t mem_buf[MAX_PACKET_LENGTH];
+     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+     char thread_id[16];
+@@ -1556,30 +1555,46 @@ static int gdb_handle_packet(GDBState *s, const c=
 har *line_buf)
-     trace_gdbstub_io_command(line_buf);
-=20
-     p =3D line_buf;
-     ch =3D *p++;
-     switch(ch) {
-+    case '!':
-+        put_packet(s, "OK");
-+        break;
-     case '?':
-         /* TODO: Make this return the correct value for user-mode.  */
-         snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
-                  gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread=
-_id)));
-         put_packet(s, buf);
+             snprintf(buf, sizeof(buf), "QC%s",
+                      gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_=
+id)));
+             put_packet(s, buf);
+             break;
+         } else if (strcmp(p,"fThreadInfo") =3D=3D 0) {
+-            s->query_cpu =3D first_cpu;
++            s->query_cpu =3D gdb_first_cpu(s);
+             goto report_cpuinfo;
+         } else if (strcmp(p,"sThreadInfo") =3D=3D 0) {
+         report_cpuinfo:
+             if (s->query_cpu) {
+-                snprintf(buf, sizeof(buf), "m%x", cpu_gdb_index(s->query=
+_cpu));
++                snprintf(buf, sizeof(buf), "m%s",
++                         gdb_fmt_thread_id(s, s->query_cpu,
++                                       thread_id, sizeof(thread_id)));
+                 put_packet(s, buf);
+-                s->query_cpu =3D CPU_NEXT(s->query_cpu);
++                s->query_cpu =3D gdb_next_cpu(s, s->query_cpu);
+             } else
+                 put_packet(s, "l");
+             break;
+         } else if (strncmp(p,"ThreadExtraInfo,", 16) =3D=3D 0) {
+-            thread =3D strtoull(p+16, (char **)&p, 16);
+-            cpu =3D find_cpu(thread);
++            if (read_thread_id(p + 16, &p, &pid, &tid) =3D=3D GDB_READ_T=
+HREAD_ERR) {
++                put_packet(s, "E22");
++                break;
++            }
++            cpu =3D gdb_get_cpu(s, pid, tid);
+             if (cpu !=3D NULL) {
+                 cpu_synchronize_state(cpu);
+-                /* memtohex() doubles the required space */
+-                len =3D snprintf((char *)mem_buf, sizeof(buf) / 2,
+-                               "CPU#%d [%s]", cpu->cpu_index,
+-                               cpu->halted ? "halted " : "running");
++
++                if (s->multiprocess && (s->process_num > 1)) {
++                    /* Print the CPU model in multiprocess mode */
++                    ObjectClass *oc =3D object_get_class(OBJECT(cpu));
++                    const char *cpu_model =3D object_class_get_name(oc);
++                    len =3D snprintf((char *)mem_buf, sizeof(buf) / 2,
++                                   "CPU#%d %s [%s]", cpu->cpu_index,
++                                   cpu_model,
++                                   cpu->halted ? "halted " : "running");
++                } else {
++                    /* memtohex() doubles the required space */
++                    len =3D snprintf((char *)mem_buf, sizeof(buf) / 2,
++                                   "CPU#%d [%s]", cpu->cpu_index,
++                                   cpu->halted ? "halted " : "running");
++                }
+                 trace_gdbstub_op_extra_info((char *)mem_buf);
+                 memtohex(buf, mem_buf, len);
+                 put_packet(s, buf);
+             }
+             break;
 --=20
 2.19.1
