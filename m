@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNFdd-0002I6-0V
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:16:45 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gNFjJ-0003iV-Vj
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:22:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNFdb-0006u9-8a
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:16:44 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37920)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNFdZ-0006sK-EA
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:16:43 -0500
-Received: by mail-oi1-x243.google.com with SMTP id a77so10492518oii.5
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 03:16:37 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1gNFjC-0002BC-IT
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:22:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gNFjA-00029H-LR
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:22:30 -0500
+Date: Thu, 15 Nov 2018 12:21:55 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181115122155.7a15df7d.cohuck@redhat.com>
+In-Reply-To: <20181114233831.10374-1-ehabkost@redhat.com>
+References: <20181114233831.10374-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181114101610.26854-1-cohuck@redhat.com>
-References: <20181114101610.26854-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Nov 2018 11:16:16 +0000
-Message-ID: <CAFEAcA9ABQyqCcne_33QF3H7qegqBUhLzOZvsib7jnPtzDNz5w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL for-3.1 0/1] bugfix for s390x
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] virtio: Provide
+ version-specific variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +27,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Andrea Bolognani <abologna@redhat.com>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P.
+	=?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-On 14 November 2018 at 10:16, Cornelia Huck <cohuck@redhat.com> wrote:
-> The following changes since commit 6ff144698935e8bdbc96d255cf49b1a7d54174ac:
->
->   Merge remote-tracking branch 'remotes/mdroth/tags/qga-pull-2018-11-12-tag' into staging (2018-11-13 12:32:30 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/cohuck/qemu tags/s390x-20181114
->
-> for you to fetch changes up to b6e67ecc7b6e8938982ab94820c079f24845f623:
->
->   s390x/pci: properly fail if the zPCI device cannot be created (2018-11-13 16:46:55 +0100)
->
-> ----------------------------------------------------------------
-> Fix error handling during zpci device creation.
->
-> ----------------------------------------------------------------
->
-> David Hildenbrand (1):
->   s390x/pci: properly fail if the zPCI device cannot be created
->
->  hw/s390x/s390-pci-bus.c | 25 +++++++++++++++++++------
->  1 file changed, 19 insertions(+), 6 deletions(-)
->
+On Wed, 14 Nov 2018 21:38:31 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Applied, thanks.
+> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+> index 813082b0d7..1d2a11504f 100644
+> --- a/hw/virtio/virtio-pci.h
+> +++ b/hw/virtio/virtio-pci.h
 
--- PMM
+(...)
+
+> +/**
+> + * VirtioPCIDeviceTypeInfo:
+> + *
+> + * Template for virtio PCI device types.  See virtio_pci_types_register()
+> + * for details.
+> + */
+> +typedef struct VirtioPCIDeviceTypeInfo {
+> +    /* Prefix for the class names */
+> +    const char *name_prefix;
+
+<bikeshed>Maybe call this the vpci_name instead? It's not really a
+prefix in the way I would usually use the term, but rather a type name
+with a possible suffix tacked onto it.</bikeshed>
+
+> +    /* Parent type.  If NULL, TYPE_VIRTIO_PCI is used */
+> +    const char *parent;
+> +    /* If modern_only is true, only <name_prefix> type will be registered */
+> +    bool modern_only;
+> +
+> +    /* Same as TypeInfo fields: */
+> +    size_t instance_size;
+> +    void (*instance_init)(Object *obj);
+> +    void (*class_init)(ObjectClass *klass, void *data);
+> +} VirtioPCIDeviceTypeInfo;
+> +
+> +/*
+> + * Register virtio-pci types.  Each virtio-pci device type will be available
+> + * in 3 flavors:
+> + * - <prefix>-transitional: modern device supporting legacy drivers
+> + *   - Supports Conventional PCI buses only
+> + * - <prefix>-non-transitional: modern-only
+> + *   - Supports Conventional PCI and PCI Express buses
+> + * - <prefix>: virtio version configurable, legacy driver support
+> + *                  automatically selected when device is plugged
+> + *   _ This was the only flavor supported until QEMU 3.1
+
+s/_/-/
+s/until/up to/ ?
+
+> + *   - Supports Conventional PCI and PCI Express buses
+> + *
+> + * All the types above will inherit from "<prefix>-base", so generic
+> + * code can use "<prefix>-base" on type casts.
+> + *
+> + * We need a separate "<prefix>-base" type instead of making all types inherit
+> + * from <prefix> for two reasons:
+> + * 1) <prefix> will implement INTERFACE_PCIE_DEVICE, but
+> + *    <prefix>-transitional won't.
+> + * 2) <prefix> will have the "disable-legacy" and "disable-modern" properties,
+> + *    <prefix>-transitional and <prefix>-non-transitional won't.
+
+<bikeshed>I'd formulate this rather as "x implements/has something, y
+and z do not", as the code actually does that (and does not just intend
+to do so :)</bikeshed>
+
+> + */
+> +void virtio_pci_types_register(const VirtioPCIDeviceTypeInfo *t);
+> +
+>  #endif
+
+(...)
+
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index a954799267..0fa248d68c 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+
+(...)
+
+> +static void virtio_pci_1_0_instance_init(Object *obj)
+
+Ditch the _0? I don't expect this to change the name when virtio 1.1
+arrives.
+
+> +{
+> +    VirtIOPCIProxy *proxy = VIRTIO_PCI(obj);
+> +
+> +    proxy->disable_legacy = ON_OFF_AUTO_ON;
+> +    proxy->disable_modern = false;
+> +}
+
+(...)
+
+After a quick look, this seems fine; have not actually tried to run it
+yet.
