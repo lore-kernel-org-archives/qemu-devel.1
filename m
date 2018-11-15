@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gNNoe-0003Qf-Q9
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 15:00:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1gNOQe-0004VK-6U
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 15:39:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gNNoS-0007gr-34
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 15:00:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48430)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gNNoG-0007Ul-EP
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 15:00:20 -0500
-Date: Thu, 15 Nov 2018 20:00:00 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181115200000.GF2321@work-vm>
-References: <20181115154639.29949-1-dgilbert@redhat.com>
-	<CAJ+F1CJq7VHKTJw-OKYoEdwaZJWS9v-v8ENkEWLByZAWYNOZZw@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1gNOQd-0004kJ-Bp
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 15:39:56 -0500
+References: <20181105163744.25139-1-kwolf@redhat.com>
+	<20181105163744.25139-30-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <05732a1e-9ed2-69da-8e9a-4ac793d8a4b4@redhat.com>
+Date: Thu, 15 Nov 2018 14:39:39 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CJq7VHKTJw-OKYoEdwaZJWS9v-v8ENkEWLByZAWYNOZZw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 3.1] x86: Add 3.1 machine types
+In-Reply-To: <20181105163744.25139-30-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 29/36] qemu-iotests: Test auto-read-only
+ with -drive and -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,139 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
-> On Thu, Nov 15, 2018 at 7:47 PM Dr. David Alan Gilbert (git)
-> <dgilbert@redhat.com> wrote:
-> >
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > x86 doesn't need a 3.1 machine type, because there's no incompatibili=
-ty,
-> > but it looks odd not having one, especially since s390, ppc and ARM h=
-ave
-> > it.  Join the party.
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
->=20
-> I sent same patch already reviewed by Michael a few weeks ago:
-> https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg06574.html
+On 11/5/18 10:37 AM, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>   tests/qemu-iotests/232     | 147 +++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/232.out |  59 +++++++++++++++
+>   tests/qemu-iotests/group   |   1 +
+>   3 files changed, 207 insertions(+)
+>   create mode 100755 tests/qemu-iotests/232
+>   create mode 100644 tests/qemu-iotests/232.out
+> 
+> diff --git a/tests/qemu-iotests/232 b/tests/qemu-iotests/232
+> new file mode 100755
+> index 0000000000..bc2972d124
+> --- /dev/null
+> +++ b/tests/qemu-iotests/232
+> @@ -0,0 +1,147 @@
+> +#!/bin/bash
+> +#
+> +# Test for auto-read-only
 
-OK, the problem is it's buried in the middle of a big series; can we
-just take either this version or your version for 3.1?
+This breaks './check -luks 232':
 
-> > ---
-> >  hw/i386/pc_piix.c    | 15 ++++++++++++---
-> >  hw/i386/pc_q35.c     | 13 +++++++++++--
-> >  include/hw/i386/pc.h |  3 +++
-> >  3 files changed, 26 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > index dc09466b3e..7092d6d13f 100644
-> > --- a/hw/i386/pc_piix.c
-> > +++ b/hw/i386/pc_piix.c
-> > @@ -428,21 +428,30 @@ static void pc_i440fx_machine_options(MachineCl=
-ass *m)
-> >      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
-> >  }
-> >
-> > -static void pc_i440fx_3_0_machine_options(MachineClass *m)
-> > +static void pc_i440fx_3_1_machine_options(MachineClass *m)
-> >  {
-> >      pc_i440fx_machine_options(m);
-> >      m->alias =3D "pc";
-> >      m->is_default =3D 1;
-> >  }
-> >
-> > +DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
-> > +                      pc_i440fx_3_1_machine_options);
-> > +
-> > +static void pc_i440fx_3_0_machine_options(MachineClass *m)
-> > +{
-> > +    pc_i440fx_3_1_machine_options(m);
-> > +    m->is_default =3D 0;
-> > +    m->alias =3D NULL;
-> > +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-> > +}
-> > +
-> >  DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
-> >                        pc_i440fx_3_0_machine_options);
-> >
-> >  static void pc_i440fx_2_12_machine_options(MachineClass *m)
-> >  {
-> >      pc_i440fx_3_0_machine_options(m);
-> > -    m->is_default =3D 0;
-> > -    m->alias =3D NULL;
-> >      SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
-> >  }
-> >
-> > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> > index 532241e3f8..6799b3e553 100644
-> > --- a/hw/i386/pc_q35.c
-> > +++ b/hw/i386/pc_q35.c
-> > @@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass=
- *m)
-> >      m->max_cpus =3D 288;
-> >  }
-> >
-> > -static void pc_q35_3_0_machine_options(MachineClass *m)
-> > +static void pc_q35_3_1_machine_options(MachineClass *m)
-> >  {
-> >      pc_q35_machine_options(m);
-> >      m->alias =3D "q35";
-> >  }
-> >
-> > +DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
-> > +                    pc_q35_3_1_machine_options);
-> > +
-> > +static void pc_q35_3_0_machine_options(MachineClass *m)
-> > +{
-> > +    pc_q35_3_1_machine_options(m);
-> > +    m->alias =3D NULL;
-> > +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-> > +}
-> > +
-> >  DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
-> >                      pc_q35_3_0_machine_options);
-> >
-> >  static void pc_q35_2_12_machine_options(MachineClass *m)
-> >  {
-> >      pc_q35_3_0_machine_options(m);
-> > -    m->alias =3D NULL;
-> >      SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
-> >  }
-> >
-> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > index 136fe497b6..c37d4333a0 100644
-> > --- a/include/hw/i386/pc.h
-> > +++ b/include/hw/i386/pc.h
-> > @@ -294,6 +294,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
-> >  int e820_get_num_entries(void);
-> >  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> >
-> > +#define PC_COMPAT_3_1 \
-> > +    HW_COMPAT_3_1
->=20
-> you shouldn't need that, right?
+@@ -3,57 +3,60 @@
 
-Oops, true, that's for next time around.
+  === -drive with read-write image: read-only/auto-read-only 
+combinations ===
 
-Dave
+-NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+-NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+-NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+-
+-NODE_NAME: TEST_DIR/t.IMGFMT (file)
+-NODE_NAME: TEST_DIR/t.IMGFMT (file)
+-NODE_NAME: TEST_DIR/t.IMGFMT (file)
+-
+-NODE_NAME: TEST_DIR/t.IMGFMT (file)
+-NODE_NAME: TEST_DIR/t.IMGFMT (file)
+-NODE_NAME: TEST_DIR/t.IMGFMT (file)
++QEMU_PROG: -drive 
+driver=file,file=driver=IMGFMT,key-secret=keysec0,file.filename=TEST_DIR/t.IMGFMT,if=none,read-only=on,auto-read-only=off: 
+Could not open 'driver=IMGFMT': No such file or directory
++QEMU_PROG: -drive 
+driver=file,file=driver=IMGFMT,key-secret=keysec0,file.filename=TEST_DIR/t.IMGFMT,if=none,read-only=on,auto-read-only=on: 
+Could not open 'driver=IMGFMT': No such file or directory
 
-> > +
-> >  #define PC_COMPAT_3_0 \
-> >      HW_COMPAT_3_0 \
-> >      {\
-> > --
-> > 2.19.1
-> >
-> >
->=20
->=20
-> --=20
-> Marc-Andr=E9 Lureau
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+...
+
+I know that for LUKS, you have to use --image-opts, which would require 
+some rewrites of the commands you are testing; so maybe the best thing 
+is to just blacklist this test from running on LUKS?
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
