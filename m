@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNJsj-0000Bw-M0
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 10:48:38 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gNK50-00038P-3E
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:01:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNJsf-0003UQ-VI
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 10:48:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56477)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gNK4s-0000yF-TD
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:01:15 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:35879 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gNJsf-0003Tv-PP
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 10:48:33 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 29381307D856
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 15:48:33 +0000 (UTC)
-References: <cover.1542294676.git.eskultet@redhat.com>
-	<85078eacaa4ba2c83f0ff25387a664dcccb65308.1542294676.git.eskultet@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <12a0dadf-8f39-5c38-abcf-30102fb670b7@redhat.com>
-Date: Thu, 15 Nov 2018 09:48:27 -0600
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gNK4m-0000GQ-24
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 11:01:06 -0500
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Thu, 15 Nov 2018 16:59:43 +0100
+Message-Id: <1542297583-6494-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-In-Reply-To: <85078eacaa4ba2c83f0ff25387a664dcccb65308.1542294676.git.eskultet@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] qapi: Add "rendernode" display option
- for egl-headless
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: Add Stefan Markovic as a MIPS
+ reviewer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,58 +26,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Erik Skultety <eskultet@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com
 
-On 11/15/18 9:15 AM, Erik Skultety wrote:
-> Unlike SPICE, egl-headless doesn't offer a way of specifying the DRM
-> node used for OpenGL, hence QEMU always selecting the first one that is
-> available. Thus, add rendernode option to QAPI.
-> 
-> Signed-off-by: Erik Skultety <eskultet@redhat.com>
-> ---
->   qapi/ui.json | 16 +++++++++++++++-
->   1 file changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qapi/ui.json b/qapi/ui.json
-> index bf9e157d5a..7ecc6eb67e 100644
-> --- a/qapi/ui.json
-> +++ b/qapi/ui.json
-> @@ -1037,6 +1037,19 @@
->     'data'    : { '*grab-on-hover' : 'bool',
->                   '*zoom-to-fit'   : 'bool'  } }
->   
-> +##
-> +# @DisplayEGLHeadless:
-> +#
-> +# EGL headless display options.
-> +#
-> +# @rendernode: Which DRM render node should be used.
-> +#
-> +# Since: 3.2
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Either 3.1 or 4.0, depending on whether this is okay this late after 
-soft freeze.  Worth mentioning that rendernode defaults to the first 
-available node?
+Add Stefan Markovic as a MIPS reviewer. He had several key
+contributions to QEMU for MIPS this year. He is a meticulous
+person with the ability to think and act on many levels.
 
-> +#
-> +##
-> +{ 'struct'  : 'DisplayEGLHeadless',
-> +  'data'    : { '*rendernode' : 'str' } }
-> +
->    ##
->    # @DisplayGLMode:
->    #
-> @@ -1086,4 +1099,5 @@
->                   '*window-close'  : 'bool',
->                   '*gl'            : 'DisplayGLMode' },
->     'discriminator' : 'type',
-> -  'data'    : { 'gtk'            : 'DisplayGTK' } }
-> +  'data'    : { 'gtk'            : 'DisplayGTK',
-> +                'egl-headless'   : 'DisplayEGLHeadless'} }
-> 
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ MAINTAINERS | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4b8db61..f718264 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -190,6 +190,7 @@ F: disas/microblaze.c
+ MIPS
+ M: Aurelien Jarno <aurelien@aurel32.net>
+ M: Aleksandar Markovic <amarkovic@wavecomp.com>
++R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: target/mips/
+ F: hw/mips/
+@@ -336,6 +337,7 @@ F: target/arm/kvm.c
+=20
+ MIPS
+ M: James Hogan <jhogan@kernel.org>
++R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: target/mips/kvm.c
+=20
+@@ -741,27 +743,32 @@ MIPS Machines
+ -------------
+ Jazz
+ M: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
++R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: hw/mips/mips_jazz.c
+=20
+ Malta
+ M: Aurelien Jarno <aurelien@aurel32.net>
++R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: hw/mips/mips_malta.c
+=20
+ Mipssim
+ M: Aleksandar Markovic <amarkovic@wavecomp.com>
++R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Odd Fixes
+ F: hw/mips/mips_mipssim.c
+ F: hw/net/mipsnet.c
+=20
+ R4000
+ M: Aurelien Jarno <aurelien@aurel32.net>
++R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: hw/mips/mips_r4k.c
+=20
+ Fulong 2E
+ M: Aleksandar Markovic <amarkovic@wavecomp.com>
++R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Odd Fixes
+ F: hw/mips/mips_fulong2e.c
+ F: hw/isa/vt82c686.c
+@@ -770,6 +777,7 @@ F: include/hw/isa/vt82c686.h
+=20
+ Boston
+ M: Paul Burton <pburton@wavecomp.com>
++R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: hw/core/loader-fit.c
+ F: hw/mips/boston.c
+@@ -1992,6 +2000,7 @@ F: disas/i386.c
+=20
+ MIPS target
+ M: Aurelien Jarno <aurelien@aurel32.net>
++R: Stefan Markovic <smarkovic@wavecomp.com>
+ S: Maintained
+ F: tcg/mips/
+ F: disas/mips.c
+--=20
+2.7.4
