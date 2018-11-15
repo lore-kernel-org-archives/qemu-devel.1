@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQD9-0005Fo-5Y
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:34:10 -0500
+	(envelope-from <philmd@redhat.com>) id 1gNQDI-0005Jk-1d
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:34:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQD6-0003Ov-0w
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:34:07 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 15 Nov 2018 22:34:00 +0000
-Message-ID: <35d983dbea36b3d8af70cc0055fc4136b476ace5.1542321076.git.alistair.francis@wdc.com>
-References: <cover.1542321076.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1542321076.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <philmd@redhat.com>) id 1gNQDE-0003Sv-Pg
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:34:15 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gNQDE-0003SQ-KL
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:34:12 -0500
+Received: by mail-wr1-f65.google.com with SMTP id e3-v6so22910756wrs.5
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 14:34:12 -0800 (PST)
+References: <20181115192446.17187-1-minyard@acm.org>
+	<20181115192446.17187-11-minyard@acm.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6a655849-76ea-de14-11fb-8642c7f5bc54@redhat.com>
+Date: Thu, 15 Nov 2018 23:34:10 +0100
 MIME-Version: 1.0
-Subject: [Qemu-devel] [RFC v1 01/23] elf.h: Add the RISCV ELF magic numbers
+In-Reply-To: <20181115192446.17187-11-minyard@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/12] i2c: Add a size constant for the
+ smbus_eeprom size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: minyard@acm.org, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Corey Minyard <cminyard@mvista.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
----
- include/elf.h | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+On 15/11/18 20:24, minyard@acm.org wrote:
+> From: Corey Minyard <cminyard@mvista.com>
+> 
+> It was hard-coded to 256 in a number of places, create a constant
+> for that.
+> 
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> ---
+>   hw/i2c/smbus_eeprom.c | 10 +++++++---
+>   1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+> index 8d4eed129f..8e9b734c09 100644
+> --- a/hw/i2c/smbus_eeprom.c
+> +++ b/hw/i2c/smbus_eeprom.c
+> @@ -35,6 +35,8 @@
+>   #define SMBUS_EEPROM(obj) \
+>       OBJECT_CHECK(SMBusEEPROMDevice, (obj), TYPE_SMBUS_EEPROM)
+>   
+> +#define SMBUS_EEPROM_SIZE 256
+> +
+>   typedef struct SMBusEEPROMDevice {
+>       SMBusDevice smbusdev;
+>       void *data;
+> @@ -70,7 +72,7 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+>   
+>       for (; len > 0; len--) {
+>           data[eeprom->offset] = *buf++;
+> -        eeprom->offset = (eeprom->offset + 1) % 256;
+> +        eeprom->offset = (eeprom->offset + 1) % SMBUS_EEPROM_SIZE;
+>       }
+>   
+>       return 0;
+> @@ -129,12 +131,14 @@ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
+>                          const uint8_t *eeprom_spd, int eeprom_spd_size)
+>   {
+>       int i;
+> -    uint8_t *eeprom_buf = g_malloc0(8 * 256); /* XXX: make this persistent */
+> +     /* XXX: make this persistent */
+> +    uint8_t *eeprom_buf = g_malloc0(8 * SMBUS_EEPROM_SIZE);
 
-diff --git a/include/elf.h b/include/elf.h
-index c151164b63..0ac7911b7b 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -1338,6 +1338,61 @@ typedef struct {
- #define R_IA64_DTPREL64LSB	0xb7	/* @dtprel(sym + add), data8 LSB */
- #define R_IA64_LTOFF_DTPREL22	0xba	/* @ltoff(@dtprel(s+a)), imm22 */
-=20
-+/* RISC-V relocations.  */
-+#define R_RISCV_NONE          0
-+#define R_RISCV_32            1
-+#define R_RISCV_64            2
-+#define R_RISCV_RELATIVE      3
-+#define R_RISCV_COPY          4
-+#define R_RISCV_JUMP_SLOT     5
-+#define R_RISCV_TLS_DTPMOD32  6
-+#define R_RISCV_TLS_DTPMOD64  7
-+#define R_RISCV_TLS_DTPREL32  8
-+#define R_RISCV_TLS_DTPREL64  9
-+#define R_RISCV_TLS_TPREL32   10
-+#define R_RISCV_TLS_TPREL64   11
-+#define R_RISCV_BRANCH        16
-+#define R_RISCV_JAL           17
-+#define R_RISCV_CALL          18
-+#define R_RISCV_CALL_PLT      19
-+#define R_RISCV_GOT_HI20      20
-+#define R_RISCV_TLS_GOT_HI20  21
-+#define R_RISCV_TLS_GD_HI20   22
-+#define R_RISCV_PCREL_HI20    23
-+#define R_RISCV_PCREL_LO12_I  24
-+#define R_RISCV_PCREL_LO12_S  25
-+#define R_RISCV_HI20          26
-+#define R_RISCV_LO12_I        27
-+#define R_RISCV_LO12_S        28
-+#define R_RISCV_TPREL_HI20    29
-+#define R_RISCV_TPREL_LO12_I  30
-+#define R_RISCV_TPREL_LO12_S  31
-+#define R_RISCV_TPREL_ADD     32
-+#define R_RISCV_ADD8          33
-+#define R_RISCV_ADD16         34
-+#define R_RISCV_ADD32         35
-+#define R_RISCV_ADD64         36
-+#define R_RISCV_SUB8          37
-+#define R_RISCV_SUB16         38
-+#define R_RISCV_SUB32         39
-+#define R_RISCV_SUB64         40
-+#define R_RISCV_GNU_VTINHERIT 41
-+#define R_RISCV_GNU_VTENTRY   42
-+#define R_RISCV_ALIGN         43
-+#define R_RISCV_RVC_BRANCH    44
-+#define R_RISCV_RVC_JUMP      45
-+#define R_RISCV_RVC_LUI       46
-+#define R_RISCV_GPREL_I       47
-+#define R_RISCV_GPREL_S       48
-+#define R_RISCV_TPREL_I       49
-+#define R_RISCV_TPREL_S       50
-+#define R_RISCV_RELAX         51
-+#define R_RISCV_SUB6          52
-+#define R_RISCV_SET6          53
-+#define R_RISCV_SET8          54
-+#define R_RISCV_SET16         55
-+#define R_RISCV_SET32         56
-+
- typedef struct elf32_rel {
-   Elf32_Addr	r_offset;
-   Elf32_Word	r_info;
---=20
-2.19.1
+Ideally this requires a previous patch replacing 8 -> nb_eeprom, fixing 
+a long standing bug.
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+>       if (eeprom_spd_size > 0) {
+>           memcpy(eeprom_buf, eeprom_spd, eeprom_spd_size);
+>       }
+>   
+>       for (i = 0; i < nb_eeprom; i++) {
+> -        smbus_eeprom_init_one(smbus, 0x50 + i, eeprom_buf + (i * 256));
+> +        smbus_eeprom_init_one(smbus, 0x50 + i,
+> +                              eeprom_buf + (i * SMBUS_EEPROM_SIZE));
+>       }
+>   }
+> 
