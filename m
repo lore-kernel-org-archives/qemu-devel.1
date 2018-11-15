@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNLKj-0002Rw-Kg
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:21:38 -0500
+	(envelope-from <david@redhat.com>) id 1gNLPB-0003xB-Dh
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:26:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNLKX-0002DV-E0
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:21:27 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41125)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNLKX-00027M-06
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:21:25 -0500
-Received: by mail-ot1-x344.google.com with SMTP id u16so18429074otk.8
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 09:21:24 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1gNLP8-0002MX-6V
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:26:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51826)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gNLP6-0007eY-2A
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:26:08 -0500
+References: <20181115140501.7872-1-david@redhat.com>
+	<20181115140501.7872-2-david@redhat.com>
+	<5e2769ed-f017-d684-da9e-115d31c3189b@redhat.com>
+	<874lcicntp.fsf@dusky.pond.sub.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <2464ddd5-24b3-396b-7ea7-c3e9cf36ffc9@redhat.com>
+Date: Thu, 15 Nov 2018 18:25:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181102134112.26370-3-richard.henderson@linaro.org>
-References: <20181102134112.26370-1-richard.henderson@linaro.org>
-	<20181102134112.26370-3-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Nov 2018 17:21:03 +0000
-Message-ID: <CAFEAcA8Em2FP7rQgsHXuBcAhM+L-KUsFHR9PbW7QcRzHq8uy4g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-4.0 2/4] target/arm:
- Implement the ARMv8.1-LOR extension
+In-Reply-To: <874lcicntp.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 1/9] cutils: add qemu_strtod() and
+ qemu_strtod_finite()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,139 +31,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 2 November 2018 at 13:41, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Provide a trivial implementation with zero limited ordering regions,
-> which causes the LDLAR and STLLR instructions to devolve into the
-> LDAR and STLR instructions from the base ARMv8.0 instruction set.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu.h           |  5 +++++
->  target/arm/cpu64.c         |  4 ++++
->  target/arm/helper.c        | 26 ++++++++++++++++++++++++++
->  target/arm/translate-a64.c | 12 ++++++++++++
->  4 files changed, 47 insertions(+)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 2ce5e80dfc..f12a6afddc 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -3278,6 +3278,11 @@ static inline bool isar_feature_aa64_atomics(const ARMISARegisters *id)
->      return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, ATOMIC) != 0;
->  }
->
-> +static inline bool isar_feature_aa64_lor(const ARMISARegisters *id)
-> +{
-> +    return FIELD_EX64(id->id_aa64mmfr0, ID_AA64MMFR1, LO) != 0;
-> +}
-> +
->  static inline bool isar_feature_aa64_rdm(const ARMISARegisters *id)
->  {
->      return FIELD_EX64(id->id_aa64isar0, ID_AA64ISAR0, RDM) != 0;
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 0babe483ac..aac6283018 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -324,6 +324,10 @@ static void aarch64_max_initfn(Object *obj)
->          t = FIELD_DP64(t, ID_AA64PFR0, ADVSIMD, 1);
->          cpu->isar.id_aa64pfr0 = t;
->
-> +        t = cpu->isar.id_aa64mmfr1;
-> +        t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1);
-> +        cpu->isar.id_aa64mmfr1 = t;
-> +
->          /* Replicate the same data to the 32-bit id registers.  */
->          u = cpu->isar.id_isar5;
->          u = FIELD_DP32(u, ID_ISAR5, AES, 2); /* AES + PMULL */
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 70376764cb..758ddac5e9 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -5714,6 +5714,32 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->          define_one_arm_cp_reg(cpu, &sctlr);
->      }
->
-> +    if (cpu_isar_feature(aa64_lor, cpu)) {
-> +        /*
-> +         * A trivial implementation of ARMv8.1-LOR leaves all of these
-> +         * registers fixed at 0, which indicates that there are zero
-> +         * supported Limited Ordering regions.
-> +         */
-> +        static const ARMCPRegInfo lor_reginfo[] = {
-> +            { .name = "LORSA_EL1", .state = ARM_CP_STATE_AA64,
-> +              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 0,
-> +              .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-> +            { .name = "LOREA_EL1", .state = ARM_CP_STATE_AA64,
-> +              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 1,
-> +              .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-> +            { .name = "LORN_EL1", .state = ARM_CP_STATE_AA64,
-> +              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 2,
-> +              .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-> +            { .name = "LORC_EL1", .state = ARM_CP_STATE_AA64,
-> +              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 3,
-> +              .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-> +            { .name = "LORID_EL1", .state = ARM_CP_STATE_AA64,
-> +              .opc0 = 3, .opc1 = 0, .crn = 10, .crm = 4, .opc2 = 7,
-> +              .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-> +        };
+On 15.11.18 17:22, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+>=20
+>> On 11/15/18 8:04 AM, David Hildenbrand wrote:
+>>> Let's provide a wrapper for strtod().
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>   include/qemu/cutils.h |  2 ++
+>>>   util/cutils.c         | 38 ++++++++++++++++++++++++++++++++++++++
+>>>   2 files changed, 40 insertions(+)
+>>>
+>>
+>>
+>>> +
+>>> +/**
+>>> + * Convert string @nptr to a finite double.
+>>> + *
+>>> + * Works like qemu_strtoul(), except it stores +/-HUGE_VAL on
+>>> + * overflow/underflow. "NaN" or "inf" are rejcted with -EINVAL.
+>>
+>> s/rejcted/rejected/
+>=20
+> Also, just overflow.  Floating-point underflow is when a computation's
+> mathematical result is too close to zero to be represented without
+> extraordinary rounding error.
 
-There are access checks needed for these registers:
-HCR_EL2.TLOR controls trapping to EL2
-SCR_EL3.TLOR controls trapping to EL3.
-All except LORID_EL1 are also inaccessible from Secure state.
+Indeed, as the "man strod" states
+"... would cause overflow, plus or minus HUGE_VAL (HUGE_VALF, HUGE_VALL)
+is returned (according to the sign of the value)"
 
-> +        define_arm_cp_regs(cpu, lor_reginfo);
-> +    }
-> +
->      if (cpu_isar_feature(aa64_sve, cpu)) {
->          define_one_arm_cp_reg(cpu, &zcr_el1_reginfo);
->          if (arm_feature(env, ARM_FEATURE_EL2)) {
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 88195ab949..2307a18d5a 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -2290,6 +2290,12 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
->          }
->          return;
->
-> +    case 0x8: /* STLLR */
-> +        if (!dc_isar_feature(aa64_lor, s)) {
-> +            break;
-> +        }
-> +        /* StoreLORelease is the same as Store-Release for QEMU.  */
-> +        /* fallthru */
->      case 0x9: /* STLR */
->          /* Generate ISS for non-exclusive accesses including LASR.  */
->          if (rn == 31) {
-> @@ -2301,6 +2307,12 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
->                    disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
->          return;
->
-> +    case 0xc: /* LDLAR */
-> +        if (!dc_isar_feature(aa64_lor, s)) {
-> +            break;
-> +        }
-> +        /* LoadLOAcquire is the same as Load-Acquire for QEMU.  */
-> +        /* fallthru */
->      case 0xd: /* LDAR */
->          /* Generate ISS for non-exclusive accesses including LASR.  */
->          if (rn == 31) {
-> --
+>=20
+> Skip this paragraph unless you're ready to nerd out.  IEEE 754 section
+> 7.5 defines underflow to happen
+>=20
+>     [...] either
+>=20
+>     a) after rounding =E2=80=94 when a non-zero result computed as thou=
+gh the
+>     exponent range were unbounded would lie strictly between =C2=B1b^em=
+in,
+>     or
+>=20
+>     b) before rounding =E2=80=94 when a non-zero result computed as tho=
+ugh both
+>     the exponent range and the precision were unbounded would lie
+>     strictly between =C2=B1b^emin.
+>=20
+> where b^emin is the smallest normal number. =20
+>=20
+> The "Works like qemu_strtoul()" is a bit lazy.  I guess it works like
+> qemu_strtoul() in the sense that it adds to strtod() what qemu_strtoul(=
+)
+> adds to strtoul().  I consciously didn't take a similar shortcut in
+> commit 4295f879bec: I documented both qemu_strtol() and qemu_strtoul()
+> in longhand, and used "Works like" shorthand only where that's actually
+> the case: qemu_strtoll() works like qemu_strtol(), and qemu_strtoull()
+> works like qemu_strtoul().  I'd prefer longhand for qemu_strtod().  It
+> costs us a few lines, but it results in a clearer contract.
 
-We should check the SBO bits in these encodings:
-the instructions have "(1)"s in the fields for Rs and Rt2, which means
-that the behaviour if not set is CONSTRAINED UNPREDICTABLE
-(see DDI0487D.a C2.2.2). "Executes as if the value of the bit is 1"
-is a permitted choice, so not checking the fields isn't wrong, but
-it does make it a bit harder to tell when some future guest makes
-use of some new encoding that borrows some of the space, so it's
-nicer to take the "make the instruction UNDEFINED" option.
-It looks like we missed this with some of the other encodings in
-this space too.
+/**
+ * Convert string @nptr to a double.
+  *
+ * This is a wrapper around strtod() that is harder to misuse.
+ * Semantics of @nptr and @endptr match strtod() with differences
+ * noted below.
+ *
+ * @nptr may be null, and no conversion is performed then.
+ *
+ * If no conversion is performed, store @nptr in *@endptr and return
+ * -EINVAL.
+ *
+ * If @endptr is null, and the string isn't fully converted, return
+ * -EINVAL.  This is the case when the pointer that would be stored in
+ * a non-null @endptr points to a character other than '\0'.
+ *
+ * If the conversion overflows @result, store +/-HUGE_VAL, depending on
+ * the sign, in @result and return -ERANGE.
+ *
+ * Else store the converted value in @result, and return zero.
+ */
 
-thanks
--- PMM
+>=20
+>>> + */
+>>> +int qemu_strtod_finite(const char *nptr, const char **endptr, double=
+ *result)
+>>> +{
+>>> +    int ret =3D qemu_strtod(nptr, endptr, result);
+>>
+>> On overflow, result is set to HUGE_VAL (aka "inf") with ret set to
+>> -ERANGE.  (The C standard uses HUGE_VAL rather than directly requiring
+>> infinity on overflow, in order to cater to museum platforms where the
+>> largest representable double is still finite; but no one develops qemu
+>> on a non-IEEE machine these days so we know that HUGE_VAL =3D=3D INF).
+>=20
+> Aside: museum clauses like this one make the standard much harder to
+> read than necessary.  I wish they'll purge them from C2X.
+>=20
+>>> +
+>>> +    if (!ret && !isfinite(*result)) {
+>>> +        return -EINVAL;
+>>> +    }
+>=20
+> qemu_strtol() & friends leave *result alone when they return -EINVAL.
+> This one doesn't.  Unlikely to hurt anyone, but I'd prefer to keep them
+> consistent.
+
+Will use a temporary and also properly set endptr in case we return
+-EINVAL; And add a fully-blown description as noted above :)
+
+>=20
+>> This check means that overflow ("1e9999") fails with -ERANGE, while
+>> actual infinity ("inf") fails with -EINVAL, letting the user
+>> distinguish between the two.  Still, I wonder if assigning a
+>> non-finite value into result on -ERANGE is the wisest course of
+>> action.  We'll just have to see in the next patches that use this.
+>=20
+> I guess it's about as "wise" as qemu_strtol() storing LONG_MAX on
+> integer overflow.
+>=20
+> I'm fine with the semantics David picked, as long as they're spelled ou=
+t
+> in the function contract.
+
+I think for now we're fine treating explicit "infinity" user input as
+-EINVAL. We could return something like "HUGE_VAL - 1" along with
+-ERANGE, but I guess for now this is overkill. Most callers will bail
+out on -ERANGE either way. And if not, they have to make sure they can
+deal with HUGE_VAL.
+
+>=20
+>> With the typo fix,
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
+
+--=20
+
+Thanks,
+
+David / dhildenb
