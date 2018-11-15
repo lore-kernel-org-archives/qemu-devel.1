@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gNHCA-0004vv-5b
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 07:56:31 -0500
+	(envelope-from <simon@ruderich.org>) id 1gNHHA-00075f-6w
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:01:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gNHBy-0001Dc-U9
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 07:56:26 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:51814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gNHBy-0001CD-OT
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 07:56:18 -0500
-Received: by mail-wm1-f67.google.com with SMTP id w7-v6so18706764wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 04:56:16 -0800 (PST)
-References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
-	<20181114123643.24091-9-marcandre.lureau@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <32f53263-4a02-0c60-c012-6895d9e936ba@redhat.com>
-Date: Thu, 15 Nov 2018 13:56:11 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181114123643.24091-9-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-3.2 08/41] slirp: add callbacks for
- timer
+	(envelope-from <simon@ruderich.org>) id 1gNHH8-0003cs-Hc
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:01:40 -0500
+Received: from zucker2.schokokeks.org ([178.63.68.90]:40299)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <simon@ruderich.org>) id 1gNHH8-0003WP-BJ
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 08:01:38 -0500
+From: Simon Ruderich <simon@ruderich.org>
+Date: Thu, 15 Nov 2018 14:01:14 +0100
+Message-Id: <50e486c7e6d8d39bee2d12ee95b15adb7012ef36.1542285958.git.simon@ruderich.org>
+In-Reply-To: <cover.1542285958.git.simon@ruderich.org>
+References: <0e59c79ddc01e195ddc59d77d9df2b95bf89b600.1523395243.git.simon@ruderich.org>
+	<cover.1542285958.git.simon@ruderich.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v6 6/6] hmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,140 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: samuel.thibault@ens-lyon.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it
+To: qemu-devel@nongnu.org
+Cc: David Alan Gilbert <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Simon Ruderich <simon@ruderich.org>
 
-On 14/11/2018 13:36, Marc-André Lureau wrote:
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> ---
->  slirp/libslirp.h |  6 ++++++
->  slirp/slirp.h    |  2 +-
->  net/slirp.c      | 23 +++++++++++++++++++++++
->  slirp/ip6_icmp.c | 21 ++++++++++-----------
->  4 files changed, 40 insertions(+), 12 deletions(-)
-> 
-> diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-> index fcebcd1e58..88185e6c33 100644
-> --- a/slirp/libslirp.h
-> +++ b/slirp/libslirp.h
-> @@ -10,10 +10,16 @@ typedef enum SlirpClockType {
->      SLIRP_CLOCK_REALTIME,
->  } SlirpClockType;
->  
-> +typedef void (*SlirpTimerCb)(void *opaque);
-> +
->  typedef struct SlirpCb {
->      void (*output)(void *opaque, const uint8_t *pkt, int pkt_len);
->      int (*chr_write_all)(void *chr, const void *buf, size_t len);
->      int64_t (*clock_get_ns)(SlirpClockType type);
-> +    void *(*timer_new)(SlirpClockType type, int scale,
-> +                      SlirpTimerCb cb, void *opaque);
+Adapted patch from Baojun Wang [1] with the following commit message:
 
-Same here wrt SlirpClockType; and nicely, scale is always nanoseconds so
-it can be removed.
+    I found this could be useful to have qemu-softmmu as a cross
+    debugger (launch with -s -S command line option), then if we can
+    have a command to load guest physical memory, we can use cross gdb
+    to do some target debug which gdb cannot do directly.
 
-Paolo
+This patch contains only the hmp changes of the original patch.
 
-> +    void (*timer_free)(void *timer);
-> +    void (*timer_mod)(void *timer, int64_t expire_timer);
->  } SlirpCb;
->  
->  
-> diff --git a/slirp/slirp.h b/slirp/slirp.h
-> index f7c087456a..e5abf1c594 100644
-> --- a/slirp/slirp.h
-> +++ b/slirp/slirp.h
-> @@ -218,7 +218,7 @@ struct Slirp {
->      NdpTable ndp_table;
->  
->      GRand *grand;
-> -    QEMUTimer *ra_timer;
-> +    void *ra_timer;
->  
->      const SlirpCb *cb;
->      void *opaque;
-> diff --git a/net/slirp.c b/net/slirp.c
-> index af6c643b82..7b28886802 100644
-> --- a/net/slirp.c
-> +++ b/net/slirp.c
-> @@ -163,10 +163,33 @@ static int64_t net_slirp_clock_get_ns(SlirpClockType type)
->      return qemu_clock_get_ns(slirp_clock_to_qemu(type));
->  }
->  
-> +static void *net_slirp_timer_new(SlirpClockType type,
-> +                                 int scale,
-> +                                 SlirpTimerCb cb, void *opaque)
-> +{
-> +    return timer_new_full(NULL, slirp_clock_to_qemu(type),
-> +                          scale, QEMU_TIMER_ATTR_EXTERNAL,
-> +                          cb, opaque);
-> +}
-> +
-> +static void net_slirp_timer_free(void *timer)
-> +{
-> +    timer_del(timer);
-> +    timer_free(timer);
-> +}
-> +
-> +static void net_slirp_timer_mod(void *timer, int64_t expire_timer)
-> +{
-> +    timer_mod(timer, expire_timer);
-> +}
-> +
->  static SlirpCb slirp_cb = {
->      .output = net_slirp_output,
->      .chr_write_all = net_slirp_chr_write_all,
->      .clock_get_ns = net_slirp_clock_get_ns,
-> +    .timer_new = net_slirp_timer_new,
-> +    .timer_free = net_slirp_timer_free,
-> +    .timer_mod = net_slirp_timer_mod,
->  };
->  
->  static int net_slirp_init(NetClientState *peer, const char *model,
-> diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-> index 0f80d49ef9..71d95daef0 100644
-> --- a/slirp/ip6_icmp.c
-> +++ b/slirp/ip6_icmp.c
-> @@ -16,9 +16,10 @@
->  static void ra_timer_handler(void *opaque)
->  {
->      Slirp *slirp = opaque;
-> -    timer_mod(slirp->ra_timer,
-> -              slirp->cb->clock_get_ns(SLIRP_CLOCK_VIRTUAL) / SCALE_MS +
-> -              NDP_Interval);
-> +
-> +    slirp->cb->timer_mod(slirp->ra_timer,
-> +        slirp->cb->clock_get_ns(SLIRP_CLOCK_VIRTUAL) / SCALE_MS +
-> +        NDP_Interval);
->      ndp_send_ra(slirp);
->  }
->  
-> @@ -28,12 +29,11 @@ void icmp6_init(Slirp *slirp)
->          return;
->      }
->  
-> -    slirp->ra_timer = timer_new_full(NULL, QEMU_CLOCK_VIRTUAL,
-> -                                     SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
-> -                                     ra_timer_handler, slirp);
-> -    timer_mod(slirp->ra_timer,
-> -              slirp->cb->clock_get_ns(SLIRP_CLOCK_VIRTUAL) / SCALE_MS +
-> -              NDP_Interval);
-> +    slirp->ra_timer = slirp->cb->timer_new(SLIRP_CLOCK_VIRTUAL, SCALE_MS,
-> +                                           ra_timer_handler, slirp);
-> +    slirp->cb->timer_mod(slirp->ra_timer,
-> +        slirp->cb->clock_get_ns(SLIRP_CLOCK_VIRTUAL) / SCALE_MS +
-> +        NDP_Interval);
->  }
->  
->  void icmp6_cleanup(Slirp *slirp)
-> @@ -42,8 +42,7 @@ void icmp6_cleanup(Slirp *slirp)
->          return;
->      }
->  
-> -    timer_del(slirp->ra_timer);
-> -    timer_free(slirp->ra_timer);
-> +    slirp->cb->timer_free(slirp->ra_timer);
->  }
->  
->  static void icmp6_send_echoreply(struct mbuf *m, Slirp *slirp, struct ip6 *ip,
-> 
+[1]: https://lists.gnu.org/archive/html/qemu-trivial/2014-04/msg00074.html
+
+Based-on-patch-by: Baojun Wang <wangbj@gmail.com>
+Signed-off-by: Simon Ruderich <simon@ruderich.org>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hmp-commands.hx | 14 ++++++++++++++
+ hmp.c           | 12 ++++++++++++
+ hmp.h           |  1 +
+ 3 files changed, 27 insertions(+)
+
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 2404a5210d..baadbb3a69 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -857,6 +857,20 @@ STEXI
+ @item pmemsave @var{addr} @var{size} @var{file}
+ @findex pmemsave
+ save to disk physical memory dump starting at @var{addr} of size @var{size}.
++ETEXI
++
++    {
++        .name       = "pmemload",
++        .args_type  = "val:l,size:l,offset:l,filename:F",
++        .params     = "addr size offset file",
++        .help       = "load from disk physical memory dump starting at 'addr' of size 'size' at file offset 'offset'",
++        .cmd        = hmp_pmemload,
++    },
++
++STEXI
++@item pmemload @var{addr} @var{size} @var{offset} @var{file}
++@findex pmemload
++load from disk physical memory dump starting at @var{addr} of size @var{size} at file offset @var{offset}.
+ ETEXI
+ 
+     {
+diff --git a/hmp.c b/hmp.c
+index 42a5d163cd..c2a77fc390 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1169,6 +1169,18 @@ void hmp_pmemsave(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, &err);
+ }
+ 
++void hmp_pmemload(Monitor *mon, const QDict *qdict)
++{
++    uint64_t size = qdict_get_int(qdict, "size");
++    uint64_t offset = qdict_get_int(qdict, "offset");
++    const char *filename = qdict_get_str(qdict, "filename");
++    uint64_t addr = qdict_get_int(qdict, "val");
++    Error *err = NULL;
++
++    qmp_pmemload(addr, filename, true, size, true, offset, &err);
++    hmp_handle_error(mon, &err);
++}
++
+ void hmp_ringbuf_write(Monitor *mon, const QDict *qdict)
+ {
+     const char *chardev = qdict_get_str(qdict, "device");
+diff --git a/hmp.h b/hmp.h
+index 5f1addcca2..6503146a8c 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -49,6 +49,7 @@ void hmp_exit_preconfig(Monitor *mon, const QDict *qdict);
+ void hmp_cpu(Monitor *mon, const QDict *qdict);
+ void hmp_memsave(Monitor *mon, const QDict *qdict);
+ void hmp_pmemsave(Monitor *mon, const QDict *qdict);
++void hmp_pmemload(Monitor *mon, const QDict *qdict);
+ void hmp_ringbuf_write(Monitor *mon, const QDict *qdict);
+ void hmp_ringbuf_read(Monitor *mon, const QDict *qdict);
+ void hmp_cont(Monitor *mon, const QDict *qdict);
+-- 
+2.19.1
