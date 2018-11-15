@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNG8t-00029m-DA
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:49:04 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gNGHN-0004VW-Ry
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:57:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNG8s-0006fx-K0
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:49:03 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35355)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gNGHL-0003fP-Pj
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:57:49 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44830)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNG8r-0006dJ-NG
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:49:01 -0500
-Received: by mail-oi1-x243.google.com with SMTP id v6so4171646oif.2
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 03:48:58 -0800 (PST)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gNGHK-0003bK-PU
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:57:47 -0500
+Received: by mail-wr1-x442.google.com with SMTP id j17-v6so20895783wrq.11
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 03:57:42 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181017095128.GK22755@stefanha-x1.localdomain>
-References: <20181016132018.5054-1-vsementsov@virtuozzo.com>
-	<20181017095128.GK22755@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Nov 2018 11:48:37 +0000
-Message-ID: <CAFEAcA_h8pWjNokWQqUXqLDS=WrtKz-zKQ4QjhjV5UR2Yb8MbQ@mail.gmail.com>
+References: <20180830163831.18586-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20180830163831.18586-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 15 Nov 2018 15:57:29 +0400
+Message-ID: <CAJ+F1CLprQF4guKvsVEuH-WpbEG=s=ukJLpHu2E=FXZ8FsMzFg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] migration/block-dirty-bitmap:
- fix Coverity CID1390625
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] libvhost-user: fix clang enum-conversion
+ warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
+To: QEMU <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 17 October 2018 at 10:51, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Tue, Oct 16, 2018 at 04:20:18PM +0300, Vladimir Sementsov-Ogievskiy wrote:
->> Theoretically possible that we finish the skipping loop with bs = NULL
->> and the following code will crash trying to dereference it. Fix that.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>  migration/block-dirty-bitmap.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
->> index 477826330c..6de808f95f 100644
->> --- a/migration/block-dirty-bitmap.c
->> +++ b/migration/block-dirty-bitmap.c
->> @@ -288,6 +288,10 @@ static int init_dirty_bitmap_migration(void)
->>              bs = backing_bs(bs);
->>          }
->>
->> +        if (!bs || bs->implicit) {
->> +            continue;
->> +        }
->> +
->>          for (bitmap = bdrv_dirty_bitmap_next(bs, NULL); bitmap;
->>               bitmap = bdrv_dirty_bitmap_next(bs, bitmap))
->>          {
+On Thu, Aug 30, 2018 at 8:50 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
 >
-> Previous discussion:
-> http://qemu.11.n7.nabble.com/PATCH-migration-Appease-coverity-skip-empty-block-trees-td582504.html
+> Now that the VhostUserMsg.request field is used for both master &
+> slave requests, since commit d84599f56c820d8c1ac9928a76500dcdfbbf194d:
 >
-> I've CCed John so he can take a look.
+> contrib/libvhost-user/libvhost-user.c:953:20: error: implicit conversion =
+from enumeration type 'enum VhostUserSlaveRequest' to different enumeration=
+ type 'VhostUserRequest' (aka 'enum VhostUserRequest') [-Werror,-Wenum-conv=
+ersion]
+>         .request =3D VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG,
+>                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-So have you block-layer folks figured out how you want to address
-this Coverity issue yet?
-
+ping,
 thanks
--- PMM
+
+> ---
+>  contrib/libvhost-user/libvhost-user.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
+r/libvhost-user.h
+> index 4aa55b4d2d..c0133b7f3f 100644
+> --- a/contrib/libvhost-user/libvhost-user.h
+> +++ b/contrib/libvhost-user/libvhost-user.h
+> @@ -145,7 +145,7 @@ typedef struct VhostUserVringArea {
+>  #endif
+>
+>  typedef struct VhostUserMsg {
+> -    VhostUserRequest request;
+> +    int request;
+>
+>  #define VHOST_USER_VERSION_MASK     (0x3)
+>  #define VHOST_USER_REPLY_MASK       (0x1 << 2)
+> --
+> 2.19.0.rc0.48.gb9dfa238d5
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
