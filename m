@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gNM6S-0002VU-Gw
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:10:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gNMKl-00058t-4r
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:25:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gNM6R-0002sW-3S
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:10:56 -0500
-References: <1541121763-3277-1-git-send-email-liq3ea@gmail.com>
-	<CAKXe6SL=6m5u1utFoJCG65ucuBeGTiuu8rA9wEj_X-tO1jHzEA@mail.gmail.com>
-	<20181113101704.GB4830@localhost.localdomain>
-	<2db2eb88-bc7c-d3c0-93ca-43d6a2f79b0a@redhat.com>
-	<CAKXe6S+e8zBgYU8DnU2tUqQm2C1w14pgqg55YmxwPn1UUW3E7g@mail.gmail.com>
-	<9e733597-36bf-0b64-892f-1b35e67a632c@redhat.com>
-	<CAKXe6S+Atz0M9NgUEuuN-2e5XDUyGMA0Ser7kipy1yfvuLguSA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ff40a572-18a1-1609-450f-b1b8e99ed3d5@redhat.com>
-Date: Thu, 15 Nov 2018 19:10:38 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gNMKi-0002Ys-Jh
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:25:42 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45876)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gNMKe-0002X1-MU
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:25:39 -0500
+Received: by mail-oi1-x241.google.com with SMTP id b141so8543415oii.12
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 10:25:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6S+Atz0M9NgUEuuN-2e5XDUyGMA0Ser7kipy1yfvuLguSA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] nvme: fix oob access issue(CVE-2018-16847)
+In-Reply-To: <20181029155339.15280-1-richard.henderson@linaro.org>
+References: <20181029155339.15280-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Nov 2018 18:25:12 +0000
+Message-ID: <CAFEAcA8ot22iu5OkW+A1fuHCQapfRK_tJMQPc7aH=hXmr89jJQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/4] target/arm: Minimize TLB flushing for
+ ASID changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: kwolf@redhat.com, keith.busch@intel.com, mreitz@redhat.com, P J P <ppandit@redhat.com>, qemu-block@nongnu.org, Qemu Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 15/11/2018 04:14, Li Qiang wrote:
->=20
->=20
-> Paolo Bonzini <pbonzini@redhat.com <mailto:pbonzini@redhat.com>> =E4=BA=
-=8E2018
-> =E5=B9=B411=E6=9C=8814=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8811:=
-44=E5=86=99=E9=81=93=EF=BC=9A
->=20
->     On 14/11/2018 02:38, Li Qiang wrote:
->     >
->     >
->     > Paolo Bonzini <pbonzini@redhat.com <mailto:pbonzini@redhat.com>
->     <mailto:pbonzini@redhat.com <mailto:pbonzini@redhat.com>>> =E4=BA=8E=
-2018
->     > =E5=B9=B411=E6=9C=8814=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8A=E5=8D=
-=882:27=E5=86=99=E9=81=93=EF=BC=9A
->     >
->     >=C2=A0 =C2=A0 =C2=A0On 13/11/2018 11:17, Kevin Wolf wrote:
->     >=C2=A0 =C2=A0 =C2=A0> Am 13.11.2018 um 02:45 hat Li Qiang geschrie=
-ben:
->     >=C2=A0 =C2=A0 =C2=A0>> Ping.... what't the status of this patch.
->     >=C2=A0 =C2=A0 =C2=A0>>
->     >=C2=A0 =C2=A0 =C2=A0>> I see Kevin's new pr doesn't contain this p=
-atch.
->     >=C2=A0 =C2=A0 =C2=A0>
->     >=C2=A0 =C2=A0 =C2=A0> Oh, I thought you said that you wanted to fi=
-x this at a higher
->     >=C2=A0 =C2=A0 =C2=A0level so
->     >=C2=A0 =C2=A0 =C2=A0> that the problem is caught before even getti=
-ng into nvme
->     code? If you
->     >=C2=A0 =C2=A0 =C2=A0> don't, I can apply the patch for my next pul=
-l request.
->     >
->     >=C2=A0 =C2=A0 =C2=A0As far as I know the bug doesn't exist.=C2=A0 =
-Li Qiang, if you have a
->     >=C2=A0 =C2=A0 =C2=A0reproducer please send it.
->     >
->     >
->     > Hello Paolo,
->     > Though I've send the debug information and ASAN output in the mai=
-l to
->     > secalert@redhat.com <mailto:secalert@redhat.com>
->     <mailto:secalert@redhat.com <mailto:secalert@redhat.com>>, I'm glad
->     provide here.
->     > This is for read, I think the write the same but as the PoC is in
->     > userspace, the mmap can only map the exact size of the MMIO,
->     > So we can only write within the area. But if we using a module we=
- can
->     > write the out of MMIO I think
->     > The nvme device's parameter should set as 'cmb_size_mb=3D2' and t=
-he PCI
->     > address may differ in your system.
->=20
->     Ok, thanks.=C2=A0 I've created a reproducer using qtest (though I h=
-ave to run
->     now and cannot post it properly).
->=20
->     The patch for the fix is simply:
->=20
->=20
-> So do you send this or me?
+On 29 October 2018 at 15:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> In http://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg04181.html
+> (already upstream) I added a check for ASID changes without realizing
+> that TTBCR_EL1 has the A1 bit, controlling which register actually
+> contains the active ASID.
+>
+> In http://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg04182.html
+> I suggested a set of mmu_idx to flush when the ASID does change.  In
+> follow-up, Peter suggested more.
+>
+> I now choose secure vs non-secure mmu_idx based on which register is being
+> modified, not the current state of the cpu.  Unless I am mistaken, secure
+> state can write to the non-secure registers.  Which means that the current
+> state of the cpu is irrelevant and only the register matters.
+>
+> Peter suggested flushing S1E3 when changing ttbr0_s.  I can see how this
+> is overlapped onto the EL3 (Secure Monitor) state, but I cannot see how
+> the ASID is used from EL3.  The best evidence I can find for this is that
+> there is no TLBIASID* register that is applicable to flushing EL3; that's
+> not conclusive proof though.  So while I'm not sure it's necessary, I'm
+> also not sure it isn't necessary, and so I've included S1E3 in the flush.
 
-Me, together with the test.
+"TLBIASID" flushes EL3, when EL3 is AArch32 and you are in Secure PL1
+(ie EL3). From the register spec:
+"If executed in Secure state when EL3 is using AArch32, the Secure PL1&0
+translation regime."
+The spec's "SecurePL1&0 translation regime" is in QEMU ARMMMUIdx_S1E3.
+TTBR0(S) contains an ASID if TTBCR(S).EAE is 1.
 
-Paolo
+(If EL3 is AArch64 then there's no TTBR0(S), only TTBR_EL3, which doesn't
+have an ASID.)
+
+thanks
+-- PMM
