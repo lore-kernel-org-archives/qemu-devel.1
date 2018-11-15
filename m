@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gN70g-0002EC-67
+	(envelope-from <eblake@redhat.com>) id 1gN70g-0002ED-6Y
 	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 21:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gN70e-0005dq-9X
+	(envelope-from <eblake@redhat.com>) id 1gN70e-0005dr-9h
 	for qemu-devel@nongnu.org; Wed, 14 Nov 2018 21:03:58 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 14 Nov 2018 20:03:25 -0600
-Message-Id: <20181115020334.1189829-5-eblake@redhat.com>
+Date: Wed, 14 Nov 2018 20:03:24 -0600
+Message-Id: <20181115020334.1189829-4-eblake@redhat.com>
 In-Reply-To: <20181115020334.1189829-1-eblake@redhat.com>
 References: <20181115020334.1189829-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 04/13] block: Removed unused sector-based
- blocking I/O
+Subject: [Qemu-devel] [PATCH v2 03/13] vvfat: Switch to byte-based calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,136 +20,90 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Now that all callers of blocking I/O have been converted
-to use our preferred byte-based bdrv_p{read,write}(), we can
-delete the unused bdrv_{read,write}().
+byte-based.  Make the change for the last few sector-based calls
+into the block layer from the vvfat driver.
 
-Note that the old byte-based code checked that callers passed values
-for transactions that did not exceed 2G limits (to prevent scaling
-the caller's input by the sector size from exceeding a signed 32-bit
-length). We can double-check that the block layer does the same thing
-for byte-based code, by noting that even though the newer signatures
-allow a 64-bit length parameter, the block layer is actually
-fragmenting things to honor both bl.max_transfer (0 if the driver
-has no inherent limit, or has not been audited for 64-bit cleanness;
-non-zero if the driver wants to enforce a particular cap) as well as
-some sanity sizing, as follows:
-
-- bdrv_merge_limits(): Uses the smaller cap of either driver (or leaves things
-uncapped if both drivers enforce no cap)
-- bdrv_co_do_copy_on_readv(): Caps things to 2G if driver did not request cap
-- bdrv_aligned_preadv(): Caps things to 2G if driver did not request cap
-- bdrv_co_do_pwrite_zeroes(): Caps things to MAX_BOUNCE_BUFFER if driver
-did not request cap
-- bdrv_aligned_pwritev(): Caps things to 2G if driver did not request cap
+Ideally, the vvfat driver should switch to doing everything
+byte-based, but that's a more invasive change that requires a
+bit more auditing.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
-v2: Enhance commit message with audit results
----
- include/block/block.h |  4 ----
- block/io.c            | 48 ++++++++-----------------------------------
- 2 files changed, 8 insertions(+), 44 deletions(-)
+ block/vvfat.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 7f5453b45b6..52b18373807 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -307,10 +307,6 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state,
-                         BlockReopenQueue *queue, Error **errp);
- void bdrv_reopen_commit(BDRVReopenState *reopen_state);
- void bdrv_reopen_abort(BDRVReopenState *reopen_state);
--int bdrv_read(BdrvChild *child, int64_t sector_num,
--              uint8_t *buf, int nb_sectors);
--int bdrv_write(BdrvChild *child, int64_t sector_num,
--               const uint8_t *buf, int nb_sectors);
- int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
-                        int bytes, BdrvRequestFlags flags);
- int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags);
-diff --git a/block/io.c b/block/io.c
-index bd9d688f8ba..39d4e7a3ae1 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -836,45 +836,6 @@ static int bdrv_prwv_co(BdrvChild *child, int64_t offset,
-     return rwco.ret;
- }
-
--/*
-- * Process a synchronous request using coroutines
-- */
--static int bdrv_rw_co(BdrvChild *child, int64_t sector_num, uint8_t *buf,
--                      int nb_sectors, bool is_write, BdrvRequestFlags flags)
--{
--    QEMUIOVector qiov;
--    struct iovec iov = {
--        .iov_base = (void *)buf,
--        .iov_len = nb_sectors * BDRV_SECTOR_SIZE,
--    };
--
--    if (nb_sectors < 0 || nb_sectors > BDRV_REQUEST_MAX_SECTORS) {
--        return -EINVAL;
--    }
--
--    qemu_iovec_init_external(&qiov, &iov, 1);
--    return bdrv_prwv_co(child, sector_num << BDRV_SECTOR_BITS,
--                        &qiov, is_write, flags);
--}
--
--/* return < 0 if error. See bdrv_write() for the return codes */
--int bdrv_read(BdrvChild *child, int64_t sector_num,
--              uint8_t *buf, int nb_sectors)
--{
--    return bdrv_rw_co(child, sector_num, buf, nb_sectors, false, 0);
--}
--
--/* Return < 0 if error. Important errors are:
--  -EIO         generic I/O error (may happen for all errors)
--  -ENOMEDIUM   No media inserted.
--  -EINVAL      Invalid sector number or nb_sectors
--  -EACCES      Trying to write a read-only device
--*/
--int bdrv_write(BdrvChild *child, int64_t sector_num,
--               const uint8_t *buf, int nb_sectors)
--{
--    return bdrv_rw_co(child, sector_num, (uint8_t *)buf, nb_sectors, true, 0);
--}
-
- int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
-                        int bytes, BdrvRequestFlags flags)
-@@ -897,7 +858,7 @@ int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
-  * flags are passed through to bdrv_pwrite_zeroes (e.g. BDRV_REQ_MAY_UNMAP,
-  * BDRV_REQ_FUA).
+diff --git a/block/vvfat.c b/block/vvfat.c
+index b7b61ea8b78..915a05ae4f2 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -1494,8 +1494,8 @@ static int vvfat_read(BlockDriverState *bs, int64_t sector_num,
+                 DLOG(fprintf(stderr, "sectors %" PRId64 "+%" PRId64
+                              " allocated\n", sector_num,
+                              n >> BDRV_SECTOR_BITS));
+-                if (bdrv_read(s->qcow, sector_num, buf + i * 0x200,
+-                              n >> BDRV_SECTOR_BITS)) {
++                if (bdrv_pread(s->qcow, sector_num * BDRV_SECTOR_BITS,
++                               buf + i * 0x200, n) < 0) {
+                     return -1;
+                 }
+                 i += (n >> BDRV_SECTOR_BITS) - 1;
+@@ -1983,7 +1983,8 @@ static uint32_t get_cluster_count_for_direntry(BDRVVVFATState* s,
+                         if (res) {
+                             return -1;
+                         }
+-                        res = bdrv_write(s->qcow, offset, s->cluster_buffer, 1);
++                        res = bdrv_pwrite(s->qcow, offset * BDRV_SECTOR_SIZE,
++                                          s->cluster_buffer, BDRV_SECTOR_SIZE);
+                         if (res) {
+                             return -2;
+                         }
+@@ -2146,7 +2147,7 @@ DLOG(checkpoint());
+      * - get modified FAT
+      * - compare the two FATs (TODO)
+      * - get buffer for marking used clusters
+-     * - recurse direntries from root (using bs->bdrv_read to make
++     * - recurse direntries from root (using bs->bdrv_pread to make
+      *    sure to get the new data)
+      *   - check that the FAT agrees with the size
+      *   - count the number of clusters occupied by this directory and
+@@ -2911,9 +2912,9 @@ static int handle_deletes(BDRVVVFATState* s)
+ /*
+  * synchronize mapping with new state:
   *
-- * Returns < 0 on error, 0 on success. For error codes see bdrv_write().
-+ * Returns < 0 on error, 0 on success. For error codes see bdrv_pwrite().
+- * - copy FAT (with bdrv_read)
++ * - copy FAT (with bdrv_pread)
+  * - mark all filenames corresponding to mappings as deleted
+- * - recurse direntries from root (using bs->bdrv_read)
++ * - recurse direntries from root (using bs->bdrv_pread)
+  * - delete files corresponding to mappings marked as deleted
   */
- int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
- {
-@@ -935,6 +896,7 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
+ static int do_commit(BDRVVVFATState* s)
+@@ -2933,10 +2934,10 @@ static int do_commit(BDRVVVFATState* s)
+         return ret;
      }
- }
 
-+/* return < 0 if error. See bdrv_pwrite() for the return codes */
- int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
- {
-     int ret;
-@@ -975,6 +937,12 @@ int bdrv_pwritev(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
-     return qiov->size;
- }
+-    /* copy FAT (with bdrv_read) */
++    /* copy FAT (with bdrv_pread) */
+     memcpy(s->fat.pointer, s->fat2, 0x200 * s->sectors_per_fat);
 
-+/* Return < 0 if error. Important errors are:
-+  -EIO         generic I/O error (may happen for all errors)
-+  -ENOMEDIUM   No media inserted.
-+  -EINVAL      Invalid sector number or nb_sectors
-+  -EACCES      Trying to write a read-only device
-+*/
- int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf, int bytes)
- {
-     QEMUIOVector qiov;
+-    /* recurse direntries from root (using bs->bdrv_read) */
++    /* recurse direntries from root (using bs->bdrv_pread) */
+     ret = commit_direntries(s, 0, -1);
+     if (ret) {
+         fprintf(stderr, "Fatal: error while committing (%d)\n", ret);
+@@ -3050,7 +3051,8 @@ DLOG(checkpoint());
+      * Use qcow backend. Commit later.
+      */
+ DLOG(fprintf(stderr, "Write to qcow backend: %d + %d\n", (int)sector_num, nb_sectors));
+-    ret = bdrv_write(s->qcow, sector_num, buf, nb_sectors);
++    ret = bdrv_pwrite(s->qcow, sector_num * BDRV_SECTOR_SIZE, buf,
++                      nb_sectors * BDRV_SECTOR_SIZE);
+     if (ret < 0) {
+         fprintf(stderr, "Error writing to qcow backend\n");
+         return ret;
 -- 
 2.17.2
