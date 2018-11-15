@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNEo2-00034r-Hb
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:23:27 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gNErR-0004VC-E8
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:26:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNEnt-0005Jp-Rm
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:23:20 -0500
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:34503)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNEns-0005Ip-Uw
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:23:17 -0500
-Received: by mail-ot1-x32f.google.com with SMTP id t5so17628766otk.1
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 02:23:16 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1gNErN-00088u-DC
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:26:57 -0500
+Resent-Message-Id: <E1gNErN-00088u-DC@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21323)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gNErM-0007xy-MQ
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:26:53 -0500
+In-Reply-To: <20181114233831.10374-1-ehabkost@redhat.com>
+Message-ID: <154227124289.21.12980929179950133314@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20181108121646.26173-2-david@gibson.dropbear.id.au>
-References: <20181108121646.26173-1-david@gibson.dropbear.id.au>
-	<20181108121646.26173-2-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Nov 2018 10:22:55 +0000
-Message-ID: <CAFEAcA9XbnnpTKDJQMHqxfChBaKp5j71gsxUYOCo2SQXkOZ9DQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 01/22] target/ppc: add external PID support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 15 Nov 2018 00:40:45 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] virtio: Provide
+ version-specific variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, Alexander Graf <agraf@suse.de>, Laurent Vivier <lvivier@redhat.com>, Roman Kapl <rka@sysgo.com>
+To: ehabkost@redhat.com
+Cc: famz@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.comfamz@redhat.com, laine@redhat.com, amit@kernel.org, libvir-list@redhat.com, armbru@redhat.com, jasowang@redhat.com, cohuck@redhat.com, stefanha@redhat.com, abologna@redhat.com, wainersm@redhat.com, mreitz@redhat.com, ccarrara@redhat.com, arei.gonglei@huawei.com, kraxel@redhat.com, crosa@redhat.com, pbonzini@redhat.com, philmd@redhat.com
 
-On 8 November 2018 at 12:16, David Gibson <david@gibson.dropbear.id.au> wrote:
-> From: Roman Kapl <rka@sysgo.com>
->
-> External PID is a mechanism present on BookE 2.06 that enables application to
-> store/load data from different address spaces. There are special version of some
-> instructions, which operate on alternate address space, which is specified in
-> the EPLC/EPSC regiser.
->
-> This implementation uses two additional MMU modes (mmu_idx) to provide the
-> address space for the load and store instructions. The QEMU TLB fill code was
-> modified to recognize these MMU modes and use the values in EPLC/EPSC to find
-> the proper entry in he PPC TLB. These two QEMU TLBs are also flushed on each
-> write to EPLC/EPSC.
->
-> Following instructions are implemented: dcbfep dcbstep dcbtep dcbtstep dcbzep
-> dcbzlep icbiep lbepx ldepx lfdepx lhepx lwepx stbepx stdepx stfdepx sthepx
-> stwepx.
->
-> Following vector instructions are not: evlddepx evstddepx lvepx lvepxl stvepx
-> stvepxl.
-
-Hi; Coverity reports an issue (CID1396864) with this function:
-
-> +/* dcbfep (external PID dcbf) */
-> +static void gen_dcbfep(DisasContext *ctx)
-> +{
-> +    /* XXX: specification says this is treated as a load by the MMU */
-> +    TCGv t0;
-> +    CHK_SV;
-> +    gen_set_access_type(ctx, ACCESS_CACHE);
-> +    t0 = tcg_temp_new();
-> +    gen_addr_reg_index(ctx, t0);
-> +    tcg_gen_qemu_ld_tl(t0, t0, PPC_TLB_EPID_LOAD, DEF_MEMOP(MO_UB));
-> +    tcg_temp_free(t0);
-> +}
-
-It says that the gen_set_access_type() call is unreachable. I think
-this is a false positive (the code is unreachable, but only if
-CONFIG_USER_ONLY is defined). On the other hand, all the other
-similar gen_* functions in this file that use CHK_SV seem to have
-a pattern of
-
-#if defined(CONFIG_USER_ONLY)
-    GEN_PRIV;
-#else
-    TCGv t0;
-    CHK_SV;
-    [etc]
-#endif
-
-so maybe we should do that here too for consistency?
-
-thanks
--- PMM
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+ODExMTQyMzM4MzEuMTAzNzQtMS1laGFia29zdEByZWRoYXQuY29tClR5cGU6IHNlcmllcwpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIGZvci00LjAgdjJdIHZpcnRpbzogUHJvdmlkZSB2ZXJz
+aW9uLXNwZWNpZmljIHZhcmlhbnRzIG9mIHZpcnRpbyBQQ0kgZGV2aWNlcwoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cg
+LS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0
+IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
+bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
+cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
+Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
+ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
+IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
+ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyMDMzMmFmIHZp
+cnRpbzogUHJvdmlkZSB2ZXJzaW9uLXNwZWNpZmljIHZhcmlhbnRzIG9mIHZpcnRpbyBQQ0kgZGV2
+aWNlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiB2aXJ0aW86IFBy
+b3ZpZGUgdmVyc2lvbi1zcGVjaWZpYyB2YXJpYW50cyBvZiB2aXJ0aW8gUENJIGRldmljZXMuLi4K
+V0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVS
+UyBuZWVkIHVwZGF0aW5nPwojNjY4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBsaW5l
+IG92ZXIgOTAgY2hhcmFjdGVycwojNzI0OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3ZpcnRpb192
+ZXJzaW9uLnB5OjUyOgorICAgIHJldHVybiBkZXZ0eXBlIGluIFtkWyduYW1lJ10gZm9yIGQgaW4g
+dm0uY29tbWFuZCgncW9tLWxpc3QtdHlwZXMnLCBpbXBsZW1lbnRzPWltcGxlbWVudHMpXQoKRVJS
+T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM3MjY6IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2Uv
+dmlydGlvX3ZlcnNpb24ucHk6NTQ6CitkZWYgZ2V0X2ludGVyZmFjZXModm0sIGRldnR5cGUsIGlu
+dGVyZmFjZXM9WydwY2ktZXhwcmVzcy1kZXZpY2UnLCAnY29udmVudGlvbmFsLXBjaS1kZXZpY2Un
+XSk6CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzgwOiBGSUxFOiB0ZXN0cy9h
+Y2NlcHRhbmNlL3ZpcnRpb192ZXJzaW9uLnB5OjEwODoKKyAgICAgICAgZGV2XzFfMCxudF9pZmFj
+ZXMgPSBzZWxmLnJ1bl9kZXZpY2UoJyVzLW5vbi10cmFuc2l0aW9uYWwnICUgKHFlbXVfZGV2dHlw
+ZSkpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODA0OiBGSUxFOiB0ZXN0cy9h
+Y2NlcHRhbmNlL3ZpcnRpb192ZXJzaW9uLnB5OjEzMjoKKyAgICAgICAgZGV2X3RyYW5zLHRyYW5z
+X2lmYWNlcyA9IHNlbGYucnVuX2RldmljZSgnJXMtdHJhbnNpdGlvbmFsJyAlIChxZW11X2RldnR5
+cGUpKQoKdG90YWw6IDIgZXJyb3JzLCAzIHdhcm5pbmdzLCA3MzIgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
