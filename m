@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gNFjJ-0003iV-Vj
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:22:38 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gNFsW-0005wR-J6
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:32:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gNFjC-0002BC-IT
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:22:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40264)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gNFjA-00029H-LR
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:22:30 -0500
-Date: Thu, 15 Nov 2018 12:21:55 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181115122155.7a15df7d.cohuck@redhat.com>
-In-Reply-To: <20181114233831.10374-1-ehabkost@redhat.com>
-References: <20181114233831.10374-1-ehabkost@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gNFsT-0006el-Fl
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:32:08 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39013)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gNFsT-0006eZ-3Q
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 06:32:05 -0500
+Received: by mail-wr1-x441.google.com with SMTP id b13so20811890wrx.6
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 03:32:04 -0800 (PST)
+References: <20181112214503.22941-1-richard.henderson@linaro.org>
+	<20181114010014.GA19024@flamenco>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d15fa143-ab52-3de9-29f0-ff794cec6ac3@linaro.org>
+Date: Thu, 15 Nov 2018 12:32:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20181114010014.GA19024@flamenco>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] virtio: Provide
- version-specific variants of virtio PCI devices
+Subject: Re: [Qemu-devel] [PATCH for-4.0 00/17] tcg: Move softmmu out-of-line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,102 +31,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Andrea Bolognani <abologna@redhat.com>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P.
-	=?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org
 
-On Wed, 14 Nov 2018 21:38:31 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+On 11/14/18 2:00 AM, Emilio G. Cota wrote:
+> The following might be related: I'm seeing segfaults with -smp 8
+> and beyond when doing bootup+shutdown of an aarch64 guest on
+> an x86-64 host.
 
-> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-> index 813082b0d7..1d2a11504f 100644
-> --- a/hw/virtio/virtio-pci.h
-> +++ b/hw/virtio/virtio-pci.h
+I'm not seeing that.  Anything else special on the command-line?
+Are the segv in the code_gen_buffer or elsewhere?
 
-(...)
 
-> +/**
-> + * VirtioPCIDeviceTypeInfo:
-> + *
-> + * Template for virtio PCI device types.  See virtio_pci_types_register()
-> + * for details.
-> + */
-> +typedef struct VirtioPCIDeviceTypeInfo {
-> +    /* Prefix for the class names */
-> +    const char *name_prefix;
-
-<bikeshed>Maybe call this the vpci_name instead? It's not really a
-prefix in the way I would usually use the term, but rather a type name
-with a possible suffix tacked onto it.</bikeshed>
-
-> +    /* Parent type.  If NULL, TYPE_VIRTIO_PCI is used */
-> +    const char *parent;
-> +    /* If modern_only is true, only <name_prefix> type will be registered */
-> +    bool modern_only;
-> +
-> +    /* Same as TypeInfo fields: */
-> +    size_t instance_size;
-> +    void (*instance_init)(Object *obj);
-> +    void (*class_init)(ObjectClass *klass, void *data);
-> +} VirtioPCIDeviceTypeInfo;
-> +
-> +/*
-> + * Register virtio-pci types.  Each virtio-pci device type will be available
-> + * in 3 flavors:
-> + * - <prefix>-transitional: modern device supporting legacy drivers
-> + *   - Supports Conventional PCI buses only
-> + * - <prefix>-non-transitional: modern-only
-> + *   - Supports Conventional PCI and PCI Express buses
-> + * - <prefix>: virtio version configurable, legacy driver support
-> + *                  automatically selected when device is plugged
-> + *   _ This was the only flavor supported until QEMU 3.1
-
-s/_/-/
-s/until/up to/ ?
-
-> + *   - Supports Conventional PCI and PCI Express buses
-> + *
-> + * All the types above will inherit from "<prefix>-base", so generic
-> + * code can use "<prefix>-base" on type casts.
-> + *
-> + * We need a separate "<prefix>-base" type instead of making all types inherit
-> + * from <prefix> for two reasons:
-> + * 1) <prefix> will implement INTERFACE_PCIE_DEVICE, but
-> + *    <prefix>-transitional won't.
-> + * 2) <prefix> will have the "disable-legacy" and "disable-modern" properties,
-> + *    <prefix>-transitional and <prefix>-non-transitional won't.
-
-<bikeshed>I'd formulate this rather as "x implements/has something, y
-and z do not", as the code actually does that (and does not just intend
-to do so :)</bikeshed>
-
-> + */
-> +void virtio_pci_types_register(const VirtioPCIDeviceTypeInfo *t);
-> +
->  #endif
-
-(...)
-
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index a954799267..0fa248d68c 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-
-(...)
-
-> +static void virtio_pci_1_0_instance_init(Object *obj)
-
-Ditch the _0? I don't expect this to change the name when virtio 1.1
-arrives.
-
-> +{
-> +    VirtIOPCIProxy *proxy = VIRTIO_PCI(obj);
-> +
-> +    proxy->disable_legacy = ON_OFF_AUTO_ON;
-> +    proxy->disable_modern = false;
-> +}
-
-(...)
-
-After a quick look, this seems fine; have not actually tried to run it
-yet.
+r~
