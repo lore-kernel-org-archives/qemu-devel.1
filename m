@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48535)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQFx-0007WE-8E
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:37:04 -0500
+	id 1gNQG6-0007es-Vg
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:37:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQFu-0004rG-3P
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:37:01 -0500
+	id 1gNQG3-0004yy-Q4
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:37:10 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 15 Nov 2018 22:36:55 +0000
-Message-ID: <cd89e90aeb79ed438aaee6cfa02ca42a36d633b6.1542321076.git.alistair.francis@wdc.com>
+Date: Thu, 15 Nov 2018 22:37:04 +0000
+Message-ID: <9e9303670bf6210b643b05f9bddf9c52f684173b.1542321076.git.alistair.francis@wdc.com>
 References: <cover.1542321076.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1542321076.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [RFC v1 20/23] riscv: tcg-target: Add the target init
- code
+Subject: [Qemu-devel] [RFC v1 21/23] tcg: Add RISC-V cpu signal handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +31,67 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- tcg/riscv/tcg-target.inc.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ accel/tcg/user-exec.c | 48 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-index 4b8f65f367..dfc4e8b44c 100644
---- a/tcg/riscv/tcg-target.inc.c
-+++ b/tcg/riscv/tcg-target.inc.c
-@@ -1641,6 +1641,39 @@ static void tcg_target_qemu_prologue(TCGContext *s)
-     tcg_out_opc_imm(s, OPC_JALR, TCG_REG_ZERO, TCG_REG_RA, 0);
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index cd75829cf2..bb693484ed 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -571,6 +571,54 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+     return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
  }
 =20
-+static void tcg_target_init(TCGContext *s)
++#elif defined(__riscv)
++
++int cpu_signal_handler(int host_signum, void *pinfo,
++                       void *puc)
 +{
-+    tcg_target_available_regs[TCG_TYPE_I32] =3D 0xffffffff;
-+    if (TCG_TARGET_REG_BITS =3D=3D 64) {
-+        tcg_target_available_regs[TCG_TYPE_I64] =3D 0xffffffff;
++    siginfo_t *info =3D pinfo;
++    ucontext_t *uc =3D puc;
++    greg_t pc =3D uc->uc_mcontext.__gregs[REG_PC];
++
++    /* Detect store by reading the instruction at the program
++       counter. Note: we currently only generate 32-bit
++       instructions so we thus only detect 32-bit stores */
++    uint32_t insn =3D *(uint32_t *)pc;
++    int is_write =3D 0;
++    switch (((insn >> 0) & 0b11)) {
++    case 3:
++        switch (((insn >> 2) & 0b11111)) {
++        case 8:
++            switch (((insn >> 12) & 0b111)) {
++            case 0: /* sb */
++            case 1: /* sh */
++            case 2: /* sw */
++            case 3: /* sd */
++            case 4: /* sq */
++                is_write =3D 1;
++                break;
++            default:
++                break;
++            }
++            break;
++        case 9:
++            switch (((insn >> 12) & 0b111)) {
++            case 2: /* fsw */
++            case 3: /* fsd */
++            case 4: /* fsq */
++                is_write =3D 1;
++                break;
++            default:
++                break;
++            }
++            break;
++        default:
++            break;
++        }
 +    }
-+
-+    tcg_target_call_clobber_regs =3D -1u;
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S0);
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S1);
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S2);
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S3);
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S4);
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S5);
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S6);
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S7);
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S8);
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S9);
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S10);
-+    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_S11);
-+
-+    s->reserved_regs =3D 0;
-+    tcg_regset_set_reg(s->reserved_regs, TCG_REG_ZERO);
-+    tcg_regset_set_reg(s->reserved_regs, TCG_REG_TMP0);
-+    tcg_regset_set_reg(s->reserved_regs, TCG_REG_TMP1);
-+    tcg_regset_set_reg(s->reserved_regs, TCG_REG_L0);
-+    tcg_regset_set_reg(s->reserved_regs, TCG_REG_L1);
-+    tcg_regset_set_reg(s->reserved_regs, TCG_REG_RA);
-+    tcg_regset_set_reg(s->reserved_regs, TCG_REG_SP);
-+    tcg_regset_set_reg(s->reserved_regs, TCG_REG_GP);
-+    tcg_regset_set_reg(s->reserved_regs, TCG_REG_TP);
++    return handle_cpu_signal(pc, info, is_write, &uc->uc_sigmask);
 +}
 +
- void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
-                               uintptr_t addr)
- {
+ #else
+=20
+ #error host CPU specific signal handler needed
 --=20
 2.19.1
