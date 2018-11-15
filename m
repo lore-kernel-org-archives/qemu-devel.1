@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1gNQ6x-0003cV-BU
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:27:44 -0500
+	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
+	id 1gNQD2-0005DW-Qo
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:34:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1gNQ6o-0008VN-7M
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:27:41 -0500
-Received: from mail-vs1-f51.google.com ([209.85.217.51]:33752)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1gNQ6k-0008TD-NV
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:27:32 -0500
-Received: by mail-vs1-f51.google.com with SMTP id p74so12679955vsc.0
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 14:27:26 -0800 (PST)
+	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
+	id 1gNQCz-0003LH-M3
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:34:00 -0500
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Thu, 15 Nov 2018 22:33:51 +0000
+Message-ID: <cover.1542321076.git.alistair.francis@wdc.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20181107121319.GC14842@redhat.com>
-	<20181107143628.GG8125@redhat.com>
-	<CAMRbyyuFGVtNWF9LKoi0n6_r5Gr4j8LetbAMd0L_5cKMif9LjQ@mail.gmail.com>
-	<20181107172737.GB4721@linux.fritz.box>
-	<CAMRbyys2XVgjPx9HteGP8c6R5rPM=n86m30kfEG6a0+c-jLZ4g@mail.gmail.com>
-	<CAMRbyytm2qY6ucuaMSAXaw=BhjG9BGoyU_6Xi_YC+fzBaP754Q@mail.gmail.com>
-In-Reply-To: <CAMRbyytm2qY6ucuaMSAXaw=BhjG9BGoyU_6Xi_YC+fzBaP754Q@mail.gmail.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Fri, 16 Nov 2018 00:27:13 +0200
-Message-ID: <CAMRbyyubqi1QgpDcnxrObVLfzRYODeHfz5qbYfjoeda4SgsbMw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] Change in qemu 2.12 causes qemu-img
- convert to NBD to write more data
+Subject: [Qemu-devel] [RFC v1 00/23]  Add RISC-V TCG backend support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,135 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
 
-On Sun, Nov 11, 2018 at 6:11 PM Nir Soffer <nsoffer@redhat.com> wrote:
+This patch set adds RISC-V backend support to QEMU. This is based on
+Michael Clark's original work with some patches ontop.
 
-> On Wed, Nov 7, 2018 at 7:55 PM Nir Soffer <nsoffer@redhat.com> wrote:
->
->> On Wed, Nov 7, 2018 at 7:27 PM Kevin Wolf <kwolf@redhat.com> wrote:
->>
->>> Am 07.11.2018 um 15:56 hat Nir Soffer geschrieben:
->>> > Wed, Nov 7, 2018 at 4:36 PM Richard W.M. Jones <rjones@redhat.com>
->>> wrote:
->>> >
->>> > > Another thing I tried was to change the NBD server (nbdkit) so that
->>> it
->>> > > doesn't advertise zero support to the client:
->>> > >
->>> > >   $ nbdkit --filter=log --filter=nozero memory size=6G
->>> logfile=/tmp/log \
->>> > >       --run './qemu-img convert ./fedora-28.img -n $nbd'
->>> > >   $ grep '\.\.\.$' /tmp/log | sed 's/.*\([A-Z][a-z]*\).*/\1/' | uniq
->>> -c
->>> > >    2154 Write
->>> > >
->>> > > Not surprisingly no zero commands are issued.  The size of the write
->>> > > commands is very uneven -- it appears to be send one command per
->>> block
->>> > > of zeroes or data.
->>> > >
->>> > > Nir: If we could get information from imageio about whether zeroing
->>> is
->>> > > implemented efficiently or not by the backend, we could change
->>> > > virt-v2v / nbdkit to advertise this back to qemu.
->>> >
->>> > There is no way to detect the capability, ioctl(BLKZEROOUT) always
->>> > succeeds, falling back to manual zeroing in the kernel silently
->>> >
->>> > Even if we could, sending zero on the wire from qemu may be even
->>> > slower, and it looks like qemu send even more requests in this case
->>> > (2154 vs ~1300).
->>> >
->>> > Looks like this optimization in qemu side leads to worse performance,
->>> > so it should not be enabled by default.
->>>
->>> Well, that's overgeneralising your case a bit. If the backend does
->>> support efficient zero writes (which file systems, the most common case,
->>> generally do), doing one big write_zeroes request at the start can
->>> improve performance quite a bit.
->>>
->>> It seems the problem is that we can't really know whether the operation
->>> will be efficient because the backends generally don't tell us. Maybe
->>> NBD could introduce a flag for this, but in the general case it appears
->>> to me that we'll have to have a command line option.
->>>
->>> However, I'm curious what your exact use case and the backend used in it
->>> is? Can something be improved there to actually get efficient zero
->>> writes and get even better performance than by just disabling the big
->>> zero write?
->>
->>
->> The backend is some NetApp storage connected via FC. I don't have
->> more info on this. We get zero rate of about 1G/s on this storage, which
->> is quite slow compared with other storage we tested.
->>
->> One option we check now is if this is the kernel silent fallback to manual
->> zeroing when the server advertise wrong value of write_same_max_bytes.
->>
->
-> We eliminated this using blkdiscard. This is what we get on with this
-> storage
-> zeroing 100G LV:
->
-> for i in 1 2 4 8 16 32; do time blkdiscard -z -p ${i}m
-> /dev/6e1d84f9-f939-46e9-b108-0427a08c280c/2d5c06ce-6536-4b3c-a7b6-13c6d8e55ade;
-> done
->
-> real 4m50.851s
-> user 0m0.065s
-> sys 0m1.482s
->
-> real 4m30.504s
-> user 0m0.047s
-> sys 0m0.870s
->
-> real 4m19.443s
-> user 0m0.029s
-> sys 0m0.508s
->
-> real 4m13.016s
-> user 0m0.020s
-> sys 0m0.284s
->
-> real 2m45.888s
-> user 0m0.011s
-> sys 0m0.162s
->
-> real 2m10.153s
-> user 0m0.003s
-> sys 0m0.100s
->
-> We are investigating why we get low throughput on this server, and also
-> will check
-> several other servers.
->
-> Having a command line option to control this behavior sounds good. I don't
->> have enough data to tell what should be the default, but I think the safe
->> way would be to keep old behavior.
->>
->
-> We file this bug:
-> https://bugzilla.redhat.com/1648622
->
+This has been slightly tested and can run other architecture softmmu
+code for a number of instructions but eventually QEMU will either
+seg fault or generate an illigal instruction (depending on the guest
+architecture).
 
-More data from even slower storage - zeroing 10G lv on Kaminario K2
+I haven't tested linux user support at all yet. I think Michael had that
+working reliably though and hopefully my changes haven't broken it. I'll
+test both a lot more before I send a full patchset.
 
-# time blkdiscard -z -p 32m /dev/test_vg/test_lv2
+My hope of submitting an RFC is that some extra eyes on the code might
+help catch what is wrong. Comparing the guest CPU state to a working
+version hasn't given any hints as the states match, even up until the
+generated code segfaults.
 
-real    50m12.425s
-user    0m0.018s
-sys     2m6.785s
+This branch can be found here:
+https://github.com/alistair23/qemu/tree/mainline/alistair/tcg-backend-upstr=
+eam.next
 
-Maybe something is wrong with this storage, since we see this:
+The working version with Michael's orignal patch and work ontop can be
+found here:
+https://github.com/alistair23/qemu/tree/mainline/alistair/tcg-backend.next
 
-# grep -s "" /sys/block/dm-29/queue/* | grep write_same_max_bytes
-/sys/block/dm-29/queue/write_same_max_bytes:512
 
-Since BLKZEROOUT always fallback to manual slow zeroing silently,
-maybe we can disable the aggressive pre-zero of the entire device
-for block devices, and keep this optimization for files when fallocate()
-is supported?
+Alistair Francis (23):
+  elf.h: Add the RISCV ELF magic numbers
+  linux-user: Add host dependency for RISC-V 32-bit
+  linux-user: Add host dependency for RISC-V 64-bit
+  exec: Add RISC-V GCC poison macro
+  riscv: Add the tcg-target header file
+  riscv: Add the tcg target registers
+  riscv: tcg-target: Regiser the JIT
+  riscv: tcg-target: Add support for the constraints
+  riscv: tcg-target: Add the immediate encoders
+  riscv: tcg-target: Add the instruction emitters
+  riscv: tcg-target: Add the relocation functions
+  riscv: tcg-target: Add the mov and movi instruction
+  riscv: tcg-target: Add the extract instructions
+  riscv: tcg-target: Add the out load and store instructions
+  riscv: tcg-target: Add branch and jump instructions
+  riscv: tcg-target: Add slowpath load and store instructions
+  riscv: tcg-target: Add direct load and store instructions
+  riscv: tcg-target: Add the out op decoder
+  riscv: tcg-target: Add the prologue generation
+  riscv: tcg-target: Add the target init code
+  tcg: Add RISC-V cpu signal handler
+  dias: Add RISC-V support
+  configure: Add support for building RISC-V host
 
-Nir
+ accel/tcg/user-exec.c             |   48 +
+ configure                         |   12 +-
+ disas.c                           |   10 +-
+ include/elf.h                     |   55 +
+ include/exec/poison.h             |    1 +
+ linux-user/host/riscv32/hostdep.h |   11 +
+ linux-user/host/riscv64/hostdep.h |   11 +
+ tcg/riscv/tcg-target.h            |  173 +++
+ tcg/riscv/tcg-target.inc.c        | 1728 +++++++++++++++++++++++++++++
+ 9 files changed, 2045 insertions(+), 4 deletions(-)
+ create mode 100644 linux-user/host/riscv32/hostdep.h
+ create mode 100644 linux-user/host/riscv64/hostdep.h
+ create mode 100644 tcg/riscv/tcg-target.h
+ create mode 100644 tcg/riscv/tcg-target.inc.c
+
+--=20
+2.19.1
