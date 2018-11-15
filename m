@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gNEAi-0007JA-M0
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:42:51 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gNEAn-0007Qm-QA
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:42:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gNEAb-0004cR-Qc
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:42:45 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gNEAm-0004nc-RZ
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:42:53 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Thu, 15 Nov 2018 10:41:54 +0100
-Message-Id: <20181115094207.22846-4-luc.michel@greensocs.com>
+Date: Thu, 15 Nov 2018 10:42:01 +0100
+Message-Id: <20181115094207.22846-11-luc.michel@greensocs.com>
 In-Reply-To: <20181115094207.22846-1-luc.michel@greensocs.com>
 References: <20181115094207.22846-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 03/16] gdbstub: add multiprocess support to
- '?' packets
+Subject: [Qemu-devel] [PATCH v6 10/16] gdbstub: add multiprocess support to
+ 'D' packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,138 +26,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-The gdb_get_cpu_pid() function does the PID lookup for the given CPU. It
-checks if the CPU is a direct child of a CPU cluster. If it is, the
-returned PID is the cluster ID plus one (cluster IDs start at 0, GDB
-PIDs at 1). When the CPU is not a child of such a container, the PID of
-the first process is returned.
-
-The gdb_fmt_thread_id() function generates the string to be used to ident=
-ify
-a given thread, in a response packet for the peer. This function
-supports generating thread IDs when multiprocess mode is enabled (in the
-form `p<pid>.<tid>').
-
-Use them in the reply to a '?' request.
+'D' packets are used by GDB to detach from a process. In multiprocess
+mode, the PID to detach from is sent in the request.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- gdbstub.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 58 insertions(+), 2 deletions(-)
+ gdbstub.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 53 insertions(+), 7 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 26f5a7449a..4fbc05dfe3 100644
+index 5df9929f92..eec1cf0d09 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -638,10 +638,52 @@ static int memtox(char *buf, const char *mem, int l=
-en)
-         }
+@@ -1039,24 +1039,39 @@ static int gdb_breakpoint_remove(target_ulong add=
+r, target_ulong len, int type)
+     default:
+         return -ENOSYS;
      }
-     return p - buf;
  }
 =20
-+static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
++static inline void gdb_cpu_breakpoint_remove_all(CPUState *cpu)
 +{
++    cpu_breakpoint_remove_all(cpu, BP_GDB);
 +#ifndef CONFIG_USER_ONLY
-+    gchar *path, *name;
-+    Object *obj;
-+    CPUClusterState *cluster;
-+    uint32_t ret;
-+
-+    path =3D object_get_canonical_path(OBJECT(cpu));
-+    name =3D object_get_canonical_path_component(OBJECT(cpu));
-+
-+    if (path =3D=3D NULL) {
-+        ret =3D s->processes[0].pid;
-+        goto out;
-+    }
-+
-+    /*
-+     * Retrieve the CPU parent path by removing the last '/' and the CPU=
- name
-+     * from the CPU canonical path. */
-+    path[strlen(path) - strlen(name) - 1] =3D '\0';
-+
-+    obj =3D object_resolve_path_type(path, TYPE_CPU_CLUSTER, NULL);
-+
-+    if (obj =3D=3D NULL) {
-+        ret =3D s->processes[0].pid;
-+        goto out;
-+    }
-+
-+    cluster =3D CPU_CLUSTER(obj);
-+    ret =3D cluster->cluster_id + 1;
-+
-+out:
-+    g_free(name);
-+    g_free(path);
-+
-+    return ret;
-+
-+#else
-+    return s->processes[0].pid;
++    cpu_watchpoint_remove_all(cpu, BP_GDB);
 +#endif
 +}
 +
- static const char *get_feature_xml(const char *p, const char **newp,
-                                    CPUClass *cc)
- {
-     size_t len;
-     int i;
-@@ -907,10 +949,23 @@ static CPUState *find_cpu(uint32_t thread_id)
-     }
-=20
-     return NULL;
- }
-=20
-+static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
-+                           char *buf, size_t buf_size)
++static void gdb_process_breakpoint_remove_all(const GDBState *s, GDBProc=
+ess *p)
 +{
-+    if (s->multiprocess) {
-+        snprintf(buf, buf_size, "p%02x.%02x",
-+                 gdb_get_cpu_pid(s, cpu), cpu_gdb_index(cpu));
-+    } else {
-+        snprintf(buf, buf_size, "%02x", cpu_gdb_index(cpu));
-+    }
++    CPUState *cpu =3D get_first_cpu_in_process(s, p);
 +
-+    return buf;
++    while (cpu) {
++        gdb_cpu_breakpoint_remove_all(cpu);
++        cpu =3D gdb_next_cpu_in_process(s, cpu);
++    }
 +}
 +
- static int is_query_packet(const char *p, const char *query, char separa=
-tor)
+ static void gdb_breakpoint_remove_all(void)
  {
-     unsigned int query_len =3D strlen(query);
+     CPUState *cpu;
 =20
-     return strncmp(p, query, query_len) =3D=3D 0 &&
-@@ -1018,22 +1073,23 @@ static int gdb_handle_packet(GDBState *s, const c=
+     if (kvm_enabled()) {
+         kvm_remove_all_breakpoints(gdbserver_state->c_cpu);
+         return;
+     }
+=20
+     CPU_FOREACH(cpu) {
+-        cpu_breakpoint_remove_all(cpu, BP_GDB);
+-#ifndef CONFIG_USER_ONLY
+-        cpu_watchpoint_remove_all(cpu, BP_GDB);
+-#endif
++        gdb_cpu_breakpoint_remove_all(cpu);
+     }
+ }
+=20
+ static void gdb_set_cpu_pc(GDBState *s, target_ulong pc)
+ {
+@@ -1331,13 +1346,44 @@ static int gdb_handle_packet(GDBState *s, const c=
 har *line_buf)
-     const char *p;
-     uint32_t thread;
-     int ch, reg_size, type, res;
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-+    char thread_id[16];
-     uint8_t *registers;
-     target_ulong addr, len;
-=20
-     trace_gdbstub_io_command(line_buf);
-=20
-     p =3D line_buf;
-     ch =3D *p++;
-     switch(ch) {
-     case '?':
-         /* TODO: Make this return the correct value for user-mode.  */
--        snprintf(buf, sizeof(buf), "T%02xthread:%02x;", GDB_SIGNAL_TRAP,
--                 cpu_gdb_index(s->c_cpu));
-+        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
-+                 gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread=
-_id)));
-         put_packet(s, buf);
-         /* Remove all the breakpoints when this query is issued,
-          * because gdb is doing and initial connect and the state
-          * should be cleaned up.
-          */
+         /* Kill the target */
+         error_report("QEMU: Terminated via GDBstub");
+         exit(0);
+     case 'D':
+         /* Detach packet */
+-        gdb_breakpoint_remove_all();
+-        gdb_syscall_mode =3D GDB_SYS_DISABLED;
+-        gdb_continue(s);
++        pid =3D 1;
++
++        if (s->multiprocess) {
++            unsigned long lpid;
++            if (*p !=3D ';') {
++                put_packet(s, "E22");
++                break;
++            }
++
++            if (qemu_strtoul(p + 1, &p, 16, &lpid)) {
++                put_packet(s, "E22");
++                break;
++            }
++
++            pid =3D lpid;
++        }
++
++        process =3D gdb_get_process(s, pid);
++        gdb_process_breakpoint_remove_all(s, process);
++        process->attached =3D false;
++
++        if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
++            s->c_cpu =3D gdb_first_cpu(s);
++        }
++
++        if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
++            s->g_cpu =3D gdb_first_cpu(s);
++        }
++
++        if (s->c_cpu =3D=3D NULL) {
++            /* No more process attached */
++            gdb_syscall_mode =3D GDB_SYS_DISABLED;
++            gdb_continue(s);
++        }
+         put_packet(s, "OK");
+         break;
+     case 's':
+         if (*p !=3D '\0') {
+             addr =3D strtoull(p, (char **)&p, 16);
 --=20
 2.19.1
