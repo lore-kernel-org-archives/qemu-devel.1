@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gNJr1-0007GP-QQ
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 10:46:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1gNJs1-0008Av-EH
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 10:47:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gNJqy-0002f5-Ls
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 10:46:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45542)
+	(envelope-from <eblake@redhat.com>) id 1gNJry-000379-AJ
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 10:47:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46176)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gNJqx-0002dj-GK
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 10:46:48 -0500
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 15 Nov 2018 15:46:39 +0000
-Message-Id: <20181115154639.29949-1-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gNJry-00036f-4l
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 10:47:50 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7145D37EEF
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 15:47:49 +0000 (UTC)
+References: <cover.1542294676.git.eskultet@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <49306290-125b-8d63-ae27-495c0c17e113@redhat.com>
+Date: Thu, 15 Nov 2018 09:47:44 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for 3.1] x86: Add 3.1 machine types
+In-Reply-To: <cover.1542294676.git.eskultet@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] Introduce 'rendernode' option for
+ egl-headless display type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,109 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com, peter.maydell@linaro.org
+To: Erik Skultety <eskultet@redhat.com>, qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 11/15/18 9:15 AM, Erik Skultety wrote:
+> Since QEMU always picks the default DRI device, libvirt doesn't know which one
+> to put into the mount namespace and relabel it accordingly, hence hitting
+> permission issues, unless admin tweaks the default permissions of the DRI
+> devices.
+> 
+> https://bugzilla.redhat.com/show_bug.cgi?id=1648236
 
-x86 doesn't need a 3.1 machine type, because there's no incompatibility,
-but it looks odd not having one, especially since s390, ppc and ARM have
-it.  Join the party.
+This is borderline between fixing a bug that gets in the way of libvirt 
+(and thus useful for 3.1) and a feature (thus for 4.0, since we won't 
+have a 3.2 release). I'll let Gerd decide.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/i386/pc_piix.c    | 15 ++++++++++++---
- hw/i386/pc_q35.c     | 13 +++++++++++--
- include/hw/i386/pc.h |  3 +++
- 3 files changed, 26 insertions(+), 5 deletions(-)
+> 
+> Erik Skultety (3):
+>    qapi: Add "rendernode" display option for egl-headless
+>    ui: Allow specifying 'rendernode' display option for egl-headless
+>    help: Provide help for egl-headless
+> 
+>   qapi/ui.json      | 16 +++++++++++++++-
+>   qemu-options.hx   |  6 +++++-
+>   ui/egl-headless.c |  2 +-
+>   3 files changed, 21 insertions(+), 3 deletions(-)
+> 
+> --
+> 2.19.1
+> 
+> 
+> 
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index dc09466b3e..7092d6d13f 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -428,21 +428,30 @@ static void pc_i440fx_machine_options(MachineClass =
-*m)
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
- }
-=20
--static void pc_i440fx_3_0_machine_options(MachineClass *m)
-+static void pc_i440fx_3_1_machine_options(MachineClass *m)
- {
-     pc_i440fx_machine_options(m);
-     m->alias =3D "pc";
-     m->is_default =3D 1;
- }
-=20
-+DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
-+                      pc_i440fx_3_1_machine_options);
-+
-+static void pc_i440fx_3_0_machine_options(MachineClass *m)
-+{
-+    pc_i440fx_3_1_machine_options(m);
-+    m->is_default =3D 0;
-+    m->alias =3D NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-+}
-+
- DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
-                       pc_i440fx_3_0_machine_options);
-=20
- static void pc_i440fx_2_12_machine_options(MachineClass *m)
- {
-     pc_i440fx_3_0_machine_options(m);
--    m->is_default =3D 0;
--    m->alias =3D NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
-=20
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 532241e3f8..6799b3e553 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus =3D 288;
- }
-=20
--static void pc_q35_3_0_machine_options(MachineClass *m)
-+static void pc_q35_3_1_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias =3D "q35";
- }
-=20
-+DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
-+                    pc_q35_3_1_machine_options);
-+
-+static void pc_q35_3_0_machine_options(MachineClass *m)
-+{
-+    pc_q35_3_1_machine_options(m);
-+    m->alias =3D NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-+}
-+
- DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
-                     pc_q35_3_0_machine_options);
-=20
- static void pc_q35_2_12_machine_options(MachineClass *m)
- {
-     pc_q35_3_0_machine_options(m);
--    m->alias =3D NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
-=20
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 136fe497b6..c37d4333a0 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -294,6 +294,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
- int e820_get_num_entries(void);
- bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-=20
-+#define PC_COMPAT_3_1 \
-+    HW_COMPAT_3_1
-+
- #define PC_COMPAT_3_0 \
-     HW_COMPAT_3_0 \
-     {\
---=20
-2.19.1
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
