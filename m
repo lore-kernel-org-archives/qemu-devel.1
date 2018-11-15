@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gNNGH-0003U8-5M
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:18 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gNNGJ-0003Wi-AU
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gNNG7-00081B-RL
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:09 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38944)
+	(envelope-from <tcminyard@gmail.com>) id 1gNNG9-00082O-Th
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:11 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34283)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gNNG6-00080H-1D
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:24:59 -0500
-Received: by mail-oi1-x244.google.com with SMTP id 192-v6so17718996oii.6
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 11:24:57 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gNNG8-00080k-1d
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:01 -0500
+Received: by mail-oi1-x241.google.com with SMTP id a202-v6so9591494oib.1
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 11:24:59 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu, 15 Nov 2018 13:24:39 -0600
-Message-Id: <20181115192446.17187-6-minyard@acm.org>
+Date: Thu, 15 Nov 2018 13:24:42 -0600
+Message-Id: <20181115192446.17187-9-minyard@acm.org>
 In-Reply-To: <20181115192446.17187-1-minyard@acm.org>
 References: <20181115192446.17187-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v2 05/12] i2c: Fix pm_smbus handling of I2C
- block read
+Subject: [Qemu-devel] [PATCH v2 08/12] i2c: Add an SMBus vmstate structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,208 +31,86 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
 
 From: Corey Minyard <cminyard@mvista.com>
 
-The I2C block read function of pm_smbus was completely broken.  It
-required doing some direct I2C handling because it didn't have a
-defined size, the OS code just reads bytes until it marks the
-transaction finished.
-
-This also required adjusting how the AMIBIOS workaround code worked,
-the I2C block mode was setting STS_HOST_BUSY during a transaction,
-so that bit could no longer be used to inform the host status read
-code to start the transaction.  Create a explicit bool for that
-operation.
-
-Also, don't read the next byte from the device in byte-by-byte
-mode unless the OS is actually clearing the byte done bit.  Just
-assuming that's what the OS is doing is a bad idea.
+There is no vmstate handling for SMBus, so no device sitting on SMBus
+can have a state transfer that works reliably.  So add it.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/i2c/pm_smbus.c         | 86 ++++++++++++++++++++++++++++++---------
- include/hw/i2c/pm_smbus.h |  6 +++
- 2 files changed, 73 insertions(+), 19 deletions(-)
+ hw/i2c/smbus_slave.c         | 18 ++++++++++++++++++
+ include/hw/i2c/smbus_slave.h | 24 +++++++++++++++++++++---
+ 2 files changed, 39 insertions(+), 3 deletions(-)
 
-diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-index f3c6cc46f9..8793113c25 100644
---- a/hw/i2c/pm_smbus.c
-+++ b/hw/i2c/pm_smbus.c
-@@ -118,19 +118,30 @@ static void smb_transaction(PMSMBus *s)
-         }
-         break;
-     case PROT_I2C_BLOCK_READ:
--        if (read) {
--            int xfersize = s->smb_data0;
--            if (xfersize > sizeof(s->smb_data)) {
--                xfersize = sizeof(s->smb_data);
--            }
--            ret = smbus_read_block(bus, addr, s->smb_data1, s->smb_data,
--                                   xfersize, false, true);
--            goto data8;
--        } else {
--            /* The manual says the behavior is undefined, just set DEV_ERR. */
-+        /* According to the Linux i2c-i801 driver:
-+         *   NB: page 240 of ICH5 datasheet shows that the R/#W
-+         *   bit should be cleared here, even when reading.
-+         *   However if SPD Write Disable is set (Lynx Point and later),
-+         *   the read will fail if we don't set the R/#W bit.
-+         * So at least Linux may or may not set the read bit here.
-+         * So just ignore the read bit for this command.
-+         */
-+        if (i2c_start_transfer(bus, addr, 0)) {
-             goto error;
-         }
--        break;
-+        ret = i2c_send(bus, s->smb_data1);
-+        if (ret) {
-+            goto error;
-+        }
-+        if (i2c_start_transfer(bus, addr, 1)) {
-+            goto error;
-+        }
-+        s->in_i2c_block_read = true;
-+        s->smb_blkdata = i2c_recv(s->smbus);
-+        s->op_done = false;
-+        s->smb_stat |= STS_HOST_BUSY | STS_BYTE_DONE;
-+        goto out;
-+
-     case PROT_BLOCK_DATA:
-         if (read) {
-             ret = smbus_read_block(bus, addr, cmd, s->smb_data,
-@@ -208,6 +219,7 @@ static void smb_transaction_start(PMSMBus *s)
- {
-     if (s->smb_ctl & CTL_INTREN) {
-         smb_transaction(s);
-+        s->start_transaction_on_status_read = false;
-     } else {
-         /* Do not execute immediately the command; it will be
-          * executed when guest will read SMB_STAT register.  This
-@@ -217,6 +229,7 @@ static void smb_transaction_start(PMSMBus *s)
-          * checking for status.  If STS_HOST_BUSY doesn't get
-          * set, it gets stuck. */
-         s->smb_stat |= STS_HOST_BUSY;
-+        s->start_transaction_on_status_read = true;
-     }
+diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
+index fa988919d8..b8a2d521f4 100644
+--- a/hw/i2c/smbus_slave.c
++++ b/hw/i2c/smbus_slave.c
+@@ -206,6 +206,24 @@ static void smbus_device_class_init(ObjectClass *klass, void *data)
+     sc->send = smbus_i2c_send;
  }
  
-@@ -226,19 +239,38 @@ smb_irq_value(PMSMBus *s)
-     return ((s->smb_stat & ~STS_HOST_BUSY) != 0) && (s->smb_ctl & CTL_INTREN);
- }
- 
-+static bool
-+smb_byte_by_byte(PMSMBus *s)
++bool smbus_vmstate_needed(SMBusDevice *dev)
 +{
-+    if (s->op_done) {
-+        return false;
-+    }
-+    if (s->in_i2c_block_read) {
-+        return true;
-+    }
-+    return !(s->smb_auxctl & AUX_BLK);
++    return dev->mode != SMBUS_IDLE;
 +}
 +
- static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-                               unsigned width)
- {
-     PMSMBus *s = opaque;
-+    uint8_t clear_byte_done;
- 
-     SMBUS_DPRINTF("SMB writeb port=0x%04" HWADDR_PRIx
-                   " val=0x%02" PRIx64 "\n", addr, val);
-     switch(addr) {
-     case SMBHSTSTS:
-+        clear_byte_done = s->smb_stat & val & STS_BYTE_DONE;
-         s->smb_stat &= ~(val & ~STS_HOST_BUSY);
--        if (!s->op_done && !(s->smb_auxctl & AUX_BLK)) {
-+        if (clear_byte_done && smb_byte_by_byte(s)) {
-             uint8_t read = s->smb_addr & 0x01;
- 
-+            if (s->in_i2c_block_read) {
-+                /* See comment below PROT_I2C_BLOCK_READ above. */
-+                read = 1;
-+            }
++const VMStateDescription vmstate_smbus_device = {
++    .name = TYPE_SMBUS_DEVICE,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields      = (VMStateField[]) {
++        VMSTATE_I2C_SLAVE(i2c, SMBusDevice),
++        VMSTATE_INT32(mode, SMBusDevice),
++        VMSTATE_INT32(data_len, SMBusDevice),
++        VMSTATE_UINT8_ARRAY(data_buf, SMBusDevice, SMBUS_DATA_MAX_LEN),
++        VMSTATE_END_OF_LIST()
++    }
++};
 +
-             s->smb_index++;
-             if (!read && s->smb_index == s->smb_data0) {
-                 uint8_t prot = (s->smb_ctl >> 2) & 0x07;
-@@ -265,12 +297,23 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-                 s->smb_stat |= STS_BYTE_DONE;
-             } else if (s->smb_ctl & CTL_LAST_BYTE) {
-                 s->op_done = true;
--                s->smb_blkdata = s->smb_data[s->smb_index];
-+                if (s->in_i2c_block_read) {
-+                    s->in_i2c_block_read = false;
-+                    s->smb_blkdata = i2c_recv(s->smbus);
-+                    i2c_nack(s->smbus);
-+                    i2c_end_transfer(s->smbus);
-+                } else {
-+                    s->smb_blkdata = s->smb_data[s->smb_index];
-+                }
-                 s->smb_index = 0;
-                 s->smb_stat |= STS_INTR;
-                 s->smb_stat &= ~STS_HOST_BUSY;
-             } else {
--                s->smb_blkdata = s->smb_data[s->smb_index];
-+                if (s->in_i2c_block_read) {
-+                    s->smb_blkdata = i2c_recv(s->smbus);
-+                } else {
-+                    s->smb_blkdata = s->smb_data[s->smb_index];
-+                }
-                 s->smb_stat |= STS_BYTE_DONE;
-             }
-         }
-@@ -281,6 +324,10 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-             if (!s->op_done) {
-                 s->smb_index = 0;
-                 s->op_done = true;
-+                if (s->in_i2c_block_read) {
-+                    s->in_i2c_block_read = false;
-+                    i2c_end_transfer(s->smbus);
-+                }
-             }
-             smb_transaction_start(s);
-         }
-@@ -334,8 +381,9 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-     switch(addr) {
-     case SMBHSTSTS:
-         val = s->smb_stat;
--        if (s->smb_stat & STS_HOST_BUSY) {
-+        if (s->start_transaction_on_status_read) {
-             /* execute command now */
-+            s->start_transaction_on_status_read = false;
-             s->smb_stat &= ~STS_HOST_BUSY;
-             smb_transaction(s);
-         }
-@@ -356,10 +404,10 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-         val = s->smb_data1;
-         break;
-     case SMBBLKDAT:
--        if (s->smb_index >= PM_SMBUS_MAX_MSG_SIZE) {
--            s->smb_index = 0;
--        }
--        if (s->smb_auxctl & AUX_BLK) {
-+        if (s->smb_auxctl & AUX_BLK && !s->in_i2c_block_read) {
-+            if (s->smb_index >= PM_SMBUS_MAX_MSG_SIZE) {
-+                s->smb_index = 0;
-+            }
-             val = s->smb_data[s->smb_index++];
-             if (!s->op_done && s->smb_index == s->smb_data0) {
-                 s->op_done = true;
-diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
-index 6dd5b7040b..7bcca97672 100644
---- a/include/hw/i2c/pm_smbus.h
-+++ b/include/hw/i2c/pm_smbus.h
-@@ -33,6 +33,12 @@ typedef struct PMSMBus {
-     /* Set on block transfers after the last byte has been read, so the
-        INTR bit can be set at the right time. */
-     bool op_done;
-+
-+    /* Set during an I2C block read, so we know how to handle data. */
-+    bool in_i2c_block_read;
-+
-+    /* Used to work around a bug in AMIBIOS, see smb_transaction_start() */
-+    bool start_transaction_on_status_read;
- } PMSMBus;
+ static const TypeInfo smbus_device_type_info = {
+     .name = TYPE_SMBUS_DEVICE,
+     .parent = TYPE_I2C_SLAVE,
+diff --git a/include/hw/i2c/smbus_slave.h b/include/hw/i2c/smbus_slave.h
+index eabac1dd73..d53d691bf6 100644
+--- a/include/hw/i2c/smbus_slave.h
++++ b/include/hw/i2c/smbus_slave.h
+@@ -75,14 +75,32 @@ typedef struct SMBusDeviceClass
+     void (*transaction_complete)(SMBusDevice *dev);
+ } SMBusDeviceClass;
  
- void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk);
++#define SMBUS_DATA_MAX_LEN 34  /* command + len + 32 bytes of data.  */
++
+ struct SMBusDevice {
+     /* The SMBus protocol is implemented on top of I2C.  */
+     I2CSlave i2c;
+ 
+     /* Remaining fields for internal use only.  */
+-    int mode;
+-    int data_len;
+-    uint8_t data_buf[34]; /* command + len + 32 bytes of data.  */
++    int32_t mode;
++    int32_t data_len;
++    uint8_t data_buf[SMBUS_DATA_MAX_LEN];
+ };
+ 
++extern const VMStateDescription vmstate_smbus_device;
++
++#define VMSTATE_SMBUS_DEVICE(_field, _state) {                       \
++    .name       = (stringify(_field)),                               \
++    .size       = sizeof(SMBusDevice),                               \
++    .vmsd       = &vmstate_smbus_device,                             \
++    .flags      = VMS_STRUCT,                                        \
++    .offset     = vmstate_offset_value(_state, _field, SMBusDevice), \
++}
++
++/*
++ * Users should call this in their .needed functions to know if the
++ * SMBus slave data needs to be transferred.
++ */
++bool smbus_vmstate_needed(SMBusDevice *dev);
++
+ #endif
 -- 
 2.17.1
