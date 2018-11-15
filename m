@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNIZB-0004Di-TH
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:24:25 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gNIZX-0004U2-DT
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:24:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNIYx-0008Kw-ID
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:24:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48510)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gNIYx-0008KJ-BW
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:24:07 -0500
-References: <20181115140501.7872-1-david@redhat.com>
-	<20181115140501.7872-2-david@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5e2769ed-f017-d684-da9e-115d31c3189b@redhat.com>
-Date: Thu, 15 Nov 2018 08:23:59 -0600
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gNIZT-00005R-T6
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:24:43 -0500
+Received: from mail-yb1-f194.google.com ([209.85.219.194]:39366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gNIZT-0008Vc-OF
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 09:24:39 -0500
+Received: by mail-yb1-f194.google.com with SMTP id w17-v6so8400082ybl.6
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 06:24:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181115140501.7872-2-david@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/9] cutils: add qemu_strtod() and
- qemu_strtod_finite()
+References: <1533076661-8030-1-git-send-email-linux@roeck-us.net>
+In-Reply-To: <1533076661-8030-1-git-send-email-linux@roeck-us.net>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 15 Nov 2018 15:24:25 +0100
+Message-ID: <CAAdtpL6dAKVj3bBLRS_6x4B3Pmed9hodd6-kh2imBbs81txV8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/sd: Mark sd-card as storage device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Guenter Roeck <linux@roeck-us.net>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 11/15/18 8:04 AM, David Hildenbrand wrote:
-> Let's provide a wrapper for strtod().
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On Wed, Aug 1, 2018 at 12:37 AM Guenter Roeck <linux@roeck-us.net> wrote:
+>
+> sd-card is currently listed as uncategorized device.
+> Mark it as storage device.
+>
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
 > ---
->   include/qemu/cutils.h |  2 ++
->   util/cutils.c         | 38 ++++++++++++++++++++++++++++++++++++++
->   2 files changed, 40 insertions(+)
-> 
-
-
-> +
-> +/**
-> + * Convert string @nptr to a finite double.
-> + *
-> + * Works like qemu_strtoul(), except it stores +/-HUGE_VAL on
-> + * overflow/underflow. "NaN" or "inf" are rejcted with -EINVAL.
-
-s/rejcted/rejected/
-
-> + */
-> +int qemu_strtod_finite(const char *nptr, const char **endptr, double *result)
-> +{
-> +    int ret = qemu_strtod(nptr, endptr, result);
-
-On overflow, result is set to HUGE_VAL (aka "inf") with ret set to 
--ERANGE.  (The C standard uses HUGE_VAL rather than directly requiring 
-infinity on overflow, in order to cater to museum platforms where the 
-largest representable double is still finite; but no one develops qemu 
-on a non-IEEE machine these days so we know that HUGE_VAL == INF).
-
-> +
-> +    if (!ret && !isfinite(*result)) {
-> +        return -EINVAL;
-> +    }
-
-This check means that overflow ("1e9999") fails with -ERANGE, while 
-actual infinity ("inf") fails with -EINVAL, letting the user distinguish 
-between the two.  Still, I wonder if assigning a non-finite value into 
-result on -ERANGE is the wisest course of action.  We'll just have to 
-see in the next patches that use this.
-
-With the typo fix,
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>  hw/sd/sd.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index d4356e9..aaab15f 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -2121,6 +2121,7 @@ static void sd_class_init(ObjectClass *klass, void =
+*data)
+>      dc->vmsd =3D &sd_vmstate;
+>      dc->reset =3D sd_reset;
+>      dc->bus_type =3D TYPE_SD_BUS;
+> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+>
+>      sc->set_voltage =3D sd_set_voltage;
+>      sc->get_dat_lines =3D sd_get_dat_lines;
+> --
+> 2.7.4
+>
