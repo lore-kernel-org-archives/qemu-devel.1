@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48069)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQFM-00071P-IC
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:36:28 -0500
+	id 1gNQFi-0007Iy-A1
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:36:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQFG-0004bB-CI
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:36:22 -0500
+	id 1gNQFS-0004eg-NF
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:36:39 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 15 Nov 2018 22:36:09 +0000
-Message-ID: <f1a7d2617c26c1745fafe13bbe3bc3b042c14217.1542321076.git.alistair.francis@wdc.com>
+Date: Thu, 15 Nov 2018 22:36:19 +0000
+Message-ID: <bd8f5c781f7086c5b26e1bd4c8e6570b5534b22d.1542321076.git.alistair.francis@wdc.com>
 References: <cover.1542321076.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1542321076.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [RFC v1 15/23] riscv: tcg-target: Add branch and jump
- instructions
+Subject: [Qemu-devel] [RFC v1 16/23] riscv: tcg-target: Add slowpath load
+ and store instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,162 +32,262 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- tcg/riscv/tcg-target.inc.c | 144 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 144 insertions(+)
+ tcg/riscv/tcg-target.inc.c | 240 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 240 insertions(+)
 
 diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-index bc433170c4..b449e17295 100644
+index b449e17295..5fe6935e24 100644
 --- a/tcg/riscv/tcg-target.inc.c
 +++ b/tcg/riscv/tcg-target.inc.c
-@@ -574,6 +574,150 @@ static bool tcg_out_sti(TCGContext *s, TCGType type, =
-TCGArg val,
-     return false;
+@@ -718,6 +718,246 @@ static void tcg_out_call(TCGContext *s, tcg_insn_unit=
+ *arg)
+     tcg_out_call_int(s, arg, false);
  }
 =20
-+static const struct {
-+    RISCVInsn op;
-+    bool swap;
-+} tcg_brcond_to_riscv[] =3D {
-+    [TCG_COND_EQ] =3D  { OPC_BEQ,  false },
-+    [TCG_COND_NE] =3D  { OPC_BNE,  false },
-+    [TCG_COND_LT] =3D  { OPC_BLT,  false },
-+    [TCG_COND_GE] =3D  { OPC_BGE,  false },
-+    [TCG_COND_LE] =3D  { OPC_BGE,  true  },
-+    [TCG_COND_GT] =3D  { OPC_BLT,  true  },
-+    [TCG_COND_LTU] =3D { OPC_BLTU, false },
-+    [TCG_COND_GEU] =3D { OPC_BGEU, false },
-+    [TCG_COND_LEU] =3D { OPC_BGEU, true  },
-+    [TCG_COND_GTU] =3D { OPC_BLTU, true  }
++static void tcg_out_mb(TCGContext *s, TCGArg a0)
++{
++    static const RISCVInsn fence[] =3D {
++        [0 ... TCG_MO_ALL] =3D OPC_FENCE_RW_RW,
++        [TCG_MO_LD_LD]     =3D OPC_FENCE_R_R,
++        [TCG_MO_ST_LD]     =3D OPC_FENCE_W_R,
++        [TCG_MO_LD_ST]     =3D OPC_FENCE_R_W,
++        [TCG_MO_ST_ST]     =3D OPC_FENCE_W_W,
++        [TCG_BAR_LDAQ]     =3D OPC_FENCE_R_RW,
++        [TCG_BAR_STRL]     =3D OPC_FENCE_RW_W,
++        [TCG_BAR_SC]       =3D OPC_FENCE_RW_RW,
++    };
++    tcg_out32(s, fence[a0 & TCG_MO_ALL]);
++}
++
++/*
++ * Load/store and TLB
++ */
++
++#if defined(CONFIG_SOFTMMU)
++#include "tcg-ldst.inc.c"
++
++/* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
++ *                                     TCGMemOpIdx oi, uintptr_t ra)
++ */
++static void * const qemu_ld_helpers[16] =3D {
++    [MO_UB]   =3D helper_ret_ldub_mmu,
++    [MO_SB]   =3D helper_ret_ldsb_mmu,
++    [MO_LEUW] =3D helper_le_lduw_mmu,
++    [MO_LESW] =3D helper_le_ldsw_mmu,
++    [MO_LEUL] =3D helper_le_ldul_mmu,
++    [MO_LESL] =3D helper_le_ldsl_mmu,
++    [MO_LEQ]  =3D helper_le_ldq_mmu,
++    [MO_BEUW] =3D helper_be_lduw_mmu,
++    [MO_BESW] =3D helper_be_ldsw_mmu,
++    [MO_BEUL] =3D helper_be_ldul_mmu,
++    [MO_BESL] =3D helper_be_ldsl_mmu,
++    [MO_BEQ]  =3D helper_be_ldq_mmu,
 +};
 +
-+static void tcg_out_brcond(TCGContext *s, TCGCond cond, TCGReg arg1,
-+                           TCGReg arg2, TCGLabel *l)
++/* helper signature: helper_ret_st_mmu(CPUState *env, target_ulong addr,
++ *                                     uintxx_t val, TCGMemOpIdx oi,
++ *                                     uintptr_t ra)
++ */
++static void * const qemu_st_helpers[16] =3D {
++    [MO_UB]   =3D helper_ret_stb_mmu,
++    [MO_LEUW] =3D helper_le_stw_mmu,
++    [MO_LEUL] =3D helper_le_stl_mmu,
++    [MO_LEQ]  =3D helper_le_stq_mmu,
++    [MO_BEUW] =3D helper_be_stw_mmu,
++    [MO_BEUL] =3D helper_be_stl_mmu,
++    [MO_BEQ]  =3D helper_be_stq_mmu,
++};
++
++static void tcg_out_tlb_load(TCGContext *s, TCGReg addrl,
++                             TCGReg addrh, TCGMemOpIdx oi,
++                             tcg_insn_unit **label_ptr, bool is_load)
 +{
-+    RISCVInsn op =3D tcg_brcond_to_riscv[cond].op;
-+    bool swap =3D tcg_brcond_to_riscv[cond].swap;
++    TCGMemOp opc =3D get_memop(oi);
++    unsigned s_bits =3D opc & MO_SIZE;
++    unsigned a_bits =3D get_alignment_bits(opc);
++    target_ulong mask;
++    int mem_index =3D get_mmuidx(oi);
++    int cmp_off
++        =3D (is_load
++           ? offsetof(CPUArchState, tlb_table[mem_index][0].addr_read)
++           : offsetof(CPUArchState, tlb_table[mem_index][0].addr_write));
++    int add_off =3D offsetof(CPUArchState, tlb_table[mem_index][0].addend)=
+;
++    int addend_offset =3D (offsetof(CPUTLBEntry, addend)) -
++                            (is_load ? offsetof(CPUTLBEntry, addr_read)
++                                     : offsetof(CPUTLBEntry, addr_write));
++    RISCVInsn load_cmp_op =3D (TARGET_LONG_BITS =3D=3D 64 ? OPC_LD :
++                             TCG_TARGET_REG_BITS =3D=3D 64 ? OPC_LWU : OPC=
+_LW);
++    RISCVInsn load_add_op =3D TCG_TARGET_REG_BITS =3D=3D 64 ? OPC_LD : OPC=
+_LW;
++    TCGReg base =3D TCG_AREG0;
++    TCGReg cmpr;
 +
-+    tcg_out_opc_branch(s, op, swap ? arg2 : arg1, swap ? arg1 : arg2, 0);
-+
-+    if (l->has_value) {
-+        reloc_sbimm12(s->code_ptr - 1, l->u.value_ptr);
-+    } else {
-+        tcg_out_reloc(s, s->code_ptr - 1, R_RISCV_BRANCH, l, 0);
-+    }
-+}
-+
-+static void tcg_out_setcond(TCGContext *s, TCGCond cond, TCGReg ret,
-+                            TCGReg arg1, TCGReg arg2)
-+{
-+    switch (cond) {
-+    case TCG_COND_EQ:
-+        tcg_out_opc_reg(s, OPC_SUB, ret, arg1, arg2);
-+        tcg_out_opc_imm(s, OPC_SLTIU, ret, ret, 1);
-+        break;
-+    case TCG_COND_NE:
-+        tcg_out_opc_reg(s, OPC_SUB, ret, arg1, arg2);
-+        tcg_out_opc_reg(s, OPC_SLTU, ret, TCG_REG_ZERO, ret);
-+        break;
-+    case TCG_COND_LT:
-+        tcg_out_opc_reg(s, OPC_SLT, ret, arg1, arg2);
-+        break;
-+    case TCG_COND_GE:
-+        tcg_out_opc_reg(s, OPC_SLT, ret, arg1, arg2);
-+        tcg_out_opc_imm(s, OPC_XORI, ret, ret, 1);
-+        break;
-+    case TCG_COND_LE:
-+        tcg_out_opc_reg(s, OPC_SLT, ret, arg2, arg1);
-+        tcg_out_opc_imm(s, OPC_XORI, ret, ret, 1);
-+        break;
-+    case TCG_COND_GT:
-+        tcg_out_opc_reg(s, OPC_SLT, ret, arg2, arg1);
-+        break;
-+    case TCG_COND_LTU:
-+        tcg_out_opc_reg(s, OPC_SLTU, ret, arg1, arg2);
-+        break;
-+    case TCG_COND_GEU:
-+        tcg_out_opc_reg(s, OPC_SLTU, ret, arg1, arg2);
-+        tcg_out_opc_imm(s, OPC_XORI, ret, ret, 1);
-+        break;
-+    case TCG_COND_LEU:
-+        tcg_out_opc_reg(s, OPC_SLTU, ret, arg2, arg1);
-+        tcg_out_opc_imm(s, OPC_XORI, ret, ret, 1);
-+        break;
-+    case TCG_COND_GTU:
-+        tcg_out_opc_reg(s, OPC_SLTU, ret, arg2, arg1);
-+        break;
-+    default:
-+         g_assert_not_reached();
-+         break;
-+     }
-+}
-+
-+static void tcg_out_brcond2(TCGContext *s, TCGCond cond, TCGReg al, TCGReg=
- ah,
-+                            TCGReg bl, TCGReg bh, TCGLabel *l)
-+{
-+    /* todo */
-+    g_assert_not_reached();
-+}
-+
-+static void tcg_out_setcond2(TCGContext *s, TCGCond cond, TCGReg ret,
-+                             TCGReg al, TCGReg ah, TCGReg bl, TCGReg bh)
-+{
-+    /* todo */
-+    g_assert_not_reached();
-+}
-+
-+static inline void tcg_out_goto(TCGContext *s, tcg_insn_unit *target)
-+{
-+    ptrdiff_t offset =3D tcg_pcrel_diff(s, target);
-+    tcg_debug_assert(offset =3D=3D sextract64(offset, 0, 26));
-+    tcg_out_opc_jump(s, OPC_JAL, TCG_REG_ZERO, offset);
-+}
-+
-+static inline void tcg_out_goto_long(TCGContext *s, tcg_insn_unit *target)
-+{
-+    ptrdiff_t offset =3D tcg_pcrel_diff(s, target);
-+
-+    if (offset =3D=3D sextract64(offset, 0, 26)) {
-+        tcg_out_opc_jump(s, OPC_JAL, TCG_REG_ZERO, offset);
-+    } else {
-+        tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_TMP0, (intptr_t)target);
-+        tcg_out_opc_jump(s, OPC_JAL, TCG_REG_TMP0, 0);
-+    }
-+}
-+
-+static void tcg_out_call_int(TCGContext *s, tcg_insn_unit *arg, bool tail)
-+{
-+    TCGReg link =3D tail ? TCG_REG_ZERO : TCG_REG_RA;
-+    ptrdiff_t offset =3D tcg_pcrel_diff(s, arg);
-+    if (offset =3D=3D sextract32(offset, 1, 20) << 1) {
-+        /* short jump: -2097150 to 2097152 */
-+        tcg_out_opc_jump(s, OPC_JAL, link, offset);
-+    } else if (TCG_TARGET_REG_BITS =3D=3D 32 ||
-+        offset =3D=3D sextract32(offset, 1, 31) << 1) {
-+        /* long jump: -2147483646 to 2147483648 */
-+        tcg_out_opc_upper(s, OPC_AUIPC, TCG_REG_TMP0, 0);
-+        tcg_out_opc_imm(s, OPC_JALR, link, TCG_REG_TMP0, 0);
-+        reloc_call(s->code_ptr - 2, arg);
-+    } else if (TCG_TARGET_REG_BITS =3D=3D 64) {
-+        /* far jump: 64-bit */
-+        tcg_target_long imm =3D sextract32((tcg_target_long)arg, 0, 12);
-+        tcg_target_long base =3D (tcg_target_long)arg - imm;
-+        tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_TMP0, base);
-+        tcg_out_opc_imm(s, OPC_JALR, link, TCG_REG_TMP0, imm);
-+    } else {
++    /* We don't support oversize guests */
++    if (TCG_TARGET_REG_BITS < TARGET_LONG_BITS) {
 +        g_assert_not_reached();
 +    }
++
++    /* We don't support unaligned accesses. */
++    if (a_bits < s_bits) {
++        a_bits =3D s_bits;
++    }
++    mask =3D (target_ulong)TARGET_PAGE_MASK | ((1 << a_bits) - 1);
++
++
++    /* Compensate for very large offsets.  */
++    if (add_off >=3D 0x1000) {
++        int adj;
++        base =3D TCG_REG_TMP2;
++        if (cmp_off <=3D 2 * 0xfff) {
++            adj =3D 0xfff;
++            tcg_out_opc_imm(s, OPC_ADDI, base, TCG_AREG0, adj);
++        } else {
++            adj =3D cmp_off - sextract32(cmp_off, 0, 12);
++            tcg_debug_assert(add_off - adj >=3D -0x1000
++                             && add_off - adj < 0x1000);
++
++            tcg_out_opc_upper(s, OPC_LUI, base, adj);
++            tcg_out_opc_reg(s, OPC_ADD, base, TCG_REG_ZERO, TCG_AREG0);
++        }
++        add_off -=3D adj;
++        cmp_off -=3D adj;
++    }
++
++    /* Extract the page index.  */
++    if (CPU_TLB_BITS + CPU_TLB_ENTRY_BITS < 12) {
++        tcg_out_opc_imm(s, OPC_SRLI, TCG_REG_TMP0, addrl,
++                        TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
++        tcg_out_opc_imm(s, OPC_ANDI, TCG_REG_TMP0, TCG_REG_TMP0,
++                        MAKE_64BIT_MASK(CPU_TLB_ENTRY_BITS, CPU_TLB_BITS))=
+;
++    } else {
++        tcg_out_opc_imm(s, OPC_SRLI, TCG_REG_TMP0, addrl, TARGET_PAGE_BITS=
+);
++        tcg_out_opc_imm(s, OPC_ANDI, TCG_REG_TMP0, TCG_REG_TMP0,
++                        MAKE_64BIT_MASK(0, CPU_TLB_BITS));
++        tcg_out_opc_imm(s, OPC_SLLI, TCG_REG_TMP0, TCG_REG_TMP0,
++                        CPU_TLB_ENTRY_BITS);
++    }
++
++    /* Add that to the base address to index the tlb.  */
++    tcg_out_opc_reg(s, OPC_ADD, TCG_REG_TMP2, base, TCG_REG_TMP0);
++    base =3D TCG_REG_TMP2;
++
++    /* Load the tlb comparator and the addend.  */
++    tcg_out_ldst(s, load_cmp_op, TCG_REG_TMP0, base, cmp_off);
++    tcg_out_ldst(s, load_cmp_op, TCG_REG_TMP2, base, add_off);
++
++    /* Clear the non-page, non-alignment bits from the address.  */
++    if (mask =3D=3D sextract64(mask, 0, 12)) {
++        tcg_out_opc_imm(s, OPC_ANDI, TCG_REG_TMP1, addrl, mask);
++    } else {
++        tcg_out_movi(s, TCG_TYPE_REG, TCG_REG_TMP1, mask);
++        tcg_out_opc_reg(s, OPC_AND, TCG_REG_TMP1, TCG_REG_TMP1, addrl);
++     }
++
++    /* Compare masked address with the TLB entry. */
++    label_ptr[0] =3D s->code_ptr;
++    tcg_out_opc_branch(s, OPC_BNE, TCG_REG_TMP0, TCG_REG_TMP1, 0);
++
++    /* TLB Hit - translate address using addend.  */
++    if (TCG_TARGET_REG_BITS > TARGET_LONG_BITS) {
++        tcg_out_ext32u(s, TCG_REG_TMP0, addrl);
++        addrl =3D TCG_REG_TMP0;
++    }
++    tcg_out_opc_reg(s, OPC_ADD, TCG_REG_L0, TCG_REG_TMP2, addrl);
 +}
 +
-+static void tcg_out_tail(TCGContext *s, tcg_insn_unit *arg)
++static void add_qemu_ldst_label(TCGContext *s, int is_ld, TCGMemOpIdx oi,
++                                TCGType ext,
++                                TCGReg datalo, TCGReg datahi,
++                                TCGReg addrlo, TCGReg addrhi,
++                                void *raddr, tcg_insn_unit **label_ptr)
 +{
-+    tcg_out_call_int(s, arg, true);
++    TCGLabelQemuLdst *label =3D new_ldst_label(s);
++
++    label->is_ld =3D is_ld;
++    label->oi =3D oi;
++    label->type =3D ext;
++    label->datalo_reg =3D datalo;
++    label->datahi_reg =3D datahi;
++    label->addrlo_reg =3D addrlo;
++    label->addrhi_reg =3D addrhi;
++    label->raddr =3D raddr;
++    label->label_ptr[0] =3D label_ptr[0];
 +}
 +
-+static void tcg_out_call(TCGContext *s, tcg_insn_unit *arg)
++static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
 +{
-+    tcg_out_call_int(s, arg, false);
++    TCGMemOpIdx oi =3D l->oi;
++    TCGMemOp opc =3D get_memop(oi);
++    TCGReg a0 =3D tcg_target_call_iarg_regs[0];
++    TCGReg a1 =3D tcg_target_call_iarg_regs[1];
++    TCGReg a2 =3D tcg_target_call_iarg_regs[2];
++    TCGReg a3 =3D tcg_target_call_iarg_regs[3];
++
++    /* We don't support oversize guests */
++    if (TCG_TARGET_REG_BITS < TARGET_LONG_BITS) {
++        g_assert_not_reached();
++    }
++
++    /* resolve label address */
++    reloc_sbimm12(l->label_ptr[0], s->code_ptr);
++
++    /* call load helper */
++    tcg_out_mov(s, TCG_TYPE_PTR, a0, TCG_AREG0);
++    tcg_out_mov(s, TCG_TYPE_PTR, a1, l->addrlo_reg);
++    tcg_out_movi(s, TCG_TYPE_PTR, a2, oi);
++    tcg_out_movi(s, TCG_TYPE_PTR, a3, (tcg_target_long)l->raddr);
++
++    tcg_out_call(s, qemu_ld_helpers[opc & (MO_BSWAP | MO_SSIZE)]);
++    tcg_out_mov(s, (opc & MO_SIZE) =3D=3D MO_64, l->datalo_reg, a0);
++
++    tcg_out_goto(s, l->raddr);
 +}
++
++static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
++{
++    TCGMemOpIdx oi =3D l->oi;
++    TCGMemOp opc =3D get_memop(oi);
++    TCGMemOp s_bits =3D opc & MO_SIZE;
++    TCGReg a0 =3D tcg_target_call_iarg_regs[0];
++    TCGReg a1 =3D tcg_target_call_iarg_regs[1];
++    TCGReg a2 =3D tcg_target_call_iarg_regs[2];
++    TCGReg a3 =3D tcg_target_call_iarg_regs[3];
++    TCGReg a4 =3D tcg_target_call_iarg_regs[4];
++
++    /* We don't support oversize guests */
++    if (TCG_TARGET_REG_BITS < TARGET_LONG_BITS) {
++        g_assert_not_reached();
++    }
++
++    /* resolve label address */
++    reloc_sbimm12(l->label_ptr[0], s->code_ptr);
++
++    /* call store helper */
++    tcg_out_mov(s, TCG_TYPE_PTR, a0, TCG_AREG0);
++    tcg_out_mov(s, TCG_TYPE_PTR, a1, l->addrlo_reg);
++    tcg_out_mov(s, TCG_TYPE_PTR, a2, l->datalo_reg);
++    switch (s_bits) {
++    case MO_8:
++        tcg_out_ext8u(s, a2, a2);
++        break;
++    case MO_16:
++        tcg_out_ext16u(s, a2, a2);
++        break;
++    default:
++        break;
++    }
++    tcg_out_movi(s, TCG_TYPE_PTR, a3, oi);
++    tcg_out_movi(s, TCG_TYPE_PTR, a4, (tcg_target_long)l->raddr);
++
++    tcg_out_call(s, qemu_st_helpers[opc & (MO_BSWAP | MO_SSIZE)]);
++
++    tcg_out_goto(s, l->raddr);
++}
++#endif /* CONFIG_SOFTMMU */
 +
  void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
                                uintptr_t addr)
