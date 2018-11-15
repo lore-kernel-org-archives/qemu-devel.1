@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47899)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQEn-0006WO-3G
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:35:51 -0500
+	id 1gNQEw-0006fy-2O
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:35:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQEj-0004LY-MB
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:35:49 -0500
+	id 1gNQEs-0004Q0-Ri
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:35:57 -0500
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 15 Nov 2018 22:35:42 +0000
-Message-ID: <51aa21df48c5d80484bf396b82d9e3943daf1e0c.1542321076.git.alistair.francis@wdc.com>
+Date: Thu, 15 Nov 2018 22:35:51 +0000
+Message-ID: <ac51f3b3a2d91ea1b08ccd89add5282d308cfe70.1542321076.git.alistair.francis@wdc.com>
 References: <cover.1542321076.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1542321076.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [RFC v1 12/23] riscv: tcg-target: Add the mov and movi
- instruction
+Subject: [Qemu-devel] [RFC v1 13/23] riscv: tcg-target: Add the extract
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +32,50 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- tcg/riscv/tcg-target.inc.c | 62 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ tcg/riscv/tcg-target.inc.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-index 475feca906..0e891e24c9 100644
+index 0e891e24c9..646a4d3ebd 100644
 --- a/tcg/riscv/tcg-target.inc.c
 +++ b/tcg/riscv/tcg-target.inc.c
-@@ -422,6 +422,68 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int t=
-ype,
+@@ -484,6 +484,40 @@ static void tcg_out_movi(TCGContext *s, TCGType type, =
+TCGReg rd,
      }
  }
 =20
-+/*
-+ * TCG intrinsics
-+ */
-+
-+static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg ar=
-g)
++static void tcg_out_ext8u(TCGContext *s, TCGReg ret, TCGReg arg)
 +{
-+    if (ret =3D=3D arg) {
-+        return;
-+    }
-+    switch (type) {
-+    case TCG_TYPE_I32:
-+    case TCG_TYPE_I64:
-+        tcg_out_opc_imm(s, OPC_ADDI, ret, arg, 0);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
++    tcg_out_opc_imm(s, OPC_ANDI, ret, arg, 0xff);
 +}
 +
-+static void tcg_out_movi(TCGContext *s, TCGType type, TCGReg rd,
-+                         tcg_target_long val)
++static void tcg_out_ext16u(TCGContext *s, TCGReg ret, TCGReg arg)
 +{
-+    tcg_target_long lo =3D sextract32(val, 0, 12);
-+    tcg_target_long hi =3D val - lo;
++    tcg_out_opc_imm(s, OPC_SLLI, ret, arg, TCG_TARGET_REG_BITS - 16);
++    tcg_out_opc_imm(s, OPC_SRLI, ret, ret, TCG_TARGET_REG_BITS - 16);
++}
 +
-+    RISCVInsn add32_op =3D TCG_TARGET_REG_BITS =3D=3D 64 ? OPC_ADDIW : OPC=
-_ADDI;
++static void tcg_out_ext32u(TCGContext *s, TCGReg ret, TCGReg arg)
++{
++    tcg_out_opc_imm(s, OPC_SLLI, ret, arg, 32);
++    tcg_out_opc_imm(s, OPC_SRLI, ret, ret, 32);
++}
 +
-+#if TCG_TARGET_REG_BITS =3D=3D 64
-+    ptrdiff_t offset =3D tcg_pcrel_diff(s, (void *)val);
-+#endif
++static void tcg_out_ext8s(TCGContext *s, TCGReg ret, TCGReg arg)
++{
++    tcg_out_opc_imm(s, OPC_SLLI, ret, arg, TCG_TARGET_REG_BITS - 8);
++    tcg_out_opc_imm(s, OPC_SRAI, ret, ret, TCG_TARGET_REG_BITS - 8);
++}
 +
-+    if (val =3D=3D lo) {
-+        tcg_out_opc_imm(s, OPC_ADDI, rd, TCG_REG_ZERO, val);
-+    } else if (val && !(val & (val - 1))) {
-+        /* power of 2 */
-+        tcg_out_opc_imm(s, OPC_ADDI, rd, TCG_REG_ZERO, 1);
-+        tcg_out_opc_imm(s, OPC_SLLI, rd, rd, ctz64(val));
-+    } else if (TCG_TARGET_REG_BITS =3D=3D 64 &&
-+               !(val >> 31 =3D=3D 0 || val >> 31 =3D=3D -1)) {
-+        int shift =3D 12 + ctz64(hi >> 12);
-+        hi >>=3D shift;
-+        tcg_out_movi(s, type, rd, hi);
-+        tcg_out_opc_imm(s, OPC_SLLI, rd, rd, shift);
-+        if (lo !=3D 0) {
-+            tcg_out_opc_imm(s, OPC_ADDI, rd, rd, lo);
-+        }
-+#if TCG_TARGET_REG_BITS =3D=3D 64
-+    } else if (offset =3D=3D sextract32(offset, 1, 31) << 1) {
-+        tcg_out_opc_upper(s, OPC_AUIPC, rd, 0);
-+        tcg_out_opc_imm(s, OPC_ADDI, rd, rd, 0);
-+        reloc_call(s->code_ptr - 2, (tcg_insn_unit *)val);
-+#endif
-+    } else {
-+        if (hi !=3D 0) {
-+            tcg_out_opc_upper(s, OPC_LUI, rd, hi);
-+        }
-+        if (lo !=3D 0) {
-+            tcg_out_opc_imm(s, add32_op, rd, hi =3D=3D 0 ? TCG_REG_ZERO : =
-rd, lo);
-+        }
-+    }
++static void tcg_out_ext16s(TCGContext *s, TCGReg ret, TCGReg arg)
++{
++    tcg_out_opc_imm(s, OPC_SLLI, ret, arg, TCG_TARGET_REG_BITS - 16);
++    tcg_out_opc_imm(s, OPC_SRAI, ret, ret, TCG_TARGET_REG_BITS - 16);
++}
++
++static void tcg_out_ext32s(TCGContext *s, TCGReg ret, TCGReg arg)
++{
++    tcg_out_opc_imm(s, OPC_ADDIW, ret, arg, 0);
 +}
 +
  void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
