@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQGw-0008TW-MD
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:38:03 -0500
+	(envelope-from <eblake@redhat.com>) id 1gNQLs-0004av-8e
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:43:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8503fdbbc=Alistair.Francis@wdc.com>)
-	id 1gNQGt-00059e-AR
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:38:02 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 15 Nov 2018 22:37:22 +0000
-Message-ID: <b7bd19036aa7af06a54d904f5473d97bd8dcfc6e.1542321076.git.alistair.francis@wdc.com>
-References: <cover.1542321076.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1542321076.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1gNQLp-0007QE-3G
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 17:43:08 -0500
+References: <20181115215449.1300769-1-eblake@redhat.com>
+	<b600b483-0e46-5c2e-f52b-2f330ebaa5a7@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e772baf5-80eb-3690-1782-cb2d69302fe3@redhat.com>
+Date: Thu, 15 Nov 2018 16:43:02 -0600
 MIME-Version: 1.0
-Subject: [Qemu-devel] [RFC v1 23/23] configure: Add support for building
- RISC-V host
+In-Reply-To: <b600b483-0e46-5c2e-f52b-2f330ebaa5a7@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qapi: Reduce Makefile boilerplate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, armbru@redhat.com, xiezhide@huawei.com, Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
----
- configure | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+On 11/15/18 4:37 PM, Eric Blake wrote:
+> I'm trying to do the same thing to Makefile.objs, but when I use:
+>=20
+> common-obj-y +=3D $(QAPI_MODULES:%=3Dqapi/qapi-commands-%.o)
+>=20
+> or the longer $(patsubst %,qapi,qapi-commands-%.o,$(QAPI_MODULES))
+>=20
+> both before and after the change, 'make print-common-obj-y | grep qapi'=
+=20
+> returns identical content, but after the change, the linker fails with:
+>=20
 
-diff --git a/configure b/configure
-index 74e313a810..8a7b9fc933 100755
---- a/configure
-+++ b/configure
-@@ -700,6 +700,12 @@ elif check_define __s390__ ; then
-   else
-     cpu=3D"s390"
-   fi
-+elif check_define __riscv ; then
-+  if check_define _LP64 ; then
-+    cpu=3D"riscv64"
-+  elif check_define _ILP32 ; then
-+    cpu=3D"riscv32"
-+  fi
- elif check_define __arm__ ; then
-   cpu=3D"arm"
- elif check_define __aarch64__ ; then
-@@ -712,7 +718,7 @@ ARCH=3D
- # Normalise host CPU name and set ARCH.
- # Note that this case should only have supported host CPUs, not guests.
- case "$cpu" in
--  ppc|ppc64|s390|s390x|sparc64|x32)
-+  ppc|ppc64|s390|s390x|sparc64|x32|riscv32|riscv64)
-     cpu=3D"$cpu"
-     supported_cpu=3D"yes"
-     eval "cross_cc_${cpu}=3D\$host_cc"
-@@ -6809,6 +6815,8 @@ elif test "$ARCH" =3D "x86_64" -o "$ARCH" =3D "x32" ;=
- then
-   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
- elif test "$ARCH" =3D "ppc64" ; then
-   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
-+elif test "$ARCH" =3D "riscv32" -o "$ARCH" =3D "riscv64" ; then
-+  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/tcg/riscv $QEMU_INCLUDES"
- else
-   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
- fi
-@@ -7306,7 +7314,7 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-   ppc*)
-     disas_config "PPC"
-   ;;
--  riscv)
-+  riscv*)
-     disas_config "RISCV"
-   ;;
-   s390*)
+>=20
+> So something about variable expansions is NOT playing nicely with our
+>=20
+> dummy :=3D $(call unnest-vars,, \
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 stub-obj-y \
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 chardev-obj-y \
+> ...
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 common-obj-y \
+
+Aha - the problem is that $(QAPI_MODULES) is empty at the time=20
+unnest-vars tries to slurp in Makefile.objs, while it was non-empty at=20
+the time that Makefile directly includes it. Moving the definition of=20
+QAPI_MODULES into Makefile.objs solves that. v2 coming up.
+
 --=20
-2.19.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
