@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNLeW-0000XT-NB
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:42:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gNLqw-0003pT-7L
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:54:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNLeV-0006Kc-IU
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:42:04 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37354)
+	(envelope-from <peter.maydell@linaro.org>) id 1gNLqv-0000SQ-6q
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:54:54 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38679)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNLeV-0006DC-5d
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:42:03 -0500
-Received: by mail-oi1-x242.google.com with SMTP id y23so8313407oia.4
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 09:42:03 -0800 (PST)
+	id 1gNLqu-000087-Kk
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 12:54:53 -0500
+Received: by mail-ot1-x341.google.com with SMTP id u3so13713101ota.5
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 09:54:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181102134112.26370-4-richard.henderson@linaro.org>
+In-Reply-To: <20181102134112.26370-5-richard.henderson@linaro.org>
 References: <20181102134112.26370-1-richard.henderson@linaro.org>
-	<20181102134112.26370-4-richard.henderson@linaro.org>
+	<20181102134112.26370-5-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Nov 2018 17:41:41 +0000
-Message-ID: <CAFEAcA-96EyPc3RnR5-EveW=F+SgatMw52M0W_A=Dk0fCkOypg@mail.gmail.com>
+Date: Thu, 15 Nov 2018 17:54:31 +0000
+Message-ID: <CAFEAcA8C1x8HRDd5JiV8sUgBM48CE+YcLH3HU2=3Vu6mSz_ACw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-4.0 3/4] target/arm: Implement the
- ARMv8.1-HPD extension
+Subject: Re: [Qemu-devel] [PATCH for-4.0 4/4] target/arm: Implement the
+ ARMv8.2-AA32HPD extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +35,50 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
 On 2 November 2018 at 13:41, Richard Henderson
 <richard.henderson@linaro.org> wrote:
-> Since the TCR_*.HPD bits were RES0 in ARMv8.0, we can simply
-> interpret the bits as if ARMv8.1-HPD is present without checking.
-> We will need a slightly different check for hpd for aarch32.
+> The bulk of the work here, beyond base HPD, is defining the TTBCR2 register.
+> In addition we must check TTBCR.T2E, which is not present (RES0) for AArch64.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h    |  8 ++++++++
+>  target/arm/cpu.c    |  4 ++++
+>  target/arm/helper.c | 37 +++++++++++++++++++++++++++++--------
+>  3 files changed, 41 insertions(+), 8 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index f12a6afddc..a253cdebde 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -1517,6 +1517,14 @@ FIELD(ID_ISAR6, FHM, 8, 4)
+>  FIELD(ID_ISAR6, SB, 12, 4)
+>  FIELD(ID_ISAR6, SPECRES, 16, 4)
+>
+> +FIELD(ID_MMFR4, SPECSEI, 0, 4)
+> +FIELD(ID_MMFR4, AC2, 4, 4)
+> +FIELD(ID_MMFR4, XNX, 8, 4)
+> +FIELD(ID_MMFR4, CNP, 12, 4)
+> +FIELD(ID_MMFR4, HPDS, 16, 4)
+> +FIELD(ID_MMFR4, LSM, 20, 4)
+> +FIELD(ID_MMFR4, CCIDX, 24, 4)
 
+Maybe add the v8.5 field too?
+FIELD(ID_MMFR4, EVT, 28, 4)
+
+> +/* Note that unlike TTBCR, writing to TTBCR2 does not require flushing
+> + * qemu tlbs nor adjusting cached masks.
+> + */
+> +static const ARMCPRegInfo ttbcr2_reginfo = {
+> +    .name = "TTBCR2", .cp = 15, .crn = 2, .crm = 0, .opc1 = 0, .opc2 = 3,
+
+Our usual order for these fields is cp, opc1, crn, crm, opc2.
+
+> +    .access = PL1_RW, .type = ARM_CP_ALIAS,
+> +    .bank_fieldoffsets = { offsetofhigh32(CPUARMState, cp15.tcr_el[3]),
+> +                           offsetofhigh32(CPUARMState, cp15.tcr_el[1]) },
+> +};
+
+Otherwise
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-Another way to write the tail end of the loop would be
-to move the nstable handling up, so:
-
-        if (mmu_idx == ARMMMUIdx_S2NS) {
-            /* Stage 2 table descriptors do not include any attribute fields */
-            break;
-        }
-        /* Merge in attributes from table descriptors */
-        attrs |= nstable << 3; /* NS */
-        if (!hpd) {
-            /* HPD disables all the table attributes except NSTable */
-            break;
-        }
-        attrs |= extract32(tableattrs, 0, 2) << 11; /* XN, PXN */
-        attrs |= extract32(tableattrs, 3, 1) << 5; /* APTable[1] => AP[2] */
-        /* The sense of AP[1] vs APTable[0] is reversed, as APTable[0] == 1
-         * means "force PL1 access only", which means forcing AP[1] to 0.
-         */
-        if (extract32(tableattrs, 2, 1)) {
-            attrs &= ~(1 << 4);
-        }
-        attrs |= nstable << 3; /* NS */
-        break;
-
-which would then make the hpd handling use the same
-approach we already have for "don't merge attributes if
-this is a stage 2 table". But don't bother changing your
-patch unless you think that's actually better.
 
 thanks
 -- PMM
