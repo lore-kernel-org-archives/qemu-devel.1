@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gNNGJ-0003Wi-AU
+	(envelope-from <tcminyard@gmail.com>) id 1gNNGJ-0003Wh-AB
 	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gNNG9-00082O-Th
+	(envelope-from <tcminyard@gmail.com>) id 1gNNG9-00082G-SJ
 	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:11 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34283)
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40074)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gNNG8-00080k-1d
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:01 -0500
-Received: by mail-oi1-x241.google.com with SMTP id a202-v6so9591494oib.1
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 11:24:59 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gNNG7-00080d-PF
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 14:25:00 -0500
+Received: by mail-oi1-x244.google.com with SMTP id u130-v6so17704906oie.7
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 11:24:58 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Thu, 15 Nov 2018 13:24:42 -0600
-Message-Id: <20181115192446.17187-9-minyard@acm.org>
+Date: Thu, 15 Nov 2018 13:24:41 -0600
+Message-Id: <20181115192446.17187-8-minyard@acm.org>
 In-Reply-To: <20181115192446.17187-1-minyard@acm.org>
 References: <20181115192446.17187-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v2 08/12] i2c: Add an SMBus vmstate structure
+Subject: [Qemu-devel] [PATCH v2 07/12] i2c:pm_smbus: Fix state transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +31,119 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
 
 From: Corey Minyard <cminyard@mvista.com>
 
-There is no vmstate handling for SMBus, so no device sitting on SMBus
-can have a state transfer that works reliably.  So add it.
+Transfer the state information for the SMBus registers and
+internal data so it will work on a VM transfer.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/i2c/smbus_slave.c         | 18 ++++++++++++++++++
- include/hw/i2c/smbus_slave.h | 24 +++++++++++++++++++++---
- 2 files changed, 39 insertions(+), 3 deletions(-)
+ hw/acpi/piix4.c           |  3 ++-
+ hw/i2c/pm_smbus.c         | 31 +++++++++++++++++++++++++++++++
+ hw/i2c/smbus_ich9.c       |  6 ++++--
+ include/hw/i2c/pm_smbus.h |  2 ++
+ 4 files changed, 39 insertions(+), 3 deletions(-)
 
-diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
-index fa988919d8..b8a2d521f4 100644
---- a/hw/i2c/smbus_slave.c
-+++ b/hw/i2c/smbus_slave.c
-@@ -206,6 +206,24 @@ static void smbus_device_class_init(ObjectClass *klass, void *data)
-     sc->send = smbus_i2c_send;
- }
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index e330f24c71..313305f5a0 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -309,7 +309,7 @@ static const VMStateDescription vmstate_cpuhp_state = {
+  */
+ static const VMStateDescription vmstate_acpi = {
+     .name = "piix4_pm",
+-    .version_id = 3,
++    .version_id = 4,
+     .minimum_version_id = 3,
+     .minimum_version_id_old = 1,
+     .load_state_old = acpi_load_old,
+@@ -320,6 +320,7 @@ static const VMStateDescription vmstate_acpi = {
+         VMSTATE_UINT16(ar.pm1.evt.en, PIIX4PMState),
+         VMSTATE_UINT16(ar.pm1.cnt.cnt, PIIX4PMState),
+         VMSTATE_STRUCT(apm, PIIX4PMState, 0, vmstate_apm, APMState),
++        VMSTATE_STRUCT(smb, PIIX4PMState, 4, pmsmb_vmstate, PMSMBus),
+         VMSTATE_TIMER_PTR(ar.tmr.timer, PIIX4PMState),
+         VMSTATE_INT64(ar.tmr.overflow_time, PIIX4PMState),
+         VMSTATE_STRUCT(ar.gpe, PIIX4PMState, 2, vmstate_gpe, ACPIGPE),
+diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+index 8793113c25..75907e1c22 100644
+--- a/hw/i2c/pm_smbus.c
++++ b/hw/i2c/pm_smbus.c
+@@ -19,6 +19,7 @@
+  */
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
++#include "hw/boards.h"
+ #include "hw/i2c/pm_smbus.h"
+ #include "hw/i2c/smbus_master.h"
  
-+bool smbus_vmstate_needed(SMBusDevice *dev)
+@@ -450,6 +451,36 @@ static const MemoryRegionOps pm_smbus_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
++static bool pm_smbus_vmstate_needed(void *opaque)
 +{
-+    return dev->mode != SMBUS_IDLE;
++    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
++
++    return !mc->smbus_no_migration_support;
 +}
 +
-+const VMStateDescription vmstate_smbus_device = {
-+    .name = TYPE_SMBUS_DEVICE,
++const VMStateDescription pmsmb_vmstate = {
++    .name = "pmsmb",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_I2C_SLAVE(i2c, SMBusDevice),
-+        VMSTATE_INT32(mode, SMBusDevice),
-+        VMSTATE_INT32(data_len, SMBusDevice),
-+        VMSTATE_UINT8_ARRAY(data_buf, SMBusDevice, SMBUS_DATA_MAX_LEN),
++    .needed = pm_smbus_vmstate_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8(smb_stat, PMSMBus),
++        VMSTATE_UINT8(smb_ctl, PMSMBus),
++        VMSTATE_UINT8(smb_cmd, PMSMBus),
++        VMSTATE_UINT8(smb_addr, PMSMBus),
++        VMSTATE_UINT8(smb_data0, PMSMBus),
++        VMSTATE_UINT8(smb_data1, PMSMBus),
++        VMSTATE_UINT32(smb_index, PMSMBus),
++        VMSTATE_UINT8_ARRAY(smb_data, PMSMBus, PM_SMBUS_MAX_MSG_SIZE),
++        VMSTATE_UINT8(smb_auxctl, PMSMBus),
++        VMSTATE_BOOL(i2c_enable, PMSMBus),
++        VMSTATE_BOOL(op_done, PMSMBus),
++        VMSTATE_BOOL(in_i2c_block_read, PMSMBus),
++        VMSTATE_BOOL(start_transaction_on_status_read, PMSMBus),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
- static const TypeInfo smbus_device_type_info = {
-     .name = TYPE_SMBUS_DEVICE,
-     .parent = TYPE_I2C_SLAVE,
-diff --git a/include/hw/i2c/smbus_slave.h b/include/hw/i2c/smbus_slave.h
-index eabac1dd73..d53d691bf6 100644
---- a/include/hw/i2c/smbus_slave.h
-+++ b/include/hw/i2c/smbus_slave.h
-@@ -75,14 +75,32 @@ typedef struct SMBusDeviceClass
-     void (*transaction_complete)(SMBusDevice *dev);
- } SMBusDeviceClass;
+ void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk)
+ {
+     smb->op_done = true;
+diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+index e6d8d28194..c9b7482a54 100644
+--- a/hw/i2c/smbus_ich9.c
++++ b/hw/i2c/smbus_ich9.c
+@@ -45,10 +45,12 @@ typedef struct ICH9SMBState {
  
-+#define SMBUS_DATA_MAX_LEN 34  /* command + len + 32 bytes of data.  */
-+
- struct SMBusDevice {
-     /* The SMBus protocol is implemented on top of I2C.  */
-     I2CSlave i2c;
- 
-     /* Remaining fields for internal use only.  */
--    int mode;
--    int data_len;
--    uint8_t data_buf[34]; /* command + len + 32 bytes of data.  */
-+    int32_t mode;
-+    int32_t data_len;
-+    uint8_t data_buf[SMBUS_DATA_MAX_LEN];
+ static const VMStateDescription vmstate_ich9_smbus = {
+     .name = "ich9_smb",
+-    .version_id = 1,
++    .version_id = 2,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+-        VMSTATE_PCI_DEVICE(dev, struct ICH9SMBState),
++        VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
++        VMSTATE_BOOL_V(irq_enabled, ICH9SMBState, 2),
++        VMSTATE_STRUCT(smb, ICH9SMBState, 2, pmsmb_vmstate, PMSMBus),
+         VMSTATE_END_OF_LIST()
+     }
  };
+diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
+index 7bcca97672..5075fc64fa 100644
+--- a/include/hw/i2c/pm_smbus.h
++++ b/include/hw/i2c/pm_smbus.h
+@@ -43,4 +43,6 @@ typedef struct PMSMBus {
  
-+extern const VMStateDescription vmstate_smbus_device;
+ void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk);
+ 
++extern const VMStateDescription pmsmb_vmstate;
 +
-+#define VMSTATE_SMBUS_DEVICE(_field, _state) {                       \
-+    .name       = (stringify(_field)),                               \
-+    .size       = sizeof(SMBusDevice),                               \
-+    .vmsd       = &vmstate_smbus_device,                             \
-+    .flags      = VMS_STRUCT,                                        \
-+    .offset     = vmstate_offset_value(_state, _field, SMBusDevice), \
-+}
-+
-+/*
-+ * Users should call this in their .needed functions to know if the
-+ * SMBus slave data needs to be transferred.
-+ */
-+bool smbus_vmstate_needed(SMBusDevice *dev);
-+
- #endif
+ #endif /* PM_SMBUS_H */
 -- 
 2.17.1
