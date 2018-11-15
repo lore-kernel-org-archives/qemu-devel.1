@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNMVo-0001Ij-Ik
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:37:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gNMXx-00037Q-J2
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:39:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNMVn-0007wC-NX
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:37:08 -0500
-References: <20181113230319.1008531-1-eblake@redhat.com>
-	<20181114143526.GD10481@dhcp-200-186.str.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9e9c7103-cc52-7535-7b32-2169ec31775e@redhat.com>
-Date: Thu, 15 Nov 2018 12:36:59 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1gNMXw-0000Yk-WC
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:39:21 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41520)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gNMXw-0000YS-Pw
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 13:39:20 -0500
+Received: by mail-oi1-x241.google.com with SMTP id g188-v6so17586396oif.8
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 10:39:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181114143526.GD10481@dhcp-200-186.str.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for 3.1 v3 0/3] minor qcow2 compression
- improvements
+In-Reply-To: <20181029155339.15280-5-richard.henderson@linaro.org>
+References: <20181029155339.15280-1-richard.henderson@linaro.org>
+	<20181029155339.15280-5-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Nov 2018 18:38:59 +0000
+Message-ID: <CAFEAcA_am7SANb_iVGJmZPfN-my501+da_ohWVvoPu392oOo9Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 4/4] target/arm: Install ASIDs for EL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +29,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, berto@igalia.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 11/14/18 8:35 AM, Kevin Wolf wrote:
-> Am 14.11.2018 um 00:03 hat Eric Blake geschrieben:
->> As the added iotests shows, we have a (corner case) data corruption
->> that is user triggerable, therefore, this is still appropriate for
->> inclusion in 3.1.
-> 
-> Thanks, applied to the block branch.
+On 29 October 2018 at 15:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> The VMID is the ASID for the 2nd stage page lookup.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.c | 26 ++++++++++++++++----------
+>  1 file changed, 16 insertions(+), 10 deletions(-)
 
-Patch 2 and 3 are fine; but Berto raised questions about patch 1 so I 
-posted a v9 of that patch, in case you want to replace it in your queue 
-and/or defer it out of 3.1 and instead save it for 4.0.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+thanks
+-- PMM
