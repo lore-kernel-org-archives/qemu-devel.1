@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNENE-0000yi-Gu
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:55:45 -0500
+	(envelope-from <armbru@redhat.com>) id 1gNERR-000523-Fc
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:00:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNEND-0004BK-Ic
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:55:44 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43690)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNENC-00049P-JO
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:55:43 -0500
-Received: by mail-ot1-x344.google.com with SMTP id a11so13861580otr.10
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 01:55:42 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1gNERJ-00063x-Sa
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 05:00:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gNERH-000606-Tn
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 04:59:57 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181109110221.10553-1-david@redhat.com>
+	<20181109110221.10553-6-david@redhat.com>
+	<87h8gjocj9.fsf@dusky.pond.sub.org>
+	<24876f15-3f6e-3daf-fc63-da3ab1d4d0f5@redhat.com>
+Date: Thu, 15 Nov 2018 10:59:50 +0100
+In-Reply-To: <24876f15-3f6e-3daf-fc63-da3ab1d4d0f5@redhat.com> (David
+	Hildenbrand's message of "Wed, 14 Nov 2018 21:03:08 +0100")
+Message-ID: <87ftw2iru1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87lg5ud5xt.fsf@linaro.org>
-References: <20181108134139.31666-1-peter.maydell@linaro.org>
-	<CAKmqyKMaW0Ye5E_PMZXpnUpYZRGdwCBEOf9Qr_bzJpPR=-_p2A@mail.gmail.com>
-	<CAFEAcA-tct9gOM-mShPXhaZvMK1o14K4dcK-QbNxR5r36_DM2g@mail.gmail.com>
-	<086b3ab4-6845-3884-bdd8-7c776d2e5d00@gmail.com>
-	<87lg5ud5xt.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Nov 2018 09:55:21 +0000
-Message-ID: <CAFEAcA_xY_SmL4_JgUfHWdUsEenNfkdrD9ZXK+AXaWNDJkAnZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: list myself as maintainer for
- various Arm boards
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC 5/6] test-string-input-visitor: split
+ off uint64 list tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,53 +30,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Rob Herring <robh@kernel.org>, Thomas Huth <thuth@redhat.com>, Patch Tracking <patches@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Markus Armbruster <armbru@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>, Jan Kiszka <jan.kiszka@web.de>, Antony Pavlov <antonynpavlov@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 15 November 2018 at 09:51, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> Alistair Francis <alistair23@gmail.com> writes:
->
->> On 14/11/2018 3:12 am, Peter Maydell wrote:
->>> On 13 November 2018 at 20:10, Alistair Francis <alistair23@gmail.com> w=
-rote:
->>>> These two and the Xilinx boards seem a little out of place in this
->>>> patch. I agree they probably aren't maintained as well as they should
->>>> be, but the patch talks about orphaned boards and these four all have
->>>> active QEMU maintainers listed.
+David Hildenbrand <david@redhat.com> writes:
+
+> On 14.11.18 17:21, Markus Armbruster wrote:
+>> David Hildenbrand <david@redhat.com> writes:
+>> 
+>>> Basically copy all int64 list tests but adapt them to work on uint64
+>>> instead.
 >>>
->>> Yeah, I was planning to improve the commit message,
->>> something along the lines of an extra para:
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>  tests/test-string-input-visitor.c | 71 +++++++++++++++++++++++++++++--
+>>>  1 file changed, 67 insertions(+), 4 deletions(-)
 >>>
->>> "The Xilinx boards are maintained, but patches to
->>> them go via the target-arm tree, so add myself as a
->>> maintainer there too."
->>>
->>> Really this is because we're overloading "maintainer"
->>> to mean both "this person cares about and is the
->>> primary reviewer and yes/no decision for them" and
->>> also "this person is responsible for getting the
->>> patches into the tree". Perhaps we should instead
->>> define a new letter tag for the latter ?
->>
->> What about adding a "P:" tag for pull request sender?
+>>> diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
+>>> index 2f6360e9ca..731094f789 100644
+>>> --- a/tests/test-string-input-visitor.c
+>>> +++ b/tests/test-string-input-visitor.c
+>>> @@ -111,7 +111,6 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
+>>>                            6, 7, 8 };
+>>>      int64_t expect2[] = { 32767, -32768, -32767 };
+>>>      int64_t expect3[] = { INT64_MIN, INT64_MAX };
+>>> -    uint64_t expect4[] = { UINT64_MAX };
+>>>      Error *err = NULL;
+>>>      int64List *res = NULL;
+>>>      Visitor *v;
+>>> @@ -129,9 +128,6 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
+>>>                                  "-9223372036854775808,9223372036854775807");
+>>>      check_ilist(v, expect3, ARRAY_SIZE(expect3));
+>>>  
+>>> -    v = visitor_input_test_init(data, "18446744073709551615");
+>>> -    check_ulist(v, expect4, ARRAY_SIZE(expect4));
+>>> -
+>> 
+>> Hmm.  Testing behavior for this input is still worthwhile, isn't it?
+>> 
+>> The use of check_ulist() here is admittedly unclean.
 >
-> Don't all pull requests generally come from the relevant T: (tree)?
+> This check has been moved to the other function where we test ulists.
 
-What relevant tree? There isn't a T: tag for the target-arm
-tree (it would not be of much use to quote a git url for
-it in MAINTAINERS because I don't expect people to base
-work on top of it or indeed generally push it publicly
-until I'm doing a pull request from it). Also, a git URL
-is not an email that can be cc'd on a patch submission
-or ping...
+You're right, you didn't reduce test coverage.  I got confused.
 
-> could either extend that or just state the first M: in the list is the
-> person who owns the relevant tree.
+But there's an opportunity to extend coverage: test
+visit_type_int64List() for this input.  Separate patch.  If you put it
+before PATCH 3, it'll ensure PATCH 3 doesn't change behavior for this
+case.  Suggestion, not demand.  Use your judgement.
 
-I think the first M: should be the actual maintainer of
-the code, personally.
+> Or do you want this check here to test again ilist and see that an error
+> gets reported as the value is too big? Will add such range checks.
 
-thanks
--- PMM
+Be careful with new range checks, they can easily break backward
+compatibility.  Deciding whether the break is acceptable then requires
+analysis.
+
+>> 
+>>>      /* Empty list */
+>>>  
+>>>      v = visitor_input_test_init(data, "");
+>>> @@ -174,6 +170,71 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
+>>>      visit_end_list(v, NULL);
+>>>  }
+>>>  
+>>> +static void test_visitor_in_uintList(TestInputVisitorData *data,
+>>> +                                     const void *unused)
+>>> +{
+>>> +    uint64_t expect1[] = { 1, 2, 0, 2, 3, 4, 20, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5,
+>> 
+>> Please wrap this line a bit earlier.
+>
+> Yes.
+>
+>> 
+>>> +                           6, 7, 8 };
+>>> +    uint64_t expect2[] = { 32767, -32768, -32767 };
+>>> +    uint64_t expect3[] = { UINT64_MAX };
+>>> +    Error *err = NULL;
+>>> +    uint64List *res = NULL;
+>>> +    Visitor *v;
+>>> +    uint64_t val;
+>>> +
+>>> +    /* Valid lists */
+>>> +
+>>> +    v = visitor_input_test_init(data, "1,2,0,2-4,20,5-9,1-8");
+>>> +    check_ulist(v, expect1, ARRAY_SIZE(expect1));
+>>> +
+>>> +    v = visitor_input_test_init(data, "32767,-32768--32767");
+>>> +    check_ulist(v, expect2, ARRAY_SIZE(expect2));
+>>> +
+>>> +    v = visitor_input_test_init(data, "18446744073709551615");
+>>> +    check_ulist(v, expect3, ARRAY_SIZE(expect3));
+>> 
+>> Test behavior for large negative numbers?
+>
+> Yes, will add.
+
+Again, a separate patch before PATCH 3 might be best.
