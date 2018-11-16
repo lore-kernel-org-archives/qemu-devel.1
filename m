@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wlosh@bsdimp.com>) id 1gNf3q-0004P5-2h
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:25:30 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gNf7W-00067q-Co
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:29:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wlosh@bsdimp.com>) id 1gNf3o-0004X9-8k
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:25:30 -0500
-Received: from mail-it1-x12e.google.com ([2607:f8b0:4864:20::12e]:50451)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wlosh@bsdimp.com>) id 1gNf3m-0004Vk-GD
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:25:27 -0500
-Received: by mail-it1-x12e.google.com with SMTP id k206-v6so34897015ite.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 06:25:24 -0800 (PST)
+	(envelope-from <stefanha@redhat.com>) id 1gNf7V-0006rM-K9
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:29:18 -0500
+Date: Fri, 16 Nov 2018 14:29:03 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20181116142903.GB9742@stefanha-x1.localdomain>
+References: <20181016132018.5054-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-References: <20181115085808.GH27915@xz-x1>
-	<162b1a37-79d7-8133-22ee-688748fe62b1@redhat.com>
-	<20181116025304.GC11565@xz-x1>
-	<CANCZdfrozw4f+ntOyUuX+N1Ny1j+BBEqhuowPXk2sRTSBzCGEw@mail.gmail.com>
-	<20181116050134.GA16550@xz-x1>
-	<CAFEAcA_r6QmSHHpvRCAOic1EppZamfhwFVQ_R7dUvNzomfNsgg@mail.gmail.com>
-	<20181116123026.bcjmirbs2sl2phm7@sirius.home.kraxel.org>
-In-Reply-To: <20181116123026.bcjmirbs2sl2phm7@sirius.home.kraxel.org>
-From: Warner Losh <imp@bsdimp.com>
-Date: Fri, 16 Nov 2018 07:25:11 -0700
-Message-ID: <CANCZdfojn3U6NkQRyJWBBwsGNBu_XMDRpHH7JuOWEidaRjJkUw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Are FreeBSD guest images working?
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="tsOsTdHNUZQcU9Ye"
+Content-Disposition: inline
+In-Reply-To: <20181016132018.5054-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: fix Coverity
+ CID1390625
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,30 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Ilya Maximets <i.maximets@samsung.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, dgilbert@redhat.com, quintela@redhat.com, famz@redhat.com, peter.maydell@linaro.org, den@openvz.org
 
-On Fri, Nov 16, 2018, 5:30 AM Gerd Hoffmann <kraxel@redhat.com wrote:
 
-> On Fri, Nov 16, 2018 at 09:47:48AM +0000, Peter Maydell wrote:
-> > On 16 November 2018 at 05:01, Peter Xu <peterx@redhat.com> wrote:
-> > > I would guess there aren't many people like me to prefer booting a VM
-> > > using console, though I agree that it'll be nice if we put something
-> > > into the prebuilt images like what's suggested by Ilya (and so far I
-> > > don't see anything bad with that):
-> >
-> > As it happens I would have preferred the instructions on
-> > the QEMU wiki to work with a pure serial console but was unable
-> > to get that working so defaulted to graphics. (I didn't try very
-> > hard: x86 in general is much worse for getting serial boot
-> > working than other architectures, partly because of the BIOS.)
->
-> qemu-system-x86_64 -machine graphics=off should work reasonable well
-> these days.
->
+--tsOsTdHNUZQcU9Ye
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-That's what I use to test the boot blocks / boot loader :)
+On Tue, Oct 16, 2018 at 04:20:18PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Theoretically possible that we finish the skipping loop with bs =3D NULL
+> and the following code will crash trying to dereference it. Fix that.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  migration/block-dirty-bitmap.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitma=
+p.c
+> index 477826330c..6de808f95f 100644
+> --- a/migration/block-dirty-bitmap.c
+> +++ b/migration/block-dirty-bitmap.c
+> @@ -288,6 +288,10 @@ static int init_dirty_bitmap_migration(void)
+>              bs =3D backing_bs(bs);
+>          }
+> =20
+> +        if (!bs || bs->implicit) {
 
-Warner
+Why is it necessary to check bs->implicit?
 
->
+--tsOsTdHNUZQcU9Ye
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJb7tQvAAoJEJykq7OBq3PIyrUH/jc8mcRqs29AcohcfNxkEwBo
+NRIlntn3Nu96+uaoWo/3/ezf5DgXP2+fTi6YiG9OGm7S4nELbRLckMZzFmKgMeno
+xke8ybpHFIPjIb/7FDvkeO91I/YXvUJ2TislchvQCrseuMnQKJlNzUtjXQFZ/TNq
+MwHlR0vf9KAdVLOLUaeyPVVxFsR8dDxXDXrvggKArvuQMg7e/xFtO6IhdXq8oHI+
+AKFVzdiGOdQ0wzNC9uVhn8jFCv6Bz7M8Pr4syPrdLCwecPmUJMbDhDq58eRIzrxx
+xRpj1wzoBbm7kvR71KBCCqPyVhXFPCJwOihtzloHVLuB5+QhrK9ho0MN5gkRJSg=
+=no+w
+-----END PGP SIGNATURE-----
+
+--tsOsTdHNUZQcU9Ye--
