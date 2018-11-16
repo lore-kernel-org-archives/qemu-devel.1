@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gNZ94-0002aI-Iy
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:06:33 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gNZAT-0003wc-O9
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:07:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gNZ8v-0007Kb-IS
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:06:26 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:50365 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gNZ8u-0007FF-92
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:06:20 -0500
-From: xiezhide <xiezhide@huawei.com>
-Date: Fri, 16 Nov 2018 16:00:33 +0800
-Message-ID: <05988243066ce14c5f78799952aba7fd33af35d3.1542384802.git.xiezhide@huawei.com>
-In-Reply-To: <cover.1542384802.git.xiezhide@huawei.com>
-References: <cover.1542384802.git.xiezhide@huawei.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gNZAQ-0000R0-NP
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:07:57 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34239)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gNZAQ-0000Nv-Ac
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:07:54 -0500
+Received: by mail-wr1-x441.google.com with SMTP id j26-v6so23868604wre.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 00:07:54 -0800 (PST)
+References: <20181112214503.22941-1-richard.henderson@linaro.org>
+	<20181114010014.GA19024@flamenco>
+	<d15fa143-ab52-3de9-29f0-ff794cec6ac3@linaro.org>
+	<20181115184827.GA12024@flamenco>
+	<06e66024-1abb-e5b7-591c-3633b5cb3e31@linaro.org>
+	<20181116011338.GB17566@flamenco> <20181116051040.GA25165@flamenco>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <00eece57-cd7d-f4da-c3ec-6bcfbf82b2f2@linaro.org>
+Date: Fri, 16 Nov 2018 09:07:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 6/6] fsdev-throttle-qmp: hmp interface for
- fsdev io throttling
+In-Reply-To: <20181116051040.GA25165@flamenco>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 00/17] tcg: Move softmmu out-of-line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,199 +35,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, eblake@redhat.com, armbru@redhat.com, berto@igalia.com, zengcanfu@huawei.com, jinxuefeng@huawei.com, chenhui.rtos@huawei.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org
 
-introduces io throttling hmp interfaces for the fsdev devices
+On 11/16/18 6:10 AM, Emilio G. Cota wrote:
+> It's possible that newer machines with larger reorder buffers
+> will be able to take better advantage of the higher instruction
+> locality, hiding the latency of having to execute more instructions.
+> I'll test on Skylake tomorrow.
 
-Signed-off-by: xiezhide <xiezhide@huawei.com>
----
- hmp-commands-info.hx | 15 ++++++++++
- hmp-commands.hx      | 15 ++++++++++
- hmp.c                | 81 ++++++++++++++++++++++++++++++++++++++++++++++------
- hmp.h                |  4 +++
- 4 files changed, 107 insertions(+), 8 deletions(-)
+I've noticed that the code we generate for calls has twice as many instructions
+as really needed for setting up the arguments.  I have a plan to fix that,
+which hopefully will solve this problem.
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index cbee8b9..eaf0ff5 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -100,6 +100,21 @@ STEXI
- Show progress of ongoing block device operations.
- ETEXI
- 
-+#if defined(CONFIG_VIRTFS)
-+     {
-+        .name       = "fsdev_iothrottle",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "show fsdev iothrottle information",
-+        .cmd        = hmp_info_fsdev_iothrottle,
-+    },
-+#endif
-+STEXI
-+@item info fsdev_iothrottle
-+@findex fsdev_iothrottle
-+Show fsdev device throttle info.
-+ETEXI
-+
-     {
-         .name       = "registers",
-         .args_type  = "cpustate_all:-a",
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index db0c681..40ca7fe 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1716,6 +1716,21 @@ Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_
- @var{device} can be a block device name, a qdev ID or a QOM path.
- ETEXI
- 
-+#if defined(CONFIG_VIRTFS)
-+     {
-+        .name       = "fsdev_set_io_throttle",
-+        .args_type  = "device:B,bps:l,bps_rd:l,bps_wr:l,iops:l,iops_rd:l,iops_wr:l",
-+        .params     = "device bps bps_rd bps_wr iops iops_rd iops_wr",
-+        .help       = "change I/O throttle limits for a fs devices",
-+        .cmd        = hmp_fsdev_set_io_throttle,
-+    },
-+#endif
-+STEXI
-+@item fsdev_set_io_throttle @var{device} @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
-+@findex fsdev_set_io_throttle
-+Change I/O throttle limits for a fs devices to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
-+ETEXI
-+
-     {
-         .name       = "set_password",
-         .args_type  = "protocol:s,password:s,connected:s?",
-diff --git a/hmp.c b/hmp.c
-index 7828f93..7162d87 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -38,6 +38,7 @@
- #include "qapi/qapi-commands-run-state.h"
- #include "qapi/qapi-commands-tpm.h"
- #include "qapi/qapi-commands-ui.h"
-+#include "qapi/qapi-commands-fsdev.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qerror.h"
- #include "qapi/string-input-visitor.h"
-@@ -1886,18 +1887,22 @@ void hmp_change(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
- }
- 
-+static void hmp_initialize_throttle_limits(ThrottleLimits *iot,
-+                                           const QDict *qdict)
-+{
-+    iot->bps = qdict_get_int(qdict, "bps");
-+    iot->bps_rd = qdict_get_int(qdict, "bps_rd");
-+    iot->bps_wr = qdict_get_int(qdict, "bps_wr");
-+    iot->iops = qdict_get_int(qdict, "iops");
-+    iot->iops_rd = qdict_get_int(qdict, "iops_rd");
-+    iot->iops_wr = qdict_get_int(qdict, "iops_wr");
-+}
-+
- void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
-     char *device = (char *) qdict_get_str(qdict, "device");
--    BlockIOThrottle throttle = {
--        .bps = qdict_get_int(qdict, "bps"),
--        .bps_rd = qdict_get_int(qdict, "bps_rd"),
--        .bps_wr = qdict_get_int(qdict, "bps_wr"),
--        .iops = qdict_get_int(qdict, "iops"),
--        .iops_rd = qdict_get_int(qdict, "iops_rd"),
--        .iops_wr = qdict_get_int(qdict, "iops_wr"),
--    };
-+    BlockIOThrottle throttle = {0};
- 
-     /* qmp_block_set_io_throttle has separate parameters for the
-      * (deprecated) block device name and the qdev ID but the HMP
-@@ -1910,10 +1915,70 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
-         throttle.id = device;
-     }
- 
-+    hmp_initialize_throttle_limits(qapi_BlockIOThrottle_base(&throttle), qdict);
-     qmp_block_set_io_throttle(&throttle, &err);
-     hmp_handle_error(mon, &err);
- }
- 
-+#ifdef CONFIG_VIRTFS
-+void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+    ThrottleLimits *tlimits;
-+    FsdevIOThrottle throttle = {
-+        .has_id = true,
-+        .id = (char *) qdict_get_str(qdict, "device"),
-+    };
-+
-+    tlimits = qapi_FsdevIOThrottle_base(&throttle);
-+    hmp_initialize_throttle_limits(tlimits, qdict);
-+    qmp_fsdev_set_io_throttle(&throttle, &err);
-+    hmp_handle_error(mon, &err);
-+}
-+
-+static void print_fsdev_throttle_config(Monitor *mon, FsdevIOThrottle *fscfg)
-+{
-+    monitor_printf(mon, "%s", fscfg->id);
-+    monitor_printf(mon, "    I/O throttling:"
-+                   " bps=%" PRId64
-+                   " bps_rd=%" PRId64  " bps_wr=%" PRId64
-+                   " bps_max=%" PRId64
-+                   " bps_rd_max=%" PRId64
-+                   " bps_wr_max=%" PRId64
-+                   " iops=%" PRId64 " iops_rd=%" PRId64
-+                   " iops_wr=%" PRId64
-+                   " iops_max=%" PRId64
-+                   " iops_rd_max=%" PRId64
-+                   " iops_wr_max=%" PRId64
-+                   " iops_size=%" PRId64
-+                   "\n",
-+                   fscfg->bps,
-+                   fscfg->bps_rd,
-+                   fscfg->bps_wr,
-+                   fscfg->bps_max,
-+                   fscfg->bps_rd_max,
-+                   fscfg->bps_wr_max,
-+                   fscfg->iops,
-+                   fscfg->iops_rd,
-+                   fscfg->iops_wr,
-+                   fscfg->iops_max,
-+                   fscfg->iops_rd_max,
-+                   fscfg->iops_wr_max,
-+                   fscfg->iops_size);
-+}
-+
-+void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict)
-+{
-+    FsdevIOThrottleList *fsdev_list, *info;
-+    fsdev_list = qmp_query_fsdev_io_throttle(NULL);
-+
-+    for (info = fsdev_list; info; info = info->next) {
-+        print_fsdev_throttle_config(mon, info->value);
-+    }
-+    qapi_free_FsdevIOThrottleList(fsdev_list);
-+}
-+#endif
-+
- void hmp_block_stream(Monitor *mon, const QDict *qdict)
- {
-     Error *error = NULL;
-diff --git a/hmp.h b/hmp.h
-index 5f1addc..9330e11 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -91,6 +91,10 @@ void hmp_block_job_cancel(Monitor *mon, const QDict *qdict);
- void hmp_block_job_pause(Monitor *mon, const QDict *qdict);
- void hmp_block_job_resume(Monitor *mon, const QDict *qdict);
- void hmp_block_job_complete(Monitor *mon, const QDict *qdict);
-+#ifdef CONFIG_VIRTFS
-+void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict);
-+void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict);
-+#endif
- void hmp_migrate(Monitor *mon, const QDict *qdict);
- void hmp_device_add(Monitor *mon, const QDict *qdict);
- void hmp_device_del(Monitor *mon, const QDict *qdict);
--- 
-1.8.3.1
+
+r~
