@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gNgFh-0005sQ-SB
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:41:50 -0500
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gNgFz-00062Y-BQ
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:42:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gNgFe-0002sf-3c
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:41:49 -0500
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:35105)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gNgFd-0002oQ-8g
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:41:46 -0500
-Date: Fri, 16 Nov 2018 10:41:36 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181116154136.GA19765@flamenco>
-References: <04fcf478-29c3-67be-74bb-fd26975fe441@imag.fr>
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gNgFy-00035Y-GP
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:42:07 -0500
+From: Aaron Lindsay <aaron@os.amperecomputing.com>
+Date: Fri, 16 Nov 2018 15:41:57 +0000
+Message-ID: <20181116154137.GC23658@quinoa.localdomain>
+References: <20181105185046.2802-1-aaron@os.amperecomputing.com>
+	<20181105185046.2802-3-aaron@os.amperecomputing.com>
+	<CAFEAcA-ryywQJsequ9F2Yhb2So0U5XuojF5B2o6ttPA3hN732Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA-ryywQJsequ9F2Yhb2So0U5XuojF5B2o6ttPA3hN732Q@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <EA7FBDFA7212B7449D0E61BA66CEF3C0@prod.exchangelabs.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <04fcf478-29c3-67be-74bb-fd26975fe441@imag.fr>
-Subject: Re: [Qemu-devel] qemu-user performance
+Subject: Re: [Qemu-devel] [PATCH v7 02/12] target/arm: Reorganize PMCCNTR
+ accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Etienne =?iso-8859-1?Q?Dubl=E9?= <etienne.duble@imag.fr>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>, Aaron Lindsay <aclindsa@gmail.com>
 
-On Fri, Nov 16, 2018 at 14:55:01 +0100, Etienne Dublé wrote:
-(snip)
-> So the idea is: what if we could share the cache of code already translated
-> between all those processes?
-> There would be sereral ways to achieve this:
-> * use a shared memory area for the cache, and locking mechanisms.
-> * have a (maybe optional) daemon that would manage the cache of all
-> processes.
-> * python-like model: the first time a binary or library is translated, save
-> this translated code in a cache file next to the original file, with
-> different extension.
-> Please let me know what you think about it, if something similar has already
-> been studied, or if I miss something obvious.
+On Nov 16 14:50, Peter Maydell wrote:
+> On 5 November 2018 at 18:51, Aaron Lindsay <aaron@os.amperecomputing.com>=
+ wrote:
+> > pmccntr_read and pmccntr_write contained duplicate code that was alread=
+y
+> > being handled by pmccntr_sync. Consolidate the duplicated code into two
+> > functions: pmccntr_op_start and pmccntr_op_finish. Add a companion to
+> > c15_ccnt in CPUARMState so that we can simultaneously save both the
+> > architectural register value and the last underlying cycle count - this
+> > ensures time isn't lost and will also allow us to access the 'old'
+> > architectural register value in order to detect overflows in later
+> > patches.
+> >
+> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> > Signed-off-by: Aaron Lindsay <aclindsa@gmail.com>
+>=20
+>=20
+> >  /**
+> > - * pmccntr_sync
+> > + * pmccntr_op_start/finish
+> > + * @env: CPUARMState
+> > + *
+> > + * Convert the counter in the PMCCNTR between its delta form (the typi=
+cal mode
+> > + * when it's enabled) and the guest-visible value. These two calls mus=
+t always
+> > + * surround any action which might affect the counter.
+> > + */
+> > +void pmccntr_op_start(CPUARMState *env);
+> > +void pmccntr_op_finish(CPUARMState *env);
+> > +
+> > +/**
+> > + * pmu_op_start/finish
+> >   * @env: CPUARMState
+> >   *
+> > - * Synchronises the counter in the PMCCNTR. This must always be called=
+ twice,
+> > - * once before any action that might affect the timer and again afterw=
+ards.
+> > - * The function is used to swap the state of the register if required.
+> > - * This only happens when not in user mode (!CONFIG_USER_ONLY)
+> > + * Convert all PMU counters between their delta form (the typical mode=
+ when
+> > + * they are enabled) and the guest-visible values. These two calls mus=
+t
+> > + * surround any action which might affect the counters, and the return=
+ value
+> > + * from pmu_op_start must be supplied as the second argument to pmu_op=
+_finish.
+> >   */
+> > -void pmccntr_sync(CPUARMState *env);
+> > +void pmu_op_start(CPUARMState *env);
+> > +void pmu_op_finish(CPUARMState *env);
+>=20
+> The comment says that pmu_op_start returns a value and pmu_op_finish
+> has a second argument, but the prototypes disagree...
 
-There's a recent paper that implements something similar to what you
-propose:
+Doh, I updated the comment for pmccntr_op_* but missed pmu_op_*. The
+last sentence should end after the comma:
 
-  "A General Persistent Code Caching Framework for Dynamic Binary
-  Translation (DBT)", ATC'16
-  https://www.usenix.org/system/files/conference/atc16/atc16_paper-wang.pdf
+> > + * Convert all PMU counters between their delta form (the typical mode=
+ when
+> > + * they are enabled) and the guest-visible values. These two calls mus=
+t
+> > + * surround any action which might affect the counters.
+> >   */
 
-Note that in that paper they compare against HQEMU, and not against
-upstream QEMU. I presume they chose HQEMU because it spends
-more effort than QEMU in trying to generate better code for hot
-code paths (they use LLVM in a separate thread for those), which
-means that code generation can be a bottleneck for some workloads
-(e.g. SPEC's gcc or perlbench).
+> Otherwise
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> so if this turns out to be the only problem I can fix it up when
+> I apply it to my tree, if you provide suitable new comment text.
 
-QEMU, on the other hand, generates much simpler code, and as a result
-it is rare to find workloads where code generation is a bottleneck.
-(You can measure this with perf top in your system; make sure you
-configured QEMU with --disable-strip to keep the symbols after
-"make install".)
-So until QEMU gets some sort of "hot code optimization" that makes
-translation more expensive, there's little point in implementing
-persistent code caching for it.
+I've also updated the comment text in my tree, so if/when there is a v8
+of this patchset, it won't be lost.
 
-As an aside, what QEMU version are you running? Performance has
-improved quite a bit (particularly for integer workloads) in the
-last couple of years, e.g. see the perf improvements from v2.6 to
-v2.11 here:
-  https://imgur.com/a/5P5zj
-
-Cheers,
-
-		Emilio
+-Aaron
