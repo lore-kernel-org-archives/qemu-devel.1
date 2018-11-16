@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gNbpt-0007Dj-Mh
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:58:57 -0500
+	(envelope-from <clg@kaod.org>) id 1gNbpz-0007IE-35
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:59:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gNbpp-0007q8-OL
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:58:53 -0500
-Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:34923)
+	(envelope-from <clg@kaod.org>) id 1gNbpu-0007u7-Sg
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:58:58 -0500
+Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:37068)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gNbpp-0007pe-GR
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:58:49 -0500
-Received: from player734.ha.ovh.net (unknown [10.109.159.68])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 1E28310AB90
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 11:58:48 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gNbpu-0007sx-Lq
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:58:54 -0500
+Received: from player734.ha.ovh.net (unknown [10.109.159.159])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 66AD334CD3
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 11:58:53 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 16 Nov 2018 11:57:05 +0100
-Message-Id: <20181116105729.23240-13-clg@kaod.org>
+Date: Fri, 16 Nov 2018 11:57:06 +0100
+Message-Id: <20181116105729.23240-14-clg@kaod.org>
 In-Reply-To: <20181116105729.23240-1-clg@kaod.org>
 References: <20181116105729.23240-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 12/36] spapr: initialize VSMT before
- initializing the IRQ backend
+Subject: [Qemu-devel] [PATCH v5 13/36] spapr: introduce a spapr_irq_init()
+ routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,45 +33,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-We will need to use xics_max_server_number() to create the sPAPRXive
-object modeling the interrupt controller of the machine which is
-created before the CPUs.
+Initialize the MSI bitmap from it as this will be necessary for the
+sPAPR IRQ backend for XIVE.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/spapr.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ include/hw/ppc/spapr_irq.h |  1 +
+ hw/ppc/spapr.c             |  2 +-
+ hw/ppc/spapr_irq.c         | 16 +++++++++++-----
+ 3 files changed, 13 insertions(+), 6 deletions(-)
 
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index a467ce696ee4..bd7301e6d9c6 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -43,6 +43,7 @@ typedef struct sPAPRIrq {
+ extern sPAPRIrq spapr_irq_xics;
+ extern sPAPRIrq spapr_irq_xics_legacy;
+=20
++void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
+ int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp);
+ void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7afd1a175bf2..50cb9f9f4a02 100644
+index 50cb9f9f4a02..e470efe7993c 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -2466,11 +2466,6 @@ static void spapr_init_cpus(sPAPRMachineState *spa=
-pr)
-         boot_cores_nr =3D possible_cpus->len;
-     }
+@@ -2594,7 +2594,7 @@ static void spapr_machine_init(MachineState *machin=
+e)
+     spapr_set_vsmt_mode(spapr, &error_fatal);
 =20
--    /* VSMT must be set in order to be able to compute VCPU ids, ie to
--     * call xics_max_server_number() or spapr_vcpu_id().
--     */
--    spapr_set_vsmt_mode(spapr, &error_fatal);
--
-     if (smc->pre_2_10_has_unused_icps) {
-         int i;
-=20
-@@ -2593,6 +2588,11 @@ static void spapr_machine_init(MachineState *machi=
-ne)
-     /* Setup a load limit for the ramdisk leaving room for SLOF and FDT =
-*/
-     load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
-=20
-+    /* VSMT must be set in order to be able to compute VCPU ids, ie to
-+     * call xics_max_server_number() or spapr_vcpu_id().
-+     */
-+    spapr_set_vsmt_mode(spapr, &error_fatal);
-+
      /* Set up Interrupt Controller before we create the VCPUs */
-     smc->irq->init(spapr, &error_fatal);
+-    smc->irq->init(spapr, &error_fatal);
++    spapr_irq_init(spapr, &error_fatal);
 =20
+     /* Set up containers for ibm,client-architecture-support negotiated =
+options
+      */
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index e77b94cc685e..f8b651de0ec9 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -97,11 +97,6 @@ static void spapr_irq_init_xics(sPAPRMachineState *spa=
+pr, Error **errp)
+     int nr_irqs =3D smc->irq->nr_irqs;
+     Error *local_err =3D NULL;
+=20
+-    /* Initialize the MSI IRQ allocator. */
+-    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+-        spapr_irq_msi_init(spapr, smc->irq->nr_msis);
+-    }
+-
+     if (kvm_enabled()) {
+         if (machine_kernel_irqchip_allowed(machine) &&
+             !xics_kvm_init(spapr, &local_err)) {
+@@ -213,6 +208,17 @@ sPAPRIrq spapr_irq_xics =3D {
+ /*
+  * sPAPR IRQ frontend routines for devices
+  */
++void spapr_irq_init(sPAPRMachineState *spapr, Error **errp)
++{
++    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
++
++    /* Initialize the MSI IRQ allocator. */
++    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
++        spapr_irq_msi_init(spapr, smc->irq->nr_msis);
++    }
++
++    smc->irq->init(spapr, errp);
++}
+=20
+ int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp)
+ {
 --=20
 2.17.2
