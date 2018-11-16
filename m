@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gNTJU-0003G7-Ag
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 20:52:56 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gNTlY-0000a0-Sf
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 21:21:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gNTJT-00023N-J4
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 20:52:52 -0500
-Date: Fri, 16 Nov 2018 09:52:25 +0800 (CST)
-Message-ID: <201811160952253214674@zte.com.cn>
-In-Reply-To: <20181115142532.ppvacfmw753dfq26@kamzik.brq.redhat.com>
-References: 1542022940-46849-1-git-send-email-peng.hao2@zte.com.cn,
-	20181115142532.ppvacfmw753dfq26@kamzik.brq.redhat.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_V6_6/6=5D__pvpanic_=3A_update_pv?=
- =?utf-8?q?panic_document?=
+	(envelope-from <jasowang@redhat.com>) id 1gNTlV-0001B2-O4
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 21:21:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47676)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gNTlU-0001Ah-Vm
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 21:21:49 -0500
+References: <20181031005015.5433-1-zhangckid@gmail.com>
+	<159ef9c8-e0b2-6183-b33c-6925fb6574dc@redhat.com>
+	<CAFEAcA99FxTp6G8+vG-YsjWA5LAye1T3j4_h=5_uM6WbZaW2QA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <409b9337-a9ef-5206-ecde-f3317b62e263@redhat.com>
+Date: Fri, 16 Nov 2018 10:21:42 +0800
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA99FxTp6G8+vG-YsjWA5LAye1T3j4_h=5_uM6WbZaW2QA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V2] net/filter-rewriter.c: Fix coverity
+ static analysis issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: drjones@redhat.com
-Cc: peter.maydell@linaro.org, philmd@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Zhang Chen <chen.zhang@intel.com>, QEMU Developers <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>
 
-PiBBZGQgbW1pbyBzdXBwb3J0IGluZm8gaW4gZG9jcy9zcGVjcy9wdnBhbmljLnR4dC4KPj4KPj4g
-U2lnbmVkLW9mZi1ieTogUGVuZyBIYW8gPHBlbmcuaGFvMkB6dGUuY29tLmNuPgo+PiAtLS0KPj4g
-IGRvY3Mvc3BlY3MvcHZwYW5pYy50eHQgfCAxMyArKysrKysrKysrKystCj4+ICAxIGZpbGUgY2hh
-bmdlZCwgMTIgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+Pgo+PiBkaWZmIC0tZ2l0IGEv
-ZG9jcy9zcGVjcy9wdnBhbmljLnR4dCBiL2RvY3Mvc3BlY3MvcHZwYW5pYy50eHQKPj4gaW5kZXgg
-YzdiYmFjYy4uNWQ4ZTlkYyAxMDA2NDQKPj4gLS0tIGEvZG9jcy9zcGVjcy9wdnBhbmljLnR4dAo+
-PiArKysgYi9kb2NzL3NwZWNzL3B2cGFuaWMudHh0Cj4+IEBAIC0xLDcgKzEsNyBAQAo+PiAgUFZQ
-QU5JQyBERVZJQ0UKPj4gID09PT09PT09PT09PT09Cj4+Cj4+IC1wdnBhbmljIGRldmljZSBpcyBh
-IHNpbXVsYXRlZCBJU0EgZGV2aWNlLCB0aHJvdWdoIHdoaWNoIGEgZ3Vlc3QgcGFuaWMKPj4gK3B2
-cGFuaWMgZGV2aWNlIGlzIGEgc2ltdWxhdGVkIGRldmljZSwgdGhyb3VnaCB3aGljaCBhIGd1ZXN0
-IHBhbmljCj4+ICBldmVudCBpcyBzZW50IHRvIHFlbXUsIGFuZCBhIFFNUCBldmVudCBpcyBnZW5l
-cmF0ZWQuIFRoaXMgYWxsb3dzCj4+ICBtYW5hZ2VtZW50IGFwcHMgKGUuZy4gbGlidmlydCkgdG8g
-YmUgbm90aWZpZWQgYW5kIHJlc3BvbmQgdG8gdGhlIGV2ZW50Lgo+Pgo+PiBAQCAtOSw2ICs5LDEw
-IEBAIFRoZSBtYW5hZ2VtZW50IGFwcCBoYXMgdGhlIG9wdGlvbiBvZiB3YWl0aW5nIGZvciBHVUVT
-VF9QQU5JQ0tFRCBldmVudHMsCj4+ICBhbmQvb3IgcG9sbGluZyBmb3IgZ3Vlc3QtcGFuaWNrZWQg
-UnVuU3RhdGUsIHRvIGxlYXJuIHdoZW4gdGhlIHB2cGFuaWMKPj4gIGRldmljZSBoYXMgZmlyZWQg
-YSBwYW5pYyBldmVudC4KPj4KPj4gK1doZW4gcHZwYW5pYyBkZXZpY2UgaXMgaW1wbGVtZW50ZWQg
-YXMgYSBJU0EgZGV2aWNlLCBpdCBzdXBwb3J0cyBJT1BPUlQKPl50aGUgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBeYW4KPj4gK21vZGUuIElmIHB2cGFuaWMgZGV2aWNlIHN1cHBvcnRzIE1N
-SU8gbW9kZSwgaXQgd2lsbCBiZSBpbXBsZW1lbnRlZCBhcwo+Cj5XaGVuIHRoZSBwdnBhbmljIGRl
-dmljZSBuZWVkcyB0byB1c2UgTU1JTyBtb2RlLCAuLi4KPgpJIHdpbGwgYWRkICJTb21lIGFyY2hp
-dGVjdHVyZXMgZG8gbm90IHN1cHBvcnQgaW9wb3J0LCBqdXN0IGxpa2UgYXJtLiIKPj4gK2EgU1lT
-QlVTIGRldmljZS4KPj4gKwo+PiAgSVNBIEludGVyZmFjZQo+PiAgLS0tLS0tLS0tLS0tLQo+Pgo+
-PiBAQCAtMTksNiArMjMsMTMgQEAgU29mdHdhcmUgc2hvdWxkIHNldCBvbmx5IGJpdHMgYm90aCBp
-dHNlbGYgYW5kIHRoZSBkZXZpY2UgcmVjb2duaXplLgo+PiAgQ3VycmVudGx5LCBvbmx5IGJpdCAw
-IGlzIHJlY29nbml6ZWQsIHNldHRpbmcgaXQgaW5kaWNhdGVzIGEgZ3Vlc3QgcGFuaWMKPj4gIGhh
-cyBoYXBwZW5lZC4KPj4KPj4gK1NZU0JVUyBJbnRlcmZhY2UKPj4gKy0tLS0tLS0tLS0tLS0tCj4+
-ICsKPj4gK0l0IGlzIGJhc2ljYWxseSB0aGUgc2FtZSBhcyBJU0EgaW50ZXJmYWNlIGV4Y2VwdCB0
-aGF0IGl0IHVzZXMgTU1JTy4KPgo+VGhlIFNZU0JVUyBpbnRlcmZhY2UgaXMgc2ltaWxhciB0byB0
-aGUgSVNBIGludGVyZmFjZS4uLgo+Ckkgd2lsbCBjaGFuZ2UgaXQuCj4+IFB2cGFuaWMgZXhwb3Nl
-cwo+PiArYSBhZGRyZXNzIHNwYWNlIHJlZ2lvbiAweDA5MDYwMDAwLS0weDA5MDYwMDAxIGluIGFy
-bSB2aXJ0IG1hY2hpbmUuCj4+ICtDdXJyZW50bHkgb25seSB0aGUgZmlyc3QgYnl0ZSBpcyB1c2Vk
-Lgo+PiArCj4KPkkgd291bGQgZHJvcCB0aGUgYWJvdmUgbGluZXMuIFRoZXkncmUgbm90IGNvcnJl
-Y3QgYW55d2F5LiBUaGUgcmVnaW9uIGlzCj45MDcwMDAwLTkwNzAwMDEgKGluY2x1c2l2ZSkuCnNv
-cnJ5LEkgd3JvdGUgYSAgd3JvbmcgYWRkcmVzcyBzcGFuLgo+Cj4+ICBBQ1BJIEludGVyZmFjZQo+
-PiAgLS0tLS0tLS0tLS0tLS0KPj4KPj4gLS0KPj4gMS44LjMuMQo+Pgo+Pgo+Cj5UaGFua3MsCj5k
-cmV3
+
+On 2018/11/15 =E4=B8=8B=E5=8D=886:32, Peter Maydell wrote:
+> On 2 November 2018 at 02:21, Jason Wang <jasowang@redhat.com> wrote:
+>> On 2018/10/31 =E4=B8=8A=E5=8D=888:50, Zhang Chen wrote:
+>>> The original code just follow the TCP state diagram,
+>>> but in this case, we can skip the TCPS_TIME_WAIT state to simplify
+>>> the implementation.
+>>>
+>>> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+>>> ---
+>>>    net/filter-rewriter.c | 3 ++-
+>>>    1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
+>>> index bb8f4d93b1..2e26839bc2 100644
+>>> --- a/net/filter-rewriter.c
+>>> +++ b/net/filter-rewriter.c
+>>> @@ -155,12 +155,13 @@ static int handle_primary_tcp_pkt(RewriterState=
+ *rf,
+>>>             * Active close step 2.
+>>>             */
+>>>            if (conn->tcp_state =3D=3D TCPS_FIN_WAIT_1) {
+>>> -            conn->tcp_state =3D TCPS_TIME_WAIT;
+>>>                /*
+>>>                 * For simplify implementation, we needn't wait 2MSL t=
+ime
+>>>                 * in filter rewriter. Because guest kernel will track=
+ the
+>>>                 * TCP status and wait 2MSL time, if client resend the=
+ FIN
+>>>                 * packet, guest will apply the last ACK too.
+>>> +             * So, we skip the TCPS_TIME_WAIT state here and go stra=
+ight
+>>> +             * to TCPS_CLOSED state.
+>>>                 */
+>>>                conn->tcp_state =3D TCPS_CLOSED;
+>>>                g_hash_table_remove(rf->connection_track_table, key);
+>>
+>>
+>> Applied.
+> Ping -- this doesn't seem to have made it into master?
+>
+> thanks
+> -- PMM
+>
+
+Will send a pull request soon.
+
+Thanks
