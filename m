@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gNgzt-0000vK-Dn
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:29:34 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gNh33-0002Ez-Lp
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gNgzs-0003eb-2g
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:29:33 -0500
-Date: Fri, 16 Nov 2018 17:29:19 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181116172919.43f3e27d@redhat.com>
-In-Reply-To: <20181105014047.26447-1-sameo@linux.intel.com>
-References: <20181105014047.26447-1-sameo@linux.intel.com>
+	(envelope-from <kwolf@redhat.com>) id 1gNh31-0005dt-PU
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:32:49 -0500
+Date: Fri, 16 Nov 2018 17:32:17 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181116163217.GF5066@localhost.localdomain>
+References: <20181115020334.1189829-1-eblake@redhat.com>
+	<20181115020334.1189829-6-eblake@redhat.com>
+	<20181115154529.GC12677@localhost.localdomain>
+	<2e484653-79f0-ee5d-9e92-1171f886b3e1@redhat.com>
+	<20181116153249.GC5066@localhost.localdomain>
+	<bbf54281-2a4b-a1ac-f256-5e1a71766303@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 00/24] ACPI reorganization for
- hardware-reduced API addition
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bbf54281-2a4b-a1ac-f256-5e1a71766303@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 05/13] block: Switch to 64-bit
+ bl.max_transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,146 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Mon,  5 Nov 2018 02:40:23 +0100
-Samuel Ortiz <sameo@linux.intel.com> wrote:
+Am 16.11.2018 um 16:54 hat Eric Blake geschrieben:
+> On 11/16/18 9:32 AM, Kevin Wolf wrote:
+> > Am 15.11.2018 um 17:28 hat Eric Blake geschrieben:
+> > > On 11/15/18 9:45 AM, Kevin Wolf wrote:
+> > > > Am 15.11.2018 um 03:03 hat Eric Blake geschrieben:
+> > > > > This change has no semantic impact: all drivers either leave the
+> > > > > value at 0 (no inherent 32-bit limit is still translated into
+> > > > > fragmentation below 2G; see the previous patch for that audit), or
+> > > > > set it to a value less than 2G.  However, switching to a larger
+> > > > > type and enforcing the 2G cap at the block layer makes it easier
+> > > > > to audit specific drivers for their robustness to larger sizing,
+> > > > > by letting them specify a value larger than INT_MAX if they have
+> > > > > been audited to be 64-bit clean.
+> > > > > 
+> 
+> > > > > +
+> > > > > +    /* Clamp max_transfer to 2G */
+> > > > > +    if (bs->bl.max_transfer > UINT32_MAX) {
+> > > > 
+> > > > UINT32_MAX is 4G, not 2G.
+> > > > 
+> > > > Would it make more sense to make BDRV_REQUEST_MAX_BYTES the maximum
+> > > > anyway?
+> > > 
+> > > D'oh.  Yes, that's what I intended, possibly by spelling it INT_MAX (the
+> > > fact that the 'if' goes away in patch 13 is not an excuse for sloppy coding
+> > > in the meantime).
+> > 
+> > INT_MAX is not a different spelling of BDRV_REQUEST_MAX_BYTES. The
+> > latter is slightly lower (0x7ffffe00).
+> 
+> Ah, but:
+> 
+> > +    if (bs->bl.max_transfer > UINT32_MAX) {
+> > +        bs->bl.max_transfer = QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
+> > +                                              MAX(bs->bl.opt_transfer,
+> > +                                                  bs->bl.request_alignment));
+> > +    }
+> 
+> QEMU_ALIGN_DOWN() will change INT_MAX to BDRV_REQUEST_MAX_BYTES if
+> bs->bl.request_alignment is 512 and opt_transfer is 0; and if either
+> alignment number is larger than 512, max_transfer is capped even lower
+> regardless of whether I was aligning INT_MAX or BDRV_REQUEST_MAX_BYTES down
+> to an alignment boundary.
 
-> This patch set provides an ACPI code reorganization in preparation for
-> adding a shared hardware-reduced ACPI API to QEMU.
-> 
-> The changes are coming from the NEMU [1] project where we're defining
-> a new x86 machine type: i386/virt. This is an EFI only, ACPI
-> hardware-reduced platform that is built on top of a generic
-> hardware-reduced ACPI API [2]. This API was initially based off the
-> generic parts of the arm/virt-acpi-build.c implementation, and the goal
-> is for both i386/virt and arm/virt to duplicate as little code as
-> possible by using this new, shared API.
-> 
-> As a preliminary for adding this hardware-reduced ACPI API to QEMU, we did
-> some ACPI code reorganization with the following goals:
-> 
-> * Share as much as possible of the current ACPI build APIs between
->   legacy and hardware-reduced ACPI.
-> * Share the ACPI build code across machine types and architectures and
->   remove the typical PC machine type dependency.
-> 
-> The patches are also available in their own git branch [3].
-I think, I'm done with reviewing this patchset, to sum up
-thanks for trying generalize acpi parts. It is implemented not
-exactly generic way and patches aren't split perfectly but
-we can work on it.
+That's true. But why use INT_MAX and argue that it will be rounded to
+the right value later when you can just use BDRV_REQUEST_MAX_BYTES,
+which is obviously correct without additional correction?
 
-General suggestions for this series:
-  1. Preferably don't do multiple changes within a patch
-     neither post huge patches (unless it's pure code movement).
-     (it's easy to squash patches later it necessary)
-  2. Start small, pick a table generalize it and send as
-     one small patchset. Tables are often independent
-     and it's much easier on both author/reviewer to agree upon
-     changes and rewrite it if necessary.
-  3. when you think about refactoring acpi into a generic API
-     think about it as routines that go into a separate library
-     (pure acpi spec code) and qemu/acpi glue routines and
-      divide them correspondingly.
-
-> [1] https://github.com/intel/nemu
-> [2] https://github.com/intel/nemu/blob/topic/virt-x86/hw/acpi/reduced.c
-> [3] https://github.com/intel/nemu/tree/topic/upstream/acpi
-> 
-> v1 -> v2:
->    * Drop the hardware-reduced implementation for now. Our next patch
->    * set
->      will add hardware-reduced and convert arm/virt to it.
->    * Implement the ACPI build methods as a QOM Interface Class and
->    * convert
->      the PC machine type to it.
->    * acpi_conf_pc_init() uses a PCMachineState pointer and not a
->      MachineState one as its argument.
-> 
-> v2 -> v3:
->    * Cc all relevant maintainers, no functional changes.
-> 
-> v3 -> v4:
->    * Renamed all AcpiConfiguration pointers from conf to acpi_conf.
->    * Removed the ACPI_BUILD_ALIGN_SIZE export.
->    * Temporarily updated the arm virt build_rsdp() prototype for
->      bisectability purposes.
->    * Removed unneeded pci headers from acpi-build.c.
->    * Refactor the acpi PCI host getter so that it truly is architecture
->      agnostic, by carrying the PCI host pointer through the
->      AcpiConfiguration structure.
->    * Splitted the PCI host AML builder API export patch from the PCI
->      host and holes getter one.
->    * Reduced the build_srat() export scope to hw/i386 instead of the
->      broader hw/acpi. SRAT builders are truly architecture specific
->      and can hardly be generalized.
->    * Completed the ACPI builder documentation.
-> 
-> v4 -> v5:
->    * Reorganize the ACPI RSDP export and XSDT implementation into 3
->      patches.
->    * Fix the hw/i386/acpi header inclusions.
-> 
-> Samuel Ortiz (16):
->   hw: i386: Decouple the ACPI build from the PC machine type
->   hw: acpi: Export ACPI build alignment API
->   hw: acpi: The RSDP build API can return void
->   hw: acpi: Export the RSDP build API
->   hw: acpi: Implement XSDT support for RSDP
->   hw: acpi: Factorize the RSDP build API implementation
->   hw: i386: Move PCI host definitions to pci_host.h
->   hw: acpi: Export the PCI host and holes getters
->   hw: acpi: Do not create hotplug method when handler is not defined
->   hw: i386: Make the hotpluggable memory size property more generic
->   hw: i386: Export the i386 ACPI SRAT build method
->   hw: i386: Export the MADT build method
->   hw: acpi: Define ACPI tables builder interface
->   hw: i386: Implement the ACPI builder interface for PC
->   hw: pci-host: piix: Return PCI host pointer instead of PCI bus
->   hw: i386: Set ACPI configuration PCI host pointer
-> 
-> Sebastien Boeuf (2):
->   hw: acpi: Export the PCI hotplug API
->   hw: acpi: Retrieve the PCI bus from AcpiPciHpState
-> 
-> Yang Zhong (6):
->   hw: acpi: Generalize AML build routines
->   hw: acpi: Factorize _OSC AML across architectures
->   hw: acpi: Export and generalize the PCI host AML API
->   hw: acpi: Export the MCFG getter
->   hw: acpi: Fix memory hotplug AML generation error
->   hw: i386: Refactor PCI host getter
-> 
->  hw/i386/acpi-build.h           |    9 +-
->  include/hw/acpi/acpi-defs.h    |   14 +
->  include/hw/acpi/acpi.h         |   44 ++
->  include/hw/acpi/aml-build.h    |   47 ++
->  include/hw/acpi/builder.h      |  100 +++
->  include/hw/i386/acpi.h         |   28 +
->  include/hw/i386/pc.h           |   49 +-
->  include/hw/mem/memory-device.h |    2 +
->  include/hw/pci/pci_host.h      |    6 +
->  hw/acpi/aml-build.c            |  981 +++++++++++++++++++++++++++++
->  hw/acpi/builder.c              |   97 +++
->  hw/acpi/cpu.c                  |    8 +-
->  hw/acpi/cpu_hotplug.c          |    9 +-
->  hw/acpi/memory_hotplug.c       |   21 +-
->  hw/acpi/pcihp.c                |   10 +-
->  hw/arm/virt-acpi-build.c       |   93 +--
->  hw/i386/acpi-build.c           | 1072 +++-----------------------------
->  hw/i386/pc.c                   |  198 +++---
->  hw/i386/pc_piix.c              |   36 +-
->  hw/i386/pc_q35.c               |   22 +-
->  hw/i386/xen/xen-hvm.c          |   19 +-
->  hw/pci-host/piix.c             |   32 +-
->  stubs/pci-host-piix.c          |    6 -
->  hw/acpi/Makefile.objs          |    1 +
->  stubs/Makefile.objs            |    1 -
->  25 files changed, 1644 insertions(+), 1261 deletions(-)
->  create mode 100644 include/hw/acpi/builder.h
->  create mode 100644 include/hw/i386/acpi.h
->  create mode 100644 hw/acpi/builder.c
->  delete mode 100644 stubs/pci-host-piix.c
-> 
+Kevin
