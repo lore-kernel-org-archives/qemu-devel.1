@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gNevk-0008Nm-1i
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:17:08 -0500
+	(envelope-from <wlosh@bsdimp.com>) id 1gNf3q-0004P5-2h
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:25:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gNevj-0006tO-9d
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:17:08 -0500
-From: Max Reitz <mreitz@redhat.com>
-References: <20181011072135.588-1-famz@redhat.com>
-	<20181011072135.588-3-famz@redhat.com>
-	<w51tvkjkbmc.fsf@maestria.local.igalia.com>
-	<8924431e-f533-70bc-4efa-848f9641fbc4@redhat.com>
-	<w51lg5tunti.fsf@maestria.local.igalia.com>
-	<1baf27e0-fa37-0d84-5d08-c4dcd788a67e@redhat.com>
-Message-ID: <4c70596f-d6e3-f243-7512-6ef9176b9d52@redhat.com>
-Date: Fri, 16 Nov 2018 15:16:55 +0100
+	(envelope-from <wlosh@bsdimp.com>) id 1gNf3o-0004X9-8k
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:25:30 -0500
+Received: from mail-it1-x12e.google.com ([2607:f8b0:4864:20::12e]:50451)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wlosh@bsdimp.com>) id 1gNf3m-0004Vk-GD
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:25:27 -0500
+Received: by mail-it1-x12e.google.com with SMTP id k206-v6so34897015ite.0
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 06:25:24 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1baf27e0-fa37-0d84-5d08-c4dcd788a67e@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SMq7PWO0M8lLLYHpRX5fBs2Ha5BDVdpf5"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 2/3] file-posix: Drop
- s->lock_fd
+References: <20181115085808.GH27915@xz-x1>
+	<162b1a37-79d7-8133-22ee-688748fe62b1@redhat.com>
+	<20181116025304.GC11565@xz-x1>
+	<CANCZdfrozw4f+ntOyUuX+N1Ny1j+BBEqhuowPXk2sRTSBzCGEw@mail.gmail.com>
+	<20181116050134.GA16550@xz-x1>
+	<CAFEAcA_r6QmSHHpvRCAOic1EppZamfhwFVQ_R7dUvNzomfNsgg@mail.gmail.com>
+	<20181116123026.bcjmirbs2sl2phm7@sirius.home.kraxel.org>
+In-Reply-To: <20181116123026.bcjmirbs2sl2phm7@sirius.home.kraxel.org>
+From: Warner Losh <imp@bsdimp.com>
+Date: Fri, 16 Nov 2018 07:25:11 -0700
+Message-ID: <CANCZdfojn3U6NkQRyJWBBwsGNBu_XMDRpHH7JuOWEidaRjJkUw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Are FreeBSD guest images working?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, Ilya Maximets <i.maximets@samsung.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SMq7PWO0M8lLLYHpRX5fBs2Ha5BDVdpf5
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, Fam Zheng <famz@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Message-ID: <4c70596f-d6e3-f243-7512-6ef9176b9d52@redhat.com>
-Subject: Re: [Qemu-block] [PATCH v5 2/3] file-posix: Drop s->lock_fd
-References: <20181011072135.588-1-famz@redhat.com>
- <20181011072135.588-3-famz@redhat.com>
- <w51tvkjkbmc.fsf@maestria.local.igalia.com>
- <8924431e-f533-70bc-4efa-848f9641fbc4@redhat.com>
- <w51lg5tunti.fsf@maestria.local.igalia.com>
- <1baf27e0-fa37-0d84-5d08-c4dcd788a67e@redhat.com>
-In-Reply-To: <1baf27e0-fa37-0d84-5d08-c4dcd788a67e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Nov 16, 2018, 5:30 AM Gerd Hoffmann <kraxel@redhat.com wrote:
 
-On 16.11.18 15:02, Max Reitz wrote:
-> On 16.11.18 14:58, Alberto Garcia wrote:
->> On Fri 16 Nov 2018 02:34:25 PM CET, Max Reitz wrote:
->>> To me that looks like a problem in the general reopen code.
->>> raw_reopen_prepare() is called and succeeds.  Then
->>> bdrv_reopen_prepare() notices the option wasn't handled and therefore=
+> On Fri, Nov 16, 2018 at 09:47:48AM +0000, Peter Maydell wrote:
+> > On 16 November 2018 at 05:01, Peter Xu <peterx@redhat.com> wrote:
+> > > I would guess there aren't many people like me to prefer booting a VM
+> > > using console, though I agree that it'll be nice if we put something
+> > > into the prebuilt images like what's suggested by Ilya (and so far I
+> > > don't see anything bad with that):
+> >
+> > As it happens I would have preferred the instructions on
+> > the QEMU wiki to work with a pure serial console but was unable
+> > to get that working so defaulted to graphics. (I didn't try very
+> > hard: x86 in general is much worse for getting serial boot
+> > working than other architectures, partly because of the BIOS.)
+>
+> qemu-system-x86_64 -machine graphics=off should work reasonable well
+> these days.
+>
 
->>> fails.  bdrv_reopen_multiple() thus doesn't set bs_entry->prepared to=
+That's what I use to test the boot blocks / boot loader :)
 
->>> true, which means raw_reopen_abort() won't be called.
->>>
->>> We should always call either BlockDriver.bdrv_reopen_commit() or
->>> BlockDriver.bdrv_reopen_abort() when BlockDriver.bdrv_reopen_prepare(=
-)
->>> succeeded.
->>
->> So you mean getting rid of BlockReopenQueueEntry.prepared altogether?
->=20
-> I mean just calling .bdrv_reopen_abort() in bdrv_reopen_prepare() if
-> there was an error after .bdrv_reopen_prepare() succeeded.
->=20
-> I have a patch, I'm just trying to think of a useful test...
+Warner
 
-To elaborate, I didn't want to use your test for two reasons.  First, it
-seemed generally too dependant on what file-posix's implementation does.
- Second, I couldn't get it to work in any shorter form (which seemed
-weird) and why would it even print something about consistent_read?
-That seemed weird, too.
-
-I would've thought that just any case where bdrv_reopen_prepare() fails
-after a successful .bdrv_reopen_prepare() could trigger the issue, but
-that's not the case.
-
-This is because the file locks are not applied to the new FD just by
-duping it, they are only applied in raw_reopen_commit().  So if you
-prepare without abort without any commit before, the problem disappears.
-
-So there had to be something wrong in raw_reopen_commit(), too.  It
-turns out that this is indeed in the above commit, it should pass
-"s->locked_shared_perm" instead of "~s->locked_shared_perm" to
-raw_apply_lock_bytes().
-
-Max
-
-
---SMq7PWO0M8lLLYHpRX5fBs2Ha5BDVdpf5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvu0VcACgkQ9AfbAGHV
-z0AIhwf6AgBvVKMBeIH0eoXkhZAT9OV3AUTuo/61ga0tRe3KO/ic8aDcYuvoZ5ub
-XAhr3jd+fUMkrqrVsYaRxyCVsLTGjwltzlCn64KtqJEsAdOlcFScf5WXMbZ7BPjT
-SGTFl0VxsID12i3cOf3KQKsYPict9rw0Lgh858BfxQt9U51YvHecUiipqxLVC4FI
-RQ/qeQhRIwssyDGnzWoXJPFfKNl0zzYLudWbzuUtjoQ2oa3TCCawA0RDNNi9W3fS
-VBsyVujaNnRjmKTA987xMh1TGVyqtiOa46o50Gs6sHt9dg+Dc0iEqGFKndOegWHt
-Nl/qzpM7Aae3c0jE8Go8ou9K3aldCw==
-=0HRK
------END PGP SIGNATURE-----
-
---SMq7PWO0M8lLLYHpRX5fBs2Ha5BDVdpf5--
+>
