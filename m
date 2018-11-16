@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gNb9B-0000jZ-Ox
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:14:46 -0500
+	(envelope-from <edgari@xilinx.com>) id 1gNb9N-0000r7-9U
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:14:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gNb96-0005mL-76
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:14:45 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181115211752.1295571-1-eblake@redhat.com>
-Date: Fri, 16 Nov 2018 11:14:16 +0100
-In-Reply-To: <20181115211752.1295571-1-eblake@redhat.com> (Eric Blake's
-	message of "Thu, 15 Nov 2018 15:17:50 -0600")
-Message-ID: <87in0x72iv.fsf@dusky.pond.sub.org>
+	(envelope-from <edgari@xilinx.com>) id 1gNb9M-000635-HJ
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:14:57 -0500
+Date: Fri, 16 Nov 2018 11:14:18 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20181116101418.GX7447@toto>
+References: <20181115094207.22846-1-luc.michel@greensocs.com>
+	<20181115094207.22846-15-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/2] typedefs.h cleanup
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20181115094207.22846-15-luc.michel@greensocs.com>
+Subject: Re: [Qemu-devel] [PATCH v6 14/16] gdbstub: gdb_set_stop_cpu: ignore
+ request when process is not attached
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,13 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Luc Michel <luc.michel@greensocs.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Eric Blake <eblake@redhat.com> writes:
+On Thu, Nov 15, 2018 at 10:42:05AM +0100, Luc Michel wrote:
+> When gdb_set_stop_cpu() is called with a CPU associated to a process
+> currently not attached by the GDB client, return without modifying the
+> stop CPU. Otherwise, GDB gets confused if it receives packets with a
+> thread-id it does not know about.
+> 
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> Acked-by: Alistair Francis <alistair.francis@wdc.com>
 
-> Prompted by my review of xiezhide's work.  No semantic change, but
-> not technically a bug fix, so I don't care if it goes in 3.1 or
-> waits for 4.0.
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+> ---
+>  gdbstub.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 59eed3b878..89819a6a72 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1787,10 +1787,19 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>      return RS_IDLE;
+>  }
+>  
+>  void gdb_set_stop_cpu(CPUState *cpu)
+>  {
+> +    GDBProcess *p = gdb_get_cpu_process(gdbserver_state, cpu);
+> +
+> +    if (!p->attached) {
+> +        /* Having a stop CPU corresponding to a process that is not attached
+> +         * confuses GDB. So we ignore the request.
+> +         */
+> +        return;
+> +    }
+> +
+>      gdbserver_state->c_cpu = cpu;
+>      gdbserver_state->g_cpu = cpu;
+>  }
+>  
+>  #ifndef CONFIG_USER_ONLY
+> -- 
+> 2.19.1
+> 
