@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gNhLS-0000dv-Gt
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:51:51 -0500
+	(envelope-from <armbru@redhat.com>) id 1gNhMm-0001hp-9L
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:53:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gNhLQ-0000oL-Bb
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:51:50 -0500
-References: <d9876015-2126-79fe-415f-ca7427ab3059@gmail.com>
-	<CAFEAcA84aoWNdu1T90iR0uw7emfF1SRF09FjL+gu12yrdAr2yA@mail.gmail.com>
-From: Nick Hudson <nicholas.a.hudson@gmail.com>
-Message-ID: <327575eb-cb88-8ba2-d61a-c133f1c0d30c@gmail.com>
-Date: Fri, 16 Nov 2018 16:51:28 +0000
+	(envelope-from <armbru@redhat.com>) id 1gNhMi-0001Sa-9o
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:53:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47164)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gNhMi-0001SA-2K
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:53:08 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181110034115.103335-1-liq3ea@163.com>
+	<20181110034115.103335-3-liq3ea@163.com>
+Date: Fri, 16 Nov 2018 17:52:58 +0100
+In-Reply-To: <20181110034115.103335-3-liq3ea@163.com> (Li Qiang's message of
+	"Fri, 9 Nov 2018 19:41:15 -0800")
+Message-ID: <87k1ld0xsl.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA84aoWNdu1T90iR0uw7emfF1SRF09FjL+gu12yrdAr2yA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] Support u-boot noload images for arm as
- used by NetBSD/evbarm GENERIC kernel.
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw: fw_cfg: refactor fw_cfg_reboot()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,121 +27,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Li Qiang <liq3ea@163.com>
+Cc: pbonzini@redhat.com, kraxel@redhat.com, lersek@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org
 
+Li Qiang <liq3ea@163.com> writes:
 
-On 16/11/2018 14:34, Peter Maydell wrote:
-> On 7 November 2018 at 13:19, Nick Hudson <nicholas.a.hudson@gmail.com> wrote:
->> noload kernels are loaded with the u-boot image header and as a result
->> the header size needs adding to the entry point.  Fake up a hdr so the
->> kernel image is loaded at the right address and the entry point is
->> adjusted appropriately
->>
->> Signed-off-by: Nick Hudson <skrll@netbsd.org>
-> Hi; thanks for this patch.
+> Currently the user can set a negative reboot_timeout.
+> Also it is wrong to parse 'reboot-timeout' with qemu_opt_get() and then
+> convert it to number.
 
+Again, it's not wrong per se, just needlessly complicated and
+error-prone.  What makes it wrong is ...
 
-Thanks for reviewing.
-
+> convert it to number. This patch refactor this function by following:
+> 1. ensure reboot_timeout is in 0~0xffff
+> 2. use qemu_opt_get_number() to parse reboot_timeout
+> 3. simlify code
 >
->> ---
->>   hw/arm/boot.c         |  8 +++++---
->>   hw/core/loader.c      | 12 +++++++++---
->>   hw/core/uboot_image.h |  1 +
->>   3 files changed, 15 insertions(+), 6 deletions(-)
->>
->> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
->> index 586baa9b64..450267566a 100644
->> --- a/hw/arm/boot.c
->> +++ b/hw/arm/boot.c
->> @@ -30,8 +30,9 @@
->>    * Documentation/arm/Booting and Documentation/arm64/booting.txt
->>    * They have different preferred image load offsets from system RAM base.
->>    */
->> -#define KERNEL_ARGS_ADDR 0x100
->> -#define KERNEL_LOAD_ADDR 0x00010000
->> +#define KERNEL_ARGS_ADDR   0x100
->> +#define KERNEL_NOLOAD_ADDR 0x00000000
->> +#define KERNEL_LOAD_ADDR   0x00010000
->>   #define KERNEL64_LOAD_ADDR 0x00080000
->>
->>   #define ARM64_TEXT_OFFSET_OFFSET    8
->> @@ -1078,7 +1079,8 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info
->> *info)
->>       }
->>       entry = elf_entry;
->>       if (kernel_size < 0) {
->> -        kernel_size = load_uimage_as(info->kernel_filename, &entry, NULL,
->> +        uint64_t loadaddr = info->loader_start + KERNEL_NOLOAD_ADDR;
->> +        kernel_size = load_uimage_as(info->kernel_filename, &entry,
->> &loadaddr,
->>                                        &is_linux, NULL, NULL, as);
-> I don't really understand this change. The API for load_uimage_as()
-> says that the loadaddr argument is an output, not an input, and that
-> it is ignored if it is NULL. If we're changing the API here then
-> we need to (a) document that change and (b) check all the callers
-> can handle it. It would be better if we can avoid having to do that.
-
-
-I chose to pass where the noload kernel should be loaded via loadaddr as 
-arm_load_kernel knows where RAM is. Perhaps there's a better way?
-
-BTW, I should have mentioned that I pass the same address that is used 
-for the bootloader. This address is adjusted in load_uboot_image by the 
-size of the uboot header. As the bootloader is smaller than the uboot 
-header it all works. uboot loads the whole image including header and 
-adjusts the entry point by the header size.
-
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+>  hw/nvram/fw_cfg.c | 23 +++++++++++------------
+>  vl.c              |  2 +-
+>  2 files changed, 12 insertions(+), 13 deletions(-)
 >
->>       }
->>       if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 0) {
->> diff --git a/hw/core/loader.c b/hw/core/loader.c
->> index aa0b3fc867..952562c2da 100644
->> --- a/hw/core/loader.c
->> +++ b/hw/core/loader.c
->> @@ -638,13 +638,19 @@ static int load_uboot_image(const char *filename,
->> hwaddr *ep, hwaddr *loadaddr,
->>           goto out;
->>
->>       if (hdr->ih_type != image_type) {
->> -        fprintf(stderr, "Wrong image type %d, expected %d\n", hdr->ih_type,
->> -                image_type);
->> -        goto out;
->> +        if (image_type != IH_TYPE_KERNEL && hdr->ih_type !=
->> IH_TYPE_KERNEL_NOLOAD) {
->> +            fprintf(stderr, "Wrong image type %d, expected %d\n",
->> hdr->ih_type,
->> +                    image_type);
->> +            goto out;
->> +        }
->>       }
->>
->>       /* TODO: Implement other image types.  */
->>       switch (hdr->ih_type) {
->> +    case IH_TYPE_KERNEL_NOLOAD:
->> +        hdr->ih_load = *loadaddr + sizeof(*hdr);
-> This will segfault if the user passed in NULL for loadaddr,
-> as they are allowed to do by the API.
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 78f43dad93..6aca80846a 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -178,24 +178,23 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+>  
+>  static void fw_cfg_reboot(FWCfgState *s)
+>  {
+> -    int reboot_timeout = -1;
+> -    char *p;
+> -    const char *temp;
+> +    const char *reboot_timeout = NULL;
+>  
+>      /* get user configuration */
+>      QemuOptsList *plist = qemu_find_opts("boot-opts");
+>      QemuOpts *opts = QTAILQ_FIRST(&plist->head);
+> -    if (opts != NULL) {
+> -        temp = qemu_opt_get(opts, "reboot-timeout");
+> -        if (temp != NULL) {
+> -            p = (char *)temp;
+> -            reboot_timeout = strtol(p, &p, 10);
 
+... the total lack of error checking here.  Same in PATCH 1.
 
-I can update the header with this API change and update callers if 
-that's ok?
+Here's my attempt at a clearer commit message:
 
+    fw_cfg: Fix -boot reboot-timeout error checking
 
->
->> +        hdr->ih_ep += hdr->ih_load;
->> +
-> Cases which fall through need a specific
->       /* fall through */
->
-> comment. This tells human readers and static analysis tools that
-> it was intentional.
+    fw_cfg_reboot() gets option parameter "reboot-timeout" with
+    qemu_opt_get(), then converts it to an integer by hand.  It neglects
+    to check that conversion for errors, and fails to reject negative
+    values.  Positive values above the limit get reported and replaced
+    by the limit.
 
+    Check for conversion errors properly, and reject all values outside
+    0..0xffff.
 
-Sure, I did wonder if this was expected.
+PATCH 1's commit message could be improved the same way.
 
+> -        }
+> +    reboot_timeout = qemu_opt_get(opts, "reboot-timeout");
+> +
+> +    if (reboot_timeout == NULL) {
+> +        return;
+>      }
+> +    int64_t rt_val = qemu_opt_get_number(opts, "reboot-timeout", -1);
+> +
+>      /* validate the input */
+> -    if (reboot_timeout > 0xffff) {
+> -        error_report("reboot timeout is larger than 65535, force it to 65535.");
+> -        reboot_timeout = 0xffff;
+> +    if (rt_val < 0 || rt_val > 0xffff) {
+> +        error_report("reboot timeout is invalid,"
+> +                     "it should be a value between 0 and 65535");
+> +        exit(1);
+>      }
+>      fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&reboot_timeout, 4), 4);
+>  }
 
-Thanks,
+Change in behavior when "reboot-timeout" isn't specified.
 
-Nick
+Before your patch, we fw_cfg_add_file() with a value of -1.
+
+After your patch, we don't fw_cfg_add_file().
+
+Why is that okay?
+
+> diff --git a/vl.c b/vl.c
+> index be37da46f0..086127ff0b 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -339,7 +339,7 @@ static QemuOptsList qemu_boot_opts = {
+>              .type = QEMU_OPT_NUMBER,
+>          }, {
+>              .name = "reboot-timeout",
+> -            .type = QEMU_OPT_STRING,
+> +            .type = QEMU_OPT_NUMBER,
+>          }, {
+>              .name = "strict",
+>              .type = QEMU_OPT_BOOL,
