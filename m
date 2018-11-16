@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gNROx-0006Id-Nr
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 18:50:24 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gNSEx-0002VU-Uo
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 19:44:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gNROt-0000Ut-Ga
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 18:50:23 -0500
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:52979)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gNROr-0000Tq-GH
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 18:50:17 -0500
-Date: Thu, 15 Nov 2018 18:50:13 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181115235013.GA17566@flamenco>
-References: <20181114114400.15577-1-pbonzini@redhat.com>
-	<20181114194208.GA500@flamenco>
-	<7648aa01-5458-bef1-9b65-f6ef83287e63@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gNSEt-0005qF-1c
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 19:44:07 -0500
+Resent-Message-Id: <E1gNSEt-0005qF-1c@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21447)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gNSEs-0005pV-PM
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 19:44:02 -0500
+In-Reply-To: <20181115143124.19234-1-pbonzini@redhat.com>
+Message-ID: <154232901293.21.17511445659613171350@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7648aa01-5458-bef1-9b65-f6ef83287e63@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] cpus: run work items for all vCPUs if
- single-threaded
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 15 Nov 2018 16:43:34 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH for-3.2 00/10] vhost: preparation for
+ qgraph conversion of vhost-user-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, alex.bennee@linaro.org
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, lvivier@redhat.com, marcandre.lureau@redhat.com, jasowang@redhat.com, mst@redhat.com
 
-On Fri, Nov 16, 2018 at 00:15:53 +0100, Paolo Bonzini wrote:
-> On 14/11/2018 20:42, Emilio G. Cota wrote:
-> > On Wed, Nov 14, 2018 at 12:44:00 +0100, Paolo Bonzini wrote:
-> >> This avoids the following deadlock:
-> >>
-> >> 1) a thread calls run_on_cpu for CPU 2 from a timer, and single_tcg_halt_cond
-> >> is signaled
-> >>
-> >> 2) CPU 1 is running and exits.  It finds no work item and enters CPU 2
-> >>
-> >> 3) because the I/O thread is stuck in run_on_cpu, the round-robin kick
-> >> timer never triggers, and CPU 2 never runs the work item
-> >>
-> >> 4) run_on_cpu never completes
-(snip)
-> > I can see though how with an additional CPU the deadlock
-> > could happen. For example, the I/O thread does run_on_cpu(cpu3),
-> > which kicks cpu1 (i.e. the tcg_current_rr_cpu) and cpu3, but not cpu2.
-> > Then cpu1 exits, and cpu2 starts executing; unless cpu2 exits on its
-> > own volition, it will run forever.
-> 
-> Yes, the thread must call run_on_cpu for CPU *3* from a timer.
-
-Thanks! Please add my
-
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-
-tag when fixing up the commit message.
-
-		E.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+ODExMTUxNDMxMjQuMTkyMzQtMS1wYm9uemluaUByZWRoYXQuY29tClR5cGU6IHNlcmllcwpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIGZvci0zLjIgMDAvMTBdIHZob3N0OiBwcmVwYXJhdGlv
+biBmb3IgcWdyYXBoIGNvbnZlcnNpb24gb2Ygdmhvc3QtdXNlci10ZXN0Cgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
+LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQg
+bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
+CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
+bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
+ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
+NDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmQ3YTRkZGQgdmhv
+c3QtdXNlci10ZXN0OiBjcmVhdGUgYSB0ZW1wb3JhcnkgZGlyZWN0b3J5IHBlciBUZXN0U2VydmVy
+CjA2NzFjYWIgdmhvc3QtdXNlci10ZXN0OiBzbWFsbCBjaGFuZ2VzIHRvIGluaXRfaHVnZXBhZ2Vm
+cwoyYWZhNDNmIHZob3N0LXVzZXItdGVzdDogY3JlYXRlIGEgbWFpbiBsb29wIHBlciBUZXN0U2Vy
+dmVyCjQ5YWUzOTAgdmhvc3QtdXNlci10ZXN0OiByZWR1Y2UgdXNhZ2Ugb2YgZ2xvYmFsX3F0ZXN0
+CjI3MzJmMGIgdmhvc3QtdXNlci10ZXN0OiBza2lwIGlmIHRoZXJlIGlzIG5vIG1lbW9yeSBhdCBh
+ZGRyZXNzIDAKYjc5MmU1MCB2aG9zdC11c2VyLXRlc3Q6IHN1cHBvcnQgVkhPU1RfVVNFUl9QUk9U
+T0NPTF9GX0NST1NTX0VORElBTgpiODJiYTJmIHZob3N0LXVzZXI6IHN1cHBvcnQgY3Jvc3MtZW5k
+aWFuIHZuZXQgaGVhZGVycwo0OGI2MWY2IHZob3N0LW5ldDogY29tcGlsZSBpdCBmb3IgYWxsIHRh
+cmdldHMKOGUzMjdiNSB2aG9zdC11c2VyLXRlc3Q6IHNpZ25hbCBkYXRhX2NvbmQgd2hlbiBzLT5y
+aW5ncyBjaGFuZ2VzCjRlMzI2MGUgdmhvc3QtdXNlci10ZXN0OiB1c2UgZ19jb25kX2Jyb2FkY2Fz
+dAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMDogdmhvc3QtdXNlci10
+ZXN0OiB1c2UgZ19jb25kX2Jyb2FkY2FzdC4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiB2aG9zdC11
+c2VyLXRlc3Q6IHNpZ25hbCBkYXRhX2NvbmQgd2hlbiBzLT5yaW5ncyBjaGFuZ2VzLi4uCkNoZWNr
+aW5nIFBBVENIIDMvMTA6IHZob3N0LW5ldDogY29tcGlsZSBpdCBmb3IgYWxsIHRhcmdldHMuLi4K
+Q2hlY2tpbmcgUEFUQ0ggNC8xMDogdmhvc3QtdXNlcjogc3VwcG9ydCBjcm9zcy1lbmRpYW4gdm5l
+dCBoZWFkZXJzLi4uCkNoZWNraW5nIFBBVENIIDUvMTA6IHZob3N0LXVzZXItdGVzdDogc3VwcG9y
+dCBWSE9TVF9VU0VSX1BST1RPQ09MX0ZfQ1JPU1NfRU5ESUFOLi4uCkNoZWNraW5nIFBBVENIIDYv
+MTA6IHZob3N0LXVzZXItdGVzdDogc2tpcCBpZiB0aGVyZSBpcyBubyBtZW1vcnkgYXQgYWRkcmVz
+cyAwLi4uCkNoZWNraW5nIFBBVENIIDcvMTA6IHZob3N0LXVzZXItdGVzdDogcmVkdWNlIHVzYWdl
+IG9mIGdsb2JhbF9xdGVzdC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjE6
+IEZJTEU6IHRlc3RzL3Zob3N0LXVzZXItdGVzdC5jOjE5MDoKK3N0YXRpYyB2b2lkIGluaXRfdmly
+dGlvX2RldihRVGVzdFN0YXRlICpxdHMsIFRlc3RTZXJ2ZXIgKnMsIHVpbnQzMl90IGZlYXR1cmVz
+X21hc2spCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTQ6IEZJTEU6IHRlc3Rz
+L3Zob3N0LXVzZXItdGVzdC5jOjI5NjoKKyAgICAgICAgICAgIHVpbnQzMl90IGEgPSBxdGVzdF9y
+ZWFkYihxdHMsIHMtPm1lbW9yeS5yZWdpb25zW2ldLmd1ZXN0X3BoeXNfYWRkciArIGopOwoKdG90
+YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAxMzIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA4LzEwOiB2aG9zdC11c2Vy
+LXRlc3Q6IGNyZWF0ZSBhIG1haW4gbG9vcCBwZXIgVGVzdFNlcnZlci4uLgpFUlJPUjogc3BhY2Ug
+cHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygn
+CiM1MDogRklMRTogdGVzdHMvdmhvc3QtdXNlci10ZXN0LmM6NTUxOgorICAgICAgICBnX21haW5f
+Y29udGV4dF9pdGVyYXRpb24gKE5VTEwsIFRSVUUpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5p
+bmdzLCA4MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgpDaGVja2luZyBQQVRDSCA5LzEwOiB2aG9zdC11c2VyLXRlc3Q6IHNtYWxsIGNoYW5nZXMg
+dG8gaW5pdF9odWdlcGFnZWZzLi4uCkNoZWNraW5nIFBBVENIIDEwLzEwOiB2aG9zdC11c2VyLXRl
+c3Q6IGNyZWF0ZSBhIHRlbXBvcmFyeSBkaXJlY3RvcnkgcGVyIFRlc3RTZXJ2ZXIuLi4KPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
