@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gNfvV-0003dy-6C
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:20:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gNfxl-0005cq-54
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:23:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gNfvU-0000HZ-CD
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:20:57 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <w51in0xuksv.fsf@maestria.local.igalia.com>
-References: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
-	<w511s7p9fkk.fsf@maestria.local.igalia.com>
-	<462138b3-e9e7-29e5-da55-d0ebd626aee7@redhat.com>
-	<w51efbmh0tp.fsf@maestria.local.igalia.com>
-	<2e1b90ae-1a0c-711a-6ef8-3c814335f696@redhat.com>
-	<w51in0xuksv.fsf@maestria.local.igalia.com>
-Date: Fri, 16 Nov 2018 16:20:40 +0100
-Message-ID: <w51ftw1ujzr.fsf@maestria.local.igalia.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gNfxk-0001MV-Bc
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:23:17 -0500
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:42375)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gNfxk-0001MG-44
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:23:16 -0500
+Received: by mail-oi1-x236.google.com with SMTP id w13so7322429oiw.9
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 07:23:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] KVM Forum block no[td]es
+In-Reply-To: <20181116132931.8737-1-kraxel@redhat.com>
+References: <20181116132931.8737-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Nov 2018 15:22:54 +0000
+Message-ID: <CAFEAcA-hiZ92ngyy33kbvSZQ_xa7jKdBcTT0sXFFeNsEDab2JQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] Fixes 31 20181116 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On Fri 16 Nov 2018 04:03:12 PM CET, Alberto Garcia wrote:
->> top (T) -> intermediate (I) -> base (B)
->>
->> Now you commit from top to base.  Clearly you don't want the backing
->> chain between top and base to change.  So say you unshare the GRAPH_MOD
->> permission (implying that whenever a parent doesn't care, it just shares
->> it).  But as said above, if someone just drops the backing link from I
->> to B, the permission system won't catch that.
+On 16 November 2018 at 13:29, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit cb968d275c145467c8b385a3618a207ec111eab1:
 >
-> Yes it will, because the block job (either mirror or commit depending on
-> the case) is the parent of all three nodes (BlockJob.nodes is where the
-> list is stored) and does not alow GRAPH_MOD in any of them[*]. So
-> dropping that backing link fails (I also have a test case for that).
+>   Update version for v3.1.0-rc1 release (2018-11-13 18:16:14 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/fixes-31-20181116-pull-request
+>
+> for you to fetch changes up to 144aaa990e0d54d08865c4d98ba2138a89689530:
+>
+>   help: Provide help for egl-headless (2018-11-16 11:44:22 +0100)
+>
+> ----------------------------------------------------------------
+> ui: add rendernode arg for egl-headless (fixes permission issues with libvirt)
+>
+> ----------------------------------------------------------------
+>
+> Erik Skultety (3):
+>   qapi: Add "rendernode" display option for egl-headless
+>   ui: Allow specifying 'rendernode' display option for egl-headless
+>   help: Provide help for egl-headless
+>
+>  ui/egl-headless.c |  2 +-
+>  qapi/ui.json      | 17 ++++++++++++++++-
+>  qemu-options.hx   |  6 +++++-
+>  3 files changed, 22 insertions(+), 3 deletions(-)
 
-I forgot to add the footnote [*] in my previous e-mail:
+Applied, thanks.
 
-The mirror block job (in particular when in "commit-active" mode, but
-also in other cases) creates a "mirror_top" node and then blocks the
-target and all intermediate nodes by calling block_job_add_bdrv() in
-each one of them:
-
-   mirror_top (M) -> top (T) -> intermediate (I) -> base (B)
-
-The problem is that those intermediate nodes start from top's
-backing_bs(), so top itself is not added to the block job's list of
-children and doesn't have its permissions restricted during the job's
-lifetime.
-
-This looks like a bug, I'll see if there's a way to reproduce and I'll
-prepare a patch.
-
-Berto
+-- PMM
