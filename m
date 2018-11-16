@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gNjLP-0005Yr-UQ
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 13:59:56 -0500
+	(envelope-from <remy.noel@blade-group.com>) id 1gNjNY-0006Wl-Ia
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 14:02:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gNjLM-0003IG-Pj
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 13:59:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gNjLM-0003Du-Ho
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 13:59:52 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AFE503082E51
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 18:59:51 +0000 (UTC)
-Date: Fri, 16 Nov 2018 18:59:46 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181116185945.GG2447@work-vm>
-References: <20181114132130.27141-1-marcandre.lureau@redhat.com>
+	(envelope-from <remy.noel@blade-group.com>) id 1gNjNX-0004dK-8x
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 14:02:08 -0500
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:51958)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <remy.noel@blade-group.com>)
+	id 1gNjNW-0004cT-VL
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 14:02:07 -0500
+Received: by mail-wm1-x32a.google.com with SMTP id w7-v6so23041966wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 11:02:06 -0800 (PST)
+From: remy.noel@blade-group.com
+Date: Fri, 16 Nov 2018 20:02:08 +0100
+Message-Id: <20181116190211.17622-2-remy.noel@blade-group.com>
+In-Reply-To: <20181116190211.17622-1-remy.noel@blade-group.com>
+References: <20181116190211.17622-1-remy.noel@blade-group.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181114132130.27141-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: add /vmstate/simple/array
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] aio-posix: Fix concurrent aio_poll/set_fd_handler.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,100 +28,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Remy Noel <remy.noel@blade-group.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>, "open list:Block I/O path" <qemu-block@nongnu.org>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> A very simple test to show VMSTATE_*_ARRAY usage and result. It could
-> be systematically extended to other primitives, but I leave that as an
-> exercise for others :).
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+From: Remy Noel <remy.noel@blade-group.com>
 
-Yes, fair enough.  I don't think it's necessary to test every subtype
-that can go in the array; but it would be nice to add some of the more
-esoteric array macros no one understands.
+We no longer modify existing handlers entries and instead, always insert
+those after having properly initialized those.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Also, we do not call aio_epoll_update for deleted handlers as this has
+no impact whastoever.
 
-> ---
->  tests/test-vmstate.c | 50 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
->=20
-> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-> index 37a7a93784..2a960dedbe 100644
-> --- a/tests/test-vmstate.c
-> +++ b/tests/test-vmstate.c
-> @@ -284,6 +284,55 @@ static void test_simple_primitive(void)
->      FIELD_EQUAL(i64_2);
->  }
-> =20
-> +typedef struct TestSimpleArray {
-> +    uint16_t u16_1[3];
-> +} TestSimpleArray;
-> +
-> +/* Object instantiation, we are going to use it in more than one test =
-*/
-> +
-> +TestSimpleArray obj_simple_arr =3D {
-> +    .u16_1 =3D { 0x42, 0x43, 0x44 },
-> +};
-> +
-> +/* Description of the values.  If you add a primitive type
-> +   you are expected to add a test here */
-> +
-> +static const VMStateDescription vmstate_simple_arr =3D {
-> +    .name =3D "simple/array",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT16_ARRAY(u16_1, TestSimpleArray, 3),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +uint8_t wire_simple_arr[] =3D {
-> +    /* u16_1 */ 0x00, 0x42,
-> +    /* u16_1 */ 0x00, 0x43,
-> +    /* u16_1 */ 0x00, 0x44,
-> +    QEMU_VM_EOF, /* just to ensure we won't get EOF reported premature=
-ly */
-> +};
-> +
-> +static void obj_simple_arr_copy(void *target, void *source)
-> +{
-> +    memcpy(target, source, sizeof(TestSimpleArray));
-> +}
-> +
-> +static void test_simple_array(void)
-> +{
-> +    TestSimpleArray obj, obj_clone;
-> +
-> +    memset(&obj, 0, sizeof(obj));
-> +    save_vmstate(&vmstate_simple_arr, &obj_simple_arr);
-> +
-> +    compare_vmstate(wire_simple_arr, sizeof(wire_simple_arr));
-> +
-> +    SUCCESS(load_vmstate(&vmstate_simple_arr, &obj, &obj_clone,
-> +                         obj_simple_arr_copy, 1, wire_simple_arr,
-> +                         sizeof(wire_simple_arr)));
-> +}
-> +
->  typedef struct TestStruct {
->      uint32_t a, b, c, e;
->      uint64_t d, f;
-> @@ -863,6 +912,7 @@ int main(int argc, char **argv)
-> =20
->      g_test_init(&argc, &argv, NULL);
->      g_test_add_func("/vmstate/simple/primitive", test_simple_primitive=
-);
-> +    g_test_add_func("/vmstate/simple/array", test_simple_array);
->      g_test_add_func("/vmstate/versioned/load/v1", test_load_v1);
->      g_test_add_func("/vmstate/versioned/load/v2", test_load_v2);
->      g_test_add_func("/vmstate/field_exists/load/noskip", test_load_nos=
-kip);
-> --=20
-> 2.19.1.708.g4ede3d42df
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Signed-off-by: Remy Noel <remy.noel@blade-group.com>
+---
+ util/aio-posix.c | 85 ++++++++++++++++++++++++++++--------------------
+ util/aio-win32.c | 54 ++++++++++++++----------------
+ 2 files changed, 74 insertions(+), 65 deletions(-)
+
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 51c41ed3c9..b34d97292a 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -200,6 +200,31 @@ static AioHandler *find_aio_handler(AioContext *ctx, int fd)
+     return NULL;
+ }
+ 
++static bool aio_remove_fd_handler(AioContext *ctx, AioHandler *node)
++{
++    /* If the GSource is in the process of being destroyed then
++     * g_source_remove_poll() causes an assertion failure.  Skip
++     * removal in that case, because glib cleans up its state during
++     * destruction anyway.
++     */
++    if (!g_source_is_destroyed(&ctx->source)) {
++        g_source_remove_poll(&ctx->source, &node->pfd);
++    }
++
++    /* If a read is in progress, just mark the node as deleted */
++    if (qemu_lockcnt_count(&ctx->list_lock)) {
++        node->deleted = 1;
++        node->pfd.revents = 0;
++        return false;
++    }
++    /* Otherwise, delete it for real.  We can't just mark it as
++     * deleted because deleted nodes are only cleaned up while
++     * no one is walking the handlers list.
++     */
++    QLIST_REMOVE(node, node);
++    return true;
++}
++
+ void aio_set_fd_handler(AioContext *ctx,
+                         int fd,
+                         bool is_external,
+@@ -209,6 +234,7 @@ void aio_set_fd_handler(AioContext *ctx,
+                         void *opaque)
+ {
+     AioHandler *node;
++    AioHandler *new_node = NULL;
+     bool is_new = false;
+     bool deleted = false;
+     int poll_disable_change;
+@@ -223,50 +249,35 @@ void aio_set_fd_handler(AioContext *ctx,
+             qemu_lockcnt_unlock(&ctx->list_lock);
+             return;
+         }
+-
+-        /* If the GSource is in the process of being destroyed then
+-         * g_source_remove_poll() causes an assertion failure.  Skip
+-         * removal in that case, because glib cleans up its state during
+-         * destruction anyway.
+-         */
+-        if (!g_source_is_destroyed(&ctx->source)) {
+-            g_source_remove_poll(&ctx->source, &node->pfd);
+-        }
+-
+-        /* If a read is in progress, just mark the node as deleted */
+-        if (qemu_lockcnt_count(&ctx->list_lock)) {
+-            node->deleted = 1;
+-            node->pfd.revents = 0;
+-        } else {
+-            /* Otherwise, delete it for real.  We can't just mark it as
+-             * deleted because deleted nodes are only cleaned up while
+-             * no one is walking the handlers list.
+-             */
+-            QLIST_REMOVE(node, node);
+-            deleted = true;
+-        }
++        deleted = aio_remove_fd_handler(ctx, node);
+         poll_disable_change = -!node->io_poll;
+     } else {
+         poll_disable_change = !io_poll - (node && !node->io_poll);
+         if (node == NULL) {
+-            /* Alloc and insert if it's not already there */
+-            node = g_new0(AioHandler, 1);
+-            node->pfd.fd = fd;
+-            QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
+-
+-            g_source_add_poll(&ctx->source, &node->pfd);
+             is_new = true;
+         }
++        /* Alloc and insert if it's not already there */
++        new_node = g_new0(AioHandler, 1);
+ 
+         /* Update handler with latest information */
+-        node->io_read = io_read;
+-        node->io_write = io_write;
+-        node->io_poll = io_poll;
+-        node->opaque = opaque;
+-        node->is_external = is_external;
++        new_node->io_read = io_read;
++        new_node->io_write = io_write;
++        new_node->io_poll = io_poll;
++        new_node->opaque = opaque;
++        new_node->is_external = is_external;
++
++        if (is_new) {
++            new_node->pfd.fd = fd;
++        } else {
++            deleted = aio_remove_fd_handler(ctx, node);
++            new_node->pfd = node->pfd;
++        }
++        g_source_add_poll(&ctx->source, &new_node->pfd);
+ 
+-        node->pfd.events = (io_read ? G_IO_IN | G_IO_HUP | G_IO_ERR : 0);
+-        node->pfd.events |= (io_write ? G_IO_OUT | G_IO_ERR : 0);
++        new_node->pfd.events = (io_read ? G_IO_IN | G_IO_HUP | G_IO_ERR : 0);
++        new_node->pfd.events |= (io_write ? G_IO_OUT | G_IO_ERR : 0);
++
++        QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, new_node, node);
+     }
+ 
+     /* No need to order poll_disable_cnt writes against other updates;
+@@ -278,7 +289,9 @@ void aio_set_fd_handler(AioContext *ctx,
+     atomic_set(&ctx->poll_disable_cnt,
+                atomic_read(&ctx->poll_disable_cnt) + poll_disable_change);
+ 
+-    aio_epoll_update(ctx, node, is_new);
++    if (new_node) {
++        aio_epoll_update(ctx, new_node, is_new);
++    }
+     qemu_lockcnt_unlock(&ctx->list_lock);
+     aio_notify(ctx);
+ 
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index c58957cc4b..00e38cdd9f 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -35,6 +35,22 @@ struct AioHandler {
+     QLIST_ENTRY(AioHandler) node;
+ };
+ 
++static void aio_remove_fd_handler(AioContext *ctx, AioHandler *node)
++{
++    /* If aio_poll is in progress, just mark the node as deleted */
++    if (qemu_lockcnt_count(&ctx->list_lock)) {
++        node->deleted = 1;
++        node->pfd.revents = 0;
++    } else {
++        /* Otherwise, delete it for real.  We can't just mark it as
++         * deleted because deleted nodes are only cleaned up after
++         * releasing the list_lock.
++         */
++        QLIST_REMOVE(node, node);
++        g_free(node);
++    }
++}
++
+ void aio_set_fd_handler(AioContext *ctx,
+                         int fd,
+                         bool is_external,
+@@ -56,30 +72,20 @@ void aio_set_fd_handler(AioContext *ctx,
+     /* Are we deleting the fd handler? */
+     if (!io_read && !io_write) {
+         if (node) {
+-            /* If aio_poll is in progress, just mark the node as deleted */
+-            if (qemu_lockcnt_count(&ctx->list_lock)) {
+-                node->deleted = 1;
+-                node->pfd.revents = 0;
+-            } else {
+-                /* Otherwise, delete it for real.  We can't just mark it as
+-                 * deleted because deleted nodes are only cleaned up after
+-                 * releasing the list_lock.
+-                 */
+-                QLIST_REMOVE(node, node);
+-                g_free(node);
+-            }
++            aio_remove_fd_handler(ctx, node);
+         }
+     } else {
+         HANDLE event;
+         long bitmask = 0;
+ 
+-        if (node == NULL) {
+-            /* Alloc and insert if it's not already there */
+-            node = g_new0(AioHandler, 1);
+-            node->pfd.fd = fd;
+-            QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
++        if (node) {
++            aio_remove_fd_handler(ctx, node);
+         }
+ 
++        /* Alloc and insert if it's not already there */
++        node = g_new0(AioHandler, 1);
++        node->pfd.fd = fd;
++
+         node->pfd.events = 0;
+         if (node->io_read) {
+             node->pfd.events |= G_IO_IN;
+@@ -104,6 +110,7 @@ void aio_set_fd_handler(AioContext *ctx,
+             bitmask |= FD_WRITE | FD_CONNECT;
+         }
+ 
++        QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
+         event = event_notifier_get_handle(&ctx->notifier);
+         WSAEventSelect(node->pfd.fd, event, bitmask);
+     }
+@@ -139,18 +146,7 @@ void aio_set_event_notifier(AioContext *ctx,
+         if (node) {
+             g_source_remove_poll(&ctx->source, &node->pfd);
+ 
+-            /* aio_poll is in progress, just mark the node as deleted */
+-            if (qemu_lockcnt_count(&ctx->list_lock)) {
+-                node->deleted = 1;
+-                node->pfd.revents = 0;
+-            } else {
+-                /* Otherwise, delete it for real.  We can't just mark it as
+-                 * deleted because deleted nodes are only cleaned up after
+-                 * releasing the list_lock.
+-                 */
+-                QLIST_REMOVE(node, node);
+-                g_free(node);
+-            }
++            aio_remove_fd_handler(ctx, node);
+         }
+     } else {
+         if (node == NULL) {
+-- 
+2.19.1
