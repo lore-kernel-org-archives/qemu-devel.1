@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <casasfernando@outlook.com>) id 1gNbvj-0003uT-Qb
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:05:01 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gNfLA-0002UW-61
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <casasfernando@outlook.com>) id 1gNbvh-0002xr-LS
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:04:55 -0500
-From: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@outlook.com>
-Date: Fri, 16 Nov 2018 11:04:37 +0000
-Message-ID: <AM0PR06MB52990C51EA2E76CFC9D9D8BDA4DD0@AM0PR06MB5299.eurprd06.prod.outlook.com>
-References: <VI1PR10MB0301515CFEEA940842FDF26FB7330@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-	<20171211115634.GI13593@stefanha-x1.localdomain>
-	<VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-	<20171213112345.GK16782@stefanha-x1.localdomain>
-	<VI1PR10MB0301BD1873225A06B658C988B7350@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
-	<20180129160104.GN20446@stefanha-x1.localdomain>
-	<AM6PR10MB2247BA55ABF2CC4F38B30339B7F80@AM6PR10MB2247.EURPRD10.PROD.OUTLOOK.COM>
-	<20181018123816.GB4946@localhost.localdomain>
-	<AM6PR10MB2247D63F532AE33155BA57EFB7F80@AM6PR10MB2247.EURPRD10.PROD.OUTLOOK.COM>
-In-Reply-To: <AM6PR10MB2247D63F532AE33155BA57EFB7F80@AM6PR10MB2247.EURPRD10.PROD.OUTLOOK.C
-	OM>
-Content-Language: en-US
+	(envelope-from <peter.maydell@linaro.org>) id 1gNfL7-0007ev-V9
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:43:23 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:38230)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gNfL7-0007cD-MY
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:43:21 -0500
+Received: by mail-ot1-x342.google.com with SMTP id u3so16404948ota.5
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 06:43:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] qemu process crash: Assertion failed:
- QLIST_EMPTY(&bs->tracked_requests)
+In-Reply-To: <20181105185046.2802-2-aaron@os.amperecomputing.com>
+References: <20181105185046.2802-1-aaron@os.amperecomputing.com>
+	<20181105185046.2802-2-aaron@os.amperecomputing.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Nov 2018 14:42:58 +0000
+Message-ID: <CAFEAcA_M=KfiFdtVbyuiFPfAh1r+p=vQT+CHBpRNdiqPBxN_4g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v7 01/12] migration: Add post_save function
+ to VMStateDescription
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@hotmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Jeff
-	Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Aaron Lindsay <aaron@os.amperecomputing.com>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <aclindsa@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi again,
+On 5 November 2018 at 18:51, Aaron Lindsay <aaron@os.amperecomputing.com> wrote:
+> In some cases it may be helpful to modify state before saving it for
+> migration, and then modify the state back after it has been saved. The
+> existing pre_save function provides half of this functionality. This
+> patch adds a post_save function to provide the second half.
+>
+> Signed-off-by: Aaron Lindsay <aclindsa@gmail.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
 
-I hit another occurrence of this issue and collected the qemy dump as well.=
- So at the moment I have two qemu dumps for this issue happening on two dif=
-ferent guests.
-I wish I know how to analyze them myself but is not the case so if anyone i=
-n the list is willing to take a look I'm more than willing to share them.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Thanks in advance.
+David: do you want to provide a reviewed-by/acked-by for
+the migration vmstate API change ?
 
-Fernando
-
-On jue, oct 18, 2018 at 3:40 PM, Fernando Casas Sch=F6ssow <casasfernando@h=
-otmail.com> wrote:
-Hi Kevin,
-
-Not at the moment. This is a production system and pretty much up to date b=
-ut can't upgrade to 3.0 yet.
-If the dump can be of any use, I can upload it somewhere for analysis.
-
-BR,
-
-Fernando
-
-On jue, oct 18, 2018 at 2:38 PM, Kevin Wolf <kwolf@redhat.com> wrote:
-Hi Fernando, Am 18.10.2018 um 14:25 hat Fernando Casas Sch=F6ssow geschrieb=
-en:
-I hope this email finds you well and I apologize in advance for resurrectin=
-g this thread. I'm currently running on qemu 2.12.1 and I'm still having th=
-is issue every few days but now I managed to get a core dump generated (wit=
-hout including the guest memory). Would you take a look at the dump? Please=
- let me know how do you prefer me to share it. The file is around 290MB as =
-is but I can try to compress it.
-would it be possible for you to test whether the bug still exists in QEMU 3=
-.0? There were a few fixes related to request draining in that release, so =
-maybe it's already solved now. Kevin
+thanks
+-- PMM
