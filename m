@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1gNb5O-0006Fx-L9
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:10:51 -0500
+	(envelope-from <edgari@xilinx.com>) id 1gNb5q-0006Z1-Hd
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:11:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1gNb5N-0003aO-L9
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:10:50 -0500
-Date: Fri, 16 Nov 2018 11:10:08 +0100
+	(envelope-from <edgari@xilinx.com>) id 1gNb5p-00045M-RT
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:11:18 -0500
+Date: Fri, 16 Nov 2018 11:10:44 +0100
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20181116101008.GT7447@toto>
+Message-ID: <20181116101044.GU7447@toto>
 References: <20181115094207.22846-1-luc.michel@greensocs.com>
-	<20181115094207.22846-11-luc.michel@greensocs.com>
+	<20181115094207.22846-12-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20181115094207.22846-11-luc.michel@greensocs.com>
-Subject: Re: [Qemu-devel] [PATCH v6 10/16] gdbstub: add multiprocess support
- to 'D' packets
+In-Reply-To: <20181115094207.22846-12-luc.michel@greensocs.com>
+Subject: Re: [Qemu-devel] [PATCH v6 11/16] gdbstub: add support for extended
+ mode packet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,119 +27,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Luc Michel <luc.michel@greensocs.com>
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-On Thu, Nov 15, 2018 at 10:42:01AM +0100, Luc Michel wrote:
-> 'D' packets are used by GDB to detach from a process. In multiprocess
-> mode, the PID to detach from is sent in the request.
->=20
+On Thu, Nov 15, 2018 at 10:42:02AM +0100, Luc Michel wrote:
+> Add support for the '!' extended mode packet. This is required for the
+> multiprocess extension.
+> 
 > Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 
+
 > ---
->  gdbstub.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 53 insertions(+), 7 deletions(-)
->=20
+>  gdbstub.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
 > diff --git a/gdbstub.c b/gdbstub.c
-> index 5df9929f92..eec1cf0d09 100644
+> index eec1cf0d09..ada53ac559 100644
 > --- a/gdbstub.c
 > +++ b/gdbstub.c
-> @@ -1039,24 +1039,39 @@ static int gdb_breakpoint_remove(target_ulong add=
-r, target_ulong len, int type)
->      default:
->          return -ENOSYS;
->      }
->  }
-> =20
-> +static inline void gdb_cpu_breakpoint_remove_all(CPUState *cpu)
-> +{
-> +    cpu_breakpoint_remove_all(cpu, BP_GDB);
-> +#ifndef CONFIG_USER_ONLY
-> +    cpu_watchpoint_remove_all(cpu, BP_GDB);
-> +#endif
-> +}
-> +
-> +static void gdb_process_breakpoint_remove_all(const GDBState *s, GDBProc=
-ess *p)
-> +{
-> +    CPUState *cpu =3D get_first_cpu_in_process(s, p);
-> +
-> +    while (cpu) {
-> +        gdb_cpu_breakpoint_remove_all(cpu);
-> +        cpu =3D gdb_next_cpu_in_process(s, cpu);
-> +    }
-> +}
-> +
->  static void gdb_breakpoint_remove_all(void)
->  {
->      CPUState *cpu;
-> =20
->      if (kvm_enabled()) {
->          kvm_remove_all_breakpoints(gdbserver_state->c_cpu);
->          return;
->      }
-> =20
->      CPU_FOREACH(cpu) {
-> -        cpu_breakpoint_remove_all(cpu, BP_GDB);
-> -#ifndef CONFIG_USER_ONLY
-> -        cpu_watchpoint_remove_all(cpu, BP_GDB);
-> -#endif
-> +        gdb_cpu_breakpoint_remove_all(cpu);
->      }
->  }
-> =20
->  static void gdb_set_cpu_pc(GDBState *s, target_ulong pc)
->  {
-> @@ -1331,13 +1346,44 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
->          /* Kill the target */
->          error_report("QEMU: Terminated via GDBstub");
->          exit(0);
->      case 'D':
->          /* Detach packet */
-> -        gdb_breakpoint_remove_all();
-> -        gdb_syscall_mode =3D GDB_SYS_DISABLED;
-> -        gdb_continue(s);
-> +        pid =3D 1;
-> +
-> +        if (s->multiprocess) {
-> +            unsigned long lpid;
-> +            if (*p !=3D ';') {
-> +                put_packet(s, "E22");
-> +                break;
-> +            }
-> +
-> +            if (qemu_strtoul(p + 1, &p, 16, &lpid)) {
-> +                put_packet(s, "E22");
-> +                break;
-> +            }
-> +
-> +            pid =3D lpid;
-> +        }
-> +
-> +        process =3D gdb_get_process(s, pid);
-> +        gdb_process_breakpoint_remove_all(s, process);
-> +        process->attached =3D false;
-> +
-> +        if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
-> +            s->c_cpu =3D gdb_first_cpu(s);
-> +        }
-> +
-> +        if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
-> +            s->g_cpu =3D gdb_first_cpu(s);
-> +        }
-> +
-> +        if (s->c_cpu =3D=3D NULL) {
-> +            /* No more process attached */
-> +            gdb_syscall_mode =3D GDB_SYS_DISABLED;
-> +            gdb_continue(s);
-> +        }
->          put_packet(s, "OK");
->          break;
->      case 's':
->          if (*p !=3D '\0') {
->              addr =3D strtoull(p, (char **)&p, 16);
-> --=20
+> @@ -1294,10 +1294,13 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>      trace_gdbstub_io_command(line_buf);
+>  
+>      p = line_buf;
+>      ch = *p++;
+>      switch(ch) {
+> +    case '!':
+> +        put_packet(s, "OK");
+> +        break;
+>      case '?':
+>          /* TODO: Make this return the correct value for user-mode.  */
+>          snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
+>                   gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread_id)));
+>          put_packet(s, buf);
+> -- 
 > 2.19.1
->=20
+> 
