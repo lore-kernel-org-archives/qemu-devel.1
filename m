@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gNdd6-0000eX-Ta
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 07:53:50 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gNdte-000514-By
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 08:11:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gNdd3-0003Id-Pv
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 07:53:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35750)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gNdd3-0003Hu-I6
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 07:53:45 -0500
-References: <20181114130428.32326-1-asanchez@kryptoslogic.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1782562d-41c7-0cc7-94f3-fb7ff4b7bd40@redhat.com>
-Date: Fri, 16 Nov 2018 13:52:45 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gNdta-00046r-HF
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 08:10:53 -0500
+Resent-Message-Id: <E1gNdta-00046r-HF@eggs.gnu.org>
+In-Reply-To: <20181116093152.27227-1-pbonzini@redhat.com>
+Message-ID: <154237380986.21605.16182014589419512717@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20181114130428.32326-1-asanchez@kryptoslogic.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hax: Support for Linux hosts
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 16 Nov 2018 05:10:11 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH for-3.1] nvme: fix out-of-bounds access to
+ the CMB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,18 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexandro Sanchez Bach <asanchez@kryptoslogic.com>, qemu-devel@nongnu.org
-Cc: yu.ning@intel.com, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, keith.busch@intel.com, liq3ea@gmail.com, qemu-block@nongnu.org
 
-On 14/11/18 14:04, Alexandro Sanchez Bach wrote:
-> Intel HAXM supports now 32-bit and 64-bit Linux hosts. This patch includes
-> the corresponding userland changes.
-> 
-> Since the Darwin userland backend is POSIX-compliant, the hax-darwin.{c,h}
-> files have been renamed to hax-posix.{c,h}. This prefix is consistent with
-> the naming used in the rest of QEMU.
-
-What's the advantage of HAXM when Linux hosts can just run KVM?  I guess
-avoiding bitrot?
-
-Paolo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+ODExMTYwOTMxNTIuMjcyMjctMS1wYm9uemluaUByZWRoYXQuY29tClR5cGU6IHNlcmllcwpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIGZvci0zLjFdIG52bWU6IGZpeCBvdXQtb2YtYm91bmRz
+IGFjY2VzcyB0byB0aGUgQ01CCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
+KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
+ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
+SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
+Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
+PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjNhYjY2ZTcgbnZtZTogZml4IG91dC1vZi1ib3VuZHMgYWNj
+ZXNzIHRvIHRoZSBDTUIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTog
+bnZtZTogZml4IG91dC1vZi1ib3VuZHMgYWNjZXNzIHRvIHRoZSBDTUIuLi4KRVJST1I6IHNwYWNl
+IHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojOTk6IEZJTEU6IHRlc3RzL252bWUt
+dGVzdC5jOjUzOgorICAgIHBkZXYgPSBxcGNpX2RldmljZV9maW5kKHFzLT5wY2lidXMsIFFQQ0lf
+REVWRk4oNCwwKSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA5MSBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9
+PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
