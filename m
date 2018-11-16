@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gNbrx-0000fa-5W
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:01:09 -0500
+	(envelope-from <clg@kaod.org>) id 1gNbs4-0000of-Bq
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:01:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gNbrq-0001DN-11
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:01:01 -0500
-Received: from 3.mo4.mail-out.ovh.net ([46.105.57.129]:40373)
+	(envelope-from <clg@kaod.org>) id 1gNbru-0001GF-6y
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:01:08 -0500
+Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:49424)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gNbrp-00015T-N2
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:00:53 -0500
-Received: from player734.ha.ovh.net (unknown [10.109.159.7])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 93FEB1C14CF
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 12:00:40 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gNbru-0001Fw-12
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:00:58 -0500
+Received: from player734.ha.ovh.net (unknown [10.109.146.168])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 167AAD429A
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 12:00:57 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 16 Nov 2018 11:57:25 +0100
-Message-Id: <20181116105729.23240-33-clg@kaod.org>
+Date: Fri, 16 Nov 2018 11:57:28 +0100
+Message-Id: <20181116105729.23240-36-clg@kaod.org>
 In-Reply-To: <20181116105729.23240-1-clg@kaod.org>
 References: <20181116105729.23240-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 32/36] spapr/rtas: modify
- spapr_rtas_register() to remove RTAS handlers
+Subject: [Qemu-devel] [PATCH v5 35/36] ppc: externalize ppc_get_vcpu_by_pir()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +32,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Removing RTAS handlers will become necessary when the new pseries
-machine supporting multiple interrupt mode is introduced.
+We will use it to get the CPU interrupt presenter in XIVE.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/spapr_rtas.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/hw/ppc/ppc.h |  1 +
+ hw/ppc/pnv.c         | 16 ----------------
+ hw/ppc/ppc.c         | 16 ++++++++++++++++
+ 3 files changed, 17 insertions(+), 16 deletions(-)
 
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index d6a0952154ac..e005d5d08151 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -404,7 +404,7 @@ void spapr_rtas_register(int token, const char *name,=
- spapr_rtas_fn fn)
+diff --git a/include/hw/ppc/ppc.h b/include/hw/ppc/ppc.h
+index 298ec354a8a8..daaa04a22dbf 100644
+--- a/include/hw/ppc/ppc.h
++++ b/include/hw/ppc/ppc.h
+@@ -4,6 +4,7 @@
+ #include "target/ppc/cpu-qom.h"
 =20
-     token -=3D RTAS_TOKEN_BASE;
+ void ppc_set_irq(PowerPCCPU *cpu, int n_IRQ, int level);
++PowerPCCPU *ppc_get_vcpu_by_pir(int pir);
 =20
--    assert(!rtas_table[token].name);
-+    assert(!name || !rtas_table[token].name);
+ /* PowerPC hardware exceptions management helpers */
+ typedef void (*clk_setup_cb)(void *opaque, uint32_t freq);
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 346f5e7aedb5..66f2301b4ece 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -1070,22 +1070,6 @@ static void pnv_ics_resend(XICSFabric *xi)
+     }
+ }
 =20
-     rtas_table[token].name =3D name;
-     rtas_table[token].fn =3D fn;
+-static PowerPCCPU *ppc_get_vcpu_by_pir(int pir)
+-{
+-    CPUState *cs;
+-
+-    CPU_FOREACH(cs) {
+-        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-        CPUPPCState *env =3D &cpu->env;
+-
+-        if (env->spr_cb[SPR_PIR].default_value =3D=3D pir) {
+-            return cpu;
+-        }
+-    }
+-
+-    return NULL;
+-}
+-
+ static ICPState *pnv_icp_get(XICSFabric *xi, int pir)
+ {
+     PowerPCCPU *cpu =3D ppc_get_vcpu_by_pir(pir);
+diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+index ec4be25f4994..9292f986eba7 100644
+--- a/hw/ppc/ppc.c
++++ b/hw/ppc/ppc.c
+@@ -1358,3 +1358,19 @@ void PPC_debug_write (void *opaque, uint32_t addr,=
+ uint32_t val)
+         break;
+     }
+ }
++
++PowerPCCPU *ppc_get_vcpu_by_pir(int pir)
++{
++    CPUState *cs;
++
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++        CPUPPCState *env =3D &cpu->env;
++
++        if (env->spr_cb[SPR_PIR].default_value =3D=3D pir) {
++            return cpu;
++        }
++    }
++
++    return NULL;
++}
 --=20
 2.17.2
