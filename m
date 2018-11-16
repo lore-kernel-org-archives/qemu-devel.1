@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gNZQp-00043l-EQ
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:24:52 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gNZSo-0004l3-S4
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:26:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gNZQl-0002nm-I9
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:24:51 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2348 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gNZQl-0002m4-5E
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:24:47 -0500
-From: xiezhide <xiezhide@huawei.com>
-Date: Fri, 16 Nov 2018 08:24:32 +0000
-Message-ID: <A02D6AA901860840B46E751C5E9E38B43CC975E3@DGGEML532-MBX.china.huawei.com>
-References: <cover.1542301855.git.xiezhide@huawei.com>
-	<0fcad1d4a27bcf9066d3349e8f1a8af6dfe3bb6e.1542301855.git.xiezhide@huawei.com>
-	<078c1065-1e36-5f70-92f0-044b0d4daefe@redhat.com>
-In-Reply-To: <078c1065-1e36-5f70-92f0-044b0d4daefe@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <richard.henderson@linaro.org>) id 1gNZSj-0003mO-O7
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:26:54 -0500
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:38353)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gNZSa-0003iP-Hn
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:26:42 -0500
+Received: by mail-wr1-x436.google.com with SMTP id e3-v6so23943615wrs.5
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 00:26:34 -0800 (PST)
+References: <cover.1542321076.git.alistair.francis@wdc.com>
+	<2d6d038f9949b5b39feb48e322be881f31a7f4e1.1542321076.git.alistair.francis@wdc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a5b5dda4-77df-6e28-509f-3a0ab696f390@linaro.org>
+Date: Fri, 16 Nov 2018 09:26:30 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] fsdev-throttle-qmp: factor out
- throttle code to reuse code
+In-Reply-To: <2d6d038f9949b5b39feb48e322be881f31a7f4e1.1542321076.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v1 09/23] riscv: tcg-target: Add the
+ immediate encoders
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "groug@kaod.org" <groug@kaod.org>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>, "armbru@redhat.com" <armbru@redhat.com>, "berto@igalia.com" <berto@igalia.com>, zengcanfu 00215970 <zengcanfu@huawei.com>, Jinxuefeng <jinxuefeng@huawei.com>, "Chenhui (Felix, Euler)" <chenhui.rtos@huawei.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 
-DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBFcmljIEJsYWtlIFttYWlsdG86
-ZWJsYWtlQHJlZGhhdC5jb21dIA0KU2VudDogMjAxOOW5tDEx5pyIMTbml6UgNDo1Ng0KVG86IHhp
-ZXpoaWRlIDx4aWV6aGlkZUBodWF3ZWkuY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3JnDQpDYzog
-Z3JvdWdAa2FvZC5vcmc7IGFuZWVzaC5rdW1hckBsaW51eC52bmV0LmlibS5jb207IGFybWJydUBy
-ZWRoYXQuY29tOyBiZXJ0b0BpZ2FsaWEuY29tOyB6ZW5nY2FuZnUgMDAyMTU5NzAgPHplbmdjYW5m
-dUBodWF3ZWkuY29tPjsgSmlueHVlZmVuZyA8amlueHVlZmVuZ0BodWF3ZWkuY29tPjsgQ2hlbmh1
-aSAoRmVsaXgsIEV1bGVyKSA8Y2hlbmh1aS5ydG9zQGh1YXdlaS5jb20+DQpTdWJqZWN0OiBSZTog
-W1BBVENIIHY0IDEvNF0gZnNkZXYtdGhyb3R0bGUtcW1wOiBmYWN0b3Igb3V0IHRocm90dGxlIGNv
-ZGUgdG8gcmV1c2UgY29kZQ0KDQpPbiAxMS8xNS8xOCAyOjU0IEFNLCB4aWV6aGlkZSB3cm90ZToN
-Cj4gVGhpcyBwYXRjaCBmYWN0b3Igb3V0IHRocm90dGxlIHBhcmFtZXRlciBwYXJzZSBjb2RlIHRv
-IGNvbW1vbiBmdW5jdGlvbg0KDQpzL2ZhY3Rvci9mYWN0b3JzLw0KDQpBY3R1YWxseSwgd2hlbiBJ
-IHdyaXRlIGNvbW1pdCBtZXNzYWdlcywgSSBsaWtlIHRvIHVzZSB0aGUgaW1wZXJhdGl2ZSBtb29k
-LCB3aXRoIGFuIGltcGxpY2l0ICJBcHBseSB0aGlzIHBhdGNoIGluIG9yZGVyIHRvIiB1bnNwb2tl
-biBwcmVmaXguIA0KU3RhcnRpbmcgd2l0aCBhbiBleHBsaWNpdCAiVGhpcyBwYXRjaCBkb2VzIiBp
-cyBtb3JlIG9mIGEgZGVzY3JpcHRpdmUgbW9vZC4gU28gSSBtaWdodCBoYXZlIHdyaXR0ZW46DQoN
-CkZhY3RvciBvdXQgdGhlIHRocm90dGxlIHBhcmFtZXRlciBwYXJzaW5nIGNvZGUgdG8gYSBuZXcg
-Y29tbW9uIGZ1bmN0aW9uIHdoaWNoIHdpbGwgYmUgdXNlZCBieSBibG9jayBhbmQgZnNkZXYuDQoN
-ClZlcnkgaGVscGZ1bCwgdGhhbmtzDQoNCj4gd2hpY2ggd2lsbCBiZSB1c2VkIGJ5IGJsb2NrIGFu
-ZCBmc2Rldi4NCj4gcmVuYW1lIGZ1bmN0aW9uIHRocm90dGxlX3BhcnNlX29wdGlvbnMgdG8gdGhy
-b3R0bGVfcGFyc2VfZ3JvdXAgdG8gDQo+IHJlc29sdmUgZnVuY3Rpb24gbmFtZSBjb25mbGljdA0K
-PiANCj4gU2lnbmVkLW9mZi1ieTogeGllemhpZGUgPHhpZXpoaWRlQGh1YXdlaS5jb20+DQo+IC0t
-LQ0KPiAgIGJsb2NrL3Rocm90dGxlLmMgICAgICAgICAgICAgICAgfCAgNiArKy0tDQo+ICAgYmxv
-Y2tkZXYuYyAgICAgICAgICAgICAgICAgICAgICB8IDQzICstLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tDQo+ICAgZnNkZXYvcWVtdS1mc2Rldi10aHJvdHRsZS5jICAgICB8IDQ0ICsrLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tDQo+ICAgaW5jbHVkZS9xZW11L3Rocm90dGxlLW9wdGlvbnMuaCB8ICAy
-ICsrDQo+ICAgaW5jbHVkZS9xZW11L3Rocm90dGxlLmggICAgICAgICB8ICA0ICstLQ0KPiAgIGlu
-Y2x1ZGUvcWVtdS90eXBlZGVmcy5oICAgICAgICAgfCAgMSArDQo+ICAgdXRpbC90aHJvdHRsZS5j
-ICAgICAgICAgICAgICAgICB8IDY4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrDQo+ICAgNyBmaWxlcyBjaGFuZ2VkLCA3OSBpbnNlcnRpb25zKCspLCA4OSBkZWxldGlv
-bnMoLSkNCj4gDQo+ICsrKyBiL2luY2x1ZGUvcWVtdS90aHJvdHRsZS1vcHRpb25zLmgNCj4gQEAg
-LTExMSw0ICsxMTEsNiBAQA0KPiAgICAgICAgICAgICAgIC5oZWxwID0gIndoZW4gbGltaXRpbmcg
-YnkgaW9wcyBtYXggc2l6ZSBvZiBhbiBJL08gaW4gYnl0ZXMiLFwNCj4gICAgICAgICAgIH0NCj4g
-ICANCj4gK3ZvaWQgdGhyb3R0bGVfcGFyc2Vfb3B0aW9ucyhUaHJvdHRsZUNvbmZpZyAqLCBRZW11
-T3B0cyAqKTsNCg0KSXQncyBva2F5IHRvIHVzZSBwYXJhbWV0ZXIgbmFtZXMgaW4gZnVuY3Rpb24g
-ZGVjbGFyYXRpb25zLg0KDQo+ICsrKyBiL2luY2x1ZGUvcWVtdS90eXBlZGVmcy5oDQo+IEBAIC0x
-MTMsNiArMTEzLDcgQEAgdHlwZWRlZiBzdHJ1Y3QgdVdpcmVTbGF2ZSB1V2lyZVNsYXZlOw0KPiAg
-IHR5cGVkZWYgc3RydWN0IFZpcnRJT0RldmljZSBWaXJ0SU9EZXZpY2U7DQo+ICAgdHlwZWRlZiBz
-dHJ1Y3QgVmlzaXRvciBWaXNpdG9yOw0KPiAgIHR5cGVkZWYgc3RydWN0IG5vZGVfaW5mbyBOb2Rl
-SW5mbzsNCj4gK3R5cGVkZWYgc3RydWN0IFRocm90dGxlQ29uZmlnIFRocm90dGxlQ29uZmlnOw0K
-DQpQbGVhc2Uga2VlcCB0aGlzIGluIHRoZSByaWdodCBzb3J0ZWQgbG9jYXRpb24sIHJpZ2h0IGFm
-dGVyIFNTSUJ1cy4NCg0KW0htbSwgd2UgYWxyZWFkeSBoYXZlIGFuIGluY29uc2lzdGVuY3kgb24g
-d2hldGhlciB3ZSBhcmUgc29ydGluZyBieSBlbl9VUyBydWxlcywgd2hpY2ggYXJlIGNhc2UtaW5z
-ZW5zaXRpdmUgYW5kIHRoZXJlZm9yZSBoYXMgJ3N0cnVjdCBub2RlX2luZm8nIGluIHRoZSB3cm9u
-ZyBsb2NhdGlvbiwgb3IgYnkgQyBydWxlcyB3aGljaCBzb3J0IGxvd2VyY2FzZSBsYXRlciBhbmQg
-dGhlcmVmb3JlIGhhcyAnc3RydWN0IHVXaXJlU2xhdmUnIGluIHRoZSB3cm9uZyBwb3NpdGlvbi4g
-Rm9yIHRoYXQgbWF0dGVyLCB3aHkgYXJlIHdlIHJlbmFtaW5nICdzdHJ1Y3Qgbm9kZV9pbmZvIE5v
-ZGVJbmZvJywgYW5kIHdoeSBkb2VzIHVXaXJlU2xhdmUgdmlvbGF0ZSBvdXIgbmFtaW5nIGNvbnZl
-bnRpb25zPyAgQnV0IHRob3NlIGFyZSBpbmRlcGVuZGVudCBjbGVhbnVwcywgYW5kIG5vdCBuZWNl
-c3NhcmlseSBzb21ldGhpbmcgZm9yIHlvdSB0byB3b3JyeSBhYm91dF0NCg0KV2l0aCB0aGUgc29y
-dGluZyBmaXhlZCwNCg0KLS0tLS1GaXggaXQgbm93DQoNClRoYW5rcw0KS2lkZA0K
+On 11/15/18 11:35 PM, Alistair Francis wrote:
+> +static int32_t encode_simm12(uint32_t imm)
+> +{
+> +    return ((imm << 20) >> 25) << 25 | ((imm << 27) >> 27) << 7;
+> +}
+
+I'm not fond of triple shifts like this, as it makes me count.
+I'd be ok with a formulation like
+
+    return ((imm & 0x1f) << 7) | ((imm & 0xfe) << (25 - 5));
+
+but perhaps best as
+
+    uint32_t ret = 0;
+    ret = deposit32(ret, imm, 7, 5);
+    ret = deposit32(ret, imm >> 5, 25, 7);
+
+Similarly with encode_sbimm12, encode_uimm20 (which is a simple &), encode_ujimm12.
+
+
+r~
