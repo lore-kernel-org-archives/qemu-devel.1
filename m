@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gNgRk-0002fy-Jx
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:54:17 -0500
+	(envelope-from <berrange@redhat.com>) id 1gNgSE-00038Z-7n
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:54:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gNgRj-0000nA-Cj
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:54:16 -0500
+	(envelope-from <berrange@redhat.com>) id 1gNgS5-0000tI-9i
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:54:42 -0500
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri, 16 Nov 2018 15:53:22 +0000
-Message-Id: <20181116155325.22428-4-berrange@redhat.com>
+Date: Fri, 16 Nov 2018 15:53:25 +0000
+Message-Id: <20181116155325.22428-7-berrange@redhat.com>
 In-Reply-To: <20181116155325.22428-1-berrange@redhat.com>
 References: <20181116155325.22428-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/6] tests: pull qemu-nbd iotest helpers into
- common.nbd file
+Subject: [Qemu-devel] [PATCH 6/6] tests: exercise NBD server in TLS mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,110 +24,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-The helpers for starting/stopping qemu-nbd in 058 will be useful in
-other test cases, so move them into a common.nbd file.
-
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Add tests that validate it is possible to connect to an NBD server
+running TLS mode. Also test mis-matched TLS vs non-TLS connections
+correctly fail.
 ---
- tests/qemu-iotests/058        | 47 +++++------------------------
- tests/qemu-iotests/common.nbd | 56 +++++++++++++++++++++++++++++++++++
- 2 files changed, 64 insertions(+), 39 deletions(-)
- create mode 100644 tests/qemu-iotests/common.nbd
+ tests/qemu-iotests/233        | 99 +++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/233.out    | 33 ++++++++++++
+ tests/qemu-iotests/common.nbd | 47 +++++++++++++++++
+ tests/qemu-iotests/group      |  1 +
+ 4 files changed, 180 insertions(+)
+ create mode 100755 tests/qemu-iotests/233
+ create mode 100644 tests/qemu-iotests/233.out
 
-diff --git a/tests/qemu-iotests/058 b/tests/qemu-iotests/058
-index 5eb8784669..cd73250c48 100755
---- a/tests/qemu-iotests/058
-+++ b/tests/qemu-iotests/058
-@@ -29,55 +29,19 @@ echo "QA output created by $seq"
- here=3D`pwd`
- status=3D1	# failure is the default!
-=20
--nbd_unix_socket=3D$TEST_DIR/test_qemu_nbd_socket
--nbd_snapshot_img=3D"nbd:unix:$nbd_unix_socket"
--rm -f "${TEST_DIR}/qemu-nbd.pid"
--
--_cleanup_nbd()
--{
--    local NBD_SNAPSHOT_PID
--    if [ -f "${TEST_DIR}/qemu-nbd.pid" ]; then
--        read NBD_SNAPSHOT_PID < "${TEST_DIR}/qemu-nbd.pid"
--        rm -f "${TEST_DIR}/qemu-nbd.pid"
--        if [ -n "$NBD_SNAPSHOT_PID" ]; then
--            kill "$NBD_SNAPSHOT_PID"
--        fi
--    fi
--    rm -f "$nbd_unix_socket"
--}
--
--_wait_for_nbd()
--{
--    for ((i =3D 0; i < 300; i++))
--    do
--        if [ -r "$nbd_unix_socket" ]; then
--            return
--        fi
--        sleep 0.1
--    done
--    echo "Failed in check of unix socket created by qemu-nbd"
--    exit 1
--}
--
--converted_image=3D$TEST_IMG.converted
--
- _export_nbd_snapshot()
- {
--    _cleanup_nbd
--    $QEMU_NBD -v -t -k "$nbd_unix_socket" "$TEST_IMG" -l $1 &
--    _wait_for_nbd
-+    nbd_server_start_unix_socket "$TEST_IMG" -l $1
- }
-=20
- _export_nbd_snapshot1()
- {
--    _cleanup_nbd
--    $QEMU_NBD -v -t -k "$nbd_unix_socket" "$TEST_IMG" -l snapshot.name=3D=
-$1 &
--    _wait_for_nbd
-+    nbd_server_start_unix_socket "$TEST_IMG" -l snapshot.name=3D$1
- }
-=20
- _cleanup()
- {
--    _cleanup_nbd
-+    nbd_server_stop
-     _cleanup_test_img
-     rm -f "$converted_image"
- }
-@@ -87,6 +51,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- . ./common.rc
- . ./common.filter
- . ./common.pattern
-+. ./common.nbd
-=20
- _supported_fmt qcow2
- _supported_proto file
-@@ -95,6 +60,10 @@ _require_command QEMU_NBD
- # Internal snapshots are (currently) impossible with refcount_bits=3D1
- _unsupported_imgopts 'refcount_bits=3D1[^0-9]'
-=20
-+nbd_snapshot_img=3D"nbd:unix:$nbd_unix_socket"
-+
-+converted_image=3D$TEST_IMG.converted
-+
- # Use -f raw instead of -f $IMGFMT for the NBD connection
- QEMU_IO_NBD=3D"$QEMU_IO -f raw --cache=3D$CACHEMODE"
-=20
-diff --git a/tests/qemu-iotests/common.nbd b/tests/qemu-iotests/common.nb=
-d
-new file mode 100644
-index 0000000000..f920a578f1
+diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
+new file mode 100755
+index 0000000000..8f3d5bd013
 --- /dev/null
-+++ b/tests/qemu-iotests/common.nbd
-@@ -0,0 +1,56 @@
++++ b/tests/qemu-iotests/233
+@@ -0,0 +1,99 @@
 +#!/bin/bash
-+# -*- shell-script-mode -*-
 +#
-+# Helpers for NBD server related config
++# Test NBD TLS certificate / authorization integration
 +#
 +# Copyright (C) 2018 Red Hat, Inc.
 +#
@@ -147,28 +62,188 @@ index 0000000000..f920a578f1
 +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +#
 +
-+nbd_unix_socket=3D"${TEST_DIR}/qemu-nbd.sock"
-+nbd_pid_file=3D"${TEST_DIR}/qemu-nbd.pid"
++# creator
++owner=3Dberrange@redhat.com
 +
-+function nbd_server_stop()
++seq=3D`basename $0`
++echo "QA output created by $seq"
++
++here=3D`pwd`
++status=3D1	# failure is the default!
++
++_cleanup()
 +{
-+    local NBD_PID
-+    if [ -f "$nbd_pid_file" ]; then
-+        read NBD_PID < "$nbd_pid_file"
-+        rm -f "$nbd_pid_file"
-+        if [ -n "$NBD_PID" ]; then
-+            kill "$NBD_PID"
++    nbd_server_stop
++    _cleanup_test_img
++    tls_x509_cleanup
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.pattern
++. ./common.tls
++. ./common.nbd
++
++_supported_fmt raw qcow2
++_supported_proto file
++_supported_os Linux
++_require_command QEMU_NBD
++
++nbd_server_set_tcp_port
++tls_x509_init
++
++echo
++echo "=3D=3D preparing TLS creds =3D=3D"
++
++tls_x509_create_root_ca "ca1"
++tls_x509_create_root_ca "ca2"
++tls_x509_create_server "ca1" "server1"
++tls_x509_create_client "ca1" "client1"
++tls_x509_create_client "ca2" "client2"
++
++echo
++echo "=3D=3D preparing image =3D=3D"
++_make_test_img 64M
++
++
++echo
++echo "=3D=3D check TLS client to plain server fails =3D=3D"
++nbd_server_start_tcp_socket "$TEST_IMG"
++
++$QEMU_IMG info --image-opts \
++    --object tls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclient,i=
+d=3Dtls0 \
++    driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-creds=3Dt=
+ls0
++
++nbd_server_stop
++
++echo
++echo "=3D=3D check plain client to TLS server fails =3D=3D"
++
++nbd_server_start_tcp_socket --object tls-creds-x509,dir=3D${tls_dir}/ser=
+ver1,endpoint=3Dserver,id=3Dtls0,verify-peer=3Dyes --tls-creds tls0 "$TES=
+T_IMG"
++
++$QEMU_IMG info nbd://localhost:$nbd_tcp_port
++
++echo
++echo "=3D=3D check TLS works =3D=3D"
++$QEMU_IMG info --image-opts \
++    --object tls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclient,i=
+d=3Dtls0 \
++    driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-creds=3Dt=
+ls0
++
++echo
++echo "=3D=3D check TLS with different CA fails =3D=3D"
++$QEMU_IMG info --image-opts \
++    --object tls-creds-x509,dir=3D${tls_dir}/client2,endpoint=3Dclient,i=
+d=3Dtls0 \
++    driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-creds=3Dt=
+ls0
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/233.out b/tests/qemu-iotests/233.out
+new file mode 100644
+index 0000000000..eaa410c270
+--- /dev/null
++++ b/tests/qemu-iotests/233.out
+@@ -0,0 +1,33 @@
++QA output created by 233
++
++=3D=3D preparing TLS creds =3D=3D
++Generating a self signed certificate...
++Generating a self signed certificate...
++Generating a signed certificate...
++Generating a signed certificate...
++Generating a signed certificate...
++
++=3D=3D preparing image =3D=3D
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
++
++=3D=3D check TLS client to plain server fails =3D=3D
++option negotiation failed: read failed: Unexpected end-of-file before al=
+l bytes were read
++qemu-img: Could not open 'driver=3Dnbd,host=3D127.0.0.1,port=3D10809,tls=
+-creds=3Dtls0': Denied by server for option 5 (starttls)
++server reported: TLS not configured
++
++=3D=3D check plain client to TLS server fails =3D=3D
++option negotiation failed: read failed: Unexpected end-of-file before al=
+l bytes were read
++qemu-img: Could not open 'nbd://localhost:10809': TLS negotiation requir=
+ed before option 8 (structured reply)
++server reported: Option 0x8 not permitted before TLS
++write failed (error message): Unable to write to socket: Broken pipe
++
++=3D=3D check TLS works =3D=3D
++image: nbd://127.0.0.1:10809
++file format: nbd
++virtual size: 64M (67108864 bytes)
++disk size: unavailable
++
++=3D=3D check TLS with different CA fails =3D=3D
++option negotiation failed: Verify failed: No certificate was found.
++qemu-img: Could not open 'driver=3Dnbd,host=3D127.0.0.1,port=3D10809,tls=
+-creds=3Dtls0': The certificate hasn't got a known issuer
++*** done
+diff --git a/tests/qemu-iotests/common.nbd b/tests/qemu-iotests/common.nb=
+d
+index 61e9e90fee..0483ea7c55 100644
+--- a/tests/qemu-iotests/common.nbd
++++ b/tests/qemu-iotests/common.nbd
+@@ -20,6 +20,7 @@
+ #
+=20
+ nbd_unix_socket=3D"${TEST_DIR}/qemu-nbd.sock"
++nbd_tcp_addr=3D"127.0.0.1"
+ nbd_pid_file=3D"${TEST_DIR}/qemu-nbd.pid"
+=20
+ function nbd_server_stop()
+@@ -62,3 +63,49 @@ function nbd_server_start_unix_socket()
+     $QEMU_NBD -v -t -k "$nbd_unix_socket" $@ &
+     nbd_server_wait_for_unix_socket $!
+ }
++
++function nbd_server_set_tcp_port()
++{
++    for port in `seq 10809 10909`
++    do
++	socat TCP:$nbd_tcp_addr:$port STDIO < /dev/null 1>/dev/null 2>&1
++        if test $? !=3D 0
++	then
++	    nbd_tcp_port=3D$port
++            return
 +        fi
-+    fi
-+    rm -f "$nbd_unix_socket"
++    done
++
++    echo "Cannot find free TCP port for nbd in range 10809-10909"
++    exit 1
 +}
 +
-+function nbd_server_wait_for_unix_socket()
++function nbd_server_wait_for_tcp_socket()
 +{
++    pid=3D$1
++
 +    for ((i =3D 0; i < 300; i++))
 +    do
-+        if [ -r "$nbd_unix_socket" ]; then
++        socat TCP:localhost:$nbd_tcp_port STDIO < /dev/null 1>/dev/null =
+2>&1
++        if test $? =3D=3D 0
++	then
 +            return
++        fi
++        kill -s 0 $pid 2>/dev/null
++        if test $? !=3D 0
++        then
++            echo "qemu-nbd unexpectedly quit"
++            exit 1
 +        fi
 +        sleep 0.1
 +    done
@@ -176,11 +251,20 @@ index 0000000000..f920a578f1
 +    exit 1
 +}
 +
-+function nbd_server_start_unix_socket()
++function nbd_server_start_tcp_socket()
 +{
 +    nbd_server_stop
-+    $QEMU_NBD -v -t -k "$nbd_unix_socket" $@ &
-+    nbd_server_wait_for_unix_socket
++    $QEMU_NBD -v -t -b $nbd_tcp_addr -p $nbd_tcp_port $@ &
++    nbd_server_wait_for_tcp_socket $!
 +}
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index ebe4fe78bc..e4327efa42 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -228,3 +228,4 @@
+ 229 auto quick
+ 231 auto quick
+ 232 auto quick
++233 auto quick
 --=20
 2.19.1
