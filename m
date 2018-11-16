@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gNZNp-0002Eg-De
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:21:47 -0500
+	(envelope-from <hongbo.zhang@linaro.org>) id 1gNZPW-0003Ph-9Y
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:23:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gNZNk-0008VJ-Rw
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:21:45 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2409 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gNZNf-0008QA-2U
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:21:37 -0500
-From: xiezhide <xiezhide@huawei.com>
-Date: Fri, 16 Nov 2018 08:21:11 +0000
-Message-ID: <A02D6AA901860840B46E751C5E9E38B43CC975D8@DGGEML532-MBX.china.huawei.com>
-References: <cover.1542301855.git.xiezhide@huawei.com>
-	<37e2a76b4020a5f9e48fe3b7c36d8e4bfb111569.1542301855.git.xiezhide@huawei.com>
-	<df1afb51-f027-d5f8-d5e2-b9869cf104f7@redhat.com>
-In-Reply-To: <df1afb51-f027-d5f8-d5e2-b9869cf104f7@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <hongbo.zhang@linaro.org>) id 1gNZPU-0001X9-Tf
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:23:30 -0500
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:44899)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1gNZPU-0001Wt-GD
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:23:28 -0500
+Received: by mail-lj1-x241.google.com with SMTP id k19-v6so19541352lji.11
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 00:23:28 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] fsdev-throttle-qmp: move struct
- ThrottleLimits to new file
+References: <1539939312-19713-1-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA-gt4aLx171zU=qzbzygL6AN98HEPmL6iKG2O6E31ka4A@mail.gmail.com>
+In-Reply-To: <CAFEAcA-gt4aLx171zU=qzbzygL6AN98HEPmL6iKG2O6E31ka4A@mail.gmail.com>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Fri, 16 Nov 2018 16:23:15 +0800
+Message-ID: <CAHmQWvA7fyCFz-qE2_B1SHH+29gns5m_tccLSwF_GTs52LV9Lw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4] Add arm SBSA reference machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,97 +30,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "groug@kaod.org" <groug@kaod.org>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>, "armbru@redhat.com" <armbru@redhat.com>, "berto@igalia.com" <berto@igalia.com>, zengcanfu 00215970 <zengcanfu@huawei.com>, Jinxuefeng <jinxuefeng@huawei.com>, "Chenhui (Felix, Euler)" <chenhui.rtos@huawei.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
 
-DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBFcmljIEJsYWtlIFttYWlsdG86
-ZWJsYWtlQHJlZGhhdC5jb21dIA0KU2VudDogMjAxOOW5tDEx5pyIMTbml6UgNTo0MQ0KVG86IHhp
-ZXpoaWRlIDx4aWV6aGlkZUBodWF3ZWkuY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3JnDQpDYzog
-Z3JvdWdAa2FvZC5vcmc7IGFuZWVzaC5rdW1hckBsaW51eC52bmV0LmlibS5jb207IGFybWJydUBy
-ZWRoYXQuY29tOyBiZXJ0b0BpZ2FsaWEuY29tOyB6ZW5nY2FuZnUgMDAyMTU5NzAgPHplbmdjYW5m
-dUBodWF3ZWkuY29tPjsgSmlueHVlZmVuZyA8amlueHVlZmVuZ0BodWF3ZWkuY29tPjsgQ2hlbmh1
-aSAoRmVsaXgsIEV1bGVyKSA8Y2hlbmh1aS5ydG9zQGh1YXdlaS5jb20+DQpTdWJqZWN0OiBSZTog
-W1BBVENIIHY0IDIvNF0gZnNkZXYtdGhyb3R0bGUtcW1wOiBtb3ZlIHN0cnVjdCBUaHJvdHRsZUxp
-bWl0cyB0byBuZXcgZmlsZQ0KDQpPbiAxMS8xNS8xOCAyOjU1IEFNLCB4aWV6aGlkZSB3cm90ZToN
-Cj4gdGhpcyBwYXRjaCBtb3ZlIFRocm90dGxlTGltaXRzIHRvIG5ldyBmaWxlIGFuZCByZW5hbWUg
-c3RydWN0IGZpZWxkIA0KPiB3aXRoIGNvbW1vbiBmb3JtYXQNCg0KQXMgd3JpdHRlbiwgeW91IG5l
-ZWQgcy9tb3ZlL21vdmVzLyBhbmQgcy9yZW5hbWUvcmVuYW1lcy8gdG8gbWF0Y2ggdGhlIHNpbmd1
-bGFyIGFjdG9yICd0aGlzIHBhdGNoJy4gIE9yLCBpZiB5b3Ugc3RpY2sgd2l0aCBteSBwcmVmZXJl
-bmNlIGZvciBpbXBlcmF0aXZlIHNlbnNlLCBzL3RoaXMgcGF0Y2ggbW92ZS9Nb3ZlLw0KDQpzL3Rv
-IG5ldy90byBhIG5ldy8NCg0KPiANCj4gU2lnbmVkLW9mZi1ieTogeGllemhpZGUgPHhpZXpoaWRl
-QGh1YXdlaS5jb20+DQo+IC0tLQ0KDQo+ICsrKyBiL01ha2VmaWxlDQo+IEBAIC0xMDYsNiArMTA2
-LDcgQEAgR0VORVJBVEVEX0ZJTEVTICs9IHFhcGkvcWFwaS10eXBlcy1zb2NrZXRzLmggcWFwaS9x
-YXBpLXR5cGVzLXNvY2tldHMuYw0KPiAgIEdFTkVSQVRFRF9GSUxFUyArPSBxYXBpL3FhcGktdHlw
-ZXMtdHBtLmggcWFwaS9xYXBpLXR5cGVzLXRwbS5jDQo+ICAgR0VORVJBVEVEX0ZJTEVTICs9IHFh
-cGkvcWFwaS10eXBlcy10cmFjZS5oIHFhcGkvcWFwaS10eXBlcy10cmFjZS5jDQo+ICAgR0VORVJB
-VEVEX0ZJTEVTICs9IHFhcGkvcWFwaS10eXBlcy10cmFuc2FjdGlvbi5oIA0KPiBxYXBpL3FhcGkt
-dHlwZXMtdHJhbnNhY3Rpb24uYw0KPiArR0VORVJBVEVEX0ZJTEVTICs9IHFhcGkvcWFwaS10eXBl
-cy10bGltaXRzLmggDQo+ICtxYXBpL3FhcGktdHlwZXMtdGxpbWl0cy5jDQoNCnRsaW1pdHMgY29t
-ZXMgYmVmb3JlIHRwbSwgbm90IGFmdGVyIHRyYW5zYWN0aW9uLiAgKE11bHRpcGxlIHRpbWVzIGlu
-IHRoaXMgZmlsZSkNCg0KPiArKysgYi9NYWtlZmlsZS5vYmpzDQo+IEBAIC0yMCw2ICsyMCw3IEBA
-IHV0aWwtb2JqLXkgKz0gcWFwaS9xYXBpLXR5cGVzLXNvY2tldHMubw0KPiAgIHV0aWwtb2JqLXkg
-Kz0gcWFwaS9xYXBpLXR5cGVzLXRwbS5vDQo+ICAgdXRpbC1vYmoteSArPSBxYXBpL3FhcGktdHlw
-ZXMtdHJhY2Uubw0KPiAgIHV0aWwtb2JqLXkgKz0gcWFwaS9xYXBpLXR5cGVzLXRyYW5zYWN0aW9u
-Lm8NCj4gK3V0aWwtb2JqLXkgKz0gcWFwaS9xYXBpLXR5cGVzLXRsaW1pdHMubw0KDQpIZXJlIHRv
-by4NCg0KDQo+ICAgeyAnc3RydWN0JzogJ0Jsb2NrSU9UaHJvdHRsZScsDQo+IC0gICdkYXRhJzog
-eyAnKmRldmljZSc6ICdzdHInLCAnKmlkJzogJ3N0cicsICdicHMnOiAnaW50JywgJ2Jwc19yZCc6
-ICdpbnQnLA0KPiAtICAgICAgICAgICAgJ2Jwc193cic6ICdpbnQnLCAnaW9wcyc6ICdpbnQnLCAn
-aW9wc19yZCc6ICdpbnQnLCAnaW9wc193cic6ICdpbnQnLA0KPiAtICAgICAgICAgICAgJypicHNf
-bWF4JzogJ2ludCcsICcqYnBzX3JkX21heCc6ICdpbnQnLA0KPiAtICAgICAgICAgICAgJypicHNf
-d3JfbWF4JzogJ2ludCcsICcqaW9wc19tYXgnOiAnaW50JywNCj4gLSAgICAgICAgICAgICcqaW9w
-c19yZF9tYXgnOiAnaW50JywgJyppb3BzX3dyX21heCc6ICdpbnQnLA0KPiAtICAgICAgICAgICAg
-JypicHNfbWF4X2xlbmd0aCc6ICdpbnQnLCAnKmJwc19yZF9tYXhfbGVuZ3RoJzogJ2ludCcsDQo+
-IC0gICAgICAgICAgICAnKmJwc193cl9tYXhfbGVuZ3RoJzogJ2ludCcsICcqaW9wc19tYXhfbGVu
-Z3RoJzogJ2ludCcsDQo+IC0gICAgICAgICAgICAnKmlvcHNfcmRfbWF4X2xlbmd0aCc6ICdpbnQn
-LCAnKmlvcHNfd3JfbWF4X2xlbmd0aCc6ICdpbnQnLA0KPiAtICAgICAgICAgICAgJyppb3BzX3Np
-emUnOiAnaW50JywgJypncm91cCc6ICdzdHInIH0gfQ0KPiAtDQoNCj4gLXsgJ3N0cnVjdCc6ICdU
-aHJvdHRsZUxpbWl0cycsDQo+IC0gICdkYXRhJzogeyAnKmlvcHMtdG90YWwnIDogJ2ludCcsICcq
-aW9wcy10b3RhbC1tYXgnIDogJ2ludCcsDQo+IC0gICAgICAgICAgICAnKmlvcHMtdG90YWwtbWF4
-LWxlbmd0aCcgOiAnaW50JywgJyppb3BzLXJlYWQnIDogJ2ludCcsDQo+IC0gICAgICAgICAgICAn
-KmlvcHMtcmVhZC1tYXgnIDogJ2ludCcsICcqaW9wcy1yZWFkLW1heC1sZW5ndGgnIDogJ2ludCcs
-DQo+IC0gICAgICAgICAgICAnKmlvcHMtd3JpdGUnIDogJ2ludCcsICcqaW9wcy13cml0ZS1tYXgn
-IDogJ2ludCcsDQo+IC0gICAgICAgICAgICAnKmlvcHMtd3JpdGUtbWF4LWxlbmd0aCcgOiAnaW50
-JywgJypicHMtdG90YWwnIDogJ2ludCcsDQo+IC0gICAgICAgICAgICAnKmJwcy10b3RhbC1tYXgn
-IDogJ2ludCcsICcqYnBzLXRvdGFsLW1heC1sZW5ndGgnIDogJ2ludCcsDQo+IC0gICAgICAgICAg
-ICAnKmJwcy1yZWFkJyA6ICdpbnQnLCAnKmJwcy1yZWFkLW1heCcgOiAnaW50JywNCj4gLSAgICAg
-ICAgICAgICcqYnBzLXJlYWQtbWF4LWxlbmd0aCcgOiAnaW50JywgJypicHMtd3JpdGUnIDogJ2lu
-dCcsDQo+IC0gICAgICAgICAgICAnKmJwcy13cml0ZS1tYXgnIDogJ2ludCcsICcqYnBzLXdyaXRl
-LW1heC1sZW5ndGgnIDogJ2ludCcsDQo+IC0gICAgICAgICAgICAnKmlvcHMtc2l6ZScgOiAnaW50
-JyB9IH0NCj4gKyAgJ2Jhc2UnOiAnVGhyb3R0bGVMaW1pdHMnLA0KPiArICAnZGF0YSc6IHsgJypk
-ZXZpY2UnOiAnc3RyJywgJyppZCc6ICdzdHInLCAnKmdyb3VwJzogJ3N0cicgfSB9DQoNClRoZSBv
-bGQgY29kZSBoYXMgUU1QIHVzaW5nICdicHNfd3InIGZvciBCbG9ja0lPVGhyb3R0bGUsIGJ1dCAn
-YnBzLXdyaXRlJyANCmZvciBUaHJvdHRsZUxpbWl0cy4gVGhlIG5ldyBjb2RlLi4uDQoNCj4gKysr
-IGIvcWFwaS90bGltaXRzLmpzb24NCg0KPiAreyAnc3RydWN0JzogJ1Rocm90dGxlTGltaXRzJywN
-Cj4gKyAgJ2RhdGEnOiB7ICcqYnBzJzogJ2ludCcsICcqYnBzX3JkJzogJ2ludCcsDQo+ICsgICAg
-ICAgICAgICAnKmJwc193cic6ICdpbnQnLCAnKmlvcHMnOiAnaW50JywgJyppb3BzX3JkJzogJ2lu
-dCcsICcqaW9wc193cic6ICdpbnQnLA0KPiArICAgICAgICAgICAgJypicHNfbWF4JzogJ2ludCcs
-ICcqYnBzX3JkX21heCc6ICdpbnQnLA0KPiArICAgICAgICAgICAgJypicHNfd3JfbWF4JzogJ2lu
-dCcsICcqaW9wc19tYXgnOiAnaW50JywNCj4gKyAgICAgICAgICAgICcqaW9wc19yZF9tYXgnOiAn
-aW50JywgJyppb3BzX3dyX21heCc6ICdpbnQnLA0KPiArICAgICAgICAgICAgJypicHNfbWF4X2xl
-bmd0aCc6ICdpbnQnLCAnKmJwc19yZF9tYXhfbGVuZ3RoJzogJ2ludCcsDQo+ICsgICAgICAgICAg
-ICAnKmJwc193cl9tYXhfbGVuZ3RoJzogJ2ludCcsICcqaW9wc19tYXhfbGVuZ3RoJzogJ2ludCcs
-DQo+ICsgICAgICAgICAgICAnKmlvcHNfcmRfbWF4X2xlbmd0aCc6ICdpbnQnLCAnKmlvcHNfd3Jf
-bWF4X2xlbmd0aCc6ICdpbnQnLA0KPiArICAgICAgICAgICAgJyppb3BzX3NpemUnOiAnaW50JyB9
-IH0NCg0KLi4uaXMgc3RpY2tpbmcgd2l0aCB0aGUgQmxvY2tJT1Rocm90dGxlIG5hbWluZy4gIEkg
-ZG9uJ3Qgc2VlIGFueSB1c2Ugb2YgVGhyb3R0bGVMaW1pdHMgaW4gUUFQSSBjb2RlIChxdWljayBj
-aGVjazogZ3JlcCBicHMtd3IgcWFwaS9xYXBpLWludHJvc3BlY3QuYyBjb21lcyB1cCBlbXB0eSks
-IHNvIHdlIFNIT1VMRCBiZSBva2F5IHdpdGggcmVnYXJkcyB0byBiYWNrLWNvbXBhdC4gIEJ1dCBJ
-J2Qgc3RpbGwgc3BsaXQgdGhpcyBwYXRjaCBpbnRvIG11bHRpcGxlDQpwaWVjZXM6IDEuIFJlbmFt
-ZSB0aGUgVGhyb3R0bGVMaW1pdHMgbWVtYmVyIG5hbWVzIChhbmQgZ2l2ZSBqdXN0aWZpY2F0aW9u
-IHdoeSBzdWNoIHJlbmFtZSBkb2Vzbid0IGJyZWFrIGJhY2stY29tcGF0KS4gMi4gUmV3cml0ZSBC
-bG9ja0lPVGhyb3R0bGUgd2l0aCBUaHJvdHRsZUxpbWl0cyBhcyBpdHMgYmFzZSBjbGFzcy4gMy4g
-TW92ZSBUaHJvdHRsZUxpbWl0cyBpbnRvIGEgbmV3IGZpbGUgZm9yIGZ1dHVyZSByZXVzZS4gIChN
-YXliZSAyIGFuZCAzIGNhbiBiZSBzcXVhc2hlZCBpbnRvIGEgc2luZ2xlIHBhdGNoKQ0KDQo+IGRp
-ZmYgLS1naXQgYS91dGlsL3Rocm90dGxlLmMgYi91dGlsL3Rocm90dGxlLmMgaW5kZXggZTdkYjJh
-ZC4uYjQyMWUzMyANCj4gMTAwNjQ0DQo+IC0tLSBhL3V0aWwvdGhyb3R0bGUuYw0KPiArKysgYi91
-dGlsL3Rocm90dGxlLmMNCj4gQEAgLTQ5Niw5OCArNDk2LDk3IEBAIHZvaWQgdGhyb3R0bGVfYWNj
-b3VudChUaHJvdHRsZVN0YXRlICp0cywgYm9vbCBpc193cml0ZSwgdWludDY0X3Qgc2l6ZSkNCj4g
-ICB2b2lkIHRocm90dGxlX2xpbWl0c190b19jb25maWcoVGhyb3R0bGVMaW1pdHMgKmFyZywgVGhy
-b3R0bGVDb25maWcgKmNmZywNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJy
-b3IgKiplcnJwKQ0KPiAgIHsNCj4gLSAgICBpZiAoYXJnLT5oYXNfYnBzX3RvdGFsKSB7DQo+IC0g
-ICAgICAgIGNmZy0+YnVja2V0c1tUSFJPVFRMRV9CUFNfVE9UQUxdLmF2ZyA9IGFyZy0+YnBzX3Rv
-dGFsOw0KPiArICAgIGlmIChhcmctPmhhc19icHMpIHsNCj4gKyAgICAgICAgY2ZnLT5idWNrZXRz
-W1RIUk9UVExFX0JQU19UT1RBTF0uYXZnID0gYXJnLT5icHM7DQoNCk90aGVyd2lzZSwgdGhlIGNo
-dXJuIGZyb20gcmVuYW1pbmcgbWVtYmVycyAocGFydCAxKSBtYWtlcyBpdCBoYXJkIHRvIHNlZSBp
-ZiB0aGUgY29kZSB3YXMgcHJvcGVybHkgbW92ZWQgaW50byBhIG5ldyBmaWxlLg0KDQpTcGxpdCB0
-aGlzIHBhdGNoIHRvIHRocmVlIHBhdGNoZXMgaW4gdjUNCg0KVGhhbmtzDQpLaWRkDQoNCg==
+On Fri, 16 Nov 2018 at 00:21, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+>
+> On 19 October 2018 at 09:55, Hongbo Zhang <hongbo.zhang@linaro.org> wrote=
+:
+> > there are two commit reverts I have to do to boot system currently, the=
+se block not only my new 'sbsa-ref', but also the 'virt'.
+> > (other two workarounds can be ignored, they are just for temp using bef=
+ore firmware porting is fully finished)
+> >
+> > I am not saying the comments themselves have problem, maybe firmware ne=
+ed to be adapted accordingly too. But before they are fixed, I just simply =
+revert them to not block my run.
+> > (And, I've mentioned in v3 list that there are still problem of booting=
+ SMP too, but I won't mention it here this time, otherwise this patch/cover=
+ letter becomes too complicated -- at least we can boot one core, I can fix=
+/discuss it later separately.)
+>
+> We do need to investigate and at least understand all these issues
+> before we can take this new board. Thanks for the repro instructions
+> for the virt board.
+>
+Well, for the SMP booting, when GICv2 used, there is no problem, max
+CPU number 8 can be booted, including all the three cases: kernel
+only, UEFI+kernel and ATF+UEFI+kernel.
+
+But when GICv3 used, these two cases still work: kernel only, and
+UEFI+kernel, but ATF+UEFI+kernel fails booting more than 4 cores with
+GICv3.
+The original ATF didn't support GICv3, so I added the support:
+http://git.linaro.org/people/hongbo.zhang/atf-sbsa.git/log/?h=3Dsbsa_gicv3
+
+Root cause of failing to boot more than 4 cores with ATF+UEFI+kernel
+with my GICv3 enabled is due to this:
+In QEMU, we have this defination
+#define ARM_DEFAULT_CPUS_PER_CLUSTER 8
+But in ATF, the defination is
+#define PLATFORM_MAX_CPUS_PER_CLUSTER 4
+So when we pass smp=3D6 for example, QEMU generates MPIDR showing all
+the 6 cores are at cluster 0, but when ATF parses such MPIDR, the
+function plat_core_pos_by_mpidr() in plat/qemu/topology.c returns
+error since there should be no more cores than 4.
+
+I think we should change the definition in QEMU to 4, instead of
+changing the ATF's, because I checked Cortext a57/a72/a73/a75 spec, it
+says there are 4 cores max at one cluster.
+
+> > Steps to reproduce issues:
+> > 1. Compile ARMTF
+> > make CROSS_COMPILE=3Daarch64-linux-gnu- PLAT=3Dqemu all DEBUG=3D1
+>
+> What source tree do I need to build this EDK ?
+>
+I use https://github.com/ARM-software/arm-trusted-firmware.git
+And you can also use my
+http://git.linaro.org/people/hongbo.zhang/atf-sbsa.git/log/?h=3Dsbsa_gicv3
+with GICv3 enabled.
+
+Use additional compiling parameter QEMU_USE_GIC_DRIVER to selecct GICv3
+"make PLAT=3Dqemu all DEBUG=3D1 QEMU_USE_GIC_DRIVER=3DQEMU_GICV3"
+No such parameter to select default GICv2
+(But I found if you change GICv2 and v3 from time to time when
+compiling, the build system may not do the correct changing every
+time, so it is better to do a clean before compiling)
+
+> > 2. Compile edk2
+> > make -C BaseTools
+> > . edksetup.sh
+> > export GCC49_AARCH64_PREFIX=3Daarch64-linux-gnu-
+> > build -a AARCH64 -t GCC49 -p ArmVirtPkg/ArmVirtQemuKernel.dsc
+> >
+> > 3. Run QEMU
+> > 3a. copy or link ARMTF and edk2 images to the directory where you want =
+to launch QEMU
+> > bl1.bin -> /home/hongbo/work/arm-trusted-firmware/build/qemu/debug/bl1.=
+bin*
+> > bl2.bin -> /home/hongbo/work/arm-trusted-firmware/build/qemu/debug/bl2.=
+bin*
+> > bl31.bin -> /home/hongbo/work/arm-trusted-firmware/build/qemu/debug/bl3=
+1.bin*
+> > bl33.bin -> /home/hongbo/work/edk2/Build/ArmVirtQemuKernel-AARCH64/DEBU=
+G_GCC49/FV/QEMU_EFI.fd
+> >
+> > 3b. command to launch QEMU
+> > command1 to load a whole system
+> > qemu-system-aarch64 -machine virt,secure=3Don,virtualization=3Don -cpu =
+cortex-a57 -m 1024 -bios bl1.bin -semihosting -serial stdio -device virtio-=
+scsi-device,id=3Dscsi -drive file=3D../qemu-imgs/deb9_arm64_netinst_uefi.ra=
+w,id=3Drootimg,if=3Dnone -device scsi-hd,drive=3Drootimg -netdev user,id=3D=
+unet -device virtio-net-device,netdev=3Dunet -net user
+> >
+> > or command2 simply load a kernel
+> > qemu-system-aarch64 -machine virt,secure=3Don,virtualization=3Don -cpu =
+cortex-a57 -m 1024 -bios bl1.bin -semihosting -serial stdio -kernel Image -=
+initrd xxx -append "root=3D/dev/xxx console=3DttyAMA0"
+> >
+> > 4a. system halt with error message
+> > ASSERT_EFI_ERROR (Status =3D Not Found)
+> > ASSERT [ResetSystemRuntimeDxe] /home/hongbo/work/edk2/Build/ArmVirtQemu=
+Kernel-AARCH64/DEBUG_GCC49/AARCH64/MdeModulePkg/Universal/ResetSystemRuntim=
+eDxe/ResetSystemRuntimeDxe/DEBUG/AutoGen.c(370): !EFI_ERROR (Status)
+> >
+> > 4b. Revert "device_tree: Increase FDT_MAX_SIZE to 1 MiB"
+> > command1 can run further to halt at nother place, see 5a and 5b
+> > command2 can load kernel successfully
+>
+> I'm not sure what's going on here. Some debugging of what the
+> assertion is checking and why we've hit it would be required.
+> I didn't expect changing FDT_MAX_SIZE would affect much but
+> perhaps it changes where the fdt winds up in memory or how
+> big it is so it overlaps with something else.
+> There is an fdt_pack() function which should compress a
+> created dtb, and which QEMU uses for some board models but
+> not others; but I would want to find out what's actually
+> happening here before looking at whether that is the right fix.
+>
+> > 5a. 2nd system halt with message
+> > Synchronous Exception at 0x0000000078A152F0
+> > PC 0x000078A152F0 (0x000078A00000+0x000152F0) [ 0] ArmVeNorFlashDxe.dll
+> > PC 0x000078A152A0 (0x000078A00000+0x000152A0) [ 0] ArmVeNorFlashDxe.dll
+> > PC 0x000078A11DF0 (0x000078A00000+0x00011DF0) [ 0] ArmVeNorFlashDxe.dll
+> > [...snip...]
+> > PC 0x0000600088C4
+> > PC 0x000060008230
+> > PC 0x580B24C2580B24A1
+> >
+> > Recursive exception occurred while dumping the CPU state
+> >
+> > 5b Revert "target/arm: Implement new do_transaction_failed hook"
+> > then no halt, command1 can boot OS successfully
+>
+> The bug here will be that the firmware is attempting to access
+> an address which has no device present there. We need to
+> find out what code in the firmware is doing that, and what
+> device it is trying to access. Then we can find out if it's
+> a firmware bug, or if there needs to be some device present,
+> or if we've given the wrong information in the device tree
+> or ACPI tables.
+>
+I think the firmware is checking mass storage device to find a
+bootable OS at this stage.
+
+> Can EDK be made to give a backtrace with source filenames
+> and line numbers for the exception ?
+>
+> thanks
+> -- PMM
