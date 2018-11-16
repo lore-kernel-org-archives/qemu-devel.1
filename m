@@ -1,33 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gNaSt-0003i4-Nc
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:31:04 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gNaTx-0004Lk-Ks
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:32:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gNaSo-0006Px-Qj
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:31:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42078)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gNaSo-0006PJ-LP
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:30:58 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B9AD43680A
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 09:30:56 +0000 (UTC)
-Date: Fri, 16 Nov 2018 10:30:55 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181116093055.jyhb2cscyrbmujsa@sirius.home.kraxel.org>
-References: <cover.1542294676.git.eskultet@redhat.com>
-	<49306290-125b-8d63-ae27-495c0c17e113@redhat.com>
-	<20181116084352.t7in4ztnnhkgd37b@sirius.home.kraxel.org>
-	<20181116092430.GA13547@ridgehead>
+	(envelope-from <pbonzini@redhat.com>) id 1gNaTv-0006k6-MR
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:32:09 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 16 Nov 2018 10:31:52 +0100
+Message-Id: <20181116093152.27227-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181116092430.GA13547@ridgehead>
-Subject: Re: [Qemu-devel] [PATCH 0/3] Introduce 'rendernode' option for
- egl-headless display type
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-3.1] nvme: fix out-of-bounds access to the
+ CMB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,22 +20,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Erik Skultety <eskultet@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Li Qiang <liq3ea@gmail.com>
 
-On Fri, Nov 16, 2018 at 10:24:30AM +0100, Erik Skultety wrote:
-> On Fri, Nov 16, 2018 at 09:43:52AM +0100, Gerd Hoffmann wrote:
-> > It's simple enough and we are early in the -rc cycle still, I think it
-> > would be okay for 3.1.
-> 
-> As far as upstream's concerned, I'm okay with both because libvirt has to add
-> another version specific capability enum for this anyway. It's been broken
-> since libvirt 4.6.0 where I added egl-headless graphics type. Luckily, even
-> though it's far from optimal, a working solution exists, just change the
-> permissions on the device.
+Because the CMB BAR has a min_access_size of 2, if you read the last
+byte it will try to memcpy *2* bytes from n->cmbuf, causing an off-by-one
+error.  This is CVE-2018-16847.
 
-I'm fine either way too.  So just pick a version, update the doc
-comments and repost.
+Another way to fix this might be to register the CMB as a RAM memory
+region, which would also be more efficient.  However, that might be a
+change for big-endian machines; I didn't think this through and I don't
+know how real hardware works.  Add a basic testcase for the CMB in case
+somebody does this change later on.
 
-thanks,
-  Gerd
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: qemu-block@nongnu.org
+Cc: Li Qiang <liq3ea@gmail.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/block/nvme.c        |  2 +-
+ tests/Makefile.include |  2 +-
+ tests/nvme-test.c      | 58 +++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 57 insertions(+), 5 deletions(-)
+
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 09d7c90259..5d92794ef7 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1192,7 +1192,7 @@ static const MemoryRegionOps nvme_cmb_ops =3D {
+     .write =3D nvme_cmb_write,
+     .endianness =3D DEVICE_LITTLE_ENDIAN,
+     .impl =3D {
+-        .min_access_size =3D 2,
++        .min_access_size =3D 1,
+         .max_access_size =3D 8,
+     },
+ };
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 613242bc6e..fb0b449c02 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -730,7 +730,7 @@ tests/test-hmp$(EXESUF): tests/test-hmp.o
+ tests/machine-none-test$(EXESUF): tests/machine-none-test.o
+ tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-virtio-ob=
+j-y)
+ tests/qdev-monitor-test$(EXESUF): tests/qdev-monitor-test.o $(libqos-pc-=
+obj-y)
+-tests/nvme-test$(EXESUF): tests/nvme-test.o
++tests/nvme-test$(EXESUF): tests/nvme-test.o $(libqos-pc-obj-y)
+ tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
+ tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
+ tests/ac97-test$(EXESUF): tests/ac97-test.o
+diff --git a/tests/nvme-test.c b/tests/nvme-test.c
+index 7674a446e4..2abb3b6d19 100644
+--- a/tests/nvme-test.c
++++ b/tests/nvme-test.c
+@@ -8,11 +8,64 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "libqtest.h"
++#include "libqos/libqos-pc.h"
++
++static QOSState *qnvme_start(const char *extra_opts)
++{
++    QOSState *qs;
++    const char *arch =3D qtest_get_arch();
++    const char *cmd =3D "-drive id=3Ddrv0,if=3Dnone,file=3Dnull-co://,fo=
+rmat=3Draw "
++                      "-device nvme,addr=3D0x4.0,serial=3Dfoo,drive=3Ddr=
+v0 %s";
++
++    if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
+) {
++        qs =3D qtest_pc_boot(cmd, extra_opts ? : "");
++        global_qtest =3D qs->qts;
++        return qs;
++    }
++
++    g_printerr("nvme tests are only available on x86\n");
++    exit(EXIT_FAILURE);
++}
++
++static void qnvme_stop(QOSState *qs)
++{
++    qtest_shutdown(qs);
++}
+=20
+-/* Tests only initialization so far. TODO: Replace with functional tests=
+ */
+ static void nop(void)
+ {
++    QOSState *qs;
++
++    qs =3D qnvme_start(NULL);
++    qnvme_stop(qs);
++}
++
++static void nvmetest_cmb_test(void)
++{
++    const int cmb_bar_size =3D 2 * MiB;
++    QOSState *qs;
++    QPCIDevice *pdev;
++    QPCIBar bar;
++
++    qs =3D qnvme_start("-global nvme.cmb_size_mb=3D2");
++    pdev =3D qpci_device_find(qs->pcibus, QPCI_DEVFN(4,0));
++    g_assert(pdev !=3D NULL);
++
++    qpci_device_enable(pdev);
++    bar =3D qpci_iomap(pdev, 2, NULL);
++
++    qpci_io_writel(pdev, bar, 0, 0xccbbaa99);
++    g_assert_cmpint(qpci_io_readb(pdev, bar, 0), =3D=3D, 0x99);
++    g_assert_cmpint(qpci_io_readw(pdev, bar, 0), =3D=3D, 0xaa99);
++
++    /* Test partially out-of-bounds accesses.  */
++    qpci_io_writel(pdev, bar, cmb_bar_size - 1, 0x44332211);
++    g_assert_cmpint(qpci_io_readb(pdev, bar, cmb_bar_size - 1), =3D=3D, =
+0x11);
++    g_assert_cmpint(qpci_io_readw(pdev, bar, cmb_bar_size - 1), !=3D, 0x=
+2211);
++    g_assert_cmpint(qpci_io_readl(pdev, bar, cmb_bar_size - 1), !=3D, 0x=
+44332211);
++    qnvme_stop(qs);
+ }
+=20
+ int main(int argc, char **argv)
+@@ -21,9 +74,8 @@ int main(int argc, char **argv)
+=20
+     g_test_init(&argc, &argv, NULL);
+     qtest_add_func("/nvme/nop", nop);
++    qtest_add_func("/nvme/cmb_test", nvmetest_cmb_test);
+=20
+-    qtest_start("-drive id=3Ddrv0,if=3Dnone,file=3Dnull-co://,format=3Dr=
+aw "
+-                "-device nvme,drive=3Ddrv0,serial=3Dfoo");
+     ret =3D g_test_run();
+=20
+     qtest_end();
+--=20
+2.19.1
