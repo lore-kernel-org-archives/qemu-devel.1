@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gNg7g-0001Vr-MG
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:33:33 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gNg85-0001sV-T2
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:33:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gNg7e-0007NI-GM
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:33:32 -0500
-Date: Fri, 16 Nov 2018 16:26:04 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181116152604.GB5066@localhost.localdomain>
-References: <20181107121319.GC14842@redhat.com>
-	<20181107143628.GG8125@redhat.com>
-	<CAMRbyyuFGVtNWF9LKoi0n6_r5Gr4j8LetbAMd0L_5cKMif9LjQ@mail.gmail.com>
-	<20181107172737.GB4721@linux.fritz.box>
-	<CAMRbyys2XVgjPx9HteGP8c6R5rPM=n86m30kfEG6a0+c-jLZ4g@mail.gmail.com>
-	<CAMRbyytm2qY6ucuaMSAXaw=BhjG9BGoyU_6Xi_YC+fzBaP754Q@mail.gmail.com>
-	<CAMRbyyubqi1QgpDcnxrObVLfzRYODeHfz5qbYfjoeda4SgsbMw@mail.gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1gNg82-0007TI-Ka
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:33:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42058)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gNg82-0007T6-EK
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:33:54 -0500
+Date: Fri, 16 Nov 2018 16:33:50 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181116163350.40fcd163.cohuck@redhat.com>
+In-Reply-To: <20654e1b-38a0-7f70-df97-7ccd5bf17197@redhat.com>
+References: <20181026105711.29605-1-cohuck@redhat.com>
+	<20181115172032.53945f5e.cohuck@redhat.com>
+	<1c020087-acd7-302a-d5be-dcdbf7b7084d@redhat.com>
+	<20181116161400.1e3c2669.cohuck@redhat.com>
+	<20654e1b-38a0-7f70-df97-7ccd5bf17197@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMRbyyubqi1QgpDcnxrObVLfzRYODeHfz5qbYfjoeda4SgsbMw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [Qemu-block] Change in qemu 2.12 causes qemu-img
- convert to NBD to write more data
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] MAINTAINERS: clarify some of the tags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,142 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nsoffer@redhat.com>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Am 15.11.2018 um 23:27 hat Nir Soffer geschrieben:
-> On Sun, Nov 11, 2018 at 6:11 PM Nir Soffer <nsoffer@redhat.com> wrote:
-> 
-> > On Wed, Nov 7, 2018 at 7:55 PM Nir Soffer <nsoffer@redhat.com> wrote:
-> >
-> >> On Wed, Nov 7, 2018 at 7:27 PM Kevin Wolf <kwolf@redhat.com> wrote:
-> >>
-> >>> Am 07.11.2018 um 15:56 hat Nir Soffer geschrieben:
-> >>> > Wed, Nov 7, 2018 at 4:36 PM Richard W.M. Jones <rjones@redhat.com>
-> >>> wrote:
-> >>> >
-> >>> > > Another thing I tried was to change the NBD server (nbdkit) so that
-> >>> it
-> >>> > > doesn't advertise zero support to the client:
-> >>> > >
-> >>> > >   $ nbdkit --filter=log --filter=nozero memory size=6G
-> >>> logfile=/tmp/log \
-> >>> > >       --run './qemu-img convert ./fedora-28.img -n $nbd'
-> >>> > >   $ grep '\.\.\.$' /tmp/log | sed 's/.*\([A-Z][a-z]*\).*/\1/' | uniq
-> >>> -c
-> >>> > >    2154 Write
-> >>> > >
-> >>> > > Not surprisingly no zero commands are issued.  The size of the write
-> >>> > > commands is very uneven -- it appears to be send one command per
-> >>> block
-> >>> > > of zeroes or data.
-> >>> > >
-> >>> > > Nir: If we could get information from imageio about whether zeroing
-> >>> is
-> >>> > > implemented efficiently or not by the backend, we could change
-> >>> > > virt-v2v / nbdkit to advertise this back to qemu.
-> >>> >
-> >>> > There is no way to detect the capability, ioctl(BLKZEROOUT) always
-> >>> > succeeds, falling back to manual zeroing in the kernel silently
-> >>> >
-> >>> > Even if we could, sending zero on the wire from qemu may be even
-> >>> > slower, and it looks like qemu send even more requests in this case
-> >>> > (2154 vs ~1300).
-> >>> >
-> >>> > Looks like this optimization in qemu side leads to worse performance,
-> >>> > so it should not be enabled by default.
-> >>>
-> >>> Well, that's overgeneralising your case a bit. If the backend does
-> >>> support efficient zero writes (which file systems, the most common case,
-> >>> generally do), doing one big write_zeroes request at the start can
-> >>> improve performance quite a bit.
-> >>>
-> >>> It seems the problem is that we can't really know whether the operation
-> >>> will be efficient because the backends generally don't tell us. Maybe
-> >>> NBD could introduce a flag for this, but in the general case it appears
-> >>> to me that we'll have to have a command line option.
-> >>>
-> >>> However, I'm curious what your exact use case and the backend used in it
-> >>> is? Can something be improved there to actually get efficient zero
-> >>> writes and get even better performance than by just disabling the big
-> >>> zero write?
-> >>
-> >>
-> >> The backend is some NetApp storage connected via FC. I don't have
-> >> more info on this. We get zero rate of about 1G/s on this storage, which
-> >> is quite slow compared with other storage we tested.
-> >>
-> >> One option we check now is if this is the kernel silent fallback to manual
-> >> zeroing when the server advertise wrong value of write_same_max_bytes.
-> >>
-> >
-> > We eliminated this using blkdiscard. This is what we get on with this
-> > storage
-> > zeroing 100G LV:
-> >
-> > for i in 1 2 4 8 16 32; do time blkdiscard -z -p ${i}m
-> > /dev/6e1d84f9-f939-46e9-b108-0427a08c280c/2d5c06ce-6536-4b3c-a7b6-13c6d8e55ade;
-> > done
-> >
-> > real 4m50.851s
-> > user 0m0.065s
-> > sys 0m1.482s
-> >
-> > real 4m30.504s
-> > user 0m0.047s
-> > sys 0m0.870s
-> >
-> > real 4m19.443s
-> > user 0m0.029s
-> > sys 0m0.508s
-> >
-> > real 4m13.016s
-> > user 0m0.020s
-> > sys 0m0.284s
-> >
-> > real 2m45.888s
-> > user 0m0.011s
-> > sys 0m0.162s
-> >
-> > real 2m10.153s
-> > user 0m0.003s
-> > sys 0m0.100s
-> >
-> > We are investigating why we get low throughput on this server, and also
-> > will check
-> > several other servers.
-> >
-> > Having a command line option to control this behavior sounds good. I don't
-> >> have enough data to tell what should be the default, but I think the safe
-> >> way would be to keep old behavior.
-> >>
-> >
-> > We file this bug:
-> > https://bugzilla.redhat.com/1648622
-> >
-> 
-> More data from even slower storage - zeroing 10G lv on Kaminario K2
-> 
-> # time blkdiscard -z -p 32m /dev/test_vg/test_lv2
-> 
-> real    50m12.425s
-> user    0m0.018s
-> sys     2m6.785s
-> 
-> Maybe something is wrong with this storage, since we see this:
-> 
-> # grep -s "" /sys/block/dm-29/queue/* | grep write_same_max_bytes
-> /sys/block/dm-29/queue/write_same_max_bytes:512
-> 
-> Since BLKZEROOUT always fallback to manual slow zeroing silently,
-> maybe we can disable the aggressive pre-zero of the entire device
-> for block devices, and keep this optimization for files when fallocate()
-> is supported?
+On Fri, 16 Nov 2018 09:23:27 -0600
+Eric Blake <eblake@redhat.com> wrote:
 
-I'm not sure what the detour through NBD changes, but qemu-img directly
-on a block device doesn't use BLKZEROOUT first, but
-FALLOC_FL_PUNCH_HOLE. Maybe we can add a flag that avoids anything that
-could be slow, such as BLKZEROOUT, as a fallback (and also the slow
-emulation that QEMU itself would do if all kernel calls fail).
+> On 11/16/18 9:14 AM, Cornelia Huck wrote:
 
-Kevin
+> >>>> +++ b/MAINTAINERS
+> >>>> @@ -12,9 +12,14 @@ consult qemu-devel and not any specific individual privately.
+> >>>>    Descriptions of section entries:
+> >>>>    
+> >>>>    	M: Mail patches to: FullName <address@domain>
+> >>>> +	   Maintainers are looking after a certain area and must be CCed on
+> >>>> +	   patches. They are considered the main contact point.  
+> >>
+> >> Maybe add something along the lines of "However, a maintainer may accept
+> >> code that has been reviewed by others without explicitly reviewing it
+> >> themselves"?  
+> > 
+> > I'm not sure whether that adds vital information. If a maintainer picks
+> > a patch that has been reviewed by others, they may or may not do a
+> > proper review themselves; but the end result is basically the same
+> > (patch makes its way into the tree.)  
+> 
+> Okay. There's also the counter argument that too much text makes it 
+> something that no one will want to spend time reading, so leaving things 
+> concise is desirable.
+
+We could also write up a more verbose "patch handling and
+maintainership guide" or so; but I'd prefer short comments in
+MAINTAINERS covering the basics only.
+
+> 
+> >> At any rate, I like the idea of adding the additional descriptions for
+> >> the categories, even if we still bike-shed on the wording or even the
+> >> set of categories to use.  
+> > 
+> > What about going with this as a starting point?  
+> 
+> Yes, works for me. We can always add more patches later if desired.
+
+OK, great!
+
+Peter, would you consider picking up this one for 3.1? At the very
+least, it has a R-b from Markus already :)
