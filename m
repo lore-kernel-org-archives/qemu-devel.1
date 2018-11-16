@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gNgQk-0001fC-Px
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:53:15 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gNgQm-0001hh-Ax
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:53:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gNgQj-0000EC-Tw
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:53:14 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gNgQl-0000J7-6x
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:53:16 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 16 Nov 2018 16:52:59 +0100
-Message-Id: <20181116155302.22472-1-mreitz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.1? 0/3] block: Fix two minor reopen issues
+Date: Fri, 16 Nov 2018 16:53:00 +0100
+Message-Id: <20181116155302.22472-2-mreitz@redhat.com>
+In-Reply-To: <20181116155302.22472-1-mreitz@redhat.com>
+References: <20181116155302.22472-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.1? 1/3] block: Always abort reopen after
+ prepare succeeded
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +23,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
 
-These are fixes for issues I found when looking after something Berto
-has reported.  The second patch fixes that issue Berto found, the first
-one is only kind of related.
+bdrv_reopen_multiple() does not invoke bdrv_reopen_abort() for the
+element of the reopen queue for which bdrv_reopen_prepare() failed,
+because it assumes that the prepare function will have rolled back all
+changes already.
 
-For the first patch:  bdrv_reopen_abort() or bdrv_reopen_commit() are
-called only if the respective bdrv_reopen_prepare() has succeeded.
-However, bdrv_reopen_prepare() can fail even if the block driver=E2=80=99=
-s
-.bdrv_reopen_prepare() succeeded.  In that case, the block driver is
-expecting a .bdrv_reopen_abort() or .bdrv_reopen_commit(), but will
-never get it.
+However, bdrv_reopen_prepare() does not do this in every case: It may
+notice an error after BlockDriver.bdrv_reopen_prepare() succeeded, and
+it will not invoke BlockDriver.bdrv_reopen_abort() then; and neither
+will bdrv_reopen_multiple(), as explained above.
 
-This is fixed by making bdrv_reopen_prepare() call .bdrv_reopen_abort()
-if an error occurs after .bdrv_reopen_prepare() has already succeeded.
+This is wrong because we must always call .bdrv_reopen_commit() or
+.bdrv_reopen_abort() after .bdrv_reopen_prepare() has succeeded.
+Otherwise, the block driver has no chance to undo what it has done in
+its implementation of .bdrv_reopen_prepare().
 
-In practice this just prevents resource leaks, so nothing too dramatic
-(fine for qemu-next).  It also means I=E2=80=99ve been incapable of writi=
-ng a
-test, sorry.
+To fix this, bdrv_reopen_prepare() has to call .bdrv_reopen_abort() if
+it wants to return an error after .bdrv_reopen_prepare() has succeeded.
 
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-The second issue is more severe: file-posix applies the inverse share
-locks when reopening.  Now the user can only directly do reopens from
-the monitor for now, so that wouldn=E2=80=99t be so bad.  But of course t=
-here
-are other places in qemu that implicitly reopen nodes, like dropping
-R/W to RO or gaining R/W from RO.  Most of these places are symmetrical
-at least (they=E2=80=99ll get R/W on an RO image for a short period of ti=
-me and
-then drop back to RO), so you=E2=80=99ll see the wrong shared permission =
-locks
-only for a short duration.  But at least blockdev-snapshot and
-blockdev-snapshot-sync are one way; they drop R/W to RO and stay there.
-So if you do a blockdev-snapshot*, the shared permission bits will be
-flipped.  This is therefore very much user-visible.
-
-It=E2=80=99s not catastrophic, though, so I=E2=80=99m not sure whether we=
- need it in
-3.1.  It=E2=80=99s definitely a bugfix, and I think we have patches queue=
-d for
-the next RC already, so I think it makes sense to include at least
-patches 2 and 3 as well.
-
-
-Max Reitz (3):
-  block: Always abort reopen after prepare succeeded
-  file-posix: Fix shared locks on reopen commit
-  iotests: Test file-posix locking and reopen
-
- block.c                    | 17 +++++++--
- block/file-posix.c         |  2 +-
- tests/qemu-iotests/182     | 71 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/182.out |  9 +++++
- 4 files changed, 96 insertions(+), 3 deletions(-)
-
---=20
+diff --git a/block.c b/block.c
+index fd67e14dfa..7f5859aa74 100644
+--- a/block.c
++++ b/block.c
+@@ -3332,7 +3332,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+             if (!qobject_is_equal(new, old)) {
+                 error_setg(errp, "Cannot change the option '%s'", entry->key);
+                 ret = -EINVAL;
+-                goto error;
++                goto late_error;
+             }
+         } while ((entry = qdict_next(reopen_state->options, entry)));
+     }
+@@ -3340,7 +3340,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+     ret = bdrv_check_perm(reopen_state->bs, queue, reopen_state->perm,
+                           reopen_state->shared_perm, NULL, errp);
+     if (ret < 0) {
+-        goto error;
++        goto late_error;
+     }
+ 
+     ret = 0;
+@@ -3354,6 +3354,19 @@ error:
+     qobject_unref(orig_reopen_opts);
+     g_free(discard);
+     return ret;
++
++late_error:
++    /* drv->bdrv_reopen_prepare() has succeeded, so we need to call
++     * drv->bdrv_reopen_abort() before signaling an error
++     * (bdrv_reopen_multiple() will not call bdrv_reopen_abort() when
++     * the respective bdrv_reopen_prepare() failed) */
++    if (drv->bdrv_reopen_abort) {
++        drv->bdrv_reopen_abort(reopen_state);
++    }
++    qemu_opts_del(opts);
++    qobject_unref(orig_reopen_opts);
++    g_free(discard);
++    return ret;
+ }
+ 
+ /*
+-- 
 2.17.2
