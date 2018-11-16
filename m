@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gNeCl-0002Ia-9M
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 08:30:43 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gNeGr-0004py-6Q
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 08:34:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gNeCZ-000360-24
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 08:30:32 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40180)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gNeCV-00033O-6F
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 08:30:23 -0500
-Received: by mail-ot1-x343.google.com with SMTP id s5so21290172oth.7
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 05:30:20 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-Reply-To: minyard@acm.org
-References: <20181115192446.17187-1-minyard@acm.org>
-	<d23cb41c-b6a5-9573-32af-07a963f8f827@redhat.com>
-From: Corey Minyard <minyard@acm.org>
-Message-ID: <60277859-5c6d-4cf5-6ecd-c145b4889a05@acm.org>
-Date: Fri, 16 Nov 2018 07:30:16 -0600
+	(envelope-from <mreitz@redhat.com>) id 1gNeGq-0005ui-BO
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 08:34:53 -0500
+References: <20181011072135.588-1-famz@redhat.com>
+	<20181011072135.588-3-famz@redhat.com>
+	<w51tvkjkbmc.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <8924431e-f533-70bc-4efa-848f9641fbc4@redhat.com>
+Date: Fri, 16 Nov 2018 14:34:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <d23cb41c-b6a5-9573-32af-07a963f8f827@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH v2 00/12] RFC: Fix/add vmstate handling in
- some I2C code
+In-Reply-To: <w51tvkjkbmc.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hDU8kHdobSjONjJpBwKeYQyRoXE0rDXtX"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 2/3] file-posix: Drop
+ s->lock_fd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,72 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-On 11/15/18 5:01 PM, Philippe Mathieu-Daudé wrote:
-> Hi Corey,
->
-> On 15/11/18 20:24, minyard@acm.org wrote:
->> These changes allow SMBus access while doing a state transfer.
->> Seems like a good idea to me in general.
->>
->> I have these queued for the SMBus IPMI driver work, of course.
->>
->> I had submitted this before and then lost track of the work since I
->> started finding all kinds of broken things in the I2C code.  I
->> have fixed the broken things I found first, and then added the
->> previous patches.
->>
->> I have tested this in q35 and it works without issue.  On piix4 the
->> pm_smbus code is broken on a migration, however. The device disappears
->> from the PCI bus on a migration, from what I can tell.  It's not the
->> fault of this code, something more fundamental is going on.  The
->> following comment in piix4.c may have something to do with it:
->>
->> /* qemu-kvm 1.2 uses version 3 but advertised as 2
->>   * To support incoming qemu-kvm 1.2 migration, change version_id
->>   * and minimum_version_id to 2 below (which breaks migration from
->>   * qemu 1.2).
->>
->> Anyway, I need to chase that down.
->>
->> I'm primarily submitting this to make sure I'm doing the backwards
->> compatability with .needed correctly.  I'm adding a new field in
->> the machine class and setting it in the initialization code for
->> older versions.  David, is this what you wanted?  It will have to
->> be adjusted for the proper version if/when it really goes in, of
->> course.  You can see those in the following commits:
->>    boards.h: Ignore migration for SMBus devices on
->>    i2c:pm_smbus: Fix state transfer
->>    i2c: Add vmstate handling to the smbus eeprom
->> I thought about adding a field to the pm_smbus code to only transfer
->> if it was accessed, but I'm assuming that most modern OSes will
->> at least initialized the device based on its presence on the PCI
->> bus.  So that didn't seem like it would add any value.
->>
->> I'm also submitting to see if all the fixes and cleanups look ok.
->> That's the first 5 commits.
->
-> $ git diff origin/master --summary
->  delete mode 100644 hw/i2c/smbus.c
->  create mode 100644 hw/i2c/smbus_master.c
->  create mode 100644 hw/i2c/smbus_slave.c
->  create mode 100644 include/hw/i2c/smbus_eeprom.h
->  rename include/hw/i2c/{smbus.h => smbus_master.h} (56%)
->  create mode 100644 include/hw/i2c/smbus_slave.h
->
-> Can you add the following files in the MAINTAINERS file:
-> - hw/i2c/smbus_master.c
-> - hw/i2c/smbus_slave.c
-> - include/hw/i2c/smbus_eeprom.h
-> - include/hw/i2c/smbus_master.h
-> - include/hw/i2c/smbus_slave.h
->
-Ok, but who should the maintainer be?  I guess I can take
-it, if that is what you are implying.  But most of the files in
-i2c are not maintained.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hDU8kHdobSjONjJpBwKeYQyRoXE0rDXtX
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, Fam Zheng <famz@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <8924431e-f533-70bc-4efa-848f9641fbc4@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v5 2/3] file-posix: Drop s->lock_fd
+References: <20181011072135.588-1-famz@redhat.com>
+ <20181011072135.588-3-famz@redhat.com>
+ <w51tvkjkbmc.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51tvkjkbmc.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On 14.11.18 14:54, Alberto Garcia wrote:
+> On Thu 11 Oct 2018 09:21:34 AM CEST, Fam Zheng wrote:
+>> The lock_fd field is not strictly necessary because transferring locke=
+d
+>> bytes from old fd to the new one shouldn't fail anyway. This spares th=
+e
+>> user one fd per image.
+>>
+>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>=20
+> One of my tests (not published yet) starts to fail after this
+> patch. Here's how you can reproduce the error:
+>=20
+> $ qemu-img create -f qcow2 hd.qcow2 4G
+> $ qemu-system-x86_64 -qmp stdio
+>=20
+> { "execute": "qmp_capabilities" }
+> { "execute": "blockdev-add", "arguments": {"driver": "qcow2", "node-nam=
+e": "hd0", "file": {"driver": "file", "filename": "hd.qcow2", "locking": =
+"on" }}}
+> { "execute": "human-monitor-command", "arguments": {"command-line": "qe=
+mu-io hd0 \"reopen -o file.locking=3Don\""}}
+> { "execute": "human-monitor-command", "arguments": {"command-line": "qe=
+mu-io hd0 \"reopen -o file.locking=3Doff\""}}
+> { "execute": "blockdev-del", "arguments": {"node-name": "hd0"}}
+> { "execute": "blockdev-add", "arguments": {"driver": "qcow2", "node-nam=
+e": "hd0", "file": {"driver": "file", "filename": "hd.qcow2"}}}
+>=20
+> {"error": {"class": "GenericError", "desc": "Failed to get \"consistent=
+ read\" lock"}}
 
--corey
+To me that looks like a problem in the general reopen code.
+raw_reopen_prepare() is called and succeeds.  Then bdrv_reopen_prepare()
+notices the option wasn't handled and therefore fails.
+bdrv_reopen_multiple() thus doesn't set bs_entry->prepared to true,
+which means raw_reopen_abort() won't be called.
+
+We should always call either BlockDriver.bdrv_reopen_commit() or
+BlockDriver.bdrv_reopen_abort() when BlockDriver.bdrv_reopen_prepare()
+succeeded.
+
+Max
+
+
+--hDU8kHdobSjONjJpBwKeYQyRoXE0rDXtX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvux2EACgkQ9AfbAGHV
+z0CgDwgAg3OUcL8aLEIT7K1YEwxl1heWeILKSyGKLiuKZvnKkPeV4br95FoVdb7D
+gbMGLZDINIlK8+VooI9ruEGZnLHeiwGWNiAxygwTOt+chxcYjHwMLnimlc8JxxBO
+B9sfUUCppMGr74UViaJrW+YWEGo7f7nLt++YuHGaVVy97J+dc290Vuf6c8nQTFfE
+f4w3nguZ8j8ts7376U/BeuHH+6YL/rDw5jJAU3uAd7aXE4Vk7BbVxKfxZOQJrMta
+6vJJ0c6eqmLJCW8VstbDJxtaIvyWBsxIrCC+OvBWqkRz2TkYplLu14IGVhe10gPG
+cfTRHUnYk0ENictwkjXxUt4A+VPHiQ==
+=95wp
+-----END PGP SIGNATURE-----
+
+--hDU8kHdobSjONjJpBwKeYQyRoXE0rDXtX--
