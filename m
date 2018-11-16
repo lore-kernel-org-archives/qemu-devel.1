@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gNUb6-0000uz-C0
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 22:15:09 -0500
+	(envelope-from <wlosh@bsdimp.com>) id 1gNUkW-00033S-Lo
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 22:24:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gNUb5-0006Qe-Cu
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 22:15:08 -0500
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:46275)
+	(envelope-from <wlosh@bsdimp.com>) id 1gNUkV-0007Kq-GN
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 22:24:52 -0500
+Received: from mail-io1-xd34.google.com ([2607:f8b0:4864:20::d34]:35819)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gNUb5-0006QK-6C
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 22:15:07 -0500
-Received: by mail-io1-xd41.google.com with SMTP id m1-v6so5240570ioc.13
-	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 19:15:07 -0800 (PST)
+	(Exim 4.71) (envelope-from <wlosh@bsdimp.com>) id 1gNUkU-0007EZ-Om
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 22:24:51 -0500
+Received: by mail-io1-xd34.google.com with SMTP id u19so11862538ioc.2
+	for <qemu-devel@nongnu.org>; Thu, 15 Nov 2018 19:24:35 -0800 (PST)
 MIME-Version: 1.0
-References: <1542272663-6619-1-git-send-email-liq3ea@gmail.com>
-	<87bm6qh3kc.fsf@dusky.pond.sub.org>
-In-Reply-To: <87bm6qh3kc.fsf@dusky.pond.sub.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 16 Nov 2018 11:14:30 +0800
-Message-ID: <CAKXe6SLv4ob4NqnbwwEYfYbf3D=v9mNvAzxe329tMR52PZfiQg@mail.gmail.com>
+References: <20181115085808.GH27915@xz-x1>
+	<162b1a37-79d7-8133-22ee-688748fe62b1@redhat.com>
+	<20181116025304.GC11565@xz-x1>
+In-Reply-To: <20181116025304.GC11565@xz-x1>
+From: Warner Losh <imp@bsdimp.com>
+Date: Thu, 15 Nov 2018 20:24:23 -0700
+Message-ID: <CANCZdfrozw4f+ntOyUuX+N1Ny1j+BBEqhuowPXk2sRTSBzCGEw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] keymaps: detect recursive keyboard layout
- file
+Subject: Re: [Qemu-devel] Are FreeBSD guest images working?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,100 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+To: peterx@redhat.com
+Cc: philmd@redhat.com, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, armbru@redhat.com
 
-Markus Armbruster <armbru@redhat.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=8815=
-=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=889:29=E5=86=99=E9=81=93=EF=BC=
-=9A
+On Thu, Nov 15, 2018 at 7:54 PM Peter Xu <peterx@redhat.com> wrote:
 
-> Li Qiang <liq3ea@gmail.com> writes:
->
-> > When the parse_keyboard_layout() find a "include " line
-> > in the keyboard layout file, it will call parse_keyboard_layout()
-> > to perform a recursive parse. If the keyboard layout is malformed
-> > by adding a line include itself, this can cause an infinite parse.
-> > Thus cause qemu a segv. This patch avoid this.
+> On Thu, Nov 15, 2018 at 11:05:33AM +0100, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> > On 15/11/18 9:58, Peter Xu wrote:
+> > > Hi, the list,
+> > >
+> > > I am trying to boot a FreeBSD guest but failed.  It hangs at the
+> > > kernel booting phase:
+> > >
+> > > /boot/ker]el/kernel text=3D0x14ed860 data=3D0x132538+0x4baa68
+> syms=3D[0x8+0x159ee8+0x8
+> > > Booting...
+> > > (nothing more)
+> > >
+> > > It's just as simple as downloading the image and boot so I can't thin=
+k
+> > > of anything strange within my procedures so far:
+> > >
+> > > https://wiki.qemu.org/Hosts/BSD#FreeBSD
+> > >
+> > > I also tried the latest image here:
+> > >
+> > >
+> https://download.freebsd.org/ftp/releases/VM-IMAGES/11.2-RELEASE/amd64/La=
+test/FreeBSD-11.2-RELEASE-amd64.qcow2.xz
+> > >
+> > > but it's having the same problem as 11.0.
+> > >
+> > > Am downloading an fresh ISO, but before I continue I'm just curious o=
+n
+> > > whether anyone is using these images and whether there's quick answer=
+s
+> > > to what I have encountered.
+> > >
+> > > Thanks in advance,
 > >
-> > Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> > ---
-> >  ui/keymaps.c | 17 ++++++++++++++++-
-> >  1 file changed, 16 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/ui/keymaps.c b/ui/keymaps.c
-> > index 085889b555..564893a9f3 100644
-> > --- a/ui/keymaps.c
-> > +++ b/ui/keymaps.c
-> > @@ -38,6 +38,8 @@ struct kbd_layout_t {
-> >      GHashTable *hash;
-> >  };
-> >
-> > +GList *keyboard_files;
-> > +
-> >  static int get_keysym(const name2keysym_t *table,
-> >                        const char *name)
-> >  {
-> > @@ -80,6 +82,11 @@ static void add_keysym(char *line, int keysym, int
-> keycode, kbd_layout_t *k)
-> >      trace_keymap_add(keysym, keycode, line);
-> >  }
-> >
-> > +static gint compare_string(gconstpointer a, gconstpointer b)
-> > +{
-> > +    return g_strcmp0(a, b);
-> > +}
-> > +
-> >  static int parse_keyboard_layout(kbd_layout_t *k,
-> >                                   const name2keysym_t *table,
-> >                                   const char *language, Error **errp)
-> > @@ -94,12 +101,18 @@ static int parse_keyboard_layout(kbd_layout_t *k,
-> >      filename =3D qemu_find_file(QEMU_FILE_TYPE_KEYMAP, language);
-> >      trace_keymap_parse(filename);
-> >      f =3D filename ? fopen(filename, "r") : NULL;
-> > -    g_free(filename);
-> >      if (!f) {
-> > +        g_free(filename);
-> >          error_setg(errp, "could not read keymap file: '%s'", language)=
-;
-> >          return -1;
-> >      }
-> >
-> > +    if (g_list_find_custom(keyboard_files, filename, compare_string)) =
-{
-> > +        error_setg(errp, "find recursive keyboard layout: %s'",
-> filename);
+> > I use 'make vm-build-freebsd' which works, but the image comes
+> > pre-installed.
 >
-> Suggest something like "Inclusion loop for %s".
+> It's because I'm always with no-gui mode and FreeBSD images has no
+> serial enabled by default.  I was possibly spoiled by the nice
+> virt-builder before with consoles setup already for all Linux guest
+> images.  Thanks for answering!
 >
-> > +        g_free(filename);
-> > +        return -1;
-> > +    }
-> > +    keyboard_files =3D g_list_append(keyboard_files, filename);
-> >      for(;;) {
-> >          if (fgets(line, 1024, f) =3D=3D NULL) {
-> >              break;
-> > @@ -168,6 +181,8 @@ static int parse_keyboard_layout(kbd_layout_t *k,
-> >      ret =3D 0;
-> >  out:
-> >      fclose(f);
-> > +    keyboard_files =3D g_list_remove(keyboard_files, filename);
-> > +    g_free(filename);
-> >      return ret;
-> >  }
->
-> There's no real need to make @keyboard_files global.  I'd make it local
-> to init_keyboard_layout(), and pass it as argument to
-> parse_keyboard_layout().
 
+I'm coming to the game late...
 
+I run FreeBSD in qemu all the time, but I build images from source to test
+the boot loader and it's all serial and my test scripts are tuned to that.
+I rarely use the pre-built images, however.
 
-Thanks Markus,
-Finally, Gerd decide remove the support of "include" in keymaps.
+If there's ways that we can build images that work better than we're doing
+right now to make the experience better, like making sure we enable the
+dual console support for them... We're late in our release cycle, but if
+what we need to change is what I think we need to change, we still have
+time for it.
 
-Thanks,
-Li Qiang
+In the mean time I'll read through wiki and see if there's anything
+obviously wrong...
 
-
-> Matter of taste.  Gerd is the maintainer, not
-> me.
->
+Warner
