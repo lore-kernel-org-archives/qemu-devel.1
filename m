@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNgvw-00073l-TS
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:25:30 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gNgzt-0000vK-Dn
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:29:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNgvs-0001fT-Ol
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:25:26 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43121)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNgvq-0001ej-RY
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:25:23 -0500
-Received: by mail-oi1-x244.google.com with SMTP id u18so1896490oie.10
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 08:25:22 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1gNgzs-0003eb-2g
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:29:33 -0500
+Date: Fri, 16 Nov 2018 17:29:19 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181116172919.43f3e27d@redhat.com>
+In-Reply-To: <20181105014047.26447-1-sameo@linux.intel.com>
+References: <20181105014047.26447-1-sameo@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20181112214224.31560-7-contrib@steffen-goertz.de>
-References: <20181112214224.31560-1-contrib@steffen-goertz.de>
-	<20181112214224.31560-7-contrib@steffen-goertz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Nov 2018 16:25:01 +0000
-Message-ID: <CAFEAcA8sz-QpvR039dC0fEuRC4qkxTEwY-=3LpoXG27aFO1S9g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 06/14] arm: Instantiate NRF51 special
- NVM's and NVMC
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 00/24] ACPI reorganization for
+ hardware-reduced API addition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,17 +23,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, "open list:NRF51" <qemu-arm@nongnu.org>
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
 
-On 12 November 2018 at 21:42, Steffen G=C3=B6rtz <contrib@steffen-goertz.de=
-> wrote:
-> Instantiates UICR, FICR, FLASH and NVMC in nRF51 SOC.
->
-> Signed-off-by: Steffen G=C3=B6rtz <contrib@steffen-goertz.de>
-> ---
+On Mon,  5 Nov 2018 02:40:23 +0100
+Samuel Ortiz <sameo@linux.intel.com> wrote:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> This patch set provides an ACPI code reorganization in preparation for
+> adding a shared hardware-reduced ACPI API to QEMU.
+> 
+> The changes are coming from the NEMU [1] project where we're defining
+> a new x86 machine type: i386/virt. This is an EFI only, ACPI
+> hardware-reduced platform that is built on top of a generic
+> hardware-reduced ACPI API [2]. This API was initially based off the
+> generic parts of the arm/virt-acpi-build.c implementation, and the goal
+> is for both i386/virt and arm/virt to duplicate as little code as
+> possible by using this new, shared API.
+> 
+> As a preliminary for adding this hardware-reduced ACPI API to QEMU, we did
+> some ACPI code reorganization with the following goals:
+> 
+> * Share as much as possible of the current ACPI build APIs between
+>   legacy and hardware-reduced ACPI.
+> * Share the ACPI build code across machine types and architectures and
+>   remove the typical PC machine type dependency.
+> 
+> The patches are also available in their own git branch [3].
+I think, I'm done with reviewing this patchset, to sum up
+thanks for trying generalize acpi parts. It is implemented not
+exactly generic way and patches aren't split perfectly but
+we can work on it.
 
-thanks
--- PMM
+General suggestions for this series:
+  1. Preferably don't do multiple changes within a patch
+     neither post huge patches (unless it's pure code movement).
+     (it's easy to squash patches later it necessary)
+  2. Start small, pick a table generalize it and send as
+     one small patchset. Tables are often independent
+     and it's much easier on both author/reviewer to agree upon
+     changes and rewrite it if necessary.
+  3. when you think about refactoring acpi into a generic API
+     think about it as routines that go into a separate library
+     (pure acpi spec code) and qemu/acpi glue routines and
+      divide them correspondingly.
+
+> [1] https://github.com/intel/nemu
+> [2] https://github.com/intel/nemu/blob/topic/virt-x86/hw/acpi/reduced.c
+> [3] https://github.com/intel/nemu/tree/topic/upstream/acpi
+> 
+> v1 -> v2:
+>    * Drop the hardware-reduced implementation for now. Our next patch
+>    * set
+>      will add hardware-reduced and convert arm/virt to it.
+>    * Implement the ACPI build methods as a QOM Interface Class and
+>    * convert
+>      the PC machine type to it.
+>    * acpi_conf_pc_init() uses a PCMachineState pointer and not a
+>      MachineState one as its argument.
+> 
+> v2 -> v3:
+>    * Cc all relevant maintainers, no functional changes.
+> 
+> v3 -> v4:
+>    * Renamed all AcpiConfiguration pointers from conf to acpi_conf.
+>    * Removed the ACPI_BUILD_ALIGN_SIZE export.
+>    * Temporarily updated the arm virt build_rsdp() prototype for
+>      bisectability purposes.
+>    * Removed unneeded pci headers from acpi-build.c.
+>    * Refactor the acpi PCI host getter so that it truly is architecture
+>      agnostic, by carrying the PCI host pointer through the
+>      AcpiConfiguration structure.
+>    * Splitted the PCI host AML builder API export patch from the PCI
+>      host and holes getter one.
+>    * Reduced the build_srat() export scope to hw/i386 instead of the
+>      broader hw/acpi. SRAT builders are truly architecture specific
+>      and can hardly be generalized.
+>    * Completed the ACPI builder documentation.
+> 
+> v4 -> v5:
+>    * Reorganize the ACPI RSDP export and XSDT implementation into 3
+>      patches.
+>    * Fix the hw/i386/acpi header inclusions.
+> 
+> Samuel Ortiz (16):
+>   hw: i386: Decouple the ACPI build from the PC machine type
+>   hw: acpi: Export ACPI build alignment API
+>   hw: acpi: The RSDP build API can return void
+>   hw: acpi: Export the RSDP build API
+>   hw: acpi: Implement XSDT support for RSDP
+>   hw: acpi: Factorize the RSDP build API implementation
+>   hw: i386: Move PCI host definitions to pci_host.h
+>   hw: acpi: Export the PCI host and holes getters
+>   hw: acpi: Do not create hotplug method when handler is not defined
+>   hw: i386: Make the hotpluggable memory size property more generic
+>   hw: i386: Export the i386 ACPI SRAT build method
+>   hw: i386: Export the MADT build method
+>   hw: acpi: Define ACPI tables builder interface
+>   hw: i386: Implement the ACPI builder interface for PC
+>   hw: pci-host: piix: Return PCI host pointer instead of PCI bus
+>   hw: i386: Set ACPI configuration PCI host pointer
+> 
+> Sebastien Boeuf (2):
+>   hw: acpi: Export the PCI hotplug API
+>   hw: acpi: Retrieve the PCI bus from AcpiPciHpState
+> 
+> Yang Zhong (6):
+>   hw: acpi: Generalize AML build routines
+>   hw: acpi: Factorize _OSC AML across architectures
+>   hw: acpi: Export and generalize the PCI host AML API
+>   hw: acpi: Export the MCFG getter
+>   hw: acpi: Fix memory hotplug AML generation error
+>   hw: i386: Refactor PCI host getter
+> 
+>  hw/i386/acpi-build.h           |    9 +-
+>  include/hw/acpi/acpi-defs.h    |   14 +
+>  include/hw/acpi/acpi.h         |   44 ++
+>  include/hw/acpi/aml-build.h    |   47 ++
+>  include/hw/acpi/builder.h      |  100 +++
+>  include/hw/i386/acpi.h         |   28 +
+>  include/hw/i386/pc.h           |   49 +-
+>  include/hw/mem/memory-device.h |    2 +
+>  include/hw/pci/pci_host.h      |    6 +
+>  hw/acpi/aml-build.c            |  981 +++++++++++++++++++++++++++++
+>  hw/acpi/builder.c              |   97 +++
+>  hw/acpi/cpu.c                  |    8 +-
+>  hw/acpi/cpu_hotplug.c          |    9 +-
+>  hw/acpi/memory_hotplug.c       |   21 +-
+>  hw/acpi/pcihp.c                |   10 +-
+>  hw/arm/virt-acpi-build.c       |   93 +--
+>  hw/i386/acpi-build.c           | 1072 +++-----------------------------
+>  hw/i386/pc.c                   |  198 +++---
+>  hw/i386/pc_piix.c              |   36 +-
+>  hw/i386/pc_q35.c               |   22 +-
+>  hw/i386/xen/xen-hvm.c          |   19 +-
+>  hw/pci-host/piix.c             |   32 +-
+>  stubs/pci-host-piix.c          |    6 -
+>  hw/acpi/Makefile.objs          |    1 +
+>  stubs/Makefile.objs            |    1 -
+>  25 files changed, 1644 insertions(+), 1261 deletions(-)
+>  create mode 100644 include/hw/acpi/builder.h
+>  create mode 100644 include/hw/i386/acpi.h
+>  create mode 100644 hw/acpi/builder.c
+>  delete mode 100644 stubs/pci-host-piix.c
+> 
