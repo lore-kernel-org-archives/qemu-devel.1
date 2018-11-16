@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gNbr3-0008IT-9w
+	(envelope-from <clg@kaod.org>) id 1gNbr3-0008IW-BR
 	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:00:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gNbqx-0000Pv-6Y
+	(envelope-from <clg@kaod.org>) id 1gNbqv-0000Ot-Vr
 	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:00:05 -0500
-Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:56614)
+Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:37474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gNbqv-0000Lm-9k
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gNbqt-00008s-Fm
 	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:59:57 -0500
-Received: from player734.ha.ovh.net (unknown [10.109.143.24])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id D39432056DF
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 11:59:55 +0100 (CET)
+Received: from player734.ha.ovh.net (unknown [10.109.159.35])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id E2487E31B3
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 11:59:49 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 16 Nov 2018 11:57:17 +0100
-Message-Id: <20181116105729.23240-25-clg@kaod.org>
+Date: Fri, 16 Nov 2018 11:57:16 +0100
+Message-Id: <20181116105729.23240-24-clg@kaod.org>
 In-Reply-To: <20181116105729.23240-1-clg@kaod.org>
 References: <20181116105729.23240-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 24/36] spapr: add a 'reset' method to the
- sPAPR IRQ backend
+Subject: [Qemu-devel] [PATCH v5 23/36] spapr/xive: add migration support for
+ KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,163 +33,861 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-This method will become useful when the new machine supporting both
-interrupt modes, XIVE and XICS, is introduced. In this machine, the
-interrupt mode is chosen by the CAS negotiation process and activated
-after a reset.
+This extends the KVM XIVE models to handle the state synchronization
+with KVM, for the monitor usage and for the migration.
 
-For the time being, the only thing that can be done in the XIVE reset
-handler is to map the pages for the TIMA and for the source ESBs.
+The migration priority of the XIVE interrupt controller sPAPRXive is
+raised for KVM. It operates first and orchestrates the capture
+sequence of the states of all the XIVE models. The XIVE sources are
+masked to quiesce the interrupt flow and a XIVE xync is performed to
+stabilize the OS Event Queues. The state of the ENDs are then captured
+by the XIVE interrupt controller model, sPAPRXive, and the state of
+the thread contexts by the thread interrupt presenter model,
+XiveTCTX. When done, a rollback is performed to restore the sources to
+their initial state.
+
+The sPAPRXive 'post_load' method is called from the sPAPR machine,
+after all XIVE device states have been transfered and loaded. First,
+sPAPRXive restores the XIVE routing tables: ENDT and EAT. Next, are
+restored the thread interrupt context registers and the source PQ
+bits.
+
+The get/set operations rely on their KVM counterpart in the host
+kernel which acts as a proxy for OPAL, the host firmware.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/spapr_irq.h  |  2 ++
- include/hw/ppc/spapr_xive.h |  1 +
- hw/intc/spapr_xive.c        |  4 +---
- hw/ppc/spapr.c              |  2 ++
- hw/ppc/spapr_irq.c          | 21 +++++++++++++++++++++
- 5 files changed, 27 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index 4e36c0984e1a..34128976e21c 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -46,6 +46,7 @@ typedef struct sPAPRIrq {
-     Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
-                                Error **errp);
-     int (*post_load)(sPAPRMachineState *spapr, int version_id);
-+    void (*reset)(sPAPRMachineState *spapr, Error **errp);
- } sPAPRIrq;
+ WIP:
 =20
- extern sPAPRIrq spapr_irq_xics;
-@@ -57,6 +58,7 @@ int spapr_irq_claim(sPAPRMachineState *spapr, int irq, =
-bool lsi, Error **errp);
- void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
- qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
- int spapr_irq_post_load(sPAPRMachineState *spapr, int version_id);
-+void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp);
-=20
- /*
-  * XICS legacy routines
+    If migration occurs when a VCPU is 'ceded', some the OS event
+    notification queues are mapped to the ZERO_PAGE on the receiving
+    side. As if the HW had triggered a page fault before the dirty
+    page was transferred from the source or as if we were not using
+    the correct page table.
+
+ include/hw/ppc/spapr_xive.h     |   5 +
+ include/hw/ppc/xive.h           |   3 +
+ include/migration/vmstate.h     |   1 +
+ linux-headers/asm-powerpc/kvm.h |  33 +++
+ hw/intc/spapr_xive.c            |  32 +++
+ hw/intc/spapr_xive_kvm.c        | 494 ++++++++++++++++++++++++++++++++
+ hw/intc/xive.c                  |  46 +++
+ hw/ppc/spapr_irq.c              |   2 +-
+ 8 files changed, 615 insertions(+), 1 deletion(-)
+
 diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index d2517c040958..fa7f3d7718da 100644
+index 9c817bb7ae74..d2517c040958 100644
 --- a/include/hw/ppc/spapr_xive.h
 +++ b/include/hw/ppc/spapr_xive.h
-@@ -91,6 +91,7 @@ typedef struct sPAPRMachineState sPAPRMachineState;
- void spapr_xive_hcall_init(sPAPRMachineState *spapr);
- void spapr_dt_xive(sPAPRXive *xive, int nr_servers, void *fdt,
-                    uint32_t phandle);
-+void spapr_xive_mmio_map(sPAPRXive *xive);
+@@ -55,12 +55,17 @@ typedef struct sPAPRXiveClass {
+     XiveRouterClass parent_class;
+=20
+     DeviceRealize   parent_realize;
++
++    void (*synchronize_state)(sPAPRXive *xive);
++    int  (*pre_save)(sPAPRXive *xsrc);
++    int  (*post_load)(sPAPRXive *xsrc, int version_id);
+ } sPAPRXiveClass;
+=20
+ bool spapr_xive_irq_enable(sPAPRXive *xive, uint32_t lisn, bool lsi);
+ bool spapr_xive_irq_disable(sPAPRXive *xive, uint32_t lisn);
+ void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
+ qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn);
++int spapr_xive_post_load(sPAPRXive *xive, int version_id);
 =20
  /*
-  * XIVE KVM models
+  * sPAPR NVT and END indexing helpers
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 7aaf5a182cb3..c8201462d698 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -309,6 +309,9 @@ typedef struct XiveTCTXClass {
+     DeviceClass       parent_class;
+=20
+     DeviceRealize     parent_realize;
++
++    void (*synchronize_state)(XiveTCTX *tctx);
++    int  (*post_load)(XiveTCTX *tctx, int version_id);
+ } XiveTCTXClass;
+=20
+ /*
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 2b501d04669a..ee2e836cc1c1 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -154,6 +154,7 @@ typedef enum {
+     MIG_PRI_PCI_BUS,            /* Must happen before IOMMU */
+     MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
+     MIG_PRI_GICV3,              /* Must happen before the ITS */
++    MIG_PRI_XIVE_IC,            /* Must happen before all XIVE models */
+     MIG_PRI_MAX,
+ } MigrationPriority;
+=20
+diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/=
+kvm.h
+index f34c971491dd..9d55ade23634 100644
+--- a/linux-headers/asm-powerpc/kvm.h
++++ b/linux-headers/asm-powerpc/kvm.h
+@@ -480,6 +480,8 @@ struct kvm_ppc_cpu_char {
+ #define  KVM_REG_PPC_ICP_PPRI_SHIFT	16	/* pending irq priority */
+ #define  KVM_REG_PPC_ICP_PPRI_MASK	0xff
+=20
++#define KVM_REG_PPC_NVT_STATE	(KVM_REG_PPC | KVM_REG_SIZE_U256 | 0x8d)
++
+ /* Device control API: PPC-specific devices */
+ #define KVM_DEV_MPIC_GRP_MISC		1
+ #define   KVM_DEV_MPIC_BASE_ADDR	0	/* 64-bit */
+@@ -681,10 +683,41 @@ struct kvm_ppc_cpu_char {
+ #define   KVM_DEV_XIVE_GET_TIMA_FD	2
+ #define   KVM_DEV_XIVE_VC_BASE		3
+ #define KVM_DEV_XIVE_GRP_SOURCES	2	/* 64-bit source attributes */
++#define KVM_DEV_XIVE_GRP_SYNC		3	/* 64-bit source attributes */
++#define KVM_DEV_XIVE_GRP_EAS		4	/* 64-bit eas attributes */
++#define KVM_DEV_XIVE_GRP_EQ		5	/* 64-bit eq attributes */
+=20
+ /* Layout of 64-bit XIVE source attribute values */
+ #define KVM_XIVE_LEVEL_SENSITIVE	(1ULL << 0)
+ #define KVM_XIVE_LEVEL_ASSERTED		(1ULL << 1)
+=20
++/* Layout of 64-bit eas attribute values */
++#define KVM_XIVE_EAS_PRIORITY_SHIFT	0
++#define KVM_XIVE_EAS_PRIORITY_MASK	0x7
++#define KVM_XIVE_EAS_SERVER_SHIFT	3
++#define KVM_XIVE_EAS_SERVER_MASK	0xfffffff8ULL
++#define KVM_XIVE_EAS_MASK_SHIFT		32
++#define KVM_XIVE_EAS_MASK_MASK		0x100000000ULL
++#define KVM_XIVE_EAS_EISN_SHIFT		33
++#define KVM_XIVE_EAS_EISN_MASK		0xfffffffe00000000ULL
++
++/* Layout of 64-bit eq attribute */
++#define KVM_XIVE_EQ_PRIORITY_SHIFT	0
++#define KVM_XIVE_EQ_PRIORITY_MASK	0x7
++#define KVM_XIVE_EQ_SERVER_SHIFT	3
++#define KVM_XIVE_EQ_SERVER_MASK		0xfffffff8ULL
++
++/* Layout of 64-bit eq attribute values */
++struct kvm_ppc_xive_eq {
++	__u32 flags;
++	__u32 qsize;
++	__u64 qpage;
++	__u32 qtoggle;
++	__u32 qindex;
++};
++
++#define KVM_XIVE_EQ_FLAG_ENABLED	0x00000001
++#define KVM_XIVE_EQ_FLAG_ALWAYS_NOTIFY	0x00000002
++#define KVM_XIVE_EQ_FLAG_ESCALATE	0x00000004
+=20
+ #endif /* __LINUX_KVM_POWERPC_H */
 diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index c5c0e063dc33..def43160e12a 100644
+index ec85f7e4f88d..c5c0e063dc33 100644
 --- a/hw/intc/spapr_xive.c
 +++ b/hw/intc/spapr_xive.c
-@@ -51,7 +51,7 @@ void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor=
- *mon)
- }
+@@ -27,9 +27,14 @@
 =20
- /* Map the ESB pages and the TIMA pages */
--static void spapr_xive_mmio_map(sPAPRXive *xive)
-+void spapr_xive_mmio_map(sPAPRXive *xive)
+ void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon)
  {
-     sysbus_mmio_map(SYS_BUS_DEVICE(&xive->source), 0, xive->vc_base);
-     sysbus_mmio_map(SYS_BUS_DEVICE(&xive->end_source), 0, xive->end_base=
-);
-@@ -77,8 +77,6 @@ static void spapr_xive_base_reset(DeviceState *dev)
-     for (i =3D 0; i < xive->nr_ends; i++) {
-         xive_end_reset(&xive->endt[i]);
-     }
--
--    spapr_xive_mmio_map(xive);
- }
++    sPAPRXiveClass *sxc =3D SPAPR_XIVE_BASE_GET_CLASS(xive);
+     int i;
+     uint32_t offset =3D 0;
 =20
- static void spapr_xive_base_instance_init(Object *obj)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d1be2579cd9b..013e6ea8aa64 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1628,6 +1628,8 @@ static void spapr_machine_reset(void)
-         spapr_irq_msi_reset(spapr);
-     }
-=20
-+    spapr_irq_reset(spapr, &error_fatal);
++    if (sxc->synchronize_state) {
++        sxc->synchronize_state(xive);
++    }
 +
-     qemu_devices_reset();
-=20
-     /* DRC reset may cause a device to be unplugged. This will cause tro=
-ubles
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 6fac6ca70595..984c6d60cd9f 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -13,6 +13,7 @@
- #include "qapi/error.h"
- #include "hw/ppc/spapr.h"
- #include "hw/ppc/spapr_xive.h"
-+#include "hw/ppc/spapr_cpu_core.h"
- #include "hw/ppc/xics.h"
- #include "sysemu/kvm.h"
-=20
-@@ -215,6 +216,10 @@ static int spapr_irq_post_load_xics(sPAPRMachineStat=
-e *spapr, int version_id)
-     return 0;
- }
-=20
-+static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **errp)
-+{
-+}
-+
- #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
- #define SPAPR_IRQ_XICS_NR_MSIS     \
-     (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-@@ -232,6 +237,7 @@ sPAPRIrq spapr_irq_xics =3D {
-     .dt_populate =3D spapr_irq_dt_populate_xics,
-     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
-     .post_load   =3D spapr_irq_post_load_xics,
-+    .reset       =3D spapr_irq_reset_xics,
+     monitor_printf(mon, "XIVE Source %08x .. %08x\n", offset,
+                    offset + xive->source.nr_irqs - 1);
+     xive_source_pic_print_info(&xive->source, offset, mon);
+@@ -354,10 +359,37 @@ static const VMStateDescription vmstate_spapr_xive_=
+eas =3D {
+     },
  };
 =20
-  /*
-@@ -362,6 +368,11 @@ static int spapr_irq_post_load_xive(sPAPRMachineStat=
-e *spapr, int version_id)
-     return spapr_xive_post_load(spapr->xive, version_id);
- }
-=20
-+static void spapr_irq_reset_xive(sPAPRMachineState *spapr, Error **errp)
++static int vmstate_spapr_xive_pre_save(void *opaque)
 +{
-+    spapr_xive_mmio_map(spapr->xive);
++    sPAPRXive *xive =3D SPAPR_XIVE_BASE(opaque);
++    sPAPRXiveClass *sxc =3D SPAPR_XIVE_BASE_GET_CLASS(xive);
++
++    if (sxc->pre_save) {
++        return sxc->pre_save(xive);
++    }
++
++    return 0;
 +}
 +
- /*
-  * XIVE uses the full IRQ number space. Set it to 8K to be compatible
-  * with XICS.
-@@ -383,6 +394,7 @@ sPAPRIrq spapr_irq_xive =3D {
-     .dt_populate =3D spapr_irq_dt_populate_xive,
-     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
-     .post_load   =3D spapr_irq_post_load_xive,
-+    .reset       =3D spapr_irq_reset_xive,
- };
-=20
- /*
-@@ -428,6 +440,15 @@ int spapr_irq_post_load(sPAPRMachineState *spapr, in=
-t version_id)
-     return smc->irq->post_load(spapr, version_id);
- }
-=20
-+void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp)
++/* handled at the machine level */
++int spapr_xive_post_load(sPAPRXive *xive, int version_id)
 +{
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
++    sPAPRXiveClass *sxc =3D SPAPR_XIVE_BASE_GET_CLASS(xive);
 +
-+    if (smc->irq->reset) {
-+        smc->irq->reset(spapr, errp);
++    if (sxc->post_load) {
++        return sxc->post_load(xive, version_id);
++    }
++
++    return 0;
++}
++
+ static const VMStateDescription vmstate_spapr_xive_base =3D {
+     .name =3D TYPE_SPAPR_XIVE,
+     .version_id =3D 1,
+     .minimum_version_id =3D 1,
++    .pre_save =3D vmstate_spapr_xive_pre_save,
++    .post_load =3D NULL, /* handled at the machine level */
++    .priority =3D MIG_PRI_XIVE_IC,
+     .fields =3D (VMStateField[]) {
+         VMSTATE_UINT32_EQUAL(nr_irqs, sPAPRXive, NULL),
+         VMSTATE_STRUCT_VARRAY_POINTER_UINT32(eat, sPAPRXive, nr_irqs,
+diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+index 767f90826e43..176083c37d61 100644
+--- a/hw/intc/spapr_xive_kvm.c
++++ b/hw/intc/spapr_xive_kvm.c
+@@ -58,6 +58,58 @@ static void kvm_cpu_enable(CPUState *cs)
+ /*
+  * XIVE Thread Interrupt Management context (KVM)
+  */
++static void xive_tctx_kvm_set_state(XiveTCTX *tctx, Error **errp)
++{
++    uint64_t state[4];
++    int ret;
++
++    /* word0 and word1 of the OS ring. */
++    state[0] =3D *((uint64_t *) &tctx->regs[TM_QW1_OS]);
++
++    /* VP identifier. Only for KVM pr_debug() */
++    state[1] =3D *((uint64_t *) &tctx->regs[TM_QW1_OS + TM_WORD2]);
++
++    ret =3D kvm_set_one_reg(tctx->cs, KVM_REG_PPC_NVT_STATE, state);
++    if (ret !=3D 0) {
++        error_setg_errno(errp, errno, "Could restore KVM XIVE CPU %ld st=
+ate",
++                         kvm_arch_vcpu_id(tctx->cs));
 +    }
 +}
 +
++static void xive_tctx_kvm_get_state(XiveTCTX *tctx, Error **errp)
++{
++    uint64_t state[4] =3D { 0 };
++    int ret;
++
++    ret =3D kvm_get_one_reg(tctx->cs, KVM_REG_PPC_NVT_STATE, state);
++    if (ret !=3D 0) {
++        error_setg_errno(errp, errno, "Could capture KVM XIVE CPU %ld st=
+ate",
++                         kvm_arch_vcpu_id(tctx->cs));
++        return;
++    }
++
++    /* word0 and word1 of the OS ring. */
++    *((uint64_t *) &tctx->regs[TM_QW1_OS]) =3D state[0];
++
++    /*
++     * KVM also returns word2 containing the VP CAM line value which
++     * is interesting to print out the VP identifier in the QEMU
++     * monitor. No need to restore it.
++     */
++    *((uint64_t *) &tctx->regs[TM_QW1_OS + TM_WORD2]) =3D state[1];
++}
++
++static void xive_tctx_kvm_do_synchronize_state(CPUState *cpu,
++                                              run_on_cpu_data arg)
++{
++    xive_tctx_kvm_get_state(arg.host_ptr, &error_fatal);
++}
++
++static void xive_tctx_kvm_synchronize_state(XiveTCTX *tctx)
++{
++    run_on_cpu(tctx->cs, xive_tctx_kvm_do_synchronize_state,
++               RUN_ON_CPU_HOST_PTR(tctx));
++}
+=20
+ static void xive_tctx_kvm_init(XiveTCTX *tctx, Error **errp)
+ {
+@@ -112,6 +164,8 @@ static void xive_tctx_kvm_class_init(ObjectClass *kla=
+ss, void *data)
+=20
+     device_class_set_parent_realize(dc, xive_tctx_kvm_realize,
+                                     &xtc->parent_realize);
++
++    xtc->synchronize_state =3D xive_tctx_kvm_synchronize_state;
+ }
+=20
+ static const TypeInfo xive_tctx_kvm_info =3D {
+@@ -166,6 +220,34 @@ static void xive_source_kvm_reset(DeviceState *dev)
+     xive_source_kvm_init(xsrc, &error_fatal);
+ }
+=20
++/*
++ * This is used to perform the magic loads on the ESB pages, described
++ * in xive.h.
++ */
++static uint8_t xive_esb_read(XiveSource *xsrc, int srcno, uint32_t offse=
+t)
++{
++    unsigned long addr =3D (unsigned long) xsrc->esb_mmap +
++        xive_source_esb_mgmt(xsrc, srcno) + offset;
++
++    /* Prevent the compiler from optimizing away the load */
++    volatile uint64_t value =3D *((uint64_t *) addr);
++
++    return be64_to_cpu(value) & 0x3;
++}
++
++static void xive_source_kvm_get_state(XiveSource *xsrc)
++{
++    int i;
++
++    for (i =3D 0; i < xsrc->nr_irqs; i++) {
++        /* Perform a load without side effect to retrieve the PQ bits */
++        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
++
++        /* and save PQ locally */
++        xive_source_esb_set(xsrc, i, pq);
++    }
++}
++
+ static void xive_source_kvm_set_irq(void *opaque, int srcno, int val)
+ {
+     XiveSource *xsrc =3D opaque;
+@@ -295,6 +377,414 @@ static const TypeInfo xive_source_kvm_info =3D {
  /*
-  * XICS legacy routines - to deprecate one day
+  * sPAPR XIVE Router (KVM)
   */
++static int spapr_xive_kvm_set_eq_state(sPAPRXive *xive, CPUState *cs,
++                                       Error **errp)
++{
++    XiveRouter *xrtr =3D XIVE_ROUTER(xive);
++    unsigned long vcpu_id =3D kvm_arch_vcpu_id(cs);
++    int ret;
++    int i;
++
++    for (i =3D 0; i < XIVE_PRIORITY_MAX + 1; i++) {
++        Error *local_err =3D NULL;
++        XiveEND end;
++        uint8_t end_blk;
++        uint32_t end_idx;
++        struct kvm_ppc_xive_eq kvm_eq =3D { 0 };
++        uint64_t kvm_eq_idx;
++
++        if (!spapr_xive_priority_is_valid(i)) {
++            continue;
++        }
++
++        spapr_xive_cpu_to_end(xive, POWERPC_CPU(cs), i, &end_blk, &end_i=
+dx);
++
++        ret =3D xive_router_get_end(xrtr, end_blk, end_idx, &end);
++        if (ret) {
++            error_setg(errp, "XIVE: No END for CPU %ld priority %d",
++                       vcpu_id, i);
++            return ret;
++        }
++
++        if (!(end.w0 & END_W0_VALID)) {
++            continue;
++        }
++
++        /* Build the KVM state from the local END structure */
++        kvm_eq.flags   =3D KVM_XIVE_EQ_FLAG_ALWAYS_NOTIFY;
++        kvm_eq.qsize   =3D GETFIELD(END_W0_QSIZE, end.w0) + 12;
++        kvm_eq.qpage   =3D (((uint64_t)(end.w2 & 0x0fffffff)) << 32) | e=
+nd.w3;
++        kvm_eq.qtoggle =3D GETFIELD(END_W1_GENERATION, end.w1);
++        kvm_eq.qindex  =3D GETFIELD(END_W1_PAGE_OFF, end.w1);
++
++        /* Encode the tuple (server, prio) as a KVM EQ index */
++        kvm_eq_idx =3D i << KVM_XIVE_EQ_PRIORITY_SHIFT &
++            KVM_XIVE_EQ_PRIORITY_MASK;
++        kvm_eq_idx |=3D vcpu_id << KVM_XIVE_EQ_SERVER_SHIFT &
++            KVM_XIVE_EQ_SERVER_MASK;
++
++        ret =3D kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ, kvm_eq_=
+idx,
++                                &kvm_eq, true, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return ret;
++        }
++    }
++
++    return 0;
++}
++
++static int spapr_xive_kvm_get_eq_state(sPAPRXive *xive, CPUState *cs,
++                                       Error **errp)
++{
++    XiveRouter *xrtr =3D XIVE_ROUTER(xive);
++    unsigned long vcpu_id =3D kvm_arch_vcpu_id(cs);
++    int ret;
++    int i;
++
++    for (i =3D 0; i < XIVE_PRIORITY_MAX + 1; i++) {
++        Error *local_err =3D NULL;
++        struct kvm_ppc_xive_eq kvm_eq =3D { 0 };
++        uint64_t kvm_eq_idx;
++        XiveEND end =3D { 0 };
++        uint8_t end_blk, nvt_blk;
++        uint32_t end_idx, nvt_idx;
++
++        /* Skip priorities reserved for the hypervisor */
++        if (!spapr_xive_priority_is_valid(i)) {
++            continue;
++        }
++
++        /* Encode the tuple (server, prio) as a KVM EQ index */
++        kvm_eq_idx =3D i << KVM_XIVE_EQ_PRIORITY_SHIFT &
++            KVM_XIVE_EQ_PRIORITY_MASK;
++        kvm_eq_idx |=3D vcpu_id << KVM_XIVE_EQ_SERVER_SHIFT &
++            KVM_XIVE_EQ_SERVER_MASK;
++
++        ret =3D kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ, kvm_eq_=
+idx,
++                                &kvm_eq, false, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return ret;
++        }
++
++        if (!(kvm_eq.flags & KVM_XIVE_EQ_FLAG_ENABLED)) {
++            continue;
++        }
++
++        /* Update the local END structure with the KVM input */
++        if (kvm_eq.flags & KVM_XIVE_EQ_FLAG_ENABLED) {
++                end.w0 |=3D END_W0_VALID | END_W0_ENQUEUE;
++        }
++        if (kvm_eq.flags & KVM_XIVE_EQ_FLAG_ALWAYS_NOTIFY) {
++                end.w0 |=3D END_W0_UCOND_NOTIFY;
++        }
++        if (kvm_eq.flags & KVM_XIVE_EQ_FLAG_ESCALATE) {
++                end.w0 |=3D END_W0_ESCALATE_CTL;
++        }
++        end.w0 |=3D SETFIELD(END_W0_QSIZE, 0ul, kvm_eq.qsize - 12);
++
++        end.w1 =3D SETFIELD(END_W1_GENERATION, 0ul, kvm_eq.qtoggle) |
++            SETFIELD(END_W1_PAGE_OFF, 0ul, kvm_eq.qindex);
++        end.w2 =3D (kvm_eq.qpage >> 32) & 0x0fffffff;
++        end.w3 =3D kvm_eq.qpage & 0xffffffff;
++        end.w4 =3D 0;
++        end.w5 =3D 0;
++
++        ret =3D spapr_xive_cpu_to_nvt(xive, POWERPC_CPU(cs), &nvt_blk, &=
+nvt_idx);
++        if (ret) {
++            error_setg(errp, "XIVE: No NVT for CPU %ld", vcpu_id);
++            return ret;
++        }
++
++        end.w6 =3D SETFIELD(END_W6_NVT_BLOCK, 0ul, nvt_blk) |
++            SETFIELD(END_W6_NVT_INDEX, 0ul, nvt_idx);
++        end.w7 =3D SETFIELD(END_W7_F0_PRIORITY, 0ul, i);
++
++        spapr_xive_cpu_to_end(xive, POWERPC_CPU(cs), i, &end_blk, &end_i=
+dx);
++
++        ret =3D xive_router_set_end(xrtr, end_blk, end_idx, &end);
++        if (ret) {
++            error_setg(errp, "XIVE: No END for CPU %ld priority %d",
++                       vcpu_id, i);
++            return ret;
++        }
++    }
++
++    return 0;
++}
++
++static void spapr_xive_kvm_set_eas_state(sPAPRXive *xive, Error **errp)
++{
++    XiveSource *xsrc =3D &xive->source;
++    int i;
++
++    for (i =3D 0; i < xsrc->nr_irqs; i++) {
++        XiveEAS *eas =3D &xive->eat[i];
++        uint32_t end_idx;
++        uint32_t end_blk;
++        uint32_t eisn;
++        uint8_t priority;
++        uint32_t server;
++        uint64_t kvm_eas;
++        Error *local_err =3D NULL;
++
++        /* No need to set MASKED EAS, this is the default state after re=
+set */
++        if (!(eas->w & EAS_VALID) || eas->w & EAS_MASKED) {
++            continue;
++        }
++
++        end_idx =3D GETFIELD(EAS_END_INDEX, eas->w);
++        end_blk =3D GETFIELD(EAS_END_BLOCK, eas->w);
++        eisn =3D GETFIELD(EAS_END_DATA, eas->w);
++
++        spapr_xive_end_to_target(xive, end_blk, end_idx, &server, &prior=
+ity);
++
++        kvm_eas =3D priority << KVM_XIVE_EAS_PRIORITY_SHIFT &
++            KVM_XIVE_EAS_PRIORITY_MASK;
++        kvm_eas |=3D server << KVM_XIVE_EAS_SERVER_SHIFT &
++            KVM_XIVE_EAS_SERVER_MASK;
++        kvm_eas |=3D ((uint64_t)eisn << KVM_XIVE_EAS_EISN_SHIFT) &
++            KVM_XIVE_EAS_EISN_MASK;
++
++        kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EAS, i, &kvm_eas, t=
+rue,
++                          &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
++    }
++}
++
++static void spapr_xive_kvm_get_eas_state(sPAPRXive *xive, Error **errp)
++{
++    XiveSource *xsrc =3D &xive->source;
++    int i;
++
++    for (i =3D 0; i < xsrc->nr_irqs; i++) {
++        XiveEAS *eas =3D &xive->eat[i];
++        XiveEAS new_eas;
++        uint64_t kvm_eas;
++        uint8_t priority;
++        uint32_t server;
++        uint32_t end_idx;
++        uint8_t end_blk;
++        uint32_t eisn;
++        Error *local_err =3D NULL;
++
++        if (!(eas->w & EAS_VALID)) {
++            continue;
++        }
++
++        kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EAS, i, &kvm_eas, f=
+alse,
++                          &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
++
++        priority =3D (kvm_eas & KVM_XIVE_EAS_PRIORITY_MASK) >>
++            KVM_XIVE_EAS_PRIORITY_SHIFT;
++        server =3D (kvm_eas & KVM_XIVE_EAS_SERVER_MASK) >>
++            KVM_XIVE_EAS_SERVER_SHIFT;
++        eisn =3D (kvm_eas & KVM_XIVE_EAS_EISN_MASK) >> KVM_XIVE_EAS_EISN=
+_SHIFT;
++
++        if (spapr_xive_target_to_end(xive, server, priority, &end_blk,
++                                     &end_idx)) {
++            error_setg(errp, "XIVE: invalid tuple CPU %d priority %d", s=
+erver,
++                       priority);
++            return;
++        }
++
++        new_eas.w =3D EAS_VALID;
++        if (kvm_eas & KVM_XIVE_EAS_MASK_MASK) {
++            new_eas.w |=3D EAS_MASKED;
++        }
++
++        new_eas.w =3D SETFIELD(EAS_END_INDEX, new_eas.w, end_idx);
++        new_eas.w =3D SETFIELD(EAS_END_BLOCK, new_eas.w, end_blk);
++        new_eas.w =3D SETFIELD(EAS_END_DATA, new_eas.w, eisn);
++
++        *eas =3D new_eas;
++    }
++}
++
++static void spapr_xive_kvm_sync_all(sPAPRXive *xive, Error **errp)
++{
++    XiveSource *xsrc =3D &xive->source;
++    Error *local_err =3D NULL;
++    int i;
++
++    /* Sync the KVM source. This reaches the XIVE HW through OPAL */
++    for (i =3D 0; i < xsrc->nr_irqs; i++) {
++        XiveEAS *eas =3D &xive->eat[i];
++
++        if (!(eas->w & EAS_VALID)) {
++            continue;
++        }
++
++        kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SYNC, i, NULL, true=
+,
++                          &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
++    }
++}
++
++/*
++ * The sPAPRXive KVM model migration priority is higher to make sure
++ * its 'pre_save' method runs before all the other XIVE models. It
++ * orchestrates the capture sequence of the XIVE states in the
++ * following order:
++ *
++ *   1. mask all the sources by setting PQ=3D01, which returns the
++ *      previous value and save it.
++ *   2. sync the sources in KVM to stabilize all the queues
++ *      sync the ENDs to make sure END -> VP is fully completed
++ *   3. dump the EAS table
++ *   4. dump the END table
++ *   5. dump the thread context (IPB)
++ *
++ *  Rollback to restore the current configuration of the sources
++ */
++static int spapr_xive_kvm_pre_save(sPAPRXive *xive)
++{
++    XiveSource *xsrc =3D &xive->source;
++    Error *local_err =3D NULL;
++    CPUState *cs;
++    int i;
++    int ret =3D 0;
++
++    /* Quiesce the sources, to stop the flow of event notifications */
++    for (i =3D 0; i < xsrc->nr_irqs; i++) {
++        /*
++         * Mask and save the ESB PQs locally in the XiveSource object.
++         */
++        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_01);
++        xive_source_esb_set(xsrc, i, pq);
++    }
++
++    /* Sync the sources in KVM */
++    spapr_xive_kvm_sync_all(xive, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        goto out;
++    }
++
++    /* Grab the EAT (could be done earlier ?) */
++    spapr_xive_kvm_get_eas_state(xive, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        goto out;
++    }
++
++    /*
++     * Grab the ENDs. The EQ index and the toggle bit are what we want
++     * to capture
++     */
++    CPU_FOREACH(cs) {
++        spapr_xive_kvm_get_eq_state(xive, cs, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            goto out;
++        }
++    }
++
++    /* Capture the thread interrupt contexts */
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++
++        /* TODO: Check if we need to use under run_on_cpu() ? */
++        xive_tctx_kvm_get_state(XIVE_TCTX_KVM(cpu->intc), &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            goto out;
++        }
++    }
++
++    /* All done. */
++
++out:
++    /* Restore the sources to their initial state */
++    for (i =3D 0; i < xsrc->nr_irqs; i++) {
++        uint8_t pq =3D xive_source_esb_get(xsrc, i);
++        if (xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq << 8)) !=3D =
+0x1) {
++            error_report("XIVE: IRQ %d has an invalid state", i);
++        }
++    }
++
++    /*
++     * The XiveSource and the XiveTCTX states will be collected by
++     * their respective vmstate handlers afterwards.
++     */
++    return ret;
++}
++
++/*
++ * The sPAPRXive 'post_load' method is called by the sPAPR machine,
++ * after all XIVE device states have been transfered and loaded.
++ *
++ * All should be in place when the VCPUs resume execution.
++ */
++static int spapr_xive_kvm_post_load(sPAPRXive *xive, int version_id)
++{
++    XiveSource *xsrc =3D &xive->source;
++    Error *local_err =3D NULL;
++    CPUState *cs;
++    int i;
++
++    /* Set the ENDs first. The targetting depends on it. */
++    CPU_FOREACH(cs) {
++        spapr_xive_kvm_set_eq_state(xive, cs, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            return -1;
++        }
++    }
++
++    /* Restore the targetting, if any */
++    spapr_xive_kvm_set_eas_state(xive, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return -1;
++    }
++
++    /* Restore the thread interrupt contexts */
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++
++        xive_tctx_kvm_set_state(XIVE_TCTX_KVM(cpu->intc), &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            return -1;
++        }
++    }
++
++    /*
++     * Get the saved state from the XiveSource model and restore the
++     * PQ bits
++     */
++    for (i =3D 0; i < xsrc->nr_irqs; i++) {
++        uint8_t pq =3D xive_source_esb_get(xsrc, i);
++        xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq << 8));
++    }
++    return 0;
++}
++
++static void spapr_xive_kvm_synchronize_state(sPAPRXive *xive)
++{
++    XiveSource *xsrc =3D &xive->source;
++    CPUState *cs;
++
++    xive_source_kvm_get_state(xsrc);
++
++    spapr_xive_kvm_get_eas_state(xive, &error_fatal);
++
++    CPU_FOREACH(cs) {
++        spapr_xive_kvm_get_eq_state(xive, cs, &error_fatal);
++    }
++}
+=20
+ static void spapr_xive_kvm_instance_init(Object *obj)
+ {
+@@ -409,6 +899,10 @@ static void spapr_xive_kvm_class_init(ObjectClass *k=
+lass, void *data)
+=20
+     dc->desc =3D "sPAPR XIVE KVM Interrupt Controller";
+     dc->unrealize =3D spapr_xive_kvm_unrealize;
++
++    sxc->synchronize_state =3D spapr_xive_kvm_synchronize_state;
++    sxc->pre_save =3D spapr_xive_kvm_pre_save;
++    sxc->post_load =3D spapr_xive_kvm_post_load;
+ }
+=20
+ static const TypeInfo spapr_xive_kvm_info =3D {
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 9bb37553c9ec..c9aedecc8216 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -438,9 +438,14 @@ static const struct {
+=20
+ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon)
+ {
++    XiveTCTXClass *xtc =3D XIVE_TCTX_BASE_GET_CLASS(tctx);
+     int cpu_index =3D tctx->cs ? tctx->cs->cpu_index : -1;
+     int i;
+=20
++    if (xtc->synchronize_state) {
++        xtc->synchronize_state(tctx);
++    }
++
+     monitor_printf(mon, "CPU[%04x]:   QW   NSR CPPR IPB LSMFB ACK# INC A=
+GE PIPR"
+                    "  W2\n", cpu_index);
+=20
+@@ -552,10 +557,23 @@ static void xive_tctx_base_unrealize(DeviceState *d=
+ev, Error **errp)
+     qemu_unregister_reset(xive_tctx_base_reset, dev);
+ }
+=20
++static int vmstate_xive_tctx_post_load(void *opaque, int version_id)
++{
++    XiveTCTX *tctx =3D XIVE_TCTX_BASE(opaque);
++    XiveTCTXClass *xtc =3D XIVE_TCTX_BASE_GET_CLASS(tctx);
++
++    if (xtc->post_load) {
++        return xtc->post_load(tctx, version_id);
++    }
++
++    return 0;
++}
++
+ static const VMStateDescription vmstate_xive_tctx_base =3D {
+     .name =3D TYPE_XIVE_TCTX,
+     .version_id =3D 1,
+     .minimum_version_id =3D 1,
++    .post_load =3D vmstate_xive_tctx_post_load,
+     .fields =3D (VMStateField[]) {
+         VMSTATE_BUFFER(regs, XiveTCTX),
+         VMSTATE_END_OF_LIST()
+@@ -581,9 +599,37 @@ static const TypeInfo xive_tctx_base_info =3D {
+     .class_size    =3D sizeof(XiveTCTXClass),
+ };
+=20
++static int xive_tctx_post_load(XiveTCTX *tctx, int version_id)
++{
++    XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(tctx->xrtr);
++
++    /*
++     * When we collect the states from KVM XIVE irqchip, we set word2
++     * of the thread context to print out the OS CAM line under the
++     * QEMU monitor.
++     *
++     * This breaks migration on a guest using TCG or not using a KVM
++     * irqchip. Fix with an extra reset of the thread contexts.
++     */
++    if (xrc->reset_tctx) {
++        xrc->reset_tctx(tctx->xrtr, tctx);
++    }
++    return 0;
++}
++
++static void xive_tctx_class_init(ObjectClass *klass, void *data)
++{
++    XiveTCTXClass *xtc =3D XIVE_TCTX_BASE_CLASS(klass);
++
++    xtc->post_load =3D xive_tctx_post_load;
++}
++
+ static const TypeInfo xive_tctx_info =3D {
+     .name          =3D TYPE_XIVE_TCTX,
+     .parent        =3D TYPE_XIVE_TCTX_BASE,
++    .instance_size =3D sizeof(XiveTCTX),
++    .class_init    =3D xive_tctx_class_init,
++    .class_size    =3D sizeof(XiveTCTXClass),
+ };
+=20
+ Object *xive_tctx_create(Object *cpu, const char *type, XiveRouter *xrtr=
+,
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 92ef53743b64..6fac6ca70595 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -359,7 +359,7 @@ static Object *spapr_irq_cpu_intc_create_xive(sPAPRMa=
+chineState *spapr,
+=20
+ static int spapr_irq_post_load_xive(sPAPRMachineState *spapr, int versio=
+n_id)
+ {
+-    return 0;
++    return spapr_xive_post_load(spapr->xive, version_id);
+ }
+=20
+ /*
 --=20
 2.17.2
