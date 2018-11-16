@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gNaTx-0004Lk-Ks
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:32:10 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gNabE-00089J-Vz
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:39:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gNaTv-0006k6-MR
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:32:09 -0500
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 16 Nov 2018 10:31:52 +0100
-Message-Id: <20181116093152.27227-1-pbonzini@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1gNab9-0003r7-R7
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:39:40 -0500
+Date: Fri, 16 Nov 2018 10:39:09 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181116103909.64f35d5d@redhat.com>
+In-Reply-To: <20181105014047.26447-20-sameo@linux.intel.com>
+References: <20181105014047.26447-1-sameo@linux.intel.com>
+	<20181105014047.26447-20-sameo@linux.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.1] nvme: fix out-of-bounds access to the
- CMB
+Subject: Re: [Qemu-devel] [PATCH v5 19/24] hw: acpi: Retrieve the PCI bus
+ from AcpiPciHpState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,145 +24,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Li Qiang <liq3ea@gmail.com>
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, xen-devel@lists.xenproject.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Sebastien Boeuf <sebastien.boeuf@intel.com>, Jing Liu <jing2.liu@linux.intel.com>
 
-Because the CMB BAR has a min_access_size of 2, if you read the last
-byte it will try to memcpy *2* bytes from n->cmbuf, causing an off-by-one
-error.  This is CVE-2018-16847.
+On Mon,  5 Nov 2018 02:40:42 +0100
+Samuel Ortiz <sameo@linux.intel.com> wrote:
 
-Another way to fix this might be to register the CMB as a RAM memory
-region, which would also be more efficient.  However, that might be a
-change for big-endian machines; I didn't think this through and I don't
-know how real hardware works.  Add a basic testcase for the CMB in case
-somebody does this change later on.
+> From: Sebastien Boeuf <sebastien.boeuf@intel.com>
+>=20
+> Instead of using the machine type specific method find_i440fx() to
+> retrieve the PCI bus, this commit aims to rely on the fact that the
+> PCI bus is known by the structure AcpiPciHpState.
+>=20
+> When the structure is initialized through acpi_pcihp_init() call,
+> it saves the PCI bus, which means there is no need to invoke a
+> special function later on.
+>=20
+> Based on the fact that find_i440fx() was only used there, this
+> patch also removes the function find_i440fx() itself from the
+> entire codebase.
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+Thanks for cleaning it up
 
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: qemu-block@nongnu.org
-Cc: Li Qiang <liq3ea@gmail.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/block/nvme.c        |  2 +-
- tests/Makefile.include |  2 +-
- tests/nvme-test.c      | 58 +++++++++++++++++++++++++++++++++++++++---
- 3 files changed, 57 insertions(+), 5 deletions(-)
+minor nit:
+Taking in account that you're removing '/* TODO: Q35 support */'
+comment along with find_i440fx(), it might be worth to mention
+in this commit message. Something along lines that ACPI PCIHP
+exist to support guests without SHPC support on PCI
+based PC machine. Considering that Q35 provides native
+PCI-E hotplug, there is no need to add ACPI hotplug there.
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 09d7c90259..5d92794ef7 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1192,7 +1192,7 @@ static const MemoryRegionOps nvme_cmb_ops =3D {
-     .write =3D nvme_cmb_write,
-     .endianness =3D DEVICE_LITTLE_ENDIAN,
-     .impl =3D {
--        .min_access_size =3D 2,
-+        .min_access_size =3D 1,
-         .max_access_size =3D 8,
-     },
- };
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 613242bc6e..fb0b449c02 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -730,7 +730,7 @@ tests/test-hmp$(EXESUF): tests/test-hmp.o
- tests/machine-none-test$(EXESUF): tests/machine-none-test.o
- tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-virtio-ob=
-j-y)
- tests/qdev-monitor-test$(EXESUF): tests/qdev-monitor-test.o $(libqos-pc-=
-obj-y)
--tests/nvme-test$(EXESUF): tests/nvme-test.o
-+tests/nvme-test$(EXESUF): tests/nvme-test.o $(libqos-pc-obj-y)
- tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
- tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
- tests/ac97-test$(EXESUF): tests/ac97-test.o
-diff --git a/tests/nvme-test.c b/tests/nvme-test.c
-index 7674a446e4..2abb3b6d19 100644
---- a/tests/nvme-test.c
-+++ b/tests/nvme-test.c
-@@ -8,11 +8,64 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "libqtest.h"
-+#include "libqos/libqos-pc.h"
-+
-+static QOSState *qnvme_start(const char *extra_opts)
-+{
-+    QOSState *qs;
-+    const char *arch =3D qtest_get_arch();
-+    const char *cmd =3D "-drive id=3Ddrv0,if=3Dnone,file=3Dnull-co://,fo=
-rmat=3Draw "
-+                      "-device nvme,addr=3D0x4.0,serial=3Dfoo,drive=3Ddr=
-v0 %s";
-+
-+    if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
-) {
-+        qs =3D qtest_pc_boot(cmd, extra_opts ? : "");
-+        global_qtest =3D qs->qts;
-+        return qs;
-+    }
-+
-+    g_printerr("nvme tests are only available on x86\n");
-+    exit(EXIT_FAILURE);
-+}
-+
-+static void qnvme_stop(QOSState *qs)
-+{
-+    qtest_shutdown(qs);
-+}
-=20
--/* Tests only initialization so far. TODO: Replace with functional tests=
- */
- static void nop(void)
- {
-+    QOSState *qs;
-+
-+    qs =3D qnvme_start(NULL);
-+    qnvme_stop(qs);
-+}
-+
-+static void nvmetest_cmb_test(void)
-+{
-+    const int cmb_bar_size =3D 2 * MiB;
-+    QOSState *qs;
-+    QPCIDevice *pdev;
-+    QPCIBar bar;
-+
-+    qs =3D qnvme_start("-global nvme.cmb_size_mb=3D2");
-+    pdev =3D qpci_device_find(qs->pcibus, QPCI_DEVFN(4,0));
-+    g_assert(pdev !=3D NULL);
-+
-+    qpci_device_enable(pdev);
-+    bar =3D qpci_iomap(pdev, 2, NULL);
-+
-+    qpci_io_writel(pdev, bar, 0, 0xccbbaa99);
-+    g_assert_cmpint(qpci_io_readb(pdev, bar, 0), =3D=3D, 0x99);
-+    g_assert_cmpint(qpci_io_readw(pdev, bar, 0), =3D=3D, 0xaa99);
-+
-+    /* Test partially out-of-bounds accesses.  */
-+    qpci_io_writel(pdev, bar, cmb_bar_size - 1, 0x44332211);
-+    g_assert_cmpint(qpci_io_readb(pdev, bar, cmb_bar_size - 1), =3D=3D, =
-0x11);
-+    g_assert_cmpint(qpci_io_readw(pdev, bar, cmb_bar_size - 1), !=3D, 0x=
-2211);
-+    g_assert_cmpint(qpci_io_readl(pdev, bar, cmb_bar_size - 1), !=3D, 0x=
-44332211);
-+    qnvme_stop(qs);
- }
-=20
- int main(int argc, char **argv)
-@@ -21,9 +74,8 @@ int main(int argc, char **argv)
-=20
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/nvme/nop", nop);
-+    qtest_add_func("/nvme/cmb_test", nvmetest_cmb_test);
-=20
--    qtest_start("-drive id=3Ddrv0,if=3Dnone,file=3Dnull-co://,format=3Dr=
-aw "
--                "-device nvme,drive=3Ddrv0,serial=3Dfoo");
-     ret =3D g_test_run();
-=20
-     qtest_end();
---=20
-2.19.1
+
+with commit message fixed
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  include/hw/i386/pc.h  |  1 -
+>  hw/acpi/pcihp.c       | 10 ++++------
+>  hw/pci-host/piix.c    |  8 --------
+>  stubs/pci-host-piix.c |  6 ------
+>  stubs/Makefile.objs   |  1 -
+>  5 files changed, 4 insertions(+), 22 deletions(-)
+>  delete mode 100644 stubs/pci-host-piix.c
+>=20
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 44cb6bf3f3..8e5f1464eb 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -255,7 +255,6 @@ PCIBus *i440fx_init(const char *host_type, const char=
+ *pci_type,
+>                      MemoryRegion *pci_memory,
+>                      MemoryRegion *ram_memory);
+> =20
+> -PCIBus *find_i440fx(void);
+>  /* piix4.c */
+>  extern PCIDevice *piix4_dev;
+>  int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
+> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+> index 80d42e12ff..254b2e50ab 100644
+> --- a/hw/acpi/pcihp.c
+> +++ b/hw/acpi/pcihp.c
+> @@ -93,10 +93,9 @@ static void *acpi_set_bsel(PCIBus *bus, void *opaque)
+>      return bsel_alloc;
+>  }
+> =20
+> -static void acpi_set_pci_info(void)
+> +static void acpi_set_pci_info(AcpiPciHpState *s)
+>  {
+>      static bool bsel_is_set;
+> -    PCIBus *bus;
+>      unsigned bsel_alloc =3D ACPI_PCIHP_BSEL_DEFAULT;
+> =20
+>      if (bsel_is_set) {
+> @@ -104,10 +103,9 @@ static void acpi_set_pci_info(void)
+>      }
+>      bsel_is_set =3D true;
+> =20
+> -    bus =3D find_i440fx(); /* TODO: Q35 support */
+> -    if (bus) {
+> +    if (s->root) {
+>          /* Scan all PCI buses. Set property to enable acpi based hotplug=
+. */
+> -        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_all=
+oc);
+> +        pci_for_each_bus_depth_first(s->root, acpi_set_bsel, NULL, &bsel=
+_alloc);
+>      }
+>  }
+> =20
+> @@ -213,7 +211,7 @@ static void acpi_pcihp_update(AcpiPciHpState *s)
+> =20
+>  void acpi_pcihp_reset(AcpiPciHpState *s)
+>  {
+> -    acpi_set_pci_info();
+> +    acpi_set_pci_info(s);
+>      acpi_pcihp_update(s);
+>  }
+> =20
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index 47293a3915..658460264b 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -445,14 +445,6 @@ PCIBus *i440fx_init(const char *host_type, const cha=
+r *pci_type,
+>      return b;
+>  }
+> =20
+> -PCIBus *find_i440fx(void)
+> -{
+> -    PCIHostState *s =3D OBJECT_CHECK(PCIHostState,
+> -                                   object_resolve_path("/machine/i440fx"=
+, NULL),
+> -                                   TYPE_PCI_HOST_BRIDGE);
+> -    return s ? s->bus : NULL;
+> -}
+> -
+>  /* PIIX3 PCI to ISA bridge */
+>  static void piix3_set_irq_pic(PIIX3State *piix3, int pic_irq)
+>  {
+> diff --git a/stubs/pci-host-piix.c b/stubs/pci-host-piix.c
+> deleted file mode 100644
+> index 6ed81b1f21..0000000000
+> --- a/stubs/pci-host-piix.c
+> +++ /dev/null
+> @@ -1,6 +0,0 @@
+> -#include "qemu/osdep.h"
+> -#include "hw/i386/pc.h"
+> -PCIBus *find_i440fx(void)
+> -{
+> -    return NULL;
+> -}
+> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+> index 5dd0aeeec6..725f78bedc 100644
+> --- a/stubs/Makefile.objs
+> +++ b/stubs/Makefile.objs
+> @@ -41,6 +41,5 @@ stub-obj-y +=3D pc_madt_cpu_entry.o
+>  stub-obj-y +=3D vmgenid.o
+>  stub-obj-y +=3D xen-common.o
+>  stub-obj-y +=3D xen-hvm.o
+> -stub-obj-y +=3D pci-host-piix.o
+>  stub-obj-y +=3D ram-block.o
+>  stub-obj-y +=3D ramfb.o
