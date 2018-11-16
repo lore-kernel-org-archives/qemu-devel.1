@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gNbrr-0000bo-1v
+	(envelope-from <clg@kaod.org>) id 1gNbrs-0000cE-D2
 	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:01:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gNbrm-00019n-0f
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:00:54 -0500
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:55060)
+	(envelope-from <clg@kaod.org>) id 1gNbrn-0001Ao-C2
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:00:56 -0500
+Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:35616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gNbri-0000xW-Vh
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:00:49 -0500
-Received: from player734.ha.ovh.net (unknown [10.109.160.46])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 5D1C6DC945
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 12:00:29 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gNbrm-0000co-Un
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:00:51 -0500
+Received: from player734.ha.ovh.net (unknown [10.109.160.39])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 448A4E308E
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 12:00:12 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 16 Nov 2018 11:57:23 +0100
-Message-Id: <20181116105729.23240-31-clg@kaod.org>
+Date: Fri, 16 Nov 2018 11:57:20 +0100
+Message-Id: <20181116105729.23240-28-clg@kaod.org>
 In-Reply-To: <20181116105729.23240-1-clg@kaod.org>
 References: <20181116105729.23240-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 30/36] spapr: check for KVM IRQ device
- activation
+Subject: [Qemu-devel] [PATCH v5 27/36] sysbus: add a sysbus_mmio_unmap()
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,85 +33,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The KVM IRQ device activation will depend on the interrupt mode chosen
-at CAS time by the machine and some methods used at reset or by the
-migration need to be protected.
+This will be used to remove the MMIO regions of the POWER9 XIVE
+interrupt controller when the sPAPR machine is reseted.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/spapr_xive_kvm.c |  5 +++++
- hw/intc/xics_kvm.c       | 20 ++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+ include/hw/sysbus.h |  1 +
+ hw/core/sysbus.c    | 10 ++++++++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index 176083c37d61..b9fee4ea240f 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -656,6 +656,11 @@ static int spapr_xive_kvm_pre_save(sPAPRXive *xive)
-     int i;
-     int ret =3D 0;
+diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+index 0b59a3b8d605..bc641984b5da 100644
+--- a/include/hw/sysbus.h
++++ b/include/hw/sysbus.h
+@@ -92,6 +92,7 @@ qemu_irq sysbus_get_connected_irq(SysBusDevice *dev, in=
+t n);
+ void sysbus_mmio_map(SysBusDevice *dev, int n, hwaddr addr);
+ void sysbus_mmio_map_overlap(SysBusDevice *dev, int n, hwaddr addr,
+                              int priority);
++void sysbus_mmio_unmap(SysBusDevice *dev, int n);
+ void sysbus_add_io(SysBusDevice *dev, hwaddr addr,
+                    MemoryRegion *mem);
+ MemoryRegion *sysbus_address_space(SysBusDevice *dev);
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index 7ac36ad3e707..09f202167dcb 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -153,6 +153,16 @@ static void sysbus_mmio_map_common(SysBusDevice *dev=
+, int n, hwaddr addr,
+     }
+ }
 =20
-+    /* The KVM XIVE device is not in use */
-+    if (xive->fd =3D=3D -1) {
-+        return 0;
-+    }
++void sysbus_mmio_unmap(SysBusDevice *dev, int n)
++{
++    assert(n >=3D 0 && n < dev->num_mmio);
 +
-     /* Quiesce the sources, to stop the flow of event notifications */
-     for (i =3D 0; i < xsrc->nr_irqs; i++) {
-         /*
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 9662e208fa81..eabc901a4556 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -58,6 +58,11 @@ static void icp_get_kvm_state(ICPState *icp)
-     uint64_t state;
-     int ret;
-=20
-+    /* The KVM XICS device is not in use */
-+    if (kernel_xics_fd =3D=3D -1) {
-+        return;
++    if (dev->mmio[n].addr !=3D (hwaddr)-1) {
++        memory_region_del_subregion(get_system_memory(), dev->mmio[n].me=
+mory);
++        dev->mmio[n].addr =3D (hwaddr)-1;
 +    }
++}
 +
-     /* ICP for this CPU thread is not in use, exiting */
-     if (!icp->cs) {
-         return;
-@@ -94,6 +99,11 @@ static int icp_set_kvm_state(ICPState *icp, int versio=
-n_id)
-     uint64_t state;
-     int ret;
-=20
-+    /* The KVM XICS device is not in use */
-+    if (kernel_xics_fd =3D=3D -1) {
-+        return 0;
-+    }
-+
-     /* ICP for this CPU thread is not in use, exiting */
-     if (!icp->cs) {
-         return 0;
-@@ -209,6 +219,11 @@ static void ics_get_kvm_state(ICSState *ics)
-     uint64_t state;
-     int i;
-=20
-+    /* The KVM XICS device is not in use */
-+    if (kernel_xics_fd =3D=3D -1) {
-+        return;
-+    }
-+
-     for (i =3D 0; i < ics->nr_irqs; i++) {
-         ICSIRQState *irq =3D &ics->irqs[i];
-=20
-@@ -268,6 +283,11 @@ static int ics_set_kvm_state(ICSState *ics, int vers=
-ion_id)
-     int i;
-     Error *local_err =3D NULL;
-=20
-+    /* The KVM XICS device is not in use */
-+    if (kernel_xics_fd =3D=3D -1) {
-+        return 0;
-+    }
-+
-     for (i =3D 0; i < ics->nr_irqs; i++) {
-         ICSIRQState *irq =3D &ics->irqs[i];
-         int ret;
+ void sysbus_mmio_map(SysBusDevice *dev, int n, hwaddr addr)
+ {
+     sysbus_mmio_map_common(dev, n, addr, false, 0);
 --=20
 2.17.2
