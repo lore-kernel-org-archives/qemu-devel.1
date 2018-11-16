@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gNgRC-0002E7-Rw
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:53:48 -0500
+	(envelope-from <berrange@redhat.com>) id 1gNgRL-0002JJ-Pq
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:53:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gNgR3-0000Yq-Ow
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:53:34 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 16 Nov 2018 16:53:01 +0100
-Message-Id: <20181116155302.22472-3-mreitz@redhat.com>
-In-Reply-To: <20181116155302.22472-1-mreitz@redhat.com>
-References: <20181116155302.22472-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-3.1? 2/3] file-posix: Fix shared locks on
- reopen commit
+	(envelope-from <berrange@redhat.com>) id 1gNgRE-0000b2-A1
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:53:49 -0500
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 16 Nov 2018 15:53:19 +0000
+Message-Id: <20181116155325.22428-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/6] Misc fixes to NBD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,31 +20,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-s->locked_shared_perm is the set of bits locked in the file, which is
-the inverse of the permissions actually shared.  So we need to pass them
-as they are to raw_apply_lock_bytes() instead of inverting them again.
+This does two minor fixes to the NBD code and adds significant coverage
+of the NBD TLS support to detect future problems.
 
-Reported-by: Alberto Garcia <berto@igalia.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/file-posix.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The first two patches should be for 3.1.
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index df3a8d7cdf..8460d003f0 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -963,7 +963,7 @@ static void raw_reopen_commit(BDRVReopenState *state)
- 
-     /* Copy locks to the new fd before closing the old one. */
-     raw_apply_lock_bytes(NULL, rs->fd, s->locked_perm,
--                         ~s->locked_shared_perm, false, &local_err);
-+                         s->locked_shared_perm, false, &local_err);
-     if (local_err) {
-         /* shouldn't fail in a sane host, but report it just in case. */
-         error_report_err(local_err);
--- 
-2.17.2
+The tests can wait till 4.0 if desired.
+
+Daniel P. Berrang=C3=A9 (6):
+  nbd: fix whitespace in server error message
+  nbd: stop waiting for a NBD response with NBD_CMD_DISC
+  tests: pull qemu-nbd iotest helpers into common.nbd file
+  tests: check if qemu-nbd is still alive before waiting
+  tests: add iotests helpers for dealing with TLS certificates
+  tests: exercise NBD server in TLS mode
+
+ block/nbd-client.c            |   1 +
+ nbd/server.c                  |   2 +-
+ tests/qemu-iotests/058        |  47 ++----------
+ tests/qemu-iotests/233        |  99 ++++++++++++++++++++++++
+ tests/qemu-iotests/233.out    |  33 ++++++++
+ tests/qemu-iotests/common.nbd | 111 +++++++++++++++++++++++++++
+ tests/qemu-iotests/common.tls | 139 ++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group      |   1 +
+ 8 files changed, 393 insertions(+), 40 deletions(-)
+ create mode 100755 tests/qemu-iotests/233
+ create mode 100644 tests/qemu-iotests/233.out
+ create mode 100644 tests/qemu-iotests/common.nbd
+ create mode 100644 tests/qemu-iotests/common.tls
+
+--=20
+2.19.1
