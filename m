@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gNfli-0008NY-6B
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:10:50 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gNfov-0001EU-B0
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:14:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gNfld-00044d-Rs
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:10:49 -0500
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:47341)
+	(envelope-from <cohuck@redhat.com>) id 1gNfos-0005c2-6m
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:14:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44252)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gNflT-0003tk-Pp
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:10:38 -0500
-Date: Fri, 16 Nov 2018 10:10:34 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181116151034.GA19881@flamenco>
-References: <20181112214503.22941-1-richard.henderson@linaro.org>
-	<20181114010014.GA19024@flamenco>
-	<d15fa143-ab52-3de9-29f0-ff794cec6ac3@linaro.org>
-	<20181115184827.GA12024@flamenco>
-	<06e66024-1abb-e5b7-591c-3633b5cb3e31@linaro.org>
-	<20181116011338.GB17566@flamenco>
-	<97154616-dbef-a407-2e52-e09b21f3a0eb@linaro.org>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gNfor-0005bC-SE
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:14:06 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B4D423097063
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 15:14:03 +0000 (UTC)
+Date: Fri, 16 Nov 2018 16:14:00 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181116161400.1e3c2669.cohuck@redhat.com>
+In-Reply-To: <1c020087-acd7-302a-d5be-dcdbf7b7084d@redhat.com>
+References: <20181026105711.29605-1-cohuck@redhat.com>
+	<20181115172032.53945f5e.cohuck@redhat.com>
+	<1c020087-acd7-302a-d5be-dcdbf7b7084d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <97154616-dbef-a407-2e52-e09b21f3a0eb@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 00/17] tcg: Move softmmu out-of-line
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC] MAINTAINERS: clarify some of the tags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +34,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
+To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-On Fri, Nov 16, 2018 at 09:10:32 +0100, Richard Henderson wrote:
-> On 11/16/18 2:13 AM, Emilio G. Cota wrote:
-> > This allows us to discard most TBs; in the example above,
-> > we end up *not* discarding only ~70 TBs, that is we end up keeping
-> > only 70/2500 = 2.8% of the TBs that we'd discard without OOL.
+On Thu, 15 Nov 2018 10:46:21 -0600
+Eric Blake <eblake@redhat.com> wrote:
+
+> On 11/15/18 10:20 AM, Cornelia Huck wrote:
+> > On Fri, 26 Oct 2018 12:57:11 +0200
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >   
+> >> The MAINTAINERS file is a bit sparse on information about what
+> >> the different designators are. Let's add some more information
+> >> to give contributors a better idea about what the different
+> >> roles are.
+> >>
+> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >> ---
+> >>
+> >> This came out of a discussion about what being a 'reviewer' listed in
+> >> this file actually means. A reviewer probably should already have a
+> >> track record of doing helpful reviews before being listed in here.
+> >>
+> >> While at it, I also tried to add some more hints for the other entries.
+> >> This patch is supposed to be a starting point for further discussion.  
+> > 
+> > Ping. Further discussion would be good :)  
 > 
-> Thanks.
+> Recent threads have mentioned the possibility of potentially adding a 
+> new category P: for the person that submits pull requests, although I'm 
+> not quite sure how that is different from M: as a maintainer
+
+Let's wait how that discussion turns out (I'm not quite sure about the
+semantics, either.) We can document it then.
+
 > 
-> When I apply this I think I'll rename "n_ool_thunks" to "ool_generation".  We
-> don't care about the absolute count, but any change.
+> >> +++ b/MAINTAINERS
+> >> @@ -12,9 +12,14 @@ consult qemu-devel and not any specific individual privately.
+> >>   Descriptions of section entries:
+> >>   
+> >>   	M: Mail patches to: FullName <address@domain>
+> >> +	   Maintainers are looking after a certain area and must be CCed on
+> >> +	   patches. They are considered the main contact point.  
+> 
+> Maybe add something along the lines of "However, a maintainer may accept 
+> code that has been reviewed by others without explicitly reviewing it 
+> themselves"?
 
-Agreed, that's much better.
+I'm not sure whether that adds vital information. If a maintainer picks
+a patch that has been reviewed by others, they may or may not do a
+proper review themselves; but the end result is basically the same
+(patch makes its way into the tree.)
 
-Thanks,
+> 
+> >>   	R: Designated reviewer: FullName <address@domain>
+> >>   	   These reviewers should be CCed on patches.
+> >> +	   Reviewers are familiar with the subject matter and provide feedback
+> >> +	   even though they are not maintainers.
+> >>   	L: Mailing list that is relevant to this area
+> >> +	   These lists should be CCed on patches.
+> >>   	W: Web-page with status/info
+> >>   	Q: Patchwork web based patch tracking system site
+> >>   	T: SCM tree type and location.  Type is one of: git, hg, quilt, stgit.  
+> >   
+> 
+> At any rate, I like the idea of adding the additional descriptions for 
+> the categories, even if we still bike-shed on the wording or even the 
+> set of categories to use.
 
-		E.
+What about going with this as a starting point?
