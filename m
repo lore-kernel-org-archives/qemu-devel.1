@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gNXTR-00071h-Ar
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 01:19:26 -0500
+	(envelope-from <thuth@redhat.com>) id 1gNY6y-0006eb-1z
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 02:00:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gNXTQ-0003iu-1u
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 01:19:25 -0500
-References: <20181115143535.5885-1-peter.maydell@linaro.org>
-	<20181115143535.5885-3-peter.maydell@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1gNY6u-0000Ej-P3
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 02:00:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46676)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gNY6u-0000Dw-Gf
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 02:00:12 -0500
+References: <20181115123218.25387-1-kraxel@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <fe946842-bd54-2db9-c064-44d551c52a2f@redhat.com>
-Date: Fri, 16 Nov 2018 07:19:10 +0100
+Message-ID: <c53234c7-60ed-20bb-7856-777113b018a6@redhat.com>
+Date: Fri, 16 Nov 2018 08:00:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181115143535.5885-3-peter.maydell@linaro.org>
+In-Reply-To: <20181115123218.25387-1-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] hw/block/onenand: use
- qemu_log_mask() for reporting
+Subject: Re: [Qemu-devel] [PATCH 0/4] keymaps: drop support for include files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +27,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <richard.henderson@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Li Qiang <liq3ea@gmail.com>
 
-On 2018-11-15 15:35, Peter Maydell wrote:
-> Update the onenand device to use qemu_log_mask() for reporting
-> guest errors and unimplemented features, rather than plain
-> fprintf() and hw_error().
-> 
-> (We leave the hw_error() in onenand_reset(), as that is
-> triggered by a failure to read the underlying block device
-> for the bootRAM, not by guest action.)
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/block/onenand.c | 22 +++++++++++++---------
->  1 file changed, 13 insertions(+), 9 deletions(-)
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+On 2018-11-15 13:32, Gerd Hoffmann wrote:
+> Gerd Hoffmann (4):
+>   keymaps: remove modifiers include
+>   keymaps: drop nl-be map
+>   keymaps: remove common include
+>   keymaps: drop support for include files
+
+Please give some rationale in the cover letter... why do you want to
+drop support for this?
+
+ Thomas
