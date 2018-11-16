@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gNd0k-0007Nw-Tb
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 07:14:11 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gNd1V-0007nF-2f
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 07:14:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gNd0g-0007OD-TT
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 07:14:10 -0500
-Received: from mail-eopbgr720133.outbound.protection.outlook.com
-	([40.107.72.133]:12000
-	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
-	id 1gNd0g-0007NK-Ms
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 07:14:06 -0500
-From: Stefan Markovic <smarkovic@wavecomp.com>
-Date: Fri, 16 Nov 2018 12:14:03 +0000
-Message-ID: <de562dc8-f335-01f0-fe1e-1101377b8d31@wavecomp.com>
-References: <1542297583-6494-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1542297583-6494-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <134DE29D8B881A498598E7502A2A57A3@namprd22.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mreitz@redhat.com>) id 1gNd1T-0007k0-Vu
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 07:14:57 -0500
+References: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
+	<w511s7p9fkk.fsf@maestria.local.igalia.com>
+	<462138b3-e9e7-29e5-da55-d0ebd626aee7@redhat.com>
+	<w51efbmh0tp.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <2e1b90ae-1a0c-711a-6ef8-3c814335f696@redhat.com>
+Date: Fri, 16 Nov 2018 13:14:37 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add Stefan Markovic as a MIPS
- reviewer
+In-Reply-To: <w51efbmh0tp.fsf@maestria.local.igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mM1NaSlAinvG59ziLpLAMNJdu7hbBBT4M"
+Subject: Re: [Qemu-devel] KVM Forum block no[td]es
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +26,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>
+To: Alberto Garcia <berto@igalia.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-DQpPbiAxNS4xMS4xOC4gMTY6NTksIEFsZWtzYW5kYXIgTWFya292aWMgd3JvdGU6DQo+IEZyb206
-IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+DQo+IEFkZCBT
-dGVmYW4gTWFya292aWMgYXMgYSBNSVBTIHJldmlld2VyLiBIZSBoYWQgc2V2ZXJhbCBrZXkNCj4g
-Y29udHJpYnV0aW9ucyB0byBRRU1VIGZvciBNSVBTIHRoaXMgeWVhci4gSGUgaXMgYSBtZXRpY3Vs
-b3VzDQo+IHBlcnNvbiB3aXRoIHRoZSBhYmlsaXR5IHRvIHRoaW5rIGFuZCBhY3Qgb24gbWFueSBs
-ZXZlbHMuDQo+DQo+IFNpZ25lZC1vZmYtYnk6IEFsZWtzYW5kYXIgTWFya292aWMgPGFtYXJrb3Zp
-Y0B3YXZlY29tcC5jb20+DQo+IC0tLQ0KPiAgIE1BSU5UQUlORVJTIHwgOSArKysrKysrKysNCj4g
-ICAxIGZpbGUgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspDQoNCg0KUmV2aWV3ZWQtYnk6IFN0ZWZh
-biBNYXJrb3ZpYyA8c21hcmtvdmljQHdhdmVjb21wLmNvbT4NCg0KDQo+IGRpZmYgLS1naXQgYS9N
-QUlOVEFJTkVSUyBiL01BSU5UQUlORVJTDQo+IGluZGV4IDRiOGRiNjEuLmY3MTgyNjQgMTAwNjQ0
-DQo+IC0tLSBhL01BSU5UQUlORVJTDQo+ICsrKyBiL01BSU5UQUlORVJTDQo+IEBAIC0xOTAsNiAr
-MTkwLDcgQEAgRjogZGlzYXMvbWljcm9ibGF6ZS5jDQo+ICAgTUlQUw0KPiAgIE06IEF1cmVsaWVu
-IEphcm5vIDxhdXJlbGllbkBhdXJlbDMyLm5ldD4NCj4gICBNOiBBbGVrc2FuZGFyIE1hcmtvdmlj
-IDxhbWFya292aWNAd2F2ZWNvbXAuY29tPg0KPiArUjogU3RlZmFuIE1hcmtvdmljIDxzbWFya292
-aWNAd2F2ZWNvbXAuY29tPg0KPiAgIFM6IE1haW50YWluZWQNCj4gICBGOiB0YXJnZXQvbWlwcy8N
-Cj4gICBGOiBody9taXBzLw0KPiBAQCAtMzM2LDYgKzMzNyw3IEBAIEY6IHRhcmdldC9hcm0va3Zt
-LmMNCj4gICANCj4gICBNSVBTDQo+ICAgTTogSmFtZXMgSG9nYW4gPGpob2dhbkBrZXJuZWwub3Jn
-Pg0KPiArUjogU3RlZmFuIE1hcmtvdmljIDxzbWFya292aWNAd2F2ZWNvbXAuY29tPg0KPiAgIFM6
-IE1haW50YWluZWQNCj4gICBGOiB0YXJnZXQvbWlwcy9rdm0uYw0KPiAgIA0KPiBAQCAtNzQxLDI3
-ICs3NDMsMzIgQEAgTUlQUyBNYWNoaW5lcw0KPiAgIC0tLS0tLS0tLS0tLS0NCj4gICBKYXp6DQo+
-ICAgTTogSGVydsOpIFBvdXNzaW5lYXUgPGhwb3Vzc2luQHJlYWN0b3Mub3JnPg0KPiArUjogU3Rl
-ZmFuIE1hcmtvdmljIDxzbWFya292aWNAd2F2ZWNvbXAuY29tPg0KPiAgIFM6IE1haW50YWluZWQN
-Cj4gICBGOiBody9taXBzL21pcHNfamF6ei5jDQo+ICAgDQo+ICAgTWFsdGENCj4gICBNOiBBdXJl
-bGllbiBKYXJubyA8YXVyZWxpZW5AYXVyZWwzMi5uZXQ+DQo+ICtSOiBTdGVmYW4gTWFya292aWMg
-PHNtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+ICAgUzogTWFpbnRhaW5lZA0KPiAgIEY6IGh3L21p
-cHMvbWlwc19tYWx0YS5jDQo+ICAgDQo+ICAgTWlwc3NpbQ0KPiAgIE06IEFsZWtzYW5kYXIgTWFy
-a292aWMgPGFtYXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+ICtSOiBTdGVmYW4gTWFya292aWMgPHNt
-YXJrb3ZpY0B3YXZlY29tcC5jb20+DQo+ICAgUzogT2RkIEZpeGVzDQo+ICAgRjogaHcvbWlwcy9t
-aXBzX21pcHNzaW0uYw0KPiAgIEY6IGh3L25ldC9taXBzbmV0LmMNCj4gICANCj4gICBSNDAwMA0K
-PiAgIE06IEF1cmVsaWVuIEphcm5vIDxhdXJlbGllbkBhdXJlbDMyLm5ldD4NCj4gK1I6IFN0ZWZh
-biBNYXJrb3ZpYyA8c21hcmtvdmljQHdhdmVjb21wLmNvbT4NCj4gICBTOiBNYWludGFpbmVkDQo+
-ICAgRjogaHcvbWlwcy9taXBzX3I0ay5jDQo+ICAgDQo+ICAgRnVsb25nIDJFDQo+ICAgTTogQWxl
-a3NhbmRhciBNYXJrb3ZpYyA8YW1hcmtvdmljQHdhdmVjb21wLmNvbT4NCj4gK1I6IFN0ZWZhbiBN
-YXJrb3ZpYyA8c21hcmtvdmljQHdhdmVjb21wLmNvbT4NCj4gICBTOiBPZGQgRml4ZXMNCj4gICBG
-OiBody9taXBzL21pcHNfZnVsb25nMmUuYw0KPiAgIEY6IGh3L2lzYS92dDgyYzY4Ni5jDQo+IEBA
-IC03NzAsNiArNzc3LDcgQEAgRjogaW5jbHVkZS9ody9pc2EvdnQ4MmM2ODYuaA0KPiAgIA0KPiAg
-IEJvc3Rvbg0KPiAgIE06IFBhdWwgQnVydG9uIDxwYnVydG9uQHdhdmVjb21wLmNvbT4NCj4gK1I6
-IFN0ZWZhbiBNYXJrb3ZpYyA8c21hcmtvdmljQHdhdmVjb21wLmNvbT4NCj4gICBTOiBNYWludGFp
-bmVkDQo+ICAgRjogaHcvY29yZS9sb2FkZXItZml0LmMNCj4gICBGOiBody9taXBzL2Jvc3Rvbi5j
-DQo+IEBAIC0xOTkyLDYgKzIwMDAsNyBAQCBGOiBkaXNhcy9pMzg2LmMNCj4gICANCj4gICBNSVBT
-IHRhcmdldA0KPiAgIE06IEF1cmVsaWVuIEphcm5vIDxhdXJlbGllbkBhdXJlbDMyLm5ldD4NCj4g
-K1I6IFN0ZWZhbiBNYXJrb3ZpYyA8c21hcmtvdmljQHdhdmVjb21wLmNvbT4NCj4gICBTOiBNYWlu
-dGFpbmVkDQo+ICAgRjogdGNnL21pcHMvDQo+ICAgRjogZGlzYXMvbWlwcy5jDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mM1NaSlAinvG59ziLpLAMNJdu7hbBBT4M
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2e1b90ae-1a0c-711a-6ef8-3c814335f696@redhat.com>
+Subject: Re: KVM Forum block no[td]es
+References: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
+ <w511s7p9fkk.fsf@maestria.local.igalia.com>
+ <462138b3-e9e7-29e5-da55-d0ebd626aee7@redhat.com>
+ <w51efbmh0tp.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51efbmh0tp.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 15.11.18 15:28, Alberto Garcia wrote:
+> On Wed 14 Nov 2018 06:24:10 PM CET, Max Reitz wrote:
+>>>> Permission system
+>>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>>>
+>>>> GRAPH_MOD
+>>>> ---------
+>>>>
+>>>> We need some way for the commit job to prevent graph changes on its
+>>>> chain while it is running.  Our current blocker doesn=E2=80=99t do t=
+he job,
+>>>> however.  What to do?
+>>>>
+>>>> - We have no idea how to make a *permission* work.  Maybe the bigges=
+t
+>>>>   problem is that it just doesn=E2=80=99t work as a permission, beca=
+use the
+>>>>   commit job doesn=E2=80=99t own the BdrvChildren that would need to=
+ be
+>>>>   blocked (namely the @backing BdrvChild).
+>>>
+>>> What I'm doing at the moment in my blockdev-reopen series is check
+>>> whether all parents of the node I want to change share the GRAPH_MOD
+>>> permission. If any of them doesn't then the operation fails.
+>>>
+>>> This can be checked by calling bdrv_get_cumulative_perm() or simply
+>>> bdrv_check_update_perm(..., BLK_PERM_GRAPH_MOD, ...).
+>>
+>> Sure.
+>>
+>>> It solves the problem because e.g. the stream block job only allows
+>>> BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED, so no graph
+>>> modifications allowed.
+>>
+>> But the problem is that the commit job needs to unshare the permission=
+
+>> on all backing links between base and top, so none of the backing
+>> links can be broken.  But it cannot do that because those backing
+>> links do not belong to it (but to the respective overlay nodes).
+>=20
+> I'm not sure if I'm following you. The commit block job has references
+> to all intermediate nodes (with block_job_add_bdrv()) and only shares
+> BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE. Anyone trying to obtain
+> BLK_PERM_GRAPH_MOD on an intermediate node would see that the block job=
+
+> doesn't allow it.
+
+But first of all, why would anyone try to obtain it?  You only obtain a
+permission when you attach a new parent (or when an existing parent
+tries to change the ones it has).
+
+For instance, in the commit case, if you just remove a backing link,
+then the chain is clearly broken and the graph has been modified, but
+noone will have taken any permission to do so.
+
+But even beyond that, commit doesn't care about all of the graph.  All
+it cares about are the backing links.  So it should not prevent anyone
+else from changing any links outside of the backing chain (which a
+permission would clearly do).
+
+Let me give a concrete example:
+
+top (T) -> intermediate (I) -> base (B)
+
+Now you commit from top to base.  Clearly you don't want the backing
+chain between top and base to change.  So say you unshare the GRAPH_MOD
+permission (implying that whenever a parent doesn't care, it just shares
+it).  But as said above, if someone just drops the backing link from I
+to B, the permission system won't catch that.
+
+The next thing is that how would you even try to catch it in the first
+place?  The normal case would be for everything to both share and claim
+the GRAPH_MOD permission, the latter so it can see if something unshared
+it.  But that would mean that everything is holding that permission all
+the time and it's impossible to unshare it.
+
+(You'd take the GRAPH_MOD permission for the backing link from I to B,
+and then commit couldn't unshare it because, well, it's taken already.)
+
+So the solution might be to take it first, and release it after having
+attached the child.  And maybe you'd say that for the removal case,
+you'd have to take the GRAPH_MOD permission before you remove any child.
+ But I think that's weird, and also, there's another issue still.
+
+
+What if you try to attach a read-only NBD server to B?  That should be
+OK in my mind.  But it is a graph change, so it wouldn't be allowed if
+GRAPH_MOD is a permission, even though commit doesn't care at all.
+
+The fact is that commit clearly only cares about edges it is not
+involved in as either parent or child (the backing links), and therefore
+has not control over the permissions taken.  It does not care about any
+other edges, which is different from what permissions do, because they
+always apply to a whole set of edges.
+
+
+I don't think anything needs a way to generally block graph changes
+around some node.  We only need to prevent changes to very specific sets
+of edges.  This is something that the permission system just cannot do.
+
+>>>>   (We never quite knew what =E2=80=9Ctaking the GRAPH_PERMISSION=E2=80=
+=9D or
+>>>>   =E2=80=9Cunsharing the GRPAH_MOD permission=E2=80=9D was supposed =
+to mean.
+>>>>   Figuring that out always took like half an our in any face-to-face=
+
+>>>>   meeting, and then we decided it was pretty much useless for any
+>>>>   case we had at hand.)
+>>>
+>>> Yeah it's a bit unclear. It can mean "none of this node's children
+>>> can be replaced / removed", which is what I'm using it for at the
+>>> moment.
+>>
+>> Yes, but that's just not useful.  I don't think we have any case where=
+
+>> something would be annoyed by having its immediate child replaced
+>> (other than the visible data changing, potentially).  Usually when we
+>> say something (e.g. a block job) wants to prevent graph modification,
+>> it's about changing edges that exist independently of the job (such as=
+
+>> a backing chain).
+>=20
+> Isn't that what I just said? You cannot change other edges <=3D> you
+> cannot replace a node's children (or parents).
+
+Hm, true, but I think it's (1) hard to understand, (2) would require
+non-trivial changes to the current model anyway (take GRAPH_MOD before
+any modification, release it afterwards (which is quite different from
+any other permission anyway)), and (3) would be too restrictive.
+
+Max
+
+
+--mM1NaSlAinvG59ziLpLAMNJdu7hbBBT4M
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlvutK0ACgkQ9AfbAGHV
+z0BV8wf/TX8vg0QSPDnXkGtoXAlayTFtxOHeYYUce66YJ7M5sPjMU5uTJ+B6nckp
+cgP1B6a0tWNVtGes8v8+ht1uLoyaByaO8aHGh5u1WBkX43QCVbQK0YvBZKR1ZuEI
+f1JwI9qGrOGPwFYVh5tMwFp574DCLSRAgF+bXBkATWA+S1jmJlueGAiJcJ8Mu+X/
+dHZWflcqwEi6DljBp09Xs8kSFwH4fI05/le8227pEnLoM7NdBiTW9HmGvDeqyt0u
+39QxKfArgLclXx/QxUQfnsFtvLktipzNHgDnDyww4kxeREaNv07W1FUvZ6q8zS9b
+E5Xxb5ZbRy5fj5xW8/9LP5yvpDO2XQ==
+=zhRO
+-----END PGP SIGNATURE-----
+
+--mM1NaSlAinvG59ziLpLAMNJdu7hbBBT4M--
