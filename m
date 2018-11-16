@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1gNZPW-0003Ph-9Y
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:23:31 -0500
+	(envelope-from <xiezhide@huawei.com>) id 1gNZQp-00043l-EQ
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:24:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1gNZPU-0001X9-Tf
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:23:30 -0500
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:44899)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1gNZPU-0001Wt-GD
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:23:28 -0500
-Received: by mail-lj1-x241.google.com with SMTP id k19-v6so19541352lji.11
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 00:23:28 -0800 (PST)
+	(envelope-from <xiezhide@huawei.com>) id 1gNZQl-0002nm-I9
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:24:51 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2348 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gNZQl-0002m4-5E
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 03:24:47 -0500
+From: xiezhide <xiezhide@huawei.com>
+Date: Fri, 16 Nov 2018 08:24:32 +0000
+Message-ID: <A02D6AA901860840B46E751C5E9E38B43CC975E3@DGGEML532-MBX.china.huawei.com>
+References: <cover.1542301855.git.xiezhide@huawei.com>
+	<0fcad1d4a27bcf9066d3349e8f1a8af6dfe3bb6e.1542301855.git.xiezhide@huawei.com>
+	<078c1065-1e36-5f70-92f0-044b0d4daefe@redhat.com>
+In-Reply-To: <078c1065-1e36-5f70-92f0-044b0d4daefe@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1539939312-19713-1-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA-gt4aLx171zU=qzbzygL6AN98HEPmL6iKG2O6E31ka4A@mail.gmail.com>
-In-Reply-To: <CAFEAcA-gt4aLx171zU=qzbzygL6AN98HEPmL6iKG2O6E31ka4A@mail.gmail.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Fri, 16 Nov 2018 16:23:15 +0800
-Message-ID: <CAHmQWvA7fyCFz-qE2_B1SHH+29gns5m_tccLSwF_GTs52LV9Lw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4] Add arm SBSA reference machine
+Subject: Re: [Qemu-devel] [PATCH v4 1/4] fsdev-throttle-qmp: factor out
+ throttle code to reuse code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,153 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "groug@kaod.org" <groug@kaod.org>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>, "armbru@redhat.com" <armbru@redhat.com>, "berto@igalia.com" <berto@igalia.com>, zengcanfu 00215970 <zengcanfu@huawei.com>, Jinxuefeng <jinxuefeng@huawei.com>, "Chenhui (Felix, Euler)" <chenhui.rtos@huawei.com>
 
-On Fri, 16 Nov 2018 at 00:21, Peter Maydell <peter.maydell@linaro.org> wrot=
-e:
->
-> On 19 October 2018 at 09:55, Hongbo Zhang <hongbo.zhang@linaro.org> wrote=
-:
-> > there are two commit reverts I have to do to boot system currently, the=
-se block not only my new 'sbsa-ref', but also the 'virt'.
-> > (other two workarounds can be ignored, they are just for temp using bef=
-ore firmware porting is fully finished)
-> >
-> > I am not saying the comments themselves have problem, maybe firmware ne=
-ed to be adapted accordingly too. But before they are fixed, I just simply =
-revert them to not block my run.
-> > (And, I've mentioned in v3 list that there are still problem of booting=
- SMP too, but I won't mention it here this time, otherwise this patch/cover=
- letter becomes too complicated -- at least we can boot one core, I can fix=
-/discuss it later separately.)
->
-> We do need to investigate and at least understand all these issues
-> before we can take this new board. Thanks for the repro instructions
-> for the virt board.
->
-Well, for the SMP booting, when GICv2 used, there is no problem, max
-CPU number 8 can be booted, including all the three cases: kernel
-only, UEFI+kernel and ATF+UEFI+kernel.
-
-But when GICv3 used, these two cases still work: kernel only, and
-UEFI+kernel, but ATF+UEFI+kernel fails booting more than 4 cores with
-GICv3.
-The original ATF didn't support GICv3, so I added the support:
-http://git.linaro.org/people/hongbo.zhang/atf-sbsa.git/log/?h=3Dsbsa_gicv3
-
-Root cause of failing to boot more than 4 cores with ATF+UEFI+kernel
-with my GICv3 enabled is due to this:
-In QEMU, we have this defination
-#define ARM_DEFAULT_CPUS_PER_CLUSTER 8
-But in ATF, the defination is
-#define PLATFORM_MAX_CPUS_PER_CLUSTER 4
-So when we pass smp=3D6 for example, QEMU generates MPIDR showing all
-the 6 cores are at cluster 0, but when ATF parses such MPIDR, the
-function plat_core_pos_by_mpidr() in plat/qemu/topology.c returns
-error since there should be no more cores than 4.
-
-I think we should change the definition in QEMU to 4, instead of
-changing the ATF's, because I checked Cortext a57/a72/a73/a75 spec, it
-says there are 4 cores max at one cluster.
-
-> > Steps to reproduce issues:
-> > 1. Compile ARMTF
-> > make CROSS_COMPILE=3Daarch64-linux-gnu- PLAT=3Dqemu all DEBUG=3D1
->
-> What source tree do I need to build this EDK ?
->
-I use https://github.com/ARM-software/arm-trusted-firmware.git
-And you can also use my
-http://git.linaro.org/people/hongbo.zhang/atf-sbsa.git/log/?h=3Dsbsa_gicv3
-with GICv3 enabled.
-
-Use additional compiling parameter QEMU_USE_GIC_DRIVER to selecct GICv3
-"make PLAT=3Dqemu all DEBUG=3D1 QEMU_USE_GIC_DRIVER=3DQEMU_GICV3"
-No such parameter to select default GICv2
-(But I found if you change GICv2 and v3 from time to time when
-compiling, the build system may not do the correct changing every
-time, so it is better to do a clean before compiling)
-
-> > 2. Compile edk2
-> > make -C BaseTools
-> > . edksetup.sh
-> > export GCC49_AARCH64_PREFIX=3Daarch64-linux-gnu-
-> > build -a AARCH64 -t GCC49 -p ArmVirtPkg/ArmVirtQemuKernel.dsc
-> >
-> > 3. Run QEMU
-> > 3a. copy or link ARMTF and edk2 images to the directory where you want =
-to launch QEMU
-> > bl1.bin -> /home/hongbo/work/arm-trusted-firmware/build/qemu/debug/bl1.=
-bin*
-> > bl2.bin -> /home/hongbo/work/arm-trusted-firmware/build/qemu/debug/bl2.=
-bin*
-> > bl31.bin -> /home/hongbo/work/arm-trusted-firmware/build/qemu/debug/bl3=
-1.bin*
-> > bl33.bin -> /home/hongbo/work/edk2/Build/ArmVirtQemuKernel-AARCH64/DEBU=
-G_GCC49/FV/QEMU_EFI.fd
-> >
-> > 3b. command to launch QEMU
-> > command1 to load a whole system
-> > qemu-system-aarch64 -machine virt,secure=3Don,virtualization=3Don -cpu =
-cortex-a57 -m 1024 -bios bl1.bin -semihosting -serial stdio -device virtio-=
-scsi-device,id=3Dscsi -drive file=3D../qemu-imgs/deb9_arm64_netinst_uefi.ra=
-w,id=3Drootimg,if=3Dnone -device scsi-hd,drive=3Drootimg -netdev user,id=3D=
-unet -device virtio-net-device,netdev=3Dunet -net user
-> >
-> > or command2 simply load a kernel
-> > qemu-system-aarch64 -machine virt,secure=3Don,virtualization=3Don -cpu =
-cortex-a57 -m 1024 -bios bl1.bin -semihosting -serial stdio -kernel Image -=
-initrd xxx -append "root=3D/dev/xxx console=3DttyAMA0"
-> >
-> > 4a. system halt with error message
-> > ASSERT_EFI_ERROR (Status =3D Not Found)
-> > ASSERT [ResetSystemRuntimeDxe] /home/hongbo/work/edk2/Build/ArmVirtQemu=
-Kernel-AARCH64/DEBUG_GCC49/AARCH64/MdeModulePkg/Universal/ResetSystemRuntim=
-eDxe/ResetSystemRuntimeDxe/DEBUG/AutoGen.c(370): !EFI_ERROR (Status)
-> >
-> > 4b. Revert "device_tree: Increase FDT_MAX_SIZE to 1 MiB"
-> > command1 can run further to halt at nother place, see 5a and 5b
-> > command2 can load kernel successfully
->
-> I'm not sure what's going on here. Some debugging of what the
-> assertion is checking and why we've hit it would be required.
-> I didn't expect changing FDT_MAX_SIZE would affect much but
-> perhaps it changes where the fdt winds up in memory or how
-> big it is so it overlaps with something else.
-> There is an fdt_pack() function which should compress a
-> created dtb, and which QEMU uses for some board models but
-> not others; but I would want to find out what's actually
-> happening here before looking at whether that is the right fix.
->
-> > 5a. 2nd system halt with message
-> > Synchronous Exception at 0x0000000078A152F0
-> > PC 0x000078A152F0 (0x000078A00000+0x000152F0) [ 0] ArmVeNorFlashDxe.dll
-> > PC 0x000078A152A0 (0x000078A00000+0x000152A0) [ 0] ArmVeNorFlashDxe.dll
-> > PC 0x000078A11DF0 (0x000078A00000+0x00011DF0) [ 0] ArmVeNorFlashDxe.dll
-> > [...snip...]
-> > PC 0x0000600088C4
-> > PC 0x000060008230
-> > PC 0x580B24C2580B24A1
-> >
-> > Recursive exception occurred while dumping the CPU state
-> >
-> > 5b Revert "target/arm: Implement new do_transaction_failed hook"
-> > then no halt, command1 can boot OS successfully
->
-> The bug here will be that the firmware is attempting to access
-> an address which has no device present there. We need to
-> find out what code in the firmware is doing that, and what
-> device it is trying to access. Then we can find out if it's
-> a firmware bug, or if there needs to be some device present,
-> or if we've given the wrong information in the device tree
-> or ACPI tables.
->
-I think the firmware is checking mass storage device to find a
-bootable OS at this stage.
-
-> Can EDK be made to give a backtrace with source filenames
-> and line numbers for the exception ?
->
-> thanks
-> -- PMM
+DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBFcmljIEJsYWtlIFttYWlsdG86
+ZWJsYWtlQHJlZGhhdC5jb21dIA0KU2VudDogMjAxOOW5tDEx5pyIMTbml6UgNDo1Ng0KVG86IHhp
+ZXpoaWRlIDx4aWV6aGlkZUBodWF3ZWkuY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3JnDQpDYzog
+Z3JvdWdAa2FvZC5vcmc7IGFuZWVzaC5rdW1hckBsaW51eC52bmV0LmlibS5jb207IGFybWJydUBy
+ZWRoYXQuY29tOyBiZXJ0b0BpZ2FsaWEuY29tOyB6ZW5nY2FuZnUgMDAyMTU5NzAgPHplbmdjYW5m
+dUBodWF3ZWkuY29tPjsgSmlueHVlZmVuZyA8amlueHVlZmVuZ0BodWF3ZWkuY29tPjsgQ2hlbmh1
+aSAoRmVsaXgsIEV1bGVyKSA8Y2hlbmh1aS5ydG9zQGh1YXdlaS5jb20+DQpTdWJqZWN0OiBSZTog
+W1BBVENIIHY0IDEvNF0gZnNkZXYtdGhyb3R0bGUtcW1wOiBmYWN0b3Igb3V0IHRocm90dGxlIGNv
+ZGUgdG8gcmV1c2UgY29kZQ0KDQpPbiAxMS8xNS8xOCAyOjU0IEFNLCB4aWV6aGlkZSB3cm90ZToN
+Cj4gVGhpcyBwYXRjaCBmYWN0b3Igb3V0IHRocm90dGxlIHBhcmFtZXRlciBwYXJzZSBjb2RlIHRv
+IGNvbW1vbiBmdW5jdGlvbg0KDQpzL2ZhY3Rvci9mYWN0b3JzLw0KDQpBY3R1YWxseSwgd2hlbiBJ
+IHdyaXRlIGNvbW1pdCBtZXNzYWdlcywgSSBsaWtlIHRvIHVzZSB0aGUgaW1wZXJhdGl2ZSBtb29k
+LCB3aXRoIGFuIGltcGxpY2l0ICJBcHBseSB0aGlzIHBhdGNoIGluIG9yZGVyIHRvIiB1bnNwb2tl
+biBwcmVmaXguIA0KU3RhcnRpbmcgd2l0aCBhbiBleHBsaWNpdCAiVGhpcyBwYXRjaCBkb2VzIiBp
+cyBtb3JlIG9mIGEgZGVzY3JpcHRpdmUgbW9vZC4gU28gSSBtaWdodCBoYXZlIHdyaXR0ZW46DQoN
+CkZhY3RvciBvdXQgdGhlIHRocm90dGxlIHBhcmFtZXRlciBwYXJzaW5nIGNvZGUgdG8gYSBuZXcg
+Y29tbW9uIGZ1bmN0aW9uIHdoaWNoIHdpbGwgYmUgdXNlZCBieSBibG9jayBhbmQgZnNkZXYuDQoN
+ClZlcnkgaGVscGZ1bCwgdGhhbmtzDQoNCj4gd2hpY2ggd2lsbCBiZSB1c2VkIGJ5IGJsb2NrIGFu
+ZCBmc2Rldi4NCj4gcmVuYW1lIGZ1bmN0aW9uIHRocm90dGxlX3BhcnNlX29wdGlvbnMgdG8gdGhy
+b3R0bGVfcGFyc2VfZ3JvdXAgdG8gDQo+IHJlc29sdmUgZnVuY3Rpb24gbmFtZSBjb25mbGljdA0K
+PiANCj4gU2lnbmVkLW9mZi1ieTogeGllemhpZGUgPHhpZXpoaWRlQGh1YXdlaS5jb20+DQo+IC0t
+LQ0KPiAgIGJsb2NrL3Rocm90dGxlLmMgICAgICAgICAgICAgICAgfCAgNiArKy0tDQo+ICAgYmxv
+Y2tkZXYuYyAgICAgICAgICAgICAgICAgICAgICB8IDQzICstLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tDQo+ICAgZnNkZXYvcWVtdS1mc2Rldi10aHJvdHRsZS5jICAgICB8IDQ0ICsrLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tDQo+ICAgaW5jbHVkZS9xZW11L3Rocm90dGxlLW9wdGlvbnMuaCB8ICAy
+ICsrDQo+ICAgaW5jbHVkZS9xZW11L3Rocm90dGxlLmggICAgICAgICB8ICA0ICstLQ0KPiAgIGlu
+Y2x1ZGUvcWVtdS90eXBlZGVmcy5oICAgICAgICAgfCAgMSArDQo+ICAgdXRpbC90aHJvdHRsZS5j
+ICAgICAgICAgICAgICAgICB8IDY4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrDQo+ICAgNyBmaWxlcyBjaGFuZ2VkLCA3OSBpbnNlcnRpb25zKCspLCA4OSBkZWxldGlv
+bnMoLSkNCj4gDQo+ICsrKyBiL2luY2x1ZGUvcWVtdS90aHJvdHRsZS1vcHRpb25zLmgNCj4gQEAg
+LTExMSw0ICsxMTEsNiBAQA0KPiAgICAgICAgICAgICAgIC5oZWxwID0gIndoZW4gbGltaXRpbmcg
+YnkgaW9wcyBtYXggc2l6ZSBvZiBhbiBJL08gaW4gYnl0ZXMiLFwNCj4gICAgICAgICAgIH0NCj4g
+ICANCj4gK3ZvaWQgdGhyb3R0bGVfcGFyc2Vfb3B0aW9ucyhUaHJvdHRsZUNvbmZpZyAqLCBRZW11
+T3B0cyAqKTsNCg0KSXQncyBva2F5IHRvIHVzZSBwYXJhbWV0ZXIgbmFtZXMgaW4gZnVuY3Rpb24g
+ZGVjbGFyYXRpb25zLg0KDQo+ICsrKyBiL2luY2x1ZGUvcWVtdS90eXBlZGVmcy5oDQo+IEBAIC0x
+MTMsNiArMTEzLDcgQEAgdHlwZWRlZiBzdHJ1Y3QgdVdpcmVTbGF2ZSB1V2lyZVNsYXZlOw0KPiAg
+IHR5cGVkZWYgc3RydWN0IFZpcnRJT0RldmljZSBWaXJ0SU9EZXZpY2U7DQo+ICAgdHlwZWRlZiBz
+dHJ1Y3QgVmlzaXRvciBWaXNpdG9yOw0KPiAgIHR5cGVkZWYgc3RydWN0IG5vZGVfaW5mbyBOb2Rl
+SW5mbzsNCj4gK3R5cGVkZWYgc3RydWN0IFRocm90dGxlQ29uZmlnIFRocm90dGxlQ29uZmlnOw0K
+DQpQbGVhc2Uga2VlcCB0aGlzIGluIHRoZSByaWdodCBzb3J0ZWQgbG9jYXRpb24sIHJpZ2h0IGFm
+dGVyIFNTSUJ1cy4NCg0KW0htbSwgd2UgYWxyZWFkeSBoYXZlIGFuIGluY29uc2lzdGVuY3kgb24g
+d2hldGhlciB3ZSBhcmUgc29ydGluZyBieSBlbl9VUyBydWxlcywgd2hpY2ggYXJlIGNhc2UtaW5z
+ZW5zaXRpdmUgYW5kIHRoZXJlZm9yZSBoYXMgJ3N0cnVjdCBub2RlX2luZm8nIGluIHRoZSB3cm9u
+ZyBsb2NhdGlvbiwgb3IgYnkgQyBydWxlcyB3aGljaCBzb3J0IGxvd2VyY2FzZSBsYXRlciBhbmQg
+dGhlcmVmb3JlIGhhcyAnc3RydWN0IHVXaXJlU2xhdmUnIGluIHRoZSB3cm9uZyBwb3NpdGlvbi4g
+Rm9yIHRoYXQgbWF0dGVyLCB3aHkgYXJlIHdlIHJlbmFtaW5nICdzdHJ1Y3Qgbm9kZV9pbmZvIE5v
+ZGVJbmZvJywgYW5kIHdoeSBkb2VzIHVXaXJlU2xhdmUgdmlvbGF0ZSBvdXIgbmFtaW5nIGNvbnZl
+bnRpb25zPyAgQnV0IHRob3NlIGFyZSBpbmRlcGVuZGVudCBjbGVhbnVwcywgYW5kIG5vdCBuZWNl
+c3NhcmlseSBzb21ldGhpbmcgZm9yIHlvdSB0byB3b3JyeSBhYm91dF0NCg0KV2l0aCB0aGUgc29y
+dGluZyBmaXhlZCwNCg0KLS0tLS1GaXggaXQgbm93DQoNClRoYW5rcw0KS2lkZA0K
