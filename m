@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNajS-0002hj-Gd
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:48:11 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gNanD-0003mp-5O
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:52:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNajR-0007gi-TA
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:48:10 -0500
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:35301)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNajR-0007gS-OS
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:48:09 -0500
-Received: by mail-oi1-x22a.google.com with SMTP id v6so6870404oif.2
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 01:48:09 -0800 (PST)
+	(envelope-from <eric.auger@redhat.com>) id 1gNanC-0000SP-EA
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:52:03 -0500
+From: Auger Eric <eric.auger@redhat.com>
+References: <20181109112957.10067-1-eric.auger@redhat.com>
+	<20181109112957.10067-16-eric.auger@redhat.com>
+	<2d6c96ce-9eb5-9347-1a75-4e13c0cea0ec@arm.com>
+	<8653586f-404f-5b03-30ba-a0eb3676c107@redhat.com>
+Message-ID: <bd60d093-1669-50d2-c718-aa66a65bd358@redhat.com>
+Date: Fri, 16 Nov 2018 10:51:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181116050134.GA16550@xz-x1>
-References: <20181115085808.GH27915@xz-x1>
-	<162b1a37-79d7-8133-22ee-688748fe62b1@redhat.com>
-	<20181116025304.GC11565@xz-x1>
-	<CANCZdfrozw4f+ntOyUuX+N1Ny1j+BBEqhuowPXk2sRTSBzCGEw@mail.gmail.com>
-	<20181116050134.GA16550@xz-x1>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Nov 2018 09:47:48 +0000
-Message-ID: <CAFEAcA_r6QmSHHpvRCAOic1EppZamfhwFVQ_R7dUvNzomfNsgg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Are FreeBSD guest images working?
+In-Reply-To: <8653586f-404f-5b03-30ba-a0eb3676c107@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v8 15/18] hw/arm/virt: Add virtio-iommu to
+ the virt board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Warner Losh <imp@bsdimp.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Ilya Maximets <i.maximets@samsung.com>
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "mst@redhat.com" <mst@redhat.com>
+Cc: "tn@semihalf.com" <tn@semihalf.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "bharat.bhushan@nxp.com" <bharat.bhushan@nxp.com>, "peterx@redhat.com" <peterx@redhat.com>
 
-On 16 November 2018 at 05:01, Peter Xu <peterx@redhat.com> wrote:
-> I would guess there aren't many people like me to prefer booting a VM
-> using console, though I agree that it'll be nice if we put something
-> into the prebuilt images like what's suggested by Ilya (and so far I
-> don't see anything bad with that):
+Hi Jean, Bharat,
 
-As it happens I would have preferred the instructions on
-the QEMU wiki to work with a pure serial console but was unable
-to get that working so defaulted to graphics. (I didn't try very
-hard: x86 in general is much worse for getting serial boot
-working than other architectures, partly because of the BIOS.)
+On 11/14/18 5:41 PM, Auger Eric wrote:
+> Hi Jean,
+> 
+> On 11/14/18 5:01 PM, Jean-Philippe Brucker wrote:
+>> On 09/11/2018 11:29, Eric Auger wrote:
+>>> +static void create_virtio_iommu(VirtMachineState *vms,
+>>> +                                const char *pciehb_nodename, PCIBus *bus)
+>>> +{
+>>> +    const char compat[] = "virtio,pci-iommu";
+>>> +    uint16_t bdf = 0x8; /* 00:01.0 */
+>>> +    DeviceState *dev;
+>>> +    char *node;
+>>> +
+>>> +    dev = qdev_create(BUS(bus), TYPE_VIRTIO_IOMMU_PCI);
+>>> +    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
+>>
+>> For the Arm virt platform, should msi_bypass default to false? Otherwise
+>> I don't think pass-through to guest userpace will work.
+> That's correct. It's a regression compared to v7. I will fix this soon
+> while doing the pc machine integration + resv regions flaws you reported
+> in the meantime.
 
-thanks
--- PMM
+The reported issues related to probe requests are fixed in the following
+branch:
+https://github.com/eauger/qemu/tree/v3.1.0-rc1-virtio-iommu-v0.8.1
+
+This branch was used to test [PATCH v4 0/7] Add virtio-iommu driver
+
+Thanks
+
+Eric
+
+> 
+> Thanks!
+> 
+> Eric
+>>
+>> Thanks,
+>> Jean
+>>
+> 
