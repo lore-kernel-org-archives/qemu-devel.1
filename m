@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asanchez@kryptoslogic.com>) id 1gNfc7-0002UA-Bb
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:00:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1gNfeg-0003sn-Sd
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:03:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <asanchez@kryptoslogic.com>) id 1gNfc1-0005ND-B2
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:00:55 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43411)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <asanchez@kryptoslogic.com>)
-	id 1gNfbz-0004m7-Iz
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:00:48 -0500
-Received: by mail-ot1-x343.google.com with SMTP id a11so17905171otr.10
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 07:00:45 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1gNfeX-0007nH-8G
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:03:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59232)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gNfeX-0007mF-2I
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:03:25 -0500
+References: <cover.1542301855.git.xiezhide@huawei.com>
+	<37e2a76b4020a5f9e48fe3b7c36d8e4bfb111569.1542301855.git.xiezhide@huawei.com>
+	<df1afb51-f027-d5f8-d5e2-b9869cf104f7@redhat.com>
+	<A02D6AA901860840B46E751C5E9E38B43CC975D8@DGGEML532-MBX.china.huawei.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c2c4e7d2-b39f-1d82-f382-4aab96c9ee2a@redhat.com>
+Date: Fri, 16 Nov 2018 09:03:20 -0600
 MIME-Version: 1.0
-References: <20181114130428.32326-1-asanchez@kryptoslogic.com>
-	<1782562d-41c7-0cc7-94f3-fb7ff4b7bd40@redhat.com>
-In-Reply-To: <1782562d-41c7-0cc7-94f3-fb7ff4b7bd40@redhat.com>
-From: Alexandro Sanchez <asanchez@kryptoslogic.com>
-Date: Fri, 16 Nov 2018 16:00:33 +0100
-Message-ID: <CAA-NuGpjK30VMxb9+OojO4OXSV0yfR2gycpR9tpTxu=vAfTaTw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hax: Support for Linux hosts
+In-Reply-To: <A02D6AA901860840B46E751C5E9E38B43CC975D8@DGGEML532-MBX.china.huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] fsdev-throttle-qmp: move struct
+ ThrottleLimits to new file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, "Ning, Yu" <yu.ning@intel.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: xiezhide <xiezhide@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "groug@kaod.org" <groug@kaod.org>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>, "armbru@redhat.com" <armbru@redhat.com>, "berto@igalia.com" <berto@igalia.com>, zengcanfu 00215970 <zengcanfu@huawei.com>, Jinxuefeng <jinxuefeng@huawei.com>, "Chenhui (Felix, Euler)" <chenhui.rtos@huawei.com>
 
-Hey Paolo,
+On 11/16/18 2:21 AM, xiezhide wrote:
+> 
 
-> What's the advantage of HAXM when Linux hosts can just run KVM?
-
-For end-users, it's true that there's several disadvantages and barely any
-advantages: There's some guests run only on HAXM, since it can handle MMIO
-accesses using BMI instructions ...and that's about it. :-) The HAXM API
-also offers protecting/unprotecting arbitrary chunks of guest memory, which
-has some advantages over KVM_GET_DIRTY_LOG. It's used in [1], but has not
-been upstreamed yet.
-
-For developers, there's few advantages over KVM that make work slightly
-easier/simpler:
-- No need to recompile+install a kernel, but just build+load a kernel
-module, which takes few seconds, e.g. [2]. I'm aware of your kvm-kmod
-(really helpful!), but Linux updates require patching it, which in turn
-makes it incompatible with older Linux releases.
-- Automated building, testing (and soon nightly builds as well).
-- Extensive emulator tests [3] (generic virtualization tests also on the
-way).
-- Inspired by Bareflank, support for 3rd party "extensions". [4]
-
-Of course, I'm aware that KVM is much more mature/compatible/performant
-that HAXM and many other alternatives. My point is that it might be a bit
-more comfortable to work with HAXM (and we are trying to improve this
-further every day).
-
-Another point concerns what I feel is the raison d'etre for HAXM:
-
-There seems to be an unnecessary fragmentation of hypervisor APIs: KVM
-(Linux), HVF (Mac), WHPX (Windows), which resembles the fragmentation of
-graphics APIs. Afaik, no cross-platform type-2 hypervisor exists aside from
-HAXM and Bareflank. This is fine for QEMU, since all major accelerators are
-implemented, but other smaller projects might suffer from this. Of course,
-we could wrap all APIs under a single userland library, but aside from
-adding another layer of abstraction/translation, the underlying problem
-persists: Each new feature needs to be re-implemented inside each
-hypervisor (and HVF/WHPX are closed-source!).
-
-Type-2 hypervisors don't *need* to be tightly coupled to a specific kernel:
-If you look at HAXM, a thin platform-specific layer exists, the rest is
-shared code. I believe that's much more convenient.
-
-Cheers,
-Alexandro
-
-[1]
-https://android-review.googlesource.com/c/platform/external/qemu/+/643674/
-[2] https://travis-ci.com/intel/haxm/builds/91615353
-[3] https://github.com/intel/haxm/blob/master/tests/test_emulator.cpp
-[4] https://github.com/intel/haxm/pull/121
+Here's a couple of meta observations:
 
 
-On Fri, Nov 16, 2018 at 1:53 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+>>
+>> Signed-off-by: xiezhide <xiezhide@huawei.com>
 
-> On 14/11/18 14:04, Alexandro Sanchez Bach wrote:
-> > Intel HAXM supports now 32-bit and 64-bit Linux hosts. This patch
-> includes
-> > the corresponding userland changes.
-> >
-> > Since the Darwin userland backend is POSIX-compliant, the
-> hax-darwin.{c,h}
-> > files have been renamed to hax-posix.{c,h}. This prefix is consistent
-> with
-> > the naming used in the rest of QEMU.
->
-> What's the advantage of HAXM when Linux hosts can just run KVM?  I guess
-> avoiding bitrot?
->
-> Paolo
->
+Your sign-off line ...[1]
+
+>> -    if (arg->has_bps_total) {
+>> -        cfg->buckets[THROTTLE_BPS_TOTAL].avg = arg->bps_total;
+>> +    if (arg->has_bps) {
+>> +        cfg->buckets[THROTTLE_BPS_TOTAL].avg = arg->bps;
+> 
+> Otherwise, the churn from renaming members (part 1) makes it hard to see if the code was properly moved into a new file.
+> 
+> Split this patch to three patches in v5
+
+Your mailer's quoting style makes it very hard to read your replies. 
+You are including both a line that I originally wrote and your reply 
+with no difference in quoting levels between the two, which makes it 
+look like you are writing both the question and the answer.  It is MUCH 
+easier to read mails where quoted material is prefixed by some form of 
+quoting (and '>' is probably the easiest form).
+
+> 
+> Thanks
+> Kidd
+
+[1] ...does not match your informal signature.  That's not necessarily a 
+problem, but the project does prefer that Signed-off-by lines use a 
+preferred legal name rather than merely a nickname or username.  It is 
+acceptable for a sign off to include multiple variations of your name 
+(I've seen people use UTF-8 characters to represent their name natively, 
+followed by a Latinized transcription of the name they use in English), 
+as well as signatures that use just a UTF-8 form or just a Latinized 
+form; at the same time, I won't reject your patch as written, because if 
+you look hard enough in git history, you'll find other commit authors 
+that got away with a username or nickname.  If you prefer to be 
+addressed by 'Kidd' when speaking in English, then including that as 
+part of your S-o-b lines will help other reviewers know the best name to 
+use for mentioning you by name.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
