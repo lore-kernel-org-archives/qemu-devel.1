@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1gNb2B-0003pc-Ld
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:07:32 -0500
+	(envelope-from <edgari@xilinx.com>) id 1gNb4L-0005Rf-Pa
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:09:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1gNb29-0001zP-MU
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:07:31 -0500
-Date: Fri, 16 Nov 2018 11:06:59 +0100
+	(envelope-from <edgari@xilinx.com>) id 1gNb4J-0002uV-Tj
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:09:45 -0500
+Date: Fri, 16 Nov 2018 11:09:04 +0100
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20181116100659.GR7447@toto>
+Message-ID: <20181116100904.GS7447@toto>
 References: <20181115094207.22846-1-luc.michel@greensocs.com>
-	<20181115094207.22846-9-luc.michel@greensocs.com>
+	<20181115094207.22846-10-luc.michel@greensocs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20181115094207.22846-9-luc.michel@greensocs.com>
-Subject: Re: [Qemu-devel] [PATCH v6 08/16] gdbstub: add multiprocess support
- to Xfer:features:read:
+In-Reply-To: <20181115094207.22846-10-luc.michel@greensocs.com>
+Subject: Re: [Qemu-devel] [PATCH v6 09/16] gdbstub: add multiprocess support
+ to gdb_vm_state_change()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,17 +28,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Luc Michel <luc.michel@greensocs.com>
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-On Thu, Nov 15, 2018 at 10:41:59AM +0100, Luc Michel wrote:
-> Change the Xfer:features:read: packet handling to support the
-> multiprocess extension. This packet is used to request the XML
-> description of the CPU. In multiprocess mode, different descriptions can
-> be sent for different processes.
->=20
-> This function now takes the process to send the description for as a
-> parameter, and use a buffer in the process structure to store the
-> generated description.
->=20
-> It takes the first CPU of the process to generate the description.
+On Thu, Nov 15, 2018 at 10:42:00AM +0100, Luc Michel wrote:
+> Add support for multiprocess extension in gdb_vm_state_change()
+> function.
 >=20
 > Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 > Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
@@ -47,157 +39,77 @@ Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 
 > ---
->  gdbstub.c | 47 +++++++++++++++++++++++++++--------------------
->  1 file changed, 27 insertions(+), 20 deletions(-)
+>  gdbstub.c | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
 >=20
 > diff --git a/gdbstub.c b/gdbstub.c
-> index 292dee8914..4cbc81ae5b 100644
+> index 4cbc81ae5b..5df9929f92 100644
 > --- a/gdbstub.c
 > +++ b/gdbstub.c
-> @@ -298,10 +298,12 @@ typedef struct GDBRegisterState {
->  } GDBRegisterState;
-> =20
->  typedef struct GDBProcess {
->      uint32_t pid;
->      bool attached;
-> +
-> +    char target_xml[1024];
->  } GDBProcess;
-> =20
->  enum RSState {
->      RS_INACTIVE,
->      RS_IDLE,
-> @@ -804,55 +806,57 @@ static CPUState *gdb_first_cpu(const GDBState *s)
->      }
-> =20
->      return cpu;
->  }
-> =20
-> -static const char *get_feature_xml(const char *p, const char **newp,
-> -                                   CPUClass *cc)
-> +static const char *get_feature_xml(const GDBState *s, const char *p,
-> +                                   const char **newp, GDBProcess *proces=
-s)
+> @@ -1713,10 +1713,11 @@ void gdb_set_stop_cpu(CPUState *cpu)
+>  static void gdb_vm_state_change(void *opaque, int running, RunState stat=
+e)
 >  {
->      size_t len;
->      int i;
->      const char *name;
-> -    static char target_xml[1024];
-> +    CPUState *cpu =3D get_first_cpu_in_process(s, process);
-> +    CPUClass *cc =3D CPU_GET_CLASS(cpu);
+>      GDBState *s =3D gdbserver_state;
+>      CPUState *cpu =3D s->c_cpu;
+>      char buf[256];
+> +    char thread_id[16];
+>      const char *type;
+>      int ret;
 > =20
->      len =3D 0;
->      while (p[len] && p[len] !=3D ':')
->          len++;
->      *newp =3D p + len;
-> =20
->      name =3D NULL;
->      if (strncmp(p, "target.xml", len) =3D=3D 0) {
-> +        char *buf =3D process->target_xml;
-> +        const size_t buf_sz =3D sizeof(process->target_xml);
-> +
->          /* Generate the XML description for this CPU.  */
-> -        if (!target_xml[0]) {
-> +        if (!buf[0]) {
->              GDBRegisterState *r;
-> -            CPUState *cpu =3D first_cpu;
-> =20
-> -            pstrcat(target_xml, sizeof(target_xml),
-> +            pstrcat(buf, buf_sz,
->                      "<?xml version=3D\"1.0\"?>"
->                      "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">"
->                      "<target>");
->              if (cc->gdb_arch_name) {
->                  gchar *arch =3D cc->gdb_arch_name(cpu);
-> -                pstrcat(target_xml, sizeof(target_xml), "<architecture>"=
-);
-> -                pstrcat(target_xml, sizeof(target_xml), arch);
-> -                pstrcat(target_xml, sizeof(target_xml), "</architecture>=
-");
-> +                pstrcat(buf, buf_sz, "<architecture>");
-> +                pstrcat(buf, buf_sz, arch);
-> +                pstrcat(buf, buf_sz, "</architecture>");
->                  g_free(arch);
->              }
-> -            pstrcat(target_xml, sizeof(target_xml), "<xi:include href=3D=
-\"");
-> -            pstrcat(target_xml, sizeof(target_xml), cc->gdb_core_xml_fil=
-e);
-> -            pstrcat(target_xml, sizeof(target_xml), "\"/>");
-> +            pstrcat(buf, buf_sz, "<xi:include href=3D\"");
-> +            pstrcat(buf, buf_sz, cc->gdb_core_xml_file);
-> +            pstrcat(buf, buf_sz, "\"/>");
->              for (r =3D cpu->gdb_regs; r; r =3D r->next) {
-> -                pstrcat(target_xml, sizeof(target_xml), "<xi:include hre=
-f=3D\"");
-> -                pstrcat(target_xml, sizeof(target_xml), r->xml);
-> -                pstrcat(target_xml, sizeof(target_xml), "\"/>");
-> +                pstrcat(buf, buf_sz, "<xi:include href=3D\"");
-> +                pstrcat(buf, buf_sz, r->xml);
-> +                pstrcat(buf, buf_sz, "\"/>");
->              }
-> -            pstrcat(target_xml, sizeof(target_xml), "</target>");
-> +            pstrcat(buf, buf_sz, "</target>");
->          }
-> -        return target_xml;
-> +        return buf;
+>      if (running || s->state =3D=3D RS_INACTIVE) {
+>          return;
+> @@ -1724,10 +1725,18 @@ static void gdb_vm_state_change(void *opaque, int=
+ running, RunState state)
+>      /* Is there a GDB syscall waiting to be sent?  */
+>      if (s->current_syscall_cb) {
+>          put_packet(s, s->syscall_buf);
+>          return;
 >      }
->      if (cc->gdb_get_dynamic_xml) {
-> -        CPUState *cpu =3D first_cpu;
->          char *xmlname =3D g_strndup(p, len);
->          const char *xml =3D cc->gdb_get_dynamic_xml(cpu, xmlname);
-> =20
->          g_free(xmlname);
->          if (xml) {
-> @@ -1258,10 +1262,11 @@ out:
->  }
-> =20
->  static int gdb_handle_packet(GDBState *s, const char *line_buf)
->  {
->      CPUState *cpu;
-> +    GDBProcess *process;
->      CPUClass *cc;
->      const char *p;
->      uint32_t pid, tid;
->      int ch, reg_size, type, res;
->      uint8_t mem_buf[MAX_PACKET_LENGTH];
-> @@ -1639,18 +1644,19 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
->          }
->          if (strncmp(p, "Xfer:features:read:", 19) =3D=3D 0) {
->              const char *xml;
->              target_ulong total_len;
-> =20
-> -            cc =3D CPU_GET_CLASS(first_cpu);
-> +            process =3D gdb_get_cpu_process(s, s->g_cpu);
-> +            cc =3D CPU_GET_CLASS(s->g_cpu);
->              if (cc->gdb_core_xml_file =3D=3D NULL) {
->                  goto unknown_command;
->              }
-> =20
->              gdb_has_xml =3D true;
->              p +=3D 19;
-> -            xml =3D get_feature_xml(p, &p, cc);
-> +            xml =3D get_feature_xml(s, p, &p, process);
->              if (!xml) {
->                  snprintf(buf, sizeof(buf), "E00");
->                  put_packet(s, buf);
+> +
+> +    if (cpu =3D=3D NULL) {
+> +        /* No process attached */
+> +        return;
+> +    }
+> +
+> +    gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_id));
+> +
+>      switch (state) {
+>      case RUN_STATE_DEBUG:
+>          if (cpu->watchpoint_hit) {
+>              switch (cpu->watchpoint_hit->flags & BP_MEM_ACCESS) {
+>              case BP_MEM_READ:
+> @@ -1741,12 +1750,12 @@ static void gdb_vm_state_change(void *opaque, int=
+ running, RunState state)
 >                  break;
 >              }
-> @@ -2323,10 +2329,11 @@ static int find_cpu_clusters(Object *child, void =
-*opaque)
->           * runtime, we enforce here that the machine does not use a clus=
-ter ID
->           * that would lead to PID 0. */
->          assert(process->pid !=3D UINT32_MAX);
->          process->pid =3D cluster->cluster_id + 1;
->          process->attached =3D false;
-> +        process->target_xml[0] =3D '\0';
-> =20
->          return 0;
+>              trace_gdbstub_hit_watchpoint(type, cpu_gdb_index(cpu),
+>                      (target_ulong)cpu->watchpoint_hit->vaddr);
+>              snprintf(buf, sizeof(buf),
+> -                     "T%02xthread:%02x;%swatch:" TARGET_FMT_lx ";",
+> -                     GDB_SIGNAL_TRAP, cpu_gdb_index(cpu), type,
+> +                     "T%02xthread:%s;%swatch:" TARGET_FMT_lx ";",
+> +                     GDB_SIGNAL_TRAP, thread_id, type,
+>                       (target_ulong)cpu->watchpoint_hit->vaddr);
+>              cpu->watchpoint_hit =3D NULL;
+>              goto send_packet;
+>          } else {
+>              trace_gdbstub_hit_break();
+> @@ -1784,11 +1793,11 @@ static void gdb_vm_state_change(void *opaque, int=
+ running, RunState state)
+>          trace_gdbstub_hit_unknown(state);
+>          ret =3D GDB_SIGNAL_UNKNOWN;
+>          break;
 >      }
+>      gdb_set_stop_cpu(cpu);
+> -    snprintf(buf, sizeof(buf), "T%02xthread:%02x;", ret, cpu_gdb_index(c=
+pu));
+> +    snprintf(buf, sizeof(buf), "T%02xthread:%s;", ret, thread_id);
 > =20
->      return object_child_foreach(child, find_cpu_clusters, opaque);
+>  send_packet:
+>      put_packet(s, buf);
+> =20
+>      /* disable single step if it was enabled */
 > --=20
 > 2.19.1
 >=20
