@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <remy.noel@blade-group.com>) id 1gNjNj-0006c7-KQ
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 14:02:22 -0500
+	(envelope-from <sebastien.boeuf@intel.com>) id 1gNk0Y-0007fU-9M
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 14:42:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <remy.noel@blade-group.com>) id 1gNjNb-0004fT-5i
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 14:02:19 -0500
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:38116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <remy.noel@blade-group.com>)
-	id 1gNjNa-0004f3-U8
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 14:02:11 -0500
-Received: by mail-wm1-x32d.google.com with SMTP id f2-v6so21939254wme.3
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 11:02:10 -0800 (PST)
-From: remy.noel@blade-group.com
-Date: Fri, 16 Nov 2018 20:02:09 +0100
-Message-Id: <20181116190211.17622-3-remy.noel@blade-group.com>
-In-Reply-To: <20181116190211.17622-1-remy.noel@blade-group.com>
-References: <20181116190211.17622-1-remy.noel@blade-group.com>
+	(envelope-from <sebastien.boeuf@intel.com>) id 1gNk0N-00061T-HM
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 14:42:22 -0500
+From: "Boeuf, Sebastien" <sebastien.boeuf@intel.com>
+Date: Fri, 16 Nov 2018 19:42:08 +0000
+Message-ID: <1542397323.18399.3.camel@intel.com>
+References: <20181105014047.26447-1-sameo@linux.intel.com>
+	<20181105014047.26447-20-sameo@linux.intel.com>
+	<20181116103909.64f35d5d@redhat.com>
+In-Reply-To: <20181116103909.64f35d5d@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B92904E1858E1343BC680CD9F2F58131@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] util/aio-posix: Use RCU for handler insertion.
+Subject: Re: [Qemu-devel] [PATCH v5 19/24] hw: acpi: Retrieve the PCI bus
+ from AcpiPciHpState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,404 +27,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Remy Noel <remy.noel@blade-group.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Weil <sw@weilnetz.de>, "open list:Block I/O path" <qemu-block@nongnu.org>
+To: "sameo@linux.intel.com" <sameo@linux.intel.com>, "imammedo@redhat.com" <imammedo@redhat.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "anthony.perard@citrix.com" <anthony.perard@citrix.com>, "sstabellini@kernel.org" <sstabellini@kernel.org>, "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "rth@twiddle.net" <rth@twiddle.net>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-From: Remy Noel <remy.noel@blade-group.com>
-
-get rid of the delete attribute.
-
-We still need to get rid of the context list lock.
-
-Signed-off-by: Remy Noel <remy.noel@blade-group.com>
----
- util/aio-posix.c | 75 ++++++++++++++++++++++--------------------------
- util/aio-win32.c | 43 ++++++++++-----------------
- 2 files changed, 49 insertions(+), 69 deletions(-)
-
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index b34d97292a..83db3f65f4 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -16,6 +16,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "block/block.h"
-+#include "qemu/rcu.h"
- #include "qemu/rcu_queue.h"
- #include "qemu/sockets.h"
- #include "qemu/cutils.h"
-@@ -26,13 +27,14 @@
- 
- struct AioHandler
- {
-+    struct rcu_head rcu;
-+
-     GPollFD pfd;
-     IOHandler *io_read;
-     IOHandler *io_write;
-     AioPollFn *io_poll;
-     IOHandler *io_poll_begin;
-     IOHandler *io_poll_end;
--    int deleted;
-     void *opaque;
-     bool is_external;
-     QLIST_ENTRY(AioHandler) node;
-@@ -65,19 +67,25 @@ static bool aio_epoll_try_enable(AioContext *ctx)
- {
-     AioHandler *node;
-     struct epoll_event event;
-+    int r = 0;
-+
- 
-+    rcu_read_lock();
-     QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
--        int r;
--        if (node->deleted || !node->pfd.events) {
-+        if (!node->pfd.events) {
-             continue;
-         }
-         event.events = epoll_events_from_pfd(node->pfd.events);
-         event.data.ptr = node;
-         r = epoll_ctl(ctx->epollfd, EPOLL_CTL_ADD, node->pfd.fd, &event);
-         if (r) {
--            return false;
-+            break;
-         }
-     }
-+    rcu_read_unlock();
-+    if (r) {
-+        return false;
-+    }
-     ctx->epoll_enabled = true;
-     return true;
- }
-@@ -193,14 +201,13 @@ static AioHandler *find_aio_handler(AioContext *ctx, int fd)
- 
-     QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-         if (node->pfd.fd == fd)
--            if (!node->deleted)
--                return node;
-+            return node;
-     }
- 
-     return NULL;
- }
- 
--static bool aio_remove_fd_handler(AioContext *ctx, AioHandler *node)
-+static void aio_remove_fd_handler(AioContext *ctx, AioHandler *node)
- {
-     /* If the GSource is in the process of being destroyed then
-      * g_source_remove_poll() causes an assertion failure.  Skip
-@@ -210,19 +217,7 @@ static bool aio_remove_fd_handler(AioContext *ctx, AioHandler *node)
-     if (!g_source_is_destroyed(&ctx->source)) {
-         g_source_remove_poll(&ctx->source, &node->pfd);
-     }
--
--    /* If a read is in progress, just mark the node as deleted */
--    if (qemu_lockcnt_count(&ctx->list_lock)) {
--        node->deleted = 1;
--        node->pfd.revents = 0;
--        return false;
--    }
--    /* Otherwise, delete it for real.  We can't just mark it as
--     * deleted because deleted nodes are only cleaned up while
--     * no one is walking the handlers list.
--     */
--    QLIST_REMOVE(node, node);
--    return true;
-+    QLIST_REMOVE_RCU(node, node);
- }
- 
- void aio_set_fd_handler(AioContext *ctx,
-@@ -249,7 +244,8 @@ void aio_set_fd_handler(AioContext *ctx,
-             qemu_lockcnt_unlock(&ctx->list_lock);
-             return;
-         }
--        deleted = aio_remove_fd_handler(ctx, node);
-+        aio_remove_fd_handler(ctx, node);
-+        deleted = true;
-         poll_disable_change = -!node->io_poll;
-     } else {
-         poll_disable_change = !io_poll - (node && !node->io_poll);
-@@ -269,7 +265,8 @@ void aio_set_fd_handler(AioContext *ctx,
-         if (is_new) {
-             new_node->pfd.fd = fd;
-         } else {
--            deleted = aio_remove_fd_handler(ctx, node);
-+            aio_remove_fd_handler(ctx, node);
-+            deleted = true;
-             new_node->pfd = node->pfd;
-         }
-         g_source_add_poll(&ctx->source, &new_node->pfd);
-@@ -296,7 +293,7 @@ void aio_set_fd_handler(AioContext *ctx,
-     aio_notify(ctx);
- 
-     if (deleted) {
--        g_free(node);
-+        g_free_rcu(node, rcu);
-     }
- }
- 
-@@ -345,13 +342,10 @@ static void poll_set_started(AioContext *ctx, bool started)
-     ctx->poll_started = started;
- 
-     qemu_lockcnt_inc(&ctx->list_lock);
-+    rcu_read_lock();
-     QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-         IOHandler *fn;
- 
--        if (node->deleted) {
--            continue;
--        }
--
-         if (started) {
-             fn = node->io_poll_begin;
-         } else {
-@@ -362,6 +356,7 @@ static void poll_set_started(AioContext *ctx, bool started)
-             fn(node->opaque);
-         }
-     }
-+    rcu_read_unlock();
-     qemu_lockcnt_dec(&ctx->list_lock);
- }
- 
-@@ -385,6 +380,7 @@ bool aio_pending(AioContext *ctx)
-      */
-     qemu_lockcnt_inc(&ctx->list_lock);
- 
-+    rcu_read_lock();
-     QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-         int revents;
- 
-@@ -400,6 +396,7 @@ bool aio_pending(AioContext *ctx)
-             break;
-         }
-     }
-+    rcu_read_unlock();
-     qemu_lockcnt_dec(&ctx->list_lock);
- 
-     return result;
-@@ -410,14 +407,14 @@ static bool aio_dispatch_handlers(AioContext *ctx)
-     AioHandler *node, *tmp;
-     bool progress = false;
- 
-+    rcu_read_lock();
-     QLIST_FOREACH_SAFE_RCU(node, &ctx->aio_handlers, node, tmp) {
-         int revents;
- 
-         revents = node->pfd.revents & node->pfd.events;
-         node->pfd.revents = 0;
- 
--        if (!node->deleted &&
--            (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) &&
-+        if ((revents & (G_IO_IN | G_IO_HUP | G_IO_ERR)) &&
-             aio_node_check(ctx, node->is_external) &&
-             node->io_read) {
-             node->io_read(node->opaque);
-@@ -427,22 +424,14 @@ static bool aio_dispatch_handlers(AioContext *ctx)
-                 progress = true;
-             }
-         }
--        if (!node->deleted &&
--            (revents & (G_IO_OUT | G_IO_ERR)) &&
-+        if ((revents & (G_IO_OUT | G_IO_ERR)) &&
-             aio_node_check(ctx, node->is_external) &&
-             node->io_write) {
-             node->io_write(node->opaque);
-             progress = true;
-         }
--
--        if (node->deleted) {
--            if (qemu_lockcnt_dec_if_lock(&ctx->list_lock)) {
--                QLIST_REMOVE(node, node);
--                g_free(node);
--                qemu_lockcnt_inc_and_unlock(&ctx->list_lock);
--            }
--        }
-     }
-+    rcu_read_unlock();
- 
-     return progress;
- }
-@@ -508,8 +497,9 @@ static bool run_poll_handlers_once(AioContext *ctx, int64_t *timeout)
-     bool progress = false;
-     AioHandler *node;
- 
-+    rcu_read_lock();
-     QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
--        if (!node->deleted && node->io_poll &&
-+        if (node->io_poll &&
-             aio_node_check(ctx, node->is_external) &&
-             node->io_poll(node->opaque)) {
-             *timeout = 0;
-@@ -520,6 +510,7 @@ static bool run_poll_handlers_once(AioContext *ctx, int64_t *timeout)
- 
-         /* Caller handles freeing deleted nodes.  Don't do it here. */
-     }
-+    rcu_read_unlock();
- 
-     return progress;
- }
-@@ -637,12 +628,14 @@ bool aio_poll(AioContext *ctx, bool blocking)
-         /* fill pollfds */
- 
-         if (!aio_epoll_enabled(ctx)) {
-+            rcu_read_lock();
-             QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
--                if (!node->deleted && node->pfd.events
-+                if (node->pfd.events
-                     && aio_node_check(ctx, node->is_external)) {
-                     add_pollfd(node);
-                 }
-             }
-+            rcu_read_unlock();
-         }
- 
-         /* wait until next event */
-diff --git a/util/aio-win32.c b/util/aio-win32.c
-index 00e38cdd9f..d7c694e5ac 100644
---- a/util/aio-win32.c
-+++ b/util/aio-win32.c
-@@ -29,7 +29,6 @@ struct AioHandler {
-     IOHandler *io_write;
-     EventNotifierHandler *io_notify;
-     GPollFD pfd;
--    int deleted;
-     void *opaque;
-     bool is_external;
-     QLIST_ENTRY(AioHandler) node;
-@@ -37,18 +36,8 @@ struct AioHandler {
- 
- static void aio_remove_fd_handler(AioContext *ctx, AioHandler *node)
- {
--    /* If aio_poll is in progress, just mark the node as deleted */
--    if (qemu_lockcnt_count(&ctx->list_lock)) {
--        node->deleted = 1;
--        node->pfd.revents = 0;
--    } else {
--        /* Otherwise, delete it for real.  We can't just mark it as
--         * deleted because deleted nodes are only cleaned up after
--         * releasing the list_lock.
--         */
--        QLIST_REMOVE(node, node);
--        g_free(node);
--    }
-+    QLIST_REMOVE_RCU(node, node);
-+    g_free_rcu(node);
- }
- 
- void aio_set_fd_handler(AioContext *ctx,
-@@ -64,7 +53,7 @@ void aio_set_fd_handler(AioContext *ctx,
- 
-     qemu_lockcnt_lock(&ctx->list_lock);
-     QLIST_FOREACH(node, &ctx->aio_handlers, node) {
--        if (node->pfd.fd == fd && !node->deleted) {
-+        if (node->pfd.fd == fd) {
-             break;
-         }
-     }
-@@ -136,7 +125,7 @@ void aio_set_event_notifier(AioContext *ctx,
- 
-     qemu_lockcnt_lock(&ctx->list_lock);
-     QLIST_FOREACH(node, &ctx->aio_handlers, node) {
--        if (node->e == e && !node->deleted) {
-+        if (node->e == e) {
-             break;
-         }
-     }
-@@ -188,6 +177,7 @@ bool aio_prepare(AioContext *ctx)
-      * called while we're walking.
-      */
-     qemu_lockcnt_inc(&ctx->list_lock);
-+    rcu_read_lock();
- 
-     /* fill fd sets */
-     FD_ZERO(&rfds);
-@@ -215,7 +205,7 @@ bool aio_prepare(AioContext *ctx)
-             }
-         }
-     }
--
-+    rcu_read_unlock();
-     qemu_lockcnt_dec(&ctx->list_lock);
-     return have_select_revents;
- }
-@@ -230,6 +220,7 @@ bool aio_pending(AioContext *ctx)
-      * called while we're walking.
-      */
-     qemu_lockcnt_inc(&ctx->list_lock);
-+    rcu_read_lock();
-     QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-         if (node->pfd.revents && node->io_notify) {
-             result = true;
-@@ -246,6 +237,7 @@ bool aio_pending(AioContext *ctx)
-         }
-     }
- 
-+    rcu_read_unlock();
-     qemu_lockcnt_dec(&ctx->list_lock);
-     return result;
- }
-@@ -256,6 +248,7 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
-     bool progress = false;
-     AioHandler *tmp;
- 
-+    rcu_read_lock();
-     /*
-      * We have to walk very carefully in case aio_set_fd_handler is
-      * called while we're walking.
-@@ -263,8 +256,7 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
-     QLIST_FOREACH_SAFE_RCU(node, &ctx->aio_handlers, node, tmp) {
-         int revents = node->pfd.revents;
- 
--        if (!node->deleted &&
--            (revents || event_notifier_get_handle(node->e) == event) &&
-+        if ((revents || event_notifier_get_handle(node->e) == event) &&
-             node->io_notify) {
-             node->pfd.revents = 0;
-             node->io_notify(node->e);
-@@ -275,8 +267,7 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
-             }
-         }
- 
--        if (!node->deleted &&
--            (node->io_read || node->io_write)) {
-+        if ((node->io_read || node->io_write)) {
-             node->pfd.revents = 0;
-             if ((revents & G_IO_IN) && node->io_read) {
-                 node->io_read(node->opaque);
-@@ -297,14 +288,8 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
-             }
-         }
- 
--        if (node->deleted) {
--            if (qemu_lockcnt_dec_if_lock(&ctx->list_lock)) {
--                QLIST_REMOVE(node, node);
--                g_free(node);
--                qemu_lockcnt_inc_and_unlock(&ctx->list_lock);
--            }
--        }
-     }
-+    rcu_read_unlock();
- 
-     return progress;
- }
-@@ -344,12 +329,14 @@ bool aio_poll(AioContext *ctx, bool blocking)
- 
-     /* fill fd sets */
-     count = 0;
-+    rcu_read_lock();
-     QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
--        if (!node->deleted && node->io_notify
-+        if (node->io_notify
-             && aio_node_check(ctx, node->is_external)) {
-             events[count++] = event_notifier_get_handle(node->e);
-         }
-     }
-+    rcu_read_unlock();
- 
-     first = true;
- 
--- 
-2.19.1
+SGkgSWdvciwNCg0KT24gRnJpLCAyMDE4LTExLTE2IGF0IDEwOjM5ICswMTAwLCBJZ29yIE1hbW1l
+ZG92IHdyb3RlOg0KPiBPbiBNb24swqDCoDUgTm92IDIwMTggMDI6NDA6NDIgKzAxMDANCj4gU2Ft
+dWVsIE9ydGl6IDxzYW1lb0BsaW51eC5pbnRlbC5jb20+IHdyb3RlOg0KPiANCj4gPiANCj4gPiBG
+cm9tOiBTZWJhc3RpZW4gQm9ldWYgPHNlYmFzdGllbi5ib2V1ZkBpbnRlbC5jb20+DQo+ID4gDQo+
+ID4gSW5zdGVhZCBvZiB1c2luZyB0aGUgbWFjaGluZSB0eXBlIHNwZWNpZmljIG1ldGhvZCBmaW5k
+X2k0NDBmeCgpIHRvDQo+ID4gcmV0cmlldmUgdGhlIFBDSSBidXMsIHRoaXMgY29tbWl0IGFpbXMg
+dG8gcmVseSBvbiB0aGUgZmFjdCB0aGF0IHRoZQ0KPiA+IFBDSSBidXMgaXMga25vd24gYnkgdGhl
+IHN0cnVjdHVyZSBBY3BpUGNpSHBTdGF0ZS4NCj4gPiANCj4gPiBXaGVuIHRoZSBzdHJ1Y3R1cmUg
+aXMgaW5pdGlhbGl6ZWQgdGhyb3VnaCBhY3BpX3BjaWhwX2luaXQoKSBjYWxsLA0KPiA+IGl0IHNh
+dmVzIHRoZSBQQ0kgYnVzLCB3aGljaCBtZWFucyB0aGVyZSBpcyBubyBuZWVkIHRvIGludm9rZSBh
+DQo+ID4gc3BlY2lhbCBmdW5jdGlvbiBsYXRlciBvbi4NCj4gPiANCj4gPiBCYXNlZCBvbiB0aGUg
+ZmFjdCB0aGF0IGZpbmRfaTQ0MGZ4KCkgd2FzIG9ubHkgdXNlZCB0aGVyZSwgdGhpcw0KPiA+IHBh
+dGNoIGFsc28gcmVtb3ZlcyB0aGUgZnVuY3Rpb24gZmluZF9pNDQwZngoKSBpdHNlbGYgZnJvbSB0
+aGUNCj4gPiBlbnRpcmUgY29kZWJhc2UuDQo+ID4gDQo+ID4gUmV2aWV3ZWQtYnk6IFBoaWxpcHBl
+IE1hdGhpZXUtRGF1ZMOpIDxwaGlsbWRAcmVkaGF0LmNvbT4NCj4gPiBUZXN0ZWQtYnk6IFBoaWxp
+cHBlIE1hdGhpZXUtRGF1ZMOpIDxwaGlsbWRAcmVkaGF0LmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5
+OiBTZWJhc3RpZW4gQm9ldWYgPHNlYmFzdGllbi5ib2V1ZkBpbnRlbC5jb20+DQo+ID4gU2lnbmVk
+LW9mZi1ieTogSmluZyBMaXUgPGppbmcyLmxpdUBsaW51eC5pbnRlbC5jb20+DQo+IFRoYW5rcyBm
+b3IgY2xlYW5pbmcgaXQgdXANCj4gDQo+IG1pbm9yIG5pdDoNCj4gVGFraW5nIGluIGFjY291bnQg
+dGhhdCB5b3UncmUgcmVtb3ZpbmcgJy8qIFRPRE86IFEzNSBzdXBwb3J0ICovJw0KPiBjb21tZW50
+IGFsb25nIHdpdGggZmluZF9pNDQwZngoKSwgaXQgbWlnaHQgYmUgd29ydGggdG8gbWVudGlvbg0K
+PiBpbiB0aGlzIGNvbW1pdCBtZXNzYWdlLiBTb21ldGhpbmcgYWxvbmcgbGluZXMgdGhhdCBBQ1BJ
+IFBDSUhQDQo+IGV4aXN0IHRvIHN1cHBvcnQgZ3Vlc3RzIHdpdGhvdXQgU0hQQyBzdXBwb3J0IG9u
+IFBDSQ0KPiBiYXNlZCBQQyBtYWNoaW5lLiBDb25zaWRlcmluZyB0aGF0IFEzNSBwcm92aWRlcyBu
+YXRpdmUNCj4gUENJLUUgaG90cGx1ZywgdGhlcmUgaXMgbm8gbmVlZCB0byBhZGQgQUNQSSBob3Rw
+bHVnIHRoZXJlLg0KDQpPaCB5ZXMgc3VyZSB3ZSBjYW4gdXBkYXRlIHRoZSBjb21taXQgbWVzc2Fn
+ZSA6KS4gQnV0IGp1c3Qgd2FudGVkIHRvDQptZW50aW9uIHRoYXQgJ3BjJyBtYWNoaW5lIHR5cGUg
+dXNlcyBBQ1BJIFBDSUhQIGFuZCBkb2VzIHN1cHBvcnQNClNIUEMsIHNvIGl0J3Mgbm90IG11dHVh
+bGx5IGV4Y2x1c2l2ZS4NCg0KPiANCj4gDQo+IHdpdGggY29tbWl0IG1lc3NhZ2UgZml4ZWQNCj4g
+DQo+IFJldmlld2VkLWJ5OiBJZ29yIE1hbW1lZG92IDxpbWFtbWVkb0ByZWRoYXQuY29tPg0KPiAN
+Cj4gPiANCj4gPiAtLS0NCj4gPiDCoGluY2x1ZGUvaHcvaTM4Ni9wYy5owqDCoHzCoMKgMSAtDQo+
+ID4gwqBody9hY3BpL3BjaWhwLmPCoMKgwqDCoMKgwqDCoHwgMTAgKysrKy0tLS0tLQ0KPiA+IMKg
+aHcvcGNpLWhvc3QvcGlpeC5jwqDCoMKgwqB8wqDCoDggLS0tLS0tLS0NCj4gPiDCoHN0dWJzL3Bj
+aS1ob3N0LXBpaXguYyB8wqDCoDYgLS0tLS0tDQo+ID4gwqBzdHVicy9NYWtlZmlsZS5vYmpzwqDC
+oMKgfMKgwqAxIC0NCj4gPiDCoDUgZmlsZXMgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspLCAyMiBk
+ZWxldGlvbnMoLSkNCj4gPiDCoGRlbGV0ZSBtb2RlIDEwMDY0NCBzdHVicy9wY2ktaG9zdC1waWl4
+LmMNCj4gPiANCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ody9pMzg2L3BjLmggYi9pbmNsdWRl
+L2h3L2kzODYvcGMuaA0KPiA+IGluZGV4IDQ0Y2I2YmYzZjMuLjhlNWYxNDY0ZWIgMTAwNjQ0DQo+
+ID4gLS0tIGEvaW5jbHVkZS9ody9pMzg2L3BjLmgNCj4gPiArKysgYi9pbmNsdWRlL2h3L2kzODYv
+cGMuaA0KPiA+IEBAIC0yNTUsNyArMjU1LDYgQEAgUENJQnVzICppNDQwZnhfaW5pdChjb25zdCBj
+aGFyICpob3N0X3R5cGUsDQo+ID4gY29uc3QgY2hhciAqcGNpX3R5cGUsDQo+ID4gwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgTWVtb3J5UmVnaW9uICpwY2lfbWVtb3J5
+LA0KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoE1lbW9yeVJl
+Z2lvbiAqcmFtX21lbW9yeSk7DQo+ID4gwqANCj4gPiAtUENJQnVzICpmaW5kX2k0NDBmeCh2b2lk
+KTsNCj4gPiDCoC8qIHBpaXg0LmMgKi8NCj4gPiDCoGV4dGVybiBQQ0lEZXZpY2UgKnBpaXg0X2Rl
+djsNCj4gPiDCoGludCBwaWl4NF9pbml0KFBDSUJ1cyAqYnVzLCBJU0FCdXMgKippc2FfYnVzLCBp
+bnQgZGV2Zm4pOw0KPiA+IGRpZmYgLS1naXQgYS9ody9hY3BpL3BjaWhwLmMgYi9ody9hY3BpL3Bj
+aWhwLmMNCj4gPiBpbmRleCA4MGQ0MmUxMmZmLi4yNTRiMmU1MGFiIDEwMDY0NA0KPiA+IC0tLSBh
+L2h3L2FjcGkvcGNpaHAuYw0KPiA+ICsrKyBiL2h3L2FjcGkvcGNpaHAuYw0KPiA+IEBAIC05Mywx
+MCArOTMsOSBAQCBzdGF0aWMgdm9pZCAqYWNwaV9zZXRfYnNlbChQQ0lCdXMgKmJ1cywgdm9pZA0K
+PiA+ICpvcGFxdWUpDQo+ID4gwqDCoMKgwqDCoHJldHVybiBic2VsX2FsbG9jOw0KPiA+IMKgfQ0K
+PiA+IMKgDQo+ID4gLXN0YXRpYyB2b2lkIGFjcGlfc2V0X3BjaV9pbmZvKHZvaWQpDQo+ID4gK3N0
+YXRpYyB2b2lkIGFjcGlfc2V0X3BjaV9pbmZvKEFjcGlQY2lIcFN0YXRlICpzKQ0KPiA+IMKgew0K
+PiA+IMKgwqDCoMKgwqBzdGF0aWMgYm9vbCBic2VsX2lzX3NldDsNCj4gPiAtwqDCoMKgwqBQQ0lC
+dXMgKmJ1czsNCj4gPiDCoMKgwqDCoMKgdW5zaWduZWQgYnNlbF9hbGxvYyA9IEFDUElfUENJSFBf
+QlNFTF9ERUZBVUxUOw0KPiA+IMKgDQo+ID4gwqDCoMKgwqDCoGlmIChic2VsX2lzX3NldCkgew0K
+PiA+IEBAIC0xMDQsMTAgKzEwMyw5IEBAIHN0YXRpYyB2b2lkIGFjcGlfc2V0X3BjaV9pbmZvKHZv
+aWQpDQo+ID4gwqDCoMKgwqDCoH0NCj4gPiDCoMKgwqDCoMKgYnNlbF9pc19zZXQgPSB0cnVlOw0K
+PiA+IMKgDQo+ID4gLcKgwqDCoMKgYnVzID0gZmluZF9pNDQwZngoKTsgLyogVE9ETzogUTM1IHN1
+cHBvcnQgKi8NCj4gPiAtwqDCoMKgwqBpZiAoYnVzKSB7DQo+ID4gK8KgwqDCoMKgaWYgKHMtPnJv
+b3QpIHsNCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqAvKiBTY2FuIGFsbCBQQ0kgYnVzZXMuIFNldCBw
+cm9wZXJ0eSB0byBlbmFibGUgYWNwaSBiYXNlZA0KPiA+IGhvdHBsdWcuICovDQo+ID4gLcKgwqDC
+oMKgwqDCoMKgwqBwY2lfZm9yX2VhY2hfYnVzX2RlcHRoX2ZpcnN0KGJ1cywgYWNwaV9zZXRfYnNl
+bCwgTlVMTCwNCj4gPiAmYnNlbF9hbGxvYyk7DQo+ID4gK8KgwqDCoMKgwqDCoMKgwqBwY2lfZm9y
+X2VhY2hfYnVzX2RlcHRoX2ZpcnN0KHMtPnJvb3QsIGFjcGlfc2V0X2JzZWwsIE5VTEwsDQo+ID4g
+JmJzZWxfYWxsb2MpOw0KPiA+IMKgwqDCoMKgwqB9DQo+ID4gwqB9DQo+ID4gwqANCj4gPiBAQCAt
+MjEzLDcgKzIxMSw3IEBAIHN0YXRpYyB2b2lkIGFjcGlfcGNpaHBfdXBkYXRlKEFjcGlQY2lIcFN0
+YXRlDQo+ID4gKnMpDQo+ID4gwqANCj4gPiDCoHZvaWQgYWNwaV9wY2locF9yZXNldChBY3BpUGNp
+SHBTdGF0ZSAqcykNCj4gPiDCoHsNCj4gPiAtwqDCoMKgwqBhY3BpX3NldF9wY2lfaW5mbygpOw0K
+PiA+ICvCoMKgwqDCoGFjcGlfc2V0X3BjaV9pbmZvKHMpOw0KPiA+IMKgwqDCoMKgwqBhY3BpX3Bj
+aWhwX3VwZGF0ZShzKTsNCj4gPiDCoH0NCj4gPiDCoA0KPiA+IGRpZmYgLS1naXQgYS9ody9wY2kt
+aG9zdC9waWl4LmMgYi9ody9wY2ktaG9zdC9waWl4LmMNCj4gPiBpbmRleCA0NzI5M2EzOTE1Li42
+NTg0NjAyNjRiIDEwMDY0NA0KPiA+IC0tLSBhL2h3L3BjaS1ob3N0L3BpaXguYw0KPiA+ICsrKyBi
+L2h3L3BjaS1ob3N0L3BpaXguYw0KPiA+IEBAIC00NDUsMTQgKzQ0NSw2IEBAIFBDSUJ1cyAqaTQ0
+MGZ4X2luaXQoY29uc3QgY2hhciAqaG9zdF90eXBlLA0KPiA+IGNvbnN0IGNoYXIgKnBjaV90eXBl
+LA0KPiA+IMKgwqDCoMKgwqByZXR1cm4gYjsNCj4gPiDCoH0NCj4gPiDCoA0KPiA+IC1QQ0lCdXMg
+KmZpbmRfaTQ0MGZ4KHZvaWQpDQo+ID4gLXsNCj4gPiAtwqDCoMKgwqBQQ0lIb3N0U3RhdGUgKnMg
+PSBPQkpFQ1RfQ0hFQ0soUENJSG9zdFN0YXRlLA0KPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgb2JqZWN0X3Jl
+c29sdmVfcGF0aCgiL21hY2hpbmUvaQ0KPiA+IDQ0MGZ4IiwgTlVMTCksDQo+ID4gLcKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqBUWVBFX1BDSV9IT1NUX0JSSURHRSk7DQo+ID4gLcKgwqDCoMKgcmV0dXJuIHMgPyBzLT5i
+dXMgOiBOVUxMOw0KPiA+IC19DQo+ID4gLQ0KPiA+IMKgLyogUElJWDMgUENJIHRvIElTQSBicmlk
+Z2UgKi8NCj4gPiDCoHN0YXRpYyB2b2lkIHBpaXgzX3NldF9pcnFfcGljKFBJSVgzU3RhdGUgKnBp
+aXgzLCBpbnQgcGljX2lycSkNCj4gPiDCoHsNCj4gPiBkaWZmIC0tZ2l0IGEvc3R1YnMvcGNpLWhv
+c3QtcGlpeC5jIGIvc3R1YnMvcGNpLWhvc3QtcGlpeC5jDQo+ID4gZGVsZXRlZCBmaWxlIG1vZGUg
+MTAwNjQ0DQo+ID4gaW5kZXggNmVkODFiMWYyMS4uMDAwMDAwMDAwMA0KPiA+IC0tLSBhL3N0dWJz
+L3BjaS1ob3N0LXBpaXguYw0KPiA+ICsrKyAvZGV2L251bGwNCj4gPiBAQCAtMSw2ICswLDAgQEAN
+Cj4gPiAtI2luY2x1ZGUgInFlbXUvb3NkZXAuaCINCj4gPiAtI2luY2x1ZGUgImh3L2kzODYvcGMu
+aCINCj4gPiAtUENJQnVzICpmaW5kX2k0NDBmeCh2b2lkKQ0KPiA+IC17DQo+ID4gLcKgwqDCoMKg
+cmV0dXJuIE5VTEw7DQo+ID4gLX0NCj4gPiBkaWZmIC0tZ2l0IGEvc3R1YnMvTWFrZWZpbGUub2Jq
+cyBiL3N0dWJzL01ha2VmaWxlLm9ianMNCj4gPiBpbmRleCA1ZGQwYWVlZWM2Li43MjVmNzhiZWRj
+IDEwMDY0NA0KPiA+IC0tLSBhL3N0dWJzL01ha2VmaWxlLm9ianMNCj4gPiArKysgYi9zdHVicy9N
+YWtlZmlsZS5vYmpzDQo+ID4gQEAgLTQxLDYgKzQxLDUgQEAgc3R1Yi1vYmoteSArPSBwY19tYWR0
+X2NwdV9lbnRyeS5vDQo+ID4gwqBzdHViLW9iai15ICs9IHZtZ2VuaWQubw0KPiA+IMKgc3R1Yi1v
+YmoteSArPSB4ZW4tY29tbW9uLm8NCj4gPiDCoHN0dWItb2JqLXkgKz0geGVuLWh2bS5vDQo+ID4g
+LXN0dWItb2JqLXkgKz0gcGNpLWhvc3QtcGlpeC5vDQo+ID4gwqBzdHViLW9iai15ICs9IHJhbS1i
+bG9jay5vDQo+ID4gwqBzdHViLW9iai15ICs9IHJhbWZiLm8NCg0KVGhhbmtzLA0KU2ViYXN0aWVu
