@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gNfov-0001EU-B0
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:14:10 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gNftQ-0002LK-8U
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:18:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gNfos-0005c2-6m
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:14:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44252)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gNfor-0005bC-SE
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:14:06 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B4D423097063
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 15:14:03 +0000 (UTC)
-Date: Fri, 16 Nov 2018 16:14:00 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181116161400.1e3c2669.cohuck@redhat.com>
-In-Reply-To: <1c020087-acd7-302a-d5be-dcdbf7b7084d@redhat.com>
-References: <20181026105711.29605-1-cohuck@redhat.com>
-	<20181115172032.53945f5e.cohuck@redhat.com>
-	<1c020087-acd7-302a-d5be-dcdbf7b7084d@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gNftP-0007Rb-IT
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:18:48 -0500
+Date: Fri, 16 Nov 2018 16:18:34 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181116151834.GA5066@localhost.localdomain>
+References: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
+	<w511s7p9fkk.fsf@maestria.local.igalia.com>
+	<462138b3-e9e7-29e5-da55-d0ebd626aee7@redhat.com>
+	<w51efbmh0tp.fsf@maestria.local.igalia.com>
+	<2e1b90ae-1a0c-711a-6ef8-3c814335f696@redhat.com>
+	<w51in0xuksv.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] MAINTAINERS: clarify some of the tags
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w51in0xuksv.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] KVM Forum block no[td]es
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,72 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>
+Cc: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Thu, 15 Nov 2018 10:46:21 -0600
-Eric Blake <eblake@redhat.com> wrote:
-
-> On 11/15/18 10:20 AM, Cornelia Huck wrote:
-> > On Fri, 26 Oct 2018 12:57:11 +0200
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> >> The MAINTAINERS file is a bit sparse on information about what
-> >> the different designators are. Let's add some more information
-> >> to give contributors a better idea about what the different
-> >> roles are.
-> >>
-> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >> ---
-> >>
-> >> This came out of a discussion about what being a 'reviewer' listed in
-> >> this file actually means. A reviewer probably should already have a
-> >> track record of doing helpful reviews before being listed in here.
-> >>
-> >> While at it, I also tried to add some more hints for the other entries.
-> >> This patch is supposed to be a starting point for further discussion.  
-> > 
-> > Ping. Further discussion would be good :)  
+Am 16.11.2018 um 16:03 hat Alberto Garcia geschrieben:
+> > I don't think anything needs a way to generally block graph changes
+> > around some node.  We only need to prevent changes to very specific
+> > sets of edges.  This is something that the permission system just
+> > cannot do.
 > 
-> Recent threads have mentioned the possibility of potentially adding a 
-> new category P: for the person that submits pull requests, although I'm 
-> not quite sure how that is different from M: as a maintainer
+> But what would you do then?
 
-Let's wait how that discussion turns out (I'm not quite sure about the
-semantics, either.) We can document it then.
+I agree with you mostly in that I think that most problems that Max
+mentioned aren't readl. The only real problem I see with GRAPH_MOD as a
+permission on the node level is this overblocking - but that's bad
+enough that I feel using permissions to block changes to a whole node is
+not a good solution.
 
-> 
-> >> +++ b/MAINTAINERS
-> >> @@ -12,9 +12,14 @@ consult qemu-devel and not any specific individual privately.
-> >>   Descriptions of section entries:
-> >>   
-> >>   	M: Mail patches to: FullName <address@domain>
-> >> +	   Maintainers are looking after a certain area and must be CCed on
-> >> +	   patches. They are considered the main contact point.  
-> 
-> Maybe add something along the lines of "However, a maintainer may accept 
-> code that has been reviewed by others without explicitly reviewing it 
-> themselves"?
+So what's the alternative? Max had a possible solution in the first
+email in this thread:
 
-I'm not sure whether that adds vital information. If a maintainer picks
-a patch that has been reviewed by others, they may or may not do a
-proper review themselves; but the end result is basically the same
-(patch makes its way into the tree.)
+> - A property of BdrvChild that can be set by a non-parent seems more
+>   feasible, e.g. a counter where changing the child is possible only
+>   if the counter is 0.  This also actually makes sense in what it
+>   means.
 
-> 
-> >>   	R: Designated reviewer: FullName <address@domain>
-> >>   	   These reviewers should be CCed on patches.
-> >> +	   Reviewers are familiar with the subject matter and provide feedback
-> >> +	   even though they are not maintainers.
-> >>   	L: Mailing list that is relevant to this area
-> >> +	   These lists should be CCed on patches.
-> >>   	W: Web-page with status/info
-> >>   	Q: Patchwork web based patch tracking system site
-> >>   	T: SCM tree type and location.  Type is one of: git, hg, quilt, stgit.  
-> >   
-> 
-> At any rate, I like the idea of adding the additional descriptions for 
-> the categories, even if we still bike-shed on the wording or even the 
-> set of categories to use.
+The commit job would increment BdrvChild.block_change (or whatever we
+would call it) for all bs->backing edges in the subchain.
 
-What about going with this as a starting point?
+Kevin
