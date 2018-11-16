@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gNTlY-0000a0-Sf
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 21:21:53 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gNTrk-0003G2-8W
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 21:28:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gNTlV-0001B2-O4
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 21:21:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47676)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gNTlU-0001Ah-Vm
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 21:21:49 -0500
-References: <20181031005015.5433-1-zhangckid@gmail.com>
-	<159ef9c8-e0b2-6183-b33c-6925fb6574dc@redhat.com>
-	<CAFEAcA99FxTp6G8+vG-YsjWA5LAye1T3j4_h=5_uM6WbZaW2QA@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <409b9337-a9ef-5206-ecde-f3317b62e263@redhat.com>
-Date: Fri, 16 Nov 2018 10:21:42 +0800
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gNTrY-000860-Hc
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 21:28:08 -0500
+From: Peng Hao <peng.hao2@zte.com.cn>
+Date: Fri, 16 Nov 2018 18:50:00 +0800
+Message-Id: <1542365406-81310-1-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA99FxTp6G8+vG-YsjWA5LAye1T3j4_h=5_uM6WbZaW2QA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V2] net/filter-rewriter.c: Fix coverity
- static analysis issue
+Subject: [Qemu-devel] [PATCH V7 0/5]  add pvpanic mmio support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +20,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Zhang Chen <chen.zhang@intel.com>, QEMU Developers <qemu-devel@nongnu.org>, Zhang Chen <zhangckid@gmail.com>
+To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
+The first patches are simple cleanups:
+- patch 1 move the pvpanic device with the 'ocmmon objects' so we compile
+  it once for the x86/arm/aarch64 archs,
+- patch 2 simply renames ISA fields/definitions to generic ones.
 
-On 2018/11/15 =E4=B8=8B=E5=8D=886:32, Peter Maydell wrote:
-> On 2 November 2018 at 02:21, Jason Wang <jasowang@redhat.com> wrote:
->> On 2018/10/31 =E4=B8=8A=E5=8D=888:50, Zhang Chen wrote:
->>> The original code just follow the TCP state diagram,
->>> but in this case, we can skip the TCPS_TIME_WAIT state to simplify
->>> the implementation.
->>>
->>> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
->>> ---
->>>    net/filter-rewriter.c | 3 ++-
->>>    1 file changed, 2 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
->>> index bb8f4d93b1..2e26839bc2 100644
->>> --- a/net/filter-rewriter.c
->>> +++ b/net/filter-rewriter.c
->>> @@ -155,12 +155,13 @@ static int handle_primary_tcp_pkt(RewriterState=
- *rf,
->>>             * Active close step 2.
->>>             */
->>>            if (conn->tcp_state =3D=3D TCPS_FIN_WAIT_1) {
->>> -            conn->tcp_state =3D TCPS_TIME_WAIT;
->>>                /*
->>>                 * For simplify implementation, we needn't wait 2MSL t=
-ime
->>>                 * in filter rewriter. Because guest kernel will track=
- the
->>>                 * TCP status and wait 2MSL time, if client resend the=
- FIN
->>>                 * packet, guest will apply the last ACK too.
->>> +             * So, we skip the TCPS_TIME_WAIT state here and go stra=
-ight
->>> +             * to TCPS_CLOSED state.
->>>                 */
->>>                conn->tcp_state =3D TCPS_CLOSED;
->>>                g_hash_table_remove(rf->connection_track_table, key);
->>
->>
->> Applied.
-> Ping -- this doesn't seem to have made it into master?
->
-> thanks
-> -- PMM
->
+Then instead of add/use the MMIO pvpanic device in the virt machine in an
+unique patch, I split it in two distinct patches:
+- patch 3 uses Peng Hao's work, but add the MMIO interface to the existing
+  device (no logical change).
+- patch 4 is Peng Hao's work in the virt machine (no logical change).
+- patch 5 add pvpanic device in acpi table in virt machine
+v2 from Peng Hao is:
+https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03433.html
 
-Will send a pull request soon.
+v3 --> v4
+  patch 1,2 no modification.
+  patch 3, add TYPE=5FPANIC=5FMMIO for distinguishing different bus device,
+           virt + isa=5Fpvpanic will abnormally terminate virtual machine. =
 
-Thanks
+  patch 4, "pvpanic,mmio" --> "qemu,pvpanic-mmio".
+  patch 5, newly added.
+
+v4 --> v5
+  patch 1,2 no modification.
+  patch 3 delete PvpanicCommonState structure.
+  patch 4 VIRT=5FPVPANIC=5FMMIO --> VIRT=5FPVPANIC
+          correct VIRT=5FPVPANIC's overlap start address
+  patch 5 no modification.
+
+v5 --> v6
+  add document.
+
+v6 --> v7
+  patch 5 modify device name from "PANC" to "PEVT".
+  patch 6 modify document description.
+ =20
+the kernel part of the series:
+https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc.git/log/?h=
+=3Dchar-misc-testing
+misc/pvpanic: remove a redundant comma=20
+misc/pvpanic: convert to SPDX license tags=20
+misc/pvpanic: change header file sort style=20
+misc/pvpanic: remove unnecessary header file =20
+misc/pvpanic : break dependency on ACPI=20
+misc/pvpanic : grouping ACPI related stuff =20
+misc/pvpanic: add support to get pvpanic device info FDT =20
+dt-bindings: misc/pvpanic: add document for pvpanic-mmio =20
+misc/pvpanic: add MMIO support =20
+misc/pvpanic: simplify the code using acpi=5Fdev=5Fresource=5Fio =20
+pvpanic: move pvpanic to misc as common driver=20
+
+Philippe Mathieu-Daud=C3=A9 (2):
+  hw/misc/pvpanic: Build the pvpanic device in $(common-obj)
+  hw/misc/pvpanic: Cosmetic renaming
+
+Peng Hao (3):
+  hw/misc/pvpanic: Add the MMIO interface
+  hw/arm/virt: Use the pvpanic device
+  hw/arm/virt: add pvpanic device in virt acpi table
+  pvpanic : update pvpanic document
+
+ default-configs/aarch64-softmmu.mak |  1 +
+ hw/arm/virt-acpi-build.c            | 16 ++++++++
+ hw/arm/virt.c                       | 21 ++++++++++
+ hw/misc/Makefile.objs               |  2 +-
+ hw/misc/pvpanic.c                   | 78 ++++++++++++++++++++++++++++++---=
+----
+ include/hw/arm/virt.h               |  1 +
+ include/hw/misc/pvpanic.h           |  2 +
+ docs/specs/pvpanic.txt              | 13 ++++++++++++-
+ 8 files changed, 118 insertions(+), 17 deletions(-)
+
+--=20
+1.8.3.1
