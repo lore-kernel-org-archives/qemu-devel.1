@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gNUoY-0004uk-Ve
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 22:29:03 -0500
+	(envelope-from <shannon.zhaosl@gmail.com>) id 1gNUoz-00057Y-6x
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 22:29:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gNUoX-00016o-U5
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 22:29:02 -0500
-References: <20181016132018.5054-1-vsementsov@virtuozzo.com>
-	<20181017095128.GK22755@stefanha-x1.localdomain>
-	<CAFEAcA_h8pWjNokWQqUXqLDS=WrtKz-zKQ4QjhjV5UR2Yb8MbQ@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <97c6b0f3-da95-7c99-c478-303544c2990b@redhat.com>
-Date: Thu, 15 Nov 2018 22:28:48 -0500
+	(envelope-from <shannon.zhaosl@gmail.com>) id 1gNUou-0001Ef-1h
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 22:29:27 -0500
+References: <1542365406-81310-1-git-send-email-peng.hao2@zte.com.cn>
+	<1542365406-81310-5-git-send-email-peng.hao2@zte.com.cn>
+From: Shannon Zhao <shannon.zhaosl@gmail.com>
+Message-ID: <28d47b6b-acfd-3e24-2926-84e9fffee6c8@gmail.com>
+Date: Fri, 16 Nov 2018 11:29:13 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_h8pWjNokWQqUXqLDS=WrtKz-zKQ4QjhjV5UR2Yb8MbQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1542365406-81310-5-git-send-email-peng.hao2@zte.com.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] migration/block-dirty-bitmap:
- fix Coverity CID1390625
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH V7 4/6] hw/arm/virt: Use the
+ pvpanic device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,79 +25,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Peng Hao <peng.hao2@zte.com.cn>, peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
+Hi,
 
-
-On 11/15/18 6:48 AM, Peter Maydell wrote:
-> On 17 October 2018 at 10:51, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> On Tue, Oct 16, 2018 at 04:20:18PM +0300, Vladimir Sementsov-Ogievskiy wrote:
->>> Theoretically possible that we finish the skipping loop with bs = NULL
->>> and the following code will crash trying to dereference it. Fix that.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>>  migration/block-dirty-bitmap.c | 4 ++++
->>>  1 file changed, 4 insertions(+)
->>>
->>> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
->>> index 477826330c..6de808f95f 100644
->>> --- a/migration/block-dirty-bitmap.c
->>> +++ b/migration/block-dirty-bitmap.c
->>> @@ -288,6 +288,10 @@ static int init_dirty_bitmap_migration(void)
->>>              bs = backing_bs(bs);
->>>          }
->>>
->>> +        if (!bs || bs->implicit) {
->>> +            continue;
->>> +        }
->>> +
->>>          for (bitmap = bdrv_dirty_bitmap_next(bs, NULL); bitmap;
->>>               bitmap = bdrv_dirty_bitmap_next(bs, bitmap))
->>>          {
->>
->> Previous discussion:
->> http://qemu.11.n7.nabble.com/PATCH-migration-Appease-coverity-skip-empty-block-trees-td582504.html
->>
->> I've CCed John so he can take a look.
+On 2018/11/16 18:50, Peng Hao wrote:
+>   Add pvpanic device in arm virt machine.
 > 
-> So have you block-layer folks figured out how you want to address
-> this Coverity issue yet?
+> Signed-off-by: Peng Hao<peng.hao2@zte.com.cn>
+> Signed-off-by: Philippe Mathieu-Daudé<philmd@redhat.com>
+> ---
+>   default-configs/arm-softmmu.mak |  1 +
+>   hw/arm/virt.c                   | 21 +++++++++++++++++++++
+>   include/hw/arm/virt.h           |  1 +
+>   3 files changed, 23 insertions(+)
 > 
-> thanks
-> -- PMM
-> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 2420491..50345df 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -159,3 +159,4 @@ CONFIG_PCI_DESIGNWARE=y
+>   CONFIG_STRONGARM=y
+>   CONFIG_HIGHBANK=y
+>   CONFIG_MUSICPAL=y
+> +CONFIG_PVPANIC=y
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 9f67782..c4f29c8 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -59,6 +59,7 @@
+>   #include "qapi/visitor.h"
+>   #include "standard-headers/linux/input.h"
+>   #include "hw/arm/smmuv3.h"
+> +#include "hw/misc/pvpanic.h"
+>   
+>   #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>       static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -143,6 +144,7 @@ static const MemMapEntry a15memmap[] = {
+>       [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+>       [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
+>       [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
+> +    [VIRT_PVPANIC] =            { 0x09070000, 0x00000002 },
+>       [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+>       /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+>       [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+> @@ -190,6 +192,23 @@ static bool cpu_type_valid(const char *cpu)
+>       return false;
+>   }
+>   
+> +static void create_pvpanic_device(const VirtMachineState *vms)
+> +{
+> +    char *nodename;
+> +    hwaddr base = vms->memmap[VIRT_PVPANIC].base;
+> +    hwaddr size = vms->memmap[VIRT_PVPANIC].size;
+> +
+> +    sysbus_create_simple(TYPE_PVPANIC_MMIO, base, NULL);
+> +
+> +    nodename = g_strdup_printf("/pvpanic-mmio@%" PRIx64, base);
+> +    qemu_fdt_add_subnode(vms->fdt, nodename);
+> +    qemu_fdt_setprop_string(vms->fdt, nodename,
+> +                            "compatible", "qemu,pvpanic-mmio");
+> +    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
+> +                                 2, base, 2, size);
+> +    g_free(nodename);
+> +}
+> +
+>   static void create_fdt(VirtMachineState *vms)
+>   {
+>       void *fdt = create_device_tree(&vms->fdt_size);
+> @@ -1531,6 +1550,8 @@ static void machvirt_init(MachineState *machine)
+>   
+>       create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>   
+> +    create_pvpanic_device(vms);
+> +
+It should not create pvpanic by default. It should be configurable via 
+-device pvpanic.
 
-I looked again. I think Vladimir's patch will shut up Coverity for sure,
-feel free to apply it if you want this out of your hair.
-
-Stefan suggests the following, however;
-
-
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index 5e90f44c2f..00c068fda3 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -284,7 +284,7 @@ static int init_dirty_bitmap_migration(void)
-         const char *drive_name = bdrv_get_device_or_node_name(bs);
-
-         /* skip automatically inserted nodes */
--        while (bs && bs->drv && bs->implicit) {
-+        while (bs->drv && bs->implicit) {
-             bs = backing_bs(bs);
-         }
-
-
-that by removing the assumption that bs could ever be null here (it
-shouldn't), that we'll coax coverity into not warning anymore. I don't
-know if that will work, because backing_bs can theoretically return NULL
-and might convince coverity there's a problem. In practice it won't be.
-
-I don't know how to check this to see if Stefan's suggestion is appropriate.
-
-For such a small, trivial issue though, just merge this and be done with
-it, in my opinion. If you want to take this fix directly as a "build
-fix" I wouldn't object.
-
-I'm sorry for the fuss.
+Thanks,
+Shannon
