@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNh9J-0007D9-HJ
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:39:21 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gNh9a-0007QL-Fx
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:39:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gNh9F-0002bi-RN
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:39:15 -0500
-References: <20181116155325.22428-1-berrange@redhat.com>
-	<20181116155325.22428-6-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5acd44f8-69c7-a791-0ce0-49cad6e48423@redhat.com>
-Date: Fri, 16 Nov 2018 10:39:03 -0600
+	(envelope-from <stefanha@gmail.com>) id 1gNh9Z-0002km-Ri
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:39:34 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:45945)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gNh9Z-0002kJ-JF
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 11:39:33 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id v6so3657222wrr.12
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 08:39:32 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181116155325.22428-6-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] tests: add iotests helpers for dealing
- with TLS certificates
+References: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
+In-Reply-To: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 16 Nov 2018 16:39:20 +0000
+Message-ID: <CAJSP0QVKVktawsab4pPb3qdGuh9D1zBZOucN+K2B=nrkdW2_qQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,118 +27,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Samuel Ortiz <sameo@linux.intel.com>, robert.bradford@intel.com
+Cc: SeaBIOS <seabios@seabios.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, sgarzare@redhat.com
 
-On 11/16/18 9:53 AM, Daniel P. Berrang=C3=A9 wrote:
-> Add helpers to common.tls for creating TLS certificates for a CA,
-> server and client.
+On Fri, Nov 16, 2018 at 4:21 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> I'm investigating the SeaBIOS booting time, to understand if we can reduce
+> the boot time in some cases (e.g. legacy hardware is not needed). I think
+> this
+> can be interesting also for NEMU developers.
 
-MUCH appreciated!  We NEED this coverage, easily automated.
+Questions for NEMU folks:
 
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->   tests/qemu-iotests/common.tls | 139 +++++++++++++++++++++++++++++++++=
-+
->   1 file changed, 139 insertions(+)
->   create mode 100644 tests/qemu-iotests/common.tls
->=20
-> diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.=
-tls
-> new file mode 100644
+qboot isn't part of the virt-x86 NEMU tree and is only mentioned in
+one or two places.  Is NEMU focussing exclusively on OVMF guest
+firmware instead of qboot?
 
-I was a bit surprised that this wasn't 100755, but this matches the fact=20
-that none of the other common.* are executable. And after thinking more,=20
-it makes sense - they aren't standalone scripts, but designed to be=20
-sourced, and 'source' doesn't care about execute bits.
+Are there other boot time optimizations in NEMU that are a candidate
+for upstreaming?
 
-> +tls_dir=3D"${TEST_DIR}/tls"
-> +
-> +function tls_x509_cleanup()
-> +{
-> +    rm -f ${tls_dir}/*.pem
-> +    rm -f ${tls_dir}/*/*.pem
-> +    rmdir ${tls_dir}/*
-> +    rmdir ${tls_dir}
-
-Why not just:
-rm -rf $tls_dir
-
-Also, the quoting is a bit inconsistent. if ${TEST_DIR} can contain=20
-spaces, then all uses of ${tls_dir} need to be in "".
-
-> +}
-> +
-> +
-> +function tls_x509_init()
-> +{
-> +    mkdir "${tls_dir}"
-
-And this just highlights the quoting inconsistency.  Should this use=20
-mkdir -p?
-
-> +
-> +function tls_x509_create_root_ca()
-> +{
-> +    name=3D$1
-> +
-> +    test -z "$name" && name=3Dca-cert
-
-Could also be shortened as:
-
-name=3D${1:-ca-cert}
-
-> +
-> +    cat > ${tls_dir}/ca.info <<EOF
-> +cn =3D Cthulu Dark Lord Enterprises $name
-
-s/Cthulu/Cthulhu/ - after all, we don't want him coming after us just=20
-because we botched the spelling of his name :)
-
-> +ca
-> +cert_signing_key
-> +EOF
-> +
-> +    certtool --generate-self-signed \
-> +             --load-privkey ${tls_dir}/key.pem \
-> +             --template ${tls_dir}/ca.info \
-> +             --outfile ${tls_dir}/$name-cert.pem 2>&1 | head -1
-
-More missing ""
-
-> +
-> +    rm -f ${tls_dir}/ca.info
-> +}
-> +
-> +
-> +function tls_x509_create_server()
-> +{
-> +    caname=3D$1
-> +    name=3D$2
-> +
-> +    mkdir ${tls_dir}/$name
-> +    cat > ${tls_dir}/cert.info <<EOF
-> +organization =3D Cthulu Dark Lord Enterprises $name
-
-Matched spelling
-
-> +function tls_x509_create_client()
-> +{
-> +    caname=3D$1
-> +    name=3D$2
-> +
-> +    mkdir ${tls_dir}/$name
-> +    cat > ${tls_dir}/cert.info <<EOF
-> +country =3D South Pacific
-> +locality =3D  R'lyeh
-> +organization =3D Cthulu Dark Lord Enterprises $name
-
-And again
-
-Needs several touch-ups, but the idea itself is sound.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Stefan
