@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1gNat8-0006Vz-TV
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:58:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gNato-0006ym-Jc
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:58:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1gNat8-0002dK-1x
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:58:10 -0500
-Date: Fri, 16 Nov 2018 10:57:45 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20181116095745.GP7447@toto>
-References: <20181115094207.22846-1-luc.michel@greensocs.com>
-	<20181115094207.22846-7-luc.michel@greensocs.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gNatn-0002yp-JS
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:58:52 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34343)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gNatj-0002sh-Hu
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:58:49 -0500
+Received: by mail-ot1-x341.google.com with SMTP id t5so20868270otk.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 01:58:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20181115094207.22846-7-luc.michel@greensocs.com>
-Subject: Re: [Qemu-devel] [PATCH v6 06/16] gdbstub: add multiprocess support
- to 'sC' packets
+In-Reply-To: <CAHmQWvA7fyCFz-qE2_B1SHH+29gns5m_tccLSwF_GTs52LV9Lw@mail.gmail.com>
+References: <1539939312-19713-1-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA-gt4aLx171zU=qzbzygL6AN98HEPmL6iKG2O6E31ka4A@mail.gmail.com>
+	<CAHmQWvA7fyCFz-qE2_B1SHH+29gns5m_tccLSwF_GTs52LV9Lw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Nov 2018 09:58:21 +0000
+Message-ID: <CAFEAcA8601qTOVRJiMpe84w62ObpzvM-jeq5hLxhs9OFTvCskQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4] Add arm SBSA reference machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
+To: Hongbo Zhang <hongbo.zhang@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
 
-On Thu, Nov 15, 2018 at 10:41:57AM +0100, Luc Michel wrote:
-> Change the sC packet handling to support the multiprocess extension.
-> Instead of returning the first thread, we return the first thread of the
-> current process.
->=20
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+On 16 November 2018 at 08:23, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+> Well, for the SMP booting, when GICv2 used, there is no problem, max
+> CPU number 8 can be booted, including all the three cases: kernel
+> only, UEFI+kernel and ATF+UEFI+kernel.
+>
+> But when GICv3 used, these two cases still work: kernel only, and
+> UEFI+kernel, but ATF+UEFI+kernel fails booting more than 4 cores with
+> GICv3.
+> The original ATF didn't support GICv3, so I added the support:
+> http://git.linaro.org/people/hongbo.zhang/atf-sbsa.git/log/?h=sbsa_gicv3
+>
+> Root cause of failing to boot more than 4 cores with ATF+UEFI+kernel
+> with my GICv3 enabled is due to this:
+> In QEMU, we have this defination
+> #define ARM_DEFAULT_CPUS_PER_CLUSTER 8
+> But in ATF, the defination is
+> #define PLATFORM_MAX_CPUS_PER_CLUSTER 4
+> So when we pass smp=6 for example, QEMU generates MPIDR showing all
+> the 6 cores are at cluster 0, but when ATF parses such MPIDR, the
+> function plat_core_pos_by_mpidr() in plat/qemu/topology.c returns
+> error since there should be no more cores than 4.
+>
+> I think we should change the definition in QEMU to 4, instead of
+> changing the ATF's, because I checked Cortext a57/a72/a73/a75 spec, it
+> says there are 4 cores max at one cluster.
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Architecturally 8 per cluster is entirely legal. This is
+an ATF limitation and there's an argument for fixing it there.
+However, since for this board we're trying to match what real
+hardware with these CPUs would look like, it does make sense
+to use the same number of CPUs per cluster as the hardware.
+If you want your board to instantiate 4 per cluster this is possible,
+and you don't need to change ARM_DEFAULT_CPUS_PER_CLUSTER.
+This value is only used if the board code does not set the
+cpu->mp_affinity value itself (it is the default, as the
+name suggests). So you can just make your board code set
+the mp_affinity up however you like, after the CPU object
+is created but before it is realized.
 
-
-> ---
->  gdbstub.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
->=20
-> diff --git a/gdbstub.c b/gdbstub.c
-> index f1ec3481cb..d19b0137e8 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -1546,13 +1546,18 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
->              type =3D strtoul(p, (char **)&p, 16);
->              sstep_flags =3D type;
->              put_packet(s, "OK");
->              break;
->          } else if (strcmp(p,"C") =3D=3D 0) {
-> -            /* "Current thread" remains vague in the spec, so always ret=
-urn
-> -             *  the first CPU (gdb returns the first thread). */
-> -            put_packet(s, "QC1");
-> +            /* "Current thread" remains vague in the spec, so always ret=
-urn the
-> +             * first thread of the current process (gdb returns the firs=
-t
-> +             * thread).
-> +             */
-> +            cpu =3D get_first_cpu_in_process(s, gdb_get_cpu_process(s, s=
-->g_cpu));
-> +            snprintf(buf, sizeof(buf), "QC%s",
-> +                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_=
-id)));
-> +            put_packet(s, buf);
->              break;
->          } else if (strcmp(p,"fThreadInfo") =3D=3D 0) {
->              s->query_cpu =3D first_cpu;
->              goto report_cpuinfo;
->          } else if (strcmp(p,"sThreadInfo") =3D=3D 0) {
-> --=20
-> 2.19.1
->=20
+thanks
+-- PMM
