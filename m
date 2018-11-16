@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1gNbAB-0001bf-SL
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:15:48 -0500
+	(envelope-from <edgari@xilinx.com>) id 1gNbAi-00022m-37
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:16:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1gNbA7-0006QZ-R2
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:15:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60416)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1gNbA7-0006Py-L1
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:15:43 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EDB9D308FEE5
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 10:15:42 +0000 (UTC)
-From: Erik Skultety <eskultet@redhat.com>
-Date: Fri, 16 Nov 2018 11:14:42 +0100
-Message-Id: <7658e15eca72d520e7a5fb1c2e724702d83d4f7f.1542362949.git.eskultet@redhat.com>
-In-Reply-To: <cover.1542362949.git.eskultet@redhat.com>
-References: <cover.1542362949.git.eskultet@redhat.com>
+	(envelope-from <edgari@xilinx.com>) id 1gNbAe-0006dN-FM
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:16:18 -0500
+Date: Fri, 16 Nov 2018 11:15:49 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20181116101549.GZ7447@toto>
+References: <20181115094207.22846-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/3] qapi: Add "rendernode" display option
- for egl-headless
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20181115094207.22846-1-luc.michel@greensocs.com>
+Subject: Re: [Qemu-devel] [PATCH v6 00/16] gdbstub: support for the
+ multiprocess extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +23,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Erik Skultety <eskultet@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Luc Michel <luc.michel@greensocs.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Unlike SPICE, egl-headless doesn't offer a way of specifying the DRM
-node used for OpenGL, hence QEMU always selecting the first one that is
-available. Thus, add the 'rendernode' option for egl-headless to QAPI.
+On Thu, Nov 15, 2018 at 10:41:51AM +0100, Luc Michel wrote:
 
-Signed-off-by: Erik Skultety <eskultet@redhat.com>
----
- qapi/ui.json | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+Hi Luc,
 
-diff --git a/qapi/ui.json b/qapi/ui.json
-index bf9e157d5a..e0000248d3 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1037,6 +1037,20 @@
-   'data'    : { '*grab-on-hover' : 'bool',
-                 '*zoom-to-fit'   : 'bool'  } }
-=20
-+##
-+# @DisplayEGLHeadless:
-+#
-+# EGL headless display options.
-+#
-+# @rendernode: Which DRM render node should be used. Default is the firs=
-t
-+#              available node on the host.
-+#
-+# Since: 3.1
-+#
-+##
-+{ 'struct'  : 'DisplayEGLHeadless',
-+  'data'    : { '*rendernode' : 'str' } }
-+
-  ##
-  # @DisplayGLMode:
-  #
-@@ -1086,4 +1100,5 @@
-                 '*window-close'  : 'bool',
-                 '*gl'            : 'DisplayGLMode' },
-   'discriminator' : 'type',
--  'data'    : { 'gtk'            : 'DisplayGTK' } }
-+  'data'    : { 'gtk'            : 'DisplayGTK',
-+                'egl-headless'   : 'DisplayEGLHeadless'} }
---=20
-2.19.1
+I think I've either reviewed all of the patches or commented on all now.
+
+Great work!
+
+Thanks,
+Edgar
+
+
+> changes since v5:
+>   - patch 1    Rebased on top of master
+> 
+>   - patch 2    Cluster ID handling hardening to ensure uint32_t overflow
+>                won't cause PID 0 to be used [Edgar]
+> 
+>   - patch 2    Fix the GDB process ordering function to avoid uint32_t
+>                overflow when comparing two cluster_ids [Edgar]
+> 
+> changes since v4:
+>   - patch 1    add cpu_cluster.[ch] files into MAINTAINERS Machine core
+>                section (thanks Eduardo!) [Philippe, Eduardo]
+> 
+>   - patch 1    revert to uint32_t for cluster IDs [Philippe]
+> 
+>   - patch 1    fixed a coding style issue [patchew]
+> 
+> changes since v3:
+>   - patch 1    cpu_cluster.h: remove QEMU_ from the multiple includes
+>                guard #ifdef/#define [Alistair]
+> 
+>   - patch 1    cpu_cluster.c: include osdep.h first [Alistair]
+> 
+>   - patch 1    use uint64_t for cluster ID for prosperity :) [Philippe]
+> 
+>   - patch 1    auto-assign a cluster ID to newly created clusters [Philippe]
+> 
+>   - patch 2    fix mid-code variable declaration [Alistair]
+> 
+>   - patch 3    add a comment in gdb_get_cpu_pid() when retrieving CPU
+>                parent canonical path [Alistair]
+> 
+>   - patch 14   fix a typo in the commit message [Alistair]
+> 
+> changes since v2:
+>   - patch 1    introducing the cpu-cluster type. I didn't opt for an
+>                Interface, but I can add one if you think it's necessary.
+>                For now this class inherits from Device and has a
+>                cluster-id property, used by the GDB stub to compute a
+>                PID.
+> 
+>   - patch 2    removed GDB group related code as it has been replaced
+>                with CPU clusters
+> 
+>   - patch 2/8  moved GDBProcess target_xml field introduction into patch
+>                8 [Philippe]
+> 
+>   - patch 3    gdb_get_cpu_pid() now search for CPU being a child of a
+>                cpu-cluster object. Use the cluster-id to compute the PID.
+> 
+>   - patch 4    gdb_get_process() does not rely on s->processes array
+>                indices anymore as PIDs can now be sparse. Instead, iterate
+>                over the array to find the process.
+> 
+>   - patch 3/4  removed Reviewed-by tags because of substantial changes.
+> 
+>   - patch 4/7  read_thread_id() hardening [Philippe]
+> 
+>   - patch 12   safer vAttach packet parsing [Phillipe]
+> 
+>   - patch 16   put APUs and RPUs in different clusters instead of GDB
+>                groups
+> 
+> changes since v1:
+>   - rename qemu_get_thread_id() to gdb_fmt_thread_id() [Philippe]
+>   - check qemu_strtoul() return value for 'D' packets [Philippe]
+> 
+> 
+> This series adds support for the multiprocess extension of the GDB
+> remote protocol in the QEMU GDB stub.
+> 
+> This extension is useful to split QEMU emulated CPUs in different
+> processes from the point of view of the GDB client. It adds the
+> possibility to debug different kind of processors (e.g. an AArch64 and
+> an ARMv7 CPU) at the same time (it is not possible otherwise since GDB
+> expects an SMP view at the thread granularity.
+> 
+> CPUs are grouped using specially named QOM containers. CPUs that are
+> children of such a container are grouped under the same GDB process.
+> 
+> The last patch groups the CPUs of different model in the zynqmp machines
+> into separate processes.
+> 
+> To test this patchset, you can use the following commands:
+> 
+> (Note that this requires a recent enough GDB, I think GDB 7.2 is OK.
+> Also, it must be compiled to support both ARM and AArch64 architectures)
+> 
+> Run QEMU: (-smp 6 in xlnx-zcu102 enables both cortex-a53 and cortex-r5
+> CPUs)
+> 
+> qemu-system-aarch64 -M xlnx-zcu102 -gdb tcp::1234 -S -smp 6
+> 
+> Run the following commands in GDB:
+> 
+> target extended :1234
+> add-inferior
+> inferior 2
+> attach 2
+> info threads
+> 
+> I want to thanks the Xilinx's QEMU team who sponsored this work for
+> their collaboration and their prototype implementation.
+> 
+> Luc Michel (16):
+>   hw/cpu: introduce CPU clusters
+>   gdbstub: introduce GDB processes
+>   gdbstub: add multiprocess support to '?' packets
+>   gdbstub: add multiprocess support to 'H' and 'T' packets
+>   gdbstub: add multiprocess support to vCont packets
+>   gdbstub: add multiprocess support to 'sC' packets
+>   gdbstub: add multiprocess support to (f|s)ThreadInfo and
+>     ThreadExtraInfo
+>   gdbstub: add multiprocess support to Xfer:features:read:
+>   gdbstub: add multiprocess support to gdb_vm_state_change()
+>   gdbstub: add multiprocess support to 'D' packets
+>   gdbstub: add support for extended mode packet
+>   gdbstub: add support for vAttach packets
+>   gdbstub: processes initialization on new peer connection
+>   gdbstub: gdb_set_stop_cpu: ignore request when process is not attached
+>   gdbstub: add multiprocess extension support
+>   arm/xlnx-zynqmp: put APUs and RPUs in separate CPU clusters
+> 
+>  include/hw/arm/xlnx-zynqmp.h |   3 +
+>  include/hw/cpu/cluster.h     |  38 +++
+>  gdbstub.c                    | 643 ++++++++++++++++++++++++++++++-----
+>  hw/arm/xlnx-zynqmp.c         |  21 +-
+>  hw/cpu/cluster.c             |  59 ++++
+>  MAINTAINERS                  |   2 +
+>  hw/cpu/Makefile.objs         |   2 +-
+>  7 files changed, 687 insertions(+), 81 deletions(-)
+>  create mode 100644 include/hw/cpu/cluster.h
+>  create mode 100644 hw/cpu/cluster.c
+> 
+> --
+> 2.19.1
+> 
