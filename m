@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gNT1A-0006nI-V6
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 20:33:57 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gNTD0-0000zC-Ck
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 20:46:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gNT17-0000ya-Qc
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 20:33:56 -0500
-Received: from mga03.intel.com ([134.134.136.65]:16114)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1gNT17-0000hS-Hl
-	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 20:33:53 -0500
-Message-ID: <5BEE1FA0.10002@intel.com>
-Date: Fri, 16 Nov 2018 09:38:40 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <154230782139.21.15647395935691674416@c26723477dc9>
-In-Reply-To: <154230782139.21.15647395935691674416@c26723477dc9>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 0/8] virtio-balloon: free page hint
- support
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gNTCz-0007ft-Hz
+	for qemu-devel@nongnu.org; Thu, 15 Nov 2018 20:46:10 -0500
+Date: Fri, 16 Nov 2018 09:45:42 +0800 (CST)
+Message-ID: <201811160945428164241@zte.com.cn>
+In-Reply-To: <20181115141003.r6imovu25ymatm4w@kamzik.brq.redhat.com>
+References: 1542022940-46849-1-git-send-email-peng.hao2@zte.com.cn,
+	20181115141003.r6imovu25ymatm4w@kamzik.brq.redhat.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V6_5/6=5D_hw/arm/virt=3A_add_pvp?=
+ =?utf-8?q?anic_device_invirt_acpi_table?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, liliang.opensource@gmail.com, peterx@redhat.com, pbonzini@redhat.com, nilal@redhat.com
+To: drjones@redhat.com
+Cc: peter.maydell@linaro.org, philmd@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On 11/16/2018 02:50 AM, no-reply@patchew.org wrote:
-> Hi,
->
-> This series failed docker-quick@centos7 build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
->
->    CC      net/filter.o
->    CC      net/filter-buffer.o
->    CC      net/filter-mirror.o
->    CC      net/colo-compare.o
-> /tmp/qemu-test/src/migration/rdma.c: In function 'qemu_rdma_accept':
-> /tmp/qemu-test/src/migration/rdma.c:3353:5: error: implicit declaration of function 'migrate_postcopy' [-Werror=implicit-function-declaration]
->       if (migrate_postcopy() && !rdma->is_return_path) {
->       ^
-> /tmp/qemu-test/src/migration/rdma.c:3353:5: error: nested extern declaration of 'migrate_postcopy' [-Werror=nested-externs]
-> cc1: all warnings being treated as errors
-> make: *** [migration/rdma.o] Error 1
-> make: *** Waiting for unfinished jobs....
-
-This is caused by missing "migration/misc.h" in rdma.c, since we moved 
-the migrate_postcopy() declaration there. I'll add it.
-
-Best,
-Wei
+Pj4gYWRkIHB2cGFuaWMgZGV2aWNlIGluIHZpcnQgYWNwaSB0YWJsZSwgc28gd2hlbiBrZW5yZWwg
+Y29tbWFuZCBsaW5lIHVzZXMKPj4gYWNwaT1mb3JjZSwga2VybmVsIGNhbiBnZXQgaW5mbyBmcm9t
+IGFjcGkgdGFibGUgaW4gYWFyY2g2NC4KClsuLi5dCgo+Pgo+PiArc3RhdGljIHZvaWQgYWNwaV9k
+c2R0X2FkZF9wdnBhbmljKEFtbCAqc2NvcGUsIGNvbnN0IE1lbU1hcEVudHJ5ICpwdnBhbmljX21l
+bW1hcCkKPj4gK3sKPj4gKyAgICBBbWwgKmRldiA9IGFtbF9kZXZpY2UoIlBBTkMiKTsKPgo+U2hv
+dWxkbid0IHRoaXMgYmUgIlBFVlQiICgicGFuaWMgZXZlbnQiKSwgbGlrZSBpdCBpcyBmb3IgeDg2
+Pwo+CnllYWgsIEkgd2lsbCBjaGFuZ2UgaXQuCj4+ICsgICAgYW1sX2FwcGVuZChkZXYsIGFtbF9u
+YW1lX2RlY2woIl9ISUQiLCBhbWxfc3RyaW5nKCJRRU1VMDAwMSIpKSk7Cj4+ICsgICAgYW1sX2Fw
+cGVuZChkZXYsIGFtbF9uYW1lX2RlY2woIl9VSUQiLCBhbWxfaW50KDApKSk7Cj4KPldoeSBhZGQg
+X1VJRD8gQWxzbywgSSBzZWUgeDg2IGhhZCBzb21lIGlzc3VlcyB3aXRoIG5vdCBoYXZpbmcgX1NU
+QSBhbmQKPnRoZW4gaGF2aW5nIGEgX1NUQSB3aXRob3V0IHRoZSBVSSBmbGFnLiBJdCBub3cgaGFz
+IF9TVEE9MHhmCj4oUFJFU0VOVHxFTkFCTEVEfFVJfEZVTkNUSU9OSU5HKS4gSSdtIG5vdCBzYXlp
+bmcgd2UgbmVlZCB0byBkbyB0aGF0IHRvLAo+YnV0IEknZCBsaWtlIHRvIGtub3cgaWYgaXQgd2Fz
+IGNvbnNpZGVyZWQgYW5kIGRlY2lkZWQgd2UgZG9uJ3QgbmVlZCB0by4KPgpUaGUgd2F5IHRoZSBr
+ZXJuZWwgY29kZSBwcm9jZXNzZXMgX1NUQSBpcyB0aGF0IGlmIF9TVEEgaXMgbm90IGZvdW5kLCB0
+aGUgZGVmYXVsdCAKc2V0dGluZyBpcyAoUFJFU0VOVHxFTkFCTEVEfFVJfEZVTkNUSU9OSU5HKS4g
+U28gSSB0aGluayBpdCBpcyBub3QgbmVjZXNzYXJ5CiB0byBhZGQgaXQuIEl0IGlzIG9ubHkgcGFy
+c2VkIGluIHRoZSBwdnBhbmljIGRyaXZlci4gCmZvciBfVUlELCBJIHRoaW5rIGl0IGlzIHVzZWQg
+Zm9yIGRldmljZSBpbmRleC4gSSBqdXN0IGZpbGwgaXQgd2l0aCAwIGJlY2F1c2UgdGhlcmUgaXMg
+Cm9ubHkgb25lIHB2cGFuaWMgZGV2aWNlLgoKYnkgdGhlIHdheSwgSG93IHRvIGdldCB0aGUgdmFs
+dWUgb2YgQUNQSSBjb252ZW5pZW50bHk/IGhvdyBkb3UgeW91IGdldCB0aGUgCnZhbHVlIG9mIF9T
+VEE/CgpUaGFua3MuCj4+ICsKPj4gKyAgICBBbWwgKmNycyA9IGFtbF9yZXNvdXJjZV90ZW1wbGF0
+ZSgpOwo+PiArICAgIGFtbF9hcHBlbmQoY3JzLCBhbWxfbWVtb3J5MzJfZml4ZWQocHZwYW5pY19t
+ZW1tYXAtPmJhc2UsCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBw
+dnBhbmljX21lbW1hcC0+c2l6ZSwgQU1MX1JFQURfV1JJVEUpKTsKPj4gKwo+PiArICAgIGFtbF9h
+cHBlbmQoZGV2LCBhbWxfbmFtZV9kZWNsKCJfQ1JTIiwgY3JzKSk7Cj4+ICsKPj4gKyAgICBhbWxf
+YXBwZW5kKHNjb3BlLCBkZXYpOwo+PiArfQo+PiArCj4+ICBzdGF0aWMgdm9pZCBhY3BpX2RzZHRf
+YWRkX3VhcnQoQW1sICpzY29wZSwgY29uc3QgTWVtTWFwRW50cnkgKnVhcnRfbWVtbWFwLAo+PiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQzMl90IHVhcnRf
+aXJxKQo+PiAgewo+PiBAQCAtNzcwLDYgKzc4NSw3IEBAIGJ1aWxkX2RzZHQoR0FycmF5ICp0YWJs
+ZV9kYXRhLCBCSU9TTGlua2VyICpsaW5rZXIsIFZpcnRNYWNoaW5lU3RhdGUgKnZtcykKPj4gICAg
+ICBhY3BpX2RzZHRfYWRkX2NwdXMoc2NvcGUsIHZtcy0+c21wX2NwdXMpOwo+PiAgICAgIGFjcGlf
+ZHNkdF9hZGRfdWFydChzY29wZSwgJm1lbW1hcFtWSVJUX1VBUlRdLAo+PiAgICAgICAgICAgICAg
+ICAgICAgICAgICAoaXJxbWFwW1ZJUlRfVUFSVF0gKyBBUk1fU1BJX0JBU0UpKTsKPj4gKyAgICBh
+Y3BpX2RzZHRfYWRkX3B2cGFuaWMoc2NvcGUsICZtZW1tYXBbVklSVF9QVlBBTklDXSk7Cj4+ICAg
+ICAgYWNwaV9kc2R0X2FkZF9mbGFzaChzY29wZSwgJm1lbW1hcFtWSVJUX0ZMQVNIXSk7Cj4+ICAg
+ICAgYWNwaV9kc2R0X2FkZF9md19jZmcoc2NvcGUsICZtZW1tYXBbVklSVF9GV19DRkddKTsKPj4g
+ICAgICBhY3BpX2RzZHRfYWRkX3ZpcnRpbyhzY29wZSwgJm1lbW1hcFtWSVJUX01NSU9dLAo+PiAt
+LQo+PiAxLjguMy4xCj4+Cj4+Cj4KPlRoYW5rcywKPmRyZXc=
