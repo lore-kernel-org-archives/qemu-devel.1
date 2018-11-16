@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gNhwW-0007ey-4j
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 12:30:12 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gNhxL-0008G2-5S
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 12:31:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gNhwR-0005SH-Vx
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 12:30:08 -0500
-Received: from mail-it1-x131.google.com ([2607:f8b0:4864:20::131]:38938)
+	(envelope-from <richard.henderson@linaro.org>) id 1gNhxG-0005xh-Ka
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 12:30:59 -0500
+Received: from mail-io1-xd33.google.com ([2607:f8b0:4864:20::d33]:41050)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gNhwR-0005Rm-Pe
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 12:30:03 -0500
-Received: by mail-it1-x131.google.com with SMTP id m15so35334349itl.4
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 09:30:03 -0800 (PST)
+	id 1gNhxG-0005sO-BN
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 12:30:54 -0500
+Received: by mail-io1-xd33.google.com with SMTP id s22so5777544ioc.8
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 09:30:53 -0800 (PST)
 References: <cover.1542321076.git.alistair.francis@wdc.com>
-	<84be65cc6caa8421b04ac381f4623e21f80ee39f.1542321076.git.alistair.francis@wdc.com>
+	<b7bd19036aa7af06a54d904f5473d97bd8dcfc6e.1542321076.git.alistair.francis@wdc.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0876b1fe-49bf-a9b2-e531-f7fcc11e162f@linaro.org>
-Date: Fri, 16 Nov 2018 18:29:56 +0100
+Message-ID: <33a84c65-046f-d8ba-d177-4a2edf8ac036@linaro.org>
+Date: Fri, 16 Nov 2018 18:30:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <84be65cc6caa8421b04ac381f4623e21f80ee39f.1542321076.git.alistair.francis@wdc.com>
+In-Reply-To: <b7bd19036aa7af06a54d904f5473d97bd8dcfc6e.1542321076.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v1 22/23] dias: Add RISC-V support
+Subject: Re: [Qemu-devel] [RFC v1 23/23] configure: Add support for building
+ RISC-V host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,8 +39,8 @@ On 11/15/18 11:37 PM, Alistair Francis wrote:
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > Signed-off-by: Michael Clark <mjc@sifive.com>
 > ---
->  disas.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
+>  configure | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
