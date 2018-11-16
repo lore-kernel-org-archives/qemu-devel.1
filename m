@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gNg85-0001sV-T2
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:33:59 -0500
+	(envelope-from <cota@braap.org>) id 1gNgFh-0005sQ-SB
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:41:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gNg82-0007TI-Ka
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:33:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42058)
+	(envelope-from <cota@braap.org>) id 1gNgFe-0002sf-3c
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:41:49 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:35105)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gNg82-0007T6-EK
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:33:54 -0500
-Date: Fri, 16 Nov 2018 16:33:50 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181116163350.40fcd163.cohuck@redhat.com>
-In-Reply-To: <20654e1b-38a0-7f70-df97-7ccd5bf17197@redhat.com>
-References: <20181026105711.29605-1-cohuck@redhat.com>
-	<20181115172032.53945f5e.cohuck@redhat.com>
-	<1c020087-acd7-302a-d5be-dcdbf7b7084d@redhat.com>
-	<20181116161400.1e3c2669.cohuck@redhat.com>
-	<20654e1b-38a0-7f70-df97-7ccd5bf17197@redhat.com>
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gNgFd-0002oQ-8g
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 10:41:46 -0500
+Date: Fri, 16 Nov 2018 10:41:36 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181116154136.GA19765@flamenco>
+References: <04fcf478-29c3-67be-74bb-fd26975fe441@imag.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] MAINTAINERS: clarify some of the tags
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <04fcf478-29c3-67be-74bb-fd26975fe441@imag.fr>
+Subject: Re: [Qemu-devel] qemu-user performance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Etienne =?iso-8859-1?Q?Dubl=E9?= <etienne.duble@imag.fr>
 Cc: qemu-devel@nongnu.org
 
-On Fri, 16 Nov 2018 09:23:27 -0600
-Eric Blake <eblake@redhat.com> wrote:
+On Fri, Nov 16, 2018 at 14:55:01 +0100, Etienne Dublé wrote:
+(snip)
+> So the idea is: what if we could share the cache of code already translated
+> between all those processes?
+> There would be sereral ways to achieve this:
+> * use a shared memory area for the cache, and locking mechanisms.
+> * have a (maybe optional) daemon that would manage the cache of all
+> processes.
+> * python-like model: the first time a binary or library is translated, save
+> this translated code in a cache file next to the original file, with
+> different extension.
+> Please let me know what you think about it, if something similar has already
+> been studied, or if I miss something obvious.
 
-> On 11/16/18 9:14 AM, Cornelia Huck wrote:
+There's a recent paper that implements something similar to what you
+propose:
 
-> >>>> +++ b/MAINTAINERS
-> >>>> @@ -12,9 +12,14 @@ consult qemu-devel and not any specific individual privately.
-> >>>>    Descriptions of section entries:
-> >>>>    
-> >>>>    	M: Mail patches to: FullName <address@domain>
-> >>>> +	   Maintainers are looking after a certain area and must be CCed on
-> >>>> +	   patches. They are considered the main contact point.  
-> >>
-> >> Maybe add something along the lines of "However, a maintainer may accept
-> >> code that has been reviewed by others without explicitly reviewing it
-> >> themselves"?  
-> > 
-> > I'm not sure whether that adds vital information. If a maintainer picks
-> > a patch that has been reviewed by others, they may or may not do a
-> > proper review themselves; but the end result is basically the same
-> > (patch makes its way into the tree.)  
-> 
-> Okay. There's also the counter argument that too much text makes it 
-> something that no one will want to spend time reading, so leaving things 
-> concise is desirable.
+  "A General Persistent Code Caching Framework for Dynamic Binary
+  Translation (DBT)", ATC'16
+  https://www.usenix.org/system/files/conference/atc16/atc16_paper-wang.pdf
 
-We could also write up a more verbose "patch handling and
-maintainership guide" or so; but I'd prefer short comments in
-MAINTAINERS covering the basics only.
+Note that in that paper they compare against HQEMU, and not against
+upstream QEMU. I presume they chose HQEMU because it spends
+more effort than QEMU in trying to generate better code for hot
+code paths (they use LLVM in a separate thread for those), which
+means that code generation can be a bottleneck for some workloads
+(e.g. SPEC's gcc or perlbench).
 
-> 
-> >> At any rate, I like the idea of adding the additional descriptions for
-> >> the categories, even if we still bike-shed on the wording or even the
-> >> set of categories to use.  
-> > 
-> > What about going with this as a starting point?  
-> 
-> Yes, works for me. We can always add more patches later if desired.
+QEMU, on the other hand, generates much simpler code, and as a result
+it is rare to find workloads where code generation is a bottleneck.
+(You can measure this with perf top in your system; make sure you
+configured QEMU with --disable-strip to keep the symbols after
+"make install".)
+So until QEMU gets some sort of "hot code optimization" that makes
+translation more expensive, there's little point in implementing
+persistent code caching for it.
 
-OK, great!
+As an aside, what QEMU version are you running? Performance has
+improved quite a bit (particularly for integer workloads) in the
+last couple of years, e.g. see the perf improvements from v2.6 to
+v2.11 here:
+  https://imgur.com/a/5P5zj
 
-Peter, would you consider picking up this one for 3.1? At the very
-least, it has a R-b from Markus already :)
+Cheers,
+
+		Emilio
