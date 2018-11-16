@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNc2b-0000rZ-2c
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:12:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gNcJy-00010N-Jh
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:30:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNc2W-0007iT-Ez
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:12:01 -0500
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:46986)
+	(envelope-from <peter.maydell@linaro.org>) id 1gNcJv-00087L-Cm
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:29:58 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39593)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNc2W-0007f1-2l
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:11:56 -0500
-Received: by mail-oi1-x235.google.com with SMTP id x202so7941043oif.13
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 03:11:49 -0800 (PST)
+	id 1gNcJu-0007zX-R6
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:29:55 -0500
+Received: by mail-oi1-x243.google.com with SMTP id 192-v6so19384794oii.6
+	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 03:29:48 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1542339811-18549-1-git-send-email-jasowang@redhat.com>
-References: <1542339811-18549-1-git-send-email-jasowang@redhat.com>
+In-Reply-To: <CAHmQWvD1ocAfZo=9aJYeuVDWrBk=AF_D-AgHriYb3-7=n+rR6A@mail.gmail.com>
+References: <1539939312-19713-1-git-send-email-hongbo.zhang@linaro.org>
+	<1539939312-19713-2-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA-vF5orNpfGFe2sGWh=TxWL054PmCM-Yu4faJne+4CkbA@mail.gmail.com>
+	<CAHmQWvD1ocAfZo=9aJYeuVDWrBk=AF_D-AgHriYb3-7=n+rR6A@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Nov 2018 11:11:28 +0000
-Message-ID: <CAFEAcA-ywk5aVkpgOXmforvmEF94VPPj6SOFRibQmE0=jBcoMw@mail.gmail.com>
+Date: Fri, 16 Nov 2018 11:29:27 +0000
+Message-ID: <CAFEAcA_a-YMNaGtPPn+8DBFmx4xGYCkuybMck_Wquw6zmLTbCQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] Net patches
+Subject: Re: [Qemu-devel] [PATCH v4] hw/arm: Add arm SBSA reference machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +31,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Hongbo Zhang <hongbo.zhang@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
 
-On 16 November 2018 at 03:43, Jason Wang <jasowang@redhat.com> wrote:
-> The following changes since commit d835c6192495dc5b2c3a15a0761eb57d8d310828:
->
->   Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2018-11-15-1' into staging (2018-11-15 14:18:25 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/jasowang/qemu.git tags/net-pull-request
->
-> for you to fetch changes up to 013a62020a92f371555c67342424f2f944b62be4:
->
->   net/filter-rewriter.c: Fix coverity static analysis issue (2018-11-16 11:08:26 +0800)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
-> Zhang Chen (1):
->       net/filter-rewriter.c: Fix coverity static analysis issue
->
->  net/filter-rewriter.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+On 16 November 2018 at 10:46, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+> On Fri, 16 Nov 2018 at 00:05, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> If after you've done that this patch is still more than
+>> about 500 lines long, I would recommend that you split it
+>> up into coherent pieces, to make it easier to review.
 
+> I think however I re-work this file, it is still more than 500 lines.
+> If split it, then how? one for most basic skeleton, including memory
+> map, class and instance init etc, and another adding peripheral
+> devices, like pcie etc?
 
-Applied, thanks.
+Yes, that's a reasonable split.
 
+>> This is still generating a lot of device tree nodes.
+>> I thought we had agreed that we were going to just have
+>> a minimal device tree that says "here is the RAM" and nothing
+>> else ?
+>>
+> If I remember correct, it was not only the RAM, but also the CPUs
+> because it depends on the command parameters dynamically, and also the
+> GIC as well since it depends on the CPU number.
+> And should NUMA info if used, be added to DT?
+> And by the way, I didn't find the RAM size info in the DT.
+
+You should include the absolute minimum you need that you
+cannot either say "we know what this value is because we
+know the board" or probe for anyway. I think that is basically
+ram inf and number of CPUs. (Ram size and numa configuration
+is added to the dtb by the hw/arm/boot.c code, which sets up
+the "/memory" nodes.)
+
+You shouldn't need to put the GIC info into the DT, because
+you can just hard code into UEFI where it is in memory.
+
+>> > +static void create_ehci(const VirtMachineState *vms, qemu_irq *pic)
+>> > +{
+>> > +    hwaddr base = vms->memmap[VIRT_EHCI].base;
+>> > +    int irq = vms->irqmap[VIRT_EHCI];
+>> > +    USBBus *usb_bus;
+>> > +
+>> > +    sysbus_create_simple("exynos4210-ehci-usb", base, pic[irq]);
+>>
+>> What is this using the exynos4210 USB device for? That
+>> is definitely not correct for a generic board.
+>>
+> Checked the code:
+> #define TYPE_SYS_BUS_EHCI "sysbus-ehci-usb"
+> #define TYPE_EXYNOS4210_EHCI "exynos4210-ehci-usb"
+> #define TYPE_TEGRA2_EHCI "tegra2-ehci-usb"
+> #define TYPE_PPC4xx_EHCI "ppc4xx-ehci-usb"
+> #define TYPE_FUSBH200_EHCI "fusbh200-ehci-usb"
+>
+> The first one seems only a parent type, not a general instance, cannot
+> be used directly.
+> The other four are specific instances using the first as parent type,
+> one of them can be chosen to use.
+> That is my understanding, any comments, or do we need to implement one
+> which seems generic?
+
+You need to work out what you want and implement that;
+I don't really know enough about USB to advise.
+You probably also need to consider how you want
+the USB companion chip stuff to work -- I know that
+we've had a bug report that the Exynos4210 USB setup
+is not getting that right, so it may be a poor example
+to copy from.
+
+>> > +
+>> > +    usb_bus = usb_bus_find(-1);
+>> > +    usb_create_simple(usb_bus, "usb-kbd");
+>> > +    usb_create_simple(usb_bus, "usb-mouse");
+>>
+>> Don't create USB devices by default -- let the user do it on
+>> the command line.
+>>
+> Some users hope that, I can remove it if not reasonable.
+
+Almost no other board models do it (only a few PPC ones
+and an sh4 board). Generally for QEMU the approach we take
+is that we don't provide defaults, we expect the user
+(or the 'management layer' software like libvirt) to
+specify what they want. This allows users to specify that
+they *don't* want a usb keyboard, for instance.
+
+>> > +    /* If we have an EL3 boot ROM then the assumption is that it will
+>> > +     * implement PSCI itself, so disable QEMU's internal implementation
+>> > +     * so it doesn't get in the way. Instead of starting secondary
+>> > +     * CPUs in PSCI powerdown state we will start them all running and
+>> > +     * let the boot ROM sort them out.
+>> > +     * The usual case is that we do use QEMU's PSCI implementation;
+>> > +     * if the guest has EL2 then we will use SMC as the conduit,
+>> > +     * and otherwise we will use HVC (for backwards compatibility and
+>> > +     * because if we're using KVM then we must use HVC).
+>> > +     */
+>> > +    if (vms->secure && firmware_loaded) {
+>> > +        vms->psci_conduit = QEMU_PSCI_CONDUIT_DISABLED;
+>> > +    } else if (vms->virt) {
+>> > +        vms->psci_conduit = QEMU_PSCI_CONDUIT_SMC;
+>> > +    } else {
+>> > +        vms->psci_conduit = QEMU_PSCI_CONDUIT_HVC;
+>> > +    }
+>>
+>> Do you actually intend this to work in all these cases? I
+>> thought the intention was "always start the boot rom in EL3"
+>> for this board, like the real hardware would. In that case, most
+>> of these if clauses are dead code.
+>>
+> Well, I myself prefer "always enable EL3" too.
+> But during this work, I found that if EL2/EL3 enabled, QEMU runs much
+> slower than without EL2/3, so I guess if there would be some user of
+> this platform, for the reason of speed they choose to disable EL2/3,
+> should we give them such a chance?
+> If get confirmation that we always enable EL2/3, that is fine for me,
+> this will make codes cleaner.
+>
+> (By the way, I wonder why QEMU becomes much slower with EL2/3 enabled,
+> because when OS is running, most of the time, we don't call into
+> EL2/3, does this mean there is a big space for us to optimize it?)
+
+I think users who don't care about the EL2/EL3 parts of the software
+stack should just use the "virt" machine instead -- that is the
+board we have for "run as fast as possible and just boot a kernel".
+
+It would be interesting at some point to find out why EL2 and EL3
+are causing slowdowns, yes.
+
+thanks
 -- PMM
