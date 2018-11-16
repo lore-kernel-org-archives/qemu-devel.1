@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNfCu-00087d-TP
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:34:53 -0500
+	(envelope-from <casasfernando@outlook.com>) id 1gNbvj-0003uT-Qb
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:05:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gNfCt-0002WK-PF
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:34:52 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40549)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gNfCt-0002Sp-4M
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 09:34:51 -0500
-Received: by mail-ot1-x342.google.com with SMTP id s5so21470402oth.7
-	for <qemu-devel@nongnu.org>; Fri, 16 Nov 2018 06:34:46 -0800 (PST)
+	(envelope-from <casasfernando@outlook.com>) id 1gNbvh-0002xr-LS
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 06:04:55 -0500
+From: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@outlook.com>
+Date: Fri, 16 Nov 2018 11:04:37 +0000
+Message-ID: <AM0PR06MB52990C51EA2E76CFC9D9D8BDA4DD0@AM0PR06MB5299.eurprd06.prod.outlook.com>
+References: <VI1PR10MB0301515CFEEA940842FDF26FB7330@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+	<20171211115634.GI13593@stefanha-x1.localdomain>
+	<VI1PR10MB030143CAC84D8E8AA783C0B0B7370@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+	<20171213112345.GK16782@stefanha-x1.localdomain>
+	<VI1PR10MB0301BD1873225A06B658C988B7350@VI1PR10MB0301.EURPRD10.PROD.OUTLOOK.COM>
+	<20180129160104.GN20446@stefanha-x1.localdomain>
+	<AM6PR10MB2247BA55ABF2CC4F38B30339B7F80@AM6PR10MB2247.EURPRD10.PROD.OUTLOOK.COM>
+	<20181018123816.GB4946@localhost.localdomain>
+	<AM6PR10MB2247D63F532AE33155BA57EFB7F80@AM6PR10MB2247.EURPRD10.PROD.OUTLOOK.COM>
+In-Reply-To: <AM6PR10MB2247D63F532AE33155BA57EFB7F80@AM6PR10MB2247.EURPRD10.PROD.OUTLOOK.C
+	OM>
+Content-Language: en-US
 MIME-Version: 1.0
-In-Reply-To: <d9876015-2126-79fe-415f-ca7427ab3059@gmail.com>
-References: <d9876015-2126-79fe-415f-ca7427ab3059@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Nov 2018 14:34:24 +0000
-Message-ID: <CAFEAcA84aoWNdu1T90iR0uw7emfF1SRF09FjL+gu12yrdAr2yA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Support u-boot noload images for arm as
- used by NetBSD/evbarm GENERIC kernel.
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] qemu process crash: Assertion failed:
+ QLIST_EMPTY(&bs->tracked_requests)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,110 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nick Hudson <nicholas.a.hudson@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: =?iso-8859-1?Q?Fernando_Casas_Sch=F6ssow?= <casasfernando@hotmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Jeff
+	Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 
-On 7 November 2018 at 13:19, Nick Hudson <nicholas.a.hudson@gmail.com> wrote:
-> noload kernels are loaded with the u-boot image header and as a result
-> the header size needs adding to the entry point.  Fake up a hdr so the
-> kernel image is loaded at the right address and the entry point is
-> adjusted appropriately
->
-> Signed-off-by: Nick Hudson <skrll@netbsd.org>
+Hi again,
 
-Hi; thanks for this patch.
+I hit another occurrence of this issue and collected the qemy dump as well.=
+ So at the moment I have two qemu dumps for this issue happening on two dif=
+ferent guests.
+I wish I know how to analyze them myself but is not the case so if anyone i=
+n the list is willing to take a look I'm more than willing to share them.
 
-> ---
->  hw/arm/boot.c         |  8 +++++---
->  hw/core/loader.c      | 12 +++++++++---
->  hw/core/uboot_image.h |  1 +
->  3 files changed, 15 insertions(+), 6 deletions(-)
->
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index 586baa9b64..450267566a 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -30,8 +30,9 @@
->   * Documentation/arm/Booting and Documentation/arm64/booting.txt
->   * They have different preferred image load offsets from system RAM base.
->   */
-> -#define KERNEL_ARGS_ADDR 0x100
-> -#define KERNEL_LOAD_ADDR 0x00010000
-> +#define KERNEL_ARGS_ADDR   0x100
-> +#define KERNEL_NOLOAD_ADDR 0x00000000
-> +#define KERNEL_LOAD_ADDR   0x00010000
->  #define KERNEL64_LOAD_ADDR 0x00080000
->
->  #define ARM64_TEXT_OFFSET_OFFSET    8
-> @@ -1078,7 +1079,8 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info
-> *info)
->      }
->      entry = elf_entry;
->      if (kernel_size < 0) {
-> -        kernel_size = load_uimage_as(info->kernel_filename, &entry, NULL,
-> +        uint64_t loadaddr = info->loader_start + KERNEL_NOLOAD_ADDR;
-> +        kernel_size = load_uimage_as(info->kernel_filename, &entry,
-> &loadaddr,
->                                       &is_linux, NULL, NULL, as);
+Thanks in advance.
 
-I don't really understand this change. The API for load_uimage_as()
-says that the loadaddr argument is an output, not an input, and that
-it is ignored if it is NULL. If we're changing the API here then
-we need to (a) document that change and (b) check all the callers
-can handle it. It would be better if we can avoid having to do that.
+Fernando
 
->      }
->      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 0) {
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index aa0b3fc867..952562c2da 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -638,13 +638,19 @@ static int load_uboot_image(const char *filename,
-> hwaddr *ep, hwaddr *loadaddr,
->          goto out;
->
->      if (hdr->ih_type != image_type) {
-> -        fprintf(stderr, "Wrong image type %d, expected %d\n", hdr->ih_type,
-> -                image_type);
-> -        goto out;
-> +        if (image_type != IH_TYPE_KERNEL && hdr->ih_type !=
-> IH_TYPE_KERNEL_NOLOAD) {
-> +            fprintf(stderr, "Wrong image type %d, expected %d\n",
-> hdr->ih_type,
-> +                    image_type);
-> +            goto out;
-> +        }
->      }
->
->      /* TODO: Implement other image types.  */
->      switch (hdr->ih_type) {
-> +    case IH_TYPE_KERNEL_NOLOAD:
-> +        hdr->ih_load = *loadaddr + sizeof(*hdr);
+On jue, oct 18, 2018 at 3:40 PM, Fernando Casas Sch=F6ssow <casasfernando@h=
+otmail.com> wrote:
+Hi Kevin,
 
-This will segfault if the user passed in NULL for loadaddr,
-as they are allowed to do by the API.
+Not at the moment. This is a production system and pretty much up to date b=
+ut can't upgrade to 3.0 yet.
+If the dump can be of any use, I can upload it somewhere for analysis.
 
-> +        hdr->ih_ep += hdr->ih_load;
-> +
+BR,
 
-Cases which fall through need a specific
-     /* fall through */
+Fernando
 
-comment. This tells human readers and static analysis tools that
-it was intentional.
-
->      case IH_TYPE_KERNEL:
->          address = hdr->ih_load;
->          if (translate_fn) {
-> diff --git a/hw/core/uboot_image.h b/hw/core/uboot_image.h
-> index 34c11a70a6..608022de6e 100644
-> --- a/hw/core/uboot_image.h
-> +++ b/hw/core/uboot_image.h
-> @@ -124,6 +124,7 @@
->  #define IH_TYPE_SCRIPT        6    /* Script file            */
->  #define IH_TYPE_FILESYSTEM    7    /* Filesystem Image (any type)    */
->  #define IH_TYPE_FLATDT        8    /* Binary Flat Device Tree Blob    */
-> +#define IH_TYPE_KERNEL_NOLOAD  14    /* OS Kernel Image (noload)    */
-
-thanks
--- PMM
+On jue, oct 18, 2018 at 2:38 PM, Kevin Wolf <kwolf@redhat.com> wrote:
+Hi Fernando, Am 18.10.2018 um 14:25 hat Fernando Casas Sch=F6ssow geschrieb=
+en:
+I hope this email finds you well and I apologize in advance for resurrectin=
+g this thread. I'm currently running on qemu 2.12.1 and I'm still having th=
+is issue every few days but now I managed to get a core dump generated (wit=
+hout including the guest memory). Would you take a look at the dump? Please=
+ let me know how do you prefer me to share it. The file is around 290MB as =
+is but I can try to compress it.
+would it be possible for you to test whether the bug still exists in QEMU 3=
+.0? There were a few fixes related to request draining in that release, so =
+maybe it's already solved now. Kevin
