@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gNaK9-0005nP-6e
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:22:02 -0500
+	(envelope-from <thuth@redhat.com>) id 1gNaMh-0007Cf-7M
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:24:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gNaK7-00017U-8l
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:22:01 -0500
-Date: Fri, 16 Nov 2018 17:21:33 +0800 (CST)
-Message-ID: <201811161721333758820@zte.com.cn>
-In-Reply-To: <20181116090751.272tyagevqwvosy6@kamzik.brq.redhat.com>
-References: 20181115141003.r6imovu25ymatm4w@kamzik.brq.redhat.com,
-	20181116090751.272tyagevqwvosy6@kamzik.brq.redhat.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_V6_5/6=5D_hw/arm/virt=3A_add_pvp?=
- =?utf-8?q?anic_deviceinvirt_acpi_table?=
+	(envelope-from <thuth@redhat.com>) id 1gNaMb-0002cW-62
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:24:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44610)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gNaMa-0002bt-Rk
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 04:24:33 -0500
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f0875422-2f51-e136-47af-e52947b4b405@redhat.com>
+Date: Fri, 16 Nov 2018 10:24:29 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] QEMU crash with sun4v machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +25,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: drjones@redhat.com
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org
+To: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Pj4gPj4gYWRkIHB2cGFuaWMgZGV2aWNlIGluIHZpcnQgYWNwaSB0YWJsZSwgc28gd2hlbiBrZW5y
-ZWwgY29tbWFuZCBsaW5lIHVzZXMKPj4gPj4gYWNwaT1mb3JjZSwga2VybmVsIGNhbiBnZXQgaW5m
-byBmcm9tIGFjcGkgdGFibGUgaW4gYWFyY2g2NC4KPj4KPj4gWy4uLl0KPj4KPj4gPj4KPj4gPj4g
-K3N0YXRpYyB2b2lkIGFjcGlfZHNkdF9hZGRfcHZwYW5pYyhBbWwgKnNjb3BlLCBjb25zdCBNZW1N
-YXBFbnRyeSAqcHZwYW5pY19tZW1tYXApCj4+ID4+ICt7Cj4+ID4+ICsgICAgQW1sICpkZXYgPSBh
-bWxfZGV2aWNlKCJQQU5DIik7Cj4+ID4KPj4gPlNob3VsZG4ndCB0aGlzIGJlICJQRVZUIiAoInBh
-bmljIGV2ZW50IiksIGxpa2UgaXQgaXMgZm9yIHg4Nj8KPj4gPgo+PiB5ZWFoLCBJIHdpbGwgY2hh
-bmdlIGl0Lgo+PiA+PiArICAgIGFtbF9hcHBlbmQoZGV2LCBhbWxfbmFtZV9kZWNsKCJfSElEIiwg
-YW1sX3N0cmluZygiUUVNVTAwMDEiKSkpOwo+PiA+PiArICAgIGFtbF9hcHBlbmQoZGV2LCBhbWxf
-bmFtZV9kZWNsKCJfVUlEIiwgYW1sX2ludCgwKSkpOwo+PiA+Cj4+ID5XaHkgYWRkIF9VSUQ/IEFs
-c28sIEkgc2VlIHg4NiBoYWQgc29tZSBpc3N1ZXMgd2l0aCBub3QgaGF2aW5nIF9TVEEgYW5kCj4+
-ID50aGVuIGhhdmluZyBhIF9TVEEgd2l0aG91dCB0aGUgVUkgZmxhZy4gSXQgbm93IGhhcyBfU1RB
-PTB4Zgo+PiA+KFBSRVNFTlR8RU5BQkxFRHxVSXxGVU5DVElPTklORykuIEknbSBub3Qgc2F5aW5n
-IHdlIG5lZWQgdG8gZG8gdGhhdCB0bywKPj4gPmJ1dCBJJ2QgbGlrZSB0byBrbm93IGlmIGl0IHdh
-cyBjb25zaWRlcmVkIGFuZCBkZWNpZGVkIHdlIGRvbid0IG5lZWQgdG8uCj4+ID4KPj4gVGhlIHdh
-eSB0aGUga2VybmVsIGNvZGUgcHJvY2Vzc2VzIF9TVEEgaXMgdGhhdCBpZiBfU1RBIGlzIG5vdCBm
-b3VuZCwgdGhlIGRlZmF1bHQKPj4gc2V0dGluZyBpcyAoUFJFU0VOVHxFTkFCTEVEfFVJfEZVTkNU
-SU9OSU5HKS4gU28gSSB0aGluayBpdCBpcyBub3QgbmVjZXNzYXJ5Cj4+ICB0byBhZGQgaXQuIEl0
-IGlzIG9ubHkgcGFyc2VkIGluIHRoZSBwdnBhbmljIGRyaXZlci4KPgo+R29vZCBlbm91Z2ggZm9y
-IG1lLgo+Cj4+IGZvciBfVUlELCBJIHRoaW5rIGl0IGlzIHVzZWQgZm9yIGRldmljZSBpbmRleC4g
-SSBqdXN0IGZpbGwgaXQgd2l0aCAwIGJlY2F1c2UgdGhlcmUgaXMKPj4gb25seSBvbmUgcHZwYW5p
-YyBkZXZpY2UuCj4KPk9LLCBidXQgSSdtIHN0aWxsIG5vdCBzdXJlIGl0J3MgbmVjZXNzYXJ5Lgo+
-CnlvdSBjYW4gc2VlIG90aGVyIGRldmljZXMgaW4gdmlydC1hY3BpLWJ1aWxkLmMuIF9VSUQgaXMg
-dXNlZCBmb3IgZGV2aWNlIGluZGV4LgoKPj4KPj4gYnkgdGhlIHdheSwgSG93IHRvIGdldCB0aGUg
-dmFsdWUgb2YgQUNQSSBjb252ZW5pZW50bHk/IGhvdyBkb3UgeW91IGdldCB0aGUKPj4gdmFsdWUg
-b2YgX1NUQT8KPgo+Tm90IHN1cmUgd2hhdCB5b3UgbWVhbiBoZXJlLiBGcm9tIHdoZXJlIGRvIHlv
-dSB3YW50IHRvIGNoZWNrIHRoZSB2YWx1ZT8KPklmIHlvdSBtZWFuIGZyb20gZ3Vlc3QgdXNlcnNw
-YWNlLCB0aGVuIHRoZXJlJ3Mgbm90aGluZyBjb252ZW5pZW50IHRoYXQgSQo+a25vdyBvZi4gWW91
-J2xsIGhhdmUgdG8gZGlzYXNzZW1ibGUgdGhlIHRhYmxlcyB5b3UgZXh0cmFjdCBmcm9tIHN5c2Zz
-LAo+YWZhaWsuCj4KeWVhaCAsSSBqdXN0IHdhbnQgdG8ga25vdyB0aGlzLgp0aGFua3MKPlRoYW5r
-cywKPmRyZXcKCj4KPiBUaGFua3MuCj4gPj4gKwo+ID4+ICsgICAgQW1sICpjcnMgPSBhbWxfcmVz
-b3VyY2VfdGVtcGxhdGUoKTsKPiA+PiArICAgIGFtbF9hcHBlbmQoY3JzLCBhbWxfbWVtb3J5MzJf
-Zml4ZWQocHZwYW5pY19tZW1tYXAtPmJhc2UsCj4gPj4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIHB2cGFuaWNfbWVtbWFwLT5zaXplLCBBTUxfUkVBRF9XUklURSkpOwo+
-ID4+ICsKPiA+PiArICAgIGFtbF9hcHBlbmQoZGV2LCBhbWxfbmFtZV9kZWNsKCJfQ1JTIiwgY3Jz
-KSk7Cj4gPj4gKwo+ID4+ICsgICAgYW1sX2FwcGVuZChzY29wZSwgZGV2KTsKPiA+PiArfQo+ID4+
-ICsKPiA+PiAgc3RhdGljIHZvaWQgYWNwaV9kc2R0X2FkZF91YXJ0KEFtbCAqc2NvcGUsIGNvbnN0
-IE1lbU1hcEVudHJ5ICp1YXJ0X21lbW1hcCwKPiA+PiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIHVpbnQzMl90IHVhcnRfaXJxKQo+ID4+ICB7Cj4gPj4gQEAgLTc3
-MCw2ICs3ODUsNyBAQCBidWlsZF9kc2R0KEdBcnJheSAqdGFibGVfZGF0YSwgQklPU0xpbmtlciAq
-bGlua2VyLCBWaXJ0TWFjaGluZVN0YXRlICp2bXMpCj4gPj4gICAgICBhY3BpX2RzZHRfYWRkX2Nw
-dXMoc2NvcGUsIHZtcy0+c21wX2NwdXMpOwo+ID4+ICAgICAgYWNwaV9kc2R0X2FkZF91YXJ0KHNj
-b3BlLCAmbWVtbWFwW1ZJUlRfVUFSVF0sCj4gPj4gICAgICAgICAgICAgICAgICAgICAgICAgKGly
-cW1hcFtWSVJUX1VBUlRdICsgQVJNX1NQSV9CQVNFKSk7Cj4gPj4gKyAgICBhY3BpX2RzZHRfYWRk
-X3B2cGFuaWMoc2NvcGUsICZtZW1tYXBbVklSVF9QVlBBTklDXSk7Cj4gPj4gICAgICBhY3BpX2Rz
-ZHRfYWRkX2ZsYXNoKHNjb3BlLCAmbWVtbWFwW1ZJUlRfRkxBU0hdKTsKPiA+PiAgICAgIGFjcGlf
-ZHNkdF9hZGRfZndfY2ZnKHNjb3BlLCAmbWVtbWFwW1ZJUlRfRldfQ0ZHXSk7Cj4gPj4gICAgICBh
-Y3BpX2RzZHRfYWRkX3ZpcnRpbyhzY29wZSwgJm1lbW1hcFtWSVJUX01NSU9dLAo+ID4+IC0tCj4g
-Pj4gMS44LjMuMQo+ID4+Cj4gPj4KPiA+Cj4gPlRoYW5rcywKPiA+ZHJldw==
+
+ Hi Artyom,
+
+I noticed that QEMU aborts the hard way when it is simply started like this:
+
+$ sparc64-softmmu/qemu-system-sparc64 -M sun4v 
+qemu: fatal: Trap 0x0010 while trap level (6) >= MAXTL (6), Error state
+pc: 0000000000000200  npc: 0000000000000204
+%g0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%g4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%o0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+%o4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+%l0-3: 0000000007f00000 000001ff00000000 000001fff0080000 0000000000000000 
+%l4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+%i0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+%i4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+%f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%f32:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%f40:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%f48:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+%f56:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
+pstate: 00000014 ccr: 44 (icc: -Z-- xcc: -Z--) asi: 00 tl: 6 pil: 0 gl: 8
+tbr: 0000000000000000 hpstate: 0000000000000004 htba: 0000000000000000
+cansave: 6 canrestore: 0 otherwin: 0 wstate: 0 cleanwin: 6 cwp: 7
+fsr: 0000000000000000 y: 0000000000000000 fprs: 0000000000000000
+
+Aborted (core dumped)
+
+That's ugly - QEMU should never simply abort unless we hit a
+programming error. Do you see a good way to ease this situation, e.g.
+by printing a more friendly error message if both, kernel and bios
+could not be loaded?
+
+ Thomas
