@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gNb5J-0006CM-QC
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:10:48 -0500
+	(envelope-from <edgari@xilinx.com>) id 1gNb5O-0006Fx-L9
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:10:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gNb5E-0003Ou-Lt
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:10:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52538)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gNb5E-0003Na-DS
-	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:10:40 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181115140501.7872-1-david@redhat.com>
-	<20181115140501.7872-7-david@redhat.com>
-Date: Fri, 16 Nov 2018 11:10:35 +0100
-In-Reply-To: <20181115140501.7872-7-david@redhat.com> (David Hildenbrand's
-	message of "Thu, 15 Nov 2018 15:04:58 +0100")
-Message-ID: <87muq972p0.fsf@dusky.pond.sub.org>
+	(envelope-from <edgari@xilinx.com>) id 1gNb5N-0003aO-L9
+	for qemu-devel@nongnu.org; Fri, 16 Nov 2018 05:10:50 -0500
+Date: Fri, 16 Nov 2018 11:10:08 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20181116101008.GT7447@toto>
+References: <20181115094207.22846-1-luc.michel@greensocs.com>
+	<20181115094207.22846-11-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1 6/9] qapi: rewrite string-input-visitor
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20181115094207.22846-11-luc.michel@greensocs.com>
+Subject: Re: [Qemu-devel] [PATCH v6 10/16] gdbstub: add multiprocess support
+ to 'D' packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,691 +25,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Luc Michel <luc.michel@greensocs.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-David Hildenbrand <david@redhat.com> writes:
+On Thu, Nov 15, 2018 at 10:42:01AM +0100, Luc Michel wrote:
+> 'D' packets are used by GDB to detach from a process. In multiprocess
+> mode, the PID to detach from is sent in the request.
+>=20
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
-> The input visitor has some problems right now, especially
-> - unsigned type "Range" is used to process signed ranges, resulting in
->   inconsistent behavior and ugly/magical code
-> - uint64_t are parsed like int64_t, so big uint64_t values are not
->   supported and error messages are misleading
-> - lists/ranges of int64_t are accepted although no list is parsed and
->   we should rather report an error
-> - lists/ranges are preparsed using int64_t, making it hard to
->   implement uint64_t values or uint64_t lists
-> - types that don't support lists don't bail out
-> - visiting beyond the end of a list is not handled properly
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-  - We don't actually parse lists, we parse *sets*: members are sorted,
-    and duplicates eliminated
 
-Reproducers for the problems would be nice.  Suggestion, not demand.
-
->
-> So let's rewrite it by getting rid of usage of the type "Range" and
-> properly supporting lists of int64_t and uint64_t (including ranges of
-> both types), fixing the above mentioned issues.
->
-> Lists of other types are not supported and will properly report an
-> error. Virtual walks are now supported.
->
-> Tests have to be fixed up:
-> - Two BUGs were hardcoded that are fixed now
-> - The string-input-visitor now actually returns a parsed list and not
->   an ordered set.
-
-I'd expect this to necessitate an update of callers that expect a set, but...
-
-> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  include/qapi/string-input-visitor.h |   4 +-
->  qapi/string-input-visitor.c         | 410 ++++++++++++++++------------
->  tests/test-string-input-visitor.c   |  18 +-
->  3 files changed, 239 insertions(+), 193 deletions(-)
-
-... there's none.
-
-Let me know if you need help finding them.  I think we tracked them down
-during the discussion that led to this series.
-
->
-> diff --git a/include/qapi/string-input-visitor.h b/include/qapi/string-input-visitor.h
-> index 33551340e3..921f3875b9 100644
-> --- a/include/qapi/string-input-visitor.h
-> +++ b/include/qapi/string-input-visitor.h
-> @@ -19,8 +19,8 @@ typedef struct StringInputVisitor StringInputVisitor;
->  
->  /*
->   * The string input visitor does not implement support for visiting
-> - * QAPI structs, alternates, null, or arbitrary QTypes.  It also
-> - * requires a non-null list argument to visit_start_list().
-> + * QAPI structs, alternates, null, or arbitrary QTypes. Only flat lists
-> + * of integers (except type "size") are supported.
->   */
->  Visitor *string_input_visitor_new(const char *str);
->  
-> diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-> index b89c6c4e06..4113be01fb 100644
-> --- a/qapi/string-input-visitor.c
-> +++ b/qapi/string-input-visitor.c
-> @@ -4,10 +4,10 @@
->   * Copyright Red Hat, Inc. 2012-2016
->   *
->   * Author: Paolo Bonzini <pbonzini@redhat.com>
-> + *         David Hildenbrand <david@redhat.com>
->   *
->   * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
->   * See the COPYING.LIB file in the top-level directory.
-> - *
->   */
->  
->  #include "qemu/osdep.h"
-> @@ -18,21 +18,39 @@
->  #include "qapi/qmp/qerror.h"
->  #include "qapi/qmp/qnull.h"
->  #include "qemu/option.h"
-> -#include "qemu/queue.h"
-> -#include "qemu/range.h"
->  #include "qemu/cutils.h"
->  
-> +typedef enum ListMode {
-> +    /* no list parsing active / no list expected */
-> +    LM_NONE,
-> +    /* we have an unparsed string remaining */
-> +    LM_UNPARSED,
-> +    /* we have an unfinished int64 range */
-> +    LM_INT64_RANGE,
-> +    /* we have an unfinished uint64 range */
-> +    LM_UINT64_RANGE,
-> +    /* we have parsed the string completely and no range is remaining */
-> +    LM_END,
-> +} ListMode;
-> +
-> +typedef union RangeElement {
-> +    int64_t i64;
-> +    uint64_t u64;
-> +} RangeElement;
->  
->  struct StringInputVisitor
->  {
->      Visitor visitor;
->  
-> -    GList *ranges;
-> -    GList *cur_range;
-> -    int64_t cur;
-> +    /* List parsing state */
-> +    ListMode lm;
-> +    RangeElement rangeNext;
-> +    RangeElement rangeEnd;
-> +    const char *unparsed_string;
-> +    void *list;
->  
-> +    /* The original string to parse */
->      const char *string;
-> -    void *list; /* Only needed for sanity checking the caller */
->  };
->  
->  static StringInputVisitor *to_siv(Visitor *v)
-> @@ -40,136 +58,43 @@ static StringInputVisitor *to_siv(Visitor *v)
->      return container_of(v, StringInputVisitor, visitor);
->  }
->  
-> -static void free_range(void *range, void *dummy)
-> -{
-> -    g_free(range);
-> -}
-> -
-> -static int parse_str(StringInputVisitor *siv, const char *name, Error **errp)
-> -{
-> -    char *str = (char *) siv->string;
-> -    long long start, end;
-> -    Range *cur;
-> -    char *endptr;
-> -
-> -    if (siv->ranges) {
-> -        return 0;
-> -    }
-> -
-> -    if (!*str) {
-> -        return 0;
-> -    }
-> -
-> -    do {
-> -        errno = 0;
-> -        start = strtoll(str, &endptr, 0);
-> -        if (errno == 0 && endptr > str) {
-> -            if (*endptr == '\0') {
-> -                cur = g_malloc0(sizeof(*cur));
-> -                range_set_bounds(cur, start, start);
-> -                siv->ranges = range_list_insert(siv->ranges, cur);
-> -                cur = NULL;
-> -                str = NULL;
-> -            } else if (*endptr == '-') {
-> -                str = endptr + 1;
-> -                errno = 0;
-> -                end = strtoll(str, &endptr, 0);
-> -                if (errno == 0 && endptr > str && start <= end &&
-> -                    (start > INT64_MAX - 65536 ||
-> -                     end < start + 65536)) {
-> -                    if (*endptr == '\0') {
-> -                        cur = g_malloc0(sizeof(*cur));
-> -                        range_set_bounds(cur, start, end);
-> -                        siv->ranges = range_list_insert(siv->ranges, cur);
-> -                        cur = NULL;
-> -                        str = NULL;
-> -                    } else if (*endptr == ',') {
-> -                        str = endptr + 1;
-> -                        cur = g_malloc0(sizeof(*cur));
-> -                        range_set_bounds(cur, start, end);
-> -                        siv->ranges = range_list_insert(siv->ranges, cur);
-> -                        cur = NULL;
-> -                    } else {
-> -                        goto error;
-> -                    }
-> -                } else {
-> -                    goto error;
-> -                }
-> -            } else if (*endptr == ',') {
-> -                str = endptr + 1;
-> -                cur = g_malloc0(sizeof(*cur));
-> -                range_set_bounds(cur, start, start);
-> -                siv->ranges = range_list_insert(siv->ranges, cur);
-> -                cur = NULL;
-> -            } else {
-> -                goto error;
-> -            }
-> -        } else {
-> -            goto error;
-> -        }
-> -    } while (str);
-> -
-> -    return 0;
-> -error:
-> -    g_list_foreach(siv->ranges, free_range, NULL);
-> -    g_list_free(siv->ranges);
-> -    siv->ranges = NULL;
-> -    error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? name : "null",
-> -               "an int64 value or range");
-> -    return -1;
-> -}
-> -
-> -static void
-> -start_list(Visitor *v, const char *name, GenericList **list, size_t size,
-> -           Error **errp)
-> +static void start_list(Visitor *v, const char *name, GenericList **list,
-> +                       size_t size, Error **errp)
->  {
->      StringInputVisitor *siv = to_siv(v);
->  
-> -    /* We don't support visits without a list */
-> -    assert(list);
-> +    /* properly set the list parsing state */
-
-This comment feels redundant.
-
-> +    assert(siv->lm == LM_NONE);
->      siv->list = list;
-> +    siv->unparsed_string = siv->string;
->  
-> -    if (parse_str(siv, name, errp) < 0) {
-> -        *list = NULL;
-> -        return;
-> -    }
-> -
-> -    siv->cur_range = g_list_first(siv->ranges);
-> -    if (siv->cur_range) {
-> -        Range *r = siv->cur_range->data;
-> -        if (r) {
-> -            siv->cur = range_lob(r);
-> +    if (!siv->string[0]) {
-> +        if (list) {
-> +            *list = NULL;
->          }
-> -        *list = g_malloc0(size);
-> +        siv->lm = LM_END;
->      } else {
-> -        *list = NULL;
-> +        if (list) {
-> +            *list = g_malloc0(size);
-> +        }
-> +        siv->lm = LM_UNPARSED;
+>  gdbstub.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 53 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 5df9929f92..eec1cf0d09 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1039,24 +1039,39 @@ static int gdb_breakpoint_remove(target_ulong add=
+r, target_ulong len, int type)
+>      default:
+>          return -ENOSYS;
 >      }
 >  }
->  
->  static GenericList *next_list(Visitor *v, GenericList *tail, size_t size)
->  {
->      StringInputVisitor *siv = to_siv(v);
-> -    Range *r;
->  
-> -    if (!siv->ranges || !siv->cur_range) {
-> +    switch (siv->lm) {
-> +    case LM_END:
->          return NULL;
-> -    }
-> -
-> -    r = siv->cur_range->data;
-> -    if (!r) {
-> -        return NULL;
-> -    }
-> -
-> -    if (!range_contains(r, siv->cur)) {
-> -        siv->cur_range = g_list_next(siv->cur_range);
-> -        if (!siv->cur_range) {
-> -            return NULL;
-> -        }
-> -        r = siv->cur_range->data;
-> -        if (!r) {
-> -            return NULL;
-> -        }
-> -        siv->cur = range_lob(r);
-> +    case LM_INT64_RANGE:
-> +    case LM_UINT64_RANGE:
-> +    case LM_UNPARSED:
-> +        /* we have an unparsed string or something left in a range */
-> +        break;
-> +    default:
-> +        abort();
->      }
->  
->      tail->next = g_malloc0(size);
-> @@ -179,88 +104,215 @@ static GenericList *next_list(Visitor *v, GenericList *tail, size_t size)
->  static void check_list(Visitor *v, Error **errp)
->  {
->      const StringInputVisitor *siv = to_siv(v);
-> -    Range *r;
-> -    GList *cur_range;
->  
-> -    if (!siv->ranges || !siv->cur_range) {
-> +    switch (siv->lm) {
-> +    case LM_INT64_RANGE:
-> +    case LM_UINT64_RANGE:
-> +    case LM_UNPARSED:
-> +        error_setg(errp, "Fewer list elements expected");
->          return;
-> -    }
-> -
-> -    r = siv->cur_range->data;
-> -    if (!r) {
-> +    case LM_END:
->          return;
-> +    default:
-> +        abort();
->      }
-> -
-> -    if (!range_contains(r, siv->cur)) {
-> -        cur_range = g_list_next(siv->cur_range);
-> -        if (!cur_range) {
-> -            return;
-> -        }
-> -        r = cur_range->data;
-> -        if (!r) {
-> -            return;
-> -        }
-> -    }
-> -
-> -    error_setg(errp, "Range contains too many values");
->  }
->  
->  static void end_list(Visitor *v, void **obj)
->  {
->      StringInputVisitor *siv = to_siv(v);
->  
-> +    assert(siv->lm != LM_NONE);
->      assert(siv->list == obj);
-> +    siv->list = NULL;
-> +    siv->unparsed_string = NULL;
-> +    siv->lm = LM_NONE;
+> =20
+> +static inline void gdb_cpu_breakpoint_remove_all(CPUState *cpu)
+> +{
+> +    cpu_breakpoint_remove_all(cpu, BP_GDB);
+> +#ifndef CONFIG_USER_ONLY
+> +    cpu_watchpoint_remove_all(cpu, BP_GDB);
+> +#endif
 > +}
 > +
-> +static int try_parse_int64_list_entry(StringInputVisitor *siv, int64_t *obj)
+> +static void gdb_process_breakpoint_remove_all(const GDBState *s, GDBProc=
+ess *p)
 > +{
-> +    const char *endptr;
-> +    int64_t start, end;
+> +    CPUState *cpu =3D get_first_cpu_in_process(s, p);
 > +
-> +    if (qemu_strtoi64(siv->unparsed_string, &endptr, 0, &start)) {
-> +        return -EINVAL;
+> +    while (cpu) {
+> +        gdb_cpu_breakpoint_remove_all(cpu);
+> +        cpu =3D gdb_next_cpu_in_process(s, cpu);
 > +    }
-> +    end = start;
-> +
-> +    switch (endptr[0]) {
-> +    case '\0':
-> +        siv->unparsed_string = endptr;
-> +        break;
-> +    case ',':
-> +        siv->unparsed_string = endptr + 1;
-> +        break;
-> +    case '-':
-> +        /* parse the end of the range */
-> +        if (qemu_strtoi64(endptr + 1, &endptr, 0, &end)) {
-> +            return -EINVAL;
-> +        }
-> +        if (start > end) {
-> +            return -EINVAL;
-> +        }
-> +        switch (endptr[0]) {
-> +        case '\0':
-> +            siv->unparsed_string = endptr;
-> +            break;
-> +        case ',':
-> +            siv->unparsed_string = endptr + 1;
-> +            break;
-> +        default:
-> +            return -EINVAL;
-> +        }
-> +        break;
-> +    default:
-> +        return -EINVAL;
-> +    }
-> +
-> +    /* we have a proper range (with maybe only one element) */
-> +    siv->lm = LM_INT64_RANGE;
-> +    siv->rangeNext.i64 = start;
-> +    siv->rangeEnd.i64 = end;
-> +    return 0;
->  }
->  
->  static void parse_type_int64(Visitor *v, const char *name, int64_t *obj,
->                               Error **errp)
->  {
->      StringInputVisitor *siv = to_siv(v);
-> -
-> -    if (parse_str(siv, name, errp) < 0) {
-> +    int64_t val;
-> +
-> +    switch (siv->lm) {
-> +    case LM_NONE:
-> +        /* just parse a simple int64, bail out if not completely consumed */
-> +        if (qemu_strtoi64(siv->string, NULL, 0, &val)) {
-> +                error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-> +                           name ? name : "null", "int64");
-> +            return;
-> +        }
-> +        *obj = val;
->          return;
-> +    case LM_UNPARSED:
-> +        if (try_parse_int64_list_entry(siv, obj)) {
-> +            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? name : "null",
-> +                       "list of int64 values or ranges");
-> +            return;
-> +        }
-> +        assert(siv->lm == LM_INT64_RANGE);
-> +        /* FALLTHROUGH */
-
-Please spell it /* fall through */, because:
-
-$ git-grep -Ei '/\* *fall.?thr[a-z]* *\*/' | sed 's/.*\* *\(fall[^*]*\)\*.*/\1/i' | sort | uniq -c
-      4 FALL THROUGH 
-      8 FALLTHROUGH 
-     61 FALLTHRU 
-     36 Fall through 
-     20 Fallthrough 
-      4 Fallthru 
-    237 fall through 
-      1 fall-through 
-     16 fallthrough 
-     39 fallthru 
-
-> +    case LM_INT64_RANGE:
-> +        /* return the next element in the range */
-> +        assert(siv->rangeNext.i64 <= siv->rangeEnd.i64);
-> +        *obj = siv->rangeNext.i64++;
-> +
-> +        if (siv->rangeNext.i64 > siv->rangeEnd.i64 || *obj == INT64_MAX) {
-> +            /* end of range, check if there is more to parse */
-> +            if (siv->unparsed_string[0]) {
-> +                siv->lm = LM_UNPARSED;
-> +            } else {
-> +                siv->lm = LM_END;
-> +            }
-
-I'd do
-
-               siv->lm = siv->unparsed_string[0] ? LM_UNPARSED : LM_END;
-
-Matter of taste, entirely up to you.
-
-> +        }
-> +        return;
-> +    case LM_END:
-> +        error_setg(errp, "Fewer list elements expected");
-> +        return;
-> +    default:
-> +        abort();
->      }
 > +}
->  
-> -    if (!siv->ranges) {
-> -        goto error;
-> -    }
-> -
-> -    if (!siv->cur_range) {
-> -        Range *r;
-> +static int try_parse_uint64_list_entry(StringInputVisitor *siv, uint64_t *obj)
-> +{
-> +    const char *endptr;
-> +    uint64_t start, end;
->  
-> -        siv->cur_range = g_list_first(siv->ranges);
-> -        if (!siv->cur_range) {
-> -            goto error;
-> +    /* parse a simple uint64 or range */
-
-try_parse_int64_list_entry() doesn't have this comment.  I think either
-both or none should have it.  You decide.
-
-> +    if (qemu_strtou64(siv->unparsed_string, &endptr, 0, &start)) {
-> +        return -EINVAL;
-> +    }
-> +    end = start;
 > +
-> +    switch (endptr[0]) {
-> +    case '\0':
-> +        siv->unparsed_string = endptr;
-> +        break;
-> +    case ',':
-> +        siv->unparsed_string = endptr + 1;
-> +        break;
-> +    case '-':
-> +        /* parse the end of the range */
-> +        if (qemu_strtou64(endptr + 1, &endptr, 0, &end)) {
-> +            return -EINVAL;
->          }
-> -
-> -        r = siv->cur_range->data;
-> -        if (!r) {
-> -            goto error;
-> +        if (start > end) {
-> +            return -EINVAL;
->          }
-> -
-> -        siv->cur = range_lob(r);
-> +        switch (endptr[0]) {
-> +        case '\0':
-> +            siv->unparsed_string = endptr;
-> +            break;
-> +        case ',':
-> +            siv->unparsed_string = endptr + 1;
-> +            break;
-> +        default:
-> +            return -EINVAL;
-> +        }
-> +        break;
-> +    default:
-> +        return -EINVAL;
->      }
->  
-> -    *obj = siv->cur;
-> -    siv->cur++;
-> -    return;
-> -
-> -error:
-> -    error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? name : "null",
-> -               "an int64 value or range");
-> +    /* we have a proper range (with maybe only one element) */
-> +    siv->lm = LM_UINT64_RANGE;
-> +    siv->rangeNext.u64 = start;
-> +    siv->rangeEnd.u64 = end;
-> +    return 0;
->  }
->  
->  static void parse_type_uint64(Visitor *v, const char *name, uint64_t *obj,
->                                Error **errp)
+>  static void gdb_breakpoint_remove_all(void)
 >  {
-> -    /* FIXME: parse_type_int64 mishandles values over INT64_MAX */
-> -    int64_t i;
-> -    Error *err = NULL;
-> -    parse_type_int64(v, name, &i, &err);
-> -    if (err) {
-> -        error_propagate(errp, err);
-> -    } else {
-> -        *obj = i;
-> +    StringInputVisitor *siv = to_siv(v);
-> +    uint64_t val;
-> +
-> +    switch (siv->lm) {
-> +    case LM_NONE:
-> +        /* just parse a simple uint64, bail out if not completely consumed */
-> +        if (qemu_strtou64(siv->string, NULL, 0, &val)) {
-> +            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? name : "null",
-> +                       "uint64");
-> +            return;
-> +        }
-> +        *obj = val;
-> +        return;
-> +    case LM_UNPARSED:
-> +        if (try_parse_uint64_list_entry(siv, obj)) {
-> +            error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name ? name : "null",
-> +                       "list of uint64 values or ranges");
-> +            return;
-> +        }
-> +        assert(siv->lm == LM_UINT64_RANGE);
-> +        /* FALLTHROUGH */
-> +    case LM_UINT64_RANGE:
-> +        /* return the next element in the range */
-> +        assert(siv->rangeNext.u64 <= siv->rangeEnd.u64);
-> +        *obj = siv->rangeNext.u64++;
-> +
-> +        if (siv->rangeNext.u64 > siv->rangeEnd.u64 || *obj == UINT64_MAX) {
-> +            /* end of range, check if there is more to parse */
-> +            if (siv->unparsed_string[0]) {
-> +                siv->lm = LM_UNPARSED;
-> +            } else {
-> +                siv->lm = LM_END;
-> +            }
-> +        }
-> +        return;
-> +    case LM_END:
-> +        error_setg(errp, "Fewer list elements expected");
-> +        return;
-> +    default:
-> +        abort();
->      }
->  }
->  
-> @@ -271,6 +323,7 @@ static void parse_type_size(Visitor *v, const char *name, uint64_t *obj,
->      Error *err = NULL;
->      uint64_t val;
->  
-> +    assert(siv->lm == LM_NONE);
->      parse_option_size(name, siv->string, &val, &err);
->      if (err) {
->          error_propagate(errp, err);
-> @@ -285,6 +338,7 @@ static void parse_type_bool(Visitor *v, const char *name, bool *obj,
->  {
->      StringInputVisitor *siv = to_siv(v);
->  
-> +    assert(siv->lm == LM_NONE);
->      if (!strcasecmp(siv->string, "on") ||
->          !strcasecmp(siv->string, "yes") ||
->          !strcasecmp(siv->string, "true")) {
-> @@ -307,6 +361,7 @@ static void parse_type_str(Visitor *v, const char *name, char **obj,
->  {
->      StringInputVisitor *siv = to_siv(v);
->  
-> +    assert(siv->lm == LM_NONE);
->      *obj = g_strdup(siv->string);
->  }
->  
-> @@ -316,6 +371,7 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
->      StringInputVisitor *siv = to_siv(v);
->      double val;
->  
-> +    assert(siv->lm == LM_NONE);
->      if (qemu_strtod_finite(siv->string, NULL, &val)) {
->          error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
->                     "number");
-> @@ -330,9 +386,10 @@ static void parse_type_null(Visitor *v, const char *name, QNull **obj,
->  {
->      StringInputVisitor *siv = to_siv(v);
->  
-> +    assert(siv->lm == LM_NONE);
->      *obj = NULL;
->  
-> -    if (!siv->string || siv->string[0]) {
-> +    if (siv->string[0]) {
->          error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
->                     "null");
+>      CPUState *cpu;
+> =20
+>      if (kvm_enabled()) {
+>          kvm_remove_all_breakpoints(gdbserver_state->c_cpu);
 >          return;
-> @@ -345,8 +402,6 @@ static void string_input_free(Visitor *v)
->  {
->      StringInputVisitor *siv = to_siv(v);
->  
-> -    g_list_foreach(siv->ranges, free_range, NULL);
-> -    g_list_free(siv->ranges);
->      g_free(siv);
+>      }
+> =20
+>      CPU_FOREACH(cpu) {
+> -        cpu_breakpoint_remove_all(cpu, BP_GDB);
+> -#ifndef CONFIG_USER_ONLY
+> -        cpu_watchpoint_remove_all(cpu, BP_GDB);
+> -#endif
+> +        gdb_cpu_breakpoint_remove_all(cpu);
+>      }
 >  }
->  
-> @@ -372,5 +427,6 @@ Visitor *string_input_visitor_new(const char *str)
->      v->visitor.free = string_input_free;
->  
->      v->string = str;
-> +    v->lm = LM_NONE;
->      return &v->visitor;
->  }
-> diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-> index f55e0696c0..a198aedfce 100644
-> --- a/tests/test-string-input-visitor.c
-> +++ b/tests/test-string-input-visitor.c
-> @@ -92,16 +92,6 @@ static void check_ulist(Visitor *v, uint64_t *expected, size_t n)
->      uint64List *tail;
->      int i;
->  
-> -    /* BUG: unsigned numbers above INT64_MAX don't work */
-> -    for (i = 0; i < n; i++) {
-> -        if (expected[i] > INT64_MAX) {
-> -            Error *err = NULL;
-> -            visit_type_uint64List(v, NULL, &res, &err);
-> -            error_free_or_abort(&err);
-> -            return;
-> -        }
-> -    }
-> -
->      visit_type_uint64List(v, NULL, &res, &error_abort);
->      tail = res;
->      for (i = 0; i < n; i++) {
-> @@ -117,10 +107,10 @@ static void check_ulist(Visitor *v, uint64_t *expected, size_t n)
->  static void test_visitor_in_intList(TestInputVisitorData *data,
->                                      const void *unused)
+> =20
+>  static void gdb_set_cpu_pc(GDBState *s, target_ulong pc)
 >  {
-> -    /* Note: the visitor *sorts* ranges *unsigned* */
-> -    int64_t expect1[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20 };
-> +    int64_t expect1[] = { 1, 2, 0, 2, 3, 4, 20, 5, 6, 7,
-> +                          8, 9, 1, 2, 3, 4, 5, 6, 7, 8 };
->      int64_t expect2[] = { 32767, -32768, -32767 };
-> -    int64_t expect3[] = { INT64_MAX, INT64_MIN };
-> +    int64_t expect3[] = { INT64_MIN, INT64_MAX };
->      int64_t expect4[] = { 1 };
->      uint64_t expect5[] = { UINT64_MAX };
->      Error *err = NULL;
-> @@ -207,7 +197,7 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
->      visit_type_int64(v, NULL, &tail->value, &err);
->      g_assert_cmpint(tail->value, ==, 0);
->      visit_type_int64(v, NULL, &val, &err);
-> -    g_assert_cmpint(val, ==, 1); /* BUG */
-> +    error_free_or_abort(&err);
->      visit_check_list(v, &error_abort);
->      visit_end_list(v, (void **)&res);
-
-Lovely!
+> @@ -1331,13 +1346,44 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+>          /* Kill the target */
+>          error_report("QEMU: Terminated via GDBstub");
+>          exit(0);
+>      case 'D':
+>          /* Detach packet */
+> -        gdb_breakpoint_remove_all();
+> -        gdb_syscall_mode =3D GDB_SYS_DISABLED;
+> -        gdb_continue(s);
+> +        pid =3D 1;
+> +
+> +        if (s->multiprocess) {
+> +            unsigned long lpid;
+> +            if (*p !=3D ';') {
+> +                put_packet(s, "E22");
+> +                break;
+> +            }
+> +
+> +            if (qemu_strtoul(p + 1, &p, 16, &lpid)) {
+> +                put_packet(s, "E22");
+> +                break;
+> +            }
+> +
+> +            pid =3D lpid;
+> +        }
+> +
+> +        process =3D gdb_get_process(s, pid);
+> +        gdb_process_breakpoint_remove_all(s, process);
+> +        process->attached =3D false;
+> +
+> +        if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
+> +            s->c_cpu =3D gdb_first_cpu(s);
+> +        }
+> +
+> +        if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
+> +            s->g_cpu =3D gdb_first_cpu(s);
+> +        }
+> +
+> +        if (s->c_cpu =3D=3D NULL) {
+> +            /* No more process attached */
+> +            gdb_syscall_mode =3D GDB_SYS_DISABLED;
+> +            gdb_continue(s);
+> +        }
+>          put_packet(s, "OK");
+>          break;
+>      case 's':
+>          if (*p !=3D '\0') {
+>              addr =3D strtoull(p, (char **)&p, 16);
+> --=20
+> 2.19.1
+>=20
