@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UO-00014L-Ek
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UO-00014J-F8
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:38:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UK-00020g-Ay
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UK-00021D-L1
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:38:40 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:54232 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:54239 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gO5UK-0001zn-33
+	id 1gO5UK-0001zu-8J
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:38:36 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Sat, 17 Nov 2018 19:38:18 +0100
-Message-Id: <1542479908-20067-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sat, 17 Nov 2018 19:38:20 +0100
+Message-Id: <1542479908-20067-4-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1542479908-20067-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1542479908-20067-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 01/11] linux-user: Update MIPS specific
- prctl() implementation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 03/11] target/mips: Fix decoding mechanism of
+ R5900 DIV1 and DIVU1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +31,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com, laurent@vivier.eu
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Fredrik Noring <noring@nocrew.org>
 
-Perform needed checks before actual prctl() PR_SET_FP_MODE and
-PR_GET_FP_MODE work based on kernel implementation. Also, update
-necessary hflags.
+DIV1 and DIVU1 are generated in gen_div1_tx79 instead of the generic
+gen_muldiv.
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+Signed-off-by: Fredrik Noring <noring@nocrew.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/syscall.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ target/mips/translate.c | 65 +++++++++++++++++++++++++++++++++++++++++++=
++-----
+ 1 file changed, 59 insertions(+), 6 deletions(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 5c16692..280137d 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -9554,9 +9554,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         {
-             CPUMIPSState *env = ((CPUMIPSState *)cpu_env);
-             bool old_fr = env->CP0_Status & (1 << CP0St_FR);
-+            bool old_fre = env->CP0_Config5 & (1 << CP0C5_FRE);
-             bool new_fr = arg2 & TARGET_PR_FP_MODE_FR;
-             bool new_fre = arg2 & TARGET_PR_FP_MODE_FRE;
- 
-+            const unsigned int known_bits = TARGET_PR_FP_MODE_FR |
-+                                            TARGET_PR_FP_MODE_FRE;
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 8601333..3ddd700 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -4743,6 +4743,63 @@ static void gen_r6_muldiv(DisasContext *ctx, int o=
+pc, int rd, int rs, int rt)
+     tcg_temp_free(t1);
+ }
+=20
++static void gen_div1_tx79(DisasContext *ctx, uint32_t opc, int rs, int r=
+t)
++{
++    TCGv t0, t1;
 +
-+            /* If nothing to change, return right away, successfully.  */
-+            if (old_fr == new_fr && old_fre == new_fre) {
-+                return 0;
-+            }
-+            /* Check the value is valid */
-+            if (arg2 & ~known_bits) {
-+                return -TARGET_EOPNOTSUPP;
-+            }
-+            /* Setting FRE without FR is not supported.  */
-+            if (new_fre && !new_fr) {
-+                return -TARGET_EOPNOTSUPP;
-+            }
-             if (new_fr && !(env->active_fpu.fcr0 & (1 << FCR0_F64))) {
-                 /* FR1 is not supported */
-                 return -TARGET_EOPNOTSUPP;
-@@ -9586,6 +9602,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 env->hflags |= MIPS_HFLAG_F64;
-             } else {
-                 env->CP0_Status &= ~(1 << CP0St_FR);
-+                env->hflags &= ~MIPS_HFLAG_F64;
-             }
-             if (new_fre) {
-                 env->CP0_Config5 |= (1 << CP0C5_FRE);
-@@ -9594,6 +9611,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 }
-             } else {
-                 env->CP0_Config5 &= ~(1 << CP0C5_FRE);
-+                env->hflags &= ~MIPS_HFLAG_FRE;
-             }
- 
-             return 0;
--- 
++    t0 =3D tcg_temp_new();
++    t1 =3D tcg_temp_new();
++
++    gen_load_gpr(t0, rs);
++    gen_load_gpr(t1, rt);
++
++    switch (opc) {
++    case TX79_MMI_DIV1:
++        {
++            TCGv t2 =3D tcg_temp_new();
++            TCGv t3 =3D tcg_temp_new();
++            tcg_gen_ext32s_tl(t0, t0);
++            tcg_gen_ext32s_tl(t1, t1);
++            tcg_gen_setcondi_tl(TCG_COND_EQ, t2, t0, INT_MIN);
++            tcg_gen_setcondi_tl(TCG_COND_EQ, t3, t1, -1);
++            tcg_gen_and_tl(t2, t2, t3);
++            tcg_gen_setcondi_tl(TCG_COND_EQ, t3, t1, 0);
++            tcg_gen_or_tl(t2, t2, t3);
++            tcg_gen_movi_tl(t3, 0);
++            tcg_gen_movcond_tl(TCG_COND_NE, t1, t2, t3, t2, t1);
++            tcg_gen_div_tl(cpu_LO[1], t0, t1);
++            tcg_gen_rem_tl(cpu_HI[1], t0, t1);
++            tcg_gen_ext32s_tl(cpu_LO[1], cpu_LO[1]);
++            tcg_gen_ext32s_tl(cpu_HI[1], cpu_HI[1]);
++            tcg_temp_free(t3);
++            tcg_temp_free(t2);
++        }
++        break;
++    case TX79_MMI_DIVU1:
++        {
++            TCGv t2 =3D tcg_const_tl(0);
++            TCGv t3 =3D tcg_const_tl(1);
++            tcg_gen_ext32u_tl(t0, t0);
++            tcg_gen_ext32u_tl(t1, t1);
++            tcg_gen_movcond_tl(TCG_COND_EQ, t1, t1, t2, t3, t1);
++            tcg_gen_divu_tl(cpu_LO[1], t0, t1);
++            tcg_gen_remu_tl(cpu_HI[1], t0, t1);
++            tcg_gen_ext32s_tl(cpu_LO[1], cpu_LO[1]);
++            tcg_gen_ext32s_tl(cpu_HI[1], cpu_HI[1]);
++            tcg_temp_free(t3);
++            tcg_temp_free(t2);
++        }
++        break;
++    default:
++        MIPS_INVAL("div1 TX79");
++        generate_exception_end(ctx, EXCP_RI);
++        goto out;
++    }
++ out:
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++}
++
+ static void gen_muldiv(DisasContext *ctx, uint32_t opc,
+                        int acc, int rs, int rt)
+ {
+@@ -4755,14 +4812,11 @@ static void gen_muldiv(DisasContext *ctx, uint32_=
+t opc,
+     gen_load_gpr(t1, rt);
+=20
+     if (acc !=3D 0) {
+-        if (!(ctx->insn_flags & INSN_R5900)) {
+-            check_dsp(ctx);
+-        }
++        check_dsp(ctx);
+     }
+=20
+     switch (opc) {
+     case OPC_DIV:
+-    case TX79_MMI_DIV1:
+         {
+             TCGv t2 =3D tcg_temp_new();
+             TCGv t3 =3D tcg_temp_new();
+@@ -4784,7 +4838,6 @@ static void gen_muldiv(DisasContext *ctx, uint32_t =
+opc,
+         }
+         break;
+     case OPC_DIVU:
+-    case TX79_MMI_DIVU1:
+         {
+             TCGv t2 =3D tcg_const_tl(0);
+             TCGv t3 =3D tcg_const_tl(1);
+@@ -26525,7 +26578,7 @@ static void decode_tx79_mmi(CPUMIPSState *env, Di=
+sasContext *ctx)
+         break;
+     case TX79_MMI_DIV1:
+     case TX79_MMI_DIVU1:
+-        gen_muldiv(ctx, opc, 1, rs, rt);
++        gen_div1_tx79(ctx, opc, rs, rt);
+         break;
+     case TX79_MMI_MTLO1:
+     case TX79_MMI_MTHI1:
+--=20
 2.7.4
