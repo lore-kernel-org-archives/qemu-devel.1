@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gO5Rf-0007KG-To
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:35:52 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gO5SN-0007f4-N1
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:36:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1gO5Rb-0000eM-Uw
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:35:51 -0500
-Received: from mail-eopbgr790133.outbound.protection.outlook.com
-	([40.107.79.133]:21248
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1gO5Rb-0000e1-MO
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:35:47 -0500
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Sat, 17 Nov 2018 18:35:44 +0000
-Message-ID: <BN6PR2201MB1251DA3BD67967AAA976FFFDC6DE0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<CAAdtpL6-pbPvJ4z5Tr29FBEau2BGK29Z+ERgkqX_fdZfU2=9gg@mail.gmail.com>
-In-Reply-To: <CAAdtpL6-pbPvJ4z5Tr29FBEau2BGK29Z+ERgkqX_fdZfU2=9gg@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gO5SJ-0000tx-PM
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:36:35 -0500
+Received: from mail-yw1-f49.google.com ([209.85.161.49]:46674)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gO5SJ-0000tp-L9
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:36:31 -0500
+Received: by mail-yw1-f49.google.com with SMTP id t13so7247280ywe.13
+	for <qemu-devel@nongnu.org>; Sat, 17 Nov 2018 10:36:31 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PULL 00/11] MIPS queue for November 2018 (for
- QEMU 3.1-rc2)
+References: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1542470080-5797-12-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1542470080-5797-12-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Sat, 17 Nov 2018 19:36:21 +0100
+Message-ID: <CAAdtpL7DtkyO34yFqrumB4PyZSMCEzMB+JpFHrb_6Htw5dcqsQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 11/11] MAINTAINERS: Add Stefan Markovic as a
+ MIPS reviewer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +33,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, amarkovic@wavecomp.com
 
-> Some patches of this series miss your S-o-b tag
+Le sam. 17 nov. 2018 16:56, Aleksandar Markovic <
+aleksandar.markovic@rt-rk.com> a =C3=A9crit :
 
-Will be fixed in a minute.
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> Add Stefan Markovic as a MIPS reviewer. He had several key
+> contributions to QEMU for MIPS this year. He is a meticulous
+> person with the ability to think and act on many levels.
+>
+> Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  MAINTAINERS | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 4b8db61..f718264 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -190,6 +190,7 @@ F: disas/microblaze.c
+>  MIPS
+>  M: Aurelien Jarno <aurelien@aurel32.net>
+>  M: Aleksandar Markovic <amarkovic@wavecomp.com>
+> +R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: target/mips/
+>  F: hw/mips/
+> @@ -336,6 +337,7 @@ F: target/arm/kvm.c
+>
+>  MIPS
+>  M: James Hogan <jhogan@kernel.org>
+> +R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: target/mips/kvm.c
+>
+> @@ -741,27 +743,32 @@ MIPS Machines
+>  -------------
+>  Jazz
+>  M: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+> +R: Stefan Markovic <smarkovic@wavecomp.com>
+>
 
-________________________________________
-From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-Sent: Saturday, November 17, 2018 7:09:37 PM
-To: Aleksandar Markovic
-Cc: qemu-devel@nongnu.org Developers; Peter Maydell; Aleksandar Markovic
-Subject: Re: [Qemu-devel] [PULL 00/11] MIPS queue for November 2018 (for QE=
-MU 3.1-rc2)
+I find a bit unfair, while you don't allow to list reviewers not from the
+MIPS company to your section, you add reviewers to section where you are
+not listed as maintainer.
+Why not add yourself as maintainer in these sections?
 
-Hi Aleksandar,
+I understand your concept of "reviewer" as someone whom R-b tag weight more
+than unlisted person. Is it how you see it for the MIPS subsystem?
 
-Le sam. 17 nov. 2018 16:58, Aleksandar Markovic <aleksandar.markovic@rt-rk.=
-com<mailto:aleksandar.markovic@rt-rk.com>> a =E9crit :
-From: Aleksandar Markovic <amarkovic@wavecomp.com<mailto:amarkovic@wavecomp=
-.com>>
+Thanks,
 
-The following changes since commit 83c496599cc04926ecbc3e47a37debaa3e38b686=
-:
+Phil.
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/fixes-31-20181116-pull-=
-request' into staging (2018-11-16 13:53:01 +0000)
-
-are available in the git repository at:
-
-  https://github.com/AMarkovic/qemu tags/mips-queue-november-2018
-
-for you to fetch changes up to b6ac8eed1ca277a6ed59a61bb7bd4785190990f6:
-
-  MAINTAINERS: Add Stefan Markovic as a MIPS reviewer (2018-11-17 16:17:08 =
-+0100)
-
-----------------------------------------------------------------
-MIPS queue for November 2018
-
-  - fix MIPS-specific prctl() handling in linux-user
-  - fix some issues of R5900 support
-  - update MAINTAINERS wrt. MIPS reviewer
-
-
-Some patches of this series miss your S-o-b tag.
-
-----------------------------------------------------------------
-
-Aleksandar Markovic (5):
-  target/mips: Rename MMI-related masks
-  target/mips: Rename MMI-related opcodes
-  target/mips: Rename MMI-related functions
-  target/mips: Disable R5900 support
-  MAINTAINERS: Add Stefan Markovic as a MIPS reviewer
-
-Fredrik Noring (5):
-  target/mips: Fix decoding mechanism of R5900 MFLO1, MFHI1, MTLO1 and
-    MTHI1
-  target/mips: Fix decoding mechanism of R5900 DIV1 and DIVU1
-  target/mips: Fix decoding mechanism of special R5900 opcodes
-  target/mips: Guard check_insn_opc_user_only with INSN_R5900 check
-  target/mips: Guard check_insn with INSN_R5900 check
-
-Stefan Markovic (1):
-  linux-user: Update MIPS specific prctl() implementation
-
- MAINTAINERS                      |   9 +
- linux-user/syscall.c             |  18 +
- target/mips/translate.c          | 707 +++++++++++++++++++++++------------=
-----
- target/mips/translate_init.inc.c |  59 ----
- 4 files changed, 450 insertions(+), 343 deletions(-)
-
---
-2.7.4
+ S: Maintained
+>  F: hw/mips/mips_jazz.c
+>
+>  Malta
+>  M: Aurelien Jarno <aurelien@aurel32.net>
+> +R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: hw/mips/mips_malta.c
+>
+>  Mipssim
+>  M: Aleksandar Markovic <amarkovic@wavecomp.com>
+> +R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Odd Fixes
+>  F: hw/mips/mips_mipssim.c
+>  F: hw/net/mipsnet.c
+>
+>  R4000
+>  M: Aurelien Jarno <aurelien@aurel32.net>
+> +R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: hw/mips/mips_r4k.c
+>
+>  Fulong 2E
+>  M: Aleksandar Markovic <amarkovic@wavecomp.com>
+> +R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Odd Fixes
+>  F: hw/mips/mips_fulong2e.c
+>  F: hw/isa/vt82c686.c
+> @@ -770,6 +777,7 @@ F: include/hw/isa/vt82c686.h
+>
+>  Boston
+>  M: Paul Burton <pburton@wavecomp.com>
+> +R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: hw/core/loader-fit.c
+>  F: hw/mips/boston.c
+> @@ -1992,6 +2000,7 @@ F: disas/i386.c
+>
+>  MIPS target
+>  M: Aurelien Jarno <aurelien@aurel32.net>
+> +R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Maintained
+>  F: tcg/mips/
+>  F: disas/mips.c
+> --
+> 2.7.4
+>
+>
+>
