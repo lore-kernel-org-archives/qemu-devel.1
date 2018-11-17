@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2x2-0003yz-Nw
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:07 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gO33e-0001m3-Ra
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 11:02:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2wz-0000hO-2b
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:04 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60470 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gO2wy-0000gO-HC
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:01 -0500
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Sat, 17 Nov 2018 16:54:37 +0100
-Message-Id: <1542470080-5797-9-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	(envelope-from <luc.michel@greensocs.com>) id 1gO33d-00049J-RK
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 11:02:54 -0500
+From: Luc Michel <luc.michel@greensocs.com>
+Date: Sat, 17 Nov 2018 17:02:13 +0100
+Message-Id: <20181117160213.18995-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/11] target/mips: Rename MMI-related opcodes
+Subject: [Qemu-devel] [PATCH] target/arm: fix smc incorrectly trapping to
+ EL3 when secure is off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,748 +21,141 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+This commit fixes a case where the CPU would try to go to EL3 when
+executing an smc instruction, even though ARM_FEATURE_EL3 is false. This
+case is raised when the PSCI conduit is set to smc, but the smc
+instruction does not lead to a valid PSCI call.
 
-Rename MMI-related opcodes.
+QEMU crashes with an assertion failure latter on because of incoherent
+mmu_idx.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+This commit refactors the pre_smc helper by enumerating all the possible
+way of handling an scm instruction, and covering the previously missing
+case leading to the crash.
+
+The following minimal test would crash before this commit:
+
+.global _start
+    .text
+_start:
+    ldr x0, =3D0xdeadbeef  ; invalid PSCI call
+    smc #0
+
+run with the following command line:
+
+aarch64-linux-gnu-gcc -nostdinc -nostdlib -Wl,-Ttext=3D40000000 \
+                      -o test test.s
+
+qemu-system-aarch64 -M virt,virtualization=3Don,secure=3Doff \
+                    -cpu cortex-a57 -kernel test
+
+Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 ---
- target/mips/translate.c | 472 ++++++++++++++++++++++++------------------=
-------
- 1 file changed, 236 insertions(+), 236 deletions(-)
+ target/arm/op_helper.c | 54 +++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 46 insertions(+), 8 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 12591c1..98dc468 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -2138,10 +2138,10 @@ enum {
-  * MTSAH   rs, immediate     Move Halfword Count to Shift Amount Registe=
-r
-  * PROT3W  rd, rt            Parallel Rotate 3 Words
-  *
-- *     The TX79-specific Multimedia Instruction encodings
-- *     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-+ *     MMI (MultiMedia Instruction) encodings
-+ *     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  *
-- * TX79 Multimedia Instruction encoding table keys:
-+ * MMI instructions encoding table keys:
-  *
-  *     *   This code is reserved for future use. An attempt to execute i=
-t
-  *         causes a Reserved Instruction exception.
-@@ -2152,7 +2152,7 @@ enum {
-  *         DMULTU, DDIV, DDIVU, LL, LLD, SC, SCD, LWC2 and SWC2. An atte=
-mpt
-  *         to execute it causes a Reserved Instruction exception.
-  *
-- * TX79 Multimedia Instructions encoded by opcode field (MMI, LQ, SQ):
-+ * MMI instructions encoded by opcode field (MMI, LQ, SQ):
-  *
-  *  31    26                                        0
-  * +--------+----------------------------------------+
-@@ -2174,13 +2174,13 @@ enum {
-  */
-=20
- enum {
--    TX79_CLASS_MMI =3D 0x1C << 26,    /* Same as OPC_SPECIAL2 */
--    TX79_LQ        =3D 0x1E << 26,    /* Same as OPC_MSA */
--    TX79_SQ        =3D 0x1F << 26,    /* Same as OPC_SPECIAL3 */
-+    MMI_OPC_CLASS_MMI =3D 0x1C << 26,    /* Same as OPC_SPECIAL2 */
-+    MMI_OPC_LQ        =3D 0x1E << 26,    /* Same as OPC_MSA */
-+    MMI_OPC_SQ        =3D 0x1F << 26,    /* Same as OPC_SPECIAL3 */
- };
-=20
- /*
-- * TX79 Multimedia Instructions with opcode field =3D MMI:
-+ * MMI instructions with opcode field =3D MMI:
-  *
-  *  31    26                                 5      0
-  * +--------+-------------------------------+--------+
-@@ -2203,35 +2203,35 @@ enum {
-=20
- #define MASK_MMI(op) (MASK_OP_MAJOR(op) | ((op) & 0x3F))
- enum {
--    TX79_MMI_MADD       =3D 0x00 | TX79_CLASS_MMI, /* Same as OPC_MADD *=
-/
--    TX79_MMI_MADDU      =3D 0x01 | TX79_CLASS_MMI, /* Same as OPC_MADDU =
-*/
--    TX79_MMI_PLZCW      =3D 0x04 | TX79_CLASS_MMI,
--    TX79_MMI_CLASS_MMI0 =3D 0x08 | TX79_CLASS_MMI,
--    TX79_MMI_CLASS_MMI2 =3D 0x09 | TX79_CLASS_MMI,
--    TX79_MMI_MFHI1      =3D 0x10 | TX79_CLASS_MMI, /* Same minor as OPC_=
-MFHI */
--    TX79_MMI_MTHI1      =3D 0x11 | TX79_CLASS_MMI, /* Same minor as OPC_=
-MTHI */
--    TX79_MMI_MFLO1      =3D 0x12 | TX79_CLASS_MMI, /* Same minor as OPC_=
-MFLO */
--    TX79_MMI_MTLO1      =3D 0x13 | TX79_CLASS_MMI, /* Same minor as OPC_=
-MTLO */
--    TX79_MMI_MULT1      =3D 0x18 | TX79_CLASS_MMI, /* Same minor as OPC_=
-MULT */
--    TX79_MMI_MULTU1     =3D 0x19 | TX79_CLASS_MMI, /* Same minor as OPC_=
-MULTU */
--    TX79_MMI_DIV1       =3D 0x1A | TX79_CLASS_MMI, /* Same minor as OPC_=
-DIV */
--    TX79_MMI_DIVU1      =3D 0x1B | TX79_CLASS_MMI, /* Same minor as OPC_=
-DIVU */
--    TX79_MMI_MADD1      =3D 0x20 | TX79_CLASS_MMI,
--    TX79_MMI_MADDU1     =3D 0x21 | TX79_CLASS_MMI,
--    TX79_MMI_CLASS_MMI1 =3D 0x28 | TX79_CLASS_MMI,
--    TX79_MMI_CLASS_MMI3 =3D 0x29 | TX79_CLASS_MMI,
--    TX79_MMI_PMFHL      =3D 0x30 | TX79_CLASS_MMI,
--    TX79_MMI_PMTHL      =3D 0x31 | TX79_CLASS_MMI,
--    TX79_MMI_PSLLH      =3D 0x34 | TX79_CLASS_MMI,
--    TX79_MMI_PSRLH      =3D 0x36 | TX79_CLASS_MMI,
--    TX79_MMI_PSRAH      =3D 0x37 | TX79_CLASS_MMI,
--    TX79_MMI_PSLLW      =3D 0x3C | TX79_CLASS_MMI,
--    TX79_MMI_PSRLW      =3D 0x3E | TX79_CLASS_MMI,
--    TX79_MMI_PSRAW      =3D 0x3F | TX79_CLASS_MMI,
-+    MMI_OPC_MADD       =3D 0x00 | MMI_OPC_CLASS_MMI, /* Same as OPC_MADD=
- */
-+    MMI_OPC_MADDU      =3D 0x01 | MMI_OPC_CLASS_MMI, /* Same as OPC_MADD=
-U */
-+    MMI_OPC_PLZCW      =3D 0x04 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_CLASS_MMI0 =3D 0x08 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_CLASS_MMI2 =3D 0x09 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_MFHI1      =3D 0x10 | MMI_OPC_CLASS_MMI, /* Same minor as OP=
-C_MFHI */
-+    MMI_OPC_MTHI1      =3D 0x11 | MMI_OPC_CLASS_MMI, /* Same minor as OP=
-C_MTHI */
-+    MMI_OPC_MFLO1      =3D 0x12 | MMI_OPC_CLASS_MMI, /* Same minor as OP=
-C_MFLO */
-+    MMI_OPC_MTLO1      =3D 0x13 | MMI_OPC_CLASS_MMI, /* Same minor as OP=
-C_MTLO */
-+    MMI_OPC_MULT1      =3D 0x18 | MMI_OPC_CLASS_MMI, /* Same minor as OP=
-C_MULT */
-+    MMI_OPC_MULTU1     =3D 0x19 | MMI_OPC_CLASS_MMI, /* Same min. as OPC=
-_MULTU */
-+    MMI_OPC_DIV1       =3D 0x1A | MMI_OPC_CLASS_MMI, /* Same minor as OP=
-C_DIV  */
-+    MMI_OPC_DIVU1      =3D 0x1B | MMI_OPC_CLASS_MMI, /* Same minor as OP=
-C_DIVU */
-+    MMI_OPC_MADD1      =3D 0x20 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_MADDU1     =3D 0x21 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_CLASS_MMI1 =3D 0x28 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_CLASS_MMI3 =3D 0x29 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_PMFHL      =3D 0x30 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_PMTHL      =3D 0x31 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_PSLLH      =3D 0x34 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_PSRLH      =3D 0x36 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_PSRAH      =3D 0x37 | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_PSLLW      =3D 0x3C | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_PSRLW      =3D 0x3E | MMI_OPC_CLASS_MMI,
-+    MMI_OPC_PSRAW      =3D 0x3F | MMI_OPC_CLASS_MMI,
- };
-=20
- /*
-- * TX79 Multimedia Instructions with opcode field =3D MMI and bits 5..0 =
-=3D MMI0:
-+ * MMI instructions with opcode field =3D MMI and bits 5..0 =3D MMI0:
-  *
-  *  31    26                        10     6 5      0
-  * +--------+----------------------+--------+--------+
-@@ -2254,35 +2254,35 @@ enum {
-=20
- #define MASK_MMI0(op) (MASK_OP_MAJOR(op) | ((op) & 0x7FF))
- enum {
--    TX79_MMI0_PADDW  =3D (0x00 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PSUBW  =3D (0x01 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PCGTW  =3D (0x02 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PMAXW  =3D (0x03 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PADDH  =3D (0x04 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PSUBH  =3D (0x05 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PCGTH  =3D (0x06 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PMAXH  =3D (0x07 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PADDB  =3D (0x08 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PSUBB  =3D (0x09 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PCGTB  =3D (0x0A << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PADDSW =3D (0x10 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PSUBSW =3D (0x11 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PEXTLW =3D (0x12 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PPACW  =3D (0x13 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PADDSH =3D (0x14 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PSUBSH =3D (0x15 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PEXTLH =3D (0x16 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PPACH  =3D (0x17 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PADDSB =3D (0x18 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PSUBSB =3D (0x19 << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PEXTLB =3D (0x1A << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PPACB  =3D (0x1B << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PEXT5  =3D (0x1E << 6) | TX79_MMI_CLASS_MMI0,
--    TX79_MMI0_PPAC5  =3D (0x1F << 6) | TX79_MMI_CLASS_MMI0,
-+    MMI_OPC_0_PADDW  =3D (0x00 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PSUBW  =3D (0x01 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PCGTW  =3D (0x02 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PMAXW  =3D (0x03 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PADDH  =3D (0x04 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PSUBH  =3D (0x05 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PCGTH  =3D (0x06 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PMAXH  =3D (0x07 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PADDB  =3D (0x08 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PSUBB  =3D (0x09 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PCGTB  =3D (0x0A << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PADDSW =3D (0x10 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PSUBSW =3D (0x11 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PEXTLW =3D (0x12 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PPACW  =3D (0x13 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PADDSH =3D (0x14 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PSUBSH =3D (0x15 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PEXTLH =3D (0x16 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PPACH  =3D (0x17 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PADDSB =3D (0x18 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PSUBSB =3D (0x19 << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PEXTLB =3D (0x1A << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PPACB  =3D (0x1B << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PEXT5  =3D (0x1E << 6) | MMI_OPC_CLASS_MMI0,
-+    MMI_OPC_0_PPAC5  =3D (0x1F << 6) | MMI_OPC_CLASS_MMI0,
- };
-=20
- /*
-- * TX79 Multimedia Instructions with opcode field =3D MMI and bits 5..0 =
-=3D MMI1:
-+ * MMI instructions with opcode field =3D MMI and bits 5..0 =3D MMI1:
-  *
-  *  31    26                        10     6 5      0
-  * +--------+----------------------+--------+--------+
-@@ -2305,28 +2305,28 @@ enum {
-=20
- #define MASK_MMI1(op) (MASK_OP_MAJOR(op) | ((op) & 0x7FF))
- enum {
--    TX79_MMI1_PABSW  =3D (0x01 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PCEQW  =3D (0x02 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PMINW  =3D (0x03 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PADSBH =3D (0x04 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PABSH  =3D (0x05 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PCEQH  =3D (0x06 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PMINH  =3D (0x07 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PCEQB  =3D (0x0A << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PADDUW =3D (0x10 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PSUBUW =3D (0x11 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PEXTUW =3D (0x12 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PADDUH =3D (0x14 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PSUBUH =3D (0x15 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PEXTUH =3D (0x16 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PADDUB =3D (0x18 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PSUBUB =3D (0x19 << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_PEXTUB =3D (0x1A << 6) | TX79_MMI_CLASS_MMI1,
--    TX79_MMI1_QFSRV  =3D (0x1B << 6) | TX79_MMI_CLASS_MMI1,
-+    MMI_OPC_1_PABSW  =3D (0x01 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PCEQW  =3D (0x02 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PMINW  =3D (0x03 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PADSBH =3D (0x04 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PABSH  =3D (0x05 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PCEQH  =3D (0x06 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PMINH  =3D (0x07 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PCEQB  =3D (0x0A << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PADDUW =3D (0x10 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PSUBUW =3D (0x11 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PEXTUW =3D (0x12 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PADDUH =3D (0x14 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PSUBUH =3D (0x15 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PEXTUH =3D (0x16 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PADDUB =3D (0x18 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PSUBUB =3D (0x19 << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_PEXTUB =3D (0x1A << 6) | MMI_OPC_CLASS_MMI1,
-+    MMI_OPC_1_QFSRV  =3D (0x1B << 6) | MMI_OPC_CLASS_MMI1,
- };
-=20
- /*
-- * TX79 Multimedia Instructions with opcode field =3D MMI and bits 5..0 =
-=3D MMI2:
-+ * MMI instructions with opcode field =3D MMI and bits 5..0 =3D MMI2:
-  *
-  *  31    26                        10     6 5      0
-  * +--------+----------------------+--------+--------+
-@@ -2349,32 +2349,32 @@ enum {
-=20
- #define MASK_MMI2(op) (MASK_OP_MAJOR(op) | ((op) & 0x7FF))
- enum {
--    TX79_MMI2_PMADDW =3D (0x00 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PSLLVW =3D (0x02 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PSRLVW =3D (0x03 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PMSUBW =3D (0x04 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PMFHI  =3D (0x08 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PMFLO  =3D (0x09 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PINTH  =3D (0x0A << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PMULTW =3D (0x0C << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PDIVW  =3D (0x0D << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PCPYLD =3D (0x0E << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PMADDH =3D (0x10 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PHMADH =3D (0x11 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PAND   =3D (0x12 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PXOR   =3D (0x13 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PMSUBH =3D (0x14 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PHMSBH =3D (0x15 << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PEXEH  =3D (0x1A << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PREVH  =3D (0x1B << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PMULTH =3D (0x1C << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PDIVBW =3D (0x1D << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PEXEW  =3D (0x1E << 6) | TX79_MMI_CLASS_MMI2,
--    TX79_MMI2_PROT3W =3D (0x1F << 6) | TX79_MMI_CLASS_MMI2,
-+    MMI_OPC_2_PMADDW =3D (0x00 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PSLLVW =3D (0x02 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PSRLVW =3D (0x03 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PMSUBW =3D (0x04 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PMFHI  =3D (0x08 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PMFLO  =3D (0x09 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PINTH  =3D (0x0A << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PMULTW =3D (0x0C << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PDIVW  =3D (0x0D << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PCPYLD =3D (0x0E << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PMADDH =3D (0x10 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PHMADH =3D (0x11 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PAND   =3D (0x12 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PXOR   =3D (0x13 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PMSUBH =3D (0x14 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PHMSBH =3D (0x15 << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PEXEH  =3D (0x1A << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PREVH  =3D (0x1B << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PMULTH =3D (0x1C << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PDIVBW =3D (0x1D << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PEXEW  =3D (0x1E << 6) | MMI_OPC_CLASS_MMI2,
-+    MMI_OPC_2_PROT3W =3D (0x1F << 6) | MMI_OPC_CLASS_MMI2,
- };
-=20
- /*
-- * TX79 Multimedia Instructions with opcode field =3D MMI and bits 5..0 =
-=3D MMI3:
-+ * MMI instructions with opcode field =3D MMI and bits 5..0 =3D MMI3:
-  *
-  *  31    26                        10     6 5      0
-  * +--------+----------------------+--------+--------+
-@@ -2397,19 +2397,19 @@ enum {
-=20
- #define MASK_MMI3(op) (MASK_OP_MAJOR(op) | ((op) & 0x7FF))
- enum {
--    TX79_MMI3_PMADDUW =3D (0x00 << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_PSRAVW  =3D (0x03 << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_PMTHI   =3D (0x08 << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_PMTLO   =3D (0x09 << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_PINTEH  =3D (0x0A << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_PMULTUW =3D (0x0C << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_PDIVUW  =3D (0x0D << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_PCPYUD  =3D (0x0E << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_POR     =3D (0x12 << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_PNOR    =3D (0x13 << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_PEXCH   =3D (0x1A << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_PCPYH   =3D (0x1B << 6) | TX79_MMI_CLASS_MMI3,
--    TX79_MMI3_PEXCW   =3D (0x1E << 6) | TX79_MMI_CLASS_MMI3,
-+    MMI_OPC_3_PMADDUW =3D (0x00 << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_PSRAVW  =3D (0x03 << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_PMTHI   =3D (0x08 << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_PMTLO   =3D (0x09 << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_PINTEH  =3D (0x0A << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_PMULTUW =3D (0x0C << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_PDIVUW  =3D (0x0D << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_PCPYUD  =3D (0x0E << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_POR     =3D (0x12 << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_PNOR    =3D (0x13 << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_PEXCH   =3D (0x1A << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_PCPYH   =3D (0x1B << 6) | MMI_OPC_CLASS_MMI3,
-+    MMI_OPC_3_PEXCW   =3D (0x1E << 6) | MMI_OPC_CLASS_MMI3,
- };
-=20
- /* global register indices */
-@@ -4362,26 +4362,26 @@ static void gen_shift(DisasContext *ctx, uint32_t=
- opc,
- /* Copy GPR to and from TX79 HI1/LO1 register. */
- static void gen_HILO1_tx79(DisasContext *ctx, uint32_t opc, int reg)
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index eb6fb82fb8..0d6e89e474 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -937,43 +937,81 @@ void HELPER(pre_hvc)(CPUARMState *env)
+ void HELPER(pre_smc)(CPUARMState *env, uint32_t syndrome)
  {
--    if (reg =3D=3D 0 && (opc =3D=3D TX79_MMI_MFHI1 || opc =3D=3D TX79_MM=
-I_MFLO1)) {
-+    if (reg =3D=3D 0 && (opc =3D=3D MMI_OPC_MFHI1 || opc =3D=3D MMI_OPC_=
-MFLO1)) {
-         /* Treat as NOP. */
-         return;
+     ARMCPU *cpu =3D arm_env_get_cpu(env);
+     int cur_el =3D arm_current_el(env);
+     bool secure =3D arm_is_secure(env);
+-    bool smd =3D env->cp15.scr_el3 & SCR_SMD;
++    bool smd_flag =3D env->cp15.scr_el3 & SCR_SMD;
++
++    /*
++     * SMC behaviour is summarized in the following table.
++     * This helper handles the "Trap to EL2" and "Undef insn" cases.
++     * The "Trap to EL3" and "PSCI call" cases are handled in the except=
+ion
++     * helper.
++     *
++     *  -> ARM_FEATURE_EL3 and !SMD
++     *                           HCR_TSC && NS EL1   !HCR_TSC || !NS EL1
++     *
++     *  Conduit SMC, valid call  Trap to EL2         PSCI Call
++     *  Conduit SMC, inval call  Trap to EL2         Trap to EL3
++     *  Conduit not SMC          Trap to EL2         Trap to EL3
++     *
++     *
++     *  -> ARM_FEATURE_EL3 and SMD
++     *                           HCR_TSC && NS EL1   !HCR_TSC || !NS EL1
++     *
++     *  Conduit SMC, valid call  Trap to EL2         PSCI Call
++     *  Conduit SMC, inval call  Trap to EL2         Undef insn
++     *  Conduit not SMC          Trap to EL2         Undef insn
++     *
++     *
++     *  -> !ARM_FEATURE_EL3
++     *                           HCR_TSC && NS EL1   !HCR_TSC || !NS EL1
++     *
++     *  Conduit SMC, valid call  Trap to EL2         PSCI Call
++     *  Conduit SMC, inval call  Trap to EL2         Undef insn
++     *  Conduit not SMC          Undef insn          Undef insn
++     */
++
+     /* On ARMv8 with EL3 AArch64, SMD applies to both S and NS state.
+      * On ARMv8 with EL3 AArch32, or ARMv7 with the Virtualization
+      *  extensions, SMD only applies to NS state.
+      * On ARMv7 without the Virtualization extensions, the SMD bit
+      * doesn't exist, but we forbid the guest to set it to 1 in scr_writ=
+e(),
+      * so we need not special case this here.
+      */
+-    bool undef =3D arm_feature(env, ARM_FEATURE_AARCH64) ? smd : smd && =
+!secure;
++    bool smd =3D arm_feature(env, ARM_FEATURE_AARCH64) ? smd_flag
++                                                     : smd_flag && !secu=
+re;
+=20
+     if (!arm_feature(env, ARM_FEATURE_EL3) &&
+         cpu->psci_conduit !=3D QEMU_PSCI_CONDUIT_SMC) {
+         /* If we have no EL3 then SMC always UNDEFs and can't be
+          * trapped to EL2. PSCI-via-SMC is a sort of ersatz EL3
+          * firmware within QEMU, and we want an EL2 guest to be able
+          * to forbid its EL1 from making PSCI calls into QEMU's
+          * "firmware" via HCR.TSC, so for these purposes treat
+          * PSCI-via-SMC as implying an EL3.
++         * This handles the very last line of the previous table.
+          */
+-        undef =3D true;
+-    } else if (!secure && cur_el =3D=3D 1 && (env->cp15.hcr_el2 & HCR_TS=
+C)) {
++        raise_exception(env, EXCP_UDEF, syn_uncategorized(),
++                        exception_target_el(env));
++    }
++
++    if (!secure && cur_el =3D=3D 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
+         /* In NS EL1, HCR controlled routing to EL2 has priority over SM=
+D.
+          * We also want an EL2 guest to be able to forbid its EL1 from
+          * making PSCI calls into QEMU's "firmware" via HCR.TSC.
++         * This handles all the "Trap to EL2" cases of the previous tabl=
+e.
+          */
+         raise_exception(env, EXCP_HYP_TRAP, syndrome, 2);
      }
 =20
-     switch (opc) {
--    case TX79_MMI_MFHI1:
-+    case MMI_OPC_MFHI1:
-         tcg_gen_mov_tl(cpu_gpr[reg], cpu_HI[1]);
-         break;
--    case TX79_MMI_MFLO1:
-+    case MMI_OPC_MFLO1:
-         tcg_gen_mov_tl(cpu_gpr[reg], cpu_LO[1]);
-         break;
--    case TX79_MMI_MTHI1:
-+    case MMI_OPC_MTHI1:
-         if (reg !=3D 0) {
-             tcg_gen_mov_tl(cpu_HI[1], cpu_gpr[reg]);
-         } else {
-             tcg_gen_movi_tl(cpu_HI[1], 0);
-         }
-         break;
--    case TX79_MMI_MTLO1:
-+    case MMI_OPC_MTLO1:
-         if (reg !=3D 0) {
-             tcg_gen_mov_tl(cpu_LO[1], cpu_gpr[reg]);
-         } else {
-@@ -4754,7 +4754,7 @@ static void gen_div1_tx79(DisasContext *ctx, uint32=
-_t opc, int rs, int rt)
-     gen_load_gpr(t1, rt);
-=20
-     switch (opc) {
--    case TX79_MMI_DIV1:
-+    case MMI_OPC_DIV1:
-         {
-             TCGv t2 =3D tcg_temp_new();
-             TCGv t3 =3D tcg_temp_new();
-@@ -4775,7 +4775,7 @@ static void gen_div1_tx79(DisasContext *ctx, uint32=
-_t opc, int rs, int rt)
-             tcg_temp_free(t2);
-         }
-         break;
--    case TX79_MMI_DIVU1:
-+    case MMI_OPC_DIVU1:
-         {
-             TCGv t2 =3D tcg_const_tl(0);
-             TCGv t3 =3D tcg_const_tl(1);
-@@ -5021,7 +5021,7 @@ static void gen_mul_txx9(DisasContext *ctx, uint32_=
-t opc,
-     gen_load_gpr(t1, rt);
-=20
-     switch (opc) {
--    case TX79_MMI_MULT1:
-+    case MMI_OPC_MULT1:
-         acc =3D 1;
-         /* Fall through */
-     case OPC_MULT:
-@@ -5040,7 +5040,7 @@ static void gen_mul_txx9(DisasContext *ctx, uint32_=
-t opc,
-             tcg_temp_free_i32(t3);
-         }
-         break;
--    case TX79_MMI_MULTU1:
-+    case MMI_OPC_MULTU1:
-         acc =3D 1;
-         /* Fall through */
-     case OPC_MULTU:
-@@ -26469,32 +26469,32 @@ static void decode_tx79_mmi0(CPUMIPSState *env,=
- DisasContext *ctx)
-     uint32_t opc =3D MASK_MMI0(ctx->opcode);
-=20
-     switch (opc) {
--    case TX79_MMI0_PADDW:     /* TODO: TX79_MMI0_PADDW */
--    case TX79_MMI0_PSUBW:     /* TODO: TX79_MMI0_PSUBW */
--    case TX79_MMI0_PCGTW:     /* TODO: TX79_MMI0_PCGTW */
--    case TX79_MMI0_PMAXW:     /* TODO: TX79_MMI0_PMAXW */
--    case TX79_MMI0_PADDH:     /* TODO: TX79_MMI0_PADDH */
--    case TX79_MMI0_PSUBH:     /* TODO: TX79_MMI0_PSUBH */
--    case TX79_MMI0_PCGTH:     /* TODO: TX79_MMI0_PCGTH */
--    case TX79_MMI0_PMAXH:     /* TODO: TX79_MMI0_PMAXH */
--    case TX79_MMI0_PADDB:     /* TODO: TX79_MMI0_PADDB */
--    case TX79_MMI0_PSUBB:     /* TODO: TX79_MMI0_PSUBB */
--    case TX79_MMI0_PCGTB:     /* TODO: TX79_MMI0_PCGTB */
--    case TX79_MMI0_PADDSW:    /* TODO: TX79_MMI0_PADDSW */
--    case TX79_MMI0_PSUBSW:    /* TODO: TX79_MMI0_PSUBSW */
--    case TX79_MMI0_PEXTLW:    /* TODO: TX79_MMI0_PEXTLW */
--    case TX79_MMI0_PPACW:     /* TODO: TX79_MMI0_PPACW */
--    case TX79_MMI0_PADDSH:    /* TODO: TX79_MMI0_PADDSH */
--    case TX79_MMI0_PSUBSH:    /* TODO: TX79_MMI0_PSUBSH */
--    case TX79_MMI0_PEXTLH:    /* TODO: TX79_MMI0_PEXTLH */
--    case TX79_MMI0_PPACH:     /* TODO: TX79_MMI0_PPACH */
--    case TX79_MMI0_PADDSB:    /* TODO: TX79_MMI0_PADDSB */
--    case TX79_MMI0_PSUBSB:    /* TODO: TX79_MMI0_PSUBSB */
--    case TX79_MMI0_PEXTLB:    /* TODO: TX79_MMI0_PEXTLB */
--    case TX79_MMI0_PPACB:     /* TODO: TX79_MMI0_PPACB */
--    case TX79_MMI0_PEXT5:     /* TODO: TX79_MMI0_PEXT5 */
--    case TX79_MMI0_PPAC5:     /* TODO: TX79_MMI0_PPAC5 */
--        generate_exception_end(ctx, EXCP_RI); /* TODO: TX79_MMI_CLASS_MM=
-I0 */
-+    case MMI_OPC_0_PADDW:     /* TODO: MMI_OPC_0_PADDW */
-+    case MMI_OPC_0_PSUBW:     /* TODO: MMI_OPC_0_PSUBW */
-+    case MMI_OPC_0_PCGTW:     /* TODO: MMI_OPC_0_PCGTW */
-+    case MMI_OPC_0_PMAXW:     /* TODO: MMI_OPC_0_PMAXW */
-+    case MMI_OPC_0_PADDH:     /* TODO: MMI_OPC_0_PADDH */
-+    case MMI_OPC_0_PSUBH:     /* TODO: MMI_OPC_0_PSUBH */
-+    case MMI_OPC_0_PCGTH:     /* TODO: MMI_OPC_0_PCGTH */
-+    case MMI_OPC_0_PMAXH:     /* TODO: MMI_OPC_0_PMAXH */
-+    case MMI_OPC_0_PADDB:     /* TODO: MMI_OPC_0_PADDB */
-+    case MMI_OPC_0_PSUBB:     /* TODO: MMI_OPC_0_PSUBB */
-+    case MMI_OPC_0_PCGTB:     /* TODO: MMI_OPC_0_PCGTB */
-+    case MMI_OPC_0_PADDSW:    /* TODO: MMI_OPC_0_PADDSW */
-+    case MMI_OPC_0_PSUBSW:    /* TODO: MMI_OPC_0_PSUBSW */
-+    case MMI_OPC_0_PEXTLW:    /* TODO: MMI_OPC_0_PEXTLW */
-+    case MMI_OPC_0_PPACW:     /* TODO: MMI_OPC_0_PPACW */
-+    case MMI_OPC_0_PADDSH:    /* TODO: MMI_OPC_0_PADDSH */
-+    case MMI_OPC_0_PSUBSH:    /* TODO: MMI_OPC_0_PSUBSH */
-+    case MMI_OPC_0_PEXTLH:    /* TODO: MMI_OPC_0_PEXTLH */
-+    case MMI_OPC_0_PPACH:     /* TODO: MMI_OPC_0_PPACH */
-+    case MMI_OPC_0_PADDSB:    /* TODO: MMI_OPC_0_PADDSB */
-+    case MMI_OPC_0_PSUBSB:    /* TODO: MMI_OPC_0_PSUBSB */
-+    case MMI_OPC_0_PEXTLB:    /* TODO: MMI_OPC_0_PEXTLB */
-+    case MMI_OPC_0_PPACB:     /* TODO: MMI_OPC_0_PPACB */
-+    case MMI_OPC_0_PEXT5:     /* TODO: MMI_OPC_0_PEXT5 */
-+    case MMI_OPC_0_PPAC5:     /* TODO: MMI_OPC_0_PPAC5 */
-+        generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI=
-0 */
-         break;
-     default:
-         MIPS_INVAL("TX79 MMI class MMI0");
-@@ -26508,25 +26508,25 @@ static void decode_tx79_mmi1(CPUMIPSState *env,=
- DisasContext *ctx)
-     uint32_t opc =3D MASK_MMI1(ctx->opcode);
-=20
-     switch (opc) {
--    case TX79_MMI1_PABSW:     /* TODO: TX79_MMI1_PABSW */
--    case TX79_MMI1_PCEQW:     /* TODO: TX79_MMI1_PCEQW */
--    case TX79_MMI1_PMINW:     /* TODO: TX79_MMI1_PMINW */
--    case TX79_MMI1_PADSBH:    /* TODO: TX79_MMI1_PADSBH */
--    case TX79_MMI1_PABSH:     /* TODO: TX79_MMI1_PABSH */
--    case TX79_MMI1_PCEQH:     /* TODO: TX79_MMI1_PCEQH */
--    case TX79_MMI1_PMINH:     /* TODO: TX79_MMI1_PMINH */
--    case TX79_MMI1_PCEQB:     /* TODO: TX79_MMI1_PCEQB */
--    case TX79_MMI1_PADDUW:    /* TODO: TX79_MMI1_PADDUW */
--    case TX79_MMI1_PSUBUW:    /* TODO: TX79_MMI1_PSUBUW */
--    case TX79_MMI1_PEXTUW:    /* TODO: TX79_MMI1_PEXTUW */
--    case TX79_MMI1_PADDUH:    /* TODO: TX79_MMI1_PADDUH */
--    case TX79_MMI1_PSUBUH:    /* TODO: TX79_MMI1_PSUBUH */
--    case TX79_MMI1_PEXTUH:    /* TODO: TX79_MMI1_PEXTUH */
--    case TX79_MMI1_PADDUB:    /* TODO: TX79_MMI1_PADDUB */
--    case TX79_MMI1_PSUBUB:    /* TODO: TX79_MMI1_PSUBUB */
--    case TX79_MMI1_PEXTUB:    /* TODO: TX79_MMI1_PEXTUB */
--    case TX79_MMI1_QFSRV:     /* TODO: TX79_MMI1_QFSRV */
--        generate_exception_end(ctx, EXCP_RI); /* TODO: TX79_MMI_CLASS_MM=
-I1 */
-+    case MMI_OPC_1_PABSW:     /* TODO: MMI_OPC_1_PABSW */
-+    case MMI_OPC_1_PCEQW:     /* TODO: MMI_OPC_1_PCEQW */
-+    case MMI_OPC_1_PMINW:     /* TODO: MMI_OPC_1_PMINW */
-+    case MMI_OPC_1_PADSBH:    /* TODO: MMI_OPC_1_PADSBH */
-+    case MMI_OPC_1_PABSH:     /* TODO: MMI_OPC_1_PABSH */
-+    case MMI_OPC_1_PCEQH:     /* TODO: MMI_OPC_1_PCEQH */
-+    case MMI_OPC_1_PMINH:     /* TODO: MMI_OPC_1_PMINH */
-+    case MMI_OPC_1_PCEQB:     /* TODO: MMI_OPC_1_PCEQB */
-+    case MMI_OPC_1_PADDUW:    /* TODO: MMI_OPC_1_PADDUW */
-+    case MMI_OPC_1_PSUBUW:    /* TODO: MMI_OPC_1_PSUBUW */
-+    case MMI_OPC_1_PEXTUW:    /* TODO: MMI_OPC_1_PEXTUW */
-+    case MMI_OPC_1_PADDUH:    /* TODO: MMI_OPC_1_PADDUH */
-+    case MMI_OPC_1_PSUBUH:    /* TODO: MMI_OPC_1_PSUBUH */
-+    case MMI_OPC_1_PEXTUH:    /* TODO: MMI_OPC_1_PEXTUH */
-+    case MMI_OPC_1_PADDUB:    /* TODO: MMI_OPC_1_PADDUB */
-+    case MMI_OPC_1_PSUBUB:    /* TODO: MMI_OPC_1_PSUBUB */
-+    case MMI_OPC_1_PEXTUB:    /* TODO: MMI_OPC_1_PEXTUB */
-+    case MMI_OPC_1_QFSRV:     /* TODO: MMI_OPC_1_QFSRV */
-+        generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI=
-1 */
-         break;
-     default:
-         MIPS_INVAL("TX79 MMI class MMI1");
-@@ -26540,29 +26540,29 @@ static void decode_tx79_mmi2(CPUMIPSState *env,=
- DisasContext *ctx)
-     uint32_t opc =3D MASK_MMI2(ctx->opcode);
-=20
-     switch (opc) {
--    case TX79_MMI2_PMADDW:    /* TODO: TX79_MMI2_PMADDW */
--    case TX79_MMI2_PSLLVW:    /* TODO: TX79_MMI2_PSLLVW */
--    case TX79_MMI2_PSRLVW:    /* TODO: TX79_MMI2_PSRLVW */
--    case TX79_MMI2_PMSUBW:    /* TODO: TX79_MMI2_PMSUBW */
--    case TX79_MMI2_PMFHI:     /* TODO: TX79_MMI2_PMFHI */
--    case TX79_MMI2_PMFLO:     /* TODO: TX79_MMI2_PMFLO */
--    case TX79_MMI2_PINTH:     /* TODO: TX79_MMI2_PINTH */
--    case TX79_MMI2_PMULTW:    /* TODO: TX79_MMI2_PMULTW */
--    case TX79_MMI2_PDIVW:     /* TODO: TX79_MMI2_PDIVW */
--    case TX79_MMI2_PCPYLD:    /* TODO: TX79_MMI2_PCPYLD */
--    case TX79_MMI2_PMADDH:    /* TODO: TX79_MMI2_PMADDH */
--    case TX79_MMI2_PHMADH:    /* TODO: TX79_MMI2_PHMADH */
--    case TX79_MMI2_PAND:      /* TODO: TX79_MMI2_PAND */
--    case TX79_MMI2_PXOR:      /* TODO: TX79_MMI2_PXOR */
--    case TX79_MMI2_PMSUBH:    /* TODO: TX79_MMI2_PMSUBH */
--    case TX79_MMI2_PHMSBH:    /* TODO: TX79_MMI2_PHMSBH */
--    case TX79_MMI2_PEXEH:     /* TODO: TX79_MMI2_PEXEH */
--    case TX79_MMI2_PREVH:     /* TODO: TX79_MMI2_PREVH */
--    case TX79_MMI2_PMULTH:    /* TODO: TX79_MMI2_PMULTH */
--    case TX79_MMI2_PDIVBW:    /* TODO: TX79_MMI2_PDIVBW */
--    case TX79_MMI2_PEXEW:     /* TODO: TX79_MMI2_PEXEW */
--    case TX79_MMI2_PROT3W:    /* TODO: TX79_MMI2_PROT3W */
--        generate_exception_end(ctx, EXCP_RI); /* TODO: TX79_MMI_CLASS_MM=
-I2 */
-+    case MMI_OPC_2_PMADDW:    /* TODO: MMI_OPC_2_PMADDW */
-+    case MMI_OPC_2_PSLLVW:    /* TODO: MMI_OPC_2_PSLLVW */
-+    case MMI_OPC_2_PSRLVW:    /* TODO: MMI_OPC_2_PSRLVW */
-+    case MMI_OPC_2_PMSUBW:    /* TODO: MMI_OPC_2_PMSUBW */
-+    case MMI_OPC_2_PMFHI:     /* TODO: MMI_OPC_2_PMFHI */
-+    case MMI_OPC_2_PMFLO:     /* TODO: MMI_OPC_2_PMFLO */
-+    case MMI_OPC_2_PINTH:     /* TODO: MMI_OPC_2_PINTH */
-+    case MMI_OPC_2_PMULTW:    /* TODO: MMI_OPC_2_PMULTW */
-+    case MMI_OPC_2_PDIVW:     /* TODO: MMI_OPC_2_PDIVW */
-+    case MMI_OPC_2_PCPYLD:    /* TODO: MMI_OPC_2_PCPYLD */
-+    case MMI_OPC_2_PMADDH:    /* TODO: MMI_OPC_2_PMADDH */
-+    case MMI_OPC_2_PHMADH:    /* TODO: MMI_OPC_2_PHMADH */
-+    case MMI_OPC_2_PAND:      /* TODO: MMI_OPC_2_PAND */
-+    case MMI_OPC_2_PXOR:      /* TODO: MMI_OPC_2_PXOR */
-+    case MMI_OPC_2_PMSUBH:    /* TODO: MMI_OPC_2_PMSUBH */
-+    case MMI_OPC_2_PHMSBH:    /* TODO: MMI_OPC_2_PHMSBH */
-+    case MMI_OPC_2_PEXEH:     /* TODO: MMI_OPC_2_PEXEH */
-+    case MMI_OPC_2_PREVH:     /* TODO: MMI_OPC_2_PREVH */
-+    case MMI_OPC_2_PMULTH:    /* TODO: MMI_OPC_2_PMULTH */
-+    case MMI_OPC_2_PDIVBW:    /* TODO: MMI_OPC_2_PDIVBW */
-+    case MMI_OPC_2_PEXEW:     /* TODO: MMI_OPC_2_PEXEW */
-+    case MMI_OPC_2_PROT3W:    /* TODO: MMI_OPC_2_PROT3W */
-+        generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI=
-2 */
-         break;
-     default:
-         MIPS_INVAL("TX79 MMI class MMI2");
-@@ -26576,20 +26576,20 @@ static void decode_tx79_mmi3(CPUMIPSState *env,=
- DisasContext *ctx)
-     uint32_t opc =3D MASK_MMI3(ctx->opcode);
-=20
-     switch (opc) {
--    case TX79_MMI3_PMADDUW:    /* TODO: TX79_MMI3_PMADDUW */
--    case TX79_MMI3_PSRAVW:     /* TODO: TX79_MMI3_PSRAVW */
--    case TX79_MMI3_PMTHI:      /* TODO: TX79_MMI3_PMTHI */
--    case TX79_MMI3_PMTLO:      /* TODO: TX79_MMI3_PMTLO */
--    case TX79_MMI3_PINTEH:     /* TODO: TX79_MMI3_PINTEH */
--    case TX79_MMI3_PMULTUW:    /* TODO: TX79_MMI3_PMULTUW */
--    case TX79_MMI3_PDIVUW:     /* TODO: TX79_MMI3_PDIVUW */
--    case TX79_MMI3_PCPYUD:     /* TODO: TX79_MMI3_PCPYUD */
--    case TX79_MMI3_POR:        /* TODO: TX79_MMI3_POR */
--    case TX79_MMI3_PNOR:       /* TODO: TX79_MMI3_PNOR */
--    case TX79_MMI3_PEXCH:      /* TODO: TX79_MMI3_PEXCH */
--    case TX79_MMI3_PCPYH:      /* TODO: TX79_MMI3_PCPYH */
--    case TX79_MMI3_PEXCW:      /* TODO: TX79_MMI3_PEXCW */
--        generate_exception_end(ctx, EXCP_RI); /* TODO: TX79_MMI_CLASS_MM=
-I3 */
-+    case MMI_OPC_3_PMADDUW:    /* TODO: MMI_OPC_3_PMADDUW */
-+    case MMI_OPC_3_PSRAVW:     /* TODO: MMI_OPC_3_PSRAVW */
-+    case MMI_OPC_3_PMTHI:      /* TODO: MMI_OPC_3_PMTHI */
-+    case MMI_OPC_3_PMTLO:      /* TODO: MMI_OPC_3_PMTLO */
-+    case MMI_OPC_3_PINTEH:     /* TODO: MMI_OPC_3_PINTEH */
-+    case MMI_OPC_3_PMULTUW:    /* TODO: MMI_OPC_3_PMULTUW */
-+    case MMI_OPC_3_PDIVUW:     /* TODO: MMI_OPC_3_PDIVUW */
-+    case MMI_OPC_3_PCPYUD:     /* TODO: MMI_OPC_3_PCPYUD */
-+    case MMI_OPC_3_POR:        /* TODO: MMI_OPC_3_POR */
-+    case MMI_OPC_3_PNOR:       /* TODO: MMI_OPC_3_PNOR */
-+    case MMI_OPC_3_PEXCH:      /* TODO: MMI_OPC_3_PEXCH */
-+    case MMI_OPC_3_PCPYH:      /* TODO: MMI_OPC_3_PCPYH */
-+    case MMI_OPC_3_PEXCW:      /* TODO: MMI_OPC_3_PEXCW */
-+        generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI=
-3 */
-         break;
-     default:
-         MIPS_INVAL("TX79 MMI class MMI3");
-@@ -26606,48 +26606,48 @@ static void decode_tx79_mmi(CPUMIPSState *env, =
-DisasContext *ctx)
-     int rd =3D extract32(ctx->opcode, 11, 5);
-=20
-     switch (opc) {
--    case TX79_MMI_CLASS_MMI0:
-+    case MMI_OPC_CLASS_MMI0:
-         decode_tx79_mmi0(env, ctx);
-         break;
--    case TX79_MMI_CLASS_MMI1:
-+    case MMI_OPC_CLASS_MMI1:
-         decode_tx79_mmi1(env, ctx);
-         break;
--    case TX79_MMI_CLASS_MMI2:
-+    case MMI_OPC_CLASS_MMI2:
-         decode_tx79_mmi2(env, ctx);
-         break;
--    case TX79_MMI_CLASS_MMI3:
-+    case MMI_OPC_CLASS_MMI3:
-         decode_tx79_mmi3(env, ctx);
-         break;
--    case TX79_MMI_MULT1:
--    case TX79_MMI_MULTU1:
-+    case MMI_OPC_MULT1:
-+    case MMI_OPC_MULTU1:
-         gen_mul_txx9(ctx, opc, rd, rs, rt);
-         break;
--    case TX79_MMI_DIV1:
--    case TX79_MMI_DIVU1:
-+    case MMI_OPC_DIV1:
-+    case MMI_OPC_DIVU1:
-         gen_div1_tx79(ctx, opc, rs, rt);
-         break;
--    case TX79_MMI_MTLO1:
--    case TX79_MMI_MTHI1:
-+    case MMI_OPC_MTLO1:
-+    case MMI_OPC_MTHI1:
-         gen_HILO1_tx79(ctx, opc, rs);
-         break;
--    case TX79_MMI_MFLO1:
--    case TX79_MMI_MFHI1:
-+    case MMI_OPC_MFLO1:
-+    case MMI_OPC_MFHI1:
-         gen_HILO1_tx79(ctx, opc, rd);
-         break;
--    case TX79_MMI_MADD:          /* TODO: TX79_MMI_MADD */
--    case TX79_MMI_MADDU:         /* TODO: TX79_MMI_MADDU */
--    case TX79_MMI_PLZCW:         /* TODO: TX79_MMI_PLZCW */
--    case TX79_MMI_MADD1:         /* TODO: TX79_MMI_MADD1 */
--    case TX79_MMI_MADDU1:        /* TODO: TX79_MMI_MADDU1 */
--    case TX79_MMI_PMFHL:         /* TODO: TX79_MMI_PMFHL */
--    case TX79_MMI_PMTHL:         /* TODO: TX79_MMI_PMTHL */
--    case TX79_MMI_PSLLH:         /* TODO: TX79_MMI_PSLLH */
--    case TX79_MMI_PSRLH:         /* TODO: TX79_MMI_PSRLH */
--    case TX79_MMI_PSRAH:         /* TODO: TX79_MMI_PSRAH */
--    case TX79_MMI_PSLLW:         /* TODO: TX79_MMI_PSLLW */
--    case TX79_MMI_PSRLW:         /* TODO: TX79_MMI_PSRLW */
--    case TX79_MMI_PSRAW:         /* TODO: TX79_MMI_PSRAW */
--        generate_exception_end(ctx, EXCP_RI);    /* TODO: TX79_CLASS_MMI=
- */
-+    case MMI_OPC_MADD:          /* TODO: MMI_OPC_MADD */
-+    case MMI_OPC_MADDU:         /* TODO: MMI_OPC_MADDU */
-+    case MMI_OPC_PLZCW:         /* TODO: MMI_OPC_PLZCW */
-+    case MMI_OPC_MADD1:         /* TODO: MMI_OPC_MADD1 */
-+    case MMI_OPC_MADDU1:        /* TODO: MMI_OPC_MADDU1 */
-+    case MMI_OPC_PMFHL:         /* TODO: MMI_OPC_PMFHL */
-+    case MMI_OPC_PMTHL:         /* TODO: MMI_OPC_PMTHL */
-+    case MMI_OPC_PSLLH:         /* TODO: MMI_OPC_PSLLH */
-+    case MMI_OPC_PSRLH:         /* TODO: MMI_OPC_PSRLH */
-+    case MMI_OPC_PSRAH:         /* TODO: MMI_OPC_PSRAH */
-+    case MMI_OPC_PSLLW:         /* TODO: MMI_OPC_PSLLW */
-+    case MMI_OPC_PSRLW:         /* TODO: MMI_OPC_PSRLW */
-+    case MMI_OPC_PSRAW:         /* TODO: MMI_OPC_PSRAW */
-+        generate_exception_end(ctx, EXCP_RI);    /* TODO: MMI_OPC_CLASS_=
-MMI */
-         break;
-     default:
-         MIPS_INVAL("TX79 MMI class");
-@@ -26658,12 +26658,12 @@ static void decode_tx79_mmi(CPUMIPSState *env, =
-DisasContext *ctx)
-=20
- static void decode_tx79_lq(CPUMIPSState *env, DisasContext *ctx)
- {
--    generate_exception_end(ctx, EXCP_RI);    /* TODO: TX79_LQ */
-+    generate_exception_end(ctx, EXCP_RI);    /* TODO: MMI_OPC_LQ */
+-    /* If PSCI is enabled and this looks like a valid PSCI call then
+-     * suppress the UNDEF -- we'll catch the SMC exception and
+-     * implement the PSCI call behaviour there.
++    /* Catch the two remaining "Undef insn" cases of the previous table:
++     *    - PSCI conduit is SMC but we don't have a valid PCSI call,
++     *    - We don't have EL3 or SMD is set.
+      */
+-    if (undef && !arm_is_psci_call(cpu, EXCP_SMC)) {
++    if (!arm_is_psci_call(cpu, EXCP_SMC) &&
++        (smd || !arm_feature(env, ARM_FEATURE_EL3))) {
+         raise_exception(env, EXCP_UDEF, syn_uncategorized(),
+                         exception_target_el(env));
+     }
  }
 =20
- static void gen_tx79_sq(DisasContext *ctx, int base, int rt, int offset)
- {
--    generate_exception_end(ctx, EXCP_RI);    /* TODO: TX79_SQ */
-+    generate_exception_end(ctx, EXCP_RI);    /* TODO: MMI_OPC_SQ */
- }
-=20
- /*
-@@ -28023,7 +28023,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
-ntext *ctx)
-         break;
-     case OPC_SPECIAL3:
-         if (ctx->insn_flags & INSN_R5900) {
--            decode_tx79_sq(env, ctx);    /* TX79_SQ */
-+            decode_tx79_sq(env, ctx);    /* MMI_OPC_SQ */
-         } else {
-             decode_opc_special3(env, ctx);
-         }
-@@ -28698,7 +28698,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
-ntext *ctx)
-         break;
-     case OPC_MSA: /* OPC_MDMX */
-         if (ctx->insn_flags & INSN_R5900) {
--            decode_tx79_lq(env, ctx);    /* TX79_LQ */
-+            decode_tx79_lq(env, ctx);    /* MMI_OPC_LQ */
-         } else {
-             /* MDMX: Not implemented. */
-             gen_msa(env, ctx);
 --=20
-2.7.4
+2.19.1
