@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UO-00014F-EM
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UO-00014D-Cv
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:38:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UK-00020y-Hw
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UL-00021v-My
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:38:40 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:54235 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:54264 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gO5UK-0001zp-6T
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:38:36 -0500
+	id 1gO5UL-000214-FL
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:38:37 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Sat, 17 Nov 2018 19:38:19 +0100
-Message-Id: <1542479908-20067-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sat, 17 Nov 2018 19:38:23 +0100
+Message-Id: <1542479908-20067-7-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1542479908-20067-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1542479908-20067-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 02/11] target/mips: Fix decoding mechanism of
- R5900 MFLO1, MFHI1, MTLO1 and MTHI1
+Subject: [Qemu-devel] [PULL v2 06/11] target/mips: Guard check_insn with
+ INSN_R5900 check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,120 +30,35 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com, laurent@vivier.eu
 
 From: Fredrik Noring <noring@nocrew.org>
 
-MFLO1, MFHI1, MTLO1 and MTHI1 are generated in gen_HILO1_tx79 instead of
-the generic gen_HILO.
+Explicitely mark handling of PREF instruction for R5900 as
+treating the same as NOP.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 51 ++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 40 insertions(+), 11 deletions(-)
+ target/mips/translate.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 60320cb..8601333 100644
+index c79da3c..714f2e6 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -4359,24 +4359,56 @@ static void gen_shift(DisasContext *ctx, uint32_t opc,
-     tcg_temp_free(t1);
- }
- 
-+/* Copy GPR to and from TX79 HI1/LO1 register. */
-+static void gen_HILO1_tx79(DisasContext *ctx, uint32_t opc, int reg)
-+{
-+    if (reg == 0 && (opc == TX79_MMI_MFHI1 || opc == TX79_MMI_MFLO1)) {
-+        /* Treat as NOP. */
-+        return;
-+    }
-+
-+    switch (opc) {
-+    case TX79_MMI_MFHI1:
-+        tcg_gen_mov_tl(cpu_gpr[reg], cpu_HI[1]);
-+        break;
-+    case TX79_MMI_MFLO1:
-+        tcg_gen_mov_tl(cpu_gpr[reg], cpu_LO[1]);
-+        break;
-+    case TX79_MMI_MTHI1:
-+        if (reg != 0) {
-+            tcg_gen_mov_tl(cpu_HI[1], cpu_gpr[reg]);
+@@ -28357,9 +28357,12 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+         break;
+     case OPC_PREF:
+         check_insn_opc_removed(ctx, ISA_MIPS32R6);
+-        check_insn(ctx, ISA_MIPS4 | ISA_MIPS32 |
+-                   INSN_R5900);
+-        /* Treat as NOP. */
++        if (ctx->insn_flags & INSN_R5900) {
++            /* Treat as NOP. */
 +        } else {
-+            tcg_gen_movi_tl(cpu_HI[1], 0);
++            check_insn(ctx, ISA_MIPS4 | ISA_MIPS32);
++            /* Treat as NOP. */
 +        }
-+        break;
-+    case TX79_MMI_MTLO1:
-+        if (reg != 0) {
-+            tcg_gen_mov_tl(cpu_LO[1], cpu_gpr[reg]);
-+        } else {
-+            tcg_gen_movi_tl(cpu_LO[1], 0);
-+        }
-+        break;
-+    default:
-+        MIPS_INVAL("mfthilo1 TX79");
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    }
-+}
-+
- /* Arithmetic on HI/LO registers */
- static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
- {
--    if (reg == 0 && (opc == OPC_MFHI || opc == TX79_MMI_MFHI1 ||
--                     opc == OPC_MFLO || opc == TX79_MMI_MFLO1)) {
-+    if (reg == 0 && (opc == OPC_MFHI || opc == OPC_MFLO)) {
-         /* Treat as NOP. */
-         return;
-     }
+         break;
  
-     if (acc != 0) {
--        if (!(ctx->insn_flags & INSN_R5900)) {
--            check_dsp(ctx);
--        }
-+        check_dsp(ctx);
-     }
- 
-     switch (opc) {
-     case OPC_MFHI:
--    case TX79_MMI_MFHI1:
- #if defined(TARGET_MIPS64)
-         if (acc != 0) {
-             tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_HI[acc]);
-@@ -4387,7 +4419,6 @@ static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
-         }
-         break;
-     case OPC_MFLO:
--    case TX79_MMI_MFLO1:
- #if defined(TARGET_MIPS64)
-         if (acc != 0) {
-             tcg_gen_ext32s_tl(cpu_gpr[reg], cpu_LO[acc]);
-@@ -4398,7 +4429,6 @@ static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
-         }
-         break;
-     case OPC_MTHI:
--    case TX79_MMI_MTHI1:
-         if (reg != 0) {
- #if defined(TARGET_MIPS64)
-             if (acc != 0) {
-@@ -4413,7 +4443,6 @@ static void gen_HILO(DisasContext *ctx, uint32_t opc, int acc, int reg)
-         }
-         break;
-     case OPC_MTLO:
--    case TX79_MMI_MTLO1:
-         if (reg != 0) {
- #if defined(TARGET_MIPS64)
-             if (acc != 0) {
-@@ -26500,11 +26529,11 @@ static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
-         break;
-     case TX79_MMI_MTLO1:
-     case TX79_MMI_MTHI1:
--        gen_HILO(ctx, opc, 1, rs);
-+        gen_HILO1_tx79(ctx, opc, rs);
-         break;
-     case TX79_MMI_MFLO1:
-     case TX79_MMI_MFHI1:
--        gen_HILO(ctx, opc, 1, rd);
-+        gen_HILO1_tx79(ctx, opc, rd);
-         break;
-     case TX79_MMI_MADD:          /* TODO: TX79_MMI_MADD */
-     case TX79_MMI_MADDU:         /* TODO: TX79_MMI_MADDU */
+     /* Floating point (COP1). */
 -- 
 2.7.4
