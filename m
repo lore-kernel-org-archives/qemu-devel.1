@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gNzZV-0002TD-G9
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:19:34 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gNzcZ-0003F2-04
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:22:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gNzZR-0004cw-F5
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:19:33 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35526)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gNzcT-0006kM-7m
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:22:42 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36652)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gNzZP-0004TG-Df
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:19:29 -0500
-Received: by mail-wm1-x344.google.com with SMTP id t15-v6so1045635wmt.0
-	for <qemu-devel@nongnu.org>; Sat, 17 Nov 2018 04:19:26 -0800 (PST)
+	id 1gNzcR-0006cw-Kt
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:22:37 -0500
+Received: by mail-wr1-x441.google.com with SMTP id z13-v6so27466856wrs.3
+	for <qemu-devel@nongnu.org>; Sat, 17 Nov 2018 04:22:35 -0800 (PST)
 References: <20181113071336.6242-1-yuval.shaia@oracle.com>
-	<20181113071336.6242-17-yuval.shaia@oracle.com>
+	<20181113071336.6242-18-yuval.shaia@oracle.com>
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <3ea07f59-4d2d-7b1d-38ef-8a8fd01fce83@gmail.com>
-Date: Sat, 17 Nov 2018 14:19:21 +0200
+Message-ID: <0770c06d-b482-c0bf-0d6a-efe31984b31e@gmail.com>
+Date: Sat, 17 Nov 2018 14:22:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181113071336.6242-17-yuval.shaia@oracle.com>
+In-Reply-To: <20181113071336.6242-18-yuval.shaia@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 16/23] hw/pvrdma: Fill all CQE fields
+Subject: Re: [Qemu-devel] [PATCH v3 17/23] hw/pvrdma: Fill error code in
+ command's response
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,286 +37,202 @@ To: Yuval Shaia <yuval.shaia@oracle.com>, dmitry.fleytman@gmail.com, jasowang@re
 
 
 On 11/13/18 9:13 AM, Yuval Shaia wrote:
-> Add ability to pass specific WC attributes to CQE such as GRH_BIT flag.
+> Driver checks error code let's set it.
 >
 > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 > ---
->   hw/rdma/rdma_backend.c      | 59 +++++++++++++++++++++++--------------
->   hw/rdma/rdma_backend.h      |  4 +--
->   hw/rdma/vmw/pvrdma_qp_ops.c | 31 +++++++++++--------
->   3 files changed, 58 insertions(+), 36 deletions(-)
+>   hw/rdma/vmw/pvrdma_cmd.c | 67 ++++++++++++++++++++++++++++------------
+>   1 file changed, 48 insertions(+), 19 deletions(-)
 >
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index 5675504165..e453bda8f9 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -59,13 +59,24 @@ struct backend_umad {
->       char mad[RDMA_MAX_PRIVATE_DATA];
->   };
+> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+> index 0d3c818c20..a326c5d470 100644
+> --- a/hw/rdma/vmw/pvrdma_cmd.c
+> +++ b/hw/rdma/vmw/pvrdma_cmd.c
+> @@ -131,7 +131,8 @@ static int query_port(PVRDMADev *dev, union pvrdma_cmd_req *req,
 >   
-> -static void (*comp_handler)(int status, unsigned int vendor_err, void *ctx);
-> +static void (*comp_handler)(void *ctx, struct ibv_wc *wc);
+>       if (rdma_backend_query_port(&dev->backend_dev,
+>                                   (struct ibv_port_attr *)&attrs)) {
+> -        return -ENOMEM;
+> +        resp->hdr.err = -ENOMEM;
+> +        goto out;
+>       }
 >   
-> -static void dummy_comp_handler(int status, unsigned int vendor_err, void *ctx)
-> +static void dummy_comp_handler(void *ctx, struct ibv_wc *wc)
->   {
->       pr_err("No completion handler is registered\n");
+>       memset(resp, 0, sizeof(*resp));
+> @@ -150,7 +151,9 @@ static int query_port(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>       resp->attrs.active_width = 1;
+>       resp->attrs.active_speed = 1;
+>   
+> -    return 0;
+> +out:
+> +    pr_dbg("ret=%d\n", resp->hdr.err);
+> +    return resp->hdr.err;
 >   }
 >   
-> +static inline void complete_work(enum ibv_wc_status status, uint32_t vendor_err,
-> +                                 void *ctx)
-> +{
-> +    struct ibv_wc wc = {0};
-> +
-> +    wc.status = status;
-> +    wc.vendor_err = vendor_err;
-> +
-> +    comp_handler(ctx, &wc);
-> +}
-> +
->   static void poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
->   {
->       int i, ne;
-> @@ -90,7 +101,7 @@ static void poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
->               }
->               pr_dbg("Processing %s CQE\n", bctx->is_tx_req ? "send" : "recv");
+>   static int query_pkey(PVRDMADev *dev, union pvrdma_cmd_req *req,
+> @@ -170,7 +173,7 @@ static int query_pkey(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>       resp->pkey = PVRDMA_PKEY;
+>       pr_dbg("pkey=0x%x\n", resp->pkey);
 >   
-> -            comp_handler(wc[i].status, wc[i].vendor_err, bctx->up_ctx);
-> +            comp_handler(bctx->up_ctx, &wc[i]);
->   
->               rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
->               g_free(bctx);
-> @@ -184,8 +195,8 @@ static void start_comp_thread(RdmaBackendDev *backend_dev)
->                          comp_handler_thread, backend_dev, QEMU_THREAD_DETACHED);
+> -    return 0;
+> +    return resp->hdr.err;
 >   }
 >   
-> -void rdma_backend_register_comp_handler(void (*handler)(int status,
-> -                                        unsigned int vendor_err, void *ctx))
-> +void rdma_backend_register_comp_handler(void (*handler)(void *ctx,
-> +                                                         struct ibv_wc *wc))
->   {
->       comp_handler = handler;
->   }
-> @@ -369,14 +380,14 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
->       if (!qp->ibqp) { /* This field does not get initialized for QP0 and QP1 */
->           if (qp_type == IBV_QPT_SMI) {
->               pr_dbg("QP0 unsupported\n");
-> -            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
-> +            complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
->           } else if (qp_type == IBV_QPT_GSI) {
->               pr_dbg("QP1\n");
->               rc = mad_send(backend_dev, sgid_idx, sgid, sge, num_sge);
->               if (rc) {
-> -                comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ctx);
-> +                complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_MAD_SEND, ctx);
->               } else {
-> -                comp_handler(IBV_WC_SUCCESS, 0, ctx);
-> +                complete_work(IBV_WC_SUCCESS, 0, ctx);
->               }
->           }
->           return;
-> @@ -385,7 +396,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
->       pr_dbg("num_sge=%d\n", num_sge);
->       if (!num_sge) {
->           pr_dbg("num_sge=0\n");
-> -        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
-> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
->           return;
->       }
+>   static int create_pd(PVRDMADev *dev, union pvrdma_cmd_req *req,
+> @@ -200,7 +203,9 @@ static int destroy_pd(PVRDMADev *dev, union pvrdma_cmd_req *req,
 >   
-> @@ -396,21 +407,21 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
->       rc = rdma_rm_alloc_cqe_ctx(backend_dev->rdma_dev_res, &bctx_id, bctx);
->       if (unlikely(rc)) {
->           pr_dbg("Failed to allocate cqe_ctx\n");
-> -        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
-> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
->           goto out_free_bctx;
->       }
+>       rdma_rm_dealloc_pd(&dev->rdma_dev_res, cmd->pd_handle);
 >   
->       rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge);
->       if (rc) {
->           pr_dbg("Error: Failed to build host SGE array\n");
-> -        comp_handler(IBV_WC_GENERAL_ERR, rc, ctx);
-> +        complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
->           goto out_dealloc_cqe_ctx;
->       }
->   
->       if (qp_type == IBV_QPT_UD) {
->           wr.wr.ud.ah = create_ah(backend_dev, qp->ibpd, sgid_idx, dgid);
->           if (!wr.wr.ud.ah) {
-> -            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
-> +            complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
->               goto out_dealloc_cqe_ctx;
->           }
->           wr.wr.ud.remote_qpn = dqpn;
-> @@ -428,7 +439,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
->       if (rc) {
->           pr_dbg("Fail (%d, %d) to post send WQE to qpn %d\n", rc, errno,
->                   qp->ibqp->qp_num);
-> -        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
-> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
->           goto out_dealloc_cqe_ctx;
->       }
->   
-> @@ -497,13 +508,13 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
->       if (!qp->ibqp) { /* This field does not get initialized for QP0 and QP1 */
->           if (qp_type == IBV_QPT_SMI) {
->               pr_dbg("QP0 unsupported\n");
-> -            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
-> +            complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_QP0, ctx);
->           }
->           if (qp_type == IBV_QPT_GSI) {
->               pr_dbg("QP1\n");
->               rc = save_mad_recv_buffer(backend_dev, sge, num_sge, ctx);
->               if (rc) {
-> -                comp_handler(IBV_WC_GENERAL_ERR, rc, ctx);
-> +                complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
->               }
->           }
->           return;
-> @@ -512,7 +523,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
->       pr_dbg("num_sge=%d\n", num_sge);
->       if (!num_sge) {
->           pr_dbg("num_sge=0\n");
-> -        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
-> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NO_SGE, ctx);
->           return;
->       }
->   
-> @@ -523,14 +534,14 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
->       rc = rdma_rm_alloc_cqe_ctx(rdma_dev_res, &bctx_id, bctx);
->       if (unlikely(rc)) {
->           pr_dbg("Failed to allocate cqe_ctx\n");
-> -        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
-> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_NOMEM, ctx);
->           goto out_free_bctx;
->       }
->   
->       rc = build_host_sge_array(rdma_dev_res, new_sge, sge, num_sge);
->       if (rc) {
->           pr_dbg("Error: Failed to build host SGE array\n");
-> -        comp_handler(IBV_WC_GENERAL_ERR, rc, ctx);
-> +        complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
->           goto out_dealloc_cqe_ctx;
->       }
->   
-> @@ -542,7 +553,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
->       if (rc) {
->           pr_dbg("Fail (%d, %d) to post recv WQE to qpn %d\n", rc, errno,
->                   qp->ibqp->qp_num);
-> -        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
-> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
->           goto out_dealloc_cqe_ctx;
->       }
->   
-> @@ -926,9 +937,10 @@ static void mad_read(void *opaque, const uint8_t *buf, int size)
->       mad = rdma_pci_dma_map(backend_dev->dev, bctx->sge.addr,
->                              bctx->sge.length);
->       if (!mad || bctx->sge.length < msg->umad_len + MAD_HDR_SIZE) {
-> -        comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_MAD_BUFF,
-> -                     bctx->up_ctx);
-> +        complete_work(IBV_WC_GENERAL_ERR, VENDOR_ERR_INV_MAD_BUFF,
-> +                      bctx->up_ctx);
->       } else {
-> +        struct ibv_wc wc = {0};
->           pr_dbg_buf("mad", msg->umad.mad, msg->umad_len);
->           memset(mad, 0, bctx->sge.length);
->           build_mad_hdr((struct ibv_grh *)mad,
-> @@ -937,7 +949,10 @@ static void mad_read(void *opaque, const uint8_t *buf, int size)
->           memcpy(&mad[MAD_HDR_SIZE], msg->umad.mad, msg->umad_len);
->           rdma_pci_dma_unmap(backend_dev->dev, mad, bctx->sge.length);
->   
-> -        comp_handler(IBV_WC_SUCCESS, 0, bctx->up_ctx);
-> +        wc.byte_len = msg->umad_len;
-> +        wc.status = IBV_WC_SUCCESS;
-> +        wc.wc_flags = IBV_WC_GRH;
-> +        comp_handler(bctx->up_ctx, &wc);
->       }
->   
->       g_free(bctx);
-> diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-> index 59ad2b874b..8cae40f827 100644
-> --- a/hw/rdma/rdma_backend.h
-> +++ b/hw/rdma/rdma_backend.h
-> @@ -57,8 +57,8 @@ int rdma_backend_get_gid_index(RdmaBackendDev *backend_dev,
->                                  union ibv_gid *gid);
->   void rdma_backend_start(RdmaBackendDev *backend_dev);
->   void rdma_backend_stop(RdmaBackendDev *backend_dev);
-> -void rdma_backend_register_comp_handler(void (*handler)(int status,
-> -                                        unsigned int vendor_err, void *ctx));
-> +void rdma_backend_register_comp_handler(void (*handler)(void *ctx,
-> +                                                        struct ibv_wc *wc));
->   void rdma_backend_unregister_comp_handler(void);
->   
->   int rdma_backend_query_port(RdmaBackendDev *backend_dev,
-> diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-> index 2130824098..300471a4c9 100644
-> --- a/hw/rdma/vmw/pvrdma_qp_ops.c
-> +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-> @@ -47,7 +47,7 @@ typedef struct PvrdmaRqWqe {
->    * 3. Interrupt host
->    */
->   static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
-> -                           struct pvrdma_cqe *cqe)
-> +                           struct pvrdma_cqe *cqe, struct ibv_wc *wc)
->   {
->       struct pvrdma_cqe *cqe1;
->       struct pvrdma_cqne *cqne;
-> @@ -66,6 +66,7 @@ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
->       pr_dbg("Writing CQE\n");
->       cqe1 = pvrdma_ring_next_elem_write(ring);
->       if (unlikely(!cqe1)) {
-> +        pr_dbg("No CQEs in ring\n");
->           return -EINVAL;
->       }
->   
-> @@ -73,8 +74,20 @@ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
->       cqe1->wr_id = cqe->wr_id;
->       cqe1->qp = cqe->qp;
->       cqe1->opcode = cqe->opcode;
-> -    cqe1->status = cqe->status;
-> -    cqe1->vendor_err = cqe->vendor_err;
-> +    cqe1->status = wc->status;
-> +    cqe1->byte_len = wc->byte_len;
-> +    cqe1->src_qp = wc->src_qp;
-> +    cqe1->wc_flags = wc->wc_flags;
-> +    cqe1->vendor_err = wc->vendor_err;
-> +
-> +    pr_dbg("wr_id=%" PRIx64 "\n", cqe1->wr_id);
-> +    pr_dbg("qp=0x%lx\n", cqe1->qp);
-> +    pr_dbg("opcode=%d\n", cqe1->opcode);
-> +    pr_dbg("status=%d\n", cqe1->status);
-> +    pr_dbg("byte_len=%d\n", cqe1->byte_len);
-> +    pr_dbg("src_qp=%d\n", cqe1->src_qp);
-> +    pr_dbg("wc_flags=%d\n", cqe1->wc_flags);
-> +    pr_dbg("vendor_err=%d\n", cqe1->vendor_err);
->   
->       pvrdma_ring_write_inc(ring);
->   
-> @@ -99,18 +112,12 @@ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
->       return 0;
->   }
->   
-> -static void pvrdma_qp_ops_comp_handler(int status, unsigned int vendor_err,
-> -                                       void *ctx)
-> +static void pvrdma_qp_ops_comp_handler(void *ctx, struct ibv_wc *wc)
->   {
->       CompHandlerCtx *comp_ctx = (CompHandlerCtx *)ctx;
->   
-> -    pr_dbg("cq_handle=%d\n", comp_ctx->cq_handle);
-> -    pr_dbg("wr_id=%" PRIx64 "\n", comp_ctx->cqe.wr_id);
-> -    pr_dbg("status=%d\n", status);
-> -    pr_dbg("vendor_err=0x%x\n", vendor_err);
-> -    comp_ctx->cqe.status = status;
-> -    comp_ctx->cqe.vendor_err = vendor_err;
-> -    pvrdma_post_cqe(comp_ctx->dev, comp_ctx->cq_handle, &comp_ctx->cqe);
-> +    pvrdma_post_cqe(comp_ctx->dev, comp_ctx->cq_handle, &comp_ctx->cqe, wc);
-> +
->       g_free(ctx);
->   }
->   
+> -    return 0;
+> +    rsp->hdr.err = 0;
 
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+Is it possible to ensure err is 0 by default during hdr creation
+instead of manually setting it every time?
 
 Thanks,
 Marcel
+
+> +
+> +    return rsp->hdr.err;
+>   }
+>   
+>   static int create_mr(PVRDMADev *dev, union pvrdma_cmd_req *req,
+> @@ -251,7 +256,9 @@ static int destroy_mr(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>   
+>       rdma_rm_dealloc_mr(&dev->rdma_dev_res, cmd->mr_handle);
+>   
+> -    return 0;
+> +    rsp->hdr.err = 0;
+> +
+> +    return rsp->hdr.err;
+>   }
+>   
+>   static int create_cq_ring(PCIDevice *pci_dev , PvrdmaRing **ring,
+> @@ -353,7 +360,8 @@ static int destroy_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>       cq = rdma_rm_get_cq(&dev->rdma_dev_res, cmd->cq_handle);
+>       if (!cq) {
+>           pr_dbg("Invalid CQ handle\n");
+> -        return -EINVAL;
+> +        rsp->hdr.err = -EINVAL;
+> +        goto out;
+>       }
+>   
+>       ring = (PvrdmaRing *)cq->opaque;
+> @@ -364,7 +372,11 @@ static int destroy_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>   
+>       rdma_rm_dealloc_cq(&dev->rdma_dev_res, cmd->cq_handle);
+>   
+> -    return 0;
+> +    rsp->hdr.err = 0;
+> +
+> +out:
+> +    pr_dbg("ret=%d\n", rsp->hdr.err);
+> +    return rsp->hdr.err;
+>   }
+>   
+>   static int create_qp_rings(PCIDevice *pci_dev, uint64_t pdir_dma,
+> @@ -553,7 +565,8 @@ static int destroy_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>       qp = rdma_rm_get_qp(&dev->rdma_dev_res, cmd->qp_handle);
+>       if (!qp) {
+>           pr_dbg("Invalid QP handle\n");
+> -        return -EINVAL;
+> +        rsp->hdr.err = -EINVAL;
+> +        goto out;
+>       }
+>   
+>       rdma_rm_dealloc_qp(&dev->rdma_dev_res, cmd->qp_handle);
+> @@ -567,7 +580,11 @@ static int destroy_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>       rdma_pci_dma_unmap(PCI_DEVICE(dev), ring->ring_state, TARGET_PAGE_SIZE);
+>       g_free(ring);
+>   
+> -    return 0;
+> +    rsp->hdr.err = 0;
+> +
+> +out:
+> +    pr_dbg("ret=%d\n", rsp->hdr.err);
+> +    return rsp->hdr.err;
+>   }
+>   
+>   static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+> @@ -580,7 +597,8 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>       pr_dbg("index=%d\n", cmd->index);
+>   
+>       if (cmd->index >= MAX_PORT_GIDS) {
+> -        return -EINVAL;
+> +        rsp->hdr.err = -EINVAL;
+> +        goto out;
+>       }
+>   
+>       pr_dbg("gid[%d]=0x%llx,0x%llx\n", cmd->index,
+> @@ -590,10 +608,15 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>       rc = rdma_rm_add_gid(&dev->rdma_dev_res, &dev->backend_dev,
+>                            dev->backend_eth_device_name, gid, cmd->index);
+>       if (rc < 0) {
+> -        return -EINVAL;
+> +        rsp->hdr.err = rc;
+> +        goto out;
+>       }
+>   
+> -    return 0;
+> +    rsp->hdr.err = 0;
+> +
+> +out:
+> +    pr_dbg("ret=%d\n", rsp->hdr.err);
+> +    return rsp->hdr.err;
+>   }
+>   
+>   static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+> @@ -606,7 +629,8 @@ static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>       pr_dbg("index=%d\n", cmd->index);
+>   
+>       if (cmd->index >= MAX_PORT_GIDS) {
+> -        return -EINVAL;
+> +        rsp->hdr.err = -EINVAL;
+> +        goto out;
+>       }
+>   
+>       rc = rdma_rm_del_gid(&dev->rdma_dev_res, &dev->backend_dev,
+> @@ -617,7 +641,11 @@ static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>           goto out;
+>       }
+>   
+> -    return 0;
+> +    rsp->hdr.err = 0;
+> +
+> +out:
+> +    pr_dbg("ret=%d\n", rsp->hdr.err);
+> +    return rsp->hdr.err;
+>   }
+>   
+>   static int create_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
+> @@ -634,9 +662,8 @@ static int create_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>       resp->hdr.err = rdma_rm_alloc_uc(&dev->rdma_dev_res, cmd->pfn,
+>                                        &resp->ctx_handle);
+>   
+> -    pr_dbg("ret=%d\n", resp->hdr.err);
+> -
+> -    return 0;
+> +    pr_dbg("ret=%d\n", rsp->hdr.err);
+> +    return rsp->hdr.err;
+>   }
+>   
+>   static int destroy_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
+> @@ -648,7 +675,9 @@ static int destroy_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>   
+>       rdma_rm_dealloc_uc(&dev->rdma_dev_res, cmd->ctx_handle);
+>   
+> -    return 0;
+> +    rsp->hdr.err = 0;
+> +
+> +    return rsp->hdr.err;
+>   }
+>   struct cmd_handler {
+>       uint32_t cmd;
+> @@ -696,7 +725,7 @@ int execute_command(PVRDMADev *dev)
+>       }
+>   
+>       err = cmd_handlers[dsr_info->req->hdr.cmd].exec(dev, dsr_info->req,
+> -                            dsr_info->rsp);
+> +                                                    dsr_info->rsp);
+>   out:
+>       set_reg_val(dev, PVRDMA_REG_ERR, err);
+>       post_interrupt(dev, INTR_VEC_CMD_RING);
