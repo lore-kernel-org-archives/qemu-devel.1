@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2x0-0003xH-KY
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2x0-0003xI-Kc
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2wy-0000hC-Oe
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2wy-0000gs-NH
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:02 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60468 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:60467 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gO2wy-0000gE-CG
+	id 1gO2wy-0000gA-Aw
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:00 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Sat, 17 Nov 2018 16:54:39 +0100
-Message-Id: <1542470080-5797-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sat, 17 Nov 2018 16:54:38 +0100
+Message-Id: <1542470080-5797-10-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/11] target/mips: Disable R5900 support
+Subject: [Qemu-devel] [PULL 09/11] target/mips: Rename MMI-related functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,99 +32,158 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Disable R5900 support. There are some outstanding issues related
-to ABI support and emulation accuracy, that were not understood
-well during review process. Disable to avoid backward compatibility
-issues.
+Rename MMI-related functions.
 
-Reverts commit ed4f49ba9bb56ebca6987b1083255daf6c89b5de.
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate_init.inc.c | 59 ----------------------------------=
-------
- 1 file changed, 59 deletions(-)
+ target/mips/translate.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_ini=
-t.inc.c
-index 85da4a2..acab097 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -411,65 +411,6 @@ const mips_def_t mips_defs[] =3D
-         .mmu_type =3D MMU_TYPE_R4000,
-     },
-     {
--        /*
--         * The Toshiba TX System RISC TX79 Core Architecture manual
--         *
--         * https://wiki.qemu.org/File:C790.pdf
--         *
--         * describes the C790 processor that is a follow-up to the R5900=
-.
--         * There are a few notable differences in that the R5900 FPU
--         *
--         * - is not IEEE 754-1985 compliant,
--         * - does not implement double format, and
--         * - its machine code is nonstandard.
--         */
--        .name =3D "R5900",
--        .CP0_PRid =3D 0x00002E00,
--        /* No L2 cache, icache size 32k, dcache size 32k, uncached coher=
-ency. */
--        .CP0_Config0 =3D (0x3 << 9) | (0x3 << 6) | (0x2 << CP0C0_K0),
--        .CP0_Status_rw_bitmask =3D 0xF4C79C1F,
--#ifdef CONFIG_USER_ONLY
--        /*
--         * R5900 hardware traps to the Linux kernel for IEEE 754-1985 an=
-d LL/SC
--         * emulation. For user only, QEMU is the kernel, so we emulate t=
-he traps
--         * by simply emulating the instructions directly.
--         *
--         * Note: Config1 is only used internally, the R5900 has only Con=
-fig0.
--         */
--        .CP0_Config1 =3D (1 << CP0C1_FP) | (47 << CP0C1_MMU),
--        .CP0_LLAddr_rw_bitmask =3D 0xFFFFFFFF,
--        .CP0_LLAddr_shift =3D 4,
--        .CP1_fcr0 =3D (0x38 << FCR0_PRID) | (0x0 << FCR0_REV),
--        .CP1_fcr31 =3D 0,
--        .CP1_fcr31_rw_bitmask =3D 0x0183FFFF,
--#else
--        /*
--         * The R5900 COP1 FPU implements single-precision floating-point
--         * operations but is not entirely IEEE 754-1985 compatible. In
--         * particular,
--         *
--         * - NaN (not a number) and +/- infinities are not supported;
--         * - exception mechanisms are not fully supported;
--         * - denormalized numbers are not supported;
--         * - rounding towards nearest and +/- infinities are not support=
-ed;
--         * - computed results usually differs in the least significant b=
-it;
--         * - saturations can differ more than the least significant bit.
--         *
--         * Since only rounding towards zero is supported, the two least
--         * significant bits of FCR31 are hardwired to 01.
--         *
--         * FPU emulation is disabled here until it is implemented.
--         *
--         * Note: Config1 is only used internally, the R5900 has only Con=
-fig0.
--         */
--        .CP0_Config1 =3D (47 << CP0C1_MMU),
--#endif /* !CONFIG_USER_ONLY */
--        .SEGBITS =3D 32,
--        .PABITS =3D 32,
--        .insn_flags =3D CPU_R5900 | ASE_MMI,
--        .mmu_type =3D MMU_TYPE_R4000,
--    },
--    {
-         /* A generic CPU supporting MIPS32 Release 6 ISA.
-            FIXME: Support IEEE 754-2008 FP.
-                   Eventually this should be replaced by a real CPU model=
-. */
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 98dc468..e9c23a5 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -26464,7 +26464,7 @@ static void decode_opc_special3_legacy(CPUMIPSSta=
+te *env, DisasContext *ctx)
+     }
+ }
+=20
+-static void decode_tx79_mmi0(CPUMIPSState *env, DisasContext *ctx)
++static void decode_mmi0(CPUMIPSState *env, DisasContext *ctx)
+ {
+     uint32_t opc =3D MASK_MMI0(ctx->opcode);
+=20
+@@ -26503,7 +26503,7 @@ static void decode_tx79_mmi0(CPUMIPSState *env, D=
+isasContext *ctx)
+     }
+ }
+=20
+-static void decode_tx79_mmi1(CPUMIPSState *env, DisasContext *ctx)
++static void decode_mmi1(CPUMIPSState *env, DisasContext *ctx)
+ {
+     uint32_t opc =3D MASK_MMI1(ctx->opcode);
+=20
+@@ -26535,7 +26535,7 @@ static void decode_tx79_mmi1(CPUMIPSState *env, D=
+isasContext *ctx)
+     }
+ }
+=20
+-static void decode_tx79_mmi2(CPUMIPSState *env, DisasContext *ctx)
++static void decode_mmi2(CPUMIPSState *env, DisasContext *ctx)
+ {
+     uint32_t opc =3D MASK_MMI2(ctx->opcode);
+=20
+@@ -26571,7 +26571,7 @@ static void decode_tx79_mmi2(CPUMIPSState *env, D=
+isasContext *ctx)
+     }
+ }
+=20
+-static void decode_tx79_mmi3(CPUMIPSState *env, DisasContext *ctx)
++static void decode_mmi3(CPUMIPSState *env, DisasContext *ctx)
+ {
+     uint32_t opc =3D MASK_MMI3(ctx->opcode);
+=20
+@@ -26598,7 +26598,7 @@ static void decode_tx79_mmi3(CPUMIPSState *env, D=
+isasContext *ctx)
+     }
+ }
+=20
+-static void decode_tx79_mmi(CPUMIPSState *env, DisasContext *ctx)
++static void decode_mmi(CPUMIPSState *env, DisasContext *ctx)
+ {
+     uint32_t opc =3D MASK_MMI(ctx->opcode);
+     int rs =3D extract32(ctx->opcode, 21, 5);
+@@ -26607,16 +26607,16 @@ static void decode_tx79_mmi(CPUMIPSState *env, =
+DisasContext *ctx)
+=20
+     switch (opc) {
+     case MMI_OPC_CLASS_MMI0:
+-        decode_tx79_mmi0(env, ctx);
++        decode_mmi0(env, ctx);
+         break;
+     case MMI_OPC_CLASS_MMI1:
+-        decode_tx79_mmi1(env, ctx);
++        decode_mmi1(env, ctx);
+         break;
+     case MMI_OPC_CLASS_MMI2:
+-        decode_tx79_mmi2(env, ctx);
++        decode_mmi2(env, ctx);
+         break;
+     case MMI_OPC_CLASS_MMI3:
+-        decode_tx79_mmi3(env, ctx);
++        decode_mmi3(env, ctx);
+         break;
+     case MMI_OPC_MULT1:
+     case MMI_OPC_MULTU1:
+@@ -26656,12 +26656,12 @@ static void decode_tx79_mmi(CPUMIPSState *env, =
+DisasContext *ctx)
+     }
+ }
+=20
+-static void decode_tx79_lq(CPUMIPSState *env, DisasContext *ctx)
++static void gen_mmi_lq(CPUMIPSState *env, DisasContext *ctx)
+ {
+     generate_exception_end(ctx, EXCP_RI);    /* TODO: MMI_OPC_LQ */
+ }
+=20
+-static void gen_tx79_sq(DisasContext *ctx, int base, int rt, int offset)
++static void gen_mmi_sq(DisasContext *ctx, int base, int rt, int offset)
+ {
+     generate_exception_end(ctx, EXCP_RI);    /* TODO: MMI_OPC_SQ */
+ }
+@@ -26687,7 +26687,7 @@ static void gen_tx79_sq(DisasContext *ctx, int ba=
+se, int rt, int offset)
+  * In user mode, QEMU must verify the upper and lower 11 bits to disting=
+uish
+  * between SQ and RDHWR, as the Linux kernel does.
+  */
+-static void decode_tx79_sq(CPUMIPSState *env, DisasContext *ctx)
++static void decode_mmi_sq(CPUMIPSState *env, DisasContext *ctx)
+ {
+     int base =3D extract32(ctx->opcode, 21, 5);
+     int rt =3D extract32(ctx->opcode, 16, 5);
+@@ -26705,7 +26705,7 @@ static void decode_tx79_sq(CPUMIPSState *env, Dis=
+asContext *ctx)
+     }
+ #endif
+=20
+-    gen_tx79_sq(ctx, base, rt, offset);
++    gen_mmi_sq(ctx, base, rt, offset);
+ }
+=20
+ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
+@@ -28014,7 +28014,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
+ntext *ctx)
+         break;
+     case OPC_SPECIAL2:
+         if ((ctx->insn_flags & INSN_R5900) && (ctx->insn_flags & ASE_MMI=
+)) {
+-            decode_tx79_mmi(env, ctx);
++            decode_mmi(env, ctx);
+         } else if (ctx->insn_flags & ASE_MXU) {
+             decode_opc_mxu(env, ctx);
+         } else {
+@@ -28023,7 +28023,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
+ntext *ctx)
+         break;
+     case OPC_SPECIAL3:
+         if (ctx->insn_flags & INSN_R5900) {
+-            decode_tx79_sq(env, ctx);    /* MMI_OPC_SQ */
++            decode_mmi_sq(env, ctx);    /* MMI_OPC_SQ */
+         } else {
+             decode_opc_special3(env, ctx);
+         }
+@@ -28698,7 +28698,7 @@ static void decode_opc(CPUMIPSState *env, DisasCo=
+ntext *ctx)
+         break;
+     case OPC_MSA: /* OPC_MDMX */
+         if (ctx->insn_flags & INSN_R5900) {
+-            decode_tx79_lq(env, ctx);    /* MMI_OPC_LQ */
++            gen_mmi_lq(env, ctx);    /* MMI_OPC_LQ */
+         } else {
+             /* MDMX: Not implemented. */
+             gen_msa(env, ctx);
 --=20
 2.7.4
