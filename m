@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1gO4q9-0007qQ-F8
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 12:57:06 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gO52V-0002mW-TG
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:09:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1gO4q5-0000AS-Kb
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 12:57:05 -0500
-Received: from mail-qk1-x733.google.com ([2607:f8b0:4864:20::733]:40682)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gO52S-00015M-Ps
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:09:51 -0500
+Received: from mail-yb1-f171.google.com ([209.85.219.171]:41722)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1gO4q2-00007D-St
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 12:56:59 -0500
-Received: by mail-qk1-x733.google.com with SMTP id y16so42648265qki.7
-	for <qemu-devel@nongnu.org>; Sat, 17 Nov 2018 09:56:56 -0800 (PST)
-Date: Sat, 17 Nov 2018 12:56:53 -0500
-From: Kevin O'Connor <kevin@koconnor.net>
-Message-ID: <20181117175653.GA6175@morn.lan>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gO52S-000151-Lo
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:09:48 -0500
+Received: by mail-yb1-f171.google.com with SMTP id t13-v6so11059374ybb.8
+	for <qemu-devel@nongnu.org>; Sat, 17 Nov 2018 10:09:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [ANNOUNCE] SeaBIOS 1.12.0
+References: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Sat, 17 Nov 2018 19:09:37 +0100
+Message-ID: <CAAdtpL6-pbPvJ4z5Tr29FBEau2BGK29Z+ERgkqX_fdZfU2=9gg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/11] MIPS queue for November 2018 (for
+ QEMU 3.1-rc2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,101 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: seabios@seabios.org, qemu-devel@nongnu.org, coreboot@coreboot.org
+To: Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, amarkovic@wavecomp.com
 
-The 1.12.0 version of SeaBIOS has now been released.  For more
-information on the release, please see:
+Hi Aleksandar,
 
-http://seabios.org/Releases
+Le sam. 17 nov. 2018 16:58, Aleksandar Markovic <
+aleksandar.markovic@rt-rk.com> a =C3=A9crit :
 
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> The following changes since commit
+> 83c496599cc04926ecbc3e47a37debaa3e38b686:
+>
+>   Merge remote-tracking branch
+> 'remotes/kraxel/tags/fixes-31-20181116-pull-request' into staging
+> (2018-11-16 13:53:01 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/AMarkovic/qemu tags/mips-queue-november-2018
+>
+> for you to fetch changes up to b6ac8eed1ca277a6ed59a61bb7bd4785190990f6:
+>
+>   MAINTAINERS: Add Stefan Markovic as a MIPS reviewer (2018-11-17 16:17:0=
+8
+> +0100)
+>
+> ----------------------------------------------------------------
+> MIPS queue for November 2018
+>
+>   - fix MIPS-specific prctl() handling in linux-user
+>   - fix some issues of R5900 support
+>   - update MAINTAINERS wrt. MIPS reviewer
+>
+>
+Some patches of this series miss your S-o-b tag.
 
-New in this release:
-
-* Initial support for "TPM CRB" hardware
-* Improved cdrom media reporting in the boot menu on QEMU
-* Improved floppy support on real floppy hardware
-* SeaVGABIOS support for QEMU "bochs-display" and QEMU "ramfb" displays
-* Several bug fixes and code cleanups
-
-
-For information on obtaining SeaBIOS, please see:
-
-http://seabios.org/Download
-
-
-===== git shortlog -n rel-1.11.0..rel-1.12.0 =====
-
-Gerd Hoffmann (12):
-      optionrom: enable non-vga display devices
-      cbvga: factor out cbvga_setup_modes()
-      qemu: add bochs-display support
-      cbvga_setup_modes: use real mode number instead of 0x140
-      cbvga_list_modes: don't list current mode twice
-      cbvga_set_mode: disable clearmem in windows x86 emulator.
-      bochs_display_setup: return error on failure
-      pmm: use tmp zone on oom
-      vgasrc: add allocate_pmm()
-      qemu: add qemu ramfb support
-      cbvga_set_mode: refine clear display logic
-      pretty boot menu entry for cdrom drives
-
-Nikolay Nikolov (11):
-      floppy: Introduce the floppy_dor_read() function
-      floppy: Introduce floppy_dor_mask()
-      floppy: Introduce FLOPPY_DOR_XXX constants
-      floppy: Preserve motor and drive sel bits when resetting the floppy controller
-      floppy: Reset the floppy motor count in floppy_drive_pio()
-      floppy: Use timer_check() in floppy_wait_irq()
-      floppy: hold the DOR reset bit low for 4 microseconds, when resetting
-      floppy: Execute a SPECIFY command after sensing the media type
-      floppy: Support up to 4 floppy drives when turning on the floppy motor
-      floppy: Wait for the floppy motor to reach a stable speed, after starting
-      floppy: Send 4 sense interrupt commands during controller initialization
-
-Kevin O'Connor (10):
-      docs: Add sercon-port to Runtime_config.md documentation
-      paravirt: Only enable sercon in NOGRAPHIC mode if no other console specified
-      shadow: Don't invoke a shutdown on reboot unless in a reboot loop
-      build: Use git describe --always
-      docs: Update Download.md to use git clone via https
-      ssdt: Fix building of legacy acpi tables on current iasl compiler
-      docs: Update download file link
-      sdcard: Increase SDHCI_POWER_ON_TIME to 5ms
-      shadow: Rework bios copy code to prevent gcc array-bounds warning
-      docs: Note v1.12.0 release
-
-Stefan Berger (5):
-      tpm: Add support for TPM2 ACPI table
-      tpm: Wait for tpmRegValidSts flag on CRB interface before probing
-      tpm: revert return values for successful/failed CRB probing
-      tpm: when CRB is active, select, lock it, and check addresses
-      tpm: Request access to locality 0
-
-Marc-André Lureau (4):
-      x86: add readq()
-      tpm: generalize init_timeout()
-      tpm: use get_tpm_version() callback
-      tpm: add TPM CRB device support
-
-Jing Liu (3):
-      pci: fix the return value for truncated capability
-      pci: clean up the debug message for pci capability found
-      pci: recognize RH PCI legacy bridge resource reservation capability
-
-Stephen Douthit (3):
-      tpm: Refactor duplicated wait code in tis_wait_sts() & crb_wait_reg()
-      tpm: Wait for interface startup when probing
-      tpm: Handle unimplemented TIS_REG_IFACE_ID in tis_get_tpm_version()
-
-Matt DeVillier (2):
-      nvme: fix I/O queue length calculation overflow
-      SeaVGABios/cbvga: Fix bpp for coreboot framebuffer
-
-Marcel Apfelbaum (1):
-      pci: fix 'io hints' capability for RedHat PCI bridges
-
-Paul Menzel (1):
-      docs/Download: Use more secure HTTPS URLs where possible
-
-Shmuel Eiderman (1):
-      pvscsi: Scan all 64 possible targets
+----------------------------------------------------------------
+>
+> Aleksandar Markovic (5):
+>   target/mips: Rename MMI-related masks
+>   target/mips: Rename MMI-related opcodes
+>   target/mips: Rename MMI-related functions
+>   target/mips: Disable R5900 support
+>   MAINTAINERS: Add Stefan Markovic as a MIPS reviewer
+>
+> Fredrik Noring (5):
+>   target/mips: Fix decoding mechanism of R5900 MFLO1, MFHI1, MTLO1 and
+>     MTHI1
+>   target/mips: Fix decoding mechanism of R5900 DIV1 and DIVU1
+>   target/mips: Fix decoding mechanism of special R5900 opcodes
+>   target/mips: Guard check_insn_opc_user_only with INSN_R5900 check
+>   target/mips: Guard check_insn with INSN_R5900 check
+>
+> Stefan Markovic (1):
+>   linux-user: Update MIPS specific prctl() implementation
+>
+>  MAINTAINERS                      |   9 +
+>  linux-user/syscall.c             |  18 +
+>  target/mips/translate.c          | 707
+> +++++++++++++++++++++++----------------
+>  target/mips/translate_init.inc.c |  59 ----
+>  4 files changed, 450 insertions(+), 343 deletions(-)
+>
+> --
+> 2.7.4
+>
+>
+>
