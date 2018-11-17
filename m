@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2x0-0003xC-KM
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:03 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2x1-0003xJ-GL
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2wx-0000g1-AQ
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:02 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60348 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2wz-0000ha-Hh
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:03 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:60473 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gO2ww-00077T-VA
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:55:59 -0500
+	id 1gO2wz-0000gl-AR
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:01 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Sat, 17 Nov 2018 16:54:33 +0100
-Message-Id: <1542470080-5797-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sat, 17 Nov 2018 16:54:35 +0100
+Message-Id: <1542470080-5797-7-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 04/11] target/mips: Fix decoding mechanism of
- special R5900 opcodes
+Subject: [Qemu-devel] [PULL 06/11] target/mips: Guard check_insn with
+ INSN_R5900 check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +30,34 @@ Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
 From: Fredrik Noring <noring@nocrew.org>
 
-MOVN, MOVZ, MFHI, MFLO, MTHI, MTLO, MULT, MULTU, DIV, DIVU, DMULT,
-DMULTU, DDIV, DDIVU and JR are decoded in decode_opc_special_tx79
-instead of the generic decode_opc_special_legacy.
+Explicitely mark handling of PREF instruction for R5900 as
+treating the same as NOP.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Fredrik Noring <noring@nocrew.org>
 ---
- target/mips/translate.c | 54 +++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 50 insertions(+), 4 deletions(-)
+ target/mips/translate.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 3ddd700..a21b277 100644
+index c79da3c..714f2e6 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -23863,6 +23863,53 @@ static void decode_opc_special_r6(CPUMIPSState *env, DisasContext *ctx)
-     }
- }
+@@ -28357,9 +28357,12 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+         break;
+     case OPC_PREF:
+         check_insn_opc_removed(ctx, ISA_MIPS32R6);
+-        check_insn(ctx, ISA_MIPS4 | ISA_MIPS32 |
+-                   INSN_R5900);
+-        /* Treat as NOP. */
++        if (ctx->insn_flags & INSN_R5900) {
++            /* Treat as NOP. */
++        } else {
++            check_insn(ctx, ISA_MIPS4 | ISA_MIPS32);
++            /* Treat as NOP. */
++        }
+         break;
  
-+static void decode_opc_special_tx79(CPUMIPSState *env, DisasContext *ctx)
-+{
-+    int rs = extract32(ctx->opcode, 21, 5);
-+    int rt = extract32(ctx->opcode, 16, 5);
-+    int rd = extract32(ctx->opcode, 11, 5);
-+    uint32_t op1 = MASK_SPECIAL(ctx->opcode);
-+
-+    switch (op1) {
-+    case OPC_MOVN:         /* Conditional move */
-+    case OPC_MOVZ:
-+        gen_cond_move(ctx, op1, rd, rs, rt);
-+        break;
-+    case OPC_MFHI:          /* Move from HI/LO */
-+    case OPC_MFLO:
-+        gen_HILO(ctx, op1, 0, rd);
-+        break;
-+    case OPC_MTHI:
-+    case OPC_MTLO:          /* Move to HI/LO */
-+        gen_HILO(ctx, op1, 0, rs);
-+        break;
-+    case OPC_MULT:
-+    case OPC_MULTU:
-+        gen_mul_txx9(ctx, op1, rd, rs, rt);
-+        break;
-+    case OPC_DIV:
-+    case OPC_DIVU:
-+        gen_muldiv(ctx, op1, 0, rs, rt);
-+        break;
-+#if defined(TARGET_MIPS64)
-+    case OPC_DMULT:
-+    case OPC_DMULTU:
-+    case OPC_DDIV:
-+    case OPC_DDIVU:
-+        check_insn_opc_user_only(ctx, INSN_R5900);
-+        gen_muldiv(ctx, op1, 0, rs, rt);
-+        break;
-+#endif
-+    case OPC_JR:
-+        gen_compute_branch(ctx, op1, 4, rs, 0, 0, 4);
-+        break;
-+    default:            /* Invalid */
-+        MIPS_INVAL("special_tx79");
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
-+    }
-+}
-+
- static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
- {
-     int rs, rt, rd, sa;
-@@ -23878,7 +23925,7 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
-     case OPC_MOVN:         /* Conditional move */
-     case OPC_MOVZ:
-         check_insn(ctx, ISA_MIPS4 | ISA_MIPS32 |
--                   INSN_LOONGSON2E | INSN_LOONGSON2F | INSN_R5900);
-+                   INSN_LOONGSON2E | INSN_LOONGSON2F);
-         gen_cond_move(ctx, op1, rd, rs, rt);
-         break;
-     case OPC_MFHI:          /* Move from HI/LO */
-@@ -23905,8 +23952,6 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
-             check_insn(ctx, INSN_VR54XX);
-             op1 = MASK_MUL_VR54XX(ctx->opcode);
-             gen_mul_vr54xx(ctx, op1, rd, rs, rt);
--        } else if (ctx->insn_flags & INSN_R5900) {
--            gen_mul_txx9(ctx, op1, rd, rs, rt);
-         } else {
-             gen_muldiv(ctx, op1, rd & 3, rs, rt);
-         }
-@@ -23921,7 +23966,6 @@ static void decode_opc_special_legacy(CPUMIPSState *env, DisasContext *ctx)
-     case OPC_DDIV:
-     case OPC_DDIVU:
-         check_insn(ctx, ISA_MIPS3);
--        check_insn_opc_user_only(ctx, INSN_R5900);
-         check_mips_64(ctx);
-         gen_muldiv(ctx, op1, 0, rs, rt);
-         break;
-@@ -24148,6 +24192,8 @@ static void decode_opc_special(CPUMIPSState *env, DisasContext *ctx)
-     default:
-         if (ctx->insn_flags & ISA_MIPS32R6) {
-             decode_opc_special_r6(env, ctx);
-+        } else if (ctx->insn_flags & INSN_R5900) {
-+            decode_opc_special_tx79(env, ctx);
-         } else {
-             decode_opc_special_legacy(env, ctx);
-         }
+     /* Floating point (COP1). */
 -- 
 2.7.4
