@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2x0-0003xG-Kp
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2x0-0003xH-KY
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2wx-0000fu-96
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2wy-0000hC-Oe
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:02 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60343 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:60468 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gO2ww-00077S-UV
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:55:59 -0500
+	id 1gO2wy-0000gE-CG
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:00 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Sat, 17 Nov 2018 16:54:32 +0100
-Message-Id: <1542470080-5797-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sat, 17 Nov 2018 16:54:39 +0100
+Message-Id: <1542470080-5797-11-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/11] target/mips: Fix decoding mechanism of
- R5900 DIV1 and DIVU1
+Subject: [Qemu-devel] [PULL 10/11] target/mips: Disable R5900 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,123 +30,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Fredrik Noring <noring@nocrew.org>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-DIV1 and DIVU1 are generated in gen_div1_tx79 instead of the generic
-gen_muldiv.
+Disable R5900 support. There are some outstanding issues related
+to ABI support and emulation accuracy, that were not understood
+well during review process. Disable to avoid backward compatibility
+issues.
 
-Signed-off-by: Fredrik Noring <noring@nocrew.org>
+Reverts commit ed4f49ba9bb56ebca6987b1083255daf6c89b5de.
+
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 65 +++++++++++++++++++++++++++++++++++++++++++=
-+-----
- 1 file changed, 59 insertions(+), 6 deletions(-)
+ target/mips/translate_init.inc.c | 59 ----------------------------------=
+------
+ 1 file changed, 59 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 8601333..3ddd700 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -4743,6 +4743,63 @@ static void gen_r6_muldiv(DisasContext *ctx, int o=
-pc, int rd, int rs, int rt)
-     tcg_temp_free(t1);
- }
-=20
-+static void gen_div1_tx79(DisasContext *ctx, uint32_t opc, int rs, int r=
-t)
-+{
-+    TCGv t0, t1;
-+
-+    t0 =3D tcg_temp_new();
-+    t1 =3D tcg_temp_new();
-+
-+    gen_load_gpr(t0, rs);
-+    gen_load_gpr(t1, rt);
-+
-+    switch (opc) {
-+    case TX79_MMI_DIV1:
-+        {
-+            TCGv t2 =3D tcg_temp_new();
-+            TCGv t3 =3D tcg_temp_new();
-+            tcg_gen_ext32s_tl(t0, t0);
-+            tcg_gen_ext32s_tl(t1, t1);
-+            tcg_gen_setcondi_tl(TCG_COND_EQ, t2, t0, INT_MIN);
-+            tcg_gen_setcondi_tl(TCG_COND_EQ, t3, t1, -1);
-+            tcg_gen_and_tl(t2, t2, t3);
-+            tcg_gen_setcondi_tl(TCG_COND_EQ, t3, t1, 0);
-+            tcg_gen_or_tl(t2, t2, t3);
-+            tcg_gen_movi_tl(t3, 0);
-+            tcg_gen_movcond_tl(TCG_COND_NE, t1, t2, t3, t2, t1);
-+            tcg_gen_div_tl(cpu_LO[1], t0, t1);
-+            tcg_gen_rem_tl(cpu_HI[1], t0, t1);
-+            tcg_gen_ext32s_tl(cpu_LO[1], cpu_LO[1]);
-+            tcg_gen_ext32s_tl(cpu_HI[1], cpu_HI[1]);
-+            tcg_temp_free(t3);
-+            tcg_temp_free(t2);
-+        }
-+        break;
-+    case TX79_MMI_DIVU1:
-+        {
-+            TCGv t2 =3D tcg_const_tl(0);
-+            TCGv t3 =3D tcg_const_tl(1);
-+            tcg_gen_ext32u_tl(t0, t0);
-+            tcg_gen_ext32u_tl(t1, t1);
-+            tcg_gen_movcond_tl(TCG_COND_EQ, t1, t1, t2, t3, t1);
-+            tcg_gen_divu_tl(cpu_LO[1], t0, t1);
-+            tcg_gen_remu_tl(cpu_HI[1], t0, t1);
-+            tcg_gen_ext32s_tl(cpu_LO[1], cpu_LO[1]);
-+            tcg_gen_ext32s_tl(cpu_HI[1], cpu_HI[1]);
-+            tcg_temp_free(t3);
-+            tcg_temp_free(t2);
-+        }
-+        break;
-+    default:
-+        MIPS_INVAL("div1 TX79");
-+        generate_exception_end(ctx, EXCP_RI);
-+        goto out;
-+    }
-+ out:
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+}
-+
- static void gen_muldiv(DisasContext *ctx, uint32_t opc,
-                        int acc, int rs, int rt)
- {
-@@ -4755,14 +4812,11 @@ static void gen_muldiv(DisasContext *ctx, uint32_=
-t opc,
-     gen_load_gpr(t1, rt);
-=20
-     if (acc !=3D 0) {
--        if (!(ctx->insn_flags & INSN_R5900)) {
--            check_dsp(ctx);
--        }
-+        check_dsp(ctx);
-     }
-=20
-     switch (opc) {
-     case OPC_DIV:
--    case TX79_MMI_DIV1:
-         {
-             TCGv t2 =3D tcg_temp_new();
-             TCGv t3 =3D tcg_temp_new();
-@@ -4784,7 +4838,6 @@ static void gen_muldiv(DisasContext *ctx, uint32_t =
-opc,
-         }
-         break;
-     case OPC_DIVU:
--    case TX79_MMI_DIVU1:
-         {
-             TCGv t2 =3D tcg_const_tl(0);
-             TCGv t3 =3D tcg_const_tl(1);
-@@ -26525,7 +26578,7 @@ static void decode_tx79_mmi(CPUMIPSState *env, Di=
-sasContext *ctx)
-         break;
-     case TX79_MMI_DIV1:
-     case TX79_MMI_DIVU1:
--        gen_muldiv(ctx, opc, 1, rs, rt);
-+        gen_div1_tx79(ctx, opc, rs, rt);
-         break;
-     case TX79_MMI_MTLO1:
-     case TX79_MMI_MTHI1:
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_ini=
+t.inc.c
+index 85da4a2..acab097 100644
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -411,65 +411,6 @@ const mips_def_t mips_defs[] =3D
+         .mmu_type =3D MMU_TYPE_R4000,
+     },
+     {
+-        /*
+-         * The Toshiba TX System RISC TX79 Core Architecture manual
+-         *
+-         * https://wiki.qemu.org/File:C790.pdf
+-         *
+-         * describes the C790 processor that is a follow-up to the R5900=
+.
+-         * There are a few notable differences in that the R5900 FPU
+-         *
+-         * - is not IEEE 754-1985 compliant,
+-         * - does not implement double format, and
+-         * - its machine code is nonstandard.
+-         */
+-        .name =3D "R5900",
+-        .CP0_PRid =3D 0x00002E00,
+-        /* No L2 cache, icache size 32k, dcache size 32k, uncached coher=
+ency. */
+-        .CP0_Config0 =3D (0x3 << 9) | (0x3 << 6) | (0x2 << CP0C0_K0),
+-        .CP0_Status_rw_bitmask =3D 0xF4C79C1F,
+-#ifdef CONFIG_USER_ONLY
+-        /*
+-         * R5900 hardware traps to the Linux kernel for IEEE 754-1985 an=
+d LL/SC
+-         * emulation. For user only, QEMU is the kernel, so we emulate t=
+he traps
+-         * by simply emulating the instructions directly.
+-         *
+-         * Note: Config1 is only used internally, the R5900 has only Con=
+fig0.
+-         */
+-        .CP0_Config1 =3D (1 << CP0C1_FP) | (47 << CP0C1_MMU),
+-        .CP0_LLAddr_rw_bitmask =3D 0xFFFFFFFF,
+-        .CP0_LLAddr_shift =3D 4,
+-        .CP1_fcr0 =3D (0x38 << FCR0_PRID) | (0x0 << FCR0_REV),
+-        .CP1_fcr31 =3D 0,
+-        .CP1_fcr31_rw_bitmask =3D 0x0183FFFF,
+-#else
+-        /*
+-         * The R5900 COP1 FPU implements single-precision floating-point
+-         * operations but is not entirely IEEE 754-1985 compatible. In
+-         * particular,
+-         *
+-         * - NaN (not a number) and +/- infinities are not supported;
+-         * - exception mechanisms are not fully supported;
+-         * - denormalized numbers are not supported;
+-         * - rounding towards nearest and +/- infinities are not support=
+ed;
+-         * - computed results usually differs in the least significant b=
+it;
+-         * - saturations can differ more than the least significant bit.
+-         *
+-         * Since only rounding towards zero is supported, the two least
+-         * significant bits of FCR31 are hardwired to 01.
+-         *
+-         * FPU emulation is disabled here until it is implemented.
+-         *
+-         * Note: Config1 is only used internally, the R5900 has only Con=
+fig0.
+-         */
+-        .CP0_Config1 =3D (47 << CP0C1_MMU),
+-#endif /* !CONFIG_USER_ONLY */
+-        .SEGBITS =3D 32,
+-        .PABITS =3D 32,
+-        .insn_flags =3D CPU_R5900 | ASE_MMI,
+-        .mmu_type =3D MMU_TYPE_R4000,
+-    },
+-    {
+         /* A generic CPU supporting MIPS32 Release 6 ISA.
+            FIXME: Support IEEE 754-2008 FP.
+                   Eventually this should be replaced by a real CPU model=
+. */
 --=20
 2.7.4
