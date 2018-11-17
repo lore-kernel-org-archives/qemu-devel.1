@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UO-00014D-Cv
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:38:41 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UO-00014I-EQ
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:38:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UL-00021v-My
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO5UM-00022K-1W
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:38:40 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:54264 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:54268 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gO5UL-000214-FL
+	id 1gO5UL-00021P-MM
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 13:38:37 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Sat, 17 Nov 2018 19:38:23 +0100
-Message-Id: <1542479908-20067-7-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sat, 17 Nov 2018 19:38:27 +0100
+Message-Id: <1542479908-20067-11-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1542479908-20067-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1542479908-20067-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 06/11] target/mips: Guard check_insn with
- INSN_R5900 check
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 10/11] target/mips: Disable R5900 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +30,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com, laurent@vivier.eu
 
-From: Fredrik Noring <noring@nocrew.org>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Explicitely mark handling of PREF instruction for R5900 as
-treating the same as NOP.
+Disable R5900 support. There are some outstanding issues related
+to ABI support and emulation accuracy, that were not understood
+well during review process. Disable to avoid backward compatibility
+issues.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Fredrik Noring <noring@nocrew.org>
+Reverts commit ed4f49ba9bb56ebca6987b1083255daf6c89b5de.
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ target/mips/translate_init.inc.c | 59 ----------------------------------=
+------
+ 1 file changed, 59 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index c79da3c..714f2e6 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28357,9 +28357,12 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-         break;
-     case OPC_PREF:
-         check_insn_opc_removed(ctx, ISA_MIPS32R6);
--        check_insn(ctx, ISA_MIPS4 | ISA_MIPS32 |
--                   INSN_R5900);
--        /* Treat as NOP. */
-+        if (ctx->insn_flags & INSN_R5900) {
-+            /* Treat as NOP. */
-+        } else {
-+            check_insn(ctx, ISA_MIPS4 | ISA_MIPS32);
-+            /* Treat as NOP. */
-+        }
-         break;
- 
-     /* Floating point (COP1). */
--- 
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_ini=
+t.inc.c
+index 85da4a2..acab097 100644
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -411,65 +411,6 @@ const mips_def_t mips_defs[] =3D
+         .mmu_type =3D MMU_TYPE_R4000,
+     },
+     {
+-        /*
+-         * The Toshiba TX System RISC TX79 Core Architecture manual
+-         *
+-         * https://wiki.qemu.org/File:C790.pdf
+-         *
+-         * describes the C790 processor that is a follow-up to the R5900=
+.
+-         * There are a few notable differences in that the R5900 FPU
+-         *
+-         * - is not IEEE 754-1985 compliant,
+-         * - does not implement double format, and
+-         * - its machine code is nonstandard.
+-         */
+-        .name =3D "R5900",
+-        .CP0_PRid =3D 0x00002E00,
+-        /* No L2 cache, icache size 32k, dcache size 32k, uncached coher=
+ency. */
+-        .CP0_Config0 =3D (0x3 << 9) | (0x3 << 6) | (0x2 << CP0C0_K0),
+-        .CP0_Status_rw_bitmask =3D 0xF4C79C1F,
+-#ifdef CONFIG_USER_ONLY
+-        /*
+-         * R5900 hardware traps to the Linux kernel for IEEE 754-1985 an=
+d LL/SC
+-         * emulation. For user only, QEMU is the kernel, so we emulate t=
+he traps
+-         * by simply emulating the instructions directly.
+-         *
+-         * Note: Config1 is only used internally, the R5900 has only Con=
+fig0.
+-         */
+-        .CP0_Config1 =3D (1 << CP0C1_FP) | (47 << CP0C1_MMU),
+-        .CP0_LLAddr_rw_bitmask =3D 0xFFFFFFFF,
+-        .CP0_LLAddr_shift =3D 4,
+-        .CP1_fcr0 =3D (0x38 << FCR0_PRID) | (0x0 << FCR0_REV),
+-        .CP1_fcr31 =3D 0,
+-        .CP1_fcr31_rw_bitmask =3D 0x0183FFFF,
+-#else
+-        /*
+-         * The R5900 COP1 FPU implements single-precision floating-point
+-         * operations but is not entirely IEEE 754-1985 compatible. In
+-         * particular,
+-         *
+-         * - NaN (not a number) and +/- infinities are not supported;
+-         * - exception mechanisms are not fully supported;
+-         * - denormalized numbers are not supported;
+-         * - rounding towards nearest and +/- infinities are not support=
+ed;
+-         * - computed results usually differs in the least significant b=
+it;
+-         * - saturations can differ more than the least significant bit.
+-         *
+-         * Since only rounding towards zero is supported, the two least
+-         * significant bits of FCR31 are hardwired to 01.
+-         *
+-         * FPU emulation is disabled here until it is implemented.
+-         *
+-         * Note: Config1 is only used internally, the R5900 has only Con=
+fig0.
+-         */
+-        .CP0_Config1 =3D (47 << CP0C1_MMU),
+-#endif /* !CONFIG_USER_ONLY */
+-        .SEGBITS =3D 32,
+-        .PABITS =3D 32,
+-        .insn_flags =3D CPU_R5900 | ASE_MMI,
+-        .mmu_type =3D MMU_TYPE_R4000,
+-    },
+-    {
+         /* A generic CPU supporting MIPS32 Release 6 ISA.
+            FIXME: Support IEEE 754-2008 FP.
+                   Eventually this should be replaced by a real CPU model=
+. */
+--=20
 2.7.4
