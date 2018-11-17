@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2x0-0003xD-KL
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:04 -0500
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2x0-0003xG-Kp
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2wx-0000fg-5O
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gO2wx-0000fu-96
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:56:02 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60326 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:60343 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gO2ww-00077N-UU
+	id 1gO2ww-00077S-UV
 	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 10:55:59 -0500
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Sat, 17 Nov 2018 16:54:29 +0100
-Message-Id: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 00/11] MIPS queue for November 2018 (for QEMU
- 3.1-rc2)
+Date: Sat, 17 Nov 2018 16:54:32 +0100
+Message-Id: <1542470080-5797-4-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1542470080-5797-1-git-send-email-aleksandar.markovic@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 03/11] target/mips: Fix decoding mechanism of
+ R5900 DIV1 and DIVU1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +31,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Fredrik Noring <noring@nocrew.org>
 
-The following changes since commit 83c496599cc04926ecbc3e47a37debaa3e38b686:
+DIV1 and DIVU1 are generated in gen_div1_tx79 instead of the generic
+gen_muldiv.
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/fixes-31-20181116-pull-request' into staging (2018-11-16 13:53:01 +0000)
+Signed-off-by: Fredrik Noring <noring@nocrew.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ target/mips/translate.c | 65 +++++++++++++++++++++++++++++++++++++++++++=
++-----
+ 1 file changed, 59 insertions(+), 6 deletions(-)
 
-are available in the git repository at:
-
-  https://github.com/AMarkovic/qemu tags/mips-queue-november-2018
-
-for you to fetch changes up to b6ac8eed1ca277a6ed59a61bb7bd4785190990f6:
-
-  MAINTAINERS: Add Stefan Markovic as a MIPS reviewer (2018-11-17 16:17:08 +0100)
-
-----------------------------------------------------------------
-MIPS queue for November 2018
-
-  - fix MIPS-specific prctl() handling in linux-user
-  - fix some issues of R5900 support
-  - update MAINTAINERS wrt. MIPS reviewer
-
-----------------------------------------------------------------
-
-Aleksandar Markovic (5):
-  target/mips: Rename MMI-related masks
-  target/mips: Rename MMI-related opcodes
-  target/mips: Rename MMI-related functions
-  target/mips: Disable R5900 support
-  MAINTAINERS: Add Stefan Markovic as a MIPS reviewer
-
-Fredrik Noring (5):
-  target/mips: Fix decoding mechanism of R5900 MFLO1, MFHI1, MTLO1 and
-    MTHI1
-  target/mips: Fix decoding mechanism of R5900 DIV1 and DIVU1
-  target/mips: Fix decoding mechanism of special R5900 opcodes
-  target/mips: Guard check_insn_opc_user_only with INSN_R5900 check
-  target/mips: Guard check_insn with INSN_R5900 check
-
-Stefan Markovic (1):
-  linux-user: Update MIPS specific prctl() implementation
-
- MAINTAINERS                      |   9 +
- linux-user/syscall.c             |  18 +
- target/mips/translate.c          | 707 +++++++++++++++++++++++----------------
- target/mips/translate_init.inc.c |  59 ----
- 4 files changed, 450 insertions(+), 343 deletions(-)
-
--- 
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 8601333..3ddd700 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -4743,6 +4743,63 @@ static void gen_r6_muldiv(DisasContext *ctx, int o=
+pc, int rd, int rs, int rt)
+     tcg_temp_free(t1);
+ }
+=20
++static void gen_div1_tx79(DisasContext *ctx, uint32_t opc, int rs, int r=
+t)
++{
++    TCGv t0, t1;
++
++    t0 =3D tcg_temp_new();
++    t1 =3D tcg_temp_new();
++
++    gen_load_gpr(t0, rs);
++    gen_load_gpr(t1, rt);
++
++    switch (opc) {
++    case TX79_MMI_DIV1:
++        {
++            TCGv t2 =3D tcg_temp_new();
++            TCGv t3 =3D tcg_temp_new();
++            tcg_gen_ext32s_tl(t0, t0);
++            tcg_gen_ext32s_tl(t1, t1);
++            tcg_gen_setcondi_tl(TCG_COND_EQ, t2, t0, INT_MIN);
++            tcg_gen_setcondi_tl(TCG_COND_EQ, t3, t1, -1);
++            tcg_gen_and_tl(t2, t2, t3);
++            tcg_gen_setcondi_tl(TCG_COND_EQ, t3, t1, 0);
++            tcg_gen_or_tl(t2, t2, t3);
++            tcg_gen_movi_tl(t3, 0);
++            tcg_gen_movcond_tl(TCG_COND_NE, t1, t2, t3, t2, t1);
++            tcg_gen_div_tl(cpu_LO[1], t0, t1);
++            tcg_gen_rem_tl(cpu_HI[1], t0, t1);
++            tcg_gen_ext32s_tl(cpu_LO[1], cpu_LO[1]);
++            tcg_gen_ext32s_tl(cpu_HI[1], cpu_HI[1]);
++            tcg_temp_free(t3);
++            tcg_temp_free(t2);
++        }
++        break;
++    case TX79_MMI_DIVU1:
++        {
++            TCGv t2 =3D tcg_const_tl(0);
++            TCGv t3 =3D tcg_const_tl(1);
++            tcg_gen_ext32u_tl(t0, t0);
++            tcg_gen_ext32u_tl(t1, t1);
++            tcg_gen_movcond_tl(TCG_COND_EQ, t1, t1, t2, t3, t1);
++            tcg_gen_divu_tl(cpu_LO[1], t0, t1);
++            tcg_gen_remu_tl(cpu_HI[1], t0, t1);
++            tcg_gen_ext32s_tl(cpu_LO[1], cpu_LO[1]);
++            tcg_gen_ext32s_tl(cpu_HI[1], cpu_HI[1]);
++            tcg_temp_free(t3);
++            tcg_temp_free(t2);
++        }
++        break;
++    default:
++        MIPS_INVAL("div1 TX79");
++        generate_exception_end(ctx, EXCP_RI);
++        goto out;
++    }
++ out:
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++}
++
+ static void gen_muldiv(DisasContext *ctx, uint32_t opc,
+                        int acc, int rs, int rt)
+ {
+@@ -4755,14 +4812,11 @@ static void gen_muldiv(DisasContext *ctx, uint32_=
+t opc,
+     gen_load_gpr(t1, rt);
+=20
+     if (acc !=3D 0) {
+-        if (!(ctx->insn_flags & INSN_R5900)) {
+-            check_dsp(ctx);
+-        }
++        check_dsp(ctx);
+     }
+=20
+     switch (opc) {
+     case OPC_DIV:
+-    case TX79_MMI_DIV1:
+         {
+             TCGv t2 =3D tcg_temp_new();
+             TCGv t3 =3D tcg_temp_new();
+@@ -4784,7 +4838,6 @@ static void gen_muldiv(DisasContext *ctx, uint32_t =
+opc,
+         }
+         break;
+     case OPC_DIVU:
+-    case TX79_MMI_DIVU1:
+         {
+             TCGv t2 =3D tcg_const_tl(0);
+             TCGv t3 =3D tcg_const_tl(1);
+@@ -26525,7 +26578,7 @@ static void decode_tx79_mmi(CPUMIPSState *env, Di=
+sasContext *ctx)
+         break;
+     case TX79_MMI_DIV1:
+     case TX79_MMI_DIVU1:
+-        gen_muldiv(ctx, opc, 1, rs, rt);
++        gen_div1_tx79(ctx, opc, rs, rt);
+         break;
+     case TX79_MMI_MTLO1:
+     case TX79_MMI_MTHI1:
+--=20
 2.7.4
