@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gNzO8-00066o-Ef
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:07:49 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gNzQj-0007bz-N4
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:10:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gNzO3-0007fW-In
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:07:48 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50832)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gNzQe-0000xv-Qf
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:10:29 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44735)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gNzO3-0007bW-CS
-	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:07:43 -0500
-Received: by mail-wm1-x344.google.com with SMTP id 124-v6so1035310wmw.0
-	for <qemu-devel@nongnu.org>; Sat, 17 Nov 2018 04:07:43 -0800 (PST)
+	id 1gNzQe-0000us-Hs
+	for qemu-devel@nongnu.org; Sat, 17 Nov 2018 07:10:24 -0500
+Received: by mail-wr1-x441.google.com with SMTP id j17-v6so27419671wrq.11
+	for <qemu-devel@nongnu.org>; Sat, 17 Nov 2018 04:10:24 -0800 (PST)
 References: <20181113071336.6242-1-yuval.shaia@oracle.com>
-	<20181113071336.6242-10-yuval.shaia@oracle.com>
+	<20181113071336.6242-15-yuval.shaia@oracle.com>
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <e9370e48-b8e4-3280-fe64-f6bc3457af64@gmail.com>
-Date: Sat, 17 Nov 2018 14:07:39 +0200
+Message-ID: <da94c640-a5c1-cb4c-1bb1-5ebd06edd7ab@gmail.com>
+Date: Sat, 17 Nov 2018 14:10:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181113071336.6242-10-yuval.shaia@oracle.com>
+In-Reply-To: <20181113071336.6242-15-yuval.shaia@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 09/23] hw/pvrdma: Set the correct opcode
- for send completion
+Subject: Re: [Qemu-devel] [PATCH v3 14/23] hw/rdma: Initialize node_guid
+ from vmxnet3 mac address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,29 +36,86 @@ To: Yuval Shaia <yuval.shaia@oracle.com>, dmitry.fleytman@gmail.com, jasowang@re
 
 
 
-On 11/13/18 9:12 AM, Yuval Shaia wrote:
-> opcode for WC should be set by the device and not taken from work
-> element.
+On 11/13/18 9:13 AM, Yuval Shaia wrote:
+> node_guid should be set once device is load.
+> Make node_guid be GID format (32 bit) of PCI function 0 vmxnet3 device's
+> MAC.
+>
+> A new function was added to do the conversion.
+> So for example the MAC 56:b6:44:e9:62:dc will be converted to GID
+> 54b6:44ff:fee9:62dc.
 >
 > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 > ---
->   hw/rdma/vmw/pvrdma_qp_ops.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   hw/rdma/rdma_utils.h      |  9 +++++++++
+>   hw/rdma/vmw/pvrdma_cmd.c  | 10 ----------
+>   hw/rdma/vmw/pvrdma_main.c |  5 ++++-
+>   3 files changed, 13 insertions(+), 11 deletions(-)
 >
-> diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-> index 7b0f440fda..3388be1926 100644
-> --- a/hw/rdma/vmw/pvrdma_qp_ops.c
-> +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-> @@ -154,7 +154,7 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
->           comp_ctx->cq_handle = qp->send_cq_handle;
->           comp_ctx->cqe.wr_id = wqe->hdr.wr_id;
->           comp_ctx->cqe.qp = qp_handle;
-> -        comp_ctx->cqe.opcode = wqe->hdr.opcode;
-> +        comp_ctx->cqe.opcode = IBV_WC_SEND;
+> diff --git a/hw/rdma/rdma_utils.h b/hw/rdma/rdma_utils.h
+> index 989db249ef..202abb3366 100644
+> --- a/hw/rdma/rdma_utils.h
+> +++ b/hw/rdma/rdma_utils.h
+> @@ -63,4 +63,13 @@ extern unsigned long pr_dbg_cnt;
+>   void *rdma_pci_dma_map(PCIDevice *dev, dma_addr_t addr, dma_addr_t plen);
+>   void rdma_pci_dma_unmap(PCIDevice *dev, void *buffer, dma_addr_t len);
 >   
->           rdma_backend_post_send(&dev->backend_dev, &qp->backend_qp, qp->qp_type,
->                                  (struct ibv_sge *)&wqe->sge[0], wqe->hdr.num_sge,
+> +static inline void addrconf_addr_eui48(uint8_t *eui, const char *addr)
+> +{
+> +    memcpy(eui, addr, 3);
+> +    eui[3] = 0xFF;
+> +    eui[4] = 0xFE;
+> +    memcpy(eui + 5, addr + 3, 3);
+> +    eui[0] ^= 2;
+> +}
+> +
+>   #endif
+> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+> index a334f6205e..2979582fac 100644
+> --- a/hw/rdma/vmw/pvrdma_cmd.c
+> +++ b/hw/rdma/vmw/pvrdma_cmd.c
+> @@ -592,16 +592,6 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+>           return -EINVAL;
+>       }
+>   
+> -    /* TODO: Since drivers stores node_guid at load_dsr phase then this
+> -     * assignment is not relevant, i need to figure out a way how to
+> -     * retrieve MAC of our netdev */
+> -    if (!cmd->index) {
+> -        dev->node_guid =
+> -            dev->rdma_dev_res.ports[0].gid_tbl[0].gid.global.interface_id;
+> -        pr_dbg("dev->node_guid=0x%llx\n",
+> -               (long long unsigned int)be64_to_cpu(dev->node_guid));
+> -    }
+> -
+>       return 0;
+>   }
+>   
+> diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+> index fa6468d221..95e9322b7c 100644
+> --- a/hw/rdma/vmw/pvrdma_main.c
+> +++ b/hw/rdma/vmw/pvrdma_main.c
+> @@ -264,7 +264,7 @@ static void init_dsr_dev_caps(PVRDMADev *dev)
+>       dsr->caps.sys_image_guid = 0;
+>       pr_dbg("sys_image_guid=%" PRIx64 "\n", dsr->caps.sys_image_guid);
+>   
+> -    dsr->caps.node_guid = cpu_to_be64(dev->node_guid);
+> +    dsr->caps.node_guid = dev->node_guid;
+>       pr_dbg("node_guid=%" PRIx64 "\n", be64_to_cpu(dsr->caps.node_guid));
+>   
+>       dsr->caps.phys_port_cnt = MAX_PORTS;
+> @@ -579,6 +579,9 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
+>       /* Break if not vmxnet3 device in slot 0 */
+>       dev->func0 = VMXNET3(pci_get_function_0(pdev));
+>   
+> +    addrconf_addr_eui48((unsigned char *)&dev->node_guid,
+> +                        (const char *)&dev->func0->conf.macaddr.a);
+> +
+>       memdev_root = object_resolve_path("/objects", NULL);
+>       if (memdev_root) {
+>           object_child_foreach(memdev_root, pvrdma_check_ram_shared, &ram_shared);
 
 Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+
 Thanks,
 Marcel
