@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gOOxg-0004hu-EE
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 10:26:13 -0500
+	(envelope-from <balducci@units.it>) id 1gOQ7z-0003gB-EG
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 11:40:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gOOxb-0008Tq-PS
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 10:26:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38046)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1gOOxb-0008TL-JU
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 10:26:07 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B22FE3083394
-	for <qemu-devel@nongnu.org>; Sun, 18 Nov 2018 15:26:06 +0000 (UTC)
-Date: Sun, 18 Nov 2018 15:26:00 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181118152600.GA6861@redhat.com>
-References: <1539424403-2884-1-git-send-email-pbonzini@redhat.com>
-	<1539424403-2884-3-git-send-email-pbonzini@redhat.com>
+	(envelope-from <balducci@units.it>) id 1gOQ7w-0006CZ-5n
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 11:40:55 -0500
+Received: from dschgrazlin2.univ.trieste.it ([140.105.55.81]:41760
+	helo=dschgrazlin2.units.it) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <balducci@units.it>) id 1gOQ7v-00068b-R2
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 11:40:52 -0500
+Received: from dschgrazlin2.units.it (loopback [127.0.0.1])
+	by dschgrazlin2.units.it (8.15.2/8.15.2) with ESMTP id wAIGeP50001236
+	for <qemu-devel@nongnu.org>; Sun, 18 Nov 2018 17:40:25 +0100
+From: balducci@units.it
+Reply-to: balducci@units.it
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1539424403-2884-3-git-send-email-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] scsi-disk: fix rerror/werror=ignore
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1234.1542559249.1@dschgrazlin2.units.it>
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 18 Nov 2018 17:40:25 +0100
+Message-ID: <1235.1542559249@dschgrazlin2.units.it>
+Subject: [Qemu-devel] 3.1.0-rc{0,1} doesn't start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +29,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com
+To: qemu-devel@nongnu.org
 
-On Sat, Oct 13, 2018 at 11:53:23AM +0200, Paolo Bonzini wrote:
-> rerror=ignore was returning true from scsi_handle_rw_error but the callers were not
-> calling scsi_req_complete when rerror=ignore returns true (this is the correct thing
-> to do when true is returned after executing a passthrough command).  Fix this by
-> calling it in scsi_handle_rw_error.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/scsi/scsi-disk.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> index 4074d7c..e2c5408 100644
-> --- a/hw/scsi/scsi-disk.c
-> +++ b/hw/scsi/scsi-disk.c
-> @@ -473,10 +473,15 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
->      }
->  
->      blk_error_action(s->qdev.conf.blk, action, is_read, error);
-> +    if (action == BLOCK_ERROR_ACTION_IGNORE) {
-> +        scsi_req_complete(&r->req, 0);
-> +        return true;
-> +    }
-> +
->      if (action == BLOCK_ERROR_ACTION_STOP) {
->          scsi_req_retry(&r->req);
->      }
-> -    return action != BLOCK_ERROR_ACTION_IGNORE;
-> +    return false;
->  }
+hello
 
-This commit seems to cause an assertion failure in qemu which is
-trivial to reproduce:
+I'm building qemu from source and happily using it since a bit
+(2.3.0)
 
-(1) Create an NBD disk which returns EIO for every request:
+Since 3.1.0-rc0 (including latest 3.1.0-rc1) I'm no more able to start
+qemu, getting:
 
-  $ nbdkit -f -v --filter=error memory size=64M error-rate=100%
+    ----8<----
+    install:115> qemu
+    qemu: error: failed to set MSR 0x10a to 0x0
+    qemu: /home/balducci/tmp/install-us-d/qemu-3.1.0-rc1.d/qemu-3.1.0-rc0/=
+target/i386/kvm.c:2185: kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_b=
+uf->nmsrs' failed.
+    Aborted
+    ---->8----
 
-(2) Attach the disk to qemu as a virtio-scsi device:
+I have no idea about what the reason might be, apologies.
 
-  $ x86_64-softmmu/qemu-system-x86_64 -device virtio-scsi,id=scsi -drive file=nbd:localhost:10809,format=raw,id=hd0,if=none -device scsi-hd,drive=hd0
-  qemu-system-x86_64: hw/scsi/scsi-bus.c:1374: scsi_req_complete: Assertion `req->status == -1' failed.
+Actually, I have found a recent (2018-10-16) post which might be
+related to this (it mentions the same error message from qemu):
+https://lkml.org/lkml/2018/10/16/440; but I'm not in the position to
+go through. AFAICS, the commit mentioned in the link is present in the
+4.19.2 kernel I'm using, so...?
 
-More details including a stack trace here:
+I can add that 3.0.0 works nicely (everything else unchanged,
+including running kernel 4.19.2)
 
-  https://bugzilla.redhat.com/show_bug.cgi?id=1650975
+OTOH, 3.1.0-rc0 dumps the same error message if I boot into 4.17.14 or
+4.18.16 kernels.
 
-Rich.
+I enclose my specs hoping that somebody can spot where the problem
+might be. I will be happy to send any other detail which might be
+useful.
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+I suspect that this might be some problem on my side, as I couldn't
+find any similar report (apart some old (qemu-2.8.50) threads, that
+didn't help)
+
+
+thanks a lot in advance for any hint/help
+
+ciao
+gabriele
+
+
+Here are my specs:
+
+# --------------------------------
+# command to run qemu is:
+qemu -m 2G /opt/windog  \
+    -accel kvm,thread=3Dmulti \
+    -netdev user,id=3Dnet0,smb=3D/home/balducci \
+    -device rtl8139,netdev=3Dnet0
+
+# --------------------------------
+# qemu build configuration:
+--prefix=3D/opt/stow.d/versions/qemu-3.1.0-rc1/usr
+--libdir=3D/opt/stow.d/versions/qemu-3.1.0-rc1/usr/lib64
+--sysconfdir=3D/opt/stow.d/versions/qemu-3.1.0-rc1/etc
+--localstatedir=3D/var/run
+--docdir=3D/opt/stow.d/versions/qemu-3.1.0-rc1/usr/share/doc/qemu
+--target-list=3Dx86_64-softmmu
+--audio-drv-list=3Dalsa
+
+
+# --------------------------------
+install:154> uname -sr
+Linux 4.19.2
+
+# --------------------------------
+install:155> cat /proc/cpuinfo
+processor       : 0
+vendor_id       : AuthenticAMD
+cpu family      : 21
+model           : 48
+model name      : AMD Athlon(tm) X4 860K Quad Core Processor
+stepping        : 1
+microcode       : 0x6003106
+cpu MHz         : 3473.492
+cache size      : 2048 KB
+physical id     : 0
+siblings        : 4
+core id         : 0
+cpu cores       : 2
+apicid          : 16
+initial apicid  : 0
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 13
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca=
+ cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pd=
+pe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid a=
+perfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xs=
+ave avx f16c lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misaligns=
+se 3dnowprefetch osvw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoe=
+xt perfctr_core perfctr_nb bpext ptsc cpb hw_pstate ssbd vmmcall fsgsbase =
+bmi1 xsaveopt arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushb=
+yasid decodeassists pausefilter pfthreshold overflow_recov
+bugs            : fxsave_leak sysret_ss_attrs null_seg spectre_v1 spectre_=
+v2 spec_store_bypass
+bogomips        : 7380.73
+TLB size        : 1536 4K pages
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 48 bits physical, 48 bits virtual
+power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro [13]
+
+[...cpus 1 2 3 omitted...]
+
+
+# --------------------------------
+install:156> egrep KVM .config-4.19.2
+CONFIG_HAVE_KVM=3Dy
+CONFIG_HAVE_KVM_IRQCHIP=3Dy
+CONFIG_HAVE_KVM_IRQFD=3Dy
+CONFIG_HAVE_KVM_IRQ_ROUTING=3Dy
+CONFIG_HAVE_KVM_EVENTFD=3Dy
+CONFIG_KVM_MMIO=3Dy
+CONFIG_KVM_ASYNC_PF=3Dy
+CONFIG_HAVE_KVM_MSI=3Dy
+CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT=3Dy
+CONFIG_KVM_VFIO=3Dy
+CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=3Dy
+CONFIG_KVM_COMPAT=3Dy
+CONFIG_HAVE_KVM_IRQ_BYPASS=3Dy
+CONFIG_KVM=3Dy
+# CONFIG_KVM_INTEL is not set
+CONFIG_KVM_AMD=3Dy
+
+[of course, I can send the whole kernel configuration file, if needed]
