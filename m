@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gOmSE-0005yf-4P
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:31:19 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gOmlR-00010x-LF
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:51:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gOmS9-0003zO-W6
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:31:18 -0500
-Date: Mon, 19 Nov 2018 17:31:06 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181119173106.6ebcb042@redhat.com>
-In-Reply-To: <20181105102044.20547-7-david@redhat.com>
-References: <20181105102044.20547-1-david@redhat.com>
-	<20181105102044.20547-7-david@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1gOmkt-0005Y9-03
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:50:38 -0500
+Resent-Message-Id: <E1gOmkt-0005Y9-03@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21365)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gOmks-0004WT-Lr
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:50:34 -0500
+In-Reply-To: <20181118203312.5376-1-f4bug@amsat.org>
+Message-ID: <154257499321.4551.1929216374510101910@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 06/10] pci/pcihp: overwrite hotplug
- handler recursively from the start
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 18 Nov 2018 13:03:14 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] docker: Add
+ gentoo-mipsr5900el-cross image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,104 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: f4bug@amsat.org
+Cc: famz@redhat.com, noring@nocrew.org, alex.bennee@linaro.orgfamz@redhat.com, vapier@gentoo.org, qemu-devel@nongnu.org
 
-On Mon,  5 Nov 2018 11:20:40 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> For now, the hotplug handler is not called for devices that are
-> being cold plugged. The hotplug handler is setup when the machine
-> initialization is fully done. Only bridges that were cold plugged are
-> considered.
-> 
-> Set the hotplug handler for the root piix bus directly when realizing.
-> Overwrite the hotplug handler of bridges when coldplugging them.
-> 
-> This will now make sure that the ACPI PCI hotplug handler is also called
-> for cold plugged devices (also on bridges) but not for bridges that were
-> hotplugged (keeping the current behavior).
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/acpi/pcihp.c | 15 +++++++++++++++
->  hw/acpi/piix4.c | 16 +---------------
->  2 files changed, 16 insertions(+), 15 deletions(-)
-> 
-> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-> index 5e7cef173c..05e3f8d11e 100644
-> --- a/hw/acpi/pcihp.c
-> +++ b/hw/acpi/pcihp.c
-> @@ -30,6 +30,7 @@
->  #include "hw/hw.h"
->  #include "hw/i386/pc.h"
->  #include "hw/pci/pci.h"
-> +#include "hw/pci/pci_bridge.h"
->  #include "hw/acpi/acpi.h"
->  #include "sysemu/sysemu.h"
->  #include "exec/address-spaces.h"
-> @@ -240,6 +241,20 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
->       * it is present on boot, no hotplug event is necessary. We do send an
->       * event when the device is disabled later. */
->      if (!dev->hotplugged) {
-> +        /*
-> +         * Overwrite the default hotplug handler with the ACPI PCI one
-> +         * for cold plugged bridges only.
-> +         */
-> +        if (!s->legacy_piix &&
-> +            object_dynamic_cast(OBJECT(dev), TYPE_PCI_BRIDGE)) {
-> +            PCIBus *sec = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
-> +
-> +            qbus_set_hotplug_handler(BUS(sec), DEVICE(hotplug_dev),
-> +                                     &error_abort);
-> +            /* We don't have to overwrite any other hotplug handler yet */
-> +            assert(QLIST_EMPTY(&sec->child));
-> +        }
-> +
->          return;
->      }
->  
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index e586cfdc53..160f727a5e 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -446,15 +446,6 @@ static void piix4_device_unplug_cb(HotplugHandler *hotplug_dev,
->      }
->  }
->  
-> -static void piix4_update_bus_hotplug(PCIBus *pci_bus, void *opaque)
-> -{
-> -    PIIX4PMState *s = opaque;
-> -
-> -    /* pci_bus cannot outlive PIIX4PMState, because /machine keeps it alive
-> -     * and it's not hot-unpluggable */
-> -    qbus_set_hotplug_handler(BUS(pci_bus), DEVICE(s), &error_abort);
-> -}
-> -
->  static void piix4_pm_machine_ready(Notifier *n, void *opaque)
->  {
->      PIIX4PMState *s = container_of(n, PIIX4PMState, machine_ready);
-> @@ -468,12 +459,6 @@ static void piix4_pm_machine_ready(Notifier *n, void *opaque)
->      pci_conf[0x63] = 0x60;
->      pci_conf[0x67] = (memory_region_present(io_as, 0x3f8) ? 0x08 : 0) |
->          (memory_region_present(io_as, 0x2f8) ? 0x90 : 0);
-> -
-> -    if (s->use_acpi_pci_hotplug) {
-> -        pci_for_each_bus(pci_get_bus(d), piix4_update_bus_hotplug, s);
-> -    } else {
-> -        piix4_update_bus_hotplug(pci_get_bus(d), s);
-> -    }
->  }
->  
->  static void piix4_pm_add_propeties(PIIX4PMState *s)
-> @@ -547,6 +532,7 @@ static void piix4_pm_realize(PCIDevice *dev, Error **errp)
->  
->      piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
->                                     pci_get_bus(dev), s);
-> +    qbus_set_hotplug_handler(BUS(pci_get_bus(dev)), DEVICE(s), &error_abort);
->  
->      piix4_pm_add_propeties(s);
->  }
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgxMTE4MjAzMzEyLjUzNzYtMS1mNGJ1Z0BhbXNhdC5vcmcKU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0ggMC8yXSBkb2NrZXI6IEFkZCBnZW50b28tbWlwc3I1OTAw
+ZWwtY3Jvc3MgaW1hZ2UKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
+U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
+aWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
+aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
+QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
+LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
+c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
+bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
+ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKZDUzMGZmNSBzaGlwcGFibGU6IEFkZCB0aGUgbWlwc3I1OTAwZWwg
+bGludXgtdXNlciB0YXJnZXQKMGRhNzgyZCBkb2NrZXI6IEFkZCBnZW50b28tbWlwc3I1OTAwZWwt
+Y3Jvc3MgaW1hZ2UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjogZG9j
+a2VyOiBBZGQgZ2VudG9vLW1pcHNyNTkwMGVsLWNyb3NzIGltYWdlLi4uCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNl
+CiMxNjE6IEZJTEU6IHRlc3RzL2RvY2tlci9kb2NrZXJmaWxlcy9nZW50b28tbWlwc3I1OTAwZWwt
+Y3Jvc3MuZG9ja2VyLmQvZ2NjLXY3LjIuMC1wczItbGxzYy5wYXRjaDoyMzoKKyAkCgpFUlJPUjog
+dHJhaWxpbmcgd2hpdGVzcGFjZQojMTgxOiBGSUxFOiB0ZXN0cy9kb2NrZXIvZG9ja2VyZmlsZXMv
+Z2VudG9vLW1pcHNyNTkwMGVsLWNyb3NzLmRvY2tlci5kL2djYy12Ny4yLjAtcHMyLnBhdGNoOjE0
+OgorICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzNTc6IEZJTEU6IHRlc3RzL2RvY2tl
+ci9kb2NrZXJmaWxlcy9nZW50b28tbWlwc3I1OTAwZWwtY3Jvc3MuZG9ja2VyLmQvZ2NjLXY3LjIu
+MC1wczIucGF0Y2g6MTkwOgorICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzODU6IEZJ
+TEU6IHRlc3RzL2RvY2tlci9kb2NrZXJmaWxlcy9nZW50b28tbWlwc3I1OTAwZWwtY3Jvc3MuZG9j
+a2VyLmQvZ2NjLXY3LjIuMC1wczIucGF0Y2g6MjE4OgorICQKCnRvdGFsOiA0IGVycm9ycywgMSB3
+YXJuaW5ncywgMzM0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMjogc2hpcHBhYmxlOiBBZGQgdGhlIG1pcHNyNTkw
+MGVsIGxpbnV4LXVzZXIgdGFyZ2V0Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
+IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
