@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gOJCF-0003d0-26
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 04:16:51 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gOJg7-0002LC-P5
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 04:47:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gOJCA-000809-4p
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 04:16:51 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:55044)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gOJam-0002OV-P1
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 04:42:16 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:48374)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gOJC9-0007zN-TI
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 04:16:46 -0500
-Date: Sun, 18 Nov 2018 11:16:30 +0200
+	id 1gOJal-0002NJ-Gu
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 04:42:12 -0500
+Date: Sun, 18 Nov 2018 11:42:01 +0200
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181118091629.GD3638@lap1>
-References: <20181108160818.5485-1-yuval.shaia@oracle.com>
-	<20181108160818.5485-14-yuval.shaia@oracle.com>
-	<ee9f5ed6-f68b-eb45-2d2a-357ff1c47cf0@gmail.com>
-	<20181111074541.GB2974@lap1>
-	<70f15298-24c2-d899-82fc-5d07e483474d@gmail.com>
+Message-ID: <20181118094201.GF3638@lap1>
+References: <20181113071336.6242-1-yuval.shaia@oracle.com>
+	<20181113071336.6242-23-yuval.shaia@oracle.com>
+	<c061e6b3-2485-652a-b7da-8d5c5f3a739f@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <70f15298-24c2-d899-82fc-5d07e483474d@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 13/22] hw/pvrdma: Make sure PCI function
- 0 is vmxnet3
+In-Reply-To: <c061e6b3-2485-652a-b7da-8d5c5f3a739f@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 22/23] hw/rdma: Do not call
+ rdma_backend_del_gid on an empty gid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +31,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, yuval.shaia@oracle.com
+Cc: dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com, yuval.shaia@oracle.com
 
-On Sat, Nov 17, 2018 at 01:41:41PM +0200, Marcel Apfelbaum wrote:
+On Sat, Nov 17, 2018 at 02:25:55PM +0200, Marcel Apfelbaum wrote:
 > 
 > 
-> On 11/11/18 9:45 AM, Yuval Shaia wrote:
-> > On Sat, Nov 10, 2018 at 08:27:44PM +0200, Marcel Apfelbaum wrote:
-> > > 
-> > > On 11/8/18 6:08 PM, Yuval Shaia wrote:
-> > > > Guest driver enforces it, we should also.
-> > > > 
-> > > > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > > > ---
-> > > >    hw/rdma/vmw/pvrdma.h      | 2 ++
-> > > >    hw/rdma/vmw/pvrdma_main.c | 3 +++
-> > > >    2 files changed, 5 insertions(+)
-> > > > 
-> > > > diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
-> > > > index b019cb843a..10a3c4fb7c 100644
-> > > > --- a/hw/rdma/vmw/pvrdma.h
-> > > > +++ b/hw/rdma/vmw/pvrdma.h
-> > > > @@ -20,6 +20,7 @@
-> > > >    #include "hw/pci/pci.h"
-> > > >    #include "hw/pci/msix.h"
-> > > >    #include "chardev/char-fe.h"
-> > > > +#include "hw/net/vmxnet3_defs.h"
-> > > >    #include "../rdma_backend_defs.h"
-> > > >    #include "../rdma_rm_defs.h"
-> > > > @@ -85,6 +86,7 @@ typedef struct PVRDMADev {
-> > > >        RdmaBackendDev backend_dev;
-> > > >        RdmaDeviceResources rdma_dev_res;
-> > > >        CharBackend mad_chr;
-> > > > +    VMXNET3State *func0;
-> > > >    } PVRDMADev;
-> > > >    #define PVRDMA_DEV(dev) OBJECT_CHECK(PVRDMADev, (dev), PVRDMA_HW_NAME)
-> > > > diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-> > > > index ac8c092db0..fa6468d221 100644
-> > > > --- a/hw/rdma/vmw/pvrdma_main.c
-> > > > +++ b/hw/rdma/vmw/pvrdma_main.c
-> > > > @@ -576,6 +576,9 @@ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
-> > > >            return;
-> > > >        }
-> > > > +    /* Break if not vmxnet3 device in slot 0 */
-> > > > +    dev->func0 = VMXNET3(pci_get_function_0(pdev));
-> > > > +
-> > > I don't see the error code flow in case VMXNET3 is not func 0.
-> > > Am I missing something?
-> > Yes, this is a dynamic cast that will break the process when fail to cast.
+> On 11/13/18 9:13 AM, Yuval Shaia wrote:
+> > When device goes down the function fini_ports loops over all entries in
+> > gid table regardless of the fact whether entry is valid or not. In case
+> > that entry is not valid we'd like to skip from any further processing in
+> > backend device.
 > > 
-> > This is the error message that you will get in case that device on function
-> > 0 is not vmxnet3:
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > ---
+> >   hw/rdma/rdma_rm.c | 4 ++++
+> >   1 file changed, 4 insertions(+)
 > > 
-> > pvrdma_main.c:589:pvrdma_realize: Object 0x557b959841a0 is not an instance of type vmxnet3
+> > diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> > index 35a96d9a64..e3f6b2f6ea 100644
+> > --- a/hw/rdma/rdma_rm.c
+> > +++ b/hw/rdma/rdma_rm.c
+> > @@ -555,6 +555,10 @@ int rdma_rm_del_gid(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+> >   {
+> >       int rc;
+> > +    if (!dev_res->port.gid_tbl[gid_idx].gid.global.interface_id) {
+> > +        return 0;
+> > +    }
+> > +
+> >       rc = rdma_backend_del_gid(backend_dev, ifname,
+> >                                 &dev_res->port.gid_tbl[gid_idx].gid);
+> >       if (rc < 0) {
 > 
-> I am not sure we will see this error if QEMU is compiled in Release mode.
-> I think object_dynamic_cast_assert throws this error only if
-> CONFIG_QOM_CAST_DEBUG
-> is set, and is possible the mentioned flag is not set in Release.
+> Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+
+There seems to be a missing space separator between "Apfelbaum" and "<". Is
+that ok?
+
 > 
 > Thanks,
 > Marcel
-
-Done.
-Thanks.
-
-> 
-> > 
-> > > 
-> > > Thanks,
-> > > Marcel
-> > > 
-> > > >        memdev_root = object_resolve_path("/objects", NULL);
-> > > >        if (memdev_root) {
-> > > >            object_child_foreach(memdev_root, pvrdma_check_ram_shared, &ram_shared);
 > 
