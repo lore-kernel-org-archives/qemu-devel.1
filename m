@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1gOHS5-0004SE-90
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 02:25:07 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gOHV3-0005oF-3c
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 02:28:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1gOHS0-0005CU-8S
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 02:25:05 -0500
-Received: from mail-vs1-f43.google.com ([209.85.217.43]:44563)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1gOHS0-0005C7-2g
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 02:25:00 -0500
-Received: by mail-vs1-f43.google.com with SMTP id g68so16037555vsd.11
-	for <qemu-devel@nongnu.org>; Sat, 17 Nov 2018 23:25:00 -0800 (PST)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gOHUy-0007Cw-4V
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 02:28:09 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:53262)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gOHUx-0007CL-Ts
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 02:28:04 -0500
+Date: Sun, 18 Nov 2018 09:27:51 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20181118072750.GA3638@lap1>
+References: <20181113071336.6242-1-yuval.shaia@oracle.com>
+	<20181113071336.6242-24-yuval.shaia@oracle.com>
+	<f5f448d1-2945-9ea7-1693-26c570981a4e@gmail.com>
 MIME-Version: 1.0
-References: <20181107121319.GC14842@redhat.com>
-	<20181107143628.GG8125@redhat.com>
-	<CAMRbyyuFGVtNWF9LKoi0n6_r5Gr4j8LetbAMd0L_5cKMif9LjQ@mail.gmail.com>
-	<20181107172737.GB4721@linux.fritz.box>
-	<CAMRbyys2XVgjPx9HteGP8c6R5rPM=n86m30kfEG6a0+c-jLZ4g@mail.gmail.com>
-	<CAMRbyytm2qY6ucuaMSAXaw=BhjG9BGoyU_6Xi_YC+fzBaP754Q@mail.gmail.com>
-	<CAMRbyyubqi1QgpDcnxrObVLfzRYODeHfz5qbYfjoeda4SgsbMw@mail.gmail.com>
-	<20181116152604.GB5066@localhost.localdomain>
-	<CAMRbyytf-NU3QgYoqbTvNR1f-FfA9DxRzUb+-oZGx=34qFXi5g@mail.gmail.com>
-	<20181117211356.GG27120@redhat.com>
-In-Reply-To: <20181117211356.GG27120@redhat.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Sun, 18 Nov 2018 09:24:46 +0200
-Message-ID: <CAMRbyys07n-pAXgayFayHqpFG17mQA=aCTOX8FSKqkyCE5ojSA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] Change in qemu 2.12 causes qemu-img
- convert to NBD to write more data
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f5f448d1-2945-9ea7-1693-26c570981a4e@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 23/23] docs: Update pvrdma device
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,246 +30,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Eric Blake <eblake@redhat.com>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-On Sat, Nov 17, 2018 at 11:13 PM Richard W.M. Jones <rjones@redhat.com>
-wrote:
+On Sat, Nov 17, 2018 at 02:34:18PM +0200, Marcel Apfelbaum wrote:
+> 
+> 
+> On 11/13/18 9:13 AM, Yuval Shaia wrote:
+> > Interface with the device is changed with the addition of support for
+> > MAD packets.
+> > Adjust documentation accordingly.
+> > 
+> > While there fix a minor mistake which may lead to think that there is a
+> > relation between using RXE on host and the compatibility with bare-metal
+> > peers.
+> > 
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > ---
+> >   docs/pvrdma.txt | 103 +++++++++++++++++++++++++++++++++++++++---------
+> >   1 file changed, 84 insertions(+), 19 deletions(-)
+> > 
+> > diff --git a/docs/pvrdma.txt b/docs/pvrdma.txt
+> > index 5599318159..9e8d1674b7 100644
+> > --- a/docs/pvrdma.txt
+> > +++ b/docs/pvrdma.txt
+> > @@ -9,8 +9,9 @@ It works with its Linux Kernel driver AS IS, no need for any special guest
+> >   modifications.
+> >   While it complies with the VMware device, it can also communicate with bare
+> > -metal RDMA-enabled machines and does not require an RDMA HCA in the host, it
+> > -can work with Soft-RoCE (rxe).
+> > +metal RDMA-enabled machines as peers.
+> > +
+> > +It does not require an RDMA HCA in the host, it can work with Soft-RoCE (rxe).
+> >   It does not require the whole guest RAM to be pinned allowing memory
+> >   over-commit and, even if not implemented yet, migration support will be
+> > @@ -78,29 +79,93 @@ the required RDMA libraries.
+> >   3. Usage
+> >   ========
+> > +
+> > +
+> > +3.1 VM Memory settings
+> > +======================
+> >   Currently the device is working only with memory backed RAM
+> >   and it must be mark as "shared":
+> >      -m 1G \
+> >      -object memory-backend-ram,id=mb1,size=1G,share \
+> >      -numa node,memdev=mb1 \
+> > -The pvrdma device is composed of two functions:
+> > - - Function 0 is a vmxnet Ethernet Device which is redundant in Guest
+> > -   but is required to pass the ibdevice GID using its MAC.
+> > -   Examples:
+> > -     For an rxe backend using eth0 interface it will use its mac:
+> > -       -device vmxnet3,addr=<slot>.0,multifunction=on,mac=<eth0 MAC>
+> > -     For an SRIOV VF, we take the Ethernet Interface exposed by it:
+> > -       -device vmxnet3,multifunction=on,mac=<RoCE eth MAC>
+> > - - Function 1 is the actual device:
+> > -       -device pvrdma,addr=<slot>.1,backend-dev=<ibdevice>,backend-gid-idx=<gid>,backend-port=<port>
+> > -   where the ibdevice can be rxe or RDMA VF (e.g. mlx5_4)
+> > - Note: Pay special attention that the GID at backend-gid-idx matches vmxnet's MAC.
+> > - The rules of conversion are part of the RoCE spec, but since manual conversion
+> > - is not required, spotting problems is not hard:
+> > -    Example: GID: fe80:0000:0000:0000:7efe:90ff:fecb:743a
+> > -             MAC: 7c:fe:90:cb:74:3a
+> > -    Note the difference between the first byte of the MAC and the GID.
+> > +
+> > +3.2 MAD Multiplexer
+> > +===================
+> > +MAD Multiplexer is a service that exposes MAD-like interface for VMs in
+> > +order to overcome the limitation where only single entity can register with
+> > +MAD layer to send and receive RDMA-CM MAD packets.
+> > +
+> > +To build rdmacm-mux run
+> > +# make rdmacm-mux
+> > +
+> > +The program accepts 3 command line arguments and exposes a UNIX socket to
+> > +be used to relay control and data messages to and from the service.
+> > +-s unix-socket-path   Path to unix socket to listen on
+> > +                      (default /var/run/rdmacm-mux)
+> > +-d rdma-device-name   Name of RDMA device to register with
+> > +                      (default rxe0)
+> > +-p rdma-device-port   Port number of RDMA device to register with
+> > +                      (default 1)
+> > +The final UNIX socket file name is a concatenation of the 3 arguments so
+> > +for example for device name mlx5_0 and port 2 the file
+> > +/var/run/rdmacm-mux-mlx5_0-2 will be created.
+> > +
+> > +Please refer to contrib/rdmacm-mux for more details.
+> > +
+> > +
+> > +3.3 PCI devices settings
+> > +========================
+> > +RoCE device exposes two functions - Ethernet and RDMA.
+> > +To support it, pvrdma device is composed of two PCI functions, an Ethernet
+> > +device of type vmxnet3 on PCI slot 0 and a pvrdma device on PCI slot 1. The
+> > +Ethernet function can be used for other Ethernet purposes such as IP.
+> > +
+> > +
+> > +3.4 Device parameters
+> > +=====================
+> > +- netdev: Specifies the Ethernet device on host. For Soft-RoCE (rxe) this
+> > +  would be the Ethernet device used to create it. For any other physical
+> > +  RoCE device this would be the netdev name of the device.
+> 
+> I didn't understand, can you please elaborate? We need the ibdev,
+> this is clear, but what is the "ethernet device on host", how do
+> we get it and how it is used?
 
-> On Sat, Nov 17, 2018 at 10:59:26PM +0200, Nir Soffer wrote:
-> > On Fri, Nov 16, 2018 at 5:26 PM Kevin Wolf <kwolf@redhat.com> wrote:
-> >
-> > > Am 15.11.2018 um 23:27 hat Nir Soffer geschrieben:
-> > > > On Sun, Nov 11, 2018 at 6:11 PM Nir Soffer <nsoffer@redhat.com>
-> wrote:
-> > > >
-> > > > > On Wed, Nov 7, 2018 at 7:55 PM Nir Soffer <nsoffer@redhat.com>
-> wrote:
-> > > > >
-> > > > >> On Wed, Nov 7, 2018 at 7:27 PM Kevin Wolf <kwolf@redhat.com>
-> wrote:
-> > > > >>
-> > > > >>> Am 07.11.2018 um 15:56 hat Nir Soffer geschrieben:
-> > > > >>> > Wed, Nov 7, 2018 at 4:36 PM Richard W.M. Jones <
-> rjones@redhat.com>
-> > > > >>> wrote:
-> > > > >>> >
-> > > > >>> > > Another thing I tried was to change the NBD server (nbdkit)
-> so
-> > > that
-> > > > >>> it
-> > > > >>> > > doesn't advertise zero support to the client:
-> > > > >>> > >
-> > > > >>> > >   $ nbdkit --filter=log --filter=nozero memory size=6G
-> > > > >>> logfile=/tmp/log \
-> > > > >>> > >       --run './qemu-img convert ./fedora-28.img -n $nbd'
-> > > > >>> > >   $ grep '\.\.\.$' /tmp/log | sed
-> 's/.*\([A-Z][a-z]*\).*/\1/' |
-> > > uniq
-> > > > >>> -c
-> > > > >>> > >    2154 Write
-> > > > >>> > >
-> > > > >>> > > Not surprisingly no zero commands are issued.  The size of
-> the
-> > > write
-> > > > >>> > > commands is very uneven -- it appears to be send one command
-> per
-> > > > >>> block
-> > > > >>> > > of zeroes or data.
-> > > > >>> > >
-> > > > >>> > > Nir: If we could get information from imageio about whether
-> > > zeroing
-> > > > >>> is
-> > > > >>> > > implemented efficiently or not by the backend, we could
-> change
-> > > > >>> > > virt-v2v / nbdkit to advertise this back to qemu.
-> > > > >>> >
-> > > > >>> > There is no way to detect the capability, ioctl(BLKZEROOUT)
-> always
-> > > > >>> > succeeds, falling back to manual zeroing in the kernel silently
-> > > > >>> >
-> > > > >>> > Even if we could, sending zero on the wire from qemu may be
-> even
-> > > > >>> > slower, and it looks like qemu send even more requests in this
-> case
-> > > > >>> > (2154 vs ~1300).
-> > > > >>> >
-> > > > >>> > Looks like this optimization in qemu side leads to worse
-> > > performance,
-> > > > >>> > so it should not be enabled by default.
-> > > > >>>
-> > > > >>> Well, that's overgeneralising your case a bit. If the backend
-> does
-> > > > >>> support efficient zero writes (which file systems, the most
-> common
-> > > case,
-> > > > >>> generally do), doing one big write_zeroes request at the start
-> can
-> > > > >>> improve performance quite a bit.
-> > > > >>>
-> > > > >>> It seems the problem is that we can't really know whether the
-> > > operation
-> > > > >>> will be efficient because the backends generally don't tell us.
-> Maybe
-> > > > >>> NBD could introduce a flag for this, but in the general case it
-> > > appears
-> > > > >>> to me that we'll have to have a command line option.
-> > > > >>>
-> > > > >>> However, I'm curious what your exact use case and the backend
-> used
-> > > in it
-> > > > >>> is? Can something be improved there to actually get efficient
-> zero
-> > > > >>> writes and get even better performance than by just disabling
-> the big
-> > > > >>> zero write?
-> > > > >>
-> > > > >>
-> > > > >> The backend is some NetApp storage connected via FC. I don't have
-> > > > >> more info on this. We get zero rate of about 1G/s on this storage,
-> > > which
-> > > > >> is quite slow compared with other storage we tested.
-> > > > >>
-> > > > >> One option we check now is if this is the kernel silent fallback
-> to
-> > > manual
-> > > > >> zeroing when the server advertise wrong value of
-> write_same_max_bytes.
-> > > > >>
-> > > > >
-> > > > > We eliminated this using blkdiscard. This is what we get on with
-> this
-> > > > > storage
-> > > > > zeroing 100G LV:
-> > > > >
-> > > > > for i in 1 2 4 8 16 32; do time blkdiscard -z -p ${i}m
-> > > > >
-> > >
-> /dev/6e1d84f9-f939-46e9-b108-0427a08c280c/2d5c06ce-6536-4b3c-a7b6-13c6d8e55ade;
-> > > > > done
-> > > > >
-> > > > > real 4m50.851s
-> > > > > user 0m0.065s
-> > > > > sys 0m1.482s
-> > > > >
-> > > > > real 4m30.504s
-> > > > > user 0m0.047s
-> > > > > sys 0m0.870s
-> > > > >
-> > > > > real 4m19.443s
-> > > > > user 0m0.029s
-> > > > > sys 0m0.508s
-> > > > >
-> > > > > real 4m13.016s
-> > > > > user 0m0.020s
-> > > > > sys 0m0.284s
-> > > > >
-> > > > > real 2m45.888s
-> > > > > user 0m0.011s
-> > > > > sys 0m0.162s
-> > > > >
-> > > > > real 2m10.153s
-> > > > > user 0m0.003s
-> > > > > sys 0m0.100s
-> > > > >
-> > > > > We are investigating why we get low throughput on this server, and
-> also
-> > > > > will check
-> > > > > several other servers.
-> > > > >
-> > > > > Having a command line option to control this behavior sounds good.
-> I
-> > > don't
-> > > > >> have enough data to tell what should be the default, but I think
-> the
-> > > safe
-> > > > >> way would be to keep old behavior.
-> > > > >>
-> > > > >
-> > > > > We file this bug:
-> > > > > https://bugzilla.redhat.com/1648622
-> > > > >
-> > > >
-> > > > More data from even slower storage - zeroing 10G lv on Kaminario K2
-> > > >
-> > > > # time blkdiscard -z -p 32m /dev/test_vg/test_lv2
-> > > >
-> > > > real    50m12.425s
-> > > > user    0m0.018s
-> > > > sys     2m6.785s
-> > > >
-> > > > Maybe something is wrong with this storage, since we see this:
-> > > >
-> > > > # grep -s "" /sys/block/dm-29/queue/* | grep write_same_max_bytes
-> > > > /sys/block/dm-29/queue/write_same_max_bytes:512
-> > > >
-> > > > Since BLKZEROOUT always fallback to manual slow zeroing silently,
-> > > > maybe we can disable the aggressive pre-zero of the entire device
-> > > > for block devices, and keep this optimization for files when
-> fallocate()
-> > > > is supported?
-> > >
-> > > I'm not sure what the detour through NBD changes, but qemu-img directly
-> > > on a block device doesn't use BLKZEROOUT first, but
-> > > FALLOC_FL_PUNCH_HOLE.
-> >
-> >
-> > Looking at block/file-posix.c (83c496599cc04926ecbc3e47a37debaa3e38b686)
-> > we don't use PUNCH_HOLE for block devices:
-> >
-> > 1472     if (aiocb->aio_type & QEMU_AIO_BLKDEV) {
-> > 1473         return handle_aiocb_write_zeroes_block(aiocb);
-> > 1474     }
-> >
-> > qemu uses BLKZEROOUT, which is not guaranteed to be fast on storage side,
-> > and even worse fallback silently to manual zero if storage does not
-> support
-> > WRITE_SAME.
-> >
-> > Maybe we can add a flag that avoids anything that
-> > > could be slow, such as BLKZEROOUT, as a fallback (and also the slow
-> > > emulation that QEMU itself would do if all kernel calls fail).
-> > >
-> >
-> > But the issue here is not how qemu-img handles this case, but how NBD
-> > server can handle it. NBD may support zeroing, but there is no way to
-> tell
-> > if zeroing is going to be fast, since the backend writing zeros to
-> storage
-> > has the same limits of qemu-img.
-> >
-> > So I think we need to fix the performance regression in 2.12 by enabling
-> > pre-zero of entire disk only if FALLOCATE_FL_PUNCH_HOLE can be used
-> > and only if it can be used without a fallback to slow zero method.
-> >
-> > Enabling this optimization for anything else requires changing the entire
-> > stack (storage, kernel, NBD protocol) to support reporting fast zero
-> > capability
-> > or limit zero to fast operations.
->
-> I may be missing something here, but doesn't imageio know if the
-> backing block device starts out as all zeroes?
+netdev is used to maintain port's GID table.
 
+Adding GID entry is by assigning new IPv6 address to the corresponding
+Ethernet function, opposite is the same, i.e. removing an IPv6 address from
+the Ethernet function will delete the corresponding GID from the GID table.
 
-imageio cannot know since it is stateless. When you send a request
-we don't know what happened before your request.
+I wish there would be a way to extract netdev from a given ibdev (by means
+of an API) but since there isn't - we must have it as a parameter.
 
-Engine knows if an image is zeroed when creating a disk for some disks
-(raw sparse on file storage) so it  can report this info, and nbdkit can use
-this when writing zeros...
-
-
-> If so couldn't it
-> maintain a bitmap and simply ignore zero requests sent for unwritten
-> disk blocks?
->
-
-But if nbdkit knows that it is writing to a new zeroed image, it would be
-better to report it back to qemu, so qemu can skip zeroing the entire
-device.
-
-This does not solve the issue with block storage which is the most
-interesting
-use case for oVirt.
-
-Nir
+> 
+> Thanks,
+> Marcel
+> 
+> > +- ibdev: The IB device name on host for example rxe0, mlx5_0 etc.
+> > +- mad-chardev: The name of the MAD multiplexer char device.
+> > +- ibport: In case of multi-port device (such as Mellanox's HCA) this
+> > +  specify the port to use. If not set 1 will be used.
+> > +- dev-caps-max-mr-size: The maximum size of MR.
+> > +- dev-caps-max-qp: Maximum number of QPs.
+> > +- dev-caps-max-sge: Maximum number of SGE elements in WR.
+> > +- dev-caps-max-cq: Maximum number of CQs.
+> > +- dev-caps-max-mr: Maximum number of MRs.
+> > +- dev-caps-max-pd: Maximum number of PDs.
+> > +- dev-caps-max-ah: Maximum number of AHs.
+> > +
+> > +Notes:
+> > +- The first 3 parameters are mandatory settings, the rest have their
+> > +  defaults.
+> > +- The last 8 parameters (the ones that prefixed by dev-caps) defines the top
+> > +  limits but the final values are adjusted by the backend device limitations.
+> > +
+> > +3.5 Example
+> > +===========
+> > +Define bridge device with vmxnet3 network backend:
+> > +<interface type='bridge'>
+> > +  <mac address='56:b4:44:e9:62:dc'/>
+> > +  <source bridge='bridge1'/>
+> > +  <model type='vmxnet3'/>
+> > +  <address type='pci' domain='0x0000' bus='0x00' slot='0x10' function='0x0' multifunction='on'/>
+> > +</interface>
+> > +
+> > +Define pvrdma device:
+> > +<qemu:commandline>
+> > +  <qemu:arg value='-object'/>
+> > +  <qemu:arg value='memory-backend-ram,id=mb1,size=1G,share'/>
+> > +  <qemu:arg value='-numa'/>
+> > +  <qemu:arg value='node,memdev=mb1'/>
+> > +  <qemu:arg value='-chardev'/>
+> > +  <qemu:arg value='socket,path=/var/run/rdmacm-mux-rxe0-1,id=mads'/>
+> > +  <qemu:arg value='-device'/>
+> > +  <qemu:arg value='pvrdma,addr=10.1,ibdev=rxe0,netdev=bridge0,mad-chardev=mads'/>
+> > +</qemu:commandline>
+> 
