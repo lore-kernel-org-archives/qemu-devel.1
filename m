@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gOWCm-00079r-1c
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 18:10:16 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gOWgh-0005za-FB
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 18:41:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gOWCi-0006YE-TJ
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 18:10:16 -0500
-Received: from mga14.intel.com ([192.55.52.115]:1667)
+	(envelope-from <sameo@linux.intel.com>) id 1gOWXV-0002VL-Tg
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 18:31:45 -0500
+Received: from mga06.intel.com ([134.134.136.31]:33702)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gOWCi-0006Uw-Lw
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 18:10:12 -0500
-Date: Mon, 19 Nov 2018 00:09:32 +0100
+	id 1gOWXV-0002Uj-KC
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 18:31:41 -0500
+Date: Mon, 19 Nov 2018 00:31:04 +0100
 From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181118230932.GA9556@caravaggio.hotspot.internet-for-guests.com>
+Message-ID: <20181118233104.GB9556@caravaggio.hotspot.internet-for-guests.com>
 References: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
-	<CAJSP0QVKVktawsab4pPb3qdGuh9D1zBZOucN+K2B=nrkdW2_qQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJSP0QVKVktawsab4pPb3qdGuh9D1zBZOucN+K2B=nrkdW2_qQ@mail.gmail.com>
+In-Reply-To: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
 Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,39 +27,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: robert.bradford@intel.com, SeaBIOS <seabios@seabios.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, sgarzare@redhat.com
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: seabios@seabios.org, qemu-devel@nongnu.org, Rob Bradford <robert.bradford@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Stefan,
+Hi Stefano,
 
-On Fri, Nov 16, 2018 at 04:39:20PM +0000, Stefan Hajnoczi wrote:
-> On Fri, Nov 16, 2018 at 4:21 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > I'm investigating the SeaBIOS booting time, to understand if we can reduce
-> > the boot time in some cases (e.g. legacy hardware is not needed). I think
-> > this
-> > can be interesting also for NEMU developers.
+On Fri, Nov 16, 2018 at 05:13:59PM +0100, Stefano Garzarella wrote:
+> Hi,
+> I'm investigating the SeaBIOS booting time, to understand if we can reduce
+> the boot time in some cases (e.g. legacy hardware is not needed). I think
+> this
+> can be interesting also for NEMU developers.
+Definitely, thanks.
+
+
+> Following this thread (
+> https://mail.coreboot.org/pipermail/seabios/2015-July/009497.html),
+> I'm using qboot (https://github.com/bonzini/qboot) to compare the SeaBIOS
+> booting time.
 > 
-> Questions for NEMU folks:
+> As Paolo did in qboot, I manually add small debug port writes in SeaBIOS and
+> linuxboot_dma.c (QEMU) to trace the events with perf (kvm_pio events)
+When doing similar measuremnts, I also used the debug-exit qemu device
+in order to make imho simpler measuremnts, see
+https://github.com/intel/nemu/wiki/Measuring-Boot-Latency
+
+Probably not as precised as yours, but it was enough for what we tried
+to characterize.
+
+> The goal is to have only one image of SeaBIOS configurable at runtime to
+> reduce
+> the boot time, avoiding unnecessary initialization.
 > 
-> qboot isn't part of the virt-x86 NEMU tree and is only mentioned in
-> one or two places.  Is NEMU focussing exclusively on OVMF guest
-> firmware instead of qboot?
-Initally we were only focusing on OVMF, but we added support for qboot
-[1] as we were not happy with the OVMF boot latencies we measured,
-especially in the Kata containers context. Rob was about to start
-looking at seabios support as well.
+> Any pointers or suggestions would be helpful.
+> 
+> Following I put some preliminary measurements that I obtained:
+> I used this QEMU command line:
+> ./qemu-system-x86_64 -bios $BIOS -m 1G -cpu host -M accel=kvm \
+> -kernel /boot/vmlinuz-4.18.18-300.fc29.x86_64 -append 'console=ttyS0' \
+> -nographic -serial mon:stdio
+> 
+> For each test, I measured these times (in milliseconds) relative to the
+> "sched_process_exec" event:
+> - qemu_init_end: first kvm_entry (i.e. QEMU initialized has finished)
+> - fw_start: first entry of the BIOS
+> - fw_do_boot: after the BIOS initialization (e.g. PCI setup, etc.)
+> - linux_start_boot: before the jump to the Linux kernel
+Are you planning to also measure the total time to userspace as well?
+How we set the hardware up from the FW/BIOS can also influence the
+overall (up to ring 3) boot latency on our experiments.
 
-We are going to upstream a cleaner version of the virt support to qboot
-very soon now.
+> # qboot
+> BIOS=/home/stefano/repos/qboot/bios.bin
+>  qemu_init_end: 40.561234
+>  fw_start: 40.721729 (+0.160495)
+>  fw_do_boot: 47.025591 (+6.303862)
+>  linux_start_boot: 48.874112 (+1.848521)
+> 
+> # SeaBIOS with default configuration
+> BIOS=/home/stefano/repos/seabios/out_default/bios.bin
+>  qemu_init_end: 40.419451
+>  fw_start: 40.639967 (+0.220516)
+>  fw_do_boot: 886.668828 (+846.028861)
+>  linux_start_boot: 889.723547 (+3.054719)
+> 
+> # SeaBIOS with Kevin's configuration
+> # (https://mail.coreboot.org/pipermail/seabios/2015-July/009508.html)
+> # Note: this SeaBIOS setup is so stripped down that it can't actually boot
+> an OS
+> BIOS=/home/stefano/repos/seabios/out_kevin/bios.bin
+>  qemu_init_end: 40.676412
+>  fw_start: 40.755757 (+0.079345)
+>  fw_do_boot: 56.427023 (+15.671266)
+That's a slight improvement ;)
 
-> Are there other boot time optimizations in NEMU that are a candidate
-> for upstreaming?
 
-We did not add anything specific, but when comparing PC+qboot with
-virt+qboot, we're seeing interesting overall boot time improvements. We
-assume the simpler virt machine type explains the difference.
+> I did the same tests also with NEMU (without using -M virt) and I have
+> approximately the same results.
+Yes, as expected.
+
+
+> As the next step, I'll start from Kevin's configuration to have a minimal
+> SeaBIOS image ables to boot a Linux kernel.
+Please keep us posted.
 
 Cheers,
 Samuel.
-
-[1] https://github.com/rbradford/qboot/commit/dbcaaa1f6921064cd46f330a3625eb01e44aa4df
