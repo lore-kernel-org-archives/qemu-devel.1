@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gOsWK-0008Kr-6W
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 17:59:57 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gOsXS-0000lm-Ly
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 18:01:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gOsWH-0001oT-2P
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 17:59:56 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:56660)
+	(envelope-from <ehabkost@redhat.com>) id 1gOsXO-00045z-S4
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 18:01:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37942)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gOsWG-0001oG-Sm
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 17:59:53 -0500
-Date: Mon, 19 Nov 2018 23:59:50 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20181119225950.43sytfmqg2ak2lho@function>
-References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
-	<20181114123643.24091-4-marcandre.lureau@redhat.com>
-	<20181114142234.GJ19298@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gOsXM-00042k-Qz
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 18:01:01 -0500
+Date: Mon, 19 Nov 2018 21:00:54 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181119230054.GI3807@habkost.net>
+References: <1235.1542559249@dschgrazlin2.units.it>
+	<jpgefbgag1q.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181114142234.GJ19298@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 03/41] slirp: simplify fork_exec()
+In-Reply-To: <jpgefbgag1q.fsf@linux.bootlegged.copy>
+Subject: Re: [Qemu-devel] 3.1.0-rc{0,1} doesn't start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +27,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it
+To: Bandan Das <bsd@redhat.com>
+Cc: balducci@units.it, qemu-devel@nongnu.org, Robert Hoo <robert.hu@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hello,
+On Mon, Nov 19, 2018 at 04:55:13PM -0500, Bandan Das wrote:
+> balducci@units.it writes:
+> 
+> > hello
+> >
+> > I'm building qemu from source and happily using it since a bit
+> > (2.3.0)
+> >
+> > Since 3.1.0-rc0 (including latest 3.1.0-rc1) I'm no more able to start
+> > qemu, getting:
+> >
+> >     ----8<----
+> >     install:115> qemu
+> >     qemu: error: failed to set MSR 0x10a to 0x0
+> >     qemu: /home/balducci/tmp/install-us-d/qemu-3.1.0-rc1.d/qemu-3.1.0-rc0/target/i386/kvm.c:2185: kvm_put_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+> >     Aborted
+> >     ---->8----
+> >
+> I believe the check on whether MSR_IA32_ARCH_CAPABILITIES is present is
+> incomplete because it can return 0 for data. Can you try this:
+> 
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index f524e7d929..4878ffb90b 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -2002,14 +2002,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>  #endif
+>  
+>      /* If host supports feature MSR, write down. */
+> -    if (kvm_feature_msrs) {
+> -        int i;
+> -        for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
+> -            if (kvm_feature_msrs->indices[i] == MSR_IA32_ARCH_CAPABILITIES) {
+> -                kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+> +    if (kvm_arch_get_supported_msr_feature(kvm_state, MSR_IA32_ARCH_CAPABILITIES)) {
+> +        kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+>                                env->features[FEAT_ARCH_CAPABILITIES]);
 
-Daniel P. Berrang=C3=A9, le mer. 14 nov. 2018 14:22:34 +0000, a ecrit:
-> On Wed, Nov 14, 2018 at 04:36:05PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > Use g_spawn_async_with_fds() to setup the child.
-> >=20
-> > GSpawn handles reaping the child, and closing parent file descriptors=
-.
->=20
-> The g_spawn* family of APIs is portable to Win32, which the current
-> fork/exec code in slirp is not.
->=20
-> So I'm curious if this conversion is sufficient to make this part
-> of slirp work on Win32, or if further portability problems remain.
-> If it does work on Win32, then you can also delete the stub
-> fork_exec() impl the code currently has.
+kvm_arch_get_supported_msr_feature() will return the value of the
+MSR on the host side (kvm/x86.c:kvm_get_msr_feature()).  Having
+it return non-zero doesn't mean KVM's
+svm_set_msr(MSR_IA32_ARCH_CAPABILITIES) will work.
 
-Mmm, I don't think any portability issue remains. SO_OOBINLINE is used
-in other places, the rest is portable. There is the setsid() call which
-may just not make sense on Windows, but we could just disable it there.
+If the MSR doesn't work on KVM_SET_MSRS, it is not supposed to
+appear on KVM_GET_MSR_INDEX_LIST (even if it appears on
+KVM_GET_MSR_FEATURE_INDEX_LIST).  QEMU must check
+KVM_GET_MSR_INDEX_LIST too before including the MSR on the
+KVM_SET_MSRS call.
 
-I have pushed to=20
+> -                break;
+> -            }
+>      }
+>  
+>      /*
+> 
+> 
+> > I have no idea about what the reason might be, apologies.
+> >
+> > Actually, I have found a recent (2018-10-16) post which might be
+> > related to this (it mentions the same error message from qemu):
+> > https://lkml.org/lkml/2018/10/16/440; but I'm not in the position to
+> > go through. AFAICS, the commit mentioned in the link is present in the
+> > 4.19.2 kernel I'm using, so...?
+> >
+> > I can add that 3.0.0 works nicely (everything else unchanged,
+> > including running kernel 4.19.2)
+> >
+> > OTOH, 3.1.0-rc0 dumps the same error message if I boot into 4.17.14 or
+> > 4.18.16 kernels.
+> >
+> > I enclose my specs hoping that somebody can spot where the problem
+> > might be. I will be happy to send any other detail which might be
+> > useful.
+> >
+> > I suspect that this might be some problem on my side, as I couldn't
+> > find any similar report (apart some old (qemu-2.8.50) threads, that
+> > didn't help)
+> >
+> >
+> > thanks a lot in advance for any hint/help
+> >
+> > ciao
+> > gabriele
+> >
+> >
+> > Here are my specs:
+> >
+> > # --------------------------------
+> > # command to run qemu is:
+> > qemu -m 2G /opt/windog  \
+> >     -accel kvm,thread=multi \
+> >     -netdev user,id=net0,smb=/home/balducci \
+> >     -device rtl8139,netdev=net0
+> >
+> > # --------------------------------
+> > # qemu build configuration:
+> > --prefix=/opt/stow.d/versions/qemu-3.1.0-rc1/usr
+> > --libdir=/opt/stow.d/versions/qemu-3.1.0-rc1/usr/lib64
+> > --sysconfdir=/opt/stow.d/versions/qemu-3.1.0-rc1/etc
+> > --localstatedir=/var/run
+> > --docdir=/opt/stow.d/versions/qemu-3.1.0-rc1/usr/share/doc/qemu
+> > --target-list=x86_64-softmmu
+> > --audio-drv-list=alsa
+> >
+> >
+> > # --------------------------------
+> > install:154> uname -sr
+> > Linux 4.19.2
+> >
+> > # --------------------------------
+> > install:155> cat /proc/cpuinfo
+> > processor       : 0
+> > vendor_id       : AuthenticAMD
+> > cpu family      : 21
+> > model           : 48
+> > model name      : AMD Athlon(tm) X4 860K Quad Core Processor
+> > stepping        : 1
+> > microcode       : 0x6003106
+> > cpu MHz         : 3473.492
+> > cache size      : 2048 KB
+> > physical id     : 0
+> > siblings        : 4
+> > core id         : 0
+> > cpu cores       : 2
+> > apicid          : 16
+> > initial apicid  : 0
+> > fpu             : yes
+> > fpu_exception   : yes
+> > cpuid level     : 13
+> > wp              : yes
+> > flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsave avx f16c lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext perfctr_core perfctr_nb bpext ptsc cpb hw_pstate ssbd vmmcall fsgsbase bmi1 xsaveopt arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold overflow_recov
+> > bugs            : fxsave_leak sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass
+> > bogomips        : 7380.73
+> > TLB size        : 1536 4K pages
+> > clflush size    : 64
+> > cache_alignment : 64
+> > address sizes   : 48 bits physical, 48 bits virtual
+> > power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro [13]
+> >
+> > [...cpus 1 2 3 omitted...]
+> >
+> >
+> > # --------------------------------
+> > install:156> egrep KVM .config-4.19.2
+> > CONFIG_HAVE_KVM=y
+> > CONFIG_HAVE_KVM_IRQCHIP=y
+> > CONFIG_HAVE_KVM_IRQFD=y
+> > CONFIG_HAVE_KVM_IRQ_ROUTING=y
+> > CONFIG_HAVE_KVM_EVENTFD=y
+> > CONFIG_KVM_MMIO=y
+> > CONFIG_KVM_ASYNC_PF=y
+> > CONFIG_HAVE_KVM_MSI=y
+> > CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT=y
+> > CONFIG_KVM_VFIO=y
+> > CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=y
+> > CONFIG_KVM_COMPAT=y
+> > CONFIG_HAVE_KVM_IRQ_BYPASS=y
+> > CONFIG_KVM=y
+> > # CONFIG_KVM_INTEL is not set
+> > CONFIG_KVM_AMD=y
+> >
+> > [of course, I can send the whole kernel configuration file, if needed]
 
-https://people.debian.org/~sthibault/qemu.git slirp-2-win
-
-what it could look like. I don't have a windows box off hand, could
-somebody try it to confirm that it builds?
-
-Samuel
+-- 
+Eduardo
