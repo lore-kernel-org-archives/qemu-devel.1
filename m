@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gOkX5-0000EW-9B
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:28:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gOkYz-0001Dt-9y
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:30:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gOkWz-0005eo-QK
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:28:11 -0500
-References: <20181116155325.22428-1-berrange@redhat.com>
-	<20181116155325.22428-6-berrange@redhat.com>
-	<5acd44f8-69c7-a791-0ce0-49cad6e48423@redhat.com>
-	<20181119102732.GF19532@redhat.com>
-	<5a677a31-ce10-cc2a-58b1-5589c20970da@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <30b19e80-a7c5-8012-e9ff-86ae2025ca15@redhat.com>
-Date: Mon, 19 Nov 2018 08:27:56 -0600
+	(envelope-from <kwolf@redhat.com>) id 1gOkYu-0006wm-N7
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:30:09 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Mon, 19 Nov 2018 15:29:36 +0100
+Message-Id: <20181119142944.29061-2-kwolf@redhat.com>
+In-Reply-To: <20181119142944.29061-1-kwolf@redhat.com>
+References: <20181119142944.29061-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5a677a31-ce10-cc2a-58b1-5589c20970da@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/6] tests: add iotests helpers for dealing
- with TLS certificates
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/9] nvme: fix oob access issue(CVE-2018-16847)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +21,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On 11/19/18 5:04 AM, Max Reitz wrote:
+From: Li Qiang <liq3ea@gmail.com>
 
->>>> +tls_dir="${TEST_DIR}/tls"
->>>> +
->>>> +function tls_x509_cleanup()
->>>> +{
->>>> +    rm -f ${tls_dir}/*.pem
->>>> +    rm -f ${tls_dir}/*/*.pem
->>>> +    rmdir ${tls_dir}/*
->>>> +    rmdir ${tls_dir}
->>>
->>> Why not just:
->>> rm -rf $tls_dir
->>
->> Yeah, I guess we could do that for simplicity
->>
->>> Also, the quoting is a bit inconsistent. if ${TEST_DIR} can contain spaces,
->>> then all uses of ${tls_dir} need to be in "".
->>
->> Hmm, yes.
-> 
-> Which by the way is a very good reason *not* to blindly use "rm -r".
+Currently, the nvme_cmb_ops mr doesn't check the addr and size.
+This can lead an oob access issue. This is triggerable in the guest.
+Add check to avoid this issue.
 
-If we ever revive Jeff Cody's patches to let each test run with its own 
-temporary directory, then we don't need this function at all.  With that 
-in place, you either run the testsuite in debug mode (all temporary 
-files preserved) or in normal mode (./check itself does rm -rf on the 
-temporary directory).
+Fixes CVE-2018-16847.
 
-> 
-> So far we only seem to have one instance of "rm -r" in the iotests (and
-> that is on three files, so I don't even know why that has -r), and I'm
-> glad about that.
+Reported-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Li Qiang <liq3ea@gmail.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ hw/block/nvme.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-But until we have the global implementation of per-test temporary 
-directories with cleanup relegated to the testsuite driver, I'm fine 
-following your preference of explicit deletion of specific files rather 
-than recursive deletion of the tree, even if it is more lines of code.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 09d7c90259..d0226e7fdc 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1175,6 +1175,10 @@ static void nvme_cmb_write(void *opaque, hwaddr ad=
+dr, uint64_t data,
+     unsigned size)
+ {
+     NvmeCtrl *n =3D (NvmeCtrl *)opaque;
++
++    if (addr + size > NVME_CMBSZ_GETSIZE(n->bar.cmbsz)) {
++        return;
++    }
+     memcpy(&n->cmbuf[addr], &data, size);
+ }
+=20
+@@ -1183,6 +1187,9 @@ static uint64_t nvme_cmb_read(void *opaque, hwaddr =
+addr, unsigned size)
+     uint64_t val;
+     NvmeCtrl *n =3D (NvmeCtrl *)opaque;
+=20
++    if (addr + size > NVME_CMBSZ_GETSIZE(n->bar.cmbsz)) {
++        return 0;
++    }
+     memcpy(&val, &n->cmbuf[addr], size);
+     return val;
+ }
+--=20
+2.19.1
