@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gOkZE-0001Tf-4z
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:30:29 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gOkZJ-0001Xi-CJ
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:30:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gOkZB-0007AO-3I
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:30:24 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gOkZD-0007Cm-N8
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:30:29 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 19 Nov 2018 15:29:39 +0100
-Message-Id: <20181119142944.29061-5-kwolf@redhat.com>
+Date: Mon, 19 Nov 2018 15:29:43 +0100
+Message-Id: <20181119142944.29061-9-kwolf@redhat.com>
 In-Reply-To: <20181119142944.29061-1-kwolf@redhat.com>
 References: <20181119142944.29061-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/9] qcow2: Document some maximum size
- constraints
+Subject: [Qemu-devel] [PULL 8/9] file-posix: Fix shared locks on reopen
+ commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +25,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-Although off_t permits up to 63 bits (8EB) of file offsets, in
-practice, we're going to hit other limits first.  Document some
-of those limits in the qcow2 spec (some are inherent, others are
-implementation choices of qemu), and how choice of cluster size
-can influence some of the limits.
+s->locked_shared_perm is the set of bits locked in the file, which is
+the inverse of the permissions actually shared.  So we need to pass them
+as they are to raw_apply_lock_bytes() instead of inverting them again.
 
-While we cannot map any uncompressed virtual cluster to any
-address higher than 64 PB (56 bits) (due to the current L1/L2
-field encoding stopping at bit 55), qemu's cap of 8M for the
-refcount table can still access larger host addresses for some
-combinations of large clusters and small refcount_order.  For
-comparison, ext4 with 4k blocks caps files at 16PB.
-
-Another interesting limit: for compressed clusters, the L2 layout
-requires an ever-smaller maximum host offset as cluster size gets
-larger, down to a 512 TB maximum with 2M clusters.  In particular,
-note that with a cluster size of 8k or smaller, the L2 entry for
-a compressed cluster could technically point beyond the 64PB mark,
-but when you consider that with 8k clusters and refcount_order =3D 0,
-you cannot access beyond 512T without exceeding qemu's limit of an
-8M cap on the refcount table, it is unlikely that any image in the
-wild has attempted to do so.  To be safe, let's document that bits
-beyond 55 in a compressed cluster must be 0.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Reported-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- docs/interop/qcow2.txt | 38 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 36 insertions(+), 2 deletions(-)
+ block/file-posix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index 845d40a086..fb5cb47245 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -40,7 +40,18 @@ The first cluster of a qcow2 image contains the file h=
-eader:
-                     with larger cluster sizes.
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 58c86a01ea..07bbdab953 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -959,7 +959,7 @@ static void raw_reopen_commit(BDRVReopenState *state)
 =20
-          24 - 31:   size
--                    Virtual disk size in bytes
-+                    Virtual disk size in bytes.
-+
-+                    Note: qemu has an implementation limit of 32 MB as
-+                    the maximum L1 table size.  With a 2 MB cluster
-+                    size, it is unable to populate a virtual cluster
-+                    beyond 2 EB (61 bits); with a 512 byte cluster
-+                    size, it is unable to populate a virtual size
-+                    larger than 128 GB (37 bits).  Meanwhile, L1/L2
-+                    table layouts limit an image to no more than 64 PB
-+                    (56 bits) of populated clusters, and an image may
-+                    hit other limits first (such as a file system's
-+                    maximum size).
-=20
-          32 - 35:   crypt_method
-                     0 for no encryption
-@@ -326,6 +337,17 @@ in the image file.
- It contains pointers to the second level structures which are called ref=
-count
- blocks and are exactly one cluster in size.
-=20
-+Although a large enough refcount table can reserve clusters past 64 PB
-+(56 bits) (assuming the underlying protocol can even be sized that
-+large), note that some qcow2 metadata such as L1/L2 tables must point
-+to clusters prior to that point.
-+
-+Note: qemu has an implementation limit of 8 MB as the maximum refcount
-+table size.  With a 2 MB cluster size and a default refcount_order of
-+4, it is unable to reference host resources beyond 2 EB (61 bits); in
-+the worst case, with a 512 cluster size and refcount_order of 6, it is
-+unable to access beyond 32 GB (35 bits).
-+
- Given an offset into the image file, the refcount of its cluster can be
- obtained as follows:
-=20
-@@ -365,6 +387,16 @@ The L1 table has a variable size (stored in the head=
-er) and may use multiple
- clusters, however it must be contiguous in the image file. L2 tables are
- exactly one cluster in size.
-=20
-+The L1 and L2 tables have implications on the maximum virtual file
-+size; for a given L1 table size, a larger cluster size is required for
-+the guest to have access to more space.  Furthermore, a virtual
-+cluster must currently map to a host offset below 64 PB (56 bits)
-+(although this limit could be relaxed by putting reserved bits into
-+use).  Additionally, as cluster size increases, the maximum host
-+offset for a compressed cluster is reduced (a 2M cluster size requires
-+compressed clusters to reside below 512 TB (49 bits), and this limit
-+cannot be relaxed without an incompatible layout change).
-+
- Given an offset into the virtual disk, the offset into the image file ca=
-n be
- obtained as follows:
-=20
-@@ -427,7 +459,9 @@ Standard Cluster Descriptor:
- Compressed Clusters Descriptor (x =3D 62 - (cluster_bits - 8)):
-=20
-     Bit  0 - x-1:   Host cluster offset. This is usually _not_ aligned t=
-o a
--                    cluster or sector boundary!
-+                    cluster or sector boundary!  If cluster_bits is
-+                    small enough that this field includes bits beyond
-+                    55, those upper bits must be set to 0.
-=20
-          x - 61:    Number of additional 512-byte sectors used for the
-                     compressed data, beyond the sector containing the of=
-fset
+     /* Copy locks to the new fd before closing the old one. */
+     raw_apply_lock_bytes(NULL, rs->fd, s->locked_perm,
+-                         ~s->locked_shared_perm, false, &local_err);
++                         s->locked_shared_perm, false, &local_err);
+     if (local_err) {
+         /* shouldn't fail in a sane host, but report it just in case. */
+         error_report_err(local_err);
 --=20
 2.19.1
