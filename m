@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gOlvl-0002C0-Vi
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:47 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gOlvn-0002Fl-Ae
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gOlvk-0006wC-Ut
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:45 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52680)
+	(envelope-from <pm215@archaic.org.uk>) id 1gOlvm-0006x9-5A
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:47 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52678)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gOlvk-0006tw-ND
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:44 -0500
+	id 1gOlvl-0006rE-TJ
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:46 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gOlve-000659-Ar
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 15:57:38 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1gOlvb-00064S-IC
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 15:57:35 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Nov 2018 15:57:25 +0000
-Message-Id: <20181119155730.11758-6-peter.maydell@linaro.org>
+Date: Mon, 19 Nov 2018 15:57:22 +0000
+Message-Id: <20181119155730.11758-3-peter.maydell@linaro.org>
 In-Reply-To: <20181119155730.11758-1-peter.maydell@linaro.org>
 References: <20181119155730.11758-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 05/10] MAINTAINERS: Add entries for missing ARM
- boards
+Subject: [Qemu-devel] [PULL 02/10] target/arm: Fill in ARMISARegisters for
+ kvm64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,139 +32,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Thomas Huth <thuth@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Add entries for the boards "mcimx6ul-evk", "mcimx7d-sabre", "raspi2",
-"raspi3", "sabrelite", "vexpress-a15", "vexpress-a9" and "virt".
-While we're at it, also adjust the "i.MX31" section a little bit,
-so that the wildcards there do not match anymore for unrelated files
-(e.g. the new hw/misc/imx6ul_ccm.c file).
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-id: 1542184999-11145-1-git-send-email-thuth@redhat.com
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20181113180154.17903-3-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- MAINTAINERS | 70 +++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 65 insertions(+), 5 deletions(-)
+ target/arm/kvm64.c | 90 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 88 insertions(+), 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ba52b8c77b0..bb71f5e6500 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -528,14 +528,15 @@ L: qemu-arm@nongnu.org
- S: Odd Fixes
- F: hw/arm/gumstix.c
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 46fbe6d8ff6..0a502091e76 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -456,17 +456,40 @@ static inline void unset_feature(uint64_t *features, int feature)
+     *features &= ~(1ULL << feature);
+ }
  
--i.MX31
-+i.MX31 (kzm)
- M: Peter Chubb <peter.chubb@nicta.com.au>
- L: qemu-arm@nongnu.org
--S: Odd fixes
--F: hw/*/imx*
--F: include/hw/*/imx*
-+S: Odd Fixes
- F: hw/arm/kzm.c
--F: include/hw/arm/fsl-imx31.h
-+F: hw/*/imx_*
-+F: hw/*/*imx31*
-+F: include/hw/*/imx_*
-+F: include/hw/*/*imx31*
- 
- Integrator CP
- M: Peter Maydell <peter.maydell@linaro.org>
-@@ -544,6 +545,28 @@ S: Maintained
- F: hw/arm/integratorcp.c
- F: hw/misc/arm_integrator_debug.c
- 
-+MCIMX6UL EVK / i.MX6ul
-+M: Peter Maydell <peter.maydell@linaro.org>
-+R: Jean-Christophe Dubois <jcd@tribudubois.net>
-+L: qemu-arm@nongnu.org
-+S: Odd Fixes
-+F: hw/arm/mcimx6ul-evk.c
-+F: hw/arm/fsl-imx6ul.c
-+F: hw/misc/imx6ul_ccm.c
-+F: include/hw/arm/fsl-imx6ul.h
-+F: include/hw/misc/imx6ul_ccm.h
++static int read_sys_reg32(int fd, uint32_t *pret, uint64_t id)
++{
++    uint64_t ret;
++    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)&ret };
++    int err;
 +
-+MCIMX7D SABRE / i.MX7
-+M: Peter Maydell <peter.maydell@linaro.org>
-+R: Andrey Smirnov <andrew.smirnov@gmail.com>
-+L: qemu-arm@nongnu.org
-+S: Odd Fixes
-+F: hw/arm/mcimx7d-sabre.c
-+F: hw/arm/fsl-imx7.c
-+F: include/hw/arm/fsl-imx7.h
-+F: hw/pci-host/designware.c
-+F: include/hw/pci-host/designware.h
++    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U64);
++    err = ioctl(fd, KVM_GET_ONE_REG, &idreg);
++    if (err < 0) {
++        return -1;
++    }
++    *pret = ret;
++    return 0;
++}
 +
- MPS2
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
-@@ -577,6 +600,17 @@ L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/arm/palm.c
++static int read_sys_reg64(int fd, uint64_t *pret, uint64_t id)
++{
++    struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)pret };
++
++    assert((id & KVM_REG_SIZE_MASK) == KVM_REG_SIZE_U64);
++    return ioctl(fd, KVM_GET_ONE_REG, &idreg);
++}
++
+ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+ {
+     /* Identify the feature bits corresponding to the host CPU, and
+      * fill out the ARMHostCPUClass fields accordingly. To do this
+      * we have to create a scratch VM, create a single CPU inside it,
+      * and then query that CPU for the relevant ID registers.
+-     * For AArch64 we currently don't care about ID registers at
+-     * all; we just want to know the CPU type.
+      */
+     int fdarray[3];
+     uint64_t features = 0;
++    int err;
++
+     /* Old kernels may not know about the PREFERRED_TARGET ioctl: however
+      * we know these will only support creating one kind of guest CPU,
+      * which is its preferred CPU type. Fortunately these old kernels
+@@ -487,8 +510,71 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+     ahcf->target = init.target;
+     ahcf->dtb_compatible = "arm,arm-v8";
  
-+Raspberry Pi
-+M: Peter Maydell <peter.maydell@linaro.org>
-+R: Andrew Baumann <Andrew.Baumann@microsoft.com>
-+R: Philippe Mathieu-Daudé <f4bug@amsat.org>
-+L: qemu-arm@nongnu.org
-+S: Odd Fixes
-+F: hw/arm/raspi_platform.h
-+F: hw/*/bcm283*
-+F: include/hw/arm/raspi*
-+F: include/hw/*/bcm283*
++    err = read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64pfr0,
++                         ARM64_SYS_REG(3, 0, 0, 4, 0));
++    if (unlikely(err < 0)) {
++        /*
++         * Before v4.15, the kernel only exposed a limited number of system
++         * registers, not including any of the interesting AArch64 ID regs.
++         * For the most part we could leave these fields as zero with minimal
++         * effect, since this does not affect the values seen by the guest.
++         *
++         * However, it could cause problems down the line for QEMU,
++         * so provide a minimal v8.0 default.
++         *
++         * ??? Could read MIDR and use knowledge from cpu64.c.
++         * ??? Could map a page of memory into our temp guest and
++         *     run the tiniest of hand-crafted kernels to extract
++         *     the values seen by the guest.
++         * ??? Either of these sounds like too much effort just
++         *     to work around running a modern host kernel.
++         */
++        ahcf->isar.id_aa64pfr0 = 0x00000011; /* EL1&0, AArch64 only */
++        err = 0;
++    } else {
++        err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64pfr1,
++                              ARM64_SYS_REG(3, 0, 0, 4, 1));
++        err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64isar0,
++                              ARM64_SYS_REG(3, 0, 0, 6, 0));
++        err |= read_sys_reg64(fdarray[2], &ahcf->isar.id_aa64isar1,
++                              ARM64_SYS_REG(3, 0, 0, 6, 1));
 +
- Real View
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
-@@ -598,6 +632,19 @@ F: hw/*/pxa2xx*
- F: hw/misc/mst_fpga.c
- F: include/hw/arm/pxa.h
++        /*
++         * Note that if AArch32 support is not present in the host,
++         * the AArch32 sysregs are present to be read, but will
++         * return UNKNOWN values.  This is neither better nor worse
++         * than skipping the reads and leaving 0, as we must avoid
++         * considering the values in every case.
++         */
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar0,
++                              ARM64_SYS_REG(3, 0, 0, 2, 0));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar1,
++                              ARM64_SYS_REG(3, 0, 0, 2, 1));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar2,
++                              ARM64_SYS_REG(3, 0, 0, 2, 2));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar3,
++                              ARM64_SYS_REG(3, 0, 0, 2, 3));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar4,
++                              ARM64_SYS_REG(3, 0, 0, 2, 4));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar5,
++                              ARM64_SYS_REG(3, 0, 0, 2, 5));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.id_isar6,
++                              ARM64_SYS_REG(3, 0, 0, 2, 7));
++
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr0,
++                              ARM64_SYS_REG(3, 0, 0, 3, 0));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr1,
++                              ARM64_SYS_REG(3, 0, 0, 3, 1));
++        err |= read_sys_reg32(fdarray[2], &ahcf->isar.mvfr2,
++                              ARM64_SYS_REG(3, 0, 0, 3, 2));
++    }
++
+     kvm_arm_destroy_scratch_host_vcpu(fdarray);
  
-+SABRELITE / i.MX6
-+M: Peter Maydell <peter.maydell@linaro.org>
-+R: Jean-Christophe Dubois <jcd@tribudubois.net>
-+L: qemu-arm@nongnu.org
-+S: Odd Fixes
-+F: hw/arm/sabrelite.c
-+F: hw/arm/fsl-imx6.c
-+F: hw/misc/imx6_src.c
-+F: hw/ssi/imx_spi.c
-+F: include/hw/arm/fsl-imx6.h
-+F: include/hw/misc/imx6_src.h
-+F: include/hw/ssi/imx_spi.h
++    if (err < 0) {
++        return false;
++    }
 +
- Sharp SL-5500 (Collie) PDA
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
-@@ -611,6 +658,12 @@ L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/*/stellaris*
- 
-+Versatile Express
-+M: Peter Maydell <peter.maydell@linaro.org>
-+L: qemu-arm@nongnu.org
-+S: Maintained
-+F: hw/arm/vexpress.c
-+
- Versatile PB
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
-@@ -618,6 +671,13 @@ S: Maintained
- F: hw/*/versatile*
- F: hw/misc/arm_sysctl.c
- 
-+Virt
-+M: Peter Maydell <peter.maydell@linaro.org>
-+L: qemu-arm@nongnu.org
-+S: Maintained
-+F: hw/arm/virt*
-+F: include/hw/arm/virt.h
-+
- Xilinx Zynq
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- M: Alistair Francis <alistair@alistair23.me>
+    /* We can assume any KVM supporting CPU is at least a v8
+      * with VFPv4+Neon; this in turn implies most of the other
+      * feature bits.
 -- 
 2.19.1
