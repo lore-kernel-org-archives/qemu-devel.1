@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gOjdp-00005F-U0
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:31:06 -0500
+	(envelope-from <eskultet@redhat.com>) id 1gOjeZ-0000On-4Q
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:31:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gOjdp-0003c2-3G
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:31:05 -0500
-References: <1542632978-65604-1-git-send-email-spopovyc@redhat.com>
-	<20181119142719.3d702892@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <6ff0a235-0136-63b6-dd6a-cd78f656ca0e@redhat.com>
-Date: Mon, 19 Nov 2018 14:30:55 +0100
+	(envelope-from <eskultet@redhat.com>) id 1gOjeT-0004Uc-Jr
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:31:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42864)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1gOjeT-0004Ts-E2
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:31:45 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0F8AE88308
+	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 13:31:44 +0000 (UTC)
+Date: Mon, 19 Nov 2018 14:31:40 +0100
+From: Erik Skultety <eskultet@redhat.com>
+Message-ID: <20181119133140.GB24590@beluga.usersys.redhat.com>
+References: <20181116132931.8737-1-kraxel@redhat.com>
+	<20181116132931.8737-2-kraxel@redhat.com>
+	<18814747-c3b1-75c9-f04a-fed50f81b987@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181119142719.3d702892@bahia.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for 3.1] spapr: Fix ibm,
- max-associativity-domains property number of nodes
+Content-Disposition: inline
+In-Reply-To: <18814747-c3b1-75c9-f04a-fed50f81b987@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 1/3] qapi: Add "rendernode" display option
+ for egl-headless
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,114 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Serhii Popovych <spopovyc@redhat.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Eric Blake <eblake@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 19/11/2018 14:27, Greg Kurz wrote:
-> On Mon, 19 Nov 2018 08:09:38 -0500
-> Serhii Popovych <spopovyc@redhat.com> wrote:
-> 
->> Laurent Vivier reported off by one with maximum number of NUMA nodes
->> provided by qemu-kvm being less by one than required according to
->> description of "ibm,max-associativity-domains" property in LoPAPR.
->>
->> It appears that I incorrectly treated LoPAPR description of this
->> property assuming it provides last valid domain (NUMA node here)
->> instead of maximum number of domains.
->>
->>   ### Before hot-add
->>
->>   (qemu) info numa
->>   3 nodes
->>   node 0 cpus: 0
->>   node 0 size: 0 MB
->>   node 0 plugged: 0 MB
->>   node 1 cpus:
->>   node 1 size: 1024 MB
->>   node 1 plugged: 0 MB
->>   node 2 cpus:
->>   node 2 size: 0 MB
->>   node 2 plugged: 0 MB
->>
->>   $ numactl -H
->>   available: 2 nodes (0-1)
->>   node 0 cpus: 0
->>   node 0 size: 0 MB
->>   node 0 free: 0 MB
->>   node 1 cpus:
->>   node 1 size: 999 MB
->>   node 1 free: 658 MB
->>   node distances:
->>   node   0   1
->>     0:  10  40
->>     1:  40  10
->>
->>   ### Hot-add
->>
->>   (qemu) object_add memory-backend-ram,id=mem0,size=1G
->>   (qemu) device_add pc-dimm,id=dimm1,memdev=mem0,node=2
->>   (qemu) [   87.704898] pseries-hotplug-mem: Attempting to hot-add 4 ...
->>   <there is no "Initmem setup node 2 [mem 0xHEX-0xHEX]">
->>   [   87.705128] lpar: Attempting to resize HPT to shift 21
->>   ... <HPT resize messages>
->>
->>   ### After hot-add
->>
->>   (qemu) info numa
->>   3 nodes
->>   node 0 cpus: 0
->>   node 0 size: 0 MB
->>   node 0 plugged: 0 MB
->>   node 1 cpus:
->>   node 1 size: 1024 MB
->>   node 1 plugged: 0 MB
->>   node 2 cpus:
->>   node 2 size: 1024 MB
->>   node 2 plugged: 1024 MB
->>
->>   $ numactl -H
->>   available: 2 nodes (0-1)
->>   ^^^^^^^^^^^^^^^^^^^^^^^^
->>              Still only two nodes (and memory hot-added to node 0 below)
->>   node 0 cpus: 0
->>   node 0 size: 1024 MB
->>   node 0 free: 1021 MB
->>   node 1 cpus:
->>   node 1 size: 999 MB
->>   node 1 free: 658 MB
->>   node distances:
->>   node   0   1
->>     0:  10  40
->>     1:  40  10
->>
->> After fix applied numactl(8) reports 3 nodes available and memory
->> plugged into node 2 as expected.
->>
->> Fixes: da9f80fbad21 ("spapr: Add ibm,max-associativity-domains property")
->> Reported-by: Laurent Vivier <lvivier@redhat.com>
->> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
->> ---
->>  hw/ppc/spapr.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 7afd1a1..843ae6c 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1033,7 +1033,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
->>          cpu_to_be32(0),
->>          cpu_to_be32(0),
->>          cpu_to_be32(0),
->> -        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes - 1 : 0),
->> +        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 0),
-> 
-> Maybe simply cpu_to_be32(nb_numa_nodes) ?
+On Mon, Nov 19, 2018 at 07:10:21AM -0600, Eric Blake wrote:
+> On 11/16/18 7:29 AM, Gerd Hoffmann wrote:
+> > From: Erik Skultety <eskultet@redhat.com>
+> >
+> > Unlike SPICE, egl-headless doesn't offer a way of specifying the DRM
+> > node used for OpenGL, hence QEMU always selecting the first one that is
+> > available. Thus, add the 'rendernode' option for egl-headless to QAPI.
+> >
+> > Signed-off-by: Erik Skultety <eskultet@redhat.com>
+> > Message-id: 7658e15eca72d520e7a5fb1c2e724702d83d4f7f.1542362949.git.eskultet@redhat.com
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > ---
+> >   qapi/ui.json | 17 ++++++++++++++++-
+> >   1 file changed, 16 insertions(+), 1 deletion(-)
+>
+> This has already landed, but I noticed via an off-list discussion that it is
+> not introspectible through query-qmp-schema, because DisplayOptions is
+> currently used only for command line handling. I don't know off-hand whether
+> query-command-line-options even exposes the existence of DisplayOptions (not
 
-I agree the "? : " is not needed.
+It does not...
 
-With "cpu_to_be32(nb_numa_nodes)":
+> all of our command line options can be queried), but even if it does, I also
+> know that our current command line queries are not detailed enough to
+> readily expose the addition of a new optional member.  I think it would be
+> appropriate for the 3.1 timeframe to add a new QMP command that exposes the
+> display configuration set up at runtime, if only so that the DisplayOptions
+> becomes visible through query-qmp-commands as a bug fix for making this
+> change easier to use.
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+That would be awesome
 
-Thanks,
-Laurent
+Erik
