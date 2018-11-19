@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMP-0001mg-5c
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:03 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMR-0001mo-B8
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMN-0002wr-Fb
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:00 -0500
-Received: from cmccmta3.chinamobile.com ([221.176.66.81]:21649)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiML-0002pK-Sp
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:08:59 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMO-0002yl-No
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:03 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Mon, 19 Nov 2018 20:08:14 +0800
-Message-Id: <20181119120820.29878-17-maozhongyi@cmss.chinamobile.com>
+Date: Mon, 19 Nov 2018 20:08:00 +0800
+Message-Id: <20181119120820.29878-3-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
 References: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH 16/22] timer/etraxfs_timer: Convert sysbus init
+Subject: [Qemu-devel] [PATCH 02/22] block/noenand: Convert sysbus init
  function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,58 +21,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, edgar.iglesias@gmail.com, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-etraxfs_timer_class_init().
+onenand_class_init().
 
-Cc: edgar.iglesias@gmail.com
+Cc: kwolf@redhat.com
+Cc: mreitz@redhat.com
+Cc: qemu-block@nongnu.org
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 ---
- hw/timer/etraxfs_timer.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ hw/block/onenand.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/hw/timer/etraxfs_timer.c b/hw/timer/etraxfs_timer.c
-index d13bc30b2d..e8c53b836e 100644
---- a/hw/timer/etraxfs_timer.c
-+++ b/hw/timer/etraxfs_timer.c
-@@ -315,7 +315,7 @@ static void etraxfs_timer_reset(void *opaque)
-     qemu_irq_lower(t->irq);
- }
+diff --git a/hw/block/onenand.c b/hw/block/onenand.c
+index 0cb8d7fa13..6bf89aac1d 100644
+--- a/hw/block/onenand.c
++++ b/hw/block/onenand.c
+@@ -768,9 +768,8 @@ static const MemoryRegionOps onenand_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
  
--static int etraxfs_timer_init(SysBusDevice *dev)
-+static void etraxfs_timer_realize(DeviceState *dev, Error **errp)
+-static int onenand_initfn(SysBusDevice *sbd)
++static void onenand_realize(DeviceState *dev, Error **errp)
  {
-     ETRAXTimerState *t = ETRAX_TIMER(dev);
- 
-@@ -326,21 +326,20 @@ static int etraxfs_timer_init(SysBusDevice *dev)
-     t->ptimer_t1 = ptimer_init(t->bh_t1, PTIMER_POLICY_DEFAULT);
-     t->ptimer_wd = ptimer_init(t->bh_wd, PTIMER_POLICY_DEFAULT);
- 
--    sysbus_init_irq(dev, &t->irq);
--    sysbus_init_irq(dev, &t->nmi);
-+    sysbus_init_irq(SYS_BUS_DEVICE(dev), &t->irq);
-+    sysbus_init_irq(SYS_BUS_DEVICE(dev), &t->nmi);
- 
-     memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t,
-                           "etraxfs-timer", 0x5c);
--    sysbus_init_mmio(dev, &t->mmio);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &t->mmio);
-     qemu_register_reset(etraxfs_timer_reset, t);
+-    DeviceState *dev = DEVICE(sbd);
+     OneNANDState *s = ONE_NAND(dev);
+     uint32_t size = 1 << (24 + ((s->id.dev >> 4) & 7));
+     void *ram;
+@@ -790,14 +789,14 @@ static int onenand_initfn(SysBusDevice *sbd)
+                           0xff, size + (size >> 5));
+     } else {
+         if (blk_is_read_only(s->blk)) {
+-            error_report("Can't use a read-only drive");
+-            return -1;
++            error_setg(errp, "Can't use a read-only drive");
++            return;
+         }
+         blk_set_perm(s->blk, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
+                      BLK_PERM_ALL, &local_err);
+         if (local_err) {
+-            error_report_err(local_err);
+-            return -1;
++            error_propagate(errp, local_err);
++            return;
+         }
+         s->blk_cur = s->blk;
+     }
+@@ -814,15 +813,14 @@ static int onenand_initfn(SysBusDevice *sbd)
+     s->data[1][0] = ram + ((0x0200 + (1 << (PAGE_SHIFT - 1))) << s->shift);
+     s->data[1][1] = ram + ((0x8010 + (1 << (PAGE_SHIFT - 6))) << s->shift);
+     onenand_mem_setup(s);
+-    sysbus_init_irq(sbd, &s->intr);
+-    sysbus_init_mmio(sbd, &s->container);
++    sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->intr);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->container);
+     vmstate_register(dev,
+                      ((s->shift & 0x7f) << 24)
+                      | ((s->id.man & 0xff) << 16)
+                      | ((s->id.dev & 0xff) << 8)
+                      | (s->id.ver & 0xff),
+                      &vmstate_onenand, s);
 -    return 0;
  }
  
- static void etraxfs_timer_class_init(ObjectClass *klass, void *data)
+ static Property onenand_properties[] = {
+@@ -837,9 +835,8 @@ static Property onenand_properties[] = {
+ static void onenand_class_init(ObjectClass *klass, void *data)
  {
--    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
  
--    sdc->init = etraxfs_timer_init;
-+    dc->realize = etraxfs_timer_realize;
+-    k->init = onenand_initfn;
++    dc->realize = onenand_realize;
+     dc->reset = onenand_system_reset;
+     dc->props = onenand_properties;
  }
- 
- static const TypeInfo etraxfs_timer_info = {
 -- 
 2.17.1
