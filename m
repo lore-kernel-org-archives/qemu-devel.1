@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gOkZE-0001Te-4v
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:30:25 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gOkZL-0001ZW-BE
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:30:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gOkZ9-00079r-VY
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:30:24 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gOkZF-0007F4-DB
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:30:31 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 19 Nov 2018 15:29:42 +0100
-Message-Id: <20181119142944.29061-8-kwolf@redhat.com>
+Date: Mon, 19 Nov 2018 15:29:44 +0100
+Message-Id: <20181119142944.29061-10-kwolf@redhat.com>
 In-Reply-To: <20181119142944.29061-1-kwolf@redhat.com>
 References: <20181119142944.29061-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 7/9] block: Always abort reopen after prepare
- succeeded
+Subject: [Qemu-devel] [PULL 9/9] iotests: Test file-posix locking and reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +26,123 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-bdrv_reopen_multiple() does not invoke bdrv_reopen_abort() for the
-element of the reopen queue for which bdrv_reopen_prepare() failed,
-because it assumes that the prepare function will have rolled back all
-changes already.
-
-However, bdrv_reopen_prepare() does not do this in every case: It may
-notice an error after BlockDriver.bdrv_reopen_prepare() succeeded, and
-it will not invoke BlockDriver.bdrv_reopen_abort() then; and neither
-will bdrv_reopen_multiple(), as explained above.
-
-This is wrong because we must always call .bdrv_reopen_commit() or
-.bdrv_reopen_abort() after .bdrv_reopen_prepare() has succeeded.
-Otherwise, the block driver has no chance to undo what it has done in
-its implementation of .bdrv_reopen_prepare().
-
-To fix this, bdrv_reopen_prepare() has to call .bdrv_reopen_abort() if
-it wants to return an error after .bdrv_reopen_prepare() has succeeded.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ tests/qemu-iotests/182     | 71 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/182.out |  9 +++++
+ 2 files changed, 80 insertions(+)
 
-diff --git a/block.c b/block.c
-index fd67e14dfa..3feac08535 100644
---- a/block.c
-+++ b/block.c
-@@ -3201,6 +3201,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_sta=
-te, BlockReopenQueue *queue,
-     QDict *orig_reopen_opts;
-     char *discard =3D NULL;
-     bool read_only;
-+    bool drv_prepared =3D false;
+diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
+index 4b31592fb8..3b7689c1d5 100755
+--- a/tests/qemu-iotests/182
++++ b/tests/qemu-iotests/182
+@@ -31,6 +31,7 @@ status=3D1	# failure is the default!
+ _cleanup()
+ {
+     _cleanup_test_img
++    rm -f "$TEST_IMG.overlay"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
 =20
-     assert(reopen_state !=3D NULL);
-     assert(reopen_state->bs->drv !=3D NULL);
-@@ -3285,6 +3286,8 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_sta=
-te, BlockReopenQueue *queue,
-         goto error;
-     }
+@@ -71,6 +72,76 @@ echo 'quit' | $QEMU -nographic -monitor stdio \
 =20
-+    drv_prepared =3D true;
+ _cleanup_qemu
+=20
++echo
++echo '=3D=3D=3D Testing reopen =3D=3D=3D'
++echo
 +
-     /* Options that are not handled are only okay if they are unchanged
-      * compared to the old state. It is expected that some options are o=
-nly
-      * used for the initial open, but not reopen (e.g. filename) */
-@@ -3350,6 +3353,15 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_st=
-ate, BlockReopenQueue *queue,
-     reopen_state->options =3D qobject_ref(orig_reopen_opts);
-=20
- error:
-+    if (ret < 0 && drv_prepared) {
-+        /* drv->bdrv_reopen_prepare() has succeeded, so we need to
-+         * call drv->bdrv_reopen_abort() before signaling an error
-+         * (bdrv_reopen_multiple() will not call bdrv_reopen_abort()
-+         * when the respective bdrv_reopen_prepare() has failed) */
-+        if (drv->bdrv_reopen_abort) {
-+            drv->bdrv_reopen_abort(reopen_state);
-+        }
-+    }
-     qemu_opts_del(opts);
-     qobject_unref(orig_reopen_opts);
-     g_free(discard);
++# This tests that reopening does not unshare any permissions it should
++# not unshare
++# (There was a bug where reopening shared exactly the opposite of the
++# permissions it was supposed to share)
++
++_launch_qemu
++
++_send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'qmp_capabilities'}" \
++    'return'
++
++# Open the image without any format layer (we are not going to access
++# it, so that is fine)
++# This should keep all permissions shared.
++success_or_failure=3Dy _send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'blockdev-add',
++      'arguments': {
++          'node-name': 'node0',
++          'driver': 'file',
++          'filename': '$TEST_IMG',
++          'locking': 'on'
++          } }" \
++    'return' \
++    'error'
++
++# This snapshot will perform a reopen to drop R/W to RO.
++# It should still keep all permissions shared.
++success_or_failure=3Dy _send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'blockdev-snapshot-sync',
++      'arguments': {
++          'node-name': 'node0',
++          'snapshot-file': '$TEST_IMG.overlay',
++          'snapshot-node-name': 'node1'
++      } }" \
++    'return' \
++    'error'
++
++# Now open the same file again
++# This does not require any permissions (and does not unshare any), so
++# this will not conflict with node0.
++success_or_failure=3Dy _send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'blockdev-add',
++      'arguments': {
++          'node-name': 'node1',
++          'driver': 'file',
++          'filename': '$TEST_IMG',
++          'locking': 'on'
++          } }" \
++    'return' \
++    'error'
++
++# Now we attach the image to a virtio-blk device.  This device does
++# require some permissions (at least WRITE and READ_CONSISTENT), so if
++# reopening node0 unshared any (which it should not have), this will
++# fail (but it should not).
++success_or_failure=3Dy _send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'device_add',
++      'arguments': {
++          'driver': 'virtio-blk',
++          'drive': 'node1'
++      } }" \
++    'return' \
++    'error'
++
++_cleanup_qemu
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/182.out b/tests/qemu-iotests/182.out
+index f1463c8862..af501ca3f3 100644
+--- a/tests/qemu-iotests/182.out
++++ b/tests/qemu-iotests/182.out
+@@ -5,4 +5,13 @@ Starting QEMU
+ Starting a second QEMU using the same image should fail
+ QEMU_PROG: -drive file=3DTEST_DIR/t.qcow2,if=3Dnone,id=3Ddrive0,file.loc=
+king=3Don: Failed to get "write" lock
+ Is another process using the image [TEST_DIR/t.qcow2]?
++
++=3D=3D=3D Testing reopen =3D=3D=3D
++
++{"return": {}}
++{"return": {}}
++Formatting 'TEST_DIR/t.qcow2.overlay', fmt=3Dqcow2 size=3D197120 backing=
+_file=3DTEST_DIR/t.qcow2 backing_fmt=3Dfile cluster_size=3D65536 lazy_ref=
+counts=3Doff refcount_bits=3D16
++{"return": {}}
++{"return": {}}
++{"return": {}}
+ *** done
 --=20
 2.19.1
