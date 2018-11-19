@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gP4pq-00076g-38
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:08:55 -0500
+	(envelope-from <philmd@redhat.com>) id 1gP4tM-000832-Mr
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:12:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gP4pk-0001tP-4u
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:08:54 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35207)
+	(envelope-from <philmd@redhat.com>) id 1gP4tJ-0003ib-Is
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:12:32 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43297)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gP4pj-0001t6-V7
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:08:48 -0500
-Received: by mail-wr1-x444.google.com with SMTP id 96so1721036wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 04:08:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gP4tJ-0003hm-CG
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:12:29 -0500
+Received: by mail-wr1-f65.google.com with SMTP id r10so1706688wrs.10
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 04:12:28 -0800 (PST)
+References: <20181116155325.22428-1-berrange@redhat.com>
+	<20181116155325.22428-2-berrange@redhat.com>
+	<23c92cc5-029f-ec4c-03d0-d56045001cab@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b922d120-6303-a26e-0e08-d291b92a2329@redhat.com>
+Date: Mon, 19 Nov 2018 17:29:15 +0100
 MIME-Version: 1.0
-References: <20181107151311.1058-1-marcandre.lureau@redhat.com>
-	<20181112160124.GT3602@redhat.com>
-In-Reply-To: <20181112160124.GT3602@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 20 Nov 2018 16:08:34 +0400
-Message-ID: <CAJ+F1CKdGfDas5jynuUD35CCyNVNavJnsAnitZDk4d8EMk17=g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v2] vhost-user: define conventions
- for vhost-user backends
+In-Reply-To: <23c92cc5-029f-ec4c-03d0-d56045001cab@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/6 for-3.1] nbd: fix whitespace in server
+ error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,122 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Victor Kaplansky <victork@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, "Liu, Changpeng" <changpeng.liu@intel.com>
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Hi
-On Mon, Nov 12, 2018 at 8:03 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
->
-> On Wed, Nov 07, 2018 at 07:13:11PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > As discussed during "[PATCH v4 00/29] vhost-user for input & GPU"
-> > review, let's define a common set of backend conventions to help with
-> > management layer implementation, and interoperability.
-> >
-> > v2:
-> >  - use a vhost-user.json schema to discover backends and describe
-> >    capability format
-> >  - drop --pidfile
-> >  - add some notes about daemonizing & stdin/out/err
-> >
-> > Cc: libvir-list@redhat.com
-> > Cc: Gerd Hoffmann <kraxel@redhat.com>
-> > Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Cc: Changpeng Liu <changpeng.liu@intel.com>
-> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Cc: Felipe Franciosi <felipe@nutanix.com>
-> > Cc: Gonglei <arei.gonglei@huawei.com>
-> > Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Victor Kaplansky <victork@redhat.com>
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  MAINTAINERS                  |   1 +
-> >  docs/interop/vhost-user.json | 219 +++++++++++++++++++++++++++++++++++
-> >  docs/interop/vhost-user.txt  | 101 +++++++++++++++-
-> >  3 files changed, 319 insertions(+), 2 deletions(-)
-> >  create mode 100644 docs/interop/vhost-user.json
->
->
-> > diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.jso=
-n
-> > new file mode 100644
-> > index 0000000000..91b5bf499e
-> > --- /dev/null
-> > +++ b/docs/interop/vhost-user.json
-> > @@ -0,0 +1,219 @@
-> > +# -*- Mode: Python -*-
-> > +#
-> > +# Copyright (C) 2018 Red Hat, Inc.
-> > +#
-> > +# Authors:
-> > +#  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > +#
-> > +# This work is licensed under the terms of the GNU GPL, version 2 or
-> > +# later. See the COPYING file in the top-level directory.
-> > +
-> > +##
-> > +# =3D vhost user backend discovery & capabilities
-> > +##
-> > +
-> > +##
-> > +# @VHostUserBackendType:
-> > +#
-> > +# List the various vhost user backend types.
-> > +#
-> > +# @net: virtio net
-> > +# @block: virtio block
-> > +# @console: virtio console
-> > +# @rng: virtio rng
-> > +# @balloon: virtio balloon
-> > +# @rpmsg: virtio remote processor messaging
-> > +# @scsi: virtio scsi
-> > +# @9p: 9p virtio console
-> > +# @rproc-serial: virtio remoteproc serial link
-> > +# @caif: virtio caif
-> > +# @gpu: virtio gpu
-> > +# @input: virtio input
-> > +# @vsock: virtio vsock transport
-> > +# @crypto: virtio crypto
->
-> Is it possible to actually use an external backend process with
-> all these yet ?  If not, perhaps we should only start with the
-> backends that will be usable immediately ?
+On 16/11/18 17:01, Eric Blake wrote:
+> On 11/16/18 9:53 AM, Daniel P. Berrangé wrote:
+>> A space was missing after the option number was printed:
+>>
+>>    Option 0x8not permitted before TLS
+>>
+>> becomes
+>>
+>>    Option 0x8 not permitted before TLS
+>>
+>> This fixes
+>>
+>>    commit 3668328303429f3bc93ab3365c66331600b06a2d
+>>    Author: Eric Blake <eblake@redhat.com>
+>>    Date:   Fri Oct 14 13:33:09 2016 -0500
+>>
+>>      nbd: Send message along with server NBD_REP_ERR errors
+>>
+>> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+>> ---
+>>   nbd/server.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/nbd/server.c b/nbd/server.c
+>> index 4e8f5ae51b..12e8139f95 100644
+>> --- a/nbd/server.c
+>> +++ b/nbd/server.c
+>> @@ -1135,7 +1135,7 @@ static int nbd_negotiate_options(NBDClient 
+>> *client, uint16_t myflags,
+>>               default:
+>>                   ret = nbd_opt_drop(client, NBD_REP_ERR_TLS_REQD, errp,
+>> -                                   "Option 0x%" PRIx32
+>> +                                   "Option 0x%" PRIx32 " "
+>>                                      "not permitted before TLS", option);
+> 
+> Visually, I'd include the space in the next line instead of on its own 
 
-No, most of them don't have vhost-user support in qemu. Nevertheless,
-I think the vhost-user spec should cover existing virtio devices, and
-not be limited to what qemu can do today, for interoperability.
+Agreed :)
 
->
-> > +#
-> > +# Since: 3.2
-> > +##
-> > +{
-> > +  'enum': 'VHostUserBackendType',
-> > +  'data': [ 'net', 'block', 'console', 'rng', 'balloon', 'rpmsg',
-> > +            'scsi', '9p', 'rproc-serial', 'caif', 'gpu', 'input', 'vso=
-ck',
-> > +            'crypto' ]
-> > +}
->
-> Regardless of the answer to the above question,
->
->   Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-thanks
-
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+> (but that's aesthetics, not semantic). Agree that this is 3.1 material; 
+> I'll queue it up and send a PR on Monday.
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
