@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gOoGZ-0004CM-G9
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:27:24 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gOoMA-0006fG-6P
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:33:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gOoGY-0006j1-HH
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:27:23 -0500
-Date: Mon, 19 Nov 2018 13:27:14 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181119131625-mutt-send-email-mst@kernel.org>
-References: <20181105014047.26447-1-sameo@linux.intel.com>
-	<20181105014047.26447-6-sameo@linux.intel.com>
-	<20181108151623.4de26ecb@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gOoM7-0006fS-0C
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:33:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39052)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gOoM6-0006eC-Nt
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:33:06 -0500
+Date: Mon, 19 Nov 2018 19:32:38 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181119193238.117c2f4e.cohuck@redhat.com>
+In-Reply-To: <20181119125519-mutt-send-email-mst@kernel.org>
+References: <20181114233831.10374-1-ehabkost@redhat.com>
+	<c1b4a0ee39dfddeb19f1be46710c10cbefd3f07a.camel@redhat.com>
+	<20181116034551.GK3807@habkost.net>
+	<20181119114105.4da89f2c.cohuck@redhat.com>
+	<20181119125519-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181108151623.4de26ecb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 05/24] hw: acpi: Implement XSDT support
- for RSDP
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] virtio: Provide
+ version-specific variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,123 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, xen-devel@lists.xenproject.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-On Thu, Nov 08, 2018 at 03:16:23PM +0100, Igor Mammedov wrote:
-> On Mon,  5 Nov 2018 02:40:28 +0100
-> Samuel Ortiz <sameo@linux.intel.com> wrote:
-> 
-> > XSDT is the 64-bit version of the legacy ACPI RSDT (Root System
-> > Description Table). RSDT only allow for 32-bit addressses and have thus
-> > been deprecated. Since ACPI version 2.0, RSDPs should point at XSDTs and
-> > no longer RSDTs, although RSDTs are still supported for backward
-> > compatibility.
+On Mon, 19 Nov 2018 13:07:59 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+> On Mon, Nov 19, 2018 at 11:41:05AM +0100, Cornelia Huck wrote:
+> > On Fri, 16 Nov 2018 01:45:51 -0200
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >   
+> > > On Thu, Nov 15, 2018 at 05:29:24PM +0100, Andrea Bolognani wrote:  
+
+> > > > And once that's done, "non-transitional" (while matching the
+> > > > language of the spec) starts to look a bit unnecessary when you
+> > > > could simply have
+> > > > 
+> > > >   virtio-*-pci
+> > > >   virtio-*-pci-1
+> > > >   virtio-*-pci-1-transitional
+> > > > 
+> > > > instead. But I don't feel as strongly about this as I do about
+> > > > keeping the virtio revision in the device name :)    
+> > > 
+> > > I like that suggestion.  Makes the device names more explicit
+> > > _and_ shorter.  I'll do that in v3.  
 > > 
-> > Since version 2.0, RSDPs should add an extended checksum, a complete table
-> > length and a version field to the table.
+> > OTOH, that would mean we'd need to introduce new device types if we
+> > ever start to support a virtio 2.x standard. My understanding was that
+> > we'll want separate device types for transitional and non-transitional
+> > for two reasons: the bus which a device can be plugged into, and
+> > changing ids. Do we really expect huge changes in a possible 2.x
+> > standard that affect virtio-pci only, and not other virtio transports
+> > as well?  
 > 
-> This patch re-implements what arm/virt board already does
-> and fixes checksum bug in the later and at the same time
-> without a user (within the patch).
+> Yes I think adding a version there is a mistake.
+> transitional/legacy/non-transitional are spec terms so
+> they are unlikely to change abruptly. OTOH virtio TC can
+> just decide next version is 2.0 on a drop of a hat.
+
+I don't really expect that to happen on a drop of a hat, though :) It's
+probably more likely when we either have some really major change (and
+we messed up if we can't handle that via the virtio compatibility
+mechanism), or we go up from 1.x because x is getting too large (won't
+happen in the near future.)
+
+But yes, we should be able to handle further updates without any change
+like the ones complicating things now for virtio-pci, as that was
+mostly the transition to a proper standard while flushing out some
+design problems that you only become aware of later.
+
 > 
-> I'd suggest redo it a way similar to FADT refactoring
->   patch 1: fix checksum bug in virt/arm
->   patch 2: update reference tables in test
->   patch 3: introduce AcpiRsdpData similar to commit 937d1b587
->              (both arm and x86) wich stores all data in hos byte order
->   patch 4: convert arm's impl. to build_append_int_noprefix() API (commit 5d7a334f7)
->            ... move out to aml-build.c
->   patch 5: reuse generalized arm's build_rsdp() for x86, dropping x86 specific one
->       amending it to generate rev1 variant defined by revision in AcpiRsdpData
->       (commit dd1b2037a)
+> And I strongly believe command line users really really do not want all
+> this mess. Even adding "pci" is the name confuses people (what are the
+> other options?). For command line model=virtio is pretty much perfect.
+
+I'd argue that it's problematic on platforms where you have different
+options for virtio transports. What does "model=virtio" mean? Always
+virtio-pci, if available? Or rather virtio-<transport>, with
+<transport> being the best option for the machine?
+
+> So all these names are there primarily for libvirt's benefit.
+> And the only input from libvirt devs so far
+> has been that it's unclear how does cross version
+> migration work. That needs to be addressed in some way.
 > 
->   'make check V=1' shouldn't observe any ACPI tables changes after patch 2.
-
-And your next suggestion is to add patch 6.  I guess it's doable but
-this will make a single patch a 6 patch series. At this rate this series
-will be at 200 patches easily.
-
-Automated checks are cool but hey it's easy to see what changed in a
-disassembled table, and we do not update them blindly. So just note in
-the comment that there's a table change for ARM and expected files need
-to be updated and we should be fine IMHO.
-
-> > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > ---
-> >  include/hw/acpi/aml-build.h |  3 +++
-> >  hw/acpi/aml-build.c         | 37 +++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 40 insertions(+)
-> > 
-> > diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> > index c9bcb32d81..3580d0ce90 100644
-> > --- a/include/hw/acpi/aml-build.h
-> > +++ b/include/hw/acpi/aml-build.h
-> > @@ -393,6 +393,9 @@ void
-> >  build_rsdp(GArray *table_data,
-> >             BIOSLinker *linker, unsigned rsdt_tbl_offset);
-> >  void
-> > +build_rsdp_xsdt(GArray *table_data,
-> > +                BIOSLinker *linker, unsigned xsdt_tbl_offset);
-> > +void
-> >  build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
-> >             const char *oem_id, const char *oem_table_id);
-> >  void
-> > diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> > index 51b608432f..a030d40674 100644
-> > --- a/hw/acpi/aml-build.c
-> > +++ b/hw/acpi/aml-build.c
-> > @@ -1651,6 +1651,43 @@ build_xsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
-> >                   (void *)xsdt, "XSDT", xsdt_len, 1, oem_id, oem_table_id);
-> >  }
-> >  
-> > +/* RSDP pointing at an XSDT */
-> > +void
-> > +build_rsdp_xsdt(GArray *rsdp_table,
-> > +                BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> > +{
-> > +    AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
-> > +    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
-> > +    unsigned xsdt_pa_offset =
-> > +        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
-> > +    unsigned xsdt_offset =
-> > +        (char *)&rsdp->length - rsdp_table->data;
-
-There's a cleaner way to get at the offsets than pointer math:
-1. save rsdp_table length before you push
-2. add offset_of for fields
-
-If switching to build_append_int_noprefix then it's even
-easier - just save length before you append the int
-you intend to patch.
-
-
-> > +
-> > +    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
-> > +                             true /* fseg memory */);
-> > +
-> > +    memcpy(&rsdp->signature, "RSD PTR ", 8);
-> > +    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, 6);
-> > +    rsdp->length = cpu_to_le32(sizeof(*rsdp));
-> > +    /* version 2, we will use the XSDT pointer */
-> > +    rsdp->revision = 0x02;
-> > +
-> > +    /* Address to be filled by Guest linker */
-> > +    bios_linker_loader_add_pointer(linker,
-> > +        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
-> > +        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
-> > +
-> > +    /* Legacy checksum to be filled by Guest linker */
-> > +    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> > +        (char *)rsdp - rsdp_table->data, xsdt_offset,
-> > +        (char *)&rsdp->checksum - rsdp_table->data);
-> > +
-> > +    /* Extended checksum to be filled by Guest linker */
-> > +    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> > +        (char *)rsdp - rsdp_table->data, sizeof *rsdp,
-> > +        (char *)&rsdp->extended_checksum - rsdp_table->data);
-> > +}
-> > +
-> >  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
-> >                         uint64_t len, int node, MemoryAffinityFlags flags)
-> >  {
+> So can we maybe start with a libvirt domain xml patch, with an
+> implementation for existing QEMU, get that acked, and then just map it
+> back to qemu command line as directly as possible?
+> 
