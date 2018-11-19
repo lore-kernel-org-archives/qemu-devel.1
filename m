@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gOlmZ-0003cy-Il
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:48:16 -0500
+	(envelope-from <macro@linux-mips.org>) id 1gOlme-0003k1-SR
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:48:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gOlmX-00018U-Se
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:48:15 -0500
-Received: from m12-16.163.com ([220.181.12.16]:52575)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gOlmX-00017h-8l
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:48:13 -0500
-From: Li Qiang <liq3ea@163.com>
-Date: Mon, 19 Nov 2018 07:47:37 -0800
-Message-Id: <20181119154737.9840-4-liq3ea@163.com>
-In-Reply-To: <20181119154737.9840-1-liq3ea@163.com>
-References: <20181119154737.9840-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH 3/3] fw_cfg: make qemu_extra_params_fw locally
+	(envelope-from <macro@linux-mips.org>) id 1gOlma-00019r-UH
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:48:20 -0500
+Received: from eddie.linux-mips.org ([148.251.95.138]:48182
+	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <macro@linux-mips.org>) id 1gOlma-00018t-LH
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:48:16 -0500
+Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
+	with ESMTP id S23992246AbeKSPqaSR0tA (ORCPT
+	<rfc822;qemu-devel@nongnu.org>); Mon, 19 Nov 2018 16:46:30 +0100
+Date: Mon, 19 Nov 2018 15:46:30 +0000 (GMT)
+Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
+From: "Maciej W. Rozycki" <macro@linux-mips.org>
+In-Reply-To: <20181119152952.GA2405@sx9>
+Message-ID: <alpine.LFD.2.21.1811191537140.22162@eddie.linux-mips.org>
+References: <20181118203312.5376-1-f4bug@amsat.org> <20181119152952.GA2405@sx9>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] docker: Add
+ gentoo-mipsr5900el-cross image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, kraxel@redhat.com, lersek@redhat.com, philmd@redhat.com, armbru@redhat.com
-Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
+To: Fredrik Noring <noring@nocrew.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Mike Frysinger <vapier@gentoo.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>
 
-qemu_extra_params_fw[] has external linkage, but is used
-only in fw_cfg_bootsplash(), it makes sense to make it
-locally.
+On Mon, 19 Nov 2018, Fredrik Noring wrote:
 
-Suggested-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- hw/nvram/fw_cfg.c       | 1 +
- include/sysemu/sysemu.h | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+> > The first patch adds a cross toolchain for the R5900 MIPS.
+> > It is working correctly but the patches provided by Fredrik in [1] don't
+> > have proper S-o-b, thus it is tagged RFC.
+> > Fredrik: any update on the status of those patches upstream?
+> 
+> With GCC 8.2.0 and a current Gentoo this is even simpler. You should
+> only need commit d728eb9085d8 ("MIPS: Default to --with-llsc for the
+> R5900 Linux target as well"):
+> 
+> https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=d728eb9085d8
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 0489d63a1b..4eddd6a885 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -120,6 +120,7 @@ static void fw_cfg_bootsplash(FWCfgState *s)
- {
-     const char *boot_splash_filename = NULL;
-     const char *boot_splash_time = NULL;
-+    uint8_t qemu_extra_params_fw[2];
-     char *filename, *file_data;
-     gsize file_size;
-     int file_type;
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 8d6095d98b..f8608d24d9 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -133,7 +133,6 @@ extern uint8_t *boot_splash_filedata;
- extern size_t boot_splash_filedata_size;
- extern bool enable_mlock;
- extern bool enable_cpu_pm;
--extern uint8_t qemu_extra_params_fw[2];
- extern QEMUClockType rtc_clock;
- extern const char *mem_path;
- extern int mem_prealloc;
--- 
-2.17.1
+ Of course you can instead just set the default manually by using 
+`--with-llsc' when configuring GCC or specify `-mllsc' explicitly in 
+CFLAGS with a compiler that has been already built without that set by 
+default.
+
+> For the o32 ABI with Glibc, only commit 8e3c00db16fc ("MIPS: Use `.set
+> mips2' to emulate LL/SC for the R5900 too") is needed:
+> 
+> https://sourceware.org/git/?p=glibc.git;a=commit;h=8e3c00db16fc
+> 
+> Eventually, with a future GCC/Glibc release, no patches will be needed.
+
+ For the record the glibc change will be available with upcoming glibc 
+2.29, currently scheduled Feb 1st, 2019, and the GCC change will appear in 
+GCC 9.1.0, currently scheduled Mar-Apr 2019.
+
+ FWIW,
+
+  Maciej
