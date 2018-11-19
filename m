@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gOoSB-0001KQ-NG
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:39:26 -0500
+	(envelope-from <mst@redhat.com>) id 1gOoW2-0002gH-S8
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:43:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gOoS8-0000fQ-CX
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:39:23 -0500
-Received: from mail-qk1-f180.google.com ([209.85.222.180]:42718)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gOoS6-0008Ow-Bo
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:39:18 -0500
-Received: by mail-qk1-f180.google.com with SMTP id m5so50310962qka.9
-	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 10:38:51 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1gOoVz-0000x6-L2
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:43:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43766)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gOoVz-0000vG-Cv
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:43:19 -0500
+Date: Mon, 19 Nov 2018 13:42:58 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181119133434-mutt-send-email-mst@kernel.org>
+References: <20181114233831.10374-1-ehabkost@redhat.com>
+	<c1b4a0ee39dfddeb19f1be46710c10cbefd3f07a.camel@redhat.com>
+	<20181116034551.GK3807@habkost.net>
+	<20181119114105.4da89f2c.cohuck@redhat.com>
+	<20181119125519-mutt-send-email-mst@kernel.org>
+	<20181119193238.117c2f4e.cohuck@redhat.com>
 MIME-Version: 1.0
-References: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
-	<20181119084855.uyira2lpu73mu2fo@sirius.home.kraxel.org>
-	<CAGxU2F4O4aKzrJky7EFeWaHFuBKPwi_Z-j7G7m+ENRojVG_5vA@mail.gmail.com>
-	<20181119130713.GB6443@stefanha-x1.localdomain>
-	<20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
-In-Reply-To: <20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Mon, 19 Nov 2018 19:38:39 +0100
-Message-ID: <CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181119193238.117c2f4e.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] virtio: Provide
+ version-specific variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,105 +32,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com, stefanha@gmail.com
-Cc: Samuel Ortiz <sameo@linux.intel.com>, Rob Bradford <robert.bradford@intel.com>, seabios@seabios.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-On Mon, Nov 19, 2018 at 3:15 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+On Mon, Nov 19, 2018 at 07:32:38PM +0100, Cornelia Huck wrote:
+> On Mon, 19 Nov 2018 13:07:59 -0500
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Mon, Nov 19, 2018 at 11:41:05AM +0100, Cornelia Huck wrote:
+> > > On Fri, 16 Nov 2018 01:45:51 -0200
+> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > >   
+> > > > On Thu, Nov 15, 2018 at 05:29:24PM +0100, Andrea Bolognani wrote:  
+> 
+> > > > > And once that's done, "non-transitional" (while matching the
+> > > > > language of the spec) starts to look a bit unnecessary when you
+> > > > > could simply have
+> > > > > 
+> > > > >   virtio-*-pci
+> > > > >   virtio-*-pci-1
+> > > > >   virtio-*-pci-1-transitional
+> > > > > 
+> > > > > instead. But I don't feel as strongly about this as I do about
+> > > > > keeping the virtio revision in the device name :)    
+> > > > 
+> > > > I like that suggestion.  Makes the device names more explicit
+> > > > _and_ shorter.  I'll do that in v3.  
+> > > 
+> > > OTOH, that would mean we'd need to introduce new device types if we
+> > > ever start to support a virtio 2.x standard. My understanding was that
+> > > we'll want separate device types for transitional and non-transitional
+> > > for two reasons: the bus which a device can be plugged into, and
+> > > changing ids. Do we really expect huge changes in a possible 2.x
+> > > standard that affect virtio-pci only, and not other virtio transports
+> > > as well?  
+> > 
+> > Yes I think adding a version there is a mistake.
+> > transitional/legacy/non-transitional are spec terms so
+> > they are unlikely to change abruptly. OTOH virtio TC can
+> > just decide next version is 2.0 on a drop of a hat.
+> 
+> I don't really expect that to happen on a drop of a hat, though :) It's
+> probably more likely when we either have some really major change (and
+> we messed up if we can't handle that via the virtio compatibility
+> mechanism), or we go up from 1.x because x is getting too large (won't
+> happen in the near future.)
+> 
+> But yes, we should be able to handle further updates without any change
+> like the ones complicating things now for virtio-pci, as that was
+> mostly the transition to a proper standard while flushing out some
+> design problems that you only become aware of later.
+> 
+> > 
+> > And I strongly believe command line users really really do not want all
+> > this mess. Even adding "pci" is the name confuses people (what are the
+> > other options?). For command line model=virtio is pretty much perfect.
+> 
+> I'd argue that it's problematic on platforms where you have different
+> options for virtio transports. What does "model=virtio" mean? Always
+> virtio-pci, if available? Or rather virtio-<transport>, with
+> <transport> being the best option for the machine?
 
-> On Mon, Nov 19, 2018 at 01:07:13PM +0000, Stefan Hajnoczi wrote:
-> > On Mon, Nov 19, 2018 at 11:42:28AM +0100, Stefano Garzarella wrote:
-> > > On Mon, Nov 19, 2018 at 9:49 AM Gerd Hoffmann <kraxel@redhat.com>
-> wrote:
-> > >
-> > > > Why at runtime?  What is bad with two images?  With a runtime option
-> > > > you probably need some way to enable the "fastboot" hint for seabios,
-> > > > because some optimizations (like skipping ps/2 initialization) breaks
-> > > > functionality.  So it must be opt-in so you can enable it if you know
-> > > > your use case is fine with that.  But "qemu -boot fast=on" isn't much
-> > > > different from "qemu -bios seabios-fastboot.bin" after all ...
-> > > >
-> > >
-> > > You are right, but maybe having a single image can be simpler to
-> distribute,
-> > > and we can implement something (eg. using fw_cfg) to selectively enable
-> > > features needed.
-> > > Anyway, as the first step, I'll try to build a separate image of
-> SeaBIOS.
-> >
-> > Gerd, you may be right that explicit an command-line option like -boot
-> > fast=on is required.  I was hoping SeaBIOS improvements could
-> > automatically detect cases where no functionality is lost and would not
-> > require new command-line options for users or management tools (e.g.
-> > libvirt).
->
-> Will probably be possible to a certain degree, but I expect you can't
-> get 100% of the qboot savings without something like -boot fast=on.
->
-> > For example, if SeaBIOS sees -kernel, is it necessary to follow the full
-> > BIOS boot process including loading option ROMs?
->
-> Well, right now -kernel loading is actually implemented by an option rom
-> ...
->
-> > This way we could avoid scanning PCI devices.
->
-> That has consequences for the acpi tables, because qemu checks where the
-> firmware mapped the pci bars when generating the tables.
->
-> Also it is not a given that skipping pci initialization in seabios is a
-> win in the end.  The linux kernel has to handle pci bar configuration
-> then so it might be we just shift around boot times.
->
-> > Admittedly I don't know the answer to how transparent we can make this,
-> > but I hope Stefano will identify how far we can go.
->
-> Yes, lets see.
->
+Most people don't care, for them it's "whatever works".
 
-Hi guys,
-just an update, I enabled the debug prints and I saw two timeouts fired
-with a lot
-of time lost (~780ms between "init timer" and "Scan for VGA ..."),
-putting other prints I discovered that a lot of time is spent in the
-tpm_setup(),
-during the probe of the 2 TPM devices:
+We have this assumption that if we force a choice then people will
+choose the right thing but in practice they will do what we all do, play
+with it until it kind of works and leave well alone afterwards.
+That's at best - at worst give up and use an easier tool.
 
-00.548869 init timer
-00.549677 ./src/post.c:157 platform_hardware_setup
-00.550182 ./src/hw/tpm_drivers.c:579 tpmhw_probe
-01.300833 WARNING - Timeout at wait_reg8:81!
-01.301388 ./src/hw/tpm_drivers.c:579 tpmhw_probe
-01.331843 WARNING - Timeout at wait_reg8:81!
-01.332316 ./src/post.c:160 platform_hardware_setup
-01.333358 Scan for VGA option rom
-
-Indeed, in the probe of the TPM devices (TIS and CRB)  there are timeouts of
-750 ms and 30 ms respectively.
-
-Then, statically disabling TPM and TCG (CONFIG_TCGBIOS) the time spent
-in SeaBIOS goes down from ~846ms to ~56ms:
-# SeaBIOS disabling CONFIG_TCGBIOS
-BIOS=/home/stefano/repos/seabios/out_notcgbios/bios.bin
- qemu_init_end: 40.658371
- fw_start: 40.850395 (+0.192024)
- fw_do_boot: 96.750142 (+55.899747)
- linux_start_boot: 98.880578 (+2.130436)
-
-The tpm_setup() is called after the qemu_cfg_init(), so I think we can
-disable
-this call using some fw_cfg parameters, if we will decide to implement a
-runtime
-approach.
-
-Cheers,
-Stefano
-
-
-> cheers,
->   Gerd
->
->
-
--- 
-Stefano Garzarella
-Red Hat
+> > So all these names are there primarily for libvirt's benefit.
+> > And the only input from libvirt devs so far
+> > has been that it's unclear how does cross version
+> > migration work. That needs to be addressed in some way.
+> > 
+> > So can we maybe start with a libvirt domain xml patch, with an
+> > implementation for existing QEMU, get that acked, and then just map it
+> > back to qemu command line as directly as possible?
+> > 
