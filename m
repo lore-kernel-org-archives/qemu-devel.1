@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gOlvi-0001w9-1K
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:42 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gOlvj-00024s-VO
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gOlvh-0006tO-7X
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:41 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52678)
+	(envelope-from <pm215@archaic.org.uk>) id 1gOlvj-0006uY-1m
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:43 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52680)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gOlvh-0006rE-0C
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:41 -0500
+	id 1gOlvi-0006tw-QY
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:42 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gOlvZ-000640-OB
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 15:57:33 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1gOlvh-000666-UZ
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 15:57:41 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Nov 2018 15:57:20 +0000
-Message-Id: <20181119155730.11758-1-peter.maydell@linaro.org>
+Date: Mon, 19 Nov 2018 15:57:29 +0000
+Message-Id: <20181119155730.11758-10-peter.maydell@linaro.org>
+In-Reply-To: <20181119155730.11758-1-peter.maydell@linaro.org>
+References: <20181119155730.11758-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/10] target-arm queue
+Subject: [Qemu-devel] [PULL 09/10] hw/block/onenand: use qemu_log_mask() for
+ reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +33,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Some Arm bugfixes for rc2...
+Update the onenand device to use qemu_log_mask() for reporting
+guest errors and unimplemented features, rather than plain
+fprintf() and hw_error().
 
-thanks
--- PMM
+(We leave the hw_error() in onenand_reset(), as that is
+triggered by a failure to read the underlying block device
+for the bootRAM, not by guest action.)
 
-The following changes since commit e6ebbd46b6e539f3613136111977721d212c2812:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20181115143535.5885-3-peter.maydell@linaro.org
+---
+ hw/block/onenand.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
-  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2018-11-19 14:31:48 +0000)
-
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20181119
-
-for you to fetch changes up to a00d7f2048c2a1a6a4487ac195c804c78adcf60e:
-
-  MAINTAINERS: list myself as maintainer for various Arm boards (2018-11-19 15:55:11 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * various MAINTAINERS file updates
- * hw/block/onenand: use qemu_log_mask() for reporting
- * hw/block/onenand: Fix off-by-one error allowing out-of-bounds read
-   on the n800 and n810 machine models
- * target/arm: fix smc incorrectly trapping to EL3 when secure is off
- * hw/arm/stm32f205: Fix the UART and Timer region size
- * target/arm: read ID registers for KVM guests so they can be
-   used to gate "is feature X present" checks
-
-----------------------------------------------------------------
-Luc Michel (1):
-      target/arm: fix smc incorrectly trapping to EL3 when secure is off
-
-Peter Maydell (3):
-      hw/block/onenand: Fix off-by-one error allowing out-of-bounds read
-      hw/block/onenand: use qemu_log_mask() for reporting
-      MAINTAINERS: list myself as maintainer for various Arm boards
-
-Richard Henderson (4):
-      target/arm: Install ARMISARegisters from kvm host
-      target/arm: Fill in ARMISARegisters for kvm64
-      target/arm: Introduce read_sys_reg32 for kvm32
-      target/arm: Fill in ARMISARegisters for kvm32
-
-Seth Kintigh (1):
-      hw/arm/stm32f205: Fix the UART and Timer region size
-
-Thomas Huth (1):
-      MAINTAINERS: Add entries for missing ARM boards
-
- target/arm/kvm_arm.h       |   1 +
- hw/block/onenand.c         |  24 +++++-----
- hw/char/stm32f2xx_usart.c  |   2 +-
- hw/timer/stm32f2xx_timer.c |   2 +-
- target/arm/kvm.c           |   1 +
- target/arm/kvm32.c         |  77 ++++++++++++++++++++------------
- target/arm/kvm64.c         |  90 +++++++++++++++++++++++++++++++++++++-
- target/arm/op_helper.c     |  54 +++++++++++++++++++----
- MAINTAINERS                | 106 +++++++++++++++++++++++++++++++++++++++------
- 9 files changed, 293 insertions(+), 64 deletions(-)
+diff --git a/hw/block/onenand.c b/hw/block/onenand.c
+index 49ef68c9b14..2b48609776d 100644
+--- a/hw/block/onenand.c
++++ b/hw/block/onenand.c
+@@ -28,6 +28,7 @@
+ #include "exec/memory.h"
+ #include "hw/sysbus.h"
+ #include "qemu/error-report.h"
++#include "qemu/log.h"
+ 
+ /* 11 for 2kB-page OneNAND ("2nd generation") and 10 for 1kB-page chips */
+ #define PAGE_SHIFT	11
+@@ -594,8 +595,8 @@ static void onenand_command(OneNANDState *s)
+     default:
+         s->status |= ONEN_ERR_CMD;
+         s->intstatus |= ONEN_INT;
+-        fprintf(stderr, "%s: unknown OneNAND command %x\n",
+-                        __func__, s->command);
++        qemu_log_mask(LOG_GUEST_ERROR, "unknown OneNAND command %x\n",
++                      s->command);
+     }
+ 
+     onenand_intr_update(s);
+@@ -657,12 +658,13 @@ static uint64_t onenand_read(void *opaque, hwaddr addr,
+     case 0xff02:	/* ECC Result of spare area data */
+     case 0xff03:	/* ECC Result of main area data */
+     case 0xff04:	/* ECC Result of spare area data */
+-        hw_error("%s: implement ECC\n", __func__);
++        qemu_log_mask(LOG_UNIMP,
++                      "onenand: ECC result registers unimplemented\n");
+         return 0x0000;
+     }
+ 
+-    fprintf(stderr, "%s: unknown OneNAND register %x\n",
+-                    __func__, offset);
++    qemu_log_mask(LOG_GUEST_ERROR, "read of unknown OneNAND register 0x%x\n",
++                  offset);
+     return 0;
+ }
+ 
+@@ -706,8 +708,9 @@ static void onenand_write(void *opaque, hwaddr addr,
+             break;
+ 
+         default:
+-            fprintf(stderr, "%s: unknown OneNAND boot command %"PRIx64"\n",
+-                            __func__, value);
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "unknown OneNAND boot command %" PRIx64 "\n",
++                          value);
+         }
+         break;
+ 
+@@ -757,8 +760,9 @@ static void onenand_write(void *opaque, hwaddr addr,
+         break;
+ 
+     default:
+-        fprintf(stderr, "%s: unknown OneNAND register %x\n",
+-                        __func__, offset);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "write to unknown OneNAND register 0x%x\n",
++                      offset);
+     }
+ }
+ 
+-- 
+2.19.1
