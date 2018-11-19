@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gOkRY-0005rJ-GM
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:22:30 -0500
+	(envelope-from <eblake@redhat.com>) id 1gOkT9-0007AT-Ix
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:24:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gOkRX-00023L-Mk
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:22:28 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40232)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gOkRX-00022X-Ar
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:22:27 -0500
-Received: by mail-ot1-x344.google.com with SMTP id s5so27758082oth.7
-	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 06:22:27 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1gOkT8-0002pM-S4
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 09:24:07 -0500
+References: <20181116155325.22428-1-berrange@redhat.com>
+	<20181116155325.22428-3-berrange@redhat.com>
+	<0d437d60-c422-b931-03a2-120e6c1912af@redhat.com>
+	<20181119102326.GB19532@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d92111bb-3b5f-064d-6161-db0e6a50b7a7@redhat.com>
+Date: Mon, 19 Nov 2018 08:24:00 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181117160213.18995-1-luc.michel@greensocs.com>
-References: <20181117160213.18995-1-luc.michel@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Nov 2018 14:22:06 +0000
-Message-ID: <CAFEAcA9Y4fykSD+FyE_K_G6U1OB0oSjEgxma6wp-qYm9pws_Qw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: fix smc incorrectly trapping
- to EL3 when secure is off
+In-Reply-To: <20181119102326.GB19532@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/6 for-3.1] nbd: stop waiting for a NBD
+ response with NBD_CMD_DISC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 17 November 2018 at 16:02, Luc Michel <luc.michel@greensocs.com> wrote:
-> This commit fixes a case where the CPU would try to go to EL3 when
-> executing an smc instruction, even though ARM_FEATURE_EL3 is false. This
-> case is raised when the PSCI conduit is set to smc, but the smc
-> instruction does not lead to a valid PSCI call.
->
-> QEMU crashes with an assertion failure latter on because of incoherent
-> mmu_idx.
->
-> This commit refactors the pre_smc helper by enumerating all the possible
-> way of handling an scm instruction, and covering the previously missing
-> case leading to the crash.
->
-> The following minimal test would crash before this commit:
->
-> .global _start
->     .text
-> _start:
->     ldr x0, =0xdeadbeef  ; invalid PSCI call
->     smc #0
->
-> run with the following command line:
->
-> aarch64-linux-gnu-gcc -nostdinc -nostdlib -Wl,-Ttext=40000000 \
->                       -o test test.s
->
-> qemu-system-aarch64 -M virt,virtualization=on,secure=off \
->                     -cpu cortex-a57 -kernel test
->
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+On 11/19/18 4:23 AM, Daniel P. Berrang=C3=A9 wrote:
 
-Thanks in particular for that helpful table summarising all
-the cases -- that made this patch much easier to review.
+>>> Simply setting the 'quit' flag after sending NBD_CMD_DISC is enough t=
+o
+>>> get the coroutine to stop waiting for a reply and thus supress the er=
+ror
+>>> message.
+>>
+>> Actually, it's not quite enough - once you actually start performing I=
+/O,
+>> enough coroutines are kicked off that the error still happens:
+>=20
+> Hmm, does the client not send requests synchronously  ? I expected that
+> any other I/O operations would have already received their reply by the
+> time we sent the DISC command.
+>=20
 
-Applied to target-arm.next, thanks.
+During handshake phase (NBD_OPT_* messages), client sends requests=20
+synchronously (at most one pending read, in response to the most recent=20
+write). During transmission phase (NBD_CMD_* messages), the client is=20
+allowed to send messages asynchronously.  However, the NBD protocol=20
+recommends (but not requires) that the client never send NBD_CMD_DISC to=20
+disconnect until AFTER the client has collected all responses to any=20
+earlier in-flight messages. And if I'm reading the block/nbd-client.c=20
+code correctly, in general we don't try to shutdown a client while there=20
+are any pending commands with unread replies, except when we are=20
+shutting down due to detecting a protocol error (at which point we are=20
+already out of sync with the server and waiting for replies is not going=20
+to be helpful).
 
--- PMM
+
+>> But I want to do more testing to make sure I'm not missing out on repo=
+rting
+>> an actual error if I add that.
+>=20
+> Yes, I'd be a little concerned about missing reporting of an error from
+> a command other than NBD_CMD_DISC if we did this.
+
+But it looks like your approach of making the qio code behave more=20
+nicely is a smarter cleanup than my idea, so I'm willing to ditch my=20
+code in favor of yours.  Testing your approach now :)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
