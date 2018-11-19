@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1gOjeZ-0000On-4Q
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:31:59 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gOjkd-0003H2-Ib
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:38:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1gOjeT-0004Uc-Jr
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:31:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42864)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1gOjeT-0004Ts-E2
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:31:45 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0F8AE88308
-	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 13:31:44 +0000 (UTC)
-Date: Mon, 19 Nov 2018 14:31:40 +0100
-From: Erik Skultety <eskultet@redhat.com>
-Message-ID: <20181119133140.GB24590@beluga.usersys.redhat.com>
-References: <20181116132931.8737-1-kraxel@redhat.com>
-	<20181116132931.8737-2-kraxel@redhat.com>
-	<18814747-c3b1-75c9-f04a-fed50f81b987@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gOjkX-000833-Vm
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:38:07 -0500
+Date: Mon, 19 Nov 2018 14:37:48 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181119133748.GF8066@localhost.localdomain>
+References: <20181116164526.31487-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <18814747-c3b1-75c9-f04a-fed50f81b987@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 1/3] qapi: Add "rendernode" display option
- for egl-headless
+In-Reply-To: <20181116164526.31487-1-mreitz@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.1? v2 0/3] block: Fix two minor
+ reopen issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Alberto Garcia <berto@igalia.com>, Fam Zheng <famz@redhat.com>
 
-On Mon, Nov 19, 2018 at 07:10:21AM -0600, Eric Blake wrote:
-> On 11/16/18 7:29 AM, Gerd Hoffmann wrote:
-> > From: Erik Skultety <eskultet@redhat.com>
-> >
-> > Unlike SPICE, egl-headless doesn't offer a way of specifying the DRM
-> > node used for OpenGL, hence QEMU always selecting the first one that is
-> > available. Thus, add the 'rendernode' option for egl-headless to QAPI.
-> >
-> > Signed-off-by: Erik Skultety <eskultet@redhat.com>
-> > Message-id: 7658e15eca72d520e7a5fb1c2e724702d83d4f7f.1542362949.git.eskultet@redhat.com
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> > ---
-> >   qapi/ui.json | 17 ++++++++++++++++-
-> >   1 file changed, 16 insertions(+), 1 deletion(-)
->
-> This has already landed, but I noticed via an off-list discussion that it is
-> not introspectible through query-qmp-schema, because DisplayOptions is
-> currently used only for command line handling. I don't know off-hand whether
-> query-command-line-options even exposes the existence of DisplayOptions (not
+Am 16.11.2018 um 17:45 hat Max Reitz geschrieben:
+> These are fixes for issues I found when looking after something Berto
+> has reported.  The second patch fixes that issue Berto found, the first
+> one is only kind of related.
+>=20
+> For the first patch:  bdrv_reopen_abort() or bdrv_reopen_commit() are
+> called only if the respective bdrv_reopen_prepare() has succeeded.
+> However, bdrv_reopen_prepare() can fail even if the block driver=E2=80=99=
+s
+> .bdrv_reopen_prepare() succeeded.  In that case, the block driver is
+> expecting a .bdrv_reopen_abort() or .bdrv_reopen_commit(), but will
+> never get it.
+>=20
+> This is fixed by making bdrv_reopen_prepare() call .bdrv_reopen_abort()
+> if an error occurs after .bdrv_reopen_prepare() has already succeeded.
+>=20
+> In practice this just prevents resource leaks, so nothing too dramatic
+> (fine for qemu-next).  It also means I=E2=80=99ve been incapable of wri=
+ting a
+> test, sorry.
+>=20
+>=20
+> The second issue is more severe: file-posix applies the inverse share
+> locks when reopening.  Now the user can only directly do reopens from
+> the monitor for now, so that wouldn=E2=80=99t be so bad.  But of course=
+ there
+> are other places in qemu that implicitly reopen nodes, like dropping
+> R/W to RO or gaining R/W from RO.  Most of these places are symmetrical
+> at least (they=E2=80=99ll get R/W on an RO image for a short period of =
+time and
+> then drop back to RO), so you=E2=80=99ll see the wrong shared permissio=
+n locks
+> only for a short duration.  But at least blockdev-snapshot and
+> blockdev-snapshot-sync are one way; they drop R/W to RO and stay there.
+> So if you do a blockdev-snapshot*, the shared permission bits will be
+> flipped.  This is therefore very much user-visible.
+>=20
+> It=E2=80=99s not catastrophic, though, so I=E2=80=99m not sure whether =
+we need it in
+> 3.1.  It=E2=80=99s definitely a bugfix, and I think we have patches que=
+ued for
+> the next RC already, so I think it makes sense to include at least
+> patches 2 and 3 as well.
 
-It does not...
+Thanks, applied to the block branch.
 
-> all of our command line options can be queried), but even if it does, I also
-> know that our current command line queries are not detailed enough to
-> readily expose the addition of a new optional member.  I think it would be
-> appropriate for the 3.1 timeframe to add a new QMP command that exposes the
-> display configuration set up at runtime, if only so that the DisplayOptions
-> becomes visible through query-qmp-commands as a bug fix for making this
-> change easier to use.
-
-That would be awesome
-
-Erik
+Kevin
