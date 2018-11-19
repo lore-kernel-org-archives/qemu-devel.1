@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sebastien.boeuf@intel.com>) id 1gOnt5-0007aN-A0
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:03:08 -0500
+	(envelope-from <armbru@redhat.com>) id 1gOnyC-00030E-38
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:08:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sebastien.boeuf@intel.com>) id 1gOnt4-0002oq-3U
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:03:07 -0500
-From: "Boeuf, Sebastien" <sebastien.boeuf@intel.com>
-Date: Mon, 19 Nov 2018 18:02:53 +0000
-Message-ID: <1542650570.24389.5.camel@intel.com>
-References: <20181105014047.26447-1-sameo@linux.intel.com>
-	<20181105014047.26447-20-sameo@linux.intel.com>
-	<20181116103909.64f35d5d@redhat.com>
-	<1542397323.18399.3.camel@intel.com>
-	<20181119163757.3c975f62@redhat.com>
-In-Reply-To: <20181119163757.3c975f62@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <BF2DA991E64C0B4A93214E8803EE21A6@intel.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1gOny8-0006xn-Tv
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:08:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46446)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gOny8-0006wr-J9
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:08:20 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181030191620.32168-1-armbru@redhat.com>
+	<CAFEAcA8RdNrbCLL7tXY=e95N2Y0LcZdCPr3EuQo1_hu08qJuaQ@mail.gmail.com>
+	<87sh0eyzb0.fsf@dusky.pond.sub.org> <20181107025628.GB17134@xz-x1>
+	<CAFEAcA_FhkA_1DiDM2PWDw27dupsAdP==kBUxRrw5rGDnLzMwg@mail.gmail.com>
+	<20181108024406.GB3170@xz-x1> <20181119061727.GA1901@xz-x1>
+	<20181119070558.GB1901@xz-x1>
+Date: Mon, 19 Nov 2018 19:08:13 +0100
+In-Reply-To: <20181119070558.GB1901@xz-x1> (Peter Xu's message of "Mon, 19 Nov
+	2018 15:05:58 +0800")
+Message-ID: <87ftvxlz3m.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 19/24] hw: acpi: Retrieve the PCI bus
- from AcpiPciHpState
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 0/8] Monitor patches for 2018-10-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,128 +31,265 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "imammedo@redhat.com" <imammedo@redhat.com>
-Cc: "sameo@linux.intel.com" <sameo@linux.intel.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "anthony.perard@citrix.com" <anthony.perard@citrix.com>, "sstabellini@kernel.org" <sstabellini@kernel.org>, "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "rth@twiddle.net" <rth@twiddle.net>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-T24gTW9uLCAyMDE4LTExLTE5IGF0IDE2OjM3ICswMTAwLCBJZ29yIE1hbW1lZG92IHdyb3RlOg0K
-PiBPbiBGcmksIDE2IE5vdiAyMDE4IDE5OjQyOjA4ICswMDAwDQo+ICJCb2V1ZiwgU2ViYXN0aWVu
-IiA8c2ViYXN0aWVuLmJvZXVmQGludGVsLmNvbT4gd3JvdGU6DQo+IA0KPiA+IA0KPiA+IEhpIEln
-b3IsDQo+ID4gDQo+ID4gT24gRnJpLCAyMDE4LTExLTE2IGF0IDEwOjM5ICswMTAwLCBJZ29yIE1h
-bW1lZG92IHdyb3RlOg0KPiA+ID4gDQo+ID4gPiBPbiBNb24swqDCoDUgTm92IDIwMTggMDI6NDA6
-NDIgKzAxMDANCj4gPiA+IFNhbXVlbCBPcnRpeiA8c2FtZW9AbGludXguaW50ZWwuY29tPiB3cm90
-ZToNCj4gPiA+IMKgwqANCj4gPiA+ID4gDQo+ID4gPiA+IA0KPiA+ID4gPiBGcm9tOiBTZWJhc3Rp
-ZW4gQm9ldWYgPHNlYmFzdGllbi5ib2V1ZkBpbnRlbC5jb20+DQo+ID4gPiA+IA0KPiA+ID4gPiBJ
-bnN0ZWFkIG9mIHVzaW5nIHRoZSBtYWNoaW5lIHR5cGUgc3BlY2lmaWMgbWV0aG9kIGZpbmRfaTQ0
-MGZ4KCkNCj4gPiA+ID4gdG8NCj4gPiA+ID4gcmV0cmlldmUgdGhlIFBDSSBidXMsIHRoaXMgY29t
-bWl0IGFpbXMgdG8gcmVseSBvbiB0aGUgZmFjdCB0aGF0DQo+ID4gPiA+IHRoZQ0KPiA+ID4gPiBQ
-Q0kgYnVzIGlzIGtub3duIGJ5IHRoZSBzdHJ1Y3R1cmUgQWNwaVBjaUhwU3RhdGUuDQo+ID4gPiA+
-IA0KPiA+ID4gPiBXaGVuIHRoZSBzdHJ1Y3R1cmUgaXMgaW5pdGlhbGl6ZWQgdGhyb3VnaCBhY3Bp
-X3BjaWhwX2luaXQoKQ0KPiA+ID4gPiBjYWxsLA0KPiA+ID4gPiBpdCBzYXZlcyB0aGUgUENJIGJ1
-cywgd2hpY2ggbWVhbnMgdGhlcmUgaXMgbm8gbmVlZCB0byBpbnZva2UgYQ0KPiA+ID4gPiBzcGVj
-aWFsIGZ1bmN0aW9uIGxhdGVyIG9uLg0KPiA+ID4gPiANCj4gPiA+ID4gQmFzZWQgb24gdGhlIGZh
-Y3QgdGhhdCBmaW5kX2k0NDBmeCgpIHdhcyBvbmx5IHVzZWQgdGhlcmUsIHRoaXMNCj4gPiA+ID4g
-cGF0Y2ggYWxzbyByZW1vdmVzIHRoZSBmdW5jdGlvbiBmaW5kX2k0NDBmeCgpIGl0c2VsZiBmcm9t
-IHRoZQ0KPiA+ID4gPiBlbnRpcmUgY29kZWJhc2UuDQo+ID4gPiA+IA0KPiA+ID4gPiBSZXZpZXdl
-ZC1ieTogUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPHBoaWxtZEByZWRoYXQuY29tPg0KPiA+ID4g
-PiBUZXN0ZWQtYnk6IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIDxwaGlsbWRAcmVkaGF0LmNvbT4N
-Cj4gPiA+ID4gU2lnbmVkLW9mZi1ieTogU2ViYXN0aWVuIEJvZXVmIDxzZWJhc3RpZW4uYm9ldWZA
-aW50ZWwuY29tPg0KPiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBKaW5nIExpdSA8amluZzIubGl1QGxp
-bnV4LmludGVsLmNvbT7CoMKgDQo+ID4gPiBUaGFua3MgZm9yIGNsZWFuaW5nIGl0IHVwDQo+ID4g
-PiANCj4gPiA+IG1pbm9yIG5pdDoNCj4gPiA+IFRha2luZyBpbiBhY2NvdW50IHRoYXQgeW91J3Jl
-IHJlbW92aW5nICcvKiBUT0RPOiBRMzUgc3VwcG9ydCAqLycNCj4gPiA+IGNvbW1lbnQgYWxvbmcg
-d2l0aCBmaW5kX2k0NDBmeCgpLCBpdCBtaWdodCBiZSB3b3J0aCB0byBtZW50aW9uDQo+ID4gPiBp
-biB0aGlzIGNvbW1pdCBtZXNzYWdlLiBTb21ldGhpbmcgYWxvbmcgbGluZXMgdGhhdCBBQ1BJIFBD
-SUhQDQo+ID4gPiBleGlzdCB0byBzdXBwb3J0IGd1ZXN0cyB3aXRob3V0IFNIUEMgc3VwcG9ydCBv
-biBQQ0kNCj4gPiA+IGJhc2VkIFBDIG1hY2hpbmUuIENvbnNpZGVyaW5nIHRoYXQgUTM1IHByb3Zp
-ZGVzIG5hdGl2ZQ0KPiA+ID4gUENJLUUgaG90cGx1ZywgdGhlcmUgaXMgbm8gbmVlZCB0byBhZGQg
-QUNQSSBob3RwbHVnIHRoZXJlLsKgwqANCj4gPiBPaCB5ZXMgc3VyZSB3ZSBjYW4gdXBkYXRlIHRo
-ZSBjb21taXQgbWVzc2FnZSA6KS4gQnV0IGp1c3Qgd2FudGVkIHRvDQo+ID4gbWVudGlvbiB0aGF0
-ICdwYycgbWFjaGluZSB0eXBlIHVzZXMgQUNQSSBQQ0lIUCBhbmQgZG9lcyBzdXBwb3J0DQo+ID4g
-U0hQQywgc28gaXQncyBub3QgbXV0dWFsbHkgZXhjbHVzaXZlLg0KPiBpdCBzdXBwb3J0cyBib3Ro
-IGJ1dCBpcyBpdCByZWxldmFudCB0byB0aGlzIHBhdGNoPw0KPiANCj4gUG9pbnQgd2FzIHRoYXQg
-b25lIHNob3VsZG4ndCByZW1vdmUgc29tZXRoaW5nIHNpbGVudGx5IHdpdGhvdXQNCj4gYW55IGp1
-c3RpZmljYXRpb24vZXhwbGFuYXRpb24uIFNvIHRoYXQgcmVhZGVycyB0aGF0IGNvbWUgbGF0ZXIN
-Cj4gd291bGRuJ3Qgd29uZGVyIGFib3V0IHRoZSByZWFzb25zIHdoeSB0aGUgY29kZSB3YXMgcmVt
-b3ZlZC4NCj4gDQoNCkkgdW5kZXJzdGFuZCB0aGUgcG9pbnQgYnV0IEkgdGhpbmsgdGhlIGNvbW1l
-bnQgd2FzIHdyb25nIGluIHRoZSBmaXJzdA0KcGxhY2Ugc2luY2UgcTM1IG5ldmVyIHRyaWVkIHRv
-IHN1cHBvcnQgQUNQSSBQQ0lIUCwgYXMgdGhleSBzdXBwb3J0IFBDSWUNCm5hdGl2ZSBob3RwbHVn
-IGFzIHlvdSBtZW50aW9uZWQuDQoNCj4gwqANCj4gPiANCj4gPiA+IA0KPiA+ID4gDQo+ID4gPiB3
-aXRoIGNvbW1pdCBtZXNzYWdlIGZpeGVkDQo+ID4gPiANCj4gPiA+IFJldmlld2VkLWJ5OiBJZ29y
-IE1hbW1lZG92IDxpbWFtbWVkb0ByZWRoYXQuY29tPg0KPiA+ID4gwqDCoA0KPiA+ID4gPiANCj4g
-PiA+ID4gDQo+ID4gPiA+IC0tLQ0KPiA+ID4gPiDCoGluY2x1ZGUvaHcvaTM4Ni9wYy5owqDCoHzC
-oMKgMSAtDQo+ID4gPiA+IMKgaHcvYWNwaS9wY2locC5jwqDCoMKgwqDCoMKgwqB8IDEwICsrKyst
-LS0tLS0NCj4gPiA+ID4gwqBody9wY2ktaG9zdC9waWl4LmPCoMKgwqDCoHzCoMKgOCAtLS0tLS0t
-LQ0KPiA+ID4gPiDCoHN0dWJzL3BjaS1ob3N0LXBpaXguYyB8wqDCoDYgLS0tLS0tDQo+ID4gPiA+
-IMKgc3R1YnMvTWFrZWZpbGUub2Jqc8KgwqDCoHzCoMKgMSAtDQo+ID4gPiA+IMKgNSBmaWxlcyBj
-aGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDIyIGRlbGV0aW9ucygtKQ0KPiA+ID4gPiDCoGRlbGV0
-ZSBtb2RlIDEwMDY0NCBzdHVicy9wY2ktaG9zdC1waWl4LmMNCj4gPiA+ID4gDQo+ID4gPiA+IGRp
-ZmYgLS1naXQgYS9pbmNsdWRlL2h3L2kzODYvcGMuaCBiL2luY2x1ZGUvaHcvaTM4Ni9wYy5oDQo+
-ID4gPiA+IGluZGV4IDQ0Y2I2YmYzZjMuLjhlNWYxNDY0ZWIgMTAwNjQ0DQo+ID4gPiA+IC0tLSBh
-L2luY2x1ZGUvaHcvaTM4Ni9wYy5oDQo+ID4gPiA+ICsrKyBiL2luY2x1ZGUvaHcvaTM4Ni9wYy5o
-DQo+ID4gPiA+IEBAIC0yNTUsNyArMjU1LDYgQEAgUENJQnVzICppNDQwZnhfaW5pdChjb25zdCBj
-aGFyICpob3N0X3R5cGUsDQo+ID4gPiA+IGNvbnN0IGNoYXIgKnBjaV90eXBlLA0KPiA+ID4gPiDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBNZW1vcnlSZWdpb24gKnBj
-aV9tZW1vcnksDQo+ID4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoE1lbW9yeVJlZ2lvbiAqcmFtX21lbW9yeSk7DQo+ID4gPiA+IMKgDQo+ID4gPiA+IC1QQ0lC
-dXMgKmZpbmRfaTQ0MGZ4KHZvaWQpOw0KPiA+ID4gPiDCoC8qIHBpaXg0LmMgKi8NCj4gPiA+ID4g
-wqBleHRlcm4gUENJRGV2aWNlICpwaWl4NF9kZXY7DQo+ID4gPiA+IMKgaW50IHBpaXg0X2luaXQo
-UENJQnVzICpidXMsIElTQUJ1cyAqKmlzYV9idXMsIGludCBkZXZmbik7DQo+ID4gPiA+IGRpZmYg
-LS1naXQgYS9ody9hY3BpL3BjaWhwLmMgYi9ody9hY3BpL3BjaWhwLmMNCj4gPiA+ID4gaW5kZXgg
-ODBkNDJlMTJmZi4uMjU0YjJlNTBhYiAxMDA2NDQNCj4gPiA+ID4gLS0tIGEvaHcvYWNwaS9wY2lo
-cC5jDQo+ID4gPiA+ICsrKyBiL2h3L2FjcGkvcGNpaHAuYw0KPiA+ID4gPiBAQCAtOTMsMTAgKzkz
-LDkgQEAgc3RhdGljIHZvaWQgKmFjcGlfc2V0X2JzZWwoUENJQnVzICpidXMsIHZvaWQNCj4gPiA+
-ID4gKm9wYXF1ZSkNCj4gPiA+ID4gwqDCoMKgwqDCoHJldHVybiBic2VsX2FsbG9jOw0KPiA+ID4g
-PiDCoH0NCj4gPiA+ID4gwqANCj4gPiA+ID4gLXN0YXRpYyB2b2lkIGFjcGlfc2V0X3BjaV9pbmZv
-KHZvaWQpDQo+ID4gPiA+ICtzdGF0aWMgdm9pZCBhY3BpX3NldF9wY2lfaW5mbyhBY3BpUGNpSHBT
-dGF0ZSAqcykNCj4gPiA+ID4gwqB7DQo+ID4gPiA+IMKgwqDCoMKgwqBzdGF0aWMgYm9vbCBic2Vs
-X2lzX3NldDsNCj4gPiA+ID4gLcKgwqDCoMKgUENJQnVzICpidXM7DQo+ID4gPiA+IMKgwqDCoMKg
-wqB1bnNpZ25lZCBic2VsX2FsbG9jID0gQUNQSV9QQ0lIUF9CU0VMX0RFRkFVTFQ7DQo+ID4gPiA+
-IMKgDQo+ID4gPiA+IMKgwqDCoMKgwqBpZiAoYnNlbF9pc19zZXQpIHsNCj4gPiA+ID4gQEAgLTEw
-NCwxMCArMTAzLDkgQEAgc3RhdGljIHZvaWQgYWNwaV9zZXRfcGNpX2luZm8odm9pZCkNCj4gPiA+
-ID4gwqDCoMKgwqDCoH0NCj4gPiA+ID4gwqDCoMKgwqDCoGJzZWxfaXNfc2V0ID0gdHJ1ZTsNCj4g
-PiA+ID4gwqANCj4gPiA+ID4gLcKgwqDCoMKgYnVzID0gZmluZF9pNDQwZngoKTsgLyogVE9ETzog
-UTM1IHN1cHBvcnQgKi8NCj4gPiA+ID4gLcKgwqDCoMKgaWYgKGJ1cykgew0KPiA+ID4gPiArwqDC
-oMKgwqBpZiAocy0+cm9vdCkgew0KPiA+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqAvKiBTY2FuIGFs
-bCBQQ0kgYnVzZXMuIFNldCBwcm9wZXJ0eSB0byBlbmFibGUgYWNwaQ0KPiA+ID4gPiBiYXNlZA0K
-PiA+ID4gPiBob3RwbHVnLiAqLw0KPiA+ID4gPiAtwqDCoMKgwqDCoMKgwqDCoHBjaV9mb3JfZWFj
-aF9idXNfZGVwdGhfZmlyc3QoYnVzLCBhY3BpX3NldF9ic2VsLCBOVUxMLA0KPiA+ID4gPiAmYnNl
-bF9hbGxvYyk7DQo+ID4gPiA+ICvCoMKgwqDCoMKgwqDCoMKgcGNpX2Zvcl9lYWNoX2J1c19kZXB0
-aF9maXJzdChzLT5yb290LCBhY3BpX3NldF9ic2VsLA0KPiA+ID4gPiBOVUxMLA0KPiA+ID4gPiAm
-YnNlbF9hbGxvYyk7DQo+ID4gPiA+IMKgwqDCoMKgwqB9DQo+ID4gPiA+IMKgfQ0KPiA+ID4gPiDC
-oA0KPiA+ID4gPiBAQCAtMjEzLDcgKzIxMSw3IEBAIHN0YXRpYyB2b2lkDQo+ID4gPiA+IGFjcGlf
-cGNpaHBfdXBkYXRlKEFjcGlQY2lIcFN0YXRlDQo+ID4gPiA+ICpzKQ0KPiA+ID4gPiDCoA0KPiA+
-ID4gPiDCoHZvaWQgYWNwaV9wY2locF9yZXNldChBY3BpUGNpSHBTdGF0ZSAqcykNCj4gPiA+ID4g
-wqB7DQo+ID4gPiA+IC3CoMKgwqDCoGFjcGlfc2V0X3BjaV9pbmZvKCk7DQo+ID4gPiA+ICvCoMKg
-wqDCoGFjcGlfc2V0X3BjaV9pbmZvKHMpOw0KPiA+ID4gPiDCoMKgwqDCoMKgYWNwaV9wY2locF91
-cGRhdGUocyk7DQo+ID4gPiA+IMKgfQ0KPiA+ID4gPiDCoA0KPiA+ID4gPiBkaWZmIC0tZ2l0IGEv
-aHcvcGNpLWhvc3QvcGlpeC5jIGIvaHcvcGNpLWhvc3QvcGlpeC5jDQo+ID4gPiA+IGluZGV4IDQ3
-MjkzYTM5MTUuLjY1ODQ2MDI2NGIgMTAwNjQ0DQo+ID4gPiA+IC0tLSBhL2h3L3BjaS1ob3N0L3Bp
-aXguYw0KPiA+ID4gPiArKysgYi9ody9wY2ktaG9zdC9waWl4LmMNCj4gPiA+ID4gQEAgLTQ0NSwx
-NCArNDQ1LDYgQEAgUENJQnVzICppNDQwZnhfaW5pdChjb25zdCBjaGFyICpob3N0X3R5cGUsDQo+
-ID4gPiA+IGNvbnN0IGNoYXIgKnBjaV90eXBlLA0KPiA+ID4gPiDCoMKgwqDCoMKgcmV0dXJuIGI7
-DQo+ID4gPiA+IMKgfQ0KPiA+ID4gPiDCoA0KPiA+ID4gPiAtUENJQnVzICpmaW5kX2k0NDBmeCh2
-b2lkKQ0KPiA+ID4gPiAtew0KPiA+ID4gPiAtwqDCoMKgwqBQQ0lIb3N0U3RhdGUgKnMgPSBPQkpF
-Q1RfQ0hFQ0soUENJSG9zdFN0YXRlLA0KPiA+ID4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG9iamVjdF9yZXNv
-bHZlX3BhdGgoIi9tYWNoaQ0KPiA+ID4gPiBuZS9pDQo+ID4gPiA+IDQ0MGZ4IiwgTlVMTCksDQo+
-ID4gPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgVFlQRV9QQ0lfSE9TVF9CUklER0UpOw0KPiA+ID4gPiAtwqDC
-oMKgwqByZXR1cm4gcyA/IHMtPmJ1cyA6IE5VTEw7DQo+ID4gPiA+IC19DQo+ID4gPiA+IC0NCj4g
-PiA+ID4gwqAvKiBQSUlYMyBQQ0kgdG8gSVNBIGJyaWRnZSAqLw0KPiA+ID4gPiDCoHN0YXRpYyB2
-b2lkIHBpaXgzX3NldF9pcnFfcGljKFBJSVgzU3RhdGUgKnBpaXgzLCBpbnQgcGljX2lycSkNCj4g
-PiA+ID4gwqB7DQo+ID4gPiA+IGRpZmYgLS1naXQgYS9zdHVicy9wY2ktaG9zdC1waWl4LmMgYi9z
-dHVicy9wY2ktaG9zdC1waWl4LmMNCj4gPiA+ID4gZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0DQo+
-ID4gPiA+IGluZGV4IDZlZDgxYjFmMjEuLjAwMDAwMDAwMDANCj4gPiA+ID4gLS0tIGEvc3R1YnMv
-cGNpLWhvc3QtcGlpeC5jDQo+ID4gPiA+ICsrKyAvZGV2L251bGwNCj4gPiA+ID4gQEAgLTEsNiAr
-MCwwIEBADQo+ID4gPiA+IC0jaW5jbHVkZSAicWVtdS9vc2RlcC5oIg0KPiA+ID4gPiAtI2luY2x1
-ZGUgImh3L2kzODYvcGMuaCINCj4gPiA+ID4gLVBDSUJ1cyAqZmluZF9pNDQwZngodm9pZCkNCj4g
-PiA+ID4gLXsNCj4gPiA+ID4gLcKgwqDCoMKgcmV0dXJuIE5VTEw7DQo+ID4gPiA+IC19DQo+ID4g
-PiA+IGRpZmYgLS1naXQgYS9zdHVicy9NYWtlZmlsZS5vYmpzIGIvc3R1YnMvTWFrZWZpbGUub2Jq
-cw0KPiA+ID4gPiBpbmRleCA1ZGQwYWVlZWM2Li43MjVmNzhiZWRjIDEwMDY0NA0KPiA+ID4gPiAt
-LS0gYS9zdHVicy9NYWtlZmlsZS5vYmpzDQo+ID4gPiA+ICsrKyBiL3N0dWJzL01ha2VmaWxlLm9i
-anMNCj4gPiA+ID4gQEAgLTQxLDYgKzQxLDUgQEAgc3R1Yi1vYmoteSArPSBwY19tYWR0X2NwdV9l
-bnRyeS5vDQo+ID4gPiA+IMKgc3R1Yi1vYmoteSArPSB2bWdlbmlkLm8NCj4gPiA+ID4gwqBzdHVi
-LW9iai15ICs9IHhlbi1jb21tb24ubw0KPiA+ID4gPiDCoHN0dWItb2JqLXkgKz0geGVuLWh2bS5v
-DQo+ID4gPiA+IC1zdHViLW9iai15ICs9IHBjaS1ob3N0LXBpaXgubw0KPiA+ID4gPiDCoHN0dWIt
-b2JqLXkgKz0gcmFtLWJsb2NrLm8NCj4gPiA+ID4gwqBzdHViLW9iai15ICs9IHJhbWZiLm/CoMKg
-DQo+ID4gVGhhbmtzLA0KPiA+IFNlYmFzdGllbg==
+Peter Xu <peterx@redhat.com> writes:
+
+> On Mon, Nov 19, 2018 at 02:17:27PM +0800, Peter Xu wrote:
+>> I reproduced the error with a FreeBSD guest and this change (which
+>> possibly can be squashed into "tests: qmp-test: add queue full test")
+>> worked for me:
+>> 
+>> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+>> index 6989acbca4..83f353db4f 100644
+>> --- a/tests/qmp-test.c
+>> +++ b/tests/qmp-test.c
+>> @@ -281,8 +281,15 @@ static void test_qmp_oob(void)
+>>       * will only be able to be handled after the queue is shrinked, so
+>>       * it'll be processed only after one existing in-band command
+>>       * finishes.
+>> +     *
+>> +     * NOTE: we need to feed the queue with one extra request to make
+>> +     * sure it'll be stuck since when we have sent the Nth request
+>> +     * it's possible that we have already popped and processing the
+>> +     * 1st request so the Nth request (which could potentially be the
+>> +     * [N-1]th element on the queue) might not trigger the
+>> +     * monitor-full condition deterministically.
+>>       */
+>> -    for (i = 1; i <= QMP_REQ_QUEUE_LEN_MAX; i++) {
+>> +    for (i = 1; i <= QMP_REQ_QUEUE_LEN_MAX + 1; i++) {
+>>          id = g_strdup_printf("queue-blocks-%d", i);
+>>          send_cmd_that_blocks(qts, id);
+>>          g_free(id);
+>> @@ -291,7 +298,7 @@ static void test_qmp_oob(void)
+>>      unblock_blocked_cmd();
+>>      recv_cmd_id(qts, "queue-blocks-1");
+>>      recv_cmd_id(qts, "oob-1");
+>> -    for (i = 2; i <= QMP_REQ_QUEUE_LEN_MAX; i++) {
+>> +    for (i = 2; i <= QMP_REQ_QUEUE_LEN_MAX + 1; i++) {
+>>          unblock_blocked_cmd();
+>>          id = g_strdup_printf("queue-blocks-%d", i);
+>>          recv_cmd_id(qts, id);
+>> 
+>> So the problem here is that the queue-block-N command might not really
+>> suspend the monitor everytime if we already popped the 1st request,
+>> which will let the N-th request to be (N-1)th, then the parser will
+>> continue to eat the oob command and it could "preempt" the previous
+>> commands.
+>> 
+>> Maybe FreeBSD is scheduling the threads in some pattern so it happens
+>> only on FreeBSD and very constantly, but anyway it should be a general
+>> fix to the test program.
+
+I feel particularly dense right now, and need a more detailed analysis
+to understand.  Let me try.
+
+Here's what the test does before your fix
+
+    Send QMP_REQ_QUEUE_LEN_MAX "blocking" in-band commands
+    queue-blocks-1, queue-blocks-2, ...  "Blocking" means the command
+    blocks until we explicitly unblock it.
+
+    Send an out-of-band command oob-1.
+
+    Unblock queue-blocks-1.
+
+    Receive response to queue-blocks-1.
+
+    Receive response to oob-1.
+
+    Unblock queue-blocks-2, receive response
+    ...
+
+Here's what test test expects QEMU to do:
+
+    In I/O thread:
+
+        Receive and queue queue-blocks-1, ...
+
+        Queue is full, stop receiving commands.
+
+    In main thread:
+
+        Dequeue queue-blocks-1.
+
+        Execute queue-blocks-1, block for a while, finish and send
+        response.
+
+    In I/O thread:
+
+        Queue is no longer full, resume receiving commands.
+
+        Receive and execute oob-1, send response
+
+    In main thread:
+
+        Dequeue queue-blocks-2, execute, block for a while, finish and
+        send response.
+        ...
+
+No good because the two threads race.  On my Linux box the test passes.
+Let's have a closer look how it does that.  The appended patch that adds
+another tracepoint.  With tracepoints monitor_* and handle_qmp_command
+enabled, I get:
+
+    19271@1542641581.372890:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-1", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
+
+I/O thread receives and queues queue-blocks-1.
+
+    19271@1542641581.372954:monitor_qmp_cmd_in_band queue-blocks-1
+
+Main thread dequeues qemu-blocks-1 and starts executing it.
+
+We already lost: the queue won't actually fill up.  The test passes
+anyway, but it doesn't actually test "queue full".  But why does it
+pass?  Let's see.
+
+    19271@1542641581.373211:monitor_qmp_respond queue-blocks-1
+
+Main thread sends response to queue-blocks-1.  This means queue-blocks-1
+has been unblocked already.  This is possible, because qmp-test sends
+all the commands and then immediately unblocks queue-blocks-1, and the
+main thread can win the race with the I/O thread.
+
+    19271@1542641581.373826:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-2", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
+    19271@1542641581.373864:monitor_qmp_cmd_in_band queue-blocks-2
+    19271@1542641581.374575:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-3", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
+    19271@1542641581.375344:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-4", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
+    19271@1542641581.376162:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-5", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
+    19271@1542641581.376996:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-6", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
+    19271@1542641581.377790:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-7", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
+    19271@1542641581.378562:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-8", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
+
+I/O thread receives and queues queue-blocks-2, ... queue-blocks-8.
+
+    19271@1542641581.378796:handle_qmp_command mon 0x563e19be4e80 req: {"exec-oob": "migrate-pause"}
+    19271@1542641581.378800:monitor_qmp_cmd_out_of_band oob-1
+    19271@1542641581.378823:monitor_qmp_respond oob-1
+
+I/O thread receives, executes and responds to oob-1.
+
+    19271@1542641581.379197:monitor_qmp_respond queue-blocks-2
+    19271@1542641581.379228:monitor_qmp_cmd_in_band queue-blocks-3
+    19271@1542641581.379435:monitor_qmp_respond queue-blocks-3
+    19271@1542641581.379477:monitor_qmp_cmd_in_band queue-blocks-4
+    19271@1542641581.379597:monitor_qmp_respond queue-blocks-4
+    19271@1542641581.379621:monitor_qmp_cmd_in_band queue-blocks-5
+    19271@1542641581.379800:monitor_qmp_respond queue-blocks-5
+    19271@1542641581.379824:monitor_qmp_cmd_in_band queue-blocks-6
+    19271@1542641581.379953:monitor_qmp_respond queue-blocks-6
+    19271@1542641581.379992:monitor_qmp_cmd_in_band queue-blocks-7
+    19271@1542641581.380132:monitor_qmp_respond queue-blocks-7
+    19271@1542641581.380170:monitor_qmp_cmd_in_band queue-blocks-8
+    19271@1542641581.380283:monitor_qmp_respond queue-blocks-8
+
+Main thread dequeues, executes and responds to queue-blocks-2,
+... queue-blocks-8.
+
+If I make the main thread lose the race by sticking a sleep(1) before
+the unblock_blocked_cmd() that unblocks queue-blocks-1, I get:
+
+    22762@1542641707.818838:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-1", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
+
+I/O thread receives and queues queue-blocks-1.
+
+    22762@1542641707.818856:monitor_qmp_cmd_in_band queue-blocks-1
+
+Main thread dequeues qemu-blocks-1 and starts executing it.  We already
+lost.
+
+    22762@1542641707.819585:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-2", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
+    22762@1542641707.820331:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-3", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
+    22762@1542641707.821072:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-4", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
+    22762@1542641707.821821:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-5", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
+    22762@1542641707.822569:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-6", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
+    22762@1542641707.823314:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-7", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
+    22762@1542641707.824069:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-8", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
+
+I/O thread receives and queues queue-blocks-2, ... queue-blocks-8.
+
+    22762@1542641707.824253:handle_qmp_command mon 0x55f5b6a5de80 req: {"exec-oob": "migrate-pause"}
+    22762@1542641707.824257:monitor_qmp_cmd_out_of_band oob-1
+    22762@1542641707.824282:monitor_qmp_respond oob-1
+
+I/O thread receives, executes and responds to oob-1.
+
+Test is going to fail: response to oob-1 sent before response to
+queue-blocks-1.
+
+Now let me try your fix.  Here's what I see:
+
+    16585@1542650042.980953:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-1", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
+    16585@1542650042.981018:monitor_qmp_cmd_in_band queue-blocks-1
+    16585@1542650042.981252:monitor_qmp_respond queue-blocks-1
+    16585@1542650042.981838:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-2", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
+    16585@1542650042.981916:monitor_qmp_cmd_in_band queue-blocks-2
+    16585@1542650042.982656:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-3", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
+    16585@1542650042.983406:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-4", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
+    16585@1542650042.984170:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-5", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
+    16585@1542650042.984975:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-6", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
+    16585@1542650042.985778:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-7", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
+    16585@1542650042.986565:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-8", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
+    16585@1542650042.987396:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-9", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
+    16585@1542650042.987626:handle_qmp_command mon 0x5597b8e0de80 req: {"exec-oob": "migrate-pause"}
+    16585@1542650042.987630:monitor_qmp_cmd_out_of_band oob-1
+    16585@1542650042.987676:monitor_qmp_respond oob-1
+    16585@1542650042.988035:monitor_qmp_respond queue-blocks-2
+    16585@1542650042.988066:monitor_qmp_cmd_in_band queue-blocks-3
+    16585@1542650042.988329:monitor_qmp_respond queue-blocks-3
+    16585@1542650042.988360:monitor_qmp_cmd_in_band queue-blocks-4
+    16585@1542650042.988575:monitor_qmp_respond queue-blocks-4
+    16585@1542650042.988616:monitor_qmp_cmd_in_band queue-blocks-5
+    16585@1542650042.988803:monitor_qmp_respond queue-blocks-5
+    16585@1542650042.988826:monitor_qmp_cmd_in_band queue-blocks-6
+    16585@1542650042.988977:monitor_qmp_respond queue-blocks-6
+    16585@1542650042.989001:monitor_qmp_cmd_in_band queue-blocks-7
+    16585@1542650042.989223:monitor_qmp_respond queue-blocks-7
+    16585@1542650042.989279:monitor_qmp_cmd_in_band queue-blocks-8
+    16585@1542650042.989447:monitor_qmp_respond queue-blocks-8
+    16585@1542650042.989469:monitor_qmp_cmd_in_band queue-blocks-9
+    16585@1542650042.989582:monitor_qmp_respond queue-blocks-9
+
+Tracepoint monitor_suspend still not hit.  This means the queue does not
+fill up.
+
+> Markus, do you want me to repost a new version with this change?  Is
+> it still possible to have the oob-default series for 3.1?
+
+We're trying to, but we need to get the test to work.
+
+Two problems:
+
+1. The test doesn't seem to succed at testing "queue full".
+
+2. The test might still be racy.
+
+I suspect the code we test is solid, and it's "only" the test we screwed
+up.
+
+
+diff --git a/monitor.c b/monitor.c
+index 431795d686..52112889ef 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4064,6 +4064,7 @@ static int monitor_can_read(void *opaque)
+  */
+ static void monitor_qmp_respond(Monitor *mon, QDict *rsp, QObject *id)
+ {
++    trace_monitor_qmp_respond(qobject_get_try_str(id) ?: "");
+     if (rsp) {
+         if (id) {
+             qdict_put_obj(rsp, "id", qobject_ref(id));
+diff --git a/trace-events b/trace-events
+index 4fd2cb4b97..57c5f6cc94 100644
+--- a/trace-events
++++ b/trace-events
+@@ -50,6 +50,7 @@ handle_qmp_command(void *mon, const char *req) "mon %p req: %s"
+ monitor_suspend(void *ptr, int cnt) "mon %p: %d"
+ monitor_qmp_cmd_in_band(const char *id) "%s"
+ monitor_qmp_cmd_out_of_band(const char *id) "%s"
++monitor_qmp_respond(const char *id) "%s"
+ 
+ # dma-helpers.c
+ dma_blk_io(void *dbs, void *bs, int64_t offset, bool to_dev) "dbs=%p bs=%p offset=%" PRId64 " to_dev=%d"
