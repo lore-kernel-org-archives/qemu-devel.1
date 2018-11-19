@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gOpaN-0006Gw-Tn
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 14:51:56 -0500
+	(envelope-from <crobinso@redhat.com>) id 1gOqOQ-0002Wd-P8
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 15:43:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gOpaJ-00019K-SE
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 14:51:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35224)
+	(envelope-from <crobinso@redhat.com>) id 1gOqOL-0000kJ-0p
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 15:43:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:19479)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gOpaJ-00016z-Kx
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 14:51:51 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181115140501.7872-1-david@redhat.com>
-	<20181115140501.7872-7-david@redhat.com>
-	<87muq972p0.fsf@dusky.pond.sub.org>
-	<3d186921-e32f-60aa-cfc6-07345f6795c7@redhat.com>
-Date: Mon, 19 Nov 2018 20:51:45 +0100
-In-Reply-To: <3d186921-e32f-60aa-cfc6-07345f6795c7@redhat.com> (David
-	Hildenbrand's message of "Mon, 19 Nov 2018 15:12:11 +0100")
-Message-ID: <87o9akkfqm.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1gOqOJ-0000a5-4K
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 15:43:31 -0500
+References: <20181119104330.GA2367@work-vm>
+	<16966.1542632079@dschgrazlin2.units.it>
+	<20181119183343.GD2365@work-vm>
+From: Cole Robinson <crobinso@redhat.com>
+Message-ID: <0f9a622f-d3af-0bfb-36f0-c08447292523@redhat.com>
+Date: Mon, 19 Nov 2018 15:43:25 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1 6/9] qapi: rewrite string-input-visitor
+In-Reply-To: <20181119183343.GD2365@work-vm>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] 3.1.0-rc{0,1} doesn't start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,130 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, balducci@units.it, pbonzini@redhat.com, ehabkost@redhat.com, robert.hu@linux.intel.com
+Cc: qemu-devel@nongnu.org
 
-Copying Igor and Eduardo for a hostmem.c bug.  Search for "core dumped".
-
-David Hildenbrand <david@redhat.com> writes:
-
+On 11/19/2018 01:35 PM, Dr. David Alan Gilbert wrote:
+> * balducci@units.it (balducci@units.it) wrote:
+>> hi
+>>
+>> thanks for taking the time to reply
+>>
+>> Dr. David Alan Gilbert writes:
+>>>> I suspect that this might be some problem on my side, as I couldn't
+>>>> find any similar report (apart some old (qemu-2.8.50) threads, that
+>>>> didn't help)
 >>>
->>> Tests have to be fixed up:
->>> - Two BUGs were hardcoded that are fixed now
->>> - The string-input-visitor now actually returns a parsed list and not
->>>   an ordered set.
->> 
->> I'd expect this to necessitate an update of callers that expect a set, but...
->> 
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>  include/qapi/string-input-visitor.h |   4 +-
->>>  qapi/string-input-visitor.c         | 410 ++++++++++++++++------------
->>>  tests/test-string-input-visitor.c   |  18 +-
->>>  3 files changed, 239 insertions(+), 193 deletions(-)
->> 
->> ... there's none.
->> 
->> Let me know if you need help finding them.  I think we tracked them down
->> during the discussion that led to this series.
->> 
->
-> Indeed, I missed to document that. So here is the outcome:
->
-> 1. backends/hostmem.c:host_memory_backend_set_host_nodes()
->
-> -> calls visit_type_uint16List(via bitmap)
-> -> the code can deal with duplicates/unsorted lists (bitmap_set)
+>>> Not necessarily; can you tell me:
+>>>    a) At what point does it fail - immediately when booting the guest?
+>>>       Some time during the boot? Later?
+>>>    b) What guest does it happen on?
+>>
+>> a) the error happens almost immediately; I mean: when I run qemu from an
+>>     xterm, it doesn't even popup its window: it just dumps the error
+>>     message to the terminal and stops
+>> b) the guest is an old windows XP OS; but, as I say above, all goes as
+>>     if qemu doesn't even load the OS image (at least this is my
+>>     impression)
+>>
+> A colleague has confirmed this on his FX-8320 on Fedora 29 with the
+> virt-next repo;  so it's nothing that's special about your machine;
+> it's 3.1 that really doesn't like the old AMDs.
+> 
 
-Yes.
+Also we received a similar report in Fedora bugzilla:
 
-> Side node: I am not sure if there should be some range checks, but maybe
-> the bitmap is large enough .... hm ...
+https://bugzilla.redhat.com/show_bug.cgi?id=1651021
 
-Fishy.  MAX_NODES is 128.  Tinker, tinker, ...
-
-    $ upstream-qemu -nodefaults -object memory-backend-file,id=mem0,mem-path=x,size=4096,host-nodes=12345
-    Segmentation fault (core dumped)
-
-Igor, Eduardo, this is yours.
-
-There's another use of visit_type_uint16List() is this file, but it's in
-property getter host_memory_backend_get_host_nodes(), and property
-getters aren't used with the string input visitor.
-
-> 2. qapi-visit.c::visit_type_Memdev_members()
->
-> -> calls visit_type_uint16List()
-> -> I think this never used for input, only for output / freeing
-
-Yes, it's used by query-memdev with the QObject output visitor to build
-the value of @host-nodes.
-
-> 3. qapi-visit.c::visit_type_NumaNodeOptions_members()
->
-> -> calls visit_type_uint16List()
-> -> I think this never used for input, only for output / freeing
-
-It's used for input, but with the opts visitor, see parse_numa().
-
-> 4. qapi-visit.c::visit_type_RockerOfDpaGroup_members
->
-> -> calls visit_type_uint32List()
-> -> I think this never used for input, only for output / freeing
-
-Yes, it's used by query-rocker-of-dpa-groups with the QObject output
-visitor to build the value of @group-ids.
-
-> 5. qapi-visit.c::visit_type_RxFilterInfo_members()
->
-> -> calls visit_type_intList()
-> -> I think this never used for input, only for output / freeing
-
-Yes, it's used by query-rx-filter with the QObject output visitor to
-build the value of @vlan-table.
-
-> 6. numa.c::query_memdev()
->
-> -> calls object_property_get_uint16List()
-> --> String parsed via visit_type_uint16List() into list
-
-QOM, hard to understand.
-
-The value of struct HostMemoryBackend member @host-nodes (a bitmap) is
-first converted to a list (sorted, no duplicates) with
-host_memory_backend_get_host_nodes() via object_property_get(), then
-converted to a string with the string output visitor.  The resulting
-string is then converted back to a list with the string input visitor.
-
-Despite the shenanigans going on in the string output visitor, I'd
-expect the resulting list to also be sorted and without duplicates.
-
-> -> qmp_query_memdev() uses this list
-> --> Not relevant if unique or sorted
-
-Depends on the contract of QMP command query-memdev.  Here's the
-relevant part.
-
-    # @host-nodes: host nodes for its memory policy
-
-Useless.
-
-"Sorted, no duplicates" might have become de facto ABI.  Not sure.
-However, I believe your patch won't affect it, as per the argument I
-just made.
-
-> -> hmp_info_memdev() uses this list
-> --> List converted again to a string using string output visitor
->
-> -> I don't think unique/sorted is relevant here.
-
-HMP is not a stable interface.
-
-> Am I missing anything / is any of my statements wrong?
-
-Searching the QAPI schema for lists of integers coughs up block latency
-histogram stuff, but that's unrelated, as far as I can tell.
-
-Looks like we're good.  I didn't expect that :)
-
-[...]
+Thanks,
+Cole
