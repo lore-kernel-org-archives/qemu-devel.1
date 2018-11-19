@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gOjv7-00085W-Gw
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:48:59 -0500
+	(envelope-from <berrange@redhat.com>) id 1gOk50-0003ZC-1O
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:59:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gOjv3-0007Hf-6a
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:48:57 -0500
-References: <1542632978-65604-1-git-send-email-spopovyc@redhat.com>
-	<20181119142719.3d702892@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <3411737e-824a-0653-024b-f46fe5695790@redhat.com>
-Date: Mon, 19 Nov 2018 14:48:34 +0100
+	(envelope-from <berrange@redhat.com>) id 1gOk4w-0006mk-PF
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:59:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60088)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gOk4w-0006mC-Jm
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:59:06 -0500
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Mon, 19 Nov 2018 13:59:03 +0000
+Message-Id: <20181119135903.11729-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181119142719.3d702892@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for 3.1] spapr: Fix ibm,
- max-associativity-domains property number of nodes
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] qom: avoid reporting errors for NULL error
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,112 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Serhii Popovych <spopovyc@redhat.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-On 19/11/2018 14:27, Greg Kurz wrote:
-> On Mon, 19 Nov 2018 08:09:38 -0500
-> Serhii Popovych <spopovyc@redhat.com> wrote:
-> 
->> Laurent Vivier reported off by one with maximum number of NUMA nodes
->> provided by qemu-kvm being less by one than required according to
->> description of "ibm,max-associativity-domains" property in LoPAPR.
->>
->> It appears that I incorrectly treated LoPAPR description of this
->> property assuming it provides last valid domain (NUMA node here)
->> instead of maximum number of domains.
->>
->>   ### Before hot-add
->>
->>   (qemu) info numa
->>   3 nodes
->>   node 0 cpus: 0
->>   node 0 size: 0 MB
->>   node 0 plugged: 0 MB
->>   node 1 cpus:
->>   node 1 size: 1024 MB
->>   node 1 plugged: 0 MB
->>   node 2 cpus:
->>   node 2 size: 0 MB
->>   node 2 plugged: 0 MB
->>
->>   $ numactl -H
->>   available: 2 nodes (0-1)
->>   node 0 cpus: 0
->>   node 0 size: 0 MB
->>   node 0 free: 0 MB
->>   node 1 cpus:
->>   node 1 size: 999 MB
->>   node 1 free: 658 MB
->>   node distances:
->>   node   0   1
->>     0:  10  40
->>     1:  40  10
->>
->>   ### Hot-add
->>
->>   (qemu) object_add memory-backend-ram,id=mem0,size=1G
->>   (qemu) device_add pc-dimm,id=dimm1,memdev=mem0,node=2
->>   (qemu) [   87.704898] pseries-hotplug-mem: Attempting to hot-add 4 ...
->>   <there is no "Initmem setup node 2 [mem 0xHEX-0xHEX]">
->>   [   87.705128] lpar: Attempting to resize HPT to shift 21
->>   ... <HPT resize messages>
->>
->>   ### After hot-add
->>
->>   (qemu) info numa
->>   3 nodes
->>   node 0 cpus: 0
->>   node 0 size: 0 MB
->>   node 0 plugged: 0 MB
->>   node 1 cpus:
->>   node 1 size: 1024 MB
->>   node 1 plugged: 0 MB
->>   node 2 cpus:
->>   node 2 size: 1024 MB
->>   node 2 plugged: 1024 MB
->>
->>   $ numactl -H
->>   available: 2 nodes (0-1)
->>   ^^^^^^^^^^^^^^^^^^^^^^^^
->>              Still only two nodes (and memory hot-added to node 0 below)
->>   node 0 cpus: 0
->>   node 0 size: 1024 MB
->>   node 0 free: 1021 MB
->>   node 1 cpus:
->>   node 1 size: 999 MB
->>   node 1 free: 658 MB
->>   node distances:
->>   node   0   1
->>     0:  10  40
->>     1:  40  10
->>
->> After fix applied numactl(8) reports 3 nodes available and memory
->> plugged into node 2 as expected.
->>
->> Fixes: da9f80fbad21 ("spapr: Add ibm,max-associativity-domains property")
->> Reported-by: Laurent Vivier <lvivier@redhat.com>
->> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
->> ---
->>  hw/ppc/spapr.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 7afd1a1..843ae6c 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1033,7 +1033,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
->>          cpu_to_be32(0),
->>          cpu_to_be32(0),
->>          cpu_to_be32(0),
->> -        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes - 1 : 0),
->> +        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 0),
-> 
-> Maybe simply cpu_to_be32(nb_numa_nodes) ?
+When debugging QEMU it is often useful to put a breakpoint on the
+error_setg_internal method impl.
 
-Or "cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 1)" ?
+Unfortunately the object_property_add / object_class_property_add
+methods call object_property_find / object_class_property_find methods
+to check if a property exists already before adding the new property.
 
-In spapr_populate_drconf_memory() we have this logic.
+As a result there are a huge number of calls to error_setg_internal
+on startup of most QEMU commands, making it very painful to set a
+breakpoint on this method.
 
-Thanks,
-Laurent
+This puts a minor optimization on the code so that we avoid calling
+error_setg() when errp is NULL. Functionally there's no difference
+since error_setg() is a no-op when errp is NULL, but this lets us
+use breakpoints in GDB in a practical way.
+
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ qom/object.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/qom/object.c b/qom/object.c
+index 547dcf97c3..ddd5e7a30e 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1087,7 +1087,12 @@ ObjectProperty *object_property_find(Object *obj, =
+const char *name,
+         return prop;
+     }
+=20
+-    error_setg(errp, "Property '.%s' not found", name);
++    /* Optimized to avoid calling error_setg if errp =3D=3D NULL
++     * otherwise every property add call hits error_setg
++     * making it impratical to set breakpoints in GDB */
++    if (errp) {
++        error_setg(errp, "Property '.%s' not found", name);
++    }
+     return NULL;
+ }
+=20
+@@ -1133,7 +1138,10 @@ ObjectProperty *object_class_property_find(ObjectC=
+lass *klass, const char *name,
+     }
+=20
+     prop =3D g_hash_table_lookup(klass->properties, name);
+-    if (!prop) {
++    /* Optimized to avoid calling error_setg if errp =3D=3D NULL
++     * otherwise every property add call hits error_setg
++     * making it impratical to set breakpoints in GDB */
++    if (!prop && errp) {
+         error_setg(errp, "Property '.%s' not found", name);
+     }
+     return prop;
+--=20
+2.19.1
