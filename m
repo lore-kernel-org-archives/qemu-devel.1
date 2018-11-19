@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMP-0001mj-P0
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:04 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMS-0001pI-UJ
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMM-0002vH-Bo
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:01 -0500
-Received: from cmccmta2.chinamobile.com ([221.176.66.80]:24190)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMQ-00030q-82
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:04 -0500
+Received: from cmccmta2.chinamobile.com ([221.176.66.80]:55551)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiML-0002q1-JR
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:08:58 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMP-0002xC-FH
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:02 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Mon, 19 Nov 2018 20:08:06 +0800
-Message-Id: <20181119120820.29878-9-maozhongyi@cmss.chinamobile.com>
+Date: Mon, 19 Nov 2018 20:08:20 +0800
+Message-Id: <20181119120820.29878-23-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
 References: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH 08/22] milkymist-softusb: Convert sysbus init
- function to realize function
+Subject: [Qemu-devel] [PATCH 22/22] core/sysbus: remove the
+ SysBusDeviceClass::init path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +25,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, michael@walle.cc, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, ehabkost@redhat.com, thuth@redhat.com, pbonzini@redhat.com, armbru@redhat.com, peter.maydell@linaro.org, richard.henderson@linaro.org, alistair.francis@wdc.com, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
-Use DeviceClass rather than SysBusDeviceClass in
-milkymist_softusb_class_init().
+Currently, all sysbus devices have been converted to realize(),
+so remove this path.
 
-Cc: michael@walle.cc
+Cc: ehabkost@redhat.com
+Cc: thuth@redhat.com
+Cc: pbonzini@redhat.com
+Cc: armbru@redhat.com
+Cc: peter.maydell@linaro.org
+Cc: richard.henderson@linaro.org
+Cc: alistair.francis@wdc.com
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 ---
- hw/input/milkymist-softusb.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ hw/core/sysbus.c    | 15 ---------------
+ include/hw/sysbus.h |  3 ---
+ 2 files changed, 18 deletions(-)
 
-diff --git a/hw/input/milkymist-softusb.c b/hw/input/milkymist-softusb.c
-index ef8f47cd83..6e4cb29205 100644
---- a/hw/input/milkymist-softusb.c
-+++ b/hw/input/milkymist-softusb.c
-@@ -245,32 +245,30 @@ static void milkymist_softusb_reset(DeviceState *d)
-     s->regs[R_CTRL] = CTRL_RESET;
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index 7ac36ad3e7..030ad426c1 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -201,20 +201,6 @@ void sysbus_init_ioports(SysBusDevice *dev, uint32_t ioport, uint32_t size)
+     }
  }
  
--static int milkymist_softusb_init(SysBusDevice *dev)
-+static void milkymist_softusb_realize(DeviceState *dev, Error **errp)
- {
-     MilkymistSoftUsbState *s = MILKYMIST_SOFTUSB(dev);
- 
--    sysbus_init_irq(dev, &s->irq);
-+    sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
- 
-     memory_region_init_io(&s->regs_region, OBJECT(s), &softusb_mmio_ops, s,
-                           "milkymist-softusb", R_MAX * 4);
--    sysbus_init_mmio(dev, &s->regs_region);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->regs_region);
- 
-     /* register pmem and dmem */
-     memory_region_init_ram_nomigrate(&s->pmem, OBJECT(s), "milkymist-softusb.pmem",
-                            s->pmem_size, &error_fatal);
-     vmstate_register_ram_global(&s->pmem);
-     s->pmem_ptr = memory_region_get_ram_ptr(&s->pmem);
--    sysbus_init_mmio(dev, &s->pmem);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->pmem);
-     memory_region_init_ram_nomigrate(&s->dmem, OBJECT(s), "milkymist-softusb.dmem",
-                            s->dmem_size, &error_fatal);
-     vmstate_register_ram_global(&s->dmem);
-     s->dmem_ptr = memory_region_get_ram_ptr(&s->dmem);
--    sysbus_init_mmio(dev, &s->dmem);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->dmem);
- 
-     hid_init(&s->hid_kbd, HID_KEYBOARD, softusb_kbd_hid_datain);
-     hid_init(&s->hid_mouse, HID_MOUSE, softusb_mouse_hid_datain);
+-/* TODO remove once all sysbus devices have been converted to realize */
+-static void sysbus_realize(DeviceState *dev, Error **errp)
+-{
+-    SysBusDevice *sd = SYS_BUS_DEVICE(dev);
+-    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(sd);
 -
--    return 0;
- }
- 
- static const VMStateDescription vmstate_milkymist_softusb = {
-@@ -296,9 +294,8 @@ static Property milkymist_softusb_properties[] = {
- static void milkymist_softusb_class_init(ObjectClass *klass, void *data)
+-    if (!sbc->init) {
+-        return;
+-    }
+-    if (sbc->init(sd) < 0) {
+-        error_setg(errp, "Device initialization failed");
+-    }
+-}
+-
+ DeviceState *sysbus_create_varargs(const char *name,
+                                    hwaddr addr, ...)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+@@ -327,7 +313,6 @@ MemoryRegion *sysbus_address_space(SysBusDevice *dev)
+ static void sysbus_device_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *k = DEVICE_CLASS(klass);
+-    k->realize = sysbus_realize;
+     k->bus_type = TYPE_SYSTEM_BUS;
+     /*
+      * device_add plugs devices into a suitable bus.  For "real" buses,
+diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+index 0b59a3b8d6..1aedcf05c9 100644
+--- a/include/hw/sysbus.h
++++ b/include/hw/sysbus.h
+@@ -38,9 +38,6 @@ typedef struct SysBusDevice SysBusDevice;
+ typedef struct SysBusDeviceClass {
+     /*< private >*/
+     DeviceClass parent_class;
+-    /*< public >*/
+-
+-    int (*init)(SysBusDevice *dev);
  
--    k->init = milkymist_softusb_init;
-+    dc->realize = milkymist_softusb_realize;
-     dc->reset = milkymist_softusb_reset;
-     dc->vmsd = &vmstate_milkymist_softusb;
-     dc->props = milkymist_softusb_properties;
+     /*
+      * Let the sysbus device format its own non-PIO, non-MMIO unit address.
 -- 
 2.17.1
