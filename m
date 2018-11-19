@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gOlme-0003k1-SR
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:48:21 -0500
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1gOlpy-0005lt-NM
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:51:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gOlma-00019r-UH
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:48:20 -0500
-Received: from eddie.linux-mips.org ([148.251.95.138]:48182
-	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <macro@linux-mips.org>) id 1gOlma-00018t-LH
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:48:16 -0500
-Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
-	with ESMTP id S23992246AbeKSPqaSR0tA (ORCPT
-	<rfc822;qemu-devel@nongnu.org>); Mon, 19 Nov 2018 16:46:30 +0100
-Date: Mon, 19 Nov 2018 15:46:30 +0000 (GMT)
-Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
-From: "Maciej W. Rozycki" <macro@linux-mips.org>
-In-Reply-To: <20181119152952.GA2405@sx9>
-Message-ID: <alpine.LFD.2.21.1811191537140.22162@eddie.linux-mips.org>
-References: <20181118203312.5376-1-f4bug@amsat.org> <20181119152952.GA2405@sx9>
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1gOlpx-0003E5-L4
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:51:46 -0500
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:37738)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1gOlpx-0003BC-Ah
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:51:45 -0500
+Received: by mail-io1-xd41.google.com with SMTP id a3so15875528ioc.4
+	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 07:51:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] docker: Add
- gentoo-mipsr5900el-cross image
+References: <1539939312-19713-1-git-send-email-hongbo.zhang@linaro.org>
+	<1539939312-19713-2-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA-vF5orNpfGFe2sGWh=TxWL054PmCM-Yu4faJne+4CkbA@mail.gmail.com>
+	<CAHmQWvD1ocAfZo=9aJYeuVDWrBk=AF_D-AgHriYb3-7=n+rR6A@mail.gmail.com>
+	<20181116122705.msdb5hydmhtyzzxy@sirius.home.kraxel.org>
+	<CAKv+Gu8QXaRioVPNze_+mJg4aqjJmwn4O-1jdRcYwrkieXrBwQ@mail.gmail.com>
+	<20181119124423.qj3sjhhdyetrbju5@bivouac.eciton.net>
+In-Reply-To: <20181119124423.qj3sjhhdyetrbju5@bivouac.eciton.net>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Mon, 19 Nov 2018 07:51:29 -0800
+Message-ID: <CAKv+Gu_-U8BHthhen-GBkium9qJMdd-pe_PB9TPdUaP=koeajQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4] hw/arm: Add arm SBSA reference machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fredrik Noring <noring@nocrew.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Mike Frysinger <vapier@gentoo.org>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>
+To: Leif Lindholm <leif.lindholm@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Hongbo Zhang <hongbo.zhang@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Mon, 19 Nov 2018, Fredrik Noring wrote:
+On Mon, 19 Nov 2018 at 04:44, Leif Lindholm <leif.lindholm@linaro.org> wrote:
+>
+> On Fri, Nov 16, 2018 at 02:04:07PM -0800, Ard Biesheuvel wrote:
+> > > > > What is this using the exynos4210 USB device for? That
+> > > > > is definitely not correct for a generic board.
+> > > > >
+> > > > Checked the code:
+> > > > #define TYPE_SYS_BUS_EHCI "sysbus-ehci-usb"
+> > > > #define TYPE_EXYNOS4210_EHCI "exynos4210-ehci-usb"
+> > > > #define TYPE_TEGRA2_EHCI "tegra2-ehci-usb"
+> > > > #define TYPE_PPC4xx_EHCI "ppc4xx-ehci-usb"
+> > > > #define TYPE_FUSBH200_EHCI "fusbh200-ehci-usb"
+> > > >
+> > > > The first one seems only a parent type, not a general instance, cannot
+> > > > be used directly.
+> > > > The other four are specific instances using the first as parent type,
+> > > > one of them can be chosen to use.
+> > > > That is my understanding, any comments, or do we need to implement one
+> > > > which seems generic?
+> > >
+> > > I think what we *really* want is sysbus-xhci-generic.
+> > >
+> > > That'll be a bit more work though as xhci core and xhci pci needs to be
+> > > splitted, simliar to how it was done for ehci in commit
+> > > 5010d4dc618b6b8e7c21129c487c06f6493f71fc (and related patches).
+> > >
+> > > Or just plug qemu-xhci into a pcie slot.  Not sure which would be closer
+> > > to physical hardware.
+> >
+> > We don't need XHCI especially, EHCI is perfectly fine as well.
+> >
+> > This is mostly about ensuring that the emulated hardware spans the
+> > space of what we encounter on real hardware, and non-PCIE SATA and USB
+> > controllers is something we see often.
+> >
+> > So I could live with MMIO SATA and PCI USB as well, but I'd prefer it
+> > if we could have both MMIO.
+>
+> I would actually strongly prefer non-MMIO.
+>
+> What "we see" is generally a result of embedded companies "value
+> adding" in the usual way when moving from embedded to servers.
+>
+> I want the SBSA target to be an idealised machine, not an educational
+> vehicle for showing how companies have got it wrong.
+>
+> Where in doubt, anything software discoverable should win over
+> non-discoverable.
+>
 
-> > The first patch adds a cross toolchain for the R5900 MIPS.
-> > It is working correctly but the patches provided by Fredrik in [1] don't
-> > have proper S-o-b, thus it is tagged RFC.
-> > Fredrik: any update on the status of those patches upstream?
-> 
-> With GCC 8.2.0 and a current Gentoo this is even simpler. You should
-> only need commit d728eb9085d8 ("MIPS: Default to --with-llsc for the
-> R5900 Linux target as well"):
-> 
-> https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=d728eb9085d8
-
- Of course you can instead just set the default manually by using 
-`--with-llsc' when configuring GCC or specify `-mllsc' explicitly in 
-CFLAGS with a compiler that has been already built without that set by 
-default.
-
-> For the o32 ABI with Glibc, only commit 8e3c00db16fc ("MIPS: Use `.set
-> mips2' to emulate LL/SC for the R5900 too") is needed:
-> 
-> https://sourceware.org/git/?p=glibc.git;a=commit;h=8e3c00db16fc
-> 
-> Eventually, with a future GCC/Glibc release, no patches will be needed.
-
- For the record the glibc change will be available with upcoming glibc 
-2.29, currently scheduled Feb 1st, 2019, and the GCC change will appear in 
-GCC 9.1.0, currently scheduled Mar-Apr 2019.
-
- FWIW,
-
-  Maciej
+I don't think it makes sense at all to idealize the SBSA machine in
+this way. For example, there are elaborate provisions in the IORT spec
+how to describe an I/O topology involving named components (as opposed
+to PCIe devices), and I have not seen an arm64 SoC yet that uses PCIe
+internally for on-chip network controllers, nor do I expect to in the
+near future. So having non-PCIe USB or SATA will permit us to exercise
+code paths in the OS that we do rely on in production, and will for
+the foreseeable future.
