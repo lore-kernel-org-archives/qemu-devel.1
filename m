@@ -1,15 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1gOmKO-0002TU-4X
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:23:12 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gOmOD-0003ls-SD
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:27:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1gOmKJ-0003tE-3z
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:23:12 -0500
-From: Serhii Popovych <spopovyc@redhat.com>
-Date: Mon, 19 Nov 2018 11:23:05 -0500
-Message-Id: <1542644585-87579-1-git-send-email-spopovyc@redhat.com>
-Subject: [Qemu-devel] [PATCH for 3.1 v2] spapr: Fix ibm,
- max-associativity-domains property number of nodes
+	(envelope-from <pm215@archaic.org.uk>) id 1gOmOB-0007iX-Pe
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:27:09 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52682)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gOmOA-0007gp-6f
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:27:07 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Nov 2018 16:26:58 +0000
+Message-Id: <20181119162658.30358-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for-3.1] hw/xen/xen_pt_graphics: Don't trust
+ the BIOS ROM contents so much
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,108 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
 
-Laurent Vivier reported off by one with maximum number of NUMA nodes
-provided by qemu-kvm being less by one than required according to
-description of "ibm,max-associativity-domains" property in LoPAPR.
+Coverity (CID 796599) points out that xen_pt_setup_vga() trusts
+the rom->size field in the BIOS ROM from a PCI passthrough VGA
+device, and uses it as an index into the memory which contains
+the BIOS image. A corrupt BIOS ROM could therefore cause us to
+index off the end of the buffer.
 
-It appears that I incorrectly treated LoPAPR description of this
-property assuming it provides last valid domain (NUMA node here)
-instead of maximum number of domains.
+Check that the size is within bounds before we use it.
 
-  ### Before hot-add
+We are also trusting the pcioffset field, and assuming that
+the whole rom_header is present; Coverity doesn't notice these,
+but check them too.
 
-  (qemu) info numa
-  3 nodes
-  node 0 cpus: 0
-  node 0 size: 0 MB
-  node 0 plugged: 0 MB
-  node 1 cpus:
-  node 1 size: 1024 MB
-  node 1 plugged: 0 MB
-  node 2 cpus:
-  node 2 size: 0 MB
-  node 2 plugged: 0 MB
-
-  $ numactl -H
-  available: 2 nodes (0-1)
-  node 0 cpus: 0
-  node 0 size: 0 MB
-  node 0 free: 0 MB
-  node 1 cpus:
-  node 1 size: 999 MB
-  node 1 free: 658 MB
-  node distances:
-  node   0   1
-    0:  10  40
-    1:  40  10
-
-  ### Hot-add
-
-  (qemu) object_add memory-backend-ram,id=mem0,size=1G
-  (qemu) device_add pc-dimm,id=dimm1,memdev=mem0,node=2
-  (qemu) [   87.704898] pseries-hotplug-mem: Attempting to hot-add 4 ...
-  <there is no "Initmem setup node 2 [mem 0xHEX-0xHEX]">
-  [   87.705128] lpar: Attempting to resize HPT to shift 21
-  ... <HPT resize messages>
-
-  ### After hot-add
-
-  (qemu) info numa
-  3 nodes
-  node 0 cpus: 0
-  node 0 size: 0 MB
-  node 0 plugged: 0 MB
-  node 1 cpus:
-  node 1 size: 1024 MB
-  node 1 plugged: 0 MB
-  node 2 cpus:
-  node 2 size: 1024 MB
-  node 2 plugged: 1024 MB
-
-  $ numactl -H
-  available: 2 nodes (0-1)
-  ^^^^^^^^^^^^^^^^^^^^^^^^
-             Still only two nodes (and memory hot-added to node 0 below)
-  node 0 cpus: 0
-  node 0 size: 1024 MB
-  node 0 free: 1021 MB
-  node 1 cpus:
-  node 1 size: 999 MB
-  node 1 free: 658 MB
-  node distances:
-  node   0   1
-    0:  10  40
-    1:  40  10
-
-After fix applied numactl(8) reports 3 nodes available and memory
-plugged into node 2 as expected.
-
-Fixes: da9f80fbad21 ("spapr: Add ibm,max-associativity-domains property")
-Reported-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-v2
-  Remove now unneeded ?: statement previously used to catch -1 as numa node
-  causing Linux guests hanging on boot.
+Disclaimer: compile tested only, as I don't have a Xen setup,
+let alone one with pass-through PCI graphics.
 
- hw/ppc/spapr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Note that https://xenbits.xen.org/xsa/advisory-124.html
+defines that bugs which are only exploitable by a malicious
+piece of hardware that is passed through to the guest are
+not security vulnerabilities as far as the Xen Project is
+concerned, and are treated like normal non-security-related bugs.
+So this is just a bugfix, not a security issue.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7afd1a1..a7171fb 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1033,7 +1033,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
-         cpu_to_be32(0),
-         cpu_to_be32(0),
-         cpu_to_be32(0),
--        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes - 1 : 0),
-+        cpu_to_be32(nb_numa_nodes),
-     };
+Marked "for-3.1" because it would let us squash another Coverity
+issue, and it is a bug fix; on the other hand it's an obscure
+corner case and has been this way since forever.
+
+---
+ hw/xen/xen_pt_graphics.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/hw/xen/xen_pt_graphics.c b/hw/xen/xen_pt_graphics.c
+index 135c8df1e72..60d6b4a5563 100644
+--- a/hw/xen/xen_pt_graphics.c
++++ b/hw/xen/xen_pt_graphics.c
+@@ -185,8 +185,19 @@ void xen_pt_setup_vga(XenPCIPassthroughState *s, XenHostPCIDevice *dev,
+         return;
+     }
  
-     _FDT(rtas = fdt_add_subnode(fdt, 0, "rtas"));
++    if (bios_size < sizeof(struct rom_header)) {
++        error_setg(errp, "VGA: VBIOS image corrupt (too small)");
++        return;
++    }
++
+     /* Currently we fixed this address as a primary. */
+     rom = (struct rom_header *)bios;
++
++    if (rom->pcioffset + sizeof(struct pci_data) > bios_size) {
++        error_setg(errp, "VGA: VBIOS image corrupt (bad pcioffset field)");
++        return;
++    }
++
+     pd = (void *)(bios + (unsigned char)rom->pcioffset);
+ 
+     /* We may need to fixup Device Identification. */
+@@ -194,6 +205,11 @@ void xen_pt_setup_vga(XenPCIPassthroughState *s, XenHostPCIDevice *dev,
+         pd->device = s->real_device.device_id;
+ 
+         len = rom->size * 512;
++        if (len > bios_size) {
++            error_setg(errp, "VGA: VBIOS image corrupt (bad size field)");
++            return;
++        }
++
+         /* Then adjust the bios checksum */
+         for (c = (char *)bios; c < ((char *)bios + len); c++) {
+             checksum += *c;
 -- 
-1.8.3.1
+2.19.1
