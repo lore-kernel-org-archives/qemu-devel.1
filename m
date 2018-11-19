@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balducci@units.it>) id 1gOj4g-0003uA-V9
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:54:47 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gOjCB-0005Hd-5V
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:02:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balducci@units.it>) id 1gOj4c-0001eI-1k
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:54:46 -0500
-Received: from dschgrazlin2.univ.trieste.it ([140.105.55.81]:49790
-	helo=dschgrazlin2.units.it) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balducci@units.it>) id 1gOj4b-0001ds-Nf
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:54:42 -0500
-From: balducci@units.it
-In-reply-to: Your message of "Mon, 19 Nov 2018 10:43:30 +0000."
-	<20181119104330.GA2367@work-vm>
+	(envelope-from <stefanha@gmail.com>) id 1gOjC1-0006r7-Tx
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:02:31 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34835)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gOjC1-0006qd-NE
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:02:21 -0500
+Received: by mail-wm1-x342.google.com with SMTP id t15-v6so5189872wmt.0
+	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 05:02:21 -0800 (PST)
+Date: Mon, 19 Nov 2018 13:02:18 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20181119130218.GA6443@stefanha-x1.localdomain>
+References: <20181112214224.31560-1-contrib@steffen-goertz.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <16965.1542632079.1@dschgrazlin2.units.it>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 19 Nov 2018 13:54:15 +0100
-Message-ID: <16966.1542632079@dschgrazlin2.units.it>
-Subject: Re: [Qemu-devel] 3.1.0-rc{0,1} doesn't start
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="HcAYCG3uE/tztfnV"
+Content-Disposition: inline
+In-Reply-To: <20181112214224.31560-1-contrib@steffen-goertz.de>
+Subject: Re: [Qemu-devel] [PATCH v5 00/14] arm: nRF51 Devices and Microbit
+ Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>
+Cc: qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-hi
 
-thanks for taking the time to reply
+--HcAYCG3uE/tztfnV
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Dr. David Alan Gilbert writes:
-> > I suspect that this might be some problem on my side, as I couldn't
-> > find any similar report (apart some old (qemu-2.8.50) threads, that
-> > didn't help)
->
-> Not necessarily; can you tell me:
->   a) At what point does it fail - immediately when booting the guest?
->      Some time during the boot? Later?
->   b) What guest does it happen on?
+On Mon, Nov 12, 2018 at 04:42:10PM -0500, Steffen G=F6rtz wrote:
+> This series contains additional peripheral devices for the nRF51822
+> microcontroller.=20
 
-a) the error happens almost immediately; I mean: when I run qemu from an
-   xterm, it doesn't even popup its window: it just dumps the error
-   message to the terminal and stops
-b) the guest is an old windows XP OS; but, as I say above, all goes as
-   if qemu doesn't even load the OS image (at least this is my
-   impression)
+Hi Steffen,
+I have finished reviewing this revision, please feel free to send the
+next revision addressing comments.  It's getting very close and I expect
+to post my Reviewed-by for the remaining patches then.
 
-Meantime, I have tried to (quick&dirty) disable the error
-catching/asserting in i386/kvm.c:
+Stefan
 
-install:41> diff ./qemu-3.1.0-rc1/target/i386/kvm.c.MSR_HACK ./qemu-3.1.0-=
-rc1/target/i386/kvm.c
-2205c2205
-<     if (ret < cpu->kvm_msr_buf->nmsrs) {
----
->     if (1=3D=3D0) {
-2211c2211
-<     assert(ret =3D=3D cpu->kvm_msr_buf->nmsrs);
----
->     assert(1=3D=3D1);
-2524c2524
-<     if (ret < cpu->kvm_msr_buf->nmsrs) {
----
->     if (1=3D=3D0) {
-2530c2530
-<     assert(ret =3D=3D cpu->kvm_msr_buf->nmsrs);
----
->     assert(1=3D=3D1);
+--HcAYCG3uE/tztfnV
+Content-Type: application/pgp-signature; name="signature.asc"
 
-and that makes qemu start and work without apparent problems.
-Of course, that is a crude and risky (I guess) workaround...
+-----BEGIN PGP SIGNATURE-----
 
-thanks again
+iQEcBAEBAgAGBQJb8rRaAAoJEJykq7OBq3PI6ZYIAKM4cTLUG2sWICiRbEyO7qGz
+bLGzY2hjL8YVaK+CqxbgZZNq7wA9WBPv6so73IchaUBY7ADQaPeolSnZidE72rH2
+83rJ2VIKQ619MniXmqy8/sG97OmsdHAFsz3QqesIFAHsroTF0lJcMnDBVioTnp5p
+37572K3T/KvOg+qNTPXisQrZ+7xPjGYKewMmjqv9SMW3g09jHkQdiaA9H1kUkF0b
+Dk8pTZ2xjb+LAugzdTl7bE9GfzFvRD5Ij3gZN51eFP2l/b+saHzMN+ptOZC24G97
+C+LMZGJMC2Bv1SeCpHmF5dtaSG2FZTGIXuTdzp3+7JcjwUlRwVRr5HJJ3VXovoQ=
+=+Ehk
+-----END PGP SIGNATURE-----
 
-ciao
--gabriele
+--HcAYCG3uE/tztfnV--
