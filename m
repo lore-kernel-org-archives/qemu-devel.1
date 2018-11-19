@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gOr9v-0006Oi-EQ
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:32:44 -0500
+	(envelope-from <farosas@linux.ibm.com>) id 1gOrEw-00089F-Mp
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:37:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gOr9r-0000AW-LU
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:32:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:22913)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gOr9p-000063-NL
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:32:39 -0500
-Date: Mon, 19 Nov 2018 19:32:32 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181119213232.GE3807@habkost.net>
-References: <20181114233831.10374-1-ehabkost@redhat.com>
-	<c1b4a0ee39dfddeb19f1be46710c10cbefd3f07a.camel@redhat.com>
-	<20181116034551.GK3807@habkost.net>
-	<20181119114105.4da89f2c.cohuck@redhat.com>
-	<20181119125519-mutt-send-email-mst@kernel.org>
-	<20181119193238.117c2f4e.cohuck@redhat.com>
-	<20181119133434-mutt-send-email-mst@kernel.org>
-	<20181119195638.49a9c21e.cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181119195638.49a9c21e.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] virtio: Provide
- version-specific variants of virtio PCI devices
+	(envelope-from <farosas@linux.ibm.com>) id 1gOrEt-0004RT-Iw
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:37:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44310)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
+	id 1gOrEt-0004QW-Au
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:37:51 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wAJLXYf1042651
+	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 16:37:49 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2nv4e0hwu7-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 16:37:49 -0500
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
+	Mon, 19 Nov 2018 21:37:48 -0000
+From: Fabiano Rosas <farosas@linux.ibm.com>
+Date: Mon, 19 Nov 2018 19:37:38 -0200
+Message-Id: <20181119213739.773-1-farosas@linux.ibm.com>
+Subject: [Qemu-devel] [RFC PATCH 0/1] single step for KVM HV
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +35,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: david@gibson.dropbear.id.au
 
-On Mon, Nov 19, 2018 at 07:56:38PM +0100, Cornelia Huck wrote:
-> On Mon, 19 Nov 2018 13:42:58 -0500
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Mon, Nov 19, 2018 at 07:32:38PM +0100, Cornelia Huck wrote:
-> > > On Mon, 19 Nov 2018 13:07:59 -0500
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > > > And I strongly believe command line users really really do not want all
-> > > > this mess. Even adding "pci" is the name confuses people (what are the
-> > > > other options?). For command line model=virtio is pretty much perfect.  
-> > > 
-> > > I'd argue that it's problematic on platforms where you have different
-> > > options for virtio transports. What does "model=virtio" mean? Always
-> > > virtio-pci, if available? Or rather virtio-<transport>, with
-> > > <transport> being the best option for the machine?  
-> > 
-> > Most people don't care, for them it's "whatever works".
-> > 
-> > We have this assumption that if we force a choice then people will
-> > choose the right thing but in practice they will do what we all do, play
-> > with it until it kind of works and leave well alone afterwards.
-> > That's at best - at worst give up and use an easier tool.
-> 
-> That implies that we (the developers) need to care and make sure that
-> "model=virtio" gets them the best possible transport (i.e. on s390x,
-> that would be ccw unless the user explicitly requests pci; I'm not sure
-> what the situation with mmio is -- probably "use pci whenever
-> possible"?) I think that's what libvirt already gives us today (I hope.)
-> 
-> What makes it messy on the pci side is that the "best option" actually
-> depends on what kind of guest the user wants to run (if the guest is
-> too old, you're stuck with transitional; if you want to reap the
-> benefits of PCIe, you need non-transitional...)
+Single stepping via GDB/gdbstub is currently not working with KVM
+HV. When asking for a single step (stepi), KVM simply ignores the
+request and execution continues.
 
-Yeah, sometimes we can't make everything work out of the box on
-the default case.  But I think in this case we can make the QEMU
-command-line a bit more usable if we just cover more recent OSes.
+This has the direct effect of breaking GDB's 'step', 'stepi', 'next',
+'nexti' commands. The 'continue' command is also affected since
+continuing right after a breakpoint requires that GDB first perform a
+single step so that the breakpoint can be re-inserted before
+continuing - in this case the breakpoint is not re-inserted and it
+won't hit again.
 
-However, I wish this kind of usability magic didn't automatically
-imposed us the burden of keeping guest ABI compatibility too.
-Keeping ABI compatibility on the machine-friendly device types and
-interfaces is already hard enough.
+The issue here is that single stepping in POWER makes use of an
+interrupt (Trace Interrupt [1]) that does not reach the hypervisor, so
+while the single step would happen if properly triggered, it would not
+cause an exit to KVM so there would be no way of handing control back
+to GDB. Aside from that, the guest kernel is not prepared to deal with
+such an interrupt in kernel mode (when not using KGDB, or some other
+debugging facility) and it causes an Oops.
 
-We already have aliases that automatically select a virtio device
-type at qdev-monitor.c:qdev_alias_table[], and I don't know if
-they are supposed to keep a stable guest ABI.
+This series implements a "software single step" approach that makes
+use of: i) the Trace Interrupt to perform the step inside the guest
+and ii) a breakpoint at the Trace Interrupt handler address to cause a
+vm exit (Emulation Assist) so that we can return control to QEMU.
 
--- 
-Eduardo
+With (i), we basically get the single step for free, without having to
+discover what are the possible targets of instructions that divert
+execution.
+
+With (ii), we hide the single step from the guest and keep all of the
+step logic in QEMU.
+
+This was so far tested with single and multiple vcpus and with GDB
+scheduler locking on and off [2].
+
+I have not fully explored yet the potential issues when using
+debuggers simultaneously inside and outside the guest, however I was
+able to single step the ptrace code while single stepping a userspace
+program inside the guest with GDB.
+
+I'm looking for feedback on the general approach before I develop this
+further.
+
+1- PowerISA Section 6.5.15 - Trace Interrupt
+2- https://sourceware.org/gdb/onlinedocs/gdb/All_002dStop-Mode.html
+
+
+Fabiano Rosas (1):
+  target/ppc: support single stepping with KVM HV
+
+ accel/kvm/kvm-all.c  | 10 +++++++
+ exec.c               |  1 +
+ include/sysemu/kvm.h |  4 +++
+ target/arm/kvm.c     |  4 +++
+ target/i386/kvm.c    |  4 +++
+ target/ppc/kvm.c     | 65 +++++++++++++++++++++++++++++++++++++++++++-
+ target/s390x/kvm.c   |  4 +++
+ 7 files changed, 91 insertions(+), 1 deletion(-)
+
+--
+2.17.1
