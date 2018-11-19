@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gOX1w-0003SR-HV
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 19:03:09 -0500
+	(envelope-from <liq3ea@163.com>) id 1gOYU8-00044y-4L
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 20:36:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gOX1s-0007kP-Jg
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 19:03:08 -0500
-Received: from mail-yb1-f193.google.com ([209.85.219.193]:45908)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gOX1s-0007kF-Fg
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 19:03:04 -0500
-Received: by mail-yb1-f193.google.com with SMTP id 131-v6so11896767ybe.12
-	for <qemu-devel@nongnu.org>; Sun, 18 Nov 2018 16:03:04 -0800 (PST)
+	(envelope-from <liq3ea@163.com>) id 1gOYU4-0000iL-G7
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 20:36:20 -0500
+Received: from m13-102.163.com ([220.181.13.102]:14510)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <liq3ea@163.com>) id 1gOYU1-0000gx-FJ
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 20:36:14 -0500
+Date: Mon, 19 Nov 2018 09:36:07 +0800 (CST)
+From: =?GBK?B?wO7Hvw==?= <liq3ea@163.com>
+In-Reply-To: <87pnv50yox.fsf@dusky.pond.sub.org>
+References: <20181110034115.103335-1-liq3ea@163.com>
+	<20181110034115.103335-2-liq3ea@163.com>
+	<87pnv50yox.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <154238824601.3534.13597728205342770469.stgit@wayrath>
-	<87k1lai2vo.fsf@linaro.org>
-	<177817734b4def66a3a0641ad2fba1ec9a4092cb.camel@suse.com>
-In-Reply-To: <177817734b4def66a3a0641ad2fba1ec9a4092cb.camel@suse.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 19 Nov 2018 01:02:51 +0100
-Message-ID: <CAAdtpL4nkWZ4_p=Vo=Smz9TpL97eYxDLrd8OGXWhGEn=92C_kw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] docker: dockerfile for openSUSE Leap
+Message-ID: <44b68976.4834.167299c496e.Coremail.liq3ea@163.com>
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw: fw_cfg: refactor
+ fw_cfg_bootsplash()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dfaggioli@suse.com
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: pbonzini@redhat.com, kraxel@redhat.com, lersek@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org
 
-Hi Dario,
-
-On Sun, Nov 18, 2018 at 10:54 PM Dario Faggioli <dfaggioli@suse.com> wrote:
->
-> On Sun, 2018-11-18 at 19:47 +0000, Alex Benn=C3=A9e wrote:
-> > Dario Faggioli <dfaggioli@suse.com> writes:
-> >
-> > > Dockerfile for building an openSUSE Leap container.
-> > >
-> > > Tracks the latest release (at the time of writing this
-> > > patch, it is Leap 15).
-> > >
-> > > Signed-off-by: Dario Faggioli <dfaggioli@suse.com>
-> > > ---
-> > > Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
-> > > Cc: Fam Zheng <famz@redhat.com>
-> > > Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
-> > > ---
-> > >  tests/docker/dockerfiles/opensuse-leap.docker |   62
-> > > +++++++++++++++++++++++++
-> > >  1 file changed, 62 insertions(+)
-> > >  create mode 100644 tests/docker/dockerfiles/opensuse-leap.docker
-> > >
-> > > diff --git a/tests/docker/dockerfiles/opensuse-leap.docker
-> > > b/tests/docker/dockerfiles/opensuse-leap.docker
-> > > new file mode 100644
-> > > index 0000000000..9d00861e66
-> > > --- /dev/null
-> > > +++ b/tests/docker/dockerfiles/opensuse-leap.docker
-> > > @@ -0,0 +1,62 @@
-> > > +FROM opensuse/leap
-> > > +ENV PACKAGES \
-> > <snip>
-> > > +    tar \
-> > > +    usbredir-devel \
-> > > +    virglrenderer-devel \
-> > > +    vte-devel \
-> > > +    which \
-> > > +    xen-devel
-> > > +    zlib-devel \
-> >
-> > This hasn't been tested because the docker image fails to build due
-> > to
-> > continuation breakage.
-> >
-> It is indeed broken.
->
-> Basically, I tested it thoroughly, and I'm quite sure it works ok
-> (although, I'm no docker expert).
-
-I quickly fixed/tried it.
-First this package list pulls many unuseful system packages.
-I added '--no-recommends' to reduce a bit:
-
-RUN zypper ref && \
-    zypper up -y && \
-    zypper install -y --no-recommends $PACKAGES
-
-This still install a bunch of unnecessary stuffs:
-
-Creating group systemd-journal with gid 485.
-Creating group systemd-network with gid 484.
-Creating user systemd-network (systemd Network Management) with uid
-484 and gid 484.
-Creating group systemd-coredump with gid 483.
-Creating user systemd-coredump (systemd Core Dumper) with uid 483 and gid 4=
-83.
-Creating group systemd-timesync with gid 482.
-Creating user systemd-timesync (systemd Time Synchronization) with uid
-482 and gid 482.
-Failed to connect to bus: No such file or directory
-
-Then the resulting image takes the same than without --no-recommends:
-1.1GB. No idea why.
-At some point some package tried to talk to the network manager via
-DBus to start sshd...
-
-Second, while this works on x86_64, it fails on aarch64:
-
-Problem: libcurl-devel-7.59.0-lp150.1.2.aarch64 requires libcurl4 =3D
-7.59.0, but this requirement cannot be provided
-  not installable providers: libcurl4-7.59.0-lp150.1.2.aarch64[repo-oss]
- Solution 1: downgrade of libcurl4-7.60.0-lp150.2.15.1.aarch64 to
-libcurl4-7.59.0-lp150.1.2.aarch64
- Solution 2: do not install libcurl-devel-7.59.0-lp150.1.2.aarch64
- Solution 3: break libcurl-devel-7.59.0-lp150.1.2.aarch64 by ignoring
-some of its dependencies
-
-Not your fault. So I suppose you are planning to use this image to
-compile QEMU for openSUSE/x86_64 only, is this correct?
-
-Regards,
-
-Phil.
-
->
-> Then, when I was about to send the mail, I saw in another commit that
-> it was best to have the package list sorted; so I did that, and forgot
-> to adjust the continuation. :-(
->
-> Sorry.
->
-> I'll send a v2 with this fixed.
->
-> Thanks and Regards,
-> Dario
-> --
-> <<This happens because I choose it to happen!>> (Raistlin Majere)
-> -----------------------------------------------------------------
-> Dario Faggioli, Ph.D, http://about.me/dario.faggioli
-> Software Engineer @ SUSE https://www.suse.com/
+CgoKCgoKCgoKQXQgMjAxOC0xMS0xNyAwMDozMzozNCwgIk1hcmt1cyBBcm1icnVzdGVyIiA8YXJt
+YnJ1QHJlZGhhdC5jb20+IHdyb3RlOgo+TGkgUWlhbmcgPGxpcTNlYUAxNjMuY29tPiB3cml0ZXM6
+Cj4KPj4gQ3VycmVudGx5IHdoZW4gdGhlIHNwbGFzaC10aW1lIHZhbHVlIGlzIGJpZ2dlciB0aGFu
+IDB4ZmZmZgo+PiB3ZSByZXBvcnQgYW5kIGNvcnJlY3QgaXQsIHdoZW4gaXQgaXMgbGVzcyB0aGFu
+IDAgd2UganVzdCBpbmdvcmUgaXQuCj4KPnMvaW5nb3JlL2lnbm9yZS8KPgo+PiBBbHNvIHdlIHVz
+ZSBxZW11X29wdF9nZXQoKSB0byBnZXQgJ3NwbGFzaC10aW1lJywgdGhlbiBjb252ZXJ0IGl0IHRv
+IGEgbnVtYmVyCj4+IG91cnNlbHZlcy4gVGhpcyBpcyB3cm9uZy4KPgo+V2VsbCwgZG9pbmcgaXQg
+dGhhdCB3YXkgaXNuJ3Qgd3JvbmcsIGl0J3MganVzdCBuZWVkbGVzc2x5IGNvbXBsaWNhdGVkCj5h
+bmQgZXJyb3ItcHJvbmUuCj4KPlN1Z2dlc3Qgc3RhcnRpbmcgYSBuZXcgcGFyYWdyYXBoIHJpZ2h0
+IGhlcmUuCj4KPj4gICAgICAgICAgICAgICAgICAgICAgICAgICBUaGlzIHBhdGNoIGRvZXMgZm9s
+bG93aW5nOgo+PiAxLiB1c2UgcWVtdV9vcHRfZ2V0X251bWJlcigpIHRvIHBhcnNlICdzcGxhc2gt
+dGltZScKPj4gMi4gZXhpdCB3aGVuIHRoZSBzcGxhc2gtdGltZSBpcyBpbnZhbGlkIG9yIGxvYWRp
+bmcgdGhlIHNwbGFzaCBmaWxlIGZhaWxlZAo+PiAzLiBzaW1wbGlmeSBjb2RlCj4+Cj4+IFNpZ25l
+ZC1vZmYtYnk6IExpIFFpYW5nIDxsaXEzZWFAMTYzLmNvbT4KPj4gLS0tCj4+ICBody9udnJhbS9m
+d19jZmcuYyB8IDQwICsrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPj4g
+IHZsLmMgICAgICAgICAgICAgIHwgIDIgKy0KPj4gIDIgZmlsZXMgY2hhbmdlZCwgMTcgaW5zZXJ0
+aW9ucygrKSwgMjUgZGVsZXRpb25zKC0pCj4+Cj4+IGRpZmYgLS1naXQgYS9ody9udnJhbS9md19j
+ZmcuYyBiL2h3L252cmFtL2Z3X2NmZy5jCj4+IGluZGV4IDk0NmY3NjVmN2YuLjc4ZjQzZGFkOTMg
+MTAwNjQ0Cj4+IC0tLSBhL2h3L252cmFtL2Z3X2NmZy5jCj4+ICsrKyBiL2h3L252cmFtL2Z3X2Nm
+Zy5jCj4+IEBAIC0xMTgsNTUgKzExOCw0NyBAQCBlcnJvcjoKPj4gIAo+PiAgc3RhdGljIHZvaWQg
+ZndfY2ZnX2Jvb3RzcGxhc2goRldDZmdTdGF0ZSAqcykKPj4gIHsKPj4gLSAgICBpbnQgYm9vdF9z
+cGxhc2hfdGltZSA9IC0xOwo+PiAgICAgIGNvbnN0IGNoYXIgKmJvb3Rfc3BsYXNoX2ZpbGVuYW1l
+ID0gTlVMTDsKPj4gLSAgICBjaGFyICpwOwo+PiArICAgIGNvbnN0IGNoYXIgKmJvb3Rfc3BsYXNo
+X3RpbWUgPSBOVUxMOwo+PiAgICAgIGNoYXIgKmZpbGVuYW1lLCAqZmlsZV9kYXRhOwo+PiAgICAg
+IGdzaXplIGZpbGVfc2l6ZTsKPj4gICAgICBpbnQgZmlsZV90eXBlOwo+PiAtICAgIGNvbnN0IGNo
+YXIgKnRlbXA7Cj4+ICAKPj4gICAgICAvKiBnZXQgdXNlciBjb25maWd1cmF0aW9uICovCj4+ICAg
+ICAgUWVtdU9wdHNMaXN0ICpwbGlzdCA9IHFlbXVfZmluZF9vcHRzKCJib290LW9wdHMiKTsKPj4g
+ICAgICBRZW11T3B0cyAqb3B0cyA9IFFUQUlMUV9GSVJTVCgmcGxpc3QtPmhlYWQpOwo+PiAtICAg
+IGlmIChvcHRzICE9IE5VTEwpIHsKPj4gLSAgICAgICAgdGVtcCA9IHFlbXVfb3B0X2dldChvcHRz
+LCAic3BsYXNoIik7Cj4+IC0gICAgICAgIGlmICh0ZW1wICE9IE5VTEwpIHsKPj4gLSAgICAgICAg
+ICAgIGJvb3Rfc3BsYXNoX2ZpbGVuYW1lID0gdGVtcDsKPj4gLSAgICAgICAgfQo+PiAtICAgICAg
+ICB0ZW1wID0gcWVtdV9vcHRfZ2V0KG9wdHMsICJzcGxhc2gtdGltZSIpOwo+PiAtICAgICAgICBp
+ZiAodGVtcCAhPSBOVUxMKSB7Cj4+IC0gICAgICAgICAgICBwID0gKGNoYXIgKil0ZW1wOwo+PiAt
+ICAgICAgICAgICAgYm9vdF9zcGxhc2hfdGltZSA9IHN0cnRvbChwLCAmcCwgMTApOwo+PiAtICAg
+ICAgICB9Cj4+IC0gICAgfQo+PiArICAgIGJvb3Rfc3BsYXNoX2ZpbGVuYW1lID0gcWVtdV9vcHRf
+Z2V0KG9wdHMsICJzcGxhc2giKTsKPj4gKyAgICBib290X3NwbGFzaF90aW1lID0gcWVtdV9vcHRf
+Z2V0KG9wdHMsICJzcGxhc2gtdGltZSIpOwo+Cj5Zb3UgZmlyc3QgZ2V0ICJzcGxhc2gtdGltZSIg
+YXMgYSBzdHJpbmcsIGFuZCB0aGVuIC4uLgo+PiAgCj4+ICAgICAgLyogaW5zZXJ0IHNwbGFzaCB0
+aW1lIGlmIHVzZXIgY29uZmlndXJhdGVkICovCj4+IC0gICAgaWYgKGJvb3Rfc3BsYXNoX3RpbWUg
+Pj0gMCkgewo+PiArICAgIGlmIChib290X3NwbGFzaF90aW1lKSB7Cj4+ICsgICAgICAgIGludDY0
+X3QgYnN0X3ZhbCA9IHFlbXVfb3B0X2dldF9udW1iZXIob3B0cywgInNwbGFzaC10aW1lIiwgLTEp
+Owo+Cj4uLi4geW91IGdldCBpdCBhZ2FpbiBhcyBhIG51bWJlci4gIEkgZmlndXJlIHlvdSBkbyB0
+aGF0IGJlY2F1c2UKPiJzcGxhc2gtdGltZSBub3Qgc3BlY2lmaWVkIiBpcyBub3QgdGhlIHNhbWUg
+YXMgInNwbGFzaC10aW1lPVQiIGZvciBhbnkKPlQuICBJIGRvbid0IGxpa2Ugc3VjaCBpbnRlcmZh
+Y2VzLiAgTm90IHRoaXMgcGF0Y2gncyBmYXVsdC4KPgo+SnVzdCBub3RpY2VkOiBxZW11X2V4dHJh
+X3BhcmFtc19md1tdIGhhcyBleHRlcm5hbCBsaW5rYWdlLCBidXQgaXMgdXNlZAo+b25seSBpbiB0
+aGlzIGZ1bmN0aW9uLiAgQ2FyZSB0byBtYWtlIGl0IHN0YXRpYyBpbiB0aGlzIGZ1bmN0aW9uIGlu
+IGEKCj5zZXBhcmF0ZSBwYXRjaD8KCgpXaWxsIGRvIGluIHRoZSBuZXh0IHJldmlzaW9uLgoKClRo
+YW5rcywKTGkgUWlhbmcKCgo+Cj4+ICAgICAgICAgIC8qIHZhbGlkYXRlIHRoZSBpbnB1dCAqLwo+
+PiAtICAgICAgICBpZiAoYm9vdF9zcGxhc2hfdGltZSA+IDB4ZmZmZikgewo+PiAtICAgICAgICAg
+ICAgZXJyb3JfcmVwb3J0KCJzcGxhc2ggdGltZSBpcyBiaWcgdGhhbiA2NTUzNSwgZm9yY2UgaXQg
+dG8gNjU1MzUuIik7Cj4+IC0gICAgICAgICAgICBib290X3NwbGFzaF90aW1lID0gMHhmZmZmOwo+
+PiArICAgICAgICBpZiAoYnN0X3ZhbCA8IDAgfHwgYnN0X3ZhbCA+IDB4ZmZmZikgewo+PiArICAg
+ICAgICAgICAgZXJyb3JfcmVwb3J0KCJzcGxhc2ggdGltZSBpcyBpbnZhbGlkLCIKPj4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAiaXQgc2hvdWxkIGJlIGEgdmFsdWUgYmV0d2VlbiAwIGFuZCA2
+NTUzNSIpOwo+PiArICAgICAgICAgICAgZXhpdCgxKTsKPj4gICAgICAgICAgfQo+PiAgICAgICAg
+ICAvKiB1c2UgbGl0dGxlIGVuZGlhbiBmb3JtYXQgKi8KPj4gLSAgICAgICAgcWVtdV9leHRyYV9w
+YXJhbXNfZndbMF0gPSAodWludDhfdCkoYm9vdF9zcGxhc2hfdGltZSAmIDB4ZmYpOwo+PiAtICAg
+ICAgICBxZW11X2V4dHJhX3BhcmFtc19md1sxXSA9ICh1aW50OF90KSgoYm9vdF9zcGxhc2hfdGlt
+ZSA+PiA4KSAmIDB4ZmYpOwo+PiArICAgICAgICBxZW11X2V4dHJhX3BhcmFtc19md1swXSA9ICh1
+aW50OF90KShic3RfdmFsICYgMHhmZik7Cj4+ICsgICAgICAgIHFlbXVfZXh0cmFfcGFyYW1zX2Z3
+WzFdID0gKHVpbnQ4X3QpKChic3RfdmFsID4+IDgpICYgMHhmZik7Cj4+ICAgICAgICAgIGZ3X2Nm
+Z19hZGRfZmlsZShzLCAiZXRjL2Jvb3QtbWVudS13YWl0IiwgcWVtdV9leHRyYV9wYXJhbXNfZncs
+IDIpOwo+PiAgICAgIH0KPj4gIAo+PiAgICAgIC8qIGluc2VydCBzcGxhc2ggZmlsZSBpZiB1c2Vy
+IGNvbmZpZ3VyYXRlZCAqLwo+PiAtICAgIGlmIChib290X3NwbGFzaF9maWxlbmFtZSAhPSBOVUxM
+KSB7Cj4+ICsgICAgaWYgKGJvb3Rfc3BsYXNoX2ZpbGVuYW1lKSB7Cj4+ICAgICAgICAgIGZpbGVu
+YW1lID0gcWVtdV9maW5kX2ZpbGUoUUVNVV9GSUxFX1RZUEVfQklPUywgYm9vdF9zcGxhc2hfZmls
+ZW5hbWUpOwo+PiAgICAgICAgICBpZiAoZmlsZW5hbWUgPT0gTlVMTCkgewo+PiAtICAgICAgICAg
+ICAgZXJyb3JfcmVwb3J0KCJmYWlsZWQgdG8gZmluZCBmaWxlICclcycuIiwgYm9vdF9zcGxhc2hf
+ZmlsZW5hbWUpOwo+PiAtICAgICAgICAgICAgcmV0dXJuOwo+PiArICAgICAgICAgICAgZXJyb3Jf
+cmVwb3J0KCJmYWlsZWQgdG8gZmluZCBmaWxlICclcyciLCBib290X3NwbGFzaF9maWxlbmFtZSk7
+Cj4+ICsgICAgICAgICAgICBleGl0KDEpOwo+PiAgICAgICAgICB9Cj4+ICAKPj4gICAgICAgICAg
+LyogbG9hZGluZyBmaWxlIGRhdGEgKi8KPj4gICAgICAgICAgZmlsZV9kYXRhID0gcmVhZF9zcGxh
+c2hmaWxlKGZpbGVuYW1lLCAmZmlsZV9zaXplLCAmZmlsZV90eXBlKTsKPj4gICAgICAgICAgaWYg
+KGZpbGVfZGF0YSA9PSBOVUxMKSB7Cj4+ICAgICAgICAgICAgICBnX2ZyZWUoZmlsZW5hbWUpOwo+
+PiAtICAgICAgICAgICAgcmV0dXJuOwo+PiArICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJmYWls
+ZWQgdG8gcmVhZCBmaWxlICclcyciLCBib290X3NwbGFzaF9maWxlbmFtZSk7Cj4+ICsgICAgICAg
+ICAgICBleGl0KDEpOwo+PiAgICAgICAgICB9Cj4+ICAgICAgICAgIGdfZnJlZShib290X3NwbGFz
+aF9maWxlZGF0YSk7Cj4+ICAgICAgICAgIGJvb3Rfc3BsYXNoX2ZpbGVkYXRhID0gKHVpbnQ4X3Qg
+KilmaWxlX2RhdGE7Cj4+IGRpZmYgLS1naXQgYS92bC5jIGIvdmwuYwo+PiBpbmRleCA1NWJhYjAw
+NWI2Li5iZTM3ZGE0NmYwIDEwMDY0NAo+PiAtLS0gYS92bC5jCj4+ICsrKyBiL3ZsLmMKPj4gQEAg
+LTMzNiw3ICszMzYsNyBAQCBzdGF0aWMgUWVtdU9wdHNMaXN0IHFlbXVfYm9vdF9vcHRzID0gewo+
+PiAgICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TVFJJTkcsCj4+ICAgICAgICAgIH0sIHsK
+Pj4gICAgICAgICAgICAgIC5uYW1lID0gInNwbGFzaC10aW1lIiwKPj4gLSAgICAgICAgICAgIC50
+eXBlID0gUUVNVV9PUFRfU1RSSU5HLAo+PiArICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9O
+VU1CRVIsCj4+ICAgICAgICAgIH0sIHsKPj4gICAgICAgICAgICAgIC5uYW1lID0gInJlYm9vdC10
+aW1lb3V0IiwKPj4gICAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfU1RSSU5HLAo+Cj5SZXZp
+ZXdlZC1ieTogTWFya3VzIEFybWJydXN0ZXIgPGFybWJydUByZWRoYXQuY29tPgo=
