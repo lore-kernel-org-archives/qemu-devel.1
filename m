@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gOgmR-0005Ak-5q
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:27:48 -0500
+	(envelope-from <berrange@redhat.com>) id 1gOgvG-0001ry-VL
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:36:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gOgmQ-0005dk-1z
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:27:47 -0500
-Date: Mon, 19 Nov 2018 10:27:32 +0000
+	(envelope-from <berrange@redhat.com>) id 1gOgvF-0003xQ-Hw
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:36:54 -0500
+Date: Mon, 19 Nov 2018 10:36:43 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181119102732.GF19532@redhat.com>
+Message-ID: <20181119103643.GG19532@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20181116155325.22428-1-berrange@redhat.com>
-	<20181116155325.22428-6-berrange@redhat.com>
-	<5acd44f8-69c7-a791-0ce0-49cad6e48423@redhat.com>
+	<20181116155325.22428-7-berrange@redhat.com>
+	<5508fd21-b2e6-26d3-78f0-9ea89db10ccc@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5acd44f8-69c7-a791-0ce0-49cad6e48423@redhat.com>
+In-Reply-To: <5508fd21-b2e6-26d3-78f0-9ea89db10ccc@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] tests: add iotests helpers for dealing
- with TLS certificates
+Subject: Re: [Qemu-devel] [PATCH 6/6] tests: exercise NBD server in TLS mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +29,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Fri, Nov 16, 2018 at 10:39:03AM -0600, Eric Blake wrote:
+On Fri, Nov 16, 2018 at 11:20:26AM -0600, Eric Blake wrote:
 > On 11/16/18 9:53 AM, Daniel P. Berrang=C3=A9 wrote:
-> > Add helpers to common.tls for creating TLS certificates for a CA,
-> > server and client.
->=20
-> MUCH appreciated!  We NEED this coverage, easily automated.
->=20
-> >=20
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > Add tests that validate it is possible to connect to an NBD server
+> > running TLS mode. Also test mis-matched TLS vs non-TLS connections
+> > correctly fail.
 > > ---
-> >   tests/qemu-iotests/common.tls | 139 +++++++++++++++++++++++++++++++=
+> >   tests/qemu-iotests/233        | 99 ++++++++++++++++++++++++++++++++=
 +++
-> >   1 file changed, 139 insertions(+)
-> >   create mode 100644 tests/qemu-iotests/common.tls
-> >=20
-> > diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/commo=
-n.tls
-> > new file mode 100644
+> >   tests/qemu-iotests/233.out    | 33 ++++++++++++
+> >   tests/qemu-iotests/common.nbd | 47 +++++++++++++++++
+> >   tests/qemu-iotests/group      |  1 +
+> >   4 files changed, 180 insertions(+)
+> >   create mode 100755 tests/qemu-iotests/233
+> >   create mode 100644 tests/qemu-iotests/233.out
 >=20
-> I was a bit surprised that this wasn't 100755, but this matches the fac=
-t
-> that none of the other common.* are executable. And after thinking more=
-, it
-> makes sense - they aren't standalone scripts, but designed to be source=
-d,
-> and 'source' doesn't care about execute bits.
->=20
-> > +tls_dir=3D"${TEST_DIR}/tls"
+> Adding tests is non-invasive, so I have no objection to taking the enti=
+re
+> series in 3.1.  Do you want me to touch up the nits I found earlier, or
+> should I wait for a v2?
+
+If you're happy to touch it up, that's fine with me.
+
 > > +
-> > +function tls_x509_cleanup()
+> > +$QEMU_IMG info nbd://localhost:$nbd_tcp_port
+> > +
+> > +echo
+> > +echo "=3D=3D check TLS works =3D=3D"
+> > +$QEMU_IMG info --image-opts \
+> > +    --object tls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclie=
+nt,id=3Dtls0 \
+> > +    driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-creds=
+=3Dtls0
+>=20
+> Is it also worth reading or even writing, to ensure that more than just=
+ the
+> handshake is working?
+
+I was mostly interested in the handshake/cert stuff, but yes, we could
+do some qemu-io testing too.
+
+> > +
+> > +echo
+> > +echo "=3D=3D check TLS with different CA fails =3D=3D"
+> > +$QEMU_IMG info --image-opts \
+> > +    --object tls-creds-x509,dir=3D${tls_dir}/client2,endpoint=3Dclie=
+nt,id=3Dtls0 \
+> > +    driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-creds=
+=3Dtls0
+> > +
+> > +# success, all done
+>=20
+> > +=3D=3D check TLS client to plain server fails =3D=3D
+> > +option negotiation failed: read failed: Unexpected end-of-file befor=
+e all bytes were read
+>=20
+> Annoying message; I wonder if we can clean that up. But not this patch'=
+s
+> problem.
+
+This is a result of using the 'socat' check to poll for qemu-nbd
+readiness. When socat finally succeeds in connecting & then drops
+the conenction, qemu-nbd prints this message.  Personally I don't
+think we need remove it unless we want to make qemu-nbd silently
+by default when clients do unusual things.
+
+> > +qemu-img: Could not open 'driver=3Dnbd,host=3D127.0.0.1,port=3D10809=
+,tls-creds=3Dtls0': Denied by server for option 5 (starttls)
+> > +server reported: TLS not configured
+>=20
+> This 2-line message is better (and as such, explains why I think the me=
+ssage
+> about early EOF should be silenced in this case).
+>=20
+> > +
+> > +=3D=3D check plain client to TLS server fails =3D=3D
+> > +option negotiation failed: read failed: Unexpected end-of-file befor=
+e all bytes were read
+> > +qemu-img: Could not open 'nbd://localhost:10809': TLS negotiation re=
+quired before option 8 (structured reply)
+> > +server reported: Option 0x8 not permitted before TLS
+>=20
+> Same story about a redundant message.
+
+Again this was the socat polling.
+
+>=20
+> > +write failed (error message): Unable to write to socket: Broken pipe
+>=20
+> Hmm - is this the client complaining that it can't send more to the ser=
+ver
+> (that's a bug if the server hung up, since the protocol allows the clie=
+nt to
+> change its mind and try TLS after all), or the server complaining that =
+the
+> client hung up abruptly without sending NBD_OPT_ABORT? Qemu as client e=
+ither
+> tries TLS right away, or knows that if the server requires TLS and the
+> client has no TLS credentials then the client will never succeed, so th=
+e
+> client gives up - but it SHOULD be giving up with NBD_OPT_ABORT rather =
+than
+> just disconnecting.  I'll have to play with that.  Doesn't impact your
+> patch, but might spur a followup fix :)
+
+I'm unclear if this message comes from the server or the client since
+they are intermingled.
+
+
+> > diff --git a/tests/qemu-iotests/common.nbd b/tests/qemu-iotests/commo=
+n.nbd
+> > index 61e9e90fee..0483ea7c55 100644
+> > --- a/tests/qemu-iotests/common.nbd
+> > +++ b/tests/qemu-iotests/common.nbd
+> > @@ -20,6 +20,7 @@
+> >   #
+> >   nbd_unix_socket=3D"${TEST_DIR}/qemu-nbd.sock"
+> > +nbd_tcp_addr=3D"127.0.0.1"
+>=20
+> Should this be in your earlier patch that created common.nbd? Maybe not=
+, as
+> it doesn't get used until the functions you add here for tcp support. S=
+till,
+> I wonder if we should split the addition of tcp support separate from t=
+he
+> new test.
+
+Yeah, I wanted the earlier patch to be a plain refactor of existing
+functionality, not adding anything new.
+
+> >   nbd_pid_file=3D"${TEST_DIR}/qemu-nbd.pid"
+> >   function nbd_server_stop()
+> > @@ -62,3 +63,49 @@ function nbd_server_start_unix_socket()
+> >       $QEMU_NBD -v -t -k "$nbd_unix_socket" $@ &
+> >       nbd_server_wait_for_unix_socket $!
+> >   }
+> > +
+> > +function nbd_server_set_tcp_port()
 > > +{
-> > +    rm -f ${tls_dir}/*.pem
-> > +    rm -f ${tls_dir}/*/*.pem
-> > +    rmdir ${tls_dir}/*
-> > +    rmdir ${tls_dir}
+> > +    for port in `seq 10809 10909`
+> > +    do
+> > +	socat TCP:$nbd_tcp_addr:$port STDIO < /dev/null 1>/dev/null 2>&1
 >=20
-> Why not just:
-> rm -rf $tls_dir
+> This is the first use of socat in iotests.  Might not be the most porta=
+ble,
+> but I don't know if I have better ideas. nbdkit.git/tests/test-ip.sh gr=
+eps
+> the output of 'ss -ltn' to locate free ports, but I don't know if ss is=
+ any
+> better than socat.
 
-Yeah, I guess we could do that for simplicity
+'ss' is a Linux specific command IIUC since it is part of 'iproute',
+while 'socat' is in fact available more or less everywhere:
 
-> Also, the quoting is a bit inconsistent. if ${TEST_DIR} can contain spa=
-ces,
-> then all uses of ${tls_dir} need to be in "".
+  https://repology.org/metapackage/socat1/versions
 
-Hmm, yes.
 
-> > +}
-> > +
-> > +
-> > +function tls_x509_init()
-> > +{
-> > +    mkdir "${tls_dir}"
->=20
-> And this just highlights the quoting inconsistency.  Should this use mk=
-dir
-> -p?
+> > +        if test $? !=3D 0
+> > +	then
+> > +	    nbd_tcp_port=3D$port
 
-I assume $TEST_DIR would already exist, so wouldn't need -p.
+Opps, a stray <tab> here
 
+> > +            return
+> > +        fi
+> > +    done
 > > +
-> > +function tls_x509_create_root_ca()
-> > +{
-> > +    name=3D$1
-> > +
-> > +    test -z "$name" && name=3Dca-cert
+> > +    echo "Cannot find free TCP port for nbd in range 10809-10909"
+> > +    exit 1
 >=20
-> Could also be shortened as:
->=20
-> name=3D${1:-ca-cert}
+> Should we skip instead of fail in this case? Would we do well picking a
+> larger port range?
 
-ok
-
-> > +
-> > +    cat > ${tls_dir}/ca.info <<EOF
-> > +cn =3D Cthulu Dark Lord Enterprises $name
->=20
-> s/Cthulu/Cthulhu/ - after all, we don't want him coming after us just
-> because we botched the spelling of his name :)
->=20
-> > +ca
-> > +cert_signing_key
-> > +EOF
-> > +
-> > +    certtool --generate-self-signed \
-> > +             --load-privkey ${tls_dir}/key.pem \
-> > +             --template ${tls_dir}/ca.info \
-> > +             --outfile ${tls_dir}/$name-cert.pem 2>&1 | head -1
->=20
-> More missing ""
->=20
-> > +
-> > +    rm -f ${tls_dir}/ca.info
-> > +}
-> > +
-> > +
-> > +function tls_x509_create_server()
-> > +{
-> > +    caname=3D$1
-> > +    name=3D$2
-> > +
-> > +    mkdir ${tls_dir}/$name
-> > +    cat > ${tls_dir}/cert.info <<EOF
-> > +organization =3D Cthulu Dark Lord Enterprises $name
->=20
-> Matched spelling
->=20
-> > +function tls_x509_create_client()
-> > +{
-> > +    caname=3D$1
-> > +    name=3D$2
-> > +
-> > +    mkdir ${tls_dir}/$name
-> > +    cat > ${tls_dir}/cert.info <<EOF
-> > +country =3D South Pacific
-> > +locality =3D  R'lyeh
-> > +organization =3D Cthulu Dark Lord Enterprises $name
->=20
-> And again
->=20
-> Needs several touch-ups, but the idea itself is sound.
-
-Yes will fix
+Yes, we could simply skip. I figure 100 ports is fine, since tests are
+normally run on a largely idle system.
 
 Regards,
 Daniel
