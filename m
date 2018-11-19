@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <d.csapak@proxmox.com>) id 1gOjsI-0006AF-28
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:46:02 -0500
+	(envelope-from <berrange@redhat.com>) id 1gOjtc-0006n2-Ri
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:47:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <d.csapak@proxmox.com>) id 1gOjsE-00051S-0x
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:46:02 -0500
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:41910)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <d.csapak@proxmox.com>)
-	id 1gOjsD-0004qK-PQ
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:45:57 -0500
-From: Dominik Csapak <d.csapak@proxmox.com>
-References: <20181031115242.6558-1-d.csapak@proxmox.com>
-Message-ID: <aafe8c68-b822-4098-2e38-5a5fc7c7c06c@proxmox.com>
-Date: Mon, 19 Nov 2018 14:45:48 +0100
+	(envelope-from <berrange@redhat.com>) id 1gOjtb-0006Cf-Jt
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:47:24 -0500
+Date: Mon, 19 Nov 2018 13:47:08 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181119134708.GO19532@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181116155325.22428-1-berrange@redhat.com>
+	<20181116155325.22428-3-berrange@redhat.com>
+	<0d437d60-c422-b931-03a2-120e6c1912af@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181031115242.6558-1-d.csapak@proxmox.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] qapi: return ShutdownCause for events
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0d437d60-c422-b931-03a2-120e6c1912af@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/6 for-3.1] nbd: stop waiting for a NBD
+ response with NBD_CMD_DISC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +27,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Hi,
+On Sat, Nov 17, 2018 at 08:19:10PM -0600, Eric Blake wrote:
+> On 11/16/18 9:53 AM, Daniel P. Berrang=C3=A9 wrote:
+> > When sending a NBD_CMD_DISC message there is no reply expected,
+> > however, the nbd_read_eof() coroutine is still waiting for a reply.
+> > In a plain NBD connection this doesn't matter as it will just get an
+> > EOF, however, on a TLS connection it will get an interrupted TLS data
+> > packet. The nbd_read_eof() will then print an error message on the
+> > console due to missing reply to NBD_CMD_DISC.
+> >=20
+> > This can be seen with qemu-img
+> >=20
+> >    $ qemu-img info \
+> >        --object tls-creds-x509,dir=3Dtlsdir,id=3Dtls0,endpoint=3Dclie=
+nt \
+> >        --image-opts driver=3Dnbd,host=3D127.0.0.1,port=3D9000,tls-cre=
+ds=3Dtls0
+> >    qemu-img: Cannot read from TLS channel: Input/output error
+> >    image: nbd://127.0.0.1:9000
+> >    file format: nbd
+> >    virtual size: 10M (10485760 bytes)
+> >    disk size: unavailable
+> >=20
+> > Simply setting the 'quit' flag after sending NBD_CMD_DISC is enough t=
+o
+> > get the coroutine to stop waiting for a reply and thus supress the er=
+ror
+> > message.
+>=20
+> Actually, it's not quite enough - once you actually start performing I/=
+O,
+> enough coroutines are kicked off that the error still happens:
+>=20
+> $  qemu-io -c 'r 1m 1m' -c 'w -P 0x22 1m 1m' --image-opts \
+> --object tls-creds-x509,dir=3Dscratch/tls/client1,endpoint=3Dclient,id=3D=
+tls0\
+>  driver=3Dnbd,host=3Dlocalhost,port=3D10809,tls-creds=3Dtls0
+> read 1048576/1048576 bytes at offset 1048576
+> 1 MiB, 1 ops; 0.0430 sec (23.204 MiB/sec and 23.2040 ops/sec)
+> wrote 1048576/1048576 bytes at offset 1048576
+> 1 MiB, 1 ops; 0.0152 sec (65.479 MiB/sec and 65.4793 ops/sec)
+> Cannot read from TLS channel: Input/output error
+>=20
+> Squashing this in on top of your patch helps, though:
+>=20
+> diff --git i/block/nbd-client.c w/block/nbd-client.c
+> index 5f63e4b8f15..e7916c78996 100644
+> --- i/block/nbd-client.c
+> +++ w/block/nbd-client.c
+> @@ -79,7 +79,14 @@ static coroutine_fn void nbd_read_reply_entry(void
+> *opaque)
+>          assert(s->reply.handle =3D=3D 0);
+>          ret =3D nbd_receive_reply(s->ioc, &s->reply, &local_err);
+>          if (local_err) {
+> -            error_report_err(local_err);
+> +            /* If we are already quitting, either another error has
+> +             * already been reported, or we requested NBD_CMD_DISC and
+> +             * don't need to report anything further.  */
+> +            if (!s->quit) {
+> +                error_report_err(local_err);
+> +            } else {
+> +                error_free(local_err);
+> +            }
+>          }
+>          if (ret <=3D 0) {
+>              break;
+>=20
+> But I want to do more testing to make sure I'm not missing out on repor=
+ting
+> an actual error if I add that.
 
-i guess many of you are occupied with 3.1,
-but had anyone time to look at this?
+It occurred to me that it would be nice if the TLS channel behaved the sa=
+me
+a normal channel when seeing EOF on the socket. Unfortunately the reason =
+why
+GNUTLS returns an error in this case does in fact make sense, so it isn't
+quite as simple as just ignoring the error. Fortunately the NBD client ha=
+s
+decided it wants to shutdown and crucially has called qio_channel_shutdow=
+n()
+at this point. Thus we can safely ignore the gnutls error code when the
+channel has been shutdown for read and just return 0 for EOF as with a pl=
+ain
+socket.
 
-kind regards
+Thus I've sent a patch which solves the problem in that way:
 
-On 10/31/18 12:52 PM, Dominik Csapak wrote:
-> This series improves the QMP SHUTDOWN and RESET events by adding
-> the ShutdownCause as additional parameter and splitting
-> the HOST_QMP reason into HOST_QMP_QUIT and HOST_QMP_SYSTEM_RESET
-> to be able to detect the difference between them when using '--no-reboot'
-> 
-> this is an alternative to my previous patches[1][2] which
-> added an exit-script/added a 'reset' argument to the events
-> 
->   1: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00697.html
->   2: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01271.html
-> 
-> Dominik Csapak (3):
->    qapi: move ShutdownCause to qapi/run-state.json
->    qapi: split host-qmp into quit and system-reset
->    qapi: add reason to SHUTDOWN and RESET events
-> 
->   include/sysemu/sysemu.h    | 20 --------------------
->   qapi/run-state.json        | 39 +++++++++++++++++++++++++++++++++++++--
->   qmp.c                      |  4 ++--
->   tests/qemu-iotests/060.out |  4 ++--
->   tests/qemu-iotests/071.out |  4 ++--
->   tests/qemu-iotests/081.out |  2 +-
->   tests/qemu-iotests/087.out | 12 ++++++------
->   tests/qemu-iotests/094.out |  2 +-
->   tests/qemu-iotests/109.out | 44 ++++++++++++++++++++++----------------------
->   tests/qemu-iotests/117.out |  2 +-
->   tests/qemu-iotests/119.out |  2 +-
->   tests/qemu-iotests/120.out |  2 +-
->   tests/qemu-iotests/127.out |  2 +-
->   tests/qemu-iotests/140.out |  2 +-
->   tests/qemu-iotests/143.out |  2 +-
->   tests/qemu-iotests/156.out |  2 +-
->   tests/qemu-iotests/176.out | 16 ++++++++--------
->   tests/qemu-iotests/183.out |  4 ++--
->   tests/qemu-iotests/184.out | 12 ++++++++----
->   tests/qemu-iotests/185.out | 10 +++++-----
->   tests/qemu-iotests/191.out |  6 ++++--
->   tests/qemu-iotests/195.out |  6 ++++--
->   tests/qemu-iotests/223.out |  2 +-
->   tests/qemu-iotests/227.out | 12 ++++++++----
->   vl.c                       |  4 ++--
->   25 files changed, 122 insertions(+), 95 deletions(-)
-> 
+  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg03616.html
+
+With this applied, both my original patch and your extra chunk here
+should be redundant.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
