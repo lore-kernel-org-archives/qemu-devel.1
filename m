@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMR-0001mp-B7
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:05 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMT-0001po-KY
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMO-0002xz-4m
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:03 -0500
-Received: from cmccmta1.chinamobile.com ([221.176.66.79]:24225)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMN-0002r9-6g
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:08:59 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOiMP-00030Z-UG
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 07:09:05 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Mon, 19 Nov 2018 20:08:12 +0800
-Message-Id: <20181119120820.29878-15-maozhongyi@cmss.chinamobile.com>
+Date: Mon, 19 Nov 2018 20:08:19 +0800
+Message-Id: <20181119120820.29878-22-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
 References: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH 14/22] nvram/ds1225y: Convert sysbus init
- function to realize function
+Subject: [Qemu-devel] [PATCH 21/22] event-facility: Change SysBusDeviceClass
+ *sbdc to SysBusDeviceClass *sbc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +21,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, pbonzini@redhat.com, marcandre.lureau@redhat.com, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, cohuck@redhat.com, borntraeger@de.ibm.com, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
-Use DeviceClass rather than SysBusDeviceClass in
-nvram_sysbus_class_init().
+Most of the SysBusDeviceClass variables are named sbc,
+and sbdc here is a bit weird, so changing sbdc to keep
+it consistent with others might look good.
 
-Cc: pbonzini@redhat.com
-Cc: marcandre.lureau@redhat.com
+Cc: cohuck@redhat.com
+Cc: borntraeger@de.ibm.com
+Cc: rth@twiddle.net
+Cc: david@redhat.com
+Cc: qemu-s390x@nongnu.org
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 ---
- hw/nvram/ds1225y.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ hw/s390x/event-facility.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/nvram/ds1225y.c b/hw/nvram/ds1225y.c
-index ad7345f288..b6ef463db0 100644
---- a/hw/nvram/ds1225y.c
-+++ b/hw/nvram/ds1225y.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "hw/sysbus.h"
- #include "trace.h"
-+#include "qemu/error-report.h"
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index ee5b83448b..759e7bee01 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -484,8 +484,8 @@ static void reset_event_facility(DeviceState *dev)
  
- typedef struct {
-     MemoryRegion iomem;
-@@ -113,7 +114,7 @@ typedef struct {
-     NvRamState nvram;
- } SysBusNvRamState;
- 
--static int nvram_sysbus_initfn(SysBusDevice *dev)
-+static void nvram_sysbus_realize(DeviceState *dev, Error **errp)
+ static void init_event_facility_class(ObjectClass *klass, void *data)
  {
-     SysBusNvRamState *sys = DS1225Y(dev);
-     NvRamState *s = &sys->nvram;
-@@ -123,20 +124,18 @@ static int nvram_sysbus_initfn(SysBusDevice *dev)
+-    SysBusDeviceClass *sbdc = SYS_BUS_DEVICE_CLASS(klass);
+-    DeviceClass *dc = DEVICE_CLASS(sbdc);
++    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(sbc);
+     SCLPEventFacilityClass *k = EVENT_FACILITY_CLASS(dc);
  
-     memory_region_init_io(&s->iomem, OBJECT(s), &nvram_ops, s,
-                           "nvram", s->chip_size);
--    sysbus_init_mmio(dev, &s->iomem);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
- 
-     /* Read current file */
-     file = s->filename ? fopen(s->filename, "rb") : NULL;
-     if (file) {
-         /* Read nvram contents */
-         if (fread(s->contents, s->chip_size, 1, file) != 1) {
--            printf("nvram_sysbus_initfn: short read\n");
-+            error_report("nvram_sysbus_realize: short read");
-         }
-         fclose(file);
-     }
-     nvram_post_load(s, 0);
--
--    return 0;
- }
- 
- static Property nvram_sysbus_properties[] = {
-@@ -148,9 +147,8 @@ static Property nvram_sysbus_properties[] = {
- static void nvram_sysbus_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
- 
--    k->init = nvram_sysbus_initfn;
-+    dc->realize = nvram_sysbus_realize;
-     dc->vmsd = &vmstate_nvram;
-     dc->props = nvram_sysbus_properties;
- }
+     dc->reset = reset_event_facility;
 -- 
 2.17.1
