@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gOYXQ-0005LK-9L
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 20:39:45 -0500
+	(envelope-from <rob@landley.net>) id 1gOZKO-0007Zf-8x
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 21:30:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gOYXN-0001vT-3t
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 20:39:44 -0500
-Received: from m13-102.163.com ([220.181.13.102]:16794)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1gOYXM-0001ul-Ai
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 20:39:41 -0500
-Date: Mon, 19 Nov 2018 09:24:06 +0800 (CST)
-From: =?GBK?B?wO7Hvw==?= <liq3ea@163.com>
-In-Reply-To: <87k1ld0xsl.fsf@dusky.pond.sub.org>
-References: <20181110034115.103335-1-liq3ea@163.com>
-	<20181110034115.103335-3-liq3ea@163.com>
-	<87k1ld0xsl.fsf@dusky.pond.sub.org>
+	(envelope-from <rob@landley.net>) id 1gOZKL-0001Xd-3P
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 21:30:20 -0500
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:43856)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rob@landley.net>) id 1gOZKK-0001XP-Tg
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 21:30:17 -0500
+Received: by mail-io1-xd41.google.com with SMTP id g8so4407674iop.10
+	for <qemu-devel@nongnu.org>; Sun, 18 Nov 2018 18:30:16 -0800 (PST)
+References: <20181029134000.11157-1-mark.cave-ayland@ilande.co.uk>
+	<97900b04-28f0-975f-b3c0-2c0aa7039a4f@linaro.org>
+	<5c41b46c-70e3-33a0-76cf-ba2fd8155d33@ilande.co.uk>
+	<393eca98-a092-80aa-2016-f14cd2e02d45@vivier.eu>
+	<3b1f8942-d8c7-04db-45bc-a7c30de9d769@ilande.co.uk>
+	<ad444bbf-0606-2b80-7f7d-389a6df29cfe@vivier.eu>
+	<49e0547c-0112-c610-6755-5d6a82b1e105@posteo.de>
+	<7787c5d5-598a-65e2-7d40-d580551704ca@vivier.eu>
+From: Rob Landley <rob@landley.net>
+Message-ID: <ab6b11b1-4a34-2243-cb73-253de281f785@landley.net>
+Date: Sun, 18 Nov 2018 20:30:14 -0600
 MIME-Version: 1.0
-Message-ID: <1dce907c.4226.16729914a43.Coremail.liq3ea@163.com>
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH 2/2] hw: fw_cfg: refactor fw_cfg_reboot()
+In-Reply-To: <7787c5d5-598a-65e2-7d40-d580551704ca@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 00/11] hw/m68k: add Apple Machintosh
+ Quadra 800 machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: liq3ea@gmail.com, pbonzini@redhat.com, kraxel@redhat.com, lersek@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, Thomas Huth <th.huth@posteo.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, hpoussin@reactos.org, aurelien@aurel32.net
 
-CgoKCgoKCgoKQXQgMjAxOC0xMS0xNyAwMDo1Mjo1OCwgIk1hcmt1cyBBcm1icnVzdGVyIiA8YXJt
-YnJ1QHJlZGhhdC5jb20+IHdyb3RlOgo+TGkgUWlhbmcgPGxpcTNlYUAxNjMuY29tPiB3cml0ZXM6
-Cj4KPj4gQ3VycmVudGx5IHRoZSB1c2VyIGNhbiBzZXQgYSBuZWdhdGl2ZSByZWJvb3RfdGltZW91
-dC4KPj4gQWxzbyBpdCBpcyB3cm9uZyB0byBwYXJzZSAncmVib290LXRpbWVvdXQnIHdpdGggcWVt
-dV9vcHRfZ2V0KCkgYW5kIHRoZW4KPj4gY29udmVydCBpdCB0byBudW1iZXIuCj4KPkFnYWluLCBp
-dCdzIG5vdCB3cm9uZyBwZXIgc2UsIGp1c3QgbmVlZGxlc3NseSBjb21wbGljYXRlZCBhbmQKPmVy
-cm9yLXByb25lLiAgV2hhdCBtYWtlcyBpdCB3cm9uZyBpcyAuLi4KPgo+PiBjb252ZXJ0IGl0IHRv
-IG51bWJlci4gVGhpcyBwYXRjaCByZWZhY3RvciB0aGlzIGZ1bmN0aW9uIGJ5IGZvbGxvd2luZzoK
-Pj4gMS4gZW5zdXJlIHJlYm9vdF90aW1lb3V0IGlzIGluIDB+MHhmZmZmCj4+IDIuIHVzZSBxZW11
-X29wdF9nZXRfbnVtYmVyKCkgdG8gcGFyc2UgcmVib290X3RpbWVvdXQKPj4gMy4gc2ltbGlmeSBj
-b2RlCj4+Cj4+IFNpZ25lZC1vZmYtYnk6IExpIFFpYW5nIDxsaXEzZWFAMTYzLmNvbT4KPj4gLS0t
-Cj4+ICBody9udnJhbS9md19jZmcuYyB8IDIzICsrKysrKysrKysrLS0tLS0tLS0tLS0tCj4+ICB2
-bC5jICAgICAgICAgICAgICB8ICAyICstCj4+ICAyIGZpbGVzIGNoYW5nZWQsIDEyIGluc2VydGlv
-bnMoKyksIDEzIGRlbGV0aW9ucygtKQo+Pgo+PiBkaWZmIC0tZ2l0IGEvaHcvbnZyYW0vZndfY2Zn
-LmMgYi9ody9udnJhbS9md19jZmcuYwo+PiBpbmRleCA3OGY0M2RhZDkzLi42YWNhODA4NDZhIDEw
-MDY0NAo+PiAtLS0gYS9ody9udnJhbS9md19jZmcuYwo+PiArKysgYi9ody9udnJhbS9md19jZmcu
-Ywo+PiBAQCAtMTc4LDI0ICsxNzgsMjMgQEAgc3RhdGljIHZvaWQgZndfY2ZnX2Jvb3RzcGxhc2go
-RldDZmdTdGF0ZSAqcykKPj4gIAo+PiAgc3RhdGljIHZvaWQgZndfY2ZnX3JlYm9vdChGV0NmZ1N0
-YXRlICpzKQo+PiAgewo+PiAtICAgIGludCByZWJvb3RfdGltZW91dCA9IC0xOwo+PiAtICAgIGNo
-YXIgKnA7Cj4+IC0gICAgY29uc3QgY2hhciAqdGVtcDsKPj4gKyAgICBjb25zdCBjaGFyICpyZWJv
-b3RfdGltZW91dCA9IE5VTEw7Cj4+ICAKPj4gICAgICAvKiBnZXQgdXNlciBjb25maWd1cmF0aW9u
-ICovCj4+ICAgICAgUWVtdU9wdHNMaXN0ICpwbGlzdCA9IHFlbXVfZmluZF9vcHRzKCJib290LW9w
-dHMiKTsKPj4gICAgICBRZW11T3B0cyAqb3B0cyA9IFFUQUlMUV9GSVJTVCgmcGxpc3QtPmhlYWQp
-Owo+PiAtICAgIGlmIChvcHRzICE9IE5VTEwpIHsKPj4gLSAgICAgICAgdGVtcCA9IHFlbXVfb3B0
-X2dldChvcHRzLCAicmVib290LXRpbWVvdXQiKTsKPj4gLSAgICAgICAgaWYgKHRlbXAgIT0gTlVM
-TCkgewo+PiAtICAgICAgICAgICAgcCA9IChjaGFyICopdGVtcDsKPj4gLSAgICAgICAgICAgIHJl
-Ym9vdF90aW1lb3V0ID0gc3RydG9sKHAsICZwLCAxMCk7Cj4KPi4uLiB0aGUgdG90YWwgbGFjayBv
-ZiBlcnJvciBjaGVja2luZyBoZXJlLiAgU2FtZSBpbiBQQVRDSCAxLgoKPgoKCkdvdC4KCgo+SGVy
-ZSdzIG15IGF0dGVtcHQgYXQgYSBjbGVhcmVyIGNvbW1pdCBtZXNzYWdlOgo+Cj4gICAgZndfY2Zn
-OiBGaXggLWJvb3QgcmVib290LXRpbWVvdXQgZXJyb3IgY2hlY2tpbmcKPgo+ICAgIGZ3X2NmZ19y
-ZWJvb3QoKSBnZXRzIG9wdGlvbiBwYXJhbWV0ZXIgInJlYm9vdC10aW1lb3V0IiB3aXRoCj4gICAg
-cWVtdV9vcHRfZ2V0KCksIHRoZW4gY29udmVydHMgaXQgdG8gYW4gaW50ZWdlciBieSBoYW5kLiAg
-SXQgbmVnbGVjdHMKPiAgICB0byBjaGVjayB0aGF0IGNvbnZlcnNpb24gZm9yIGVycm9ycywgYW5k
-IGZhaWxzIHRvIHJlamVjdCBuZWdhdGl2ZQo+ICAgIHZhbHVlcy4gIFBvc2l0aXZlIHZhbHVlcyBh
-Ym92ZSB0aGUgbGltaXQgZ2V0IHJlcG9ydGVkIGFuZCByZXBsYWNlZAo+ICAgIGJ5IHRoZSBsaW1p
-dC4KPgo+ICAgIENoZWNrIGZvciBjb252ZXJzaW9uIGVycm9ycyBwcm9wZXJseSwgYW5kIHJlamVj
-dCBhbGwgdmFsdWVzIG91dHNpZGUKPiAgICAwLi4weGZmZmYuCgo+CgoKVGhhbmtzIGZvciB5b3Vy
-IGFkdmljZSwgSSBhcHByZWNpYXRlIGl0IGFuZCB3aWxsIGNoYW5nZSBpbiB0aGUgcmV2aXNpb24g
-dmVyc2lvbi4KCgo+UEFUQ0ggMSdzIGNvbW1pdCBtZXNzYWdlIGNvdWxkIGJlIGltcHJvdmVkIHRo
-ZSBzYW1lIHdheS4KPgo+PiAtICAgICAgICB9Cj4+ICsgICAgcmVib290X3RpbWVvdXQgPSBxZW11
-X29wdF9nZXQob3B0cywgInJlYm9vdC10aW1lb3V0Iik7Cj4+ICsKPj4gKyAgICBpZiAocmVib290
-X3RpbWVvdXQgPT0gTlVMTCkgewo+PiArICAgICAgICByZXR1cm47Cj4+ICAgICAgfQo+PiArICAg
-IGludDY0X3QgcnRfdmFsID0gcWVtdV9vcHRfZ2V0X251bWJlcihvcHRzLCAicmVib290LXRpbWVv
-dXQiLCAtMSk7Cj4+ICsKPj4gICAgICAvKiB2YWxpZGF0ZSB0aGUgaW5wdXQgKi8KPj4gLSAgICBp
-ZiAocmVib290X3RpbWVvdXQgPiAweGZmZmYpIHsKPj4gLSAgICAgICAgZXJyb3JfcmVwb3J0KCJy
-ZWJvb3QgdGltZW91dCBpcyBsYXJnZXIgdGhhbiA2NTUzNSwgZm9yY2UgaXQgdG8gNjU1MzUuIik7
-Cj4+IC0gICAgICAgIHJlYm9vdF90aW1lb3V0ID0gMHhmZmZmOwo+PiArICAgIGlmIChydF92YWwg
-PCAwIHx8IHJ0X3ZhbCA+IDB4ZmZmZikgewo+PiArICAgICAgICBlcnJvcl9yZXBvcnQoInJlYm9v
-dCB0aW1lb3V0IGlzIGludmFsaWQsIgo+PiArICAgICAgICAgICAgICAgICAgICAgIml0IHNob3Vs
-ZCBiZSBhIHZhbHVlIGJldHdlZW4gMCBhbmQgNjU1MzUiKTsKPj4gKyAgICAgICAgZXhpdCgxKTsK
-Pj4gICAgICB9Cj4+ICAgICAgZndfY2ZnX2FkZF9maWxlKHMsICJldGMvYm9vdC1mYWlsLXdhaXQi
-LCBnX21lbWR1cCgmcmVib290X3RpbWVvdXQsIDQpLCA0KTsKPj4gIH0KPgo+Q2hhbmdlIGluIGJl
-aGF2aW9yIHdoZW4gInJlYm9vdC10aW1lb3V0IiBpc24ndCBzcGVjaWZpZWQuCj4KPkJlZm9yZSB5
-b3VyIHBhdGNoLCB3ZSBmd19jZmdfYWRkX2ZpbGUoKSB3aXRoIGEgdmFsdWUgb2YgLTEuCj4KPkFm
-dGVyIHlvdXIgcGF0Y2gsIHdlIGRvbid0IGZ3X2NmZ19hZGRfZmlsZSgpLgo+Cj5XaHkgaXMgdGhh
-dCBva2F5PwoKPgoKCkhlcmUgSSBmb2xsb3dpbmcgR2VyZCdzIGFkdmljZS4gCkZvciB2YWx1ZXMg
-PjB4ZmZmZiAgb3IgPCAwLCByZXBvcnQgYW5kIGV4aXQuCi0tPmh0dHA6Ly9saXN0cy5nbnUub3Jn
-L2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMTEvbXNnMDA1NTEuaHRtbApUaGFua3MsCkxp
-IFFpYW5nCj4+IGRpZmYgLS1naXQgYS92bC5jIGIvdmwuYwo+PiBpbmRleCBiZTM3ZGE0NmYwLi4w
-ODYxMjdmZjBiIDEwMDY0NAo+PiAtLS0gYS92bC5jCj4+ICsrKyBiL3ZsLmMKPj4gQEAgLTMzOSw3
-ICszMzksNyBAQCBzdGF0aWMgUWVtdU9wdHNMaXN0IHFlbXVfYm9vdF9vcHRzID0gewo+PiAgICAg
-ICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsCj4+ICAgICAgICAgIH0sIHsKPj4gICAg
-ICAgICAgICAgIC5uYW1lID0gInJlYm9vdC10aW1lb3V0IiwKPj4gLSAgICAgICAgICAgIC50eXBl
-ID0gUUVNVV9PUFRfU1RSSU5HLAo+PiArICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1C
-RVIsCj4+ICAgICAgICAgIH0sIHsKPj4gICAgICAgICAgICAgIC5uYW1lID0gInN0cmljdCIsCj4+
-ICAgICAgICAgICAgICAudHlwZSA9IFFFTVVfT1BUX0JPT0wsCg==
+On 11/2/18 6:25 AM, Laurent Vivier wrote:
+>> If that does not work, I'm also fine if we simply deprecate the simcalls
+>> (if possible).
+> 
+> I have a patch to deprecate the interface. I will send it once the
+> release will be done.
+
+Did I ever point out that I got m68k running under your q800 emulation in my
+https://github.com/landley/mkroot project?
+
+Now that m68k is in musl-libc, you can build
+https://github.com/richfelker/musl-cross-make or grab a prebuilt binary a
+toolchain from http://b.zv.io/mcm/bin/m68k-linux-musl-cross.tar.gz and then:
+
+  CROSS_COMPILE=/path/to/m68k-linux-musl-cross/bin/m68k-linux-musl- \
+    ./mkroot.sh kernel
+
+And then:
+
+  cd output/m68k
+  ./qemu-m68k.sh -hda log.txt
+
+The -hda is just so you have a hard drive image you can play with. Cat /dev/?da
+should show you the log.txt contents. The network interface works too, although
+I haven't got wget in toybox yet but:
+
+  echo GET / | netcat landley.net /
+
+Works. :)
+
+When does this go upstream?
+
+P.S. to build a current kernel:
+
+  cd download
+  git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux
+  cd ..
+
+And then mkroot.sh again. I tested with 4.20-rc1 and m68k worked fine.
+
+> Thanks,
+> Laurent
+
+Rob
