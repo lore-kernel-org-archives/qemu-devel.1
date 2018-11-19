@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gOmm2-00010x-IP
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:51:49 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gOmmC-0001B8-UZ
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:51:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gOmiI-0000xX-Ps
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:47:55 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20181116151834.GA5066@localhost.localdomain>
-References: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
-	<w511s7p9fkk.fsf@maestria.local.igalia.com>
-	<462138b3-e9e7-29e5-da55-d0ebd626aee7@redhat.com>
-	<w51efbmh0tp.fsf@maestria.local.igalia.com>
-	<2e1b90ae-1a0c-711a-6ef8-3c814335f696@redhat.com>
-	<w51in0xuksv.fsf@maestria.local.igalia.com>
-	<20181116151834.GA5066@localhost.localdomain>
-Date: Mon, 19 Nov 2018 17:47:48 +0100
-Message-ID: <w51h8gdypxn.fsf@maestria.local.igalia.com>
+	(envelope-from <imammedo@redhat.com>) id 1gOmhI-0000Gl-Qj
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:46:56 -0500
+Date: Mon, 19 Nov 2018 17:46:41 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181119174641.22da85de@redhat.com>
+In-Reply-To: <20181105102044.20547-9-david@redhat.com>
+References: <20181105102044.20547-1-david@redhat.com>
+	<20181105102044.20547-9-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] KVM Forum block no[td]es
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/10] pci/pcie: perform unplug via the
+ hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-On Fri 16 Nov 2018 04:18:34 PM CET, Kevin Wolf wrote:
-> Am 16.11.2018 um 16:03 hat Alberto Garcia geschrieben:
->> > I don't think anything needs a way to generally block graph changes
->> > around some node.  We only need to prevent changes to very specific
->> > sets of edges.  This is something that the permission system just
->> > cannot do.
->> 
->> But what would you do then?
->
-> I agree with you mostly in that I think that most problems that Max
-> mentioned aren't readl. The only real problem I see with GRAPH_MOD as
-> a permission on the node level is this overblocking - but that's bad
-> enough that I feel using permissions to block changes to a whole node
-> is not a good solution.
+On Mon,  5 Nov 2018 11:20:42 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-I understand that this restriction would be too coarse, but do you have
-any case in mind where this would be a problem, or are you simply
-worried because it's not an elegant solution?
+> Introduce and use the "unplug" callback.
+> 
+> This is a preparation for multi-stage hotplug handlers, whereby the bus
+> hotplug handler is overwritten by the machine hotplug handler. This handler
+> will then pass control to the bus hotplug handler. So to get this running
+> cleanly, we also have to make sure to go via the hotplug handler chain when
+> actually unplugging a device after an unplug request. Lookup the hotplug
+> handler and call "unplug".
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-(not that I'm resisting the proposal of using a counter, I'm just
-curious)
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-> So what's the alternative? Max had a possible solution in the first
-> email in this thread:
->
->> - A property of BdrvChild that can be set by a non-parent seems more
->>   feasible, e.g. a counter where changing the child is possible only
->>   if the counter is 0.  This also actually makes sense in what it
->>   means.
->
-> The commit job would increment BdrvChild.block_change (or whatever we
-> would call it) for all bs->backing edges in the subchain.
-
-So instead of having a permission blocking changes in all of a node's
-links, this would only affect the backing links.
-
-It should work, I can give it a try.
-
-Does it make sense to keep the GRAPH_MOD permission at all if we're not
-really using it and we don't know what it is for? We can just drop it,
-or are we breaking the API or the ABI?
-
-Berto
+> ---
+>  hw/pci/pcie.c         | 10 +++++++++-
+>  hw/pci/pcie_port.c    |  1 +
+>  include/hw/pci/pcie.h |  2 ++
+>  3 files changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index ccba29269e..ba3ea925e9 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -364,11 +364,19 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      }
+>  }
+>  
+> -static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
+> +void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                             Error **errp)
+>  {
+>      object_unparent(OBJECT(dev));
+>  }
+>  
+> +static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
+> +{
+> +    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(dev));
+> +
+> +    hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
+> +}
+> +
+>  void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
+>                                       DeviceState *dev, Error **errp)
+>  {
+> diff --git a/hw/pci/pcie_port.c b/hw/pci/pcie_port.c
+> index 7982a87880..a30291ef54 100644
+> --- a/hw/pci/pcie_port.c
+> +++ b/hw/pci/pcie_port.c
+> @@ -156,6 +156,7 @@ static void pcie_slot_class_init(ObjectClass *oc, void *data)
+>      dc->props = pcie_slot_props;
+>      hc->pre_plug = pcie_cap_slot_pre_plug_cb;
+>      hc->plug = pcie_cap_slot_plug_cb;
+> +    hc->unplug = pcie_cap_slot_unplug_cb;
+>      hc->unplug_request = pcie_cap_slot_unplug_request_cb;
+>  }
+>  
+> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> index d9fbcf4a4a..9ae6482658 100644
+> --- a/include/hw/pci/pcie.h
+> +++ b/include/hw/pci/pcie.h
+> @@ -135,6 +135,8 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                 Error **errp);
+>  void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                             Error **errp);
+> +void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                             Error **errp);
+>  void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
+>                                       DeviceState *dev, Error **errp);
+>  #endif /* QEMU_PCIE_H */
