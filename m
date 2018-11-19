@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gOmml-0001hH-UW
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:52:34 -0500
+	(envelope-from <groug@kaod.org>) id 1gOmtO-0000mu-2c
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:59:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gOmYC-0001iV-07
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:37:32 -0500
-Date: Mon, 19 Nov 2018 17:36:59 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181119173659.61a8925e@redhat.com>
-In-Reply-To: <20181105102044.20547-8-david@redhat.com>
-References: <20181105102044.20547-1-david@redhat.com>
-	<20181105102044.20547-8-david@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1gOmtL-00071V-A5
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:59:21 -0500
+Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:36964)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gOmtK-0006zf-Iw
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:59:18 -0500
+Received: from player688.ha.ovh.net (unknown [10.109.159.157])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id CB798E0D12
+	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 17:59:16 +0100 (CET)
+Date: Mon, 19 Nov 2018 17:59:08 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181119175908.5d3e1d4a@bahia.lan>
+In-Reply-To: <3411737e-824a-0653-024b-f46fe5695790@redhat.com>
+References: <1542632978-65604-1-git-send-email-spopovyc@redhat.com>
+	<20181119142719.3d702892@bahia.lan>
+	<3411737e-824a-0653-024b-f46fe5695790@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 07/10] pci/pcihp: perform unplug via the
- hotplug handler
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for 3.1] spapr: Fix ibm,
+ max-associativity-domains property number of nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +32,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Serhii Popovych <spopovyc@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-On Mon,  5 Nov 2018 11:20:41 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Mon, 19 Nov 2018 14:48:34 +0100
+Laurent Vivier <lvivier@redhat.com> wrote:
 
-> Introduce and use the "unplug" callback.
+> On 19/11/2018 14:27, Greg Kurz wrote:
+> > On Mon, 19 Nov 2018 08:09:38 -0500
+> > Serhii Popovych <spopovyc@redhat.com> wrote:
+> >   
+> >> Laurent Vivier reported off by one with maximum number of NUMA nodes
+> >> provided by qemu-kvm being less by one than required according to
+> >> description of "ibm,max-associativity-domains" property in LoPAPR.
+> >>
+> >> It appears that I incorrectly treated LoPAPR description of this
+> >> property assuming it provides last valid domain (NUMA node here)
+> >> instead of maximum number of domains.
+> >>
+> >>   ### Before hot-add
+> >>
+> >>   (qemu) info numa
+> >>   3 nodes
+> >>   node 0 cpus: 0
+> >>   node 0 size: 0 MB
+> >>   node 0 plugged: 0 MB
+> >>   node 1 cpus:
+> >>   node 1 size: 1024 MB
+> >>   node 1 plugged: 0 MB
+> >>   node 2 cpus:
+> >>   node 2 size: 0 MB
+> >>   node 2 plugged: 0 MB
+> >>
+> >>   $ numactl -H
+> >>   available: 2 nodes (0-1)
+> >>   node 0 cpus: 0
+> >>   node 0 size: 0 MB
+> >>   node 0 free: 0 MB
+> >>   node 1 cpus:
+> >>   node 1 size: 999 MB
+> >>   node 1 free: 658 MB
+> >>   node distances:
+> >>   node   0   1
+> >>     0:  10  40
+> >>     1:  40  10
+> >>
+> >>   ### Hot-add
+> >>
+> >>   (qemu) object_add memory-backend-ram,id=mem0,size=1G
+> >>   (qemu) device_add pc-dimm,id=dimm1,memdev=mem0,node=2
+> >>   (qemu) [   87.704898] pseries-hotplug-mem: Attempting to hot-add 4 ...
+> >>   <there is no "Initmem setup node 2 [mem 0xHEX-0xHEX]">
+> >>   [   87.705128] lpar: Attempting to resize HPT to shift 21
+> >>   ... <HPT resize messages>
+> >>
+> >>   ### After hot-add
+> >>
+> >>   (qemu) info numa
+> >>   3 nodes
+> >>   node 0 cpus: 0
+> >>   node 0 size: 0 MB
+> >>   node 0 plugged: 0 MB
+> >>   node 1 cpus:
+> >>   node 1 size: 1024 MB
+> >>   node 1 plugged: 0 MB
+> >>   node 2 cpus:
+> >>   node 2 size: 1024 MB
+> >>   node 2 plugged: 1024 MB
+> >>
+> >>   $ numactl -H
+> >>   available: 2 nodes (0-1)
+> >>   ^^^^^^^^^^^^^^^^^^^^^^^^
+> >>              Still only two nodes (and memory hot-added to node 0 below)
+> >>   node 0 cpus: 0
+> >>   node 0 size: 1024 MB
+> >>   node 0 free: 1021 MB
+> >>   node 1 cpus:
+> >>   node 1 size: 999 MB
+> >>   node 1 free: 658 MB
+> >>   node distances:
+> >>   node   0   1
+> >>     0:  10  40
+> >>     1:  40  10
+> >>
+> >> After fix applied numactl(8) reports 3 nodes available and memory
+> >> plugged into node 2 as expected.
+> >>
+> >> Fixes: da9f80fbad21 ("spapr: Add ibm,max-associativity-domains property")
+> >> Reported-by: Laurent Vivier <lvivier@redhat.com>
+> >> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
+> >> ---
+> >>  hw/ppc/spapr.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >> index 7afd1a1..843ae6c 100644
+> >> --- a/hw/ppc/spapr.c
+> >> +++ b/hw/ppc/spapr.c
+> >> @@ -1033,7 +1033,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
+> >>          cpu_to_be32(0),
+> >>          cpu_to_be32(0),
+> >>          cpu_to_be32(0),
+> >> -        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes - 1 : 0),
+> >> +        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 0),  
+> > 
+> > Maybe simply cpu_to_be32(nb_numa_nodes) ?  
 > 
-> This is a preparation for multi-stage hotplug handlers, whereby the bus
-> hotplug handler is overwritten by the machine hotplug handler. This handler
-> will then pass control to the bus hotplug handler. So to get this running
-> cleanly, we also have to make sure to go via the hotplug handler chain when
-> actually unplugging a device after an unplug request. Lookup the hotplug
-> handler and call "unplug".
+> Or "cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 1)" ?
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/acpi/pcihp.c         | 11 ++++++++++-
->  hw/acpi/piix4.c         |  7 +++++--
->  include/hw/acpi/pcihp.h |  3 +++
->  3 files changed, 18 insertions(+), 3 deletions(-)
+> In spapr_populate_drconf_memory() we have this logic.
 > 
-> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-> index 05e3f8d11e..7bc7a72340 100644
-> --- a/hw/acpi/pcihp.c
-> +++ b/hw/acpi/pcihp.c
-> @@ -154,6 +154,7 @@ static bool acpi_pcihp_pc_no_hotplug(AcpiPciHpState *s, PCIDevice *dev)
->  
->  static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slots)
->  {
-> +    HotplugHandler *hotplug_ctrl;
->      BusChild *kid, *next;
->      int slot = ctz32(slots);
->      PCIBus *bus = acpi_pcihp_find_hotplug_bus(s, bsel);
-> @@ -171,7 +172,8 @@ static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slo
->          PCIDevice *dev = PCI_DEVICE(qdev);
->          if (PCI_SLOT(dev->devfn) == slot) {
->              if (!acpi_pcihp_pc_no_hotplug(s, dev)) {
-> -                object_unparent(OBJECT(qdev));
-> +                hotplug_ctrl = qdev_get_hotplug_handler(qdev);
-> +                hotplug_handler_unplug(hotplug_ctrl, qdev, &error_abort);
->              }
->          }
->      }
-> @@ -266,6 +268,13 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
->  
->  void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
->                                   DeviceState *dev, Error **errp)
-> +{
-> +    object_unparent(OBJECT(dev));
-> +}
-> +
-> +void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> +                                         AcpiPciHpState *s, DeviceState *dev,
-> +                                         Error **errp)
->  {
->      PCIDevice *pdev = PCI_DEVICE(dev);
->      int slot = PCI_SLOT(pdev->devfn);
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index 160f727a5e..54a12a36f5 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -418,8 +418,8 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
->                                        dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> -        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> -                                    errp);
-> +        acpi_pcihp_device_unplug_request_cb(hotplug_dev, &s->acpi_pci_hotplug,
-> +                                            dev, errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
->                 !s->cpu_hotplug_legacy) {
->          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
-> @@ -437,6 +437,9 @@ static void piix4_device_unplug_cb(HotplugHandler *hotplug_dev,
->      if (s->acpi_memory_hotplug.is_enabled &&
->          object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->          acpi_memory_unplug_cb(&s->acpi_memory_hotplug, dev, errp);
-> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-> +        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-> +                                    errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
->                 !s->cpu_hotplug_legacy) {
->          acpi_cpu_unplug_cb(&s->cpuhp_state, dev, errp);
-> diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
-> index ce31625850..8bc4a4c01d 100644
-> --- a/include/hw/acpi/pcihp.h
-> +++ b/include/hw/acpi/pcihp.h
-> @@ -62,6 +62,9 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
->                                 DeviceState *dev, Error **errp);
->  void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
->                                   DeviceState *dev, Error **errp);
-> +void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> +                                         AcpiPciHpState *s, DeviceState *dev,
-> +                                         Error **errp);
->  
->  /* Called on reset */
->  void acpi_pcihp_reset(AcpiPciHpState *s);
+
+Hmm... maybe you're right, it seems that the code assumes
+non-NUMA configs have at one node. Similar assumption is
+also present in pc_dimm_realize():
+
+    if (((nb_numa_nodes > 0) && (dimm->node >= nb_numa_nodes)) ||
+        (!nb_numa_nodes && dimm->node)) {
+        error_setg(errp, "'DIMM property " PC_DIMM_NODE_PROP " has value %"
+                   PRIu32 "' which exceeds the number of numa nodes: %d",
+                   dimm->node, nb_numa_nodes ? nb_numa_nodes : 1);
+        return;
+    }
+
+This is a bit confusing...
+
+> Thanks,
+> Laurent
