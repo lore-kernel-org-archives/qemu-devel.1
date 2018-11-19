@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gOh0w-0005xl-HD
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:42:47 -0500
+	(envelope-from <berrange@redhat.com>) id 1gOh1a-0006WX-Qn
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:43:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gOh0s-0008Ci-Ht
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:42:46 -0500
-Received: from mail-qk1-f180.google.com ([209.85.222.180]:34955)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gOh0q-0008B5-UN
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:42:41 -0500
-Received: by mail-qk1-f180.google.com with SMTP id w204so47744819qka.2
-	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 02:42:40 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1gOh1Z-0000Hu-NZ
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:43:26 -0500
+Date: Mon, 19 Nov 2018 10:43:16 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181119104316.GM19532@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181116215002.2124581-1-eblake@redhat.com>
 MIME-Version: 1.0
-References: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
-	<20181119084855.uyira2lpu73mu2fo@sirius.home.kraxel.org>
-In-Reply-To: <20181119084855.uyira2lpu73mu2fo@sirius.home.kraxel.org>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Mon, 19 Nov 2018 11:42:28 +0100
-Message-ID: <CAGxU2F4O4aKzrJky7EFeWaHFuBKPwi_Z-j7G7m+ENRojVG_5vA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181116215002.2124581-1-eblake@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] iotests: Drop use of bash keyword
+ 'function'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: seabios@seabios.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Rob Bradford <robert.bradford@intel.com>, Samuel Ortiz <sameo@linux.intel.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On Mon, Nov 19, 2018 at 9:49 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+On Fri, Nov 16, 2018 at 03:50:02PM -0600, Eric Blake wrote:
+> Bash allows functions to be declared with or without the leading
+> keyword 'function'; but including the keyword does not comply with
+> POSIX syntax, and is confusing to ksh users where the use of the
+> keyword changes the scoping rules for functions.  Stick to the
+> POSIX form through iotests.
+>=20
+> Done mechanically with:
+>   sed -i 's/^function //' $(git ls-files tests/qemu-iotests)
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
 
->   Hi,
->
-> > I'm investigating the SeaBIOS booting time, to understand if we can
-> > reduce the boot time in some cases (e.g. legacy hardware is not
-> > needed). I think this can be interesting also for NEMU developers.
->
-> > The goal is to have only one image of SeaBIOS configurable at runtime
-> > to reduce the boot time, avoiding unnecessary initialization.
->
-> Why at runtime?  What is bad with two images?  With a runtime option
-> you probably need some way to enable the "fastboot" hint for seabios,
-> because some optimizations (like skipping ps/2 initialization) breaks
-> functionality.  So it must be opt-in so you can enable it if you know
-> your use case is fine with that.  But "qemu -boot fast=on" isn't much
-> different from "qemu -bios seabios-fastboot.bin" after all ...
->
-
-You are right, but maybe having a single image can be simpler to distribute,
-and we can implement something (eg. using fw_cfg) to selectively enable
-features needed.
-Anyway, as the first step, I'll try to build a separate image of SeaBIOS.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
 
-> > Any pointers or suggestions would be helpful.
->
-> seabios could try to skip initializing hardware without bootindex with
-> "qemu -boot menu=off,strict=on".
->
-> mmconfig support?  I think that would reduce the number of vmexits
-> needed for pci initialization.
->
-
-Thank you very much, I'll investigate that points.
-
-Cheers,
-Stefano
-
-
-> cheers,
->   Gerd
->
->
-
--- 
-Stefano Garzarella
-Red Hat
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
