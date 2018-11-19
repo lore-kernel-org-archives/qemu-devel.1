@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gOnyC-00030E-38
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:08:25 -0500
+	(envelope-from <mst@redhat.com>) id 1gOnyO-00036r-1k
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:08:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gOny8-0006xn-Tv
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:08:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46446)
+	(envelope-from <mst@redhat.com>) id 1gOnyI-00077q-EM
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:08:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58766)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gOny8-0006wr-J9
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:08:20 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181030191620.32168-1-armbru@redhat.com>
-	<CAFEAcA8RdNrbCLL7tXY=e95N2Y0LcZdCPr3EuQo1_hu08qJuaQ@mail.gmail.com>
-	<87sh0eyzb0.fsf@dusky.pond.sub.org> <20181107025628.GB17134@xz-x1>
-	<CAFEAcA_FhkA_1DiDM2PWDw27dupsAdP==kBUxRrw5rGDnLzMwg@mail.gmail.com>
-	<20181108024406.GB3170@xz-x1> <20181119061727.GA1901@xz-x1>
-	<20181119070558.GB1901@xz-x1>
-Date: Mon, 19 Nov 2018 19:08:13 +0100
-In-Reply-To: <20181119070558.GB1901@xz-x1> (Peter Xu's message of "Mon, 19 Nov
-	2018 15:05:58 +0800")
-Message-ID: <87ftvxlz3m.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gOnyI-000762-4V
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:08:30 -0500
+Date: Mon, 19 Nov 2018 13:07:59 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181119125519-mutt-send-email-mst@kernel.org>
+References: <20181114233831.10374-1-ehabkost@redhat.com>
+	<c1b4a0ee39dfddeb19f1be46710c10cbefd3f07a.camel@redhat.com>
+	<20181116034551.GK3807@habkost.net>
+	<20181119114105.4da89f2c.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL 0/8] Monitor patches for 2018-10-30
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181119114105.4da89f2c.cohuck@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] virtio: Provide
+ version-specific variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,265 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-Peter Xu <peterx@redhat.com> writes:
+On Mon, Nov 19, 2018 at 11:41:05AM +0100, Cornelia Huck wrote:
+> On Fri, 16 Nov 2018 01:45:51 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+>=20
+> > On Thu, Nov 15, 2018 at 05:29:24PM +0100, Andrea Bolognani wrote:
+>=20
+> > > One thing that I'm very much not convinced about is the naming,
+> > > specifically leaving the virtio revision out: I get it that we
+> > > Should Never Need=E2=84=A2 another major version of the spec, but I=
+'m
+> > > afraid discounting the possibility outright might prove to be
+> > > shortsighted and come back to bite us later, so I'd much rather
+> > > keep it.
 
-> On Mon, Nov 19, 2018 at 02:17:27PM +0800, Peter Xu wrote:
->> I reproduced the error with a FreeBSD guest and this change (which
->> possibly can be squashed into "tests: qmp-test: add queue full test")
->> worked for me:
->> 
->> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
->> index 6989acbca4..83f353db4f 100644
->> --- a/tests/qmp-test.c
->> +++ b/tests/qmp-test.c
->> @@ -281,8 +281,15 @@ static void test_qmp_oob(void)
->>       * will only be able to be handled after the queue is shrinked, so
->>       * it'll be processed only after one existing in-band command
->>       * finishes.
->> +     *
->> +     * NOTE: we need to feed the queue with one extra request to make
->> +     * sure it'll be stuck since when we have sent the Nth request
->> +     * it's possible that we have already popped and processing the
->> +     * 1st request so the Nth request (which could potentially be the
->> +     * [N-1]th element on the queue) might not trigger the
->> +     * monitor-full condition deterministically.
->>       */
->> -    for (i = 1; i <= QMP_REQ_QUEUE_LEN_MAX; i++) {
->> +    for (i = 1; i <= QMP_REQ_QUEUE_LEN_MAX + 1; i++) {
->>          id = g_strdup_printf("queue-blocks-%d", i);
->>          send_cmd_that_blocks(qts, id);
->>          g_free(id);
->> @@ -291,7 +298,7 @@ static void test_qmp_oob(void)
->>      unblock_blocked_cmd();
->>      recv_cmd_id(qts, "queue-blocks-1");
->>      recv_cmd_id(qts, "oob-1");
->> -    for (i = 2; i <= QMP_REQ_QUEUE_LEN_MAX; i++) {
->> +    for (i = 2; i <= QMP_REQ_QUEUE_LEN_MAX + 1; i++) {
->>          unblock_blocked_cmd();
->>          id = g_strdup_printf("queue-blocks-%d", i);
->>          recv_cmd_id(qts, id);
->> 
->> So the problem here is that the queue-block-N command might not really
->> suspend the monitor everytime if we already popped the 1st request,
->> which will let the N-th request to be (N-1)th, then the parser will
->> continue to eat the oob command and it could "preempt" the previous
->> commands.
->> 
->> Maybe FreeBSD is scheduling the threads in some pattern so it happens
->> only on FreeBSD and very constantly, but anyway it should be a general
->> fix to the test program.
+That's not the claim. In fact the reverse is true - a major revision can
+come at any point. The claim is that virtio compatibility is not based
+on version numbers.  And another claim is that you can trust the
+virtio TC not to overload terminology that it put in the spec. So use
+that and you should be fine.  Come up with your own and end up writing
+another spec just to document it.
 
-I feel particularly dense right now, and need a more detailed analysis
-to understand.  Let me try.
+> > >=20
+> > > And once that's done, "non-transitional" (while matching the
+> > > language of the spec) starts to look a bit unnecessary when you
+> > > could simply have
+> > >=20
+> > >   virtio-*-pci
+> > >   virtio-*-pci-1
+> > >   virtio-*-pci-1-transitional
+> > >=20
+> > > instead. But I don't feel as strongly about this as I do about
+> > > keeping the virtio revision in the device name :) =20
+> >=20
+> > I like that suggestion.  Makes the device names more explicit
+> > _and_ shorter.  I'll do that in v3.
+>=20
+> OTOH, that would mean we'd need to introduce new device types if we
+> ever start to support a virtio 2.x standard. My understanding was that
+> we'll want separate device types for transitional and non-transitional
+> for two reasons: the bus which a device can be plugged into, and
+> changing ids. Do we really expect huge changes in a possible 2.x
+> standard that affect virtio-pci only, and not other virtio transports
+> as well?
 
-Here's what the test does before your fix
+Yes I think adding a version there is a mistake.
+transitional/legacy/non-transitional are spec terms so
+they are unlikely to change abruptly. OTOH virtio TC can
+just decide next version is 2.0 on a drop of a hat.
 
-    Send QMP_REQ_QUEUE_LEN_MAX "blocking" in-band commands
-    queue-blocks-1, queue-blocks-2, ...  "Blocking" means the command
-    blocks until we explicitly unblock it.
+And I strongly believe command line users really really do not want all
+this mess. Even adding "pci" is the name confuses people (what are the
+other options?). For command line model=3Dvirtio is pretty much perfect.
+So all these names are there primarily for libvirt's benefit.
+And the only input from libvirt devs so far
+has been that it's unclear how does cross version
+migration work. That needs to be addressed in some way.
 
-    Send an out-of-band command oob-1.
+So can we maybe start with a libvirt domain xml patch, with an
+implementation for existing QEMU, get that acked, and then just map it
+back to qemu command line as directly as possible?
 
-    Unblock queue-blocks-1.
-
-    Receive response to queue-blocks-1.
-
-    Receive response to oob-1.
-
-    Unblock queue-blocks-2, receive response
-    ...
-
-Here's what test test expects QEMU to do:
-
-    In I/O thread:
-
-        Receive and queue queue-blocks-1, ...
-
-        Queue is full, stop receiving commands.
-
-    In main thread:
-
-        Dequeue queue-blocks-1.
-
-        Execute queue-blocks-1, block for a while, finish and send
-        response.
-
-    In I/O thread:
-
-        Queue is no longer full, resume receiving commands.
-
-        Receive and execute oob-1, send response
-
-    In main thread:
-
-        Dequeue queue-blocks-2, execute, block for a while, finish and
-        send response.
-        ...
-
-No good because the two threads race.  On my Linux box the test passes.
-Let's have a closer look how it does that.  The appended patch that adds
-another tracepoint.  With tracepoints monitor_* and handle_qmp_command
-enabled, I get:
-
-    19271@1542641581.372890:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-1", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
-
-I/O thread receives and queues queue-blocks-1.
-
-    19271@1542641581.372954:monitor_qmp_cmd_in_band queue-blocks-1
-
-Main thread dequeues qemu-blocks-1 and starts executing it.
-
-We already lost: the queue won't actually fill up.  The test passes
-anyway, but it doesn't actually test "queue full".  But why does it
-pass?  Let's see.
-
-    19271@1542641581.373211:monitor_qmp_respond queue-blocks-1
-
-Main thread sends response to queue-blocks-1.  This means queue-blocks-1
-has been unblocked already.  This is possible, because qmp-test sends
-all the commands and then immediately unblocks queue-blocks-1, and the
-main thread can win the race with the I/O thread.
-
-    19271@1542641581.373826:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-2", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
-    19271@1542641581.373864:monitor_qmp_cmd_in_band queue-blocks-2
-    19271@1542641581.374575:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-3", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
-    19271@1542641581.375344:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-4", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
-    19271@1542641581.376162:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-5", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
-    19271@1542641581.376996:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-6", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
-    19271@1542641581.377790:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-7", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
-    19271@1542641581.378562:handle_qmp_command mon 0x563e19be4e80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-8", "driver": "blkdebug", "config": "/tmp/qmp-test-EZroW3/fifo"}}
-
-I/O thread receives and queues queue-blocks-2, ... queue-blocks-8.
-
-    19271@1542641581.378796:handle_qmp_command mon 0x563e19be4e80 req: {"exec-oob": "migrate-pause"}
-    19271@1542641581.378800:monitor_qmp_cmd_out_of_band oob-1
-    19271@1542641581.378823:monitor_qmp_respond oob-1
-
-I/O thread receives, executes and responds to oob-1.
-
-    19271@1542641581.379197:monitor_qmp_respond queue-blocks-2
-    19271@1542641581.379228:monitor_qmp_cmd_in_band queue-blocks-3
-    19271@1542641581.379435:monitor_qmp_respond queue-blocks-3
-    19271@1542641581.379477:monitor_qmp_cmd_in_band queue-blocks-4
-    19271@1542641581.379597:monitor_qmp_respond queue-blocks-4
-    19271@1542641581.379621:monitor_qmp_cmd_in_band queue-blocks-5
-    19271@1542641581.379800:monitor_qmp_respond queue-blocks-5
-    19271@1542641581.379824:monitor_qmp_cmd_in_band queue-blocks-6
-    19271@1542641581.379953:monitor_qmp_respond queue-blocks-6
-    19271@1542641581.379992:monitor_qmp_cmd_in_band queue-blocks-7
-    19271@1542641581.380132:monitor_qmp_respond queue-blocks-7
-    19271@1542641581.380170:monitor_qmp_cmd_in_band queue-blocks-8
-    19271@1542641581.380283:monitor_qmp_respond queue-blocks-8
-
-Main thread dequeues, executes and responds to queue-blocks-2,
-... queue-blocks-8.
-
-If I make the main thread lose the race by sticking a sleep(1) before
-the unblock_blocked_cmd() that unblocks queue-blocks-1, I get:
-
-    22762@1542641707.818838:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-1", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
-
-I/O thread receives and queues queue-blocks-1.
-
-    22762@1542641707.818856:monitor_qmp_cmd_in_band queue-blocks-1
-
-Main thread dequeues qemu-blocks-1 and starts executing it.  We already
-lost.
-
-    22762@1542641707.819585:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-2", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
-    22762@1542641707.820331:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-3", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
-    22762@1542641707.821072:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-4", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
-    22762@1542641707.821821:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-5", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
-    22762@1542641707.822569:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-6", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
-    22762@1542641707.823314:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-7", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
-    22762@1542641707.824069:handle_qmp_command mon 0x55f5b6a5de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-8", "driver": "blkdebug", "config": "/tmp/qmp-test-PqO2uz/fifo"}}
-
-I/O thread receives and queues queue-blocks-2, ... queue-blocks-8.
-
-    22762@1542641707.824253:handle_qmp_command mon 0x55f5b6a5de80 req: {"exec-oob": "migrate-pause"}
-    22762@1542641707.824257:monitor_qmp_cmd_out_of_band oob-1
-    22762@1542641707.824282:monitor_qmp_respond oob-1
-
-I/O thread receives, executes and responds to oob-1.
-
-Test is going to fail: response to oob-1 sent before response to
-queue-blocks-1.
-
-Now let me try your fix.  Here's what I see:
-
-    16585@1542650042.980953:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-1", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
-    16585@1542650042.981018:monitor_qmp_cmd_in_band queue-blocks-1
-    16585@1542650042.981252:monitor_qmp_respond queue-blocks-1
-    16585@1542650042.981838:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-2", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
-    16585@1542650042.981916:monitor_qmp_cmd_in_band queue-blocks-2
-    16585@1542650042.982656:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-3", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
-    16585@1542650042.983406:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-4", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
-    16585@1542650042.984170:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-5", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
-    16585@1542650042.984975:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-6", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
-    16585@1542650042.985778:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-7", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
-    16585@1542650042.986565:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-8", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
-    16585@1542650042.987396:handle_qmp_command mon 0x5597b8e0de80 req: {"execute": "blockdev-add", "arguments": {"image": {"driver": "null-co"}, "node-name": "queue-blocks-9", "driver": "blkdebug", "config": "/tmp/qmp-test-8YRbOJ/fifo"}}
-    16585@1542650042.987626:handle_qmp_command mon 0x5597b8e0de80 req: {"exec-oob": "migrate-pause"}
-    16585@1542650042.987630:monitor_qmp_cmd_out_of_band oob-1
-    16585@1542650042.987676:monitor_qmp_respond oob-1
-    16585@1542650042.988035:monitor_qmp_respond queue-blocks-2
-    16585@1542650042.988066:monitor_qmp_cmd_in_band queue-blocks-3
-    16585@1542650042.988329:monitor_qmp_respond queue-blocks-3
-    16585@1542650042.988360:monitor_qmp_cmd_in_band queue-blocks-4
-    16585@1542650042.988575:monitor_qmp_respond queue-blocks-4
-    16585@1542650042.988616:monitor_qmp_cmd_in_band queue-blocks-5
-    16585@1542650042.988803:monitor_qmp_respond queue-blocks-5
-    16585@1542650042.988826:monitor_qmp_cmd_in_band queue-blocks-6
-    16585@1542650042.988977:monitor_qmp_respond queue-blocks-6
-    16585@1542650042.989001:monitor_qmp_cmd_in_band queue-blocks-7
-    16585@1542650042.989223:monitor_qmp_respond queue-blocks-7
-    16585@1542650042.989279:monitor_qmp_cmd_in_band queue-blocks-8
-    16585@1542650042.989447:monitor_qmp_respond queue-blocks-8
-    16585@1542650042.989469:monitor_qmp_cmd_in_band queue-blocks-9
-    16585@1542650042.989582:monitor_qmp_respond queue-blocks-9
-
-Tracepoint monitor_suspend still not hit.  This means the queue does not
-fill up.
-
-> Markus, do you want me to repost a new version with this change?  Is
-> it still possible to have the oob-default series for 3.1?
-
-We're trying to, but we need to get the test to work.
-
-Two problems:
-
-1. The test doesn't seem to succed at testing "queue full".
-
-2. The test might still be racy.
-
-I suspect the code we test is solid, and it's "only" the test we screwed
-up.
-
-
-diff --git a/monitor.c b/monitor.c
-index 431795d686..52112889ef 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4064,6 +4064,7 @@ static int monitor_can_read(void *opaque)
-  */
- static void monitor_qmp_respond(Monitor *mon, QDict *rsp, QObject *id)
- {
-+    trace_monitor_qmp_respond(qobject_get_try_str(id) ?: "");
-     if (rsp) {
-         if (id) {
-             qdict_put_obj(rsp, "id", qobject_ref(id));
-diff --git a/trace-events b/trace-events
-index 4fd2cb4b97..57c5f6cc94 100644
---- a/trace-events
-+++ b/trace-events
-@@ -50,6 +50,7 @@ handle_qmp_command(void *mon, const char *req) "mon %p req: %s"
- monitor_suspend(void *ptr, int cnt) "mon %p: %d"
- monitor_qmp_cmd_in_band(const char *id) "%s"
- monitor_qmp_cmd_out_of_band(const char *id) "%s"
-+monitor_qmp_respond(const char *id) "%s"
- 
- # dma-helpers.c
- dma_blk_io(void *dbs, void *bs, int64_t offset, bool to_dev) "dbs=%p bs=%p offset=%" PRId64 " to_dev=%d"
+--=20
+MST
