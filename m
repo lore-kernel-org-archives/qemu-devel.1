@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gOlvl-0002AG-EJ
+	(envelope-from <pm215@archaic.org.uk>) id 1gOlvl-0002AF-EK
 	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gOlvk-0006vR-02
+	(envelope-from <pm215@archaic.org.uk>) id 1gOlvk-0006vi-69
 	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:45 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52680)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52678)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gOlvj-0006tw-Oa
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:43 -0500
+	id 1gOlvj-0006rE-Uf
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:57:44 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1gOlvi-00066N-Ru
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 15:57:42 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1gOlvf-00065N-8T
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 15:57:39 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Nov 2018 15:57:30 +0000
-Message-Id: <20181119155730.11758-11-peter.maydell@linaro.org>
+Date: Mon, 19 Nov 2018 15:57:26 +0000
+Message-Id: <20181119155730.11758-7-peter.maydell@linaro.org>
 In-Reply-To: <20181119155730.11758-1-peter.maydell@linaro.org>
 References: <20181119155730.11758-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/10] MAINTAINERS: list myself as maintainer
- for various Arm boards
+Subject: [Qemu-devel] [PULL 06/10] hw/arm/stm32f205: Fix the UART and Timer
+ region size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,203 +33,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In practice for most of the more-or-less orphan Arm board models,
-I will review patches and put them in via the target-arm tree.
-So list myself as an "Odd Fixes" status maintainer for them.
+From: Seth Kintigh <skintigh@gmail.com>
 
-This commit downgrades these boards to "Odd Fixes":
- * Allwinner-A10
- * Exynos
- * Calxeda Highbank
- * Canon DIGIC
- * Musicpal
- * nSeries
- * Palm
- * PXA2xx
+The UART and timer devices for the stm32f205 were being created
+with memory regions that were too large. Use the size specified
+in the chip datasheet.
 
-These boards were already "Odd Fixes":
- * Gumstix
- * i.MX31 (kzm)
+The old sizes were so large that the devices would overlap with
+each other in the SoC memory map, so this fixes a bug that
+caused odd behavior and/or crashes when trying to set up multiple
+UARTs.
 
-Philippe Mathieu-Daudé has requested to be moved to R:
-status for Gumstix now that I am listed as the M: contact.
-
-Some boards are maintained, but their patches still go
-via the target-arm tree, so add myself as a secondary
-maintainer contact for those:
- * Xilinx Zynq
- * Xilinx ZynqMP
- * STM32F205
- * Netduino 2
- * SmartFusion2
- * Mecraft M2S-FG484
- * ASPEED BMCs
- * NRF51
-
+Signed-off-by: Seth Kintigh <skintigh@gmail.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+[PMM: rephrased commit message to follow our usual standard]
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-id: 20181108134139.31666-1-peter.maydell@linaro.org
 ---
- MAINTAINERS | 36 +++++++++++++++++++++++++++---------
- 1 file changed, 27 insertions(+), 9 deletions(-)
+ hw/char/stm32f2xx_usart.c  | 2 +-
+ hw/timer/stm32f2xx_timer.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bb71f5e6500..1032406c560 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -442,8 +442,9 @@ ARM Machines
- ------------
- Allwinner-a10
- M: Beniamino Galvani <b.galvani@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/*/allwinner*
- F: include/hw/*/allwinner*
- F: hw/arm/cubieboard.c
-@@ -502,27 +503,31 @@ F: tests/test-arm-mptimer.c
+diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
+index 032b5fda135..f3363a2952d 100644
+--- a/hw/char/stm32f2xx_usart.c
++++ b/hw/char/stm32f2xx_usart.c
+@@ -202,7 +202,7 @@ static void stm32f2xx_usart_init(Object *obj)
+     sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
  
- Exynos
- M: Igor Mitsyanko <i.mitsyanko@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/*/exynos*
- F: include/hw/arm/exynos4210.h
+     memory_region_init_io(&s->mmio, obj, &stm32f2xx_usart_ops, s,
+-                          TYPE_STM32F2XX_USART, 0x2000);
++                          TYPE_STM32F2XX_USART, 0x400);
+     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
+ }
  
- Calxeda Highbank
- M: Rob Herring <robh@kernel.org>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/arm/highbank.c
- F: hw/net/xgmac.c
+diff --git a/hw/timer/stm32f2xx_timer.c b/hw/timer/stm32f2xx_timer.c
+index 58fc7b1188e..ae744d16425 100644
+--- a/hw/timer/stm32f2xx_timer.c
++++ b/hw/timer/stm32f2xx_timer.c
+@@ -308,7 +308,7 @@ static void stm32f2xx_timer_init(Object *obj)
+     sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
  
- Canon DIGIC
- M: Antony Pavlov <antonynpavlov@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: include/hw/arm/digic.h
- F: hw/*/digic*
+     memory_region_init_io(&s->iomem, obj, &stm32f2xx_timer_ops, s,
+-                          "stm32f2xx_timer", 0x4000);
++                          "stm32f2xx_timer", 0x400);
+     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
  
- Gumstix
--M: Philippe Mathieu-Daudé <f4bug@amsat.org>
-+M: Peter Maydell <peter.maydell@linaro.org>
-+R: Philippe Mathieu-Daudé <f4bug@amsat.org>
- L: qemu-devel@nongnu.org
- L: qemu-arm@nongnu.org
- S: Odd Fixes
-@@ -530,6 +535,7 @@ F: hw/arm/gumstix.c
- 
- i.MX31 (kzm)
- M: Peter Chubb <peter.chubb@nicta.com.au>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
- S: Odd Fixes
- F: hw/arm/kzm.c
-@@ -584,20 +590,23 @@ F: include/hw/misc/iotkit-sysinfo.h
- 
- Musicpal
- M: Jan Kiszka <jan.kiszka@web.de>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/arm/musicpal.c
- 
- nSeries
- M: Andrzej Zaborowski <balrogg@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/arm/nseries.c
- 
- Palm
- M: Andrzej Zaborowski <balrogg@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/arm/palm.c
- 
- Raspberry Pi
-@@ -622,8 +631,9 @@ F: include/hw/intc/realview_gic.h
- 
- PXA2XX
- M: Andrzej Zaborowski <balrogg@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
--S: Maintained
-+S: Odd Fixes
- F: hw/arm/mainstone.c
- F: hw/arm/spitz.c
- F: hw/arm/tosa.c
-@@ -681,6 +691,7 @@ F: include/hw/arm/virt.h
- Xilinx Zynq
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- M: Alistair Francis <alistair@alistair23.me>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/*/xilinx_*
-@@ -692,6 +703,7 @@ X: hw/ssi/xilinx_*
- Xilinx ZynqMP
- M: Alistair Francis <alistair@alistair23.me>
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/*/xlnx*.c
-@@ -705,6 +717,7 @@ F: hw/arm/virt-acpi-build.c
- 
- STM32F205
- M: Alistair Francis <alistair@alistair23.me>
-+M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
- F: hw/arm/stm32f205_soc.c
- F: hw/misc/stm32f2xx_syscfg.c
-@@ -716,11 +729,13 @@ F: include/hw/*/stm32*.h
- 
- Netduino 2
- M: Alistair Francis <alistair@alistair23.me>
-+M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
- F: hw/arm/netduino2.c
- 
- SmartFusion2
- M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
- F: hw/arm/msf2-soc.c
- F: hw/misc/msf2-sysreg.c
-@@ -733,11 +748,13 @@ F: include/hw/ssi/mss-spi.h
- 
- Emcraft M2S-FG484
- M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-+M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
- F: hw/arm/msf2-som.c
- 
- ASPEED BMCs
- M: Cédric Le Goater <clg@kaod.org>
-+M: Peter Maydell <peter.maydell@linaro.org>
- R: Andrew Jeffery <andrew@aj.id.au>
- R: Joel Stanley <joel@jms.id.au>
- L: qemu-arm@nongnu.org
-@@ -749,6 +766,7 @@ F: include/hw/net/ftgmac100.h
- 
- NRF51
- M: Joel Stanley <joel@jms.id.au>
-+M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/arm/nrf51_soc.c
+     s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, stm32f2xx_timer_interrupt, s);
 -- 
 2.19.1
