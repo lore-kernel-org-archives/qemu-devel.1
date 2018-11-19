@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gOspd-0001dd-0i
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 18:19:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1gOsqS-0002T1-KL
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 18:20:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gOspY-0004qT-51
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 18:19:53 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:44840)
+	(envelope-from <eblake@redhat.com>) id 1gOsqN-0005fZ-VO
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 18:20:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55578)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gOspQ-0004oI-JB
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 18:19:42 -0500
-Date: Tue, 20 Nov 2018 00:19:38 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20181119231938.wvac6o5dgolxvxbn@function>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gOsqN-0005eA-PP
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 18:20:39 -0500
 References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
-	<20181114123643.24091-13-marcandre.lureau@redhat.com>
-	<20181114134646.GQ19298@redhat.com>
+	<20181114123643.24091-4-marcandre.lureau@redhat.com>
+	<20181114142234.GJ19298@redhat.com>
+	<20181119225950.43sytfmqg2ak2lho@function>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c065664f-ff6d-8781-a389-c3d64ce4fcf7@redhat.com>
+Date: Mon, 19 Nov 2018 17:20:31 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181114134646.GQ19298@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 12/41] slirp: remove the disabled
- readv()/writev() code path
+In-Reply-To: <20181119225950.43sytfmqg2ak2lho@function>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.2 03/41] slirp: simplify fork_exec()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it
+To: Samuel Thibault <samuel.thibault@gnu.org>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, renzo@cs.unibo.it, qemu-devel@nongnu.org, stefanha@redhat.com, rjones@redhat.com
 
-Daniel P. Berrang=C3=A9, le mer. 14 nov. 2018 13:46:46 +0000, a ecrit:
-> On Wed, Nov 14, 2018 at 04:36:14PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > The soread() function may be used on datagram sockets, and would
-> > provide different behaviour if HAVE_READV was set, on empty datagrams=
-.
-> > This looks like a minor optimization, that never has been a strong
-> > goal for slirp.
-> >=20
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  slirp/slirp_config.h |  3 ---
-> >  slirp/socket.c       | 15 ---------------
-> >  2 files changed, 18 deletions(-)
->=20
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On 11/19/18 4:59 PM, Samuel Thibault wrote:
+> Mmm, I don't think any portability issue remains. SO_OOBINLINE is used
+> in other places, the rest is portable. There is the setsid() call which
+> may just not make sense on Windows, but we could just disable it there.
+> 
+> I have pushed to
+> 
+> https://people.debian.org/~sthibault/qemu.git slirp-2-win
+> 
+> what it could look like. I don't have a windows box off hand, could
+> somebody try it to confirm that it builds?
 
-Applied to my tree, thanks!
+You could try 'make docker-test-mingw@fedora' to at least try building 
+for a Windows environment (but that doesn't say much about testing the 
+resulting binary).
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
