@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gOlxn-0004Hj-6v
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:59:51 -0500
+	(envelope-from <berrange@redhat.com>) id 1gOm3X-0000n6-BV
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:05:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gOlxk-0007gy-0f
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 10:59:51 -0500
-Date: Mon, 19 Nov 2018 16:59:37 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181119165937.076e98f8@redhat.com>
-In-Reply-To: <20181105102044.20547-4-david@redhat.com>
-References: <20181105102044.20547-1-david@redhat.com>
-	<20181105102044.20547-4-david@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1gOm3W-0002OR-Bb
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:05:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38494)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gOm3W-0002Nv-62
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:05:46 -0500
+Date: Mon, 19 Nov 2018 16:05:42 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181119160542.GS19532@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181119151527.4a925a75@naga> <20181119142059.GP19532@redhat.com>
+	<20181119165516.388123be@naga>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 03/10] s390x/pci: rename hotplug handler
- callbacks
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181119165516.388123be@naga>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Block format 'raw' does not support the option
+ 'serial'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
-	. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: Michal =?utf-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
+Cc: qemu-devel@nongnu.org
 
-On Mon,  5 Nov 2018 11:20:37 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Mon, Nov 19, 2018 at 04:55:16PM +0100, Michal Such=C3=A1nek wrote:
+> On Mon, 19 Nov 2018 14:20:59 +0000
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+>=20
+> > On Mon, Nov 19, 2018 at 03:15:27PM +0100, Michal Such=C3=A1nek wrote:
+> > > Hello,
+> > >=20
+> > > I tried to run my VM with qemu git and I am greeted with:
+> > >=20
+> > > Block format 'raw' does not support the option 'serial'
+> > >=20
+> > > Is there any sensible reason to *not^ support disk serial number? =20
+> >=20
+> > The 'serial' property on -drive was deprecated in QEMU 2.10, and dele=
+ted
+> > in 3.1, as it is not a property that makes sense for the backend.
+> >=20
+> > It should be set on the virtual device instead via the -device arg
+>=20
+> Is this documented anywhere?
+>=20
+> Looking at the man page I only see serial property on smbios.
 
-> The callbacks are also called for cold plugged devices. Drop the "hot"
-> to better match the actual callback names.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+The original deprecation was listed in the qemu man page / online user
+guide, but this documentation gets deleted once the feature is actually
+removed.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+This wouldn't be so bad if we actually published versioned copies of
+the qemu manual online, but we just overwrite the manual each time there
+is a new release, so we've no historical record of deprecations.
 
-> ---
->  hw/s390x/s390-pci-bus.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index e42e1b80d6..e1b14b131b 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -813,8 +813,8 @@ static bool s390_pci_alloc_idx(S390pciState *s, S390PCIBusDevice *pbdev)
->      return true;
->  }
->  
-> -static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
-> -                                  DeviceState *dev, Error **errp)
-> +static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                              Error **errp)
->  {
->      PCIDevice *pdev = NULL;
->      S390PCIBusDevice *pbdev = NULL;
-> @@ -923,8 +923,8 @@ static void s390_pcihost_timer_cb(void *opaque)
->      qdev_unplug(DEVICE(pbdev), NULL);
->  }
->  
-> -static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
-> -                                    DeviceState *dev, Error **errp)
-> +static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> +                                Error **errp)
->  {
->      PCIDevice *pci_dev = NULL;
->      PCIBus *bus;
-> @@ -1032,8 +1032,8 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
->  
->      dc->reset = s390_pcihost_reset;
->      dc->realize = s390_pcihost_realize;
-> -    hc->plug = s390_pcihost_hot_plug;
-> -    hc->unplug = s390_pcihost_hot_unplug;
-> +    hc->plug = s390_pcihost_plug;
-> +    hc->unplug = s390_pcihost_unplug;
->      msi_nonbroken = true;
->  }
->  
+Thirdly the -device properties are not documented at all - you just
+have to look for them live with eg '$QEMU -device virtio-blk,help'
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
