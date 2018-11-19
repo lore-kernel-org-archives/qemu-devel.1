@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gOcDO-0000KI-Ch
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 00:35:19 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gOcTk-0003rg-BS
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 00:52:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gOcDK-0003VM-Ib
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 00:35:18 -0500
-Date: Mon, 19 Nov 2018 16:31:31 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181119053131.GJ23503@umbus>
+	(envelope-from <aik@ozlabs.ru>) id 1gOcTg-000275-AQ
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 00:52:12 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40077)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gOcTf-00023Y-Rv
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 00:52:08 -0500
+Received: by mail-pl1-x641.google.com with SMTP id b22-v6so8584531pls.7
+	for <qemu-devel@nongnu.org>; Sun, 18 Nov 2018 21:52:04 -0800 (PST)
 References: <20181113083104.2692-1-aik@ozlabs.ru>
-	<20181113083104.2692-6-aik@ozlabs.ru>
-	<20181119024239.GF23503@umbus>
-	<cb9e4cf1-7902-93ca-616f-c8d41cc3ff2b@ozlabs.ru>
+	<20181113083104.2692-2-aik@ozlabs.ru> <20181119014513.GC23503@umbus>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <88143ae6-3d62-5ee4-96a7-e383bfe42859@ozlabs.ru>
+Date: Mon, 19 Nov 2018 16:51:57 +1100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="cN519qCC4CN1mUcX"
-Content-Disposition: inline
-In-Reply-To: <cb9e4cf1-7902-93ca-616f-c8d41cc3ff2b@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu RFC 5/7] spapr-iommu: Always advertise
- the maximum possible DMA window size
+In-Reply-To: <20181119014513.GC23503@umbus>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu RFC 1/7] vfio/spapr: Fix indirect
+ levels calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,152 +31,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alistair Popple <alistair@popple.id.au>, Reza Arbab <arbab@linux.ibm.com>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, Leonardo Augusto =?iso-8859-1?Q?Guimar=E3es?= Garcia <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Oliver O'Halloran <oohall@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alistair Popple <alistair@popple.id.au>, Reza Arbab <arbab@linux.ibm.com>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, =?UTF-8?Q?Leonardo_Augusto_Guimar=c3=a3es_Garcia?= <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Oliver O'Halloran <oohall@gmail.com>
 
 
---cN519qCC4CN1mUcX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 19, 2018 at 04:08:33PM +1100, Alexey Kardashevskiy wrote:
->=20
->=20
-> On 19/11/2018 13:42, David Gibson wrote:
-> > On Tue, Nov 13, 2018 at 07:31:02PM +1100, Alexey Kardashevskiy wrote:
-> >> When deciding about the huge DMA window, the typical Linux pseries gue=
-st
-> >> uses the maximum allowed RAM size as the upper limit. We did the same
-> >> on QEMU side to match that logic. Now we are going to support GPU RAM
-> >> pass through which is not available at the guest boot time as it requi=
-res
-> >> the guest driver interaction. As the result, the guest requests a smal=
-ler
-> >> window than it should. Therefore the guest needs to be patched to
-> >> understand this new memory and so does QEMU.
-> >>
-> >> Instead of reimplementing here whatever solution we will choose for
-> >> the guest, this advertises the biggest possible window size limited by
-> >> 32 bit (as defined by LoPAPR).
-> >>
-> >> This seems to be safe as:
-> >> 1. The guest visible emulated table is allocated in KVM (actual pages
-> >> are allocated in page fault handler) and QEMU (actual pages are alloca=
-ted
-> >> when changed);
-> >> 2. The hardware table (and corresponding userspace addresses cache)
-> >> supports sparse allocation and also checks for locked_vm limit so
-> >> it is unable to cause the host any damage.
-> >>
-> >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >=20
-> > This seems like a good idea to me, even without the NPU stuff.  It
-> > always bothered me slightly that we based what's effectively the IOVA
-> > limit on the guest RAM size which doesn't have any direct connection
-> > to it.
-> >=20
-> > As long as it doesn't hit the locked memory limits, I don't see any
-> > reason we should prevent a guest from doing something weird like
-> > mapping a small bit of RAM over and over in IOVA space, or mapping its
-> > RAM sparsely in IOVA space.
-> >=20
-> >> ---
-> >>  hw/ppc/spapr_rtas_ddw.c | 19 +++----------------
-> >>  1 file changed, 3 insertions(+), 16 deletions(-)
-> >>
-> >> diff --git a/hw/ppc/spapr_rtas_ddw.c b/hw/ppc/spapr_rtas_ddw.c
-> >> index 329feb1..df60351 100644
-> >> --- a/hw/ppc/spapr_rtas_ddw.c
-> >> +++ b/hw/ppc/spapr_rtas_ddw.c
-> >> @@ -96,9 +96,8 @@ static void rtas_ibm_query_pe_dma_window(PowerPCCPU =
-*cpu,
-> >>                                           uint32_t nret, target_ulong =
-rets)
-> >>  {
-> >>      sPAPRPHBState *sphb;
-> >> -    uint64_t buid, max_window_size;
-> >> +    uint64_t buid;
-> >>      uint32_t avail, addr, pgmask =3D 0;
-> >> -    MachineState *machine =3D MACHINE(spapr);
-> >> =20
-> >>      if ((nargs !=3D 3) || (nret !=3D 5)) {
-> >>          goto param_error_exit;
-> >> @@ -114,27 +113,15 @@ static void rtas_ibm_query_pe_dma_window(PowerPC=
-CPU *cpu,
-> >>      /* Translate page mask to LoPAPR format */
-> >>      pgmask =3D spapr_page_mask_to_query_mask(sphb->page_size_mask);
-> >> =20
-> >> -    /*
-> >> -     * This is "Largest contiguous block of TCEs allocated specifical=
-ly
-> >> -     * for (that is, are reserved for) this PE".
-> >> -     * Return the maximum number as maximum supported RAM size was in=
- 4K pages.
-> >> -     */
-> >> -    if (machine->ram_size =3D=3D machine->maxram_size) {
-> >> -        max_window_size =3D machine->ram_size;
-> >> -    } else {
-> >> -        max_window_size =3D machine->device_memory->base +
-> >> -                          memory_region_size(&machine->device_memory-=
->mr);
-> >> -    }
-> >> -
-> >>      avail =3D SPAPR_PCI_DMA_MAX_WINDOWS - spapr_phb_get_active_win_nu=
-m(sphb);
-> >> =20
-> >>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> >>      rtas_st(rets, 1, avail);
-> >> -    rtas_st(rets, 2, max_window_size >> SPAPR_TCE_PAGE_SHIFT);
-> >> +    rtas_st(rets, 2, 0xFFFFFFFF); /* Largest contiguous block of TCEs=
- */
-> >=20
-> > One detail though.. where does this limit actually come from?  Is it
-> > actually a limit imposed by the hardware somewhere, or just because
-> > the RTAS call doesn't ahve room for anything more?
->=20
-> I used this limit just because of the parameter size.
->=20
-> >=20
-> > Previously limits would usually have been a power of 2; is it likely
-> > to matter that now it won't be?
->=20
-> LoPAPR says it is "Largest contiguous block of TCEs" and no mention of
-> power of two but ibm,create-pe-dma-window takes a window shift so it is
-> assumed that windows can still be only power of two. Not sure. The
-> powernv code will fail if the requested window is not power of two.
->=20
-> Replacing 0xffffffff with 0x80000000 won't make a difference though here
-> but probably will make the error clearer...
+On 19/11/2018 12:45, David Gibson wrote:
+> On Tue, Nov 13, 2018 at 07:30:58PM +1100, Alexey Kardashevskiy wrote:
+>> The current code assumes that we can address more bits on a PCI bus
+>> for DMA than we really can. Limit to the known tested maximum of 55 bits
+>> and assume 64K IOMMU pages.
+> 
+> This doesn't make much sense to me.  It looks nothing like the
+> calculation it's replacing, and not just for extreme values.  For
+> example the new calculation doesn't depend on the size of the window
+> at all, whereas the previous one did.
 
-Yeah, given that the windows have to be a power of 2 in size, I think
-it makes sense for this to be a power of 2, even if it doesn't
-strictly have to be.  So I think 0x80000000 would be a better option.
+Uff. Yes, this is confusing. There are a typical 64k IOMMU page size and
+a typical 64k system page size...
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+For the window as big as 0x200.0000.0000 and 64k pages (actual working
+example), 33554432 entries are needed, or 256MB of space. The existing
+code calculates it as 25/6+1=5 levels. Which the hardware can do.
 
---cN519qCC4CN1mUcX
-Content-Type: application/pgp-signature; name="signature.asc"
+But:
+1. all TCE levels are the same size and
+2. for the minimum size of the level I take a system page size which is 64k.
 
------BEGIN PGP SIGNATURE-----
+So with 5 levels 16bit each (and this is without counting IOMMU page
+size, which is plus extra 16 bits) the table is huuuge.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlvySrMACgkQbDjKyiDZ
-s5Icpw/9EufIZG0HXtuip8KQCiUukQM1MoSel01zu1XfWZpRW8Zd+DmdUetlqDIS
-5++eaftXEj+19QJ0W6bJ18+wIV9TBxdh1NO8PDAIijmeITfztEVisEo9E274PWKu
-O6dQk2aJYums+t9Fct4i0tBvJcDDKRJbUG2HMC4zh2+pJ+NRikNn/oxPDWnXvbts
-49HlF14TfNwc3pd433QB6y81eK7lByueEZRhvJ3Wuo3p7UQjLBzJ3gSt8rhcb5ms
-STtoKmxRnEILqvTJl2eeLH12ym1n+ul0exn5u+bSsDEEYbanhCmtG/FvhSn5dbb9
-53GZ0jnOmS5GpAgbQ/rxksOIwJY8l7rECBsltAn2O21ttxa9sINVuD3yS/5LRnHw
-zO0DefJxgTlVxEER+/kn6ghGVwpom94NX9ZK+k7qNwHnXMf+07/pUal9xvjl2adO
-wMrW3TwmEqGmM8pc+ix0bM1pC6NrsBEVDoQEDoQRWDhUPhQo3rgu8HBff2JGn1l2
-3xo8GaFtWpdsTFF1wiTbQyKBA9L2n9c/vKdh03IbXqTvDK+rxzHJb6lzkMhyRZRR
-NHSM0oAfCJsIVsJyLxBzxAhmT0qrMfQXztBWTnmPgpbLMZge865qd3/CcfyGRHT/
-ymK5Sa3nwDgWQ9vc62K7MgcfDnPiyxThWw/kJJ90y3bvUvoOQu0=
-=wkHr
------END PGP SIGNATURE-----
+And I know from tests that 55 bits is the maximum the hardware can
+handle, and I have this limit in the powernv code so VFIO ioctl to
+create a window will fail. If I do not have a check in powernv, than
+things silently do not work (no EEH though).
 
---cN519qCC4CN1mUcX--
+
+> You say you're assuming 64k
+> IOMMU pages, but create.page_shift (the actual IOMMU page size) is in
+> there. 
+
+It is a radix tree basically. Out of 64bits available, I cannot use bits
+56..63 (hardware does not work) and 0..12/15/21 (IOMMU page size), so I
+have bits 13/16/22..55 which I need to split equally between levels,
+each of which is 64k (system page size).
+
+
+> Nor is it clear to me why the maximum PCI address is relevant
+> to the number of levels in the first place.
+
+
+The window can only as big as the PHB hardware supports, this is why
+maximum PCI address.
+
+
+> 
+> In addition, AFAICT the new calculation gives the answer '2' for all
+> likely IOMMU page sizes (4k, 64k, 2M)
+
+Hm, I did not realize that :) Instead of using 64k as a default level
+size, I could use some idea of what CONFIG_FORCE_MAX_ZONEORDER could be.
+
+Currently it is:
+
+arch/powerpc/Kconfig
+config FORCE_MAX_ZONEORDER
+        int "Maximum zone order"
+        range 8 9 if PPC64 && PPC_64K_PAGES
+        default "9" if PPC64 && PPC_64K_PAGES
+        range 13 13 if PPC64 && !PPC_64K_PAGES
+        default "13" if PPC64 && !PPC_64K_PAGES
+        range 9 64 if PPC32 && PPC_16K_PAGES
+        default "9" if PPC32 && PPC_16K_PAGES
+        range 7 64 if PPC32 && PPC_64K_PAGES
+        default "7" if PPC32 && PPC_64K_PAGES
+        range 5 64 if PPC32 && PPC_256K_PAGES
+        default "5" if PPC32 && PPC_256K_PAGES
+        range 11 64
+        default "11"
+
+So assuming that "8" is the absolute minimum, I could try levels as big
+as 1<<(16+8-1) and if this fails, then increase the number of levels
+till a window is created or it is too many levels. Or there is some
+obviously better solution to the problem?
+
+
+
+
+
+> 
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>  hw/vfio/spapr.c      | 3 ++-
+>>  hw/vfio/trace-events | 2 +-
+>>  2 files changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+>> index becf71a..f5fdc53 100644
+>> --- a/hw/vfio/spapr.c
+>> +++ b/hw/vfio/spapr.c
+>> @@ -183,7 +183,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
+>>      entries = create.window_size >> create.page_shift;
+>>      pages = MAX((entries * sizeof(uint64_t)) / getpagesize(), 1);
+>>      pages = MAX(pow2ceil(pages), 1); /* Round up */
+>> -    create.levels = ctz64(pages) / 6 + 1;
+>> +    create.levels = MAX(1, (55 - create.page_shift) / 16);
+>>  
+>>      ret = ioctl(container->fd, VFIO_IOMMU_SPAPR_TCE_CREATE, &create);
+>>      if (ret) {
+>> @@ -200,6 +200,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
+>>          return -EINVAL;
+>>      }
+>>      trace_vfio_spapr_create_window(create.page_shift,
+>> +                                   create.levels,
+>>                                     create.window_size,
+>>                                     create.start_addr);
+>>      *pgsize = pagesize;
+>> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+>> index a85e866..db730f3 100644
+>> --- a/hw/vfio/trace-events
+>> +++ b/hw/vfio/trace-events
+>> @@ -128,6 +128,6 @@ vfio_prereg_listener_region_add_skip(uint64_t start, uint64_t end) "0x%"PRIx64"
+>>  vfio_prereg_listener_region_del_skip(uint64_t start, uint64_t end) "0x%"PRIx64" - 0x%"PRIx64
+>>  vfio_prereg_register(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0x%"PRIx64" ret=%d"
+>>  vfio_prereg_unregister(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0x%"PRIx64" ret=%d"
+>> -vfio_spapr_create_window(int ps, uint64_t ws, uint64_t off) "pageshift=0x%x winsize=0x%"PRIx64" offset=0x%"PRIx64
+>> +vfio_spapr_create_window(int ps, unsigned int levels, uint64_t ws, uint64_t off) "pageshift=0x%x levels=%u winsize=0x%"PRIx64" offset=0x%"PRIx64
+>>  vfio_spapr_remove_window(uint64_t off) "offset=0x%"PRIx64
+>>  vfio_spapr_group_attach(int groupfd, int tablefd) "Attached groupfd %d to liobn fd %d"
+> 
+
+-- 
+Alexey
