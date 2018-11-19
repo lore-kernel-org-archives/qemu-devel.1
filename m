@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gOoW2-0002gH-S8
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:43:23 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gOoXW-0003JJ-Gt
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:44:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gOoVz-0000x6-L2
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:43:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43766)
+	(envelope-from <ppandit@redhat.com>) id 1gOoXU-0003Vy-0d
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:44:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52940)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gOoVz-0000vG-Cv
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:43:19 -0500
-Date: Mon, 19 Nov 2018 13:42:58 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181119133434-mutt-send-email-mst@kernel.org>
-References: <20181114233831.10374-1-ehabkost@redhat.com>
-	<c1b4a0ee39dfddeb19f1be46710c10cbefd3f07a.camel@redhat.com>
-	<20181116034551.GK3807@habkost.net>
-	<20181119114105.4da89f2c.cohuck@redhat.com>
-	<20181119125519-mutt-send-email-mst@kernel.org>
-	<20181119193238.117c2f4e.cohuck@redhat.com>
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gOoXT-0003Ru-Po
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 13:44:51 -0500
+Date: Tue, 20 Nov 2018 00:14:46 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <154226612321.706352.2726376089201743065.stgit@bahia.lan>
+Message-ID: <nycvar.YSQ.7.76.1811192358020.17923@xnncv>
+References: <154226612321.706352.2726376089201743065.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181119193238.117c2f4e.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] virtio: Provide
- version-specific variants of virtio PCI devices
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] 9p: take write lock on fid path updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,80 +25,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, zhibin hu <noirfate@gmail.com>
 
-On Mon, Nov 19, 2018 at 07:32:38PM +0100, Cornelia Huck wrote:
-> On Mon, 19 Nov 2018 13:07:59 -0500
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Mon, Nov 19, 2018 at 11:41:05AM +0100, Cornelia Huck wrote:
-> > > On Fri, 16 Nov 2018 01:45:51 -0200
-> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > >   
-> > > > On Thu, Nov 15, 2018 at 05:29:24PM +0100, Andrea Bolognani wrote:  
-> 
-> > > > > And once that's done, "non-transitional" (while matching the
-> > > > > language of the spec) starts to look a bit unnecessary when you
-> > > > > could simply have
-> > > > > 
-> > > > >   virtio-*-pci
-> > > > >   virtio-*-pci-1
-> > > > >   virtio-*-pci-1-transitional
-> > > > > 
-> > > > > instead. But I don't feel as strongly about this as I do about
-> > > > > keeping the virtio revision in the device name :)    
-> > > > 
-> > > > I like that suggestion.  Makes the device names more explicit
-> > > > _and_ shorter.  I'll do that in v3.  
-> > > 
-> > > OTOH, that would mean we'd need to introduce new device types if we
-> > > ever start to support a virtio 2.x standard. My understanding was that
-> > > we'll want separate device types for transitional and non-transitional
-> > > for two reasons: the bus which a device can be plugged into, and
-> > > changing ids. Do we really expect huge changes in a possible 2.x
-> > > standard that affect virtio-pci only, and not other virtio transports
-> > > as well?  
-> > 
-> > Yes I think adding a version there is a mistake.
-> > transitional/legacy/non-transitional are spec terms so
-> > they are unlikely to change abruptly. OTOH virtio TC can
-> > just decide next version is 2.0 on a drop of a hat.
-> 
-> I don't really expect that to happen on a drop of a hat, though :) It's
-> probably more likely when we either have some really major change (and
-> we messed up if we can't handle that via the virtio compatibility
-> mechanism), or we go up from 1.x because x is getting too large (won't
-> happen in the near future.)
-> 
-> But yes, we should be able to handle further updates without any change
-> like the ones complicating things now for virtio-pci, as that was
-> mostly the transition to a proper standard while flushing out some
-> design problems that you only become aware of later.
-> 
-> > 
-> > And I strongly believe command line users really really do not want all
-> > this mess. Even adding "pci" is the name confuses people (what are the
-> > other options?). For command line model=virtio is pretty much perfect.
-> 
-> I'd argue that it's problematic on platforms where you have different
-> options for virtio transports. What does "model=virtio" mean? Always
-> virtio-pci, if available? Or rather virtio-<transport>, with
-> <transport> being the best option for the machine?
++-- On Thu, 15 Nov 2018, Greg Kurz wrote --+
+| Recent commit 5b76ef50f62079a fixed a race where v9fs_co_open2() could
+| possibly overwrite a fid path with v9fs_path_copy() while it is being
+| accessed by some other thread, ie, use-after-free that can be detected
+| by ASAN with a custom 9p client.
+| 
+| It turns out that the same can happen at several locations where
+| v9fs_path_copy() is used to set the fid path. The fix is again to
+| take the write lock.
+| 
+| Cc: P J P <ppandit@redhat.com>
+| Reported-by: zhibin hu <noirfate@gmail.com>
+| Signed-off-by: Greg Kurz <groug@kaod.org>
+| ---
+|  hw/9pfs/9p.c |   15 +++++++++++++++
+|  1 file changed, 15 insertions(+)
+| 
+| diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+| index eef289e394d4..267a25533b77 100644
+| --- a/hw/9pfs/9p.c
+| +++ b/hw/9pfs/9p.c
+| @@ -1391,7 +1391,9 @@ static void coroutine_fn v9fs_walk(void *opaque)
+|              err = -EINVAL;
+|              goto out;
+|          }
+| +        v9fs_path_write_lock(s);
+|          v9fs_path_copy(&fidp->path, &path);
+| +        v9fs_path_unlock(s);
+|      } else {
+|          newfidp = alloc_fid(s, newfid);
+|          if (newfidp == NULL) {
+| @@ -2160,6 +2162,7 @@ static void coroutine_fn v9fs_create(void *opaque)
+|      V9fsString extension;
+|      int iounit;
+|      V9fsPDU *pdu = opaque;
+| +    V9fsState *s = pdu->s;
+|  
+|      v9fs_path_init(&path);
+|      v9fs_string_init(&name);
+| @@ -2200,7 +2203,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+|          if (err < 0) {
+|              goto out;
+|          }
+| +        v9fs_path_write_lock(s);
+|          v9fs_path_copy(&fidp->path, &path);
+| +        v9fs_path_unlock(s);
+|          err = v9fs_co_opendir(pdu, fidp);
+|          if (err < 0) {
+|              goto out;
+| @@ -2216,7 +2221,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+|          if (err < 0) {
+|              goto out;
+|          }
+| +        v9fs_path_write_lock(s);
+|          v9fs_path_copy(&fidp->path, &path);
+| +        v9fs_path_unlock(s);
+|      } else if (perm & P9_STAT_MODE_LINK) {
+|          int32_t ofid = atoi(extension.data);
+|          V9fsFidState *ofidp = get_fid(pdu, ofid);
+| @@ -2234,7 +2241,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+|              fidp->fid_type = P9_FID_NONE;
+|              goto out;
+|          }
+| +        v9fs_path_write_lock(s);
+|          v9fs_path_copy(&fidp->path, &path);
+| +        v9fs_path_unlock(s);
+|          err = v9fs_co_lstat(pdu, &fidp->path, &stbuf);
+|          if (err < 0) {
+|              fidp->fid_type = P9_FID_NONE;
+| @@ -2272,7 +2281,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+|          if (err < 0) {
+|              goto out;
+|          }
+| +        v9fs_path_write_lock(s);
+|          v9fs_path_copy(&fidp->path, &path);
+| +        v9fs_path_unlock(s);
+|      } else if (perm & P9_STAT_MODE_NAMED_PIPE) {
+|          err = v9fs_co_mknod(pdu, fidp, &name, fidp->uid, -1,
+|                              0, S_IFIFO | (perm & 0777), &stbuf);
+| @@ -2283,7 +2294,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+|          if (err < 0) {
+|              goto out;
+|          }
+| +        v9fs_path_write_lock(s);
+|          v9fs_path_copy(&fidp->path, &path);
+| +        v9fs_path_unlock(s);
+|      } else if (perm & P9_STAT_MODE_SOCKET) {
+|          err = v9fs_co_mknod(pdu, fidp, &name, fidp->uid, -1,
+|                              0, S_IFSOCK | (perm & 0777), &stbuf);
+| @@ -2294,7 +2307,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+|          if (err < 0) {
+|              goto out;
+|          }
+| +        v9fs_path_write_lock(s);
+|          v9fs_path_copy(&fidp->path, &path);
+| +        v9fs_path_unlock(s);
+|      } else {
+|          err = v9fs_co_open2(pdu, fidp, &name, -1,
+|                              omode_to_uflags(mode)|O_CREAT, perm, &stbuf);
+| 
 
-Most people don't care, for them it's "whatever works".
+Looks okay.
+Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
 
-We have this assumption that if we force a choice then people will
-choose the right thing but in practice they will do what we all do, play
-with it until it kind of works and leave well alone afterwards.
-That's at best - at worst give up and use an easier tool.
-
-> > So all these names are there primarily for libvirt's benefit.
-> > And the only input from libvirt devs so far
-> > has been that it's unclear how does cross version
-> > migration work. That needs to be addressed in some way.
-> > 
-> > So can we maybe start with a libvirt domain xml patch, with an
-> > implementation for existing QEMU, get that acked, and then just map it
-> > back to qemu command line as directly as possible?
-> > 
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
