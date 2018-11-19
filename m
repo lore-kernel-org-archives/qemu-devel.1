@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gOp0Z-0005dp-Li
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 14:14:56 -0500
+	(envelope-from <armbru@redhat.com>) id 1gOpaN-0006Gw-Tn
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 14:51:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gOp0W-0006qX-He
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 14:14:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43746)
+	(envelope-from <armbru@redhat.com>) id 1gOpaJ-00019K-SE
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 14:51:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35224)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gOp0W-0006pG-9w
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 14:14:52 -0500
-Date: Mon, 19 Nov 2018 14:14:27 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181119140813-mutt-send-email-mst@kernel.org>
-References: <20181114233831.10374-1-ehabkost@redhat.com>
-	<c1b4a0ee39dfddeb19f1be46710c10cbefd3f07a.camel@redhat.com>
-	<20181116034551.GK3807@habkost.net>
-	<20181119114105.4da89f2c.cohuck@redhat.com>
-	<20181119125519-mutt-send-email-mst@kernel.org>
-	<20181119193238.117c2f4e.cohuck@redhat.com>
-	<20181119133434-mutt-send-email-mst@kernel.org>
-	<20181119195638.49a9c21e.cohuck@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gOpaJ-00016z-Kx
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 14:51:51 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181115140501.7872-1-david@redhat.com>
+	<20181115140501.7872-7-david@redhat.com>
+	<87muq972p0.fsf@dusky.pond.sub.org>
+	<3d186921-e32f-60aa-cfc6-07345f6795c7@redhat.com>
+Date: Mon, 19 Nov 2018 20:51:45 +0100
+In-Reply-To: <3d186921-e32f-60aa-cfc6-07345f6795c7@redhat.com> (David
+	Hildenbrand's message of "Mon, 19 Nov 2018 15:12:11 +0100")
+Message-ID: <87o9akkfqm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181119195638.49a9c21e.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] virtio: Provide
- version-specific variants of virtio PCI devices
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v1 6/9] qapi: rewrite string-input-visitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,49 +29,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Mon, Nov 19, 2018 at 07:56:38PM +0100, Cornelia Huck wrote:
-> On Mon, 19 Nov 2018 13:42:58 -0500
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Mon, Nov 19, 2018 at 07:32:38PM +0100, Cornelia Huck wrote:
-> > > On Mon, 19 Nov 2018 13:07:59 -0500
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > > > And I strongly believe command line users really really do not want all
-> > > > this mess. Even adding "pci" is the name confuses people (what are the
-> > > > other options?). For command line model=virtio is pretty much perfect.  
-> > > 
-> > > I'd argue that it's problematic on platforms where you have different
-> > > options for virtio transports. What does "model=virtio" mean? Always
-> > > virtio-pci, if available? Or rather virtio-<transport>, with
-> > > <transport> being the best option for the machine?  
-> > 
-> > Most people don't care, for them it's "whatever works".
-> > 
-> > We have this assumption that if we force a choice then people will
-> > choose the right thing but in practice they will do what we all do, play
-> > with it until it kind of works and leave well alone afterwards.
-> > That's at best - at worst give up and use an easier tool.
-> 
-> That implies that we (the developers) need to care and make sure that
-> "model=virtio" gets them the best possible transport (i.e. on s390x,
-> that would be ccw unless the user explicitly requests pci; I'm not sure
-> what the situation with mmio is -- probably "use pci whenever
-> possible"?) I think that's what libvirt already gives us today (I hope.)
-> 
-> What makes it messy on the pci side is that the "best option" actually
-> depends on what kind of guest the user wants to run (if the guest is
-> too old, you're stuck with transitional; if you want to reap the
-> benefits of PCIe, you need non-transitional...)
+Copying Igor and Eduardo for a hostmem.c bug.  Search for "core dumped".
 
-Well it works now - connect it to a bus and it figures out whether it
-should do transitional or not. You can force transitional in PCIe anyway
-but then you are limited to about 15 devices - probably sufficient for
-most people ...
+David Hildenbrand <david@redhat.com> writes:
 
+>>>
+>>> Tests have to be fixed up:
+>>> - Two BUGs were hardcoded that are fixed now
+>>> - The string-input-visitor now actually returns a parsed list and not
+>>>   an ordered set.
+>> 
+>> I'd expect this to necessitate an update of callers that expect a set, but...
+>> 
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>  include/qapi/string-input-visitor.h |   4 +-
+>>>  qapi/string-input-visitor.c         | 410 ++++++++++++++++------------
+>>>  tests/test-string-input-visitor.c   |  18 +-
+>>>  3 files changed, 239 insertions(+), 193 deletions(-)
+>> 
+>> ... there's none.
+>> 
+>> Let me know if you need help finding them.  I think we tracked them down
+>> during the discussion that led to this series.
+>> 
+>
+> Indeed, I missed to document that. So here is the outcome:
+>
+> 1. backends/hostmem.c:host_memory_backend_set_host_nodes()
+>
+> -> calls visit_type_uint16List(via bitmap)
+> -> the code can deal with duplicates/unsorted lists (bitmap_set)
 
--- 
-MST
+Yes.
+
+> Side node: I am not sure if there should be some range checks, but maybe
+> the bitmap is large enough .... hm ...
+
+Fishy.  MAX_NODES is 128.  Tinker, tinker, ...
+
+    $ upstream-qemu -nodefaults -object memory-backend-file,id=mem0,mem-path=x,size=4096,host-nodes=12345
+    Segmentation fault (core dumped)
+
+Igor, Eduardo, this is yours.
+
+There's another use of visit_type_uint16List() is this file, but it's in
+property getter host_memory_backend_get_host_nodes(), and property
+getters aren't used with the string input visitor.
+
+> 2. qapi-visit.c::visit_type_Memdev_members()
+>
+> -> calls visit_type_uint16List()
+> -> I think this never used for input, only for output / freeing
+
+Yes, it's used by query-memdev with the QObject output visitor to build
+the value of @host-nodes.
+
+> 3. qapi-visit.c::visit_type_NumaNodeOptions_members()
+>
+> -> calls visit_type_uint16List()
+> -> I think this never used for input, only for output / freeing
+
+It's used for input, but with the opts visitor, see parse_numa().
+
+> 4. qapi-visit.c::visit_type_RockerOfDpaGroup_members
+>
+> -> calls visit_type_uint32List()
+> -> I think this never used for input, only for output / freeing
+
+Yes, it's used by query-rocker-of-dpa-groups with the QObject output
+visitor to build the value of @group-ids.
+
+> 5. qapi-visit.c::visit_type_RxFilterInfo_members()
+>
+> -> calls visit_type_intList()
+> -> I think this never used for input, only for output / freeing
+
+Yes, it's used by query-rx-filter with the QObject output visitor to
+build the value of @vlan-table.
+
+> 6. numa.c::query_memdev()
+>
+> -> calls object_property_get_uint16List()
+> --> String parsed via visit_type_uint16List() into list
+
+QOM, hard to understand.
+
+The value of struct HostMemoryBackend member @host-nodes (a bitmap) is
+first converted to a list (sorted, no duplicates) with
+host_memory_backend_get_host_nodes() via object_property_get(), then
+converted to a string with the string output visitor.  The resulting
+string is then converted back to a list with the string input visitor.
+
+Despite the shenanigans going on in the string output visitor, I'd
+expect the resulting list to also be sorted and without duplicates.
+
+> -> qmp_query_memdev() uses this list
+> --> Not relevant if unique or sorted
+
+Depends on the contract of QMP command query-memdev.  Here's the
+relevant part.
+
+    # @host-nodes: host nodes for its memory policy
+
+Useless.
+
+"Sorted, no duplicates" might have become de facto ABI.  Not sure.
+However, I believe your patch won't affect it, as per the argument I
+just made.
+
+> -> hmp_info_memdev() uses this list
+> --> List converted again to a string using string output visitor
+>
+> -> I don't think unique/sorted is relevant here.
+
+HMP is not a stable interface.
+
+> Am I missing anything / is any of my statements wrong?
+
+Searching the QAPI schema for lists of integers coughs up block latency
+histogram stuff, but that's unrelated, as far as I can tell.
+
+Looks like we're good.  I didn't expect that :)
+
+[...]
