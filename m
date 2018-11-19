@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gOcTk-0003rg-BS
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 00:52:13 -0500
+	(envelope-from <peterx@redhat.com>) id 1gOcsM-0001ER-7p
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 01:17:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1gOcTg-000275-AQ
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 00:52:12 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40077)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gOcTf-00023Y-Rv
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 00:52:08 -0500
-Received: by mail-pl1-x641.google.com with SMTP id b22-v6so8584531pls.7
-	for <qemu-devel@nongnu.org>; Sun, 18 Nov 2018 21:52:04 -0800 (PST)
-References: <20181113083104.2692-1-aik@ozlabs.ru>
-	<20181113083104.2692-2-aik@ozlabs.ru> <20181119014513.GC23503@umbus>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <88143ae6-3d62-5ee4-96a7-e383bfe42859@ozlabs.ru>
-Date: Mon, 19 Nov 2018 16:51:57 +1100
+	(envelope-from <peterx@redhat.com>) id 1gOcsJ-0001CZ-3w
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 01:17:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gOcsI-0001BF-SV
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 01:17:35 -0500
+Date: Mon, 19 Nov 2018 14:17:27 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20181119061727.GA1901@xz-x1>
+References: <20181030191620.32168-1-armbru@redhat.com>
+	<CAFEAcA8RdNrbCLL7tXY=e95N2Y0LcZdCPr3EuQo1_hu08qJuaQ@mail.gmail.com>
+	<87sh0eyzb0.fsf@dusky.pond.sub.org> <20181107025628.GB17134@xz-x1>
+	<CAFEAcA_FhkA_1DiDM2PWDw27dupsAdP==kBUxRrw5rGDnLzMwg@mail.gmail.com>
+	<20181108024406.GB3170@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <20181119014513.GC23503@umbus>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu RFC 1/7] vfio/spapr: Fix indirect
- levels calculation
+Content-Disposition: inline
+In-Reply-To: <20181108024406.GB3170@xz-x1>
+Subject: Re: [Qemu-devel] [PULL 0/8] Monitor patches for 2018-10-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,136 +30,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alistair Popple <alistair@popple.id.au>, Reza Arbab <arbab@linux.ibm.com>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, =?UTF-8?Q?Leonardo_Augusto_Guimar=c3=a3es_Garcia?= <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Oliver O'Halloran <oohall@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-
-
-On 19/11/2018 12:45, David Gibson wrote:
-> On Tue, Nov 13, 2018 at 07:30:58PM +1100, Alexey Kardashevskiy wrote:
->> The current code assumes that we can address more bits on a PCI bus
->> for DMA than we really can. Limit to the known tested maximum of 55 bits
->> and assume 64K IOMMU pages.
+On Thu, Nov 08, 2018 at 10:44:06AM +0800, Peter Xu wrote:
+> On Wed, Nov 07, 2018 at 11:21:32AM +0000, Peter Maydell wrote:
+> > On 7 November 2018 at 02:56, Peter Xu <peterx@redhat.com> wrote:
+> > > Strange, "make check -j8" failed on my hosts (I tried two) with either
+> > > Markus's pull tree or qemu master:
+> > >
+> > > hw/core/ptimer.o: In function `timer_new_tl':
+> > > /home/xz/git/qemu/include/qemu/timer.h:536: undefined reference to `timer_init_tl'
+> > > collect2: error: ld returned 1 exit status
+> > > make: *** [/home/xz/git/qemu/rules.mak:124: tests/ptimer-test] Error 1
+> > >
+> > > Is that only happening on my hosts?
+> > 
+> > Commit 89a603a0c80ae3 changed things so that there is no
+> > timer_new_tl() or timer_init_tl() any more, so if you have
+> > an object file that's referring to it then it's probably
+> > stale. Try a make clean.
 > 
-> This doesn't make much sense to me.  It looks nothing like the
-> calculation it's replacing, and not just for extreme values.  For
-> example the new calculation doesn't depend on the size of the window
-> at all, whereas the previous one did.
-
-Uff. Yes, this is confusing. There are a typical 64k IOMMU page size and
-a typical 64k system page size...
-
-For the window as big as 0x200.0000.0000 and 64k pages (actual working
-example), 33554432 entries are needed, or 256MB of space. The existing
-code calculates it as 25/6+1=5 levels. Which the hardware can do.
-
-But:
-1. all TCE levels are the same size and
-2. for the minimum size of the level I take a system page size which is 64k.
-
-So with 5 levels 16bit each (and this is without counting IOMMU page
-size, which is plus extra 16 bits) the table is huuuge.
-
-And I know from tests that 55 bits is the maximum the hardware can
-handle, and I have this limit in the powernv code so VFIO ioctl to
-create a window will fail. If I do not have a check in powernv, than
-things silently do not work (no EEH though).
-
-
-> You say you're assuming 64k
-> IOMMU pages, but create.page_shift (the actual IOMMU page size) is in
-> there. 
-
-It is a radix tree basically. Out of 64bits available, I cannot use bits
-56..63 (hardware does not work) and 0..12/15/21 (IOMMU page size), so I
-have bits 13/16/22..55 which I need to split equally between levels,
-each of which is 64k (system page size).
-
-
-> Nor is it clear to me why the maximum PCI address is relevant
-> to the number of levels in the first place.
-
-
-The window can only as big as the PHB hardware supports, this is why
-maximum PCI address.
-
-
+> Yeh it worked for me, thanks Peter.
 > 
-> In addition, AFAICT the new calculation gives the answer '2' for all
-> likely IOMMU page sizes (4k, 64k, 2M)
+> Though after running a few more rounds of "configure --enable-debug &&
+> make check -j8" I still cannot see anything wrong with Markus's tree.
+> I'll see whether there's any news from Markus and then I'll consider
+> whether I should install a FreeBSD.
 
-Hm, I did not realize that :) Instead of using 64k as a default level
-size, I could use some idea of what CONFIG_FORCE_MAX_ZONEORDER could be.
+I reproduced the error with a FreeBSD guest and this change (which
+possibly can be squashed into "tests: qmp-test: add queue full test")
+worked for me:
 
-Currently it is:
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 6989acbca4..83f353db4f 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -281,8 +281,15 @@ static void test_qmp_oob(void)
+      * will only be able to be handled after the queue is shrinked, so
+      * it'll be processed only after one existing in-band command
+      * finishes.
++     *
++     * NOTE: we need to feed the queue with one extra request to make
++     * sure it'll be stuck since when we have sent the Nth request
++     * it's possible that we have already popped and processing the
++     * 1st request so the Nth request (which could potentially be the
++     * [N-1]th element on the queue) might not trigger the
++     * monitor-full condition deterministically.
+      */
+-    for (i = 1; i <= QMP_REQ_QUEUE_LEN_MAX; i++) {
++    for (i = 1; i <= QMP_REQ_QUEUE_LEN_MAX + 1; i++) {
+         id = g_strdup_printf("queue-blocks-%d", i);
+         send_cmd_that_blocks(qts, id);
+         g_free(id);
+@@ -291,7 +298,7 @@ static void test_qmp_oob(void)
+     unblock_blocked_cmd();
+     recv_cmd_id(qts, "queue-blocks-1");
+     recv_cmd_id(qts, "oob-1");
+-    for (i = 2; i <= QMP_REQ_QUEUE_LEN_MAX; i++) {
++    for (i = 2; i <= QMP_REQ_QUEUE_LEN_MAX + 1; i++) {
+         unblock_blocked_cmd();
+         id = g_strdup_printf("queue-blocks-%d", i);
+         recv_cmd_id(qts, id);
 
-arch/powerpc/Kconfig
-config FORCE_MAX_ZONEORDER
-        int "Maximum zone order"
-        range 8 9 if PPC64 && PPC_64K_PAGES
-        default "9" if PPC64 && PPC_64K_PAGES
-        range 13 13 if PPC64 && !PPC_64K_PAGES
-        default "13" if PPC64 && !PPC_64K_PAGES
-        range 9 64 if PPC32 && PPC_16K_PAGES
-        default "9" if PPC32 && PPC_16K_PAGES
-        range 7 64 if PPC32 && PPC_64K_PAGES
-        default "7" if PPC32 && PPC_64K_PAGES
-        range 5 64 if PPC32 && PPC_256K_PAGES
-        default "5" if PPC32 && PPC_256K_PAGES
-        range 11 64
-        default "11"
+So the problem here is that the queue-block-N command might not really
+suspend the monitor everytime if we already popped the 1st request,
+which will let the N-th request to be (N-1)th, then the parser will
+continue to eat the oob command and it could "preempt" the previous
+commands.
 
-So assuming that "8" is the absolute minimum, I could try levels as big
-as 1<<(16+8-1) and if this fails, then increase the number of levels
-till a window is created or it is too many levels. Or there is some
-obviously better solution to the problem?
+Maybe FreeBSD is scheduling the threads in some pattern so it happens
+only on FreeBSD and very constantly, but anyway it should be a general
+fix to the test program.
 
-
-
-
-
-> 
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> ---
->>  hw/vfio/spapr.c      | 3 ++-
->>  hw/vfio/trace-events | 2 +-
->>  2 files changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
->> index becf71a..f5fdc53 100644
->> --- a/hw/vfio/spapr.c
->> +++ b/hw/vfio/spapr.c
->> @@ -183,7 +183,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
->>      entries = create.window_size >> create.page_shift;
->>      pages = MAX((entries * sizeof(uint64_t)) / getpagesize(), 1);
->>      pages = MAX(pow2ceil(pages), 1); /* Round up */
->> -    create.levels = ctz64(pages) / 6 + 1;
->> +    create.levels = MAX(1, (55 - create.page_shift) / 16);
->>  
->>      ret = ioctl(container->fd, VFIO_IOMMU_SPAPR_TCE_CREATE, &create);
->>      if (ret) {
->> @@ -200,6 +200,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
->>          return -EINVAL;
->>      }
->>      trace_vfio_spapr_create_window(create.page_shift,
->> +                                   create.levels,
->>                                     create.window_size,
->>                                     create.start_addr);
->>      *pgsize = pagesize;
->> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
->> index a85e866..db730f3 100644
->> --- a/hw/vfio/trace-events
->> +++ b/hw/vfio/trace-events
->> @@ -128,6 +128,6 @@ vfio_prereg_listener_region_add_skip(uint64_t start, uint64_t end) "0x%"PRIx64"
->>  vfio_prereg_listener_region_del_skip(uint64_t start, uint64_t end) "0x%"PRIx64" - 0x%"PRIx64
->>  vfio_prereg_register(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0x%"PRIx64" ret=%d"
->>  vfio_prereg_unregister(uint64_t va, uint64_t size, int ret) "va=0x%"PRIx64" size=0x%"PRIx64" ret=%d"
->> -vfio_spapr_create_window(int ps, uint64_t ws, uint64_t off) "pageshift=0x%x winsize=0x%"PRIx64" offset=0x%"PRIx64
->> +vfio_spapr_create_window(int ps, unsigned int levels, uint64_t ws, uint64_t off) "pageshift=0x%x levels=%u winsize=0x%"PRIx64" offset=0x%"PRIx64
->>  vfio_spapr_remove_window(uint64_t off) "offset=0x%"PRIx64
->>  vfio_spapr_group_attach(int groupfd, int tablefd) "Attached groupfd %d to liobn fd %d"
-> 
+Regards,
 
 -- 
-Alexey
+Peter Xu
