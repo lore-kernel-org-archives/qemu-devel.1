@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <skintigh@gmail.com>) id 1gOa2o-0003id-A4
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 22:16:15 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1gObng-0002Od-EB
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 00:08:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <skintigh@gmail.com>) id 1gOa2n-0005Qu-9e
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 22:16:14 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40594)
+	(envelope-from <aik@ozlabs.ru>) id 1gObnd-0000SS-8b
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 00:08:44 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:35268)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <skintigh@gmail.com>) id 1gOa2n-0005Qb-2y
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 22:16:13 -0500
-Received: by mail-oi1-x243.google.com with SMTP id t204so1331740oie.7
-	for <qemu-devel@nongnu.org>; Sun, 18 Nov 2018 19:16:12 -0800 (PST)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1gObnc-0000RF-SR
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 00:08:41 -0500
+Received: by mail-pf1-x444.google.com with SMTP id v9-v6so14241098pff.2
+	for <qemu-devel@nongnu.org>; Sun, 18 Nov 2018 21:08:40 -0800 (PST)
+References: <20181113083104.2692-1-aik@ozlabs.ru>
+	<20181113083104.2692-6-aik@ozlabs.ru> <20181119024239.GF23503@umbus>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <cb9e4cf1-7902-93ca-616f-c8d41cc3ff2b@ozlabs.ru>
+Date: Mon, 19 Nov 2018 16:08:33 +1100
 MIME-Version: 1.0
-References: <CAErn8fSCPZ1YKnf0OWq98S3-GFK9-3=uWgwfMO5Hut7PiDpcrw@mail.gmail.com>
-	<CAFEAcA9o0m+Nc3PgbMfM95NczASWjqc8X+=xrJONRuc5d_nydg@mail.gmail.com>
-In-Reply-To: <CAFEAcA9o0m+Nc3PgbMfM95NczASWjqc8X+=xrJONRuc5d_nydg@mail.gmail.com>
-From: Seth K <skintigh@gmail.com>
-Date: Sun, 18 Nov 2018 22:15:36 -0500
-Message-ID: <CAErn8fSyzGLaywOf3qGXD7pUtKnH+ZxG3W1ocXPMwcsmpoC-yQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] [PATCH] hw/arm/stm32f205: Fix the UART and Timer
- region size
+In-Reply-To: <20181119024239.GF23503@umbus>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu RFC 5/7] spapr-iommu: Always advertise
+ the maximum possible DMA window size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +31,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: Alistair Francis <alistair@alistair23.me>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-
-From: Seth Kintigh <skintigh@gmail.com>
-
-I corrected these 2 memory regions based on specifications from the chip
-manufacturer. The existing ranges seem to overlap and and cause odd
-behavior and/or crashes when trying to set up multiple UARTs,
-
-Signed-off-by: Seth Kintigh <skintigh@gmail.com>
----
-Phil, I hope this is the right format.
-
-PMM, my original changes were made on an old version, but I made the patch
-from the latest version per the instructions. I'm glad to hear that serial
-port limit is gone!
-
- hw/char/stm32f2xx_usart.c  | 2 +-
- hw/timer/stm32f2xx_timer.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/hw/char/stm32f2xx_usart.c b/hw/char/stm32f2xx_usart.c
-index 032b5fda13..f3363a2952 100644
---- a/hw/char/stm32f2xx_usart.c
-+++ b/hw/char/stm32f2xx_usart.c
-@@ -202,7 +202,7 @@ static void stm32f2xx_usart_init(Object *obj)
-     sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
-
-     memory_region_init_io(&s->mmio, obj, &stm32f2xx_usart_ops, s,
--                          TYPE_STM32F2XX_USART, 0x2000);
-+                          TYPE_STM32F2XX_USART, 0x400);
-     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
- }
-
-diff --git a/hw/timer/stm32f2xx_timer.c b/hw/timer/stm32f2xx_timer.c
-index 58fc7b1188..ae744d1642 100644
---- a/hw/timer/stm32f2xx_timer.c
-+++ b/hw/timer/stm32f2xx_timer.c
-@@ -308,7 +308,7 @@ static void stm32f2xx_timer_init(Object *obj)
-     sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
-
-     memory_region_init_io(&s->iomem, obj, &stm32f2xx_timer_ops, s,
--                          "stm32f2xx_timer", 0x4000);
-+                          "stm32f2xx_timer", 0x400);
-     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
-
-     s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, stm32f2xx_timer_interrupt,
-s);
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alistair Popple <alistair@popple.id.au>, Reza Arbab <arbab@linux.ibm.com>, Sam Bobroff <sbobroff@linux.ibm.com>, Piotr Jaroszynski <pjaroszynski@nvidia.com>, =?UTF-8?Q?Leonardo_Augusto_Guimar=c3=a3es_Garcia?= <lagarcia@br.ibm.com>, Jose Ricardo Ziviani <joserz@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, Oliver O'Halloran <oohall@gmail.com>
 
 
-On Thu, Nov 15, 2018 at 7:05 AM Peter Maydell <peter.maydell@linaro.org>
-wrote:
 
-> On 4 November 2018 at 07:42, Seth K <skintigh@gmail.com> wrote:
-> > I corrected these 2 memory regions based on specifications from the chip
-> > manufacturer. The existing ranges seem to overlap and and cause odd
-> > behavior and/or crashes when trying to set up multiple UARTs,
-> > I also played with changing MAX_SERIAL_PORTS to 8 to match the hardware,
-> > but I did not include that in this patch as I never fully tested its
-> > effects.
->
-> Hi; thanks for the patch. As Philippe says, it looks good,
-> but the one thing we definitely need is a Signed-off-by:
-> line from you.
->
-> A minor note -- there is no "MAX_SERIAL_PORTS" definition
-> in QEMU any more: we removed that artificial limitation
-> earlier this year. Maybe you're basing your patch on an
-> older version of QEMU? It's best to use git master for
-> development. Our SoC model defines 6 uarts (STM_NUM_USARTS)
-> in hw/arm/stm32f205_soc.c, which should all now be connectable
-> on the command line, though I haven't tested that or checked
-> whether the hardware has 6 or some other number...
->
-> thanks
-> -- PMM
->
+On 19/11/2018 13:42, David Gibson wrote:
+> On Tue, Nov 13, 2018 at 07:31:02PM +1100, Alexey Kardashevskiy wrote:
+>> When deciding about the huge DMA window, the typical Linux pseries guest
+>> uses the maximum allowed RAM size as the upper limit. We did the same
+>> on QEMU side to match that logic. Now we are going to support GPU RAM
+>> pass through which is not available at the guest boot time as it requires
+>> the guest driver interaction. As the result, the guest requests a smaller
+>> window than it should. Therefore the guest needs to be patched to
+>> understand this new memory and so does QEMU.
+>>
+>> Instead of reimplementing here whatever solution we will choose for
+>> the guest, this advertises the biggest possible window size limited by
+>> 32 bit (as defined by LoPAPR).
+>>
+>> This seems to be safe as:
+>> 1. The guest visible emulated table is allocated in KVM (actual pages
+>> are allocated in page fault handler) and QEMU (actual pages are allocated
+>> when changed);
+>> 2. The hardware table (and corresponding userspace addresses cache)
+>> supports sparse allocation and also checks for locked_vm limit so
+>> it is unable to cause the host any damage.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> 
+> This seems like a good idea to me, even without the NPU stuff.  It
+> always bothered me slightly that we based what's effectively the IOVA
+> limit on the guest RAM size which doesn't have any direct connection
+> to it.
+> 
+> As long as it doesn't hit the locked memory limits, I don't see any
+> reason we should prevent a guest from doing something weird like
+> mapping a small bit of RAM over and over in IOVA space, or mapping its
+> RAM sparsely in IOVA space.
+> 
+>> ---
+>>  hw/ppc/spapr_rtas_ddw.c | 19 +++----------------
+>>  1 file changed, 3 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr_rtas_ddw.c b/hw/ppc/spapr_rtas_ddw.c
+>> index 329feb1..df60351 100644
+>> --- a/hw/ppc/spapr_rtas_ddw.c
+>> +++ b/hw/ppc/spapr_rtas_ddw.c
+>> @@ -96,9 +96,8 @@ static void rtas_ibm_query_pe_dma_window(PowerPCCPU *cpu,
+>>                                           uint32_t nret, target_ulong rets)
+>>  {
+>>      sPAPRPHBState *sphb;
+>> -    uint64_t buid, max_window_size;
+>> +    uint64_t buid;
+>>      uint32_t avail, addr, pgmask = 0;
+>> -    MachineState *machine = MACHINE(spapr);
+>>  
+>>      if ((nargs != 3) || (nret != 5)) {
+>>          goto param_error_exit;
+>> @@ -114,27 +113,15 @@ static void rtas_ibm_query_pe_dma_window(PowerPCCPU *cpu,
+>>      /* Translate page mask to LoPAPR format */
+>>      pgmask = spapr_page_mask_to_query_mask(sphb->page_size_mask);
+>>  
+>> -    /*
+>> -     * This is "Largest contiguous block of TCEs allocated specifically
+>> -     * for (that is, are reserved for) this PE".
+>> -     * Return the maximum number as maximum supported RAM size was in 4K pages.
+>> -     */
+>> -    if (machine->ram_size == machine->maxram_size) {
+>> -        max_window_size = machine->ram_size;
+>> -    } else {
+>> -        max_window_size = machine->device_memory->base +
+>> -                          memory_region_size(&machine->device_memory->mr);
+>> -    }
+>> -
+>>      avail = SPAPR_PCI_DMA_MAX_WINDOWS - spapr_phb_get_active_win_num(sphb);
+>>  
+>>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>      rtas_st(rets, 1, avail);
+>> -    rtas_st(rets, 2, max_window_size >> SPAPR_TCE_PAGE_SHIFT);
+>> +    rtas_st(rets, 2, 0xFFFFFFFF); /* Largest contiguous block of TCEs */
+> 
+> One detail though.. where does this limit actually come from?  Is it
+> actually a limit imposed by the hardware somewhere, or just because
+> the RTAS call doesn't ahve room for anything more?
+
+I used this limit just because of the parameter size.
+
+> 
+> Previously limits would usually have been a power of 2; is it likely
+> to matter that now it won't be?
+
+LoPAPR says it is "Largest contiguous block of TCEs" and no mention of
+power of two but ibm,create-pe-dma-window takes a window shift so it is
+assumed that windows can still be only power of two. Not sure. The
+powernv code will fail if the requested window is not power of two.
+
+Replacing 0xffffffff with 0x80000000 won't make a difference though here
+but probably will make the error clearer...
+
+
+
+
+> 
+>>      rtas_st(rets, 3, pgmask);
+>>      rtas_st(rets, 4, 0); /* DMA migration mask, not supported */
+>>  
+>> -    trace_spapr_iommu_ddw_query(buid, addr, avail, max_window_size, pgmask);
+>> +    trace_spapr_iommu_ddw_query(buid, addr, avail, 0xFFFFFFFF, pgmask);
+>>      return;
+>>  
+>>  param_error_exit:
+> 
+
+-- 
+Alexey
