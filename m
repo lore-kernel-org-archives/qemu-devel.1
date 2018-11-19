@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gOjp5-0004G2-Td
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:42:44 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gOjqS-000562-MO
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:44:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gOjoz-0002Ie-44
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:42:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gOjoy-0002Hu-TB
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:42:37 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3077D30917A1
-	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 13:42:36 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon, 19 Nov 2018 13:42:28 +0000
-Message-Id: <20181119134228.11031-1-berrange@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gOjqO-0003WQ-HG
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:44:08 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40703)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gOjqO-0003Vy-BE
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 08:44:04 -0500
+Received: by mail-wr1-x443.google.com with SMTP id p4so22960582wrt.7
+	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 05:44:04 -0800 (PST)
+References: <20181118203312.5376-1-f4bug@amsat.org>
+	<20181118203312.5376-2-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181118203312.5376-2-f4bug@amsat.org>
+Date: Mon, 19 Nov 2018 13:44:01 +0000
+Message-ID: <87va4ti3mm.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] io: return 0 for EOF in TLS session read after
- shutdown
+Subject: Re: [Qemu-devel] [RFC PATCH 1/2] docker: Add
+ gentoo-mipsr5900el-cross image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,105 +31,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Fredrik Noring <noring@nocrew.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Mike Frysinger <vapier@gentoo.org>
 
-GNUTLS takes a paranoid approach when seeing 0 bytes returned by the
-underlying OS read() function. It will consider this an error and
-return GNUTLS_E_PREMATURE_TERMINATION instead of propagating the 0
-return value. It expects apps to arrange for clean termination at
-the protocol level and not rely on seeing EOF from a read call to
-detect shutdown. This is to harden apps against a malicious 3rd party
-causing termination of the sockets layer.
 
-This is unhelpful for the QEMU NBD code which does have a clean
-protocol level shutdown, but still relies on seeing 0 from the I/O
-channel read in the coroutine handling incoming replies.
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-The upshot is that when using a plain NBD connection shutdown is
-silent, but when using TLS, the client spams the console with
+> This image is based on Gentoo and the toolchain is built using crossdev.
+>
+> Recipe from:
+>   https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg03944.html
+>
+> Suggested-by: Fredrik Noring <noring@nocrew.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> TODO:
+> - Add Fredrik Noring S-o-b in his patches
+> - Check patch merged upstream
+>
+>  tests/docker/Makefile.include                 |   6 +
+>  .../gentoo-mipsr5900el-cross.docker           |  39 ++++
+>  .../binutils-v2.30-ps2-llsc.patch             |  36 +++
+>  .../crossdev.conf                             |   5 +
+>  .../gcc-v7.2.0-ps2-llsc.patch                 |  23 ++
+>  .../gcc-v7.2.0-ps2.patch                      | 219 ++++++++++++++++++
+>  6 files changed, 328 insertions(+)
+>  create mode 100644 tests/docker/dockerfiles/gentoo-mipsr5900el-cross.doc=
+ker
+>  create mode 100644 tests/docker/dockerfiles/gentoo-mipsr5900el-cross.doc=
+ker.d/binutils-v2.30-ps2-llsc.patch
+>  create mode 100644 tests/docker/dockerfiles/gentoo-mipsr5900el-cross.doc=
+ker.d/crossdev.conf
+>  create mode 100644 tests/docker/dockerfiles/gentoo-mipsr5900el-cross.doc=
+ker.d/gcc-v7.2.0-ps2-llsc.patch
+>  create mode 100644 tests/docker/dockerfiles/gentoo-mipsr5900el-cross.doc=
+ker.d/gcc-v7.2.0-ps2.patch
+>
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index 9467e9d088..6ca615206f 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -119,6 +119,12 @@ docker-image-debian-sparc64-cross: docker-image-debi=
+an-sid
+>  docker-image-debian-mips64-cross: docker-image-debian-sid
+>  docker-image-debian-riscv64-cross: docker-image-debian-sid
+>  docker-image-debian-powerpc-cross: docker-image-debian-sid
+> +docker-image-gentoo-mipsr5900el-cross: EXTRA_FILES:=3D$(addprefix \
+> +			$(SRC_PATH)/tests/docker/dockerfiles/gentoo-mipsr5900el-cross.docker.=
+d/,\
+> +				crossdev.conf \
+> +				binutils-v2.30-ps2-llsc.patch \
+> +				gcc-v7.2.0-ps2.patch \
+> +				gcc-v7.2.0-ps2-llsc.patch)
+>  docker-image-travis: NOUSER=3D1
+>
+>  # Specialist build images, sometimes very limited tools
+> diff --git a/tests/docker/dockerfiles/gentoo-mipsr5900el-cross.docker b/t=
+ests/docker/dockerfiles/gentoo-mipsr5900el-cross.docker
+> new file mode 100644
+> index 0000000000..dbc2eb007b
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/gentoo-mipsr5900el-cross.docker
+> @@ -0,0 +1,39 @@
+> +#
+> +# Docker mipsel (r5900) cross-compiler target
+> +#
+> +# Using multi-stage builds, this image requires docker-17.05.0 or later.
+> +# (See: https://github.com/gentoo/gentoo-docker-images)
+> +#
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +
+> +# name the portage image
+> +FROM gentoo/portage:latest as portage
+> +
+> +# image is based on stage3-amd64
+> +FROM gentoo/stage3-amd64:latest
+> +
+> +# copy the entire portage volume in
+> +COPY --from=3Dportage /usr/portage /usr/portage
 
-  Cannot read from TLS channel: Broken pipe
+OK digging into this more I think the problem is the images are too old:
 
-The NBD connection has, however, called qio_channel_shutdown()
-at this point to indicate that it is done with I/O. This gives
-the opportunity to optimize the code such that when the channel
-has been shutdown in the read direction, the error code
-GNUTLS_E_PREMATURE_TERMINATION gets turned into a '0' return
-instead of an error.
+  bdb7b450deaa / # ls -l usr/lib/python-exec/python-exec2
+  -rwxr-xr-x 1 root root 1461 Dec  8  2016 usr/lib/python-exec/python-exec2
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- crypto/tlssession.c      | 3 +++
- include/io/channel-tls.h | 1 +
- include/io/channel.h     | 6 +++---
- io/channel-tls.c         | 5 +++++
- 4 files changed, 12 insertions(+), 3 deletions(-)
+To have a proper Gentoo environment you need to take the latest stage3,
+sync the portage tree and update all the tools. It's a little odd
+because the hub claims the last build was 18 hours ago but the portage
+is still older than mine:
 
-diff --git a/crypto/tlssession.c b/crypto/tlssession.c
-index 2f28fa7f71..0dedd4af52 100644
---- a/crypto/tlssession.c
-+++ b/crypto/tlssession.c
-@@ -473,6 +473,9 @@ qcrypto_tls_session_read(QCryptoTLSSession *session,
-         case GNUTLS_E_INTERRUPTED:
-             errno =3D EINTR;
-             break;
-+        case GNUTLS_E_PREMATURE_TERMINATION:
-+            errno =3D ECONNABORTED;
-+            break;
-         default:
-             errno =3D EIO;
-             break;
-diff --git a/include/io/channel-tls.h b/include/io/channel-tls.h
-index 87fcaf9146..fdbdf12feb 100644
---- a/include/io/channel-tls.h
-+++ b/include/io/channel-tls.h
-@@ -48,6 +48,7 @@ struct QIOChannelTLS {
-     QIOChannel parent;
-     QIOChannel *master;
-     QCryptoTLSSession *session;
-+    QIOChannelShutdown shutdown;
- };
-=20
- /**
-diff --git a/include/io/channel.h b/include/io/channel.h
-index e8cdadb0b0..da2f138200 100644
---- a/include/io/channel.h
-+++ b/include/io/channel.h
-@@ -51,9 +51,9 @@ enum QIOChannelFeature {
- typedef enum QIOChannelShutdown QIOChannelShutdown;
-=20
- enum QIOChannelShutdown {
--    QIO_CHANNEL_SHUTDOWN_BOTH,
--    QIO_CHANNEL_SHUTDOWN_READ,
--    QIO_CHANNEL_SHUTDOWN_WRITE,
-+    QIO_CHANNEL_SHUTDOWN_READ =3D 1,
-+    QIO_CHANNEL_SHUTDOWN_WRITE =3D 2,
-+    QIO_CHANNEL_SHUTDOWN_BOTH =3D 3,
- };
-=20
- typedef gboolean (*QIOChannelFunc)(QIOChannel *ioc,
-diff --git a/io/channel-tls.c b/io/channel-tls.c
-index 9628e6fa47..c98ead21b0 100644
---- a/io/channel-tls.c
-+++ b/io/channel-tls.c
-@@ -275,6 +275,9 @@ static ssize_t qio_channel_tls_readv(QIOChannel *ioc,
-                 } else {
-                     return QIO_CHANNEL_ERR_BLOCK;
-                 }
-+            } else if (errno =3D=3D ECONNABORTED &&
-+                       (tioc->shutdown & QIO_CHANNEL_SHUTDOWN_READ)) {
-+                return 0;
-             }
-=20
-             error_setg_errno(errp, errno,
-@@ -357,6 +360,8 @@ static int qio_channel_tls_shutdown(QIOChannel *ioc,
- {
-     QIOChannelTLS *tioc =3D QIO_CHANNEL_TLS(ioc);
-=20
-+    tioc->shutdown |=3D how;
-+
-     return qio_channel_shutdown(tioc->master, how, errp);
- }
-=20
---=20
-2.19.1
+  13:37:45 [alex@danny:~/tmp] 1 $ ls -l /usr/lib/python-exec/python-exec2
+  -rwxr-xr-x 1 root root 2302 Sep 10 14:09 /usr/lib/python-exec/python-exec=
+2*
+
+I'll have a dig into the stage tarballs.
+
+--
+Alex Benn=C3=A9e
