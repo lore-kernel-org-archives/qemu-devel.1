@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gOWgh-0005za-FB
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 18:41:16 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gOX1w-0003SR-HV
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 19:03:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gOWXV-0002VL-Tg
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 18:31:45 -0500
-Received: from mga06.intel.com ([134.134.136.31]:33702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sameo@linux.intel.com>)
-	id 1gOWXV-0002Uj-KC
-	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 18:31:41 -0500
-Date: Mon, 19 Nov 2018 00:31:04 +0100
-From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181118233104.GB9556@caravaggio.hotspot.internet-for-guests.com>
-References: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gOX1s-0007kP-Jg
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 19:03:08 -0500
+Received: from mail-yb1-f193.google.com ([209.85.219.193]:45908)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gOX1s-0007kF-Fg
+	for qemu-devel@nongnu.org; Sun, 18 Nov 2018 19:03:04 -0500
+Received: by mail-yb1-f193.google.com with SMTP id 131-v6so11896767ybe.12
+	for <qemu-devel@nongnu.org>; Sun, 18 Nov 2018 16:03:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
-Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
+References: <154238824601.3534.13597728205342770469.stgit@wayrath>
+	<87k1lai2vo.fsf@linaro.org>
+	<177817734b4def66a3a0641ad2fba1ec9a4092cb.camel@suse.com>
+In-Reply-To: <177817734b4def66a3a0641ad2fba1ec9a4092cb.camel@suse.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 19 Nov 2018 01:02:51 +0100
+Message-ID: <CAAdtpL4nkWZ4_p=Vo=Smz9TpL97eYxDLrd8OGXWhGEn=92C_kw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] docker: dockerfile for openSUSE Leap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +33,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: seabios@seabios.org, qemu-devel@nongnu.org, Rob Bradford <robert.bradford@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: dfaggioli@suse.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-Hi Stefano,
+Hi Dario,
 
-On Fri, Nov 16, 2018 at 05:13:59PM +0100, Stefano Garzarella wrote:
-> Hi,
-> I'm investigating the SeaBIOS booting time, to understand if we can reduce
-> the boot time in some cases (e.g. legacy hardware is not needed). I think
-> this
-> can be interesting also for NEMU developers.
-Definitely, thanks.
+On Sun, Nov 18, 2018 at 10:54 PM Dario Faggioli <dfaggioli@suse.com> wrote:
+>
+> On Sun, 2018-11-18 at 19:47 +0000, Alex Benn=C3=A9e wrote:
+> > Dario Faggioli <dfaggioli@suse.com> writes:
+> >
+> > > Dockerfile for building an openSUSE Leap container.
+> > >
+> > > Tracks the latest release (at the time of writing this
+> > > patch, it is Leap 15).
+> > >
+> > > Signed-off-by: Dario Faggioli <dfaggioli@suse.com>
+> > > ---
+> > > Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
+> > > Cc: Fam Zheng <famz@redhat.com>
+> > > Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+> > > ---
+> > >  tests/docker/dockerfiles/opensuse-leap.docker |   62
+> > > +++++++++++++++++++++++++
+> > >  1 file changed, 62 insertions(+)
+> > >  create mode 100644 tests/docker/dockerfiles/opensuse-leap.docker
+> > >
+> > > diff --git a/tests/docker/dockerfiles/opensuse-leap.docker
+> > > b/tests/docker/dockerfiles/opensuse-leap.docker
+> > > new file mode 100644
+> > > index 0000000000..9d00861e66
+> > > --- /dev/null
+> > > +++ b/tests/docker/dockerfiles/opensuse-leap.docker
+> > > @@ -0,0 +1,62 @@
+> > > +FROM opensuse/leap
+> > > +ENV PACKAGES \
+> > <snip>
+> > > +    tar \
+> > > +    usbredir-devel \
+> > > +    virglrenderer-devel \
+> > > +    vte-devel \
+> > > +    which \
+> > > +    xen-devel
+> > > +    zlib-devel \
+> >
+> > This hasn't been tested because the docker image fails to build due
+> > to
+> > continuation breakage.
+> >
+> It is indeed broken.
+>
+> Basically, I tested it thoroughly, and I'm quite sure it works ok
+> (although, I'm no docker expert).
 
+I quickly fixed/tried it.
+First this package list pulls many unuseful system packages.
+I added '--no-recommends' to reduce a bit:
 
-> Following this thread (
-> https://mail.coreboot.org/pipermail/seabios/2015-July/009497.html),
-> I'm using qboot (https://github.com/bonzini/qboot) to compare the SeaBIOS
-> booting time.
-> 
-> As Paolo did in qboot, I manually add small debug port writes in SeaBIOS and
-> linuxboot_dma.c (QEMU) to trace the events with perf (kvm_pio events)
-When doing similar measuremnts, I also used the debug-exit qemu device
-in order to make imho simpler measuremnts, see
-https://github.com/intel/nemu/wiki/Measuring-Boot-Latency
+RUN zypper ref && \
+    zypper up -y && \
+    zypper install -y --no-recommends $PACKAGES
 
-Probably not as precised as yours, but it was enough for what we tried
-to characterize.
+This still install a bunch of unnecessary stuffs:
 
-> The goal is to have only one image of SeaBIOS configurable at runtime to
-> reduce
-> the boot time, avoiding unnecessary initialization.
-> 
-> Any pointers or suggestions would be helpful.
-> 
-> Following I put some preliminary measurements that I obtained:
-> I used this QEMU command line:
-> ./qemu-system-x86_64 -bios $BIOS -m 1G -cpu host -M accel=kvm \
-> -kernel /boot/vmlinuz-4.18.18-300.fc29.x86_64 -append 'console=ttyS0' \
-> -nographic -serial mon:stdio
-> 
-> For each test, I measured these times (in milliseconds) relative to the
-> "sched_process_exec" event:
-> - qemu_init_end: first kvm_entry (i.e. QEMU initialized has finished)
-> - fw_start: first entry of the BIOS
-> - fw_do_boot: after the BIOS initialization (e.g. PCI setup, etc.)
-> - linux_start_boot: before the jump to the Linux kernel
-Are you planning to also measure the total time to userspace as well?
-How we set the hardware up from the FW/BIOS can also influence the
-overall (up to ring 3) boot latency on our experiments.
+Creating group systemd-journal with gid 485.
+Creating group systemd-network with gid 484.
+Creating user systemd-network (systemd Network Management) with uid
+484 and gid 484.
+Creating group systemd-coredump with gid 483.
+Creating user systemd-coredump (systemd Core Dumper) with uid 483 and gid 4=
+83.
+Creating group systemd-timesync with gid 482.
+Creating user systemd-timesync (systemd Time Synchronization) with uid
+482 and gid 482.
+Failed to connect to bus: No such file or directory
 
-> # qboot
-> BIOS=/home/stefano/repos/qboot/bios.bin
->  qemu_init_end: 40.561234
->  fw_start: 40.721729 (+0.160495)
->  fw_do_boot: 47.025591 (+6.303862)
->  linux_start_boot: 48.874112 (+1.848521)
-> 
-> # SeaBIOS with default configuration
-> BIOS=/home/stefano/repos/seabios/out_default/bios.bin
->  qemu_init_end: 40.419451
->  fw_start: 40.639967 (+0.220516)
->  fw_do_boot: 886.668828 (+846.028861)
->  linux_start_boot: 889.723547 (+3.054719)
-> 
-> # SeaBIOS with Kevin's configuration
-> # (https://mail.coreboot.org/pipermail/seabios/2015-July/009508.html)
-> # Note: this SeaBIOS setup is so stripped down that it can't actually boot
-> an OS
-> BIOS=/home/stefano/repos/seabios/out_kevin/bios.bin
->  qemu_init_end: 40.676412
->  fw_start: 40.755757 (+0.079345)
->  fw_do_boot: 56.427023 (+15.671266)
-That's a slight improvement ;)
+Then the resulting image takes the same than without --no-recommends:
+1.1GB. No idea why.
+At some point some package tried to talk to the network manager via
+DBus to start sshd...
 
+Second, while this works on x86_64, it fails on aarch64:
 
-> I did the same tests also with NEMU (without using -M virt) and I have
-> approximately the same results.
-Yes, as expected.
+Problem: libcurl-devel-7.59.0-lp150.1.2.aarch64 requires libcurl4 =3D
+7.59.0, but this requirement cannot be provided
+  not installable providers: libcurl4-7.59.0-lp150.1.2.aarch64[repo-oss]
+ Solution 1: downgrade of libcurl4-7.60.0-lp150.2.15.1.aarch64 to
+libcurl4-7.59.0-lp150.1.2.aarch64
+ Solution 2: do not install libcurl-devel-7.59.0-lp150.1.2.aarch64
+ Solution 3: break libcurl-devel-7.59.0-lp150.1.2.aarch64 by ignoring
+some of its dependencies
 
+Not your fault. So I suppose you are planning to use this image to
+compile QEMU for openSUSE/x86_64 only, is this correct?
 
-> As the next step, I'll start from Kevin's configuration to have a minimal
-> SeaBIOS image ables to boot a Linux kernel.
-Please keep us posted.
+Regards,
 
-Cheers,
-Samuel.
+Phil.
+
+>
+> Then, when I was about to send the mail, I saw in another commit that
+> it was best to have the package list sorted; so I did that, and forgot
+> to adjust the continuation. :-(
+>
+> Sorry.
+>
+> I'll send a v2 with this fixed.
+>
+> Thanks and Regards,
+> Dario
+> --
+> <<This happens because I choose it to happen!>> (Raistlin Majere)
+> -----------------------------------------------------------------
+> Dario Faggioli, Ph.D, http://about.me/dario.faggioli
+> Software Engineer @ SUSE https://www.suse.com/
