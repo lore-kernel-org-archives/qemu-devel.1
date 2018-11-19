@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gOrEz-00089c-75
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:37:58 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gOrOq-0003Xa-Rv
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:48:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1gOrEw-0004Sx-1T
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:37:57 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45944)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1gOrEv-0004SR-Pd
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:37:53 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wAJLXd6L106651
-	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 16:37:53 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2nv0pqbmtx-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 16:37:52 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Mon, 19 Nov 2018 21:37:52 -0000
-From: Fabiano Rosas <farosas@linux.ibm.com>
-Date: Mon, 19 Nov 2018 19:37:39 -0200
-In-Reply-To: <20181119213739.773-1-farosas@linux.ibm.com>
-References: <20181119213739.773-1-farosas@linux.ibm.com>
-Message-Id: <20181119213739.773-2-farosas@linux.ibm.com>
-Subject: [Qemu-devel] [RFC PATCH 1/1] target/ppc: support single stepping
- with KVM HV
+	(envelope-from <ehabkost@redhat.com>) id 1gOrOn-0003bg-NK
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:48:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gOrOn-0003am-FX
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 16:48:05 -0500
+Date: Mon, 19 Nov 2018 19:47:40 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181119214740.GF3807@habkost.net>
+References: <20181114233831.10374-1-ehabkost@redhat.com>
+	<c1b4a0ee39dfddeb19f1be46710c10cbefd3f07a.camel@redhat.com>
+	<20181116034551.GK3807@habkost.net>
+	<20181119114105.4da89f2c.cohuck@redhat.com>
+	<20181119125519-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181119125519-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] virtio: Provide
+ version-specific variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,251 +32,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Amit Shah <amit@kernel.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-The hardware singlestep mechanism in POWER works via a Trace Interrupt
-(0xd00) that happens after any instruction executes, whenever MSR_SE =
-1 (PowerISA Section 6.5.15 - Trace Interrupt).
+On Mon, Nov 19, 2018 at 01:07:59PM -0500, Michael S. Tsirkin wrote:
+n
+> On Mon, Nov 19, 2018 at 11:41:05AM +0100, Cornelia Huck wrote:
+> > On Fri, 16 Nov 2018 01:45:51 -0200
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >=20
+> > > On Thu, Nov 15, 2018 at 05:29:24PM +0100, Andrea Bolognani wrote:
+> >=20
+> > > > One thing that I'm very much not convinced about is the naming,
+> > > > specifically leaving the virtio revision out: I get it that we
+> > > > Should Never Need=E2=84=A2 another major version of the spec, but=
+ I'm
+> > > > afraid discounting the possibility outright might prove to be
+> > > > shortsighted and come back to bite us later, so I'd much rather
+> > > > keep it.
+>=20
+> That's not the claim. In fact the reverse is true - a major revision ca=
+n
+> come at any point. The claim is that virtio compatibility is not based
+> on version numbers.  And another claim is that you can trust the
+> virtio TC not to overload terminology that it put in the spec. So use
+> that and you should be fine.  Come up with your own and end up writing
+> another spec just to document it.
+>=20
+> > > >=20
+> > > > And once that's done, "non-transitional" (while matching the
+> > > > language of the spec) starts to look a bit unnecessary when you
+> > > > could simply have
+> > > >=20
+> > > >   virtio-*-pci
+> > > >   virtio-*-pci-1
+> > > >   virtio-*-pci-1-transitional
+> > > >=20
+> > > > instead. But I don't feel as strongly about this as I do about
+> > > > keeping the virtio revision in the device name :) =20
+> > >=20
+> > > I like that suggestion.  Makes the device names more explicit
+> > > _and_ shorter.  I'll do that in v3.
+> >=20
+> > OTOH, that would mean we'd need to introduce new device types if we
+> > ever start to support a virtio 2.x standard. My understanding was tha=
+t
+> > we'll want separate device types for transitional and non-transitiona=
+l
+> > for two reasons: the bus which a device can be plugged into, and
+> > changing ids. Do we really expect huge changes in a possible 2.x
+> > standard that affect virtio-pci only, and not other virtio transports
+> > as well?
+>=20
+> Yes I think adding a version there is a mistake.
+> transitional/legacy/non-transitional are spec terms so
+> they are unlikely to change abruptly. OTOH virtio TC can
+> just decide next version is 2.0 on a drop of a hat.
+>=20
+> And I strongly believe command line users really really do not want all
+> this mess. Even adding "pci" is the name confuses people (what are the
+> other options?). For command line model=3Dvirtio is pretty much perfect=
+.
+> So all these names are there primarily for libvirt's benefit.
+> And the only input from libvirt devs so far
+> has been that it's unclear how does cross version
+> migration work. That needs to be addressed in some way.
 
-However, with kvm_hv, the Trace Interrupt happens inside the guest and
-KVM has no visibility of it. Therefore, when the gdbstub uses the
-KVM_SET_GUEST_DEBUG ioctl to enable singlestep, KVM simply ignores it.
+What still needs to be addressed?  Just keep the existing device
+types on migration.  We could make additional promises about
+compatibility with the disable-modern and disable-legacy
+properties, but I don't see why we need to do it unless we start
+deprecating the old device types.
 
-This patch takes advantage of the Trace Interrupt to perform the step
-inside the guest, but uses a breakpoint at the Trace Interrupt handler
-to return control to KVM. The exit is treated by KVM as a regular
-breakpoint and it returns to the host (and QEMU eventually).
 
-Before signalling GDB, QEMU sets the Next Instruction Pointer to the
-instruction following the one being stepped, effectively skipping the
-interrupt handler execution and hiding the trace interrupt breakpoint
-from GDB.
+>=20
+> So can we maybe start with a libvirt domain xml patch, with an
+> implementation for existing QEMU, get that acked, and then just map it
+> back to qemu command line as directly as possible?
 
-This approach works with both of GDB's 'scheduler-locking' options
-(off, step).
+I don't know what you mean here by "libvirt domain XML patch".
 
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- accel/kvm/kvm-all.c  | 10 +++++++
- exec.c               |  1 +
- include/sysemu/kvm.h |  4 +++
- target/arm/kvm.c     |  4 +++
- target/i386/kvm.c    |  4 +++
- target/ppc/kvm.c     | 65 +++++++++++++++++++++++++++++++++++++++++++-
- target/s390x/kvm.c   |  4 +++
- 7 files changed, 91 insertions(+), 1 deletion(-)
+Do you mean solving the problems only on the libvirt side,
+keeping the existing device types?  Why would we do that?  It
+would be a hack making the situation even messier.
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 4880a05399..4fb7199a15 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2313,6 +2313,11 @@ int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap)
-     return data.err;
- }
- 
-+void kvm_set_singlestep(CPUState *cs, int enabled)
-+{
-+    kvm_arch_set_singlestep(cs, enabled);
-+}
-+
- int kvm_insert_breakpoint(CPUState *cpu, target_ulong addr,
-                           target_ulong len, int type)
- {
-@@ -2439,6 +2444,11 @@ int kvm_remove_breakpoint(CPUState *cpu, target_ulong addr,
- void kvm_remove_all_breakpoints(CPUState *cpu)
- {
- }
-+
-+void kvm_set_singlestep(CPUState *cs, int enabled)
-+{
-+}
-+
- #endif /* !KVM_CAP_SET_GUEST_DEBUG */
- 
- static int kvm_set_signal_mask(CPUState *cpu, const sigset_t *sigset)
-diff --git a/exec.c b/exec.c
-index bb6170dbff..55614822c3 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1233,6 +1233,7 @@ void cpu_single_step(CPUState *cpu, int enabled)
-     if (cpu->singlestep_enabled != enabled) {
-         cpu->singlestep_enabled = enabled;
-         if (kvm_enabled()) {
-+            kvm_set_singlestep(cpu, enabled);
-             kvm_update_guest_debug(cpu, 0);
-         } else {
-             /* must flush all the translated code to avoid inconsistencies */
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 97d8d9d0d5..a01a8d58dd 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -259,6 +259,8 @@ int kvm_remove_breakpoint(CPUState *cpu, target_ulong addr,
- void kvm_remove_all_breakpoints(CPUState *cpu);
- int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap);
- 
-+void kvm_set_singlestep(CPUState *cpu, int enabled);
-+
- int kvm_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
- int kvm_on_sigbus(int code, void *addr);
- 
-@@ -431,6 +433,8 @@ void kvm_arch_remove_all_hw_breakpoints(void);
- 
- void kvm_arch_update_guest_debug(CPUState *cpu, struct kvm_guest_debug *dbg);
- 
-+void kvm_arch_set_singlestep(CPUState *cpu, int enabled);
-+
- bool kvm_arch_stop_on_emulation_error(CPUState *cpu);
- 
- int kvm_check_extension(KVMState *s, unsigned int extension);
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 44dd0ce6ce..dd8e43ab7e 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -670,6 +670,10 @@ int kvm_arch_process_async_events(CPUState *cs)
-     return 0;
- }
- 
-+void kvm_arch_set_singlestep(CPUState *cs, int enabled)
-+{
-+}
-+
- /* The #ifdef protections are until 32bit headers are imported and can
-  * be removed once both 32 and 64 bit reach feature parity.
-  */
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index f524e7d929..ba56f2ee1f 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -3521,6 +3521,10 @@ static int kvm_handle_debug(X86CPU *cpu,
-     return ret;
- }
- 
-+void kvm_arch_set_singlestep(CPUState *cs, int enabled)
-+{
-+}
-+
- void kvm_arch_update_guest_debug(CPUState *cpu, struct kvm_guest_debug *dbg)
- {
-     const uint8_t type_code[] = {
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index f81327d6cd..3af5e91997 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -94,6 +94,7 @@ static int cap_ppc_safe_indirect_branch;
- static int cap_ppc_nested_kvm_hv;
- 
- static uint32_t debug_inst_opcode;
-+static target_ulong trace_handler_addr;
- 
- /* XXX We have a race condition where we actually have a level triggered
-  *     interrupt, but the infrastructure can't expose that yet, so the guest
-@@ -509,6 +510,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     kvm_get_one_reg(cs, KVM_REG_PPC_DEBUG_INST, &debug_inst_opcode);
-     kvmppc_hw_debug_points_init(cenv);
- 
-+    trace_handler_addr = (cenv->excp_vectors[POWERPC_EXCP_TRACE] |
-+                          0xc000000000004000ull);
-+
-     return ret;
- }
- 
-@@ -1551,6 +1555,28 @@ void kvm_arch_remove_all_hw_breakpoints(void)
-     nb_hw_breakpoint = nb_hw_watchpoint = 0;
- }
- 
-+void kvm_arch_set_singlestep(CPUState *cs, int enabled)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+
-+    if (kvmppc_is_pr(kvm_state)) {
-+            return;
-+    }
-+
-+    if (enabled) {
-+        /* MSR_SE = 1 will cause a Trace Interrupt in the guest after
-+         * the next instruction executes. */
-+        env->msr |= (1ULL << MSR_SE);
-+
-+        /* We set a breakpoint at the interrupt handler address so
-+         * that the singlestep will be seen by KVM (this is treated by
-+         * KVM like an ordinary breakpoint) and control is returned to
-+         * QEMU. */
-+        kvm_insert_breakpoint(cs, trace_handler_addr, 4, GDB_BREAKPOINT_SW);
-+    }
-+}
-+
- void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
- {
-     int n;
-@@ -1590,6 +1616,43 @@ void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug *dbg)
-     }
- }
- 
-+static int kvm_handle_singlestep(CPUState *cs,
-+                                 struct kvm_debug_exit_arch *arch_info)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+    target_ulong msr = env->msr;
-+    uint32_t insn;
-+    int ret = 1;
-+    int reg;
-+
-+    if (kvmppc_is_pr(kvm_state)) {
-+        return ret;
-+    }
-+
-+    if (arch_info->address == trace_handler_addr) {
-+        cpu_synchronize_state(cs);
-+        kvm_remove_breakpoint(cs, trace_handler_addr, 4, GDB_BREAKPOINT_SW);
-+
-+        cpu_memory_rw_debug(cs, env->spr[SPR_SRR0] - 4, (uint8_t *)&insn,
-+                            sizeof(insn), 0);
-+
-+        /* If the last instruction was a mfmsr, make sure that the
-+         * MSR_SE bit is not set to avoid the guest kernel knowing
-+         * that it is being single-stepped */
-+        if (((insn >> 26) & 0x3f) == 31 && ((insn >> 1) & 0x3ff) == 83) {
-+            reg = (insn >> 21) & 0x1f;
-+            env->gpr[reg] &= ~(1ULL << MSR_SE);
-+        }
-+
-+        env->nip = env->spr[SPR_SRR0];
-+        env->msr = msr &= ~(1ULL << MSR_SE);
-+        cpu_synchronize_state(cs);
-+    }
-+
-+    return ret;
-+}
-+
- static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
- {
-     CPUState *cs = CPU(cpu);
-@@ -1600,7 +1663,7 @@ static int kvm_handle_debug(PowerPCCPU *cpu, struct kvm_run *run)
-     int flag = 0;
- 
-     if (cs->singlestep_enabled) {
--        handle = 1;
-+        handle = kvm_handle_singlestep(cs, arch_info);
-     } else if (arch_info->status) {
-         if (nb_hw_breakpoint + nb_hw_watchpoint > 0) {
-             if (arch_info->status & KVMPPC_DEBUG_BREAKPOINT) {
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 2ebf26adfe..4bde183458 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -975,6 +975,10 @@ void kvm_arch_remove_all_hw_breakpoints(void)
-     hw_breakpoints = NULL;
- }
- 
-+void kvm_arch_set_singlestep(CPUState *cs, int enabled)
-+{
-+}
-+
- void kvm_arch_update_guest_debug(CPUState *cpu, struct kvm_guest_debug *dbg)
- {
-     int i;
--- 
-2.17.1
+If libvirt needs us to provide better interfaces, let's cooperate
+with them.  I'd like us to avoid having yet another "the problem
+must be solved in the other layer first" deadlock here.
+
+--=20
+Eduardo
