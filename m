@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gOgig-0001XF-MA
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:23:56 -0500
+	(envelope-from <berrange@redhat.com>) id 1gOgjC-0001wr-UF
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:24:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gOgie-00031J-Or
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:23:54 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36221)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gOgid-00030U-5R
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:23:51 -0500
-Received: by mail-ot1-x343.google.com with SMTP id k98so27154082otk.3
-	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 02:23:50 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1gOgj9-0003IP-Qj
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 05:24:26 -0500
+Date: Mon, 19 Nov 2018 10:24:17 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181119102417.GC19532@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181116155325.22428-1-berrange@redhat.com>
+	<20181116155325.22428-4-berrange@redhat.com>
+	<abec84f9-d5c2-9488-3c1b-ca3c9b7df89f@redhat.com>
+	<2183d0b1-2b88-a9eb-abb7-ea2fdf3f4388@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181116213045.19825-1-palmer@sifive.com>
-References: <20181116213045.19825-1-palmer@sifive.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Nov 2018 10:23:29 +0000
-Message-ID: <CAFEAcA8BZmJnmeQTnorKnscZKQQd2EXvRJZ2Xa_LCShEvQ04hw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] RISC-V Patches for 3.1-rc2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2183d0b1-2b88-a9eb-abb7-ea2fdf3f4388@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/6] tests: pull qemu-nbd iotest helpers
+ into common.nbd file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 16 November 2018 at 21:30, Palmer Dabbelt <palmer@sifive.com> wrote:
-> The following changes since commit cb968d275c145467c8b385a3618a207ec111eab1:
->
->   Update version for v3.1.0-rc1 release (2018-11-13 18:16:14 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/riscv/riscv-qemu.git tags/riscv-for-master-3.1-rc2
->
-> for you to fetch changes up to 3502dc824a7b0218abb49f4350e80a49829748cf:
->
->   RISC-V: Respect fences for user-only emulators (2018-11-13 15:12:15 -0800)
->
-> ----------------------------------------------------------------
-> RISC-V Patches for 3.1-rc2
->
-> This pull request contains four patches that aren't really related to
-> each other aside from all being bug fixes that I think should go in for
-> 3.1.0:
->
-> * The second half of Alistair's memory leak patch set that I missed last
->   week.
-> * A fix to make fclass.d availiable only on RV64IFD systems (without
->   this it's availiable on RV32IFD systems, truncating the result).
-> * A fix to make sfence.vm availiable only in priv-1.9.1, and sfence.vma
->   only availiable in priv-1.10.
-> * A change to respect fences in user-mode emulators, which were
->   previously treated as NOPs.
->
-> As usual, this builds and boot Linux for me.  I don't think I have
-> anything else planned for 3.1.0, but I may be wrong as things are a bit
-> hectic this week.
->
+On Fri, Nov 16, 2018 at 03:43:16PM -0600, Eric Blake wrote:
+> On 11/16/18 3:41 PM, Eric Blake wrote:
+>=20
+> > > +#!/bin/bash
+> >=20
+> > I know we're using bash,
+> >=20
+> > > +
+> > > +function nbd_server_stop()
+> > > +{
+> >=20
+> > > +function nbd_server_wait_for_unix_socket()
+> >=20
+> > and bash supports 'function', but it is an obsolete syntactic sugar
+> > thing that I don't recommend using.=C2=A0 (In ksh, it actually makes =
+a
+> > difference in behavior whether you use 'function' or not, and using i=
+t
+> > in 'bash' makes it harder to port code over to 'ksh' - and hence in b=
+ash
+> > it is obsolete because here it does NOT cause the change in behavior
+> > that ksh users expect)
+> >=20
+>=20
+> Of course, I hit send too soon, before getting to my punchline:
+>=20
+> Since we already have so many existing iotests that use 'function', it'=
+s
+> better to clean that up as a separate patch.
 
-Applied, thanks.
+Yeah, I actually thought 'function' was the preferred syntax and
+omitting it was bad since so many iotests used it :-)
 
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
