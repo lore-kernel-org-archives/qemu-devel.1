@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gOmmh-0001ka-BD
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:52:28 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gOmml-0001hH-UW
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:52:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gOmaV-00037b-GK
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:39:52 -0500
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:39304)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gOmaV-00036u-4b
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:39:51 -0500
-Received: by mail-ot1-x333.google.com with SMTP id g27so28216651oth.6
-	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 08:39:50 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1gOmYC-0001iV-07
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:37:32 -0500
+Date: Mon, 19 Nov 2018 17:36:59 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181119173659.61a8925e@redhat.com>
+In-Reply-To: <20181105102044.20547-8-david@redhat.com>
+References: <20181105102044.20547-1-david@redhat.com>
+	<20181105102044.20547-8-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9XbnnpTKDJQMHqxfChBaKp5j71gsxUYOCo2SQXkOZ9DQ@mail.gmail.com>
-References: <20181108121646.26173-1-david@gibson.dropbear.id.au>
-	<20181108121646.26173-2-david@gibson.dropbear.id.au>
-	<CAFEAcA9XbnnpTKDJQMHqxfChBaKp5j71gsxUYOCo2SQXkOZ9DQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Nov 2018 16:39:29 +0000
-Message-ID: <CAFEAcA_=jkQjVbZEvNd_5wboHo2poHUwiVSC66u9v5JGQDB6cw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 01/22] target/ppc: add external PID support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 07/10] pci/pcihp: perform unplug via the
+ hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +24,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, Alexander Graf <agraf@suse.de>, Laurent Vivier <lvivier@redhat.com>, Roman Kapl <rka@sysgo.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-On 15 November 2018 at 10:22, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Hi; Coverity reports an issue (CID1396864) with this function:
->
->> +/* dcbfep (external PID dcbf) */
->> +static void gen_dcbfep(DisasContext *ctx)
->> +{
->> +    /* XXX: specification says this is treated as a load by the MMU */
->> +    TCGv t0;
->> +    CHK_SV;
->> +    gen_set_access_type(ctx, ACCESS_CACHE);
->> +    t0 = tcg_temp_new();
->> +    gen_addr_reg_index(ctx, t0);
->> +    tcg_gen_qemu_ld_tl(t0, t0, PPC_TLB_EPID_LOAD, DEF_MEMOP(MO_UB));
->> +    tcg_temp_free(t0);
->> +}
->
-> It says that the gen_set_access_type() call is unreachable. I think
-> this is a false positive (the code is unreachable, but only if
-> CONFIG_USER_ONLY is defined). On the other hand, all the other
-> similar gen_* functions in this file that use CHK_SV seem to have
-> a pattern of
->
-> #if defined(CONFIG_USER_ONLY)
->     GEN_PRIV;
-> #else
->     TCGv t0;
->     CHK_SV;
->     [etc]
-> #endif
->
-> so maybe we should do that here too for consistency?
+On Mon,  5 Nov 2018 11:20:41 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-I've marked the issue as a false-positive in Coverity (since it is,
-and that's what we've done with some equivalent target/ppc Coverity
-issues with other functions previously). I'll let you decide whether
-you want to prefer "with ifdefs" or "without". (TBH I think the
-"without" style is better here.)
+> Introduce and use the "unplug" callback.
+> 
+> This is a preparation for multi-stage hotplug handlers, whereby the bus
+> hotplug handler is overwritten by the machine hotplug handler. This handler
+> will then pass control to the bus hotplug handler. So to get this running
+> cleanly, we also have to make sure to go via the hotplug handler chain when
+> actually unplugging a device after an unplug request. Lookup the hotplug
+> handler and call "unplug".
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-thanks
--- PMM
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/acpi/pcihp.c         | 11 ++++++++++-
+>  hw/acpi/piix4.c         |  7 +++++--
+>  include/hw/acpi/pcihp.h |  3 +++
+>  3 files changed, 18 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+> index 05e3f8d11e..7bc7a72340 100644
+> --- a/hw/acpi/pcihp.c
+> +++ b/hw/acpi/pcihp.c
+> @@ -154,6 +154,7 @@ static bool acpi_pcihp_pc_no_hotplug(AcpiPciHpState *s, PCIDevice *dev)
+>  
+>  static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slots)
+>  {
+> +    HotplugHandler *hotplug_ctrl;
+>      BusChild *kid, *next;
+>      int slot = ctz32(slots);
+>      PCIBus *bus = acpi_pcihp_find_hotplug_bus(s, bsel);
+> @@ -171,7 +172,8 @@ static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slo
+>          PCIDevice *dev = PCI_DEVICE(qdev);
+>          if (PCI_SLOT(dev->devfn) == slot) {
+>              if (!acpi_pcihp_pc_no_hotplug(s, dev)) {
+> -                object_unparent(OBJECT(qdev));
+> +                hotplug_ctrl = qdev_get_hotplug_handler(qdev);
+> +                hotplug_handler_unplug(hotplug_ctrl, qdev, &error_abort);
+>              }
+>          }
+>      }
+> @@ -266,6 +268,13 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
+>  
+>  void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
+>                                   DeviceState *dev, Error **errp)
+> +{
+> +    object_unparent(OBJECT(dev));
+> +}
+> +
+> +void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+> +                                         AcpiPciHpState *s, DeviceState *dev,
+> +                                         Error **errp)
+>  {
+>      PCIDevice *pdev = PCI_DEVICE(dev);
+>      int slot = PCI_SLOT(pdev->devfn);
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index 160f727a5e..54a12a36f5 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -418,8 +418,8 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+>          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
+>                                        dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> -        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> -                                    errp);
+> +        acpi_pcihp_device_unplug_request_cb(hotplug_dev, &s->acpi_pci_hotplug,
+> +                                            dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+>                 !s->cpu_hotplug_legacy) {
+>          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
+> @@ -437,6 +437,9 @@ static void piix4_device_unplug_cb(HotplugHandler *hotplug_dev,
+>      if (s->acpi_memory_hotplug.is_enabled &&
+>          object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>          acpi_memory_unplug_cb(&s->acpi_memory_hotplug, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> +        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+> +                                    errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+>                 !s->cpu_hotplug_legacy) {
+>          acpi_cpu_unplug_cb(&s->cpuhp_state, dev, errp);
+> diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
+> index ce31625850..8bc4a4c01d 100644
+> --- a/include/hw/acpi/pcihp.h
+> +++ b/include/hw/acpi/pcihp.h
+> @@ -62,6 +62,9 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
+>                                 DeviceState *dev, Error **errp);
+>  void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
+>                                   DeviceState *dev, Error **errp);
+> +void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+> +                                         AcpiPciHpState *s, DeviceState *dev,
+> +                                         Error **errp);
+>  
+>  /* Called on reset */
+>  void acpi_pcihp_reset(AcpiPciHpState *s);
