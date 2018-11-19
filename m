@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gOn55-0000mm-PP
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 12:11:28 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gOn7o-0002Vw-2e
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 12:14:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gOn55-0008AV-61
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 12:11:27 -0500
-References: <20181116155325.22428-7-berrange@redhat.com>
-	<20181118022403.2211483-1-eblake@redhat.com>
-	<20181119104030.GK19532@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3f7cb55e-c3cc-bd0f-38d9-372ab8571911@redhat.com>
-Date: Mon, 19 Nov 2018 11:11:23 -0600
+	(envelope-from <imammedo@redhat.com>) id 1gOn7i-0001zI-CR
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 12:14:16 -0500
+Date: Mon, 19 Nov 2018 18:13:58 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181119181358.342399b2@redhat.com>
+In-Reply-To: <20181105102044.20547-11-david@redhat.com>
+References: <20181105102044.20547-1-david@redhat.com>
+	<20181105102044.20547-11-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181119104030.GK19532@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 7/6] iotests: Also test I/O over NBD TLS
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/10] spapr_pci: perform unplug via the
+ hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-On 11/19/18 4:40 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Sat, Nov 17, 2018 at 08:24:03PM -0600, Eric Blake wrote:
->> Enhance test 233 to also perform I/O beyond the initial handshake.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->>
->> Depends on my tweak to 2/6 to suppress an EIO error message
->> on a failed read after NBD_CMD_DISC.
->>
->>   tests/qemu-iotests/233     | 12 +++++++++++-
->>   tests/qemu-iotests/233.out | 10 ++++++++++
->>   2 files changed, 21 insertions(+), 1 deletion(-)
->=20
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On Mon,  5 Nov 2018 11:20:44 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-Yay - after dropping patch 2/6 (both your work, and the code I was=20
-questioning whether to squash in), and instead using your patch for=20
-making qio return 0 on connection abort after shutdown, this test still=20
-passes without any extra lines from the server.
+> Introduce and use the "unplug" callback.
+> 
+> This is a preparation for multi-stage hotplug handlers, whereby the bus
+> hotplug handler is overwritten by the machine hotplug handler. This handler
+> will then pass control to the bus hotplug handler. So to get this running
+> cleanly, we also have to make sure to go via the hotplug handler chain when
+> actually unplugging a device after an unplug request. Lookup the hotplug
+> handler and call "unplug".
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/ppc/spapr_pci.c | 33 +++++++++++++++++++++------------
+>  1 file changed, 21 insertions(+), 12 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 58afa46204..64b8591023 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1370,18 +1370,9 @@ static int spapr_create_pci_child_dt(sPAPRPHBState *phb, PCIDevice *dev,
+>  /* Callback to be called during DRC release. */
+>  void spapr_phb_remove_pci_device_cb(DeviceState *dev)
+>  {
+> -    /* some version guests do not wait for completion of a device
+> -     * cleanup (generally done asynchronously by the kernel) before
+> -     * signaling to QEMU that the device is safe, but instead sleep
+> -     * for some 'safe' period of time. unfortunately on a busy host
+> -     * this sleep isn't guaranteed to be long enough, resulting in
+> -     * bad things like IRQ lines being left asserted during final
+> -     * device removal. to deal with this we call reset just prior
+> -     * to finalizing the device, which will put the device back into
+> -     * an 'idle' state, as the device cleanup code expects.
+> -     */
+> -    pci_device_reset(PCI_DEVICE(dev));
+> -    object_unparent(OBJECT(dev));
+> +    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(dev);
+> +
+> +    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
+>  }
+>  
+>  static sPAPRDRConnector *spapr_phb_get_pci_func_drc(sPAPRPHBState *phb,
+> @@ -1490,6 +1481,23 @@ out:
+>      }
+>  }
+>  
+> +static void spapr_pci_unplug(HotplugHandler *plug_handler,
+> +                             DeviceState *plugged_dev, Error **errp)
+> +{
+> +    /* some version guests do not wait for completion of a device
+> +     * cleanup (generally done asynchronously by the kernel) before
+> +     * signaling to QEMU that the device is safe, but instead sleep
+> +     * for some 'safe' period of time. unfortunately on a busy host
+> +     * this sleep isn't guaranteed to be long enough, resulting in
+> +     * bad things like IRQ lines being left asserted during final
+> +     * device removal. to deal with this we call reset just prior
+> +     * to finalizing the device, which will put the device back into
+> +     * an 'idle' state, as the device cleanup code expects.
+> +     */
+> +    pci_device_reset(PCI_DEVICE(plugged_dev));
+> +    object_unparent(OBJECT(plugged_dev));
+> +}
+> +
+>  static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
+>                                       DeviceState *plugged_dev, Error **errp)
+>  {
+> @@ -1965,6 +1973,7 @@ static void spapr_phb_class_init(ObjectClass *klass, void *data)
+>      dc->user_creatable = true;
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>      hp->plug = spapr_pci_plug;
+> +    hp->unplug = spapr_pci_unplug;
+>      hp->unplug_request = spapr_pci_unplug_request;
+>  }
+>  
