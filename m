@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dfaggioli@suse.com>) id 1gOmAI-0005Bm-0z
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:12:47 -0500
+	(envelope-from <spopovyc@redhat.com>) id 1gOmFz-000842-Jn
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:18:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dfaggioli@suse.com>) id 1gOmAE-0000nB-OD
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:12:45 -0500
-Received: from smtp.nue.novell.com ([195.135.221.5]:52155)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dfaggioli@suse.com>) id 1gOmAC-0000in-Se
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:12:41 -0500
-Message-ID: <27f907253ba78277b268e3bd6775db10b90bce1f.camel@suse.com>
-From: Dario Faggioli <dfaggioli@suse.com>
-Date: Mon, 19 Nov 2018 17:12:27 +0100
-In-Reply-To: <CAAdtpL4nkWZ4_p=Vo=Smz9TpL97eYxDLrd8OGXWhGEn=92C_kw@mail.gmail.com>
-References: <154238824601.3534.13597728205342770469.stgit@wayrath>
-	<87k1lai2vo.fsf@linaro.org>
-	<177817734b4def66a3a0641ad2fba1ec9a4092cb.camel@suse.com>
-	<CAAdtpL4nkWZ4_p=Vo=Smz9TpL97eYxDLrd8OGXWhGEn=92C_kw@mail.gmail.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-MzwP4q5pYEMHYXX9VN8E"
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] docker: dockerfile for openSUSE Leap
+	(envelope-from <spopovyc@redhat.com>) id 1gOmFu-0007KU-HZ
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:18:39 -0500
+References: <1542632978-65604-1-git-send-email-spopovyc@redhat.com>
+	<20181119142719.3d702892@bahia.lan>
+	<6ff0a235-0136-63b6-dd6a-cd78f656ca0e@redhat.com>
+From: Serhii Popovych <spopovyc@redhat.com>
+Message-ID: <13c0668b-6a38-6fad-c80d-4465fda88cb9@redhat.com>
+Date: Mon, 19 Nov 2018 18:18:04 +0200
+MIME-Version: 1.0
+In-Reply-To: <6ff0a235-0136-63b6-dd6a-cd78f656ca0e@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="ZlvIlAJ6GBo5bMhDtEZspMhYgdgBe7zMO"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for 3.1] spapr: Fix ibm,
+ max-associativity-domains property number of nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,147 +26,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Fam Zheng <famz@redhat.com>, Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Laurent Vivier <lvivier@redhat.com>, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-
---=-MzwP4q5pYEMHYXX9VN8E
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZlvIlAJ6GBo5bMhDtEZspMhYgdgBe7zMO
+From: Serhii Popovych <spopovyc@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Message-ID: <13c0668b-6a38-6fad-c80d-4465fda88cb9@redhat.com>
+Subject: Re: [Qemu-ppc] [PATCH for 3.1] spapr: Fix ibm,
+ max-associativity-domains property number of nodes
+References: <1542632978-65604-1-git-send-email-spopovyc@redhat.com>
+ <20181119142719.3d702892@bahia.lan>
+ <6ff0a235-0136-63b6-dd6a-cd78f656ca0e@redhat.com>
+In-Reply-To: <6ff0a235-0136-63b6-dd6a-cd78f656ca0e@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2018-11-19 at 01:02 +0100, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Dario,
+Laurent Vivier wrote:
+> On 19/11/2018 14:27, Greg Kurz wrote:
+>> On Mon, 19 Nov 2018 08:09:38 -0500
+>> Serhii Popovych <spopovyc@redhat.com> wrote:
+>>
+>>> Laurent Vivier reported off by one with maximum number of NUMA nodes
+>>> provided by qemu-kvm being less by one than required according to
+>>> description of "ibm,max-associativity-domains" property in LoPAPR.
+>>>
+>>> It appears that I incorrectly treated LoPAPR description of this
+>>> property assuming it provides last valid domain (NUMA node here)
+>>> instead of maximum number of domains.
+>>>
+>>>   ### Before hot-add
+>>>
+>>>   (qemu) info numa
+>>>   3 nodes
+>>>   node 0 cpus: 0
+>>>   node 0 size: 0 MB
+>>>   node 0 plugged: 0 MB
+>>>   node 1 cpus:
+>>>   node 1 size: 1024 MB
+>>>   node 1 plugged: 0 MB
+>>>   node 2 cpus:
+>>>   node 2 size: 0 MB
+>>>   node 2 plugged: 0 MB
+>>>
+>>>   $ numactl -H
+>>>   available: 2 nodes (0-1)
+>>>   node 0 cpus: 0
+>>>   node 0 size: 0 MB
+>>>   node 0 free: 0 MB
+>>>   node 1 cpus:
+>>>   node 1 size: 999 MB
+>>>   node 1 free: 658 MB
+>>>   node distances:
+>>>   node   0   1
+>>>     0:  10  40
+>>>     1:  40  10
+>>>
+>>>   ### Hot-add
+>>>
+>>>   (qemu) object_add memory-backend-ram,id=3Dmem0,size=3D1G
+>>>   (qemu) device_add pc-dimm,id=3Ddimm1,memdev=3Dmem0,node=3D2
+>>>   (qemu) [   87.704898] pseries-hotplug-mem: Attempting to hot-add 4 =
+=2E..
+>>>   <there is no "Initmem setup node 2 [mem 0xHEX-0xHEX]">
+>>>   [   87.705128] lpar: Attempting to resize HPT to shift 21
+>>>   ... <HPT resize messages>
+>>>
+>>>   ### After hot-add
+>>>
+>>>   (qemu) info numa
+>>>   3 nodes
+>>>   node 0 cpus: 0
+>>>   node 0 size: 0 MB
+>>>   node 0 plugged: 0 MB
+>>>   node 1 cpus:
+>>>   node 1 size: 1024 MB
+>>>   node 1 plugged: 0 MB
+>>>   node 2 cpus:
+>>>   node 2 size: 1024 MB
+>>>   node 2 plugged: 1024 MB
+>>>
+>>>   $ numactl -H
+>>>   available: 2 nodes (0-1)
+>>>   ^^^^^^^^^^^^^^^^^^^^^^^^
+>>>              Still only two nodes (and memory hot-added to node 0 bel=
+ow)
+>>>   node 0 cpus: 0
+>>>   node 0 size: 1024 MB
+>>>   node 0 free: 1021 MB
+>>>   node 1 cpus:
+>>>   node 1 size: 999 MB
+>>>   node 1 free: 658 MB
+>>>   node distances:
+>>>   node   0   1
+>>>     0:  10  40
+>>>     1:  40  10
+>>>
+>>> After fix applied numactl(8) reports 3 nodes available and memory
+>>> plugged into node 2 as expected.
+>>>
+>>> Fixes: da9f80fbad21 ("spapr: Add ibm,max-associativity-domains proper=
+ty")
+>>> Reported-by: Laurent Vivier <lvivier@redhat.com>
+>>> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
+>>> ---
+>>>  hw/ppc/spapr.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>> index 7afd1a1..843ae6c 100644
+>>> --- a/hw/ppc/spapr.c
+>>> +++ b/hw/ppc/spapr.c
+>>> @@ -1033,7 +1033,7 @@ static void spapr_dt_rtas(sPAPRMachineState *sp=
+apr, void *fdt)
+>>>          cpu_to_be32(0),
+>>>          cpu_to_be32(0),
+>>>          cpu_to_be32(0),
+>>> -        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes - 1 : 0),
+>>> +        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 0),
+>>
+>> Maybe simply cpu_to_be32(nb_numa_nodes) ?
 >=20
-Hi,
-
-> On Sun, Nov 18, 2018 at 10:54 PM Dario Faggioli <dfaggioli@suse.com>
-> wrote:
-> > On Sun, 2018-11-18 at 19:47 +0000, Alex Benn=C3=A9e wrote:
-> > > This hasn't been tested because the docker image fails to build
-> > > due
-> > > to
-> > > continuation breakage.
-> > >=20
-> > It is indeed broken.
-> >=20
-> > Basically, I tested it thoroughly, and I'm quite sure it works ok
-> > (although, I'm no docker expert).
+> I agree the "? : " is not needed.
 >=20
-> I quickly fixed/tried it.
->
-Cool, thanks for having a look. :-)
-
-> First this package list pulls many unuseful system packages.
-> I added '--no-recommends' to reduce a bit:
+> With "cpu_to_be32(nb_numa_nodes)":
 >=20
-> RUN zypper ref && \
->     zypper up -y && \
->     zypper install -y --no-recommends $PACKAGES
+
+Agree, ?: was relevant only to catch -1 case when running guest w/o NUMA
+config. Will send v2. Thanks for quick review.
+
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 >=20
-Right, that makes sense. I'll add it.
-
-> This still install a bunch of unnecessary stuffs:
+> Thanks,
+> Laurent
 >=20
-> Creating group systemd-journal with gid 485.
-> Creating group systemd-network with gid 484.
-> Creating user systemd-network (systemd Network Management) with uid
-> 484 and gid 484.
-> Creating group systemd-coredump with gid 483.
-> Creating user systemd-coredump (systemd Core Dumper) with uid 483 and
-> gid 483.
-> Creating group systemd-timesync with gid 482.
-> Creating user systemd-timesync (systemd Time Synchronization) with
-> uid
-> 482 and gid 482.
-> Failed to connect to bus: No such file or directory
->=20
-> Then the resulting image takes the same than without --no-recommends:
-> 1.1GB. No idea why.
->
-So, my "model" was the fedora.docker dockerfile, where quite a few
-package are also installed, much more than the bare minimum necessary
-for a build to succeed (AFAICT, at least).
 
-The idea would be to enable and include support for as many
-features/backends/integrations/etc as possible, in order to test them.
 
-Basically, I did this by trial-and-error, i.e., adding packages related
-to entries in `./configure' which looked like 'no', and keeping them
-(only) if they turned such entry to 'yes'.
-
-Now, this is what I see on my system, and that's why size did not
-concerned me: :-)
-
-REPOSITORY   TAG             IMAGE ID       CREATED       SIZE
-qemu         opensuse-leap   6bd6bc2ac139   4 hours ago   1.09GB
-qemu         fedora          1b05e254d0d9   5 hours ago   2.02GB
-
-If this is not ok, I'm happy to try to shrink the image size a bit
-(e.g., I'll double check if there are useless packages left in place),
-and/or to put together another dockerfile (something like opensuse-
-leap_minimal), with just what is necessary for the build (and the
-tests) to succeed.
-
-> At some point some package tried to talk to the network manager via
-> DBus to start sshd...
->=20
-Ah, interesting. :-P
-
-So, from where did you see this (as well as the logs above) logs?
-Running `make docker-***' with 'V=3D1', I'm guessing?
-
-> Second, while this works on x86_64, it fails on aarch64:
->=20
-> Problem: libcurl-devel-7.59.0-lp150.1.2.aarch64 requires libcurl4 =3D
-> 7.59.0, but this requirement cannot be provided
->   not installable providers: libcurl4-7.59.0-lp150.1.2.aarch64[repo-
-> oss]
->  Solution 1: downgrade of libcurl4-7.60.0-lp150.2.15.1.aarch64 to
-> libcurl4-7.59.0-lp150.1.2.aarch64
->  Solution 2: do not install libcurl-devel-7.59.0-lp150.1.2.aarch64
->  Solution 3: break libcurl-devel-7.59.0-lp150.1.2.aarch64 by ignoring
-> some of its dependencies
->=20
-Ok, I see.
-
-> Not your fault. So I suppose you are planning to use this image to
-> compile QEMU for openSUSE/x86_64 only, is this correct?
->=20
-Yes, basically, x86_64 is my main usecase, and the (only) setup I can
-test quickly and easily enough. However, I'm certainly up for trying to
-improve this, and make this dockerfile useful for other arches as well.
-
-I'll try to look into this. How did you test this on aarch64? On a
-native ARM host, or using QEMU?
-
-Thanks again and Regards,
-Dario
 --=20
-<<This happens because I choose it to happen!>> (Raistlin Majere)
------------------------------------------------------------------
-Dario Faggioli, Ph.D, http://about.me/dario.faggioli
-Software Engineer @ SUSE https://www.suse.com/
+Thanks,
+Serhii
 
---=-MzwP4q5pYEMHYXX9VN8E
+
+--ZlvIlAJ6GBo5bMhDtEZspMhYgdgBe7zMO
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQIzBAABCAAdFiEES5ssOj3Vhr0WPnOLFkJ4iaW4c+4FAlvy4OsACgkQFkJ4iaW4
-c+5DtBAAkSR4w9qMkNB4bL254/W/JeONHIL+7ixWAD4LbVnGYV3xroBj5tNBVs4N
-/yreVRQMFWIrtdOdS2cG2Wp6qGjLj9oJhREMpM0h4BwRJFiGyYttvCVpE3pZhYmF
-2u1FhV49AcGsBmskGH9tTk/F/ZNYAb9kXOVHC8+scK4Fz8TRsCh0z8ktlU1onu0R
-mHXec3I9TWiVDEcdItSWXhM6naOuusn4oiS859cplw9xyXyCXmnrXJciyEcd8hKZ
-EGIeSG5RcV9kZZE/si4o5iyAG8WDLR+NUQ/x5BK6yt/nI2GgLhEQXaaGHUHvhzSw
-h25MiiG3Fujs4Gh+K3dxN7WfVlbyvbOT9kRbBxL+wsdrtRldwqTBYGUMgPJhq1np
-B+sNYnEfud7OcW8L/Ijf+3EqPfp2rZiBrAjXmE5+hzRS/DIeIKZDSyicdWXAWD7G
-u/ASWszdaKVoIwAKz57DSutihAmG6ciV3xiCD/Cc8eg3/2ZP62hlyiKE485TKsol
-dEmVZy1ye4z5xEVI4A8SmZ7x3Xn+JWG5tCYkWE7x7Px4u1z3GdcUCOoaqaj6c9Vk
-NPFGPpDXuUApz9tZDKUiw6pfC4wnr0luB088R4ssuPtb93zxGS+6NSbi+TCLNMVw
-Ti8Hkpt3hBeYnef+X2FQGcANWMFHwzoswEF214WgA4LkxCzu1Ug=
-=jvxG
+iQEcBAEBAgAGBQJb8uJUAAoJEBTawMmQ61bBSyAH/1wqB2kNy3Q6x1VATjkRaDj6
+75/oHBpPXmFElIBMopLOWUPF8HtcBhsXlZLjeWN2F7QtFBunvW4ZgK9SqXQw5dHy
+3uJrgWAg8vnWhMl7MWS1kQUKY/QieosaDJdkNRGHhVAz2v0jBZD9Dx6R5R67U/0u
+fCmxGLyOSY3Px9GavHOOhkdpTmKHI6LzMSLciJ4owY2RVDQjtil9RIL32pQptM7h
+wdaJMt8/3kbujByAR7+UinrqsaLIvmXTR3OvPKVEnBO+0UUn1+Dw2/4rBX5vMzNN
+mgab8dKQi2Dh8/1gdFruR8f+jcTsEXQ8R8o2J/5WDRZmkoc2nXe+Z3coe4l0ftU=
+=TlDF
 -----END PGP SIGNATURE-----
 
---=-MzwP4q5pYEMHYXX9VN8E--
+--ZlvIlAJ6GBo5bMhDtEZspMhYgdgBe7zMO--
