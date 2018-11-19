@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gOddK-0003aV-J1
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 02:06:11 -0500
+	(envelope-from <armbru@redhat.com>) id 1gOdn4-00069R-7W
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 02:16:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gOddH-0007bQ-DB
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 02:06:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33316)
+	(envelope-from <armbru@redhat.com>) id 1gOdn1-00085C-3e
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 02:16:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35572)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gOddH-0007au-5n
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 02:06:07 -0500
-Date: Mon, 19 Nov 2018 15:05:58 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181119070558.GB1901@xz-x1>
-References: <20181030191620.32168-1-armbru@redhat.com>
-	<CAFEAcA8RdNrbCLL7tXY=e95N2Y0LcZdCPr3EuQo1_hu08qJuaQ@mail.gmail.com>
-	<87sh0eyzb0.fsf@dusky.pond.sub.org> <20181107025628.GB17134@xz-x1>
-	<CAFEAcA_FhkA_1DiDM2PWDw27dupsAdP==kBUxRrw5rGDnLzMwg@mail.gmail.com>
-	<20181108024406.GB3170@xz-x1> <20181119061727.GA1901@xz-x1>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gOdn0-00084r-Rj
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 02:16:11 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181118122843.10892-1-yuval.shaia@oracle.com>
+	<20181118122843.10892-11-yuval.shaia@oracle.com>
+Date: Mon, 19 Nov 2018 08:16:08 +0100
+In-Reply-To: <20181118122843.10892-11-yuval.shaia@oracle.com> (Yuval Shaia's
+	message of "Sun, 18 Nov 2018 14:28:30 +0200")
+Message-ID: <87wop9v8p3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181119061727.GA1901@xz-x1>
-Subject: Re: [Qemu-devel] [PULL 0/8] Monitor patches for 2018-10-30
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 10/23] json: Define new QMP message for
+ pvrdma
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +28,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-On Mon, Nov 19, 2018 at 02:17:27PM +0800, Peter Xu wrote:
-> On Thu, Nov 08, 2018 at 10:44:06AM +0800, Peter Xu wrote:
-> > On Wed, Nov 07, 2018 at 11:21:32AM +0000, Peter Maydell wrote:
-> > > On 7 November 2018 at 02:56, Peter Xu <peterx@redhat.com> wrote:
-> > > > Strange, "make check -j8" failed on my hosts (I tried two) with either
-> > > > Markus's pull tree or qemu master:
-> > > >
-> > > > hw/core/ptimer.o: In function `timer_new_tl':
-> > > > /home/xz/git/qemu/include/qemu/timer.h:536: undefined reference to `timer_init_tl'
-> > > > collect2: error: ld returned 1 exit status
-> > > > make: *** [/home/xz/git/qemu/rules.mak:124: tests/ptimer-test] Error 1
-> > > >
-> > > > Is that only happening on my hosts?
-> > > 
-> > > Commit 89a603a0c80ae3 changed things so that there is no
-> > > timer_new_tl() or timer_init_tl() any more, so if you have
-> > > an object file that's referring to it then it's probably
-> > > stale. Try a make clean.
-> > 
-> > Yeh it worked for me, thanks Peter.
-> > 
-> > Though after running a few more rounds of "configure --enable-debug &&
-> > make check -j8" I still cannot see anything wrong with Markus's tree.
-> > I'll see whether there's any news from Markus and then I'll consider
-> > whether I should install a FreeBSD.
-> 
-> I reproduced the error with a FreeBSD guest and this change (which
-> possibly can be squashed into "tests: qmp-test: add queue full test")
-> worked for me:
-> 
-> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-> index 6989acbca4..83f353db4f 100644
-> --- a/tests/qmp-test.c
-> +++ b/tests/qmp-test.c
-> @@ -281,8 +281,15 @@ static void test_qmp_oob(void)
->       * will only be able to be handled after the queue is shrinked, so
->       * it'll be processed only after one existing in-band command
->       * finishes.
-> +     *
-> +     * NOTE: we need to feed the queue with one extra request to make
-> +     * sure it'll be stuck since when we have sent the Nth request
-> +     * it's possible that we have already popped and processing the
-> +     * 1st request so the Nth request (which could potentially be the
-> +     * [N-1]th element on the queue) might not trigger the
-> +     * monitor-full condition deterministically.
->       */
-> -    for (i = 1; i <= QMP_REQ_QUEUE_LEN_MAX; i++) {
-> +    for (i = 1; i <= QMP_REQ_QUEUE_LEN_MAX + 1; i++) {
->          id = g_strdup_printf("queue-blocks-%d", i);
->          send_cmd_that_blocks(qts, id);
->          g_free(id);
-> @@ -291,7 +298,7 @@ static void test_qmp_oob(void)
->      unblock_blocked_cmd();
->      recv_cmd_id(qts, "queue-blocks-1");
->      recv_cmd_id(qts, "oob-1");
-> -    for (i = 2; i <= QMP_REQ_QUEUE_LEN_MAX; i++) {
-> +    for (i = 2; i <= QMP_REQ_QUEUE_LEN_MAX + 1; i++) {
->          unblock_blocked_cmd();
->          id = g_strdup_printf("queue-blocks-%d", i);
->          recv_cmd_id(qts, id);
-> 
-> So the problem here is that the queue-block-N command might not really
-> suspend the monitor everytime if we already popped the 1st request,
-> which will let the N-th request to be (N-1)th, then the parser will
-> continue to eat the oob command and it could "preempt" the previous
-> commands.
-> 
-> Maybe FreeBSD is scheduling the threads in some pattern so it happens
-> only on FreeBSD and very constantly, but anyway it should be a general
-> fix to the test program.
+The subsystem tag in the commit message's title should be "qapi: " not
+"json: ".
 
-Markus, do you want me to repost a new version with this change?  Is
-it still possible to have the oob-default series for 3.1?
+Yuval Shaia <yuval.shaia@oracle.com> writes:
 
--- 
-Peter Xu
+> pvrdma requires that the same GID attached to it will be attached to the
+> backend device in the host.
+>
+> A new QMP messages is defined so pvrdma device can broadcast any change
+> made to its GID table. This event is captured by libvirt which in turn
+> will update the GID table in the backend device.
+>
+> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> ---
+>  MAINTAINERS           |  1 +
+>  Makefile              |  3 ++-
+>  Makefile.objs         |  4 ++++
+>  qapi/qapi-schema.json |  1 +
+>  qapi/rdma.json        | 38 ++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 46 insertions(+), 1 deletion(-)
+>  create mode 100644 qapi/rdma.json
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index e087d58ac6..a149f68a8f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2232,6 +2232,7 @@ F: hw/rdma/*
+>  F: hw/rdma/vmw/*
+>  F: docs/pvrdma.txt
+>  F: contrib/rdmacm-mux/*
+> +F: qapi/rdma.json
+>  
+>  Build and test automation
+>  -------------------------
+> diff --git a/Makefile b/Makefile
+> index 94072776ff..db4ce60ee5 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -599,7 +599,8 @@ qapi-modules = $(SRC_PATH)/qapi/qapi-schema.json $(SRC_PATH)/qapi/common.json \
+>                 $(SRC_PATH)/qapi/tpm.json \
+>                 $(SRC_PATH)/qapi/trace.json \
+>                 $(SRC_PATH)/qapi/transaction.json \
+> -               $(SRC_PATH)/qapi/ui.json
+> +               $(SRC_PATH)/qapi/ui.json \
+> +               $(SRC_PATH)/qapi/rdma.json
+
+Please insert between net.json and rocker.json to maintain alphabetical
+order.
+
+>  qapi/qapi-builtin-types.c qapi/qapi-builtin-types.h \
+>  qapi/qapi-types.c qapi/qapi-types.h \
+> diff --git a/Makefile.objs b/Makefile.objs
+> index cc7df3ad80..76d8028f2f 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -21,6 +21,7 @@ util-obj-y += qapi/qapi-types-tpm.o
+>  util-obj-y += qapi/qapi-types-trace.o
+>  util-obj-y += qapi/qapi-types-transaction.o
+>  util-obj-y += qapi/qapi-types-ui.o
+> +util-obj-y += qapi/qapi-types-rdma.o
+>  util-obj-y += qapi/qapi-builtin-visit.o
+>  util-obj-y += qapi/qapi-visit.o
+>  util-obj-y += qapi/qapi-visit-block-core.o
+> @@ -40,6 +41,7 @@ util-obj-y += qapi/qapi-visit-tpm.o
+>  util-obj-y += qapi/qapi-visit-trace.o
+>  util-obj-y += qapi/qapi-visit-transaction.o
+>  util-obj-y += qapi/qapi-visit-ui.o
+> +util-obj-y += qapi/qapi-visit-rdma.o
+>  util-obj-y += qapi/qapi-events.o
+>  util-obj-y += qapi/qapi-events-block-core.o
+>  util-obj-y += qapi/qapi-events-block.o
+> @@ -58,6 +60,7 @@ util-obj-y += qapi/qapi-events-tpm.o
+>  util-obj-y += qapi/qapi-events-trace.o
+>  util-obj-y += qapi/qapi-events-transaction.o
+>  util-obj-y += qapi/qapi-events-ui.o
+> +util-obj-y += qapi/qapi-events-rdma.o
+>  util-obj-y += qapi/qapi-introspect.o
+>  
+>  chardev-obj-y = chardev/
+> @@ -155,6 +158,7 @@ common-obj-y += qapi/qapi-commands-tpm.o
+>  common-obj-y += qapi/qapi-commands-trace.o
+>  common-obj-y += qapi/qapi-commands-transaction.o
+>  common-obj-y += qapi/qapi-commands-ui.o
+> +common-obj-y += qapi/qapi-commands-rdma.o
+>  common-obj-y += qapi/qapi-introspect.o
+>  common-obj-y += qmp.o hmp.o
+>  endif
+
+This is incomplete, and it conflicts with Eric Blake's "[PATCH v3] qapi:
+Reduce Makefile boilerplate".  I recommend to base on Eric's patch,
+because that'll let you add the new rdma.json much more easily.
+
+> diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+> index 65b6dc2f6f..a650d80f83 100644
+> --- a/qapi/qapi-schema.json
+> +++ b/qapi/qapi-schema.json
+> @@ -94,3 +94,4 @@
+>  { 'include': 'trace.json' }
+>  { 'include': 'introspect.json' }
+>  { 'include': 'misc.json' }
+> +{ 'include': 'rdma.json' }
+
+This makes the "RDMA device" section appear last in the QEMU QMP
+reference manual, since they appear in include order there.
+
+    $ grep -h @section bld-x86/qapi/qapi-doc.texi 
+    @section Introduction
+    @section Stability Considerations
+    @section Common data types
+    @section Socket data types
+    @section VM run state
+    @section Cryptography
+    @section Block devices
+    @section Character devices
+    @section Net devices
+    @section Rocker switch device
+    @section TPM (trusted platform module) devices
+    @section Remote desktop
+    @section Input
+    @section Migration
+    @section Transactions
+    @section Tracing
+    @section QMP introspection
+    @section Miscellanea
+    @section RDMA device
+
+It should go next to the other "device" sections, shouldn't it?
+
+> diff --git a/qapi/rdma.json b/qapi/rdma.json
+> new file mode 100644
+> index 0000000000..804c68ab36
+> --- /dev/null
+> +++ b/qapi/rdma.json
+> @@ -0,0 +1,38 @@
+> +# -*- Mode: Python -*-
+> +#
+> +
+> +##
+> +# = RDMA device
+> +##
+> +
+> +##
+> +# @RDMA_GID_STATUS_CHANGED:
+> +#
+> +# Emitted when guest driver adds/deletes GID to/from device
+> +#
+> +# @netdev: RoCE Network Device name - char *
+> +#
+> +# @gid-status: Add or delete indication - bool
+> +#
+> +# @subnet-prefix: Subnet Prefix - uint64
+> +#
+> +# @interface-id : Interface ID - uint64
+> +#
+> +# Since: 3.2
+> +#
+> +# Example:
+> +#
+> +# <- {"timestamp": {"seconds": 1541579657, "microseconds": 986760},
+> +#     "event": "RDMA_GID_STATUS_CHANGED",
+> +#     "data":
+> +#         {"netdev": "bridge0",
+> +#         "interface-id": 15880512517475447892,
+> +#         "gid-status": true,
+> +#         "subnet-prefix": 33022}}
+> +#
+> +##
+> +{ 'event': 'RDMA_GID_STATUS_CHANGED',
+> +  'data': { 'netdev'        : 'str',
+> +            'gid-status'    : 'bool',
+> +            'subnet-prefix' : 'uint64',
+> +            'interface-id'  : 'uint64' } }
+
+Schema looks okay from a QAPI perspective (I know next to nothing about
+RDMA).
