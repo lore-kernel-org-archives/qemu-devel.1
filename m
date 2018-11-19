@@ -1,26 +1,24 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:59808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gOmlR-00010x-LF
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:51:12 -0500
+	(envelope-from <berto@igalia.com>) id 1gOmm2-00010x-IP
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:51:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gOmkt-0005Y9-03
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:50:38 -0500
-Resent-Message-Id: <E1gOmkt-0005Y9-03@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21365)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gOmks-0004WT-Lr
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:50:34 -0500
-In-Reply-To: <20181118203312.5376-1-f4bug@amsat.org>
-Message-ID: <154257499321.4551.1929216374510101910@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <berto@igalia.com>) id 1gOmiI-0000xX-Ps
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 11:47:55 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181116151834.GA5066@localhost.localdomain>
+References: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
+	<w511s7p9fkk.fsf@maestria.local.igalia.com>
+	<462138b3-e9e7-29e5-da55-d0ebd626aee7@redhat.com>
+	<w51efbmh0tp.fsf@maestria.local.igalia.com>
+	<2e1b90ae-1a0c-711a-6ef8-3c814335f696@redhat.com>
+	<w51in0xuksv.fsf@maestria.local.igalia.com>
+	<20181116151834.GA5066@localhost.localdomain>
+Date: Mon, 19 Nov 2018 17:47:48 +0100
+Message-ID: <w51h8gdypxn.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 18 Nov 2018 13:03:14 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] docker: Add
- gentoo-mipsr5900el-cross image
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] KVM Forum block no[td]es
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: f4bug@amsat.org
-Cc: famz@redhat.com, noring@nocrew.org, alex.bennee@linaro.orgfamz@redhat.com, vapier@gentoo.org, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgxMTE4MjAzMzEyLjUzNzYtMS1mNGJ1Z0BhbXNhdC5vcmcKU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0ggMC8yXSBkb2NrZXI6IEFkZCBnZW50b28tbWlwc3I1OTAw
-ZWwtY3Jvc3MgaW1hZ2UKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
-U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
-aWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
-aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
-QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
-LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
-c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
-Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
-bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
-ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKZDUzMGZmNSBzaGlwcGFibGU6IEFkZCB0aGUgbWlwc3I1OTAwZWwg
-bGludXgtdXNlciB0YXJnZXQKMGRhNzgyZCBkb2NrZXI6IEFkZCBnZW50b28tbWlwc3I1OTAwZWwt
-Y3Jvc3MgaW1hZ2UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjogZG9j
-a2VyOiBBZGQgZ2VudG9vLW1pcHNyNTkwMGVsLWNyb3NzIGltYWdlLi4uCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNl
-CiMxNjE6IEZJTEU6IHRlc3RzL2RvY2tlci9kb2NrZXJmaWxlcy9nZW50b28tbWlwc3I1OTAwZWwt
-Y3Jvc3MuZG9ja2VyLmQvZ2NjLXY3LjIuMC1wczItbGxzYy5wYXRjaDoyMzoKKyAkCgpFUlJPUjog
-dHJhaWxpbmcgd2hpdGVzcGFjZQojMTgxOiBGSUxFOiB0ZXN0cy9kb2NrZXIvZG9ja2VyZmlsZXMv
-Z2VudG9vLW1pcHNyNTkwMGVsLWNyb3NzLmRvY2tlci5kL2djYy12Ny4yLjAtcHMyLnBhdGNoOjE0
-OgorICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzNTc6IEZJTEU6IHRlc3RzL2RvY2tl
-ci9kb2NrZXJmaWxlcy9nZW50b28tbWlwc3I1OTAwZWwtY3Jvc3MuZG9ja2VyLmQvZ2NjLXY3LjIu
-MC1wczIucGF0Y2g6MTkwOgorICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzODU6IEZJ
-TEU6IHRlc3RzL2RvY2tlci9kb2NrZXJmaWxlcy9nZW50b28tbWlwc3I1OTAwZWwtY3Jvc3MuZG9j
-a2VyLmQvZ2NjLXY3LjIuMC1wczIucGF0Y2g6MjE4OgorICQKCnRvdGFsOiA0IGVycm9ycywgMSB3
-YXJuaW5ncywgMzM0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMjogc2hpcHBhYmxlOiBBZGQgdGhlIG1pcHNyNTkw
-MGVsIGxpbnV4LXVzZXIgdGFyZ2V0Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
-IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Fri 16 Nov 2018 04:18:34 PM CET, Kevin Wolf wrote:
+> Am 16.11.2018 um 16:03 hat Alberto Garcia geschrieben:
+>> > I don't think anything needs a way to generally block graph changes
+>> > around some node.  We only need to prevent changes to very specific
+>> > sets of edges.  This is something that the permission system just
+>> > cannot do.
+>> 
+>> But what would you do then?
+>
+> I agree with you mostly in that I think that most problems that Max
+> mentioned aren't readl. The only real problem I see with GRAPH_MOD as
+> a permission on the node level is this overblocking - but that's bad
+> enough that I feel using permissions to block changes to a whole node
+> is not a good solution.
+
+I understand that this restriction would be too coarse, but do you have
+any case in mind where this would be a problem, or are you simply
+worried because it's not an elegant solution?
+
+(not that I'm resisting the proposal of using a counter, I'm just
+curious)
+
+> So what's the alternative? Max had a possible solution in the first
+> email in this thread:
+>
+>> - A property of BdrvChild that can be set by a non-parent seems more
+>>   feasible, e.g. a counter where changing the child is possible only
+>>   if the counter is 0.  This also actually makes sense in what it
+>>   means.
+>
+> The commit job would increment BdrvChild.block_change (or whatever we
+> would call it) for all bs->backing edges in the subchain.
+
+So instead of having a permission blocking changes in all of a node's
+links, this would only affect the backing links.
+
+It should work, I can give it a try.
+
+Does it make sense to keep the GRAPH_MOD permission at all if we're not
+really using it and we don't know what it is for? We can just drop it,
+or are we breaking the API or the ABI?
+
+Berto
