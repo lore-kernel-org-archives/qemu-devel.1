@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1gPCqE-0005r1-RX
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:41:55 -0500
+	(envelope-from <kwankhede@nvidia.com>) id 1gPCqJ-0005tb-6b
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:41:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1gPCq9-0003L0-3o
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:41:50 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:10891)
+	(envelope-from <kwankhede@nvidia.com>) id 1gPCqE-0003SW-TJ
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:41:55 -0500
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:10903)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
-	id 1gPCq7-0003ID-8O
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:41:45 -0500
+	id 1gPCqD-0003Q7-3q
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:41:50 -0500
 From: Kirti Wankhede <kwankhede@nvidia.com>
-Date: Wed, 21 Nov 2018 02:09:39 +0530
-Message-ID: <1542746383-18288-2-git-send-email-kwankhede@nvidia.com>
+Date: Wed, 21 Nov 2018 02:09:40 +0530
+Message-ID: <1542746383-18288-3-git-send-email-kwankhede@nvidia.com>
 In-Reply-To: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
 References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/5] VFIO KABI for migration interface
+Subject: [Qemu-devel] [PATCH 2/5] Add save and load functions for VFIO PCI
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,172 +30,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: alex.williamson@redhat.com, cjia@nvidia.com
 Cc: kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com, yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com, cohuck@redhat.com, dgilbert@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com, aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com, Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com, Ken.Xue@amd.com, zhi.a.wang@intel.com, qemu-devel@nongnu.org, Kirti Wankhede <kwankhede@nvidia.com>
 
-- Defined MIGRATION region type and sub-type.
-- Defined VFIO device states during migration process.
-- Defined vfio_device_migration_info structure which will be placed at 0th
-  offset of migration region to get/set VFIO device related information.
-  Defined actions and members of structure usage for each action:
-    * To convey VFIO device state to be transitioned to.
-    * To get pending bytes yet to be migrated for VFIO device
-    * To ask driver to write data to migration region and return number of bytes
-      written in the region
-    * In migration resume path, user space app writes to migration region and
-      communicates it to vendor driver.
-    * Get bitmap of dirty pages from vendor driver from given start address
+Save and restore with MSIX type is not tested.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- linux-headers/linux/vfio.h | 130 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 130 insertions(+)
+ hw/vfio/pci.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/pci.h | 29 ++++++++++++++++++
+ 2 files changed, 124 insertions(+)
 
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 3615a269d378..a6e45cb2cae2 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -301,6 +301,10 @@ struct vfio_region_info_cap_type {
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 6cbb8fa0549d..72daf1a358a0 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1234,6 +1234,101 @@ void vfio_pci_write_config(PCIDevice *pdev,
+     }
+ }
  
-+/* Migration region type and sub-type */
-+#define VFIO_REGION_TYPE_MIGRATION	        (1 << 30)
-+#define VFIO_REGION_SUBTYPE_MIGRATION	        (1)
++void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
++{
++    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
++    PCIDevice *pdev = &vdev->pdev;
++    int i;
++
++    for (i = 0; i < PCI_ROM_SLOT; i++) {
++        uint32_t bar;
++
++        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
++        qemu_put_be32(f, bar);
++    }
++
++    qemu_put_be32(f, vdev->interrupt);
++    if (vdev->interrupt == VFIO_INT_MSI) {
++        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
++        bool msi_64bit;
++
++        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
++                                            2);
++        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
++
++        msi_addr_lo = pci_default_read_config(pdev,
++                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
++        qemu_put_be32(f, msi_addr_lo);
++
++        if (msi_64bit) {
++            msi_addr_hi = pci_default_read_config(pdev,
++                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
++                                             4);
++        }
++        qemu_put_be32(f, msi_addr_hi);
++
++        msi_data = pci_default_read_config(pdev,
++                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
++                2);
++        qemu_put_be32(f, msi_data);
++    } else if (vdev->interrupt == VFIO_INT_MSIX) {
++        msix_save(pdev, f);
++    }
++}
++
++void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
++{
++    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
++    PCIDevice *pdev = &vdev->pdev;
++    uint32_t pci_cmd, interrupt_type;
++    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
++    bool msi_64bit;
++    int i;
++
++    /* retore pci bar configuration */
++    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
++    vfio_pci_write_config(pdev, PCI_COMMAND,
++                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
++    for (i = 0; i < PCI_ROM_SLOT; i++) {
++        uint32_t bar = qemu_get_be32(f);
++
++        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
++    }
++    vfio_pci_write_config(pdev, PCI_COMMAND,
++                          pci_cmd | PCI_COMMAND_IO | PCI_COMMAND_MEMORY, 2);
++
++    interrupt_type = qemu_get_be32(f);
++
++    if (interrupt_type == VFIO_INT_MSI) {
++        /* restore msi configuration */
++        msi_flags = pci_default_read_config(pdev,
++                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
++        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
++
++        vfio_pci_write_config(&vdev->pdev, pdev->msi_cap + PCI_MSI_FLAGS,
++                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
++
++        msi_addr_lo = qemu_get_be32(f);
++        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
++                              msi_addr_lo, 4);
++
++        msi_addr_hi = qemu_get_be32(f);
++        if (msi_64bit) {
++            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
++                                  msi_addr_hi, 4);
++        }
++        msi_data = qemu_get_be32(f);
++        vfio_pci_write_config(pdev,
++                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
++                msi_data, 2);
++
++        vfio_pci_write_config(&vdev->pdev, pdev->msi_cap + PCI_MSI_FLAGS,
++                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
++    } else if (vdev->interrupt == VFIO_INT_MSIX) {
++        msix_load(pdev, f);
++    }
++}
 +
  /*
-  * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
-  * which allows direct access to non-MSIX registers which happened to be within
-@@ -602,6 +606,132 @@ struct vfio_device_ioeventfd {
+  * Interrupt setup
+  */
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index 52b065421a68..890d77d66a6b 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -20,6 +20,7 @@
+ #include "qemu/queue.h"
+ #include "qemu/timer.h"
  
- #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
++#ifdef CONFIG_LINUX
+ #define PCI_ANY_ID (~0)
  
-+/**
-+ * VFIO device states :
-+ * VFIO User space application should set the device state to indicate vendor
-+ * driver in which state the VFIO device should transitioned.
-+ * - VFIO_DEVICE_STATE_NONE:
-+ *   State when VFIO device is initialized but not yet running.
-+ * - VFIO_DEVICE_STATE_RUNNING:
-+ *   Transition VFIO device in running state, that is, user space application or
-+ *   VM is active.
-+ * - VFIO_DEVICE_STATE_MIGRATION_SETUP:
-+ *   Transition VFIO device in migration setup state. This is used to prepare
-+ *   VFIO device for migration while application or VM and vCPUs are still in
-+ *   running state.
-+ * - VFIO_DEVICE_STATE_MIGRATION_PRECOPY:
-+ *   When VFIO user space application or VM is active and vCPUs are running,
-+ *   transition VFIO device in pre-copy state.
-+ * - VFIO_DEVICE_STATE_MIGRATION_STOPNCOPY:
-+ *   When VFIO user space application or VM is stopped and vCPUs are halted,
-+ *   transition VFIO device in stop-and-copy state.
-+ * - VFIO_DEVICE_STATE_MIGRATION_SAVE_COMPLETED:
-+ *   When VFIO user space application has copied data provided by vendor driver.
-+ *   This state is used by vendor driver to clean up all software state that was
-+ *   setup during MIGRATION_SETUP state.
-+ * - VFIO_DEVICE_STATE_MIGRATION_RESUME:
-+ *   Transition VFIO device to resume state, that is, start resuming VFIO device
-+ *   when user space application or VM is not running and vCPUs are halted.
-+ * - VFIO_DEVICE_STATE_MIGRATION_RESUME_COMPLETED:
-+ *   When user space application completes iterations of providing device state
-+ *   data, transition device in resume completed state.
-+ * - VFIO_DEVICE_STATE_MIGRATION_FAILED:
-+ *   Migration process failed due to some reason, transition device to failed
-+ *   state. If migration process fails while saving at source, resume device at
-+ *   source. If migration process fails while resuming application or VM at
-+ *   destination, stop restoration at destination and resume at source.
-+ * - VFIO_DEVICE_STATE_MIGRATION_CANCELLED:
-+ *   User space application has cancelled migration process either for some
-+ *   known reason or due to user's intervention. Transition device to Cancelled
-+ *   state, that is, resume device state as it was during running state at
-+ *   source.
-+ */
-+
-+enum {
-+    VFIO_DEVICE_STATE_NONE,
-+    VFIO_DEVICE_STATE_RUNNING,
-+    VFIO_DEVICE_STATE_MIGRATION_SETUP,
-+    VFIO_DEVICE_STATE_MIGRATION_PRECOPY,
-+    VFIO_DEVICE_STATE_MIGRATION_STOPNCOPY,
-+    VFIO_DEVICE_STATE_MIGRATION_SAVE_COMPLETED,
-+    VFIO_DEVICE_STATE_MIGRATION_RESUME,
-+    VFIO_DEVICE_STATE_MIGRATION_RESUME_COMPLETED,
-+    VFIO_DEVICE_STATE_MIGRATION_FAILED,
-+    VFIO_DEVICE_STATE_MIGRATION_CANCELLED,
-+};
-+
-+/**
-+ * Structure vfio_device_migration_info is placed at 0th offset of
-+ * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
-+ * information.
-+ *
-+ * Action Set state:
-+ *      To tell vendor driver the state VFIO device should be transitioned to.
-+ *      device_state [input] : User space app sends device state to vendor
-+ *           driver on state change, the state to which VFIO device should be
-+ *           transitioned to.
-+ *
-+ * Action Get pending bytes:
-+ *      To get pending bytes yet to be migrated from vendor driver
-+ *      pending.threshold_size [Input] : threshold of buffer in User space app.
-+ *      pending.precopy_only [output] : pending data which must be migrated in
-+ *          precopy phase or in stopped state, in other words - before target
-+ *          user space application or VM start. In case of migration, this
-+ *          indicates pending bytes to be transfered while application or VM or
-+ *          vCPUs are active and running.
-+ *      pending.compatible [output] : pending data which may be migrated any
-+ *          time , either when application or VM is active and vCPUs are active
-+ *          or when application or VM is halted and vCPUs are halted.
-+ *      pending.postcopy_only [output] : pending data which must be migrated in
-+ *           postcopy phase or in stopped state, in other words - after source
-+ *           application or VM stopped and vCPUs are halted.
-+ *      Sum of pending.precopy_only, pending.compatible and
-+ *      pending.postcopy_only is the whole amount of pending data.
-+ *
-+ * Action Get buffer:
-+ *      On this action, vendor driver should write data to migration region and
-+ *      return number of bytes written in the region.
-+ *      data.offset [output] : offset in the region from where data is written.
-+ *      data.size [output] : number of bytes written in migration buffer by
-+ *          vendor driver.
-+ *
-+ * Action Set buffer:
-+ *      In migration resume path, user space app writes to migration region and
-+ *      communicates it to vendor driver with this action.
-+ *      data.offset [Input] : offset in the region from where data is written.
-+ *      data.size [Input] : number of bytes written in migration buffer by
-+ *          user space app.
-+ *
-+ * Action Get dirty pages bitmap:
-+ *      Get bitmap of dirty pages from vendor driver from given start address.
-+ *      dirty_pfns.start_addr [Input] : start address
-+ *      dirty_pfns.total [Input] : Total pfn count from start_addr for which
-+ *          dirty bitmap is requested
-+ *      dirty_pfns.copied [Output] : pfn count for which dirty bitmap is copied
-+ *          to migration region.
-+ *      Vendor driver should copy the bitmap with bits set only for pages to be
-+ *      marked dirty in migration region.
-+ */
-+
-+struct vfio_device_migration_info {
-+        __u32 device_state;         /* VFIO device state */
-+        struct {
-+            __u64 precopy_only;
-+            __u64 compatible;
-+            __u64 postcopy_only;
-+            __u64 threshold_size;
-+        } pending;
-+        struct {
-+            __u64 offset;           /* offset */
-+            __u64 size;             /* size */
-+        } data;
-+        struct {
-+            __u64 start_addr;
-+            __u64 total;
-+            __u64 copied;
-+        } dirty_pfns;
-+} __attribute__((packed));
-+
- /* -------- API for Type1 VFIO IOMMU -------- */
+ struct VFIOPCIDevice;
+@@ -198,4 +199,32 @@ void vfio_display_reset(VFIOPCIDevice *vdev);
+ int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
+ void vfio_display_finalize(VFIOPCIDevice *vdev);
  
- /**
++void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f);
++void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f);
++
++static inline Object *vfio_pci_get_object(VFIODevice *vbasedev)
++{
++    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
++
++    return OBJECT(vdev);
++}
++
++#else
++static inline void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
++{
++    g_assert(false);
++}
++
++static inline void vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
++{
++    g_assert(false);
++}
++
++static inline Object *vfio_pci_get_object(VFIODevice *vbasedev)
++{
++    return NULL;
++}
++
++#endif
++
+ #endif /* HW_VFIO_VFIO_PCI_H */
 -- 
 2.7.0
