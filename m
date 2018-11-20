@@ -1,21 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP2IT-00053I-0l
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:26:17 -0500
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1gP2W4-0005Tn-Ic
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:40:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP2IO-0002bd-W4
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:26:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59770)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gP2IM-0002a0-Ba
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:26:11 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Tue, 20 Nov 2018 10:25:41 +0100
-Message-Id: <20181120092542.13102-9-david@redhat.com>
-In-Reply-To: <20181120092542.13102-1-david@redhat.com>
-References: <20181120092542.13102-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 8/9] test-string-input-visitor: Split off
- uint64 list tests
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1gP2W3-00086K-O7
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:40:20 -0500
+Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:55489)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1gP2W3-00085h-Bv
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:40:19 -0500
+Received: by mail-it1-x141.google.com with SMTP id o19so2371038itg.5
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 01:40:19 -0800 (PST)
+MIME-Version: 1.0
+References: <1539939312-19713-1-git-send-email-hongbo.zhang@linaro.org>
+	<1539939312-19713-2-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA-vF5orNpfGFe2sGWh=TxWL054PmCM-Yu4faJne+4CkbA@mail.gmail.com>
+	<CAHmQWvD1ocAfZo=9aJYeuVDWrBk=AF_D-AgHriYb3-7=n+rR6A@mail.gmail.com>
+	<20181116122705.msdb5hydmhtyzzxy@sirius.home.kraxel.org>
+	<CAKv+Gu8QXaRioVPNze_+mJg4aqjJmwn4O-1jdRcYwrkieXrBwQ@mail.gmail.com>
+	<20181119124423.qj3sjhhdyetrbju5@bivouac.eciton.net>
+	<CAKv+Gu_-U8BHthhen-GBkium9qJMdd-pe_PB9TPdUaP=koeajQ@mail.gmail.com>
+	<20181119164421.me2j4fwzo43aghaa@bivouac.eciton.net>
+	<CAKv+Gu9VjERXDdb=ZkvzVocL4Fd3_2e+F=H0nqEJVs4UEkYmhw@mail.gmail.com>
+	<20181120081613.bezcjotqhmqflvvb@sirius.home.kraxel.org>
+	<CAHmQWvDua+3fXT7wA2j7wDRbOi5VJWfMa_+YYt6Xjv9XZF1Skg@mail.gmail.com>
+In-Reply-To: <CAHmQWvDua+3fXT7wA2j7wDRbOi5VJWfMa_+YYt6Xjv9XZF1Skg@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Tue, 20 Nov 2018 10:40:07 +0100
+Message-ID: <CAKv+Gu_hMyn0g0hV9z1nZY+neGKg_7Rjm_cS-u33HkGQra_6ng@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4] hw/arm: Add arm SBSA reference machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,162 +39,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Hongbo Zhang <hongbo.zhang@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Leif Lindholm <leif.lindholm@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-Basically copy all int64 list tests but adapt them to work on uint64
-instead. The values for very big/very small values have to be adapted.
+On Tue, 20 Nov 2018 at 09:49, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+>
+> On Tue, 20 Nov 2018 at 16:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >
+> >   Hi,
+> >
+> > > > But I assume you specifically want things that do a lot of DMA, so I
+> > > > couldn't get away with asking for keeping it to the SBSA UART(s)? :)
+> > >
+> > > Ideally, it would be something that supports platform MSIs as well,
+> > > but that is unlikely to be a priority for anyone (and i would be very
+> > > surprised if any of QEMU's sysbus host controllers implement that at
+> > > the moment)
+> > >
+> > > I can live with just sysbus AHCI, though, if EHCI/XHCI are too cumbersome.
+> >
+> > Generic sysbus ehci should not be difficuilt, 10 lines patch or so.
+> >
+> > Gives you only usb2 though.  usb1 devices are handled either via ohci
+> > companion controller (should be doable), or via integrated usb2 hub
+> > (more common on recent hardware, but qemu usb-hub is usb1 only).
+> >
+> > Generic sysbus xhci would be more work.  But you'll get usb 1+2+3
+> > support.  And wiring up platform MSIs should be possible too.
+> >
+> In kernel, these drivers are enabled by default:
+> CONFIG_USB_XHCI_PLATFORM=y
+> CONFIG_USB_EHCI_HCD_PLATFORM=y
+> CONFIG_USB_OHCI_HCD_PLATFORM=y
+>
+> If we do generic EHCI or XHCI in qemu, can the driver in kernel work
+> with it? (I guess yes?)
+> My thought is if the available kernel driver will work without any
+> change, then we can create it in qemu.
+>
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- tests/test-string-input-visitor.c | 113 ++++++++++++++++++++++++++++--
- 1 file changed, 109 insertions(+), 4 deletions(-)
+Yes that should work. Our MacchiatoBin DSDT has the following for its
+XHCI controllers:
 
-diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-index 718d9a03c3..9b1dd44b2d 100644
---- a/tests/test-string-input-visitor.c
-+++ b/tests/test-string-input-visitor.c
-@@ -112,7 +112,6 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     int64_t expect2[] = { 32767, -32768, -32767 };
-     int64_t expect3[] = { INT64_MIN, INT64_MAX };
-     int64_t expect4[] = { 1 };
--    uint64_t expect5[] = { UINT64_MAX };
-     Error *err = NULL;
-     int64List *res = NULL;
-     Visitor *v;
-@@ -133,9 +132,6 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     v = visitor_input_test_init(data, "1-1");
-     check_ilist(v, expect4, ARRAY_SIZE(expect4));
- 
--    v = visitor_input_test_init(data, "18446744073709551615");
--    check_ulist(v, expect5, ARRAY_SIZE(expect5));
--
-     /* Value too large */
- 
-     v = visitor_input_test_init(data, "9223372036854775808");
-@@ -211,6 +207,113 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     visit_end_list(v, NULL);
- }
- 
-+static void test_visitor_in_uintList(TestInputVisitorData *data,
-+                                     const void *unused)
-+{
-+    uint64_t expect1[] = { 1, 2, 0, 2, 3, 4, 20, 5, 6, 7,
-+                           8, 9, 1, 2, 3, 4, 5, 6, 7, 8 };
-+    uint64_t expect2[] = { 32767, -32768, -32767 };
-+    uint64_t expect3[] = { INT64_MIN, INT64_MAX };
-+    uint64_t expect4[] = { 1 };
-+    uint64_t expect5[] = { UINT64_MAX };
-+    Error *err = NULL;
-+    uint64List *res = NULL;
-+    Visitor *v;
-+    uint64_t val;
-+
-+    /* Valid lists */
-+
-+    v = visitor_input_test_init(data, "1,2,0,2-4,20,5-9,1-8");
-+    check_ulist(v, expect1, ARRAY_SIZE(expect1));
-+
-+    v = visitor_input_test_init(data, "32767,-32768--32767");
-+    check_ulist(v, expect2, ARRAY_SIZE(expect2));
-+
-+    v = visitor_input_test_init(data,
-+                                "-9223372036854775808,9223372036854775807");
-+    check_ulist(v, expect3, ARRAY_SIZE(expect3));
-+
-+    v = visitor_input_test_init(data, "1-1");
-+    check_ulist(v, expect4, ARRAY_SIZE(expect4));
-+
-+    v = visitor_input_test_init(data, "18446744073709551615");
-+    check_ulist(v, expect5, ARRAY_SIZE(expect5));
-+
-+    /* Value too large */
-+
-+    v = visitor_input_test_init(data, "18446744073709551616");
-+    visit_type_uint64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!res);
-+
-+    /* Value too small */
-+
-+    v = visitor_input_test_init(data, "-18446744073709551616");
-+    visit_type_uint64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!res);
-+
-+    /* Range not ascending */
-+
-+    v = visitor_input_test_init(data, "3-1");
-+    visit_type_uint64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!res);
-+
-+    v = visitor_input_test_init(data, "18446744073709551615-0");
-+    visit_type_uint64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!res);
-+
-+    /* Range too big (65536 is the limit against DOS attacks) */
-+
-+    v = visitor_input_test_init(data, "0-65536");
-+    visit_type_uint64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!res);
-+
-+    /* Empty list */
-+
-+    v = visitor_input_test_init(data, "");
-+    visit_type_uint64List(v, NULL, &res, &error_abort);
-+    g_assert(!res);
-+
-+    /* Not a list */
-+
-+    v = visitor_input_test_init(data, "not an uint list");
-+
-+    visit_type_uint64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!res);
-+
-+    /* Unvisited list tail */
-+
-+    v = visitor_input_test_init(data, "0,2-3");
-+
-+    visit_start_list(v, NULL, NULL, 0, &error_abort);
-+    visit_type_uint64(v, NULL, &val, &error_abort);
-+    g_assert_cmpuint(val, ==, 0);
-+    visit_type_uint64(v, NULL, &val, &error_abort);
-+    g_assert_cmpuint(val, ==, 2);
-+
-+    visit_check_list(v, &err);
-+    error_free_or_abort(&err);
-+    visit_end_list(v, NULL);
-+
-+    /* Visit beyond end of list */
-+
-+    v = visitor_input_test_init(data, "0");
-+
-+    visit_start_list(v, NULL, NULL, 0, &error_abort);
-+    visit_type_uint64(v, NULL, &val, &err);
-+    g_assert_cmpuint(val, ==, 0);
-+    visit_type_uint64(v, NULL, &val, &err);
-+    error_free_or_abort(&err);
-+
-+    visit_check_list(v, &error_abort);
-+    visit_end_list(v, NULL);
-+}
-+
- static void test_visitor_in_bool(TestInputVisitorData *data,
-                                  const void *unused)
- {
-@@ -384,6 +487,8 @@ int main(int argc, char **argv)
-                            &in_visitor_data, test_visitor_in_int);
-     input_visitor_test_add("/string-visitor/input/intList",
-                            &in_visitor_data, test_visitor_in_intList);
-+    input_visitor_test_add("/string-visitor/input/uintList",
-+                           &in_visitor_data, test_visitor_in_uintList);
-     input_visitor_test_add("/string-visitor/input/bool",
-                            &in_visitor_data, test_visitor_in_bool);
-     input_visitor_test_add("/string-visitor/input/number",
--- 
-2.17.2
+Device (XHC0)
+{
+    Name (_HID, "PNP0D10")      // _HID: Hardware ID
+    Name (_UID, 0x00)           // _UID: Unique ID
+    Name (_CCA, 0x01)           // _CCA: Cache Coherency Attribute
+
+    Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+    {
+        Memory32Fixed (ReadWrite,
+            0xF2500000,         // Address Base (MMIO)
+            0x00004000,         // Address Length
+            )
+        Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive, ,, )
+        {
+          CP_GIC_SPI_CP0_USB_H0
+        }
+    })
+}
+
+and this gets picked up by the kernel without problems.
+
+Wiring up platform MSIs would involve modifying the IORT as well,
+which is one of the reasons I'd prefer to make these fixed devices: we
+cannot rely on qemu_fw_cfg to generate it for us, and adding a lot of
+new code to generate this on the fly is simply not worth the effort.
