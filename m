@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1gPCqq-0006Lh-Ux
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:42:33 -0500
+	(envelope-from <armbru@redhat.com>) id 1gPCuV-0001d5-81
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:46:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1gPCqc-00044a-Rn
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:42:23 -0500
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:4291)
+	(envelope-from <armbru@redhat.com>) id 1gPCuR-0000lI-13
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:46:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
-	id 1gPCqZ-0003yY-2D
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:42:12 -0500
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Date: Wed, 21 Nov 2018 02:09:43 +0530
-Message-ID: <1542746383-18288-6-git-send-email-kwankhede@nvidia.com>
-In-Reply-To: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
-References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gPCuO-0000fF-Uy
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:46:10 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181120092542.13102-1-david@redhat.com>
+	<20181120092542.13102-6-david@redhat.com>
+	<27cfb4e6-b4db-10de-02c7-691f011d5f99@redhat.com>
+	<f5dd77c5-8d40-fe95-4fc8-69aa96fa4f13@redhat.com>
+	<0a72b07b-3620-7728-4248-8cd7c0112489@redhat.com>
+Date: Tue, 20 Nov 2018 21:46:01 +0100
+In-Reply-To: <0a72b07b-3620-7728-4248-8cd7c0112489@redhat.com> (Eric Blake's
+	message of "Tue, 20 Nov 2018 11:26:39 -0600")
+Message-ID: <87efbf7a0m.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 5/5] Make vfio-pci device migration capable.
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 5/9] test-string-input-visitor: Add more
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,80 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.williamson@redhat.com, cjia@nvidia.com
-Cc: kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com, yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com, cohuck@redhat.com, dgilbert@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com, aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com, Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com, Ken.Xue@amd.com, zhi.a.wang@intel.com, qemu-devel@nongnu.org, Kirti Wankhede <kwankhede@nvidia.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Call vfio_migration_probe() and vfio_migration_finalize() functions for
-vfio-pci device to enable migration for vfio PCI device.
-Removed vfio_pci_vmstate structure.
+Eric Blake <eblake@redhat.com> writes:
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
----
- hw/vfio/pci.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+> On 11/20/18 11:20 AM, Eric Blake wrote:
+>> On 11/20/18 11:06 AM, Eric Blake wrote:
+>>> On 11/20/18 3:25 AM, David Hildenbrand wrote:
+>>>> Test that very big/small values are not accepted and that ranges with
+>>>> only one element work. Also test that ranges are ascending and cannot
+>>>> have more than 65536 elements.
+>>>>
+>>>> Rename expect4 to expect5, as we will be moving that to a separate uli=
+st
+>>>> test after the rework.
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>> =C2=A0 tests/test-string-input-visitor.c | 41 ++++++++++++++++++++++++=
++++++--
+>>>> =C2=A0 1 file changed, 39 insertions(+), 2 deletions(-)
+>>>>
+>>>
+>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>
+>> Do we also want to test garbage strings like:
+>>
+>> "1-" (incomplete range)
+>> "1X-2" (garbage suffix on first element)
+>> "1-2X" (garbage suffix on second element)
+>>
+>> and/or
+>>
+>> "-2--1" (valid range of signed integers)
+>> "-1--2" (questionable whether this is valid for the two largest
+>> unsigned integers)
+>
+> Or even " 1- 2" (we permit leading whitespace for plain integers - do
+> we also permit it in both sides of a range)?  Also, if we permit
+> whitespace after the range '-', should we permit it beforehand?
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 72daf1a358a0..0f9d06981b1b 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2930,6 +2930,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-     vdev->vbasedev.ops = &vfio_pci_ops;
-     vdev->vbasedev.type = VFIO_DEVICE_TYPE_PCI;
-     vdev->vbasedev.dev = &vdev->pdev.qdev;
-+    vdev->vbasedev.device_state = VFIO_DEVICE_STATE_NONE;
- 
-     tmp = g_strdup_printf("%s/iommu_group", vdev->vbasedev.sysfsdev);
-     len = readlink(tmp, group_path, sizeof(group_path));
-@@ -3141,10 +3142,11 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-         }
-     }
- 
-+    ret = vfio_migration_probe(&vdev->vbasedev, errp);
-+
-     vfio_register_err_notifier(vdev);
-     vfio_register_req_notifier(vdev);
-     vfio_setup_resetfn_quirk(vdev);
--
-     return;
- 
- out_teardown:
-@@ -3180,6 +3182,8 @@ static void vfio_exitfn(PCIDevice *pdev)
- {
-     VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
- 
-+    vdev->vbasedev.device_state = VFIO_DEVICE_STATE_NONE;
-+
-     vfio_unregister_req_notifier(vdev);
-     vfio_unregister_err_notifier(vdev);
-     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-@@ -3189,6 +3193,7 @@ static void vfio_exitfn(PCIDevice *pdev)
-     }
-     vfio_teardown_msi(vdev);
-     vfio_bars_exit(vdev);
-+    vfio_migration_finalize(&vdev->vbasedev);
- }
- 
- static void vfio_pci_reset(DeviceState *dev)
-@@ -3294,11 +3299,6 @@ static Property vfio_pci_dev_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--static const VMStateDescription vfio_pci_vmstate = {
--    .name = "vfio-pci",
--    .unmigratable = 1,
--};
--
- static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -3306,7 +3306,6 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
- 
-     dc->reset = vfio_pci_reset;
-     dc->props = vfio_pci_dev_properties;
--    dc->vmsd = &vfio_pci_vmstate;
-     dc->desc = "VFIO-based PCI device assignment";
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-     pdc->realize = vfio_realize;
--- 
-2.7.0
+For what it's worth, the tests for integers (as opposed to ranges)
+aren't that thorough, either.  test-cutils.c already provides cover for
+them, but not for ranges.
+
+> These sorts of questions may be fine in followup patches.
+
+David is doing me a favor with these patches.  The tests feel good
+enough, I don't want to hold these patches hostage to extort more.
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
