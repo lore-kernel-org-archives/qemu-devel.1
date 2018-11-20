@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gP2mU-0004hR-6E
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:57:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gP2xr-0000JJ-Ke
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 05:09:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gP2mR-0003n5-31
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:57:18 -0500
-Date: Tue, 20 Nov 2018 10:57:07 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181120105707.2778660d.cohuck@redhat.com>
-In-Reply-To: <20181119110548.812-1-cohuck@redhat.com>
-References: <20181119110548.812-1-cohuck@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gP2xq-0006XR-Ez
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 05:09:03 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37978)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gP2xm-0006T0-MH
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 05:09:00 -0500
+Received: by mail-oi1-x242.google.com with SMTP id a77so1039931oii.5
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 02:08:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0] s390x: introduce 4.0 compat machine
+In-Reply-To: <CAHmME9qhe0ZemTkc2jkEO=_hu6PhvKUKGHC9QYTj2j+QHhNf8g@mail.gmail.com>
+References: <CAHmME9qhe0ZemTkc2jkEO=_hu6PhvKUKGHC9QYTj2j+QHhNf8g@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Nov 2018 10:08:33 +0000
+Message-ID: <CAFEAcA8fYaKTZkLR8Ja3P590bSWy1cu61-gSxyf6+wXCfCLoxA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] more serial ports on arm?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,16 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Mon, 19 Nov 2018 12:05:48 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+On 19 November 2018 at 23:46, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> Hey guys,
+>
+> I sort of lost track of the discussion, but what ever happened to
+> adding an extra serial port to the arm virt machine? I'm still
+> carrying around the attached patch to run build.wireguard.com and I'd
+> of course like to see a real solution upstream.
 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c | 17 ++++++++++++++++-
->  include/hw/compat.h        |  3 +++
->  2 files changed, 19 insertions(+), 1 deletion(-)
+It's still stuck, because unconditionally adding a second serial
+port to the virt board breaks some commonly used existing guest
+code (UEFI + Linux), and it's not clear to me what the best
+command line UI is for allowing the user to request the second
+serial port.
 
-Queued to s390-next.
+thanks
+-- PMM
