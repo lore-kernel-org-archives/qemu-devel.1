@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gP0mc-0003ID-8g
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 02:49:19 -0500
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gP0mo-0003Ns-3R
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 02:49:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gP0mY-0001ln-Jz
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 02:49:18 -0500
-Received: from mga11.intel.com ([192.55.52.93]:58423)
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1gP0mk-00026v-VQ
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 02:49:30 -0500
+Received: from mga02.intel.com ([134.134.136.20]:38756)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
-	id 1gP0mY-0001kR-9v
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 02:49:14 -0500
+	id 1gP0mk-0001Dm-Ku
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 02:49:26 -0500
 From: Zhang Yi <yi.z.zhang@linux.intel.com>
-Date: Tue, 20 Nov 2018 15:48:48 +0800
-Message-Id: <c626bc9398250711f4635f95a9a82b7a3855dc7a.1542699775.git.yi.z.zhang@linux.intel.com>
-In-Reply-To: <cover.1542699775.git.yi.z.zhang@linux.intel.com>
-References: <cover.1542699775.git.yi.z.zhang@linux.intel.com>
-Subject: [Qemu-devel] [PATCH V5_resend 6/7] hostmem: add more information in
- error messages
+Date: Tue, 20 Nov 2018 15:47:58 +0800
+Message-Id: <cover.1542699775.git.yi.z.zhang@linux.intel.com>
+Subject: [Qemu-devel] [PATCH V5_resend 0/7] nvdimm: support MAP_SYNC for
+ memory-backend-file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +26,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: xiaoguangrong.eric@gmail.com, dan.j.williams@intel.com, stefanha@redhat.com, pbonzini@redhat.com, yu.c.zhang@linux.intel.com
 Cc: mst@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com, ehabkost@redhat.com, Zhang Yi <yi.z.zhang@linux.intel.com>
 
-When there are multiple memory backends in use, including the object type
-name, ID and the property name in the error message can help users to
-locate the error.
+Linux 4.15 introduces a new mmap flag MAP_SYNC, which can be used to
+guarantee the write persistence to mmap'ed files supporting DAX (e.g.,
+files on ext4/xfs file system mounted with '-o dax').
 
-Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
----
- backends/hostmem-file.c | 6 ++++--
- backends/hostmem.c      | 8 +++++---
- 2 files changed, 9 insertions(+), 5 deletions(-)
+A description of MAP_SYNC and MAP_SHARED_VALIDATE can be found at
+    https://patchwork.kernel.org/patch/10028151/
 
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index e640749..0dd7a90 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -82,7 +82,8 @@ static void set_mem_path(Object *o, const char *str, Error **errp)
-     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
- 
-     if (host_memory_backend_mr_inited(backend)) {
--        error_setg(errp, "cannot change property value");
-+        error_setg(errp, "cannot change property 'mem-path' of %s",
-+                   object_get_typename(o));
-         return;
-     }
-     g_free(fb->mem_path);
-@@ -120,7 +121,8 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
-     uint64_t val;
- 
-     if (host_memory_backend_mr_inited(backend)) {
--        error_setg(&local_err, "cannot change property value");
-+        error_setg(&local_err, "cannot change property '%s' of %s",
-+                   name, object_get_typename(o));
-         goto out;
-     }
- 
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 1a89342..e2bcf9f 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -47,7 +47,8 @@ host_memory_backend_set_size(Object *obj, Visitor *v, const char *name,
-     uint64_t value;
- 
-     if (host_memory_backend_mr_inited(backend)) {
--        error_setg(&local_err, "cannot change property value");
-+        error_setg(&local_err, "cannot change property %s of %s ",
-+                   name, object_get_typename(obj));
-         goto out;
-     }
- 
-@@ -56,8 +57,9 @@ host_memory_backend_set_size(Object *obj, Visitor *v, const char *name,
-         goto out;
-     }
-     if (!value) {
--        error_setg(&local_err, "Property '%s.%s' doesn't take value '%"
--                   PRIu64 "'", object_get_typename(obj), name, value);
-+        error_setg(&local_err,
-+                   "property '%s' of %s doesn't take value '%" PRIu64 "'",
-+                   name, object_get_typename(obj), value);
-         goto out;
-     }
-     backend->size = value;
+In order to make sure that the file metadata is in sync after a fault 
+while we are writing a shared DAX supporting backend files, this
+patch-set enables QEMU to use MAP_SYNC flag for memory-backend-dax-file.
+
+As the DAX vs DMA truncated issue was solved, we refined the code and
+send out this feature for the v5 version.
+
+A new auto on/off option 'sync' is added to memory-backend-file:
+ - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+        'share=off', QEMU will abort
+ - off: never pass MAP_SYNC to mmap(2)
+ - auto (default): if MAP_SYNC is supported and 'share=on', work as if
+        'sync=on'; otherwise, work as if 'sync=off'
+
+Zhang Yi (7):
+  numa: Fixed the memory leak of numa error message
+  util/mmap-alloc: switch qemu_ram_mmap() to 'flags' parameter
+  exec: switch qemu_ram_alloc_from_{file, fd} to the 'flags' parameter
+  util/mmap-alloc: support MAP_SYNC in qemu_ram_mmap()
+  util/mmap-alloc: Switch the RAM_SYNC flags to OnOffAuto
+  hostmem: add more information in error messages
+  hostmem-file: add 'sync' option
+
+ backends/hostmem-file.c               | 45 +++++++++++++++++++++++++++++++++--
+ backends/hostmem.c                    |  8 ++++---
+ docs/nvdimm.txt                       | 20 +++++++++++++++-
+ exec.c                                |  9 +++----
+ include/exec/memory.h                 | 18 ++++++++++++++
+ include/exec/ram_addr.h               |  1 +
+ include/qemu/mmap-alloc.h             | 20 +++++++++++++++-
+ include/standard-headers/linux/mman.h | 44 ++++++++++++++++++++++++++++++++++
+ numa.c                                |  1 +
+ qemu-options.hx                       | 22 ++++++++++++++++-
+ util/mmap-alloc.c                     | 26 ++++++++++++++++----
+ util/oslib-posix.c                    |  4 +++-
+ 12 files changed, 200 insertions(+), 18 deletions(-)
+ create mode 100644 include/standard-headers/linux/mman.h
+
 -- 
 2.7.4
