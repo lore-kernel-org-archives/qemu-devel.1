@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gPCn2-0004Lo-QU
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:38:33 -0500
+	(envelope-from <eblake@redhat.com>) id 1gPCpk-0005aS-Ud
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:41:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gPCn0-0007ay-Nj
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:38:32 -0500
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:43308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gPCmy-0007Up-M0
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:38:30 -0500
-Received: by mail-lj1-x243.google.com with SMTP id 83-v6so2818503ljf.10
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 12:38:26 -0800 (PST)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 20 Nov 2018 12:38:11 -0800
-Message-Id: <20181120203811.18406-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH] target/xtensa: xtfpga: provide default memory
- sizes
+	(envelope-from <eblake@redhat.com>) id 1gPCpg-0002qN-QT
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:41:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57298)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gPCpg-0002pc-KN
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:41:16 -0500
+References: <20181120092542.13102-1-david@redhat.com>
+	<20181120092542.13102-3-david@redhat.com>
+	<7d8d4e4f-bb70-5047-4e37-ed3672c89e02@redhat.com>
+	<87va4r7aou.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <64d0f403-2dd3-2841-b346-7634f37cf5b8@redhat.com>
+Date: Tue, 20 Nov 2018 14:41:12 -0600
+MIME-Version: 1.0
+In-Reply-To: <87va4r7aou.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/9] cutils: Fix qemu_strtosz() &
+ friends to reject non-finite sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Provide default RAM sizes for all XTFPGA boards, so that when started
-without -m option they do the right thing.
+On 11/20/18 2:31 PM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+> 
+>> On 11/20/18 3:25 AM, David Hildenbrand wrote:
+>>> qemu_strtosz() & friends reject NaNs, but happily accept inifities.
+>>
+>> s/inifities/infinities/
+>>
+>>> They shouldn't. Fix that.
+>>>
+>>> The fix makes use of qemu_strtod_finite(). To avoid ugly casts,
+>>> change the @end parameter of qemu_strtosz() & friends from char **
+>>> to const char **.
+>>>
+>>> Also, add two test cases, testing that "inf" and "NaN" are properly
+>>> rejected.
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>    include/qemu/cutils.h |  6 +++---
+>>>    monitor.c             |  2 +-
+>>>    tests/test-cutils.c   | 24 +++++++++++++++++-------
+>>>    util/cutils.c         | 16 +++++++---------
+>>>    4 files changed, 28 insertions(+), 20 deletions(-)
+>>>
+>>
+>>> +++ b/util/cutils.c
+>>> @@ -206,20 +206,18 @@ static int64_t suffix_mul(char suffix, int64_t unit)
+>>>     * in *end, if not NULL. Return -ERANGE on overflow, Return -EINVAL on
+>>
+>> Pre-existing, but since you're touching this area: the second 'Return'
+>> is unusual capitalization for being mid-sentence.  You could even
+>> s/Return/of/
+> 
+> "of"?
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
- hw/xtensa/xtfpga.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+"or" (ouch - wrong time for my fingers to be slipping on the keyboard)
 
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index b3161de32093..7c1421d5beb4 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -568,6 +568,7 @@ static void xtfpga_lx60_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_lx60_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-+    mc->default_ram_size = 64 * MiB;
- }
- 
- static const TypeInfo xtfpga_lx60_type = {
-@@ -584,6 +585,7 @@ static void xtfpga_lx60_nommu_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_lx60_nommu_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-+    mc->default_ram_size = 64 * MiB;
- }
- 
- static const TypeInfo xtfpga_lx60_nommu_type = {
-@@ -600,6 +602,7 @@ static void xtfpga_lx200_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_lx200_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-+    mc->default_ram_size = 96 * MiB;
- }
- 
- static const TypeInfo xtfpga_lx200_type = {
-@@ -616,6 +619,7 @@ static void xtfpga_lx200_nommu_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_lx200_nommu_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-+    mc->default_ram_size = 96 * MiB;
- }
- 
- static const TypeInfo xtfpga_lx200_nommu_type = {
-@@ -632,6 +636,7 @@ static void xtfpga_ml605_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_ml605_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-+    mc->default_ram_size = 256 * MiB;
- }
- 
- static const TypeInfo xtfpga_ml605_type = {
-@@ -648,6 +653,7 @@ static void xtfpga_ml605_nommu_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_ml605_nommu_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-+    mc->default_ram_size = 256 * MiB;
- }
- 
- static const TypeInfo xtfpga_ml605_nommu_type = {
-@@ -664,6 +670,7 @@ static void xtfpga_kc705_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_kc705_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-+    mc->default_ram_size = 1 * GiB;
- }
- 
- static const TypeInfo xtfpga_kc705_type = {
-@@ -680,6 +687,7 @@ static void xtfpga_kc705_nommu_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_kc705_nommu_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-+    mc->default_ram_size = 256 * MiB;
- }
- 
- static const TypeInfo xtfpga_kc705_nommu_type = {
+
+>> It's some hairy code to think about, but I can't find anything wrong
+>> with it.  Typo fixes are minor, so
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> Thanks for your analysis, Eric.
+> 
+> With the typo fixes:
+
+Including the fix of my attempt at a typo fix :)
+
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
+
 -- 
-2.11.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
