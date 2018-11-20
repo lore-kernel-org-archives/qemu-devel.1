@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gP94q-00008e-Vn
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:40:42 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gP9G9-0003ZB-Mi
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:52:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gP94m-0005Mr-B0
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:40:39 -0500
-Date: Tue, 20 Nov 2018 17:40:10 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181120174010.3999adda@redhat.com>
-In-Reply-To: <20181107123652.23417-6-marcandre.lureau@redhat.com>
-References: <20181107123652.23417-1-marcandre.lureau@redhat.com>
-	<20181107123652.23417-6-marcandre.lureau@redhat.com>
+	(envelope-from <sgarzare@redhat.com>) id 1gP9G5-0007eo-PC
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:52:21 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:36032)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gP9G5-0007SN-Iq
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:52:17 -0500
+Received: by mail-qk1-f196.google.com with SMTP id o125so3267314qkf.3
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 08:52:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 05/14] qdev: move
- qdev_prop_register_global_list() to tests
+References: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
+	<20181119084855.uyira2lpu73mu2fo@sirius.home.kraxel.org>
+	<CAGxU2F4O4aKzrJky7EFeWaHFuBKPwi_Z-j7G7m+ENRojVG_5vA@mail.gmail.com>
+	<20181119130713.GB6443@stefanha-x1.localdomain>
+	<20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
+	<CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
+	<20181120155500.GA29471@morn.lan>
+	<03cf3bbc-d557-1c12-dd2b-6acf7934db3c@silicom-usa.com>
+In-Reply-To: <03cf3bbc-d557-1c12-dd2b-6acf7934db3c@silicom-usa.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Tue, 20 Nov 2018 17:51:58 +0100
+Message-ID: <CAGxU2F4FtdLb-aWCS_9E7kLGDdgR0-QT_KQpkNs6Zhucv6PF9g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [SeaBIOS]  SeaBIOS booting time optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,116 +34,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, dgilbert@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: stephend@silicom-usa.com
+Cc: kevin@koconnor.net, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Rob Bradford <robert.bradford@intel.com>, seabios@seabios.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com
 
-On Wed,  7 Nov 2018 16:36:43 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+On Tue, Nov 20, 2018 at 5:13 PM Steve Douthit <stephend@silicom-usa.com> wrote:
+>
+> On 11/20/18 10:55 AM, Kevin O'Connor wrote:
+> > On Mon, Nov 19, 2018 at 07:38:39PM +0100, Stefano Garzarella wrote:
+> >> just an update, I enabled the debug prints and I saw two timeouts fired
+> >> with a lot
+> >> of time lost (~780ms between "init timer" and "Scan for VGA ..."),
+> >> putting other prints I discovered that a lot of time is spent in the
+> >> tpm_setup(),
+> >> during the probe of the 2 TPM devices:
+> >>
+> >> 00.548869 init timer
+> >> 00.549677 ./src/post.c:157 platform_hardware_setup
+> >> 00.550182 ./src/hw/tpm_drivers.c:579 tpmhw_probe
+> >> 01.300833 WARNING - Timeout at wait_reg8:81!
+> >> 01.301388 ./src/hw/tpm_drivers.c:579 tpmhw_probe
+> >> 01.331843 WARNING - Timeout at wait_reg8:81!
+> >> 01.332316 ./src/post.c:160 platform_hardware_setup
+> >> 01.333358 Scan for VGA option rom
+> >
+> > FYI, this was raised a few months ago - see:
+> >
+> > https://mail.coreboot.org/pipermail/seabios/2018-March/012186.html
+> >
+> > IIRC, it should be possible to verify the TPM device is present before
+> > trying to wait for it.
+>
+> We could skip probing entirely if there's no TCPA or TPM2 ACPI tables.
+> There'd need to be some option to force probing in the case of
+> missing/broken ACPI configurations.
 
-> The function is only used by a test, move it there.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+I've just tried the
+0001-tpm-Check-for-TPM-related-ACPI-tables-before-attempt.patch
+(https://mail.coreboot.org/pipermail/seabios/2018-March/012188.html)
+and it solves my issue with the TPM.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Thanks,
+Stefano
 
-> ---
->  include/hw/qdev-properties.h   |  1 -
->  hw/core/qdev-properties.c      |  9 ---------
->  tests/test-qdev-global-props.c | 18 ++++++++++++++----
->  3 files changed, 14 insertions(+), 14 deletions(-)
->=20
-> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-> index a95f4a73eb..3ab9cd2eb6 100644
-> --- a/include/hw/qdev-properties.h
-> +++ b/include/hw/qdev-properties.h
-> @@ -249,7 +249,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char =
-*name, int value);
->  void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
-> =20
->  void qdev_prop_register_global(GlobalProperty *prop);
-> -void qdev_prop_register_global_list(GlobalProperty *props);
->  int qdev_prop_check_globals(void);
->  void qdev_prop_set_globals(DeviceState *dev);
->  void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *=
-dev,
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index ab61d502fd..bd84c4ea4c 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -1180,15 +1180,6 @@ void qdev_prop_register_global(GlobalProperty *pro=
-p)
->      global_props =3D g_list_append(global_props, prop);
->  }
-> =20
-> -void qdev_prop_register_global_list(GlobalProperty *props)
-> -{
-> -    int i;
-> -
-> -    for (i =3D 0; props[i].driver !=3D NULL; i++) {
-> -        qdev_prop_register_global(props+i);
-> -    }
-> -}
-> -
->  int qdev_prop_check_globals(void)
->  {
->      GList *l;
-> diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-prop=
-s.c
-> index ccdf6c57c1..b1eb505442 100644
-> --- a/tests/test-qdev-global-props.c
-> +++ b/tests/test-qdev-global-props.c
-> @@ -89,6 +89,16 @@ static void test_static_prop(void)
->      g_test_trap_assert_stdout("");
->  }
-> =20
-> +static void register_global_properties(GlobalProperty *props)
-> +{
-> +    int i;
-> +
-> +    for (i =3D 0; props[i].driver !=3D NULL; i++) {
-> +        qdev_prop_register_global(props + i);
-> +    }
-> +}
-> +
-> +
->  /* Test setting of static property using global properties */
->  static void test_static_globalprop_subprocess(void)
->  {
-> @@ -98,7 +108,7 @@ static void test_static_globalprop_subprocess(void)
->          {}
->      };
-> =20
-> -    qdev_prop_register_global_list(props);
-> +    register_global_properties(props);
-> =20
->      mt =3D STATIC_TYPE(object_new(TYPE_STATIC_PROPS));
->      qdev_init_nofail(DEVICE(mt));
-> @@ -216,7 +226,7 @@ static void test_dynamic_globalprop_subprocess(void)
->      };
->      int global_error;
-> =20
-> -    qdev_prop_register_global_list(props);
-> +    register_global_properties(props);
-> =20
->      mt =3D DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
->      qdev_init_nofail(DEVICE(mt));
-> @@ -261,7 +271,7 @@ static void test_dynamic_globalprop_nouser_subprocess=
-(void)
->      };
->      int global_error;
-> =20
-> -    qdev_prop_register_global_list(props);
-> +    register_global_properties(props);
-> =20
->      mt =3D DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
->      qdev_init_nofail(DEVICE(mt));
-> @@ -299,7 +309,7 @@ static void test_subclass_global_props(void)
->          {}
->      };
-> =20
-> -    qdev_prop_register_global_list(props);
-> +    register_global_properties(props);
-> =20
->      mt =3D STATIC_TYPE(object_new(TYPE_SUBCLASS));
->      qdev_init_nofail(DEVICE(mt));
+>
+> > -Kevin
+> >
+>
+
+
+-- 
+Stefano Garzarella
+Red Hat
