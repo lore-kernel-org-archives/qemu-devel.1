@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gPDie-0001Ir-14
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:38:04 -0500
+	(envelope-from <philmd@redhat.com>) id 1gPDoE-0007Hz-6Z
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:43:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gPDid-0005ep-5I
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:38:03 -0500
-References: <20181120172252.17800-1-kwolf@redhat.com>
-	<20181120172252.17800-3-kwolf@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <c96bff11-d143-c3ea-adc9-7cb6b6431984@redhat.com>
-Date: Tue, 20 Nov 2018 16:37:52 -0500
+	(envelope-from <philmd@redhat.com>) id 1gPDo9-0004XN-Fj
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:43:50 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45291)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPDo9-0004Vi-7e
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:43:45 -0500
+Received: by mail-wr1-f66.google.com with SMTP id v6so3517840wrr.12
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 13:43:45 -0800 (PST)
+References: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
+	<20181119120820.29878-2-maozhongyi@cmss.chinamobile.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3b623909-c4f1-e939-417d-b711e7ab8150@redhat.com>
+Date: Tue, 20 Nov 2018 22:43:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181120172252.17800-3-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181119120820.29878-2-maozhongyi@cmss.chinamobile.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] iotests: Replace
- assertEquals() with assertEqual()
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 01/22] musicpal: Convert sysbus init
+ function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,18 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, jan.kiszka@web.de, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
-
-
-On 11/20/18 12:22 PM, Kevin Wolf wrote:
-> TestCase.assertEquals() is deprecated since Python 2.7. Recent Python
-> versions print a warning when the function is called, which makes test
-> cases fail.
+On 19/11/18 13:07, Mao Zhongyi wrote:
+> Use DeviceClass rather than SysBusDeviceClass in
+> mv88w8618_wlan_class_init().
 > 
-> Replace it with the preferred spelling assertEqual().
+> Cc: jan.kiszka@web.de
+> Cc: peter.maydell@linaro.org
+> Cc: qemu-arm@nongnu.org
 > 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+> Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>   hw/arm/musicpal.c | 9 ++++-----
+>   1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+> index 9648b3af44..7ffcdbb097 100644
+> --- a/hw/arm/musicpal.c
+> +++ b/hw/arm/musicpal.c
+> @@ -1147,14 +1147,13 @@ static const MemoryRegionOps mv88w8618_wlan_ops = {
+>       .endianness = DEVICE_NATIVE_ENDIAN,
+>   };
+>   
+> -static int mv88w8618_wlan_init(SysBusDevice *dev)
+> +static void mv88w8618_wlan_realize(DeviceState *dev, Error **errp)
+>   {
+>       MemoryRegion *iomem = g_new(MemoryRegion, 1);
+>   
+>       memory_region_init_io(iomem, OBJECT(dev), &mv88w8618_wlan_ops, NULL,
+>                             "musicpal-wlan", MP_WLAN_SIZE);
+> -    sysbus_init_mmio(dev, iomem);
+> -    return 0;
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), iomem);
+>   }
+>   
+>   /* GPIO register offsets */
+> @@ -1720,9 +1719,9 @@ DEFINE_MACHINE("musicpal", musicpal_machine_init)
+>   
+>   static void mv88w8618_wlan_class_init(ObjectClass *klass, void *data)
+>   {
+> -    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>   
+> -    sdc->init = mv88w8618_wlan_init;
+> +    dc->realize = mv88w8618_wlan_realize;
+>   }
+>   
+>   static const TypeInfo mv88w8618_wlan_info = {
+> 
