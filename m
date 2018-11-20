@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gP8xs-0005ED-4d
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:33:29 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gP8yA-0005J0-7W
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:33:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gP8xm-0006li-6N
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:33:25 -0500
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:55949)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gP8xk-0006h9-Ie
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:33:21 -0500
-Date: Tue, 20 Nov 2018 11:33:15 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181120163315.GA32388@flamenco>
-References: <20181106122025.3487-1-xiaoguangrong@tencent.com>
-	<20181106122025.3487-3-xiaoguangrong@tencent.com>
-	<20181113183821.GA11606@flamenco>
-	<35f0eb1a-3ec9-344b-7dda-d766c1b79626@gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1gP8y9-00078d-9S
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:33:46 -0500
+Date: Tue, 20 Nov 2018 17:33:24 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181120173324.64a36d8e@redhat.com>
+In-Reply-To: <20181107123652.23417-3-marcandre.lureau@redhat.com>
+References: <20181107123652.23417-1-marcandre.lureau@redhat.com>
+	<20181107123652.23417-3-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <35f0eb1a-3ec9-344b-7dda-d766c1b79626@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] util: introduce threaded workqueue
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 02/14] qom: make interface types
+ abstract
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, dgilbert@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>, lersek@redhat.com
 
-On Tue, Nov 20, 2018 at 18:25:25 +0800, Xiao Guangrong wrote:
-> On 11/14/18 2:38 AM, Emilio G. Cota wrote:
-> > On Tue, Nov 06, 2018 at 20:20:22 +0800, guangrong.xiao@gmail.com wrote:
-> > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
-(snip)
-> > Batching achieves higher performance at high core counts (>8),
-> > since worker threads go through fewer sleep+wake cycles while
-> > waiting for jobs. Performance however diminishes as more threads
-> > are used (>=24) due to cache line contention.
-> > 
-> > Contention can be avoided by partitioning the request array, bitmaps
-> > and completion event to be entirely local to worker threads
-> > ("+per-thread-state"). This avoids the performance decrease at >=24
-> > threads that we observe with batching alone. Note that the overall
-> > speedup does not go beyond ~8; this is explained by the fact that we
-> > use a single requester thread. Thus, as we add more worker threads,
-> > they become increasingly less busy, yet throughput remains roughly
-> > constant. I say roughly because there's quite a bit of noise--this
-> > is a 4-socket machine and I'm letting the scheduler move threads
-> > around, although I'm limiting the cores that can be used with
-> > taskset to maximize locality (this means that for 15 threads we're
-> > using 16 host cores that are all in the same socket; note that
-> > the additional thread is the requester one).
-> 
-> Hmm... I have carefully written the stuff step by step:
-> 1. separate @requests from threads to each single thread
-> 2. separate @completion from threads
-> 3. use batch mode
-> 4. separate bitmaps from threads
-> 5. revert batch mode based on step 4
-> 6. compare them with directly using Emilio's patches.
-> 
-> The big different between my modification and Emilio's patches is
-> that i still make per-thread-data be attached in the end of
-> @Threads.
->
-> I got these performance data:
-> 	https://ibb.co/kcLnLL
-> 
-> Indeed, i can almost reproduce your conclusion. The confused part
-> is batch -  I used 16G memory to do the benchmark, the batch improved
-> nothing, I guess all the threads keep busy under this case anyway.
+On Wed,  7 Nov 2018 16:36:40 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-I wouldn't worry too much about it, then. The machine I ran my tests
-on is rather old, so it's possible that cross-core/socket communication
-is much slower there than on your machine, which makes batching
-more attractive. At the end of the day, the measurements you take on
-the machines you care about are what matter =)
+> Interfaces don't have instance, let's make the interface type really
+> abstract to avoid confusion.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/hw/acpi/acpi_dev_interface.h | 6 +-----
+>  include/hw/arm/linux-boot-if.h       | 5 +----
+>  include/hw/fw-path-provider.h        | 4 +---
+>  include/hw/hotplug.h                 | 6 +-----
+>  include/hw/intc/intc.h               | 4 +---
+>  include/hw/ipmi/ipmi.h               | 4 +---
+>  include/hw/isa/isa.h                 | 4 ----
+>  include/hw/mem/memory-device.h       | 4 +---
+>  include/hw/nmi.h                     | 4 +---
+>  include/hw/stream.h                  | 4 +---
+>  include/hw/timer/m48t59.h            | 4 +---
+>  include/qom/object_interfaces.h      | 6 +-----
+>  include/sysemu/tpm.h                 | 4 +---
+>  target/arm/idau.h                    | 4 +---
+>  tests/check-qom-interface.c          | 4 +---
+>  15 files changed, 14 insertions(+), 53 deletions(-)
+>=20
+> diff --git a/include/hw/acpi/acpi_dev_interface.h b/include/hw/acpi/acpi_=
+dev_interface.h
+> index dabf4c4fc9..43ff119179 100644
+> --- a/include/hw/acpi/acpi_dev_interface.h
+> +++ b/include/hw/acpi/acpi_dev_interface.h
+> @@ -25,11 +25,7 @@ typedef enum {
+>       INTERFACE_CHECK(AcpiDeviceIf, (obj), \
+>                       TYPE_ACPI_DEVICE_IF)
+> =20
+> -
+> -typedef struct AcpiDeviceIf {
+> -    /* <private> */
+> -    Object Parent;
+> -} AcpiDeviceIf;
+> +typedef struct AcpiDeviceIf AcpiDeviceIf;
+> =20
+>  void acpi_send_event(DeviceState *dev, AcpiEventStatusBits event);
+> =20
+> diff --git a/include/hw/arm/linux-boot-if.h b/include/hw/arm/linux-boot-i=
+f.h
+> index aba4479a14..7bbdfd1cc6 100644
+> --- a/include/hw/arm/linux-boot-if.h
+> +++ b/include/hw/arm/linux-boot-if.h
+> @@ -16,10 +16,7 @@
+>  #define ARM_LINUX_BOOT_IF(obj) \
+>      INTERFACE_CHECK(ARMLinuxBootIf, (obj), TYPE_ARM_LINUX_BOOT_IF)
+> =20
+> -typedef struct ARMLinuxBootIf {
+> -    /*< private >*/
+> -    Object parent_obj;
+> -} ARMLinuxBootIf;
+> +typedef struct ARMLinuxBootIf ARMLinuxBootIf;
+I like how it makes interface truly opaque and removes the need for
+structure declaration but:
 
-> > I have pushed the above changes, along with some minor fixes (e.g.
-> > removing the Threads.name field) here:
-> > 
-> >    https://github.com/cota/qemu/tree/xiao
-> > 
-> > Note that the 0-len variable goes away, and that Threads become
-> > read-only. I also use padding to make sure the events are in
-> > separate cache lines.
-> > 
-> > Feel free to incorporate whatever you see fit from that branch into
-> > a subsequent iteraiton.
-> 
-> Nice, I will add you to the author list if you do not object. :)
+ 1: I'm not sure if it's acceptable thing to do from language point of view
 
-That's not necessary. You deserve the full credit -- I just reviewed
-the code ;-)
+ 2: For a reader not aware of a trick, it's sort of confusing to have forwa=
+rd declaration but without structure itself. So if #1 is acceptable we prob=
+ably should document interface trick in object.h
 
-Thanks,
-
-		Emilio
+[...]
