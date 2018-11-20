@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gPAKz-0000CQ-3K
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 13:01:25 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gPAQT-00022f-7j
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 13:07:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gPAKt-0006un-EH
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 13:01:24 -0500
-Received: from steffen-goertz.de ([88.198.119.201]:37596)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gPAKt-0006r3-3v
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 13:01:19 -0500
-References: <20181112214224.31560-1-contrib@steffen-goertz.de>
-	<20181119130218.GA6443@stefanha-x1.localdomain>
-From: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
-Message-ID: <bf2076f4-d34a-e748-da40-722aac630928@steffen-goertz.de>
-Date: Tue, 20 Nov 2018 13:01:15 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gPAQ4-00042q-9i
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 13:07:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gPAQ3-0003vh-SY
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 13:06:40 -0500
+Date: Tue, 20 Nov 2018 23:36:29 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <ea6eb292-53d6-9bf0-98b9-8b53c44e77c8@linux.ibm.com>
+Message-ID: <nycvar.YSQ.7.76.1811202318190.17923@xnncv>
+References: <20181120072239.512-1-ppandit@redhat.com>
+	<ea6eb292-53d6-9bf0-98b9-8b53c44e77c8@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20181119130218.GA6443@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 00/14] arm: nRF51 Devices and Microbit
- Support
+Subject: Re: [Qemu-devel] [PATCH v1] tpm: check localities index
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>
-Cc: qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Stefan Berger <stefanb@linux.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@gmail.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Cheng Feng <PSIRT@huawei.com>
 
-Thank you Stefan and Peter for your thoughtful comments and all the time =
-that went into this patch series already.
-I will send a revision of the patch series today or tomorrow.
+  Hello Stefan,
 
-Best,
-Steffen
++-- On Tue, 20 Nov 2018, Stefan Berger wrote --+
+| On 11/20/18 2:22 AM, P J P wrote:
+| > From: Prasad J Pandit <pjp@fedoraproject.org>
+| >
+| > While performing mmio device r/w operations, guest could set 'addr'
+| > parameter such that 'locty' index exceeds TPM_TIS_NUM_LOCALITIES=3D5
+| > after setting new 'locty' via 'tpm_tis_new_active_locality'.
+| > Add check to avoid OOB access.
+|=20
+| Do you have test code that can set the memory to such a locality or is =
+this
+| purely hypothetical at the moment?
 
-On 19.11.18 08:02, Stefan Hajnoczi wrote:
-> On Mon, Nov 12, 2018 at 04:42:10PM -0500, Steffen G=F6rtz wrote:
->> This series contains additional peripheral devices for the nRF51822
->> microcontroller.=20
->=20
-> Hi Steffen,
-> I have finished reviewing this revision, please feel free to send the
-> next revision addressing comments.  It's getting very close and I expec=
-t
-> to post my Reviewed-by for the remaining patches then.
->=20
-> Stefan
->=20
+It's not hypothetical, reporter used tpm-emulator below
+
+  -> https://github.com/PeterHuewe/tpm-emulator
+
+with an old version of QEMU. I shared the details with Marc-Andre earlier=
+=20
+today.
+
+| We are registering this MMIO area:
+|=20
+| =C2=A0=C2=A0=C2=A0 memory_region_init_io(&s->mmio, OBJECT(s), &tpm_tis_=
+memory_ops,
+| =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 s, "tpm-tis-mmio",
+| =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 TPM_TIS_NUM_LOCALITIES <<=20
+| TPM_TIS_LOCALITY_SHIFT);
+|=20
+| #define TPM_TIS_NUM_LOCALITIES=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 5
+|=20
+| #define TPM_TIS_LOCALITY_SHIFT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 12
+|=20
+| --> 5 << 12 =3D 0x5000, thus we get memory locations [0 .. 0x4fff]
+|=20
+|=20
+| We have the following code to get from an address to the locality:
+|=20
+| static uint8_t tpm_tis_locality_from_addr(hwaddr addr)
+| {
+| =C2=A0=C2=A0=C2=A0 return (uint8_t)((addr >> TPM_TIS_LOCALITY_SHIFT) & =
+0x7);
+| }
+|=20
+| With this we would get localities of [0x0 .. 0x4] following the memory
+| locations [0 .. 0x4fff] above.
+
+  Right. IIUC mmio r/w routines called with 'addr' value like 0x07000 may=
+ set=20
+'locty' to > TPM_TIS_NUM_LOCALITIES. Also in mmio_write at one point,=20
+'active_locty' is set to TPM_TIS_NO_LOCALITY(=3D0xff), which may be used =
+to set=20
+'new_locty'.
+
+tpm_tis_mmio_write
+   ...
+   active_locty =3D TPM_TIS_NO_LOCALITY(=3D0xff);
+   ...
+   tpm_tis_new_active_locality(s, active_locty);
+
+
+tpm_tis_new_active_locality(TPMState *s, uint8_t new_active_locty)
+   ...
+   s->active_locty =3D new_active_locty;
+
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
