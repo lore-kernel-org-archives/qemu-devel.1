@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPDae-0003Jb-8B
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:29:49 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gPDgZ-00082l-IC
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:35:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPDaa-0002IH-Qu
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:29:48 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:39268)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPDaa-0002EM-F9
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:29:44 -0500
-Received: by mail-wm1-f65.google.com with SMTP id u13-v6so3736507wmc.4
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 13:29:43 -0800 (PST)
-References: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
-	<20181119120820.29878-14-maozhongyi@cmss.chinamobile.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <29ae8070-69ed-fc41-63f5-e9923acbec4f@redhat.com>
-Date: Tue, 20 Nov 2018 22:29:40 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1gPDgX-0003Ay-DZ
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:35:55 -0500
+References: <20181105014047.26447-1-sameo@linux.intel.com>
+	<20181116172919.43f3e27d@redhat.com>
+	<d4f6f0ef-1333-a917-e3eb-d9bad47c9648@redhat.com>
+	<20181119163110.2f357f40@redhat.com>
+	<c09214f5-85fa-bb64-7c7e-2e9435ea4279@redhat.com>
+	<20181119131314-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bca20871-c6e1-b233-4cad-236c3ab36060@redhat.com>
+Date: Tue, 20 Nov 2018 22:35:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181119120820.29878-14-maozhongyi@cmss.chinamobile.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181119131314-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 13/22] puv3_pm.c: Convert sysbus init
- function to realize function
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 00/24] ACPI reorganization for
+ hardware-reduced API addition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
-Cc: gxt@mprc.pku.edu.cn, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
 
-On 19/11/18 13:08, Mao Zhongyi wrote:
-> Use DeviceClass rather than SysBusDeviceClass in
-> puv3_pm_class_init().
+On 19/11/18 19:14, Michael S. Tsirkin wrote:
+> On Mon, Nov 19, 2018 at 06:14:26PM +0100, Paolo Bonzini wrote:
+>> On 19/11/18 16:31, Igor Mammedov wrote:
+>>> I've tried to give suggestions how to restructure series
+>>> on per patch basis. In my opinion it quite possible to split
+>>> series in several smaller ones and it should really help with
+>>> making series cleaner and easier/faster to review/amend/merge
+>>> vs what we have in v5.
+>>
+>> This is true, on the other hand the series makes sense together and,
+>> even if the patches are more or less independent, they also all follow
+>> the same "plan".  For reviewing v6, are you aware of Patchew's series
+>> diff functionality?  It can tell you which patches had comments in v5,
+>> reorder patches if applicable, and display deleted and new patches at
+>> the right point in the series.
+>>
+>> v4->v5 is a bit messed up because Samuel probably added a diff order
+>> setup
+>> (https://patchew.org/QEMU/20181101102303.16439-1-sameo@linux.intel.com/diff/20181105014047.26447-1-sameo@linux.intel.com/)
+>> but it's very useful in general.
+>>
+>> Paolo
 > 
-> Cc: gxt@mprc.pku.edu.cn
-> 
-> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-> Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+> Oh I didn't realize difforder breaks patchew. Or is the problem
+> only if one switches from no order to difforder?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+No, it's just that switching it on makes the inter-version diff much
+larger, because all hunks are reordered.  difforder is not a problem.
 
-> ---
->   hw/misc/puv3_pm.c | 10 ++++------
->   1 file changed, 4 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/misc/puv3_pm.c b/hw/misc/puv3_pm.c
-> index 577cebaac7..afe191fbe1 100644
-> --- a/hw/misc/puv3_pm.c
-> +++ b/hw/misc/puv3_pm.c
-> @@ -119,7 +119,7 @@ static const MemoryRegionOps puv3_pm_ops = {
->       .endianness = DEVICE_NATIVE_ENDIAN,
->   };
->   
-> -static int puv3_pm_init(SysBusDevice *dev)
-> +static void puv3_pm_realize(DeviceState *dev, Error **errp)
->   {
->       PUV3PMState *s = PUV3_PM(dev);
->   
-> @@ -127,16 +127,14 @@ static int puv3_pm_init(SysBusDevice *dev)
->   
->       memory_region_init_io(&s->iomem, OBJECT(s), &puv3_pm_ops, s, "puv3_pm",
->               PUV3_REGS_OFFSET);
-> -    sysbus_init_mmio(dev, &s->iomem);
-> -
-> -    return 0;
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
->   }
->   
->   static void puv3_pm_class_init(ObjectClass *klass, void *data)
->   {
-> -    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
->   
-> -    sdc->init = puv3_pm_init;
-> +    dc->realize = puv3_pm_realize;
->   }
->   
->   static const TypeInfo puv3_pm_info = {
-> 
+Paolo
