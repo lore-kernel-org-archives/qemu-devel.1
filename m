@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gP9n9-0006Pz-ML
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:26:28 -0500
+	(envelope-from <eblake@redhat.com>) id 1gP9na-0006iv-Ay
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:26:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gP9n8-0006XA-JH
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:26:27 -0500
-Date: Tue, 20 Nov 2018 17:25:51 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181120172551.GD5072@work-vm>
-References: <20181120152753.10463-1-marcandre.lureau@redhat.com>
-	<20181120152753.10463-3-marcandre.lureau@redhat.com>
-	<03454b5c-f889-9401-f502-5b14eaab40c8@redhat.com>
-	<20181120172241.GC5072@work-vm>
-	<CAMxuvax0K1BH3gCXeJ2=0G7EBvpTgHV1TefK8Yp8XzyXaFyieQ@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1gP9nS-000778-S7
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:26:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gP9nS-00075T-J2
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:26:46 -0500
+References: <20181120092542.13102-1-david@redhat.com>
+	<20181120092542.13102-6-david@redhat.com>
+	<27cfb4e6-b4db-10de-02c7-691f011d5f99@redhat.com>
+	<f5dd77c5-8d40-fe95-4fc8-69aa96fa4f13@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0a72b07b-3620-7728-4248-8cd7c0112489@redhat.com>
+Date: Tue, 20 Nov 2018 11:26:39 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAMxuvax0K1BH3gCXeJ2=0G7EBvpTgHV1TefK8Yp8XzyXaFyieQ@mail.gmail.com>
+In-Reply-To: <f5dd77c5-8d40-fe95-4fc8-69aa96fa4f13@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.1? 2/3] migration: fix
- stringop-truncation warning
+Subject: Re: [Qemu-devel] [PATCH v2 5/9] test-string-input-visitor: Add more
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: "Blake, Eric" <eblake@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "Wolf, Kevin" <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, Jeff Cody <jcody@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "unix, namei" <namei.unix@gmail.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> Hi
+On 11/20/18 11:20 AM, Eric Blake wrote:
+> On 11/20/18 11:06 AM, Eric Blake wrote:
+>> On 11/20/18 3:25 AM, David Hildenbrand wrote:
+>>> Test that very big/small values are not accepted and that ranges with
+>>> only one element work. Also test that ranges are ascending and cannot
+>>> have more than 65536 elements.
+>>>
+>>> Rename expect4 to expect5, as we will be moving that to a separate ul=
+ist
+>>> test after the rework.
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>> =C2=A0 tests/test-string-input-visitor.c | 41 +++++++++++++++++++++++=
+++++++--
+>>> =C2=A0 1 file changed, 39 insertions(+), 2 deletions(-)
+>>>
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
 >=20
-> On Tue, Nov 20, 2018 at 9:22 PM Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> >
-> > * Eric Blake (eblake@redhat.com) wrote:
-> > > On 11/20/18 9:27 AM, Marc-Andr=E9 Lureau wrote:
-> > > > Adding an assert is enough to silence GCC.
-> > > >
-> > > > ~/src/qemu/migration/global_state.c: In function 'global_state_st=
-ore_running':
-> > > > ~/src/qemu/migration/global_state.c:45:5: error: 'strncpy' specif=
-ied bound 100 equals destination size [-Werror=3Dstringop-truncation]
-> > > >       strncpy((char *)global_state.runstate,
-> > > >       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > > >              state, sizeof(global_state.runstate));
-> > > >              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > > > cc1: all warnings being treated as errors
-> > > >
-> > > > (alternatively, we could hard-code "running")
-> > > >
-> > > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> > > > ---
-> > > >   migration/global_state.c | 1 +
-> > > >   1 file changed, 1 insertion(+)
-> > >
-> > > Reviewed-by: Eric Blake <eblake@redhat.com>
-> > >
-> > > I think this is safe for 3.1, but I know the migration code is part=
-icularly
-> > > wary of assert()s, even when they are non-triggerable (a 100-byte b=
-uffer at
-> > > global_state.runstate is big enough for ALL of the run states, not =
-just
-> > > RUN_STATE_RUNNING).
-> >
-> > That's OK; the universe would have to be particularly broken to trigg=
-er
-> > that one, and it's in no way connected with any state, so it would
-> > trigger on even the most basic tests.
-> >
-> > However, I wonder if this fixes the problem on mingw builds - windows
-> > asserts are not marked as noreturn.
+> Do we also want to test garbage strings like:
 >=20
-> On f29, with mingw64-gcc-8.2.0-3.fc29.x86_64, it fixes the warning.
+> "1-" (incomplete range)
+> "1X-2" (garbage suffix on first element)
+> "1-2X" (garbage suffix on second element)
+>=20
+> and/or
+>=20
+> "-2--1" (valid range of signed integers)
+> "-1--2" (questionable whether this is valid for the two largest unsigne=
+d=20
+> integers)
 
-OK, fine.
+Or even " 1- 2" (we permit leading whitespace for plain integers - do we=20
+also permit it in both sides of a range)?  Also, if we permit whitespace=20
+after the range '-', should we permit it beforehand?
 
+These sorts of questions may be fine in followup patches.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Dave
-
-> >
-> > Dave
-> >
-> > > >
-> > > > diff --git a/migration/global_state.c b/migration/global_state.c
-> > > > index 8e8ab5c51e..01805c567a 100644
-> > > > --- a/migration/global_state.c
-> > > > +++ b/migration/global_state.c
-> > > > @@ -42,6 +42,7 @@ int global_state_store(void)
-> > > >   void global_state_store_running(void)
-> > > >   {
-> > > >       const char *state =3D RunState_str(RUN_STATE_RUNNING);
-> > > > +    assert(strlen(state) < sizeof(global_state.runstate));
-> > > >       strncpy((char *)global_state.runstate,
-> > > >              state, sizeof(global_state.runstate));
-> > > >   }
-> > > >
-> > >
-> > > --
-> > > Eric Blake, Principal Software Engineer
-> > > Red Hat, Inc.           +1-919-301-3266
-> > > Virtualization:  qemu.org | libvirt.org
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
