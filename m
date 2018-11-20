@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gP66K-0003ch-32
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:30:00 -0500
+	(envelope-from <guoheyi@huawei.com>) id 1gP5Hd-00031p-Fw
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:37:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gP66F-0000St-3q
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:30:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38122)
+	(envelope-from <guoheyi@huawei.com>) id 1gP5HY-0008Lt-Hz
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:37:37 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2295 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gP66E-0000Qc-Sn
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:29:55 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 20 Nov 2018 17:26:04 +0400
-Message-Id: <20181120132604.22854-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1gP5HY-0008HG-2K
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:37:32 -0500
+Received: from DGGEML403-HUB.china.huawei.com (unknown [172.30.72.54])
+	by Forcepoint Email with ESMTP id 08209D4CEE80D
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 20:37:20 +0800 (CST)
+From: Guoheyi <guoheyi@huawei.com>
+Date: Tue, 20 Nov 2018 12:37:13 +0000
+Message-ID: <B328F08581D714418202ABF306D3781C3B774417@dggeml509-mbx.china.huawei.com>
+Content-Language: zh-CN
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.1] hw/i386: add pc-i440fx-3.1 & pc-q35-3.1
+Subject: [Qemu-devel] Can't see mouse cursor on VNC viewer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,96 +28,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-We have a couple of PC_COMPAT_3_0, so we should have 3.1 PC machines,
-and update the 3.0 machines to make use of those.
+Hi folks,
 
-Fixes a "Known issue" from https://wiki.qemu.org/Planning/3.1.
+I'm using qemu 2.8 on ARM64 with KVM enabled, and TightVNC on MS Windows as=
+ a VNC viewer. We can see the graphic screen on VNC viewer, but we can't se=
+e the mouse cursor after we enable "Mouse Cursor -> Let remote server deal =
+with cursor". When I move or click on VNC viewer screen, we can see some it=
+ems are selected or highlighted, so I believe other functions of mouse are =
+still there. If I switch to text console and use gpm, I can see the cursor =
+in rectangle shape on the screen.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/i386/pc_piix.c | 15 ++++++++++++---
- hw/i386/pc_q35.c  | 13 +++++++++++--
- 2 files changed, 23 insertions(+), 5 deletions(-)
+Do you have any idea of why this issue happens and how we can fix it?
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index dc09466b3e..7092d6d13f 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -428,21 +428,30 @@ static void pc_i440fx_machine_options(MachineClass =
-*m)
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
- }
-=20
--static void pc_i440fx_3_0_machine_options(MachineClass *m)
-+static void pc_i440fx_3_1_machine_options(MachineClass *m)
- {
-     pc_i440fx_machine_options(m);
-     m->alias =3D "pc";
-     m->is_default =3D 1;
- }
-=20
-+DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
-+                      pc_i440fx_3_1_machine_options);
-+
-+static void pc_i440fx_3_0_machine_options(MachineClass *m)
-+{
-+    pc_i440fx_3_1_machine_options(m);
-+    m->is_default =3D 0;
-+    m->alias =3D NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-+}
-+
- DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
-                       pc_i440fx_3_0_machine_options);
-=20
- static void pc_i440fx_2_12_machine_options(MachineClass *m)
- {
-     pc_i440fx_3_0_machine_options(m);
--    m->is_default =3D 0;
--    m->alias =3D NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
-=20
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 532241e3f8..4702bb13c4 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus =3D 288;
- }
-=20
--static void pc_q35_3_0_machine_options(MachineClass *m)
-+static void pc_q35_3_1_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias =3D "q35";
- }
-=20
-+DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
-+                   pc_q35_3_1_machine_options);
-+
-+static void pc_q35_3_0_machine_options(MachineClass *m)
-+{
-+    pc_q35_3_1_machine_options(m);
-+    m->alias =3D NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-+}
-+
- DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
-                     pc_q35_3_0_machine_options);
-=20
- static void pc_q35_2_12_machine_options(MachineClass *m)
- {
-     pc_q35_3_0_machine_options(m);
--    m->alias =3D NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
-=20
---=20
-2.19.1.708.g4ede3d42df
+Thanks,
+
+Heyi Guo
