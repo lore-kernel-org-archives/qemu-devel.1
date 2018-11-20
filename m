@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP7O2-0006vi-GN
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:52:23 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gP7TZ-000196-S9
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:58:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP7O1-0003NV-BE
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:52:22 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40433)
+	(envelope-from <peter.maydell@linaro.org>) id 1gP7TX-00008H-QW
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:58:05 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37969)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gP7O0-0003Le-0w
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:52:21 -0500
-Received: by mail-oi1-x243.google.com with SMTP id t204so1687932oie.7
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 06:52:19 -0800 (PST)
+	id 1gP7TX-00007q-JT
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:58:03 -0500
+Received: by mail-ot1-x344.google.com with SMTP id u3so1899199ota.5
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 06:58:03 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181119120820.29878-14-maozhongyi@cmss.chinamobile.com>
-References: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
-	<20181119120820.29878-14-maozhongyi@cmss.chinamobile.com>
+In-Reply-To: <1541672989-15967-8-git-send-email-gengdongjiu@huawei.com>
+References: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
+	<1541672989-15967-8-git-send-email-gengdongjiu@huawei.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Nov 2018 14:51:59 +0000
-Message-ID: <CAFEAcA91R47kzep1fNPC3YuPQeVWLtuY1G0Yda7aD3kiu6SPHw@mail.gmail.com>
+Date: Tue, 20 Nov 2018 14:57:42 +0000
+Message-ID: <CAFEAcA9wLv96u_GYCBPFtkQMvntoHDKhQjremmN1noaJxsvhAQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 13/22] puv3_pm.c: Convert sysbus init
- function to realize function
+Subject: Re: [Qemu-devel] [PATCH RESEND v15 07/10] KVM: Move related
+ hwpoison page functions to accel/kvm/ folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Zheng Xiang <zhengxiang9@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 19 November 2018 at 12:08, Mao Zhongyi
-<maozhongyi@cmss.chinamobile.com> wrote:
-> Use DeviceClass rather than SysBusDeviceClass in
-> puv3_pm_class_init().
+On 8 November 2018 at 10:29, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> kvm_hwpoison_page_add() and kvm_unpoison_all() will be used both
+> by X86 and ARM platforms, so move these functions to a common
+> accel/kvm/ folder to avoid duplicate code.
 >
-> Cc: gxt@mprc.pku.edu.cn
->
-> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-> Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 > ---
->  hw/misc/puv3_pm.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
+> Address Peter's comments to move related hwpoison page function to
+> accel/kvm folder in [1]
+> Address Paolo's comments to move HWPoisonPage definition back to
+> accel/kvm/kvm-all.c
 >
+> [1]:
+> https://lists.gnu.org/archive/html/qemu-arm/2017-09/msg00077.html
+> https://lists.gnu.org/archive/html/qemu-arm/2017-09/msg00152.html
+> ---
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -115,6 +115,11 @@ void qemu_ram_free(RAMBlock *block);
+>
+>  int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp);
+>
+> +/* Add a poisoned page to the list */
+> +void kvm_hwpoison_page_add(ram_addr_t ram_addr);
+> +/* Free and remove all the poisoned pages in the list */
+> +void kvm_unpoison_all(void *param);
+> +
+
+In my previous review comments I said:
+>>> Any new globally-visible function prototype in a header should
+>>> have a doc-comment formatted documentation comment, please.
+>>
+>>
+>> Ok, thanks for this reminder. Do you mean I need to add comments
+>> for this globally-visible function, such as below:
+>>
+>> /*
+>>  * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+>>  */
+>> void kvm_hwpoison_page_add(ram_addr_t ram_addr);
+>
+> It should be in the doc-comment format, which begins
+> "/**" and has some stylization of how you list parameters
+> and so on. Lots of examples in the existing headers.
+
+Can we have a doc-comment in the proper format and with a little
+more detail than a single line, please?
 
 thanks
 -- PMM
