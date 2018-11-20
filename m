@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balducci@units.it>) id 1gP1OP-0001fv-Af
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:28:22 -0500
+	(envelope-from <linzhecheng@huawei.com>) id 1gP1UX-0003zZ-Uv
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:34:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balducci@units.it>) id 1gP1OL-0004YO-Ck
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:28:21 -0500
-Received: from dschgrazlin2.univ.trieste.it ([140.105.55.81]:57528
-	helo=dschgrazlin2.units.it) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balducci@units.it>) id 1gP1OL-0004Xx-1U
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:28:17 -0500
-From: balducci@units.it
-In-reply-to: Your message of "Mon, 19 Nov 2018 16:55:13 -0500."
-	<jpgefbgag1q.fsf@linux.bootlegged.copy>
+	(envelope-from <linzhecheng@huawei.com>) id 1gP1UU-0008Kw-Gc
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:34:41 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:39927 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1gP1UU-0008Jb-4o
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:34:38 -0500
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Tue, 20 Nov 2018 16:34:19 +0800
+Message-ID: <20181120083419.17716-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <7279.1542702495.1@dschgrazlin2.units.it>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 20 Nov 2018 09:27:51 +0100
-Message-ID: <7280.1542702495@dschgrazlin2.units.it>
-Subject: Re: [Qemu-devel] 3.1.0-rc{0,1} doesn't start
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] usb-host: set ifs.detached as true if
+ kernel driver is not active
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bandan Das <bsd@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, jianjay.zhou@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, linzhecheng <linzhecheng@huawei.com>
 
-hello
+If no kernel driver is active, we can already claim and perform I/O on
+it without detaching it.
 
-> incomplete because it can return 0 for data. Can you try this:
->
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index f524e7d929..4878ffb90b 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -2002,14 +2002,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
->  #endif
->  =
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 
->      /* If host supports feature MSR, write down. */
-> -    if (kvm_feature_msrs) {
-> -        int i;
-> -        for (i =3D 0; i < kvm_feature_msrs->nmsrs; i++)
-> -            if (kvm_feature_msrs->indices[i] =3D=3D MSR_IA32_ARCH_CAPAB=
-ILITIES) =
-
-> {
-> -                kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
-> +    if (kvm_arch_get_supported_msr_feature(kvm_state, MSR_IA32_ARCH_CAP=
-ABILI
-> TIES)) {
-> +        kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
->                                env->features[FEAT_ARCH_CAPABILITIES]);
-> -                break;
-> -            }
->      }
->  =
-
->      /*
-
-I'm getting the same error message at start time (patch applied to
-official  qemu-3.1.0-rc1 tarball):
-
-----8<----
-qemu: error: failed to set MSR 0x10a to 0x0
-qemu: /home/balducci/tmp/install-us-d/qemu-3.1.0-rc1.d/qemu-3.1.0-rc1/targ=
-et/i386/kvm.c:2206: kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->=
-nmsrs' failed.
-Aborted
----->8----
-
-thanks a lot
-ciao
--gabriele
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index f31e9cbbb8..b6602ded4e 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -1120,6 +1120,9 @@ static void usb_host_detach_kernel(USBHostDevice *s)
+         rc = libusb_kernel_driver_active(s->dh, i);
+         usb_host_libusb_error("libusb_kernel_driver_active", rc);
+         if (rc != 1) {
++            if (rc == 0) {
++                s->ifs[i].detached = true;
++            }
+             continue;
+         }
+         trace_usb_host_detach_kernel(s->bus_num, s->addr, i);
+-- 
+2.12.2.windows.2
