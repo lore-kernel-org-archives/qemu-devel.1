@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP3ps-0003VU-Uz
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:04:53 -0500
+	(envelope-from <david@redhat.com>) id 1gP3q2-0003al-Vu
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:05:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP3pn-0004Pn-4N
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:04:52 -0500
+	(envelope-from <david@redhat.com>) id 1gP3q0-0004wy-K6
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:05:02 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 20 Nov 2018 12:04:17 +0100
-Message-Id: <20181120110427.7321-2-david@redhat.com>
+Date: Tue, 20 Nov 2018 12:04:19 +0100
+Message-Id: <20181120110427.7321-4-david@redhat.com>
 In-Reply-To: <20181120110427.7321-1-david@redhat.com>
 References: <20181120110427.7321-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 01/11] pci/pcie: rename hotplug handler
+Subject: [Qemu-devel] [PATCH v3 03/11] s390x/pci: rename hotplug handler
  callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,100 +26,50 @@ Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.
 The callbacks are also called for cold plugged devices. Drop the "hot"
 to better match the actual callback names.
 
-While at it, also rename  pcie_cap_slot_hotplug_common() to
-pcie_cap_slot_plug_common().
-
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/pci/pcie.c         | 17 ++++++++---------
- hw/pci/pcie_port.c    |  4 ++--
- include/hw/pci/pcie.h |  8 ++++----
- 3 files changed, 14 insertions(+), 15 deletions(-)
+ hw/s390x/s390-pci-bus.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index 6c91bd44a0..44737cc1cd 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -315,9 +315,8 @@ static void pcie_cap_slot_event(PCIDevice *dev, PCIExpressHotPlugEvent event)
-     hotplug_event_notify(dev);
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 060ff062bc..9abd49a9dc 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -827,8 +827,8 @@ static bool s390_pci_alloc_idx(S390pciState *s, S390PCIBusDevice *pbdev)
+     return true;
  }
  
--static void pcie_cap_slot_hotplug_common(PCIDevice *hotplug_dev,
--                                         DeviceState *dev,
--                                         uint8_t **exp_cap, Error **errp)
-+static void pcie_cap_slot_plug_common(PCIDevice *hotplug_dev, DeviceState *dev,
-+                                      uint8_t **exp_cap, Error **errp)
+-static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
+-                                  DeviceState *dev, Error **errp)
++static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
++                              Error **errp)
  {
-     *exp_cap = hotplug_dev->config + hotplug_dev->exp.exp_cap;
-     uint16_t sltsta = pci_get_word(*exp_cap + PCI_EXP_SLTSTA);
-@@ -331,13 +330,13 @@ static void pcie_cap_slot_hotplug_common(PCIDevice *hotplug_dev,
-     }
+     PCIDevice *pdev = NULL;
+     S390PCIBusDevice *pbdev = NULL;
+@@ -936,8 +936,8 @@ static void s390_pcihost_timer_cb(void *opaque)
+     qdev_unplug(DEVICE(pbdev), NULL);
  }
  
--void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
--                              Error **errp)
-+void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                           Error **errp)
+-static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
+-                                    DeviceState *dev, Error **errp)
++static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
++                                Error **errp)
  {
-     uint8_t *exp_cap;
-     PCIDevice *pci_dev = PCI_DEVICE(dev);
+     PCIDevice *pci_dev = NULL;
+     PCIBus *bus;
+@@ -1045,8 +1045,8 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
  
--    pcie_cap_slot_hotplug_common(PCI_DEVICE(hotplug_dev), dev, &exp_cap, errp);
-+    pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev, &exp_cap, errp);
- 
-     /* Don't send event when device is enabled during qemu machine creation:
-      * it is present on boot, no hotplug event is necessary. We do send an
-@@ -365,14 +364,14 @@ static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
-     object_unparent(OBJECT(dev));
+     dc->reset = s390_pcihost_reset;
+     dc->realize = s390_pcihost_realize;
+-    hc->plug = s390_pcihost_hot_plug;
+-    hc->unplug = s390_pcihost_hot_unplug;
++    hc->plug = s390_pcihost_plug;
++    hc->unplug = s390_pcihost_unplug;
+     msi_nonbroken = true;
  }
  
--void pcie_cap_slot_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
--                                         DeviceState *dev, Error **errp)
-+void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                     DeviceState *dev, Error **errp)
- {
-     uint8_t *exp_cap;
-     PCIDevice *pci_dev = PCI_DEVICE(dev);
-     PCIBus *bus = pci_get_bus(pci_dev);
- 
--    pcie_cap_slot_hotplug_common(PCI_DEVICE(hotplug_dev), dev, &exp_cap, errp);
-+    pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev, &exp_cap, errp);
- 
-     /* In case user cancel the operation of multi-function hot-add,
-      * remove the function that is unexposed to guest individually,
-diff --git a/hw/pci/pcie_port.c b/hw/pci/pcie_port.c
-index 6432b9ac1f..73e81e5847 100644
---- a/hw/pci/pcie_port.c
-+++ b/hw/pci/pcie_port.c
-@@ -154,8 +154,8 @@ static void pcie_slot_class_init(ObjectClass *oc, void *data)
-     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
- 
-     dc->props = pcie_slot_props;
--    hc->plug = pcie_cap_slot_hotplug_cb;
--    hc->unplug_request = pcie_cap_slot_hot_unplug_request_cb;
-+    hc->plug = pcie_cap_slot_plug_cb;
-+    hc->unplug_request = pcie_cap_slot_unplug_request_cb;
- }
- 
- static const TypeInfo pcie_slot_type_info = {
-diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-index b71e369703..735f8e8154 100644
---- a/include/hw/pci/pcie.h
-+++ b/include/hw/pci/pcie.h
-@@ -131,8 +131,8 @@ void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
- void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
- void pcie_ats_init(PCIDevice *dev, uint16_t offset);
- 
--void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
--                              Error **errp);
--void pcie_cap_slot_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
--                                         DeviceState *dev, Error **errp);
-+void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                           Error **errp);
-+void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                     DeviceState *dev, Error **errp);
- #endif /* QEMU_PCIE_H */
 -- 
 2.17.2
