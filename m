@@ -1,30 +1,25 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:34757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPBmK-00066a-5y
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:33:49 -0500
+	(envelope-from <armbru@redhat.com>) id 1gPBmP-00066a-9M
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:33:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPBjK-0005ym-TW
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:30:42 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:33724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPBjI-0005wI-Vb
+	(envelope-from <armbru@redhat.com>) id 1gPBjH-0005vs-8T
 	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:30:38 -0500
-Received: by mail-wr1-f68.google.com with SMTP id u9-v6so3227963wrr.0
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 11:30:36 -0800 (PST)
-References: <20181115192446.17187-1-minyard@acm.org>
-	<20181115192446.17187-2-minyard@acm.org>
-	<8add8514-f353-b914-78e8-e9f3e9be840d@redhat.com>
-	<c0c4051d-fe57-7399-9904-65425c6efc26@acm.org>
-	<CAFEAcA_Ubfuf-w66JJcPT+nWFFw-aa+Wfdm1ocGHf+VCSM_-qQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1f31e8e0-cde2-db7a-56ae-26eb70bb13d9@redhat.com>
-Date: Tue, 20 Nov 2018 20:30:33 +0100
+Received: from mx1.redhat.com ([209.132.183.28]:48912)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gPBjG-0005v5-SK
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:30:35 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181119154737.9840-1-liq3ea@163.com>
+	<20181119154737.9840-2-liq3ea@163.com>
+Date: Tue, 20 Nov 2018 20:30:27 +0100
+In-Reply-To: <20181119154737.9840-2-liq3ea@163.com> (Li Qiang's message of
+	"Mon, 19 Nov 2018 07:47:35 -0800")
+Message-ID: <87o9aj8s30.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_Ubfuf-w66JJcPT+nWFFw-aa+Wfdm1ocGHf+VCSM_-qQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/12] i2c: Split smbus into parts
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/3] fw_cfg: fix -boot bootsplash error
+ checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +28,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <minyard@acm.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Li Qiang <liq3ea@163.com>
+Cc: pbonzini@redhat.com, kraxel@redhat.com, lersek@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org
 
-On 20/11/18 16:47, Peter Maydell wrote:
-> On 16 November 2018 at 13:20, Corey Minyard <minyard@acm.org> wrote:
->> On 11/15/18 4:22 PM, Philippe Mathieu-Daudé wrote:
->>>> --- /dev/null
->>>> +++ b/include/hw/i2c/smbus_eeprom.h
->>>> @@ -0,0 +1,11 @@
->>>
->>>
->>> You missed the copyright notice here.
->>
->>
->> Other files don't have copyright notices (i2c.h, for instance), and for
->> the smbus.[ch] case the copyrights are kind of mixed up, the include
->> files had the big header with a copyright by one company and the C
->> file had a different copyright notice by a different company.
->>
->> Not a huge deal, but I didn't include it in that file because I didn't
->> think it was necessary.  I'm wondering if it would be best to
->> establish a style like Linux has, with the // SPDX... thing on the
->> first line.
-> 
-> Yeah, we have some legacy files with no copyright notice, but we
-> usually try to avoid that for new files. New files should have
-> a copyright notice and a license statement. (If you copied from
-> a file without a license statement, LICENSE says that means
-> 2-or-later.)
-> 
-> We don't yet use SPDX headers. (They're just a different and
-> shorter way to write the license statement.)
+Li Qiang <liq3ea@163.com> writes:
 
-Does that mean we can use them, or you rather prefer we don't?
+> fw_cfg_bootsplash() gets option parameter "splash-time"
+> with qemu_opt_get(), then converts it to an integer by hand.
+> It neglects to check that conversion for errors. This is
+> needlessly complicated and error-prone. But as "splash-time
+> not specified" is not the same as "splash-time=T" for any T,
+> we need use qemu_opt_get() to check if splash time exists.
+> This patch also make the qemu exit when finding or loading
+> splash file failed.
+>
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+>  hw/nvram/fw_cfg.c | 40 ++++++++++++++++------------------------
+>  vl.c              |  2 +-
+>  2 files changed, 17 insertions(+), 25 deletions(-)
+>
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 946f765f7f..78f43dad93 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -118,55 +118,47 @@ error:
+>  
+>  static void fw_cfg_bootsplash(FWCfgState *s)
+>  {
+> -    int boot_splash_time = -1;
+>      const char *boot_splash_filename = NULL;
+> -    char *p;
+> +    const char *boot_splash_time = NULL;
+>      char *filename, *file_data;
+>      gsize file_size;
+>      int file_type;
+> -    const char *temp;
+>  
+>      /* get user configuration */
+>      QemuOptsList *plist = qemu_find_opts("boot-opts");
+>      QemuOpts *opts = QTAILQ_FIRST(&plist->head);
+> -    if (opts != NULL) {
+> -        temp = qemu_opt_get(opts, "splash");
+> -        if (temp != NULL) {
+> -            boot_splash_filename = temp;
+> -        }
+> -        temp = qemu_opt_get(opts, "splash-time");
+> -        if (temp != NULL) {
+> -            p = (char *)temp;
+> -            boot_splash_time = strtol(p, &p, 10);
+> -        }
+> -    }
+> +    boot_splash_filename = qemu_opt_get(opts, "splash");
+> +    boot_splash_time = qemu_opt_get(opts, "splash-time");
+>  
+>      /* insert splash time if user configurated */
+> -    if (boot_splash_time >= 0) {
+> +    if (boot_splash_time) {
+> +        int64_t bst_val = qemu_opt_get_number(opts, "splash-time", -1);
+>          /* validate the input */
+> -        if (boot_splash_time > 0xffff) {
+> -            error_report("splash time is big than 65535, force it to 65535.");
+> -            boot_splash_time = 0xffff;
+> +        if (bst_val < 0 || bst_val > 0xffff) {
+> +            error_report("splash time is invalid,"
+> +                         "it should be a value between 0 and 65535");
 
-While they are machine parseable, I find them easier to understand than 
-the big chunk of legal text that sometime are not correctly written.
+Let's match the parameter name exactly: "splash-time is invalid, ..."
 
-Thanks,
+> +            exit(1);
+>          }
+>          /* use little endian format */
+> -        qemu_extra_params_fw[0] = (uint8_t)(boot_splash_time & 0xff);
+> -        qemu_extra_params_fw[1] = (uint8_t)((boot_splash_time >> 8) & 0xff);
+> +        qemu_extra_params_fw[0] = (uint8_t)(bst_val & 0xff);
+> +        qemu_extra_params_fw[1] = (uint8_t)((bst_val >> 8) & 0xff);
+>          fw_cfg_add_file(s, "etc/boot-menu-wait", qemu_extra_params_fw, 2);
+>      }
+>  
+>      /* insert splash file if user configurated */
+> -    if (boot_splash_filename != NULL) {
+> +    if (boot_splash_filename) {
+>          filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, boot_splash_filename);
+>          if (filename == NULL) {
+> -            error_report("failed to find file '%s'.", boot_splash_filename);
+> -            return;
+> +            error_report("failed to find file '%s'", boot_splash_filename);
+> +            exit(1);
+>          }
+>  
+>          /* loading file data */
+>          file_data = read_splashfile(filename, &file_size, &file_type);
+>          if (file_data == NULL) {
+>              g_free(filename);
+> -            return;
+> +            error_report("failed to read file '%s'", boot_splash_filename);
 
-Phil.
+Drop this error_report(), please.  read_splashfile() already reports the
+failure more usefully.
+
+> +            exit(1);
+>          }
+>          g_free(boot_splash_filedata);
+>          boot_splash_filedata = (uint8_t *)file_data;
+> diff --git a/vl.c b/vl.c
+> index fa25d1ae2d..96ac0ddcf6 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -336,7 +336,7 @@ static QemuOptsList qemu_boot_opts = {
+>              .type = QEMU_OPT_STRING,
+>          }, {
+>              .name = "splash-time",
+> -            .type = QEMU_OPT_STRING,
+> +            .type = QEMU_OPT_NUMBER,
+>          }, {
+>              .name = "reboot-timeout",
+>              .type = QEMU_OPT_STRING,
+
+With these minor error reporting improvements:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
