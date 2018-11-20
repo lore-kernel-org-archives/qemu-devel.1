@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gP4lB-00056U-7i
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:04:06 -0500
+	(envelope-from <groug@kaod.org>) id 1gP4lE-00056z-GE
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:04:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gP4l8-0006Zn-2S
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:04:05 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51300)
+	(envelope-from <groug@kaod.org>) id 1gP4l8-0006a2-K2
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:04:08 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58442)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gP4l7-0006ZI-Om
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:04:01 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gP4l8-0006Zd-C9
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:04:02 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wAKBwd6p134002
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 07:04:00 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2nvgbuvehe-1
+	wAKBwar5008013
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 07:04:01 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2nvg72n0wy-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 07:04:00 -0500
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 07:04:01 -0500
 Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
 	Tue, 20 Nov 2018 12:03:58 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 20 Nov 2018 13:03:25 +0100
-Message-Id: <20181120120326.30879-1-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 0/1] 9p fixes for v3.1.0-rc2
+Date: Tue, 20 Nov 2018 13:03:26 +0100
+In-Reply-To: <20181120120326.30879-1-groug@kaod.org>
+References: <20181120120326.30879-1-groug@kaod.org>
+Message-Id: <20181120120326.30879-2-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 1/1] 9p: take write lock on fid path updates
+ (CVE-2018-19364)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +38,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>, P J P <ppandit@redhat.com>
 
-The following changes since commit 3c035a41dca808f096a128fe2b62d849fe638a25:
+Recent commit 5b76ef50f62079a fixed a race where v9fs_co_open2() could
+possibly overwrite a fid path with v9fs_path_copy() while it is being
+accessed by some other thread, ie, use-after-free that can be detected
+by ASAN with a custom 9p client.
 
-  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-11-20' into staging (2018-11-20 10:56:57 +0000)
+It turns out that the same can happen at several locations where
+v9fs_path_copy() is used to set the fid path. The fix is again to
+take the write lock.
 
-are available in the Git repository at:
+Fixes CVE-2018-19364.
 
-  https://github.com/gkurz/qemu.git tags/for-upstream
-
-for you to fetch changes up to 5b3c77aa581ebb215125c84b0742119483571e55:
-
-  9p: take write lock on fid path updates (CVE-2018-19364) (2018-11-20 13:00:35 +0100)
-
-----------------------------------------------------------------
-Fixes yet another use-after-free issue that could be triggered by a
-misbehaving guest. This is a follow-up to commit:
-
-commit 5b76ef50f62079a2389ba28cacaf6cce68b1a0ed
-Author: Greg Kurz <groug@kaod.org>
-Date:   Wed Nov 7 01:00:04 2018 +0100
-
-    9p: write lock path in v9fs_co_open2()
-
-----------------------------------------------------------------
-Greg Kurz (1):
-      9p: take write lock on fid path updates (CVE-2018-19364)
-
+Cc: P J P <ppandit@redhat.com>
+Reported-by: zhibin hu <noirfate@gmail.com>
+Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
  hw/9pfs/9p.c | 15 +++++++++++++++
  1 file changed, 15 insertions(+)
+
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index eef289e394d4..267a25533b77 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -1391,7 +1391,9 @@ static void coroutine_fn v9fs_walk(void *opaque)
+             err = -EINVAL;
+             goto out;
+         }
++        v9fs_path_write_lock(s);
+         v9fs_path_copy(&fidp->path, &path);
++        v9fs_path_unlock(s);
+     } else {
+         newfidp = alloc_fid(s, newfid);
+         if (newfidp == NULL) {
+@@ -2160,6 +2162,7 @@ static void coroutine_fn v9fs_create(void *opaque)
+     V9fsString extension;
+     int iounit;
+     V9fsPDU *pdu = opaque;
++    V9fsState *s = pdu->s;
+ 
+     v9fs_path_init(&path);
+     v9fs_string_init(&name);
+@@ -2200,7 +2203,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+         if (err < 0) {
+             goto out;
+         }
++        v9fs_path_write_lock(s);
+         v9fs_path_copy(&fidp->path, &path);
++        v9fs_path_unlock(s);
+         err = v9fs_co_opendir(pdu, fidp);
+         if (err < 0) {
+             goto out;
+@@ -2216,7 +2221,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+         if (err < 0) {
+             goto out;
+         }
++        v9fs_path_write_lock(s);
+         v9fs_path_copy(&fidp->path, &path);
++        v9fs_path_unlock(s);
+     } else if (perm & P9_STAT_MODE_LINK) {
+         int32_t ofid = atoi(extension.data);
+         V9fsFidState *ofidp = get_fid(pdu, ofid);
+@@ -2234,7 +2241,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+             fidp->fid_type = P9_FID_NONE;
+             goto out;
+         }
++        v9fs_path_write_lock(s);
+         v9fs_path_copy(&fidp->path, &path);
++        v9fs_path_unlock(s);
+         err = v9fs_co_lstat(pdu, &fidp->path, &stbuf);
+         if (err < 0) {
+             fidp->fid_type = P9_FID_NONE;
+@@ -2272,7 +2281,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+         if (err < 0) {
+             goto out;
+         }
++        v9fs_path_write_lock(s);
+         v9fs_path_copy(&fidp->path, &path);
++        v9fs_path_unlock(s);
+     } else if (perm & P9_STAT_MODE_NAMED_PIPE) {
+         err = v9fs_co_mknod(pdu, fidp, &name, fidp->uid, -1,
+                             0, S_IFIFO | (perm & 0777), &stbuf);
+@@ -2283,7 +2294,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+         if (err < 0) {
+             goto out;
+         }
++        v9fs_path_write_lock(s);
+         v9fs_path_copy(&fidp->path, &path);
++        v9fs_path_unlock(s);
+     } else if (perm & P9_STAT_MODE_SOCKET) {
+         err = v9fs_co_mknod(pdu, fidp, &name, fidp->uid, -1,
+                             0, S_IFSOCK | (perm & 0777), &stbuf);
+@@ -2294,7 +2307,9 @@ static void coroutine_fn v9fs_create(void *opaque)
+         if (err < 0) {
+             goto out;
+         }
++        v9fs_path_write_lock(s);
+         v9fs_path_copy(&fidp->path, &path);
++        v9fs_path_unlock(s);
+     } else {
+         err = v9fs_co_open2(pdu, fidp, &name, -1,
+                             omode_to_uflags(mode)|O_CREAT, perm, &stbuf);
 -- 
 2.17.2
