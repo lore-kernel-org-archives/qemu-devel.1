@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP5ub-0000es-HW
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:17:54 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gP66K-0003ch-32
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:30:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP5ua-0002QN-Ip
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:17:53 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40504)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gP5ua-0002Q9-E3
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:17:52 -0500
-Received: by mail-ot1-x342.google.com with SMTP id s5so1592024oth.7
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 05:17:52 -0800 (PST)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gP66F-0000St-3q
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:30:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38122)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gP66E-0000Qc-Sn
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:29:55 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 20 Nov 2018 17:26:04 +0400
+Message-Id: <20181120132604.22854-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CJq7VHKTJw-OKYoEdwaZJWS9v-v8ENkEWLByZAWYNOZZw@mail.gmail.com>
-References: <20181115154639.29949-1-dgilbert@redhat.com>
-	<CAJ+F1CJq7VHKTJw-OKYoEdwaZJWS9v-v8ENkEWLByZAWYNOZZw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Nov 2018 13:17:31 +0000
-Message-ID: <CAFEAcA-NN+yoMfR0rQo89xfnP5Qrgisj-gc1=ob5eBxbb87Raw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 3.1] x86: Add 3.1 machine types
+Subject: [Qemu-devel] [PATCH for-3.1] hw/i386: add pc-i440fx-3.1 & pc-q35-3.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 15 November 2018 at 19:48, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
-> On Thu, Nov 15, 2018 at 7:47 PM Dr. David Alan Gilbert (git)
-> <dgilbert@redhat.com> wrote:
->>
->> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->>
->> x86 doesn't need a 3.1 machine type, because there's no incompatibility,
->> but it looks odd not having one, especially since s390, ppc and ARM have
->> it.  Join the party.
->>
->> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
->
-> I sent same patch already reviewed by Michael a few weeks ago:
-> https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg06574.html
+We have a couple of PC_COMPAT_3_0, so we should have 3.1 PC machines,
+and update the 3.0 machines to make use of those.
 
-Could you post that as a standalone patch marked as for-3.1 please?
-Then we can put it into the release without having to manually
-fish it out of a big patchset.
+Fixes a "Known issue" from https://wiki.qemu.org/Planning/3.1.
 
-thanks
--- PMM
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/i386/pc_piix.c | 15 ++++++++++++---
+ hw/i386/pc_q35.c  | 13 +++++++++++--
+ 2 files changed, 23 insertions(+), 5 deletions(-)
+
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index dc09466b3e..7092d6d13f 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -428,21 +428,30 @@ static void pc_i440fx_machine_options(MachineClass =
+*m)
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+ }
+=20
+-static void pc_i440fx_3_0_machine_options(MachineClass *m)
++static void pc_i440fx_3_1_machine_options(MachineClass *m)
+ {
+     pc_i440fx_machine_options(m);
+     m->alias =3D "pc";
+     m->is_default =3D 1;
+ }
+=20
++DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
++                      pc_i440fx_3_1_machine_options);
++
++static void pc_i440fx_3_0_machine_options(MachineClass *m)
++{
++    pc_i440fx_3_1_machine_options(m);
++    m->is_default =3D 0;
++    m->alias =3D NULL;
++    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
++}
++
+ DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
+                       pc_i440fx_3_0_machine_options);
+=20
+ static void pc_i440fx_2_12_machine_options(MachineClass *m)
+ {
+     pc_i440fx_3_0_machine_options(m);
+-    m->is_default =3D 0;
+-    m->alias =3D NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
+ }
+=20
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 532241e3f8..4702bb13c4 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->max_cpus =3D 288;
+ }
+=20
+-static void pc_q35_3_0_machine_options(MachineClass *m)
++static void pc_q35_3_1_machine_options(MachineClass *m)
+ {
+     pc_q35_machine_options(m);
+     m->alias =3D "q35";
+ }
+=20
++DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
++                   pc_q35_3_1_machine_options);
++
++static void pc_q35_3_0_machine_options(MachineClass *m)
++{
++    pc_q35_3_1_machine_options(m);
++    m->alias =3D NULL;
++    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
++}
++
+ DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
+                     pc_q35_3_0_machine_options);
+=20
+ static void pc_q35_2_12_machine_options(MachineClass *m)
+ {
+     pc_q35_3_0_machine_options(m);
+-    m->alias =3D NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
+ }
+=20
+--=20
+2.19.1.708.g4ede3d42df
