@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gP93u-0007rG-Bq
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:39:43 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gP94q-00008e-Vn
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gP93t-0004cU-CP
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:39:42 -0500
-Date: Tue, 20 Nov 2018 17:39:24 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gP94m-0005Mr-B0
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:40:39 -0500
+Date: Tue, 20 Nov 2018 17:40:10 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181120173924.0131a3e4@redhat.com>
-In-Reply-To: <20181107123652.23417-4-marcandre.lureau@redhat.com>
+Message-ID: <20181120174010.3999adda@redhat.com>
+In-Reply-To: <20181107123652.23417-6-marcandre.lureau@redhat.com>
 References: <20181107123652.23417-1-marcandre.lureau@redhat.com>
-	<20181107123652.23417-4-marcandre.lureau@redhat.com>
+	<20181107123652.23417-6-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 03/14] qom: make
- user_creatable_complete() specific to UserCreatable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 05/14] qdev: move
+ qdev_prop_register_global_list() to tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,160 +25,115 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, qemu-arm@nongnu.org, xen-devel@lists.xenproject.org, Artyom Tarasenko <atar4qemu@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Berger <stefanb@linux.ibm.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <minyard@acm.org>, =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, dgilbert@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed,  7 Nov 2018 16:36:41 +0400
+On Wed,  7 Nov 2018 16:36:43 +0400
 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-> Instead of accepting any Object*, change user_creatable_complete() to
-> require a UserCreatable*. Modify the callers to pass the appropriate
-> argument, removing redundant dynamic cast checks in object creation.
-
-Looks like it doesn't apply to current HEAD anymore
-=20
+> The function is only used by a test, move it there.
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
 > ---
->  include/qom/object_interfaces.h |  4 ++--
->  hw/misc/ivshmem.c               |  2 +-
->  hw/virtio/virtio-rng.c          |  2 +-
->  qom/object.c                    | 12 ++++++++----
->  qom/object_interfaces.c         | 14 +++-----------
->  5 files changed, 15 insertions(+), 19 deletions(-)
+>  include/hw/qdev-properties.h   |  1 -
+>  hw/core/qdev-properties.c      |  9 ---------
+>  tests/test-qdev-global-props.c | 18 ++++++++++++++----
+>  3 files changed, 14 insertions(+), 14 deletions(-)
 >=20
-> diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfa=
-ces.h
-> index 652a16d2ba..682ba1d9b0 100644
-> --- a/include/qom/object_interfaces.h
-> +++ b/include/qom/object_interfaces.h
-> @@ -51,14 +51,14 @@ typedef struct UserCreatableClass {
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index a95f4a73eb..3ab9cd2eb6 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -249,7 +249,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char =
+*name, int value);
+>  void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
 > =20
->  /**
->   * user_creatable_complete:
-> - * @obj: the object whose complete() method is called if defined
-> + * @uc: the user-creatable object whose complete() method is called if d=
-efined
->   * @errp: if an error occurs, a pointer to an area to store the error
->   *
->   * Wrapper to call complete() method if one of types it's inherited
->   * from implements USER_CREATABLE interface, otherwise the call does
->   * nothing.
->   */
-> -void user_creatable_complete(Object *obj, Error **errp);
-> +void user_creatable_complete(UserCreatable *uc, Error **errp);
-> =20
->  /**
->   * user_creatable_can_be_deleted:
-> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-> index f88910e55c..478f41044c 100644
-> --- a/hw/misc/ivshmem.c
-> +++ b/hw/misc/ivshmem.c
-> @@ -1279,7 +1279,7 @@ static void desugar_shm(IVShmemState *s)
->      object_property_set_bool(obj, true, "share", &error_abort);
->      object_property_add_child(OBJECT(s), "internal-shm-backend", obj,
->                                &error_abort);
-> -    user_creatable_complete(obj, &error_abort);
-> +    user_creatable_complete(USER_CREATABLE(obj), &error_abort);
->      s->hostmem =3D MEMORY_BACKEND(obj);
+>  void qdev_prop_register_global(GlobalProperty *prop);
+> -void qdev_prop_register_global_list(GlobalProperty *props);
+>  int qdev_prop_check_globals(void);
+>  void qdev_prop_set_globals(DeviceState *dev);
+>  void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *=
+dev,
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index ab61d502fd..bd84c4ea4c 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -1180,15 +1180,6 @@ void qdev_prop_register_global(GlobalProperty *pro=
+p)
+>      global_props =3D g_list_append(global_props, prop);
 >  }
 > =20
-> diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-> index 855f1b41d1..30493a2586 100644
-> --- a/hw/virtio/virtio-rng.c
-> +++ b/hw/virtio/virtio-rng.c
-> @@ -191,7 +191,7 @@ static void virtio_rng_device_realize(DeviceState *de=
-v, Error **errp)
->      if (vrng->conf.rng =3D=3D NULL) {
->          vrng->conf.default_backend =3D RNG_RANDOM(object_new(TYPE_RNG_RA=
-NDOM));
-> =20
-> -        user_creatable_complete(OBJECT(vrng->conf.default_backend),
-> +        user_creatable_complete(USER_CREATABLE(vrng->conf.default_backen=
-d),
->                                  &local_err);
->          if (local_err) {
->              error_propagate(errp, local_err);
-> diff --git a/qom/object.c b/qom/object.c
-> index 547dcf97c3..eb770dbf7f 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -417,6 +417,7 @@ void object_initialize_childv(Object *parentobj, cons=
-t char *propname,
->  {
->      Error *local_err =3D NULL;
->      Object *obj;
-> +    UserCreatable *uc;
-> =20
->      object_initialize(childobj, size, type);
->      obj =3D OBJECT(childobj);
-> @@ -431,8 +432,9 @@ void object_initialize_childv(Object *parentobj, cons=
-t char *propname,
->          goto out;
->      }
-> =20
-> -    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
-> -        user_creatable_complete(obj, &local_err);
-> +    uc =3D (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE=
-);
-> +    if (uc) {
-> +        user_creatable_complete(uc, &local_err);
->          if (local_err) {
->              object_unparent(obj);
->              goto out;
-> @@ -590,6 +592,7 @@ Object *object_new_with_propv(const char *typename,
->      Object *obj;
->      ObjectClass *klass;
->      Error *local_err =3D NULL;
-> +    UserCreatable *uc;
-> =20
->      klass =3D object_class_by_name(typename);
->      if (!klass) {
-> @@ -612,8 +615,9 @@ Object *object_new_with_propv(const char *typename,
->          goto error;
->      }
-> =20
-> -    if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
-> -        user_creatable_complete(obj, &local_err);
-> +    uc =3D (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE=
-);
-> +    if (uc) {
-> +        user_creatable_complete(uc, &local_err);
->          if (local_err) {
->              object_unparent(obj);
->              goto error;
-> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-> index 97b79b48bb..db85d1eb75 100644
-> --- a/qom/object_interfaces.c
-> +++ b/qom/object_interfaces.c
-> @@ -8,18 +8,10 @@
->  #include "qapi/opts-visitor.h"
->  #include "qemu/config-file.h"
-> =20
-> -void user_creatable_complete(Object *obj, Error **errp)
-> +void user_creatable_complete(UserCreatable *uc, Error **errp)
->  {
-> +    UserCreatableClass *ucc =3D USER_CREATABLE_GET_CLASS(uc);
-> =20
-> -    UserCreatableClass *ucc;
-> -    UserCreatable *uc =3D
-> -        (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE);
+> -void qdev_prop_register_global_list(GlobalProperty *props)
+> -{
+> -    int i;
 > -
-> -    if (!uc) {
-> -        return;
+> -    for (i =3D 0; props[i].driver !=3D NULL; i++) {
+> -        qdev_prop_register_global(props+i);
 > -    }
+> -}
 > -
-> -    ucc =3D USER_CREATABLE_GET_CLASS(uc);
->      if (ucc->complete) {
->          ucc->complete(uc, errp);
->      }
-> @@ -89,7 +81,7 @@ Object *user_creatable_add_type(const char *type, const=
- char *id,
->          goto out;
->      }
+>  int qdev_prop_check_globals(void)
+>  {
+>      GList *l;
+> diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-prop=
+s.c
+> index ccdf6c57c1..b1eb505442 100644
+> --- a/tests/test-qdev-global-props.c
+> +++ b/tests/test-qdev-global-props.c
+> @@ -89,6 +89,16 @@ static void test_static_prop(void)
+>      g_test_trap_assert_stdout("");
+>  }
 > =20
-> -    user_creatable_complete(obj, &local_err);
-> +    user_creatable_complete(USER_CREATABLE(obj), &local_err);
->      if (local_err) {
->          object_property_del(object_get_objects_root(),
->                              id, &error_abort);
+> +static void register_global_properties(GlobalProperty *props)
+> +{
+> +    int i;
+> +
+> +    for (i =3D 0; props[i].driver !=3D NULL; i++) {
+> +        qdev_prop_register_global(props + i);
+> +    }
+> +}
+> +
+> +
+>  /* Test setting of static property using global properties */
+>  static void test_static_globalprop_subprocess(void)
+>  {
+> @@ -98,7 +108,7 @@ static void test_static_globalprop_subprocess(void)
+>          {}
+>      };
+> =20
+> -    qdev_prop_register_global_list(props);
+> +    register_global_properties(props);
+> =20
+>      mt =3D STATIC_TYPE(object_new(TYPE_STATIC_PROPS));
+>      qdev_init_nofail(DEVICE(mt));
+> @@ -216,7 +226,7 @@ static void test_dynamic_globalprop_subprocess(void)
+>      };
+>      int global_error;
+> =20
+> -    qdev_prop_register_global_list(props);
+> +    register_global_properties(props);
+> =20
+>      mt =3D DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
+>      qdev_init_nofail(DEVICE(mt));
+> @@ -261,7 +271,7 @@ static void test_dynamic_globalprop_nouser_subprocess=
+(void)
+>      };
+>      int global_error;
+> =20
+> -    qdev_prop_register_global_list(props);
+> +    register_global_properties(props);
+> =20
+>      mt =3D DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
+>      qdev_init_nofail(DEVICE(mt));
+> @@ -299,7 +309,7 @@ static void test_subclass_global_props(void)
+>          {}
+>      };
+> =20
+> -    qdev_prop_register_global_list(props);
+> +    register_global_properties(props);
+> =20
+>      mt =3D STATIC_TYPE(object_new(TYPE_SUBCLASS));
+>      qdev_init_nofail(DEVICE(mt));
