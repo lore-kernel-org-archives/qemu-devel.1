@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gP1MU-0000e6-7f
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:26:23 -0500
+	(envelope-from <balducci@units.it>) id 1gP1OP-0001fv-Af
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:28:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gP1MS-0002tW-WE
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:26:22 -0500
-Date: Tue, 20 Nov 2018 09:26:02 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181120092602.676ff8f1@redhat.com>
-In-Reply-To: <1542650570.24389.5.camel@intel.com>
-References: <20181105014047.26447-1-sameo@linux.intel.com>
-	<20181105014047.26447-20-sameo@linux.intel.com>
-	<20181116103909.64f35d5d@redhat.com>
-	<1542397323.18399.3.camel@intel.com>
-	<20181119163757.3c975f62@redhat.com>
-	<1542650570.24389.5.camel@intel.com>
+	(envelope-from <balducci@units.it>) id 1gP1OL-0004YO-Ck
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:28:21 -0500
+Received: from dschgrazlin2.univ.trieste.it ([140.105.55.81]:57528
+	helo=dschgrazlin2.units.it) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <balducci@units.it>) id 1gP1OL-0004Xx-1U
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:28:17 -0500
+From: balducci@units.it
+In-reply-to: Your message of "Mon, 19 Nov 2018 16:55:13 -0500."
+	<jpgefbgag1q.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <7279.1542702495.1@dschgrazlin2.units.it>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 19/24] hw: acpi: Retrieve the PCI bus
- from AcpiPciHpState
+Date: Tue, 20 Nov 2018 09:27:51 +0100
+Message-ID: <7280.1542702495@dschgrazlin2.units.it>
+Subject: Re: [Qemu-devel] 3.1.0-rc{0,1} doesn't start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,218 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Boeuf, Sebastien" <sebastien.boeuf@intel.com>
-Cc: "sameo@linux.intel.com" <sameo@linux.intel.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "anthony.perard@citrix.com" <anthony.perard@citrix.com>, "sstabellini@kernel.org" <sstabellini@kernel.org>, "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "rth@twiddle.net" <rth@twiddle.net>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: Bandan Das <bsd@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, 19 Nov 2018 18:02:53 +0000
-"Boeuf, Sebastien" <sebastien.boeuf@intel.com> wrote:
+hello
 
-> On Mon, 2018-11-19 at 16:37 +0100, Igor Mammedov wrote:
-> > On Fri, 16 Nov 2018 19:42:08 +0000
-> > "Boeuf, Sebastien" <sebastien.boeuf@intel.com> wrote:
-> >  =20
-> > >=20
-> > > Hi Igor,
-> > >=20
-> > > On Fri, 2018-11-16 at 10:39 +0100, Igor Mammedov wrote: =20
-> > > >=20
-> > > > On Mon,=C2=A0=C2=A05 Nov 2018 02:40:42 +0100
-> > > > Samuel Ortiz <sameo@linux.intel.com> wrote:
-> > > > =C2=A0=C2=A0 =20
-> > > > >=20
-> > > > >=20
-> > > > > From: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> > > > >=20
-> > > > > Instead of using the machine type specific method find_i440fx()
-> > > > > to
-> > > > > retrieve the PCI bus, this commit aims to rely on the fact that
-> > > > > the
-> > > > > PCI bus is known by the structure AcpiPciHpState.
-> > > > >=20
-> > > > > When the structure is initialized through acpi_pcihp_init()
-> > > > > call,
-> > > > > it saves the PCI bus, which means there is no need to invoke a
-> > > > > special function later on.
-> > > > >=20
-> > > > > Based on the fact that find_i440fx() was only used there, this
-> > > > > patch also removes the function find_i440fx() itself from the
-> > > > > entire codebase.
-> > > > >=20
-> > > > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > > > > Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > > > > Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> > > > > Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>=C2=A0=C2=A0 =
-=20
-> > > > Thanks for cleaning it up
-> > > >=20
-> > > > minor nit:
-> > > > Taking in account that you're removing '/* TODO: Q35 support */'
-> > > > comment along with find_i440fx(), it might be worth to mention
-> > > > in this commit message. Something along lines that ACPI PCIHP
-> > > > exist to support guests without SHPC support on PCI
-> > > > based PC machine. Considering that Q35 provides native
-> > > > PCI-E hotplug, there is no need to add ACPI hotplug there.=C2=A0=C2=
-=A0 =20
-> > > Oh yes sure we can update the commit message :). But just wanted to
-> > > mention that 'pc' machine type uses ACPI PCIHP and does support
-> > > SHPC, so it's not mutually exclusive. =20
-> > it supports both but is it relevant to this patch?
-> >=20
-> > Point was that one shouldn't remove something silently without
-> > any justification/explanation. So that readers that come later
-> > wouldn't wonder about the reasons why the code was removed.
-> >  =20
->=20
-> I understand the point but I think the comment was wrong in the first
-> place since q35 never tried to support ACPI PCIHP, as they support PCIe
-> native hotplug as you mentioned.
-ok.
+> incomplete because it can return 0 for data. Can you try this:
+>
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index f524e7d929..4878ffb90b 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -2002,14 +2002,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>  #endif
+>  =
 
-when you have something ready, feel free to ping me
-(I don't mind to review on github if that helps to speed up process)
+>      /* If host supports feature MSR, write down. */
+> -    if (kvm_feature_msrs) {
+> -        int i;
+> -        for (i =3D 0; i < kvm_feature_msrs->nmsrs; i++)
+> -            if (kvm_feature_msrs->indices[i] =3D=3D MSR_IA32_ARCH_CAPAB=
+ILITIES) =
 
->=20
-> > =C2=A0 =20
-> > >  =20
-> > > >=20
-> > > >=20
-> > > > with commit message fixed
-> > > >=20
-> > > > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> > > > =C2=A0=C2=A0 =20
-> > > > >=20
-> > > > >=20
-> > > > > ---
-> > > > > =C2=A0include/hw/i386/pc.h=C2=A0=C2=A0|=C2=A0=C2=A01 -
-> > > > > =C2=A0hw/acpi/pcihp.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0| =
-10 ++++------
-> > > > > =C2=A0hw/pci-host/piix.c=C2=A0=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A08 --=
-------
-> > > > > =C2=A0stubs/pci-host-piix.c |=C2=A0=C2=A06 ------
-> > > > > =C2=A0stubs/Makefile.objs=C2=A0=C2=A0=C2=A0|=C2=A0=C2=A01 -
-> > > > > =C2=A05 files changed, 4 insertions(+), 22 deletions(-)
-> > > > > =C2=A0delete mode 100644 stubs/pci-host-piix.c
-> > > > >=20
-> > > > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > > > > index 44cb6bf3f3..8e5f1464eb 100644
-> > > > > --- a/include/hw/i386/pc.h
-> > > > > +++ b/include/hw/i386/pc.h
-> > > > > @@ -255,7 +255,6 @@ PCIBus *i440fx_init(const char *host_type,
-> > > > > const char *pci_type,
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0MemoryRegion=
- *pci_memory,
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0MemoryRegion=
- *ram_memory);
-> > > > > =C2=A0
-> > > > > -PCIBus *find_i440fx(void);
-> > > > > =C2=A0/* piix4.c */
-> > > > > =C2=A0extern PCIDevice *piix4_dev;
-> > > > > =C2=A0int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn);
-> > > > > diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-> > > > > index 80d42e12ff..254b2e50ab 100644
-> > > > > --- a/hw/acpi/pcihp.c
-> > > > > +++ b/hw/acpi/pcihp.c
-> > > > > @@ -93,10 +93,9 @@ static void *acpi_set_bsel(PCIBus *bus, void
-> > > > > *opaque)
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return bsel_alloc;
-> > > > > =C2=A0}
-> > > > > =C2=A0
-> > > > > -static void acpi_set_pci_info(void)
-> > > > > +static void acpi_set_pci_info(AcpiPciHpState *s)
-> > > > > =C2=A0{
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0static bool bsel_is_set;
-> > > > > -=C2=A0=C2=A0=C2=A0=C2=A0PCIBus *bus;
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0unsigned bsel_alloc =3D ACPI_PCIHP_=
-BSEL_DEFAULT;
-> > > > > =C2=A0
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (bsel_is_set) {
-> > > > > @@ -104,10 +103,9 @@ static void acpi_set_pci_info(void)
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bsel_is_set =3D true;
-> > > > > =C2=A0
-> > > > > -=C2=A0=C2=A0=C2=A0=C2=A0bus =3D find_i440fx(); /* TODO: Q35 supp=
-ort */
-> > > > > -=C2=A0=C2=A0=C2=A0=C2=A0if (bus) {
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0if (s->root) {
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Scan all=
- PCI buses. Set property to enable acpi
-> > > > > based
-> > > > > hotplug. */
-> > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pci_for_each_bus=
-_depth_first(bus, acpi_set_bsel, NULL,
-> > > > > &bsel_alloc);
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pci_for_each_bus=
-_depth_first(s->root, acpi_set_bsel,
-> > > > > NULL,
-> > > > > &bsel_alloc);
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > > > > =C2=A0}
-> > > > > =C2=A0
-> > > > > @@ -213,7 +211,7 @@ static void
-> > > > > acpi_pcihp_update(AcpiPciHpState
-> > > > > *s)
-> > > > > =C2=A0
-> > > > > =C2=A0void acpi_pcihp_reset(AcpiPciHpState *s)
-> > > > > =C2=A0{
-> > > > > -=C2=A0=C2=A0=C2=A0=C2=A0acpi_set_pci_info();
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0acpi_set_pci_info(s);
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0acpi_pcihp_update(s);
-> > > > > =C2=A0}
-> > > > > =C2=A0
-> > > > > diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-> > > > > index 47293a3915..658460264b 100644
-> > > > > --- a/hw/pci-host/piix.c
-> > > > > +++ b/hw/pci-host/piix.c
-> > > > > @@ -445,14 +445,6 @@ PCIBus *i440fx_init(const char *host_type,
-> > > > > const char *pci_type,
-> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return b;
-> > > > > =C2=A0}
-> > > > > =C2=A0
-> > > > > -PCIBus *find_i440fx(void)
-> > > > > -{
-> > > > > -=C2=A0=C2=A0=C2=A0=C2=A0PCIHostState *s =3D OBJECT_CHECK(PCIHost=
-State,
-> > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0obj=
-ect_resolve_path("/machi
-> > > > > ne/i
-> > > > > 440fx", NULL),
-> > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0TYP=
-E_PCI_HOST_BRIDGE);
-> > > > > -=C2=A0=C2=A0=C2=A0=C2=A0return s ? s->bus : NULL;
-> > > > > -}
-> > > > > -
-> > > > > =C2=A0/* PIIX3 PCI to ISA bridge */
-> > > > > =C2=A0static void piix3_set_irq_pic(PIIX3State *piix3, int pic_ir=
-q)
-> > > > > =C2=A0{
-> > > > > diff --git a/stubs/pci-host-piix.c b/stubs/pci-host-piix.c
-> > > > > deleted file mode 100644
-> > > > > index 6ed81b1f21..0000000000
-> > > > > --- a/stubs/pci-host-piix.c
-> > > > > +++ /dev/null
-> > > > > @@ -1,6 +0,0 @@
-> > > > > -#include "qemu/osdep.h"
-> > > > > -#include "hw/i386/pc.h"
-> > > > > -PCIBus *find_i440fx(void)
-> > > > > -{
-> > > > > -=C2=A0=C2=A0=C2=A0=C2=A0return NULL;
-> > > > > -}
-> > > > > diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> > > > > index 5dd0aeeec6..725f78bedc 100644
-> > > > > --- a/stubs/Makefile.objs
-> > > > > +++ b/stubs/Makefile.objs
-> > > > > @@ -41,6 +41,5 @@ stub-obj-y +=3D pc_madt_cpu_entry.o
-> > > > > =C2=A0stub-obj-y +=3D vmgenid.o
-> > > > > =C2=A0stub-obj-y +=3D xen-common.o
-> > > > > =C2=A0stub-obj-y +=3D xen-hvm.o
-> > > > > -stub-obj-y +=3D pci-host-piix.o
-> > > > > =C2=A0stub-obj-y +=3D ram-block.o
-> > > > > =C2=A0stub-obj-y +=3D ramfb.o=C2=A0=C2=A0 =20
-> > > Thanks,
-> > > Sebastie =20
+> {
+> -                kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+> +    if (kvm_arch_get_supported_msr_feature(kvm_state, MSR_IA32_ARCH_CAP=
+ABILI
+> TIES)) {
+> +        kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+>                                env->features[FEAT_ARCH_CAPABILITIES]);
+> -                break;
+> -            }
+>      }
+>  =
+
+>      /*
+
+I'm getting the same error message at start time (patch applied to
+official  qemu-3.1.0-rc1 tarball):
+
+----8<----
+qemu: error: failed to set MSR 0x10a to 0x0
+qemu: /home/balducci/tmp/install-us-d/qemu-3.1.0-rc1.d/qemu-3.1.0-rc1/targ=
+et/i386/kvm.c:2206: kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->=
+nmsrs' failed.
+Aborted
+---->8----
+
+thanks a lot
+ciao
+-gabriele
