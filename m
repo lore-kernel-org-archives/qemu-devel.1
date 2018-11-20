@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gOzGQ-0003Pf-DU
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:11:59 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gOzPU-0006u6-RF
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:21:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gOzGN-0004hJ-8e
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:11:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40936)
+	(envelope-from <kraxel@redhat.com>) id 1gOzPP-0003OZ-Tn
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:21:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gOzGM-0004fV-U3
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:11:55 -0500
-References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
-	<20181114123643.24091-3-marcandre.lureau@redhat.com>
-	<20181119225007.7qlbjv4fro2ftqmc@function>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3cb53825-a0ab-92a4-2eda-7646f1fc11d1@redhat.com>
-Date: Tue, 20 Nov 2018 07:11:43 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gOzPP-0003Ll-Ld
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:21:15 -0500
+Date: Tue, 20 Nov 2018 07:21:09 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181120062109.eahirgygm4br3ov7@sirius.home.kraxel.org>
+References: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
+	<20181119084855.uyira2lpu73mu2fo@sirius.home.kraxel.org>
+	<CAGxU2F4O4aKzrJky7EFeWaHFuBKPwi_Z-j7G7m+ENRojVG_5vA@mail.gmail.com>
+	<20181119130713.GB6443@stefanha-x1.localdomain>
+	<20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
+	<CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20181119225007.7qlbjv4fro2ftqmc@function>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 02/41] glib-compat: add
- g_spawn_async_with_fds() fallback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
+Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: renzo@cs.unibo.it, qemu-devel@nongnu.org, stefanha@redhat.com, rjones@redhat.com, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: stefanha@gmail.com, Samuel Ortiz <sameo@linux.intel.com>, Rob Bradford <robert.bradford@intel.com>, seabios@seabios.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 2018-11-19 23:50, Samuel Thibault wrote:
-> Marc-Andr=C3=A9 Lureau, le mer. 14 nov. 2018 16:36:04 +0400, a ecrit:
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
->=20
-> include/glib-compat.h maintainers, may I keep this in my slirp tree, to
-> be pushed to master when appropriate?
+  Hi,
 
-$ scripts/get_maintainer.pl -f include/glib-compat.h
-get_maintainer.pl: No maintainers found [...]
+> just an update, I enabled the debug prints and I saw two timeouts fired
+> with a lot
+> of time lost (~780ms between "init timer" and "Scan for VGA ..."),
+> putting other prints I discovered that a lot of time is spent in the
+> tpm_setup(),
+> during the probe of the 2 TPM devices:
+> 
+> 00.548869 init timer
+> 00.549677 ./src/post.c:157 platform_hardware_setup
+> 00.550182 ./src/hw/tpm_drivers.c:579 tpmhw_probe
+> 01.300833 WARNING - Timeout at wait_reg8:81!
+> 01.301388 ./src/hw/tpm_drivers.c:579 tpmhw_probe
+> 01.331843 WARNING - Timeout at wait_reg8:81!
+> 01.332316 ./src/post.c:160 platform_hardware_setup
+> 01.333358 Scan for VGA option rom
+> 
+> Indeed, in the probe of the TPM devices (TIS and CRB)  there are timeouts of
+> 750 ms and 30 ms respectively.
+> 
+> Then, statically disabling TPM and TCG (CONFIG_TCGBIOS) the time spent
+> in SeaBIOS goes down from ~846ms to ~56ms:
+> # SeaBIOS disabling CONFIG_TCGBIOS
+> BIOS=/home/stefano/repos/seabios/out_notcgbios/bios.bin
+>  qemu_init_end: 40.658371
+>  fw_start: 40.850395 (+0.192024)
+>  fw_do_boot: 96.750142 (+55.899747)
+>  linux_start_boot: 98.880578 (+2.130436)
+> 
+> The tpm_setup() is called after the qemu_cfg_init(), so I think we can
+> disable
+> this call using some fw_cfg parameters, if we will decide to implement a
+> runtime
+> approach.
 
-... so I'd say yes, please just go ahead and queue this :-)
+Another possible option is to simply use shorter timeouts on qemu (using
+runningOnQEMU()), I'd suggest to check with the TPM maintainers whenever
+that is ok.
 
- Thomas
+Background:  The drivers in seabios work on both virtual and physical
+hardware (you can run seabios as coreboot payload on physical hardware).
+There are quite a few places where are delays and timeouts which are
+required to work properly on physical hardware.  But typically virtual
+hardware is alot faster.  There is -- for example -- no time needed to
+establish a sata link.  Link detection in ahci is instant on qemu.
 
->> ---
->>  include/glib-compat.h | 56 ++++++++++++++++++++++++++++++++++++++++++=
-+
->>  1 file changed, 56 insertions(+)
->>
->> diff --git a/include/glib-compat.h b/include/glib-compat.h
->> index fdf95a255d..8a078c5288 100644
->> --- a/include/glib-compat.h
->> +++ b/include/glib-compat.h
->> @@ -83,6 +83,62 @@ static inline gboolean g_strv_contains_qemu(const g=
-char *const *strv,
->>  }
->>  #define g_strv_contains(a, b) g_strv_contains_qemu(a, b)
->> =20
->> +#if !GLIB_CHECK_VERSION(2, 58, 0)
->> +typedef struct QemuGSpawnFds {
->> +    GSpawnChildSetupFunc child_setup;
->> +    gpointer user_data;
->> +    gint stdin_fd;
->> +    gint stdout_fd;
->> +    gint stderr_fd;
->> +} QemuGSpawnFds;
->> +
->> +static inline void
->> +qemu_gspawn_fds_setup(gpointer user_data)
->> +{
->> +    QemuGSpawnFds *q =3D (QemuGSpawnFds *)user_data;
->> +
->> +    dup2(q->stdin_fd, 0);
->> +    dup2(q->stdout_fd, 1);
->> +    dup2(q->stderr_fd, 2);
->> +    q->child_setup(q->user_data);
->> +}
->> +#endif
->> +
->> +static inline gboolean
->> +g_spawn_async_with_fds_qemu(const gchar *working_directory,
->> +                            gchar **argv,
->> +                            gchar **envp,
->> +                            GSpawnFlags flags,
->> +                            GSpawnChildSetupFunc child_setup,
->> +                            gpointer user_data,
->> +                            GPid *child_pid,
->> +                            gint stdin_fd,
->> +                            gint stdout_fd,
->> +                            gint stderr_fd,
->> +                            GError **error)
->> +{
->> +#if GLIB_CHECK_VERSION(2, 58, 0)
->> +    return g_spawn_async_with_fds(working_directory, argv, envp, flag=
-s,
->> +                                  child_setup, user_data,
->> +                                  child_pid, stdin_fd, stdout_fd, std=
-err_fd,
->> +                                  error);
->> +#else
->> +    QemuGSpawnFds setup =3D {
->> +        .child_setup =3D child_setup,
->> +        .user_data =3D user_data,
->> +        .stdin_fd =3D stdin_fd,
->> +        .stdout_fd =3D stdout_fd,
->> +        .stderr_fd =3D stderr_fd,
->> +    };
->> +
->> +    return g_spawn_async(working_directory, argv, envp, flags,
->> +                         qemu_gspawn_fds_setup, &setup,
->> +                         child_pid, error);
->> +#endif
->> +}
->> +
->> +#define g_spawn_async_with_fds(wd, argv, env, f, c, d, p, ifd, ofd, e=
-fd, err) \
->> +    g_spawn_async_with_fds_qemu(wd, argv, env, f, c, d, p, ifd, ofd, =
-efd, err)
->> =20
->>  #if defined(_WIN32) && !GLIB_CHECK_VERSION(2, 50, 0)
->>  /*
->> --=20
->> 2.19.1.708.g4ede3d42df
->>
->=20
+cheers,
+  Gerd
