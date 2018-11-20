@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gP4vM-0000yZ-6Q
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:14:36 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gP4wx-0001fu-Fi
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:16:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gP4vJ-0004MX-47
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:14:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gP4vI-0004MJ-T7
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:14:33 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 29B5A308A941
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 12:14:32 +0000 (UTC)
-References: <20181119182330.17147-1-pbonzini@redhat.com>
-	<20181120114422.GA5072@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20c9d320-f189-f65a-8a29-ddead8949d45@redhat.com>
-Date: Tue, 20 Nov 2018 13:14:29 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181120114422.GA5072@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] target/i386: kvm: add VMX migration
- blocker
+	(envelope-from <richard.henderson@linaro.org>) id 1gP4wu-0004z1-CT
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:16:15 -0500
+Received: from mail-pf1-x435.google.com ([2607:f8b0:4864:20::435]:36736)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gP4wt-0004yi-V5
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:16:12 -0500
+Received: by mail-pf1-x435.google.com with SMTP id b85so926792pfc.3
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 04:16:11 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 20 Nov 2018 13:15:53 +0100
+Message-Id: <20181120121558.7660-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/5] tcg: Make bswap support in qemu_ld/st
+ optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,23 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alistair.Francis@wdc.com
 
-On 20/11/18 12:44, Dr. David Alan Gilbert wrote:
-> * Paolo Bonzini (pbonzini@redhat.com) wrote:
->> Nested VMX does not support live migration yet.  Add a blocker
->> until that is worked out.
->>
->> Nested SVM only does not support it, but unfortunately it is
->> enabled by default for -cpu host so we cannot really disable it.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> So I'm OK with this, but it does need a release note warning whenever it
-> goes in, because it'll surprise those who've already enabled nesting
-> but don't use it on all their VMs.
+Having to support bswap in the guest memory operations at times
+requires an irritating number of temporaries.  Better to allow
+the bswap operations to be expanded outside of the memory ops
+and let register allocation do its thing.
 
-Yes, of course.
+This is something that I've been planning to do for some time,
+to aid i386 and arm32 especially.  But I've been prompted again
+by the nacent risc-v backend, for which this would be especially
+irritating to have to open-code.
 
-Paolo
+Alistair, for convenience I've pushed this to 
+
+  https://github.com/rth7680/qemu.git tcg-next-for-4.0
+
+
+r~
+
+
+Richard Henderson (5):
+  tcg: Add TCG_TARGET_HAS_MEMORY_BSWAP
+  tcg/optimize: Optimize bswap
+  tcg/i386: Set TCG_TARGET_HAS_MEMORY_BSWAP with have_movbe
+  tcg/aarch64: Set TCG_TARGET_HAS_MEMORY_BSWAP to false
+  tcg/arm: Set TCG_TARGET_HAS_MEMORY_BSWAP to false
+
+ tcg/aarch64/tcg-target.h     |   1 +
+ tcg/arm/tcg-target.h         |   1 +
+ tcg/i386/tcg-target.h        |   3 +
+ tcg/mips/tcg-target.h        |   1 +
+ tcg/ppc/tcg-target.h         |   1 +
+ tcg/s390/tcg-target.h        |   1 +
+ tcg/sparc/tcg-target.h       |   1 +
+ tcg/tci/tcg-target.h         |   2 +
+ tcg/aarch64/tcg-target.inc.c |  63 +++--------
+ tcg/arm/tcg-target.inc.c     | 198 +++++++++--------------------------
+ tcg/i386/tcg-target.inc.c    | 112 +++++++-------------
+ tcg/optimize.c               |  12 +++
+ tcg/tcg-op.c                 | 118 ++++++++++++++++++++-
+ 13 files changed, 234 insertions(+), 280 deletions(-)
+
+-- 
+2.17.2
