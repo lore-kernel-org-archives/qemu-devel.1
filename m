@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1gP1es-0006kr-Hk
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:45:23 -0500
+	(envelope-from <hongbo.zhang@linaro.org>) id 1gP1j2-0008Dj-B6
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:49:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1gP1ep-0007v9-D5
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:45:22 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:43522 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
-	id 1gP1ep-0007tc-1y
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:45:19 -0500
-From: linzhecheng <linzhecheng@huawei.com>
-Date: Tue, 20 Nov 2018 08:28:00 +0000
-Message-ID: <D9DE8DBB19F2A24080482022C1DE758302D24F62@dggemm509-mbx.china.huawei.com>
-References: <20181120011815.10580-1-linzhecheng@huawei.com>
-	<20181120082513.t3cvd3vuh7lbp3ha@sirius.home.kraxel.org>
-In-Reply-To: <20181120082513.t3cvd3vuh7lbp3ha@sirius.home.kraxel.org>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <hongbo.zhang@linaro.org>) id 1gP1j1-0002fD-EF
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:49:40 -0500
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:39113)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1gP1j1-0002eV-5o
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:49:39 -0500
+Received: by mail-lj1-x241.google.com with SMTP id t9-v6so918535ljh.6
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 00:49:38 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] usb-host: set ifs.detached as true if
- kernel driver is not active
+References: <1539939312-19713-1-git-send-email-hongbo.zhang@linaro.org>
+	<1539939312-19713-2-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA-vF5orNpfGFe2sGWh=TxWL054PmCM-Yu4faJne+4CkbA@mail.gmail.com>
+	<CAHmQWvD1ocAfZo=9aJYeuVDWrBk=AF_D-AgHriYb3-7=n+rR6A@mail.gmail.com>
+	<20181116122705.msdb5hydmhtyzzxy@sirius.home.kraxel.org>
+	<CAKv+Gu8QXaRioVPNze_+mJg4aqjJmwn4O-1jdRcYwrkieXrBwQ@mail.gmail.com>
+	<20181119124423.qj3sjhhdyetrbju5@bivouac.eciton.net>
+	<CAKv+Gu_-U8BHthhen-GBkium9qJMdd-pe_PB9TPdUaP=koeajQ@mail.gmail.com>
+	<20181119164421.me2j4fwzo43aghaa@bivouac.eciton.net>
+	<CAKv+Gu9VjERXDdb=ZkvzVocL4Fd3_2e+F=H0nqEJVs4UEkYmhw@mail.gmail.com>
+	<20181120081613.bezcjotqhmqflvvb@sirius.home.kraxel.org>
+In-Reply-To: <20181120081613.bezcjotqhmqflvvb@sirius.home.kraxel.org>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Tue, 20 Nov 2018 16:49:26 +0800
+Message-ID: <CAHmQWvDua+3fXT7wA2j7wDRbOi5VJWfMa_+YYt6Xjv9XZF1Skg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4] hw/arm: Add arm SBSA reference machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +38,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
+To: kraxel@redhat.com
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-
-
-> -----Original Message-----
-> From: Gerd Hoffmann [mailto:kraxel@redhat.com]
-> Sent: Tuesday, November 20, 2018 4:25 PM
-> To: linzhecheng <linzhecheng@huawei.com>
-> Cc: qemu-devel@nongnu.org; Zhoujian (jay) <jianjay.zhou@huawei.com>;
-> wangxin (U) <wangxinxin.wang@huawei.com>
-> Subject: Re: [PATCH] usb-host: set ifs.detached as true if kernel driver =
-is not
-> active
->=20
-> On Tue, Nov 20, 2018 at 09:18:15AM +0800, linzhecheng wrote:
-> > If no kernel driver is active, we can already claim and perform I/O on
-> > it without detaching it.
+On Tue, 20 Nov 2018 at 16:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+>   Hi,
+>
+> > > But I assume you specifically want things that do a lot of DMA, so I
+> > > couldn't get away with asking for keeping it to the SBSA UART(s)? :)
 > >
-> > Signed-off-by: linzhecheng <linzhecheng@huawei.com>
+> > Ideally, it would be something that supports platform MSIs as well,
+> > but that is unlikely to be a priority for anyone (and i would be very
+> > surprised if any of QEMU's sysbus host controllers implement that at
+> > the moment)
 > >
-> > diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c index
-> > f31e9cbbb8..db4ae1e6e8 100644
-> > --- a/hw/usb/host-libusb.c
-> > +++ b/hw/usb/host-libusb.c
-> > @@ -1119,6 +1119,10 @@ static void
-> usb_host_detach_kernel(USBHostDevice *s)
-> >      for (i =3D 0; i < USB_MAX_INTERFACES; i++) {
-> >          rc =3D libusb_kernel_driver_active(s->dh, i);
-> >          usb_host_libusb_error("libusb_kernel_driver_active", rc);
-> > +        if (rc =3D=3D 0) {
-> > +            s->ifs[i].detached =3D true;
-> > +            continue;
-> > +        }
-> >          if (rc !=3D 1) {
->=20
-> Can't we just add detached =3D true here?
-Yes, it's better.
->=20
-> >              continue;
-> >          }
->=20
+> > I can live with just sysbus AHCI, though, if EHCI/XHCI are too cumbersome.
+>
+> Generic sysbus ehci should not be difficuilt, 10 lines patch or so.
+>
+> Gives you only usb2 though.  usb1 devices are handled either via ohci
+> companion controller (should be doable), or via integrated usb2 hub
+> (more common on recent hardware, but qemu usb-hub is usb1 only).
+>
+> Generic sysbus xhci would be more work.  But you'll get usb 1+2+3
+> support.  And wiring up platform MSIs should be possible too.
+>
+In kernel, these drivers are enabled by default:
+CONFIG_USB_XHCI_PLATFORM=y
+CONFIG_USB_EHCI_HCD_PLATFORM=y
+CONFIG_USB_OHCI_HCD_PLATFORM=y
+
+If we do generic EHCI or XHCI in qemu, can the driver in kernel work
+with it? (I guess yes?)
+My thought is if the available kernel driver will work without any
+change, then we can create it in qemu.
+
 > cheers,
 >   Gerd
+>
