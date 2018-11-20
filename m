@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gP9hu-00032i-7z
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:21:03 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gP9k1-0004Gk-Lp
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:23:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gP9hp-00010S-J3
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:21:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37798)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gP9hp-0000zH-Bk
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:20:57 -0500
-References: <20181120092542.13102-1-david@redhat.com>
-	<20181120092542.13102-6-david@redhat.com>
-	<27cfb4e6-b4db-10de-02c7-691f011d5f99@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f5dd77c5-8d40-fe95-4fc8-69aa96fa4f13@redhat.com>
-Date: Tue, 20 Nov 2018 11:20:52 -0600
+	(envelope-from <dgilbert@redhat.com>) id 1gP9jt-0002zU-US
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:23:07 -0500
+Date: Tue, 20 Nov 2018 17:22:42 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181120172241.GC5072@work-vm>
+References: <20181120152753.10463-1-marcandre.lureau@redhat.com>
+	<20181120152753.10463-3-marcandre.lureau@redhat.com>
+	<03454b5c-f889-9401-f502-5b14eaab40c8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <27cfb4e6-b4db-10de-02c7-691f011d5f99@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <03454b5c-f889-9401-f502-5b14eaab40c8@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 5/9] test-string-input-visitor: Add more
- tests
+Subject: Re: [Qemu-devel] [PATCH for-3.1? 2/3] migration: fix
+ stringop-truncation warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +26,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, Jeff Cody <jcody@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Liu Yuan <namei.unix@gmail.com>
 
-On 11/20/18 11:06 AM, Eric Blake wrote:
-> On 11/20/18 3:25 AM, David Hildenbrand wrote:
->> Test that very big/small values are not accepted and that ranges with
->> only one element work. Also test that ranges are ascending and cannot
->> have more than 65536 elements.
->>
->> Rename expect4 to expect5, as we will be moving that to a separate uli=
-st
->> test after the rework.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->> =C2=A0 tests/test-string-input-visitor.c | 41 ++++++++++++++++++++++++=
-+++++--
->> =C2=A0 1 file changed, 39 insertions(+), 2 deletions(-)
->>
+* Eric Blake (eblake@redhat.com) wrote:
+> On 11/20/18 9:27 AM, Marc-Andr=E9 Lureau wrote:
+> > Adding an assert is enough to silence GCC.
+> >=20
+> > ~/src/qemu/migration/global_state.c: In function 'global_state_store_=
+running':
+> > ~/src/qemu/migration/global_state.c:45:5: error: 'strncpy' specified =
+bound 100 equals destination size [-Werror=3Dstringop-truncation]
+> >       strncpy((char *)global_state.runstate,
+> >       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >              state, sizeof(global_state.runstate));
+> >              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > cc1: all warnings being treated as errors
+> >=20
+> > (alternatively, we could hard-code "running")
+> >=20
+> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >   migration/global_state.c | 1 +
+> >   1 file changed, 1 insertion(+)
 >=20
 > Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+> I think this is safe for 3.1, but I know the migration code is particul=
+arly
+> wary of assert()s, even when they are non-triggerable (a 100-byte buffe=
+r at
+> global_state.runstate is big enough for ALL of the run states, not just
+> RUN_STATE_RUNNING).
 
-Do we also want to test garbage strings like:
+That's OK; the universe would have to be particularly broken to trigger
+that one, and it's in no way connected with any state, so it would
+trigger on even the most basic tests.
 
-"1-" (incomplete range)
-"1X-2" (garbage suffix on first element)
-"1-2X" (garbage suffix on second element)
+However, I wonder if this fixes the problem on mingw builds - windows
+asserts are not marked as noreturn.
 
-and/or
+Dave
 
-"-2--1" (valid range of signed integers)
-"-1--2" (questionable whether this is valid for the two largest unsigned=20
-integers)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> >=20
+> > diff --git a/migration/global_state.c b/migration/global_state.c
+> > index 8e8ab5c51e..01805c567a 100644
+> > --- a/migration/global_state.c
+> > +++ b/migration/global_state.c
+> > @@ -42,6 +42,7 @@ int global_state_store(void)
+> >   void global_state_store_running(void)
+> >   {
+> >       const char *state =3D RunState_str(RUN_STATE_RUNNING);
+> > +    assert(strlen(state) < sizeof(global_state.runstate));
+> >       strncpy((char *)global_state.runstate,
+> >              state, sizeof(global_state.runstate));
+> >   }
+> >=20
+>=20
+> --=20
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
