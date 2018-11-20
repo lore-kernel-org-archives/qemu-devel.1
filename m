@@ -1,24 +1,25 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:33441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gOz8x-0000cu-On
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:04:16 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gOz8z-0000cu-VP
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:04:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gOz6S-0004I9-F8
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:01:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39994)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gOz6S-0004Ho-AN
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:01:40 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9B4D9C0C2726
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 06:01:39 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 20 Nov 2018 07:01:37 +0100
-Message-Id: <20181120060138.25446-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 0/1] Seabios 1.12 20181120 patches
+	(envelope-from <mlureau@redhat.com>) id 1gOz5r-0003RW-9J
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:01:06 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:39430)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gOz5r-0003Qd-5u
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 01:01:03 -0500
+Received: by mail-qk1-f194.google.com with SMTP id q70so1120537qkh.6
+	for <qemu-devel@nongnu.org>; Mon, 19 Nov 2018 22:01:01 -0800 (PST)
+MIME-Version: 1.0
+References: <20181120005701.9304-1-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20181120005701.9304-1-samuel.thibault@ens-lyon.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Tue, 20 Nov 2018 10:00:49 +0400
+Message-ID: <CAMxuvax5eYVwaqZDRBQzZ2cwJqd6aMV4U6VcjTq=LyHZYddn4w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] slirp: Enable fork_exec support on Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Kiszka, Jan" <jan.kiszka@siemens.com>, "Blake, Eric" <eblake@redhat.com>, "P. Berrange, Daniel" <berrange@redhat.com>
 
-The following changes since commit cb968d275c145467c8b385a3618a207ec111eab1:
+Hi
 
-  Update version for v3.1.0-rc1 release (2018-11-13 18:16:14 +0000)
+On Tue, Nov 20, 2018 at 4:57 AM Samuel Thibault
+<samuel.thibault@ens-lyon.org> wrote:
+>
+> g_spawn_async_with_fds is portable on Windows, so we can now enable
+> fork_exec support there.
+>
+> Thanks Daniel P. Berrang=C3=A9 for the notice!
+>
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-are available in the git repository at:
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-  git://git.kraxel.org/qemu tags/seabios-1.12-20181120-pull-request
-
-for you to fetch changes up to af51dbed380b7eec0c815da1c37b46e57a909ce8:
-
-  update seabios to 1.12 (2018-11-20 06:57:53 +0100)
-
-----------------------------------------------------------------
-seabios: update to 1.12-final
-
-----------------------------------------------------------------
-
-Gerd Hoffmann (1):
-  update seabios to 1.12
-
- pc-bios/bios-256k.bin             | Bin 262144 -> 262144 bytes
- pc-bios/bios.bin                  | Bin 131072 -> 131072 bytes
- pc-bios/vgabios-bochs-display.bin | Bin 27648 -> 27648 bytes
- pc-bios/vgabios-cirrus.bin        | Bin 38400 -> 38400 bytes
- pc-bios/vgabios-qxl.bin           | Bin 38912 -> 38912 bytes
- pc-bios/vgabios-ramfb.bin         | Bin 28160 -> 28160 bytes
- pc-bios/vgabios-stdvga.bin        | Bin 38912 -> 38912 bytes
- pc-bios/vgabios-virtio.bin        | Bin 38912 -> 38912 bytes
- pc-bios/vgabios-vmware.bin        | Bin 38912 -> 38912 bytes
- pc-bios/vgabios.bin               | Bin 38400 -> 38400 bytes
- roms/Makefile                     |   2 +-
- roms/seabios                      |   2 +-
- 12 files changed, 2 insertions(+), 2 deletions(-)
-
--- 
-2.9.3
+> ---
+>  slirp/misc.c | 14 ++------------
+>  1 file changed, 2 insertions(+), 12 deletions(-)
+>
+> diff --git a/slirp/misc.c b/slirp/misc.c
+> index 7972b9b05b..59b4e8f31c 100644
+> --- a/slirp/misc.c
+> +++ b/slirp/misc.c
+> @@ -62,17 +62,6 @@ int add_exec(struct ex_list **ex_ptr, void *chardev, c=
+onst char *cmdline,
+>  }
+>
+>
+> -#ifdef _WIN32
+> -
+> -int
+> -fork_exec(struct socket *so, const char *ex)
+> -{
+> -    /* not implemented */
+> -    return 0;
+> -}
+> -
+> -#else
+> -
+>  static int
+>  slirp_socketpair_with_oob(int sv[2])
+>  {
+> @@ -132,7 +121,9 @@ err:
+>  static void
+>  fork_exec_child_setup(gpointer data)
+>  {
+> +#ifndef _WIN32
+>      setsid();
+> +#endif
+>  }
+>
+>  int
+> @@ -177,7 +168,6 @@ fork_exec(struct socket *so, const char *ex)
+>      qemu_set_nonblock(so->s);
+>      return 1;
+>  }
+> -#endif
+>
+>  char *slirp_connection_info(Slirp *slirp)
+>  {
+> --
+> 2.19.1
+>
