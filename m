@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP38o-000453-1p
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 05:20:22 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gP39B-0004C5-TC
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 05:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP38h-0005BI-2c
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 05:20:22 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40756)
+	(envelope-from <peter.maydell@linaro.org>) id 1gP39A-0005TG-KF
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 05:20:45 -0500
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:42049)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gP38g-0005Ay-Sv
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 05:20:14 -0500
-Received: by mail-oi1-x243.google.com with SMTP id t204so1054891oie.7
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 02:20:14 -0800 (PST)
+	id 1gP399-0005S9-BH
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 05:20:44 -0500
+Received: by mail-oi1-x234.google.com with SMTP id w13so1042864oiw.9
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 02:20:43 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1542657473-9196-1-git-send-email-thuth@redhat.com>
-References: <1542657473-9196-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <20181119175427.2298497-1-eblake@redhat.com>
+References: <20181119175427.2298497-1-eblake@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Nov 2018 10:19:53 +0000
-Message-ID: <CAFEAcA_xhYf0VNaq1gM1OWWCkms5sTpn3kdqSHN0AZ3cH1f8Dw@mail.gmail.com>
+Date: Tue, 20 Nov 2018 10:20:21 +0000
+Message-ID: <CAFEAcA_yFpdaXB2-Rj3no3ENf8gfukaE+kbqEe5J2xEdN+9wZw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Assign some more files in the
- hw/arm/ directory
+Subject: Re: [Qemu-devel] [PULL 00/12] NBD patches for 3.1-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jean-Christophe Dubois <jcd@tribudubois.net>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 19 November 2018 at 19:57, Thomas Huth <thuth@redhat.com> wrote:
-> I apparently missed some more files and even a complete machine (the
-> "imx25-pdk") in my previous patch... but now we should hopefully have
-> a completely coverage for all available ARM boards.
-
-Hi; looks like you forgot to cc qemu-devel.
-
-> Fixes: 95a5db3ae5698b49c63144610ad02913e780c828
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  MAINTAINERS | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
+On 19 November 2018 at 17:54, Eric Blake <eblake@redhat.com> wrote:
+> The following changes since commit e6ebbd46b6e539f3613136111977721d212c28=
+12:
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 1032406..ac20dc8 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -533,6 +533,18 @@ L: qemu-arm@nongnu.org
->  S: Odd Fixes
->  F: hw/arm/gumstix.c
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into sta=
+ging (2018-11-19 14:31:48 +0000)
 >
-> +i.MX25 PDK
-> +M: Peter Maydell <peter.maydell@linaro.org>
-> +R: Jean-Christophe Dubois <jcd@tribudubois.net>
-> +L: qemu-arm@nongnu.org
-> +S: Odd Fixes
-> +F: hw/arm/fsl-imx25.c
-> +F: hw/arm/imx25_pdk.c
-> +F: hw/misc/imx25_ccm.c
-> +F: include/hw/arm/fsl-imx25.h
-> +F: include/hw/misc/imx25_ccm.h
-> +F: tests/ds1338-test.c
-> +
->  i.MX31 (kzm)
->  M: Peter Chubb <peter.chubb@nicta.com.au>
->  M: Peter Maydell <peter.maydell@linaro.org>
-> @@ -615,6 +627,7 @@ R: Andrew Baumann <Andrew.Baumann@microsoft.com>
->  R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->  L: qemu-arm@nongnu.org
->  S: Odd Fixes
-> +F: hw/arm/raspi.c
->  F: hw/arm/raspi_platform.h
->  F: hw/*/bcm283*
->  F: include/hw/arm/raspi*
-> @@ -641,6 +654,7 @@ F: hw/arm/z2.c
->  F: hw/*/pxa2xx*
->  F: hw/misc/mst_fpga.c
->  F: include/hw/arm/pxa.h
-> +F: include/hw/arm/sharpsl.h
+> are available in the Git repository at:
 >
->  SABRELITE / i.MX6
->  M: Peter Maydell <peter.maydell@linaro.org>
-> @@ -686,7 +700,9 @@ M: Peter Maydell <peter.maydell@linaro.org>
->  L: qemu-arm@nongnu.org
->  S: Maintained
->  F: hw/arm/virt*
-> +F: hw/arm/smmu*
->  F: include/hw/arm/virt.h
-> +F: include/hw/arm/smmu*
-
-The SMMU files aren't part of the virt board, they're
-the SMMUv3 device model. They should go in a section
-that lets us mark Eric Auger as their maintainer.
-
+>   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-11-19
 >
->  Xilinx Zynq
->  M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-> --
-> 1.8.3.1
+> for you to fetch changes up to 8cedcffdc195bc39aeb1373826ba0a45629741e0:
+>
+>   iotests: Drop use of bash keyword 'function' (2018-11-19 11:16:46 -0600=
+)
+>
+> There are still a couple of things I'm working on that might still
+> qualify for 3.1, but given the timing of -rc2, it's getting more
+> likely that they will shift into 4.0 instead:
+> - handling of unaligned images (also broken in 3.0, so not necessarily
+> a regression - but does fix assertion failures)
+> - qemu-nbd command line option to query server's exports and info (would
+> be new feature, but would make it a lot easier to test if existing
+> x-dirty-block feature is working)
+>
+> Also, I did not spend enough time on this release reviewing Vladimir's
+> additions for NBD reconnect, so that has now (sadly) slipped into 4.0.
+>
+> The diffstat touches a large number of files, which is rather awkward
+> for an -rc2 pull request - but those changes are mostly mechanical
+> and mostly in the iotests subdirectory. The changes to the code base
+> proper are quite small.
+>
+> ----------------------------------------------------------------
+> nbd patches for 2018-11-19
+>
+> Add iotest coverage for NBD connections using TLS, including
+> a couple of code fixes that it pointed out
+>
+> - Mao Zhongyi: 0/3 Do some cleaning work in qemu-iotests
+> - Daniel P. Berrang=C3=A9: io: return 0 for EOF in TLS session read after=
+ shutdown
+> - Daniel P. Berrang=C3=A9: 0/6 Misc fixes to NBD
+> - Eric Blake: iotests: Drop use of bash keyword 'function'
 
-thanks
+Applied, thanks.
+
 -- PMM
