@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP72A-0005I0-Cu
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:29:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gP75G-0006NR-Mm
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:32:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP729-0005kQ-6p
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:29:46 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:46855)
+	(envelope-from <peter.maydell@linaro.org>) id 1gP75F-0008N6-QC
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:32:58 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44941)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gP729-0005k0-02
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:29:45 -0500
-Received: by mail-oi1-x244.google.com with SMTP id x202so1602110oif.13
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 06:29:44 -0800 (PST)
+	id 1gP75F-0008Mg-L7
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:32:57 -0500
+Received: by mail-oi1-x244.google.com with SMTP id p82-v6so1615134oih.11
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 06:32:57 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1542365406-81310-4-git-send-email-peng.hao2@zte.com.cn>
+In-Reply-To: <1542365406-81310-5-git-send-email-peng.hao2@zte.com.cn>
 References: <1542365406-81310-1-git-send-email-peng.hao2@zte.com.cn>
-	<1542365406-81310-4-git-send-email-peng.hao2@zte.com.cn>
+	<1542365406-81310-5-git-send-email-peng.hao2@zte.com.cn>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Nov 2018 14:29:23 +0000
-Message-ID: <CAFEAcA_2ScVO3=K4b+r5RTTnNs3uqyeXwX=tH=qYS2To+y7PRA@mail.gmail.com>
+Date: Tue, 20 Nov 2018 14:32:36 +0000
+Message-ID: <CAFEAcA-u=_kq66ZxawHhGCjkKjCo=urw7W3GfOwYK00AMRfWjg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V7 3/6] hw/misc/pvpanic: Add the MMIO
- interface
+Subject: Re: [Qemu-devel] [PATCH V7 4/6] hw/arm/virt: Use the pvpanic device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,201 +34,84 @@ To: Peng Hao <peng.hao2@zte.com.cn>
 Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
 On 16 November 2018 at 10:50, Peng Hao <peng.hao2@zte.com.cn> wrote:
-> Add pvpanic new type "TYPE_PVPANIC_MMIO"
+>  Add pvpanic device in arm virt machine.
 >
 > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-I'm not entirely sure I understand why we have two
-signed-off-by lines here -- who is the author of this patch?
-
 > ---
->  hw/misc/pvpanic.c         | 81 +++++++++++++++++++++++++++++++++++++----=
-------
->  include/hw/misc/pvpanic.h |  1 +
->  2 files changed, 65 insertions(+), 17 deletions(-)
+>  default-configs/arm-softmmu.mak |  1 +
+>  hw/arm/virt.c                   | 21 +++++++++++++++++++++
+>  include/hw/arm/virt.h           |  1 +
+>  3 files changed, 23 insertions(+)
 >
-> diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
-> index dd3aef2..5d0fbc6 100644
-> --- a/hw/misc/pvpanic.c
-> +++ b/hw/misc/pvpanic.c
-> @@ -2,10 +2,12 @@
->   * QEMU simulated pvpanic device.
->   *
->   * Copyright Fujitsu, Corp. 2013
-> + * Copyright (c) 2018 ZTE Ltd.
->   *
->   * Authors:
->   *     Wen Congyang <wency@cn.fujitsu.com>
->   *     Hu Tao <hutao@cn.fujitsu.com>
-> + *     Peng Hao <peng.hao2@zte.com.cn>
->   *
->   * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
->   * See the COPYING file in the top-level directory.
-> @@ -25,9 +27,6 @@
->  /* The pv event value */
->  #define PVPANIC_PANICKED        (1 << PVPANIC_F_PANICKED)
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
+u.mak
+> index 2420491..50345df 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -159,3 +159,4 @@ CONFIG_PCI_DESIGNWARE=3Dy
+>  CONFIG_STRONGARM=3Dy
+>  CONFIG_HIGHBANK=3Dy
+>  CONFIG_MUSICPAL=3Dy
+> +CONFIG_PVPANIC=3Dy
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 9f67782..c4f29c8 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -59,6 +59,7 @@
+>  #include "qapi/visitor.h"
+>  #include "standard-headers/linux/input.h"
+>  #include "hw/arm/smmuv3.h"
+> +#include "hw/misc/pvpanic.h"
 >
-> -#define PVPANIC(obj)    \
-> -    OBJECT_CHECK(PVPanicState, (obj), TYPE_PVPANIC)
-> -
-
-We just added (renamed) this macro in the previous patch:
-has something gone wrong in a rebase ?
-
->  static void handle_event(int event)
->  {
->      static bool logged;
-> @@ -45,30 +44,50 @@ static void handle_event(int event)
->
->  #include "hw/isa/isa.h"
->
-> -typedef struct PVPanicState {
-> -    /* private */
-> -    ISADevice isadev;
-> +/* PVPanicISAState for ISA device and
-> + * use ioport.
-> + */
-> +typedef struct PVPanicISAState {
-> +     /* private */
-> +     ISADevice isadev;
-
-This should be "ISADevice parent_obj;" and go above the /* private */
-comment, because a PVPanicISAState is-a ISADevice (this is not
-a has-a relation).
-
-Again, this seems to be undoing changes from the previous patch
-somewhat ?
-
-> +     uint16_t ioport;
->
->      /* public */
->      MemoryRegion mr;
-> -    uint16_t ioport;
-> -} PVPanicState;
-> +} PVPanicISAState;
-> +
-> +/* PVPanicMMIOState for sysbus device and
-> + * use mmio.
-> + */
-> +typedef struct PVPanicMMIOState {
-> +    /* private */
-> +    SysBusDevice busdev;
-> +
-> +     /* public */
-> +    MemoryRegion mr;
-> +} PVPanicMMIOState;
-> +
-> +#define PVPANIC_ISA(obj)    \
-> +    OBJECT_CHECK(PVPanicISAState, (obj), TYPE_PVPANIC)
-> +
-> +#define PVPANIC_MMIO(obj)    \
-> +    OBJECT_CHECK(PVPanicMMIOState, (obj), TYPE_PVPANIC_MMIO)
->
->  /* return supported events on read */
-> -static uint64_t pvpanic_ioport_read(void *opaque, hwaddr addr, unsigned =
-size)
-> +static uint64_t pvpanic_read(void *opaque, hwaddr addr, unsigned size)
->  {
->      return PVPANIC_PANICKED;
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -143,6 +144,7 @@ static const MemMapEntry a15memmap[] =3D {
+>      [VIRT_GPIO] =3D               { 0x09030000, 0x00001000 },
+>      [VIRT_SECURE_UART] =3D        { 0x09040000, 0x00001000 },
+>      [VIRT_SMMU] =3D               { 0x09050000, 0x00020000 },
+> +    [VIRT_PVPANIC] =3D            { 0x09070000, 0x00000002 },
+>      [VIRT_MMIO] =3D               { 0x0a000000, 0x00000200 },
+>      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that s=
+ize */
+>      [VIRT_PLATFORM_BUS] =3D       { 0x0c000000, 0x02000000 },
+> @@ -190,6 +192,23 @@ static bool cpu_type_valid(const char *cpu)
+>      return false;
 >  }
 >
-> -static void pvpanic_ioport_write(void *opaque, hwaddr addr, uint64_t val=
-,
-> +static void pvpanic_write(void *opaque, hwaddr addr, uint64_t val,
->                                   unsigned size)
->  {
->      handle_event(val);
->  }
->
->  static const MemoryRegionOps pvpanic_ops =3D {
-> -    .read =3D pvpanic_ioport_read,
-> -    .write =3D pvpanic_ioport_write,
-> +    .read =3D pvpanic_read,
-> +    .write =3D pvpanic_write,
->      .impl =3D {
->          .min_access_size =3D 1,
->          .max_access_size =3D 1,
-> @@ -77,15 +96,16 @@ static const MemoryRegionOps pvpanic_ops =3D {
->
->  static void pvpanic_isa_initfn(Object *obj)
->  {
-> -    PVPanicState *s =3D PVPANIC(obj);
-> +    PVPanicISAState *s =3D PVPANIC_ISA(obj);
->
-> -    memory_region_init_io(&s->mr, OBJECT(s), &pvpanic_ops, s, "pvpanic",=
- 1);
-> +    memory_region_init_io(&s->mr, OBJECT(s), &pvpanic_ops, s,
-> +                          TYPE_PVPANIC, 1);
->  }
->
->  static void pvpanic_isa_realizefn(DeviceState *dev, Error **errp)
->  {
->      ISADevice *d =3D ISA_DEVICE(dev);
-> -    PVPanicState *s =3D PVPANIC(dev);
-> +    PVPanicISAState *s =3D PVPANIC_ISA(dev);
->      FWCfgState *fw_cfg =3D fw_cfg_find();
->      uint16_t *pvpanic_port;
->
-> @@ -102,7 +122,7 @@ static void pvpanic_isa_realizefn(DeviceState *dev, E=
-rror **errp)
->  }
->
->  static Property pvpanic_isa_properties[] =3D {
-> -    DEFINE_PROP_UINT16(PVPANIC_IOPORT_PROP, PVPanicState, ioport, 0x505)=
-,
-> +    DEFINE_PROP_UINT16(PVPANIC_IOPORT_PROP, PVPanicISAState, ioport, 0x5=
-05),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->
-> @@ -118,14 +138,41 @@ static void pvpanic_isa_class_init(ObjectClass *kla=
-ss, void *data)
->  static TypeInfo pvpanic_isa_info =3D {
->      .name          =3D TYPE_PVPANIC,
->      .parent        =3D TYPE_ISA_DEVICE,
-> -    .instance_size =3D sizeof(PVPanicState),
-> +    .instance_size =3D sizeof(PVPanicISAState),
->      .instance_init =3D pvpanic_isa_initfn,
->      .class_init    =3D pvpanic_isa_class_init,
->  };
->
-> +
-> +static void pvpanic_mmio_initfn(Object *obj)
+> +static void create_pvpanic_device(const VirtMachineState *vms)
 > +{
-> +    PVPanicMMIOState *s =3D PVPANIC_MMIO(obj);
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+> +    char *nodename;
+> +    hwaddr base =3D vms->memmap[VIRT_PVPANIC].base;
+> +    hwaddr size =3D vms->memmap[VIRT_PVPANIC].size;
 > +
-> +    memory_region_init_io(&s->mr, OBJECT(s), &pvpanic_ops, s,
-> +                          TYPE_PVPANIC_MMIO, 2);
-> +    sysbus_init_mmio(sbd, &s->mr);
+> +    sysbus_create_simple(TYPE_PVPANIC_MMIO, base, NULL);
+> +
+> +    nodename =3D g_strdup_printf("/pvpanic-mmio@%" PRIx64, base);
+> +    qemu_fdt_add_subnode(vms->fdt, nodename);
+> +    qemu_fdt_setprop_string(vms->fdt, nodename,
+> +                            "compatible", "qemu,pvpanic-mmio");
+> +    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
+> +                                 2, base, 2, size);
+
+Note that we can't take these patches into QEMU until the device
+tree binding has been agreed upstream and accepted into the kernel.
+
+> +    g_free(nodename);
 > +}
 > +
-> +static void pvpanic_mmio_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> +}
-> +
-> +static TypeInfo pvpanic_mmio_info =3D {
-> +    .name          =3D TYPE_PVPANIC_MMIO,
-> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(PVPanicMMIOState),
-> +    .instance_init =3D pvpanic_mmio_initfn,
-> +    .class_init    =3D pvpanic_mmio_class_init,
-> +};
-> +
->  static void pvpanic_register_types(void)
+>  static void create_fdt(VirtMachineState *vms)
 >  {
->      type_register_static(&pvpanic_isa_info);
-> +    type_register_static(&pvpanic_mmio_info);
->  }
+>      void *fdt =3D create_device_tree(&vms->fdt_size);
+> @@ -1531,6 +1550,8 @@ static void machvirt_init(MachineState *machine)
+>
+>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>
+> +    create_pvpanic_device(vms);
+> +
+>      create_gic(vms, pic);
 
-I would suggest refactoring the ISA device in one patch,
-and then adding the MMIO device in a second patch. Currently
-this patch is mixing the two.
+As Shannon suggests, we should not be creating this device by default.
 
 thanks
 -- PMM
