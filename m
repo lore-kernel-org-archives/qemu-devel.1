@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPDRW-0006AW-W0
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:20:24 -0500
+	(envelope-from <philmd@redhat.com>) id 1gPDX1-00080C-Bq
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:26:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPDRT-0004em-Rj
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:20:22 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:34087)
+	(envelope-from <philmd@redhat.com>) id 1gPDWy-0004Mb-4d
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:26:03 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41454)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPDRT-0004bx-Gy
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:20:19 -0500
-Received: by mail-wr1-f68.google.com with SMTP id j2so3503588wrw.1
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 13:20:19 -0800 (PST)
-References: <20181120184148.22501-1-pbonzini@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPDWx-0004G9-QK
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:26:00 -0500
+Received: by mail-wr1-f68.google.com with SMTP id x10so3486299wrs.8
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 13:25:54 -0800 (PST)
+References: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
+	<20181119120820.29878-5-maozhongyi@cmss.chinamobile.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ff72d440-ae9b-ae1d-dddd-dfc72ec1abf2@redhat.com>
-Date: Tue, 20 Nov 2018 22:20:16 +0100
+Message-ID: <7169f329-4eee-de9c-a4b8-ff167b0f7f82@redhat.com>
+Date: Tue, 20 Nov 2018 22:25:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181120184148.22501-1-pbonzini@redhat.com>
+In-Reply-To: <20181119120820.29878-5-maozhongyi@cmss.chinamobile.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] nvme: fix out-of-bounds access to the CMB
+Subject: Re: [Qemu-devel] [PATCH 04/22] core/empty_slot: Convert sysbus init
+ function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,156 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Keith Busch <keith.busch@intel.com>, Li Qiang <liq3ea@gmail.com>, qemu-block@nongnu.org, mreitz@redhat.com
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
+Cc: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
-On 20/11/18 19:41, Paolo Bonzini wrote:
-> Because the CMB BAR has a min_access_size of 2, if you read the last
-> byte it will try to memcpy *2* bytes from n->cmbuf, causing an off-by-one
-> error.  This is CVE-2018-16847.
+On 19/11/18 13:08, Mao Zhongyi wrote:
+> Use DeviceClass rather than SysBusDeviceClass in
+> empty_slot_class_init().
 > 
-> Another way to fix this might be to register the CMB as a RAM memory
-> region, which would also be more efficient.  However, that might be a
-> change for big-endian machines; I didn't think this through and I don't
-> know how real hardware works.  Add a basic testcase for the CMB in case
-> somebody does this change later on.
-> 
-> Cc: Keith Busch <keith.busch@intel.com>
-> Cc: qemu-block@nongnu.org
-> Reported-by: Li Qiang <liq3ea@gmail.com>
-> Reviewed-by: Li Qiang <liq3ea@gmail.com>
-> Tested-by: Li Qiang <liq3ea@gmail.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   hw/block/nvme.c        |  2 +-
->   tests/Makefile.include |  2 +-
->   tests/nvme-test.c      | 68 +++++++++++++++++++++++++++++++++++-------
->   3 files changed, 60 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index d0226e7fdc..ef046bbc54 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -1199,7 +1199,7 @@ static const MemoryRegionOps nvme_cmb_ops = {
->       .write = nvme_cmb_write,
->       .endianness = DEVICE_LITTLE_ENDIAN,
->       .impl = {
-> -        .min_access_size = 2,
-> +        .min_access_size = 1,
->           .max_access_size = 8,
->       },
->   };
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 613242bc6e..fb0b449c02 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -730,7 +730,7 @@ tests/test-hmp$(EXESUF): tests/test-hmp.o
->   tests/machine-none-test$(EXESUF): tests/machine-none-test.o
->   tests/drive_del-test$(EXESUF): tests/drive_del-test.o $(libqos-virtio-obj-y)
->   tests/qdev-monitor-test$(EXESUF): tests/qdev-monitor-test.o $(libqos-pc-obj-y)
-> -tests/nvme-test$(EXESUF): tests/nvme-test.o
-> +tests/nvme-test$(EXESUF): tests/nvme-test.o $(libqos-pc-obj-y)
->   tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
->   tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
->   tests/ac97-test$(EXESUF): tests/ac97-test.o
-> diff --git a/tests/nvme-test.c b/tests/nvme-test.c
-> index 7674a446e4..2700ba838a 100644
-> --- a/tests/nvme-test.c
-> +++ b/tests/nvme-test.c
-> @@ -8,25 +8,73 @@
->    */
->   
->   #include "qemu/osdep.h"
-> +#include "qemu/units.h"
->   #include "libqtest.h"
-> +#include "libqos/libqos-pc.h"
-> +
-> +static QOSState *qnvme_start(const char *extra_opts)
-> +{
-> +    QOSState *qs;
-> +    const char *arch = qtest_get_arch();
-> +    const char *cmd = "-drive id=drv0,if=none,file=null-co://,format=raw "
-> +                      "-device nvme,addr=0x4.0,serial=foo,drive=drv0 %s";
-> +
-> +    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-> +        qs = qtest_pc_boot(cmd, extra_opts ? : "");
-> +        global_qtest = qs->qts;
-> +        return qs;
-> +    }
-> +
-> +    g_printerr("nvme tests are only available on x86\n");
-> +    exit(EXIT_FAILURE);
-> +}
-> +
-> +static void qnvme_stop(QOSState *qs)
-> +{
-> +    qtest_shutdown(qs);
-> +}
->   
-> -/* Tests only initialization so far. TODO: Replace with functional tests */
->   static void nop(void)
->   {
-> +    QOSState *qs;
-> +
-> +    qs = qnvme_start(NULL);
-> +    qnvme_stop(qs);
->   }
->   
-> -int main(int argc, char **argv)
-> +static void nvmetest_cmb_test(void)
->   {
-> -    int ret;
-> +    const int cmb_bar_size = 2 * MiB;
-> +    QOSState *qs;
-> +    QPCIDevice *pdev;
-> +    QPCIBar bar;
->   
-> -    g_test_init(&argc, &argv, NULL);
-> -    qtest_add_func("/nvme/nop", nop);
-> +    qs = qnvme_start("-global nvme.cmb_size_mb=2");
-> +    pdev = qpci_device_find(qs->pcibus, QPCI_DEVFN(4,0));
-> +    g_assert(pdev != NULL);
-> +
-> +    qpci_device_enable(pdev);
-> +    bar = qpci_iomap(pdev, 2, NULL);
-> +
-> +    qpci_io_writel(pdev, bar, 0, 0xccbbaa99);
-> +    g_assert_cmpint(qpci_io_readb(pdev, bar, 0), ==, 0x99);
-> +    g_assert_cmpint(qpci_io_readw(pdev, bar, 0), ==, 0xaa99);
-> +
-> +    /* Test partially out-of-bounds accesses.  */
-> +    qpci_io_writel(pdev, bar, cmb_bar_size - 1, 0x44332211);
-> +    g_assert_cmpint(qpci_io_readb(pdev, bar, cmb_bar_size - 1), ==, 0x11);
-> +    g_assert_cmpint(qpci_io_readw(pdev, bar, cmb_bar_size - 1), !=, 0x2211);
-> +    g_assert_cmpint(qpci_io_readl(pdev, bar, cmb_bar_size - 1), !=, 0x44332211);
-> +    g_free(pdev);
->   
-> -    qtest_start("-drive id=drv0,if=none,file=null-co://,format=raw "
-> -                "-device nvme,drive=drv0,serial=foo");
-> -    ret = g_test_run();
-> +    qnvme_stop(qs);
-> +}
->   
-> -    qtest_end();
-> +int main(int argc, char **argv)
-> +{
-> +    g_test_init(&argc, &argv, NULL);
-> +    qtest_add_func("/nvme/nop", nop);
-> +    qtest_add_func("/nvme/cmb_test", nvmetest_cmb_test);
->   
-> -    return ret;
-> +    return g_test_run();
->   }
-> 
-
-TEST: tests/nvme-test... (pid=29324)
-   /x86_64/nvme/nop:          OK
-   /x86_64/nvme/cmb_test:     **
-ERROR:tests/nvme-test.c:65:nvmetest_cmb_test: assertion failed 
-(qpci_io_readb(pdev, bar, cmb_bar_size - 1) == 0x11): (0 == 17)
-FAIL
-
-Nice!
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+> Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>   hw/core/empty_slot.c | 9 ++++-----
+>   1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/core/empty_slot.c b/hw/core/empty_slot.c
+> index c1b9c2b104..239f78e2a7 100644
+> --- a/hw/core/empty_slot.c
+> +++ b/hw/core/empty_slot.c
+> @@ -71,21 +71,20 @@ void empty_slot_init(hwaddr addr, uint64_t slot_size)
+>       }
+>   }
+>   
+> -static int empty_slot_init1(SysBusDevice *dev)
+> +static void empty_slot_realize(DeviceState *dev, Error **errp)
+>   {
+>       EmptySlot *s = EMPTY_SLOT(dev);
+>   
+>       memory_region_init_io(&s->iomem, OBJECT(s), &empty_slot_ops, s,
+>                             "empty-slot", s->size);
+> -    sysbus_init_mmio(dev, &s->iomem);
+> -    return 0;
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
+>   }
+>   
+>   static void empty_slot_class_init(ObjectClass *klass, void *data)
+>   {
+> -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>   
+> -    k->init = empty_slot_init1;
+> +    dc->realize = empty_slot_realize;
+>   }
+>   
+>   static const TypeInfo empty_slot_info = {
+> 
