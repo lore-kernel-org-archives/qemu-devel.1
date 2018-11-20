@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yezengruan@huawei.com>) id 1gP5Uj-0008UZ-D1
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:51:11 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gP6HC-000199-3h
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:41:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yezengruan@huawei.com>) id 1gP5Uh-0003JU-Jj
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 07:51:09 -0500
-From: yezengruan <yezengruan@huawei.com>
-Date: Tue, 20 Nov 2018 12:50:41 +0000
-Message-ID: <EA71F1939A4E2F4996635D61949EB5BB01B92D72@dggemi510-mbx.china.huawei.com>
-Content-Language: zh-CN
+	(envelope-from <ehabkost@redhat.com>) id 1gP6H7-0007nS-R4
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:41:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gP6H7-0007lg-GS
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:41:09 -0500
+Date: Tue, 20 Nov 2018 11:41:06 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181120134106.GH4755@habkost.net>
+References: <20180921082217.29481-1-rkagan@virtuozzo.com>
+	<20180921082217.29481-4-rkagan@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] panic in virtio_gpu in guest centos7.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180921082217.29481-4-rkagan@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 03/10] hyperv: only add SynIC in compatible
+ configurations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,130 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
-Cc: "Wanghaibin (D)" <wanghaibin.wang@huawei.com>, "honghao (C)" <honghao5@huawei.com>, Guoheyi <guoheyi@huawei.com>
+To: Roman Kagan <rkagan@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, Vijayabhaskar Balakrishna <vijay.balakrishna@oracle.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Venu Busireddy <venu.busireddy@oracle.com>, Liran Alon <liran.alon@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, Igor Mammedov <imammedo@redhat.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Karl Heubaum <karl.heubaum@oracle.com>
 
-SGksIGFsbA0KDQpXaGVuIEkgcnVuIHFlbXUgKDIuOC4xIG9yIDMuMC4wKSB3aXRoIGd1ZXN0IG9z
-IGNlbnRvcyA3LjUoa2VybmVsIDQuMTQuMC00OS5lbDdhLmFhcmNoNjQpLCBJIGdvdCBwYW5pYyBp
-biB2aXJ0aW9fZ3B1LiBNeSB0ZXN0IHN0ZXBzIGFyZSBhcyBmb2xsb3dzOg0KMSkgU3RhcnQgdGhl
-IGNlbnRvcyA3LjUgdmlydHVhbCBtYWNoaW5lLg0KMikgRW50ZXIgYSBidW5jaCBvZiBjb21tYW5k
-cyBpbiBWTkMuDQozKSBBZnRlciBlbnRlciAndG9wJyBjb21tYW5kIGluIFZOQywgY29udGludW91
-c2x5IGVudGVyIHNoaWZ0ICsgcGFnZSB1cCBvciBwYWdlIGRvd24gc2V2ZXJhbCB0aW1lcy4NCg0K
-SSBnb3QgdGhpcyBrZXJuZWwgcGFuaWMgYWxtb3N0IGV2ZXJ5IHRpbWU6DQoNClsgICA5OS44NzQ1
-MTVdIFVuYWJsZSB0byBoYW5kbGUga2VybmVsIHBhZ2luZyByZXF1ZXN0IGF0IHZpcnR1YWwgYWRk
-cmVzcyBmZmZmMDAwMDBlYWUwOTYwDQpbICAgOTkuODc0NTE3XSBNZW0gYWJvcnQgaW5mbzoNClsg
-ICA5OS44NzQ1MThdICAgRXhjZXB0aW9uIGNsYXNzID0gREFCVCAoY3VycmVudCBFTCksIElMID0g
-MzIgYml0cw0KWyAgIDk5Ljg3NDUxOV0gICBTRVQgPSAwLCBGblYgPSAwDQpbICAgOTkuODc0NTIw
-XSAgIEVBID0gMCwgUzFQVFcgPSAwDQpbICAgOTkuODc0NTIxXSBEYXRhIGFib3J0IGluZm86DQpb
-ICAgOTkuODc0NTIyXSAgIElTViA9IDAsIElTUyA9IDB4MDAwMDAwNDcNClsgICA5OS44NzQ1MjJd
-ICAgQ00gPSAwLCBXblIgPSAxDQpbICAgOTkuODc0NTI1XSBzd2FwcGVyIHBndGFibGU6IDY0ayBw
-YWdlcywgNDgtYml0IFZBcywgcGdkID0gZmZmZjAwMDAwOTY2MDAwMA0KWyAgIDk5Ljg3NDUyNl0g
-W2ZmZmYwMDAwMGVhZTA5NjBdICpwZ2Q9MDAwMDAwMDBiZmZlMDAwMywgKnB1ZD0wMDAwMDAwMGJm
-ZmUwMDAzLCAqcG1kPTAwMDAwMDAwYmZmZDAwMDMsICpwdGU9MDAwMDAwMDAwMDAwMDAwMA0KWyAg
-IDk5Ljg3NDUzMl0gSW50ZXJuYWwgZXJyb3I6IE9vcHM6IDk2MDAwMDQ3IFsjMV0gU01QDQpbICAg
-OTkuODc0NTM1XSBNb2R1bGVzIGxpbmtlZCBpbjogdmZhdCBmYXQgY3JjMzJfY2UgZ2hhc2hfY2Ug
-c2hhMl9jZSBzaGEyNTZfYXJtNjQgc2hhMV9jZSB2aXJ0aW9fbmV0IHNnIHZpcnRpb19iYWxsb29u
-IGlwX3RhYmxlcyBleHQ0IG1iY2FjaGUgamJkMiB2aXJ0aW9fZ3B1IGRybV9rbXNfaGVscGVyIHN5
-c2NvcHlhcmVhIHN5c2ZpbGxyZWN0IHN5c2ltZ2JsdCBmYl9zeXNfZm9wcyB0dG0gZHJtIHZpcnRp
-b19zY3NpIGkyY19jb3JlIHZpcnRpb19wY2kgdmlydGlvX21taW8gdmlydGlvX3JpbmcgdmlydGlv
-DQpbICAgOTkuODc0NTYwXSBDUFU6IDAgUElEOiAxMDYyIENvbW06IHRvcCBOb3QgdGFpbnRlZCA0
-LjE0LjAtNDkuZWw3YS5hYXJjaDY0ICMxDQpbICAgOTkuODc0NTYxXSBIYXJkd2FyZSBuYW1lOiBR
-RU1VIEtWTSBWaXJ0dWFsIE1hY2hpbmUsIEJJT1MgMC4wLjAgMDIvMDYvMjAxNQ0KWyAgIDk5Ljg3
-NDU2Ml0gdGFzazogZmZmZjgwMDAzMzg0MTEwMCB0YXNrLnN0YWNrOiBmZmZmMDAwMDBmNmMwMDAw
-DQpbICAgOTkuODc0NTY3XSBQQyBpcyBhdCBzeXNfaW1hZ2VibGl0KzB4NDBjLzB4MTAwMDAgW3N5
-c2ltZ2JsdF0NClsgICA5OS44NzQ1ODldIExSIGlzIGF0IGRybV9mYl9oZWxwZXJfc3lzX2ltYWdl
-YmxpdCsweDI4LzB4NGMgW2RybV9rbXNfaGVscGVyXQ0KWyAgIDk5Ljg3NDU5MF0gcGMgOiBbPGZm
-ZmYwMDAwMDE3MTA0MGM+XSBsciA6IFs8ZmZmZjAwMDAwMTg3MmU3ND5dIHBzdGF0ZTogMDAwMDAw
-MDUNClsgICA5OS44NzQ1OTFdIHNwIDogZmZmZjAwMDAwZjZjZjdmMA0KWyAgIDk5Ljg3NDU5Ml0g
-eDI5OiBmZmZmMDAwMDBmNmNmN2YwIHgyODogMDAwMDAwMDAwMDAwMDFmZg0KWyAgIDk5Ljg3NDU5
-NF0geDI3OiBmZmZmODAwMDIxMzNjNDAwIHgyNjogMDAwMDAwMDAwMDAwMDAwMQ0KWyAgIDk5Ljg3
-NDU5Nl0geDI1OiAwMDAwMDAwMDAwMDAwMWE4IHgyNDogMDAwMDAwMDAwMDAwMDAxOA0KWyAgIDk5
-Ljg3NDU5OF0geDIzOiAwMDAwMDAwMDAwMDAwMDAwIHgyMjogZmZmZjAwMDAwZjZjZjk3OA0KWyAg
-IDk5Ljg3NDYwMF0geDIxOiBmZmZmMDAwMDBlYWUwOTYwIHgyMDogMDAwMDAwMDAwMDAwMDAwMA0K
-WyAgIDk5Ljg3NDYwMl0geDE5OiBmZmZmODAwMDJhMjBlODAwIHgxODogMDAwMGZmZmZjYWQwMTlj
-MA0KWyAgIDk5Ljg3NDYwM10geDE3OiAwMDAwMDAwMDAwMDAwMDAwIHgxNjogMDAwMDAwMDAwMDAw
-MDAwMA0KWyAgIDk5Ljg3NDYwNV0geDE1OiAwMDAwMDAwMDAwMDAwMDA4IHgxNDogMjAzMzMwMmUz
-MDMwM2EzMA0KWyAgIDk5Ljg3NDYwN10geDEzOiAwMDAwMDAwMDAwMDAwMWE4IHgxMjogMDAwMDAw
-MDAwMDAwMDAzNQ0KWyAgIDk5Ljg3NDYwOF0geDExOiAwMDAwMDAwMDAwMDAwMDBmIHgxMDogZmZm
-ZjgwMDAyNzYyZTdjMA0KWyAgIDk5Ljg3NDYxMF0geDkgOiAwMDAwMDAwMDAwYWFhYWFhIHg4IDog
-MDAwMDAwMDAwMDAwMDAwMQ0KWyAgIDk5Ljg3NDYxMl0geDcgOiBmZmZmMDAwMDAxNzIwMDkwIHg2
-IDogMDAwMDAwMDAwMDAwMDAwMQ0KWyAgIDk5Ljg3NDYxM10geDUgOiAwMDAwMDAwMDAwMDAwMDAw
-IHg0IDogMDAwMDAwMDAwMDAwMDAwMA0KWyAgIDk5Ljg3NDYxNV0geDMgOiBmZmZmODAwMDI3NjJl
-N2MwIHgyIDogZmZmZjAwMDAwZWFlMDk2MA0KWyAgIDk5Ljg3NDYxN10geDEgOiAwMDAwMDAwMDAw
-MDAwMWE3IHgwIDogMDAwMDAwMDAwMDAwMDAwNw0KWyAgIDk5Ljg3NDYxOV0gUHJvY2VzcyB0b3Ag
-KHBpZDogMTA2Miwgc3RhY2sgbGltaXQgPSAweGZmZmYwMDAwMGY2YzAwMDApDQpbICAgOTkuODc0
-NjIwXSBDYWxsIHRyYWNlOg0KWyAgIDk5Ljg3NDYyMl0gRXhjZXB0aW9uIHN0YWNrKDB4ZmZmZjAw
-MDAwZjZjZjZiMCB0byAweGZmZmYwMDAwMGY2Y2Y3ZjApDQpbICAgOTkuODc0NjI0XSBmNmEwOiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgMDAwMDAwMDAwMDAwMDAwNyAwMDAwMDAw
-MDAwMDAwMWE3DQpbICAgOTkuODc0NjI1XSBmNmMwOiBmZmZmMDAwMDBlYWUwOTYwIGZmZmY4MDAw
-Mjc2MmU3YzAgMDAwMDAwMDAwMDAwMDAwMCAwMDAwMDAwMDAwMDAwMDAwDQpbICAgOTkuODc0NjI3
-XSBmNmUwOiAwMDAwMDAwMDAwMDAwMDAxIGZmZmYwMDAwMDE3MjAwOTAgMDAwMDAwMDAwMDAwMDAw
-MSAwMDAwMDAwMDAwYWFhYWFhDQpbICAgOTkuODc0NjI4XSBmNzAwOiBmZmZmODAwMDI3NjJlN2Mw
-IDAwMDAwMDAwMDAwMDAwMGYgMDAwMDAwMDAwMDAwMDAzNSAwMDAwMDAwMDAwMDAwMWE4DQpbICAg
-OTkuODc0NjI5XSBmNzIwOiAyMDMzMzAyZTMwMzAzYTMwIDAwMDAwMDAwMDAwMDAwMDggMDAwMDAw
-MDAwMDAwMDAwMCAwMDAwMDAwMDAwMDAwMDAwDQpbICAgOTkuODc0NjMxXSBmNzQwOiAwMDAwZmZm
-ZmNhZDAxOWMwIGZmZmY4MDAwMmEyMGU4MDAgMDAwMDAwMDAwMDAwMDAwMCBmZmZmMDAwMDBlYWUw
-OTYwDQpbICAgOTkuODc0NjMyXSBmNzYwOiBmZmZmMDAwMDBmNmNmOTc4IDAwMDAwMDAwMDAwMDAw
-MDAgMDAwMDAwMDAwMDAwMDAxOCAwMDAwMDAwMDAwMDAwMWE4DQpbICAgOTkuODc0NjMzXSBmNzgw
-OiAwMDAwMDAwMDAwMDAwMDAxIGZmZmY4MDAwMjEzM2M0MDAgMDAwMDAwMDAwMDAwMDFmZiBmZmZm
-MDAwMDBmNmNmN2YwDQpbICAgOTkuODc0NjM1XSBmN2EwOiBmZmZmMDAwMDAxODcyZTc0IGZmZmYw
-MDAwMGY2Y2Y3ZjAgZmZmZjAwMDAwMTcxMDQwYyAwMDAwMDAwMDAwMDAwMDA1DQpbICAgOTkuODc0
-NjM2XSBmN2MwOiBmZmZmODAwMDJiMjNlZDA4IGZmZmYwMDAwMDE5MTEwZTggMDAwMTAwMDAwMDAw
-MDAwMCAwMDAwMDAwMDAwMDAwMDAwDQpbICAgOTkuODc0NjM3XSBmN2UwOiBmZmZmMDAwMDBmNmNm
-N2YwIGZmZmYwMDAwMDE3MTA0MGMNClsgICA5OS44NzQ2MzldIFs8ZmZmZjAwMDAwMTcxMDQwYz5d
-IHN5c19pbWFnZWJsaXQrMHg0MGMvMHgxMDAwMCBbc3lzaW1nYmx0XQ0KWyAgIDk5Ljg3NDY1OV0g
-WzxmZmZmMDAwMDAxODcyZTc0Pl0gZHJtX2ZiX2hlbHBlcl9zeXNfaW1hZ2VibGl0KzB4MjgvMHg0
-YyBbZHJtX2ttc19oZWxwZXJdDQpbICAgOTkuODc0NjY4XSBbPGZmZmYwMDAwMDE5MTEyZGM+XSB2
-aXJ0aW9fZ3B1XzNkX2ltYWdlYmxpdCsweDJjLzB4NzggW3ZpcnRpb19ncHVdDQpbICAgOTkuODc0
-Njc0XSBbPGZmZmYwMDAwMDg0N2Y0NTg+XSBiaXRfcHV0Y3MrMHgyODgvMHg0OWMNClsgICA5OS44
-NzQ2NzVdIFs8ZmZmZjAwMDAwODQ3YWQyND5dIGZiY29uX3B1dGNzKzB4MTE0LzB4MTQ4DQpbICAg
-OTkuODc0Njc4XSBbPGZmZmYwMDAwMDg0ZmU5MmM+XSBkb191cGRhdGVfcmVnaW9uKzB4MTE4LzB4
-MTljDQpbICAgOTkuODc0NjgwXSBbPGZmZmYwMDAwMDg1MDQxM2M+XSBkb19jb25fdHJvbCsweDEx
-NGMvMHgxMzE0DQpbICAgOTkuODc0NjgyXSBbPGZmZmYwMDAwMDg1MDQ0ZGM+XSBkb19jb25fd3Jp
-dGUucGFydC4yMisweDFkOC8weDg5MA0KWyAgIDk5Ljg3NDY4NF0gWzxmZmZmMDAwMDA4NTA0Yzg4
-Pl0gY29uX3dyaXRlKzB4ODQvMHg4Yw0KWyAgIDk5Ljg3NDY4Nl0gWzxmZmZmMDAwMDA4NGVjN2Yw
-Pl0gbl90dHlfd3JpdGUrMHgxOWMvMHg0MDgNClsgICA5OS44NzQ2ODhdIFs8ZmZmZjAwMDAwODRl
-OTEyMD5dIHR0eV93cml0ZSsweDE1MC8weDI3MA0KWyAgIDk5Ljg3NDY5MV0gWzxmZmZmMDAwMDA4
-MjlkNTU4Pl0gX192ZnNfd3JpdGUrMHg1OC8weDE4MA0KWyAgIDk5Ljg3NDY5M10gWzxmZmZmMDAw
-MDA4MjlkODgwPl0gdmZzX3dyaXRlKzB4YTgvMHgxYTANClsgICA5OS44NzQ2OTVdIFs8ZmZmZjAw
-MDAwODI5ZGI0MD5dIFN5U193cml0ZSsweDYwLzB4YzANClsgICA5OS44NzQ2OTZdIEV4Y2VwdGlv
-biBzdGFjaygweGZmZmYwMDAwMGY2Y2ZlYzAgdG8gMHhmZmZmMDAwMDBmNmQwMDAwKQ0KWyAgIDk5
-Ljg3NDY5N10gZmVjMDogMDAwMDAwMDAwMDAwMDAwMSAwMDAwMDAwMDAwNDU3OTU4IDAwMDAwMDAw
-MDAwMDA4MDAgMDAwMDAwMDAwMDAwMDAwMA0KWyAgIDk5Ljg3NDY5OV0gZmVlMDogMDAwMDAwMDBm
-YmFkMjg4NSAwMDAwMDAwMDAwMDAwYmQwIDAwMDBmZmZmOWI2NmFkZDQgMDAwMDAwMDAwMDAwMDAw
-MA0KWyAgIDk5Ljg3NDcwMF0gZmYwMDogMDAwMDAwMDAwMDAwMDA0MCAwMDAwMDAwMDAwMDAwMDAw
-IDAwMDAwMDAwMDA0MzRhODggMDAwMDAwMDAwMDAwMDAxMg0KWyAgIDk5Ljg3NDcwMl0gZmYyMDog
-MDAwMDAwMDEwMDAwMDAwMCAwMDAwZmZmZmNhZDAxODQwIDAwMDAwMDAwMDA0MTRiNjAgMDAwMDAw
-MDAwMDAwMDAwOA0KWyAgIDk5Ljg3NDcwM10gZmY0MDogMDAwMDAwMDAwMDAwMDAwMCAwMDAwZmZm
-ZjliNjkzYjFjIDAwMDBmZmZmY2FkMDE5YzAgMDAwMDAwMDAwMDAwMDgwMA0KWyAgIDk5Ljg3NDcw
-NF0gZmY2MDogMDAwMDAwMDAwMDQ1Nzk1OCAwMDAwZmZmZjliN2ExMTU4IDAwMDAwMDAwMDAwMDA4
-MDAgMDAwMGZmZmY5YjgyMDAwMA0KWyAgIDk5Ljg3NDcwNl0gZmY4MDogMDAwMDAwMDAwMDAwMDAw
-MCAwMDAwZmZmZjliN2Y2MDRjIDAwMDAwMDAwMDAwMDAwMDAgMDAwMDAwMDAwMDQzNjAwMA0KWyAg
-IDk5Ljg3NDcwN10gZmZhMDogMDAwMDAwMDAzYjIzOTQ0MCAwMDAwZmZmZmNhZDAyMjcwIDAwMDBm
-ZmZmOWI2OTY1ZjQgMDAwMGZmZmZjYWQwMjI3MA0KWyAgIDk5Ljg3NDcwOF0gZmZjMDogMDAwMGZm
-ZmY5YjZmMTJjOCAwMDAwMDAwMDIwMDAwMDAwIDAwMDAwMDAwMDAwMDAwMDEgMDAwMDAwMDAwMDAw
-MDA0MA0KWyAgIDk5Ljg3NDcxMF0gZmZlMDogMDAwMDAwMDAwMDAwMDAwMCAwMDAwMDAwMDAwMDAw
-MDAwIDAwMDAwMDAwMDAwMDAwMDAgMDAwMDAwMDAwMDAwMDAwMA0KWyAgIDk5Ljg3NDcxM10gWzxm
-ZmZmMDAwMDA4MDgzNTljPl0gX19zeXNfdHJhY2VfcmV0dXJuKzB4MC8weDQNClsgICA5OS44NzQ3
-MTZdIENvZGU6IDBhMDgwMDg0IGI4NjQ3OGU0IDBhMDQwMTI0IDRhMDUwMDg0IChiOTAwMDA0NCkN
-ClsgICA5OS44NzQ3MjBdIC0tLVsgZW5kIHRyYWNlIDg0NzQwY2RiZTJhMDY4MDEgXS0tLQ0KWyAg
-IDk5Ljg3NDcyMl0gS2VybmVsIHBhbmljIC0gbm90IHN5bmNpbmc6IEZhdGFsIGV4Y2VwdGlvbg0K
-WyAgIDk5Ljg3NDcyNl0gS2VybmVsIE9mZnNldDogZGlzYWJsZWQNClsgICA5OS44NzQ3MjhdIENQ
-VSBmZWF0dXJlczogMHgxODAyMDA4DQpbICAgOTkuODc0NzI5XSBNZW1vcnkgTGltaXQ6IG5vbmUN
-ClsgIDEwMC4wMjQ1MTZdIC0tLVsgZW5kIEtlcm5lbCBwYW5pYyAtIG5vdCBzeW5jaW5nOiBGYXRh
-bCBleGNlcHRpb24NCg0KxbfArc7lsr8g0rbU9sjtIDAwMzc5OTQzDQp5ZXplbmdydWFuQGh1YXdl
-aS5jb20NCruqzqq8vMr109DP3rmry74gSHVhd2VpIFRlY2hub2xvZ2llcyBDby4sIEx0ZC4NCltD
-b21wYW55X2xvZ29dDQoNCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fDQqxvtPKvP68
-sMbkuL28/rqs09C7qs6quavLvrXEsaPD3NDFz6KjrL32z97T2reiy824+MnPw+a12Na31tDB0LP2
-tcS49sjLu/LIutfpoaO9+w0K1rnIzrrOxuTL+8jL0tTIzrrO0M7Kvcq508OjqLD8wKi1q7K7z97T
-2sirsr+78rK/t9a12NC5wrahori01sahorvyyaK3oqOpsb7Tyrz+1tANCrXE0MXPoqGjyOe5+8T6
-tO3K1cHLsb7Tyrz+o6zH68T6waK8tLXnu7C78tPKvP7NqNaqt6K8/sjLsqLJvrP9sb7Tyrz+o6EN
-ClRoaXMgZS1tYWlsIGFuZCBpdHMgYXR0YWNobWVudHMgY29udGFpbiBjb25maWRlbnRpYWwgaW5m
-b3JtYXRpb24gZnJvbSBIVUFXRUksIHdoaWNoDQppcyBpbnRlbmRlZCBvbmx5IGZvciB0aGUgcGVy
-c29uIG9yIGVudGl0eSB3aG9zZSBhZGRyZXNzIGlzIGxpc3RlZCBhYm92ZS4gQW55IHVzZSBvZiB0
-aGUNCmluZm9ybWF0aW9uIGNvbnRhaW5lZCBoZXJlaW4gaW4gYW55IHdheSAoaW5jbHVkaW5nLCBi
-dXQgbm90IGxpbWl0ZWQgdG8sIHRvdGFsIG9yIHBhcnRpYWwNCmRpc2Nsb3N1cmUsIHJlcHJvZHVj
-dGlvbiwgb3IgZGlzc2VtaW5hdGlvbikgYnkgcGVyc29ucyBvdGhlciB0aGFuIHRoZSBpbnRlbmRl
-ZA0KcmVjaXBpZW50KHMpIGlzIHByb2hpYml0ZWQuIElmIHlvdSByZWNlaXZlIHRoaXMgZS1tYWls
-IGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHRoZSBzZW5kZXIgYnkNCnBob25lIG9yIGVtYWlsIGlt
-bWVkaWF0ZWx5IGFuZCBkZWxldGUgaXQhDQoNCg==
+On Fri, Sep 21, 2018 at 11:22:10AM +0300, Roman Kagan wrote:
+> Certain configurations do not allow SynIC to be used in QEMU.  In
+> particular,
+> 
+> - when hyperv_vpindex is off, SINT routes can't be used as they refer to
+>   the destination vCPU by vp_index
+> 
+> - older KVM (which doesn't expose KVM_CAP_HYPERV_SYNIC2) zeroes out
+>   SynIC message and event pages on every msr load, breaking migration
+> 
+> OTOH in-KVM users of SynIC -- SynIC timers -- do work in those
+> configurations, and we shouldn't stop the guest from using them.
+> 
+> To cover both scenarios, introduce an X86CPU property that makes CPU
+> init code to skip creation of the SynIC object (and thus disables any
+> SynIC use in QEMU) but keeps the KVM part of the SynIC working.
+> The property is clear by default but is set via compat logic for older
+> machine types.
+> 
+> As a result, when hv_synic and a modern machine type are specified, QEMU
+> will refuse to run unless vp_index is on and the kernel is recent
+> enough.  OTOH with an older machine type QEMU will run fine with
+> hv_synic=on against an older kernel and/or without vp_index enabled but
+> will disallow the in-QEMU uses of SynIC (in e.g. VMBus).
+> 
+> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> ---
+>  include/hw/i386/pc.h |  8 ++++++++
+>  target/i386/cpu.h    |  1 +
+>  target/i386/cpu.c    |  2 ++
+>  target/i386/kvm.c    | 30 ++++++++++++++++++++++--------
+>  4 files changed, 33 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 6894f37df1..dfe6746692 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -294,6 +294,14 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+>  int e820_get_num_entries(void);
+>  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>  
+> +#define PC_COMPAT_3_0 \
+> +    HW_COMPAT_3_0 \
+> +    {\
+> +        .driver   = TYPE_X86_CPU,\
+> +        .property = "x-hv-synic-kvm-only",\
+> +        .value    = "on",\
+> +    }
+
+Oops.  This macro does nothing if the 3.1 machine-types aren't
+updated to use it.  This patch breaks compatibility on pc-*-3.1.
+
+> [...]
+
+-- 
+Eduardo
