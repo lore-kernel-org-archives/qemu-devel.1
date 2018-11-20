@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stephend@silicom-usa.com>) id 1gP8eh-0007Mj-Ur
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:13:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1gP8uJ-0003Yq-IJ
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:29:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stephend@silicom-usa.com>) id 1gP8ed-0006Ra-KI
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:13:39 -0500
-Received: from mail-eopbgr70135.outbound.protection.outlook.com
-	([40.107.7.135]:56479
-	helo=EUR04-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stephend@silicom-usa.com>)
-	id 1gP8ed-0006I5-5c
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:13:35 -0500
-From: Steve Douthit <stephend@silicom-usa.com>
-Date: Tue, 20 Nov 2018 16:13:28 +0000
-Message-ID: <03cf3bbc-d557-1c12-dd2b-6acf7934db3c@silicom-usa.com>
-References: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
-	<20181119084855.uyira2lpu73mu2fo@sirius.home.kraxel.org>
-	<CAGxU2F4O4aKzrJky7EFeWaHFuBKPwi_Z-j7G7m+ENRojVG_5vA@mail.gmail.com>
-	<20181119130713.GB6443@stefanha-x1.localdomain>
-	<20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
-	<CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
-	<20181120155500.GA29471@morn.lan>
-In-Reply-To: <20181120155500.GA29471@morn.lan>
-Reply-To: Steve Douthit <stephend@silicom-usa.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E58C11DC7F7A744C826CDB205FC52D07@eurprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <eblake@redhat.com>) id 1gP8uG-0003xG-8Q
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:29:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48318)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gP8uF-0003wq-Vm
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 11:29:44 -0500
+References: <20181120092542.13102-1-david@redhat.com>
+	<20181120092542.13102-3-david@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7d8d4e4f-bb70-5047-4e37-ed3672c89e02@redhat.com>
+Date: Tue, 20 Nov 2018 10:29:39 -0600
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [SeaBIOS]  SeaBIOS booting time optimization
+In-Reply-To: <20181120092542.13102-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/9] cutils: Fix qemu_strtosz() &
+ friends to reject non-finite sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,28 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin O'Connor <kevin@koconnor.net>, Stefano Garzarella <sgarzare@redhat.com>
-Cc: "kraxel@redhat.com" <kraxel@redhat.com>, "stefanha@gmail.com" <stefanha@gmail.com>, Rob Bradford <robert.bradford@intel.com>, "seabios@seabios.org" <seabios@seabios.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-T24gMTEvMjAvMTggMTA6NTUgQU0sIEtldmluIE8nQ29ubm9yIHdyb3RlOg0KPiBPbiBNb24sIE5v
-diAxOSwgMjAxOCBhdCAwNzozODozOVBNICswMTAwLCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6
-DQo+PiBqdXN0IGFuIHVwZGF0ZSwgSSBlbmFibGVkIHRoZSBkZWJ1ZyBwcmludHMgYW5kIEkgc2F3
-IHR3byB0aW1lb3V0cyBmaXJlZA0KPj4gd2l0aCBhIGxvdA0KPj4gb2YgdGltZSBsb3N0ICh+Nzgw
-bXMgYmV0d2VlbiAiaW5pdCB0aW1lciIgYW5kICJTY2FuIGZvciBWR0EgLi4uIiksDQo+PiBwdXR0
-aW5nIG90aGVyIHByaW50cyBJIGRpc2NvdmVyZWQgdGhhdCBhIGxvdCBvZiB0aW1lIGlzIHNwZW50
-IGluIHRoZQ0KPj4gdHBtX3NldHVwKCksDQo+PiBkdXJpbmcgdGhlIHByb2JlIG9mIHRoZSAyIFRQ
-TSBkZXZpY2VzOg0KPj4NCj4+IDAwLjU0ODg2OSBpbml0IHRpbWVyDQo+PiAwMC41NDk2NzcgLi9z
-cmMvcG9zdC5jOjE1NyBwbGF0Zm9ybV9oYXJkd2FyZV9zZXR1cA0KPj4gMDAuNTUwMTgyIC4vc3Jj
-L2h3L3RwbV9kcml2ZXJzLmM6NTc5IHRwbWh3X3Byb2JlDQo+PiAwMS4zMDA4MzMgV0FSTklORyAt
-IFRpbWVvdXQgYXQgd2FpdF9yZWc4OjgxIQ0KPj4gMDEuMzAxMzg4IC4vc3JjL2h3L3RwbV9kcml2
-ZXJzLmM6NTc5IHRwbWh3X3Byb2JlDQo+PiAwMS4zMzE4NDMgV0FSTklORyAtIFRpbWVvdXQgYXQg
-d2FpdF9yZWc4OjgxIQ0KPj4gMDEuMzMyMzE2IC4vc3JjL3Bvc3QuYzoxNjAgcGxhdGZvcm1faGFy
-ZHdhcmVfc2V0dXANCj4+IDAxLjMzMzM1OCBTY2FuIGZvciBWR0Egb3B0aW9uIHJvbQ0KPiANCj4g
-RllJLCB0aGlzIHdhcyByYWlzZWQgYSBmZXcgbW9udGhzIGFnbyAtIHNlZToNCj4gDQo+IGh0dHBz
-Oi8vbWFpbC5jb3JlYm9vdC5vcmcvcGlwZXJtYWlsL3NlYWJpb3MvMjAxOC1NYXJjaC8wMTIxODYu
-aHRtbA0KPiANCj4gSUlSQywgaXQgc2hvdWxkIGJlIHBvc3NpYmxlIHRvIHZlcmlmeSB0aGUgVFBN
-IGRldmljZSBpcyBwcmVzZW50IGJlZm9yZQ0KPiB0cnlpbmcgdG8gd2FpdCBmb3IgaXQuDQoNCldl
-IGNvdWxkIHNraXAgcHJvYmluZyBlbnRpcmVseSBpZiB0aGVyZSdzIG5vIFRDUEEgb3IgVFBNMiBB
-Q1BJIHRhYmxlcy4NClRoZXJlJ2QgbmVlZCB0byBiZSBzb21lIG9wdGlvbiB0byBmb3JjZSBwcm9i
-aW5nIGluIHRoZSBjYXNlIG9mDQptaXNzaW5nL2Jyb2tlbiBBQ1BJIGNvbmZpZ3VyYXRpb25zLg0K
-DQo+IC1LZXZpbg0KPiANCg0K
+On 11/20/18 3:25 AM, David Hildenbrand wrote:
+> qemu_strtosz() & friends reject NaNs, but happily accept inifities.
+
+s/inifities/infinities/
+
+> They shouldn't. Fix that.
+> 
+> The fix makes use of qemu_strtod_finite(). To avoid ugly casts,
+> change the @end parameter of qemu_strtosz() & friends from char **
+> to const char **.
+> 
+> Also, add two test cases, testing that "inf" and "NaN" are properly
+> rejected.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>   include/qemu/cutils.h |  6 +++---
+>   monitor.c             |  2 +-
+>   tests/test-cutils.c   | 24 +++++++++++++++++-------
+>   util/cutils.c         | 16 +++++++---------
+>   4 files changed, 28 insertions(+), 20 deletions(-)
+> 
+
+> +++ b/util/cutils.c
+> @@ -206,20 +206,18 @@ static int64_t suffix_mul(char suffix, int64_t unit)
+>    * in *end, if not NULL. Return -ERANGE on overflow, Return -EINVAL on
+
+Pre-existing, but since you're touching this area: the second 'Return' 
+is unusual capitalization for being mid-sentence.  You could even 
+s/Return/of/
+
+>    * other error.
+>    */
+> -static int do_strtosz(const char *nptr, char **end,
+> +static int do_strtosz(const char *nptr, const char **end,
+>                         const char default_suffix, int64_t unit,
+>                         uint64_t *result)
+>   {
+>       int retval;
+> -    char *endptr;
+> +    const char *endptr;
+>       unsigned char c;
+>       int mul_required = 0;
+>       double val, mul, integral, fraction;
+>   
+> -    errno = 0;
+> -    val = strtod(nptr, &endptr);
+> -    if (isnan(val) || endptr == nptr || errno != 0) {
+> -        retval = -EINVAL;
+> +    retval = qemu_strtod_finite(nptr, &endptr, &val);
+> +    if (retval) {
+>           goto out;
+
+Here, retval can be -EINVAL (for failure to parse, or encountering "inf" 
+or "NaN") or -ERANGE (overflow, underflow)...
+
+>       }
+>       fraction = modf(val, &integral);
+> @@ -259,17 +257,17 @@ out:
+
+out:
+     if (end) {
+         *end = endptr;
+     } else if (*endptr) {
+         retval = -EINVAL;
+     }
+
+>       return retval;
+
+...if the failure was -EINVAL due to trailing garbage or empty string, 
+nothing changes. If the failure was -EINVAL due to "inf", and the user 
+passed in 'end', then 'end' now points to the beginning of "inf" instead 
+of the end (probably okay). If the failure was -EINVAL due to "inf" and 
+the user gave NULL for 'end', then we slam retval back to -EINVAL (no 
+change).  If the failure was -ERANGE, then there is no trailing garbage, 
+so *endptr had better be NULL, and we still fail with -ERANGE.  Any 
+other way to reach the out label is unchanged from earlier logic.
+
+It's some hairy code to think about, but I can't find anything wrong 
+with it.  Typo fixes are minor, so
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
