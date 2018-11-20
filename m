@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gP0zQ-00015v-VA
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:02:33 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gP1Co-0005Gk-5G
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:16:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gP0zM-0002eV-7J
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:02:32 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35489)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gP0zM-0002e9-1a
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:02:28 -0500
-Received: by mail-wr1-x444.google.com with SMTP id 96so893428wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 00:02:27 -0800 (PST)
+	(envelope-from <kraxel@redhat.com>) id 1gP1Cn-0003N6-Fq
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 03:16:22 -0500
+Date: Tue, 20 Nov 2018 09:16:13 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181120081613.bezcjotqhmqflvvb@sirius.home.kraxel.org>
+References: <1539939312-19713-1-git-send-email-hongbo.zhang@linaro.org>
+	<1539939312-19713-2-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA-vF5orNpfGFe2sGWh=TxWL054PmCM-Yu4faJne+4CkbA@mail.gmail.com>
+	<CAHmQWvD1ocAfZo=9aJYeuVDWrBk=AF_D-AgHriYb3-7=n+rR6A@mail.gmail.com>
+	<20181116122705.msdb5hydmhtyzzxy@sirius.home.kraxel.org>
+	<CAKv+Gu8QXaRioVPNze_+mJg4aqjJmwn4O-1jdRcYwrkieXrBwQ@mail.gmail.com>
+	<20181119124423.qj3sjhhdyetrbju5@bivouac.eciton.net>
+	<CAKv+Gu_-U8BHthhen-GBkium9qJMdd-pe_PB9TPdUaP=koeajQ@mail.gmail.com>
+	<20181119164421.me2j4fwzo43aghaa@bivouac.eciton.net>
+	<CAKv+Gu9VjERXDdb=ZkvzVocL4Fd3_2e+F=H0nqEJVs4UEkYmhw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20181120072239.512-1-ppandit@redhat.com>
-In-Reply-To: <20181120072239.512-1-ppandit@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 20 Nov 2018 12:02:15 +0400
-Message-ID: <CAJ+F1CJUWy6nw5+4anpctoH5KkkxG42xtfe_0Ro5=mMg7DVHUw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] tpm: check localities index
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu9VjERXDdb=ZkvzVocL4Fd3_2e+F=H0nqEJVs4UEkYmhw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v4] hw/arm: Add arm SBSA reference machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Huawei PSIRT <PSIRT@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Leif Lindholm <leif.lindholm@linaro.org>, Hongbo Zhang <hongbo.zhang@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hi
+  Hi,
 
-On Tue, Nov 20, 2018 at 11:24 AM P J P <ppandit@redhat.com> wrote:
->
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> While performing mmio device r/w operations, guest could set 'addr'
-> parameter such that 'locty' index exceeds TPM_TIS_NUM_LOCALITIES=3D5
-> after setting new 'locty' via 'tpm_tis_new_active_locality'.
-> Add check to avoid OOB access.
->
-> Reported-by: Cheng Feng <PSIRT@huawei.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  hw/tpm/tpm_tis.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> Update: add assert() calls
->   -> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg00912.html
->
-> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-> index 12f5c9a759..d6bf3ceb26 100644
-> --- a/hw/tpm/tpm_tis.c
-> +++ b/hw/tpm/tpm_tis.c
-> @@ -293,6 +293,7 @@ static void tpm_tis_request_completed(TPMIf *ti, int =
-ret)
->      uint8_t locty =3D s->cmd.locty;
->      uint8_t l;
->
-> +    assert(TPM_TIS_IS_VALID_LOCTY(locty));
->      if (s->cmd.selftest_done) {
->          for (l =3D 0; l < TPM_TIS_NUM_LOCALITIES; l++) {
->              s->loc[locty].sts |=3D TPM_TIS_STS_SELFTEST_DONE;
-> @@ -401,6 +402,7 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwadd=
-r addr,
->      uint32_t avail;
->      uint8_t v;
->
-> +    assert(TPM_TIS_IS_VALID_LOCTY(locty));
+> > But I assume you specifically want things that do a lot of DMA, so I
+> > couldn't get away with asking for keeping it to the SBSA UART(s)? :)
+> 
+> Ideally, it would be something that supports platform MSIs as well,
+> but that is unlikely to be a priority for anyone (and i would be very
+> surprised if any of QEMU's sysbus host controllers implement that at
+> the moment)
+> 
+> I can live with just sysbus AHCI, though, if EHCI/XHCI are too cumbersome.
 
-This is probably not really helping,
-Right after tpm_tis_locality_from_addr() you can expect IS_VALID_LOCTY
+Generic sysbus ehci should not be difficuilt, 10 lines patch or so.
 
+Gives you only usb2 though.  usb1 devices are handled either via ohci
+companion controller (should be doable), or via integrated usb2 hub
+(more common on recent hardware, but qemu usb-hub is usb1 only).
 
->      if (tpm_backend_had_startup_error(s->be_driver)) {
->          return 0;
->      }
-> @@ -523,6 +525,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr a=
-ddr,
->      uint16_t len;
->      uint32_t mask =3D (size =3D=3D 1) ? 0xff : ((size =3D=3D 2) ? 0xffff=
- : ~0);
->
-> +    assert(TPM_TIS_IS_VALID_LOCTY(locty));
->      trace_tpm_tis_mmio_write(size, addr, val);
->
->      if (locty =3D=3D 4) {
-> @@ -642,7 +645,7 @@ static void tpm_tis_mmio_write(void *opaque, hwaddr a=
-ddr,
->              }
->          }
->
-> -        if (set_new_locty) {
-> +        if (set_new_locty && TPM_TIS_IS_VALID_LOCTY(active_locty)) {
->              tpm_tis_new_active_locality(s, active_locty);
->          }
->
+Generic sysbus xhci would be more work.  But you'll get usb 1+2+3
+support.  And wiring up platform MSIs should be possible too.
 
-tpm_tis_new_active_locality() has explicit code handling for !IS_VALID_LOCT=
-Y.
-
-> --
-> 2.17.2
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+cheers,
+  Gerd
