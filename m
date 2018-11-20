@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOuZG-0007DZ-SI
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 20:11:07 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gOucP-0001Um-UY
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 20:14:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gOuZG-0000hG-6o
-	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 20:11:06 -0500
-References: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
-	<20181119120820.29878-22-maozhongyi@cmss.chinamobile.com>
-	<20181119132527.0e7c26c9.cohuck@redhat.com>
-	<a290c35d-3332-2650-af55-2e29660b67fc@redhat.com>
-From: maozy <maozhongyi@cmss.chinamobile.com>
-Message-ID: <bdd63f41-4e05-7f0d-13ee-806e3b81b808@cmss.chinamobile.com>
-Date: Tue, 20 Nov 2018 09:10:46 +0800
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gOucH-0008A9-5I
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 20:14:17 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:58810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gOucF-00084x-LW
+	for qemu-devel@nongnu.org; Mon, 19 Nov 2018 20:14:12 -0500
+Date: Tue, 20 Nov 2018 02:14:09 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20181120011409.ny2hfyrrieh3xoak@function>
+References: <20181114123643.24091-1-marcandre.lureau@redhat.com>
+	<20181114123643.24091-29-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a290c35d-3332-2650-af55-2e29660b67fc@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 21/22] event-facility:
- ChangeSysBusDeviceClass *sbdc to SysBusDeviceClass *sbc
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181114123643.24091-29-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 28/41] slirp: replace
+ error_report() with g_critical()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +30,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: david@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>, rth@twiddle.net
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, rjones@redhat.com, stefanha@redhat.com, renzo@cs.unibo.it
 
+Marc-Andr=C3=A9 Lureau, le mer. 14 nov. 2018 16:36:30 +0400, a ecrit:
+> Reduce dependency on QEMU. QEMU could use a custom log handler if it
+> wants to redirect/filter it.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-
-On 11/19/18 10:10 PM, Thomas Huth wrote:
-> On 2018-11-19 13:25, Cornelia Huck wrote:
->> On Mon, 19 Nov 2018 20:08:19 +0800
->> Mao Zhongyi <maozhongyi@cmss.chinamobile.com> wrote:
->>
->>> Most of the SysBusDeviceClass variables are named sbc,
->>> and sbdc here is a bit weird, so changing sbdc to keep
->>> it consistent with others might look good.
->>
->> A quick git grep also gives sbd and k as variable names, and it is used
->> in a total of two lines which have not been touched since 2013, so...
->> meh. If others like the change, I'm not opposed to merging, though.
-> 
-> I think I agree with Cornelia, just changing the variable name because
-> it's named differently in a couple of other places is just unnecessary
-> code churn, which makes "git blame" output harder to read later. I'd
-> suggest to drop this patch, too.
-> 
-
-Ok, I got it. :)
-
-Thanks,
-Mao
-
->   Thomas
-> 
+Applied to my tree, thanks!
