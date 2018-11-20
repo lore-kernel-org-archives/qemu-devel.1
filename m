@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gPAGc-0006n2-Hi
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:56:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gPAKK-0008Ls-Ng
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 13:00:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gPAGY-0001SP-Pt
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:56:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gPAGY-0001Qk-Fx
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 12:56:50 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 79AAD30821E4
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 17:56:49 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue, 20 Nov 2018 17:56:46 +0000
-Message-Id: <20181120175646.25763-1-berrange@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gPAKI-0006DE-0A
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 13:00:44 -0500
+Date: Tue, 20 Nov 2018 19:00:29 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181120180029.GD7513@localhost.localdomain>
+References: <cover.1542031058.git.berto@igalia.com>
+	<ab8395c8926892311948dcfd3f88c598dd74797b.1542031058.git.berto@igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] tests: fix nbd test to work correctly with raw
- images
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ab8395c8926892311948dcfd3f88c598dd74797b.1542031058.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v5 05/16] block: Use
+ bdrv_reopen_set_read_only() in stream_start/complete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-The first qemu-io command must honour the $IMGFMT that is set rather
-than hardcoding qcow2. The qemu-nbd commands should also set $IMGFMT
-to avoid the insecure format probe warning.
+Am 12.11.2018 um 15:00 hat Alberto Garcia geschrieben:
+> This patch replaces the bdrv_reopen() calls that set and remove the
+> BDRV_O_RDWR flag with the new bdrv_reopen_set_read_only() function.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/stream.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/stream.c b/block/stream.c
+> index 81a7ec8ece..262d280ccd 100644
+> --- a/block/stream.c
+> +++ b/block/stream.c
+> @@ -34,7 +34,7 @@ typedef struct StreamBlockJob {
+>      BlockDriverState *base;
+>      BlockdevOnError on_error;
+>      char *backing_file_str;
+> -    int bs_flags;
+> +    bool bs_read_only;
+>  } StreamBlockJob;
+>  
+>  static int coroutine_fn stream_populate(BlockBackend *blk,
+> @@ -89,10 +89,10 @@ static void stream_clean(Job *job)
+>      BlockDriverState *bs = blk_bs(bjob->blk);
+>  
+>      /* Reopen the image back in read-only mode if necessary */
+> -    if (s->bs_flags != bdrv_get_flags(bs)) {
+> +    if (s->bs_read_only) {
+>          /* Give up write permissions before making it read-only */
+>          blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
+> -        bdrv_reopen(bs, s->bs_flags, NULL);
+> +        bdrv_reopen_set_read_only(bs, true, NULL);
+>      }
+>  
+>      g_free(s->backing_file_str);
+> @@ -226,12 +226,12 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+>  {
+>      StreamBlockJob *s;
+>      BlockDriverState *iter;
+> -    int orig_bs_flags;
+> +    int bs_read_only;
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- tests/qemu-iotests/233 | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+bool certainly?
 
-diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
-index a4da60d0ad..1814efe333 100755
---- a/tests/qemu-iotests/233
-+++ b/tests/qemu-iotests/233
-@@ -66,7 +66,7 @@ $QEMU_IO -c 'w -P 0x11 1m 1m' "$TEST_IMG" | _filter_qem=
-u_io
-=20
- echo
- echo "=3D=3D check TLS client to plain server fails =3D=3D"
--nbd_server_start_tcp_socket "$TEST_IMG"
-+nbd_server_start_tcp_socket -f $IMGFMT "$TEST_IMG"
-=20
- $QEMU_IMG info --image-opts \
-     --object tls-creds-x509,dir=3D${tls_dir}/client1,endpoint=3Dclient,i=
-d=3Dtls0 \
-@@ -78,7 +78,10 @@ nbd_server_stop
- echo
- echo "=3D=3D check plain client to TLS server fails =3D=3D"
-=20
--nbd_server_start_tcp_socket --object tls-creds-x509,dir=3D${tls_dir}/ser=
-ver1,endpoint=3Dserver,id=3Dtls0,verify-peer=3Dyes --tls-creds tls0 "$TES=
-T_IMG"
-+nbd_server_start_tcp_socket \
-+    --object tls-creds-x509,dir=3D${tls_dir}/server1,endpoint=3Dserver,i=
-d=3Dtls0,verify-peer=3Dyes \
-+    --tls-creds tls0 \
-+    -f $IMGFMT "$TEST_IMG"
-=20
- $QEMU_IMG info nbd://localhost:$nbd_tcp_port 2>&1 | sed "s/$nbd_tcp_port=
-/PORT/g"
-=20
-@@ -104,7 +107,7 @@ $QEMU_IO -c 'r -P 0x11 1m 1m' -c 'w -P 0x22 1m 1m' --=
-image-opts \
-     driver=3Dnbd,host=3D$nbd_tcp_addr,port=3D$nbd_tcp_port,tls-creds=3Dt=
-ls0 \
-     2>&1 | _filter_qemu_io
-=20
--$QEMU_IO -f qcow2 -r -U -c 'r -P 0x22 1m 1m' "$TEST_IMG" | _filter_qemu_=
-io
-+$QEMU_IO -f $IMGFMT -r -U -c 'r -P 0x22 1m 1m' "$TEST_IMG" | _filter_qem=
-u_io
-=20
- # success, all done
- echo "*** done"
---=20
-2.19.1
+Kevin
