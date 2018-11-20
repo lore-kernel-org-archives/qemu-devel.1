@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gP5qx-00073F-35
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:14:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gP5ro-0007Qo-CZ
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:15:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gP5qt-0007rh-U3
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:14:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35860)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gP5qt-0007rI-Oy
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:14:03 -0500
-Date: Tue, 20 Nov 2018 13:13:58 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181120131358.GO25047@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <mailman.21030.1541972152.1282.qemu-devel@nongnu.org>
-	<4D9A31B6-6136-4ABD-B88D-722BA2D99528@gmail.com>
-	<CAFEAcA-pN5F7UaiWC8nmG00NC=PftG6Aw3QfmEu-Dj4b8H4fOw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gP5rn-0008Qt-Lv
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:15:00 -0500
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:45634)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gP5rn-0008Qc-HJ
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:14:59 -0500
+Received: by mail-ot1-x32f.google.com with SMTP id 32so1566379ota.12
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 05:14:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-pN5F7UaiWC8nmG00NC=PftG6Aw3QfmEu-Dj4b8H4fOw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] Fix for crashes and non-responsive UI on
- macOS Mojave
+In-Reply-To: <20181120120326.30879-1-groug@kaod.org>
+References: <20181120120326.30879-1-groug@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Nov 2018 13:14:38 +0000
+Message-ID: <CAFEAcA-wU0TB2=kb_WHp=gWpZ3edEQj4umeqO-ExKnN4oM9kvg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] 9p fixes for v3.1.0-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Programmingkid <programmingkidx@gmail.com>, Berkus Decker <berkus@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Nov 20, 2018 at 01:09:54PM +0000, Peter Maydell wrote:
-> On 13 November 2018 at 12:12, Programmingkid <programmingkidx@gmail.com> wrote:
-> >> On Nov 11, 2018, at 4:35 PM, Berkus Decker wrote:
-> >> These changes are ought to work on OSX 10.6, although I don?t have a machine handy to test it.
-> >
-> > I have Mac OS 10.6 available for testing.
-> 
-> This is perhaps a good point to ask the question: is retaining
-> support for 10.6 still worth the effort ? It was released 9
-> years ago and has been unsupported by Apple for nearly 5 years.
-> 
-> qemu-doc.texi's "Supported build platforms" section says:
-> # The project supports building with the two most recent versions
-> # of macOS, with the current homebrew package set available.
-> 
-> which would be High Sierra (10.13) and Mojave (10.14) only. If you
-> widened that to "all versions still supported by Apple" it would add
-> Sierra (10.13) to the list.
-> 
-> Given how few upstream developers we have who care about OSX,
-> I think it is not very useful to spend that effort on trying
-> to retain support for ancient versions of it.
+On 20 November 2018 at 12:03, Greg Kurz <groug@kaod.org> wrote:
+> The following changes since commit 3c035a41dca808f096a128fe2b62d849fe638a25:
+>
+>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2018-11-20' into staging (2018-11-20 10:56:57 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/gkurz/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 5b3c77aa581ebb215125c84b0742119483571e55:
+>
+>   9p: take write lock on fid path updates (CVE-2018-19364) (2018-11-20 13:00:35 +0100)
+>
+> ----------------------------------------------------------------
+> Fixes yet another use-after-free issue that could be triggered by a
+> misbehaving guest. This is a follow-up to commit:
+>
+> commit 5b76ef50f62079a2389ba28cacaf6cce68b1a0ed
+> Author: Greg Kurz <groug@kaod.org>
+> Date:   Wed Nov 7 01:00:04 2018 +0100
+>
+>     9p: write lock path in v9fs_co_open2()
+>
+> ----------------------------------------------------------------
+> Greg Kurz (1):
+>       9p: take write lock on fid path updates (CVE-2018-19364)
+>
+Applied, thanks.
 
-Yes, given how little resource there is for OSX, and lack of any serious
-automated testing beyond "does it compile", we should focus on host
-versions which have biggest benefit to users, per our build platforms
-guideline.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+-- PMM
