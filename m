@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gP2aj-00089w-Ux
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:45:13 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gP2bM-0000H4-0k
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:45:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gP2ai-0002kG-QJ
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:45:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50754)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gP2ai-0002jd-Iu
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:45:08 -0500
-Date: Tue, 20 Nov 2018 09:45:03 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181120094503.GC25047@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181119135903.11729-1-berrange@redhat.com>
-	<CAJ+F1CKnNftoqOfQBX6mMtpX+Jq2K21VyP8s-w7-wq3hAgYd7g@mail.gmail.com>
+	(envelope-from <sgarzare@redhat.com>) id 1gP2bI-0003BX-T3
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:45:47 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:34757)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gP2bI-0003BJ-PD
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:45:44 -0500
+Received: by mail-qk1-f196.google.com with SMTP id a132so1860289qkg.1
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 01:45:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CKnNftoqOfQBX6mMtpX+Jq2K21VyP8s-w7-wq3hAgYd7g@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qom: avoid reporting errors for NULL error
- object
+References: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
+	<20181119084855.uyira2lpu73mu2fo@sirius.home.kraxel.org>
+	<CAGxU2F4O4aKzrJky7EFeWaHFuBKPwi_Z-j7G7m+ENRojVG_5vA@mail.gmail.com>
+	<20181119130713.GB6443@stefanha-x1.localdomain>
+	<20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
+	<CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
+	<20181120062109.eahirgygm4br3ov7@sirius.home.kraxel.org>
+In-Reply-To: <20181120062109.eahirgygm4br3ov7@sirius.home.kraxel.org>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Tue, 20 Nov 2018 10:45:31 +0100
+Message-ID: <CAGxU2F64uK5oygQecZKOPpsyb--Pth9U00P_gghrtYDwQrSGtg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +33,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Samuel Ortiz <sameo@linux.intel.com>, Rob Bradford <robert.bradford@intel.com>, seabios@seabios.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Nov 20, 2018 at 09:45:23AM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Mon, Nov 19, 2018 at 5:59 PM Daniel P. Berrang=C3=A9 <berrange@redha=
-t.com> wrote:
-> >
-> > When debugging QEMU it is often useful to put a breakpoint on the
-> > error_setg_internal method impl.
-> >
-> > Unfortunately the object_property_add / object_class_property_add
-> > methods call object_property_find / object_class_property_find method=
-s
-> > to check if a property exists already before adding the new property.
-> >
-> > As a result there are a huge number of calls to error_setg_internal
-> > on startup of most QEMU commands, making it very painful to set a
-> > breakpoint on this method.
-> >
-> > This puts a minor optimization on the code so that we avoid calling
-> > error_setg() when errp is NULL. Functionally there's no difference
-> > since error_setg() is a no-op when errp is NULL, but this lets us
-> > use breakpoints in GDB in a practical way.
-> >
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->=20
-> Or maybe change the error_setg* macros? After all, if errp is NULL,
-> it's an error qemu can handle.
+Hi Gerd,
 
-That would mean that all callers would get short circuited which
-I don't think it is desirable in general.=20
+On Tue, Nov 20, 2018 at 7:21 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+>   Hi,
+>
+> > just an update, I enabled the debug prints and I saw two timeouts fired
+> > with a lot
+> > of time lost (~780ms between "init timer" and "Scan for VGA ..."),
+> > putting other prints I discovered that a lot of time is spent in the
+> > tpm_setup(),
+> > during the probe of the 2 TPM devices:
+> >
+> > 00.548869 init timer
+> > 00.549677 ./src/post.c:157 platform_hardware_setup
+> > 00.550182 ./src/hw/tpm_drivers.c:579 tpmhw_probe
+> > 01.300833 WARNING - Timeout at wait_reg8:81!
+> > 01.301388 ./src/hw/tpm_drivers.c:579 tpmhw_probe
+> > 01.331843 WARNING - Timeout at wait_reg8:81!
+> > 01.332316 ./src/post.c:160 platform_hardware_setup
+> > 01.333358 Scan for VGA option rom
+> >
+> > Indeed, in the probe of the TPM devices (TIS and CRB)  there are timeouts of
+> > 750 ms and 30 ms respectively.
+> >
+> > Then, statically disabling TPM and TCG (CONFIG_TCGBIOS) the time spent
+> > in SeaBIOS goes down from ~846ms to ~56ms:
+> > # SeaBIOS disabling CONFIG_TCGBIOS
+> > BIOS=/home/stefano/repos/seabios/out_notcgbios/bios.bin
+> >  qemu_init_end: 40.658371
+> >  fw_start: 40.850395 (+0.192024)
+> >  fw_do_boot: 96.750142 (+55.899747)
+> >  linux_start_boot: 98.880578 (+2.130436)
+> >
+> > The tpm_setup() is called after the qemu_cfg_init(), so I think we can
+> > disable
+> > this call using some fw_cfg parameters, if we will decide to implement a
+> > runtime
+> > approach.
+>
+> Another possible option is to simply use shorter timeouts on qemu (using
+> runningOnQEMU()), I'd suggest to check with the TPM maintainers whenever
+> that is ok.
 
-This QOM usage is special in that the calling code is using the
-error scenario as a means to trigger different code flow. IOW
-it doesn't consider it an error scenario at all.
+Yes, it is a good idea!
 
-> > ---
-> >  qom/object.c | 12 ++++++++++--
-> >  1 file changed, 10 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/qom/object.c b/qom/object.c
-> > index 547dcf97c3..ddd5e7a30e 100644
-> > --- a/qom/object.c
-> > +++ b/qom/object.c
-> > @@ -1087,7 +1087,12 @@ ObjectProperty *object_property_find(Object *o=
-bj, const char *name,
-> >          return prop;
-> >      }
-> >
-> > -    error_setg(errp, "Property '.%s' not found", name);
-> > +    /* Optimized to avoid calling error_setg if errp =3D=3D NULL
-> > +     * otherwise every property add call hits error_setg
-> > +     * making it impratical to set breakpoints in GDB */
-> > +    if (errp) {
-> > +        error_setg(errp, "Property '.%s' not found", name);
-> > +    }
-> >      return NULL;
-> >  }
-> >
-> > @@ -1133,7 +1138,10 @@ ObjectProperty *object_class_property_find(Obj=
-ectClass *klass, const char *name,
-> >      }
-> >
-> >      prop =3D g_hash_table_lookup(klass->properties, name);
-> > -    if (!prop) {
-> > +    /* Optimized to avoid calling error_setg if errp =3D=3D NULL
-> > +     * otherwise every property add call hits error_setg
-> > +     * making it impratical to set breakpoints in GDB */
-> > +    if (!prop && errp) {
-> >          error_setg(errp, "Property '.%s' not found", name);
-> >      }
-> >      return prop;
-> > --
-> > 2.19.1
-> >
-> >
->=20
->=20
-> --=20
-> Marc-Andr=C3=A9 Lureau
+>
+> Background:  The drivers in seabios work on both virtual and physical
+> hardware (you can run seabios as coreboot payload on physical hardware).
+> There are quite a few places where are delays and timeouts which are
+> required to work properly on physical hardware.  But typically virtual
+> hardware is alot faster.  There is -- for example -- no time needed to
+> establish a sata link.  Link detection in ahci is instant on qemu.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+I'll investigate also other timeouts.
+
+Thanks,
+Stefano
+
+>
+> cheers,
+>   Gerd
+>
+
+
+--
+Stefano Garzarella
+Red Hat
