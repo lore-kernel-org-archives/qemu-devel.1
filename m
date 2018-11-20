@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP6lj-000707-Ex
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:12:48 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gP6mu-0008Be-P2
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:14:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP6lh-0001Wu-RM
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:12:47 -0500
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:37924)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gP6lh-0001WV-NO
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:12:45 -0500
-Received: by mail-oi1-x22a.google.com with SMTP id a77so1582024oii.5
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 06:12:45 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1gP6mq-000245-O4
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 09:14:00 -0500
+Date: Tue, 20 Nov 2018 15:13:45 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181120151345.667f6b7b@redhat.com>
+In-Reply-To: <90a755cf-bee5-fcbb-b1ff-0ed3cfff960d@redhat.com>
+References: <20181105102044.20547-1-david@redhat.com>
+	<20181105102044.20547-10-david@redhat.com>
+	<20181119180934.08f4570c@redhat.com>
+	<90a755cf-bee5-fcbb-b1ff-0ed3cfff960d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181120134908.8439-2-ehabkost@redhat.com>
-References: <20181120134908.8439-1-ehabkost@redhat.com>
-	<20181120134908.8439-2-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Nov 2018 14:12:24 +0000
-Message-ID: <CAFEAcA9DbV8RR9uqp9nba7xc+VXwRqbcDHqbcmqJZFLMse2xGg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 1/1] hw/i386: add pc-i440fx-3.1 & pc-q35-3.1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 09/10] pci/shpc: perform unplug via the
+ hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,20 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-On 20 November 2018 at 13:49, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> We have a couple of PC_COMPAT_3_0, so we should have 3.1 PC machines,
-> and update the 3.0 machines to make use of those.
+On Tue, 20 Nov 2018 11:11:46 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-As a side note, we should have 3.1 machines regardless.
-Every versioned machine should have a new -x.y type
-every version of QEMU. (We should also try to remember
-to do this at the start of the release cycle rather than
-the end :-))
-
-thanks
--- PMM
+> >> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+> >> index c634353b06..7c667bc97c 100644
+> >> --- a/hw/pci-bridge/pcie_pci_bridge.c
+> >> +++ b/hw/pci-bridge/pcie_pci_bridge.c
+> >> @@ -150,6 +150,19 @@ static void pcie_pci_bridge_plug_cb(HotplugHandler *hotplug_dev,
+> >>      shpc_device_plug_cb(hotplug_dev, dev, errp);
+> >>  }
+> >>  
+> >> +static void pcie_pci_bridge_unplug_cb(HotplugHandler *hotplug_dev,
+> >> +                                      DeviceState *dev, Error **errp)
+> >> +{
+> >> +    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+> >> +
+> >> +    if (!shpc_present(pci_hotplug_dev)) {
+> >> +        error_setg(errp, "standard hotplug controller has been disabled for "
+> >> +                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);  
+> > Is it possible to reach here at all?  
+> 
+> Right, this should right now not be possible. I'll turn this into an
+> 
+> g_assert(shpc_present(pci_hotplug_dev));
+> 
+> (if we every support surprise removal, we'll have to rethink either way)
+> 
+> >   
+> >> +        return;
+> >> +    }
+> >> +    shpc_device_unplug_cb(hotplug_dev, dev, errp);
+> >> +}  
+> > 
+> > you probably can share this function impl. with pci_bridge_dev_unplug_cb()
+> > if you use object_get_typename().  
+> 
+> The same holds for all three functions (+ later pre_plug), however can
+> we be sure there won't be differences in the near future?
+> 
+> If we don't expect these functions to differ, I can add a patch to
+> factor the existing two functions (plug/unplug) out.
+I'm not sure if they will differ or not in future,
+but right now it looks as premature splitting.
+It might be better to have a single function now and split it later
+when it is necessary.
