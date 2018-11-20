@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPBmi-00066a-Fj
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:34:13 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gPBn3-0006cY-Ha
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:34:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPBfW-0002Yy-MT
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:26:45 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:53288)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPBfU-0002V8-Oa
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:26:41 -0500
-Received: by mail-wm1-f66.google.com with SMTP id y1so7874wmi.3
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 11:26:36 -0800 (PST)
-References: <20181113165247.4806-1-sameo@linux.intel.com>
-	<20181113165247.4806-4-sameo@linux.intel.com>
-	<CAFEAcA98so9yyJN=qAhD=Kr6pi1xxfrxt28atqZ8ATVJYXTaMg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a145c571-b5d9-1ef4-de8b-fad7dc7855c7@redhat.com>
-Date: Tue, 20 Nov 2018 20:26:33 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1gPBn1-0001bP-E3
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:34:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gPBmv-0001Uq-DS
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:34:23 -0500
+References: <1235.1542559249@dschgrazlin2.units.it>
+	<jpgefbgag1q.fsf@linux.bootlegged.copy>
+	<20181119230054.GI3807@habkost.net>
+	<824b8c1e-ee32-411b-53b3-68cd76fe0641@redhat.com>
+	<20181120184845.GQ4755@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <04d022e0-2408-0a2f-b2ef-171d1d9017d7@redhat.com>
+Date: Tue, 20 Nov 2018 20:34:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA98so9yyJN=qAhD=Kr6pi1xxfrxt28atqZ8ATVJYXTaMg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181120184845.GQ4755@habkost.net>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 03/13] target: arm: Move all v7m helpers
- into their own file
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] 3.1.0-rc{0,1} doesn't start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,126 +31,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Samuel Ortiz <sameo@linux.intel.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Bandan Das <bsd@redhat.com>, balducci@units.it, qemu-devel@nongnu.org, Robert Hoo <robert.hu@linux.intel.com>
 
-On 20/11/18 14:54, Peter Maydell wrote:
-> On 13 November 2018 at 16:52, Samuel Ortiz <sameo@linux.intel.com> wrote:
->> In preparation for supporting TCG disablement on ARM, we move all TCG
->> related v7m helpers and APIs into their own file (m_helper.c for all
->> v*-m helpers).
->> arm_v7m_cpu_do_interrupt pulls a large number of static functions
->> out of helper.c into m_helper.c because it is TCG dependent.
+On 20/11/18 19:48, Eduardo Habkost wrote:
+> On Tue, Nov 20, 2018 at 07:40:01PM +0100, Paolo Bonzini wrote:
+>> On 20/11/18 00:00, Eduardo Habkost wrote:
+>>> On Mon, Nov 19, 2018 at 04:55:13PM -0500, Bandan Das wrote:
+>>>> balducci@units.it writes:
+>>>>
+>>>>> hello
+>>>>>
+>>>>> I'm building qemu from source and happily using it since a bit
+>>>>> (2.3.0)
+>>>>>
+>>>>> Since 3.1.0-rc0 (including latest 3.1.0-rc1) I'm no more able to start
+>>>>> qemu, getting:
+>>>>>
+>>>>>     ----8<----
+>>>>>     install:115> qemu
+>>>>>     qemu: error: failed to set MSR 0x10a to 0x0
+>>>>>     qemu: /home/balducci/tmp/install-us-d/qemu-3.1.0-rc1.d/qemu-3.1.0-rc0/target/i386/kvm.c:2185: kvm_put_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+>>>>>     Aborted
+>>>>>     ---->8----
+>>>>>
+>>>> I believe the check on whether MSR_IA32_ARCH_CAPABILITIES is present is
+>>>> incomplete because it can return 0 for data. Can you try this:
+>>>>
+>>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>>>> index f524e7d929..4878ffb90b 100644
+>>>> --- a/target/i386/kvm.c
+>>>> +++ b/target/i386/kvm.c
+>>>> @@ -2002,14 +2002,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>>>>  #endif
+>>>>  
+>>>>      /* If host supports feature MSR, write down. */
+>>>> -    if (kvm_feature_msrs) {
+>>>> -        int i;
+>>>> -        for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
+>>>> -            if (kvm_feature_msrs->indices[i] == MSR_IA32_ARCH_CAPABILITIES) {
+>>>> -                kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+>>>> +    if (kvm_arch_get_supported_msr_feature(kvm_state, MSR_IA32_ARCH_CAPABILITIES)) {
+>>>> +        kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+>>>>                                env->features[FEAT_ARCH_CAPABILITIES]);
+>>>
+>>> kvm_arch_get_supported_msr_feature() will return the value of the
+>>> MSR on the host side (kvm/x86.c:kvm_get_msr_feature()).  Having
+>>> it return non-zero doesn't mean KVM's
+>>> svm_set_msr(MSR_IA32_ARCH_CAPABILITIES) will work.
+>>>
+>>> If the MSR doesn't work on KVM_SET_MSRS, it is not supposed to
+>>> appear on KVM_GET_MSR_INDEX_LIST (even if it appears on
+>>> KVM_GET_MSR_FEATURE_INDEX_LIST).  QEMU must check
+>>> KVM_GET_MSR_INDEX_LIST too before including the MSR on the
+>>> KVM_SET_MSRS call.
 >>
->> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Reviewed-by: Robert Bradford <robert.bradford@intel.com>
->> ---
->>   target/arm/internals.h   |   37 +
->>   target/arm/helper.c      | 2209 +++-----------------------------------
->>   target/arm/m_helper.c    | 1892 ++++++++++++++++++++++++++++++++
->>   target/arm/Makefile.objs |    2 +-
->>   4 files changed, 2086 insertions(+), 2054 deletions(-)
->>   create mode 100644 target/arm/m_helper.c
+>> Yes, this is a KVM bug.  For 3.1, making it "writable if nonzero" is a
+>> valid workaround, because AMD processors always return 0. It's not the
+>> prettiest thing, but it works.
 > 
->> +/* Function used to synchronize QEMU's AArch64 register set with AArch32
->> + * register set.  This is necessary when switching between AArch32 and AArch64
->> + * execution state.
->> + */
->> +void aarch64_sync_32_to_64(CPUARMState *env)
->>   {
->> -    uint32_t new_ss_msp, new_ss_psp;
->> +    int i;
->> +    uint32_t mode = env->uncached_cpsr & CPSR_M;
->>
->> -    if (env->v7m.secure == new_secstate) {
->> -        return;
->> +    /* We can blanket copy R[0:7] to X[0:7] */
->> +    for (i = 0; i < 8; i++) {
->> +        env->xregs[i] = env->regs[i];
->>       }
->>
->> -    /* All the banked state is accessed by looking at env->v7m.secure
->> -     * except for the stack pointer; rearrange the SP appropriately.
->> +    /* Unless we are in FIQ mode, x8-x12 come from the user registers r8-r12.
->> +     * Otherwise, they come from the banked user regs.
->>        */
->> -    new_ss_msp = env->v7m.other_ss_msp;
->> -    new_ss_psp = env->v7m.other_ss_psp;
->> -
->> -    if (v7m_using_psp(env)) {
->> -        env->v7m.other_ss_psp = env->regs[13];
->> -        env->v7m.other_ss_msp = env->v7m.other_sp;
->> -    } else {
->> -        env->v7m.other_ss_msp = env->regs[13];
->> -        env->v7m.other_ss_psp = env->v7m.other_sp;
->> -    }
->> -
->> -    env->v7m.secure = new_secstate;
->> -
->> -    if (v7m_using_psp(env)) {
->> -        env->regs[13] = new_ss_psp;
->> -        env->v7m.other_sp = new_ss_msp;
->> +    if (mode == ARM_CPU_MODE_FIQ) {
->> +        for (i = 8; i < 13; i++) {
->> +            env->xregs[i] = env->usr_regs[i - 8];
->> +        }
->>       } else {
->> -        env->regs[13] = new_ss_msp;
->> -        env->v7m.other_sp = new_ss_psp;
->> +        for (i = 8; i < 13; i++) {
->> +            env->xregs[i] = env->regs[i];
->> +        }
->>       }
->> -}
->>
->> -void HELPER(v7m_bxns)(CPUARMState *env, uint32_t dest)
->> -{
->> -    /* Handle v7M BXNS:
->> -     *  - if the return value is a magic value, do exception return (like BX)
->> -     *  - otherwise bit 0 of the return value is the target security state
->> +    /* Registers x13-x23 are the various mode SP and FP registers. Registers
->> +     * r13 and r14 are only copied if we are in that mode, otherwise we copy
->> +     * from the mode banked register.
->>        */
->> -    uint32_t min_magic;
->> -
->> -    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
->> -        /* Covers FNC_RETURN and EXC_RETURN magic */
->> -        min_magic = FNC_RETURN_MIN_MAGIC;
->> +    if (mode == ARM_CPU_MODE_USR || mode == ARM_CPU_MODE_SYS) {
->> +        env->xregs[13] = env->regs[13];
->> +        env->xregs[14] = env->regs[14];
->>       } else {
->> -        /* EXC_RETURN magic only */
->> -        min_magic = EXC_RETURN_MIN_MAGIC;
->> +        env->xregs[13] = env->banked_r13[bank_number(ARM_CPU_MODE_USR)];
->> +        /* HYP is an exception in that it is copied from r14 */
->> +        if (mode == ARM_CPU_MODE_HYP) {
->> +            env->xregs[14] = env->regs[14];
->> +        } else {
->> +            env->xregs[14] = env->banked_r14[bank_number(ARM_CPU_MODE_USR)];
->> +        }
->>       }
+> So it looks like we have 2 bugs?  Is KVM incorrectly returning
+> the MSR on KVM_GET_MSR_INDEX_LIST?
 > 
-> This part of the patch is a mess to read. I suspect this is a
-> combination of (a) your git not being configured to use a better
-> diff algorithm than the default (try "algorithm = histogram"
-> in the [diff] section of your .gitconfig), and it doing an effective
-> revert of 593cfa2b637b92d37 by accident.
+> I thought the bug was only in QEMU, which is supposed to be
+> checking KVM_GET_MSR_INDEX_LIST before setting the MSR (it is
+> only checking KVM_GET_MSR_FEATURE_INDEX_LIST).
 
-I did the review offline, applying the series then looking at each 
-commit with gitk, this is why I did not notice this.
+Oh, wait.  I didn't understand that.  Then yeah, fixing QEMU is enough.
+ KVM is not reporting the MSR in the list on AMD, but it should (and it
+should implement the MSR, of course!).
 
-> It's also an absolutely enormous patch, even for a "just
-> moving code" patch, which makes it hard to review even
-> with diff --color-moved. Maybe it would be better in two
-> pieces ("helper routines for various insns" and "exception
-> handling functions" seems like a workable split).
-
-Good idea.
-
-Regards,
-
-Phil.
+Paolo
