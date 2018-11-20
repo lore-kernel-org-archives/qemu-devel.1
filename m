@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gPDh3-0008Oc-H8
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:36:31 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gPDhh-0000Q7-2d
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:37:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gPDh1-0003bG-F4
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:36:25 -0500
-References: <20181105014047.26447-1-sameo@linux.intel.com>
-	<20181116172919.43f3e27d@redhat.com>
-	<d4f6f0ef-1333-a917-e3eb-d9bad47c9648@redhat.com>
-	<20181119163110.2f357f40@redhat.com>
-	<c09214f5-85fa-bb64-7c7e-2e9435ea4279@redhat.com>
-	<20181120135719.3965e33b@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <df790ea7-332c-66b1-63a3-052e1e7a2432@redhat.com>
-Date: Tue, 20 Nov 2018 22:36:01 +0100
+	(envelope-from <jsnow@redhat.com>) id 1gPDhf-0004Nw-BJ
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 16:37:04 -0500
+References: <20181120172252.17800-1-kwolf@redhat.com>
+	<20181120172252.17800-2-kwolf@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <acb65342-2927-90c1-dea3-52d373071d69@redhat.com>
+Date: Tue, 20 Nov 2018 16:36:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181120135719.3965e33b@redhat.com>
+In-Reply-To: <20181120172252.17800-2-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 00/24] ACPI reorganization for
- hardware-reduced API addition
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] iotests: Replace
+ time.clock() with Timeout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 
-On 20/11/18 13:57, Igor Mammedov wrote:
-> On Mon, 19 Nov 2018 18:14:26 +0100
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+
+On 11/20/18 12:22 PM, Kevin Wolf wrote:
+> time.clock() is deprecated since Python 3.3. Current Python versions
+> warn that the function will be removed in Python 3.8, and those warnings
+> make the test case 118 fail.
 > 
->> On 19/11/18 16:31, Igor Mammedov wrote:
->>> I've tried to give suggestions how to restructure series
->>> on per patch basis. In my opinion it quite possible to split
->>> series in several smaller ones and it should really help with
->>> making series cleaner and easier/faster to review/amend/merge
->>> vs what we have in v5.  
->>
->> This is true, on the other hand the series makes sense together and,
->> even if the patches are more or less independent, they also all follow
->> the same "plan".  For reviewing v6, are you aware of Patchew's series
->> diff functionality?  It can tell you which patches had comments in v5,
->> reorder patches if applicable, and display deleted and new patches at
->> the right point in the series.
-> Thanks, I'll give it a try.
+> Replace it with the Timeout mechanism that is compatible with both
+> Python 2 and 3, and makes the code even a little nicer.
 > 
-> Suggestion to split series mostly comes from contributor's point of view,
-> it much easier to amend small series than a larger one.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/118 | 16 ++++++----------
+>  1 file changed, 6 insertions(+), 10 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
+> index ff3b2ae3e7..c4f4c213ca 100755
+> --- a/tests/qemu-iotests/118
+> +++ b/tests/qemu-iotests/118
+> @@ -53,21 +53,17 @@ class ChangeBaseClass(iotests.QMPTestCase):
+>          if not self.has_real_tray:
+>              return
+>  
+> -        timeout = time.clock() + 3
+> -        while not self.has_opened and time.clock() < timeout:
+> -            self.process_events()
+> -        if not self.has_opened:
+> -            self.fail('Timeout while waiting for the tray to open')
+> +        with iotests.Timeout(3, 'Timeout while waiting for the tray to open'):
+> +            while not self.has_opened:
+> +                self.process_events()
+>  
+>      def wait_for_close(self):
+>          if not self.has_real_tray:
+>              return
+>  
+> -        timeout = time.clock() + 3
+> -        while not self.has_closed and time.clock() < timeout:
+> -            self.process_events()
+> -        if not self.has_opened:
+> -            self.fail('Timeout while waiting for the tray to close')
+> +        with iotests.Timeout(3, 'Timeout while waiting for the tray to close'):
+> +            while not self.has_closed:
+> +                self.process_events()
+>  
+>  class GeneralChangeTestsBaseClass(ChangeBaseClass):
+>  
+> 
 
-That's true, on the other hand rules exist to have exceptions. :)  IIRC
-your AML builder patch was also a huge series, this is not very different.
+I love the way that reads. Very cool!
 
-Paolo
+Reviewed-by: John Snow <jsnow@redhat.com>
