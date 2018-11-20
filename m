@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gP7kv-0006ML-Co
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:16:07 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gP7oW-0000hL-9b
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:19:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gP7kk-0004Fv-7s
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:15:59 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 20 Nov 2018 15:15:28 +0000
-Message-ID: <4bc81482-fab6-80dd-f684-4ffde4241dce@virtuozzo.com>
-References: <20181116184324.8093-1-jsnow@redhat.com>
-In-Reply-To: <20181116184324.8093-1-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C12B534B2C70B64093721F4821CC57D3@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1gP7oS-0007MM-6Y
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:19:44 -0500
+Date: Tue, 20 Nov 2018 16:19:30 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181120161930.62bc45bf@redhat.com>
+In-Reply-To: <20181120110427.7321-11-david@redhat.com>
+References: <20181120110427.7321-1-david@redhat.com>
+	<20181120110427.7321-11-david@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: Silence
- coverity CID 1390625
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 10/11] pci/shpc: perform unplug via the
+ hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +24,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan
-	Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org
 
-MTYuMTEuMjAxOCAyMTo0MywgSm9obiBTbm93IHdyb3RlOg0KPiBDb3Zlcml0eSB3YXJucyB0aGF0
-IGJhY2tpbmdfYnMoKSBjb3VsZCBnaXZlIHVzIGEgTlVMTCBwb2ludGVyLCB3aGljaA0KPiB3ZSB0
-aGVuIHVzZSB3aXRob3V0IGNoZWNraW5nIHRoYXQgaXQgaXNuJ3QuDQo+IA0KPiBJbiBvdXIgbG9v
-cCBjb25kaXRpb24sIHdlIGNoZWNrIGJzICYmIGJzLT5kcnYgYXMgYSBwb2ludCBvZiBoYWJpdCwg
-YnV0DQo+IGJ5IG5hdHVyZSBvZiB0aGUgYmxvY2sgZ3JhcGgsIHdlIGNhbm5vdCBoYXZlIG51bGwg
-YnMgcG9pbnRlcnMgaGVyZS4NCj4gDQo+IFRoaXMgbG9vcCBza2lwcyBvbmx5IGltcGxpY2l0IG5v
-ZGVzLCB3aGljaCBhbHdheXMgaGF2ZSBjaGlsZHJlbiwgc28NCj4gdGhpcyBsb29wIHNob3VsZCBu
-ZXZlciBlbmNvdW50ZXIgYSBudWxsIHZhbHVlLg0KDQpZb3UgbWVhbiwgYWx3YXlzIGhhdmUgYmFj
-a2luZyAobm90IGZpbGUgZm9yIGV4Lik/IFNob3VsZCB3ZSBhdCBsZWFzdCBhZGQgYSBjb21tZW50
-DQpuZWFyICJib29sIGltcGxpY2l0OyIgdGhhdCB0aGUgbm9kZSBtdXN0IGhhdmUgYmFja2luZy4u
-DQoNCkRvIHdlIGhhdmUgZmlsdGVycywgdXNpbmcgJ2ZpbGUnIGNoaWxkIGluc3RlYWQgb2YgYmFj
-a2luZywgd2lsbCB3ZSB3YW50IHRvIGF1dG8gaW5zZXJ0IHRoZW0sIGFuZCB0aGVyZWZvcmUgbWFy
-ayB0aGVtIHdpdGggaW1wbGljaXQ9dHJ1ZT8NCg0KQW5kIG9uZSBtb3JlIHRoaW5nOg0KU28sIGl0
-J3MgbG9va3MgbGlrZSBhIHdyb25nIHdheSB0byBzZWFyY2ggZm9yIGFsbCBibG9jay1ub2Rlcywg
-aW5zdGVhZCBvZiBsb29waW5nIHRocm91Z2ggYmFja2luZyBjaGFpbiB0byB0aGUgZmlyc3Qgbm90
-LWltcGxpY2l0IGJkcywgd2UgbXVzdCByZWN1cnNpdmVseSBleHBsb3JlIHRoZSB3aG9sZSBibG9j
-ayBncmFwaCwgdG8gZmluZCBfYWxsXyB0aGUgYml0bWFwcy4NCg0KPiANCj4gVGlnaHRlbiB0aGUg
-bG9vcCBjb25kaXRpb24gdG8gY29heCBDb3Zlcml0eSBpbnRvIGRyb3BwaW5nDQo+IGl0cyBmYWxz
-ZSBwb3NpdGl2ZS4NCj4gDQo+IFN1Z2dlc3RlZC1ieTogU3RlZmFuIEhham5vY3ppIDxzdGVmYW5o
-YUByZWRoYXQuY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBKb2huIFNub3cgPGpzbm93QHJlZGhhdC5j
-b20+DQoNCg0KPiAtLS0NCj4gICBtaWdyYXRpb24vYmxvY2stZGlydHktYml0bWFwLmMgfCAyICst
-DQo+ICAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0K
-PiBkaWZmIC0tZ2l0IGEvbWlncmF0aW9uL2Jsb2NrLWRpcnR5LWJpdG1hcC5jIGIvbWlncmF0aW9u
-L2Jsb2NrLWRpcnR5LWJpdG1hcC5jDQo+IGluZGV4IDVlOTBmNDRjMmYuLjAwYzA2OGZkYTMgMTAw
-NjQ0DQo+IC0tLSBhL21pZ3JhdGlvbi9ibG9jay1kaXJ0eS1iaXRtYXAuYw0KPiArKysgYi9taWdy
-YXRpb24vYmxvY2stZGlydHktYml0bWFwLmMNCj4gQEAgLTI4NCw3ICsyODQsNyBAQCBzdGF0aWMg
-aW50IGluaXRfZGlydHlfYml0bWFwX21pZ3JhdGlvbih2b2lkKQ0KPiAgICAgICAgICAgY29uc3Qg
-Y2hhciAqZHJpdmVfbmFtZSA9IGJkcnZfZ2V0X2RldmljZV9vcl9ub2RlX25hbWUoYnMpOw0KPiAg
-IA0KPiAgICAgICAgICAgLyogc2tpcCBhdXRvbWF0aWNhbGx5IGluc2VydGVkIG5vZGVzICovDQo+
-IC0gICAgICAgIHdoaWxlIChicyAmJiBicy0+ZHJ2ICYmIGJzLT5pbXBsaWNpdCkgew0KPiArICAg
-ICAgICB3aGlsZSAoYnMtPmRydiAmJiBicy0+aW1wbGljaXQpIHsNCj4gICAgICAgICAgICAgICBi
-cyA9IGJhY2tpbmdfYnMoYnMpOw0KPiAgICAgICAgICAgfQ0KPiAgIA0KPiANCg0KDQotLSANCkJl
-c3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On Tue, 20 Nov 2018 12:04:26 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> Introduce and use the "unplug" callback.
+> 
+> This is a preparation for multi-stage hotplug handlers, whereby the bus
+> hotplug handler is overwritten by the machine hotplug handler. This handler
+> will then pass control to the bus hotplug handler. So to get this running
+> cleanly, we also have to make sure to go via the hotplug handler chain when
+> actually unplugging a device after an unplug request. Lookup the hotplug
+> handler and call "unplug".
+> 
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/pci-bridge/pci_bridge_dev.c  | 10 ++++++++++
+>  hw/pci-bridge/pcie_pci_bridge.c |  1 +
+>  hw/pci/shpc.c                   | 11 ++++++++++-
+>  include/hw/pci/pci_bridge.h     |  2 ++
+>  include/hw/pci/shpc.h           |  2 ++
+>  5 files changed, 25 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+> index fa0be13ac4..ff6b8323da 100644
+> --- a/hw/pci-bridge/pci_bridge_dev.c
+> +++ b/hw/pci-bridge/pci_bridge_dev.c
+> @@ -219,6 +219,15 @@ void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      shpc_device_plug_cb(hotplug_dev, dev, errp);
+>  }
+>  
+> +void pci_bridge_dev_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                              Error **errp)
+> +{
+> +    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+> +
+> +    g_assert(shpc_present(pci_hotplug_dev));
+> +    shpc_device_unplug_cb(hotplug_dev, dev, errp);
+> +}
+> +
+>  void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
+>                                        DeviceState *dev, Error **errp)
+>  {
+> @@ -251,6 +260,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+>      dc->vmsd = &pci_bridge_dev_vmstate;
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>      hc->plug = pci_bridge_dev_plug_cb;
+> +    hc->unplug = pci_bridge_dev_unplug_cb;
+>      hc->unplug_request = pci_bridge_dev_unplug_request_cb;
+>  }
+>  
+> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+> index 0ffea680d5..d491b40d04 100644
+> --- a/hw/pci-bridge/pcie_pci_bridge.c
+> +++ b/hw/pci-bridge/pcie_pci_bridge.c
+> @@ -154,6 +154,7 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+>      dc->reset = &pcie_pci_bridge_reset;
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>      hc->plug = pci_bridge_dev_plug_cb;
+> +    hc->unplug = pci_bridge_dev_unplug_cb;
+>      hc->unplug_request = pci_bridge_dev_unplug_request_cb;
+>  }
+>  
+> diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+> index 098ffaef1d..5de905cb56 100644
+> --- a/hw/pci/shpc.c
+> +++ b/hw/pci/shpc.c
+> @@ -238,6 +238,7 @@ static void shpc_invalid_command(SHPCDevice *shpc)
+>  
+>  static void shpc_free_devices_in_slot(SHPCDevice *shpc, int slot)
+>  {
+> +    HotplugHandler *hotplug_ctrl;
+>      int devfn;
+>      int pci_slot = SHPC_IDX_TO_PCI(slot);
+>      for (devfn = PCI_DEVFN(pci_slot, 0);
+> @@ -245,7 +246,9 @@ static void shpc_free_devices_in_slot(SHPCDevice *shpc, int slot)
+>           ++devfn) {
+>          PCIDevice *affected_dev = shpc->sec_bus->devices[devfn];
+>          if (affected_dev) {
+> -            object_unparent(OBJECT(affected_dev));
+> +            hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(affected_dev));
+> +            hotplug_handler_unplug(hotplug_ctrl, DEVICE(affected_dev),
+> +                                   &error_abort);
+>          }
+>      }
+>  }
+> @@ -540,6 +543,12 @@ void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      shpc_interrupt_update(pci_hotplug_dev);
+>  }
+>  
+> +void shpc_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                           Error **errp)
+> +{
+> +    object_unparent(OBJECT(dev));
+> +}
+> +
+>  void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+>                                     DeviceState *dev, Error **errp)
+>  {
+> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+> index 6e37c7551a..ba488818d2 100644
+> --- a/include/hw/pci/pci_bridge.h
+> +++ b/include/hw/pci/pci_bridge.h
+> @@ -101,6 +101,8 @@ void pci_bridge_exitfn(PCIDevice *pci_dev);
+>  
+>  void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                              Error **errp);
+> +void pci_bridge_dev_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                              Error **errp);
+>  void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
+>                                        DeviceState *dev, Error **errp);
+>  
+> diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+> index 71293aca58..18f6ec1cd5 100644
+> --- a/include/hw/pci/shpc.h
+> +++ b/include/hw/pci/shpc.h
+> @@ -47,6 +47,8 @@ void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
+>  
+>  void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                           Error **errp);
+> +void shpc_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                           Error **errp);
+>  void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+>                                     DeviceState *dev, Error **errp);
+>  
