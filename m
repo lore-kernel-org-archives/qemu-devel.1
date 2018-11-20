@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP3pj-0003Tc-Uf
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:04:49 -0500
+	(envelope-from <david@redhat.com>) id 1gP3pt-0003Vb-6u
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:04:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP3pf-00044N-Mf
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:04:43 -0500
+	(envelope-from <david@redhat.com>) id 1gP3pq-0004Z2-Aw
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:04:53 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 20 Nov 2018 12:04:16 +0100
-Message-Id: <20181120110427.7321-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 00/11] pci: hotplug handler reworks
+Date: Tue, 20 Nov 2018 12:04:18 +0100
+Message-Id: <20181120110427.7321-3-david@redhat.com>
+In-Reply-To: <20181120110427.7321-1-david@redhat.com>
+References: <20181120110427.7321-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 02/11] pci/shpc: rename hotplug handler
+ callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,82 +23,195 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>
 
-This series reworks some pci hotplug handlers (except for s390, that will
-require more work but is not required for now).
+The callbacks are also called for cold plugged devices. Drop the "hot"
+to better match the actual callback names.
 
-1. Route all unplug calls via the hotplug handler when called from the
-   unplug_request handler. This will be required to get multi-stage
-   hotplug handlers running, but also makes sense on its own (just like we
-   already did for some CPU/memory hotplug handlers).
+While at it, also rename shpc_device_hotplug_common() to
+shpc_device_plug_common().
 
-2. Introduce some pre_plug handlers where it makes sense already.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/pci-bridge/pci_bridge_dev.c  | 17 ++++++++---------
+ hw/pci-bridge/pcie_pci_bridge.c | 17 ++++++++---------
+ hw/pci/shpc.c                   | 14 +++++++-------
+ include/hw/pci/shpc.h           |  8 ++++----
+ 4 files changed, 27 insertions(+), 29 deletions(-)
 
-3. Call the plug/pre_plug handler also for coldplugged devices. Especially
-   pcihp is special as it overwrites hotplug handlers.
-
-This series will not yet factor out pre_plug/plug/unplug from pci device
-realize/unrealize functions, this will require more work but this
-series is also required first to get it running.
-
-In my opinion what needs to be done in the future:
-1. Introduce pre_plug/plug/unplug_request/unplug handlers for all PCI
-   buses
-2. Move pci realize/unrealize parts to pre_plug/pkug/unplug functions like
-   pci_pre_plug() ...
-3. Call the pci pre_plug/plug/unplug handlers from the PCI bus hotplug
-   handler at the right spots
-4. Factor more checks from existing plug() handlers out into pre_plug()
-   (e.g. after the call to pci_pre_plug())
-
-v2 -> v3:
-- Added "pci: Reuse pci-bridge hotplug handler handlers for pcie-pci-bridge"
--- Use one handler callback for pcie and !pcie
-- "pci/shpc: perform unplug via the hotplug handler"
--- Use one handler callback for pcie and !pcie
--- Replace error check by an assertion
-- Minor description changes.
-- Added Rbs
-
-v1 -> v2:
-- Added "pci/pcie: rename hotplug handler callbacks"
-- Added "pci/shpc: rename hotplug handler callbacks"
-- Added "s390x/pci: rename hotplug handler callbacks"
-- Dropped "pci/shpc: move hotplug checks to preplug handler"
--- We will have to factor out stuff into pre_plug() first as described
-   above
-- Renamed and added more details to the "perform unplug via the hotplug
-  handler" patches
-- "pci/pcihp: overwrite hotplug handler recursively from the start"
--- Perform the overwrite only for cold plugged bridges, to keep the
-   existing behavior
-
-David Hildenbrand (11):
-  pci/pcie: rename hotplug handler callbacks
-  pci/shpc: rename hotplug handler callbacks
-  s390x/pci: rename hotplug handler callbacks
-  pci/pcie: stop plug/unplug if the slot is locked
-  pci/pcihp: perform check for bus capability in pre_plug handler
-  pci/pcihp: overwrite hotplug handler recursively from the start
-  pci/pcihp: perform unplug via the hotplug handler
-  pci/pcie: perform unplug via the hotplug handler
-  pci: Reuse pci-bridge hotplug handler handlers for pcie-pci-bridge
-  pci/shpc: perform unplug via the hotplug handler
-  spapr_pci: perform unplug via the hotplug handler
-
- hw/acpi/pcihp.c                 | 47 ++++++++++++++++++++++++++++-----
- hw/acpi/piix4.c                 | 39 ++++++++++++++-------------
- hw/pci-bridge/pci_bridge_dev.c  | 31 ++++++++++++++--------
- hw/pci-bridge/pcie_pci_bridge.c | 32 +++-------------------
- hw/pci/pcie.c                   | 46 +++++++++++++++++++++-----------
- hw/pci/pcie_port.c              |  6 +++--
- hw/pci/shpc.c                   | 25 ++++++++++++------
- hw/ppc/spapr_pci.c              | 33 ++++++++++++++---------
- hw/s390x/s390-pci-bus.c         | 12 ++++-----
- include/hw/acpi/pcihp.h         |  5 ++++
- include/hw/pci/pci_bridge.h     |  6 +++++
- include/hw/pci/pcie.h           | 12 ++++++---
- include/hw/pci/shpc.h           | 10 ++++---
- 13 files changed, 187 insertions(+), 117 deletions(-)
-
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+index 97a8e8b6a4..e1df9a52ac 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -206,8 +206,8 @@ static const VMStateDescription pci_bridge_dev_vmstate = {
+     }
+ };
+ 
+-static void pci_bridge_dev_hotplug_cb(HotplugHandler *hotplug_dev,
+-                                      DeviceState *dev, Error **errp)
++static void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev,
++                                   DeviceState *dev, Error **errp)
+ {
+     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+ 
+@@ -216,12 +216,11 @@ static void pci_bridge_dev_hotplug_cb(HotplugHandler *hotplug_dev,
+                    "this %s", TYPE_PCI_BRIDGE_DEV);
+         return;
+     }
+-    shpc_device_hotplug_cb(hotplug_dev, dev, errp);
++    shpc_device_plug_cb(hotplug_dev, dev, errp);
+ }
+ 
+-static void pci_bridge_dev_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+-                                                 DeviceState *dev,
+-                                                 Error **errp)
++static void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
++                                             DeviceState *dev, Error **errp)
+ {
+     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+ 
+@@ -230,7 +229,7 @@ static void pci_bridge_dev_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+                    "this %s", TYPE_PCI_BRIDGE_DEV);
+         return;
+     }
+-    shpc_device_hot_unplug_request_cb(hotplug_dev, dev, errp);
++    shpc_device_unplug_request_cb(hotplug_dev, dev, errp);
+ }
+ 
+ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+@@ -251,8 +250,8 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+     dc->props = pci_bridge_dev_properties;
+     dc->vmsd = &pci_bridge_dev_vmstate;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+-    hc->plug = pci_bridge_dev_hotplug_cb;
+-    hc->unplug_request = pci_bridge_dev_hot_unplug_request_cb;
++    hc->plug = pci_bridge_dev_plug_cb;
++    hc->unplug_request = pci_bridge_dev_unplug_request_cb;
+ }
+ 
+ static const TypeInfo pci_bridge_dev_info = {
+diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+index 04cf5a6a92..c634353b06 100644
+--- a/hw/pci-bridge/pcie_pci_bridge.c
++++ b/hw/pci-bridge/pcie_pci_bridge.c
+@@ -137,8 +137,8 @@ static const VMStateDescription pcie_pci_bridge_dev_vmstate = {
+         }
+ };
+ 
+-static void pcie_pci_bridge_hotplug_cb(HotplugHandler *hotplug_dev,
+-                                      DeviceState *dev, Error **errp)
++static void pcie_pci_bridge_plug_cb(HotplugHandler *hotplug_dev,
++                                    DeviceState *dev, Error **errp)
+ {
+     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+ 
+@@ -147,12 +147,11 @@ static void pcie_pci_bridge_hotplug_cb(HotplugHandler *hotplug_dev,
+                    "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
+         return;
+     }
+-    shpc_device_hotplug_cb(hotplug_dev, dev, errp);
++    shpc_device_plug_cb(hotplug_dev, dev, errp);
+ }
+ 
+-static void pcie_pci_bridge_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+-                                                 DeviceState *dev,
+-                                                 Error **errp)
++static void pcie_pci_bridge_unplug_request_cb(HotplugHandler *hotplug_dev,
++                                              DeviceState *dev, Error **errp)
+ {
+     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+ 
+@@ -161,7 +160,7 @@ static void pcie_pci_bridge_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+                    "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
+         return;
+     }
+-    shpc_device_hot_unplug_request_cb(hotplug_dev, dev, errp);
++    shpc_device_unplug_request_cb(hotplug_dev, dev, errp);
+ }
+ 
+ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+@@ -180,8 +179,8 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+     dc->props = pcie_pci_bridge_dev_properties;
+     dc->reset = &pcie_pci_bridge_reset;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+-    hc->plug = pcie_pci_bridge_hotplug_cb;
+-    hc->unplug_request = pcie_pci_bridge_hot_unplug_request_cb;
++    hc->plug = pcie_pci_bridge_plug_cb;
++    hc->unplug_request = pcie_pci_bridge_unplug_request_cb;
+ }
+ 
+ static const TypeInfo pcie_pci_bridge_info = {
+diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+index a8462d48bb..098ffaef1d 100644
+--- a/hw/pci/shpc.c
++++ b/hw/pci/shpc.c
+@@ -482,8 +482,8 @@ static const MemoryRegionOps shpc_mmio_ops = {
+         .max_access_size = 4,
+     },
+ };
+-static void shpc_device_hotplug_common(PCIDevice *affected_dev, int *slot,
+-                                       SHPCDevice *shpc, Error **errp)
++static void shpc_device_plug_common(PCIDevice *affected_dev, int *slot,
++                                    SHPCDevice *shpc, Error **errp)
+ {
+     int pci_slot = PCI_SLOT(affected_dev->devfn);
+     *slot = SHPC_PCI_TO_IDX(pci_slot);
+@@ -497,7 +497,7 @@ static void shpc_device_hotplug_common(PCIDevice *affected_dev, int *slot,
+     }
+ }
+ 
+-void shpc_device_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+                             Error **errp)
+ {
+     Error *local_err = NULL;
+@@ -505,7 +505,7 @@ void shpc_device_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     SHPCDevice *shpc = pci_hotplug_dev->shpc;
+     int slot;
+ 
+-    shpc_device_hotplug_common(PCI_DEVICE(dev), &slot, shpc, &local_err);
++    shpc_device_plug_common(PCI_DEVICE(dev), &slot, shpc, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -540,8 +540,8 @@ void shpc_device_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     shpc_interrupt_update(pci_hotplug_dev);
+ }
+ 
+-void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+-                                       DeviceState *dev, Error **errp)
++void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
++                                   DeviceState *dev, Error **errp)
+ {
+     Error *local_err = NULL;
+     PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+@@ -550,7 +550,7 @@ void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+     uint8_t led;
+     int slot;
+ 
+-    shpc_device_hotplug_common(PCI_DEVICE(dev), &slot, shpc, &local_err);
++    shpc_device_plug_common(PCI_DEVICE(dev), &slot, shpc, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/include/hw/pci/shpc.h b/include/hw/pci/shpc.h
+index ee19fecf61..71293aca58 100644
+--- a/include/hw/pci/shpc.h
++++ b/include/hw/pci/shpc.h
+@@ -45,10 +45,10 @@ void shpc_free(PCIDevice *dev);
+ void shpc_cap_write_config(PCIDevice *d, uint32_t addr, uint32_t val, int len);
+ 
+ 
+-void shpc_device_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+-                            Error **errp);
+-void shpc_device_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+-                                       DeviceState *dev, Error **errp);
++void shpc_device_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
++                         Error **errp);
++void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
++                                   DeviceState *dev, Error **errp);
+ 
+ extern VMStateInfo shpc_vmstate_info;
+ #define SHPC_VMSTATE(_field, _type,  _test) \
 -- 
 2.17.2
