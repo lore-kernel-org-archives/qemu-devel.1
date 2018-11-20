@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gPFNb-0004Qb-3O
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 18:24:32 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gPFmJ-0002lX-Hy
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 18:50:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gPFNX-0002vP-8i
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 18:24:26 -0500
-References: <20181119172924.2296342-1-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e1308285-de68-deca-217e-7fee39b8f92a@redhat.com>
-Date: Tue, 20 Nov 2018 18:24:14 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gPFmI-0004Kx-IP
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 18:49:59 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181119172924.2296342-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-3.1] iotests: Enhance 223
- to cover multiple bitmap granularities
+References: <cover.1542321076.git.alistair.francis@wdc.com>
+	<f1a7d2617c26c1745fafe13bbe3bc3b042c14217.1542321076.git.alistair.francis@wdc.com>
+	<23831afc-0ebf-5802-e8e2-6ce48dd340f9@linaro.org>
+In-Reply-To: <23831afc-0ebf-5802-e8e2-6ce48dd340f9@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 20 Nov 2018 15:49:29 -0800
+Message-ID: <CAKmqyKP5cCRZujTm+OvoNZWNwPhJirPLA7PjurbovnN8RYCcgQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC v1 15/23] riscv: tcg-target: Add branch and
+ jump instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,213 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
 
+On Fri, Nov 16, 2018 at 1:14 AM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 11/15/18 11:36 PM, Alistair Francis wrote:
+> > +static void tcg_out_brcond(TCGContext *s, TCGCond cond, TCGReg arg1,
+> > +                           TCGReg arg2, TCGLabel *l)
+> > +{
+> > +    RISCVInsn op = tcg_brcond_to_riscv[cond].op;
+> > +    bool swap = tcg_brcond_to_riscv[cond].swap;
+> > +
+> > +    tcg_out_opc_branch(s, op, swap ? arg2 : arg1, swap ? arg1 : arg2, 0);
+>
+> You might want to tcg_debug_assert(op != 0) here.
+>
+> > +    if (l->has_value) {
+> > +        reloc_sbimm12(s->code_ptr - 1, l->u.value_ptr);
+>
+> I'm concerned about the conditional branch range.  +-4K isn't much to work
+> with.  The minimum we have for other hosts is +-32K.
+>
+> We have two options: (1) greatly reduce the max size of the TB for this host;
+> (2) be prepared to emit a 2 insn sequence: conditional branch across
+> unconditional branch, with forward branches that turn out to be small patched
+> with a nop.
+>
+> FWIW, the first case would be done via modification of tcg_op_buf_full.  You
+> might have to go as low as 500 opcodes, I'm not sure.
 
+How do we do option 2?
 
-On 11/19/18 12:29 PM, Eric Blake wrote:
-> Testing granularity at the same size as the cluster isn't quite
-> as fun as what happens when it is larger or smaller.  This
-> enhancement also shows that qemu's nbd server can server the
-> same disk over multiple exports simultaneously.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+>
+> > +static inline void tcg_out_goto(TCGContext *s, tcg_insn_unit *target)
+> > +{
+> > +    ptrdiff_t offset = tcg_pcrel_diff(s, target);
+> > +    tcg_debug_assert(offset == sextract64(offset, 0, 26));
+> > +    tcg_out_opc_jump(s, OPC_JAL, TCG_REG_ZERO, offset);
+> > +}
+> > +
+> > +static inline void tcg_out_goto_long(TCGContext *s, tcg_insn_unit *target)
+> > +{
+> > +    ptrdiff_t offset = tcg_pcrel_diff(s, target);
+> > +
+> > +    if (offset == sextract64(offset, 0, 26)) {
+> > +        tcg_out_opc_jump(s, OPC_JAL, TCG_REG_ZERO, offset);
+> > +    } else {
+> > +        tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_TMP0, (intptr_t)target);
+> > +        tcg_out_opc_jump(s, OPC_JAL, TCG_REG_TMP0, 0);
+> > +    }
+> > +}
+>
+> How are these to be used?  I guess I'll find out...
 
-Tested-by: John Snow <jsnow@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
+It's called on a exit TB op. I'm not sure if that's correct though.
 
-Good enhancement.
+Alistair
 
-> ---
-> 
-> Just a testsuite enhancement, so suitable for -rc2 if it gets a
-> quick review. Otherwise, I will probably include it as part of
-> a larger series I'm working on to make qemu-nbd handle misaligned
-> images more sanely (that's a pre-existing problem in the 3.0 release,
-> so it's not fixing a regression and may be invovled enough to slip
-> into 4.0, depending on what the rest of my series looks like).
-> 
->  tests/qemu-iotests/223     | 43 +++++++++++++++++++++++++++++++-------
->  tests/qemu-iotests/223.out | 32 +++++++++++++++++++++-------
->  2 files changed, 60 insertions(+), 15 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
-> index 72419e03388..397b865d347 100755
-> --- a/tests/qemu-iotests/223
-> +++ b/tests/qemu-iotests/223
-> @@ -57,10 +57,11 @@ run_qemu()
->  }
-> 
->  echo
-> -echo "=== Create partially sparse image, then add dirty bitmap ==="
-> +echo "=== Create partially sparse image, then add dirty bitmaps ==="
->  echo
-> 
-> -_make_test_img 4M
-> +# Two bitmaps, to contrast granularity issues
-> +_make_test_img -o cluster_size=4k 4M
->  $QEMU_IO -c 'w -P 0x11 1M 2M' "$TEST_IMG" | _filter_qemu_io
->  run_qemu <<EOF
->  { "execute": "qmp_capabilities" }
-> @@ -78,7 +79,16 @@ run_qemu <<EOF
->    "arguments": {
->      "node": "n",
->      "name": "b",
-> -    "persistent": true
-> +    "persistent": true,
-> +    "granularity": 65536
-> +  }
-> +}
-> +{ "execute": "block-dirty-bitmap-add",
-> +  "arguments": {
-> +    "node": "n",
-> +    "name": "b2",
-> +    "persistent": true,
-> +    "granularity": 512
->    }
->  }
->  { "execute": "quit" }
-> @@ -88,10 +98,11 @@ echo
->  echo "=== Write part of the file under active bitmap ==="
->  echo
-> 
-> -$QEMU_IO -c 'w -P 0x22 2M 2M' "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IO -c 'w -P 0x22 512 512' -c 'w -P 0x33 2M 2M' "$TEST_IMG" \
-> +    | _filter_qemu_io
-> 
->  echo
-> -echo "=== End dirty bitmap, and start serving image over NBD ==="
-> +echo "=== End dirty bitmaps, and start serving image over NBD ==="
->  echo
-> 
->  _launch_qemu 2> >(_filter_nbd)
-> @@ -103,6 +114,8 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"blockdev-add",
->      "file":{"driver":"file", "filename":"'"$TEST_IMG"'"}}}' "return"
->  _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-block-dirty-bitmap-disable",
->    "arguments":{"node":"n", "name":"b"}}' "return"
-> +_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-block-dirty-bitmap-disable",
-> +  "arguments":{"node":"n", "name":"b2"}}' "return"
->  _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-start",
->    "arguments":{"addr":{"type":"unix",
->      "data":{"path":"'"$TEST_DIR/nbd"'"}}}}' "return"
-> @@ -110,26 +123,40 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
->    "arguments":{"device":"n"}}' "return"
->  _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
->    "arguments":{"name":"n", "bitmap":"b"}}' "return"
-> +_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
-> +  "arguments":{"device":"n", "name":"n2"}}' "return"
-> +_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
-> +  "arguments":{"name":"n2", "bitmap":"b2"}}' "return"
-> 
->  echo
-> -echo "=== Contrast normal status with dirty-bitmap status ==="
-> +echo "=== Contrast normal status to large granularity dirty-bitmap ==="
->  echo
-> 
->  QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
->  IMG="driver=nbd,export=n,server.type=unix,server.path=$TEST_DIR/nbd"
-> -$QEMU_IO -r -c 'r -P 0 0 1m' -c 'r -P 0x11 1m 1m' \
-> -  -c 'r -P 0x22 2m 2m' --image-opts "$IMG" | _filter_qemu_io
-> +$QEMU_IO -r -c 'r -P 0x22 512 512' -c 'r -P 0 512k 512k' -c 'r -P 0x11 1m 1m' \
-> +  -c 'r -P 0x33 2m 2m' --image-opts "$IMG" | _filter_qemu_io
->  $QEMU_IMG map --output=json --image-opts \
->    "$IMG" | _filter_qemu_img_map
->  $QEMU_IMG map --output=json --image-opts \
->    "$IMG,x-dirty-bitmap=qemu:dirty-bitmap:b" | _filter_qemu_img_map
-> 
-> +echo
-> +echo "=== Contrast to small granularity dirty-bitmap ==="
-> +echo
-> +
-> +IMG="driver=nbd,export=n2,server.type=unix,server.path=$TEST_DIR/nbd"
-> +$QEMU_IMG map --output=json --image-opts \
-> +  "$IMG,x-dirty-bitmap=qemu:dirty-bitmap:b2" | _filter_qemu_img_map
-> +
->  echo
->  echo "=== End NBD server ==="
->  echo
-> 
->  _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-remove",
->    "arguments":{"name":"n"}}' "return"
-> +_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-remove",
-> +  "arguments":{"name":"n2"}}' "return"
->  _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-stop"}' "return"
->  _send_qemu_cmd $QEMU_HANDLE '{"execute":"quit"}' "return"
-> 
-> diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
-> index 33021c8e6a1..de417477de0 100644
-> --- a/tests/qemu-iotests/223.out
-> +++ b/tests/qemu-iotests/223.out
-> @@ -1,6 +1,6 @@
->  QA output created by 223
-> 
-> -=== Create partially sparse image, then add dirty bitmap ===
-> +=== Create partially sparse image, then add dirty bitmaps ===
-> 
->  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4194304
->  wrote 2097152/2097152 bytes at offset 1048576
-> @@ -11,16 +11,22 @@ QMP_VERSION
->  {"return": {}}
->  {"return": {}}
->  {"return": {}}
-> +{"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> 
-> 
->  === Write part of the file under active bitmap ===
-> 
-> +wrote 512/512 bytes at offset 512
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  wrote 2097152/2097152 bytes at offset 2097152
->  2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> 
-> -=== End dirty bitmap, and start serving image over NBD ===
-> +=== End dirty bitmaps, and start serving image over NBD ===
-> 
-> +{"return": {}}
-> +{"return": {}}
-> +{"return": {}}
->  {"return": {}}
->  {"return": {}}
->  {"return": {}}
-> @@ -28,21 +34,33 @@ wrote 2097152/2097152 bytes at offset 2097152
->  {"return": {}}
->  {"return": {}}
-> 
-> -=== Contrast normal status with dirty-bitmap status ===
-> +=== Contrast normal status to large granularity dirty-bitmap ===
-> 
-> -read 1048576/1048576 bytes at offset 0
-> -1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 512/512 bytes at offset 512
-> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +read 524288/524288 bytes at offset 524288
-> +512 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  read 1048576/1048576 bytes at offset 1048576
->  1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  read 2097152/2097152 bytes at offset 2097152
->  2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": false},
-> +[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true},
-> +{ "start": 4096, "length": 1044480, "depth": 0, "zero": true, "data": false},
->  { "start": 1048576, "length": 3145728, "depth": 0, "zero": false, "data": true}]
-> -[{ "start": 0, "length": 2097152, "depth": 0, "zero": false, "data": true},
-> +[{ "start": 0, "length": 65536, "depth": 0, "zero": false, "data": false},
-> +{ "start": 65536, "length": 2031616, "depth": 0, "zero": false, "data": true},
-> +{ "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data": false}]
-> +
-> +=== Contrast to small granularity dirty-bitmap ===
-> +
-> +[{ "start": 0, "length": 512, "depth": 0, "zero": false, "data": true},
-> +{ "start": 512, "length": 512, "depth": 0, "zero": false, "data": false},
-> +{ "start": 1024, "length": 2096128, "depth": 0, "zero": false, "data": true},
->  { "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data": false}]
-> 
->  === End NBD server ===
-> 
-> +{"return": {}}
->  {"return": {}}
->  {"return": {}}
->  {"return": {}}
-> 
+>
+> > +static void tcg_out_call_int(TCGContext *s, tcg_insn_unit *arg, bool tail)
+> > +{
+> > +    TCGReg link = tail ? TCG_REG_ZERO : TCG_REG_RA;
+> > +    ptrdiff_t offset = tcg_pcrel_diff(s, arg);
+> > +    if (offset == sextract32(offset, 1, 20) << 1) {
+>
+> sextract64.
+>
+> > +        /* short jump: -2097150 to 2097152 */
+> > +        tcg_out_opc_jump(s, OPC_JAL, link, offset);
+> > +    } else if (TCG_TARGET_REG_BITS == 32 ||
+> > +        offset == sextract32(offset, 1, 31) << 1) {
+>
+> sextract64.
+>
+> > +        /* long jump: -2147483646 to 2147483648 */
+> > +        tcg_out_opc_upper(s, OPC_AUIPC, TCG_REG_TMP0, 0);
+> > +        tcg_out_opc_imm(s, OPC_JALR, link, TCG_REG_TMP0, 0);
+> > +        reloc_call(s->code_ptr - 2, arg);
+> > +    } else if (TCG_TARGET_REG_BITS == 64) {
+> > +        /* far jump: 64-bit */
+> > +        tcg_target_long imm = sextract32((tcg_target_long)arg, 0, 12);
+> > +        tcg_target_long base = (tcg_target_long)arg - imm;
+> > +        tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_TMP0, base);
+> > +        tcg_out_opc_imm(s, OPC_JALR, link, TCG_REG_TMP0, imm);
+>
+>
+> r~
