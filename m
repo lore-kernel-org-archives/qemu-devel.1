@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gPClG-0002b8-6w
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:36:42 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gPCn2-0004Lo-QU
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:38:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gPClB-0005M3-He
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:36:42 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 20 Nov 2018 14:36:28 -0600
-Message-Id: <20181120203628.2367003-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] misc: Avoid UTF-8 in error messages
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gPCn0-0007ay-Nj
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:38:32 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:43308)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gPCmy-0007Up-M0
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 15:38:30 -0500
+Received: by mail-lj1-x243.google.com with SMTP id 83-v6so2818503ljf.10
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 12:38:26 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue, 20 Nov 2018 12:38:11 -0800
+Message-Id: <20181120203811.18406-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH] target/xtensa: xtfpga: provide default memory
+ sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,54 +25,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-While most developers are now using UTF-8 environments, it's
-harder to guarantee that error messages will be output to
-a multibyte locale. Rather than risking error messages that
-get corrupted into mojibake when the user runs qemu in a
-non-multibyte locale, let's stick to straight ASCII error
-messages, rather than assuming that our use of UTF-8 in source
-code string constants will work unchanged in other locales.
+Provide default RAM sizes for all XTFPGA boards, so that when started
+without -m option they do the right thing.
 
-Reported-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- hw/misc/tmp105.c | 2 +-
- hw/misc/tmp421.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/xtensa/xtfpga.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/hw/misc/tmp105.c b/hw/misc/tmp105.c
-index 0918f3a6ea2..f6d7163273a 100644
---- a/hw/misc/tmp105.c
-+++ b/hw/misc/tmp105.c
-@@ -79,7 +79,7 @@ static void tmp105_set_temperature(Object *obj, Visitor=
- *v, const char *name,
-         return;
-     }
-     if (temp >=3D 128000 || temp < -128000) {
--        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " =C2=B0C is out=
- of range",
-+        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " C is out of ra=
-nge",
-                    temp / 1000, temp % 1000);
-         return;
-     }
-diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
-index c234044305d..eeb11000f0f 100644
---- a/hw/misc/tmp421.c
-+++ b/hw/misc/tmp421.c
-@@ -153,7 +153,7 @@ static void tmp421_set_temperature(Object *obj, Visit=
-or *v, const char *name,
-     }
-
-     if (temp >=3D maxs[ext_range] || temp < mins[ext_range]) {
--        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " =C2=B0C is out=
- of range",
-+        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " C is out of ra=
-nge",
-                    temp / 1000, temp % 1000);
-         return;
-     }
---=20
-2.17.2
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index b3161de32093..7c1421d5beb4 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -568,6 +568,7 @@ static void xtfpga_lx60_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_lx60_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
++    mc->default_ram_size = 64 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_lx60_type = {
+@@ -584,6 +585,7 @@ static void xtfpga_lx60_nommu_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_lx60_nommu_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
++    mc->default_ram_size = 64 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_lx60_nommu_type = {
+@@ -600,6 +602,7 @@ static void xtfpga_lx200_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_lx200_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
++    mc->default_ram_size = 96 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_lx200_type = {
+@@ -616,6 +619,7 @@ static void xtfpga_lx200_nommu_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_lx200_nommu_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
++    mc->default_ram_size = 96 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_lx200_nommu_type = {
+@@ -632,6 +636,7 @@ static void xtfpga_ml605_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_ml605_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
++    mc->default_ram_size = 256 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_ml605_type = {
+@@ -648,6 +653,7 @@ static void xtfpga_ml605_nommu_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_ml605_nommu_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
++    mc->default_ram_size = 256 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_ml605_nommu_type = {
+@@ -664,6 +670,7 @@ static void xtfpga_kc705_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_kc705_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
++    mc->default_ram_size = 1 * GiB;
+ }
+ 
+ static const TypeInfo xtfpga_kc705_type = {
+@@ -680,6 +687,7 @@ static void xtfpga_kc705_nommu_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_kc705_nommu_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
++    mc->default_ram_size = 256 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_kc705_nommu_type = {
+-- 
+2.11.0
