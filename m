@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP3qQ-0003yH-GS
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:05:27 -0500
+	(envelope-from <thuth@redhat.com>) id 1gP3qW-00043b-16
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:05:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP3qL-0006WQ-FG
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:05:26 -0500
-From: David Hildenbrand <david@redhat.com>
-Date: Tue, 20 Nov 2018 12:04:23 +0100
-Message-Id: <20181120110427.7321-8-david@redhat.com>
-In-Reply-To: <20181120110427.7321-1-david@redhat.com>
-References: <20181120110427.7321-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 07/11] pci/pcihp: perform unplug via the
- hotplug handler
+	(envelope-from <thuth@redhat.com>) id 1gP3qS-0006xr-69
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:05:31 -0500
+References: <1542657473-9196-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA_xhYf0VNaq1gM1OWWCkms5sTpn3kdqSHN0AZ3cH1f8Dw@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <27dd52ce-1cd6-0a92-635c-20ce1c9d5c2b@redhat.com>
+Date: Tue, 20 Nov 2018 12:05:13 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_xhYf0VNaq1gM1OWWCkms5sTpn3kdqSHN0AZ3cH1f8Dw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Assign some more files in the
+ hw/arm/ directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,100 +25,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Eric Auger <eric.auger@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Jean-Christophe Dubois <jcd@tribudubois.net>
 
-Introduce and use the "unplug" callback.
+On 2018-11-20 11:19, Peter Maydell wrote:
+> On 19 November 2018 at 19:57, Thomas Huth <thuth@redhat.com> wrote:
+>> I apparently missed some more files and even a complete machine (the
+>> "imx25-pdk") in my previous patch... but now we should hopefully have
+>> a completely coverage for all available ARM boards.
+>=20
+> Hi; looks like you forgot to cc qemu-devel.
 
-This is a preparation for multi-stage hotplug handlers, whereby the bus
-hotplug handler is overwritten by the machine hotplug handler. This handler
-will then pass control to the bus hotplug handler. So to get this running
-cleanly, we also have to make sure to go via the hotplug handler chain when
-actually unplugging a device after an unplug request. Lookup the hotplug
-handler and call "unplug".
+Oops, sorry about that.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/acpi/pcihp.c         | 11 ++++++++++-
- hw/acpi/piix4.c         |  7 +++++--
- include/hw/acpi/pcihp.h |  3 +++
- 3 files changed, 18 insertions(+), 3 deletions(-)
+>> Fixes: 95a5db3ae5698b49c63144610ad02913e780c828
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  MAINTAINERS | 16 ++++++++++++++++
+>>  1 file changed, 16 insertions(+)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 1032406..ac20dc8 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -533,6 +533,18 @@ L: qemu-arm@nongnu.org
+>>  S: Odd Fixes
+>>  F: hw/arm/gumstix.c
+>>
+>> +i.MX25 PDK
+>> +M: Peter Maydell <peter.maydell@linaro.org>
+>> +R: Jean-Christophe Dubois <jcd@tribudubois.net>
+>> +L: qemu-arm@nongnu.org
+>> +S: Odd Fixes
+>> +F: hw/arm/fsl-imx25.c
+>> +F: hw/arm/imx25_pdk.c
+>> +F: hw/misc/imx25_ccm.c
+>> +F: include/hw/arm/fsl-imx25.h
+>> +F: include/hw/misc/imx25_ccm.h
+>> +F: tests/ds1338-test.c
+>> +
+>>  i.MX31 (kzm)
+>>  M: Peter Chubb <peter.chubb@nicta.com.au>
+>>  M: Peter Maydell <peter.maydell@linaro.org>
+>> @@ -615,6 +627,7 @@ R: Andrew Baumann <Andrew.Baumann@microsoft.com>
+>>  R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>  L: qemu-arm@nongnu.org
+>>  S: Odd Fixes
+>> +F: hw/arm/raspi.c
+>>  F: hw/arm/raspi_platform.h
+>>  F: hw/*/bcm283*
+>>  F: include/hw/arm/raspi*
+>> @@ -641,6 +654,7 @@ F: hw/arm/z2.c
+>>  F: hw/*/pxa2xx*
+>>  F: hw/misc/mst_fpga.c
+>>  F: include/hw/arm/pxa.h
+>> +F: include/hw/arm/sharpsl.h
+>>
+>>  SABRELITE / i.MX6
+>>  M: Peter Maydell <peter.maydell@linaro.org>
+>> @@ -686,7 +700,9 @@ M: Peter Maydell <peter.maydell@linaro.org>
+>>  L: qemu-arm@nongnu.org
+>>  S: Maintained
+>>  F: hw/arm/virt*
+>> +F: hw/arm/smmu*
+>>  F: include/hw/arm/virt.h
+>> +F: include/hw/arm/smmu*
+>=20
+> The SMMU files aren't part of the virt board, they're
+> the SMMUv3 device model. They should go in a section
+> that lets us mark Eric Auger as their maintainer.
 
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index 05e3f8d11e..7bc7a72340 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -154,6 +154,7 @@ static bool acpi_pcihp_pc_no_hotplug(AcpiPciHpState *s, PCIDevice *dev)
- 
- static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slots)
- {
-+    HotplugHandler *hotplug_ctrl;
-     BusChild *kid, *next;
-     int slot = ctz32(slots);
-     PCIBus *bus = acpi_pcihp_find_hotplug_bus(s, bsel);
-@@ -171,7 +172,8 @@ static void acpi_pcihp_eject_slot(AcpiPciHpState *s, unsigned bsel, unsigned slo
-         PCIDevice *dev = PCI_DEVICE(qdev);
-         if (PCI_SLOT(dev->devfn) == slot) {
-             if (!acpi_pcihp_pc_no_hotplug(s, dev)) {
--                object_unparent(OBJECT(qdev));
-+                hotplug_ctrl = qdev_get_hotplug_handler(qdev);
-+                hotplug_handler_unplug(hotplug_ctrl, qdev, &error_abort);
-             }
-         }
-     }
-@@ -266,6 +268,13 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
- 
- void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
-                                  DeviceState *dev, Error **errp)
-+{
-+    object_unparent(OBJECT(dev));
-+}
-+
-+void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                         AcpiPciHpState *s, DeviceState *dev,
-+                                         Error **errp)
- {
-     PCIDevice *pdev = PCI_DEVICE(dev);
-     int slot = PCI_SLOT(pdev->devfn);
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 160f727a5e..54a12a36f5 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -418,8 +418,8 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-         acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
-                                       dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
--        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
--                                    errp);
-+        acpi_pcihp_device_unplug_request_cb(hotplug_dev, &s->acpi_pci_hotplug,
-+                                            dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
-                !s->cpu_hotplug_legacy) {
-         acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
-@@ -437,6 +437,9 @@ static void piix4_device_unplug_cb(HotplugHandler *hotplug_dev,
-     if (s->acpi_memory_hotplug.is_enabled &&
-         object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-         acpi_memory_unplug_cb(&s->acpi_memory_hotplug, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-+        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-+                                    errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
-                !s->cpu_hotplug_legacy) {
-         acpi_cpu_unplug_cb(&s->cpuhp_state, dev, errp);
-diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
-index ce31625850..8bc4a4c01d 100644
---- a/include/hw/acpi/pcihp.h
-+++ b/include/hw/acpi/pcihp.h
-@@ -62,6 +62,9 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
-                                DeviceState *dev, Error **errp);
- void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
-                                  DeviceState *dev, Error **errp);
-+void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                         AcpiPciHpState *s, DeviceState *dev,
-+                                         Error **errp);
- 
- /* Called on reset */
- void acpi_pcihp_reset(AcpiPciHpState *s);
--- 
-2.17.2
+Ok, I'll send a v2 without the smmu* files. Eric, could you please take
+care of sending a patch for a new SMMU section?
+
+ Thomas
