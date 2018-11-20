@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1gPBEm-0002L6-Sv
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 13:59:06 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gPBGK-0003IC-EK
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:00:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <spopovyc@redhat.com>) id 1gPBEh-00053N-Pv
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 13:59:04 -0500
-References: <1542632978-65604-1-git-send-email-spopovyc@redhat.com>
-	<20181119142719.3d702892@bahia.lan>
-	<3411737e-824a-0653-024b-f46fe5695790@redhat.com>
-	<20181119175908.5d3e1d4a@bahia.lan>
-From: Serhii Popovych <spopovyc@redhat.com>
-Message-ID: <576a1203-eb43-8c87-6865-51ffc2c6451b@redhat.com>
-Date: Tue, 20 Nov 2018 20:58:45 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1gPBGI-0006Py-8f
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 14:00:40 -0500
+References: <20181116093152.27227-1-pbonzini@redhat.com>
+	<4c83906c-0d78-3a73-b40d-ae5f7e58ffa3@oracle.com>
+	<c968b33e-a487-3071-a51a-805794598b2c@redhat.com>
+	<20181119174340.GH8066@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <94514f40-e751-7102-a966-c3d2111a9b09@redhat.com>
+Date: Tue, 20 Nov 2018 20:00:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181119175908.5d3e1d4a@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="459z02zfEYnoBH63hpsBhkd7ZtX6PbeNk"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for 3.1] spapr: Fix ibm,
- max-associativity-domains property number of nodes
+In-Reply-To: <20181119174340.GH8066@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.1] nvme: fix out-of-bounds access to
+ the CMB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,205 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Mark Kanda <mark.kanda@oracle.com>, qemu-devel@nongnu.org, Keith Busch <keith.busch@intel.com>, Li Qiang <liq3ea@gmail.com>, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---459z02zfEYnoBH63hpsBhkd7ZtX6PbeNk
-From: Serhii Popovych <spopovyc@redhat.com>
-To: Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
-Message-ID: <576a1203-eb43-8c87-6865-51ffc2c6451b@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for 3.1] spapr: Fix ibm,
- max-associativity-domains property number of nodes
-References: <1542632978-65604-1-git-send-email-spopovyc@redhat.com>
- <20181119142719.3d702892@bahia.lan>
- <3411737e-824a-0653-024b-f46fe5695790@redhat.com>
- <20181119175908.5d3e1d4a@bahia.lan>
-In-Reply-To: <20181119175908.5d3e1d4a@bahia.lan>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-Greg Kurz wrote:
-> On Mon, 19 Nov 2018 14:48:34 +0100
-> Laurent Vivier <lvivier@redhat.com> wrote:
->=20
->> On 19/11/2018 14:27, Greg Kurz wrote:
->>> On Mon, 19 Nov 2018 08:09:38 -0500
->>> Serhii Popovych <spopovyc@redhat.com> wrote:
->>>  =20
->>>> Laurent Vivier reported off by one with maximum number of NUMA nodes=
-
->>>> provided by qemu-kvm being less by one than required according to
->>>> description of "ibm,max-associativity-domains" property in LoPAPR.
->>>>
->>>> It appears that I incorrectly treated LoPAPR description of this
->>>> property assuming it provides last valid domain (NUMA node here)
->>>> instead of maximum number of domains.
->>>>
->>>>   ### Before hot-add
->>>>
->>>>   (qemu) info numa
->>>>   3 nodes
->>>>   node 0 cpus: 0
->>>>   node 0 size: 0 MB
->>>>   node 0 plugged: 0 MB
->>>>   node 1 cpus:
->>>>   node 1 size: 1024 MB
->>>>   node 1 plugged: 0 MB
->>>>   node 2 cpus:
->>>>   node 2 size: 0 MB
->>>>   node 2 plugged: 0 MB
->>>>
->>>>   $ numactl -H
->>>>   available: 2 nodes (0-1)
->>>>   node 0 cpus: 0
->>>>   node 0 size: 0 MB
->>>>   node 0 free: 0 MB
->>>>   node 1 cpus:
->>>>   node 1 size: 999 MB
->>>>   node 1 free: 658 MB
->>>>   node distances:
->>>>   node   0   1
->>>>     0:  10  40
->>>>     1:  40  10
->>>>
->>>>   ### Hot-add
->>>>
->>>>   (qemu) object_add memory-backend-ram,id=3Dmem0,size=3D1G
->>>>   (qemu) device_add pc-dimm,id=3Ddimm1,memdev=3Dmem0,node=3D2
->>>>   (qemu) [   87.704898] pseries-hotplug-mem: Attempting to hot-add 4=
- ...
->>>>   <there is no "Initmem setup node 2 [mem 0xHEX-0xHEX]">
->>>>   [   87.705128] lpar: Attempting to resize HPT to shift 21
->>>>   ... <HPT resize messages>
->>>>
->>>>   ### After hot-add
->>>>
->>>>   (qemu) info numa
->>>>   3 nodes
->>>>   node 0 cpus: 0
->>>>   node 0 size: 0 MB
->>>>   node 0 plugged: 0 MB
->>>>   node 1 cpus:
->>>>   node 1 size: 1024 MB
->>>>   node 1 plugged: 0 MB
->>>>   node 2 cpus:
->>>>   node 2 size: 1024 MB
->>>>   node 2 plugged: 1024 MB
->>>>
->>>>   $ numactl -H
->>>>   available: 2 nodes (0-1)
->>>>   ^^^^^^^^^^^^^^^^^^^^^^^^
->>>>              Still only two nodes (and memory hot-added to node 0 be=
-low)
->>>>   node 0 cpus: 0
->>>>   node 0 size: 1024 MB
->>>>   node 0 free: 1021 MB
->>>>   node 1 cpus:
->>>>   node 1 size: 999 MB
->>>>   node 1 free: 658 MB
->>>>   node distances:
->>>>   node   0   1
->>>>     0:  10  40
->>>>     1:  40  10
->>>>
->>>> After fix applied numactl(8) reports 3 nodes available and memory
->>>> plugged into node 2 as expected.
->>>>
->>>> Fixes: da9f80fbad21 ("spapr: Add ibm,max-associativity-domains prope=
-rty")
->>>> Reported-by: Laurent Vivier <lvivier@redhat.com>
->>>> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
->>>> ---
->>>>  hw/ppc/spapr.c | 2 +-
->>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>>> index 7afd1a1..843ae6c 100644
->>>> --- a/hw/ppc/spapr.c
->>>> +++ b/hw/ppc/spapr.c
->>>> @@ -1033,7 +1033,7 @@ static void spapr_dt_rtas(sPAPRMachineState *s=
-papr, void *fdt)
->>>>          cpu_to_be32(0),
->>>>          cpu_to_be32(0),
->>>>          cpu_to_be32(0),
->>>> -        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes - 1 : 0),
->>>> +        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 0), =20
->>>
->>> Maybe simply cpu_to_be32(nb_numa_nodes) ? =20
+On 19/11/18 18:43, Kevin Wolf wrote:
+> Am 19.11.2018 um 18:09 hat Paolo Bonzini geschrieben:
+>> On 19/11/18 16:23, Mark Kanda wrote:
+>>> For CVE-2018-16847, I just noticed Kevin pulled in Li's previous fix =
+(as
+>>> opposed to this one). Was this done in error?
 >>
->> Or "cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 1)" ?
-
-Linux handles zero correctly, but nb_numa_nodes ?: 1 looks better.
-
-I did testing with just cpu_to_be32(nb_numa_nodes) and
-cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 1) it works with Linux
-correctly in both cases
-
-(guest)# numactl -H
-available: 1 nodes (0)
-node 0 cpus: 0
-node 0 size: 487 MB
-node 0 free: 148 MB
-node distances:
-node   0
-  0:  10
-
-(qemu) info numa
-0 nodes
-
->>
->> In spapr_populate_drconf_memory() we have this logic.
->>
+>> Probably.  Kevin, can you revert and apply this one instead?  I don't
+>> care if 3.1 or 3.2, but the previous fix is pointless complication.
 >=20
-> Hmm... maybe you're right, it seems that the code assumes
-> non-NUMA configs have at one node. Similar assumption is
-> also present in pc_dimm_realize():
->=20
->     if (((nb_numa_nodes > 0) && (dimm->node >=3D nb_numa_nodes)) ||
->         (!nb_numa_nodes && dimm->node))=20
-According to this nb_numa_nodes can be zero
+> I was waiting for you to address Li Qiang's review comments before I
+> apply it. I can revert the other one once this is ready.
 
->         error_setg(errp, "'DIMM property " PC_DIMM_NODE_PROP " has valu=
-e %"
->                    PRIu32 "' which exceeds the number of numa nodes: %d=
-",
->                    dimm->node, nb_numa_nodes ? nb_numa_nodes : 1);
-and this just handles this case to show proper error message.
+Sorry, I forgot to send it.  Did it now.
 
->         return;
->     }
+> Anyway, that .min_access_size influences the accessible range feels
+> weird to me. Is this really how it is meant to work? I expected this
+> only to influence the allowed granularity of accesses, and that the
+> maximum accessible offset of the memory region is size - access_size.
+>> Does this mean that the size parameter of memory_region_init_io() real=
+ly
+> means we allow access to offsets from 0 to size + impl.min_access_size =
+- 1?
+> If so, this is very surprising and I wonder if this is really the only
+> device that gets it wrong.
 
->=20
-> This is a bit confusing...
->=20
->> Thanks,
->> Laurent
->=20
->=20
+Usually the offset is a register, so an invalid value will simply be
+ignored by the device or reported as a guest error.
 
+> For nvme it doesn't matter much because it can trivially support
+> single-byte accesses, so this change is correct and fixes the problem,
+> but isn't the real bug in access_with_adjusted_size(), which should
+> adjust the accessed range in a way that it doesn't exceed the size of
+> the memory region?
 
---=20
-Thanks,
-Serhii
+Hmm, what's happening is complicated.  memory_access_size is clamping
+the access size to 1 because impl.unaligned is false.  However,
+access_with_adjusted_size is bringing it back to 2 because it does
 
+    access_size =3D MAX(MIN(size, access_size_max), access_size_min);
 
---459z02zfEYnoBH63hpsBhkd7ZtX6PbeNk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+So we could do something like
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
+diff --git a/exec.c b/exec.c
+index bb6170dbff..f1437b2be6 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3175,7 +3175,11 @@
+     if (!mr->ops->impl.unaligned) {
+         unsigned align_size_max =3D addr & -addr;
+         if (align_size_max !=3D 0 && align_size_max < access_size_max) {
+-            access_size_max =3D align_size_max;
++            unsigned access_size_min =3D mr->ops->valid.min_access_size;
++            if (access_size_min =3D=3D 0) {
++                access_size_min =3D 1;
++            }
++            access_size_max =3D MAX(min_access_size, align_size_max);
+         }
+     }
 
-iQEcBAEBAgAGBQJb9FltAAoJEBTawMmQ61bBHJkH/RMRKibqLxxdIYRFLIUm/+pX
-XW5p9VtYjPFGXuU7RnEUET4GYqYpq0kat6guxfF23led3qRVEvbRHnVqFsnOJptt
-vfG5ZiakbKkGKX0zsygu/kHac+HqPWD/qPEtdmk3Yb6DlkBqftgo+js4ti3dYVXM
-1Kw6Q/EtIwM/UJq2tveAtoB3wkaCPw53D62v9ai4hpokue9huisqUEiB6e8BY/18
-HFczqM8OyxlFB9606n36/ck1W191RvxIldZmjVA67G9vjPkGmuNJUPbkF0021rs1
-Vsc2OYPq2BnwrHvIiMmgjj8sTuhiFUhoJkG1vGjjWt+rrAnFaqahm3Y2D4vQB4s=
-=5i//
------END PGP SIGNATURE-----
+Then I think the access size would remain 2 and and
+memory_region_access_valid would reject it as unaligned.  That would
+avoid the bug, but then nvme should be setting valid.min_access_size and
+the exec.c patch alone would not be enough.
 
---459z02zfEYnoBH63hpsBhkd7ZtX6PbeNk--
+> I'm not sure why impl.min_access_size was set to 2 in the first place,
+> but was valid.min_access_size meant maybe? Though if I read the spec
+> correctly, that one should be 4, not 2.
+
+I don't see any requirement for the CMB (section 4.7 in my copy)?
+
+Paolo
