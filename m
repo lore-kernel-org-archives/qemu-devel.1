@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP821-00084F-FK
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:33:42 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gP82V-0008J9-Lx
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:34:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP820-0001v6-NX
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:33:41 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39872)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gP820-0001uJ-ID
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:33:40 -0500
-Received: by mail-ot1-x344.google.com with SMTP id g27so2014963oth.6
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 07:33:40 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1gP82U-0002Rd-5V
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:34:11 -0500
+Date: Tue, 20 Nov 2018 16:33:29 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181120163329.6c960628@redhat.com>
+In-Reply-To: <20181107123652.23417-2-marcandre.lureau@redhat.com>
+References: <20181107123652.23417-1-marcandre.lureau@redhat.com>
+	<20181107123652.23417-2-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181115192446.17187-5-minyard@acm.org>
-References: <20181115192446.17187-1-minyard@acm.org>
-	<20181115192446.17187-5-minyard@acm.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Nov 2018 15:33:19 +0000
-Message-ID: <CAFEAcA8uTFRiYZuJx=9o0Bs483TgVt=TTAV50n3JNsZCJaqKfA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 04/12] i2c: Add a length check to the
- SMBus write handling
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 01/14] tests:
+ qdev_prop_check_globals() doesn't return "all_used"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <minyard@acm.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Corey Minyard <cminyard@mvista.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, dgilbert@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On 15 November 2018 at 19:24,  <minyard@acm.org> wrote:
-> From: Corey Minyard <cminyard@mvista.com>
->
-> Avoid an overflow.
->
-> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+On Wed,  7 Nov 2018 16:36:39 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+
+> Instead, it returns 1 if an error was detected, which is the case for:
+>=20
+> /qdev/properties/dynamic/global/subprocess:
+> warning: global dynamic-prop-type-bad.prop3 has invalid class name
+> warning: global nohotplug-type.prop5=3D105 not used
+> warning: global nondevice-type.prop6 has invalid class name
+>=20
+> Clarify the function return value.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
 > ---
->  hw/i2c/smbus_slave.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
-> index 83ca041b5d..fa988919d8 100644
-> --- a/hw/i2c/smbus_slave.c
-> +++ b/hw/i2c/smbus_slave.c
-> @@ -182,7 +182,11 @@ static int smbus_i2c_send(I2CSlave *s, uint8_t data)
->      switch (dev->mode) {
->      case SMBUS_WRITE_DATA:
->          DPRINTF("Write data %02x\n", data);
-> -        dev->data_buf[dev->data_len++] = data;
-> +        if (dev->data_len >= sizeof(dev->data_buf)) {
-> +            BADF("Too many bytes sent\n");
-> +        } else {
-> +            dev->data_buf[dev->data_len++] = data;
-> +        }
->          break;
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-What happens on a real device in this situation ?
-
-thanks
--- PMM
+>  tests/test-qdev-global-props.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-prop=
+s.c
+> index d81b0862d5..ccdf6c57c1 100644
+> --- a/tests/test-qdev-global-props.c
+> +++ b/tests/test-qdev-global-props.c
+> @@ -214,7 +214,7 @@ static void test_dynamic_globalprop_subprocess(void)
+>          { TYPE_NONDEVICE, "prop6", "106", true },
+>          {}
+>      };
+> -    int all_used;
+> +    int global_error;
+> =20
+>      qdev_prop_register_global_list(props);
+> =20
+> @@ -223,8 +223,8 @@ static void test_dynamic_globalprop_subprocess(void)
+> =20
+>      g_assert_cmpuint(mt->prop1, =3D=3D, 101);
+>      g_assert_cmpuint(mt->prop2, =3D=3D, 102);
+> -    all_used =3D qdev_prop_check_globals();
+> -    g_assert_cmpuint(all_used, =3D=3D, 1);
+> +    global_error =3D qdev_prop_check_globals();
+> +    g_assert_cmpuint(global_error, =3D=3D, 1);
+>      g_assert(props[0].used);
+>      g_assert(props[1].used);
+>      g_assert(!props[2].used);
+> @@ -259,7 +259,7 @@ static void test_dynamic_globalprop_nouser_subprocess=
+(void)
+>          { TYPE_NONDEVICE, "prop6", "106" },
+>          {}
+>      };
+> -    int all_used;
+> +    int global_error;
+> =20
+>      qdev_prop_register_global_list(props);
+> =20
+> @@ -268,8 +268,8 @@ static void test_dynamic_globalprop_nouser_subprocess=
+(void)
+> =20
+>      g_assert_cmpuint(mt->prop1, =3D=3D, 101);
+>      g_assert_cmpuint(mt->prop2, =3D=3D, 102);
+> -    all_used =3D qdev_prop_check_globals();
+> -    g_assert_cmpuint(all_used, =3D=3D, 0);
+> +    global_error =3D qdev_prop_check_globals();
+> +    g_assert_cmpuint(global_error, =3D=3D, 0);
+>      g_assert(props[0].used);
+>      g_assert(props[1].used);
+>      g_assert(!props[2].used);
