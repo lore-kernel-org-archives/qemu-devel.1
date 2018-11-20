@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP7kl-0006HC-La
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:15:54 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gP7ko-0006IY-PW
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:15:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gP7ki-0004EG-Oe
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:15:51 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40582)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gP7kh-0004CZ-W3
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:15:48 -0500
-Received: by mail-oi1-x242.google.com with SMTP id t204so1759589oie.7
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 07:15:47 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1gP7kh-0004Cg-Hv
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 10:15:54 -0500
+Date: Tue, 20 Nov 2018 16:15:31 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181120161531.15040d73@redhat.com>
+In-Reply-To: <20181120110427.7321-10-david@redhat.com>
+References: <20181120110427.7321-1-david@redhat.com>
+	<20181120110427.7321-10-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1541672989-15967-11-git-send-email-gengdongjiu@huawei.com>
-References: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
-	<1541672989-15967-11-git-send-email-gengdongjiu@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Nov 2018 15:15:26 +0000
-Message-ID: <CAFEAcA-6UKk-WF+M+z0=AN-X7q0XRFLo2RG_yBadDeCas4A5wQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH RESEND v15 10/10] target-arm: kvm64: handle
- SIGBUS signal from kernel or KVM
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 09/11] pci: Reuse pci-bridge hotplug
+ handler handlers for pcie-pci-bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +24,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Zheng Xiang <zhengxiang9@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org
 
-On 8 November 2018 at 10:29, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-> Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
-> translates the host VA delivered by host to guest PA, then fill this PA
-> to guest APEI GHES memory, then notify guest according to the SIGBUS type.
-> There are two kinds of SIGBUS that QEMU needs to handle, which are
-> BUS_MCEERR_AO and BUS_MCEERR_AR.
->
-> If guest accesses the poisoned memory, it generates Synchronous External
-> Abort(SEA). Then host kernel gets an APEI notification and call memory_failure()
-> to unmapped the affected page from the guest's stage 2, finally return
-> to guest.
->
-> Guest continues to access PG_hwpoison page, it will trap to KVM as stage2 fault,
-> then a SIGBUS_MCEERR_AR synchronous signal is delivered to Qemu, Qemu record this
-> error into guest APEI GHES memory and notify guest using Synchronous-External-Abort(SEA).
->
-> Suggested-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+On Tue, 20 Nov 2018 12:04:25 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> These functions are essentially the same, we only have to use
+> object_get_typename() for reporting errors. So let's share the
+> implementation of hotplug handler callbacks.
+> 
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
 > ---
-> Address James's comments to record CPER and notify guest for SIGBUS signal handling.
-> Shown some discussion in [1].
->
-> [1]:
-> https://lkml.org/lkml/2017/2/27/246
-> https://lkml.org/lkml/2017/9/14/241
-> https://lkml.org/lkml/2017/9/22/499
-> ---
-
->
-> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-> +{
-> +    ram_addr_t ram_addr;
-> +    hwaddr paddr;
-> +
-> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
-> +    if (addr) {
-> +        ram_addr = qemu_ram_addr_from_host(addr);
-> +        if (ram_addr != RAM_ADDR_INVALID &&
-> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-> +            kvm_hwpoison_page_add(ram_addr);
-> +            if (code == BUS_MCEERR_AR) {
-> +                kvm_cpu_synchronize_state(c);
-> +                if (ghes_record_errors(ACPI_HEST_NOTIFY_SEA, paddr)) {
-> +                    kvm_inject_arm_sea(c);
-> +                } else {
-> +                    fprintf(stderr, "failed to record the error\n");
-> +                }
-
-Shouldn't there be something in here to say "only report this
-error to the guest if we are actually reporting RAS errors
-to the guest" ?
-
-> +            }
-> +            return;
-> +        }
-> +        fprintf(stderr, "Hardware memory error for memory used by "
-> +                "QEMU itself instead of guest system!\n");
-> +    }
-> +
-> +    if (code == BUS_MCEERR_AR) {
-> +        fprintf(stderr, "Hardware memory error!\n");
-> +        exit(1);
-> +    }
-> +}
-> +
->  /* C6.6.29 BRK instruction */
->  static const uint32_t brk_insn = 0xd4200000;
-
-thanks
--- PMM
+>  hw/pci-bridge/pci_bridge_dev.c  | 12 ++++++------
+>  hw/pci-bridge/pcie_pci_bridge.c | 30 ++----------------------------
+>  include/hw/pci/pci_bridge.h     |  4 ++++
+>  3 files changed, 12 insertions(+), 34 deletions(-)
+> 
+> diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+> index e1df9a52ac..fa0be13ac4 100644
+> --- a/hw/pci-bridge/pci_bridge_dev.c
+> +++ b/hw/pci-bridge/pci_bridge_dev.c
+> @@ -206,27 +206,27 @@ static const VMStateDescription pci_bridge_dev_vmstate = {
+>      }
+>  };
+>  
+> -static void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev,
+> -                                   DeviceState *dev, Error **errp)
+> +void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                            Error **errp)
+>  {
+>      PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+>  
+>      if (!shpc_present(pci_hotplug_dev)) {
+>          error_setg(errp, "standard hotplug controller has been disabled for "
+> -                   "this %s", TYPE_PCI_BRIDGE_DEV);
+> +                   "this %s", object_get_typename(OBJECT(hotplug_dev)));
+>          return;
+>      }
+>      shpc_device_plug_cb(hotplug_dev, dev, errp);
+>  }
+>  
+> -static void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
+> -                                             DeviceState *dev, Error **errp)
+> +void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
+> +                                      DeviceState *dev, Error **errp)
+>  {
+>      PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+>  
+>      if (!shpc_present(pci_hotplug_dev)) {
+>          error_setg(errp, "standard hotplug controller has been disabled for "
+> -                   "this %s", TYPE_PCI_BRIDGE_DEV);
+> +                   "this %s", object_get_typename(OBJECT(hotplug_dev)));
+>          return;
+>      }
+>      shpc_device_unplug_request_cb(hotplug_dev, dev, errp);
+> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+> index c634353b06..0ffea680d5 100644
+> --- a/hw/pci-bridge/pcie_pci_bridge.c
+> +++ b/hw/pci-bridge/pcie_pci_bridge.c
+> @@ -137,32 +137,6 @@ static const VMStateDescription pcie_pci_bridge_dev_vmstate = {
+>          }
+>  };
+>  
+> -static void pcie_pci_bridge_plug_cb(HotplugHandler *hotplug_dev,
+> -                                    DeviceState *dev, Error **errp)
+> -{
+> -    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+> -
+> -    if (!shpc_present(pci_hotplug_dev)) {
+> -        error_setg(errp, "standard hotplug controller has been disabled for "
+> -                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
+> -        return;
+> -    }
+> -    shpc_device_plug_cb(hotplug_dev, dev, errp);
+> -}
+> -
+> -static void pcie_pci_bridge_unplug_request_cb(HotplugHandler *hotplug_dev,
+> -                                              DeviceState *dev, Error **errp)
+> -{
+> -    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+> -
+> -    if (!shpc_present(pci_hotplug_dev)) {
+> -        error_setg(errp, "standard hotplug controller has been disabled for "
+> -                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
+> -        return;
+> -    }
+> -    shpc_device_unplug_request_cb(hotplug_dev, dev, errp);
+> -}
+> -
+>  static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+>  {
+>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> @@ -179,8 +153,8 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+>      dc->props = pcie_pci_bridge_dev_properties;
+>      dc->reset = &pcie_pci_bridge_reset;
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> -    hc->plug = pcie_pci_bridge_plug_cb;
+> -    hc->unplug_request = pcie_pci_bridge_unplug_request_cb;
+> +    hc->plug = pci_bridge_dev_plug_cb;
+> +    hc->unplug_request = pci_bridge_dev_unplug_request_cb;
+>  }
+>  
+>  static const TypeInfo pcie_pci_bridge_info = {
+> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+> index cdff7edfd1..6e37c7551a 100644
+> --- a/include/hw/pci/pci_bridge.h
+> +++ b/include/hw/pci/pci_bridge.h
+> @@ -99,6 +99,10 @@ void pci_bridge_reset(DeviceState *qdev);
+>  void pci_bridge_initfn(PCIDevice *pci_dev, const char *typename);
+>  void pci_bridge_exitfn(PCIDevice *pci_dev);
+>  
+> +void pci_bridge_dev_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                            Error **errp);
+> +void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
+> +                                      DeviceState *dev, Error **errp);
+>  
+>  /*
+>   * before qdev initialization(qdev_init()), this function sets bus_name and
