@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gP45G-0008Eg-Fc
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:20:47 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gP46c-0000cW-At
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:22:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gP45F-0000zW-AU
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:20:46 -0500
-References: <1542657473-9196-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA_xhYf0VNaq1gM1OWWCkms5sTpn3kdqSHN0AZ3cH1f8Dw@mail.gmail.com>
-	<27dd52ce-1cd6-0a92-635c-20ce1c9d5c2b@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <62488962-e0bc-e116-cc2d-699c4cd1cbe7@redhat.com>
-Date: Tue, 20 Nov 2018 12:20:35 +0100
+	(envelope-from <kraxel@redhat.com>) id 1gP46b-0005RM-OH
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:22:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52322)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gP46b-0005Pt-Iz
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 06:22:09 -0500
+Date: Tue, 20 Nov 2018 12:22:03 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181120112203.rzhhdl6hhsjf5twt@sirius.home.kraxel.org>
+References: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
+	<20181119084855.uyira2lpu73mu2fo@sirius.home.kraxel.org>
+	<CAGxU2F4O4aKzrJky7EFeWaHFuBKPwi_Z-j7G7m+ENRojVG_5vA@mail.gmail.com>
+	<20181119130713.GB6443@stefanha-x1.localdomain>
+	<20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
+	<CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
+	<20181120062109.eahirgygm4br3ov7@sirius.home.kraxel.org>
+	<CAGxU2F64uK5oygQecZKOPpsyb--Pth9U00P_gghrtYDwQrSGtg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <27dd52ce-1cd6-0a92-635c-20ce1c9d5c2b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Assign some more files in the
- hw/arm/ directory
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGxU2F64uK5oygQecZKOPpsyb--Pth9U00P_gghrtYDwQrSGtg@mail.gmail.com>
+Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Jean-Christophe Dubois <jcd@tribudubois.net>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Samuel Ortiz <sameo@linux.intel.com>, Rob Bradford <robert.bradford@intel.com>, seabios@seabios.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Thomas,
+  Hi,
 
-On 11/20/18 12:05 PM, Thomas Huth wrote:
-> On 2018-11-20 11:19, Peter Maydell wrote:
->> On 19 November 2018 at 19:57, Thomas Huth <thuth@redhat.com> wrote:
->>> I apparently missed some more files and even a complete machine (the
->>> "imx25-pdk") in my previous patch... but now we should hopefully have
->>> a completely coverage for all available ARM boards.
->>
->> Hi; looks like you forgot to cc qemu-devel.
->=20
-> Oops, sorry about that.
->=20
->>> Fixes: 95a5db3ae5698b49c63144610ad02913e780c828
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  MAINTAINERS | 16 ++++++++++++++++
->>>  1 file changed, 16 insertions(+)
->>>
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index 1032406..ac20dc8 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -533,6 +533,18 @@ L: qemu-arm@nongnu.org
->>>  S: Odd Fixes
->>>  F: hw/arm/gumstix.c
->>>
->>> +i.MX25 PDK
->>> +M: Peter Maydell <peter.maydell@linaro.org>
->>> +R: Jean-Christophe Dubois <jcd@tribudubois.net>
->>> +L: qemu-arm@nongnu.org
->>> +S: Odd Fixes
->>> +F: hw/arm/fsl-imx25.c
->>> +F: hw/arm/imx25_pdk.c
->>> +F: hw/misc/imx25_ccm.c
->>> +F: include/hw/arm/fsl-imx25.h
->>> +F: include/hw/misc/imx25_ccm.h
->>> +F: tests/ds1338-test.c
->>> +
->>>  i.MX31 (kzm)
->>>  M: Peter Chubb <peter.chubb@nicta.com.au>
->>>  M: Peter Maydell <peter.maydell@linaro.org>
->>> @@ -615,6 +627,7 @@ R: Andrew Baumann <Andrew.Baumann@microsoft.com>
->>>  R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>  L: qemu-arm@nongnu.org
->>>  S: Odd Fixes
->>> +F: hw/arm/raspi.c
->>>  F: hw/arm/raspi_platform.h
->>>  F: hw/*/bcm283*
->>>  F: include/hw/arm/raspi*
->>> @@ -641,6 +654,7 @@ F: hw/arm/z2.c
->>>  F: hw/*/pxa2xx*
->>>  F: hw/misc/mst_fpga.c
->>>  F: include/hw/arm/pxa.h
->>> +F: include/hw/arm/sharpsl.h
->>>
->>>  SABRELITE / i.MX6
->>>  M: Peter Maydell <peter.maydell@linaro.org>
->>> @@ -686,7 +700,9 @@ M: Peter Maydell <peter.maydell@linaro.org>
->>>  L: qemu-arm@nongnu.org
->>>  S: Maintained
->>>  F: hw/arm/virt*
->>> +F: hw/arm/smmu*
->>>  F: include/hw/arm/virt.h
->>> +F: include/hw/arm/smmu*
->>
->> The SMMU files aren't part of the virt board, they're
->> the SMMUv3 device model. They should go in a section
->> that lets us mark Eric Auger as their maintainer.
->=20
-> Ok, I'll send a v2 without the smmu* files. Eric, could you please take
-> care of sending a patch for a new SMMU section?
-Yes sure.
+> > Background:  The drivers in seabios work on both virtual and physical
+> > hardware (you can run seabios as coreboot payload on physical hardware).
+> > There are quite a few places where are delays and timeouts which are
+> > required to work properly on physical hardware.  But typically virtual
+> > hardware is alot faster.  There is -- for example -- no time needed to
+> > establish a sata link.  Link detection in ahci is instant on qemu.
+> 
+> I'll investigate also other timeouts.
 
-Thanks
+I'd focus on legacy lpc/isa hardware here.  PCI-ish hardware which has
+such timeouts (sata, usb, ...) typically isn't present in the virtual
+machine if you care about performance.  Or, in other words, the best way
+to handle the sata link detection delay is to use "qemu -M q35,sata=off".
 
-Eric
->=20
->  Thomas
->=20
+cheers,
+  Gerd
