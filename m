@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gP6HC-000199-3h
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:41:15 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gP6LO-0003os-9r
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:45:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gP6H7-0007nS-R4
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:41:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50460)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gP6H7-0007lg-GS
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:41:09 -0500
-Date: Tue, 20 Nov 2018 11:41:06 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181120134106.GH4755@habkost.net>
-References: <20180921082217.29481-1-rkagan@virtuozzo.com>
-	<20180921082217.29481-4-rkagan@virtuozzo.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gP6LG-000669-J7
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:45:32 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34708)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gP6LE-0005tb-Ou
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 08:45:25 -0500
+Received: by mail-oi1-x244.google.com with SMTP id h25so1524648oig.1
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 05:45:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180921082217.29481-4-rkagan@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 03/10] hyperv: only add SynIC in compatible
- configurations
+In-Reply-To: <20181113165247.4806-5-sameo@linux.intel.com>
+References: <20181113165247.4806-1-sameo@linux.intel.com>
+	<20181113165247.4806-5-sameo@linux.intel.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Nov 2018 13:45:03 +0000
+Message-ID: <CAFEAcA9wvrnshOTYz-jZ0n6m7SfusYY+bnB-iPnQuVNqqdg5Ww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 04/13] target: arm: Move all interrupt and
+ exception handlers into their own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, Vijayabhaskar Balakrishna <vijay.balakrishna@oracle.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Venu Busireddy <venu.busireddy@oracle.com>, Liran Alon <liran.alon@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, Igor Mammedov <imammedo@redhat.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Karl Heubaum <karl.heubaum@oracle.com>
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Fri, Sep 21, 2018 at 11:22:10AM +0300, Roman Kagan wrote:
-> Certain configurations do not allow SynIC to be used in QEMU.  In
-> particular,
-> 
-> - when hyperv_vpindex is off, SINT routes can't be used as they refer to
->   the destination vCPU by vp_index
-> 
-> - older KVM (which doesn't expose KVM_CAP_HYPERV_SYNIC2) zeroes out
->   SynIC message and event pages on every msr load, breaking migration
-> 
-> OTOH in-KVM users of SynIC -- SynIC timers -- do work in those
-> configurations, and we shouldn't stop the guest from using them.
-> 
-> To cover both scenarios, introduce an X86CPU property that makes CPU
-> init code to skip creation of the SynIC object (and thus disables any
-> SynIC use in QEMU) but keeps the KVM part of the SynIC working.
-> The property is clear by default but is set via compat logic for older
-> machine types.
-> 
-> As a result, when hv_synic and a modern machine type are specified, QEMU
-> will refuse to run unless vp_index is on and the kernel is recent
-> enough.  OTOH with an older machine type QEMU will run fine with
-> hv_synic=on against an older kernel and/or without vp_index enabled but
-> will disallow the in-QEMU uses of SynIC (in e.g. VMBus).
-> 
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+On 13 November 2018 at 16:52, Samuel Ortiz <sameo@linux.intel.com> wrote:
+> Most of them are TCG dependent so we want to be able to not build them
+> in order to support TCG disablement with ARM.
+>
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Robert Bradford <robert.bradford@intel.com>
 > ---
->  include/hw/i386/pc.h |  8 ++++++++
->  target/i386/cpu.h    |  1 +
->  target/i386/cpu.c    |  2 ++
->  target/i386/kvm.c    | 30 ++++++++++++++++++++++--------
->  4 files changed, 33 insertions(+), 8 deletions(-)
-> 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 6894f37df1..dfe6746692 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -294,6 +294,14 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
->  int e820_get_num_entries(void);
->  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->  
-> +#define PC_COMPAT_3_0 \
-> +    HW_COMPAT_3_0 \
-> +    {\
-> +        .driver   = TYPE_X86_CPU,\
-> +        .property = "x-hv-synic-kvm-only",\
-> +        .value    = "on",\
-> +    }
+>  target/arm/excp_helper.c | 550 +++++++++++++++++++++++++++++++++++++++
+>  target/arm/helper.c      | 531 -------------------------------------
+>  target/arm/Makefile.objs |   2 +-
+>  3 files changed, 551 insertions(+), 532 deletions(-)
+>  create mode 100644 target/arm/excp_helper.c
 
-Oops.  This macro does nothing if the 3.1 machine-types aren't
-updated to use it.  This patch breaks compatibility on pc-*-3.1.
+You'll find that you need to rebase as there is a recent change
+that your moved copies are missing: commit e24ad484909e7.
+(I have just discovered git diff's --color-moved option which
+is great for checking this sort of code-movement patch.)
 
-> [...]
+What is your plan for dealing with the way that the KVM code
+for injecting a breakpoint exception into the guest works
+by calling the do_interrupt code ?
+(see target/arm/kvm64.c:kvm_arm_handle_debug(),
+which calls cc->do_interrupt(cs).) This patch moves those
+functions to a file which won't be compiled and a later one
+in the series seems to stop cc->do_interrupt being set at all
+if CONFIG_TCG is not defined. That will result in QEMU crashing
+when it tries to inject an exception, won't it?
 
--- 
-Eduardo
+thanks
+-- PMM
