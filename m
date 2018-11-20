@@ -1,14 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gPEwk-00088u-5u
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 17:56:45 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gPExD-0008Rf-AG
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 17:57:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gPEt2-0002g0-5z
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 17:52:54 -0500
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 20 Nov 2018 16:52:41 -0600
-Message-Id: <20181120225241.2371769-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] iotests: Skip 233 if certtool not installed
+	(envelope-from <jsnow@redhat.com>) id 1gPEje-0004Tv-5C
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 17:43:13 -0500
+References: <20181120203628.2367003-1-eblake@redhat.com>
+	<cb5fbd50-0629-8afb-e1d4-cc3d1a94e057@redhat.com>
+	<1671d82c-da21-de1e-58c4-dd22696f9a62@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <53e365fc-bc5f-5a3a-0b96-68e308c1e5b7@redhat.com>
+Date: Tue, 20 Nov 2018 17:43:04 -0500
+MIME-Version: 1.0
+In-Reply-To: <1671d82c-da21-de1e-58c4-dd22696f9a62@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] misc: Avoid UTF-8 in error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,41 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-The use of TLS while building qemu is optional. While the
-'certtool' binary should be available on every platform that
-supports building against TLS, that does not imply that the
-developer has installed it.  Make the test gracefully skip
-in that case.
 
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
 
-On Fedora, libvirt requires libtls-utils to be present, but not qemu.
+On 11/20/18 5:01 PM, Eric Blake wrote:
+> [adding Markus in CC, since git didn't do it automatically from the
+> 'Reported-by']
+>=20
+> On 11/20/18 3:28 PM, John Snow wrote:
+>>
+>>
+>> On 11/20/18 3:36 PM, Eric Blake wrote:
+>>> While most developers are now using UTF-8 environments, it's
+>>> harder to guarantee that error messages will be output to
+>>> a multibyte locale. Rather than risking error messages that
+>>> get corrupted into mojibake when the user runs qemu in a
+>>> non-multibyte locale, let's stick to straight ASCII error
+>>> messages, rather than assuming that our use of UTF-8 in source
+>>> code string constants will work unchanged in other locales.
+>>>
+>>> Reported-by: Markus Armbruster <armbru@redhat.com>
+>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>> ---
+>>> =C2=A0 hw/misc/tmp105.c | 2 +-
+>>> =C2=A0 hw/misc/tmp421.c | 2 +-
+>>> =C2=A0 2 files changed, 2 insertions(+), 2 deletions(-)
+>=20
+>>
+>> Do we have any policy in place to prohibit this in the future?
+>> (Presumably a policy that is automatic and won't interfere with QEMU
+>> localization efforts which may rightly attempt to use UTF-8 for those
+>> locales.)
+>=20
+> Not that I know of.
+>=20
+>>
+>> Do you have a script or trick to find utf-8 containing strings in our
+>> source?
+>=20
+> Markus found these two, probably by reading over a list resulting from
+> his claim of finding 217 out of 6455 files (53 of them binary, which
+> don't count):
+> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg04017.html
+>=20
+> My quick and dirty attempt, which does not quite reproduce his numbers:
+>=20
+> $ LC_ALL=3DC git grep -l $'[\x80-\xff]' | wc
+> =C2=A0=C2=A0=C2=A0 279=C2=A0=C2=A0=C2=A0=C2=A0 279=C2=A0=C2=A0=C2=A0 74=
+90
+>=20
+> Thus, by forcing a unibyte locale (where encoding errors are impossible=
+)
+> with sane range expressions (POSIX says only the C locale is required t=
+o
+> interpret regex ranges according to byte value - all bets are off in
+> other locales) and using $'' to type non-UTF-8 bytes into my search, I
+> found 279 files with at least one byte outside of ASCII.=C2=A0 But the =
+use of
+> -l has no easy way to filter which of those files are binary; while
+> dropping -l claims 2138 "lines" with non-ASCII, which gets tedious to
+> scroll through, especially considering there ARE binary files in the mi=
+x.
+>=20
+> Narrowing the search to a more specific pattern:
+>=20
+> $ LC_ALL=3DC git grep $'".*[\x80-\xff].*"' | grep -v 'Binary file' | wc
+> =C2=A0=C2=A0=C2=A0 129=C2=A0=C2=A0=C2=A0=C2=A0 685=C2=A0=C2=A0=C2=A0 88=
+08
+>=20
+> is a bit more manageable, with MOST of the hits in pc-bios/qemu.rsrc
+> (false positive hits, due to interesting? comments), in po/ (which
+> doesn't count), or in scripts/ for python.=C2=A0 And the proof for THIS=
+ patch:
+>=20
+> $ LC_ALL=3DC git grep -l $'".*[\x80-\xff].*"' origin -- '**/*.[ch]' | c=
+at
+> origin:hw/misc/tmp105.c
+> origin:hw/misc/tmp421.c
+>=20
 
-I'm fine if Kevin wants to pick this up in a pull request related
-to iotests in general; if not, I'll do a pull request through my
-NBD tree in time for -rc3.
+Aha!
 
- tests/qemu-iotests/common.tls | 3 +++
- 1 file changed, 3 insertions(+)
+Thanks. I was surprised we've managed to introduce only two cases of
+this so far. Your patch seems complete in this case.
 
-diff --git a/tests/qemu-iotests/common.tls b/tests/qemu-iotests/common.tls
-index 39f17c1b999..eae81789bbc 100644
---- a/tests/qemu-iotests/common.tls
-+++ b/tests/qemu-iotests/common.tls
-@@ -31,6 +31,9 @@ tls_x509_cleanup()
+Since I took the time to read along, I may as well:
 
- tls_x509_init()
- {
-+    (certtool --help) >/dev/null 2>&1 || \
-+	_notrun "certtool utility not found, skipping test"
-+
-     mkdir -p "${tls_dir}"
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-     # use a fixed key so we don't waste system entropy on
--- 
-2.17.2
+>>
+>> Only curious, don't hold this patch up on my account. I'm not raising =
+a
+>> challenge.
+>=20
+> Maybe checkpatch.pl could be taught to do a similar check?
+>=20
