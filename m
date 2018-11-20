@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP2I6-0004pe-S4
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:55 -0500
+	(envelope-from <david@redhat.com>) id 1gP2I8-0004qP-AC
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP2I6-0002Ek-0T
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52434)
+	(envelope-from <david@redhat.com>) id 1gP2I7-0002Mz-Lj
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gP2I5-0002AL-QT
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:53 -0500
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gP2I7-0002M0-Gg
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:55 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 20 Nov 2018 10:25:36 +0100
-Message-Id: <20181120092542.13102-4-david@redhat.com>
+Date: Tue, 20 Nov 2018 10:25:37 +0100
+Message-Id: <20181120092542.13102-5-david@redhat.com>
 In-Reply-To: <20181120092542.13102-1-david@redhat.com>
 References: <20181120092542.13102-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/9] qapi: Fix string-input-visitor to
- reject NaN and infinities
+Subject: [Qemu-devel] [PATCH v2 4/9] qapi: Use qemu_strtod_finite() in
+ qobject-input-visitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +27,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>
 
-The string-input-visitor happily accepts NaN and inifities when parsing
-numbers (doubles). They shouldn't. Fix that.
-
-Also, add two test cases, testing if "NaN" and "inf" is properly
-rejected.
+Let's use the new function. Just as current behavior, we have to
+consume the whole string (now it's just way clearer what's going on).
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- qapi/string-input-visitor.c       |  6 ++----
- tests/test-string-input-visitor.c | 13 +++++++++++++
- 2 files changed, 15 insertions(+), 4 deletions(-)
+ qapi/qobject-input-visitor.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-index b3fdd0827d..b89c6c4e06 100644
---- a/qapi/string-input-visitor.c
-+++ b/qapi/string-input-visitor.c
-@@ -20,6 +20,7 @@
- #include "qemu/option.h"
- #include "qemu/queue.h"
- #include "qemu/range.h"
-+#include "qemu/cutils.h"
- 
- 
- struct StringInputVisitor
-@@ -313,12 +314,9 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
-                               Error **errp)
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 3e88b27f9e..07465f9947 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -562,19 +562,20 @@ static void qobject_input_type_number_keyval(Visitor *v, const char *name,
  {
-     StringInputVisitor *siv = to_siv(v);
--    char *endp = (char *) siv->string;
-     double val;
+     QObjectInputVisitor *qiv = to_qiv(v);
+     const char *str = qobject_input_get_keyval(qiv, name, errp);
+-    char *endp;
++    double val;
+ 
+     if (!str) {
+         return;
+     }
  
 -    errno = 0;
--    val = strtod(siv->string, &endp);
--    if (errno || endp == siv->string || *endp) {
-+    if (qemu_strtod_finite(siv->string, NULL, &val)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
-                    "number");
-         return;
-diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-index 88e0e1aa9a..1efba06948 100644
---- a/tests/test-string-input-visitor.c
-+++ b/tests/test-string-input-visitor.c
-@@ -252,6 +252,19 @@ static void test_visitor_in_number(TestInputVisitorData *data,
-     visit_type_number(v, NULL, &res, &err);
-     g_assert(!err);
-     g_assert_cmpfloat(res, ==, value);
+-    *obj = strtod(str, &endp);
+-    if (errno || endp == str || *endp || !isfinite(*obj)) {
++    if (qemu_strtod_finite(str, NULL, &val)) {
+         /* TODO report -ERANGE more nicely */
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+                    full_name(qiv, name), "number");
++        return;
+     }
 +
-+    /* NaN and infinity has to be rejected */
-+
-+    v = visitor_input_test_init(data, "NaN");
-+
-+    visit_type_number(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+
-+    v = visitor_input_test_init(data, "inf");
-+
-+    visit_type_number(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+
++    *obj = val;
  }
  
- static void test_visitor_in_string(TestInputVisitorData *data,
+ static void qobject_input_type_any(Visitor *v, const char *name, QObject **obj,
 -- 
 2.17.2
