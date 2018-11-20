@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP2IA-0004ql-1l
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:59 -0500
+	(envelope-from <david@redhat.com>) id 1gP2I5-0004pK-Ll
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gP2I9-0002P4-Bu
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43094)
+	(envelope-from <david@redhat.com>) id 1gP2I1-0001nJ-I1
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43036)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gP2I9-0002OJ-6g
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:57 -0500
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gP2I1-0001hw-AM
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 04:25:49 -0500
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 20 Nov 2018 10:25:38 +0100
-Message-Id: <20181120092542.13102-6-david@redhat.com>
-In-Reply-To: <20181120092542.13102-1-david@redhat.com>
-References: <20181120092542.13102-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/9] test-string-input-visitor: Add more
- tests
+Date: Tue, 20 Nov 2018 10:25:33 +0100
+Message-Id: <20181120092542.13102-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/9] qapi: rewrite string-input-visitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +24,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Test that very big/small values are not accepted and that ranges with
-only one element work. Also test that ranges are ascending and cannot
-have more than 65536 elements.
+Rewrite string-input-visitor to be (hopefully) less ugly. Support
+int and uint lists (including ranges, but not implemented via type
+"Range").
 
-Rename expect4 to expect5, as we will be moving that to a separate ulist
-test after the rework.
+Virtual walks are now supported and more errors are cought (and some bugs
+fixed). Fix and extend the tests. Parsing of uint64_t is now properly
+supported.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- tests/test-string-input-visitor.c | 41 +++++++++++++++++++++++++++++--
- 1 file changed, 39 insertions(+), 2 deletions(-)
+Importantly, when parsing a list we now return the list and not an
+ordered set (we are not an ordered set parser after all). Whoever needs
+that can add it on top. As far as I can see, current code can deal with
+it but I'll have to look at the details.
 
-diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-index 1efba06948..8ee0d1b284 100644
---- a/tests/test-string-input-visitor.c
-+++ b/tests/test-string-input-visitor.c
-@@ -121,7 +121,8 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     int64_t expect1[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20 };
-     int64_t expect2[] = { 32767, -32768, -32767 };
-     int64_t expect3[] = { INT64_MAX, INT64_MIN };
--    uint64_t expect4[] = { UINT64_MAX };
-+    int64_t expect4[] = { 1 };
-+    uint64_t expect5[] = { UINT64_MAX };
-     Error *err = NULL;
-     int64List *res = NULL;
-     int64List *tail;
-@@ -140,8 +141,44 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-                                 "-9223372036854775808,9223372036854775807");
-     check_ilist(v, expect3, ARRAY_SIZE(expect3));
- 
-+    v = visitor_input_test_init(data, "1-1");
-+    check_ilist(v, expect4, ARRAY_SIZE(expect4));
-+
-     v = visitor_input_test_init(data, "18446744073709551615");
--    check_ulist(v, expect4, ARRAY_SIZE(expect4));
-+    check_ulist(v, expect5, ARRAY_SIZE(expect5));
-+
-+    /* Value too large */
-+
-+    v = visitor_input_test_init(data, "9223372036854775808");
-+    visit_type_int64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!res);
-+
-+    /* Value too small */
-+
-+    v = visitor_input_test_init(data, "-9223372036854775809");
-+    visit_type_int64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!res);
-+
-+    /* Range not ascending */
-+
-+    v = visitor_input_test_init(data, "3-1");
-+    visit_type_int64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!res);
-+
-+    v = visitor_input_test_init(data, "9223372036854775807-0");
-+    visit_type_int64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!res);
-+
-+    /* Range too big (65536 is the limit against DOS attacks) */
-+
-+    v = visitor_input_test_init(data, "0-65536");
-+    visit_type_int64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+    g_assert(!res);
- 
-     /* Empty list */
- 
+While at it, introduce and use qemu_strtod() and qemu_strtod_finite().
+However don't convert monitor.c as that seems to be too broken for me
+(it ignores both conversion errors and range errors, and there is an
+actual unit test in which conversion is expected to fail).
+
+v1 -> v2:
+- "cutils: Add qemu_strtod() and qemu_strtod_finite()"
+-- Add a proper documentation
+-- Make -EINVAL perform "no conversion" in qemu_strtod_finite().
+- "cutils: Fix qemu_strtosz() & friends to reject non-finite sizes"
+-- New subject/description
+-- Added test case
+-- Forward -ERANGE
+- "qapi: Fix string-input-visitor to reject NaN and infinities"
+-- New subject/description
+-- Added test case
+- "test-string-input-visitor: Add more tests"
+-- Add even more tests (descending range, overflow, range limit)
+- "qapi: Rewrite string-input-visitor"
+-- Accept ranges with one element (e.g. 1-1)
+-- Bail out on big ranges (just like before)
+-- Minor style fixed + description updates
+- "test-string-input-visitor: split off uint64 list tests"
+-- ALso copy + adapt newly added tests for int64 lists
+
+RFC -> v1:
+- Too much to name it all, just some highlights
+- Pull some tests before the rework
+- Introduce qemu_strtod_finite() and use it in more places
+- More tests
+- "qapi: rewrite string-input-visitor"
+-- programming error -> assert
+-- g_assert() -> assert(), g_assert_not_reached() -> abort()
+-- Accept single-element ranges "1-1"
+-- Split parsing and returning the next range element
+-- Minor style fixes
+
+David Hildenbrand (9):
+  cutils: Add qemu_strtod() and qemu_strtod_finite()
+  cutils: Fix qemu_strtosz() & friends to reject non-finite sizes
+  qapi: Fix string-input-visitor to reject NaN and infinities
+  qapi: Use qemu_strtod_finite() in qobject-input-visitor
+  test-string-input-visitor: Add more tests
+  qapi: Rewrite string-input-visitor
+  test-string-input-visitor: Use virtual walk
+  test-string-input-visitor: Split off uint64 list tests
+  test-string-input-visitor: Add range overflow tests
+
+ include/qapi/string-input-visitor.h |   4 +-
+ include/qemu/cutils.h               |   8 +-
+ monitor.c                           |   2 +-
+ qapi/qobject-input-visitor.c        |   9 +-
+ qapi/string-input-visitor.c         | 413 ++++++++++++++++------------
+ tests/test-cutils.c                 |  24 +-
+ tests/test-string-input-visitor.c   | 223 ++++++++++++---
+ util/cutils.c                       |  81 +++++-
+ 8 files changed, 516 insertions(+), 248 deletions(-)
+
 -- 
 2.17.2
