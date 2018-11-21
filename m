@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gunthorp@deltatee.com>) id 1gPX3L-00005w-N3
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:16:46 -0500
+	(envelope-from <logang@deltatee.com>) id 1gPX3Y-0000Ib-W2
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:17:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gunthorp@deltatee.com>) id 1gPWxM-0002AH-I8
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:10:33 -0500
+	(envelope-from <logang@deltatee.com>) id 1gPWu9-0006uw-0d
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:07:13 -0500
+References: <cover.1542819633.git.alistair.francis@wdc.com>
+	<44e7883bd17c6867f0ac488bdab6c880b2420a9b.1542819633.git.alistair.francis@wdc.com>
 From: Logan Gunthorpe <logang@deltatee.com>
-Date: Wed, 21 Nov 2018 11:10:13 -0700
-Message-Id: <20181121181013.4983-1-logang@deltatee.com>
+Message-ID: <0ddaeccd-94fd-22a8-f5e0-91fbafdf1761@deltatee.com>
+Date: Wed, 21 Nov 2018 11:07:05 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] hw/block/nvme: fix bug with PCI IRQ pins on
- teardown
+In-Reply-To: <44e7883bd17c6867f0ac488bdab6c880b2420a9b.1542819633.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 6/6] hw/riscv/virt: Connect a
+ VirtIO net PCIe device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,37 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, Keith Busch <keith.busch@intel.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stephen Bates <stephen@eideticom.com>, Logan Gunthorpe <logang@deltatee.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "linux@roeck-us.net" <linux@roeck-us.net>, "abologna@redhat.com" <abologna@redhat.com>
 
-When the submission and completion queues are being torn down
-the IRQ will be asserted for the completion queue when the
-submsission queue is deleted. Then when the completion queue
-is deleted it stays asserted. Thus, on systems that do
-not use MSI, no further interrupts can be triggered on the host.
 
-Linux sees this as a long delay when unbinding the nvme device.
-Eventually the interrupt timeout occurs and it continues.
+On 2018-11-21 10:03 a.m., Alistair Francis wrote:
+> +    pci_bus = PCI_HOST_BRIDGE(dev)->bus;
+> +
+> +    for (i = 0; i < nb_nics; i++) {
+> +        NICInfo *nd = &nd_table[i];
+> +
+> +        if (!nd->model) {
+> +            nd->model = g_strdup("virtio");
+> +        }
+> +
+> +        pci_nic_init_nofail(nd, pci_bus, nd->model, NULL);
+> +    }
 
-To fix this we ensure we deassert the IRQ for a CQ when it is
-deleted.
+I don't understand what this patch actually accomplishes. It doesn't
+seem to affect my network devices when running QEMU. Can you provide a
+commit message explaining this?
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
----
- hw/block/nvme.c | 1 +
- 1 file changed, 1 insertion(+)
+Thanks,
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index fc7dacb816c8..7cbed75ce5fd 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -554,6 +554,7 @@ static uint16_t nvme_del_cq(NvmeCtrl *n, NvmeCmd *cmd)
-         trace_nvme_err_invalid_del_cq_notempty(qid);
-         return NVME_INVALID_QUEUE_DEL;
-     }
-+    nvme_irq_deassert(n, cq);
-     trace_nvme_del_cq(qid);
-     nvme_free_cq(cq, n);
-     return NVME_SUCCESS;
--- 
-2.19.0
+Logan
