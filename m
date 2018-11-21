@@ -1,31 +1,31 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:36806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gPNG7-00017i-8B
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:49:18 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gPNGA-00017i-Bv
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:49:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gPNAG-00056R-KE
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:43:15 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:53938)
+	(envelope-from <richard.henderson@linaro.org>) id 1gPN7P-0008K8-6K
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:40:18 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gPNAG-00055e-Db
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:43:12 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id y1so1218582wmi.3
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 23:43:12 -0800 (PST)
+	id 1gPN7O-0008Ga-VA
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:40:15 -0500
+Received: by mail-wm1-x343.google.com with SMTP id q26so4639632wmf.5
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 23:40:14 -0800 (PST)
 References: <cover.1542321076.git.alistair.francis@wdc.com>
-	<bd8f5c781f7086c5b26e1bd4c8e6570b5534b22d.1542321076.git.alistair.francis@wdc.com>
-	<f56a1b1c-8cc8-7e85-c88b-3894e4628d6b@linaro.org>
-	<CAKmqyKMJm-hcBLeP5-hWW-0Sru8ggFVWFZRCiHhZ4romx-ej4g@mail.gmail.com>
+	<f1a7d2617c26c1745fafe13bbe3bc3b042c14217.1542321076.git.alistair.francis@wdc.com>
+	<23831afc-0ebf-5802-e8e2-6ce48dd340f9@linaro.org>
+	<CAKmqyKP5cCRZujTm+OvoNZWNwPhJirPLA7PjurbovnN8RYCcgQ@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <09e882be-660e-03e9-34cd-7f667f09d7af@linaro.org>
-Date: Wed, 21 Nov 2018 08:43:08 +0100
+Message-ID: <8bacdaca-94c2-d2c7-3af7-b98517a98b64@linaro.org>
+Date: Wed, 21 Nov 2018 08:40:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKMJm-hcBLeP5-hWW-0Sru8ggFVWFZRCiHhZ4romx-ej4g@mail.gmail.com>
+In-Reply-To: <CAKmqyKP5cCRZujTm+OvoNZWNwPhJirPLA7PjurbovnN8RYCcgQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v1 16/23] riscv: tcg-target: Add slowpath
- load and store instructions
+Subject: Re: [Qemu-devel] [RFC v1 15/23] riscv: tcg-target: Add branch and
+ jump instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,86 +37,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair23@gmail.com>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
 
-On 11/21/18 1:18 AM, Alistair Francis wrote:
-> On Fri, Nov 16, 2018 at 1:24 AM Richard Henderson
+On 11/21/18 12:49 AM, Alistair Francis wrote:
+> On Fri, Nov 16, 2018 at 1:14 AM Richard Henderson
 > <richard.henderson@linaro.org> wrote:
 >>
 >> On 11/15/18 11:36 PM, Alistair Francis wrote:
->>> +static void tcg_out_mb(TCGContext *s, TCGArg a0)
+>>> +static void tcg_out_brcond(TCGContext *s, TCGCond cond, TCGReg arg1,
+>>> +                           TCGReg arg2, TCGLabel *l)
 >>> +{
->>> +    static const RISCVInsn fence[] = {
->>> +        [0 ... TCG_MO_ALL] = OPC_FENCE_RW_RW,
->>> +        [TCG_MO_LD_LD]     = OPC_FENCE_R_R,
->>> +        [TCG_MO_ST_LD]     = OPC_FENCE_W_R,
->>> +        [TCG_MO_LD_ST]     = OPC_FENCE_R_W,
->>> +        [TCG_MO_ST_ST]     = OPC_FENCE_W_W,
->>> +        [TCG_BAR_LDAQ]     = OPC_FENCE_R_RW,
->>> +        [TCG_BAR_STRL]     = OPC_FENCE_RW_W,
->>> +        [TCG_BAR_SC]       = OPC_FENCE_RW_RW,
->>> +    };
->>> +    tcg_out32(s, fence[a0 & TCG_MO_ALL]);
->>> +}
+>>> +    RISCVInsn op = tcg_brcond_to_riscv[cond].op;
+>>> +    bool swap = tcg_brcond_to_riscv[cond].swap;
 >>> +
+>>> +    tcg_out_opc_branch(s, op, swap ? arg2 : arg1, swap ? arg1 : arg2, 0);
 >>
->> TCG_MO_* and TCG_BAR_* are two different bitmasks, or'ed together.
->> Which you've separated by "& TCG_MO_ALL".  Thus the TCG_BAR_* constants should
->> not appear in this table.
+>> You might want to tcg_debug_assert(op != 0) here.
 >>
+>>> +    if (l->has_value) {
+>>> +        reloc_sbimm12(s->code_ptr - 1, l->u.value_ptr);
 >>
->>> +static void * const qemu_ld_helpers[16] = {
->>> +    [MO_UB]   = helper_ret_ldub_mmu,
->>> +    [MO_SB]   = helper_ret_ldsb_mmu,
->>> +    [MO_LEUW] = helper_le_lduw_mmu,
->>> +    [MO_LESW] = helper_le_ldsw_mmu,
->>> +    [MO_LEUL] = helper_le_ldul_mmu,
->>> +    [MO_LESL] = helper_le_ldsl_mmu,
->>> +    [MO_LEQ]  = helper_le_ldq_mmu,
->>> +    [MO_BEUW] = helper_be_lduw_mmu,
->>> +    [MO_BESW] = helper_be_ldsw_mmu,
->>> +    [MO_BEUL] = helper_be_ldul_mmu,
->>> +    [MO_BESL] = helper_be_ldsl_mmu,
->>> +    [MO_BEQ]  = helper_be_ldq_mmu,
->>> +};
+>> I'm concerned about the conditional branch range.  +-4K isn't much to work
+>> with.  The minimum we have for other hosts is +-32K.
 >>
->> The LESL and BESL functions will not be present for rv32 -> link error.  Here
->> you do need an ifdef.
+>> We have two options: (1) greatly reduce the max size of the TB for this host;
+>> (2) be prepared to emit a 2 insn sequence: conditional branch across
+>> unconditional branch, with forward branches that turn out to be small patched
+>> with a nop.
 >>
->>> +        } else {
->>> +            adj = cmp_off - sextract32(cmp_off, 0, 12);
->>> +            tcg_debug_assert(add_off - adj >= -0x1000
->>> +                             && add_off - adj < 0x1000);
->>> +
->>> +            tcg_out_opc_upper(s, OPC_LUI, base, adj);
->>> +            tcg_out_opc_reg(s, OPC_ADD, base, TCG_REG_ZERO, TCG_AREG0);
->>
->> base, base, TCG_AREG0.
->>
->>> +    /* Compare masked address with the TLB entry. */
->>> +    label_ptr[0] = s->code_ptr;
->>> +    tcg_out_opc_branch(s, OPC_BNE, TCG_REG_TMP0, TCG_REG_TMP1, 0);
->>
->> Another case of a potential out-of-range branch.
->>
->> It might be worthwhile to move all of this out-of-line from the start, where
->> that branch will always be short.  See
->>
->> http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg02234.html
+>> FWIW, the first case would be done via modification of tcg_op_buf_full.  You
+>> might have to go as low as 500 opcodes, I'm not sure.
 > 
-> That does look cool, but it's not in the tree yet.
+> How do we do option 2?
 
-No, but it'll probably be in tree before this code is.  ;-)
-I'll put it into my tcg-next-for-4.0 branch, and you can base off that.
+If l->has_value, just check the actual range.  But of course backward branching
+isn't that common in tcg generated code.  Most branches within the TB are short
+forward branches, but we also don't know how short is short.
 
-> Otherwise can we directly just call tcg_out_brcond()?
+But every TB begins with a test of env->exit_code and a conditional branch to
+the end of the block, where we place some code to return to the main loop and
+return the pointer to the TB at which we exited.  Thus every TB has a branch
+that spans the size of the entire TB.
 
-Not quite, because there's no label structure.  But you can break out
-subroutines and use those.
+So, invent (or repurpose) an R_RISCV_FOO value.  It doesn't matter which
+because it's private within tcg/riscv/.  Just add some commentary.  (See e.g.
+tcg/sparc/ and its use of R_SPARC_13.)
 
-> PS: Thanks for your review. I have gone through most of your comments.
-> I now don't see any segfaults when running. My guest still doesn't
-> boot, but it's getting further then it used to :)
+While generating code, emit the conditional branch as normal; leave the unknown
+destination 0 for now.  Emit a nop as the second insn.
 
-Excellent.
+When resolving R_RISCV_FOO, if the conditional branch is in range, great!  Just
+patch it.  If it is out of range, then you need to edit the conditional branch
+to reverse the condition (insn ^ (1 << 12)) and branch to pc+8, i.e. over the
+next instruction.  Which was a nop during generation, but you will now install
+jal r0,dest going to the real destination.
 
 
 r~
