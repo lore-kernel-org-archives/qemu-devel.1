@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gPXma-0005Gv-Qm
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 14:03:30 -0500
+	(envelope-from <groeck7@gmail.com>) id 1gPXoO-0006Fu-54
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 14:05:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gPXmZ-0002Ln-4n
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 14:03:28 -0500
+	(envelope-from <groeck7@gmail.com>) id 1gPXoE-0003bJ-NU
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 14:05:14 -0500
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Wed, 21 Nov 2018 11:04:55 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20181121190455.GA9571@roeck-us.net>
+References: <1542754831-25567-1-git-send-email-linux@roeck-us.net>
+	<CAKmqyKNNAkBY6o06=jokZcMipmtdFyX5zq9W-cQvx96R=RzzRg@mail.gmail.com>
+	<d793d87c-3825-9a72-971d-856291286d57@roeck-us.net>
+	<CAKmqyKNEE-9kA+yhcbs5cbGhD_Miza=hvXSrJ5F+V6fkYR0yfQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <cover.1542819633.git.alistair.francis@wdc.com>
-	<85a3fe487514f4cb659ef7e6b88762ebc567c1b8.1542819633.git.alistair.francis@wdc.com>
-	<e7398997-ba1a-9182-6be0-da8e43e920df@deltatee.com>
-	<CAKmqyKMtTqi=D-PKZFnt40MaA8+e6Sj8nUr0VmBFajScw1MYng@mail.gmail.com>
-	<ffd80fff-55bf-0578-4fe5-00f07ef6bdc6@deltatee.com>
-In-Reply-To: <ffd80fff-55bf-0578-4fe5-00f07ef6bdc6@deltatee.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 21 Nov 2018 11:02:57 -0800
-Message-ID: <CAKmqyKMhpAPXFF5cQkqKYcNjD5aciDW7Ek53+W=1XNp3RGFLmw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 5/6] hw/riscv/sifive_u: Connect
- the Xilinx PCIe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKmqyKNEE-9kA+yhcbs5cbGhD_Miza=hvXSrJ5F+V6fkYR0yfQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] riscv: virt: Fix pcie memory ranges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +26,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org, Guenter Roeck <linux@roeck-us.net>, Andrea Bolognani <abologna@redhat.com>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Andrea Bolognani <abologna@redhat.com>, paul.walmsley@sifive.com
 
-On Wed, Nov 21, 2018 at 10:50 AM Logan Gunthorpe <logang@deltatee.com> wrote:
->
->
->
-> On 2018-11-21 11:32 a.m., Alistair Francis wrote:
-> > That seems like either a kernel or bbl issue.
+On Wed, Nov 21, 2018 at 08:00:45AM -0800, Alistair Francis wrote:
+> On Tue, Nov 20, 2018 at 8:08 PM Guenter Roeck <linux@roeck-us.net> wrote:
 > >
-> > You need to make sure that bbl doesn't edit the device tree (to add
-> > the Microsemi device or remove the Xilinx one) and ensure your kernel
-> > supports the Xilinx one.
->
-> Ok, how do I stop bbl from editing the device tree? I have a kernel with
-> Xilinx PCI support but it fails initializing on that machine (see below).
-
-You should just be able to edit the source, grep for "microsemi".
-
-Do you see the MicroSemi PCIe probe in your dmesg?
-
->
-> >> In any case, it would be nice if the Microsemi/Xilinx confusion was at
-> >> least explained in the commit message.
+> > Hi Alistair,
 > >
-> > What should we say? The QEMU machine accurately models the real
-> > hardware which reports a Xilinx PCIe. The confusion generally appears
-> > above QEMU where people are used to using the MicroSemi one.
->
-> Maybe describing the bbl issue and what to do to overcome it would be
-> sufficient.
+> > On 11/20/18 4:43 PM, Alistair Francis wrote:
+> > > On Tue, Nov 20, 2018 at 3:01 PM Guenter Roeck <linux@roeck-us.net> wrote:
+> > >>
+> > >> - Provide separate maps for VIRT_PCIE_MMIO (32 bit) and
+> > >>    VIRT_PCIE_MMIO_HIGH (64 bit)
+> > >> - VIRT_PCIE_PIO is for IO ports, not for the physical address
+> > >> - VIRT_PCIE_ECAM size reduced to size needed to cover 256 ports
+> > >> - Use memmap[VIRT_PCIE_ECAM].size instead of memmap[VIRT_PCIE_ECAM].base
+> > >>    to calculate the bus number range
+> > >> - Use qemu_fdt_setprop_sized_cells() to create reg and ranges entries
+> > >> - Fix parameters for gpex_pcie_init()
+> > >>    (ECAM and MMIO addresses were swapped)
+> > >>
+> > >> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> > >
+> > > Hey Gunter,
+> > >
+> > > Thanks for the patch! This was causing me all kinds of headaches.
+> > > Unfortunately I had managed to figure out the memory addresses thanks
+> > > to Bin Meng's help.
+> > >
+> > > You can see the new tree here:
+> > > https://github.com/alistair23/qemu/tree/mainline/alistair/sifive_pcie.next
+> > >
+> >
+> > Looks good. With your patch series applied on top of v3.1-rc2 and usb.mak
+> > added to the build:
+> >
+> > Building riscv:virt:defconfig:initrd ... running ....... passed
+> > Building riscv:virt:defconfig:virtio-blk:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:virtio:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:virtio-pci:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:mmc:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:nvme:rootfs ... running ................... passed
+> > Building riscv:virt:defconfig:usb-ohci:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:usb-ehci:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:usb-xhci:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:usb-uas-ehci:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:usb-uas-xhci:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:scsi[53C810]:rootfs ... running ........ passed
+> > Building riscv:virt:defconfig:scsi[53C895A]:rootfs ... running ........ passed
+> > Building riscv:virt:defconfig:scsi[MEGASAS]:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:scsi[MEGASAS2]:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:scsi[FUSION]:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:scsi[virtio]:rootfs ... running ....... passed
+> > Building riscv:virt:defconfig:scsi[virtio-pci]:rootfs ... running ....... passed
+> 
+> Awesome! Can I add your tested by tag?
+> 
+Sure, go ahead.
 
-This is not really a QEMU problem though. If you tried to use the
-Xilinx PCIe board on hardware you would see the same thing. Most
-people don't have a MicroSemi board so most aren't using bbl versions
-that are editing it into their device tree.
+Guenter
 
-Alistair
-
->
-> Logan
->
->
->
->
->
-> [    0.312000] xilinx-pcie 2000000000.pci: PCIe Link is UP
-> [    0.316000] xilinx-pcie 2000000000.pci: host bridge /pci@2000000000
-> ranges:
-> [    0.316000] xilinx-pcie 2000000000.pci:   No bus range found for
-> /pci@2000000000, using [bus 00-ff]
-> [    0.320000] xilinx-pcie 2000000000.pci:   MEM 0x40000000..0x5fffffff
-> -> 0x40000000
-> [    0.320000] xilinx-pcie 2000000000.pci: PCI host bridge to bus 0000:00
-> [    0.324000] pci_bus 0000:00: root bus resource [bus 00-ff]
-> [    0.324000] pci_bus 0000:00: root bus resource [mem
-> 0x40000000-0x5fffffff]
-> [    0.332000] pci 0000:00:00.0: bridge configuration invalid ([bus
-> 00-00]), reconfiguring
-> [    0.336000] pci_bus 0000:01: extended config space not accessible
-> [    0.340000] pci 0000:00:00.0: PCI bridge to [bus 01]
+> Alistair
+> 
+> >
+> > Guenter
