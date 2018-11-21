@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gPUsA-00033b-JC
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:57:03 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gPV9w-000836-KI
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 11:15:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1gPUs7-0002kw-9c
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:57:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45220)
+	(envelope-from <ehabkost@redhat.com>) id 1gPUxy-0002AU-8V
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 11:03:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1gPUs6-0002hC-UJ
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:56:59 -0500
-References: <20181121153036.2941-1-famz@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <9f2d3627-cbe9-3c51-4650-1b7e1e278999@redhat.com>
-Date: Wed, 21 Nov 2018 10:56:56 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gPUxy-00028r-2i
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 11:03:02 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4890261D07
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 16:03:01 +0000 (UTC)
+Date: Wed, 21 Nov 2018 14:02:43 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181121160243.GW4755@habkost.net>
+References: <20181120165300.18993-1-wainersm@redhat.com>
+	<20181120190238.GR4755@habkost.net>
+	<20181121155559.GB32503@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20181121153036.2941-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Update email address for Fam
- Zheng
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181121155559.GB32503@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] scripts/qemu.py: allow to launch the VM
+ without a monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,110 +35,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: fam@euphon.net, pbonzini@redhat.com, stefanha@redhat.com, alex.bennee@linaro.org
+To: Caio Carrara <ccarrara@redhat.com>
+Cc: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org, crosa@redhat.com, philmd@redhat.com
 
+On Wed, Nov 21, 2018 at 01:56:00PM -0200, Caio Carrara wrote:
+> Hello Wainer and Eduardo,
+> 
+> On Tue, Nov 20, 2018 at 05:02:38PM -0200, Eduardo Habkost wrote:
+> > On Tue, Nov 20, 2018 at 11:53:00AM -0500, Wainer dos Santos Moschetta wrote:
+> > > QEMUMachine launches the VM with a monitor enabled, afterwards
+> > > a qmp connection is attempted on _post_launch(). In case
+> > > the QEMU process exits with an error, qmp.accept() reaches
+> > > timeout and raises an exception.
+> > > 
+> > > But sometimes you don't need that monitor. As an example,
+> > > when a test launches the VM expects its immediate crash,
+> > > and only intend to check the process's return code. In this
+> > > case the fact that launch() tries to establish the qmp
+> > > connection (ending up in an exception) is troublesome.
+> > > 
+> > > So this patch adds the disable_qmp() that allow to
+> > > launch the VM without creating the monitor machinery.
+> > > 
+> {...}
+> > > +
+> > > +        self._args.extend(['-chardev', moncdev, '-mon', 'chardev=mon,mode=control'])
+> > 
+> > This will extend self._args multiple times if making a
+> > .shutdown()/.launch() cycle:
+> > 
+> {...}
+> > 
+> > Why did you move this code outside _base_args(), where it already
+> > worked without relying on method side-effects and required no
+> > extra state to be kept inside self._args?
+> 
+> Eduardo, I think the purpose was to get a way to set up the monitor
+> conditionally. So the arguments related with monitor was moved out
+> _base_args() method and put into the _setup_qmp(). However, as you
+> showed, this implementation has undesired side-effects.
+> 
+> Wainer, probably the most straightforward way to add this capability to
+> QEMUMachine is to change the _base_args() method to only include monitor
+> arguments when necessary. Something like this:
+> 
+> ```
+>     # create a proper method to get moncdev_args
+>     def _get_moncdev_args():
+>         if isinstance(self._monitor_address, tuple):
+>             return "socket,id=mon,host=%s,port=%s" % (
+>                 self._monitor_address[0],
+>                 self._monitor_address[1])
+>         else:
+>             return 'socket,id=mon,path=%s' % self._vm_monitor
+> 
+>     # update _base_args method to use new attribute _with_qmp
+>     def _base_args(self):
+>         args = ['-display', 'none', '-vga', 'none']
+>         if self._with_qmp:
+>             args.extend(['-chardev', self._get_moncdev_args(),
+>                          '-mon', 'chardev=mon,mode=control'])
+>         if self._machine is not None:
+> ```
+> 
+> Does it make sense?
 
+Yes, this is what I was expecting.  Thanks!
 
-On 11/21/18 10:30 AM, Fam Zheng wrote:
-> Since I am about to change company, update the email address in
-> MAINTAINERS to my personal one. Depending on responsibility changes I
-> may eventually fade out in some of the maintained areas, but that will
-> be figured out afterward, or maybe I'll use the work email later. For
-> now, just do a search and replace.
->=20
-> Signed-off-by: Fam Zheng <fam@euphon.net>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-Best of luck!
-
-> ---
->  MAINTAINERS | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 1032406c56..906d40d06d 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1252,7 +1252,7 @@ T: git https://github.com/jasowang/qemu.git net
-> =20
->  SCSI
->  M: Paolo Bonzini <pbonzini@redhat.com>
-> -R: Fam Zheng <famz@redhat.com>
-> +R: Fam Zheng <fam@euphon.net>
->  S: Supported
->  F: include/hw/scsi/*
->  F: hw/scsi/*
-> @@ -1565,7 +1565,7 @@ T: git https://repo.or.cz/qemu/kevin.git block
-> =20
->  Block I/O path
->  M: Stefan Hajnoczi <stefanha@redhat.com>
-> -M: Fam Zheng <famz@redhat.com>
-> +M: Fam Zheng <fam@euphon.net>
->  L: qemu-block@nongnu.org
->  S: Supported
->  F: util/async.c
-> @@ -1579,7 +1579,7 @@ T: git https://github.com/stefanha/qemu.git block
-> =20
->  Block SCSI subsystem
->  M: Paolo Bonzini <pbonzini@redhat.com>
-> -R: Fam Zheng <famz@redhat.com>
-> +R: Fam Zheng <fam@euphon.net>
->  L: qemu-block@nongnu.org
->  S: Supported
->  F: include/scsi/*
-> @@ -1611,7 +1611,7 @@ F: qapi/transaction.json
->  T: git https://repo.or.cz/qemu/armbru.git block-next
-> =20
->  Dirty Bitmaps
-> -M: Fam Zheng <famz@redhat.com>
-> +M: Fam Zheng <fam@euphon.net>
->  M: John Snow <jsnow@redhat.com>
->  L: qemu-block@nongnu.org
->  S: Supported
-> @@ -1985,7 +1985,7 @@ F: tests/test-throttle.c
->  L: qemu-block@nongnu.org
-> =20
->  UUID
-> -M: Fam Zheng <famz@redhat.com>
-> +M: Fam Zheng <fam@euphon.net>
->  S: Supported
->  F: util/uuid.c
->  F: include/qemu/uuid.h
-> @@ -2116,7 +2116,7 @@ F: disas/tci.c
->  Block drivers
->  -------------
->  VMDK
-> -M: Fam Zheng <famz@redhat.com>
-> +M: Fam Zheng <fam@euphon.net>
->  L: qemu-block@nongnu.org
->  S: Supported
->  F: block/vmdk.c
-> @@ -2202,13 +2202,13 @@ F: block/gluster.c
->  T: git https://github.com/codyprime/qemu-kvm-jtc.git block
-> =20
->  Null Block Driver
-> -M: Fam Zheng <famz@redhat.com>
-> +M: Fam Zheng <fam@euphon.net>
->  L: qemu-block@nongnu.org
->  S: Supported
->  F: block/null.c
-> =20
->  NVMe Block Driver
-> -M: Fam Zheng <famz@redhat.com>
-> +M: Fam Zheng <fam@euphon.net>
->  L: qemu-block@nongnu.org
->  S: Supported
->  F: block/nvme*
-> @@ -2339,7 +2339,7 @@ Build and test automation
->  -------------------------
->  Build and test automation
->  M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> -M: Fam Zheng <famz@redhat.com>
-> +M: Fam Zheng <fam@euphon.net>
->  R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->  L: qemu-devel@nongnu.org
->  S: Maintained
->=20
+-- 
+Eduardo
