@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=856356900=Paul.Durrant@citrix.com>)
-	id 1gPUBB-0005bg-2T
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gPUBP-00060v-MM
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=856356900=Paul.Durrant@citrix.com>)
-	id 1gPUB7-0003m3-7p
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:37 -0500
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Wed, 21 Nov 2018 15:11:59 +0000
-Message-ID: <20181121151211.15997-7-paul.durrant@citrix.com>
-In-Reply-To: <20181121151211.15997-1-paul.durrant@citrix.com>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gPUBO-000491-Bn
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:51 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39744)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gPUBM-00041u-Cf
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:49 -0500
+Received: by mail-oi1-x244.google.com with SMTP id 192-v6so4793533oii.6
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 07:12:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 06/18] xen: add grant table interface for
- XenDevice-s
+In-Reply-To: <CAFEAcA983Q16B8y1j3msg31BtM5LXhUcB5ouyg6Dp1y-aUaDpw@mail.gmail.com>
+References: <D965412A-A975-4660-BEC5-6FBF34E35C45@gmail.com>
+	<CAFEAcA983Q16B8y1j3msg31BtM5LXhUcB5ouyg6Dp1y-aUaDpw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 21 Nov 2018 15:12:25 +0000
+Message-ID: <CAFEAcA8WMh8AnD8X5eMz7YX_c5z0Aw8_ydZ-0poY5Sv9mnxUHw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Fix for crashes and non-responsive UI on
+ macOS Mojave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,232 +31,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+To: Berkus Decker <berkus@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-The legacy PV backend infrastructure provides functions to map, unmap and
-copy pages granted by frontends. Similar functionality will be required
-by XenDevice implementations so this patch adds the necessary support.
+(Hi Gerd -- I have a question at the bottom of this email
+about the thread/locking semantics of the UI midlayer...)
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
----
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
----
- hw/xen/xen-bus.c         | 145 +++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/xen/xen-bus.h |  25 ++++++++
- 2 files changed, 170 insertions(+)
+On 20 November 2018 at 12:59, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+> On 11 November 2018 at 21:24, Berkus Decker <berkus@gmail.com> wrote:
+>> It seems that Cocoa checks are stricter on Mojave and some callbacks tha=
+t worked from non-GUI thread on High Sierra are no longer working.
+>>
+>> The fixes included here are:
+>>
+>> * Deferring qemu_main() to another thread so that the actual main thread=
+ is reserved for the Cocoa UI; it also removes blocking from applicationDid=
+FinishLoading: delegate. I beleive this alone caused complete UI blockage o=
+n Mojave.
+>> * Deferring UI-related updates in callbacks to the UI thread using invok=
+eOnMainThread helper function. This function uses DDInvocationGrabber objec=
+t courtesy of Dave Dribin, licensed under MIT license.
+>> Here=E2=80=99s relevant blog post for his code: https://www.dribin.org/d=
+ave/blog/archives/2008/05/22/invoke_on_main_thread/
+>>
+>> NSInvocation is used here instead of plain performSelectorOnMainThread:w=
+ithObject:waitUntilDone: because we want to be able to pass non-id types to=
+ the handlers.
+>>
+>> These changes are ought to work on OSX 10.6, although I don=E2=80=99t ha=
+ve a machine handy to test it.
+>>
+>> Fixes https://bugs.launchpad.net/qemu/+bug/1802684
+>
+> Hi; thanks for these patches. I haven't tried running them yet
+> (I should be able to get to that tomorrow)
 
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 99988f8568..7a152d2a2f 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -447,6 +447,138 @@ static void xen_device_frontend_destroy(XenDevice *xendev)
-     g_free(xendev->frontend_path);
- }
- 
-+void xen_device_set_max_grant_refs(XenDevice *xendev, unsigned int nr_refs,
-+                                   Error **errp)
-+{
-+    if (xengnttab_set_max_grants(xendev->xgth, nr_refs)) {
-+        error_setg_errno(errp, errno, "xengnttab_set_max_grants failed");
-+    }
-+}
-+
-+void *xen_device_map_grant_refs(XenDevice *xendev, uint32_t *refs,
-+                                unsigned int nr_refs, int prot,
-+                                Error **errp)
-+{
-+    void *map = xengnttab_map_domain_grant_refs(xendev->xgth, nr_refs,
-+                                                xendev->frontend_id, refs,
-+                                                prot);
-+
-+    if (!map) {
-+        error_setg_errno(errp, errno,
-+                         "xengnttab_map_domain_grant_refs failed");
-+    }
-+
-+    return map;
-+}
-+
-+void xen_device_unmap_grant_refs(XenDevice *xendev, void *map,
-+                                 unsigned int nr_refs, Error **errp)
-+{
-+    if (xengnttab_unmap(xendev->xgth, map, nr_refs)) {
-+        error_setg_errno(errp, errno, "xengnttab_unmap failed");
-+    }
-+}
-+
-+static void compat_copy_grant_refs(XenDevice *xendev, bool to_domain,
-+                                   XenDeviceGrantCopySegment segs[],
-+                                   unsigned int nr_segs, Error **errp)
-+{
-+    uint32_t *refs = g_new(uint32_t, nr_segs);
-+    int prot = to_domain ? PROT_WRITE : PROT_READ;
-+    void *map;
-+    unsigned int i;
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        XenDeviceGrantCopySegment *seg = &segs[i];
-+
-+        refs[i] = to_domain ? seg->dest.foreign.ref :
-+            seg->source.foreign.ref;
-+    }
-+
-+    map = xengnttab_map_domain_grant_refs(xendev->xgth, nr_segs,
-+                                          xendev->frontend_id, refs,
-+                                          prot);
-+    if (!map) {
-+        error_setg_errno(errp, errno,
-+                         "xengnttab_map_domain_grant_refs failed");
-+        goto done;
-+    }
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        XenDeviceGrantCopySegment *seg = &segs[i];
-+        void *page = map + (i * XC_PAGE_SIZE);
-+
-+        if (to_domain) {
-+            memcpy(page + seg->dest.foreign.offset, seg->source.virt,
-+                   seg->len);
-+        } else {
-+            memcpy(seg->dest.virt, page + seg->source.foreign.offset,
-+                   seg->len);
-+        }
-+    }
-+
-+    if (xengnttab_unmap(xendev->xgth, map, nr_segs)) {
-+        error_setg_errno(errp, errno, "xengnttab_unmap failed");
-+    }
-+
-+done:
-+    g_free(refs);
-+}
-+
-+void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
-+                                XenDeviceGrantCopySegment segs[],
-+                                unsigned int nr_segs, Error **errp)
-+{
-+    xengnttab_grant_copy_segment_t *xengnttab_segs;
-+    unsigned int i;
-+
-+    if (!xendev->feature_grant_copy) {
-+        compat_copy_grant_refs(xendev, to_domain, segs, nr_segs, errp);
-+        return;
-+    }
-+
-+    xengnttab_segs = g_new0(xengnttab_grant_copy_segment_t, nr_segs);
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        XenDeviceGrantCopySegment *seg = &segs[i];
-+        xengnttab_grant_copy_segment_t *xengnttab_seg = &xengnttab_segs[i];
-+
-+        if (to_domain) {
-+            xengnttab_seg->flags = GNTCOPY_dest_gref;
-+            xengnttab_seg->dest.foreign.domid = xendev->frontend_id;
-+            xengnttab_seg->dest.foreign.ref = seg->dest.foreign.ref;
-+            xengnttab_seg->dest.foreign.offset = seg->dest.foreign.offset;
-+            xengnttab_seg->source.virt = seg->source.virt;
-+        } else {
-+            xengnttab_seg->flags = GNTCOPY_source_gref;
-+            xengnttab_seg->source.foreign.domid = xendev->frontend_id;
-+            xengnttab_seg->source.foreign.ref = seg->source.foreign.ref;
-+            xengnttab_seg->source.foreign.offset =
-+                seg->source.foreign.offset;
-+            xengnttab_seg->dest.virt = seg->dest.virt;
-+        }
-+
-+        xengnttab_seg->len = seg->len;
-+    }
-+
-+    if (xengnttab_grant_copy(xendev->xgth, nr_segs, xengnttab_segs)) {
-+        error_setg_errno(errp, errno, "xengnttab_grant_copy failed");
-+        goto done;
-+    }
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        xengnttab_grant_copy_segment_t *xengnttab_seg = &xengnttab_segs[i];
-+
-+        if (xengnttab_seg->status != GNTST_okay) {
-+            error_setg(errp, "xengnttab_grant_copy seg[%u] failed", i);
-+            break;
-+        }
-+    }
-+
-+done:
-+    g_free(xengnttab_segs);
-+}
-+
- static void xen_device_unrealize(DeviceState *dev, Error **errp)
- {
-     XenDevice *xendev = XEN_DEVICE(dev);
-@@ -470,6 +602,10 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
-     xen_device_frontend_destroy(xendev);
-     xen_device_backend_destroy(xendev);
- 
-+    if (xendev->xgth) {
-+        xengnttab_close(xendev->xgth);
-+    }
-+
-     g_free(xendev->name);
- }
- 
-@@ -511,6 +647,15 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
- 
-     trace_xen_device_realize(type, xendev->name);
- 
-+    xendev->xgth = xengnttab_open(NULL, 0);
-+    if (!xendev->xgth) {
-+        error_setg_errno(errp, errno, "failed xengnttab_open");
-+        goto unrealize;
-+    }
-+
-+    xendev->feature_grant_copy =
-+        (xengnttab_grant_copy(xendev->xgth, 0, NULL) == 0);
-+
-     xen_device_backend_create(xendev, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 954149e51b..db14d49027 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -22,6 +22,8 @@ typedef struct XenDevice {
-     enum xenbus_state backend_state, frontend_state;
-     Notifier exit;
-     XenWatch *frontend_state_watch;
-+    xengnttab_handle *xgth;
-+    bool feature_grant_copy;
- } XenDevice;
- 
- typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
-@@ -77,4 +79,27 @@ void xen_device_backend_set_state(XenDevice *xendev,
-                                   enum xenbus_state state);
- enum xenbus_state xen_device_backend_get_state(XenDevice *xendev);
- 
-+void xen_device_set_max_grant_refs(XenDevice *xendev, unsigned int nr_refs,
-+                                   Error **errp);
-+void *xen_device_map_grant_refs(XenDevice *xendev, uint32_t *refs,
-+                                unsigned int nr_refs, int prot,
-+                                Error **errp);
-+void xen_device_unmap_grant_refs(XenDevice *xendev, void *map,
-+                                 unsigned int nr_refs, Error **errp);
-+
-+typedef struct XenDeviceGrantCopySegment {
-+    union {
-+        void *virt;
-+        struct {
-+            uint32_t ref;
-+            off_t offset;
-+        } foreign;
-+    } source, dest;
-+    size_t len;
-+} XenDeviceGrantCopySegment;
-+
-+void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
-+                                XenDeviceGrantCopySegment segs[],
-+                                unsigned int nr_segs, Error **errp);
-+
- #endif /* HW_XEN_BUS_H */
--- 
-2.11.0
+On High Sierra this does run for me, but seems to
+introduce a bug:
+
+ * Run qemu-system-x86_64 with no arguments
+ * Let the BIOS get to the "No bootable devices" message
+ * Press a key in the QEMU window
+
+QEMU hits an assert:
+ERROR:/Users/pm215/src/qemu/accel/tcg/tcg-all.c:42:tcg_handle_interrupt:
+assertion failed: (qemu_mutex_iothread_locked())
+
+with this backtrace:
+
+* thread #1, queue =3D 'com.apple.main-thread', stop reason =3D signal SIGA=
+BRT
+  * frame #0: 0x00007fff7b123b66 libsystem_kernel.dylib`__pthread_kill + 10
+    frame #1: 0x00007fff7b2ee080 libsystem_pthread.dylib`pthread_kill + 333
+    frame #2: 0x00007fff7b07f1ae libsystem_c.dylib`abort + 127
+    frame #3: 0x00000001014f7f19 libglib-2.0.0.dylib`g_assertion_message + =
+407
+    frame #4: 0x00000001014f7f77
+libglib-2.0.0.dylib`g_assertion_message_expr + 94
+    frame #5: 0x00000001000a3509
+qemu-system-x86_64`tcg_handle_interrupt(cpu=3D0x0000000103883200,
+mask=3D2) at tcg-all.c:42
+    frame #6: 0x00000001000e8222
+qemu-system-x86_64`cpu_interrupt(cpu=3D0x0000000103883200, mask=3D2) at
+cpu.h:855
+    frame #7: 0x00000001000e70ca
+qemu-system-x86_64`apic_local_deliver(s=3D0x0000000101e40010, vector=3D3)
+at apic.c:156
+    frame #8: 0x00000001000e6f71
+qemu-system-x86_64`apic_deliver_pic_intr(dev=3D0x0000000101e40010,
+level=3D1) at apic.c:173
+    frame #9: 0x000000010010ff9e
+qemu-system-x86_64`pic_irq_request(opaque=3D0x0000000000000000, irq=3D0,
+level=3D1) at pc.c:195
+    frame #10: 0x0000000100297f3b
+qemu-system-x86_64`qemu_set_irq(irq=3D0x0000000101cdac30, level=3D1) at
+irq.c:45
+    frame #11: 0x000000010030073a
+qemu-system-x86_64`qemu_irq_raise(irq=3D0x0000000101cdac30) at irq.h:16
+    frame #12: 0x00000001003006ad
+qemu-system-x86_64`pic_update_irq(s=3D0x0000000101cdada0) at i8259.c:111
+    frame #13: 0x0000000100300d1c
+qemu-system-x86_64`pic_set_irq(opaque=3D0x0000000101cdada0, irq=3D1,
+level=3D1) at i8259.c:153
+    frame #14: 0x0000000100297f3b
+qemu-system-x86_64`qemu_set_irq(irq=3D0x0000000101cdbf50, level=3D1) at
+irq.c:45
+    frame #15: 0x000000010010cad8
+qemu-system-x86_64`gsi_handler(opaque=3D0x0000000101cc7760, n=3D1,
+level=3D1) at pc.c:118
+    frame #16: 0x0000000100297f3b
+qemu-system-x86_64`qemu_set_irq(irq=3D0x0000000101cc7410, level=3D1) at
+irq.c:45
+    frame #17: 0x00000001002fa162
+qemu-system-x86_64`kbd_update_irq(s=3D0x0000000101e5cef8) at pckbd.c:181
+    frame #18: 0x00000001002f967f
+qemu-system-x86_64`kbd_update_kbd_irq(opaque=3D0x0000000101e5cef8,
+level=3D1) at pckbd.c:193
+    frame #19: 0x00000001002fa603
+qemu-system-x86_64`ps2_queue(s=3D0x0000000101e5e490, b=3D22) at ps2.c:213
+    frame #20: 0x00000001002fadd4
+qemu-system-x86_64`ps2_put_keycode(opaque=3D0x0000000101e5e490,
+keycode=3D60) at ps2.c:267
+    frame #21: 0x00000001002fd10f
+qemu-system-x86_64`ps2_keyboard_event(dev=3D0x0000000101e5e490,
+src=3D0x0000000000000000, evt=3D0x0000000101af02c0) at ps2.c:470
+    frame #22: 0x0000000100491e2c
+qemu-system-x86_64`qemu_input_event_send_impl(src=3D0x0000000000000000,
+evt=3D0x0000000101af02c0) at input.c:346
+    frame #23: 0x000000010046c8d5
+qemu-system-x86_64`replay_input_event(src=3D0x0000000000000000,
+evt=3D0x0000000101af02c0) at replay-input.c:128
+    frame #24: 0x0000000100491d5b
+qemu-system-x86_64`qemu_input_event_send(src=3D0x0000000000000000,
+evt=3D0x0000000101af02c0) at input.c:375
+    frame #25: 0x0000000100492297
+qemu-system-x86_64`qemu_input_event_send_key(src=3D0x0000000000000000,
+key=3D0x00000001159037f0, down=3Dtrue) at input.c:419
+    frame #26: 0x0000000100491c71
+qemu-system-x86_64`qemu_input_event_send_key_qcode(src=3D0x0000000000000000=
+,
+q=3DQ_KEY_CODE_U, down=3Dtrue) at input.c:441
+    frame #27: 0x0000000100496a0b qemu-system-x86_64`-[QemuCocoaView
+handleEvent:](self=3D0x0000000101c2eef0, _cmd=3D"handleEvent:",
+event=3D0x0000000101cebdf0) at cocoa.m:767
+    frame #28: 0x0000000100495b4e qemu-system-x86_64`-[QemuCocoaView
+refresh](self=3D0x0000000101c2eef0, _cmd=3D"refresh") at cocoa.m:541
+    frame #29: 0x00007fff5301139c CoreFoundation`__invoking___ + 140
+    frame #30: 0x00007fff53011270 CoreFoundation`-[NSInvocation invoke] + 3=
+20
+    frame #31: 0x00007fff551730b5 Foundation`__NSThreadPerformPerform + 334
+    frame #32: 0x00007fff53031be1
+CoreFoundation`__CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__
++ 17
+    frame #33: 0x00007fff530e94bc CoreFoundation`__CFRunLoopDoSource0 + 108
+    frame #34: 0x00007fff53014b90 CoreFoundation`__CFRunLoopDoSources0 + 20=
+8
+    frame #35: 0x00007fff5301400d CoreFoundation`__CFRunLoopRun + 1293
+    frame #36: 0x00007fff53013867 CoreFoundation`CFRunLoopRunSpecific + 487
+    frame #37: 0x00007fff522f3d96 HIToolbox`RunCurrentEventLoopInMode + 286
+    frame #38: 0x00007fff522f3b06 HIToolbox`ReceiveNextEventCommon + 613
+    frame #39: 0x00007fff522f3884
+HIToolbox`_BlockUntilNextEventMatchingListInModeWithFilter + 64
+    frame #40: 0x00007fff505a3a73 AppKit`_DPSNextEvent + 2085
+    frame #41: 0x00007fff50d39e34 AppKit`-[NSApplication(NSEvent)
+_nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 3044
+    frame #42: 0x00007fff50598885 AppKit`-[NSApplication run] + 764
+    frame #43: 0x000000010049aac1 qemu-system-x86_64`main(argc=3D1,
+argv=3D0x00007ffeefbffa40) at cocoa.m:1575
+    frame #44: 0x00007fff7afd3015 libdyld.dylib`start + 1
+
+Something somewhere in this call chain should have taken
+the iothread lock, I assume, but I'm not sure where.
+
+Gerd -- what are the rules of the UI subsystem regarding
+multiple threads, and what threads are allowed to call
+UI functions like qemu_input_event_send_key_qcode(),
+from which threads, and whether they need to eg hold
+the iothread lock when they do so? There's no
+documentation on these functions in include/ui/input.h.
+
+(To fix a problem on OSX Mojave this patchset has moved
+which thread the UI executes on, so it is now always
+the main thread and not the thread which calls
+the QemuDisplay 'init' callback. That seems to break
+an implicit assumption in the UI layer.)
+
+thanks
+-- PMM
