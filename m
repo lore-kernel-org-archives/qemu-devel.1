@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gPQ0G-0001gE-Pc
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:45:05 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gPQ4P-0003yD-VG
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:49:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gPQ0D-0005PG-Jj
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:45:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52236)
+	(envelope-from <ppandit@redhat.com>) id 1gPQ4M-0004PR-Po
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:49:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44916)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gPQ0D-0005Ob-Ba
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:45:01 -0500
-References: <20181120092542.13102-1-david@redhat.com>
-	<20181120092542.13102-3-david@redhat.com>
-	<7d8d4e4f-bb70-5047-4e37-ed3672c89e02@redhat.com>
-	<87va4r7aou.fsf@dusky.pond.sub.org>
-	<64d0f403-2dd3-2841-b346-7634f37cf5b8@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <8dc6889b-eed7-34f2-8bef-c03b11dc435a@redhat.com>
-Date: Wed, 21 Nov 2018 11:44:57 +0100
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gPQ4M-0004Oi-Kq
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:49:18 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E41DA307D850
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 10:49:17 +0000 (UTC)
+Date: Wed, 21 Nov 2018 16:19:11 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20181112131835.xccqqvhu63xhh7pk@sirius.home.kraxel.org>
+Message-ID: <nycvar.YSQ.7.76.1811211613440.4176@xnncv>
+References: <20181030082340.17170-1-kraxel@redhat.com>
+	<20181112131835.xccqqvhu63xhh7pk@sirius.home.kraxel.org>
 MIME-Version: 1.0
-In-Reply-To: <64d0f403-2dd3-2841-b346-7634f37cf5b8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/9] cutils: Fix qemu_strtosz() &
- friends to reject non-finite sizes
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] fmops: fix off-by-one in AR_TABLE and
+ DR_TABLE array size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,74 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 20.11.18 21:41, Eric Blake wrote:
-> On 11/20/18 2:31 PM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->>
->>> On 11/20/18 3:25 AM, David Hildenbrand wrote:
->>>> qemu_strtosz() & friends reject NaNs, but happily accept inifities.
->>>
->>> s/inifities/infinities/
->>>
->>>> They shouldn't. Fix that.
->>>>
->>>> The fix makes use of qemu_strtod_finite(). To avoid ugly casts,
->>>> change the @end parameter of qemu_strtosz() & friends from char **
->>>> to const char **.
->>>>
->>>> Also, add two test cases, testing that "inf" and "NaN" are properly
->>>> rejected.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>    include/qemu/cutils.h |  6 +++---
->>>>    monitor.c             |  2 +-
->>>>    tests/test-cutils.c   | 24 +++++++++++++++++-------
->>>>    util/cutils.c         | 16 +++++++---------
->>>>    4 files changed, 28 insertions(+), 20 deletions(-)
->>>>
->>>
->>>> +++ b/util/cutils.c
->>>> @@ -206,20 +206,18 @@ static int64_t suffix_mul(char suffix, int64_t unit)
->>>>     * in *end, if not NULL. Return -ERANGE on overflow, Return -EINVAL on
->>>
->>> Pre-existing, but since you're touching this area: the second 'Return'
->>> is unusual capitalization for being mid-sentence.  You could even
->>> s/Return/of/
->>
->> "of"?
-> 
-> "or" (ouch - wrong time for my fingers to be slipping on the keyboard)
+ Hello Gerd,
 
-Shouldn't that be "and" and s/Return/Returns/
++-- On Mon, 12 Nov 2018, Gerd Hoffmann wrote --+
+| On Tue, Oct 30, 2018 at 09:23:40AM +0100, Gerd Hoffmann wrote:
+| > Fixes: CVE-2018-???
+| > Cc: P J P <ppandit@redhat.com>
+| 
+| ping, do we have a cve number meanwhile?
 
+No, the off-by-one does not seem to have an adverse effect. One byte past 
+AR_TABLE[75] array would likely read into DR_TABLE[75] array, which would 
+anyway be accessible to a driver. It does not seem to crash Qemu either. I 
+think it's more of a bug fix, than security fix. Hope that's okay.
 
-"Returns -ERANGE on overflow and -EINVAL on other errors".
-
-I can include that fixup (whetever version you guys prefer)
-
-> 
-> 
->>> It's some hairy code to think about, but I can't find anything wrong
->>> with it.  Typo fixes are minor, so
->>>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>
->> Thanks for your analysis, Eric.
->>
->> With the typo fixes:
-> 
-> Including the fix of my attempt at a typo fix :)
-> 
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-Thanks!
-
--- 
-
-Thanks,
-
-David / dhildenb
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
