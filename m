@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1gPXMH-0006YP-QJ
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:36:18 -0500
+	(envelope-from <philmd@redhat.com>) id 1gPXOQ-0000K9-9q
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:38:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1gPXMH-00006S-1H
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:36:17 -0500
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Wed, 21 Nov 2018 10:36:13 -0800
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <20181121183613.GA4874@roeck-us.net>
-References: <cover.1542819633.git.alistair.francis@wdc.com>
-	<85a3fe487514f4cb659ef7e6b88762ebc567c1b8.1542819633.git.alistair.francis@wdc.com>
-	<e7398997-ba1a-9182-6be0-da8e43e920df@deltatee.com>
+	(envelope-from <philmd@redhat.com>) id 1gPXOL-000397-L2
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:38:30 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40268)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPXOK-00033z-3w
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:38:25 -0500
+Received: by mail-wm1-f66.google.com with SMTP id q26so6743787wmf.5
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 10:38:22 -0800 (PST)
+References: <20181121182725.4263-1-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8a8dd805-7ec7-1cf5-afc3-ac78d54b1501@redhat.com>
+Date: Wed, 21 Nov 2018 19:38:19 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e7398997-ba1a-9182-6be0-da8e43e920df@deltatee.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 5/6] hw/riscv/sifive_u: Connect
- the Xilinx PCIe
+In-Reply-To: <20181121182725.4263-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: g_test_message does not need a
+ a trailing newline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>, "alistair23@gmail.com" <alistair23@gmail.com>, "abologna@redhat.com" <abologna@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com
 
-Hi Logan,
 
-On Wed, Nov 21, 2018 at 11:05:21AM -0700, Logan Gunthorpe wrote:
-> 
-> 
-> On 2018-11-21 10:02 a.m., Alistair Francis wrote:
-> > Connect the Xilinx PCIe device based on the information in the device
-> > tree stored in the ROM of the HiFish Unleashed board.
-> 
-> I only briefly tested this patch but could not get any PCI devices to
-> come up with the sifive_u machine. Depending on the kernel I tried, it
-> either failed to initialize a Xilinx PCIe (likely due to a mismatch with
-> the DT) or it appears to successfully initialize a Microsemi device but
-> did not enumerate any devices underneath.
 
-What kernel configuration, devicetree, and qemu command line do you use
-for the sifive_u machine ?
+On 21/11/18 19:27, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   scripts/checkpatch.pl | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index eccd656c41..d27bc51f8c 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2802,7 +2802,8 @@ sub process {
+>   				info_vreport|
+>   				error_report|
+>   				warn_report|
+> -				info_report}x;
+> +				info_report|
+> +                                g_test_message}x;
 
-Thanks,
-Guenter
+This perl file use <tab> here, shouldn't we keep the same style?
 
+>   
+>   	if ($rawline =~ /\b(?:$qemu_error_funcs)\s*\(.*\".*\\n/) {
+>   		ERROR("Error messages should not contain newlines\n" . $herecurr);
 > 
-> In any case, it would be nice if the Microsemi/Xilinx confusion was at
-> least explained in the commit message.
-> 
-> Thanks,
-> 
-> Logan
+
+$ ./scripts/checkpatch.pl -f tests/ipmi-bt-test.c
+ERROR: Error messages should not contain newlines
+#408: FILE: tests/ipmi-bt-test.c:408:
++        g_test_message("Skipping test for non-x86\n");
+total: 1 errors, 0 warnings, 430 lines checked
+
+Nice :)
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
