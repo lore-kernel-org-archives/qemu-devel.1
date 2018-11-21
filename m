@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gPaSW-0006Wz-IS
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:54:58 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gPaTd-00077r-6Q
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:56:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gPaSU-0002wK-PG
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:54:56 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gPaTb-0003xE-Hy
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:56:05 -0500
 MIME-Version: 1.0
 References: <cover.1542819633.git.alistair.francis@wdc.com>
-	<85a3fe487514f4cb659ef7e6b88762ebc567c1b8.1542819633.git.alistair.francis@wdc.com>
-	<e7398997-ba1a-9182-6be0-da8e43e920df@deltatee.com>
-	<CAKmqyKMtTqi=D-PKZFnt40MaA8+e6Sj8nUr0VmBFajScw1MYng@mail.gmail.com>
-	<ffd80fff-55bf-0578-4fe5-00f07ef6bdc6@deltatee.com>
-	<CAKmqyKMhpAPXFF5cQkqKYcNjD5aciDW7Ek53+W=1XNp3RGFLmw@mail.gmail.com>
-	<33646fef-adb7-26b4-ba01-79f9a0f5bdae@deltatee.com>
-	<CAKmqyKMJvTb=JebfA1N-40-MqgHkAj98JOH51t6K--zjYLXSnA@mail.gmail.com>
-	<d316a936-c726-dd4c-f90a-9690b4e3fc3d@deltatee.com>
-	<CAKmqyKM1pf1zJVMuqZvocN07LxDGrRjoSNLojt=06UbN4P-bpg@mail.gmail.com>
-	<6480496b-dbb5-37bb-57e2-7a4819c61511@deltatee.com>
-	<CAKmqyKMPHg7nGr-Ua1Cb7yvdZzWAs6HOM4eB+SinMypXQ5Ni6w@mail.gmail.com>
-In-Reply-To: <CAKmqyKMPHg7nGr-Ua1Cb7yvdZzWAs6HOM4eB+SinMypXQ5Ni6w@mail.gmail.com>
+	<44e7883bd17c6867f0ac488bdab6c880b2420a9b.1542819633.git.alistair.francis@wdc.com>
+	<0ddaeccd-94fd-22a8-f5e0-91fbafdf1761@deltatee.com>
+	<CAKmqyKNitWerbpVzQrNye3KiPj=5DVFXan4SpiN-+br_P-RG+Q@mail.gmail.com>
+	<0fac09ca-12d5-1462-4456-66646f168ab5@deltatee.com>
+In-Reply-To: <0fac09ca-12d5-1462-4456-66646f168ab5@deltatee.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 21 Nov 2018 13:54:25 -0800
-Message-ID: <CAKmqyKMTiMJKCc=oEP97XLWFQMMfE0PFHB8ZKGm2=AP5_HEoNg@mail.gmail.com>
+Date: Wed, 21 Nov 2018 13:55:34 -0800
+Message-ID: <CAKmqyKMTxgk41cBz=hW-meCUAi-_20vguqN40f_ThRU-rsaJXA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 5/6] hw/riscv/sifive_u: Connect
- the Xilinx PCIe
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 6/6] hw/riscv/virt: Connect a
+ VirtIO net PCIe device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,62 +29,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Logan Gunthorpe <logang@deltatee.com>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org, Guenter Roeck <linux@roeck-us.net>, Andrea Bolognani <abologna@redhat.com>
 
-On Wed, Nov 21, 2018 at 11:51 AM Alistair Francis <alistair23@gmail.com> wrote:
+On Wed, Nov 21, 2018 at 11:12 AM Logan Gunthorpe <logang@deltatee.com> wrote:
 >
-> On Wed, Nov 21, 2018 at 11:25 AM Logan Gunthorpe <logang@deltatee.com> wrote:
-> >
-> >
-> >
-> > On 2018-11-21 12:21 p.m., Alistair Francis wrote:
-> > > On Wed, Nov 21, 2018 at 11:19 AM Logan Gunthorpe <logang@deltatee.com> wrote:
-> > >> Well, I also have a kernel (one I've built myself) without microsemi
-> > >> support, but with Xilinx support and it also doesn't work (see my dmesg
-> > >> logs I sent).
-> > >
-> > > So this one should work.
-> >
-> > It does not, see the dmesgs I sent a few emails ago.
-> >
-> > >>
-> > >>> For people who have modified the standard bbl to edit the device tree
-> > >>> before passing it to Linux to add the MicroSemi PCIe node, it won't
-> > >>> work. That's a very small number of people who have modified the
-> > >>> standard boot loader. I don't think we need to document how those
-> > >>> people get back to the default set-up.
-> > >>
-> > >> I have not done that. And it's not working for me.
-> > >
-> > > If you haven't done this then how can Linux know to probe the
-> > > MicroSemi PCIe root complex?
-> >
-> > Oh, well actually, in this case I was using the bbl/kernel you sent us,
-> > so I'm not actually sure what's in it. The stuff I built myself doesn't
-> > have any of the microsemi stuff, so it sounds like all that was a red
-> > herring.
 >
-> Ah ok. There was some confusion there then.
 >
-> So now it sounds like it's not working and there is no MicroSemi
-> device. I will check and see what I find.
+> On 2018-11-21 11:34 a.m., Alistair Francis wrote:
+> >> I don't understand what this patch actually accomplishes. It doesn't
+> >> seem to affect my network devices when running QEMU. Can you provide a
+> >> commit message explaining this?
+> >
+> > Could you connect a PCIe networking device without this commit? This
+> > is what the other architectures all do as well.
+>
+> Yes, actually.
+>
+> Other architectures doing something is never a sufficient justification
+> to make a change. I'm also not sure how virtio relates to this patch...
+>
+> I'd say unless you know you're fixing something specific and can
+> describe it, you should drop this patch.
 
-Yep, I have no idea.
-
-The last time I tested this it worked (although I might not have
-tested interrupts) and now it doesn't. Nothing has changed in the
-series, my guest software has changed though. I can see the root
-complex, but no devices underneath it.
-
-Sorry for the confusion with the MicroSemi PCIe root complex.
-
-I think I'll just drop this patch. It doesn't work for 32-bit guests,
-but I would like to model the hardware so I don't want to change the
-addresses. We can revisit this in the future along with the gpex high
-MMIO support and USB support.
+It is required for networking for PCIe devices. What PCIe device works
+for you without this patch? Can you tell me your command line
+arguments.
 
 Alistair
 
 >
-> Alistair
->
-> >
-> > Logan
+> Logan
