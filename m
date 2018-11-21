@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gPQ8r-00065L-Qf
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:53:58 -0500
+	(envelope-from <david@redhat.com>) id 1gPQ8y-00068C-Vw
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:54:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1gPQ8o-0002P7-MM
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:53:57 -0500
-Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:37868)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1gPQ8o-0002Ol-IE
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:53:54 -0500
-Received: by mail-it1-x141.google.com with SMTP id b5so8199245iti.2
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 02:53:54 -0800 (PST)
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Wed, 21 Nov 2018 05:53:50 -0500
-References: <mailman.23054.1542721275.1282.qemu-devel@nongnu.org>
-In-Reply-To: <mailman.23054.1542721275.1282.qemu-devel@nongnu.org>
-Message-Id: <36E62A3F-7402-418F-AB88-9B597E437C69@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] Fix for crashes and non-responsive UI on
- macOS Mojave
+	(envelope-from <david@redhat.com>) id 1gPQ8u-0002UH-UC
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:54:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45574)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gPQ8u-0002T8-LX
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:54:00 -0500
+References: <20181120092542.13102-1-david@redhat.com>
+	<20181120092542.13102-7-david@redhat.com>
+	<a2262bd0-7b54-c1f0-865b-d53357cce171@redhat.com>
+	<87a7m379fn.fsf@dusky.pond.sub.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <3021bc1d-d802-96ad-fd30-8dc78f5af3c8@redhat.com>
+Date: Wed, 21 Nov 2018 11:53:57 +0100
+MIME-Version: 1.0
+In-Reply-To: <87a7m379fn.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 6/9] qapi: Rewrite string-input-visitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
+On 20.11.18 21:58, Markus Armbruster wrote:
+> I think the title should be something like
+> 
+>     qapi: Rewrite string-input-visitor's integer and list parsing
+> 
+> because you don't actually rewrite all of it.
+> 
+> Eric Blake <eblake@redhat.com> writes:
+> 
+>> On 11/20/18 3:25 AM, David Hildenbrand wrote:
+>>> The input visitor has some problems right now, especially
+>>> - unsigned type "Range" is used to process signed ranges, resulting in
+>>>    inconsistent behavior and ugly/magical code
+>>> - uint64_t are parsed like int64_t, so big uint64_t values are not
+>>>    supported and error messages are misleading
+>>> - lists/ranges of int64_t are accepted although no list is parsed and
+>>>    we should rather report an error
+>>> - lists/ranges are preparsed using int64_t, making it hard to
+>>>    implement uint64_t values or uint64_t lists
+>>> - types that don't support lists don't bail out
+>>> - visiting beyond the end of a list is not handled properly
+>>> - we don't actually parse lists, we parse *sets*: members are sorted,
+>>>    and duplicates eliminated
+>>>
+>>> So let's rewrite it by getting rid of usage of the type "Range" and
+>>> properly supporting lists of int64_t and uint64_t (including ranges of
+>>> both types), fixing the above mentioned issues.
+>>>
+>>> Lists of other types are not supported and will properly report an
+>>> error. Virtual walks are now supported.
+>>>
+>>> Tests have to be fixed up:
+>>> - Two BUGs were hardcoded that are fixed now
+>>> - The string-input-visitor now actually returns a parsed list and not
+>>>    an ordered set.
+>>>
+>>> Please note that no users/callers have to be fixed up. Candiates using
+>>
+>> s/Candiates/Candidates/
+>>
+>>> visit_type_uint16List() and friends are:
+>>> - backends/hostmem.c:host_memory_backend_set_host_nodes()
+>>> -- Code can deal with dupilcates/unsorted lists
+>>
+>> s/dupilcates/duplicates/
 
-> On 13 November 2018 at 12:12, Programmingkid =
-<programmingkidx@gmail.com> wrote:
->>> On Nov 11, 2018, at 4:35 PM, Berkus Decker wrote:
->>> These changes are ought to work on OSX 10.6, although I don?t have a =
-machine handy to test it.
->>=20
->> I have Mac OS 10.6 available for testing.
->=20
-> This is perhaps a good point to ask the question: is retaining
-> support for 10.6 still worth the effort ? It was released 9
-> years ago and has been unsupported by Apple for nearly 5 years.
->=20
-> qemu-doc.texi's "Supported build platforms" section says:
-> # The project supports building with the two most recent versions
-> # of macOS, with the current homebrew package set available.
->=20
-> which would be High Sierra (10.13) and Mojave (10.14) only. If you
-> widened that to "all versions still supported by Apple" it would add
-> Sierra (10.13) to the list.
->=20
-> Given how few upstream developers we have who care about OSX,
-> I think it is not very useful to spend that effort on trying
-> to retain support for ancient versions of it.
->=20
-> thanks
-> -- PMM
+Thanks, both fixed.
 
-Mac OS 10.6 is a very good operating system. I much rather we simplify =
-the patch rather than drop support for this excellent operation system =
-just because it is a few years old. I suspect rewriting the the patch to =
-use performSelectorOnMainThread:withObject:waitUntilDone: would be a =
-simpler and better patch.
+> 
+>>> @@ -330,9 +381,10 @@ static void parse_type_null(Visitor *v, const char *name, QNull **obj,
+>>>   {
+>>>       StringInputVisitor *siv = to_siv(v);
+>>>   +    assert(siv->lm == LM_NONE);
+>>>       *obj = NULL;
+>>>   -    if (!siv->string || siv->string[0]) {
+>>> +    if (siv->string[0]) {
+>>
+>> Why did this condition change?
+> 
+> As far as I can tell, siv->string can't ever be null.  Sticking the
+> change into this patch is perhaps debatable.  I'm okay with it.
 
-I have tried the patch out already on Mac OS 10.12 and it did not work. =
-The firmware never runs and the Machine menu does not populate. I do not =
-believe this patch is worth dropping the support of many versions of Mac =
-OS X.=
+Yes, we have an assertion when creating the visitor. Do you want me to
+pull this into a separate patch?
+
+(It made sense under the old patch subject ;) )
+
+> 
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> With the commit message improved once more:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
+Thanks!
+
+-- 
+
+Thanks,
+
+David / dhildenb
