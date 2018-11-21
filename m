@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52515)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=856356900=Paul.Durrant@citrix.com>)
-	id 1gPURM-0001iI-8c
+	id 1gPURM-0001iL-9o
 	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:29:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=856356900=Paul.Durrant@citrix.com>)
-	id 1gPURG-0007jx-HY
+	id 1gPURE-0007iU-MA
 	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:29:18 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Wed, 21 Nov 2018 15:12:08 +0000
-Message-ID: <20181121151211.15997-16-paul.durrant@citrix.com>
+Date: Wed, 21 Nov 2018 15:12:07 +0000
+Message-ID: <20181121151211.15997-15-paul.durrant@citrix.com>
 In-Reply-To: <20181121151211.15997-1-paul.durrant@citrix.com>
 References: <20181121151211.15997-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 15/18] xen: add a mechanism to automatically
- create XenDevice-s...
+Subject: [Qemu-devel] [PATCH 14/18] xen: add implementations of xen-qdisk
+ connect and disconnect functions...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,516 +25,308 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-...that maintains compatibility with existing Xen toolstacks.
+...and wire in the dataplane.
 
-Xen toolstacks instantiate PV backends by simply writing information into
-xenstore and expecting a backend implementation to be watching for this.
-
-This patch adds a new 'xen-backend' module to allow individual XenDevice
-implementations to register a creator function to be called when a tool-
-stack instantiates a new backend in this way.
-
-To support this it is also necessary to add new watchers into the XenBus
-implementation to handle enumeration of new backends and also destruction
-of XenDevice-s when the toolstack sets the backend 'online' key to 0.
-
-NOTE: This patch only adds the framework. A subsequent patch will add a
-      creator function for xen-qdisk.
+This patch adds the remaining code to make the xen-qdisk XenDevice
+functional. The parameters that a block frontend expects to find are
+populated in the backend xenstore area, and the 'ring-ref' and
+'event-channel' values specified in the frontend xenstore area are
+mapped/bound and used to set up the dataplane.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 ---
 Cc: Stefano Stabellini <sstabellini@kernel.org>
 Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
 ---
- hw/xen/Makefile.objs         |   2 +-
- hw/xen/trace-events          |   5 +
- hw/xen/xen-backend.c         |  67 +++++++++++++
- hw/xen/xen-bus.c             | 220 +++++++++++++++++++++++++++++++++++++++----
- include/hw/xen/xen-backend.h |  24 +++++
- include/hw/xen/xen-bus.h     |   5 +-
- include/qemu/module.h        |   3 +
- 7 files changed, 305 insertions(+), 21 deletions(-)
- create mode 100644 hw/xen/xen-backend.c
- create mode 100644 include/hw/xen/xen-backend.h
+ hw/block/xen-qdisk.c       | 140 +++++++++++++++++++++++++++++++++++++++++++++
+ hw/xen/xen-bus.c           |  12 ++--
+ include/hw/xen/xen-bus.h   |   8 +++
+ include/hw/xen/xen-qdisk.h |  12 ++++
+ 4 files changed, 166 insertions(+), 6 deletions(-)
 
-diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-index 77c0868190..84df60a928 100644
---- a/hw/xen/Makefile.objs
-+++ b/hw/xen/Makefile.objs
-@@ -1,5 +1,5 @@
- # xen backend driver support
--common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o
-+common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o xen-bus-helper.o xen-backend.o
- 
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
-diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index 94c46c2e34..5b12135083 100644
---- a/hw/xen/trace-events
-+++ b/hw/xen/trace-events
-@@ -16,11 +16,16 @@ xen_domid_restrict(int err) "err: %u"
- # include/hw/xen/xen-bus.c
- xen_bus_realize(void) ""
- xen_bus_unrealize(void) ""
-+xen_bus_enumerate(void) ""
-+xen_bus_type_enumerate(const char *type) "type: %s"
-+xen_bus_backend_create(const char *type, const char *path) "type: %s path: %s"
- xen_bus_add_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
- xen_bus_remove_watch(const char *node, const char *key, char *token) "node: %s key: %s token: %s"
- xen_bus_watch(const char *token) "token: %s"
- xen_device_realize(const char *type, char *name) "type: %s name: %s"
- xen_device_unrealize(const char *type, char *name) "type: %s name: %s"
- xen_device_backend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
-+xen_device_backend_online(const char *type, char *name, bool online) "type: %s name: %s -> %u"
- xen_device_frontend_state(const char *type, char *name, const char *state) "type: %s name: %s -> %s"
-+xen_device_backend_changed(const char *type, char *name) "type: %s name: %s"
- xen_device_frontend_changed(const char *type, char *name) "type: %s name: %s"
-diff --git a/hw/xen/xen-backend.c b/hw/xen/xen-backend.c
-new file mode 100644
-index 0000000000..7581fd390d
---- /dev/null
-+++ b/hw/xen/xen-backend.c
-@@ -0,0 +1,67 @@
-+/*
-+ * Copyright (c) Citrix Systems Inc.
-+ * All rights reserved.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "hw/xen/xen-backend.h"
-+
-+typedef struct XenBackendImpl {
-+    const char *type;
-+    XenBackendDeviceCreate create;
-+} XenBackendImpl;
-+
-+static GHashTable *xen_backend_table_get(void)
-+{
-+    static GHashTable *table;
-+
-+    if (table == NULL) {
-+        table = g_hash_table_new(g_str_hash, g_str_equal);
-+    }
-+
-+    return table;
-+}
-+
-+static void xen_backend_table_add(XenBackendImpl *impl)
-+{
-+    g_hash_table_insert(xen_backend_table_get(), (void *)impl->type, impl);
-+}
-+
-+static XenBackendImpl *xen_backend_table_lookup(const char *type)
-+{
-+    return g_hash_table_lookup(xen_backend_table_get(), type);
-+}
-+
-+void xen_backend_register(const XenBackendInfo *info)
-+{
-+    XenBackendImpl *impl = g_new0(XenBackendImpl, 1);
-+
-+    g_assert(info->type);
-+
-+    if (xen_backend_table_lookup(info->type)) {
-+        error_report("attempt to register duplicate Xen backend type '%s'",
-+                     info->type);
-+        abort();
-+    }
-+
-+    if (!info->create) {
-+        error_report("backend type '%s' has no creator", info->type);
-+        abort();
-+    }
-+
-+    impl->type = info->type;
-+    impl->create = info->create;
-+
-+    xen_backend_table_add(impl);
-+}
-+
-+void xen_backend_device_create(BusState *bus, const char *type,
-+                               const char *name, QDict *opts, Error **errp)
-+{
-+    XenBackendImpl *impl = xen_backend_table_lookup(type);
-+
-+    if (impl) {
-+        impl->create(bus, name, opts, errp);
-+    }
-+}
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index c4b253103f..e58b891c93 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -10,10 +10,12 @@
+diff --git a/hw/block/xen-qdisk.c b/hw/block/xen-qdisk.c
+index 35f7b70480..8c88393832 100644
+--- a/hw/block/xen-qdisk.c
++++ b/hw/block/xen-qdisk.c
+@@ -9,6 +9,10 @@
+ #include "qapi/visitor.h"
  #include "hw/hw.h"
- #include "hw/sysbus.h"
- #include "hw/xen/xen.h"
-+#include "hw/xen/xen-backend.h"
- #include "hw/xen/xen-bus.h"
- #include "hw/xen/xen-bus-helper.h"
- #include "monitor/monitor.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qdict.h"
- #include "sysemu/sysemu.h"
+ #include "hw/xen/xen-qdisk.h"
++#include "sysemu/blockdev.h"
++#include "sysemu/block-backend.h"
++#include "sysemu/iothread.h"
++#include "dataplane/xen-qdisk.h"
  #include "trace.h"
  
-@@ -132,12 +134,118 @@ static void xen_bus_remove_watch(XenBus *xenbus, XenWatch *watch)
-     g_free(watch);
- }
- 
-+static void xen_bus_backend_create(XenBus *xenbus, const char *type,
-+                                   const char *name, char *path)
-+{
-+    char **key;
-+    QDict *opts;
-+    unsigned int i, n;
-+    Error *local_err = NULL;
-+
-+    trace_xen_bus_backend_create(type, path);
-+
-+    key = xs_directory(xenbus->xsh, XBT_NULL, path, &n);
-+    if (!key) {
-+        return;
-+    }
-+
-+    opts = qdict_new();
-+    for (i = 0; i < n; i++) {
-+        char *val;
-+
-+        /*
-+         * Assume anything found in the xenstore backend area, other than
-+         * the keys created for a generic XenDevice, are parameters
-+         * to be used to configure the backend.
-+         */
-+        if (!strcmp(key[i], "state") ||
-+            !strcmp(key[i], "online") ||
-+            !strcmp(key[i], "frontend") ||
-+            !strcmp(key[i], "frontend-id") ||
-+            !strcmp(key[i], "hotplug-status"))
-+            continue;
-+
-+        if (xs_node_scanf(xenbus->xsh, path, key[i], "%ms", &val) == 1) {
-+            qdict_put_str(opts, key[i], val);
-+            free(val);
-+        }
-+    }
-+
-+    xen_backend_device_create(BUS(xenbus), type, name, opts, &local_err);
-+    qobject_unref(opts);
-+
-+    if (local_err) {
-+        const char *msg = error_get_pretty(local_err);
-+
-+        error_report("failed to create '%s' device '%s': %s", type, name,
-+                     msg);
-+        error_free(local_err);
-+    }
-+}
-+
-+static void xen_bus_type_enumerate(XenBus *xenbus, const char *type)
-+{
-+    char *domain_path = g_strdup_printf("backend/%s/%u", type, xen_domid);
-+    char **backend;
-+    unsigned int i, n;
-+
-+    trace_xen_bus_type_enumerate(type);
-+
-+    backend = xs_directory(xenbus->xsh, XBT_NULL, domain_path, &n);
-+    if (!backend) {
-+        return;
-+    }
-+
-+    for (i = 0; i < n; i++) {
-+        char *backend_path = g_strdup_printf("%s/%s", domain_path,
-+                                             backend[i]);
-+        enum xenbus_state backend_state;
-+
-+        if (xs_node_scanf(xenbus->xsh, backend_path, "state", "%u",
-+                          &backend_state) != 1)
-+            backend_state = XenbusStateUnknown;
-+
-+        if (backend_state == XenbusStateInitialising) {
-+            xen_bus_backend_create(xenbus, type, backend[i], backend_path);
-+        }
-+
-+        g_free(backend_path);
-+    }
-+
-+    free(backend);
-+    g_free(domain_path);
-+}
-+
-+static void xen_bus_enumerate(void *opaque)
-+{
-+    XenBus *xenbus = opaque;
-+    char **type;
-+    unsigned int i, n;
-+
-+    trace_xen_bus_enumerate();
-+
-+    type = xs_directory(xenbus->xsh, XBT_NULL, "backend", &n);
-+    if (!type) {
-+        return;
-+    }
-+
-+    for (i = 0; i < n; i++) {
-+        xen_bus_type_enumerate(xenbus, type[i]);
-+    }
-+
-+    free(type);
-+}
-+
- static void xen_bus_unrealize(BusState *bus, Error **errp)
+ static char *xen_qdisk_get_name(XenDevice *xendev, Error **errp)
+@@ -23,6 +27,11 @@ static void xen_qdisk_realize(XenDevice *xendev, Error **errp)
  {
-     XenBus *xenbus = XEN_BUS(bus);
+     XenQdiskDevice *qdiskdev = XEN_QDISK_DEVICE(xendev);
+     XenQdiskVdev *vdev = &qdiskdev->vdev;
++    BlockConf *conf = &qdiskdev->conf;
++    DriveInfo *dinfo;
++    bool is_cdrom;
++    unsigned int info;
++    int64_t size;
  
-     trace_xen_bus_unrealize();
- 
-+    if (xenbus->backend_watch) {
-+        xen_bus_remove_watch(xenbus, xenbus->backend_watch);
-+    }
-+
-     if (!xenbus->xsh) {
-         return;
+     if (!vdev->valid) {
+         error_setg(errp, "vdev property not set");
+@@ -30,13 +39,134 @@ static void xen_qdisk_realize(XenDevice *xendev, Error **errp)
      }
-@@ -174,6 +282,7 @@ static void xen_bus_realize(BusState *bus, Error **errp)
- {
-     XenBus *xenbus = XEN_BUS(bus);
-     unsigned int domid;
-+    Error *local_err = NULL;
  
-     trace_xen_bus_realize();
- 
-@@ -193,6 +302,17 @@ static void xen_bus_realize(BusState *bus, Error **errp)
-     notifier_list_init(&xenbus->watch_notifiers);
-     qemu_set_fd_handler(xs_fileno(xenbus->xsh), xen_bus_watch, NULL,
-                         xenbus);
+     trace_xen_qdisk_realize(vdev->disk, vdev->partition);
 +
-+    module_call_init(MODULE_INIT_XEN_BACKEND);
-+
-+    xenbus->backend_watch =
-+        xen_bus_add_watch(xenbus, "", /* domain root node */
-+                          "backend", xen_bus_enumerate, xenbus, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        error_prepend(errp, "failed to set up enumeration watch: ");
-+    }
-+
-     return;
- 
- fail:
-@@ -268,6 +388,60 @@ enum xenbus_state xen_device_backend_get_state(XenDevice *xendev)
-     return xendev->backend_state;
- }
- 
-+static void xen_device_backend_set_online(XenDevice *xendev, bool online)
-+{
-+    const char *type = object_get_typename(OBJECT(xendev));
-+
-+    if (xendev->backend_online == online) {
++    if (!conf->blk) {
++        error_setg(errp, "drive property not set");
 +        return;
 +    }
 +
-+    trace_xen_device_backend_online(type, xendev->name, online);
-+
-+    xendev->backend_online = online;
-+    xen_device_backend_printf(xendev, "online", "%u", online);
-+}
-+
-+static void xen_device_backend_changed(void *opaque)
-+{
-+    XenDevice *xendev = opaque;
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    enum xenbus_state state;
-+    unsigned int online;
-+
-+    trace_xen_device_backend_changed(type, xendev->name);
-+
-+    if (xen_device_backend_scanf(xendev, "state", "%u", &state) != 1) {
-+        state = XenbusStateUnknown;
++    if (!blk_is_inserted(conf->blk)) {
++        error_setg(errp, "device needs media, but drive is empty");
++        return;
 +    }
 +
-+    xen_device_backend_set_state(xendev, state);
-+
-+    if (xen_device_backend_scanf(xendev, "online", "%u", &online) != 1) {
-+        online = 0;
++    if (!blkconf_apply_backend_options(conf, blk_is_read_only(conf->blk),
++                                       false, errp)) {
++        return;
 +    }
 +
-+    xen_device_backend_set_online(xendev, !!online);
-+
-+    /*
-+     * If a backend is still 'online' then its state should be cycled
-+     * back round to InitWait in order for a new frontend instance to
-+     * connect. This may happen when, for example, a frontend driver is
-+     * re-installed or updated.
-+     * If a backend id not 'online' then the device should be destroyed.
-+     */
-+    if (xendev->backend_online &&
-+        xendev->backend_state == XenbusStateClosed) {
-+        xen_device_backend_set_state(xendev, XenbusStateInitWait);
-+    } else if (!xendev->backend_online &&
-+               (xendev->backend_state == XenbusStateClosed ||
-+                xendev->backend_state == XenbusStateInitialising ||
-+                xendev->backend_state == XenbusStateInitWait ||
-+                xendev->backend_state == XenbusStateUnknown)) {
-+        object_unparent(OBJECT(xendev));
++    if (!blkconf_geometry(conf, NULL, 65535, 255, 255, errp)) {
++        return;
 +    }
-+}
 +
- static void xen_device_backend_create(XenDevice *xendev, Error **errp)
++    dinfo = blk_legacy_dinfo(conf->blk);
++    is_cdrom = (dinfo && dinfo->media_cd);
++
++    blkconf_blocksizes(conf);
++
++    if (conf->logical_block_size > conf->physical_block_size) {
++        error_setg(
++            errp, "logical_block_size > physical_block_size not supported");
++        return;
++    }
++
++    blk_set_guest_block_size(conf->blk, conf->logical_block_size);
++
++    if (conf->discard_granularity > 0) {
++        xen_device_backend_printf(xendev, "feature-discard", "%u", 1);
++    }
++
++    xen_device_backend_printf(xendev, "feature-flush-cache", "%u", 1);
++    xen_device_backend_printf(xendev, "max-ring-page-order", "%u",
++                              qdiskdev->max_ring_page_order);
++
++    info = blk_is_read_only(conf->blk) ? VDISK_READONLY : 0;
++    info |= is_cdrom ? VDISK_CDROM : 0;
++
++    xen_device_backend_printf(xendev, "info", "%u", info);
++
++    xen_device_frontend_printf(xendev, "virtual-device", "%u",
++                               vdev->number);
++    xen_device_frontend_printf(xendev, "device-type", "%s",
++                               is_cdrom ? "cdrom" : "disk");
++
++    size = blk_getlength(conf->blk);
++    xen_device_backend_printf(xendev, "sector-size", "%u",
++                              conf->logical_block_size);
++    xen_device_backend_printf(xendev, "sectors", "%lu",
++                              size / conf->logical_block_size);
++
++    qdiskdev->dataplane = xen_qdisk_dataplane_create(xendev, conf,
++                                                     qdiskdev->iothread);
+ }
+ 
+ static void xen_qdisk_connect(XenQdiskDevice *qdiskdev, Error **errp)
+ {
+     XenQdiskVdev *vdev = &qdiskdev->vdev;
++    XenDevice *xendev = XEN_DEVICE(qdiskdev);
++    unsigned int order, nr_ring_ref, *ring_ref, event_channel, protocol;
++    char *str;
+ 
+     trace_xen_qdisk_connect(vdev->disk, vdev->partition);
++
++    if (xen_device_frontend_scanf(xendev, "ring-page-order", "%u",
++                                  &order) != 1) {
++        nr_ring_ref = 1;
++        ring_ref = g_new(unsigned int, nr_ring_ref);
++
++        if (xen_device_frontend_scanf(xendev, "ring-ref", "%u",
++                                      &ring_ref[0]) != 1) {
++            error_setg(errp, "failed to read ring-ref");
++            return;
++        }
++    } else if (order <= qdiskdev->max_ring_page_order) {
++        unsigned int i;
++
++        nr_ring_ref = 1 << order;
++        ring_ref = g_new(unsigned int, nr_ring_ref);
++
++        for (i = 0; i < nr_ring_ref; i++) {
++            const char *key = g_strdup_printf("ring-ref%u", i);
++
++            if (xen_device_frontend_scanf(xendev, key, "%u",
++                                          &ring_ref[i]) != 1) {
++                error_setg(errp, "failed to read %s", key);
++                g_free((gpointer)key);
++                return;
++            }
++
++            g_free((gpointer)key);
++        }
++    } else {
++        error_setg(errp, "invalid ring-page-order (%d)", order);
++        return;
++    }
++
++    if (xen_device_frontend_scanf(xendev, "event-channel", "%u",
++                                  &event_channel) != 1) {
++        error_setg(errp, "failed to read event-channel");
++        return;
++    }
++
++    if (xen_device_frontend_scanf(xendev, "protocol", "%ms",
++                                  &str) != 1) {
++        protocol = BLKIF_PROTOCOL_NATIVE;
++    } else {
++        if (strcmp(str, XEN_IO_PROTO_ABI_X86_32) == 0) {
++            protocol = BLKIF_PROTOCOL_X86_32;
++        } else if (strcmp(str, XEN_IO_PROTO_ABI_X86_64) == 0) {
++            protocol = BLKIF_PROTOCOL_X86_64;
++        } else {
++            protocol = BLKIF_PROTOCOL_NATIVE;
++        }
++
++        free(str);
++    }
++
++    xen_qdisk_dataplane_start(qdiskdev->dataplane, ring_ref, nr_ring_ref,
++                              event_channel, protocol);
++
++    g_free(ring_ref);
+ }
+ 
+ static void xen_qdisk_disconnect(XenQdiskDevice *qdiskdev, Error **errp)
+@@ -44,6 +174,8 @@ static void xen_qdisk_disconnect(XenQdiskDevice *qdiskdev, Error **errp)
+     XenQdiskVdev *vdev = &qdiskdev->vdev;
+ 
+     trace_xen_qdisk_disconnect(vdev->disk, vdev->partition);
++
++    xen_qdisk_dataplane_stop(qdiskdev->dataplane);
+ }
+ 
+ static void xen_qdisk_frontend_changed(XenDevice *xendev,
+@@ -93,6 +225,9 @@ static void xen_qdisk_unrealize(XenDevice *xendev, Error **errp)
+     trace_xen_qdisk_unrealize(vdev->disk, vdev->partition);
+ 
+     xen_qdisk_disconnect(qdiskdev, &error_fatal);
++
++    xen_qdisk_dataplane_destroy(qdiskdev->dataplane);
++    qdiskdev->dataplane = NULL;
+ }
+ 
+ static char *disk_to_vbd_name(unsigned int disk)
+@@ -289,6 +424,11 @@ const PropertyInfo xen_qdisk_prop_vdev = {
+ static Property xen_qdisk_props[] = {
+     DEFINE_PROP("vdev", XenQdiskDevice, vdev,
+                 xen_qdisk_prop_vdev, XenQdiskVdev),
++    DEFINE_BLOCK_PROPERTIES(XenQdiskDevice, conf),
++    DEFINE_PROP_UINT32("max-ring-page-order", XenQdiskDevice,
++                       max_ring_page_order, 4),
++    DEFINE_PROP_LINK("iothread", XenQdiskDevice, iothread, TYPE_IOTHREAD,
++                     IOThread *),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index 64c8af54b0..c4b253103f 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -217,8 +217,8 @@ static const TypeInfo xen_bus_type_info = {
+     .class_init = xen_bus_class_init,
+ };
+ 
+-static void xen_device_backend_printf(XenDevice *xendev, const char *key,
+-                                      const char *fmt, ...)
++void xen_device_backend_printf(XenDevice *xendev, const char *key,
++                               const char *fmt, ...)
  {
      XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-@@ -289,12 +463,38 @@ static void xen_device_backend_create(XenDevice *xendev, Error **errp)
-         error_propagate(errp, local_err);
-         error_prepend(errp, "failed to create backend: ");
-     }
-+
-+    xendev->backend_state_watch =
-+        xen_bus_add_watch(xenbus, xendev->backend_path,
-+                          "state", xen_device_backend_changed,
-+                          xendev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        error_prepend(errp, "failed to watch backend state: ");
-+    }
-+
-+    xendev->backend_online_watch =
-+        xen_bus_add_watch(xenbus, xendev->backend_path,
-+                          "online", xen_device_backend_changed,
-+                          xendev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        error_prepend(errp, "failed to watch backend online: ");
-+    }
+     va_list ap;
+@@ -305,8 +305,8 @@ static void xen_device_backend_destroy(XenDevice *xendev)
+     g_free(xendev->backend_path);
  }
  
- static void xen_device_backend_destroy(XenDevice *xendev)
+-static void xen_device_frontend_printf(XenDevice *xendev, const char *key,
+-                                       const char *fmt, ...)
++void xen_device_frontend_printf(XenDevice *xendev, const char *key,
++                                const char *fmt, ...)
  {
      XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
- 
-+    if (xendev->backend_online_watch) {
-+        xen_bus_remove_watch(xenbus, xendev->backend_online_watch);
-+    }
-+
-+    if (xendev->backend_state_watch) {
-+        xen_bus_remove_watch(xenbus, xendev->backend_state_watch);
-+    }
-+
-     if (!xendev->backend_path) {
-         return;
-     }
-@@ -378,24 +578,6 @@ static void xen_device_frontend_changed(void *opaque)
-             error_free(local_err);
-         }
-     }
--
--    /*
--     * If a backend is still 'online' then its state should be cycled
--     * back round to InitWait in order for a new frontend instance to
--     * connect. This may happen when, for example, a frontend driver is
--     * re-installed or updated.
--     */
--    if (xendev->backend_state == XenbusStateClosed) {
--        unsigned int online;
--
--        if (xen_device_backend_scanf(xendev, "online", "%u", &online) != 1) {
--            online = 0;
--        }
--
--        if (online) {
--            xen_device_backend_set_state(xendev, XenbusStateInitWait);
--        }
--    }
+     va_list ap;
+@@ -318,8 +318,8 @@ static void xen_device_frontend_printf(XenDevice *xendev, const char *key,
+     va_end(ap);
  }
  
- static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
-@@ -764,9 +946,9 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
-                               xendev->frontend_path);
-     xen_device_backend_printf(xendev, "frontend-id", "%u",
-                               xendev->frontend_id);
--    xen_device_backend_printf(xendev, "online", "%u", 1);
-     xen_device_backend_printf(xendev, "hotplug-status", "connected");
- 
-+    xen_device_backend_set_online(xendev, true);
-     xen_device_backend_set_state(xendev, XenbusStateInitWait);
- 
-     xen_device_frontend_printf(xendev, "backend", "%s",
-diff --git a/include/hw/xen/xen-backend.h b/include/hw/xen/xen-backend.h
-new file mode 100644
-index 0000000000..ca5ae34398
---- /dev/null
-+++ b/include/hw/xen/xen-backend.h
-@@ -0,0 +1,24 @@
-+/*
-+ * Copyright (c) Citrix Systems Inc.
-+ * All rights reserved.
-+ */
-+
-+#ifndef HW_XEN_BACKEND_H
-+#define HW_XEN_BACKEND_H
-+
-+#include "hw/xen/xen-bus.h"
-+
-+typedef void (*XenBackendDeviceCreate)(BusState *bus, const char *name,
-+                                       QDict *opts, Error **errp);
-+
-+typedef struct XenBackendInfo {
-+    const char *type;
-+    XenBackendDeviceCreate create;
-+} XenBackendInfo;
-+
-+void xen_backend_register(const XenBackendInfo *info);
-+
-+void xen_backend_device_create(BusState *bus, const char *type,
-+                               const char *name, QDict *opts, Error **errp);
-+
-+#endif /* HW_XEN_BACKEND_H */
+-static int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
+-                                      const char *fmt, ...)
++int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
++                              const char *fmt, ...)
+ {
+     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
+     va_list ap;
 diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index d931e01268..48f3e068d3 100644
+index 386f6bfc93..d931e01268 100644
 --- a/include/hw/xen/xen-bus.h
 +++ b/include/hw/xen/xen-bus.h
-@@ -21,7 +21,9 @@ typedef struct XenDevice {
-     char *backend_path, *frontend_path;
-     enum xenbus_state backend_state, frontend_state;
-     Notifier exit;
--    XenWatch *frontend_state_watch;
-+    XenWatch *backend_state_watch, *frontend_state_watch;
-+    bool backend_online;
-+    XenWatch *backend_online_watch;
-     xengnttab_handle *xgth;
-     bool feature_grant_copy;
-     xenevtchn_handle *xeh;
-@@ -61,6 +63,7 @@ typedef struct XenBus {
-     domid_t backend_id;
-     struct xs_handle *xsh;
-     NotifierList watch_notifiers;
-+    XenWatch *backend_watch;
- } XenBus;
+@@ -82,6 +82,14 @@ void xen_device_backend_set_state(XenDevice *xendev,
+                                   enum xenbus_state state);
+ enum xenbus_state xen_device_backend_get_state(XenDevice *xendev);
  
- typedef struct XenBusClass {
-diff --git a/include/qemu/module.h b/include/qemu/module.h
-index 54300ab6e5..55dd2beea8 100644
---- a/include/qemu/module.h
-+++ b/include/qemu/module.h
-@@ -44,6 +44,7 @@ typedef enum {
-     MODULE_INIT_OPTS,
-     MODULE_INIT_QOM,
-     MODULE_INIT_TRACE,
-+    MODULE_INIT_XEN_BACKEND,
-     MODULE_INIT_MAX
- } module_init_type;
++void xen_device_backend_printf(XenDevice *xendev, const char *key,
++                               const char *fmt, ...);
++
++void xen_device_frontend_printf(XenDevice *xendev, const char *key,
++                                const char *fmt, ...);
++int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
++                              const char *fmt, ...);
++
+ void xen_device_set_max_grant_refs(XenDevice *xendev, unsigned int nr_refs,
+                                    Error **errp);
+ void *xen_device_map_grant_refs(XenDevice *xendev, uint32_t *refs,
+diff --git a/include/hw/xen/xen-qdisk.h b/include/hw/xen/xen-qdisk.h
+index ade0866037..d7dd2bf0ee 100644
+--- a/include/hw/xen/xen-qdisk.h
++++ b/include/hw/xen/xen-qdisk.h
+@@ -6,7 +6,15 @@
+ #ifndef HW_XEN_QDISK_H
+ #define HW_XEN_QDISK_H
  
-@@ -51,6 +52,8 @@ typedef enum {
- #define opts_init(function) module_init(function, MODULE_INIT_OPTS)
- #define type_init(function) module_init(function, MODULE_INIT_QOM)
- #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
-+#define xen_backend_init(function) module_init(function, \
-+                                               MODULE_INIT_XEN_BACKEND)
++#include "hw/xen/xen.h"
+ #include "hw/xen/xen-bus.h"
++#include "hw/block/block.h"
++#include "hw/block/xen_blkif.h"
++#include "hw/block/dataplane/xen-qdisk.h"
++#include "sysemu/blockdev.h"
++#include "sysemu/iothread.h"
++#include "sysemu/block-backend.h"
++#include "sysemu/iothread.h"
  
- #define block_module_load_one(lib) module_load_one("block-", lib)
- #define ui_module_load_one(lib) module_load_one("ui-", lib)
+ typedef enum XenQdiskVdevType {
+     XEN_QDISK_VDEV_TYPE_DP,
+@@ -33,6 +41,10 @@ typedef struct XenQdiskDevice XenQdiskDevice;
+ struct XenQdiskDevice {
+     XenDevice xendev;
+     XenQdiskVdev vdev;
++    BlockConf conf;
++    unsigned int max_ring_page_order;
++    IOThread *iothread;
++    XenQdiskDataPlane *dataplane;
+ };
+ 
+ #endif /* HW_XEN_QDISK_H */
 -- 
 2.11.0
