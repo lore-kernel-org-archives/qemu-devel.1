@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gPb2y-0001ke-Rd
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:32:37 -0500
+	(envelope-from <prvs=856724ab1=Alistair.Francis@wdc.com>)
+	id 1gPb5L-00042Q-1r
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:35:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gPb2u-0006mn-Oq
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:32:36 -0500
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:32790)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gPb2s-0006Rl-Ib
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:32:32 -0500
-Date: Wed, 21 Nov 2018 23:32:12 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20181121223212.ylsvzufrifb6pabs@function>
-References: <20181121220647.18844-1-marcandre.lureau@redhat.com>
-	<20181121220647.18844-19-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181121220647.18844-19-marcandre.lureau@redhat.com>
+	(envelope-from <prvs=856724ab1=Alistair.Francis@wdc.com>)
+	id 1gPb5J-0002k4-W2
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:35:02 -0500
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Wed, 21 Nov 2018 22:34:44 +0000
+Message-ID: <6559716eae4b53d2cad39ec6011cdd7b1b32138a.1542839652.git.alistair.francis@wdc.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-3.2 v2 18/30] slirp: no need to make
- DPRINTF conditional on DEBUG
+MIME-Version: 1.0
+Subject: [Qemu-devel] [PATCH v1 1/1] riscv: virt: Cast the initrd start
+ address to target bit length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,12 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "agraf@suse.de" <agraf@suse.de>
 
-Marc-Andr=C3=A9 Lureau, le jeu. 22 nov. 2018 02:06:35 +0400, a ecrit:
-> DEBUG_CALL is already handled conditionally.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Ensure that the calculate initrd offset points to a valid address for
+the architecture.
 
-Applied to my tree, thanks!
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Suggested-by: Alexander Graf <agraf@suse.de>
+Reported-by: Alexander Graf <agraf@suse.de>
+---
+ hw/riscv/virt.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 2b38f89070..4467195fac 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -85,7 +85,12 @@ static hwaddr load_initrd(const char *filename, uint64_t=
+ mem_size,
+      * halfway into RAM, and for boards with 256MB of RAM or more we put
+      * the initrd at 128MB.
+      */
+-    *start =3D kernel_entry + MIN(mem_size / 2, 128 * MiB);
++    /* As hwaddr is a 64-bit number we need to cast it for 32-bit */
++#if defined(TARGET_RISCV32)
++    *start =3D (uint32_t) (kernel_entry + MIN(mem_size / 2, 128ULL * MiB))=
+;
++#elif defined(TARGET_RISCV64)
++    *start =3D (uint64_t) (kernel_entry + MIN(mem_size / 2, 128 * MiB));
++#endif
+=20
+     size =3D load_ramdisk(filename, *start, mem_size - *start);
+     if (size =3D=3D -1) {
+--=20
+2.19.1
