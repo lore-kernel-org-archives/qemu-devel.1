@@ -1,29 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gPYY0-0000Rf-Fg
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 14:52:29 -0500
+	(envelope-from <Chris.Friesen@windriver.com>) id 1gPYoM-00057i-Kl
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 15:09:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gPYXz-000277-D0
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 14:52:28 -0500
+	(envelope-from <Chris.Friesen@windriver.com>) id 1gPYfM-00053Y-1Z
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 15:00:07 -0500
+Received: from mail1.windriver.com ([147.11.146.13]:51565)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Chris.Friesen@windriver.com>)
+	id 1gPYfL-0004wO-PX
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 15:00:03 -0500
+Received: from ALA-HCA.corp.ad.wrs.com ([147.11.189.40])
+	by mail1.windriver.com (8.15.2/8.15.1) with ESMTPS id wALHcJYU004539
+	(version=TLSv1 cipher=AES128-SHA bits=128 verify=FAIL)
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 09:38:19 -0800 (PST)
+References: <d5d6e09a-78ed-41c4-bbb9-260263c05bf2@windriver.com>
+	<87pnvn6hnq.fsf@linaro.org>
+	<b109fe05-1e88-a6e3-34cb-21a4b61e64b3@windriver.com>
+	<87lg6b5shx.fsf@linaro.org>
+	<98428a27-8634-9521-297c-a61c618e867a@windriver.com>
+	<20181102175111.GA2388@work-vm>
+	<54304edc-9de4-a25a-63d0-96518c5d7956@windriver.com>
+From: Chris Friesen <chris.friesen@windriver.com>
+Message-ID: <eedf3d4a-62c2-d1c7-1dbf-ae9cf5e09e11@windriver.com>
+Date: Wed, 21 Nov 2018 11:38:16 -0600
 MIME-Version: 1.0
-References: <cover.1542819633.git.alistair.francis@wdc.com>
-	<85a3fe487514f4cb659ef7e6b88762ebc567c1b8.1542819633.git.alistair.francis@wdc.com>
-	<e7398997-ba1a-9182-6be0-da8e43e920df@deltatee.com>
-	<CAKmqyKMtTqi=D-PKZFnt40MaA8+e6Sj8nUr0VmBFajScw1MYng@mail.gmail.com>
-	<ffd80fff-55bf-0578-4fe5-00f07ef6bdc6@deltatee.com>
-	<CAKmqyKMhpAPXFF5cQkqKYcNjD5aciDW7Ek53+W=1XNp3RGFLmw@mail.gmail.com>
-	<33646fef-adb7-26b4-ba01-79f9a0f5bdae@deltatee.com>
-	<CAKmqyKMJvTb=JebfA1N-40-MqgHkAj98JOH51t6K--zjYLXSnA@mail.gmail.com>
-	<d316a936-c726-dd4c-f90a-9690b4e3fc3d@deltatee.com>
-	<CAKmqyKM1pf1zJVMuqZvocN07LxDGrRjoSNLojt=06UbN4P-bpg@mail.gmail.com>
-	<6480496b-dbb5-37bb-57e2-7a4819c61511@deltatee.com>
-In-Reply-To: <6480496b-dbb5-37bb-57e2-7a4819c61511@deltatee.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 21 Nov 2018 11:51:58 -0800
-Message-ID: <CAKmqyKMPHg7nGr-Ua1Cb7yvdZzWAs6HOM4eB+SinMypXQ5Ni6w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 5/6] hw/riscv/sifive_u: Connect
- the Xilinx PCIe
+In-Reply-To: <54304edc-9de4-a25a-63d0-96518c5d7956@windriver.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] strange situation,
+ guest cpu thread spinning at ~100%, but display not yet initialized
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +39,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org, Guenter Roeck <linux@roeck-us.net>, Andrea Bolognani <abologna@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, Nov 21, 2018 at 11:25 AM Logan Gunthorpe <logang@deltatee.com> wrote:
->
->
->
-> On 2018-11-21 12:21 p.m., Alistair Francis wrote:
-> > On Wed, Nov 21, 2018 at 11:19 AM Logan Gunthorpe <logang@deltatee.com> wrote:
-> >> Well, I also have a kernel (one I've built myself) without microsemi
-> >> support, but with Xilinx support and it also doesn't work (see my dmesg
-> >> logs I sent).
-> >
-> > So this one should work.
->
-> It does not, see the dmesgs I sent a few emails ago.
->
-> >>
-> >>> For people who have modified the standard bbl to edit the device tree
-> >>> before passing it to Linux to add the MicroSemi PCIe node, it won't
-> >>> work. That's a very small number of people who have modified the
-> >>> standard boot loader. I don't think we need to document how those
-> >>> people get back to the default set-up.
-> >>
-> >> I have not done that. And it's not working for me.
-> >
-> > If you haven't done this then how can Linux know to probe the
-> > MicroSemi PCIe root complex?
->
-> Oh, well actually, in this case I was using the bbl/kernel you sent us,
-> so I'm not actually sure what's in it. The stuff I built myself doesn't
-> have any of the microsemi stuff, so it sounds like all that was a red
-> herring.
+On 11/2/2018 2:45 PM, Chris Friesen wrote:
+> On 11/2/2018 11:51 AM, Dr. David Alan Gilbert wrote:
 
-Ah ok. There was some confusion there then.
+>> =C2=A0=C2=A0=C2=A0 so the fix is Fam's 'aio: Do aio_notify_accept only=
+ during blocking
+>> aio_poll'.=C2=A0 I see you're running the qemu-kvm-ev from centos, if =
+I read
+>> the version tea-leaves right, then I think that patch is in the
+>> 2.10.0-21.el7_5.7.1 package I can see.
+>=20
+> It looks like we do not have this fix in our code, will definitely be=20
+> giving it a try.
+Well, it appears that this was not the fix.  With the patches applied we=20
+still saw the problem.
 
-So now it sounds like it's not working and there is no MicroSemi
-device. I will check and see what I find.
+One of my coworkers has been investigating further, and he sent me the=20
+following information:
 
-Alistair
+"One of the things the BIOS does before initializing the VGA is to start=20
+the CPUs. More specifically, from CPU-0, it broadcasts a Setup=20
+InterProcess Interrupt (SIPI) to all the remaining processors so that=20
+they wake up and are initialized. CPU-0 busy-waits for all the=20
+Instance=E2=80=99s CPUs to be initialized, and once that happens, it move=
+s on to=20
+continue booting (which includes initializing the VGA).  In our case,=20
+one CPU fails to respond to the SIPI causing CPU-0 to keep busy waiting=20
+for it. I am in the process of adding more instrumentation to qemu so=20
+that we can know whether the missing CPU did not receive the SIPI or=20
+what happened."
 
->
-> Logan
+Chris
