@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <logang@deltatee.com>) id 1gPX3n-0000OQ-RE
+	(envelope-from <logang@deltatee.com>) id 1gPX3p-0000OB-5o
 	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:17:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <logang@deltatee.com>) id 1gPWoq-0001Qv-N9
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:01:46 -0500
+	(envelope-from <logang@deltatee.com>) id 1gPWoW-0000z8-Dv
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:01:26 -0500
 References: <cover.1542819633.git.alistair.francis@wdc.com>
-	<4120d0a7e4fe6f3fd6bdd6c084a40a67a48be374.1542819633.git.alistair.francis@wdc.com>
+	<86e2120f18412152ed2994b72bd874120b86d749.1542819633.git.alistair.francis@wdc.com>
 From: Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <e3478876-09d1-121a-8c3c-850aa353449c@deltatee.com>
-Date: Wed, 21 Nov 2018 11:01:29 -0700
+Message-ID: <b49b54bf-2548-5a6b-1808-511b57cd33ad@deltatee.com>
+Date: Wed, 21 Nov 2018 11:01:10 -0700
 MIME-Version: 1.0
-In-Reply-To: <4120d0a7e4fe6f3fd6bdd6c084a40a67a48be374.1542819633.git.alistair.francis@wdc.com>
+In-Reply-To: <86e2120f18412152ed2994b72bd874120b86d749.1542819633.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-CA
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 4/6] riscv: Enable VGA and
- PCIE_VGA
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 3/6] hw/riscv/virt: Connect the
+ gpex PCIe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +31,31 @@ Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "linux@roeck-us.net" <linux@r
 
 
 On 2018-11-21 10:02 a.m., Alistair Francis wrote:
-> Enable compile support for VGA devices. This allows the user to conenct
-> a display by adding '-device bochs-display -display sdl' to their
-> command line argument.
-> 
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 
 Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 
-> ---
->  default-configs/riscv32-softmmu.mak | 3 +++
->  default-configs/riscv64-softmmu.mak | 3 +++
->  2 files changed, 6 insertions(+)
-> 
+
 > diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-> index 3e3d195f37..05fae82f1b 100644
+> index 7937c69e22..3e3d195f37 100644
 > --- a/default-configs/riscv32-softmmu.mak
 > +++ b/default-configs/riscv32-softmmu.mak
-> @@ -9,3 +9,6 @@ CONFIG_CADENCE=y
+> @@ -1,7 +1,11 @@
+>  # Default configuration for riscv-softmmu
 >  
->  CONFIG_PCI_GENERIC=y
->  CONFIG_PCI_XILINX=y
+> +include pci.mak
 > +
-> +CONFIG_VGA=y
-> +CONFIG_VGA_PCI=y
-> diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-> index 3e3d195f37..05fae82f1b 100644
-> --- a/default-configs/riscv64-softmmu.mak
-> +++ b/default-configs/riscv64-softmmu.mak
-> @@ -9,3 +9,6 @@ CONFIG_CADENCE=y
+>  CONFIG_SERIAL=y
+>  CONFIG_VIRTIO_MMIO=y
+> -include virtio.mak
 >  
->  CONFIG_PCI_GENERIC=y
->  CONFIG_PCI_XILINX=y
+>  CONFIG_CADENCE=y
 > +
-> +CONFIG_VGA=y
-> +CONFIG_VGA_PCI=y
-> 
+> +CONFIG_PCI_GENERIC=y
+> +CONFIG_PCI_XILINX=y
+
+Nit: should PCI_XILINX not be in patch 5? It's not used in this patch
+and was a bit confusing when reviewing.
+
+Logan
