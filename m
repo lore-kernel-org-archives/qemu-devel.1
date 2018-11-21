@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gPah6-0006Uh-Le
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPah6-0006Ug-Kz
 	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gPah0-00051B-9S
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPah0-00051H-B1
 	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:09:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47466)
+Received: from mx1.redhat.com ([209.132.183.28]:46258)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gPagw-0004pr-9h
+	id 1gPagw-0004cT-Aj
 	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:09:52 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 22 Nov 2018 02:06:40 +0400
-Message-Id: <20181121220647.18844-24-marcandre.lureau@redhat.com>
+Date: Thu, 22 Nov 2018 02:06:38 +0400
+Message-Id: <20181121220647.18844-22-marcandre.lureau@redhat.com>
 In-Reply-To: <20181121220647.18844-1-marcandre.lureau@redhat.com>
 References: <20181121220647.18844-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 for-3.2 v2 23/30] slirp: replace DEBUG_ARGS
- with DEBUG_ARG
+Subject: [Qemu-devel] [PATCH v2 for-3.2 v2 21/30] slirp: use %p for pointers
+ format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,175 +31,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-There is no clear benefit in calling an alias DEBUG_ARGS(). Replace
-calls with DEBUG_ARG(), and fix the white-spacing while at it.
+This fixes some compilation warnings on mingw64.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/debug.h     |  2 --
- slirp/arp_table.c | 12 ++++++------
- slirp/ip6_icmp.c  |  2 +-
- slirp/ndp_table.c | 18 +++++++++---------
- slirp/slirp.c     | 12 ++++++------
- slirp/tcp_input.c |  6 +++---
- 6 files changed, 25 insertions(+), 27 deletions(-)
+ slirp/ip6_icmp.c   | 2 +-
+ slirp/ip6_input.c  | 2 +-
+ slirp/ip6_output.c | 4 ++--
+ slirp/udp6.c       | 6 +++---
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/slirp/debug.h b/slirp/debug.h
-index ff920f0b87..50f30898fb 100644
---- a/slirp/debug.h
-+++ b/slirp/debug.h
-@@ -33,8 +33,6 @@ extern int slirp_debug;
-     }                                           \
- } while (0)
-=20
--#define DEBUG_ARGS(fmt, ...) DEBUG_ARG(fmt, ##__VA_ARGS__)
--
- #define DEBUG_MISC(fmt, ...) do {               \
-     if (slirp_debug & DBG_MISC) {               \
-         fprintf(dfd, fmt, ##__VA_ARGS__);       \
-diff --git a/slirp/arp_table.c b/slirp/arp_table.c
-index ce19e6e7c0..bf71b984ad 100644
---- a/slirp/arp_table.c
-+++ b/slirp/arp_table.c
-@@ -34,9 +34,9 @@ void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint=
-8_t ethaddr[ETH_ALEN])
-=20
-     DEBUG_CALL("arp_table_add");
-     DEBUG_ARG("ip =3D %s", inet_ntoa((struct in_addr){.s_addr =3D ip_add=
-r}));
--    DEBUG_ARGS(" hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
--               ethaddr[0], ethaddr[1], ethaddr[2],
--               ethaddr[3], ethaddr[4], ethaddr[5]);
-+    DEBUG_ARG("hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+              ethaddr[0], ethaddr[1], ethaddr[2],
-+              ethaddr[3], ethaddr[4], ethaddr[5]);
-=20
-     if (ip_addr =3D=3D 0 || ip_addr =3D=3D 0xffffffff || ip_addr =3D=3D =
-broadcast_addr) {
-         /* Do not register broadcast addresses */
-@@ -79,9 +79,9 @@ bool arp_table_search(Slirp *slirp, uint32_t ip_addr,
-     for (i =3D 0; i < ARP_TABLE_SIZE; i++) {
-         if (arptbl->table[i].ar_sip =3D=3D ip_addr) {
-             memcpy(out_ethaddr, arptbl->table[i].ar_sha,  ETH_ALEN);
--            DEBUG_ARGS(" found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x=
-\n",
--                       out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
--                       out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-+            DEBUG_ARG("found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+                      out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
-+                      out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-             return 1;
-         }
-     }
 diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index 95f8fddacc..e72c57a81d 100644
+index 0acdcc26a2..95f8fddacc 100644
 --- a/slirp/ip6_icmp.c
 +++ b/slirp/ip6_icmp.c
-@@ -75,7 +75,7 @@ void icmp6_send_error(struct mbuf *m, uint8_t type, uin=
-t8_t code)
-     char addrstr[INET6_ADDRSTRLEN];
+@@ -388,7 +388,7 @@ void icmp6_input(struct mbuf *m)
+     int hlen =3D sizeof(struct ip6);
 =20
-     DEBUG_CALL("icmp6_send_error");
--    DEBUG_ARGS(" type =3D %d, code =3D %d\n", type, code);
-+    DEBUG_ARG("type =3D %d, code =3D %d", type, code);
+     DEBUG_CALL("icmp6_input");
+-    DEBUG_ARG("m =3D %lx", (long) m);
++    DEBUG_ARG("m =3D %p", m);
+     DEBUG_ARG("m_len =3D %d", m->m_len);
 =20
-     if (IN6_IS_ADDR_MULTICAST(&ip->ip_src) ||
-             in6_zero(&ip->ip_src)) {
-diff --git a/slirp/ndp_table.c b/slirp/ndp_table.c
-index 1401e1b322..b7b73722f7 100644
---- a/slirp/ndp_table.c
-+++ b/slirp/ndp_table.c
-@@ -18,9 +18,9 @@ void ndp_table_add(Slirp *slirp, struct in6_addr ip_add=
-r,
-=20
-     DEBUG_CALL("ndp_table_add");
-     DEBUG_ARG("ip =3D %s", addrstr);
--    DEBUG_ARGS(" hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
--               ethaddr[0], ethaddr[1], ethaddr[2],
--               ethaddr[3], ethaddr[4], ethaddr[5]);
-+    DEBUG_ARG("hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+              ethaddr[0], ethaddr[1], ethaddr[2],
-+              ethaddr[3], ethaddr[4], ethaddr[5]);
-=20
-     if (IN6_IS_ADDR_MULTICAST(&ip_addr) || in6_zero(&ip_addr)) {
-         /* Do not register multicast or unspecified addresses */
-@@ -67,18 +67,18 @@ bool ndp_table_search(Slirp *slirp, struct in6_addr i=
-p_addr,
-         out_ethaddr[3] =3D ip_addr.s6_addr[13];
-         out_ethaddr[4] =3D ip_addr.s6_addr[14];
-         out_ethaddr[5] =3D ip_addr.s6_addr[15];
--        DEBUG_ARGS(" multicast addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n"=
-,
--                   out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
--                   out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-+        DEBUG_ARG("multicast addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+                  out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
-+                  out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-         return 1;
+     if (ntohs(ip->ip_pl) < ICMP6_MINLEN) {
+diff --git a/slirp/ip6_input.c b/slirp/ip6_input.c
+index ac2e3ea882..ab656a0a9d 100644
+--- a/slirp/ip6_input.c
++++ b/slirp/ip6_input.c
+@@ -31,7 +31,7 @@ void ip6_input(struct mbuf *m)
      }
 =20
-     for (i =3D 0; i < NDP_TABLE_SIZE; i++) {
-         if (in6_equal(&ndp_table->table[i].ip_addr, &ip_addr)) {
-             memcpy(out_ethaddr, ndp_table->table[i].eth_addr,  ETH_ALEN)=
-;
--            DEBUG_ARGS(" found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x=
-\n",
--                       out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
--                       out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-+            DEBUG_ARG("found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+                      out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
-+                      out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
-             return 1;
-         }
-     }
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 5954a99d3c..12aad702c2 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -989,12 +989,12 @@ int if_encap(Slirp *slirp, struct mbuf *ifm)
-     }
+     DEBUG_CALL("ip6_input");
+-    DEBUG_ARG("m =3D %lx", (long)m);
++    DEBUG_ARG("m =3D %p", m);
+     DEBUG_ARG("m_len =3D %d", m->m_len);
 =20
-     memcpy(eh->h_dest, ethaddr, ETH_ALEN);
--    DEBUG_ARGS(" src =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
--               eh->h_source[0], eh->h_source[1], eh->h_source[2],
--               eh->h_source[3], eh->h_source[4], eh->h_source[5]);
--    DEBUG_ARGS(" dst =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
--               eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
--               eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]);
-+    DEBUG_ARG("src =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+              eh->h_source[0], eh->h_source[1], eh->h_source[2],
-+              eh->h_source[3], eh->h_source[4], eh->h_source[5]);
-+    DEBUG_ARG("dst =3D %02x:%02x:%02x:%02x:%02x:%02x",
-+              eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
-+              eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]);
-     memcpy(buf + sizeof(struct ethhdr), ifm->m_data, ifm->m_len);
-     slirp->cb->output(slirp->opaque, buf, ifm->m_len + ETH_HLEN);
-     return 1;
-diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
-index bc4aa60046..d24295813a 100644
---- a/slirp/tcp_input.c
-+++ b/slirp/tcp_input.c
-@@ -215,8 +215,8 @@ tcp_input(struct mbuf *m, int iphlen, struct socket *=
-inso, unsigned short af)
-     Slirp *slirp;
+     if (m->m_len < sizeof(struct ip6)) {
+diff --git a/slirp/ip6_output.c b/slirp/ip6_output.c
+index 762cbfe89c..52c88ad691 100644
+--- a/slirp/ip6_output.c
++++ b/slirp/ip6_output.c
+@@ -19,8 +19,8 @@ int ip6_output(struct socket *so, struct mbuf *m, int f=
+ast)
+     struct ip6 *ip =3D mtod(m, struct ip6 *);
 =20
- 	DEBUG_CALL("tcp_input");
--	DEBUG_ARGS(" m =3D %p  iphlen =3D %2d  inso =3D %p\n",
--               m, iphlen, inso);
-+	DEBUG_ARG("m =3D %p  iphlen =3D %2d  inso =3D %p",
-+              m, iphlen, inso);
+     DEBUG_CALL("ip6_output");
+-    DEBUG_ARG("so =3D %lx", (long)so);
+-    DEBUG_ARG("m =3D %lx", (long)m);
++    DEBUG_ARG("so =3D %p", so);
++    DEBUG_ARG("m =3D %p", m);
 =20
- 	/*
- 	 * If called with m =3D=3D 0, then we're continuing the connect
-@@ -1389,7 +1389,7 @@ tcp_dooptions(struct tcpcb *tp, u_char *cp, int cnt=
-, struct tcpiphdr *ti)
- 	int opt, optlen;
+     /* Fill IPv6 header */
+     ip->ip_v =3D IP6VERSION;
+diff --git a/slirp/udp6.c b/slirp/udp6.c
+index 473ba1586e..8cdb1892e2 100644
+--- a/slirp/udp6.c
++++ b/slirp/udp6.c
+@@ -20,7 +20,7 @@ void udp6_input(struct mbuf *m)
+     struct sockaddr_in6 lhost;
 =20
- 	DEBUG_CALL("tcp_dooptions");
--	DEBUG_ARGS(" tp =3D %p  cnt=3D%i\n", tp, cnt);
-+	DEBUG_ARG("tp =3D %p  cnt=3D%i", tp, cnt);
+     DEBUG_CALL("udp6_input");
+-    DEBUG_ARG("m =3D %lx", (long)m);
++    DEBUG_ARG("m =3D %p", m);
 =20
- 	for (; cnt > 0; cnt -=3D optlen, cp +=3D optlen) {
- 		opt =3D cp[0];
+     if (slirp->restricted) {
+         goto bad;
+@@ -144,8 +144,8 @@ int udp6_output(struct socket *so, struct mbuf *m,
+     struct udphdr *uh;
+=20
+     DEBUG_CALL("udp6_output");
+-    DEBUG_ARG("so =3D %lx", (long)so);
+-    DEBUG_ARG("m =3D %lx", (long)m);
++    DEBUG_ARG("so =3D %p", so);
++    DEBUG_ARG("m =3D %p", m);
+=20
+     /* adjust for header */
+     m->m_data -=3D sizeof(struct udphdr);
 --=20
 2.20.0.rc1
