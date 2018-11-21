@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1gPOK1-000745-Ha
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 03:57:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gPOQN-0001Hk-Nl
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 04:03:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1gPOK0-0001KK-Eb
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 03:57:21 -0500
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:33846)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1gPOK0-0001Iw-4d
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 03:57:20 -0500
-Received: by mail-ed1-x543.google.com with SMTP id b3so4254237ede.1
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 00:57:19 -0800 (PST)
+	(envelope-from <dgibson@ozlabs.org>) id 1gPOQK-0007Rx-JT
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 04:03:55 -0500
+Date: Wed, 21 Nov 2018 19:42:30 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181121084230.GA10448@umbus.fritz.box>
+References: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
+	<20181119120820.29878-16-maozhongyi@cmss.chinamobile.com>
 MIME-Version: 1.0
-References: <20170601124746.32140-1-t.lamprecht@proxmox.com>
-	<CAJ+F1C+AmJCgtrSTxzhztmBpaNB2Y07grhXvq8DV+8z0Mj6YwA@mail.gmail.com>
-	<31b925a2-01df-695a-50d4-995a52a0820b@proxmox.com>
-In-Reply-To: <31b925a2-01df-695a-50d4-995a52a0820b@proxmox.com>
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Wed, 21 Nov 2018 10:57:08 +0200
-Message-ID: <CAKPgXcGU=F9rx1cKKHppYyU1Lh6sj=9cOnTx2RKzzcPvtoRR6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 1/1] qemu-ga: add missing libpcre to MSI build
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ew6BAiZeqk4r7MaW"
+Content-Disposition: inline
+In-Reply-To: <20181119120820.29878-16-maozhongyi@cmss.chinamobile.com>
+Subject: Re: [Qemu-devel] [PATCH 15/22] pci-bridge/dec: Convert sysbus init
+ function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: t.lamprecht@proxmox.com
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, sw@weilnetz.de, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, marcel.apfelbaum@gmail.com, qemu-ppc@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
-Hi thomas,
 
-Can you please share more info on why libpcre is needed in the first
-place? I have tried to build qemu without it and I see no issues of
-qemu-ga failing.
-On Fri, Jul 7, 2017 at 9:47 AM Thomas Lamprecht <t.lamprecht@proxmox.com> w=
-rote:
->
-> Hi,
->
-> On 06/02/2017 01:42 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >
-> > On Thu, Jun 1, 2017 at 5:08 PM Thomas Lamprecht<t.lamprecht@proxmox.com=
->
-> > wrote:
-> >
-> >> glib depends on libpcre which was not shipped with the MSI, thus
-> >> starting of the qemu-ga.exe failed with the respective error message.
-> >>
-> >> Tell WIXL to ship this library with the MSI to avoid this problem.
-> >>
-> >> Signed-off-by: Thomas Lamprecht<t.lamprecht@proxmox.com>
-> >> CC: Stefan Weil<sw@weilnetz.de>
-> >> CC: Michael Roth<mdroth@linux.vnet.ibm.com>
-> >>
-> > It depends on your glib build, but since Fedora is one of the most
-> > maintained cross mingw- distrib, it make sense to fix the build there.
->
-> But even if it isn't best to ship an unnecessary library it shouldn't
-> harm either. I'd like to make it nicer but after looking at the complexit=
-y
-> of possibilities to do so I rather want to avoid it, especially with my
-> almost non-existing knowledge of windows builds.
->
-> > Other solutions would involve either using wixl-specific require
-> > preprocessor directive (which comes with a bunch of unused files since
-> > those are mostly generated from mingw*- packages), or coming up with so=
-me
-> > kind of dynamic dependency resolution (approach similar to Richard W.M.
-> > Jones nsiswrapper). However this last approach is quite limited, since =
-it
-> > doesn't reach to data files etc.
-> > In the meantime:
-> >   Reviewed-by: Marc-Andr=C3=A9 Lureau<marcandre.lureau@redhat.com>
-> >
->
-> Thank you for the review!Has this any chance to still get into qemu 2.10?
-> Would be nice.
->
-> cheers,
-> Thomas
->
-> >> I haven't done much with the qga or WIXL, so I send this as a RFC.
-> >> I hope that I guessed the right people to get CC'ed from MAINTAINERS.
-> >>
-> >> This fixes a current qemu-ga MSI build, I tested it successfully with
-> >> Windows 7
-> >> and Windows 10 as guest OS.
-> >>
-> >> I cross built from a Fedora 25 LXC container.
-> >>
-> >> The Guid for the libpcre was generated byhttps://www.guidgen.com/  as
-> >> suggested
-> >> by:
-> >>
-> >> http://wixtoolset.org/documentation/manual/v3/howtos/general/generate_=
-guids.html
-> >>
-> >>   qga/installer/qemu-ga.wxs | 4 ++++
-> >>   1 file changed, 4 insertions(+)
-> >>
-> >> diff --git a/qga/installer/qemu-ga.wxs b/qga/installer/qemu-ga.wxs
-> >> index fa2260cafa..5af11627f8 100644
-> >> --- a/qga/installer/qemu-ga.wxs
-> >> +++ b/qga/installer/qemu-ga.wxs
-> >> @@ -125,6 +125,9 @@
-> >>             <Component Id=3D"libwinpthread"
-> >> Guid=3D"{6C117C78-0F47-4B07-8F34-6BEE11643829}">
-> >>               <File Id=3D"libwinpthread_1.dll" Name=3D"libwinpthread-1=
-.dll"
-> >> Source=3D"$(var.Mingw_bin)/libwinpthread-1.dll" KeyPath=3D"yes" DiskId=
-=3D"1"/>
-> >>             </Component>
-> >> +          <Component Id=3D"libpcre"
-> >> Guid=3D"{7A86B45E-A009-489A-A849-CE3BACF03CD0}">
-> >> +            <File Id=3D"libpcre_1.dll" Name=3D"libpcre-1.dll"
-> >> Source=3D"$(var.Mingw_bin)/libpcre-1.dll" KeyPath=3D"yes" DiskId=3D"1"=
-/>
-> >> +          </Component>
-> >>             <Component Id=3D"registry_entries"
-> >> Guid=3D"{D075D109-51CA-11E3-9F8B-000C29858960}">
-> >>               <RegistryKey Root=3D"HKLM"
-> >>
-> >> Key=3D"Software\$(env.QEMU_GA_MANUFACTURER)\$(env.QEMU_GA_DISTRO)\Tool=
-s\QemuGA">
-> >> @@ -173,6 +176,7 @@
-> >>         <ComponentRef Id=3D"libssp" />
-> >>         <ComponentRef Id=3D"libwinpthread" />
-> >>         <ComponentRef Id=3D"registry_entries" />
-> >> +      <ComponentRef Id=3D"libpcre" />
-> >>       </Feature>
-> >>
-> >>       <InstallExecuteSequence>
-> >> --
-> >> 2.11.0
-> >>
-> >>
-> >>
-> >> --
-> > Marc-Andr=C3=A9 Lureau
-> >
->
->
->
->
+--ew6BAiZeqk4r7MaW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Nov 19, 2018 at 08:08:13PM +0800, Mao Zhongyi wrote:
+> Use DeviceClass rather than SysBusDeviceClass in
+> pci_dec_21154_device_class_init().
+>=20
+> Cc: david@gibson.dropbear.id.au
+> Cc: mst@redhat.com
+> Cc: marcel.apfelbaum@gmail.com
+> Cc: qemu-ppc@nongnu.org
+>=20
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+> Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  hw/pci-bridge/dec.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
+> index 84492d5e5f..5b21c20e50 100644
+> --- a/hw/pci-bridge/dec.c
+> +++ b/hw/pci-bridge/dec.c
+> @@ -98,7 +98,7 @@ PCIBus *pci_dec_21154_init(PCIBus *parent_bus, int devf=
+n)
+>      return pci_bridge_get_sec_bus(br);
+>  }
+> =20
+> -static int pci_dec_21154_device_init(SysBusDevice *dev)
+> +static void pci_dec_21154_device_realize(DeviceState *dev, Error **errp)
+>  {
+>      PCIHostState *phb;
+> =20
+> @@ -108,9 +108,8 @@ static int pci_dec_21154_device_init(SysBusDevice *de=
+v)
+>                            dev, "pci-conf-idx", 0x1000);
+>      memory_region_init_io(&phb->data_mem, OBJECT(dev), &pci_host_data_le=
+_ops,
+>                            dev, "pci-data-idx", 0x1000);
+> -    sysbus_init_mmio(dev, &phb->conf_mem);
+> -    sysbus_init_mmio(dev, &phb->data_mem);
+> -    return 0;
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &phb->conf_mem);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &phb->data_mem);
+>  }
+> =20
+>  static void dec_21154_pci_host_realize(PCIDevice *d, Error **errp)
+> @@ -150,9 +149,9 @@ static const TypeInfo dec_21154_pci_host_info =3D {
+> =20
+>  static void pci_dec_21154_device_class_init(ObjectClass *klass, void *da=
+ta)
+>  {
+> -    SysBusDeviceClass *sdc =3D SYS_BUS_DEVICE_CLASS(klass);
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> =20
+> -    sdc->init =3D pci_dec_21154_device_init;
+> +    dc->realize =3D pci_dec_21154_device_realize;
+>  }
+> =20
+>  static const TypeInfo pci_dec_21154_device_info =3D {
 
 --=20
-Respectfully,
-Sameeh Jubran
-Linkedin
-Software Engineer @ Daynix.
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ew6BAiZeqk4r7MaW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv1GnMACgkQbDjKyiDZ
+s5L53A/+InPGP00kkA6rcGJ542ZHsywiSBO5FZQ+7iAhGTqbNhw3qBCMhUSaW3eP
+ioeTGeeFnVOgbi04PGD6pjB7RINPaH6w3CBhU5S0iS7y3r132gMcQVPo8HLyRTYn
+i8LAo/YYjZHiFuIasD902BP8oaYMH35WDZSP2nt7rDFxLcqMq8isVMDyGAccS6Kf
+0YJu6+kndbJWpMpzwwX36V+7b6HmRT1Q4QFmxJEYW3QP1n8eFVKiq/LQc31+XKZi
+21PPY/Orr3dTiKXSPh0iHLmAhsqiD9dspCLmCDJvGXY85DwI3GVobCm1iiwA3VQr
+RdsQs/ew9fgL1K0HW8gZK/2DUjfrk8/0KdmWcVcwHCefwBQ6fLYTtnR6OdtSHi2G
+XnUjwUMNHxnStdysDLC/3W95MuVw450CSyLYTAHQi9012LVPyADgjZ+tNeeLDNqk
+/7o265JcCMKPiuYXpOIle51LhsbFY9yhrqh4d0zewDbAPr4xXwk1G0EZfqatjQJb
+9EoBmZ683DfICjg/3Yu/k6QreXeY8DuEWhq+oLwlltKxk8HjsYX3abrGvJr6zFzN
+zThFYP/UqT/qpXNlooZ93yFuxY9smOT5+KBA3hefASdiKsq/eBA69eDZjEHDBBKB
+jlWIdBQI4V6jwNk3fDQyoGJvyt2mSIZkTpTVNI3Knr15gM7sP28=
+=w6wx
+-----END PGP SIGNATURE-----
+
+--ew6BAiZeqk4r7MaW--
