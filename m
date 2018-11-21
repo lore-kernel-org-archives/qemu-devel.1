@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gPSN9-0004kM-Vb
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:16:52 -0500
+	(envelope-from <mst@redhat.com>) id 1gPSYO-0008WE-Qa
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:28:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gPSN4-00074h-Vf
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:16:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57132)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gPSN4-00072U-Q0
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:16:46 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1212C394D3E
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 13:16:46 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 21 Nov 2018 14:16:38 +0100
-Message-Id: <20181121131638.26369-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] qapi: add query-display-options command
+	(envelope-from <mst@redhat.com>) id 1gPSYK-00054z-PM
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:28:28 -0500
+Date: Wed, 21 Nov 2018 08:28:20 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181121082647-mutt-send-email-mst@kernel.org>
+References: <20181120110427.7321-1-david@redhat.com>
+	<12d77ab0-f846-56e9-dcbd-e6d19a108a62@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <12d77ab0-f846-56e9-dcbd-e6d19a108a62@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/11] pci: hotplug handler reworks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +23,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org
 
-Add query-display-options command, which allows querying the qemu
-display configuration, and -- as an intentional side effect -- makes
-DisplayOptions discoverable via query-qmp-schema so libvirt can go
-figure which display options are supported.
+On Wed, Nov 21, 2018 at 01:43:05PM +0100, David Hildenbrand wrote:
+> On 20.11.18 12:04, David Hildenbrand wrote:
+> > This series reworks some pci hotplug handlers (except for s390, that will
+> > require more work but is not required for now).
+> > 
+> > 1. Route all unplug calls via the hotplug handler when called from the
+> >    unplug_request handler. This will be required to get multi-stage
+> >    hotplug handlers running, but also makes sense on its own (just like we
+> >    already did for some CPU/memory hotplug handlers).
+> > 
+> > 2. Introduce some pre_plug handlers where it makes sense already.
+> > 
+> > 3. Call the plug/pre_plug handler also for coldplugged devices. Especially
+> >    pcihp is special as it overwrites hotplug handlers.
+> > 
+> > This series will not yet factor out pre_plug/plug/unplug from pci device
+> > realize/unrealize functions, this will require more work but this
+> > series is also required first to get it running.
+> > 
+> > In my opinion what needs to be done in the future:
+> > 1. Introduce pre_plug/plug/unplug_request/unplug handlers for all PCI
+> >    buses
+> > 2. Move pci realize/unrealize parts to pre_plug/pkug/unplug functions like
+> >    pci_pre_plug() ...
+> > 3. Call the pci pre_plug/plug/unplug handlers from the PCI bus hotplug
+> >    handler at the right spots
+> > 4. Factor more checks from existing plug() handlers out into pre_plug()
+> >    (e.g. after the call to pci_pre_plug())
+> > 
+> > v2 -> v3:
+> > - Added "pci: Reuse pci-bridge hotplug handler handlers for pcie-pci-bridge"
+> > -- Use one handler callback for pcie and !pcie
+> > - "pci/shpc: perform unplug via the hotplug handler"
+> > -- Use one handler callback for pcie and !pcie
+> > -- Replace error check by an assertion
+> > - Minor description changes.
+> > - Added Rbs
+> > 
+> > v1 -> v2:
+> > - Added "pci/pcie: rename hotplug handler callbacks"
+> > - Added "pci/shpc: rename hotplug handler callbacks"
+> > - Added "s390x/pci: rename hotplug handler callbacks"
+> > - Dropped "pci/shpc: move hotplug checks to preplug handler"
+> > -- We will have to factor out stuff into pre_plug() first as described
+> >    above
+> > - Renamed and added more details to the "perform unplug via the hotplug
+> >   handler" patches
+> > - "pci/pcihp: overwrite hotplug handler recursively from the start"
+> > -- Perform the overwrite only for cold plugged bridges, to keep the
+> >    existing behavior
+> > 
+> > David Hildenbrand (11):
+> >   pci/pcie: rename hotplug handler callbacks
+> >   pci/shpc: rename hotplug handler callbacks
+> >   s390x/pci: rename hotplug handler callbacks
+> >   pci/pcie: stop plug/unplug if the slot is locked
+> >   pci/pcihp: perform check for bus capability in pre_plug handler
+> >   pci/pcihp: overwrite hotplug handler recursively from the start
+> >   pci/pcihp: perform unplug via the hotplug handler
+> >   pci/pcie: perform unplug via the hotplug handler
+> >   pci: Reuse pci-bridge hotplug handler handlers for pcie-pci-bridge
+> >   pci/shpc: perform unplug via the hotplug handler
+> >   spapr_pci: perform unplug via the hotplug handler
+> > 
+> >  hw/acpi/pcihp.c                 | 47 ++++++++++++++++++++++++++++-----
+> >  hw/acpi/piix4.c                 | 39 ++++++++++++++-------------
+> >  hw/pci-bridge/pci_bridge_dev.c  | 31 ++++++++++++++--------
+> >  hw/pci-bridge/pcie_pci_bridge.c | 32 +++-------------------
+> >  hw/pci/pcie.c                   | 46 +++++++++++++++++++++-----------
+> >  hw/pci/pcie_port.c              |  6 +++--
+> >  hw/pci/shpc.c                   | 25 ++++++++++++------
+> >  hw/ppc/spapr_pci.c              | 33 ++++++++++++++---------
+> >  hw/s390x/s390-pci-bus.c         | 12 ++++-----
+> >  include/hw/acpi/pcihp.h         |  5 ++++
+> >  include/hw/pci/pci_bridge.h     |  6 +++++
+> >  include/hw/pci/pcie.h           | 12 ++++++---
+> >  include/hw/pci/shpc.h           | 10 ++++---
+> >  13 files changed, 187 insertions(+), 117 deletions(-)
+> > 
+> 
+> Seems like everything is reviewed and this is good to go. Anybody fancy
+> queuing this? (@mst?) Thanks!
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Tested-by: Eric Blake <eblake@redhat.com>
-Tested-by: Erik Skultety <eskultet@redhat.com>
----
- vl.c         | 10 ++++++++++
- qapi/ui.json | 13 +++++++++++++
- 2 files changed, 23 insertions(+)
+Yes, thanks! But we are in freeze so please repost after the release and I will queue.
 
-diff --git a/vl.c b/vl.c
-index fa25d1ae2d..c6e662677a 100644
---- a/vl.c
-+++ b/vl.c
-@@ -128,6 +128,7 @@ int main(int argc, char **argv)
- #include "qapi/qapi-commands-block-core.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qapi/qapi-commands-run-state.h"
-+#include "qapi/qapi-commands-ui.h"
- #include "qapi/qmp/qerror.h"
- #include "sysemu/iothread.h"
- 
-@@ -2055,6 +2056,15 @@ static void parse_display_qapi(const char *optarg)
-     visit_free(v);
- }
- 
-+DisplayOptions *qmp_query_display_options(Error **errp)
-+{
-+    DisplayOptions *opts;
-+
-+    opts = g_new(DisplayOptions, 1);
-+    QAPI_CLONE_MEMBERS(DisplayOptions, opts, &dpy);
-+    return opts;
-+}
-+
- static void parse_display(const char *p)
- {
-     const char *opts;
-diff --git a/qapi/ui.json b/qapi/ui.json
-index e0000248d3..fd39acb5c3 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1102,3 +1102,16 @@
-   'discriminator' : 'type',
-   'data'    : { 'gtk'            : 'DisplayGTK',
-                 'egl-headless'   : 'DisplayEGLHeadless'} }
-+
-+##
-+# @query-display-options:
-+#
-+# Returns information about display configuration
-+#
-+# Returns: @DisplayOptions
-+#
-+# Since: 3.1
-+#
-+##
-+{ 'command': 'query-display-options',
-+  'returns': 'DisplayOptions' }
--- 
-2.9.3
+> -- 
+> 
+> Thanks,
+> 
+> David / dhildenb
