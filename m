@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46104)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=856356900=Paul.Durrant@citrix.com>)
-	id 1gPUB4-0005UM-IC
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:32 -0500
+	id 1gPUB3-0005Ss-CK
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=856356900=Paul.Durrant@citrix.com>)
-	id 1gPUB2-0003fk-Ej
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:30 -0500
+	id 1gPUB1-0003fO-VM
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:29 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Wed, 21 Nov 2018 15:11:55 +0000
-Message-ID: <20181121151211.15997-3-paul.durrant@citrix.com>
+Date: Wed, 21 Nov 2018 15:12:00 +0000
+Message-ID: <20181121151211.15997-8-paul.durrant@citrix.com>
 In-Reply-To: <20181121151211.15997-1-paul.durrant@citrix.com>
 References: <20181121151211.15997-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 02/18] xen: introduce new 'XenBus' and
- 'XenDevice' object hierarchy
+Subject: [Qemu-devel] [PATCH 07/18] xen: add event channel interface for
+ XenDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,293 +25,169 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-This patch adds the basic boilerplate for a 'XenBus' object that will act
-as a parent to 'XenDevice' PV backends.
-A new 'XenBridge' object is also added to connect XenBus to the system bus.
-
-The XenBus object is instantiated by a new xen_bus_init() function called
-from the same sites as the legacy xen_be_init() function.
-
-Subsequent patches will flesh-out the functionality of these objects.
+The legacy PV backend infrastructure provides functions to bind, unbind
+and send notifications to event channnels. Similar functionality will be
+required by XenDevice implementations so this patch adds the necessary
+support.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 ---
 Cc: Stefano Stabellini <sstabellini@kernel.org>
 Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/i386/xen/xen-hvm.c     |   3 ++
- hw/xen/Makefile.objs      |   2 +-
- hw/xen/trace-events       |   6 +++
- hw/xen/xen-bus.c          | 125 ++++++++++++++++++++++++++++++++++++++++++++++
- hw/xenpv/xen_machine_pv.c |   3 ++
- include/hw/xen/xen-bus.h  |  53 ++++++++++++++++++++
- 6 files changed, 191 insertions(+), 1 deletion(-)
- create mode 100644 hw/xen/xen-bus.c
- create mode 100644 include/hw/xen/xen-bus.h
+ hw/xen/xen-bus.c         | 84 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/xen/xen-bus.h | 16 +++++++++
+ 2 files changed, 100 insertions(+)
 
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 1d637639c7..4497f751d2 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -17,6 +17,7 @@
- #include "hw/i386/apic-msidef.h"
- #include "hw/xen/xen_common.h"
- #include "hw/xen/xen-legacy-backend.h"
-+#include "hw/xen/xen-bus.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qemu/error-report.h"
-@@ -1479,6 +1480,8 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
-     QLIST_INIT(&state->dev_list);
-     device_listener_register(&state->device_listener);
- 
-+    xen_bus_init();
-+
-     /* Initialize backend core & drivers */
-     if (xen_be_init() != 0) {
-         error_report("xen backend core setup failed");
-diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-index 3f64a44051..d9d6d7b4f9 100644
---- a/hw/xen/Makefile.objs
-+++ b/hw/xen/Makefile.objs
-@@ -1,5 +1,5 @@
- # xen backend driver support
--common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o
-+common-obj-$(CONFIG_XEN) += xen-legacy-backend.o xen_devconfig.o xen_pvdev.o xen-common.o xen-bus.o
- 
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
-diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-index c7e7a3b523..0172cd4e26 100644
---- a/hw/xen/trace-events
-+++ b/hw/xen/trace-events
-@@ -12,3 +12,9 @@ xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id:
- xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
- xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
- xen_domid_restrict(int err) "err: %u"
-+
-+# include/hw/xen/xen-bus.c
-+xen_bus_realize(void) ""
-+xen_bus_unrealize(void) ""
-+xen_device_realize(const char *type) "type: %s"
-+xen_device_unrealize(const char *type) "type: %s"
 diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-new file mode 100644
-index 0000000000..dede2d914a
---- /dev/null
+index 7a152d2a2f..64c8af54b0 100644
+--- a/hw/xen/xen-bus.c
 +++ b/hw/xen/xen-bus.c
-@@ -0,0 +1,125 @@
-+/*
-+ * Copyright (c) Citrix Systems Inc.
-+ * All rights reserved.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/xen/xen-bus.h"
-+#include "qapi/error.h"
-+#include "trace.h"
-+
-+static void xen_bus_unrealize(BusState *bus, Error **errp)
-+{
-+    trace_xen_bus_unrealize();
-+}
-+
-+static void xen_bus_realize(BusState *bus, Error **errp)
-+{
-+    trace_xen_bus_realize();
-+}
-+
-+static void xen_bus_class_init(ObjectClass *class, void *data)
-+{
-+    BusClass *bus_class = BUS_CLASS(class);
-+
-+    bus_class->realize = xen_bus_realize;
-+    bus_class->unrealize = xen_bus_unrealize;
-+}
-+
-+static const TypeInfo xen_bus_type_info = {
-+    .name = TYPE_XEN_BUS,
-+    .parent = TYPE_BUS,
-+    .instance_size = sizeof(XenBus),
-+    .class_size = sizeof(XenBusClass),
-+    .class_init = xen_bus_class_init,
-+};
-+
-+static void xen_device_unrealize(DeviceState *dev, Error **errp)
-+{
-+    XenDevice *xendev = XEN_DEVICE(dev);
-+    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    Error *local_err = NULL;
-+
-+    trace_xen_device_unrealize(type);
-+
-+    if (xendev_class->unrealize) {
-+        xendev_class->unrealize(xendev, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return;
-+        }
-+    }
-+}
-+
-+static void xen_device_realize(DeviceState *dev, Error **errp)
-+{
-+    XenDevice *xendev = XEN_DEVICE(dev);
-+    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
-+    const char *type = object_get_typename(OBJECT(xendev));
-+    Error *local_err = NULL;
-+
-+    trace_xen_device_realize(type);
-+
-+    if (xendev_class->realize) {
-+        xendev_class->realize(xendev, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            goto unrealize;
-+        }
-+    }
-+
-+    return;
-+
-+unrealize:
-+    xen_device_unrealize(dev, &error_abort);
-+}
-+
-+static void xen_device_class_init(ObjectClass *class, void *data)
-+{
-+    DeviceClass *dev_class = DEVICE_CLASS(class);
-+
-+    dev_class->realize = xen_device_realize;
-+    dev_class->unrealize = xen_device_unrealize;
-+    dev_class->bus_type = TYPE_XEN_BUS;
-+}
-+
-+static const TypeInfo xen_device_type_info = {
-+    .name = TYPE_XEN_DEVICE,
-+    .parent = TYPE_DEVICE,
-+    .instance_size = sizeof(XenDevice),
-+    .abstract = true,
-+    .class_size = sizeof(XenDeviceClass),
-+    .class_init = xen_device_class_init,
-+};
-+
-+typedef struct XenBridge {
-+    SysBusDevice busdev;
-+} XenBridge;
-+
-+#define TYPE_XEN_BRIDGE "xen-bridge"
-+
-+static const TypeInfo xen_bridge_type_info = {
-+    .name = TYPE_XEN_BRIDGE,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(XenBridge),
-+};
-+
-+static void xen_register_types(void)
-+{
-+    type_register_static(&xen_bridge_type_info);
-+    type_register_static(&xen_bus_type_info);
-+    type_register_static(&xen_device_type_info);
-+}
-+
-+type_init(xen_register_types)
-+
-+void xen_bus_init(void)
-+{
-+    DeviceState *dev = qdev_create(NULL, TYPE_XEN_BRIDGE);
-+
-+    qbus_create(TYPE_XEN_BUS, dev, NULL);
-+    qdev_init_nofail(dev);
-+}
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 8c86fb7031..608e591bcc 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -27,6 +27,7 @@
- #include "hw/hw.h"
- #include "hw/boards.h"
- #include "hw/xen/xen-legacy-backend.h"
-+#include "hw/xen/xen-bus.h"
- #include "xen_domainbuild.h"
- #include "sysemu/block-backend.h"
- 
-@@ -93,6 +94,8 @@ static void xen_init_pv(MachineState *machine)
-         xen_config_dev_nic(nd_table + i);
-     }
- 
-+    xen_bus_init();
-+
-     /* config cleanup hook */
-     atexit(xen_config_cleanup);
+@@ -579,6 +579,65 @@ done:
+     g_free(xengnttab_segs);
  }
+ 
++struct XenEventChannel {
++    unsigned int local_port;
++    XenEventHandler handler;
++    void *opaque;
++    Notifier notifier;
++};
++
++static void event_notify(Notifier *n, void *data)
++{
++    XenEventChannel *channel = container_of(n, XenEventChannel, notifier);
++    unsigned long port = (unsigned long)data;
++
++    if (port == channel->local_port) {
++        channel->handler(channel->opaque);
++    }
++}
++
++XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
++                                               unsigned int port,
++                                               XenEventHandler handler,
++                                               void *opaque, Error **errp)
++{
++    XenEventChannel *channel = g_new0(XenEventChannel, 1);
++
++    channel->local_port = xenevtchn_bind_interdomain(xendev->xeh,
++                                                     xendev->frontend_id,
++                                                     port);
++    if (xendev->local_port < 0) {
++        error_setg_errno(errp, errno, "xenevtchn_bind_interdomain failed");
++
++        g_free(channel);
++        return NULL;
++    }
++
++    channel->handler = handler;
++    channel->opaque = opaque;
++    channel->notifier.notify = event_notify;
++
++    notifier_list_add(&xendev->event_notifiers, &channel->notifier);
++
++    return channel;
++}
++
++void xen_device_notify_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel)
++{
++    xenevtchn_notify(xendev->xeh, channel->local_port);
++}
++
++void xen_device_unbind_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel)
++{
++    notifier_remove(&channel->notifier);
++
++    xenevtchn_unbind(xendev->xeh, channel->local_port);
++
++    g_free(channel);
++}
++
+ static void xen_device_unrealize(DeviceState *dev, Error **errp)
+ {
+     XenDevice *xendev = XEN_DEVICE(dev);
+@@ -602,6 +661,11 @@ static void xen_device_unrealize(DeviceState *dev, Error **errp)
+     xen_device_frontend_destroy(xendev);
+     xen_device_backend_destroy(xendev);
+ 
++    if (xendev->xeh) {
++        qemu_set_fd_handler(xenevtchn_fd(xendev->xeh), NULL, NULL, NULL);
++        xenevtchn_close(xendev->xeh);
++    }
++
+     if (xendev->xgth) {
+         xengnttab_close(xendev->xgth);
+     }
+@@ -616,6 +680,16 @@ static void xen_device_exit(Notifier *n, void *data)
+     xen_device_unrealize(DEVICE(xendev), &error_abort);
+ }
+ 
++static void xen_device_event(void *opaque)
++{
++    XenDevice *xendev = opaque;
++    unsigned long port = xenevtchn_pending(xendev->xeh);
++
++    notifier_list_notify(&xendev->event_notifiers, (void *)port);
++
++    xenevtchn_unmask(xendev->xeh, port);
++}
++
+ static void xen_device_realize(DeviceState *dev, Error **errp)
+ {
+     XenDevice *xendev = XEN_DEVICE(dev);
+@@ -656,6 +730,16 @@ static void xen_device_realize(DeviceState *dev, Error **errp)
+     xendev->feature_grant_copy =
+         (xengnttab_grant_copy(xendev->xgth, 0, NULL) == 0);
+ 
++    xendev->xeh = xenevtchn_open(NULL, 0);
++    if (!xendev->xeh) {
++        error_setg_errno(errp, errno, "failed xenevtchn_open");
++        goto unrealize;
++    }
++
++    notifier_list_init(&xendev->event_notifiers);
++    qemu_set_fd_handler(xenevtchn_fd(xendev->xeh), xen_device_event, NULL,
++                        xendev);
++
+     xen_device_backend_create(xendev, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
 diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-new file mode 100644
-index 0000000000..41772dc73a
---- /dev/null
+index db14d49027..386f6bfc93 100644
+--- a/include/hw/xen/xen-bus.h
 +++ b/include/hw/xen/xen-bus.h
-@@ -0,0 +1,53 @@
-+/*
-+ * Copyright (c) Citrix Systems Inc.
-+ * All rights reserved.
-+ */
+@@ -24,6 +24,9 @@ typedef struct XenDevice {
+     XenWatch *frontend_state_watch;
+     xengnttab_handle *xgth;
+     bool feature_grant_copy;
++    xenevtchn_handle *xeh;
++    xenevtchn_port_or_error_t local_port;
++    NotifierList event_notifiers;
+ } XenDevice;
+ 
+ typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
+@@ -102,4 +105,17 @@ void xen_device_copy_grant_refs(XenDevice *xendev, bool to_domain,
+                                 XenDeviceGrantCopySegment segs[],
+                                 unsigned int nr_segs, Error **errp);
+ 
++typedef struct XenEventChannel XenEventChannel;
 +
-+#ifndef HW_XEN_BUS_H
-+#define HW_XEN_BUS_H
++typedef void (*XenEventHandler)(void *opaque);
 +
-+#include "hw/sysbus.h"
++XenEventChannel *xen_device_bind_event_channel(XenDevice *xendev,
++                                               unsigned int port,
++                                               XenEventHandler handler,
++                                               void *opaque, Error **errp);
++void xen_device_notify_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel);
++void xen_device_unbind_event_channel(XenDevice *xendev,
++                                     XenEventChannel *channel);
 +
-+typedef struct XenDevice {
-+    DeviceState qdev;
-+} XenDevice;
-+
-+typedef void (*XenDeviceRealize)(XenDevice *xendev, Error **errp);
-+typedef void (*XenDeviceUnrealize)(XenDevice *xendev, Error **errp);
-+
-+typedef struct XenDeviceClass {
-+    /*< private >*/
-+    DeviceClass parent_class;
-+    /*< public >*/
-+    XenDeviceRealize realize;
-+    XenDeviceUnrealize unrealize;
-+} XenDeviceClass;
-+
-+#define TYPE_XEN_DEVICE "xen-device"
-+#define XEN_DEVICE(obj) \
-+     OBJECT_CHECK(XenDevice, (obj), TYPE_XEN_DEVICE)
-+#define XEN_DEVICE_CLASS(class) \
-+     OBJECT_CLASS_CHECK(XenDeviceClass, (class), TYPE_XEN_DEVICE)
-+#define XEN_DEVICE_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(XenDeviceClass, (obj), TYPE_XEN_DEVICE)
-+
-+typedef struct XenBus {
-+    BusState qbus;
-+} XenBus;
-+
-+typedef struct XenBusClass {
-+    /*< private >*/
-+    BusClass parent_class;
-+} XenBusClass;
-+
-+#define TYPE_XEN_BUS "xen-bus"
-+#define XEN_BUS(obj) \
-+    OBJECT_CHECK(XenBus, (obj), TYPE_XEN_BUS)
-+#define XEN_BUS_CLASS(class) \
-+    OBJECT_CLASS_CHECK(XenBusClass, (class), TYPE_XEN_BUS)
-+#define XEN_BUS_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(XenBusClass, (obj), TYPE_XEN_BUS)
-+
-+void xen_bus_init(void);
-+
-+#endif /* HW_XEN_BUS_H */
+ #endif /* HW_XEN_BUS_H */
 -- 
 2.11.0
