@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gPRqt-0007lO-E0
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:43:32 -0500
+	(envelope-from <rjones@redhat.com>) id 1gPRvR-0001sE-Vk
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:48:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gPRqp-0008JP-El
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:43:31 -0500
-References: <20181120110427.7321-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <12d77ab0-f846-56e9-dcbd-e6d19a108a62@redhat.com>
-Date: Wed, 21 Nov 2018 13:43:05 +0100
+	(envelope-from <rjones@redhat.com>) id 1gPRvO-0003rS-0h
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:48:13 -0500
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Wed, 21 Nov 2018 12:47:47 +0000
+Message-Id: <20181121124747.30696-1-rjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181120110427.7321-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 00/11] pci: hotplug handler reworks
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] scsi-disk: Fix crash if underlying host file
+ or disk returns error.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +20,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 20.11.18 12:04, David Hildenbrand wrote:
-> This series reworks some pci hotplug handlers (except for s390, that will
-> require more work but is not required for now).
-> 
-> 1. Route all unplug calls via the hotplug handler when called from the
->    unplug_request handler. This will be required to get multi-stage
->    hotplug handlers running, but also makes sense on its own (just like we
->    already did for some CPU/memory hotplug handlers).
-> 
-> 2. Introduce some pre_plug handlers where it makes sense already.
-> 
-> 3. Call the plug/pre_plug handler also for coldplugged devices. Especially
->    pcihp is special as it overwrites hotplug handlers.
-> 
-> This series will not yet factor out pre_plug/plug/unplug from pci device
-> realize/unrealize functions, this will require more work but this
-> series is also required first to get it running.
-> 
-> In my opinion what needs to be done in the future:
-> 1. Introduce pre_plug/plug/unplug_request/unplug handlers for all PCI
->    buses
-> 2. Move pci realize/unrealize parts to pre_plug/pkug/unplug functions like
->    pci_pre_plug() ...
-> 3. Call the pci pre_plug/plug/unplug handlers from the PCI bus hotplug
->    handler at the right spots
-> 4. Factor more checks from existing plug() handlers out into pre_plug()
->    (e.g. after the call to pci_pre_plug())
-> 
-> v2 -> v3:
-> - Added "pci: Reuse pci-bridge hotplug handler handlers for pcie-pci-bridge"
-> -- Use one handler callback for pcie and !pcie
-> - "pci/shpc: perform unplug via the hotplug handler"
-> -- Use one handler callback for pcie and !pcie
-> -- Replace error check by an assertion
-> - Minor description changes.
-> - Added Rbs
-> 
-> v1 -> v2:
-> - Added "pci/pcie: rename hotplug handler callbacks"
-> - Added "pci/shpc: rename hotplug handler callbacks"
-> - Added "s390x/pci: rename hotplug handler callbacks"
-> - Dropped "pci/shpc: move hotplug checks to preplug handler"
-> -- We will have to factor out stuff into pre_plug() first as described
->    above
-> - Renamed and added more details to the "perform unplug via the hotplug
->   handler" patches
-> - "pci/pcihp: overwrite hotplug handler recursively from the start"
-> -- Perform the overwrite only for cold plugged bridges, to keep the
->    existing behavior
-> 
-> David Hildenbrand (11):
->   pci/pcie: rename hotplug handler callbacks
->   pci/shpc: rename hotplug handler callbacks
->   s390x/pci: rename hotplug handler callbacks
->   pci/pcie: stop plug/unplug if the slot is locked
->   pci/pcihp: perform check for bus capability in pre_plug handler
->   pci/pcihp: overwrite hotplug handler recursively from the start
->   pci/pcihp: perform unplug via the hotplug handler
->   pci/pcie: perform unplug via the hotplug handler
->   pci: Reuse pci-bridge hotplug handler handlers for pcie-pci-bridge
->   pci/shpc: perform unplug via the hotplug handler
->   spapr_pci: perform unplug via the hotplug handler
-> 
->  hw/acpi/pcihp.c                 | 47 ++++++++++++++++++++++++++++-----
->  hw/acpi/piix4.c                 | 39 ++++++++++++++-------------
->  hw/pci-bridge/pci_bridge_dev.c  | 31 ++++++++++++++--------
->  hw/pci-bridge/pcie_pci_bridge.c | 32 +++-------------------
->  hw/pci/pcie.c                   | 46 +++++++++++++++++++++-----------
->  hw/pci/pcie_port.c              |  6 +++--
->  hw/pci/shpc.c                   | 25 ++++++++++++------
->  hw/ppc/spapr_pci.c              | 33 ++++++++++++++---------
->  hw/s390x/s390-pci-bus.c         | 12 ++++-----
->  include/hw/acpi/pcihp.h         |  5 ++++
->  include/hw/pci/pci_bridge.h     |  6 +++++
->  include/hw/pci/pcie.h           | 12 ++++++---
->  include/hw/pci/shpc.h           | 10 ++++---
->  13 files changed, 187 insertions(+), 117 deletions(-)
-> 
+Commit 40dce4ee6 "scsi-disk: fix rerror/werror=3Dignore" introduced a
+bug which causes qemu to crash with the assertion error below if the
+host file or disk returns an error:
 
-Seems like everything is reviewed and this is good to go. Anybody fancy
-queuing this? (@mst?) Thanks!
+  qemu-system-x86_64: hw/scsi/scsi-bus.c:1374: scsi_req_complete:
+  Assertion `req->status =3D=3D -1' failed.
 
--- 
+Kevin Wolf suggested this fix:
 
-Thanks,
+  < kwolf> Hm, should the final return false; in that patch
+           actually be a return true?
+  < kwolf> Because I think he didn't intend to change anything
+           except BLOCK_ERROR_ACTION_IGNORE
 
-David / dhildenb
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1804323
+---
+ hw/scsi/scsi-disk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 6eb258d3f3..0e9027c8f3 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -482,7 +482,7 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int =
+error, bool acct_failed)
+     if (action =3D=3D BLOCK_ERROR_ACTION_STOP) {
+         scsi_req_retry(&r->req);
+     }
+-    return false;
++    return true;
+ }
+=20
+ static void scsi_write_complete_noio(SCSIDiskReq *r, int ret)
+--=20
+2.19.0.rc0
