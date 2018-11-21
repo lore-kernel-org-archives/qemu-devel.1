@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gPTiR-0000Ta-L9
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 09:43:01 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gPTir-00012j-Ul
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 09:43:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gPTiQ-00017b-SO
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 09:42:55 -0500
-Date: Wed, 21 Nov 2018 15:42:11 +0100
+	(envelope-from <sameo@linux.intel.com>) id 1gPTir-0001MN-5C
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 09:43:21 -0500
+Date: Wed, 21 Nov 2018 15:42:37 +0100
 From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181121144211.GE4426@caravaggio>
+Message-ID: <20181121144237.GF4426@caravaggio>
 References: <20181105014047.26447-1-sameo@linux.intel.com>
-	<20181105014047.26447-6-sameo@linux.intel.com>
-	<20181108151623.4de26ecb@redhat.com>
+	<20181105014047.26447-2-sameo@linux.intel.com>
+	<20181109152316.43b79217@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181108151623.4de26ecb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 05/24] hw: acpi: Implement XSDT support
- for RSDP
+In-Reply-To: <20181109152316.43b79217@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 01/24] hw: i386: Decouple the ACPI build
+ from the PC machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +30,66 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@ke
 
 Hi Igor,
 
-On Thu, Nov 08, 2018 at 03:16:23PM +0100, Igor Mammedov wrote:
-> On Mon,  5 Nov 2018 02:40:28 +0100
+On Fri, Nov 09, 2018 at 03:23:16PM +0100, Igor Mammedov wrote:
+> On Mon,  5 Nov 2018 02:40:24 +0100
 > Samuel Ortiz <sameo@linux.intel.com> wrote:
 > 
-> > XSDT is the 64-bit version of the legacy ACPI RSDT (Root System
-> > Description Table). RSDT only allow for 32-bit addressses and have thus
-> > been deprecated. Since ACPI version 2.0, RSDPs should point at XSDTs and
-> > no longer RSDTs, although RSDTs are still supported for backward
-> > compatibility.
+> > ACPI tables are platform and machine type and even architecture
+> > agnostic, and as such we want to provide an internal ACPI API that
+> > only depends on platform agnostic information.
 > > 
-> > Since version 2.0, RSDPs should add an extended checksum, a complete table
-> > length and a version field to the table.
+> > For the x86 architecture, in order to build ACPI tables independently
+> > from the PC or Q35 machine types, we are moving a few MachineState
+> > structure fields into a machine type agnostic structure called
+> > AcpiConfiguration. The structure fields we move are:
 > 
-> This patch re-implements what arm/virt board already does
-> and fixes checksum bug in the later and at the same time
-> without a user (within the patch).
+> It's not obvious why new structure is needed, especially at
+> the beginning of series. We probably should place this patch
+> much later in the series (if we need it at all) and try
+> generalize a much as possible without using it.
+Patches order set aside, this new structure is needed to make the
+existing API not completely bound to the pc machine type anymore and
+"Decouple the ACPI build from the PC machine type".
+
+It was either creating a structure to build ACPI tables in a machine
+type independent fashion, or pass custom structures (or potentially long
+list of arguments) to the existing APIs. See below.
+
+
+> And try to come up with an API that doesn't need centralized collection
+> of data somehow related to ACPI (most of the fields here are not generic
+> and applicable to a specific board/target).
 > 
-> I'd suggest redo it a way similar to FADT refactoring
->   patch 1: fix checksum bug in virt/arm
->   patch 2: update reference tables in test
->   patch 3: introduce AcpiRsdpData similar to commit 937d1b587
->              (both arm and x86) wich stores all data in hos byte order
->   patch 4: convert arm's impl. to build_append_int_noprefix() API (commit 5d7a334f7)
->
->            ... move out to aml-build.c
->   patch 5: reuse generalized arm's build_rsdp() for x86, dropping x86 specific one
->       amending it to generate rev1 variant defined by revision in AcpiRsdpData
->       (commit dd1b2037a)
-I agree patches #1, #2 and #5 make sense. 3 and 4 as well, but here
-you're asking about something that's out of scope of the current serie.
-I'll move those patches from this serie and build a 6 patches new serie
-as suggested.
+> For generic API, I'd prefer a separate building blocks
+> like build_fadt()/... that take as an input only parameters
+> necessary to compose a table/aml part with occasional board
+> interface hooks instead of all encompassing AcpiConfiguration
+> and board specific 'acpi_build' that would use them when/if needed.
+Let's take build_madt as an example. With my patch we define:
+
+void build_madt(GArray *table_data, BIOSLinker *linker,
+                MachineState *ms, AcpiConfiguration *conf);
+
+And you're suggesting we'd define:
+
+void build_madt(GArray *table_data, BIOSLinker *linker,
+                MachineState *ms, HotplugHandler *acpi_dev,
+                bool apic_xrupt_override);
+
+instead. Is that correct?
+
+Pros for the latter is the fact that, as you said, we would not need to
+define a centralized structure holding all possibly needed ACPI related
+fields.
+Pros for the former is about defining a pointer to all needed ACPI
+fields once and for all and hiding the details of the API in the AML
+building implementation.
+
+
+> We probably should split series into several smaller
+> (if possible independent) ones, so people won't be scared of
+> its sheer size and run away from reviewing it.
+I will try to split it in smaller chunks if that helps.
 
 Cheers,
 Samuel.
