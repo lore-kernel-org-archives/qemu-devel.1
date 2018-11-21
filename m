@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1gPOHO-0006DZ-5U
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 03:54:38 -0500
+	(envelope-from <sameeh@daynix.com>) id 1gPOK1-000745-Ha
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 03:57:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1gPOHL-0006tn-1y
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 03:54:38 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3109 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1gPOHK-0006q1-Ly
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 03:54:34 -0500
-References: <B328F08581D714418202ABF306D3781C3B774417@dggeml509-mbx.china.huawei.com>
-	<20181120152325.ekxhvjndzgflijvb@sirius.home.kraxel.org>
-	<B328F08581D714418202ABF306D3781C3B776FA6@dggeml509-mbx.china.huawei.com>
-	<20181121082307.3fa3nd7cuu3canx4@sirius.home.kraxel.org>
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <994425cd-c99e-f69f-9fac-fbd7d2edf470@huawei.com>
-Date: Wed, 21 Nov 2018 16:54:15 +0800
+	(envelope-from <sameeh@daynix.com>) id 1gPOK0-0001KK-Eb
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 03:57:21 -0500
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:33846)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1gPOK0-0001Iw-4d
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 03:57:20 -0500
+Received: by mail-ed1-x543.google.com with SMTP id b3so4254237ede.1
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 00:57:19 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181121082307.3fa3nd7cuu3canx4@sirius.home.kraxel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+References: <20170601124746.32140-1-t.lamprecht@proxmox.com>
+	<CAJ+F1C+AmJCgtrSTxzhztmBpaNB2Y07grhXvq8DV+8z0Mj6YwA@mail.gmail.com>
+	<31b925a2-01df-695a-50d4-995a52a0820b@proxmox.com>
+In-Reply-To: <31b925a2-01df-695a-50d4-995a52a0820b@proxmox.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Wed, 21 Nov 2018 10:57:08 +0200
+Message-ID: <CAKPgXcGU=F9rx1cKKHppYyU1Lh6sj=9cOnTx2RKzzcPvtoRR6g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel]
- =?utf-8?b?562U5aSNOiAgQ2FuJ3Qgc2VlIG1vdXNlIGN1cnNv?=
- =?utf-8?q?r_on_VNC_viewer?=
+Subject: Re: [Qemu-devel] [RFC 1/1] qemu-ga: add missing libpcre to MSI build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +30,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: t.lamprecht@proxmox.com
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, sw@weilnetz.de, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Hi Gerd,
+Hi thomas,
 
-Is there any hacking way to turn off hardware cursor support for virtio-g=
-pu, and make the cursor also be rendered to the framebuffer?
-
-Thanks,
-
-Heyi
-
-
-On 2018/11/21 16:23, Gerd Hoffmann wrote:
->    Hi,
+Can you please share more info on why libpcre is needed in the first
+place? I have tried to build qemu without it and I see no issues of
+qemu-ga failing.
+On Fri, Jul 7, 2017 at 9:47 AM Thomas Lamprecht <t.lamprecht@proxmox.com> w=
+rote:
 >
->> and can=E2=80=99t see cursor either with =E2=80=9Cvirtio-gpu=E2=80=9D.=
- Does that mean
->> virtio-gpu + VNC must rely on VNC client to draw the cursor image on
->> the screen?
-> Yes.  virtio-gpu sends the cursor to the vnc client (via rich cursor
-> extension) and expects the vnc client to show it.  So, if you ask your
-> vnc client to not show the rich cursor the cursor is gone.  Solution:
-> don't do that.
+> Hi,
 >
-> stdvga has no hardware cursor support, so it is rendered to the
-> framebuffer (by the guest).
+> On 06/02/2017 01:42 PM, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > On Thu, Jun 1, 2017 at 5:08 PM Thomas Lamprecht<t.lamprecht@proxmox.com=
 >
-> cirrus hardware cursor can't be mapped to rich cursor,
-> so it is rendered to the framebuffer too (by qemu this time).
+> > wrote:
+> >
+> >> glib depends on libpcre which was not shipped with the MSI, thus
+> >> starting of the qemu-ga.exe failed with the respective error message.
+> >>
+> >> Tell WIXL to ship this library with the MSI to avoid this problem.
+> >>
+> >> Signed-off-by: Thomas Lamprecht<t.lamprecht@proxmox.com>
+> >> CC: Stefan Weil<sw@weilnetz.de>
+> >> CC: Michael Roth<mdroth@linux.vnet.ibm.com>
+> >>
+> > It depends on your glib build, but since Fedora is one of the most
+> > maintained cross mingw- distrib, it make sense to fix the build there.
+>
+> But even if it isn't best to ship an unnecessary library it shouldn't
+> harm either. I'd like to make it nicer but after looking at the complexit=
+y
+> of possibilities to do so I rather want to avoid it, especially with my
+> almost non-existing knowledge of windows builds.
+>
+> > Other solutions would involve either using wixl-specific require
+> > preprocessor directive (which comes with a bunch of unused files since
+> > those are mostly generated from mingw*- packages), or coming up with so=
+me
+> > kind of dynamic dependency resolution (approach similar to Richard W.M.
+> > Jones nsiswrapper). However this last approach is quite limited, since =
+it
+> > doesn't reach to data files etc.
+> > In the meantime:
+> >   Reviewed-by: Marc-Andr=C3=A9 Lureau<marcandre.lureau@redhat.com>
+> >
+>
+> Thank you for the review!Has this any chance to still get into qemu 2.10?
+> Would be nice.
 >
 > cheers,
->    Gerd
+> Thomas
+>
+> >> I haven't done much with the qga or WIXL, so I send this as a RFC.
+> >> I hope that I guessed the right people to get CC'ed from MAINTAINERS.
+> >>
+> >> This fixes a current qemu-ga MSI build, I tested it successfully with
+> >> Windows 7
+> >> and Windows 10 as guest OS.
+> >>
+> >> I cross built from a Fedora 25 LXC container.
+> >>
+> >> The Guid for the libpcre was generated byhttps://www.guidgen.com/  as
+> >> suggested
+> >> by:
+> >>
+> >> http://wixtoolset.org/documentation/manual/v3/howtos/general/generate_=
+guids.html
+> >>
+> >>   qga/installer/qemu-ga.wxs | 4 ++++
+> >>   1 file changed, 4 insertions(+)
+> >>
+> >> diff --git a/qga/installer/qemu-ga.wxs b/qga/installer/qemu-ga.wxs
+> >> index fa2260cafa..5af11627f8 100644
+> >> --- a/qga/installer/qemu-ga.wxs
+> >> +++ b/qga/installer/qemu-ga.wxs
+> >> @@ -125,6 +125,9 @@
+> >>             <Component Id=3D"libwinpthread"
+> >> Guid=3D"{6C117C78-0F47-4B07-8F34-6BEE11643829}">
+> >>               <File Id=3D"libwinpthread_1.dll" Name=3D"libwinpthread-1=
+.dll"
+> >> Source=3D"$(var.Mingw_bin)/libwinpthread-1.dll" KeyPath=3D"yes" DiskId=
+=3D"1"/>
+> >>             </Component>
+> >> +          <Component Id=3D"libpcre"
+> >> Guid=3D"{7A86B45E-A009-489A-A849-CE3BACF03CD0}">
+> >> +            <File Id=3D"libpcre_1.dll" Name=3D"libpcre-1.dll"
+> >> Source=3D"$(var.Mingw_bin)/libpcre-1.dll" KeyPath=3D"yes" DiskId=3D"1"=
+/>
+> >> +          </Component>
+> >>             <Component Id=3D"registry_entries"
+> >> Guid=3D"{D075D109-51CA-11E3-9F8B-000C29858960}">
+> >>               <RegistryKey Root=3D"HKLM"
+> >>
+> >> Key=3D"Software\$(env.QEMU_GA_MANUFACTURER)\$(env.QEMU_GA_DISTRO)\Tool=
+s\QemuGA">
+> >> @@ -173,6 +176,7 @@
+> >>         <ComponentRef Id=3D"libssp" />
+> >>         <ComponentRef Id=3D"libwinpthread" />
+> >>         <ComponentRef Id=3D"registry_entries" />
+> >> +      <ComponentRef Id=3D"libpcre" />
+> >>       </Feature>
+> >>
+> >>       <InstallExecuteSequence>
+> >> --
+> >> 2.11.0
+> >>
+> >>
+> >>
+> >> --
+> > Marc-Andr=C3=A9 Lureau
+> >
 >
 >
 >
+>
+
+
+--=20
+Respectfully,
+Sameeh Jubran
+Linkedin
+Software Engineer @ Daynix.
