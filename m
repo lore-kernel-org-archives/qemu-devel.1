@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gPRdH-0002a9-6z
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:29:28 -0500
+	(envelope-from <mst@redhat.com>) id 1gPRja-0004SE-85
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:35:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gPRdF-00076d-9V
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:29:27 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39099)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gPRdD-0006zR-BN
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:29:25 -0500
-Received: by mail-pl1-x644.google.com with SMTP id b5-v6so5353327pla.6
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 04:29:21 -0800 (PST)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Wed, 21 Nov 2018 04:29:10 -0800
-Message-Id: <20181121122910.20631-1-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] target/xtensa: xtfpga: provide default
- memory sizes
+	(envelope-from <mst@redhat.com>) id 1gPRjY-00079c-Fa
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:35:58 -0500
+Date: Wed, 21 Nov 2018 07:35:47 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181121072954-mutt-send-email-mst@kernel.org>
+References: <20181105014047.26447-1-sameo@linux.intel.com>
+	<20181116172919.43f3e27d@redhat.com>
+	<d4f6f0ef-1333-a917-e3eb-d9bad47c9648@redhat.com>
+	<20181119163110.2f357f40@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181119163110.2f357f40@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 00/24] ACPI reorganization for
+ hardware-reduced API addition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
 
-Provide default RAM sizes for all XTFPGA boards, so that when started
-without -m option they do the right thing.
+On Mon, Nov 19, 2018 at 04:31:10PM +0100, Igor Mammedov wrote:
+> On Fri, 16 Nov 2018 17:37:54 +0100
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+> > On 16/11/18 17:29, Igor Mammedov wrote:
+> > > General suggestions for this series:
+> > >   1. Preferably don't do multiple changes within a patch
+> > >      neither post huge patches (unless it's pure code movement).
+> > >      (it's easy to squash patches later it necessary)
+> > >   2. Start small, pick a table generalize it and send as
+> > >      one small patchset. Tables are often independent
+> > >      and it's much easier on both author/reviewer to agree upon
+> > >      changes and rewrite it if necessary.  
+> > 
+> > How would that be done?  This series is on the bigger side, agreed, but
+> > most of it is really just code movement.  It's a starting point, having
+> > a generic ACPI library is way beyond what this is trying to do.
+> I've tried to give suggestions how to restructure series
+> on per patch basis. In my opinion it quite possible to split
+> series in several smaller ones and it should really help with
+> making series cleaner and easier/faster to review/amend/merge
+> vs what we have in v5.
+> (it's more frustrating to rework large series vs smaller one)
+> 
+> If something isn't clear, it's easy to reach out to me here
+> or directly (email/irc/github) for clarification/feed back.
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
-Changes v1->v2:
-- fix memory sizes for ml605 and kc705 with MMU
+I assume the #1 goal is to add reduced HW support.  So another
+option to speed up merging is to just go ahead and duplicate a
+bunch of code e.g. in pc_virt.c acpi/reduced.c or in any other
+file.
+This way it might be easier to see what's common code and what isn't.
+And I think offline Igor said he might prefer that way. Right Igor?
 
- hw/xtensa/xtfpga.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index b3161de32093..f9d41c5d1875 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -568,6 +568,7 @@ static void xtfpga_lx60_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_lx60_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-+    mc->default_ram_size = 64 * MiB;
- }
- 
- static const TypeInfo xtfpga_lx60_type = {
-@@ -584,6 +585,7 @@ static void xtfpga_lx60_nommu_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_lx60_nommu_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-+    mc->default_ram_size = 64 * MiB;
- }
- 
- static const TypeInfo xtfpga_lx60_nommu_type = {
-@@ -600,6 +602,7 @@ static void xtfpga_lx200_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_lx200_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-+    mc->default_ram_size = 96 * MiB;
- }
- 
- static const TypeInfo xtfpga_lx200_type = {
-@@ -616,6 +619,7 @@ static void xtfpga_lx200_nommu_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_lx200_nommu_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-+    mc->default_ram_size = 96 * MiB;
- }
- 
- static const TypeInfo xtfpga_lx200_nommu_type = {
-@@ -632,6 +636,7 @@ static void xtfpga_ml605_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_ml605_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-+    mc->default_ram_size = 384 * MiB;
- }
- 
- static const TypeInfo xtfpga_ml605_type = {
-@@ -648,6 +653,7 @@ static void xtfpga_ml605_nommu_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_ml605_nommu_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-+    mc->default_ram_size = 256 * MiB;
- }
- 
- static const TypeInfo xtfpga_ml605_nommu_type = {
-@@ -664,6 +670,7 @@ static void xtfpga_kc705_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_kc705_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-+    mc->default_ram_size = 896 * MiB;
- }
- 
- static const TypeInfo xtfpga_kc705_type = {
-@@ -680,6 +687,7 @@ static void xtfpga_kc705_nommu_class_init(ObjectClass *oc, void *data)
-     mc->init = xtfpga_kc705_nommu_init;
-     mc->max_cpus = 4;
-     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-+    mc->default_ram_size = 256 * MiB;
- }
- 
- static const TypeInfo xtfpga_kc705_nommu_type = {
--- 
-2.11.0
+> > 
+> > Paolo
+> > 
+> > >   3. when you think about refactoring acpi into a generic API
+> > >      think about it as routines that go into a separate library
+> > >      (pure acpi spec code) and qemu/acpi glue routines and
+> > >       divide them correspondingly.  
+> > 
