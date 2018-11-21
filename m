@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gPQ4j-00048X-41
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:49:41 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1gPQ8r-00065L-Qf
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:53:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gPQ4f-0004r1-9G
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:49:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gPQ4b-0004mj-LC
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:49:35 -0500
-References: <20181120092542.13102-1-david@redhat.com>
-	<20181120092542.13102-6-david@redhat.com>
-	<27cfb4e6-b4db-10de-02c7-691f011d5f99@redhat.com>
-	<f5dd77c5-8d40-fe95-4fc8-69aa96fa4f13@redhat.com>
-	<0a72b07b-3620-7728-4248-8cd7c0112489@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <9a7bc7ca-774c-5419-65a3-a4ebf621996b@redhat.com>
-Date: Wed, 21 Nov 2018 11:49:30 +0100
-MIME-Version: 1.0
-In-Reply-To: <0a72b07b-3620-7728-4248-8cd7c0112489@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+	(envelope-from <programmingkidx@gmail.com>) id 1gPQ8o-0002P7-MM
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:53:57 -0500
+Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:37868)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1gPQ8o-0002Ol-IE
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:53:54 -0500
+Received: by mail-it1-x141.google.com with SMTP id b5so8199245iti.2
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 02:53:54 -0800 (PST)
+From: Programmingkid <programmingkidx@gmail.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 5/9] test-string-input-visitor: Add more
- tests
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Date: Wed, 21 Nov 2018 05:53:50 -0500
+References: <mailman.23054.1542721275.1282.qemu-devel@nongnu.org>
+In-Reply-To: <mailman.23054.1542721275.1282.qemu-devel@nongnu.org>
+Message-Id: <36E62A3F-7402-418F-AB88-9B597E437C69@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] Fix for crashes and non-responsive UI on
+ macOS Mojave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
 
-On 20.11.18 18:26, Eric Blake wrote:
-> On 11/20/18 11:20 AM, Eric Blake wrote:
->> On 11/20/18 11:06 AM, Eric Blake wrote:
->>> On 11/20/18 3:25 AM, David Hildenbrand wrote:
->>>> Test that very big/small values are not accepted and that ranges wit=
-h
->>>> only one element work. Also test that ranges are ascending and canno=
-t
->>>> have more than 65536 elements.
->>>>
->>>> Rename expect4 to expect5, as we will be moving that to a separate u=
-list
->>>> test after the rework.
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>> =C2=A0 tests/test-string-input-visitor.c | 41 ++++++++++++++++++++++=
-+++++++--
->>>> =C2=A0 1 file changed, 39 insertions(+), 2 deletions(-)
->>>>
->>>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>
->> Do we also want to test garbage strings like:
->>
->> "1-" (incomplete range)
->> "1X-2" (garbage suffix on first element)
->> "1-2X" (garbage suffix on second element)
->>
->> and/or
->>
->> "-2--1" (valid range of signed integers)
->> "-1--2" (questionable whether this is valid for the two largest unsign=
-ed=20
->> integers)
+
+> On 13 November 2018 at 12:12, Programmingkid =
+<programmingkidx@gmail.com> wrote:
+>>> On Nov 11, 2018, at 4:35 PM, Berkus Decker wrote:
+>>> These changes are ought to work on OSX 10.6, although I don?t have a =
+machine handy to test it.
+>>=20
+>> I have Mac OS 10.6 available for testing.
 >=20
-> Or even " 1- 2" (we permit leading whitespace for plain integers - do w=
-e=20
-> also permit it in both sides of a range)?  Also, if we permit whitespac=
-e=20
-> after the range '-', should we permit it beforehand?
+> This is perhaps a good point to ask the question: is retaining
+> support for 10.6 still worth the effort ? It was released 9
+> years ago and has been unsupported by Apple for nearly 5 years.
 >=20
-> These sorts of questions may be fine in followup patches.
+> qemu-doc.texi's "Supported build platforms" section says:
+> # The project supports building with the two most recent versions
+> # of macOS, with the current homebrew package set available.
 >=20
+> which would be High Sierra (10.13) and Mojave (10.14) only. If you
+> widened that to "all versions still supported by Apple" it would add
+> Sierra (10.13) to the list.
+>=20
+> Given how few upstream developers we have who care about OSX,
+> I think it is not very useful to spend that effort on trying
+> to retain support for ancient versions of it.
+>=20
+> thanks
+> -- PMM
 
-As always, you can never cover all cases during tests :)
+Mac OS 10.6 is a very good operating system. I much rather we simplify =
+the patch rather than drop support for this excellent operation system =
+just because it is a few years old. I suspect rewriting the the patch to =
+use performSelectorOnMainThread:withObject:waitUntilDone: would be a =
+simpler and better patch.
 
-While these things surely make sense, I will not add them right now. As
-you said, we can do that later.
-
-
-Taking about spaces:
-
-I think spaces before the "-" are not supported before/after the rewrite
-(I remember that strto.* does not skip over them). Spaces after the
-space should be covered by strto* automatically (strto.* skips over
-leading spaces).
-
-Thanks!
-
---=20
-
-Thanks,
-
-David / dhildenb
+I have tried the patch out already on Mac OS 10.12 and it did not work. =
+The firmware never runs and the Machine menu does not populate. I do not =
+believe this patch is worth dropping the support of many versions of Mac =
+OS X.=
