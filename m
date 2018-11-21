@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gPX8P-0004xA-0O
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:21:58 -0500
+	(envelope-from <philmd@redhat.com>) id 1gPXCL-0000p3-1F
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:26:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gPX8M-0007rl-DB
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:21:56 -0500
+	(envelope-from <philmd@redhat.com>) id 1gPXCE-00072J-Jm
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:26:00 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:45704)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPXCE-0006zY-BY
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:25:54 -0500
+Received: by mail-wr1-f68.google.com with SMTP id v6so6707455wrr.12
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 10:25:53 -0800 (PST)
+References: <20181120203811.18406-1-jcmvbkbc@gmail.com>
+	<3526a4e0-2b26-dfc5-4b81-9fdf94734398@redhat.com>
+	<CAMo8Bf+oCDyOmpj9mNZF1nL3X7JgZU5fidDd-LZNGEG9dOPHew@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d8733646-4ee4-df53-24c1-b89f1d8a1569@redhat.com>
+Date: Wed, 21 Nov 2018 19:25:49 +0100
 MIME-Version: 1.0
-References: <cover.1542819633.git.alistair.francis@wdc.com>
-	<86e2120f18412152ed2994b72bd874120b86d749.1542819633.git.alistair.francis@wdc.com>
-	<b49b54bf-2548-5a6b-1808-511b57cd33ad@deltatee.com>
-In-Reply-To: <b49b54bf-2548-5a6b-1808-511b57cd33ad@deltatee.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 21 Nov 2018 10:21:19 -0800
-Message-ID: <CAKmqyKP4pp_QFGrLHTm4TzjTKzpTcCXyA+_5+unbtrkiEUj9Ug@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 3/6] hw/riscv/virt: Connect the
- gpex PCIe
+In-Reply-To: <CAMo8Bf+oCDyOmpj9mNZF1nL3X7JgZU5fidDd-LZNGEG9dOPHew@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target/xtensa: xtfpga: provide default
+ memory sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Logan Gunthorpe <logang@deltatee.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org, Guenter Roeck <linux@roeck-us.net>, Andrea Bolognani <abologna@redhat.com>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Wed, Nov 21, 2018 at 10:01 AM Logan Gunthorpe <logang@deltatee.com> wrote:
->
->
->
-> On 2018-11-21 10:02 a.m., Alistair Francis wrote:
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
->
-> Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
->
->
-> > diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-> > index 7937c69e22..3e3d195f37 100644
-> > --- a/default-configs/riscv32-softmmu.mak
-> > +++ b/default-configs/riscv32-softmmu.mak
-> > @@ -1,7 +1,11 @@
-> >  # Default configuration for riscv-softmmu
-> >
-> > +include pci.mak
-> > +
-> >  CONFIG_SERIAL=y
-> >  CONFIG_VIRTIO_MMIO=y
-> > -include virtio.mak
-> >
-> >  CONFIG_CADENCE=y
-> > +
-> > +CONFIG_PCI_GENERIC=y
-> > +CONFIG_PCI_XILINX=y
->
-> Nit: should PCI_XILINX not be in patch 5? It's not used in this patch
-> and was a bit confusing when reviewing.
+On 21/11/18 13:21, Max Filippov wrote:
+> Hi Philippe,
+> 
+> thanks for your review.
+> 
+> On Wed, Nov 21, 2018 at 4:00 AM Philippe Mathieu-Daudé
+> <philmd@redhat.com> wrote:
+>> On 20/11/18 21:38, Max Filippov wrote:
+>>>    static const TypeInfo xtfpga_lx200_nommu_type = {
+>>> @@ -632,6 +636,7 @@ static void xtfpga_ml605_class_init(ObjectClass *oc, void *data)
+>>>        mc->init = xtfpga_ml605_init;
+>>>        mc->max_cpus = 4;
+>>>        mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
+>>> +    mc->default_ram_size = 256 * MiB;
+>>
+>> Isn't it 512 MB for the ML605?
+> 
+> There's 512MB on the board, but the Tensilica prototyping
+> user's guide for the ML605 only documents 256MB in the memory
+> map section. But now that you've mentioned it I recall that in reality
+> both ML605 and KC705 had all onboard memory minus 128MB
+> mapped for cores with MMU.
+> 
+>>>    }
+>>>
+>>>    static const TypeInfo xtfpga_ml605_type = {
+>>> @@ -648,6 +653,7 @@ static void xtfpga_ml605_nommu_class_init(ObjectClass *oc, void *data)
+>>>        mc->init = xtfpga_ml605_nommu_init;
+>>>        mc->max_cpus = 4;
+>>>        mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
+>>> +    mc->default_ram_size = 256 * MiB;
+>>
+>> Ditto.
+> 
+> For noMMU cores there's only 256MB window available for
+> the system memory, so it's capped at 256MB.
 
-It probably should be, I have moved it.
+This totally makes sense.
 
-Alistair
+> 
+> I'll send an updated v2.
 
->
-> Logan
+Thanks!
+
+Phil.
