@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gPRxP-0002oh-DL
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:50:16 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1gPSAx-0007uw-Tc
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:04:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gPRxM-00055L-7N
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:50:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32770)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1gPSAs-000534-M7
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:04:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53408)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gPRxM-00054Z-00
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:50:12 -0500
-Date: Wed, 21 Nov 2018 10:50:08 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181121125008.GV4755@habkost.net>
-References: <7280.1542702495@dschgrazlin2.units.it>
-	<jpgd0qz3vg4.fsf@linux.bootlegged.copy>
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1gPSAs-00051W-GF
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:04:10 -0500
+References: <1539266915-15216-1-git-send-email-wexu@redhat.com>
+	<1539266915-15216-13-git-send-email-wexu@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <1e29f314-f227-55ad-23f0-353dab8e7f98@redhat.com>
+Date: Wed, 21 Nov 2018 14:03:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <jpgd0qz3vg4.fsf@linux.bootlegged.copy>
-Subject: Re: [Qemu-devel] 3.1.0-rc{0,1} doesn't start
+In-Reply-To: <1539266915-15216-13-git-send-email-wexu@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [[RFC v3 12/12] virtio: feature vhost-net support
+ for packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,93 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bandan Das <bsd@redhat.com>
-Cc: balducci@units.it, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>, David Alan Gilbert <dgilbert@redhat.com>, Cole Robinson <crobinso@redhat.com>
+To: wexu@redhat.com, qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, tiwei.bie@intel.com, jfreimann@redhat.com
 
-On Tue, Nov 20, 2018 at 11:28:59PM -0500, Bandan Das wrote:
-> balducci@units.it writes:
+Hi Wei,
+
+On 10/11/18 4:08 PM, wexu@redhat.com wrote:
+> From: Wei Xu <wexu@redhat.com>
 > 
-> > hello
-> >
-> >> incomplete because it can return 0 for data. Can you try this:
-> >>
-> >> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> >> index f524e7d929..4878ffb90b 100644
-> >> --- a/target/i386/kvm.c
-> >> +++ b/target/i386/kvm.c
-> >> @@ -2002,14 +2002,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-> >>  #endif
-> >>  
-> >>      /* If host supports feature MSR, write down. */
-> >> -    if (kvm_feature_msrs) {
-> >> -        int i;
-> >> -        for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
-> >> -            if (kvm_feature_msrs->indices[i] == MSR_IA32_ARCH_CAPABILITIES) 
-> >> {
-> >> -                kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
-> >> +    if (kvm_arch_get_supported_msr_feature(kvm_state, MSR_IA32_ARCH_CAPABILI
-> >> TIES)) {
-> >> +        kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
-> >>                                env->features[FEAT_ARCH_CAPABILITIES]);
-> >> -                break;
-> >> -            }
-> >>      }
-> >>  
-> >>      /*
-> >
-> Sorry Gabriele, Eduardo and Paolo pointed out that the patch was incomplete.
-> I am not sure however how you are getting non zero data with the rdmsr on an AMD.
-> Can you please try this instead ?
+> (cherry picked from commit 305a2c4640c15c5717245067ab937fd10f478ee6)
+> Signed-off-by: Wei Xu <wexu@redhat.com>
+> (cherry picked from commit 46476dae6f44c6fef8802a4a0ac7d0d79fe399e3)
+> Signed-off-by: Wei Xu <wexu@redhat.com>
+> ---
+>   hw/virtio/vhost.c          | 3 +++
+>   hw/virtio/virtio.c         | 4 ++++
+>   include/hw/virtio/virtio.h | 1 +
+>   3 files changed, 8 insertions(+)
 > 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index f524e7d929..cfec559aa3 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -95,6 +95,7 @@ static bool has_msr_xss;
->  static bool has_msr_spec_ctrl;
->  static bool has_msr_virt_ssbd;
->  static bool has_msr_smi_count;
-> +static bool has_msr_arch_capabs;
->  
->  static uint32_t has_architectural_pmu_version;
->  static uint32_t num_architectural_pmu_gp_counters;
-> @@ -1481,6 +1482,9 @@ static int kvm_get_supported_msrs(KVMState *s)
->                  case MSR_VIRT_SSBD:
->                      has_msr_virt_ssbd = true;
->                      break;
-> +                case MSR_IA32_ARCH_CAPABILITIES:
-> +                    has_msr_arch_capabs = true;
-> +                    break;
->                  }
->              }
->          }
-> @@ -2002,14 +2006,10 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
->  #endif
->  
->      /* If host supports feature MSR, write down. */
-> -    if (kvm_feature_msrs) {
-> -        int i;
-> -        for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
-> -            if (kvm_feature_msrs->indices[i] == MSR_IA32_ARCH_CAPABILITIES) {
-> +    if (kvm_arch_get_supported_msr_feature(kvm_state, MSR_IA32_ARCH_CAPABILITIES)
-> +        && has_msr_arch_capabs) {
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 9df2da3..de06d55 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -974,6 +974,9 @@ static int vhost_virtqueue_start(struct vhost_dev *dev,
+>       }
+>   
+>       state.num = virtio_queue_get_last_avail_idx(vdev, idx);
+> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> +        state.num |= ((int)virtio_queue_packed_get_wc(vdev, idx)) << 31;
 
-Unless we have a KVM bug too, has_msr_arch_capabs should be
-enough.
-
-If has_msr_arch_capabs is not enough, we'll need to add a comment
-explaining why, or we risk reintroducing the same bug later.
-
-
->                  kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
->                                env->features[FEAT_ARCH_CAPABILITIES]);
-> -                break;
-> -            }
->      }
->  
->      /*
-> 
-> 
-
--- 
-Eduardo
+For next version, please note that we agreed to move the wrap counter
+value at bit 15. DPDK vhost lib implemented it that way.
