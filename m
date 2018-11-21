@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <logang@deltatee.com>) id 1gPbsp-000613-Ik
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 18:26:12 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gPbzj-0000as-PU
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 18:33:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <logang@deltatee.com>) id 1gPbsm-0002H6-FL
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 18:26:11 -0500
-References: <CAKmqyKNpSWpaUVzJobNPvB=_T+tXhGdiWPTkWmQxdKQf8SHbig@mail.gmail.com>
-	<mhng-dc5c5bfa-47d8-41c6-8240-fdb97d24555e@palmer-si-x1c4>
-	<20181121231005.GB1421@roeck-us.net>
-From: Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <9ee74477-105f-db2e-b69c-e67d485b9c2f@deltatee.com>
-Date: Wed, 21 Nov 2018 16:26:01 -0700
+	(envelope-from <sameo@linux.intel.com>) id 1gPbzg-00055e-Le
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 18:33:19 -0500
+Date: Thu, 22 Nov 2018 00:27:33 +0100
+From: Samuel Ortiz <sameo@linux.intel.com>
+Message-ID: <20181121232733.GC4450@caravaggio>
+References: <20181105014047.26447-1-sameo@linux.intel.com>
+	<20181105014047.26447-16-sameo@linux.intel.com>
+	<20181115142854.1c62f32f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181121231005.GB1421@roeck-us.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 5/6] hw/riscv/sifive_u: Connect
- the Xilinx PCIe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181115142854.1c62f32f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 15/24] hw: i386: Export the i386 ACPI
+ SRAT build method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,16 +25,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>, Palmer Dabbelt <palmer@sifive.com>
-Cc: alistair23@gmail.com, qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org, abologna@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
 
+On Thu, Nov 15, 2018 at 02:28:54PM +0100, Igor Mammedov wrote:
+> On Mon,  5 Nov 2018 02:40:38 +0100
+> Samuel Ortiz <sameo@linux.intel.com> wrote:
+> 
+> > This is the standard way of building SRAT on x86 platfoms. But future
+> > machine types could decide to define their own custom SRAT build method
+> > through the ACPI builder methods.
+> > Moreover, we will also need to reach build_srat() from outside of
+> > acpi-build in order to use it as the ACPI builder SRAT build method.
+> SRAT is usually highly machine specific (memory holes, layout, guest OS
+> specific quirks) so it's hard to generalize it.
+Hence the need for an SRAT builder interface.
 
+> I'd  drop SRAT related patches from this series and introduce
+> i386/virt specific SRAT when you post patches for it.
+virt uses the existing i386 build_srat() routine, there's nothing
+special about it. So this would be purely duplicated code.
 
-On 2018-11-21 4:10 p.m., Guenter Roeck wrote:
-> FWIW, I absoutely agree. If the board can only be used to boot an initrd,
-> it is quite pointless to have it around. Actually it is worse than pointless,
-> since it will result in people wasting their time trying to get it to work.
-
-As someone who has wasted their time on it, I second this sentiment.
-
-Logan
+Cheers,
+Samuel.
