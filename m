@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gPWij-0000Fg-GP
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 12:55:26 -0500
+	(envelope-from <logang@deltatee.com>) id 1gPWm4-0003h8-65
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 12:58:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gPWii-00083u-QY
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 12:55:25 -0500
-References: <1542261954-4060-1-git-send-email-liq3ea@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <da889f34-09b3-6c01-050a-778b86a731fa@redhat.com>
-Date: Wed, 21 Nov 2018 18:55:18 +0100
+	(envelope-from <logang@deltatee.com>) id 1gPWm3-000581-6X
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 12:58:52 -0500
+References: <cover.1542819633.git.alistair.francis@wdc.com>
+	<a2c70c88a145d2e239f113e28979c7a50d71aedf.1542819633.git.alistair.francis@wdc.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <ff4ef556-0989-ec47-0424-3f153f10a8d0@deltatee.com>
+Date: Wed, 21 Nov 2018 10:58:35 -0700
 MIME-Version: 1.0
-In-Reply-To: <1542261954-4060-1-git-send-email-liq3ea@gmail.com>
+In-Reply-To: <a2c70c88a145d2e239f113e28979c7a50d71aedf.1542819633.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-CA
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target: hax: replace g_malloc with
- g_malloc0
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 1/6] hw/riscv/virt: Increase the
+ number of interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, rth@twiddle.net, ehabkost@redhat.com, laurent@vivier.eu
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "linux@roeck-us.net" <linux@roeck-us.net>, "abologna@redhat.com" <abologna@redhat.com>
 
-On 15/11/18 07:05, Li Qiang wrote:
-> And also the g_malloc doesn't need check return value,
-> remove it.
+
+
+On 2018-11-21 10:02 a.m., Alistair Francis wrote:
+> Increase the number of interrupts to match the HiFive Unleashed board.
 > 
-> Cc: qemu-trivial@nongnu.org
-> 
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  target/i386/hax-all.c | 15 +++------------
->  1 file changed, 3 insertions(+), 12 deletions(-)
+>  include/hw/riscv/virt.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-> index d2e512856b..a460c605af 100644
-> --- a/target/i386/hax-all.c
-> +++ b/target/i386/hax-all.c
-> @@ -154,13 +154,7 @@ int hax_vcpu_create(int id)
->          return 0;
->      }
->  
-> -    vcpu = g_malloc(sizeof(struct hax_vcpu_state));
-> -    if (!vcpu) {
-> -        fprintf(stderr, "Failed to alloc vcpu state\n");
-> -        return -ENOMEM;
-> -    }
-> -
-> -    memset(vcpu, 0, sizeof(struct hax_vcpu_state));
-> +    vcpu = g_malloc0(sizeof(struct hax_vcpu_state));
->  
->      ret = hax_host_create_vcpu(hax_global.vm->fd, id);
->      if (ret) {
-> @@ -250,11 +244,8 @@ struct hax_vm *hax_vm_create(struct hax_state *hax)
->          return hax->vm;
->      }
->  
-> -    vm = g_malloc(sizeof(struct hax_vm));
-> -    if (!vm) {
-> -        return NULL;
-> -    }
-> -    memset(vm, 0, sizeof(struct hax_vm));
-> +    vm = g_malloc0(sizeof(struct hax_vm));
-> +
->      ret = hax_host_create_vm(hax, &vm_id);
->      if (ret) {
->          fprintf(stderr, "Failed to create vm %x\n", ret);
-> 
+> diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+> index 91163d6cbf..7cb2742070 100644
+> --- a/include/hw/riscv/virt.h
+> +++ b/include/hw/riscv/virt.h
+> @@ -45,7 +45,7 @@ enum {
+>      UART0_IRQ = 10,
+>      VIRTIO_IRQ = 1, /* 1 to 8 */
+>      VIRTIO_COUNT = 8,
+> -    VIRTIO_NDEV = 10
+> +    VIRTIO_NDEV = 0x35
 
-Queued, thanks.
+Why 0x35? Based on the PCI patch we are using only 36 interrupts, not 53...
 
-Paolo
+Logan
