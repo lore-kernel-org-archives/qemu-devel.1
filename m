@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gPahR-0006qj-8A
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:22 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPahR-0006rF-OJ
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gPahP-0005h4-GN
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPahP-0005hz-PO
 	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51612)
+Received: from mx1.redhat.com ([209.132.183.28]:36268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gPahP-0005CB-45
+	id 1gPahP-0005dI-AO
 	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:19 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 22 Nov 2018 02:06:43 +0400
-Message-Id: <20181121220647.18844-27-marcandre.lureau@redhat.com>
+Date: Thu, 22 Nov 2018 02:06:44 +0400
+Message-Id: <20181121220647.18844-28-marcandre.lureau@redhat.com>
 In-Reply-To: <20181121220647.18844-1-marcandre.lureau@redhat.com>
 References: <20181121220647.18844-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 for-3.2 v2 26/30] slirp: add a
- set_nonblock() callback
+Subject: [Qemu-devel] [PATCH v2 for-3.2 v2 27/30] slirp: replace
+ qemu_notify_event() with a callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +31,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-qemu_set_nonblock() does some event registration with the main loop on
-win32, let's have a callback.
+Introduce a SlirpCb callback to kick the main io-thread.
+
+Add an intermediary sodrop() function that will call SlirpCb.notify
+callback when sbdrop() returns true.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/libslirp.h | 2 ++
- net/slirp.c      | 1 +
- slirp/misc.c     | 2 +-
- slirp/tcp_subr.c | 4 ++--
- 4 files changed, 6 insertions(+), 3 deletions(-)
+ slirp/libslirp.h  | 2 ++
+ slirp/sbuf.h      | 2 +-
+ slirp/socket.h    | 1 +
+ net/slirp.c       | 1 +
+ slirp/sbuf.c      | 6 ++++--
+ slirp/socket.c    | 7 +++++++
+ slirp/tcp_input.c | 6 +++---
+ 7 files changed, 19 insertions(+), 6 deletions(-)
 
 diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 3e75dadfa3..e79a2d2b11 100644
+index e79a2d2b11..f2d71bd1f6 100644
 --- a/slirp/libslirp.h
 +++ b/slirp/libslirp.h
-@@ -27,6 +27,8 @@ typedef struct SlirpCb {
-     void (*timer_free)(void *timer);
-     /* Modify a timer to expire at @expire_time */
+@@ -29,6 +29,8 @@ typedef struct SlirpCb {
      void (*timer_mod)(void *timer, int64_t expire_time);
-+    /* Put a fd in nonblocking mode and register it for future polling *=
+     /* Put a fd in nonblocking mode and register it for future polling *=
 /
-+    void (*set_nonblock)(int fd);
+     void (*set_nonblock)(int fd);
++    /* Kick the io-thread, to signal that new events may be processed */
++    void (*notify)(void);
  } SlirpCb;
 =20
 =20
+diff --git a/slirp/sbuf.h b/slirp/sbuf.h
+index 644c201341..1cb9a42834 100644
+--- a/slirp/sbuf.h
++++ b/slirp/sbuf.h
+@@ -21,7 +21,7 @@ struct sbuf {
+ };
+=20
+ void sbfree(struct sbuf *);
+-void sbdrop(struct sbuf *, int);
++bool sbdrop(struct sbuf *, int);
+ void sbreserve(struct sbuf *, int);
+ void sbappend(struct socket *, struct mbuf *);
+ void sbcopy(struct sbuf *, int, int, char *);
+diff --git a/slirp/socket.h b/slirp/socket.h
+index fc35ca5f72..1c1c8b5871 100644
+--- a/slirp/socket.h
++++ b/slirp/socket.h
+@@ -156,6 +156,7 @@ int soreadbuf(struct socket *so, const char *buf, int=
+ size);
+ void sotranslate_out(struct socket *, struct sockaddr_storage *);
+ void sotranslate_in(struct socket *, struct sockaddr_storage *);
+ void sotranslate_accept(struct socket *);
++void sodrop(struct socket *, int num);
+=20
+=20
+ #endif /* SLIRP_SOCKET_H */
 diff --git a/net/slirp.c b/net/slirp.c
-index f7cdf8398b..a31193a25a 100644
+index a31193a25a..fbdc6ea9a0 100644
 --- a/net/slirp.c
 +++ b/net/slirp.c
-@@ -193,6 +193,7 @@ static const SlirpCb slirp_cb =3D {
-     .timer_new =3D net_slirp_timer_new,
+@@ -194,6 +194,7 @@ static const SlirpCb slirp_cb =3D {
      .timer_free =3D net_slirp_timer_free,
      .timer_mod =3D net_slirp_timer_mod,
-+    .set_nonblock =3D qemu_set_nonblock,
+     .set_nonblock =3D qemu_set_nonblock,
++    .notify =3D qemu_notify_event,
  };
 =20
  static int net_slirp_init(NetClientState *peer, const char *model,
-diff --git a/slirp/misc.c b/slirp/misc.c
-index f9b2c64541..7789cefefa 100644
---- a/slirp/misc.c
-+++ b/slirp/misc.c
-@@ -172,7 +172,7 @@ fork_exec(struct socket *so, const char *ex)
-     socket_set_fast_reuse(so->s);
-     opt =3D 1;
-     qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
--    qemu_set_nonblock(so->s);
-+    so->slirp->cb->set_nonblock(so->s);
-     return 1;
+diff --git a/slirp/sbuf.c b/slirp/sbuf.c
+index 912f235f65..17f28e97a6 100644
+--- a/slirp/sbuf.c
++++ b/slirp/sbuf.c
+@@ -17,7 +17,7 @@ sbfree(struct sbuf *sb)
+ 	free(sb->sb_data);
  }
- #endif
-diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
-index 5dcf979c3c..3b15148187 100644
---- a/slirp/tcp_subr.c
-+++ b/slirp/tcp_subr.c
-@@ -412,7 +412,7 @@ int tcp_fconnect(struct socket *so, unsigned short af=
-)
-     int opt, s=3Dso->s;
-     struct sockaddr_storage addr;
 =20
--    qemu_set_nonblock(s);
-+    so->slirp->cb->set_nonblock(s);
-     socket_set_fast_reuse(s);
-     opt =3D 1;
-     qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
-@@ -484,7 +484,7 @@ void tcp_connect(struct socket *inso)
-         tcp_close(sototcpcb(so)); /* This will sofree() as well */
-         return;
+-void
++bool
+ sbdrop(struct sbuf *sb, int num)
+ {
+     int limit =3D sb->sb_datalen / 2;
+@@ -34,8 +34,10 @@ sbdrop(struct sbuf *sb, int num)
+ 		sb->sb_rptr -=3D sb->sb_datalen;
+=20
+     if (sb->sb_cc < limit && sb->sb_cc + num >=3D limit) {
+-        qemu_notify_event();
++        return true;
      }
--    qemu_set_nonblock(s);
-+    so->slirp->cb->set_nonblock(s);
-     socket_set_fast_reuse(s);
-     opt =3D 1;
-     qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
++
++    return false;
+ }
+=20
+ void
+diff --git a/slirp/socket.c b/slirp/socket.c
+index 5ffbaa064a..4d5be38747 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -928,3 +928,10 @@ void sotranslate_accept(struct socket *so)
+         break;
+     }
+ }
++
++void sodrop(struct socket *s, int num)
++{
++    if (sbdrop(&s->so_snd, num)) {
++        s->slirp->cb->notify();
++    }
++}
+diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+index a6596b63ac..f205a1e6cb 100644
+--- a/slirp/tcp_input.c
++++ b/slirp/tcp_input.c
+@@ -506,7 +506,7 @@ findso:
+ 				    SEQ_GT(ti->ti_ack, tp->t_rtseq))
+ 					tcp_xmit_timer(tp, tp->t_rtt);
+ 				acked =3D ti->ti_ack - tp->snd_una;
+-				sbdrop(&so->so_snd, acked);
++				sodrop(so, acked);
+ 				tp->snd_una =3D ti->ti_ack;
+ 				m_free(m);
+=20
+@@ -1118,10 +1118,10 @@ trimthenstep6:
+ 		}
+ 		if (acked > so->so_snd.sb_cc) {
+ 			tp->snd_wnd -=3D so->so_snd.sb_cc;
+-			sbdrop(&so->so_snd, (int )so->so_snd.sb_cc);
++			sodrop(so, (int)so->so_snd.sb_cc);
+ 			ourfinisacked =3D 1;
+ 		} else {
+-			sbdrop(&so->so_snd, acked);
++			sodrop(so, acked);
+ 			tp->snd_wnd -=3D acked;
+ 			ourfinisacked =3D 0;
+ 		}
 --=20
 2.20.0.rc1
