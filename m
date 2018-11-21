@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gPLME-0007j7-Rf
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 00:47:27 -0500
+	(envelope-from <thuth@redhat.com>) id 1gPLc9-0004PU-TA
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 01:03:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gPLMA-0001T3-Th
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 00:47:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57508)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gPLMA-0001Sf-LN
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 00:47:22 -0500
-Date: Wed, 21 Nov 2018 13:47:09 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181121054709.GA10918@xz-x1>
-References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
+	(envelope-from <thuth@redhat.com>) id 1gPLc3-00046p-RJ
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 01:03:52 -0500
+References: <20181120203628.2367003-1-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <23455d1b-59fe-d972-a2ab-c53eb1b8a1f9@redhat.com>
+Date: Wed, 21 Nov 2018 07:03:44 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181120203628.2367003-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
-Subject: Re: [Qemu-devel] [PATCH 0/5] Add migration support for VFIO device
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] misc: Avoid UTF-8 in error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,19 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Cc: alex.williamson@redhat.com, cjia@nvidia.com, Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On Wed, Nov 21, 2018 at 02:09:38AM +0530, Kirti Wankhede wrote:
-> Add migration support for VFIO device
+On 2018-11-20 21:36, Eric Blake wrote:
+> While most developers are now using UTF-8 environments, it's
+> harder to guarantee that error messages will be output to
+> a multibyte locale. Rather than risking error messages that
+> get corrupted into mojibake when the user runs qemu in a
+> non-multibyte locale, let's stick to straight ASCII error
+> messages, rather than assuming that our use of UTF-8 in source
+> code string constants will work unchanged in other locales.
+>=20
+> Reported-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  hw/misc/tmp105.c | 2 +-
+>  hw/misc/tmp421.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/misc/tmp105.c b/hw/misc/tmp105.c
+> index 0918f3a6ea2..f6d7163273a 100644
+> --- a/hw/misc/tmp105.c
+> +++ b/hw/misc/tmp105.c
+> @@ -79,7 +79,7 @@ static void tmp105_set_temperature(Object *obj, Visit=
+or *v, const char *name,
+>          return;
+>      }
+>      if (temp >=3D 128000 || temp < -128000) {
+> -        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " =C2=B0C is o=
+ut of range",
+> +        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " C is out of =
+range",
+>                     temp / 1000, temp % 1000);
+>          return;
+>      }
+> diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
+> index c234044305d..eeb11000f0f 100644
+> --- a/hw/misc/tmp421.c
+> +++ b/hw/misc/tmp421.c
+> @@ -153,7 +153,7 @@ static void tmp421_set_temperature(Object *obj, Vis=
+itor *v, const char *name,
+>      }
+>=20
+>      if (temp >=3D maxs[ext_range] || temp < mins[ext_range]) {
+> -        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " =C2=B0C is o=
+ut of range",
+> +        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " C is out of =
+range",
+>                     temp / 1000, temp % 1000);
+>          return;
+>      }
+>=20
 
-Hi, Kirti,
-
-I failed to apply the series cleanly onto master.  Could you push the
-tree somewhere so that people might read the work easier?  Or would
-you tell me the base commit, then I can apply it myself.
-
-Thanks in advance,
-
--- 
-Peter Xu
+Reviewed-by: Thomas Huth <thuth@redhat.com>
