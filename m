@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gPUBP-00060v-MM
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:53 -0500
+	(envelope-from <prvs=856356900=Paul.Durrant@citrix.com>)
+	id 1gPUR9-0001Y3-OA
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:29:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gPUBO-000491-Bn
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:51 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39744)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gPUBM-00041u-Cf
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:12:49 -0500
-Received: by mail-oi1-x244.google.com with SMTP id 192-v6so4793533oii.6
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 07:12:47 -0800 (PST)
+	(envelope-from <prvs=856356900=Paul.Durrant@citrix.com>)
+	id 1gPUR5-0007cy-FR
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:29:05 -0500
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Wed, 21 Nov 2018 15:12:06 +0000
+Message-ID: <20181121151211.15997-14-paul.durrant@citrix.com>
+In-Reply-To: <20181121151211.15997-1-paul.durrant@citrix.com>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA983Q16B8y1j3msg31BtM5LXhUcB5ouyg6Dp1y-aUaDpw@mail.gmail.com>
-References: <D965412A-A975-4660-BEC5-6FBF34E35C45@gmail.com>
-	<CAFEAcA983Q16B8y1j3msg31BtM5LXhUcB5ouyg6Dp1y-aUaDpw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 21 Nov 2018 15:12:25 +0000
-Message-ID: <CAFEAcA8WMh8AnD8X5eMz7YX_c5z0Aw8_ydZ-0poY5Sv9mnxUHw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Fix for crashes and non-responsive UI on
- macOS Mojave
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 13/18] xen: purge 'blk' and 'ioreq' from
+ function names in dataplane/xen-qdisk.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,171 +24,343 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Berkus Decker <berkus@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-(Hi Gerd -- I have a question at the bottom of this email
-about the thread/locking semantics of the UI midlayer...)
+This is a purely cosmetic patch that purges remaining use of 'blk' and
+'ioreq' in local function names.
 
-On 20 November 2018 at 12:59, Peter Maydell <peter.maydell@linaro.org> wrot=
-e:
-> On 11 November 2018 at 21:24, Berkus Decker <berkus@gmail.com> wrote:
->> It seems that Cocoa checks are stricter on Mojave and some callbacks tha=
-t worked from non-GUI thread on High Sierra are no longer working.
->>
->> The fixes included here are:
->>
->> * Deferring qemu_main() to another thread so that the actual main thread=
- is reserved for the Cocoa UI; it also removes blocking from applicationDid=
-FinishLoading: delegate. I beleive this alone caused complete UI blockage o=
-n Mojave.
->> * Deferring UI-related updates in callbacks to the UI thread using invok=
-eOnMainThread helper function. This function uses DDInvocationGrabber objec=
-t courtesy of Dave Dribin, licensed under MIT license.
->> Here=E2=80=99s relevant blog post for his code: https://www.dribin.org/d=
-ave/blog/archives/2008/05/22/invoke_on_main_thread/
->>
->> NSInvocation is used here instead of plain performSelectorOnMainThread:w=
-ithObject:waitUntilDone: because we want to be able to pass non-id types to=
- the handlers.
->>
->> These changes are ought to work on OSX 10.6, although I don=E2=80=99t ha=
-ve a machine handy to test it.
->>
->> Fixes https://bugs.launchpad.net/qemu/+bug/1802684
->
-> Hi; thanks for these patches. I haven't tried running them yet
-> (I should be able to get to that tomorrow)
+No functional change.
 
-On High Sierra this does run for me, but seems to
-introduce a bug:
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+---
+ hw/block/dataplane/xen-qdisk.c | 86 +++++++++++++++++++++---------------------
+ 1 file changed, 43 insertions(+), 43 deletions(-)
 
- * Run qemu-system-x86_64 with no arguments
- * Let the BIOS get to the "No bootable devices" message
- * Press a key in the QEMU window
-
-QEMU hits an assert:
-ERROR:/Users/pm215/src/qemu/accel/tcg/tcg-all.c:42:tcg_handle_interrupt:
-assertion failed: (qemu_mutex_iothread_locked())
-
-with this backtrace:
-
-* thread #1, queue =3D 'com.apple.main-thread', stop reason =3D signal SIGA=
-BRT
-  * frame #0: 0x00007fff7b123b66 libsystem_kernel.dylib`__pthread_kill + 10
-    frame #1: 0x00007fff7b2ee080 libsystem_pthread.dylib`pthread_kill + 333
-    frame #2: 0x00007fff7b07f1ae libsystem_c.dylib`abort + 127
-    frame #3: 0x00000001014f7f19 libglib-2.0.0.dylib`g_assertion_message + =
-407
-    frame #4: 0x00000001014f7f77
-libglib-2.0.0.dylib`g_assertion_message_expr + 94
-    frame #5: 0x00000001000a3509
-qemu-system-x86_64`tcg_handle_interrupt(cpu=3D0x0000000103883200,
-mask=3D2) at tcg-all.c:42
-    frame #6: 0x00000001000e8222
-qemu-system-x86_64`cpu_interrupt(cpu=3D0x0000000103883200, mask=3D2) at
-cpu.h:855
-    frame #7: 0x00000001000e70ca
-qemu-system-x86_64`apic_local_deliver(s=3D0x0000000101e40010, vector=3D3)
-at apic.c:156
-    frame #8: 0x00000001000e6f71
-qemu-system-x86_64`apic_deliver_pic_intr(dev=3D0x0000000101e40010,
-level=3D1) at apic.c:173
-    frame #9: 0x000000010010ff9e
-qemu-system-x86_64`pic_irq_request(opaque=3D0x0000000000000000, irq=3D0,
-level=3D1) at pc.c:195
-    frame #10: 0x0000000100297f3b
-qemu-system-x86_64`qemu_set_irq(irq=3D0x0000000101cdac30, level=3D1) at
-irq.c:45
-    frame #11: 0x000000010030073a
-qemu-system-x86_64`qemu_irq_raise(irq=3D0x0000000101cdac30) at irq.h:16
-    frame #12: 0x00000001003006ad
-qemu-system-x86_64`pic_update_irq(s=3D0x0000000101cdada0) at i8259.c:111
-    frame #13: 0x0000000100300d1c
-qemu-system-x86_64`pic_set_irq(opaque=3D0x0000000101cdada0, irq=3D1,
-level=3D1) at i8259.c:153
-    frame #14: 0x0000000100297f3b
-qemu-system-x86_64`qemu_set_irq(irq=3D0x0000000101cdbf50, level=3D1) at
-irq.c:45
-    frame #15: 0x000000010010cad8
-qemu-system-x86_64`gsi_handler(opaque=3D0x0000000101cc7760, n=3D1,
-level=3D1) at pc.c:118
-    frame #16: 0x0000000100297f3b
-qemu-system-x86_64`qemu_set_irq(irq=3D0x0000000101cc7410, level=3D1) at
-irq.c:45
-    frame #17: 0x00000001002fa162
-qemu-system-x86_64`kbd_update_irq(s=3D0x0000000101e5cef8) at pckbd.c:181
-    frame #18: 0x00000001002f967f
-qemu-system-x86_64`kbd_update_kbd_irq(opaque=3D0x0000000101e5cef8,
-level=3D1) at pckbd.c:193
-    frame #19: 0x00000001002fa603
-qemu-system-x86_64`ps2_queue(s=3D0x0000000101e5e490, b=3D22) at ps2.c:213
-    frame #20: 0x00000001002fadd4
-qemu-system-x86_64`ps2_put_keycode(opaque=3D0x0000000101e5e490,
-keycode=3D60) at ps2.c:267
-    frame #21: 0x00000001002fd10f
-qemu-system-x86_64`ps2_keyboard_event(dev=3D0x0000000101e5e490,
-src=3D0x0000000000000000, evt=3D0x0000000101af02c0) at ps2.c:470
-    frame #22: 0x0000000100491e2c
-qemu-system-x86_64`qemu_input_event_send_impl(src=3D0x0000000000000000,
-evt=3D0x0000000101af02c0) at input.c:346
-    frame #23: 0x000000010046c8d5
-qemu-system-x86_64`replay_input_event(src=3D0x0000000000000000,
-evt=3D0x0000000101af02c0) at replay-input.c:128
-    frame #24: 0x0000000100491d5b
-qemu-system-x86_64`qemu_input_event_send(src=3D0x0000000000000000,
-evt=3D0x0000000101af02c0) at input.c:375
-    frame #25: 0x0000000100492297
-qemu-system-x86_64`qemu_input_event_send_key(src=3D0x0000000000000000,
-key=3D0x00000001159037f0, down=3Dtrue) at input.c:419
-    frame #26: 0x0000000100491c71
-qemu-system-x86_64`qemu_input_event_send_key_qcode(src=3D0x0000000000000000=
-,
-q=3DQ_KEY_CODE_U, down=3Dtrue) at input.c:441
-    frame #27: 0x0000000100496a0b qemu-system-x86_64`-[QemuCocoaView
-handleEvent:](self=3D0x0000000101c2eef0, _cmd=3D"handleEvent:",
-event=3D0x0000000101cebdf0) at cocoa.m:767
-    frame #28: 0x0000000100495b4e qemu-system-x86_64`-[QemuCocoaView
-refresh](self=3D0x0000000101c2eef0, _cmd=3D"refresh") at cocoa.m:541
-    frame #29: 0x00007fff5301139c CoreFoundation`__invoking___ + 140
-    frame #30: 0x00007fff53011270 CoreFoundation`-[NSInvocation invoke] + 3=
-20
-    frame #31: 0x00007fff551730b5 Foundation`__NSThreadPerformPerform + 334
-    frame #32: 0x00007fff53031be1
-CoreFoundation`__CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__
-+ 17
-    frame #33: 0x00007fff530e94bc CoreFoundation`__CFRunLoopDoSource0 + 108
-    frame #34: 0x00007fff53014b90 CoreFoundation`__CFRunLoopDoSources0 + 20=
-8
-    frame #35: 0x00007fff5301400d CoreFoundation`__CFRunLoopRun + 1293
-    frame #36: 0x00007fff53013867 CoreFoundation`CFRunLoopRunSpecific + 487
-    frame #37: 0x00007fff522f3d96 HIToolbox`RunCurrentEventLoopInMode + 286
-    frame #38: 0x00007fff522f3b06 HIToolbox`ReceiveNextEventCommon + 613
-    frame #39: 0x00007fff522f3884
-HIToolbox`_BlockUntilNextEventMatchingListInModeWithFilter + 64
-    frame #40: 0x00007fff505a3a73 AppKit`_DPSNextEvent + 2085
-    frame #41: 0x00007fff50d39e34 AppKit`-[NSApplication(NSEvent)
-_nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 3044
-    frame #42: 0x00007fff50598885 AppKit`-[NSApplication run] + 764
-    frame #43: 0x000000010049aac1 qemu-system-x86_64`main(argc=3D1,
-argv=3D0x00007ffeefbffa40) at cocoa.m:1575
-    frame #44: 0x00007fff7afd3015 libdyld.dylib`start + 1
-
-Something somewhere in this call chain should have taken
-the iothread lock, I assume, but I'm not sure where.
-
-Gerd -- what are the rules of the UI subsystem regarding
-multiple threads, and what threads are allowed to call
-UI functions like qemu_input_event_send_key_qcode(),
-from which threads, and whether they need to eg hold
-the iothread lock when they do so? There's no
-documentation on these functions in include/ui/input.h.
-
-(To fix a problem on OSX Mojave this patchset has moved
-which thread the UI executes on, so it is now always
-the main thread and not the thread which calls
-the QemuDisplay 'init' callback. That seems to break
-an implicit assumption in the UI layer.)
-
-thanks
--- PMM
+diff --git a/hw/block/dataplane/xen-qdisk.c b/hw/block/dataplane/xen-qdisk.c
+index 50a48b6f5f..94785eeff3 100644
+--- a/hw/block/dataplane/xen-qdisk.c
++++ b/hw/block/dataplane/xen-qdisk.c
+@@ -57,7 +57,7 @@ struct XenQdiskDataPlane {
+     AioContext *ctx;
+ };
+ 
+-static void ioreq_reset(XenQdiskRequest *request)
++static void reset_request(XenQdiskRequest *request)
+ {
+     memset(&request->req, 0, sizeof(request->req));
+     request->status = 0;
+@@ -76,7 +76,7 @@ static void ioreq_reset(XenQdiskRequest *request)
+     qemu_iovec_reset(&request->v);
+ }
+ 
+-static XenQdiskRequest *ioreq_start(XenQdiskDataPlane *dataplane)
++static XenQdiskRequest *start_request(XenQdiskDataPlane *dataplane)
+ {
+     XenQdiskRequest *request = NULL;
+ 
+@@ -101,7 +101,7 @@ out:
+     return request;
+ }
+ 
+-static void ioreq_finish(XenQdiskRequest *request)
++static void finish_request(XenQdiskRequest *request)
+ {
+     XenQdiskDataPlane *dataplane = request->dataplane;
+ 
+@@ -111,12 +111,12 @@ static void ioreq_finish(XenQdiskRequest *request)
+     dataplane->requests_finished++;
+ }
+ 
+-static void ioreq_release(XenQdiskRequest *request, bool finish)
++static void release_request(XenQdiskRequest *request, bool finish)
+ {
+     XenQdiskDataPlane *dataplane = request->dataplane;
+ 
+     QLIST_REMOVE(request, list);
+-    ioreq_reset(request);
++    reset_request(request);
+     request->dataplane = dataplane;
+     QLIST_INSERT_HEAD(&dataplane->freelist, request, list);
+     if (finish) {
+@@ -130,7 +130,7 @@ static void ioreq_release(XenQdiskRequest *request, bool finish)
+  * translate request into iovec + start offset
+  * do sanity checks along the way
+  */
+-static int ioreq_parse(XenQdiskRequest *request)
++static int parse_request(XenQdiskRequest *request)
+ {
+     XenQdiskDataPlane *dataplane = request->dataplane;
+     size_t len;
+@@ -191,7 +191,7 @@ err:
+     return -1;
+ }
+ 
+-static int ioreq_grant_copy(XenQdiskRequest *request)
++static int copy_request(XenQdiskRequest *request)
+ {
+     XenQdiskDataPlane *dataplane = request->dataplane;
+     XenDevice *xendev = dataplane->xendev;
+@@ -240,9 +240,9 @@ static int ioreq_grant_copy(XenQdiskRequest *request)
+     return 0;
+ }
+ 
+-static int ioreq_runio_qemu_aio(XenQdiskRequest *request);
++static int do_aio(XenQdiskRequest *request);
+ 
+-static void qemu_aio_complete(void *opaque, int ret)
++static void complete_aio(void *opaque, int ret)
+ {
+     XenQdiskRequest *request = opaque;
+     XenQdiskDataPlane *dataplane = request->dataplane;
+@@ -259,7 +259,7 @@ static void qemu_aio_complete(void *opaque, int ret)
+     request->aio_inflight--;
+     if (request->presync) {
+         request->presync = 0;
+-        ioreq_runio_qemu_aio(request);
++        do_aio(request);
+         goto done;
+     }
+     if (request->aio_inflight > 0) {
+@@ -270,7 +270,7 @@ static void qemu_aio_complete(void *opaque, int ret)
+     case BLKIF_OP_READ:
+         /* in case of failure request->aio_errors is increased */
+         if (ret == 0) {
+-            ioreq_grant_copy(request);
++            copy_request(request);
+         }
+         qemu_vfree(request->buf);
+         break;
+@@ -286,7 +286,7 @@ static void qemu_aio_complete(void *opaque, int ret)
+     }
+ 
+     request->status = request->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_OKAY;
+-    ioreq_finish(request);
++    finish_request(request);
+ 
+     switch (request->req.operation) {
+     case BLKIF_OP_WRITE:
+@@ -311,9 +311,8 @@ done:
+     aio_context_release(dataplane->ctx);
+ }
+ 
+-static bool blk_split_discard(XenQdiskRequest *request,
+-                              blkif_sector_t sector_number,
+-                              uint64_t nr_sectors)
++static bool split_discard(XenQdiskRequest *request,
++                          blkif_sector_t sector_number, uint64_t nr_sectors)
+ {
+     XenQdiskDataPlane *dataplane = request->dataplane;
+     int64_t byte_offset;
+@@ -336,7 +335,7 @@ static bool blk_split_discard(XenQdiskRequest *request,
+         byte_chunk = byte_remaining > limit ? limit : byte_remaining;
+         request->aio_inflight++;
+         blk_aio_pdiscard(dataplane->blk, byte_offset, byte_chunk,
+-                         qemu_aio_complete, request);
++                         complete_aio, request);
+         byte_remaining -= byte_chunk;
+         byte_offset += byte_chunk;
+     } while (byte_remaining > 0);
+@@ -344,7 +343,7 @@ static bool blk_split_discard(XenQdiskRequest *request,
+     return true;
+ }
+ 
+-static int ioreq_runio_qemu_aio(XenQdiskRequest *request)
++static int do_aio(XenQdiskRequest *request)
+ {
+     XenQdiskDataPlane *dataplane = request->dataplane;
+ 
+@@ -352,14 +351,14 @@ static int ioreq_runio_qemu_aio(XenQdiskRequest *request)
+     if (request->req.nr_segments &&
+         (request->req.operation == BLKIF_OP_WRITE ||
+          request->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
+-        ioreq_grant_copy(request)) {
++        copy_request(request)) {
+         qemu_vfree(request->buf);
+         goto err;
+     }
+ 
+     request->aio_inflight++;
+     if (request->presync) {
+-        blk_aio_flush(request->dataplane->blk, qemu_aio_complete, request);
++        blk_aio_flush(request->dataplane->blk, complete_aio, request);
+         return 0;
+     }
+ 
+@@ -370,7 +369,7 @@ static int ioreq_runio_qemu_aio(XenQdiskRequest *request)
+                          request->v.size, BLOCK_ACCT_READ);
+         request->aio_inflight++;
+         blk_aio_preadv(dataplane->blk, request->start, &request->v, 0,
+-                       qemu_aio_complete, request);
++                       complete_aio, request);
+         break;
+     case BLKIF_OP_WRITE:
+     case BLKIF_OP_FLUSH_DISKCACHE:
+@@ -385,12 +384,12 @@ static int ioreq_runio_qemu_aio(XenQdiskRequest *request)
+                          BLOCK_ACCT_WRITE : BLOCK_ACCT_FLUSH);
+         request->aio_inflight++;
+         blk_aio_pwritev(dataplane->blk, request->start, &request->v, 0,
+-                        qemu_aio_complete, request);
++                        complete_aio, request);
+         break;
+     case BLKIF_OP_DISCARD:
+     {
+         struct blkif_request_discard *req = (void *)&request->req;
+-        if (!blk_split_discard(request, req->sector_number, req->nr_sectors)) {
++        if (!split_discard(request, req->sector_number, req->nr_sectors)) {
+             goto err;
+         }
+         break;
+@@ -400,17 +399,17 @@ static int ioreq_runio_qemu_aio(XenQdiskRequest *request)
+         goto err;
+     }
+ 
+-    qemu_aio_complete(request, 0);
++    complete_aio(request, 0);
+ 
+     return 0;
+ 
+ err:
+-    ioreq_finish(request);
++    finish_request(request);
+     request->status = BLKIF_RSP_ERROR;
+     return -1;
+ }
+ 
+-static int blk_send_response_one(XenQdiskRequest *request)
++static int send_response_one(XenQdiskRequest *request)
+ {
+     XenQdiskDataPlane *dataplane = request->dataplane;
+     int send_notify = 0;
+@@ -466,15 +465,15 @@ static int blk_send_response_one(XenQdiskRequest *request)
+ }
+ 
+ /* walk finished list, send outstanding responses, free requests */
+-static void blk_send_response_all(XenQdiskDataPlane *dataplane)
++static void send_response_all(XenQdiskDataPlane *dataplane)
+ {
+     XenQdiskRequest *request;
+     int send_notify = 0;
+ 
+     while (!QLIST_EMPTY(&dataplane->finished)) {
+         request = QLIST_FIRST(&dataplane->finished);
+-        send_notify += blk_send_response_one(request);
+-        ioreq_release(request, true);
++        send_notify += send_response_one(request);
++        release_request(request, true);
+     }
+     if (send_notify) {
+         xen_device_notify_event_channel(dataplane->xendev,
+@@ -482,8 +481,8 @@ static void blk_send_response_all(XenQdiskDataPlane *dataplane)
+     }
+ }
+ 
+-static int blk_get_request(XenQdiskDataPlane *dataplane,
+-                           XenQdiskRequest *request, RING_IDX rc)
++static int get_request(XenQdiskDataPlane *dataplane,
++                       XenQdiskRequest *request, RING_IDX rc)
+ {
+     switch (dataplane->protocol) {
+     case BLKIF_PROTOCOL_NATIVE: {
+@@ -513,7 +512,7 @@ static int blk_get_request(XenQdiskDataPlane *dataplane,
+     return 0;
+ }
+ 
+-static void blk_handle_requests(XenQdiskDataPlane *dataplane)
++static void handle_requests(XenQdiskDataPlane *dataplane)
+ {
+     RING_IDX rc, rp;
+     XenQdiskRequest *request;
+@@ -524,22 +523,22 @@ static void blk_handle_requests(XenQdiskDataPlane *dataplane)
+     rp = dataplane->rings.common.sring->req_prod;
+     xen_rmb(); /* Ensure we see queued requests up to 'rp'. */
+ 
+-    blk_send_response_all(dataplane);
++    send_response_all(dataplane);
+     while (rc != rp) {
+         /* pull request from ring */
+         if (RING_REQUEST_CONS_OVERFLOW(&dataplane->rings.common, rc)) {
+             break;
+         }
+-        request = ioreq_start(dataplane);
++        request = start_request(dataplane);
+         if (request == NULL) {
+             dataplane->more_work++;
+             break;
+         }
+-        blk_get_request(dataplane, request, rc);
++        get_request(dataplane, request, rc);
+         dataplane->rings.common.req_cons = ++rc;
+ 
+         /* parse them */
+-        if (ioreq_parse(request) != 0) {
++        if (parse_request(request) != 0) {
+ 
+             switch (request->req.operation) {
+             case BLKIF_OP_READ:
+@@ -557,15 +556,15 @@ static void blk_handle_requests(XenQdiskDataPlane *dataplane)
+                 break;
+             };
+ 
+-            if (blk_send_response_one(request)) {
++            if (send_response_one(request)) {
+                 xen_device_notify_event_channel(dataplane->xendev,
+                                                 dataplane->event_channel);
+             }
+-            ioreq_release(request, false);
++            release_request(request, false);
+             continue;
+         }
+ 
+-        ioreq_runio_qemu_aio(request);
++        do_aio(request);
+     }
+ 
+     if (dataplane->more_work &&
+@@ -574,16 +573,16 @@ static void blk_handle_requests(XenQdiskDataPlane *dataplane)
+     }
+ }
+ 
+-static void blk_bh(void *opaque)
++static void xen_qdisk_dataplane_bh(void *opaque)
+ {
+     XenQdiskDataPlane *dataplane = opaque;
+ 
+     aio_context_acquire(dataplane->ctx);
+-    blk_handle_requests(dataplane);
++    handle_requests(dataplane);
+     aio_context_release(dataplane->ctx);
+ }
+ 
+-static void blk_event(void *opaque)
++static void xen_qdisk_dataplane_event(void *opaque)
+ {
+     XenQdiskDataPlane *dataplane = opaque;
+ 
+@@ -612,7 +611,8 @@ XenQdiskDataPlane *xen_qdisk_dataplane_create(XenDevice *xendev,
+     } else {
+         dataplane->ctx = qemu_get_aio_context();
+     }
+-    dataplane->bh = aio_bh_new(dataplane->ctx, blk_bh, dataplane);
++    dataplane->bh = aio_bh_new(dataplane->ctx, xen_qdisk_dataplane_bh,
++                               dataplane);
+ 
+     return dataplane;
+ }
+@@ -718,7 +718,7 @@ void xen_qdisk_dataplane_start(XenQdiskDataPlane *dataplane,
+ 
+     dataplane->event_channel =
+         xen_device_bind_event_channel(xendev, event_channel,
+-                                      blk_event, dataplane,
++                                      xen_qdisk_dataplane_event, dataplane,
+                                       &error_fatal);
+ 
+     aio_context_acquire(dataplane->ctx);
+-- 
+2.11.0
