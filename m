@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gPUfW-0005dX-KZ
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:43:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1gPUmg-0007r3-Gw
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:51:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gPUfV-0001gF-QE
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:43:58 -0500
-Date: Wed, 21 Nov 2018 16:43:12 +0100
-From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181121154312.GI4426@caravaggio>
-References: <20181105014047.26447-1-sameo@linux.intel.com>
-	<20181105014047.26447-11-sameo@linux.intel.com>
-	<20181113165918.5cc2b2b5@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1gPUmc-0000nM-EQ
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:51:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59338)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gPUma-0000aq-Iq
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:51:16 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AB18A58A5A
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 15:51:14 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181121134151.23993-1-crosa@redhat.com>
+	<20181121134151.23993-2-crosa@redhat.com>
+Date: Wed, 21 Nov 2018 16:50:49 +0100
+In-Reply-To: <20181121134151.23993-2-crosa@redhat.com> (Cleber Rosa's message
+	of "Wed, 21 Nov 2018 08:41:51 -0500")
+Message-ID: <87pnuy1lba.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181113165918.5cc2b2b5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 10/24] hw: acpi: Export the PCI host and
- holes getters
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/1] Acceptance tests: add test for
+ set-numa-node error handler fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +34,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Philippe =?utf-8?Q?Mathieu-D?= =?utf-8?Q?aud=C3=A9?= <pmathieu@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Tue, Nov 13, 2018 at 04:59:18PM +0100, Igor Mammedov wrote:
-> On Mon,  5 Nov 2018 02:40:33 +0100
-> Samuel Ortiz <sameo@linux.intel.com> wrote:
-> 
-> > This is going to be needed by the hardware reduced implementation, so
-> > let's export it.
-> > Once the ACPI builder methods and getters will be implemented, the
-> > acpi_get_pci_host() implementation will become hardware agnostic.
-> > 
-> > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > ---
-> >  include/hw/acpi/aml-build.h |  2 ++
-> >  hw/acpi/aml-build.c         | 43 +++++++++++++++++++++++++++++++++
-> >  hw/i386/acpi-build.c        | 47 ++-----------------------------------
-> >  3 files changed, 47 insertions(+), 45 deletions(-)
-> > 
-> > diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> > index c27c0935ae..fde2785b9a 100644
-> > --- a/include/hw/acpi/aml-build.h
-> > +++ b/include/hw/acpi/aml-build.h
-> > @@ -400,6 +400,8 @@ build_header(BIOSLinker *linker, GArray *table_data,
-> >               const char *oem_id, const char *oem_table_id);
-> >  void *acpi_data_push(GArray *table_data, unsigned size);
-> >  unsigned acpi_data_len(GArray *table);
-> > +Object *acpi_get_pci_host(void);
-> > +void acpi_get_pci_holes(Range *hole, Range *hole64);
-> >  /* Align AML blob size to a multiple of 'align' */
-> >  void acpi_align_size(GArray *blob, unsigned align);
-> >  void acpi_add_table(GArray *table_offsets, GArray *table_data);
-> > diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> > index 2b9a636e75..b8e32f15f7 100644
-> > --- a/hw/acpi/aml-build.c
-> > +++ b/hw/acpi/aml-build.c
-> > @@ -1601,6 +1601,49 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
-> >      g_array_free(tables->vmgenid, mfre);
-> >  }
-> 
-> > +/*
-> > + * Because of the PXB hosts we cannot simply query TYPE_PCI_HOST_BRIDGE.
-> > + */
-> > +Object *acpi_get_pci_host(void)
-> > +{
-> > +    PCIHostState *host;
-> > +
-> > +    host = OBJECT_CHECK(PCIHostState,
-> > +                        object_resolve_path("/machine/i440fx", NULL),
-> > +                        TYPE_PCI_HOST_BRIDGE);
-> > +    if (!host) {
-> > +        host = OBJECT_CHECK(PCIHostState,
-> > +                            object_resolve_path("/machine/q35", NULL),
-> > +                            TYPE_PCI_HOST_BRIDGE);
-> > +    }
-> > +
-> > +    return OBJECT(host);
-> > +}
-> in general aml-build.c is a place to put ACPI spec primitives,
-> so I'd suggest to move it somewhere else.
-> 
-> Considering it's x86 code (so far), maybe move it to something like
-> hw/i386/acpi-pci.c
-> 
-> Also it might be good to get rid of acpi_get_pci_host() and pass
-> a pointer to pci_host as acpi_setup() an argument, since it's static
-> for life of boar we can keep it in AcpiBuildState, and reuse for
-> mfg/pci_hole/pci bus accesses.
-That's what I'm trying to do with patches #23 and 24, but through the
-ACPI configuration structure. I could try using the build state instead,
-as it's platform agnostic as well.
+Cleber Rosa <crosa@redhat.com> writes:
 
-Cheers,
-Samuel.
+> Commit a22528b918 fixed an issue that is exposed by means of the
+> "set-numa-node" QMP command (introduced in f3be67812).  This adds a
+> test that pretty much maps the steps documented on the fix.
+>
+> Additionally, given that 'set-numa-node' is only allowed in
+> 'preconfig' state, a specific check for that was added a separate
+> test.
+>
+> Tests: a22528b918c7d29795129b5a64c4cb44bb57a44d
+> Reference: f3be67812c226162f86ce92634bd913714445420
+> CC: Igor Mammedov <imammedo@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  tests/acceptance/set_numa_node.py | 41 +++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
+>  create mode 100644 tests/acceptance/set_numa_node.py
+>
+> diff --git a/tests/acceptance/set_numa_node.py b/tests/acceptance/set_numa_node.py
+> new file mode 100644
+> index 0000000000..0c55315231
+> --- /dev/null
+> +++ b/tests/acceptance/set_numa_node.py
+> @@ -0,0 +1,41 @@
+> +# Tests for QMP set-numa-node related behavior and regressions
+> +#
+> +# Copyright (c) 2018 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Cleber Rosa <crosa@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
+> +
+> +from avocado_qemu import Test
+> +
+> +
+> +class SetNumaNode(Test):
+> +    """
+> +    :avocado: enable
+> +    :avocado: tags=quick,numa
+> +    """
+> +    def test_numa_not_supported(self):
+> +        self.vm.add_args('-nodefaults', '-S', '-preconfig')
+> +        self.vm.set_machine('none')
+> +        self.vm.launch()
+> +        res = self.vm.qmp('set-numa-node', type='node')
+> +        self.assertIsNotNone(res, 'Unexpected empty QMP response to "set-numa-node"')
+> +        self.assertEqual(res['error']['class'], 'GenericError')
+> +        self.assertEqual(res['error']['desc'],
+> +                         'NUMA is not supported by this machine-type')
+
+Checking the QMP command fails a certain way takes you four lines[*].
+Such checks are pretty common in tests using QMP.  Consider creating a
+convenience method.
+
+> +        self.assertTrue(self.vm.is_running())
+> +        self.vm.qmp('x-exit-preconfig')
+> +        self.vm.shutdown()
+> +        self.assertEqual(self.vm.exitcode(), 0)
+> +
+> +    def test_no_preconfig(self):
+> +        self.vm.add_args('-nodefaults', '-S')
+> +        self.vm.set_machine('none')
+> +        self.vm.launch()
+> +        res = self.vm.qmp('set-numa-node', type='node')
+> +        self.assertIsNotNone(res, 'Unexpected empty QMP response to "set-numa-node"')
+> +        self.assertEqual(res['error']['class'], 'GenericError')
+> +        self.assertEqual(res['error']['desc'],
+> +                         "The command is permitted only in 'preconfig' state")
+
+The test looks good to me.
+
+It could also be done as a qtest in C.  Do we have guidance on when to
+use C / qtest and when to use Python / Avocado?
+
+One possible argument for using Python more could be "tests are cheaper
+to create and easier to debug that way".  Do we have evidence for that,
+or at least gut feelings?
+
+A possible argument against using Python could be much slower "make
+check".  I have no idea whether that's actually the case.
+
+Non-argument: requiring Avocado as a build dependency for testing.  I
+think that's totally fine as long as it's readily available on all our
+supported host platforms.  Same as for any other build dependency,
+really.
+
+
+[*] Would be more if you additionally checked res['error'] exists and is
+a dictionary.  I'm not saying you should, just that checking @res isn't
+None feels odd to me unless you do.
