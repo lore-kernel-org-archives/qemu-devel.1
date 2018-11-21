@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52549)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=856356900=Paul.Durrant@citrix.com>)
-	id 1gPURM-0001iL-9o
+	id 1gPURN-0001jY-JR
 	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:29:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=856356900=Paul.Durrant@citrix.com>)
-	id 1gPURE-0007iU-MA
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:29:18 -0500
+	id 1gPURL-0007qG-Fl
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 10:29:21 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Wed, 21 Nov 2018 15:12:07 +0000
-Message-ID: <20181121151211.15997-15-paul.durrant@citrix.com>
+Date: Wed, 21 Nov 2018 15:12:09 +0000
+Message-ID: <20181121151211.15997-17-paul.durrant@citrix.com>
 In-Reply-To: <20181121151211.15997-1-paul.durrant@citrix.com>
 References: <20181121151211.15997-1-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 14/18] xen: add implementations of xen-qdisk
- connect and disconnect functions...
+Subject: [Qemu-devel] [PATCH 16/18] xen: automatically create
+ XenQdiskDevice-s
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,308 +25,344 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-...and wire in the dataplane.
+This patch adds a creator function for XenQdiskDevice-s so that they can
+be created automatically when the Xen toolstack instantiates a new
+PV backend. When the XenQdiskDevice is created this way it is also
+necessary to create a drive which matches the configuration that the Xen
+toolstack has written into xenstore. This drive is marked 'auto_del' so
+that it will be removed when the XenQdiskDevice is destroyed. Also, for
+compatibilitye with the legacy 'xen_disk' implementation, an iothread
+is automatically created for the new XenQdiskDevice. This will also be
+removed when he XenQdiskDevice is destroyed.
 
-This patch adds the remaining code to make the xen-qdisk XenDevice
-functional. The parameters that a block frontend expects to find are
-populated in the backend xenstore area, and the 'ring-ref' and
-'event-channel' values specified in the frontend xenstore area are
-mapped/bound and used to set up the dataplane.
+Correspondingly the legacy backend scan for 'qdisk' is removed.
+
+After this patch is applied the legacy 'xen_disk' code is redundant. It
+will be removed by a subsequent patch.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 ---
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
 Cc: Kevin Wolf <kwolf@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
 ---
- hw/block/xen-qdisk.c       | 140 +++++++++++++++++++++++++++++++++++++++++++++
- hw/xen/xen-bus.c           |  12 ++--
- include/hw/xen/xen-bus.h   |   8 +++
- include/hw/xen/xen-qdisk.h |  12 ++++
- 4 files changed, 166 insertions(+), 6 deletions(-)
+ hw/block/trace-events       |   1 +
+ hw/block/xen-qdisk.c        | 237 +++++++++++++++++++++++++++++++++++++++++++-
+ hw/xen/xen-legacy-backend.c |   1 -
+ include/hw/xen/xen-qdisk.h  |   1 +
+ 4 files changed, 238 insertions(+), 2 deletions(-)
 
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 8b95567560..ee2ac756cf 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -133,3 +133,4 @@ xen_qdisk_realize(uint32_t disk, uint32_t partition) "d%up%u"
+ xen_qdisk_connect(uint32_t disk, uint32_t partition) "d%up%u"
+ xen_qdisk_disconnect(uint32_t disk, uint32_t partition) "d%up%u"
+ xen_qdisk_unrealize(uint32_t disk, uint32_t partition) "d%up%u"
++xen_qdisk_device_create(const char *name) "name: %s"
 diff --git a/hw/block/xen-qdisk.c b/hw/block/xen-qdisk.c
-index 35f7b70480..8c88393832 100644
+index 8c88393832..00cdd8181b 100644
 --- a/hw/block/xen-qdisk.c
 +++ b/hw/block/xen-qdisk.c
-@@ -9,6 +9,10 @@
- #include "qapi/visitor.h"
- #include "hw/hw.h"
- #include "hw/xen/xen-qdisk.h"
-+#include "sysemu/blockdev.h"
-+#include "sysemu/block-backend.h"
-+#include "sysemu/iothread.h"
-+#include "dataplane/xen-qdisk.h"
- #include "trace.h"
+@@ -5,9 +5,12 @@
  
- static char *xen_qdisk_get_name(XenDevice *xendev, Error **errp)
-@@ -23,6 +27,11 @@ static void xen_qdisk_realize(XenDevice *xendev, Error **errp)
- {
+ #include "qemu/osdep.h"
+ #include "qemu/cutils.h"
++#include "qemu/option.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
++#include "qapi/qmp/qdict.h"
+ #include "hw/hw.h"
++#include "hw/xen/xen-backend.h"
+ #include "hw/xen/xen-qdisk.h"
+ #include "sysemu/blockdev.h"
+ #include "sysemu/block-backend.h"
+@@ -28,6 +31,8 @@ static void xen_qdisk_realize(XenDevice *xendev, Error **errp)
      XenQdiskDevice *qdiskdev = XEN_QDISK_DEVICE(xendev);
      XenQdiskVdev *vdev = &qdiskdev->vdev;
-+    BlockConf *conf = &qdiskdev->conf;
-+    DriveInfo *dinfo;
-+    bool is_cdrom;
-+    unsigned int info;
-+    int64_t size;
+     BlockConf *conf = &qdiskdev->conf;
++    IOThread *iothread = qdiskdev->auto_iothread ?
++        qdiskdev->auto_iothread : qdiskdev->iothread;
+     DriveInfo *dinfo;
+     bool is_cdrom;
+     unsigned int info;
+@@ -97,7 +102,7 @@ static void xen_qdisk_realize(XenDevice *xendev, Error **errp)
+                               size / conf->logical_block_size);
  
-     if (!vdev->valid) {
-         error_setg(errp, "vdev property not set");
-@@ -30,13 +39,134 @@ static void xen_qdisk_realize(XenDevice *xendev, Error **errp)
-     }
- 
-     trace_xen_qdisk_realize(vdev->disk, vdev->partition);
-+
-+    if (!conf->blk) {
-+        error_setg(errp, "drive property not set");
-+        return;
-+    }
-+
-+    if (!blk_is_inserted(conf->blk)) {
-+        error_setg(errp, "device needs media, but drive is empty");
-+        return;
-+    }
-+
-+    if (!blkconf_apply_backend_options(conf, blk_is_read_only(conf->blk),
-+                                       false, errp)) {
-+        return;
-+    }
-+
-+    if (!blkconf_geometry(conf, NULL, 65535, 255, 255, errp)) {
-+        return;
-+    }
-+
-+    dinfo = blk_legacy_dinfo(conf->blk);
-+    is_cdrom = (dinfo && dinfo->media_cd);
-+
-+    blkconf_blocksizes(conf);
-+
-+    if (conf->logical_block_size > conf->physical_block_size) {
-+        error_setg(
-+            errp, "logical_block_size > physical_block_size not supported");
-+        return;
-+    }
-+
-+    blk_set_guest_block_size(conf->blk, conf->logical_block_size);
-+
-+    if (conf->discard_granularity > 0) {
-+        xen_device_backend_printf(xendev, "feature-discard", "%u", 1);
-+    }
-+
-+    xen_device_backend_printf(xendev, "feature-flush-cache", "%u", 1);
-+    xen_device_backend_printf(xendev, "max-ring-page-order", "%u",
-+                              qdiskdev->max_ring_page_order);
-+
-+    info = blk_is_read_only(conf->blk) ? VDISK_READONLY : 0;
-+    info |= is_cdrom ? VDISK_CDROM : 0;
-+
-+    xen_device_backend_printf(xendev, "info", "%u", info);
-+
-+    xen_device_frontend_printf(xendev, "virtual-device", "%u",
-+                               vdev->number);
-+    xen_device_frontend_printf(xendev, "device-type", "%s",
-+                               is_cdrom ? "cdrom" : "disk");
-+
-+    size = blk_getlength(conf->blk);
-+    xen_device_backend_printf(xendev, "sector-size", "%u",
-+                              conf->logical_block_size);
-+    xen_device_backend_printf(xendev, "sectors", "%lu",
-+                              size / conf->logical_block_size);
-+
-+    qdiskdev->dataplane = xen_qdisk_dataplane_create(xendev, conf,
-+                                                     qdiskdev->iothread);
+     qdiskdev->dataplane = xen_qdisk_dataplane_create(xendev, conf,
+-                                                     qdiskdev->iothread);
++                                                     iothread);
  }
  
  static void xen_qdisk_connect(XenQdiskDevice *qdiskdev, Error **errp)
- {
-     XenQdiskVdev *vdev = &qdiskdev->vdev;
-+    XenDevice *xendev = XEN_DEVICE(qdiskdev);
-+    unsigned int order, nr_ring_ref, *ring_ref, event_channel, protocol;
-+    char *str;
+@@ -228,6 +233,11 @@ static void xen_qdisk_unrealize(XenDevice *xendev, Error **errp)
  
-     trace_xen_qdisk_connect(vdev->disk, vdev->partition);
+     xen_qdisk_dataplane_destroy(qdiskdev->dataplane);
+     qdiskdev->dataplane = NULL;
 +
-+    if (xen_device_frontend_scanf(xendev, "ring-page-order", "%u",
-+                                  &order) != 1) {
-+        nr_ring_ref = 1;
-+        ring_ref = g_new(unsigned int, nr_ring_ref);
-+
-+        if (xen_device_frontend_scanf(xendev, "ring-ref", "%u",
-+                                      &ring_ref[0]) != 1) {
-+            error_setg(errp, "failed to read ring-ref");
-+            return;
-+        }
-+    } else if (order <= qdiskdev->max_ring_page_order) {
-+        unsigned int i;
-+
-+        nr_ring_ref = 1 << order;
-+        ring_ref = g_new(unsigned int, nr_ring_ref);
-+
-+        for (i = 0; i < nr_ring_ref; i++) {
-+            const char *key = g_strdup_printf("ring-ref%u", i);
-+
-+            if (xen_device_frontend_scanf(xendev, key, "%u",
-+                                          &ring_ref[i]) != 1) {
-+                error_setg(errp, "failed to read %s", key);
-+                g_free((gpointer)key);
-+                return;
-+            }
-+
-+            g_free((gpointer)key);
-+        }
-+    } else {
-+        error_setg(errp, "invalid ring-page-order (%d)", order);
-+        return;
++    if (qdiskdev->auto_iothread) {
++        iothread_destroy(qdiskdev->auto_iothread);
++        qdiskdev->auto_iothread = NULL;
 +    }
-+
-+    if (xen_device_frontend_scanf(xendev, "event-channel", "%u",
-+                                  &event_channel) != 1) {
-+        error_setg(errp, "failed to read event-channel");
-+        return;
-+    }
-+
-+    if (xen_device_frontend_scanf(xendev, "protocol", "%ms",
-+                                  &str) != 1) {
-+        protocol = BLKIF_PROTOCOL_NATIVE;
-+    } else {
-+        if (strcmp(str, XEN_IO_PROTO_ABI_X86_32) == 0) {
-+            protocol = BLKIF_PROTOCOL_X86_32;
-+        } else if (strcmp(str, XEN_IO_PROTO_ABI_X86_64) == 0) {
-+            protocol = BLKIF_PROTOCOL_X86_64;
-+        } else {
-+            protocol = BLKIF_PROTOCOL_NATIVE;
-+        }
-+
-+        free(str);
-+    }
-+
-+    xen_qdisk_dataplane_start(qdiskdev->dataplane, ring_ref, nr_ring_ref,
-+                              event_channel, protocol);
-+
-+    g_free(ring_ref);
- }
- 
- static void xen_qdisk_disconnect(XenQdiskDevice *qdiskdev, Error **errp)
-@@ -44,6 +174,8 @@ static void xen_qdisk_disconnect(XenQdiskDevice *qdiskdev, Error **errp)
-     XenQdiskVdev *vdev = &qdiskdev->vdev;
- 
-     trace_xen_qdisk_disconnect(vdev->disk, vdev->partition);
-+
-+    xen_qdisk_dataplane_stop(qdiskdev->dataplane);
- }
- 
- static void xen_qdisk_frontend_changed(XenDevice *xendev,
-@@ -93,6 +225,9 @@ static void xen_qdisk_unrealize(XenDevice *xendev, Error **errp)
-     trace_xen_qdisk_unrealize(vdev->disk, vdev->partition);
- 
-     xen_qdisk_disconnect(qdiskdev, &error_fatal);
-+
-+    xen_qdisk_dataplane_destroy(qdiskdev->dataplane);
-+    qdiskdev->dataplane = NULL;
  }
  
  static char *disk_to_vbd_name(unsigned int disk)
-@@ -289,6 +424,11 @@ const PropertyInfo xen_qdisk_prop_vdev = {
- static Property xen_qdisk_props[] = {
-     DEFINE_PROP("vdev", XenQdiskDevice, vdev,
-                 xen_qdisk_prop_vdev, XenQdiskVdev),
-+    DEFINE_BLOCK_PROPERTIES(XenQdiskDevice, conf),
-+    DEFINE_PROP_UINT32("max-ring-page-order", XenQdiskDevice,
-+                       max_ring_page_order, 4),
-+    DEFINE_PROP_LINK("iothread", XenQdiskDevice, iothread, TYPE_IOTHREAD,
-+                     IOThread *),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 64c8af54b0..c4b253103f 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -217,8 +217,8 @@ static const TypeInfo xen_bus_type_info = {
-     .class_init = xen_bus_class_init,
- };
- 
--static void xen_device_backend_printf(XenDevice *xendev, const char *key,
--                                      const char *fmt, ...)
-+void xen_device_backend_printf(XenDevice *xendev, const char *key,
-+                               const char *fmt, ...)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     va_list ap;
-@@ -305,8 +305,8 @@ static void xen_device_backend_destroy(XenDevice *xendev)
-     g_free(xendev->backend_path);
+@@ -461,3 +471,228 @@ static void xen_qdisk_register_types(void)
  }
  
--static void xen_device_frontend_printf(XenDevice *xendev, const char *key,
--                                       const char *fmt, ...)
-+void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-+                                const char *fmt, ...)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     va_list ap;
-@@ -318,8 +318,8 @@ static void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-     va_end(ap);
- }
- 
--static int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
--                                      const char *fmt, ...)
-+int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
-+                              const char *fmt, ...)
- {
-     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
-     va_list ap;
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 386f6bfc93..d931e01268 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -82,6 +82,14 @@ void xen_device_backend_set_state(XenDevice *xendev,
-                                   enum xenbus_state state);
- enum xenbus_state xen_device_backend_get_state(XenDevice *xendev);
- 
-+void xen_device_backend_printf(XenDevice *xendev, const char *key,
-+                               const char *fmt, ...);
+ type_init(xen_qdisk_register_types)
 +
-+void xen_device_frontend_printf(XenDevice *xendev, const char *key,
-+                                const char *fmt, ...);
-+int xen_device_frontend_scanf(XenDevice *xendev, const char *key,
-+                              const char *fmt, ...);
++static void xen_qdisk_drive_create(const char *id, QDict *opts,
++                                   Error **errp)
++{
++    const char *params, *device_type, *mode, *direct_io_safe,
++        *discard_enable;
++    char *format = NULL;
++    char *file = NULL;
++    char *drive_optstr = NULL;
++    QemuOpts *drive_opts;
++    Error *local_err = NULL;
 +
- void xen_device_set_max_grant_refs(XenDevice *xendev, unsigned int nr_refs,
-                                    Error **errp);
- void *xen_device_map_grant_refs(XenDevice *xendev, uint32_t *refs,
++    params = qdict_get_try_str(opts, "params");
++    if (params) {
++        char **v = g_strsplit(params, ":", 2);
++
++        if (v[1] == NULL) {
++            file = g_strdup(v[0]);
++        } else {
++            if (strcmp(v[0], "aio") == 0) {
++                format = g_strdup("raw");
++            } else if (strcmp(v[0], "vhd") == 0) {
++                format = g_strdup("vpc");
++            } else {
++                format = g_strdup(v[0]);
++            }
++            file = g_strdup(v[1]);
++        }
++
++        g_strfreev(v);
++    }
++
++    if (!file) {
++        error_setg(errp, "no file parameter");
++        return;
++    }
++
++    drive_optstr = g_strdup_printf("id=%s", id);
++    drive_opts = drive_def(drive_optstr);
++    if (!drive_opts) {
++        error_setg(errp, "failed to create drive options");
++        goto done;
++    }
++
++    qemu_opt_set(drive_opts, "file", file, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        error_prepend(errp, "failed to set 'file': ");
++        goto done;
++    }
++
++    if (format) {
++        qemu_opt_set(drive_opts, "format", format, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            error_prepend(errp, "failed to set 'format': ");
++            goto done;
++        }
++    }
++
++    device_type = qdict_get_try_str(opts, "device-type");
++    if (device_type) {
++        qemu_opt_set(drive_opts, "media", device_type, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            error_prepend(errp, "failed to set 'media': ");
++            goto done;
++        }
++    }
++
++    mode = qdict_get_try_str(opts, "mode");
++    if (mode && *mode != 'w') {
++        qemu_opt_set_bool(drive_opts, BDRV_OPT_READ_ONLY, true, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            error_prepend(errp, "failed to set '%s': ", BDRV_OPT_READ_ONLY);
++            goto done;
++        }
++    }
++
++    qemu_opt_set(drive_opts, "file.locking", "off", &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        error_prepend(errp, "failed to set 'file.locking': ");
++        goto done;
++    }
++
++    qemu_opt_set_bool(drive_opts, BDRV_OPT_CACHE_WB, true, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        error_prepend(errp, "failed to set '%s': ", BDRV_OPT_CACHE_WB);
++        goto done;
++    }
++
++    direct_io_safe = qdict_get_try_str(opts, "direct-io-safe");
++    if (direct_io_safe) {
++        qemu_opt_set_bool(drive_opts, BDRV_OPT_CACHE_DIRECT, true,
++                          &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            error_prepend(errp, "failed to set '%s': ",
++                          BDRV_OPT_CACHE_DIRECT);
++            goto done;
++        }
++
++        qemu_opt_set(drive_opts, "aio", "native", &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            error_prepend(errp, "failed to set 'aio': ");
++            goto done;
++        }
++    }
++
++    discard_enable = qdict_get_try_str(opts, "discard-enable");
++    if (discard_enable) {
++        unsigned long value;
++
++        if (!qemu_strtoul(discard_enable, NULL, 2, &value)) {
++            qemu_opt_set_bool(drive_opts, BDRV_OPT_DISCARD, !!value,
++                              &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                error_prepend(errp, "failed to set '%s': ",
++                              BDRV_OPT_DISCARD);
++                goto done;
++            }
++        }
++    }
++
++    drive_new(drive_opts, IF_NONE, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        error_prepend(errp, "failed to create drive: ");
++        goto done;
++    }
++
++done:
++    g_free(drive_optstr);
++    g_free(format);
++    g_free(file);
++}
++
++static void xen_qdisk_device_create(BusState *bus, const char *name,
++                                    QDict *opts, Error **errp)
++{
++    unsigned long number;
++    const char *vdev;
++    BlockBackend *blk = NULL;
++    IOThread *iothread = NULL;
++    DeviceState *dev = NULL;
++    Error *local_err = NULL;
++
++    trace_xen_qdisk_device_create(name);
++
++    if (qemu_strtoul(name, NULL, 10, &number)) {
++        error_setg(errp, "failed to parse name '%s'", name);
++        return;
++    }
++
++    vdev = qdict_get_try_str(opts, "dev");
++    if (!vdev) {
++        error_setg(errp, "no dev parameter");
++        return;
++    }
++
++    xen_qdisk_drive_create(vdev, opts, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    blk = blk_by_name(vdev);
++    g_assert(blk);
++
++    iothread = iothread_create(vdev, &error_abort);
++
++    dev = qdev_create(bus, TYPE_XEN_QDISK_DEVICE);
++
++    qdev_prop_set_string(dev, "vdev", vdev);
++
++    if (XEN_QDISK_DEVICE(dev)->vdev.number != number) {
++        error_setg(errp, "invalid dev parameter '%s'", vdev);
++        goto unref;
++    }
++
++    qdev_prop_set_drive(dev, "drive", blk, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        error_prepend(errp, "failed to set 'drive': ");
++        goto unref;
++    }
++
++    XEN_QDISK_DEVICE(dev)->auto_iothread = iothread;
++
++    qdev_init_nofail(dev);
++
++    blockdev_mark_auto_del(blk);
++    return;
++
++unref:
++    if (dev) {
++        object_unparent(OBJECT(dev));
++    }
++
++    if (iothread) {
++        iothread_destroy(iothread);
++    }
++
++    if (blk) {
++        monitor_remove_blk(blk);
++        blk_unref(blk);
++    }
++}
++
++static const XenBackendInfo xen_qdisk_backend_info = {
++    .type = "qdisk",
++    .create = xen_qdisk_device_create,
++};
++
++static void xen_qdisk_register_backend(void)
++{
++    xen_backend_register(&xen_qdisk_backend_info);
++}
++
++xen_backend_init(xen_qdisk_register_backend);
+diff --git a/hw/xen/xen-legacy-backend.c b/hw/xen/xen-legacy-backend.c
+index 2d748665a6..cc0add0a5b 100644
+--- a/hw/xen/xen-legacy-backend.c
++++ b/hw/xen/xen-legacy-backend.c
+@@ -753,7 +753,6 @@ void xen_be_register_common(void)
+ 
+     xen_be_register("console", &xen_console_ops);
+     xen_be_register("vkbd", &xen_kbdmouse_ops);
+-    xen_be_register("qdisk", &xen_blkdev_ops);
+ #ifdef CONFIG_VIRTFS
+     xen_be_register("9pfs", &xen_9pfs_ops);
+ #endif
 diff --git a/include/hw/xen/xen-qdisk.h b/include/hw/xen/xen-qdisk.h
-index ade0866037..d7dd2bf0ee 100644
+index d7dd2bf0ee..c7bc011731 100644
 --- a/include/hw/xen/xen-qdisk.h
 +++ b/include/hw/xen/xen-qdisk.h
-@@ -6,7 +6,15 @@
- #ifndef HW_XEN_QDISK_H
- #define HW_XEN_QDISK_H
- 
-+#include "hw/xen/xen.h"
- #include "hw/xen/xen-bus.h"
-+#include "hw/block/block.h"
-+#include "hw/block/xen_blkif.h"
-+#include "hw/block/dataplane/xen-qdisk.h"
-+#include "sysemu/blockdev.h"
-+#include "sysemu/iothread.h"
-+#include "sysemu/block-backend.h"
-+#include "sysemu/iothread.h"
- 
- typedef enum XenQdiskVdevType {
-     XEN_QDISK_VDEV_TYPE_DP,
-@@ -33,6 +41,10 @@ typedef struct XenQdiskDevice XenQdiskDevice;
- struct XenQdiskDevice {
-     XenDevice xendev;
-     XenQdiskVdev vdev;
-+    BlockConf conf;
-+    unsigned int max_ring_page_order;
-+    IOThread *iothread;
-+    XenQdiskDataPlane *dataplane;
+@@ -44,6 +44,7 @@ struct XenQdiskDevice {
+     BlockConf conf;
+     unsigned int max_ring_page_order;
+     IOThread *iothread;
++    IOThread *auto_iothread;
+     XenQdiskDataPlane *dataplane;
  };
  
- #endif /* HW_XEN_QDISK_H */
 -- 
 2.11.0
