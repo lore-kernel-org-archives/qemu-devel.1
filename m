@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gPafZ-00050r-MU
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:08:26 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPafl-0005MB-7q
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:08:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gPafY-0002MK-99
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:08:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41128)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPaff-0002W1-BH
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:08:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41164)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gPafY-0002Lf-22
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:08:24 -0500
+	id 1gPaff-0002UT-2S
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:08:31 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 22 Nov 2018 02:06:29 +0400
-Message-Id: <20181121220647.18844-13-marcandre.lureau@redhat.com>
+Date: Thu, 22 Nov 2018 02:06:30 +0400
+Message-Id: <20181121220647.18844-14-marcandre.lureau@redhat.com>
 In-Reply-To: <20181121220647.18844-1-marcandre.lureau@redhat.com>
 References: <20181121220647.18844-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 for-3.2 v2 12/30] slirp: add callbacks for
- timer
+Subject: [Qemu-devel] [PATCH v2 for-3.2 v2 13/30] build-sys: use a seperate
+ slirp-obj-y && slirp.mo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,142 +31,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+This will allow to have cflags for the whole slirp.mo -objs.
+It makes it possible to build tests that links only with
+slirp-obj-y (and not the whole common-obj).
+
+It is also a step towards building slirp as a shared library, although
+this requires a bit more thoughts to build with
+net/slirp.o (CONFIG_SLIRP would need to be 'm') and other build issues.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/libslirp.h | 14 +++++++++++---
- slirp/slirp.h    |  2 +-
- net/slirp.c      | 21 +++++++++++++++++++++
- slirp/ip6_icmp.c | 16 +++++++---------
- 4 files changed, 40 insertions(+), 13 deletions(-)
+ Makefile.objs       |  3 +--
+ Makefile.target     |  5 ++++-
+ slirp/Makefile.objs | 35 ++++++++++++++++++++++++++++++-----
+ 3 files changed, 35 insertions(+), 8 deletions(-)
 
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index ea019828e8..3e75dadfa3 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -6,19 +6,27 @@
- typedef struct Slirp Slirp;
+diff --git a/Makefile.objs b/Makefile.objs
+index 31852eaf8f..a11050a7aa 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -61,6 +61,7 @@ util-obj-y +=3D qapi/qapi-events-ui.o
+ util-obj-y +=3D qapi/qapi-introspect.o
 =20
- typedef int (*SlirpWriteCb)(const void *buf, size_t len, void *opaque);
-+typedef void (*SlirpTimerCb)(void *opaque);
+ chardev-obj-y =3D chardev/
++slirp-obj-$(CONFIG_SLIRP) =3D slirp/
 =20
- /*
-  * Callbacks from slirp
-- *
-- * The opaque parameter comes from the opaque parameter given to slirp_i=
-nit().
-  */
- typedef struct SlirpCb {
--    /* Send an ethernet frame to the guest network.  */
-+    /*
-+     * Send an ethernet frame to the guest network. The opaque parameter
-+     * is the one given to slirp_init().
-+     */
-     void (*output)(void *opaque, const uint8_t *pkt, int pkt_len);
-     /* Print a message for an error due to guest misbehavior.  */
-     void (*guest_error)(const char *msg);
-     /* Return the virtual clock value in nanoseconds */
-     int64_t (*clock_get_ns)(void);
-+    /* Create a new timer with the given callback and opaque data */
-+    void *(*timer_new)(SlirpTimerCb cb, void *opaque);
-+    /* Remove and free a timer */
-+    void (*timer_free)(void *timer);
-+    /* Modify a timer to expire at @expire_time */
-+    void (*timer_mod)(void *timer, int64_t expire_time);
- } SlirpCb;
+ #######################################################################
+ # block-obj-y is code used by both qemu system emulation and qemu-img
+@@ -123,8 +124,6 @@ common-obj-y +=3D vl.o
+ vl.o-cflags :=3D $(GPROF_CFLAGS) $(SDL_CFLAGS)
+ common-obj-$(CONFIG_TPM) +=3D tpm.o
 =20
+-common-obj-$(CONFIG_SLIRP) +=3D slirp/
+-
+ common-obj-y +=3D backends/
+ common-obj-y +=3D chardev/
 =20
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 9aa245715d..17056f4b83 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -193,7 +193,7 @@ struct Slirp {
-     NdpTable ndp_table;
-=20
-     GRand *grand;
--    QEMUTimer *ra_timer;
-+    void *ra_timer;
-=20
-     const SlirpCb *cb;
-     void *opaque;
-diff --git a/net/slirp.c b/net/slirp.c
-index c7062b51c2..f7cdf8398b 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -168,10 +168,31 @@ static int64_t net_slirp_clock_get_ns(void)
-     return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
- }
-=20
-+static void *net_slirp_timer_new(SlirpTimerCb cb, void *opaque)
-+{
-+    return timer_new_full(NULL, QEMU_CLOCK_VIRTUAL,
-+                          SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
-+                          cb, opaque);
-+}
+diff --git a/Makefile.target b/Makefile.target
+index 4d56298bbf..3a970b1b77 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -168,6 +168,7 @@ target-obj-y :=3D
+ block-obj-y :=3D
+ common-obj-y :=3D
+ chardev-obj-y :=3D
++slirp-obj-y :=3D
+ include $(SRC_PATH)/Makefile.objs
+ dummy :=3D $(call unnest-vars,,target-obj-y)
+ target-obj-y-save :=3D $(target-obj-y)
+@@ -180,9 +181,11 @@ dummy :=3D $(call unnest-vars,.., \
+                qom-obj-y \
+                io-obj-y \
+                common-obj-y \
+-               common-obj-m)
++               common-obj-m \
++               slirp-obj-y)
+ target-obj-y :=3D $(target-obj-y-save)
+ all-obj-y +=3D $(common-obj-y)
++all-obj-y +=3D $(slirp-obj-y)
+ all-obj-y +=3D $(target-obj-y)
+ all-obj-y +=3D $(qom-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) +=3D $(block-obj-y) $(chardev-obj-y)
+diff --git a/slirp/Makefile.objs b/slirp/Makefile.objs
+index 28049b03cd..21653f69e9 100644
+--- a/slirp/Makefile.objs
++++ b/slirp/Makefile.objs
+@@ -1,5 +1,30 @@
+-common-obj-y =3D cksum.o if.o ip_icmp.o ip6_icmp.o ip6_input.o ip6_outpu=
+t.o \
+-               ip_input.o ip_output.o dnssearch.o dhcpv6.o
+-common-obj-y +=3D slirp.o mbuf.o misc.o sbuf.o socket.o tcp_input.o tcp_=
+output.o
+-common-obj-y +=3D tcp_subr.o tcp_timer.o udp.o udp6.o bootp.o tftp.o arp=
+_table.o \
+-                ndp_table.o ncsi.o
++slirp-obj-y =3D slirp.mo
 +
-+static void net_slirp_timer_free(void *timer)
-+{
-+    timer_del(timer);
-+    timer_free(timer);
-+}
-+
-+static void net_slirp_timer_mod(void *timer, int64_t expire_timer)
-+{
-+    timer_mod(timer, expire_timer);
-+}
-+
- static const SlirpCb slirp_cb =3D {
-     .output =3D net_slirp_output,
-     .guest_error =3D net_slirp_guest_error,
-     .clock_get_ns =3D net_slirp_clock_get_ns,
-+    .timer_new =3D net_slirp_timer_new,
-+    .timer_free =3D net_slirp_timer_free,
-+    .timer_mod =3D net_slirp_timer_mod,
- };
-=20
- static int net_slirp_init(NetClientState *peer, const char *model,
-diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
-index 6e2d952f17..0acdcc26a2 100644
---- a/slirp/ip6_icmp.c
-+++ b/slirp/ip6_icmp.c
-@@ -16,8 +16,9 @@
- static void ra_timer_handler(void *opaque)
- {
-     Slirp *slirp =3D opaque;
--    timer_mod(slirp->ra_timer,
--              slirp->cb->clock_get_ns() / SCALE_MS + NDP_Interval);
-+
-+    slirp->cb->timer_mod(slirp->ra_timer,
-+                         slirp->cb->clock_get_ns() / SCALE_MS + NDP_Inte=
-rval);
-     ndp_send_ra(slirp);
- }
-=20
-@@ -27,11 +28,9 @@ void icmp6_init(Slirp *slirp)
-         return;
-     }
-=20
--    slirp->ra_timer =3D timer_new_full(NULL, QEMU_CLOCK_VIRTUAL,
--                                     SCALE_MS, QEMU_TIMER_ATTR_EXTERNAL,
--                                     ra_timer_handler, slirp);
--    timer_mod(slirp->ra_timer,
--              slirp->cb->clock_get_ns() / SCALE_MS + NDP_Interval);
-+    slirp->ra_timer =3D slirp->cb->timer_new(ra_timer_handler, slirp);
-+    slirp->cb->timer_mod(slirp->ra_timer,
-+                         slirp->cb->clock_get_ns() / SCALE_MS + NDP_Inte=
-rval);
- }
-=20
- void icmp6_cleanup(Slirp *slirp)
-@@ -40,8 +39,7 @@ void icmp6_cleanup(Slirp *slirp)
-         return;
-     }
-=20
--    timer_del(slirp->ra_timer);
--    timer_free(slirp->ra_timer);
-+    slirp->cb->timer_free(slirp->ra_timer);
- }
-=20
- static void icmp6_send_echoreply(struct mbuf *m, Slirp *slirp, struct ip=
-6 *ip,
++slirp.mo-objs =3D \
++	arp_table.o \
++	bootp.o \
++	cksum.o \
++	dhcpv6.o \
++	dnssearch.o \
++	if.o \
++	ip6_icmp.o \
++	ip6_input.o \
++	ip6_output.o \
++	ip_icmp.o \
++	ip_input.o \
++	ip_output.o \
++	mbuf.o \
++	misc.o \
++	ncsi.o \
++	ndp_table.o \
++	sbuf.o \
++	slirp.o \
++	socket.o \
++	tcp_input.o \
++	tcp_output.o \
++	tcp_subr.o \
++	tcp_timer.o \
++	tftp.o \
++	udp.o \
++	udp6.o \
++	$(NULL)
 --=20
 2.20.0.rc1
