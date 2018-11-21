@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gPHFr-00035j-8I
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 20:24:36 -0500
+	(envelope-from <jsnow@redhat.com>) id 1gPHJh-0003zj-Po
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 20:28:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gPHFo-00014l-1j
-	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 20:24:35 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 21 Nov 2018 01:24:28 +0000
-Message-ID: <d697a989-dacd-9912-84b1-098eec9672a7@virtuozzo.com>
-References: <79c52867-2c10-401b-95d9-2d2edd8afa5e@redhat.com>
-	<CAMRbyysA2h5MbJM8LyyYfFOOttH_D+Fc=Nb51vcvk=o+=hJsbA@mail.gmail.com>
-	<7e6da1d6-68bf-913d-6eaf-9acff0623218@redhat.com>
-	<CAMRbyyuaU5UbcbQhV0g=zOHcQBieiZjEz631o=vhNZZGCmtONQ@mail.gmail.com>
-In-Reply-To: <CAMRbyyuaU5UbcbQhV0g=zOHcQBieiZjEz631o=vhNZZGCmtONQ@mail.gmail.com>
-Content-Language: en-US
+	(envelope-from <jsnow@redhat.com>) id 1gPHJe-0004yz-Mv
+	for qemu-devel@nongnu.org; Tue, 20 Nov 2018 20:28:33 -0500
+References: <20181119101921.31949-1-mreitz@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <362e12d5-bc66-a0ce-9d00-ecc56d49932b@redhat.com>
+Date: Tue, 20 Nov 2018 20:23:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [Qemu-block] KVM Forum block no[td]es
+In-Reply-To: <20181119101921.31949-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-next? 0/2] qemu-img: Minor
+ fixes to an amend error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nir Soffer <nsoffer@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org
 
-DQpPbiAxMi4xMS4yMDE4IDE2OjEwLCBOaXIgU29mZmVyIHdyb3RlOg0KT24gTW9uLCBOb3YgMTIs
-IDIwMTggYXQgNToyNiBQTSBNYXggUmVpdHogPG1yZWl0ekByZWRoYXQuY29tPG1haWx0bzptcmVp
-dHpAcmVkaGF0LmNvbT4+IHdyb3RlOg0KT24gMTIuMTEuMTggMDA6MzYsIE5pciBTb2ZmZXIgd3Jv
-dGU6DQo+IE9uIE1vbiwgTm92IDEyLCAyMDE4IGF0IDEyOjI1IEFNIE1heCBSZWl0eiA8bXJlaXR6
-QHJlZGhhdC5jb208bWFpbHRvOm1yZWl0ekByZWRoYXQuY29tPg0KPiA8bWFpbHRvOm1yZWl0ekBy
-ZWRoYXQuY29tPG1haWx0bzptcmVpdHpAcmVkaGF0LmNvbT4+PiB3cm90ZToNCj4NCj4gICAgIFRo
-aXMgaXMgd2hhdCBJ4oCZdmUgdGFrZW4gZnJvbSB0d28gb3IgdGhyZWUgQm9GLWxpa2UgZ2V0LXRv
-Z2V0aGVycyBvbg0KPiAgICAgYmxvY2t5IHRoaW5ncy4gIEFtZW5kbWVudHMgYXJlIG1vcmUgdGhh
-biB3ZWxjb21lLCBvZiBjb3Vyc2UuDQo+DQo+IC4uLg0KPg0KPiAgICAgQml0bWFwcw0KPg0KPiAg
-ICAgPT09PT09PQ0KPg0KPiAgICAgKEdvdCB0aGlzIHNlY3Rpb24gZnJvbSBzbmVha2luZyBpbnRv
-IGEgQm9GIEkgd2FzbuKAmXQgaW52aXRlZCB0by4gIE9oDQo+ICAgICB3ZWxsLiAgV29u4oCZdCBo
-dXJ0IHRvIGluY2x1ZGUgdGhlbSBoZXJlLikNCj4NCj4gICAgIEN1cnJlbnRseSwgd2hlbiBkaXJ0
-eSBiaXRtYXBzIGFyZSBsb2FkZWQsIGFsbCBJTl9VU0UgYml0bWFwcyBhcmUganVzdA0KPiAgICAg
-bm90IGxvYWRlZCBhdCBhbGwgYW5kIGNvbXBsZXRlbHkgaWdub3JlZC4gIFRoYXQgaXNu4oCZdCBj
-b3JyZWN0LCB0aG91Z2gsDQo+ICAgICB0aGV5IHNob3VsZCBlaXRoZXIgc3RpbGwgYmUgbG9hZGVk
-IChhbmQgYXV0b21hdGljYWxseSB0cmVhdGVkIGFuZA0KPiAgICAgd3JpdHRlbiBiYWNrIGFzIGZ1
-bGx5IGRpcnR5KSwgb3IgYXQgbGVhc3QgcWVtdS1pbWcgY2hlY2sgc2hvdWxkDQo+ICAgICDigJxy
-ZXBhaXLigJ0gdGhlbSAoaS5lLiBmdWxseSBkaXJ0eWluZyB0aGVtKS4NCj4NCj4NCj4gSSdtIG5v
-dCBzdXJlIG1ha2luZyBiaXRtYXBzIGRpcnR5IGlzIGJldHRlci4NCj4NCj4gV2hlbiBiaXRtYXAg
-aXMgbWFya2VkIElOX1VTRSwgaXQgbWVhbnMgdGhhdCB3ZSBjYW5ub3QgdXNlIGl0IGZvcg0KPiBi
-YWNrdXAuIERlbGV0aW5nIHRoZSBiaXRtYXAgb3IgbWFraW5nIGl0IGFzIGJhZCBzbyBpdCBjYW5u
-b3QgYmUgdXNlZA0KPiBmb3IgdGhlIG5leHQgYmFja3VwIGlzIHRoZSBzYW1lLiBNYWtpbmcgdGhl
-IGJpdG1hcCBhcyBkaXJ0eSB3aWxsIGZ1bGwNCj4gdGhlIG1hbmFnZW1lbnQgbGF5ZXIgdGhhdCBl
-dmVyeXRoaW5nIHdhcyBmaW5lIHdoZW4gdGhlIG5leHQgYmFja3VwDQo+IGluY2x1ZGVzIHRoZSBl
-bnRpcmUgZGlzay4gSXQgaXMgYmV0dGVyIHRvIGNhdXNlIHRoZSBuZXh0IGJhY2t1cCB0byBmYWls
-DQo+IGluIGEgdmVyYm9zZSB3YXksIHNpbmNlIHRoZSBiYWNrdXAgc29mdHdhcmUgY2FuIHJlY292
-ZXIgYnkgZG9pbmcNCj4gYSBmdWxsIGJhY2t1cC4NCg0KQnV0IG1ha2luZyB0aGUgZGlydHkgYml0
-bWFwIGZ1bGx5IGRpcnR5IHdpbGwgYXV0b21hdGljYWxseSBlbmZvcmNlIGENCmZ1bGwgYmFja3Vw
-Lg0KDQpUcnVlLCBidXQgaXMgYWxzbyBoaWRlIHRoZSBmYWN0IHRoYXQgd2UgbG9zdCB0aGUgYml0
-bWFwLiBJIHRoaW5rIHdlIHNob3VsZA0Kc3RhcnQgd2l0aCB0aGUgc2ltcGxlIHdheSBvZiBtYWtp
-bmcgaXQgZmFpbCBhbmQgbGV0IHRoZSByZXN0IG9mIHRoZSBzdGFjaw0KZmFsbGJhY2sgdG8gZnVs
-bCBiYWNrdXAuDQoNCg0KSSBhZ3JlZS4gTWFuYWdlbWVudCB0b29sIHNob3VsZCBkZWNpZGUgd2hh
-dCB0byBkbyBpZiB3ZSBsb29zZSBhIGJpdG1hcC4gSGF2aW5nIGFic29sdXRlbHkgZGlydHkgZGly
-dHktYml0bWFwIGlzIGFjdHVhbGx5IHVzZWxlc3MsIGFzIGl0J3MgZXF1YWwgdG8gbm90IGhhdmlu
-ZyBhIGJpdG1hcC4NCg0KQW55d2F5LCB3ZSBjYW4gYWRkIHNvbWUgZmxhZ3MgdG8gcWVtdS1pbWcg
-Y2hlY2ssIHRvIGZpeCBJTl9VU0UgYml0bWFwcyBzb21laG93LiBJIHRoaW5nIHRoZSBtb3N0IHNp
-bXBsZSBhbmQgdXNlZnVsIG9wdGlvbiB3b3VsZCBiZSBqdXN0IHJlbW92ZSBJTl9VU0UgYml0bWFw
-cy4NCg0KDQo+ICAgICBTb21ldGltZXMgcWVtdSAocnVubmluZyBpbiBhIG1vZGUgYXMgYmFyZSBh
-cyBwb3NzaWJsZSkgaXMgYmV0dGVyIHRoYW4NCj4gICAgIHVzaW5nIHFlbXUtaW1nIGNvbnZlcnQs
-IGZvciBpbnN0YW5jZS4gIEl0IGdpdmVzIHlvdSBtb3JlIGNvbnRyb2wNCj4gICAgICh0aHJvdWdo
-IFFNUDsgeW91IGdldCBlLmcuIGJldHRlciBwcm9ncmVzcyByZXBvcnRpbmcpLCB5b3UgZ2V0IGFs
-bCBvZg0KPiAgICAgdGhlIG1pcnJvciBvcHRpbWl6YXRpb25zICh3ZSBkbyBoYXZlIG9wdGltaXph
-dGlvbnMgZm9yIGNvbnZlcnQsIHRvbywNCj4gICAgIGJ1dCB3aGV0aGVyIGl04oCZcyBhbnkgZ29v
-ZCB0byB3cml0ZSB0aGUgc2FtZSAob3IgZGlmZmVyZW50PykNCj4gICAgIG9wdGltaXphdGlvbnMg
-dHdpY2UgaXMgYW5vdGhlciBxdWVzdGlvbiksIGFuZCB5b3UgZ2V0IGEgY29tbW9uDQo+ICAgICBp
-bnRlcmZhY2UgZm9yIGV2ZXJ5dGhpbmcgKG9ubGluZSBhbmQgb2ZmbGluZSkuDQo+ICAgICBOb3Rl
-IHRoYXQgYmVzaWRlcyBhIGJhcmUgcWVtdSB3ZeKAmXZlIGFsc28gYWx3YXlzIHdhbnRlZCB0byBj
-b252ZXJ0IGFzDQo+ICAgICBtYW55IHFlbXUtaW1nIG9wZXJhdGlvbnMgaW50byBmcm9udGVuZHMg
-Zm9yIGJsb2NrIGpvYnMgYXMgcG9zc2libGUuDQo+ICAgICBXZSBoYXZlIG9ubHkgZG9uZSB0aGlz
-IGZvciBjb21taXQsIGhvd2V2ZXIsIGV2ZW4gdGhvdWdoIGNvbnZlcnQgbG9va2VkDQo+ICAgICBs
-aWtlIGJhc2ljYWxseSB0aGUgaWRlYWwgdGFyZ2V0LiAgSXQgd2FzIGp1c3QgdG9vIGhhcmQgd2l0
-aCB0b28gbGl0dGxlDQo+ICAgICBhcHBhcmVudCBnYWluLCBsaWtlIGFsd2F5cyAoYW5kIGNvbnZl
-cnQgc3VwcG9ydHMgYWRkaXRpb25hbCBmZWF0dXJlcw0KPiAgICAgbGlrZSBjb25jYXRlbmF0aW9u
-IHdoaWNoIHdlIGRvbuKAmXQgaGF2ZSBpbiB0aGUgcnVudGltZSBibG9jayBsYXllcg0KPiAgICAg
-eWV0KS4NCj4NCj4NCj4gSSdtIG5vdCBzdXJlIGl0IGlzIGJldHRlciB0byBydW4gcWVtdSBhbmQg
-dXNlIHFlbXUtaW1nIGFzIHRoaW4gd3JhcHBlcg0KPiBvdmVyIHFtcC4NCj4NCj4gRm9yIGV4YW1w
-bGUsIG1hbmFnZW1lbnQgc3lzdGVtIG1heSBhc2NvY2lhdGUgcWVtdS1pbWcNCj4gd2l0aCBhIHNh
-bmxvY2sgbGVhc2UsIGFuZCBzYW5sb2NrIG1heSB0cnkgdG8gdGVybWluYXRlIHFlbXUtaW1nIHdo
-ZW4NCj4gYSBsZWFzZSBpcyBpbnZhbGlkYXRlZC4gSW4gdGhpcyBjYXNlIHNhbmxvY2sgd2lsbCBz
-dWNjZWVkIHdoaWxlIHFlbXUgaXMgdGlsbA0KPiBhY2Nlc3Npbmcgc3RvcmFnZSBpdCBzaG91bGQg
-bm90IGFjY2Vzcy4NCj4gLi4uDQoNClRoZSBwb2ludCB3YXMgbm90IHRvIHJ1biB0d28gcHJvY2Vz
-c2VzLCBidXQgdG8gbGluayB0aGUgbmVjZXNzYXJ5IGJpdHMNCm9mIHFlbXUgaW50byBxZW11LWlt
-ZyBhbmQgdGhlbiB1c2UgdGhlbSBpbnNpZGUgdGhlIHNpbmdsZSBxZW11LWltZw0KcHJvY2VzcyBp
-dHNlbGYuICBBcyBoaW50ZWQgYXQgYWJvdmUsIHdlJ3ZlIGJlZW4gZG9pbmcgdGhpcyBmb3IgcWVt
-dS1pbWcNCmNvbW1pdCBmb3IgcXVpdGUgc29tZSB0aW1lOyB0aGF0IGNvbW1hbmQgYWN0dWFsbHkg
-cnVucyBhIGJsb2NrIGpvYiB1bmRlcg0KdGhlIGhvb2QgKGluc2lkZSBvZiBxZW11LWltZykuDQoN
-ClNvdW5kcyBncmVhdC4NCg0KDQpPcmlnaW5hbCBpZGVhIHdhcyBub3QgdG8gdXNlIHFlbXUtaW1n
-IGF0IGFsbCwgYnV0IG9ubHkgcWVtdS4uDQoNCg0KTmlyDQo=
+
+
+On 11/19/18 5:19 AM, Max Reitz wrote:
+> One of the amend error paths has two issues that are fixed by this
+> series.  Since they are relatively minor and have been present in 3.0
+> already, I think there is no need to get them into 3.1.  OTOH they are
+> bug fixes, so they could go into 3.1 if you, dear reader, insist.
+
+I enjoy your use of "dear reader" in cover letters.
+
+Not related to the above:
+
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+> 
+> 
+> Max Reitz (2):
+>   qemu-img: Fix typo
+>   qemu-img: Fix leak
+> 
+>  qemu-img.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
