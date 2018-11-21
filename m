@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gPan2-00043Y-HO
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:16:13 -0500
+	(envelope-from <palmer@sifive.com>) id 1gPanD-0004Dz-HU
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:16:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gPamy-0004NZ-Hz
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:16:06 -0500
-Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:40175)
+	(envelope-from <palmer@sifive.com>) id 1gPan8-0004bJ-Vr
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:16:19 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:35034)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gPamu-0004Gv-Np
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:16:02 -0500
-Received: by mail-pl1-x631.google.com with SMTP id b22-v6so7385717pls.7
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 14:15:59 -0800 (PST)
-Date: Wed, 21 Nov 2018 14:15:57 -0800 (PST)
-In-Reply-To: <CAKmqyKMZ7+xAPcks33omgaEjQig9b-BSDGMbZBfTDSzW8eiThg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gPan6-0004J7-QT
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:16:12 -0500
+Received: by mail-pl1-x641.google.com with SMTP id v1-v6so7396513plo.2
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 14:16:01 -0800 (PST)
+Date: Wed, 21 Nov 2018 14:15:59 -0800 (PST)
+In-Reply-To: <00f7a2ba-8eb1-77fd-1c4b-14e83e553bed@deltatee.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-03c7e6ba-b10e-4597-8383-c734fe78f4ad@palmer-si-x1c4>
+Message-ID: <mhng-a407b21a-ace2-461c-8f27-ee95ed9c3d9b@palmer-si-x1c4>
 Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
@@ -28,50 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alistair23@gmail.com
-Cc: logang@deltatee.com, qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org, linux@roeck-us.net, abologna@redhat.com
+To: logang@deltatee.com
+Cc: alistair23@gmail.com, qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org, linux@roeck-us.net, abologna@redhat.com
 
-On Wed, 21 Nov 2018 14:01:10 PST (-0800), alistair23@gmail.com wrote:
-> On Wed, Nov 21, 2018 at 1:37 PM Palmer Dabbelt <palmer@sifive.com> wrote:
->>
->> On Wed, 21 Nov 2018 11:21:40 PST (-0800), alistair23@gmail.com wrote:
->> > On Wed, Nov 21, 2018 at 11:19 AM Logan Gunthorpe <logang@deltatee.com> wrote:
->> >>
->> >>
->> >>
->> >> On 2018-11-21 12:16 p.m., Alistair Francis wrote:
->> >> >>> Do you see the MicroSemi PCIe probe in your dmesg?
->> >> >>
->> >> >> I do when I have a kernel with microsemi PCI Support (specifically the
->> >> >> one included in the bbl you sent us a while back).
->> >> >
->> >> > Yeah, so you need to make sure that doesn't happen.
->> >>
->> >> Well, I also have a kernel (one I've built myself) without microsemi
->> >> support, but with Xilinx support and it also doesn't work (see my dmesg
->> >> logs I sent).
->> >
->> > So this one should work.
->> >
->> >>
->> >> > For people who have modified the standard bbl to edit the device tree
->> >> > before passing it to Linux to add the MicroSemi PCIe node, it won't
->> >> > work. That's a very small number of people who have modified the
->> >> > standard boot loader. I don't think we need to document how those
->> >> > people get back to the default set-up.
->> >>
->> >> I have not done that. And it's not working for me.
->> >
->> > If you haven't done this then how can Linux know to probe the
->> > MicroSemi PCIe root complex?
->>
->> BBL passes this through from the FSBL, which has the DTB compiled in:
->>
->> https://github.com/sifive/freedom-u540-c000-bootloader/blob/master/fsbl/ux00_fsbl.dts#L405
+On Wed, 21 Nov 2018 14:01:34 PST (-0800), logang@deltatee.com wrote:
 >
-> That's fairly new though. Our boards show a Xilinx PCIe device.
+>
+> On 2018-11-21 2:54 p.m., Alistair Francis wrote:
+>> The last time I tested this it worked (although I might not have
+>> tested interrupts) and now it doesn't. Nothing has changed in the
+>> series, my guest software has changed though. I can see the root
+>> complex, but no devices underneath it.
+>>
+>> Sorry for the confusion with the MicroSemi PCIe root complex.
+>>
+>> I think I'll just drop this patch. It doesn't work for 32-bit guests,
+>> but I would like to model the hardware so I don't want to change the
+>> addresses. We can revisit this in the future along with the gpex high
+>> MMIO support and USB support.
+>
+> Yeah, I'm less concerned about all the board variant stuff as I am about
+> having something actually work. I don't want to have to jump through any
+> bbl hoops or anything to use it if it doesn't work out of the box. And
+> you're right, getting the virt pci support upstream seems more important
+> and this issue can be revisited later.
+>
+> On an slight tangent: what root device do you use with the sifive_u
+> machine? I can't find any virtual hardware that works. If I had PCI I
+> could use NVMe, but that's not working. And for this reason I've only
+> been using the 'virt' device.
 
-Presumably you have the Xilinx motherboards, then?  That would mean you have a 
-FSBL that was compiled with the device tree to match, which is the right thing 
-to do.  Right now there's no way of probing for the motherboard, though at some 
-point we designed a scheme to do so it's just not implemented yet.
+I've only been using the virt device as well.
