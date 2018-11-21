@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gPQmd-0003fQ-5L
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 06:35:04 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gPQq9-0005qF-Ev
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 06:38:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gPQmc-0007c0-9v
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 06:35:03 -0500
-Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:54426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gPQmc-0007am-1m
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 06:35:02 -0500
-Received: by mail-it1-x144.google.com with SMTP id a205-v6so8282347itd.4
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 03:35:01 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1gPQq5-0005rJ-GG
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 06:38:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43384)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gPQq5-0005qb-AS
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 06:38:37 -0500
+Date: Wed, 21 Nov 2018 11:38:33 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181121113832.GB6103@work-vm>
+References: <20181114190912.7242-1-chen.zhang@intel.com>
 MIME-Version: 1.0
-References: <1542799319-2595-1-git-send-email-liq3ea@gmail.com>
-	<CAJ+F1C+FQ8WWkrw3Qup-DzyryZZ3UqHdomjzY=-kfCiHcvLWEw@mail.gmail.com>
-In-Reply-To: <CAJ+F1C+FQ8WWkrw3Qup-DzyryZZ3UqHdomjzY=-kfCiHcvLWEw@mail.gmail.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 21 Nov 2018 19:34:25 +0800
-Message-ID: <CAKXe6SL_CNQ1xoyDM8Lx9FGVhGrAsCUFh=6ujx2ESPp6YUxkxw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] net: tap: use qemu_set_nonblock
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181114190912.7242-1-chen.zhang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH] migration/migration.c: Add COLO dependency
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>, mst@redhat.com, Qemu Developers <qemu-devel@nongnu.org>
+To: Zhang Chen <chen.zhang@intel.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> =E4=BA=8E2018=E5=B9=B41=
-1=E6=9C=8821=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=887:28=E5=86=99=E9=
-=81=93=EF=BC=9A
+* Zhang Chen (chen.zhang@intel.com) wrote:
+> From: Zhang Chen <chen.zhang@intel.com>
+> 
+> Current COLO mode(independent disk mode) need replication module work
+> together. Suggested by Dr. David Alan Gilbert <dgilbert@redhat.com>.
+> 
+> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 
-> Hi
->
-> On Wed, Nov 21, 2018 at 3:22 PM Li Qiang <liq3ea@gmail.com> wrote:
-> >
-> > The fcntl will change the flags directly, use qemu_set_nonblock()
-> > instead.
->
-> qemu_set_nonblock() will preserve the existing flags. And on windows,
-> it will register the FD to the event loop.
->
+Queued
 
-Oh, I don't consider the windows behavior. I'm not sure is this the
-expected behavior.
-
-
-> that's a reasonable thing to do, is this fixing an actual bug?
->
-
-No, I just think there is no reason to change other flags in linux.
-
-Thanks,
-Li Qiang
-
-
->
-> >
-> > Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> > ---
-> >  net/tap.c | 10 +++++-----
-> >  1 file changed, 5 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/net/tap.c b/net/tap.c
-> > index cc8525f154..e8aadd8d4b 100644
-> > --- a/net/tap.c
-> > +++ b/net/tap.c
-> > @@ -592,7 +592,7 @@ int net_init_bridge(const Netdev *netdev, const cha=
-r
-> *name,
-> >          return -1;
-> >      }
-> >
-> > -    fcntl(fd, F_SETFL, O_NONBLOCK);
-> > +    qemu_set_nonblock(fd);
-> >      vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> >      s =3D net_tap_fd_init(peer, "bridge", name, fd, vnet_hdr);
-> >
-> > @@ -707,7 +707,7 @@ static void net_init_tap_one(const NetdevTapOptions
-> *tap, NetClientState *peer,
-> >                  }
-> >                  return;
-> >              }
-> > -            fcntl(vhostfd, F_SETFL, O_NONBLOCK);
-> > +            qemu_set_nonblock(vhostfd);
-> >          }
-> >          options.opaque =3D (void *)(uintptr_t)vhostfd;
-> >
-> > @@ -791,7 +791,7 @@ int net_init_tap(const Netdev *netdev, const char
-> *name,
-> >              return -1;
-> >          }
-> >
-> > -        fcntl(fd, F_SETFL, O_NONBLOCK);
-> > +        qemu_set_nonblock(fd);
-> >
-> >          vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> >
-> > @@ -839,7 +839,7 @@ int net_init_tap(const Netdev *netdev, const char
-> *name,
-> >                  goto free_fail;
-> >              }
-> >
-> > -            fcntl(fd, F_SETFL, O_NONBLOCK);
-> > +            qemu_set_nonblock(fd);
-> >
-> >              if (i =3D=3D 0) {
-> >                  vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> > @@ -887,7 +887,7 @@ free_fail:
-> >              return -1;
-> >          }
-> >
-> > -        fcntl(fd, F_SETFL, O_NONBLOCK);
-> > +        qemu_set_nonblock(fd);
-> >          vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> >
-> >          net_init_tap_one(tap, peer, "bridge", name, ifname,
-> > --
-> > 2.11.0
-> >
-> >
->
->
-> --
-> Marc-Andr=C3=A9 Lureau
->
+> ---
+>  migration/migration.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index b261c1e4ce..49ffb9997a 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -918,6 +918,15 @@ static bool migrate_caps_check(bool *cap_list,
+>      }
+>  #endif
+>  
+> +#ifndef CONFIG_REPLICATION
+> +    if (cap_list[MIGRATION_CAPABILITY_X_COLO]) {
+> +        error_setg(errp, "QEMU compiled without replication module"
+> +                   " can't enable COLO");
+> +        error_append_hint(errp, "Please enable replication before COLO.\n");
+> +        return false;
+> +    }
+> +#endif
+> +
+>      if (cap_list[MIGRATION_CAPABILITY_POSTCOPY_RAM]) {
+>          if (cap_list[MIGRATION_CAPABILITY_COMPRESS]) {
+>              /* The decompression threads asynchronously write into RAM
+> -- 
+> 2.17.GIT
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
