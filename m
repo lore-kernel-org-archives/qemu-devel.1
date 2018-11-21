@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gPa8F-0005fw-8u
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:34:01 -0500
+	(envelope-from <palmer@sifive.com>) id 1gPaBD-0007cn-TB
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:37:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gPa1U-0001Lo-2y
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:27:03 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38280)
+	(envelope-from <palmer@sifive.com>) id 1gPaBD-0001QG-3R
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:37:03 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:37250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gPa1S-0001Jo-3e
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:27:00 -0500
-Received: by mail-pl1-x644.google.com with SMTP id e5so7238564plb.5
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 13:26:56 -0800 (PST)
-Date: Wed, 21 Nov 2018 13:26:54 -0800 (PST)
-In-Reply-To: <CAKmqyKMtTqi=D-PKZFnt40MaA8+e6Sj8nUr0VmBFajScw1MYng@mail.gmail.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gPaBC-0001M2-Mb
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:37:02 -0500
+Received: by mail-pl1-x644.google.com with SMTP id b5so7278388plr.4
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 13:37:01 -0800 (PST)
+Date: Wed, 21 Nov 2018 13:37:00 -0800 (PST)
+In-Reply-To: <CAKmqyKM1pf1zJVMuqZvocN07LxDGrRjoSNLojt=06UbN4P-bpg@mail.gmail.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-ac7d7069-f2ae-45b5-a950-17410b48481f@palmer-si-x1c4>
+Message-ID: <mhng-ad48cd5f-383f-427e-9bd6-db4947b3839f@palmer-si-x1c4>
 Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
@@ -31,46 +31,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: alistair23@gmail.com
 Cc: logang@deltatee.com, qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org, linux@roeck-us.net, abologna@redhat.com
 
-On Wed, 21 Nov 2018 10:32:45 PST (-0800), alistair23@gmail.com wrote:
-> On Wed, Nov 21, 2018 at 10:05 AM Logan Gunthorpe <logang@deltatee.com> wrote:
+On Wed, 21 Nov 2018 11:21:40 PST (-0800), alistair23@gmail.com wrote:
+> On Wed, Nov 21, 2018 at 11:19 AM Logan Gunthorpe <logang@deltatee.com> wrote:
 >>
 >>
 >>
->> On 2018-11-21 10:02 a.m., Alistair Francis wrote:
->> > Connect the Xilinx PCIe device based on the information in the device
->> > tree stored in the ROM of the HiFish Unleashed board.
+>> On 2018-11-21 12:16 p.m., Alistair Francis wrote:
+>> >>> Do you see the MicroSemi PCIe probe in your dmesg?
+>> >>
+>> >> I do when I have a kernel with microsemi PCI Support (specifically the
+>> >> one included in the bbl you sent us a while back).
+>> >
+>> > Yeah, so you need to make sure that doesn't happen.
 >>
->> I only briefly tested this patch but could not get any PCI devices to
->> come up with the sifive_u machine. Depending on the kernel I tried, it
->> either failed to initialize a Xilinx PCIe (likely due to a mismatch with
->> the DT) or it appears to successfully initialize a Microsemi device but
->> did not enumerate any devices underneath.
+>> Well, I also have a kernel (one I've built myself) without microsemi
+>> support, but with Xilinx support and it also doesn't work (see my dmesg
+>> logs I sent).
 >
-> That seems like either a kernel or bbl issue.
->
-> You need to make sure that bbl doesn't edit the device tree (to add
-> the Microsemi device or remove the Xilinx one) and ensure your kernel
-> supports the Xilinx one.
+> So this one should work.
 >
 >>
->> In any case, it would be nice if the Microsemi/Xilinx confusion was at
->> least explained in the commit message.
+>> > For people who have modified the standard bbl to edit the device tree
+>> > before passing it to Linux to add the MicroSemi PCIe node, it won't
+>> > work. That's a very small number of people who have modified the
+>> > standard boot loader. I don't think we need to document how those
+>> > people get back to the default set-up.
+>>
+>> I have not done that. And it's not working for me.
 >
-> What should we say? The QEMU machine accurately models the real
-> hardware which reports a Xilinx PCIe. The confusion generally appears
-> above QEMU where people are used to using the MicroSemi one.
+> If you haven't done this then how can Linux know to probe the
+> MicroSemi PCIe root complex?
 
-I think the real issue here is that "sifive_u" doesn't actually fully describe 
-the device we're trying to emulate.  Is it a:
+BBL passes this through from the FSBL, which has the DTB compiled in:
 
-* Generic SiFive U core?  In that case we just have a 64-bit core and 
-  essentially no devices.  This is kind of useless.
-* A HiFive Unleashed?  In that case there's no PCIe, as it requires an 
-  expansion board.
-* A HiFive Unleashed + VC707?  Here we have Xilinx PCIe.
-* A HiFive Unleashed + Microsemi Expansion?  Here have Microsemi PCIe.
-
-There's a tradeoff between accurately emulating the hardware and blowing up the 
-amount of targets we support in QEMU.  We went through this discussion before 
-and ended up where we are now, but maybe it's best to go have the discussion 
-again?
+https://github.com/sifive/freedom-u540-c000-bootloader/blob/master/fsbl/ux00_fsbl.dts#L405
