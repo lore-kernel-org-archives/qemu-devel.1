@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gPKml-00043b-EI
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 00:10:48 -0500
+	(envelope-from <peterx@redhat.com>) id 1gPL7j-0002PI-2F
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 00:32:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gPKmi-00031M-Bt
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 00:10:47 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gPKmi-0002zh-60
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 00:10:44 -0500
-Received: by mail-pl1-x641.google.com with SMTP id v1-v6so3697975plo.2
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 21:10:44 -0800 (PST)
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 20 Nov 2018 21:10:26 -0800
-Message-Id: <1542777026-2788-4-git-send-email-liq3ea@gmail.com>
-In-Reply-To: <1542777026-2788-1-git-send-email-liq3ea@gmail.com>
-References: <1542777026-2788-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] fw_cfg: make qemu_extra_params_fw
- locally
+	(envelope-from <peterx@redhat.com>) id 1gPL7d-0001g5-TQ
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 00:32:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gPL7c-0001cW-N3
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 00:32:20 -0500
+Date: Wed, 21 Nov 2018 13:32:05 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20181121053205.GD24163@xz-x1>
+References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
+	<1542746383-18288-3-git-send-email-kwankhede@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1542746383-18288-3-git-send-email-kwankhede@nvidia.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] Add save and load functions for VFIO
+ PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com, pbonzini@redhat.com, kraxel@redhat.com, lersek@redhat.com, philmd@redhat.com
-Cc: qemu-devel@nongnu.org, liq3ea@gmail.com
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: alex.williamson@redhat.com, cjia@nvidia.com, Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com, jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 
-qemu_extra_params_fw[] has external linkage, but is used
-only in fw_cfg_bootsplash(), it makes sense to make it
-locally.
+On Wed, Nov 21, 2018 at 02:09:40AM +0530, Kirti Wankhede wrote:
+> Save and restore with MSIX type is not tested.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  hw/vfio/pci.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/vfio/pci.h | 29 ++++++++++++++++++
+>  2 files changed, 124 insertions(+)
+> 
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 6cbb8fa0549d..72daf1a358a0 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -1234,6 +1234,101 @@ void vfio_pci_write_config(PCIDevice *pdev,
+>      }
+>  }
+>  
+> +void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
+> +{
+> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> +    PCIDevice *pdev = &vdev->pdev;
+> +    int i;
+> +
+> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> +        uint32_t bar;
+> +
+> +        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
+> +        qemu_put_be32(f, bar);
 
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- hw/nvram/fw_cfg.c       | 1 +
- include/sysemu/sysemu.h | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+Is it possible to avoid calling qemu_put_*() directly from vfio code?
+E.g., using VMStateDescription and hooks like pre_save, post_load and
+etc.  Then we update all the data into the data structure and leave
+all the rest of IO operations to general migration framework.
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index aafa96721f..a71f043b5d 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -120,6 +120,7 @@ static void fw_cfg_bootsplash(FWCfgState *s)
- {
-     const char *boot_splash_filename = NULL;
-     const char *boot_splash_time = NULL;
-+    uint8_t qemu_extra_params_fw[2];
-     char *filename, *file_data;
-     gsize file_size;
-     int file_type;
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 8d6095d98b..f8608d24d9 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -133,7 +133,6 @@ extern uint8_t *boot_splash_filedata;
- extern size_t boot_splash_filedata_size;
- extern bool enable_mlock;
- extern bool enable_cpu_pm;
--extern uint8_t qemu_extra_params_fw[2];
- extern QEMUClockType rtc_clock;
- extern const char *mem_path;
- extern int mem_prealloc;
+Regards,
+
 -- 
-2.11.0
+Peter Xu
