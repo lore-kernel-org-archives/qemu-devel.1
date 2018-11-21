@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <logang@deltatee.com>) id 1gPX3p-0000OB-5o
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:17:14 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gPX4f-0001U5-8E
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:18:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <logang@deltatee.com>) id 1gPWoW-0000z8-Dv
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:01:26 -0500
-References: <cover.1542819633.git.alistair.francis@wdc.com>
-	<86e2120f18412152ed2994b72bd874120b86d749.1542819633.git.alistair.francis@wdc.com>
-From: Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <b49b54bf-2548-5a6b-1808-511b57cd33ad@deltatee.com>
-Date: Wed, 21 Nov 2018 11:01:10 -0700
+	(envelope-from <alistair23@gmail.com>) id 1gPX4e-0002is-F8
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:18:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <86e2120f18412152ed2994b72bd874120b86d749.1542819633.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 3/6] hw/riscv/virt: Connect the
- gpex PCIe
+References: <cover.1542819633.git.alistair.francis@wdc.com>
+	<a2c70c88a145d2e239f113e28979c7a50d71aedf.1542819633.git.alistair.francis@wdc.com>
+	<ff4ef556-0989-ec47-0424-3f153f10a8d0@deltatee.com>
+In-Reply-To: <ff4ef556-0989-ec47-0424-3f153f10a8d0@deltatee.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 21 Nov 2018 10:17:34 -0800
+Message-ID: <CAKmqyKOMsBda223ptqt2iVFi6oVifK_0L+=Mne=v9p_umwxVLg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 1/6] hw/riscv/virt: Increase the
+ number of interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "linux@roeck-us.net" <linux@roeck-us.net>, "abologna@redhat.com" <abologna@redhat.com>
+To: Logan Gunthorpe <logang@deltatee.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org, Guenter Roeck <linux@roeck-us.net>, Andrea Bolognani <abologna@redhat.com>
 
+On Wed, Nov 21, 2018 at 9:58 AM Logan Gunthorpe <logang@deltatee.com> wrote:
+>
+>
+>
+> On 2018-11-21 10:02 a.m., Alistair Francis wrote:
+> > Increase the number of interrupts to match the HiFive Unleashed board.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  include/hw/riscv/virt.h | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+> > index 91163d6cbf..7cb2742070 100644
+> > --- a/include/hw/riscv/virt.h
+> > +++ b/include/hw/riscv/virt.h
+> > @@ -45,7 +45,7 @@ enum {
+> >      UART0_IRQ = 10,
+> >      VIRTIO_IRQ = 1, /* 1 to 8 */
+> >      VIRTIO_COUNT = 8,
+> > -    VIRTIO_NDEV = 10
+> > +    VIRTIO_NDEV = 0x35
+>
+> Why 0x35? Based on the PCI patch we are using only 36 interrupts, not 53...
 
+This is just for future proofing. There is no reason to set the number
+lower then the number of interrupts we have, now hopefully this won't
+keep churning every time we add a device.
 
-On 2018-11-21 10:02 a.m., Alistair Francis wrote:
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Alistair
 
-Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-
-
-> diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
-> index 7937c69e22..3e3d195f37 100644
-> --- a/default-configs/riscv32-softmmu.mak
-> +++ b/default-configs/riscv32-softmmu.mak
-> @@ -1,7 +1,11 @@
->  # Default configuration for riscv-softmmu
->  
-> +include pci.mak
-> +
->  CONFIG_SERIAL=y
->  CONFIG_VIRTIO_MMIO=y
-> -include virtio.mak
->  
->  CONFIG_CADENCE=y
-> +
-> +CONFIG_PCI_GENERIC=y
-> +CONFIG_PCI_XILINX=y
-
-Nit: should PCI_XILINX not be in patch 5? It's not used in this patch
-and was a bit confusing when reviewing.
-
-Logan
+>
+> Logan
