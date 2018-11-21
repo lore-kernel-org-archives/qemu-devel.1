@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gPaMK-0003KN-Ds
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:48:33 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gPaOB-0004PD-L0
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:50:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gPaMG-0003w5-NW
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:48:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58136)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gPaMG-0003tv-Hv
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:48:28 -0500
-From: Cleber Rosa <crosa@redhat.com>
-Date: Wed, 21 Nov 2018 16:48:17 -0500
-Message-Id: <20181121214818.22874-2-crosa@redhat.com>
-In-Reply-To: <20181121214818.22874-1-crosa@redhat.com>
-References: <20181121214818.22874-1-crosa@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1gPaOA-0006TI-PK
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 16:50:27 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/2] RFC: Acceptance tests: add the build
- directory to the system PATH
+References: <CAKmqyKMtTqi=D-PKZFnt40MaA8+e6Sj8nUr0VmBFajScw1MYng@mail.gmail.com>
+	<mhng-ac7d7069-f2ae-45b5-a950-17410b48481f@palmer-si-x1c4>
+In-Reply-To: <mhng-ac7d7069-f2ae-45b5-a950-17410b48481f@palmer-si-x1c4>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 21 Nov 2018 13:49:53 -0800
+Message-ID: <CAKmqyKM2pmF_D812mp1hcJe8KcLGiNz9vLpy7OpsbS0XxNwo+w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 5/6] hw/riscv/sifive_u: Connect
+ the Xilinx PCIe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +23,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Wainer dos Santos Moschetta <wainersm@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, Cleber Rosa <crosa@redhat.com>
+To: Palmer Dabbelt <palmer@sifive.com>
+Cc: Logan Gunthorpe <logang@deltatee.com>, qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Guenter Roeck <linux@roeck-us.net>, Andrea Bolognani <abologna@redhat.com>
 
-So that when binaries such as qemu-img are searched for, those in the
-build tree will be favored.  As a clarification, SRC_ROOT_DIR is
-dependent on the location from where tests are executed, so they are
-equal to the build directory if one is being used.
+On Wed, Nov 21, 2018 at 1:26 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> On Wed, 21 Nov 2018 10:32:45 PST (-0800), alistair23@gmail.com wrote:
+> > On Wed, Nov 21, 2018 at 10:05 AM Logan Gunthorpe <logang@deltatee.com> wrote:
+> >>
+> >>
+> >>
+> >> On 2018-11-21 10:02 a.m., Alistair Francis wrote:
+> >> > Connect the Xilinx PCIe device based on the information in the device
+> >> > tree stored in the ROM of the HiFish Unleashed board.
+> >>
+> >> I only briefly tested this patch but could not get any PCI devices to
+> >> come up with the sifive_u machine. Depending on the kernel I tried, it
+> >> either failed to initialize a Xilinx PCIe (likely due to a mismatch with
+> >> the DT) or it appears to successfully initialize a Microsemi device but
+> >> did not enumerate any devices underneath.
+> >
+> > That seems like either a kernel or bbl issue.
+> >
+> > You need to make sure that bbl doesn't edit the device tree (to add
+> > the Microsemi device or remove the Xilinx one) and ensure your kernel
+> > supports the Xilinx one.
+> >
+> >>
+> >> In any case, it would be nice if the Microsemi/Xilinx confusion was at
+> >> least explained in the commit message.
+> >
+> > What should we say? The QEMU machine accurately models the real
+> > hardware which reports a Xilinx PCIe. The confusion generally appears
+> > above QEMU where people are used to using the MicroSemi one.
+>
+> I think the real issue here is that "sifive_u" doesn't actually fully describe
+> the device we're trying to emulate.  Is it a:
+>
+> * Generic SiFive U core?  In that case we just have a 64-bit core and
+>   essentially no devices.  This is kind of useless.
+> * A HiFive Unleashed?  In that case there's no PCIe, as it requires an
+>   expansion board.
+> * A HiFive Unleashed + VC707?  Here we have Xilinx PCIe.
+> * A HiFive Unleashed + Microsemi Expansion?  Here have Microsemi PCIe.
 
-The original motivation is that Avocado libraries such as
-avocado.utils.vmimage.get() may use the matching binaries, but it may
-also apply to any other binary that test code may eventually attempt
-to execute.
+This isn't even always consistent. For example the sifive_u machine
+exists for 32-bit cores, but the PCIe address reported by the hardware
+only works for 64-bit machines.
 
-Other competing alternatives would be a more explicit path or binary
-registration mechanism, in which we tell the libraries such as
-avocado.utils.vmimage, the binaries to use in advance.  I think the
-model proposed here is simpler though, and is not inconsistent with
-the general approach of favoring the built binaries, and falling back
-to binaries available in the system.  I'd love to have comments on
-that, though.
+So we need a trade off between accurately modelling the hardware or
+having 32-bit support.
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- tests/acceptance/avocado_qemu/__init__.py | 9 +++++++++
- 1 file changed, 9 insertions(+)
+>
+> There's a tradeoff between accurately emulating the hardware and blowing up the
+> amount of targets we support in QEMU.  We went through this discussion before
+> and ended up where we are now, but maybe it's best to go have the discussion
+> again?
 
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
-/avocado_qemu/__init__.py
-index 1e54fd5932..3d5190cbab 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -49,6 +49,15 @@ class Test(avocado.Test):
-             self.cancel("No QEMU binary defined or found in the source t=
-ree")
-         self.vm =3D QEMUMachine(self.qemu_bin)
-=20
-+        # RFC: avocado.utils.vmimage.get() uses qemu-img, from the
-+        # system's PATH, to create a snapshot.  This is a transparent,
-+        # but implicit way of making sure it finds the qemu-img that
-+        # matches the code being tested (as tests it indirectly too).
-+        # As for the cleanup, given that in the Avocado test execution
-+        # model every test is started in a different process, no
-+        # cleanup is needed.
-+        os.environ['PATH'] =3D '%s:%s' % (SRC_ROOT_DIR, os.environ['PATH=
-'])
-+
-     def tearDown(self):
-         if self.vm is not None:
-             self.vm.shutdown()
---=20
-2.19.1
+Up to you, it is your board :)
+
+I think it makes more sense to remove these generic boards (that is
+what the virt board is for) and model real hardware boards.
+
+Alistair
