@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gPRWK-0005DT-PT
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:22:17 -0500
+	(envelope-from <mst@redhat.com>) id 1gPRXi-0006ln-UL
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:23:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1gPRWA-0005l4-QR
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:22:14 -0500
-Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:43669)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gPRWA-0005iu-IC
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:22:06 -0500
-Received: by mail-yw1-xc43.google.com with SMTP id l200so2132655ywe.10
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 04:22:05 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1gPRXe-0000CX-MQ
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:23:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54586)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gPRXe-0000Ba-DM
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:23:38 -0500
+Date: Wed, 21 Nov 2018 07:23:36 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181121072237-mutt-send-email-mst@kernel.org>
+References: <1542799319-2595-1-git-send-email-liq3ea@gmail.com>
+	<CAJ+F1C+FQ8WWkrw3Qup-DzyryZZ3UqHdomjzY=-kfCiHcvLWEw@mail.gmail.com>
+	<20181121115718.GN26577@redhat.com>
 MIME-Version: 1.0
-References: <20181120203811.18406-1-jcmvbkbc@gmail.com>
-	<3526a4e0-2b26-dfc5-4b81-9fdf94734398@redhat.com>
-In-Reply-To: <3526a4e0-2b26-dfc5-4b81-9fdf94734398@redhat.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Wed, 21 Nov 2018 04:21:53 -0800
-Message-ID: <CAMo8Bf+oCDyOmpj9mNZF1nL3X7JgZU5fidDd-LZNGEG9dOPHew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181121115718.GN26577@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/xtensa: xtfpga: provide default
- memory sizes
+Subject: Re: [Qemu-devel] [PATCH] net: tap: use qemu_set_nonblock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +29,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Li Qiang <liq3ea@gmail.com>, Jason Wang <jasowang@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-Hi Philippe,
+On Wed, Nov 21, 2018 at 11:57:18AM +0000, Daniel P. Berrang=E9 wrote:
+> On Wed, Nov 21, 2018 at 03:28:29PM +0400, Marc-Andr=E9 Lureau wrote:
+> > Hi
+> >=20
+> > On Wed, Nov 21, 2018 at 3:22 PM Li Qiang <liq3ea@gmail.com> wrote:
+> > >
+> > > The fcntl will change the flags directly, use qemu_set_nonblock()
+> > > instead.
+> >=20
+> > qemu_set_nonblock() will preserve the existing flags. And on windows,
+> > it will register the FD to the event loop.
+> > that's a reasonable thing to do, is this fixing an actual bug?
+>=20
+> tap.c is only built with CONFIG_POSIX. Win32 is completely separate
+> in tap-win32.c.  So the event loop reg doesn't apply.
+>=20
+> I agree it is good to preserve fcntl flags though, so this patch
+> looks desirable.
+>=20
+> Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
 
-thanks for your review.
+Sure
 
-On Wed, Nov 21, 2018 at 4:00 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
-> On 20/11/18 21:38, Max Filippov wrote:
-> >   static const TypeInfo xtfpga_lx200_nommu_type =3D {
-> > @@ -632,6 +636,7 @@ static void xtfpga_ml605_class_init(ObjectClass *oc=
-, void *data)
-> >       mc->init =3D xtfpga_ml605_init;
-> >       mc->max_cpus =3D 4;
-> >       mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_TYPE;
-> > +    mc->default_ram_size =3D 256 * MiB;
->
-> Isn't it 512 MB for the ML605?
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-There's 512MB on the board, but the Tensilica prototyping
-user's guide for the ML605 only documents 256MB in the memory
-map section. But now that you've mentioned it I recall that in reality
-both ML605 and KC705 had all onboard memory minus 128MB
-mapped for cores with MMU.
+but really not for this release I guess as we are in freeze.
+So thanks! And pls remember to ping after the release.
 
-> >   }
-> >
-> >   static const TypeInfo xtfpga_ml605_type =3D {
-> > @@ -648,6 +653,7 @@ static void xtfpga_ml605_nommu_class_init(ObjectCla=
-ss *oc, void *data)
-> >       mc->init =3D xtfpga_ml605_nommu_init;
-> >       mc->max_cpus =3D 4;
-> >       mc->default_cpu_type =3D XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-> > +    mc->default_ram_size =3D 256 * MiB;
->
-> Ditto.
 
-For noMMU cores there's only 256MB window available for
-the system memory, so it's capped at 256MB.
-
-I'll send an updated v2.
-
---=20
-Thanks.
--- Max
+>=20
+> >=20
+> > >
+> > > Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> > > ---
+> > >  net/tap.c | 10 +++++-----
+> > >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/net/tap.c b/net/tap.c
+> > > index cc8525f154..e8aadd8d4b 100644
+> > > --- a/net/tap.c
+> > > +++ b/net/tap.c
+> > > @@ -592,7 +592,7 @@ int net_init_bridge(const Netdev *netdev, const=
+ char *name,
+> > >          return -1;
+> > >      }
+> > >
+> > > -    fcntl(fd, F_SETFL, O_NONBLOCK);
+> > > +    qemu_set_nonblock(fd);
+> > >      vnet_hdr =3D tap_probe_vnet_hdr(fd);
+> > >      s =3D net_tap_fd_init(peer, "bridge", name, fd, vnet_hdr);
+> > >
+> > > @@ -707,7 +707,7 @@ static void net_init_tap_one(const NetdevTapOpt=
+ions *tap, NetClientState *peer,
+> > >                  }
+> > >                  return;
+> > >              }
+> > > -            fcntl(vhostfd, F_SETFL, O_NONBLOCK);
+> > > +            qemu_set_nonblock(vhostfd);
+> > >          }
+> > >          options.opaque =3D (void *)(uintptr_t)vhostfd;
+> > >
+> > > @@ -791,7 +791,7 @@ int net_init_tap(const Netdev *netdev, const ch=
+ar *name,
+> > >              return -1;
+> > >          }
+> > >
+> > > -        fcntl(fd, F_SETFL, O_NONBLOCK);
+> > > +        qemu_set_nonblock(fd);
+> > >
+> > >          vnet_hdr =3D tap_probe_vnet_hdr(fd);
+> > >
+> > > @@ -839,7 +839,7 @@ int net_init_tap(const Netdev *netdev, const ch=
+ar *name,
+> > >                  goto free_fail;
+> > >              }
+> > >
+> > > -            fcntl(fd, F_SETFL, O_NONBLOCK);
+> > > +            qemu_set_nonblock(fd);
+> > >
+> > >              if (i =3D=3D 0) {
+> > >                  vnet_hdr =3D tap_probe_vnet_hdr(fd);
+> > > @@ -887,7 +887,7 @@ free_fail:
+> > >              return -1;
+> > >          }
+> > >
+> > > -        fcntl(fd, F_SETFL, O_NONBLOCK);
+> > > +        qemu_set_nonblock(fd);
+> > >          vnet_hdr =3D tap_probe_vnet_hdr(fd);
+> > >
+> > >          net_init_tap_one(tap, peer, "bridge", name, ifname,
+> > > --
+> > > 2.11.0
+> > >
+> > >
+> >=20
+> >=20
+> > --=20
+> > Marc-Andr=E9 Lureau
+> >=20
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
