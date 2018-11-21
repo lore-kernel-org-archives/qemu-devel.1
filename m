@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gPboc-00043N-5a
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 18:21:50 -0500
+	(envelope-from <logang@deltatee.com>) id 1gPbsp-000613-Ik
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 18:26:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gPbob-0002W4-JH
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 18:21:50 -0500
-Date: Thu, 22 Nov 2018 00:21:06 +0100
-From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181121232106.GB4450@caravaggio>
-References: <20181105014047.26447-1-sameo@linux.intel.com>
-	<20181105014047.26447-13-sameo@linux.intel.com>
-	<20181115133658.2cdbd918@redhat.com>
+	(envelope-from <logang@deltatee.com>) id 1gPbsm-0002H6-FL
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 18:26:11 -0500
+References: <CAKmqyKNpSWpaUVzJobNPvB=_T+tXhGdiWPTkWmQxdKQf8SHbig@mail.gmail.com>
+	<mhng-dc5c5bfa-47d8-41c6-8240-fdb97d24555e@palmer-si-x1c4>
+	<20181121231005.GB1421@roeck-us.net>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <9ee74477-105f-db2e-b69c-e67d485b9c2f@deltatee.com>
+Date: Wed, 21 Nov 2018 16:26:01 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181115133658.2cdbd918@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 12/24] hw: acpi: Export the MCFG getter
+In-Reply-To: <20181121231005.GB1421@roeck-us.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 5/6] hw/riscv/sifive_u: Connect
+ the Xilinx PCIe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +26,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
+To: Guenter Roeck <linux@roeck-us.net>, Palmer Dabbelt <palmer@sifive.com>
+Cc: alistair23@gmail.com, qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org, abologna@redhat.com
 
-Hi Igor,
 
-On Thu, Nov 15, 2018 at 01:36:58PM +0100, Igor Mammedov wrote:
-> On Mon,  5 Nov 2018 02:40:35 +0100
-> Samuel Ortiz <sameo@linux.intel.com> wrote:
-> 
-> > From: Yang Zhong <yang.zhong@intel.com>
-> > 
-> > The ACPI MCFG getter is not x86 specific and could be called from
-> > anywhere within generic ACPI API, so let's export it.
-> So far it's x86 or more exactly q35 specific thing,
-It's property based, and it's using a generic PCIE property afaict.
-So it's up to each machine type to define those properties.
-I'm curious here: What's the idiomatic way to define a machine
-setting/attribute/property, let each instance define it or not, and
-make it available at run time?
-Would you be getting the PCI host pointer from the ACPI build state and
-getting that information back from there?
 
-Cheers,
-Samuel.
+On 2018-11-21 4:10 p.m., Guenter Roeck wrote:
+> FWIW, I absoutely agree. If the board can only be used to boot an initrd,
+> it is quite pointless to have it around. Actually it is worse than pointless,
+> since it will result in people wasting their time trying to get it to work.
+
+As someone who has wasted their time on it, I second this sentiment.
+
+Logan
