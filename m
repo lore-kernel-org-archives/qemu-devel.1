@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gPagu-0006Jk-7l
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:09:52 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPah6-0006Uh-Le
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gPagn-0004nJ-Lb
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:09:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59298)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPah0-00051B-9S
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:09:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gPagl-0004jT-NK
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:09:40 -0500
+	id 1gPagw-0004pr-9h
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:09:52 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 22 Nov 2018 02:06:39 +0400
-Message-Id: <20181121220647.18844-23-marcandre.lureau@redhat.com>
+Date: Thu, 22 Nov 2018 02:06:40 +0400
+Message-Id: <20181121220647.18844-24-marcandre.lureau@redhat.com>
 In-Reply-To: <20181121220647.18844-1-marcandre.lureau@redhat.com>
 References: <20181121220647.18844-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 for-3.2 v2 22/30] slirp: remove remaining
- DEBUG blocks
+Subject: [Qemu-devel] [PATCH v2 for-3.2 v2 23/30] slirp: replace DEBUG_ARGS
+ with DEBUG_ARG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,90 +31,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Instead, rely on slirp_debug flags, or compile unconditionally (the
-substraction in cksum is unlikely to affect any benchmark result).
+There is no clear benefit in calling an alias DEBUG_ARGS(). Replace
+calls with DEBUG_ARG(), and fix the white-spacing while at it.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/cksum.c   | 4 ----
- slirp/ip_icmp.c | 5 ++---
- slirp/slirp.c   | 5 +----
- 3 files changed, 3 insertions(+), 11 deletions(-)
+ slirp/debug.h     |  2 --
+ slirp/arp_table.c | 12 ++++++------
+ slirp/ip6_icmp.c  |  2 +-
+ slirp/ndp_table.c | 18 +++++++++---------
+ slirp/slirp.c     | 12 ++++++------
+ slirp/tcp_input.c |  6 +++---
+ 6 files changed, 25 insertions(+), 27 deletions(-)
 
-diff --git a/slirp/cksum.c b/slirp/cksum.c
-index b9466485b5..0a988b845d 100644
---- a/slirp/cksum.c
-+++ b/slirp/cksum.c
-@@ -70,9 +70,7 @@ int cksum(struct mbuf *m, int len)
+diff --git a/slirp/debug.h b/slirp/debug.h
+index ff920f0b87..50f30898fb 100644
+--- a/slirp/debug.h
++++ b/slirp/debug.h
+@@ -33,8 +33,6 @@ extern int slirp_debug;
+     }                                           \
+ } while (0)
 =20
- 	if (len < mlen)
- 	   mlen =3D len;
--#ifdef DEBUG
- 	len -=3D mlen;
--#endif
- 	/*
- 	 * Force to even boundary.
- 	 */
-@@ -122,12 +120,10 @@ int cksum(struct mbuf *m, int len)
- 	   s_util.c[0] =3D *(uint8_t *)w;
+-#define DEBUG_ARGS(fmt, ...) DEBUG_ARG(fmt, ##__VA_ARGS__)
+-
+ #define DEBUG_MISC(fmt, ...) do {               \
+     if (slirp_debug & DBG_MISC) {               \
+         fprintf(dfd, fmt, ##__VA_ARGS__);       \
+diff --git a/slirp/arp_table.c b/slirp/arp_table.c
+index ce19e6e7c0..bf71b984ad 100644
+--- a/slirp/arp_table.c
++++ b/slirp/arp_table.c
+@@ -34,9 +34,9 @@ void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint=
+8_t ethaddr[ETH_ALEN])
 =20
- cont:
--#ifdef DEBUG
- 	if (len) {
- 		DEBUG_ERROR("cksum: out of data\n");
- 		DEBUG_ERROR(" len =3D %d\n", len);
- 	}
--#endif
- 	if (mlen =3D=3D -1) {
- 		/* The last mbuf has odd # of bytes. Follow the
- 		 standard (the odd byte may be shifted left by 8 bits
-diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
-index 6c7e375ff8..cd2faeacb6 100644
---- a/slirp/ip_icmp.c
-+++ b/slirp/ip_icmp.c
-@@ -257,13 +257,12 @@ icmp_send_error(struct mbuf *msrc, u_char type, u_c=
-har code, int minsize,
-   /* check msrc */
-   if(!msrc) goto end_error;
-   ip =3D mtod(msrc, struct ip *);
--#ifdef DEBUG
--  { char bufa[20], bufb[20];
-+  if (slirp_debug & DBG_MISC) {
-+    char bufa[20], bufb[20];
-     strcpy(bufa, inet_ntoa(ip->ip_src));
-     strcpy(bufb, inet_ntoa(ip->ip_dst));
-     DEBUG_MISC(" %.16s to %.16s\n", bufa, bufb);
-   }
--#endif
-   if(ip->ip_off & IP_OFFMASK) goto end_error;    /* Only reply to fragme=
-nt 0 */
+     DEBUG_CALL("arp_table_add");
+     DEBUG_ARG("ip =3D %s", inet_ntoa((struct in_addr){.s_addr =3D ip_add=
+r}));
+-    DEBUG_ARGS(" hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
+-               ethaddr[0], ethaddr[1], ethaddr[2],
+-               ethaddr[3], ethaddr[4], ethaddr[5]);
++    DEBUG_ARG("hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
++              ethaddr[0], ethaddr[1], ethaddr[2],
++              ethaddr[3], ethaddr[4], ethaddr[5]);
 =20
-   /* Do not reply to source-only IPs */
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 51c5813c7c..5954a99d3c 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -194,9 +194,7 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
-s_addr, void *cached_addr,
-             if (++found > 3) {
-                 DEBUG_MISC("(more)");
-                 break;
--            }
--#ifdef DEBUG
--            else {
-+            } else if (slirp_debug & DBG_MISC) {
-                 char s[INET6_ADDRSTRLEN];
-                 const char *res =3D inet_ntop(af, tmp_addr, s, sizeof(s)=
-);
-                 if (!res) {
-@@ -204,7 +202,6 @@ static int get_dns_addr_resolv_conf(int af, void *pdn=
-s_addr, void *cached_addr,
-                 }
-                 DEBUG_MISC("%s", res);
-             }
--#endif
+     if (ip_addr =3D=3D 0 || ip_addr =3D=3D 0xffffffff || ip_addr =3D=3D =
+broadcast_addr) {
+         /* Do not register broadcast addresses */
+@@ -79,9 +79,9 @@ bool arp_table_search(Slirp *slirp, uint32_t ip_addr,
+     for (i =3D 0; i < ARP_TABLE_SIZE; i++) {
+         if (arptbl->table[i].ar_sip =3D=3D ip_addr) {
+             memcpy(out_ethaddr, arptbl->table[i].ar_sha,  ETH_ALEN);
+-            DEBUG_ARGS(" found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x=
+\n",
+-                       out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
+-                       out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
++            DEBUG_ARG("found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
++                      out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
++                      out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
+             return 1;
          }
      }
-     fclose(f);
+diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
+index 95f8fddacc..e72c57a81d 100644
+--- a/slirp/ip6_icmp.c
++++ b/slirp/ip6_icmp.c
+@@ -75,7 +75,7 @@ void icmp6_send_error(struct mbuf *m, uint8_t type, uin=
+t8_t code)
+     char addrstr[INET6_ADDRSTRLEN];
+=20
+     DEBUG_CALL("icmp6_send_error");
+-    DEBUG_ARGS(" type =3D %d, code =3D %d\n", type, code);
++    DEBUG_ARG("type =3D %d, code =3D %d", type, code);
+=20
+     if (IN6_IS_ADDR_MULTICAST(&ip->ip_src) ||
+             in6_zero(&ip->ip_src)) {
+diff --git a/slirp/ndp_table.c b/slirp/ndp_table.c
+index 1401e1b322..b7b73722f7 100644
+--- a/slirp/ndp_table.c
++++ b/slirp/ndp_table.c
+@@ -18,9 +18,9 @@ void ndp_table_add(Slirp *slirp, struct in6_addr ip_add=
+r,
+=20
+     DEBUG_CALL("ndp_table_add");
+     DEBUG_ARG("ip =3D %s", addrstr);
+-    DEBUG_ARGS(" hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
+-               ethaddr[0], ethaddr[1], ethaddr[2],
+-               ethaddr[3], ethaddr[4], ethaddr[5]);
++    DEBUG_ARG("hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
++              ethaddr[0], ethaddr[1], ethaddr[2],
++              ethaddr[3], ethaddr[4], ethaddr[5]);
+=20
+     if (IN6_IS_ADDR_MULTICAST(&ip_addr) || in6_zero(&ip_addr)) {
+         /* Do not register multicast or unspecified addresses */
+@@ -67,18 +67,18 @@ bool ndp_table_search(Slirp *slirp, struct in6_addr i=
+p_addr,
+         out_ethaddr[3] =3D ip_addr.s6_addr[13];
+         out_ethaddr[4] =3D ip_addr.s6_addr[14];
+         out_ethaddr[5] =3D ip_addr.s6_addr[15];
+-        DEBUG_ARGS(" multicast addr =3D %02x:%02x:%02x:%02x:%02x:%02x\n"=
+,
+-                   out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
+-                   out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
++        DEBUG_ARG("multicast addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
++                  out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
++                  out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
+         return 1;
+     }
+=20
+     for (i =3D 0; i < NDP_TABLE_SIZE; i++) {
+         if (in6_equal(&ndp_table->table[i].ip_addr, &ip_addr)) {
+             memcpy(out_ethaddr, ndp_table->table[i].eth_addr,  ETH_ALEN)=
+;
+-            DEBUG_ARGS(" found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x=
+\n",
+-                       out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
+-                       out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
++            DEBUG_ARG("found hw addr =3D %02x:%02x:%02x:%02x:%02x:%02x",
++                      out_ethaddr[0], out_ethaddr[1], out_ethaddr[2],
++                      out_ethaddr[3], out_ethaddr[4], out_ethaddr[5]);
+             return 1;
+         }
+     }
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 5954a99d3c..12aad702c2 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -989,12 +989,12 @@ int if_encap(Slirp *slirp, struct mbuf *ifm)
+     }
+=20
+     memcpy(eh->h_dest, ethaddr, ETH_ALEN);
+-    DEBUG_ARGS(" src =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
+-               eh->h_source[0], eh->h_source[1], eh->h_source[2],
+-               eh->h_source[3], eh->h_source[4], eh->h_source[5]);
+-    DEBUG_ARGS(" dst =3D %02x:%02x:%02x:%02x:%02x:%02x\n",
+-               eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
+-               eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]);
++    DEBUG_ARG("src =3D %02x:%02x:%02x:%02x:%02x:%02x",
++              eh->h_source[0], eh->h_source[1], eh->h_source[2],
++              eh->h_source[3], eh->h_source[4], eh->h_source[5]);
++    DEBUG_ARG("dst =3D %02x:%02x:%02x:%02x:%02x:%02x",
++              eh->h_dest[0], eh->h_dest[1], eh->h_dest[2],
++              eh->h_dest[3], eh->h_dest[4], eh->h_dest[5]);
+     memcpy(buf + sizeof(struct ethhdr), ifm->m_data, ifm->m_len);
+     slirp->cb->output(slirp->opaque, buf, ifm->m_len + ETH_HLEN);
+     return 1;
+diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+index bc4aa60046..d24295813a 100644
+--- a/slirp/tcp_input.c
++++ b/slirp/tcp_input.c
+@@ -215,8 +215,8 @@ tcp_input(struct mbuf *m, int iphlen, struct socket *=
+inso, unsigned short af)
+     Slirp *slirp;
+=20
+ 	DEBUG_CALL("tcp_input");
+-	DEBUG_ARGS(" m =3D %p  iphlen =3D %2d  inso =3D %p\n",
+-               m, iphlen, inso);
++	DEBUG_ARG("m =3D %p  iphlen =3D %2d  inso =3D %p",
++              m, iphlen, inso);
+=20
+ 	/*
+ 	 * If called with m =3D=3D 0, then we're continuing the connect
+@@ -1389,7 +1389,7 @@ tcp_dooptions(struct tcpcb *tp, u_char *cp, int cnt=
+, struct tcpiphdr *ti)
+ 	int opt, optlen;
+=20
+ 	DEBUG_CALL("tcp_dooptions");
+-	DEBUG_ARGS(" tp =3D %p  cnt=3D%i\n", tp, cnt);
++	DEBUG_ARG("tp =3D %p  cnt=3D%i", tp, cnt);
+=20
+ 	for (; cnt > 0; cnt -=3D optlen, cp +=3D optlen) {
+ 		opt =3D cp[0];
 --=20
 2.20.0.rc1
