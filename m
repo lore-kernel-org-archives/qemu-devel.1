@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gPW0r-0002Wh-Vq
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 12:10:11 -0500
+	(envelope-from <eblake@redhat.com>) id 1gPW28-0003ar-Bs
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 12:11:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gPW0o-0007Y9-2a
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 12:10:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34648)
+	(envelope-from <eblake@redhat.com>) id 1gPW24-0000o3-B3
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 12:11:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45638)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gPW0n-0007Uu-Tk
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 12:10:02 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B06093002C89
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 17:10:00 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181121131638.26369-1-kraxel@redhat.com>
-Date: Wed, 21 Nov 2018 18:09:56 +0100
-In-Reply-To: <20181121131638.26369-1-kraxel@redhat.com> (Gerd Hoffmann's
-	message of "Wed, 21 Nov 2018 14:16:38 +0100")
-Message-ID: <874lca1hnf.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gPW24-0000kP-4e
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 12:11:20 -0500
+References: <20181119154737.9840-1-liq3ea@163.com>
+	<87bm6j8rvm.fsf@dusky.pond.sub.org>
+	<8e31bbc2-20c9-86b7-97f9-d4cc8fd35656@redhat.com>
+	<169ff9e0.8b5b.16734530e0c.Coremail.liq3ea@163.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7fe10f10-d913-4060-9e17-7b3e2dff1ac9@redhat.com>
+Date: Wed, 21 Nov 2018 11:11:00 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] qapi: add query-display-options command
+In-Reply-To: <169ff9e0.8b5b.16734530e0c.Coremail.liq3ea@163.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] fw_cfg: fix boot bootsplash and
+ reboot-timeout error checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?B?5p2O5by6?= <liq3ea@163.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: liq3ea@gmail.com, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, kraxel@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-Gerd Hoffmann <kraxel@redhat.com> writes:
+On 11/20/18 9:31 PM, =E6=9D=8E=E5=BC=BA wrote:
 
-> Add query-display-options command, which allows querying the qemu
-> display configuration, and -- as an intentional side effect -- makes
-> DisplayOptions discoverable via query-qmp-schema so libvirt can go
-> figure which display options are supported.
+>=20
+> Nice, when 4.0 window open? I don't find the release planning.
 
-I understand the why the side effect is useful.  But is it the only
-reason for the new command?
+https://wiki.qemu.org/Planning gives the overview, and=20
+https://wiki.qemu.org/Planning/3.1 gives the dates we are trying to hit=20
+for 3.1.
 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Tested-by: Eric Blake <eblake@redhat.com>
-> Tested-by: Erik Skultety <eskultet@redhat.com>
-> ---
->  vl.c         | 10 ++++++++++
->  qapi/ui.json | 13 +++++++++++++
->  2 files changed, 23 insertions(+)
->
-> diff --git a/vl.c b/vl.c
-> index fa25d1ae2d..c6e662677a 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -128,6 +128,7 @@ int main(int argc, char **argv)
->  #include "qapi/qapi-commands-block-core.h"
->  #include "qapi/qapi-commands-misc.h"
->  #include "qapi/qapi-commands-run-state.h"
-> +#include "qapi/qapi-commands-ui.h"
->  #include "qapi/qmp/qerror.h"
->  #include "sysemu/iothread.h"
->  
-> @@ -2055,6 +2056,15 @@ static void parse_display_qapi(const char *optarg)
->      visit_free(v);
->  }
->  
-> +DisplayOptions *qmp_query_display_options(Error **errp)
-> +{
-> +    DisplayOptions *opts;
-> +
-> +    opts = g_new(DisplayOptions, 1);
-> +    QAPI_CLONE_MEMBERS(DisplayOptions, opts, &dpy);
-> +    return opts;
+> Maybe my another fw_cfg patches can be merged:
+> -->https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg00004.html
+> -->https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg00005.html
 
-What's wrong with
+Any new features have missed 3.1, especially since -rc2 has already been=20
+cut.  There is still room for bug fixes in -rc3, but the bar gets=20
+progressively higher (we are reluctant to take something that might=20
+destabilize the binaries without adequate time for testing), and while=20
+we want to avoid an -rc4, past history says we'll probably have one,=20
+although it will be as limited as possible.
 
-       return QAPI_CLONE(DisplayOptions, &dpy)
+> PS: I'm quite surprise the qemu's version up to 4 quickly(anyway, the 3=
+.1 is just begin)...
 
-?
+Version numbers are somewhat arbitrary.  We recently switched to bumping=20
+the major version every year (it's arbitrary, after all), so 2019 will=20
+have 4.0, 4.1, and probably 4.2 (if we stick to a release every 4=20
+months) before 2020 starting with 5.0.  The change from 3.0 to 3.1 will,=20
+in reality, be about the same as the change from 3.1 to 4.0.  A better=20
+way to think of it is that both the old and new naming schemes are both=20
+arbitrary, but the new naming scheme has the benefit of not resulting in=20
+large minor numbers.
 
-> +}
-> +
->  static void parse_display(const char *p)
->  {
->      const char *opts;
-> diff --git a/qapi/ui.json b/qapi/ui.json
-> index e0000248d3..fd39acb5c3 100644
-> --- a/qapi/ui.json
-> +++ b/qapi/ui.json
-> @@ -1102,3 +1102,16 @@
->    'discriminator' : 'type',
->    'data'    : { 'gtk'            : 'DisplayGTK',
->                  'egl-headless'   : 'DisplayEGLHeadless'} }
-> +
-> +##
-> +# @query-display-options:
-> +#
-> +# Returns information about display configuration
-> +#
-> +# Returns: @DisplayOptions
-> +#
-> +# Since: 3.1
-> +#
-> +##
-> +{ 'command': 'query-display-options',
-> +  'returns': 'DisplayOptions' }
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
