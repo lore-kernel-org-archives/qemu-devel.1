@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gPMtO-00041u-Vu
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:25:47 -0500
+	(envelope-from <balducci@units.it>) id 1gPNG3-00017i-0U
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:49:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gPMtK-0002pq-Ro
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:25:46 -0500
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:43902)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gPMtK-0002mS-JV
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:25:42 -0500
-Received: by mail-wr1-x42f.google.com with SMTP id r10so4474284wrs.10
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 23:25:42 -0800 (PST)
-References: <cover.1542321076.git.alistair.francis@wdc.com>
-	<1fe9630dd4ad73b8581684cd0ed6d5fa2918390f.1542321076.git.alistair.francis@wdc.com>
-	<34cb4780-f35f-9bd5-7980-fae18e3e93dd@linaro.org>
-	<CAKmqyKMh3T7w-NsP-i2HaRUHvR-0BhqeyTgd2mD0hnH9k8gZiQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ec2b5e9c-0e46-c7b9-f123-decfbafe996b@linaro.org>
-Date: Wed, 21 Nov 2018 08:25:38 +0100
+	(envelope-from <balducci@units.it>) id 1gPNFz-0006bx-RY
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:49:10 -0500
+Received: from dschgrazlin2.univ.trieste.it ([140.105.55.81]:37064
+	helo=dschgrazlin2.units.it) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <balducci@units.it>) id 1gPNFz-0006HV-HG
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:49:07 -0500
+From: balducci@units.it
+In-reply-to: Your message of "Tue, 20 Nov 2018 23:28:59 -0500."
+	<jpgd0qz3vg4.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKMh3T7w-NsP-i2HaRUHvR-0BhqeyTgd2mD0hnH9k8gZiQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v1 11/23] riscv: tcg-target: Add the
- relocation functions
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <17003.1542786544.1@dschgrazlin2.units.it>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 21 Nov 2018 08:48:40 +0100
+Message-ID: <17004.1542786544@dschgrazlin2.units.it>
+Subject: Re: [Qemu-devel] 3.1.0-rc{0,1} doesn't start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +27,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
+To: Bandan Das <bsd@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 11/21/18 2:15 AM, Alistair Francis wrote:
->> Will the riscv-32 compiler use a FSTD insn to implement atomic_set for 64-bit?
->>  If not, you may be just better off using the indirect method.
-> 
-> I'm not sure. Is the indirect method just using atomic set, because
-> that is what I have now?
+> Sorry Gabriele, Eduardo and Paolo pointed out that the patch was incompl=
+ete.
+> I am not sure however how you are getting non zero data with the rdmsr o=
+n an =
 
-It's controlled by TCG_TARGET_HAS_direct_jump, and goes through here:
+> AMD.
+> Can you please try this instead ?
+>
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index f524e7d929..cfec559aa3 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -95,6 +95,7 @@ static bool has_msr_xss;
+>  static bool has_msr_spec_ctrl;
+>  static bool has_msr_virt_ssbd;
+>  static bool has_msr_smi_count;
+> +static bool has_msr_arch_capabs;
+>  =
 
-> +    case INDEX_op_goto_tb:
-> +        if (s->tb_jmp_insn_offset) {
-> +            /* direct jump method */
-> +            s->tb_jmp_insn_offset[a0] = tcg_current_code_size(s);
-> +            /* should align on 64-bit boundary for atomic patching */
-> +            tcg_out_opc_upper(s, OPC_AUIPC, TCG_REG_TMP0, 0);
-> +            tcg_out_opc_imm(s, OPC_JALR, TCG_REG_ZERO, TCG_REG_TMP0, 0);
-> +        } else {
-> +            /* indirect jump method */
-> +            tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_TMP0, TCG_REG_ZERO,
-> +                       (uintptr_t)(s->tb_jmp_target_addr + a0));
-> +            tcg_out_opc_imm(s, OPC_JALR, TCG_REG_ZERO, TCG_REG_TMP0, 0);
-> +        }
-> +        s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
-> +        break;
+>  static uint32_t has_architectural_pmu_version;
+>  static uint32_t num_architectural_pmu_gp_counters;
+> @@ -1481,6 +1482,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+>                  case MSR_VIRT_SSBD:
+>                      has_msr_virt_ssbd =3D true;
+>                      break;
+> +                case MSR_IA32_ARCH_CAPABILITIES:
+> +                    has_msr_arch_capabs =3D true;
+> +                    break;
+>                  }
+>              }
+>          }
+> @@ -2002,14 +2006,10 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>  #endif
+>  =
 
-where as you've correctly implemented, the indirect jump loads a destination
-from memory (atomically, via a single load insn), and then branches to it.
+>      /* If host supports feature MSR, write down. */
+> -    if (kvm_feature_msrs) {
+> -        int i;
+> -        for (i =3D 0; i < kvm_feature_msrs->nmsrs; i++)
+> -            if (kvm_feature_msrs->indices[i] =3D=3D MSR_IA32_ARCH_CAPAB=
+ILITIES) =
 
-The direct jump method avoids the load from memory, but then one has to be able
-to modify the insn(s) that perform the jump with a single atomic_set.  Which in
-this case, means that the two insns must be aligned so that we can perform a
-single aligned 64-bit store.
+> {
+> +    if (kvm_arch_get_supported_msr_feature(kvm_state, MSR_IA32_ARCH_CAP=
+ABILI
+> TIES)
+> +        && has_msr_arch_capabs) {
+>                  kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+>                                env->features[FEAT_ARCH_CAPABILITIES]);
+> -                break;
+> -            }
+>      }
+>  =
 
-I recommend at least starting with the indirect method because it's easier.
+>      /*
 
+this one works: qemu starts without any complaint and behaves as usual
+(AFAICS)
 
-r~
+thank you very much for working on this
+
+ciao
+gabriele
