@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gPRXi-0006ln-UL
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:23:43 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gPRdH-0002a9-6z
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:29:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gPRXe-0000CX-MQ
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:23:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54586)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gPRXe-0000Ba-DM
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:23:38 -0500
-Date: Wed, 21 Nov 2018 07:23:36 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181121072237-mutt-send-email-mst@kernel.org>
-References: <1542799319-2595-1-git-send-email-liq3ea@gmail.com>
-	<CAJ+F1C+FQ8WWkrw3Qup-DzyryZZ3UqHdomjzY=-kfCiHcvLWEw@mail.gmail.com>
-	<20181121115718.GN26577@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181121115718.GN26577@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] net: tap: use qemu_set_nonblock
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gPRdF-00076d-9V
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:29:27 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39099)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gPRdD-0006zR-BN
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:29:25 -0500
+Received: by mail-pl1-x644.google.com with SMTP id b5-v6so5353327pla.6
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 04:29:21 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Wed, 21 Nov 2018 04:29:10 -0800
+Message-Id: <20181121122910.20631-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH v2] target/xtensa: xtfpga: provide default
+ memory sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,115 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Li Qiang <liq3ea@gmail.com>, Jason Wang <jasowang@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>
 
-On Wed, Nov 21, 2018 at 11:57:18AM +0000, Daniel P. Berrang=E9 wrote:
-> On Wed, Nov 21, 2018 at 03:28:29PM +0400, Marc-Andr=E9 Lureau wrote:
-> > Hi
-> >=20
-> > On Wed, Nov 21, 2018 at 3:22 PM Li Qiang <liq3ea@gmail.com> wrote:
-> > >
-> > > The fcntl will change the flags directly, use qemu_set_nonblock()
-> > > instead.
-> >=20
-> > qemu_set_nonblock() will preserve the existing flags. And on windows,
-> > it will register the FD to the event loop.
-> > that's a reasonable thing to do, is this fixing an actual bug?
->=20
-> tap.c is only built with CONFIG_POSIX. Win32 is completely separate
-> in tap-win32.c.  So the event loop reg doesn't apply.
->=20
-> I agree it is good to preserve fcntl flags though, so this patch
-> looks desirable.
->=20
-> Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+Provide default RAM sizes for all XTFPGA boards, so that when started
+without -m option they do the right thing.
 
-Sure
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+Changes v1->v2:
+- fix memory sizes for ml605 and kc705 with MMU
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+ hw/xtensa/xtfpga.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-but really not for this release I guess as we are in freeze.
-So thanks! And pls remember to ping after the release.
-
-
->=20
-> >=20
-> > >
-> > > Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> > > ---
-> > >  net/tap.c | 10 +++++-----
-> > >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/net/tap.c b/net/tap.c
-> > > index cc8525f154..e8aadd8d4b 100644
-> > > --- a/net/tap.c
-> > > +++ b/net/tap.c
-> > > @@ -592,7 +592,7 @@ int net_init_bridge(const Netdev *netdev, const=
- char *name,
-> > >          return -1;
-> > >      }
-> > >
-> > > -    fcntl(fd, F_SETFL, O_NONBLOCK);
-> > > +    qemu_set_nonblock(fd);
-> > >      vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> > >      s =3D net_tap_fd_init(peer, "bridge", name, fd, vnet_hdr);
-> > >
-> > > @@ -707,7 +707,7 @@ static void net_init_tap_one(const NetdevTapOpt=
-ions *tap, NetClientState *peer,
-> > >                  }
-> > >                  return;
-> > >              }
-> > > -            fcntl(vhostfd, F_SETFL, O_NONBLOCK);
-> > > +            qemu_set_nonblock(vhostfd);
-> > >          }
-> > >          options.opaque =3D (void *)(uintptr_t)vhostfd;
-> > >
-> > > @@ -791,7 +791,7 @@ int net_init_tap(const Netdev *netdev, const ch=
-ar *name,
-> > >              return -1;
-> > >          }
-> > >
-> > > -        fcntl(fd, F_SETFL, O_NONBLOCK);
-> > > +        qemu_set_nonblock(fd);
-> > >
-> > >          vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> > >
-> > > @@ -839,7 +839,7 @@ int net_init_tap(const Netdev *netdev, const ch=
-ar *name,
-> > >                  goto free_fail;
-> > >              }
-> > >
-> > > -            fcntl(fd, F_SETFL, O_NONBLOCK);
-> > > +            qemu_set_nonblock(fd);
-> > >
-> > >              if (i =3D=3D 0) {
-> > >                  vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> > > @@ -887,7 +887,7 @@ free_fail:
-> > >              return -1;
-> > >          }
-> > >
-> > > -        fcntl(fd, F_SETFL, O_NONBLOCK);
-> > > +        qemu_set_nonblock(fd);
-> > >          vnet_hdr =3D tap_probe_vnet_hdr(fd);
-> > >
-> > >          net_init_tap_one(tap, peer, "bridge", name, ifname,
-> > > --
-> > > 2.11.0
-> > >
-> > >
-> >=20
-> >=20
-> > --=20
-> > Marc-Andr=E9 Lureau
-> >=20
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index b3161de32093..f9d41c5d1875 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -568,6 +568,7 @@ static void xtfpga_lx60_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_lx60_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
++    mc->default_ram_size = 64 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_lx60_type = {
+@@ -584,6 +585,7 @@ static void xtfpga_lx60_nommu_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_lx60_nommu_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
++    mc->default_ram_size = 64 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_lx60_nommu_type = {
+@@ -600,6 +602,7 @@ static void xtfpga_lx200_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_lx200_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
++    mc->default_ram_size = 96 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_lx200_type = {
+@@ -616,6 +619,7 @@ static void xtfpga_lx200_nommu_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_lx200_nommu_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
++    mc->default_ram_size = 96 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_lx200_nommu_type = {
+@@ -632,6 +636,7 @@ static void xtfpga_ml605_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_ml605_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
++    mc->default_ram_size = 384 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_ml605_type = {
+@@ -648,6 +653,7 @@ static void xtfpga_ml605_nommu_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_ml605_nommu_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
++    mc->default_ram_size = 256 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_ml605_nommu_type = {
+@@ -664,6 +670,7 @@ static void xtfpga_kc705_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_kc705_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
++    mc->default_ram_size = 896 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_kc705_type = {
+@@ -680,6 +687,7 @@ static void xtfpga_kc705_nommu_class_init(ObjectClass *oc, void *data)
+     mc->init = xtfpga_kc705_nommu_init;
+     mc->max_cpus = 4;
+     mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
++    mc->default_ram_size = 256 * MiB;
+ }
+ 
+ static const TypeInfo xtfpga_kc705_nommu_type = {
+-- 
+2.11.0
