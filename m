@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gPauQ-0002m5-Ll
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:23:49 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gPazy-0007uT-GV
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:29:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gPauP-0006mx-LR
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:23:46 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gPazu-0008Ln-EY
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:29:30 -0500
+Received: from hera.aquilenet.fr ([185.233.100.1]:44956)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1gPazs-00085z-Bv
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:29:24 -0500
+Date: Wed, 21 Nov 2018 23:28:43 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20181121222843.2bwph4tsatam5aum@function>
+References: <20181121220647.18844-1-marcandre.lureau@redhat.com>
+	<20181121220647.18844-16-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <CAKmqyKM2pmF_D812mp1hcJe8KcLGiNz9vLpy7OpsbS0XxNwo+w@mail.gmail.com>
-	<mhng-39e17271-363f-4e08-ba7e-779c2f46b54f@palmer-si-x1c4>
-In-Reply-To: <mhng-39e17271-363f-4e08-ba7e-779c2f46b54f@palmer-si-x1c4>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 21 Nov 2018 14:23:13 -0800
-Message-ID: <CAKmqyKNpSWpaUVzJobNPvB=_T+tXhGdiWPTkWmQxdKQf8SHbig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 5/6] hw/riscv/sifive_u: Connect
- the Xilinx PCIe
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181121220647.18844-16-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 for-3.2 v2 15/30] slirp: replace
+ error_report() and a fprintf with g_critical()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +30,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: Logan Gunthorpe <logang@deltatee.com>, qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Guenter Roeck <linux@roeck-us.net>, Andrea Bolognani <abologna@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>
 
-On Wed, Nov 21, 2018 at 2:15 PM Palmer Dabbelt <palmer@sifive.com> wrote:
->
-> On Wed, 21 Nov 2018 13:49:53 PST (-0800), alistair23@gmail.com wrote:
-> > On Wed, Nov 21, 2018 at 1:26 PM Palmer Dabbelt <palmer@sifive.com> wrote:
-> >>
-> >> On Wed, 21 Nov 2018 10:32:45 PST (-0800), alistair23@gmail.com wrote:
-> >> > On Wed, Nov 21, 2018 at 10:05 AM Logan Gunthorpe <logang@deltatee.com> wrote:
-> >> >>
-> >> >>
-> >> >>
-> >> >> On 2018-11-21 10:02 a.m., Alistair Francis wrote:
-> >> >> > Connect the Xilinx PCIe device based on the information in the device
-> >> >> > tree stored in the ROM of the HiFish Unleashed board.
-> >> >>
-> >> >> I only briefly tested this patch but could not get any PCI devices to
-> >> >> come up with the sifive_u machine. Depending on the kernel I tried, it
-> >> >> either failed to initialize a Xilinx PCIe (likely due to a mismatch with
-> >> >> the DT) or it appears to successfully initialize a Microsemi device but
-> >> >> did not enumerate any devices underneath.
-> >> >
-> >> > That seems like either a kernel or bbl issue.
-> >> >
-> >> > You need to make sure that bbl doesn't edit the device tree (to add
-> >> > the Microsemi device or remove the Xilinx one) and ensure your kernel
-> >> > supports the Xilinx one.
-> >> >
-> >> >>
-> >> >> In any case, it would be nice if the Microsemi/Xilinx confusion was at
-> >> >> least explained in the commit message.
-> >> >
-> >> > What should we say? The QEMU machine accurately models the real
-> >> > hardware which reports a Xilinx PCIe. The confusion generally appears
-> >> > above QEMU where people are used to using the MicroSemi one.
-> >>
-> >> I think the real issue here is that "sifive_u" doesn't actually fully describe
-> >> the device we're trying to emulate.  Is it a:
-> >>
-> >> * Generic SiFive U core?  In that case we just have a 64-bit core and
-> >>   essentially no devices.  This is kind of useless.
-> >> * A HiFive Unleashed?  In that case there's no PCIe, as it requires an
-> >>   expansion board.
-> >> * A HiFive Unleashed + VC707?  Here we have Xilinx PCIe.
-> >> * A HiFive Unleashed + Microsemi Expansion?  Here have Microsemi PCIe.
-> >
-> > This isn't even always consistent. For example the sifive_u machine
-> > exists for 32-bit cores, but the PCIe address reported by the hardware
-> > only works for 64-bit machines.
-> >
-> > So we need a trade off between accurately modelling the hardware or
-> > having 32-bit support.
->
-> Yep, there's another issue.
->
-> >> There's a tradeoff between accurately emulating the hardware and blowing up the
-> >> amount of targets we support in QEMU.  We went through this discussion before
-> >> and ended up where we are now, but maybe it's best to go have the discussion
-> >> again?
-> >
-> > Up to you, it is your board :)
-> >
-> > I think it makes more sense to remove these generic boards (that is
-> > what the virt board is for) and model real hardware boards.
->
-> That seems reasonable to me.  Is removing boards allowed?  If so I'd be OK
+Marc-Andr=C3=A9 Lureau, le jeu. 22 nov. 2018 02:06:32 +0400, a ecrit:
+> Reduce dependency on QEMU. QEMU could use a custom glib log handler if
+> it wants to redirect/filter it.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-It's possible, but takes some releases and deprecation warnings.
-
-You can see info about it here:
-https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features
-
-As it sounds like no one uses sifive u board (you can't specify a
-rootFS) it probably isn't that bad to remove.
-
-> renaming these to "sifive-hifive1" and "sifive-hifive-unleashed", and possibly
-> adding a "sifive-hifive-unleashed-vc707" as it's possible to emulate most of
-> that.  Then we at least have accurate names for the boards.
-
-That sounds good to me.
-
->
-> We do have an issue where I'd like to be able to have some system by which we
-> can configure the memory map of the target, but maybe that's separate
-> discussion.
-
-Yeah, that would also be nice, but I think is separate.
-
-Alistair
+Applied, thanks!
