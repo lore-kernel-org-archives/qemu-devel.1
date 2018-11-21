@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gPSxr-0006lf-8H
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:54:52 -0500
+	(envelope-from <crosa@redhat.com>) id 1gPSyR-0006mA-W6
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:55:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gPSuO-0006Wf-Gd
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:51:13 -0500
-Date: Wed, 21 Nov 2018 14:50:30 +0100
-From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181121135030.GC4426@caravaggio>
-References: <20181105014047.26447-1-sameo@linux.intel.com>
-	<20181116172919.43f3e27d@redhat.com>
-	<d4f6f0ef-1333-a917-e3eb-d9bad47c9648@redhat.com>
-	<20181119163110.2f357f40@redhat.com>
-	<20181121072954-mutt-send-email-mst@kernel.org>
+	(envelope-from <crosa@redhat.com>) id 1gPSlP-0004Wo-Jd
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:42:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57282)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gPSlP-0004WS-Eq
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 08:41:55 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 129A8C0BFBBA
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 13:41:54 +0000 (UTC)
+From: Cleber Rosa <crosa@redhat.com>
+Date: Wed, 21 Nov 2018 08:41:50 -0500
+Message-Id: <20181121134151.23993-1-crosa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181121072954-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v5 00/24] ACPI reorganization for
- hardware-reduced API addition
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/1] Acceptance tests: add test for
+ set-numa-node error handler fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <pmathieu@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-Hi Michael,
+This cover letter does nothing but provides hopefully useful
+references to reviewers.  More information on the patch itself.
 
-On Wed, Nov 21, 2018 at 07:35:47AM -0500, Michael S. Tsirkin wrote:
-> On Mon, Nov 19, 2018 at 04:31:10PM +0100, Igor Mammedov wrote:
-> > On Fri, 16 Nov 2018 17:37:54 +0100
-> > Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > 
-> > > On 16/11/18 17:29, Igor Mammedov wrote:
-> > > > General suggestions for this series:
-> > > >   1. Preferably don't do multiple changes within a patch
-> > > >      neither post huge patches (unless it's pure code movement).
-> > > >      (it's easy to squash patches later it necessary)
-> > > >   2. Start small, pick a table generalize it and send as
-> > > >      one small patchset. Tables are often independent
-> > > >      and it's much easier on both author/reviewer to agree upon
-> > > >      changes and rewrite it if necessary.  
-> > > 
-> > > How would that be done?  This series is on the bigger side, agreed, but
-> > > most of it is really just code movement.  It's a starting point, having
-> > > a generic ACPI library is way beyond what this is trying to do.
-> > I've tried to give suggestions how to restructure series
-> > on per patch basis. In my opinion it quite possible to split
-> > series in several smaller ones and it should really help with
-> > making series cleaner and easier/faster to review/amend/merge
-> > vs what we have in v5.
-> > (it's more frustrating to rework large series vs smaller one)
-> > 
-> > If something isn't clear, it's easy to reach out to me here
-> > or directly (email/irc/github) for clarification/feed back.
-> 
-> I assume the #1 goal is to add reduced HW support.
->From our perspective, yes. From the project's point of view, it's about
-making the current ACPI code more generic and not bound to any specific
-machine type.
+Git Info:
+  - URI: https://github.com/clebergnu/qemu/tree/sent/set-numa-node
+  - Remote: https://github.com/clebergnu/qemu
+  - Branch: sent/set-numa-node
 
-> So another
-> option to speed up merging is to just go ahead and duplicate a
-> bunch of code e.g. in pc_virt.c acpi/reduced.c or in any other
-> file.
-It's precisely what we wanted to avoid in the very first place and we
-assumed this would be largely frowned upon by the community. It's also a
-burden for everyone to maintain that amount of duplicated code. Also I
-suppose this would also mean we'd have to eventually de-duplicate and
-factorize things in.
-Honestly I'd rather not rush things out and work on code sharing first.
-I'll answer Igor's numerous comments today and will start addressing
-some of his concerns right aways as well.
+Travis CI Info:
+  - Build: https://travis-ci.org/clebergnu/qemu/builds/457721153
+  - Execution results for tests updated on this series:
+    * https://travis-ci.org/clebergnu/qemu/jobs/457721176#L2051
+    * https://travis-ci.org/clebergnu/qemu/jobs/457721176#L2052
 
-Cheers,
-Samuel.
+Cleber Rosa (1):
+  Acceptance tests: add test for set-numa-node error handler fix
+
+ tests/acceptance/set_numa_node.py | 41 +++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+ create mode 100644 tests/acceptance/set_numa_node.py
+
+--=20
+2.19.1
