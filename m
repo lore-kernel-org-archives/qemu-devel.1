@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gPXx0-0002Uo-Eb
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 14:14:19 -0500
+	(envelope-from <logang@deltatee.com>) id 1gPXyB-0003Fo-RN
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 14:15:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gPXwv-0003bo-LX
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 14:14:14 -0500
-Received: from mail-wm1-f54.google.com ([209.85.128.54]:54654)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gPXwp-0003Gx-NY
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 14:14:03 -0500
-Received: by mail-wm1-f54.google.com with SMTP id r63-v6so6664680wma.4
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 11:13:56 -0800 (PST)
-References: <1542276385-7638-1-git-send-email-liq3ea@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e929f930-2a0b-28ee-fab9-234c99da1d3a@redhat.com>
-Date: Wed, 21 Nov 2018 20:13:52 +0100
+	(envelope-from <logang@deltatee.com>) id 1gPXyA-0004nF-HZ
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 14:15:27 -0500
+References: <cover.1542819633.git.alistair.francis@wdc.com>
+	<85a3fe487514f4cb659ef7e6b88762ebc567c1b8.1542819633.git.alistair.francis@wdc.com>
+	<e7398997-ba1a-9182-6be0-da8e43e920df@deltatee.com>
+	<CAKmqyKMtTqi=D-PKZFnt40MaA8+e6Sj8nUr0VmBFajScw1MYng@mail.gmail.com>
+	<ffd80fff-55bf-0578-4fe5-00f07ef6bdc6@deltatee.com>
+	<CAKmqyKMhpAPXFF5cQkqKYcNjD5aciDW7Ek53+W=1XNp3RGFLmw@mail.gmail.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <1abdea1e-57bd-b841-a924-259baa3b9033@deltatee.com>
+Date: Wed, 21 Nov 2018 12:15:14 -0700
 MIME-Version: 1.0
-In-Reply-To: <1542276385-7638-1-git-send-email-liq3ea@gmail.com>
+In-Reply-To: <CAKmqyKMhpAPXFF5cQkqKYcNjD5aciDW7Ek53+W=1XNp3RGFLmw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] vl.c: remove outdated comment
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 5/6] hw/riscv/sifive_u: Connect
+ the Xilinx PCIe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, laurent@vivier.eu
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Alistair Francis <alistair23@gmail.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org, Guenter Roeck <linux@roeck-us.net>, Andrea Bolognani <abologna@redhat.com>
 
-On 15/11/18 11:06, Li Qiang wrote:
-> Cc: qemu-trivial@nongnu.org
-> 
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> ---
->  vl.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/vl.c b/vl.c
-> index fa25d1ae2d..ae63018a1d 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1522,9 +1522,6 @@ static int machine_help_func(QemuOpts *opts, MachineState *machine)
->      return 1;
->  }
->  
-> -/***********************************************************/
-> -/* main execution loop */
-> -
->  struct vm_change_state_entry {
->      VMChangeStateHandler *cb;
->      void *opaque;
-> 
 
-Queued, thanks.
 
-Paolo
+On 2018-11-21 12:02 p.m., Alistair Francis wrote:
+> On Wed, Nov 21, 2018 at 10:50 AM Logan Gunthorpe <logang@deltatee.com> wrote:
+>>
+>>
+>>
+>> On 2018-11-21 11:32 a.m., Alistair Francis wrote:
+>>> That seems like either a kernel or bbl issue.
+>>>
+>>> You need to make sure that bbl doesn't edit the device tree (to add
+>>> the Microsemi device or remove the Xilinx one) and ensure your kernel
+>>> supports the Xilinx one.
+>>
+>> Ok, how do I stop bbl from editing the device tree? I have a kernel with
+>> Xilinx PCI support but it fails initializing on that machine (see below).
+> 
+> You should just be able to edit the source, grep for "microsemi".
+
+I don't see any "microsemi" in my riscv-pk source...
+
+Logan
