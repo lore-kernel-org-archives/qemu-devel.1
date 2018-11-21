@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gPb2b-0001Tn-1U
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:32:13 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gPb2y-0001ke-Rd
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:32:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gPb2V-0004Yb-Pb
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:32:12 -0500
-Received: from hera.aquilenet.fr ([185.233.100.1]:44990)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1gPb2u-0006mn-Oq
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:32:36 -0500
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:32790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1gPb2M-0004MN-3b
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:32:00 -0500
-Date: Wed, 21 Nov 2018 23:31:24 +0100
+	id 1gPb2s-0006Rl-Ib
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:32:32 -0500
+Date: Wed, 21 Nov 2018 23:32:12 +0100
 From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20181121223124.nt6q3fdtk7ytnlg4@function>
+Message-ID: <20181121223212.ylsvzufrifb6pabs@function>
 References: <20181121220647.18844-1-marcandre.lureau@redhat.com>
-	<20181121220647.18844-18-marcandre.lureau@redhat.com>
+	<20181121220647.18844-19-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20181121220647.18844-18-marcandre.lureau@redhat.com>
+In-Reply-To: <20181121220647.18844-19-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 for-3.2 v2 17/30] slirp: replace a DEBUG
- block with WITH_ICMP_ERROR_MSG
+Subject: Re: [Qemu-devel] [PATCH v2 for-3.2 v2 18/30] slirp: no need to make
+ DPRINTF conditional on DEBUG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,10 +33,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Cc: qemu-devel@nongnu.org, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>
 
-Marc-Andr=C3=A9 Lureau, le jeu. 22 nov. 2018 02:06:34 +0400, a ecrit:
-> icmp_send_error() doesnt actually log messages when DEBUG is enabled.
-> Let's use a different define that describes better the tweaked
-> behaviour of the function, and avoid uncompiled code.
+Marc-Andr=C3=A9 Lureau, le jeu. 22 nov. 2018 02:06:35 +0400, a ecrit:
+> DEBUG_CALL is already handled conditionally.
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
