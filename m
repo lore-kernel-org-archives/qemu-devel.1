@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gPMbM-0006VJ-OQ
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:07:14 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gPMtO-00041u-Vu
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:25:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gPMVN-0000qV-0z
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:01:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47656)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gPMVM-0000pc-OY
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:00:56 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <CAFEAcA8RdNrbCLL7tXY=e95N2Y0LcZdCPr3EuQo1_hu08qJuaQ@mail.gmail.com>
-	<87sh0eyzb0.fsf@dusky.pond.sub.org> <20181107025628.GB17134@xz-x1>
-	<CAFEAcA_FhkA_1DiDM2PWDw27dupsAdP==kBUxRrw5rGDnLzMwg@mail.gmail.com>
-	<20181108024406.GB3170@xz-x1> <20181119061727.GA1901@xz-x1>
-	<20181119070558.GB1901@xz-x1> <87ftvxlz3m.fsf@dusky.pond.sub.org>
-	<20181120063143.GB24163@xz-x1> <874lcbbq4k.fsf@dusky.pond.sub.org>
-	<20181121032819.GC24163@xz-x1>
-Date: Wed, 21 Nov 2018 08:00:53 +0100
-In-Reply-To: <20181121032819.GC24163@xz-x1> (Peter Xu's message of "Wed, 21
-	Nov 2018 11:28:19 +0800")
-Message-ID: <8736ru6hju.fsf@dusky.pond.sub.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1gPMtK-0002pq-Ro
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:25:46 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:43902)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gPMtK-0002mS-JV
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:25:42 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id r10so4474284wrs.10
+	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 23:25:42 -0800 (PST)
+References: <cover.1542321076.git.alistair.francis@wdc.com>
+	<1fe9630dd4ad73b8581684cd0ed6d5fa2918390f.1542321076.git.alistair.francis@wdc.com>
+	<34cb4780-f35f-9bd5-7980-fae18e3e93dd@linaro.org>
+	<CAKmqyKMh3T7w-NsP-i2HaRUHvR-0BhqeyTgd2mD0hnH9k8gZiQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ec2b5e9c-0e46-c7b9-f123-decfbafe996b@linaro.org>
+Date: Wed, 21 Nov 2018 08:25:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL 0/8] Monitor patches for 2018-10-30
+In-Reply-To: <CAKmqyKMh3T7w-NsP-i2HaRUHvR-0BhqeyTgd2mD0hnH9k8gZiQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v1 11/23] riscv: tcg-target: Add the
+ relocation functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,96 +34,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
 
-Peter Xu <peterx@redhat.com> writes:
+On 11/21/18 2:15 AM, Alistair Francis wrote:
+>> Will the riscv-32 compiler use a FSTD insn to implement atomic_set for 64-bit?
+>>  If not, you may be just better off using the indirect method.
+> 
+> I'm not sure. Is the indirect method just using atomic set, because
+> that is what I have now?
 
-> On Tue, Nov 20, 2018 at 06:44:27PM +0100, Markus Armbruster wrote:
->> 
->> We want the test to drive QEMU into the "queue full" state with an
->> out-of-band command unreceived, then watch the queue drain and the
->> out-of-band command overtaking part of it.
->> 
->> Driving QEMU into this state is easy enough: we can use a blocking
->> in-band command to plug the queue's drain.
->> 
->> Once we have QEMU in this state, we can unblock that command and watch
->> the show.  But we really have to wait until QEMU reaches this state
->> before we unblock.
->> 
->> Our problem is the test can't easily observe when QEMU reaches this
->> state.
->> 
->> You mentioned sending a "queue full" event, and that adding such an
->> event just for testing is hard to justify.  I agree.  Could such an
->> event have a non-testing use?  All I can think of is letting the
->> management application detect "we mismanaged the queue and compromised
->> monitor availability for out-of-band commands".  Doesn't sound
->> particularly convincing to me, but we can talk with libvirt guys to see
->> whether they want it.
->> 
->> Can the test observe the monitor is suspended just from the behavior of
->> its monitor socket?  Not reliably: sending lots of input eventually
->> fails with EAGAIN when the monitor is suspended, but it can also fail
->> when the monitor reads the input too slowly.
->> 
->> Can the test observe the monitor_suspend trace point?  Awkward, because
->> the trace backends are configurable.  We could have the test monitor the
->> "simple" backend's output file, skipping the test when "simple" isn't
->> available.  Hmm.
->> 
->> Here comes the heavy hammer: extend the qtest protocol.  When the
->> monitor suspends / resumes, send a suitable asynchronous message to the
->> qtest socket.  Have libqtest use that to track monitor suspend state.
->> The test can then busy-wait for the state to flip to suspended.
->> 
->> Other ideas?
->
-> I don't have more to add (already a lot of ideas! :-).  I'd say I
-> would prefer to start with the queue full event and we can discuss
-> with libvirt on that after 3.1 when proper.  And besides libvirt
-> (which I am not quite sure whether this event could be really useful
-> in the near future) maybe it can also be used as a hint for any new
-> QMP client when people want to complain about "hey, why my QMP client
-> didn't get any respond from QEMU" - if the client didn't get any
-> response but however it sees this event then we know the answer even
-> before debugging more.
+It's controlled by TCG_TARGET_HAS_direct_jump, and goes through here:
 
-Good point.
+> +    case INDEX_op_goto_tb:
+> +        if (s->tb_jmp_insn_offset) {
+> +            /* direct jump method */
+> +            s->tb_jmp_insn_offset[a0] = tcg_current_code_size(s);
+> +            /* should align on 64-bit boundary for atomic patching */
+> +            tcg_out_opc_upper(s, OPC_AUIPC, TCG_REG_TMP0, 0);
+> +            tcg_out_opc_imm(s, OPC_JALR, TCG_REG_ZERO, TCG_REG_TMP0, 0);
+> +        } else {
+> +            /* indirect jump method */
+> +            tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_TMP0, TCG_REG_ZERO,
+> +                       (uintptr_t)(s->tb_jmp_target_addr + a0));
+> +            tcg_out_opc_imm(s, OPC_JALR, TCG_REG_ZERO, TCG_REG_TMP0, 0);
+> +        }
+> +        s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
+> +        break;
 
-Say we implement full flow control, i.e. we also suspend when the output
-buffer becomes too large.  Then the event won't really help, because the
-client won't see it until it fixed the situation by draining the output
-buffer.  But it won't really hurt, either: even a client that misbehaves
-in a really unfortunate way can't trigger many events without also
-generating much more other output.  Orders of magnitude more.
+where as you've correctly implemented, the indirect jump loads a destination
+from memory (atomically, via a single load insn), and then branches to it.
 
->> >> > Markus, do you want me to repost a new version with this change?  Is
->> >> > it still possible to have the oob-default series for 3.1?
->> >> 
->> >> We're trying to, but we need to get the test to work.
->> >> 
->> >> Two problems:
->> >> 
->> >> 1. The test doesn't seem to succed at testing "queue full".
->> >> 
->> >> 2. The test might still be racy.
->> >> 
->> >> I suspect the code we test is solid, and it's "only" the test we screwed
->> >> up.
->> >
->> > I agree.  Do you have better idea to test queue full?  I'd be more
->> > than glad to try any suggestions here, otherwise I am thinking whether
->> > we can just simply drop the queue full test (which is the last patch
->> > of the oob series) for now but merge the rest.  We can introduce new
->> > queue full test after 3.1 if we want, though again I really doubt
->> > whether we can without new things introduced into the procedure.
->> >
->> > Thoughts?
->> 
->> I'm afraid dropping the test (for now?) is what we have to do.
->
-> Agreed.
+The direct jump method avoids the load from memory, but then one has to be able
+to modify the insn(s) that perform the jump with a single atomic_set.  Which in
+this case, means that the two insns must be aligned so that we can perform a
+single aligned 64-bit store.
 
-Okay, I'll prepare the pull request later today.
+I recommend at least starting with the indirect method because it's easier.
+
+
+r~
