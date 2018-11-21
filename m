@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gPRvR-0001sE-Vk
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:48:14 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gPRxP-0002oh-DL
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:50:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gPRvO-0003rS-0h
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:48:13 -0500
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Date: Wed, 21 Nov 2018 12:47:47 +0000
-Message-Id: <20181121124747.30696-1-rjones@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1gPRxM-00055L-7N
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:50:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32770)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gPRxM-00054Z-00
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 07:50:12 -0500
+Date: Wed, 21 Nov 2018 10:50:08 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181121125008.GV4755@habkost.net>
+References: <7280.1542702495@dschgrazlin2.units.it>
+	<jpgd0qz3vg4.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] scsi-disk: Fix crash if underlying host file
- or disk returns error.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <jpgd0qz3vg4.fsf@linux.bootlegged.copy>
+Subject: Re: [Qemu-devel] 3.1.0-rc{0,1} doesn't start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,42 +27,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Bandan Das <bsd@redhat.com>
+Cc: balducci@units.it, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>, David Alan Gilbert <dgilbert@redhat.com>, Cole Robinson <crobinso@redhat.com>
 
-Commit 40dce4ee6 "scsi-disk: fix rerror/werror=3Dignore" introduced a
-bug which causes qemu to crash with the assertion error below if the
-host file or disk returns an error:
+On Tue, Nov 20, 2018 at 11:28:59PM -0500, Bandan Das wrote:
+> balducci@units.it writes:
+> 
+> > hello
+> >
+> >> incomplete because it can return 0 for data. Can you try this:
+> >>
+> >> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> >> index f524e7d929..4878ffb90b 100644
+> >> --- a/target/i386/kvm.c
+> >> +++ b/target/i386/kvm.c
+> >> @@ -2002,14 +2002,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+> >>  #endif
+> >>  
+> >>      /* If host supports feature MSR, write down. */
+> >> -    if (kvm_feature_msrs) {
+> >> -        int i;
+> >> -        for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
+> >> -            if (kvm_feature_msrs->indices[i] == MSR_IA32_ARCH_CAPABILITIES) 
+> >> {
+> >> -                kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+> >> +    if (kvm_arch_get_supported_msr_feature(kvm_state, MSR_IA32_ARCH_CAPABILI
+> >> TIES)) {
+> >> +        kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+> >>                                env->features[FEAT_ARCH_CAPABILITIES]);
+> >> -                break;
+> >> -            }
+> >>      }
+> >>  
+> >>      /*
+> >
+> Sorry Gabriele, Eduardo and Paolo pointed out that the patch was incomplete.
+> I am not sure however how you are getting non zero data with the rdmsr on an AMD.
+> Can you please try this instead ?
+> 
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index f524e7d929..cfec559aa3 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -95,6 +95,7 @@ static bool has_msr_xss;
+>  static bool has_msr_spec_ctrl;
+>  static bool has_msr_virt_ssbd;
+>  static bool has_msr_smi_count;
+> +static bool has_msr_arch_capabs;
+>  
+>  static uint32_t has_architectural_pmu_version;
+>  static uint32_t num_architectural_pmu_gp_counters;
+> @@ -1481,6 +1482,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+>                  case MSR_VIRT_SSBD:
+>                      has_msr_virt_ssbd = true;
+>                      break;
+> +                case MSR_IA32_ARCH_CAPABILITIES:
+> +                    has_msr_arch_capabs = true;
+> +                    break;
+>                  }
+>              }
+>          }
+> @@ -2002,14 +2006,10 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>  #endif
+>  
+>      /* If host supports feature MSR, write down. */
+> -    if (kvm_feature_msrs) {
+> -        int i;
+> -        for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
+> -            if (kvm_feature_msrs->indices[i] == MSR_IA32_ARCH_CAPABILITIES) {
+> +    if (kvm_arch_get_supported_msr_feature(kvm_state, MSR_IA32_ARCH_CAPABILITIES)
+> +        && has_msr_arch_capabs) {
 
-  qemu-system-x86_64: hw/scsi/scsi-bus.c:1374: scsi_req_complete:
-  Assertion `req->status =3D=3D -1' failed.
+Unless we have a KVM bug too, has_msr_arch_capabs should be
+enough.
 
-Kevin Wolf suggested this fix:
+If has_msr_arch_capabs is not enough, we'll need to add a comment
+explaining why, or we risk reintroducing the same bug later.
 
-  < kwolf> Hm, should the final return false; in that patch
-           actually be a return true?
-  < kwolf> Because I think he didn't intend to change anything
-           except BLOCK_ERROR_ACTION_IGNORE
 
-Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1804323
----
- hw/scsi/scsi-disk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>                  kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+>                                env->features[FEAT_ARCH_CAPABILITIES]);
+> -                break;
+> -            }
+>      }
+>  
+>      /*
+> 
+> 
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 6eb258d3f3..0e9027c8f3 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -482,7 +482,7 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int =
-error, bool acct_failed)
-     if (action =3D=3D BLOCK_ERROR_ACTION_STOP) {
-         scsi_req_retry(&r->req);
-     }
--    return false;
-+    return true;
- }
-=20
- static void scsi_write_complete_noio(SCSIDiskReq *r, int ret)
---=20
-2.19.0.rc0
+-- 
+Eduardo
