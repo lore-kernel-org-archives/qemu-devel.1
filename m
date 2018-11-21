@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gPahb-00075Q-Ia
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:34 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPahk-0007DP-Nt
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gPahX-00066g-BS
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56854)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPahg-0006bS-ID
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36328)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gPahX-00063t-1A
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:27 -0500
+	id 1gPahg-0006YN-55
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 17:10:36 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 22 Nov 2018 02:06:45 +0400
-Message-Id: <20181121220647.18844-29-marcandre.lureau@redhat.com>
+Date: Thu, 22 Nov 2018 02:06:46 +0400
+Message-Id: <20181121220647.18844-30-marcandre.lureau@redhat.com>
 In-Reply-To: <20181121220647.18844-1-marcandre.lureau@redhat.com>
 References: <20181121220647.18844-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 for-3.2 v2 28/30] slirp: move QEMU state
- saving to a separate unit
+Subject: [Qemu-devel] [PATCH v2 for-3.2 v2 29/30] slirp: replace remaining
+ QEMU dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,490 +31,607 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Make state saving optional: this will allow to build SLIRP without
-QEMU. (eventually, the vmstate helpers will be extracted, so an
-external project & process could save its state)
+Introduce utility header/object, and replace remaining qemu functions
+with SLIRP helpers.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- slirp/slirp.h       |   3 +
- slirp/state.h       |   9 +
- slirp/slirp.c       | 372 ++---------------------------------------
- slirp/state.c       | 394 ++++++++++++++++++++++++++++++++++++++++++++
- slirp/Makefile.objs |   3 +-
- 5 files changed, 419 insertions(+), 362 deletions(-)
- create mode 100644 slirp/state.h
- create mode 100644 slirp/state.c
+ slirp/ip.h          |  14 +--
+ slirp/ip6.h         |   5 +-
+ slirp/ip6_icmp.h    |  16 ++--
+ slirp/libslirp.h    |  12 ++-
+ slirp/qtailq.h      | 218 ++++++++++++++++++++++++++++++++++++++++++++
+ slirp/slirp.h       |  12 +--
+ slirp/util.h        | 148 ++++++++++++++++++++++++++++++
+ slirp/arp_table.c   |   1 -
+ slirp/bootp.c       |   1 -
+ slirp/cksum.c       |   1 -
+ slirp/dhcpv6.c      |   2 -
+ slirp/dnssearch.c   |   1 -
+ slirp/if.c          |   2 -
+ slirp/ip6_icmp.c    |   4 -
+ slirp/ip6_input.c   |   1 -
+ slirp/ip6_output.c  |   2 -
+ slirp/ip_icmp.c     |   7 +-
+ slirp/ip_input.c    |   1 -
+ slirp/ip_output.c   |   1 -
+ slirp/mbuf.c        |   1 -
+ slirp/misc.c        |  21 ++---
+ slirp/ncsi.c        |   1 -
+ slirp/ndp_table.c   |   2 -
+ slirp/sbuf.c        |   2 -
+ slirp/slirp.c       |   7 --
+ slirp/socket.c      |  18 ++--
+ slirp/tcp_input.c   |   1 -
+ slirp/tcp_output.c  |   1 -
+ slirp/tcp_subr.c    |  13 ++-
+ slirp/tcp_timer.c   |   1 -
+ slirp/tftp.c        |   7 +-
+ slirp/udp.c         |   7 +-
+ slirp/udp6.c        |   2 -
+ slirp/util.c        | 176 +++++++++++++++++++++++++++++++++++
+ slirp/Makefile.objs |   1 +
+ 35 files changed, 609 insertions(+), 101 deletions(-)
+ create mode 100644 slirp/qtailq.h
+ create mode 100644 slirp/util.h
+ create mode 100644 slirp/util.c
 
+diff --git a/slirp/ip.h b/slirp/ip.h
+index 243b6c8b24..cd6ddf2bb7 100644
+--- a/slirp/ip.h
++++ b/slirp/ip.h
+@@ -89,7 +89,7 @@ struct ip {
+ 	uint8_t ip_p;			/* protocol */
+ 	uint16_t	ip_sum;			/* checksum */
+ 	struct	in_addr ip_src,ip_dst;	/* source and dest address */
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ #define	IP_MAXPACKET	65535		/* maximum packet size */
+=20
+@@ -151,7 +151,7 @@ struct	ip_timestamp {
+ 			n_long ipt_time;
+ 		} ipt_ta[1];
+ 	} ipt_timestamp;
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ /* flag bits for ipt_flg */
+ #define	IPOPT_TS_TSONLY		0		/* timestamps only */
+@@ -181,11 +181,11 @@ struct	ip_timestamp {
+ struct mbuf_ptr {
+ 	struct mbuf *mptr;
+ 	uint32_t dummy;
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+ #else
+ struct mbuf_ptr {
+ 	struct mbuf *mptr;
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+ #endif
+ struct qlink {
+ 	void *next, *prev;
+@@ -201,7 +201,7 @@ struct ipovly {
+ 	uint16_t	ih_len;			/* protocol length */
+ 	struct	in_addr ih_src;		/* source internet address */
+ 	struct	in_addr ih_dst;		/* destination internet address */
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ /*
+  * Ip reassembly queue structure.  Each fragment
+@@ -217,7 +217,7 @@ struct ipq {
+ 	uint8_t	ipq_p;			/* protocol of this fragment */
+ 	uint16_t	ipq_id;			/* sequence id for reassembly */
+ 	struct	in_addr ipq_src,ipq_dst;
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ /*
+  * Ip header, when holding a fragment.
+@@ -227,7 +227,7 @@ struct ipq {
+ struct	ipasfrag {
+ 	struct qlink ipf_link;
+ 	struct ip ipf_ip;
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ #define ipf_off      ipf_ip.ip_off
+ #define ipf_tos      ipf_ip.ip_tos
+diff --git a/slirp/ip6.h b/slirp/ip6.h
+index 14e9c78735..e0a13dec1c 100644
+--- a/slirp/ip6.h
++++ b/slirp/ip6.h
+@@ -7,7 +7,6 @@
+ #define SLIRP_IP6_H
+=20
+ #include <glib.h>
+-#include "net/eth.h"
+=20
+ #define ALLNODES_MULTICAST  { .s6_addr =3D \
+                             { 0xff, 0x02, 0x00, 0x00,\
+@@ -133,7 +132,7 @@ struct ip6 {
+     uint8_t     ip_nh;               /* next header */
+     uint8_t     ip_hl;               /* hop limit */
+     struct in6_addr ip_src, ip_dst;  /* source and dest address */
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ /*
+  * IPv6 pseudo-header used by upper-layer protocols
+@@ -145,7 +144,7 @@ struct ip6_pseudohdr {
+     uint16_t    ih_zero_hi;       /* zero */
+     uint8_t     ih_zero_lo;       /* zero */
+     uint8_t     ih_nh;            /* next header */
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+=20
+ #endif
+diff --git a/slirp/ip6_icmp.h b/slirp/ip6_icmp.h
+index 32b0914055..1f09b485e3 100644
+--- a/slirp/ip6_icmp.h
++++ b/slirp/ip6_icmp.h
+@@ -48,12 +48,12 @@ struct ndp_ra {     /* Router Advertisement Message *=
+/
+     uint16_t lifetime;      /* Router Lifetime */
+     uint32_t reach_time;    /* Reachable Time */
+     uint32_t retrans_time;  /* Retrans Timer */
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ struct ndp_ns {     /* Neighbor Solicitation Message */
+     uint32_t reserved;
+     struct in6_addr target; /* Target Address */
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ struct ndp_na {     /* Neighbor Advertisement Message */
+ #if G_BYTE_ORDER =3D=3D G_BIG_ENDIAN
+@@ -72,13 +72,13 @@ struct ndp_na {     /* Neighbor Advertisement Message=
+ */
+         reserved_lo:24;
+ #endif
+     struct in6_addr target; /* Target Address */
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ struct ndp_redirect {
+     uint32_t reserved;
+     struct in6_addr target; /* Target Address */
+     struct in6_addr dest;   /* Destination Address */
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ /*
+  * Structure of an icmpv6 header.
+@@ -103,7 +103,7 @@ struct icmp6 {
+ #define icmp6_nns icmp6_body.ndp_ns
+ #define icmp6_nna icmp6_body.ndp_na
+ #define icmp6_redirect icmp6_body.ndp_redirect
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ #define ICMP6_MINLEN    4
+ #define ICMP6_ERROR_MINLEN  8
+@@ -134,16 +134,16 @@ struct ndpopt {
+             uint32_t    pref_lt;                /* Preferred Lifetime */
+             uint32_t    reserved2;
+             struct in6_addr prefix;
+-        } QEMU_PACKED prefixinfo;
++        } SLIRP_PACKED prefixinfo;
+ #define ndpopt_prefixinfo ndpopt_body.prefixinfo
+         struct rdnss {
+             uint16_t reserved;
+             uint32_t lifetime;
+             struct in6_addr addr;
+-        } QEMU_PACKED rdnss;
++        } SLIRP_PACKED rdnss;
+ #define ndpopt_rdnss ndpopt_body.rdnss
+     } ndpopt_body;
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ /* NDP options type */
+ #define NDPOPT_LINKLAYER_SOURCE     1   /* Source Link-Layer Address */
+diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+index f2d71bd1f6..2c90738f89 100644
+--- a/slirp/libslirp.h
++++ b/slirp/libslirp.h
+@@ -1,7 +1,17 @@
+ #ifndef LIBSLIRP_H
+ #define LIBSLIRP_H
+=20
+-#include "qemu-common.h"
++#include <glib.h>
++#include <stdint.h>
++#include <stdbool.h>
++
++#ifdef _WIN32
++#include <winsock2.h>
++#include <in6addr.h>
++#else
++#include <netinet/in.h>
++#include <arpa/inet.h>
++#endif
+=20
+ typedef struct Slirp Slirp;
+=20
+diff --git a/slirp/qtailq.h b/slirp/qtailq.h
+new file mode 100644
+index 0000000000..7c1d73a5bd
+--- /dev/null
++++ b/slirp/qtailq.h
+@@ -0,0 +1,218 @@
++/*      $NetBSD: queue.h,v 1.52 2009/04/20 09:56:08 mschuett Exp $ */
++
++/*
++ * slirp version: Copy from QEMU, removed all but tail queues.
++ */
++
++/*
++ * Copyright (c) 1991, 1993
++ *      The Regents of the University of California.  All rights reserve=
+d.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in th=
+e
++ *    documentation and/or other materials provided with the distributio=
+n.
++ * 3. Neither the name of the University nor the names of its contributo=
+rs
++ *    may be used to endorse or promote products derived from this softw=
+are
++ *    without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' A=
+ND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PU=
+RPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIA=
+BLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUE=
+NTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOO=
+DS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, S=
+TRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY=
+ WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY O=
+F
++ * SUCH DAMAGE.
++ *
++ *      @(#)queue.h     8.5 (Berkeley) 8/20/94
++ */
++
++#ifndef QTAILQ_H
++#define QTAILQ_H
++
++/*
++ * A tail queue is headed by a pair of pointers, one to the head of the
++ * list and the other to the tail of the list. The elements are doubly
++ * linked so that an arbitrary element can be removed without a need to
++ * traverse the list. New elements can be added to the list before or
++ * after an existing element, at the head of the list, or at the end of
++ * the list. A tail queue may be traversed in either direction.
++ */
++
++#define Q_TAILQ_HEAD(name, type, qual)                                  =
+       \
++    struct name {                                                       =
+       \
++        qual type *tqh_first;      /* first element */                  =
+       \
++        qual type *qual *tqh_last; /* addr of last next element */      =
+       \
++    }
++#define QTAILQ_HEAD(name, type) Q_TAILQ_HEAD(name, struct type, )
++
++#define QTAILQ_HEAD_INITIALIZER(head)                                   =
+       \
++    {                                                                   =
+       \
++        NULL, &(head).tqh_first                                         =
+       \
++    }
++
++#define Q_TAILQ_ENTRY(type, qual)                                       =
+       \
++    struct {                                                            =
+       \
++        qual type *tqe_next;       /* next element */                   =
+       \
++        qual type *qual *tqe_prev; /* address of previous next element *=
+/      \
++    }
++#define QTAILQ_ENTRY(type) Q_TAILQ_ENTRY(struct type, )
++
++/*
++ * Tail queue functions.
++ */
++#define QTAILQ_INIT(head)                                               =
+       \
++    do {                                                                =
+       \
++        (head)->tqh_first =3D NULL;                                     =
+         \
++        (head)->tqh_last =3D &(head)->tqh_first;                        =
+         \
++    } while (/*CONSTCOND*/ 0)
++
++#define QTAILQ_INSERT_HEAD(head, elm, field)                            =
+       \
++    do {                                                                =
+       \
++        if (((elm)->field.tqe_next =3D (head)->tqh_first) !=3D NULL)    =
+           \
++            (head)->tqh_first->field.tqe_prev =3D &(elm)->field.tqe_next=
+;        \
++        else                                                            =
+       \
++            (head)->tqh_last =3D &(elm)->field.tqe_next;                =
+         \
++        (head)->tqh_first =3D (elm);                                    =
+         \
++        (elm)->field.tqe_prev =3D &(head)->tqh_first;                   =
+         \
++    } while (/*CONSTCOND*/ 0)
++
++#define QTAILQ_INSERT_TAIL(head, elm, field)                            =
+       \
++    do {                                                                =
+       \
++        (elm)->field.tqe_next =3D NULL;                                 =
+         \
++        (elm)->field.tqe_prev =3D (head)->tqh_last;                     =
+         \
++        *(head)->tqh_last =3D (elm);                                    =
+         \
++        (head)->tqh_last =3D &(elm)->field.tqe_next;                    =
+         \
++    } while (/*CONSTCOND*/ 0)
++
++#define QTAILQ_INSERT_AFTER(head, listelm, elm, field)                  =
+       \
++    do {                                                                =
+       \
++        if (((elm)->field.tqe_next =3D (listelm)->field.tqe_next) !=3D N=
+ULL)       \
++            (elm)->field.tqe_next->field.tqe_prev =3D &(elm)->field.tqe_=
+next;    \
++        else                                                            =
+       \
++            (head)->tqh_last =3D &(elm)->field.tqe_next;                =
+         \
++        (listelm)->field.tqe_next =3D (elm);                            =
+         \
++        (elm)->field.tqe_prev =3D &(listelm)->field.tqe_next;           =
+         \
++    } while (/*CONSTCOND*/ 0)
++
++#define QTAILQ_INSERT_BEFORE(listelm, elm, field)                       =
+       \
++    do {                                                                =
+       \
++        (elm)->field.tqe_prev =3D (listelm)->field.tqe_prev;            =
+         \
++        (elm)->field.tqe_next =3D (listelm);                            =
+         \
++        *(listelm)->field.tqe_prev =3D (elm);                           =
+         \
++        (listelm)->field.tqe_prev =3D &(elm)->field.tqe_next;           =
+         \
++    } while (/*CONSTCOND*/ 0)
++
++#define QTAILQ_REMOVE(head, elm, field)                                 =
+       \
++    do {                                                                =
+       \
++        if (((elm)->field.tqe_next) !=3D NULL)                          =
+         \
++            (elm)->field.tqe_next->field.tqe_prev =3D (elm)->field.tqe_p=
+rev;     \
++        else                                                            =
+       \
++            (head)->tqh_last =3D (elm)->field.tqe_prev;                 =
+         \
++        *(elm)->field.tqe_prev =3D (elm)->field.tqe_next;               =
+         \
++        (elm)->field.tqe_prev =3D NULL;                                 =
+         \
++    } while (/*CONSTCOND*/ 0)
++
++#define QTAILQ_FOREACH(var, head, field)                                =
+       \
++    for ((var) =3D ((head)->tqh_first); (var); (var) =3D ((var)->field.t=
+qe_next))
++
++#define QTAILQ_FOREACH_SAFE(var, head, field, next_var)                 =
+       \
++    for ((var) =3D ((head)->tqh_first);                                 =
+         \
++         (var) && ((next_var) =3D ((var)->field.tqe_next), 1);          =
+         \
++         (var) =3D (next_var))
++
++#define QTAILQ_FOREACH_REVERSE(var, head, headname, field)              =
+       \
++    for ((var) =3D (*(((struct headname *)((head)->tqh_last))->tqh_last)=
+);       \
++         (var);                                                         =
+       \
++         (var) =3D (*(((struct headname *)((var)->field.tqe_prev))->tqh_=
+last)))
++
++#define QTAILQ_FOREACH_REVERSE_SAFE(var, head, headname, field, prev_var=
+)      \
++    for ((var) =3D (*(((struct headname *)((head)->tqh_last))->tqh_last)=
+);       \
++         (var) &&                                                       =
+       \
++         ((prev_var) =3D                                                =
+         \
++              (*(((struct headname *)((var)->field.tqe_prev))->tqh_last)=
+),     \
++         1);                                                            =
+       \
++         (var) =3D (prev_var))
++
++/*
++ * Tail queue access methods.
++ */
++#define QTAILQ_EMPTY(head) ((head)->tqh_first =3D=3D NULL)
++#define QTAILQ_FIRST(head) ((head)->tqh_first)
++#define QTAILQ_NEXT(elm, field) ((elm)->field.tqe_next)
++#define QTAILQ_IN_USE(elm, field) ((elm)->field.tqe_prev !=3D NULL)
++
++#define QTAILQ_LAST(head, headname)                                     =
+       \
++    (*(((struct headname *)((head)->tqh_last))->tqh_last))
++#define QTAILQ_PREV(elm, headname, field)                               =
+       \
++    (*(((struct headname *)((elm)->field.tqe_prev))->tqh_last))
++
++#define field_at_offset(base, offset, type)                             =
+       \
++    ((type)(((char *)(base)) + (offset)))
++
++typedef struct DUMMY_Q_ENTRY DUMMY_Q_ENTRY;
++typedef struct DUMMY_Q DUMMY_Q;
++
++struct DUMMY_Q_ENTRY {
++    QTAILQ_ENTRY(DUMMY_Q_ENTRY) next;
++};
++
++struct DUMMY_Q {
++    QTAILQ_HEAD(DUMMY_Q_HEAD, DUMMY_Q_ENTRY) head;
++};
++
++#define dummy_q ((DUMMY_Q *)0)
++#define dummy_qe ((DUMMY_Q_ENTRY *)0)
++
++/*
++ * Offsets of layout of a tail queue head.
++ */
++#define QTAILQ_FIRST_OFFSET (offsetof(typeof(dummy_q->head), tqh_first))
++#define QTAILQ_LAST_OFFSET (offsetof(typeof(dummy_q->head), tqh_last))
++/*
++ * Raw access of elements of a tail queue
++ */
++#define QTAILQ_RAW_FIRST(head)                                          =
+       \
++    (*field_at_offset(head, QTAILQ_FIRST_OFFSET, void **))
++#define QTAILQ_RAW_TQH_LAST(head)                                       =
+       \
++    (*field_at_offset(head, QTAILQ_LAST_OFFSET, void ***))
++
++/*
++ * Offsets of layout of a tail queue element.
++ */
++#define QTAILQ_NEXT_OFFSET (offsetof(typeof(dummy_qe->next), tqe_next))
++#define QTAILQ_PREV_OFFSET (offsetof(typeof(dummy_qe->next), tqe_prev))
++
++/*
++ * Raw access of elements of a tail entry
++ */
++#define QTAILQ_RAW_NEXT(elm, entry)                                     =
+       \
++    (*field_at_offset(elm, entry + QTAILQ_NEXT_OFFSET, void **))
++#define QTAILQ_RAW_TQE_PREV(elm, entry)                                 =
+       \
++    (*field_at_offset(elm, entry + QTAILQ_PREV_OFFSET, void ***))
++/*
++ * Tail queue tranversal using pointer arithmetic.
++ */
++#define QTAILQ_RAW_FOREACH(elm, head, entry)                            =
+       \
++    for ((elm) =3D QTAILQ_RAW_FIRST(head); (elm);                       =
+         \
++         (elm) =3D QTAILQ_RAW_NEXT(elm, entry))
++/*
++ * Tail queue insertion using pointer arithmetic.
++ */
++#define QTAILQ_RAW_INSERT_TAIL(head, elm, entry)                        =
+       \
++    do {                                                                =
+       \
++        QTAILQ_RAW_NEXT(elm, entry) =3D NULL;                           =
+         \
++        QTAILQ_RAW_TQE_PREV(elm, entry) =3D QTAILQ_RAW_TQH_LAST(head);  =
+         \
++        *QTAILQ_RAW_TQH_LAST(head) =3D (elm);                           =
+         \
++        QTAILQ_RAW_TQH_LAST(head) =3D &QTAILQ_RAW_NEXT(elm, entry);     =
+         \
++    } while (/*CONSTCOND*/ 0)
++
++#endif /* QTAILQ_H */
 diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 17056f4b83..6e7a663b6f 100644
+index 6e7a663b6f..08ec331ee5 100644
 --- a/slirp/slirp.h
 +++ b/slirp/slirp.h
-@@ -270,4 +270,7 @@ int tcp_emu(struct socket *, struct mbuf *);
- int tcp_ctl(struct socket *);
- struct tcpcb *tcp_drop(struct tcpcb *tp, int err);
+@@ -5,8 +5,8 @@
 =20
-+struct socket *
-+slirp_find_ctl_socket(Slirp *slirp, struct in_addr guest_addr, int guest=
-_port);
-+
- #endif
-diff --git a/slirp/state.h b/slirp/state.h
+ typedef char *caddr_t;
+=20
+-# include <windows.h>
+ # include <winsock2.h>
++# include <windows.h>
+ # include <ws2tcpip.h>
+ # include <sys/timeb.h>
+ # include <iphlpapi.h>
+@@ -45,10 +45,8 @@ typedef char *caddr_t;
+ #define quehead slirp_quehead
+=20
+ #include "debug.h"
+-
+-#include "qemu/queue.h"
+-#include "qemu/sockets.h"
+-#include "net/eth.h"
++#include "util.h"
++#include "qtailq.h"
+=20
+ #include "libslirp.h"
+ #include "ip.h"
+@@ -93,7 +91,7 @@ struct slirp_arphdr {
+     uint32_t      ar_sip;           /* sender IP address       */
+     unsigned char ar_tha[ETH_ALEN]; /* target hardware address */
+     uint32_t      ar_tip;           /* target IP address       */
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ #define ARP_TABLE_SIZE 16
+=20
+@@ -110,7 +108,7 @@ bool arp_table_search(Slirp *slirp, uint32_t ip_addr,
+ struct ndpentry {
+     unsigned char   eth_addr[ETH_ALEN];     /* sender hardware address *=
+/
+     struct in6_addr ip_addr;                /* sender IP address       *=
+/
+-} QEMU_PACKED;
++} SLIRP_PACKED;
+=20
+ #define NDP_TABLE_SIZE 16
+=20
+diff --git a/slirp/util.h b/slirp/util.h
 new file mode 100644
-index 0000000000..154866898f
+index 0000000000..daf652d3e6
 --- /dev/null
-+++ b/slirp/state.h
-@@ -0,0 +1,9 @@
-+#ifndef SLIRP_STATE_H_
-+#define SLIRP_STATE_H_
-+
-+#include "libslirp.h"
-+
-+void slirp_state_register(Slirp *slirp);
-+void slirp_state_unregister(Slirp *slirp);
-+
-+#endif /* SLIRP_STATE_H_ */
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index cd0ad81f26..a1f42c8b19 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -30,6 +30,10 @@
- #include "hw/hw.h"
- #include "qemu/cutils.h"
-=20
-+#ifdef WITH_QEMU
-+#include "state.h"
-+#endif
-+
- #ifndef _WIN32
- #include <net/if.h>
- #endif
-@@ -278,14 +282,6 @@ static void slirp_init_once(void)
-=20
- }
-=20
--static void slirp_state_save(QEMUFile *f, void *opaque);
--static int slirp_state_load(QEMUFile *f, void *opaque, int version_id);
--
--static SaveVMHandlers savevm_slirp_state =3D {
--    .save_state =3D slirp_state_save,
--    .load_state =3D slirp_state_load,
--};
--
- Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwo=
-rk,
-                   struct in_addr vnetmask, struct in_addr vhost,
-                   bool in6_enabled,
-@@ -341,8 +337,9 @@ Slirp *slirp_init(int restricted, bool in_enabled, st=
-ruct in_addr vnetwork,
-=20
-     slirp->opaque =3D opaque;
-=20
--    register_savevm_live(NULL, "slirp", 0, 4, &savevm_slirp_state, slirp=
-);
--
-+#ifdef WITH_QEMU
-+    slirp_state_register(slirp);
-+#endif
-     QTAILQ_INSERT_TAIL(&slirp_instances, slirp, entry);
-=20
-     return slirp;
-@@ -359,9 +356,9 @@ void slirp_cleanup(Slirp *slirp)
-     }
-=20
-     QTAILQ_REMOVE(&slirp_instances, slirp, entry);
--
--    unregister_savevm(NULL, "slirp", slirp);
--
-+#ifdef WITH_QEMU
-+    slirp_state_unregister(slirp);
-+#endif
-     ip_cleanup(slirp);
-     ip6_cleanup(slirp);
-     m_cleanup(slirp);
-@@ -1114,7 +1111,7 @@ ssize_t slirp_send(struct socket *so, const void *b=
-uf, size_t len, int flags)
-     return send(so->s, buf, len, flags);
- }
-=20
--static struct socket *
-+struct socket *
- slirp_find_ctl_socket(Slirp *slirp, struct in_addr guest_addr, int guest=
-_port)
- {
-     struct socket *so;
-@@ -1161,350 +1158,3 @@ void slirp_socket_recv(Slirp *slirp, struct in_ad=
-dr guest_addr, int guest_port,
-     if (ret > 0)
-         tcp_output(sototcpcb(so));
- }
--
--static int slirp_tcp_post_load(void *opaque, int version)
--{
--    tcp_template((struct tcpcb *)opaque);
--
--    return 0;
--}
--
--static const VMStateDescription vmstate_slirp_tcp =3D {
--    .name =3D "slirp-tcp",
--    .version_id =3D 0,
--    .post_load =3D slirp_tcp_post_load,
--    .fields =3D (VMStateField[]) {
--        VMSTATE_INT16(t_state, struct tcpcb),
--        VMSTATE_INT16_ARRAY(t_timer, struct tcpcb, TCPT_NTIMERS),
--        VMSTATE_INT16(t_rxtshift, struct tcpcb),
--        VMSTATE_INT16(t_rxtcur, struct tcpcb),
--        VMSTATE_INT16(t_dupacks, struct tcpcb),
--        VMSTATE_UINT16(t_maxseg, struct tcpcb),
--        VMSTATE_UINT8(t_force, struct tcpcb),
--        VMSTATE_UINT16(t_flags, struct tcpcb),
--        VMSTATE_UINT32(snd_una, struct tcpcb),
--        VMSTATE_UINT32(snd_nxt, struct tcpcb),
--        VMSTATE_UINT32(snd_up, struct tcpcb),
--        VMSTATE_UINT32(snd_wl1, struct tcpcb),
--        VMSTATE_UINT32(snd_wl2, struct tcpcb),
--        VMSTATE_UINT32(iss, struct tcpcb),
--        VMSTATE_UINT32(snd_wnd, struct tcpcb),
--        VMSTATE_UINT32(rcv_wnd, struct tcpcb),
--        VMSTATE_UINT32(rcv_nxt, struct tcpcb),
--        VMSTATE_UINT32(rcv_up, struct tcpcb),
--        VMSTATE_UINT32(irs, struct tcpcb),
--        VMSTATE_UINT32(rcv_adv, struct tcpcb),
--        VMSTATE_UINT32(snd_max, struct tcpcb),
--        VMSTATE_UINT32(snd_cwnd, struct tcpcb),
--        VMSTATE_UINT32(snd_ssthresh, struct tcpcb),
--        VMSTATE_INT16(t_idle, struct tcpcb),
--        VMSTATE_INT16(t_rtt, struct tcpcb),
--        VMSTATE_UINT32(t_rtseq, struct tcpcb),
--        VMSTATE_INT16(t_srtt, struct tcpcb),
--        VMSTATE_INT16(t_rttvar, struct tcpcb),
--        VMSTATE_UINT16(t_rttmin, struct tcpcb),
--        VMSTATE_UINT32(max_sndwnd, struct tcpcb),
--        VMSTATE_UINT8(t_oobflags, struct tcpcb),
--        VMSTATE_UINT8(t_iobc, struct tcpcb),
--        VMSTATE_INT16(t_softerror, struct tcpcb),
--        VMSTATE_UINT8(snd_scale, struct tcpcb),
--        VMSTATE_UINT8(rcv_scale, struct tcpcb),
--        VMSTATE_UINT8(request_r_scale, struct tcpcb),
--        VMSTATE_UINT8(requested_s_scale, struct tcpcb),
--        VMSTATE_UINT32(ts_recent, struct tcpcb),
--        VMSTATE_UINT32(ts_recent_age, struct tcpcb),
--        VMSTATE_UINT32(last_ack_sent, struct tcpcb),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
--/* The sbuf has a pair of pointers that are migrated as offsets;
-- * we calculate the offsets and restore the pointers using
-- * pre_save/post_load on a tmp structure.
-- */
--struct sbuf_tmp {
--    struct sbuf *parent;
--    uint32_t roff, woff;
--};
--
--static int sbuf_tmp_pre_save(void *opaque)
--{
--    struct sbuf_tmp *tmp =3D opaque;
--    tmp->woff =3D tmp->parent->sb_wptr - tmp->parent->sb_data;
--    tmp->roff =3D tmp->parent->sb_rptr - tmp->parent->sb_data;
--
--    return 0;
--}
--
--static int sbuf_tmp_post_load(void *opaque, int version)
--{
--    struct sbuf_tmp *tmp =3D opaque;
--    uint32_t requested_len =3D tmp->parent->sb_datalen;
--
--    /* Allocate the buffer space used by the field after the tmp */
--    sbreserve(tmp->parent, tmp->parent->sb_datalen);
--
--    if (tmp->parent->sb_datalen !=3D requested_len) {
--        return -ENOMEM;
--    }
--    if (tmp->woff >=3D requested_len ||
--        tmp->roff >=3D requested_len) {
--        g_critical("invalid sbuf offsets r/w=3D%u/%u len=3D%u",
--                   tmp->roff, tmp->woff, requested_len);
--        return -EINVAL;
--    }
--
--    tmp->parent->sb_wptr =3D tmp->parent->sb_data + tmp->woff;
--    tmp->parent->sb_rptr =3D tmp->parent->sb_data + tmp->roff;
--
--    return 0;
--}
--
--
--static const VMStateDescription vmstate_slirp_sbuf_tmp =3D {
--    .name =3D "slirp-sbuf-tmp",
--    .post_load =3D sbuf_tmp_post_load,
--    .pre_save  =3D sbuf_tmp_pre_save,
--    .version_id =3D 0,
--    .fields =3D (VMStateField[]) {
--        VMSTATE_UINT32(woff, struct sbuf_tmp),
--        VMSTATE_UINT32(roff, struct sbuf_tmp),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
--static const VMStateDescription vmstate_slirp_sbuf =3D {
--    .name =3D "slirp-sbuf",
--    .version_id =3D 0,
--    .fields =3D (VMStateField[]) {
--        VMSTATE_UINT32(sb_cc, struct sbuf),
--        VMSTATE_UINT32(sb_datalen, struct sbuf),
--        VMSTATE_WITH_TMP(struct sbuf, struct sbuf_tmp, vmstate_slirp_sbu=
-f_tmp),
--        VMSTATE_VBUFFER_UINT32(sb_data, struct sbuf, 0, NULL, sb_datalen=
-),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
--static bool slirp_older_than_v4(void *opaque, int version_id)
--{
--    return version_id < 4;
--}
--
--static bool slirp_family_inet(void *opaque, int version_id)
--{
--    union slirp_sockaddr *ssa =3D (union slirp_sockaddr *)opaque;
--    return ssa->ss.ss_family =3D=3D AF_INET;
--}
--
--static int slirp_socket_pre_load(void *opaque)
--{
--    struct socket *so =3D opaque;
--    if (tcp_attach(so) < 0) {
--        return -ENOMEM;
--    }
--    /* Older versions don't load these fields */
--    so->so_ffamily =3D AF_INET;
--    so->so_lfamily =3D AF_INET;
--    return 0;
--}
--
--#ifndef _WIN32
--#define VMSTATE_SIN4_ADDR(f, s, t) VMSTATE_UINT32_TEST(f, s, t)
--#else
--/* Win uses u_long rather than uint32_t - but it's still 32bits long */
--#define VMSTATE_SIN4_ADDR(f, s, t) VMSTATE_SINGLE_TEST(f, s, t, 0, \
--                                       vmstate_info_uint32, u_long)
--#endif
--
--/* The OS provided ss_family field isn't that portable; it's size
-- * and type varies (16/8 bit, signed, unsigned)
-- * and the values it contains aren't fully portable.
-- */
--typedef struct SS_FamilyTmpStruct {
--    union slirp_sockaddr    *parent;
--    uint16_t                 portable_family;
--} SS_FamilyTmpStruct;
--
--#define SS_FAMILY_MIG_IPV4   2  /* Linux, BSD, Win... */
--#define SS_FAMILY_MIG_IPV6  10  /* Linux */
--#define SS_FAMILY_MIG_OTHER 0xffff
--
--static int ss_family_pre_save(void *opaque)
--{
--    SS_FamilyTmpStruct *tss =3D opaque;
--
--    tss->portable_family =3D SS_FAMILY_MIG_OTHER;
--
--    if (tss->parent->ss.ss_family =3D=3D AF_INET) {
--        tss->portable_family =3D SS_FAMILY_MIG_IPV4;
--    } else if (tss->parent->ss.ss_family =3D=3D AF_INET6) {
--        tss->portable_family =3D SS_FAMILY_MIG_IPV6;
--    }
--
--    return 0;
--}
--
--static int ss_family_post_load(void *opaque, int version_id)
--{
--    SS_FamilyTmpStruct *tss =3D opaque;
--
--    switch (tss->portable_family) {
--    case SS_FAMILY_MIG_IPV4:
--        tss->parent->ss.ss_family =3D AF_INET;
--        break;
--    case SS_FAMILY_MIG_IPV6:
--    case 23: /* compatibility: AF_INET6 from mingw */
--    case 28: /* compatibility: AF_INET6 from FreeBSD sys/socket.h */
--        tss->parent->ss.ss_family =3D AF_INET6;
--        break;
--    default:
--        g_critical("invalid ss_family type %x", tss->portable_family);
--        return -EINVAL;
--    }
--
--    return 0;
--}
--
--static const VMStateDescription vmstate_slirp_ss_family =3D {
--    .name =3D "slirp-socket-addr/ss_family",
--    .pre_save  =3D ss_family_pre_save,
--    .post_load =3D ss_family_post_load,
--    .fields =3D (VMStateField[]) {
--        VMSTATE_UINT16(portable_family, SS_FamilyTmpStruct),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
--static const VMStateDescription vmstate_slirp_socket_addr =3D {
--    .name =3D "slirp-socket-addr",
--    .version_id =3D 4,
--    .fields =3D (VMStateField[]) {
--        VMSTATE_WITH_TMP(union slirp_sockaddr, SS_FamilyTmpStruct,
--                            vmstate_slirp_ss_family),
--        VMSTATE_SIN4_ADDR(sin.sin_addr.s_addr, union slirp_sockaddr,
--                            slirp_family_inet),
--        VMSTATE_UINT16_TEST(sin.sin_port, union slirp_sockaddr,
--                            slirp_family_inet),
--
--#if 0
--        /* Untested: Needs checking by someone with IPv6 test */
--        VMSTATE_BUFFER_TEST(sin6.sin6_addr, union slirp_sockaddr,
--                            slirp_family_inet6),
--        VMSTATE_UINT16_TEST(sin6.sin6_port, union slirp_sockaddr,
--                            slirp_family_inet6),
--        VMSTATE_UINT32_TEST(sin6.sin6_flowinfo, union slirp_sockaddr,
--                            slirp_family_inet6),
--        VMSTATE_UINT32_TEST(sin6.sin6_scope_id, union slirp_sockaddr,
--                            slirp_family_inet6),
--#endif
--
--        VMSTATE_END_OF_LIST()
--    }
--};
--
--static const VMStateDescription vmstate_slirp_socket =3D {
--    .name =3D "slirp-socket",
--    .version_id =3D 4,
--    .pre_load =3D slirp_socket_pre_load,
--    .fields =3D (VMStateField[]) {
--        VMSTATE_UINT32(so_urgc, struct socket),
--        /* Pre-v4 versions */
--        VMSTATE_SIN4_ADDR(so_faddr.s_addr, struct socket,
--                            slirp_older_than_v4),
--        VMSTATE_SIN4_ADDR(so_laddr.s_addr, struct socket,
--                            slirp_older_than_v4),
--        VMSTATE_UINT16_TEST(so_fport, struct socket, slirp_older_than_v4=
-),
--        VMSTATE_UINT16_TEST(so_lport, struct socket, slirp_older_than_v4=
-),
--        /* v4 and newer */
--        VMSTATE_STRUCT(fhost, struct socket, 4, vmstate_slirp_socket_add=
-r,
--                       union slirp_sockaddr),
--        VMSTATE_STRUCT(lhost, struct socket, 4, vmstate_slirp_socket_add=
-r,
--                       union slirp_sockaddr),
--
--        VMSTATE_UINT8(so_iptos, struct socket),
--        VMSTATE_UINT8(so_emu, struct socket),
--        VMSTATE_UINT8(so_type, struct socket),
--        VMSTATE_INT32(so_state, struct socket),
--        VMSTATE_STRUCT(so_rcv, struct socket, 0, vmstate_slirp_sbuf,
--                       struct sbuf),
--        VMSTATE_STRUCT(so_snd, struct socket, 0, vmstate_slirp_sbuf,
--                       struct sbuf),
--        VMSTATE_STRUCT_POINTER(so_tcpcb, struct socket, vmstate_slirp_tc=
-p,
--                       struct tcpcb),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
--static const VMStateDescription vmstate_slirp_bootp_client =3D {
--    .name =3D "slirp_bootpclient",
--    .fields =3D (VMStateField[]) {
--        VMSTATE_UINT16(allocated, BOOTPClient),
--        VMSTATE_BUFFER(macaddr, BOOTPClient),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
--static const VMStateDescription vmstate_slirp =3D {
--    .name =3D "slirp",
--    .version_id =3D 4,
--    .fields =3D (VMStateField[]) {
--        VMSTATE_UINT16_V(ip_id, Slirp, 2),
--        VMSTATE_STRUCT_ARRAY(bootp_clients, Slirp, NB_BOOTP_CLIENTS, 3,
--                             vmstate_slirp_bootp_client, BOOTPClient),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
--static void slirp_state_save(QEMUFile *f, void *opaque)
--{
--    Slirp *slirp =3D opaque;
--    struct gfwd_list *ex_ptr;
--
--    for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
-next)
--        if (ex_ptr->write_cb) {
--            struct socket *so;
--            so =3D slirp_find_ctl_socket(slirp, ex_ptr->ex_addr,
--                                       ntohs(ex_ptr->ex_fport));
--            if (!so)
--                continue;
--
--            qemu_put_byte(f, 42);
--            vmstate_save_state(f, &vmstate_slirp_socket, so, NULL);
--        }
--    qemu_put_byte(f, 0);
--
--    vmstate_save_state(f, &vmstate_slirp, slirp, NULL);
--}
--
--
--static int slirp_state_load(QEMUFile *f, void *opaque, int version_id)
--{
--    Slirp *slirp =3D opaque;
--    struct gfwd_list *ex_ptr;
--
--    while (qemu_get_byte(f)) {
--        int ret;
--        struct socket *so =3D socreate(slirp);
--
--        ret =3D vmstate_load_state(f, &vmstate_slirp_socket, so, version=
-_id);
--
--        if (ret < 0)
--            return ret;
--
--        if ((so->so_faddr.s_addr & slirp->vnetwork_mask.s_addr) !=3D
--            slirp->vnetwork_addr.s_addr) {
--            return -EINVAL;
--        }
--        for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_ptr-=
->ex_next) {
--            if (ex_ptr->write_cb &&
--                so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr &&
--                so->so_fport =3D=3D ex_ptr->ex_fport) {
--                break;
--            }
--        }
--        if (!ex_ptr)
--            return -EINVAL;
--    }
--
--    return vmstate_load_state(f, &vmstate_slirp, slirp, version_id);
--}
-diff --git a/slirp/state.c b/slirp/state.c
-new file mode 100644
-index 0000000000..0e5a706e87
---- /dev/null
-+++ b/slirp/state.c
-@@ -0,0 +1,394 @@
++++ b/slirp/util.h
+@@ -0,0 +1,148 @@
 +/*
-+ * libslirp
-+ *
-+ * Copyright (c) 2004-2008 Fabrice Bellard
++ * Copyright (c) 2003-2008 Fabrice Bellard
++ * Copyright (c) 2010-2016 Red Hat, Inc.
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining=
  a copy
@@ -545,405 +662,930 @@ NG FROM,
 S IN
 + * THE SOFTWARE.
 + */
-+#include "qemu/osdep.h"
++#ifndef UTIL_H_
++#define UTIL_H_
 +
-+#include "slirp.h"
-+#include "state.h"
-+#include "migration/vmstate.h"
-+#include "migration/qemu-file-types.h"
-+#include "migration/register.h"
++#include <stdlib.h>
++#include <stdio.h>
++#include <assert.h>
++#include <errno.h>
++#include <unistd.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <unistd.h>
++#include <inttypes.h>
 +
-+static int slirp_tcp_post_load(void *opaque, int version)
-+{
-+    tcp_template((struct tcpcb *)opaque);
-+
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_slirp_tcp =3D {
-+    .name =3D "slirp-tcp",
-+    .version_id =3D 0,
-+    .post_load =3D slirp_tcp_post_load,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_INT16(t_state, struct tcpcb),
-+        VMSTATE_INT16_ARRAY(t_timer, struct tcpcb, TCPT_NTIMERS),
-+        VMSTATE_INT16(t_rxtshift, struct tcpcb),
-+        VMSTATE_INT16(t_rxtcur, struct tcpcb),
-+        VMSTATE_INT16(t_dupacks, struct tcpcb),
-+        VMSTATE_UINT16(t_maxseg, struct tcpcb),
-+        VMSTATE_UINT8(t_force, struct tcpcb),
-+        VMSTATE_UINT16(t_flags, struct tcpcb),
-+        VMSTATE_UINT32(snd_una, struct tcpcb),
-+        VMSTATE_UINT32(snd_nxt, struct tcpcb),
-+        VMSTATE_UINT32(snd_up, struct tcpcb),
-+        VMSTATE_UINT32(snd_wl1, struct tcpcb),
-+        VMSTATE_UINT32(snd_wl2, struct tcpcb),
-+        VMSTATE_UINT32(iss, struct tcpcb),
-+        VMSTATE_UINT32(snd_wnd, struct tcpcb),
-+        VMSTATE_UINT32(rcv_wnd, struct tcpcb),
-+        VMSTATE_UINT32(rcv_nxt, struct tcpcb),
-+        VMSTATE_UINT32(rcv_up, struct tcpcb),
-+        VMSTATE_UINT32(irs, struct tcpcb),
-+        VMSTATE_UINT32(rcv_adv, struct tcpcb),
-+        VMSTATE_UINT32(snd_max, struct tcpcb),
-+        VMSTATE_UINT32(snd_cwnd, struct tcpcb),
-+        VMSTATE_UINT32(snd_ssthresh, struct tcpcb),
-+        VMSTATE_INT16(t_idle, struct tcpcb),
-+        VMSTATE_INT16(t_rtt, struct tcpcb),
-+        VMSTATE_UINT32(t_rtseq, struct tcpcb),
-+        VMSTATE_INT16(t_srtt, struct tcpcb),
-+        VMSTATE_INT16(t_rttvar, struct tcpcb),
-+        VMSTATE_UINT16(t_rttmin, struct tcpcb),
-+        VMSTATE_UINT32(max_sndwnd, struct tcpcb),
-+        VMSTATE_UINT8(t_oobflags, struct tcpcb),
-+        VMSTATE_UINT8(t_iobc, struct tcpcb),
-+        VMSTATE_INT16(t_softerror, struct tcpcb),
-+        VMSTATE_UINT8(snd_scale, struct tcpcb),
-+        VMSTATE_UINT8(rcv_scale, struct tcpcb),
-+        VMSTATE_UINT8(request_r_scale, struct tcpcb),
-+        VMSTATE_UINT8(requested_s_scale, struct tcpcb),
-+        VMSTATE_UINT32(ts_recent, struct tcpcb),
-+        VMSTATE_UINT32(ts_recent_age, struct tcpcb),
-+        VMSTATE_UINT32(last_ack_sent, struct tcpcb),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+/* The sbuf has a pair of pointers that are migrated as offsets;
-+ * we calculate the offsets and restore the pointers using
-+ * pre_save/post_load on a tmp structure.
-+ */
-+struct sbuf_tmp {
-+    struct sbuf *parent;
-+    uint32_t roff, woff;
-+};
-+
-+static int sbuf_tmp_pre_save(void *opaque)
-+{
-+    struct sbuf_tmp *tmp =3D opaque;
-+    tmp->woff =3D tmp->parent->sb_wptr - tmp->parent->sb_data;
-+    tmp->roff =3D tmp->parent->sb_rptr - tmp->parent->sb_data;
-+
-+    return 0;
-+}
-+
-+static int sbuf_tmp_post_load(void *opaque, int version)
-+{
-+    struct sbuf_tmp *tmp =3D opaque;
-+    uint32_t requested_len =3D tmp->parent->sb_datalen;
-+
-+    /* Allocate the buffer space used by the field after the tmp */
-+    sbreserve(tmp->parent, tmp->parent->sb_datalen);
-+
-+    if (tmp->parent->sb_datalen !=3D requested_len) {
-+        return -ENOMEM;
-+    }
-+    if (tmp->woff >=3D requested_len ||
-+        tmp->roff >=3D requested_len) {
-+        g_critical("invalid sbuf offsets r/w=3D%u/%u len=3D%u",
-+                   tmp->roff, tmp->woff, requested_len);
-+        return -EINVAL;
-+    }
-+
-+    tmp->parent->sb_wptr =3D tmp->parent->sb_data + tmp->woff;
-+    tmp->parent->sb_rptr =3D tmp->parent->sb_data + tmp->roff;
-+
-+    return 0;
-+}
-+
-+
-+static const VMStateDescription vmstate_slirp_sbuf_tmp =3D {
-+    .name =3D "slirp-sbuf-tmp",
-+    .post_load =3D sbuf_tmp_post_load,
-+    .pre_save  =3D sbuf_tmp_pre_save,
-+    .version_id =3D 0,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(woff, struct sbuf_tmp),
-+        VMSTATE_UINT32(roff, struct sbuf_tmp),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_slirp_sbuf =3D {
-+    .name =3D "slirp-sbuf",
-+    .version_id =3D 0,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(sb_cc, struct sbuf),
-+        VMSTATE_UINT32(sb_datalen, struct sbuf),
-+        VMSTATE_WITH_TMP(struct sbuf, struct sbuf_tmp, vmstate_slirp_sbu=
-f_tmp),
-+        VMSTATE_VBUFFER_UINT32(sb_data, struct sbuf, 0, NULL, sb_datalen=
-),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool slirp_older_than_v4(void *opaque, int version_id)
-+{
-+    return version_id < 4;
-+}
-+
-+static bool slirp_family_inet(void *opaque, int version_id)
-+{
-+    union slirp_sockaddr *ssa =3D (union slirp_sockaddr *)opaque;
-+    return ssa->ss.ss_family =3D=3D AF_INET;
-+}
-+
-+static int slirp_socket_pre_load(void *opaque)
-+{
-+    struct socket *so =3D opaque;
-+    if (tcp_attach(so) < 0) {
-+        return -ENOMEM;
-+    }
-+    /* Older versions don't load these fields */
-+    so->so_ffamily =3D AF_INET;
-+    so->so_lfamily =3D AF_INET;
-+    return 0;
-+}
-+
-+#ifndef _WIN32
-+#define VMSTATE_SIN4_ADDR(f, s, t) VMSTATE_UINT32_TEST(f, s, t)
++#ifdef _WIN32
++#include <winsock2.h>
++#include <windows.h>
 +#else
-+/* Win uses u_long rather than uint32_t - but it's still 32bits long */
-+#define VMSTATE_SIN4_ADDR(f, s, t) VMSTATE_SINGLE_TEST(f, s, t, 0, \
-+                                       vmstate_info_uint32, u_long)
++#include <sys/socket.h>
++#include <netinet/tcp.h>
++#include <netinet/in.h>
 +#endif
 +
-+/* The OS provided ss_family field isn't that portable; it's size
-+ * and type varies (16/8 bit, signed, unsigned)
-+ * and the values it contains aren't fully portable.
++#if defined(_WIN32)
++# define SLIRP_PACKED __attribute__((gcc_struct, packed))
++#else
++# define SLIRP_PACKED __attribute__((packed))
++#endif
++
++#ifndef DIV_ROUND_UP
++#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
++#endif
++
++#define SCALE_MS 1000000
++
++#ifndef container_of
++#define container_of(ptr, type, member) (__extension__({                =
+\
++                const typeof(((type *) 0)->member) *__mptr =3D (ptr);   =
+  \
++                (type *) ((char *) __mptr - offsetof(type, member));}))
++#endif
++
++#ifndef glue
++#define xglue(x, y) x ## y
++#define glue(x, y) xglue(x, y)
++#define stringify(s) tostring(s)
++#define tostring(s) #s
++#endif
++
++#if defined(_WIN32) /* CONFIG_IOVEC */
++# if !defined(IOV_MAX) /* XXX: to avoid duplicate with QEMU osdep.h */
++struct iovec {
++    void *iov_base;
++    size_t iov_len;
++};
++# endif
++#else
++#include <sys/uio.h>
++#endif
++
++#define ETH_ALEN    6
++#define ETH_HLEN    6
++#define ETH_P_IP                  (0x0800)      /* Internet Protocol pac=
+ket  */
++#define ETH_P_ARP                 (0x0806)      /* Address Resolution pa=
+cket */
++#define ETH_P_IPV6                (0x86dd)
++#define ETH_P_VLAN                (0x8100)
++#define ETH_P_DVLAN               (0x88a8)
++#define ETH_P_NCSI                (0x88f8)
++#define ETH_P_UNKNOWN             (0xffff)
++
++#ifdef _WIN32
++int slirp_closesocket(int fd);
++int slirp_ioctlsocket(int fd, int req, void *val);
++int inet_aton(const char *cp, struct in_addr *ia);
++#define slirp_getsockopt(sockfd, level, optname, optval, optlen) \
++    getsockopt(sockfd, level, optname, (void *)optval, optlen)
++#define slirp_setsockopt(sockfd, level, optname, optval, optlen)        =
+\
++    setsockopt(sockfd, level, optname, (const void *)optval, optlen)
++#define slirp_recv(sockfd, buf, len, flags) recv(sockfd, (void *)buf, le=
+n, flags)
++#else
++#define slirp_setsockopt setsockopt
++#define slirp_getsockopt getsockopt
++#define slirp_recv recv
++#define slirp_closesocket close
++#define slirp_ioctlsocket ioctl
++#endif
++
++int slirp_socket(int domain, int type, int protocol);
++
++static inline int socket_set_nodelay(int fd)
++{
++    int v =3D 1;
++    return slirp_setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &v, sizeof(v))=
+;
++}
++
++static inline int socket_set_fast_reuse(int fd)
++{
++#ifndef _WIN32
++    int v =3D 1;
++    return slirp_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &v, sizeof(v))=
+;
++#else
++    /* Enabling the reuse of an endpoint that was used by a socket still=
+ in
++     * TIME_WAIT state is usually performed by setting SO_REUSEADDR. On =
+Windows
++     * fast reuse is the default and SO_REUSEADDR does strange things. S=
+o we
++     * don't have to do anything here. More info can be found at:
++     * http://msdn.microsoft.com/en-us/library/windows/desktop/ms740621.=
+aspx */
++    return 0;
++#endif
++}
++
++static inline void pstrcpy(char *buf, int buf_size, const char *str)
++{
++    int c;
++    char *q =3D buf;
++
++    if (buf_size <=3D 0)
++        return;
++
++    for(;;) {
++        c =3D *str++;
++        if (c =3D=3D 0 || q >=3D buf + buf_size - 1)
++            break;
++        *q++ =3D c;
++    }
++    *q =3D '\0';
++}
++
++#endif
+diff --git a/slirp/arp_table.c b/slirp/arp_table.c
+index bf71b984ad..8ea655f79d 100644
+--- a/slirp/arp_table.c
++++ b/slirp/arp_table.c
+@@ -22,7 +22,6 @@
+  * THE SOFTWARE.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ void arp_table_add(Slirp *slirp, uint32_t ip_addr, uint8_t ethaddr[ETH_A=
+LEN])
+diff --git a/slirp/bootp.c b/slirp/bootp.c
+index 4c9a77eb98..d396849a05 100644
+--- a/slirp/bootp.c
++++ b/slirp/bootp.c
+@@ -21,7 +21,6 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+  * THE SOFTWARE.
+  */
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ #if defined(_WIN32)
+diff --git a/slirp/cksum.c b/slirp/cksum.c
+index 84c858fafb..25bfa67348 100644
+--- a/slirp/cksum.c
++++ b/slirp/cksum.c
+@@ -30,7 +30,6 @@
+  * in_cksum.c,v 1.2 1994/08/02 07:48:16 davidg Exp
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ /*
+diff --git a/slirp/dhcpv6.c b/slirp/dhcpv6.c
+index 752df40536..9ffba38e8f 100644
+--- a/slirp/dhcpv6.c
++++ b/slirp/dhcpv6.c
+@@ -20,8 +20,6 @@
+  * along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+=20
+-#include "qemu/osdep.h"
+-#include "qemu/log.h"
+ #include "slirp.h"
+ #include "dhcpv6.h"
+=20
+diff --git a/slirp/dnssearch.c b/slirp/dnssearch.c
+index 8fb563321b..c459cece8d 100644
+--- a/slirp/dnssearch.c
++++ b/slirp/dnssearch.c
+@@ -22,7 +22,6 @@
+  * THE SOFTWARE.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ static const uint8_t RFC3397_OPT_DOMAIN_SEARCH =3D 119;
+diff --git a/slirp/if.c b/slirp/if.c
+index 73e3705740..2ad03b8a79 100644
+--- a/slirp/if.c
++++ b/slirp/if.c
+@@ -5,9 +5,7 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+-#include "qemu/timer.h"
+=20
+ static void
+ ifs_insque(struct mbuf *ifm, struct mbuf *ifmhead)
+diff --git a/slirp/ip6_icmp.c b/slirp/ip6_icmp.c
+index e72c57a81d..2a432ebbd4 100644
+--- a/slirp/ip6_icmp.c
++++ b/slirp/ip6_icmp.c
+@@ -3,12 +3,8 @@
+  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip6_icmp.h"
+-#include "qemu/timer.h"
+-#include "qemu/error-report.h"
+-#include "qemu/log.h"
+=20
+ #define NDP_Interval g_rand_int_range(slirp->grand, \
+         NDP_MinRtrAdvInterval, NDP_MaxRtrAdvInterval)
+diff --git a/slirp/ip6_input.c b/slirp/ip6_input.c
+index ab656a0a9d..1b8c003c66 100644
+--- a/slirp/ip6_input.c
++++ b/slirp/ip6_input.c
+@@ -3,7 +3,6 @@
+  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip6_icmp.h"
+=20
+diff --git a/slirp/ip6_output.c b/slirp/ip6_output.c
+index 52c88ad691..19d1ae7748 100644
+--- a/slirp/ip6_output.c
++++ b/slirp/ip6_output.c
+@@ -3,8 +3,6 @@
+  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+  */
+=20
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "slirp.h"
+=20
+ /* Number of packets queued before we start sending
+diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
+index 7c7e042049..e2e673ceaa 100644
+--- a/slirp/ip_icmp.c
++++ b/slirp/ip_icmp.c
+@@ -30,7 +30,6 @@
+  * ip_icmp.c,v 1.7 1995/05/30 08:09:42 rgrimes Exp
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip_icmp.h"
+=20
+@@ -83,7 +82,7 @@ static int icmp_send(struct socket *so, struct mbuf *m,=
+ int hlen)
+     struct ip *ip =3D mtod(m, struct ip *);
+     struct sockaddr_in addr;
+=20
+-    so->s =3D qemu_socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
++    so->s =3D slirp_socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+     if (so->s =3D=3D -1) {
+         return -1;
+     }
+@@ -114,7 +113,7 @@ static int icmp_send(struct socket *so, struct mbuf *=
+m, int hlen)
+=20
+ void icmp_detach(struct socket *so)
+ {
+-    closesocket(so->s);
++    slirp_closesocket(so->s);
+     sofree(so);
+ }
+=20
+@@ -421,7 +420,7 @@ void icmp_receive(struct socket *so)
+     icp =3D mtod(m, struct icmp *);
+=20
+     id =3D icp->icmp_id;
+-    len =3D qemu_recv(so->s, icp, M_ROOM(m), 0);
++    len =3D slirp_recv(so->s, icp, M_ROOM(m), 0);
+     /*
+      * The behavior of reading SOCK_DGRAM+IPPROTO_ICMP sockets is incons=
+istent
+      * between host OSes.  On Linux, only the ICMP header and payload is
+diff --git a/slirp/ip_input.c b/slirp/ip_input.c
+index 6831526320..cfda30fccd 100644
+--- a/slirp/ip_input.c
++++ b/slirp/ip_input.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip_icmp.h"
+=20
+diff --git a/slirp/ip_output.c b/slirp/ip_output.c
+index db403f04c1..f6ec141df5 100644
+--- a/slirp/ip_output.c
++++ b/slirp/ip_output.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ /* Number of packets queued before we start sending
+diff --git a/slirp/mbuf.c b/slirp/mbuf.c
+index d8d275e0e7..521c02c967 100644
+--- a/slirp/mbuf.c
++++ b/slirp/mbuf.c
+@@ -15,7 +15,6 @@
+  * the flags
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ #define MBUF_THRESH 30
+diff --git a/slirp/misc.c b/slirp/misc.c
+index 7789cefefa..5b1c526f17 100644
+--- a/slirp/misc.c
++++ b/slirp/misc.c
+@@ -5,11 +5,8 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "libslirp.h"
+-#include "qemu/error-report.h"
+-#include "qemu/main-loop.h"
+=20
+ inline void
+ insque(void *a, void *b)
+@@ -83,14 +80,14 @@ slirp_socketpair_with_oob(int sv[2])
+     int ret, s;
+=20
+     sv[1] =3D -1;
+-    s =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
++    s =3D slirp_socket(AF_INET, SOCK_STREAM, 0);
+     if (s < 0 || bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
+         listen(s, 1) < 0 ||
+         getsockname(s, (struct sockaddr *)&addr, &addrlen) < 0) {
+         goto err;
+     }
+=20
+-    sv[1] =3D qemu_socket(AF_INET, SOCK_STREAM, 0);
++    sv[1] =3D slirp_socket(AF_INET, SOCK_STREAM, 0);
+     if (sv[1] < 0) {
+         goto err;
+     }
+@@ -113,16 +110,16 @@ slirp_socketpair_with_oob(int sv[2])
+         goto err;
+     }
+=20
+-    closesocket(s);
++    slirp_closesocket(s);
+     return 0;
+=20
+ err:
+     g_critical("slirp_socketpair(): %s", strerror(errno));
+     if (s >=3D 0) {
+-        closesocket(s);
++        slirp_closesocket(s);
+     }
+     if (sv[1] >=3D 0) {
+-        closesocket(sv[1]);
++        slirp_closesocket(sv[1]);
+     }
+     return -1;
+ }
+@@ -162,16 +159,16 @@ fork_exec(struct socket *so, const char *ex)
+     if (err) {
+         g_critical("fork_exec: %s", err->message);
+         g_error_free(err);
+-        closesocket(sp[0]);
+-        closesocket(sp[1]);
++        slirp_closesocket(sp[0]);
++        slirp_closesocket(sp[1]);
+         return 0;
+     }
+=20
+     so->s =3D sp[0];
+-    closesocket(sp[1]);
++    slirp_closesocket(sp[1]);
+     socket_set_fast_reuse(so->s);
+     opt =3D 1;
+-    qemu_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
++    slirp_setsockopt(so->s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int))=
+;
+     so->slirp->cb->set_nonblock(so->s);
+     return 1;
+ }
+diff --git a/slirp/ncsi.c b/slirp/ncsi.c
+index 8594382270..327f17543c 100644
+--- a/slirp/ncsi.c
++++ b/slirp/ncsi.c
+@@ -6,7 +6,6 @@
+  * This code is licensed under the GPL version 2 or later. See the
+  * COPYING file in the top-level directory.
+  */
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ #include "ncsi-pkt.h"
+diff --git a/slirp/ndp_table.c b/slirp/ndp_table.c
+index b7b73722f7..34ea4fdf1f 100644
+--- a/slirp/ndp_table.c
++++ b/slirp/ndp_table.c
+@@ -3,8 +3,6 @@
+  * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.
+  */
+=20
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "slirp.h"
+=20
+ void ndp_table_add(Slirp *slirp, struct in6_addr ip_addr,
+diff --git a/slirp/sbuf.c b/slirp/sbuf.c
+index 17f28e97a6..51a9f0cc7d 100644
+--- a/slirp/sbuf.c
++++ b/slirp/sbuf.c
+@@ -5,9 +5,7 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+-#include "qemu/main-loop.h"
+=20
+ static void sbappendsb(struct sbuf *sb, struct mbuf *m);
+=20
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index a1f42c8b19..39c0370e19 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -21,14 +21,7 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+  * THE SOFTWARE.
+  */
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "qemu/timer.h"
+-#include "qemu/error-report.h"
+-#include "migration/register.h"
+ #include "slirp.h"
+-#include "hw/hw.h"
+-#include "qemu/cutils.h"
+=20
+ #ifdef WITH_QEMU
+ #include "state.h"
+diff --git a/slirp/socket.c b/slirp/socket.c
+index 4d5be38747..7ae88b8e87 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -5,8 +5,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "slirp.h"
+ #include "ip_icmp.h"
+ #ifdef __sun__
+@@ -187,7 +185,7 @@ soread(struct socket *so)
+ 	 */
+ 	sopreprbuf(so, iov, &n);
+=20
+-	nn =3D qemu_recv(so->s, iov[0].iov_base, iov[0].iov_len,0);
++	nn =3D slirp_recv(so->s, iov[0].iov_base, iov[0].iov_len,0);
+ 	if (nn <=3D 0) {
+ 		if (nn < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN))
+ 			return 0;
+@@ -203,7 +201,7 @@ soread(struct socket *so)
+ 				if (getpeername(so->s, paddr, &alen) < 0) {
+ 					err =3D errno;
+ 				} else {
+-					getsockopt(so->s, SOL_SOCKET, SO_ERROR,
++					slirp_getsockopt(so->s, SOL_SOCKET, SO_ERROR,
+ 						&err, &elen);
+ 				}
+ 			}
+@@ -233,7 +231,7 @@ soread(struct socket *so)
+ 	 */
+ 	if (n =3D=3D 2 && nn =3D=3D iov[0].iov_len) {
+             int ret;
+-            ret =3D qemu_recv(so->s, iov[1].iov_base, iov[1].iov_len,0);
++            ret =3D slirp_recv(so->s, iov[1].iov_base, iov[1].iov_len,0)=
+;
+             if (ret > 0)
+                 nn +=3D ret;
+         }
+@@ -554,7 +552,7 @@ sorecvfrom(struct socket *so)
+ 	   */
+ 	  len =3D M_FREEROOM(m);
+ 	  /* if (so->so_fport !=3D htons(53)) { */
+-	  ioctlsocket(so->s, FIONREAD, &n);
++	  slirp_ioctlsocket(so->s, FIONREAD, &n);
+=20
+ 	  if (n > len) {
+ 	    n =3D (m->m_data - m->m_dat) + m->m_len + n + 1;
+@@ -719,14 +717,14 @@ tcp_listen(Slirp *slirp, uint32_t haddr, u_int hpor=
+t, uint32_t laddr,
+ 	addr.sin_addr.s_addr =3D haddr;
+ 	addr.sin_port =3D hport;
+=20
+-	if (((s =3D qemu_socket(AF_INET,SOCK_STREAM,0)) < 0) ||
++	if (((s =3D slirp_socket(AF_INET,SOCK_STREAM,0)) < 0) ||
+ 	    (socket_set_fast_reuse(s) < 0) ||
+ 	    (bind(s,(struct sockaddr *)&addr, sizeof(addr)) < 0) ||
+ 	    (listen(s,1) < 0)) {
+ 		int tmperrno =3D errno; /* Don't clobber the real reason we failed */
+=20
+                 if (s >=3D 0) {
+-                    closesocket(s);
++                    slirp_closesocket(s);
+                 }
+ 		sofree(so);
+ 		/* Restore the real errno */
+@@ -737,9 +735,9 @@ tcp_listen(Slirp *slirp, uint32_t haddr, u_int hport,=
+ uint32_t laddr,
+ #endif
+ 		return NULL;
+ 	}
+-	qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
++	slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
+ 	opt =3D 1;
+-	qemu_setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(int));
++	slirp_setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(int));
+=20
+ 	getsockname(s,(struct sockaddr *)&addr,&addrlen);
+ 	so->so_ffamily =3D AF_INET;
+diff --git a/slirp/tcp_input.c b/slirp/tcp_input.c
+index f205a1e6cb..3cd6277672 100644
+--- a/slirp/tcp_input.c
++++ b/slirp/tcp_input.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip_icmp.h"
+=20
+diff --git a/slirp/tcp_output.c b/slirp/tcp_output.c
+index 2f7f90d67e..f02b94b8f0 100644
+--- a/slirp/tcp_output.c
++++ b/slirp/tcp_output.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ static const u_char  tcp_outflags[TCP_NSTATES] =3D {
+diff --git a/slirp/tcp_subr.c b/slirp/tcp_subr.c
+index 3b15148187..4e486093c0 100644
+--- a/slirp/tcp_subr.c
++++ b/slirp/tcp_subr.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ /* patchable/settable parameters for tcp */
+@@ -337,7 +336,7 @@ tcp_close(struct tcpcb *tp)
+ 	/* clobber input socket cache if we're closing the cached connection */
+ 	if (so =3D=3D slirp->tcp_last_so)
+ 		slirp->tcp_last_so =3D &slirp->tcb;
+-	closesocket(so->s);
++	slirp_closesocket(so->s);
+ 	sbfree(&so->so_rcv);
+ 	sbfree(&so->so_snd);
+ 	sofree(so);
+@@ -407,7 +406,7 @@ int tcp_fconnect(struct socket *so, unsigned short af=
+)
+   DEBUG_CALL("tcp_fconnect");
+   DEBUG_ARG("so =3D %p", so);
+=20
+-  ret =3D so->s =3D qemu_socket(af, SOCK_STREAM, 0);
++  ret =3D so->s =3D slirp_socket(af, SOCK_STREAM, 0);
+   if (ret >=3D 0) {
+     int opt, s=3Dso->s;
+     struct sockaddr_storage addr;
+@@ -415,9 +414,9 @@ int tcp_fconnect(struct socket *so, unsigned short af=
+)
+     so->slirp->cb->set_nonblock(s);
+     socket_set_fast_reuse(s);
+     opt =3D 1;
+-    qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
++    slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(opt));
+     opt =3D 1;
+-    qemu_setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt));
++    slirp_setsockopt(s, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt));
+=20
+     addr =3D so->fhost.ss;
+     DEBUG_CALL(" connect()ing");
+@@ -487,7 +486,7 @@ void tcp_connect(struct socket *inso)
+     so->slirp->cb->set_nonblock(s);
+     socket_set_fast_reuse(s);
+     opt =3D 1;
+-    qemu_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
++    slirp_setsockopt(s, SOL_SOCKET, SO_OOBINLINE, &opt, sizeof(int));
+     socket_set_nodelay(s);
+=20
+     so->fhost.ss =3D addr;
+@@ -496,7 +495,7 @@ void tcp_connect(struct socket *inso)
+     /* Close the accept() socket, set right state */
+     if (inso->so_state & SS_FACCEPTONCE) {
+         /* If we only accept once, close the accept() socket */
+-        closesocket(so->s);
++        slirp_closesocket(so->s);
+=20
+         /* Don't select it yet, even though we have an FD */
+         /* if it's not FACCEPTONCE, it's already NOFDREF */
+diff --git a/slirp/tcp_timer.c b/slirp/tcp_timer.c
+index d953a16386..ebc9d16f06 100644
+--- a/slirp/tcp_timer.c
++++ b/slirp/tcp_timer.c
+@@ -30,7 +30,6 @@
+  * tcp_timer.c,v 1.2 1994/08/02 07:49:10 davidg Exp
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+=20
+ static struct tcpcb *tcp_timers(register struct tcpcb *tp, int timer);
+diff --git a/slirp/tftp.c b/slirp/tftp.c
+index 6fb381ef33..eae7f7c7f2 100644
+--- a/slirp/tftp.c
++++ b/slirp/tftp.c
+@@ -22,10 +22,11 @@
+  * THE SOFTWARE.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+-#include "qemu-common.h"
+-#include "qemu/cutils.h"
++
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
+=20
+ static inline int tftp_session_in_use(struct tftp_session *spt)
+ {
+diff --git a/slirp/udp.c b/slirp/udp.c
+index 4cf0d34d64..e49a8862d4 100644
+--- a/slirp/udp.c
++++ b/slirp/udp.c
+@@ -38,7 +38,6 @@
+  * terms and conditions of the copyright.
+  */
+=20
+-#include "qemu/osdep.h"
+ #include "slirp.h"
+ #include "ip_icmp.h"
+=20
+@@ -281,7 +280,7 @@ int udp_output(struct socket *so, struct mbuf *m,
+ int
+ udp_attach(struct socket *so, unsigned short af)
+ {
+-  so->s =3D qemu_socket(af, SOCK_DGRAM, 0);
++  so->s =3D slirp_socket(af, SOCK_DGRAM, 0);
+   if (so->s !=3D -1) {
+     so->so_expire =3D curtime + SO_EXPIRE;
+     insque(so, &so->slirp->udb);
+@@ -292,7 +291,7 @@ udp_attach(struct socket *so, unsigned short af)
+ void
+ udp_detach(struct socket *so)
+ {
+-	closesocket(so->s);
++	slirp_closesocket(so->s);
+ 	sofree(so);
+ }
+=20
+@@ -327,7 +326,7 @@ udp_listen(Slirp *slirp, uint32_t haddr, u_int hport,=
+ uint32_t laddr,
+ 	socklen_t addrlen =3D sizeof(struct sockaddr_in);
+=20
+ 	so =3D socreate(slirp);
+-	so->s =3D qemu_socket(AF_INET,SOCK_DGRAM,0);
++	so->s =3D slirp_socket(AF_INET,SOCK_DGRAM,0);
+         if (so->s < 0) {
+             sofree(so);
+             return NULL;
+diff --git a/slirp/udp6.c b/slirp/udp6.c
+index fa531e03c4..be5cba1f54 100644
+--- a/slirp/udp6.c
++++ b/slirp/udp6.c
+@@ -3,8 +3,6 @@
+  * Guillaume Subiron
+  */
+=20
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "slirp.h"
+ #include "udp.h"
+ #include "dhcpv6.h"
+diff --git a/slirp/util.c b/slirp/util.c
+new file mode 100644
+index 0000000000..b1a36b27bc
+--- /dev/null
++++ b/slirp/util.c
+@@ -0,0 +1,176 @@
++/*
++ * util.c (mostly based on QEMU os-win32.c)
++ *
++ * Copyright (c) 2003-2008 Fabrice Bellard
++ * Copyright (c) 2010-2016 Red Hat, Inc.
++ *
++ * QEMU library functions for win32 which are shared between QEMU and
++ * the QEMU tools.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
 + */
-+typedef struct SS_FamilyTmpStruct {
-+    union slirp_sockaddr    *parent;
-+    uint16_t                 portable_family;
-+} SS_FamilyTmpStruct;
++#include "util.h"
 +
-+#define SS_FAMILY_MIG_IPV4   2  /* Linux, BSD, Win... */
-+#define SS_FAMILY_MIG_IPV6  10  /* Linux */
-+#define SS_FAMILY_MIG_OTHER 0xffff
++#include <glib.h>
++#include <fcntl.h>
++#include <stdint.h>
 +
-+static int ss_family_pre_save(void *opaque)
++#if defined(_WIN32) && !defined(WITH_QEMU)
++int inet_aton(const char *cp, struct in_addr *ia)
 +{
-+    SS_FamilyTmpStruct *tss =3D opaque;
-+
-+    tss->portable_family =3D SS_FAMILY_MIG_OTHER;
-+
-+    if (tss->parent->ss.ss_family =3D=3D AF_INET) {
-+        tss->portable_family =3D SS_FAMILY_MIG_IPV4;
-+    } else if (tss->parent->ss.ss_family =3D=3D AF_INET6) {
-+        tss->portable_family =3D SS_FAMILY_MIG_IPV6;
++    uint32_t addr =3D inet_addr(cp);
++    if (addr =3D=3D 0xffffffff) {
++        return 0;
 +    }
-+
-+    return 0;
++    ia->s_addr =3D addr;
++    return 1;
 +}
-+
-+static int ss_family_post_load(void *opaque, int version_id)
-+{
-+    SS_FamilyTmpStruct *tss =3D opaque;
-+
-+    switch (tss->portable_family) {
-+    case SS_FAMILY_MIG_IPV4:
-+        tss->parent->ss.ss_family =3D AF_INET;
-+        break;
-+    case SS_FAMILY_MIG_IPV6:
-+    case 23: /* compatibility: AF_INET6 from mingw */
-+    case 28: /* compatibility: AF_INET6 from FreeBSD sys/socket.h */
-+        tss->parent->ss.ss_family =3D AF_INET6;
-+        break;
-+    default:
-+        g_critical("invalid ss_family type %x", tss->portable_family);
-+        return -EINVAL;
-+    }
-+
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_slirp_ss_family =3D {
-+    .name =3D "slirp-socket-addr/ss_family",
-+    .pre_save  =3D ss_family_pre_save,
-+    .post_load =3D ss_family_post_load,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT16(portable_family, SS_FamilyTmpStruct),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_slirp_socket_addr =3D {
-+    .name =3D "slirp-socket-addr",
-+    .version_id =3D 4,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_WITH_TMP(union slirp_sockaddr, SS_FamilyTmpStruct,
-+                            vmstate_slirp_ss_family),
-+        VMSTATE_SIN4_ADDR(sin.sin_addr.s_addr, union slirp_sockaddr,
-+                            slirp_family_inet),
-+        VMSTATE_UINT16_TEST(sin.sin_port, union slirp_sockaddr,
-+                            slirp_family_inet),
-+
-+#if 0
-+        /* Untested: Needs checking by someone with IPv6 test */
-+        VMSTATE_BUFFER_TEST(sin6.sin6_addr, union slirp_sockaddr,
-+                            slirp_family_inet6),
-+        VMSTATE_UINT16_TEST(sin6.sin6_port, union slirp_sockaddr,
-+                            slirp_family_inet6),
-+        VMSTATE_UINT32_TEST(sin6.sin6_flowinfo, union slirp_sockaddr,
-+                            slirp_family_inet6),
-+        VMSTATE_UINT32_TEST(sin6.sin6_scope_id, union slirp_sockaddr,
-+                            slirp_family_inet6),
 +#endif
 +
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_slirp_socket =3D {
-+    .name =3D "slirp-socket",
-+    .version_id =3D 4,
-+    .pre_load =3D slirp_socket_pre_load,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(so_urgc, struct socket),
-+        /* Pre-v4 versions */
-+        VMSTATE_SIN4_ADDR(so_faddr.s_addr, struct socket,
-+                            slirp_older_than_v4),
-+        VMSTATE_SIN4_ADDR(so_laddr.s_addr, struct socket,
-+                            slirp_older_than_v4),
-+        VMSTATE_UINT16_TEST(so_fport, struct socket, slirp_older_than_v4=
-),
-+        VMSTATE_UINT16_TEST(so_lport, struct socket, slirp_older_than_v4=
-),
-+        /* v4 and newer */
-+        VMSTATE_STRUCT(fhost, struct socket, 4, vmstate_slirp_socket_add=
-r,
-+                       union slirp_sockaddr),
-+        VMSTATE_STRUCT(lhost, struct socket, 4, vmstate_slirp_socket_add=
-r,
-+                       union slirp_sockaddr),
-+
-+        VMSTATE_UINT8(so_iptos, struct socket),
-+        VMSTATE_UINT8(so_emu, struct socket),
-+        VMSTATE_UINT8(so_type, struct socket),
-+        VMSTATE_INT32(so_state, struct socket),
-+        VMSTATE_STRUCT(so_rcv, struct socket, 0, vmstate_slirp_sbuf,
-+                       struct sbuf),
-+        VMSTATE_STRUCT(so_snd, struct socket, 0, vmstate_slirp_sbuf,
-+                       struct sbuf),
-+        VMSTATE_STRUCT_POINTER(so_tcpcb, struct socket, vmstate_slirp_tc=
-p,
-+                       struct tcpcb),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_slirp_bootp_client =3D {
-+    .name =3D "slirp_bootpclient",
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT16(allocated, BOOTPClient),
-+        VMSTATE_BUFFER(macaddr, BOOTPClient),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_slirp =3D {
-+    .name =3D "slirp",
-+    .version_id =3D 4,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT16_V(ip_id, Slirp, 2),
-+        VMSTATE_STRUCT_ARRAY(bootp_clients, Slirp, NB_BOOTP_CLIENTS, 3,
-+                             vmstate_slirp_bootp_client, BOOTPClient),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void slirp_state_save(QEMUFile *f, void *opaque)
++static void slirp_set_cloexec(int fd)
 +{
-+    Slirp *slirp =3D opaque;
-+    struct gfwd_list *ex_ptr;
-+
-+    for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_ptr->ex_=
-next)
-+        if (ex_ptr->write_cb) {
-+            struct socket *so;
-+            so =3D slirp_find_ctl_socket(slirp, ex_ptr->ex_addr,
-+                                       ntohs(ex_ptr->ex_fport));
-+            if (!so) {
-+                continue;
-+            }
-+
-+            qemu_put_byte(f, 42);
-+            vmstate_save_state(f, &vmstate_slirp_socket, so, NULL);
-+        }
-+    qemu_put_byte(f, 0);
-+
-+    vmstate_save_state(f, &vmstate_slirp, slirp, NULL);
++#ifndef _WIN32
++    int f;
++    f =3D fcntl(fd, F_GETFD);
++    assert(f !=3D -1);
++    f =3D fcntl(fd, F_SETFD, f | FD_CLOEXEC);
++    assert(f !=3D -1);
++#endif
 +}
 +
-+
-+static int slirp_state_load(QEMUFile *f, void *opaque, int version_id)
++/*
++ * Opens a socket with FD_CLOEXEC set
++ */
++int slirp_socket(int domain, int type, int protocol)
 +{
-+    Slirp *slirp =3D opaque;
-+    struct gfwd_list *ex_ptr;
++    int ret;
 +
-+    while (qemu_get_byte(f)) {
-+        int ret;
-+        struct socket *so =3D socreate(slirp);
-+
-+        ret =3D vmstate_load_state(f, &vmstate_slirp_socket, so, version=
-_id);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+
-+        if ((so->so_faddr.s_addr & slirp->vnetwork_mask.s_addr) !=3D
-+            slirp->vnetwork_addr.s_addr) {
-+            return -EINVAL;
-+        }
-+        for (ex_ptr =3D slirp->guestfwd_list; ex_ptr; ex_ptr =3D ex_ptr-=
->ex_next) {
-+            if (ex_ptr->write_cb &&
-+                so->so_faddr.s_addr =3D=3D ex_ptr->ex_addr.s_addr &&
-+                so->so_fport =3D=3D ex_ptr->ex_fport) {
-+                break;
-+            }
-+        }
-+        if (!ex_ptr) {
-+            return -EINVAL;
-+        }
++#ifdef SOCK_CLOEXEC
++    ret =3D socket(domain, type | SOCK_CLOEXEC, protocol);
++    if (ret !=3D -1 || errno !=3D EINVAL) {
++        return ret;
++    }
++#endif
++    ret =3D socket(domain, type, protocol);
++    if (ret >=3D 0) {
++        slirp_set_cloexec(ret);
 +    }
 +
-+    return vmstate_load_state(f, &vmstate_slirp, slirp, version_id);
++    return ret;
 +}
 +
-+void slirp_state_register(Slirp *slirp)
++#ifdef _WIN32
++static int socket_error(void)
 +{
-+    static SaveVMHandlers savevm_slirp_state =3D {
-+        .save_state =3D slirp_state_save,
-+        .load_state =3D slirp_state_load,
-+    };
-+
-+    register_savevm_live(NULL, "slirp", 0, 4, &savevm_slirp_state, slirp=
-);
++    switch (WSAGetLastError()) {
++    case 0:
++        return 0;
++    case WSAEINTR:
++        return EINTR;
++    case WSAEINVAL:
++        return EINVAL;
++    case WSA_INVALID_HANDLE:
++        return EBADF;
++    case WSA_NOT_ENOUGH_MEMORY:
++        return ENOMEM;
++    case WSA_INVALID_PARAMETER:
++        return EINVAL;
++    case WSAENAMETOOLONG:
++        return ENAMETOOLONG;
++    case WSAENOTEMPTY:
++        return ENOTEMPTY;
++    case WSAEWOULDBLOCK:
++         /* not using EWOULDBLOCK as we don't want code to have
++          * to check both EWOULDBLOCK and EAGAIN */
++        return EAGAIN;
++    case WSAEINPROGRESS:
++        return EINPROGRESS;
++    case WSAEALREADY:
++        return EALREADY;
++    case WSAENOTSOCK:
++        return ENOTSOCK;
++    case WSAEDESTADDRREQ:
++        return EDESTADDRREQ;
++    case WSAEMSGSIZE:
++        return EMSGSIZE;
++    case WSAEPROTOTYPE:
++        return EPROTOTYPE;
++    case WSAENOPROTOOPT:
++        return ENOPROTOOPT;
++    case WSAEPROTONOSUPPORT:
++        return EPROTONOSUPPORT;
++    case WSAEOPNOTSUPP:
++        return EOPNOTSUPP;
++    case WSAEAFNOSUPPORT:
++        return EAFNOSUPPORT;
++    case WSAEADDRINUSE:
++        return EADDRINUSE;
++    case WSAEADDRNOTAVAIL:
++        return EADDRNOTAVAIL;
++    case WSAENETDOWN:
++        return ENETDOWN;
++    case WSAENETUNREACH:
++        return ENETUNREACH;
++    case WSAENETRESET:
++        return ENETRESET;
++    case WSAECONNABORTED:
++        return ECONNABORTED;
++    case WSAECONNRESET:
++        return ECONNRESET;
++    case WSAENOBUFS:
++        return ENOBUFS;
++    case WSAEISCONN:
++        return EISCONN;
++    case WSAENOTCONN:
++        return ENOTCONN;
++    case WSAETIMEDOUT:
++        return ETIMEDOUT;
++    case WSAECONNREFUSED:
++        return ECONNREFUSED;
++    case WSAELOOP:
++        return ELOOP;
++    case WSAEHOSTUNREACH:
++        return EHOSTUNREACH;
++    default:
++        return EIO;
++    }
 +}
 +
-+void slirp_state_unregister(Slirp *slirp)
++#undef ioctlsocket
++int slirp_ioctlsocket(int fd, int req, void *val)
 +{
-+    unregister_savevm(NULL, "slirp", slirp);
++    int ret;
++    ret =3D ioctlsocket(fd, req, val);
++    if (ret < 0) {
++        errno =3D socket_error();
++    }
++    return ret;
 +}
++
++#undef closesocket
++int slirp_closesocket(int fd)
++{
++    int ret;
++    ret =3D closesocket(fd);
++    if (ret < 0) {
++        errno =3D socket_error();
++    }
++    return ret;
++}
++#endif /* WIN32 */
 diff --git a/slirp/Makefile.objs b/slirp/Makefile.objs
-index 959558c732..7abc7549ab 100644
+index 7abc7549ab..61cdcc6877 100644
 --- a/slirp/Makefile.objs
 +++ b/slirp/Makefile.objs
-@@ -20,6 +20,7 @@ slirp.mo-objs =3D \
- 	sbuf.o \
- 	slirp.o \
- 	socket.o \
-+	state.o \
- 	tcp_input.o \
- 	tcp_output.o \
- 	tcp_subr.o \
-@@ -29,4 +30,4 @@ slirp.mo-objs =3D \
+@@ -28,6 +28,7 @@ slirp.mo-objs =3D \
+ 	tftp.o \
+ 	udp.o \
  	udp6.o \
++	util.o \
  	$(NULL)
 =20
--slirp.mo-cflags =3D -DG_LOG_DOMAIN=3D\"Slirp\"
-+slirp.mo-cflags =3D -DG_LOG_DOMAIN=3D\"Slirp\" -DWITH_QEMU=3D1
+ slirp.mo-cflags =3D -DG_LOG_DOMAIN=3D\"Slirp\" -DWITH_QEMU=3D1
 --=20
 2.20.0.rc1
