@@ -1,31 +1,27 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:36806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gPNGA-00017i-Bv
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:49:19 -0500
+	(envelope-from <yan.y.zhao@intel.com>) id 1gPNGB-00017i-HC
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:49:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gPN7P-0008K8-6K
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:40:18 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40650)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gPN7O-0008Ga-VA
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:40:15 -0500
-Received: by mail-wm1-x343.google.com with SMTP id q26so4639632wmf.5
-	for <qemu-devel@nongnu.org>; Tue, 20 Nov 2018 23:40:14 -0800 (PST)
-References: <cover.1542321076.git.alistair.francis@wdc.com>
-	<f1a7d2617c26c1745fafe13bbe3bc3b042c14217.1542321076.git.alistair.francis@wdc.com>
-	<23831afc-0ebf-5802-e8e2-6ce48dd340f9@linaro.org>
-	<CAKmqyKP5cCRZujTm+OvoNZWNwPhJirPLA7PjurbovnN8RYCcgQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8bacdaca-94c2-d2c7-3af7-b98517a98b64@linaro.org>
-Date: Wed, 21 Nov 2018 08:40:11 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAKmqyKP5cCRZujTm+OvoNZWNwPhJirPLA7PjurbovnN8RYCcgQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <yan.y.zhao@intel.com>) id 1gPN6R-0006MG-Ta
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:39:19 -0500
+Received: from mga03.intel.com ([134.134.136.65]:36433)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1gPN6R-0006J7-ID
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 02:39:15 -0500
+From: "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Date: Wed, 21 Nov 2018 07:39:05 +0000
+Message-ID: <F22B14EC3CFBB843AD3E03B6B78F2C6A4AD3D596@SHSMSX104.ccr.corp.intel.com>
+References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
+	<1542746383-18288-4-git-send-email-kwankhede@nvidia.com>
+In-Reply-To: <1542746383-18288-4-git-send-email-kwankhede@nvidia.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v1 15/23] riscv: tcg-target: Add branch and
- jump instructions
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO
+ devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,61 +30,934 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
-
-On 11/21/18 12:49 AM, Alistair Francis wrote:
-> On Fri, Nov 16, 2018 at 1:14 AM Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> On 11/15/18 11:36 PM, Alistair Francis wrote:
->>> +static void tcg_out_brcond(TCGContext *s, TCGCond cond, TCGReg arg1,
->>> +                           TCGReg arg2, TCGLabel *l)
->>> +{
->>> +    RISCVInsn op = tcg_brcond_to_riscv[cond].op;
->>> +    bool swap = tcg_brcond_to_riscv[cond].swap;
->>> +
->>> +    tcg_out_opc_branch(s, op, swap ? arg2 : arg1, swap ? arg1 : arg2, 0);
->>
->> You might want to tcg_debug_assert(op != 0) here.
->>
->>> +    if (l->has_value) {
->>> +        reloc_sbimm12(s->code_ptr - 1, l->u.value_ptr);
->>
->> I'm concerned about the conditional branch range.  +-4K isn't much to work
->> with.  The minimum we have for other hosts is +-32K.
->>
->> We have two options: (1) greatly reduce the max size of the TB for this host;
->> (2) be prepared to emit a 2 insn sequence: conditional branch across
->> unconditional branch, with forward branches that turn out to be small patched
->> with a nop.
->>
->> FWIW, the first case would be done via modification of tcg_op_buf_full.  You
->> might have to go as low as 500 opcodes, I'm not sure.
-> 
-> How do we do option 2?
-
-If l->has_value, just check the actual range.  But of course backward branching
-isn't that common in tcg generated code.  Most branches within the TB are short
-forward branches, but we also don't know how short is short.
-
-But every TB begins with a test of env->exit_code and a conditional branch to
-the end of the block, where we place some code to return to the main loop and
-return the pointer to the TB at which we exited.  Thus every TB has a branch
-that spans the size of the entire TB.
-
-So, invent (or repurpose) an R_RISCV_FOO value.  It doesn't matter which
-because it's private within tcg/riscv/.  Just add some commentary.  (See e.g.
-tcg/sparc/ and its use of R_SPARC_13.)
-
-While generating code, emit the conditional branch as normal; leave the unknown
-destination 0 for now.  Emit a nop as the second insn.
-
-When resolving R_RISCV_FOO, if the conditional branch is in range, great!  Just
-patch it.  If it is out of range, then you need to edit the conditional branch
-to reverse the condition (insn ^ (1 << 12)) and branch to pc+8, i.e. over the
-next instruction.  Which was a nop during generation, but you will now install
-jal r0,dest going to the real destination.
+To: Kirti Wankhede <kwankhede@nvidia.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+	Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "Yang, Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>
 
 
-r~
+
+> -----Original Message-----
+> From: Qemu-devel [mailto:qemu-devel-
+> bounces+yan.y.zhao=3Dintel.com@nongnu.org] On Behalf Of Kirti Wankhede
+> Sent: Wednesday, November 21, 2018 4:40 AM
+> To: alex.williamson@redhat.com; cjia@nvidia.com
+> Cc: Zhengxiao.zx@Alibaba-inc.com; Tian, Kevin <kevin.tian@intel.com>; Liu=
+, Yi L
+> <yi.l.liu@intel.com>; eskultet@redhat.com; Yang, Ziye <ziye.yang@intel.co=
+m>;
+> qemu-devel@nongnu.org; cohuck@redhat.com; shuangtai.tst@alibaba-inc.com;
+> dgilbert@redhat.com; Wang, Zhi A <zhi.a.wang@intel.com>;
+> mlevitsk@redhat.com; pasic@linux.ibm.com; aik@ozlabs.ru; Kirti Wankhede
+> <kwankhede@nvidia.com>; eauger@redhat.com; felipe@nutanix.com;
+> jonathan.davies@nutanix.com; Liu, Changpeng <changpeng.liu@intel.com>;
+> Ken.Xue@amd.com
+> Subject: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO device=
+s
+>=20
+> - Migration function are implemented for VFIO_DEVICE_TYPE_PCI device.
+> - Added SaveVMHandlers and implemented all basic functions required for l=
+ive
+>   migration.
+> - Added VM state change handler to know running or stopped state of VM.
+> - Added migration state change notifier to get notification on migration =
+state
+>   change. This state is translated to VFIO device state and conveyed to v=
+endor
+>   driver.
+> - VFIO device supportd migration or not is decided based of migration reg=
+ion
+>   query. If migration region query is successful then migration is suppor=
+ted
+>   else migration is blocked.
+> - Structure vfio_device_migration_info is mapped at 0th offset of migrati=
+on
+>   region and should always trapped by VFIO device's driver. Added both ty=
+pe of
+>   access support, trapped or mmapped, for data section of the region.
+> - To save device state, read data offset and size using structure
+>   vfio_device_migration_info.data, accordingly copy data from the region.
+> - To restore device state, write data offset and size in the structure an=
+d write
+>   data in the region.
+> - To get dirty page bitmap, write start address and pfn count then read c=
+ount of
+>   pfns copied and accordingly read those from the rest of the region or m=
+maped
+>   part of the region. This copy is iterated till page bitmap for all requ=
+ested
+>   pfns are copied.
+>=20
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  hw/vfio/Makefile.objs         |   2 +-
+>  hw/vfio/migration.c           | 729
+> ++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/vfio/vfio-common.h |  23 ++
+>  3 files changed, 753 insertions(+), 1 deletion(-)  create mode 100644
+> hw/vfio/migration.c
+>=20
+> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs index
+> a2e7a0a7cf02..2cf2ba1440f2 100644
+> --- a/hw/vfio/Makefile.objs
+> +++ b/hw/vfio/Makefile.objs
+> @@ -1,5 +1,5 @@
+>  ifeq ($(CONFIG_LINUX), y)
+> -obj-$(CONFIG_SOFTMMU) +=3D common.o
+> +obj-$(CONFIG_SOFTMMU) +=3D common.o migration.o
+>  obj-$(CONFIG_PCI) +=3D pci.o pci-quirks.o display.o
+>  obj-$(CONFIG_VFIO_CCW) +=3D ccw.o
+>  obj-$(CONFIG_SOFTMMU) +=3D platform.o
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c new file mode 1006=
+44
+> index 000000000000..717fb63e4f43
+> --- /dev/null
+> +++ b/hw/vfio/migration.c
+> @@ -0,0 +1,729 @@
+> +/*
+> + * Migration support for VFIO devices
+> + *
+> + * Copyright NVIDIA, Inc. 2018
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2. See
+> + * the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include <linux/vfio.h>
+> +
+> +#include "hw/vfio/vfio-common.h"
+> +#include "cpu.h"
+> +#include "migration/migration.h"
+> +#include "migration/qemu-file.h"
+> +#include "migration/register.h"
+> +#include "migration/blocker.h"
+> +#include "migration/misc.h"
+> +#include "qapi/error.h"
+> +#include "exec/ramlist.h"
+> +#include "exec/ram_addr.h"
+> +#include "pci.h"
+> +
+> +/*
+> + * Flags used as delimiter:
+> + * 0xffffffff =3D> MSB 32-bit all 1s
+> + * 0xef10     =3D> emulated (virtual) function IO
+> + * 0x0000     =3D> 16-bits reserved for flags
+> + */
+> +#define VFIO_MIG_FLAG_END_OF_STATE      (0xffffffffef100001ULL)
+> +#define VFIO_MIG_FLAG_DEV_CONFIG_STATE  (0xffffffffef100002ULL)
+> +#define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
+> +
+> +static void vfio_migration_region_exit(VFIODevice *vbasedev) {
+> +    VFIOMigration *migration =3D vbasedev->migration;
+> +
+> +    if (!migration) {
+> +        return;
+> +    }
+> +
+> +    if (migration->region.buffer.size) {
+> +        vfio_region_exit(&migration->region.buffer);
+> +        vfio_region_finalize(&migration->region.buffer);
+> +    }
+> +}
+> +
+> +static int vfio_migration_region_init(VFIODevice *vbasedev) {
+> +    VFIOMigration *migration =3D vbasedev->migration;
+> +    Object *obj =3D NULL;
+> +    int ret =3D -EINVAL;
+> +
+> +    if (!migration) {
+> +        return ret;
+> +    }
+> +
+> +    /* Migration support added for PCI device only */
+> +    if (vbasedev->type =3D=3D VFIO_DEVICE_TYPE_PCI) {
+> +        obj =3D vfio_pci_get_object(vbasedev);
+> +    }
+> +
+> +    if (!obj) {
+> +        return ret;
+> +    }
+> +
+> +    ret =3D vfio_region_setup(obj, vbasedev, &migration->region.buffer,
+> +                            migration->region.index, "migration");
+> +    if (ret) {
+> +        error_report("Failed to setup VFIO migration region %d: %s",
+> +                      migration->region.index, strerror(-ret));
+> +        goto err;
+> +    }
+> +
+> +    if (!migration->region.buffer.size) {
+> +        ret =3D -EINVAL;
+> +        error_report("Invalid region size of VFIO migration region %d: %=
+s",
+> +                     migration->region.index, strerror(-ret));
+> +        goto err;
+> +    }
+> +
+> +    if (migration->region.buffer.mmaps) {
+> +        ret =3D vfio_region_mmap(&migration->region.buffer);
+> +        if (ret) {
+> +            error_report("Failed to mmap VFIO migration region %d: %s",
+> +                         migration->region.index, strerror(-ret));
+> +            goto err;
+> +        }
+> +    }
+> +
+> +    return 0;
+> +
+> +err:
+> +    vfio_migration_region_exit(vbasedev);
+> +    return ret;
+> +}
+> +
+> +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t
+> +state) {
+> +    VFIOMigration *migration =3D vbasedev->migration;
+> +    VFIORegion *region =3D &migration->region.buffer;
+> +    int ret =3D 0;
+> +
+> +    if (vbasedev->device_state =3D=3D state) {
+> +        return ret;
+> +    }
+> +
+> +    ret =3D pwrite(vbasedev->fd, &state, sizeof(state),
+> +                 region->fd_offset + offsetof(struct vfio_device_migrati=
+on_info,
+> +                                              device_state));
+> +    if (ret < 0) {
+> +        error_report("Failed to set migration state %d %s",
+> +                     ret, strerror(errno));
+> +        return ret;
+> +    }
+> +
+> +    vbasedev->device_state =3D state;
+> +    return ret;
+> +}
+> +
+> +void vfio_get_dirty_page_list(VFIODevice *vbasedev,
+> +                              uint64_t start_addr,
+> +                              uint64_t pfn_count) {
+> +    VFIOMigration *migration =3D vbasedev->migration;
+> +    VFIORegion *region =3D &migration->region.buffer;
+> +    struct vfio_device_migration_info migration_info;
+> +    uint64_t count =3D 0;
+> +    int ret;
+> +
+> +    migration_info.dirty_pfns.start_addr =3D start_addr;
+> +    migration_info.dirty_pfns.total =3D pfn_count;
+> +
+> +    ret =3D pwrite(vbasedev->fd, &migration_info.dirty_pfns,
+> +                 sizeof(migration_info.dirty_pfns),
+> +                 region->fd_offset + offsetof(struct vfio_device_migrati=
+on_info,
+> +                                              dirty_pfns));
+> +    if (ret < 0) {
+> +        error_report("Failed to set dirty pages start address %d %s",
+> +                ret, strerror(errno));
+> +        return;
+> +    }
+> +
+> +    do {
+> +        /* Read dirty_pfns.copied */
+> +        ret =3D pread(vbasedev->fd, &migration_info.dirty_pfns,
+> +                sizeof(migration_info.dirty_pfns),
+> +                region->fd_offset + offsetof(struct vfio_device_migratio=
+n_info,
+> +                                             dirty_pfns));
+> +        if (ret < 0) {
+> +            error_report("Failed to get dirty pages bitmap count %d %s",
+> +                    ret, strerror(errno));
+> +            return;
+> +        }
+> +
+> +        if (migration_info.dirty_pfns.copied) {
+> +            uint64_t bitmap_size;
+> +            void *buf =3D NULL;
+> +            bool buffer_mmaped =3D false;
+> +
+> +            bitmap_size =3D (BITS_TO_LONGS(migration_info.dirty_pfns.cop=
+ied) + 1)
+> +                           * sizeof(unsigned long);
+> +
+> +            if (region->mmaps) {
+> +                int i;
+> +
+> +                for (i =3D 0; i < region->nr_mmaps; i++) {
+> +                    if (region->mmaps[i].size >=3D bitmap_size) {
+> +                        buf =3D region->mmaps[i].mmap;
+> +                        buffer_mmaped =3D true;
+> +                        break;
+> +                    }
+> +                }
+> +            }
+What if mmapped data area is in front of mmaped dirty bit area?
+Maybe you need to record dirty bit region's index as what does for data reg=
+ion.
+
+> +
+> +            if (!buffer_mmaped) {
+> +                buf =3D g_malloc0(bitmap_size);
+> +
+> +                ret =3D pread(vbasedev->fd, buf, bitmap_size,
+> +                            region->fd_offset + sizeof(migration_info) +=
+ 1);
+> +                if (ret !=3D bitmap_size) {
+> +                    error_report("Failed to get migration data %d", ret)=
+;
+> +                    g_free(buf);
+> +                    return;
+> +                }
+> +            }
+> +
+> +            cpu_physical_memory_set_dirty_lebitmap((unsigned long *)buf,
+> +                                        start_addr + (count * TARGET_PAG=
+E_SIZE),
+> +                                        migration_info.dirty_pfns.copied=
+);
+> +            count +=3D  migration_info.dirty_pfns.copied;
+> +
+> +            if (!buffer_mmaped) {
+> +                g_free(buf);
+> +            }
+> +        }
+> +    } while (count < migration_info.dirty_pfns.total); }
+> +
+> +static int vfio_save_device_config_state(QEMUFile *f, void *opaque) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_CONFIG_STATE);
+> +
+> +    if (vbasedev->type =3D=3D VFIO_DEVICE_TYPE_PCI) {
+> +        vfio_pci_save_config(vbasedev, f);
+> +    }
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> +
+> +    return qemu_file_get_error(f);
+> +}
+> +
+> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +
+> +    if (vbasedev->type =3D=3D VFIO_DEVICE_TYPE_PCI) {
+> +        vfio_pci_load_config(vbasedev, f);
+> +    }
+> +
+> +    if (qemu_get_be64(f) !=3D VFIO_MIG_FLAG_END_OF_STATE) {
+> +        error_report("Wrong end of block while loading device config spa=
+ce");
+> +        return -EINVAL;
+> +    }
+> +
+> +    return qemu_file_get_error(f);
+> +}
+> +
+What's the purpose to add a tailing VFIO_MIG_FLAG_END_OF_STATE for each sec=
+tion?=20
+For compatibility check?
+Maybe a version id or magic in struct vfio_device_migration_info is more ap=
+propriate?
+
+
+> +/*
+> +----------------------------------------------------------------------
+> +*/
+> +
+> +static bool vfio_is_active_iterate(void *opaque) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +
+> +    if (vbasedev->vm_running && vbasedev->migration &&
+> +        (vbasedev->migration->pending_precopy_only !=3D 0))
+> +        return true;
+> +
+> +    if (!vbasedev->vm_running && vbasedev->migration &&
+> +        (vbasedev->migration->pending_postcopy !=3D 0))
+> +        return true;
+> +
+> +    return false;
+> +}
+> +
+> +static int vfio_save_setup(QEMUFile *f, void *opaque) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +    int ret;
+> +
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_SETUP_STATE);
+> +
+> +    qemu_mutex_lock_iothread();
+> +    ret =3D vfio_migration_region_init(vbasedev);
+> +    qemu_mutex_unlock_iothread();
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> +
+> +    ret =3D qemu_file_get_error(f);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev) {
+> +    VFIOMigration *migration =3D vbasedev->migration;
+> +    VFIORegion *region =3D &migration->region.buffer;
+> +    struct vfio_device_migration_info migration_info;
+> +    int ret;
+> +
+> +    ret =3D pread(vbasedev->fd, &migration_info.data,
+> +                sizeof(migration_info.data),
+> +                region->fd_offset + offsetof(struct vfio_device_migratio=
+n_info,
+> +                                             data));
+> +    if (ret !=3D sizeof(migration_info.data)) {
+> +        error_report("Failed to get migration buffer information %d",
+> +                     ret);
+> +        return -EINVAL;
+> +    }
+> +
+> +    if (migration_info.data.size) {
+> +        void *buf =3D NULL;
+> +        bool buffer_mmaped =3D false;
+> +
+> +        if (region->mmaps) {
+> +            int i;
+> +
+> +            for (i =3D 0; i < region->nr_mmaps; i++) {
+> +                if (region->mmaps[i].offset =3D=3D migration_info.data.o=
+ffset) {
+> +                    buf =3D region->mmaps[i].mmap;
+> +                    buffer_mmaped =3D true;
+> +                    break;
+> +                }
+> +            }
+> +        }
+> +
+> +        if (!buffer_mmaped) {
+> +            buf =3D g_malloc0(migration_info.data.size);
+> +            ret =3D pread(vbasedev->fd, buf, migration_info.data.size,
+> +                        region->fd_offset + migration_info.data.offset);
+> +            if (ret !=3D migration_info.data.size) {
+> +                error_report("Failed to get migration data %d", ret);
+> +                return -EINVAL;
+> +            }
+> +        }
+> +
+> +        qemu_put_be64(f, migration_info.data.size);
+> +        qemu_put_buffer(f, buf, migration_info.data.size);
+> +
+> +        if (!buffer_mmaped) {
+> +            g_free(buf);
+> +        }
+> +
+> +    } else {
+> +        qemu_put_be64(f, migration_info.data.size);
+> +    }
+> +
+> +    ret =3D qemu_file_get_error(f);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    return migration_info.data.size;
+> +}
+> +
+> +static int vfio_save_iterate(QEMUFile *f, void *opaque) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +    int ret;
+> +
+> +    ret =3D vfio_save_buffer(f, vbasedev);
+> +    if (ret < 0) {
+> +        error_report("vfio_save_buffer failed %s",
+> +                     strerror(errno));
+> +        return ret;
+> +    }
+> +
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> +
+> +    ret =3D qemu_file_get_error(f);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void vfio_update_pending(VFIODevice *vbasedev, uint64_t
+> +threshold_size) {
+> +    VFIOMigration *migration =3D vbasedev->migration;
+> +    VFIORegion *region =3D &migration->region.buffer;
+> +    struct vfio_device_migration_info migration_info;
+> +    int ret;
+> +
+> +    ret =3D pwrite(vbasedev->fd, &threshold_size, sizeof(threshold_size)=
+,
+> +                 region->fd_offset + offsetof(struct vfio_device_migrati=
+on_info,
+> +                                              pending.threshold_size));
+> +    if (ret < 0) {
+> +        error_report("Failed to set threshold size %d %s",
+> +                     ret, strerror(errno));
+> +        return;
+> +    }
+> +
+> +    ret =3D pread(vbasedev->fd, &migration_info.pending,
+> +                sizeof(migration_info.pending),
+> +                region->fd_offset + offsetof(struct vfio_device_migratio=
+n_info,
+> +                                             pending));
+> +    if (ret !=3D sizeof(migration_info.pending)) {
+> +        error_report("Failed to get pending bytes %d", ret);
+> +        return;
+> +    }
+> +
+> +    migration->pending_precopy_only =3D migration_info.pending.precopy_o=
+nly;
+> +    migration->pending_compatible =3D migration_info.pending.compatible;
+> +    migration->pending_postcopy =3D migration_info.pending.postcopy_only=
+;
+> +
+> +    return;
+> +}
+> +
+> +static void vfio_save_pending(QEMUFile *f, void *opaque,
+> +                              uint64_t threshold_size,
+> +                              uint64_t *res_precopy_only,
+> +                              uint64_t *res_compatible,
+> +                              uint64_t *res_postcopy_only) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +    VFIOMigration *migration =3D vbasedev->migration;
+> +
+> +    vfio_update_pending(vbasedev, threshold_size);
+> +
+> +    *res_precopy_only +=3D migration->pending_precopy_only;
+> +    *res_compatible +=3D migration->pending_compatible;
+> +    *res_postcopy_only +=3D migration->pending_postcopy; }
+> +
+> +static int vfio_save_complete_precopy(QEMUFile *f, void *opaque) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +    VFIOMigration *migration =3D vbasedev->migration;
+> +    MigrationState *ms =3D migrate_get_current();
+> +    int ret;
+> +
+> +    if (vbasedev->vm_running) {
+> +        vbasedev->vm_running =3D 0;
+> +    }
+> +
+> +    ret =3D vfio_migration_set_state(vbasedev,
+> +                                   VFIO_DEVICE_STATE_MIGRATION_STOPNCOPY=
+);
+> +    if (ret) {
+> +        error_report("Failed to set state STOPNCOPY_ACTIVE");
+> +        return ret;
+> +    }
+> +
+> +    ret =3D vfio_save_device_config_state(f, opaque);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    do {
+> +        vfio_update_pending(vbasedev, ms->threshold_size);
+> +
+> +        if (vfio_is_active_iterate(opaque)) {
+> +            ret =3D vfio_save_buffer(f, vbasedev);
+> +            if (ret < 0) {
+> +                error_report("Failed to save buffer");
+> +                break;
+> +            } else if (ret =3D=3D 0) {
+> +                break;
+> +            }
+> +        }
+> +    } while ((migration->pending_compatible +
+> + migration->pending_postcopy) > 0);
+> +
+
+if migration->pending_postcopy is not 0, vfio_save_complete_precopy() canno=
+t finish? Is that true?
+But vfio_save_complete_precopy() does not need to copy post copy data.
+
+
+
+> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> +
+> +    ret =3D qemu_file_get_error(f);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    ret =3D vfio_migration_set_state(vbasedev,
+> +                                   VFIO_DEVICE_STATE_MIGRATION_SAVE_COMP=
+LETED);
+> +    if (ret) {
+> +        error_report("Failed to set state SAVE_COMPLETED");
+> +        return ret;
+> +    }
+> +    return ret;
+> +}
+> +
+> +static void vfio_save_cleanup(void *opaque) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +
+> +    vfio_migration_region_exit(vbasedev);
+> +}
+> +
+> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +    int ret;
+> +    uint64_t data;
+> +
+Need to use version_id to check source and target version.
+
+> +    data =3D qemu_get_be64(f);
+> +    while (data !=3D VFIO_MIG_FLAG_END_OF_STATE) {
+> +        if (data =3D=3D VFIO_MIG_FLAG_DEV_CONFIG_STATE) {
+> +            ret =3D vfio_load_device_config_state(f, opaque);
+> +            if (ret) {
+> +                return ret;
+> +            }
+> +        } else if (data =3D=3D VFIO_MIG_FLAG_DEV_SETUP_STATE) {
+> +            data =3D qemu_get_be64(f);
+> +            if (data =3D=3D VFIO_MIG_FLAG_END_OF_STATE) {
+> +                return 0;
+> +            } else {
+> +                error_report("SETUP STATE: EOS not found 0x%lx", data);
+> +                return -EINVAL;
+> +            }
+> +        } else if (data !=3D 0) {
+> +            VFIOMigration *migration =3D vbasedev->migration;
+> +            VFIORegion *region =3D &migration->region.buffer;
+> +            struct vfio_device_migration_info migration_info;
+> +            void *buf =3D NULL;
+> +            bool buffer_mmaped =3D false;
+> +
+> +            migration_info.data.size =3D data;
+> +
+> +            if (region->mmaps) {
+> +                int i;
+> +
+> +                for (i =3D 0; i < region->nr_mmaps; i++) {
+> +                    if (region->mmaps[i].mmap &&
+> +                        (region->mmaps[i].size >=3D data)) {
+> +                        buf =3D region->mmaps[i].mmap;
+> +                        migration_info.data.offset =3D region->mmaps[i].=
+offset;
+> +                        buffer_mmaped =3D true;
+> +                        break;
+> +                    }
+> +                }
+> +            }
+> +
+> +            if (!buffer_mmaped) {
+> +                buf =3D g_malloc0(migration_info.data.size);
+> +                migration_info.data.offset =3D sizeof(migration_info) + =
+1;
+> +            }
+> +
+> +            qemu_get_buffer(f, buf, data);
+> +
+> +            ret =3D pwrite(vbasedev->fd, &migration_info.data,
+> +                         sizeof(migration_info.data),
+> +                         region->fd_offset +
+> +                         offsetof(struct vfio_device_migration_info, dat=
+a));
+> +            if (ret !=3D sizeof(migration_info.data)) {
+> +                error_report("Failed to set migration buffer information=
+ %d",
+> +                        ret);
+> +                return -EINVAL;
+> +            }
+> +
+> +            if (!buffer_mmaped) {
+> +                ret =3D pwrite(vbasedev->fd, buf, migration_info.data.si=
+ze,
+> +                             region->fd_offset + migration_info.data.off=
+set);
+> +                g_free(buf);
+> +
+> +                if (ret !=3D migration_info.data.size) {
+> +                    error_report("Failed to set migration buffer %d", re=
+t);
+> +                    return -EINVAL;
+> +                }
+> +            }
+> +        }
+> +
+> +        ret =3D qemu_file_get_error(f);
+> +        if (ret) {
+> +            return ret;
+> +        }
+> +        data =3D qemu_get_be64(f);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int vfio_load_setup(QEMUFile *f, void *opaque) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +    int ret;
+> +
+> +    ret =3D vfio_migration_set_state(vbasedev,
+> +                                    VFIO_DEVICE_STATE_MIGRATION_RESUME);
+> +    if (ret) {
+> +        error_report("Failed to set state RESUME");
+> +    }
+> +
+> +    ret =3D vfio_migration_region_init(vbasedev);
+> +    if (ret) {
+> +        error_report("Failed to initialise migration region");
+> +        return ret;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+Why vfio_migration_set_state() is in front of  vfio_migration_region_init()=
+?
+So VFIO_DEVICE_STATE_MIGRATION_RESUME is really useful? :)
+
+
+> +static int vfio_load_cleanup(void *opaque) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +    int ret =3D 0;
+> +
+> +    ret =3D vfio_migration_set_state(vbasedev,
+> +                                 VFIO_DEVICE_STATE_MIGRATION_RESUME_COMP=
+LETED);
+> +    if (ret) {
+> +        error_report("Failed to set state RESUME_COMPLETED");
+> +    }
+> +
+> +    vfio_migration_region_exit(vbasedev);
+> +    return ret;
+> +}
+> +
+> +static SaveVMHandlers savevm_vfio_handlers =3D {
+> +    .save_setup =3D vfio_save_setup,
+> +    .save_live_iterate =3D vfio_save_iterate,
+> +    .save_live_complete_precopy =3D vfio_save_complete_precopy,
+> +    .save_live_pending =3D vfio_save_pending,
+> +    .save_cleanup =3D vfio_save_cleanup,
+> +    .load_state =3D vfio_load_state,
+> +    .load_setup =3D vfio_load_setup,
+> +    .load_cleanup =3D vfio_load_cleanup,
+> +    .is_active_iterate =3D vfio_is_active_iterate, };
+> +
+> +static void vfio_vmstate_change(void *opaque, int running, RunState
+> +state) {
+> +    VFIODevice *vbasedev =3D opaque;
+> +
+> +    if ((vbasedev->vm_running !=3D running) && running) {
+> +        int ret;
+> +
+> +        ret =3D vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUN=
+NING);
+> +        if (ret) {
+> +            error_report("Failed to set state RUNNING");
+> +        }
+> +    }
+> +
+> +    vbasedev->vm_running =3D running;
+> +}
+> +
+vfio_vmstate_change() is registered at initialization, so for source vm=20
+vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUNNING) will be calle=
+d on vm start.
+but vfio_migration_region_init() is called in save_setup() when migration s=
+tarts,
+as a result,  "vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUNNING=
+)" should not function here for source vm.
+So, again, is this state really used? :)
+
+
+> +static void vfio_migration_state_notifier(Notifier *notifier, void
+> +*data) {
+> +    MigrationState *s =3D data;
+> +    VFIODevice *vbasedev =3D container_of(notifier, VFIODevice, migratio=
+n_state);
+> +    int ret;
+> +
+> +    switch (s->state) {
+> +    case MIGRATION_STATUS_SETUP:
+> +        ret =3D vfio_migration_set_state(vbasedev,
+> +                                       VFIO_DEVICE_STATE_MIGRATION_SETUP=
+);
+> +        if (ret) {
+> +            error_report("Failed to set state SETUP");
+> +        }
+> +        return;
+> +
+> +    case MIGRATION_STATUS_ACTIVE:
+> +        if (vbasedev->device_state =3D=3D VFIO_DEVICE_STATE_MIGRATION_SE=
+TUP) {
+> +            if (vbasedev->vm_running) {
+> +                ret =3D vfio_migration_set_state(vbasedev,
+> +                                          VFIO_DEVICE_STATE_MIGRATION_PR=
+ECOPY);
+> +                if (ret) {
+> +                    error_report("Failed to set state PRECOPY_ACTIVE");
+> +                }
+> +            } else {
+> +                ret =3D vfio_migration_set_state(vbasedev,
+> +                                        VFIO_DEVICE_STATE_MIGRATION_STOP=
+NCOPY);
+> +                if (ret) {
+> +                    error_report("Failed to set state STOPNCOPY_ACTIVE")=
+;
+> +                }
+> +            }
+> +        } else {
+> +            ret =3D vfio_migration_set_state(vbasedev,
+> +                                           VFIO_DEVICE_STATE_MIGRATION_R=
+ESUME);
+> +            if (ret) {
+> +                error_report("Failed to set state RESUME");
+> +            }
+> +        }
+> +        return;
+> +
+> +    case MIGRATION_STATUS_CANCELLING:
+> +    case MIGRATION_STATUS_CANCELLED:
+> +        ret =3D vfio_migration_set_state(vbasedev,
+> +                                       VFIO_DEVICE_STATE_MIGRATION_CANCE=
+LLED);
+> +        if (ret) {
+> +            error_report("Failed to set state CANCELLED");
+> +        }
+> +        return;
+> +
+> +    case MIGRATION_STATUS_FAILED:
+> +        ret =3D vfio_migration_set_state(vbasedev,
+> +                                       VFIO_DEVICE_STATE_MIGRATION_FAILE=
+D);
+> +        if (ret) {
+> +            error_report("Failed to set state FAILED");
+> +        }
+> +        return;
+> +    }
+> +}
+> +
+> +static int vfio_migration_init(VFIODevice *vbasedev,
+> +                               struct vfio_region_info *info) {
+> +    vbasedev->migration =3D g_new0(VFIOMigration, 1);
+> +    vbasedev->migration->region.index =3D info->index;
+> +
+> +    register_savevm_live(NULL, "vfio", -1, 1, &savevm_vfio_handlers, vba=
+sedev);
+> +    vbasedev->vm_state =3D
+> qemu_add_vm_change_state_handler(vfio_vmstate_change,
+> +                                                          vbasedev);
+> +
+> +    vbasedev->migration_state.notify =3D vfio_migration_state_notifier;
+> +    add_migration_state_change_notifier(&vbasedev->migration_state);
+> +
+> +    return 0;
+> +}
+> +
+> +
+> +/*
+> +----------------------------------------------------------------------
+> +*/
+> +
+> +int vfio_migration_probe(VFIODevice *vbasedev, Error **errp) {
+> +    struct vfio_region_info *info;
+> +    int ret;
+> +
+> +    ret =3D vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_MIGRATIO=
+N,
+> +                                   VFIO_REGION_SUBTYPE_MIGRATION, &info)=
+;
+> +    if (ret) {
+> +        Error *local_err =3D NULL;
+> +
+> +        error_setg(&vbasedev->migration_blocker,
+> +                   "VFIO device doesn't support migration");
+> +        ret =3D migrate_add_blocker(vbasedev->migration_blocker, &local_=
+err);
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +            error_free(vbasedev->migration_blocker);
+> +            return ret;
+> +        }
+> +    } else {
+> +        return vfio_migration_init(vbasedev, info);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +void vfio_migration_finalize(VFIODevice *vbasedev) {
+> +    if (!vbasedev->migration) {
+> +        return;
+> +    }
+> +
+> +    if (vbasedev->vm_state) {
+> +        qemu_del_vm_change_state_handler(vbasedev->vm_state);
+> +        remove_migration_state_change_notifier(&vbasedev->migration_stat=
+e);
+> +    }
+> +
+> +    if (vbasedev->migration_blocker) {
+> +        migrate_del_blocker(vbasedev->migration_blocker);
+> +        error_free(vbasedev->migration_blocker);
+> +    }
+> +
+> +    g_free(vbasedev->migration);
+> +}
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.=
+h
+> index a9036929b220..ab8217c9e249 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -30,6 +30,8 @@
+>  #include <linux/vfio.h>
+>  #endif
+>=20
+> +#include "sysemu/sysemu.h"
+> +
+>  #define ERR_PREFIX "vfio error: %s: "
+>  #define WARN_PREFIX "vfio warning: %s: "
+>=20
+> @@ -57,6 +59,16 @@ typedef struct VFIORegion {
+>      uint8_t nr; /* cache the region number for debug */  } VFIORegion;
+>=20
+> +typedef struct VFIOMigration {
+> +    struct {
+> +        VFIORegion buffer;
+> +        uint32_t index;
+> +    } region;
+> +    uint64_t pending_precopy_only;
+> +    uint64_t pending_compatible;
+> +    uint64_t pending_postcopy;
+> +} VFIOMigration;
+> +
+>  typedef struct VFIOAddressSpace {
+>      AddressSpace *as;
+>      QLIST_HEAD(, VFIOContainer) containers; @@ -116,6 +128,12 @@ typedef
+> struct VFIODevice {
+>      unsigned int num_irqs;
+>      unsigned int num_regions;
+>      unsigned int flags;
+> +    uint32_t device_state;
+> +    VMChangeStateEntry *vm_state;
+> +    int vm_running;
+> +    Notifier migration_state;
+> +    VFIOMigration *migration;
+> +    Error *migration_blocker;
+>  } VFIODevice;
+>=20
+>  struct VFIODeviceOps {
+> @@ -193,4 +211,9 @@ int vfio_spapr_create_window(VFIOContainer
+> *container,  int vfio_spapr_remove_window(VFIOContainer *container,
+>                               hwaddr offset_within_address_space);
+>=20
+> +int vfio_migration_probe(VFIODevice *vbasedev, Error **errp); void
+> +vfio_migration_finalize(VFIODevice *vbasedev); void
+> +vfio_get_dirty_page_list(VFIODevice *vbasedev, uint64_t start_addr,
+> +                               uint64_t pfn_count);
+> +
+>  #endif /* HW_VFIO_VFIO_COMMON_H */
+> --
+> 2.7.0
+>=20
