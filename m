@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <logang@deltatee.com>) id 1gPX3h-0008Ts-MU
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:17:06 -0500
+	(envelope-from <logang@deltatee.com>) id 1gPX3n-0000OQ-RE
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:17:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <logang@deltatee.com>) id 1gPWsV-000569-0B
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:05:31 -0500
+	(envelope-from <logang@deltatee.com>) id 1gPWoq-0001Qv-N9
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 13:01:46 -0500
 References: <cover.1542819633.git.alistair.francis@wdc.com>
-	<85a3fe487514f4cb659ef7e6b88762ebc567c1b8.1542819633.git.alistair.francis@wdc.com>
+	<4120d0a7e4fe6f3fd6bdd6c084a40a67a48be374.1542819633.git.alistair.francis@wdc.com>
 From: Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <e7398997-ba1a-9182-6be0-da8e43e920df@deltatee.com>
-Date: Wed, 21 Nov 2018 11:05:21 -0700
+Message-ID: <e3478876-09d1-121a-8c3c-850aa353449c@deltatee.com>
+Date: Wed, 21 Nov 2018 11:01:29 -0700
 MIME-Version: 1.0
-In-Reply-To: <85a3fe487514f4cb659ef7e6b88762ebc567c1b8.1542819633.git.alistair.francis@wdc.com>
+In-Reply-To: <4120d0a7e4fe6f3fd6bdd6c084a40a67a48be374.1542819633.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-CA
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 5/6] hw/riscv/sifive_u: Connect
- the Xilinx PCIe
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 4/6] riscv: Enable VGA and
+ PCIE_VGA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,18 +31,39 @@ Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "linux@roeck-us.net" <linux@r
 
 
 On 2018-11-21 10:02 a.m., Alistair Francis wrote:
-> Connect the Xilinx PCIe device based on the information in the device
-> tree stored in the ROM of the HiFish Unleashed board.
+> Enable compile support for VGA devices. This allows the user to conenct
+> a display by adding '-device bochs-display -display sdl' to their
+> command line argument.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 
-I only briefly tested this patch but could not get any PCI devices to
-come up with the sifive_u machine. Depending on the kernel I tried, it
-either failed to initialize a Xilinx PCIe (likely due to a mismatch with
-the DT) or it appears to successfully initialize a Microsemi device but
-did not enumerate any devices underneath.
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
 
-In any case, it would be nice if the Microsemi/Xilinx confusion was at
-least explained in the commit message.
-
-Thanks,
-
-Logan
+> ---
+>  default-configs/riscv32-softmmu.mak | 3 +++
+>  default-configs/riscv64-softmmu.mak | 3 +++
+>  2 files changed, 6 insertions(+)
+> 
+> diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+> index 3e3d195f37..05fae82f1b 100644
+> --- a/default-configs/riscv32-softmmu.mak
+> +++ b/default-configs/riscv32-softmmu.mak
+> @@ -9,3 +9,6 @@ CONFIG_CADENCE=y
+>  
+>  CONFIG_PCI_GENERIC=y
+>  CONFIG_PCI_XILINX=y
+> +
+> +CONFIG_VGA=y
+> +CONFIG_VGA_PCI=y
+> diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+> index 3e3d195f37..05fae82f1b 100644
+> --- a/default-configs/riscv64-softmmu.mak
+> +++ b/default-configs/riscv64-softmmu.mak
+> @@ -9,3 +9,6 @@ CONFIG_CADENCE=y
+>  
+>  CONFIG_PCI_GENERIC=y
+>  CONFIG_PCI_XILINX=y
+> +
+> +CONFIG_VGA=y
+> +CONFIG_VGA_PCI=y
+> 
