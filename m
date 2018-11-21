@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gPPrU-0005xc-Dl
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:36:05 -0500
+	(envelope-from <david@redhat.com>) id 1gPQ0G-0001gE-Pc
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:45:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gPPrR-0002ps-89
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:36:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56998)
+	(envelope-from <david@redhat.com>) id 1gPQ0D-0005PG-Jj
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:45:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gPPrR-0002ow-0w
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:35:57 -0500
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gPQ0D-0005Ob-Ba
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 05:45:01 -0500
 References: <20181120092542.13102-1-david@redhat.com>
-	<20181120092542.13102-2-david@redhat.com>
-	<74608eca-34f8-f85f-39ab-ab98a206b0c1@redhat.com>
-	<871s7f8qcz.fsf@dusky.pond.sub.org>
+	<20181120092542.13102-3-david@redhat.com>
+	<7d8d4e4f-bb70-5047-4e37-ed3672c89e02@redhat.com>
+	<87va4r7aou.fsf@dusky.pond.sub.org>
+	<64d0f403-2dd3-2841-b346-7634f37cf5b8@redhat.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <3c656208-5569-d48f-9555-11d15389fe90@redhat.com>
-Date: Wed, 21 Nov 2018 11:35:53 +0100
+Message-ID: <8dc6889b-eed7-34f2-8bef-c03b11dc435a@redhat.com>
+Date: Wed, 21 Nov 2018 11:44:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <871s7f8qcz.fsf@dusky.pond.sub.org>
+In-Reply-To: <64d0f403-2dd3-2841-b346-7634f37cf5b8@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/9] cutils: Add qemu_strtod() and
- qemu_strtod_finite()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/9] cutils: Fix qemu_strtosz() &
+ friends to reject non-finite sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,113 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 20.11.18 21:07, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
->=20
->> On 11/20/18 3:25 AM, David Hildenbrand wrote:
->>> Let's provide a wrapper for strtod().
+On 20.11.18 21:41, Eric Blake wrote:
+> On 11/20/18 2:31 PM, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>>
+>>> On 11/20/18 3:25 AM, David Hildenbrand wrote:
+>>>> qemu_strtosz() & friends reject NaNs, but happily accept inifities.
+>>>
+>>> s/inifities/infinities/
+>>>
+>>>> They shouldn't. Fix that.
+>>>>
+>>>> The fix makes use of qemu_strtod_finite(). To avoid ugly casts,
+>>>> change the @end parameter of qemu_strtosz() & friends from char **
+>>>> to const char **.
+>>>>
+>>>> Also, add two test cases, testing that "inf" and "NaN" are properly
+>>>> rejected.
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>    include/qemu/cutils.h |  6 +++---
+>>>>    monitor.c             |  2 +-
+>>>>    tests/test-cutils.c   | 24 +++++++++++++++++-------
+>>>>    util/cutils.c         | 16 +++++++---------
+>>>>    4 files changed, 28 insertions(+), 20 deletions(-)
+>>>>
+>>>
+>>>> +++ b/util/cutils.c
+>>>> @@ -206,20 +206,18 @@ static int64_t suffix_mul(char suffix, int64_t unit)
+>>>>     * in *end, if not NULL. Return -ERANGE on overflow, Return -EINVAL on
+>>>
+>>> Pre-existing, but since you're touching this area: the second 'Return'
+>>> is unusual capitalization for being mid-sentence.  You could even
+>>> s/Return/of/
+>>
+>> "of"?
+> 
+> "or" (ouch - wrong time for my fingers to be slipping on the keyboard)
+
+Shouldn't that be "and" and s/Return/Returns/
+
+
+"Returns -ERANGE on overflow and -EINVAL on other errors".
+
+I can include that fixup (whetever version you guys prefer)
+
+> 
+> 
+>>> It's some hairy code to think about, but I can't find anything wrong
+>>> with it.  Typo fixes are minor, so
 >>>
 >>> Reviewed-by: Eric Blake <eblake@redhat.com>
 >>
->> This changed enough from v1 that I would have dropped R-b to ensure
->> that reviewers notice the differences.
-
-Indeed, dropping it now ;)
-
+>> Thanks for your analysis, Eric.
 >>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>   include/qemu/cutils.h |  2 ++
->>>   util/cutils.c         | 65 ++++++++++++++++++++++++++++++++++++++++=
-+++
->>>   2 files changed, 67 insertions(+)
->>>
->>
->>> + * If the conversion overflows, store +/-HUGE_VAL in @result, depend=
-ing
->>> + * on the sign, and return -ERANGE.
->>> + *
->>> + * If the conversion underflows, store =C2=B10.0 in @result, dependi=
-ng on the
->>> + * sign, and return -ERANGE.
->>
->> The use of UTF-8 =C2=B1 in one place but not both is odd.  I think we'=
-re at
->> the point where UTF-8 comments are acceptable these days, rather than
->> trying to keep our codebase ASCII-clean, so I don't care which way you
->> resolve the inconsistency.
->=20
-> 217 out of 6455 git-controlled files contain non-ASCII characters.  53
-> of them are binary, and don't count.  In most text files, it's for
-> spelling names of authors properly in comments.  Ample precedence for
-> UTF-8 in comments, I'd say.
->=20
-> That said, I second Eric's call for consistency, with the slightest of
-> preferrences for plain ASCII.
+>> With the typo fixes:
+> 
+> Including the fix of my attempt at a typo fix :)
+> 
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-I'll just go with +/-. Thanks.
+Thanks!
 
->=20
-> I spotted UTF-8 in two error messages, which might still be unadvisable=
-:
->=20
-> hw/misc/tmp105.c:        error_setg(errp, "value %" PRId64 ".%03" PRIu6=
-4 " =C2=B0C is out of range",
-> hw/misc/tmp421.c:        error_setg(errp, "value %" PRId64 ".%03" PRIu6=
-4 " =C2=B0C is out of range",
->=20
->>> +/**
->>> + * Convert string @nptr to a finite double.
->>> + *
->>> + * Works like qemu_strtod(), except that "NaN" and "inf" are rejecte=
-d
->>> + * with -EINVAL and no conversion is performed.
->>> + */
->>> +int qemu_strtod_finite(const char *nptr, const char **endptr, double=
- *result)
->>> +{
->>> +    double tmp;
->>> +    int ret;
->>> +
->>> +    ret =3D qemu_strtod(nptr, endptr, &tmp);
->>> +    if (ret) {
->>> +        return ret;
->>
->> So, if we overflow, we are returning -ERANGE but with nothing stored
->> into *result.  This is different from qemu_strtod(), where a return of
->> -ERANGE guarantees that *result is one of 4 values (+/- 0.0/inf).
->> That seems awkward.
->=20
-> Violates the contract's "like qemu_strtod()".
-
-Right, I missed that. What about something like this:
-
-int qemu_strtod_finite(const char *nptr, const char **endptr, double
-*result)
-{
-    double tmp;
-    int ret;
-
-    ret =3D qemu_strtod(nptr, endptr, &tmp);
-    if (!ret && !isfinite(tmp)) {
-        if (endptr) {
-            *endptr =3D nptr;
-        }
-        ret =3D -EINVAL;
-    }
-
-    if (ret !=3D -EINVAL) {
-        *result =3D tmp;
-    }
-    return ret;
-}
-
-
-
---=20
+-- 
 
 Thanks,
 
