@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gPq2J-0004SX-TJ
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:32:56 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gPqF1-00018T-EW
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:46:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gPq2I-0004Dp-SB
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:32:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52098)
+	(envelope-from <jasowang@redhat.com>) id 1gPqEy-0001cN-B7
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:46:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42402)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gPq2I-00042P-J3
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:32:54 -0500
-Date: Thu, 22 Nov 2018 22:31:18 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20181122143118.GA11036@wei-ubt>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gPqEy-0001bE-4T
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:46:00 -0500
 References: <1542895581-10721-1-git-send-email-wexu@redhat.com>
-	<1542895581-10721-2-git-send-email-wexu@redhat.com>
+	<1542895581-10721-13-git-send-email-wexu@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <e0fc9da4-264a-b003-0304-470b15d28368@redhat.com>
+Date: Thu, 22 Nov 2018 22:45:36 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1542895581-10721-2-git-send-email-wexu@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 01/16] Update version for v3.1.0-rc2
- release
+In-Reply-To: <1542895581-10721-13-git-send-email-wexu@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 12/16] virtio: add userspace migration
+ of packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, tiwei.bie@intel.com, mst@redhat.com, maxime.coquelin@redhat.com, jfreimann@redhat.com
+To: wexu@redhat.com, qemu-devel@nongnu.org
+Cc: maxime.coquelin@redhat.com, jfreimann@redhat.com, tiwei.bie@intel.com, mst@redhat.com
 
-This is an irrelevant patch mistakenly posted, please drop this, sorry.
 
-On Thu, Nov 22, 2018 at 09:06:06AM -0500, wexu@redhat.com wrote:
-> From: Peter Maydell <peter.maydell@linaro.org>
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 2018/11/22 =E4=B8=8B=E5=8D=8810:06, wexu@redhat.com wrote:
+> From: Wei Xu <wexu@redhat.com>
+>
+> Signed-off-by: Wei Xu <wexu@redhat.com>
+
+
+I think you need subsection. Otherwise you will break migration=20
+compatibility.
+
+Thanks
+
+
 > ---
->  VERSION | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/VERSION b/VERSION
-> index 3af1c22..bbcce69 100644
-> --- a/VERSION
-> +++ b/VERSION
-> @@ -1 +1 @@
-> -3.0.91
-> +3.0.92
-> -- 
-> 1.8.3.1
-> 
-> 
+>   hw/virtio/virtio.c | 18 ++++++++++++++++++
+>   1 file changed, 18 insertions(+)
+>
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 240c4e3..64d5c04 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -2558,6 +2558,12 @@ int virtio_save(VirtIODevice *vdev, QEMUFile *f)
+>            */
+>           qemu_put_be64(f, vdev->vq[i].vring.desc);
+>           qemu_put_be16s(f, &vdev->vq[i].last_avail_idx);
+> +        qemu_put_8s(f, (const uint8_t *)&vdev->vq[i].avail_wrap_counte=
+r);
+> +        qemu_put_8s(f, (const uint8_t *)&vdev->vq[i].event_wrap_counte=
+r);
+> +        qemu_put_8s(f, (const uint8_t *)&vdev->vq[i].used_wrap_counter=
+);
+> +        qemu_put_be16s(f, &vdev->vq[i].used_idx);
+> +        qemu_put_be16s(f, &vdev->vq[i].shadow_avail_idx);
+> +        qemu_put_be32s(f, &vdev->vq[i].inuse);
+>           if (k->save_queue) {
+>               k->save_queue(qbus->parent, i, f);
+>           }
+> @@ -2705,6 +2711,14 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f,=
+ int version_id)
+>           }
+>           vdev->vq[i].vring.desc =3D qemu_get_be64(f);
+>           qemu_get_be16s(f, &vdev->vq[i].last_avail_idx);
+> +
+> +        qemu_get_8s(f, (uint8_t *)&vdev->vq[i].avail_wrap_counter);
+> +        qemu_get_8s(f, (uint8_t *)&vdev->vq[i].event_wrap_counter);
+> +        qemu_get_8s(f, (uint8_t *)&vdev->vq[i].used_wrap_counter);
+> +        qemu_get_be16s(f, &vdev->vq[i].used_idx);
+> +        qemu_get_be16s(f, &vdev->vq[i].shadow_avail_idx);
+> +        qemu_get_be32s(f, &vdev->vq[i].inuse);
+> +
+>           vdev->vq[i].signalled_used_valid =3D false;
+>           vdev->vq[i].notification =3D true;
+>  =20
+> @@ -2786,6 +2800,10 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f,=
+ int version_id)
+>                   virtio_queue_update_rings(vdev, i);
+>               }
+>  =20
+> +            if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> +                continue;
+> +            }
+> +
+>               nheads =3D vring_avail_idx(&vdev->vq[i]) - vdev->vq[i].la=
+st_avail_idx;
+>               /* Check it isn't doing strange things with descriptor nu=
+mbers. */
+>               if (nheads > vdev->vq[i].vring.num) {
