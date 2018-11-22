@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gPehy-0003pR-Fg
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 21:27:11 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1gPfJg-0005Iy-FK
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 22:06:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gPeht-0001aL-Fb
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 21:27:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gPeht-0001CM-3G
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 21:27:05 -0500
-Date: Thu, 22 Nov 2018 00:26:39 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181122022639.GK4755@habkost.net>
-References: <20181122021139.1486-1-philmd@redhat.com>
+	(envelope-from <gengdongjiu@huawei.com>) id 1gPfJf-0002NP-OQ
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 22:06:08 -0500
+From: gengdongjiu <gengdongjiu@huawei.com>
+Date: Thu, 22 Nov 2018 03:05:41 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201F7D7EB@DGGEMA503-MBX.china.huawei.com>
+References: <1541672989-15967-1-git-send-email-gengdongjiu@huawei.com>
+	<1541672989-15967-11-git-send-email-gengdongjiu@huawei.com>
+	<CAFEAcA-6UKk-WF+M+z0=AN-X7q0XRFLo2RG_yBadDeCas4A5wQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA-6UKk-WF+M+z0=AN-X7q0XRFLo2RG_yBadDeCas4A5wQ@mail.gmail.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181122021139.1486-1-philmd@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.1] MAINTAINERS: Add an entry for the
- Firmware Configuration (fw_cfg) device
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBbUEFUQ0ggUkVTRU5EIHYxNSAxMC8x?=
+ =?utf-8?q?0=5D_target-arm=3A_kvm64=3A_handle_SIGBUS_signal_from_kernel_or?=
+ =?utf-8?q?_KVM?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Peter Maydell <peter.maydell@linaro.org>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Li Qiang <liq3ea@gmail.com>
+To: 'Peter Maydell' <peter.maydell@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard
+	Henderson <rth@twiddle.net>, "zhengxiang (A)" <zhengxiang9@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Thu, Nov 22, 2018 at 03:11:39AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Step in to maintain it, with Laszlo (EDK2) and Gerd (SeaBIOS)
-> as designated reviewers.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
-
-> ---
-> Note than OpenBIOS also consumes this device (PPC/Sparc).
->=20
->  MAINTAINERS | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 1032406c56..b28ec13963 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1534,6 +1534,19 @@ F: hw/display/edid*
->  F: include/hw/display/edid.h
->  F: qemu-edid.c
-> =20
-> +Firmware configuration (fw_cfg)
-> +M: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> +R: Laszlo Ersek <lersek@redhat.com>
-> +R: Gerd Hoffmann <kraxel@redhat.com>
-> +S: Supported
-> +F: docs/specs/fw_cfg.txt
-> +F: hw/nvram/fw_cfg.c
-> +F: include/hw/nvram/fw_cfg.h
-> +F: include/standard-headers/linux/qemu_fw_cfg.h
-> +F: tests/libqos/fw_cfg.c
-> +F: tests/fw_cfg-test.c
-> +T: git https://github.com/philmd/qemu.git fw_cfg-next
-> +
->  Subsystems
->  ----------
->  Audio
-> --=20
-> 2.17.2
->=20
-
---=20
-Eduardo
+PiA+DQo+ID4gK3ZvaWQga3ZtX2FyY2hfb25fc2lnYnVzX3ZjcHUoQ1BVU3RhdGUgKmMsIGludCBj
+b2RlLCB2b2lkICphZGRyKSB7DQo+ID4gKyAgICByYW1fYWRkcl90IHJhbV9hZGRyOw0KPiA+ICsg
+ICAgaHdhZGRyIHBhZGRyOw0KPiA+ICsNCj4gPiArICAgIGFzc2VydChjb2RlID09IEJVU19NQ0VF
+UlJfQVIgfHwgY29kZSA9PSBCVVNfTUNFRVJSX0FPKTsNCj4gPiArICAgIGlmIChhZGRyKSB7DQo+
+ID4gKyAgICAgICAgcmFtX2FkZHIgPSBxZW11X3JhbV9hZGRyX2Zyb21faG9zdChhZGRyKTsNCj4g
+PiArICAgICAgICBpZiAocmFtX2FkZHIgIT0gUkFNX0FERFJfSU5WQUxJRCAmJg0KPiA+ICsgICAg
+ICAgICAgICBrdm1fcGh5c2ljYWxfbWVtb3J5X2FkZHJfZnJvbV9ob3N0KGMtPmt2bV9zdGF0ZSwg
+YWRkciwgJnBhZGRyKSkgew0KPiA+ICsgICAgICAgICAgICBrdm1faHdwb2lzb25fcGFnZV9hZGQo
+cmFtX2FkZHIpOw0KPiA+ICsgICAgICAgICAgICBpZiAoY29kZSA9PSBCVVNfTUNFRVJSX0FSKSB7
+DQo+ID4gKyAgICAgICAgICAgICAgICBrdm1fY3B1X3N5bmNocm9uaXplX3N0YXRlKGMpOw0KPiA+
+ICsgICAgICAgICAgICAgICAgaWYgKGdoZXNfcmVjb3JkX2Vycm9ycyhBQ1BJX0hFU1RfTk9USUZZ
+X1NFQSwgcGFkZHIpKSB7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAga3ZtX2luamVjdF9hcm1f
+c2VhKGMpOw0KPiA+ICsgICAgICAgICAgICAgICAgfSBlbHNlIHsNCj4gPiArICAgICAgICAgICAg
+ICAgICAgICBmcHJpbnRmKHN0ZGVyciwgImZhaWxlZCB0byByZWNvcmQgdGhlIGVycm9yXG4iKTsN
+Cj4gPiArICAgICAgICAgICAgICAgIH0NCj4gDQo+IFNob3VsZG4ndCB0aGVyZSBiZSBzb21ldGhp
+bmcgaW4gaGVyZSB0byBzYXkgIm9ubHkgcmVwb3J0IHRoaXMgZXJyb3IgdG8gdGhlIGd1ZXN0IGlm
+IHdlIGFyZSBhY3R1YWxseSByZXBvcnRpbmcgUkFTIGVycm9ycyB0byB0aGUgZ3Vlc3QiID8NCg0K
+WWVzLCBXZSBjYW4gc2F5IHNvbWV0aGluZyB0aGF0IHN1Y2ggYXMgInJlcG9ydCB0aGlzIGVycm9y
+IHRvIHRoZSBndWVzdCIsIGJlY2F1c2UgdGhpcyBlcnJvciBpcyBpbmRlZWQgdHJpZ2dlcmVkIGJ5
+IGd1ZXN0LCB3aGljaCBpcyBndWVzdCBlcnJvci4NCg0KPiANCj4gPiArICAgICAgICAgICAgfQ0K
+PiA+ICsgICAgICAgICAgICByZXR1cm47DQo+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgICAgIGZw
+cmludGYoc3RkZXJyLCAiSGFyZHdhcmUgbWVtb3J5IGVycm9yIGZvciBtZW1vcnkgdXNlZCBieSAi
+DQo+ID4gKyAgICAgICAgICAgICAgICAiUUVNVSBpdHNlbGYgaW5zdGVhZCBvZiBndWVzdCBzeXN0
+ZW0hXG4iKTsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICBpZiAoY29kZSA9PSBCVVNfTUNF
+RVJSX0FSKSB7DQo+ID4gKyAgICAgICAgZnByaW50ZihzdGRlcnIsICJIYXJkd2FyZSBtZW1vcnkg
+ZXJyb3IhXG4iKTsNCj4gPiArICAgICAgICBleGl0KDEpOw0KPiA+ICsgICAgfQ0KPiA+ICt9DQo+
+ID4gKw0KPiA+ICAvKiBDNi42LjI5IEJSSyBpbnN0cnVjdGlvbiAqLw0KPiA+ICBzdGF0aWMgY29u
+c3QgdWludDMyX3QgYnJrX2luc24gPSAweGQ0MjAwMDAwOw0KPiANCj4gdGhhbmtzDQo+IC0tIFBN
+TQ0K
