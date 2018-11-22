@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gPqKw-0003RL-9F
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:52:13 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gPqNL-0005Dk-Rk
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:54:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gPqKu-0000qd-Ti
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:52:10 -0500
-References: <154289709597.235079.13366613265527123490.stgit@bahia.lan>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <2d93a332-33ad-3d3a-ab70-300d33b14e53@vivier.eu>
-Date: Thu, 22 Nov 2018 15:51:53 +0100
+	(envelope-from <kwolf@redhat.com>) id 1gPqNK-0004l7-2o
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:54:39 -0500
+Date: Thu, 22 Nov 2018 15:54:29 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181122145429.GD31879@linux.fritz.box>
+References: <20181120184148.22501-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <154289709597.235079.13366613265527123490.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] spapr: drop redundant
- statement in spapr_populate_drconf_memory()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181120184148.22501-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] nvme: fix out-of-bounds access to the CMB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +22,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, Li Qiang <liq3ea@gmail.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org
 
-On 22/11/2018 15:31, Greg Kurz wrote:
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/ppc/spapr.c |    2 --
->  1 file changed, 2 deletions(-)
+Am 20.11.2018 um 19:41 hat Paolo Bonzini geschrieben:
+> Because the CMB BAR has a min_access_size of 2, if you read the last
+> byte it will try to memcpy *2* bytes from n->cmbuf, causing an off-by-one
+> error.  This is CVE-2018-16847.
 > 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 9c41098b5781..7771a628f879 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -893,8 +893,6 @@ static int spapr_populate_drconf_memory(sPAPRMachineState *spapr, void *fdt)
->      /* ibm,associativity-lookup-arrays */
->      buf_len = (nr_nodes * 4 + 2) * sizeof(uint32_t);
->      cur_index = int_buf = g_malloc0(buf_len);
-> -
-> -    cur_index = int_buf;
->      int_buf[0] = cpu_to_be32(nr_nodes);
->      int_buf[1] = cpu_to_be32(4); /* Number of entries per associativity list */
->      cur_index += 2;
+> Another way to fix this might be to register the CMB as a RAM memory
+> region, which would also be more efficient.  However, that might be a
+> change for big-endian machines; I didn't think this through and I don't
+> know how real hardware works.  Add a basic testcase for the CMB in case
+> somebody does this change later on.
 > 
-> 
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: qemu-block@nongnu.org
+> Reported-by: Li Qiang <liq3ea@gmail.com>
+> Reviewed-by: Li Qiang <liq3ea@gmail.com>
+> Tested-by: Li Qiang <liq3ea@gmail.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Thanks, applied to the block branch and reverted 5e3c0220d7.
+
+Kevin
