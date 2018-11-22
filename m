@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1gPkyM-0006Br-9m
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 04:08:32 -0500
+	(envelope-from <thuth@redhat.com>) id 1gPkzN-0007vT-GX
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 04:09:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guoheyi@huawei.com>) id 1gPkyH-00043k-AS
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 04:08:30 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2575 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1gPkyG-0003yh-Ud
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 04:08:25 -0500
-References: <B328F08581D714418202ABF306D3781C3B774417@dggeml509-mbx.china.huawei.com>
-	<20181120152325.ekxhvjndzgflijvb@sirius.home.kraxel.org>
-	<B328F08581D714418202ABF306D3781C3B776FA6@dggeml509-mbx.china.huawei.com>
-	<20181121082307.3fa3nd7cuu3canx4@sirius.home.kraxel.org>
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <95db2c67-d3bd-1ab3-2f12-2adf218a3038@huawei.com>
-Date: Thu, 22 Nov 2018 17:08:16 +0800
+	(envelope-from <thuth@redhat.com>) id 1gPkzI-0005Lu-TG
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 04:09:33 -0500
+References: <mhng-ce1dc513-eb34-4ace-b3a2-248347025887@palmer-si-x1c4>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1a6f23a1-fba1-578b-38cb-4274177ee7d5@redhat.com>
+Date: Thu, 22 Nov 2018 10:09:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181121082307.3fa3nd7cuu3canx4@sirius.home.kraxel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <mhng-ce1dc513-eb34-4ace-b3a2-248347025887@palmer-si-x1c4>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel]
- =?utf-8?b?562U5aSNOiAgQ2FuJ3Qgc2VlIG1vdXNlIGN1cnNv?=
- =?utf-8?q?r_on_VNC_viewer?=
+Subject: Re: [Qemu-devel] [PATCH for-3.1 1/2] MAINTAINERS: Any file with
+ "riscv" in the name is a RISC-V file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Palmer Dabbelt <palmer@sifive.com>, philmd@redhat.com
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 
-Hi Gerd,
+On 2018-11-22 02:44, Palmer Dabbelt wrote:
+> On Wed, 21 Nov 2018 16:29:09 PST (-0800), philmd@redhat.com wrote:
+>> On 22/11/18 0:46, Palmer Dabbelt wrote:
+>>> There was a recent thread about unmaintained files in QEMU where it w=
+as
+>>> noted that a few RISC-V related files had slipped through the pattern=
+s
+>>> in our MAINTAINERS file entry.=C2=A0 This patch adds some more aggres=
+sive
+>>> pattern matching in an attempt to rectify this situation.
+>>>
+>>> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+>>> ---
+>>> =C2=A0 MAINTAINERS | 2 ++
+>>> =C2=A0 1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index 1032406c5607..e89adc81d5d5 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -255,6 +255,8 @@ F: target/riscv/
+>>> =C2=A0 F: hw/riscv/
+>>> =C2=A0 F: include/hw/riscv/
+>>> =C2=A0 F: disas/riscv.c
+>>> +K: riscv
 
-One more question: do you know any VNC client which supports rich cursor =
-extension? We'd like to try such client to see the real effect.
+Please be very careful with the "K:" lines ... you could suddenly end up
+being a "maintainer" for files that you did not expect. For example,
+after applying your patch, I guess the following commands will tell you
+that you're the maintainer of these files:
 
-Thanks,
+ script/get_maintainer.pl -f MAINTAINERS
+ script/get_maintainer.pl -f qapi/misc.json
+ script/get_maintainer.pl -f configure
+ ...
 
-Heyi
+For this reason, we've limited the "K:" lines in MAINTAINERS so far to
+files that contain the regex "^Subject:", too (so that they only match
+patches with the keyword in the subject).
 
+>>> +N: riscv
+>>
+>> QEMU doesn't support the 'N' tag.
+>> I see from the Linux kernel:
+>>
+>> =C2=A0=C2=A0 N: Files and directories with regex patterns.
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 N:=C2=A0=C2=A0 [^a-z]tegra=C2=A0=C2=A0=C2=
+=A0=C2=A0 all files whose path contains the word tegra
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 One pattern per line.=C2=A0 Multiple N:=
+ lines acceptable.
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 scripts/get_maintainer.pl has different=
+ behavior for files that
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 match F: pattern and matches of N: patt=
+erns.=C2=A0 By default,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 get_maintainer will not look at git log=
+ history when an F: pattern
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 match occurs.=C2=A0 When an N: match oc=
+curs, git log history is used
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 to also notify the people that have git=
+ commit signatures.
+>>
+>> Should we add this feature to checkscript?
+>=20
+> Ah, I didn't check because I just copied this from our Linux entry.=C2=A0
+> It's pretty much the core of what I'm trying to do here so if it's easy
+> then that'd be great.
+>=20
+> Unfortunately I don't know how to do so.
 
-On 2018/11/21 16:23, Gerd Hoffmann wrote:
->    Hi,
->
->> and can=E2=80=99t see cursor either with =E2=80=9Cvirtio-gpu=E2=80=9D.=
- Does that mean
->> virtio-gpu + VNC must rely on VNC client to draw the cursor image on
->> the screen?
-> Yes.  virtio-gpu sends the cursor to the vnc client (via rich cursor
-> extension) and expects the vnc client to show it.  So, if you ask your
-> vnc client to not show the rich cursor the cursor is gone.  Solution:
-> don't do that.
->
-> stdvga has no hardware cursor support, so it is rendered to the
-> framebuffer (by the guest).
->
-> cirrus hardware cursor can't be mapped to rich cursor,
-> so it is rendered to the framebuffer too (by qemu this time).
->
-> cheers,
->    Gerd
->
->
->
+Try to export the commits eb90d0855 and bbbe96ed8 from the Linux kernel
+git and see whether the patches can be applied to our version of
+get_maintainers.pl, too.
+
+ HTH,
+  Thomas
