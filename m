@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gPp12-0003bz-8W
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 08:27:35 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gPp5d-0006FX-4l
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 08:32:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gPp0u-0007Oi-0w
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 08:27:30 -0500
-Received: from 9.mo7.mail-out.ovh.net ([46.105.60.248]:40327)
+	(envelope-from <kraxel@redhat.com>) id 1gPp5Z-0005oZ-TR
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 08:32:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gPp0t-0007Ck-QO
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 08:27:23 -0500
-Received: from player691.ha.ovh.net (unknown [10.109.143.146])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 585BAE9461
-	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 14:27:17 +0100 (CET)
-Date: Thu, 22 Nov 2018 14:27:08 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181122142708.510f2f69@bahia.lan>
-In-Reply-To: <1542892767-37213-1-git-send-email-spopovyc@redhat.com>
-References: <1542892767-37213-1-git-send-email-spopovyc@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for 3.1 v3] spapr: Fix ibm,
- max-associativity-domains property number of nodes
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gPp5Z-0005nn-OF
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 08:32:13 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E41EB811DA
+	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 13:32:12 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 22 Nov 2018 14:32:07 +0100
+Message-Id: <20181122133207.29928-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] audio/hda: fix guest triggerable assert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,119 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Serhii Popovych <spopovyc@redhat.com>
-Cc: qemu-ppc@nongnu.org, lvivier@redhat.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Thu, 22 Nov 2018 08:19:27 -0500
-Serhii Popovych <spopovyc@redhat.com> wrote:
+Guest writes to a readonly register trigger the assert in
+intel_hda_reg_write().  Add a check and just ignore them.
 
-> Laurent Vivier reported off by one with maximum number of NUMA nodes
-> provided by qemu-kvm being less by one than required according to
-> description of "ibm,max-associativity-domains" property in LoPAPR.
-> 
-> It appears that I incorrectly treated LoPAPR description of this
-> property assuming it provides last valid domain (NUMA node here)
-> instead of maximum number of domains.
-> 
->   ### Before hot-add
-> 
->   (qemu) info numa
->   3 nodes
->   node 0 cpus: 0
->   node 0 size: 0 MB
->   node 0 plugged: 0 MB
->   node 1 cpus:
->   node 1 size: 1024 MB
->   node 1 plugged: 0 MB
->   node 2 cpus:
->   node 2 size: 0 MB
->   node 2 plugged: 0 MB
-> 
->   $ numactl -H
->   available: 2 nodes (0-1)
->   node 0 cpus: 0
->   node 0 size: 0 MB
->   node 0 free: 0 MB
->   node 1 cpus:
->   node 1 size: 999 MB
->   node 1 free: 658 MB
->   node distances:
->   node   0   1
->     0:  10  40
->     1:  40  10
-> 
->   ### Hot-add
-> 
->   (qemu) object_add memory-backend-ram,id=mem0,size=1G
->   (qemu) device_add pc-dimm,id=dimm1,memdev=mem0,node=2
->   (qemu) [   87.704898] pseries-hotplug-mem: Attempting to hot-add 4 ...
->   <there is no "Initmem setup node 2 [mem 0xHEX-0xHEX]">
->   [   87.705128] lpar: Attempting to resize HPT to shift 21
->   ... <HPT resize messages>
-> 
->   ### After hot-add
-> 
->   (qemu) info numa
->   3 nodes
->   node 0 cpus: 0
->   node 0 size: 0 MB
->   node 0 plugged: 0 MB
->   node 1 cpus:
->   node 1 size: 1024 MB
->   node 1 plugged: 0 MB
->   node 2 cpus:
->   node 2 size: 1024 MB
->   node 2 plugged: 1024 MB
-> 
->   $ numactl -H
->   available: 2 nodes (0-1)
->   ^^^^^^^^^^^^^^^^^^^^^^^^
->              Still only two nodes (and memory hot-added to node 0 below)
->   node 0 cpus: 0
->   node 0 size: 1024 MB
->   node 0 free: 1021 MB
->   node 1 cpus:
->   node 1 size: 999 MB
->   node 1 free: 658 MB
->   node distances:
->   node   0   1
->     0:  10  40
->     1:  40  10
-> 
-> After fix applied numactl(8) reports 3 nodes available and memory
-> plugged into node 2 as expected.
-> 
-> From David Gibson:
-> ------------------
->   Qemu makes a distinction between "non NUMA" (nb_numa_nodes == 0) and
->   "NUMA with one node" (nb_numa_nodes == 1).  But from a PAPR guests's
->   point of view these are equivalent.  I don't want to present two
->   different cases to the guest when we don't need to, so even though the
->   guest can handle it, I'd prefer we put a '1' here for both the
->   nb_numa_nodes == 0 and nb_numa_nodes == 1 case.
-> 
-> This consolidates everything discussed previously on mailing list.
-> 
-> Fixes: da9f80fbad21 ("spapr: Add ibm,max-associativity-domains property")
-> Reported-by: Laurent Vivier <lvivier@redhat.com>
-> Signed-off-by: Serhii Popovych <spopovyc@redhat.com>
-> ---
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1628433
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/audio/intel-hda.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/spapr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 7afd1a1..2ee7201 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1033,7 +1033,7 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
->          cpu_to_be32(0),
->          cpu_to_be32(0),
->          cpu_to_be32(0),
-> -        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes - 1 : 0),
-> +        cpu_to_be32(nb_numa_nodes ? nb_numa_nodes : 1),
->      };
->  
->      _FDT(rtas = fdt_add_subnode(fdt, 0, "rtas"));
+diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+index 23a2cf6484..066532713c 100644
+--- a/hw/audio/intel-hda.c
++++ b/hw/audio/intel-hda.c
+@@ -929,6 +929,10 @@ static void intel_hda_reg_write(IntelHDAState *d, const IntelHDAReg *reg, uint32
+     if (!reg) {
+         return;
+     }
++    if (!reg->wmask) {
++        /* read-only register */
++        return;
++    }
+ 
+     if (d->debug) {
+         time_t now = time(NULL);
+-- 
+2.9.3
