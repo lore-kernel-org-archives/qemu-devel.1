@@ -1,15 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gPlqi-0007ya-Nk
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 05:04:43 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gPlqz-00084t-Bj
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 05:04:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gPlmq-0001V6-Ia
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 05:00:41 -0500
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 22 Nov 2018 02:00:25 -0800
-Message-Id: <1542880825-2604-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH] hw: arm: musicpal: drop TYPE_WM8750 in
- object_property_set_link()
+	(envelope-from <kraxel@redhat.com>) id 1gPlqt-0005bu-UQ
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 05:04:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43216)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gPlqt-0005Zt-NM
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 05:04:51 -0500
+Date: Thu, 22 Nov 2018 11:04:49 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181122100449.azp2vrxiupqcdfem@sirius.home.kraxel.org>
+References: <B328F08581D714418202ABF306D3781C3B774417@dggeml509-mbx.china.huawei.com>
+	<20181120152325.ekxhvjndzgflijvb@sirius.home.kraxel.org>
+	<B328F08581D714418202ABF306D3781C3B776FA6@dggeml509-mbx.china.huawei.com>
+	<20181121082307.3fa3nd7cuu3canx4@sirius.home.kraxel.org>
+	<95db2c67-d3bd-1ab3-2f12-2adf218a3038@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <95db2c67-d3bd-1ab3-2f12-2adf218a3038@huawei.com>
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSNOiAgQ2FuJ3Qgc2VlIG1vdXNlIGN1cnNv?=
+ =?utf-8?q?r_on_VNC_viewer?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,30 +32,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jan.kiszka@web.de, peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, maozhongyi@cmss.chinamobile.com, philmd@redhat.com, Li Qiang <liq3ea@gmail.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-The third argument of object_property_set_link() is the name of
-property, not related with the QOM type name, using the constant
-string instead.
+On Thu, Nov 22, 2018 at 05:08:16PM +0800, Heyi Guo wrote:
+> Hi Gerd,
+> 
+> One more question: do you know any VNC client which supports rich
+> cursor extension? We'd like to try such client to see the real effect.
 
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
----
- hw/arm/musicpal.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+remote-viewer (comes with virt-viewer) supports it for sure.
 
-diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index 9648b3af44..726ae29394 100644
---- a/hw/arm/musicpal.c
-+++ b/hw/arm/musicpal.c
-@@ -1696,7 +1696,7 @@ static void musicpal_init(MachineState *machine)
-     dev = qdev_create(NULL, TYPE_MV88W8618_AUDIO);
-     s = SYS_BUS_DEVICE(dev);
-     object_property_set_link(OBJECT(dev), OBJECT(wm8750_dev),
--                             TYPE_WM8750, NULL);
-+                             "wm8750", NULL);
-     qdev_init_nofail(dev);
-     sysbus_mmio_map(s, 0, MP_AUDIO_BASE);
-     sysbus_connect_irq(s, 0, pic[MP_AUDIO_IRQ]);
--- 
-2.11.0
+cheers,
+  Gerd
