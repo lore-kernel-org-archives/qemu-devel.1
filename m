@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gPjDv-0000ox-QD
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:16:29 -0500
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gPjI2-0002gT-IQ
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gPjDp-0005Pk-QL
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:16:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39406)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gPjDp-0005IQ-4q
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:16:21 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 980E83082AFC
-	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 07:16:17 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 22 Nov 2018 08:16:13 +0100
-Message-Id: <20181122071613.2889-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] qapi: add query-display-options command
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gPjHy-0001gV-5D
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:20:42 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:39996)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1gPjHx-0001f9-Sm
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:20:38 -0500
+Received: by mail-pg1-x541.google.com with SMTP id z10so1312366pgp.7
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 23:20:37 -0800 (PST)
+From: guangrong.xiao@gmail.com
+Date: Thu, 22 Nov 2018 15:20:23 +0800
+Message-Id: <20181122072028.22819-1-xiaoguangrong@tencent.com>
+Subject: [Qemu-devel] [PATCH v3 0/5] migration: improve multithreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +24,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Add query-display-options command, which allows querying the qemu
-display configuration, and -- as an intentional side effect -- makes
-DisplayOptions discoverable via query-qmp-schema so libvirt can go
-figure which display options are supported.
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Use case: commit d4dc4ab1 added rendernode parameter for egl-headless.
+Changelog in v3:
+Thanks to Emilio's comments and his example code, the changes in
+this version are:
+1. move @requests from the shared data struct to each single thread
+2. move completion ev from the shared data struct to each single thread
+3. move bitmaps from the shared data struct to each single thread
+4. limit the number of request that each thread need handle to 64, then
+   use uint64_t instead of bitmap pointer.
+   
+The performance is measured by using the benchmark we introduced in
+this pachset:
+	./tests/threaded-workqueue-bench -c 20 -m 16 -t N
+the data is as followings:
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Tested-by: Eric Blake <eblake@redhat.com>
-Tested-by: Erik Skultety <eskultet@redhat.com>
----
- vl.c         |  6 ++++++
- qapi/ui.json | 13 +++++++++++++
- 2 files changed, 19 insertions(+)
+The baseline of v2:
+Thread #, Throughput
+1, 0.428024
+4, 1.668876
+8, 3.501940
+12, 5.026403
+16, 1.912374
+20, 1.174771
+24, 1.074085
+28, 0.747920
+32, 0.651409
+36, 0.533240
+40, 0.517421
+44, 0.482153
+48, 0.525176
+52, 0.492677
+56, 0.798679
+60, 0.733868
+64, 0.751396
 
-diff --git a/vl.c b/vl.c
-index fa25d1ae2d..d6fd95c227 100644
---- a/vl.c
-+++ b/vl.c
-@@ -128,6 +128,7 @@ int main(int argc, char **argv)
- #include "qapi/qapi-commands-block-core.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qapi/qapi-commands-run-state.h"
-+#include "qapi/qapi-commands-ui.h"
- #include "qapi/qmp/qerror.h"
- #include "sysemu/iothread.h"
- 
-@@ -2055,6 +2056,11 @@ static void parse_display_qapi(const char *optarg)
-     visit_free(v);
- }
- 
-+DisplayOptions *qmp_query_display_options(Error **errp)
-+{
-+    return QAPI_CLONE(DisplayOptions, &dpy);
-+}
-+
- static void parse_display(const char *p)
- {
-     const char *opts;
-diff --git a/qapi/ui.json b/qapi/ui.json
-index e0000248d3..fd39acb5c3 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1102,3 +1102,16 @@
-   'discriminator' : 'type',
-   'data'    : { 'gtk'            : 'DisplayGTK',
-                 'egl-headless'   : 'DisplayEGLHeadless'} }
-+
-+##
-+# @query-display-options:
-+#
-+# Returns information about display configuration
-+#
-+# Returns: @DisplayOptions
-+#
-+# Since: 3.1
-+#
-+##
-+{ 'command': 'query-display-options',
-+  'returns': 'DisplayOptions' }
+After this patchset:
+Thread #, Throughput
+1, 0.449192
+4, 1.849271
+8, 3.644339
+12, 4.809391
+16, 4.709095
+20, 4.942153
+24, 5.116967
+28, 4.921542
+32, 5.008816
+36, 5.408070
+40, 5.166064
+44, 4.994953
+48, 4.853351
+52, 4.797540
+56, 4.815153
+60, 4.793704
+64, 4.913544
+
+To see more detailed compression by each step, please refer to
+   https://ibb.co/hq7u5V
+
+Xiao Guangrong (5):
+  bitops: introduce change_bit_atomic
+  util: introduce threaded workqueue
+  migration: use threaded workqueue for compression
+  migration: use threaded workqueue for decompression
+  tests: add threaded-workqueue-bench
+
+ include/qemu/bitops.h             |  13 +
+ include/qemu/threaded-workqueue.h | 106 ++++++++
+ migration/ram.c                   | 530 ++++++++++++++------------------------
+ tests/Makefile.include            |   5 +-
+ tests/threaded-workqueue-bench.c  | 255 ++++++++++++++++++
+ util/Makefile.objs                |   1 +
+ util/threaded-workqueue.c         | 463 +++++++++++++++++++++++++++++++++
+ 7 files changed, 1029 insertions(+), 344 deletions(-)
+ create mode 100644 include/qemu/threaded-workqueue.h
+ create mode 100644 tests/threaded-workqueue-bench.c
+ create mode 100644 util/threaded-workqueue.c
+
 -- 
-2.9.3
+2.14.5
