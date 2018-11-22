@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55151)
+Received: from eggs.gnu.org ([208.118.235.92]:55059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPnta-0000Pq-3O
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPnta-0000Nx-0K
 	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPntT-0001w6-E7
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:45 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:53508)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPnt9-00015T-WC
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:24 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:58000)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gPntL-0001Wj-Qx
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:33 -0500
+	id 1gPnt9-00012f-Ni
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:19 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 22 Nov 2018 14:13:59 +0200
-Message-Id: <20181122121402.13764-22-yuval.shaia@oracle.com>
+Date: Thu, 22 Nov 2018 14:13:57 +0200
+Message-Id: <20181122121402.13764-20-yuval.shaia@oracle.com>
 In-Reply-To: <20181122121402.13764-1-yuval.shaia@oracle.com>
 References: <20181122121402.13764-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v5 21/24] hw/rdma: Do not use
- bitmap_zero_extend to free bitmap
+Subject: [Qemu-devel] [PATCH v5 19/24] vl: Introduce shutdown_notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +26,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-bitmap_zero_extend is designed to work for extending, not for
-shrinking.
-Using g_free instead.
+Notifier will be used for signaling shutdown event to inform system is
+shutdown. This will allow devices and other component to run some
+cleanup code needed before VM is shutdown.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/rdma/rdma_rm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/sysemu/sysemu.h |  1 +
+ vl.c                    | 15 ++++++++++++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index b7d4ebe972..ca127c8c26 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -43,7 +43,7 @@ static inline void res_tbl_free(RdmaRmResTbl *tbl)
- {
-     qemu_mutex_destroy(&tbl->lock);
-     g_free(tbl->tbl);
--    bitmap_zero_extend(tbl->bitmap, tbl->tbl_sz, 0);
-+    g_free(tbl->bitmap);
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 8d6095d98b..0d15f16492 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -80,6 +80,7 @@ void qemu_register_wakeup_notifier(Notifier *notifier);
+ void qemu_system_shutdown_request(ShutdownCause reason);
+ void qemu_system_powerdown_request(void);
+ void qemu_register_powerdown_notifier(Notifier *notifier);
++void qemu_register_shutdown_notifier(Notifier *notifier);
+ void qemu_system_debug_request(void);
+ void qemu_system_vmstop_request(RunState reason);
+ void qemu_system_vmstop_request_prepare(void);
+diff --git a/vl.c b/vl.c
+index fa25d1ae2d..48177f7dd1 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1578,6 +1578,8 @@ static NotifierList suspend_notifiers =
+     NOTIFIER_LIST_INITIALIZER(suspend_notifiers);
+ static NotifierList wakeup_notifiers =
+     NOTIFIER_LIST_INITIALIZER(wakeup_notifiers);
++static NotifierList shutdown_notifiers =
++    NOTIFIER_LIST_INITIALIZER(shutdown_notifiers);
+ static uint32_t wakeup_reason_mask = ~(1 << QEMU_WAKEUP_REASON_NONE);
+ 
+ ShutdownCause qemu_shutdown_requested_get(void)
+@@ -1809,6 +1811,12 @@ static void qemu_system_powerdown(void)
+     notifier_list_notify(&powerdown_notifiers, NULL);
  }
  
- static inline void *res_tbl_get(RdmaRmResTbl *tbl, uint32_t handle)
++static void qemu_system_shutdown(ShutdownCause cause)
++{
++    qapi_event_send_shutdown(shutdown_caused_by_guest(cause));
++    notifier_list_notify(&shutdown_notifiers, &cause);
++}
++
+ void qemu_system_powerdown_request(void)
+ {
+     trace_qemu_system_powerdown_request();
+@@ -1821,6 +1829,11 @@ void qemu_register_powerdown_notifier(Notifier *notifier)
+     notifier_list_add(&powerdown_notifiers, notifier);
+ }
+ 
++void qemu_register_shutdown_notifier(Notifier *notifier)
++{
++    notifier_list_add(&shutdown_notifiers, notifier);
++}
++
+ void qemu_system_debug_request(void)
+ {
+     debug_requested = 1;
+@@ -1848,7 +1861,7 @@ static bool main_loop_should_exit(void)
+     request = qemu_shutdown_requested();
+     if (request) {
+         qemu_kill_report();
+-        qapi_event_send_shutdown(shutdown_caused_by_guest(request));
++        qemu_system_shutdown(request);
+         if (no_shutdown) {
+             vm_stop(RUN_STATE_SHUTDOWN);
+         } else {
 -- 
 2.17.2
