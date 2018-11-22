@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPn7s-0000eY-E9
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:26:29 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gPnBK-0002It-5b
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:30:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPn7o-0003s1-CG
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:26:28 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:39690)
+	(envelope-from <pm215@archaic.org.uk>) id 1gPnBJ-0005ax-9Q
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:30:02 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52716)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gPn7o-0003i5-1k
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:26:24 -0500
-Date: Thu, 22 Nov 2018 13:26:12 +0200
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181122112611.GB8920@lap1>
-References: <20181116200016.2080785-1-eblake@redhat.com>
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1gPnBJ-0004lO-2L
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:30:01 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Nov 2018 11:29:44 +0000
+Message-Id: <20181122112947.7586-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181116200016.2080785-1-eblake@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] qapi: Reduce Makefile boilerplate
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for-4.0 0/3] Avoid cpu_physical_memory_read()
+ in generic code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Nov 20, 2018 at 01:17:28PM +0200, Eric Blake wrote:
-> Adding a new qapi module had some rather tedious repetition to
-> wire it into Makefile, Makefile.objs, and .gitignore (for example,
-> see commit bf42508f and its followup b61acdec). For make, add some
-> indirection by taking advantage of GNU Make string processing to
-> expand a list of module names into all the required artifacts, so
-> that future additions of a new module need only touch the list of
-> module names.  And for gitignore, use globs to cover all generated
-> file names.
->=20
-> The list has to live in Makefile.objs, due to the way that
-> our unnest-vars macro slirps in that file without remembering
-> any definition of $(QAPI_MODULES) from Makefile.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> ---
-> v3: also tweak .gitignore [Dan]
-> v2: also condense Makefile.objs, prefer $(FOO:%=3Da%b) over
-> $(patsubst %,a%b,$(FOO))
-> ---
+This patchset takes three places in generic code which
+use cpu_physical_memory_read(), and changes them to use
+address_space_read() instead.
 
-Used it to integrate a new QMP message for pvrdma device and it indeed
-makes effort minimal.
+cpu_physical_memory_{read,rw,write} all implicitly assume
+that there is exactly one view of physical memory. This
+is sort-of true today, but we'd like to be able to move
+to having heterogenous systems where not all CPUs share
+the same view of physical memory.
 
-So:
+In disas.c we are disassembling for a particular CPU, so
+use that CPU's primary address space (cs->as).
 
-Tested-by: Yuval Shaia <yuval.shaia@oracle.com>
+In monitor.c we are reading physical memory for a
+particular CPU, so again use that CPU's primary address
+space; we fall back to address_space_memory for the case
+where there are no CPUs in the system (-machine none).
 
-Thanks,
-Yuval
+In elf_ops.h the function was passed an address space to
+use, so just use it.
 
->  Makefile      | 192 ++++++--------------------------------------------
->  Makefile.objs |  75 ++------------------
->  .gitignore    |  72 ++-----------------
->  3 files changed, 34 insertions(+), 305 deletions(-)
->=20
+Other places in generic code that use these functions are:
+ * dump.c -- the whole UI here seems to assume that there
+   is only one view of memory and that is what is being dumped
+ * cpu.c:qmp_pmemsave() -- again, the UI assumption is that
+   there's only one view of memory
+So I've left those alone.
+
+NB: git grep command line for finding callsites:
+ git grep '\<cpu_physical_memory_\(read\|write\|rw\)\>'
+
+thanks
+-- PMM
+
+Peter Maydell (3):
+  disas.c: Use address_space_read() to read memory
+  monitor: Use address_space_read() to read memory
+  elf_ops.h: Use address_space_write() to write memory
+
+ include/hw/elf_ops.h | 3 ++-
+ disas.c              | 5 ++++-
+ monitor.c            | 8 +++++++-
+ 3 files changed, 13 insertions(+), 3 deletions(-)
+
+-- 
+2.19.1
