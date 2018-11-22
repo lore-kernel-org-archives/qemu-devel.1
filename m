@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1gPip7-0001bE-65
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 01:50:50 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gPjBd-00088p-A3
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:14:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1gPip0-0006Lk-IM
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 01:50:49 -0500
-Message-ID: <121d4f915a03c2e734feebceda023947aedb78a3.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Thu, 22 Nov 2018 17:50:07 +1100
-In-Reply-To: <20181122044450.GF10448@umbus.fritz.box>
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-5-clg@kaod.org>
-	<20181122044450.GF10448@umbus.fritz.box>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gPjBc-0003DB-DW
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:14:05 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34976)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gPjBc-0003Ba-3s
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:14:04 -0500
+Received: by mail-wr1-x441.google.com with SMTP id 96so8137935wrb.2
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 23:14:04 -0800 (PST)
+MIME-Version: 1.0
+References: <20181121224220.10595-1-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20181121224220.10595-1-samuel.thibault@ens-lyon.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 22 Nov 2018 11:13:51 +0400
+Message-ID: <CAJ+F1CLYHOQ6E34EqfMN28SsJS4vMhYque2fBuauE=CL2V5SDQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 04/36] ppc/xive: introduce the
- XiveRouter model
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] slirp: Mark debugging calls as unlikely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: QEMU <qemu-devel@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangckid@gmail.com>
 
-On Thu, 2018-11-22 at 15:44 +1100, David Gibson wrote:
-> 
-> Sorry, didn't think of this in my first reply.
-> 
-> 1) Does the hardware ever actually write back to the EAS?  I know it
-> does for the END, but it's not clear why it would need to for the
-> EAS.  If not, we don't need the setter.
+Hi
 
-Nope, though the PAPR model will via hcalls
+On Thu, Nov 22, 2018 at 2:54 AM Samuel Thibault
+<samuel.thibault@ens-lyon.org> wrote:
+>
+> to get them out of the hot path.
+>
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> ---
+>  slirp/debug.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/slirp/debug.h b/slirp/debug.h
+> index ff920f0b87..ad4e07aa01 100644
+> --- a/slirp/debug.h
+> +++ b/slirp/debug.h
+> @@ -17,7 +17,7 @@
+>  extern int slirp_debug;
+>
+>  #define DEBUG_CALL(fmt, ...) do {               \
+> -    if (slirp_debug & DBG_CALL) {               \
+> +    if (unlikely(slirp_debug & DBG_CALL)) {     \
+>          fprintf(dfd, fmt, ##__VA_ARGS__);       \
+>          fprintf(dfd, "...\n");                  \
+>          fflush(dfd);                            \
+> @@ -25,7 +25,7 @@ extern int slirp_debug;
+>  } while (0)
+>
+>  #define DEBUG_ARG(fmt, ...) do {                \
+> -    if (slirp_debug & DBG_CALL) {               \
+> +    if (unlikely(slirp_debug & DBG_CALL)) {     \
+>          fputc(' ', dfd);                        \
+>          fprintf(dfd, fmt, ##__VA_ARGS__);       \
+>          fputc('\n', dfd);                       \
+> @@ -36,14 +36,14 @@ extern int slirp_debug;
+>  #define DEBUG_ARGS(fmt, ...) DEBUG_ARG(fmt, ##__VA_ARGS__)
+>
+>  #define DEBUG_MISC(fmt, ...) do {               \
+> -    if (slirp_debug & DBG_MISC) {               \
+> +    if (unlikely(slirp_debug & DBG_MISC)) {     \
+>          fprintf(dfd, fmt, ##__VA_ARGS__);       \
+>          fflush(dfd);                            \
+>      }                                           \
+>  } while (0)
+>
+>  #define DEBUG_ERROR(fmt, ...) do {              \
+> -    if (slirp_debug & DBG_ERROR) {              \
+> +    if (unlikely(slirp_debug & DBG_ERROR)) {    \
+>          fprintf(dfd, fmt, ##__VA_ARGS__);       \
+>          fflush(dfd);                            \
+>      }                                           \
+> --
+> 2.19.1
+>
+>
 
-> 
-> 2) The signatures are a bit odd here.  For the setter, a value would
-> make sense than a (XiveEAS *), since it's just a word.  For the getter
-> you could return the EAS value directly rather than using a pointer -
-> there's already a valid bit in the EAS so you can construct a value
-> with that cleared if the lisn is out of bounds.
+With s/unlikely/G_UNLIKELY:
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
