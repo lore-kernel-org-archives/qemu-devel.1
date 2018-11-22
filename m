@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gPsaQ-0004oe-KY
+	(envelope-from <eric.auger@redhat.com>) id 1gPsaQ-0004oo-OY
 	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:16:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gPsaN-0005e6-Cm
+	(envelope-from <eric.auger@redhat.com>) id 1gPsaN-0005eY-HS
 	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:16:18 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Thu, 22 Nov 2018 18:15:25 +0100
-Message-Id: <20181122171538.12359-5-eric.auger@redhat.com>
-In-Reply-To: <20181122171538.12359-1-eric.auger@redhat.com>
-References: <20181122171538.12359-1-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v9 04/17] virtio-iommu: Decode the command payload
+Date: Thu, 22 Nov 2018 18:15:21 +0100
+Message-Id: <20181122171538.12359-1-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v9 00/17] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,168 +20,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com, jean-philippe.brucker@arm.com
 Cc: kevin.tian@intel.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com
 
-This patch adds the command payload decoding and
-introduces the functions that will do the actual
-command handling. Those functions are not yet implemented.
+This series rebases the virtio-iommu device on qemu 3.1.0-rc2
+and implements the v0.8(.1) virtio-iommu spec [1]. The pci proxy
+for the virtio-iommu device is now available and needs to be
+instantiated from the command line using "-device virtio-iommu-pci".
+The iommu machvirt option is not used anymore to instantiate the
+virtio-iommu.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+At the moment the virtio-iommu-device only is functional in the
+ARM virt machine. Indeed, besides its instantiation, links between
+the PCIe end points and the IOMMU must be described. This is achieved
+by DT or ACPI description (IORT). This description currently only is
+done in ARM virt.
 
----
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/qemu/tree/v3.1.0-rc2-virtio-iommu-v0.9
+
+References:
+[1] [PATCH v3 0/7] Add virtio-iommu driver
+
+[2] guest branch featuring the virtio-iommu driver v0.8.1 + ACPI
+    integration not yet officially released by Jean.
+https://github.com/eauger/linux/tree/virtio-iommu-v0.8.1
+
+Testing:
+- tested with guest using virtio-net-pci
+  (,vhost=off,iommu_platform,disable-modern=off,disable-legacy=on)
+  and virtio-blk-pci
+- VFIO/VHOST integration is not part of this series
+- When using the virtio-blk-pci, some EDK2 FW versions feature
+  unmapped transactions and in that case the guest fails to boot.
+
+History:
+
+v8 -> v9:
+- virtio-iommu-pci device needs to be instantiated from the command
+  line (RID is not imposed anymore).
+- tail structure properly initialized
+
 v7 -> v8:
-- handle new domain parameter in detach
-- remove reserved checks
+- virtio-iommu-pci added
+- virt instantiation modified
+- DT and ACPI modified to exclude the iommu RID from the mapping
+- VIRTIO_IOMMU_F_BYPASS, VIRTIO_F_VERSION_1 features exposed
+
+v6 -> v7:
+- rebase on qemu 3.0.0-rc3
+- minor update against v0.7
+- fix issue with EP not on pci.0 and ACPI probing
+- change the instantiation method
 
 v5 -> v6:
-- change map/unmap semantics (remove size)
+- minor update against v0.6 spec
+- fix g_hash_table_lookup in virtio_iommu_find_add_as
+- replace some error_reports by qemu_log_mask(LOG_GUEST_ERROR, ...)
 
 v4 -> v5:
-- adopt new v0.5 terminology
+- event queue and fault reporting
+- we now return the IOAPIC MSI region if the virtio-iommu is instantiated
+  in a PC machine.
+- we bypass transactions on MSI HW region and fault on reserved ones.
+- We support ACPI boot with mach-virt (based on IORT proposal)
+- We moved to the new driver naming conventions
+- simplified mach-virt instantiation
+- worked around the disappearing of pci_find_primary_bus
+- in virtio_iommu_translate, check the dev->as is not NULL
+- initialize as->device_list in virtio_iommu_get_as
+- initialize bufstate.error to false in virtio_iommu_probe
 
 v3 -> v4:
-- no flags field anymore in struct virtio_iommu_req_unmap
-- test reserved on attach/detach, change trace proto
-- rebase on v2.10.0.
----
- hw/virtio/trace-events   |  4 ++
- hw/virtio/virtio-iommu.c | 95 ++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 95 insertions(+), 4 deletions(-)
+- probe request support although no reserved region is returned at
+  the moment
+- unmap semantics less strict, as specified in v0.4
+- device registration, attach/detach revisited
+- split into smaller patches to ease review
+- propose a way to inform the IOMMU mr about the page_size_mask
+  of underlying HW IOMMU, if any
+- remove warning associated with the translation of the MSI doorbell
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 84da904d8b..e6177ca0e4 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -55,3 +55,7 @@ virtio_iommu_set_features(uint64_t features) "features accepted by the driver =0
- virtio_iommu_device_status(uint8_t status) "driver status = %d"
- virtio_iommu_get_config(uint64_t page_size_mask, uint64_t start, uint64_t end, uint8_t domain_bits, uint32_t probe_size) "page_size_mask=0x%"PRIx64" start=0x%"PRIx64" end=0x%"PRIx64" domain_bits=%d probe_size=0x%x"
- virtio_iommu_set_config(uint64_t page_size_mask, uint64_t start, uint64_t end, uint8_t domain_bits, uint32_t probe_size) "page_size_mask=0x%"PRIx64" start=0x%"PRIx64" end=0x%"PRIx64" domain_bits=%d probe_size=0x%x"
-+virtio_iommu_attach(uint32_t domain_id, uint32_t ep_id) "domain=%d endpoint=%d"
-+virtio_iommu_detach(uint32_t domain_id, uint32_t ep_id) "domain=%d endpoint=%d"
-+virtio_iommu_map(uint32_t domain_id, uint64_t virt_start, uint64_t virt_end, uint64_t phys_start, uint32_t flags) "domain=%d virt_start=0x%"PRIx64" virt_end=0x%"PRIx64 " phys_start=0x%"PRIx64" flags=%d"
-+virtio_iommu_unmap(uint32_t domain_id, uint64_t virt_start, uint64_t virt_end) "domain=%d virt_start=0x%"PRIx64" virt_end=0x%"PRIx64
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index d8894f047b..fc95751c40 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -33,29 +33,116 @@
- /* Max size */
- #define VIOMMU_DEFAULT_QUEUE_SIZE 256
- 
-+static int virtio_iommu_attach(VirtIOIOMMU *s,
-+                               struct virtio_iommu_req_attach *req)
-+{
-+    uint32_t domain_id = le32_to_cpu(req->domain);
-+    uint32_t ep_id = le32_to_cpu(req->endpoint);
-+
-+    trace_virtio_iommu_attach(domain_id, ep_id);
-+
-+    return VIRTIO_IOMMU_S_UNSUPP;
-+}
-+
-+static int virtio_iommu_detach(VirtIOIOMMU *s,
-+                               struct virtio_iommu_req_detach *req)
-+{
-+    uint32_t domain_id = le32_to_cpu(req->domain);
-+    uint32_t ep_id = le32_to_cpu(req->endpoint);
-+
-+    trace_virtio_iommu_detach(domain_id, ep_id);
-+
-+    return VIRTIO_IOMMU_S_UNSUPP;
-+}
-+
-+static int virtio_iommu_map(VirtIOIOMMU *s,
-+                            struct virtio_iommu_req_map *req)
-+{
-+    uint32_t domain_id = le32_to_cpu(req->domain);
-+    uint64_t phys_start = le64_to_cpu(req->phys_start);
-+    uint64_t virt_start = le64_to_cpu(req->virt_start);
-+    uint64_t virt_end = le64_to_cpu(req->virt_end);
-+    uint32_t flags = le32_to_cpu(req->flags);
-+
-+    trace_virtio_iommu_map(domain_id, virt_start, virt_end, phys_start, flags);
-+
-+    return VIRTIO_IOMMU_S_UNSUPP;
-+}
-+
-+static int virtio_iommu_unmap(VirtIOIOMMU *s,
-+                              struct virtio_iommu_req_unmap *req)
-+{
-+    uint32_t domain_id = le32_to_cpu(req->domain);
-+    uint64_t virt_start = le64_to_cpu(req->virt_start);
-+    uint64_t virt_end = le64_to_cpu(req->virt_end);
-+
-+    trace_virtio_iommu_unmap(domain_id, virt_start, virt_end);
-+
-+    return VIRTIO_IOMMU_S_UNSUPP;
-+}
-+
-+#define get_payload_size(req) (\
-+sizeof((req)) - sizeof(struct virtio_iommu_req_tail))
-+
- static int virtio_iommu_handle_attach(VirtIOIOMMU *s,
-                                       struct iovec *iov,
-                                       unsigned int iov_cnt)
- {
--    return -ENOENT;
-+    struct virtio_iommu_req_attach req;
-+    size_t sz, payload_sz;
-+
-+    payload_sz = get_payload_size(req);
-+
-+    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
-+    if (sz != payload_sz) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    return virtio_iommu_attach(s, &req);
- }
- static int virtio_iommu_handle_detach(VirtIOIOMMU *s,
-                                       struct iovec *iov,
-                                       unsigned int iov_cnt)
- {
--    return -ENOENT;
-+    struct virtio_iommu_req_detach req;
-+    size_t sz, payload_sz;
-+
-+    payload_sz = get_payload_size(req);
-+
-+    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
-+    if (sz != payload_sz) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    return virtio_iommu_detach(s, &req);
- }
- static int virtio_iommu_handle_map(VirtIOIOMMU *s,
-                                    struct iovec *iov,
-                                    unsigned int iov_cnt)
- {
--    return -ENOENT;
-+    struct virtio_iommu_req_map req;
-+    size_t sz, payload_sz;
-+
-+    payload_sz = get_payload_size(req);
-+
-+    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
-+    if (sz != payload_sz) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    return virtio_iommu_map(s, &req);
- }
- static int virtio_iommu_handle_unmap(VirtIOIOMMU *s,
-                                      struct iovec *iov,
-                                      unsigned int iov_cnt)
- {
--    return -ENOENT;
-+    struct virtio_iommu_req_unmap req;
-+    size_t sz, payload_sz;
-+
-+    payload_sz = get_payload_size(req);
-+
-+    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
-+    if (sz != payload_sz) {
-+        return VIRTIO_IOMMU_S_INVAL;
-+    }
-+    return virtio_iommu_unmap(s, &req);
- }
- 
- static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
+v2 -> v3:
+- rebase on top of 2.10-rc0 and especially
+  [PATCH qemu v9 0/2] memory/iommu: QOM'fy IOMMU MemoryRegion
+- add mutex init
+- fix as->mappings deletion using g_tree_ref/unref
+- when a dev is attached whereas it is already attached to
+  another address space, first detach it
+- fix some error values
+- page_sizes = TARGET_PAGE_MASK;
+- I haven't changed the unmap() semantics yet, waiting for the
+  next virtio-iommu spec revision.
+
+v1 -> v2:
+- fix redifinition of viommu_as typedef
+
+Eric Auger (17):
+  update-linux-headers: Import virtio_iommu.h
+  linux-headers: Partial update for virtio-iommu v0.8
+  virtio-iommu: Add skeleton
+  virtio-iommu: Decode the command payload
+  virtio-iommu: Add the iommu regions
+  virtio-iommu: Endpoint and domains structs and helpers
+  virtio-iommu: Implement attach/detach command
+  virtio-iommu: Implement map/unmap
+  virtio-iommu: Implement translate
+  virtio-iommu: Implement probe request
+  virtio-iommu: Expose the IOAPIC MSI reserved region when relevant
+  virtio-iommu: Implement fault reporting
+  virtio_iommu: Handle reserved regions in translation process
+  virtio-iommu-pci: Add virtio iommu pci support
+  hw/arm/virt: Add the virtio-iommu device tree mappings
+  hw/arm/virt-acpi-build: Introduce fill_iort_idmap helper
+  hw/arm/virt-acpi-build: Add virtio-iommu node in IORT table
+
+ hw/arm/virt-acpi-build.c                      |   91 +-
+ hw/arm/virt.c                                 |   57 +-
+ hw/virtio/Makefile.objs                       |    1 +
+ hw/virtio/trace-events                        |   26 +
+ hw/virtio/virtio-iommu.c                      | 1040 +++++++++++++++++
+ hw/virtio/virtio-pci.c                        |   51 +
+ hw/virtio/virtio-pci.h                        |   14 +
+ include/hw/acpi/acpi-defs.h                   |   21 +-
+ include/hw/arm/virt.h                         |    2 +
+ include/hw/pci/pci.h                          |    1 +
+ include/hw/virtio/virtio-iommu.h              |   65 ++
+ include/standard-headers/linux/virtio_ids.h   |    1 +
+ include/standard-headers/linux/virtio_iommu.h |  159 +++
+ linux-headers/linux/virtio_iommu.h            |    1 +
+ qdev-monitor.c                                |    1 +
+ scripts/update-linux-headers.sh               |    3 +
+ 16 files changed, 1501 insertions(+), 33 deletions(-)
+ create mode 100644 hw/virtio/virtio-iommu.c
+ create mode 100644 include/hw/virtio/virtio-iommu.h
+ create mode 100644 include/standard-headers/linux/virtio_iommu.h
+ create mode 100644 linux-headers/linux/virtio_iommu.h
+
 -- 
 2.17.2
