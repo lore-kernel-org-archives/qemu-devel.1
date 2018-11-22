@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gPwtM-0008El-OQ
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:52:09 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gPwxz-0001sH-MJ
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:56:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gPwtH-000824-Pr
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:52:08 -0500
-Resent-Message-Id: <E1gPwtH-000824-Pr@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21356)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gPwtH-0007zA-5u
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:52:03 -0500
-In-Reply-To: <20181122072028.22819-1-xiaoguangrong@tencent.com>
-Message-ID: <154292254994.3075.15325134887017277128@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1gPwxw-0006RA-Db
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:56:55 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:36909)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gPwxw-0006OK-7B
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:56:52 -0500
+Date: Thu, 22 Nov 2018 22:56:32 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <a7902403-7572-9b64-235e-cb6f9e0efbae@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1811222249030.51852@zero.eik.bme.hu>
+References: <87mw8rumhb.fsf@blackfin.pond.sub.org>
+	<87y4s8h5rh.fsf@blackfin.pond.sub.org>
+	<876132olyi.fsf@blackfin.pond.sub.org>
+	<87a8fucx33.fsf@dusky.pond.sub.org>
+	<87muq2fgbw.fsf@dusky.pond.sub.org>
+	<a7902403-7572-9b64-235e-cb6f9e0efbae@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 22 Nov 2018 13:35:52 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] migration: improve multithreads
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] MAINTAINERS leaves too many files uncovered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: famz@redhat.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, quintela@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, wei.w.wang@intel.com, cota@braap.org, jiang.biao2@zte.com.cn
+To: Thomas Huth <thuth@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-ODExMjIwNzIwMjguMjI4MTktMS14aWFvZ3Vhbmdyb25nQHRlbmNlbnQuY29tClR5cGU6IHNlcmll
-cwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAvNV0gbWlncmF0aW9uOiBpbXByb3Zl
-IG11bHRpdGhyZWFkcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
-RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
-bGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRo
-bSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
-U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
-JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
-aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
-KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
-IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0JwoxZjQwZjg4IHRlc3RzOiBhZGQgdGhyZWFkZWQtd29ya3F1ZXVlLWJl
-bmNoCjBjNTYwYWMgbWlncmF0aW9uOiB1c2UgdGhyZWFkZWQgd29ya3F1ZXVlIGZvciBkZWNvbXBy
-ZXNzaW9uCmVmZmRjYjQgbWlncmF0aW9uOiB1c2UgdGhyZWFkZWQgd29ya3F1ZXVlIGZvciBjb21w
-cmVzc2lvbgplYjkxYzYzIHV0aWw6IGludHJvZHVjZSB0aHJlYWRlZCB3b3JrcXVldWUKM2JmOGI0
-NCBiaXRvcHM6IGludHJvZHVjZSBjaGFuZ2VfYml0X2F0b21pYwoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KQ2hlY2tpbmcgUEFUQ0ggMS81OiBiaXRvcHM6IGludHJvZHVjZSBjaGFuZ2VfYml0X2F0b21p
-Yy4uLgpDaGVja2luZyBQQVRDSCAyLzU6IHV0aWw6IGludHJvZHVjZSB0aHJlYWRlZCB3b3JrcXVl
-dWUuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
-VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6
-IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzIzMzogRklMRTogdXRpbC90
-aHJlYWRlZC13b3JrcXVldWUuYzo2NToKKyAgICB1aW50NjRfdCByZXF1ZXN0X2ZpbGxfYml0bWFw
-IFFFTVVfQUxJR05FRChTTVBfQ0FDSEVfQllURVMpOwoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJl
-IGF2b2lkZWQgaW4gLmMgZmlsZXMKIzIzNTogRklMRTogdXRpbC90aHJlYWRlZC13b3JrcXVldWUu
-Yzo2NzoKKyAgICB1aW50NjRfdCByZXF1ZXN0X2RvbmVfYml0bWFwIFFFTVVfQUxJR05FRChTTVBf
-Q0FDSEVfQllURVMpOwoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmls
-ZXMKIzI0MTogRklMRTogdXRpbC90aHJlYWRlZC13b3JrcXVldWUuYzo3MzoKKyAgICBRZW11RXZl
-bnQgcmVxdWVzdF92YWxpZF9ldiBRRU1VX0FMSUdORUQoU01QX0NBQ0hFX0JZVEVTKTsKCkVSUk9S
-OiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMyNDc6IEZJTEU6IHV0aWwv
-dGhyZWFkZWQtd29ya3F1ZXVlLmM6Nzk6CisgICAgUWVtdUV2ZW50IHJlcXVlc3RfZnJlZV9ldiBR
-RU1VX0FMSUdORUQoU01QX0NBQ0hFX0JZVEVTKTsKCnRvdGFsOiA0IGVycm9ycywgMSB3YXJuaW5n
-cywgNTc1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCkNoZWNraW5nIFBBVENIIDMvNTogbWlncmF0aW9uOiB1c2UgdGhyZWFkZWQgd29ya3F1ZXVl
-IGZvciBjb21wcmVzc2lvbi4uLgpDaGVja2luZyBQQVRDSCA0LzU6IG1pZ3JhdGlvbjogdXNlIHRo
-cmVhZGVkIHdvcmtxdWV1ZSBmb3IgZGVjb21wcmVzc2lvbi4uLgpDaGVja2luZyBQQVRDSCA1LzU6
-IHRlc3RzOiBhZGQgdGhyZWFkZWQtd29ya3F1ZXVlLWJlbmNoLi4uCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-IzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiMyMzQ6IEZJTEU6IHRlc3RzL3RocmVhZGVkLXdvcmtxdWV1ZS1iZW5jaC5jOjE5NDoKKyAg
-ICBwcmludGYoIiAgIC1yOiAgICAgICB0aGUgbnVtYmVyIG9mIHJlcXVlc3RzIGhhbmRsZWQgYnkg
-ZWFjaCB0aHJlYWQgKGRlZmF1bHQgJWQpLlxuIiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMyMzY6IEZJTEU6IHRlc3RzL3RocmVhZGVkLXdvcmtxdWV1ZS1iZW5jaC5jOjE5NjoK
-KyAgICBwcmludGYoIiAgIC1tOiAgICAgICB0aGUgc2l6ZSBvZiB0aGUgbWVtb3J5IChHKSB1c2Vk
-IHRvIHRlc3QgKGRlZmF1bHQgJWRHKS5cbiIsCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
-cnMKIzI4MjogRklMRTogdGVzdHMvdGhyZWFkZWQtd29ya3F1ZXVlLWJlbmNoLmM6MjQyOgorICAg
-IHByaW50ZigiUnVuIHRoZSBiZW5jaG1hcms6IHRocmVhZHMgJWQgcmVxdWVzdHMtcGVyLXRocmVh
-ZDogJWQgbWVtb3J5ICVsZEcgcmVwZWF0ICVkLlxuIiwKCnRvdGFsOiAxIGVycm9ycywgMyB3YXJu
-aW5ncywgMjcyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
-IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEByZWRoYXQuY29t
+On Thu, 22 Nov 2018, Thomas Huth wrote:
+>>      19 hw/display/sm501.c
+>
+> Maybe Balaton wants to adopt this file?
+
+As discussed before this was originally part of SH4 but since that seems 
+to be not actively maintained any more and latest changes were for 
+sam460ex I can add it to sam460ex. I planned to do that when I make any 
+changes in the future but if needed I can send a patch for this now.
+
+While we're there, should I also add pc-bios/canyonlands.dts which is the 
+device tree for sam460ex?
+
+Regards,
+BALATON Zoltan
