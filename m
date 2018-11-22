@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gPtzE-0002Cc-BB
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 13:46:01 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gPu1S-0003OA-LX
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 13:48:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gPtzD-000495-HI
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 13:46:00 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 22 Nov 2018 19:45:45 +0100
-Message-Id: <20181122184545.31487-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 00/16] Block layer patches
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gPu1P-00074Y-Um
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 13:48:18 -0500
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Date: Thu, 22 Nov 2018 21:48:02 +0300
+Message-Id: <1542912487-279165-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 0/5] Discrad blocks during block-stream
+ operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,88 +18,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, dgilbert@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-The following changes since commit 47c1cc30e440860aa695358f7c2dd0b9d7b53d=
-16:
+Hello everyone!
 
-  Update version for v3.1.0-rc2 release (2018-11-20 18:10:26 +0000)
+The given feature discards blocks with copy-on-read operation while the
+streaming process runs. Adding the 'discard' argument to the QMP block-stream
+command allows dropping a block in the backing chain after it has been copied
+to the active layer. That will elude the block duplication in the intermediate
+backing file. It saves the disk space while external snapshots are being
+merged.
+The method involves the filter insertion above the active layer to allow write
+operation in the backing chain. The method is similar to that in the 'commit
+active' command (mirror.c).
+The permission to write into an inactive layer can not be obtained due to the
+existing child permission mechanism. There is a commented up hack in the
+callback function bdrv_stream_top_pwritev() in block/stream.c that redirects
+write operations below the filter node. Being uncommented, it enables writing
+into the inactive layer and passing all the iotests in the 030 file. Otherwise,
+no WRITE permission is granted after the filter insertion above the target node.
+Any suggestions to resolve that issue will be appreciated.
 
-are available in the Git repository at:
+The suggestions of Dr. David Alan Gilbert and Alberto Garcia after their first
+review have been applied.
 
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+Sincerely,
 
-for you to fetch changes up to 6bd858b3117a5aab066f3cf02ca72000eaa10ddb:
+Andrey Shinkevich (5):
+  Discard blocks while copy-on-read
+  The discard flag for block stream operation
+  iotests: allow resume_drive by node name
+  iotests: prepare 030 for graph change
+  iotests: 030 with block-stream discard
 
-  block: Update BlockDriverState.inherits_from on bdrv_drop_intermediate(=
-) (2018-11-22 19:37:31 +0100)
+ block/stream.c                | 429 ++++++++++++++++++++++++++++++++++++++++--
+ blockdev.c                    |   8 +-
+ hmp-commands.hx               |   4 +-
+ hmp.c                         |   4 +-
+ include/block/block_int.h     |   2 +-
+ qapi/block-core.json          |   5 +-
+ tests/qemu-iotests/030        | 163 +++++++++++-----
+ tests/qemu-iotests/030.out    |   4 +-
+ tests/qemu-iotests/iotests.py |   9 +-
+ 9 files changed, 558 insertions(+), 70 deletions(-)
 
-----------------------------------------------------------------
-Block layer patches:
-
-- block: Fix update of BDRV_O_AUTO_RDONLY in update_flags_from_options()
-- block: Fix option inheritance after stream/commit job graph changes
-- qemu-img: Fix memory leak and typo in error message
-- nvme: Fixes for lockups and crashes
-- scsi-disk: Fix crash if underlying host file or disk returns error
-- Several qemu-iotests fixes and improvements
-
-----------------------------------------------------------------
-Alberto Garcia (3):
-      block: Fix update of BDRV_O_AUTO_RDONLY in update_flags_from_option=
-s()
-      block: Update BlockDriverState.inherits_from on bdrv_set_backing_hd=
-()
-      block: Update BlockDriverState.inherits_from on bdrv_drop_intermedi=
-ate()
-
-Daniel P. Berrang=C3=A9 (1):
-      iotests: fix nbd test 233 to work correctly with raw images
-
-Eric Blake (2):
-      iotests: Skip 233 if certtool not installed
-      iotests: Enhance 223 to cover multiple bitmap granularities
-
-Igor Druzhinin (1):
-      nvme: call blk_drain in NVMe reset code to avoid lockups
-
-Kevin Wolf (3):
-      iotests: Replace time.clock() with Timeout
-      iotests: Replace assertEquals() with assertEqual()
-      Revert "nvme: fix oob access issue(CVE-2018-16847)"
-
-Logan Gunthorpe (1):
-      nvme: fix bug with PCI IRQ pins on teardown
-
-Max Reitz (2):
-      qemu-img: Fix typo
-      qemu-img: Fix leak
-
-Paolo Bonzini (2):
-      nvme: fix out-of-bounds access to the CMB
-      nvme: fix CMB endianness confusion
-
-Richard W.M. Jones (1):
-      scsi-disk: Fix crash if underlying host file or disk returns error
-
- block.c                       |  41 ++++++++++++-
- hw/block/nvme.c               |  19 ++----
- hw/scsi/scsi-disk.c           |   2 +-
- qemu-img.c                    |   3 +-
- tests/nvme-test.c             |  68 ++++++++++++++++++---
- tests/Makefile.include        |   2 +-
- tests/qemu-iotests/041        |   6 +-
- tests/qemu-iotests/118        |  20 +++---
- tests/qemu-iotests/161        | 137 ++++++++++++++++++++++++++++++++++++=
-++++++
- tests/qemu-iotests/161.out    |  39 ++++++++++++
- tests/qemu-iotests/223        |  43 ++++++++++---
- tests/qemu-iotests/223.out    |  32 +++++++---
- tests/qemu-iotests/233        |   9 ++-
- tests/qemu-iotests/common.tls |   3 +
- tests/qemu-iotests/group      |   1 +
- tests/qemu-iotests/iotests.py |   2 +-
- 16 files changed, 364 insertions(+), 63 deletions(-)
- create mode 100755 tests/qemu-iotests/161
- create mode 100644 tests/qemu-iotests/161.out
+-- 
+1.8.3.1
