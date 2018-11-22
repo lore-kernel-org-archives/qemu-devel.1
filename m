@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gPsbH-0005aW-1O
+	(envelope-from <eric.auger@redhat.com>) id 1gPsbF-0005YA-0U
 	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:17:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gPsbE-0006sk-TP
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:17:11 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gPsbC-0006oF-Kj
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:17:08 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Thu, 22 Nov 2018 18:15:36 +0100
-Message-Id: <20181122171538.12359-16-eric.auger@redhat.com>
+Date: Thu, 22 Nov 2018 18:15:35 +0100
+Message-Id: <20181122171538.12359-15-eric.auger@redhat.com>
 In-Reply-To: <20181122171538.12359-1-eric.auger@redhat.com>
 References: <20181122171538.12359-1-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v9 15/17] hw/arm/virt: Add the virtio-iommu
- device tree mappings
+Subject: [Qemu-devel] [RFC v9 14/17] virtio-iommu-pci: Add virtio iommu pci
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,159 +23,153 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com, jean-philippe.brucker@arm.com
 Cc: kevin.tian@intel.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com
 
-Adds the "virtio,pci-iommu" node in the host bridge node and
-the RID mapping, excluding the IOMMU RID.
+This patch adds virtio-iommu-pci, which is the pci proxy for
+the virtio-iommu device.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
 v8 -> v9:
-- disable msi-bypass property
-- addition of the subnode is handled is the hotplug handler
-  and IOMMU RID is notimposed anymore
-
-v6 -> v7:
-- align to the smmu instantiation code
-
-v4 -> v5:
-- VirtMachineClass no_iommu added in this patch
-- Use object_resolve_path_type
+- add the msi-bypass property
 ---
- hw/arm/virt.c         | 57 +++++++++++++++++++++++++++++++++++++------
- include/hw/arm/virt.h |  2 ++
- 2 files changed, 52 insertions(+), 7 deletions(-)
+ hw/virtio/virtio-pci.c | 51 ++++++++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.h | 14 ++++++++++++
+ include/hw/pci/pci.h   |  1 +
+ qdev-monitor.c         |  1 +
+ 4 files changed, 67 insertions(+)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index a2b8d8f7c2..b2bbb0ef49 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -29,6 +29,7 @@
-  */
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index a954799267..cdd18afe9e 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2342,6 +2342,56 @@ static const TypeInfo virtio_balloon_pci_info = {
+     .class_init    = virtio_balloon_pci_class_init,
+ };
  
- #include "qemu/osdep.h"
-+#include "monitor/qdev.h"
- #include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "hw/arm/arm.h"
-@@ -49,6 +50,7 @@
- #include "qemu/bitops.h"
- #include "qemu/error-report.h"
- #include "hw/pci-host/gpex.h"
-+#include "hw/virtio/virtio-pci.h"
- #include "hw/arm/sysbus-fdt.h"
- #include "hw/platform-bus.h"
- #include "hw/arm/fdt.h"
-@@ -59,6 +61,7 @@
- #include "qapi/visitor.h"
- #include "standard-headers/linux/input.h"
- #include "hw/arm/smmuv3.h"
-+#include "hw/virtio/virtio-iommu.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1085,6 +1088,33 @@ static void create_smmu(const VirtMachineState *vms, qemu_irq *pic,
-     g_free(node);
- }
- 
-+static void create_virtio_iommu(VirtMachineState *vms, Error **errp)
++/* virtio-iommu-pci */
++
++static Property virtio_iommu_pci_properties[] = {
++    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
++    DEFINE_PROP_BOOL("msi-bypass", VirtIOIOMMUPCI, vdev.msi_bypass, true),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
 +{
-+    const char compat[] = "virtio,pci-iommu";
-+    uint16_t bdf = vms->virtio_iommu_bdf;
-+    char *node;
++    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
 +
-+    vms->iommu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
-+
-+    node = g_strdup_printf("%s/virtio_iommu@%d", vms->pciehb_nodename, bdf);
-+    qemu_fdt_add_subnode(vms->fdt, node);
-+    qemu_fdt_setprop(vms->fdt, node, "compatible", compat, sizeof(compat));
-+    qemu_fdt_setprop_sized_cells(vms->fdt, node, "reg",
-+                                 1, bdf << 8 /* phys.hi */,
-+                                 1, 0        /* phys.mid */,
-+                                 1, 0        /* phys.lo  */,
-+                                 1, 0        /* size.hi  */,
-+                                 1, 0        /* size.low */);
-+
-+    qemu_fdt_setprop_cell(vms->fdt, node, "#iommu-cells", 1);
-+    qemu_fdt_setprop_cell(vms->fdt, node, "phandle", vms->iommu_phandle);
-+    g_free(node);
-+
-+    qemu_fdt_setprop_cells(vms->fdt, vms->pciehb_nodename, "iommu-map",
-+                           0x0, vms->iommu_phandle, 0x0, bdf,
-+                           bdf + 1, vms->iommu_phandle, bdf + 1, 0xffff - bdf);
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_link(OBJECT(dev),
++                             OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
++                             "primary-bus", errp);
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 +}
 +
- static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
- {
-     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
-@@ -1162,7 +1192,7 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
-         }
-     }
- 
--    nodename = g_strdup_printf("/pcie@%" PRIx64, base);
-+    nodename = vms->pciehb_nodename = g_strdup_printf("/pcie@%" PRIx64, base);
-     qemu_fdt_add_subnode(vms->fdt, nodename);
-     qemu_fdt_setprop_string(vms->fdt, nodename,
-                             "compatible", "pci-host-ecam-generic");
-@@ -1205,13 +1235,17 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
-     if (vms->iommu) {
-         vms->iommu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
- 
--        create_smmu(vms, pic, pci->bus);
-+        switch (vms->iommu) {
-+        case VIRT_IOMMU_SMMUV3:
-+            create_smmu(vms, pic, pci->bus);
-+            qemu_fdt_setprop_cells(vms->fdt, nodename, "iommu-map",
-+                                   0x0, vms->iommu_phandle, 0x0, 0x10000);
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
- 
--        qemu_fdt_setprop_cells(vms->fdt, nodename, "iommu-map",
--                               0x0, vms->iommu_phandle, 0x0, 0x10000);
-     }
--
--    g_free(nodename);
- }
- 
- static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
-@@ -1736,12 +1770,21 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                      SYS_BUS_DEVICE(dev));
-         }
-     }
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
-+        PCIDevice *pdev = PCI_DEVICE(dev);
++static void virtio_iommu_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++    k->realize = virtio_iommu_pci_realize;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    dc->props = virtio_iommu_pci_properties;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_IOMMU;
++    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
++    pcidev_k->class_id = PCI_CLASS_OTHERS;
++}
 +
-+        vms->iommu = VIRT_IOMMU_VIRTIO;
-+        vms->virtio_iommu_bdf = pci_get_bdf(pdev);
-+        object_property_set_bool(OBJECT(dev), false, "msi-bypass", errp);
-+        create_virtio_iommu(vms, errp);
-+    }
- }
++static void virtio_iommu_pci_instance_init(Object *obj)
++{
++    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VIRTIO_IOMMU);
++}
++
++static const TypeInfo virtio_iommu_pci_info = {
++    .name          = TYPE_VIRTIO_IOMMU_PCI,
++    .parent        = TYPE_VIRTIO_PCI,
++    .instance_size = sizeof(VirtIOIOMMUPCI),
++    .instance_init = virtio_iommu_pci_instance_init,
++    .class_init    = virtio_iommu_pci_class_init,
++};
++
+ /* virtio-serial-pci */
  
- static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-                                                         DeviceState *dev)
- {
--    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
-+        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
-         return HOTPLUG_HANDLER(machine);
-     }
+ static void virtio_serial_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+@@ -2712,6 +2762,7 @@ static void virtio_pci_register_types(void)
+ #endif
+     type_register_static(&virtio_scsi_pci_info);
+     type_register_static(&virtio_balloon_pci_info);
++    type_register_static(&virtio_iommu_pci_info);
+     type_register_static(&virtio_serial_pci_info);
+     type_register_static(&virtio_net_pci_info);
+ #ifdef CONFIG_VHOST_SCSI
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 813082b0d7..a17100b4a0 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -26,6 +26,7 @@
+ #include "hw/virtio/virtio-input.h"
+ #include "hw/virtio/virtio-gpu.h"
+ #include "hw/virtio/virtio-crypto.h"
++#include "hw/virtio/virtio-iommu.h"
+ #include "hw/virtio/vhost-user-scsi.h"
+ #if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+ #include "hw/virtio/vhost-user-blk.h"
+@@ -57,6 +58,7 @@ typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
+ typedef struct VirtIOGPUPCI VirtIOGPUPCI;
+ typedef struct VHostVSockPCI VHostVSockPCI;
+ typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
++typedef struct VirtIOIOMMUPCI VirtIOIOMMUPCI;
  
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 4cc57a7ef6..c330f6f4b7 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -115,7 +115,9 @@ typedef struct {
-     bool virt;
-     int32_t gic_version;
-     VirtIOMMUType iommu;
-+    uint16_t virtio_iommu_bdf;
-     struct arm_boot_info bootinfo;
-+    char *pciehb_nodename;
-     const MemMapEntry *memmap;
-     const int *irqmap;
-     int smp_cpus;
+ /* virtio-pci-bus */
+ 
+@@ -363,6 +365,18 @@ struct VirtIOInputHIDPCI {
+     VirtIOInputHID vdev;
+ };
+ 
++/*
++ *  * virtio-iommu-pci: This extends VirtioPCIProxy.
++ *   */
++#define TYPE_VIRTIO_IOMMU_PCI "virtio-iommu-pci"
++#define VIRTIO_IOMMU_PCI(obj) \
++        OBJECT_CHECK(VirtIOIOMMUPCI, (obj), TYPE_VIRTIO_IOMMU_PCI)
++
++struct VirtIOIOMMUPCI {
++    VirtIOPCIProxy parent_obj;
++    VirtIOIOMMU vdev;
++};
++
+ #ifdef CONFIG_LINUX
+ 
+ #define TYPE_VIRTIO_INPUT_HOST_PCI "virtio-input-host-pci"
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index e6514bba23..a01fd4d2e1 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -85,6 +85,7 @@ extern bool pci_available;
+ #define PCI_DEVICE_ID_VIRTIO_RNG         0x1005
+ #define PCI_DEVICE_ID_VIRTIO_9P          0x1009
+ #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
++#define PCI_DEVICE_ID_VIRTIO_IOMMU       0x1013
+ 
+ #define PCI_VENDOR_ID_REDHAT             0x1b36
+ #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 07147c63bf..4f1ae056da 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -62,6 +62,7 @@ static const QDevAlias qdev_alias_table[] = {
+     { "virtio-input-host-ccw", "virtio-input-host", QEMU_ARCH_S390X },
+     { "virtio-input-host-pci", "virtio-input-host",
+             QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
++    { "virtio-iommu-pci", "virtio-iommu", QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
+     { "virtio-keyboard-ccw", "virtio-keyboard", QEMU_ARCH_S390X },
+     { "virtio-keyboard-pci", "virtio-keyboard",
+             QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
 -- 
 2.17.2
