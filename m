@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gPsG8-0002Mt-42
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:55:21 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gPsMW-0000XM-Fj
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:01:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gPsG6-0001m4-Jp
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:55:20 -0500
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu, 22 Nov 2018 17:54:57 +0100
-Message-Id: <20181122165457.4517-3-cohuck@redhat.com>
-In-Reply-To: <20181122165457.4517-1-cohuck@redhat.com>
-References: <20181122165457.4517-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] vfio-ccw: support async command subregion
+	(envelope-from <peter.maydell@linaro.org>) id 1gPsMR-0000qP-1g
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:01:56 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37692)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gPsMQ-0000on-TI
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:01:50 -0500
+Received: by mail-ot1-x343.google.com with SMTP id 40so8582857oth.4
+	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 09:01:50 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20181120184148.22501-1-pbonzini@redhat.com>
+References: <20181120184148.22501-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Nov 2018 17:01:29 +0000
+Message-ID: <CAFEAcA-7GePo8ycBHTW1D0WCC3ryToneSzGnY3kABKaT=YzWbA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] nvme: fix out-of-bounds access to the CMB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,237 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Keith Busch <keith.busch@intel.com>, Li Qiang <liq3ea@gmail.com>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-A vfio-ccw device may provide an async command subregion for
-issuing halt/clear subchannel requests. If it is present, use
-it for sending halt/clear request to the device; if not, fall
-back to emulation (as done today).
+On 20 November 2018 at 18:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> Because the CMB BAR has a min_access_size of 2, if you read the last
+> byte it will try to memcpy *2* bytes from n->cmbuf, causing an off-by-one
+> error.  This is CVE-2018-16847.
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- hw/s390x/css.c              |  27 +++++++--
- hw/vfio/ccw.c               | 109 +++++++++++++++++++++++++++++++++++-
- include/hw/s390x/s390-ccw.h |   3 +
- 3 files changed, 133 insertions(+), 6 deletions(-)
+Maybe we should change the MemoryRegionOps API so that
+devices have to explicitly opt in to handling accesses
+that span off the end of the region size they've registered?
+IIRC we have one or two oddball devices that care about that
+(probably mostly x86 IO port devices), but most device
+implementations will not be expecting it.
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 04ec5cc970..0897c041c5 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -22,6 +22,7 @@
- #include "trace.h"
- #include "hw/s390x/s390_flic.h"
- #include "hw/s390x/s390-virtio-ccw.h"
-+#include "hw/s390x/s390-ccw.h"
- 
- typedef struct CrwContainer {
-     CRW crw;
-@@ -1194,6 +1195,26 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
- 
- }
- 
-+static void sch_handle_halt_func_passthrough(SubchDev *sch)
-+{
-+    int ret;
-+
-+    ret = vfio_ccw_handle_halt(sch);
-+    if (ret == -ENOSYS) {
-+        sch_handle_halt_func(sch);
-+    }
-+}
-+
-+static void sch_handle_clear_func_passthrough(SubchDev *sch)
-+{
-+    int ret;
-+
-+    ret = vfio_ccw_handle_clear(sch);
-+    if (ret == -ENOSYS) {
-+        sch_handle_clear_func(sch);
-+    }
-+}
-+
- static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
- {
- 
-@@ -1237,11 +1258,9 @@ IOInstEnding do_subchannel_work_passthrough(SubchDev *sch)
-     SCSW *s = &sch->curr_status.scsw;
- 
-     if (s->ctrl & SCSW_FCTL_CLEAR_FUNC) {
--        /* TODO: Clear handling */
--        sch_handle_clear_func(sch);
-+        sch_handle_clear_func_passthrough(sch);
-     } else if (s->ctrl & SCSW_FCTL_HALT_FUNC) {
--        /* TODO: Halt handling */
--        sch_handle_halt_func(sch);
-+        sch_handle_halt_func_passthrough(sch);
-     } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
-         return sch_handle_start_func_passthrough(sch);
-     }
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 9246729a75..dd0fecf168 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -2,9 +2,12 @@
-  * vfio based subchannel assignment support
-  *
-  * Copyright 2017 IBM Corp.
-+ * Copyright 2018 Red Hat, Inc.
-+ *
-  * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-  *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-  *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-+ *            Cornelia Huck <cohuck@redhat.com>
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or (at
-  * your option) any later version. See the COPYING file in the top-level
-@@ -32,6 +35,9 @@ typedef struct VFIOCCWDevice {
-     uint64_t io_region_size;
-     uint64_t io_region_offset;
-     struct ccw_io_region *io_region;
-+    uint64_t async_cmd_region_size;
-+    uint64_t async_cmd_region_offset;
-+    struct ccw_cmd_region *async_cmd_region;
-     EventNotifier io_notifier;
-     bool force_orb_pfch;
-     bool warned_orb_pfch;
-@@ -114,6 +120,87 @@ again:
-     }
- }
- 
-+int vfio_ccw_handle_clear(SubchDev *sch)
-+{
-+    S390CCWDevice *cdev = sch->driver_data;
-+    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-+    struct ccw_cmd_region *region = vcdev->async_cmd_region;
-+    int ret;
-+
-+    if (!vcdev->async_cmd_region) {
-+        /* Async command region not available, fall back to emulation */
-+        return -ENOSYS;
-+    }
-+
-+    memset(region, 0, sizeof(*region));
-+    region->command = VFIO_CCW_ASYNC_CMD_CSCH;
-+
-+again:
-+    ret = pwrite(vcdev->vdev.fd, region,
-+                 vcdev->async_cmd_region_size, vcdev->async_cmd_region_offset);
-+    if (ret != vcdev->async_cmd_region_size) {
-+        if (errno == EAGAIN) {
-+            goto again;
-+        }
-+        error_report("vfio-ccw: wirte I/O region failed with errno=%d", errno);
-+        ret = -errno;
-+    } else {
-+        ret = region->ret_code;
-+    }
-+    switch (ret) {
-+    case 0:
-+    case -ENODEV:
-+    case -EACCES:
-+        return 0;
-+    case -EFAULT:
-+    default:
-+        sch_gen_unit_exception(sch);
-+        css_inject_io_interrupt(sch);
-+        return 0;
-+    }
-+}
-+
-+int vfio_ccw_handle_halt(SubchDev *sch)
-+{
-+    S390CCWDevice *cdev = sch->driver_data;
-+    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-+    struct ccw_cmd_region *region = vcdev->async_cmd_region;
-+    int ret;
-+
-+    if (!vcdev->async_cmd_region) {
-+        /* Async command region not available, fall back to emulation */
-+        return -ENOSYS;
-+    }
-+
-+    memset(region, 0, sizeof(*region));
-+    region->command = VFIO_CCW_ASYNC_CMD_HSCH;
-+
-+again:
-+    ret = pwrite(vcdev->vdev.fd, region,
-+                 vcdev->async_cmd_region_size, vcdev->async_cmd_region_offset);
-+    if (ret != vcdev->async_cmd_region_size) {
-+        if (errno == EAGAIN) {
-+            goto again;
-+        }
-+        error_report("vfio-ccw: wirte I/O region failed with errno=%d", errno);
-+        ret = -errno;
-+    } else {
-+        ret = region->ret_code;
-+    }
-+    switch (ret) {
-+    case 0:
-+    case -EBUSY:
-+    case -ENODEV:
-+    case -EACCES:
-+        return 0;
-+    case -EFAULT:
-+    default:
-+        sch_gen_unit_exception(sch);
-+        css_inject_io_interrupt(sch);
-+        return 0;
-+    }
-+}
-+
- static void vfio_ccw_reset(DeviceState *dev)
- {
-     CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
-@@ -285,9 +372,13 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
-         return;
-     }
- 
-+    /*
-+     * We always expect at least the I/O region to be present. We also
-+     * may have a variable number of regions governed by capabilities.
-+     */
-     if (vdev->num_regions < VFIO_CCW_CONFIG_REGION_INDEX + 1) {
--        error_setg(errp, "vfio: Unexpected number of the I/O region %u",
--                   vdev->num_regions);
-+        error_setg(errp, "vfio: too few regions (%u), expected at least %u",
-+                   vdev->num_regions, VFIO_CCW_CONFIG_REGION_INDEX + 1);
-         return;
-     }
- 
-@@ -307,6 +398,20 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
-     vcdev->io_region_offset = info->offset;
-     vcdev->io_region = g_malloc0(info->size);
- 
-+    /* check for the optional async command region */
-+    ret = vfio_get_dev_region_info(vdev, VFIO_REGION_TYPE_CCW,
-+                                   VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD, &info);
-+    if (!ret) {
-+        vcdev->async_cmd_region_size = info->size;
-+        if (sizeof(*vcdev->async_cmd_region) != vcdev->async_cmd_region_size) {
-+            error_setg(errp, "vfio: Unexpected size of the async cmd region");
-+            g_free(info);
-+            return;
-+        }
-+        vcdev->async_cmd_region_offset = info->offset;
-+        vcdev->async_cmd_region = g_malloc0(info->size);
-+    }
-+
-     g_free(info);
- }
- 
-diff --git a/include/hw/s390x/s390-ccw.h b/include/hw/s390x/s390-ccw.h
-index 7d15a1a5d4..38d54a7a69 100644
---- a/include/hw/s390x/s390-ccw.h
-+++ b/include/hw/s390x/s390-ccw.h
-@@ -36,4 +36,7 @@ typedef struct S390CCWDeviceClass {
-     IOInstEnding (*handle_request) (SubchDev *sch);
- } S390CCWDeviceClass;
- 
-+int vfio_ccw_handle_clear(SubchDev *sch);
-+int vfio_ccw_handle_halt(SubchDev *sch);
-+
- #endif
--- 
-2.17.2
+I'm also surprised that the memory subsystem permits a
+2 byte access at address sz-1 here, since .impl.unaligned
+is not set...
+
+thanks
+-- PMM
