@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPxXt-0006nl-8C
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 17:34:01 -0500
+	(envelope-from <philmd@redhat.com>) id 1gPxjz-0002N8-Mp
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 17:46:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPxXp-0004t9-4a
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 17:34:01 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40275)
+	(envelope-from <philmd@redhat.com>) id 1gPxjw-0000og-JW
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 17:46:31 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54172)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPxXo-0004sx-UR
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 17:33:57 -0500
-Received: by mail-wr1-f68.google.com with SMTP id p4so10590047wrt.7
-	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 14:33:56 -0800 (PST)
-References: <20181122180143.14237-1-eric.auger@redhat.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPxjw-0000n2-DE
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 17:46:28 -0500
+Received: by mail-wm1-f68.google.com with SMTP id y1so7041345wmi.3
+	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 14:46:28 -0800 (PST)
+References: <20181122133207.29928-1-kraxel@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1259e457-6cb8-3b1e-853f-53f1e47cac63@redhat.com>
-Date: Thu, 22 Nov 2018 23:33:54 +0100
+Message-ID: <0e3834f7-7345-2e23-9b85-254ac354d20b@redhat.com>
+Date: Thu, 22 Nov 2018 23:46:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181122180143.14237-1-eric.auger@redhat.com>
+In-Reply-To: <20181122133207.29928-1-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1] MAINTAINERS: Add an ARM SMMU
- section
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] audio/hda: fix guest triggerable assert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, thuth@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-Hi Eric,
+Hi Gerd,
 
-On 22/11/18 19:01, Eric Auger wrote:
-> Add a new ARM SMMU section and set Eric Auger as the maintainer
-> for ARM SMMU emulation sources.
+On 22/11/18 14:32, Gerd Hoffmann wrote:
+> Guest writes to a readonly register trigger the assert in
+> intel_hda_reg_write().  Add a check and just ignore them.
+
+Is this 3.1 material? It seems to apply.
+
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1628433
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  MAINTAINERS | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  hw/audio/intel-hda.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 1032406c56..3cac9f0a0c 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -151,6 +151,13 @@ F: disas/arm.c
->  F: disas/arm-a64.cc
->  F: disas/libvixl/
+> diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+> index 23a2cf6484..066532713c 100644
+> --- a/hw/audio/intel-hda.c
+> +++ b/hw/audio/intel-hda.c
+> @@ -929,6 +929,10 @@ static void intel_hda_reg_write(IntelHDAState *d, const IntelHDAReg *reg, uint32
+>      if (!reg) {
+>          return;
+>      }
+> +    if (!reg->wmask) {
+> +        /* read-only register */
+
+Can you add:
+
+           qemu_log_mask(LOG_GUEST_ERROR,
+                         "intel-hda: Register %s is read-only\n",
+                         reg->name);
+
+Regardless:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> +        return;
+> +    }
 >  
-> +ARM SMMU
-> +M: Eric Auger <eric.auger@redhat.com>
-> +L: qemu-arm@nongnu.org
-> +S: Maintained
-
-Shouldn't you use 'Supported': "Someone is actually paid to look after
-this."?
-
-> +F: hw/arm/smmu*
-> +F: include/hw/arm/smmu*
-> +
->  CRIS
->  M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
->  S: Maintained
+>      if (d->debug) {
+>          time_t now = time(NULL);
 > 
