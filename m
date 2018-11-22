@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPdYS-0005cQ-AZ
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:13:17 -0500
+	(envelope-from <palmer@sifive.com>) id 1gPe3G-0004lj-Uq
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:45:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPdYO-0007oW-7H
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:13:16 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:52556)
+	(envelope-from <palmer@sifive.com>) id 1gPe3C-000058-C9
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:45:06 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:32824)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPdYM-0007kb-Cr
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:13:11 -0500
-Received: by mail-wm1-f66.google.com with SMTP id r11-v6so7258705wmb.2
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 17:13:10 -0800 (PST)
-References: <20181121185810.24647-1-jcmvbkbc@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5fb19799-34a4-5295-e6ae-a2e39193284d@redhat.com>
-Date: Thu, 22 Nov 2018 02:13:07 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181121185810.24647-1-jcmvbkbc@gmail.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gPe3C-0008VA-4A
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:45:02 -0500
+Received: by mail-pl1-x644.google.com with SMTP id z23so8016382plo.0
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 17:45:02 -0800 (PST)
+Date: Wed, 21 Nov 2018 17:44:59 -0800 (PST)
+In-Reply-To: <201f1cf4-30af-03c5-393b-0eab6ac7eb87@redhat.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-ce1dc513-eb34-4ace-b3a2-248347025887@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3] target/xtensa: xtfpga: provide default
- memory sizes
+Subject: Re: [Qemu-devel] [PATCH for-3.1 1/2] MAINTAINERS: Any file with
+ "riscv" in the name is a RISC-V file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,104 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+To: philmd@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 
-On 21/11/18 19:58, Max Filippov wrote:
-> Provide default RAM sizes for all XTFPGA boards, so that when started
-> without -m option they do the right thing.
-> 
-> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> Changes v2->v3:
-> - add XTFPGA_MMU_RESERVED_MEMORY_SIZE definition and express Xilinx board
->    memory sizes using it as suggested by Philippe;
+On Wed, 21 Nov 2018 16:29:09 PST (-0800), philmd@redhat.com wrote:
+> On 22/11/18 0:46, Palmer Dabbelt wrote:
+>> There was a recent thread about unmaintained files in QEMU where it was
+>> noted that a few RISC-V related files had slipped through the patterns
+>> in our MAINTAINERS file entry.  This patch adds some more aggressive
+>> pattern matching in an attempt to rectify this situation.
+>>
+>> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+>> ---
+>>   MAINTAINERS | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 1032406c5607..e89adc81d5d5 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -255,6 +255,8 @@ F: target/riscv/
+>>   F: hw/riscv/
+>>   F: include/hw/riscv/
+>>   F: disas/riscv.c
+>> +K: riscv
+>> +N: riscv
+>
+> QEMU doesn't support the 'N' tag.
+> I see from the Linux kernel:
+>
+>    N: Files and directories with regex patterns.
+>       N:   [^a-z]tegra     all files whose path contains the word tegra
+>       One pattern per line.  Multiple N: lines acceptable.
+>       scripts/get_maintainer.pl has different behavior for files that
+>       match F: pattern and matches of N: patterns.  By default,
+>       get_maintainer will not look at git log history when an F: pattern
+>       match occurs.  When an N: match occurs, git log history is used
+>       to also notify the people that have git commit signatures.
+>
+> Should we add this feature to checkscript?
 
-Thanks for your v3, this is now very clean!
+Ah, I didn't check because I just copied this from our Linux entry.  It's 
+pretty much the core of what I'm trying to do here so if it's easy then that'd 
+be great.
 
-> 
-> Changes v1->v2:
-> - fix memory sizes for ml605 and kc705 with MMU
-> 
-> 
->   hw/xtensa/xtfpga.c | 10 ++++++++++
->   1 file changed, 10 insertions(+)
-> 
-> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-> index b3161de32093..21094319a659 100644
-> --- a/hw/xtensa/xtfpga.c
-> +++ b/hw/xtensa/xtfpga.c
-> @@ -446,6 +446,8 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
->       }
->   }
->   
-> +#define XTFPGA_MMU_RESERVED_MEMORY_SIZE (128 * MiB)
-> +
->   static const hwaddr xtfpga_mmu_io[2] = {
->       0xf0000000,
->   };
-> @@ -568,6 +570,7 @@ static void xtfpga_lx60_class_init(ObjectClass *oc, void *data)
->       mc->init = xtfpga_lx60_init;
->       mc->max_cpus = 4;
->       mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-> +    mc->default_ram_size = 64 * MiB;
->   }
->   
->   static const TypeInfo xtfpga_lx60_type = {
-> @@ -584,6 +587,7 @@ static void xtfpga_lx60_nommu_class_init(ObjectClass *oc, void *data)
->       mc->init = xtfpga_lx60_nommu_init;
->       mc->max_cpus = 4;
->       mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-> +    mc->default_ram_size = 64 * MiB;
->   }
->   
->   static const TypeInfo xtfpga_lx60_nommu_type = {
-> @@ -600,6 +604,7 @@ static void xtfpga_lx200_class_init(ObjectClass *oc, void *data)
->       mc->init = xtfpga_lx200_init;
->       mc->max_cpus = 4;
->       mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-> +    mc->default_ram_size = 96 * MiB;
->   }
->   
->   static const TypeInfo xtfpga_lx200_type = {
-> @@ -616,6 +621,7 @@ static void xtfpga_lx200_nommu_class_init(ObjectClass *oc, void *data)
->       mc->init = xtfpga_lx200_nommu_init;
->       mc->max_cpus = 4;
->       mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-> +    mc->default_ram_size = 96 * MiB;
->   }
->   
->   static const TypeInfo xtfpga_lx200_nommu_type = {
-> @@ -632,6 +638,7 @@ static void xtfpga_ml605_class_init(ObjectClass *oc, void *data)
->       mc->init = xtfpga_ml605_init;
->       mc->max_cpus = 4;
->       mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-> +    mc->default_ram_size = 512 * MiB - XTFPGA_MMU_RESERVED_MEMORY_SIZE;
->   }
->   
->   static const TypeInfo xtfpga_ml605_type = {
-> @@ -648,6 +655,7 @@ static void xtfpga_ml605_nommu_class_init(ObjectClass *oc, void *data)
->       mc->init = xtfpga_ml605_nommu_init;
->       mc->max_cpus = 4;
->       mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-> +    mc->default_ram_size = 256 * MiB;
->   }
->   
->   static const TypeInfo xtfpga_ml605_nommu_type = {
-> @@ -664,6 +672,7 @@ static void xtfpga_kc705_class_init(ObjectClass *oc, void *data)
->       mc->init = xtfpga_kc705_init;
->       mc->max_cpus = 4;
->       mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
-> +    mc->default_ram_size = 1 * GiB - XTFPGA_MMU_RESERVED_MEMORY_SIZE;
->   }
->   
->   static const TypeInfo xtfpga_kc705_type = {
-> @@ -680,6 +689,7 @@ static void xtfpga_kc705_nommu_class_init(ObjectClass *oc, void *data)
->       mc->init = xtfpga_kc705_nommu_init;
->       mc->max_cpus = 4;
->       mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
-> +    mc->default_ram_size = 256 * MiB;
->   }
->   
->   static const TypeInfo xtfpga_kc705_nommu_type = {
-> 
+Unfortunately I don't know how to do so.
+
+>
+>>
+>>   S390
+>>   M: Richard Henderson <rth@twiddle.net>
+>>
