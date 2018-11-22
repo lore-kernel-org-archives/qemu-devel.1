@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPxjz-0002N8-Mp
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 17:46:32 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gPy5z-0002Vn-Gj
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 18:09:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gPxjw-0000og-JW
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 17:46:31 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:54172)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1gPy5y-00071X-QM
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 18:09:15 -0500
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:40559)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPxjw-0000n2-DE
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 17:46:28 -0500
-Received: by mail-wm1-f68.google.com with SMTP id y1so7041345wmi.3
-	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 14:46:28 -0800 (PST)
-References: <20181122133207.29928-1-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0e3834f7-7345-2e23-9b85-254ac354d20b@redhat.com>
-Date: Thu, 22 Nov 2018 23:46:26 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181122133207.29928-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] audio/hda: fix guest triggerable assert
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1gPy5y-00071I-JH
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 18:09:14 -0500
+Received: by mail-lf1-x141.google.com with SMTP id v5so7473097lfe.7
+	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 15:09:14 -0800 (PST)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 22 Nov 2018 15:08:58 -0800
+Message-Id: <20181122230858.23345-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: add missing xtensa patterns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +23,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>
 
-Hi Gerd,
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On 22/11/18 14:32, Gerd Hoffmann wrote:
-> Guest writes to a readonly register trigger the assert in
-> intel_hda_reg_write().  Add a check and just ignore them.
-
-Is this 3.1 material? It seems to apply.
-
-> 
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1628433
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/audio/intel-hda.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
-> index 23a2cf6484..066532713c 100644
-> --- a/hw/audio/intel-hda.c
-> +++ b/hw/audio/intel-hda.c
-> @@ -929,6 +929,10 @@ static void intel_hda_reg_write(IntelHDAState *d, const IntelHDAReg *reg, uint32
->      if (!reg) {
->          return;
->      }
-> +    if (!reg->wmask) {
-> +        /* read-only register */
-
-Can you add:
-
-           qemu_log_mask(LOG_GUEST_ERROR,
-                         "intel-hda: Register %s is read-only\n",
-                         reg->name);
-
-Regardless:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> +        return;
-> +    }
->  
->      if (d->debug) {
->          time_t now = time(NULL);
-> 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1032406c5607..f4a7e453c06f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -311,6 +311,8 @@ F: target/xtensa/
+ F: hw/xtensa/
+ F: tests/tcg/xtensa/
+ F: disas/xtensa.c
++F: include/hw/xtensa/xtensa-isa.h
++F: default-configs/xtensa*.mak
+ 
+ TriCore
+ M: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+-- 
+2.11.0
