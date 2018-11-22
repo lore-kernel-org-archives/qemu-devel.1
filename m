@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gPsZg-0004A8-6m
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:15:35 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gPsaQ-0004oe-KY
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:16:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gPsZY-0004aY-F9
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:15:30 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:33578)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gPsZY-0004YT-6P
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:15:24 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id 79so9980310wmo.0
-	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 09:15:23 -0800 (PST)
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-14-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025172057.20414-14-cota@braap.org>
-Date: Thu, 22 Nov 2018 17:15:20 +0000
-Message-ID: <87zhu1ghjr.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 13/48] xxhash: add qemu_xxhash8
+	(envelope-from <eric.auger@redhat.com>) id 1gPsaN-0005e6-Cm
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:16:18 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Thu, 22 Nov 2018 18:15:25 +0100
+Message-Id: <20181122171538.12359-5-eric.auger@redhat.com>
+In-Reply-To: <20181122171538.12359-1-eric.auger@redhat.com>
+References: <20181122171538.12359-1-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v9 04/17] virtio-iommu: Decode the command payload
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,114 +19,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com, jean-philippe.brucker@arm.com
+Cc: kevin.tian@intel.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com
 
+This patch adds the command payload decoding and
+introduces the functions that will do the actual
+command handling. Those functions are not yet implemented.
 
-Emilio G. Cota <cota@braap.org> writes:
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-> It will be used for TB hashing soon.
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  include/qemu/xxhash.h | 40 +++++++++++++++++++++++++++-------------
->  1 file changed, 27 insertions(+), 13 deletions(-)
->
-> diff --git a/include/qemu/xxhash.h b/include/qemu/xxhash.h
-> index fe35dde328..450427eeaa 100644
-> --- a/include/qemu/xxhash.h
-> +++ b/include/qemu/xxhash.h
-> @@ -49,7 +49,8 @@
->   * contiguous in memory.
->   */
->  static inline uint32_t
-> -qemu_xxhash7(uint64_t ab, uint64_t cd, uint32_t e, uint32_t f, uint32_t =
-g)
-> +qemu_xxhash8(uint64_t ab, uint64_t cd, uint32_t e, uint32_t f, uint32_t =
-g,
-> +             uint32_t h)
+---
+v7 -> v8:
+- handle new domain parameter in detach
+- remove reserved checks
 
-As we've expanded to bigger and bigger hashes why are everything after
-cd passed as 32 bit values? Isn't this just generating extra register
-pressure or is the compiler smart enough to figure it out?
+v5 -> v6:
+- change map/unmap semantics (remove size)
 
->  {
->      uint32_t v1 =3D QEMU_XXHASH_SEED + PRIME32_1 + PRIME32_2;
->      uint32_t v2 =3D QEMU_XXHASH_SEED + PRIME32_2;
-> @@ -77,17 +78,24 @@ qemu_xxhash7(uint64_t ab, uint64_t cd, uint32_t e, ui=
-nt32_t f, uint32_t g)
->      v4 =3D rol32(v4, 13);
->      v4 *=3D PRIME32_1;
->
-> -    h32 =3D rol32(v1, 1) + rol32(v2, 7) + rol32(v3, 12) + rol32(v4, 18);
-> -    h32 +=3D 28;
-> +    v1 +=3D e * PRIME32_2;
-> +    v1 =3D rol32(v1, 13);
-> +    v1 *=3D PRIME32_1;
->
-> -    h32 +=3D e * PRIME32_3;
-> -    h32  =3D rol32(h32, 17) * PRIME32_4;
-> +    v2 +=3D f * PRIME32_2;
-> +    v2 =3D rol32(v2, 13);
-> +    v2 *=3D PRIME32_1;
-> +
-> +    v3 +=3D g * PRIME32_2;
-> +    v3 =3D rol32(v3, 13);
-> +    v3 *=3D PRIME32_1;
->
-> -    h32 +=3D f * PRIME32_3;
-> -    h32  =3D rol32(h32, 17) * PRIME32_4;
-> +    v4 +=3D h * PRIME32_2;
-> +    v4 =3D rol32(v4, 13);
-> +    v4 *=3D PRIME32_1;
->
-> -    h32 +=3D g * PRIME32_3;
-> -    h32  =3D rol32(h32, 17) * PRIME32_4;
-> +    h32 =3D rol32(v1, 1) + rol32(v2, 7) + rol32(v3, 12) + rol32(v4, 18);
-> +    h32 +=3D 32;
+v4 -> v5:
+- adopt new v0.5 terminology
 
-How do we validate we haven't broken the distribution of the original
-xxhash as we've extended it?
+v3 -> v4:
+- no flags field anymore in struct virtio_iommu_req_unmap
+- test reserved on attach/detach, change trace proto
+- rebase on v2.10.0.
+---
+ hw/virtio/trace-events   |  4 ++
+ hw/virtio/virtio-iommu.c | 95 ++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 95 insertions(+), 4 deletions(-)
 
->
->      h32 ^=3D h32 >> 15;
->      h32 *=3D PRIME32_2;
-> @@ -100,23 +108,29 @@ qemu_xxhash7(uint64_t ab, uint64_t cd, uint32_t e, =
-uint32_t f, uint32_t g)
->
->  static inline uint32_t qemu_xxhash2(uint64_t ab)
->  {
-> -    return qemu_xxhash7(ab, 0, 0, 0, 0);
-> +    return qemu_xxhash8(ab, 0, 0, 0, 0, 0);
->  }
->
->  static inline uint32_t qemu_xxhash4(uint64_t ab, uint64_t cd)
->  {
-> -    return qemu_xxhash7(ab, cd, 0, 0, 0);
-> +    return qemu_xxhash8(ab, cd, 0, 0, 0, 0);
->  }
->
->  static inline uint32_t qemu_xxhash5(uint64_t ab, uint64_t cd, uint32_t e)
->  {
-> -    return qemu_xxhash7(ab, cd, e, 0, 0);
-> +    return qemu_xxhash8(ab, cd, e, 0, 0, 0);
->  }
->
->  static inline uint32_t qemu_xxhash6(uint64_t ab, uint64_t cd, uint32_t e,
->                                      uint32_t f)
->  {
-> -    return qemu_xxhash7(ab, cd, e, f, 0);
-> +    return qemu_xxhash8(ab, cd, e, f, 0, 0);
-> +}
-> +
-> +static inline uint32_t qemu_xxhash7(uint64_t ab, uint64_t cd, uint32_t e,
-> +                                    uint32_t f, uint32_t g)
-> +{
-> +    return qemu_xxhash8(ab, cd, e, f, g, 0);
->  }
->
->  #endif /* QEMU_XXHASH_H */
-
-
---
-Alex Benn=C3=A9e
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 84da904d8b..e6177ca0e4 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -55,3 +55,7 @@ virtio_iommu_set_features(uint64_t features) "features accepted by the driver =0
+ virtio_iommu_device_status(uint8_t status) "driver status = %d"
+ virtio_iommu_get_config(uint64_t page_size_mask, uint64_t start, uint64_t end, uint8_t domain_bits, uint32_t probe_size) "page_size_mask=0x%"PRIx64" start=0x%"PRIx64" end=0x%"PRIx64" domain_bits=%d probe_size=0x%x"
+ virtio_iommu_set_config(uint64_t page_size_mask, uint64_t start, uint64_t end, uint8_t domain_bits, uint32_t probe_size) "page_size_mask=0x%"PRIx64" start=0x%"PRIx64" end=0x%"PRIx64" domain_bits=%d probe_size=0x%x"
++virtio_iommu_attach(uint32_t domain_id, uint32_t ep_id) "domain=%d endpoint=%d"
++virtio_iommu_detach(uint32_t domain_id, uint32_t ep_id) "domain=%d endpoint=%d"
++virtio_iommu_map(uint32_t domain_id, uint64_t virt_start, uint64_t virt_end, uint64_t phys_start, uint32_t flags) "domain=%d virt_start=0x%"PRIx64" virt_end=0x%"PRIx64 " phys_start=0x%"PRIx64" flags=%d"
++virtio_iommu_unmap(uint32_t domain_id, uint64_t virt_start, uint64_t virt_end) "domain=%d virt_start=0x%"PRIx64" virt_end=0x%"PRIx64
+diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+index d8894f047b..fc95751c40 100644
+--- a/hw/virtio/virtio-iommu.c
++++ b/hw/virtio/virtio-iommu.c
+@@ -33,29 +33,116 @@
+ /* Max size */
+ #define VIOMMU_DEFAULT_QUEUE_SIZE 256
+ 
++static int virtio_iommu_attach(VirtIOIOMMU *s,
++                               struct virtio_iommu_req_attach *req)
++{
++    uint32_t domain_id = le32_to_cpu(req->domain);
++    uint32_t ep_id = le32_to_cpu(req->endpoint);
++
++    trace_virtio_iommu_attach(domain_id, ep_id);
++
++    return VIRTIO_IOMMU_S_UNSUPP;
++}
++
++static int virtio_iommu_detach(VirtIOIOMMU *s,
++                               struct virtio_iommu_req_detach *req)
++{
++    uint32_t domain_id = le32_to_cpu(req->domain);
++    uint32_t ep_id = le32_to_cpu(req->endpoint);
++
++    trace_virtio_iommu_detach(domain_id, ep_id);
++
++    return VIRTIO_IOMMU_S_UNSUPP;
++}
++
++static int virtio_iommu_map(VirtIOIOMMU *s,
++                            struct virtio_iommu_req_map *req)
++{
++    uint32_t domain_id = le32_to_cpu(req->domain);
++    uint64_t phys_start = le64_to_cpu(req->phys_start);
++    uint64_t virt_start = le64_to_cpu(req->virt_start);
++    uint64_t virt_end = le64_to_cpu(req->virt_end);
++    uint32_t flags = le32_to_cpu(req->flags);
++
++    trace_virtio_iommu_map(domain_id, virt_start, virt_end, phys_start, flags);
++
++    return VIRTIO_IOMMU_S_UNSUPP;
++}
++
++static int virtio_iommu_unmap(VirtIOIOMMU *s,
++                              struct virtio_iommu_req_unmap *req)
++{
++    uint32_t domain_id = le32_to_cpu(req->domain);
++    uint64_t virt_start = le64_to_cpu(req->virt_start);
++    uint64_t virt_end = le64_to_cpu(req->virt_end);
++
++    trace_virtio_iommu_unmap(domain_id, virt_start, virt_end);
++
++    return VIRTIO_IOMMU_S_UNSUPP;
++}
++
++#define get_payload_size(req) (\
++sizeof((req)) - sizeof(struct virtio_iommu_req_tail))
++
+ static int virtio_iommu_handle_attach(VirtIOIOMMU *s,
+                                       struct iovec *iov,
+                                       unsigned int iov_cnt)
+ {
+-    return -ENOENT;
++    struct virtio_iommu_req_attach req;
++    size_t sz, payload_sz;
++
++    payload_sz = get_payload_size(req);
++
++    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
++    if (sz != payload_sz) {
++        return VIRTIO_IOMMU_S_INVAL;
++    }
++    return virtio_iommu_attach(s, &req);
+ }
+ static int virtio_iommu_handle_detach(VirtIOIOMMU *s,
+                                       struct iovec *iov,
+                                       unsigned int iov_cnt)
+ {
+-    return -ENOENT;
++    struct virtio_iommu_req_detach req;
++    size_t sz, payload_sz;
++
++    payload_sz = get_payload_size(req);
++
++    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
++    if (sz != payload_sz) {
++        return VIRTIO_IOMMU_S_INVAL;
++    }
++    return virtio_iommu_detach(s, &req);
+ }
+ static int virtio_iommu_handle_map(VirtIOIOMMU *s,
+                                    struct iovec *iov,
+                                    unsigned int iov_cnt)
+ {
+-    return -ENOENT;
++    struct virtio_iommu_req_map req;
++    size_t sz, payload_sz;
++
++    payload_sz = get_payload_size(req);
++
++    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
++    if (sz != payload_sz) {
++        return VIRTIO_IOMMU_S_INVAL;
++    }
++    return virtio_iommu_map(s, &req);
+ }
+ static int virtio_iommu_handle_unmap(VirtIOIOMMU *s,
+                                      struct iovec *iov,
+                                      unsigned int iov_cnt)
+ {
+-    return -ENOENT;
++    struct virtio_iommu_req_unmap req;
++    size_t sz, payload_sz;
++
++    payload_sz = get_payload_size(req);
++
++    sz = iov_to_buf(iov, iov_cnt, 0, &req, payload_sz);
++    if (sz != payload_sz) {
++        return VIRTIO_IOMMU_S_INVAL;
++    }
++    return virtio_iommu_unmap(s, &req);
+ }
+ 
+ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
+-- 
+2.17.2
