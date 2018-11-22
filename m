@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gPqTw-0007r5-G4
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 10:01:30 -0500
+	(envelope-from <lersek@redhat.com>) id 1gPqe1-0003K3-N7
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 10:11:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gPqTt-0005Wp-A9
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 10:01:28 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 22 Nov 2018 17:00:27 +0200
-Message-Id: <04d62642b7f6845c555423ef1c5dce125eef158c.1542898669.git.berto@igalia.com>
-In-Reply-To: <cover.1542898669.git.berto@igalia.com>
-References: <cover.1542898669.git.berto@igalia.com>
-In-Reply-To: <cover.1542898669.git.berto@igalia.com>
-References: <cover.1542898669.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 2/2] mirror: Block the source BlockDriverState
- in mirror_start_job()
+	(envelope-from <lersek@redhat.com>) id 1gPqdy-0000D3-6C
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 10:11:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gPqdx-0000C9-Rp
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 10:11:50 -0500
+References: <20181122021139.1486-1-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <61a8ebf8-fb64-1b04-8c92-f14bf5bb61aa@redhat.com>
+Date: Thu, 22 Nov 2018 16:11:32 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181122021139.1486-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.1] MAINTAINERS: Add an entry for the
+ Firmware Configuration (fw_cfg) device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,91 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Li Qiang <liq3ea@gmail.com>
 
-The mirror_start_job() function used for the commit-active job blocks
-the source, target and all intermediate nodes for the duration of the
-job.
+On 11/22/18 03:11, Philippe Mathieu-Daud=C3=A9 wrote:
+> Step in to maintain it, with Laszlo (EDK2) and Gerd (SeaBIOS)
+> as designated reviewers.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> Note than OpenBIOS also consumes this device (PPC/Sparc).
+>=20
+>  MAINTAINERS | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 1032406c56..b28ec13963 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1534,6 +1534,19 @@ F: hw/display/edid*
+>  F: include/hw/display/edid.h
+>  F: qemu-edid.c
+> =20
+> +Firmware configuration (fw_cfg)
+> +M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> +R: Laszlo Ersek <lersek@redhat.com>
+> +R: Gerd Hoffmann <kraxel@redhat.com>
+> +S: Supported
+> +F: docs/specs/fw_cfg.txt
+> +F: hw/nvram/fw_cfg.c
+> +F: include/hw/nvram/fw_cfg.h
+> +F: include/standard-headers/linux/qemu_fw_cfg.h
+> +F: tests/libqos/fw_cfg.c
+> +F: tests/fw_cfg-test.c
+> +T: git https://github.com/philmd/qemu.git fw_cfg-next
+> +
+>  Subsystems
+>  ----------
+>  Audio
+>=20
 
-   target <- intermediate <- source
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Since 4ef85a9c2339 this function creates a dummy mirror_top_bs that
-goes on top of the source node, and it is this dummy node that gets
-blocked instead. The source node is never blocked or added to the
-job's list of nodes.
-
-   target <- intermediate <- source <- mirror_top
-
-At the moment I don't think it is possible to exploit this problem
-because any additional job on 'source' would either be forbidden for
-other reasons or it would need to involve an additional node that is
-blocked, causing an error.
-
-This can be seen in the error messages, however, because they never
-refer to the source node being blocked:
-
-  $ qemu-img create -f qcow2 hd0.qcow2 1M
-  $ qemu-img create -f qcow2 -b hd0.qcow2 hd1.qcow2
-  $ qemu-io -c 'write 0 1M' hd0.qcow2
-  $ $QEMU -drive if=none,file=hd1.qcow2,node-name=hd1
-  { "execute": "qmp_capabilities" }
-  { "execute": "block-commit", "arguments": {"device": "hd1", "speed": 256}}
-  { "execute": "block-stream", "arguments": {"device": "hd1"}}
-  { "error": {"class": "GenericError",
-    "desc": "Node 'hd0' is busy: block device is in use by block job: commit"}}
-
-After this patch the error message refers to 'hd1', as it should.
-
-The expected output of iotest 141 also needs to be updated for the
-same reason.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/mirror.c             | 8 ++++++++
- tests/qemu-iotests/141.out | 4 ++--
- 2 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/block/mirror.c b/block/mirror.c
-index 664c452f71..467eec9b89 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1612,6 +1612,14 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-         goto fail;
-     }
- 
-+    ret = block_job_add_bdrv(&s->common, "source", bs, 0,
-+                             BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE |
-+                             BLK_PERM_CONSISTENT_READ,
-+                             errp);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-     /* Required permissions are already taken with blk_new() */
-     block_job_add_bdrv(&s->common, "target", target, 0, BLK_PERM_ALL,
-                        &error_abort);
-diff --git a/tests/qemu-iotests/141.out b/tests/qemu-iotests/141.out
-index f252c86875..41c7291258 100644
---- a/tests/qemu-iotests/141.out
-+++ b/tests/qemu-iotests/141.out
-@@ -28,7 +28,7 @@ Formatting 'TEST_DIR/o.IMGFMT', fmt=IMGFMT size=1048576 backing_file=TEST_DIR/t.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "job0", "len": 0, "offset": 0, "speed": 0, "type": "mirror"}}
- {"return": {}}
--{"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: node is used as backing hd of 'NODE_NAME'"}}
-+{"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: block device is in use by block job: mirror"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "job0"}}
-@@ -45,7 +45,7 @@ Formatting 'TEST_DIR/o.IMGFMT', fmt=IMGFMT size=1048576 backing_file=TEST_DIR/t.
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "job0", "len": 0, "offset": 0, "speed": 0, "type": "commit"}}
- {"return": {}}
--{"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: node is used as backing hd of 'NODE_NAME'"}}
-+{"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: block device is in use by block job: commit"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "job0"}}
--- 
-2.11.0
+Thanks!
+Laszlo
