@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gPdXR-0004v3-2k
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:12:14 -0500
+	(envelope-from <philmd@redhat.com>) id 1gPdYS-0005cQ-AZ
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:13:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gPdXN-0006dm-56
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:12:13 -0500
-Resent-Message-Id: <E1gPdXN-0006dm-56@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21473)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gPdXM-0006Yl-RL
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:12:09 -0500
-In-Reply-To: <20181120121558.7660-1-richard.henderson@linaro.org>
-Message-ID: <154284909410.30611.18237872212557540606@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <philmd@redhat.com>) id 1gPdYO-0007oW-7H
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:13:16 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:52556)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gPdYM-0007kb-Cr
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:13:11 -0500
+Received: by mail-wm1-f66.google.com with SMTP id r11-v6so7258705wmb.2
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 17:13:10 -0800 (PST)
+References: <20181121185810.24647-1-jcmvbkbc@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <5fb19799-34a4-5295-e6ae-a2e39193284d@redhat.com>
+Date: Thu, 22 Nov 2018 02:13:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 21 Nov 2018 17:11:35 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/5] tcg: Make bswap support in qemu_ld/st
- optional
+In-Reply-To: <20181121185810.24647-1-jcmvbkbc@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3] target/xtensa: xtfpga: provide default
+ memory sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +30,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, Alistair.Francis@wdc.com
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-ODExMjAxMjE1NTguNzY2MC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKVHlwZTogc2Vy
-aWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC81XSB0Y2c6IE1ha2UgYnN3YXAgc3Vw
-cG9ydCBpbiBxZW11X2xkL3N0IG9wdGlvbmFsCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
-LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
-IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
-a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
-ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
-IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApT
-d2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjYzMzYxNTYgdGNnL2FybTogU2V0IFRDR19U
-QVJHRVRfSEFTX01FTU9SWV9CU1dBUCB0byBmYWxzZQo4YjZjNzdiIHRjZy9hYXJjaDY0OiBTZXQg
-VENHX1RBUkdFVF9IQVNfTUVNT1JZX0JTV0FQIHRvIGZhbHNlCjk3OTM2Y2UgdGNnL2kzODY6IFNl
-dCBUQ0dfVEFSR0VUX0hBU19NRU1PUllfQlNXQVAgd2l0aCBoYXZlX21vdmJlCmI2ZDZmYWYgdGNn
-L29wdGltaXplOiBPcHRpbWl6ZSBic3dhcAo2YTY3MWM3IHRjZzogQWRkIFRDR19UQVJHRVRfSEFT
-X01FTU9SWV9CU1dBUAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS81OiB0
-Y2c6IEFkZCBUQ0dfVEFSR0VUX0hBU19NRU1PUllfQlNXQVAuLi4KQ2hlY2tpbmcgUEFUQ0ggMi81
-OiB0Y2cvb3B0aW1pemU6IE9wdGltaXplIGJzd2FwLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
-YXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQojMjE6IEZJTEU6IHRjZy9vcHRpbWl6ZS5jOjM1NjoK
-KyAgICBDQVNFX09QXzMyXzY0KGJzd2FwMTYpOgogICAgICAgICAgICAgICAgICAgICAgICAgICBe
-CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzI0OiBG
-SUxFOiB0Y2cvb3B0aW1pemUuYzozNTk6CisgICAgQ0FTRV9PUF8zMl82NChic3dhcDMyKToKICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQg
-dGhhdCAnOicgKGN0eDpWeEUpCiMzNzogRklMRTogdGNnL29wdGltaXplLmM6MTExNzoKKyAgICAg
-ICAgQ0FTRV9PUF8zMl82NChic3dhcDE2KToKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQojMzg6
-IEZJTEU6IHRjZy9vcHRpbWl6ZS5jOjExMTg6CisgICAgICAgIENBU0VfT1BfMzJfNjQoYnN3YXAz
-Mik6CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogNCBlcnJvcnMsIDAg
-d2FybmluZ3MsIDI0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvNTogdGNnL2kzODY6IFNldCBUQ0dfVEFSR0VUX0hB
-U19NRU1PUllfQlNXQVAgd2l0aCBoYXZlX21vdmJlLi4uCkNoZWNraW5nIFBBVENIIDQvNTogdGNn
-L2FhcmNoNjQ6IFNldCBUQ0dfVEFSR0VUX0hBU19NRU1PUllfQlNXQVAgdG8gZmFsc2UuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNS81OiB0Y2cvYXJtOiBTZXQgVENHX1RBUkdFVF9IQVNfTUVNT1JZX0JTV0FQ
-IHRvIGZhbHNlLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
-IGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
-aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+On 21/11/18 19:58, Max Filippov wrote:
+> Provide default RAM sizes for all XTFPGA boards, so that when started
+> without -m option they do the right thing.
+> 
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> Changes v2->v3:
+> - add XTFPGA_MMU_RESERVED_MEMORY_SIZE definition and express Xilinx board
+>    memory sizes using it as suggested by Philippe;
+
+Thanks for your v3, this is now very clean!
+
+> 
+> Changes v1->v2:
+> - fix memory sizes for ml605 and kc705 with MMU
+> 
+> 
+>   hw/xtensa/xtfpga.c | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
+> 
+> diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+> index b3161de32093..21094319a659 100644
+> --- a/hw/xtensa/xtfpga.c
+> +++ b/hw/xtensa/xtfpga.c
+> @@ -446,6 +446,8 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
+>       }
+>   }
+>   
+> +#define XTFPGA_MMU_RESERVED_MEMORY_SIZE (128 * MiB)
+> +
+>   static const hwaddr xtfpga_mmu_io[2] = {
+>       0xf0000000,
+>   };
+> @@ -568,6 +570,7 @@ static void xtfpga_lx60_class_init(ObjectClass *oc, void *data)
+>       mc->init = xtfpga_lx60_init;
+>       mc->max_cpus = 4;
+>       mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
+> +    mc->default_ram_size = 64 * MiB;
+>   }
+>   
+>   static const TypeInfo xtfpga_lx60_type = {
+> @@ -584,6 +587,7 @@ static void xtfpga_lx60_nommu_class_init(ObjectClass *oc, void *data)
+>       mc->init = xtfpga_lx60_nommu_init;
+>       mc->max_cpus = 4;
+>       mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
+> +    mc->default_ram_size = 64 * MiB;
+>   }
+>   
+>   static const TypeInfo xtfpga_lx60_nommu_type = {
+> @@ -600,6 +604,7 @@ static void xtfpga_lx200_class_init(ObjectClass *oc, void *data)
+>       mc->init = xtfpga_lx200_init;
+>       mc->max_cpus = 4;
+>       mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
+> +    mc->default_ram_size = 96 * MiB;
+>   }
+>   
+>   static const TypeInfo xtfpga_lx200_type = {
+> @@ -616,6 +621,7 @@ static void xtfpga_lx200_nommu_class_init(ObjectClass *oc, void *data)
+>       mc->init = xtfpga_lx200_nommu_init;
+>       mc->max_cpus = 4;
+>       mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
+> +    mc->default_ram_size = 96 * MiB;
+>   }
+>   
+>   static const TypeInfo xtfpga_lx200_nommu_type = {
+> @@ -632,6 +638,7 @@ static void xtfpga_ml605_class_init(ObjectClass *oc, void *data)
+>       mc->init = xtfpga_ml605_init;
+>       mc->max_cpus = 4;
+>       mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
+> +    mc->default_ram_size = 512 * MiB - XTFPGA_MMU_RESERVED_MEMORY_SIZE;
+>   }
+>   
+>   static const TypeInfo xtfpga_ml605_type = {
+> @@ -648,6 +655,7 @@ static void xtfpga_ml605_nommu_class_init(ObjectClass *oc, void *data)
+>       mc->init = xtfpga_ml605_nommu_init;
+>       mc->max_cpus = 4;
+>       mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
+> +    mc->default_ram_size = 256 * MiB;
+>   }
+>   
+>   static const TypeInfo xtfpga_ml605_nommu_type = {
+> @@ -664,6 +672,7 @@ static void xtfpga_kc705_class_init(ObjectClass *oc, void *data)
+>       mc->init = xtfpga_kc705_init;
+>       mc->max_cpus = 4;
+>       mc->default_cpu_type = XTENSA_DEFAULT_CPU_TYPE;
+> +    mc->default_ram_size = 1 * GiB - XTFPGA_MMU_RESERVED_MEMORY_SIZE;
+>   }
+>   
+>   static const TypeInfo xtfpga_kc705_type = {
+> @@ -680,6 +689,7 @@ static void xtfpga_kc705_nommu_class_init(ObjectClass *oc, void *data)
+>       mc->init = xtfpga_kc705_nommu_init;
+>       mc->max_cpus = 4;
+>       mc->default_cpu_type = XTENSA_DEFAULT_CPU_NOMMU_TYPE;
+> +    mc->default_ram_size = 256 * MiB;
+>   }
+>   
+>   static const TypeInfo xtfpga_kc705_nommu_type = {
+> 
