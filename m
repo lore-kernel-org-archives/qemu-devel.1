@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gPo5n-0004lZ-NC
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:28:24 -0500
+	(envelope-from <thuth@redhat.com>) id 1gPoXw-0005rv-Ta
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:57:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gPo5m-0005ls-VT
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:28:23 -0500
-References: <20181120203628.2367003-1-eblake@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <9a664c5c-d15d-5320-c60a-eeef56638e0f@vivier.eu>
-Date: Thu, 22 Nov 2018 13:27:59 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181120203628.2367003-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] misc: Avoid UTF-8 in error
- messages
+	(envelope-from <thuth@redhat.com>) id 1gPoXs-0007nx-Ro
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:57:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42274)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gPoXs-0007nK-Mv
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:57:24 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 22 Nov 2018 13:57:18 +0100
+Message-Id: <1542891438-13329-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: Add some missing entries related
+ to accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +22,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On 20/11/2018 21:36, Eric Blake wrote:
-> While most developers are now using UTF-8 environments, it's
-> harder to guarantee that error messages will be output to
-> a multibyte locale. Rather than risking error messages that
-> get corrupted into mojibake when the user runs qemu in a
-> non-multibyte locale, let's stick to straight ASCII error
-> messages, rather than assuming that our use of UTF-8 in source
-> code string constants will work unchanged in other locales.
-> 
-> Reported-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  hw/misc/tmp105.c | 2 +-
->  hw/misc/tmp421.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/misc/tmp105.c b/hw/misc/tmp105.c
-> index 0918f3a6ea2..f6d7163273a 100644
-> --- a/hw/misc/tmp105.c
-> +++ b/hw/misc/tmp105.c
-> @@ -79,7 +79,7 @@ static void tmp105_set_temperature(Object *obj, Visitor *v, const char *name,
->          return;
->      }
->      if (temp >= 128000 || temp < -128000) {
-> -        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " °C is out of range",
-> +        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " C is out of range",
->                     temp / 1000, temp % 1000);
->          return;
->      }
-> diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
-> index c234044305d..eeb11000f0f 100644
-> --- a/hw/misc/tmp421.c
-> +++ b/hw/misc/tmp421.c
-> @@ -153,7 +153,7 @@ static void tmp421_set_temperature(Object *obj, Visitor *v, const char *name,
->      }
-> 
->      if (temp >= maxs[ext_range] || temp < mins[ext_range]) {
-> -        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " °C is out of range",
-> +        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " C is out of range",
->                     temp / 1000, temp % 1000);
->          return;
->      }
-> 
+Add some files from accel/stubs/, include/hw/kvm/ and scripts/kvm/
+to the MAINTAINERS file.
 
-Applied to qemu-trivial with updated message log (command to find the
-non-ASCII characters).
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ MAINTAINERS | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Thanks,
-Laurent
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 63c88e1..6522621 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -117,6 +117,7 @@ S: Maintained
+ F: cpus.c
+ F: exec.c
+ F: accel/tcg/
++F: accel/stubs/tcg-stub.c
+ F: include/exec/cpu*.h
+ F: include/exec/exec-all.h
+ F: include/exec/helper*.h
+@@ -332,7 +333,10 @@ L: kvm@vger.kernel.org
+ S: Supported
+ F: */kvm.*
+ F: accel/kvm/
++F: accel/stubs/kvm-stub.c
++F: include/hw/kvm/
+ F: include/sysemu/kvm*.h
++F: scripts/kvm/kvm_flightrecorder
+ 
+ ARM
+ M: Peter Maydell <peter.maydell@linaro.org>
+@@ -375,6 +379,7 @@ M: Marcelo Tosatti <mtosatti@redhat.com>
+ L: kvm@vger.kernel.org
+ S: Supported
+ F: target/i386/kvm.c
++F: scripts/kvm/vmxcap
+ 
+ Guest CPU Cores (Xen):
+ ----------------------
+-- 
+1.8.3.1
