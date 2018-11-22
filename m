@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gPsFd-0001xR-G1
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:54:51 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gPsFf-0001z3-6L
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:54:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gPsFa-00017n-NX
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:54:49 -0500
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu, 22 Nov 2018 17:54:30 +0100
-Message-Id: <20181122165432.4437-2-cohuck@redhat.com>
-In-Reply-To: <20181122165432.4437-1-cohuck@redhat.com>
-References: <20181122165432.4437-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] vfio-ccw: add capabilities chain
+	(envelope-from <kwolf@redhat.com>) id 1gPsFd-0001D2-D8
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:54:51 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Thu, 22 Nov 2018 17:54:17 +0100
+Message-Id: <20181122165417.23894-14-kwolf@redhat.com>
+In-Reply-To: <20181122165417.23894-1-kwolf@redhat.com>
+References: <20181122165417.23894-1-kwolf@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 13/13] iotests: Enhance 223 to cover multiple
+ bitmap granularities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,386 +22,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Allow to extend the regions used by vfio-ccw. The first user will be
-handling of halt and clear subchannel.
+From: Eric Blake <eblake@redhat.com>
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Testing granularity at the same size as the cluster isn't quite
+as fun as what happens when it is larger or smaller.  This
+enhancement also shows that qemu's nbd server can serve the
+same disk over multiple exports simultaneously.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Tested-by: John Snow <jsnow@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- drivers/s390/cio/vfio_ccw_ops.c     | 182 ++++++++++++++++++++++++----
- drivers/s390/cio/vfio_ccw_private.h |  38 ++++++
- include/uapi/linux/vfio.h           |   1 +
- 3 files changed, 195 insertions(+), 26 deletions(-)
+ tests/qemu-iotests/223     | 43 +++++++++++++++++++++++++++++++-------
+ tests/qemu-iotests/223.out | 32 +++++++++++++++++++++-------
+ 2 files changed, 60 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index f673e106c041..a5d731ed2a39 100644
---- a/drivers/s390/cio/vfio_ccw_ops.c
-+++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -3,9 +3,11 @@
-  * Physical device callbacks for vfio_ccw
-  *
-  * Copyright IBM Corp. 2017
-+ * Copyright Red Hat, Inc. 2018
-  *
-  * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-  *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-+ *            Cornelia Huck <cohuck@redhat.com>
-  */
- 
- #include <linux/vfio.h>
-@@ -157,47 +159,76 @@ static void vfio_ccw_mdev_release(struct mdev_device *mdev)
- {
- 	struct vfio_ccw_private *private =
- 		dev_get_drvdata(mdev_parent_dev(mdev));
-+	int i;
- 
- 	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
- 				 &private->nb);
-+
-+	for (i = 0; i < private->num_regions; i++)
-+		private->region[i].ops->release(private, &private->region[i]);
-+
-+	private->num_regions = 0;
-+	kfree(private->region);
-+	private->region = NULL;
+diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
+index 72419e0338..397b865d34 100755
+--- a/tests/qemu-iotests/223
++++ b/tests/qemu-iotests/223
+@@ -57,10 +57,11 @@ run_qemu()
  }
- 
--static ssize_t vfio_ccw_mdev_read(struct mdev_device *mdev,
--				  char __user *buf,
--				  size_t count,
--				  loff_t *ppos)
-+static ssize_t vfio_ccw_mdev_read_io_region(struct vfio_ccw_private *private,
-+					    char __user *buf, size_t count,
-+					    loff_t *ppos)
- {
--	struct vfio_ccw_private *private;
-+	loff_t pos = *ppos & VFIO_CCW_OFFSET_MASK;
- 	struct ccw_io_region *region;
- 
--	if (*ppos + count > sizeof(*region))
-+	if (pos + count > sizeof(*region))
- 		return -EINVAL;
- 
--	private = dev_get_drvdata(mdev_parent_dev(mdev));
- 	region = private->io_region;
--	if (copy_to_user(buf, (void *)region + *ppos, count))
-+	if (copy_to_user(buf, (void *)region + pos, count))
- 		return -EFAULT;
- 
- 	return count;
- }
- 
--static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
--				   const char __user *buf,
--				   size_t count,
--				   loff_t *ppos)
-+static ssize_t vfio_ccw_mdev_read(struct mdev_device *mdev,
-+				  char __user *buf,
-+				  size_t count,
-+				  loff_t *ppos)
- {
-+	unsigned int index = VFIO_CCW_OFFSET_TO_INDEX(*ppos);
- 	struct vfio_ccw_private *private;
-+
-+	private = dev_get_drvdata(mdev_parent_dev(mdev));
-+
-+	if (index >= VFIO_CCW_NUM_REGIONS + private->num_regions)
-+		return -EINVAL;
-+
-+	switch (index) {
-+	case VFIO_CCW_CONFIG_REGION_INDEX:
-+		return vfio_ccw_mdev_read_io_region(private, buf, count, ppos);
-+	default:
-+		index -= VFIO_CCW_NUM_REGIONS;
-+		return private->region[index].ops->read(private, buf, count,
-+							ppos);
-+	}
-+
-+	return -EINVAL;
+=20
+ echo
+-echo "=3D=3D=3D Create partially sparse image, then add dirty bitmap =3D=
+=3D=3D"
++echo "=3D=3D=3D Create partially sparse image, then add dirty bitmaps =3D=
+=3D=3D"
+ echo
+=20
+-_make_test_img 4M
++# Two bitmaps, to contrast granularity issues
++_make_test_img -o cluster_size=3D4k 4M
+ $QEMU_IO -c 'w -P 0x11 1M 2M' "$TEST_IMG" | _filter_qemu_io
+ run_qemu <<EOF
+ { "execute": "qmp_capabilities" }
+@@ -78,7 +79,16 @@ run_qemu <<EOF
+   "arguments": {
+     "node": "n",
+     "name": "b",
+-    "persistent": true
++    "persistent": true,
++    "granularity": 65536
++  }
 +}
-+
-+static ssize_t vfio_ccw_mdev_write_io_region(struct vfio_ccw_private *private,
-+					     const char __user *buf,
-+					     size_t count, loff_t *ppos)
-+{
-+	loff_t pos = *ppos & VFIO_CCW_OFFSET_MASK;
- 	struct ccw_io_region *region;
- 
--	if (*ppos + count > sizeof(*region))
-+	if (pos + count > sizeof(*region))
- 		return -EINVAL;
- 
--	private = dev_get_drvdata(mdev_parent_dev(mdev));
- 	if (private->state != VFIO_CCW_STATE_IDLE)
- 		return -EACCES;
- 
- 	region = private->io_region;
--	if (copy_from_user((void *)region + *ppos, buf, count))
-+	if (copy_from_user((void *)region + pos, buf, count))
- 		return -EFAULT;
- 
- 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_IO_REQ);
-@@ -207,21 +238,55 @@ static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
- 	}
- 
- 	return count;
-+
++{ "execute": "block-dirty-bitmap-add",
++  "arguments": {
++    "node": "n",
++    "name": "b2",
++    "persistent": true,
++    "granularity": 512
+   }
  }
- 
--static int vfio_ccw_mdev_get_device_info(struct vfio_device_info *info)
-+static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
-+				   const char __user *buf,
-+				   size_t count,
-+				   loff_t *ppos)
- {
-+	unsigned int index = VFIO_CCW_OFFSET_TO_INDEX(*ppos);
-+	struct vfio_ccw_private *private;
+ { "execute": "quit" }
+@@ -88,10 +98,11 @@ echo
+ echo "=3D=3D=3D Write part of the file under active bitmap =3D=3D=3D"
+ echo
+=20
+-$QEMU_IO -c 'w -P 0x22 2M 2M' "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c 'w -P 0x22 512 512' -c 'w -P 0x33 2M 2M' "$TEST_IMG" \
++    | _filter_qemu_io
+=20
+ echo
+-echo "=3D=3D=3D End dirty bitmap, and start serving image over NBD =3D=3D=
+=3D"
++echo "=3D=3D=3D End dirty bitmaps, and start serving image over NBD =3D=3D=
+=3D"
+ echo
+=20
+ _launch_qemu 2> >(_filter_nbd)
+@@ -103,6 +114,8 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"blockdev-add=
+",
+     "file":{"driver":"file", "filename":"'"$TEST_IMG"'"}}}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-block-dirty-bitmap-disable",
+   "arguments":{"node":"n", "name":"b"}}' "return"
++_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-block-dirty-bitmap-disable",
++  "arguments":{"node":"n", "name":"b2"}}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-start",
+   "arguments":{"addr":{"type":"unix",
+     "data":{"path":"'"$TEST_DIR/nbd"'"}}}}' "return"
+@@ -110,26 +123,40 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server=
+-add",
+   "arguments":{"device":"n"}}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
+   "arguments":{"name":"n", "bitmap":"b"}}' "return"
++_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
++  "arguments":{"device":"n", "name":"n2"}}' "return"
++_send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
++  "arguments":{"name":"n2", "bitmap":"b2"}}' "return"
+=20
+ echo
+-echo "=3D=3D=3D Contrast normal status with dirty-bitmap status =3D=3D=3D=
+"
++echo "=3D=3D=3D Contrast normal status to large granularity dirty-bitmap=
+ =3D=3D=3D"
+ echo
+=20
+ QEMU_IO_OPTIONS=3D$QEMU_IO_OPTIONS_NO_FMT
+ IMG=3D"driver=3Dnbd,export=3Dn,server.type=3Dunix,server.path=3D$TEST_DI=
+R/nbd"
+-$QEMU_IO -r -c 'r -P 0 0 1m' -c 'r -P 0x11 1m 1m' \
+-  -c 'r -P 0x22 2m 2m' --image-opts "$IMG" | _filter_qemu_io
++$QEMU_IO -r -c 'r -P 0x22 512 512' -c 'r -P 0 512k 512k' -c 'r -P 0x11 1=
+m 1m' \
++  -c 'r -P 0x33 2m 2m' --image-opts "$IMG" | _filter_qemu_io
+ $QEMU_IMG map --output=3Djson --image-opts \
+   "$IMG" | _filter_qemu_img_map
+ $QEMU_IMG map --output=3Djson --image-opts \
+   "$IMG,x-dirty-bitmap=3Dqemu:dirty-bitmap:b" | _filter_qemu_img_map
+=20
++echo
++echo "=3D=3D=3D Contrast to small granularity dirty-bitmap =3D=3D=3D"
++echo
 +
-+	private = dev_get_drvdata(mdev_parent_dev(mdev));
++IMG=3D"driver=3Dnbd,export=3Dn2,server.type=3Dunix,server.path=3D$TEST_D=
+IR/nbd"
++$QEMU_IMG map --output=3Djson --image-opts \
++  "$IMG,x-dirty-bitmap=3Dqemu:dirty-bitmap:b2" | _filter_qemu_img_map
 +
-+	if (index >= VFIO_CCW_NUM_REGIONS + private->num_regions)
-+		return -EINVAL;
+ echo
+ echo "=3D=3D=3D End NBD server =3D=3D=3D"
+ echo
+=20
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-remove",
+   "arguments":{"name":"n"}}' "return"
++_send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-remove",
++  "arguments":{"name":"n2"}}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-stop"}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"quit"}' "return"
+=20
+diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
+index 33021c8e6a..de417477de 100644
+--- a/tests/qemu-iotests/223.out
++++ b/tests/qemu-iotests/223.out
+@@ -1,6 +1,6 @@
+ QA output created by 223
+=20
+-=3D=3D=3D Create partially sparse image, then add dirty bitmap =3D=3D=3D
++=3D=3D=3D Create partially sparse image, then add dirty bitmaps =3D=3D=3D
+=20
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4194304
+ wrote 2097152/2097152 bytes at offset 1048576
+@@ -11,15 +11,18 @@ QMP_VERSION
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
++{"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
+t": "SHUTDOWN", "data": {"guest": false}}
+=20
+=20
+ =3D=3D=3D Write part of the file under active bitmap =3D=3D=3D
+=20
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 2097152/2097152 bytes at offset 2097152
+ 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+-=3D=3D=3D End dirty bitmap, and start serving image over NBD =3D=3D=3D
++=3D=3D=3D End dirty bitmaps, and start serving image over NBD =3D=3D=3D
+=20
+ {"return": {}}
+ {"return": {}}
+@@ -27,18 +30,32 @@ wrote 2097152/2097152 bytes at offset 2097152
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
++{"return": {}}
++{"return": {}}
++{"return": {}}
+=20
+-=3D=3D=3D Contrast normal status with dirty-bitmap status =3D=3D=3D
++=3D=3D=3D Contrast normal status to large granularity dirty-bitmap =3D=3D=
+=3D
+=20
+-read 1048576/1048576 bytes at offset 0
+-1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 524288/524288 bytes at offset 524288
++512 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 1048576/1048576 bytes at offset 1048576
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 2097152/2097152 bytes at offset 2097152
+ 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": fals=
+e},
++[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true},
++{ "start": 4096, "length": 1044480, "depth": 0, "zero": true, "data": fa=
+lse},
+ { "start": 1048576, "length": 3145728, "depth": 0, "zero": false, "data"=
+: true}]
+-[{ "start": 0, "length": 2097152, "depth": 0, "zero": false, "data": tru=
+e},
++[{ "start": 0, "length": 65536, "depth": 0, "zero": false, "data": false=
+},
++{ "start": 65536, "length": 2031616, "depth": 0, "zero": false, "data": =
+true},
++{ "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data"=
+: false}]
 +
-+	switch (index) {
-+	case VFIO_CCW_CONFIG_REGION_INDEX:
-+		return vfio_ccw_mdev_write_io_region(private, buf, count, ppos);
-+	default:
-+		index -= VFIO_CCW_NUM_REGIONS;
-+		return private->region[index].ops->write(private, buf, count,
-+							 ppos);
-+	}
++=3D=3D=3D Contrast to small granularity dirty-bitmap =3D=3D=3D
 +
-+	return -EINVAL;
-+}
-+
-+static int vfio_ccw_mdev_get_device_info(struct vfio_device_info *info,
-+					 struct mdev_device *mdev)
-+{
-+	struct vfio_ccw_private *private;
-+
-+	private = dev_get_drvdata(mdev_parent_dev(mdev));
- 	info->flags = VFIO_DEVICE_FLAGS_CCW | VFIO_DEVICE_FLAGS_RESET;
--	info->num_regions = VFIO_CCW_NUM_REGIONS;
-+	info->num_regions = VFIO_CCW_NUM_REGIONS + private->num_regions;
- 	info->num_irqs = VFIO_CCW_NUM_IRQS;
- 
- 	return 0;
- }
- 
- static int vfio_ccw_mdev_get_region_info(struct vfio_region_info *info,
--					 u16 *cap_type_id,
--					 void **cap_type)
-+					 struct mdev_device *mdev,
-+					 unsigned long arg)
- {
-+	struct vfio_ccw_private *private;
-+	int i;
-+
-+	private = dev_get_drvdata(mdev_parent_dev(mdev));
- 	switch (info->index) {
- 	case VFIO_CCW_CONFIG_REGION_INDEX:
- 		info->offset = 0;
-@@ -229,9 +294,51 @@ static int vfio_ccw_mdev_get_region_info(struct vfio_region_info *info,
- 		info->flags = VFIO_REGION_INFO_FLAG_READ
- 			      | VFIO_REGION_INFO_FLAG_WRITE;
- 		return 0;
--	default:
--		return -EINVAL;
-+	default: /* all other regions are handled via capability chain */
-+	{
-+		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
-+		struct vfio_region_info_cap_type cap_type = {
-+			.header.id = VFIO_REGION_INFO_CAP_TYPE,
-+			.header.version = 1 };
-+		int ret;
-+
-+		if (info->index >=
-+		    VFIO_CCW_NUM_REGIONS + private->num_regions)
-+			return -EINVAL;
-+
-+		i = info->index - VFIO_CCW_NUM_REGIONS;
-+
-+		info->offset = VFIO_CCW_INDEX_TO_OFFSET(info->index);
-+		info->size = private->region[i].size;
-+		info->flags = private->region[i].flags;
-+
-+		cap_type.type = private->region[i].type;
-+		cap_type.subtype = private->region[i].subtype;
-+
-+		ret = vfio_info_add_capability(&caps, &cap_type.header,
-+					       sizeof(cap_type));
-+		if (ret)
-+			return ret;
-+
-+		info->flags |= VFIO_REGION_INFO_FLAG_CAPS;
-+		if (info->argsz < sizeof(*info) + caps.size) {
-+			info->argsz = sizeof(*info) + caps.size;
-+			info->cap_offset = 0;
-+		} else {
-+			vfio_info_cap_shift(&caps, sizeof(*info));
-+			if (copy_to_user((void __user *)arg + sizeof(*info),
-+					 caps.buf, caps.size)) {
-+				kfree(caps.buf);
-+				return -EFAULT;
-+			}
-+			info->cap_offset = sizeof(*info);
-+		}
-+
-+		kfree(caps.buf);
-+
-+	}
- 	}
-+	return 0;
- }
- 
- static int vfio_ccw_mdev_get_irq_info(struct vfio_irq_info *info)
-@@ -308,6 +415,32 @@ static int vfio_ccw_mdev_set_irqs(struct mdev_device *mdev,
- 	}
- }
- 
-+int vfio_ccw_register_dev_region(struct vfio_ccw_private *private,
-+				 unsigned int subtype,
-+				 const struct vfio_ccw_regops *ops,
-+				 size_t size, u32 flags, void *data)
-+{
-+	struct vfio_ccw_region *region;
-+
-+	region = krealloc(private->region,
-+			  (private->num_regions + 1) * sizeof(*region),
-+			  GFP_KERNEL);
-+	if (!region)
-+		return -ENOMEM;
-+
-+	private->region = region;
-+	private->region[private->num_regions].type = VFIO_REGION_TYPE_CCW;
-+	private->region[private->num_regions].subtype = subtype;
-+	private->region[private->num_regions].ops = ops;
-+	private->region[private->num_regions].size = size;
-+	private->region[private->num_regions].flags = flags;
-+	private->region[private->num_regions].data = data;
-+
-+	private->num_regions++;
-+
-+	return 0;
-+}
-+
- static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
- 				   unsigned int cmd,
- 				   unsigned long arg)
-@@ -328,7 +461,7 @@ static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
- 		if (info.argsz < minsz)
- 			return -EINVAL;
- 
--		ret = vfio_ccw_mdev_get_device_info(&info);
-+		ret = vfio_ccw_mdev_get_device_info(&info, mdev);
- 		if (ret)
- 			return ret;
- 
-@@ -337,8 +470,6 @@ static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
- 	case VFIO_DEVICE_GET_REGION_INFO:
- 	{
- 		struct vfio_region_info info;
--		u16 cap_type_id = 0;
--		void *cap_type = NULL;
- 
- 		minsz = offsetofend(struct vfio_region_info, offset);
- 
-@@ -348,8 +479,7 @@ static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
- 		if (info.argsz < minsz)
- 			return -EINVAL;
- 
--		ret = vfio_ccw_mdev_get_region_info(&info, &cap_type_id,
--						    &cap_type);
-+		ret = vfio_ccw_mdev_get_region_info(&info, mdev, arg);
- 		if (ret)
- 			return ret;
- 
-diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index 078e46f9623d..a6f9f84526e2 100644
---- a/drivers/s390/cio/vfio_ccw_private.h
-+++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -3,9 +3,11 @@
-  * Private stuff for vfio_ccw driver
-  *
-  * Copyright IBM Corp. 2017
-+ * Copyright Red Hat, Inc. 2018
-  *
-  * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-  *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-+ *            Cornelia Huck <cohuck@redhat.com>
-  */
- 
- #ifndef _VFIO_CCW_PRIVATE_H_
-@@ -19,6 +21,38 @@
- #include "css.h"
- #include "vfio_ccw_cp.h"
- 
-+#define VFIO_CCW_OFFSET_SHIFT   40
-+#define VFIO_CCW_OFFSET_TO_INDEX(off)	(off >> VFIO_CCW_OFFSET_SHIFT)
-+#define VFIO_CCW_INDEX_TO_OFFSET(index)	((u64)(index) << VFIO_CCW_OFFSET_SHIFT)
-+#define VFIO_CCW_OFFSET_MASK	(((u64)(1) << VFIO_CCW_OFFSET_SHIFT) - 1)
-+
-+/* capability chain handling similar to vfio-pci */
-+struct vfio_ccw_private;
-+struct vfio_ccw_region;
-+
-+struct vfio_ccw_regops {
-+	size_t	(*read)(struct vfio_ccw_private *private, char __user *buf,
-+			size_t count, loff_t *ppos);
-+	size_t	(*write)(struct vfio_ccw_private *private,
-+			 const char __user *buf, size_t count, loff_t *ppos);
-+	void	(*release)(struct vfio_ccw_private *private,
-+			   struct vfio_ccw_region *region);
-+};
-+
-+struct vfio_ccw_region {
-+	u32				type;
-+	u32				subtype;
-+	const struct vfio_ccw_regops	*ops;
-+	void				*data;
-+	size_t				size;
-+	u32				flags;
-+};
-+
-+int vfio_ccw_register_dev_region(struct vfio_ccw_private *private,
-+				 unsigned int subtype,
-+				 const struct vfio_ccw_regops *ops,
-+				 size_t size, u32 flags, void *data);
-+
- /**
-  * struct vfio_ccw_private
-  * @sch: pointer to the subchannel
-@@ -28,6 +62,8 @@
-  * @mdev: pointer to the mediated device
-  * @nb: notifier for vfio events
-  * @io_region: MMIO region to input/output I/O arguments/results
-+ * @region: additional regions for other subchannel operations
-+ * @num_regions: number of additional regions
-  * @cp: channel program for the current I/O operation
-  * @irb: irb info received from interrupt
-  * @scsw: scsw info
-@@ -42,6 +78,8 @@ struct vfio_ccw_private {
- 	struct mdev_device	*mdev;
- 	struct notifier_block	nb;
- 	struct ccw_io_region	*io_region;
-+	struct vfio_ccw_region *region;
-+	int num_regions;
- 
- 	struct channel_program	cp;
- 	struct irb		irb;
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 813102810f53..565669f95534 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -297,6 +297,7 @@ struct vfio_region_info_cap_type {
- 
- #define VFIO_REGION_TYPE_PCI_VENDOR_TYPE	(1 << 31)
- #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
-+#define VFIO_REGION_TYPE_CCW			(1 << 30)
- 
- /* 8086 Vendor sub-types */
- #define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
--- 
-2.17.2
++[{ "start": 0, "length": 512, "depth": 0, "zero": false, "data": true},
++{ "start": 512, "length": 512, "depth": 0, "zero": false, "data": false}=
+,
++{ "start": 1024, "length": 2096128, "depth": 0, "zero": false, "data": t=
+rue},
+ { "start": 2097152, "length": 2097152, "depth": 0, "zero": false, "data"=
+: false}]
+=20
+ =3D=3D=3D End NBD server =3D=3D=3D
+@@ -46,4 +63,5 @@ read 2097152/2097152 bytes at offset 2097152
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
++{"return": {}}
+ *** done
+--=20
+2.19.1
