@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gPwxz-0001sH-MJ
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:56:56 -0500
+	(envelope-from <clg@kaod.org>) id 1gPx07-0003Nt-7V
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:59:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gPwxw-0006RA-Db
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:56:55 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:36909)
+	(envelope-from <clg@kaod.org>) id 1gPx03-0001Aw-Sq
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:59:07 -0500
+Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:46554)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gPwxw-0006OK-7B
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:56:52 -0500
-Date: Thu, 22 Nov 2018 22:56:32 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <a7902403-7572-9b64-235e-cb6f9e0efbae@redhat.com>
-Message-ID: <alpine.BSF.2.21.9999.1811222249030.51852@zero.eik.bme.hu>
-References: <87mw8rumhb.fsf@blackfin.pond.sub.org>
-	<87y4s8h5rh.fsf@blackfin.pond.sub.org>
-	<876132olyi.fsf@blackfin.pond.sub.org>
-	<87a8fucx33.fsf@dusky.pond.sub.org>
-	<87muq2fgbw.fsf@dusky.pond.sub.org>
-	<a7902403-7572-9b64-235e-cb6f9e0efbae@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gPx03-0001A2-MD
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:59:03 -0500
+Received: from player696.ha.ovh.net (unknown [10.109.160.25])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 4DFEA33C30
+	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 22:59:02 +0100 (CET)
+References: <20181116105729.23240-1-clg@kaod.org>
+	<20181116105729.23240-7-clg@kaod.org>
+	<20181122051302.GG10448@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <14e8b331-0c33-b07e-01ca-a540852bea37@kaod.org>
+Date: Thu, 22 Nov 2018 22:58:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] MAINTAINERS leaves too many files uncovered
+In-Reply-To: <20181122051302.GG10448@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 06/36] ppc/xive: add support for the END
+ Event State buffers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +33,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Thu, 22 Nov 2018, Thomas Huth wrote:
->>      19 hw/display/sm501.c
->
-> Maybe Balaton wants to adopt this file?
+On 11/22/18 6:13 AM, David Gibson wrote:
+> On Fri, Nov 16, 2018 at 11:56:59AM +0100, C=E9dric Le Goater wrote:
+>> The Event Notification Descriptor also contains two Event State
+>> Buffers providing further coalescing of interrupts, one for the
+>> notification event (ESn) and one for the escalation events (ESe). A
+>> MMIO page is assigned for each to control the EOI through loads
+>> only. Stores are not allowed.
+>>
+>> The END ESBs are modeled through an object resembling the 'XiveSource'
+>> It is stateless as the END state bits are backed into the XiveEND
+>> structure under the XiveRouter and the MMIO accesses follow the same
+>> rules as for the standard source ESBs.
+>>
+>> END ESBs are not supported by the Linux drivers neither on OPAL nor on
+>> sPAPR. Nevetherless, it provides a mean to study the question in the
+>> future and validates a bit more the XIVE model.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/xive.h |  20 ++++++
+>>  hw/intc/xive.c        | 160 +++++++++++++++++++++++++++++++++++++++++=
+-
+>>  2 files changed, 178 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>> index ce62aaf28343..24301bf2076d 100644
+>> --- a/include/hw/ppc/xive.h
+>> +++ b/include/hw/ppc/xive.h
+>> @@ -208,6 +208,26 @@ int xive_router_get_end(XiveRouter *xrtr, uint8_t=
+ end_blk, uint32_t end_idx,
+>>  int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t e=
+nd_idx,
+>>                          XiveEND *end);
+>> =20
+>> +/*
+>> + * XIVE END ESBs
+>> + */
+>> +
+>> +#define TYPE_XIVE_END_SOURCE "xive-end-source"
+>> +#define XIVE_END_SOURCE(obj) \
+>> +    OBJECT_CHECK(XiveENDSource, (obj), TYPE_XIVE_END_SOURCE)
+>=20
+> Is there a particular reason to make this a full QOM object, rather
+> than just embedding it in the XiveRouter?
 
-As discussed before this was originally part of SH4 but since that seems 
-to be not actively maintained any more and latest changes were for 
-sam460ex I can add it to sam460ex. I planned to do that when I make any 
-changes in the future but if needed I can send a patch for this now.
+yes, it should probably be under the XiveRouter you are right because
+there is a direct link with the ENDT which is in the XiverRouter.=20
 
-While we're there, should I also add pc-bios/canyonlands.dts which is the 
-device tree for sam460ex?
+But if I remove the chip_id field from the XiveRouter, it becomes a QOM
+interface. something to ponder.
+=20
+>> +typedef struct XiveENDSource {
+>> +    SysBusDevice parent;
+>> +
+>> +    uint32_t        nr_ends;
+>> +
+>> +    /* ESB memory region */
+>> +    uint32_t        esb_shift;
+>> +    MemoryRegion    esb_mmio;
+>> +
+>> +    XiveRouter      *xrtr;
+>> +} XiveENDSource;
+>> +
+>>  /*
+>>   * For legacy compatibility, the exceptions define up to 256 differen=
+t
+>>   * priorities. P9 implements only 9 levels : 8 active levels [0 - 7]
+>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>> index 9cb001e7b540..5a8882d47a98 100644
+>> --- a/hw/intc/xive.c
+>> +++ b/hw/intc/xive.c
+>> @@ -622,8 +622,18 @@ static void xive_router_end_notify(XiveRouter *xr=
+tr, uint8_t end_blk,
+>>       * even futher coalescing in the Router
+>>       */
+>>      if (!(end.w0 & END_W0_UCOND_NOTIFY)) {
+>> -        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented=
+\n");
+>> -        return;
+>> +        uint8_t pq =3D GETFIELD(END_W1_ESn, end.w1);
+>> +        bool notify =3D xive_esb_trigger(&pq);
+>> +
+>> +        if (pq !=3D GETFIELD(END_W1_ESn, end.w1)) {
+>> +            end.w1 =3D SETFIELD(END_W1_ESn, end.w1, pq);
+>> +            xive_router_set_end(xrtr, end_blk, end_idx, &end);
+>> +        }
+>> +
+>> +        /* ESn[Q]=3D1 : end of notification */
+>> +        if (!notify) {
+>> +            return;
+>> +        }
+>>      }
+>> =20
+>>      /*
+>> @@ -706,6 +716,151 @@ void xive_eas_pic_print_info(XiveEAS *eas, uint3=
+2_t lisn, Monitor *mon)
+>>                     (uint32_t) GETFIELD(EAS_END_DATA, eas->w));
+>>  }
+>> =20
+>> +/*
+>> + * END ESB MMIO loads
+>> + */
+>> +static uint64_t xive_end_source_read(void *opaque, hwaddr addr, unsig=
+ned size)
+>> +{
+>> +    XiveENDSource *xsrc =3D XIVE_END_SOURCE(opaque);
+>> +    XiveRouter *xrtr =3D xsrc->xrtr;
+>> +    uint32_t offset =3D addr & 0xFFF;
+>> +    uint8_t end_blk;
+>> +    uint32_t end_idx;
+>> +    XiveEND end;
+>> +    uint32_t end_esmask;
+>> +    uint8_t pq;
+>> +    uint64_t ret =3D -1;
+>> +
+>> +    end_blk =3D xrtr->chip_id;
+>> +    end_idx =3D addr >> (xsrc->esb_shift + 1);
+>> +    if (xive_router_get_end(xrtr, end_blk, end_idx, &end)) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No END %x/%x\n", end_bl=
+k,
+>> +                      end_idx);
+>> +        return -1;
+>> +    }
+>> +
+>> +    if (!(end.w0 & END_W0_VALID)) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: END %x/%x is invalid\n"=
+,
+>> +                      end_blk, end_idx);
+>> +        return -1;
+>> +    }
+>> +
+>> +    end_esmask =3D addr_is_even(addr, xsrc->esb_shift) ? END_W1_ESn :=
+ END_W1_ESe;
+>> +    pq =3D GETFIELD(end_esmask, end.w1);
+>> +
+>> +    switch (offset) {
+>> +    case XIVE_ESB_LOAD_EOI ... XIVE_ESB_LOAD_EOI + 0x7FF:
+>> +        ret =3D xive_esb_eoi(&pq);
+>> +
+>> +        /* Forward the source event notification for routing ?? */
+>> +        break;
+>> +
+>> +    case XIVE_ESB_GET ... XIVE_ESB_GET + 0x3FF:
+>> +        ret =3D pq;
+>> +        break;
+>> +
+>> +    case XIVE_ESB_SET_PQ_00 ... XIVE_ESB_SET_PQ_00 + 0x0FF:
+>> +    case XIVE_ESB_SET_PQ_01 ... XIVE_ESB_SET_PQ_01 + 0x0FF:
+>> +    case XIVE_ESB_SET_PQ_10 ... XIVE_ESB_SET_PQ_10 + 0x0FF:
+>> +    case XIVE_ESB_SET_PQ_11 ... XIVE_ESB_SET_PQ_11 + 0x0FF:
+>> +        ret =3D xive_esb_set(&pq, (offset >> 8) & 0x3);
+>> +        break;
+>> +    default:
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid END ESB load ad=
+dr %d\n",
+>> +                      offset);
+>> +        return -1;
+>> +    }
+>> +
+>> +    if (pq !=3D GETFIELD(end_esmask, end.w1)) {
+>> +        end.w1 =3D SETFIELD(end_esmask, end.w1, pq);
+>> +        xive_router_set_end(xrtr, end_blk, end_idx, &end);
+>> +    }
+>=20
+> We can probably share some more code with XiveSource here, but that's
+> something that can be refined later.
 
-Regards,
-BALATON Zoltan
+yes clearly. The idea was to introduce a XiveESB model handling only the=20
+MMIO aspects and rely on an interface to query/modify the underlying PQ b=
+its.
+These state bits are related to a device and the ESB pages are the XIVE w=
+ay=20
+to expose them.=20
+
+I left that for later. I didn't want to complexify more the XiveSource=20
+with a feature not used today.=20
+
+Thanks,
+
+C.
+
+>=20
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +/*
+>> + * END ESB MMIO stores are invalid
+>> + */
+>> +static void xive_end_source_write(void *opaque, hwaddr addr,
+>> +                                  uint64_t value, unsigned size)
+>> +{
+>> +    qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB write addr 0x%"
+>> +                  HWADDR_PRIx"\n", addr);
+>> +}
+>> +
+>> +static const MemoryRegionOps xive_end_source_ops =3D {
+>> +    .read =3D xive_end_source_read,
+>> +    .write =3D xive_end_source_write,
+>> +    .endianness =3D DEVICE_BIG_ENDIAN,
+>> +    .valid =3D {
+>> +        .min_access_size =3D 8,
+>> +        .max_access_size =3D 8,
+>> +    },
+>> +    .impl =3D {
+>> +        .min_access_size =3D 8,
+>> +        .max_access_size =3D 8,
+>> +    },
+>> +};
+>> +
+>> +static void xive_end_source_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    XiveENDSource *xsrc =3D XIVE_END_SOURCE(dev);
+>> +    Object *obj;
+>> +    Error *local_err =3D NULL;
+>> +
+>> +    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_err)=
+;
+>> +    if (!obj) {
+>> +        error_propagate(errp, local_err);
+>> +        error_prepend(errp, "required link 'xive' not found: ");
+>> +        return;
+>> +    }
+>> +
+>> +    xsrc->xrtr =3D XIVE_ROUTER(obj);
+>> +
+>> +    if (!xsrc->nr_ends) {
+>> +        error_setg(errp, "Number of interrupt needs to be greater tha=
+n 0");
+>> +        return;
+>> +    }
+>> +
+>> +    if (xsrc->esb_shift !=3D XIVE_ESB_4K &&
+>> +        xsrc->esb_shift !=3D XIVE_ESB_64K) {
+>> +        error_setg(errp, "Invalid ESB shift setting");
+>> +        return;
+>> +    }
+>> +
+>> +    /*
+>> +     * Each END is assigned an even/odd pair of MMIO pages, the even =
+page
+>> +     * manages the ESn field while the odd page manages the ESe field=
+.
+>> +     */
+>> +    memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+>> +                          &xive_end_source_ops, xsrc, "xive.end",
+>> +                          (1ull << (xsrc->esb_shift + 1)) * xsrc->nr_=
+ends);
+>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &xsrc->esb_mmio);
+>> +}
+>> +
+>> +static Property xive_end_source_properties[] =3D {
+>> +    DEFINE_PROP_UINT32("nr-ends", XiveENDSource, nr_ends, 0),
+>> +    DEFINE_PROP_UINT32("shift", XiveENDSource, esb_shift, XIVE_ESB_64=
+K),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>> +
+>> +static void xive_end_source_class_init(ObjectClass *klass, void *data=
+)
+>> +{
+>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+>> +
+>> +    dc->desc    =3D "XIVE END Source";
+>> +    dc->props   =3D xive_end_source_properties;
+>> +    dc->realize =3D xive_end_source_realize;
+>> +}
+>> +
+>> +static const TypeInfo xive_end_source_info =3D {
+>> +    .name          =3D TYPE_XIVE_END_SOURCE,
+>> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
+>> +    .instance_size =3D sizeof(XiveENDSource),
+>> +    .class_init    =3D xive_end_source_class_init,
+>> +};
+>> +
+>>  /*
+>>   * XIVE Fabric
+>>   */
+>> @@ -720,6 +875,7 @@ static void xive_register_types(void)
+>>      type_register_static(&xive_source_info);
+>>      type_register_static(&xive_fabric_info);
+>>      type_register_static(&xive_router_info);
+>> +    type_register_static(&xive_end_source_info);
+>>  }
+>> =20
+>>  type_init(xive_register_types)
+>=20
