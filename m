@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51431)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gPjIK-0002rK-LN
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:21:07 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53538)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1gPjKa-0004qd-2T
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:23:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gPjIF-0002EH-GR
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:21:00 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:34479)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1gPjIF-0002Cs-5z
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:20:55 -0500
-Received: by mail-pl1-x644.google.com with SMTP id f12-v6so8843059plo.1
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 23:20:55 -0800 (PST)
-From: guangrong.xiao@gmail.com
-Date: Thu, 22 Nov 2018 15:20:27 +0800
-Message-Id: <20181122072028.22819-5-xiaoguangrong@tencent.com>
-In-Reply-To: <20181122072028.22819-1-xiaoguangrong@tencent.com>
-References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH v3 4/5] migration: use threaded workqueue for
- decompression
+	(envelope-from <n54@gmx.com>) id 1gPjKV-0004mX-MF
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:23:19 -0500
+Received: from mout.gmx.net ([212.227.15.18]:44119)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1gPjKV-0004gy-7j
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 02:23:15 -0500
+References: <20181114130428.32326-1-asanchez@kryptoslogic.com>
+	<1782562d-41c7-0cc7-94f3-fb7ff4b7bd40@redhat.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <adc671f3-808a-59ef-2650-2b558958a00f@gmx.com>
+Date: Thu, 22 Nov 2018 08:24:02 +0100
+MIME-Version: 1.0
+In-Reply-To: <1782562d-41c7-0cc7-94f3-fb7ff4b7bd40@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OT3Wfv3LobKQRwJ1cctmgq3lD7Ao8uZSF"
+Subject: Re: [Qemu-devel] [PATCH] hax: Support for Linux hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,322 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Alexandro Sanchez Bach <asanchez@kryptoslogic.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, yu.ning@intel.com, Richard Henderson <rth@twiddle.net>
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OT3Wfv3LobKQRwJ1cctmgq3lD7Ao8uZSF
+From: Kamil Rytarowski <n54@gmx.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Alexandro Sanchez Bach <asanchez@kryptoslogic.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, yu.ning@intel.com,
+ Richard Henderson <rth@twiddle.net>
+Message-ID: <adc671f3-808a-59ef-2650-2b558958a00f@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH] hax: Support for Linux hosts
+References: <20181114130428.32326-1-asanchez@kryptoslogic.com>
+ <1782562d-41c7-0cc7-94f3-fb7ff4b7bd40@redhat.com>
+In-Reply-To: <1782562d-41c7-0cc7-94f3-fb7ff4b7bd40@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Adapt the compression code to the threaded workqueue
+On 16.11.2018 13:52, Paolo Bonzini wrote:
+> On 14/11/18 14:04, Alexandro Sanchez Bach wrote:
+>> Intel HAXM supports now 32-bit and 64-bit Linux hosts. This patch incl=
+udes
+>> the corresponding userland changes.
+>>
+>> Since the Darwin userland backend is POSIX-compliant, the hax-darwin.{=
+c,h}
+>> files have been renamed to hax-posix.{c,h}. This prefix is consistent =
+with
+>> the naming used in the rest of QEMU.
+>=20
+> What's the advantage of HAXM when Linux hosts can just run KVM?  I gues=
+s
+> avoiding bitrot?
+>=20
+> Paolo
+>=20
 
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
----
- migration/ram.c | 222 ++++++++++++++++++++------------------------------------
- 1 file changed, 77 insertions(+), 145 deletions(-)
+This patch is also useful for NetBSD, even if it's not a Linux host.
+There is a driver in progress again (thanks to the newly added Linux
+port, it's now much easier to get done).
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 254c08f27b..ccec59c35e 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -350,25 +350,9 @@ typedef struct PageSearchStatus PageSearchStatus;
- 
- CompressionStats compression_counters;
- 
--struct DecompressParam {
--    bool done;
--    bool quit;
--    QemuMutex mutex;
--    QemuCond cond;
--    void *des;
--    uint8_t *compbuf;
--    int len;
--    z_stream stream;
--};
--typedef struct DecompressParam DecompressParam;
--
- static const QEMUFileOps empty_ops = { };
- 
- static QEMUFile *decomp_file;
--static DecompressParam *decomp_param;
--static QemuThread *decompress_threads;
--static QemuMutex decomp_done_lock;
--static QemuCond decomp_done_cond;
- 
- /* Multiple fd's */
- 
-@@ -3399,6 +3383,7 @@ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size)
-     }
- }
- 
-+
- /* return the size after decompression, or negative value on error */
- static int
- qemu_uncompress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
-@@ -3424,166 +3409,113 @@ qemu_uncompress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
-     return stream->total_out;
- }
- 
--static void *do_data_decompress(void *opaque)
--{
--    DecompressParam *param = opaque;
--    unsigned long pagesize;
--    uint8_t *des;
--    int len, ret;
--
--    qemu_mutex_lock(&param->mutex);
--    while (!param->quit) {
--        if (param->des) {
--            des = param->des;
--            len = param->len;
--            param->des = 0;
--            qemu_mutex_unlock(&param->mutex);
--
--            pagesize = TARGET_PAGE_SIZE;
--
--            ret = qemu_uncompress_data(&param->stream, des, pagesize,
--                                       param->compbuf, len);
--            if (ret < 0 && migrate_get_current()->decompress_error_check) {
--                error_report("decompress data failed");
--                qemu_file_set_error(decomp_file, ret);
--            }
-+struct DecompressData {
-+    /* filled by migration thread.*/
-+    void *des;
-+    uint8_t *compbuf;
-+    size_t len;
- 
--            qemu_mutex_lock(&decomp_done_lock);
--            param->done = true;
--            qemu_cond_signal(&decomp_done_cond);
--            qemu_mutex_unlock(&decomp_done_lock);
-+    z_stream stream;
-+};
-+typedef struct DecompressData DecompressData;
- 
--            qemu_mutex_lock(&param->mutex);
--        } else {
--            qemu_cond_wait(&param->cond, &param->mutex);
--        }
-+static Threads *decompress_threads;
-+
-+static int decompress_thread_data_init(void *request)
-+{
-+    DecompressData *dd = request;
-+
-+    if (inflateInit(&dd->stream) != Z_OK) {
-+        return -1;
-     }
--    qemu_mutex_unlock(&param->mutex);
- 
--    return NULL;
-+    dd->compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
-+    return 0;
- }
- 
--static int wait_for_decompress_done(void)
-+static void decompress_thread_data_fini(void *request)
- {
--    int idx, thread_count;
-+    DecompressData *dd = request;
- 
--    if (!migrate_use_compression()) {
--        return 0;
--    }
-+    inflateEnd(&dd->stream);
-+    g_free(dd->compbuf);
-+}
- 
--    thread_count = migrate_decompress_threads();
--    qemu_mutex_lock(&decomp_done_lock);
--    for (idx = 0; idx < thread_count; idx++) {
--        while (!decomp_param[idx].done) {
--            qemu_cond_wait(&decomp_done_cond, &decomp_done_lock);
--        }
-+static void decompress_thread_data_handler(void *request)
-+{
-+    DecompressData *dd = request;
-+    unsigned long pagesize = TARGET_PAGE_SIZE;
-+    int ret;
-+
-+    ret = qemu_uncompress_data(&dd->stream, dd->des, pagesize,
-+                               dd->compbuf, dd->len);
-+    if (ret < 0 && migrate_get_current()->decompress_error_check) {
-+        error_report("decompress data failed");
-+        qemu_file_set_error(decomp_file, ret);
-     }
--    qemu_mutex_unlock(&decomp_done_lock);
--    return qemu_file_get_error(decomp_file);
- }
- 
--static void compress_threads_load_cleanup(void)
-+static void decompress_thread_data_done(void *request)
- {
--    int i, thread_count;
-+}
-+
-+static const ThreadedWorkqueueOps decompress_ops = {
-+    .thread_request_init = decompress_thread_data_init,
-+    .thread_request_uninit = decompress_thread_data_fini,
-+    .thread_request_handler = decompress_thread_data_handler,
-+    .thread_request_done = decompress_thread_data_done,
-+    .request_size = sizeof(DecompressData),
-+};
- 
-+static int decompress_init(QEMUFile *f)
-+{
-     if (!migrate_use_compression()) {
--        return;
-+        return 0;
-     }
--    thread_count = migrate_decompress_threads();
--    for (i = 0; i < thread_count; i++) {
--        /*
--         * we use it as a indicator which shows if the thread is
--         * properly init'd or not
--         */
--        if (!decomp_param[i].compbuf) {
--            break;
--        }
- 
--        qemu_mutex_lock(&decomp_param[i].mutex);
--        decomp_param[i].quit = true;
--        qemu_cond_signal(&decomp_param[i].cond);
--        qemu_mutex_unlock(&decomp_param[i].mutex);
--    }
--    for (i = 0; i < thread_count; i++) {
--        if (!decomp_param[i].compbuf) {
--            break;
--        }
-+    decomp_file = f;
-+    decompress_threads = threaded_workqueue_create("decompress",
-+                                migrate_decompress_threads(),
-+                                DEFAULT_THREAD_REQUEST_NR, &decompress_ops);
-+    return decompress_threads ? 0 : -1;
-+}
- 
--        qemu_thread_join(decompress_threads + i);
--        qemu_mutex_destroy(&decomp_param[i].mutex);
--        qemu_cond_destroy(&decomp_param[i].cond);
--        inflateEnd(&decomp_param[i].stream);
--        g_free(decomp_param[i].compbuf);
--        decomp_param[i].compbuf = NULL;
-+static void decompress_fini(void)
-+{
-+    if (!decompress_threads) {
-+        return;
-     }
--    g_free(decompress_threads);
--    g_free(decomp_param);
-+
-+    threaded_workqueue_destroy(decompress_threads);
-     decompress_threads = NULL;
--    decomp_param = NULL;
-     decomp_file = NULL;
- }
- 
--static int compress_threads_load_setup(QEMUFile *f)
-+static int flush_decompressed_data(void)
- {
--    int i, thread_count;
--
-     if (!migrate_use_compression()) {
-         return 0;
-     }
- 
--    thread_count = migrate_decompress_threads();
--    decompress_threads = g_new0(QemuThread, thread_count);
--    decomp_param = g_new0(DecompressParam, thread_count);
--    qemu_mutex_init(&decomp_done_lock);
--    qemu_cond_init(&decomp_done_cond);
--    decomp_file = f;
--    for (i = 0; i < thread_count; i++) {
--        if (inflateInit(&decomp_param[i].stream) != Z_OK) {
--            goto exit;
--        }
--
--        decomp_param[i].compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
--        qemu_mutex_init(&decomp_param[i].mutex);
--        qemu_cond_init(&decomp_param[i].cond);
--        decomp_param[i].done = true;
--        decomp_param[i].quit = false;
--        qemu_thread_create(decompress_threads + i, "decompress",
--                           do_data_decompress, decomp_param + i,
--                           QEMU_THREAD_JOINABLE);
--    }
--    return 0;
--exit:
--    compress_threads_load_cleanup();
--    return -1;
-+    threaded_workqueue_wait_for_requests(decompress_threads);
-+    return qemu_file_get_error(decomp_file);
- }
- 
- static void decompress_data_with_multi_threads(QEMUFile *f,
--                                               void *host, int len)
-+                                               void *host, size_t len)
- {
--    int idx, thread_count;
-+    DecompressData *dd;
- 
--    thread_count = migrate_decompress_threads();
--    qemu_mutex_lock(&decomp_done_lock);
--    while (true) {
--        for (idx = 0; idx < thread_count; idx++) {
--            if (decomp_param[idx].done) {
--                decomp_param[idx].done = false;
--                qemu_mutex_lock(&decomp_param[idx].mutex);
--                qemu_get_buffer(f, decomp_param[idx].compbuf, len);
--                decomp_param[idx].des = host;
--                decomp_param[idx].len = len;
--                qemu_cond_signal(&decomp_param[idx].cond);
--                qemu_mutex_unlock(&decomp_param[idx].mutex);
--                break;
--            }
--        }
--        if (idx < thread_count) {
--            break;
--        } else {
--            qemu_cond_wait(&decomp_done_cond, &decomp_done_lock);
--        }
-+retry:
-+    dd = threaded_workqueue_get_request(decompress_threads);
-+    if (!dd) {
-+        goto retry;
-     }
--    qemu_mutex_unlock(&decomp_done_lock);
-+
-+    dd->des = host;
-+    dd->len = len;
-+    qemu_get_buffer(f, dd->compbuf, len);
-+    threaded_workqueue_submit_request(decompress_threads, dd);
- }
- 
- /*
-@@ -3678,7 +3610,7 @@ void colo_release_ram_cache(void)
-  */
- static int ram_load_setup(QEMUFile *f, void *opaque)
- {
--    if (compress_threads_load_setup(f)) {
-+    if (decompress_init(f)) {
-         return -1;
-     }
- 
-@@ -3699,7 +3631,7 @@ static int ram_load_cleanup(void *opaque)
-     }
- 
-     xbzrle_load_cleanup();
--    compress_threads_load_cleanup();
-+    decompress_fini();
- 
-     RAMBLOCK_FOREACH_MIGRATABLE(rb) {
-         g_free(rb->receivedmap);
-@@ -4101,7 +4033,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-         }
-     }
- 
--    ret |= wait_for_decompress_done();
-+    ret |= flush_decompressed_data();
-     rcu_read_unlock();
-     trace_ram_load_complete(ret, seq_iter);
- 
--- 
-2.14.5
+I recommend to merge this patch.
+
+
+--OT3Wfv3LobKQRwJ1cctmgq3lD7Ao8uZSF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlv2WZIMHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZsdnwP/RvHPK/RTdd7izfDKx016HqEdvNnyIhkekKKtRMj
+43VCR5lRhNndM5yFCQB+0c3bXcBJ+vqA3yuePI0CufQPfWWNCbuB8cp2cZ/+AGyH
+SEGjAKsp/wP9DkExAdQFJszmG4FZDMSPJIIjdtQ8/uR/P6ZvcVS9eVxPoTjJIY+p
+NsJ/+2xsf4ArTtCfYcxSLJufi5sAH9Rj9w5VHhtv4dHvOqJ2LmQb1b+bZMBGm3Ca
+Z956BVfFXeEqIWdBd8LQqYQVPJT4COut39XVW99fNH5ouL/L1+1jWq7PyUZ0D2ZG
+zNAFDafl6CsXfoWrpqUMTQHBJu/zyjxpBac/Sup8gI5ximAVgT2npSV6n3UdP7hv
+5SRnL3ft+j24tPYCcg97zVcgJ/NcJx2JvzmgvXBzldPua3ePC6I0oVkdvd8Xe5a9
+EemJeRHq2xD+/VIe/O6bMvGjM27tr6clm0EDc2BKSy+SnwpNh6u8zaViH5qiHO2s
+0MEA6VFQ42EHYG+9W7p9fMmIyDPP0HzZGcA4s5vV1Mi5E0lcz7XBEm3vCoM2wVqU
+QPJHOFACdyUl21cVqVPcE6XL+Jba6AkkE0HdWDWxH6hPsfP6pIqdwC8wzv5ehIOe
+PvaMd508QARYnEtolF+jkywc0P+pYsAWg5C9sizS/FwlIuO+vwPfdK/9akGRqKc3
+rruy
+=4QTt
+-----END PGP SIGNATURE-----
+
+--OT3Wfv3LobKQRwJ1cctmgq3lD7Ao8uZSF--
