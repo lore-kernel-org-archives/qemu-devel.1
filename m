@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gPe3G-0004lj-Uq
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:45:07 -0500
+	(envelope-from <palmer@sifive.com>) id 1gPeFz-0001Nv-MK
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:58:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gPe3C-000058-C9
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:45:06 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:32824)
+	(envelope-from <palmer@sifive.com>) id 1gPeFv-0004jR-IH
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:58:13 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:42201)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gPe3C-0008VA-4A
-	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:45:02 -0500
-Received: by mail-pl1-x644.google.com with SMTP id z23so8016382plo.0
-	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 17:45:02 -0800 (PST)
-Date: Wed, 21 Nov 2018 17:44:59 -0800 (PST)
-In-Reply-To: <201f1cf4-30af-03c5-393b-0eab6ac7eb87@redhat.com>
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gPeFr-0004U2-LS
+	for qemu-devel@nongnu.org; Wed, 21 Nov 2018 20:58:09 -0500
+Received: by mail-pl1-x643.google.com with SMTP id x21-v6so8039924pln.9
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 17:58:05 -0800 (PST)
+Date: Wed, 21 Nov 2018 17:58:03 -0800 (PST)
+In-Reply-To: <6559716eae4b53d2cad39ec6011cdd7b1b32138a.1542839652.git.alistair.francis@wdc.com>
 From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-ce1dc513-eb34-4ace-b3a2-248347025887@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1 1/2] MAINTAINERS: Any file with
- "riscv" in the name is a RISC-V file
+Message-ID: <mhng-3aa4aa94-927c-4ff8-867b-10d341c90d52@palmer-si-x1c4>
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] riscv: virt: Cast the initrd start
+ address to target bit length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, alistair23@gmail.com, Alistair Francis <Alistair.Francis@wdc.com>, agraf@suse.de
 
-On Wed, 21 Nov 2018 16:29:09 PST (-0800), philmd@redhat.com wrote:
-> On 22/11/18 0:46, Palmer Dabbelt wrote:
->> There was a recent thread about unmaintained files in QEMU where it was
->> noted that a few RISC-V related files had slipped through the patterns
->> in our MAINTAINERS file entry.  This patch adds some more aggressive
->> pattern matching in an attempt to rectify this situation.
->>
->> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
->> ---
->>   MAINTAINERS | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 1032406c5607..e89adc81d5d5 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -255,6 +255,8 @@ F: target/riscv/
->>   F: hw/riscv/
->>   F: include/hw/riscv/
->>   F: disas/riscv.c
->> +K: riscv
->> +N: riscv
+On Wed, 21 Nov 2018 14:34:44 PST (-0800), Alistair Francis wrote:
+> Ensure that the calculate initrd offset points to a valid address for
+> the architecture.
 >
-> QEMU doesn't support the 'N' tag.
-> I see from the Linux kernel:
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Suggested-by: Alexander Graf <agraf@suse.de>
+> Reported-by: Alexander Graf <agraf@suse.de>
+> ---
+>  hw/riscv/virt.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 >
->    N: Files and directories with regex patterns.
->       N:   [^a-z]tegra     all files whose path contains the word tegra
->       One pattern per line.  Multiple N: lines acceptable.
->       scripts/get_maintainer.pl has different behavior for files that
->       match F: pattern and matches of N: patterns.  By default,
->       get_maintainer will not look at git log history when an F: pattern
->       match occurs.  When an N: match occurs, git log history is used
->       to also notify the people that have git commit signatures.
->
-> Should we add this feature to checkscript?
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index 2b38f89070..4467195fac 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -85,7 +85,12 @@ static hwaddr load_initrd(const char *filename, uint64_t mem_size,
+>       * halfway into RAM, and for boards with 256MB of RAM or more we put
+>       * the initrd at 128MB.
+>       */
+> -    *start = kernel_entry + MIN(mem_size / 2, 128 * MiB);
+> +    /* As hwaddr is a 64-bit number we need to cast it for 32-bit */
+> +#if defined(TARGET_RISCV32)
+> +    *start = (uint32_t) (kernel_entry + MIN(mem_size / 2, 128ULL * MiB));
+> +#elif defined(TARGET_RISCV64)
+> +    *start = (uint64_t) (kernel_entry + MIN(mem_size / 2, 128 * MiB));
+> +#endif
+>  
+>      size = load_ramdisk(filename, *start, mem_size - *start);
+>      if (size == -1) {
+> -- 
+> 2.19.1
 
-Ah, I didn't check because I just copied this from our Linux entry.  It's 
-pretty much the core of what I'm trying to do here so if it's easy then that'd 
-be great.
+Maybe I'm missing something, but wouldn't something like
 
-Unfortunately I don't know how to do so.
+    uint64_t start_unclobbered = kernel_entry + MIN(mem_size / 2, 128ULL * MiB);
+    assert(start_unclobbered == (hwaddr)start_unclobbered);
+    *start = (hwaddr)start_unclobbered;
 
->
->>
->>   S390
->>   M: Richard Henderson <rth@twiddle.net>
->>
+work better?  That should actually check this all lines up, as opposed to just 
+silently truncating a bad address.
