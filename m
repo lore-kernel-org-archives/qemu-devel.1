@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gPsFU-0001ms-OO
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:54:42 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gPsFU-0001mz-Sq
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:54:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gPsFT-0000vv-Hs
+	(envelope-from <kwolf@redhat.com>) id 1gPsFT-0000vg-FD
 	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:54:40 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 22 Nov 2018 17:54:11 +0100
-Message-Id: <20181122165417.23894-8-kwolf@redhat.com>
+Date: Thu, 22 Nov 2018 17:54:10 +0100
+Message-Id: <20181122165417.23894-7-kwolf@redhat.com>
 In-Reply-To: <20181122165417.23894-1-kwolf@redhat.com>
 References: <20181122165417.23894-1-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/13] block: Fix update of BDRV_O_AUTO_RDONLY
- in update_flags_from_options()
+Subject: [Qemu-devel] [PULL 06/13] scsi-disk: Fix crash if underlying host
+ file or disk returns error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +25,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Alberto Garcia <berto@igalia.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 
-Commit e35bdc123a4ace9f4d3fcca added the auto-read-only option and the
-code to update its corresponding flag in update_flags_from_options(),
-but forgot to clear the flag if auto-read-only is false.
+Commit 40dce4ee6 "scsi-disk: fix rerror/werror=3Dignore" introduced a
+bug which causes qemu to crash with the assertion error below if the
+host file or disk returns an error:
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reported-by: Max Reitz <mreitz@redhat.com>
+  qemu-system-x86_64: hw/scsi/scsi-bus.c:1374: scsi_req_complete:
+  Assertion `req->status =3D=3D -1' failed.
+
+Kevin Wolf suggested this fix:
+
+  < kwolf> Hm, should the final return false; in that patch
+           actually be a return true?
+  < kwolf> Because I think he didn't intend to change anything
+           except BLOCK_ERROR_ACTION_IGNORE
+
+Buglink: https://bugs.launchpad.net/qemu/+bug/1804323
+Fixes: 40dce4ee61c68395f6d463fae792f61b7c003bce
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ hw/scsi/scsi-disk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block.c b/block.c
-index 3feac08535..9cd6f4a50d 100644
---- a/block.c
-+++ b/block.c
-@@ -1137,7 +1137,7 @@ static int bdrv_open_flags(BlockDriverState *bs, in=
-t flags)
-=20
- static void update_flags_from_options(int *flags, QemuOpts *opts)
- {
--    *flags &=3D ~BDRV_O_CACHE_MASK;
-+    *flags &=3D ~(BDRV_O_CACHE_MASK | BDRV_O_RDWR | BDRV_O_AUTO_RDONLY);
-=20
-     assert(qemu_opt_find(opts, BDRV_OPT_CACHE_NO_FLUSH));
-     if (qemu_opt_get_bool_del(opts, BDRV_OPT_CACHE_NO_FLUSH, false)) {
-@@ -1149,8 +1149,6 @@ static void update_flags_from_options(int *flags, Q=
-emuOpts *opts)
-         *flags |=3D BDRV_O_NOCACHE;
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 6eb258d3f3..0e9027c8f3 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -482,7 +482,7 @@ static bool scsi_handle_rw_error(SCSIDiskReq *r, int =
+error, bool acct_failed)
+     if (action =3D=3D BLOCK_ERROR_ACTION_STOP) {
+         scsi_req_retry(&r->req);
      }
+-    return false;
++    return true;
+ }
 =20
--    *flags &=3D ~BDRV_O_RDWR;
--
-     assert(qemu_opt_find(opts, BDRV_OPT_READ_ONLY));
-     if (!qemu_opt_get_bool_del(opts, BDRV_OPT_READ_ONLY, false)) {
-         *flags |=3D BDRV_O_RDWR;
+ static void scsi_write_complete_noio(SCSIDiskReq *r, int ret)
 --=20
 2.19.1
