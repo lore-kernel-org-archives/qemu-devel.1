@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gPrxa-0007eQ-VL
+	(envelope-from <pmorel@linux.ibm.com>) id 1gPrxb-0007eS-Or
 	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:36:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gPrxW-0008Rf-31
+	(envelope-from <pmorel@linux.ibm.com>) id 1gPrxW-0008TE-UB
 	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:36:11 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32908
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33652
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gPrxU-0008MQ-DS
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:36:05 -0500
+	id 1gPrxW-0008Sc-PW
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 11:36:06 -0500
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wAMGYFIE103075
-	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 11:36:03 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2nwya82357-1
+	wAMGYGBR103188
+	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 11:36:06 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2nwya82388-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 11:36:02 -0500
+	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 11:36:06 -0500
 Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Thu, 22 Nov 2018 16:36:01 -0000
+	Thu, 22 Nov 2018 16:36:04 -0000
 From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Thu, 22 Nov 2018 17:35:49 +0100
-Message-Id: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 0/6] s390x/vfio: VFIO-AP interrupt control
- interception
+Date: Thu, 22 Nov 2018 17:35:51 +0100
+In-Reply-To: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
+References: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
+Message-Id: <1542904555-1136-3-git-send-email-pmorel@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 2/6] s390x/vfio: ap: Use the APdevice as a
+ child of the APBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,82 +42,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: borntraeger@de.ibm.com
 Cc: cohuck@redhat.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com
 
-This series has 3 different type of patches:
+Two good reasons to use the base device as a child of the
+AP BUS:
+- We can easily find the device without traversing the qtree.
+- In case we have different APdevice instantiation, VFIO with
+  interception or emulation, we will need the APDevice as
+  a parent device.
 
-The first two:
-  s390x/vfio: ap: Finding the AP bridge
-  s390x/vfio: ap: Use the APdevice as a child of the APBus
+Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+---
+ hw/s390x/ap-device.c         | 22 ++++++++++++++++++++++
+ hw/vfio/ap.c                 | 16 ++++++----------
+ include/hw/s390x/ap-device.h |  2 ++
+ 3 files changed, 30 insertions(+), 10 deletions(-)
 
-Are dealing with the QEMU Object Model and how we retrieve the
-AP devices from instruction interception.
-A lifting of the AP bridge, bus and device was necessary to
-ease the process and allow future extensions.
-
-The third one is a place holder to ease reviewing:
-  s390x/vfio: ap: Linux uapi VFIO place holder
-
-The last three are really dealing with PQAP/AQIC instruction
-interception and associate IOCTL calls to the VFIO AP device
-driver.
-  s390x/cpumodel: Set up CPU model for AQIC interception
-  s390x/vfio: ap: Definition for AP Adapter type
-  s390x/vfio: ap: Implementing AP Queue Interrupt Control
-
-The S390 APQP/AQIC instruction is intercepted by the host
-to configure the AP queues interruption redirection.
-It retrieves the ISC used by the host and the one used
-by the guest and setup the indicator address.
-
-This patch series
-- define the AQIC feature in the cpumodel,
-- extend the APDevice type for per card and queue interrupt handling,
-- intercept the APQP/AQIC instruction, uses the S390 adapter interface
-  to setup the adapter 
-- and use a VFIO ioctl to let the VFIO-AP driver handle the host
-  instruction associated with the intercepted guest instruction.
-
-This patch serie can be tested with the Linux/KVM patch series
-for the VFIO-AP driver: "s390: vfio: ap: Using GISA for AP Interrupt"
-
-
-Pierre Morel (6):
-  s390x/vfio: ap: Finding the AP bridge
-  s390x/vfio: ap: Use the APdevice as a child of the APBus
-  s390x/vfio: ap: Linux uapi VFIO place holder
-  s390x/cpumodel: Set up CPU model for AQIC interception
-  s390x/vfio: ap: Definition for AP Adapter type
-  s390x/vfio: ap: Implementing AP Queue Interrupt Control
-
- hw/s390x/ap-bridge.c            |  12 ++++
- hw/s390x/ap-device.c            |  22 +++++++
- hw/vfio/ap.c                    | 131 +++++++++++++++++++++++++++++++++++++---
- include/hw/s390x/ap-bridge.h    |   1 +
- include/hw/s390x/ap-device.h    |  65 ++++++++++++++++++++
- include/hw/s390x/css.h          |   1 +
- linux-headers/linux/vfio.h      |  25 ++++++++
- target/s390x/cpu_features.c     |   1 +
- target/s390x/cpu_features_def.h |   1 +
- target/s390x/cpu_models.c       |   1 +
- target/s390x/gen-features.c     |   1 +
- target/s390x/kvm.c              |  31 ++++++++++
- 12 files changed, 282 insertions(+), 10 deletions(-)
-
+diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
+index f5ac8db..554d5aa 100644
+--- a/hw/s390x/ap-device.c
++++ b/hw/s390x/ap-device.c
+@@ -11,13 +11,35 @@
+ #include "qemu/module.h"
+ #include "qapi/error.h"
+ #include "hw/qdev.h"
++#include "hw/s390x/ap-bridge.h"
+ #include "hw/s390x/ap-device.h"
+ 
++APDevice *s390_get_ap(void)
++{
++    static DeviceState *apb;
++    BusState *bus;
++    BusChild *child;
++    static APDevice *ap;
++
++    if (ap) {
++        return ap;
++    }
++
++    apb = s390_get_ap_bridge();
++    /* We have only a single child on the BUS */
++    bus = qdev_get_child_bus(apb, TYPE_AP_BUS);
++    child = QTAILQ_FIRST(&bus->children);
++    assert(child != NULL);
++    ap = DO_UPCAST(APDevice, parent_obj, child->child);
++    return ap;
++}
++
+ static void ap_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->desc = "AP device class";
++    dc->bus_type = TYPE_AP_BUS;
+     dc->hotpluggable = false;
+ }
+ 
+diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+index 65de952..94e5a1a 100644
+--- a/hw/vfio/ap.c
++++ b/hw/vfio/ap.c
+@@ -35,9 +35,6 @@ typedef struct VFIOAPDevice {
+     VFIODevice vdev;
+ } VFIOAPDevice;
+ 
+-#define VFIO_AP_DEVICE(obj) \
+-        OBJECT_CHECK(VFIOAPDevice, (obj), VFIO_AP_DEVICE_TYPE)
+-
+ static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
+ {
+     vdev->needs_reset = false;
+@@ -90,8 +87,8 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
+     char *mdevid;
+     Error *local_err = NULL;
+     VFIOGroup *vfio_group;
+-    APDevice *apdev = AP_DEVICE(dev);
+-    VFIOAPDevice *vapdev = VFIO_AP_DEVICE(apdev);
++    APDevice *apdev = DO_UPCAST(APDevice, parent_obj, dev);
++    VFIOAPDevice *vapdev = DO_UPCAST(VFIOAPDevice, apdev, apdev);
+ 
+     vfio_group = vfio_ap_get_group(vapdev, &local_err);
+     if (!vfio_group) {
+@@ -120,8 +117,8 @@ out_err:
+ 
+ static void vfio_ap_unrealize(DeviceState *dev, Error **errp)
+ {
+-    APDevice *apdev = AP_DEVICE(dev);
+-    VFIOAPDevice *vapdev = VFIO_AP_DEVICE(apdev);
++    APDevice *apdev = DO_UPCAST(APDevice, parent_obj, dev);
++    VFIOAPDevice *vapdev = DO_UPCAST(VFIOAPDevice, apdev, apdev);
+     VFIOGroup *group = vapdev->vdev.group;
+ 
+     vfio_ap_put_device(vapdev);
+@@ -136,8 +133,8 @@ static Property vfio_ap_properties[] = {
+ static void vfio_ap_reset(DeviceState *dev)
+ {
+     int ret;
+-    APDevice *apdev = AP_DEVICE(dev);
+-    VFIOAPDevice *vapdev = VFIO_AP_DEVICE(apdev);
++    APDevice *apdev = DO_UPCAST(APDevice, parent_obj, dev);
++    VFIOAPDevice *vapdev = DO_UPCAST(VFIOAPDevice, apdev, apdev);
+ 
+     ret = ioctl(vapdev->vdev.fd, VFIO_DEVICE_RESET);
+     if (ret) {
+@@ -163,7 +160,6 @@ static void vfio_ap_class_init(ObjectClass *klass, void *data)
+     dc->unrealize = vfio_ap_unrealize;
+     dc->hotpluggable = false;
+     dc->reset = vfio_ap_reset;
+-    dc->bus_type = TYPE_AP_BUS;
+ }
+ 
+ static const TypeInfo vfio_ap_info = {
+diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.h
+index 765e908..5f3c840 100644
+--- a/include/hw/s390x/ap-device.h
++++ b/include/hw/s390x/ap-device.h
+@@ -19,4 +19,6 @@ typedef struct APDevice {
+ #define AP_DEVICE(obj) \
+     OBJECT_CHECK(APDevice, (obj), AP_DEVICE_TYPE)
+ 
++APDevice *s390_get_ap(void);
++
+ #endif /* HW_S390X_AP_DEVICE_H */
 -- 
 2.7.4
-
-Changelog from v1:
-- legitimate "Huh" from Conny on global lead me to reconsider
-  the QOM for AP Device, BUS and Bridge and remove globals
-- squash patches for kvm.c and hw/vfio/ap.c
-  (Conny) so related changes are easier to see
-- modified the UAPI (Also comes from Linux)
-- suppressed complicated structures to integer conversions
-  and use masks to avoid endianess considerations,
-  I did not change anything for endianess since we get all
-  from the registers, AFAIU we do not need to.
-  Tell me if I am wrong (I know you will :) )
-- simplified the implementation of the ioctl
-
-Tested with according Linux patch.
-Take care that the UAPI changed betwen V1 and V2!
-and do NOT use with the older version.
