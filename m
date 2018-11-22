@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gPhGP-0004nN-3A
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 00:10:55 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1gPiY0-0002xR-8l
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 01:33:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gPhGL-0005b6-PZ
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 00:10:53 -0500
-Date: Thu, 22 Nov 2018 15:41:27 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181122044127.GE10448@umbus.fritz.box>
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-6-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="6e7ZaeXHKrTJCxdu"
-Content-Disposition: inline
-In-Reply-To: <20181116105729.23240-6-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 05/36] ppc/xive: introduce the XIVE
- Event Notification Descriptors
+	(envelope-from <liq3ea@gmail.com>) id 1gPiXy-0001i8-Uc
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 01:33:08 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44251)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gPiXy-0001fh-MO
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 01:33:06 -0500
+Received: by mail-pl1-x641.google.com with SMTP id s5-v6so8764435plq.11
+	for <qemu-devel@nongnu.org>; Wed, 21 Nov 2018 22:33:06 -0800 (PST)
+From: Li Qiang <liq3ea@gmail.com>
+Date: Wed, 21 Nov 2018 22:32:51 -0800
+Message-Id: <1542868372-2602-2-git-send-email-liq3ea@gmail.com>
+In-Reply-To: <1542868372-2602-1-git-send-email-liq3ea@gmail.com>
+References: <1542868372-2602-1-git-send-email-liq3ea@gmail.com>
+Subject: [Qemu-devel] [PATCH 1/2] hw: pc: use TYPE_XXX instead of constant
+ strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,419 +26,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, mark.cave-ayland@ilande.co.uk
+Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
 
+Signed-off-by: Li Qiang <liq3ea@gmail.com>
+---
+ hw/i386/pc.c         | 9 +++------
+ hw/sparc64/sun4u.c   | 2 +-
+ include/hw/i386/pc.h | 7 +++++++
+ 3 files changed, 11 insertions(+), 7 deletions(-)
 
---6e7ZaeXHKrTJCxdu
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Nov 16, 2018 at 11:56:58AM +0100, C=E9dric Le Goater wrote:
-> To complete the event routing, the IVRE sub-engine uses an internal
-> table containing Event Notification Descriptor (END) structures.
->=20
-> An END specifies on which Event Queue (EQ) the event notification
-> data, defined in the associated EAS, should be posted when an
-> exception occurs. It also defines which Notification Virtual Target
-> (NVT) should be notified.
->=20
-> The Event Queue is a memory page provided by the O/S defining a
-> circular buffer, one per server and priority couple, containing Event
-> Queue entries. These are 4 bytes long, the first bit being a
-> 'generation' bit and the 31 following bits the END Data field. They
-> are pulled by the O/S when the exception occurs.
->=20
-> The END Data field is a way to set an invariant logical event source
-> number for an IRQ. It is set with the H_INT_SET_SOURCE_CONFIG hcall
-> when the EISN flag is used.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/xive.h      |  18 ++++
->  include/hw/ppc/xive_regs.h |  48 ++++++++++
->  hw/intc/xive.c             | 185 ++++++++++++++++++++++++++++++++++++-
->  3 files changed, 248 insertions(+), 3 deletions(-)
->=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index 5a0696366577..ce62aaf28343 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -193,11 +193,29 @@ typedef struct XiveRouterClass {
->      /* XIVE table accessors */
->      int (*get_eas)(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas);
->      int (*set_eas)(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas);
-> +    int (*get_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_idx,
-> +                   XiveEND *end);
-> +    int (*set_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_idx,
-> +                   XiveEND *end);
-
-Hrm.  So unlike the EAS, which is basically just a word, the END is a
-pretty large structure.  It's unclear here if get/set are expected to
-copy the whole thing out and in, or if get get give you a pointer into
-a "live" structure and set just does any necessary barriers after an
-update.
-
-Really, for a non-atomic value like this, I'm not sure get/set is the
-right model.
-
-Also as I understand it nearly all the indices in XIVE are broken into
-block/index.  Is there a reason those are folded together into lisn
-for the EAS, but not for the END?
-
->  } XiveRouterClass;
-> =20
->  void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mon);
-> =20
->  int xive_router_get_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas);
->  int xive_router_set_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas);
-> +int xive_router_get_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_=
-idx,
-> +                        XiveEND *end);
-> +int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_=
-idx,
-> +                        XiveEND *end);
-> +
-> +/*
-> + * For legacy compatibility, the exceptions define up to 256 different
-> + * priorities. P9 implements only 9 levels : 8 active levels [0 - 7]
-> + * and the least favored level 0xFF.
-> + */
-> +#define XIVE_PRIORITY_MAX  7
-> +
-> +void xive_end_reset(XiveEND *end);
-> +void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor *mo=
-n);
-> =20
->  #endif /* PPC_XIVE_H */
-> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-> index 12499b33614c..f97fb2b90bee 100644
-> --- a/include/hw/ppc/xive_regs.h
-> +++ b/include/hw/ppc/xive_regs.h
-> @@ -28,4 +28,52 @@ typedef struct XiveEAS {
->  #define EAS_END_DATA    PPC_BITMASK(33, 63)      /* Data written to the =
-END */
->  } XiveEAS;
-> =20
-> +/* Event Notification Descriptor (END) */
-> +typedef struct XiveEND {
-> +        uint32_t        w0;
-> +#define END_W0_VALID             PPC_BIT32(0) /* "v" bit */
-> +#define END_W0_ENQUEUE           PPC_BIT32(1) /* "q" bit */
-> +#define END_W0_UCOND_NOTIFY      PPC_BIT32(2) /* "n" bit */
-> +#define END_W0_BACKLOG           PPC_BIT32(3) /* "b" bit */
-> +#define END_W0_PRECL_ESC_CTL     PPC_BIT32(4) /* "p" bit */
-> +#define END_W0_ESCALATE_CTL      PPC_BIT32(5) /* "e" bit */
-> +#define END_W0_UNCOND_ESCALATE   PPC_BIT32(6) /* "u" bit - DD2.0 */
-> +#define END_W0_SILENT_ESCALATE   PPC_BIT32(7) /* "s" bit - DD2.0 */
-> +#define END_W0_QSIZE             PPC_BITMASK32(12, 15)
-> +#define END_W0_SW0               PPC_BIT32(16)
-> +#define END_W0_FIRMWARE          END_W0_SW0 /* Owned by FW */
-> +#define END_QSIZE_4K             0
-> +#define END_QSIZE_64K            4
-> +#define END_W0_HWDEP             PPC_BITMASK32(24, 31)
-> +        uint32_t        w1;
-> +#define END_W1_ESn               PPC_BITMASK32(0, 1)
-> +#define END_W1_ESn_P             PPC_BIT32(0)
-> +#define END_W1_ESn_Q             PPC_BIT32(1)
-> +#define END_W1_ESe               PPC_BITMASK32(2, 3)
-> +#define END_W1_ESe_P             PPC_BIT32(2)
-> +#define END_W1_ESe_Q             PPC_BIT32(3)
-> +#define END_W1_GENERATION        PPC_BIT32(9)
-> +#define END_W1_PAGE_OFF          PPC_BITMASK32(10, 31)
-> +        uint32_t        w2;
-> +#define END_W2_MIGRATION_REG     PPC_BITMASK32(0, 3)
-> +#define END_W2_OP_DESC_HI        PPC_BITMASK32(4, 31)
-> +        uint32_t        w3;
-> +#define END_W3_OP_DESC_LO        PPC_BITMASK32(0, 31)
-> +        uint32_t        w4;
-> +#define END_W4_ESC_END_BLOCK     PPC_BITMASK32(4, 7)
-> +#define END_W4_ESC_END_INDEX     PPC_BITMASK32(8, 31)
-> +        uint32_t        w5;
-> +#define END_W5_ESC_END_DATA      PPC_BITMASK32(1, 31)
-> +        uint32_t        w6;
-> +#define END_W6_FORMAT_BIT        PPC_BIT32(8)
-> +#define END_W6_NVT_BLOCK         PPC_BITMASK32(9, 12)
-> +#define END_W6_NVT_INDEX         PPC_BITMASK32(13, 31)
-> +        uint32_t        w7;
-> +#define END_W7_F0_IGNORE         PPC_BIT32(0)
-> +#define END_W7_F0_BLK_GROUPING   PPC_BIT32(1)
-> +#define END_W7_F0_PRIORITY       PPC_BITMASK32(8, 15)
-> +#define END_W7_F1_WAKEZ          PPC_BIT32(0)
-> +#define END_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
-> +} XiveEND;
-> +
->  #endif /* PPC_XIVE_REGS_H */
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index c4c90a25758e..9cb001e7b540 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -442,6 +442,101 @@ static const TypeInfo xive_source_info =3D {
->      .class_init    =3D xive_source_class_init,
->  };
-> =20
-> +/*
-> + * XiveEND helpers
-> + */
-> +
-> +void xive_end_reset(XiveEND *end)
-> +{
-> +    memset(end, 0, sizeof(*end));
-> +
-> +    /* switch off the escalation and notification ESBs */
-> +    end->w1 =3D END_W1_ESe_Q | END_W1_ESn_Q;
-
-It's not obvious to me what circumstances this would be called under.
-Since the ENDs are in system memory, a memset() seems like an odd
-thing for (virtual) hardware to be doing to it.
-
-> +}
-> +
-> +static void xive_end_queue_pic_print_info(XiveEND *end, uint32_t width,
-> +                                          Monitor *mon)
-> +{
-> +    uint64_t qaddr_base =3D (((uint64_t)(end->w2 & 0x0fffffff)) << 32) |=
- end->w3;
-> +    uint32_t qsize =3D GETFIELD(END_W0_QSIZE, end->w0);
-> +    uint32_t qindex =3D GETFIELD(END_W1_PAGE_OFF, end->w1);
-> +    uint32_t qentries =3D 1 << (qsize + 10);
-> +    int i;
-> +
-> +    /*
-> +     * print out the [ (qindex - (width - 1)) .. (qindex + 1)] window
-> +     */
-> +    monitor_printf(mon, " [ ");
-> +    qindex =3D (qindex - (width - 1)) & (qentries - 1);
-> +    for (i =3D 0; i < width; i++) {
-> +        uint64_t qaddr =3D qaddr_base + (qindex << 2);
-> +        uint32_t qdata =3D -1;
-> +
-> +        if (dma_memory_read(&address_space_memory, qaddr, &qdata,
-> +                            sizeof(qdata))) {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to read EQ @0x%"
-> +                          HWADDR_PRIx "\n", qaddr);
-> +            return;
-> +        }
-> +        monitor_printf(mon, "%s%08x ", i =3D=3D width - 1 ? "^" : "",
-> +                       be32_to_cpu(qdata));
-> +        qindex =3D (qindex + 1) & (qentries - 1);
-> +    }
-> +    monitor_printf(mon, "]\n");
-> +}
-> +
-> +void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor *mo=
-n)
-> +{
-> +    uint64_t qaddr_base =3D (((uint64_t)(end->w2 & 0x0fffffff)) << 32) |=
- end->w3;
-> +    uint32_t qindex =3D GETFIELD(END_W1_PAGE_OFF, end->w1);
-> +    uint32_t qgen =3D GETFIELD(END_W1_GENERATION, end->w1);
-> +    uint32_t qsize =3D GETFIELD(END_W0_QSIZE, end->w0);
-> +    uint32_t qentries =3D 1 << (qsize + 10);
-> +
-> +    uint32_t nvt =3D GETFIELD(END_W6_NVT_INDEX, end->w6);
-> +    uint8_t priority =3D GETFIELD(END_W7_F0_PRIORITY, end->w7);
-> +
-> +    if (!(end->w0 & END_W0_VALID)) {
-> +        return;
-> +    }
-> +
-> +    monitor_printf(mon, "  %08x %c%c%c%c%c prio:%d nvt:%04x eq:@%08"PRIx=
-64
-> +                   "% 6d/%5d ^%d", end_idx,
-> +                   end->w0 & END_W0_VALID ? 'v' : '-',
-> +                   end->w0 & END_W0_ENQUEUE ? 'q' : '-',
-> +                   end->w0 & END_W0_UCOND_NOTIFY ? 'n' : '-',
-> +                   end->w0 & END_W0_BACKLOG ? 'b' : '-',
-> +                   end->w0 & END_W0_ESCALATE_CTL ? 'e' : '-',
-> +                   priority, nvt, qaddr_base, qindex, qentries, qgen);
-> +
-> +    xive_end_queue_pic_print_info(end, 6, mon);
-> +}
-> +
-> +static void xive_end_push(XiveEND *end, uint32_t data)
-
-s/push/enqueue/ please, "push" suggests a stack.  (Not to mention that
-"push" and "pull" are used as terms elsewhere in XIVE).
-
-> +{
-> +    uint64_t qaddr_base =3D (((uint64_t)(end->w2 & 0x0fffffff)) << 32) |=
- end->w3;
-> +    uint32_t qsize =3D GETFIELD(END_W0_QSIZE, end->w0);
-> +    uint32_t qindex =3D GETFIELD(END_W1_PAGE_OFF, end->w1);
-> +    uint32_t qgen =3D GETFIELD(END_W1_GENERATION, end->w1);
-> +
-> +    uint64_t qaddr =3D qaddr_base + (qindex << 2);
-> +    uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7fffffff));
-> +    uint32_t qentries =3D 1 << (qsize + 10);
-> +
-> +    if (dma_memory_write(&address_space_memory, qaddr, &qdata, sizeof(qd=
-ata))) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to write END data @=
-0x%"
-> +                      HWADDR_PRIx "\n", qaddr);
-> +        return;
-> +    }
-> +
-> +    qindex =3D (qindex + 1) & (qentries - 1);
-> +    if (qindex =3D=3D 0) {
-> +        qgen ^=3D 1;
-> +        end->w1 =3D SETFIELD(END_W1_GENERATION, end->w1, qgen);
-> +    }
-> +    end->w1 =3D SETFIELD(END_W1_PAGE_OFF, end->w1, qindex);
-> +}
-> +
->  /*
->   * XIVE Router (aka. Virtualization Controller or IVRE)
->   */
-> @@ -460,6 +555,82 @@ int xive_router_set_eas(XiveRouter *xrtr, uint32_t l=
-isn, XiveEAS *eas)
->      return xrc->set_eas(xrtr, lisn, eas);
->  }
-> =20
-> +int xive_router_get_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_=
-idx,
-> +                        XiveEND *end)
-> +{
-> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
-> +
-> +   return xrc->get_end(xrtr, end_blk, end_idx, end);
-> +}
-> +
-> +int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_=
-idx,
-> +                        XiveEND *end)
-> +{
-> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
-> +
-> +   return xrc->set_end(xrtr, end_blk, end_idx, end);
-> +}
-> +
-> +/*
-> + * An END trigger can come from an event trigger (IPI or HW) or from
-> + * another chip. We don't model the PowerBus but the END trigger
-> + * message has the same parameters than in the function below.
-> + */
-> +static void xive_router_end_notify(XiveRouter *xrtr, uint8_t end_blk,
-> +                                   uint32_t end_idx, uint32_t end_data)
-> +{
-> +    XiveEND end;
-> +    uint8_t priority;
-> +    uint8_t format;
-> +
-> +    /* END cache lookup */
-> +    if (xive_router_get_end(xrtr, end_blk, end_idx, &end)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No END %x/%x\n", end_blk,
-> +                      end_idx);
-> +        return;
-> +    }
-> +
-> +    if (!(end.w0 & END_W0_VALID)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: END %x/%x is invalid\n",
-> +                      end_blk, end_idx);
-> +        return;
-> +    }
-> +
-> +    if (end.w0 & END_W0_ENQUEUE) {
-> +        xive_end_push(&end, end_data);
-> +        xive_router_set_end(xrtr, end_blk, end_idx, &end);
-> +    }
-> +
-> +    /*
-> +     * The W7 format depends on the F bit in W6. It defines the type
-> +     * of the notification :
-> +     *
-> +     *   F=3D0 : single or multiple NVT notification
-> +     *   F=3D1 : User level Event-Based Branch (EBB) notification, no
-> +     *         priority
-> +     */
-> +    format =3D GETFIELD(END_W6_FORMAT_BIT, end.w6);
-> +    priority =3D GETFIELD(END_W7_F0_PRIORITY, end.w7);
-> +
-> +    /* The END is masked */
-> +    if (format =3D=3D 0 && priority =3D=3D 0xff) {
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Check the END ESn (Event State Buffer for notification) for
-> +     * even futher coalescing in the Router
-> +     */
-> +    if (!(end.w0 & END_W0_UCOND_NOTIFY)) {
-> +        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n"=
-);
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Follows IVPE notification
-> +     */
-> +}
-> +
->  static void xive_router_notify(XiveFabric *xf, uint32_t lisn)
->  {
->      XiveRouter *xrtr =3D XIVE_ROUTER(xf);
-> @@ -471,9 +642,9 @@ static void xive_router_notify(XiveFabric *xf, uint32=
-_t lisn)
->          return;
->      }
-> =20
-> -    /* The IVRE has a State Bit Cache for its internal sources which
-> -     * is also involed at this point. We skip the SBC lookup because
-> -     * the state bits of the sources are modeled internally in QEMU.
-> +    /* The IVRE checks the State Bit Cache at this point. We skip the
-> +     * SBC lookup because the state bits of the sources are modeled
-> +     * internally in QEMU.
-
-Replacing a comment about something we're not doing with a different
-comment about something we're not doing doesn't seem very useful.
-Maybe fold these together into one patch or the other.
-
->       */
-> =20
->      if (!(eas.w & EAS_VALID)) {
-> @@ -485,6 +656,14 @@ static void xive_router_notify(XiveFabric *xf, uint3=
-2_t lisn)
->          /* Notification completed */
->          return;
->      }
-> +
-> +    /*
-> +     * The event trigger becomes an END trigger
-> +     */
-> +    xive_router_end_notify(xrtr,
-> +                           GETFIELD(EAS_END_BLOCK, eas.w),
-> +                           GETFIELD(EAS_END_INDEX, eas.w),
-> +                           GETFIELD(EAS_END_DATA,  eas.w));
->  }
-> =20
->  static Property xive_router_properties[] =3D {
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---6e7ZaeXHKrTJCxdu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv2M3QACgkQbDjKyiDZ
-s5JR5BAAtj9De6y868CbrXQcFt3CQdh5U4/bgigGE9j1S1WuSaRkLcjA7V9G/O69
-3n83skwqpdlqCwlnpbyl19moGVQjJmFxZF8AuUtQx19yHtsC9h6MIGnkXKHbrj4r
-ggZGfeDEmHA8yPv7/B8aAtVCvaIv91flmlFUh0Cpb85ds+QV2sTJeNS2KW1MyHga
-uha11D/wCKuPuTyINp740UMu602Ek4XxleJZmJGZ5dEj/DQsGOz8Y+VTxniW0jNB
-fLrdEPR85NY0UJFlFoGBQF+Ew4AtWe3rX0/3K5UBhHm3CCX9vfnFEI/SBZ41RwEw
-ITDps/IBp50kOKC57lbjA+MGPXQsmz8ktqm4RW9tO8fGpSWESOIMCUYvPpvYjip/
-UE8CvHbNxIUaPPFE8okxmTUa/NFYjf0ftJDRnjakN9kAP13TSzRZajHtaHtaV0Dr
-MEA+jg5xaLDCjVa9UkHjN977s1HSQvQIXh98ghMTMsl9pz5O0v1A8hQD9r3spH8t
-t5hqSZk+V/yxoBdKezIH+eDsa6Ty6ArBpVKFPoeWDQ7PWMAIv5iRbkwk7qCqmCf4
-BJMi3LPT3ovcjxxNp4ITYvWQ/jKdF3E379NWGQr1jVhO7mUqoif7ObXMh2gZEACp
-j9ExqD5t4Bwjih9DS4hZB/RG9lVlX/7z7OoTGIsRSM8JS/hu5s4=
-=169R
------END PGP SIGNATURE-----
-
---6e7ZaeXHKrTJCxdu--
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f095725dba..5d3fd86b83 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -502,9 +502,6 @@ void pc_cmos_init(PCMachineState *pcms,
+     qemu_register_reset(pc_cmos_init_late, &arg);
+ }
+ 
+-#define TYPE_PORT92 "port92"
+-#define PORT92(obj) OBJECT_CHECK(Port92State, (obj), TYPE_PORT92)
+-
+ /* port 92 stuff: could be split off */
+ typedef struct Port92State {
+     ISADevice parent_obj;
+@@ -1543,10 +1540,10 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
+         fdctrl_init_isa(isa_bus, fd);
+     }
+ 
+-    i8042 = isa_create_simple(isa_bus, "i8042");
++    i8042 = isa_create_simple(isa_bus, TYPE_I8042);
+     if (!no_vmport) {
+         vmport_init(isa_bus);
+-        vmmouse = isa_try_create(isa_bus, "vmmouse");
++        vmmouse = isa_try_create(isa_bus, TYPE_VMMOUSE);
+     } else {
+         vmmouse = NULL;
+     }
+@@ -1555,7 +1552,7 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
+         qdev_prop_set_ptr(dev, "ps2_mouse", i8042);
+         qdev_init_nofail(dev);
+     }
+-    port92 = isa_create_simple(isa_bus, "port92");
++    port92 = isa_create_simple(isa_bus, TYPE_PORT92);
+ 
+     a20_line = qemu_allocate_irqs(handle_a20_line_change, first_cpu, 2);
+     i8042_setup_a20_line(i8042, a20_line[0]);
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index f76b19e4e9..c49a416b95 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -305,7 +305,7 @@ static void ebus_realize(PCIDevice *pci_dev, Error **errp)
+     parallel_hds_isa_init(s->isa_bus, MAX_PARALLEL_PORTS);
+ 
+     /* Keyboard */
+-    isa_create_simple(s->isa_bus, "i8042");
++    isa_create_simple(s->isa_bus, TYPE_I8042);
+ 
+     /* Floppy */
+     for (i = 0; i < MAX_FD; i++) {
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 136fe497b6..29db770d86 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -169,6 +169,13 @@ void gsi_handler(void *opaque, int n, int level);
+ #define TYPE_VMPORT "vmport"
+ typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
+ 
++#define TYPE_PORT92 "port92"
++#define PORT92(obj) OBJECT_CHECK(Port92State, (obj), TYPE_PORT92)
++
++/* vmmouse.c */
++#define TYPE_VMMOUSE "vmmouse"
++#define VMMOUSE(obj) OBJECT_CHECK(VMMouseState, (obj), TYPE_VMMOUSE)
++
+ static inline void vmport_init(ISABus *bus)
+ {
+     isa_create_simple(bus, TYPE_VMPORT);
+-- 
+2.11.0
