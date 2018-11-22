@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1gPwQH-0006dz-QI
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:22:08 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gPwV5-0000uM-8n
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:27:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1gPwQC-000804-Iy
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:22:05 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:10831)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
-	id 1gPwQ4-0007if-LP
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:21:56 -0500
-References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
-	<1542746383-18288-4-git-send-email-kwankhede@nvidia.com>
-	<F22B14EC3CFBB843AD3E03B6B78F2C6A4AD3D596@SHSMSX104.ccr.corp.intel.com>
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <3fa593b7-ff53-c983-5725-365876eee993@nvidia.com>
-Date: Fri, 23 Nov 2018 02:51:39 +0530
+	(envelope-from <no-reply@patchew.org>) id 1gPwV0-00080D-TS
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:27:03 -0500
+Resent-Message-Id: <E1gPwV0-00080D-TS@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21335)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gPwV0-0007Rb-Hl
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:26:58 -0500
+In-Reply-To: <20181122072028.22819-1-xiaoguangrong@tencent.com>
+Message-ID: <154292195394.3075.16441191755024264881@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <F22B14EC3CFBB843AD3E03B6B78F2C6A4AD3D596@SHSMSX104.ccr.corp.intel.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO
- devices
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 22 Nov 2018 13:25:56 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] migration: improve multithreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,908 +28,611 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Zhao, Yan Y" <yan.y.zhao@intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
-	Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>, "Yang, Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "cohuck@redhat.com" <cohuck@redhat.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>
+To: guangrong.xiao@gmail.com
+Cc: famz@redhat.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, quintela@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, wei.w.wang@intel.com, cota@braap.org, jiang.biao2@zte.com.cn
 
-
-
-On 11/21/2018 1:09 PM, Zhao, Yan Y wrote:
-> 
-> 
->> -----Original Message-----
->> From: Qemu-devel [mailto:qemu-devel-
->> bounces+yan.y.zhao=intel.com@nongnu.org] On Behalf Of Kirti Wankhede
->> Sent: Wednesday, November 21, 2018 4:40 AM
->> To: alex.williamson@redhat.com; cjia@nvidia.com
->> Cc: Zhengxiao.zx@Alibaba-inc.com; Tian, Kevin <kevin.tian@intel.com>; Liu, Yi L
->> <yi.l.liu@intel.com>; eskultet@redhat.com; Yang, Ziye <ziye.yang@intel.com>;
->> qemu-devel@nongnu.org; cohuck@redhat.com; shuangtai.tst@alibaba-inc.com;
->> dgilbert@redhat.com; Wang, Zhi A <zhi.a.wang@intel.com>;
->> mlevitsk@redhat.com; pasic@linux.ibm.com; aik@ozlabs.ru; Kirti Wankhede
->> <kwankhede@nvidia.com>; eauger@redhat.com; felipe@nutanix.com;
->> jonathan.davies@nutanix.com; Liu, Changpeng <changpeng.liu@intel.com>;
->> Ken.Xue@amd.com
->> Subject: [Qemu-devel] [PATCH 3/5] Add migration functions for VFIO devices
->>
->> - Migration function are implemented for VFIO_DEVICE_TYPE_PCI device.
->> - Added SaveVMHandlers and implemented all basic functions required for live
->>   migration.
->> - Added VM state change handler to know running or stopped state of VM.
->> - Added migration state change notifier to get notification on migration state
->>   change. This state is translated to VFIO device state and conveyed to vendor
->>   driver.
->> - VFIO device supportd migration or not is decided based of migration region
->>   query. If migration region query is successful then migration is supported
->>   else migration is blocked.
->> - Structure vfio_device_migration_info is mapped at 0th offset of migration
->>   region and should always trapped by VFIO device's driver. Added both type of
->>   access support, trapped or mmapped, for data section of the region.
->> - To save device state, read data offset and size using structure
->>   vfio_device_migration_info.data, accordingly copy data from the region.
->> - To restore device state, write data offset and size in the structure and write
->>   data in the region.
->> - To get dirty page bitmap, write start address and pfn count then read count of
->>   pfns copied and accordingly read those from the rest of the region or mmaped
->>   part of the region. This copy is iterated till page bitmap for all requested
->>   pfns are copied.
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> ---
->>  hw/vfio/Makefile.objs         |   2 +-
->>  hw/vfio/migration.c           | 729
->> ++++++++++++++++++++++++++++++++++++++++++
->>  include/hw/vfio/vfio-common.h |  23 ++
->>  3 files changed, 753 insertions(+), 1 deletion(-)  create mode 100644
->> hw/vfio/migration.c
->>
->> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs index
->> a2e7a0a7cf02..2cf2ba1440f2 100644
->> --- a/hw/vfio/Makefile.objs
->> +++ b/hw/vfio/Makefile.objs
->> @@ -1,5 +1,5 @@
->>  ifeq ($(CONFIG_LINUX), y)
->> -obj-$(CONFIG_SOFTMMU) += common.o
->> +obj-$(CONFIG_SOFTMMU) += common.o migration.o
->>  obj-$(CONFIG_PCI) += pci.o pci-quirks.o display.o
->>  obj-$(CONFIG_VFIO_CCW) += ccw.o
->>  obj-$(CONFIG_SOFTMMU) += platform.o
->> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c new file mode 100644
->> index 000000000000..717fb63e4f43
->> --- /dev/null
->> +++ b/hw/vfio/migration.c
->> @@ -0,0 +1,729 @@
->> +/*
->> + * Migration support for VFIO devices
->> + *
->> + * Copyright NVIDIA, Inc. 2018
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2. See
->> + * the COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include <linux/vfio.h>
->> +
->> +#include "hw/vfio/vfio-common.h"
->> +#include "cpu.h"
->> +#include "migration/migration.h"
->> +#include "migration/qemu-file.h"
->> +#include "migration/register.h"
->> +#include "migration/blocker.h"
->> +#include "migration/misc.h"
->> +#include "qapi/error.h"
->> +#include "exec/ramlist.h"
->> +#include "exec/ram_addr.h"
->> +#include "pci.h"
->> +
->> +/*
->> + * Flags used as delimiter:
->> + * 0xffffffff => MSB 32-bit all 1s
->> + * 0xef10     => emulated (virtual) function IO
->> + * 0x0000     => 16-bits reserved for flags
->> + */
->> +#define VFIO_MIG_FLAG_END_OF_STATE      (0xffffffffef100001ULL)
->> +#define VFIO_MIG_FLAG_DEV_CONFIG_STATE  (0xffffffffef100002ULL)
->> +#define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
->> +
->> +static void vfio_migration_region_exit(VFIODevice *vbasedev) {
->> +    VFIOMigration *migration = vbasedev->migration;
->> +
->> +    if (!migration) {
->> +        return;
->> +    }
->> +
->> +    if (migration->region.buffer.size) {
->> +        vfio_region_exit(&migration->region.buffer);
->> +        vfio_region_finalize(&migration->region.buffer);
->> +    }
->> +}
->> +
->> +static int vfio_migration_region_init(VFIODevice *vbasedev) {
->> +    VFIOMigration *migration = vbasedev->migration;
->> +    Object *obj = NULL;
->> +    int ret = -EINVAL;
->> +
->> +    if (!migration) {
->> +        return ret;
->> +    }
->> +
->> +    /* Migration support added for PCI device only */
->> +    if (vbasedev->type == VFIO_DEVICE_TYPE_PCI) {
->> +        obj = vfio_pci_get_object(vbasedev);
->> +    }
->> +
->> +    if (!obj) {
->> +        return ret;
->> +    }
->> +
->> +    ret = vfio_region_setup(obj, vbasedev, &migration->region.buffer,
->> +                            migration->region.index, "migration");
->> +    if (ret) {
->> +        error_report("Failed to setup VFIO migration region %d: %s",
->> +                      migration->region.index, strerror(-ret));
->> +        goto err;
->> +    }
->> +
->> +    if (!migration->region.buffer.size) {
->> +        ret = -EINVAL;
->> +        error_report("Invalid region size of VFIO migration region %d: %s",
->> +                     migration->region.index, strerror(-ret));
->> +        goto err;
->> +    }
->> +
->> +    if (migration->region.buffer.mmaps) {
->> +        ret = vfio_region_mmap(&migration->region.buffer);
->> +        if (ret) {
->> +            error_report("Failed to mmap VFIO migration region %d: %s",
->> +                         migration->region.index, strerror(-ret));
->> +            goto err;
->> +        }
->> +    }
->> +
->> +    return 0;
->> +
->> +err:
->> +    vfio_migration_region_exit(vbasedev);
->> +    return ret;
->> +}
->> +
->> +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t
->> +state) {
->> +    VFIOMigration *migration = vbasedev->migration;
->> +    VFIORegion *region = &migration->region.buffer;
->> +    int ret = 0;
->> +
->> +    if (vbasedev->device_state == state) {
->> +        return ret;
->> +    }
->> +
->> +    ret = pwrite(vbasedev->fd, &state, sizeof(state),
->> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
->> +                                              device_state));
->> +    if (ret < 0) {
->> +        error_report("Failed to set migration state %d %s",
->> +                     ret, strerror(errno));
->> +        return ret;
->> +    }
->> +
->> +    vbasedev->device_state = state;
->> +    return ret;
->> +}
->> +
->> +void vfio_get_dirty_page_list(VFIODevice *vbasedev,
->> +                              uint64_t start_addr,
->> +                              uint64_t pfn_count) {
->> +    VFIOMigration *migration = vbasedev->migration;
->> +    VFIORegion *region = &migration->region.buffer;
->> +    struct vfio_device_migration_info migration_info;
->> +    uint64_t count = 0;
->> +    int ret;
->> +
->> +    migration_info.dirty_pfns.start_addr = start_addr;
->> +    migration_info.dirty_pfns.total = pfn_count;
->> +
->> +    ret = pwrite(vbasedev->fd, &migration_info.dirty_pfns,
->> +                 sizeof(migration_info.dirty_pfns),
->> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
->> +                                              dirty_pfns));
->> +    if (ret < 0) {
->> +        error_report("Failed to set dirty pages start address %d %s",
->> +                ret, strerror(errno));
->> +        return;
->> +    }
->> +
->> +    do {
->> +        /* Read dirty_pfns.copied */
->> +        ret = pread(vbasedev->fd, &migration_info.dirty_pfns,
->> +                sizeof(migration_info.dirty_pfns),
->> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
->> +                                             dirty_pfns));
->> +        if (ret < 0) {
->> +            error_report("Failed to get dirty pages bitmap count %d %s",
->> +                    ret, strerror(errno));
->> +            return;
->> +        }
->> +
->> +        if (migration_info.dirty_pfns.copied) {
->> +            uint64_t bitmap_size;
->> +            void *buf = NULL;
->> +            bool buffer_mmaped = false;
->> +
->> +            bitmap_size = (BITS_TO_LONGS(migration_info.dirty_pfns.copied) + 1)
->> +                           * sizeof(unsigned long);
->> +
->> +            if (region->mmaps) {
->> +                int i;
->> +
->> +                for (i = 0; i < region->nr_mmaps; i++) {
->> +                    if (region->mmaps[i].size >= bitmap_size) {
->> +                        buf = region->mmaps[i].mmap;
->> +                        buffer_mmaped = true;
->> +                        break;
->> +                    }
->> +                }
->> +            }
-> What if mmapped data area is in front of mmaped dirty bit area?
-> Maybe you need to record dirty bit region's index as what does for data region.
->
-
-No, data section is not different than dirty bit area.
-Migration region is like:
- ----------------------------------------------------------------------
-|vfio_device_migration_info|    data section			      |	
-|                          |     ///////////////////////////////////  |
- ----------------------------------------------------------------------
- ^			         ^                                 ^
- offset 0-trapped part         data.offset                     data.size
-
-Same data section is used to copy vendor driver data during save and
-during dirty page bitmap query.
-
->> +
->> +            if (!buffer_mmaped) {
->> +                buf = g_malloc0(bitmap_size);
->> +
->> +                ret = pread(vbasedev->fd, buf, bitmap_size,
->> +                            region->fd_offset + sizeof(migration_info) + 1);
->> +                if (ret != bitmap_size) {
->> +                    error_report("Failed to get migration data %d", ret);
->> +                    g_free(buf);
->> +                    return;
->> +                }
->> +            }
->> +
->> +            cpu_physical_memory_set_dirty_lebitmap((unsigned long *)buf,
->> +                                        start_addr + (count * TARGET_PAGE_SIZE),
->> +                                        migration_info.dirty_pfns.copied);
->> +            count +=  migration_info.dirty_pfns.copied;
->> +
->> +            if (!buffer_mmaped) {
->> +                g_free(buf);
->> +            }
->> +        }
->> +    } while (count < migration_info.dirty_pfns.total); }
->> +
->> +static int vfio_save_device_config_state(QEMUFile *f, void *opaque) {
->> +    VFIODevice *vbasedev = opaque;
->> +
->> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_CONFIG_STATE);
->> +
->> +    if (vbasedev->type == VFIO_DEVICE_TYPE_PCI) {
->> +        vfio_pci_save_config(vbasedev, f);
->> +    }
->> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
->> +
->> +    return qemu_file_get_error(f);
->> +}
->> +
->> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque) {
->> +    VFIODevice *vbasedev = opaque;
->> +
->> +    if (vbasedev->type == VFIO_DEVICE_TYPE_PCI) {
->> +        vfio_pci_load_config(vbasedev, f);
->> +    }
->> +
->> +    if (qemu_get_be64(f) != VFIO_MIG_FLAG_END_OF_STATE) {
->> +        error_report("Wrong end of block while loading device config space");
->> +        return -EINVAL;
->> +    }
->> +
->> +    return qemu_file_get_error(f);
->> +}
->> +
-> What's the purpose to add a tailing VFIO_MIG_FLAG_END_OF_STATE for each section? 
-> For compatibility check?
-> Maybe a version id or magic in struct vfio_device_migration_info is more appropriate?
-> 
-
-No, this is to identify the section end during resume, see
-vfio_load_state().
-
-> 
->> +/*
->> +----------------------------------------------------------------------
->> +*/
->> +
->> +static bool vfio_is_active_iterate(void *opaque) {
->> +    VFIODevice *vbasedev = opaque;
->> +
->> +    if (vbasedev->vm_running && vbasedev->migration &&
->> +        (vbasedev->migration->pending_precopy_only != 0))
->> +        return true;
->> +
->> +    if (!vbasedev->vm_running && vbasedev->migration &&
->> +        (vbasedev->migration->pending_postcopy != 0))
->> +        return true;
->> +
->> +    return false;
->> +}
->> +
->> +static int vfio_save_setup(QEMUFile *f, void *opaque) {
->> +    VFIODevice *vbasedev = opaque;
->> +    int ret;
->> +
->> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_SETUP_STATE);
->> +
->> +    qemu_mutex_lock_iothread();
->> +    ret = vfio_migration_region_init(vbasedev);
->> +    qemu_mutex_unlock_iothread();
->> +    if (ret) {
->> +        return ret;
->> +    }
->> +
->> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
->> +
->> +    ret = qemu_file_get_error(f);
->> +    if (ret) {
->> +        return ret;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev) {
->> +    VFIOMigration *migration = vbasedev->migration;
->> +    VFIORegion *region = &migration->region.buffer;
->> +    struct vfio_device_migration_info migration_info;
->> +    int ret;
->> +
->> +    ret = pread(vbasedev->fd, &migration_info.data,
->> +                sizeof(migration_info.data),
->> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
->> +                                             data));
->> +    if (ret != sizeof(migration_info.data)) {
->> +        error_report("Failed to get migration buffer information %d",
->> +                     ret);
->> +        return -EINVAL;
->> +    }
->> +
->> +    if (migration_info.data.size) {
->> +        void *buf = NULL;
->> +        bool buffer_mmaped = false;
->> +
->> +        if (region->mmaps) {
->> +            int i;
->> +
->> +            for (i = 0; i < region->nr_mmaps; i++) {
->> +                if (region->mmaps[i].offset == migration_info.data.offset) {
->> +                    buf = region->mmaps[i].mmap;
->> +                    buffer_mmaped = true;
->> +                    break;
->> +                }
->> +            }
->> +        }
->> +
->> +        if (!buffer_mmaped) {
->> +            buf = g_malloc0(migration_info.data.size);
->> +            ret = pread(vbasedev->fd, buf, migration_info.data.size,
->> +                        region->fd_offset + migration_info.data.offset);
->> +            if (ret != migration_info.data.size) {
->> +                error_report("Failed to get migration data %d", ret);
->> +                return -EINVAL;
->> +            }
->> +        }
->> +
->> +        qemu_put_be64(f, migration_info.data.size);
->> +        qemu_put_buffer(f, buf, migration_info.data.size);
->> +
->> +        if (!buffer_mmaped) {
->> +            g_free(buf);
->> +        }
->> +
->> +    } else {
->> +        qemu_put_be64(f, migration_info.data.size);
->> +    }
->> +
->> +    ret = qemu_file_get_error(f);
->> +    if (ret) {
->> +        return ret;
->> +    }
->> +
->> +    return migration_info.data.size;
->> +}
->> +
->> +static int vfio_save_iterate(QEMUFile *f, void *opaque) {
->> +    VFIODevice *vbasedev = opaque;
->> +    int ret;
->> +
->> +    ret = vfio_save_buffer(f, vbasedev);
->> +    if (ret < 0) {
->> +        error_report("vfio_save_buffer failed %s",
->> +                     strerror(errno));
->> +        return ret;
->> +    }
->> +
->> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
->> +
->> +    ret = qemu_file_get_error(f);
->> +    if (ret) {
->> +        return ret;
->> +    }
->> +
->> +    return ret;
->> +}
->> +
->> +static void vfio_update_pending(VFIODevice *vbasedev, uint64_t
->> +threshold_size) {
->> +    VFIOMigration *migration = vbasedev->migration;
->> +    VFIORegion *region = &migration->region.buffer;
->> +    struct vfio_device_migration_info migration_info;
->> +    int ret;
->> +
->> +    ret = pwrite(vbasedev->fd, &threshold_size, sizeof(threshold_size),
->> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
->> +                                              pending.threshold_size));
->> +    if (ret < 0) {
->> +        error_report("Failed to set threshold size %d %s",
->> +                     ret, strerror(errno));
->> +        return;
->> +    }
->> +
->> +    ret = pread(vbasedev->fd, &migration_info.pending,
->> +                sizeof(migration_info.pending),
->> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
->> +                                             pending));
->> +    if (ret != sizeof(migration_info.pending)) {
->> +        error_report("Failed to get pending bytes %d", ret);
->> +        return;
->> +    }
->> +
->> +    migration->pending_precopy_only = migration_info.pending.precopy_only;
->> +    migration->pending_compatible = migration_info.pending.compatible;
->> +    migration->pending_postcopy = migration_info.pending.postcopy_only;
->> +
->> +    return;
->> +}
->> +
->> +static void vfio_save_pending(QEMUFile *f, void *opaque,
->> +                              uint64_t threshold_size,
->> +                              uint64_t *res_precopy_only,
->> +                              uint64_t *res_compatible,
->> +                              uint64_t *res_postcopy_only) {
->> +    VFIODevice *vbasedev = opaque;
->> +    VFIOMigration *migration = vbasedev->migration;
->> +
->> +    vfio_update_pending(vbasedev, threshold_size);
->> +
->> +    *res_precopy_only += migration->pending_precopy_only;
->> +    *res_compatible += migration->pending_compatible;
->> +    *res_postcopy_only += migration->pending_postcopy; }
->> +
->> +static int vfio_save_complete_precopy(QEMUFile *f, void *opaque) {
->> +    VFIODevice *vbasedev = opaque;
->> +    VFIOMigration *migration = vbasedev->migration;
->> +    MigrationState *ms = migrate_get_current();
->> +    int ret;
->> +
->> +    if (vbasedev->vm_running) {
->> +        vbasedev->vm_running = 0;
->> +    }
->> +
->> +    ret = vfio_migration_set_state(vbasedev,
->> +                                   VFIO_DEVICE_STATE_MIGRATION_STOPNCOPY);
->> +    if (ret) {
->> +        error_report("Failed to set state STOPNCOPY_ACTIVE");
->> +        return ret;
->> +    }
->> +
->> +    ret = vfio_save_device_config_state(f, opaque);
->> +    if (ret) {
->> +        return ret;
->> +    }
->> +
->> +    do {
->> +        vfio_update_pending(vbasedev, ms->threshold_size);
->> +
->> +        if (vfio_is_active_iterate(opaque)) {
->> +            ret = vfio_save_buffer(f, vbasedev);
->> +            if (ret < 0) {
->> +                error_report("Failed to save buffer");
->> +                break;
->> +            } else if (ret == 0) {
->> +                break;
->> +            }
->> +        }
->> +    } while ((migration->pending_compatible +
->> + migration->pending_postcopy) > 0);
->> +
-> 
-> if migration->pending_postcopy is not 0, vfio_save_complete_precopy() cannot finish? Is that true?
-> But vfio_save_complete_precopy() does not need to copy post copy data.
-> 
->
-
-This is stop and copy phase, that is pre-copy phase ended and vCPUs are
-stopped. So all data for device should be copied in this callback.
-
-> 
->> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
->> +
->> +    ret = qemu_file_get_error(f);
->> +    if (ret) {
->> +        return ret;
->> +    }
->> +
->> +    ret = vfio_migration_set_state(vbasedev,
->> +                                   VFIO_DEVICE_STATE_MIGRATION_SAVE_COMPLETED);
->> +    if (ret) {
->> +        error_report("Failed to set state SAVE_COMPLETED");
->> +        return ret;
->> +    }
->> +    return ret;
->> +}
->> +
->> +static void vfio_save_cleanup(void *opaque) {
->> +    VFIODevice *vbasedev = opaque;
->> +
->> +    vfio_migration_region_exit(vbasedev);
->> +}
->> +
->> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id) {
->> +    VFIODevice *vbasedev = opaque;
->> +    int ret;
->> +    uint64_t data;
->> +
-> Need to use version_id to check source and target version.
-> 
-
-Good point. I'll add that.
-
->> +    data = qemu_get_be64(f);
->> +    while (data != VFIO_MIG_FLAG_END_OF_STATE) {
->> +        if (data == VFIO_MIG_FLAG_DEV_CONFIG_STATE) {
->> +            ret = vfio_load_device_config_state(f, opaque);
->> +            if (ret) {
->> +                return ret;
->> +            }
->> +        } else if (data == VFIO_MIG_FLAG_DEV_SETUP_STATE) {
->> +            data = qemu_get_be64(f);
->> +            if (data == VFIO_MIG_FLAG_END_OF_STATE) {
->> +                return 0;
->> +            } else {
->> +                error_report("SETUP STATE: EOS not found 0x%lx", data);
->> +                return -EINVAL;
->> +            }
->> +        } else if (data != 0) {
->> +            VFIOMigration *migration = vbasedev->migration;
->> +            VFIORegion *region = &migration->region.buffer;
->> +            struct vfio_device_migration_info migration_info;
->> +            void *buf = NULL;
->> +            bool buffer_mmaped = false;
->> +
->> +            migration_info.data.size = data;
->> +
->> +            if (region->mmaps) {
->> +                int i;
->> +
->> +                for (i = 0; i < region->nr_mmaps; i++) {
->> +                    if (region->mmaps[i].mmap &&
->> +                        (region->mmaps[i].size >= data)) {
->> +                        buf = region->mmaps[i].mmap;
->> +                        migration_info.data.offset = region->mmaps[i].offset;
->> +                        buffer_mmaped = true;
->> +                        break;
->> +                    }
->> +                }
->> +            }
->> +
->> +            if (!buffer_mmaped) {
->> +                buf = g_malloc0(migration_info.data.size);
->> +                migration_info.data.offset = sizeof(migration_info) + 1;
->> +            }
->> +
->> +            qemu_get_buffer(f, buf, data);
->> +
->> +            ret = pwrite(vbasedev->fd, &migration_info.data,
->> +                         sizeof(migration_info.data),
->> +                         region->fd_offset +
->> +                         offsetof(struct vfio_device_migration_info, data));
->> +            if (ret != sizeof(migration_info.data)) {
->> +                error_report("Failed to set migration buffer information %d",
->> +                        ret);
->> +                return -EINVAL;
->> +            }
->> +
->> +            if (!buffer_mmaped) {
->> +                ret = pwrite(vbasedev->fd, buf, migration_info.data.size,
->> +                             region->fd_offset + migration_info.data.offset);
->> +                g_free(buf);
->> +
->> +                if (ret != migration_info.data.size) {
->> +                    error_report("Failed to set migration buffer %d", ret);
->> +                    return -EINVAL;
->> +                }
->> +            }
->> +        }
->> +
->> +        ret = qemu_file_get_error(f);
->> +        if (ret) {
->> +            return ret;
->> +        }
->> +        data = qemu_get_be64(f);
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +static int vfio_load_setup(QEMUFile *f, void *opaque) {
->> +    VFIODevice *vbasedev = opaque;
->> +    int ret;
->> +
->> +    ret = vfio_migration_set_state(vbasedev,
->> +                                    VFIO_DEVICE_STATE_MIGRATION_RESUME);
->> +    if (ret) {
->> +        error_report("Failed to set state RESUME");
->> +    }
->> +
->> +    ret = vfio_migration_region_init(vbasedev);
->> +    if (ret) {
->> +        error_report("Failed to initialise migration region");
->> +        return ret;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
-> Why vfio_migration_set_state() is in front of  vfio_migration_region_init()?
-> So VFIO_DEVICE_STATE_MIGRATION_RESUME is really useful? :)
-> 
-> 
-
-Yes, how will kernel driver know that resume has started?
-
-
->> +static int vfio_load_cleanup(void *opaque) {
->> +    VFIODevice *vbasedev = opaque;
->> +    int ret = 0;
->> +
->> +    ret = vfio_migration_set_state(vbasedev,
->> +                                 VFIO_DEVICE_STATE_MIGRATION_RESUME_COMPLETED);
->> +    if (ret) {
->> +        error_report("Failed to set state RESUME_COMPLETED");
->> +    }
->> +
->> +    vfio_migration_region_exit(vbasedev);
->> +    return ret;
->> +}
->> +
->> +static SaveVMHandlers savevm_vfio_handlers = {
->> +    .save_setup = vfio_save_setup,
->> +    .save_live_iterate = vfio_save_iterate,
->> +    .save_live_complete_precopy = vfio_save_complete_precopy,
->> +    .save_live_pending = vfio_save_pending,
->> +    .save_cleanup = vfio_save_cleanup,
->> +    .load_state = vfio_load_state,
->> +    .load_setup = vfio_load_setup,
->> +    .load_cleanup = vfio_load_cleanup,
->> +    .is_active_iterate = vfio_is_active_iterate, };
->> +
->> +static void vfio_vmstate_change(void *opaque, int running, RunState
->> +state) {
->> +    VFIODevice *vbasedev = opaque;
->> +
->> +    if ((vbasedev->vm_running != running) && running) {
->> +        int ret;
->> +
->> +        ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUNNING);
->> +        if (ret) {
->> +            error_report("Failed to set state RUNNING");
->> +        }
->> +    }
->> +
->> +    vbasedev->vm_running = running;
->> +}
->> +
-> vfio_vmstate_change() is registered at initialization, so for source vm 
-> vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUNNING) will be called on vm start.
-> but vfio_migration_region_init() is called in save_setup() when migration starts,
-> as a result,  "vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RUNNING)" should not function here for source vm.
-> So, again, is this state really used? :)
-> 
-> 
-
-vfio_vmstate_change() is not only called at VM start, this also gets
-called after resume is done. Kernel driver need to know after resume
-that vCPUs are running.
-
-Thanks,
-Kirti
-
->> +static void vfio_migration_state_notifier(Notifier *notifier, void
->> +*data) {
->> +    MigrationState *s = data;
->> +    VFIODevice *vbasedev = container_of(notifier, VFIODevice, migration_state);
->> +    int ret;
->> +
->> +    switch (s->state) {
->> +    case MIGRATION_STATUS_SETUP:
->> +        ret = vfio_migration_set_state(vbasedev,
->> +                                       VFIO_DEVICE_STATE_MIGRATION_SETUP);
->> +        if (ret) {
->> +            error_report("Failed to set state SETUP");
->> +        }
->> +        return;
->> +
->> +    case MIGRATION_STATUS_ACTIVE:
->> +        if (vbasedev->device_state == VFIO_DEVICE_STATE_MIGRATION_SETUP) {
->> +            if (vbasedev->vm_running) {
->> +                ret = vfio_migration_set_state(vbasedev,
->> +                                          VFIO_DEVICE_STATE_MIGRATION_PRECOPY);
->> +                if (ret) {
->> +                    error_report("Failed to set state PRECOPY_ACTIVE");
->> +                }
->> +            } else {
->> +                ret = vfio_migration_set_state(vbasedev,
->> +                                        VFIO_DEVICE_STATE_MIGRATION_STOPNCOPY);
->> +                if (ret) {
->> +                    error_report("Failed to set state STOPNCOPY_ACTIVE");
->> +                }
->> +            }
->> +        } else {
->> +            ret = vfio_migration_set_state(vbasedev,
->> +                                           VFIO_DEVICE_STATE_MIGRATION_RESUME);
->> +            if (ret) {
->> +                error_report("Failed to set state RESUME");
->> +            }
->> +        }
->> +        return;
->> +
->> +    case MIGRATION_STATUS_CANCELLING:
->> +    case MIGRATION_STATUS_CANCELLED:
->> +        ret = vfio_migration_set_state(vbasedev,
->> +                                       VFIO_DEVICE_STATE_MIGRATION_CANCELLED);
->> +        if (ret) {
->> +            error_report("Failed to set state CANCELLED");
->> +        }
->> +        return;
->> +
->> +    case MIGRATION_STATUS_FAILED:
->> +        ret = vfio_migration_set_state(vbasedev,
->> +                                       VFIO_DEVICE_STATE_MIGRATION_FAILED);
->> +        if (ret) {
->> +            error_report("Failed to set state FAILED");
->> +        }
->> +        return;
->> +    }
->> +}
->> +
->> +static int vfio_migration_init(VFIODevice *vbasedev,
->> +                               struct vfio_region_info *info) {
->> +    vbasedev->migration = g_new0(VFIOMigration, 1);
->> +    vbasedev->migration->region.index = info->index;
->> +
->> +    register_savevm_live(NULL, "vfio", -1, 1, &savevm_vfio_handlers, vbasedev);
->> +    vbasedev->vm_state =
->> qemu_add_vm_change_state_handler(vfio_vmstate_change,
->> +                                                          vbasedev);
->> +
->> +    vbasedev->migration_state.notify = vfio_migration_state_notifier;
->> +    add_migration_state_change_notifier(&vbasedev->migration_state);
->> +
->> +    return 0;
->> +}
->> +
->> +
->> +/*
->> +----------------------------------------------------------------------
->> +*/
->> +
->> +int vfio_migration_probe(VFIODevice *vbasedev, Error **errp) {
->> +    struct vfio_region_info *info;
->> +    int ret;
->> +
->> +    ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_MIGRATION,
->> +                                   VFIO_REGION_SUBTYPE_MIGRATION, &info);
->> +    if (ret) {
->> +        Error *local_err = NULL;
->> +
->> +        error_setg(&vbasedev->migration_blocker,
->> +                   "VFIO device doesn't support migration");
->> +        ret = migrate_add_blocker(vbasedev->migration_blocker, &local_err);
->> +        if (local_err) {
->> +            error_propagate(errp, local_err);
->> +            error_free(vbasedev->migration_blocker);
->> +            return ret;
->> +        }
->> +    } else {
->> +        return vfio_migration_init(vbasedev, info);
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +void vfio_migration_finalize(VFIODevice *vbasedev) {
->> +    if (!vbasedev->migration) {
->> +        return;
->> +    }
->> +
->> +    if (vbasedev->vm_state) {
->> +        qemu_del_vm_change_state_handler(vbasedev->vm_state);
->> +        remove_migration_state_change_notifier(&vbasedev->migration_state);
->> +    }
->> +
->> +    if (vbasedev->migration_blocker) {
->> +        migrate_del_blocker(vbasedev->migration_blocker);
->> +        error_free(vbasedev->migration_blocker);
->> +    }
->> +
->> +    g_free(vbasedev->migration);
->> +}
->> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
->> index a9036929b220..ab8217c9e249 100644
->> --- a/include/hw/vfio/vfio-common.h
->> +++ b/include/hw/vfio/vfio-common.h
->> @@ -30,6 +30,8 @@
->>  #include <linux/vfio.h>
->>  #endif
->>
->> +#include "sysemu/sysemu.h"
->> +
->>  #define ERR_PREFIX "vfio error: %s: "
->>  #define WARN_PREFIX "vfio warning: %s: "
->>
->> @@ -57,6 +59,16 @@ typedef struct VFIORegion {
->>      uint8_t nr; /* cache the region number for debug */  } VFIORegion;
->>
->> +typedef struct VFIOMigration {
->> +    struct {
->> +        VFIORegion buffer;
->> +        uint32_t index;
->> +    } region;
->> +    uint64_t pending_precopy_only;
->> +    uint64_t pending_compatible;
->> +    uint64_t pending_postcopy;
->> +} VFIOMigration;
->> +
->>  typedef struct VFIOAddressSpace {
->>      AddressSpace *as;
->>      QLIST_HEAD(, VFIOContainer) containers; @@ -116,6 +128,12 @@ typedef
->> struct VFIODevice {
->>      unsigned int num_irqs;
->>      unsigned int num_regions;
->>      unsigned int flags;
->> +    uint32_t device_state;
->> +    VMChangeStateEntry *vm_state;
->> +    int vm_running;
->> +    Notifier migration_state;
->> +    VFIOMigration *migration;
->> +    Error *migration_blocker;
->>  } VFIODevice;
->>
->>  struct VFIODeviceOps {
->> @@ -193,4 +211,9 @@ int vfio_spapr_create_window(VFIOContainer
->> *container,  int vfio_spapr_remove_window(VFIOContainer *container,
->>                               hwaddr offset_within_address_space);
->>
->> +int vfio_migration_probe(VFIODevice *vbasedev, Error **errp); void
->> +vfio_migration_finalize(VFIODevice *vbasedev); void
->> +vfio_get_dirty_page_list(VFIODevice *vbasedev, uint64_t start_addr,
->> +                               uint64_t pfn_count);
->> +
->>  #endif /* HW_VFIO_VFIO_COMMON_H */
->> --
->> 2.7.0
->>
-> 
+SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQ
+bGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJ
+ZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBp
+dApsb2NhbGx5LgoKTWVzc2FnZS1pZDogMjAxODExMjIwNzIwMjguMjI4MTktMS14aWFvZ3Vhbmdy
+b25nQHRlbmNlbnQuY29tClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENI
+IHYzIDAvNV0gbWlncmF0aW9uOiBpbXByb3ZlIG11bHRpdGhyZWFkcwoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
+IFNIT1dfRU5WPTEgSj04Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVh
+OWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
+aCAndGVzdCcKMWY0MGY4OCB0ZXN0czogYWRkIHRocmVhZGVkLXdvcmtxdWV1ZS1iZW5jaAowYzU2
+MGFjIG1pZ3JhdGlvbjogdXNlIHRocmVhZGVkIHdvcmtxdWV1ZSBmb3IgZGVjb21wcmVzc2lvbgpl
+ZmZkY2I0IG1pZ3JhdGlvbjogdXNlIHRocmVhZGVkIHdvcmtxdWV1ZSBmb3IgY29tcHJlc3Npb24K
+ZWI5MWM2MyB1dGlsOiBpbnRyb2R1Y2UgdGhyZWFkZWQgd29ya3F1ZXVlCjNiZjhiNDQgYml0b3Bz
+OiBpbnRyb2R1Y2UgY2hhbmdlX2JpdF9hdG9taWMKCj09PSBPVVRQVVQgQkVHSU4gPT09CiAgQlVJ
+TEQgICBmZWRvcmEKbWFrZVsxXTogRW50ZXJpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3
+LXRlc3Rlci10bXAtMXZ1c3FoOXYvc3JjJwogIEdFTiAgICAgL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLTF2dXNxaDl2L3NyYy9kb2NrZXItc3JjLjIwMTgtMTEtMjItMTYuMjQuMjMuMjMyMTgv
+cWVtdS50YXIKQ2xvbmluZyBpbnRvICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMXZ1c3Fo
+OXYvc3JjL2RvY2tlci1zcmMuMjAxOC0xMS0yMi0xNi4yNC4yMy4yMzIxOC9xZW11LnRhci52cm9v
+dCcuLi4KZG9uZS4KU3VibW9kdWxlICdkdGMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvZHRj
+LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpDbG9uaW5nIGludG8gJ2R0YycuLi4KU3Vi
+bW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICc4OGYxODkwOWRiNzMxYTYyNzQ1NmYyNmQ3
+Nzk0NDVmODRlNDQ5NTM2JwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBkYicgKGh0dHBzOi8vZ2l0
+LnFlbXUub3JnL2dpdC9rZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd1aS9r
+ZXljb2RlbWFwZGInCkNsb25pbmcgaW50byAndWkva2V5Y29kZW1hcGRiJy4uLgpTdWJtb2R1bGUg
+cGF0aCAndWkva2V5Y29kZW1hcGRiJzogY2hlY2tlZCBvdXQgJzZiM2Q3MTZlMmI2NDcyZWI3MTg5
+ZDMyMjA1NTIyODBlZjNkODMyY2UnCiAgQ09QWSAgICBSVU5ORVIKICAgIFJVTiB0ZXN0LW1pbmd3
+IGluIHFlbXU6ZmVkb3JhIApQYWNrYWdlcyBpbnN0YWxsZWQ6ClNETDItZGV2ZWwtMi4wLjktMS5m
+YzI4Lng4Nl82NApiYy0xLjA3LjEtNS5mYzI4Lng4Nl82NApiaXNvbi0zLjAuNC05LmZjMjgueDg2
+XzY0CmJsdWV6LWxpYnMtZGV2ZWwtNS41MC0xLmZjMjgueDg2XzY0CmJybGFwaS1kZXZlbC0wLjYu
+Ny0xOS5mYzI4Lng4Nl82NApiemlwMi0xLjAuNi0yNi5mYzI4Lng4Nl82NApiemlwMi1kZXZlbC0x
+LjAuNi0yNi5mYzI4Lng4Nl82NApjY2FjaGUtMy40LjItMi5mYzI4Lng4Nl82NApjbGFuZy02LjAu
+MS0yLmZjMjgueDg2XzY0CmRldmljZS1tYXBwZXItbXVsdGlwYXRoLWRldmVsLTAuNy40LTMuZ2l0
+MDdlN2JkNS5mYzI4Lng4Nl82NApmaW5kdXRpbHMtNC42LjAtMTkuZmMyOC54ODZfNjQKZmxleC0y
+LjYuMS03LmZjMjgueDg2XzY0CmdjYy04LjIuMS01LmZjMjgueDg2XzY0CmdjYy1jKystOC4yLjEt
+NS5mYzI4Lng4Nl82NApnZXR0ZXh0LTAuMTkuOC4xLTE0LmZjMjgueDg2XzY0CmdpdC0yLjE3LjIt
+MS5mYzI4Lng4Nl82NApnbGliMi1kZXZlbC0yLjU2LjMtMi5mYzI4Lng4Nl82NApnbHVzdGVyZnMt
+YXBpLWRldmVsLTQuMS41LTEuZmMyOC54ODZfNjQKZ251dGxzLWRldmVsLTMuNi40LTEuZmMyOC54
+ODZfNjQKZ3RrMy1kZXZlbC0zLjIyLjMwLTEuZmMyOC54ODZfNjQKaG9zdG5hbWUtMy4yMC0zLmZj
+MjgueDg2XzY0CmxpYmFpby1kZXZlbC0wLjMuMTEwLTExLmZjMjgueDg2XzY0CmxpYmFzYW4tOC4y
+LjEtNS5mYzI4Lng4Nl82NApsaWJhdHRyLWRldmVsLTIuNC40OC0zLmZjMjgueDg2XzY0CmxpYmNh
+cC1kZXZlbC0yLjI1LTkuZmMyOC54ODZfNjQKbGliY2FwLW5nLWRldmVsLTAuNy45LTQuZmMyOC54
+ODZfNjQKbGliY3VybC1kZXZlbC03LjU5LjAtOC5mYzI4Lng4Nl82NApsaWJmZHQtZGV2ZWwtMS40
+LjctMS5mYzI4Lng4Nl82NApsaWJwbmctZGV2ZWwtMS42LjM0LTYuZmMyOC54ODZfNjQKbGlicmJk
+LWRldmVsLTEyLjIuOC0xLmZjMjgueDg2XzY0CmxpYnNzaDItZGV2ZWwtMS44LjAtNy5mYzI4Lng4
+Nl82NApsaWJ1YnNhbi04LjIuMS01LmZjMjgueDg2XzY0CmxpYnVzYngtZGV2ZWwtMS4wLjIyLTEu
+ZmMyOC54ODZfNjQKbGlieG1sMi1kZXZlbC0yLjkuOC00LmZjMjgueDg2XzY0Cmxsdm0tNi4wLjEt
+OC5mYzI4Lng4Nl82NApsem8tZGV2ZWwtMi4wOC0xMi5mYzI4Lng4Nl82NAptYWtlLTQuMi4xLTYu
+ZmMyOC54ODZfNjQKbWluZ3czMi1TREwyLTIuMC45LTEuZmMyOC5ub2FyY2gKbWluZ3czMi1iemlw
+Mi0xLjAuNi05LmZjMjcubm9hcmNoCm1pbmd3MzItY3VybC03LjU3LjAtMS5mYzI4Lm5vYXJjaApt
+aW5ndzMyLWdsaWIyLTIuNTYuMS0xLmZjMjgubm9hcmNoCm1pbmd3MzItZ21wLTYuMS4yLTIuZmMy
+Ny5ub2FyY2gKbWluZ3czMi1nbnV0bHMtMy42LjMtMS5mYzI4Lm5vYXJjaAptaW5ndzMyLWd0azMt
+My4yMi4zMC0xLmZjMjgubm9hcmNoCm1pbmd3MzItbGlianBlZy10dXJiby0xLjUuMS0zLmZjMjcu
+bm9hcmNoCm1pbmd3MzItbGlicG5nLTEuNi4yOS0yLmZjMjcubm9hcmNoCm1pbmd3MzItbGlic3No
+Mi0xLjguMC0zLmZjMjcubm9hcmNoCm1pbmd3MzItbGlidGFzbjEtNC4xMy0xLmZjMjgubm9hcmNo
+Cm1pbmd3MzItbmV0dGxlLTMuNC0xLmZjMjgubm9hcmNoCm1pbmd3MzItcGl4bWFuLTAuMzQuMC0z
+LmZjMjcubm9hcmNoCm1pbmd3MzItcGtnLWNvbmZpZy0wLjI4LTkuZmMyNy54ODZfNjQKbWluZ3c2
+NC1TREwyLTIuMC45LTEuZmMyOC5ub2FyY2gKbWluZ3c2NC1iemlwMi0xLjAuNi05LmZjMjcubm9h
+cmNoCm1pbmd3NjQtY3VybC03LjU3LjAtMS5mYzI4Lm5vYXJjaAptaW5ndzY0LWdsaWIyLTIuNTYu
+MS0xLmZjMjgubm9hcmNoCm1pbmd3NjQtZ21wLTYuMS4yLTIuZmMyNy5ub2FyY2gKbWluZ3c2NC1n
+bnV0bHMtMy42LjMtMS5mYzI4Lm5vYXJjaAptaW5ndzY0LWd0azMtMy4yMi4zMC0xLmZjMjgubm9h
+cmNoCm1pbmd3NjQtbGlianBlZy10dXJiby0xLjUuMS0zLmZjMjcubm9hcmNoCm1pbmd3NjQtbGli
+cG5nLTEuNi4yOS0yLmZjMjcubm9hcmNoCm1pbmd3NjQtbGlic3NoMi0xLjguMC0zLmZjMjcubm9h
+cmNoCm1pbmd3NjQtbGlidGFzbjEtNC4xMy0xLmZjMjgubm9hcmNoCm1pbmd3NjQtbmV0dGxlLTMu
+NC0xLmZjMjgubm9hcmNoCm1pbmd3NjQtcGl4bWFuLTAuMzQuMC0zLmZjMjcubm9hcmNoCm1pbmd3
+NjQtcGtnLWNvbmZpZy0wLjI4LTkuZmMyNy54ODZfNjQKbmN1cnNlcy1kZXZlbC02LjEtNS4yMDE4
+MDIyNC5mYzI4Lng4Nl82NApuZXR0bGUtZGV2ZWwtMy40LTIuZmMyOC54ODZfNjQKbnNzLWRldmVs
+LTMuMzkuMC0xLjAuZmMyOC54ODZfNjQKbnVtYWN0bC1kZXZlbC0yLjAuMTEtOC5mYzI4Lng4Nl82
+NApwYWNrYWdlIFB5WUFNTCBpcyBub3QgaW5zdGFsbGVkCnBhY2thZ2UgbGlianBlZy1kZXZlbCBp
+cyBub3QgaW5zdGFsbGVkCnBlcmwtNS4yNi4yLTQxNC5mYzI4Lng4Nl82NApwaXhtYW4tZGV2ZWwt
+MC4zNC4wLTguZmMyOC54ODZfNjQKcHl0aG9uMy0zLjYuNi0xLmZjMjgueDg2XzY0CnNuYXBweS1k
+ZXZlbC0xLjEuNy01LmZjMjgueDg2XzY0CnNwYXJzZS0wLjUuMi0xLmZjMjgueDg2XzY0CnNwaWNl
+LXNlcnZlci1kZXZlbC0wLjE0LjAtNC5mYzI4Lng4Nl82NApzeXN0ZW10YXAtc2R0LWRldmVsLTQu
+MC0xLmZjMjgueDg2XzY0CnRhci0xLjMwLTMuZmMyOC54ODZfNjQKdXNicmVkaXItZGV2ZWwtMC44
+LjAtMS5mYzI4Lng4Nl82NAp2aXJnbHJlbmRlcmVyLWRldmVsLTAuNi4wLTQuMjAxNzAyMTBnaXQ3
+NmIzZGE5N2IuZmMyOC54ODZfNjQKdnRlMy1kZXZlbC0wLjM2LjUtNi5mYzI4Lng4Nl82NAp3aGlj
+aC0yLjIxLTguZmMyOC54ODZfNjQKeGVuLWRldmVsLTQuMTAuMi0yLmZjMjgueDg2XzY0CnpsaWIt
+ZGV2ZWwtMS4yLjExLTguZmMyOC54ODZfNjQKCkVudmlyb25tZW50IHZhcmlhYmxlczoKVEFSR0VU
+X0xJU1Q9ClBBQ0tBR0VTPWJjICAgICBiaXNvbiAgICAgYmx1ZXotbGlicy1kZXZlbCAgICAgYnJs
+YXBpLWRldmVsICAgICBiemlwMiAgICAgYnppcDItZGV2ZWwgICAgIGNjYWNoZSAgICAgY2xhbmcg
+ICAgIGRldmljZS1tYXBwZXItbXVsdGlwYXRoLWRldmVsICAgICBmaW5kdXRpbHMgICAgIGZsZXgg
+ICAgIGdjYyAgICAgZ2NjLWMrKyAgICAgZ2V0dGV4dCAgICAgZ2l0ICAgICBnbGliMi1kZXZlbCAg
+ICAgZ2x1c3RlcmZzLWFwaS1kZXZlbCAgICAgZ251dGxzLWRldmVsICAgICBndGszLWRldmVsICAg
+ICBob3N0bmFtZSAgICAgbGliYWlvLWRldmVsICAgICBsaWJhc2FuICAgICBsaWJhdHRyLWRldmVs
+ICAgICBsaWJjYXAtZGV2ZWwgICAgIGxpYmNhcC1uZy1kZXZlbCAgICAgbGliY3VybC1kZXZlbCAg
+ICAgbGliZmR0LWRldmVsICAgICBsaWJqcGVnLWRldmVsICAgICBsaWJwbmctZGV2ZWwgICAgIGxp
+YnJiZC1kZXZlbCAgICAgbGlic3NoMi1kZXZlbCAgICAgbGlidWJzYW4gICAgIGxpYnVzYngtZGV2
+ZWwgICAgIGxpYnhtbDItZGV2ZWwgICAgIGxsdm0gICAgIGx6by1kZXZlbCAgICAgbWFrZSAgICAg
+bWluZ3czMi1iemlwMiAgICAgbWluZ3czMi1jdXJsICAgICBtaW5ndzMyLWdsaWIyICAgICBtaW5n
+dzMyLWdtcCAgICAgbWluZ3czMi1nbnV0bHMgICAgIG1pbmd3MzItZ3RrMyAgICAgbWluZ3czMi1s
+aWJqcGVnLXR1cmJvICAgICBtaW5ndzMyLWxpYnBuZyAgICAgbWluZ3czMi1saWJzc2gyICAgICBt
+aW5ndzMyLWxpYnRhc24xICAgICBtaW5ndzMyLW5ldHRsZSAgICAgbWluZ3czMi1waXhtYW4gICAg
+IG1pbmd3MzItcGtnLWNvbmZpZyAgICAgbWluZ3czMi1TREwyICAgICBtaW5ndzY0LWJ6aXAyICAg
+ICBtaW5ndzY0LWN1cmwgICAgIG1pbmd3NjQtZ2xpYjIgICAgIG1pbmd3NjQtZ21wICAgICBtaW5n
+dzY0LWdudXRscyAgICAgbWluZ3c2NC1ndGszICAgICBtaW5ndzY0LWxpYmpwZWctdHVyYm8gICAg
+IG1pbmd3NjQtbGlicG5nICAgICBtaW5ndzY0LWxpYnNzaDIgICAgIG1pbmd3NjQtbGlidGFzbjEg
+ICAgIG1pbmd3NjQtbmV0dGxlICAgICBtaW5ndzY0LXBpeG1hbiAgICAgbWluZ3c2NC1wa2ctY29u
+ZmlnICAgICBtaW5ndzY0LVNETDIgICAgIG5jdXJzZXMtZGV2ZWwgICAgIG5ldHRsZS1kZXZlbCAg
+ICAgbnNzLWRldmVsICAgICBudW1hY3RsLWRldmVsICAgICBwZXJsICAgICBwaXhtYW4tZGV2ZWwg
+ICAgIHB5dGhvbjMgICAgIFB5WUFNTCAgICAgU0RMMi1kZXZlbCAgICAgc25hcHB5LWRldmVsICAg
+ICBzcGFyc2UgICAgIHNwaWNlLXNlcnZlci1kZXZlbCAgICAgc3lzdGVtdGFwLXNkdC1kZXZlbCAg
+ICAgdGFyICAgICB1c2JyZWRpci1kZXZlbCAgICAgdmlyZ2xyZW5kZXJlci1kZXZlbCAgICAgdnRl
+My1kZXZlbCAgICAgd2hpY2ggICAgIHhlbi1kZXZlbCAgICAgemxpYi1kZXZlbApKPTgKVj0KSE9T
+VE5BTUU9MTY5MGRiNmY5YzUwCkRFQlVHPQpTSE9XX0VOVj0xClBXRD0vCkhPTUU9LwpDQ0FDSEVf
+RElSPS92YXIvdG1wL2NjYWNoZQpGQlI9ZjI4CkRJU1RUQUc9ZjI4Y29udGFpbmVyClFFTVVfQ09O
+RklHVVJFX09QVFM9LS1weXRob249L3Vzci9iaW4vcHl0aG9uMwpGR0M9ZjI4ClRFU1RfRElSPS90
+bXAvcWVtdS10ZXN0ClNITFZMPTEKRkVBVFVSRVM9bWluZ3cgY2xhbmcgcHl5YW1sIGFzYW4gZHRj
+ClBBVEg9L3Vzci9saWIvY2NhY2hlOi91c3IvbGliNjQvY2NhY2hlOi91c3IvbG9jYWwvc2Jpbjov
+dXNyL2xvY2FsL2JpbjovdXNyL3NiaW46L3Vzci9iaW46L3NiaW46L2JpbgpNQUtFRkxBR1M9IC1q
+OApFWFRSQV9DT05GSUdVUkVfT1BUUz0KXz0vdXNyL2Jpbi9lbnYKCkNvbmZpZ3VyZSBvcHRpb25z
+OgotLWVuYWJsZS13ZXJyb3IgLS10YXJnZXQtbGlzdD14ODZfNjQtc29mdG1tdSxhYXJjaDY0LXNv
+ZnRtbXUgLS1wcmVmaXg9L3RtcC9xZW11LXRlc3QvaW5zdGFsbCAtLXB5dGhvbj0vdXNyL2Jpbi9w
+eXRob24zIC0tY3Jvc3MtcHJlZml4PXg4Nl82NC13NjQtbWluZ3czMi0gLS1lbmFibGUtdHJhY2Ut
+YmFja2VuZHM9c2ltcGxlIC0tZW5hYmxlLWdudXRscyAtLWVuYWJsZS1uZXR0bGUgLS1lbmFibGUt
+Y3VybCAtLWVuYWJsZS12bmMgLS1lbmFibGUtYnppcDIgLS1lbmFibGUtZ3Vlc3QtYWdlbnQgLS13
+aXRoLXNkbGFiaT0yLjAKSW5zdGFsbCBwcmVmaXggICAgL3RtcC9xZW11LXRlc3QvaW5zdGFsbApC
+SU9TIGRpcmVjdG9yeSAgICAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsCmZpcm13YXJlIHBhdGggICAg
+IC90bXAvcWVtdS10ZXN0L2luc3RhbGwvc2hhcmUvcWVtdS1maXJtd2FyZQpiaW5hcnkgZGlyZWN0
+b3J5ICAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsCmxpYnJhcnkgZGlyZWN0b3J5IC90bXAvcWVtdS10
+ZXN0L2luc3RhbGwvbGliCm1vZHVsZSBkaXJlY3RvcnkgIC90bXAvcWVtdS10ZXN0L2luc3RhbGwv
+bGliCmxpYmV4ZWMgZGlyZWN0b3J5IC90bXAvcWVtdS10ZXN0L2luc3RhbGwvbGliZXhlYwppbmNs
+dWRlIGRpcmVjdG9yeSAvdG1wL3FlbXUtdGVzdC9pbnN0YWxsL2luY2x1ZGUKY29uZmlnIGRpcmVj
+dG9yeSAgL3RtcC9xZW11LXRlc3QvaW5zdGFsbApsb2NhbCBzdGF0ZSBkaXJlY3RvcnkgICBxdWVy
+aWVkIGF0IHJ1bnRpbWUKV2luZG93cyBTREsgICAgICAgbm8KU291cmNlIHBhdGggICAgICAgL3Rt
+cC9xZW11LXRlc3Qvc3JjCkdJVCBiaW5hcnkgICAgICAgIGdpdApHSVQgc3VibW9kdWxlcyAgICAK
+QyBjb21waWxlciAgICAgICAgeDg2XzY0LXc2NC1taW5ndzMyLWdjYwpIb3N0IEMgY29tcGlsZXIg
+ICBjYwpDKysgY29tcGlsZXIgICAgICB4ODZfNjQtdzY0LW1pbmd3MzItZysrCk9iamVjdGl2ZS1D
+IGNvbXBpbGVyIGNsYW5nCkFSRkxBR1MgICAgICAgICAgIHJ2CkNGTEFHUyAgICAgICAgICAgIC1P
+MiAtVV9GT1JUSUZZX1NPVVJDRSAtRF9GT1JUSUZZX1NPVVJDRT0yIC1nIApRRU1VX0NGTEFHUyAg
+ICAgICAtSS91c3IveDg2XzY0LXc2NC1taW5ndzMyL3N5cy1yb290L21pbmd3L2luY2x1ZGUvcGl4
+bWFuLTEgIC1JJChTUkNfUEFUSCkvZHRjL2xpYmZkdCAtV2Vycm9yIC1ESEFTX0xJQlNTSDJfU0ZU
+UF9GU1lOQyAtSS91c3IveDg2XzY0LXc2NC1taW5ndzMyL3N5cy1yb290L21pbmd3L2luY2x1ZGUg
+IC1tbXMtYml0ZmllbGRzIC1JL3Vzci94ODZfNjQtdzY0LW1pbmd3MzIvc3lzLXJvb3QvbWluZ3cv
+aW5jbHVkZS9nbGliLTIuMCAtSS91c3IveDg2XzY0LXc2NC1taW5ndzMyL3N5cy1yb290L21pbmd3
+L2xpYi9nbGliLTIuMC9pbmNsdWRlIC1JL3Vzci94ODZfNjQtdzY0LW1pbmd3MzIvc3lzLXJvb3Qv
+bWluZ3cvaW5jbHVkZSAgLW02NCAtbWN4MTYgLW10aHJlYWRzIC1EX19VU0VfTUlOR1dfQU5TSV9T
+VERJTz0xIC1EV0lOMzJfTEVBTl9BTkRfTUVBTiAtRFdJTlZFUj0weDUwMSAtRF9HTlVfU09VUkNF
+IC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90
+b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1X
+bWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3Jh
+cHYgIC1XZXhwYW5zaW9uLXRvLWRlZmluZWQgLVdlbmRpZi1sYWJlbHMgLVduby1zaGlmdC1uZWdh
+dGl2ZS12YWx1ZSAtV25vLW1pc3NpbmctaW5jbHVkZS1kaXJzIC1XZW1wdHktYm9keSAtV25lc3Rl
+ZC1leHRlcm5zIC1XZm9ybWF0LXNlY3VyaXR5IC1XZm9ybWF0LXkyayAtV2luaXQtc2VsZiAtV2ln
+bm9yZWQtcXVhbGlmaWVycyAtV29sZC1zdHlsZS1kZWNsYXJhdGlvbiAtV29sZC1zdHlsZS1kZWZp
+bml0aW9uIC1XdHlwZS1saW1pdHMgLWZzdGFjay1wcm90ZWN0b3Itc3Ryb25nIC1JL3Vzci94ODZf
+NjQtdzY0LW1pbmd3MzIvc3lzLXJvb3QvbWluZ3cvaW5jbHVkZSAtSS91c3IveDg2XzY0LXc2NC1t
+aW5ndzMyL3N5cy1yb290L21pbmd3L2luY2x1ZGUvcDExLWtpdC0xICAtSS91c3IveDg2XzY0LXc2
+NC1taW5ndzMyL3N5cy1yb290L21pbmd3L2luY2x1ZGUgICAtSS91c3IveDg2XzY0LXc2NC1taW5n
+dzMyL3N5cy1yb290L21pbmd3L2luY2x1ZGUvbGlicG5nMTYgCkxERkxBR1MgICAgICAgICAgIC1X
+bCwtLW54Y29tcGF0IC1XbCwtLW5vLXNlaCAtV2wsLS1keW5hbWljYmFzZSAtV2wsLS13YXJuLWNv
+bW1vbiAtbTY0IC1nIApRRU1VX0xERkxBR1MgICAgICAtTCQoQlVJTERfRElSKS9kdGMvbGliZmR0
+IAptYWtlICAgICAgICAgICAgICBtYWtlCmluc3RhbGwgICAgICAgICAgIGluc3RhbGwKcHl0aG9u
+ICAgICAgICAgICAgL3Vzci9iaW4vcHl0aG9uMyAtQgpzbWJkICAgICAgICAgICAgICAvdXNyL3Ni
+aW4vc21iZAptb2R1bGUgc3VwcG9ydCAgICBubwpob3N0IENQVSAgICAgICAgICB4ODZfNjQKaG9z
+dCBiaWcgZW5kaWFuICAgbm8KdGFyZ2V0IGxpc3QgICAgICAgeDg2XzY0LXNvZnRtbXUgYWFyY2g2
+NC1zb2Z0bW11Cmdwcm9mIGVuYWJsZWQgICAgIG5vCnNwYXJzZSBlbmFibGVkICAgIG5vCnN0cmlw
+IGJpbmFyaWVzICAgIHllcwpwcm9maWxlciAgICAgICAgICBubwpzdGF0aWMgYnVpbGQgICAgICBu
+bwpTREwgc3VwcG9ydCAgICAgICB5ZXMgKDIuMC45KQpHVEsgc3VwcG9ydCAgICAgICB5ZXMgKDMu
+MjIuMzApCkdUSyBHTCBzdXBwb3J0ICAgIG5vClZURSBzdXBwb3J0ICAgICAgIG5vIApUTFMgcHJp
+b3JpdHkgICAgICBOT1JNQUwKR05VVExTIHN1cHBvcnQgICAgeWVzCmxpYmdjcnlwdCAgICAgICAg
+IG5vCm5ldHRsZSAgICAgICAgICAgIHllcyAoMy40KQpsaWJ0YXNuMSAgICAgICAgICB5ZXMKY3Vy
+c2VzIHN1cHBvcnQgICAgbm8KdmlyZ2wgc3VwcG9ydCAgICAgbm8gCmN1cmwgc3VwcG9ydCAgICAg
+IHllcwptaW5ndzMyIHN1cHBvcnQgICB5ZXMKQXVkaW8gZHJpdmVycyAgICAgZHNvdW5kCkJsb2Nr
+IHdoaXRlbGlzdCAocncpIApCbG9jayB3aGl0ZWxpc3QgKHJvKSAKVmlydEZTIHN1cHBvcnQgICAg
+bm8KTXVsdGlwYXRoIHN1cHBvcnQgbm8KVk5DIHN1cHBvcnQgICAgICAgeWVzClZOQyBTQVNMIHN1
+cHBvcnQgIG5vClZOQyBKUEVHIHN1cHBvcnQgIHllcwpWTkMgUE5HIHN1cHBvcnQgICB5ZXMKeGVu
+IHN1cHBvcnQgICAgICAgbm8KYnJsYXBpIHN1cHBvcnQgICAgbm8KYmx1ZXogIHN1cHBvcnQgICAg
+bm8KRG9jdW1lbnRhdGlvbiAgICAgbm8KUElFICAgICAgICAgICAgICAgbm8KdmRlIHN1cHBvcnQg
+ICAgICAgbm8KbmV0bWFwIHN1cHBvcnQgICAgbm8KTGludXggQUlPIHN1cHBvcnQgbm8KQVRUUi9Y
+QVRUUiBzdXBwb3J0IG5vCkluc3RhbGwgYmxvYnMgICAgIHllcwpLVk0gc3VwcG9ydCAgICAgICBu
+bwpIQVggc3VwcG9ydCAgICAgICB5ZXMKSFZGIHN1cHBvcnQgICAgICAgbm8KV0hQWCBzdXBwb3J0
+ICAgICAgbm8KVENHIHN1cHBvcnQgICAgICAgeWVzClRDRyBkZWJ1ZyBlbmFibGVkIG5vClRDRyBp
+bnRlcnByZXRlciAgIG5vCm1hbGxvYyB0cmltIHN1cHBvcnQgbm8KUkRNQSBzdXBwb3J0ICAgICAg
+bm8KUFZSRE1BIHN1cHBvcnQgICAgbm8KZmR0IHN1cHBvcnQgICAgICAgZ2l0Cm1lbWJhcnJpZXIg
+ICAgICAgIG5vCnByZWFkdiBzdXBwb3J0ICAgIG5vCmZkYXRhc3luYyAgICAgICAgIG5vCm1hZHZp
+c2UgICAgICAgICAgIG5vCnBvc2l4X21hZHZpc2UgICAgIG5vCnBvc2l4X21lbWFsaWduICAgIG5v
+CmxpYmNhcC1uZyBzdXBwb3J0IG5vCnZob3N0LW5ldCBzdXBwb3J0IG5vCnZob3N0LWNyeXB0byBz
+dXBwb3J0IG5vCnZob3N0LXNjc2kgc3VwcG9ydCBubwp2aG9zdC12c29jayBzdXBwb3J0IG5vCnZo
+b3N0LXVzZXIgc3VwcG9ydCBubwpUcmFjZSBiYWNrZW5kcyAgICBzaW1wbGUKVHJhY2Ugb3V0cHV0
+IGZpbGUgdHJhY2UtPHBpZD4Kc3BpY2Ugc3VwcG9ydCAgICAgbm8gCnJiZCBzdXBwb3J0ICAgICAg
+IG5vCnhmc2N0bCBzdXBwb3J0ICAgIG5vCnNtYXJ0Y2FyZCBzdXBwb3J0IG5vCmxpYnVzYiAgICAg
+ICAgICAgIG5vCnVzYiBuZXQgcmVkaXIgICAgIG5vCk9wZW5HTCBzdXBwb3J0ICAgIG5vCk9wZW5H
+TCBkbWFidWZzICAgIG5vCmxpYmlzY3NpIHN1cHBvcnQgIG5vCmxpYm5mcyBzdXBwb3J0ICAgIG5v
+CmJ1aWxkIGd1ZXN0IGFnZW50IHllcwpRR0EgVlNTIHN1cHBvcnQgICBubwpRR0EgdzMyIGRpc2sg
+aW5mbyB5ZXMKUUdBIE1TSSBzdXBwb3J0ICAgbm8Kc2VjY29tcCBzdXBwb3J0ICAgbm8KY29yb3V0
+aW5lIGJhY2tlbmQgd2luMzIKY29yb3V0aW5lIHBvb2wgICAgeWVzCmRlYnVnIHN0YWNrIHVzYWdl
+IG5vCm11dGV4IGRlYnVnZ2luZyAgIG5vCmNyeXB0byBhZmFsZyAgICAgIG5vCkdsdXN0ZXJGUyBz
+dXBwb3J0IG5vCmdjb3YgICAgICAgICAgICAgIGdjb3YKZ2NvdiBlbmFibGVkICAgICAgbm8KVFBN
+IHN1cHBvcnQgICAgICAgeWVzCmxpYnNzaDIgc3VwcG9ydCAgIHllcwpUUE0gcGFzc3Rocm91Z2gg
+ICBubwpUUE0gZW11bGF0b3IgICAgICBubwpRT00gZGVidWdnaW5nICAgICB5ZXMKTGl2ZSBibG9j
+ayBtaWdyYXRpb24geWVzCmx6byBzdXBwb3J0ICAgICAgIG5vCnNuYXBweSBzdXBwb3J0ICAgIG5v
+CmJ6aXAyIHN1cHBvcnQgICAgIHllcwpOVU1BIGhvc3Qgc3VwcG9ydCBubwpsaWJ4bWwyICAgICAg
+ICAgICBubwp0Y21hbGxvYyBzdXBwb3J0ICBubwpqZW1hbGxvYyBzdXBwb3J0ICBubwphdngyIG9w
+dGltaXphdGlvbiB5ZXMKcmVwbGljYXRpb24gc3VwcG9ydCB5ZXMKVnhIUyBibG9jayBkZXZpY2Ug
+bm8KYm9jaHMgc3VwcG9ydCAgICAgeWVzCmNsb29wIHN1cHBvcnQgICAgIHllcwpkbWcgc3VwcG9y
+dCAgICAgICB5ZXMKcWNvdyB2MSBzdXBwb3J0ICAgeWVzCnZkaSBzdXBwb3J0ICAgICAgIHllcwp2
+dmZhdCBzdXBwb3J0ICAgICB5ZXMKcWVkIHN1cHBvcnQgICAgICAgeWVzCnBhcmFsbGVscyBzdXBw
+b3J0IHllcwpzaGVlcGRvZyBzdXBwb3J0ICB5ZXMKY2Fwc3RvbmUgICAgICAgICAgbm8KZG9ja2Vy
+ICAgICAgICAgICAgbm8KbGlicG1lbSBzdXBwb3J0ICAgbm8KbGlidWRldiAgICAgICAgICAgbm8K
+Ck5PVEU6IGNyb3NzLWNvbXBpbGVycyBlbmFibGVkOiAgJ3g4Nl82NC13NjQtbWluZ3czMi1nY2Mn
+CiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5tYWsudG1wCiAgR0VOICAg
+ICBhYXJjaDY0LXNvZnRtbXUvY29uZmlnLWRldmljZXMubWFrLnRtcAogIEdFTiAgICAgY29uZmln
+LWhvc3QuaAogIEdFTiAgICAgcWVtdS1vcHRpb25zLmRlZgogIEdFTiAgICAgcWFwaS1nZW4KICBH
+RU4gICAgIHRyYWNlL2dlbmVyYXRlZC10Y2ctdHJhY2Vycy5oCiAgR0VOICAgICB0cmFjZS9nZW5l
+cmF0ZWQtaGVscGVycy13cmFwcGVycy5oCiAgR0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtaGVscGVy
+cy5oCiAgR0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtaGVscGVycy5jCiAgR0VOICAgICBhYXJjaDY0
+LXNvZnRtbXUvY29uZmlnLWRldmljZXMubWFrCiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9jb25m
+aWctZGV2aWNlcy5tYWsKICBHRU4gICAgIG1vZHVsZV9ibG9jay5oCiAgR0VOICAgICB1aS9pbnB1
+dC1rZXltYXAtYXRzZXQxLXRvLXFjb2RlLmMKICBHRU4gICAgIHVpL2lucHV0LWtleW1hcC1saW51
+eC10by1xY29kZS5jCiAgR0VOICAgICB1aS9pbnB1dC1rZXltYXAtcWNvZGUtdG8tYXRzZXQxLmMK
+ICBHRU4gICAgIHVpL2lucHV0LWtleW1hcC1xY29kZS10by1hdHNldDIuYwogIEdFTiAgICAgdWkv
+aW5wdXQta2V5bWFwLXFjb2RlLXRvLWF0c2V0My5jCiAgR0VOICAgICB1aS9pbnB1dC1rZXltYXAt
+cWNvZGUtdG8tbGludXguYwogIEdFTiAgICAgdWkvaW5wdXQta2V5bWFwLXFjb2RlLXRvLXFudW0u
+YwogIEdFTiAgICAgdWkvaW5wdXQta2V5bWFwLXFjb2RlLXRvLXN1bi5jCiAgR0VOICAgICB1aS9p
+bnB1dC1rZXltYXAtcW51bS10by1xY29kZS5jCiAgR0VOICAgICB1aS9pbnB1dC1rZXltYXAtdXNi
+LXRvLXFjb2RlLmMKICBHRU4gICAgIHVpL2lucHV0LWtleW1hcC13aW4zMi10by1xY29kZS5jCiAg
+R0VOICAgICB1aS9pbnB1dC1rZXltYXAteDExLXRvLXFjb2RlLmMKICBHRU4gICAgIHVpL2lucHV0
+LWtleW1hcC14b3JnZXZkZXYtdG8tcWNvZGUuYwogIEdFTiAgICAgdWkvaW5wdXQta2V5bWFwLXhv
+cmdrYmQtdG8tcWNvZGUuYwogIEdFTiAgICAgdWkvaW5wdXQta2V5bWFwLXhvcmd4cXVhcnR6LXRv
+LXFjb2RlLmMKICBHRU4gICAgIHVpL2lucHV0LWtleW1hcC14b3JneHdpbi10by1xY29kZS5jCiAg
+R0VOICAgICB1aS9pbnB1dC1rZXltYXAtb3N4LXRvLXFjb2RlLmMKICBHRU4gICAgIHRlc3RzL3Rl
+c3QtcWFwaS1nZW4KICBHRU4gICAgIHRyYWNlLXJvb3QuaAogIEdFTiAgICAgYWNjZWwva3ZtL3Ry
+YWNlLmgKICBHRU4gICAgIGFjY2VsL3RjZy90cmFjZS5oCiAgR0VOICAgICBhdWRpby90cmFjZS5o
+CiAgR0VOICAgICBibG9jay90cmFjZS5oCiAgR0VOICAgICBjaGFyZGV2L3RyYWNlLmgKICBHRU4g
+ICAgIGNyeXB0by90cmFjZS5oCiAgR0VOICAgICBody85cGZzL3RyYWNlLmgKICBHRU4gICAgIGh3
+L2FjcGkvdHJhY2UuaAogIEdFTiAgICAgaHcvYWxwaGEvdHJhY2UuaAogIEdFTiAgICAgaHcvYXJt
+L3RyYWNlLmgKICBHRU4gICAgIGh3L2F1ZGlvL3RyYWNlLmgKICBHRU4gICAgIGh3L2Jsb2NrL3Ry
+YWNlLmgKICBHRU4gICAgIGh3L2Jsb2NrL2RhdGFwbGFuZS90cmFjZS5oCiAgR0VOICAgICBody9j
+aGFyL3RyYWNlLmgKICBHRU4gICAgIGh3L2Rpc3BsYXkvdHJhY2UuaAogIEdFTiAgICAgaHcvZG1h
+L3RyYWNlLmgKICBHRU4gICAgIGh3L2hwcGEvdHJhY2UuaAogIEdFTiAgICAgaHcvaTJjL3RyYWNl
+LmgKICBHRU4gICAgIGh3L2kzODYvdHJhY2UuaAogIEdFTiAgICAgaHcvaTM4Ni94ZW4vdHJhY2Uu
+aAogIEdFTiAgICAgaHcvaWRlL3RyYWNlLmgKICBHRU4gICAgIGh3L2lucHV0L3RyYWNlLmgKICBH
+RU4gICAgIGh3L2ludGMvdHJhY2UuaAogIEdFTiAgICAgaHcvaXNhL3RyYWNlLmgKICBHRU4gICAg
+IGh3L21lbS90cmFjZS5oCiAgR0VOICAgICBody9taXNjL3RyYWNlLmgKICBHRU4gICAgIGh3L21p
+c2MvbWFjaW8vdHJhY2UuaAogIEdFTiAgICAgaHcvbmV0L3RyYWNlLmgKICBHRU4gICAgIGh3L252
+cmFtL3RyYWNlLmgKICBHRU4gICAgIGh3L3BjaS90cmFjZS5oCiAgR0VOICAgICBody9wY2ktaG9z
+dC90cmFjZS5oCiAgR0VOICAgICBody9wcGMvdHJhY2UuaAogIEdFTiAgICAgaHcvcmRtYS90cmFj
+ZS5oCiAgR0VOICAgICBody9yZG1hL3Ztdy90cmFjZS5oCiAgR0VOICAgICBody9zMzkweC90cmFj
+ZS5oCiAgR0VOICAgICBody9zY3NpL3RyYWNlLmgKICBHRU4gICAgIGh3L3NkL3RyYWNlLmgKICBH
+RU4gICAgIGh3L3NwYXJjL3RyYWNlLmgKICBHRU4gICAgIGh3L3NwYXJjNjQvdHJhY2UuaAogIEdF
+TiAgICAgaHcvdGltZXIvdHJhY2UuaAogIEdFTiAgICAgaHcvdHBtL3RyYWNlLmgKICBHRU4gICAg
+IGh3L3VzYi90cmFjZS5oCiAgR0VOICAgICBody92ZmlvL3RyYWNlLmgKICBHRU4gICAgIGh3L3Zp
+cnRpby90cmFjZS5oCiAgR0VOICAgICBody93YXRjaGRvZy90cmFjZS5oCiAgR0VOICAgICBody94
+ZW4vdHJhY2UuaAogIEdFTiAgICAgaW8vdHJhY2UuaAogIEdFTiAgICAgbGludXgtdXNlci90cmFj
+ZS5oCiAgR0VOICAgICBtaWdyYXRpb24vdHJhY2UuaAogIEdFTiAgICAgbmJkL3RyYWNlLmgKICBH
+RU4gICAgIG5ldC90cmFjZS5oCiAgR0VOICAgICBxYXBpL3RyYWNlLmgKICBHRU4gICAgIHFvbS90
+cmFjZS5oCiAgR0VOICAgICBzY3NpL3RyYWNlLmgKICBHRU4gICAgIHRhcmdldC9hcm0vdHJhY2Uu
+aAogIEdFTiAgICAgdGFyZ2V0L2kzODYvdHJhY2UuaAogIEdFTiAgICAgdGFyZ2V0L21pcHMvdHJh
+Y2UuaAogIEdFTiAgICAgdGFyZ2V0L3BwYy90cmFjZS5oCiAgR0VOICAgICB0YXJnZXQvczM5MHgv
+dHJhY2UuaAogIEdFTiAgICAgdGFyZ2V0L3NwYXJjL3RyYWNlLmgKICBHRU4gICAgIHVpL3RyYWNl
+LmgKICBHRU4gICAgIHV0aWwvdHJhY2UuaAogIEdFTiAgICAgdHJhY2Utcm9vdC5jCiAgR0VOICAg
+ICBhY2NlbC9rdm0vdHJhY2UuYwogIEdFTiAgICAgYWNjZWwvdGNnL3RyYWNlLmMKICBHRU4gICAg
+IGF1ZGlvL3RyYWNlLmMKICBHRU4gICAgIGJsb2NrL3RyYWNlLmMKICBHRU4gICAgIGNoYXJkZXYv
+dHJhY2UuYwogIEdFTiAgICAgY3J5cHRvL3RyYWNlLmMKICBHRU4gICAgIGh3LzlwZnMvdHJhY2Uu
+YwogIEdFTiAgICAgaHcvYWNwaS90cmFjZS5jCiAgR0VOICAgICBody9hbHBoYS90cmFjZS5jCiAg
+R0VOICAgICBody9hcm0vdHJhY2UuYwogIEdFTiAgICAgaHcvYXVkaW8vdHJhY2UuYwogIEdFTiAg
+ICAgaHcvYmxvY2svdHJhY2UuYwogIEdFTiAgICAgaHcvYmxvY2svZGF0YXBsYW5lL3RyYWNlLmMK
+ICBHRU4gICAgIGh3L2NoYXIvdHJhY2UuYwogIEdFTiAgICAgaHcvZGlzcGxheS90cmFjZS5jCiAg
+R0VOICAgICBody9kbWEvdHJhY2UuYwogIEdFTiAgICAgaHcvaHBwYS90cmFjZS5jCiAgR0VOICAg
+ICBody9pMmMvdHJhY2UuYwogIEdFTiAgICAgaHcvaTM4Ni90cmFjZS5jCiAgR0VOICAgICBody9p
+Mzg2L3hlbi90cmFjZS5jCiAgR0VOICAgICBody9pZGUvdHJhY2UuYwogIEdFTiAgICAgaHcvaW5w
+dXQvdHJhY2UuYwogIEdFTiAgICAgaHcvaW50Yy90cmFjZS5jCiAgR0VOICAgICBody9pc2EvdHJh
+Y2UuYwogIEdFTiAgICAgaHcvbWVtL3RyYWNlLmMKICBHRU4gICAgIGh3L21pc2MvdHJhY2UuYwog
+IEdFTiAgICAgaHcvbWlzYy9tYWNpby90cmFjZS5jCiAgR0VOICAgICBody9uZXQvdHJhY2UuYwog
+IEdFTiAgICAgaHcvbnZyYW0vdHJhY2UuYwogIEdFTiAgICAgaHcvcGNpL3RyYWNlLmMKICBHRU4g
+ICAgIGh3L3BjaS1ob3N0L3RyYWNlLmMKICBHRU4gICAgIGh3L3BwYy90cmFjZS5jCiAgR0VOICAg
+ICBody9yZG1hL3RyYWNlLmMKICBHRU4gICAgIGh3L3JkbWEvdm13L3RyYWNlLmMKICBHRU4gICAg
+IGh3L3MzOTB4L3RyYWNlLmMKICBHRU4gICAgIGh3L3Njc2kvdHJhY2UuYwogIEdFTiAgICAgaHcv
+c2QvdHJhY2UuYwogIEdFTiAgICAgaHcvc3BhcmMvdHJhY2UuYwogIEdFTiAgICAgaHcvc3BhcmM2
+NC90cmFjZS5jCiAgR0VOICAgICBody90aW1lci90cmFjZS5jCiAgR0VOICAgICBody90cG0vdHJh
+Y2UuYwogIEdFTiAgICAgaHcvdXNiL3RyYWNlLmMKICBHRU4gICAgIGh3L3ZmaW8vdHJhY2UuYwog
+IEdFTiAgICAgaHcvdmlydGlvL3RyYWNlLmMKICBHRU4gICAgIGh3L3dhdGNoZG9nL3RyYWNlLmMK
+ICBHRU4gICAgIGh3L3hlbi90cmFjZS5jCiAgR0VOICAgICBpby90cmFjZS5jCiAgR0VOICAgICBs
+aW51eC11c2VyL3RyYWNlLmMKICBHRU4gICAgIG1pZ3JhdGlvbi90cmFjZS5jCiAgR0VOICAgICBu
+YmQvdHJhY2UuYwogIEdFTiAgICAgbmV0L3RyYWNlLmMKICBHRU4gICAgIHFhcGkvdHJhY2UuYwog
+IEdFTiAgICAgcW9tL3RyYWNlLmMKICBHRU4gICAgIHNjc2kvdHJhY2UuYwogIEdFTiAgICAgdGFy
+Z2V0L2FybS90cmFjZS5jCiAgR0VOICAgICB0YXJnZXQvaTM4Ni90cmFjZS5jCiAgR0VOICAgICB0
+YXJnZXQvbWlwcy90cmFjZS5jCiAgR0VOICAgICB0YXJnZXQvcHBjL3RyYWNlLmMKICBHRU4gICAg
+IHRhcmdldC9zMzkweC90cmFjZS5jCiAgR0VOICAgICB0YXJnZXQvc3BhcmMvdHJhY2UuYwogIEdF
+TiAgICAgdWkvdHJhY2UuYwogIEdFTiAgICAgdXRpbC90cmFjZS5jCiAgR0VOICAgICBjb25maWct
+YWxsLWRldmljZXMubWFrCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZHVtcHRy
+ZWVzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy90cmVlcy5TCgkgREVQIC90
+bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvdmFsdWUtbGFiZWxzLmMKCSBERVAgL3RtcC9xZW11
+LXRlc3Qvc3JjL2R0Yy90ZXN0cy90ZXN0dXRpbHMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMv
+ZHRjL3Rlc3RzL2FzbV90cmVlX2R1bXAuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rl
+c3RzL3RydW5jYXRlZF9tZW1yc3YuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3Rz
+L3RydW5jYXRlZF9zdHJpbmcuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3Ry
+dW5jYXRlZF9wcm9wZXJ0eS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvY2hl
+Y2tfZnVsbC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvY2hlY2tfcGF0aC5j
+CgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvY2hlY2tfaGVhZGVyLmMKCSBERVAg
+L3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9vdmVybGF5X2JhZF9maXh1cC5jCgkgREVQIC90
+bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvb3ZlcmxheS5jCgkgREVQIC90bXAvcWVtdS10ZXN0
+L3NyYy9kdGMvdGVzdHMvc3Vibm9kZV9pdGVyYXRlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3Jj
+L2R0Yy90ZXN0cy9pbnRlZ2VyLWV4cHJlc3Npb25zLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3Jj
+L2R0Yy90ZXN0cy9wcm9wZXJ0eV9pdGVyYXRlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0
+Yy90ZXN0cy91dGlsZmR0X3Rlc3QuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3Rz
+L3BhdGhfb2Zmc2V0X2FsaWFzZXMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3Rz
+L2FkZF9zdWJub2RlX3dpdGhfbm9wcy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVz
+dHMvZHRic19lcXVhbF91bm9yZGVyZWQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rl
+c3RzL2R0Yl9yZXZlcnNlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9kdGJz
+X2VxdWFsX29yZGVyZWQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2V4dHJh
+LXRlcm1pbmF0aW5nLW51bGwuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2lu
+Y2Jpbi5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvYm9vdC1jcHVpZC5jCgkg
+REVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvcGhhbmRsZV9mb3JtYXQuYwoJIERFUCAv
+dG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3BhdGgtcmVmZXJlbmNlcy5jCgkgREVQIC90bXAv
+cWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvcmVmZXJlbmNlcy5jCgkgREVQIC90bXAvcWVtdS10ZXN0
+L3NyYy9kdGMvdGVzdHMvc3RyaW5nX2VzY2FwZXMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMv
+ZHRjL3Rlc3RzL3Byb3BuYW1lX2VzY2FwZXMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRj
+L3Rlc3RzL2FwcGVuZHByb3AyLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9h
+cHBlbmRwcm9wMS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZGVsX25vZGUu
+YwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2RlbF9wcm9wZXJ0eS5jCgkgREVQ
+IC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvc2V0cHJvcC5jCgkgREVQIC90bXAvcWVtdS10
+ZXN0L3NyYy9kdGMvdGVzdHMvc2V0X25hbWUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRj
+L3Rlc3RzL3J3X3RyZWUxLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9vcGVu
+X3BhY2suYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL25vcHVsYXRlLmMKCSBE
+RVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9tYW5nbGUtbGF5b3V0LmMKCSBERVAgL3Rt
+cC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9tb3ZlX2FuZF9zYXZlLmMKCSBERVAgL3RtcC9xZW11
+LXRlc3Qvc3JjL2R0Yy90ZXN0cy9zd19zdGF0ZXMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMv
+ZHRjL3Rlc3RzL3N3X3RyZWUxLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9u
+b3Bfbm9kZS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvbm9wX3Byb3BlcnR5
+LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9zZXRwcm9wX2lucGxhY2UuYwoJ
+IERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL3N0cmluZ2xpc3QuYwoJIERFUCAvdG1w
+L3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2FkZHJfc2l6ZV9jZWxsczIuYwoJIERFUCAvdG1wL3Fl
+bXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2FkZHJfc2l6ZV9jZWxscy5jCgkgREVQIC90bXAvcWVtdS10
+ZXN0L3NyYy9kdGMvdGVzdHMvbm90Zm91bmQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRj
+L3Rlc3RzL3NpemVkX2NlbGxzLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9j
+aGFyX2xpdGVyYWwuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2dldF9hbGlh
+cy5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvbm9kZV9vZmZzZXRfYnlfY29t
+cGF0aWJsZS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvbm9kZV9jaGVja19j
+b21wYXRpYmxlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9ub2RlX29mZnNl
+dF9ieV9waGFuZGxlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9ub2RlX29m
+ZnNldF9ieV9wcm9wX3ZhbHVlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9w
+YXJlbnRfb2Zmc2V0LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9zdXBlcm5v
+ZGVfYXRkZXB0aF9vZmZzZXQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3Rlc3RzL2dl
+dF9wYXRoLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9nZXRfcGhhbmRsZS5j
+CgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZ2V0cHJvcC5jCgkgREVQIC90bXAv
+cWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvZ2V0X25hbWUuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9z
+cmMvZHRjL3Rlc3RzL3BhdGhfb2Zmc2V0LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90
+ZXN0cy9zdWJub2RlX29mZnNldC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMv
+ZmluZF9wcm9wZXJ0eS5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvdGVzdHMvcm9vdF9u
+b2RlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy90ZXN0cy9nZXRfbWVtX3Jzdi5jCgkg
+REVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0L2ZkdF9vdmVybGF5LmMKCSBERVAgL3Rt
+cC9xZW11LXRlc3Qvc3JjL2R0Yy9saWJmZHQvZmR0X2FkZHJlc3Nlcy5jCgkgREVQIC90bXAvcWVt
+dS10ZXN0L3NyYy9kdGMvbGliZmR0L2ZkdF9lbXB0eV90cmVlLmMKCSBERVAgL3RtcC9xZW11LXRl
+c3Qvc3JjL2R0Yy9saWJmZHQvZmR0X3N0cmVycm9yLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3Jj
+L2R0Yy9saWJmZHQvZmR0X3J3LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9saWJmZHQv
+ZmR0X3N3LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9saWJmZHQvZmR0X3dpcC5jCgkg
+REVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0L2ZkdF9yby5jCgkgREVQIC90bXAvcWVt
+dS10ZXN0L3NyYy9kdGMvbGliZmR0L2ZkdC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMv
+dXRpbC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvZmR0b3ZlcmxheS5jCgkgREVQIC90
+bXAvcWVtdS10ZXN0L3NyYy9kdGMvZmR0cHV0LmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0
+Yy9mZHRnZXQuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2ZkdGR1bXAuYwoJIExFWCBj
+b252ZXJ0LWR0c3YwLWxleGVyLmxleC5jCgkgREVQIC90bXAvcWVtdS10ZXN0L3NyYy9kdGMvc3Jj
+cG9zLmMKCSBCSVNPTiBkdGMtcGFyc2VyLnRhYi5jCgkgTEVYIGR0Yy1sZXhlci5sZXguYwoJIERF
+UCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3RyZWVzb3VyY2UuYwoJIERFUCAvdG1wL3FlbXUtdGVz
+dC9zcmMvZHRjL2xpdmV0cmVlLmMKCSBERVAgL3RtcC9xZW11LXRlc3Qvc3JjL2R0Yy9mc3RyZWUu
+YwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2ZsYXR0cmVlLmMKCSBERVAgL3RtcC9xZW11
+LXRlc3Qvc3JjL2R0Yy9kdGMuYwoJIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2RhdGEuYwoJ
+IERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2NoZWNrcy5jCgkgREVQIGNvbnZlcnQtZHRzdjAt
+bGV4ZXIubGV4LmMKCSBERVAgZHRjLXBhcnNlci50YWIuYwoJIERFUCBkdGMtbGV4ZXIubGV4LmMK
+CUNISyB2ZXJzaW9uX2dlbi5oCglVUEQgdmVyc2lvbl9nZW4uaAoJIERFUCAvdG1wL3FlbXUtdGVz
+dC9zcmMvZHRjL3V0aWwuYwoJIENDIGxpYmZkdC9mZHQubwoJIENDIGxpYmZkdC9mZHRfcm8ubwoJ
+IENDIGxpYmZkdC9mZHRfd2lwLm8KCSBDQyBsaWJmZHQvZmR0X3N3Lm8KCSBDQyBsaWJmZHQvZmR0
+X3J3Lm8KCSBDQyBsaWJmZHQvZmR0X3N0cmVycm9yLm8KCSBDQyBsaWJmZHQvZmR0X2VtcHR5X3Ry
+ZWUubwoJIENDIGxpYmZkdC9mZHRfYWRkcmVzc2VzLm8KCSBDQyBsaWJmZHQvZmR0X292ZXJsYXku
+bwoJIEFSIGxpYmZkdC9saWJmZHQuYQp4ODZfNjQtdzY0LW1pbmd3MzItYXI6IGNyZWF0aW5nIGxp
+YmZkdC9saWJmZHQuYQphIC0gbGliZmR0L2ZkdC5vCmEgLSBsaWJmZHQvZmR0X3JvLm8KYSAtIGxp
+YmZkdC9mZHRfd2lwLm8KYSAtIGxpYmZkdC9mZHRfc3cubwphIC0gbGliZmR0L2ZkdF9ydy5vCmEg
+LSBsaWJmZHQvZmR0X3N0cmVycm9yLm8KYSAtIGxpYmZkdC9mZHRfZW1wdHlfdHJlZS5vCmEgLSBs
+aWJmZHQvZmR0X2FkZHJlc3Nlcy5vCmEgLSBsaWJmZHQvZmR0X292ZXJsYXkubwogIFJDICAgICAg
+dmVyc2lvbi5vCiAgR0VOICAgICBxZ2EvcWFwaS1nZW5lcmF0ZWQvcWFwaS1nZW4KICBDQyAgICAg
+IHFhcGkvcWFwaS1idWlsdGluLXR5cGVzLm8KICBDQyAgICAgIHFhcGkvcWFwaS10eXBlcy5vCiAg
+Q0MgICAgICBxYXBpL3FhcGktdHlwZXMtYmxvY2stY29yZS5vCiAgQ0MgICAgICBxYXBpL3FhcGkt
+dHlwZXMtYmxvY2subwogIENDICAgICAgcWFwaS9xYXBpLXR5cGVzLWNoYXIubwogIENDICAgICAg
+cWFwaS9xYXBpLXR5cGVzLWNvbW1vbi5vCiAgQ0MgICAgICBxYXBpL3FhcGktdHlwZXMtY3J5cHRv
+Lm8KICBDQyAgICAgIHFhcGkvcWFwaS10eXBlcy1pbnRyb3NwZWN0Lm8KICBDQyAgICAgIHFhcGkv
+cWFwaS10eXBlcy1qb2IubwogIENDICAgICAgcWFwaS9xYXBpLXR5cGVzLW1pZ3JhdGlvbi5vCiAg
+Q0MgICAgICBxYXBpL3FhcGktdHlwZXMtbWlzYy5vCiAgQ0MgICAgICBxYXBpL3FhcGktdHlwZXMt
+bmV0Lm8KICBDQyAgICAgIHFhcGkvcWFwaS10eXBlcy1yb2NrZXIubwogIENDICAgICAgcWFwaS9x
+YXBpLXR5cGVzLXJ1bi1zdGF0ZS5vCiAgQ0MgICAgICBxYXBpL3FhcGktdHlwZXMtc29ja2V0cy5v
+CiAgQ0MgICAgICBxYXBpL3FhcGktdHlwZXMtdHBtLm8KICBDQyAgICAgIHFhcGkvcWFwaS10eXBl
+cy10cmFjZS5vCiAgQ0MgICAgICBxYXBpL3FhcGktdHlwZXMtdHJhbnNhY3Rpb24ubwogIENDICAg
+ICAgcWFwaS9xYXBpLXR5cGVzLXVpLm8KICBDQyAgICAgIHFhcGkvcWFwaS1idWlsdGluLXZpc2l0
+Lm8KICBDQyAgICAgIHFhcGkvcWFwaS12aXNpdC5vCiAgQ0MgICAgICBxYXBpL3FhcGktdmlzaXQt
+YmxvY2stY29yZS5vCiAgQ0MgICAgICBxYXBpL3FhcGktdmlzaXQtYmxvY2subwogIENDICAgICAg
+cWFwaS9xYXBpLXZpc2l0LWNvbW1vbi5vCiAgQ0MgICAgICBxYXBpL3FhcGktdmlzaXQtY2hhci5v
+CiAgQ0MgICAgICBxYXBpL3FhcGktdmlzaXQtY3J5cHRvLm8KICBDQyAgICAgIHFhcGkvcWFwaS12
+aXNpdC1pbnRyb3NwZWN0Lm8KICBDQyAgICAgIHFhcGkvcWFwaS12aXNpdC1taWdyYXRpb24ubwog
+IENDICAgICAgcWFwaS9xYXBpLXZpc2l0LWpvYi5vCiAgQ0MgICAgICBxYXBpL3FhcGktdmlzaXQt
+bWlzYy5vCiAgQ0MgICAgICBxYXBpL3FhcGktdmlzaXQtbmV0Lm8KICBDQyAgICAgIHFhcGkvcWFw
+aS12aXNpdC1yb2NrZXIubwogIENDICAgICAgcWFwaS9xYXBpLXZpc2l0LXJ1bi1zdGF0ZS5vCiAg
+Q0MgICAgICBxYXBpL3FhcGktdmlzaXQtc29ja2V0cy5vCiAgQ0MgICAgICBxYXBpL3FhcGktdmlz
+aXQtdHBtLm8KICBDQyAgICAgIHFhcGkvcWFwaS12aXNpdC10cmFjZS5vCiAgQ0MgICAgICBxYXBp
+L3FhcGktdmlzaXQtdWkubwogIENDICAgICAgcWFwaS9xYXBpLXZpc2l0LXRyYW5zYWN0aW9uLm8K
+ICBDQyAgICAgIHFhcGkvcWFwaS1ldmVudHMubwogIENDICAgICAgcWFwaS9xYXBpLWV2ZW50cy1i
+bG9jay1jb3JlLm8KICBDQyAgICAgIHFhcGkvcWFwaS1ldmVudHMtYmxvY2subwogIENDICAgICAg
+cWFwaS9xYXBpLWV2ZW50cy1jaGFyLm8KICBDQyAgICAgIHFhcGkvcWFwaS1ldmVudHMtY29tbW9u
+Lm8KICBDQyAgICAgIHFhcGkvcWFwaS1ldmVudHMtY3J5cHRvLm8KICBDQyAgICAgIHFhcGkvcWFw
+aS1ldmVudHMtaW50cm9zcGVjdC5vCiAgQ0MgICAgICBxYXBpL3FhcGktZXZlbnRzLWpvYi5vCiAg
+Q0MgICAgICBxYXBpL3FhcGktZXZlbnRzLW1pZ3JhdGlvbi5vCiAgQ0MgICAgICBxYXBpL3FhcGkt
+ZXZlbnRzLW1pc2MubwogIENDICAgICAgcWFwaS9xYXBpLWV2ZW50cy1uZXQubwogIENDICAgICAg
+cWFwaS9xYXBpLWV2ZW50cy1yb2NrZXIubwogIENDICAgICAgcWFwaS9xYXBpLWV2ZW50cy1ydW4t
+c3RhdGUubwogIENDICAgICAgcWFwaS9xYXBpLWV2ZW50cy1zb2NrZXRzLm8KICBDQyAgICAgIHFh
+cGkvcWFwaS1ldmVudHMtdHBtLm8KICBDQyAgICAgIHFhcGkvcWFwaS1ldmVudHMtdHJhY2Uubwog
+IENDICAgICAgcWFwaS9xYXBpLWV2ZW50cy10cmFuc2FjdGlvbi5vCiAgQ0MgICAgICBxYXBpL3Fh
+cGktZXZlbnRzLXVpLm8KICBDQyAgICAgIHFhcGkvcWFwaS1pbnRyb3NwZWN0Lm8KICBDQyAgICAg
+IHFhcGkvcWFwaS12aXNpdC1jb3JlLm8KICBDQyAgICAgIHFhcGkvcWFwaS1kZWFsbG9jLXZpc2l0
+b3IubwogIENDICAgICAgcWFwaS9xb2JqZWN0LWlucHV0LXZpc2l0b3IubwogIENDICAgICAgcWFw
+aS9xb2JqZWN0LW91dHB1dC12aXNpdG9yLm8KICBDQyAgICAgIHFhcGkvcW1wLXJlZ2lzdHJ5Lm8K
+ICBDQyAgICAgIHFhcGkvcW1wLWRpc3BhdGNoLm8KICBDQyAgICAgIHFhcGkvc3RyaW5nLWlucHV0
+LXZpc2l0b3IubwogIENDICAgICAgcWFwaS9zdHJpbmctb3V0cHV0LXZpc2l0b3IubwogIENDICAg
+ICAgcWFwaS9vcHRzLXZpc2l0b3IubwogIENDICAgICAgcWFwaS9xYXBpLWNsb25lLXZpc2l0b3Iu
+bwogIENDICAgICAgcWFwaS9xbXAtZXZlbnQubwogIENDICAgICAgcWFwaS9xYXBpLXV0aWwubwog
+IENDICAgICAgcW9iamVjdC9xbnVsbC5vCiAgQ0MgICAgICBxb2JqZWN0L3FudW0ubwogIENDICAg
+ICAgcW9iamVjdC9xc3RyaW5nLm8KICBDQyAgICAgIHFvYmplY3QvcWRpY3QubwogIENDICAgICAg
+cW9iamVjdC9xbGlzdC5vCiAgQ0MgICAgICBxb2JqZWN0L3Fib29sLm8KICBDQyAgICAgIHFvYmpl
+Y3QvcWxpdC5vCiAgQ0MgICAgICBxb2JqZWN0L3Fqc29uLm8KICBDQyAgICAgIHFvYmplY3QvcW9i
+amVjdC5vCiAgQ0MgICAgICBxb2JqZWN0L2pzb24tbGV4ZXIubwogIENDICAgICAgcW9iamVjdC9q
+c29uLXN0cmVhbWVyLm8KICBDQyAgICAgIHFvYmplY3QvanNvbi1wYXJzZXIubwogIENDICAgICAg
+cW9iamVjdC9ibG9jay1xZGljdC5vCiAgQ0MgICAgICB0cmFjZS9zaW1wbGUubwogIENDICAgICAg
+dHJhY2UvY29udHJvbC5vCiAgQ0MgICAgICB0cmFjZS9xbXAubwogIENDICAgICAgdXRpbC9vc2Rl
+cC5vCiAgQ0MgICAgICB1dGlsL2N1dGlscy5vCiAgQ0MgICAgICB1dGlsL3VuaWNvZGUubwogIEND
+ICAgICAgdXRpbC9xZW11LXRpbWVyLWNvbW1vbi5vCiAgQ0MgICAgICB1dGlsL2J1ZmZlcmlzemVy
+by5vCiAgQ0MgICAgICB1dGlsL2xvY2tjbnQubwogIENDICAgICAgdXRpbC9haW9jYi5vCiAgQ0Mg
+ICAgICB1dGlsL2FzeW5jLm8KICBDQyAgICAgIHV0aWwvYWlvLXdhaXQubwogIENDICAgICAgdXRp
+bC90aHJlYWQtcG9vbC5vCiAgQ0MgICAgICB1dGlsL3FlbXUtdGltZXIubwogIENDICAgICAgdXRp
+bC9tYWluLWxvb3AubwogIENDICAgICAgdXRpbC9pb2hhbmRsZXIubwogIENDICAgICAgdXRpbC9h
+aW8td2luMzIubwogIENDICAgICAgdXRpbC9ldmVudF9ub3RpZmllci13aW4zMi5vCiAgQ0MgICAg
+ICB1dGlsL29zbGliLXdpbjMyLm8KICBDQyAgICAgIHV0aWwvcWVtdS10aHJlYWQtd2luMzIubwog
+IENDICAgICAgdXRpbC9lbnZsaXN0Lm8KICBDQyAgICAgIHV0aWwvcGF0aC5vCiAgQ0MgICAgICB1
+dGlsL21vZHVsZS5vCiAgQ0MgICAgICB1dGlsL2hvc3QtdXRpbHMubwogIENDICAgICAgdXRpbC9i
+aXRtYXAubwogIENDICAgICAgdXRpbC9iaXRvcHMubwogIENDICAgICAgdXRpbC9oYml0bWFwLm8K
+ICBDQyAgICAgIHV0aWwvZmlmbzgubwogIENDICAgICAgdXRpbC9hY2wubwogIENDICAgICAgdXRp
+bC9jYWNoZWluZm8ubwogIENDICAgICAgdXRpbC9lcnJvci5vCiAgQ0MgICAgICB1dGlsL3FlbXUt
+ZXJyb3IubwogIENDICAgICAgdXRpbC9pZC5vCiAgQ0MgICAgICB1dGlsL2lvdi5vCiAgQ0MgICAg
+ICB1dGlsL3FlbXUtY29uZmlnLm8KICBDQyAgICAgIHV0aWwvcWVtdS1zb2NrZXRzLm8KICBDQyAg
+ICAgIHV0aWwvdXJpLm8KICBDQyAgICAgIHV0aWwvbm90aWZ5Lm8KICBDQyAgICAgIHV0aWwvcWVt
+dS1vcHRpb24ubwogIENDICAgICAgdXRpbC9xZW11LXByb2dyZXNzLm8KICBDQyAgICAgIHV0aWwv
+a2V5dmFsLm8KICBDQyAgICAgIHV0aWwvaGV4ZHVtcC5vCiAgQ0MgICAgICB1dGlsL2NyYzMyYy5v
+CiAgQ0MgICAgICB1dGlsL3V1aWQubwogIENDICAgICAgdXRpbC90aHJvdHRsZS5vCiAgQ0MgICAg
+ICB1dGlsL2dldGF1eHZhbC5vCiAgQ0MgICAgICB1dGlsL3JlYWRsaW5lLm8KICBDQyAgICAgIHV0
+aWwvcmN1Lm8KICBDQyAgICAgIHV0aWwvcWVtdS1jb3JvdXRpbmUubwogIENDICAgICAgdXRpbC9x
+ZW11LWNvcm91dGluZS1sb2NrLm8KICBDQyAgICAgIHV0aWwvcWVtdS1jb3JvdXRpbmUtaW8ubwog
+IENDICAgICAgdXRpbC9xZW11LWNvcm91dGluZS1zbGVlcC5vCiAgQ0MgICAgICB1dGlsL2Nvcm91
+dGluZS13aW4zMi5vCiAgQ0MgICAgICB1dGlsL2J1ZmZlci5vCiAgQ0MgICAgICB1dGlsL3RpbWVk
+LWF2ZXJhZ2UubwogIENDICAgICAgdXRpbC9iYXNlNjQubwogIENDICAgICAgdXRpbC9sb2cubwog
+IENDICAgICAgdXRpbC9wYWdlc2l6ZS5vCiAgQ0MgICAgICB1dGlsL3FkaXN0Lm8KICBDQyAgICAg
+IHV0aWwvcWh0Lm8KICBDQyAgICAgIHV0aWwvcXNwLm8KICBDQyAgICAgIHV0aWwvcmFuZ2Uubwog
+IENDICAgICAgdXRpbC9zdGF0czY0Lm8KICBDQyAgICAgIHV0aWwvc3lzdGVtZC5vCiAgQ0MgICAg
+ICB1dGlsL2lvdmEtdHJlZS5vCiAgQ0MgICAgICB1dGlsL3RocmVhZGVkLXdvcmtxdWV1ZS5vCiAg
+Q0MgICAgICB0cmFjZS1yb290Lm8KICBDQyAgICAgIGFjY2VsL2t2bS90cmFjZS5vCiAgQ0MgICAg
+ICBhY2NlbC90Y2cvdHJhY2UubwogIENDICAgICAgYXVkaW8vdHJhY2UubwogIENDICAgICAgYmxv
+Y2svdHJhY2UubwogIENDICAgICAgY2hhcmRldi90cmFjZS5vCi90bXAvcWVtdS10ZXN0L3NyYy91
+dGlsL3RocmVhZGVkLXdvcmtxdWV1ZS5jOiBJbiBmdW5jdGlvbiAnZ2V0X2ZyZWVfcmVxdWVzdF9i
+aXRtYXAnOgovdG1wL3FlbXUtdGVzdC9zcmMvdXRpbC90aHJlYWRlZC13b3JrcXVldWUuYzoxMzU6
+MTY6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50IDEgb2YgJ2JpdG1hcF94b3InIGZyb20gaW5jb21w
+YXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9pbnRlci10eXBlc10K
+ICAgICBiaXRtYXBfeG9yKCZyZXN1bHRfYml0bWFwLCAmcmVxdWVzdF9maWxsX2JpdG1hcCwgJnJl
+cXVlc3RfZG9uZV9iaXRtYXAsCiAgICAgICAgICAgICAgICBeCkluIGZpbGUgaW5jbHVkZWQgZnJv
+bSAvdG1wL3FlbXUtdGVzdC9zcmMvdXRpbC90aHJlYWRlZC13b3JrcXVldWUuYzoxNDowOgovdG1w
+L3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xZW11L2JpdG1hcC5oOjE1NDoyMDogbm90ZTogZXhwZWN0
+ZWQgJ2xvbmcgdW5zaWduZWQgaW50IConIGJ1dCBhcmd1bWVudCBpcyBvZiB0eXBlICd1aW50NjRf
+dCAqIHtha2EgbG9uZyBsb25nIHVuc2lnbmVkIGludCAqfScKIHN0YXRpYyBpbmxpbmUgdm9pZCBi
+aXRtYXBfeG9yKHVuc2lnbmVkIGxvbmcgKmRzdCwgY29uc3QgdW5zaWduZWQgbG9uZyAqc3JjMSwK
+ICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy91dGlsL3Ro
+cmVhZGVkLXdvcmtxdWV1ZS5jOjEzNTozMjogZXJyb3I6IHBhc3NpbmcgYXJndW1lbnQgMiBvZiAn
+Yml0bWFwX3hvcicgZnJvbSBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlIFstV2Vycm9yPWluY29t
+cGF0aWJsZS1wb2ludGVyLXR5cGVzXQogICAgIGJpdG1hcF94b3IoJnJlc3VsdF9iaXRtYXAsICZy
+ZXF1ZXN0X2ZpbGxfYml0bWFwLCAmcmVxdWVzdF9kb25lX2JpdG1hcCwKICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBeCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9z
+cmMvdXRpbC90aHJlYWRlZC13b3JrcXVldWUuYzoxNDowOgovdG1wL3FlbXUtdGVzdC9zcmMvaW5j
+bHVkZS9xZW11L2JpdG1hcC5oOjE1NDoyMDogbm90ZTogZXhwZWN0ZWQgJ2NvbnN0IGxvbmcgdW5z
+aWduZWQgaW50IConIGJ1dCBhcmd1bWVudCBpcyBvZiB0eXBlICd1aW50NjRfdCAqIHtha2EgbG9u
+ZyBsb25nIHVuc2lnbmVkIGludCAqfScKIHN0YXRpYyBpbmxpbmUgdm9pZCBiaXRtYXBfeG9yKHVu
+c2lnbmVkIGxvbmcgKmRzdCwgY29uc3QgdW5zaWduZWQgbG9uZyAqc3JjMSwKICAgICAgICAgICAg
+ICAgICAgICBefn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy91dGlsL3RocmVhZGVkLXdvcmtx
+dWV1ZS5jOjEzNTo1NDogZXJyb3I6IHBhc3NpbmcgYXJndW1lbnQgMyBvZiAnYml0bWFwX3hvcicg
+ZnJvbSBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlIFstV2Vycm9yPWluY29tcGF0aWJsZS1wb2lu
+dGVyLXR5cGVzXQogICAgIGJpdG1hcF94b3IoJnJlc3VsdF9iaXRtYXAsICZyZXF1ZXN0X2ZpbGxf
+Yml0bWFwLCAmcmVxdWVzdF9kb25lX2JpdG1hcCwKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9x
+ZW11LXRlc3Qvc3JjL3V0aWwvdGhyZWFkZWQtd29ya3F1ZXVlLmM6MTQ6MDoKL3RtcC9xZW11LXRl
+c3Qvc3JjL2luY2x1ZGUvcWVtdS9iaXRtYXAuaDoxNTQ6MjA6IG5vdGU6IGV4cGVjdGVkICdjb25z
+dCBsb25nIHVuc2lnbmVkIGludCAqJyBidXQgYXJndW1lbnQgaXMgb2YgdHlwZSAndWludDY0X3Qg
+KiB7YWthIGxvbmcgbG9uZyB1bnNpZ25lZCBpbnQgKn0nCiBzdGF0aWMgaW5saW5lIHZvaWQgYml0
+bWFwX3hvcih1bnNpZ25lZCBsb25nICpkc3QsIGNvbnN0IHVuc2lnbmVkIGxvbmcgKnNyYzEsCiAg
+ICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvdXRpbC90aHJl
+YWRlZC13b3JrcXVldWUuYzogSW4gZnVuY3Rpb24gJ2ZpbmRfdGhyZWFkX2ZyZWVfcmVxdWVzdCc6
+Ci90bXAvcWVtdS10ZXN0L3NyYy91dGlsL3RocmVhZGVkLXdvcmtxdWV1ZS5jOjE1MzozNDogZXJy
+b3I6IHBhc3NpbmcgYXJndW1lbnQgMSBvZiAnZmluZF9maXJzdF96ZXJvX2JpdCcgZnJvbSBpbmNv
+bXBhdGlibGUgcG9pbnRlciB0eXBlIFstV2Vycm9yPWluY29tcGF0aWJsZS1wb2ludGVyLXR5cGVz
+XQogICAgIGluZGV4ICA9IGZpbmRfZmlyc3RfemVyb19iaXQoJnJlc3VsdF9iaXRtYXAsIHRocmVh
+ZHMtPnRocmVhZF9yZXF1ZXN0c19ucik7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBeCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xZW11
+L2JpdG1hcC5oOjE2OjAsCiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMv
+dXRpbC90aHJlYWRlZC13b3JrcXVldWUuYzoxNDoKL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUv
+cWVtdS9iaXRvcHMuaDoyMTE6Mjk6IG5vdGU6IGV4cGVjdGVkICdjb25zdCBsb25nIHVuc2lnbmVk
+IGludCAqJyBidXQgYXJndW1lbnQgaXMgb2YgdHlwZSAndWludDY0X3QgKiB7YWthIGxvbmcgbG9u
+ZyB1bnNpZ25lZCBpbnQgKn0nCiBzdGF0aWMgaW5saW5lIHVuc2lnbmVkIGxvbmcgZmluZF9maXJz
+dF96ZXJvX2JpdChjb25zdCB1bnNpZ25lZCBsb25nICphZGRyLAogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvdGhy
+ZWFkZWQtd29ya3F1ZXVlLmM6IEluIGZ1bmN0aW9uICd0aHJlYWRfZmluZF9maXJzdF92YWxpZF9y
+ZXF1ZXN0X2luZGV4JzoKL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvdGhyZWFkZWQtd29ya3F1ZXVl
+LmM6MjE3OjE2OiBlcnJvcjogcGFzc2luZyBhcmd1bWVudCAxIG9mICdiaXRtYXBfeG9yJyBmcm9t
+IGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGUgWy1XZXJyb3I9aW5jb21wYXRpYmxlLXBvaW50ZXIt
+dHlwZXNdCiAgICAgYml0bWFwX3hvcigmcmVzdWx0X2JpdG1hcCwgJnJlcXVlc3RfZmlsbF9iaXRt
+YXAsICZyZXF1ZXN0X2RvbmVfYml0bWFwLAogICAgICAgICAgICAgICAgXgpJbiBmaWxlIGluY2x1
+ZGVkIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvdGhyZWFkZWQtd29ya3F1ZXVlLmM6MTQ6
+MDoKL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcWVtdS9iaXRtYXAuaDoxNTQ6MjA6IG5vdGU6
+IGV4cGVjdGVkICdsb25nIHVuc2lnbmVkIGludCAqJyBidXQgYXJndW1lbnQgaXMgb2YgdHlwZSAn
+dWludDY0X3QgKiB7YWthIGxvbmcgbG9uZyB1bnNpZ25lZCBpbnQgKn0nCiBzdGF0aWMgaW5saW5l
+IHZvaWQgYml0bWFwX3hvcih1bnNpZ25lZCBsb25nICpkc3QsIGNvbnN0IHVuc2lnbmVkIGxvbmcg
+KnNyYzEsCiAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMv
+dXRpbC90aHJlYWRlZC13b3JrcXVldWUuYzoyMTc6MzI6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50
+IDIgb2YgJ2JpdG1hcF94b3InIGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJv
+cj1pbmNvbXBhdGlibGUtcG9pbnRlci10eXBlc10KICAgICBiaXRtYXBfeG9yKCZyZXN1bHRfYml0
+bWFwLCAmcmVxdWVzdF9maWxsX2JpdG1hcCwgJnJlcXVlc3RfZG9uZV9iaXRtYXAsCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9xZW11
+LXRlc3Qvc3JjL3V0aWwvdGhyZWFkZWQtd29ya3F1ZXVlLmM6MTQ6MDoKL3RtcC9xZW11LXRlc3Qv
+c3JjL2luY2x1ZGUvcWVtdS9iaXRtYXAuaDoxNTQ6MjA6IG5vdGU6IGV4cGVjdGVkICdjb25zdCBs
+b25nIHVuc2lnbmVkIGludCAqJyBidXQgYXJndW1lbnQgaXMgb2YgdHlwZSAndWludDY0X3QgKiB7
+YWthIGxvbmcgbG9uZyB1bnNpZ25lZCBpbnQgKn0nCiBzdGF0aWMgaW5saW5lIHZvaWQgYml0bWFw
+X3hvcih1bnNpZ25lZCBsb25nICpkc3QsIGNvbnN0IHVuc2lnbmVkIGxvbmcgKnNyYzEsCiAgICAg
+ICAgICAgICAgICAgICAgXn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvdXRpbC90aHJlYWRl
+ZC13b3JrcXVldWUuYzoyMTc6NTQ6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50IDMgb2YgJ2JpdG1h
+cF94b3InIGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBhdGli
+bGUtcG9pbnRlci10eXBlc10KICAgICBiaXRtYXBfeG9yKCZyZXN1bHRfYml0bWFwLCAmcmVxdWVz
+dF9maWxsX2JpdG1hcCwgJnJlcXVlc3RfZG9uZV9iaXRtYXAsCiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KSW4gZmlsZSBpbmNsdWRlZCBmcm9t
+IC90bXAvcWVtdS10ZXN0L3NyYy91dGlsL3RocmVhZGVkLXdvcmtxdWV1ZS5jOjE0OjA6Ci90bXAv
+cWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FlbXUvYml0bWFwLmg6MTU0OjIwOiBub3RlOiBleHBlY3Rl
+ZCAnY29uc3QgbG9uZyB1bnNpZ25lZCBpbnQgKicgYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUgJ3Vp
+bnQ2NF90ICoge2FrYSBsb25nIGxvbmcgdW5zaWduZWQgaW50ICp9Jwogc3RhdGljIGlubGluZSB2
+b2lkIGJpdG1hcF94b3IodW5zaWduZWQgbG9uZyAqZHN0LCBjb25zdCB1bnNpZ25lZCBsb25nICpz
+cmMxLAogICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL3V0
+aWwvdGhyZWFkZWQtd29ya3F1ZXVlLmM6MjI1OjI4OiBlcnJvcjogcGFzc2luZyBhcmd1bWVudCAx
+IG9mICdmaW5kX2ZpcnN0X2JpdCcgZnJvbSBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlIFstV2Vy
+cm9yPWluY29tcGF0aWJsZS1wb2ludGVyLXR5cGVzXQogICAgIGluZGV4ID0gZmluZF9maXJzdF9i
+aXQoJnJlc3VsdF9iaXRtYXAsIHRocmVhZHMtPnRocmVhZF9yZXF1ZXN0c19ucik7CiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBeCkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVz
+dC9zcmMvaW5jbHVkZS9xZW11L2JpdG1hcC5oOjE2OjAsCiAgICAgICAgICAgICAgICAgZnJvbSAv
+dG1wL3FlbXUtdGVzdC9zcmMvdXRpbC90aHJlYWRlZC13b3JrcXVldWUuYzoxNDoKL3RtcC9xZW11
+LXRlc3Qvc3JjL2luY2x1ZGUvcWVtdS9iaXRvcHMuaDoxODg6Mjk6IG5vdGU6IGV4cGVjdGVkICdj
+b25zdCBsb25nIHVuc2lnbmVkIGludCAqJyBidXQgYXJndW1lbnQgaXMgb2YgdHlwZSAndWludDY0
+X3QgKiB7YWthIGxvbmcgbG9uZyB1bnNpZ25lZCBpbnQgKn0nCiBzdGF0aWMgaW5saW5lIHVuc2ln
+bmVkIGxvbmcgZmluZF9maXJzdF9iaXQoY29uc3QgdW5zaWduZWQgbG9uZyAqYWRkciwKICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMv
+dXRpbC90aHJlYWRlZC13b3JrcXVldWUuYzogSW4gZnVuY3Rpb24gJ21hcmtfcmVxdWVzdF9mcmVl
+JzoKL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvdGhyZWFkZWQtd29ya3F1ZXVlLmM6MjM4OjMwOiBl
+cnJvcjogcGFzc2luZyBhcmd1bWVudCAyIG9mICdjaGFuZ2VfYml0X2F0b21pYycgZnJvbSBpbmNv
+bXBhdGlibGUgcG9pbnRlciB0eXBlIFstV2Vycm9yPWluY29tcGF0aWJsZS1wb2ludGVyLXR5cGVz
+XQogICAgIGNoYW5nZV9iaXRfYXRvbWljKGluZGV4LCAmdGhyZWFkLT5yZXF1ZXN0X2RvbmVfYml0
+bWFwKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgpJbiBmaWxlIGluY2x1ZGVkIGZy
+b20gL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcWVtdS9iaXRtYXAuaDoxNjowLAogICAgICAg
+ICAgICAgICAgIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvdGhyZWFkZWQtd29ya3F1ZXVl
+LmM6MTQ6Ci90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FlbXUvYml0b3BzLmg6ODc6MjA6IG5v
+dGU6IGV4cGVjdGVkICdsb25nIHVuc2lnbmVkIGludCAqJyBidXQgYXJndW1lbnQgaXMgb2YgdHlw
+ZSAndWludDY0X3QgKiB7YWthIGxvbmcgbG9uZyB1bnNpZ25lZCBpbnQgKn0nCiBzdGF0aWMgaW5s
+aW5lIHZvaWQgY2hhbmdlX2JpdF9hdG9taWMobG9uZyBuciwgdW5zaWduZWQgbG9uZyAqYWRkcikK
+ICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMv
+dXRpbC90aHJlYWRlZC13b3JrcXVldWUuYzogSW4gZnVuY3Rpb24gJ3RocmVhZGVkX3dvcmtxdWV1
+ZV93YWl0X2Zvcl9yZXF1ZXN0cyc6Ci90bXAvcWVtdS10ZXN0L3NyYy91dGlsL3RocmVhZGVkLXdv
+cmtxdWV1ZS5jOjQ1NTozMzogZXJyb3I6IHBhc3NpbmcgYXJndW1lbnQgMiBvZiAndGVzdF9iaXQn
+IGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9p
+bnRlci10eXBlc10KICAgICAgICAgICAgIGlmICh0ZXN0X2JpdChpbmRleCwgJnJlc3VsdF9iaXRt
+YXApKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KSW4gZmlsZSBpbmNsdWRl
+ZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FlbXUvYml0bWFwLmg6MTY6MCwKICAg
+ICAgICAgICAgICAgICBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy91dGlsL3RocmVhZGVkLXdvcmtx
+dWV1ZS5jOjE0OgovdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xZW11L2JpdG9wcy5oOjE0NTox
+OTogbm90ZTogZXhwZWN0ZWQgJ2NvbnN0IGxvbmcgdW5zaWduZWQgaW50IConIGJ1dCBhcmd1bWVu
+dCBpcyBvZiB0eXBlICd1aW50NjRfdCAqIHtha2EgbG9uZyBsb25nIHVuc2lnbmVkIGludCAqfScK
+IHN0YXRpYyBpbmxpbmUgaW50IHRlc3RfYml0KGxvbmcgbnIsIGNvbnN0IHVuc2lnbmVkIGxvbmcg
+KmFkZHIpCiAgICAgICAgICAgICAgICAgICBefn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWlu
+ZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5t
+YWs6Njk6IHV0aWwvdGhyZWFkZWQtd29ya3F1ZXVlLm9dIEVycm9yIDEKbWFrZTogKioqIFdhaXRp
+bmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBDQyAgICAgIGNyeXB0by90cmFjZS5vClRyYWNl
+YmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2Nr
+ZXIucHkiLCBsaW5lIDU2MywgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKICBGaWxl
+ICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDU2MCwgaW4gbWFpbgogICAgcmV0dXJu
+IGFyZ3MuY21kb2JqLnJ1bihhcmdzLCBhcmd2KQogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tl
+ci5weSIsIGxpbmUgMzA2LCBpbiBydW4KICAgIHJldHVybiBEb2NrZXIoKS5ydW4oYXJndiwgYXJn
+cy5rZWVwLCBxdWlldD1hcmdzLnF1aWV0KQogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5w
+eSIsIGxpbmUgMjc0LCBpbiBydW4KICAgIHF1aWV0PXF1aWV0KQogIEZpbGUgIi4vdGVzdHMvZG9j
+a2VyL2RvY2tlci5weSIsIGxpbmUgMTgxLCBpbiBfZG9fY2hlY2sKICAgIHJldHVybiBzdWJwcm9j
+ZXNzLmNoZWNrX2NhbGwoc2VsZi5fY29tbWFuZCArIGNtZCwgKiprd2FyZ3MpCiAgRmlsZSAiL3Vz
+ci9saWI2NC9weXRob24yLjcvc3VicHJvY2Vzcy5weSIsIGxpbmUgNTQyLCBpbiBjaGVja19jYWxs
+CiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNh
+bGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4n
+LCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTA3ZmFlMGM0ZWU5ZDExZThiMjI0
+NjhiNTk5NzNiN2QwJywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11
+bmNvbmZpbmVkJywgJy0tcm0nLCAnLS1uZXQ9bm9uZScsICctZScsICdUQVJHRVRfTElTVD0nLCAn
+LWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9OCcsICct
+ZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIv
+dG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2Fj
+aGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1w
+LTF2dXNxaDl2L3NyYy9kb2NrZXItc3JjLjIwMTgtMTEtMjItMTYuMjQuMjMuMjMyMTg6L3Zhci90
+bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3Qt
+bWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMgptYWtlWzFdOiAqKiogW2Rv
+Y2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3Bh
+dGNoZXctdGVzdGVyLXRtcC0xdnVzcWg5di9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0
+LW1pbmd3QGZlZG9yYV0gRXJyb3IgMgoKcmVhbAkxbTMwLjY5OXMKdXNlcgkwbTE2Ljg0OHMKc3lz
+CTBtMy41NzBzCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
+ZGU6IDIKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
+cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
+ZXZlbEByZWRoYXQuY29t
