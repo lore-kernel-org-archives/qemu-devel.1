@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55046)
+Received: from eggs.gnu.org ([208.118.235.92]:55019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gPntw-0000Nw-EL
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:16:12 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPntp-0000Nv-J8
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:16:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gPnmk-0007xx-Tl
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:08:46 -0500
-References: <1542261954-4060-1-git-send-email-liq3ea@gmail.com>
-	<da889f34-09b3-6c01-050a-778b86a731fa@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <815170fb-b014-23cd-f1ad-03969a7964e7@vivier.eu>
-Date: Thu, 22 Nov 2018 13:08:17 +0100
-MIME-Version: 1.0
-In-Reply-To: <da889f34-09b3-6c01-050a-778b86a731fa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target: hax: replace g_malloc with
- g_malloc0
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPnsA-0006yK-Fe
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:14:22 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:37550)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gPnsA-0006no-5s
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:14:18 -0500
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Date: Thu, 22 Nov 2018 14:13:38 +0200
+Message-Id: <20181122121402.13764-1-yuval.shaia@oracle.com>
+Subject: [Qemu-devel] [PATCH v5 00/24] Add support for RDMA MAD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +22,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Li Qiang <liq3ea@gmail.com>, rth@twiddle.net, ehabkost@redhat.com
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-On 21/11/2018 18:55, Paolo Bonzini wrote:
-> On 15/11/18 07:05, Li Qiang wrote:
->> And also the g_malloc doesn't need check return value,
->> remove it.
->>
->> Cc: qemu-trivial@nongnu.org
->>
->> Signed-off-by: Li Qiang <liq3ea@gmail.com>
->> ---
->>  target/i386/hax-all.c | 15 +++------------
->>  1 file changed, 3 insertions(+), 12 deletions(-)
->>
->> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
->> index d2e512856b..a460c605af 100644
->> --- a/target/i386/hax-all.c
->> +++ b/target/i386/hax-all.c
->> @@ -154,13 +154,7 @@ int hax_vcpu_create(int id)
->>          return 0;
->>      }
->>  
->> -    vcpu = g_malloc(sizeof(struct hax_vcpu_state));
->> -    if (!vcpu) {
->> -        fprintf(stderr, "Failed to alloc vcpu state\n");
->> -        return -ENOMEM;
->> -    }
->> -
->> -    memset(vcpu, 0, sizeof(struct hax_vcpu_state));
->> +    vcpu = g_malloc0(sizeof(struct hax_vcpu_state));
->>  
->>      ret = hax_host_create_vcpu(hax_global.vm->fd, id);
->>      if (ret) {
->> @@ -250,11 +244,8 @@ struct hax_vm *hax_vm_create(struct hax_state *hax)
->>          return hax->vm;
->>      }
->>  
->> -    vm = g_malloc(sizeof(struct hax_vm));
->> -    if (!vm) {
->> -        return NULL;
->> -    }
->> -    memset(vm, 0, sizeof(struct hax_vm));
->> +    vm = g_malloc0(sizeof(struct hax_vm));
->> +
->>      ret = hax_host_create_vm(hax, &vm_id);
->>      if (ret) {
->>          fprintf(stderr, "Failed to create vm %x\n", ret);
->>
-> 
-> Queued, thanks.
+Hi all.
 
-Markus and Philippe have asked to use g_new0() rather than g_malloc0().
+This is a major enhancement to the pvrdma device to allow it to work with
+state of the art applications such as MPI.
 
-Thanks,
-Laurent
+As described in patch #5, MAD packets are management packets that are used
+for many purposes including but not limited to communication layer above IB
+verbs API.
+
+Patch 1 exposes new external executable (under contrib) that aims to
+address a specific limitation in the RDMA usrespace MAD stack.
+
+This patch-set mainly present MAD enhancement but during the work on it i
+came across some bugs and enhancement needed to be implemented before doing
+any MAD coding. This is the role of patches 2 to 4, 7 to 9 and 15 to 17.
+
+Patches 6 and 18 are cosmetic changes while not relevant to this patchset
+still introduce with it since (at least for 6) hard to decouple.
+
+Patches 12 to 15 couple pvrdma device with vmxnet3 device as this is the
+configuration enforced by pvrdma driver in guest - a vmxnet3 device in
+function 0 and pvrdma device in function 1 in the same PCI slot. Patch 12
+moves needed code from vmxnet3 device to a new header file that can be used
+by pvrdma code while Patches 13 to 15 use of it.
+
+Along with this patch-set there is a parallel patch posted to libvirt to
+apply the change needed there as part of the process implemented in patches
+10 and 11. This change is needed so that guest would be able to configure
+any IP to the Ethernet function of the pvrdma device.
+https://www.redhat.com/archives/libvir-list/2018-November/msg00135.html
+
+Since we maintain external resources such as GIDs on host GID table we need
+to do some cleanup before going down. This is the job of patches 19 and 20.
+
+Patches 21 to 23 contain a fixes for bugs detected during the work on
+processing VM shutdown notification.
+
+Patch 24 fixes documentation.
+
+Review is needed for:
+[05] hw/rdma: Add support for MAD packets
+[11] hw/pvrdma: Add support to allow guest to configure GID table
+[13] hw/pvrdma: Make sure PCI function 0 is vmxnet3
+[17] hw/pvrdma: Fill error code in command's response
+[23] hw/pvrdma: Do not clean resources on shutdown
+[24] docs: Update pvrdma device documentation
+
+And second review is needed for:
+[10] qapi: Define new QMP message for pvrdma
+
+v1 -> v2:
+    * Fix compilation issue detected when compiling for mingw
+    * Address comment from Eric Blake re version of QEMU in json
+      message
+    * Fix example from QMP message in json file
+    * Fix case where a VM tries to remove an invalid GID from GID table
+    * rdmacm-mux: Cleanup entries in socket-gids table when socket is
+      closed
+    * Cleanup resources (GIDs, QPs etc) when VM goes down
+
+v2 -> v3:
+    * Address comment from Cornelia Huck for patch #19
+    * Add some R-Bs from Marcel Apfelbaum and Dmitry Fleytman
+    * Update docs/pvrdma.txt with the changes made by this patchset
+    * Address comments from Shamir Rabinovitch for UMAD multiplexer
+
+v3 -> v4:
+    * Address some comments from Marcel
+    * Add some R-Bs from Cornelia Huck and Shamir Rabinovitch
+
+v4 -> v5:
+    * Add one more patch that deletes code that performs unneeded (and
+      buggy) cleanup of resources during VM shutdown.
+    * Fix race condition that might happen when MAD respose arrive before
+      ack for the send is received.
+    * Based qapi patch on Eric Blake's patch "qapi: Reduce Makefile
+      boilerplate" per Markus Armbruster's suggestion.
+      Please note that this will cause build error until Eric's patch will
+      be applied.
+    * Add some debug log messages to rdmacm-mux
+
+Yuval Shaia (24):
+  contrib/rdmacm-mux: Add implementation of RDMA User MAD multiplexer
+  hw/rdma: Add ability to force notification without re-arm
+  hw/rdma: Return qpn 1 if ibqp is NULL
+  hw/rdma: Abort send-op if fail to create addr handler
+  hw/rdma: Add support for MAD packets
+  hw/pvrdma: Make function reset_device return void
+  hw/pvrdma: Make default pkey 0xFFFF
+  hw/pvrdma: Set the correct opcode for recv completion
+  hw/pvrdma: Set the correct opcode for send completion
+  qapi: Define new QMP message for pvrdma
+  hw/pvrdma: Add support to allow guest to configure GID table
+  vmxnet3: Move some definitions to header file
+  hw/pvrdma: Make sure PCI function 0 is vmxnet3
+  hw/rdma: Initialize node_guid from vmxnet3 mac address
+  hw/pvrdma: Make device state depend on Ethernet function state
+  hw/pvrdma: Fill all CQE fields
+  hw/pvrdma: Fill error code in command's response
+  hw/rdma: Remove unneeded code that handles more that one port
+  vl: Introduce shutdown_notifiers
+  hw/pvrdma: Clean device's resource when system is shutdown
+  hw/rdma: Do not use bitmap_zero_extend to free bitmap
+  hw/rdma: Do not call rdma_backend_del_gid on an empty gid
+  hw/pvrdma: Do not clean resources on shutdown
+  docs: Update pvrdma device documentation
+
+ MAINTAINERS                      |   2 +
+ Makefile                         |   3 +
+ Makefile.objs                    |   2 +
+ contrib/rdmacm-mux/Makefile.objs |   4 +
+ contrib/rdmacm-mux/main.c        | 790 +++++++++++++++++++++++++++++++
+ contrib/rdmacm-mux/rdmacm-mux.h  |  61 +++
+ docs/pvrdma.txt                  | 103 +++-
+ hw/net/vmxnet3.c                 | 116 +----
+ hw/net/vmxnet3_defs.h            | 133 ++++++
+ hw/rdma/rdma_backend.c           | 513 +++++++++++++++++---
+ hw/rdma/rdma_backend.h           |  28 +-
+ hw/rdma/rdma_backend_defs.h      |  19 +-
+ hw/rdma/rdma_rm.c                | 120 ++++-
+ hw/rdma/rdma_rm.h                |  17 +-
+ hw/rdma/rdma_rm_defs.h           |  21 +-
+ hw/rdma/rdma_utils.h             |  24 +
+ hw/rdma/vmw/pvrdma.h             |  10 +-
+ hw/rdma/vmw/pvrdma_cmd.c         | 119 +++--
+ hw/rdma/vmw/pvrdma_main.c        |  61 ++-
+ hw/rdma/vmw/pvrdma_qp_ops.c      |  62 ++-
+ include/sysemu/sysemu.h          |   1 +
+ qapi/qapi-schema.json            |   1 +
+ qapi/rdma.json                   |  38 ++
+ vl.c                             |  15 +-
+ 24 files changed, 1957 insertions(+), 306 deletions(-)
+ create mode 100644 contrib/rdmacm-mux/Makefile.objs
+ create mode 100644 contrib/rdmacm-mux/main.c
+ create mode 100644 contrib/rdmacm-mux/rdmacm-mux.h
+ create mode 100644 hw/net/vmxnet3_defs.h
+ create mode 100644 qapi/rdma.json
+
+-- 
+2.17.2
