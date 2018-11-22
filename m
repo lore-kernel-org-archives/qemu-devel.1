@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gPwpJ-0007Ki-Qt
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:47:59 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gPwtM-0008El-OQ
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:52:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gPwpF-0000x2-L4
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:47:57 -0500
-Received: from 9.mo68.mail-out.ovh.net ([46.105.78.111]:35357)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gPwpF-0000uG-A0
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:47:53 -0500
-Received: from player791.ha.ovh.net (unknown [10.109.159.222])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 425F510631C
-	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 22:47:51 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-6-clg@kaod.org>
-	<20181122044127.GE10448@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <3095c0b4-ebcd-907b-360d-d5e7cdfd3b7d@kaod.org>
-Date: Thu, 22 Nov 2018 22:47:44 +0100
+	(envelope-from <no-reply@patchew.org>) id 1gPwtH-000824-Pr
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:52:08 -0500
+Resent-Message-Id: <E1gPwtH-000824-Pr@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21356)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gPwtH-0007zA-5u
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 16:52:03 -0500
+In-Reply-To: <20181122072028.22819-1-xiaoguangrong@tencent.com>
+Message-ID: <154292254994.3075.15325134887017277128@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20181122044127.GE10448@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 05/36] ppc/xive: introduce the XIVE
- Event Notification Descriptors
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 22 Nov 2018 13:35:52 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] migration: improve multithreads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,453 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: guangrong.xiao@gmail.com
+Cc: famz@redhat.com, pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org, quintela@redhat.com, xiaoguangrong@tencent.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, wei.w.wang@intel.com, cota@braap.org, jiang.biao2@zte.com.cn
 
-On 11/22/18 5:41 AM, David Gibson wrote:
-> On Fri, Nov 16, 2018 at 11:56:58AM +0100, C=E9dric Le Goater wrote:
->> To complete the event routing, the IVRE sub-engine uses an internal
->> table containing Event Notification Descriptor (END) structures.
->>
->> An END specifies on which Event Queue (EQ) the event notification
->> data, defined in the associated EAS, should be posted when an
->> exception occurs. It also defines which Notification Virtual Target
->> (NVT) should be notified.
->>
->> The Event Queue is a memory page provided by the O/S defining a
->> circular buffer, one per server and priority couple, containing Event
->> Queue entries. These are 4 bytes long, the first bit being a
->> 'generation' bit and the 31 following bits the END Data field. They
->> are pulled by the O/S when the exception occurs.
->>
->> The END Data field is a way to set an invariant logical event source
->> number for an IRQ. It is set with the H_INT_SET_SOURCE_CONFIG hcall
->> when the EISN flag is used.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  include/hw/ppc/xive.h      |  18 ++++
->>  include/hw/ppc/xive_regs.h |  48 ++++++++++
->>  hw/intc/xive.c             | 185 ++++++++++++++++++++++++++++++++++++=
--
->>  3 files changed, 248 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->> index 5a0696366577..ce62aaf28343 100644
->> --- a/include/hw/ppc/xive.h
->> +++ b/include/hw/ppc/xive.h
->> @@ -193,11 +193,29 @@ typedef struct XiveRouterClass {
->>      /* XIVE table accessors */
->>      int (*get_eas)(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas);
->>      int (*set_eas)(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas);
->> +    int (*get_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_id=
-x,
->> +                   XiveEND *end);
->> +    int (*set_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_id=
-x,
->> +                   XiveEND *end);
->=20
-> Hrm.  So unlike the EAS, which is basically just a word, the END is a
-> pretty large structure. =20
-
-yes. and so will be the NVT.
-
-> It's unclear here if get/set are expected to copy the whole thing out=20
-> and in,=20
-
-That's the plan.=20
-
-What I had in mind are memory accessors to the XIVE structures, which=20
-are local to QEMU for sPAPR and in the guest RAM for PowerNV (Please
-take a look at the XIVE PowerNV model).
-
-> or if get give you a pointer into a "live" structure=20
-
-no
-
-> and set just does any necessary barriers after an update.
-that would be too complex for the PowerNV model I think. There is a cache
-in between the software running on the (QEMU) machine and the XIVE HW but
-it would be hard to handle.=20
-=20
-> Really, for a non-atomic value like this, I'm not sure get/set is the
-> right model.
-
-ok. we need something to get them out and in.
-
-> Also as I understand it nearly all the indices in XIVE are broken into
-> block/index.  Is there a reason those are folded together into lisn
-> for the EAS, but not for the END?
-
-The indexing of the EAT is global to the sytem and the index defines
-which blk to use. The IRQ source numbers on the powerbus are architected=20
-to be :
-
-    #define XIVE_SRCNO(blk, idx)      ((uint32_t)(blk) << 28 | (idx))
-
-and XIVE can use different strategies to identify the XIVE IC in charge=20
-of routing. It can be a one-to-one chip to block relation as skiboot does=
-.=20
-Using a block scope table is possible also. Our model only supports one=20
-block per chip and some shortcuts are taken but not that much in fact.
-=20
-Remote access to the XIVE structures of another chip are done through=20
-MMIO (not modeled in PowerNV) and the blkid is used to partition the MMIO=
-=20
-regions. Being local is better for performance because the END and NVT=20
-tables have a strong relation with the XIVE subengines using them=20
-(VC and PC).=20
-
-May be, Ben can clarified it this is badly explained.=20
-
->>  } XiveRouterClass;
->> =20
->>  void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mo=
-n);
->> =20
->>  int xive_router_get_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas=
-);
->>  int xive_router_set_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas=
-);
->> +int xive_router_get_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t e=
-nd_idx,
->> +                        XiveEND *end);
->> +int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t e=
-nd_idx,
->> +                        XiveEND *end);
->> +
->> +/*
->> + * For legacy compatibility, the exceptions define up to 256 differen=
-t
->> + * priorities. P9 implements only 9 levels : 8 active levels [0 - 7]
->> + * and the least favored level 0xFF.
->> + */
->> +#define XIVE_PRIORITY_MAX  7
->> +
->> +void xive_end_reset(XiveEND *end);
->> +void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor =
-*mon);
->> =20
->>  #endif /* PPC_XIVE_H */
->> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
->> index 12499b33614c..f97fb2b90bee 100644
->> --- a/include/hw/ppc/xive_regs.h
->> +++ b/include/hw/ppc/xive_regs.h
->> @@ -28,4 +28,52 @@ typedef struct XiveEAS {
->>  #define EAS_END_DATA    PPC_BITMASK(33, 63)      /* Data written to t=
-he END */
->>  } XiveEAS;
->> =20
->> +/* Event Notification Descriptor (END) */
->> +typedef struct XiveEND {
->> +        uint32_t        w0;
->> +#define END_W0_VALID             PPC_BIT32(0) /* "v" bit */
->> +#define END_W0_ENQUEUE           PPC_BIT32(1) /* "q" bit */
->> +#define END_W0_UCOND_NOTIFY      PPC_BIT32(2) /* "n" bit */
->> +#define END_W0_BACKLOG           PPC_BIT32(3) /* "b" bit */
->> +#define END_W0_PRECL_ESC_CTL     PPC_BIT32(4) /* "p" bit */
->> +#define END_W0_ESCALATE_CTL      PPC_BIT32(5) /* "e" bit */
->> +#define END_W0_UNCOND_ESCALATE   PPC_BIT32(6) /* "u" bit - DD2.0 */
->> +#define END_W0_SILENT_ESCALATE   PPC_BIT32(7) /* "s" bit - DD2.0 */
->> +#define END_W0_QSIZE             PPC_BITMASK32(12, 15)
->> +#define END_W0_SW0               PPC_BIT32(16)
->> +#define END_W0_FIRMWARE          END_W0_SW0 /* Owned by FW */
->> +#define END_QSIZE_4K             0
->> +#define END_QSIZE_64K            4
->> +#define END_W0_HWDEP             PPC_BITMASK32(24, 31)
->> +        uint32_t        w1;
->> +#define END_W1_ESn               PPC_BITMASK32(0, 1)
->> +#define END_W1_ESn_P             PPC_BIT32(0)
->> +#define END_W1_ESn_Q             PPC_BIT32(1)
->> +#define END_W1_ESe               PPC_BITMASK32(2, 3)
->> +#define END_W1_ESe_P             PPC_BIT32(2)
->> +#define END_W1_ESe_Q             PPC_BIT32(3)
->> +#define END_W1_GENERATION        PPC_BIT32(9)
->> +#define END_W1_PAGE_OFF          PPC_BITMASK32(10, 31)
->> +        uint32_t        w2;
->> +#define END_W2_MIGRATION_REG     PPC_BITMASK32(0, 3)
->> +#define END_W2_OP_DESC_HI        PPC_BITMASK32(4, 31)
->> +        uint32_t        w3;
->> +#define END_W3_OP_DESC_LO        PPC_BITMASK32(0, 31)
->> +        uint32_t        w4;
->> +#define END_W4_ESC_END_BLOCK     PPC_BITMASK32(4, 7)
->> +#define END_W4_ESC_END_INDEX     PPC_BITMASK32(8, 31)
->> +        uint32_t        w5;
->> +#define END_W5_ESC_END_DATA      PPC_BITMASK32(1, 31)
->> +        uint32_t        w6;
->> +#define END_W6_FORMAT_BIT        PPC_BIT32(8)
->> +#define END_W6_NVT_BLOCK         PPC_BITMASK32(9, 12)
->> +#define END_W6_NVT_INDEX         PPC_BITMASK32(13, 31)
->> +        uint32_t        w7;
->> +#define END_W7_F0_IGNORE         PPC_BIT32(0)
->> +#define END_W7_F0_BLK_GROUPING   PPC_BIT32(1)
->> +#define END_W7_F0_PRIORITY       PPC_BITMASK32(8, 15)
->> +#define END_W7_F1_WAKEZ          PPC_BIT32(0)
->> +#define END_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
->> +} XiveEND;
->> +
->>  #endif /* PPC_XIVE_REGS_H */
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index c4c90a25758e..9cb001e7b540 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -442,6 +442,101 @@ static const TypeInfo xive_source_info =3D {
->>      .class_init    =3D xive_source_class_init,
->>  };
->> =20
->> +/*
->> + * XiveEND helpers
->> + */
->> +
->> +void xive_end_reset(XiveEND *end)
->> +{
->> +    memset(end, 0, sizeof(*end));
->> +
->> +    /* switch off the escalation and notification ESBs */
->> +    end->w1 =3D END_W1_ESe_Q | END_W1_ESn_Q;
->=20
-> It's not obvious to me what circumstances this would be called under.
-> Since the ENDs are in system memory, a memset() seems like an odd
-> thing for (virtual) hardware to be doing to it.
-
-It makes sense on sPAPR if one day some OS starts using the END ESBs for=20
-further coalescing of the events. None does for now but I have added the=20
-model though.=20
-
->> +}
->> +
->> +static void xive_end_queue_pic_print_info(XiveEND *end, uint32_t widt=
-h,
->> +                                          Monitor *mon)
->> +{
->> +    uint64_t qaddr_base =3D (((uint64_t)(end->w2 & 0x0fffffff)) << 32=
-) | end->w3;
->> +    uint32_t qsize =3D GETFIELD(END_W0_QSIZE, end->w0);
->> +    uint32_t qindex =3D GETFIELD(END_W1_PAGE_OFF, end->w1);
->> +    uint32_t qentries =3D 1 << (qsize + 10);
->> +    int i;
->> +
->> +    /*
->> +     * print out the [ (qindex - (width - 1)) .. (qindex + 1)] window
->> +     */
->> +    monitor_printf(mon, " [ ");
->> +    qindex =3D (qindex - (width - 1)) & (qentries - 1);
->> +    for (i =3D 0; i < width; i++) {
->> +        uint64_t qaddr =3D qaddr_base + (qindex << 2);
->> +        uint32_t qdata =3D -1;
->> +
->> +        if (dma_memory_read(&address_space_memory, qaddr, &qdata,
->> +                            sizeof(qdata))) {
->> +            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to read EQ @=
-0x%"
->> +                          HWADDR_PRIx "\n", qaddr);
->> +            return;
->> +        }
->> +        monitor_printf(mon, "%s%08x ", i =3D=3D width - 1 ? "^" : "",
->> +                       be32_to_cpu(qdata));
->> +        qindex =3D (qindex + 1) & (qentries - 1);
->> +    }
->> +    monitor_printf(mon, "]\n");
->> +}
->> +
->> +void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor =
-*mon)
->> +{
->> +    uint64_t qaddr_base =3D (((uint64_t)(end->w2 & 0x0fffffff)) << 32=
-) | end->w3;
->> +    uint32_t qindex =3D GETFIELD(END_W1_PAGE_OFF, end->w1);
->> +    uint32_t qgen =3D GETFIELD(END_W1_GENERATION, end->w1);
->> +    uint32_t qsize =3D GETFIELD(END_W0_QSIZE, end->w0);
->> +    uint32_t qentries =3D 1 << (qsize + 10);
->> +
->> +    uint32_t nvt =3D GETFIELD(END_W6_NVT_INDEX, end->w6);
->> +    uint8_t priority =3D GETFIELD(END_W7_F0_PRIORITY, end->w7);
->> +
->> +    if (!(end->w0 & END_W0_VALID)) {
->> +        return;
->> +    }
->> +
->> +    monitor_printf(mon, "  %08x %c%c%c%c%c prio:%d nvt:%04x eq:@%08"P=
-RIx64
->> +                   "% 6d/%5d ^%d", end_idx,
->> +                   end->w0 & END_W0_VALID ? 'v' : '-',
->> +                   end->w0 & END_W0_ENQUEUE ? 'q' : '-',
->> +                   end->w0 & END_W0_UCOND_NOTIFY ? 'n' : '-',
->> +                   end->w0 & END_W0_BACKLOG ? 'b' : '-',
->> +                   end->w0 & END_W0_ESCALATE_CTL ? 'e' : '-',
->> +                   priority, nvt, qaddr_base, qindex, qentries, qgen)=
-;
->> +
->> +    xive_end_queue_pic_print_info(end, 6, mon);
->> +}
->> +
->> +static void xive_end_push(XiveEND *end, uint32_t data)
->=20
-> s/push/enqueue/ please, "push" suggests a stack.  (Not to mention that
-> "push" and "pull" are used as terms elsewhere in XIVE).
-
-yes. you are right. I will change.
-
->> +{
->> +    uint64_t qaddr_base =3D (((uint64_t)(end->w2 & 0x0fffffff)) << 32=
-) | end->w3;
->> +    uint32_t qsize =3D GETFIELD(END_W0_QSIZE, end->w0);
->> +    uint32_t qindex =3D GETFIELD(END_W1_PAGE_OFF, end->w1);
->> +    uint32_t qgen =3D GETFIELD(END_W1_GENERATION, end->w1);
->> +
->> +    uint64_t qaddr =3D qaddr_base + (qindex << 2);
->> +    uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7fffffff)=
-);
->> +    uint32_t qentries =3D 1 << (qsize + 10);
->> +
->> +    if (dma_memory_write(&address_space_memory, qaddr, &qdata, sizeof=
-(qdata))) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to write END dat=
-a @0x%"
->> +                      HWADDR_PRIx "\n", qaddr);
->> +        return;
->> +    }
->> +
->> +    qindex =3D (qindex + 1) & (qentries - 1);
->> +    if (qindex =3D=3D 0) {
->> +        qgen ^=3D 1;
->> +        end->w1 =3D SETFIELD(END_W1_GENERATION, end->w1, qgen);
->> +    }
->> +    end->w1 =3D SETFIELD(END_W1_PAGE_OFF, end->w1, qindex);
->> +}
->> +
->>  /*
->>   * XIVE Router (aka. Virtualization Controller or IVRE)
->>   */
->> @@ -460,6 +555,82 @@ int xive_router_set_eas(XiveRouter *xrtr, uint32_=
-t lisn, XiveEAS *eas)
->>      return xrc->set_eas(xrtr, lisn, eas);
->>  }
->> =20
->> +int xive_router_get_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t e=
-nd_idx,
->> +                        XiveEND *end)
->> +{
->> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
->> +
->> +   return xrc->get_end(xrtr, end_blk, end_idx, end);
->> +}
->> +
->> +int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t e=
-nd_idx,
->> +                        XiveEND *end)
->> +{
->> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
->> +
->> +   return xrc->set_end(xrtr, end_blk, end_idx, end);
->> +}
->> +
->> +/*
->> + * An END trigger can come from an event trigger (IPI or HW) or from
->> + * another chip. We don't model the PowerBus but the END trigger
->> + * message has the same parameters than in the function below.
->> + */
->> +static void xive_router_end_notify(XiveRouter *xrtr, uint8_t end_blk,
->> +                                   uint32_t end_idx, uint32_t end_dat=
-a)
->> +{
->> +    XiveEND end;
->> +    uint8_t priority;
->> +    uint8_t format;
->> +
->> +    /* END cache lookup */
->> +    if (xive_router_get_end(xrtr, end_blk, end_idx, &end)) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No END %x/%x\n", end_bl=
-k,
->> +                      end_idx);
->> +        return;
->> +    }
->> +
->> +    if (!(end.w0 & END_W0_VALID)) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: END %x/%x is invalid\n"=
-,
->> +                      end_blk, end_idx);
->> +        return;
->> +    }
->> +
->> +    if (end.w0 & END_W0_ENQUEUE) {
->> +        xive_end_push(&end, end_data);
->> +        xive_router_set_end(xrtr, end_blk, end_idx, &end);
->> +    }
->> +
->> +    /*
->> +     * The W7 format depends on the F bit in W6. It defines the type
->> +     * of the notification :
->> +     *
->> +     *   F=3D0 : single or multiple NVT notification
->> +     *   F=3D1 : User level Event-Based Branch (EBB) notification, no
->> +     *         priority
->> +     */
->> +    format =3D GETFIELD(END_W6_FORMAT_BIT, end.w6);
->> +    priority =3D GETFIELD(END_W7_F0_PRIORITY, end.w7);
->> +
->> +    /* The END is masked */
->> +    if (format =3D=3D 0 && priority =3D=3D 0xff) {
->> +        return;
->> +    }
->> +
->> +    /*
->> +     * Check the END ESn (Event State Buffer for notification) for
->> +     * even futher coalescing in the Router
->> +     */
->> +    if (!(end.w0 & END_W0_UCOND_NOTIFY)) {
->> +        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented=
-\n");
->> +        return;
->> +    }
->> +
->> +    /*
->> +     * Follows IVPE notification
->> +     */
->> +}
->> +
->>  static void xive_router_notify(XiveFabric *xf, uint32_t lisn)
->>  {
->>      XiveRouter *xrtr =3D XIVE_ROUTER(xf);
->> @@ -471,9 +642,9 @@ static void xive_router_notify(XiveFabric *xf, uin=
-t32_t lisn)
->>          return;
->>      }
->> =20
->> -    /* The IVRE has a State Bit Cache for its internal sources which
->> -     * is also involed at this point. We skip the SBC lookup because
->> -     * the state bits of the sources are modeled internally in QEMU.
->> +    /* The IVRE checks the State Bit Cache at this point. We skip the
->> +     * SBC lookup because the state bits of the sources are modeled
->> +     * internally in QEMU.
->=20
-> Replacing a comment about something we're not doing with a different
-> comment about something we're not doing doesn't seem very useful.
-> Maybe fold these together into one patch or the other.
-
-That's me rephrasing. it should be indeed in the previous patch
-
-Thanks,
-
-C.
-
->>       */
->> =20
->>      if (!(eas.w & EAS_VALID)) {
->> @@ -485,6 +656,14 @@ static void xive_router_notify(XiveFabric *xf, ui=
-nt32_t lisn)
->>          /* Notification completed */
->>          return;
->>      }
->> +
->> +    /*
->> +     * The event trigger becomes an END trigger
->> +     */
->> +    xive_router_end_notify(xrtr,
->> +                           GETFIELD(EAS_END_BLOCK, eas.w),
->> +                           GETFIELD(EAS_END_INDEX, eas.w),
->> +                           GETFIELD(EAS_END_DATA,  eas.w));
->>  }
->> =20
->>  static Property xive_router_properties[] =3D {
->=20
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+ODExMjIwNzIwMjguMjI4MTktMS14aWFvZ3Vhbmdyb25nQHRlbmNlbnQuY29tClR5cGU6IHNlcmll
+cwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzIDAvNV0gbWlncmF0aW9uOiBpbXByb3Zl
+IG11bHRpdGhyZWFkcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
+RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
+bGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRo
+bSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
+U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
+JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
+aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
+ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
+KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
+IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBu
+ZXcgYnJhbmNoICd0ZXN0JwoxZjQwZjg4IHRlc3RzOiBhZGQgdGhyZWFkZWQtd29ya3F1ZXVlLWJl
+bmNoCjBjNTYwYWMgbWlncmF0aW9uOiB1c2UgdGhyZWFkZWQgd29ya3F1ZXVlIGZvciBkZWNvbXBy
+ZXNzaW9uCmVmZmRjYjQgbWlncmF0aW9uOiB1c2UgdGhyZWFkZWQgd29ya3F1ZXVlIGZvciBjb21w
+cmVzc2lvbgplYjkxYzYzIHV0aWw6IGludHJvZHVjZSB0aHJlYWRlZCB3b3JrcXVldWUKM2JmOGI0
+NCBiaXRvcHM6IGludHJvZHVjZSBjaGFuZ2VfYml0X2F0b21pYwoKPT09IE9VVFBVVCBCRUdJTiA9
+PT0KQ2hlY2tpbmcgUEFUQ0ggMS81OiBiaXRvcHM6IGludHJvZHVjZSBjaGFuZ2VfYml0X2F0b21p
+Yy4uLgpDaGVja2luZyBQQVRDSCAyLzU6IHV0aWw6IGludHJvZHVjZSB0aHJlYWRlZCB3b3JrcXVl
+dWUuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
+VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6
+IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzIzMzogRklMRTogdXRpbC90
+aHJlYWRlZC13b3JrcXVldWUuYzo2NToKKyAgICB1aW50NjRfdCByZXF1ZXN0X2ZpbGxfYml0bWFw
+IFFFTVVfQUxJR05FRChTTVBfQ0FDSEVfQllURVMpOwoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJl
+IGF2b2lkZWQgaW4gLmMgZmlsZXMKIzIzNTogRklMRTogdXRpbC90aHJlYWRlZC13b3JrcXVldWUu
+Yzo2NzoKKyAgICB1aW50NjRfdCByZXF1ZXN0X2RvbmVfYml0bWFwIFFFTVVfQUxJR05FRChTTVBf
+Q0FDSEVfQllURVMpOwoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmls
+ZXMKIzI0MTogRklMRTogdXRpbC90aHJlYWRlZC13b3JrcXVldWUuYzo3MzoKKyAgICBRZW11RXZl
+bnQgcmVxdWVzdF92YWxpZF9ldiBRRU1VX0FMSUdORUQoU01QX0NBQ0hFX0JZVEVTKTsKCkVSUk9S
+OiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzCiMyNDc6IEZJTEU6IHV0aWwv
+dGhyZWFkZWQtd29ya3F1ZXVlLmM6Nzk6CisgICAgUWVtdUV2ZW50IHJlcXVlc3RfZnJlZV9ldiBR
+RU1VX0FMSUdORUQoU01QX0NBQ0hFX0JZVEVTKTsKCnRvdGFsOiA0IGVycm9ycywgMSB3YXJuaW5n
+cywgNTc1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCkNoZWNraW5nIFBBVENIIDMvNTogbWlncmF0aW9uOiB1c2UgdGhyZWFkZWQgd29ya3F1ZXVl
+IGZvciBjb21wcmVzc2lvbi4uLgpDaGVja2luZyBQQVRDSCA0LzU6IG1pZ3JhdGlvbjogdXNlIHRo
+cmVhZGVkIHdvcmtxdWV1ZSBmb3IgZGVjb21wcmVzc2lvbi4uLgpDaGVja2luZyBQQVRDSCA1LzU6
+IHRlc3RzOiBhZGQgdGhyZWFkZWQtd29ya3F1ZXVlLWJlbmNoLi4uCldBUk5JTkc6IGFkZGVkLCBt
+b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
+IzM2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
+ZXJzCiMyMzQ6IEZJTEU6IHRlc3RzL3RocmVhZGVkLXdvcmtxdWV1ZS1iZW5jaC5jOjE5NDoKKyAg
+ICBwcmludGYoIiAgIC1yOiAgICAgICB0aGUgbnVtYmVyIG9mIHJlcXVlc3RzIGhhbmRsZWQgYnkg
+ZWFjaCB0aHJlYWQgKGRlZmF1bHQgJWQpLlxuIiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiMyMzY6IEZJTEU6IHRlc3RzL3RocmVhZGVkLXdvcmtxdWV1ZS1iZW5jaC5jOjE5NjoK
+KyAgICBwcmludGYoIiAgIC1tOiAgICAgICB0aGUgc2l6ZSBvZiB0aGUgbWVtb3J5IChHKSB1c2Vk
+IHRvIHRlc3QgKGRlZmF1bHQgJWRHKS5cbiIsCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
+cnMKIzI4MjogRklMRTogdGVzdHMvdGhyZWFkZWQtd29ya3F1ZXVlLWJlbmNoLmM6MjQyOgorICAg
+IHByaW50ZigiUnVuIHRoZSBiZW5jaG1hcms6IHRocmVhZHMgJWQgcmVxdWVzdHMtcGVyLXRocmVh
+ZDogJWQgbWVtb3J5ICVsZEcgcmVwZWF0ICVkLlxuIiwKCnRvdGFsOiAxIGVycm9ycywgMyB3YXJu
+aW5ncywgMjcyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
+IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEByZWRoYXQuY29t
