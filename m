@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gPmhh-0004jl-Sv
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 05:59:27 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPmj5-0005WE-54
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:00:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gPmhe-0007WP-Oh
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 05:59:25 -0500
-Message-ID: <84778e31610b0b98aea9b2dec5570a02dbf52180.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 22 Nov 2018 11:59:18 +0100
-In-Reply-To: <cover.1542819633.git.alistair.francis@wdc.com>
-References: <cover.1542819633.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v7 0/6] Connect a PCIe host and
- graphics support to RISC-V
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gPmj3-0003Ut-Fc
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:00:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54967)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gPmj3-0003TR-9m
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:00:49 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 22 Nov 2018 15:00:35 +0400
+Message-Id: <20181122110039.15972-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-3.2 0/4] build-sys: require Vista API by
+ default globally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +26,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "linux@roeck-us.net" <linux@roeck-us.net>, "logang@deltatee.com" <logang@deltatee.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Stefan Weil <sw@weilnetz.de>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, samuel.thibault@ens-lyon.org, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Wed, 2018-11-21 at 17:02 +0000, Alistair Francis wrote:
-> V7:
->  - Fix the GPEX memory mapping thanks to Bin Meng
->  - Fix the interrupt mapping thanks to Logan Gunthorpe
-> 
-[...]
-> 
-> Alistair Francis (6):
->   hw/riscv/virt: Increase the number of interrupts
->   hw/riscv/virt: Adjust memory layout spacing
->   hw/riscv/virt: Connect the gpex PCIe
->   riscv: Enable VGA and PCIE_VGA
->   hw/riscv/sifive_u: Connect the Xilinx PCIe
->   hw/riscv/virt: Connect a VirtIO net PCIe device
+Hi,
 
-Using QEMU master + these patches, libvirt master + my own patches,
-a disk image from [1] and the bbl from [2], I was able to run a pure
-PCI RISC-V guest, including connecting to it through ssh and
-performing a system update using dnf; based on these results, the
-series gets a big old
+Here is a small series improving a bit Windows headers inclusion, and
+setting the default required API version globally to Vista. It also
+allows easier tweaking of available API version via CFLAGS.
 
-  Tested-by: Andrea Bolognani <abologna@redhat.com>
+Building QGA for older versions (XP) seems possible so far: the
+dependency on libqemuutil.a implies building qemu-thread-win32.c,
+which requires Vista API since commit 12f8def0 (v2.9). But qemu-thread
+isn't being used in QGA, the resulting binary may still work on XP.
+XP is no longer supported for the past 4.5y, it's time to drop support
+for it.
 
+Marc-Andr=C3=A9 Lureau (4):
+  build-sys: don't include windows.h, osdep.h does it
+  build-sys: move windows defines in osdep.h header
+  build-sys: build with Vista API by default
+  RFC: qga: drop < Vista compatibility
 
-[1] https://fedora-riscv.tranquillity.se/koji/
-    Unfortunately the site is broken at the moment :(
-[2] https://fedorapeople.org/groups/risc-v/disk-images/
-    PCI support is included in the bbl now! \o/
--- 
-Andrea Bolognani / Red Hat / Virtualization
+ include/qemu/osdep.h      | 17 ++++++++++
+ accel/tcg/translate-all.c |  4 ---
+ qga/commands-win32.c      | 70 +--------------------------------------
+ util/qemu-thread-win32.c  |  4 ---
+ configure                 |  3 --
+ roms/seabios              |  2 +-
+ 6 files changed, 19 insertions(+), 81 deletions(-)
+
+--=20
+2.20.0.rc1
