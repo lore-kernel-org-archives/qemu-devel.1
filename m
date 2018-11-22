@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPn3K-0007KE-Ui
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:21:53 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPn7s-0000eY-E9
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:26:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPn3E-0006Nj-Vx
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:21:46 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:39984)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPn7o-0003s1-CG
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:26:28 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:39690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gPn3E-000685-LU
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:21:40 -0500
-Date: Thu, 22 Nov 2018 13:21:30 +0200
+	id 1gPn7o-0003i5-1k
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:26:24 -0500
+Date: Thu, 22 Nov 2018 13:26:12 +0200
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Message-ID: <20181122112129.GA8920@lap1>
-References: <20181118122843.10892-1-yuval.shaia@oracle.com>
-	<20181118122843.10892-11-yuval.shaia@oracle.com>
-	<87wop9v8p3.fsf@dusky.pond.sub.org>
+Message-ID: <20181122112611.GB8920@lap1>
+References: <20181116200016.2080785-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <87wop9v8p3.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v4 10/23] json: Define new QMP message for
- pvrdma
+In-Reply-To: <20181116200016.2080785-1-eblake@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] qapi: Reduce Makefile boilerplate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,203 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com, yuval.shaia@oracle.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Nov 19, 2018 at 08:16:08AM +0100, Markus Armbruster wrote:
-> The subsystem tag in the commit message's title should be "qapi: " not
-> "json: ".
+On Tue, Nov 20, 2018 at 01:17:28PM +0200, Eric Blake wrote:
+> Adding a new qapi module had some rather tedious repetition to
+> wire it into Makefile, Makefile.objs, and .gitignore (for example,
+> see commit bf42508f and its followup b61acdec). For make, add some
+> indirection by taking advantage of GNU Make string processing to
+> expand a list of module names into all the required artifacts, so
+> that future additions of a new module need only touch the list of
+> module names.  And for gitignore, use globs to cover all generated
+> file names.
+>=20
+> The list has to live in Makefile.objs, due to the way that
+> our unnest-vars macro slirps in that file without remembering
+> any definition of $(QAPI_MODULES) from Makefile.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> ---
+> v3: also tweak .gitignore [Dan]
+> v2: also condense Makefile.objs, prefer $(FOO:%=3Da%b) over
+> $(patsubst %,a%b,$(FOO))
+> ---
 
-Done.
+Used it to integrate a new QMP message for pvrdma device and it indeed
+makes effort minimal.
 
-> 
-> Yuval Shaia <yuval.shaia@oracle.com> writes:
-> 
-> > pvrdma requires that the same GID attached to it will be attached to the
-> > backend device in the host.
-> >
-> > A new QMP messages is defined so pvrdma device can broadcast any change
-> > made to its GID table. This event is captured by libvirt which in turn
-> > will update the GID table in the backend device.
-> >
-> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > ---
-> >  MAINTAINERS           |  1 +
-> >  Makefile              |  3 ++-
-> >  Makefile.objs         |  4 ++++
-> >  qapi/qapi-schema.json |  1 +
-> >  qapi/rdma.json        | 38 ++++++++++++++++++++++++++++++++++++++
-> >  5 files changed, 46 insertions(+), 1 deletion(-)
-> >  create mode 100644 qapi/rdma.json
-> >
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index e087d58ac6..a149f68a8f 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -2232,6 +2232,7 @@ F: hw/rdma/*
-> >  F: hw/rdma/vmw/*
-> >  F: docs/pvrdma.txt
-> >  F: contrib/rdmacm-mux/*
-> > +F: qapi/rdma.json
-> >  
-> >  Build and test automation
-> >  -------------------------
-> > diff --git a/Makefile b/Makefile
-> > index 94072776ff..db4ce60ee5 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -599,7 +599,8 @@ qapi-modules = $(SRC_PATH)/qapi/qapi-schema.json $(SRC_PATH)/qapi/common.json \
-> >                 $(SRC_PATH)/qapi/tpm.json \
-> >                 $(SRC_PATH)/qapi/trace.json \
-> >                 $(SRC_PATH)/qapi/transaction.json \
-> > -               $(SRC_PATH)/qapi/ui.json
-> > +               $(SRC_PATH)/qapi/ui.json \
-> > +               $(SRC_PATH)/qapi/rdma.json
-> 
-> Please insert between net.json and rocker.json to maintain alphabetical
-> order.
+So:
 
-Removed after using Eric Blake's framework.
+Tested-by: Yuval Shaia <yuval.shaia@oracle.com>
 
-> 
-> >  qapi/qapi-builtin-types.c qapi/qapi-builtin-types.h \
-> >  qapi/qapi-types.c qapi/qapi-types.h \
-> > diff --git a/Makefile.objs b/Makefile.objs
-> > index cc7df3ad80..76d8028f2f 100644
-> > --- a/Makefile.objs
-> > +++ b/Makefile.objs
-> > @@ -21,6 +21,7 @@ util-obj-y += qapi/qapi-types-tpm.o
-> >  util-obj-y += qapi/qapi-types-trace.o
-> >  util-obj-y += qapi/qapi-types-transaction.o
-> >  util-obj-y += qapi/qapi-types-ui.o
-> > +util-obj-y += qapi/qapi-types-rdma.o
-> >  util-obj-y += qapi/qapi-builtin-visit.o
-> >  util-obj-y += qapi/qapi-visit.o
-> >  util-obj-y += qapi/qapi-visit-block-core.o
-> > @@ -40,6 +41,7 @@ util-obj-y += qapi/qapi-visit-tpm.o
-> >  util-obj-y += qapi/qapi-visit-trace.o
-> >  util-obj-y += qapi/qapi-visit-transaction.o
-> >  util-obj-y += qapi/qapi-visit-ui.o
-> > +util-obj-y += qapi/qapi-visit-rdma.o
-> >  util-obj-y += qapi/qapi-events.o
-> >  util-obj-y += qapi/qapi-events-block-core.o
-> >  util-obj-y += qapi/qapi-events-block.o
-> > @@ -58,6 +60,7 @@ util-obj-y += qapi/qapi-events-tpm.o
-> >  util-obj-y += qapi/qapi-events-trace.o
-> >  util-obj-y += qapi/qapi-events-transaction.o
-> >  util-obj-y += qapi/qapi-events-ui.o
-> > +util-obj-y += qapi/qapi-events-rdma.o
-> >  util-obj-y += qapi/qapi-introspect.o
-> >  
-> >  chardev-obj-y = chardev/
-> > @@ -155,6 +158,7 @@ common-obj-y += qapi/qapi-commands-tpm.o
-> >  common-obj-y += qapi/qapi-commands-trace.o
-> >  common-obj-y += qapi/qapi-commands-transaction.o
-> >  common-obj-y += qapi/qapi-commands-ui.o
-> > +common-obj-y += qapi/qapi-commands-rdma.o
-> >  common-obj-y += qapi/qapi-introspect.o
-> >  common-obj-y += qmp.o hmp.o
-> >  endif
-> 
-> This is incomplete, and it conflicts with Eric Blake's "[PATCH v3] qapi:
-> Reduce Makefile boilerplate".  I recommend to base on Eric's patch,
-> because that'll let you add the new rdma.json much more easily.
+Thanks,
+Yuval
 
-Sure, will do that but let's ignore build error reports generated by build
-robot for my v5 :)
-
-Framework looks great!
-
-> 
-> > diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-> > index 65b6dc2f6f..a650d80f83 100644
-> > --- a/qapi/qapi-schema.json
-> > +++ b/qapi/qapi-schema.json
-> > @@ -94,3 +94,4 @@
-> >  { 'include': 'trace.json' }
-> >  { 'include': 'introspect.json' }
-> >  { 'include': 'misc.json' }
-> > +{ 'include': 'rdma.json' }
-
-Done.
-
-> 
-> This makes the "RDMA device" section appear last in the QEMU QMP
-> reference manual, since they appear in include order there.
-> 
->     $ grep -h @section bld-x86/qapi/qapi-doc.texi 
->     @section Introduction
->     @section Stability Considerations
->     @section Common data types
->     @section Socket data types
->     @section VM run state
->     @section Cryptography
->     @section Block devices
->     @section Character devices
->     @section Net devices
->     @section Rocker switch device
->     @section TPM (trusted platform module) devices
->     @section Remote desktop
->     @section Input
->     @section Migration
->     @section Transactions
->     @section Tracing
->     @section QMP introspection
->     @section Miscellanea
->     @section RDMA device
-> 
-> It should go next to the other "device" sections, shouldn't it?
-
-Removed after using Eric Blake's framework.
-
-> 
-> > diff --git a/qapi/rdma.json b/qapi/rdma.json
-> > new file mode 100644
-> > index 0000000000..804c68ab36
-> > --- /dev/null
-> > +++ b/qapi/rdma.json
-> > @@ -0,0 +1,38 @@
-> > +# -*- Mode: Python -*-
-> > +#
-> > +
-> > +##
-> > +# = RDMA device
-> > +##
-> > +
-> > +##
-> > +# @RDMA_GID_STATUS_CHANGED:
-> > +#
-> > +# Emitted when guest driver adds/deletes GID to/from device
-> > +#
-> > +# @netdev: RoCE Network Device name - char *
-> > +#
-> > +# @gid-status: Add or delete indication - bool
-> > +#
-> > +# @subnet-prefix: Subnet Prefix - uint64
-> > +#
-> > +# @interface-id : Interface ID - uint64
-> > +#
-> > +# Since: 3.2
-> > +#
-> > +# Example:
-> > +#
-> > +# <- {"timestamp": {"seconds": 1541579657, "microseconds": 986760},
-> > +#     "event": "RDMA_GID_STATUS_CHANGED",
-> > +#     "data":
-> > +#         {"netdev": "bridge0",
-> > +#         "interface-id": 15880512517475447892,
-> > +#         "gid-status": true,
-> > +#         "subnet-prefix": 33022}}
-> > +#
-> > +##
-> > +{ 'event': 'RDMA_GID_STATUS_CHANGED',
-> > +  'data': { 'netdev'        : 'str',
-> > +            'gid-status'    : 'bool',
-> > +            'subnet-prefix' : 'uint64',
-> > +            'interface-id'  : 'uint64' } }
-> 
-> Schema looks okay from a QAPI perspective (I know next to nothing about
-> RDMA).
-
-Thanks
+>  Makefile      | 192 ++++++--------------------------------------------
+>  Makefile.objs |  75 ++------------------
+>  .gitignore    |  72 ++-----------------
+>  3 files changed, 34 insertions(+), 305 deletions(-)
+>=20
