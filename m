@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gPpgc-0006on-D2
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:10:32 -0500
+	(envelope-from <wexu@redhat.com>) id 1gPph2-00079r-9q
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:10:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gPpga-0007AD-1k
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:10:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60180)
+	(envelope-from <wexu@redhat.com>) id 1gPph0-0000fO-6S
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:10:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43384)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gPpgZ-00074S-Kl
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:10:27 -0500
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gPpgz-0000bM-WC
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:10:54 -0500
 From: wexu@redhat.com
-Date: Thu, 22 Nov 2018 09:06:15 -0500
-Message-Id: <1542895581-10721-11-git-send-email-wexu@redhat.com>
+Date: Thu, 22 Nov 2018 09:06:17 -0500
+Message-Id: <1542895581-10721-13-git-send-email-wexu@redhat.com>
 In-Reply-To: <1542895581-10721-1-git-send-email-wexu@redhat.com>
 References: <1542895581-10721-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 10/16] virtio: event suppression support for
+Subject: [Qemu-devel] [PATCH v1 12/16] virtio: add userspace migration of
  packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,168 +31,51 @@ From: Wei Xu <wexu@redhat.com>
 
 Signed-off-by: Wei Xu <wexu@redhat.com>
 ---
- hw/virtio/virtio.c | 121 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 118 insertions(+), 3 deletions(-)
+ hw/virtio/virtio.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 99a6601..240c4e3 100644
+index 240c4e3..64d5c04 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -238,6 +238,30 @@ static void vring_desc_read(VirtIODevice *vdev, VRingDesc *desc,
-     virtio_tswap16s(vdev, &desc->next);
- }
+@@ -2558,6 +2558,12 @@ int virtio_save(VirtIODevice *vdev, QEMUFile *f)
+          */
+         qemu_put_be64(f, vdev->vq[i].vring.desc);
+         qemu_put_be16s(f, &vdev->vq[i].last_avail_idx);
++        qemu_put_8s(f, (const uint8_t *)&vdev->vq[i].avail_wrap_counter);
++        qemu_put_8s(f, (const uint8_t *)&vdev->vq[i].event_wrap_counter);
++        qemu_put_8s(f, (const uint8_t *)&vdev->vq[i].used_wrap_counter);
++        qemu_put_be16s(f, &vdev->vq[i].used_idx);
++        qemu_put_be16s(f, &vdev->vq[i].shadow_avail_idx);
++        qemu_put_be32s(f, &vdev->vq[i].inuse);
+         if (k->save_queue) {
+             k->save_queue(qbus->parent, i, f);
+         }
+@@ -2705,6 +2711,14 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+         }
+         vdev->vq[i].vring.desc = qemu_get_be64(f);
+         qemu_get_be16s(f, &vdev->vq[i].last_avail_idx);
++
++        qemu_get_8s(f, (uint8_t *)&vdev->vq[i].avail_wrap_counter);
++        qemu_get_8s(f, (uint8_t *)&vdev->vq[i].event_wrap_counter);
++        qemu_get_8s(f, (uint8_t *)&vdev->vq[i].used_wrap_counter);
++        qemu_get_be16s(f, &vdev->vq[i].used_idx);
++        qemu_get_be16s(f, &vdev->vq[i].shadow_avail_idx);
++        qemu_get_be32s(f, &vdev->vq[i].inuse);
++
+         vdev->vq[i].signalled_used_valid = false;
+         vdev->vq[i].notification = true;
  
-+static void vring_packed_event_read(VirtIODevice *vdev,
-+                            MemoryRegionCache *cache, VRingPackedDescEvent *e)
-+{
-+    address_space_read_cached(cache, 0, e, sizeof(*e));
-+    virtio_tswap16s(vdev, &e->off_wrap);
-+    virtio_tswap16s(vdev, &e->flags);
-+}
-+
-+static void vring_packed_off_wrap_write(VirtIODevice *vdev,
-+                            MemoryRegionCache *cache, uint16_t off_wrap)
-+{
-+    virtio_tswap16s(vdev, &off_wrap);
-+    address_space_write_cached(cache, 0, &off_wrap, sizeof(off_wrap));
-+    address_space_cache_invalidate(cache, 0, sizeof(off_wrap));
-+}
-+
-+static void vring_packed_flags_write(VirtIODevice *vdev,
-+                            MemoryRegionCache *cache, uint16_t flags)
-+{
-+    virtio_tswap16s(vdev, &flags);
-+    address_space_write_cached(cache, sizeof(uint16_t), &flags, sizeof(flags));
-+    address_space_cache_invalidate(cache, sizeof(uint16_t), sizeof(flags));
-+}
-+
- static VRingMemoryRegionCaches *vring_get_region_caches(struct VirtQueue *vq)
- {
-     VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
-@@ -344,7 +368,7 @@ static inline void vring_set_avail_event(VirtQueue *vq, uint16_t val)
-     address_space_cache_invalidate(&caches->used, pa, sizeof(val));
- }
+@@ -2786,6 +2800,10 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+                 virtio_queue_update_rings(vdev, i);
+             }
  
--void virtio_queue_set_notification(VirtQueue *vq, int enable)
-+static void virtio_queue_set_notification_split(VirtQueue *vq, int enable)
- {
-     vq->notification = enable;
- 
-@@ -367,6 +391,51 @@ void virtio_queue_set_notification(VirtQueue *vq, int enable)
-     rcu_read_unlock();
- }
- 
-+static void virtio_queue_set_notification_packed(VirtQueue *vq, int enable)
-+{
-+    VRingPackedDescEvent e;
-+    VRingMemoryRegionCaches *caches;
++            if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++                continue;
++            }
 +
-+    rcu_read_lock();
-+    caches  = vring_get_region_caches(vq);
-+    vring_packed_event_read(vq->vdev, &caches->used, &e);
-+
-+    if (!enable) {
-+        e.flags = RING_EVENT_FLAGS_DISABLE;
-+        goto out;
-+    }
-+
-+    e.flags = RING_EVENT_FLAGS_ENABLE;
-+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
-+        uint16_t off_wrap = vq->shadow_avail_idx | vq->event_wrap_counter << 15;
-+
-+        vring_packed_off_wrap_write(vq->vdev, &caches->used, off_wrap);
-+        /* Make sure off_wrap is wrote before flags */
-+        smp_wmb();
-+
-+        e.flags = RING_EVENT_FLAGS_DESC;
-+    }
-+
-+out:
-+    vring_packed_flags_write(vq->vdev, &caches->used, e.flags);
-+    rcu_read_unlock();
-+}
-+
-+void virtio_queue_set_notification(VirtQueue *vq, int enable)
-+{
-+    vq->notification = enable;
-+
-+    if (!vq->vring.desc) {
-+        return;
-+    }
-+
-+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
-+        virtio_queue_set_notification_packed(vq, enable);
-+    } else {
-+        virtio_queue_set_notification_split(vq, enable);
-+    }
-+}
-+
- int virtio_queue_ready(VirtQueue *vq)
- {
-     return vq->vring.avail != 0;
-@@ -2113,8 +2182,7 @@ static void virtio_set_isr(VirtIODevice *vdev, int value)
-     }
- }
- 
--/* Called within rcu_read_lock().  */
--static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
-+static bool virtio_split_should_notify(VirtIODevice *vdev, VirtQueue *vq)
- {
-     uint16_t old, new;
-     bool v;
-@@ -2137,6 +2205,53 @@ static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
-     return !v || vring_need_event(vring_get_used_event(vq), new, old);
- }
- 
-+static bool vring_packed_need_event(VirtQueue *vq, bool wrap, 
-+                            uint16_t off_wrap, uint16_t new, uint16_t old)
-+{
-+    int off = off_wrap & ~(1 << 15);
-+
-+    if (wrap != off_wrap >> 15) {
-+        off -= vq->vring.num;
-+    }
-+
-+    return vring_need_event(off, new, old);
-+}
-+
-+static bool virtio_packed_should_notify(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    VRingPackedDescEvent e;
-+    uint16_t old, new;
-+    bool v;
-+    VRingMemoryRegionCaches *caches;
-+
-+    caches  = vring_get_region_caches(vq);
-+    vring_packed_event_read(vdev, &caches->avail, &e);
-+
-+    old = vq->signalled_used;
-+    new = vq->signalled_used = vq->used_idx;
-+    v = vq->signalled_used_valid;
-+    vq->signalled_used_valid = true;
-+
-+    if (e.flags == RING_EVENT_FLAGS_DISABLE) {
-+        return false;
-+    } else if (e.flags == RING_EVENT_FLAGS_ENABLE) {
-+        return true;
-+    }
-+
-+    return !v || vring_packed_need_event(vq,
-+        vq->used_wrap_counter, e.off_wrap, new, old);
-+}
-+
-+/* Called within rcu_read_lock().  */
-+static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-+        return virtio_packed_should_notify(vdev, vq);
-+    } else {
-+        return virtio_split_should_notify(vdev, vq);
-+    }
-+}
-+
- void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
- {
-     bool should_notify;
+             nheads = vring_avail_idx(&vdev->vq[i]) - vdev->vq[i].last_avail_idx;
+             /* Check it isn't doing strange things with descriptor numbers. */
+             if (nheads > vdev->vq[i].vring.num) {
 -- 
 1.8.3.1
