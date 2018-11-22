@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55046)
+Received: from eggs.gnu.org ([208.118.235.92]:55151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPntU-0000Nw-1f
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:41 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPnta-0000Pq-3O
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPntL-0001bx-S0
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:39 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:58158)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPntT-0001w6-E7
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:45 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:53508)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gPntK-0001Oi-3M
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:31 -0500
+	id 1gPntL-0001Wj-Qx
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:33 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 22 Nov 2018 14:14:00 +0200
-Message-Id: <20181122121402.13764-23-yuval.shaia@oracle.com>
+Date: Thu, 22 Nov 2018 14:13:59 +0200
+Message-Id: <20181122121402.13764-22-yuval.shaia@oracle.com>
 In-Reply-To: <20181122121402.13764-1-yuval.shaia@oracle.com>
 References: <20181122121402.13764-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v5 22/24] hw/rdma: Do not call
- rdma_backend_del_gid on an empty gid
+Subject: [Qemu-devel] [PATCH v5 21/24] hw/rdma: Do not use
+ bitmap_zero_extend to free bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +27,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-When device goes down the function fini_ports loops over all entries in
-gid table regardless of the fact whether entry is valid or not. In case
-that entry is not valid we'd like to skip from any further processing in
-backend device.
+bitmap_zero_extend is designed to work for extending, not for
+shrinking.
+Using g_free instead.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_rm.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ hw/rdma/rdma_rm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index ca127c8c26..f5b1295890 100644
+index b7d4ebe972..ca127c8c26 100644
 --- a/hw/rdma/rdma_rm.c
 +++ b/hw/rdma/rdma_rm.c
-@@ -555,6 +555,10 @@ int rdma_rm_del_gid(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
+@@ -43,7 +43,7 @@ static inline void res_tbl_free(RdmaRmResTbl *tbl)
  {
-     int rc;
+     qemu_mutex_destroy(&tbl->lock);
+     g_free(tbl->tbl);
+-    bitmap_zero_extend(tbl->bitmap, tbl->tbl_sz, 0);
++    g_free(tbl->bitmap);
+ }
  
-+    if (!dev_res->port.gid_tbl[gid_idx].gid.global.interface_id) {
-+        return 0;
-+    }
-+
-     rc = rdma_backend_del_gid(backend_dev, ifname,
-                               &dev_res->port.gid_tbl[gid_idx].gid);
-     if (rc) {
+ static inline void *res_tbl_get(RdmaRmResTbl *tbl, uint32_t handle)
 -- 
 2.17.2
