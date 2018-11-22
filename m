@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gPpV8-0000qw-Jx
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 08:58:40 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gPpZp-0002cl-8Q
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:03:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gPpV6-000740-RU
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 08:58:38 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Nov 2018 13:35:07 +0000
-Message-Id: <20181122133507.30950-3-peter.maydell@linaro.org>
-In-Reply-To: <20181122133507.30950-1-peter.maydell@linaro.org>
-References: <20181122133507.30950-1-peter.maydell@linaro.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1gPpZk-0007Mt-UM
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:03:29 -0500
+Received: from ozlabs.org ([203.11.71.1]:51959)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1gPpZj-0007HO-Sm
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:03:24 -0500
+Date: Fri, 23 Nov 2018 00:22:38 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181122132238.GL10448@umbus.fritz.box>
+References: <20181121181347.24035-1-farosas@linux.ibm.com>
+	<20181121181347.24035-2-farosas@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH for-4.0 2/2] Rename
- cpu_physical_memory_write_rom() to address_space_write_rom()
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="AGBBLMjITsWHeOTZ"
+Content-Disposition: inline
+In-Reply-To: <20181121181347.24035-2-farosas@linux.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/3] target/ppc: Add macro
+ definitions for relocated interrupt vectors offsets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,223 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, philmd@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, James Hogan <jhogan@kernel.org>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
 
-The API of cpu_physical_memory_write_rom() is odd, because it
-takes an AddressSpace, unlike all the other cpu_physical_memory_*
-access functions. Rename it to address_space_write_rom(), and
-bring its API into line with address_space_write().
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/exec/cpu-common.h   |  2 --
- include/exec/memory.h       | 26 ++++++++++++++++++++++++++
- exec.c                      | 14 ++++++++------
- hw/core/loader.c            |  4 ++--
- hw/intc/apic.c              |  7 ++++---
- hw/misc/tz-mpc.c            |  2 +-
- hw/sparc/sun4m.c            |  5 +++--
- docs/devel/loads-stores.rst | 35 ++++++++++++++++-------------------
- 8 files changed, 60 insertions(+), 35 deletions(-)
+--AGBBLMjITsWHeOTZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 18b40d6145c..2ad2d6d86bb 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -111,8 +111,6 @@ bool cpu_physical_memory_is_io(hwaddr phys_addr);
-  */
- void qemu_flush_coalesced_mmio_buffer(void);
- 
--void cpu_physical_memory_write_rom(AddressSpace *as, hwaddr addr,
--                                   const uint8_t *buf, int len);
- void cpu_flush_icache_range(hwaddr start, int len);
- 
- extern struct MemoryRegion io_mem_rom;
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 8e61450de32..ffd23ed8d8d 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -1792,6 +1792,32 @@ MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
-                                 MemTxAttrs attrs,
-                                 const uint8_t *buf, int len);
- 
-+/**
-+ * address_space_write_rom: write to address space, including ROM.
-+ *
-+ * This function writes to the specified address space, but will
-+ * write data to both ROM and RAM. This is used for non-guest
-+ * writes like writes from the gdb debug stub or initial loading
-+ * of ROM contents.
-+ *
-+ * Note that portions of the write which attempt to write data to
-+ * a device will be silently ignored -- only real RAM and ROM will
-+ * be written to.
-+ *
-+ * Return a MemTxResult indicating whether the operation succeeded
-+ * or failed (eg unassigned memory, device rejected the transaction,
-+ * IOMMU fault).
-+ *
-+ * @as: #AddressSpace to be accessed
-+ * @addr: address within that address space
-+ * @attrs: memory transaction attributes
-+ * @buf: buffer with the data transferred
-+ * @len: the number of bytes to write
-+ */
-+MemTxResult address_space_write_rom(AddressSpace *as, hwaddr addr,
-+                                    MemTxAttrs attrs,
-+                                    const uint8_t *buf, int len);
-+
- /* address_space_ld*: load from an address space
-  * address_space_st*: store to an address space
-  *
-diff --git a/exec.c b/exec.c
-index 92679508ba3..6e875f0640a 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3430,11 +3430,12 @@ static inline MemTxResult address_space_write_rom_internal(AddressSpace *as,
- }
- 
- /* used for ROM loading : can write in RAM and ROM */
--void cpu_physical_memory_write_rom(AddressSpace *as, hwaddr addr,
--                                   const uint8_t *buf, int len)
-+MemTxResult address_space_write_rom(AddressSpace *as, hwaddr addr,
-+                                    MemTxAttrs attrs,
-+                                    const uint8_t *buf, int len)
- {
--    address_space_write_rom_internal(as, addr, MEMTXATTRS_UNSPECIFIED,
--                                     buf, len, WRITE_DATA);
-+    return address_space_write_rom_internal(as, addr, attrs,
-+                                            buf, len, WRITE_DATA);
- }
- 
- void cpu_flush_icache_range(hwaddr start, int len)
-@@ -3879,8 +3880,9 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
-             l = len;
-         phys_addr += (addr & ~TARGET_PAGE_MASK);
-         if (is_write) {
--            cpu_physical_memory_write_rom(cpu->cpu_ases[asidx].as,
--                                          phys_addr, buf, l);
-+            address_space_write_rom(cpu->cpu_ases[asidx].as, phys_addr,
-+                                    MEMTXATTRS_UNSPECIFIED,
-+                                    buf, l);
-         } else {
-             address_space_rw(cpu->cpu_ases[asidx].as, phys_addr,
-                              MEMTXATTRS_UNSPECIFIED,
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index aa0b3fc8679..66a616608af 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -1103,8 +1103,8 @@ static void rom_reset(void *unused)
-             void *host = memory_region_get_ram_ptr(rom->mr);
-             memcpy(host, rom->data, rom->datasize);
-         } else {
--            cpu_physical_memory_write_rom(rom->as, rom->addr, rom->data,
--                                          rom->datasize);
-+            address_space_write_rom(rom->as, rom->addr, MEMTXATTRS_UNSPECIFIED,
-+                                    rom->data, rom->datasize);
-         }
-         if (rom->isrom) {
-             /* rom needs to be written only once */
-diff --git a/hw/intc/apic.c b/hw/intc/apic.c
-index 97ffdd820f2..c9dd65b3a03 100644
---- a/hw/intc/apic.c
-+++ b/hw/intc/apic.c
-@@ -122,9 +122,10 @@ static void apic_sync_vapic(APICCommonState *s, int sync_type)
-         }
-         vapic_state.irr = vector & 0xff;
- 
--        cpu_physical_memory_write_rom(&address_space_memory,
--                                      s->vapic_paddr + start,
--                                      ((void *)&vapic_state) + start, length);
-+        address_space_write_rom(&address_space_memory,
-+                                s->vapic_paddr + start,
-+                                MEMTXATTRS_UNSPECIFIED,
-+                                ((void *)&vapic_state) + start, length);
-     }
- }
- 
-diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
-index e0c58ba37ec..fb48a1540b9 100644
---- a/hw/misc/tz-mpc.c
-+++ b/hw/misc/tz-mpc.c
-@@ -448,7 +448,7 @@ static int tz_mpc_attrs_to_index(IOMMUMemoryRegion *iommu, MemTxAttrs attrs)
- {
-     /* We treat unspecified attributes like secure. Transactions with
-      * unspecified attributes come from places like
--     * cpu_physical_memory_write_rom() for initial image load, and we want
-+     * rom_reset() for initial image load, and we want
-      * those to pass through the from-reset "everything is secure" config.
-      * All the real during-emulation transactions from the CPU will
-      * specify attributes.
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 3c29b68e67f..639906cca30 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -559,8 +559,9 @@ static void idreg_init(hwaddr addr)
-     s = SYS_BUS_DEVICE(dev);
- 
-     sysbus_mmio_map(s, 0, addr);
--    cpu_physical_memory_write_rom(&address_space_memory,
--                                  addr, idreg_data, sizeof(idreg_data));
-+    address_space_write_rom(&address_space_memory, addr,
-+                            MEMTXATTRS_UNSPECIFIED,
-+                            idreg_data, sizeof(idreg_data));
- }
- 
- #define MACIO_ID_REGISTER(obj) \
-diff --git a/docs/devel/loads-stores.rst b/docs/devel/loads-stores.rst
-index 57d8c524bfe..c74cd090e64 100644
---- a/docs/devel/loads-stores.rst
-+++ b/docs/devel/loads-stores.rst
-@@ -253,6 +253,22 @@ Regexes for git grep
-  - ``\<address_space_ldu\?[bwql]\(_[lb]e\)\?\>``
-  - ``\<address_space_st[bwql]\(_[lb]e\)\?\>``
- 
-+``address_space_write_rom``
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+This function performs a write by physical address like
-+``address_space_write``, except that if the write is to a ROM then
-+the ROM contents will be modified, even though a write by the guest
-+CPU to the ROM would be ignored. This is used for non-guest writes
-+like writes from the gdb debug stub or initial loading of ROM contents.
-+
-+Note that portions of the write which attempt to write data to a
-+device will be silently ignored -- only real RAM and ROM will
-+be written to.
-+
-+Regexes for git grep
-+ - ``address_space_write_rom``
-+
- ``{ld,st}*_phys``
- ~~~~~~~~~~~~~~~~~
- 
-@@ -315,25 +331,6 @@ For new code they are better avoided:
- Regexes for git grep
-  - ``\<cpu_physical_memory_\(read\|write\|rw\)\>``
- 
--``cpu_physical_memory_write_rom``
--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
--
--This function performs a write by physical address like
--``address_space_write``, except that if the write is to a ROM then
--the ROM contents will be modified, even though a write by the guest
--CPU to the ROM would be ignored.
--
--Note that unlike ``cpu_physical_memory_write()`` this function takes
--an AddressSpace argument, but unlike ``address_space_write()`` this
--function does not take a ``MemTxAttrs`` or return a ``MemTxResult``.
--
--**TODO**: we should probably clean up this inconsistency and
--turn the function into ``address_space_write_rom`` with an API
--matching ``address_space_write``.
--
--``cpu_physical_memory_write_rom``
--
--
- ``cpu_memory_rw_debug``
- ~~~~~~~~~~~~~~~~~~~~~~~
- 
--- 
-2.19.1
+On Wed, Nov 21, 2018 at 04:13:45PM -0200, Fabiano Rosas wrote:
+> The PowerISA prescribes that depending on the values of MSR_IR,
+> MSR_DR, MSR_HV and LPCR_AIL, the interrupt vectors might be relocated
+> by specific offsets.
+>=20
+> This patch defines macros for these offsets so that they can be used
+> by another part of the code in a future patch.
+>=20
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> ---
+>  target/ppc/cpu.h         | 3 +++
+>  target/ppc/excp_helper.c | 4 ++--
+>  2 files changed, 5 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index ab68abe8a2..5147db4460 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -2390,6 +2390,9 @@ enum {
+>      AIL_C000_0000_0000_4000 =3D 3,
+>  };
+> =20
+> +#define AIL_0001_8000_OFFSET 0x18000
+> +#define AIL_C000_0000_0000_4000_OFFSET 0xc000000000004000ull
+
+Hrm.  Is there really a point making a #define, if the name spells out
+the value?  It's not like you can change the value without having to
+change the places that use it that way?
+
+
+>  /***********************************************************************=
+******/
+> =20
+>  #define is_isa300(ctx) (!!(ctx->insns_flags2 & PPC2_ISA300))
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index 0ec7ae1ad4..49bdf7dd54 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -687,10 +687,10 @@ static inline void powerpc_excp(PowerPCCPU *cpu, in=
+t excp_model, int excp)
+>          new_msr |=3D (1 << MSR_IR) | (1 << MSR_DR);
+>          switch(ail) {
+>          case AIL_0001_8000:
+> -            vector |=3D 0x18000;
+> +            vector |=3D AIL_0001_8000_OFFSET;
+>              break;
+>          case AIL_C000_0000_0000_4000:
+> -            vector |=3D 0xc000000000004000ull;
+> +            vector |=3D AIL_C000_0000_0000_4000_OFFSET;
+>              break;
+>          default:
+>              cpu_abort(cs, "Invalid AIL combination %d\n", ail);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--AGBBLMjITsWHeOTZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv2rZwACgkQbDjKyiDZ
+s5KpcA/+KVJLfQYBnu+nZjQ6ZGPTxE/JAwPUczCBLrRshoRqkHFvUAdY7MRzOTs6
+JI/gP1+7ZPIAW/nTrlg5ylY0Hmt8Wdork9KtfNg8i2McpDPooJcuixfKMQl/ST5d
+tH4KYlU8z0cUe/E/UsD3OdqORa55hwY+RzyJtdJXCreBXHIILYBYYy3FPn2JH2C2
+yfOJlNnAFHsK7MgMzfw7GngUrfO2iJ/Rb10mrA8loMUALHFiRijNKibdmSU6QQai
+dociwXvmobRxztqbLx+OKH/8eoMJrWcaDTMsN9kY6lqx2NcflKJjHzGpJyn0pyQ6
+em6HQpQa04G6X7MiwvtursbipSAnN99ZbU19eVNna1uR77rNHYFEsZBeAAhqiP+0
+Sax+EJoOE3N72x7mYnNggz0S/C6R9Ll8garUvQPaCCOR4ax7cQ+MngAJdyntSa+V
+D45ymn1QYt9p4iyUZ0GKj+v+5xcIIbFVgokipsbpOXiXHvBqy9hGP81v++4akExb
+VbZZXjzlKKtSmVGtP3G0iu2XZ4jjLXgefLPLhoQWrdpVb7Mv1M4FaYns1MszgdjQ
+DV3IFabwAqOcyVjJNR3JRr//rl/jecnJqIOvnbBpLOt0sLTJi9HabbHXeQn9ZVld
+6gie40QYw479fel2OQiYf5/rog6dyurd07xyNPEhOo0cpIqVmvA=
+=hXAF
+-----END PGP SIGNATURE-----
+
+--AGBBLMjITsWHeOTZ--
