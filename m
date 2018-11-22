@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55100)
+Received: from eggs.gnu.org ([208.118.235.92]:55046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPntp-0000O3-Gs
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:16:06 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gPntw-0000Nw-EL
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:16:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPnsL-0007y3-8q
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:14:35 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:57200)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gPnsL-0007t3-0B
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:14:29 -0500
-From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 22 Nov 2018 14:13:40 +0200
-Message-Id: <20181122121402.13764-3-yuval.shaia@oracle.com>
-In-Reply-To: <20181122121402.13764-1-yuval.shaia@oracle.com>
-References: <20181122121402.13764-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v5 02/24] hw/rdma: Add ability to force
- notification without re-arm
+	(envelope-from <laurent@vivier.eu>) id 1gPnmk-0007xx-Tl
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:08:46 -0500
+References: <1542261954-4060-1-git-send-email-liq3ea@gmail.com>
+	<da889f34-09b3-6c01-050a-778b86a731fa@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <815170fb-b014-23cd-f1ad-03969a7964e7@vivier.eu>
+Date: Thu, 22 Nov 2018 13:08:17 +0100
+MIME-Version: 1.0
+In-Reply-To: <da889f34-09b3-6c01-050a-778b86a731fa@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target: hax: replace g_malloc with
+ g_malloc0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Li Qiang <liq3ea@gmail.com>, rth@twiddle.net, ehabkost@redhat.com
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-Upon completion of incoming packet the device pushes CQE to driver's RX
-ring and notify the driver (msix).
-While for data-path incoming packets the driver needs the ability to
-control whether it wished to receive interrupts or not, for control-path
-packets such as incoming MAD the driver needs to be notified anyway, it
-even do not need to re-arm the notification bit.
+On 21/11/2018 18:55, Paolo Bonzini wrote:
+> On 15/11/18 07:05, Li Qiang wrote:
+>> And also the g_malloc doesn't need check return value,
+>> remove it.
+>>
+>> Cc: qemu-trivial@nongnu.org
+>>
+>> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+>> ---
+>>  target/i386/hax-all.c | 15 +++------------
+>>  1 file changed, 3 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+>> index d2e512856b..a460c605af 100644
+>> --- a/target/i386/hax-all.c
+>> +++ b/target/i386/hax-all.c
+>> @@ -154,13 +154,7 @@ int hax_vcpu_create(int id)
+>>          return 0;
+>>      }
+>>  
+>> -    vcpu = g_malloc(sizeof(struct hax_vcpu_state));
+>> -    if (!vcpu) {
+>> -        fprintf(stderr, "Failed to alloc vcpu state\n");
+>> -        return -ENOMEM;
+>> -    }
+>> -
+>> -    memset(vcpu, 0, sizeof(struct hax_vcpu_state));
+>> +    vcpu = g_malloc0(sizeof(struct hax_vcpu_state));
+>>  
+>>      ret = hax_host_create_vcpu(hax_global.vm->fd, id);
+>>      if (ret) {
+>> @@ -250,11 +244,8 @@ struct hax_vm *hax_vm_create(struct hax_state *hax)
+>>          return hax->vm;
+>>      }
+>>  
+>> -    vm = g_malloc(sizeof(struct hax_vm));
+>> -    if (!vm) {
+>> -        return NULL;
+>> -    }
+>> -    memset(vm, 0, sizeof(struct hax_vm));
+>> +    vm = g_malloc0(sizeof(struct hax_vm));
+>> +
+>>      ret = hax_host_create_vm(hax, &vm_id);
+>>      if (ret) {
+>>          fprintf(stderr, "Failed to create vm %x\n", ret);
+>>
+> 
+> Queued, thanks.
 
-Enhance the notification field to support this.
+Markus and Philippe have asked to use g_new0() rather than g_malloc0().
 
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
----
- hw/rdma/rdma_rm.c           | 12 ++++++++++--
- hw/rdma/rdma_rm_defs.h      |  8 +++++++-
- hw/rdma/vmw/pvrdma_qp_ops.c |  6 ++++--
- 3 files changed, 21 insertions(+), 5 deletions(-)
-
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index 8d59a42cd1..4f10fcabcc 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -263,7 +263,7 @@ int rdma_rm_alloc_cq(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-     }
- 
-     cq->opaque = opaque;
--    cq->notify = false;
-+    cq->notify = CNT_CLEAR;
- 
-     rc = rdma_backend_create_cq(backend_dev, &cq->backend_cq, cqe);
-     if (rc) {
-@@ -291,7 +291,10 @@ void rdma_rm_req_notify_cq(RdmaDeviceResources *dev_res, uint32_t cq_handle,
-         return;
-     }
- 
--    cq->notify = notify;
-+    if (cq->notify != CNT_SET) {
-+        cq->notify = notify ? CNT_ARM : CNT_CLEAR;
-+    }
-+
-     pr_dbg("notify=%d\n", cq->notify);
- }
- 
-@@ -349,6 +352,11 @@ int rdma_rm_alloc_qp(RdmaDeviceResources *dev_res, uint32_t pd_handle,
-         return -EINVAL;
-     }
- 
-+    if (qp_type == IBV_QPT_GSI) {
-+        scq->notify = CNT_SET;
-+        rcq->notify = CNT_SET;
-+    }
-+
-     qp = res_tbl_alloc(&dev_res->qp_tbl, &rm_qpn);
-     if (!qp) {
-         return -ENOMEM;
-diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
-index 7228151239..9b399063d3 100644
---- a/hw/rdma/rdma_rm_defs.h
-+++ b/hw/rdma/rdma_rm_defs.h
-@@ -49,10 +49,16 @@ typedef struct RdmaRmPD {
-     uint32_t ctx_handle;
- } RdmaRmPD;
- 
-+typedef enum CQNotificationType {
-+    CNT_CLEAR,
-+    CNT_ARM,
-+    CNT_SET,
-+} CQNotificationType;
-+
- typedef struct RdmaRmCQ {
-     RdmaBackendCQ backend_cq;
-     void *opaque;
--    bool notify;
-+    CQNotificationType notify;
- } RdmaRmCQ;
- 
- /* MR (DMA region) */
-diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-index c668afd0ed..762700a205 100644
---- a/hw/rdma/vmw/pvrdma_qp_ops.c
-+++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-@@ -89,8 +89,10 @@ static int pvrdma_post_cqe(PVRDMADev *dev, uint32_t cq_handle,
-     pvrdma_ring_write_inc(&dev->dsr_info.cq);
- 
-     pr_dbg("cq->notify=%d\n", cq->notify);
--    if (cq->notify) {
--        cq->notify = false;
-+    if (cq->notify != CNT_CLEAR) {
-+        if (cq->notify == CNT_ARM) {
-+            cq->notify = CNT_CLEAR;
-+        }
-         post_interrupt(dev, INTR_VEC_CMD_COMPLETION_Q);
-     }
- 
--- 
-2.17.2
+Thanks,
+Laurent
