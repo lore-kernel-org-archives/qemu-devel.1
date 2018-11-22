@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55110)
+Received: from eggs.gnu.org ([208.118.235.92]:55046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPnta-0000OA-3n
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPnta-0000Nw-13
 	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPnt7-0000zH-K0
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:21 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:38432)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPnt9-00012l-43
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:24 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:57970)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gPnt7-0000yT-BE
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:17 -0500
+	id 1gPnt8-000115-RL
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:15:19 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 22 Nov 2018 14:13:56 +0200
-Message-Id: <20181122121402.13764-19-yuval.shaia@oracle.com>
+Date: Thu, 22 Nov 2018 14:13:55 +0200
+Message-Id: <20181122121402.13764-18-yuval.shaia@oracle.com>
 In-Reply-To: <20181122121402.13764-1-yuval.shaia@oracle.com>
 References: <20181122121402.13764-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v5 18/24] hw/rdma: Remove unneeded code that
- handles more that one port
+Subject: [Qemu-devel] [PATCH v5 17/24] hw/pvrdma: Fill error code in
+ command's response
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,136 +27,197 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-Device supports only one port, let's remove a dead code that handles
-more than one port.
+Driver checks error code let's set it.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_rm.c      | 34 ++++++++++++++++------------------
- hw/rdma/rdma_rm.h      |  2 +-
- hw/rdma/rdma_rm_defs.h |  4 ++--
- 3 files changed, 19 insertions(+), 21 deletions(-)
+ hw/rdma/vmw/pvrdma_cmd.c | 67 ++++++++++++++++++++++++++++------------
+ 1 file changed, 48 insertions(+), 19 deletions(-)
 
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index 250254561c..b7d4ebe972 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -545,7 +545,7 @@ int rdma_rm_add_gid(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-         return -EINVAL;
+diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+index 0d3c818c20..a326c5d470 100644
+--- a/hw/rdma/vmw/pvrdma_cmd.c
++++ b/hw/rdma/vmw/pvrdma_cmd.c
+@@ -131,7 +131,8 @@ static int query_port(PVRDMADev *dev, union pvrdma_cmd_req *req,
+ 
+     if (rdma_backend_query_port(&dev->backend_dev,
+                                 (struct ibv_port_attr *)&attrs)) {
+-        return -ENOMEM;
++        resp->hdr.err = -ENOMEM;
++        goto out;
      }
  
--    memcpy(&dev_res->ports[0].gid_tbl[gid_idx].gid, gid, sizeof(*gid));
-+    memcpy(&dev_res->port.gid_tbl[gid_idx].gid, gid, sizeof(*gid));
+     memset(resp, 0, sizeof(*resp));
+@@ -150,7 +151,9 @@ static int query_port(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     resp->attrs.active_width = 1;
+     resp->attrs.active_speed = 1;
  
-     return 0;
- }
-@@ -556,15 +556,15 @@ int rdma_rm_del_gid(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-     int rc;
- 
-     rc = rdma_backend_del_gid(backend_dev, ifname,
--                              &dev_res->ports[0].gid_tbl[gid_idx].gid);
-+                              &dev_res->port.gid_tbl[gid_idx].gid);
-     if (rc) {
-         pr_dbg("Fail to delete gid\n");
-         return -EINVAL;
-     }
- 
--    memset(dev_res->ports[0].gid_tbl[gid_idx].gid.raw, 0,
--           sizeof(dev_res->ports[0].gid_tbl[gid_idx].gid));
--    dev_res->ports[0].gid_tbl[gid_idx].backend_gid_index = -1;
-+    memset(dev_res->port.gid_tbl[gid_idx].gid.raw, 0,
-+           sizeof(dev_res->port.gid_tbl[gid_idx].gid));
-+    dev_res->port.gid_tbl[gid_idx].backend_gid_index = -1;
- 
-     return 0;
- }
-@@ -577,16 +577,16 @@ int rdma_rm_get_backend_gid_index(RdmaDeviceResources *dev_res,
-         return -EINVAL;
-     }
- 
--    if (unlikely(dev_res->ports[0].gid_tbl[sgid_idx].backend_gid_index == -1)) {
--        dev_res->ports[0].gid_tbl[sgid_idx].backend_gid_index =
-+    if (unlikely(dev_res->port.gid_tbl[sgid_idx].backend_gid_index == -1)) {
-+        dev_res->port.gid_tbl[sgid_idx].backend_gid_index =
-         rdma_backend_get_gid_index(backend_dev,
--                                   &dev_res->ports[0].gid_tbl[sgid_idx].gid);
-+                                   &dev_res->port.gid_tbl[sgid_idx].gid);
-     }
- 
-     pr_dbg("backend_gid_index=%d\n",
--           dev_res->ports[0].gid_tbl[sgid_idx].backend_gid_index);
-+           dev_res->port.gid_tbl[sgid_idx].backend_gid_index);
- 
--    return dev_res->ports[0].gid_tbl[sgid_idx].backend_gid_index;
-+    return dev_res->port.gid_tbl[sgid_idx].backend_gid_index;
+-    return 0;
++out:
++    pr_dbg("ret=%d\n", resp->hdr.err);
++    return resp->hdr.err;
  }
  
- static void destroy_qp_hash_key(gpointer data)
-@@ -596,15 +596,13 @@ static void destroy_qp_hash_key(gpointer data)
+ static int query_pkey(PVRDMADev *dev, union pvrdma_cmd_req *req,
+@@ -170,7 +173,7 @@ static int query_pkey(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     resp->pkey = PVRDMA_PKEY;
+     pr_dbg("pkey=0x%x\n", resp->pkey);
  
- static void init_ports(RdmaDeviceResources *dev_res)
- {
--    int i, j;
-+    int i;
- 
--    memset(dev_res->ports, 0, sizeof(dev_res->ports));
-+    memset(&dev_res->port, 0, sizeof(dev_res->port));
- 
--    for (i = 0; i < MAX_PORTS; i++) {
--        dev_res->ports[i].state = IBV_PORT_DOWN;
--        for (j = 0; j < MAX_PORT_GIDS; j++) {
--            dev_res->ports[i].gid_tbl[j].backend_gid_index = -1;
--        }
-+    dev_res->port.state = IBV_PORT_DOWN;
-+    for (i = 0; i < MAX_PORT_GIDS; i++) {
-+        dev_res->port.gid_tbl[i].backend_gid_index = -1;
-     }
+-    return 0;
++    return resp->hdr.err;
  }
  
-@@ -613,7 +611,7 @@ static void fini_ports(RdmaDeviceResources *dev_res,
- {
-     int i;
+ static int create_pd(PVRDMADev *dev, union pvrdma_cmd_req *req,
+@@ -200,7 +203,9 @@ static int destroy_pd(PVRDMADev *dev, union pvrdma_cmd_req *req,
  
--    dev_res->ports[0].state = IBV_PORT_DOWN;
-+    dev_res->port.state = IBV_PORT_DOWN;
-     for (i = 0; i < MAX_PORT_GIDS; i++) {
-         rdma_rm_del_gid(dev_res, backend_dev, ifname, i);
-     }
-diff --git a/hw/rdma/rdma_rm.h b/hw/rdma/rdma_rm.h
-index a7169b4e89..3c602c04c0 100644
---- a/hw/rdma/rdma_rm.h
-+++ b/hw/rdma/rdma_rm.h
-@@ -79,7 +79,7 @@ int rdma_rm_get_backend_gid_index(RdmaDeviceResources *dev_res,
- static inline union ibv_gid *rdma_rm_get_gid(RdmaDeviceResources *dev_res,
-                                              int sgid_idx)
- {
--    return &dev_res->ports[0].gid_tbl[sgid_idx].gid;
-+    return &dev_res->port.gid_tbl[sgid_idx].gid;
+     rdma_rm_dealloc_pd(&dev->rdma_dev_res, cmd->pd_handle);
+ 
+-    return 0;
++    rsp->hdr.err = 0;
++
++    return rsp->hdr.err;
  }
  
- #endif
-diff --git a/hw/rdma/rdma_rm_defs.h b/hw/rdma/rdma_rm_defs.h
-index 7b3435f991..0ba61d1838 100644
---- a/hw/rdma/rdma_rm_defs.h
-+++ b/hw/rdma/rdma_rm_defs.h
-@@ -18,7 +18,7 @@
+ static int create_mr(PVRDMADev *dev, union pvrdma_cmd_req *req,
+@@ -251,7 +256,9 @@ static int destroy_mr(PVRDMADev *dev, union pvrdma_cmd_req *req,
  
- #include "rdma_backend_defs.h"
+     rdma_rm_dealloc_mr(&dev->rdma_dev_res, cmd->mr_handle);
  
--#define MAX_PORTS             1
-+#define MAX_PORTS             1 /* Do not change - we support only one port */
- #define MAX_PORT_GIDS         255
- #define MAX_GIDS              MAX_PORT_GIDS
- #define MAX_PORT_PKEYS        1
-@@ -97,7 +97,7 @@ typedef struct RdmaRmPort {
- } RdmaRmPort;
+-    return 0;
++    rsp->hdr.err = 0;
++
++    return rsp->hdr.err;
+ }
  
- typedef struct RdmaDeviceResources {
--    RdmaRmPort ports[MAX_PORTS];
-+    RdmaRmPort port;
-     RdmaRmResTbl pd_tbl;
-     RdmaRmResTbl mr_tbl;
-     RdmaRmResTbl uc_tbl;
+ static int create_cq_ring(PCIDevice *pci_dev , PvrdmaRing **ring,
+@@ -353,7 +360,8 @@ static int destroy_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     cq = rdma_rm_get_cq(&dev->rdma_dev_res, cmd->cq_handle);
+     if (!cq) {
+         pr_dbg("Invalid CQ handle\n");
+-        return -EINVAL;
++        rsp->hdr.err = -EINVAL;
++        goto out;
+     }
+ 
+     ring = (PvrdmaRing *)cq->opaque;
+@@ -364,7 +372,11 @@ static int destroy_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
+ 
+     rdma_rm_dealloc_cq(&dev->rdma_dev_res, cmd->cq_handle);
+ 
+-    return 0;
++    rsp->hdr.err = 0;
++
++out:
++    pr_dbg("ret=%d\n", rsp->hdr.err);
++    return rsp->hdr.err;
+ }
+ 
+ static int create_qp_rings(PCIDevice *pci_dev, uint64_t pdir_dma,
+@@ -553,7 +565,8 @@ static int destroy_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     qp = rdma_rm_get_qp(&dev->rdma_dev_res, cmd->qp_handle);
+     if (!qp) {
+         pr_dbg("Invalid QP handle\n");
+-        return -EINVAL;
++        rsp->hdr.err = -EINVAL;
++        goto out;
+     }
+ 
+     rdma_rm_dealloc_qp(&dev->rdma_dev_res, cmd->qp_handle);
+@@ -567,7 +580,11 @@ static int destroy_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     rdma_pci_dma_unmap(PCI_DEVICE(dev), ring->ring_state, TARGET_PAGE_SIZE);
+     g_free(ring);
+ 
+-    return 0;
++    rsp->hdr.err = 0;
++
++out:
++    pr_dbg("ret=%d\n", rsp->hdr.err);
++    return rsp->hdr.err;
+ }
+ 
+ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+@@ -580,7 +597,8 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     pr_dbg("index=%d\n", cmd->index);
+ 
+     if (cmd->index >= MAX_PORT_GIDS) {
+-        return -EINVAL;
++        rsp->hdr.err = -EINVAL;
++        goto out;
+     }
+ 
+     pr_dbg("gid[%d]=0x%llx,0x%llx\n", cmd->index,
+@@ -590,10 +608,15 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     rc = rdma_rm_add_gid(&dev->rdma_dev_res, &dev->backend_dev,
+                          dev->backend_eth_device_name, gid, cmd->index);
+     if (rc < 0) {
+-        return -EINVAL;
++        rsp->hdr.err = rc;
++        goto out;
+     }
+ 
+-    return 0;
++    rsp->hdr.err = 0;
++
++out:
++    pr_dbg("ret=%d\n", rsp->hdr.err);
++    return rsp->hdr.err;
+ }
+ 
+ static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+@@ -606,7 +629,8 @@ static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     pr_dbg("index=%d\n", cmd->index);
+ 
+     if (cmd->index >= MAX_PORT_GIDS) {
+-        return -EINVAL;
++        rsp->hdr.err = -EINVAL;
++        goto out;
+     }
+ 
+     rc = rdma_rm_del_gid(&dev->rdma_dev_res, &dev->backend_dev,
+@@ -617,7 +641,11 @@ static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
+         goto out;
+     }
+ 
+-    return 0;
++    rsp->hdr.err = 0;
++
++out:
++    pr_dbg("ret=%d\n", rsp->hdr.err);
++    return rsp->hdr.err;
+ }
+ 
+ static int create_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
+@@ -634,9 +662,8 @@ static int create_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     resp->hdr.err = rdma_rm_alloc_uc(&dev->rdma_dev_res, cmd->pfn,
+                                      &resp->ctx_handle);
+ 
+-    pr_dbg("ret=%d\n", resp->hdr.err);
+-
+-    return 0;
++    pr_dbg("ret=%d\n", rsp->hdr.err);
++    return rsp->hdr.err;
+ }
+ 
+ static int destroy_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
+@@ -648,7 +675,9 @@ static int destroy_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
+ 
+     rdma_rm_dealloc_uc(&dev->rdma_dev_res, cmd->ctx_handle);
+ 
+-    return 0;
++    rsp->hdr.err = 0;
++
++    return rsp->hdr.err;
+ }
+ struct cmd_handler {
+     uint32_t cmd;
+@@ -696,7 +725,7 @@ int execute_command(PVRDMADev *dev)
+     }
+ 
+     err = cmd_handlers[dsr_info->req->hdr.cmd].exec(dev, dsr_info->req,
+-                            dsr_info->rsp);
++                                                    dsr_info->rsp);
+ out:
+     set_reg_val(dev, PVRDMA_REG_ERR, err);
+     post_interrupt(dev, INTR_VEC_CMD_RING);
 -- 
 2.17.2
