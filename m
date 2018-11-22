@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gPskx-0006k9-Ei
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:27:12 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gPsky-0006lB-Bi
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:27:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gPskw-00019V-S9
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:27:11 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gPskx-0001Ao-PF
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:27:12 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:52784)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gPskw-0000ga-Ko
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:27:10 -0500
+	id 1gPskx-0000ga-J6
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:27:11 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Nov 2018 17:26:52 +0000
-Message-Id: <20181122172653.3413-3-peter.maydell@linaro.org>
+Date: Thu, 22 Nov 2018 17:26:51 +0000
+Message-Id: <20181122172653.3413-2-peter.maydell@linaro.org>
 In-Reply-To: <20181122172653.3413-1-peter.maydell@linaro.org>
 References: <20181122172653.3413-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 for-4.0 2/3] monitor: Use
+Subject: [Qemu-devel] [PATCH v2 for-4.0 1/3] disas.c: Use
  address_space_read() to read memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,39 +31,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-Currently monitor.c reads physical memory using
+Currently disas.c reads physical memory using
 cpu_physical_memory_read(). This effectively hard-codes
 assuming that all CPUs have the same view of physical
 memory. Switch to address_space_read() instead, which
 lets us use the AddressSpace for the CPU we're
-reading memory for (falling back to address_space_memory
-if there is no CPU, as happens with the "none" board).
-As a bonus, this allows us to detect failures to read memory.
+disassembling for.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- monitor.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ disas.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/monitor.c b/monitor.c
-index d39390c2f2f..b0e8f2c490a 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1604,7 +1604,13 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
-         if (l > line_size)
-             l = line_size;
-         if (is_physical) {
--            cpu_physical_memory_read(addr, buf, l);
-+            AddressSpace *as = cs ? cs->as : &address_space_memory;
-+            MemTxResult r = address_space_read(as, addr,
-+                                               MEMTXATTRS_UNSPECIFIED, buf, l);
-+            if (r != MEMTX_OK) {
-+                monitor_printf(mon, " Cannot access memory\n");
-+                break;
-+            }
-         } else {
-             if (cpu_memory_rw_debug(cs, addr, buf, l, 0) < 0) {
-                 monitor_printf(mon, " Cannot access memory\n");
+diff --git a/disas.c b/disas.c
+index 5325b7e6be6..f9c517b3588 100644
+--- a/disas.c
++++ b/disas.c
+@@ -588,7 +588,10 @@ static int
+ physical_read_memory(bfd_vma memaddr, bfd_byte *myaddr, int length,
+                      struct disassemble_info *info)
+ {
+-    cpu_physical_memory_read(memaddr, myaddr, length);
++    CPUDebug *s = container_of(info, CPUDebug, info);
++
++    address_space_read(s->cpu->as, memaddr, MEMTXATTRS_UNSPECIFIED,
++                       myaddr, length);
+     return 0;
+ }
+ 
 -- 
 2.19.1
