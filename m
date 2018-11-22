@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:55199)
+Received: from eggs.gnu.org ([208.118.235.92]:55089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPntp-0000RY-HN
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:16:07 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPnte-0000Ny-Gn
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:16:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gPnsL-0007xt-8N
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:14:33 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:52528)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPnsY-0000C6-90
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:14:46 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:37918)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gPnsK-0007su-VG
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:14:29 -0500
+	id 1gPnsX-0000BC-VX
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 07:14:42 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 22 Nov 2018 14:13:42 +0200
-Message-Id: <20181122121402.13764-5-yuval.shaia@oracle.com>
+Date: Thu, 22 Nov 2018 14:13:46 +0200
+Message-Id: <20181122121402.13764-9-yuval.shaia@oracle.com>
 In-Reply-To: <20181122121402.13764-1-yuval.shaia@oracle.com>
 References: <20181122121402.13764-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v5 04/24] hw/rdma: Abort send-op if fail to
- create addr handler
+Subject: [Qemu-devel] [PATCH v5 08/24] hw/pvrdma: Set the correct opcode for
+ recv completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +27,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-Function create_ah might return NULL, let's exit with an error.
+The function pvrdma_post_cqe populates CQE entry with opcode from the
+given completion element. For receive operation value was not set. Fix
+it by setting it to IBV_WC_RECV.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_backend.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ hw/rdma/vmw/pvrdma_qp_ops.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-index d7a4bbd91f..1e148398a2 100644
---- a/hw/rdma/rdma_backend.c
-+++ b/hw/rdma/rdma_backend.c
-@@ -338,6 +338,10 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
-     if (qp_type == IBV_QPT_UD) {
-         wr.wr.ud.ah = create_ah(backend_dev, qp->ibpd,
-                                 backend_dev->backend_gid_idx, dgid);
-+        if (!wr.wr.ud.ah) {
-+            comp_handler(IBV_WC_GENERAL_ERR, VENDOR_ERR_FAIL_BACKEND, ctx);
-+            goto out_dealloc_cqe_ctx;
-+        }
-         wr.wr.ud.remote_qpn = dqpn;
-         wr.wr.ud.remote_qkey = dqkey;
-     }
+diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
+index 762700a205..7b0f440fda 100644
+--- a/hw/rdma/vmw/pvrdma_qp_ops.c
++++ b/hw/rdma/vmw/pvrdma_qp_ops.c
+@@ -196,8 +196,9 @@ int pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
+         comp_ctx = g_malloc(sizeof(CompHandlerCtx));
+         comp_ctx->dev = dev;
+         comp_ctx->cq_handle = qp->recv_cq_handle;
+-        comp_ctx->cqe.qp = qp_handle;
+         comp_ctx->cqe.wr_id = wqe->hdr.wr_id;
++        comp_ctx->cqe.qp = qp_handle;
++        comp_ctx->cqe.opcode = IBV_WC_RECV;
+ 
+         rdma_backend_post_recv(&dev->backend_dev, &dev->rdma_dev_res,
+                                &qp->backend_qp, qp->qp_type,
 -- 
 2.17.2
