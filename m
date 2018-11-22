@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gPmxu-00057t-Pw
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:16:14 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPn3K-0007KE-Ui
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:21:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gPmxp-0002u8-CW
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:16:10 -0500
-Date: Thu, 22 Nov 2018 16:13:02 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181122051302.GG10448@umbus.fritz.box>
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-7-clg@kaod.org>
+	(envelope-from <yuval.shaia@oracle.com>) id 1gPn3E-0006Nj-Vx
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:21:46 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:39984)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gPn3E-000685-LU
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:21:40 -0500
+Date: Thu, 22 Nov 2018 13:21:30 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20181122112129.GA8920@lap1>
+References: <20181118122843.10892-1-yuval.shaia@oracle.com>
+	<20181118122843.10892-11-yuval.shaia@oracle.com>
+	<87wop9v8p3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9/eUdp+dLtKXvemk"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181116105729.23240-7-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 06/36] ppc/xive: add support for the END
- Event State buffers
+In-Reply-To: <87wop9v8p3.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v4 10/23] json: Define new QMP message for
+ pvrdma
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,295 +30,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com, yuval.shaia@oracle.com
 
+On Mon, Nov 19, 2018 at 08:16:08AM +0100, Markus Armbruster wrote:
+> The subsystem tag in the commit message's title should be "qapi: " not
+> "json: ".
 
---9/eUdp+dLtKXvemk
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Done.
 
-On Fri, Nov 16, 2018 at 11:56:59AM +0100, C=E9dric Le Goater wrote:
-> The Event Notification Descriptor also contains two Event State
-> Buffers providing further coalescing of interrupts, one for the
-> notification event (ESn) and one for the escalation events (ESe). A
-> MMIO page is assigned for each to control the EOI through loads
-> only. Stores are not allowed.
->=20
-> The END ESBs are modeled through an object resembling the 'XiveSource'
-> It is stateless as the END state bits are backed into the XiveEND
-> structure under the XiveRouter and the MMIO accesses follow the same
-> rules as for the standard source ESBs.
->=20
-> END ESBs are not supported by the Linux drivers neither on OPAL nor on
-> sPAPR. Nevetherless, it provides a mean to study the question in the
-> future and validates a bit more the XIVE model.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/xive.h |  20 ++++++
->  hw/intc/xive.c        | 160 +++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 178 insertions(+), 2 deletions(-)
->=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index ce62aaf28343..24301bf2076d 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -208,6 +208,26 @@ int xive_router_get_end(XiveRouter *xrtr, uint8_t en=
-d_blk, uint32_t end_idx,
->  int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_=
-idx,
->                          XiveEND *end);
-> =20
-> +/*
-> + * XIVE END ESBs
-> + */
-> +
-> +#define TYPE_XIVE_END_SOURCE "xive-end-source"
-> +#define XIVE_END_SOURCE(obj) \
-> +    OBJECT_CHECK(XiveENDSource, (obj), TYPE_XIVE_END_SOURCE)
+> 
+> Yuval Shaia <yuval.shaia@oracle.com> writes:
+> 
+> > pvrdma requires that the same GID attached to it will be attached to the
+> > backend device in the host.
+> >
+> > A new QMP messages is defined so pvrdma device can broadcast any change
+> > made to its GID table. This event is captured by libvirt which in turn
+> > will update the GID table in the backend device.
+> >
+> > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> > ---
+> >  MAINTAINERS           |  1 +
+> >  Makefile              |  3 ++-
+> >  Makefile.objs         |  4 ++++
+> >  qapi/qapi-schema.json |  1 +
+> >  qapi/rdma.json        | 38 ++++++++++++++++++++++++++++++++++++++
+> >  5 files changed, 46 insertions(+), 1 deletion(-)
+> >  create mode 100644 qapi/rdma.json
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index e087d58ac6..a149f68a8f 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -2232,6 +2232,7 @@ F: hw/rdma/*
+> >  F: hw/rdma/vmw/*
+> >  F: docs/pvrdma.txt
+> >  F: contrib/rdmacm-mux/*
+> > +F: qapi/rdma.json
+> >  
+> >  Build and test automation
+> >  -------------------------
+> > diff --git a/Makefile b/Makefile
+> > index 94072776ff..db4ce60ee5 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -599,7 +599,8 @@ qapi-modules = $(SRC_PATH)/qapi/qapi-schema.json $(SRC_PATH)/qapi/common.json \
+> >                 $(SRC_PATH)/qapi/tpm.json \
+> >                 $(SRC_PATH)/qapi/trace.json \
+> >                 $(SRC_PATH)/qapi/transaction.json \
+> > -               $(SRC_PATH)/qapi/ui.json
+> > +               $(SRC_PATH)/qapi/ui.json \
+> > +               $(SRC_PATH)/qapi/rdma.json
+> 
+> Please insert between net.json and rocker.json to maintain alphabetical
+> order.
 
-Is there a particular reason to make this a full QOM object, rather
-than just embedding it in the XiveRouter?
+Removed after using Eric Blake's framework.
 
-> +typedef struct XiveENDSource {
-> +    SysBusDevice parent;
-> +
-> +    uint32_t        nr_ends;
-> +
-> +    /* ESB memory region */
-> +    uint32_t        esb_shift;
-> +    MemoryRegion    esb_mmio;
-> +
-> +    XiveRouter      *xrtr;
-> +} XiveENDSource;
-> +
->  /*
->   * For legacy compatibility, the exceptions define up to 256 different
->   * priorities. P9 implements only 9 levels : 8 active levels [0 - 7]
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 9cb001e7b540..5a8882d47a98 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -622,8 +622,18 @@ static void xive_router_end_notify(XiveRouter *xrtr,=
- uint8_t end_blk,
->       * even futher coalescing in the Router
->       */
->      if (!(end.w0 & END_W0_UCOND_NOTIFY)) {
-> -        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n"=
-);
-> -        return;
-> +        uint8_t pq =3D GETFIELD(END_W1_ESn, end.w1);
-> +        bool notify =3D xive_esb_trigger(&pq);
-> +
-> +        if (pq !=3D GETFIELD(END_W1_ESn, end.w1)) {
-> +            end.w1 =3D SETFIELD(END_W1_ESn, end.w1, pq);
-> +            xive_router_set_end(xrtr, end_blk, end_idx, &end);
-> +        }
-> +
-> +        /* ESn[Q]=3D1 : end of notification */
-> +        if (!notify) {
-> +            return;
-> +        }
->      }
-> =20
->      /*
-> @@ -706,6 +716,151 @@ void xive_eas_pic_print_info(XiveEAS *eas, uint32_t=
- lisn, Monitor *mon)
->                     (uint32_t) GETFIELD(EAS_END_DATA, eas->w));
->  }
-> =20
-> +/*
-> + * END ESB MMIO loads
-> + */
-> +static uint64_t xive_end_source_read(void *opaque, hwaddr addr, unsigned=
- size)
-> +{
-> +    XiveENDSource *xsrc =3D XIVE_END_SOURCE(opaque);
-> +    XiveRouter *xrtr =3D xsrc->xrtr;
-> +    uint32_t offset =3D addr & 0xFFF;
-> +    uint8_t end_blk;
-> +    uint32_t end_idx;
-> +    XiveEND end;
-> +    uint32_t end_esmask;
-> +    uint8_t pq;
-> +    uint64_t ret =3D -1;
-> +
-> +    end_blk =3D xrtr->chip_id;
-> +    end_idx =3D addr >> (xsrc->esb_shift + 1);
-> +    if (xive_router_get_end(xrtr, end_blk, end_idx, &end)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No END %x/%x\n", end_blk,
-> +                      end_idx);
-> +        return -1;
-> +    }
-> +
-> +    if (!(end.w0 & END_W0_VALID)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: END %x/%x is invalid\n",
-> +                      end_blk, end_idx);
-> +        return -1;
-> +    }
-> +
-> +    end_esmask =3D addr_is_even(addr, xsrc->esb_shift) ? END_W1_ESn : EN=
-D_W1_ESe;
-> +    pq =3D GETFIELD(end_esmask, end.w1);
-> +
-> +    switch (offset) {
-> +    case XIVE_ESB_LOAD_EOI ... XIVE_ESB_LOAD_EOI + 0x7FF:
-> +        ret =3D xive_esb_eoi(&pq);
-> +
-> +        /* Forward the source event notification for routing ?? */
-> +        break;
-> +
-> +    case XIVE_ESB_GET ... XIVE_ESB_GET + 0x3FF:
-> +        ret =3D pq;
-> +        break;
-> +
-> +    case XIVE_ESB_SET_PQ_00 ... XIVE_ESB_SET_PQ_00 + 0x0FF:
-> +    case XIVE_ESB_SET_PQ_01 ... XIVE_ESB_SET_PQ_01 + 0x0FF:
-> +    case XIVE_ESB_SET_PQ_10 ... XIVE_ESB_SET_PQ_10 + 0x0FF:
-> +    case XIVE_ESB_SET_PQ_11 ... XIVE_ESB_SET_PQ_11 + 0x0FF:
-> +        ret =3D xive_esb_set(&pq, (offset >> 8) & 0x3);
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid END ESB load addr =
-%d\n",
-> +                      offset);
-> +        return -1;
-> +    }
-> +
-> +    if (pq !=3D GETFIELD(end_esmask, end.w1)) {
-> +        end.w1 =3D SETFIELD(end_esmask, end.w1, pq);
-> +        xive_router_set_end(xrtr, end_blk, end_idx, &end);
-> +    }
+> 
+> >  qapi/qapi-builtin-types.c qapi/qapi-builtin-types.h \
+> >  qapi/qapi-types.c qapi/qapi-types.h \
+> > diff --git a/Makefile.objs b/Makefile.objs
+> > index cc7df3ad80..76d8028f2f 100644
+> > --- a/Makefile.objs
+> > +++ b/Makefile.objs
+> > @@ -21,6 +21,7 @@ util-obj-y += qapi/qapi-types-tpm.o
+> >  util-obj-y += qapi/qapi-types-trace.o
+> >  util-obj-y += qapi/qapi-types-transaction.o
+> >  util-obj-y += qapi/qapi-types-ui.o
+> > +util-obj-y += qapi/qapi-types-rdma.o
+> >  util-obj-y += qapi/qapi-builtin-visit.o
+> >  util-obj-y += qapi/qapi-visit.o
+> >  util-obj-y += qapi/qapi-visit-block-core.o
+> > @@ -40,6 +41,7 @@ util-obj-y += qapi/qapi-visit-tpm.o
+> >  util-obj-y += qapi/qapi-visit-trace.o
+> >  util-obj-y += qapi/qapi-visit-transaction.o
+> >  util-obj-y += qapi/qapi-visit-ui.o
+> > +util-obj-y += qapi/qapi-visit-rdma.o
+> >  util-obj-y += qapi/qapi-events.o
+> >  util-obj-y += qapi/qapi-events-block-core.o
+> >  util-obj-y += qapi/qapi-events-block.o
+> > @@ -58,6 +60,7 @@ util-obj-y += qapi/qapi-events-tpm.o
+> >  util-obj-y += qapi/qapi-events-trace.o
+> >  util-obj-y += qapi/qapi-events-transaction.o
+> >  util-obj-y += qapi/qapi-events-ui.o
+> > +util-obj-y += qapi/qapi-events-rdma.o
+> >  util-obj-y += qapi/qapi-introspect.o
+> >  
+> >  chardev-obj-y = chardev/
+> > @@ -155,6 +158,7 @@ common-obj-y += qapi/qapi-commands-tpm.o
+> >  common-obj-y += qapi/qapi-commands-trace.o
+> >  common-obj-y += qapi/qapi-commands-transaction.o
+> >  common-obj-y += qapi/qapi-commands-ui.o
+> > +common-obj-y += qapi/qapi-commands-rdma.o
+> >  common-obj-y += qapi/qapi-introspect.o
+> >  common-obj-y += qmp.o hmp.o
+> >  endif
+> 
+> This is incomplete, and it conflicts with Eric Blake's "[PATCH v3] qapi:
+> Reduce Makefile boilerplate".  I recommend to base on Eric's patch,
+> because that'll let you add the new rdma.json much more easily.
 
-We can probably share some more code with XiveSource here, but that's
-something that can be refined later.
+Sure, will do that but let's ignore build error reports generated by build
+robot for my v5 :)
 
-> +
-> +    return ret;
-> +}
-> +
-> +/*
-> + * END ESB MMIO stores are invalid
-> + */
-> +static void xive_end_source_write(void *opaque, hwaddr addr,
-> +                                  uint64_t value, unsigned size)
-> +{
-> +    qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB write addr 0x%"
-> +                  HWADDR_PRIx"\n", addr);
-> +}
-> +
-> +static const MemoryRegionOps xive_end_source_ops =3D {
-> +    .read =3D xive_end_source_read,
-> +    .write =3D xive_end_source_write,
-> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> +    .valid =3D {
-> +        .min_access_size =3D 8,
-> +        .max_access_size =3D 8,
-> +    },
-> +    .impl =3D {
-> +        .min_access_size =3D 8,
-> +        .max_access_size =3D 8,
-> +    },
-> +};
-> +
-> +static void xive_end_source_realize(DeviceState *dev, Error **errp)
-> +{
-> +    XiveENDSource *xsrc =3D XIVE_END_SOURCE(dev);
-> +    Object *obj;
-> +    Error *local_err =3D NULL;
-> +
-> +    obj =3D object_property_get_link(OBJECT(dev), "xive", &local_err);
-> +    if (!obj) {
-> +        error_propagate(errp, local_err);
-> +        error_prepend(errp, "required link 'xive' not found: ");
-> +        return;
-> +    }
-> +
-> +    xsrc->xrtr =3D XIVE_ROUTER(obj);
-> +
-> +    if (!xsrc->nr_ends) {
-> +        error_setg(errp, "Number of interrupt needs to be greater than 0=
-");
-> +        return;
-> +    }
-> +
-> +    if (xsrc->esb_shift !=3D XIVE_ESB_4K &&
-> +        xsrc->esb_shift !=3D XIVE_ESB_64K) {
-> +        error_setg(errp, "Invalid ESB shift setting");
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Each END is assigned an even/odd pair of MMIO pages, the even page
-> +     * manages the ESn field while the odd page manages the ESe field.
-> +     */
-> +    memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
-> +                          &xive_end_source_ops, xsrc, "xive.end",
-> +                          (1ull << (xsrc->esb_shift + 1)) * xsrc->nr_end=
-s);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &xsrc->esb_mmio);
-> +}
-> +
-> +static Property xive_end_source_properties[] =3D {
-> +    DEFINE_PROP_UINT32("nr-ends", XiveENDSource, nr_ends, 0),
-> +    DEFINE_PROP_UINT32("shift", XiveENDSource, esb_shift, XIVE_ESB_64K),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void xive_end_source_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    dc->desc    =3D "XIVE END Source";
-> +    dc->props   =3D xive_end_source_properties;
-> +    dc->realize =3D xive_end_source_realize;
-> +}
-> +
-> +static const TypeInfo xive_end_source_info =3D {
-> +    .name          =3D TYPE_XIVE_END_SOURCE,
-> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(XiveENDSource),
-> +    .class_init    =3D xive_end_source_class_init,
-> +};
-> +
->  /*
->   * XIVE Fabric
->   */
-> @@ -720,6 +875,7 @@ static void xive_register_types(void)
->      type_register_static(&xive_source_info);
->      type_register_static(&xive_fabric_info);
->      type_register_static(&xive_router_info);
-> +    type_register_static(&xive_end_source_info);
->  }
-> =20
->  type_init(xive_register_types)
+Framework looks great!
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> 
+> > diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+> > index 65b6dc2f6f..a650d80f83 100644
+> > --- a/qapi/qapi-schema.json
+> > +++ b/qapi/qapi-schema.json
+> > @@ -94,3 +94,4 @@
+> >  { 'include': 'trace.json' }
+> >  { 'include': 'introspect.json' }
+> >  { 'include': 'misc.json' }
+> > +{ 'include': 'rdma.json' }
 
---9/eUdp+dLtKXvemk
-Content-Type: application/pgp-signature; name="signature.asc"
+Done.
 
------BEGIN PGP SIGNATURE-----
+> 
+> This makes the "RDMA device" section appear last in the QEMU QMP
+> reference manual, since they appear in include order there.
+> 
+>     $ grep -h @section bld-x86/qapi/qapi-doc.texi 
+>     @section Introduction
+>     @section Stability Considerations
+>     @section Common data types
+>     @section Socket data types
+>     @section VM run state
+>     @section Cryptography
+>     @section Block devices
+>     @section Character devices
+>     @section Net devices
+>     @section Rocker switch device
+>     @section TPM (trusted platform module) devices
+>     @section Remote desktop
+>     @section Input
+>     @section Migration
+>     @section Transactions
+>     @section Tracing
+>     @section QMP introspection
+>     @section Miscellanea
+>     @section RDMA device
+> 
+> It should go next to the other "device" sections, shouldn't it?
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv2OtwACgkQbDjKyiDZ
-s5LcoRAAr4Wv6mCUQSGMIUZ7iwa5kXA/HGGCia14Hdv2/u+hDDizkfykKNBbPLP3
-7PFMdn24Aj0jP31x/ePK1WycwOWlVb3DANXT6+73eEtPQZotn9D/hzr6mhzc7urh
-niHMwuHYhv34ZqdbtfYpLUHkp1J6zCN3w8fTmbbSJ+xH339YlbdzlrLa+chtiw1/
-GGEKWe3b9XvIsg2iw5+9CUr51tKUDsGO96NYq1iHokWjYAg72cnv8u5B7m/Xku5Q
-7I8hMmRlUFg+zuMSRXKSIiz/ABOY4i/Zp/bmHeeLeZAIDxaH+HUgPLsO5r7zOkQE
-Hp0JucvCBlcnIAXYXoTTbrlgGNSdLbw+vjIgSFuPmz9rZp008TbemIM9zNVDM9Bb
-DcIP9oOpVjReSkloAIi+RQ4iUM7FhB46h6iD2wjN4D1qQVIxvdL5cMutEsrUyhww
-bI3lwZZMtM1nj+ADfUZwdsCSs/acffU1rD4wqL97ZhHF7Ii0n59pPmvp5sIPY/lV
-Cs5NHk5ab9ThuvQfRa9V4GgStzYQEl3nlNa1JmZ4JSs0+mHXTVmT+rdSr3BFgw/H
-4b3hVV1S9yjJChHQ8teMaZFdTY+3imWlmHhZbk28V/TVYNKOF7f1nDjyXADDD7QA
-oz7XQ10mL2jfFKpZSYG5rDyR3VajfmgEy9MenoiUV3qhtrvrhsw=
-=5RPP
------END PGP SIGNATURE-----
+Removed after using Eric Blake's framework.
 
---9/eUdp+dLtKXvemk--
+> 
+> > diff --git a/qapi/rdma.json b/qapi/rdma.json
+> > new file mode 100644
+> > index 0000000000..804c68ab36
+> > --- /dev/null
+> > +++ b/qapi/rdma.json
+> > @@ -0,0 +1,38 @@
+> > +# -*- Mode: Python -*-
+> > +#
+> > +
+> > +##
+> > +# = RDMA device
+> > +##
+> > +
+> > +##
+> > +# @RDMA_GID_STATUS_CHANGED:
+> > +#
+> > +# Emitted when guest driver adds/deletes GID to/from device
+> > +#
+> > +# @netdev: RoCE Network Device name - char *
+> > +#
+> > +# @gid-status: Add or delete indication - bool
+> > +#
+> > +# @subnet-prefix: Subnet Prefix - uint64
+> > +#
+> > +# @interface-id : Interface ID - uint64
+> > +#
+> > +# Since: 3.2
+> > +#
+> > +# Example:
+> > +#
+> > +# <- {"timestamp": {"seconds": 1541579657, "microseconds": 986760},
+> > +#     "event": "RDMA_GID_STATUS_CHANGED",
+> > +#     "data":
+> > +#         {"netdev": "bridge0",
+> > +#         "interface-id": 15880512517475447892,
+> > +#         "gid-status": true,
+> > +#         "subnet-prefix": 33022}}
+> > +#
+> > +##
+> > +{ 'event': 'RDMA_GID_STATUS_CHANGED',
+> > +  'data': { 'netdev'        : 'str',
+> > +            'gid-status'    : 'bool',
+> > +            'subnet-prefix' : 'uint64',
+> > +            'interface-id'  : 'uint64' } }
+> 
+> Schema looks okay from a QAPI perspective (I know next to nothing about
+> RDMA).
+
+Thanks
