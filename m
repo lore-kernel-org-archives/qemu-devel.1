@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gPnWS-0001yE-E2
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:51:53 -0500
+	(envelope-from <groug@kaod.org>) id 1gPnYE-0003RM-GD
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:53:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gPnWN-0005Ih-G7
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:51:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58222)
+	(envelope-from <groug@kaod.org>) id 1gPnY8-0005fa-Ac
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:53:42 -0500
+Received: from 2.mo177.mail-out.ovh.net ([178.33.109.80]:59098)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gPnWN-0005AO-Aq
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:51:47 -0500
-Date: Thu, 22 Nov 2018 12:51:35 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181122115135.funmtcql3xhrixi6@sirius.home.kraxel.org>
-References: <CAGxU2F658=XjoHnF6Qq5FqBZAE68BBtMFt-6HcKp_PVxTynOnw@mail.gmail.com>
-	<20181119084855.uyira2lpu73mu2fo@sirius.home.kraxel.org>
-	<CAGxU2F4O4aKzrJky7EFeWaHFuBKPwi_Z-j7G7m+ENRojVG_5vA@mail.gmail.com>
-	<20181119130713.GB6443@stefanha-x1.localdomain>
-	<20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
-	<CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
-	<20181120062109.eahirgygm4br3ov7@sirius.home.kraxel.org>
-	<CAGxU2F64uK5oygQecZKOPpsyb--Pth9U00P_gghrtYDwQrSGtg@mail.gmail.com>
-	<20181120112203.rzhhdl6hhsjf5twt@sirius.home.kraxel.org>
-	<CAGxU2F4LNN1UtVJFADxm1V4eBDQ8eGSoAjPXC=X8+zSR4yd9Nw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gPnY6-0005Nu-Ac
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 06:53:34 -0500
+Received: from player737.ha.ovh.net (unknown [10.109.146.19])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 2F562D196D
+	for <qemu-devel@nongnu.org>; Thu, 22 Nov 2018 12:53:29 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 22 Nov 2018 12:53:25 +0100
+Message-ID: <154288760588.186240.13570647308765699402.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGxU2F4LNN1UtVJFADxm1V4eBDQ8eGSoAjPXC=X8+zSR4yd9Nw@mail.gmail.com>
-Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] 9p: fix QEMU crash when renaming files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Kevin OConnor <kevin@koconnor.net>, Samuel Ortiz <sameo@linux.intel.com>, seabios@seabios.org, Stefan Hajnoczi <stefanha@gmail.com>, Rob Bradford <robert.bradford@intel.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stephend@silicom-usa.com, stefanb@linux.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>, Prasad J Pandit <prasad@redhat.com>, zhibin hu <noirfate@gmail.com>
 
-On Thu, Nov 22, 2018 at 12:08:55PM +0100, Stefano Garzarella wrote:
-> Hi,
-> I continued to investigate how to reduce the boot time with SeaBIOS
-> and QEMU when it used with linuxboot_dma.bin (-kernel parameter).
-> I reached ~12ms with a SeaBIOS configuration (attached) where I
-> disabled debug output, all Hardware support (except SMM & MTRRs) and I
-> applied a small patch to disable VGA setup and console (attached).
+When using the 9P2000.u version of the protocol, the following shell
+command line in the guest can cause QEMU to crash:
 
-Is there any difference to "qemu -vga none" ?
+    while true; do rm -rf aa; mkdir -p a/b & touch a/b/c & mv a aa; done
 
-> Samuel, I put also the total time to userspace (linux_start_user)
-> adding a probe in the kernel_init() and when I disabled the VGA in the
-> SeaBIOS I noticed also a speed up in the kernel boot phase.
+With 9P2000.u, file renaming is handled by the WSTAT command. The
+v9fs_wstat() function calls v9fs_complete_rename(), which calls
+v9fs_fix_path() for every fid whose path is affected by the change.
+The involved calls to v9fs_path_copy() may race with any other access
+to the fid path performed by some worker thread, causing a crash like
+shown below:
 
-Might come from linux 16bit boot code scanning vgabios for available
-video modes (for vga=<mode> cmdline arg).
+Thread 12 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+0x0000555555a25da2 in local_open_nofollow (fs_ctx=0x555557d958b8, path=0x0,
+ flags=65536, mode=0) at hw/9pfs/9p-local.c:59
+59          while (*path && fd != -1) {
+(gdb) bt
+#0  0x0000555555a25da2 in local_open_nofollow (fs_ctx=0x555557d958b8,
+ path=0x0, flags=65536, mode=0) at hw/9pfs/9p-local.c:59
+#1  0x0000555555a25e0c in local_opendir_nofollow (fs_ctx=0x555557d958b8,
+ path=0x0) at hw/9pfs/9p-local.c:92
+#2  0x0000555555a261b8 in local_lstat (fs_ctx=0x555557d958b8,
+ fs_path=0x555556b56858, stbuf=0x7fff84830ef0) at hw/9pfs/9p-local.c:185
+#3  0x0000555555a2b367 in v9fs_co_lstat (pdu=0x555557d97498,
+ path=0x555556b56858, stbuf=0x7fff84830ef0) at hw/9pfs/cofile.c:53
+#4  0x0000555555a1e9e2 in v9fs_stat (opaque=0x555557d97498)
+ at hw/9pfs/9p.c:1083
+#5  0x0000555555e060a2 in coroutine_trampoline (i0=-669165424, i1=32767)
+ at util/coroutine-ucontext.c:116
+#6  0x00007fffef4f5600 in __start_context () at /lib64/libc.so.6
+#7  0x0000000000000000 in  ()
+(gdb)
 
-> Another approach that I tried, obtaining similar results, is to
-> recognize the linuxboot_dma.bin at runtime, then skip
-> device_hardware_setup(), enable_vga_console(), and vgarom_setup().
+The fix is to take the path write lock when calling v9fs_complete_rename(),
+like in v9fs_rename().
 
-Hmm, tricky.
+Impact:  DoS triggered by unprivileged guest users.
 
-linuxboot_dma.bin just registers a boot entry, so with "qemu -kernel
--boot menu=on" you can still get a boot menu, and the direkt kernel boot
-is one menu item there.  So you can't know for sure whenever a direct
-kernel boot will happen or not.
+Cc: P J P <ppandit@redhat.com>
+Reported-by: zhibin hu <noirfate@gmail.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
-So, I think at minimum we should make this depend on both linuxboot_dma
-and boot menu disabled.
-
-cheers,
-  Gerd
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index 267a25533b77..bdf7919abfc5 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -2855,6 +2855,7 @@ static void coroutine_fn v9fs_wstat(void *opaque)
+     struct stat stbuf;
+     V9fsFidState *fidp;
+     V9fsPDU *pdu = opaque;
++    V9fsState *s = pdu->s;
+ 
+     v9fs_stat_init(&v9stat);
+     err = pdu_unmarshal(pdu, offset, "dwS", &fid, &unused, &v9stat);
+@@ -2920,7 +2921,9 @@ static void coroutine_fn v9fs_wstat(void *opaque)
+         }
+     }
+     if (v9stat.name.size != 0) {
++        v9fs_path_write_lock(s);
+         err = v9fs_complete_rename(pdu, fidp, -1, &v9stat.name);
++        v9fs_path_unlock(s);
+         if (err < 0) {
+             goto out;
+         }
