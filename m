@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gPsbF-0005ZE-Px
+	(envelope-from <eric.auger@redhat.com>) id 1gPsbH-0005aW-1O
 	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:17:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gPsbD-0006qJ-IA
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:17:09 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gPsbE-0006sk-TP
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 12:17:11 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Thu, 22 Nov 2018 18:15:33 +0100
-Message-Id: <20181122171538.12359-13-eric.auger@redhat.com>
+Date: Thu, 22 Nov 2018 18:15:36 +0100
+Message-Id: <20181122171538.12359-16-eric.auger@redhat.com>
 In-Reply-To: <20181122171538.12359-1-eric.auger@redhat.com>
 References: <20181122171538.12359-1-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v9 12/17] virtio-iommu: Implement fault reporting
+Subject: [Qemu-devel] [RFC v9 15/17] hw/arm/virt: Add the virtio-iommu
+ device tree mappings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,138 +23,159 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com, jean-philippe.brucker@arm.com
 Cc: kevin.tian@intel.com, tn@semihalf.com, bharat.bhushan@nxp.com, peterx@redhat.com
 
-The event queue allows to report asynchronous errors.
-The translate function now injects faults when relevant.
+Adds the "virtio,pci-iommu" node in the host bridge node and
+the RID mapping, excluding the IOMMU RID.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/virtio/trace-events   |  1 +
- hw/virtio/virtio-iommu.c | 67 ++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 65 insertions(+), 3 deletions(-)
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 19824c3e91..053a07b3fc 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -71,3 +71,4 @@ virtio_iommu_unmap_inc_interval(uint64_t low, uint64_t high) "Unmap inc [0x%"PRI
- virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
- virtio_iommu_fill_resv_property(uint32_t devid, uint8_t subtype, uint64_t start, uint64_t end, uint32_t flags, size_t filled) "dev= %d, subtype=%d start=0x%"PRIx64" end=0x%"PRIx64" flags=%d filled=0x%lx"
- virtio_iommu_fill_none_property(uint32_t devid) "devid=%d"
-+virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 324518c300..1246dd6bdf 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -683,17 +683,63 @@ push:
-     }
+---
+
+v8 -> v9:
+- disable msi-bypass property
+- addition of the subnode is handled is the hotplug handler
+  and IOMMU RID is notimposed anymore
+
+v6 -> v7:
+- align to the smmu instantiation code
+
+v4 -> v5:
+- VirtMachineClass no_iommu added in this patch
+- Use object_resolve_path_type
+---
+ hw/arm/virt.c         | 57 +++++++++++++++++++++++++++++++++++++------
+ include/hw/arm/virt.h |  2 ++
+ 2 files changed, 52 insertions(+), 7 deletions(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index a2b8d8f7c2..b2bbb0ef49 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -29,6 +29,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "monitor/qdev.h"
+ #include "qapi/error.h"
+ #include "hw/sysbus.h"
+ #include "hw/arm/arm.h"
+@@ -49,6 +50,7 @@
+ #include "qemu/bitops.h"
+ #include "qemu/error-report.h"
+ #include "hw/pci-host/gpex.h"
++#include "hw/virtio/virtio-pci.h"
+ #include "hw/arm/sysbus-fdt.h"
+ #include "hw/platform-bus.h"
+ #include "hw/arm/fdt.h"
+@@ -59,6 +61,7 @@
+ #include "qapi/visitor.h"
+ #include "standard-headers/linux/input.h"
+ #include "hw/arm/smmuv3.h"
++#include "hw/virtio/virtio-iommu.h"
+ 
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -1085,6 +1088,33 @@ static void create_smmu(const VirtMachineState *vms, qemu_irq *pic,
+     g_free(node);
  }
  
-+static void virtio_iommu_report_fault(VirtIOIOMMU *viommu, uint8_t reason,
-+                                      uint32_t flags, uint32_t endpoint,
-+                                      uint64_t address)
++static void create_virtio_iommu(VirtMachineState *vms, Error **errp)
 +{
-+    VirtIODevice *vdev = &viommu->parent_obj;
-+    VirtQueue *vq = viommu->event_vq;
-+    struct virtio_iommu_fault fault;
-+    VirtQueueElement *elem;
-+    size_t sz;
++    const char compat[] = "virtio,pci-iommu";
++    uint16_t bdf = vms->virtio_iommu_bdf;
++    char *node;
 +
-+    memset(&fault, 0, sizeof(fault));
-+    fault.reason = reason;
-+    fault.flags = flags;
-+    fault.endpoint = endpoint;
-+    fault.address = address;
++    vms->iommu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
 +
-+    for (;;) {
-+        elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
++    node = g_strdup_printf("%s/virtio_iommu@%d", vms->pciehb_nodename, bdf);
++    qemu_fdt_add_subnode(vms->fdt, node);
++    qemu_fdt_setprop(vms->fdt, node, "compatible", compat, sizeof(compat));
++    qemu_fdt_setprop_sized_cells(vms->fdt, node, "reg",
++                                 1, bdf << 8 /* phys.hi */,
++                                 1, 0        /* phys.mid */,
++                                 1, 0        /* phys.lo  */,
++                                 1, 0        /* size.hi  */,
++                                 1, 0        /* size.low */);
 +
-+        if (!elem) {
-+            virtio_error(vdev,
-+                         "no buffer available in event queue to report event");
-+            return;
-+        }
++    qemu_fdt_setprop_cell(vms->fdt, node, "#iommu-cells", 1);
++    qemu_fdt_setprop_cell(vms->fdt, node, "phandle", vms->iommu_phandle);
++    g_free(node);
 +
-+        if (iov_size(elem->in_sg, elem->in_num) < sizeof(fault)) {
-+            virtio_error(vdev, "error buffer of wrong size");
-+            virtqueue_detach_element(vq, elem, 0);
-+            g_free(elem);
-+            continue;
-+        }
-+        break;
-+    }
-+    /* we have a buffer to fill in */
-+    sz = iov_from_buf(elem->in_sg, elem->in_num, 0,
-+                      &fault, sizeof(fault));
-+    assert(sz == sizeof(fault));
-+
-+    trace_virtio_iommu_report_fault(reason, flags, endpoint, address);
-+    virtqueue_push(vq, elem, sz);
-+    virtio_notify(vdev, vq);
-+    g_free(elem);
-+
++    qemu_fdt_setprop_cells(vms->fdt, vms->pciehb_nodename, "iommu-map",
++                           0x0, vms->iommu_phandle, 0x0, bdf,
++                           bdf + 1, vms->iommu_phandle, bdf + 1, 0xffff - bdf);
 +}
 +
- static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-                                             IOMMUAccessFlags flag,
-                                             int iommu_idx)
+ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
  {
-     IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
-     VirtIOIOMMU *s = sdev->viommu;
--    uint32_t sid;
-+    uint32_t sid, flags;
-     viommu_endpoint *ep;
-     viommu_mapping *mapping;
-     viommu_interval interval;
-     bool bypass_allowed;
-+    bool read_fault, write_fault;
- 
-     interval.low = addr;
-     interval.high = addr + 1;
-@@ -718,6 +764,8 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-     if (!ep) {
-         if (!bypass_allowed) {
-             error_report("%s sid=%d is not known!!", __func__, sid);
-+            virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_UNKNOWN,
-+                                      0, sid, 0);
-         } else {
-             entry.perm = flag;
+     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
+@@ -1162,7 +1192,7 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
          }
-@@ -729,6 +777,8 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-             qemu_log_mask(LOG_GUEST_ERROR,
-                           "%s %02x:%02x.%01x not attached to any domain\n",
-                           __func__, PCI_BUS_NUM(sid), PCI_SLOT(sid), PCI_FUNC(sid));
-+            virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_DOMAIN,
-+                                      0, sid, 0);
-         } else {
-             entry.perm = flag;
-         }
-@@ -740,14 +790,25 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "%s no mapping for 0x%"PRIx64" for sid=%d\n",
-                       __func__, addr, sid);
-+        virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_MAPPING,
-+                                  0, sid, addr);
-         goto unlock;
      }
  
--    if (((flag & IOMMU_RO) && !(mapping->flags & VIRTIO_IOMMU_MAP_F_READ)) ||
--        ((flag & IOMMU_WO) && !(mapping->flags & VIRTIO_IOMMU_MAP_F_WRITE))) {
-+    read_fault = (flag & IOMMU_RO) &&
-+                    !(mapping->flags & VIRTIO_IOMMU_MAP_F_READ);
-+    write_fault = (flag & IOMMU_WO) &&
-+                    !(mapping->flags & VIRTIO_IOMMU_MAP_F_WRITE);
+-    nodename = g_strdup_printf("/pcie@%" PRIx64, base);
++    nodename = vms->pciehb_nodename = g_strdup_printf("/pcie@%" PRIx64, base);
+     qemu_fdt_add_subnode(vms->fdt, nodename);
+     qemu_fdt_setprop_string(vms->fdt, nodename,
+                             "compatible", "pci-host-ecam-generic");
+@@ -1205,13 +1235,17 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
+     if (vms->iommu) {
+         vms->iommu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
+ 
+-        create_smmu(vms, pic, pci->bus);
++        switch (vms->iommu) {
++        case VIRT_IOMMU_SMMUV3:
++            create_smmu(vms, pic, pci->bus);
++            qemu_fdt_setprop_cells(vms->fdt, nodename, "iommu-map",
++                                   0x0, vms->iommu_phandle, 0x0, 0x10000);
++            break;
++        default:
++            g_assert_not_reached();
++        }
+ 
+-        qemu_fdt_setprop_cells(vms->fdt, nodename, "iommu-map",
+-                               0x0, vms->iommu_phandle, 0x0, 0x10000);
+     }
+-
+-    g_free(nodename);
+ }
+ 
+ static void create_platform_bus(VirtMachineState *vms, qemu_irq *pic)
+@@ -1736,12 +1770,21 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+                                      SYS_BUS_DEVICE(dev));
+         }
+     }
++    if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
++        PCIDevice *pdev = PCI_DEVICE(dev);
 +
-+    flags = read_fault ? VIRTIO_IOMMU_FAULT_F_READ : 0;
-+    flags |= write_fault ? VIRTIO_IOMMU_FAULT_F_WRITE : 0;
-+    if (flags) {
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "Permission error on 0x%"PRIx64"(%d): allowed=%d\n",
-                       addr, flag, mapping->flags);
-+        flags |= VIRTIO_IOMMU_FAULT_F_ADDRESS;
-+        virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_MAPPING,
-+                                  flags, sid, addr);
-         goto unlock;
++        vms->iommu = VIRT_IOMMU_VIRTIO;
++        vms->virtio_iommu_bdf = pci_get_bdf(pdev);
++        object_property_set_bool(OBJECT(dev), false, "msi-bypass", errp);
++        create_virtio_iommu(vms, errp);
++    }
+ }
+ 
+ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+                                                         DeviceState *dev)
+ {
+-    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
++    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
++        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
+         return HOTPLUG_HANDLER(machine);
      }
-     entry.translated_addr = addr - mapping->virt_addr + mapping->phys_addr;
+ 
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 4cc57a7ef6..c330f6f4b7 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -115,7 +115,9 @@ typedef struct {
+     bool virt;
+     int32_t gic_version;
+     VirtIOMMUType iommu;
++    uint16_t virtio_iommu_bdf;
+     struct arm_boot_info bootinfo;
++    char *pciehb_nodename;
+     const MemMapEntry *memmap;
+     const int *irqmap;
+     int smp_cpus;
 -- 
 2.17.2
