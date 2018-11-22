@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gPph2-00079r-9q
+	(envelope-from <wexu@redhat.com>) id 1gPph2-00079s-AJ
 	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:10:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gPph0-0000fO-6S
+	(envelope-from <wexu@redhat.com>) id 1gPpgy-0000Y7-Bh
 	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:10:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43384)
+Received: from mx1.redhat.com ([209.132.183.28]:2838)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gPpgz-0000bM-WC
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:10:54 -0500
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gPpgy-0000OC-0M
+	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 09:10:52 -0500
 From: wexu@redhat.com
-Date: Thu, 22 Nov 2018 09:06:17 -0500
-Message-Id: <1542895581-10721-13-git-send-email-wexu@redhat.com>
+Date: Thu, 22 Nov 2018 09:06:16 -0500
+Message-Id: <1542895581-10721-12-git-send-email-wexu@redhat.com>
 In-Reply-To: <1542895581-10721-1-git-send-email-wexu@redhat.com>
 References: <1542895581-10721-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 12/16] virtio: add userspace migration of
- packed ring
+Subject: [Qemu-devel] [PATCH v1 11/16] virtio-net: fill head desc after done
+ all in a chain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +29,54 @@ Cc: mst@redhat.com, wexu@redhat.com, jfreimann@redhat.com, maxime.coquelin@redha
 
 From: Wei Xu <wexu@redhat.com>
 
+With the support of marking a descriptor used/unused in 'flags'
+field for 1.1, the current way of filling a chained descriptors
+does not work since driver side may get the wrong 'num_buffer'
+information in case of the head descriptor has been filled in
+while the subsequent ones are still in processing in device side.
+
+This patch fills the head one after done all the others one.
+
 Signed-off-by: Wei Xu <wexu@redhat.com>
 ---
- hw/virtio/virtio.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ hw/net/virtio-net.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 240c4e3..64d5c04 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2558,6 +2558,12 @@ int virtio_save(VirtIODevice *vdev, QEMUFile *f)
-          */
-         qemu_put_be64(f, vdev->vq[i].vring.desc);
-         qemu_put_be16s(f, &vdev->vq[i].last_avail_idx);
-+        qemu_put_8s(f, (const uint8_t *)&vdev->vq[i].avail_wrap_counter);
-+        qemu_put_8s(f, (const uint8_t *)&vdev->vq[i].event_wrap_counter);
-+        qemu_put_8s(f, (const uint8_t *)&vdev->vq[i].used_wrap_counter);
-+        qemu_put_be16s(f, &vdev->vq[i].used_idx);
-+        qemu_put_be16s(f, &vdev->vq[i].shadow_avail_idx);
-+        qemu_put_be32s(f, &vdev->vq[i].inuse);
-         if (k->save_queue) {
-             k->save_queue(qbus->parent, i, f);
-         }
-@@ -2705,6 +2711,14 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
-         }
-         vdev->vq[i].vring.desc = qemu_get_be64(f);
-         qemu_get_be16s(f, &vdev->vq[i].last_avail_idx);
-+
-+        qemu_get_8s(f, (uint8_t *)&vdev->vq[i].avail_wrap_counter);
-+        qemu_get_8s(f, (uint8_t *)&vdev->vq[i].event_wrap_counter);
-+        qemu_get_8s(f, (uint8_t *)&vdev->vq[i].used_wrap_counter);
-+        qemu_get_be16s(f, &vdev->vq[i].used_idx);
-+        qemu_get_be16s(f, &vdev->vq[i].shadow_avail_idx);
-+        qemu_get_be32s(f, &vdev->vq[i].inuse);
-+
-         vdev->vq[i].signalled_used_valid = false;
-         vdev->vq[i].notification = true;
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 385b1a0..2db0e8b 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -1198,6 +1198,8 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
+     struct virtio_net_hdr_mrg_rxbuf mhdr;
+     unsigned mhdr_cnt = 0;
+     size_t offset, i, guest_offset;
++    VirtQueueElement head;
++    int head_len = 0;
  
-@@ -2786,6 +2800,10 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
-                 virtio_queue_update_rings(vdev, i);
-             }
+     if (!virtio_net_can_receive(nc)) {
+         return -1;
+@@ -1275,7 +1277,13 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
+         }
  
-+            if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-+                continue;
-+            }
-+
-             nheads = vring_avail_idx(&vdev->vq[i]) - vdev->vq[i].last_avail_idx;
-             /* Check it isn't doing strange things with descriptor numbers. */
-             if (nheads > vdev->vq[i].vring.num) {
+         /* signal other side */
+-        virtqueue_fill(q->rx_vq, elem, total, i++);
++        if (i == 0) {
++            head_len = total;
++            head = *elem;
++        } else {
++            virtqueue_fill(q->rx_vq, elem, len, i);
++        }
++        i++;
+         g_free(elem);
+     }
+ 
+@@ -1286,6 +1294,7 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
+                      &mhdr.num_buffers, sizeof mhdr.num_buffers);
+     }
+ 
++    virtqueue_fill(q->rx_vq, &head, head_len, 0);
+     virtqueue_flush(q->rx_vq, i);
+     virtio_notify(vdev, q->rx_vq);
+ 
 -- 
 1.8.3.1
