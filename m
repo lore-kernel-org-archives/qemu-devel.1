@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQI-0004xU-3Y
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQD-0004t1-VN
 	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ8-0005RV-ER
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:13 -0500
-Received: from cmccmta2.chinamobile.com ([221.176.66.80]:34190)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ7-0005OI-0u
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:09 -0500
+Received: from cmccmta2.chinamobile.com ([221.176.66.80]:55554)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ5-0005BZ-4C
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:04 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ5-0005CR-27
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:02 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 23 Nov 2018 23:30:37 +0800
-Message-Id: <20181123153040.18933-19-maozhongyi@cmss.chinamobile.com>
+Date: Fri, 23 Nov 2018 23:30:39 +0800
+Message-Id: <20181123153040.18933-21-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
 References: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH v2 18/21] timer/puv3_ost: Convert sysbus init
- function to realize function
+Subject: [Qemu-devel] [PATCH v2 20/21] xen_backend: remove xen_sysdev_init()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +25,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, gxt@mprc.pku.edu.cn, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, sstabellini@kernel.org, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, peter.maydell@linaro.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
-Use DeviceClass rather than SysBusDeviceClass in
-puv3_ost_class_init().
+The init function doesn't do anything at all, so we
+just omit it.
 
-Cc: gxt@mprc.pku.edu.cn
+Cc: sstabellini@kernel.org
+Cc: anthony.perard@citrix.com
+Cc: xen-devel@lists.xenproject.org
+Cc: peter.maydell@linaro.org
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 ---
- hw/timer/puv3_ost.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ hw/xen/xen_backend.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/hw/timer/puv3_ost.c b/hw/timer/puv3_ost.c
-index 0b3d717e60..3be58c7fdd 100644
---- a/hw/timer/puv3_ost.c
-+++ b/hw/timer/puv3_ost.c
-@@ -113,16 +113,17 @@ static void puv3_ost_tick(void *opaque)
+diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+index 9a8e8771ec..0bc6b1de60 100644
+--- a/hw/xen/xen_backend.c
++++ b/hw/xen/xen_backend.c
+@@ -809,11 +809,6 @@ static const TypeInfo xensysbus_info = {
      }
- }
+ };
  
--static int puv3_ost_init(SysBusDevice *dev)
-+static void puv3_ost_realize(DeviceState *dev, Error **errp)
- {
-     PUV3OSTState *s = PUV3_OST(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
- 
-     s->reg_OIER = 0;
-     s->reg_OSSR = 0;
-     s->reg_OSMR0 = 0;
-     s->reg_OSCR = 0;
- 
--    sysbus_init_irq(dev, &s->irq);
-+    sysbus_init_irq(sbd, &s->irq);
- 
-     s->bh = qemu_bh_new(puv3_ost_tick, s);
-     s->ptimer = ptimer_init(s->bh, PTIMER_POLICY_DEFAULT);
-@@ -130,16 +131,14 @@ static int puv3_ost_init(SysBusDevice *dev)
- 
-     memory_region_init_io(&s->iomem, OBJECT(s), &puv3_ost_ops, s, "puv3_ost",
-             PUV3_REGS_OFFSET);
--    sysbus_init_mmio(dev, &s->iomem);
--
+-static int xen_sysdev_init(SysBusDevice *dev)
+-{
 -    return 0;
-+    sysbus_init_mmio(sbd, &s->iomem);
- }
- 
- static void puv3_ost_class_init(ObjectClass *klass, void *data)
+-}
+-
+ static Property xen_sysdev_properties[] = {
+     {/* end of property list */},
+ };
+@@ -821,9 +816,7 @@ static Property xen_sysdev_properties[] = {
+ static void xen_sysdev_class_init(ObjectClass *klass, void *data)
  {
--    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
  
--    sdc->init = puv3_ost_init;
-+    dc->realize = puv3_ost_realize;
+-    k->init = xen_sysdev_init;
+     dc->props = xen_sysdev_properties;
+     dc->bus_type = TYPE_XENSYSBUS;
  }
- 
- static const TypeInfo puv3_ost_info = {
 -- 
 2.17.1
