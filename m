@@ -1,42 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gQD3U-0003dU-EF
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:07:41 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ5-0004mI-46
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gQD3R-0001AW-Kv
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:07:40 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58358
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gQD3R-00019p-G9
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:07:37 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wANF3j4K071219
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 10:07:37 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2nxj8smgtq-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 10:07:36 -0500
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Fri, 23 Nov 2018 15:07:34 -0000
-Reply-To: pmorel@linux.ibm.com
-References: <20181120110427.7321-1-david@redhat.com>
-	<20181120110427.7321-4-david@redhat.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Fri, 23 Nov 2018 16:07:28 +0100
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ1-0005Ar-RX
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:00 -0500
+Received: from cmccmta1.chinamobile.com ([221.176.66.79]:24228)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ1-00055Z-3J
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:30:57 -0500
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Date: Fri, 23 Nov 2018 23:30:23 +0800
+Message-Id: <20181123153040.18933-5-maozhongyi@cmss.chinamobile.com>
+In-Reply-To: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
+References: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
 MIME-Version: 1.0
-In-Reply-To: <20181120110427.7321-4-david@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <17287746-ee99-7022-e828-d79b932e2427@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 03/11] s390x/pci: rename hotplug handler
- callbacks
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 04/21] core/empty_slot: Convert sysbus init
+ function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,67 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Collin Walling <walling@linux.ibm.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
-On 20/11/2018 12:04, David Hildenbrand wrote:
-> The callbacks are also called for cold plugged devices. Drop the "hot"
-> to better match the actual callback names.
->=20
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->   hw/s390x/s390-pci-bus.c | 12 ++++++------
->   1 file changed, 6 insertions(+), 6 deletions(-)
->=20
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 060ff062bc..9abd49a9dc 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -827,8 +827,8 @@ static bool s390_pci_alloc_idx(S390pciState *s, S39=
-0PCIBusDevice *pbdev)
->       return true;
->   }
->=20
-> -static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
-> -                                  DeviceState *dev, Error **errp)
-> +static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState=
- *dev,
-> +                              Error **errp)
->   {
->       PCIDevice *pdev =3D NULL;
->       S390PCIBusDevice *pbdev =3D NULL;
-> @@ -936,8 +936,8 @@ static void s390_pcihost_timer_cb(void *opaque)
->       qdev_unplug(DEVICE(pbdev), NULL);
->   }
->=20
-> -static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
-> -                                    DeviceState *dev, Error **errp)
-> +static void s390_pcihost_unplug(HotplugHandler *hotplug_dev, DeviceSta=
-te *dev,
-> +                                Error **errp)
->   {
->       PCIDevice *pci_dev =3D NULL;
->       PCIBus *bus;
-> @@ -1045,8 +1045,8 @@ static void s390_pcihost_class_init(ObjectClass *=
-klass, void *data)
->=20
->       dc->reset =3D s390_pcihost_reset;
->       dc->realize =3D s390_pcihost_realize;
-> -    hc->plug =3D s390_pcihost_hot_plug;
-> -    hc->unplug =3D s390_pcihost_hot_unplug;
-> +    hc->plug =3D s390_pcihost_plug;
-> +    hc->unplug =3D s390_pcihost_unplug;
->       msi_nonbroken =3D true;
->   }
->=20
+Use DeviceClass rather than SysBusDeviceClass in
+empty_slot_class_init().
 
-LBTM (does that exist? Look Better To Me)
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/core/empty_slot.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+diff --git a/hw/core/empty_slot.c b/hw/core/empty_slot.c
+index c1b9c2b104..239f78e2a7 100644
+--- a/hw/core/empty_slot.c
++++ b/hw/core/empty_slot.c
+@@ -71,21 +71,20 @@ void empty_slot_init(hwaddr addr, uint64_t slot_size)
+     }
+ }
+ 
+-static int empty_slot_init1(SysBusDevice *dev)
++static void empty_slot_realize(DeviceState *dev, Error **errp)
+ {
+     EmptySlot *s = EMPTY_SLOT(dev);
+ 
+     memory_region_init_io(&s->iomem, OBJECT(s), &empty_slot_ops, s,
+                           "empty-slot", s->size);
+-    sysbus_init_mmio(dev, &s->iomem);
+-    return 0;
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
+ }
+ 
+ static void empty_slot_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    k->init = empty_slot_init1;
++    dc->realize = empty_slot_realize;
+ }
+ 
+ static const TypeInfo empty_slot_info = {
+-- 
+2.17.1
