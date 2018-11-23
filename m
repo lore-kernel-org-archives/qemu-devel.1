@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gQGHZ-0007Qo-Gg
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:34:26 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gQGbo-0008IA-Gy
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:55:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gQGHY-0003dv-PQ
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:34:25 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 23 Nov 2018 18:34:16 +0000
-Message-ID: <695fbd12-293f-5fae-d119-4e9e312442a7@virtuozzo.com>
-References: <20181031113418.29796-1-anton.nefedov@virtuozzo.com>
-	<20181031113418.29796-9-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20181031113418.29796-9-anton.nefedov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FE416E42503962479D848B00294731B0@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gQGZr-0005Hw-4Q
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:53:19 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39121)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gQGZq-0005FR-W3
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:53:19 -0500
+Received: by mail-oi1-x243.google.com with SMTP id 192-v6so10701693oii.6
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 10:53:18 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 8/9] file-posix: account discard
- operations
+References: <20181123091729.29921-1-luc.michel@greensocs.com>
+	<20181123091729.29921-2-luc.michel@greensocs.com>
+	<20181123181059.GN18284@habkost.net>
+	<CAFEAcA_8jJz5dE7XP4R=LjEC5WzP3jzutg=YqiYjJVwZZz+jvQ@mail.gmail.com>
+	<20181123182415.GP18284@habkost.net>
+In-Reply-To: <20181123182415.GP18284@habkost.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 23 Nov 2018 18:53:07 +0000
+Message-ID: <CAFEAcA-WwupF9Lm85+S4YSq1f5Y0AjEOtG0Uzh=7pDVdF0w38A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,17 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Luc Michel <luc.michel@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
 
-MzEuMTAuMjAxOCAxNDozNSwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gVGhpcyB3aWxsIGhlbHAg
-dG8gaWRlbnRpZnkgaG93IG1hbnkgb2YgdGhlIHVzZXItaXNzdWVkIGRpc2NhcmQgb3BlcmF0aW9u
-cw0KPiAoYWNjb3VudGVkIG9uIGEgZGV2aWNlIGxldmVsKSBoYXZlIGFjdHVhbGx5IHN1Y2VlZGVk
-IGRvd24gb24gdGhlIGhvc3QgZmlsZQ0KPiAoZXZlbiB0aG91Z2ggdGhlIG51bWJlcnMgd2lsbCBu
-b3QgYmUgZXhhY3RseSB0aGUgc2FtZSBpZiBub24tcmF3IGZvcm1hdA0KPiBkcml2ZXIgaXMgdXNl
-ZCAoZS5nLiBxY293MiBzZW5kaW5nIG1ldGFkYXRhIGRpc2NhcmRzKSkuDQo+IA0KPiBOb3RlIHRo
-YXQgdGhlc2UgbnVtYmVycyB3aWxsIG5vdCBpbmNsdWRlIGRpc2NhcmRzIHRyaWdnZXJlZCBieQ0K
-PiB3cml0ZS16ZXJvZXMgKyBNQVlfVU5NQVAgY2FsbHMuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBB
-bnRvbiBOZWZlZG92IDxhbnRvbi5uZWZlZG92QHZpcnR1b3p6by5jb20+DQoNClJldmlld2VkLWJ5
-OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+
-DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Fri, 23 Nov 2018 at 18:24, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> On Fri, Nov 23, 2018 at 06:14:28PM +0000, Peter Maydell wrote:
+> > One thing I would like to do with this new "cpu cluster"
+> > concept is to use it to handle a problem we have at the
+> > moment with TCG, where we assume all CPUs have the same
+> > view of physical memory (and so if CPU A executes from physical
+> > address X it can share translated code with CPU B executing
+> > from physical address X). The idea is that we should include
+> > the CPU cluster number in the TCG hash key that we use to
+> > look up cached translation blocks, so that only CPUs in
+> > the same cluster (assumed to have the same view of memory
+> > and to be identical) share TBs.
+> >
+> > If we don't have a unique integer key for the cluster, what
+> > should we use instead ?
+>
+> This sounds like a reasonable use of cluster_id as implemented in
+> this patch.  The ID would be only used internally and not exposed
+> to the outside, right?
+
+It would be internal to QEMU (not exposed to the guest or
+to the user), yes.
+
+> I'm more worried about cases where we could end up exposing the
+> ID in an external interface (either to guests, or through QMP or
+> the command-line).  This happened to cpu_index and we took a long
+> time to fix the mess.
+
+I see, thanks.
+
+My other question about this code was a slightly different one -- are
+we guaranteed to be holding the iothread lock when we create
+new QOM objects? (ie that we won't have races between two threads
+which both try to create new objects and increment the variable)
+
+thanks
+-- PMM
