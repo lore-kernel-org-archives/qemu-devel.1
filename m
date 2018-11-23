@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gQ50B-0002W7-KZ
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 01:31:44 -0500
+	(envelope-from <bharat.bhushan@nxp.com>) id 1gQ56h-0008QD-J1
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 01:38:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gQ506-0004Mg-NP
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 01:31:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gQ506-0004GC-Ha
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 01:31:38 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D71AF3086249
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 06:31:37 +0000 (UTC)
-Date: Fri, 23 Nov 2018 07:31:36 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181123063136.57uvdz3y7nngbn4d@sirius.home.kraxel.org>
-References: <20181122133207.29928-1-kraxel@redhat.com>
-	<20181122155212.GA2863@work-vm>
+	(envelope-from <bharat.bhushan@nxp.com>) id 1gQ56V-0005hz-Mh
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 01:38:23 -0500
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Date: Fri, 23 Nov 2018 06:38:12 +0000
+Message-ID: <VI1PR04MB484549F41959A613D3517F7D9AD40@VI1PR04MB4845.eurprd04.prod.outlook.com>
+References: <20181122171538.12359-1-eric.auger@redhat.com>
+	<20181122171538.12359-7-eric.auger@redhat.com>
+In-Reply-To: <20181122171538.12359-7-eric.auger@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181122155212.GA2863@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] audio/hda: fix guest triggerable assert
+Subject: Re: [Qemu-devel] [RFC v9 06/17] virtio-iommu: Endpoint and domains
+ structs and helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,25 +25,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "mst@redhat.com" <mst@redhat.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>
+Cc: "kevin.tian@intel.com" <kevin.tian@intel.com>, "tn@semihalf.com" <tn@semihalf.com>, "peterx@redhat.com" <peterx@redhat.com>
 
-On Thu, Nov 22, 2018 at 03:52:12PM +0000, Dr. David Alan Gilbert wrote:
-> * Gerd Hoffmann (kraxel@redhat.com) wrote:
-> > Guest writes to a readonly register trigger the assert in
-> > intel_hda_reg_write().  Add a check and just ignore them.
-> > 
-> > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1628433
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> 
-> Does make you wonder:
->   a) Why the guest was writing to a read-only register
->   b) Wth it only did it in the weird combination of
->      devices tested.
+Hi Eric,
 
-Note that we also have pci hotplug involved.  Probably a bug in the
-guest, maybe due to a register access landing at the wrong device while
-reshuffling the bars or something like that.
+> -----Original Message-----
+> From: Eric Auger <eric.auger@redhat.com>
+> Sent: Thursday, November 22, 2018 10:45 PM
+> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; qemu-
+> devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org;
+> mst@redhat.com; jean-philippe.brucker@arm.com
+> Cc: kevin.tian@intel.com; tn@semihalf.com; Bharat Bhushan
+> <bharat.bhushan@nxp.com>; peterx@redhat.com
+> Subject: [RFC v9 06/17] virtio-iommu: Endpoint and domains structs and
+> helpers
+>=20
+> This patch introduce domain and endpoint internal datatypes. Both are
+> stored in RB trees. The domain owns a list of endpoints attached to it.
+>=20
+> Helpers to get/put end points and domains are introduced.
+> get() helpers will become static in subsequent patches.
+>=20
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>=20
+> ---
+>=20
+> v6 -> v7:
+> - on virtio_iommu_find_add_as the bus number computation may
+>   not be finalized yet so we cannot register the EPs at that time.
+>   Hence, let's remove the get_endpoint and also do not use the
+>   bus number for building the memory region name string (only
+>   used for debug though).
 
-cheers,
-  Gerd
+Endpoint registration from virtio_iommu_find_add_as to PROBE request.
+It is mentioned that " the bus number computation may not be finalized ". C=
+an you please give some more information.
+I am asking this because from vfio perspective translate/replay will be cal=
+led much before the PROBE request and endpoint needed to be registered by t=
+hat time.
+
+
+Thanks
+-Bharat
+
+>=20
+> v4 -> v5:
+> - initialize as->endpoint_list
+>=20
+> v3 -> v4:
+> - new separate patch
+> ---
+>  hw/virtio/trace-events   |   4 ++
+>  hw/virtio/virtio-iommu.c | 125
+> ++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 128 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events index
+> 9270b0463e..4b15086872 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -61,3 +61,7 @@ virtio_iommu_map(uint32_t domain_id, uint64_t
+> virt_start, uint64_t virt_end, uin  virtio_iommu_unmap(uint32_t domain_id=
+,
+> uint64_t virt_start, uint64_t virt_end) "domain=3D%d virt_start=3D0x%"PRI=
+x64"
+> virt_end=3D0x%"PRIx64  virtio_iommu_translate(const char *name, uint32_t
+> rid, uint64_t iova, int flag) "mr=3D%s rid=3D%d addr=3D0x%"PRIx64" flag=
+=3D%d"
+>  virtio_iommu_init_iommu_mr(char *iommu_mr) "init %s"
+> +virtio_iommu_get_endpoint(uint32_t ep_id) "Alloc endpoint=3D%d"
+> +virtio_iommu_put_endpoint(uint32_t ep_id) "Free endpoint=3D%d"
+> +virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=3D%d"
+> +virtio_iommu_put_domain(uint32_t domain_id) "Free domain=3D%d"
+> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c index
+> dead062baf..1b9c3ba416 100644
+> --- a/hw/virtio/virtio-iommu.c
+> +++ b/hw/virtio/virtio-iommu.c
+> @@ -33,20 +33,124 @@
+>  #include "hw/virtio/virtio-bus.h"
+>  #include "hw/virtio/virtio-access.h"
+>  #include "hw/virtio/virtio-iommu.h"
+> +#include "hw/pci/pci_bus.h"
+> +#include "hw/pci/pci.h"
+>=20
+>  /* Max size */
+>  #define VIOMMU_DEFAULT_QUEUE_SIZE 256
+>=20
+> +typedef struct viommu_domain {
+> +    uint32_t id;
+> +    GTree *mappings;
+> +    QLIST_HEAD(, viommu_endpoint) endpoint_list; } viommu_domain;
+> +
+> +typedef struct viommu_endpoint {
+> +    uint32_t id;
+> +    viommu_domain *domain;
+> +    QLIST_ENTRY(viommu_endpoint) next;
+> +    VirtIOIOMMU *viommu;
+> +} viommu_endpoint;
+> +
+> +typedef struct viommu_interval {
+> +    uint64_t low;
+> +    uint64_t high;
+> +} viommu_interval;
+> +
+>  static inline uint16_t virtio_iommu_get_sid(IOMMUDevice *dev)  {
+>      return PCI_BUILD_BDF(pci_bus_num(dev->bus), dev->devfn);  }
+>=20
+> +static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer
+> +user_data) {
+> +    viommu_interval *inta =3D (viommu_interval *)a;
+> +    viommu_interval *intb =3D (viommu_interval *)b;
+> +
+> +    if (inta->high <=3D intb->low) {
+> +        return -1;
+> +    } else if (intb->high <=3D inta->low) {
+> +        return 1;
+> +    } else {
+> +        return 0;
+> +    }
+> +}
+> +
+> +static void
+> virtio_iommu_detach_endpoint_from_domain(viommu_endpoint
+> +*ep) {
+> +    QLIST_REMOVE(ep, next);
+> +    ep->domain =3D NULL;
+> +}
+> +
+> +viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
+> uint32_t
+> +ep_id); viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
+> +uint32_t ep_id) {
+> +    viommu_endpoint *ep;
+> +
+> +    ep =3D g_tree_lookup(s->endpoints, GUINT_TO_POINTER(ep_id));
+> +    if (ep) {
+> +        return ep;
+> +    }
+> +    ep =3D g_malloc0(sizeof(*ep));
+> +    ep->id =3D ep_id;
+> +    ep->viommu =3D s;
+> +    trace_virtio_iommu_get_endpoint(ep_id);
+> +    g_tree_insert(s->endpoints, GUINT_TO_POINTER(ep_id), ep);
+> +    return ep;
+> +}
+> +
+> +static void virtio_iommu_put_endpoint(gpointer data) {
+> +    viommu_endpoint *ep =3D (viommu_endpoint *)data;
+> +
+> +    if (ep->domain) {
+> +        virtio_iommu_detach_endpoint_from_domain(ep);
+> +        g_tree_unref(ep->domain->mappings);
+> +    }
+> +
+> +    trace_virtio_iommu_put_endpoint(ep->id);
+> +    g_free(ep);
+> +}
+> +
+> +viommu_domain *virtio_iommu_get_domain(VirtIOIOMMU *s, uint32_t
+> +domain_id); viommu_domain *virtio_iommu_get_domain(VirtIOIOMMU
+> *s,
+> +uint32_t domain_id) {
+> +    viommu_domain *domain;
+> +
+> +    domain =3D g_tree_lookup(s->domains, GUINT_TO_POINTER(domain_id));
+> +    if (domain) {
+> +        return domain;
+> +    }
+> +    domain =3D g_malloc0(sizeof(*domain));
+> +    domain->id =3D domain_id;
+> +    domain->mappings =3D
+> g_tree_new_full((GCompareDataFunc)interval_cmp,
+> +                                   NULL, (GDestroyNotify)g_free,
+> +                                   (GDestroyNotify)g_free);
+> +    g_tree_insert(s->domains, GUINT_TO_POINTER(domain_id), domain);
+> +    QLIST_INIT(&domain->endpoint_list);
+> +    trace_virtio_iommu_get_domain(domain_id);
+> +    return domain;
+> +}
+> +
+> +static void virtio_iommu_put_domain(gpointer data) {
+> +    viommu_domain *domain =3D (viommu_domain *)data;
+> +    viommu_endpoint *iter, *tmp;
+> +
+> +    QLIST_FOREACH_SAFE(iter, &domain->endpoint_list, next, tmp) {
+> +        virtio_iommu_detach_endpoint_from_domain(iter);
+> +    }
+> +    g_tree_destroy(domain->mappings);
+> +    trace_virtio_iommu_put_domain(domain->id);
+> +    g_free(domain);
+> +}
+> +
+>  static AddressSpace *virtio_iommu_find_add_as(PCIBus *bus, void
+> *opaque,
+>                                                int devfn)  {
+>      VirtIOIOMMU *s =3D opaque;
+>      IOMMUPciBus *sbus =3D g_hash_table_lookup(s->as_by_busptr, bus);
+> +    static uint32_t mr_index;
+>      IOMMUDevice *sdev;
+>=20
+>      if (!sbus) {
+> @@ -60,7 +164,7 @@ static AddressSpace
+> *virtio_iommu_find_add_as(PCIBus *bus, void *opaque,
+>      if (!sdev) {
+>          char *name =3D g_strdup_printf("%s-%d-%d",
+>                                       TYPE_VIRTIO_IOMMU_MEMORY_REGION,
+> -                                     pci_bus_num(bus), devfn);
+> +                                     mr_index++, devfn);
+>          sdev =3D sbus->pbdev[devfn] =3D g_malloc0(sizeof(IOMMUDevice));
+>=20
+>          sdev->viommu =3D s;
+> @@ -75,6 +179,7 @@ static AddressSpace
+> *virtio_iommu_find_add_as(PCIBus *bus, void *opaque,
+>                                   UINT64_MAX);
+>          address_space_init(&sdev->as,
+>                             MEMORY_REGION(&sdev->iommu_mr),
+> TYPE_VIRTIO_IOMMU);
+> +        g_free(name);
+>      }
+>=20
+>      return &sdev->as;
+> @@ -332,6 +437,13 @@ static const VMStateDescription
+> vmstate_virtio_iommu_device =3D {
+>      },
+>  };
+>=20
+> +static gint int_cmp(gconstpointer a, gconstpointer b, gpointer
+> +user_data) {
+> +    uint ua =3D GPOINTER_TO_UINT(a);
+> +    uint ub =3D GPOINTER_TO_UINT(b);
+> +    return (ua > ub) - (ua < ub);
+> +}
+> +
+>  static void virtio_iommu_device_realize(DeviceState *dev, Error **errp) =
+ {
+>      VirtIODevice *vdev =3D VIRTIO_DEVICE(dev); @@ -356,6 +468,8 @@ stati=
+c
+> void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
+>      virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MAP_UNMAP);
+>      virtio_add_feature(&s->features, VIRTIO_IOMMU_F_BYPASS);
+>=20
+> +    qemu_mutex_init(&s->mutex);
+> +
+>      memset(s->as_by_bus_num, 0, sizeof(s->as_by_bus_num));
+>      s->as_by_busptr =3D g_hash_table_new(NULL, NULL);
+>=20
+> @@ -364,11 +478,20 @@ static void
+> virtio_iommu_device_realize(DeviceState *dev, Error **errp)
+>      } else {
+>          error_setg(errp, "VIRTIO-IOMMU is not attached to any PCI bus!")=
+;
+>      }
+> +
+> +    s->domains =3D g_tree_new_full((GCompareDataFunc)int_cmp,
+> +                                 NULL, NULL, virtio_iommu_put_domain);
+> +    s->endpoints =3D g_tree_new_full((GCompareDataFunc)int_cmp,
+> +                                   NULL, NULL,
+> + virtio_iommu_put_endpoint);
+>  }
+>=20
+>  static void virtio_iommu_device_unrealize(DeviceState *dev, Error **errp=
+)
+> {
+>      VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+> +    VirtIOIOMMU *s =3D VIRTIO_IOMMU(dev);
+> +
+> +    g_tree_destroy(s->domains);
+> +    g_tree_destroy(s->endpoints);
+>=20
+>      virtio_cleanup(vdev);
+>  }
+> --
+> 2.17.2
