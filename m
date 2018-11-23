@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQD-0004t2-Vf
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ9-0004oL-3x
 	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ6-0005Mu-SP
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:09 -0500
-Received: from cmccmta1.chinamobile.com ([221.176.66.79]:24231)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ6-0005KH-6a
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:04 -0500
+Received: from cmccmta1.chinamobile.com ([221.176.66.79]:24229)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ5-000594-CZ
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:02 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ5-00051M-3r
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:01 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 23 Nov 2018 23:30:35 +0800
-Message-Id: <20181123153040.18933-17-maozhongyi@cmss.chinamobile.com>
+Date: Fri, 23 Nov 2018 23:30:24 +0800
+Message-Id: <20181123153040.18933-6-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
 References: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH v2 16/21] timer/etraxfs_timer: Convert sysbus
- init function to realize function
+Subject: [Qemu-devel] [PATCH v2 05/21] display/g364fb: Convert sysbus init
+ function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +25,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, edgar.iglesias@gmail.com, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, pbonzini@redhat.com, kraxel@redhat.com, f4bug@amsat.org, alistair.francis@wdc.com, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-etraxfs_timer_class_init().
+g364fb_sysbus_class_init().
 
-Cc: edgar.iglesias@gmail.com
+Cc: pbonzini@redhat.com
+Cc: kraxel@redhat.com
+Cc: f4bug@amsat.org
+Cc: alistair.francis@wdc.com
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/timer/etraxfs_timer.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ hw/display/g364fb.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/hw/timer/etraxfs_timer.c b/hw/timer/etraxfs_timer.c
-index d13bc30b2d..2280914b1d 100644
---- a/hw/timer/etraxfs_timer.c
-+++ b/hw/timer/etraxfs_timer.c
-@@ -315,9 +315,10 @@ static void etraxfs_timer_reset(void *opaque)
-     qemu_irq_lower(t->irq);
- }
+diff --git a/hw/display/g364fb.c b/hw/display/g364fb.c
+index 8ad7e5d824..3407adf98d 100644
+--- a/hw/display/g364fb.c
++++ b/hw/display/g364fb.c
+@@ -489,18 +489,16 @@ typedef struct {
+     G364State g364;
+ } G364SysBusState;
  
--static int etraxfs_timer_init(SysBusDevice *dev)
-+static void etraxfs_timer_realize(DeviceState *dev, Error **errp)
+-static int g364fb_sysbus_init(SysBusDevice *sbd)
++static void g364fb_sysbus_realize(DeviceState *dev, Error **errp)
  {
-     ETRAXTimerState *t = ETRAX_TIMER(dev);
+-    DeviceState *dev = DEVICE(sbd);
+     G364SysBusState *sbs = G364(dev);
+     G364State *s = &sbs->g364;
 +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
  
-     t->bh_t0 = qemu_bh_new(timer0_hit, t);
-     t->bh_t1 = qemu_bh_new(timer1_hit, t);
-@@ -326,21 +327,20 @@ static int etraxfs_timer_init(SysBusDevice *dev)
-     t->ptimer_t1 = ptimer_init(t->bh_t1, PTIMER_POLICY_DEFAULT);
-     t->ptimer_wd = ptimer_init(t->bh_wd, PTIMER_POLICY_DEFAULT);
- 
--    sysbus_init_irq(dev, &t->irq);
--    sysbus_init_irq(dev, &t->nmi);
-+    sysbus_init_irq(sbd, &t->irq);
-+    sysbus_init_irq(sbd, &t->nmi);
- 
-     memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t,
-                           "etraxfs-timer", 0x5c);
--    sysbus_init_mmio(dev, &t->mmio);
-+    sysbus_init_mmio(sbd, &t->mmio);
-     qemu_register_reset(etraxfs_timer_reset, t);
+     g364fb_init(dev, s);
+     sysbus_init_irq(sbd, &s->irq);
+     sysbus_init_mmio(sbd, &s->mem_ctrl);
+     sysbus_init_mmio(sbd, &s->mem_vram);
+-
 -    return 0;
  }
  
- static void etraxfs_timer_class_init(ObjectClass *klass, void *data)
+ static void g364fb_sysbus_reset(DeviceState *d)
+@@ -518,9 +516,8 @@ static Property g364fb_sysbus_properties[] = {
+ static void g364fb_sysbus_class_init(ObjectClass *klass, void *data)
  {
--    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
  
--    sdc->init = etraxfs_timer_init;
-+    dc->realize = etraxfs_timer_realize;
- }
- 
- static const TypeInfo etraxfs_timer_info = {
+-    k->init = g364fb_sysbus_init;
++    dc->realize = g364fb_sysbus_realize;
+     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+     dc->desc = "G364 framebuffer";
+     dc->reset = g364fb_sysbus_reset;
 -- 
 2.17.1
