@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gQCj4-0000Hc-J9
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:38 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gQCj1-0000EF-MM
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gQCj3-0003jY-Dy
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:34 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50879)
+	(envelope-from <richard.henderson@linaro.org>) id 1gQCix-0003aN-U2
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:30 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40880)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gQCj1-0003fW-Od
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:32 -0500
-Received: by mail-wm1-x343.google.com with SMTP id 125so12200375wmh.0
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 06:46:31 -0800 (PST)
+	id 1gQCiw-0003Ti-3g
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:27 -0500
+Received: by mail-wm1-x343.google.com with SMTP id q26so12173210wmf.5
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 06:46:24 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 23 Nov 2018 15:45:52 +0100
-Message-Id: <20181123144558.5048-32-richard.henderson@linaro.org>
+Date: Fri, 23 Nov 2018 15:45:44 +0100
+Message-Id: <20181123144558.5048-24-richard.henderson@linaro.org>
 In-Reply-To: <20181123144558.5048-1-richard.henderson@linaro.org>
 References: <20181123144558.5048-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH for-4.0 v2 31/37] tcg/aarch64: Set
- TCG_TARGET_HAS_MEMORY_BSWAP to false
+Subject: [Qemu-devel] [PATCH for-4.0 v2 23/37] tcg/ppc: Change
+ TCG_TARGET_CALL_ALIGN_ARGS to bool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,143 +30,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair.Francis@wdc.com
 
-This allows us to remove some code from the backend, allowing
-the generic code to emit any extra bswaps.
+Cleaner not to treat this as #ifdef.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/aarch64/tcg-target.h     |  2 +-
- tcg/aarch64/tcg-target.inc.c | 51 +++++++-----------------------------
- 2 files changed, 10 insertions(+), 43 deletions(-)
+ tcg/ppc/tcg-target.inc.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index 0788f2eecb..7f55d50400 100644
---- a/tcg/aarch64/tcg-target.h
-+++ b/tcg/aarch64/tcg-target.h
-@@ -137,7 +137,7 @@ typedef enum {
- #define TCG_TARGET_HAS_mul_vec          1
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 484d90ead2..f7c33f3b7f 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -30,6 +30,8 @@
+ #endif
+ #ifdef _CALL_SYSV
+ # define TCG_TARGET_CALL_ALIGN_ARGS   1
++#else
++# define TCG_TARGET_CALL_ALIGN_ARGS   0
+ #endif
  
- #define TCG_TARGET_DEFAULT_MO (0)
--#define TCG_TARGET_HAS_MEMORY_BSWAP     1
-+#define TCG_TARGET_HAS_MEMORY_BSWAP     0
- 
- static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
- {
-diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-index 8edea527f7..34f9347cdf 100644
---- a/tcg/aarch64/tcg-target.inc.c
-+++ b/tcg/aarch64/tcg-target.inc.c
-@@ -1485,8 +1485,6 @@ static void tcg_out_qemu_ld_direct(TCGContext *s, TCGMemOp memop, TCGType ext,
-                                    TCGReg data_r, TCGReg addr_r,
-                                    TCGType otype, TCGReg off_r)
- {
--    const TCGMemOp bswap = memop & MO_BSWAP;
--
-     switch (memop & MO_SSIZE) {
-     case MO_UB:
-         tcg_out_ldst_r(s, I3312_LDRB, data_r, addr_r, otype, off_r);
-@@ -1497,43 +1495,22 @@ static void tcg_out_qemu_ld_direct(TCGContext *s, TCGMemOp memop, TCGType ext,
-         break;
-     case MO_UW:
-         tcg_out_ldst_r(s, I3312_LDRH, data_r, addr_r, otype, off_r);
--        if (bswap) {
--            tcg_out_rev16(s, data_r, data_r);
--        }
-         break;
-     case MO_SW:
--        if (bswap) {
--            tcg_out_ldst_r(s, I3312_LDRH, data_r, addr_r, otype, off_r);
--            tcg_out_rev16(s, data_r, data_r);
--            tcg_out_sxt(s, ext, MO_16, data_r, data_r);
--        } else {
--            tcg_out_ldst_r(s, (ext ? I3312_LDRSHX : I3312_LDRSHW),
--                           data_r, addr_r, otype, off_r);
--        }
-+        tcg_out_ldst_r(s, (ext ? I3312_LDRSHX : I3312_LDRSHW),
-+                       data_r, addr_r, otype, off_r);
-         break;
-     case MO_UL:
-         tcg_out_ldst_r(s, I3312_LDRW, data_r, addr_r, otype, off_r);
--        if (bswap) {
--            tcg_out_rev32(s, data_r, data_r);
--        }
-         break;
-     case MO_SL:
--        if (bswap) {
--            tcg_out_ldst_r(s, I3312_LDRW, data_r, addr_r, otype, off_r);
--            tcg_out_rev32(s, data_r, data_r);
--            tcg_out_sxt(s, TCG_TYPE_I64, MO_32, data_r, data_r);
--        } else {
--            tcg_out_ldst_r(s, I3312_LDRSWX, data_r, addr_r, otype, off_r);
--        }
-+        tcg_out_ldst_r(s, I3312_LDRSWX, data_r, addr_r, otype, off_r);
-         break;
-     case MO_Q:
-         tcg_out_ldst_r(s, I3312_LDRX, data_r, addr_r, otype, off_r);
--        if (bswap) {
--            tcg_out_rev64(s, data_r, data_r);
--        }
-         break;
-     default:
--        tcg_abort();
-+        g_assert_not_reached();
-     }
- }
- 
-@@ -1541,35 +1518,21 @@ static void tcg_out_qemu_st_direct(TCGContext *s, TCGMemOp memop,
-                                    TCGReg data_r, TCGReg addr_r,
-                                    TCGType otype, TCGReg off_r)
- {
--    const TCGMemOp bswap = memop & MO_BSWAP;
--
-     switch (memop & MO_SIZE) {
-     case MO_8:
-         tcg_out_ldst_r(s, I3312_STRB, data_r, addr_r, otype, off_r);
-         break;
-     case MO_16:
--        if (bswap && data_r != TCG_REG_XZR) {
--            tcg_out_rev16(s, TCG_REG_TMP, data_r);
--            data_r = TCG_REG_TMP;
--        }
-         tcg_out_ldst_r(s, I3312_STRH, data_r, addr_r, otype, off_r);
-         break;
-     case MO_32:
--        if (bswap && data_r != TCG_REG_XZR) {
--            tcg_out_rev32(s, TCG_REG_TMP, data_r);
--            data_r = TCG_REG_TMP;
--        }
-         tcg_out_ldst_r(s, I3312_STRW, data_r, addr_r, otype, off_r);
-         break;
-     case MO_64:
--        if (bswap && data_r != TCG_REG_XZR) {
--            tcg_out_rev64(s, TCG_REG_TMP, data_r);
--            data_r = TCG_REG_TMP;
--        }
-         tcg_out_ldst_r(s, I3312_STRX, data_r, addr_r, otype, off_r);
-         break;
-     default:
--        tcg_abort();
-+        g_assert_not_reached();
-     }
- }
- 
-@@ -1578,6 +1541,8 @@ static void tcg_out_qemu_ld(TCGContext *s, TCGReg data_reg, TCGReg addr_reg,
- {
-     TCGMemOp memop = get_memop(oi);
- 
-+    tcg_debug_assert(!(memop & MO_BSWAP));
-+
- #ifdef CONFIG_SOFTMMU
-     /* Ignore the requested "ext".  We get the same correct result from
-      * a 16-bit sign-extended to 64-bit as we do sign-extended to 32-bit,
-@@ -1608,6 +1573,8 @@ static void tcg_out_qemu_st(TCGContext *s, TCGReg data_reg, TCGReg addr_reg,
- {
-     TCGMemOp memop = get_memop(oi);
- 
-+    tcg_debug_assert(!(memop & MO_BSWAP));
-+
- #ifdef CONFIG_SOFTMMU
-     bool is_64 = (memop & MO_SIZE) == MO_64;
- 
+ /* For some memory operations, we need a scratch that isn't R0.  For the AIX
+@@ -1675,9 +1677,7 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     lo = lb->addrlo_reg;
+     hi = lb->addrhi_reg;
+     if (TCG_TARGET_REG_BITS < TARGET_LONG_BITS) {
+-#ifdef TCG_TARGET_CALL_ALIGN_ARGS
+-        arg |= 1;
+-#endif
++        arg |= TCG_TARGET_CALL_ALIGN_ARGS;
+         tcg_out_mov(s, TCG_TYPE_I32, arg++, hi);
+         tcg_out_mov(s, TCG_TYPE_I32, arg++, lo);
+     } else {
+@@ -1720,9 +1720,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     lo = lb->addrlo_reg;
+     hi = lb->addrhi_reg;
+     if (TCG_TARGET_REG_BITS < TARGET_LONG_BITS) {
+-#ifdef TCG_TARGET_CALL_ALIGN_ARGS
+-        arg |= 1;
+-#endif
++        arg |= TCG_TARGET_CALL_ALIGN_ARGS;
+         tcg_out_mov(s, TCG_TYPE_I32, arg++, hi);
+         tcg_out_mov(s, TCG_TYPE_I32, arg++, lo);
+     } else {
+@@ -1736,9 +1734,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     if (TCG_TARGET_REG_BITS == 32) {
+         switch (s_bits) {
+         case MO_64:
+-#ifdef TCG_TARGET_CALL_ALIGN_ARGS
+-            arg |= 1;
+-#endif
++            arg |= TCG_TARGET_CALL_ALIGN_ARGS;
+             tcg_out_mov(s, TCG_TYPE_I32, arg++, hi);
+             /* FALLTHRU */
+         case MO_32:
 -- 
 2.17.2
