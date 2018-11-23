@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gQC5M-00039t-DO
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:05:35 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gQC5P-0003Ck-DU
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:05:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gQC5J-0007Lx-Dh
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:05:32 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gQC5J-0007LX-7f
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:05:35 -0500
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Fri, 23 Nov 2018 17:05:17 +0300
-Message-Id: <1542981922-316191-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 0/5] Discrad blocks during block-stream
+Date: Fri, 23 Nov 2018 17:05:19 +0300
+Message-Id: <1542981922-316191-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1542981922-316191-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1542981922-316191-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 2/5] The discard flag for block stream
  operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,59 +23,136 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, dgilbert@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-Dear all,
+Adding a parameter to QMP block-stream command to allow discarding
+blocks in the backing chain while blocks are being copied to the
+active layer.
 
-The given feature discards blocks with copy-on-read operation while the
-streaming process runs. Adding the 'discard' argument to the QMP block-stream
-command allows dropping a block in the backing chain after it has been copied
-to the active layer. That will elude the block duplication in the intermediate
-backing file. It saves the disk space while external snapshots are being
-merged.
-The method involves the filter insertion above the active layer to allow write
-operation in the backing chain. The method is similar to that in the 'commit
-active' command (mirror.c).
-The permission to write into an inactive layer can not be obtained due to the
-existing child permission mechanism. There is a commented up hack in the
-callback function bdrv_stream_top_pwritev() in block/stream.c that redirects
-write operations below the filter node. Being uncommented, it enables writing
-into the inactive layer and passing all the iotests in the 030 file. Otherwise,
-no WRITE permission is granted after the filter insertion above the target node.
-Any suggestions to resolve that issue will be appreciated.
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ block/stream.c            | 3 +--
+ blockdev.c                | 8 +++++++-
+ hmp-commands.hx           | 4 ++--
+ hmp.c                     | 4 +++-
+ include/block/block_int.h | 2 +-
+ qapi/block-core.json      | 5 ++++-
+ 6 files changed, 18 insertions(+), 8 deletions(-)
 
-v3:
-The series version number and the given changelog were added. 'Signed-off-by'
-subscription of the patch [PATCH 3/5] amended as Peter Krempa requested.
-
-v2 was "[PATCH 0/5] Discrad blocks during block-stream operation"
-The suggestions of Dr. David Alan Gilbert and Alberto Garcia after their first
-review have been applied.
-The abort() callback function have been added to the filter driver and some
-refactoring work done.
-The test suite for the 'block-stream' command with 'discard' option was added
-to the 030 file of iotests.
-
-v1 was "[PATCH 0/2] Discrad blocks during block-stream operation"
-The initial implementation of the feature.
-
-Sincerely,
-
-Andrey Shinkevich (5):
-  Discard blocks while copy-on-read
-  The discard flag for block stream operation
-  iotests: allow resume_drive by node name
-  iotests: prepare 030 for graph change
-  iotests: 030 with block-stream discard
-
- block/stream.c                | 429 ++++++++++++++++++++++++++++++++++++++++--
- blockdev.c                    |   8 +-
- hmp-commands.hx               |   4 +-
- hmp.c                         |   4 +-
- include/block/block_int.h     |   2 +-
- qapi/block-core.json          |   5 +-
- tests/qemu-iotests/030        | 163 +++++++++++-----
- tests/qemu-iotests/030.out    |   4 +-
- tests/qemu-iotests/iotests.py |   9 +-
- 9 files changed, 558 insertions(+), 70 deletions(-)
-
+diff --git a/block/stream.c b/block/stream.c
+index 9e85954..e844e94 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -584,10 +584,9 @@ static const BlockJobDriver stream_job_driver = {
+ 
+ void stream_start(const char *job_id, BlockDriverState *bs,
+                   BlockDriverState *base, const char *backing_file_str,
+-                  int creation_flags, int64_t speed,
++                  int creation_flags, int64_t speed, bool discard,
+                   BlockdevOnError on_error, Error **errp)
+ {
+-    const bool discard = false;
+     StreamBlockJob *s = NULL;
+     BlockDriverState *iter;
+     int orig_bs_flags;
+diff --git a/blockdev.c b/blockdev.c
+index 81f95d9..333592e 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3141,6 +3141,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+                       bool has_base_node, const char *base_node,
+                       bool has_backing_file, const char *backing_file,
+                       bool has_speed, int64_t speed,
++                      bool has_discard, bool discard,
+                       bool has_on_error, BlockdevOnError on_error,
+                       bool has_auto_finalize, bool auto_finalize,
+                       bool has_auto_dismiss, bool auto_dismiss,
+@@ -3157,6 +3158,10 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+         on_error = BLOCKDEV_ON_ERROR_REPORT;
+     }
+ 
++    if (!has_discard) {
++        discard = false;
++    }
++
+     bs = bdrv_lookup_bs(device, device, errp);
+     if (!bs) {
+         return;
+@@ -3221,7 +3226,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+     }
+ 
+     stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
+-                 job_flags, has_speed ? speed : 0, on_error, &local_err);
++                 job_flags, has_speed ? speed : 0,
++                 discard, on_error, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto out;
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index db0c681..a7e2a10 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -95,8 +95,8 @@ ETEXI
+ 
+     {
+         .name       = "block_stream",
+-        .args_type  = "device:B,speed:o?,base:s?",
+-        .params     = "device [speed [base]]",
++        .args_type  = "device:B,speed:o?,base:s?,discard:-d",
++        .params     = "device [speed [base]] [-d]",
+         .help       = "copy data from a backing file into a block device",
+         .cmd        = hmp_block_stream,
+     },
+diff --git a/hmp.c b/hmp.c
+index 7828f93..0d263e4 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1920,9 +1920,11 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
+     const char *device = qdict_get_str(qdict, "device");
+     const char *base = qdict_get_try_str(qdict, "base");
+     int64_t speed = qdict_get_try_int(qdict, "speed", 0);
++    bool discard = qdict_get_try_bool(qdict, "discard", false);
+ 
+     qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
+-                     false, NULL, qdict_haskey(qdict, "speed"), speed, true,
++                     false, NULL, qdict_haskey(qdict, "speed"), speed,
++                     true, discard, true,
+                      BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
+                      &error);
+ 
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index f605622..2660336 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -970,7 +970,7 @@ int is_windows_drive(const char *filename);
+  */
+ void stream_start(const char *job_id, BlockDriverState *bs,
+                   BlockDriverState *base, const char *backing_file_str,
+-                  int creation_flags, int64_t speed,
++                  int creation_flags, int64_t speed, bool discard,
+                   BlockdevOnError on_error, Error **errp);
+ 
+ /**
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index d4fe710..f4538fa 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2334,6 +2334,9 @@
+ #
+ # @speed:  the maximum speed, in bytes per second
+ #
++# @discard: true to delete blocks duplicated in old backing files.
++#           (default: false). Since 3.1.
++#
+ # @on-error: the action to take on an error (default report).
+ #            'stop' and 'enospc' can only be used if the block device
+ #            supports io-status (see BlockInfo).  Since 1.3.
+@@ -2366,7 +2369,7 @@
+ { 'command': 'block-stream',
+   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
+             '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
+-            '*on-error': 'BlockdevOnError',
++            '*discard': 'bool', '*on-error': 'BlockdevOnError',
+             '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
+ 
+ ##
 -- 
 1.8.3.1
