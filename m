@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gQ9DQ-0006dw-BA
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:01:52 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gQ9FB-0007cx-IS
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:03:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gQ9DM-0002TF-4E
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:01:40 -0500
-Received: from 2.mo1.mail-out.ovh.net ([178.32.119.250]:57455)
+	(envelope-from <dgilbert@redhat.com>) id 1gQ9F7-0004bv-DU
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:03:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gQ9DL-0002R4-Kc
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:01:36 -0500
-Received: from player690.ha.ovh.net (unknown [10.109.143.72])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 7A7261467BE
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 12:01:33 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-6-clg@kaod.org>
-	<20181122044127.GE10448@umbus.fritz.box>
-	<3095c0b4-ebcd-907b-360d-d5e7cdfd3b7d@kaod.org>
-	<20181123043508.GY10448@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <7f687a1f-0783-ba21-dfb6-7963c0a0480c@kaod.org>
-Date: Fri, 23 Nov 2018 12:01:27 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gQ9F7-0004ar-3f
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:03:25 -0500
+Date: Fri, 23 Nov 2018 11:02:40 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181123110239.GC2373@work-vm>
+References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
+	<20181122072028.22819-3-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20181123043508.GY10448@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181122072028.22819-3-xiaoguangrong@tencent.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 05/36] ppc/xive: introduce the XIVE
- Event Notification Descriptors
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] util: introduce threaded workqueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,532 +28,720 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 11/23/18 5:35 AM, David Gibson wrote:
-> On Thu, Nov 22, 2018 at 10:47:44PM +0100, C=E9dric Le Goater wrote:
->> On 11/22/18 5:41 AM, David Gibson wrote:
->>> On Fri, Nov 16, 2018 at 11:56:58AM +0100, C=E9dric Le Goater wrote:
->>>> To complete the event routing, the IVRE sub-engine uses an internal
->>>> table containing Event Notification Descriptor (END) structures.
->>>>
->>>> An END specifies on which Event Queue (EQ) the event notification
->>>> data, defined in the associated EAS, should be posted when an
->>>> exception occurs. It also defines which Notification Virtual Target
->>>> (NVT) should be notified.
->>>>
->>>> The Event Queue is a memory page provided by the O/S defining a
->>>> circular buffer, one per server and priority couple, containing Even=
+* guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+>=20
+> This modules implements the lockless and efficient threaded workqueue.
+>=20
+> Three abstracted objects are used in this module:
+> - Request.
+>      It not only contains the data that the workqueue fetches out
+>     to finish the request but also offers the space to save the result
+>     after the workqueue handles the request.
+>=20
+>     It's flowed between user and workqueue. The user fills the request
+>     data into it when it is owned by user. After it is submitted to the
+>     workqueue, the workqueue fetched data out and save the result into
+>     it after the request is handled.
+>=20
+>     All the requests are pre-allocated and carefully partitioned betwee=
+n
+>     threads so there is no contention on the request, that make threads
+>     be parallel as much as possible.
+>=20
+> - User, i.e, the submitter
+>     It's the one fills the request and submits it to the workqueue,
+>     the result will be collected after it is handled by the work queue.
+>=20
+>     The user can consecutively submit requests without waiting the prev=
+ious
+>     requests been handled.
+>     It only supports one submitter, you should do serial submission by
+>     yourself if you want more, e.g, use lock on you side.
+>=20
+> - Workqueue, i.e, thread
+>     Each workqueue is represented by a running thread that fetches
+>     the request submitted by the user, do the specified work and save
+>     the result to the request.
+>=20
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+> ---
+>  include/qemu/threaded-workqueue.h | 106 +++++++++
+>  util/Makefile.objs                |   1 +
+>  util/threaded-workqueue.c         | 463 ++++++++++++++++++++++++++++++=
+++++++++
+>  3 files changed, 570 insertions(+)
+>  create mode 100644 include/qemu/threaded-workqueue.h
+>  create mode 100644 util/threaded-workqueue.c
+>=20
+> diff --git a/include/qemu/threaded-workqueue.h b/include/qemu/threaded-=
+workqueue.h
+> new file mode 100644
+> index 0000000000..e0ede496d0
+> --- /dev/null
+> +++ b/include/qemu/threaded-workqueue.h
+> @@ -0,0 +1,106 @@
+> +/*
+> + * Lockless and Efficient Threaded Workqueue Abstraction
+> + *
+> + * Author:
+> + *   Xiao Guangrong <xiaoguangrong@tencent.com>
+> + *
+> + * Copyright(C) 2018 Tencent Corporation.
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.1 =
+or later.
+> + * See the COPYING.LIB file in the top-level directory.
+> + */
+> +
+> +#ifndef QEMU_THREADED_WORKQUEUE_H
+> +#define QEMU_THREADED_WORKQUEUE_H
+> +
+> +#include "qemu/queue.h"
+> +#include "qemu/thread.h"
+> +
+> +/*
+> + * This modules implements the lockless and efficient threaded workque=
+ue.
+> + *
+> + * Three abstracted objects are used in this module:
+> + * - Request.
+> + *   It not only contains the data that the workqueue fetches out
+> + *   to finish the request but also offers the space to save the resul=
 t
->>>> Queue entries. These are 4 bytes long, the first bit being a
->>>> 'generation' bit and the 31 following bits the END Data field. They
->>>> are pulled by the O/S when the exception occurs.
->>>>
->>>> The END Data field is a way to set an invariant logical event source
->>>> number for an IRQ. It is set with the H_INT_SET_SOURCE_CONFIG hcall
->>>> when the EISN flag is used.
->>>>
->>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>> ---
->>>>  include/hw/ppc/xive.h      |  18 ++++
->>>>  include/hw/ppc/xive_regs.h |  48 ++++++++++
->>>>  hw/intc/xive.c             | 185 ++++++++++++++++++++++++++++++++++=
-++-
->>>>  3 files changed, 248 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->>>> index 5a0696366577..ce62aaf28343 100644
->>>> --- a/include/hw/ppc/xive.h
->>>> +++ b/include/hw/ppc/xive.h
->>>> @@ -193,11 +193,29 @@ typedef struct XiveRouterClass {
->>>>      /* XIVE table accessors */
->>>>      int (*get_eas)(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas);
->>>>      int (*set_eas)(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas);
->>>> +    int (*get_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_=
-idx,
->>>> +                   XiveEND *end);
->>>> +    int (*set_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_=
-idx,
->>>> +                   XiveEND *end);
->>>
->>> Hrm.  So unlike the EAS, which is basically just a word, the END is a
->>> pretty large structure. =20
->>
->> yes. and so will be the NVT.
->>
->>> It's unclear here if get/set are expected to copy the whole thing out=
-=20
->>> and in,=20
->>
->> That's the plan.=20
->=20
-> Yeah, I don't think that's a good idea.  In some cases the updates are
-> on hot paths, so the extra copy isn't good, and more importantly it
-> makes it look like an atomic update, but it's not really.
->=20
-> Well... I guess it probably is because of the BQL, but I'd prefer not
-> to rely on that excessively.
->=20
->> What I had in mind are memory accessors to the XIVE structures, which=20
->> are local to QEMU for sPAPR and in the guest RAM for PowerNV (Please
->> take a look at the XIVE PowerNV model).
->>
->>> or if get give you a pointer into a "live" structure=20
->>
->> no
->>
->>> and set just does any necessary barriers after an update.
->> that would be too complex for the PowerNV model I think. There is a ca=
-che
->> in between the software running on the (QEMU) machine and the XIVE HW =
-but
->> it would be hard to handle.=20
->> =20
->>> Really, for a non-atomic value like this, I'm not sure get/set is the
->>> right model.
->>
->> ok. we need something to get them out and in.
->=20
-> I've thought about this a bit more.  What I think might work is
-> "end_read" and "end_write" callbacks, which take a word number in
-> addition to the parameters you have already
-
-ouch. This is not going to simplify the routing algo where all the get an=
-d
-set are done. The whole END is needed in the END trigger. So we will need
-routines to get and set the whole END.
-
-The NVT is not used too much for the moment.=20
-
->>> Also as I understand it nearly all the indices in XIVE are broken int=
-o
->>> block/index.  Is there a reason those are folded together into lisn
->>> for the EAS, but not for the END?
->>
->> The indexing of the EAT is global to the sytem and the index defines
->> which blk to use. The IRQ source numbers on the powerbus are architect=
-ed=20
->> to be :
->>
->>     #define XIVE_SRCNO(blk, idx)      ((uint32_t)(blk) << 28 | (idx))
->>
->> and XIVE can use different strategies to identify the XIVE IC in charg=
-e=20
->> of routing. It can be a one-to-one chip to block relation as skiboot d=
-oes.=20
->> Using a block scope table is possible also. Our model only supports on=
-e=20
->> block per chip and some shortcuts are taken but not that much in fact.
->> =20
->> Remote access to the XIVE structures of another chip are done through=20
->> MMIO (not modeled in PowerNV) and the blkid is used to partition the M=
-MIO=20
->> regions. Being local is better for performance because the END and NVT=
-=20
->> tables have a strong relation with the XIVE subengines using them=20
->> (VC and PC). =20
->>
->> May be, Ben can clarified it this is badly explained.
->=20
-> Right.. I think I understand what the blocks are all about.
->=20
-> But my question is, why encode the block and index together for the
-> EAS, but separately for the END?
-
-mostly because when the PowerNV devices forward an notification event, th=
-ey=20
-do so by writing the full IRQ number on a MMIO notify port and this numbe=
-r
-reaches the XiveRouter routing algo without being modified. On sPAPR it's
-even simpler.
-
-But we could decode the full IRQ number in the router before querying the=
-=20
-associated EAS. The EAS accessor would then use the same interface.=20
-I will look into it. Not a big change. I think.=20
-
->=20
->>
->>>>  } XiveRouterClass;
->>>> =20
->>>>  void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *=
-mon);
->>>> =20
->>>>  int xive_router_get_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *e=
-as);
->>>>  int xive_router_set_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *e=
-as);
->>>> +int xive_router_get_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t=
- end_idx,
->>>> +                        XiveEND *end);
->>>> +int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t=
- end_idx,
->>>> +                        XiveEND *end);
->>>> +
->>>> +/*
->>>> + * For legacy compatibility, the exceptions define up to 256 differ=
-ent
->>>> + * priorities. P9 implements only 9 levels : 8 active levels [0 - 7=
-]
->>>> + * and the least favored level 0xFF.
->>>> + */
->>>> +#define XIVE_PRIORITY_MAX  7
->>>> +
->>>> +void xive_end_reset(XiveEND *end);
->>>> +void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monito=
-r *mon);
->>>> =20
->>>>  #endif /* PPC_XIVE_H */
->>>> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
->>>> index 12499b33614c..f97fb2b90bee 100644
->>>> --- a/include/hw/ppc/xive_regs.h
->>>> +++ b/include/hw/ppc/xive_regs.h
->>>> @@ -28,4 +28,52 @@ typedef struct XiveEAS {
->>>>  #define EAS_END_DATA    PPC_BITMASK(33, 63)      /* Data written to=
- the END */
->>>>  } XiveEAS;
->>>> =20
->>>> +/* Event Notification Descriptor (END) */
->>>> +typedef struct XiveEND {
->>>> +        uint32_t        w0;
->>>> +#define END_W0_VALID             PPC_BIT32(0) /* "v" bit */
->>>> +#define END_W0_ENQUEUE           PPC_BIT32(1) /* "q" bit */
->>>> +#define END_W0_UCOND_NOTIFY      PPC_BIT32(2) /* "n" bit */
->>>> +#define END_W0_BACKLOG           PPC_BIT32(3) /* "b" bit */
->>>> +#define END_W0_PRECL_ESC_CTL     PPC_BIT32(4) /* "p" bit */
->>>> +#define END_W0_ESCALATE_CTL      PPC_BIT32(5) /* "e" bit */
->>>> +#define END_W0_UNCOND_ESCALATE   PPC_BIT32(6) /* "u" bit - DD2.0 */
->>>> +#define END_W0_SILENT_ESCALATE   PPC_BIT32(7) /* "s" bit - DD2.0 */
->>>> +#define END_W0_QSIZE             PPC_BITMASK32(12, 15)
->>>> +#define END_W0_SW0               PPC_BIT32(16)
->>>> +#define END_W0_FIRMWARE          END_W0_SW0 /* Owned by FW */
->>>> +#define END_QSIZE_4K             0
->>>> +#define END_QSIZE_64K            4
->>>> +#define END_W0_HWDEP             PPC_BITMASK32(24, 31)
->>>> +        uint32_t        w1;
->>>> +#define END_W1_ESn               PPC_BITMASK32(0, 1)
->>>> +#define END_W1_ESn_P             PPC_BIT32(0)
->>>> +#define END_W1_ESn_Q             PPC_BIT32(1)
->>>> +#define END_W1_ESe               PPC_BITMASK32(2, 3)
->>>> +#define END_W1_ESe_P             PPC_BIT32(2)
->>>> +#define END_W1_ESe_Q             PPC_BIT32(3)
->>>> +#define END_W1_GENERATION        PPC_BIT32(9)
->>>> +#define END_W1_PAGE_OFF          PPC_BITMASK32(10, 31)
->>>> +        uint32_t        w2;
->>>> +#define END_W2_MIGRATION_REG     PPC_BITMASK32(0, 3)
->>>> +#define END_W2_OP_DESC_HI        PPC_BITMASK32(4, 31)
->>>> +        uint32_t        w3;
->>>> +#define END_W3_OP_DESC_LO        PPC_BITMASK32(0, 31)
->>>> +        uint32_t        w4;
->>>> +#define END_W4_ESC_END_BLOCK     PPC_BITMASK32(4, 7)
->>>> +#define END_W4_ESC_END_INDEX     PPC_BITMASK32(8, 31)
->>>> +        uint32_t        w5;
->>>> +#define END_W5_ESC_END_DATA      PPC_BITMASK32(1, 31)
->>>> +        uint32_t        w6;
->>>> +#define END_W6_FORMAT_BIT        PPC_BIT32(8)
->>>> +#define END_W6_NVT_BLOCK         PPC_BITMASK32(9, 12)
->>>> +#define END_W6_NVT_INDEX         PPC_BITMASK32(13, 31)
->>>> +        uint32_t        w7;
->>>> +#define END_W7_F0_IGNORE         PPC_BIT32(0)
->>>> +#define END_W7_F0_BLK_GROUPING   PPC_BIT32(1)
->>>> +#define END_W7_F0_PRIORITY       PPC_BITMASK32(8, 15)
->>>> +#define END_W7_F1_WAKEZ          PPC_BIT32(0)
->>>> +#define END_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
->>>> +} XiveEND;
->>>> +
->>>>  #endif /* PPC_XIVE_REGS_H */
->>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->>>> index c4c90a25758e..9cb001e7b540 100644
->>>> --- a/hw/intc/xive.c
->>>> +++ b/hw/intc/xive.c
->>>> @@ -442,6 +442,101 @@ static const TypeInfo xive_source_info =3D {
->>>>      .class_init    =3D xive_source_class_init,
->>>>  };
->>>> =20
->>>> +/*
->>>> + * XiveEND helpers
->>>> + */
->>>> +
->>>> +void xive_end_reset(XiveEND *end)
->>>> +{
->>>> +    memset(end, 0, sizeof(*end));
->>>> +
->>>> +    /* switch off the escalation and notification ESBs */
->>>> +    end->w1 =3D END_W1_ESe_Q | END_W1_ESn_Q;
->>>
->>> It's not obvious to me what circumstances this would be called under.
->>> Since the ENDs are in system memory, a memset() seems like an odd
->>> thing for (virtual) hardware to be doing to it.
->>
->> It makes sense on sPAPR if one day some OS starts using the END ESBs f=
-or=20
->> further coalescing of the events. None does for now but I have added t=
-he=20
->> model though.
->=20
-> Hrm, I think that belongs in PAPR specific code.  It's not really part
-> of the router model - it's the PAPR stuff configuring the router at
-> reset time (much as firmware would configure it at reset time for bare
-> metal).
-
-This is true this routine is only used by the H_INT_RESET hcall and by=20
-the reset handler of the sPAPR controller model. But it made sense to put=
-=20
-this END helper routine with the other END routines. Don't you think so ?=
-=20
-
-C.
-
->=20
->>
->>>> +}
->>>> +
->>>> +static void xive_end_queue_pic_print_info(XiveEND *end, uint32_t wi=
-dth,
->>>> +                                          Monitor *mon)
->>>> +{
->>>> +    uint64_t qaddr_base =3D (((uint64_t)(end->w2 & 0x0fffffff)) << =
-32) | end->w3;
->>>> +    uint32_t qsize =3D GETFIELD(END_W0_QSIZE, end->w0);
->>>> +    uint32_t qindex =3D GETFIELD(END_W1_PAGE_OFF, end->w1);
->>>> +    uint32_t qentries =3D 1 << (qsize + 10);
->>>> +    int i;
->>>> +
->>>> +    /*
->>>> +     * print out the [ (qindex - (width - 1)) .. (qindex + 1)] wind=
-ow
->>>> +     */
->>>> +    monitor_printf(mon, " [ ");
->>>> +    qindex =3D (qindex - (width - 1)) & (qentries - 1);
->>>> +    for (i =3D 0; i < width; i++) {
->>>> +        uint64_t qaddr =3D qaddr_base + (qindex << 2);
->>>> +        uint32_t qdata =3D -1;
->>>> +
->>>> +        if (dma_memory_read(&address_space_memory, qaddr, &qdata,
->>>> +                            sizeof(qdata))) {
->>>> +            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to read EQ=
- @0x%"
->>>> +                          HWADDR_PRIx "\n", qaddr);
->>>> +            return;
->>>> +        }
->>>> +        monitor_printf(mon, "%s%08x ", i =3D=3D width - 1 ? "^" : "=
-",
->>>> +                       be32_to_cpu(qdata));
->>>> +        qindex =3D (qindex + 1) & (qentries - 1);
->>>> +    }
->>>> +    monitor_printf(mon, "]\n");
->>>> +}
->>>> +
->>>> +void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monito=
-r *mon)
->>>> +{
->>>> +    uint64_t qaddr_base =3D (((uint64_t)(end->w2 & 0x0fffffff)) << =
-32) | end->w3;
->>>> +    uint32_t qindex =3D GETFIELD(END_W1_PAGE_OFF, end->w1);
->>>> +    uint32_t qgen =3D GETFIELD(END_W1_GENERATION, end->w1);
->>>> +    uint32_t qsize =3D GETFIELD(END_W0_QSIZE, end->w0);
->>>> +    uint32_t qentries =3D 1 << (qsize + 10);
->>>> +
->>>> +    uint32_t nvt =3D GETFIELD(END_W6_NVT_INDEX, end->w6);
->>>> +    uint8_t priority =3D GETFIELD(END_W7_F0_PRIORITY, end->w7);
->>>> +
->>>> +    if (!(end->w0 & END_W0_VALID)) {
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    monitor_printf(mon, "  %08x %c%c%c%c%c prio:%d nvt:%04x eq:@%08=
-"PRIx64
->>>> +                   "% 6d/%5d ^%d", end_idx,
->>>> +                   end->w0 & END_W0_VALID ? 'v' : '-',
->>>> +                   end->w0 & END_W0_ENQUEUE ? 'q' : '-',
->>>> +                   end->w0 & END_W0_UCOND_NOTIFY ? 'n' : '-',
->>>> +                   end->w0 & END_W0_BACKLOG ? 'b' : '-',
->>>> +                   end->w0 & END_W0_ESCALATE_CTL ? 'e' : '-',
->>>> +                   priority, nvt, qaddr_base, qindex, qentries, qge=
-n);
->>>> +
->>>> +    xive_end_queue_pic_print_info(end, 6, mon);
->>>> +}
->>>> +
->>>> +static void xive_end_push(XiveEND *end, uint32_t data)
->>>
->>> s/push/enqueue/ please, "push" suggests a stack.  (Not to mention tha=
+> + *   after the workqueue handles the request.
+> + *
+> + *   It's flowed between user and workqueue. The user fills the reques=
 t
->>> "push" and "pull" are used as terms elsewhere in XIVE).
->>
->> yes. you are right. I will change.
->>
->>>> +{
->>>> +    uint64_t qaddr_base =3D (((uint64_t)(end->w2 & 0x0fffffff)) << =
-32) | end->w3;
->>>> +    uint32_t qsize =3D GETFIELD(END_W0_QSIZE, end->w0);
->>>> +    uint32_t qindex =3D GETFIELD(END_W1_PAGE_OFF, end->w1);
->>>> +    uint32_t qgen =3D GETFIELD(END_W1_GENERATION, end->w1);
->>>> +
->>>> +    uint64_t qaddr =3D qaddr_base + (qindex << 2);
->>>> +    uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7ffffff=
-f));
->>>> +    uint32_t qentries =3D 1 << (qsize + 10);
->>>> +
->>>> +    if (dma_memory_write(&address_space_memory, qaddr, &qdata, size=
-of(qdata))) {
->>>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to write END d=
-ata @0x%"
->>>> +                      HWADDR_PRIx "\n", qaddr);
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    qindex =3D (qindex + 1) & (qentries - 1);
->>>> +    if (qindex =3D=3D 0) {
->>>> +        qgen ^=3D 1;
->>>> +        end->w1 =3D SETFIELD(END_W1_GENERATION, end->w1, qgen);
->>>> +    }
->>>> +    end->w1 =3D SETFIELD(END_W1_PAGE_OFF, end->w1, qindex);
->>>> +}
->>>> +
->>>>  /*
->>>>   * XIVE Router (aka. Virtualization Controller or IVRE)
->>>>   */
->>>> @@ -460,6 +555,82 @@ int xive_router_set_eas(XiveRouter *xrtr, uint3=
-2_t lisn, XiveEAS *eas)
->>>>      return xrc->set_eas(xrtr, lisn, eas);
->>>>  }
->>>> =20
->>>> +int xive_router_get_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t=
- end_idx,
->>>> +                        XiveEND *end)
->>>> +{
->>>> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
->>>> +
->>>> +   return xrc->get_end(xrtr, end_blk, end_idx, end);
->>>> +}
->>>> +
->>>> +int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t=
- end_idx,
->>>> +                        XiveEND *end)
->>>> +{
->>>> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
->>>> +
->>>> +   return xrc->set_end(xrtr, end_blk, end_idx, end);
->>>> +}
->>>> +
->>>> +/*
->>>> + * An END trigger can come from an event trigger (IPI or HW) or fro=
-m
->>>> + * another chip. We don't model the PowerBus but the END trigger
->>>> + * message has the same parameters than in the function below.
->>>> + */
->>>> +static void xive_router_end_notify(XiveRouter *xrtr, uint8_t end_bl=
-k,
->>>> +                                   uint32_t end_idx, uint32_t end_d=
-ata)
->>>> +{
->>>> +    XiveEND end;
->>>> +    uint8_t priority;
->>>> +    uint8_t format;
->>>> +
->>>> +    /* END cache lookup */
->>>> +    if (xive_router_get_end(xrtr, end_blk, end_idx, &end)) {
->>>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No END %x/%x\n", end_=
-blk,
->>>> +                      end_idx);
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    if (!(end.w0 & END_W0_VALID)) {
->>>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: END %x/%x is invalid\=
-n",
->>>> +                      end_blk, end_idx);
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    if (end.w0 & END_W0_ENQUEUE) {
->>>> +        xive_end_push(&end, end_data);
->>>> +        xive_router_set_end(xrtr, end_blk, end_idx, &end);
->>>> +    }
->>>> +
->>>> +    /*
->>>> +     * The W7 format depends on the F bit in W6. It defines the typ=
-e
->>>> +     * of the notification :
->>>> +     *
->>>> +     *   F=3D0 : single or multiple NVT notification
->>>> +     *   F=3D1 : User level Event-Based Branch (EBB) notification, =
-no
->>>> +     *         priority
->>>> +     */
->>>> +    format =3D GETFIELD(END_W6_FORMAT_BIT, end.w6);
->>>> +    priority =3D GETFIELD(END_W7_F0_PRIORITY, end.w7);
->>>> +
->>>> +    /* The END is masked */
->>>> +    if (format =3D=3D 0 && priority =3D=3D 0xff) {
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    /*
->>>> +     * Check the END ESn (Event State Buffer for notification) for
->>>> +     * even futher coalescing in the Router
->>>> +     */
->>>> +    if (!(end.w0 & END_W0_UCOND_NOTIFY)) {
->>>> +        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implement=
-ed\n");
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    /*
->>>> +     * Follows IVPE notification
->>>> +     */
->>>> +}
->>>> +
->>>>  static void xive_router_notify(XiveFabric *xf, uint32_t lisn)
->>>>  {
->>>>      XiveRouter *xrtr =3D XIVE_ROUTER(xf);
->>>> @@ -471,9 +642,9 @@ static void xive_router_notify(XiveFabric *xf, u=
-int32_t lisn)
->>>>          return;
->>>>      }
->>>> =20
->>>> -    /* The IVRE has a State Bit Cache for its internal sources whic=
-h
->>>> -     * is also involed at this point. We skip the SBC lookup becaus=
-e
->>>> -     * the state bits of the sources are modeled internally in QEMU=
-.
->>>> +    /* The IVRE checks the State Bit Cache at this point. We skip t=
+> + *   data into it when it is owned by user. After it is submitted to t=
 he
->>>> +     * SBC lookup because the state bits of the sources are modeled
->>>> +     * internally in QEMU.
->>>
->>> Replacing a comment about something we're not doing with a different
->>> comment about something we're not doing doesn't seem very useful.
->>> Maybe fold these together into one patch or the other.
->>
->> That's me rephrasing. it should be indeed in the previous patch
->>
->> Thanks,
->>
->> C.
->>
->>>>       */
->>>> =20
->>>>      if (!(eas.w & EAS_VALID)) {
->>>> @@ -485,6 +656,14 @@ static void xive_router_notify(XiveFabric *xf, =
-uint32_t lisn)
->>>>          /* Notification completed */
->>>>          return;
->>>>      }
->>>> +
->>>> +    /*
->>>> +     * The event trigger becomes an END trigger
->>>> +     */
->>>> +    xive_router_end_notify(xrtr,
->>>> +                           GETFIELD(EAS_END_BLOCK, eas.w),
->>>> +                           GETFIELD(EAS_END_INDEX, eas.w),
->>>> +                           GETFIELD(EAS_END_DATA,  eas.w));
->>>>  }
->>>> =20
->>>>  static Property xive_router_properties[] =3D {
->>>
->>
+> + *   workqueue, the workqueue fetched data out and save the result int=
+o
+> + *   it after the request is handled.
+> + *
+> + *   All the requests are pre-allocated and carefully partitioned betw=
+een
+> + *   threads so there is no contention on the request, that make threa=
+ds
+> + *   be parallel as much as possible.
+> + *
+> + * - User, i.e, the submitter
+> + *   It's the one fills the request and submits it to the workqueue,
+> + *   the result will be collected after it is handled by the work queu=
+e.
+> + *
+> + *   The user can consecutively submit requests without waiting the pr=
+evious
+> + *   requests been handled.
+> + *   It only supports one submitter, you should do serial submission b=
+y
+> + *   yourself if you want more, e.g, use lock on you side.
+> + *
+> + * - Workqueue, i.e, thread
+> + *   Each workqueue is represented by a running thread that fetches
+> + *   the request submitted by the user, do the specified work and save
+> + *   the result to the request.
+> + */
+> +
+> +typedef struct Threads Threads;
+> +
+> +struct ThreadedWorkqueueOps {
+> +    /* constructor of the request */
+> +    int (*thread_request_init)(void *request);
+> +    /*  destructor of the request */
+> +    void (*thread_request_uninit)(void *request);
+> +
+> +    /* the handler of the request that is called by the thread */
+> +    void (*thread_request_handler)(void *request);
+> +    /* called by the user after the request has been handled */
+> +    void (*thread_request_done)(void *request);
+> +
+> +    size_t request_size;
+> +};
+> +typedef struct ThreadedWorkqueueOps ThreadedWorkqueueOps;
+> +
+> +/* the default number of requests that thread need handle */
+> +#define DEFAULT_THREAD_REQUEST_NR 4
+> +/* the max number of requests that thread need handle */
+> +#define MAX_THREAD_REQUEST_NR     (sizeof(uint64_t) * BITS_PER_BYTE)
+> +
+> +/*
+> + * create a threaded queue. Other APIs will work on the Threads it ret=
+urned
+> + *
+> + * @name: the identity of the workqueue which is used to construct the=
+ name
+> + *    of threads only
+> + * @threads_nr: the number of threads that the workqueue will create
+> + * @thread_requests_nr: the number of requests that each single thread=
+ will
+> + *    handle
+> + * @ops: the handlers of the request
+> + *
+> + * Return NULL if it failed
+> + */
+> +Threads *threaded_workqueue_create(const char *name, unsigned int thre=
+ads_nr,
+> +                                   unsigned int thread_requests_nr,
+> +                                   const ThreadedWorkqueueOps *ops);
+> +void threaded_workqueue_destroy(Threads *threads);
+> +
+> +/*
+> + * find a free request where the user can store the data that is neede=
+d to
+> + * finish the request
+> + *
+> + * If all requests are used up, return NULL
+> + */
+> +void *threaded_workqueue_get_request(Threads *threads);
+> +/* submit the request and notify the thread */
+> +void threaded_workqueue_submit_request(Threads *threads, void *request=
+);
+> +
+> +/*
+> + * wait all threads to complete the request to make sure there is no
+> + * previous request exists
+> + */
+> +void threaded_workqueue_wait_for_requests(Threads *threads);
+> +#endif
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index 0820923c18..f26dfe5182 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -50,5 +50,6 @@ util-obj-y +=3D range.o
+>  util-obj-y +=3D stats64.o
+>  util-obj-y +=3D systemd.o
+>  util-obj-y +=3D iova-tree.o
+> +util-obj-y +=3D threaded-workqueue.o
+>  util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
+>  util-obj-$(CONFIG_OPENGL) +=3D drm.o
+> diff --git a/util/threaded-workqueue.c b/util/threaded-workqueue.c
+> new file mode 100644
+> index 0000000000..2ab37cee8d
+> --- /dev/null
+> +++ b/util/threaded-workqueue.c
+> @@ -0,0 +1,463 @@
+> +/*
+> + * Lockless and Efficient Threaded Workqueue Abstraction
+> + *
+> + * Author:
+> + *   Xiao Guangrong <xiaoguangrong@tencent.com>
+> + *
+> + * Copyright(C) 2018 Tencent Corporation.
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.1 =
+or later.
+> + * See the COPYING.LIB file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/bitmap.h"
+> +#include "qemu/threaded-workqueue.h"
+> +
+> +#define SMP_CACHE_BYTES 64
+
+That's architecture dependent isn't it?
+
+> +
+> +/*
+> + * the request representation which contains the internally used mete =
+data,
+> + * it is the header of user-defined data.
+> + *
+> + * It should be aligned to the nature size of CPU.
+> + */
+> +struct ThreadRequest {
+> +    /*
+> +     * the request has been handled by the thread and need the user
+> +     * to fetch result out.
+> +     */
+> +    uint8_t done;
+> +
+> +    /*
+> +     * the index to Thread::requests.
+> +     * Save it to the padding space although it can be calculated at r=
+untime.
+> +     */
+> +    uint8_t request_index;
+> +
+> +    /* the index to Threads::per_thread_data */
+> +    unsigned int thread_index;
+> +} QEMU_ALIGNED(sizeof(unsigned long));
+> +typedef struct ThreadRequest ThreadRequest;
+> +
+> +struct ThreadLocal {
+> +    struct Threads *threads;
+> +
+> +    /* the index of the thread */
+> +    int self;
+> +
+> +    /* thread is useless and needs to exit */
+> +    bool quit;
+> +
+> +    QemuThread thread;
+> +
+> +    void *requests;
+> +
+> +   /*
+> +     * the bit in these two bitmaps indicates the index of the =EF=BC=A0=
+requests
+> +     * respectively. If it's the same, the corresponding request is fr=
+ee
+> +     * and owned by the user, i.e, where the user fills a request. Oth=
+erwise,
+> +     * it is valid and owned by the thread, i.e, where the thread fetc=
+hes
+> +     * the request and write the result.
+> +     */
+> +
+> +    /* after the user fills the request, the bit is flipped. */
+> +    uint64_t request_fill_bitmap QEMU_ALIGNED(SMP_CACHE_BYTES);
+> +    /* after handles the request, the thread flips the bit. */
+> +    uint64_t request_done_bitmap QEMU_ALIGNED(SMP_CACHE_BYTES);
+
+Patchew complained about some type mismatches; I think those are because
+you're using the bitmap_* functions on these; those functions always
+operate on 'long' not on uint64_t - and on some platforms they're
+unfortunately not the same.
+
+
+Dave
+
+> +    /*
+> +     * the event used to wake up the thread whenever a valid request h=
+as
+> +     * been submitted
+> +     */
+> +    QemuEvent request_valid_ev QEMU_ALIGNED(SMP_CACHE_BYTES);
+> +
+> +    /*
+> +     * the event is notified whenever a request has been completed
+> +     * (i.e, become free), which is used to wake up the user
+> +     */
+> +    QemuEvent request_free_ev QEMU_ALIGNED(SMP_CACHE_BYTES);
+> +};
+> +typedef struct ThreadLocal ThreadLocal;
+> +
+> +/*
+> + * the main data struct represents multithreads which is shared by
+> + * all threads
+> + */
+> +struct Threads {
+> +    /* the request header, ThreadRequest, is contained */
+> +    unsigned int request_size;
+> +    unsigned int thread_requests_nr;
+> +    unsigned int threads_nr;
+> +
+> +    /* the request is pushed to the thread with round-robin manner */
+> +    unsigned int current_thread_index;
+> +
+> +    const ThreadedWorkqueueOps *ops;
+> +
+> +    ThreadLocal per_thread_data[0];
+> +};
+> +typedef struct Threads Threads;
+> +
+> +static ThreadRequest *index_to_request(ThreadLocal *thread, int reques=
+t_index)
+> +{
+> +    ThreadRequest *request;
+> +
+> +    request =3D thread->requests + request_index * thread->threads->re=
+quest_size;
+> +    assert(request->request_index =3D=3D request_index);
+> +    assert(request->thread_index =3D=3D thread->self);
+> +    return request;
+> +}
+> +
+> +static int request_to_index(ThreadRequest *request)
+> +{
+> +    return request->request_index;
+> +}
+> +
+> +static int request_to_thread_index(ThreadRequest *request)
+> +{
+> +    return request->thread_index;
+> +}
+> +
+> +/*
+> + * free request: the request is not used by any thread, however, it mi=
+ght
+> + *   contain the result need the user to call thread_request_done()
+> + *
+> + * valid request: the request contains the request data and it's commi=
+tted
+> + *   to the thread, i,e. it's owned by thread.
+> + */
+> +static uint64_t get_free_request_bitmap(Threads *threads, ThreadLocal =
+*thread)
+> +{
+> +    uint64_t request_fill_bitmap, request_done_bitmap, result_bitmap;
+> +
+> +    request_fill_bitmap =3D atomic_rcu_read(&thread->request_fill_bitm=
+ap);
+> +    request_done_bitmap =3D atomic_rcu_read(&thread->request_done_bitm=
+ap);
+> +    bitmap_xor(&result_bitmap, &request_fill_bitmap, &request_done_bit=
+map,
+> +               threads->thread_requests_nr);
+> +
+> +    /*
+> +     * paired with smp_wmb() in mark_request_free() to make sure that =
+we
+> +     * read request_done_bitmap before fetching the result out.
+> +     */
+> +    smp_rmb();
+> +
+> +    return result_bitmap;
+> +}
+> +
+> +static ThreadRequest
+> +*find_thread_free_request(Threads *threads, ThreadLocal *thread)
+> +{
+> +    uint64_t result_bitmap =3D get_free_request_bitmap(threads, thread=
+);
+> +    int index;
+> +
+> +    index  =3D find_first_zero_bit(&result_bitmap, threads->thread_req=
+uests_nr);
+> +    if (index >=3D threads->thread_requests_nr) {
+> +        return NULL;
+> +    }
+> +
+> +    return index_to_request(thread, index);
+> +}
+> +
+> +static ThreadRequest *threads_find_free_request(Threads *threads)
+> +{
+> +    ThreadLocal *thread;
+> +    ThreadRequest *request;
+> +    int cur_thread, thread_index;
+> +
+> +    cur_thread =3D threads->current_thread_index % threads->threads_nr=
+;
+> +    thread_index =3D cur_thread;
+> +    do {
+> +        thread =3D threads->per_thread_data + thread_index++;
+> +        request =3D find_thread_free_request(threads, thread);
+> +        if (request) {
+> +            break;
+> +        }
+> +        thread_index %=3D threads->threads_nr;
+> +    } while (thread_index !=3D cur_thread);
+> +
+> +    return request;
+> +}
+> +
+> +/*
+> + * the change bit operation combined with READ_ONCE and WRITE_ONCE whi=
+ch
+> + * only works on single uint64_t width
+> + */
+> +static void change_bit_once(long nr, uint64_t *addr)
+> +{
+> +    uint64_t value =3D atomic_rcu_read(addr) ^ BIT_MASK(nr);
+> +
+> +    atomic_rcu_set(addr, value);
+> +}
+> +
+> +static void mark_request_valid(Threads *threads, ThreadRequest *reques=
+t)
+> +{
+> +    int thread_index =3D request_to_thread_index(request);
+> +    int request_index =3D request_to_index(request);
+> +    ThreadLocal *thread =3D threads->per_thread_data + thread_index;
+> +
+> +    /*
+> +     * paired with smp_rmb() in find_first_valid_request_index() to ma=
+ke
+> +     * sure the request has been filled before the bit is flipped that
+> +     * will make the request be visible to the thread
+> +     */
+> +    smp_wmb();
+> +
+> +    change_bit_once(request_index, &thread->request_fill_bitmap);
+> +    qemu_event_set(&thread->request_valid_ev);
+> +}
+> +
+> +static int thread_find_first_valid_request_index(ThreadLocal *thread)
+> +{
+> +    Threads *threads =3D thread->threads;
+> +    uint64_t request_fill_bitmap, request_done_bitmap, result_bitmap;
+> +    int index;
+> +
+> +    request_fill_bitmap =3D atomic_rcu_read(&thread->request_fill_bitm=
+ap);
+> +    request_done_bitmap =3D atomic_rcu_read(&thread->request_done_bitm=
+ap);
+> +    bitmap_xor(&result_bitmap, &request_fill_bitmap, &request_done_bit=
+map,
+> +               threads->thread_requests_nr);
+> +    /*
+> +     * paired with smp_wmb() in mark_request_valid() to make sure that
+> +     * we read request_fill_bitmap before fetch the request out.
+> +     */
+> +    smp_rmb();
+> +
+> +    index =3D find_first_bit(&result_bitmap, threads->thread_requests_=
+nr);
+> +    return index >=3D threads->thread_requests_nr ? -1 : index;
+> +}
+> +
+> +static void mark_request_free(ThreadLocal *thread, ThreadRequest *requ=
+est)
+> +{
+> +    int index =3D request_to_index(request);
+> +
+> +    /*
+> +     * smp_wmb() is implied in change_bit_atomic() that is paired with
+> +     * smp_rmb() in get_free_request_bitmap() to make sure the result
+> +     * has been saved before the bit is flipped.
+> +     */
+> +    change_bit_atomic(index, &thread->request_done_bitmap);
+> +    qemu_event_set(&thread->request_free_ev);
+> +}
+> +
+> +/* retry to see if there is available request before actually go to wa=
+it. */
+> +#define BUSY_WAIT_COUNT 1000
+> +
+> +static ThreadRequest *
+> +thread_busy_wait_for_request(ThreadLocal *thread)
+> +{
+> +    int index, count =3D 0;
+> +
+> +    for (count =3D 0; count < BUSY_WAIT_COUNT; count++) {
+> +        index =3D thread_find_first_valid_request_index(thread);
+> +        if (index >=3D 0) {
+> +            return index_to_request(thread, index);
+> +        }
+> +
+> +        cpu_relax();
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+> +static void *thread_run(void *opaque)
+> +{
+> +    ThreadLocal *self_data =3D (ThreadLocal *)opaque;
+> +    Threads *threads =3D self_data->threads;
+> +    void (*handler)(void *request) =3D threads->ops->thread_request_ha=
+ndler;
+> +    ThreadRequest *request;
+> +
+> +    for ( ; !atomic_read(&self_data->quit); ) {
+> +        qemu_event_reset(&self_data->request_valid_ev);
+> +
+> +        request =3D thread_busy_wait_for_request(self_data);
+> +        if (!request) {
+> +            qemu_event_wait(&self_data->request_valid_ev);
+> +            continue;
+> +        }
+> +
+> +        assert(!request->done);
+> +
+> +        handler(request + 1);
+> +        request->done =3D true;
+> +        mark_request_free(self_data, request);
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+> +static void uninit_thread_requests(ThreadLocal *thread, int free_nr)
+> +{
+> +    Threads *threads =3D thread->threads;
+> +    ThreadRequest *request =3D thread->requests;
+> +    int i;
+> +
+> +    for (i =3D 0; i < free_nr; i++) {
+> +        threads->ops->thread_request_uninit(request + 1);
+> +        request =3D (void *)request + threads->request_size;
+> +    }
+> +    g_free(thread->requests);
+> +}
+> +
+> +static int init_thread_requests(ThreadLocal *thread)
+> +{
+> +    Threads *threads =3D thread->threads;
+> +    ThreadRequest *request;
+> +    int ret, i, thread_reqs_size;
+> +
+> +    thread_reqs_size =3D threads->thread_requests_nr * threads->reques=
+t_size;
+> +    thread_reqs_size =3D QEMU_ALIGN_UP(thread_reqs_size, SMP_CACHE_BYT=
+ES);
+> +    thread->requests =3D g_malloc0(thread_reqs_size);
+> +
+> +    request =3D thread->requests;
+> +    for (i =3D 0; i < threads->thread_requests_nr; i++) {
+> +        ret =3D threads->ops->thread_request_init(request + 1);
+> +        if (ret < 0) {
+> +            goto exit;
+> +        }
+> +
+> +        request->request_index =3D i;
+> +        request->thread_index =3D thread->self;
+> +        request =3D (void *)request + threads->request_size;
+> +    }
+> +    return 0;
+> +
+> +exit:
+> +    uninit_thread_requests(thread, i);
+> +    return -1;
+> +}
+> +
+> +static void uninit_thread_data(Threads *threads, int free_nr)
+> +{
+> +    ThreadLocal *thread_local =3D threads->per_thread_data;
+> +    int i;
+> +
+> +    for (i =3D 0; i < free_nr; i++) {
+> +        thread_local[i].quit =3D true;
+> +        qemu_event_set(&thread_local[i].request_valid_ev);
+> +        qemu_thread_join(&thread_local[i].thread);
+> +        qemu_event_destroy(&thread_local[i].request_valid_ev);
+> +        qemu_event_destroy(&thread_local[i].request_free_ev);
+> +        uninit_thread_requests(&thread_local[i], threads->thread_reque=
+sts_nr);
+> +    }
+> +}
+> +
+> +static int
+> +init_thread_data(Threads *threads, const char *thread_name, int thread=
+_nr)
+> +{
+> +    ThreadLocal *thread_local =3D threads->per_thread_data;
+> +    char *name;
+> +    int i;
+> +
+> +    for (i =3D 0; i < thread_nr; i++) {
+> +        thread_local[i].threads =3D threads;
+> +        thread_local[i].self =3D i;
+> +
+> +        if (init_thread_requests(&thread_local[i]) < 0) {
+> +            goto exit;
+> +        }
+> +
+> +        qemu_event_init(&thread_local[i].request_free_ev, false);
+> +        qemu_event_init(&thread_local[i].request_valid_ev, false);
+> +
+> +        name =3D g_strdup_printf("%s/%d", thread_name, thread_local[i]=
+.self);
+> +        qemu_thread_create(&thread_local[i].thread, name,
+> +                           thread_run, &thread_local[i], QEMU_THREAD_J=
+OINABLE);
+> +        g_free(name);
+> +    }
+> +    return 0;
+> +
+> +exit:
+> +    uninit_thread_data(threads, i);
+> +    return -1;
+> +}
+> +
+> +Threads *threaded_workqueue_create(const char *name, unsigned int thre=
+ads_nr,
+> +                                   unsigned int thread_requests_nr,
+> +                                   const ThreadedWorkqueueOps *ops)
+> +{
+> +    Threads *threads;
+> +
+> +    if (threads_nr > MAX_THREAD_REQUEST_NR) {
+> +        return NULL;
+> +    }
+> +
+> +    threads =3D g_malloc0(sizeof(*threads) + threads_nr * sizeof(Threa=
+dLocal));
+> +    threads->ops =3D ops;
+> +    threads->threads_nr =3D threads_nr;
+> +    threads->thread_requests_nr =3D thread_requests_nr;
+> +
+> +    QEMU_BUILD_BUG_ON(!QEMU_IS_ALIGNED(sizeof(ThreadRequest), sizeof(l=
+ong)));
+> +    threads->request_size =3D threads->ops->request_size;
+> +    threads->request_size =3D QEMU_ALIGN_UP(threads->request_size, siz=
+eof(long));
+> +    threads->request_size +=3D sizeof(ThreadRequest);
+> +
+> +    if (init_thread_data(threads, name, threads_nr) < 0) {
+> +        g_free(threads);
+> +        return NULL;
+> +    }
+> +
+> +    return threads;
+> +}
+> +
+> +void threaded_workqueue_destroy(Threads *threads)
+> +{
+> +    uninit_thread_data(threads, threads->threads_nr);
+> +    g_free(threads);
+> +}
+> +
+> +static void request_done(Threads *threads, ThreadRequest *request)
+> +{
+> +    if (!request->done) {
+> +        return;
+> +    }
+> +
+> +    threads->ops->thread_request_done(request + 1);
+> +    request->done =3D false;
+> +}
+> +
+> +void *threaded_workqueue_get_request(Threads *threads)
+> +{
+> +    ThreadRequest *request;
+> +
+> +    request =3D threads_find_free_request(threads);
+> +    if (!request) {
+> +        return NULL;
+> +    }
+> +
+> +    request_done(threads, request);
+> +    return request + 1;
+> +}
+> +
+> +void threaded_workqueue_submit_request(Threads *threads, void *request=
+)
+> +{
+> +    ThreadRequest *req =3D request - sizeof(ThreadRequest);
+> +    int thread_index =3D request_to_thread_index(request);
+> +
+> +    assert(!req->done);
+> +    mark_request_valid(threads, req);
+> +    threads->current_thread_index =3D thread_index  + 1;
+> +}
+> +
+> +void threaded_workqueue_wait_for_requests(Threads *threads)
+> +{
+> +    ThreadLocal *thread;
+> +    uint64_t result_bitmap;
+> +    int thread_index, index =3D 0;
+> +
+> +    for (thread_index =3D 0; thread_index < threads->threads_nr; threa=
+d_index++) {
+> +        thread =3D threads->per_thread_data + thread_index;
+> +        index =3D 0;
+> +retry:
+> +        qemu_event_reset(&thread->request_free_ev);
+> +        result_bitmap =3D get_free_request_bitmap(threads, thread);
+> +
+> +        for (; index < threads->thread_requests_nr; index++) {
+> +            if (test_bit(index, &result_bitmap)) {
+> +                qemu_event_wait(&thread->request_free_ev);
+> +                goto retry;
+> +            }
+> +
+> +            request_done(threads, index_to_request(thread, index));
+> +        }
+> +    }
+> +}
+> --=20
+> 2.14.5
 >=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
