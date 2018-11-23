@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQH-0004wS-2l
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:14 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQI-0004xU-3Y
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ6-0005La-Kd
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:11 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ8-0005RV-ER
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:13 -0500
+Received: from cmccmta2.chinamobile.com ([221.176.66.80]:34190)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ5-0005BZ-4C
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:04 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 23 Nov 2018 23:30:34 +0800
-Message-Id: <20181123153040.18933-16-maozhongyi@cmss.chinamobile.com>
+Date: Fri, 23 Nov 2018 23:30:37 +0800
+Message-Id: <20181123153040.18933-19-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
 References: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH v2 15/21] pci-bridge/dec: Convert sysbus init
+Subject: [Qemu-devel] [PATCH v2 18/21] timer/puv3_ost: Convert sysbus init
  function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,60 +25,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, david@gibson.dropbear.id.au, mst@redhat.com, marcel.apfelbaum@gmail.com, qemu-ppc@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, gxt@mprc.pku.edu.cn, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-pci_dec_21154_device_class_init().
+puv3_ost_class_init().
 
-Cc: david@gibson.dropbear.id.au
-Cc: mst@redhat.com
-Cc: marcel.apfelbaum@gmail.com
-Cc: qemu-ppc@nongnu.org
+Cc: gxt@mprc.pku.edu.cn
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/pci-bridge/dec.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ hw/timer/puv3_ost.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
-index 84492d5e5f..5b21c20e50 100644
---- a/hw/pci-bridge/dec.c
-+++ b/hw/pci-bridge/dec.c
-@@ -98,7 +98,7 @@ PCIBus *pci_dec_21154_init(PCIBus *parent_bus, int devfn)
-     return pci_bridge_get_sec_bus(br);
+diff --git a/hw/timer/puv3_ost.c b/hw/timer/puv3_ost.c
+index 0b3d717e60..3be58c7fdd 100644
+--- a/hw/timer/puv3_ost.c
++++ b/hw/timer/puv3_ost.c
+@@ -113,16 +113,17 @@ static void puv3_ost_tick(void *opaque)
+     }
  }
  
--static int pci_dec_21154_device_init(SysBusDevice *dev)
-+static void pci_dec_21154_device_realize(DeviceState *dev, Error **errp)
+-static int puv3_ost_init(SysBusDevice *dev)
++static void puv3_ost_realize(DeviceState *dev, Error **errp)
  {
-     PCIHostState *phb;
+     PUV3OSTState *s = PUV3_OST(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
  
-@@ -108,9 +108,8 @@ static int pci_dec_21154_device_init(SysBusDevice *dev)
-                           dev, "pci-conf-idx", 0x1000);
-     memory_region_init_io(&phb->data_mem, OBJECT(dev), &pci_host_data_le_ops,
-                           dev, "pci-data-idx", 0x1000);
--    sysbus_init_mmio(dev, &phb->conf_mem);
--    sysbus_init_mmio(dev, &phb->data_mem);
+     s->reg_OIER = 0;
+     s->reg_OSSR = 0;
+     s->reg_OSMR0 = 0;
+     s->reg_OSCR = 0;
+ 
+-    sysbus_init_irq(dev, &s->irq);
++    sysbus_init_irq(sbd, &s->irq);
+ 
+     s->bh = qemu_bh_new(puv3_ost_tick, s);
+     s->ptimer = ptimer_init(s->bh, PTIMER_POLICY_DEFAULT);
+@@ -130,16 +131,14 @@ static int puv3_ost_init(SysBusDevice *dev)
+ 
+     memory_region_init_io(&s->iomem, OBJECT(s), &puv3_ost_ops, s, "puv3_ost",
+             PUV3_REGS_OFFSET);
+-    sysbus_init_mmio(dev, &s->iomem);
+-
 -    return 0;
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &phb->conf_mem);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &phb->data_mem);
++    sysbus_init_mmio(sbd, &s->iomem);
  }
  
- static void dec_21154_pci_host_realize(PCIDevice *d, Error **errp)
-@@ -150,9 +149,9 @@ static const TypeInfo dec_21154_pci_host_info = {
- 
- static void pci_dec_21154_device_class_init(ObjectClass *klass, void *data)
+ static void puv3_ost_class_init(ObjectClass *klass, void *data)
  {
 -    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
 +    DeviceClass *dc = DEVICE_CLASS(klass);
  
--    sdc->init = pci_dec_21154_device_init;
-+    dc->realize = pci_dec_21154_device_realize;
+-    sdc->init = puv3_ost_init;
++    dc->realize = puv3_ost_realize;
  }
  
- static const TypeInfo pci_dec_21154_device_info = {
+ static const TypeInfo puv3_ost_info = {
 -- 
 2.17.1
