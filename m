@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQ26K-0005D1-OY
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 22:25:53 -0500
+	(envelope-from <yan.y.zhao@intel.com>) id 1gQ3iU-0006Oi-4y
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 00:09:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQ26H-0001iC-LG
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 22:25:52 -0500
-Received: from cmccmta1.chinamobile.com ([221.176.66.79]:55449)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQ26G-0001cR-SU
-	for qemu-devel@nongnu.org; Thu, 22 Nov 2018 22:25:49 -0500
-References: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
-	<20181119120820.29878-7-maozhongyi@cmss.chinamobile.com>
-	<CAFEAcA-ywi9OoUHhdQXq9FOXVjKC9OrzUiT1oyTWPAQwUUhF2A@mail.gmail.com>
-From: maozy <maozhongyi@cmss.chinamobile.com>
-Message-ID: <045237dd-e33f-ae9e-eec0-0b46c822faed@cmss.chinamobile.com>
-Date: Fri, 23 Nov 2018 11:25:40 +0800
+	(envelope-from <yan.y.zhao@intel.com>) id 1gQ3iP-0007Ra-93
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 00:09:22 -0500
+Received: from mga06.intel.com ([134.134.136.31]:48517)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+	id 1gQ3iP-0007Os-09
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 00:09:17 -0500
+Date: Fri, 23 Nov 2018 00:04:51 -0500
+From: Zhao Yan <yan.y.zhao@intel.com>
+Message-ID: <20181123050451.GC31906@joy-OptiPlex-7040>
+References: <20181016021439.6212-1-yan.y.zhao@intel.com>
+	<F22B14EC3CFBB843AD3E03B6B78F2C6A4ACFD80C@SHSMSX104.ccr.corp.intel.com>
+	<20181018145636.k6ptvn4iszabjhxw@mac.bytemobile.com>
+	<20181122131110.GA31906@joy-OptiPlex-7040>
+	<20181122141805.vyqywi4ep65loye3@mac>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-ywi9OoUHhdQXq9FOXVjKC9OrzUiT1oyTWPAQwUUhF2A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/22] dma/puv3_dma: Convert sysbus
- initfunction to realize function
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181122141805.vyqywi4ep65loye3@mac>
+Subject: Re: [Qemu-devel] [PATCH] Xen PCI passthrough: fix passthrough
+ failure when irq map failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +33,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+To: Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Cc: sstabellini@kernel.org, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-
-
-On 11/20/18 10:46 PM, Peter Maydell wrote:
-> On 19 November 2018 at 12:08, Mao Zhongyi
-> <maozhongyi@cmss.chinamobile.com> wrote:
->> Use DeviceClass rather than SysBusDeviceClass in
->> puv3_dma_class_init().
->>
->> Cc: gxt@mprc.pku.edu.cn
->>
->> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
->> Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
->> ---
->>   hw/dma/puv3_dma.c | 10 ++++------
->>   1 file changed, 4 insertions(+), 6 deletions(-)
->>
->> diff --git a/hw/dma/puv3_dma.c b/hw/dma/puv3_dma.c
->> index b97a6c1767..c89eade029 100644
->> --- a/hw/dma/puv3_dma.c
->> +++ b/hw/dma/puv3_dma.c
->> @@ -76,7 +76,7 @@ static const MemoryRegionOps puv3_dma_ops = {
->>       .endianness = DEVICE_NATIVE_ENDIAN,
->>   };
->>
->> -static int puv3_dma_init(SysBusDevice *dev)
->> +static void puv3_dma_realize(DeviceState *dev, Error **errp)
->>   {
->>       PUV3DMAState *s = PUV3_DMA(dev);
->>       int i;
->> @@ -87,16 +87,14 @@ static int puv3_dma_init(SysBusDevice *dev)
->>
->>       memory_region_init_io(&s->iomem, OBJECT(s), &puv3_dma_ops, s, "puv3_dma",
->>               PUV3_REGS_OFFSET);
->> -    sysbus_init_mmio(dev, &s->iomem);
->> -
->> -    return 0;
->> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
->>   }
->>
->>   static void puv3_dma_class_init(ObjectClass *klass, void *data)
->>   {
->> -    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
->> +    DeviceClass *dc = DEVICE_CLASS(klass);
->>
->> -    sdc->init = puv3_dma_init;
->> +    dc->realize = puv3_dma_realize;
->>   }
->>
->>   static const TypeInfo puv3_dma_info = {
+On Thu, Nov 22, 2018 at 03:18:05PM +0100, Roger Pau Monné wrote:
+> On Thu, Nov 22, 2018 at 08:11:20AM -0500, Zhao Yan wrote:
+> > On Thu, Oct 18, 2018 at 03:56:36PM +0100, Roger Pau Monné wrote:
+> > > On Thu, Oct 18, 2018 at 08:22:41AM +0000, Zhao, Yan Y wrote:
+> > > > Hi
+> > > > The background for this patch is that: for some pci device, even it's PCI_INTERRUPT_PIN is not 0, it actually does not support INTx mode, so we should just report error, disable INTx mode and continue the passthrough.
+> > > > However, the commit 5a11d0f7 regards this as error condition and let qemu quit passthrough, which is too rigorous.
+> > > > 
+> > > > Error message is below:
+> > > > libxl: error: libxl_qmp.c:287:qmp_handle_error_response: Domain 2:received an error message from QMP server: Mapping machine irq 0 to pirq -1 failed: Operation not permitted
+> > > 
+> > > I'm having issues figuring out what's happening here.
+> > > s->real_device.irq is 0, yet the PCI config space read of
+> > > PCI_INTERRUPT_PIN returns something different than 0.
+> > > 
+> > > AFAICT this is due to some kind of error in Linux, so that even when
+> > > the device is supposed to have a valid IRQ the sysfs node it is set to
+> > > 0, do you know the actual underlying cause of this?
+> > > 
+> > > Thanks, Roger.
+> > Hi Roger
+> > Sorry for the later reply, I just missed this mail...
+> > On my side, it's because the hardware actually does not support INTx mode,
+> > but its configuration space does not report PCI_INTERRUPT_PIN to 0. It's a
+> > hardware bug, but previous version of qemu can tolerate it, switch to MSI
+> > and make passthrough work.
 > 
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Then I think it would be better to check both PCI_INTERRUPT_PIN and
+> s->real_device.irq before attempting to map the IRQ.
 > 
-> (I note that this device is missing a reset function and is
-> instead resetting in its init/realize function, but that's a
-> separate bug. It's also missing vmstate.)
-
-OK, I will fix it later in a separate patch.
-
-Thanks,
-Mao
-
+> Making the error non-fatal would mean that a device with a valid IRQ
+> could fail to be setup correctly but the guest will still be created,
+> and things won't go as expected when the guest attempts to use it.
 > 
-> thanks
-> -- PMM
-> 
+> Thanks, Roger.
+hi roger
+thanks for your sugguestion. it's right that "s->real_device.irq" is needed to be checked before mapping, like if it's 0.
+but on the other hand, maybe xc_physdev_map_pirq() itself can serve as a checking of "s->real_device.irq" ?
+like in our case, it will fail and return -EPERM.
+then error hanling is still conducted ==>set INTX_DISABLE flag, eventhrough the error is not fatal.
+
+    machine_irq = s->real_device.irq;
+    rc = xc_physdev_map_pirq(xen_xc, xen_domid, machine_irq, &pirq);
+    if (rc < 0) {
+        error_setg_errno(errp, errno, "Mapping machine irq %u to"
+                         " pirq %i failed", machine_irq, pirq);
+
+        /* Disable PCI intx assertion (turn on bit10 of devctl) */
+        cmd |= PCI_COMMAND_INTX_DISABLE;
+        machine_irq = 0;
+        s->machine_irq = 0;
+So, do you think it's all right just converting fatal error to non-fatal?
+
+
+Thanks
+Yan
