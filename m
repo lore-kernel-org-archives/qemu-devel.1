@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gQ9Tj-000610-3a
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:18:31 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gQ9tZ-0005v1-2W
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:45:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1gQ9Tf-0001ne-MA
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:18:31 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:50432)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gQ9Tf-0001k4-IB
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:18:27 -0500
-Received: by mail-it1-f195.google.com with SMTP id z7so355556iti.0
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 03:18:26 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1gQ9tV-0007eO-OF
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:45:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36106)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gQ9tV-0007bk-Gf
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:45:09 -0500
+Date: Fri, 23 Nov 2018 11:44:57 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181123114456.GE2373@work-vm>
+References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
+	<1542746383-18288-2-git-send-email-kwankhede@nvidia.com>
+	<20181122185417.GE2605@work-vm>
+	<b9602280-d465-479c-8f6c-9295089d5460@nvidia.com>
 MIME-Version: 1.0
-References: <CAGxU2F4O4aKzrJky7EFeWaHFuBKPwi_Z-j7G7m+ENRojVG_5vA@mail.gmail.com>
-	<20181119130713.GB6443@stefanha-x1.localdomain>
-	<20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
-	<CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
-	<20181120062109.eahirgygm4br3ov7@sirius.home.kraxel.org>
-	<CAGxU2F64uK5oygQecZKOPpsyb--Pth9U00P_gghrtYDwQrSGtg@mail.gmail.com>
-	<20181120112203.rzhhdl6hhsjf5twt@sirius.home.kraxel.org>
-	<CAGxU2F4LNN1UtVJFADxm1V4eBDQ8eGSoAjPXC=X8+zSR4yd9Nw@mail.gmail.com>
-	<20181122115135.funmtcql3xhrixi6@sirius.home.kraxel.org>
-	<CAGxU2F6462MF00_0dh_6HiFPgVyEpaRTEPJ_0-sUdg8YnhgLcw@mail.gmail.com>
-	<20181123062138.rdfaeaqq5uw43ey2@sirius.home.kraxel.org>
-In-Reply-To: <20181123062138.rdfaeaqq5uw43ey2@sirius.home.kraxel.org>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Fri, 23 Nov 2018 12:18:13 +0100
-Message-ID: <CAGxU2F5-UUaJbwpKhTY1ZsRWVst=gM79nSjnZtZJVKDpime_Lw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b9602280-d465-479c-8f6c-9295089d5460@nvidia.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] VFIO KABI for migration interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,67 +29,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Kevin OConnor <kevin@koconnor.net>, Samuel Ortiz <sameo@linux.intel.com>, seabios@seabios.org, Stefan Hajnoczi <stefanha@gmail.com>, Rob Bradford <robert.bradford@intel.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stephend@silicom-usa.com, stefanb@linux.ibm.com
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: alex.williamson@redhat.com, cjia@nvidia.com, kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com, yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com, cohuck@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com, aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com, Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com, Ken.Xue@amd.com, zhi.a.wang@intel.com, qemu-devel@nongnu.org
 
-On Fri, Nov 23, 2018 at 7:21 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On Thu, Nov 22, 2018 at 04:13:38PM +0100, Stefano Garzarella wrote:
-> > On Thu, Nov 22, 2018 at 12:51 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > >
-> > > On Thu, Nov 22, 2018 at 12:08:55PM +0100, Stefano Garzarella wrote:
-> > > > Hi,
-> > > > I continued to investigate how to reduce the boot time with SeaBIOS
-> > > > and QEMU when it used with linuxboot_dma.bin (-kernel parameter).
-> > > > I reached ~12ms with a SeaBIOS configuration (attached) where I
-> > > > disabled debug output, all Hardware support (except SMM & MTRRs) and I
-> > > > applied a small patch to disable VGA setup and console (attached).
-> > >
-> > > Is there any difference to "qemu -vga none" ?
-> >
-> > Using both (qemu -vga none, and my patch) we are around 10.8 ms.
-> > Note: using only the patch, Linux is still able to initialize and use the VGA.
->
-> But do you want linux use the vga console if you care about boot times?
-> I'd expect virtio-console would be fastest in that case.
+* Kirti Wankhede (kwankhede@nvidia.com) wrote:
+> 
+> 
+> On 11/23/2018 12:24 AM, Dr. David Alan Gilbert wrote:
+> > * Kirti Wankhede (kwankhede@nvidia.com) wrote:
+> >> - Defined MIGRATION region type and sub-type.
+> >> - Defined VFIO device states during migration process.
+> >> - Defined vfio_device_migration_info structure which will be placed at 0th
+> >>   offset of migration region to get/set VFIO device related information.
+> >>   Defined actions and members of structure usage for each action:
+> >>     * To convey VFIO device state to be transitioned to.
+> >>     * To get pending bytes yet to be migrated for VFIO device
+> >>     * To ask driver to write data to migration region and return number of bytes
+> >>       written in the region
+> >>     * In migration resume path, user space app writes to migration region and
+> >>       communicates it to vendor driver.
+> >>     * Get bitmap of dirty pages from vendor driver from given start address
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > 
+> > <snip>
+> > 
+> >> + * Action Get buffer:
+> >> + *      On this action, vendor driver should write data to migration region and
+> >> + *      return number of bytes written in the region.
+> >> + *      data.offset [output] : offset in the region from where data is written.
+> >> + *      data.size [output] : number of bytes written in migration buffer by
+> >> + *          vendor driver.
+> > 
+> > <snip>
+> > 
+> >> + */
+> >> +
+> >> +struct vfio_device_migration_info {
+> >> +        __u32 device_state;         /* VFIO device state */
+> >> +        struct {
+> >> +            __u64 precopy_only;
+> >> +            __u64 compatible;
+> >> +            __u64 postcopy_only;
+> >> +            __u64 threshold_size;
+> >> +        } pending;
+> >> +        struct {
+> >> +            __u64 offset;           /* offset */
+> >> +            __u64 size;             /* size */
+> >> +        } data;
+> > 
+> > I'm curious how the offsets/size work; how does the 
+> > kernel driver know the maximum size of state it's allowed to write?
+> 
+> 
+> Migration region looks like:
+>  ----------------------------------------------------------------------
+> |vfio_device_migration_info|    data section			      |	
+> |                          |     ///////////////////////////////////  |
+>  ----------------------------------------------------------------------
+>  ^			         ^                                 ^
+>  offset 0-trapped part         data.offset                     data.size
+> 
+> 
+> Kernel driver defines the size of migration region and tells VFIO user
+> space application (QEMU here) through VFIO_DEVICE_GET_REGION_INFO ioctl.
+> So kernel driver can calculate the size of data section. Then kernel
+> driver can have (data.size >= data section size) or (data.size < data
+> section size), hence VFIO user space application need to know data.size
+> to copy only relevant data.
+> 
+> > Why would it pick a none-0 offset into the output region?
+> 
+> Data section is always followed by vfio_device_migration_info structure
+> in the region, so data.offset will always be none-0.
+> Offset from where data is copied is decided by kernel driver, data
+> section can be trapped or mapped depending on how kernel driver defines
+> data section. If mmapped, then data.offset should be page aligned, where
+> as initial section which contain vfio_device_migration_info structure
+> might not end at offset which is page aligned.
 
-I agree with you, but if we will implement a QEMU fastboot feature in
-SeaBIOS, we are sure that it works with Linux kernel if someone uses
-"qemu -kernel" and wants also use a VGA.
+Ah OK; I see - it wasn't clear to me which buffer we were talking about
+here; so yes it makes sense if it's one the kernel had the control of.
 
->
-> > - QEMU -vga none + SeaBIOS config (CONFIG_DEBUG_LEVEL=0, disable all
-> > HW support except
-> > SMM & MTRRs) + Stephen's TPM patch
-> >  qemu_init_end: 43.675803
-> >  fw_start: 43.865178 (+0.189375)
-> >  fw_do_boot: 58.093161 (+14.227983)
-> >  linux_start_boot: 59.490308 (+1.397147)
-> >  linux_start_user: 556.782354 (+497.292046)
-> >
-> > - QEMU -vga none + SeaBIOS config (CONFIG_DEBUG_LEVEL=0, disable all
-> > HW support except
-> > SMM & MTRRs, CONFIG_DISABLE_VGA=y) + Stephen's TPM patch
-> >  qemu_init_end: 42.387412
-> >  fw_start: 42.579257 (+0.191845)
-> >  fw_do_boot: 53.381517 (+10.802260)
-> >  linux_start_boot: 54.848643 (+1.467126)
-> >  linux_start_user: 498.517050 (+443.668407)
->
-> Interesting that CONFIG_DISABLE_VGA=y makes a noticable difference even
-> without vga hardware being preset.  And not only in seabios but also for
-> the linux kernel.
->
-> Do you know why?
+Dave
 
-In SeaBIOS I think the reasons are:
-- vgarom_setup() scan all PCI devices to find a VGA
-- enable_vga_console() invokes an int10 without check if there is a
-VGA (maybe here we can add a check)
-
-Cheers,
-Stefano
-
+> Thanks,
+> Kirti
+> 
+> > Without having dug further these feel like i/o rather than just output;
+> > i.e. the calling process says 'put it at that offset and you've got size
+> > bytes' and the kernel replies with 'I did put it at offset and I wrote
+> > only this size bytes'
+> > 
+> > Dave
+> > 
+> >> +        struct {
+> >> +            __u64 start_addr;
+> >> +            __u64 total;
+> >> +            __u64 copied;
+> >> +        } dirty_pfns;
+> >> +} __attribute__((packed));
+> >> +
+> >>  /* -------- API for Type1 VFIO IOMMU -------- */
+> >>  
+> >>  /**
+> >> -- 
+> >> 2.7.0
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
 --
-Stefano Garzarella
-Red Hat
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
