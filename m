@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gQGbw-0008Pz-Nm
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:55:29 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gQGc9-0008IA-Ba
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:55:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gQGXd-00077W-SJ
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:51:03 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42215)
+	(envelope-from <peter.maydell@linaro.org>) id 1gQGSB-0004tz-4N
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:45:24 -0500
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:39033)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gQGXb-00070Q-TI
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:51:01 -0500
-Received: by mail-ot1-x343.google.com with SMTP id v23so5967734otk.9
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 10:50:59 -0800 (PST)
+	id 1gQGSA-0004sB-VI
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:45:23 -0500
+Received: by mail-oi1-x235.google.com with SMTP id 192-v6so10686575oii.6
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 10:45:22 -0800 (PST)
 MIME-Version: 1.0
-References: <0184EA26B2509940AA629AE1405DD7F201F85395@DGGEMA503-MBX.china.huawei.com>
-In-Reply-To: <0184EA26B2509940AA629AE1405DD7F201F85395@DGGEMA503-MBX.china.huawei.com>
+References: <0184EA26B2509940AA629AE1405DD7F201F7BBE8@DGGEMA503-MBX.china.huawei.com>
+In-Reply-To: <0184EA26B2509940AA629AE1405DD7F201F7BBE8@DGGEMA503-MBX.china.huawei.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Nov 2018 18:50:47 +0000
-Message-ID: <CAFEAcA_cZb_SG4MHocxB-wWGDPA0mCWUonjbuZF8srE_ZbOGbw@mail.gmail.com>
+Date: Fri, 23 Nov 2018 18:45:09 +0000
+Message-ID: <CAFEAcA_abaoxA=myPszVrO59-hSazHAePRJXUCHKSFnoEdsfiw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH RESEND v15 10/10] target-arm:
- kvm64: handle SIGBUS signal from kernel or KVM
+Subject: Re: [Qemu-devel] [PATCH RESEND v15 08/10] target-arm: kvm64: inject
+ synchronous External Abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +30,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Marcelo Tosatti <mtosatti@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Zheng Xiang <zhengxiang9@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Fri, 23 Nov 2018 at 14:31, gengdongjiu <gengdongjiu@huawei.com> wrote:
+On Wed, 21 Nov 2018 at 14:34, gengdongjiu <gengdongjiu@huawei.com> wrote:
 >
 > Hi Peter,
->   Thanks for the comments and mail.
+>   Thanks for the review and comments.
 >
 > >
-> > On 22 November 2018 at 10:28, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > > On 22 November 2018 at 03:05, gengdongjiu <gengdongjiu@huawei.com> wrote:
-> > >>> >
-> > >>> Shouldn't there be something in here to say "only report this error to the guest if we are actually reporting RAS errors to the guest" ?
-> > >>
-> > >> Yes, We can say something that such as "report this error to the guest", because this error is indeed triggered by guest, which is guest
-> > error.
-> > >
-> > > I'm afraid I don't really understand what you mean. Could you try
-> > > rephrasing it?
-> > >
-> > > My understanding was:
-> > >  * we get this signal if there is a RAS error in the host memory
-> > >  * if we are exposing RAS errors to the guest (ie we have
-> > >    told it that in the ACPI table we passed it at startup)
-> > >    then we should pass on this error to the guest
-> > >
-> > > but that these are two different conditions.
-> > >
-> > > If the host hardware detects a RAS error in memory used by the guest
-> > > but the guest is not being told about RAS errors, then we cannot
-> > > report the error: we have no mechanism to do so, and the guest is not
-> > > expecting it.
+> > On 8 November 2018 at 10:29, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> > > +bool write_part_cpustate_to_list(ARMCPU *cpu, ptrdiff_t fieldoffset)
 > >
-> > If you look at the x86 version of this function you can see that it tests (env->mcg_cap & MCG_SER_P), which I think is the equivalent x86 "is
-> > the guest CPU/config one we can report these errors to" test.
+> > What is this about? Nothing else in QEMU needs to mess with the cpustate synchronization. My first assumption is that you should not
+> > need to do so either.
 >
-> MCG_SER_P (software error recovery support present) flag indicates (when set) that the processor supports software error recovery.
-> env->mcg_cap 's value should be got from KVM as shown in the QEMU code[1], it indicates whether the KVM support software error recovery.
+> We should change the guest CP15 ESR_EL1's value, the only method is to change the cpu->cpreg_values[] in QEMU, then QEMU call write_list_to_kvmstate()
+> to set the cpu->cpreg_values[] to KVM which include the specified ESR_EL1 value, KVM do world switch, and then set the specified ESR_EL1's value to guest kernel.
+
+Ah, I see. This is a bug in our current handling of the register
+state, where we implicitly assume that nothing in QEMU will ever
+want to change any system register values. This assumption is
+now false -- kvm_arm_handle_debug() broke it -- so we need to
+fix the code that does kvm_arch_put_registers(). There is a comment
+in the kvm32.c version of that function about this. (The kvm64.c
+version has the same assumption but doesn't comment on it.)
+
+We should (ideally) fix this bug in the code that does register
+syncing, without requiring places in QEMU that update system
+registers to have to manually indicate which registers they have
+changed. I'll have a think about how best to do this.
+
+> About the detailed explanation, as shown in [2].
 >
-> [1]:
-> -------------------------------------------------------------------------------------------------------------
->   ret = kvm_get_mce_cap_supported(cs->kvm_state, &mcg_cap, &banks);
->   if (ret < 0) {
->        fprintf(stderr, "kvm_get_mce_cap_supported: %s", strerror(-ret));
->            return ret;
->    }
-> -------------------------------------------------------------------------------------------------------------
+> kvm_arm_handle_debug() does not need to do this because QEMU does not need to change CP15 registers, such as ESR_EL1.
 
-Yes, but if you look at the code which calls that, it
-goes on to do:
-        env->mcg_cap &= mcg_cap | MCG_CAP_BANKS_MASK;
+kvm_arm_handle_debug does change ESR_EL1: it is injecting an exception
+and so should set the exception register. This happens when it
+calls the do_interrupt() hook, because arm_cpu_do_interrupt_aarch64()
+writes to env->cp15.esr_el[new_el].
 
-which means that if the host kernel does not support this
-feature then we will clear those bits in the env->mcg_cap
-field, so we do not advertise it to the guest. But we might
-be not advertising it to the guest at all, if env->mcg_cap
-was 0 before this code was called. That happens if we
-are presenting the guest with a guest CPU type which does
-not have the feature.
+I'm not entirely sure why this is working today, in fact.
+Alex, did you test whether our debug-exception-injection
+reports the correct ESR_EL1 to the guest ?
 
---------------------------------------------------------------------------------------------------------------
-> void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-> {
->         ...........................
+> > > +/* Inject synchronous external abort */ static void
+> > > +kvm_inject_arm_sea(CPUState *c) {
+> > > +    ARMCPU *cpu = ARM_CPU(c);
+> > > +    CPUARMState *env = &cpu->env;
+> > > +    CPUClass *cc = CPU_GET_CLASS(c);
+> > > +    uint32_t esr;
+> > > +    int ret;
+> > > +
+> > > +    /* This exception is synchronous data abort */
+> > > +    c->exception_index = EXCP_DATA_ABORT;
+> > > +    /* Inject the exception to guest EL1 */
+> > > +    env->exception.target_el = 1;
+> >
+> > These comments don't tell us anything that the code does not.
 >
->         if (ram_addr != RAM_ADDR_INVALID &&
->             kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
->
->   If it got to here, it means the host hardware detects a RAS error in memory used by the guest using above two judgments.
->   Maybe we can test/check whether KVM supports software error recovery in [3]
->
+>  Thanks, do you mean I need to remove it or add more detailed comments to it?
 
-The question is not "does the host CPU / KVM support error
-reporting". It is "does the *guest* CPU / system support
-error reporting". These are distinct questions which may
-not have the same answer.
-
+As a rule of thumb, comments should provide information to
+the reader which they wouldn't get if they only had the code.
+Comments often answer the "why do we do this" question, or
+provide an overall summary of what the code is going to do,
+or refer to an external source (a datasheet, an algorithm)
+that is necessary to understand the code. It's better to
+avoid comments that say "what the code is doing" at a line-by-line
+level, because the code itself already answers the "what"
+question at that level of detail.
 
 thanks
 -- PMM
