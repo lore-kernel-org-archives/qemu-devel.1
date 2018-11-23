@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ5-0004mI-46
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ5-0004mj-ST
 	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ1-0005Ar-RX
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:00 -0500
-Received: from cmccmta1.chinamobile.com ([221.176.66.79]:24228)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ3-0005EO-KY
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:01 -0500
+Received: from cmccmta3.chinamobile.com ([221.176.66.81]:26250)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ1-00055Z-3J
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:30:57 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ2-00056H-Rh
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:30:59 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 23 Nov 2018 23:30:23 +0800
-Message-Id: <20181123153040.18933-5-maozhongyi@cmss.chinamobile.com>
+Date: Fri, 23 Nov 2018 23:30:30 +0800
+Message-Id: <20181123153040.18933-12-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
 References: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 04/21] core/empty_slot: Convert sysbus init
+Subject: [Qemu-devel] [PATCH v2 11/21] milkymist-hpdmc: Convert sysbus init
  function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,48 +28,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, gxt@mprc.pku.edu.cn, michael@walle.cc, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-empty_slot_class_init().
+milkymist_hpdmc_class_init().
+
+Cc: gxt@mprc.pku.edu.cn
+Cc: michael@walle.cc
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/core/empty_slot.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ hw/misc/milkymist-hpdmc.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/hw/core/empty_slot.c b/hw/core/empty_slot.c
-index c1b9c2b104..239f78e2a7 100644
---- a/hw/core/empty_slot.c
-+++ b/hw/core/empty_slot.c
-@@ -71,21 +71,20 @@ void empty_slot_init(hwaddr addr, uint64_t slot_size)
-     }
+diff --git a/hw/misc/milkymist-hpdmc.c b/hw/misc/milkymist-hpdmc.c
+index e6140eec6b..44dc0698ec 100644
+--- a/hw/misc/milkymist-hpdmc.c
++++ b/hw/misc/milkymist-hpdmc.c
+@@ -129,15 +129,13 @@ static void milkymist_hpdmc_reset(DeviceState *d)
+                          | IODELAY_PLL2_LOCKED;
  }
  
--static int empty_slot_init1(SysBusDevice *dev)
-+static void empty_slot_realize(DeviceState *dev, Error **errp)
+-static int milkymist_hpdmc_init(SysBusDevice *dev)
++static void milkymist_hpdmc_realize(DeviceState *dev, Error **errp)
  {
-     EmptySlot *s = EMPTY_SLOT(dev);
+     MilkymistHpdmcState *s = MILKYMIST_HPDMC(dev);
  
-     memory_region_init_io(&s->iomem, OBJECT(s), &empty_slot_ops, s,
-                           "empty-slot", s->size);
--    sysbus_init_mmio(dev, &s->iomem);
+     memory_region_init_io(&s->regs_region, OBJECT(dev), &hpdmc_mmio_ops, s,
+             "milkymist-hpdmc", R_MAX * 4);
+-    sysbus_init_mmio(dev, &s->regs_region);
+-
 -    return 0;
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->regs_region);
  }
  
- static void empty_slot_class_init(ObjectClass *klass, void *data)
+ static const VMStateDescription vmstate_milkymist_hpdmc = {
+@@ -153,9 +151,8 @@ static const VMStateDescription vmstate_milkymist_hpdmc = {
+ static void milkymist_hpdmc_class_init(ObjectClass *klass, void *data)
  {
+     DeviceClass *dc = DEVICE_CLASS(klass);
 -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
  
--    k->init = empty_slot_init1;
-+    dc->realize = empty_slot_realize;
+-    k->init = milkymist_hpdmc_init;
++    dc->realize = milkymist_hpdmc_realize;
+     dc->reset = milkymist_hpdmc_reset;
+     dc->vmsd = &vmstate_milkymist_hpdmc;
  }
- 
- static const TypeInfo empty_slot_info = {
 -- 
 2.17.1
