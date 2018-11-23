@@ -1,16 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gQC5O-0003C5-Tj
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:05:40 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1gQCCg-0002TO-Sf
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:13:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gQC5J-0007ML-Ha
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:05:34 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Fri, 23 Nov 2018 17:05:21 +0300
-Message-Id: <1542981922-316191-5-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1542981922-316191-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1542981922-316191-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 4/5] iotests: prepare 030 for graph change
+	(envelope-from <pmorel@linux.ibm.com>) id 1gQCCd-0006dy-PZ
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:13:06 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gQCCd-0006ag-Hs
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:13:03 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wANEAjPD078576
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 09:13:02 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2nxjft9u2x-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 09:13:01 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Fri, 23 Nov 2018 14:12:59 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <20181122165457.4517-1-cohuck@redhat.com>
+	<20181122165457.4517-2-cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Fri, 23 Nov 2018 15:12:55 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181122165457.4517-2-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <1cf1b1a1-9fde-e93f-020b-624b7fbf3fe2@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio-ccw: new capability chain support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,97 +43,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, dgilbert@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
+To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-The discard option for block-stream command requires insertion of the
-filter to write into the backing chain. In that case, the job will not
-resume by device name. So, the node name is specified.
+On 22/11/2018 17:54, Cornelia Huck wrote:
+> To be replaced with a real linux-headers update.
+>=20
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>   linux-headers/linux/vfio.h     |  4 ++++
+>   linux-headers/linux/vfio_ccw.h | 12 ++++++++++++
+>   2 files changed, 16 insertions(+)
+>=20
+> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> index ceb6453394..c9ba8d52a0 100644
+> --- a/linux-headers/linux/vfio.h
+> +++ b/linux-headers/linux/vfio.h
+> @@ -297,12 +297,16 @@ struct vfio_region_info_cap_type {
+>  =20
+>   #define VFIO_REGION_TYPE_PCI_VENDOR_TYPE	(1 << 31)
+>   #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+> +#define VFIO_REGION_TYPE_CCW			(1 << 30)
+>  =20
+>   /* 8086 Vendor sub-types */
+>   #define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
+>   #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+>   #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+>  =20
+> +/* ccw sub-types */
+> +#define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+> +
+>   /*
+>    * The MSIX mappable capability informs that MSIX data of a BAR can b=
+e mmapped
+>    * which allows direct access to non-MSIX registers which happened to=
+ be within
+> diff --git a/linux-headers/linux/vfio_ccw.h b/linux-headers/linux/vfio_=
+ccw.h
+> index 5bf96c3812..fcc3e69ef5 100644
+> --- a/linux-headers/linux/vfio_ccw.h
+> +++ b/linux-headers/linux/vfio_ccw.h
+> @@ -12,6 +12,7 @@
+>  =20
+>   #include <linux/types.h>
+>  =20
+> +/* used for START SUBCHANNEL, always present */
+>   struct ccw_io_region {
+>   #define ORB_AREA_SIZE 12
+>   	__u8	orb_area[ORB_AREA_SIZE];
+> @@ -22,4 +23,15 @@ struct ccw_io_region {
+>   	__u32	ret_code;
+>   } __attribute__((packed));
+>  =20
+> +/*
+> + * used for processing commands that trigger asynchronous actions
+> + * Note: this is controlled by a capability
+> + */
+> +#define VFIO_CCW_ASYNC_CMD_HSCH (1 << 0)
+> +#define VFIO_CCW_ASYNC_CMD_CSCH (1 << 1)
+> +struct ccw_cmd_region {
+> +	__u32 command;
+> +	__u32 ret_code;
+> +} __attribute__((packed));
+> +
+>   #endif
+>=20
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- tests/qemu-iotests/030 | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+LGTM
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 276e06b..5d148b0 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -36,7 +36,8 @@ class TestSingleDrive(iotests.QMPTestCase):
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % mid_img, test_img)
-         qemu_io('-f', 'raw', '-c', 'write -P 0x1 0 512', backing_img)
-         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0x1 524288 512', mid_img)
--        self.vm = iotests.VM().add_drive("blkdebug::" + test_img, "backing.node-name=mid")
-+        self.vm = iotests.VM().add_drive("blkdebug::" + test_img,
-+                               "node-name=source,backing.node-name=mid")
-         self.vm.launch()
- 
-     def tearDown(self):
-@@ -87,7 +88,7 @@ class TestSingleDrive(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return', {})
- 
-         self.pause_job('drive0', wait=False)
--        self.vm.resume_drive('drive0')
-+        self.vm.resume_drive('source')
-         self.pause_wait('drive0')
- 
-         result = self.vm.qmp('query-block-jobs')
-@@ -743,7 +744,8 @@ class TestStreamStop(iotests.QMPTestCase):
-         qemu_io('-f', 'raw', '-c', 'write -P 0x1 0 32M', backing_img)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, test_img)
-         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0x1 32M 32M', test_img)
--        self.vm = iotests.VM().add_drive("blkdebug::" + test_img)
-+        self.vm = iotests.VM().add_drive("blkdebug::" + test_img,
-+                                         "node-name=source")
-         self.vm.launch()
- 
-     def tearDown(self):
-@@ -764,7 +766,7 @@ class TestStreamStop(iotests.QMPTestCase):
-             self.assert_qmp(e, 'event', 'JOB_STATUS_CHANGE')
-             self.assert_qmp(e, 'data/id', 'drive0')
- 
--        self.cancel_and_wait(resume=True)
-+        self.cancel_and_wait(resume=True, resume_node='source')
- 
- class TestSetSpeed(iotests.QMPTestCase):
-     image_len = 80 * 1024 * 1024 # MB
-@@ -774,7 +776,8 @@ class TestSetSpeed(iotests.QMPTestCase):
-         qemu_io('-f', 'raw', '-c', 'write -P 0x1 0 32M', backing_img)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, test_img)
-         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0x1 32M 32M', test_img)
--        self.vm = iotests.VM().add_drive('blkdebug::' + test_img)
-+        self.vm = iotests.VM().add_drive('blkdebug::' + test_img,
-+                                         "node-name=source")
-         self.vm.launch()
- 
-     def tearDown(self):
-@@ -817,7 +820,7 @@ class TestSetSpeed(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return[0]/device', 'drive0')
-         self.assert_qmp(result, 'return[0]/speed', 8 * 1024 * 1024)
- 
--        self.cancel_and_wait(resume=True)
-+        self.cancel_and_wait(resume=True, resume_node='source')
-         self.vm.pause_drive('drive0')
- 
-         # Check setting speed in block-stream works
-@@ -828,7 +831,7 @@ class TestSetSpeed(iotests.QMPTestCase):
-         self.assert_qmp(result, 'return[0]/device', 'drive0')
-         self.assert_qmp(result, 'return[0]/speed', 4 * 1024 * 1024)
- 
--        self.cancel_and_wait(resume=True)
-+        self.cancel_and_wait(resume=True, resume_node='source')
- 
-     def test_set_speed_invalid(self):
-         self.assert_no_active_block_jobs()
-@@ -845,7 +848,8 @@ class TestSetSpeed(iotests.QMPTestCase):
-         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=-1)
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
--        self.cancel_and_wait(resume=True)
-+        self.cancel_and_wait(resume=True, resume_node='source')
-+
- 
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2', 'qed'])
--- 
-1.8.3.1
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
