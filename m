@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gQFYQ-0006Kj-AH
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:47:49 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gQFv4-00067e-H9
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:11:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gQFXT-0000Qj-TI
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:46:49 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 23 Nov 2018 17:46:38 +0000
-Message-ID: <05d5ec87-529a-8886-b304-7d0447b903d5@virtuozzo.com>
-References: <20181031113418.29796-1-anton.nefedov@virtuozzo.com>
-	<20181031113418.29796-5-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20181031113418.29796-5-anton.nefedov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B53E2E4B7D730D42AD732277595B1D26@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <ehabkost@redhat.com>) id 1gQFv3-0000Ls-Ml
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:11:10 -0500
+Date: Fri, 23 Nov 2018 16:10:59 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181123181059.GN18284@habkost.net>
+References: <20181123091729.29921-1-luc.michel@greensocs.com>
+	<20181123091729.29921-2-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 4/9] ide: account UNMAP (TRIM) operations
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181123091729.29921-2-luc.michel@greensocs.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,10 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Luc Michel <luc.michel@greensocs.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, alistair@alistair23.me, mark.burton@greensocs.com, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
 
-MzEuMTAuMjAxOCAxNDozNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gU2lnbmVkLW9mZi1ieTog
-QW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2aXJ0dW96em8uY29tPg0KDQpSZXZpZXdlZC1i
-eTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29t
-Pg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+Hi,
+
+Sorry for not reviewing this series earlier.  I just stumbled
+upon this part of the code:
+
+On Fri, Nov 23, 2018 at 10:17:14AM +0100, Luc Michel wrote:
+> This commit adds the cpu-cluster type. It aims at gathering CPUs from
+> the same cluster in a machine.
+>=20
+> For now it only has a `cluster-id` property.
+>=20
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+[...]
+> +static void cpu_cluster_init(Object *obj)
+> +{
+> +    static uint32_t cluster_id_auto_increment;
+> +    CPUClusterState *cluster =3D CPU_CLUSTER(obj);
+> +
+> +    cluster->cluster_id =3D cluster_id_auto_increment++;
+
+I see that you implemented this after a suggestion from Philippe,
+but I'm worried about this kind of side-effect on object/device
+code.  I'm afraid this will bite us back in the future.  We were
+bitten by problems caused by automatic cpu_index assignment on
+CPU instance_init, and we took a while to fix that.
+
+If you really want to do this and assign cluster_id
+automatically, please do it on realize, where it won't have
+unexpected side-effects after a simple `qom-list-properties` QMP
+command.
+
+I would also add a huge warning above the cluster_id field
+declaration, mentioning that the field is not supposed to be used
+for anything except debugging.  I think there's a large risk of
+people trying to reuse the field incorrectly, just like cpu_index
+was reused for multiple (conflicting) purposes in the past.
+
+
+> +}
+> +
+> +static Property cpu_cluster_properties[] =3D {
+> +    DEFINE_PROP_UINT32("cluster-id", CPUClusterState, cluster_id, 0),
+> +    DEFINE_PROP_END_OF_LIST()
+> +};
+[...]
+
+--=20
+Eduardo
