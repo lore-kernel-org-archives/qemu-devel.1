@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gQ6sR-0006Rm-HL
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:31:52 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gQ7Hr-0006Wz-LE
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:58:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gQ6sI-0001zf-QW
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:31:48 -0500
-Resent-Message-Id: <E1gQ6sI-0001zf-QW@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21349)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gQ6sG-0001lG-VS
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:31:42 -0500
-In-Reply-To: <1542895581-10721-1-git-send-email-wexu@redhat.com>
-Message-ID: <154295555385.6021.3093528354336136151@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cohuck@redhat.com>) id 1gQ7Hn-0001xv-NI
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:58:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37858)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gQ7Hl-0001uQ-RL
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:58:03 -0500
+Date: Fri, 23 Nov 2018 09:57:33 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181123095733.35379735.cohuck@redhat.com>
+In-Reply-To: <20181121181347.24035-3-farosas@linux.ibm.com>
+References: <20181121181347.24035-1-farosas@linux.ibm.com>
+	<20181121181347.24035-3-farosas@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 22 Nov 2018 22:45:55 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v1 00/16] packed ring virtio-net backend
- support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 2/3] kvm-all: Introduce
+ kvm_set_singlestep
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wexu@redhat.com
-Cc: famz@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org, maxime.coquelin@redhat.com, jfreimann@redhat.com, tiwei.bie@intel.com, mst@redhat.com
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, philmd@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, James Hogan <jhogan@kernel.org>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, David Gibson <david@gibson.dropbear.id.au>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTU0
-Mjg5NTU4MS0xMDcyMS0xLWdpdC1zZW5kLWVtYWlsLXdleHVAcmVkaGF0LmNvbQpUeXBlOiBzZXJp
-ZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MSAwMC8xNl0gcGFja2VkIHJpbmcgdmly
-dGlvLW5ldCBiYWNrZW5kIHN1cHBvcnQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
-ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
-IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
-aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
-ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAg
-ICAgIHBhdGNoZXcvMjAxODExMjMwNjM5NTcuOTUxNS0xLWtyYXhlbEByZWRoYXQuY29tIC0+IHBh
-dGNoZXcvMjAxODExMjMwNjM5NTcuOTUxNS0xLWtyYXhlbEByZWRoYXQuY29tClN3aXRjaGVkIHRv
-IGEgbmV3IGJyYW5jaCAndGVzdCcKZDE2YjM4YiB2aXJ0aW86IGVuYWJsZSBwYWNrZWQgcmluZyB2
-aWEgYSBuZXcgY29tbWFuZCBsaW5lCmU0ZTMxMDEgdmhvc3Q6IGVuYWJsZSBwYWNrZWQgcmluZwpk
-OWM0ZmExIHZpcnRpbzogcGFja2VkIHJpbmcgZmVhdHVyZSBiaXQgZm9yIHVzZXJzcGFjZSBiYWNr
-ZW5kCjg2OGE3MzQgdmlydGlvOiBhZGQgdmhvc3QtbmV0IG1pZ3JhdGlvbiBvZiBwYWNrZWQgcmlu
-ZwowNDE4NTk5IHZpcnRpbzogYWRkIHVzZXJzcGFjZSBtaWdyYXRpb24gb2YgcGFja2VkIHJpbmcK
-ZmY1MGUyMiB2aXJ0aW8tbmV0OiBmaWxsIGhlYWQgZGVzYyBhZnRlciBkb25lIGFsbCBpbiBhIGNo
-YWluCmJjNjBmMzIgdmlydGlvOiBldmVudCBzdXBwcmVzc2lvbiBzdXBwb3J0IGZvciBwYWNrZWQg
-cmluZwplNmVkMTI2IHZpcnRpbzogZmlsbC9mbHVzaC9wb3AgZm9yIHBhY2tlZCByaW5nCjc4MjUy
-OGQgdmlydGlvOiBnZXQgYXZhaWwgYnl0ZXMgY2hlY2sgZm9yIHBhY2tlZCByaW5nCjcyYmY5NTIg
-dmlydGlvOiBpbml0IGFuZCBkZXNjIGVtcHR5IGNoZWNrIGZvciBwYWNrZWQgcmluZwpjNDEzMWIz
-IHZpcnRpbzogaW5pdCB3cmFwIGNvdW50ZXIgZm9yIHBhY2tlZCByaW5nCjAwZjI2YmQgdmlydGlv
-OiBhZGQgbWVtb3J5IHJlZ2lvbiBpbml0IGZvciBwYWNrZWQgcmluZwoyNzljYWVhIHZpcnRpbzog
-ZXhwYW5kIG9mZnNldCBjYWxjdWxhdGlvbiBmb3IgcGFja2VkIHJpbmcKOWRjMzcxMiB2aXJ0aW86
-IHJlZGVmaW5lIHN0cnVjdHVyZSAmIG1lbW9yeSBjYWNoZSBmb3IgcGFja2VkIHJpbmcKZDFhMTQ1
-YyB2aXJ0aW86IGludHJvZHVjZSBwYWNrZWQgcmluZyBkZWZpbml0aW9ucwoKPT09IE9VVFBVVCBC
-RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xNTogdmlydGlvOiBpbnRyb2R1Y2UgcGFja2VkIHJp
-bmcgZGVmaW5pdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xNTogdmlydGlvOiByZWRlZmluZSBz
-dHJ1Y3R1cmUgJiBtZW1vcnkgY2FjaGUgZm9yIHBhY2tlZCByaW5nLi4uCkNoZWNraW5nIFBBVENI
-IDMvMTU6IHZpcnRpbzogZXhwYW5kIG9mZnNldCBjYWxjdWxhdGlvbiBmb3IgcGFja2VkIHJpbmcu
-Li4KQ2hlY2tpbmcgUEFUQ0ggNC8xNTogdmlydGlvOiBhZGQgbWVtb3J5IHJlZ2lvbiBpbml0IGZv
-ciBwYWNrZWQgcmluZy4uLgpDaGVja2luZyBQQVRDSCA1LzE1OiB2aXJ0aW86IGluaXQgd3JhcCBj
-b3VudGVyIGZvciBwYWNrZWQgcmluZy4uLgpDaGVja2luZyBQQVRDSCA2LzE1OiB2aXJ0aW86IGlu
-aXQgYW5kIGRlc2MgZW1wdHkgY2hlY2sgZm9yIHBhY2tlZCByaW5nLi4uCkNoZWNraW5nIFBBVENI
-IDcvMTU6IHZpcnRpbzogZ2V0IGF2YWlsIGJ5dGVzIGNoZWNrIGZvciBwYWNrZWQgcmluZy4uLgpD
-aGVja2luZyBQQVRDSCA4LzE1OiB2aXJ0aW86IGZpbGwvZmx1c2gvcG9wIGZvciBwYWNrZWQgcmlu
-Zy4uLgpDaGVja2luZyBQQVRDSCA5LzE1OiB2aXJ0aW86IGV2ZW50IHN1cHByZXNzaW9uIHN1cHBv
-cnQgZm9yIHBhY2tlZCByaW5nLi4uCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxMTk6IEZJ
-TEU6IGh3L3ZpcnRpby92aXJ0aW8uYzoyMjA4Ogorc3RhdGljIGJvb2wgdnJpbmdfcGFja2VkX25l
-ZWRfZXZlbnQoVmlydFF1ZXVlICp2cSwgYm9vbCB3cmFwLCAkCgp0b3RhbDogMSBlcnJvcnMsIDAg
-d2FybmluZ3MsIDE1MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMC8xNTogdmlydGlvLW5ldDogZmlsbCBoZWFkIGRl
-c2MgYWZ0ZXIgZG9uZSBhbGwgaW4gYSBjaGFpbi4uLgpDaGVja2luZyBQQVRDSCAxMS8xNTogdmly
-dGlvOiBhZGQgdXNlcnNwYWNlIG1pZ3JhdGlvbiBvZiBwYWNrZWQgcmluZy4uLgpDaGVja2luZyBQ
-QVRDSCAxMi8xNTogdmlydGlvOiBhZGQgdmhvc3QtbmV0IG1pZ3JhdGlvbiBvZiBwYWNrZWQgcmlu
-Zy4uLgpDaGVja2luZyBQQVRDSCAxMy8xNTogdmlydGlvOiBwYWNrZWQgcmluZyBmZWF0dXJlIGJp
-dCBmb3IgdXNlcnNwYWNlIGJhY2tlbmQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMTU6IHZob3N0OiBl
-bmFibGUgcGFja2VkIHJpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMTU6IHZpcnRpbzogZW5hYmxl
-IHBhY2tlZCByaW5nIHZpYSBhIG5ldyBjb21tYW5kIGxpbmUuLi4KPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
-YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Wed, 21 Nov 2018 16:13:46 -0200
+Fabiano Rosas <farosas@linux.ibm.com> wrote:
+
+> This will be used in a future patch to implement an
+> architecture-specific single step mechanism for POWER.
+> 
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> ---
+>  accel/kvm/kvm-all.c  | 10 ++++++++++
+>  exec.c               |  1 +
+>  include/sysemu/kvm.h |  4 ++++
+>  target/arm/kvm.c     |  4 ++++
+>  target/i386/kvm.c    |  4 ++++
+>  target/mips/kvm.c    |  4 ++++
+>  target/ppc/kvm.c     |  4 ++++
+>  target/s390x/kvm.c   |  4 ++++
+>  8 files changed, 35 insertions(+)
+> 
+
+> @@ -431,6 +433,8 @@ void kvm_arch_remove_all_hw_breakpoints(void);
+>  
+>  void kvm_arch_update_guest_debug(CPUState *cpu, struct kvm_guest_debug *dbg);
+>  
+> +void kvm_arch_set_singlestep(CPUState *cpu, int enabled);
+
+Might be useful to add a comment here that describes what common code
+expects the arch-specific function to do here so they don't step on
+each others toes.
+
+> +
+>  bool kvm_arch_stop_on_emulation_error(CPUState *cpu);
+>  
+>  int kvm_check_extension(KVMState *s, unsigned int extension);
