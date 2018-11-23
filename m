@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gQ7bA-0008BO-LZ
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 04:18:05 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gQ7b2-0007vm-OA
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 04:17:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gQ7b5-0000t9-IC
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 04:18:04 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gQ7b1-0000ju-1G
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 04:17:56 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Fri, 23 Nov 2018 10:17:17 +0100
-Message-Id: <20181123091729.29921-5-luc.michel@greensocs.com>
+Date: Fri, 23 Nov 2018 10:17:15 +0100
+Message-Id: <20181123091729.29921-3-luc.michel@greensocs.com>
 In-Reply-To: <20181123091729.29921-1-luc.michel@greensocs.com>
 References: <20181123091729.29921-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 04/16] gdbstub: add multiprocess support to
- 'H' and 'T' packets
+Subject: [Qemu-devel] [PATCH v7 02/16] gdbstub: introduce GDB processes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,268 +24,207 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Add a couple of helper functions to cope with GDB threads and processes.
+Add a structure GDBProcess that represent processes from the GDB
+semantic point of view.
 
-The gdb_get_process() function looks for a process given a pid.
+CPUs can be split into different processes, by grouping them under
+different cpu-cluster objects.  Each occurrence of a cpu-cluster object
+implies the existence of the corresponding process in the GDB stub. The
+GDB process ID is derived from the corresponding cluster ID as follows:
 
-The gdb_get_cpu() function returns the CPU corresponding to the (pid,
-tid) pair given as parameters.
+  GDB PID =3D cluster ID + 1
 
-The read_thread_id() function parses the thread-id sent by the peer.
-This function supports the multiprocess extension thread-id syntax.  The
-return value specifies if the parsing failed, or if a special case was
-encountered (all processes or all threads).
+This is because PIDs -1 and 0 are reserved in GDB and cannot be used by
+processes.
 
-Use them in 'H' and 'T' packets handling to support the multiprocess
-extension.
+When no such container are found, all the CPUs are put in a unique GDB
+process (create_unique_process()). This is also the case when compiled
+in user mode, where multi-processes do not make much sense for now.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- gdbstub.c | 154 +++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 136 insertions(+), 18 deletions(-)
+ gdbstub.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 87 insertions(+)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 4fbc05dfe3..64a1db21b5 100644
+index c4e4f9f082..26f5a7449a 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -680,10 +680,75 @@ out:
+@@ -27,10 +27,11 @@
+ #include "monitor/monitor.h"
+ #include "chardev/char.h"
+ #include "chardev/char-fe.h"
+ #include "sysemu/sysemu.h"
+ #include "exec/gdbstub.h"
++#include "hw/cpu/cluster.h"
+ #endif
+=20
+ #define MAX_PACKET_LENGTH 4096
+=20
+ #include "qemu/sockets.h"
+@@ -294,10 +295,15 @@ typedef struct GDBRegisterState {
+     gdb_reg_cb set_reg;
+     const char *xml;
+     struct GDBRegisterState *next;
+ } GDBRegisterState;
+=20
++typedef struct GDBProcess {
++    uint32_t pid;
++    bool attached;
++} GDBProcess;
++
+ enum RSState {
+     RS_INACTIVE,
+     RS_IDLE,
+     RS_GETLINE,
+     RS_GETLINE_ESC,
+@@ -322,10 +328,13 @@ typedef struct GDBState {
+     int running_state;
  #else
-     return s->processes[0].pid;
+     CharBackend chr;
+     Chardev *mon_chr;
+ #endif
++    bool multiprocess;
++    GDBProcess *processes;
++    int process_num;
+     char syscall_buf[256];
+     gdb_syscall_complete_cb current_syscall_cb;
+ } GDBState;
+=20
+ /* By default use no IRQs and no timers while single stepping so as to
+@@ -1749,10 +1758,24 @@ void gdb_exit(CPUArchState *env, int code)
+ #ifndef CONFIG_USER_ONLY
+   qemu_chr_fe_deinit(&s->chr, true);
  #endif
  }
 =20
-+static GDBProcess *gdb_get_process(const GDBState *s, uint32_t pid)
-+{
-+    int i;
-+
-+    if (!pid) {
-+        /* 0 means any process, we take the first one */
-+        return &s->processes[0];
-+    }
-+
-+    for (i =3D 0; i < s->process_num; i++) {
-+        if (s->processes[i].pid =3D=3D pid) {
-+            return &s->processes[i];
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static GDBProcess *gdb_get_cpu_process(const GDBState *s, CPUState *cpu)
-+{
-+    return gdb_get_process(s, gdb_get_cpu_pid(s, cpu));
-+}
-+
-+static CPUState *find_cpu(uint32_t thread_id)
-+{
-+    CPUState *cpu;
-+
-+    CPU_FOREACH(cpu) {
-+        if (cpu_gdb_index(cpu) =3D=3D thread_id) {
-+            return cpu;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static CPUState *gdb_get_cpu(const GDBState *s, uint32_t pid, uint32_t t=
-id)
++/*
++ * Create a unique process containing all the CPUs.
++ */
++static void create_unique_process(GDBState *s)
 +{
 +    GDBProcess *process;
-+    CPUState *cpu;
 +
-+    if (!tid) {
-+        /* 0 means any thread, we take the first one */
-+        tid =3D 1;
-+    }
++    s->processes =3D g_malloc0(sizeof(GDBProcess));
++    s->process_num =3D 1;
++    process =3D &s->processes[0];
 +
-+    cpu =3D find_cpu(tid);
-+
-+    if (cpu =3D=3D NULL) {
-+        return NULL;
-+    }
-+
-+    process =3D gdb_get_cpu_process(s, cpu);
-+
-+    if (process->pid !=3D pid) {
-+        return NULL;
-+    }
-+
-+    if (!process->attached) {
-+        return NULL;
-+    }
-+
-+    return cpu;
++    process->pid =3D 1;
 +}
 +
- static const char *get_feature_xml(const char *p, const char **newp,
-                                    CPUClass *cc)
+ #ifdef CONFIG_USER_ONLY
+ int
+ gdb_handlesig(CPUState *cpu, int sig)
  {
-     size_t len;
-     int i;
-@@ -936,23 +1001,10 @@ static void gdb_set_cpu_pc(GDBState *s, target_ulo=
-ng pc)
-=20
-     cpu_synchronize_state(cpu);
-     cpu_set_pc(cpu, pc);
- }
-=20
--static CPUState *find_cpu(uint32_t thread_id)
--{
--    CPUState *cpu;
--
--    CPU_FOREACH(cpu) {
--        if (cpu_gdb_index(cpu) =3D=3D thread_id) {
--            return cpu;
--        }
--    }
--
--    return NULL;
--}
--
- static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
-                            char *buf, size_t buf_size)
- {
-     if (s->multiprocess) {
-         snprintf(buf, buf_size, "p%02x.%02x",
-@@ -962,10 +1014,64 @@ static char *gdb_fmt_thread_id(const GDBState *s, =
-CPUState *cpu,
+     GDBState *s;
+@@ -1846,10 +1869,11 @@ static bool gdb_accept(void)
      }
 =20
-     return buf;
- }
+     s =3D g_malloc0(sizeof(GDBState));
+     s->c_cpu =3D first_cpu;
+     s->g_cpu =3D first_cpu;
++    create_unique_process(s);
+     s->fd =3D fd;
+     gdb_has_xml =3D false;
 =20
-+typedef enum GDBThreadIdKind {
-+    GDB_ONE_THREAD =3D 0,
-+    GDB_ALL_THREADS,     /* One process, all threads */
-+    GDB_ALL_PROCESSES,
-+    GDB_READ_THREAD_ERR
-+} GDBThreadIdKind;
-+
-+static GDBThreadIdKind read_thread_id(const char *buf, const char **end_=
-buf,
-+                                      uint32_t *pid, uint32_t *tid)
+     gdbserver_state =3D s;
+     return true;
+@@ -2002,10 +2026,69 @@ static const TypeInfo char_gdb_type_info =3D {
+     .name =3D TYPE_CHARDEV_GDB,
+     .parent =3D TYPE_CHARDEV,
+     .class_init =3D char_gdb_class_init,
+ };
+=20
++static int find_cpu_clusters(Object *child, void *opaque)
 +{
-+    unsigned long p, t;
-+    int ret;
++    if (object_dynamic_cast(child, TYPE_CPU_CLUSTER)) {
++        GDBState *s =3D (GDBState *) opaque;
++        CPUClusterState *cluster =3D CPU_CLUSTER(child);
++        GDBProcess *process;
 +
-+    if (*buf =3D=3D 'p') {
-+        buf++;
-+        ret =3D qemu_strtoul(buf, &buf, 16, &p);
++        s->processes =3D g_renew(GDBProcess, s->processes, ++s->process_=
+num);
 +
-+        if (ret) {
-+            return GDB_READ_THREAD_ERR;
-+        }
++        process =3D &s->processes[s->process_num - 1];
 +
-+        /* Skip '.' */
-+        buf++;
-+    } else {
-+        p =3D 1;
++        /*
++         * GDB process IDs -1 and 0 are reserved. To avoid subtle errors=
+ at
++         * runtime, we enforce here that the machine does not use a clus=
+ter ID
++         * that would lead to PID 0. */
++        assert(process->pid !=3D UINT32_MAX);
++        process->pid =3D cluster->cluster_id + 1;
++        process->attached =3D false;
++
++        return 0;
 +    }
 +
-+    ret =3D qemu_strtoul(buf, &buf, 16, &t);
-+
-+    if (ret) {
-+        return GDB_READ_THREAD_ERR;
-+    }
-+
-+    *end_buf =3D buf;
-+
-+    if (p =3D=3D -1) {
-+        return GDB_ALL_PROCESSES;
-+    }
-+
-+    if (pid) {
-+        *pid =3D p;
-+    }
-+
-+    if (t =3D=3D -1) {
-+        return GDB_ALL_THREADS;
-+    }
-+
-+    if (tid) {
-+        *tid =3D t;
-+    }
-+
-+    return GDB_ONE_THREAD;
++    return object_child_foreach(child, find_cpu_clusters, opaque);
 +}
 +
- static int is_query_packet(const char *p, const char *query, char separa=
-tor)
- {
-     unsigned int query_len =3D strlen(query);
-=20
-     return strncmp(p, query, query_len) =3D=3D 0 &&
-@@ -1070,16 +1176,18 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
- {
-     CPUState *cpu;
-     CPUClass *cc;
-     const char *p;
-     uint32_t thread;
-+    uint32_t pid, tid;
-     int ch, reg_size, type, res;
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-     char thread_id[16];
-     uint8_t *registers;
-     target_ulong addr, len;
-+    GDBThreadIdKind thread_kind;
-=20
-     trace_gdbstub_io_command(line_buf);
-=20
-     p =3D line_buf;
-     ch =3D *p++;
-@@ -1283,16 +1391,22 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
-         else
-             put_packet(s, "E22");
-         break;
-     case 'H':
-         type =3D *p++;
--        thread =3D strtoull(p, (char **)&p, 16);
--        if (thread =3D=3D -1 || thread =3D=3D 0) {
++static int pid_order(const void *a, const void *b)
++{
++    GDBProcess *pa =3D (GDBProcess *) a;
++    GDBProcess *pb =3D (GDBProcess *) b;
 +
-+        thread_kind =3D read_thread_id(p, &p, &pid, &tid);
-+        if (thread_kind =3D=3D GDB_READ_THREAD_ERR) {
-+            put_packet(s, "E22");
-+            break;
-+        }
++    if (pa->pid < pb->pid) {
++        return -1;
++    } else if (pa->pid > pb->pid) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
 +
-+        if (thread_kind !=3D GDB_ONE_THREAD) {
-             put_packet(s, "OK");
-             break;
-         }
--        cpu =3D find_cpu(thread);
-+        cpu =3D gdb_get_cpu(s, pid, tid);
-         if (cpu =3D=3D NULL) {
-             put_packet(s, "E22");
-             break;
-         }
-         switch (type) {
-@@ -1308,12 +1422,16 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
-              put_packet(s, "E22");
-              break;
-         }
-         break;
-     case 'T':
--        thread =3D strtoull(p, (char **)&p, 16);
--        cpu =3D find_cpu(thread);
-+        thread_kind =3D read_thread_id(p, &p, &pid, &tid);
-+        if (thread_kind =3D=3D GDB_READ_THREAD_ERR) {
-+            put_packet(s, "E22");
-+            break;
-+        }
-+        cpu =3D gdb_get_cpu(s, pid, tid);
++static void create_processes(GDBState *s)
++{
++    object_child_foreach(object_get_root(), find_cpu_clusters, s);
++
++    if (!s->processes) {
++        /* No CPU cluster specified by the machine */
++        create_unique_process(s);
++    } else {
++        /* Sort by PID */
++        qsort(s->processes, s->process_num, sizeof(s->processes[0]), pid=
+_order);
++    }
++}
++
++static void cleanup_processes(GDBState *s)
++{
++    g_free(s->processes);
++    s->process_num =3D 0;
++    s->processes =3D NULL;
++}
++
+ int gdbserver_start(const char *device)
+ {
+     trace_gdbstub_op_start(device);
 =20
-         if (cpu !=3D NULL) {
-             put_packet(s, "OK");
-         } else {
-             put_packet(s, "E22");
+     GDBState *s;
+@@ -2058,15 +2141,19 @@ int gdbserver_start(const char *device)
+                                    NULL, &error_abort);
+         monitor_init(mon_chr, 0);
+     } else {
+         qemu_chr_fe_deinit(&s->chr, true);
+         mon_chr =3D s->mon_chr;
++        cleanup_processes(s);
+         memset(s, 0, sizeof(GDBState));
+         s->mon_chr =3D mon_chr;
+     }
+     s->c_cpu =3D first_cpu;
+     s->g_cpu =3D first_cpu;
++
++    create_processes(s);
++
+     if (chr) {
+         qemu_chr_fe_init(&s->chr, chr, &error_abort);
+         qemu_chr_fe_set_handlers(&s->chr, gdb_chr_can_receive, gdb_chr_r=
+eceive,
+                                  gdb_chr_event, NULL, NULL, NULL, true);
+     }
 --=20
 2.19.1
