@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gQGD5-0003kz-S2
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:29:51 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gQGDA-0003c1-Qg
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:29:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gQG7s-0008Kl-UQ
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:24:26 -0500
-Date: Fri, 23 Nov 2018 16:24:15 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181123182415.GP18284@habkost.net>
-References: <20181123091729.29921-1-luc.michel@greensocs.com>
-	<20181123091729.29921-2-luc.michel@greensocs.com>
-	<20181123181059.GN18284@habkost.net>
-	<CAFEAcA_8jJz5dE7XP4R=LjEC5WzP3jzutg=YqiYjJVwZZz+jvQ@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gQG6U-00062O-AW
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:23:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37982)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gQG6T-00060C-Ty
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:22:58 -0500
+References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
+	<20181122072028.22819-4-xiaoguangrong@tencent.com>
+	<20181123181717.GH2373@work-vm>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ec42ec4b-652d-807e-2d88-94a2d52e9cec@redhat.com>
+Date: Fri, 23 Nov 2018 19:22:44 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_8jJz5dE7XP4R=LjEC5WzP3jzutg=YqiYjJVwZZz+jvQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
+In-Reply-To: <20181123181717.GH2373@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] migration: use threaded workqueue
+ for compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,71 +30,390 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Luc Michel <luc.michel@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, guangrong.xiao@gmail.com
+Cc: mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Fri, Nov 23, 2018 at 06:14:28PM +0000, Peter Maydell wrote:
-> On Fri, 23 Nov 2018 at 18:11, Eduardo Habkost <ehabkost@redhat.com> wro=
-te:
-> > On Fri, Nov 23, 2018 at 10:17:14AM +0100, Luc Michel wrote:
-> > > This commit adds the cpu-cluster type. It aims at gathering CPUs fr=
-om
-> > > the same cluster in a machine.
-> > >
-> > > For now it only has a `cluster-id` property.
-> > >
-> > > Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-> > > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> > > Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > > Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > > Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> > [...]
-> > > +static void cpu_cluster_init(Object *obj)
-> > > +{
-> > > +    static uint32_t cluster_id_auto_increment;
-> > > +    CPUClusterState *cluster =3D CPU_CLUSTER(obj);
-> > > +
-> > > +    cluster->cluster_id =3D cluster_id_auto_increment++;
-> >
-> > I see that you implemented this after a suggestion from Philippe,
-> > but I'm worried about this kind of side-effect on object/device
-> > code.  I'm afraid this will bite us back in the future.  We were
-> > bitten by problems caused by automatic cpu_index assignment on
-> > CPU instance_init, and we took a while to fix that.
-> >
-> > If you really want to do this and assign cluster_id
-> > automatically, please do it on realize, where it won't have
-> > unexpected side-effects after a simple `qom-list-properties` QMP
-> > command.
-> >
-> > I would also add a huge warning above the cluster_id field
-> > declaration, mentioning that the field is not supposed to be used
-> > for anything except debugging.  I think there's a large risk of
-> > people trying to reuse the field incorrectly, just like cpu_index
-> > was reused for multiple (conflicting) purposes in the past.
->=20
-> One thing I would like to do with this new "cpu cluster"
-> concept is to use it to handle a problem we have at the
-> moment with TCG, where we assume all CPUs have the same
-> view of physical memory (and so if CPU A executes from physical
-> address X it can share translated code with CPU B executing
-> from physical address X). The idea is that we should include
-> the CPU cluster number in the TCG hash key that we use to
-> look up cached translation blocks, so that only CPUs in
-> the same cluster (assumed to have the same view of memory
-> and to be identical) share TBs.
->=20
-> If we don't have a unique integer key for the cluster, what
-> should we use instead ?
+On 23/11/18 19:17, Dr. David Alan Gilbert wrote:
+> * guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
+>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+>>
+>> Adapt the compression code to the threaded workqueue
+>>
+>> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+>> ---
+>>  migration/ram.c | 308 ++++++++++++++++++++------------------------------------
+>>  1 file changed, 110 insertions(+), 198 deletions(-)
+>>
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index 7e7deec4d8..254c08f27b 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -57,6 +57,7 @@
+>>  #include "qemu/uuid.h"
+>>  #include "savevm.h"
+>>  #include "qemu/iov.h"
+>> +#include "qemu/threaded-workqueue.h"
+>>  
+>>  /***********************************************************/
+>>  /* ram save/restore */
+>> @@ -349,22 +350,6 @@ typedef struct PageSearchStatus PageSearchStatus;
+>>  
+>>  CompressionStats compression_counters;
+>>  
+>> -struct CompressParam {
+>> -    bool done;
+>> -    bool quit;
+>> -    bool zero_page;
+>> -    QEMUFile *file;
+>> -    QemuMutex mutex;
+>> -    QemuCond cond;
+>> -    RAMBlock *block;
+>> -    ram_addr_t offset;
+>> -
+>> -    /* internally used fields */
+>> -    z_stream stream;
+>> -    uint8_t *originbuf;
+>> -};
+>> -typedef struct CompressParam CompressParam;
+>> -
+>>  struct DecompressParam {
+>>      bool done;
+>>      bool quit;
+>> @@ -377,15 +362,6 @@ struct DecompressParam {
+>>  };
+>>  typedef struct DecompressParam DecompressParam;
+>>  
+>> -static CompressParam *comp_param;
+>> -static QemuThread *compress_threads;
+>> -/* comp_done_cond is used to wake up the migration thread when
+>> - * one of the compression threads has finished the compression.
+>> - * comp_done_lock is used to co-work with comp_done_cond.
+>> - */
+>> -static QemuMutex comp_done_lock;
+>> -static QemuCond comp_done_cond;
+>> -/* The empty QEMUFileOps will be used by file in CompressParam */
+>>  static const QEMUFileOps empty_ops = { };
+>>  
+>>  static QEMUFile *decomp_file;
+>> @@ -394,125 +370,6 @@ static QemuThread *decompress_threads;
+>>  static QemuMutex decomp_done_lock;
+>>  static QemuCond decomp_done_cond;
+>>  
+>> -static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
+>> -                                 ram_addr_t offset, uint8_t *source_buf);
+>> -
+>> -static void *do_data_compress(void *opaque)
+>> -{
+>> -    CompressParam *param = opaque;
+>> -    RAMBlock *block;
+>> -    ram_addr_t offset;
+>> -    bool zero_page;
+>> -
+>> -    qemu_mutex_lock(&param->mutex);
+>> -    while (!param->quit) {
+>> -        if (param->block) {
+>> -            block = param->block;
+>> -            offset = param->offset;
+>> -            param->block = NULL;
+>> -            qemu_mutex_unlock(&param->mutex);
+>> -
+>> -            zero_page = do_compress_ram_page(param->file, &param->stream,
+>> -                                             block, offset, param->originbuf);
+>> -
+>> -            qemu_mutex_lock(&comp_done_lock);
+>> -            param->done = true;
+>> -            param->zero_page = zero_page;
+>> -            qemu_cond_signal(&comp_done_cond);
+>> -            qemu_mutex_unlock(&comp_done_lock);
+>> -
+>> -            qemu_mutex_lock(&param->mutex);
+>> -        } else {
+>> -            qemu_cond_wait(&param->cond, &param->mutex);
+>> -        }
+>> -    }
+>> -    qemu_mutex_unlock(&param->mutex);
+>> -
+>> -    return NULL;
+>> -}
+>> -
+>> -static void compress_threads_save_cleanup(void)
+>> -{
+>> -    int i, thread_count;
+>> -
+>> -    if (!migrate_use_compression() || !comp_param) {
+>> -        return;
+>> -    }
+>> -
+>> -    thread_count = migrate_compress_threads();
+>> -    for (i = 0; i < thread_count; i++) {
+>> -        /*
+>> -         * we use it as a indicator which shows if the thread is
+>> -         * properly init'd or not
+>> -         */
+>> -        if (!comp_param[i].file) {
+>> -            break;
+>> -        }
+>> -
+>> -        qemu_mutex_lock(&comp_param[i].mutex);
+>> -        comp_param[i].quit = true;
+>> -        qemu_cond_signal(&comp_param[i].cond);
+>> -        qemu_mutex_unlock(&comp_param[i].mutex);
+>> -
+>> -        qemu_thread_join(compress_threads + i);
+>> -        qemu_mutex_destroy(&comp_param[i].mutex);
+>> -        qemu_cond_destroy(&comp_param[i].cond);
+>> -        deflateEnd(&comp_param[i].stream);
+>> -        g_free(comp_param[i].originbuf);
+>> -        qemu_fclose(comp_param[i].file);
+>> -        comp_param[i].file = NULL;
+>> -    }
+>> -    qemu_mutex_destroy(&comp_done_lock);
+>> -    qemu_cond_destroy(&comp_done_cond);
+>> -    g_free(compress_threads);
+>> -    g_free(comp_param);
+>> -    compress_threads = NULL;
+>> -    comp_param = NULL;
+>> -}
+>> -
+>> -static int compress_threads_save_setup(void)
+>> -{
+>> -    int i, thread_count;
+>> -
+>> -    if (!migrate_use_compression()) {
+>> -        return 0;
+>> -    }
+>> -    thread_count = migrate_compress_threads();
+>> -    compress_threads = g_new0(QemuThread, thread_count);
+>> -    comp_param = g_new0(CompressParam, thread_count);
+>> -    qemu_cond_init(&comp_done_cond);
+>> -    qemu_mutex_init(&comp_done_lock);
+>> -    for (i = 0; i < thread_count; i++) {
+>> -        comp_param[i].originbuf = g_try_malloc(TARGET_PAGE_SIZE);
+>> -        if (!comp_param[i].originbuf) {
+>> -            goto exit;
+>> -        }
+>> -
+>> -        if (deflateInit(&comp_param[i].stream,
+>> -                        migrate_compress_level()) != Z_OK) {
+>> -            g_free(comp_param[i].originbuf);
+>> -            goto exit;
+>> -        }
+>> -
+>> -        /* comp_param[i].file is just used as a dummy buffer to save data,
+>> -         * set its ops to empty.
+>> -         */
+>> -        comp_param[i].file = qemu_fopen_ops(NULL, &empty_ops);
+>> -        comp_param[i].done = true;
+>> -        comp_param[i].quit = false;
+>> -        qemu_mutex_init(&comp_param[i].mutex);
+>> -        qemu_cond_init(&comp_param[i].cond);
+>> -        qemu_thread_create(compress_threads + i, "compress",
+>> -                           do_data_compress, comp_param + i,
+>> -                           QEMU_THREAD_JOINABLE);
+>> -    }
+>> -    return 0;
+>> -
+>> -exit:
+>> -    compress_threads_save_cleanup();
+>> -    return -1;
+>> -}
+>> -
+>>  /* Multiple fd's */
+>>  
+>>  #define MULTIFD_MAGIC 0x11223344U
+>> @@ -1909,12 +1766,25 @@ exit:
+>>      return zero_page;
+>>  }
+>>  
+>> +struct CompressData {
+>> +    /* filled by migration thread.*/
+>> +    RAMBlock *block;
+>> +    ram_addr_t offset;
+>> +
+>> +    /* filled by compress thread. */
+>> +    QEMUFile *file;
+>> +    z_stream stream;
+>> +    uint8_t *originbuf;
+>> +    bool zero_page;
+>> +};
+>> +typedef struct CompressData CompressData;
+>> +
+>>  static void
+>> -update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
+>> +update_compress_thread_counts(CompressData *cd, int bytes_xmit)
+> 
+> Keep the const?
+>>  {
+>>      ram_counters.transferred += bytes_xmit;
+>>  
+>> -    if (param->zero_page) {
+>> +    if (cd->zero_page) {
+>>          ram_counters.duplicate++;
+>>          return;
+>>      }
+>> @@ -1924,81 +1794,123 @@ update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
+>>      compression_counters.pages++;
+>>  }
+>>  
+>> +static int compress_thread_data_init(void *request)
+>> +{
+>> +    CompressData *cd = request;
+>> +
+>> +    cd->originbuf = g_try_malloc(TARGET_PAGE_SIZE);
+>> +    if (!cd->originbuf) {
+>> +        return -1;
+>> +    }
+>> +
+>> +    if (deflateInit(&cd->stream, migrate_compress_level()) != Z_OK) {
+>> +        g_free(cd->originbuf);
+>> +        return -1;
+>> +    }
+> 
+> Please print errors if you fail in any case so we can easily tell what
+> happened.
+> 
+>> +    cd->file = qemu_fopen_ops(NULL, &empty_ops);
+>> +    return 0;
+>> +}
+>> +
+>> +static void compress_thread_data_fini(void *request)
+>> +{
+>> +    CompressData *cd = request;
+>> +
+>> +    qemu_fclose(cd->file);
+>> +    deflateEnd(&cd->stream);
+>> +    g_free(cd->originbuf);
+>> +}
+>> +
+>> +static void compress_thread_data_handler(void *request)
+>> +{
+>> +    CompressData *cd = request;
+>> +
+>> +    /*
+>> +     * if compression fails, it will be indicated by
+>> +     * migrate_get_current()->to_dst_file.
+>> +     */
+>> +    cd->zero_page = do_compress_ram_page(cd->file, &cd->stream, cd->block,
+>> +                                         cd->offset, cd->originbuf);
+>> +}
+>> +
+>> +static void compress_thread_data_done(void *request)
+>> +{
+>> +    CompressData *cd = request;
+>> +    RAMState *rs = ram_state;
+>> +    int bytes_xmit;
+>> +
+>> +    bytes_xmit = qemu_put_qemu_file(rs->f, cd->file);
+>> +    update_compress_thread_counts(cd, bytes_xmit);
+>> +}
+>> +
+>> +static const ThreadedWorkqueueOps compress_ops = {
+>> +    .thread_request_init = compress_thread_data_init,
+>> +    .thread_request_uninit = compress_thread_data_fini,
+>> +    .thread_request_handler = compress_thread_data_handler,
+>> +    .thread_request_done = compress_thread_data_done,
+>> +    .request_size = sizeof(CompressData),
+>> +};
+>> +
+>> +static Threads *compress_threads;
+>> +
+>>  static bool save_page_use_compression(RAMState *rs);
+>>  
+>>  static void flush_compressed_data(RAMState *rs)
+>>  {
+>> -    int idx, len, thread_count;
+>> -
+>>      if (!save_page_use_compression(rs)) {
+>>          return;
+>>      }
+>> -    thread_count = migrate_compress_threads();
+>>  
+>> -    qemu_mutex_lock(&comp_done_lock);
+>> -    for (idx = 0; idx < thread_count; idx++) {
+>> -        while (!comp_param[idx].done) {
+>> -            qemu_cond_wait(&comp_done_cond, &comp_done_lock);
+>> -        }
+>> -    }
+>> -    qemu_mutex_unlock(&comp_done_lock);
+>> +    threaded_workqueue_wait_for_requests(compress_threads);
+>> +}
+>>  
+>> -    for (idx = 0; idx < thread_count; idx++) {
+>> -        qemu_mutex_lock(&comp_param[idx].mutex);
+>> -        if (!comp_param[idx].quit) {
+>> -            len = qemu_put_qemu_file(rs->f, comp_param[idx].file);
+>> -            /*
+>> -             * it's safe to fetch zero_page without holding comp_done_lock
+>> -             * as there is no further request submitted to the thread,
+>> -             * i.e, the thread should be waiting for a request at this point.
+>> -             */
+>> -            update_compress_thread_counts(&comp_param[idx], len);
+>> -        }
+>> -        qemu_mutex_unlock(&comp_param[idx].mutex);
+>> +static void compress_threads_save_cleanup(void)
+>> +{
+>> +    if (!compress_threads) {
+>> +        return;
+>>      }
+>> +
+>> +    threaded_workqueue_destroy(compress_threads);
+>> +    compress_threads = NULL;
+>>  }
+>>  
+>> -static inline void set_compress_params(CompressParam *param, RAMBlock *block,
+>> -                                       ram_addr_t offset)
+>> +static int compress_threads_save_setup(void)
+>>  {
+>> -    param->block = block;
+>> -    param->offset = offset;
+>> +    if (!migrate_use_compression()) {
+>> +        return 0;
+>> +    }
+>> +
+>> +    compress_threads = threaded_workqueue_create("compress",
+>> +                                migrate_compress_threads(),
+>> +                                DEFAULT_THREAD_REQUEST_NR, &compress_ops);
+>> +    return compress_threads ? 0 : -1;
+>>  }
+>>  
+>>  static int compress_page_with_multi_thread(RAMState *rs, RAMBlock *block,
+>>                                             ram_addr_t offset)
+>>  {
+>> -    int idx, thread_count, bytes_xmit = -1, pages = -1;
+>> +    CompressData *cd;
+>>      bool wait = migrate_compress_wait_thread();
+>>  
+>> -    thread_count = migrate_compress_threads();
+>> -    qemu_mutex_lock(&comp_done_lock);
+>>  retry:
+>> -    for (idx = 0; idx < thread_count; idx++) {
+>> -        if (comp_param[idx].done) {
+>> -            comp_param[idx].done = false;
+>> -            bytes_xmit = qemu_put_qemu_file(rs->f, comp_param[idx].file);
+>> -            qemu_mutex_lock(&comp_param[idx].mutex);
+>> -            set_compress_params(&comp_param[idx], block, offset);
+>> -            qemu_cond_signal(&comp_param[idx].cond);
+>> -            qemu_mutex_unlock(&comp_param[idx].mutex);
+>> -            pages = 1;
+>> -            update_compress_thread_counts(&comp_param[idx], bytes_xmit);
+>> -            break;
+>> +    cd = threaded_workqueue_get_request(compress_threads);
+>> +    if (!cd) {
+>> +        /*
+>> +         * wait for the free thread if the user specifies
+>> +         * 'compress-wait-thread', otherwise we will post
+>> +         *  the page out in the main thread as normal page.
+>> +         */
+>> +        if (wait) {
+>> +            cpu_relax();
+>> +            goto retry;
+> 
+> Is there nothing better we can use to wait without eating CPU time?
 
-This sounds like a reasonable use of cluster_id as implemented in
-this patch.  The ID would be only used internally and not exposed
-to the outside, right?
+There is a mechanism to wait without eating CPU time in the data
+structure, but it makes sense to busy wait.  There are 4 threads in the
+workqueue, so you have to compare 1/4th of the time spent compressing a
+page, with the trip into the kernel to wake you up.  You're adding 20%
+CPU usage, but I'm not surprised it's worthwhile.
 
-I'm more worried about cases where we could end up exposing the
-ID in an external interface (either to guests, or through QMP or
-the command-line).  This happened to cpu_index and we took a long
-time to fix the mess.
-
---=20
-Eduardo
+Paolo
