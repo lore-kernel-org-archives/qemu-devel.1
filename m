@@ -1,16 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gQC5M-00039w-EV
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:05:33 -0500
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gQC5M-00039t-DO
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:05:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gQC5J-0007Lq-Eh
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gQC5J-0007Lx-Dh
 	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:05:32 -0500
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Fri, 23 Nov 2018 17:05:20 +0300
-Message-Id: <1542981922-316191-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1542981922-316191-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1542981922-316191-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 3/5] iotests: allow resume_drive by node name
+Date: Fri, 23 Nov 2018 17:05:17 +0300
+Message-Id: <1542981922-316191-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 0/5] Discrad blocks during block-stream
+ operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,53 +21,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, dgilbert@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Dear all,
 
-After node graph changes, we may not be able to resume_drive by device
-name (backing files are not recursively searched). So, lets allow to
-resume by node-name. Set constant name for breakpoints, to avoid
-introducing extra parameters.
+The given feature discards blocks with copy-on-read operation while the
+streaming process runs. Adding the 'discard' argument to the QMP block-stream
+command allows dropping a block in the backing chain after it has been copied
+to the active layer. That will elude the block duplication in the intermediate
+backing file. It saves the disk space while external snapshots are being
+merged.
+The method involves the filter insertion above the active layer to allow write
+operation in the backing chain. The method is similar to that in the 'commit
+active' command (mirror.c).
+The permission to write into an inactive layer can not be obtained due to the
+existing child permission mechanism. There is a commented up hack in the
+callback function bdrv_stream_top_pwritev() in block/stream.c that redirects
+write operations below the filter node. Being uncommented, it enables writing
+into the inactive layer and passing all the iotests in the 030 file. Otherwise,
+no WRITE permission is granted after the filter insertion above the target node.
+Any suggestions to resolve that issue will be appreciated.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- tests/qemu-iotests/iotests.py | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+v3:
+The series version number and the given changelog were added. 'Signed-off-by'
+subscription of the patch [PATCH 3/5] amended as Peter Krempa requested.
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 27bb2b6..78a96f0 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -407,11 +407,11 @@ class VM(qtest.QEMUQtestMachine):
-             self.pause_drive(drive, "write_aio")
-             return
-         self.qmp('human-monitor-command',
--                    command_line='qemu-io %s "break %s bp_%s"' % (drive, event, drive))
-+                    command_line='qemu-io %s "break %s bp_0"' % (drive, event))
- 
-     def resume_drive(self, drive):
-         self.qmp('human-monitor-command',
--                    command_line='qemu-io %s "remove_break bp_%s"' % (drive, drive))
-+                    command_line='qemu-io %s "remove_break bp_0"' % (drive))
- 
-     def hmp_qemu_io(self, drive, cmd):
-         '''Write to a given drive using an HMP command'''
-@@ -535,13 +535,14 @@ class QMPTestCase(unittest.TestCase):
-         self.assertEqual(self.vm.flatten_qmp_object(json.loads(json_filename[5:])),
-                          self.vm.flatten_qmp_object(reference))
- 
--    def cancel_and_wait(self, drive='drive0', force=False, resume=False):
-+    def cancel_and_wait(self, drive='drive0', force=False,
-+                        resume=False,resume_node=None):
-         '''Cancel a block job and wait for it to finish, returning the event'''
-         result = self.vm.qmp('block-job-cancel', device=drive, force=force)
-         self.assert_qmp(result, 'return', {})
- 
-         if resume:
--            self.vm.resume_drive(drive)
-+            self.vm.resume_drive(resume_node or drive)
- 
-         cancelled = False
-         result = None
+v2 was "[PATCH 0/5] Discrad blocks during block-stream operation"
+The suggestions of Dr. David Alan Gilbert and Alberto Garcia after their first
+review have been applied.
+The abort() callback function have been added to the filter driver and some
+refactoring work done.
+The test suite for the 'block-stream' command with 'discard' option was added
+to the 030 file of iotests.
+
+v1 was "[PATCH 0/2] Discrad blocks during block-stream operation"
+The initial implementation of the feature.
+
+Sincerely,
+
+Andrey Shinkevich (5):
+  Discard blocks while copy-on-read
+  The discard flag for block stream operation
+  iotests: allow resume_drive by node name
+  iotests: prepare 030 for graph change
+  iotests: 030 with block-stream discard
+
+ block/stream.c                | 429 ++++++++++++++++++++++++++++++++++++++++--
+ blockdev.c                    |   8 +-
+ hmp-commands.hx               |   4 +-
+ hmp.c                         |   4 +-
+ include/block/block_int.h     |   2 +-
+ qapi/block-core.json          |   5 +-
+ tests/qemu-iotests/030        | 163 +++++++++++-----
+ tests/qemu-iotests/030.out    |   4 +-
+ tests/qemu-iotests/iotests.py |   9 +-
+ 9 files changed, 558 insertions(+), 70 deletions(-)
+
 -- 
 1.8.3.1
