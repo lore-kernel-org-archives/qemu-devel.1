@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gQCig-0007yY-T5
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:12 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gQCih-0007yd-4z
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gQCif-0003AS-Oc
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:10 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38779)
+	(envelope-from <richard.henderson@linaro.org>) id 1gQCif-0003Ab-Q7
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:11 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38777)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gQCif-00038g-HQ
+	id 1gQCif-000384-II
 	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:09 -0500
-Received: by mail-wm1-x343.google.com with SMTP id k198so12261561wmd.3
+Received: by mail-wm1-x341.google.com with SMTP id k198so12261530wmd.3
 	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 06:46:08 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 23 Nov 2018 15:45:28 +0100
-Message-Id: <20181123144558.5048-8-richard.henderson@linaro.org>
+Date: Fri, 23 Nov 2018 15:45:27 +0100
+Message-Id: <20181123144558.5048-7-richard.henderson@linaro.org>
 In-Reply-To: <20181123144558.5048-1-richard.henderson@linaro.org>
 References: <20181123144558.5048-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH for-4.0 v2 07/37] tcg/i386: Change
- TCG_REG_L[01] to not overlap function arguments
+Subject: [Qemu-devel] [PATCH for-4.0 v2 06/37] tcg/i386: Return a base
+ register from tcg_out_tlb_load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +30,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair.Francis@wdc.com
 
-We will shortly be forcing qemu_ld/st arguments into registers
-that match the function call abi of the host, which means that
-the temps must be elsewhere.
+We will shortly be asking the hot path not to assume TCG_REG_L1
+for the host base address.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/i386/tcg-target.inc.c | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
+ tcg/i386/tcg-target.inc.c | 56 ++++++++++++++++++++-------------------
+ 1 file changed, 29 insertions(+), 27 deletions(-)
 
 diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 3234a8d8bf..07df4b2b12 100644
+index 8aef66e430..3234a8d8bf 100644
 --- a/tcg/i386/tcg-target.inc.c
 +++ b/tcg/i386/tcg-target.inc.c
-@@ -121,12 +121,16 @@ static const int tcg_target_call_oarg_regs[] = {
- #define TCG_CT_CONST_I32 0x400
- #define TCG_CT_CONST_WSZ 0x800
+@@ -1614,9 +1614,9 @@ static void * const qemu_st_helpers[16] = {
  
--/* Registers used with L constraint, which are the first argument
--   registers on x86_64, and two random call clobbered registers on
--   i386. */
-+/* Registers used with L constraint, which are two random
-+ * call clobbered registers.  These should be free.
-+ */
- #if TCG_TARGET_REG_BITS == 64
--# define TCG_REG_L0 tcg_target_call_iarg_regs[0]
--# define TCG_REG_L1 tcg_target_call_iarg_regs[1]
-+# define TCG_REG_L0   TCG_REG_RAX
-+# ifdef _WIN64
-+#  define TCG_REG_L1  TCG_REG_R10
-+# else
-+#  define TCG_REG_L1  TCG_REG_RDI
-+# endif
- #else
- # define TCG_REG_L0 TCG_REG_EAX
- # define TCG_REG_L1 TCG_REG_EDX
-@@ -1628,6 +1632,7 @@ static TCGReg tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-     unsigned a_mask = (1 << a_bits) - 1;
-     unsigned s_mask = (1 << s_bits) - 1;
-     target_ulong tlb_mask;
-+    TCGReg base;
+    First argument register is clobbered.  */
  
-     if (TCG_TARGET_REG_BITS == 64) {
-         if (TARGET_LONG_BITS == 64) {
-@@ -1674,7 +1679,12 @@ static TCGReg tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-        before the fastpath ADDQ below.  For 64-bit guest and x32 host, MOVQ
-        copies the entire guest address for the slow path, while truncation
-        for the 32-bit host happens with the fastpath ADDL below.  */
--    tcg_out_mov(s, ttype, r1, addrlo);
-+    if (TCG_TARGET_REG_BITS == 64) {
-+        base = tcg_target_call_iarg_regs[1];
-+    } else {
-+        base = r1;
-+    }
-+    tcg_out_mov(s, ttype, base, addrlo);
- 
-     /* jne slow_path */
-     tcg_out_opc(s, OPC_JCC_long + JCC_JNE, 0, 0, 0);
-@@ -1693,11 +1703,11 @@ static TCGReg tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
- 
-     /* TLB Hit.  */
- 
--    /* add addend(r0), r1 */
--    tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r1, r0,
-+    /* add addend(r0), base */
-+    tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, base, r0,
+-static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+-                                    int mem_index, TCGMemOp opc,
+-                                    tcg_insn_unit **label_ptr, int which)
++static TCGReg tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
++                               int mem_index, TCGMemOp opc,
++                               tcg_insn_unit **label_ptr, int which)
+ {
+     const TCGReg r0 = TCG_REG_L0;
+     const TCGReg r1 = TCG_REG_L1;
+@@ -1696,6 +1696,8 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+     /* add addend(r0), r1 */
+     tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r1, r0,
                           offsetof(CPUTLBEntry, addend) - which);
- 
--    return r1;
-+    return base;
++
++    return r1;
  }
  
  /*
+@@ -2001,10 +2003,6 @@ static void tcg_out_qemu_ld(TCGContext *s, const TCGArg *args, bool is64)
+     TCGReg addrhi __attribute__((unused));
+     TCGMemOpIdx oi;
+     TCGMemOp opc;
+-#if defined(CONFIG_SOFTMMU)
+-    int mem_index;
+-    tcg_insn_unit *label_ptr[2];
+-#endif
+ 
+     datalo = *args++;
+     datahi = (TCG_TARGET_REG_BITS == 32 && is64 ? *args++ : 0);
+@@ -2014,17 +2012,21 @@ static void tcg_out_qemu_ld(TCGContext *s, const TCGArg *args, bool is64)
+     opc = get_memop(oi);
+ 
+ #if defined(CONFIG_SOFTMMU)
+-    mem_index = get_mmuidx(oi);
++    {
++        int mem_index = get_mmuidx(oi);
++        tcg_insn_unit *label_ptr[2];
++        TCGReg base;
+ 
+-    tcg_out_tlb_load(s, addrlo, addrhi, mem_index, opc,
+-                     label_ptr, offsetof(CPUTLBEntry, addr_read));
++        base = tcg_out_tlb_load(s, addrlo, addrhi, mem_index, opc,
++                                label_ptr, offsetof(CPUTLBEntry, addr_read));
+ 
+-    /* TLB Hit.  */
+-    tcg_out_qemu_ld_direct(s, datalo, datahi, TCG_REG_L1, -1, 0, 0, opc);
++        /* TLB Hit.  */
++        tcg_out_qemu_ld_direct(s, datalo, datahi, base, -1, 0, 0, opc);
+ 
+-    /* Record the current context of a load into ldst label */
+-    add_qemu_ldst_label(s, true, oi, datalo, datahi, addrlo, addrhi,
+-                        s->code_ptr, label_ptr);
++        /* Record the current context of a load into ldst label */
++        add_qemu_ldst_label(s, true, oi, datalo, datahi, addrlo, addrhi,
++                            s->code_ptr, label_ptr);
++    }
+ #else
+     {
+         int32_t offset = guest_base;
+@@ -2141,10 +2143,6 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is64)
+     TCGReg addrhi __attribute__((unused));
+     TCGMemOpIdx oi;
+     TCGMemOp opc;
+-#if defined(CONFIG_SOFTMMU)
+-    int mem_index;
+-    tcg_insn_unit *label_ptr[2];
+-#endif
+ 
+     datalo = *args++;
+     datahi = (TCG_TARGET_REG_BITS == 32 && is64 ? *args++ : 0);
+@@ -2154,17 +2152,21 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is64)
+     opc = get_memop(oi);
+ 
+ #if defined(CONFIG_SOFTMMU)
+-    mem_index = get_mmuidx(oi);
++    {
++        int mem_index = get_mmuidx(oi);
++        tcg_insn_unit *label_ptr[2];
++        TCGReg base;
+ 
+-    tcg_out_tlb_load(s, addrlo, addrhi, mem_index, opc,
+-                     label_ptr, offsetof(CPUTLBEntry, addr_write));
++        base = tcg_out_tlb_load(s, addrlo, addrhi, mem_index, opc,
++                                label_ptr, offsetof(CPUTLBEntry, addr_write));
+ 
+-    /* TLB Hit.  */
+-    tcg_out_qemu_st_direct(s, datalo, datahi, TCG_REG_L1, 0, 0, opc);
++        /* TLB Hit.  */
++        tcg_out_qemu_st_direct(s, datalo, datahi, base, 0, 0, opc);
+ 
+-    /* Record the current context of a store into ldst label */
+-    add_qemu_ldst_label(s, false, oi, datalo, datahi, addrlo, addrhi,
+-                        s->code_ptr, label_ptr);
++        /* Record the current context of a store into ldst label */
++        add_qemu_ldst_label(s, false, oi, datalo, datahi, addrlo, addrhi,
++                            s->code_ptr, label_ptr);
++    }
+ #else
+     {
+         int32_t offset = guest_base;
 -- 
 2.17.2
