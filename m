@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gQGCy-0003d4-L4
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:29:44 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gQGD5-0003kz-S2
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:29:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gQG8r-0001jz-RZ
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:25:26 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 23 Nov 2018 18:25:18 +0000
-Message-ID: <211feec7-1aca-c523-076a-5ba9de2be0c2@virtuozzo.com>
-References: <20181031113418.29796-1-anton.nefedov@virtuozzo.com>
-	<20181031113418.29796-8-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20181031113418.29796-8-anton.nefedov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5F04EFA689B40447B993B3291B02F790@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <ehabkost@redhat.com>) id 1gQG7s-0008Kl-UQ
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:24:26 -0500
+Date: Fri, 23 Nov 2018 16:24:15 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181123182415.GP18284@habkost.net>
+References: <20181123091729.29921-1-luc.michel@greensocs.com>
+	<20181123091729.29921-2-luc.michel@greensocs.com>
+	<20181123181059.GN18284@habkost.net>
+	<CAFEAcA_8jJz5dE7XP4R=LjEC5WzP3jzutg=YqiYjJVwZZz+jvQ@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 7/9] scsi: account unmap operations
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_8jJz5dE7XP4R=LjEC5WzP3jzutg=YqiYjJVwZZz+jvQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +26,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Luc Michel <luc.michel@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
 
-MzEuMTAuMjAxOCAxNDozNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gU2lnbmVkLW9mZi1ieTog
-QW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2aXJ0dW96em8uY29tPg0KDQoNClJldmlld2Vk
-LWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5j
-b20+DQoNCmJ1dCBiZSBjYXJlZnVsOiBvbiBnaXQgYW0sIHRoZSBjaHVuayBhYm91dCByZWFkLW9u
-bHkgY2FzZSBnb2VzIGludG8gc2NzaV9kaXNrX2VtdWxhdGVfd3JpdGVfc2FtZSBpbnN0ZWFkIG9m
-IHNjc2lfZGlza19lbXVsYXRlX3VubWFwIChhdCBsZWFzdCBmb3IgbWUsIHdpdGggbGF0ZXN0IG1h
-c3RlciBicmFuY2ggYW5kIGdpdCAyLjE4DQoNCj4gLS0tDQo+ICAgaHcvc2NzaS9zY3NpLWRpc2su
-YyB8IDEyICsrKysrKysrKysrLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxMSBpbnNlcnRpb25zKCsp
-LCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvaHcvc2NzaS9zY3NpLWRpc2suYyBi
-L2h3L3Njc2kvc2NzaS1kaXNrLmMNCj4gaW5kZXggZTEzMjUwNDkxMy4uZGVlNzFmOWRkZSAxMDA2
-NDQNCj4gLS0tIGEvaHcvc2NzaS9zY3NpLWRpc2suYw0KPiArKysgYi9ody9zY3NpL3Njc2ktZGlz
-ay5jDQo+IEBAIC0xNjYzLDEwICsxNjYzLDE2IEBAIHN0YXRpYyB2b2lkIHNjc2lfdW5tYXBfY29t
-cGxldGVfbm9pbyhVbm1hcENCRGF0YSAqZGF0YSwgaW50IHJldCkNCj4gICAgICAgICAgIHItPnNl
-Y3RvciA9IGxkcV9iZV9wKCZkYXRhLT5pbmJ1ZlswXSk7DQo+ICAgICAgICAgICByLT5zZWN0b3Jf
-Y291bnQgPSBsZGxfYmVfcCgmZGF0YS0+aW5idWZbOF0pICYgMHhmZmZmZmZmZlVMTDsNCj4gICAg
-ICAgICAgIGlmICghY2hlY2tfbGJhX3JhbmdlKHMsIHItPnNlY3Rvciwgci0+c2VjdG9yX2NvdW50
-KSkgew0KPiArICAgICAgICAgICAgYmxvY2tfYWNjdF9pbnZhbGlkKGJsa19nZXRfc3RhdHMocy0+
-cWRldi5jb25mLmJsayksDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQkxPQ0tf
-QUNDVF9VTk1BUCk7DQo+ICAgICAgICAgICAgICAgc2NzaV9jaGVja19jb25kaXRpb24ociwgU0VO
-U0VfQ09ERShMQkFfT1VUX09GX1JBTkdFKSk7DQo+ICAgICAgICAgICAgICAgZ290byBkb25lOw0K
-PiAgICAgICAgICAgfQ0KPiAgIA0KPiArICAgICAgICBibG9ja19hY2N0X3N0YXJ0KGJsa19nZXRf
-c3RhdHMocy0+cWRldi5jb25mLmJsayksICZyLT5hY2N0LA0KPiArICAgICAgICAgICAgICAgICAg
-ICAgICAgIHItPnNlY3Rvcl9jb3VudCAqIHMtPnFkZXYuYmxvY2tzaXplLA0KPiArICAgICAgICAg
-ICAgICAgICAgICAgICAgIEJMT0NLX0FDQ1RfVU5NQVApOw0KPiArDQo+ICAgICAgICAgICByLT5y
-ZXEuYWlvY2IgPSBibGtfYWlvX3BkaXNjYXJkKHMtPnFkZXYuY29uZi5ibGssDQo+ICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHItPnNlY3RvciAqIHMtPnFkZXYuYmxv
-Y2tzaXplLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByLT5z
-ZWN0b3JfY291bnQgKiBzLT5xZGV2LmJsb2Nrc2l6ZSwNCj4gQEAgLTE2OTMsMTAgKzE2OTksMTEg
-QEAgc3RhdGljIHZvaWQgc2NzaV91bm1hcF9jb21wbGV0ZSh2b2lkICpvcGFxdWUsIGludCByZXQp
-DQo+ICAgICAgIHItPnJlcS5haW9jYiA9IE5VTEw7DQo+ICAgDQo+ICAgICAgIGFpb19jb250ZXh0
-X2FjcXVpcmUoYmxrX2dldF9haW9fY29udGV4dChzLT5xZGV2LmNvbmYuYmxrKSk7DQo+IC0gICAg
-aWYgKHNjc2lfZGlza19yZXFfY2hlY2tfZXJyb3IociwgcmV0LCBmYWxzZSkpIHsNCj4gKyAgICBp
-ZiAoc2NzaV9kaXNrX3JlcV9jaGVja19lcnJvcihyLCByZXQsIHRydWUpKSB7DQo+ICAgICAgICAg
-ICBzY3NpX3JlcV91bnJlZigmci0+cmVxKTsNCj4gICAgICAgICAgIGdfZnJlZShkYXRhKTsNCj4g
-ICAgICAgfSBlbHNlIHsNCj4gKyAgICAgICAgYmxvY2tfYWNjdF9kb25lKGJsa19nZXRfc3RhdHMo
-cy0+cWRldi5jb25mLmJsayksICZyLT5hY2N0KTsNCj4gICAgICAgICAgIHNjc2lfdW5tYXBfY29t
-cGxldGVfbm9pbyhkYXRhLCByZXQpOw0KPiAgICAgICB9DQo+ICAgICAgIGFpb19jb250ZXh0X3Jl
-bGVhc2UoYmxrX2dldF9haW9fY29udGV4dChzLT5xZGV2LmNvbmYuYmxrKSk7DQo+IEBAIC0xNzI4
-LDYgKzE3MzUsNyBAQCBzdGF0aWMgdm9pZCBzY3NpX2Rpc2tfZW11bGF0ZV91bm1hcChTQ1NJRGlz
-a1JlcSAqciwgdWludDhfdCAqaW5idWYpDQo+ICAgICAgIH0NCj4gICANCj4gICAgICAgaWYgKGJs
-a19pc19yZWFkX29ubHkocy0+cWRldi5jb25mLmJsaykpIHsNCj4gKyAgICAgICAgYmxvY2tfYWNj
-dF9pbnZhbGlkKGJsa19nZXRfc3RhdHMocy0+cWRldi5jb25mLmJsayksIEJMT0NLX0FDQ1RfVU5N
-QVApOw0KDQoNCnRoaXMgb25lIGdvZXMgdG8gc2NzaV9kaXNrX2VtdWxhdGVfd3JpdGVfc2FtZSBv
-biBhdXRvbWF0aWMgcGF0Y2ggYXBwbHkuDQoNCg0KPiAgICAgICAgICAgc2NzaV9jaGVja19jb25k
-aXRpb24ociwgU0VOU0VfQ09ERShXUklURV9QUk9URUNURUQpKTsNCj4gICAgICAgICAgIHJldHVy
-bjsNCj4gICAgICAgfQ0KPiBAQCAtMTc0MywxMCArMTc1MSwxMiBAQCBzdGF0aWMgdm9pZCBzY3Np
-X2Rpc2tfZW11bGF0ZV91bm1hcChTQ1NJRGlza1JlcSAqciwgdWludDhfdCAqaW5idWYpDQo+ICAg
-ICAgIHJldHVybjsNCj4gICANCj4gICBpbnZhbGlkX3BhcmFtX2xlbjoNCj4gKyAgICBibG9ja19h
-Y2N0X2ludmFsaWQoYmxrX2dldF9zdGF0cyhzLT5xZGV2LmNvbmYuYmxrKSwgQkxPQ0tfQUNDVF9V
-Tk1BUCk7DQo+ICAgICAgIHNjc2lfY2hlY2tfY29uZGl0aW9uKHIsIFNFTlNFX0NPREUoSU5WQUxJ
-RF9QQVJBTV9MRU4pKTsNCj4gICAgICAgcmV0dXJuOw0KPiAgIA0KPiAgIGludmFsaWRfZmllbGQ6
-DQo+ICsgICAgYmxvY2tfYWNjdF9pbnZhbGlkKGJsa19nZXRfc3RhdHMocy0+cWRldi5jb25mLmJs
-ayksIEJMT0NLX0FDQ1RfVU5NQVApOw0KPiAgICAgICBzY3NpX2NoZWNrX2NvbmRpdGlvbihyLCBT
-RU5TRV9DT0RFKElOVkFMSURfRklFTEQpKTsNCj4gICB9DQo+ICAgDQo+IA0KDQoNCi0tIA0KQmVz
-dCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On Fri, Nov 23, 2018 at 06:14:28PM +0000, Peter Maydell wrote:
+> On Fri, 23 Nov 2018 at 18:11, Eduardo Habkost <ehabkost@redhat.com> wro=
+te:
+> > On Fri, Nov 23, 2018 at 10:17:14AM +0100, Luc Michel wrote:
+> > > This commit adds the cpu-cluster type. It aims at gathering CPUs fr=
+om
+> > > the same cluster in a machine.
+> > >
+> > > For now it only has a `cluster-id` property.
+> > >
+> > > Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> > > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> > > Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > > Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > > Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > [...]
+> > > +static void cpu_cluster_init(Object *obj)
+> > > +{
+> > > +    static uint32_t cluster_id_auto_increment;
+> > > +    CPUClusterState *cluster =3D CPU_CLUSTER(obj);
+> > > +
+> > > +    cluster->cluster_id =3D cluster_id_auto_increment++;
+> >
+> > I see that you implemented this after a suggestion from Philippe,
+> > but I'm worried about this kind of side-effect on object/device
+> > code.  I'm afraid this will bite us back in the future.  We were
+> > bitten by problems caused by automatic cpu_index assignment on
+> > CPU instance_init, and we took a while to fix that.
+> >
+> > If you really want to do this and assign cluster_id
+> > automatically, please do it on realize, where it won't have
+> > unexpected side-effects after a simple `qom-list-properties` QMP
+> > command.
+> >
+> > I would also add a huge warning above the cluster_id field
+> > declaration, mentioning that the field is not supposed to be used
+> > for anything except debugging.  I think there's a large risk of
+> > people trying to reuse the field incorrectly, just like cpu_index
+> > was reused for multiple (conflicting) purposes in the past.
+>=20
+> One thing I would like to do with this new "cpu cluster"
+> concept is to use it to handle a problem we have at the
+> moment with TCG, where we assume all CPUs have the same
+> view of physical memory (and so if CPU A executes from physical
+> address X it can share translated code with CPU B executing
+> from physical address X). The idea is that we should include
+> the CPU cluster number in the TCG hash key that we use to
+> look up cached translation blocks, so that only CPUs in
+> the same cluster (assumed to have the same view of memory
+> and to be identical) share TBs.
+>=20
+> If we don't have a unique integer key for the cluster, what
+> should we use instead ?
+
+This sounds like a reasonable use of cluster_id as implemented in
+this patch.  The ID would be only used internally and not exposed
+to the outside, right?
+
+I'm more worried about cases where we could end up exposing the
+ID in an external interface (either to guests, or through QMP or
+the command-line).  This happened to cpu_index and we took a long
+time to fix the mess.
+
+--=20
+Eduardo
