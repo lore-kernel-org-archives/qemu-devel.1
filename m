@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gQ9G6-000875-By
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:04:27 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gQ9Tj-000610-3a
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:18:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gQ9G1-0005tk-Bp
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:04:26 -0500
-Date: Fri, 23 Nov 2018 12:04:05 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181123120405.4b94a220@redhat.com>
-In-Reply-To: <20181121231217.GA4450@caravaggio>
-References: <20181105014047.26447-1-sameo@linux.intel.com>
-	<20181105014047.26447-12-sameo@linux.intel.com>
-	<20181114115537.3357921b@redhat.com>
-	<20181121231217.GA4450@caravaggio>
+	(envelope-from <sgarzare@redhat.com>) id 1gQ9Tf-0001ne-MA
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:18:31 -0500
+Received: from mail-it1-f195.google.com ([209.85.166.195]:50432)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gQ9Tf-0001k4-IB
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:18:27 -0500
+Received: by mail-it1-f195.google.com with SMTP id z7so355556iti.0
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 03:18:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 11/24] hw: acpi: Export and generalize
- the PCI host AML API
+References: <CAGxU2F4O4aKzrJky7EFeWaHFuBKPwi_Z-j7G7m+ENRojVG_5vA@mail.gmail.com>
+	<20181119130713.GB6443@stefanha-x1.localdomain>
+	<20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
+	<CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
+	<20181120062109.eahirgygm4br3ov7@sirius.home.kraxel.org>
+	<CAGxU2F64uK5oygQecZKOPpsyb--Pth9U00P_gghrtYDwQrSGtg@mail.gmail.com>
+	<20181120112203.rzhhdl6hhsjf5twt@sirius.home.kraxel.org>
+	<CAGxU2F4LNN1UtVJFADxm1V4eBDQ8eGSoAjPXC=X8+zSR4yd9Nw@mail.gmail.com>
+	<20181122115135.funmtcql3xhrixi6@sirius.home.kraxel.org>
+	<CAGxU2F6462MF00_0dh_6HiFPgVyEpaRTEPJ_0-sUdg8YnhgLcw@mail.gmail.com>
+	<20181123062138.rdfaeaqq5uw43ey2@sirius.home.kraxel.org>
+In-Reply-To: <20181123062138.rdfaeaqq5uw43ey2@sirius.home.kraxel.org>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri, 23 Nov 2018 12:18:13 +0100
+Message-ID: <CAGxU2F5-UUaJbwpKhTY1ZsRWVst=gM79nSjnZtZJVKDpime_Lw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +37,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, Rob Bradford <robert.bradford@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin OConnor <kevin@koconnor.net>, Samuel Ortiz <sameo@linux.intel.com>, seabios@seabios.org, Stefan Hajnoczi <stefanha@gmail.com>, Rob Bradford <robert.bradford@intel.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stephend@silicom-usa.com, stefanb@linux.ibm.com
 
-On Thu, 22 Nov 2018 00:12:17 +0100
-Samuel Ortiz <sameo@linux.intel.com> wrote:
-
-> Hi Igor,
-> 
-> On Wed, Nov 14, 2018 at 11:55:37AM +0100, Igor Mammedov wrote:
-> > On Mon,  5 Nov 2018 02:40:34 +0100
-> > Samuel Ortiz <sameo@linux.intel.com> wrote:
-> >   
-> > > From: Yang Zhong <yang.zhong@intel.com>
-> > > 
-> > > The AML build routines for the PCI host bridge and the corresponding
-> > > DSDT addition are neither x86 nor PC machine type specific.
-> > > We can move them to the architecture agnostic hw/acpi folder, and by
-> > > carrying all the needed information through a new AcpiPciBus structure,
-> > > we can make them PC machine type independent.  
-> > 
-> > I'm don't know anything about PCI, but functional changes doesn't look
-> > correct to me.
+On Fri, Nov 23, 2018 at 7:21 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> On Thu, Nov 22, 2018 at 04:13:38PM +0100, Stefano Garzarella wrote:
+> > On Thu, Nov 22, 2018 at 12:51 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > >
+> > > On Thu, Nov 22, 2018 at 12:08:55PM +0100, Stefano Garzarella wrote:
+> > > > Hi,
+> > > > I continued to investigate how to reduce the boot time with SeaBIOS
+> > > > and QEMU when it used with linuxboot_dma.bin (-kernel parameter).
+> > > > I reached ~12ms with a SeaBIOS configuration (attached) where I
+> > > > disabled debug output, all Hardware support (except SMM & MTRRs) and I
+> > > > applied a small patch to disable VGA setup and console (attached).
+> > >
+> > > Is there any difference to "qemu -vga none" ?
 > >
-> > See more detailed comments below.
-> > 
-> > Marcel,
-> > could you take a look on this patch (in particular main csr changes), pls?
-> >   
-> > > 
-> > > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> > > Signed-off-by: Rob Bradford <robert.bradford@intel.com>
-> > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > > ---
-> > >  include/hw/acpi/aml-build.h |   8 ++
-> > >  hw/acpi/aml-build.c         | 157 ++++++++++++++++++++++++++++++++++++
-> > >  hw/i386/acpi-build.c        | 115 ++------------------------
-> > >  3 files changed, 173 insertions(+), 107 deletions(-)
-> > > 
-> > > diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> > > index fde2785b9a..1861e37ebf 100644
-> > > --- a/include/hw/acpi/aml-build.h
-> > > +++ b/include/hw/acpi/aml-build.h
-> > > @@ -229,6 +229,12 @@ typedef struct AcpiMcfgInfo {
-> > >      uint32_t mcfg_size;
-> > >  } AcpiMcfgInfo;
-> > >  
-> > > +typedef struct AcpiPciBus {
-> > > +    PCIBus *pci_bus;
-> > > +    Range *pci_hole;
-> > > +    Range *pci_hole64;
-> > > +} AcpiPciBus;  
-> > Again, this and all below is not aml-build material.
-> > Consider adding/using pci specific acpi file for it.
-> > 
-> > Also even though pci AML in arm/virt is to a large degree a subset
-> > of x86 target and it would be much better to unify ARM part with x86,
-> > it probably will be to big/complex of a change if we take on it in
-> > one go.
-> > 
-> > So not to derail you from the goal too much, we probably should
-> > generalize this a little bit less, limiting refactoring to x86
-> > target for now.  
-> So keeping it under i386 means it won't be accessible through hw/acpi/,
-> which means we won't be able to have a generic hw/acpi/reduced.c
-> implementation. From our perspective, this is the problem with keeping
-> things under i386 because we're not sure yet how much generic it is: It
-> still won't be shareable for a generic hardware-reduced ACPI
-> implementation which means we'll have to temporarily have yet another
-> hardware-reduced ACPI implementation under hw/i386 this time.
-> I guess this is what Michael meant by keeping some parts of the code
-> duplicated for now.
-> 
-> I feel it'd be easier to move those APIs under a shareable location, to
-> make it easier for ARM to consume it even if it's not entirely generic yet.
-> But you guys are the maintainers and if you think we should restric the
-> generalization to x86 only for now, we can go for it.
-If code is generic (you can reuse it with arm/virt in the same series)
-then place it in hw/acpi otherwise if it's semi-generic put to hw/i386.
-If it would be a separate file it would be easier to move it to generic
-place when we are able to resuse it with arm/virt.
+> > Using both (qemu -vga none, and my patch) we are around 10.8 ms.
+> > Note: using only the patch, Linux is still able to initialize and use the VGA.
+>
+> But do you want linux use the vga console if you care about boot times?
+> I'd expect virtio-console would be fastest in that case.
 
- 
-> Cheers,
-> Samuel.
+I agree with you, but if we will implement a QEMU fastboot feature in
+SeaBIOS, we are sure that it works with Linux kernel if someone uses
+"qemu -kernel" and wants also use a VGA.
+
+>
+> > - QEMU -vga none + SeaBIOS config (CONFIG_DEBUG_LEVEL=0, disable all
+> > HW support except
+> > SMM & MTRRs) + Stephen's TPM patch
+> >  qemu_init_end: 43.675803
+> >  fw_start: 43.865178 (+0.189375)
+> >  fw_do_boot: 58.093161 (+14.227983)
+> >  linux_start_boot: 59.490308 (+1.397147)
+> >  linux_start_user: 556.782354 (+497.292046)
+> >
+> > - QEMU -vga none + SeaBIOS config (CONFIG_DEBUG_LEVEL=0, disable all
+> > HW support except
+> > SMM & MTRRs, CONFIG_DISABLE_VGA=y) + Stephen's TPM patch
+> >  qemu_init_end: 42.387412
+> >  fw_start: 42.579257 (+0.191845)
+> >  fw_do_boot: 53.381517 (+10.802260)
+> >  linux_start_boot: 54.848643 (+1.467126)
+> >  linux_start_user: 498.517050 (+443.668407)
+>
+> Interesting that CONFIG_DISABLE_VGA=y makes a noticable difference even
+> without vga hardware being preset.  And not only in seabios but also for
+> the linux kernel.
+>
+> Do you know why?
+
+In SeaBIOS I think the reasons are:
+- vgarom_setup() scan all PCI devices to find a VGA
+- enable_vga_console() invokes an int10 without check if there is a
+VGA (maybe here we can add a check)
+
+Cheers,
+Stefano
+
+--
+Stefano Garzarella
+Red Hat
