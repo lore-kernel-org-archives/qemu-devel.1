@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gQCUj-0002U4-L8
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:31:46 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gQCif-0007yS-Qu
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gQCUi-0002Hq-Jg
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:31:45 -0500
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Fri, 23 Nov 2018 14:31:18 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F201F85395@DGGEMA503-MBX.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH RESEND v15 10/10] target-arm: kvm64: handle
- SIGBUS signal from kernel or KVM
+	(envelope-from <richard.henderson@linaro.org>) id 1gQCia-00036F-Pu
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:09 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39293)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gQCia-00035H-35
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:04 -0500
+Received: by mail-wm1-x344.google.com with SMTP id u13-v6so12247957wmc.4
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 06:46:03 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 23 Nov 2018 15:45:22 +0100
+Message-Id: <20181123144558.5048-2-richard.henderson@linaro.org>
+In-Reply-To: <20181123144558.5048-1-richard.henderson@linaro.org>
+References: <20181123144558.5048-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH for-4.0 v2 01/37] tcg/i386: Always use %ebp for
+ TCG_AREG0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,63 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard
-	Henderson <rth@twiddle.net>, "zhengxiang (A)" <zhengxiang9@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Alistair.Francis@wdc.com
 
-SGkgUGV0ZXIsDQogIFRoYW5rcyBmb3IgdGhlIGNvbW1lbnRzIGFuZCBtYWlsLg0KDQo+IA0KPiBP
-biAyMiBOb3ZlbWJlciAyMDE4IGF0IDEwOjI4LCBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxs
-QGxpbmFyby5vcmc+IHdyb3RlOg0KPiA+IE9uIDIyIE5vdmVtYmVyIDIwMTggYXQgMDM6MDUsIGdl
-bmdkb25naml1IDxnZW5nZG9uZ2ppdUBodWF3ZWkuY29tPiB3cm90ZToNCj4gPj4+ID4NCj4gPj4+
-IFNob3VsZG4ndCB0aGVyZSBiZSBzb21ldGhpbmcgaW4gaGVyZSB0byBzYXkgIm9ubHkgcmVwb3J0
-IHRoaXMgZXJyb3IgdG8gdGhlIGd1ZXN0IGlmIHdlIGFyZSBhY3R1YWxseSByZXBvcnRpbmcgUkFT
-IGVycm9ycyB0byB0aGUgZ3Vlc3QiID8NCj4gPj4NCj4gPj4gWWVzLCBXZSBjYW4gc2F5IHNvbWV0
-aGluZyB0aGF0IHN1Y2ggYXMgInJlcG9ydCB0aGlzIGVycm9yIHRvIHRoZSBndWVzdCIsIGJlY2F1
-c2UgdGhpcyBlcnJvciBpcyBpbmRlZWQgdHJpZ2dlcmVkIGJ5IGd1ZXN0LCB3aGljaCBpcyBndWVz
-dA0KPiBlcnJvci4NCj4gPg0KPiA+IEknbSBhZnJhaWQgSSBkb24ndCByZWFsbHkgdW5kZXJzdGFu
-ZCB3aGF0IHlvdSBtZWFuLiBDb3VsZCB5b3UgdHJ5DQo+ID4gcmVwaHJhc2luZyBpdD8NCj4gPg0K
-PiA+IE15IHVuZGVyc3RhbmRpbmcgd2FzOg0KPiA+ICAqIHdlIGdldCB0aGlzIHNpZ25hbCBpZiB0
-aGVyZSBpcyBhIFJBUyBlcnJvciBpbiB0aGUgaG9zdCBtZW1vcnkNCj4gPiAgKiBpZiB3ZSBhcmUg
-ZXhwb3NpbmcgUkFTIGVycm9ycyB0byB0aGUgZ3Vlc3QgKGllIHdlIGhhdmUNCj4gPiAgICB0b2xk
-IGl0IHRoYXQgaW4gdGhlIEFDUEkgdGFibGUgd2UgcGFzc2VkIGl0IGF0IHN0YXJ0dXApDQo+ID4g
-ICAgdGhlbiB3ZSBzaG91bGQgcGFzcyBvbiB0aGlzIGVycm9yIHRvIHRoZSBndWVzdA0KPiA+DQo+
-ID4gYnV0IHRoYXQgdGhlc2UgYXJlIHR3byBkaWZmZXJlbnQgY29uZGl0aW9ucy4NCj4gPg0KPiA+
-IElmIHRoZSBob3N0IGhhcmR3YXJlIGRldGVjdHMgYSBSQVMgZXJyb3IgaW4gbWVtb3J5IHVzZWQg
-YnkgdGhlIGd1ZXN0DQo+ID4gYnV0IHRoZSBndWVzdCBpcyBub3QgYmVpbmcgdG9sZCBhYm91dCBS
-QVMgZXJyb3JzLCB0aGVuIHdlIGNhbm5vdA0KPiA+IHJlcG9ydCB0aGUgZXJyb3I6IHdlIGhhdmUg
-bm8gbWVjaGFuaXNtIHRvIGRvIHNvLCBhbmQgdGhlIGd1ZXN0IGlzIG5vdA0KPiA+IGV4cGVjdGlu
-ZyBpdC4NCj4gDQo+IElmIHlvdSBsb29rIGF0IHRoZSB4ODYgdmVyc2lvbiBvZiB0aGlzIGZ1bmN0
-aW9uIHlvdSBjYW4gc2VlIHRoYXQgaXQgdGVzdHMgKGVudi0+bWNnX2NhcCAmIE1DR19TRVJfUCks
-IHdoaWNoIEkgdGhpbmsgaXMgdGhlIGVxdWl2YWxlbnQgeDg2ICJpcw0KPiB0aGUgZ3Vlc3QgQ1BV
-L2NvbmZpZyBvbmUgd2UgY2FuIHJlcG9ydCB0aGVzZSBlcnJvcnMgdG8iIHRlc3QuDQoNCk1DR19T
-RVJfUCAoc29mdHdhcmUgZXJyb3IgcmVjb3Zlcnkgc3VwcG9ydCBwcmVzZW50KSBmbGFnIGluZGlj
-YXRlcyAod2hlbiBzZXQpIHRoYXQgdGhlIHByb2Nlc3NvciBzdXBwb3J0cyBzb2Z0d2FyZSBlcnJv
-ciByZWNvdmVyeS4NCmVudi0+bWNnX2NhcCAncyB2YWx1ZSBzaG91bGQgYmUgZ290IGZyb20gS1ZN
-IGFzIHNob3duIGluIHRoZSBRRU1VIGNvZGVbMV0sIGl0IGluZGljYXRlcyB3aGV0aGVyIHRoZSBL
-Vk0gc3VwcG9ydCBzb2Z0d2FyZSBlcnJvciByZWNvdmVyeS4NCg0KWzFdOg0KLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KICByZXQgPSBrdm1fZ2V0
-X21jZV9jYXBfc3VwcG9ydGVkKGNzLT5rdm1fc3RhdGUsICZtY2dfY2FwLCAmYmFua3MpOw0KICBp
-ZiAocmV0IDwgMCkgew0KICAgICAgIGZwcmludGYoc3RkZXJyLCAia3ZtX2dldF9tY2VfY2FwX3N1
-cHBvcnRlZDogJXMiLCBzdHJlcnJvcigtcmV0KSk7DQogICAgICAgICAgIHJldHVybiByZXQ7DQog
-ICB9DQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-DQoNCg0KDQoNCg0KWzJdOg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0NCnZvaWQga3ZtX2FyY2hfb25fc2lnYnVzX3ZjcHUoQ1BVU3RhdGUgKmMs
-IGludCBjb2RlLCB2b2lkICphZGRyKQ0Kew0KICAgICAgICAuLi4uLi4uLi4uLi4uLi4uLi4uLi4u
-Li4uLi4NCg0KICAgICAgICBpZiAocmFtX2FkZHIgIT0gUkFNX0FERFJfSU5WQUxJRCAmJg0KICAg
-ICAgICAgICAga3ZtX3BoeXNpY2FsX21lbW9yeV9hZGRyX2Zyb21faG9zdChjLT5rdm1fc3RhdGUs
-IGFkZHIsICZwYWRkcikpIHsNCiAgICAgICAgICAgIA0KICBJZiBpdCBnb3QgdG8gaGVyZSwgaXQg
-bWVhbnMgdGhlIGhvc3QgaGFyZHdhcmUgZGV0ZWN0cyBhIFJBUyBlcnJvciBpbiBtZW1vcnkgdXNl
-ZCBieSB0aGUgZ3Vlc3QgdXNpbmcgYWJvdmUgdHdvIGp1ZGdtZW50cy4NCiAgTWF5YmUgd2UgY2Fu
-IHRlc3QvY2hlY2sgd2hldGhlciBLVk0gc3VwcG9ydHMgc29mdHdhcmUgZXJyb3IgcmVjb3Zlcnkg
-aW4gWzNdDQogICAgICAgICAgICAgICAgICAgICAgIA0KICAgICAgICAgICAgfQ0KICAgICAgICAg
-ICAgcmV0dXJuOw0KICAgICAgICAgICAgLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLg0KICAgICAg
-ICB9DQp9DQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0NCg0KWzNdOg0KSWYgd2UgY2hlY2sgaXQgYXMgeDg2LCB3ZSBjYW4gY2hlY2sgdGhhdCB3
-aGV0aGVyIEtWTSBzdXBwb3J0cyBzb2Z0d2FyZSByZWNvdmVyeSB0aG91Z2ggSU9DVEwsIGZvciBl
-eGFtcGxlLg0KDQppbnQgciA9IGt2bV9pb2N0bChzLCBYWFhYWFhfR0VUX1NFUl9DQVBfU1VQUE9S
-VEVELCBzZWdfY2FwKTsNCi0tLS0tLS0tLS0tLS0tDQppZiAoc2VnX2NhcCAmJiBhZGRyKSB7DQog
-ICAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCn0NCg0KPiANCj4gdGhhbmtzDQo+IC0tIFBNTQ0K
+For x86_64, this can result in smaller code when manipulating
+TCG_TYPE_I32, as we can omit a REX prefix.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/i386/tcg-target.h | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 9fdf37f23c..7488c3d869 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -84,6 +84,8 @@ typedef enum {
+     TCG_REG_RBP = TCG_REG_EBP,
+     TCG_REG_RSI = TCG_REG_ESI,
+     TCG_REG_RDI = TCG_REG_EDI,
++
++    TCG_AREG0 = TCG_REG_EBP,
+ } TCGReg;
+ 
+ /* used for function call generation */
+@@ -194,12 +196,6 @@ extern bool have_avx2;
+ #define TCG_TARGET_extract_i64_valid(ofs, len) \
+     (((ofs) == 8 && (len) == 8) || ((ofs) + (len)) == 32)
+ 
+-#if TCG_TARGET_REG_BITS == 64
+-# define TCG_AREG0 TCG_REG_R14
+-#else
+-# define TCG_AREG0 TCG_REG_EBP
+-#endif
+-
+ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+ {
+ }
+-- 
+2.17.2
