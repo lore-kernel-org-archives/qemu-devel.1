@@ -1,22 +1,43 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gQBNt-0001pl-El
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:20:39 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1gQBU8-0005D7-Tt
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:27:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gQBNp-0004T9-Do
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:20:37 -0500
-Date: Fri, 23 Nov 2018 14:20:17 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20181123132017.GJ1148@toto>
-References: <e8dae726-8853-4e44-1eb8-b9cfb0bc44f2@mentor.com>
-	<CAFEAcA_EM39P8HFoC=B=XP3Ax8NgNSotn=wMJJsG05P8Ywdruw@mail.gmail.com>
-	<abd7b108-4d21-9c1c-16d3-6d31d47f74eb@mentor.com>
+	(envelope-from <pmorel@linux.ibm.com>) id 1gQBU5-0005dr-LZ
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:27:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58508
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gQBU3-0005Yl-Qi
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:27:00 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wANDIdjl072109
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 08:26:57 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2nxg8vnw2b-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 08:26:57 -0500
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Fri, 23 Nov 2018 13:26:55 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181122165432.4437-2-cohuck@redhat.com>
+	<853a8421-af17-5130-51b7-3242cc10b989@linux.ibm.com>
+	<20181123134517.0b21c263.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Fri, 23 Nov 2018 14:26:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abd7b108-4d21-9c1c-16d3-6d31d47f74eb@mentor.com>
-Subject: Re: [Qemu-devel] [Qemu-discuss] How to select specific qemu net
- 'nic' device
+In-Reply-To: <20181123134517.0b21c263.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <dcf76e4e-95f3-e09d-7110-e66212b393c2@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/3] vfio-ccw: add capabilities chain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,125 +46,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mbilal <muhammad_bilal@mentor.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-discuss <qemu-discuss@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On Fri, Nov 23, 2018 at 02:59:32PM +0500, mbilal wrote:
-> Hi,
-> 
-> Thanks for reply.
-> 
-> According to your suggestion I've tested with 3.1 rc2 release and problem is
-> still exist in this release also.
-> 
-> Here is my reproducible scenario.
+On 23/11/2018 13:45, Cornelia Huck wrote:
+> On Fri, 23 Nov 2018 13:28:25 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>=20
+>> On 22/11/2018 17:54, Cornelia Huck wrote:
+>>> Allow to extend the regions used by vfio-ccw. The first user will be
+>>> handling of halt and clear subchannel.
+>>>
+>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>> ---
+>>>    drivers/s390/cio/vfio_ccw_ops.c     | 182 ++++++++++++++++++++++++=
+----
+>>>    drivers/s390/cio/vfio_ccw_private.h |  38 ++++++
+>>>    include/uapi/linux/vfio.h           |   1 +
+>>>    3 files changed, 195 insertions(+), 26 deletions(-)
+>>>   =20
+>>
+>> Halt and clear have no parameters (the sub-channel ID is obviously the
+>> one of the mediated device).
+>>
+>> Isn't adding a new sub-region for the purpose of handling halt and cle=
+ar
+>> superfluous?
+>>
+>> What is the reason not to use simple ioctls ?
+>=20
+> Should it turn out that we missed something and need an enhanced
+> interface, we can simply stop providing this subregion and add a new
+> subregion, without breaking existing userspace. We can't do that with
+> ioctls.
 
+OK, it is a good reason, took me a while but I get the interest of=20
+capabilities for regions too.
 
-Thanks,
+>=20
+> And moreover, this is only the first user of this infrastructure.
+> There's also that path handling series that Dong Jia had posted early
+> this year -- that would be an obvious user as well.
+>=20
 
-I've had a look and the assert looks bogus to me.
-We shouldn't be asserting on RX descriptor setups when the receiver is disabled.
+right.
 
-I'll send a patch in a moment.
+Thanks.
 
-Best regards,
-Edgar
+Regards,
+Pierre
 
-
-
-> 
-> QEMU launching
-> --------------
-> 
-> ./qemu-system-aarch64 -M xlnx-zcu102 -m 1G -kernel /dev/null -S -s  -net nic
-> -net nic -net nic -net nic -net user,hostfwd=tcp::8080-:8080 -smp 1 -serial
-> stdio -serial /dev/null
-> 
-> gdb session
-> ------------
-> 
-> (gdb) file zcu102_net_uni.out
-> Reading symbols from zcu102_net_uni.out...done.
-> (gdb) tar rem :1234
-> Remote debugging using :1234
-> _ld_text_start () at os/arch/armv8/common/arch_asm.S:381
-> 381	    MOV     X14, X0
-> (gdb) load
-> Loading section .text, size 0x59c0c lma 0x0
-> Loading section .rodata, size 0x2bbc lma 0x59c0c
-> Loading section .rtl.data, size 0x770 lma 0x5c7c8
-> Loading section .data, size 0x4dc lma 0x5cf54
-> Start address 0x0, load size 381972
-> Transfer rate: 23313 KB/sec, 2021 bytes/write.
-> (gdb) c
-> Continuing.
-> ^C
-> 
-> 
-> So any breakpoint or Ctrl-C asserts the QEMU.
-> 
-> qemu-system-aarch64: qemu-3.1.0-rc2/hw/net/cadence_gem.c:982: gem_receive:
-> Assertion `!first_desc' failed.
-> 
-> 
-> Our networking demo application running fine unless you interrupt the GDB
-> (either with breakpoints or interrupt signal).
-> You can see following message on QEMU console which is the indication of
-> demo is fine (it also well tested on actual hardware)
-> 
-> Open the following Nucleus node address in your web browser:
->     http://127.0.0.1:8080/
-> 
-> 
-> I'm attaching demo application binary.
-> 
-> 
-> 
-> 
-> Thanks for care about this issue,
-> -Bilal
-> 
-> 
-> 
-> On 11/23/2018 01:59 PM, Peter Maydell wrote:
-> > On 23 November 2018 at 04:13, mbilal <muhammad_bilal@mentor.com> wrote:
-> > > Hi,
-> > > 
-> > > I'm using qemu emulation for xilinx zcu102 platform, this board have four
-> > > networking GEM0, GEM1, GEM2 and GEM3 devices.
-> > > 
-> > > To run network demo on this board *only* require GEM3 device to be configure
-> > > while other GEM devices don't need to be configure, that's why u-boot and
-> > > other RTOS only configure GEM3 device.
-> > > 
-> > > 
-> > > QEMU is enabling these GEM devices  with networking '-net nic' option and
-> > > QEMU consider first '-net nic' option for GEM0 and second '-net nic' option
-> > > for GEM1 and so on. that's why if need to enable GEM3 network device we must
-> > > need to give following full command line options
-> > > 
-> > > -net nic -net nic -net nic -net nic -net user, ...
-> > > 
-> > > In this way all four GEM devices would be enable but first three GEM0-GEM2
-> > > devices are un-configured and useless. In our case QEMU is being *crashed*
-> > > due to trying to use these un-configured GEM devices to o send/receive GDB
-> > > breakoint/interrupt cause. IIUC QEMU uses first device in the -nic loop
-> > > i.e
-> > > 
-> > > qemu-system-aarch64: hw/net/cadence_gem.c:921: gem_receive: Assertion
-> > > `!first_desc' failed.
-> > 
-> > If QEMU asserts like this, this is a bug in QEMU. I've cc'd
-> > the maintainers of the Xilinx board.
-> > 
-> > Could you provide a complete set of instructions to reproduce
-> > this bug, please ? (full command line, guest image, etc)
-> > 
-> > Could you also tell us which version of QEMU you are using?
-> > If possible, try with the current git master or
-> > with the 3.1 rc2 release candidate we've just put out, to
-> > see if it's already been fixed.
-> > 
-> > thanks
-> > -- PMM
-> > 
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
