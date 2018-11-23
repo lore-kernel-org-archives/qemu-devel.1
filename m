@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gQCQK-00089u-PF
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:27:13 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1gQCUj-0002U4-L8
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:31:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gQCQK-0001Kc-1r
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:27:12 -0500
-Date: Fri, 23 Nov 2018 15:26:58 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181123152658.76547154@redhat.com>
-In-Reply-To: <20181107123652.23417-9-marcandre.lureau@redhat.com>
-References: <20181107123652.23417-1-marcandre.lureau@redhat.com>
-	<20181107123652.23417-9-marcandre.lureau@redhat.com>
+	(envelope-from <gengdongjiu@huawei.com>) id 1gQCUi-0002Hq-Jg
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:31:45 -0500
+From: gengdongjiu <gengdongjiu@huawei.com>
+Date: Fri, 23 Nov 2018 14:31:18 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201F85395@DGGEMA503-MBX.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 08/14] qdev-props: convert
- global_props to GArray
+Subject: Re: [Qemu-devel] [PATCH RESEND v15 10/10] target-arm: kvm64: handle
+ SIGBUS signal from kernel or KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +22,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, qemu-arm@nongnu.org, xen-devel@lists.xenproject.org, Artyom Tarasenko <atar4qemu@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Berger <stefanb@linux.ibm.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <minyard@acm.org>, =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard
+	Henderson <rth@twiddle.net>, "zhengxiang (A)" <zhengxiang9@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Wed,  7 Nov 2018 16:36:46 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-
-> A step towards being able to call object_apply_global_props().
-it also makes code more uniform as we don't have to deal with type
-inform of GList.
-
-maybe move it at the beginning of series and include accel part as well?
-
-otherwise looks good
-
-
-
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/core/qdev-properties.c | 29 ++++++++++++++++++++---------
->  1 file changed, 20 insertions(+), 9 deletions(-)
->=20
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index 43c30a57f4..353e67c05a 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -1173,22 +1173,32 @@ void qdev_prop_set_ptr(DeviceState *dev, const ch=
-ar *name, void *value)
->      *ptr =3D value;
->  }
-> =20
-> -static GList *global_props;
-> +static GArray *global_props(void)
-> +{
-> +    static GArray *gp;
-> +
-> +    if (!gp) {
-> +        gp =3D g_array_new(false, false, sizeof(GlobalProperty *));
-> +    }
-> +
-> +    return gp;
-> +}
-> =20
->  void qdev_prop_register_global(GlobalProperty *prop)
->  {
-> -    global_props =3D g_list_append(global_props, prop);
-> +    g_array_append_val(global_props(), prop);
->  }
-> =20
->  int qdev_prop_check_globals(void)
->  {
-> -    GList *l;
-> -    int ret =3D 0;
-> +    int i, ret =3D 0;
-> =20
-> -    for (l =3D global_props; l; l =3D l->next) {
-> -        GlobalProperty *prop =3D l->data;
-> +    for (i =3D 0; i < global_props()->len; i++) {
-> +        GlobalProperty *prop;
->          ObjectClass *oc;
->          DeviceClass *dc;
-> +
-> +        prop =3D g_array_index(global_props(), GlobalProperty *, i);
->          if (prop->used) {
->              continue;
->          }
-> @@ -1213,12 +1223,13 @@ int qdev_prop_check_globals(void)
-> =20
->  void qdev_prop_set_globals(DeviceState *dev)
->  {
-> -    GList *l;
-> +    int i;
-> =20
-> -    for (l =3D global_props; l; l =3D l->next) {
-> -        GlobalProperty *prop =3D l->data;
-> +    for (i =3D 0; i < global_props()->len; i++) {
-> +        GlobalProperty *prop;
->          Error *err =3D NULL;
-> =20
-> +        prop =3D g_array_index(global_props(), GlobalProperty *, i);
->          if (object_dynamic_cast(OBJECT(dev), prop->driver) =3D=3D NULL) {
->              continue;
->          }
+SGkgUGV0ZXIsDQogIFRoYW5rcyBmb3IgdGhlIGNvbW1lbnRzIGFuZCBtYWlsLg0KDQo+IA0KPiBP
+biAyMiBOb3ZlbWJlciAyMDE4IGF0IDEwOjI4LCBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxs
+QGxpbmFyby5vcmc+IHdyb3RlOg0KPiA+IE9uIDIyIE5vdmVtYmVyIDIwMTggYXQgMDM6MDUsIGdl
+bmdkb25naml1IDxnZW5nZG9uZ2ppdUBodWF3ZWkuY29tPiB3cm90ZToNCj4gPj4+ID4NCj4gPj4+
+IFNob3VsZG4ndCB0aGVyZSBiZSBzb21ldGhpbmcgaW4gaGVyZSB0byBzYXkgIm9ubHkgcmVwb3J0
+IHRoaXMgZXJyb3IgdG8gdGhlIGd1ZXN0IGlmIHdlIGFyZSBhY3R1YWxseSByZXBvcnRpbmcgUkFT
+IGVycm9ycyB0byB0aGUgZ3Vlc3QiID8NCj4gPj4NCj4gPj4gWWVzLCBXZSBjYW4gc2F5IHNvbWV0
+aGluZyB0aGF0IHN1Y2ggYXMgInJlcG9ydCB0aGlzIGVycm9yIHRvIHRoZSBndWVzdCIsIGJlY2F1
+c2UgdGhpcyBlcnJvciBpcyBpbmRlZWQgdHJpZ2dlcmVkIGJ5IGd1ZXN0LCB3aGljaCBpcyBndWVz
+dA0KPiBlcnJvci4NCj4gPg0KPiA+IEknbSBhZnJhaWQgSSBkb24ndCByZWFsbHkgdW5kZXJzdGFu
+ZCB3aGF0IHlvdSBtZWFuLiBDb3VsZCB5b3UgdHJ5DQo+ID4gcmVwaHJhc2luZyBpdD8NCj4gPg0K
+PiA+IE15IHVuZGVyc3RhbmRpbmcgd2FzOg0KPiA+ICAqIHdlIGdldCB0aGlzIHNpZ25hbCBpZiB0
+aGVyZSBpcyBhIFJBUyBlcnJvciBpbiB0aGUgaG9zdCBtZW1vcnkNCj4gPiAgKiBpZiB3ZSBhcmUg
+ZXhwb3NpbmcgUkFTIGVycm9ycyB0byB0aGUgZ3Vlc3QgKGllIHdlIGhhdmUNCj4gPiAgICB0b2xk
+IGl0IHRoYXQgaW4gdGhlIEFDUEkgdGFibGUgd2UgcGFzc2VkIGl0IGF0IHN0YXJ0dXApDQo+ID4g
+ICAgdGhlbiB3ZSBzaG91bGQgcGFzcyBvbiB0aGlzIGVycm9yIHRvIHRoZSBndWVzdA0KPiA+DQo+
+ID4gYnV0IHRoYXQgdGhlc2UgYXJlIHR3byBkaWZmZXJlbnQgY29uZGl0aW9ucy4NCj4gPg0KPiA+
+IElmIHRoZSBob3N0IGhhcmR3YXJlIGRldGVjdHMgYSBSQVMgZXJyb3IgaW4gbWVtb3J5IHVzZWQg
+YnkgdGhlIGd1ZXN0DQo+ID4gYnV0IHRoZSBndWVzdCBpcyBub3QgYmVpbmcgdG9sZCBhYm91dCBS
+QVMgZXJyb3JzLCB0aGVuIHdlIGNhbm5vdA0KPiA+IHJlcG9ydCB0aGUgZXJyb3I6IHdlIGhhdmUg
+bm8gbWVjaGFuaXNtIHRvIGRvIHNvLCBhbmQgdGhlIGd1ZXN0IGlzIG5vdA0KPiA+IGV4cGVjdGlu
+ZyBpdC4NCj4gDQo+IElmIHlvdSBsb29rIGF0IHRoZSB4ODYgdmVyc2lvbiBvZiB0aGlzIGZ1bmN0
+aW9uIHlvdSBjYW4gc2VlIHRoYXQgaXQgdGVzdHMgKGVudi0+bWNnX2NhcCAmIE1DR19TRVJfUCks
+IHdoaWNoIEkgdGhpbmsgaXMgdGhlIGVxdWl2YWxlbnQgeDg2ICJpcw0KPiB0aGUgZ3Vlc3QgQ1BV
+L2NvbmZpZyBvbmUgd2UgY2FuIHJlcG9ydCB0aGVzZSBlcnJvcnMgdG8iIHRlc3QuDQoNCk1DR19T
+RVJfUCAoc29mdHdhcmUgZXJyb3IgcmVjb3Zlcnkgc3VwcG9ydCBwcmVzZW50KSBmbGFnIGluZGlj
+YXRlcyAod2hlbiBzZXQpIHRoYXQgdGhlIHByb2Nlc3NvciBzdXBwb3J0cyBzb2Z0d2FyZSBlcnJv
+ciByZWNvdmVyeS4NCmVudi0+bWNnX2NhcCAncyB2YWx1ZSBzaG91bGQgYmUgZ290IGZyb20gS1ZN
+IGFzIHNob3duIGluIHRoZSBRRU1VIGNvZGVbMV0sIGl0IGluZGljYXRlcyB3aGV0aGVyIHRoZSBL
+Vk0gc3VwcG9ydCBzb2Z0d2FyZSBlcnJvciByZWNvdmVyeS4NCg0KWzFdOg0KLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KICByZXQgPSBrdm1fZ2V0
+X21jZV9jYXBfc3VwcG9ydGVkKGNzLT5rdm1fc3RhdGUsICZtY2dfY2FwLCAmYmFua3MpOw0KICBp
+ZiAocmV0IDwgMCkgew0KICAgICAgIGZwcmludGYoc3RkZXJyLCAia3ZtX2dldF9tY2VfY2FwX3N1
+cHBvcnRlZDogJXMiLCBzdHJlcnJvcigtcmV0KSk7DQogICAgICAgICAgIHJldHVybiByZXQ7DQog
+ICB9DQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+DQoNCg0KDQoNCg0KWzJdOg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0NCnZvaWQga3ZtX2FyY2hfb25fc2lnYnVzX3ZjcHUoQ1BVU3RhdGUgKmMs
+IGludCBjb2RlLCB2b2lkICphZGRyKQ0Kew0KICAgICAgICAuLi4uLi4uLi4uLi4uLi4uLi4uLi4u
+Li4uLi4NCg0KICAgICAgICBpZiAocmFtX2FkZHIgIT0gUkFNX0FERFJfSU5WQUxJRCAmJg0KICAg
+ICAgICAgICAga3ZtX3BoeXNpY2FsX21lbW9yeV9hZGRyX2Zyb21faG9zdChjLT5rdm1fc3RhdGUs
+IGFkZHIsICZwYWRkcikpIHsNCiAgICAgICAgICAgIA0KICBJZiBpdCBnb3QgdG8gaGVyZSwgaXQg
+bWVhbnMgdGhlIGhvc3QgaGFyZHdhcmUgZGV0ZWN0cyBhIFJBUyBlcnJvciBpbiBtZW1vcnkgdXNl
+ZCBieSB0aGUgZ3Vlc3QgdXNpbmcgYWJvdmUgdHdvIGp1ZGdtZW50cy4NCiAgTWF5YmUgd2UgY2Fu
+IHRlc3QvY2hlY2sgd2hldGhlciBLVk0gc3VwcG9ydHMgc29mdHdhcmUgZXJyb3IgcmVjb3Zlcnkg
+aW4gWzNdDQogICAgICAgICAgICAgICAgICAgICAgIA0KICAgICAgICAgICAgfQ0KICAgICAgICAg
+ICAgcmV0dXJuOw0KICAgICAgICAgICAgLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLg0KICAgICAg
+ICB9DQp9DQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0NCg0KWzNdOg0KSWYgd2UgY2hlY2sgaXQgYXMgeDg2LCB3ZSBjYW4gY2hlY2sgdGhhdCB3
+aGV0aGVyIEtWTSBzdXBwb3J0cyBzb2Z0d2FyZSByZWNvdmVyeSB0aG91Z2ggSU9DVEwsIGZvciBl
+eGFtcGxlLg0KDQppbnQgciA9IGt2bV9pb2N0bChzLCBYWFhYWFhfR0VUX1NFUl9DQVBfU1VQUE9S
+VEVELCBzZWdfY2FwKTsNCi0tLS0tLS0tLS0tLS0tDQppZiAoc2VnX2NhcCAmJiBhZGRyKSB7DQog
+ICAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCn0NCg0KPiANCj4gdGhhbmtzDQo+IC0tIFBNTQ0K
