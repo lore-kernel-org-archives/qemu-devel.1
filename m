@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gQEyq-0006mI-1A
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:11:00 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gQF5s-0004wv-5O
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:18:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gQEym-00009o-Vp
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:11:00 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35833)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gQEym-00007Q-Pw
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:10:56 -0500
-Received: by mail-wr1-x441.google.com with SMTP id 96so13031034wrb.2
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 09:10:56 -0800 (PST)
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-23-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025172057.20414-23-cota@braap.org>
-Date: Fri, 23 Nov 2018 17:10:53 +0000
-Message-ID: <87mupzhg82.fsf@linaro.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gQF5q-0000To-Ad
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:18:16 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 23 Nov 2018 17:18:03 +0000
+Message-ID: <37685961-a6a3-5ebf-e2a2-17b960c54963@virtuozzo.com>
+References: <20181031113418.29796-1-anton.nefedov@virtuozzo.com>
+	<20181031113418.29796-2-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20181031113418.29796-2-anton.nefedov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D8BB59AF78C85842B9427BD4CEC06C0D@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 22/48] cpu: hook plugin vcpu events
+Subject: Re: [Qemu-devel] [PATCH v5 1/9] qapi: group BlockDeviceStats fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,105 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-
-Emilio G. Cota <cota@braap.org> writes:
-
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  cpus.c    | 10 ++++++++++
->  exec.c    |  2 ++
->  qom/cpu.c |  2 ++
->  3 files changed, 14 insertions(+)
->
-> diff --git a/cpus.c b/cpus.c
-> index 28e39f045a..3efe89354d 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -43,6 +43,7 @@
->  #include "exec/exec-all.h"
->
->  #include "qemu/thread.h"
-> +#include "qemu/plugin.h"
->  #include "sysemu/cpus.h"
->  #include "sysemu/qtest.h"
->  #include "qemu/main-loop.h"
-> @@ -1322,12 +1323,21 @@ static void qemu_tcg_rr_wait_io_event(CPUState *c=
-pu)
->
->  static void qemu_wait_io_event(CPUState *cpu)
->  {
-> +    bool asleep =3D false;
-> +
-
-slept?
-
->      g_assert(cpu_mutex_locked(cpu));
->      g_assert(!qemu_mutex_iothread_locked());
->
->      while (cpu_thread_is_idle(cpu)) {
-> +        if (!asleep) {
-> +            asleep =3D true;
-> +            qemu_plugin_vcpu_idle_cb(cpu);
-> +        }
->          qemu_cond_wait(&cpu->halt_cond, &cpu->lock);
->      }
-> +    if (asleep) {
-> +        qemu_plugin_vcpu_resume_cb(cpu);
-> +    }
-
-I wonder if having two hooks is too much? What might a plugin want to do
-before we go into idle sleep?
-
-It feels like we are exposing too much of the guts of TCG to the plugin
-here as wait_io could be for any number of internal reasons other than
-the actual emulation blocking for IO through a WFI or something. If a
-plugin really wants to track such things shouldn't it be hooking to the
-guest sleep points?
-
-If idle sleeps really are that important maybe we could just report our
-sleep time on resume - so a single hook but passing a bit more
-information?
-
->
->  #ifdef _WIN32
->      /* Eat dummy APC queued by qemu_cpu_kick_thread.  */
-> diff --git a/exec.c b/exec.c
-> index cd171adb93..71fc76f55e 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -967,6 +967,8 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
->      }
->      tlb_init(cpu);
->
-> +    qemu_plugin_vcpu_init_hook(cpu);
-> +
->  #ifndef CONFIG_USER_ONLY
->      if (qdev_get_vmsd(DEVICE(cpu)) =3D=3D NULL) {
->          vmstate_register(NULL, cpu->cpu_index, &vmstate_cpu_common, cpu);
-> diff --git a/qom/cpu.c b/qom/cpu.c
-> index d1e6ecae03..062817c03b 100644
-> --- a/qom/cpu.c
-> +++ b/qom/cpu.c
-> @@ -32,6 +32,7 @@
->  #include "hw/boards.h"
->  #include "hw/qdev-properties.h"
->  #include "trace-root.h"
-> +#include "qemu/plugin.h"
->
->  CPUInterruptHandler cpu_interrupt_handler;
->
-> @@ -353,6 +354,7 @@ static void cpu_common_unrealizefn(DeviceState *dev, =
-Error **errp)
->      CPUState *cpu =3D CPU(dev);
->      /* NOTE: latest generic point before the cpu is fully unrealized */
->      trace_fini_vcpu(cpu);
-> +    qemu_plugin_vcpu_exit_hook(cpu);
->      cpu_exec_unrealizefn(cpu);
->  }
-
-
---
-Alex Benn=C3=A9e
+MzEuMTAuMjAxOCAxNDozNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gTWFrZSB0aGUgc3RhdCBm
+aWVsZHMgZGVmaW5pdGlvbiBzbGlnaHRseSBtb3JlIHJlYWRhYmxlLg0KPiBBbHNvIHJlb3JkZXIg
+dG90YWxfdGltZV9ucyBzdGF0cyByZWFkLXdyaXRlLWZsdXNoIGFzIGRvbmUgZWxzZXdoZXJlLg0K
+PiBDb3NtZXRpYyBjaGFuZ2Ugb25seS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEFudG9uIE5lZmVk
+b3YgPGFudG9uLm5lZmVkb3ZAdmlydHVvenpvLmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWly
+IFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiAtLS0N
+Cj4gICBxYXBpL2Jsb2NrLWNvcmUuanNvbiB8IDI2ICsrKysrKysrKysrKysrKy0tLS0tLS0tLS0t
+DQo+ICAgMSBmaWxlIGNoYW5nZWQsIDE1IGluc2VydGlvbnMoKyksIDExIGRlbGV0aW9ucygtKQ0K
+PiANCj4gZGlmZiAtLWdpdCBhL3FhcGkvYmxvY2stY29yZS5qc29uIGIvcWFwaS9ibG9jay1jb3Jl
+Lmpzb24NCj4gaW5kZXggMGZjMTU5MGMxYi4uMjkwM2I4ZGZjOSAxMDA2NDQNCj4gLS0tIGEvcWFw
+aS9ibG9jay1jb3JlLmpzb24NCj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gQEAgLTc4
+NCwxMiArNzg0LDEyIEBADQo+ICAgIyBAZmx1c2hfb3BlcmF0aW9uczogVGhlIG51bWJlciBvZiBj
+YWNoZSBmbHVzaCBvcGVyYXRpb25zIHBlcmZvcm1lZCBieSB0aGUNCj4gICAjICAgICAgICAgICAg
+ICAgICAgICBkZXZpY2UgKHNpbmNlIDAuMTUuMCkNCj4gICAjDQo+IC0jIEBmbHVzaF90b3RhbF90
+aW1lX25zOiBUb3RhbCB0aW1lIHNwZW5kIG9uIGNhY2hlIGZsdXNoZXMgaW4gbmFuby1zZWNvbmRz
+DQo+IC0jICAgICAgICAgICAgICAgICAgICAgICAoc2luY2UgMC4xNS4wKS4NCj4gKyMgQHJkX3Rv
+dGFsX3RpbWVfbnM6IFRvdGFsIHRpbWUgc3BlbnQgb24gcmVhZHMgaW4gbmFub3NlY29uZHMgKHNp
+bmNlIDAuMTUuMCkuDQo+ICAgIw0KPiAtIyBAd3JfdG90YWxfdGltZV9uczogVG90YWwgdGltZSBz
+cGVuZCBvbiB3cml0ZXMgaW4gbmFuby1zZWNvbmRzIChzaW5jZSAwLjE1LjApLg0KPiArIyBAd3Jf
+dG90YWxfdGltZV9uczogVG90YWwgdGltZSBzcGVudCBvbiB3cml0ZXMgaW4gbmFub3NlY29uZHMg
+KHNpbmNlIDAuMTUuMCkuDQo+ICAgIw0KPiAtIyBAcmRfdG90YWxfdGltZV9uczogVG90YWxfdGlt
+ZV9zcGVuZCBvbiByZWFkcyBpbiBuYW5vLXNlY29uZHMgKHNpbmNlIDAuMTUuMCkuDQo+ICsjIEBm
+bHVzaF90b3RhbF90aW1lX25zOiBUb3RhbCB0aW1lIHNwZW50IG9uIGNhY2hlIGZsdXNoZXMgaW4g
+bmFub3NlY29uZHMNCj4gKyMgICAgICAgICAgICAgICAgICAgICAgIChzaW5jZSAwLjE1LjApLg0K
+PiAgICMNCj4gICAjIEB3cl9oaWdoZXN0X29mZnNldDogVGhlIG9mZnNldCBhZnRlciB0aGUgZ3Jl
+YXRlc3QgYnl0ZSB3cml0dGVuIHRvIHRoZQ0KPiAgICMgICAgICAgICAgICAgICAgICAgICBkZXZp
+Y2UuICBUaGUgaW50ZW5kZWQgdXNlIG9mIHRoaXMgaW5mb3JtYXRpb24gaXMgZm9yDQo+IEBAIC04
+NDIsMTQgKzg0MiwxOCBAQA0KPiAgICMgU2luY2U6IDAuMTQuMA0KPiAgICMjDQo+ICAgeyAnc3Ry
+dWN0JzogJ0Jsb2NrRGV2aWNlU3RhdHMnLA0KPiAtICAnZGF0YSc6IHsncmRfYnl0ZXMnOiAnaW50
+JywgJ3dyX2J5dGVzJzogJ2ludCcsICdyZF9vcGVyYXRpb25zJzogJ2ludCcsDQo+IC0gICAgICAg
+ICAgICd3cl9vcGVyYXRpb25zJzogJ2ludCcsICdmbHVzaF9vcGVyYXRpb25zJzogJ2ludCcsDQo+
+IC0gICAgICAgICAgICdmbHVzaF90b3RhbF90aW1lX25zJzogJ2ludCcsICd3cl90b3RhbF90aW1l
+X25zJzogJ2ludCcsDQo+IC0gICAgICAgICAgICdyZF90b3RhbF90aW1lX25zJzogJ2ludCcsICd3
+cl9oaWdoZXN0X29mZnNldCc6ICdpbnQnLA0KPiAtICAgICAgICAgICAncmRfbWVyZ2VkJzogJ2lu
+dCcsICd3cl9tZXJnZWQnOiAnaW50JywgJyppZGxlX3RpbWVfbnMnOiAnaW50JywNCj4gKyAgJ2Rh
+dGEnOiB7J3JkX2J5dGVzJzogJ2ludCcsICd3cl9ieXRlcyc6ICdpbnQnLA0KPiArICAgICAgICAg
+ICAncmRfb3BlcmF0aW9ucyc6ICdpbnQnLCAnd3Jfb3BlcmF0aW9ucyc6ICdpbnQnLA0KPiArICAg
+ICAgICAgICAnZmx1c2hfb3BlcmF0aW9ucyc6ICdpbnQnLA0KPiArICAgICAgICAgICAncmRfdG90
+YWxfdGltZV9ucyc6ICdpbnQnLCAnd3JfdG90YWxfdGltZV9ucyc6ICdpbnQnLA0KPiArICAgICAg
+ICAgICAnZmx1c2hfdG90YWxfdGltZV9ucyc6ICdpbnQnLA0KPiArICAgICAgICAgICAnd3JfaGln
+aGVzdF9vZmZzZXQnOiAnaW50JywNCj4gKyAgICAgICAgICAgJ3JkX21lcmdlZCc6ICdpbnQnLCAn
+d3JfbWVyZ2VkJzogJ2ludCcsDQo+ICsgICAgICAgICAgICcqaWRsZV90aW1lX25zJzogJ2ludCcs
+DQo+ICAgICAgICAgICAgICAnZmFpbGVkX3JkX29wZXJhdGlvbnMnOiAnaW50JywgJ2ZhaWxlZF93
+cl9vcGVyYXRpb25zJzogJ2ludCcsDQo+IC0gICAgICAgICAgICdmYWlsZWRfZmx1c2hfb3BlcmF0
+aW9ucyc6ICdpbnQnLCAnaW52YWxpZF9yZF9vcGVyYXRpb25zJzogJ2ludCcsDQo+IC0gICAgICAg
+ICAgICdpbnZhbGlkX3dyX29wZXJhdGlvbnMnOiAnaW50JywgJ2ludmFsaWRfZmx1c2hfb3BlcmF0
+aW9ucyc6ICdpbnQnLA0KPiArICAgICAgICAgICAnZmFpbGVkX2ZsdXNoX29wZXJhdGlvbnMnOiAn
+aW50JywNCj4gKyAgICAgICAgICAgJ2ludmFsaWRfcmRfb3BlcmF0aW9ucyc6ICdpbnQnLCAnaW52
+YWxpZF93cl9vcGVyYXRpb25zJzogJ2ludCcsDQo+ICsgICAgICAgICAgICdpbnZhbGlkX2ZsdXNo
+X29wZXJhdGlvbnMnOiAnaW50JywNCj4gICAgICAgICAgICAgICdhY2NvdW50X2ludmFsaWQnOiAn
+Ym9vbCcsICdhY2NvdW50X2ZhaWxlZCc6ICdib29sJywNCj4gICAgICAgICAgICAgICd0aW1lZF9z
+dGF0cyc6IFsnQmxvY2tEZXZpY2VUaW1lZFN0YXRzJ10sDQo+ICAgICAgICAgICAgICAnKnhfcmRf
+bGF0ZW5jeV9oaXN0b2dyYW0nOiAnQmxvY2tMYXRlbmN5SGlzdG9ncmFtSW5mbycsDQo+IA0KDQoN
+Ci0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
