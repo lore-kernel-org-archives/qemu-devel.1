@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gQEpi-0006yA-BX
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:01:37 -0500
+	(envelope-from <edgari@xilinx.com>) id 1gQEr2-0008E2-PJ
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:03:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gQEpd-0004yW-VP
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:01:34 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:36129)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gQEpd-0004xT-OJ
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:01:29 -0500
-Received: by mail-wm1-x331.google.com with SMTP id s11so12636060wmh.1
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 09:01:29 -0800 (PST)
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-21-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025172057.20414-21-cota@braap.org>
-Date: Fri, 23 Nov 2018 17:01:27 +0000
-Message-ID: <87pnuvhgns.fsf@linaro.org>
+	(envelope-from <edgari@xilinx.com>) id 1gQEqy-0007U6-9F
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:02:54 -0500
+Date: Fri, 23 Nov 2018 18:02:25 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20181123170225.GJ7447@toto>
+References: <20181123135450.24829-1-edgar.iglesias@gmail.com>
+	<20181123135450.24829-2-edgar.iglesias@gmail.com>
+	<75bcddbc-da2d-aeb3-71d3-52b635520d2a@redhat.com>
+	<20181123165945.GM1148@toto>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 20/48] *-user: notify plugin of exit
+In-Reply-To: <20181123165945.GM1148@toto>
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] net: cadence_gem: Remove incorrect
+ assert()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, muhammad_bilal@mentor.com, frederic.konrad@adacore.com, alistair@alistair23.me, frasse.iglesias@gmail.com, figlesia@xilinx.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com
+
+On Fri, Nov 23, 2018 at 05:59:45PM +0100, Edgar E. Iglesias wrote:
+> On Fri, Nov 23, 2018 at 05:46:17PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> > Hi Edgar,
+>=20
+> Hi Philippe,
+>=20
+> >=20
+> > On 23/11/18 14:54, Edgar E. Iglesias wrote:
+> > > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> > >=20
+> > > Don't assert on RX descriptor settings when the receiver is
+> > > disabled. This fixes an issue with incoming packets on an
+> > > unused GEM.
+> > >=20
+> > > Reported-by: mbilal <muhammad_bilal@mentor.com>
+> > > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > > ---
+> > >  hw/net/cadence_gem.c | 1 -
+> > >  1 file changed, 1 deletion(-)
+> > >=20
+> > > diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+> > > index d95cc27f58..7f63411430 100644
+> > > --- a/hw/net/cadence_gem.c
+> > > +++ b/hw/net/cadence_gem.c
+> > > @@ -979,7 +979,6 @@ static ssize_t gem_receive(NetClientState *nc, co=
+nst uint8_t *buf, size_t size)
+> > > =20
+> > >          /* Do nothing if receive is not enabled. */
+> > >          if (!gem_can_receive(nc)) {
+> > > -            assert(!first_desc);
+> >=20
+> > Maybe worth:
+> >=20
+> >                trace_gem_receive_packet_drop(size);
+>=20
+> Or perhaps a generic tracepoint on packet drops for any device.
+> Anyway this is probably something for after the release.
+>=20
+> Not sure if it's too late to even get the removal of the assert into this=
+ release? Peter?
+>=20
+> >=20
+> > >              return -1;
+> >=20
+> > Shouldn't this be 'return 0'?
+> >=20
+> > The "net/net.h" doc is scarce...
+>=20
+> If we return 0 my understanding is that we later need to actively
+> call qemu_flush_or_purge_queued_packets() to renable the rx
+> path which the GEM model doesn't do. So that would mean
+> refactoring the model a bit.
+
+Actually, the GEM model does do that, my bad, so yes return 0 seems to be t=
+he right thing to do here.
+
+Thanks,
+Edgar
 
 
-Emilio G. Cota <cota@braap.org> writes:
-
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  bsd-user/syscall.c | 3 +++
->  linux-user/exit.c  | 1 +
->  2 files changed, 4 insertions(+)
->
-> diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
-> index 66492aaf5d..b7818af450 100644
-> --- a/bsd-user/syscall.c
-> +++ b/bsd-user/syscall.c
-> @@ -332,6 +332,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, a=
-bi_long arg1,
->          _mcleanup();
->  #endif
->          gdb_exit(cpu_env, arg1);
-> +        qemu_plugin_atexit_cb();
->          /* XXX: should free thread stack and CPU env */
->          _exit(arg1);
->          ret =3D 0; /* avoid warning */
-> @@ -430,6 +431,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, ab=
-i_long arg1,
->          _mcleanup();
->  #endif
->          gdb_exit(cpu_env, arg1);
-> +        qemu_plugin_atexit_cb();
->          /* XXX: should free thread stack and CPU env */
->          _exit(arg1);
->          ret =3D 0; /* avoid warning */
-> @@ -505,6 +507,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, a=
-bi_long arg1,
->          _mcleanup();
->  #endif
->          gdb_exit(cpu_env, arg1);
-> +        qemu_plugin_atexit_cb();
->          /* XXX: should free thread stack and CPU env */
->          _exit(arg1);
->          ret =3D 0; /* avoid warning */
-> diff --git a/linux-user/exit.c b/linux-user/exit.c
-> index 14e94e28fa..768856483a 100644
-> --- a/linux-user/exit.c
-> +++ b/linux-user/exit.c
-> @@ -32,4 +32,5 @@ void preexit_cleanup(CPUArchState *env, int code)
->          __gcov_dump();
->  #endif
->          gdb_exit(env, code);
-> +        qemu_plugin_atexit_cb();
->  }
-
-
---
-Alex Benn=C3=A9e
+>=20
+> Cheers,
+> Edgar
+>=20
+>=20
+> >=20
+> > Regards,
+> >=20
+> > Phil.
+> >=20
+> > >          }
+> > > =20
+> > >=20
