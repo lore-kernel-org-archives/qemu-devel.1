@@ -1,42 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gQCCy-0002bK-3L
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:13:25 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gQCOv-0006Ov-Tw
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:25:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gQCCu-000749-6C
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:13:24 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51890
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gQCCu-00073T-0c
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:13:20 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wANEAdxE054457
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 09:13:19 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2nxh24npyj-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 09:13:18 -0500
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Fri, 23 Nov 2018 14:13:17 -0000
-Reply-To: pmorel@linux.ibm.com
-References: <20181122165457.4517-1-cohuck@redhat.com>
-	<20181122165457.4517-3-cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Fri, 23 Nov 2018 15:13:12 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gQCOq-00079u-UW
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:25:45 -0500
+Date: Fri, 23 Nov 2018 15:20:22 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181123152022.2a07375b@redhat.com>
+In-Reply-To: <20181107123652.23417-8-marcandre.lureau@redhat.com>
+References: <20181107123652.23417-1-marcandre.lureau@redhat.com>
+	<20181107123652.23417-8-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181122165457.4517-3-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <8fbbe0b6-6924-ad61-1d94-26517765f346@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] vfio-ccw: support async command
- subregion
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 07/14] qdev: all globals are now
+ user-provided
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,165 +24,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, qemu-arm@nongnu.org, xen-devel@lists.xenproject.org, Artyom Tarasenko <atar4qemu@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Berger <stefanb@linux.ibm.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <minyard@acm.org>, =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>
 
-On 22/11/2018 17:54, Cornelia Huck wrote:
-> A vfio-ccw device may provide an async command subregion for
-> issuing halt/clear subchannel requests. If it is present, use
-> it for sending halt/clear request to the device; if not, fall
-> back to emulation (as done today).
+On Wed,  7 Nov 2018 16:36:45 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+
+> Considering that CPU features are provided via command line, the
+I can guess what it is about once I recall how -cpu foo,+-feat works,
+but without that knowledge I don't get meaning behind the sentence.
+Could you rephrase it?
+
+> global_props are now all user-provided globals. No need to track this
+> anymore for qdev_prop_check_globals().
 >=20
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->   hw/s390x/css.c              |  27 +++++++--
->   hw/vfio/ccw.c               | 109 +++++++++++++++++++++++++++++++++++=
--
->   include/hw/s390x/s390-ccw.h |   3 +
->   3 files changed, 133 insertions(+), 6 deletions(-)
+>  include/hw/qdev-core.h         |  3 --
+>  hw/core/qdev-properties.c      |  4 ---
+>  tests/test-qdev-global-props.c | 57 ++++------------------------------
+>  vl.c                           |  1 -
+>  4 files changed, 6 insertions(+), 59 deletions(-)
 >=20
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 04ec5cc970..0897c041c5 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -22,6 +22,7 @@
->   #include "trace.h"
->   #include "hw/s390x/s390_flic.h"
->   #include "hw/s390x/s390-virtio-ccw.h"
-> +#include "hw/s390x/s390-ccw.h"
->  =20
->   typedef struct CrwContainer {
->       CRW crw;
-> @@ -1194,6 +1195,26 @@ static void sch_handle_start_func_virtual(SubchD=
-ev *sch)
->  =20
->   }
->  =20
-> +static void sch_handle_halt_func_passthrough(SubchDev *sch)
-> +{
-> +    int ret;
-> +
-> +    ret =3D vfio_ccw_handle_halt(sch);
-> +    if (ret =3D=3D -ENOSYS) {
-> +        sch_handle_halt_func(sch);
-> +    }
-> +}
-> +
-> +static void sch_handle_clear_func_passthrough(SubchDev *sch)
-> +{
-> +    int ret;
-> +
-> +    ret =3D vfio_ccw_handle_clear(sch);
-> +    if (ret =3D=3D -ENOSYS) {
-> +        sch_handle_clear_func(sch);
-> +    }
-> +}
-> +
->   static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
->   {
->  =20
-> @@ -1237,11 +1258,9 @@ IOInstEnding do_subchannel_work_passthrough(Subc=
-hDev *sch)
->       SCSW *s =3D &sch->curr_status.scsw;
->  =20
->       if (s->ctrl & SCSW_FCTL_CLEAR_FUNC) {
-> -        /* TODO: Clear handling */
-> -        sch_handle_clear_func(sch);
-> +        sch_handle_clear_func_passthrough(sch);
->       } else if (s->ctrl & SCSW_FCTL_HALT_FUNC) {
-> -        /* TODO: Halt handling */
-> -        sch_handle_halt_func(sch);
-> +        sch_handle_halt_func_passthrough(sch);
->       } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
->           return sch_handle_start_func_passthrough(sch);
->       }
-> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> index 9246729a75..dd0fecf168 100644
-> --- a/hw/vfio/ccw.c
-> +++ b/hw/vfio/ccw.c
-> @@ -2,9 +2,12 @@
->    * vfio based subchannel assignment support
->    *
->    * Copyright 2017 IBM Corp.
-> + * Copyright 2018 Red Hat, Inc.
-> + *
->    * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->    *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
->    *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-> + *            Cornelia Huck <cohuck@redhat.com>
->    *
->    * This work is licensed under the terms of the GNU GPL, version 2 or=
- (at
->    * your option) any later version. See the COPYING file in the top-le=
-vel
-> @@ -32,6 +35,9 @@ typedef struct VFIOCCWDevice {
->       uint64_t io_region_size;
->       uint64_t io_region_offset;
->       struct ccw_io_region *io_region;
-> +    uint64_t async_cmd_region_size;
-> +    uint64_t async_cmd_region_offset;
-> +    struct ccw_cmd_region *async_cmd_region;
->       EventNotifier io_notifier;
->       bool force_orb_pfch;
->       bool warned_orb_pfch;
-> @@ -114,6 +120,87 @@ again:
->       }
->   }
->  =20
-> +int vfio_ccw_handle_clear(SubchDev *sch)
-> +{
-> +    S390CCWDevice *cdev =3D sch->driver_data;
-> +    VFIOCCWDevice *vcdev =3D DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-> +    struct ccw_cmd_region *region =3D vcdev->async_cmd_region;
-> +    int ret;
-> +
-> +    if (!vcdev->async_cmd_region) {
-> +        /* Async command region not available, fall back to emulation =
-*/
-> +        return -ENOSYS;
-> +    }
-> +
-> +    memset(region, 0, sizeof(*region));
-> +    region->command =3D VFIO_CCW_ASYNC_CMD_CSCH;
-> +
-> +again:
-> +    ret =3D pwrite(vcdev->vdev.fd, region,
-> +                 vcdev->async_cmd_region_size, vcdev->async_cmd_region=
-_offset);
-> +    if (ret !=3D vcdev->async_cmd_region_size) {
-> +        if (errno =3D=3D EAGAIN) {
-
-
-Where do the EAGAIN come from?
-
-
-> +            goto again;
-> +        }
-> +        error_report("vfio-ccw: wirte I/O region failed with errno=3D%=
-d", errno);
-> +        ret =3D -errno;
-> +    } else {
-> +        ret =3D region->ret_code;
-> +    }
-> +    switch (ret) {
-> +    case 0:
-> +    case -ENODEV:
-> +    case -EACCES:
-
-should never happen?
-
-> +        return 0;
-> +    case -EFAULT:
-> +    default:
-> +        sch_gen_unit_exception(sch);
-> +        css_inject_io_interrupt(sch);
-> +        return 0;
-> +    }
-> +}
-> +
-
-otherwise LGTM
-
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index a24d0dd566..baaf097212 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -249,8 +249,6 @@ struct PropertyInfo {
+> =20
+>  /**
+>   * GlobalProperty:
+> - * @user_provided: Set to true if property comes from user-provided conf=
+ig
+> - * (command-line or config file).
+>   * @used: Set to true if property was used when initializing a device.
+>   * @errp: Error destination, used like first argument of error_setg()
+>   *        in case property setting fails later. If @errp is NULL, we
+> @@ -262,7 +260,6 @@ typedef struct GlobalProperty {
+>      const char *driver;
+>      const char *property;
+>      const char *value;
+> -    bool user_provided;
+>      bool used;
+>      Error **errp;
+>  } GlobalProperty;
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index bd84c4ea4c..43c30a57f4 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -1192,9 +1192,6 @@ int qdev_prop_check_globals(void)
+>          if (prop->used) {
+>              continue;
+>          }
+> -        if (!prop->user_provided) {
+> -            continue;
+> -        }
+>          oc =3D object_class_by_name(prop->driver);
+>          oc =3D object_class_dynamic_cast(oc, TYPE_DEVICE);
+>          if (!oc) {
+> @@ -1233,7 +1230,6 @@ void qdev_prop_set_globals(DeviceState *dev)
+>              if (!dev->hotplugged && prop->errp) {
+>                  error_propagate(prop->errp, err);
+>              } else {
+> -                assert(prop->user_provided);
+>                  warn_report_err(err);
+>              }
+>          }
+> diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-prop=
+s.c
+> index 3a8d3170a0..f49a1b70b5 100644
+> --- a/tests/test-qdev-global-props.c
+> +++ b/tests/test-qdev-global-props.c
+> @@ -215,12 +215,12 @@ static void test_dynamic_globalprop_subprocess(void)
+>  {
+>      MyType *mt;
+>      static GlobalProperty props[] =3D {
+> -        { TYPE_DYNAMIC_PROPS, "prop1", "101", true },
+> -        { TYPE_DYNAMIC_PROPS, "prop2", "102", true },
+> -        { TYPE_DYNAMIC_PROPS"-bad", "prop3", "103", true },
+> -        { TYPE_UNUSED_HOTPLUG, "prop4", "104", true },
+> -        { TYPE_UNUSED_NOHOTPLUG, "prop5", "105", true },
+> -        { TYPE_NONDEVICE, "prop6", "106", true },
+> +        { TYPE_DYNAMIC_PROPS, "prop1", "101", },
+> +        { TYPE_DYNAMIC_PROPS, "prop2", "102", },
+> +        { TYPE_DYNAMIC_PROPS"-bad", "prop3", "103", },
+> +        { TYPE_UNUSED_HOTPLUG, "prop4", "104", },
+> +        { TYPE_UNUSED_NOHOTPLUG, "prop5", "105", },
+> +        { TYPE_NONDEVICE, "prop6", "106", },
+>          {}
+>      };
+>      int global_error;
+> @@ -255,46 +255,6 @@ static void test_dynamic_globalprop(void)
+>      g_test_trap_assert_stdout("");
+>  }
+> =20
+> -/* Test setting of dynamic properties using user_provided=3Dfalse proper=
+ties */
+> -static void test_dynamic_globalprop_nouser_subprocess(void)
+> -{
+> -    MyType *mt;
+> -    static GlobalProperty props[] =3D {
+> -        { TYPE_DYNAMIC_PROPS, "prop1", "101" },
+> -        { TYPE_DYNAMIC_PROPS, "prop2", "102" },
+> -        { TYPE_DYNAMIC_PROPS"-bad", "prop3", "103" },
+> -        { TYPE_UNUSED_HOTPLUG, "prop4", "104" },
+> -        { TYPE_UNUSED_NOHOTPLUG, "prop5", "105" },
+> -        { TYPE_NONDEVICE, "prop6", "106" },
+> -        {}
+> -    };
+> -    int global_error;
+> -
+> -    register_global_properties(props);
+> -
+> -    mt =3D DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
+> -    qdev_init_nofail(DEVICE(mt));
+> -
+> -    g_assert_cmpuint(mt->prop1, =3D=3D, 101);
+> -    g_assert_cmpuint(mt->prop2, =3D=3D, 102);
+> -    global_error =3D qdev_prop_check_globals();
+> -    g_assert_cmpuint(global_error, =3D=3D, 0);
+> -    g_assert(props[0].used);
+> -    g_assert(props[1].used);
+> -    g_assert(!props[2].used);
+> -    g_assert(!props[3].used);
+> -    g_assert(!props[4].used);
+> -    g_assert(!props[5].used);
+> -}
+> -
+> -static void test_dynamic_globalprop_nouser(void)
+> -{
+> -    g_test_trap_subprocess("/qdev/properties/dynamic/global/nouser/subpr=
+ocess", 0, 0);
+> -    g_test_trap_assert_passed();
+> -    g_test_trap_assert_stderr("");
+> -    g_test_trap_assert_stdout("");
+> -}
+> -
+>  /* Test if global props affecting subclasses are applied in the right or=
+der */
+>  static void test_subclass_global_props(void)
+>  {
+> @@ -344,11 +304,6 @@ int main(int argc, char **argv)
+>      g_test_add_func("/qdev/properties/dynamic/global",
+>                      test_dynamic_globalprop);
+> =20
+> -    g_test_add_func("/qdev/properties/dynamic/global/nouser/subprocess",
+> -                    test_dynamic_globalprop_nouser_subprocess);
+> -    g_test_add_func("/qdev/properties/dynamic/global/nouser",
+> -                    test_dynamic_globalprop_nouser);
+> -
+>      g_test_add_func("/qdev/properties/global/subclass",
+>                      test_subclass_global_props);
+> =20
+> diff --git a/vl.c b/vl.c
+> index 2aea884c9d..d11b070e70 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2931,7 +2931,6 @@ static int global_init_func(void *opaque, QemuOpts =
+*opts, Error **errp)
+>      g->driver   =3D qemu_opt_get(opts, "driver");
+>      g->property =3D qemu_opt_get(opts, "property");
+>      g->value    =3D qemu_opt_get(opts, "value");
+> -    g->user_provided =3D true;
+>      g->errp =3D &error_fatal;
+>      qdev_prop_register_global(g);
+>      return 0;
