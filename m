@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gQ4Um-0005Ll-1P
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 00:59:16 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gQ4rQ-00031W-IR
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 01:22:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gQ4Ui-0005hy-Sa
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 00:59:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42806)
+	(envelope-from <kraxel@redhat.com>) id 1gQ4qW-0001Mu-4l
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 01:21:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36198)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gQ4Ui-0005cR-Jc
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 00:59:12 -0500
-Date: Fri, 23 Nov 2018 13:57:37 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20181123055737.GA8087@wei-ubt>
-References: <1542895581-10721-1-git-send-email-wexu@redhat.com>
-	<2a4aa88d-37ce-7b9e-14c9-238b1e0ffd5c@redhat.com>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gQ4qV-0001KA-Vr
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 01:21:44 -0500
+Date: Fri, 23 Nov 2018 07:21:38 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181123062138.rdfaeaqq5uw43ey2@sirius.home.kraxel.org>
+References: <CAGxU2F4O4aKzrJky7EFeWaHFuBKPwi_Z-j7G7m+ENRojVG_5vA@mail.gmail.com>
+	<20181119130713.GB6443@stefanha-x1.localdomain>
+	<20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
+	<CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
+	<20181120062109.eahirgygm4br3ov7@sirius.home.kraxel.org>
+	<CAGxU2F64uK5oygQecZKOPpsyb--Pth9U00P_gghrtYDwQrSGtg@mail.gmail.com>
+	<20181120112203.rzhhdl6hhsjf5twt@sirius.home.kraxel.org>
+	<CAGxU2F4LNN1UtVJFADxm1V4eBDQ8eGSoAjPXC=X8+zSR4yd9Nw@mail.gmail.com>
+	<20181122115135.funmtcql3xhrixi6@sirius.home.kraxel.org>
+	<CAGxU2F6462MF00_0dh_6HiFPgVyEpaRTEPJ_0-sUdg8YnhgLcw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2a4aa88d-37ce-7b9e-14c9-238b1e0ffd5c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 00/16] packed ring virtio-net backend
- support
+In-Reply-To: <CAGxU2F6462MF00_0dh_6HiFPgVyEpaRTEPJ_0-sUdg8YnhgLcw@mail.gmail.com>
+Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,118 +35,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: qemu-devel@nongnu.org, tiwei.bie@intel.com, jasowang@redhat.com, mst@redhat.com, jfreimann@redhat.com
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Kevin OConnor <kevin@koconnor.net>, Samuel Ortiz <sameo@linux.intel.com>, seabios@seabios.org, Stefan Hajnoczi <stefanha@gmail.com>, Rob Bradford <robert.bradford@intel.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stephend@silicom-usa.com, stefanb@linux.ibm.com
 
-On Thu, Nov 22, 2018 at 06:57:31PM +0100, Maxime Coquelin wrote:
-> Hi Wei,
+On Thu, Nov 22, 2018 at 04:13:38PM +0100, Stefano Garzarella wrote:
+> On Thu, Nov 22, 2018 at 12:51 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >
+> > On Thu, Nov 22, 2018 at 12:08:55PM +0100, Stefano Garzarella wrote:
+> > > Hi,
+> > > I continued to investigate how to reduce the boot time with SeaBIOS
+> > > and QEMU when it used with linuxboot_dma.bin (-kernel parameter).
+> > > I reached ~12ms with a SeaBIOS configuration (attached) where I
+> > > disabled debug output, all Hardware support (except SMM & MTRRs) and I
+> > > applied a small patch to disable VGA setup and console (attached).
+> >
+> > Is there any difference to "qemu -vga none" ?
 > 
-> I just tested your series with Tiwei's v3, and it fails
-> with ctrl vq enabled:
-> qemu-system-x86_64: virtio-net ctrl missing headers
+> Using both (qemu -vga none, and my patch) we are around 10.8 ms.
+> Note: using only the patch, Linux is still able to initialize and use the VGA.
 
-OK, I haven't tried Tiwei's v3 yet, will give it a try.
+But do you want linux use the vga console if you care about boot times?
+I'd expect virtio-console would be fastest in that case.
 
-Wei
-
+> - QEMU -vga none + SeaBIOS config (CONFIG_DEBUG_LEVEL=0, disable all
+> HW support except
+> SMM & MTRRs) + Stephen's TPM patch
+>  qemu_init_end: 43.675803
+>  fw_start: 43.865178 (+0.189375)
+>  fw_do_boot: 58.093161 (+14.227983)
+>  linux_start_boot: 59.490308 (+1.397147)
+>  linux_start_user: 556.782354 (+497.292046)
 > 
-> Regards,
-> Maxime
-> 
-> On 11/22/18 3:06 PM, wexu@redhat.com wrote:
-> >From: Wei Xu <wexu@redhat.com>
-> >
-> >Code base:
-> >     https://github.com/Whishay/qemu.git
-> >
-> >rfc v3 -> v1
-> >- migration support for both userspace and vhost-net, need tweak vhost
-> >   ioctl() to make it work(the code is pasted in the commit message of
-> >   vhost migration patch #13).
-> >
-> >Note:
-> >   the high 32-bit guest feature bit is saved as a subsection for
-> >   virtio devices which makes packed ring feature bit check unusable when
-> >   loading the saved per-queue variables(this is done before loading
-> >   subsection which is the last action for device during migration),
-> >   so I save and load all the things generally for now, any idea to fix this?
-> >
-> >- Fixed comments from Jason for rfc v3 sorted by patch #, two comments I
-> >   didn't take were(from patch) listed here:
-> >09: - introduce new API(virtqueue_fill_n()).
-> >       - Didn't take it since userspace backend does not support batching,
-> >         so only one element is popped and current API should be enough.
-> >06 & 07: Refactor split and packed pop()/get_avail_bytes().
-> >          - the duplicated code interwined with split/packed ring specific
-> >            things and it might make it unclear, so I only extracted the few
-> >            common parts out side rcu and keep the others separate.
-> >
-> >The other revised comments:
-> >02: - reuse current 'avail/used' for 'driver/device' in VRingMemoryRegionCache.
-> >     - remove event_idx since shadow_avail_idx works.
-> >03: - move size recalculation to a separate patch.
-> >     - keep 'avail/used' in current calculation function name.
-> >     - initialize 'desc' memory region as 'false' for 1.0('true' for 1.1)
-> >04: - delete 'event_idx'
-> >05: - rename 'wc' to wrap_counter.
-> >06: - converge common part outside rcu section for 1.0/1.1.
-> >     - move memory barrier for the first 'desc' in between checking flag
-> >       and read other fields.
-> >     - remove unnecessary memory barriers for indirect descriptors.
-> >     - no need to destroy indirect memory cache since it is generally done
-> >       before return from the function.
-> >     - remove redundant maximum chained descriptors limitation check.
-> >     - there are some differences(desc name, wrap idx/counter, flags) between
-> >       split and packed rings, so keep them separate for now.
-> >     - amend the comment when recording index and wrap counter for a kick
-> >       from guest.
-> >07: - calculate fields in descriptor instead of read it when filling.
-> >     - put memory barrier correctly before filling the flags in descriptor.
-> >     - replace full memory barrier with a write barrier in fill.
-> >     - shift to read descriptor flags and descriptor necessarily and
-> >       separately in packed_pop().
-> >     - correct memory barrier in packed_pop() as in packed_fill().
-> >08: - reuse 'shadow_avail_idx' instead of adding a new 'event_idx'.
-> >     - use the compact and verified vring_packed_need_event()
-> >       version for vhost net/user.
-> >12: - remove the odd cherry-pick comment.
-> >     - used bit '15' for wrap_counters.
-> >
-> >rfc v2->v3
-> >- addressed performance issue
-> >- fixed feedback from v2
-> >
-> >rfc v1->v2
-> >- sync to tiwei's v5
-> >- reuse memory cache function with 1.0
-> >- dropped detach patch and notification helper(04 & 05 in v1)
-> >- guest virtio-net driver unload/reload support
-> >- event suppression support(not tested)
-> >- addressed feedback from v1
-> >
-> >Wei Xu (15):
-> >   virtio: introduce packed ring definitions
-> >   virtio: redefine structure & memory cache for packed ring
-> >   virtio: expand offset calculation for packed ring
-> >   virtio: add memory region init for packed ring
-> >   virtio: init wrap counter for packed ring
-> >   virtio: init and desc empty check for packed ring
-> >   virtio: get avail bytes check for packed ring
-> >   virtio: fill/flush/pop for packed ring
-> >   virtio: event suppression support for packed ring
-> >   virtio-net: fill head desc after done all in a chain
-> >   virtio: add userspace migration of packed ring
-> >   virtio: add vhost-net migration of packed ring
-> >   virtio: packed ring feature bit for userspace backend
-> >   vhost: enable packed ring
-> >   virtio: enable packed ring via a new command line
-> >
-> >  VERSION                                        |   2 +-
-> >  hw/net/vhost_net.c                             |   2 +
-> >  hw/net/virtio-net.c                            |  11 +-
-> >  hw/virtio/virtio.c                             | 756 +++++++++++++++++++++++--
-> >  include/hw/virtio/virtio.h                     |   8 +-
-> >  include/standard-headers/linux/virtio_config.h |  15 +
-> >  include/standard-headers/linux/virtio_ring.h   |  43 ++
-> >  7 files changed, 783 insertions(+), 54 deletions(-)
-> >
+> - QEMU -vga none + SeaBIOS config (CONFIG_DEBUG_LEVEL=0, disable all
+> HW support except
+> SMM & MTRRs, CONFIG_DISABLE_VGA=y) + Stephen's TPM patch
+>  qemu_init_end: 42.387412
+>  fw_start: 42.579257 (+0.191845)
+>  fw_do_boot: 53.381517 (+10.802260)
+>  linux_start_boot: 54.848643 (+1.467126)
+>  linux_start_user: 498.517050 (+443.668407)
+
+Interesting that CONFIG_DISABLE_VGA=y makes a noticable difference even
+without vga hardware being preset.  And not only in seabios but also for
+the linux kernel.
+
+Do you know why?
+
+cheers,
+  Gerd
