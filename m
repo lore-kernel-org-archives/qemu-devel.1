@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gQCif-0007yR-Qt
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:11 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gQCig-0007yY-T5
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gQCia-00036N-QM
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:09 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:55755)
+	(envelope-from <richard.henderson@linaro.org>) id 1gQCif-0003AS-Oc
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:10 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38779)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gQCia-00034b-33
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:04 -0500
-Received: by mail-wm1-x334.google.com with SMTP id y139so12074211wmc.5
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 06:46:02 -0800 (PST)
+	id 1gQCif-00038g-HQ
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:09 -0500
+Received: by mail-wm1-x343.google.com with SMTP id k198so12261561wmd.3
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 06:46:08 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 23 Nov 2018 15:45:21 +0100
-Message-Id: <20181123144558.5048-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH for-4.0 v2 00/37] tcg: Assorted cleanups
+Date: Fri, 23 Nov 2018 15:45:28 +0100
+Message-Id: <20181123144558.5048-8-richard.henderson@linaro.org>
+In-Reply-To: <20181123144558.5048-1-richard.henderson@linaro.org>
+References: <20181123144558.5048-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH for-4.0 v2 07/37] tcg/i386: Change
+ TCG_REG_L[01] to not overlap function arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +30,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair.Francis@wdc.com
 
-This includes everything queued so far -- softmmu out-of-line
-patches, bswap cleanups, and (new) eliminating all scratch
-registers from x86 user-only memops.
+We will shortly be forcing qemu_ld/st arguments into registers
+that match the function call abi of the host, which means that
+the temps must be elsewhere.
 
-This tree is now at
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/i386/tcg-target.inc.c | 28 +++++++++++++++++++---------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
 
-  https://github.com/rth7680/qemu.git tcg-next-for-4.0
-
-for future tcg/riscv/ rebasing.
-
-
-r~
-
-
-Richard Henderson (37):
-  tcg/i386: Always use %ebp for TCG_AREG0
-  tcg/i386: Move TCG_REG_CALL_STACK from define to enum
-  tcg: Return success from patch_reloc
-  tcg: Add TCG_TARGET_NEED_LDST_OOL_LABELS
-  tcg/i386: Add constraints for r8 and r9
-  tcg/i386: Return a base register from tcg_out_tlb_load
-  tcg/i386: Change TCG_REG_L[01] to not overlap function arguments
-  tcg/i386: Force qemu_ld/st arguments into fixed registers
-  tcg/i386: Use TCG_TARGET_NEED_LDST_OOL_LABELS
-  tcg/aarch64: Add constraints for x0, x1, x2
-  tcg/aarch64: Parameterize the temps for tcg_out_tlb_read
-  tcg/aarch64: Parameterize the temp for tcg_out_goto_long
-  tcg/aarch64: Use B not BL for tcg_out_goto_long
-  tcg/aarch64: Use TCG_TARGET_NEED_LDST_OOL_LABELS
-  tcg/arm: Parameterize the temps for tcg_out_tlb_read
-  tcg/arm: Add constraints for R0-R5
-  tcg/arm: Reduce the number of temps for tcg_out_tlb_read
-  tcg/arm: Force qemu_ld/st arguments into fixed registers
-  tcg/arm: Use TCG_TARGET_NEED_LDST_OOL_LABELS
-  tcg/ppc: Parameterize the temps for tcg_out_tlb_read
-  tcg/ppc: Split out tcg_out_call_int
-  tcg/ppc: Add constraints for R7-R8
-  tcg/ppc: Change TCG_TARGET_CALL_ALIGN_ARGS to bool
-  tcg/ppc: Force qemu_ld/st arguments into fixed registers
-  tcg/ppc: Use TCG_TARGET_NEED_LDST_OOL_LABELS
-  tcg: Clean up generic bswap32
-  tcg: Clean up generic bswap64
-  tcg/optimize: Optimize bswap
-  tcg: Add TCG_TARGET_HAS_MEMORY_BSWAP
-  tcg/i386: Adjust TCG_TARGET_HAS_MEMORY_BSWAP
-  tcg/aarch64: Set TCG_TARGET_HAS_MEMORY_BSWAP to false
-  tcg/arm: Set TCG_TARGET_HAS_MEMORY_BSWAP to false for user-only
-  tcg/i386: Propagate is64 to tcg_out_qemu_ld_direct
-  tcg/i386: Restrict user-only qemu_st_i32 values to q-regs
-  tcg/i386: Add setup_guest_base_seg for FreeBSD
-  tcg/i386: Require segment syscalls to succeed
-  tcg/i386: Remove L constraint
-
- tcg/aarch64/tcg-target.h     |   3 +-
- tcg/arm/tcg-target.h         |   7 +-
- tcg/i386/tcg-target.h        |  19 +-
- tcg/mips/tcg-target.h        |   1 +
- tcg/ppc/tcg-target.h         |   3 +-
- tcg/s390/tcg-target.h        |   1 +
- tcg/sparc/tcg-target.h       |   1 +
- tcg/tcg.h                    |   5 +
- tcg/tci/tcg-target.h         |   2 +
- accel/tcg/translate-all.c    |  15 +-
- tcg/aarch64/tcg-target.inc.c | 369 ++++++++--------
- tcg/arm/tcg-target.inc.c     | 643 +++++++++++++--------------
- tcg/i386/tcg-target.inc.c    | 821 ++++++++++++++++++++---------------
- tcg/mips/tcg-target.inc.c    |  29 +-
- tcg/optimize.c               |  12 +
- tcg/ppc/tcg-target.inc.c     | 562 +++++++++++++-----------
- tcg/s390/tcg-target.inc.c    |  37 +-
- tcg/sparc/tcg-target.inc.c   |  13 +-
- tcg/tcg-ldst-ool.inc.c       |  95 ++++
- tcg/tcg-op.c                 | 215 ++++++---
- tcg/tcg-pool.inc.c           |   5 +-
- tcg/tcg.c                    |  36 +-
- tcg/tci/tcg-target.inc.c     |   3 +-
- 23 files changed, 1628 insertions(+), 1269 deletions(-)
- create mode 100644 tcg/tcg-ldst-ool.inc.c
-
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 3234a8d8bf..07df4b2b12 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -121,12 +121,16 @@ static const int tcg_target_call_oarg_regs[] = {
+ #define TCG_CT_CONST_I32 0x400
+ #define TCG_CT_CONST_WSZ 0x800
+ 
+-/* Registers used with L constraint, which are the first argument
+-   registers on x86_64, and two random call clobbered registers on
+-   i386. */
++/* Registers used with L constraint, which are two random
++ * call clobbered registers.  These should be free.
++ */
+ #if TCG_TARGET_REG_BITS == 64
+-# define TCG_REG_L0 tcg_target_call_iarg_regs[0]
+-# define TCG_REG_L1 tcg_target_call_iarg_regs[1]
++# define TCG_REG_L0   TCG_REG_RAX
++# ifdef _WIN64
++#  define TCG_REG_L1  TCG_REG_R10
++# else
++#  define TCG_REG_L1  TCG_REG_RDI
++# endif
+ #else
+ # define TCG_REG_L0 TCG_REG_EAX
+ # define TCG_REG_L1 TCG_REG_EDX
+@@ -1628,6 +1632,7 @@ static TCGReg tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+     unsigned a_mask = (1 << a_bits) - 1;
+     unsigned s_mask = (1 << s_bits) - 1;
+     target_ulong tlb_mask;
++    TCGReg base;
+ 
+     if (TCG_TARGET_REG_BITS == 64) {
+         if (TARGET_LONG_BITS == 64) {
+@@ -1674,7 +1679,12 @@ static TCGReg tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+        before the fastpath ADDQ below.  For 64-bit guest and x32 host, MOVQ
+        copies the entire guest address for the slow path, while truncation
+        for the 32-bit host happens with the fastpath ADDL below.  */
+-    tcg_out_mov(s, ttype, r1, addrlo);
++    if (TCG_TARGET_REG_BITS == 64) {
++        base = tcg_target_call_iarg_regs[1];
++    } else {
++        base = r1;
++    }
++    tcg_out_mov(s, ttype, base, addrlo);
+ 
+     /* jne slow_path */
+     tcg_out_opc(s, OPC_JCC_long + JCC_JNE, 0, 0, 0);
+@@ -1693,11 +1703,11 @@ static TCGReg tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+ 
+     /* TLB Hit.  */
+ 
+-    /* add addend(r0), r1 */
+-    tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r1, r0,
++    /* add addend(r0), base */
++    tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, base, r0,
+                          offsetof(CPUTLBEntry, addend) - which);
+ 
+-    return r1;
++    return base;
+ }
+ 
+ /*
 -- 
 2.17.2
