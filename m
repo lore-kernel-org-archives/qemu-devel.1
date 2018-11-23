@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ4-0004m6-Q0
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:07 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ7-0004nM-6z
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ3-0005Dy-E2
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ4-0005Gd-Do
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:02 -0500
+Received: from cmccmta3.chinamobile.com ([221.176.66.81]:21651)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ2-00056Y-6l
 	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:00 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 23 Nov 2018 23:30:20 +0800
-Message-Id: <20181123153040.18933-2-maozhongyi@cmss.chinamobile.com>
+Date: Fri, 23 Nov 2018 23:30:31 +0800
+Message-Id: <20181123153040.18933-13-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
 References: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 01/21] musicpal: Convert sysbus init
+Subject: [Qemu-devel] [PATCH v2 12/21] milkymist-pfpu: Convert sysbus init
  function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,54 +25,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, jan.kiszka@web.de, peter.maydell@linaro.org, qemu-arm@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, michael@walle.cc, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-mv88w8618_wlan_class_init().
+milkymist_pfpu_class_init().
 
-Cc: jan.kiszka@web.de
-Cc: peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org
+Cc: michael@walle.cc
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/arm/musicpal.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ hw/misc/milkymist-pfpu.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index 9648b3af44..7ffcdbb097 100644
---- a/hw/arm/musicpal.c
-+++ b/hw/arm/musicpal.c
-@@ -1147,14 +1147,13 @@ static const MemoryRegionOps mv88w8618_wlan_ops = {
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
+diff --git a/hw/misc/milkymist-pfpu.c b/hw/misc/milkymist-pfpu.c
+index 86f5e383b0..4a03c7ee63 100644
+--- a/hw/misc/milkymist-pfpu.c
++++ b/hw/misc/milkymist-pfpu.c
+@@ -497,17 +497,16 @@ static void milkymist_pfpu_reset(DeviceState *d)
+     }
+ }
  
--static int mv88w8618_wlan_init(SysBusDevice *dev)
-+static void mv88w8618_wlan_realize(DeviceState *dev, Error **errp)
+-static int milkymist_pfpu_init(SysBusDevice *dev)
++static void milkymist_pfpu_realize(DeviceState *dev, Error **errp)
  {
-     MemoryRegion *iomem = g_new(MemoryRegion, 1);
+     MilkymistPFPUState *s = MILKYMIST_PFPU(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
  
-     memory_region_init_io(iomem, OBJECT(dev), &mv88w8618_wlan_ops, NULL,
-                           "musicpal-wlan", MP_WLAN_SIZE);
--    sysbus_init_mmio(dev, iomem);
+-    sysbus_init_irq(dev, &s->irq);
++    sysbus_init_irq(sbd, &s->irq);
+ 
+     memory_region_init_io(&s->regs_region, OBJECT(dev), &pfpu_mmio_ops, s,
+             "milkymist-pfpu", MICROCODE_END * 4);
+-    sysbus_init_mmio(dev, &s->regs_region);
+-
 -    return 0;
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), iomem);
++    sysbus_init_mmio(sbd, &s->regs_region);
  }
  
- /* GPIO register offsets */
-@@ -1720,9 +1719,9 @@ DEFINE_MACHINE("musicpal", musicpal_machine_init)
- 
- static void mv88w8618_wlan_class_init(ObjectClass *klass, void *data)
+ static const VMStateDescription vmstate_milkymist_pfpu = {
+@@ -527,9 +526,8 @@ static const VMStateDescription vmstate_milkymist_pfpu = {
+ static void milkymist_pfpu_class_init(ObjectClass *klass, void *data)
  {
--    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
  
--    sdc->init = mv88w8618_wlan_init;
-+    dc->realize = mv88w8618_wlan_realize;
+-    k->init = milkymist_pfpu_init;
++    dc->realize = milkymist_pfpu_realize;
+     dc->reset = milkymist_pfpu_reset;
+     dc->vmsd = &vmstate_milkymist_pfpu;
  }
- 
- static const TypeInfo mv88w8618_wlan_info = {
 -- 
 2.17.1
