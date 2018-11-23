@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gQ7b2-0007u5-An
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 04:17:59 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gQ7bL-0008KY-TP
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 04:18:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gQ7b1-0000kG-4t
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 04:17:56 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gQ7bH-0001S2-7f
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 04:18:15 -0500
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Fri, 23 Nov 2018 10:17:25 +0100
-Message-Id: <20181123091729.29921-13-luc.michel@greensocs.com>
+Date: Fri, 23 Nov 2018 10:17:24 +0100
+Message-Id: <20181123091729.29921-12-luc.michel@greensocs.com>
 In-Reply-To: <20181123091729.29921-1-luc.michel@greensocs.com>
 References: <20181123091729.29921-1-luc.michel@greensocs.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 12/16] gdbstub: add support for vAttach
- packets
+Subject: [Qemu-devel] [PATCH v7 11/16] gdbstub: add support for extended
+ mode packet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +25,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, mark.burton@greensocs.com, Eduardo Habkost <ehabkost@redhat.com>
 
-Add support for the vAttach packets. In multiprocess mode, GDB sends
-them to attach to additional processes.
+Add support for the '!' extended mode packet. This is required for the
+multiprocess extension.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Acked-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- gdbstub.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ gdbstub.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 5cc643b9e0..69471ea914 100644
+index 0cccce1f38..5cc643b9e0 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1342,10 +1342,45 @@ static int gdb_handle_packet(GDBState *s, const c=
+@@ -1296,10 +1296,13 @@ static int gdb_handle_packet(GDBState *s, const c=
 har *line_buf)
-                     break;
-                 }
-                 goto unknown_command;
-             }
-             break;
-+        } else if (strncmp(p, "Attach;", 7) =3D=3D 0) {
-+            unsigned long pid;
-+
-+            p +=3D 7;
-+
-+            if (qemu_strtoul(p, &p, 16, &pid)) {
-+                put_packet(s, "E22");
-+                break;
-+            }
-+
-+            process =3D gdb_get_process(s, pid);
-+
-+            if (process =3D=3D NULL) {
-+                put_packet(s, "E22");
-+                break;
-+            }
-+
-+            cpu =3D get_first_cpu_in_process(s, process);
-+
-+            if (cpu =3D=3D NULL) {
-+                /* Refuse to attach an empty process */
-+                put_packet(s, "E22");
-+                break;
-+            }
-+
-+            process->attached =3D true;
-+
-+            s->g_cpu =3D cpu;
-+            s->c_cpu =3D cpu;
-+
-+            snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRA=
-P,
-+                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_=
-id)));
-+
-+            put_packet(s, buf);
-+            break;
-         } else {
-             goto unknown_command;
-         }
-     case 'k':
-         /* Kill the target */
+     trace_gdbstub_io_command(line_buf);
+=20
+     p =3D line_buf;
+     ch =3D *p++;
+     switch(ch) {
++    case '!':
++        put_packet(s, "OK");
++        break;
+     case '?':
+         /* TODO: Make this return the correct value for user-mode.  */
+         snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
+                  gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread=
+_id)));
+         put_packet(s, buf);
 --=20
 2.19.1
