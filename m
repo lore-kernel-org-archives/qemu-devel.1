@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gQ8HW-0000Th-JR
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:01:51 -0500
+	(envelope-from <prvs=8582a9f6d=roger.pau@citrix.com>)
+	id 1gQ8Yg-0006y3-9w
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:19:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gQ8HU-0005FF-HT
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:01:50 -0500
-Date: Fri, 23 Nov 2018 10:01:30 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181123100129.GA2373@work-vm>
-References: <1542912487-279165-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-	<1542912487-279165-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+	(envelope-from <prvs=8582a9f6d=roger.pau@citrix.com>)
+	id 1gQ8Yc-0000gm-9y
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:19:34 -0500
+Received: from smtp.eu.citrix.com ([185.25.65.24]:24110)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=8582a9f6d=roger.pau@citrix.com>)
+	id 1gQ8Yb-0000YL-SL
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:19:30 -0500
+Date: Fri, 23 Nov 2018 11:19:19 +0100
+From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+Message-ID: <20181123101919.twxrmehljvyhuii6@mac>
+References: <20181016021439.6212-1-yan.y.zhao@intel.com>
+	<F22B14EC3CFBB843AD3E03B6B78F2C6A4ACFD80C@SHSMSX104.ccr.corp.intel.com>
+	<20181018145636.k6ptvn4iszabjhxw@mac.bytemobile.com>
+	<20181122131110.GA31906@joy-OptiPlex-7040>
+	<20181122141805.vyqywi4ep65loye3@mac>
+	<20181123050451.GC31906@joy-OptiPlex-7040>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Disposition: inline
-In-Reply-To: <1542912487-279165-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] The discard flag for block stream
- operation
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181123050451.GC31906@joy-OptiPlex-7040>
+Subject: Re: [Qemu-devel] [PATCH] Xen PCI passthrough: fix passthrough
+ failure when irq map failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,149 +36,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: Zhao Yan <yan.y.zhao@intel.com>
+Cc: sstabellini@kernel.org, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, JBeulich@suse.com
 
-* Andrey Shinkevich (andrey.shinkevich@virtuozzo.com) wrote:
-> Adding a parameter to QMP block-stream command to allow discarding
-> blocks in the backing chain while blocks are being copied to the
-> active layer.
+Adding Jan in case he has an opinion on my reply below.
+
+On Fri, Nov 23, 2018 at 12:04:51AM -0500, Zhao Yan wrote:
+> On Thu, Nov 22, 2018 at 03:18:05PM +0100, Roger Pau Monné wrote:
+> > On Thu, Nov 22, 2018 at 08:11:20AM -0500, Zhao Yan wrote:
+> > > On Thu, Oct 18, 2018 at 03:56:36PM +0100, Roger Pau Monné wrote:
+> > > > On Thu, Oct 18, 2018 at 08:22:41AM +0000, Zhao, Yan Y wrote:
+> > > > > Hi
+> > > > > The background for this patch is that: for some pci device, even it's PCI_INTERRUPT_PIN is not 0, it actually does not support INTx mode, so we should just report error, disable INTx mode and continue the passthrough.
+> > > > > However, the commit 5a11d0f7 regards this as error condition and let qemu quit passthrough, which is too rigorous.
+> > > > > 
+> > > > > Error message is below:
+> > > > > libxl: error: libxl_qmp.c:287:qmp_handle_error_response: Domain 2:received an error message from QMP server: Mapping machine irq 0 to pirq -1 failed: Operation not permitted
+> > > > 
+> > > > I'm having issues figuring out what's happening here.
+> > > > s->real_device.irq is 0, yet the PCI config space read of
+> > > > PCI_INTERRUPT_PIN returns something different than 0.
+> > > > 
+> > > > AFAICT this is due to some kind of error in Linux, so that even when
+> > > > the device is supposed to have a valid IRQ the sysfs node it is set to
+> > > > 0, do you know the actual underlying cause of this?
+> > > > 
+> > > > Thanks, Roger.
+> > > Hi Roger
+> > > Sorry for the later reply, I just missed this mail...
+> > > On my side, it's because the hardware actually does not support INTx mode,
+> > > but its configuration space does not report PCI_INTERRUPT_PIN to 0. It's a
+> > > hardware bug, but previous version of qemu can tolerate it, switch to MSI
+> > > and make passthrough work.
+> > 
+> > Then I think it would be better to check both PCI_INTERRUPT_PIN and
+> > s->real_device.irq before attempting to map the IRQ.
+> > 
+> > Making the error non-fatal would mean that a device with a valid IRQ
+> > could fail to be setup correctly but the guest will still be created,
+> > and things won't go as expected when the guest attempts to use it.
+> > 
+> > Thanks, Roger.
+> hi roger
+> thanks for your sugguestion. it's right that "s->real_device.irq" is needed to be checked before mapping, like if it's 0.
+> but on the other hand, maybe xc_physdev_map_pirq() itself can serve as a checking of "s->real_device.irq" ?
+> like in our case, it will fail and return -EPERM.
+> then error hanling is still conducted ==>set INTX_DISABLE flag, eventhrough the error is not fatal.
 > 
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->  block/stream.c            | 3 +--
->  blockdev.c                | 8 +++++++-
->  hmp-commands.hx           | 4 ++--
->  hmp.c                     | 4 +++-
->  include/block/block_int.h | 2 +-
->  qapi/block-core.json      | 5 ++++-
->  6 files changed, 18 insertions(+), 8 deletions(-)
+>     machine_irq = s->real_device.irq;
+>     rc = xc_physdev_map_pirq(xen_xc, xen_domid, machine_irq, &pirq);
+>     if (rc < 0) {
+>         error_setg_errno(errp, errno, "Mapping machine irq %u to"
+>                          " pirq %i failed", machine_irq, pirq);
 > 
-> diff --git a/block/stream.c b/block/stream.c
-> index 9e85954..e844e94 100644
-> --- a/block/stream.c
-> +++ b/block/stream.c
-> @@ -584,10 +584,9 @@ static const BlockJobDriver stream_job_driver = {
->  
->  void stream_start(const char *job_id, BlockDriverState *bs,
->                    BlockDriverState *base, const char *backing_file_str,
-> -                  int creation_flags, int64_t speed,
-> +                  int creation_flags, int64_t speed, bool discard,
->                    BlockdevOnError on_error, Error **errp)
->  {
-> -    const bool discard = false;
->      StreamBlockJob *s = NULL;
->      BlockDriverState *iter;
->      int orig_bs_flags;
-> diff --git a/blockdev.c b/blockdev.c
-> index 81f95d9..333592e 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -3141,6 +3141,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
->                        bool has_base_node, const char *base_node,
->                        bool has_backing_file, const char *backing_file,
->                        bool has_speed, int64_t speed,
-> +                      bool has_discard, bool discard,
->                        bool has_on_error, BlockdevOnError on_error,
->                        bool has_auto_finalize, bool auto_finalize,
->                        bool has_auto_dismiss, bool auto_dismiss,
-> @@ -3157,6 +3158,10 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
->          on_error = BLOCKDEV_ON_ERROR_REPORT;
->      }
->  
-> +    if (!has_discard) {
-> +        discard = false;
-> +    }
-> +
->      bs = bdrv_lookup_bs(device, device, errp);
->      if (!bs) {
->          return;
-> @@ -3221,7 +3226,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
->      }
->  
->      stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
-> -                 job_flags, has_speed ? speed : 0, on_error, &local_err);
-> +                 job_flags, has_speed ? speed : 0,
-> +                 discard, on_error, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
->          goto out;
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index db0c681..a7e2a10 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -95,8 +95,8 @@ ETEXI
->  
->      {
->          .name       = "block_stream",
-> -        .args_type  = "device:B,speed:o?,base:s?",
-> -        .params     = "device [speed [base]]",
-> +        .args_type  = "device:B,speed:o?,base:s?,discard:-d",
-> +        .params     = "device [speed [base]] [-d]",
->          .help       = "copy data from a backing file into a block device",
->          .cmd        = hmp_block_stream,
->      },
-> diff --git a/hmp.c b/hmp.c
-> index 7828f93..0d263e4 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1920,9 +1920,11 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
->      const char *device = qdict_get_str(qdict, "device");
->      const char *base = qdict_get_try_str(qdict, "base");
->      int64_t speed = qdict_get_try_int(qdict, "speed", 0);
-> +    bool discard = qdict_get_try_bool(qdict, "discard", false);
->  
->      qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
-> -                     false, NULL, qdict_haskey(qdict, "speed"), speed, true,
-> +                     false, NULL, qdict_haskey(qdict, "speed"), speed,
-> +                     true, discard, true,
->                       BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
->                       &error);
+>         /* Disable PCI intx assertion (turn on bit10 of devctl) */
+>         cmd |= PCI_COMMAND_INTX_DISABLE;
+>         machine_irq = 0;
+>         s->machine_irq = 0;
+> So, do you think it's all right just converting fatal error to non-fatal?
 
-Yep, so I think those are better from the HMP side; so purely from the
-HMP side;
+As I said above, I think it would be better to leave the error as
+fatal and avoid attempting a xc_physdev_map_pirq with a machine_irq ==
+0, which will fail.
 
+If we really want to go down the route of making the error non-fatal,
+I think you will also have to report PCI_INTERRUPT_PIN as 0 to the
+guest, so that it's clear to the guest that the device doesn't have
+legacy interrupt support.
 
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Exposing a device with PCI_INTERRUPT_PIN != 0 but then not allowing
+the guest to clear PCI_COMMAND_INTX_DISABLE is likely bogus.
 
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index f605622..2660336 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -970,7 +970,7 @@ int is_windows_drive(const char *filename);
->   */
->  void stream_start(const char *job_id, BlockDriverState *bs,
->                    BlockDriverState *base, const char *backing_file_str,
-> -                  int creation_flags, int64_t speed,
-> +                  int creation_flags, int64_t speed, bool discard,
->                    BlockdevOnError on_error, Error **errp);
->  
->  /**
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index d4fe710..f4538fa 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2334,6 +2334,9 @@
->  #
->  # @speed:  the maximum speed, in bytes per second
->  #
-> +# @discard: true to delete blocks duplicated in old backing files.
-> +#           (default: false). Since 3.1.
-> +#
->  # @on-error: the action to take on an error (default report).
->  #            'stop' and 'enospc' can only be used if the block device
->  #            supports io-status (see BlockInfo).  Since 1.3.
-> @@ -2366,7 +2369,7 @@
->  { 'command': 'block-stream',
->    'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
->              '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
-> -            '*on-error': 'BlockdevOnError',
-> +            '*discard': 'bool', '*on-error': 'BlockdevOnError',
->              '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
->  
->  ##
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks, Roger.
