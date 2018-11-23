@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gQEPn-00079H-RW
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 11:34:49 -0500
+	(envelope-from <philmd@redhat.com>) id 1gQET2-0001Gc-PV
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 11:38:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gQEPk-0002Da-Ly
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 11:34:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gQEPk-0002C2-Du
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 11:34:44 -0500
-References: <20181123090058.6931-1-rkagan@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0e5e461a-4e07-8175-4840-f375f758bd86@redhat.com>
-Date: Fri, 23 Nov 2018 17:34:40 +0100
+	(envelope-from <philmd@redhat.com>) id 1gQESy-0007LO-QJ
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 11:38:08 -0500
+Received: from mail-wm1-f52.google.com ([209.85.128.52]:51776)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gQESv-0007D6-23
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 11:38:03 -0500
+Received: by mail-wm1-f52.google.com with SMTP id j207so5342829wmj.1
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 08:37:59 -0800 (PST)
+References: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
+	<20181123153040.18933-16-maozhongyi@cmss.chinamobile.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <67693f9a-1210-3420-6ff5-c7c8c08810be@redhat.com>
+Date: Fri, 23 Nov 2018 17:37:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181123090058.6931-1-rkagan@virtuozzo.com>
+In-Reply-To: <20181123153040.18933-16-maozhongyi@cmss.chinamobile.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] configure: fix elf2dmp check
+Subject: Re: [Qemu-devel] [PATCH v2 15/21] pci-bridge/dec: Convert sysbus
+ init function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +31,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, qemu-ppc@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>, david@gibson.dropbear.id.au
 
-On 23/11/18 10:01, Roman Kagan wrote:
-> elf2dmp is keyed on "$posix" = "yes", but "$posix" doesn't seem to be
-> set anywhere.
+Hi Mao,
+
+On 23/11/18 16:30, Mao Zhongyi wrote:
+> Use DeviceClass rather than SysBusDeviceClass in
+> pci_dec_21154_device_class_init().
 > 
-> The original intent was presumably to skip building it on Windows, so
-> check for "$mingw32" = "no" instead.
+> Cc: david@gibson.dropbear.id.au
+> Cc: mst@redhat.com
+> Cc: marcel.apfelbaum@gmail.com
+> Cc: qemu-ppc@nongnu.org
 > 
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+> Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/pci-bridge/dec.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
 > 
-> diff --git a/configure b/configure
-> index 0a3c6a72c3..fc6ce0065d 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5722,7 +5722,7 @@ if test "$want_tools" = "yes" ; then
->    if [ "$ivshmem" = "yes" ]; then
->      tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
->    fi
-> -  if [ "$posix" = "yes" ] && [ "$curl" = "yes" ]; then
-> +  if [ "$mingw32" = "no" ] && [ "$curl" = "yes" ]; then
->      tools="elf2dmp $tools"
->    fi
->  fi
+> diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
+> index 84492d5e5f..5b21c20e50 100644
+> --- a/hw/pci-bridge/dec.c
+> +++ b/hw/pci-bridge/dec.c
+> @@ -98,7 +98,7 @@ PCIBus *pci_dec_21154_init(PCIBus *parent_bus, int devfn)
+>      return pci_bridge_get_sec_bus(br);
+>  }
+>  
+> -static int pci_dec_21154_device_init(SysBusDevice *dev)
+> +static void pci_dec_21154_device_realize(DeviceState *dev, Error **errp)
+>  {
+>      PCIHostState *phb;
+
+Why don't you use:
+
+       SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+
+like in all the other patches from this series...?
+
+>  
+> @@ -108,9 +108,8 @@ static int pci_dec_21154_device_init(SysBusDevice *dev)
+>                            dev, "pci-conf-idx", 0x1000);
+>      memory_region_init_io(&phb->data_mem, OBJECT(dev), &pci_host_data_le_ops,
+>                            dev, "pci-data-idx", 0x1000);
+> -    sysbus_init_mmio(dev, &phb->conf_mem);
+> -    sysbus_init_mmio(dev, &phb->data_mem);
+> -    return 0;
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &phb->conf_mem);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &phb->data_mem);
+
+... this would save extra type checking here, as explain by Peter:
+https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg03644.html
+
+>  }
+>  
+>  static void dec_21154_pci_host_realize(PCIDevice *d, Error **errp)
+> @@ -150,9 +149,9 @@ static const TypeInfo dec_21154_pci_host_info = {
+>  
+>  static void pci_dec_21154_device_class_init(ObjectClass *klass, void *data)
+>  {
+> -    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+> -    sdc->init = pci_dec_21154_device_init;
+> +    dc->realize = pci_dec_21154_device_realize;
+>  }
+>  
+>  static const TypeInfo pci_dec_21154_device_info = {
 > 
-
-Queued, thanks.
-
-Paolo
