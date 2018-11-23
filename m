@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gQCis-0008GY-35
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:23 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gQCj4-0000He-S3
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gQCin-0003Mi-5G
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:20 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45075)
+	(envelope-from <richard.henderson@linaro.org>) id 1gQCj3-0003ji-FJ
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:34 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38780)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gQCim-0003LE-Ph
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:17 -0500
-Received: by mail-wr1-x443.google.com with SMTP id v6so12573029wrr.12
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 06:46:16 -0800 (PST)
+	id 1gQCj2-0003dG-LD
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 09:46:33 -0500
+Received: by mail-wm1-x343.google.com with SMTP id k198so12262516wmd.3
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 06:46:30 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 23 Nov 2018 15:45:36 +0100
-Message-Id: <20181123144558.5048-16-richard.henderson@linaro.org>
+Date: Fri, 23 Nov 2018 15:45:50 +0100
+Message-Id: <20181123144558.5048-30-richard.henderson@linaro.org>
 In-Reply-To: <20181123144558.5048-1-richard.henderson@linaro.org>
 References: <20181123144558.5048-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH for-4.0 v2 15/37] tcg/arm: Parameterize the
- temps for tcg_out_tlb_read
+Subject: [Qemu-devel] [PATCH for-4.0 v2 29/37] tcg: Add
+ TCG_TARGET_HAS_MEMORY_BSWAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,193 +30,291 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alistair.Francis@wdc.com
 
-When moving the qemu_ld/st arguments to the right place for
-a function call, we'll need to move the temps out of the way.
+For now, defined universally as true, since we previously required
+backends to implement swapped memory operations.  Future patches
+may now remove that support where it is onerous.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/arm/tcg-target.inc.c | 89 +++++++++++++++++++++-------------------
- 1 file changed, 46 insertions(+), 43 deletions(-)
+ tcg/aarch64/tcg-target.h |   1 +
+ tcg/arm/tcg-target.h     |   1 +
+ tcg/i386/tcg-target.h    |   2 +
+ tcg/mips/tcg-target.h    |   1 +
+ tcg/ppc/tcg-target.h     |   1 +
+ tcg/s390/tcg-target.h    |   1 +
+ tcg/sparc/tcg-target.h   |   1 +
+ tcg/tci/tcg-target.h     |   2 +
+ tcg/tcg-op.c             | 118 ++++++++++++++++++++++++++++++++++++++-
+ 9 files changed, 126 insertions(+), 2 deletions(-)
 
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index 80d174ef44..414c91c9ea 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -1245,11 +1245,14 @@ static TCGReg tcg_out_arg_reg64(TCGContext *s, TCGReg argreg,
- /* We're expecting to use an 8-bit immediate and to mask.  */
- QEMU_BUILD_BUG_ON(CPU_TLB_BITS > 8);
+diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
+index d1bd77c41d..0788f2eecb 100644
+--- a/tcg/aarch64/tcg-target.h
++++ b/tcg/aarch64/tcg-target.h
+@@ -137,6 +137,7 @@ typedef enum {
+ #define TCG_TARGET_HAS_mul_vec          1
  
--/* Load and compare a TLB entry, leaving the flags set.  Returns the register
--   containing the addend of the tlb entry.  Clobbers R0, R1, R2, TMP.  */
--
-+/*
-+ *Load and compare a TLB entry, leaving the flags set.  Returns the register
-+ * containing the addend of the tlb entry.  Clobbers t0, t1, t2, t3.
-+ * T0 and T1 must be consecutive for LDRD.
-+ */
- static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
--                               TCGMemOp opc, int mem_index, bool is_load)
-+                               TCGMemOp opc, int mem_index, bool is_load,
-+                               TCGReg t0, TCGReg t1, TCGReg t2, TCGReg t3)
+ #define TCG_TARGET_DEFAULT_MO (0)
++#define TCG_TARGET_HAS_MEMORY_BSWAP     1
+ 
+ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
  {
-     TCGReg base = TCG_AREG0;
-     int cmp_off =
-@@ -1262,36 +1265,37 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-     unsigned a_bits = get_alignment_bits(opc);
+diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
+index 02981abdcc..7a4c55d66d 100644
+--- a/tcg/arm/tcg-target.h
++++ b/tcg/arm/tcg-target.h
+@@ -131,6 +131,7 @@ enum {
+ };
  
-     /* V7 generates the following:
--     *   ubfx   r0, addrlo, #TARGET_PAGE_BITS, #CPU_TLB_BITS
--     *   add    r2, env, #high
--     *   add    r2, r2, r0, lsl #CPU_TLB_ENTRY_BITS
--     *   ldr    r0, [r2, #cmp]
--     *   ldr    r2, [r2, #add]
--     *   movw   tmp, #page_align_mask
--     *   bic    tmp, addrlo, tmp
--     *   cmp    r0, tmp
-+     *   ubfx   t0, addrlo, #TARGET_PAGE_BITS, #CPU_TLB_BITS
-+     *   add    t2, env, #high
-+     *   add    t2, t2, r0, lsl #CPU_TLB_ENTRY_BITS
-+     *   ldr    t0, [t2, #cmp]  (and t1 w/ldrd)
-+     *   ldr    t2, [t2, #add]
-+     *   movw   t3, #page_align_mask
-+     *   bic    t3, addrlo, t3
-+     *   cmp    t0, t3
-      *
-      * Otherwise we generate:
--     *   shr    tmp, addrlo, #TARGET_PAGE_BITS
--     *   add    r2, env, #high
--     *   and    r0, tmp, #(CPU_TLB_SIZE - 1)
--     *   add    r2, r2, r0, lsl #CPU_TLB_ENTRY_BITS
--     *   ldr    r0, [r2, #cmp]
--     *   ldr    r2, [r2, #add]
-+     *   shr    t3, addrlo, #TARGET_PAGE_BITS
-+     *   add    t2, env, #high
-+     *   and    t0, t3, #(CPU_TLB_SIZE - 1)
-+     *   add    t2, t2, t0, lsl #CPU_TLB_ENTRY_BITS
-+     *   ldr    t0, [t2, #cmp]  (and t1 w/ldrd)
-+     *   ldr    t2, [t2, #add]
-      *   tst    addrlo, #s_mask
--     *   cmpeq  r0, tmp, lsl #TARGET_PAGE_BITS
-+     *   cmpeq  t0, t3, lsl #TARGET_PAGE_BITS
-      */
-     if (use_armv7_instructions) {
--        tcg_out_extract(s, COND_AL, TCG_REG_R0, addrlo,
-+        tcg_out_extract(s, COND_AL, t0, addrlo,
-                         TARGET_PAGE_BITS, CPU_TLB_BITS);
-     } else {
--        tcg_out_dat_reg(s, COND_AL, ARITH_MOV, TCG_REG_TMP,
-+        tcg_out_dat_reg(s, COND_AL, ARITH_MOV, t3,
-                         0, addrlo, SHIFT_IMM_LSR(TARGET_PAGE_BITS));
-     }
+ #define TCG_TARGET_DEFAULT_MO (0)
++#define TCG_TARGET_HAS_MEMORY_BSWAP     1
  
-     /* Add portions of the offset until the memory access is in range.
-      * If we plan on using ldrd, reduce to an 8-bit offset; otherwise
--     * we can use a 12-bit offset.  */
-+     * we can use a 12-bit offset.
-+     */
-     if (use_armv6_instructions && TARGET_LONG_BITS == 64) {
-         mask_off = 0xff;
-     } else {
-@@ -1301,34 +1305,33 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         int shift = ctz32(cmp_off & ~mask_off) & ~1;
-         int rot = ((32 - shift) << 7) & 0xf00;
-         int addend = cmp_off & (0xff << shift);
--        tcg_out_dat_imm(s, COND_AL, ARITH_ADD, TCG_REG_R2, base,
-+        tcg_out_dat_imm(s, COND_AL, ARITH_ADD, t2, base,
-                         rot | ((cmp_off >> shift) & 0xff));
--        base = TCG_REG_R2;
-+        base = t2;
-         add_off -= addend;
-         cmp_off -= addend;
-     }
+ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+ {
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 1b2d4e1b0d..212ba554e9 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -219,6 +219,8 @@ static inline void tb_target_set_jmp_target(uintptr_t tc_ptr,
  
-     if (!use_armv7_instructions) {
--        tcg_out_dat_imm(s, COND_AL, ARITH_AND,
--                        TCG_REG_R0, TCG_REG_TMP, CPU_TLB_SIZE - 1);
-+        tcg_out_dat_imm(s, COND_AL, ARITH_AND, t0, t3, CPU_TLB_SIZE - 1);
-     }
--    tcg_out_dat_reg(s, COND_AL, ARITH_ADD, TCG_REG_R2, base,
--                    TCG_REG_R0, SHIFT_IMM_LSL(CPU_TLB_ENTRY_BITS));
-+    tcg_out_dat_reg(s, COND_AL, ARITH_ADD, t2, base, t0,
-+                    SHIFT_IMM_LSL(CPU_TLB_ENTRY_BITS));
+ #define TCG_TARGET_DEFAULT_MO (TCG_MO_ALL & ~TCG_MO_ST_LD)
  
-     /* Load the tlb comparator.  Use ldrd if needed and available,
-        but due to how the pointer needs setting up, ldm isn't useful.
-        Base arm5 doesn't have ldrd, but armv5te does.  */
-     if (use_armv6_instructions && TARGET_LONG_BITS == 64) {
--        tcg_out_ldrd_8(s, COND_AL, TCG_REG_R0, TCG_REG_R2, cmp_off);
-+        tcg_out_ldrd_8(s, COND_AL, t0, t2, cmp_off);
-     } else {
--        tcg_out_ld32_12(s, COND_AL, TCG_REG_R0, TCG_REG_R2, cmp_off);
-+        tcg_out_ld32_12(s, COND_AL, t0, t2, cmp_off);
-         if (TARGET_LONG_BITS == 64) {
--            tcg_out_ld32_12(s, COND_AL, TCG_REG_R1, TCG_REG_R2, cmp_off + 4);
-+            tcg_out_ld32_12(s, COND_AL, t1, t2, cmp_off + 4);
-         }
-     }
++#define TCG_TARGET_HAS_MEMORY_BSWAP  1
++
+ #ifdef CONFIG_SOFTMMU
+ #define TCG_TARGET_NEED_LDST_OOL_LABELS
+ #endif
+diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
+index a8222476f0..5cb8672470 100644
+--- a/tcg/mips/tcg-target.h
++++ b/tcg/mips/tcg-target.h
+@@ -203,6 +203,7 @@ extern bool use_mips32r2_instructions;
+ #endif
  
-     /* Load the tlb addend.  */
--    tcg_out_ld32_12(s, COND_AL, TCG_REG_R2, TCG_REG_R2, add_off);
-+    tcg_out_ld32_12(s, COND_AL, t2, t2, add_off);
+ #define TCG_TARGET_DEFAULT_MO (0)
++#define TCG_TARGET_HAS_MEMORY_BSWAP     1
  
-     /* Check alignment.  We don't support inline unaligned acceses,
-        but we can easily support overalignment checks.  */
-@@ -1341,29 +1344,27 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         int rot = encode_imm(mask);
+ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+ {
+diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+index bbc49bb1be..6f587010fb 100644
+--- a/tcg/ppc/tcg-target.h
++++ b/tcg/ppc/tcg-target.h
+@@ -128,6 +128,7 @@ void flush_icache_range(uintptr_t start, uintptr_t stop);
+ void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
  
-         if (rot >= 0) { 
--            tcg_out_dat_imm(s, COND_AL, ARITH_BIC, TCG_REG_TMP, addrlo,
-+            tcg_out_dat_imm(s, COND_AL, ARITH_BIC, t3, addrlo,
-                             rotl(mask, rot) | (rot << 7));
-         } else {
--            tcg_out_movi32(s, COND_AL, TCG_REG_TMP, mask);
--            tcg_out_dat_reg(s, COND_AL, ARITH_BIC, TCG_REG_TMP,
--                            addrlo, TCG_REG_TMP, 0);
-+            tcg_out_movi32(s, COND_AL, t3, mask);
-+            tcg_out_dat_reg(s, COND_AL, ARITH_BIC, t3, addrlo, t3, 0);
-         }
--        tcg_out_dat_reg(s, COND_AL, ARITH_CMP, 0, TCG_REG_R0, TCG_REG_TMP, 0);
-+        tcg_out_dat_reg(s, COND_AL, ARITH_CMP, 0, t0, t3, 0);
-     } else {
-         if (a_bits) {
-             tcg_out_dat_imm(s, COND_AL, ARITH_TST, 0, addrlo,
-                             (1 << a_bits) - 1);
-         }
-         tcg_out_dat_reg(s, (a_bits ? COND_EQ : COND_AL), ARITH_CMP,
--                        0, TCG_REG_R0, TCG_REG_TMP,
--                        SHIFT_IMM_LSL(TARGET_PAGE_BITS));
-+                        0, t0, t3, SHIFT_IMM_LSL(TARGET_PAGE_BITS));
-     }
+ #define TCG_TARGET_DEFAULT_MO (0)
++#define TCG_TARGET_HAS_MEMORY_BSWAP     1
  
-     if (TARGET_LONG_BITS == 64) {
--        tcg_out_dat_reg(s, COND_EQ, ARITH_CMP, 0, TCG_REG_R1, addrhi, 0);
-+        tcg_out_dat_reg(s, COND_EQ, ARITH_CMP, 0, t1, addrhi, 0);
-     }
+ #ifdef CONFIG_SOFTMMU
+ #define TCG_TARGET_NEED_LDST_OOL_LABELS
+diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
+index 6f2b06a7d1..853ed6e7aa 100644
+--- a/tcg/s390/tcg-target.h
++++ b/tcg/s390/tcg-target.h
+@@ -135,6 +135,7 @@ extern uint64_t s390_facilities;
+ #define TCG_TARGET_CALL_STACK_OFFSET	160
  
--    return TCG_REG_R2;
-+    return t2;
+ #define TCG_TARGET_EXTEND_ARGS 1
++#define TCG_TARGET_HAS_MEMORY_BSWAP   1
+ 
+ #define TCG_TARGET_DEFAULT_MO (TCG_MO_ALL & ~TCG_MO_ST_LD)
+ 
+diff --git a/tcg/sparc/tcg-target.h b/tcg/sparc/tcg-target.h
+index d8339bf010..a0ed2a3342 100644
+--- a/tcg/sparc/tcg-target.h
++++ b/tcg/sparc/tcg-target.h
+@@ -164,6 +164,7 @@ extern bool use_vis3_instructions;
+ #define TCG_AREG0 TCG_REG_I0
+ 
+ #define TCG_TARGET_DEFAULT_MO (0)
++#define TCG_TARGET_HAS_MEMORY_BSWAP     1
+ 
+ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+ {
+diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
+index 26140d78cb..086f34e69a 100644
+--- a/tcg/tci/tcg-target.h
++++ b/tcg/tci/tcg-target.h
+@@ -198,6 +198,8 @@ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+    We prefer consistency across hosts on this.  */
+ #define TCG_TARGET_DEFAULT_MO  (0)
+ 
++#define TCG_TARGET_HAS_MEMORY_BSWAP     1
++
+ static inline void tb_target_set_jmp_target(uintptr_t tc_ptr,
+                                             uintptr_t jmp_addr, uintptr_t addr)
+ {
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 887b371a81..1ad095cc35 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -2694,25 +2694,78 @@ static void tcg_gen_req_mo(TCGBar type)
+ 
+ void tcg_gen_qemu_ld_i32(TCGv_i32 val, TCGv addr, TCGArg idx, TCGMemOp memop)
+ {
++    TCGMemOp orig_memop;
++
+     tcg_gen_req_mo(TCG_MO_LD_LD | TCG_MO_ST_LD);
+     memop = tcg_canonicalize_memop(memop, 0, 0);
+     trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
+                                addr, trace_mem_get_info(memop, 0));
++
++    orig_memop = memop;
++    if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
++        memop &= ~MO_BSWAP;
++        /* The bswap primitive requires zero-extended input.  */
++        if ((memop & MO_SSIZE) == MO_SW) {
++            memop &= ~MO_SIGN;
++        }
++    }
++
+     gen_ldst_i32(INDEX_op_qemu_ld_i32, val, addr, memop, idx);
++
++    if ((orig_memop ^ memop) & MO_BSWAP) {
++        switch (orig_memop & MO_SIZE) {
++        case MO_16:
++            tcg_gen_bswap16_i32(val, val);
++            if (orig_memop & MO_SIGN) {
++                tcg_gen_ext16s_i32(val, val);
++            }
++            break;
++        case MO_32:
++            tcg_gen_bswap32_i32(val, val);
++            break;
++        default:
++            g_assert_not_reached();
++        }
++    }
  }
  
- /* Record the context of a call to the out of line helper code for the slow
-@@ -1629,7 +1630,8 @@ static void tcg_out_qemu_ld(TCGContext *s, const TCGArg *args, bool is64)
+ void tcg_gen_qemu_st_i32(TCGv_i32 val, TCGv addr, TCGArg idx, TCGMemOp memop)
+ {
++    TCGv_i32 swap = NULL;
++
+     tcg_gen_req_mo(TCG_MO_LD_ST | TCG_MO_ST_ST);
+     memop = tcg_canonicalize_memop(memop, 0, 1);
+     trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
+                                addr, trace_mem_get_info(memop, 1));
++
++    if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
++        swap = tcg_temp_new_i32();
++        switch (memop & MO_SIZE) {
++        case MO_16:
++            tcg_gen_ext16u_i32(swap, val);
++            tcg_gen_bswap16_i32(swap, swap);
++            break;
++        case MO_32:
++            tcg_gen_bswap32_i32(swap, val);
++            break;
++        default:
++            g_assert_not_reached();
++        }
++        val = swap;
++        memop &= ~MO_BSWAP;
++    }
++
+     gen_ldst_i32(INDEX_op_qemu_st_i32, val, addr, memop, idx);
++
++    if (swap) {
++        tcg_temp_free_i32(swap);
++    }
+ }
  
- #ifdef CONFIG_SOFTMMU
-     mem_index = get_mmuidx(oi);
--    addend = tcg_out_tlb_read(s, addrlo, addrhi, opc, mem_index, 1);
-+    addend = tcg_out_tlb_read(s, addrlo, addrhi, opc, mem_index, 1,
-+                              TCG_REG_R0, TCG_REG_R1, TCG_REG_R2, TCG_REG_R14);
+ void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx, TCGMemOp memop)
+ {
+-    tcg_gen_req_mo(TCG_MO_LD_LD | TCG_MO_ST_LD);
++    TCGMemOp orig_memop;
++
+     if (TCG_TARGET_REG_BITS == 32 && (memop & MO_SIZE) < MO_64) {
+         tcg_gen_qemu_ld_i32(TCGV_LOW(val), addr, idx, memop);
+         if (memop & MO_SIGN) {
+@@ -2723,24 +2776,85 @@ void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx, TCGMemOp memop)
+         return;
+     }
  
-     /* This a conditional BL only to load a pointer within this opcode into LR
-        for the slow path.  We will not be using the value for a tail call.  */
-@@ -1760,7 +1762,8 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is64)
++    tcg_gen_req_mo(TCG_MO_LD_LD | TCG_MO_ST_LD);
+     memop = tcg_canonicalize_memop(memop, 1, 0);
+     trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
+                                addr, trace_mem_get_info(memop, 0));
++
++    orig_memop = memop;
++    if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
++        memop &= ~MO_BSWAP;
++        /* The bswap primitive requires zero-extended input.  */
++        if ((memop & MO_SIGN) && (memop & MO_SIZE) < MO_64) {
++            memop &= ~MO_SIGN;
++        }
++    }
++
+     gen_ldst_i64(INDEX_op_qemu_ld_i64, val, addr, memop, idx);
++
++    if ((orig_memop ^ memop) & MO_BSWAP) {
++        switch (orig_memop & MO_SIZE) {
++        case MO_16:
++            tcg_gen_bswap16_i64(val, val);
++            if (orig_memop & MO_SIGN) {
++                tcg_gen_ext16s_i64(val, val);
++            }
++            break;
++        case MO_32:
++            tcg_gen_bswap32_i64(val, val);
++            if (orig_memop & MO_SIGN) {
++                tcg_gen_ext32s_i64(val, val);
++            }
++            break;
++        case MO_64:
++            tcg_gen_bswap64_i64(val, val);
++            break;
++        default:
++            g_assert_not_reached();
++        }
++    }
+ }
  
- #ifdef CONFIG_SOFTMMU
-     mem_index = get_mmuidx(oi);
--    addend = tcg_out_tlb_read(s, addrlo, addrhi, opc, mem_index, 0);
-+    addend = tcg_out_tlb_read(s, addrlo, addrhi, opc, mem_index, 0,
-+                              TCG_REG_R0, TCG_REG_R1, TCG_REG_R2, TCG_REG_R14);
+ void tcg_gen_qemu_st_i64(TCGv_i64 val, TCGv addr, TCGArg idx, TCGMemOp memop)
+ {
+-    tcg_gen_req_mo(TCG_MO_LD_ST | TCG_MO_ST_ST);
++    TCGv_i64 swap = NULL;
++
+     if (TCG_TARGET_REG_BITS == 32 && (memop & MO_SIZE) < MO_64) {
+         tcg_gen_qemu_st_i32(TCGV_LOW(val), addr, idx, memop);
+         return;
+     }
  
-     tcg_out_qemu_st_index(s, COND_EQ, opc, datalo, datahi, addrlo, addend);
++    tcg_gen_req_mo(TCG_MO_LD_ST | TCG_MO_ST_ST);
+     memop = tcg_canonicalize_memop(memop, 1, 1);
+     trace_guest_mem_before_tcg(tcg_ctx->cpu, cpu_env,
+                                addr, trace_mem_get_info(memop, 1));
++
++    if (!TCG_TARGET_HAS_MEMORY_BSWAP && (memop & MO_BSWAP)) {
++        swap = tcg_temp_new_i64();
++        switch (memop & MO_SIZE) {
++        case MO_16:
++            tcg_gen_ext16u_i64(swap, val);
++            tcg_gen_bswap16_i64(swap, swap);
++            break;
++        case MO_32:
++            tcg_gen_ext32u_i64(swap, val);
++            tcg_gen_bswap32_i64(swap, swap);
++            break;
++        case MO_64:
++            tcg_gen_bswap64_i64(swap, val);
++            break;
++        default:
++            g_assert_not_reached();
++        }
++        val = swap;
++        memop &= ~MO_BSWAP;
++    }
++
+     gen_ldst_i64(INDEX_op_qemu_st_i64, val, addr, memop, idx);
++
++    if (swap) {
++        tcg_temp_free_i64(swap);
++    }
+ }
  
+ static void tcg_gen_ext_i32(TCGv_i32 ret, TCGv_i32 val, TCGMemOp opc)
 -- 
 2.17.2
