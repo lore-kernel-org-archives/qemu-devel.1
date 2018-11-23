@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ6-0004mm-0T
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:04 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ4-0004lf-1J
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ2-0005Bs-DJ
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:01 -0500
-Received: from cmccmta2.chinamobile.com ([221.176.66.80]:60422)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ0-00055M-6N
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:30:58 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ0-000578-Ni
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:30:59 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 23 Nov 2018 23:30:22 +0800
-Message-Id: <20181123153040.18933-4-maozhongyi@cmss.chinamobile.com>
+Date: Fri, 23 Nov 2018 23:30:28 +0800
+Message-Id: <20181123153040.18933-10-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
 References: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH v2 03/21] char/grlib_apbuart: Convert sysbus
- init function to realize function
+Subject: [Qemu-devel] [PATCH v2 09/21] input/pl050: Convert sysbus init
+ function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +21,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, chouteau@adacore.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, peter.maydell@linaro.org, qemu-arm@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-grlib_apbuart_class_init().
+pl050_class_init().
 
-Cc: chouteau@adacore.com
-Cc: marcandre.lureau@redhat.com
-Cc: pbonzini@redhat.com
+Cc: peter.maydell@linaro.org
+Cc: qemu-arm@nongnu.org
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 ---
- hw/char/grlib_apbuart.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ hw/input/pl050.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/hw/char/grlib_apbuart.c b/hw/char/grlib_apbuart.c
-index bac11bec58..e1d258b611 100644
---- a/hw/char/grlib_apbuart.c
-+++ b/hw/char/grlib_apbuart.c
-@@ -239,9 +239,10 @@ static const MemoryRegionOps grlib_apbuart_ops = {
+diff --git a/hw/input/pl050.c b/hw/input/pl050.c
+index be9cd57b17..15bffbfcad 100644
+--- a/hw/input/pl050.c
++++ b/hw/input/pl050.c
+@@ -139,19 +139,19 @@ static const MemoryRegionOps pl050_ops = {
      .endianness = DEVICE_NATIVE_ENDIAN,
  };
  
--static int grlib_apbuart_init(SysBusDevice *dev)
-+static void grlib_apbuart_realize(DeviceState *dev, Error **errp)
+-static int pl050_initfn(SysBusDevice *dev)
++static void pl050_realize(DeviceState *dev, Error **errp)
  {
-     UART *uart = GRLIB_APB_UART(dev);
+     PL050State *s = PL050(dev);
 +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
  
-     qemu_chr_fe_set_handlers(&uart->chr,
-                              grlib_apbuart_can_receive,
-@@ -249,14 +250,12 @@ static int grlib_apbuart_init(SysBusDevice *dev)
-                              grlib_apbuart_event,
-                              NULL, uart, NULL, true);
- 
--    sysbus_init_irq(dev, &uart->irq);
-+    sysbus_init_irq(sbd, &uart->irq);
- 
-     memory_region_init_io(&uart->iomem, OBJECT(uart), &grlib_apbuart_ops, uart,
-                           "uart", UART_REG_SIZE);
- 
--    sysbus_init_mmio(dev, &uart->iomem);
--
+     memory_region_init_io(&s->iomem, OBJECT(s), &pl050_ops, s, "pl050", 0x1000);
+-    sysbus_init_mmio(dev, &s->iomem);
+-    sysbus_init_irq(dev, &s->irq);
++    sysbus_init_mmio(sbd, &s->iomem);
++    sysbus_init_irq(sbd, &s->irq);
+     if (s->is_mouse) {
+         s->dev = ps2_mouse_init(pl050_update, s);
+     } else {
+         s->dev = ps2_kbd_init(pl050_update, s);
+     }
 -    return 0;
-+    sysbus_init_mmio(sbd, &uart->iomem);
  }
  
- static void grlib_apbuart_reset(DeviceState *d)
-@@ -280,9 +279,8 @@ static Property grlib_apbuart_properties[] = {
- static void grlib_apbuart_class_init(ObjectClass *klass, void *data)
+ static void pl050_keyboard_init(Object *obj)
+@@ -183,9 +183,8 @@ static const TypeInfo pl050_mouse_info = {
+ static void pl050_class_init(ObjectClass *oc, void *data)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(oc);
+-    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(oc);
  
--    k->init = grlib_apbuart_init;
-+    dc->realize = grlib_apbuart_realize;
-     dc->reset = grlib_apbuart_reset;
-     dc->props = grlib_apbuart_properties;
+-    sdc->init = pl050_initfn;
++    dc->realize = pl050_realize;
+     dc->vmsd = &vmstate_pl050;
  }
+ 
 -- 
 2.17.1
