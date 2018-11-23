@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gQ6Ti-0006Ki-RY
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:06:22 -0500
+	(envelope-from <clg@kaod.org>) id 1gQ6iI-0002rY-St
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:21:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gQ6Tf-0001zd-Ky
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:06:18 -0500
-Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:37313)
+	(envelope-from <clg@kaod.org>) id 1gQ6iF-0007Yp-60
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:21:22 -0500
+Received: from 4.mo1.mail-out.ovh.net ([46.105.76.26]:53771)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gQ6Tf-0001xK-8P
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:06:15 -0500
-Received: from player692.ha.ovh.net (unknown [10.109.143.249])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 90D6A1752AD
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 09:06:13 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gQ6iE-0007Rf-NH
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 03:21:19 -0500
+Received: from player776.ha.ovh.net (unknown [10.109.159.68])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id BA2AC1464BE
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 09:21:14 +0100 (CET)
 References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-5-clg@kaod.org>
-	<20181122041119.GD10448@umbus.fritz.box>
-	<5e4a0824-a014-c0c3-89f5-40aab83268f9@kaod.org>
-	<20181123035036.GW10448@umbus.fritz.box>
+	<20181116105729.23240-2-clg@kaod.org>
+	<20181122030516.GB10448@umbus.fritz.box>
+	<658dc2ad-e862-4777-9ed5-1ba82a074aa6@kaod.org>
+	<20181123003115.GR10448@umbus.fritz.box>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <31b6201b-420a-8560-19bd-8eab9dd2f3de@kaod.org>
-Date: Fri, 23 Nov 2018 09:06:07 +0100
+Message-ID: <ebec0144-de23-b3ec-41b2-720a0a40f660@kaod.org>
+Date: Fri, 23 Nov 2018 09:21:08 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181123035036.GW10448@umbus.fritz.box>
+In-Reply-To: <20181123003115.GR10448@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 04/36] ppc/xive: introduce the
- XiveRouter model
+Subject: Re: [Qemu-devel] [PATCH v5 01/36] ppc/xive: introduce a XIVE
+ interrupt source model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,1110 +38,769 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 11/23/18 4:50 AM, David Gibson wrote:
-> On Thu, Nov 22, 2018 at 08:53:00AM +0100, C=E9dric Le Goater wrote:
->> On 11/22/18 5:11 AM, David Gibson wrote:
->>> On Fri, Nov 16, 2018 at 11:56:57AM +0100, C=E9dric Le Goater wrote:
->>>> The XiveRouter models the second sub-engine of the overall XIVE
->>>> architecture : the Interrupt Virtualization Routing Engine (IVRE).
+On 11/23/18 1:31 AM, David Gibson wrote:
+> On Thu, Nov 22, 2018 at 08:25:06AM +0100, C=E9dric Le Goater wrote:
+>> On 11/22/18 4:05 AM, David Gibson wrote:
+>>> On Fri, Nov 16, 2018 at 11:56:54AM +0100, C=E9dric Le Goater wrote:
+>>>> The first sub-engine of the overall XIVE architecture is the Interru=
+pt
+>>>> Virtualization Source Engine (IVSE). An IVSE can be integrated into
+>>>> another logic, like in a PCI PHB or in the main interrupt controller
+>>>> to manage IPIs.
 >>>>
->>>> The IVRE handles event notifications of the IVSE through MMIO stores
->>>> and performs the interrupt routing process. For this purpose, it use=
-s
->>>> a set of table stored in system memory, the first of which being the
->>>> Event Assignment Structure (EAS) table.
+>>>> Each IVSE instance is associated with an Event State Buffer (ESB) th=
+at
+>>>> contains a two bit state entry for each possible event source. When =
+an
+>>>> event is signaled to the IVSE, by MMIO or some other means, the
+>>>> associated interrupt state bits are fetched from the ESB and
+>>>> modified. Depending on the resulting ESB state, the event is forward=
+ed
+>>>> to the IVRE sub-engine of the controller doing the routing.
 >>>>
->>>> The EAT associates an interrupt source number with an Event Notifica=
-tion
->>>> Descriptor (END) which will be used in a second phase of the routing
->>>> process to identify a Notification Virtual Target.
+>>>> Each supported ESB entry is associated with either a single or a
+>>>> even/odd pair of pages which provides commands to manage the source:
+>>>> to EOI, to turn off the source for instance.
 >>>>
->>>> The XiveRouter is an abstract class which needs to be inherited from
->>>> to define a storage for the EAT, and other upcoming tables. The
->>>> 'chip-id' atttribute is not strictly necessary for the sPAPR and
->>>> PowerNV machines but it's a good way to test the routing algorithm.
->>>> Without this atttribute, the XiveRouter could be a simple QOM
->>>> interface.
+>>>> On a sPAPR machine, the O/S will obtain the page address of the ESB
+>>>> entry associated with a source and its characteristic using the
+>>>> H_INT_GET_SOURCE_INFO hcall. On PowerNV, a similar OPAL call is used=
+.
+>>>>
+>>>> The xive_source_notify() routine is in charge forwarding the source
+>>>> event notification to the routing engine. It will be filled later on=
+.
 >>>>
 >>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>
+>>> Ok, this is looking basically pretty good.  Few details to query
+>>> below.
+>>>
+>>>
 >>>> ---
->>>>  include/hw/ppc/xive.h      | 32 ++++++++++++++
->>>>  include/hw/ppc/xive_regs.h | 31 ++++++++++++++
->>>>  hw/intc/xive.c             | 86 +++++++++++++++++++++++++++++++++++=
+>>>>  default-configs/ppc64-softmmu.mak |   1 +
+>>>>  include/hw/ppc/xive.h             | 130 ++++++++++
+>>>>  hw/intc/xive.c                    | 379 +++++++++++++++++++++++++++=
 +++
->>>>  3 files changed, 149 insertions(+)
->>>>  create mode 100644 include/hw/ppc/xive_regs.h
+>>>>  hw/intc/Makefile.objs             |   1 +
+>>>>  4 files changed, 511 insertions(+)
+>>>>  create mode 100644 include/hw/ppc/xive.h
+>>>>  create mode 100644 hw/intc/xive.c
 >>>>
+>>>> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc=
+64-softmmu.mak
+>>>> index aec2855750d6..2d1e7c5c4668 100644
+>>>> --- a/default-configs/ppc64-softmmu.mak
+>>>> +++ b/default-configs/ppc64-softmmu.mak
+>>>> @@ -16,6 +16,7 @@ CONFIG_VIRTIO_VGA=3Dy
+>>>>  CONFIG_XICS=3D$(CONFIG_PSERIES)
+>>>>  CONFIG_XICS_SPAPR=3D$(CONFIG_PSERIES)
+>>>>  CONFIG_XICS_KVM=3D$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+>>>> +CONFIG_XIVE=3D$(CONFIG_PSERIES)
+>>>>  CONFIG_MEM_DEVICE=3Dy
+>>>>  CONFIG_DIMM=3Dy
+>>>>  CONFIG_SPAPR_RNG=3Dy
 >>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->>>> index be93fae6317b..5a0696366577 100644
->>>> --- a/include/hw/ppc/xive.h
->>>> +++ b/include/hw/ppc/xive.h
->>>> @@ -11,6 +11,7 @@
->>>>  #define PPC_XIVE_H
->>>> =20
->>>>  #include "hw/sysbus.h"
->>>
->>> Again, I don't think making this a SysBusDevice is quite right.
->>> Even more so for the router than the source, because at least for PAP=
-R
->>> it might not have any MMIO presence at all.
->>
->> The controller model inherits from the XiveRouter and manages the
->> TIMA.
->=20
-> Um.. I'm not sure what you mean by the "controller model".  Surely the
-> presenter should own the TIMA, not the router?
-
-The XIVE VC (routing) and PC (presente) subengines are merged under the=20
-controller model sPAPRXIVE and the PC matching algo looking for a target=20
-is reduced to one function. We don't want to model the exchanges on the
-PowerBUS.
-
-The TIMA MMIO region exposing the thread interrupt context is managed by=20
-the controller sPAPRXIVE (easier for KVM) and the interrupt context=20
-registers are under model XiveTCXT. This is our XICS/ICP equivalent=20
-in XIVE.
-
->>>> +#include "hw/ppc/xive_regs.h"
->>>> =20
->>>>  /*
->>>>   * XIVE Fabric (Interface between Source and Router)
->>>> @@ -168,4 +169,35 @@ static inline void xive_source_irq_set(XiveSour=
-ce *xsrc, uint32_t srcno,
->>>>      }
->>>>  }
->>>> =20
->>>> +/*
->>>> + * XIVE Router
->>>> + */
->>>> +
->>>> +typedef struct XiveRouter {
->>>> +    SysBusDevice    parent;
->>>> +
->>>> +    uint32_t        chip_id;
->>>
->>> I don't think this belongs in the base class.  The PowerNV specific
->>> variants will need it, but it doesn't make sense for the PAPR version=
-.
->>
->> yeah. I am using it as a END and NVT block identifier but it's not=20
->> required for sPAPR, it could just be zero.=20
->>
->> It was good to test the routing algo which should not assume that the=20
->> block id is zero.=20
->> =20
->>>
->>>> +} XiveRouter;
->>>> +
->>>> +#define TYPE_XIVE_ROUTER "xive-router"
->>>> +#define XIVE_ROUTER(obj)                                \
->>>> +    OBJECT_CHECK(XiveRouter, (obj), TYPE_XIVE_ROUTER)
->>>> +#define XIVE_ROUTER_CLASS(klass)                                   =
-     \
->>>> +    OBJECT_CLASS_CHECK(XiveRouterClass, (klass), TYPE_XIVE_ROUTER)
->>>> +#define XIVE_ROUTER_GET_CLASS(obj)                              \
->>>> +    OBJECT_GET_CLASS(XiveRouterClass, (obj), TYPE_XIVE_ROUTER)
->>>> +
->>>> +typedef struct XiveRouterClass {
->>>> +    SysBusDeviceClass parent;
->>>> +
->>>> +    /* XIVE table accessors */
->>>> +    int (*get_eas)(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas);
->>>> +    int (*set_eas)(XiveRouter *xrtr, uint32_t lisn, XiveEAS *eas);
->>>> +} XiveRouterClass;
->>>> +
->>>> +void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *=
-mon);
->>>> +
->>>> +int xive_router_get_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *e=
-as);
->>>> +int xive_router_set_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *e=
-as);
->>>> +
->>>>  #endif /* PPC_XIVE_H */
->>>> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
 >>>> new file mode 100644
->>>> index 000000000000..12499b33614c
+>>>> index 000000000000..5fec4b08705d
 >>>> --- /dev/null
->>>> +++ b/include/hw/ppc/xive_regs.h
->>>> @@ -0,0 +1,31 @@
+>>>> +++ b/include/hw/ppc/xive.h
+>>>> @@ -0,0 +1,130 @@
 >>>> +/*
 >>>> + * QEMU PowerPC XIVE interrupt controller model
 >>>> + *
->>>> + * Copyright (c) 2016-2018, IBM Corporation.
+>>>> + * Copyright (c) 2017-2018, IBM Corporation.
+>>>> + *
+>>>> + * This code is licensed under the GPL version 2 or later. See the
+>>>> + * COPYING file in the top-level directory.
+>>>
+>>> A cheat sheet in the top of this header with the old and new XIVE
+>>> terms would quite nice to have.
+>>
+>> Yes. It's a good place. I will put the XIVE acronyms here :
+>>     =20
+>>      EA		Event Assignment
+>>      EISN	Effective Interrupt Source Number
+>>      END	Event Notification Descriptor
+>>      ESB	Event State Buffer
+>>      EQ		Event Queue
+>>      LISN	Logical Interrupt Source Number
+>>      NVT	Notification Virtual Target
+>>      TIMA	Thread Interrupt Management Area
+>>      ...
+>=20
+> That sounds good, but what I'd also like is showing that NVT =3D=3D VP =
+and
+> EAS =3D=3D IVT and so forth.
+
+sure. I will add that.=20
+
+skiboot and PowerNV Linux are using a mixed version and I wonder if I=20
+should not clarify that also, skiboot at least.=20
+
+>>>> + */
+>>>> +
+>>>> +#ifndef PPC_XIVE_H
+>>>> +#define PPC_XIVE_H
+>>>> +
+>>>> +#include "hw/sysbus.h"
+>>>
+>>> So, I'm a bit dubious about making the XiveSource a SysBus device -
+>>> I'm concerned it won't play well with tying it into the other devices
+>>> like PHB that "own" it in real hardware.
+>>
+>> It does but I can take a look at changing it to a DeviceState. The=20
+>> reset handlers might be a concern.
+>=20
+> As "non bus" device I think you'd need to register your own reset
+> handler rather than just setting dc->reset.  Otherwise, I think that
+> should work.
+
+yes. I will give a look/try, it might not be such a problem.=20
+
+>>> I think we'd be better off making it a direct descendent of
+>>> TYPE_DEVICE which constructs the MMIO region, but doesn't map it.
+>>
+>> At a moment, I started working on a XiveESB object doing what I think=20
+>> you are suggesting and I removed it. I am reluctant adding more=20
+>> complexity now, the patchset is just growing and growing ...=20
+>>
+>> But I agree there are fundamentals to get right for KVM. Let's talk=20
+>> about it after you have looked at the overall patchset, at least up=20
+>> to KVM initial support.
+>=20
+> Hm, ok.
+>=20
+>>> Then we can havea SysBusDevice (and/or other) wrapper which
+>>> instantiates the XiveSource core and maps it into somewhere
+>>> accessible.
+>>
+>> The XIVE controller model does the mapping of the source currently.
+>=20
+> I'm.. I'm not sure what you mean by that.   We have a
+> sysbus_init_mmio() right here which effectively maps in the MMIO
+> region AFAICT.
+
+yes. what I meant is that the XIVE controller model does all the=20
+mapping, for the TIMA and for the ESB pages of the XiveSource.=20
+
+This is a 'critical' part of the XIVE model because the region have=20
+a different nature under KVM, which requires the KVM device to be=20
+created before the region are, and to be destroyed when the device
+is.=20
+
+It took me a while to get all in place to support all aspects of=20
+the model: KVM and not KVM, switch of interrupt controller, machine=20
+reset, post_load, PowerNV devices, etc. So expect some resistant=20
+from me on that topic.=20
+
+Thanks,
+
+C.
+
+>> In the case of sPAPR, the controller model controls the TIMA and=20
+>> for PowerNV, there are quite few others MMIO regions to handle.
+>>
+>>>
+>>>> +
+>>>> +/*
+>>>> + * XIVE Interrupt Source
+>>>> + */
+>>>> +
+>>>> +#define TYPE_XIVE_SOURCE "xive-source"
+>>>> +#define XIVE_SOURCE(obj) OBJECT_CHECK(XiveSource, (obj), TYPE_XIVE_=
+SOURCE)
+>>>> +
+>>>> +/*
+>>>> + * XIVE Interrupt Source characteristics, which define how the ESB =
+are
+>>>> + * controlled.
+>>>> + */
+>>>> +#define XIVE_SRC_H_INT_ESB     0x1 /* ESB managed with hcall H_INT_=
+ESB */
+>>>> +#define XIVE_SRC_STORE_EOI     0x2 /* Store EOI supported */
+>>>> +
+>>>> +typedef struct XiveSource {
+>>>> +    SysBusDevice parent;
+>>>> +
+>>>> +    /* IRQs */
+>>>> +    uint32_t        nr_irqs;
+>>>> +    qemu_irq        *qirqs;
+>>>> +
+>>>> +    /* PQ bits */
+>>>> +    uint8_t         *status;
+>>>> +
+>>>> +    /* ESB memory region */
+>>>> +    uint64_t        esb_flags;
+>>>> +    uint32_t        esb_shift;
+>>>> +    MemoryRegion    esb_mmio;
+>>>> +} XiveSource;
+>>>> +
+>>>> +/*
+>>>> + * ESB MMIO setting. Can be one page, for both source triggering an=
+d
+>>>> + * source management, or two different pages. See below for magic
+>>>> + * values.
+>>>> + */
+>>>> +#define XIVE_ESB_4K          12 /* PSI HB only */
+>>>> +#define XIVE_ESB_4K_2PAGE    13
+>>>> +#define XIVE_ESB_64K         16
+>>>> +#define XIVE_ESB_64K_2PAGE   17
+>>>> +
+>>>> +static inline bool xive_source_esb_has_2page(XiveSource *xsrc)
+>>>> +{
+>>>> +    return xsrc->esb_shift =3D=3D XIVE_ESB_64K_2PAGE ||
+>>>> +        xsrc->esb_shift =3D=3D XIVE_ESB_4K_2PAGE;
+>>>> +}
+>>>> +
+>>>> +/* The trigger page is always the first/even page */
+>>>> +static inline hwaddr xive_source_esb_page(XiveSource *xsrc, uint32_=
+t srcno)
+>>>
+>>> This function doesn't appear to be used anywhere except..
+>>
+>> It's used in patch 16 adding the hcalls also.
+>>
+>>>> +{
+>>>> +    assert(srcno < xsrc->nr_irqs);
+>>>> +    return (1ull << xsrc->esb_shift) * srcno;
+>>>> +}
+>>>> +
+>>>> +/* In a two pages ESB MMIO setting, the odd page is for management =
+*/
+>>>> +static inline hwaddr xive_source_esb_mgmt(XiveSource *xsrc, int src=
+no)
+>>>
+>>>
+>>> ..here, and this function doesn't appear to be used anywhere.
+>>
+>> It's used in patch 16 adding the hcalls and patch 23 for KVM.
+>>
+>> This is basic ESB support which I thought belong to the patch on sourc=
+es.
+>> =20
+>>>
+>>>> +{
+>>>> +    hwaddr addr =3D xive_source_esb_page(xsrc, srcno);
+>>>> +
+>>>> +    if (xive_source_esb_has_2page(xsrc)) {
+>>>> +        addr +=3D (1 << (xsrc->esb_shift - 1));
+>>>> +    }
+>>>> +
+>>>> +    return addr;
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * Each interrupt source has a 2-bit state machine which can be
+>>>> + * controlled by MMIO. P indicates that an interrupt is pending (ha=
+s
+>>>> + * been sent to a queue and is waiting for an EOI). Q indicates tha=
+t
+>>>> + * the interrupt has been triggered while pending.
+>>>> + *
+>>>> + * This acts as a coalescing mechanism in order to guarantee that a
+>>>> + * given interrupt only occurs at most once in a queue.
+>>>> + *
+>>>> + * When doing an EOI, the Q bit will indicate if the interrupt
+>>>> + * needs to be re-triggered.
+>>>> + */
+>>>> +#define XIVE_ESB_VAL_P        0x2
+>>>> +#define XIVE_ESB_VAL_Q        0x1
+>>>> +
+>>>> +#define XIVE_ESB_RESET        0x0
+>>>> +#define XIVE_ESB_PENDING      XIVE_ESB_VAL_P
+>>>> +#define XIVE_ESB_QUEUED       (XIVE_ESB_VAL_P | XIVE_ESB_VAL_Q)
+>>>> +#define XIVE_ESB_OFF          XIVE_ESB_VAL_Q
+>>>> +
+>>>> +/*
+>>>> + * "magic" Event State Buffer (ESB) MMIO offsets.
+>>>> + *
+>>>> + * The following offsets into the ESB MMIO allow to read or manipul=
+ate
+>>>> + * the PQ bits. They must be used with an 8-byte load instruction.
+>>>> + * They all return the previous state of the interrupt (atomically)=
+.
+>>>> + *
+>>>> + * Additionally, some ESB pages support doing an EOI via a store an=
+d
+>>>> + * some ESBs support doing a trigger via a separate trigger page.
+>>>> + */
+>>>> +#define XIVE_ESB_STORE_EOI      0x400 /* Store */
+>>>> +#define XIVE_ESB_LOAD_EOI       0x000 /* Load */
+>>>> +#define XIVE_ESB_GET            0x800 /* Load */
+>>>> +#define XIVE_ESB_SET_PQ_00      0xc00 /* Load */
+>>>> +#define XIVE_ESB_SET_PQ_01      0xd00 /* Load */
+>>>> +#define XIVE_ESB_SET_PQ_10      0xe00 /* Load */
+>>>> +#define XIVE_ESB_SET_PQ_11      0xf00 /* Load */
+>>>> +
+>>>> +uint8_t xive_source_esb_get(XiveSource *xsrc, uint32_t srcno);
+>>>> +uint8_t xive_source_esb_set(XiveSource *xsrc, uint32_t srcno, uint8=
+_t pq);
+>>>> +
+>>>> +void xive_source_pic_print_info(XiveSource *xsrc, uint32_t offset,
+>>>> +                                Monitor *mon);
+>>>> +
+>>>> +static inline qemu_irq xive_source_qirq(XiveSource *xsrc, uint32_t =
+srcno)
+>>>> +{
+>>>> +    assert(srcno < xsrc->nr_irqs);
+>>>> +    return xsrc->qirqs[srcno];
+>>>> +}
+>>>> +
+>>>> +#endif /* PPC_XIVE_H */
+>>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>>>> new file mode 100644
+>>>> index 000000000000..f7621f84828c
+>>>> --- /dev/null
+>>>> +++ b/hw/intc/xive.c
+>>>> @@ -0,0 +1,379 @@
+>>>> +/*
+>>>> + * QEMU PowerPC XIVE interrupt controller model
+>>>> + *
+>>>> + * Copyright (c) 2017-2018, IBM Corporation.
 >>>> + *
 >>>> + * This code is licensed under the GPL version 2 or later. See the
 >>>> + * COPYING file in the top-level directory.
 >>>> + */
 >>>> +
->>>> +#ifndef PPC_XIVE_REGS_H
->>>> +#define PPC_XIVE_REGS_H
+>>>> +#include "qemu/osdep.h"
+>>>> +#include "qemu/log.h"
+>>>> +#include "qapi/error.h"
+>>>> +#include "target/ppc/cpu.h"
+>>>> +#include "sysemu/cpus.h"
+>>>> +#include "sysemu/dma.h"
+>>>> +#include "monitor/monitor.h"
+>>>> +#include "hw/ppc/xive.h"
 >>>> +
->>>> +/* EAS (Event Assignment Structure)
->>>> + *
->>>> + * One per interrupt source. Targets an interrupt to a given Event
->>>> + * Notification Descriptor (END) and provides the corresponding
->>>> + * logical interrupt number (END data)
->>>> + */
->>>> +typedef struct XiveEAS {
->>>> +        /* Use a single 64-bit definition to make it easier to
->>>> +         * perform atomic updates
->>>> +         */
->>>> +        uint64_t        w;
->>>> +#define EAS_VALID       PPC_BIT(0)
->>>> +#define EAS_END_BLOCK   PPC_BITMASK(4, 7)        /* Destination END=
- block# */
->>>> +#define EAS_END_INDEX   PPC_BITMASK(8, 31)       /* Destination END=
- index */
->>>> +#define EAS_MASKED      PPC_BIT(32)              /* Masked */
->>>> +#define EAS_END_DATA    PPC_BITMASK(33, 63)      /* Data written to=
- the END */
->>>> +} XiveEAS;
->>>> +
->>>> +#endif /* PPC_XIVE_REGS_H */
->>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->>>> index 014a2e41f71f..c4c90a25758e 100644
->>>> --- a/hw/intc/xive.c
->>>> +++ b/hw/intc/xive.c
->>>> @@ -442,6 +442,91 @@ static const TypeInfo xive_source_info =3D {
->>>>      .class_init    =3D xive_source_class_init,
->>>>  };
->>>> =20
 >>>> +/*
->>>> + * XIVE Router (aka. Virtualization Controller or IVRE)
+>>>> + * XIVE ESB helpers
 >>>> + */
 >>>> +
->>>> +int xive_router_get_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *e=
-as)
+>>>> +static uint8_t xive_esb_set(uint8_t *pq, uint8_t value)
 >>>> +{
->>>> +    XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
+>>>> +    uint8_t old_pq =3D *pq & 0x3;
 >>>> +
->>>> +    return xrc->get_eas(xrtr, lisn, eas);
+>>>> +    *pq &=3D ~0x3;
+>>>> +    *pq |=3D value & 0x3;
+>>>> +
+>>>> +    return old_pq;
 >>>> +}
 >>>> +
->>>> +int xive_router_set_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *e=
-as)
+>>>> +static bool xive_esb_trigger(uint8_t *pq)
 >>>> +{
->>>> +    XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
+>>>> +    uint8_t old_pq =3D *pq & 0x3;
 >>>> +
->>>> +    return xrc->set_eas(xrtr, lisn, eas);
->>>> +}
->>>> +
->>>> +static void xive_router_notify(XiveFabric *xf, uint32_t lisn)
->>>> +{
->>>> +    XiveRouter *xrtr =3D XIVE_ROUTER(xf);
->>>> +    XiveEAS eas;
->>>> +
->>>> +    /* EAS cache lookup */
->>>> +    if (xive_router_get_eas(xrtr, lisn, &eas)) {
->>>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: Unknown LISN %x\n", l=
-isn);
->>>> +        return;
+>>>> +    switch (old_pq) {
+>>>> +    case XIVE_ESB_RESET:
+>>>> +        xive_esb_set(pq, XIVE_ESB_PENDING);
+>>>> +        return true;
+>>>> +    case XIVE_ESB_PENDING:
+>>>> +    case XIVE_ESB_QUEUED:
+>>>> +        xive_esb_set(pq, XIVE_ESB_QUEUED);
+>>>> +        return false;
+>>>> +    case XIVE_ESB_OFF:
+>>>> +        xive_esb_set(pq, XIVE_ESB_OFF);
+>>>> +        return false;
+>>>> +    default:
+>>>> +         g_assert_not_reached();
 >>>> +    }
+>>>> +}
+>>>> +
+>>>> +static bool xive_esb_eoi(uint8_t *pq)
+>>>> +{
+>>>> +    uint8_t old_pq =3D *pq & 0x3;
+>>>> +
+>>>> +    switch (old_pq) {
+>>>> +    case XIVE_ESB_RESET:
+>>>> +    case XIVE_ESB_PENDING:
+>>>> +        xive_esb_set(pq, XIVE_ESB_RESET);
+>>>> +        return false;
+>>>> +    case XIVE_ESB_QUEUED:
+>>>> +        xive_esb_set(pq, XIVE_ESB_PENDING);
+>>>> +        return true;
+>>>> +    case XIVE_ESB_OFF:
+>>>> +        xive_esb_set(pq, XIVE_ESB_OFF);
+>>>> +        return false;
+>>>> +    default:
+>>>> +         g_assert_not_reached();
+>>>> +    }
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * XIVE Interrupt Source (or IVSE)
+>>>> + */
+>>>> +
+>>>> +uint8_t xive_source_esb_get(XiveSource *xsrc, uint32_t srcno)
+>>>> +{
+>>>> +    assert(srcno < xsrc->nr_irqs);
+>>>> +
+>>>> +    return xsrc->status[srcno] & 0x3;
+>>>> +}
+>>>> +
+>>>> +uint8_t xive_source_esb_set(XiveSource *xsrc, uint32_t srcno, uint8=
+_t pq)
+>>>> +{
+>>>> +    assert(srcno < xsrc->nr_irqs);
+>>>> +
+>>>> +    return xive_esb_set(&xsrc->status[srcno], pq);
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * Returns whether the event notification should be forwarded.
+>>>> + */
+>>>> +static bool xive_source_esb_trigger(XiveSource *xsrc, uint32_t srcn=
+o)
+>>>> +{
+>>>> +    assert(srcno < xsrc->nr_irqs);
+>>>> +
+>>>> +    return xive_esb_trigger(&xsrc->status[srcno]);
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * Returns whether the event notification should be forwarded.
+>>>> + */
+>>>> +static bool xive_source_esb_eoi(XiveSource *xsrc, uint32_t srcno)
+>>>> +{
+>>>> +    assert(srcno < xsrc->nr_irqs);
+>>>> +
+>>>> +    return xive_esb_eoi(&xsrc->status[srcno]);
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * Forward the source event notification to the Router
+>>>> + */
+>>>> +static void xive_source_notify(XiveSource *xsrc, int srcno)
+>>>> +{
+>>>> +
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * In a two pages ESB MMIO setting, even page is the trigger page, =
+odd
+>>>> + * page is for management
+>>>> + */
+>>>> +static inline bool addr_is_even(hwaddr addr, uint32_t shift)
+>>>> +{
+>>>> +    return !((addr >> shift) & 1);
+>>>> +}
+>>>> +
+>>>> +static inline bool xive_source_is_trigger_page(XiveSource *xsrc, hw=
+addr addr)
+>>>> +{
+>>>> +    return xive_source_esb_has_2page(xsrc) &&
+>>>> +        addr_is_even(addr, xsrc->esb_shift - 1);
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * ESB MMIO loads
+>>>> + *                      Trigger page    Management/EOI page
+>>>> + * 2 pages setting      even            odd
+>>>> + *
+>>>> + * 0x000 .. 0x3FF       -1              EOI and return 0|1
+>>>> + * 0x400 .. 0x7FF       -1              EOI and return 0|1
+>>>> + * 0x800 .. 0xBFF       -1              return PQ
+>>>> + * 0xC00 .. 0xCFF       -1              return PQ and atomically PQ=
+=3D0
+>>>> + * 0xD00 .. 0xDFF       -1              return PQ and atomically PQ=
+=3D0
+>>>> + * 0xE00 .. 0xDFF       -1              return PQ and atomically PQ=
+=3D1
+>>>> + * 0xF00 .. 0xDFF       -1              return PQ and atomically PQ=
+=3D1
+>>>> + */
 >>>
->>> AFAICT a bad LISN here means a qemu error (in the source, probably),
->>> not a user or guest error, so an assert() would be more appropriate.
+>>> I can't quite make sense of this table.  What do the -1s represent,
 >>
->> hmm, I would say no because in the case of PowerNV, the firmware could
->> have badly configured the ISN offset of a source which would notify th=
-e=20
->> router with a bad notification event data.
->=20
-> Ah, good point.  That's fine as it is then.
->=20
+>> the value returned by the load.
+>>
+>>> and how does it relate to the non-2page case?
+>>
+>> one page ESB support trigger and management on the same page. So for l=
+oads,
+>> the odd page behavior applies. =20
+>>
+>>>> +static uint64_t xive_source_esb_read(void *opaque, hwaddr addr, uns=
+igned size)
+>>>> +{
+>>>> +    XiveSource *xsrc =3D XIVE_SOURCE(opaque);
+>>>> +    uint32_t offset =3D addr & 0xFFF;
+>>>> +    uint32_t srcno =3D addr >> xsrc->esb_shift;
+>>>> +    uint64_t ret =3D -1;
 >>>> +
->>>> +    /* The IVRE has a State Bit Cache for its internal sources whic=
-h
->>>> +     * is also involed at this point. We skip the SBC lookup becaus=
-e
->>>> +     * the state bits of the sources are modeled internally in QEMU=
-.
->>>> +     */
+>>>> +    /* In a two pages ESB MMIO setting, trigger page should not be =
+read */
+>>>> +    if (xive_source_is_trigger_page(xsrc, addr)) {
+>>>> +        qemu_log_mask(LOG_GUEST_ERROR,
+>>>> +                      "XIVE: invalid load on IRQ %d trigger page at=
+ "
+>>>> +                      "0x%"HWADDR_PRIx"\n", srcno, addr);
+>>>> +        return -1;
+>>>> +    }
 >>>> +
->>>> +    if (!(eas.w & EAS_VALID)) {
->>>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %x\n", l=
-isn);
+>>>> +    switch (offset) {
+>>>> +    case XIVE_ESB_LOAD_EOI ... XIVE_ESB_LOAD_EOI + 0x7FF:
+>>>> +        ret =3D xive_source_esb_eoi(xsrc, srcno);
+>>>> +
+>>>> +        /* Forward the source event notification for routing */
+>>>> +        if (ret) {
+>>>> +            xive_source_notify(xsrc, srcno);
+>>>> +        }
+>>>> +        break;
+>>>> +
+>>>> +    case XIVE_ESB_GET ... XIVE_ESB_GET + 0x3FF:
+>>>> +        ret =3D xive_source_esb_get(xsrc, srcno);
+>>>> +        break;
+>>>> +
+>>>> +    case XIVE_ESB_SET_PQ_00 ... XIVE_ESB_SET_PQ_00 + 0x0FF:
+>>>> +    case XIVE_ESB_SET_PQ_01 ... XIVE_ESB_SET_PQ_01 + 0x0FF:
+>>>> +    case XIVE_ESB_SET_PQ_10 ... XIVE_ESB_SET_PQ_10 + 0x0FF:
+>>>> +    case XIVE_ESB_SET_PQ_11 ... XIVE_ESB_SET_PQ_11 + 0x0FF:
+>>>> +        ret =3D xive_source_esb_set(xsrc, srcno, (offset >> 8) & 0x=
+3);
+>>>> +        break;
+>>>> +    default:
+>>>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB load addr=
+ %x\n",
+>>>> +                      offset);
+>>>> +    }
+>>>> +
+>>>> +    return ret;
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * ESB MMIO stores
+>>>> + *                      Trigger page    Management/EOI page
+>>>> + * 2 pages setting      even            odd
+>>>
+>>> As with the previous table, I don't quite understand what the heading=
+s
+>>> above mean.
+>>
+>> one page ESB support trigger and management on the same page. So for s=
+tores,
+>> the odd page behavior applies.
+>>
+>> The headings can be improved. I will think of something.
+>>
+>>>> + * 0x000 .. 0x3FF       Trigger         Trigger
+>>>> + * 0x400 .. 0x7FF       Trigger         EOI
+>>>> + * 0x800 .. 0xBFF       Trigger         undefined
+>>>> + * 0xC00 .. 0xCFF       Trigger         PQ=3D00
+>>>> + * 0xD00 .. 0xDFF       Trigger         PQ=3D01
+>>>> + * 0xE00 .. 0xDFF       Trigger         PQ=3D10
+>>>> + * 0xF00 .. 0xDFF       Trigger         PQ=3D11
+>>>> + */
+>>>> +static void xive_source_esb_write(void *opaque, hwaddr addr,
+>>>> +                                  uint64_t value, unsigned size)
+>>>> +{
+>>>> +    XiveSource *xsrc =3D XIVE_SOURCE(opaque);
+>>>> +    uint32_t offset =3D addr & 0xFFF;
+>>>> +    uint32_t srcno =3D addr >> xsrc->esb_shift;
+>>>> +    bool notify =3D false;
+>>>> +
+>>>> +    /* In a two pages ESB MMIO setting, trigger page only triggers =
+*/
+>>>> +    if (xive_source_is_trigger_page(xsrc, addr)) {
+>>>> +        notify =3D xive_source_esb_trigger(xsrc, srcno);
+>>>> +        goto out;
+>>>> +    }
+>>>> +
+>>>> +    switch (offset) {
+>>>> +    case 0 ... 0x3FF:
+>>>> +        notify =3D xive_source_esb_trigger(xsrc, srcno);
+>>>> +        break;
+>>>> +
+>>>> +    case XIVE_ESB_STORE_EOI ... XIVE_ESB_STORE_EOI + 0x3FF:
+>>>> +        if (!(xsrc->esb_flags & XIVE_SRC_STORE_EOI)) {
+>>>> +            qemu_log_mask(LOG_GUEST_ERROR,
+>>>> +                          "XIVE: invalid Store EOI for IRQ %d\n", s=
+rcno);
+>>>> +            return;
+>>>> +        }
+>>>> +
+>>>> +        notify =3D xive_source_esb_eoi(xsrc, srcno);
+>>>> +        break;
+>>>> +
+>>>> +    case XIVE_ESB_SET_PQ_00 ... XIVE_ESB_SET_PQ_00 + 0x0FF:
+>>>> +    case XIVE_ESB_SET_PQ_01 ... XIVE_ESB_SET_PQ_01 + 0x0FF:
+>>>> +    case XIVE_ESB_SET_PQ_10 ... XIVE_ESB_SET_PQ_10 + 0x0FF:
+>>>> +    case XIVE_ESB_SET_PQ_11 ... XIVE_ESB_SET_PQ_11 + 0x0FF:
+>>>> +        xive_source_esb_set(xsrc, srcno, (offset >> 8) & 0x3);
+>>>> +        break;
+>>>> +
+>>>> +    default:
+>>>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid ESB write add=
+r %x\n",
+>>>> +                      offset);
 >>>> +        return;
 >>>> +    }
 >>>> +
->>>> +    if (eas.w & EAS_MASKED) {
->>>> +        /* Notification completed */
->>>> +        return;
+>>>> +out:
+>>>> +    /* Forward the source event notification for routing */
+>>>> +    if (notify) {
+>>>> +        xive_source_notify(xsrc, srcno);
 >>>> +    }
 >>>> +}
 >>>> +
->>>> +static Property xive_router_properties[] =3D {
->>>> +    DEFINE_PROP_UINT32("chip-id", XiveRouter, chip_id, 0),
->>>> +    DEFINE_PROP_END_OF_LIST(),
+>>>> +static const MemoryRegionOps xive_source_esb_ops =3D {
+>>>> +    .read =3D xive_source_esb_read,
+>>>> +    .write =3D xive_source_esb_write,
+>>>> +    .endianness =3D DEVICE_BIG_ENDIAN,
+>>>> +    .valid =3D {
+>>>> +        .min_access_size =3D 8,
+>>>> +        .max_access_size =3D 8,
+>>>> +    },
+>>>> +    .impl =3D {
+>>>> +        .min_access_size =3D 8,
+>>>> +        .max_access_size =3D 8,
+>>>> +    },
 >>>> +};
 >>>> +
->>>> +static void xive_router_class_init(ObjectClass *klass, void *data)
+>>>> +static void xive_source_set_irq(void *opaque, int srcno, int val)
 >>>> +{
->>>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->>>> +    XiveFabricClass *xfc =3D XIVE_FABRIC_CLASS(klass);
+>>>> +    XiveSource *xsrc =3D XIVE_SOURCE(opaque);
+>>>> +    bool notify =3D false;
 >>>> +
->>>> +    dc->desc    =3D "XIVE Router Engine";
->>>> +    dc->props   =3D xive_router_properties;
->>>> +    xfc->notify =3D xive_router_notify;
+>>>> +    if (val) {
+>>>> +        notify =3D xive_source_esb_trigger(xsrc, srcno);
+>>>> +    }
+>>>> +
+>>>> +    /* Forward the source event notification for routing */
+>>>> +    if (notify) {
+>>>> +        xive_source_notify(xsrc, srcno);
+>>>> +    }
 >>>> +}
 >>>> +
->>>> +static const TypeInfo xive_router_info =3D {
->>>> +    .name          =3D TYPE_XIVE_ROUTER,
->>>> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
->>>> +    .abstract      =3D true,
->>>> +    .class_size    =3D sizeof(XiveRouterClass),
->>>> +    .class_init    =3D xive_router_class_init,
->>>> +    .interfaces    =3D (InterfaceInfo[]) {
->>>> +        { TYPE_XIVE_FABRIC },
+>>>> +void xive_source_pic_print_info(XiveSource *xsrc, uint32_t offset, =
+Monitor *mon)
+>>>> +{
+>>>> +    int i;
+>>>> +
+>>>> +    for (i =3D 0; i < xsrc->nr_irqs; i++) {
+>>>> +        uint8_t pq =3D xive_source_esb_get(xsrc, i);
+>>>> +
+>>>> +        if (pq =3D=3D XIVE_ESB_OFF) {
+>>>> +            continue;
+>>>> +        }
+>>>> +
+>>>> +        monitor_printf(mon, "  %08x %c%c\n", i + offset,
+>>>> +                       pq & XIVE_ESB_VAL_P ? 'P' : '-',
+>>>> +                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
+>>>> +    }
+>>>> +}
+>>>> +
+>>>> +static void xive_source_reset(DeviceState *dev)
+>>>> +{
+>>>> +    XiveSource *xsrc =3D XIVE_SOURCE(dev);
+>>>> +
+>>>> +    /* PQs are initialized to 0b01 which corresponds to "ints off" =
+*/
+>>>> +    memset(xsrc->status, 0x1, xsrc->nr_irqs);
 >>>
->>> So as far as I can see so far, the XiveFabric interface will
->>> essentially have to be implemented on the router object, so I'm not
->>> seeing much point to having the interface rather than just a direct
->>> call on the router object.  But I haven't read the whole series yet,
->>> so maybe I'm missing something.
->>
->> The PSIHB and PHB4 models are using it but there are not in the series=
+>>> You've already got XIVE_ESB_OFF defined to make this a little clearer=
 .
 >>
->> I can send the PSIHB patch in the next version if you like, it's the=20
->> patch right after PnvXive. It's attached below for the moment. Look at=
-=20
->> pnv_psi_notify().
->=20
-> Hrm, I see.  This seems like a really convoluted way of achieving what
-> you need here.  We want to abstract exactly how the source delivers
-> notifies,=20
-
-on sPAPR, I agree that the forwarding of event notification could be a=20
-simple XiveRouter call but the XiveRouter covers both machines :/
-
-On PowerNV, HW uses MMIOs to forward events and only the device knows=20
-about the IRQ number offset in the global IRQ number space and the=20
-notification port to use for the MMIO store. A PowerNV XIVE source=20
-would forward the event notification to a piece of logic which sends=20
-a PowerBUS event notification message. How it reaches the XIVE IC is
-beyong QEMU as it would means modeling the PowerBUS.=20
-
-> but doing it with an interface on some object that's not necessarily
-> either the source or the router seems odd. =20
-There is no direct link between the device owing the source and the=20
-XIVE controller, they could be on the same Power chip but the routing=20
-could be done by some other chips. This scenario is covered btw.
-
-See it as a connector object.
-
-> At the very least the names need to change (of both interface and > pro=
-perty for the target object).
-
-I am fine with renaming it. With the above explanations, if they are=20
-clear enough, how do see them ?
-
-Thanks,
-
-C.=20
-
->=20
+>> Sure.
 >>
 >> Thanks,
 >>
->> C.
+>> C.=20
 >>
->>>> +        { }
->>>> +    }
->>>> +};
+>>
+>>>
+>>>> +}
 >>>> +
->>>> +void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *=
-mon)
+>>>> +static void xive_source_realize(DeviceState *dev, Error **errp)
 >>>> +{
->>>> +    if (!(eas->w & EAS_VALID)) {
+>>>> +    XiveSource *xsrc =3D XIVE_SOURCE(dev);
+>>>> +
+>>>> +    if (!xsrc->nr_irqs) {
+>>>> +        error_setg(errp, "Number of interrupt needs to be greater t=
+han 0");
 >>>> +        return;
 >>>> +    }
 >>>> +
->>>> +    monitor_printf(mon, "  %08x %s end:%02x/%04x data:%08x\n",
->>>> +                   lisn, eas->w & EAS_MASKED ? "M" : " ",
->>>> +                   (uint8_t)  GETFIELD(EAS_END_BLOCK, eas->w),
->>>> +                   (uint32_t) GETFIELD(EAS_END_INDEX, eas->w),
->>>> +                   (uint32_t) GETFIELD(EAS_END_DATA, eas->w));
+>>>> +    if (xsrc->esb_shift !=3D XIVE_ESB_4K &&
+>>>> +        xsrc->esb_shift !=3D XIVE_ESB_4K_2PAGE &&
+>>>> +        xsrc->esb_shift !=3D XIVE_ESB_64K &&
+>>>> +        xsrc->esb_shift !=3D XIVE_ESB_64K_2PAGE) {
+>>>> +        error_setg(errp, "Invalid ESB shift setting");
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    xsrc->qirqs =3D qemu_allocate_irqs(xive_source_set_irq, xsrc,
+>>>> +                                     xsrc->nr_irqs);
+>>>> +
+>>>> +    xsrc->status =3D g_malloc0(xsrc->nr_irqs);
+>>>> +
+>>>> +    memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+>>>> +                          &xive_source_esb_ops, xsrc, "xive.esb",
+>>>> +                          (1ull << xsrc->esb_shift) * xsrc->nr_irqs=
+);
+>>>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &xsrc->esb_mmio);
 >>>> +}
 >>>> +
->>>>  /*
->>>>   * XIVE Fabric
->>>>   */
->>>> @@ -455,6 +540,7 @@ static void xive_register_types(void)
->>>>  {
->>>>      type_register_static(&xive_source_info);
->>>>      type_register_static(&xive_fabric_info);
->>>> +    type_register_static(&xive_router_info);
->>>>  }
->>>> =20
->>>>  type_init(xive_register_types)
+>>>> +static const VMStateDescription vmstate_xive_source =3D {
+>>>> +    .name =3D TYPE_XIVE_SOURCE,
+>>>> +    .version_id =3D 1,
+>>>> +    .minimum_version_id =3D 1,
+>>>> +    .fields =3D (VMStateField[]) {
+>>>> +        VMSTATE_UINT32_EQUAL(nr_irqs, XiveSource, NULL),
+>>>> +        VMSTATE_VBUFFER_UINT32(status, XiveSource, 1, NULL, nr_irqs=
+),
+>>>> +        VMSTATE_END_OF_LIST()
+>>>> +    },
+>>>> +};
+>>>> +
+>>>> +/*
+>>>> + * The default XIVE interrupt source setting for the ESB MMIOs is t=
+wo
+>>>> + * 64k pages without Store EOI, to be in sync with KVM.
+>>>> + */
+>>>> +static Property xive_source_properties[] =3D {
+>>>> +    DEFINE_PROP_UINT64("flags", XiveSource, esb_flags, 0),
+>>>> +    DEFINE_PROP_UINT32("nr-irqs", XiveSource, nr_irqs, 0),
+>>>> +    DEFINE_PROP_UINT32("shift", XiveSource, esb_shift, XIVE_ESB_64K=
+_2PAGE),
+>>>> +    DEFINE_PROP_END_OF_LIST(),
+>>>> +};
+>>>> +
+>>>> +static void xive_source_class_init(ObjectClass *klass, void *data)
+>>>> +{
+>>>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+>>>> +
+>>>> +    dc->desc    =3D "XIVE Interrupt Source";
+>>>> +    dc->props   =3D xive_source_properties;
+>>>> +    dc->realize =3D xive_source_realize;
+>>>> +    dc->reset   =3D xive_source_reset;
+>>>> +    dc->vmsd    =3D &vmstate_xive_source;
+>>>> +}
+>>>> +
+>>>> +static const TypeInfo xive_source_info =3D {
+>>>> +    .name          =3D TYPE_XIVE_SOURCE,
+>>>> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
+>>>> +    .instance_size =3D sizeof(XiveSource),
+>>>> +    .class_init    =3D xive_source_class_init,
+>>>> +};
+>>>> +
+>>>> +static void xive_register_types(void)
+>>>> +{
+>>>> +    type_register_static(&xive_source_info);
+>>>> +}
+>>>> +
+>>>> +type_init(xive_register_types)
+>>>> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+>>>> index 0e9963f5eecc..72a46ed91c31 100644
+>>>> --- a/hw/intc/Makefile.objs
+>>>> +++ b/hw/intc/Makefile.objs
+>>>> @@ -37,6 +37,7 @@ obj-$(CONFIG_SH4) +=3D sh_intc.o
+>>>>  obj-$(CONFIG_XICS) +=3D xics.o
+>>>>  obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
+>>>>  obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
+>>>> +obj-$(CONFIG_XIVE) +=3D xive.o
+>>>>  obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
+>>>>  obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
+>>>>  obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
 >>>
 >>
->=20
->> >From 680fd6ff7c99e669708fbc5cfdbfcd95e83e7c07 Mon Sep 17 00:00:00 200=
-1
->> From: =3D?UTF-8?q?C=3DC3=3DA9dric=3D20Le=3D20Goater?=3D <clg@kaod.org>
->> Date: Wed, 21 Nov 2018 10:29:45 +0100
->> Subject: [PATCH] ppc/pnv: add a PSI bridge model for POWER9 processor
->> MIME-Version: 1.0
->> Content-Type: text/plain; charset=3DUTF-8
->> Content-Transfer-Encoding: 8bit
->>
->> The PSI bridge on POWER9 is very similar to POWER8. The BAR is still
->> set through XSCOM but the controls are now entirely done with MMIOs.
->> More interrupts are defined and the interrupt controller interface has
->> changed to XIVE. The POWER9 model is a first example of the usage of
->> the notify() handler of the XiveFabric interface, linking the PSI
->> XiveSource to its owning device model.
->>
->> Signed-off-by: C??dric Le Goater <clg@kaod.org>
->> ---
->>  include/hw/ppc/pnv.h       |   6 +
->>  include/hw/ppc/pnv_psi.h   |  50 ++++-
->>  include/hw/ppc/pnv_xscom.h |   3 +
->>  hw/ppc/pnv.c               |  20 +-
->>  hw/ppc/pnv_psi.c           | 390 ++++++++++++++++++++++++++++++++++--=
--
->>  5 files changed, 444 insertions(+), 25 deletions(-)
->>
->> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
->> index c402e5d5844b..8be1147481f9 100644
->> --- a/include/hw/ppc/pnv.h
->> +++ b/include/hw/ppc/pnv.h
->> @@ -88,6 +88,7 @@ typedef struct Pnv9Chip {
->> =20
->>      /*< public >*/
->>      PnvXive      xive;
->> +    PnvPsi       psi;
->>  } Pnv9Chip;
->> =20
->>  typedef struct PnvChipClass {
->> @@ -250,11 +251,16 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
->>  #define PNV9_XIVE_PC_SIZE            0x0000001000000000ull
->>  #define PNV9_XIVE_PC_BASE(chip)      PNV9_CHIP_BASE(chip, 0x000601800=
-0000000ull)
->> =20
->> +#define PNV9_PSIHB_SIZE              0x0000000000100000ull
->> +#define PNV9_PSIHB_BASE(chip)        PNV9_CHIP_BASE(chip, 0x000603020=
-3000000ull)
->> +
->>  #define PNV9_XIVE_IC_SIZE            0x0000000000080000ull
->>  #define PNV9_XIVE_IC_BASE(chip)      PNV9_CHIP_BASE(chip, 0x000603020=
-3100000ull)
->> =20
->>  #define PNV9_XIVE_TM_SIZE            0x0000000000040000ull
->>  #define PNV9_XIVE_TM_BASE(chip)      PNV9_CHIP_BASE(chip, 0x000603020=
-3180000ull)
->> =20
->> +#define PNV9_PSIHB_ESB_SIZE          0x0000000000010000ull
->> +#define PNV9_PSIHB_ESB_BASE(chip)    PNV9_CHIP_BASE(chip, 0x000603020=
-31c0000ull)
->> =20
->>  #endif /* _PPC_PNV_H */
->> diff --git a/include/hw/ppc/pnv_psi.h b/include/hw/ppc/pnv_psi.h
->> index f6af5eae1fa8..b8f8d082bcf9 100644
->> --- a/include/hw/ppc/pnv_psi.h
->> +++ b/include/hw/ppc/pnv_psi.h
->> @@ -21,10 +21,35 @@
->> =20
->>  #include "hw/sysbus.h"
->>  #include "hw/ppc/xics.h"
->> +#include "hw/ppc/xive.h"
->> =20
->>  #define TYPE_PNV_PSI "pnv-psi"
->>  #define PNV_PSI(obj) \
->>       OBJECT_CHECK(PnvPsi, (obj), TYPE_PNV_PSI)
->> +#define PNV_PSI_CLASS(klass) \
->> +     OBJECT_CLASS_CHECK(PnvPsiClass, (klass), TYPE_PNV_PSI)
->> +#define PNV_PSI_GET_CLASS(obj) \
->> +     OBJECT_GET_CLASS(PnvPsiClass, (obj), TYPE_PNV_PSI)
->> +
->> +typedef struct PnvPsi PnvPsi;
->> +typedef struct PnvChip PnvChip;
->> +typedef struct PnvPsiClass {
->> +    SysBusDeviceClass parent_class;
->> +
->> +    int chip_type;
->> +    uint32_t xscom_pcba;
->> +    uint32_t xscom_size;
->> +
->> +    void (*irq_set)(PnvPsi *psi, int, bool state);
->> +} PnvPsiClass;
->> +
->> +#define TYPE_PNV_PSI_POWER8 TYPE_PNV_PSI "-POWER8"
->> +#define PNV_PSI_POWER8(obj) \
->> +    OBJECT_CHECK(PnvPsi, (obj), TYPE_PNV_PSI_POWER8)
->> +
->> +#define TYPE_PNV_PSI_POWER9 TYPE_PNV_PSI "-POWER9"
->> +#define PNV_PSI_POWER9(obj) \
->> +    OBJECT_CHECK(PnvPsi, (obj), TYPE_PNV_PSI_POWER9)
->> =20
->>  #define PSIHB_XSCOM_MAX         0x20
->> =20
->> @@ -38,9 +63,12 @@ typedef struct PnvPsi {
->>      /* MemoryRegion fsp_mr; */
->>      uint64_t fsp_bar;
->> =20
->> -    /* Interrupt generation */
->> +    /* P8 Interrupt generation */
->>      ICSState ics;
->> =20
->> +    /* P9 Interrupt generation */
->> +    XiveSource source;
->> +
->>      /* Registers */
->>      uint64_t regs[PSIHB_XSCOM_MAX];
->> =20
->> @@ -60,6 +88,24 @@ typedef enum PnvPsiIrq {
->> =20
->>  #define PSI_NUM_INTERRUPTS 6
->> =20
->> -extern void pnv_psi_irq_set(PnvPsi *psi, PnvPsiIrq irq, bool state);
->> +/* P9 PSI Interrupts */
->> +#define PSIHB9_IRQ_PSI          0
->> +#define PSIHB9_IRQ_OCC          1
->> +#define PSIHB9_IRQ_FSI          2
->> +#define PSIHB9_IRQ_LPCHC        3
->> +#define PSIHB9_IRQ_LOCAL_ERR    4
->> +#define PSIHB9_IRQ_GLOBAL_ERR   5
->> +#define PSIHB9_IRQ_TPM          6
->> +#define PSIHB9_IRQ_LPC_SIRQ0    7
->> +#define PSIHB9_IRQ_LPC_SIRQ1    8
->> +#define PSIHB9_IRQ_LPC_SIRQ2    9
->> +#define PSIHB9_IRQ_LPC_SIRQ3    10
->> +#define PSIHB9_IRQ_SBE_I2C      11
->> +#define PSIHB9_IRQ_DIO          12
->> +#define PSIHB9_IRQ_PSU          13
->> +#define PSIHB9_NUM_IRQS         14
->> +
->> +void pnv_psi_irq_set(PnvPsi *psi, int irq, bool state);
->> +void pnv_psi_pic_print_info(PnvPsi *psi, Monitor *mon);
->> =20
->>  #endif /* _PPC_PNV_PSI_H */
->> diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
->> index 5bd43467a1ab..019b45bf9189 100644
->> --- a/include/hw/ppc/pnv_xscom.h
->> +++ b/include/hw/ppc/pnv_xscom.h
->> @@ -82,6 +82,9 @@ typedef struct PnvXScomInterfaceClass {
->>  #define PNV_XSCOM_PBCQ_SPCI_BASE  0x9013c00
->>  #define PNV_XSCOM_PBCQ_SPCI_SIZE  0x5
->> =20
->> +#define PNV9_XSCOM_PSIHB_BASE     0x5012900
->> +#define PNV9_XSCOM_PSIHB_SIZE     0x100
->> +
->>  #define PNV9_XSCOM_XIVE_BASE      0x5013000
->>  #define PNV9_XSCOM_XIVE_SIZE      0x300
->> =20
->> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
->> index b6af896c30e4..e67c9d7d3995 100644
->> --- a/hw/ppc/pnv.c
->> +++ b/hw/ppc/pnv.c
->> @@ -743,7 +743,7 @@ static void pnv_chip_power8_instance_init(Object *=
-obj)
->>      PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(obj);
->>      int i;
->> =20
->> -    object_initialize(&chip8->psi, sizeof(chip8->psi), TYPE_PNV_PSI);
->> +    object_initialize(&chip8->psi, sizeof(chip8->psi), TYPE_PNV_PSI_P=
-OWER8);
->>      object_property_add_child(obj, "psi", OBJECT(&chip8->psi), NULL);
->>      object_property_add_const_link(OBJECT(&chip8->psi), "xics",
->>                                     OBJECT(qdev_get_machine()), &error=
-_abort);
->> @@ -923,6 +923,11 @@ static void pnv_chip_power9_instance_init(Object =
-*obj)
->>      object_property_add_child(obj, "xive", OBJECT(&chip9->xive), NULL=
-);
->>      object_property_add_const_link(OBJECT(&chip9->xive), "chip", obj,
->>                                     &error_abort);
->> +
->> +    object_initialize(&chip9->psi, sizeof(chip9->psi), TYPE_PNV_PSI_P=
-OWER9);
->> +    object_property_add_child(obj, "psi", OBJECT(&chip9->psi), NULL);
->> +    object_property_add_const_link(OBJECT(&chip9->psi), "chip", obj,
->> +                                   &error_abort);
->>  }
->> =20
->>  static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
->> @@ -955,6 +960,18 @@ static void pnv_chip_power9_realize(DeviceState *=
-dev, Error **errp)
->>      qdev_set_parent_bus(DEVICE(&chip9->xive), sysbus_get_default());
->>      pnv_xscom_add_subregion(chip, PNV9_XSCOM_XIVE_BASE,
->>                              &chip9->xive.xscom_regs);
->> +
->> +    /* Processor Service Interface (PSI) Host Bridge */
->> +    object_property_set_int(OBJECT(&chip9->psi), PNV9_PSIHB_BASE(chip=
-),
->> +                            "bar", &error_fatal);
->> +    object_property_set_bool(OBJECT(&chip9->psi), true, "realized", &=
-local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +    qdev_set_parent_bus(DEVICE(&chip9->psi), sysbus_get_default());
->> +    pnv_xscom_add_subregion(chip, PNV9_XSCOM_PSIHB_BASE,
->> +                            &chip9->psi.xscom_regs);
->>  }
->> =20
->>  static void pnv_chip_power9_class_init(ObjectClass *klass, void *data=
-)
->> @@ -1188,6 +1205,7 @@ static void pnv_pic_print_info(InterruptStatsPro=
-vider *obj,
->>              Pnv9Chip *chip9 =3D PNV9_CHIP(chip);
->> =20
->>               pnv_xive_pic_print_info(&chip9->xive, mon);
->> +             pnv_psi_pic_print_info(&chip9->psi, mon);
->>          } else {
->>              Pnv8Chip *chip8 =3D PNV8_CHIP(chip);
->> =20
->> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
->> index 5b969127c303..8b85dd9555e8 100644
->> --- a/hw/ppc/pnv_psi.c
->> +++ b/hw/ppc/pnv_psi.c
->> @@ -22,6 +22,7 @@
->>  #include "target/ppc/cpu.h"
->>  #include "qemu/log.h"
->>  #include "qapi/error.h"
->> +#include "monitor/monitor.h"
->> =20
->>  #include "exec/address-spaces.h"
->> =20
->> @@ -114,12 +115,14 @@
->>  #define PSIHB_BAR_MASK                  0x0003fffffff00000ull
->>  #define PSIHB_FSPBAR_MASK               0x0003ffff00000000ull
->> =20
->> +#define PSIHB_REG(addr) (((addr) >> 3) + PSIHB_XSCOM_BAR)
->> +
->>  static void pnv_psi_set_bar(PnvPsi *psi, uint64_t bar)
->>  {
->>      MemoryRegion *sysmem =3D get_system_memory();
->>      uint64_t old =3D psi->regs[PSIHB_XSCOM_BAR];
->> =20
->> -    psi->regs[PSIHB_XSCOM_BAR] =3D bar & (PSIHB_BAR_MASK | PSIHB_BAR_=
-EN);
->> +    psi->regs[PSIHB_XSCOM_BAR] =3D bar;
->> =20
->>      /* Update MR, always remove it first */
->>      if (old & PSIHB_BAR_EN) {
->> @@ -128,7 +131,7 @@ static void pnv_psi_set_bar(PnvPsi *psi, uint64_t =
-bar)
->> =20
->>      /* Then add it back if needed */
->>      if (bar & PSIHB_BAR_EN) {
->> -        uint64_t addr =3D bar & PSIHB_BAR_MASK;
->> +        uint64_t addr =3D bar & ~PSIHB_BAR_EN;
->>          memory_region_add_subregion(sysmem, addr, &psi->regs_mr);
->>      }
->>  }
->> @@ -205,7 +208,12 @@ static const uint64_t stat_bits[] =3D {
->>      [PSIHB_IRQ_EXTERNAL]  =3D PSIHB_IRQ_STAT_EXT,
->>  };
->> =20
->> -void pnv_psi_irq_set(PnvPsi *psi, PnvPsiIrq irq, bool state)
->> +void pnv_psi_irq_set(PnvPsi *psi, int irq, bool state)
->> +{
->> +    PNV_PSI_GET_CLASS(psi)->irq_set(psi, irq, state);
->> +}
->> +
->> +static void pnv_psi_power8_irq_set(PnvPsi *psi, int irq, bool state)
->>  {
->>      ICSState *ics =3D &psi->ics;
->>      uint32_t xivr_reg;
->> @@ -324,7 +332,7 @@ static uint64_t pnv_psi_reg_read(PnvPsi *psi, uint=
-32_t offset, bool mmio)
->>          val =3D psi->regs[offset];
->>          break;
->>      default:
->> -        qemu_log_mask(LOG_UNIMP, "PSI: read at Ox%" PRIx32 "\n", offs=
-et);
->> +        qemu_log_mask(LOG_UNIMP, "PSI: read at 0x%" PRIx32 "\n", offs=
-et);
->>      }
->>      return val;
->>  }
->> @@ -383,7 +391,7 @@ static void pnv_psi_reg_write(PnvPsi *psi, uint32_=
-t offset, uint64_t val,
->>          pnv_psi_set_irsn(psi, val);
->>          break;
->>      default:
->> -        qemu_log_mask(LOG_UNIMP, "PSI: write at Ox%" PRIx32 "\n", off=
-set);
->> +        qemu_log_mask(LOG_UNIMP, "PSI: write at 0x%" PRIx32 "\n", off=
-set);
->>      }
->>  }
->> =20
->> @@ -393,13 +401,13 @@ static void pnv_psi_reg_write(PnvPsi *psi, uint3=
-2_t offset, uint64_t val,
->>   */
->>  static uint64_t pnv_psi_mmio_read(void *opaque, hwaddr addr, unsigned=
- size)
->>  {
->> -    return pnv_psi_reg_read(opaque, (addr >> 3) + PSIHB_XSCOM_BAR, tr=
-ue);
->> +    return pnv_psi_reg_read(opaque, PSIHB_REG(addr), true);
->>  }
->> =20
->>  static void pnv_psi_mmio_write(void *opaque, hwaddr addr,
->>                                uint64_t val, unsigned size)
->>  {
->> -    pnv_psi_reg_write(opaque, (addr >> 3) + PSIHB_XSCOM_BAR, val, tru=
-e);
->> +    pnv_psi_reg_write(opaque, PSIHB_REG(addr), val, true);
->>  }
->> =20
->>  static const MemoryRegionOps psi_mmio_ops =3D {
->> @@ -441,7 +449,7 @@ static const MemoryRegionOps pnv_psi_xscom_ops =3D=
- {
->>      }
->>  };
->> =20
->> -static void pnv_psi_init(Object *obj)
->> +static void pnv_psi_power8_instance_init(Object *obj)
->>  {
->>      PnvPsi *psi =3D PNV_PSI(obj);
->> =20
->> @@ -458,7 +466,7 @@ static const uint8_t irq_to_xivr[] =3D {
->>      PSIHB_XSCOM_XIVR_EXT,
->>  };
->> =20
->> -static void pnv_psi_realize(DeviceState *dev, Error **errp)
->> +static void pnv_psi_power8_realize(DeviceState *dev, Error **errp)
->>  {
->>      PnvPsi *psi =3D PNV_PSI(dev);
->>      ICSState *ics =3D &psi->ics;
->> @@ -510,28 +518,34 @@ static void pnv_psi_realize(DeviceState *dev, Er=
-ror **errp)
->>      }
->>  }
->> =20
->> +static const char compat_p8[] =3D "ibm,power8-psihb-x\0ibm,psihb-x";
->> +static const char compat_p9[] =3D "ibm,power9-psihb-x\0ibm,psihb-x";
->> +
->>  static int pnv_psi_dt_xscom(PnvXScomInterface *dev, void *fdt, int xs=
-com_offset)
->>  {
->> -    const char compat[] =3D "ibm,power8-psihb-x\0ibm,psihb-x";
->> +    PnvPsiClass *ppc =3D PNV_PSI_GET_CLASS(dev);
->>      char *name;
->>      int offset;
->> -    uint32_t lpc_pcba =3D PNV_XSCOM_PSIHB_BASE;
->>      uint32_t reg[] =3D {
->> -        cpu_to_be32(lpc_pcba),
->> -        cpu_to_be32(PNV_XSCOM_PSIHB_SIZE)
->> +        cpu_to_be32(ppc->xscom_pcba),
->> +        cpu_to_be32(ppc->xscom_size)
->>      };
->> =20
->> -    name =3D g_strdup_printf("psihb@%x", lpc_pcba);
->> +    name =3D g_strdup_printf("psihb@%x", ppc->xscom_pcba);
->>      offset =3D fdt_add_subnode(fdt, xscom_offset, name);
->>      _FDT(offset);
->>      g_free(name);
->> =20
->> -    _FDT((fdt_setprop(fdt, offset, "reg", reg, sizeof(reg))));
->> -
->> -    _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 2)));
->> -    _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 1)));
->> -    _FDT((fdt_setprop(fdt, offset, "compatible", compat,
->> -                      sizeof(compat))));
->> +    _FDT(fdt_setprop(fdt, offset, "reg", reg, sizeof(reg)));
->> +    _FDT(fdt_setprop_cell(fdt, offset, "#address-cells", 2));
->> +    _FDT(fdt_setprop_cell(fdt, offset, "#size-cells", 1));
->> +    if (ppc->chip_type =3D=3D PNV_CHIP_POWER9) {
->> +        _FDT(fdt_setprop(fdt, offset, "compatible", compat_p9,
->> +                         sizeof(compat_p9)));
->> +    } else {
->> +        _FDT(fdt_setprop(fdt, offset, "compatible", compat_p8,
->> +                         sizeof(compat_p8)));
->> +    }
->>      return 0;
->>  }
->> =20
->> @@ -541,6 +555,324 @@ static Property pnv_psi_properties[] =3D {
->>      DEFINE_PROP_END_OF_LIST(),
->>  };
->> =20
->> +static void pnv_psi_power8_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +    PnvPsiClass *ppc =3D PNV_PSI_CLASS(klass);
->> +
->> +    dc->desc    =3D "PowerNV PSI Controller POWER8";
->> +    dc->realize =3D pnv_psi_power8_realize;
->> +
->> +    ppc->chip_type =3D  PNV_CHIP_POWER8;
->> +    ppc->xscom_pcba =3D PNV_XSCOM_PSIHB_BASE;
->> +    ppc->xscom_size =3D PNV_XSCOM_PSIHB_SIZE;
->> +    ppc->irq_set    =3D pnv_psi_power8_irq_set;
->> +}
->> +
->> +static const TypeInfo pnv_psi_power8_info =3D {
->> +    .name          =3D TYPE_PNV_PSI_POWER8,
->> +    .parent        =3D TYPE_PNV_PSI,
->> +    .instance_init =3D pnv_psi_power8_instance_init,
->> +    .class_init    =3D pnv_psi_power8_class_init,
->> +};
->> +
->> +/* Common registers */
->> +
->> +#define PSIHB9_CR                       0x20
->> +#define PSIHB9_SEMR                     0x28
->> +
->> +/* P9 registers */
->> +
->> +#define PSIHB9_INTERRUPT_CONTROL        0x58
->> +#define   PSIHB9_IRQ_METHOD             PPC_BIT(0)
->> +#define   PSIHB9_IRQ_RESET              PPC_BIT(1)
->> +#define PSIHB9_ESB_CI_BASE              0x60
->> +#define   PSIHB9_ESB_CI_VALID           1
->> +#define PSIHB9_ESB_NOTIF_ADDR           0x68
->> +#define   PSIHB9_ESB_NOTIF_VALID        1
->> +#define PSIHB9_IVT_OFFSET               0x70
->> +#define   PSIHB9_IVT_OFF_SHIFT          32
->> +
->> +#define PSIHB9_IRQ_LEVEL                0x78 /* assertion */
->> +#define   PSIHB9_IRQ_LEVEL_PSI          PPC_BIT(0)
->> +#define   PSIHB9_IRQ_LEVEL_OCC          PPC_BIT(1)
->> +#define   PSIHB9_IRQ_LEVEL_FSI          PPC_BIT(2)
->> +#define   PSIHB9_IRQ_LEVEL_LPCHC        PPC_BIT(3)
->> +#define   PSIHB9_IRQ_LEVEL_LOCAL_ERR    PPC_BIT(4)
->> +#define   PSIHB9_IRQ_LEVEL_GLOBAL_ERR   PPC_BIT(5)
->> +#define   PSIHB9_IRQ_LEVEL_TPM          PPC_BIT(6)
->> +#define   PSIHB9_IRQ_LEVEL_LPC_SIRQ1    PPC_BIT(7)
->> +#define   PSIHB9_IRQ_LEVEL_LPC_SIRQ2    PPC_BIT(8)
->> +#define   PSIHB9_IRQ_LEVEL_LPC_SIRQ3    PPC_BIT(9)
->> +#define   PSIHB9_IRQ_LEVEL_LPC_SIRQ4    PPC_BIT(10)
->> +#define   PSIHB9_IRQ_LEVEL_SBE_I2C      PPC_BIT(11)
->> +#define   PSIHB9_IRQ_LEVEL_DIO          PPC_BIT(12)
->> +#define   PSIHB9_IRQ_LEVEL_PSU          PPC_BIT(13)
->> +#define   PSIHB9_IRQ_LEVEL_I2C_C        PPC_BIT(14)
->> +#define   PSIHB9_IRQ_LEVEL_I2C_D        PPC_BIT(15)
->> +#define   PSIHB9_IRQ_LEVEL_I2C_E        PPC_BIT(16)
->> +#define   PSIHB9_IRQ_LEVEL_SBE          PPC_BIT(19)
->> +
->> +#define PSIHB9_IRQ_STAT                 0x80 /* P bit */
->> +#define   PSIHB9_IRQ_STAT_PSI           PPC_BIT(0)
->> +#define   PSIHB9_IRQ_STAT_OCC           PPC_BIT(1)
->> +#define   PSIHB9_IRQ_STAT_FSI           PPC_BIT(2)
->> +#define   PSIHB9_IRQ_STAT_LPCHC         PPC_BIT(3)
->> +#define   PSIHB9_IRQ_STAT_LOCAL_ERR     PPC_BIT(4)
->> +#define   PSIHB9_IRQ_STAT_GLOBAL_ERR    PPC_BIT(5)
->> +#define   PSIHB9_IRQ_STAT_TPM           PPC_BIT(6)
->> +#define   PSIHB9_IRQ_STAT_LPC_SIRQ1     PPC_BIT(7)
->> +#define   PSIHB9_IRQ_STAT_LPC_SIRQ2     PPC_BIT(8)
->> +#define   PSIHB9_IRQ_STAT_LPC_SIRQ3     PPC_BIT(9)
->> +#define   PSIHB9_IRQ_STAT_LPC_SIRQ4     PPC_BIT(10)
->> +#define   PSIHB9_IRQ_STAT_SBE_I2C       PPC_BIT(11)
->> +#define   PSIHB9_IRQ_STAT_DIO           PPC_BIT(12)
->> +#define   PSIHB9_IRQ_STAT_PSU           PPC_BIT(13)
->> +
->> +static void pnv_psi_notify(XiveFabric *xf, uint32_t srcno)
->> +{
->> +    PnvPsi *psi =3D PNV_PSI(xf);
->> +    uint64_t notif_port =3D psi->regs[PSIHB_REG(PSIHB9_ESB_NOTIF_ADDR=
-)];
->> +    bool valid =3D notif_port & PSIHB9_ESB_NOTIF_VALID;
->> +    uint64_t notify_addr =3D notif_port & ~PSIHB9_ESB_NOTIF_VALID;
->> +
->> +    uint32_t offset =3D
->> +        (psi->regs[PSIHB_REG(PSIHB9_IVT_OFFSET)] >> PSIHB9_IVT_OFF_SH=
-IFT);
->> +    uint64_t lisn =3D cpu_to_be64(offset + srcno);
->> +
->> +    if (valid) {
->> +        cpu_physical_memory_write(notify_addr, &lisn, sizeof(lisn));
->> +    }
->> +}
->> +
->> +/*
->> + * TODO : move to parent class
->> + */
->> +static void pnv_psi_reset(DeviceState *dev)
->> +{
->> +    PnvPsi *psi =3D PNV_PSI(dev);
->> +
->> +    memset(psi->regs, 0x0, sizeof(psi->regs));
->> +
->> +    psi->regs[PSIHB_XSCOM_BAR] =3D psi->bar | PSIHB_BAR_EN;
->> +}
->> +
->> +static uint64_t pnv_psi_p9_mmio_read(void *opaque, hwaddr addr, unsig=
-ned size)
->> +{
->> +    PnvPsi *psi =3D PNV_PSI(opaque);
->> +    uint32_t reg =3D PSIHB_REG(addr);
->> +    uint64_t val =3D -1;
->> +
->> +    switch (addr) {
->> +    case PSIHB9_CR:
->> +    case PSIHB9_SEMR:
->> +        /* FSP stuff */
->> +    case PSIHB9_INTERRUPT_CONTROL:
->> +    case PSIHB9_ESB_CI_BASE:
->> +    case PSIHB9_ESB_NOTIF_ADDR:
->> +    case PSIHB9_IVT_OFFSET:
->> +        val =3D psi->regs[reg];
->> +        break;
->> +    default:
->> +        qemu_log_mask(LOG_GUEST_ERROR, "PSI: read at 0x%" PRIx64 "\n"=
-, addr);
->> +    }
->> +
->> +    return val;
->> +}
->> +
->> +static void pnv_psi_p9_mmio_write(void *opaque, hwaddr addr,
->> +                                  uint64_t val, unsigned size)
->> +{
->> +    PnvPsi *psi =3D PNV_PSI(opaque);
->> +    uint32_t reg =3D PSIHB_REG(addr);
->> +    MemoryRegion *sysmem =3D get_system_memory();
->> +
->> +    switch (addr) {
->> +    case PSIHB9_CR:
->> +    case PSIHB9_SEMR:
->> +        /* FSP stuff */
->> +        break;
->> +    case PSIHB9_INTERRUPT_CONTROL:
->> +        if (val & PSIHB9_IRQ_RESET) {
->> +            device_reset(DEVICE(&psi->source));
->> +        }
->> +        psi->regs[reg] =3D val;
->> +        break;
->> +
->> +    case PSIHB9_ESB_CI_BASE:
->> +        if (!(val & PSIHB9_ESB_CI_VALID)) {
->> +            if (psi->regs[reg] & PSIHB9_ESB_CI_VALID) {
->> +                memory_region_del_subregion(sysmem, &psi->source.esb_=
-mmio);
->> +            }
->> +        } else {
->> +            if (!(psi->regs[reg] & PSIHB9_ESB_CI_VALID)) {
->> +                memory_region_add_subregion(sysmem,
->> +                                        val & ~PSIHB9_ESB_CI_VALID,
->> +                                        &psi->source.esb_mmio);
->> +            }
->> +        }
->> +        psi->regs[reg] =3D val;
->> +        break;
->> +
->> +    case PSIHB9_ESB_NOTIF_ADDR:
->> +        psi->regs[reg] =3D val;
->> +        break;
->> +    case PSIHB9_IVT_OFFSET:
->> +        psi->regs[reg] =3D val;
->> +        break;
->> +    default:
->> +        qemu_log_mask(LOG_GUEST_ERROR, "PSI: write at 0x%" PRIx64 "\n=
-", addr);
->> +    }
->> +}
->> +
->> +static const MemoryRegionOps pnv_psi_p9_mmio_ops =3D {
->> +    .read =3D pnv_psi_p9_mmio_read,
->> +    .write =3D pnv_psi_p9_mmio_write,
->> +    .endianness =3D DEVICE_BIG_ENDIAN,
->> +    .valid =3D {
->> +        .min_access_size =3D 8,
->> +        .max_access_size =3D 8,
->> +    },
->> +    .impl =3D {
->> +        .min_access_size =3D 8,
->> +        .max_access_size =3D 8,
->> +    },
->> +};
->> +
->> +static uint64_t pnv_psi_p9_xscom_read(void *opaque, hwaddr addr, unsi=
-gned size)
->> +{
->> +    /* No read are expected */
->> +    qemu_log_mask(LOG_GUEST_ERROR, "PSI: xscom read at 0x%" PRIx64 "\=
-n", addr);
->> +    return -1;
->> +}
->> +
->> +static void pnv_psi_p9_xscom_write(void *opaque, hwaddr addr,
->> +                                uint64_t val, unsigned size)
->> +{
->> +    PnvPsi *psi =3D PNV_PSI(opaque);
->> +
->> +    /* XSCOM is only used to set the PSIHB MMIO region */
->> +    switch (addr >> 3) {
->> +    case PSIHB_XSCOM_BAR:
->> +        pnv_psi_set_bar(psi, val);
->> +        break;
->> +    default:
->> +        qemu_log_mask(LOG_GUEST_ERROR, "PSI: xscom write at 0x%" PRIx=
-64 "\n",
->> +                      addr);
->> +    }
->> +}
->> +
->> +static const MemoryRegionOps pnv_psi_p9_xscom_ops =3D {
->> +    .read =3D pnv_psi_p9_xscom_read,
->> +    .write =3D pnv_psi_p9_xscom_write,
->> +    .endianness =3D DEVICE_BIG_ENDIAN,
->> +    .valid =3D {
->> +        .min_access_size =3D 8,
->> +        .max_access_size =3D 8,
->> +    },
->> +    .impl =3D {
->> +        .min_access_size =3D 8,
->> +        .max_access_size =3D 8,
->> +    }
->> +};
->> +
->> +static void pnv_psi_power9_irq_set(PnvPsi *psi, int irq, bool state)
->> +{
->> +    uint32_t irq_method =3D psi->regs[PSIHB_REG(PSIHB9_INTERRUPT_CONT=
-ROL)];
->> +
->> +    if (irq > PSIHB9_NUM_IRQS) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "PSI: Unsupported irq %d\n", i=
-rq);
->> +        return;
->> +    }
->> +
->> +    if (irq_method & PSIHB9_IRQ_METHOD) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "PSI: LSI IRQ method no suppor=
-ted\n");
->> +        return;
->> +    }
->> +
->> +    /* Update LSI levels */
->> +    if (state) {
->> +        psi->regs[PSIHB_REG(PSIHB9_IRQ_LEVEL)] |=3D PPC_BIT(irq);
->> +    } else {
->> +        psi->regs[PSIHB_REG(PSIHB9_IRQ_LEVEL)] &=3D ~PPC_BIT(irq);
->> +    }
->> +
->> +    qemu_set_irq(xive_source_qirq(&psi->source, irq), state);
->> +}
->> +
->> +static void pnv_psi_power9_instance_init(Object *obj)
->> +{
->> +    PnvPsi *psi =3D PNV_PSI(obj);
->> +
->> +    object_initialize(&psi->source, sizeof(psi->source), TYPE_XIVE_SO=
-URCE);
->> +    object_property_add_child(obj, "source", OBJECT(&psi->source), NU=
-LL);
->> +}
->> +
->> +static void pnv_psi_power9_realize(DeviceState *dev, Error **errp)
->> +{
->> +    PnvPsi *psi =3D PNV_PSI(dev);
->> +    XiveSource *xsrc =3D &psi->source;
->> +    Error *local_err =3D NULL;
->> +    int i;
->> +
->> +    /* This is the only device with 4k ESB pages */
->> +    object_property_set_int(OBJECT(xsrc), XIVE_ESB_4K, "shift",
->> +                            &error_fatal);
->> +    object_property_set_int(OBJECT(xsrc), PSIHB9_NUM_IRQS, "nr-irqs",
->> +                            &error_fatal);
->> +    object_property_add_const_link(OBJECT(xsrc), "xive", OBJECT(psi),
->> +                                   &error_fatal);
->> +    object_property_set_bool(OBJECT(xsrc), true, "realized", &local_e=
-rr);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +    qdev_set_parent_bus(DEVICE(xsrc), sysbus_get_default());
->> +
->> +    for (i =3D 0; i < xsrc->nr_irqs; i++) {
->> +        xive_source_irq_set(xsrc, i, true);
->> +    }
->> +
->> +    /* XSCOM region for PSI registers */
->> +    pnv_xscom_region_init(&psi->xscom_regs, OBJECT(dev), &pnv_psi_p9_=
-xscom_ops,
->> +                psi, "xscom-psi", PNV9_XSCOM_PSIHB_SIZE);
->> +
->> +    /* Initialize MMIO region */
->> +    memory_region_init_io(&psi->regs_mr, OBJECT(dev), &pnv_psi_p9_mmi=
-o_ops, psi,
->> +                          "psihb", PNV9_PSIHB_SIZE);
->> +
->> +    /* Default BAR for MMIO region */
->> +    pnv_psi_set_bar(psi, psi->bar | PSIHB_BAR_EN);
->> +}
->> +
->> +static void pnv_psi_power9_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +    PnvPsiClass *ppc =3D PNV_PSI_CLASS(klass);
->> +    XiveFabricClass *xfc =3D XIVE_FABRIC_CLASS(klass);
->> +
->> +    dc->desc    =3D "PowerNV PSI Controller POWER9";
->> +    dc->realize =3D pnv_psi_power9_realize;
->> +
->> +    ppc->chip_type  =3D PNV_CHIP_POWER9;
->> +    ppc->xscom_pcba =3D PNV9_XSCOM_PSIHB_BASE;
->> +    ppc->xscom_size =3D PNV9_XSCOM_PSIHB_SIZE;
->> +    ppc->irq_set    =3D pnv_psi_power9_irq_set;
->> +
->> +    xfc->notify      =3D pnv_psi_notify;
->> +}
->> +
->> +static const TypeInfo pnv_psi_power9_info =3D {
->> +    .name          =3D TYPE_PNV_PSI_POWER9,
->> +    .parent        =3D TYPE_PNV_PSI,
->> +    .instance_init =3D pnv_psi_power9_instance_init,
->> +    .class_init    =3D pnv_psi_power9_class_init,
->> +    .interfaces =3D (InterfaceInfo[]) {
->> +            { TYPE_XIVE_FABRIC },
->> +            { },
->> +    },
->> +};
->> +
->>  static void pnv_psi_class_init(ObjectClass *klass, void *data)
->>  {
->>      DeviceClass *dc =3D DEVICE_CLASS(klass);
->> @@ -548,16 +880,18 @@ static void pnv_psi_class_init(ObjectClass *klas=
-s, void *data)
->> =20
->>      xdc->dt_xscom =3D pnv_psi_dt_xscom;
->> =20
->> -    dc->realize =3D pnv_psi_realize;
->> +    dc->desc =3D "PowerNV PSI Controller";
->>      dc->props =3D pnv_psi_properties;
->> +    dc->reset  =3D pnv_psi_reset;
->>  }
->> =20
->>  static const TypeInfo pnv_psi_info =3D {
->>      .name          =3D TYPE_PNV_PSI,
->>      .parent        =3D TYPE_SYS_BUS_DEVICE,
->>      .instance_size =3D sizeof(PnvPsi),
->> -    .instance_init =3D pnv_psi_init,
->>      .class_init    =3D pnv_psi_class_init,
->> +    .class_size    =3D sizeof(PnvPsiClass),
->> +    .abstract      =3D true,
->>      .interfaces    =3D (InterfaceInfo[]) {
->>          { TYPE_PNV_XSCOM_INTERFACE },
->>          { }
->> @@ -567,6 +901,18 @@ static const TypeInfo pnv_psi_info =3D {
->>  static void pnv_psi_register_types(void)
->>  {
->>      type_register_static(&pnv_psi_info);
->> +    type_register_static(&pnv_psi_power8_info);
->> +    type_register_static(&pnv_psi_power9_info);
->>  }
->> =20
->>  type_init(pnv_psi_register_types)
->> +
->> +void pnv_psi_pic_print_info(PnvPsi *psi, Monitor *mon)
->> +{
->> +    uint32_t offset =3D
->> +        (psi->regs[PSIHB_REG(PSIHB9_IVT_OFFSET)] >> PSIHB9_IVT_OFF_SH=
-IFT);
->> +
->> +    monitor_printf(mon, "PSIHB Source %08x .. %08x\n",
->> +                  offset, offset + psi->source.nr_irqs - 1);
->> +    xive_source_pic_print_info(&psi->source, offset, mon);
->> +}
->=20
 >=20
