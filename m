@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8582a9f6d=roger.pau@citrix.com>)
-	id 1gQ8Yg-0006y3-9w
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:19:36 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gQ8cr-0000o7-6Y
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:23:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8582a9f6d=roger.pau@citrix.com>)
-	id 1gQ8Yc-0000gm-9y
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:19:34 -0500
-Received: from smtp.eu.citrix.com ([185.25.65.24]:24110)
+	(envelope-from <dgilbert@redhat.com>) id 1gQ8cn-0008JH-7Z
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:23:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48086)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=8582a9f6d=roger.pau@citrix.com>)
-	id 1gQ8Yb-0000YL-SL
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:19:30 -0500
-Date: Fri, 23 Nov 2018 11:19:19 +0100
-From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-Message-ID: <20181123101919.twxrmehljvyhuii6@mac>
-References: <20181016021439.6212-1-yan.y.zhao@intel.com>
-	<F22B14EC3CFBB843AD3E03B6B78F2C6A4ACFD80C@SHSMSX104.ccr.corp.intel.com>
-	<20181018145636.k6ptvn4iszabjhxw@mac.bytemobile.com>
-	<20181122131110.GA31906@joy-OptiPlex-7040>
-	<20181122141805.vyqywi4ep65loye3@mac>
-	<20181123050451.GC31906@joy-OptiPlex-7040>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gQ8cn-0008Ik-2Y
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:23:49 -0500
+Date: Fri, 23 Nov 2018 10:23:35 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181123102334.GB2373@work-vm>
+References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
+	<20181122072028.22819-2-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181123050451.GC31906@joy-OptiPlex-7040>
-Subject: Re: [Qemu-devel] [PATCH] Xen PCI passthrough: fix passthrough
- failure when irq map failure
+In-Reply-To: <20181122072028.22819-2-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/5] bitops: introduce change_bit_atomic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,75 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhao Yan <yan.y.zhao@intel.com>
-Cc: sstabellini@kernel.org, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, JBeulich@suse.com
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Adding Jan in case he has an opinion on my reply below.
-
-On Fri, Nov 23, 2018 at 12:04:51AM -0500, Zhao Yan wrote:
-> On Thu, Nov 22, 2018 at 03:18:05PM +0100, Roger Pau Monné wrote:
-> > On Thu, Nov 22, 2018 at 08:11:20AM -0500, Zhao Yan wrote:
-> > > On Thu, Oct 18, 2018 at 03:56:36PM +0100, Roger Pau Monné wrote:
-> > > > On Thu, Oct 18, 2018 at 08:22:41AM +0000, Zhao, Yan Y wrote:
-> > > > > Hi
-> > > > > The background for this patch is that: for some pci device, even it's PCI_INTERRUPT_PIN is not 0, it actually does not support INTx mode, so we should just report error, disable INTx mode and continue the passthrough.
-> > > > > However, the commit 5a11d0f7 regards this as error condition and let qemu quit passthrough, which is too rigorous.
-> > > > > 
-> > > > > Error message is below:
-> > > > > libxl: error: libxl_qmp.c:287:qmp_handle_error_response: Domain 2:received an error message from QMP server: Mapping machine irq 0 to pirq -1 failed: Operation not permitted
-> > > > 
-> > > > I'm having issues figuring out what's happening here.
-> > > > s->real_device.irq is 0, yet the PCI config space read of
-> > > > PCI_INTERRUPT_PIN returns something different than 0.
-> > > > 
-> > > > AFAICT this is due to some kind of error in Linux, so that even when
-> > > > the device is supposed to have a valid IRQ the sysfs node it is set to
-> > > > 0, do you know the actual underlying cause of this?
-> > > > 
-> > > > Thanks, Roger.
-> > > Hi Roger
-> > > Sorry for the later reply, I just missed this mail...
-> > > On my side, it's because the hardware actually does not support INTx mode,
-> > > but its configuration space does not report PCI_INTERRUPT_PIN to 0. It's a
-> > > hardware bug, but previous version of qemu can tolerate it, switch to MSI
-> > > and make passthrough work.
-> > 
-> > Then I think it would be better to check both PCI_INTERRUPT_PIN and
-> > s->real_device.irq before attempting to map the IRQ.
-> > 
-> > Making the error non-fatal would mean that a device with a valid IRQ
-> > could fail to be setup correctly but the guest will still be created,
-> > and things won't go as expected when the guest attempts to use it.
-> > 
-> > Thanks, Roger.
-> hi roger
-> thanks for your sugguestion. it's right that "s->real_device.irq" is needed to be checked before mapping, like if it's 0.
-> but on the other hand, maybe xc_physdev_map_pirq() itself can serve as a checking of "s->real_device.irq" ?
-> like in our case, it will fail and return -EPERM.
-> then error hanling is still conducted ==>set INTX_DISABLE flag, eventhrough the error is not fatal.
+* guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
 > 
->     machine_irq = s->real_device.irq;
->     rc = xc_physdev_map_pirq(xen_xc, xen_domid, machine_irq, &pirq);
->     if (rc < 0) {
->         error_setg_errno(errp, errno, "Mapping machine irq %u to"
->                          " pirq %i failed", machine_irq, pirq);
+> It will be used by threaded workqueue
 > 
->         /* Disable PCI intx assertion (turn on bit10 of devctl) */
->         cmd |= PCI_COMMAND_INTX_DISABLE;
->         machine_irq = 0;
->         s->machine_irq = 0;
-> So, do you think it's all right just converting fatal error to non-fatal?
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-As I said above, I think it would be better to leave the error as
-fatal and avoid attempting a xc_physdev_map_pirq with a machine_irq ==
-0, which will fail.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-If we really want to go down the route of making the error non-fatal,
-I think you will also have to report PCI_INTERRUPT_PIN as 0 to the
-guest, so that it's clear to the guest that the device doesn't have
-legacy interrupt support.
-
-Exposing a device with PCI_INTERRUPT_PIN != 0 but then not allowing
-the guest to clear PCI_COMMAND_INTX_DISABLE is likely bogus.
-
-Thanks, Roger.
+> ---
+>  include/qemu/bitops.h | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
+> index 3f0926cf40..c522958852 100644
+> --- a/include/qemu/bitops.h
+> +++ b/include/qemu/bitops.h
+> @@ -79,6 +79,19 @@ static inline void change_bit(long nr, unsigned long *addr)
+>      *p ^= mask;
+>  }
+>  
+> +/**
+> + * change_bit_atomic - Toggle a bit in memory atomically
+> + * @nr: Bit to change
+> + * @addr: Address to start counting from
+> + */
+> +static inline void change_bit_atomic(long nr, unsigned long *addr)
+> +{
+> +    unsigned long mask = BIT_MASK(nr);
+> +    unsigned long *p = addr + BIT_WORD(nr);
+> +
+> +    atomic_xor(p, mask);
+> +}
+> +
+>  /**
+>   * test_and_set_bit - Set a bit and return its old value
+>   * @nr: Bit to set
+> -- 
+> 2.14.5
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
