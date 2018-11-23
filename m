@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gQ9FU-0007ld-91
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:03:54 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gQ9G6-000875-By
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:04:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gQ9FO-0004wl-LX
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:03:48 -0500
-Received: from mail-wr1-f46.google.com ([209.85.221.46]:44069)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gQ9FO-0004w4-G1
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:03:42 -0500
-Received: by mail-wr1-f46.google.com with SMTP id z5so7624110wrt.11
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 03:03:42 -0800 (PST)
-References: <87mw8rumhb.fsf@blackfin.pond.sub.org>
-	<87y4s8h5rh.fsf@blackfin.pond.sub.org>
-	<876132olyi.fsf@blackfin.pond.sub.org>
-	<87a8fucx33.fsf@dusky.pond.sub.org> <87muq2fgbw.fsf@dusky.pond.sub.org>
-	<a7902403-7572-9b64-235e-cb6f9e0efbae@redhat.com>
-	<alpine.BSF.2.21.9999.1811222249030.51852@zero.eik.bme.hu>
-	<30197297-c327-36a9-89f6-6a27eaef4cdf@redhat.com>
-	<alpine.BSF.2.21.9999.1811231151490.10585@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7a3f005e-44fb-5fe7-55b0-c2bf23c67220@redhat.com>
-Date: Fri, 23 Nov 2018 12:03:39 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gQ9G1-0005tk-Bp
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 06:04:26 -0500
+Date: Fri, 23 Nov 2018 12:04:05 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181123120405.4b94a220@redhat.com>
+In-Reply-To: <20181121231217.GA4450@caravaggio>
+References: <20181105014047.26447-1-sameo@linux.intel.com>
+	<20181105014047.26447-12-sameo@linux.intel.com>
+	<20181114115537.3357921b@redhat.com>
+	<20181121231217.GA4450@caravaggio>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.9999.1811231151490.10585@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] MAINTAINERS leaves too many files uncovered
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 11/24] hw: acpi: Export and generalize
+ the PCI host AML API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +26,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, Rob Bradford <robert.bradford@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
 
-On 23/11/18 11:56, BALATON Zoltan wrote:
-> On Fri, 23 Nov 2018, Philippe Mathieu-Daudé wrote:
->> On 22/11/18 22:56, BALATON Zoltan wrote:
->>> While we're there, should I also add pc-bios/canyonlands.dts which is
->>> the device tree for sam460ex?
->>
->> Yes, I suggest this set:
->>
->> pc-bios/canyonlands.dt?
->> pc-bios/u-boot-sam460*
->> roms/u-boot-sam460ex
+On Thu, 22 Nov 2018 00:12:17 +0100
+Samuel Ortiz <sameo@linux.intel.com> wrote:
+
+> Hi Igor,
 > 
-> Well, canyonlands.dtb and u-boot-sam460-*.bin are binaries built from
-> canyonlands.dts and roms/u-boot-sam460ex respectively and
-> roms/u-boot-sam460ex is mirrored from my git repo. So should these be
-> added despite of this or is it enough to add canyonlands.dts? I thought
-> only sources are listed in MAINTAINERS not binaries or external sources.
+> On Wed, Nov 14, 2018 at 11:55:37AM +0100, Igor Mammedov wrote:
+> > On Mon,  5 Nov 2018 02:40:34 +0100
+> > Samuel Ortiz <sameo@linux.intel.com> wrote:
+> >   
+> > > From: Yang Zhong <yang.zhong@intel.com>
+> > > 
+> > > The AML build routines for the PCI host bridge and the corresponding
+> > > DSDT addition are neither x86 nor PC machine type specific.
+> > > We can move them to the architecture agnostic hw/acpi folder, and by
+> > > carrying all the needed information through a new AcpiPciBus structure,
+> > > we can make them PC machine type independent.  
+> > 
+> > I'm don't know anything about PCI, but functional changes doesn't look
+> > correct to me.
+> >
+> > See more detailed comments below.
+> > 
+> > Marcel,
+> > could you take a look on this patch (in particular main csr changes), pls?
+> >   
+> > > 
+> > > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> > > Signed-off-by: Rob Bradford <robert.bradford@intel.com>
+> > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> > > ---
+> > >  include/hw/acpi/aml-build.h |   8 ++
+> > >  hw/acpi/aml-build.c         | 157 ++++++++++++++++++++++++++++++++++++
+> > >  hw/i386/acpi-build.c        | 115 ++------------------------
+> > >  3 files changed, 173 insertions(+), 107 deletions(-)
+> > > 
+> > > diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> > > index fde2785b9a..1861e37ebf 100644
+> > > --- a/include/hw/acpi/aml-build.h
+> > > +++ b/include/hw/acpi/aml-build.h
+> > > @@ -229,6 +229,12 @@ typedef struct AcpiMcfgInfo {
+> > >      uint32_t mcfg_size;
+> > >  } AcpiMcfgInfo;
+> > >  
+> > > +typedef struct AcpiPciBus {
+> > > +    PCIBus *pci_bus;
+> > > +    Range *pci_hole;
+> > > +    Range *pci_hole64;
+> > > +} AcpiPciBus;  
+> > Again, this and all below is not aml-build material.
+> > Consider adding/using pci specific acpi file for it.
+> > 
+> > Also even though pci AML in arm/virt is to a large degree a subset
+> > of x86 target and it would be much better to unify ARM part with x86,
+> > it probably will be to big/complex of a change if we take on it in
+> > one go.
+> > 
+> > So not to derail you from the goal too much, we probably should
+> > generalize this a little bit less, limiting refactoring to x86
+> > target for now.  
+> So keeping it under i386 means it won't be accessible through hw/acpi/,
+> which means we won't be able to have a generic hw/acpi/reduced.c
+> implementation. From our perspective, this is the problem with keeping
+> things under i386 because we're not sure yet how much generic it is: It
+> still won't be shareable for a generic hardware-reduced ACPI
+> implementation which means we'll have to temporarily have yet another
+> hardware-reduced ACPI implementation under hw/i386 this time.
+> I guess this is what Michael meant by keeping some parts of the code
+> duplicated for now.
+> 
+> I feel it'd be easier to move those APIs under a shareable location, to
+> make it easier for ARM to consume it even if it's not entirely generic yet.
+> But you guys are the maintainers and if you think we should restric the
+> generalization to x86 only for now, we can go for it.
+If code is generic (you can reuse it with arm/virt in the same series)
+then place it in hw/acpi otherwise if it's semi-generic put to hw/i386.
+If it would be a separate file it would be easier to move it to generic
+place when we are able to resuse it with arm/virt.
 
-Hmm I see various binaries, i.e.:
-
-$ file pc-bios/s390-ccw.img
-pc-bios/s390-ccw.img: ELF 64-bit MSB shared object, IBM S/390, version 1
-(SYSV), dynamically linked, interpreter /lib/ld64.so.1,
-BuildID[sha1]=5bf569bf2205ea94a015c1fe2702d7efb446a8c5, stripped
-$ ./scripts/get_maintainer.pl -f pc-bios/s390-ccw.img
-Christian Borntraeger <borntraeger@de.ibm.com> (supporter:S390-ccw boot)
-Thomas Huth <thuth@redhat.com> (supporter:S390-ccw boot)
-Cornelia Huck <cohuck@redhat.com> (supporter:S390)
-qemu-s390x@nongnu.org (open list:S390-ccw boot)
-
-$ file pc-bios/u-boot.e500
-pc-bios/u-boot.e500: ELF 32-bit MSB executable, PowerPC or cisco 4500,
-version 1 (SYSV), statically linked, stripped
-$ ./scripts/get_maintainer.pl -f pc-bios/u-boot.e500
-David Gibson <david@gibson.dropbear.id.au> (odd fixer:e500)
-qemu-ppc@nongnu.org (open list:e500)
-
-If I have issues with a binary like 'canyonlands.dtb' I'd like to be
-able to contact the maintainer. Maybe this is not the best example since
-the 'canyonlands.dts' is there too ;)
-
-Regards,
-
-Phil.
+ 
+> Cheers,
+> Samuel.
