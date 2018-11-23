@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gQEpI-0006cM-HQ
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:01:11 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gQEpi-0006yA-BX
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:01:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gQEpC-0004GQ-LL
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:01:08 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38956)
+	(envelope-from <alex.bennee@linaro.org>) id 1gQEpd-0004yW-VP
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:01:34 -0500
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:36129)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gQEpC-0004EO-6s
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:01:02 -0500
-Received: by mail-wm1-x343.google.com with SMTP id u13-v6so12624681wmc.4
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 09:01:02 -0800 (PST)
+	id 1gQEpd-0004xT-OJ
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 12:01:29 -0500
+Received: by mail-wm1-x331.google.com with SMTP id s11so12636060wmh.1
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 09:01:29 -0800 (PST)
 References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-20-cota@braap.org>
+	<20181025172057.20414-21-cota@braap.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181025172057.20414-20-cota@braap.org>
-Date: Fri, 23 Nov 2018 17:00:59 +0000
-Message-ID: <87r2fbhgok.fsf@linaro.org>
+In-reply-to: <20181025172057.20414-21-cota@braap.org>
+Date: Fri, 23 Nov 2018 17:01:27 +0000
+Message-ID: <87pnuvhgns.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 19/48] translate-all: notify plugin code of
- tb_flush
+Subject: Re: [Qemu-devel] [RFC 20/48] *-user: notify plugin of exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,54 +37,55 @@ Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?utf-8?Q
 Emilio G. Cota <cota@braap.org> writes:
 
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  accel/tcg/translate-all.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  bsd-user/syscall.c | 3 +++
+>  linux-user/exit.c  | 1 +
+>  2 files changed, 4 insertions(+)
 >
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 3423cf74db..1690e3fd5b 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -1233,6 +1233,8 @@ static gboolean tb_host_size_iter(gpointer key, gpo=
-inter value, gpointer data)
->  /* flush all the translation blocks */
->  void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
->  {
-> +    bool did_flush =3D false;
-> +
->      mmap_lock();
->      /* If it is already been done on request of another CPU,
->       * just retry.
-> @@ -1240,6 +1242,7 @@ void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_=
-flush_count)
->      if (tb_ctx.tb_flush_count !=3D tb_flush_count.host_int) {
->          goto done;
->      }
-> +    did_flush =3D true;
->
->      if (DEBUG_TB_FLUSH_GATE) {
->          size_t nb_tbs =3D tcg_nb_tbs();
-> @@ -1265,6 +1268,9 @@ void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_=
-flush_count)
->
->  done:
->      mmap_unlock();
-> +    if (did_flush) {
-> +        qemu_plugin_flush_cb();
-> +    }
-
-Are we introducing a race here?
-
-What is the purpose of letting the plugin know a flush has occurred?
-
-It shouldn't have any knowledge of the details of liveliness of the
-translated code and if it still exits or not. If all it wants to do is
-look at the counts then I think we can provide a simpler less abuse-able
-way to do this.
-
+> diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
+> index 66492aaf5d..b7818af450 100644
+> --- a/bsd-user/syscall.c
+> +++ b/bsd-user/syscall.c
+> @@ -332,6 +332,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
+>          _mcleanup();
+>  #endif
+>          gdb_exit(cpu_env, arg1);
+> +        qemu_plugin_atexit_cb();
+>          /* XXX: should free thread stack and CPU env */
+>          _exit(arg1);
+>          ret =3D 0; /* avoid warning */
+> @@ -430,6 +431,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, ab=
+i_long arg1,
+>          _mcleanup();
+>  #endif
+>          gdb_exit(cpu_env, arg1);
+> +        qemu_plugin_atexit_cb();
+>          /* XXX: should free thread stack and CPU env */
+>          _exit(arg1);
+>          ret =3D 0; /* avoid warning */
+> @@ -505,6 +507,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
+>          _mcleanup();
+>  #endif
+>          gdb_exit(cpu_env, arg1);
+> +        qemu_plugin_atexit_cb();
+>          /* XXX: should free thread stack and CPU env */
+>          _exit(arg1);
+>          ret =3D 0; /* avoid warning */
+> diff --git a/linux-user/exit.c b/linux-user/exit.c
+> index 14e94e28fa..768856483a 100644
+> --- a/linux-user/exit.c
+> +++ b/linux-user/exit.c
+> @@ -32,4 +32,5 @@ void preexit_cleanup(CPUArchState *env, int code)
+>          __gcov_dump();
+>  #endif
+>          gdb_exit(env, code);
+> +        qemu_plugin_atexit_cb();
 >  }
->
->  void tb_flush(CPUState *cpu)
 
 
 --
