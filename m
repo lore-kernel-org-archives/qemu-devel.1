@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gQ8Bp-0006cC-M1
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 04:55:58 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gQ8HW-0000Th-JR
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:01:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gQ8Bk-0006t4-FX
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 04:55:57 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43998)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gQ8Bk-0006q7-9Z
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 04:55:52 -0500
-Received: by mail-wr1-f66.google.com with SMTP id r10so11694722wrs.10
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 01:55:51 -0800 (PST)
-References: <20181123090058.6931-1-rkagan@virtuozzo.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <88dfd2f5-636b-7089-2945-5b62f98d43cd@redhat.com>
-Date: Fri, 23 Nov 2018 10:55:49 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1gQ8HU-0005FF-HT
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:01:50 -0500
+Date: Fri, 23 Nov 2018 10:01:30 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181123100129.GA2373@work-vm>
+References: <1542912487-279165-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+	<1542912487-279165-3-git-send-email-andrey.shinkevich@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20181123090058.6931-1-rkagan@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] configure: fix elf2dmp check
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1542912487-279165-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] The discard flag for block stream
+ operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +24,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
-On 23/11/18 10:01, Roman Kagan wrote:
-> elf2dmp is keyed on "$posix" = "yes", but "$posix" doesn't seem to be
-> set anywhere.
+* Andrey Shinkevich (andrey.shinkevich@virtuozzo.com) wrote:
+> Adding a parameter to QMP block-stream command to allow discarding
+> blocks in the backing chain while blocks are being copied to the
+> active layer.
 > 
-> The original intent was presumably to skip building it on Windows, so
-> check for "$mingw32" = "no" instead.
-> 
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 > ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  block/stream.c            | 3 +--
+>  blockdev.c                | 8 +++++++-
+>  hmp-commands.hx           | 4 ++--
+>  hmp.c                     | 4 +++-
+>  include/block/block_int.h | 2 +-
+>  qapi/block-core.json      | 5 ++++-
+>  6 files changed, 18 insertions(+), 8 deletions(-)
 > 
-> diff --git a/configure b/configure
-> index 0a3c6a72c3..fc6ce0065d 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5722,7 +5722,7 @@ if test "$want_tools" = "yes" ; then
->    if [ "$ivshmem" = "yes" ]; then
->      tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
->    fi
-> -  if [ "$posix" = "yes" ] && [ "$curl" = "yes" ]; then
-> +  if [ "$mingw32" = "no" ] && [ "$curl" = "yes" ]; then
->      tools="elf2dmp $tools"
->    fi
->  fi
+> diff --git a/block/stream.c b/block/stream.c
+> index 9e85954..e844e94 100644
+> --- a/block/stream.c
+> +++ b/block/stream.c
+> @@ -584,10 +584,9 @@ static const BlockJobDriver stream_job_driver = {
+>  
+>  void stream_start(const char *job_id, BlockDriverState *bs,
+>                    BlockDriverState *base, const char *backing_file_str,
+> -                  int creation_flags, int64_t speed,
+> +                  int creation_flags, int64_t speed, bool discard,
+>                    BlockdevOnError on_error, Error **errp)
+>  {
+> -    const bool discard = false;
+>      StreamBlockJob *s = NULL;
+>      BlockDriverState *iter;
+>      int orig_bs_flags;
+> diff --git a/blockdev.c b/blockdev.c
+> index 81f95d9..333592e 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3141,6 +3141,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+>                        bool has_base_node, const char *base_node,
+>                        bool has_backing_file, const char *backing_file,
+>                        bool has_speed, int64_t speed,
+> +                      bool has_discard, bool discard,
+>                        bool has_on_error, BlockdevOnError on_error,
+>                        bool has_auto_finalize, bool auto_finalize,
+>                        bool has_auto_dismiss, bool auto_dismiss,
+> @@ -3157,6 +3158,10 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+>          on_error = BLOCKDEV_ON_ERROR_REPORT;
+>      }
+>  
+> +    if (!has_discard) {
+> +        discard = false;
+> +    }
+> +
+>      bs = bdrv_lookup_bs(device, device, errp);
+>      if (!bs) {
+>          return;
+> @@ -3221,7 +3226,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+>      }
+>  
+>      stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
+> -                 job_flags, has_speed ? speed : 0, on_error, &local_err);
+> +                 job_flags, has_speed ? speed : 0,
+> +                 discard, on_error, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          goto out;
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index db0c681..a7e2a10 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -95,8 +95,8 @@ ETEXI
+>  
+>      {
+>          .name       = "block_stream",
+> -        .args_type  = "device:B,speed:o?,base:s?",
+> -        .params     = "device [speed [base]]",
+> +        .args_type  = "device:B,speed:o?,base:s?,discard:-d",
+> +        .params     = "device [speed [base]] [-d]",
+>          .help       = "copy data from a backing file into a block device",
+>          .cmd        = hmp_block_stream,
+>      },
+> diff --git a/hmp.c b/hmp.c
+> index 7828f93..0d263e4 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -1920,9 +1920,11 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
+>      const char *device = qdict_get_str(qdict, "device");
+>      const char *base = qdict_get_try_str(qdict, "base");
+>      int64_t speed = qdict_get_try_int(qdict, "speed", 0);
+> +    bool discard = qdict_get_try_bool(qdict, "discard", false);
+>  
+>      qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
+> -                     false, NULL, qdict_haskey(qdict, "speed"), speed, true,
+> +                     false, NULL, qdict_haskey(qdict, "speed"), speed,
+> +                     true, discard, true,
+>                       BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
+>                       &error);
+
+Yep, so I think those are better from the HMP side; so purely from the
+HMP side;
+
+
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index f605622..2660336 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -970,7 +970,7 @@ int is_windows_drive(const char *filename);
+>   */
+>  void stream_start(const char *job_id, BlockDriverState *bs,
+>                    BlockDriverState *base, const char *backing_file_str,
+> -                  int creation_flags, int64_t speed,
+> +                  int creation_flags, int64_t speed, bool discard,
+>                    BlockdevOnError on_error, Error **errp);
+>  
+>  /**
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index d4fe710..f4538fa 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -2334,6 +2334,9 @@
+>  #
+>  # @speed:  the maximum speed, in bytes per second
+>  #
+> +# @discard: true to delete blocks duplicated in old backing files.
+> +#           (default: false). Since 3.1.
+> +#
+>  # @on-error: the action to take on an error (default report).
+>  #            'stop' and 'enospc' can only be used if the block device
+>  #            supports io-status (see BlockInfo).  Since 1.3.
+> @@ -2366,7 +2369,7 @@
+>  { 'command': 'block-stream',
+>    'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
+>              '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
+> -            '*on-error': 'BlockdevOnError',
+> +            '*discard': 'bool', '*on-error': 'BlockdevOnError',
+>              '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
+>  
+>  ##
+> -- 
+> 1.8.3.1
 > 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
