@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gQ8cr-0000o7-6Y
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:23:53 -0500
+	(envelope-from <JBeulich@suse.com>) id 1gQ8fl-0001kb-0z
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:26:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gQ8cn-0008JH-7Z
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:23:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48086)
+	(envelope-from <JBeulich@suse.com>) id 1gQ8fh-000383-Lf
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:26:52 -0500
+Received: from prv1-mh.provo.novell.com ([137.65.248.33]:43858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gQ8cn-0008Ik-2Y
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:23:49 -0500
-Date: Fri, 23 Nov 2018 10:23:35 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181123102334.GB2373@work-vm>
-References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
-	<20181122072028.22819-2-xiaoguangrong@tencent.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1gQ8fh-00034m-DP
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:26:49 -0500
+Message-Id: <5BF7D5E402000078001FF501@prv1-mh.provo.novell.com>
+Date: Fri, 23 Nov 2018 03:26:44 -0700
+From: "Jan Beulich" <JBeulich@suse.com>
+References: <20181016021439.6212-1-yan.y.zhao@intel.com>
+	<F22B14EC3CFBB843AD3E03B6B78F2C6A4ACFD80C@SHSMSX104.ccr.corp.intel.com>
+	<20181018145636.k6ptvn4iszabjhxw@mac.bytemobile.com>
+	<20181122131110.GA31906@joy-OptiPlex-7040>
+	<20181122141805.vyqywi4ep65loye3@mac>
+	<20181123050451.GC31906@joy-OptiPlex-7040>
+	<20181123101919.twxrmehljvyhuii6@mac>
+In-Reply-To: <20181123101919.twxrmehljvyhuii6@mac>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20181122072028.22819-2-xiaoguangrong@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] bitops: introduce change_bit_atomic
+Subject: Re: [Qemu-devel] [PATCH] Xen PCI passthrough: fix passthrough
+ failure when irq map failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +34,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Roger Pau Monne <roger.pau@citrix.com>, Zhao Yan <yan.y.zhao@intel.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel <xen-devel@lists.xenproject.org>, qemu-devel@nongnu.org
 
-* guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> 
-> It will be used by threaded workqueue
-> 
-> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+>>> On 23.11.18 at 11:19, <roger.pau@citrix.com> wrote:
+> Adding Jan in case he has an opinion on my reply below.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+I agree, fwiw.
 
-> ---
->  include/qemu/bitops.h | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
-> index 3f0926cf40..c522958852 100644
-> --- a/include/qemu/bitops.h
-> +++ b/include/qemu/bitops.h
-> @@ -79,6 +79,19 @@ static inline void change_bit(long nr, unsigned long *addr)
->      *p ^= mask;
->  }
->  
-> +/**
-> + * change_bit_atomic - Toggle a bit in memory atomically
-> + * @nr: Bit to change
-> + * @addr: Address to start counting from
-> + */
-> +static inline void change_bit_atomic(long nr, unsigned long *addr)
-> +{
-> +    unsigned long mask = BIT_MASK(nr);
-> +    unsigned long *p = addr + BIT_WORD(nr);
-> +
-> +    atomic_xor(p, mask);
-> +}
-> +
->  /**
->   * test_and_set_bit - Set a bit and return its old value
->   * @nr: Bit to set
-> -- 
-> 2.14.5
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Jan
+
+> On Fri, Nov 23, 2018 at 12:04:51AM -0500, Zhao Yan wrote:
+>> On Thu, Nov 22, 2018 at 03:18:05PM +0100, Roger Pau Monn=C3=A9 wrote:
+>> > On Thu, Nov 22, 2018 at 08:11:20AM -0500, Zhao Yan wrote:
+>> > > On Thu, Oct 18, 2018 at 03:56:36PM +0100, Roger Pau Monn=C3=A9 =
+wrote:
+>> > > > On Thu, Oct 18, 2018 at 08:22:41AM +0000, Zhao, Yan Y wrote:
+>> > > > > Hi
+>> > > > > The background for this patch is that: for some pci device, =
+even it's PCI_INTERRUPT_PIN is not 0, it
+actually does not support INTx mode, so we should just report error, =
+disable INTx mode and continue the passthrough.
+>> > > > > However, the commit 5a11d0f7 regards this as error condition =
+and let qemu quit passthrough, which is too
+rigorous.
+>> > > > >=20
+>> > > > > Error message is below:
+>> > > > > libxl: error: libxl_qmp.c:287:qmp_handle_error_response: Domain =
+2:received an error message from QMP server:
+Mapping machine irq 0 to pirq -1 failed: Operation not permitted
+>> > > >=20
+>> > > > I'm having issues figuring out what's happening here.
+>> > > > s->real_device.irq is 0, yet the PCI config space read of
+>> > > > PCI_INTERRUPT_PIN returns something different than 0.
+>> > > >=20
+>> > > > AFAICT this is due to some kind of error in Linux, so that even =
+when
+>> > > > the device is supposed to have a valid IRQ the sysfs node it is =
+set to
+>> > > > 0, do you know the actual underlying cause of this?
+>> > > >=20
+>> > > > Thanks, Roger.
+>> > > Hi Roger
+>> > > Sorry for the later reply, I just missed this mail...
+>> > > On my side, it's because the hardware actually does not support =
+INTx mode,
+>> > > but its configuration space does not report PCI_INTERRUPT_PIN to 0. =
+It's a
+>> > > hardware bug, but previous version of qemu can tolerate it, switch =
+to MSI
+>> > > and make passthrough work.
+>> >=20
+>> > Then I think it would be better to check both PCI_INTERRUPT_PIN and
+>> > s->real_device.irq before attempting to map the IRQ.
+>> >=20
+>> > Making the error non-fatal would mean that a device with a valid IRQ
+>> > could fail to be setup correctly but the guest will still be created,
+>> > and things won't go as expected when the guest attempts to use it.
+>> >=20
+>> > Thanks, Roger.
+>> hi roger
+>> thanks for your sugguestion. it's right that "s->real_device.irq" is =
+needed to be checked before mapping, like if
+it's 0.
+>> but on the other hand, maybe xc_physdev_map_pirq() itself can serve as =
+a checking of "s->real_device.irq" ?
+>> like in our case, it will fail and return -EPERM.
+>> then error hanling is still conducted =3D=3D>set INTX_DISABLE flag, =
+eventhrough the error is not fatal.
+>>=20
+>>     machine_irq =3D s->real_device.irq;
+>>     rc =3D xc_physdev_map_pirq(xen_xc, xen_domid, machine_irq, &pirq);
+>>     if (rc < 0) {
+>>         error_setg_errno(errp, errno, "Mapping machine irq %u to"
+>>                          " pirq %i failed", machine_irq, pirq);
+>>=20
+>>         /* Disable PCI intx assertion (turn on bit10 of devctl) */
+>>         cmd |=3D PCI_COMMAND_INTX_DISABLE;
+>>         machine_irq =3D 0;
+>>         s->machine_irq =3D 0;
+>> So, do you think it's all right just converting fatal error to =
+non-fatal?
+>=20
+> As I said above, I think it would be better to leave the error as
+> fatal and avoid attempting a xc_physdev_map_pirq with a machine_irq =
+=3D=3D
+> 0, which will fail.
+>=20
+> If we really want to go down the route of making the error non-fatal,
+> I think you will also have to report PCI_INTERRUPT_PIN as 0 to the
+> guest, so that it's clear to the guest that the device doesn't have
+> legacy interrupt support.
+>=20
+> Exposing a device with PCI_INTERRUPT_PIN !=3D 0 but then not allowing
+> the guest to clear PCI_COMMAND_INTX_DISABLE is likely bogus.
+>=20
+> Thanks, Roger.
