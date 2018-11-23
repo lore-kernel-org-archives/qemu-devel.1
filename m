@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ5-0004mj-ST
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:04 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ3-0004lc-W3
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ3-0005EO-KY
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:31:01 -0500
-Received: from cmccmta3.chinamobile.com ([221.176.66.81]:26250)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ2-00056H-Rh
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ2-0005C4-Kr
 	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:30:59 -0500
+Received: from cmccmta3.chinamobile.com ([221.176.66.81]:62503)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQDQ1-00053z-6u
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 10:30:58 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 23 Nov 2018 23:30:30 +0800
-Message-Id: <20181123153040.18933-12-maozhongyi@cmss.chinamobile.com>
+Date: Fri, 23 Nov 2018 23:30:26 +0800
+Message-Id: <20181123153040.18933-8-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
 References: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 11/21] milkymist-hpdmc: Convert sysbus init
+Subject: [Qemu-devel] [PATCH v2 07/21] gpio/puv3_gpio: Convert sysbus init
  function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,53 +25,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, gxt@mprc.pku.edu.cn, michael@walle.cc, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, gxt@mprc.pku.edu.cn, peter.maydell@linaro.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-milkymist_hpdmc_class_init().
+puv3_gpio_class_init().
 
 Cc: gxt@mprc.pku.edu.cn
-Cc: michael@walle.cc
+Cc: peter.maydell@linaro.org
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/misc/milkymist-hpdmc.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ hw/gpio/puv3_gpio.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/hw/misc/milkymist-hpdmc.c b/hw/misc/milkymist-hpdmc.c
-index e6140eec6b..44dc0698ec 100644
---- a/hw/misc/milkymist-hpdmc.c
-+++ b/hw/misc/milkymist-hpdmc.c
-@@ -129,15 +129,13 @@ static void milkymist_hpdmc_reset(DeviceState *d)
-                          | IODELAY_PLL2_LOCKED;
- }
+diff --git a/hw/gpio/puv3_gpio.c b/hw/gpio/puv3_gpio.c
+index 445afccf9f..33241b8564 100644
+--- a/hw/gpio/puv3_gpio.c
++++ b/hw/gpio/puv3_gpio.c
+@@ -99,36 +99,35 @@ static const MemoryRegionOps puv3_gpio_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
  
--static int milkymist_hpdmc_init(SysBusDevice *dev)
-+static void milkymist_hpdmc_realize(DeviceState *dev, Error **errp)
+-static int puv3_gpio_init(SysBusDevice *dev)
++static void puv3_gpio_realize(DeviceState *dev, Error **errp)
  {
-     MilkymistHpdmcState *s = MILKYMIST_HPDMC(dev);
+     PUV3GPIOState *s = PUV3_GPIO(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
  
-     memory_region_init_io(&s->regs_region, OBJECT(dev), &hpdmc_mmio_ops, s,
-             "milkymist-hpdmc", R_MAX * 4);
--    sysbus_init_mmio(dev, &s->regs_region);
+     s->reg_GPLR = 0;
+     s->reg_GPDR = 0;
+ 
+     /* FIXME: these irqs not handled yet */
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW0]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW1]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW2]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW3]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW4]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW5]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW6]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW7]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOHIGH]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW0]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW1]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW2]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW3]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW4]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW5]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW6]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW7]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOHIGH]);
+ 
+     memory_region_init_io(&s->iomem, OBJECT(s), &puv3_gpio_ops, s, "puv3_gpio",
+             PUV3_REGS_OFFSET);
+-    sysbus_init_mmio(dev, &s->iomem);
 -
 -    return 0;
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->regs_region);
++    sysbus_init_mmio(sbd, &s->iomem);
  }
  
- static const VMStateDescription vmstate_milkymist_hpdmc = {
-@@ -153,9 +151,8 @@ static const VMStateDescription vmstate_milkymist_hpdmc = {
- static void milkymist_hpdmc_class_init(ObjectClass *klass, void *data)
+ static void puv3_gpio_class_init(ObjectClass *klass, void *data)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+-    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
  
--    k->init = milkymist_hpdmc_init;
-+    dc->realize = milkymist_hpdmc_realize;
-     dc->reset = milkymist_hpdmc_reset;
-     dc->vmsd = &vmstate_milkymist_hpdmc;
+-    sdc->init = puv3_gpio_init;
++    dc->realize = puv3_gpio_realize;
  }
+ 
+ static const TypeInfo puv3_gpio_info = {
 -- 
 2.17.1
