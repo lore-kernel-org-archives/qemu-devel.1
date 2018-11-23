@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1gQEJz-0002fd-Fo
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 11:28:50 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gQEM7-00041Y-W5
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 11:31:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1gQEJv-0006Hk-He
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 11:28:45 -0500
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Fri, 23 Nov 2018 16:28:13 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA8387E9A0C@FRAEML521-MBX.china.huawei.com>
-References: <20180921081819.9203-1-eric.auger@redhat.com>
-In-Reply-To: <20180921081819.9203-1-eric.auger@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <sgarzare@redhat.com>) id 1gQEM4-0002wC-PS
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 11:30:59 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:43498)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gQEM4-0002uq-KY
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 11:30:56 -0500
+Received: by mail-io1-f68.google.com with SMTP id g8so9155907iop.10
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 08:30:56 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v2 00/28] vSMMUv3/pSMMUv3 2 stage VFIO
- integration
+References: <20181119141543.o6xl4vfptajuksi3@sirius.home.kraxel.org>
+	<CAGxU2F4kUD85FMVEAcOpWUAGF98G2KR9O8EVAkzBDmA+DkS2KA@mail.gmail.com>
+	<20181120062109.eahirgygm4br3ov7@sirius.home.kraxel.org>
+	<CAGxU2F64uK5oygQecZKOPpsyb--Pth9U00P_gghrtYDwQrSGtg@mail.gmail.com>
+	<20181120112203.rzhhdl6hhsjf5twt@sirius.home.kraxel.org>
+	<CAGxU2F4LNN1UtVJFADxm1V4eBDQ8eGSoAjPXC=X8+zSR4yd9Nw@mail.gmail.com>
+	<20181122115135.funmtcql3xhrixi6@sirius.home.kraxel.org>
+	<CAGxU2F6462MF00_0dh_6HiFPgVyEpaRTEPJ_0-sUdg8YnhgLcw@mail.gmail.com>
+	<20181123062138.rdfaeaqq5uw43ey2@sirius.home.kraxel.org>
+	<CAGxU2F5-UUaJbwpKhTY1ZsRWVst=gM79nSjnZtZJVKDpime_Lw@mail.gmail.com>
+	<20181123155440.GA19103@morn.lan>
+In-Reply-To: <20181123155440.GA19103@morn.lan>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri, 23 Nov 2018 17:30:43 +0100
+Message-ID: <CAGxU2F7a1BPgSRmQ0B6W_ZvP7Cn9YB4c3dNepNG+QvH8a_pmWg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] SeaBIOS booting time optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,130 +37,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>
-Cc: "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "cdall@kernel.org" <cdall@kernel.org>, "mst@redhat.com" <mst@redhat.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, "peterx@redhat.com" <peterx@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, Linuxarm <linuxarm@huawei.com>, "xuwei (O)" <xuwei5@huawei.com>
+To: Kevin OConnor <kevin@koconnor.net>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>, seabios@seabios.org, Stefan Hajnoczi <stefanha@gmail.com>, Rob Bradford <robert.bradford@intel.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stephend@silicom-usa.com, stefanb@linux.ibm.com
+
+On Fri, Nov 23, 2018 at 4:54 PM Kevin O'Connor <kevin@koconnor.net> wrote:
+>
+> On Fri, Nov 23, 2018 at 12:18:13PM +0100, Stefano Garzarella wrote:
+> > On Fri, Nov 23, 2018 at 7:21 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > > On Thu, Nov 22, 2018 at 04:13:38PM +0100, Stefano Garzarella wrote:
+> > > > On Thu, Nov 22, 2018 at 12:51 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > > > > On Thu, Nov 22, 2018 at 12:08:55PM +0100, Stefano Garzarella wrote:
+> > > > > > Hi,
+> > > > > > I continued to investigate how to reduce the boot time with SeaBIOS
+> > > > > > and QEMU when it used with linuxboot_dma.bin (-kernel parameter).
+> > > > > > I reached ~12ms with a SeaBIOS configuration (attached) where I
+> > > > > > disabled debug output, all Hardware support (except SMM & MTRRs) and I
+> > > > > > applied a small patch to disable VGA setup and console (attached).
+> > > > >
+> > > > > Is there any difference to "qemu -vga none" ?
+> > > >
+> > > > Using both (qemu -vga none, and my patch) we are around 10.8 ms.
+> > > > Note: using only the patch, Linux is still able to initialize and use the VGA.
+> > >
+> > > But do you want linux use the vga console if you care about boot times?
+> > > I'd expect virtio-console would be fastest in that case.
+> >
+> > I agree with you, but if we will implement a QEMU fastboot feature in
+> > SeaBIOS, we are sure that it works with Linux kernel if someone uses
+> > "qemu -kernel" and wants also use a VGA.
+>
+> It should be possible to use "-device VGA,romfile=" to enable VGA
+> without an optionrom.
+>
+> > > > - QEMU -vga none + SeaBIOS config (CONFIG_DEBUG_LEVEL=0, disable all
+> > > > HW support except
+> > > > SMM & MTRRs) + Stephen's TPM patch
+> > > >  qemu_init_end: 43.675803
+> > > >  fw_start: 43.865178 (+0.189375)
+> > > >  fw_do_boot: 58.093161 (+14.227983)
+> > > >  linux_start_boot: 59.490308 (+1.397147)
+> > > >  linux_start_user: 556.782354 (+497.292046)
+> > > >
+> > > > - QEMU -vga none + SeaBIOS config (CONFIG_DEBUG_LEVEL=0, disable all
+> > > > HW support except
+> > > > SMM & MTRRs, CONFIG_DISABLE_VGA=y) + Stephen's TPM patch
+> > > >  qemu_init_end: 42.387412
+> > > >  fw_start: 42.579257 (+0.191845)
+> > > >  fw_do_boot: 53.381517 (+10.802260)
+> > > >  linux_start_boot: 54.848643 (+1.467126)
+> > > >  linux_start_user: 498.517050 (+443.668407)
+> > >
+> > > Interesting that CONFIG_DISABLE_VGA=y makes a noticable difference even
+> > > without vga hardware being preset.  And not only in seabios but also for
+> > > the linux kernel.
+> > >
+> > > Do you know why?
+> >
+> > In SeaBIOS I think the reasons are:
+> > - vgarom_setup() scan all PCI devices to find a VGA
+> > - enable_vga_console() invokes an int10 without check if there is a
+> > VGA (maybe here we can add a check)
+>
+> Where is CONFIG_DISABLE_VGA set - it's not a standard SeaBIOS config
+> option?
+
+Yes, it is not standard.
+I posted a small patch in this thread
+(https://mail.coreboot.org/pipermail/seabios/2018-November/012592.html)
+to explain my experiments.
+CONFIG_DISABLE_VGA=y simply skips the vgarom_setup() and enable_vga_console().
+
+>
+> In my experience, the only meaningful delays are the result of
+> accessing hardware.  Neither of the above two items would result in
+> additional hardware accesses, so I don't think they would be the cause
+> of an additional delay.
+
+Thanks, I'll investigate better the delays.
+
+Cheers,
+Stefano
+
+>
+> -Kevin
 
 
 
-> -----Original Message-----
-> From: Qemu-devel [mailto:qemu-devel-
-> bounces+shameerali.kolothum.thodi=3Dhuawei.com@nongnu.org] On Behalf Of
-> Eric Auger
-> Sent: 21 September 2018 09:18
-> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; qemu-
-> devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org
-> Cc: yi.l.liu@intel.com; cdall@kernel.org; mst@redhat.com; jean-
-> philippe.brucker@arm.com; peterx@redhat.com; alex.williamson@redhat.com
-> Subject: [Qemu-devel] [RFC v2 00/28] vSMMUv3/pSMMUv3 2 stage VFIO
-> integration
->=20
-
-[...]
-
-> This series can be found at:
-> https://github.com/eauger/qemu/tree/v3.0.0_2stage-rfc-v2
->=20
-> Testing:
-> - For testing use my kernel branch
->   https://github.com/eauger/linux/tree/v4.19-rc4-2stage-rfc-v2 [1]
-> - Tested on Qualcomm HW with 1/2 assigned e1000e NICs. Hotplug
->   was also tested OK.
-> - Known limitation:
->   - currently sending an NH_ASID command instead of NH_VA
->     upon guest NH_VA. This may cause important perf downgrade.
->     Propagating NH_VA does not work at the moment.
-
-Hi Eric,
-
-I had a  go with this RFC on one of our platform and noted that when the Gu=
-est=20
-boots with ACPI , the ping doesn't work with the assigned ixgbevf NIC thoug=
-h=20
-the network device gets detected and added to the iommu group.=20
-
-It's all fine when I boot the Guest with DT. Have you tested this with ACPI=
- yet or
-am I missing anything obvious here?
-
-Please let me know.
-
-Thanks,
-Shameer
-=20
-> References:
-> - [1] [RFC v2 00/20] SMMUv3 Nested Stage Setup
->   (https://lkml.org/lkml/2018/9/18/1087)
->   The User API still is unstable and under discussion.
->=20
-> History:
-> v1 -> v2:
-> - Fixed dual assignment (asid now correctly propagated on TLB invalidatio=
-ns)
-> - Integrated fault reporting
->=20
-> Next Steps:
-> - Mature the user API with people involved in SVA work (KVM forum may be =
-a
->   good opportunity to meet)
-> - Submit the IOMMU cfg notifier changes and some VFIO changes separately,
-> to
->   progress independently on the kernel dependency
->=20
-> Eric Auger (28):
->   hw/arm/smmu-common: Fix the name of the iommu memory regions
->   hw/arm/smmuv3: fix eventq recording and IRQ triggerring
->   update-linux-headers: Import iommu.h
->   linux-headers: Partial header update
->   memory: add IOMMU_ATTR_VFIO_NESTED IOMMU memory region attribute
->   hw/arm/smmuv3: Implement get_attr API to report
-> IOMMU_ATTR_VFIO_NESTED
->   hw/vfio/common: Refactor container initialization
->   hw/vfio/common: Force nested if iommu requires it
->   memory: Introduce IOMMUIOLTBNotifier
->   memory: rename memory_region notify_iommu, notify_one
->   memory: Add IOMMUConfigNotifier
->   memory: Add arch_id in IOTLBEntry
->   hw/arm/smmuv3: Store s1ctrptr in translation config data
->   hw/arm/smmuv3: Implement dummy replay
->   hw/arm/smmuv3: Notify on config changes
->   hw/arm/smmuv3: Fill the IOTLBEntry arch_id on NH_VA invalidation
->   hw/vfio/common: Introduce vfio_alloc_guest_iommu helper
->   hw/vfio/common: Introduce vfio_dma_(un)map_ram_section helpers
->   hw/vfio/common: Register specific nested mode notifiers and
->     memory_listener
->   hw/vfio/common: Register MAP notifier for MSI binding
->   target/arm/kvm: Notifies IOMMU on MSI stage 1 binding
->   vfio/pci: Always set up MSI route before enabling vectors
->   hw/arm/smmuv3: Remove warning about unsupported MAP notifiers
->   memory: Introduce IOMMU_NOTIFIER_INIT_CFG IOMMU Config Notifier
->   memory: Introduce IOMMU Memory Region inject_faults API
->   hw/vfio/common: Handle fault_handler
->   hw/arm/smmuv3: Init fault handling
->   hw/arm/smmuv3: Implement fault injection
->=20
->  exec.c                          |  12 +-
->  hw/arm/smmu-common.c            |  12 +-
->  hw/arm/smmuv3-internal.h        |  26 +-
->  hw/arm/smmuv3.c                 | 189 +++++++--
->  hw/i386/intel_iommu.c           |  16 +-
->  hw/misc/tz-mpc.c                |   8 +-
->  hw/ppc/spapr_iommu.c            |   2 +-
->  hw/s390x/s390-pci-inst.c        |   4 +-
->  hw/vfio/common.c                | 666 ++++++++++++++++++++++++--------
->  hw/vfio/pci.c                   |   1 +
->  hw/vfio/trace-events            |   4 +-
->  hw/virtio/vhost.c               |  12 +-
->  include/exec/memory.h           | 140 +++++--
->  include/hw/arm/smmu-common.h    |   1 +
->  include/hw/vfio/vfio-common.h   |   1 +
->  linux-headers/linux/iommu.h     | 237 ++++++++++++
->  linux-headers/linux/vfio.h      |  48 +++
->  memory.c                        |  66 +++-
->  scripts/update-linux-headers.sh |   2 +-
->  target/arm/kvm.c                |  46 +--
->  20 files changed, 1206 insertions(+), 287 deletions(-)
->  create mode 100644 linux-headers/linux/iommu.h
->=20
-> --
-> 2.17.1
->=20
+-- 
+Stefano Garzarella
+Red Hat
