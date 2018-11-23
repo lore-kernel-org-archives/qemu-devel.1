@@ -1,43 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gQBU8-0005D7-Tt
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:27:05 -0500
+	(envelope-from <clg@kaod.org>) id 1gQBVo-00075t-AK
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:28:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gQBU5-0005dr-LZ
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:27:04 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58508
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gQBU3-0005Yl-Qi
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:27:00 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wANDIdjl072109
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 08:26:57 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2nxg8vnw2b-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 08:26:57 -0500
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Fri, 23 Nov 2018 13:26:55 -0000
-Reply-To: pmorel@linux.ibm.com
-References: <20181122165432.4437-1-cohuck@redhat.com>
-	<20181122165432.4437-2-cohuck@redhat.com>
-	<853a8421-af17-5130-51b7-3242cc10b989@linux.ibm.com>
-	<20181123134517.0b21c263.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Fri, 23 Nov 2018 14:26:50 +0100
+	(envelope-from <clg@kaod.org>) id 1gQBVk-0007bY-QH
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:28:48 -0500
+Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:56317)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gQBVk-0007ZC-DP
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:28:44 -0500
+Received: from player694.ha.ovh.net (unknown [10.109.160.230])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 809FB1754A4
+	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 14:28:42 +0100 (CET)
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+References: <20181116105729.23240-1-clg@kaod.org>
+	<20181116105729.23240-3-clg@kaod.org>
+	<20181122031934.GC10448@umbus.fritz.box>
+	<75cdc1f3-f337-3c37-b234-d96222a370d2@kaod.org>
+	<20181123010852.GT10448@umbus.fritz.box>
+Message-ID: <8270d5fc-ab20-f47d-37d8-1e2ba179fbfd@kaod.org>
+Date: Fri, 23 Nov 2018 14:28:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181123134517.0b21c263.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181123010852.GT10448@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Message-Id: <dcf76e4e-95f3-e09d-7110-e66212b393c2@linux.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] vfio-ccw: add capabilities chain
+Subject: Re: [Qemu-devel] [PATCH v5 02/36] ppc/xive: add support for the LSI
+ interrupt sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,56 +35,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 23/11/2018 13:45, Cornelia Huck wrote:
-> On Fri, 23 Nov 2018 13:28:25 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
->=20
->> On 22/11/2018 17:54, Cornelia Huck wrote:
->>> Allow to extend the regions used by vfio-ccw. The first user will be
->>> handling of halt and clear subchannel.
+
+>>>> +/*
+>>>> + * Returns whether the event notification should be forwarded.
+>>>> + */
+>>>> +static bool xive_source_lsi_trigger(XiveSource *xsrc, uint32_t
+>>>> srcno)
 >>>
->>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>> ---
->>>    drivers/s390/cio/vfio_ccw_ops.c     | 182 ++++++++++++++++++++++++=
-----
->>>    drivers/s390/cio/vfio_ccw_private.h |  38 ++++++
->>>    include/uapi/linux/vfio.h           |   1 +
->>>    3 files changed, 195 insertions(+), 26 deletions(-)
->>>   =20
+>>> What exactly "trigger" means isn't entirely obvious for an LSI.  Migh=
+t
+>>> be clearer to have "lsi_assert" and "lsi_deassert" helpers instead.
 >>
->> Halt and clear have no parameters (the sub-channel ID is obviously the
->> one of the mediated device).
->>
->> Isn't adding a new sub-region for the purpose of handling halt and cle=
-ar
->> superfluous?
->>
->> What is the reason not to use simple ioctls ?
+>> This is called only when the interrupt is asserted. So it is a=20
+>> simplified LSI trigger depending only on the 'P' bit.
 >=20
-> Should it turn out that we missed something and need an enhanced
-> interface, we can simply stop providing this subregion and add a new
-> subregion, without breaking existing userspace. We can't do that with
-> ioctls.
+> Yes, I see that.  But the result is that while the MSI logic is
+> encapsulated in the MSI trigger function, this leaves the LSI logic
+> split across the trigger function and set_irq() itself. I think it=20
+> would be better to have assert and deassert helpers instead, which
+> handle both the trigger/notification and also the updating of the
+> ASSERTED bit.
 
-OK, it is a good reason, took me a while but I get the interest of=20
-capabilities for regions too.
+Something like the xive_source_set_irq_lsi() below ?
 
->=20
-> And moreover, this is only the first user of this infrastructure.
-> There's also that path handling series that Dong Jia had posted early
-> this year -- that would be an obvious user as well.
->=20
+Thanks,
 
-right.
+C.
 
-Thanks.
 
-Regards,
-Pierre
+Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+---
+ hw/intc/xive.c        |   58 +++++++++++++++++++++++++++++++++++++++++++=
++------
+ include/hw/ppc/xive.h |   19 +++++++++++++++-
+ 2 files changed, 70 insertions(+), 7 deletions(-)
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+Index: qemu.git/include/hw/ppc/xive.h
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+--- qemu.git.orig/include/hw/ppc/xive.h
++++ qemu.git/include/hw/ppc/xive.h
+@@ -32,8 +32,9 @@ typedef struct XiveSource {
+     /* IRQs */
+     uint32_t        nr_irqs;
+     qemu_irq        *qirqs;
++    unsigned long   *lsi_map;
+=20
+-    /* PQ bits */
++    /* PQ bits and LSI assertion bit */
+     uint8_t         *status;
+=20
+     /* ESB memory region */
+@@ -89,6 +90,7 @@ static inline hwaddr xive_source_esb_mgm
+  * When doing an EOI, the Q bit will indicate if the interrupt
+  * needs to be re-triggered.
+  */
++#define XIVE_STATUS_ASSERTED  0x4  /* Extra bit for LSI */
+ #define XIVE_ESB_VAL_P        0x2
+ #define XIVE_ESB_VAL_Q        0x1
+=20
+@@ -127,4 +129,19 @@ static inline qemu_irq xive_source_qirq(
+     return xsrc->qirqs[srcno];
+ }
+=20
++static inline bool xive_source_irq_is_lsi(XiveSource *xsrc, uint32_t src=
+no)
++{
++    assert(srcno < xsrc->nr_irqs);
++    return test_bit(srcno, xsrc->lsi_map);
++}
++
++static inline void xive_source_irq_set(XiveSource *xsrc, uint32_t srcno,
++                                       bool lsi)
++{
++    assert(srcno < xsrc->nr_irqs);
++    if (lsi) {
++        bitmap_set(xsrc->lsi_map, srcno, 1);
++    }
++}
++
+ #endif /* PPC_XIVE_H */
+Index: qemu.git/hw/intc/xive.c
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+--- qemu.git.orig/hw/intc/xive.c
++++ qemu.git/hw/intc/xive.c
+@@ -91,11 +91,35 @@ uint8_t xive_source_esb_set(XiveSource *
+ /*
+  * Returns whether the event notification should be forwarded.
+  */
++static bool xive_source_set_irq_lsi(XiveSource *xsrc, uint32_t srcno, in=
+t val)
++{
++    if (!val)  {
++        xsrc->status[srcno] &=3D ~XIVE_STATUS_ASSERTED;
++        return false;
++    }
++
++    xsrc->status[srcno] |=3D XIVE_STATUS_ASSERTED;
++    return xive_source_esb_get(xsrc, srcno) =3D=3D XIVE_ESB_RESET;
++}
++
++/*
++ * Returns whether the event notification should be forwarded.
++ */
+ static bool xive_source_esb_trigger(XiveSource *xsrc, uint32_t srcno)
+ {
++    bool notify;
++
+     assert(srcno < xsrc->nr_irqs);
+=20
+-    return xive_esb_trigger(&xsrc->status[srcno]);
++    notify =3D xive_esb_trigger(&xsrc->status[srcno]);
++
++    if (xive_source_irq_is_lsi(xsrc, srcno) &&
++        xive_source_esb_get(xsrc, srcno) =3D=3D XIVE_ESB_QUEUED) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "XIVE: queued an event on LSI IRQ %d\n", srcno);
++    }
++
++    return notify;
+ }
+=20
+ /*
+@@ -103,9 +127,22 @@ static bool xive_source_esb_trigger(Xive
+  */
+ static bool xive_source_esb_eoi(XiveSource *xsrc, uint32_t srcno)
+ {
++    bool notify;
++
+     assert(srcno < xsrc->nr_irqs);
+=20
+-    return xive_esb_eoi(&xsrc->status[srcno]);
++    notify =3D xive_esb_eoi(&xsrc->status[srcno]);
++
++    /* LSI sources do not set the Q bit but they can still be
++     * asserted, in which case we should forward a new event
++     * notification
++     */
++    if (xive_source_irq_is_lsi(xsrc, srcno)) {
++        bool level =3D xsrc->status[srcno] & XIVE_STATUS_ASSERTED;
++        notify =3D xive_source_set_irq_lsi(xsrc, srcno, level);
++    }
++
++    return notify;
+ }
+=20
+ /*
+@@ -268,8 +305,12 @@ static void xive_source_set_irq(void *op
+     XiveSource *xsrc =3D XIVE_SOURCE(opaque);
+     bool notify =3D false;
+=20
+-    if (val) {
+-        notify =3D xive_source_esb_trigger(xsrc, srcno);
++    if (xive_source_irq_is_lsi(xsrc, srcno)) {
++        notify =3D xive_source_set_irq_lsi(xsrc, srcno, val);
++    } else {
++        if (val) {
++            notify =3D xive_source_esb_trigger(xsrc, srcno);
++        }
+     }
+=20
+     /* Forward the source event notification for routing */
+@@ -289,9 +330,11 @@ void xive_source_pic_print_info(XiveSour
+             continue;
+         }
+=20
+-        monitor_printf(mon, "  %08x %c%c\n", i + offset,
++        monitor_printf(mon, "  %08x %s %c%c%c\n", i + offset,
++                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : "MSI",
+                        pq & XIVE_ESB_VAL_P ? 'P' : '-',
+-                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
++                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
++                       xsrc->status[i] & XIVE_STATUS_ASSERTED ? 'A' : ' =
+');
+     }
+ }
+=20
+@@ -299,6 +342,8 @@ static void xive_source_reset(DeviceStat
+ {
+     XiveSource *xsrc =3D XIVE_SOURCE(dev);
+=20
++    /* Do not clear the LSI bitmap */
++
+     /* PQs are initialized to 0b01 which corresponds to "ints off" */
+     memset(xsrc->status, 0x1, xsrc->nr_irqs);
+ }
+@@ -324,6 +369,7 @@ static void xive_source_realize(DeviceSt
+                                      xsrc->nr_irqs);
+=20
+     xsrc->status =3D g_malloc0(xsrc->nr_irqs);
++    xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
+=20
+     memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+                           &xive_source_esb_ops, xsrc, "xive.esb",
