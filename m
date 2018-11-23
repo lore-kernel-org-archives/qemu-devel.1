@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gQ95J-0003UL-7J
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:53:18 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gQ98M-0004YR-Qv
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:56:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gQ95E-0005x5-T2
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:53:16 -0500
-Resent-Message-Id: <E1gQ95E-0005x5-T2@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21306)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gQ95E-0005vv-Ns
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:53:12 -0500
-In-Reply-To: <20181122165417.23894-1-kwolf@redhat.com>
-Message-ID: <154297033949.7375.9163475867075760254@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1gQ98I-0002lv-Oc
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:56:26 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:60557)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1gQ98I-0002jP-Gz
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 05:56:22 -0500
+Date: Fri, 23 Nov 2018 11:56:20 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <30197297-c327-36a9-89f6-6a27eaef4cdf@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1811231151490.10585@zero.eik.bme.hu>
+References: <87mw8rumhb.fsf@blackfin.pond.sub.org>
+	<87y4s8h5rh.fsf@blackfin.pond.sub.org>
+	<876132olyi.fsf@blackfin.pond.sub.org>
+	<87a8fucx33.fsf@dusky.pond.sub.org>
+	<87muq2fgbw.fsf@dusky.pond.sub.org>
+	<a7902403-7572-9b64-235e-cb6f9e0efbae@redhat.com>
+	<alpine.BSF.2.21.9999.1811222249030.51852@zero.eik.bme.hu>
+	<30197297-c327-36a9-89f6-6a27eaef4cdf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 23 Nov 2018 02:52:20 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/13] Block layer patches
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] MAINTAINERS leaves too many files uncovered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-ODExMjIxNjU0MTcuMjM4OTQtMS1rd29sZkByZWRoYXQuY29tClR5cGU6IHNlcmllcwpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMTNdIEJsb2NrIGxheWVyIHBhdGNoZXMKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
-bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
-ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIk
-KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
-czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
-LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
-IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
-ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTBiYTI5
-NSBpb3Rlc3RzOiBFbmhhbmNlIDIyMyB0byBjb3ZlciBtdWx0aXBsZSBiaXRtYXAgZ3JhbnVsYXJp
-dGllcwo4ZjY5ZDM4IG52bWU6IGZpeCBidWcgd2l0aCBQQ0kgSVJRIHBpbnMgb24gdGVhcmRvd24K
-MzQ1MDZmNCBSZXZlcnQgIm52bWU6IGZpeCBvb2IgYWNjZXNzIGlzc3VlKENWRS0yMDE4LTE2ODQ3
-KSIKZjllMjlmMCBudm1lOiBmaXggb3V0LW9mLWJvdW5kcyBhY2Nlc3MgdG8gdGhlIENNQgo1YjJi
-N2FhIG52bWU6IGNhbGwgYmxrX2RyYWluIGluIE5WTWUgcmVzZXQgY29kZSB0byBhdm9pZCBsb2Nr
-dXBzCjQwZWRlOGQgaW90ZXN0czogZml4IG5iZCB0ZXN0IDIzMyB0byB3b3JrIGNvcnJlY3RseSB3
-aXRoIHJhdyBpbWFnZXMKODFmMGE4NyBibG9jazogRml4IHVwZGF0ZSBvZiBCRFJWX09fQVVUT19S
-RE9OTFkgaW4gdXBkYXRlX2ZsYWdzX2Zyb21fb3B0aW9ucygpCjlkMWQ0NDYgc2NzaS1kaXNrOiBG
-aXggY3Jhc2ggaWYgdW5kZXJseWluZyBob3N0IGZpbGUgb3IgZGlzayByZXR1cm5zIGVycm9yCjEx
-NGNmMzEgcWVtdS1pbWc6IEZpeCBsZWFrCmQxZmFjNWUgcWVtdS1pbWc6IEZpeCB0eXBvCjFlMTg3
-ZGYgaW90ZXN0czogU2tpcCAyMzMgaWYgY2VydHRvb2wgbm90IGluc3RhbGxlZApmZGY1NDNmIGlv
-dGVzdHM6IFJlcGxhY2UgYXNzZXJ0RXF1YWxzKCkgd2l0aCBhc3NlcnRFcXVhbCgpCjNiNTA4ZjQg
-aW90ZXN0czogUmVwbGFjZSB0aW1lLmNsb2NrKCkgd2l0aCBUaW1lb3V0Cgo9PT0gT1VUUFVUIEJF
-R0lOID09PQpDaGVja2luZyBQQVRDSCAxLzEzOiBpb3Rlc3RzOiBSZXBsYWNlIHRpbWUuY2xvY2so
-KSB3aXRoIFRpbWVvdXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMzogaW90ZXN0czogUmVwbGFjZSBh
-c3NlcnRFcXVhbHMoKSB3aXRoIGFzc2VydEVxdWFsKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMzog
-aW90ZXN0czogU2tpcCAyMzMgaWYgY2VydHRvb2wgbm90IGluc3RhbGxlZC4uLgpDaGVja2luZyBQ
-QVRDSCA0LzEzOiBxZW11LWltZzogRml4IHR5cG8uLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xMzogcWVt
-dS1pbWc6IEZpeCBsZWFrLi4uCkNoZWNraW5nIFBBVENIIDYvMTM6IHNjc2ktZGlzazogRml4IGNy
-YXNoIGlmIHVuZGVybHlpbmcgaG9zdCBmaWxlIG9yIGRpc2sgcmV0dXJucyBlcnJvci4uLgpDaGVj
-a2luZyBQQVRDSCA3LzEzOiBibG9jazogRml4IHVwZGF0ZSBvZiBCRFJWX09fQVVUT19SRE9OTFkg
-aW4gdXBkYXRlX2ZsYWdzX2Zyb21fb3B0aW9ucygpLi4uCkNoZWNraW5nIFBBVENIIDgvMTM6IGlv
-dGVzdHM6IGZpeCBuYmQgdGVzdCAyMzMgdG8gd29yayBjb3JyZWN0bHkgd2l0aCByYXcgaW1hZ2Vz
-Li4uCkNoZWNraW5nIFBBVENIIDkvMTM6IG52bWU6IGNhbGwgYmxrX2RyYWluIGluIE5WTWUgcmVz
-ZXQgY29kZSB0byBhdm9pZCBsb2NrdXBzLi4uCkNoZWNraW5nIFBBVENIIDEwLzEzOiBudm1lOiBm
-aXggb3V0LW9mLWJvdW5kcyBhY2Nlc3MgdG8gdGhlIENNQi4uLgpFUlJPUjogc3BhY2UgcmVxdWly
-ZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMxMDc6IEZJTEU6IHRlc3RzL252bWUtdGVzdC5j
-OjUzOgorICAgIHBkZXYgPSBxcGNpX2RldmljZV9maW5kKHFzLT5wY2lidXMsIFFQQ0lfREVWRk4o
-NCwwKSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA5OSBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMS8xMzog
-UmV2ZXJ0ICJudm1lOiBmaXggb29iIGFjY2VzcyBpc3N1ZShDVkUtMjAxOC0xNjg0NykiLi4uCkNo
-ZWNraW5nIFBBVENIIDEyLzEzOiBudm1lOiBmaXggYnVnIHdpdGggUENJIElSUSBwaW5zIG9uIHRl
-YXJkb3duLi4uCkNoZWNraW5nIFBBVENIIDEzLzEzOiBpb3Rlc3RzOiBFbmhhbmNlIDIyMyB0byBj
-b3ZlciBtdWx0aXBsZSBiaXRtYXAgZ3JhbnVsYXJpdGllcy4uLgo9PT0gT1VUUFVUIEVORCA9PT0K
-ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Fri, 23 Nov 2018, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 22/11/18 22:56, BALATON Zoltan wrote:
+>> While we're there, should I also add pc-bios/canyonlands.dts which is
+>> the device tree for sam460ex?
+>
+> Yes, I suggest this set:
+>
+> pc-bios/canyonlands.dt?
+> pc-bios/u-boot-sam460*
+> roms/u-boot-sam460ex
+
+Well, canyonlands.dtb and u-boot-sam460-*.bin are binaries built from=20
+canyonlands.dts and roms/u-boot-sam460ex respectively and=20
+roms/u-boot-sam460ex is mirrored from my git repo. So should these be=20
+added despite of this or is it enough to add canyonlands.dts? I thought=20
+only sources are listed in MAINTAINERS not binaries or external sources.
+
+Regards,
+BALATON Zoltan
