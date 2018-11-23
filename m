@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gQGCt-0003hF-AO
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:29:36 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gQGCy-0003d4-L4
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:29:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gQGCq-0000mH-27
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:29:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45072)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gQGCp-0000kX-Q8
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:29:32 -0500
-Date: Fri, 23 Nov 2018 18:29:19 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181123182918.GI2373@work-vm>
-References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
-	<20181122072028.22819-4-xiaoguangrong@tencent.com>
-	<20181123181717.GH2373@work-vm>
-	<ec42ec4b-652d-807e-2d88-94a2d52e9cec@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gQG8r-0001jz-RZ
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 13:25:26 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 23 Nov 2018 18:25:18 +0000
+Message-ID: <211feec7-1aca-c523-076a-5ba9de2be0c2@virtuozzo.com>
+References: <20181031113418.29796-1-anton.nefedov@virtuozzo.com>
+	<20181031113418.29796-8-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20181031113418.29796-8-anton.nefedov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5F04EFA689B40447B993B3291B02F790@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ec42ec4b-652d-807e-2d88-94a2d52e9cec@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] migration: use threaded workqueue
- for compression
+Subject: Re: [Qemu-devel] [PATCH v5 7/9] scsi: account unmap operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,400 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: guangrong.xiao@gmail.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 23/11/18 19:17, Dr. David Alan Gilbert wrote:
-> > * guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
-> >> From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> >>
-> >> Adapt the compression code to the threaded workqueue
-> >>
-> >> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-> >> ---
-> >>  migration/ram.c | 308 ++++++++++++++++++++------------------------------------
-> >>  1 file changed, 110 insertions(+), 198 deletions(-)
-> >>
-> >> diff --git a/migration/ram.c b/migration/ram.c
-> >> index 7e7deec4d8..254c08f27b 100644
-> >> --- a/migration/ram.c
-> >> +++ b/migration/ram.c
-> >> @@ -57,6 +57,7 @@
-> >>  #include "qemu/uuid.h"
-> >>  #include "savevm.h"
-> >>  #include "qemu/iov.h"
-> >> +#include "qemu/threaded-workqueue.h"
-> >>  
-> >>  /***********************************************************/
-> >>  /* ram save/restore */
-> >> @@ -349,22 +350,6 @@ typedef struct PageSearchStatus PageSearchStatus;
-> >>  
-> >>  CompressionStats compression_counters;
-> >>  
-> >> -struct CompressParam {
-> >> -    bool done;
-> >> -    bool quit;
-> >> -    bool zero_page;
-> >> -    QEMUFile *file;
-> >> -    QemuMutex mutex;
-> >> -    QemuCond cond;
-> >> -    RAMBlock *block;
-> >> -    ram_addr_t offset;
-> >> -
-> >> -    /* internally used fields */
-> >> -    z_stream stream;
-> >> -    uint8_t *originbuf;
-> >> -};
-> >> -typedef struct CompressParam CompressParam;
-> >> -
-> >>  struct DecompressParam {
-> >>      bool done;
-> >>      bool quit;
-> >> @@ -377,15 +362,6 @@ struct DecompressParam {
-> >>  };
-> >>  typedef struct DecompressParam DecompressParam;
-> >>  
-> >> -static CompressParam *comp_param;
-> >> -static QemuThread *compress_threads;
-> >> -/* comp_done_cond is used to wake up the migration thread when
-> >> - * one of the compression threads has finished the compression.
-> >> - * comp_done_lock is used to co-work with comp_done_cond.
-> >> - */
-> >> -static QemuMutex comp_done_lock;
-> >> -static QemuCond comp_done_cond;
-> >> -/* The empty QEMUFileOps will be used by file in CompressParam */
-> >>  static const QEMUFileOps empty_ops = { };
-> >>  
-> >>  static QEMUFile *decomp_file;
-> >> @@ -394,125 +370,6 @@ static QemuThread *decompress_threads;
-> >>  static QemuMutex decomp_done_lock;
-> >>  static QemuCond decomp_done_cond;
-> >>  
-> >> -static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
-> >> -                                 ram_addr_t offset, uint8_t *source_buf);
-> >> -
-> >> -static void *do_data_compress(void *opaque)
-> >> -{
-> >> -    CompressParam *param = opaque;
-> >> -    RAMBlock *block;
-> >> -    ram_addr_t offset;
-> >> -    bool zero_page;
-> >> -
-> >> -    qemu_mutex_lock(&param->mutex);
-> >> -    while (!param->quit) {
-> >> -        if (param->block) {
-> >> -            block = param->block;
-> >> -            offset = param->offset;
-> >> -            param->block = NULL;
-> >> -            qemu_mutex_unlock(&param->mutex);
-> >> -
-> >> -            zero_page = do_compress_ram_page(param->file, &param->stream,
-> >> -                                             block, offset, param->originbuf);
-> >> -
-> >> -            qemu_mutex_lock(&comp_done_lock);
-> >> -            param->done = true;
-> >> -            param->zero_page = zero_page;
-> >> -            qemu_cond_signal(&comp_done_cond);
-> >> -            qemu_mutex_unlock(&comp_done_lock);
-> >> -
-> >> -            qemu_mutex_lock(&param->mutex);
-> >> -        } else {
-> >> -            qemu_cond_wait(&param->cond, &param->mutex);
-> >> -        }
-> >> -    }
-> >> -    qemu_mutex_unlock(&param->mutex);
-> >> -
-> >> -    return NULL;
-> >> -}
-> >> -
-> >> -static void compress_threads_save_cleanup(void)
-> >> -{
-> >> -    int i, thread_count;
-> >> -
-> >> -    if (!migrate_use_compression() || !comp_param) {
-> >> -        return;
-> >> -    }
-> >> -
-> >> -    thread_count = migrate_compress_threads();
-> >> -    for (i = 0; i < thread_count; i++) {
-> >> -        /*
-> >> -         * we use it as a indicator which shows if the thread is
-> >> -         * properly init'd or not
-> >> -         */
-> >> -        if (!comp_param[i].file) {
-> >> -            break;
-> >> -        }
-> >> -
-> >> -        qemu_mutex_lock(&comp_param[i].mutex);
-> >> -        comp_param[i].quit = true;
-> >> -        qemu_cond_signal(&comp_param[i].cond);
-> >> -        qemu_mutex_unlock(&comp_param[i].mutex);
-> >> -
-> >> -        qemu_thread_join(compress_threads + i);
-> >> -        qemu_mutex_destroy(&comp_param[i].mutex);
-> >> -        qemu_cond_destroy(&comp_param[i].cond);
-> >> -        deflateEnd(&comp_param[i].stream);
-> >> -        g_free(comp_param[i].originbuf);
-> >> -        qemu_fclose(comp_param[i].file);
-> >> -        comp_param[i].file = NULL;
-> >> -    }
-> >> -    qemu_mutex_destroy(&comp_done_lock);
-> >> -    qemu_cond_destroy(&comp_done_cond);
-> >> -    g_free(compress_threads);
-> >> -    g_free(comp_param);
-> >> -    compress_threads = NULL;
-> >> -    comp_param = NULL;
-> >> -}
-> >> -
-> >> -static int compress_threads_save_setup(void)
-> >> -{
-> >> -    int i, thread_count;
-> >> -
-> >> -    if (!migrate_use_compression()) {
-> >> -        return 0;
-> >> -    }
-> >> -    thread_count = migrate_compress_threads();
-> >> -    compress_threads = g_new0(QemuThread, thread_count);
-> >> -    comp_param = g_new0(CompressParam, thread_count);
-> >> -    qemu_cond_init(&comp_done_cond);
-> >> -    qemu_mutex_init(&comp_done_lock);
-> >> -    for (i = 0; i < thread_count; i++) {
-> >> -        comp_param[i].originbuf = g_try_malloc(TARGET_PAGE_SIZE);
-> >> -        if (!comp_param[i].originbuf) {
-> >> -            goto exit;
-> >> -        }
-> >> -
-> >> -        if (deflateInit(&comp_param[i].stream,
-> >> -                        migrate_compress_level()) != Z_OK) {
-> >> -            g_free(comp_param[i].originbuf);
-> >> -            goto exit;
-> >> -        }
-> >> -
-> >> -        /* comp_param[i].file is just used as a dummy buffer to save data,
-> >> -         * set its ops to empty.
-> >> -         */
-> >> -        comp_param[i].file = qemu_fopen_ops(NULL, &empty_ops);
-> >> -        comp_param[i].done = true;
-> >> -        comp_param[i].quit = false;
-> >> -        qemu_mutex_init(&comp_param[i].mutex);
-> >> -        qemu_cond_init(&comp_param[i].cond);
-> >> -        qemu_thread_create(compress_threads + i, "compress",
-> >> -                           do_data_compress, comp_param + i,
-> >> -                           QEMU_THREAD_JOINABLE);
-> >> -    }
-> >> -    return 0;
-> >> -
-> >> -exit:
-> >> -    compress_threads_save_cleanup();
-> >> -    return -1;
-> >> -}
-> >> -
-> >>  /* Multiple fd's */
-> >>  
-> >>  #define MULTIFD_MAGIC 0x11223344U
-> >> @@ -1909,12 +1766,25 @@ exit:
-> >>      return zero_page;
-> >>  }
-> >>  
-> >> +struct CompressData {
-> >> +    /* filled by migration thread.*/
-> >> +    RAMBlock *block;
-> >> +    ram_addr_t offset;
-> >> +
-> >> +    /* filled by compress thread. */
-> >> +    QEMUFile *file;
-> >> +    z_stream stream;
-> >> +    uint8_t *originbuf;
-> >> +    bool zero_page;
-> >> +};
-> >> +typedef struct CompressData CompressData;
-> >> +
-> >>  static void
-> >> -update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
-> >> +update_compress_thread_counts(CompressData *cd, int bytes_xmit)
-> > 
-> > Keep the const?
-> >>  {
-> >>      ram_counters.transferred += bytes_xmit;
-> >>  
-> >> -    if (param->zero_page) {
-> >> +    if (cd->zero_page) {
-> >>          ram_counters.duplicate++;
-> >>          return;
-> >>      }
-> >> @@ -1924,81 +1794,123 @@ update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
-> >>      compression_counters.pages++;
-> >>  }
-> >>  
-> >> +static int compress_thread_data_init(void *request)
-> >> +{
-> >> +    CompressData *cd = request;
-> >> +
-> >> +    cd->originbuf = g_try_malloc(TARGET_PAGE_SIZE);
-> >> +    if (!cd->originbuf) {
-> >> +        return -1;
-> >> +    }
-> >> +
-> >> +    if (deflateInit(&cd->stream, migrate_compress_level()) != Z_OK) {
-> >> +        g_free(cd->originbuf);
-> >> +        return -1;
-> >> +    }
-> > 
-> > Please print errors if you fail in any case so we can easily tell what
-> > happened.
-> > 
-> >> +    cd->file = qemu_fopen_ops(NULL, &empty_ops);
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +static void compress_thread_data_fini(void *request)
-> >> +{
-> >> +    CompressData *cd = request;
-> >> +
-> >> +    qemu_fclose(cd->file);
-> >> +    deflateEnd(&cd->stream);
-> >> +    g_free(cd->originbuf);
-> >> +}
-> >> +
-> >> +static void compress_thread_data_handler(void *request)
-> >> +{
-> >> +    CompressData *cd = request;
-> >> +
-> >> +    /*
-> >> +     * if compression fails, it will be indicated by
-> >> +     * migrate_get_current()->to_dst_file.
-> >> +     */
-> >> +    cd->zero_page = do_compress_ram_page(cd->file, &cd->stream, cd->block,
-> >> +                                         cd->offset, cd->originbuf);
-> >> +}
-> >> +
-> >> +static void compress_thread_data_done(void *request)
-> >> +{
-> >> +    CompressData *cd = request;
-> >> +    RAMState *rs = ram_state;
-> >> +    int bytes_xmit;
-> >> +
-> >> +    bytes_xmit = qemu_put_qemu_file(rs->f, cd->file);
-> >> +    update_compress_thread_counts(cd, bytes_xmit);
-> >> +}
-> >> +
-> >> +static const ThreadedWorkqueueOps compress_ops = {
-> >> +    .thread_request_init = compress_thread_data_init,
-> >> +    .thread_request_uninit = compress_thread_data_fini,
-> >> +    .thread_request_handler = compress_thread_data_handler,
-> >> +    .thread_request_done = compress_thread_data_done,
-> >> +    .request_size = sizeof(CompressData),
-> >> +};
-> >> +
-> >> +static Threads *compress_threads;
-> >> +
-> >>  static bool save_page_use_compression(RAMState *rs);
-> >>  
-> >>  static void flush_compressed_data(RAMState *rs)
-> >>  {
-> >> -    int idx, len, thread_count;
-> >> -
-> >>      if (!save_page_use_compression(rs)) {
-> >>          return;
-> >>      }
-> >> -    thread_count = migrate_compress_threads();
-> >>  
-> >> -    qemu_mutex_lock(&comp_done_lock);
-> >> -    for (idx = 0; idx < thread_count; idx++) {
-> >> -        while (!comp_param[idx].done) {
-> >> -            qemu_cond_wait(&comp_done_cond, &comp_done_lock);
-> >> -        }
-> >> -    }
-> >> -    qemu_mutex_unlock(&comp_done_lock);
-> >> +    threaded_workqueue_wait_for_requests(compress_threads);
-> >> +}
-> >>  
-> >> -    for (idx = 0; idx < thread_count; idx++) {
-> >> -        qemu_mutex_lock(&comp_param[idx].mutex);
-> >> -        if (!comp_param[idx].quit) {
-> >> -            len = qemu_put_qemu_file(rs->f, comp_param[idx].file);
-> >> -            /*
-> >> -             * it's safe to fetch zero_page without holding comp_done_lock
-> >> -             * as there is no further request submitted to the thread,
-> >> -             * i.e, the thread should be waiting for a request at this point.
-> >> -             */
-> >> -            update_compress_thread_counts(&comp_param[idx], len);
-> >> -        }
-> >> -        qemu_mutex_unlock(&comp_param[idx].mutex);
-> >> +static void compress_threads_save_cleanup(void)
-> >> +{
-> >> +    if (!compress_threads) {
-> >> +        return;
-> >>      }
-> >> +
-> >> +    threaded_workqueue_destroy(compress_threads);
-> >> +    compress_threads = NULL;
-> >>  }
-> >>  
-> >> -static inline void set_compress_params(CompressParam *param, RAMBlock *block,
-> >> -                                       ram_addr_t offset)
-> >> +static int compress_threads_save_setup(void)
-> >>  {
-> >> -    param->block = block;
-> >> -    param->offset = offset;
-> >> +    if (!migrate_use_compression()) {
-> >> +        return 0;
-> >> +    }
-> >> +
-> >> +    compress_threads = threaded_workqueue_create("compress",
-> >> +                                migrate_compress_threads(),
-> >> +                                DEFAULT_THREAD_REQUEST_NR, &compress_ops);
-> >> +    return compress_threads ? 0 : -1;
-> >>  }
-> >>  
-> >>  static int compress_page_with_multi_thread(RAMState *rs, RAMBlock *block,
-> >>                                             ram_addr_t offset)
-> >>  {
-> >> -    int idx, thread_count, bytes_xmit = -1, pages = -1;
-> >> +    CompressData *cd;
-> >>      bool wait = migrate_compress_wait_thread();
-> >>  
-> >> -    thread_count = migrate_compress_threads();
-> >> -    qemu_mutex_lock(&comp_done_lock);
-> >>  retry:
-> >> -    for (idx = 0; idx < thread_count; idx++) {
-> >> -        if (comp_param[idx].done) {
-> >> -            comp_param[idx].done = false;
-> >> -            bytes_xmit = qemu_put_qemu_file(rs->f, comp_param[idx].file);
-> >> -            qemu_mutex_lock(&comp_param[idx].mutex);
-> >> -            set_compress_params(&comp_param[idx], block, offset);
-> >> -            qemu_cond_signal(&comp_param[idx].cond);
-> >> -            qemu_mutex_unlock(&comp_param[idx].mutex);
-> >> -            pages = 1;
-> >> -            update_compress_thread_counts(&comp_param[idx], bytes_xmit);
-> >> -            break;
-> >> +    cd = threaded_workqueue_get_request(compress_threads);
-> >> +    if (!cd) {
-> >> +        /*
-> >> +         * wait for the free thread if the user specifies
-> >> +         * 'compress-wait-thread', otherwise we will post
-> >> +         *  the page out in the main thread as normal page.
-> >> +         */
-> >> +        if (wait) {
-> >> +            cpu_relax();
-> >> +            goto retry;
-> > 
-> > Is there nothing better we can use to wait without eating CPU time?
-> 
-> There is a mechanism to wait without eating CPU time in the data
-> structure, but it makes sense to busy wait.  There are 4 threads in the
-> workqueue, so you have to compare 1/4th of the time spent compressing a
-> page, with the trip into the kernel to wake you up.  You're adding 20%
-> CPU usage, but I'm not surprised it's worthwhile.
-
-Hmm OK; in that case it does at least need a comment because it's a bit
-odd, and we should watch out how that scales - I guess it's less of
-an overhead the more threads you use.
-
-Dave
-
-> Paolo
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+MzEuMTAuMjAxOCAxNDozNCwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4gU2lnbmVkLW9mZi1ieTog
+QW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2aXJ0dW96em8uY29tPg0KDQoNClJldmlld2Vk
+LWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5j
+b20+DQoNCmJ1dCBiZSBjYXJlZnVsOiBvbiBnaXQgYW0sIHRoZSBjaHVuayBhYm91dCByZWFkLW9u
+bHkgY2FzZSBnb2VzIGludG8gc2NzaV9kaXNrX2VtdWxhdGVfd3JpdGVfc2FtZSBpbnN0ZWFkIG9m
+IHNjc2lfZGlza19lbXVsYXRlX3VubWFwIChhdCBsZWFzdCBmb3IgbWUsIHdpdGggbGF0ZXN0IG1h
+c3RlciBicmFuY2ggYW5kIGdpdCAyLjE4DQoNCj4gLS0tDQo+ICAgaHcvc2NzaS9zY3NpLWRpc2su
+YyB8IDEyICsrKysrKysrKysrLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxMSBpbnNlcnRpb25zKCsp
+LCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvaHcvc2NzaS9zY3NpLWRpc2suYyBi
+L2h3L3Njc2kvc2NzaS1kaXNrLmMNCj4gaW5kZXggZTEzMjUwNDkxMy4uZGVlNzFmOWRkZSAxMDA2
+NDQNCj4gLS0tIGEvaHcvc2NzaS9zY3NpLWRpc2suYw0KPiArKysgYi9ody9zY3NpL3Njc2ktZGlz
+ay5jDQo+IEBAIC0xNjYzLDEwICsxNjYzLDE2IEBAIHN0YXRpYyB2b2lkIHNjc2lfdW5tYXBfY29t
+cGxldGVfbm9pbyhVbm1hcENCRGF0YSAqZGF0YSwgaW50IHJldCkNCj4gICAgICAgICAgIHItPnNl
+Y3RvciA9IGxkcV9iZV9wKCZkYXRhLT5pbmJ1ZlswXSk7DQo+ICAgICAgICAgICByLT5zZWN0b3Jf
+Y291bnQgPSBsZGxfYmVfcCgmZGF0YS0+aW5idWZbOF0pICYgMHhmZmZmZmZmZlVMTDsNCj4gICAg
+ICAgICAgIGlmICghY2hlY2tfbGJhX3JhbmdlKHMsIHItPnNlY3Rvciwgci0+c2VjdG9yX2NvdW50
+KSkgew0KPiArICAgICAgICAgICAgYmxvY2tfYWNjdF9pbnZhbGlkKGJsa19nZXRfc3RhdHMocy0+
+cWRldi5jb25mLmJsayksDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQkxPQ0tf
+QUNDVF9VTk1BUCk7DQo+ICAgICAgICAgICAgICAgc2NzaV9jaGVja19jb25kaXRpb24ociwgU0VO
+U0VfQ09ERShMQkFfT1VUX09GX1JBTkdFKSk7DQo+ICAgICAgICAgICAgICAgZ290byBkb25lOw0K
+PiAgICAgICAgICAgfQ0KPiAgIA0KPiArICAgICAgICBibG9ja19hY2N0X3N0YXJ0KGJsa19nZXRf
+c3RhdHMocy0+cWRldi5jb25mLmJsayksICZyLT5hY2N0LA0KPiArICAgICAgICAgICAgICAgICAg
+ICAgICAgIHItPnNlY3Rvcl9jb3VudCAqIHMtPnFkZXYuYmxvY2tzaXplLA0KPiArICAgICAgICAg
+ICAgICAgICAgICAgICAgIEJMT0NLX0FDQ1RfVU5NQVApOw0KPiArDQo+ICAgICAgICAgICByLT5y
+ZXEuYWlvY2IgPSBibGtfYWlvX3BkaXNjYXJkKHMtPnFkZXYuY29uZi5ibGssDQo+ICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHItPnNlY3RvciAqIHMtPnFkZXYuYmxv
+Y2tzaXplLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByLT5z
+ZWN0b3JfY291bnQgKiBzLT5xZGV2LmJsb2Nrc2l6ZSwNCj4gQEAgLTE2OTMsMTAgKzE2OTksMTEg
+QEAgc3RhdGljIHZvaWQgc2NzaV91bm1hcF9jb21wbGV0ZSh2b2lkICpvcGFxdWUsIGludCByZXQp
+DQo+ICAgICAgIHItPnJlcS5haW9jYiA9IE5VTEw7DQo+ICAgDQo+ICAgICAgIGFpb19jb250ZXh0
+X2FjcXVpcmUoYmxrX2dldF9haW9fY29udGV4dChzLT5xZGV2LmNvbmYuYmxrKSk7DQo+IC0gICAg
+aWYgKHNjc2lfZGlza19yZXFfY2hlY2tfZXJyb3IociwgcmV0LCBmYWxzZSkpIHsNCj4gKyAgICBp
+ZiAoc2NzaV9kaXNrX3JlcV9jaGVja19lcnJvcihyLCByZXQsIHRydWUpKSB7DQo+ICAgICAgICAg
+ICBzY3NpX3JlcV91bnJlZigmci0+cmVxKTsNCj4gICAgICAgICAgIGdfZnJlZShkYXRhKTsNCj4g
+ICAgICAgfSBlbHNlIHsNCj4gKyAgICAgICAgYmxvY2tfYWNjdF9kb25lKGJsa19nZXRfc3RhdHMo
+cy0+cWRldi5jb25mLmJsayksICZyLT5hY2N0KTsNCj4gICAgICAgICAgIHNjc2lfdW5tYXBfY29t
+cGxldGVfbm9pbyhkYXRhLCByZXQpOw0KPiAgICAgICB9DQo+ICAgICAgIGFpb19jb250ZXh0X3Jl
+bGVhc2UoYmxrX2dldF9haW9fY29udGV4dChzLT5xZGV2LmNvbmYuYmxrKSk7DQo+IEBAIC0xNzI4
+LDYgKzE3MzUsNyBAQCBzdGF0aWMgdm9pZCBzY3NpX2Rpc2tfZW11bGF0ZV91bm1hcChTQ1NJRGlz
+a1JlcSAqciwgdWludDhfdCAqaW5idWYpDQo+ICAgICAgIH0NCj4gICANCj4gICAgICAgaWYgKGJs
+a19pc19yZWFkX29ubHkocy0+cWRldi5jb25mLmJsaykpIHsNCj4gKyAgICAgICAgYmxvY2tfYWNj
+dF9pbnZhbGlkKGJsa19nZXRfc3RhdHMocy0+cWRldi5jb25mLmJsayksIEJMT0NLX0FDQ1RfVU5N
+QVApOw0KDQoNCnRoaXMgb25lIGdvZXMgdG8gc2NzaV9kaXNrX2VtdWxhdGVfd3JpdGVfc2FtZSBv
+biBhdXRvbWF0aWMgcGF0Y2ggYXBwbHkuDQoNCg0KPiAgICAgICAgICAgc2NzaV9jaGVja19jb25k
+aXRpb24ociwgU0VOU0VfQ09ERShXUklURV9QUk9URUNURUQpKTsNCj4gICAgICAgICAgIHJldHVy
+bjsNCj4gICAgICAgfQ0KPiBAQCAtMTc0MywxMCArMTc1MSwxMiBAQCBzdGF0aWMgdm9pZCBzY3Np
+X2Rpc2tfZW11bGF0ZV91bm1hcChTQ1NJRGlza1JlcSAqciwgdWludDhfdCAqaW5idWYpDQo+ICAg
+ICAgIHJldHVybjsNCj4gICANCj4gICBpbnZhbGlkX3BhcmFtX2xlbjoNCj4gKyAgICBibG9ja19h
+Y2N0X2ludmFsaWQoYmxrX2dldF9zdGF0cyhzLT5xZGV2LmNvbmYuYmxrKSwgQkxPQ0tfQUNDVF9V
+Tk1BUCk7DQo+ICAgICAgIHNjc2lfY2hlY2tfY29uZGl0aW9uKHIsIFNFTlNFX0NPREUoSU5WQUxJ
+RF9QQVJBTV9MRU4pKTsNCj4gICAgICAgcmV0dXJuOw0KPiAgIA0KPiAgIGludmFsaWRfZmllbGQ6
+DQo+ICsgICAgYmxvY2tfYWNjdF9pbnZhbGlkKGJsa19nZXRfc3RhdHMocy0+cWRldi5jb25mLmJs
+ayksIEJMT0NLX0FDQ1RfVU5NQVApOw0KPiAgICAgICBzY3NpX2NoZWNrX2NvbmRpdGlvbihyLCBT
+RU5TRV9DT0RFKElOVkFMSURfRklFTEQpKTsNCj4gICB9DQo+ICAgDQo+IA0KDQoNCi0tIA0KQmVz
+dCByZWdhcmRzLA0KVmxhZGltaXINCg==
