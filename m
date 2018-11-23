@@ -1,42 +1,22 @@
-Received: from eggs.gnu.org ([208.118.235.92]:50605)
+Received: from eggs.gnu.org ([208.118.235.92]:52097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gQBLx-0007qY-GN
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:18:41 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gQBNt-0001pl-El
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:20:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gQBBt-0007Gb-Le
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:08:18 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43688
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gQBBr-0007Ew-Tz
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:08:13 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wANCxsbc070401
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 08:08:10 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2nxerh90uw-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 23 Nov 2018 08:08:10 -0500
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Fri, 23 Nov 2018 13:08:08 -0000
-Reply-To: pmorel@linux.ibm.com
-References: <20181122165432.4437-1-cohuck@redhat.com>
-	<20181122165432.4437-4-cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Fri, 23 Nov 2018 14:08:03 +0100
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gQBNp-0004T9-Do
+	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 08:20:37 -0500
+Date: Fri, 23 Nov 2018 14:20:17 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20181123132017.GJ1148@toto>
+References: <e8dae726-8853-4e44-1eb8-b9cfb0bc44f2@mentor.com>
+	<CAFEAcA_EM39P8HFoC=B=XP3Ax8NgNSotn=wMJJsG05P8Ywdruw@mail.gmail.com>
+	<abd7b108-4d21-9c1c-16d3-6d31d47f74eb@mentor.com>
 MIME-Version: 1.0
-In-Reply-To: <20181122165432.4437-4-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <91b54c7e-a7b1-b721-89be-12a5706a0e21@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] vfio-ccw: add handling for asnyc
- channel instructions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abd7b108-4d21-9c1c-16d3-6d31d47f74eb@mentor.com>
+Subject: Re: [Qemu-devel] [Qemu-discuss] How to select specific qemu net
+ 'nic' device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,250 +25,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: mbilal <muhammad_bilal@mentor.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-discuss <qemu-discuss@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 22/11/2018 17:54, Cornelia Huck wrote:
-> Add a region to the vfio-ccw device that can be used to submit
-> asynchronous I/O instructions. ssch continues to be handled by the
-> existing I/O region; the new region handles hsch and csch.
->=20
-> Interrupt status continues to be reported through the same channels
-> as for ssch.
->=20
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->   drivers/s390/cio/Makefile           |   3 +-
->   drivers/s390/cio/vfio_ccw_async.c   |  88 ++++++++++++++++
->   drivers/s390/cio/vfio_ccw_drv.c     |  48 ++++++---
->   drivers/s390/cio/vfio_ccw_fsm.c     | 158 +++++++++++++++++++++++++++=
--
->   drivers/s390/cio/vfio_ccw_ops.c     |  13 ++-
->   drivers/s390/cio/vfio_ccw_private.h |   6 ++
->   include/uapi/linux/vfio.h           |   4 +
->   include/uapi/linux/vfio_ccw.h       |  12 +++
->   8 files changed, 313 insertions(+), 19 deletions(-)
->   create mode 100644 drivers/s390/cio/vfio_ccw_async.c
->=20
-> diff --git a/drivers/s390/cio/Makefile b/drivers/s390/cio/Makefile
-> index f230516abb96..f6a8db04177c 100644
-> --- a/drivers/s390/cio/Makefile
-> +++ b/drivers/s390/cio/Makefile
-> @@ -20,5 +20,6 @@ obj-$(CONFIG_CCWGROUP) +=3D ccwgroup.o
->   qdio-objs :=3D qdio_main.o qdio_thinint.o qdio_debug.o qdio_setup.o
->   obj-$(CONFIG_QDIO) +=3D qdio.o
->  =20
-> -vfio_ccw-objs +=3D vfio_ccw_drv.o vfio_ccw_cp.o vfio_ccw_ops.o vfio_cc=
-w_fsm.o
-> +vfio_ccw-objs +=3D vfio_ccw_drv.o vfio_ccw_cp.o vfio_ccw_ops.o vfio_cc=
-w_fsm.o \
-> +	vfio_ccw_async.o
->   obj-$(CONFIG_VFIO_CCW) +=3D vfio_ccw.o
-> diff --git a/drivers/s390/cio/vfio_ccw_async.c b/drivers/s390/cio/vfio_=
-ccw_async.c
-> new file mode 100644
-> index 000000000000..8c7f51d17d70
-> --- /dev/null
-> +++ b/drivers/s390/cio/vfio_ccw_async.c
-> @@ -0,0 +1,88 @@
-> +// SPDX-License-Identifier: GPL-2.0
-
-...snip...
+On Fri, Nov 23, 2018 at 02:59:32PM +0500, mbilal wrote:
+> Hi,
+> 
+> Thanks for reply.
+> 
+> According to your suggestion I've tested with 3.1 rc2 release and problem is
+> still exist in this release also.
+> 
+> Here is my reproducible scenario.
 
 
->   static void __exit vfio_ccw_sch_exit(void)
-> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_cc=
-w_fsm.c
-> index f94aa01f9c36..0caf77e8f377 100644
-> --- a/drivers/s390/cio/vfio_ccw_fsm.c
-> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
-> @@ -3,8 +3,10 @@
->    * Finite state machine for vfio-ccw device handling
->    *
->    * Copyright IBM Corp. 2017
-> + * Copyright Red Hat, Inc. 2018
->    *
->    * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> + *            Cornelia Huck <cohuck@redhat.com>
->    */
->  =20
->   #include <linux/vfio.h>
-> @@ -68,6 +70,81 @@ static int fsm_io_helper(struct vfio_ccw_private *pr=
-ivate)
->   	return ret;
->   }
->  =20
-> +static int fsm_do_halt(struct vfio_ccw_private *private)
-> +{
-> +	struct subchannel *sch;
-> +	unsigned long flags;
-> +	int ccode;
-> +	int ret;
-> +
-> +	sch =3D private->sch;
-> +
-> +	spin_lock_irqsave(sch->lock, flags);
-> +	private->state =3D VFIO_CCW_STATE_BUSY;
-> +
-> +	/* Issue "Halt Subchannel" */
-> +	ccode =3D hsch(sch->schid);
-> +
-> +	switch (ccode) {
-> +	case 0:
-> +		/*
-> +		 * Initialize device status information
-> +		 */
-> +		sch->schib.scsw.cmd.actl |=3D SCSW_ACTL_HALT_PEND;
-> +		ret =3D 0;
-> +		break;
-> +	case 1:		/* Status pending */
-> +	case 2:		/* Busy */
-> +		ret =3D -EBUSY;
-> +		break;
-> +	case 3:		/* Device not operational */
-> +	{
-> +		ret =3D -ENODEV;
-> +		break;
-> +	}
-> +	default:
-> +		ret =3D ccode;
-> +	}
+Thanks,
 
-Shouldn't you set the state back here?
+I've had a look and the assert looks bogus to me.
+We shouldn't be asserting on RX descriptor setups when the receiver is disabled.
 
-> +	spin_unlock_irqrestore(sch->lock, flags);
-> +	return ret;
-> +}
-> +
-> +static int fsm_do_clear(struct vfio_ccw_private *private)
-> +{
-> +	struct subchannel *sch;
-> +	unsigned long flags;
-> +	int ccode;
-> +	int ret;
-> +
-> +	sch =3D private->sch;
-> +
-> +	spin_lock_irqsave(sch->lock, flags);
-> +	private->state =3D VFIO_CCW_STATE_BUSY;
-> +
-> +	/* Issue "Clear Subchannel" */
-> +	ccode =3D csch(sch->schid);
-> +
-> +	switch (ccode) {
-> +	case 0:
-> +		/*
-> +		 * Initialize device status information
-> +		 */
-> +		sch->schib.scsw.cmd.actl =3D SCSW_ACTL_CLEAR_PEND;
-> +		/* TODO: check what else we might need to clear */
-> +		ret =3D 0;
-> +		break;
-> +	case 3:		/* Device not operational */
-> +	{
-> +		ret =3D -ENODEV;
-> +		break;
-> +	}
-> +	default:
-> +		ret =3D ccode;
-> +	}
-> +	spin_unlock_irqrestore(sch->lock, flags);
-> +	return ret;
-> +}
-> +
->   static void fsm_notoper(struct vfio_ccw_private *private,
->   			enum vfio_ccw_event event)
->   {
-> @@ -102,6 +179,20 @@ static void fsm_io_busy(struct vfio_ccw_private *p=
-rivate,
->   	private->io_region->ret_code =3D -EBUSY;
->   }
->  =20
-> +static void fsm_async_error(struct vfio_ccw_private *private,
-> +			    enum vfio_ccw_event event)
-> +{
-> +	pr_err("vfio-ccw: FSM: halt/clear request from state:%d\n",
-> +	       private->state);
-> +	private->cmd_region->ret_code =3D -EIO;
-> +}
-> +
-> +static void fsm_async_busy(struct vfio_ccw_private *private,
-> +			   enum vfio_ccw_event event)
-> +{
-> +	private->cmd_region->ret_code =3D -EBUSY;
-> +}
-> +
->   static void fsm_disabled_irq(struct vfio_ccw_private *private,
->   			     enum vfio_ccw_event event)
->   {
-> @@ -166,11 +257,11 @@ static void fsm_io_request(struct vfio_ccw_privat=
-e *private,
->   		}
->   		return;
->   	} else if (scsw->cmd.fctl & SCSW_FCTL_HALT_FUNC) {
-> -		/* XXX: Handle halt. */
-> +		/* halt is handled via the async cmd region */
->   		io_region->ret_code =3D -EOPNOTSUPP;
->   		goto err_out;
->   	} else if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
-> -		/* XXX: Handle clear. */
-> +		/* clear is handled via the async cmd region */
->   		io_region->ret_code =3D -EOPNOTSUPP;
->   		goto err_out;
+I'll send a patch in a moment.
 
-What about filtering inside the vfio_ccw_mdev_write_io_region() before=20
-the call to the FSM?
+Best regards,
+Edgar
 
 
->   	}
-> @@ -181,6 +272,59 @@ static void fsm_io_request(struct vfio_ccw_private=
- *private,
->   			       io_region->ret_code, errstr);
->   }
->  =20
-> +/*
-> + * Deal with a halt request from userspace.
-> + */
-> +static void fsm_halt_request(struct vfio_ccw_private *private,
-> +			     enum vfio_ccw_event event)
-> +{
-> +	struct ccw_cmd_region *cmd_region =3D private->cmd_region;
-> +	int state =3D private->state;
-> +
-> +	private->state =3D VFIO_CCW_STATE_BOXED;
-> +
-> +	if (cmd_region->command !=3D VFIO_CCW_ASYNC_CMD_HSCH) {
-> +		/* should not happen? */
 
-I think we should make sure it does not happen before we get here.
-Like serializing HALT and CLEAR before the FSM.
-
-> +		cmd_region->ret_code =3D -EINVAL;
-> +		goto err_out;
-> +	}
-> +
-> +	cmd_region->ret_code =3D fsm_do_halt(private);
-
-fsm_do_halt() set the state to BUSY.
-Do we need a state change here and in fsm_do_halt ?
-
-Why not only the BUSY state?
-
-> +	if (cmd_region->ret_code)
-> +		goto err_out;
-> +
-> +	return;
-> +
-> +err_out:
-> +	private->state =3D state;
-> +}
-> +
-
-...snip...
-
-Regards,
-Pierre
-
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+> 
+> QEMU launching
+> --------------
+> 
+> ./qemu-system-aarch64 -M xlnx-zcu102 -m 1G -kernel /dev/null -S -s  -net nic
+> -net nic -net nic -net nic -net user,hostfwd=tcp::8080-:8080 -smp 1 -serial
+> stdio -serial /dev/null
+> 
+> gdb session
+> ------------
+> 
+> (gdb) file zcu102_net_uni.out
+> Reading symbols from zcu102_net_uni.out...done.
+> (gdb) tar rem :1234
+> Remote debugging using :1234
+> _ld_text_start () at os/arch/armv8/common/arch_asm.S:381
+> 381	    MOV     X14, X0
+> (gdb) load
+> Loading section .text, size 0x59c0c lma 0x0
+> Loading section .rodata, size 0x2bbc lma 0x59c0c
+> Loading section .rtl.data, size 0x770 lma 0x5c7c8
+> Loading section .data, size 0x4dc lma 0x5cf54
+> Start address 0x0, load size 381972
+> Transfer rate: 23313 KB/sec, 2021 bytes/write.
+> (gdb) c
+> Continuing.
+> ^C
+> 
+> 
+> So any breakpoint or Ctrl-C asserts the QEMU.
+> 
+> qemu-system-aarch64: qemu-3.1.0-rc2/hw/net/cadence_gem.c:982: gem_receive:
+> Assertion `!first_desc' failed.
+> 
+> 
+> Our networking demo application running fine unless you interrupt the GDB
+> (either with breakpoints or interrupt signal).
+> You can see following message on QEMU console which is the indication of
+> demo is fine (it also well tested on actual hardware)
+> 
+> Open the following Nucleus node address in your web browser:
+>     http://127.0.0.1:8080/
+> 
+> 
+> I'm attaching demo application binary.
+> 
+> 
+> 
+> 
+> Thanks for care about this issue,
+> -Bilal
+> 
+> 
+> 
+> On 11/23/2018 01:59 PM, Peter Maydell wrote:
+> > On 23 November 2018 at 04:13, mbilal <muhammad_bilal@mentor.com> wrote:
+> > > Hi,
+> > > 
+> > > I'm using qemu emulation for xilinx zcu102 platform, this board have four
+> > > networking GEM0, GEM1, GEM2 and GEM3 devices.
+> > > 
+> > > To run network demo on this board *only* require GEM3 device to be configure
+> > > while other GEM devices don't need to be configure, that's why u-boot and
+> > > other RTOS only configure GEM3 device.
+> > > 
+> > > 
+> > > QEMU is enabling these GEM devices  with networking '-net nic' option and
+> > > QEMU consider first '-net nic' option for GEM0 and second '-net nic' option
+> > > for GEM1 and so on. that's why if need to enable GEM3 network device we must
+> > > need to give following full command line options
+> > > 
+> > > -net nic -net nic -net nic -net nic -net user, ...
+> > > 
+> > > In this way all four GEM devices would be enable but first three GEM0-GEM2
+> > > devices are un-configured and useless. In our case QEMU is being *crashed*
+> > > due to trying to use these un-configured GEM devices to o send/receive GDB
+> > > breakoint/interrupt cause. IIUC QEMU uses first device in the -nic loop
+> > > i.e
+> > > 
+> > > qemu-system-aarch64: hw/net/cadence_gem.c:921: gem_receive: Assertion
+> > > `!first_desc' failed.
+> > 
+> > If QEMU asserts like this, this is a bug in QEMU. I've cc'd
+> > the maintainers of the Xilinx board.
+> > 
+> > Could you provide a complete set of instructions to reproduce
+> > this bug, please ? (full command line, guest image, etc)
+> > 
+> > Could you also tell us which version of QEMU you are using?
+> > If possible, try with the current git master or
+> > with the 3.1 rc2 release candidate we've just put out, to
+> > see if it's already been fixed.
+> > 
+> > thanks
+> > -- PMM
+> > 
