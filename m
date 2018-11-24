@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gQPZq-0003Cd-Th
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 23:29:55 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1gQSFO-00062T-8I
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 02:21:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gQPZn-0006M4-MD
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 23:29:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33570)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gQPZn-0006LE-G3
-	for qemu-devel@nongnu.org; Fri, 23 Nov 2018 23:29:51 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gQPZl-0006SZ-9B
-	for <qemu-devel@nongnu.org>; Sat, 24 Nov 2018 04:29:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 367D32E80C8
-	for <qemu-devel@nongnu.org>; Sat, 24 Nov 2018 04:29:49 +0000 (UTC)
+	(envelope-from <gengdongjiu@huawei.com>) id 1gQS9k-0001mu-6p
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 02:15:09 -0500
+References: <0184EA26B2509940AA629AE1405DD7F201F7BBE8@DGGEMA503-MBX.china.huawei.com>
+	<CAFEAcA_abaoxA=myPszVrO59-hSazHAePRJXUCHKSFnoEdsfiw@mail.gmail.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <997764b7-64b6-20f4-a38d-baefb055cff9@huawei.com>
+Date: Sat, 24 Nov 2018 15:14:36 +0800
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_abaoxA=myPszVrO59-hSazHAePRJXUCHKSFnoEdsfiw@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 24 Nov 2018 04:17:18 -0000
-From: Launchpad Bug Tracker <1498144@bugs.launchpad.net>
-Reply-To: Bug 1498144 <1498144@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150921190459.9354.26190.malonedeb@gac.canonical.com>
-Message-Id: <154303304039.13818.3742370890628333116.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1498144] Re: Failure booting hurd with
- qemu-system-i386 on ARM
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RESEND v15 08/10] target-arm: kvm64: inject
+ synchronous External Abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,64 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard
+	Henderson <rth@twiddle.net>, Zheng Xiang <zhengxiang9@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Hi Peter,
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+On 2018/11/24 2:45, Peter Maydell wrote:
+> On Wed, 21 Nov 2018 at 14:34, gengdongjiu <gengdongjiu@huawei.com> wrote:
+>>
+>> Hi Peter,
+>>   Thanks for the review and comments.
+>>
+>>>
+>>> On 8 November 2018 at 10:29, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+>>>> +bool write_part_cpustate_to_list(ARMCPU *cpu, ptrdiff_t fieldoffset)
+>>>
+>>> What is this about? Nothing else in QEMU needs to mess with the cpustate synchronization. My first assumption is that you should not
+>>> need to do so either.
+>>
+>> We should change the guest CP15 ESR_EL1's value, the only method is to change the cpu->cpreg_values[] in QEMU, then QEMU call write_list_to_kvmstate()
+>> to set the cpu->cpreg_values[] to KVM which include the specified ESR_EL1 value, KVM do world switch, and then set the specified ESR_EL1's value to guest kernel.
+> 
+> Ah, I see. This is a bug in our current handling of the register
+> state, where we implicitly assume that nothing in QEMU will ever
+> want to change any system register values. This assumption is
+> now false -- kvm_arm_handle_debug() broke it -- so we need to
+> fix the code that does kvm_arch_put_registers(). There is a comment
+> in the kvm32.c version of that function about this. (The kvm64.c
+> version has the same assumption but doesn't comment on it.)
+> 
+> We should (ideally) fix this bug in the code that does register
+> syncing, without requiring places in QEMU that update system
+> registers to have to manually indicate which registers they have
+> changed. I'll have a think about how best to do this.
 
--- =
+Ok, it is great that you will think about it, waiting for your wonderful solution
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1498144
+> 
+>> About the detailed explanation, as shown in [2].
+>>
+>> kvm_arm_handle_debug() does not need to do this because QEMU does not need to change CP15 registers, such as ESR_EL1.
+> 
+> kvm_arm_handle_debug does change ESR_EL1: it is injecting an exception
+> and so should set the exception register. This happens when it
+> calls the do_interrupt() hook, because arm_cpu_do_interrupt_aarch64()
+> writes to env->cp15.esr_el[new_el].
 
-Title:
-   Failure booting hurd with qemu-system-i386 on ARM
+Yes, I see it, but the env->cp15.esr_el[new_el] shouldn't be successfully set to KVM when call kvm_arch_put_registers()
 
-Status in QEMU:
-  Expired
+> 
+> I'm not entirely sure why this is working today, in fact.
+> Alex, did you test whether our debug-exception-injection
+> reports the correct ESR_EL1 to the guest ?
 
-Bug description:
-  Trying to boot debian-hurd-20150320.img ends with:
+Alex?
 
-  qemu-system-i386: qemu-coroutine-lock.c:91: qemu_co_queue_restart_all:
-  Assertion `qemu_in_coroutine()' failed.
+> 
+>>>> +/* Inject synchronous external abort */ static void
+>>>> +kvm_inject_arm_sea(CPUState *c) {
+>>>> +    ARMCPU *cpu = ARM_CPU(c);
+>>>> +    CPUARMState *env = &cpu->env;
+>>>> +    CPUClass *cc = CPU_GET_CLASS(c);
+>>>> +    uint32_t esr;
+>>>> +    int ret;
+>>>> +
+>>>> +    /* This exception is synchronous data abort */
+>>>> +    c->exception_index = EXCP_DATA_ABORT;
+>>>> +    /* Inject the exception to guest EL1 */
+>>>> +    env->exception.target_el = 1;
+>>>
+>>> These comments don't tell us anything that the code does not.
+>>
+>>  Thanks, do you mean I need to remove it or add more detailed comments to it?
+> 
+> As a rule of thumb, comments should provide information to
+> the reader which they wouldn't get if they only had the code.
+> Comments often answer the "why do we do this" question, or
+> provide an overall summary of what the code is going to do,
+> or refer to an external source (a datasheet, an algorithm)
+> that is necessary to understand the code. It's better to
+> avoid comments that say "what the code is doing" at a line-by-line
+> level, because the code itself already answers the "what"
+> question at that level of detail.
 
-  Program received signal SIGABRT, Aborted.
-  __libc_do_syscall ()
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../ports/sysdeps/unix/sysv/linux/arm/libc-do-s=
-yscall.S:44
-  44      ../ports/sysdeps/unix/sysv/linux/arm/libc-do-syscall.S: No such f=
-ile or directory.
-  (gdb) bt
-  #0  __libc_do_syscall ()
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../ports/sysdeps/unix/sysv/linux/arm/libc-do-s=
-yscall.S:44
-  #1  0xb6ef8f0e in __GI_raise (sig=3Dsig@entry=3D6)
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
-  #2  0xb6efb766 in __GI_abort () at abort.c:89
-  #3  0xb6ef4150 in __assert_fail_base (
-  =C2=A0=C2=A0=C2=A0=C2=A0fmt=3D0x1 <error: Cannot access memory at address=
- 0x1>,
-  =C2=A0=C2=A0=C2=A0=C2=A0assertion=3D0x7f89a234 "qemu_in_coroutine()", ass=
-ertion@entry=3D0x0,
-  =C2=A0=C2=A0=C2=A0=C2=A0file=3D0x7f89da58 "qemu-coroutine-lock.c", file@e=
-ntry=3D0xb5660000 "\001",
-  =C2=A0=C2=A0=C2=A0=C2=A0line=3D91, line@entry=3D3069931692,
-  =C2=A0=C2=A0=C2=A0=C2=A0function=3Dfunction@entry=3D0x7f89ab78 "qemu_co_q=
-ueue_restart_all")
-  =C2=A0=C2=A0=C2=A0=C2=A0at assert.c:92
-  #4  0xb6ef41e6 in __GI___assert_fail (assertion=3D0x0, file=3D0xb5660000 =
-"\001",
-  =C2=A0=C2=A0=C2=A0=C2=A0line=3D3069931692, function=3D0x7f89ab78 "qemu_co=
-_queue_restart_all")
-  =C2=A0=C2=A0=C2=A0=C2=A0at assert.c:101
-  #5  0x7f59a6b4 in ?? ()
+sure, got it, thanks for the explanation and guidelines.
 
-  I was using the same setup as in Bug 893208 (i.e git checkout from
-  2015-09-15, armv7 Odroid C1)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1498144/+subscriptions
+> 
+> thanks
+> -- PMM
+> 
+> .
+> 
