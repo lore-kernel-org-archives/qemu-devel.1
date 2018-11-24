@@ -1,16 +1,20 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:52498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTUI-0002Xf-E0
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:40:27 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTUJ-0002Xf-9M
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:40:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTSb-0000JH-Ld
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:38:42 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTSb-0000HR-40
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:38:41 -0500
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Sun, 25 Nov 2018 01:00:16 +0800
-Message-Id: <1543078821-16636-6-git-send-email-peng.hao2@zte.com.cn>
+Date: Sun, 25 Nov 2018 01:00:12 +0800
+Message-Id: <1543078821-16636-2-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1543078821-16636-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1543078821-16636-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V8 05/10] hw/arm/virt: Use the pvpanic device
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH V8 01/10] hw/misc/pvpanic: Build the pvpanic
+ device in $(common-obj)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,89 +26,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-Add pvpanic device in arm virt machine.
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+The 'pvpanic' ISA device can be use by any machine with an ISA bus.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- default-configs/arm-softmmu.mak |  1 +
- hw/arm/virt.c                   | 22 ++++++++++++++++++++++
- include/hw/arm/virt.h           |  1 +
- 3 files changed, 24 insertions(+)
+ hw/misc/Makefile.objs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 2420491..50345df 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -159,3 +159,4 @@ CONFIG_PCI_DESIGNWARE=y
- CONFIG_STRONGARM=y
- CONFIG_HIGHBANK=y
- CONFIG_MUSICPAL=y
-+CONFIG_PVPANIC=y
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index a2b8d8f..899131a 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -59,6 +59,7 @@
- #include "qapi/visitor.h"
- #include "standard-headers/linux/input.h"
- #include "hw/arm/smmuv3.h"
-+#include "hw/misc/pvpanic.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -143,6 +144,7 @@ static const MemMapEntry a15memmap[] = {
-     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
-     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
-     [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
-+    [VIRT_PVPANIC] =            { 0x09070000, 0x00000002 },
-     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
-     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
-     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-@@ -190,6 +192,24 @@ static bool cpu_type_valid(const char *cpu)
-     return false;
- }
- 
-+static void create_pvpanic_device(const VirtMachineState *vms)
-+{
-+     char *nodename;
-+     hwaddr base = vms->memmap[VIRT_PVPANIC].base;
-+     hwaddr size = vms->memmap[VIRT_PVPANIC].size;
-+
-+     sysbus_create_simple(TYPE_PVPANIC_MMIO, base, NULL);
-+
-+     nodename = g_strdup_printf("/pvpanic-mmio@%" PRIx64, base);
-+     qemu_fdt_add_subnode(vms->fdt, nodename);
-+     qemu_fdt_setprop_string(vms->fdt, nodename,
-+                             "compatible", "qemu,pvpanic-mmio");
-+     qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-+                                  2, base, 2, size);
-+
-+     g_free(nodename);
-+}
-+
- static void create_fdt(VirtMachineState *vms)
- {
-     void *fdt = create_device_tree(&vms->fdt_size);
-@@ -1531,6 +1551,8 @@ static void machvirt_init(MachineState *machine)
- 
-     create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
- 
-+    create_pvpanic_device(vms);
-+
-     create_gic(vms, pic);
- 
-     fdt_add_pmu_nodes(vms);
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 4cc57a7..937c124 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -66,6 +66,7 @@ enum {
-     VIRT_GIC_REDIST,
-     VIRT_GIC_REDIST2,
-     VIRT_SMMU,
-+    VIRT_PVPANIC,
-     VIRT_UART,
-     VIRT_MMIO,
-     VIRT_RTC,
--- 
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 680350b..c387ce4 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -8,6 +8,7 @@ common-obj-$(CONFIG=5FISA=5FTESTDEV) +=3D pc-testdev.o
+ common-obj-$(CONFIG=5FPCI=5FTESTDEV) +=3D pci-testdev.o
+ common-obj-$(CONFIG=5FEDU) +=3D edu.o
+ common-obj-$(CONFIG=5FPCA9552) +=3D pca9552.o
++common-obj-$(CONFIG=5FPVPANIC) +=3D pvpanic.o
+=20
+ common-obj-y +=3D unimp.o
+ common-obj-$(CONFIG=5FFW=5FCFG=5FDMA) +=3D vmcoreinfo.o
+@@ -70,7 +71,6 @@ obj-$(CONFIG=5FIOTKIT=5FSECCTL) +=3D iotkit-secctl.o
+ obj-$(CONFIG=5FIOTKIT=5FSYSCTL) +=3D iotkit-sysctl.o
+ obj-$(CONFIG=5FIOTKIT=5FSYSINFO) +=3D iotkit-sysinfo.o
+=20
+-obj-$(CONFIG=5FPVPANIC) +=3D pvpanic.o
+ obj-$(CONFIG=5FAUX) +=3D auxbus.o
+ obj-$(CONFIG=5FASPEED=5FSOC) +=3D aspeed=5Fscu.o aspeed=5Fsdmc.o
+ obj-$(CONFIG=5FMSF2) +=3D msf2-sysreg.o
+--=20
 1.8.3.1
