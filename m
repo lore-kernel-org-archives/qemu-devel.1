@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gQhmV-0003G3-UI
+	(envelope-from <cota@braap.org>) id 1gQhmV-0003G4-U6
 	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gQhmQ-0005EY-Qh
+	(envelope-from <cota@braap.org>) id 1gQhmU-0005aP-Bx
 	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:11 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:36303)
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:45413)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gQhmP-0004eq-KX
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:06 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gQhmU-0005Fp-2X
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:10 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sat, 24 Nov 2018 18:55:42 -0500
-Message-Id: <20181124235553.17371-3-cota@braap.org>
+Date: Sat, 24 Nov 2018 18:55:44 -0500
+Message-Id: <20181124235553.17371-5-cota@braap.org>
 In-Reply-To: <20181124235553.17371-1-cota@braap.org>
 References: <20181124235553.17371-1-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 02/13] softfloat: add float{32, 64}_is_{de,
- }normal
+Subject: [Qemu-devel] [PATCH v6 04/13] softfloat: rename canonicalize to
+ sf_canonicalize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +27,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
 
-This paves the way for upcoming work.
+glibc >= 2.25 defines canonicalize in commit eaf5ad0
+(Add canonicalize, canonicalizef, canonicalizel., 2016-10-26).
 
-Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Given that we'll be including <math.h> soon, prepare
+for this by prefixing our canonicalize() with sf_ to avoid
+clashing with the libc's canonicalize().
+
+Reported-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Tested-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/fpu/softfloat.h | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ fpu/softfloat.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 8fd9f9bbae..9eeccd88a5 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -464,6 +464,16 @@ static inline int float32_is_zero_or_denormal(float32 a)
-     return (float32_val(a) & 0x7f800000) == 0;
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index e1eef954e6..ecdc00c633 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -336,8 +336,8 @@ static inline float64 float64_pack_raw(FloatParts p)
+ #include "softfloat-specialize.h"
+ 
+ /* Canonicalize EXP and FRAC, setting CLS.  */
+-static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
+-                               float_status *status)
++static FloatParts sf_canonicalize(FloatParts part, const FloatFmt *parm,
++                                  float_status *status)
+ {
+     if (part.exp == parm->exp_max && !parm->arm_althp) {
+         if (part.frac == 0) {
+@@ -513,7 +513,7 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
+ static FloatParts float16a_unpack_canonical(float16 f, float_status *s,
+                                             const FloatFmt *params)
+ {
+-    return canonicalize(float16_unpack_raw(f), params, s);
++    return sf_canonicalize(float16_unpack_raw(f), params, s);
  }
  
-+static inline bool float32_is_normal(float32 a)
-+{
-+    return ((float32_val(a) + 0x00800000) & 0x7fffffff) >= 0x01000000;
-+}
-+
-+static inline bool float32_is_denormal(float32 a)
-+{
-+    return float32_is_zero_or_denormal(a) && !float32_is_zero(a);
-+}
-+
- static inline float32 float32_set_sign(float32 a, int sign)
+ static FloatParts float16_unpack_canonical(float16 f, float_status *s)
+@@ -534,7 +534,7 @@ static float16 float16_round_pack_canonical(FloatParts p, float_status *s)
+ 
+ static FloatParts float32_unpack_canonical(float32 f, float_status *s)
  {
-     return make_float32((float32_val(a) & 0x7fffffff) | (sign << 31));
-@@ -605,6 +615,16 @@ static inline int float64_is_zero_or_denormal(float64 a)
-     return (float64_val(a) & 0x7ff0000000000000LL) == 0;
+-    return canonicalize(float32_unpack_raw(f), &float32_params, s);
++    return sf_canonicalize(float32_unpack_raw(f), &float32_params, s);
  }
  
-+static inline bool float64_is_normal(float64 a)
-+{
-+    return ((float64_val(a) + (1ULL << 52)) & -1ULL >> 1) >= 1ULL << 53;
-+}
-+
-+static inline bool float64_is_denormal(float64 a)
-+{
-+    return float64_is_zero_or_denormal(a) && !float64_is_zero(a);
-+}
-+
- static inline float64 float64_set_sign(float64 a, int sign)
+ static float32 float32_round_pack_canonical(FloatParts p, float_status *s)
+@@ -544,7 +544,7 @@ static float32 float32_round_pack_canonical(FloatParts p, float_status *s)
+ 
+ static FloatParts float64_unpack_canonical(float64 f, float_status *s)
  {
-     return make_float64((float64_val(a) & 0x7fffffffffffffffULL)
+-    return canonicalize(float64_unpack_raw(f), &float64_params, s);
++    return sf_canonicalize(float64_unpack_raw(f), &float64_params, s);
+ }
+ 
+ static float64 float64_round_pack_canonical(FloatParts p, float_status *s)
 -- 
 2.17.1
