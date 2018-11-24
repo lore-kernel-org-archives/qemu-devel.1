@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gQhmj-0003R1-Ay
+	(envelope-from <cota@braap.org>) id 1gQhmj-0003R0-As
 	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gQhme-0006e7-AO
+	(envelope-from <cota@braap.org>) id 1gQhme-0006eH-Cl
 	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:25 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:41825)
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:57461)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gQhme-0005Fk-2M
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gQhme-0005Fn-4o
 	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:20 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sat, 24 Nov 2018 18:55:48 -0500
-Message-Id: <20181124235553.17371-9-cota@braap.org>
+Date: Sat, 24 Nov 2018 18:55:47 -0500
+Message-Id: <20181124235553.17371-8-cota@braap.org>
 In-Reply-To: <20181124235553.17371-1-cota@braap.org>
 References: <20181124235553.17371-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v6 08/13] hardfloat: implement float32/64
- addition and subtraction
+Subject: [Qemu-devel] [PATCH v6 07/13] fpu: introduce hardfloat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,216 +26,369 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
 
-Performance results (single and double precision) for fp-bench:
+The appended paves the way for leveraging the host FPU for a subset
+of guest FP operations. For most guest workloads (e.g. FP flags
+aren't ever cleared, inexact occurs often and rounding is set to the
+default [to nearest]) this will yield sizable performance speedups.
 
-1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-- before:
-add-single: 135.07 MFlops
-add-double: 131.60 MFlops
-sub-single: 130.04 MFlops
-sub-double: 133.01 MFlops
-- after:
-add-single: 443.04 MFlops
-add-double: 301.95 MFlops
-sub-single: 411.36 MFlops
-sub-double: 293.15 MFlops
+The approach followed here avoids checking the FP exception flags register.
+See the added comment for details.
 
-2. ARM Aarch64 A57 @ 2.4GHz
-- before:
-add-single: 44.79 MFlops
-add-double: 49.20 MFlops
-sub-single: 44.55 MFlops
-sub-double: 49.06 MFlops
-- after:
-add-single: 93.28 MFlops
-add-double: 88.27 MFlops
-sub-single: 91.47 MFlops
-sub-double: 88.27 MFlops
+This assumes that QEMU is running on an IEEE754-compliant FPU and
+that the rounding is set to the default (to nearest). The
+implementation-dependent specifics of the FPU should not matter; things
+like tininess detection and snan representation are still dealt with in
+soft-fp. However, this approach will break on most hosts if we compile
+QEMU with flags such as -ffast-math. We control the flags so this should
+be easy to enforce though.
 
-3. IBM POWER8E @ 2.1 GHz
-- before:
-add-single: 72.59 MFlops
-add-double: 72.27 MFlops
-sub-single: 75.33 MFlops
-sub-double: 70.54 MFlops
-- after:
-add-single: 112.95 MFlops
-add-double: 201.11 MFlops
-sub-single: 116.80 MFlops
-sub-double: 188.72 MFlops
+This patch just adds common code. Some operations will be migrated
+to hardfloat in subsequent patches to ease bisection.
 
-Note that the IBM and ARM machines benefit from having
-HARDFLOAT_2F{32,64}_USE_FP set to 0. Otherwise their performance
-can suffer significantly:
-- IBM Power8:
-add-single: [1] 54.94 vs [0] 116.37 MFlops
-add-double: [1] 58.92 vs [0] 201.44 MFlops
-- Aarch64 A57:
-add-single: [1] 80.72 vs [0] 93.24 MFlops
-add-double: [1] 82.10 vs [0] 88.18 MFlops
-
-On the Intel machine, having 2F64 set to 1 pays off, but it
-doesn't for 2F32:
-- Intel i7-6700K:
-add-single: [1] 285.79 vs [0] 426.70 MFlops
-add-double: [1] 302.15 vs [0] 278.82 MFlops
+Note: some architectures (at least PPC, there might be others) clear
+the status flags passed to softfloat before most FP operations. This
+precludes the use of hardfloat, so to avoid introducing a performance
+regression for those targets, we add a flag to disable hardfloat.
+In the long run though it would be good to fix the targets so that
+at least the inexact flag passed to softfloat is indeed sticky.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- fpu/softfloat.c | 117 ++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 98 insertions(+), 19 deletions(-)
+ fpu/softfloat.c | 315 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 315 insertions(+)
 
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 306a12fa8d..cc500b1618 100644
+index ecdc00c633..306a12fa8d 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -1050,49 +1050,128 @@ float16 QEMU_FLATTEN float16_add(float16 a, float16 b, float_status *status)
-     return float16_round_pack_canonical(pr, status);
- }
+@@ -83,6 +83,7 @@ this code that are retained.
+  * target-dependent and needs the TARGET_* macros.
+  */
+ #include "qemu/osdep.h"
++#include <math.h>
+ #include "qemu/bitops.h"
+ #include "fpu/softfloat.h"
  
--float32 QEMU_FLATTEN float32_add(float32 a, float32 b, float_status *status)
-+float16 QEMU_FLATTEN float16_sub(float16 a, float16 b, float_status *status)
-+{
-+    FloatParts pa = float16_unpack_canonical(a, status);
-+    FloatParts pb = float16_unpack_canonical(b, status);
-+    FloatParts pr = addsub_floats(pa, pb, true, status);
+@@ -95,6 +96,320 @@ this code that are retained.
+ *----------------------------------------------------------------------------*/
+ #include "fpu/softfloat-macros.h"
+ 
++/*
++ * Hardfloat
++ *
++ * Fast emulation of guest FP instructions is challenging for two reasons.
++ * First, FP instruction semantics are similar but not identical, particularly
++ * when handling NaNs. Second, emulating at reasonable speed the guest FP
++ * exception flags is not trivial: reading the host's flags register with a
++ * feclearexcept & fetestexcept pair is slow [slightly slower than soft-fp],
++ * and trapping on every FP exception is not fast nor pleasant to work with.
++ *
++ * We address these challenges by leveraging the host FPU for a subset of the
++ * operations. To do this we expand on the idea presented in this paper:
++ *
++ * Guo, Yu-Chuan, et al. "Translating the ARM Neon and VFP instructions in a
++ * binary translator." Software: Practice and Experience 46.12 (2016):1591-1615.
++ *
++ * The idea is thus to leverage the host FPU to (1) compute FP operations
++ * and (2) identify whether FP exceptions occurred while avoiding
++ * expensive exception flag register accesses.
++ *
++ * An important optimization shown in the paper is that given that exception
++ * flags are rarely cleared by the guest, we can avoid recomputing some flags.
++ * This is particularly useful for the inexact flag, which is very frequently
++ * raised in floating-point workloads.
++ *
++ * We optimize the code further by deferring to soft-fp whenever FP exception
++ * detection might get hairy. Two examples: (1) when at least one operand is
++ * denormal/inf/NaN; (2) when operands are not guaranteed to lead to a 0 result
++ * and the result is < the minimum normal.
++ */
++#define GEN_INPUT_FLUSH__NOCHECK(name, soft_t)                          \
++    static inline void name(soft_t *a, float_status *s)                 \
++    {                                                                   \
++        if (unlikely(soft_t ## _is_denormal(*a))) {                     \
++            *a = soft_t ## _set_sign(soft_t ## _zero,                   \
++                                     soft_t ## _is_neg(*a));            \
++            s->float_exception_flags |= float_flag_input_denormal;      \
++        }                                                               \
++    }
 +
-+    return float16_round_pack_canonical(pr, status);
++GEN_INPUT_FLUSH__NOCHECK(float32_input_flush__nocheck, float32)
++GEN_INPUT_FLUSH__NOCHECK(float64_input_flush__nocheck, float64)
++#undef GEN_INPUT_FLUSH__NOCHECK
++
++#define GEN_INPUT_FLUSH1(name, soft_t)                  \
++    static inline void name(soft_t *a, float_status *s) \
++    {                                                   \
++        if (likely(!s->flush_inputs_to_zero)) {         \
++            return;                                     \
++        }                                               \
++        soft_t ## _input_flush__nocheck(a, s);          \
++    }
++
++GEN_INPUT_FLUSH1(float32_input_flush1, float32)
++GEN_INPUT_FLUSH1(float64_input_flush1, float64)
++#undef GEN_INPUT_FLUSH1
++
++#define GEN_INPUT_FLUSH2(name, soft_t)                                  \
++    static inline void name(soft_t *a, soft_t *b, float_status *s)      \
++    {                                                                   \
++        if (likely(!s->flush_inputs_to_zero)) {                         \
++            return;                                                     \
++        }                                                               \
++        soft_t ## _input_flush__nocheck(a, s);                          \
++        soft_t ## _input_flush__nocheck(b, s);                          \
++    }
++
++GEN_INPUT_FLUSH2(float32_input_flush2, float32)
++GEN_INPUT_FLUSH2(float64_input_flush2, float64)
++#undef GEN_INPUT_FLUSH2
++
++#define GEN_INPUT_FLUSH3(name, soft_t)                                  \
++    static inline void name(soft_t *a, soft_t *b, soft_t *c, float_status *s) \
++    {                                                                   \
++        if (likely(!s->flush_inputs_to_zero)) {                         \
++            return;                                                     \
++        }                                                               \
++        soft_t ## _input_flush__nocheck(a, s);                          \
++        soft_t ## _input_flush__nocheck(b, s);                          \
++        soft_t ## _input_flush__nocheck(c, s);                          \
++    }
++
++GEN_INPUT_FLUSH3(float32_input_flush3, float32)
++GEN_INPUT_FLUSH3(float64_input_flush3, float64)
++#undef GEN_INPUT_FLUSH3
++
++/*
++ * Choose whether to use fpclassify or float32/64_* primitives in the generated
++ * hardfloat functions. Each combination of number of inputs and float size
++ * gets its own value.
++ */
++#if defined(__x86_64__)
++# define QEMU_HARDFLOAT_1F32_USE_FP 0
++# define QEMU_HARDFLOAT_1F64_USE_FP 1
++# define QEMU_HARDFLOAT_2F32_USE_FP 0
++# define QEMU_HARDFLOAT_2F64_USE_FP 1
++# define QEMU_HARDFLOAT_3F32_USE_FP 0
++# define QEMU_HARDFLOAT_3F64_USE_FP 1
++#else
++# define QEMU_HARDFLOAT_1F32_USE_FP 0
++# define QEMU_HARDFLOAT_1F64_USE_FP 0
++# define QEMU_HARDFLOAT_2F32_USE_FP 0
++# define QEMU_HARDFLOAT_2F64_USE_FP 0
++# define QEMU_HARDFLOAT_3F32_USE_FP 0
++# define QEMU_HARDFLOAT_3F64_USE_FP 0
++#endif
++
++/*
++ * QEMU_HARDFLOAT_USE_ISINF chooses whether to use isinf() over
++ * float{32,64}_is_infinity when !USE_FP.
++ * On x86_64/aarch64, using the former over the latter can yield a ~6% speedup.
++ * On power64 however, using isinf() reduces fp-bench performance by up to 50%.
++ */
++#if defined(__x86_64__) || defined(__aarch64__)
++# define QEMU_HARDFLOAT_USE_ISINF   1
++#else
++# define QEMU_HARDFLOAT_USE_ISINF   0
++#endif
++
++/*
++ * Some targets clear the FP flags before most FP operations. This prevents
++ * the use of hardfloat, since hardfloat relies on the inexact flag being
++ * already set.
++ */
++#if defined(TARGET_PPC)
++# define QEMU_NO_HARDFLOAT 1
++# define QEMU_SOFTFLOAT_ATTR QEMU_FLATTEN
++#else
++# define QEMU_NO_HARDFLOAT 0
++# define QEMU_SOFTFLOAT_ATTR QEMU_FLATTEN __attribute__((noinline))
++#endif
++
++static inline bool can_use_fpu(const float_status *s)
++{
++    if (QEMU_NO_HARDFLOAT) {
++        return false;
++    }
++    return likely(s->float_exception_flags & float_flag_inexact &&
++                  s->float_rounding_mode == float_round_nearest_even);
 +}
 +
-+static float32 QEMU_SOFTFLOAT_ATTR
-+soft_f32_addsub(float32 a, float32 b, bool subtract, float_status *status)
- {
-     FloatParts pa = float32_unpack_canonical(a, status);
-     FloatParts pb = float32_unpack_canonical(b, status);
--    FloatParts pr = addsub_floats(pa, pb, false, status);
-+    FloatParts pr = addsub_floats(pa, pb, subtract, status);
- 
-     return float32_round_pack_canonical(pr, status);
- }
- 
--float64 QEMU_FLATTEN float64_add(float64 a, float64 b, float_status *status)
-+static inline float32 soft_f32_add(float32 a, float32 b, float_status *status)
-+{
-+    return soft_f32_addsub(a, b, false, status);
-+}
++/*
++ * Hardfloat generation functions. Each operation can have two flavors:
++ * either using softfloat primitives (e.g. float32_is_zero_or_normal) for
++ * most condition checks, or native ones (e.g. fpclassify).
++ *
++ * The flavor is chosen by the callers. Instead of using macros, we rely on the
++ * compiler to propagate constants and inline everything into the callers.
++ *
++ * We only generate functions for operations with two inputs, since only
++ * these are common enough to justify consolidating them into common code.
++ */
 +
-+static inline float32 soft_f32_sub(float32 a, float32 b, float_status *status)
-+{
-+    return soft_f32_addsub(a, b, true, status);
-+}
++typedef union {
++    float32 s;
++    float h;
++} union_float32;
 +
-+static float64 QEMU_SOFTFLOAT_ATTR
-+soft_f64_addsub(float64 a, float64 b, bool subtract, float_status *status)
- {
-     FloatParts pa = float64_unpack_canonical(a, status);
-     FloatParts pb = float64_unpack_canonical(b, status);
--    FloatParts pr = addsub_floats(pa, pb, false, status);
-+    FloatParts pr = addsub_floats(pa, pb, subtract, status);
- 
-     return float64_round_pack_canonical(pr, status);
- }
- 
--float16 QEMU_FLATTEN float16_sub(float16 a, float16 b, float_status *status)
-+static inline float64 soft_f64_add(float64 a, float64 b, float_status *status)
- {
--    FloatParts pa = float16_unpack_canonical(a, status);
--    FloatParts pb = float16_unpack_canonical(b, status);
--    FloatParts pr = addsub_floats(pa, pb, true, status);
-+    return soft_f64_addsub(a, b, false, status);
-+}
- 
--    return float16_round_pack_canonical(pr, status);
-+static inline float64 soft_f64_sub(float64 a, float64 b, float_status *status)
-+{
-+    return soft_f64_addsub(a, b, true, status);
- }
- 
--float32 QEMU_FLATTEN float32_sub(float32 a, float32 b, float_status *status)
-+static float hard_f32_add(float a, float b)
- {
--    FloatParts pa = float32_unpack_canonical(a, status);
--    FloatParts pb = float32_unpack_canonical(b, status);
--    FloatParts pr = addsub_floats(pa, pb, true, status);
-+    return a + b;
-+}
- 
--    return float32_round_pack_canonical(pr, status);
-+static float hard_f32_sub(float a, float b)
-+{
-+    return a - b;
- }
- 
--float64 QEMU_FLATTEN float64_sub(float64 a, float64 b, float_status *status)
-+static double hard_f64_add(double a, double b)
- {
--    FloatParts pa = float64_unpack_canonical(a, status);
--    FloatParts pb = float64_unpack_canonical(b, status);
--    FloatParts pr = addsub_floats(pa, pb, true, status);
-+    return a + b;
-+}
- 
--    return float64_round_pack_canonical(pr, status);
-+static double hard_f64_sub(double a, double b)
-+{
-+    return a - b;
-+}
++typedef union {
++    float64 s;
++    double h;
++} union_float64;
 +
-+static bool f32_addsub_post(union_float32 a, union_float32 b)
++typedef bool (*f32_check_fn)(union_float32 a, union_float32 b);
++typedef bool (*f64_check_fn)(union_float64 a, union_float64 b);
++
++typedef float32 (*soft_f32_op2_fn)(float32 a, float32 b, float_status *s);
++typedef float64 (*soft_f64_op2_fn)(float64 a, float64 b, float_status *s);
++typedef float   (*hard_f32_op2_fn)(float a, float b);
++typedef double  (*hard_f64_op2_fn)(double a, double b);
++
++/* 2-input is-zero-or-normal */
++static inline bool f32_is_zon2(union_float32 a, union_float32 b)
 +{
 +    if (QEMU_HARDFLOAT_2F32_USE_FP) {
-+        return !(fpclassify(a.h) == FP_ZERO && fpclassify(b.h) == FP_ZERO);
++        /*
++         * Not using a temp variable for consecutive fpclassify calls ends up
++         * generating faster code.
++         */
++        return (fpclassify(a.h) == FP_NORMAL || fpclassify(a.h) == FP_ZERO) &&
++               (fpclassify(b.h) == FP_NORMAL || fpclassify(b.h) == FP_ZERO);
 +    }
-+    return !(float32_is_zero(a.s) && float32_is_zero(b.s));
++    return float32_is_zero_or_normal(a.s) &&
++           float32_is_zero_or_normal(b.s);
 +}
 +
-+static bool f64_addsub_post(union_float64 a, union_float64 b)
++static inline bool f64_is_zon2(union_float64 a, union_float64 b)
 +{
 +    if (QEMU_HARDFLOAT_2F64_USE_FP) {
-+        return !(fpclassify(a.h) == FP_ZERO && fpclassify(b.h) == FP_ZERO);
-+    } else {
-+        return !(float64_is_zero(a.s) && float64_is_zero(b.s));
++        return (fpclassify(a.h) == FP_NORMAL || fpclassify(a.h) == FP_ZERO) &&
++               (fpclassify(b.h) == FP_NORMAL || fpclassify(b.h) == FP_ZERO);
 +    }
++    return float64_is_zero_or_normal(a.s) &&
++           float64_is_zero_or_normal(b.s);
 +}
 +
-+static float32 float32_addsub(float32 a, float32 b, float_status *s,
-+                              hard_f32_op2_fn hard, soft_f32_op2_fn soft)
++/* 3-input is-zero-or-normal */
++static inline
++bool f32_is_zon3(union_float32 a, union_float32 b, union_float32 c)
 +{
-+    return float32_gen2(a, b, s, hard, soft,
-+                        f32_is_zon2, f32_addsub_post, NULL, NULL);
++    if (QEMU_HARDFLOAT_3F32_USE_FP) {
++        return (fpclassify(a.h) == FP_NORMAL || fpclassify(a.h) == FP_ZERO) &&
++               (fpclassify(b.h) == FP_NORMAL || fpclassify(b.h) == FP_ZERO) &&
++               (fpclassify(c.h) == FP_NORMAL || fpclassify(c.h) == FP_ZERO);
++    }
++    return float32_is_zero_or_normal(a.s) &&
++           float32_is_zero_or_normal(b.s) &&
++           float32_is_zero_or_normal(c.s);
 +}
 +
-+static float64 float64_addsub(float64 a, float64 b, float_status *s,
-+                              hard_f64_op2_fn hard, soft_f64_op2_fn soft)
++static inline
++bool f64_is_zon3(union_float64 a, union_float64 b, union_float64 c)
 +{
-+    return float64_gen2(a, b, s, hard, soft,
-+                        f64_is_zon2, f64_addsub_post, NULL, NULL);
++    if (QEMU_HARDFLOAT_3F64_USE_FP) {
++        return (fpclassify(a.h) == FP_NORMAL || fpclassify(a.h) == FP_ZERO) &&
++               (fpclassify(b.h) == FP_NORMAL || fpclassify(b.h) == FP_ZERO) &&
++               (fpclassify(c.h) == FP_NORMAL || fpclassify(c.h) == FP_ZERO);
++    }
++    return float64_is_zero_or_normal(a.s) &&
++           float64_is_zero_or_normal(b.s) &&
++           float64_is_zero_or_normal(c.s);
 +}
 +
-+float32 QEMU_FLATTEN
-+float32_add(float32 a, float32 b, float_status *s)
++static inline bool f32_is_inf(union_float32 a)
 +{
-+    return float32_addsub(a, b, s, hard_f32_add, soft_f32_add);
++    if (QEMU_HARDFLOAT_USE_ISINF) {
++        return isinff(a.h);
++    }
++    return float32_is_infinity(a.s);
 +}
 +
-+float32 QEMU_FLATTEN
-+float32_sub(float32 a, float32 b, float_status *s)
++static inline bool f64_is_inf(union_float64 a)
 +{
-+    return float32_addsub(a, b, s, hard_f32_sub, soft_f32_sub);
++    if (QEMU_HARDFLOAT_USE_ISINF) {
++        return isinf(a.h);
++    }
++    return float64_is_infinity(a.s);
 +}
 +
-+float64 QEMU_FLATTEN
-+float64_add(float64 a, float64 b, float_status *s)
++/* Note: @fast_test and @post can be NULL */
++static inline float32
++float32_gen2(float32 xa, float32 xb, float_status *s,
++             hard_f32_op2_fn hard, soft_f32_op2_fn soft,
++             f32_check_fn pre, f32_check_fn post,
++             f32_check_fn fast_test, soft_f32_op2_fn fast_op)
 +{
-+    return float64_addsub(a, b, s, hard_f64_add, soft_f64_add);
++    union_float32 ua, ub, ur;
++
++    ua.s = xa;
++    ub.s = xb;
++
++    if (unlikely(!can_use_fpu(s))) {
++        goto soft;
++    }
++
++    float32_input_flush2(&ua.s, &ub.s, s);
++    if (unlikely(!pre(ua, ub))) {
++        goto soft;
++    }
++    if (fast_test && fast_test(ua, ub)) {
++        return fast_op(ua.s, ub.s, s);
++    }
++
++    ur.h = hard(ua.h, ub.h);
++    if (unlikely(f32_is_inf(ur))) {
++        s->float_exception_flags |= float_flag_overflow;
++    } else if (unlikely(fabsf(ur.h) <= FLT_MIN)) {
++        if (post == NULL || post(ua, ub)) {
++            goto soft;
++        }
++    }
++    return ur.s;
++
++ soft:
++    return soft(ua.s, ub.s, s);
 +}
 +
-+float64 QEMU_FLATTEN
-+float64_sub(float64 a, float64 b, float_status *s)
++static inline float64
++float64_gen2(float64 xa, float64 xb, float_status *s,
++             hard_f64_op2_fn hard, soft_f64_op2_fn soft,
++             f64_check_fn pre, f64_check_fn post,
++             f64_check_fn fast_test, soft_f64_op2_fn fast_op)
 +{
-+    return float64_addsub(a, b, s, hard_f64_sub, soft_f64_sub);
- }
- 
- /*
++    union_float64 ua, ub, ur;
++
++    ua.s = xa;
++    ub.s = xb;
++
++    if (unlikely(!can_use_fpu(s))) {
++        goto soft;
++    }
++
++    float64_input_flush2(&ua.s, &ub.s, s);
++    if (unlikely(!pre(ua, ub))) {
++        goto soft;
++    }
++    if (fast_test && fast_test(ua, ub)) {
++        return fast_op(ua.s, ub.s, s);
++    }
++
++    ur.h = hard(ua.h, ub.h);
++    if (unlikely(f64_is_inf(ur))) {
++        s->float_exception_flags |= float_flag_overflow;
++    } else if (unlikely(fabs(ur.h) <= DBL_MIN)) {
++        if (post == NULL || post(ua, ub)) {
++            goto soft;
++        }
++    }
++    return ur.s;
++
++ soft:
++    return soft(ua.s, ub.s, s);
++}
++
+ /*----------------------------------------------------------------------------
+ | Returns the fraction bits of the half-precision floating-point value `a'.
+ *----------------------------------------------------------------------------*/
 -- 
 2.17.1
