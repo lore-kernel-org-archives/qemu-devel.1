@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gQhmV-0003G6-UM
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:13 -0500
+	(envelope-from <cota@braap.org>) id 1gQhmX-0003Gb-FT
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gQhmQ-0005Ey-Ra
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:11 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:40651)
+	(envelope-from <cota@braap.org>) id 1gQhmV-0005eN-SE
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:13 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:38477)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gQhmP-0004h0-Mo
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:06 -0500
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gQhmU-0005Gj-5i
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 18:56:10 -0500
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sat, 24 Nov 2018 18:55:43 -0500
-Message-Id: <20181124235553.17371-4-cota@braap.org>
+Date: Sat, 24 Nov 2018 18:55:52 -0500
+Message-Id: <20181124235553.17371-13-cota@braap.org>
 In-Reply-To: <20181124235553.17371-1-cota@braap.org>
 References: <20181124235553.17371-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v6 03/13] target/tricore: use
- float32_is_denormal
+Subject: [Qemu-devel] [PATCH v6 12/13] hardfloat: implement float32/64
+ square root
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +27,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Performance results for fp-bench:
+
+Host: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+- before:
+sqrt-single: 42.30 MFlops
+sqrt-double: 22.97 MFlops
+- after:
+sqrt-single: 311.42 MFlops
+sqrt-double: 311.08 MFlops
+
+Here USE_FP makes a huge difference for f64's, with throughput
+going from ~200 MFlops to ~300 MFlops.
+
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/tricore/fpu_helper.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ fpu/softfloat.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 58 insertions(+), 2 deletions(-)
 
-diff --git a/target/tricore/fpu_helper.c b/target/tricore/fpu_helper.c
-index df162902d6..31df462e4a 100644
---- a/target/tricore/fpu_helper.c
-+++ b/target/tricore/fpu_helper.c
-@@ -44,11 +44,6 @@ static inline uint8_t f_get_excp_flags(CPUTriCoreState *env)
-               | float_flag_inexact);
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index e03feafb6f..4c6ecd1883 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -3040,20 +3040,76 @@ float16 QEMU_FLATTEN float16_sqrt(float16 a, float_status *status)
+     return float16_round_pack_canonical(pr, status);
  }
  
--static inline bool f_is_denormal(float32 arg)
--{
--    return float32_is_zero_or_denormal(arg) && !float32_is_zero(arg);
--}
--
- static inline float32 f_maddsub_nan_result(float32 arg1, float32 arg2,
-                                            float32 arg3, float32 result,
-                                            uint32_t muladd_negate_c)
-@@ -260,8 +255,8 @@ uint32_t helper_fcmp(CPUTriCoreState *env, uint32_t r1, uint32_t r2)
-     set_flush_inputs_to_zero(0, &env->fp_status);
+-float32 QEMU_FLATTEN float32_sqrt(float32 a, float_status *status)
++static float32 QEMU_SOFTFLOAT_ATTR
++soft_f32_sqrt(float32 a, float_status *status)
+ {
+     FloatParts pa = float32_unpack_canonical(a, status);
+     FloatParts pr = sqrt_float(pa, status, &float32_params);
+     return float32_round_pack_canonical(pr, status);
+ }
  
-     result = 1 << (float32_compare_quiet(arg1, arg2, &env->fp_status) + 1);
--    result |= f_is_denormal(arg1) << 4;
--    result |= f_is_denormal(arg2) << 5;
-+    result |= float32_is_denormal(arg1) << 4;
-+    result |= float32_is_denormal(arg2) << 5;
+-float64 QEMU_FLATTEN float64_sqrt(float64 a, float_status *status)
++static float64 QEMU_SOFTFLOAT_ATTR
++soft_f64_sqrt(float64 a, float_status *status)
+ {
+     FloatParts pa = float64_unpack_canonical(a, status);
+     FloatParts pr = sqrt_float(pa, status, &float64_params);
+     return float64_round_pack_canonical(pr, status);
+ }
  
-     flags = f_get_excp_flags(env);
-     if (flags) {
++float32 QEMU_FLATTEN float32_sqrt(float32 xa, float_status *s)
++{
++    union_float32 ua, ur;
++
++    ua.s = xa;
++    if (unlikely(!can_use_fpu(s))) {
++        goto soft;
++    }
++
++    float32_input_flush1(&ua.s, s);
++    if (QEMU_HARDFLOAT_1F32_USE_FP) {
++        if (unlikely(!(fpclassify(ua.h) == FP_NORMAL ||
++                       fpclassify(ua.h) == FP_ZERO) ||
++                     signbit(ua.h))) {
++            goto soft;
++        }
++    } else if (unlikely(!float32_is_zero_or_normal(ua.s) ||
++                        float32_is_neg(ua.s))) {
++        goto soft;
++    }
++    ur.h = sqrtf(ua.h);
++    return ur.s;
++
++ soft:
++    return soft_f32_sqrt(ua.s, s);
++}
++
++float64 QEMU_FLATTEN float64_sqrt(float64 xa, float_status *s)
++{
++    union_float64 ua, ur;
++
++    ua.s = xa;
++    if (unlikely(!can_use_fpu(s))) {
++        goto soft;
++    }
++
++    float64_input_flush1(&ua.s, s);
++    if (QEMU_HARDFLOAT_1F64_USE_FP) {
++        if (unlikely(!(fpclassify(ua.h) == FP_NORMAL ||
++                       fpclassify(ua.h) == FP_ZERO) ||
++                     signbit(ua.h))) {
++            goto soft;
++        }
++    } else if (unlikely(!float64_is_zero_or_normal(ua.s) ||
++                        float64_is_neg(ua.s))) {
++        goto soft;
++    }
++    ur.h = sqrt(ua.h);
++    return ur.s;
++
++ soft:
++    return soft_f64_sqrt(ua.s, s);
++}
++
+ /*----------------------------------------------------------------------------
+ | The pattern for a default generated NaN.
+ *----------------------------------------------------------------------------*/
 -- 
 2.17.1
