@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTUB-0002j7-Bx
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:40:21 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTUH-0002Xf-NS
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:40:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTSe-0000PM-3V
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:38:44 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTSc-0000MK-RC
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:38:43 -0500
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Sun, 25 Nov 2018 01:00:17 +0800
-Message-Id: <1543078821-16636-7-git-send-email-peng.hao2@zte.com.cn>
+Date: Sun, 25 Nov 2018 01:00:18 +0800
+Message-Id: <1543078821-16636-8-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1543078821-16636-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1543078821-16636-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V8 06/10] hw/arm/virt: add pvpanic device in
- virt acpi table
+Subject: [Qemu-devel] [PATCH V8 07/10] hw/misc/pvpanic: add configure query
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +23,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-Add pvpanic device in virt acpi table, so when kenrel command line
-uses acpi=force, kernel can get info from acpi table.
+Add configure query interface for pvpanic-mmio.
 
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- hw/arm/virt-acpi-build.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ include/hw/misc/pvpanic.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 5785fb6..4208e46 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -61,6 +61,20 @@ static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
-     }
+diff --git a/include/hw/misc/pvpanic.h b/include/hw/misc/pvpanic.h
+index 066c707..1f20775 100644
+--- a/include/hw/misc/pvpanic.h
++++ b/include/hw/misc/pvpanic.h
+@@ -57,4 +57,8 @@ static inline uint16_t pvpanic_port(void)
+     return object_property_get_uint(o, PVPANIC_IOPORT_PROP, NULL);
  }
  
-+static void acpi_dsdt_add_pvpanic(Aml *scope, const MemMapEntry *pvpanic_memmap)
++static inline Object *pvpanic_mmio(void)
 +{
-+    Aml *dev = aml_device("PEVT");
-+    aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0001")));
-+    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
-+
-+    Aml *crs = aml_resource_template();
-+    aml_append(crs, aml_memory32_fixed(pvpanic_memmap->base,
-+                                       pvpanic_memmap->size, AML_READ_WRITE));
-+
-+    aml_append(dev, aml_name_decl("_CRS", crs));
-+    aml_append(scope, dev);
++    return object_resolve_path_type("", TYPE_PVPANIC_MMIO, NULL);
 +}
-+
- static void acpi_dsdt_add_uart(Aml *scope, const MemMapEntry *uart_memmap,
-                                            uint32_t uart_irq)
- {
-@@ -771,6 +785,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
-                        (irqmap[VIRT_UART] + ARM_SPI_BASE));
-     acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
-+    acpi_dsdt_add_pvpanic(scope, &memmap[VIRT_PVPANIC]);
-     acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
-     acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
-                     (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
+ #endif
 -- 
 1.8.3.1
