@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTU8-0002Xf-Bf
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:40:20 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTUD-0002j7-Cy
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:40:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTSe-0000QF-G6
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:38:45 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gQTSd-0000Nl-Mx
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 03:38:44 -0500
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Sun, 25 Nov 2018 01:00:19 +0800
-Message-Id: <1543078821-16636-9-git-send-email-peng.hao2@zte.com.cn>
+Date: Sun, 25 Nov 2018 01:00:13 +0800
+Message-Id: <1543078821-16636-3-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1543078821-16636-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1543078821-16636-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V8 08/10] hw/misc/pvpanic: preparing for adding
- configure interface
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH V8 02/10]  hw/misc/pvpanic: Cosmetic renaming
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +25,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-Prepare for pvpanic-mmio configure interface.
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+To ease the MMIO device addition in the next patch, rename:
+- ISA=5FPVPANIC=5FDEVICE -> PVPANIC=5FISA=5FDEVICE.
+- MemoryRegion io -> mr.
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- hw/arm/sysbus-fdt.c       | 2 ++
- hw/arm/virt.c             | 1 +
- hw/misc/pvpanic.c         | 7 +++++++
- include/hw/misc/pvpanic.h | 2 +-
- 4 files changed, 11 insertions(+), 1 deletion(-)
+ hw/misc/pvpanic.c | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
 
-diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index ad698d4..34577f3 100644
---- a/hw/arm/sysbus-fdt.c
-+++ b/hw/arm/sysbus-fdt.c
-@@ -38,6 +38,7 @@
- #include "hw/vfio/vfio-amd-xgbe.h"
- #include "hw/display/ramfb.h"
- #include "hw/arm/fdt.h"
-+#include "hw/misc/pvpanic.h"
- 
- /*
-  * internal struct that contains the information to create dynamic
-@@ -459,6 +460,7 @@ static const BindingEntry bindings[] = {
-     VFIO_PLATFORM_BINDING("amd,xgbe-seattle-v1a", add_amd_xgbe_fdt_node),
- #endif
-     TYPE_BINDING(TYPE_RAMFB_DEVICE, no_fdt_node),
-+    TYPE_BINDING(TYPE_PVPANIC_MMIO, no_fdt_node),
-     TYPE_BINDING("", NULL), /* last element */
- };
- 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 899131a..921220a 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1785,6 +1785,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_RAMFB_DEVICE);
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_PLATFORM);
-+    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_PVPANIC_MMIO);
-     mc->block_default_type = IF_VIRTIO;
-     mc->no_cdrom = 1;
-     mc->pci_allow_0_address = true;
 diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
-index aaa8b0c..6fea162 100644
+index 9d8961b..0f23a67 100644
 --- a/hw/misc/pvpanic.c
 +++ b/hw/misc/pvpanic.c
-@@ -121,10 +121,17 @@ static void pvpanic_mmio_initfn(Object *obj)
-     sysbus_init_mmio(sbd, &s->mr);
- }
- 
-+static Property pvpanic_mmio_properties[] = {
-+    DEFINE_PROP_UINT32("mmio", PVPanicMMIOState, base, 0x09070000),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void pvpanic_mmio_class_init(ObjectClass *klass, void *data)
+@@ -25,8 +25,8 @@
+ /* The pv event value */
+ #define PVPANIC=5FPANICKED        (1 << PVPANIC=5FF=5FPANICKED)
+=20
+-#define ISA=5FPVPANIC=5FDEVICE(obj)    \
+-    OBJECT=5FCHECK(PVPanicState, (obj), TYPE=5FPVPANIC)
++#define PVPANIC=5FISA=5FDEVICE(obj)    \
++    OBJECT=5FCHECK(PVPanicISAState, (obj), TYPE=5FPVPANIC)
+=20
+ static void handle=5Fevent(int event)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-+    dc->user_creatable = true;
-+    dc->props = pvpanic_mmio_properties;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
- }
- 
-diff --git a/include/hw/misc/pvpanic.h b/include/hw/misc/pvpanic.h
-index 1f20775..e733e1e 100644
---- a/include/hw/misc/pvpanic.h
-+++ b/include/hw/misc/pvpanic.h
-@@ -37,7 +37,7 @@ typedef struct PVPanicISAState {
- typedef struct PVPanicMMIOState {
-     SysBusDevice parent_obj;
-     /*<private>*/
+@@ -45,12 +45,16 @@ static void handle=5Fevent(int event)
+=20
+ #include "hw/isa/isa.h"
+=20
+-typedef struct PVPanicState {
++/* PVPanicISAState for ISA device and
++ * use ioport.
++ */
++typedef struct PVPanicISAState {
+     ISADevice parent=5Fobj;
 -
-+    uint32_t base;
-     /* public */
-     MemoryRegion mr;
- } PVPanicMMIOState;
--- 
+-    MemoryRegion io;
++    /*< private>*/
+     uint16=5Ft ioport;
+-} PVPanicState;
++    /*<public>*/
++    MemoryRegion mr;
++} PVPanicISAState;
+=20
+ /* return supported events on read */
+ static uint64=5Ft pvpanic=5Fioport=5Fread(void *opaque, hwaddr addr, unsig=
+ned size)
+@@ -75,15 +79,15 @@ static const MemoryRegionOps pvpanic=5Fops =3D {
+=20
+ static void pvpanic=5Fisa=5Finitfn(Object *obj)
+ {
+-    PVPanicState *s =3D ISA=5FPVPANIC=5FDEVICE(obj);
++    PVPanicISAState *s =3D PVPANIC=5FISA=5FDEVICE(obj);
+=20
+-    memory=5Fregion=5Finit=5Fio(&s->io, OBJECT(s), &pvpanic=5Fops, s, "pvp=
+anic", 1);
++    memory=5Fregion=5Finit=5Fio(&s->mr, OBJECT(s), &pvpanic=5Fops, s, "pvp=
+anic", 1);
+ }
+=20
+ static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev, Error **errp)
+ {
+     ISADevice *d =3D ISA=5FDEVICE(dev);
+-    PVPanicState *s =3D ISA=5FPVPANIC=5FDEVICE(dev);
++    PVPanicISAState *s =3D PVPANIC=5FISA=5FDEVICE(dev);
+     FWCfgState *fw=5Fcfg =3D fw=5Fcfg=5Ffind();
+     uint16=5Ft *pvpanic=5Fport;
+=20
+@@ -96,11 +100,11 @@ static void pvpanic=5Fisa=5Frealizefn(DeviceState *dev=
+, Error **errp)
+     fw=5Fcfg=5Fadd=5Ffile(fw=5Fcfg, "etc/pvpanic-port", pvpanic=5Fport,
+                     sizeof(*pvpanic=5Fport));
+=20
+-    isa=5Fregister=5Fioport(d, &s->io, s->ioport);
++    isa=5Fregister=5Fioport(d, &s->mr, s->ioport);
+ }
+=20
+ static Property pvpanic=5Fisa=5Fproperties[] =3D {
+-    DEFINE=5FPROP=5FUINT16(PVPANIC=5FIOPORT=5FPROP, PVPanicState, ioport, =
+0x505),
++    DEFINE=5FPROP=5FUINT16(PVPANIC=5FIOPORT=5FPROP, PVPanicISAState, iopor=
+t, 0x505),
+     DEFINE=5FPROP=5FEND=5FOF=5FLIST(),
+ };
+=20
+@@ -116,7 +120,7 @@ static void pvpanic=5Fisa=5Fclass=5Finit(ObjectClass *k=
+lass, void *data)
+ static TypeInfo pvpanic=5Fisa=5Finfo =3D {
+     .name          =3D TYPE=5FPVPANIC,
+     .parent        =3D TYPE=5FISA=5FDEVICE,
+-    .instance=5Fsize =3D sizeof(PVPanicState),
++    .instance=5Fsize =3D sizeof(PVPanicISAState),
+     .instance=5Finit =3D pvpanic=5Fisa=5Finitfn,
+     .class=5Finit    =3D pvpanic=5Fisa=5Fclass=5Finit,
+ };
+--=20
 1.8.3.1
