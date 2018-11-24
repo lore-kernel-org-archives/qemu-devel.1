@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gQUf6-0000G0-5w
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 04:55:41 -0500
+	(envelope-from <bounces@canonical.com>) id 1gQeeP-00011Z-7o
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 15:35:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gQUf1-0007pa-7K
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 04:55:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43672)
+	(envelope-from <bounces@canonical.com>) id 1gQeeM-0007TU-28
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 15:35:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51708)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gQUf1-0007gu-0J
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 04:55:35 -0500
+	id 1gQeeL-0007QI-Ss
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 15:35:34 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gQUez-00034c-LQ
-	for <qemu-devel@nongnu.org>; Sat, 24 Nov 2018 09:55:33 +0000
+	id 1gQeeK-00026Y-OD
+	for <qemu-devel@nongnu.org>; Sat, 24 Nov 2018 20:35:32 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8D0552E80C8
-	for <qemu-devel@nongnu.org>; Sat, 24 Nov 2018 09:55:33 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id ADC9A2E8031
+	for <qemu-devel@nongnu.org>; Sat, 24 Nov 2018 20:35:32 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 24 Nov 2018 09:49:20 -0000
-From: Gao <1802465@bugs.launchpad.net>
-Reply-To: Bug 1802465 <1802465@bugs.launchpad.net>
+Date: Sat, 24 Nov 2018 20:29:37 -0000
+From: GH Cao <1804961@bugs.launchpad.net>
+Reply-To: Bug 1804961 <1804961@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <154174980807.2749.13752196954108515323.malonedeb@gac.canonical.com>
-Message-Id: <154305296063.16140.15074172223490123378.malone@gac.canonical.com>
+Message-Id: <154309137717.32238.5287661827417174062.malonedeb@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1802465] Re: typing string via VNC is unreliable
+Subject: [Qemu-devel] [Bug 1804961] [NEW] qemu-system-aarch64: Windows 10
+ ARM64 BSoD on boot while using virt-3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,86 +38,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In my case the problem is quite subtle. =
+Public bug reported:
 
-Nearly every time we send the key strokes, the guest os keeps receiving spa=
-ce or tab or new line character. And ending part of the text is truncated, =
-where the truncated part is fixed depending on the keystrokes we are sendin=
-g. =
+When I emulate a virt-3.0 machine, Windows 10 BSoD on boot, with the
+error code being ACPI_BIOS_ERROR(0x000000A5), virt-2.12 boots fine.
 
-Additionally, the keystrokes are mis-ordered at a higher frequency than 1 o=
-ut of a few hundreds as you said. =
+Windows Build: 10.0.17134.1
+QEMU version: 3.0.0
+Commandline: qemu-system-aarch64 -M virt -accel tcg,thread=3Dmulti -cpu cor=
+tex-a57 -smp 2 -m 2048 -bios QEMU_EFI.fd -device ramfb -device nec-usb-xhci=
+ -device usb-kbd -device usb-tablet -hda disk.vhd -vnc :0
 
+By the way, the patch to add DBG2 table discussed here
+https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg02550.html
+works (although minor change is required to adapt to the qemu 3.0.0
+code), the table is accepted by Windows (Windows require both DBG2 and
+SPCR to be valid for serial kernel debugging to work), so it may help
+further diagnosing this issue.
 
-In brief,
-- Repeatedly receiving space, tab or new line character as ending
-- Truncation regarding ending part of key strokes
-- characters are mis-ordered, lost, repeated =
-
-
-A question is, how can you make character transaction faster with
-vncdotool? In my case, vncdotool is typing fairly slow.
-
-I found this debian bug report quite useful, what do you think?
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D758881
-
-Re-producing procedures
----
-
-I re-produced the problem in a slightly different way since your method
-seems not working for me.
-
-> qemu-img create tumbleweed.img 40G
-> qemu-system-x86_64 -drive file=3Dtumbleweed.img,if=3Dvirtio -boot d -cdro=
-m openSUSE-Tumbleweed-DVD-x86_64-Snapshot20181119-Media.iso -m 2048 --enabl=
-e-kvm -display vnc=3D:1
-> qemu-system-x86_64 -drive file=3Dtumbleweed.img,if=3Dvirtio  -m 4G --enab=
-le-kvm -display vnc=3D:1
-
-** Bug watch added: Debian Bug tracker #758881
-   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D758881
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1802465
+https://bugs.launchpad.net/bugs/1804961
 
 Title:
-  typing string via VNC is unreliable
+  qemu-system-aarch64: Windows 10 ARM64 BSoD on boot while using
+  virt-3.0
 
 Status in QEMU:
   New
 
 Bug description:
-  QEMU version is 3.0.0
+  When I emulate a virt-3.0 machine, Windows 10 BSoD on boot, with the
+  error code being ACPI_BIOS_ERROR(0x000000A5), virt-2.12 boots fine.
 
-  # Description
+  Windows Build: 10.0.17134.1
+  QEMU version: 3.0.0
+  Commandline: qemu-system-aarch64 -M virt -accel tcg,thread=3Dmulti -cpu c=
+ortex-a57 -smp 2 -m 2048 -bios QEMU_EFI.fd -device ramfb -device nec-usb-xh=
+ci -device usb-kbd -device usb-tablet -hda disk.vhd -vnc :0
 
-  The problem is that, when typing string through VNC, it can be
-  unreliable -- sometimes some key strokes get skipped, sometimes get
-  swapped, sometimes get repeated.  There's no problem when typing
-  through VNC on physical hardware.
-
-  # Steps to reproduce
-
-  1. Launch virtual machine by:
-
-      qemu-kvm -display vnc=3D:1 -m 2048 opensuse-leap-15.qcow2
-
-  2. Connect to VNC by:
-
-      vncviewer -Shared :5901
-
-  3. Simulate a series of key strokes by "vncdotool" [1]:
-
-      vncdotool -s 127.0.0.1::5901 typefile strings_to_be_typed.txt
-
-  4. Usually after a few hundred keys are typed, something goes wrong.
-
-  I attached a screenshot that it mistypes " hello" to "h ello".
-
-  [1] https://github.com/sibson/vncdotool
+  By the way, the patch to add DBG2 table discussed here
+  https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg02550.html
+  works (although minor change is required to adapt to the qemu 3.0.0
+  code), the table is accepted by Windows (Windows require both DBG2 and
+  SPCR to be valid for serial kernel debugging to work), so it may help
+  further diagnosing this issue.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1802465/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1804961/+subscriptions
