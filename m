@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQjAM-00027i-Kr
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 20:24:57 -0500
+	(envelope-from <cota@braap.org>) id 1gQjAy-0002Sa-Q1
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 20:25:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQjAJ-0006AN-IY
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 20:24:54 -0500
-Received: from cmccmta2.chinamobile.com ([221.176.66.80]:38035)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQjAI-00063z-Rq
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 20:24:51 -0500
-References: <20181119120820.29878-1-maozhongyi@cmss.chinamobile.com>
-	<20181119120820.29878-23-maozhongyi@cmss.chinamobile.com>
-	<20181119233139.GO3807@habkost.net>
-	<bb601691-a96d-8968-bb5b-0b15757285f6@cmss.chinamobile.com>
-	<20181123181638.GO18284@habkost.net>
-	<CAFEAcA8rcxJFtHxDJzcNurOoB7kAktNTFRbesy71Y=sEqsr5DQ@mail.gmail.com>
-From: maozy <maozhongyi@cmss.chinamobile.com>
-Message-ID: <79fa2496-65fb-89c3-6993-fe5f9b0a97ec@cmss.chinamobile.com>
-Date: Sun, 25 Nov 2018 09:24:31 +0800
+	(envelope-from <cota@braap.org>) id 1gQjAv-0006X5-N5
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 20:25:32 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:37943)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gQjAv-0006Vh-AO
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 20:25:29 -0500
+Date: Sat, 24 Nov 2018 20:25:25 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181125012525.GA22864@flamenco>
+References: <20181124235553.17371-1-cota@braap.org>
+	<20181124235553.17371-8-cota@braap.org>
+	<CAL1e-=gL0s2-zLgBYQrW1=VSOB=LepzDgDS08P7qGNAiOynsyg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8rcxJFtHxDJzcNurOoB7kAktNTFRbesy71Y=sEqsr5DQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 22/22] core/sysbus: remove the
- SysBusDeviceClass::initpath
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAL1e-=gL0s2-zLgBYQrW1=VSOB=LepzDgDS08P7qGNAiOynsyg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 07/13] fpu: introduce hardfloat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <alistair.francis@wdc.com>, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-
-
-On 11/24/18 2:19 AM, Peter Maydell wrote:
-> On Fri, 23 Nov 2018 at 18:16, Eduardo Habkost <ehabkost@redhat.com> wrote:
->> I think this is good enough for now (as long as there's a comment
->> like Peter suggested).  Allowing parent_realize to be NULL would
->> be inconvenient to all code that uses parent_realize today.
-
-It was done in v2, please review.
-
->>
->> Personally, I would love to get rid of parent_realize entirely.
->> We could simply provide a helper to let device subclasses call
->> the parent's realize function without the need to copy function
->> pointers around.
-
-well, I will do it later.
-
+On Sun, Nov 25, 2018 at 01:25:25 +0100, Aleksandar Markovic wrote:
+> > Note: some architectures (at least PPC, there might be others) clear
+> > the status flags passed to softfloat before most FP operations. This
+> > precludes the use of hardfloat, so to avoid introducing a performance
+> > regression for those targets, we add a flag to disable hardfloat.
+> > In the long run though it would be good to fix the targets so that
+> > at least the inexact flag passed to softfloat is indeed sticky.
 > 
-> Agreed -- parent_realize is a hack that is working around
-> a deficiency in our object model, and it would be nice to
-> deal with that. But let's do our cleanups one at a time :-)
+> Can you elaborate more on this paragraph?
 
-OK, I see.
+Sure. We only use hardfloat when the inexact flag is already
+set. If it isn't, we defer to softfloat. This is done for two
+reasons:
 
-Thanks,
-Mao
+- Computing the inexact flag requires duplicating
+  most of what softfloat does, so it's not worth doing. Note
+  that clearing and reading the host's fp flags is even
+  slower, so that's not an option.
 
-> 
-> thanks
-> -- PMM
-> 
+- The inexact flag is raised *very* frequently. The flag
+  remains set (in the guest) unless guest code explicitly
+  clears it, which few guest workloads do.
+
+It therefore makes sense for hardfloat to only kick in once
+the inexact flag has already been set.
+
+Most targets directly keep the guest's FP flags in the same
+struct (float_status) that is passed to softfloat ops.
+PPC, however, keeps the state of the guest FP flags in one
+place, and passes a pristine float_status to softfloat code
+every time it calls it. Thus, given that hardfloat is
+entirely implemented in softfloat.c, PPC targets cannot
+currently take advantage of it.
+
+Changing this in the PPC target is not impossible, but it will
+require additional work that I'm not doing in this series, hence
+my note. So for now, PPC targets just have hardfloat disabled
+at compile time, which avoids adding overhead for a feature
+that they cannot use.
+
+Let me know if anything is unclear. Cheers,
+
+		Emilio
