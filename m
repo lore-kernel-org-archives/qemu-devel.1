@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gQjAy-0002Sa-Q1
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 20:25:33 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQjLL-0005rz-VC
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 20:36:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gQjAv-0006X5-N5
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 20:25:32 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:37943)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gQjAv-0006Vh-AO
-	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 20:25:29 -0500
-Date: Sat, 24 Nov 2018 20:25:25 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181125012525.GA22864@flamenco>
-References: <20181124235553.17371-1-cota@braap.org>
-	<20181124235553.17371-8-cota@braap.org>
-	<CAL1e-=gL0s2-zLgBYQrW1=VSOB=LepzDgDS08P7qGNAiOynsyg@mail.gmail.com>
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gQjLK-0000mN-VA
+	for qemu-devel@nongnu.org; Sat, 24 Nov 2018 20:36:15 -0500
+References: <20181123153040.18933-1-maozhongyi@cmss.chinamobile.com>
+	<20181123153040.18933-16-maozhongyi@cmss.chinamobile.com>
+	<67693f9a-1210-3420-6ff5-c7c8c08810be@redhat.com>
+From: maozy <maozhongyi@cmss.chinamobile.com>
+Message-ID: <87bf96bc-d21d-9c7f-4e7f-e716bea12784@cmss.chinamobile.com>
+Date: Sun, 25 Nov 2018 09:36:03 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAL1e-=gL0s2-zLgBYQrW1=VSOB=LepzDgDS08P7qGNAiOynsyg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v6 07/13] fpu: introduce hardfloat
+In-Reply-To: <67693f9a-1210-3420-6ff5-c7c8c08810be@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 15/21] pci-bridge/dec: Convert sysbus
+ initfunction to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, qemu-ppc@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>, david@gibson.dropbear.id.au
 
-On Sun, Nov 25, 2018 at 01:25:25 +0100, Aleksandar Markovic wrote:
-> > Note: some architectures (at least PPC, there might be others) clear
-> > the status flags passed to softfloat before most FP operations. This
-> > precludes the use of hardfloat, so to avoid introducing a performance
-> > regression for those targets, we add a flag to disable hardfloat.
-> > In the long run though it would be good to fix the targets so that
-> > at least the inexact flag passed to softfloat is indeed sticky.
+Hi, Philippe
+
+On 11/24/18 12:37 AM, Philippe Mathieu-Daudé wrote:
+> Hi Mao,
 > 
-> Can you elaborate more on this paragraph?
+> On 23/11/18 16:30, Mao Zhongyi wrote:
+>> Use DeviceClass rather than SysBusDeviceClass in
+>> pci_dec_21154_device_class_init().
+>>
+>> Cc: david@gibson.dropbear.id.au
+>> Cc: mst@redhat.com
+>> Cc: marcel.apfelbaum@gmail.com
+>> Cc: qemu-ppc@nongnu.org
+>>
+>> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+>> Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+>> ---
+>>   hw/pci-bridge/dec.c | 11 +++++------
+>>   1 file changed, 5 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
+>> index 84492d5e5f..5b21c20e50 100644
+>> --- a/hw/pci-bridge/dec.c
+>> +++ b/hw/pci-bridge/dec.c
+>> @@ -98,7 +98,7 @@ PCIBus *pci_dec_21154_init(PCIBus *parent_bus, int devfn)
+>>       return pci_bridge_get_sec_bus(br);
+>>   }
+>>   
+>> -static int pci_dec_21154_device_init(SysBusDevice *dev)
+>> +static void pci_dec_21154_device_realize(DeviceState *dev, Error **errp)
+>>   {
+>>       PCIHostState *phb;
+> 
+> Why don't you use:
+> 
+>         SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> 
+> like in all the other patches from this series...?
 
-Sure. We only use hardfloat when the inexact flag is already
-set. If it isn't, we defer to softfloat. This is done for two
-reasons:
+Oops, sorry, I missed this one, will fix it in v3.
 
-- Computing the inexact flag requires duplicating
-  most of what softfloat does, so it's not worth doing. Note
-  that clearing and reading the host's fp flags is even
-  slower, so that's not an option.
+Thanks,
+Mao
 
-- The inexact flag is raised *very* frequently. The flag
-  remains set (in the guest) unless guest code explicitly
-  clears it, which few guest workloads do.
-
-It therefore makes sense for hardfloat to only kick in once
-the inexact flag has already been set.
-
-Most targets directly keep the guest's FP flags in the same
-struct (float_status) that is passed to softfloat ops.
-PPC, however, keeps the state of the guest FP flags in one
-place, and passes a pristine float_status to softfloat code
-every time it calls it. Thus, given that hardfloat is
-entirely implemented in softfloat.c, PPC targets cannot
-currently take advantage of it.
-
-Changing this in the PPC target is not impossible, but it will
-require additional work that I'm not doing in this series, hence
-my note. So for now, PPC targets just have hardfloat disabled
-at compile time, which avoids adding overhead for a feature
-that they cannot use.
-
-Let me know if anything is unclear. Cheers,
-
-		Emilio
+> 
+>>   
+>> @@ -108,9 +108,8 @@ static int pci_dec_21154_device_init(SysBusDevice *dev)
+>>                             dev, "pci-conf-idx", 0x1000);
+>>       memory_region_init_io(&phb->data_mem, OBJECT(dev), &pci_host_data_le_ops,
+>>                             dev, "pci-data-idx", 0x1000);
+>> -    sysbus_init_mmio(dev, &phb->conf_mem);
+>> -    sysbus_init_mmio(dev, &phb->data_mem);
+>> -    return 0;
+>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &phb->conf_mem);
+>> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &phb->data_mem);
+> 
+> ... this would save extra type checking here, as explain by Peter:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg03644.html
+> 
+>>   }
+>>   
+>>   static void dec_21154_pci_host_realize(PCIDevice *d, Error **errp)
+>> @@ -150,9 +149,9 @@ static const TypeInfo dec_21154_pci_host_info = {
+>>   
+>>   static void pci_dec_21154_device_class_init(ObjectClass *klass, void *data)
+>>   {
+>> -    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
+>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>>   
+>> -    sdc->init = pci_dec_21154_device_init;
+>> +    dc->realize = pci_dec_21154_device_realize;
+>>   }
+>>   
+>>   static const TypeInfo pci_dec_21154_device_info = {
+>>
+> 
