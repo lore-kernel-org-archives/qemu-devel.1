@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gQp2N-0004UH-56
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 02:41:04 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gQp2P-0004Uf-2i
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 02:41:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gQp2J-0007cD-Lo
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 02:41:03 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50463)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gQp2J-0007Zg-6W
+	(envelope-from <yuval.shaia@oracle.com>) id 1gQp2L-0007dN-A9
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 02:41:05 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:52826)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gQp2J-0007aV-Fi
 	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 02:40:59 -0500
-Received: by mail-wm1-x344.google.com with SMTP id 125so15231767wmh.0
-	for <qemu-devel@nongnu.org>; Sat, 24 Nov 2018 23:40:57 -0800 (PST)
+Date: Sun, 25 Nov 2018 09:30:30 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20181125073030.GB2770@lap1>
 References: <20181122121402.13764-1-yuval.shaia@oracle.com>
-	<20181122121402.13764-18-yuval.shaia@oracle.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <335892d6-7475-8465-4b20-060bd2960c0f@gmail.com>
-Date: Sun, 25 Nov 2018 09:40:33 +0200
+	<20181122121402.13764-24-yuval.shaia@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20181122121402.13764-18-yuval.shaia@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v5 17/24] hw/pvrdma: Fill error code in
- command's response
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181122121402.13764-24-yuval.shaia@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH v5 23/24] hw/pvrdma: Do not clean resources
+ on shutdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,211 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
+To: marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com, yuval.shaia@oracle.com
 
+On Thu, Nov 22, 2018 at 02:14:01PM +0200, Yuval Shaia wrote:
+> All resources are already cleaned at rm_fini phase.
 
+Please ignore this patch, i will squash it to patch #5.
 
-On 11/22/18 2:13 PM, Yuval Shaia wrote:
-> Driver checks error code let's set it.
->
+> 
 > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 > ---
->   hw/rdma/vmw/pvrdma_cmd.c | 67 ++++++++++++++++++++++++++++------------
->   1 file changed, 48 insertions(+), 19 deletions(-)
->
-> diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
-> index 0d3c818c20..a326c5d470 100644
-> --- a/hw/rdma/vmw/pvrdma_cmd.c
-> +++ b/hw/rdma/vmw/pvrdma_cmd.c
-> @@ -131,7 +131,8 @@ static int query_port(PVRDMADev *dev, union pvrdma_cmd_req *req,
->   
->       if (rdma_backend_query_port(&dev->backend_dev,
->                                   (struct ibv_port_attr *)&attrs)) {
-> -        return -ENOMEM;
-> +        resp->hdr.err = -ENOMEM;
-> +        goto out;
->       }
->   
->       memset(resp, 0, sizeof(*resp));
-> @@ -150,7 +151,9 @@ static int query_port(PVRDMADev *dev, union pvrdma_cmd_req *req,
->       resp->attrs.active_width = 1;
->       resp->attrs.active_speed = 1;
->   
-> -    return 0;
-> +out:
-> +    pr_dbg("ret=%d\n", resp->hdr.err);
-> +    return resp->hdr.err;
->   }
->   
->   static int query_pkey(PVRDMADev *dev, union pvrdma_cmd_req *req,
-> @@ -170,7 +173,7 @@ static int query_pkey(PVRDMADev *dev, union pvrdma_cmd_req *req,
->       resp->pkey = PVRDMA_PKEY;
->       pr_dbg("pkey=0x%x\n", resp->pkey);
->   
-> -    return 0;
-> +    return resp->hdr.err;
->   }
->   
->   static int create_pd(PVRDMADev *dev, union pvrdma_cmd_req *req,
-> @@ -200,7 +203,9 @@ static int destroy_pd(PVRDMADev *dev, union pvrdma_cmd_req *req,
->   
->       rdma_rm_dealloc_pd(&dev->rdma_dev_res, cmd->pd_handle);
->   
-> -    return 0;
-> +    rsp->hdr.err = 0;
-> +
-> +    return rsp->hdr.err;
->   }
->   
->   static int create_mr(PVRDMADev *dev, union pvrdma_cmd_req *req,
-> @@ -251,7 +256,9 @@ static int destroy_mr(PVRDMADev *dev, union pvrdma_cmd_req *req,
->   
->       rdma_rm_dealloc_mr(&dev->rdma_dev_res, cmd->mr_handle);
->   
-> -    return 0;
-> +    rsp->hdr.err = 0;
-> +
-> +    return rsp->hdr.err;
->   }
->   
->   static int create_cq_ring(PCIDevice *pci_dev , PvrdmaRing **ring,
-> @@ -353,7 +360,8 @@ static int destroy_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
->       cq = rdma_rm_get_cq(&dev->rdma_dev_res, cmd->cq_handle);
->       if (!cq) {
->           pr_dbg("Invalid CQ handle\n");
-> -        return -EINVAL;
-> +        rsp->hdr.err = -EINVAL;
-> +        goto out;
->       }
->   
->       ring = (PvrdmaRing *)cq->opaque;
-> @@ -364,7 +372,11 @@ static int destroy_cq(PVRDMADev *dev, union pvrdma_cmd_req *req,
->   
->       rdma_rm_dealloc_cq(&dev->rdma_dev_res, cmd->cq_handle);
->   
-> -    return 0;
-> +    rsp->hdr.err = 0;
-> +
-> +out:
-> +    pr_dbg("ret=%d\n", rsp->hdr.err);
-> +    return rsp->hdr.err;
->   }
->   
->   static int create_qp_rings(PCIDevice *pci_dev, uint64_t pdir_dma,
-> @@ -553,7 +565,8 @@ static int destroy_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
->       qp = rdma_rm_get_qp(&dev->rdma_dev_res, cmd->qp_handle);
->       if (!qp) {
->           pr_dbg("Invalid QP handle\n");
-> -        return -EINVAL;
-> +        rsp->hdr.err = -EINVAL;
-> +        goto out;
->       }
->   
->       rdma_rm_dealloc_qp(&dev->rdma_dev_res, cmd->qp_handle);
-> @@ -567,7 +580,11 @@ static int destroy_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
->       rdma_pci_dma_unmap(PCI_DEVICE(dev), ring->ring_state, TARGET_PAGE_SIZE);
->       g_free(ring);
->   
-> -    return 0;
-> +    rsp->hdr.err = 0;
-> +
-> +out:
-> +    pr_dbg("ret=%d\n", rsp->hdr.err);
-> +    return rsp->hdr.err;
->   }
->   
->   static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
-> @@ -580,7 +597,8 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
->       pr_dbg("index=%d\n", cmd->index);
->   
->       if (cmd->index >= MAX_PORT_GIDS) {
-> -        return -EINVAL;
-> +        rsp->hdr.err = -EINVAL;
-> +        goto out;
->       }
->   
->       pr_dbg("gid[%d]=0x%llx,0x%llx\n", cmd->index,
-> @@ -590,10 +608,15 @@ static int create_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
->       rc = rdma_rm_add_gid(&dev->rdma_dev_res, &dev->backend_dev,
->                            dev->backend_eth_device_name, gid, cmd->index);
->       if (rc < 0) {
-> -        return -EINVAL;
-> +        rsp->hdr.err = rc;
-> +        goto out;
->       }
->   
-> -    return 0;
-> +    rsp->hdr.err = 0;
-> +
-> +out:
-> +    pr_dbg("ret=%d\n", rsp->hdr.err);
-> +    return rsp->hdr.err;
->   }
->   
->   static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
-> @@ -606,7 +629,8 @@ static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
->       pr_dbg("index=%d\n", cmd->index);
->   
->       if (cmd->index >= MAX_PORT_GIDS) {
-> -        return -EINVAL;
-> +        rsp->hdr.err = -EINVAL;
-> +        goto out;
->       }
->   
->       rc = rdma_rm_del_gid(&dev->rdma_dev_res, &dev->backend_dev,
-> @@ -617,7 +641,11 @@ static int destroy_bind(PVRDMADev *dev, union pvrdma_cmd_req *req,
->           goto out;
->       }
->   
-> -    return 0;
-> +    rsp->hdr.err = 0;
-> +
-> +out:
-> +    pr_dbg("ret=%d\n", rsp->hdr.err);
-> +    return rsp->hdr.err;
->   }
->   
->   static int create_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
-> @@ -634,9 +662,8 @@ static int create_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
->       resp->hdr.err = rdma_rm_alloc_uc(&dev->rdma_dev_res, cmd->pfn,
->                                        &resp->ctx_handle);
->   
-> -    pr_dbg("ret=%d\n", resp->hdr.err);
+>  hw/rdma/rdma_backend.c | 21 +--------------------
+>  1 file changed, 1 insertion(+), 20 deletions(-)
+> 
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index 6a1e39d4c0..8ab25e94b1 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -1075,28 +1075,9 @@ static int mad_init(RdmaBackendDev *backend_dev, CharBackend *mad_chr_be)
+>  
+>  static void mad_stop(RdmaBackendDev *backend_dev)
+>  {
+> -    QObject *o_ctx_id;
+> -    unsigned long cqe_ctx_id;
+> -    BackendCtx *bctx;
 > -
-> -    return 0;
-> +    pr_dbg("ret=%d\n", rsp->hdr.err);
-> +    return rsp->hdr.err;
->   }
->   
->   static int destroy_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
-> @@ -648,7 +675,9 @@ static int destroy_uc(PVRDMADev *dev, union pvrdma_cmd_req *req,
->   
->       rdma_rm_dealloc_uc(&dev->rdma_dev_res, cmd->ctx_handle);
->   
-> -    return 0;
-> +    rsp->hdr.err = 0;
-> +
-> +    return rsp->hdr.err;
->   }
->   struct cmd_handler {
->       uint32_t cmd;
-> @@ -696,7 +725,7 @@ int execute_command(PVRDMADev *dev)
->       }
->   
->       err = cmd_handlers[dsr_info->req->hdr.cmd].exec(dev, dsr_info->req,
-> -                            dsr_info->rsp);
-> +                                                    dsr_info->rsp);
->   out:
->       set_reg_val(dev, PVRDMA_REG_ERR, err);
->       post_interrupt(dev, INTR_VEC_CMD_RING);
-
-
-As I responded in V4 thread :) one might forget to set hdr.error to 0
-resulting in errors hard to debug.
-
-Please consider clearing the field on init.
-
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-
-Thanks,
-Marcel
+> -    pr_dbg("Closing MAD\n");
+> +    pr_dbg("Stopping MAD\n");
+>  
+>      disable_rdmacm_mux_async(backend_dev);
+> -
+> -    /* Clear MAD buffers list */
+> -    qemu_mutex_lock(&backend_dev->recv_mads_list.lock);
+> -    do {
+> -        o_ctx_id = qlist_pop(backend_dev->recv_mads_list.list);
+> -        if (o_ctx_id) {
+> -            cqe_ctx_id = qnum_get_uint(qobject_to(QNum, o_ctx_id));
+> -            bctx = rdma_rm_get_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_id);
+> -            if (bctx) {
+> -                rdma_rm_dealloc_cqe_ctx(backend_dev->rdma_dev_res, cqe_ctx_id);
+> -                g_free(bctx);
+> -            }
+> -        }
+> -    } while (o_ctx_id);
+> -    qemu_mutex_unlock(&backend_dev->recv_mads_list.lock);
+>  }
+>  
+>  static void mad_fini(RdmaBackendDev *backend_dev)
+> -- 
+> 2.17.2
+> 
