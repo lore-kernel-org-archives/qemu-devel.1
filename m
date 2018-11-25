@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gR1fq-0001iR-NP
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 16:10:39 -0500
+	(envelope-from <philmd@redhat.com>) id 1gR1rE-0003ZR-Te
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 16:22:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gR1fm-0008GX-Lc
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 16:10:38 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:32974)
+	(envelope-from <philmd@redhat.com>) id 1gR1rB-0007Io-L3
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 16:22:24 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:36073)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gR1fm-0008GD-Fe
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 16:10:34 -0500
-Received: by mail-wr1-f67.google.com with SMTP id c14so11241086wrr.0
-	for <qemu-devel@nongnu.org>; Sun, 25 Nov 2018 13:10:34 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gR1rB-0007IU-Em
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 16:22:21 -0500
+Received: by mail-wm1-f67.google.com with SMTP id s11so16417145wmh.1
+	for <qemu-devel@nongnu.org>; Sun, 25 Nov 2018 13:22:21 -0800 (PST)
 References: <20181123091729.29921-1-luc.michel@greensocs.com>
-	<20181123091729.29921-17-luc.michel@greensocs.com>
+	<20181123091729.29921-4-luc.michel@greensocs.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6c666049-bb54-bf0a-1709-40f4c7903a26@redhat.com>
-Date: Sun, 25 Nov 2018 22:10:30 +0100
+Message-ID: <970cc3ab-f93b-75c2-f3f0-86a1ddc75ca7@redhat.com>
+Date: Sun, 25 Nov 2018 22:22:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181123091729.29921-17-luc.michel@greensocs.com>
+In-Reply-To: <20181123091729.29921-4-luc.michel@greensocs.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 16/16] arm/xlnx-zynqmp: put APUs and
- RPUs in separate CPU clusters
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 03/16] gdbstub: add multiprocess support
+ to '?' packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,113 +34,158 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, alistair@alistair23.me, mark.burton@greensocs.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
 
+Hi Luc,
+
 On 23/11/18 10:17, Luc Michel wrote:
-> Create two separate CPU clusters for APUs and RPUs.
+> The gdb_get_cpu_pid() function does the PID lookup for the given CPU. It
+> checks if the CPU is a direct child of a CPU cluster. If it is, the
+> returned PID is the cluster ID plus one (cluster IDs start at 0, GDB
+> PIDs at 1). When the CPU is not a child of such a container, the PID of
+> the first process is returned.
+> 
+> The gdb_fmt_thread_id() function generates the string to be used to identify
+> a given thread, in a response packet for the peer. This function
+> supports generating thread IDs when multiprocess mode is enabled (in the
+> form `p<pid>.<tid>').
+> 
+> Use them in the reply to a '?' request.
 > 
 > Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> Acked-by: Alistair Francis <alistair.francis@wdc.com>
 > Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 > ---
->  include/hw/arm/xlnx-zynqmp.h |  3 +++
->  hw/arm/xlnx-zynqmp.c         | 21 +++++++++++++++++----
->  2 files changed, 20 insertions(+), 4 deletions(-)
+>  gdbstub.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 58 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-> index 98f925ab84..591515c760 100644
-> --- a/include/hw/arm/xlnx-zynqmp.h
-> +++ b/include/hw/arm/xlnx-zynqmp.h
-> @@ -29,10 +29,11 @@
->  #include "hw/dma/xlnx_dpdma.h"
->  #include "hw/dma/xlnx-zdma.h"
->  #include "hw/display/xlnx_dp.h"
->  #include "hw/intc/xlnx-zynqmp-ipi.h"
->  #include "hw/timer/xlnx-zynqmp-rtc.h"
-> +#include "hw/cpu/cluster.h"
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 26f5a7449a..4fbc05dfe3 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -638,10 +638,52 @@ static int memtox(char *buf, const char *mem, int len)
+>          }
+>      }
+>      return p - buf;
+>  }
 >  
->  #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
->  #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
->                                         TYPE_XLNX_ZYNQMP)
->  
-> @@ -75,10 +76,12 @@
->  typedef struct XlnxZynqMPState {
->      /*< private >*/
->      DeviceState parent_obj;
->  
->      /*< public >*/
-> +    CPUClusterState apu_cluster;
-> +    CPUClusterState rpu_cluster;
->      ARMCPU apu_cpu[XLNX_ZYNQMP_NUM_APU_CPUS];
->      ARMCPU rpu_cpu[XLNX_ZYNQMP_NUM_RPU_CPUS];
->      GICState gic;
->      MemoryRegion gic_mr[XLNX_ZYNQMP_GIC_REGIONS][XLNX_ZYNQMP_GIC_ALIASES];
->  
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index c195040350..42a138074c 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -176,16 +176,22 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+> +static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
+> +{
+> +#ifndef CONFIG_USER_ONLY
+> +    gchar *path, *name;
+
+Setting ...
+
+       gchar *path, *name = NULL;
+
+> +    Object *obj;
+> +    CPUClusterState *cluster;
+> +    uint32_t ret;
+> +
+> +    path = object_get_canonical_path(OBJECT(cpu));
+> +    name = object_get_canonical_path_component(OBJECT(cpu));
+
+... we might move this line ...
+
+> +
+> +    if (path == NULL) {
+> +        ret = s->processes[0].pid;
+> +        goto out;
+> +    }
+
+... here:
+
+       name = object_get_canonical_path_component(OBJECT(cpu));
+
+> +
+> +    /*
+> +     * Retrieve the CPU parent path by removing the last '/' and the CPU name
+> +     * from the CPU canonical path. */
+> +    path[strlen(path) - strlen(name) - 1] = '\0';
+
+Can we get there with path != NULL && name == NULL?
+
+> +
+> +    obj = object_resolve_path_type(path, TYPE_CPU_CLUSTER, NULL);
+> +
+> +    if (obj == NULL) {
+> +        ret = s->processes[0].pid;
+> +        goto out;
+> +    }
+> +
+> +    cluster = CPU_CLUSTER(obj);
+> +    ret = cluster->cluster_id + 1;
+> +
+> +out:
+> +    g_free(name);
+> +    g_free(path);
+> +
+> +    return ret;
+> +
+> +#else
+
+[*]
+
+> +    return s->processes[0].pid;
+> +#endif
+> +}
+> +
+>  static const char *get_feature_xml(const char *p, const char **newp,
+>                                     CPUClass *cc)
 >  {
->      Error *err = NULL;
+>      size_t len;
 >      int i;
->      int num_rpus = MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQMP_NUM_RPU_CPUS);
->  
-> +    object_initialize_child(OBJECT(s), "rpu-cluster", &s->rpu_cluster,
-> +                            sizeof(s->rpu_cluster), TYPE_CPU_CLUSTER,
-> +                            &error_abort, NULL);
-> +
-> +    qdev_init_nofail(DEVICE(&s->rpu_cluster));
-> +
->      for (i = 0; i < num_rpus; i++) {
->          char *name;
->  
->          object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
->                            "cortex-r5f-" TYPE_ARM_CPU);
-> -        object_property_add_child(OBJECT(s), "rpu-cpu[*]",
-> +        object_property_add_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
->                                    OBJECT(&s->rpu_cpu[i]), &error_abort);
->  
->          name = object_get_canonical_path_component(OBJECT(&s->rpu_cpu[i]));
->          if (strcmp(name, boot_cpu)) {
->              /* Secondary CPUs start in PSCI powered-down state */
-> @@ -211,14 +217,19 @@ static void xlnx_zynqmp_init(Object *obj)
->  {
->      XlnxZynqMPState *s = XLNX_ZYNQMP(obj);
->      int i;
->      int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
->  
-> +    object_initialize_child(obj, "apu-cluster", &s->apu_cluster,
-> +                            sizeof(s->apu_cluster), TYPE_CPU_CLUSTER,
-> +                            &error_abort, NULL);
-
-This is now very clean :) Thanks for the various efforts/versions
-improving this series.
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> +
->      for (i = 0; i < num_apus; i++) {
-> -        object_initialize_child(obj, "apu-cpu[*]", &s->apu_cpu[i],
-> -                                sizeof(s->apu_cpu[i]),
-> -                                "cortex-a53-" TYPE_ARM_CPU, &error_abort, NULL);
-> +        object_initialize_child(OBJECT(&s->apu_cluster), "apu-cpu[*]",
-> +                                &s->apu_cpu[i], sizeof(s->apu_cpu[i]),
-> +                                "cortex-a53-" TYPE_ARM_CPU, &error_abort,
-> +                                NULL);
+> @@ -907,10 +949,23 @@ static CPUState *find_cpu(uint32_t thread_id)
 >      }
 >  
->      sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
->                            gic_class_name());
+>      return NULL;
+>  }
 >  
-> @@ -331,10 +342,12 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
->      qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", num_apus);
->      qdev_prop_set_bit(DEVICE(&s->gic), "has-security-extensions", s->secure);
->      qdev_prop_set_bit(DEVICE(&s->gic),
->                        "has-virtualization-extensions", s->virt);
->  
-> +    qdev_init_nofail(DEVICE(&s->apu_cluster));
+> +static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
+> +                           char *buf, size_t buf_size)
+> +{
+> +    if (s->multiprocess) {
+> +        snprintf(buf, buf_size, "p%02x.%02x",
+> +                 gdb_get_cpu_pid(s, cpu), cpu_gdb_index(cpu));
+> +    } else {
+> +        snprintf(buf, buf_size, "%02x", cpu_gdb_index(cpu));
+> +    }
 > +
->      /* Realize APUs before realizing the GIC. KVM requires this.  */
->      for (i = 0; i < num_apus; i++) {
->          char *name;
+> +    return buf;
+> +}
+> +
+>  static int is_query_packet(const char *p, const char *query, char separator)
+>  {
+>      unsigned int query_len = strlen(query);
 >  
->          object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUIT_SMC,
+>      return strncmp(p, query, query_len) == 0 &&
+> @@ -1018,22 +1073,23 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>      const char *p;
+>      uint32_t thread;
+>      int ch, reg_size, type, res;
+>      uint8_t mem_buf[MAX_PACKET_LENGTH];
+>      char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+> +    char thread_id[16];
+>      uint8_t *registers;
+>      target_ulong addr, len;
+>  
+>      trace_gdbstub_io_command(line_buf);
+>  
+>      p = line_buf;
+>      ch = *p++;
+>      switch(ch) {
+>      case '?':
+>          /* TODO: Make this return the correct value for user-mode.  */
+
+Is this comment still relevant?
+
+If so, wouldn't it be better placed in [*]?
+
+> -        snprintf(buf, sizeof(buf), "T%02xthread:%02x;", GDB_SIGNAL_TRAP,
+> -                 cpu_gdb_index(s->c_cpu));
+> +        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
+> +                 gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread_id)));
+>          put_packet(s, buf);
+>          /* Remove all the breakpoints when this query is issued,
+>           * because gdb is doing and initial connect and the state
+>           * should be cleaned up.
+>           */
 > 
