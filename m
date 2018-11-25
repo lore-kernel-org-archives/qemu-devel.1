@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gQozj-0003jS-LK
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 02:38:20 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gQp2N-0004UH-56
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 02:41:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gQozg-0005ED-Fn
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 02:38:19 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34910)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gQp2J-0007cD-Lo
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 02:41:03 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50463)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1gQozg-0005Bs-6g
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 02:38:16 -0500
-Received: by mail-wm1-x344.google.com with SMTP id c126so15219756wmh.0
-	for <qemu-devel@nongnu.org>; Sat, 24 Nov 2018 23:38:16 -0800 (PST)
-References: <20181118122843.10892-1-yuval.shaia@oracle.com>
-	<20181118122843.10892-18-yuval.shaia@oracle.com>
+	id 1gQp2J-0007Zg-6W
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 02:40:59 -0500
+Received: by mail-wm1-x344.google.com with SMTP id 125so15231767wmh.0
+	for <qemu-devel@nongnu.org>; Sat, 24 Nov 2018 23:40:57 -0800 (PST)
+References: <20181122121402.13764-1-yuval.shaia@oracle.com>
+	<20181122121402.13764-18-yuval.shaia@oracle.com>
 From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <0d8508a6-9277-1895-fd96-d84417f69391@gmail.com>
-Date: Sun, 25 Nov 2018 09:38:08 +0200
+Message-ID: <335892d6-7475-8465-4b20-060bd2960c0f@gmail.com>
+Date: Sun, 25 Nov 2018 09:40:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181118122843.10892-18-yuval.shaia@oracle.com>
+In-Reply-To: <20181122121402.13764-18-yuval.shaia@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v4 17/23] hw/pvrdma: Fill error code in
+Subject: Re: [Qemu-devel] [PATCH v5 17/24] hw/pvrdma: Fill error code in
  command's response
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,7 +36,7 @@ To: Yuval Shaia <yuval.shaia@oracle.com>, dmitry.fleytman@gmail.com, jasowang@re
 
 
 
-On 11/18/18 2:28 PM, Yuval Shaia wrote:
+On 11/22/18 2:13 PM, Yuval Shaia wrote:
 > Driver checks error code let's set it.
 >
 > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
@@ -230,7 +230,8 @@ On 11/18/18 2:28 PM, Yuval Shaia wrote:
 >       set_reg_val(dev, PVRDMA_REG_ERR, err);
 >       post_interrupt(dev, INTR_VEC_CMD_RING);
 
-As I responded in V3 thread one might forget to set hdr.error to 0
+
+As I responded in V4 thread :) one might forget to set hdr.error to 0
 resulting in errors hard to debug.
 
 Please consider clearing the field on init.
