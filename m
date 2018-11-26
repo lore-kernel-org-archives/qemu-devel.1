@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRKvc-0000Af-CU
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:44:13 -0500
+	(envelope-from <philmd@redhat.com>) id 1gRL1V-0003JI-Q3
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:50:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRKvb-0006xH-Ji
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:44:12 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34267)
+	(envelope-from <philmd@redhat.com>) id 1gRL1Q-0003j5-Bw
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:50:17 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:34391)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gRKvb-0006wz-7D
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:44:11 -0500
-Received: by mail-oi1-x242.google.com with SMTP id h25so16667583oig.1
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 09:44:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRL1Q-0003iV-6c
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:50:12 -0500
+Received: by mail-wm1-f67.google.com with SMTP id y185so13075991wmd.1
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 09:50:12 -0800 (PST)
+References: <20181125205000.10324-1-philmd@redhat.com>
+	<20181125205000.10324-11-philmd@redhat.com>
+	<40c0e94b-687c-aaba-9d29-9ecdcbad937d@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2a9cf123-f677-3bdd-efeb-08c895a6243c@redhat.com>
+Date: Mon, 26 Nov 2018 18:49:26 +0100
 MIME-Version: 1.0
-References: <20181112214224.31560-1-contrib@steffen-goertz.de>
-	<20181112214224.31560-6-contrib@steffen-goertz.de>
-	<CAFEAcA_oxGQY6K4wQ3TTz1moa8rrXd=Hd3bcjE5NM2d=omn0YQ@mail.gmail.com>
-	<e1e4c8d7-cb81-7f1d-ae38-a4cac5c85a48@steffen-goertz.de>
-In-Reply-To: <e1e4c8d7-cb81-7f1d-ae38-a4cac5c85a48@steffen-goertz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Nov 2018 17:43:59 +0000
-Message-ID: <CAFEAcA_Du4OTLqfNECY=BTvW089RTNu3qpxm2yv=iLL9g-m5qQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 05/14] hw/nvram/nrf51_nvm: Add nRF51
- non-volatile memories
+In-Reply-To: <40c0e94b-687c-aaba-9d29-9ecdcbad937d@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1 10/25] MAINTAINERS: Add missing
+ entries for the sun4u machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +32,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
-Cc: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 26 Nov 2018 at 00:24, Steffen G=C3=B6rtz <mail@steffen-goertz.de> w=
-rote:
->
-> Hi Peter,
->
-> thank you for your remarks!
->
-> >> +};
-> >> +
-> >> +static uint64_t ficr_read(void *opaque, hwaddr offset
-> >
-> >> +            value &=3D ~(NRF51_PAGE_SIZE - 1);
-> >> +            if (value < (s->flash_size - NRF51_PAGE_SIZE)) {
-> >> +                memset(s->storage + value / 4, 0xFF, NRF51_PAGE_SIZE)=
-;
-> >
-> > Can the guest try to execute from the flash storage? If so
-> > then just updating the backing storage directly like this is
-> > not sufficient to ensure that QEMU discards any now-stale
-> > translated code blocks from the affected memory.
->
-> What else is necessary to invalidate stale blocks?
+On 26/11/18 18:05, Mark Cave-Ayland wrote:
+> On 25/11/2018 20:49, Philippe Mathieu-Daudé wrote:
+> 
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  MAINTAINERS | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index ba9cd9ac2b..d9cddb0cc8 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -1019,6 +1019,10 @@ Sun4u
+>>  M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>  S: Maintained
+>>  F: hw/sparc64/sun4u.c
+>> +F: hw/sparc64/sun4u_iommu.c
+>> +F: include/hw/sparc/sun4u_iommu.h
+>> +F: hw/pci-host/sabre.c
+>> +F: include/hw/pci-host/sabre.h
+>>  F: pc-bios/openbios-sparc64
+> 
+> These are correct, however you also want to add the simba PCI bridges i.e.
+> 
+> F: hw/pci-bridge/simba.c
+> F: include/hw/pci-bridge/simba.h
 
-You need an AddressSpace that points to the MemoryRegion(s)
-you're altering, and you need to use the operations on
-the AddressSpace like address_space_write(). These will
-under the hood do the right thing with TB invalidation.
+OK, will update.
 
-> >> +static void nrf51_nvm_reset(DeviceState *dev)
-> >> +{
-> >> +    NRF51NVMState *s =3D NRF51_NVM(dev);
-> >> +
-> >> +    s->config =3D 0x00;
-> >
-> > Shouldn't uicr_content[] and storage be reset too ?
->
->
-> Storage and uicr_content should be retained during a device reset.
+> 
+> So with that:
+> 
+> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-If you want storage that lives over system reset, that is
-painful, because it means you need to back it with a
-block device (like we do for disks and for flash memory).
-(This is because QEMU's system reset is a hard-power-cycle;
-it should be equivalent to stopping QEMU entirely and
-then restarting it, so any persistent storage needs to be
-in a block device somewhere.)
+Thanks!
 
-thanks
--- PMM
+Phil.
