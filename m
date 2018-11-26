@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gR4hv-0008Ps-8d
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 19:24:59 -0500
+	(envelope-from <cota@braap.org>) id 1gR4n5-00026p-6W
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 19:30:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gR4hs-0002TV-2V
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 19:24:59 -0500
-Received: from steffen-goertz.de ([88.198.119.201]:38820)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gR4hr-0002T8-SR
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 19:24:56 -0500
-References: <20181112214224.31560-1-contrib@steffen-goertz.de>
-	<20181112214224.31560-6-contrib@steffen-goertz.de>
-	<CAFEAcA_oxGQY6K4wQ3TTz1moa8rrXd=Hd3bcjE5NM2d=omn0YQ@mail.gmail.com>
-From: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
-Message-ID: <e1e4c8d7-cb81-7f1d-ae38-a4cac5c85a48@steffen-goertz.de>
-Date: Sun, 25 Nov 2018 19:24:51 -0500
+	(envelope-from <cota@braap.org>) id 1gR4n1-0005ad-VD
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 19:30:19 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:44659)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gR4n1-0005a6-Lv
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 19:30:15 -0500
+Date: Sun, 25 Nov 2018 19:30:11 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181126003011.GA12936@flamenco>
+References: <20181123144558.5048-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_oxGQY6K4wQ3TTz1moa8rrXd=Hd3bcjE5NM2d=omn0YQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 05/14] hw/nvram/nrf51_nvm: Add nRF51
- non-volatile memories
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181123144558.5048-1-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2 00/37] tcg: Assorted cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Alistair.Francis@wdc.com
 
-Hi Peter,
+On Fri, Nov 23, 2018 at 15:45:21 +0100, Richard Henderson wrote:
+> This includes everything queued so far -- softmmu out-of-line
+> patches
 
-thank you for your remarks!
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+for patches 1-9.
 
->> +};
->> +
->> +static uint64_t ficr_read(void *opaque, hwaddr offset
-> 
->> +            value &= ~(NRF51_PAGE_SIZE - 1);
->> +            if (value < (s->flash_size - NRF51_PAGE_SIZE)) {
->> +                memset(s->storage + value / 4, 0xFF, NRF51_PAGE_SIZE);
-> 
-> Can the guest try to execute from the flash storage? If so
-> then just updating the backing storage directly like this is
-> not sufficient to ensure that QEMU discards any now-stale
-> translated code blocks from the affected memory.
+I am sad to report that on a Skylake host, this series gives
+a ~10% average slowdown for x86_64-softmmu SPEC06int
+(I'm reporting speedup, so <1 means slowdown):
+  https://imgur.com/a/25iu8Yl
 
-What else is necessary to invalidate stale blocks?
+Turns out that despite the higher icache hit, the IPC
+ends up being lower. For instance, here are perf counts when
+running hmmer x3 right after booting up (bootup is included
+in the counts, but hmmer is run 3 times in a row):
 
+- Before:
+   249,392,070,159      cycles
+   781,327,593,681      instructions              #    3.13  insn per cycle
+    85,914,418,873      branches
+       242,572,820      branch-misses             #    0.28% of all branches
+     1,567,954,032      L1-icache-load-misses
 
->> +
->> +static void nrf51_nvm_reset(DeviceState *dev)
->> +{
->> +    NRF51NVMState *s = NRF51_NVM(dev);
->> +
->> +    s->config = 0x00;
-> 
-> Shouldn't uicr_content[] and storage be reset too ?
+      70.559864567 seconds time elapsed
 
+- After:
+   277,806,651,701      cycles
+   813,619,725,225      instructions              #    2.93  insn per cycle
+   132,453,633,831      branches
+       306,969,989      branch-misses             #    0.23% of all branches
+     1,250,619,057      L1-icache-load-misses
 
-Storage and uicr_content should be retained during a device reset. 
+      78.420517079 seconds time elapsed
 
-Best,
-Steffen
+On the bright side, in an older system (Sandy Bridge), I get
+a fairly neutral average perf impact, with some workloads
+speeding up and others slowing down:
+  https://imgur.com/a/AokDbkm
+(Note that v1 of this series gave an overall slowdown, so that's
+progress.)
+
+Given the above, perhaps the best way forward is to add a
+configure flag to disable OOL thunks, unless you have any
+further optimizations coming up.
+
+Thanks,
+
+		Emilio
