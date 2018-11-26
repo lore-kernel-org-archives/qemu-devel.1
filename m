@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gRBlx-000261-G8
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 02:57:38 -0500
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gRBoy-0003mN-Ip
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 03:00:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1gRBlu-0001lz-A0
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 02:57:37 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44210)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1gRBov-0004XF-EG
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 03:00:44 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:35312)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1gRBlu-0001kt-2A
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 02:57:34 -0500
-Received: by mail-pf1-x444.google.com with SMTP id u6so6166476pfh.11
-	for <qemu-devel@nongnu.org>; Sun, 25 Nov 2018 23:57:33 -0800 (PST)
+	id 1gRBov-0004Wt-8C
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 03:00:41 -0500
+Received: by mail-pg1-x542.google.com with SMTP id s198so5790346pgs.2
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 00:00:41 -0800 (PST)
 References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
-	<20181122072028.22819-3-xiaoguangrong@tencent.com>
-	<20181123110239.GC2373@work-vm>
+	<20181122072028.22819-4-xiaoguangrong@tencent.com>
+	<20181123181717.GH2373@work-vm>
+	<ec42ec4b-652d-807e-2d88-94a2d52e9cec@redhat.com>
+	<20181123182918.GI2373@work-vm>
 From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <e60f648f-d475-a88b-b0c3-300f18a7d36d@gmail.com>
-Date: Mon, 26 Nov 2018 15:57:25 +0800
+Message-ID: <c36abd0a-fcca-c9c2-11a7-c5d39a386418@gmail.com>
+Date: Mon, 26 Nov 2018 16:00:34 +0800
 MIME-Version: 1.0
-In-Reply-To: <20181123110239.GC2373@work-vm>
+In-Reply-To: <20181123182918.GI2373@work-vm>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] util: introduce threaded workqueue
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] migration: use threaded workqueue
+ for compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +35,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
 
 
-On 11/23/18 7:02 PM, Dr. David Alan Gilbert wrote:
+On 11/24/18 2:29 AM, Dr. David Alan Gilbert wrote:
 
->> +#include "qemu/osdep.h"
->> +#include "qemu/bitmap.h"
->> +#include "qemu/threaded-workqueue.h"
->> +
->> +#define SMP_CACHE_BYTES 64
+>>>>   static void
+>>>> -update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
+>>>> +update_compress_thread_counts(CompressData *cd, int bytes_xmit)
+>>>
+>>> Keep the const?
+
+Yes, indeed. Will correct it in the next version.
+
+>>>> +    if (deflateInit(&cd->stream, migrate_compress_level()) != Z_OK) {
+>>>> +        g_free(cd->originbuf);
+>>>> +        return -1;
+>>>> +    }
+>>>
+>>> Please print errors if you fail in any case so we can easily tell what
+>>> happened.
+
+Sure, will do.
+
+>>>> +        if (wait) {
+>>>> +            cpu_relax();
+>>>> +            goto retry;
+>>>
+>>> Is there nothing better we can use to wait without eating CPU time?
+>>
+>> There is a mechanism to wait without eating CPU time in the data
+>> structure, but it makes sense to busy wait.  There are 4 threads in the
+>> workqueue, so you have to compare 1/4th of the time spent compressing a
+>> page, with the trip into the kernel to wake you up.  You're adding 20%
+>> CPU usage, but I'm not surprised it's worthwhile.
 > 
-> That's architecture dependent isn't it?
+> Hmm OK; in that case it does at least need a comment because it's a bit
+> odd, and we should watch out how that scales - I guess it's less of
+> an overhead the more threads you use.
 > 
 
-Yes, it's arch dependent indeed.
-
-I just used 64 for simplification and i think it is <= 64 on most CPU arch-es
-so that can work.
-
-Should i introduce statically defined CACHE LINE SIZE for all arch-es? :(
-
->> +   /*
->> +     * the bit in these two bitmaps indicates the index of the ＠requests
->> +     * respectively. If it's the same, the corresponding request is free
->> +     * and owned by the user, i.e, where the user fills a request. Otherwise,
->> +     * it is valid and owned by the thread, i.e, where the thread fetches
->> +     * the request and write the result.
->> +     */
->> +
->> +    /* after the user fills the request, the bit is flipped. */
->> +    uint64_t request_fill_bitmap QEMU_ALIGNED(SMP_CACHE_BYTES);
->> +    /* after handles the request, the thread flips the bit. */
->> +    uint64_t request_done_bitmap QEMU_ALIGNED(SMP_CACHE_BYTES);
-> 
-> Patchew complained about some type mismatches; I think those are because
-> you're using the bitmap_* functions on these; those functions always
-> operate on 'long' not on uint64_t - and on some platforms they're
-> unfortunately not the same.
-
-I guess you were taking about this error:
-ERROR: externs should be avoided in .c files
-#233: FILE: util/threaded-workqueue.c:65:
-+    uint64_t request_fill_bitmap QEMU_ALIGNED(SMP_CACHE_BYTES);
-
-The complained thing is "QEMU_ALIGNED(SMP_CACHE_BYTES)" as it gone
-when the aligned thing is removed...
-
-The issue you pointed out can be avoid by using type-casting, like:
-bitmap_xor(..., (void *)&thread->request_fill_bitmap)
-cannot we?
-
-Thanks!
+Sure, will add some comments to explain the purpose.
