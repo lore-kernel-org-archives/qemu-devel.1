@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@outlook.com>) id 1gREDl-00006c-RB
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:34:34 -0500
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gREE6-0000CP-85
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:34:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@outlook.com>) id 1gREDf-0003Ob-My
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:34:29 -0500
-Received: from mail-oln040092003045.outbound.protection.outlook.com
-	([40.92.3.45]:41568
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liq3ea@outlook.com>) id 1gREDe-0003H8-Kk
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:34:23 -0500
-From: li qiang <liq3ea@outlook.com>
-Date: Mon, 26 Nov 2018 10:34:13 +0000
-Message-ID: <BN6PR18MB1220C6FD680DB5E2C2AEA9F09FD70@BN6PR18MB1220.namprd18.prod.outlook.com>
-References: <20181126100836.8805-1-kraxel@redhat.com>
-In-Reply-To: <20181126100836.8805-1-kraxel@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="gb2312"
-Content-ID: <D792E567124E8F448F575430815ADD61@namprd18.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1gREE2-0003i8-O5
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:34:50 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38019)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1gREE2-0003h8-DK
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:34:46 -0500
+Received: by mail-wr1-x443.google.com with SMTP id v13so14842422wrw.5
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 02:34:46 -0800 (PST)
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+References: <20181122121402.13764-1-yuval.shaia@oracle.com>
+	<20181122121402.13764-25-yuval.shaia@oracle.com>
+	<8b89bfaf-be29-e043-32fa-9615fb4ea0f7@gmail.com>
+Message-ID: <25d71e93-c1ab-01c3-8f6c-145606d11a84@gmail.com>
+Date: Mon, 26 Nov 2018 12:34:41 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] ehci: fix fetch qtd race
+In-Reply-To: <8b89bfaf-be29-e043-32fa-9615fb4ea0f7@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v5 24/24] docs: Update pvrdma device
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +33,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Yuval Shaia <yuval.shaia@oracle.com>, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-DQrU2iAyMDE4LzExLzI2IDE4OjA4LCBHZXJkIEhvZmZtYW5uINC0tcA6DQo+IFRoZSB0b2tlbiBm
-aWVsZCBjb250YWlucyB0aGUgKGd1ZXN0LWZpbGxlZCkgc3RhdGUgb2YgdGhlIHF0ZCwgd2hpY2gN
-Cj4gaW5kaWNhdGVzIHdoZW5ldmVyIHRoZSBvdGhlciBmaWVsZHMgYXJlIHZhbGlkIG9yIG5vdC4g
-IFNvIG1ha2Ugc3VyZQ0KPiB3ZSByZWFkIHRoZSB0b2tlbiBmaXJzdCwgb3RoZXJ3aXNlIHdlIG1h
-eSBlbmQgdXAgd2l0aCBhbiBzdGFsZSBuZXh0DQo+IHBvaW50ZXI6DQo+DQo+ICAgICgxKSBlaGNp
-IHJlYWRzIG5leHQNCj4gICAgKDIpIGd1ZXN0IHdyaXRlcyBuZXh0DQo+ICAgICgzKSBndWVzdCB3
-cml0ZXMgdG9rZW4NCj4gICAgKDQpIGVoY2kgcmVhZHMgdG9rZW4NCj4gICAgKDUpIGVoY2kgb3Bl
-cmF0ZXMgd2l0aCBzdGFsZSBuZXh0Lg0KDQpIZWxsbyBHZXJkLA0KDQpDb3VsZCB5b3UgcGxlYXNl
-IGV4cGxhaW4gaG93IHRoaXMgY2FuIGhhcHBlbj8NCg0KSU1PLCB0aGUgZGV2aWNlIGVtdWxhdGlv
-biBob2xkcyB0aGUgQlFMIGFuZCB0aGUgZ3Vlc3QgY2FuJ3QgZXhlY3V0ZSwgaG93IA0KY2FuIHRo
-ZSBndWVzdA0KDQp3cml0ZSB0aGlzIHdoZW4gUUVNVSBpcyBpbiAnZWhjaV9zdGF0ZV9mZXRjaHF0
-ZCc/DQoNCg0KVGhhbmtzLA0KDQpMaSBRaWFuZw0KDQoNCj4gVHlwaWNhbCBlZmZlY3QgaXMgdGhh
-dCBxZW11IGRvZXNuJ3Qgbm90aWNlIHRoYXQgdGhlIGd1ZXN0IGFwcGVuZHMgbmV3DQo+IHF0ZHMg
-dG8gdGhlIGVuZCBvZiB0aGUgcXVldWUuICBMb29rcyBsaWtlIHRoZSB1c2IgZGV2aWNlIHN0b3Bw
-ZWQNCj4gcmVzcG9uZGluZy4gIExpbnV4IGNhbiByZWNvdmVyIGZyb20gdGhhdCwgYnV0IGxlYXZl
-cyBhIG1lc3NhZ2UgaW4gdGhlDQo+IGtlcm5lbCBsb2cgdGhhdCBpdCBkaWQgcmVzZXQgdGhlIHVz
-YiBkZXZpY2UgaW4gcXVlc3Rpb24uDQo+DQo+IFNpZ25lZC1vZmYtYnk6IEdlcmQgSG9mZm1hbm4g
-PGtyYXhlbEByZWRoYXQuY29tPg0KPiAtLS0NCj4gICBody91c2IvaGNkLWVoY2kuYyB8IDEyICsr
-KysrKysrKystLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxMCBpbnNlcnRpb25zKCspLCAyIGRlbGV0
-aW9ucygtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvaHcvdXNiL2hjZC1laGNpLmMgYi9ody91c2IvaGNk
-LWVoY2kuYw0KPiBpbmRleCBlNWFjZmM1YmE1Li44ZDQ0ZDQ4M2RmIDEwMDY0NA0KPiAtLS0gYS9o
-dy91c2IvaGNkLWVoY2kuYw0KPiArKysgYi9ody91c2IvaGNkLWVoY2kuYw0KPiBAQCAtMTc4Myw5
-ICsxNzgzLDE3IEBAIHN0YXRpYyBpbnQgZWhjaV9zdGF0ZV9mZXRjaHF0ZChFSENJUXVldWUgKnEp
-DQo+ICAgICAgIEVIQ0lxdGQgcXRkOw0KPiAgICAgICBFSENJUGFja2V0ICpwOw0KPiAgICAgICBp
-bnQgYWdhaW4gPSAxOw0KPiArICAgIHVpbnQzMl90IGFkZHI7DQo+ICAgDQo+IC0gICAgaWYgKGdl
-dF9kd29yZHMocS0+ZWhjaSwgTkxQVFJfR0VUKHEtPnF0ZGFkZHIpLCAodWludDMyX3QgKikgJnF0
-ZCwNCj4gLSAgICAgICAgICAgICAgICAgICBzaXplb2YoRUhDSXF0ZCkgPj4gMikgPCAwKSB7DQo+
-ICsgICAgYWRkciA9IE5MUFRSX0dFVChxLT5xdGRhZGRyKTsNCj4gKyAgICBpZiAoZ2V0X2R3b3Jk
-cyhxLT5laGNpLCBhZGRyICsgIDgsICZxdGQudG9rZW4sICAgMSkgPCAwKSB7DQo+ICsgICAgICAg
-IHJldHVybiAwOw0KPiArICAgIH0NCj4gKyAgICBiYXJyaWVyKCk7DQo+ICsgICAgaWYgKGdldF9k
-d29yZHMocS0+ZWhjaSwgYWRkciArICAwLCAmcXRkLm5leHQsICAgIDEpIDwgMCB8fA0KPiArICAg
-ICAgICBnZXRfZHdvcmRzKHEtPmVoY2ksIGFkZHIgKyAgNCwgJnF0ZC5hbHRuZXh0LCAxKSA8IDAg
-fHwNCj4gKyAgICAgICAgZ2V0X2R3b3JkcyhxLT5laGNpLCBhZGRyICsgMTIsIHF0ZC5idWZwdHIs
-DQo+ICsgICAgICAgICAgICAgICAgICAgQVJSQVlfU0laRShxdGQuYnVmcHRyKSkgPCAwKSB7DQo+
-ICAgICAgICAgICByZXR1cm4gMDsNCj4gICAgICAgfQ0KPiAgICAgICBlaGNpX3RyYWNlX3F0ZChx
-LCBOTFBUUl9HRVQocS0+cXRkYWRkciksICZxdGQpOw0K
+Re-sending the comments, some of the recipients didn't get it,
+
+Thanks,
+Marcel
+
+On 11/25/18 9:51 AM, Marcel Apfelbaum wrote:
+>
+>
+> On 11/22/18 2:14 PM, Yuval Shaia wrote:
+>> Interface with the device is changed with the addition of support for
+>> MAD packets.
+>> Adjust documentation accordingly.
+>>
+>> While there fix a minor mistake which may lead to think that there is a
+>> relation between using RXE on host and the compatibility with bare-metal
+>> peers.
+>>
+>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+>> ---
+>>   docs/pvrdma.txt | 103 +++++++++++++++++++++++++++++++++++++++---------
+>>   1 file changed, 84 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/docs/pvrdma.txt b/docs/pvrdma.txt
+>> index 5599318159..f82b2a69d2 100644
+>> --- a/docs/pvrdma.txt
+>> +++ b/docs/pvrdma.txt
+>> @@ -9,8 +9,9 @@ It works with its Linux Kernel driver AS IS, no need 
+>> for any special guest
+>>   modifications.
+>>     While it complies with the VMware device, it can also communicate 
+>> with bare
+>> -metal RDMA-enabled machines and does not require an RDMA HCA in the 
+>> host, it
+>> -can work with Soft-RoCE (rxe).
+>> +metal RDMA-enabled machines as peers.
+>> +
+>> +It does not require an RDMA HCA in the host, it can work with 
+>> Soft-RoCE (rxe).
+>>     It does not require the whole guest RAM to be pinned allowing memory
+>>   over-commit and, even if not implemented yet, migration support 
+>> will be
+>> @@ -78,29 +79,93 @@ the required RDMA libraries.
+>>     3. Usage
+>>   ========
+>> +
+>> +
+>> +3.1 VM Memory settings
+>> +======+++=============
+>>   Currently the device is working only with memory backed RAM
+>>   and it must be mark as "shared":
+>>      -m 1G \
+>>      -object memory-backend-ram,id=mb1,size=1G,share \
+>>      -numa node,memdev=mb1 \
+>>   -The pvrdma device is composed of two functions:
+>> - - Function 0 is a vmxnet Ethernet Device which is redundant in Guest
+>> -   but is required to pass the ibdevice GID using its MAC.
+>> -   Examples:
+>> -     For an rxe backend using eth0 interface it will use its mac:
+>> -       -device vmxnet3,addr=<slot>.0,multifunction=on,mac=<eth0 MAC>
+>> -     For an SRIOV VF, we take the Ethernet Interface exposed by it:
+>> -       -device vmxnet3,multifunction=on,mac=<RoCE eth MAC>
+>> - - Function 1 is the actual device:
+>> -       -device 
+>> pvrdma,addr=<slot>.1,backend-dev=<ibdevice>,backend-gid-idx=<gid>,backend-port=<port>
+>> -   where the ibdevice can be rxe or RDMA VF (e.g. mlx5_4)
+>> - Note: Pay special attention that the GID at backend-gid-idx matches 
+>> vmxnet's MAC.
+>> - The rules of conversion are part of the RoCE spec, but since manual 
+>> conversion
+>> - is not required, spotting problems is not hard:
+>> -    Example: GID: fe80:0000:0000:0000:7efe:90ff:fecb:743a
+>> -             MAC: 7c:fe:90:cb:74:3a
+>> -    Note the difference between the first byte of the MAC and the GID.
+>> +
+>> +3.2 MAD Multiplexer
+>> +===================
+>> +MAD Multiplexer is a service that exposes MAD-like interface for VMs in
+>> +order to overcome the limitation where only single entity can 
+>> register with
+>> +MAD layer to send and receive RDMA-CM MAD packets.
+>> +
+>> +To build rdmacm-mux run
+>> +# make rdmacm-mux
+>> +
+>> +The application accepts 3 command line arguments and exposes a UNIX 
+>> socket
+>> +to pass control and data to it.
+>> +-s unix-socket-path   Path to unix socket to listen on
+>> +                      (default /var/run/rdmacm-mux)
+>> +-d rdma-device-name   Name of RDMA device to register with
+>> +                      (default rxe0)
+>
+> I would not default it to rxe0, but request to specify a RDMA interface.
+> One can think the multiplexer may select the best available device
+> and finish with an rxe instance instead of a bare-metal one...
+>
+>> +-p rdma-device-port   Port number of RDMA device to register with
+>> +                      (default 1)
+>> +The final UNIX socket file name is a concatenation of the 3 
+>> arguments so
+>> +for example for device mlx5_0 on port 2 this 
+>> /var/run/rdmacm-mux-mlx5_0-2
+>> +will be created.
+>> +
+>> +Please refer to contrib/rdmacm-mux for more details.
+>> +
+>> +
+>> +3.3 PCI devices settings
+>> +========================
+>> +RoCE device exposes two functions - an Ethernet and RDMA.
+>> +To support it, pvrdma device is composed of two PCI functions, an 
+>> Ethernet
+>> +device of type vmxnet3 on PCI slot 0 and a PVRDMA device on PCI slot 
+>> 1. The
+>> +Ethernet function can be used for other Ethernet purposes such as IP.
+>
+> Nice !
+>
+>> +
+>> +
+>> +3.4 Device parameters
+>> +=====================
+>> +- netdev: Specifies the Ethernet device on host. For Soft-RoCE (rxe) 
+>> this
+>> +  would be the Ethernet device used to create it. For any other 
+>> physical
+>> +  RoCE device this would be the netdev name of the device.
+>
+> I don't fully understand the above explanation. Can you elaborate
+> or give an exmaple?
+>
+>> +- ibdev: The IB device name on host for example rxe0, mlx5_0 etc.
+>> +- mad-chardev: The name of the MAD multiplexer char device.
+>> +- ibport: In case of multi-port device (such as Mellanox's HCA) this
+>> +  specify the port to use. If not set 1 will be used.
+>> +- dev-caps-max-mr-size: The maximum size of MR.
+>> +- dev-caps-max-qp: Maximum number of QPs.
+>> +- dev-caps-max-sge: Maximum number of SGE elements in WR.
+>> +- dev-caps-max-cq: Maximum number of CQs.
+>> +- dev-caps-max-mr: Maximum number of MRs.
+>> +- dev-caps-max-pd: Maximum number of PDs.
+>> +- dev-caps-max-ah: Maximum number of AHs.
+>> +
+>> +Notes:
+>> +- The first 3 parameters are mandatory settings, the rest have their
+>> +  defaults.
+>> +- The last 8 parameters (the ones that prefixed by dev-caps) defines 
+>> the top
+>> +  limits but the final values is adjusted by the backend device 
+>> limitations.
+>> +
+>> +3.5 Example
+>> +===========
+>> +Define bridge device with vmxnet3 network backend:
+>> +<interface type='bridge'>
+>> +  <mac address='56:b4:44:e9:62:dc'/>
+>> +  <source bridge='bridge1'/>
+>> +  <model type='vmxnet3'/>
+>> +  <address type='pci' domain='0x0000' bus='0x00' slot='0x10' 
+>> function='0x0' multifunction='on'/>
+>> +</interface>
+>> +
+>> +Define pvrdma device:
+>> +<qemu:commandline>
+>> +  <qemu:arg value='-object'/>
+>> +  <qemu:arg value='memory-backend-ram,id=mb1,size=1G,share'/>
+>> +  <qemu:arg value='-numa'/>
+>> +  <qemu:arg value='node,memdev=mb1'/>
+>> +  <qemu:arg value='-chardev'/>
+>> +  <qemu:arg value='socket,path=/var/run/rdmacm-mux-rxe0-1,id=mads'/>
+>> +  <qemu:arg value='-device'/>
+>> +  <qemu:arg 
+>> value='pvrdma,addr=10.1,ibdev=rxe0,netdev=bridge0,mad-chardev=mads'/>
+>> +</qemu:commandline>
+>
+> Please be sure to emphasize that the pvrdma works only
+> if the QEMU is operated by libvirt. The same about the multiplexer.
+>
+> Thanks,
+> Marcel
+>
+>
