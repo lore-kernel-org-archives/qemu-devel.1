@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRKFW-0002sd-4O
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:00:43 -0500
+	(envelope-from <groeck7@gmail.com>) id 1gRKGa-0003bF-5K
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:01:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRKFR-0008K2-E5
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:00:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55012)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gRKFR-0008Iu-73
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:00:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gRKFQ-0000vg-7B
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 17:00:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2BFEB2E80BA
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 17:00:36 +0000 (UTC)
+	(envelope-from <groeck7@gmail.com>) id 1gRKGU-0000Pt-UK
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:01:48 -0500
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Mon, 26 Nov 2018 09:01:31 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20181126170131.GA13784@roeck-us.net>
+References: <1543187035-32757-1-git-send-email-linux@roeck-us.net>
+	<20181126161716.GR26707@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 26 Nov 2018 16:44:04 -0000
-From: tinywrkbee <1592351@bugs.launchpad.net>
-Reply-To: Bug 1592351 <1592351@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160614104554.31869.91941.malonedeb@soybean.canonical.com>
-Message-Id: <154325064494.16264.16475071947589679333.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1592351] Re: mouse pointer offset with gtk, gl=on
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181126161716.GR26707@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] nvme: Only generate interupt if warranted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Keith Busch <keith.busch@intel.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-seems to be fixed with f1aba960cc40ab65fa88c8678883bd2201708c55 :
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Df1aba960cc40ab65fa88c8678=
-883bd2201708c55
+Hi Keith,
 
+On Mon, Nov 26, 2018 at 09:17:17AM -0700, Keith Busch wrote:
+> On Sun, Nov 25, 2018 at 03:03:55PM -0800, Guenter Roeck wrote:
+> > So far the code generates interrupts even if it doesn't pass any new
+> > information to the user. This can result in spurious interrupts as
+> > sometimes observed with Linux.
+> > 
+> > Only generate interrupts if warranted, ie if anything new is passed
+> > to the emulated code.
+> > 
+> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> > ---
+> >  hw/block/nvme.c | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > index 9fbe567..c543c01 100644
+> > --- a/hw/block/nvme.c
+> > +++ b/hw/block/nvme.c
+> > @@ -252,6 +252,7 @@ static void nvme_post_cqes(void *opaque)
+> >      NvmeCQueue *cq = opaque;
+> >      NvmeCtrl *n = cq->ctrl;
+> >      NvmeRequest *req, *next;
+> > +    bool assert_irq = false;
+> >  
+> >      QTAILQ_FOREACH_SAFE(req, &cq->req_list, entry, next) {
+> >          NvmeSQueue *sq;
+> > @@ -271,8 +272,11 @@ static void nvme_post_cqes(void *opaque)
+> >          pci_dma_write(&n->parent_obj, addr, (void *)&req->cqe,
+> >              sizeof(req->cqe));
+> >          QTAILQ_INSERT_TAIL(&sq->req_list, req, entry);
+> > +        assert_irq = true;
+> > +    }
+> > +    if (assert_irq) {
+> > +        nvme_irq_assert(n, cq);
+> >      }
+> > -    nvme_irq_assert(n, cq);
+> >  }
+> >  
+> >  static void nvme_enqueue_req_completion(NvmeCQueue *cq, NvmeRequest *req)
+> > -- 
+> 
+> There is a corner case this may break. For example, a controller posts
+> 2 completions. The host happens to only see one of those completions due
+> to the inherent race when reading the phase bit. After the host updates
+> the CQ DB, the controller ought to send another interrupt even if it
+> didn't post any new CQEs to prevent command completion timeouts. This
+> might get the right behavior:
+> 
+> ---
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index fc7dacb816..486db6e561 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -272,7 +272,9 @@ static void nvme_post_cqes(void *opaque)
+>              sizeof(req->cqe));
+>          QTAILQ_INSERT_TAIL(&sq->req_list, req, entry);
+>      }
+> -    nvme_irq_assert(n, cq);
+> +    if (cq->tail != cq->head) {
+> +        nvme_irq_assert(n, cq);
+> +    }
+>  }
+> 
+That works for me as well, and looks much cleaner. Should I resubmit,
+or do you want to take it from here ?
 
-anyone else can confirm, i have another issue affecting scaling with my set=
-up.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1592351
-
-Title:
-  mouse pointer offset with gtk,gl=3Don
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  When I turn gl=3Don for -display gtk, some Y offset is added to the
-  mouse pointer coordinates. That is, when I click on an icon, an icon
-  _above_ the one I clicked triggers.
-
-  Using xev, it seems to be offset of 10-12 pixels.
-
-  It happens with all ps/2 mouse, -usbdevice mouse and -usbdevice
-  tablet.
-
-  Without gl=3Don, the pointer is precise.
-
-  I have these qemu versions:
-  qemu-2.6.0-470.2.x86_64
-  qemu-ipxe-1.0.0-470.2.noarch
-  qemu-ksm-2.6.0-470.2.x86_64
-  qemu-kvm-2.6.0-470.2.x86_64
-  qemu-ovmf-x86_64-2015+git1462940744.321151f-2.1.noarch
-  qemu-ppc-2.6.0-470.2.x86_64
-  qemu-seabios-1.9.1-470.2.noarch
-  qemu-sgabios-8-470.2.noarch
-  qemu-tools-2.6.0-470.2.x86_64
-  qemu-vgabios-1.9.1-470.2.noarch
-  qemu-x86-2.6.0-470.2.x86_64
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1592351/+subscriptions
+Thanks,
+Guenter
