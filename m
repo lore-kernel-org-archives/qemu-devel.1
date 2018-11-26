@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRPs7-0008Q7-NJ
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:00:57 -0500
+	(envelope-from <philmd@redhat.com>) id 1gRPsc-0000Ce-77
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:01:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRPs1-0006ut-Ss
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:00:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56006)
+	(envelope-from <philmd@redhat.com>) id 1gRPsV-00077t-84
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:01:25 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:50200)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gRPs1-0006rq-Lb
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:00:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gRPs0-0002Qz-2z
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 23:00:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 118662E80C0
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 23:00:48 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRPsU-00075m-UW
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:01:19 -0500
+Received: by mail-wm1-f66.google.com with SMTP id 125so20001983wmh.0
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 15:01:10 -0800 (PST)
+References: <20181126200435.23408-1-minyard@acm.org>
+	<20181126200435.23408-17-minyard@acm.org>
+	<d588fce5-23ad-3b53-c88a-4dfb542353e8@redhat.com>
+	<192d9e99-a3e6-0ca3-7c23-bd5a0d2b44cb@acm.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c9b8d4ab-dfd5-7ed0-4a45-df478fed24ca@redhat.com>
+Date: Tue, 27 Nov 2018 00:01:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 26 Nov 2018 22:53:57 -0000
-From: dann frazier <dann.frazier@canonical.com>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805256] [NEW] qemu-img hangs on high core count
- ARM system
+In-Reply-To: <192d9e99-a3e6-0ca3-7c23-bd5a0d2b44cb@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 16/16] i2c:smbus_eeprom: Add a reset
+ function to smbus_eeprom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,102 +33,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: minyard@acm.org, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
 
-Public bug reported:
+On 26/11/18 23:41, Corey Minyard wrote:
+> On 11/26/18 2:42 PM, Philippe Mathieu-Daudé wrote:
+>> Hi Corey,
+>>
+>> On 26/11/18 21:04, minyard@acm.org wrote:
+>>> From: Corey Minyard <cminyard@mvista.com>
+>>>
+>>> Reset the contents to init data and reset the offset on a machine
+>>> reset.
+>>>
+>>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+>>> ---
+>>>   hw/i2c/smbus_eeprom.c | 8 +++++++-
+>>>   1 file changed, 7 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+>>> index a0dcadbd60..de3a492df4 100644
+>>> --- a/hw/i2c/smbus_eeprom.c
+>>> +++ b/hw/i2c/smbus_eeprom.c
+>>> @@ -107,7 +107,7 @@ static const VMStateDescription
+>>> vmstate_smbus_eeprom = {
+>>>       }
+>>>   };
+>>>   -static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+>>> +static void smbus_eeprom_reset(DeviceState *dev)
+>>>   {
+>>>       SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+>>>   
+>> 'git diff -U4' also shows this line:
+>>
+>>         memcpy(eeprom->data, eeprom->init_data, SMBUS_EEPROM_SIZE);
+>>
+>> I don't think this is correct.
+>>
+>> One test I'd like to have is a machine booting, updating the EPROM then
+>> rebooting calling hw reset() to use the new values (BIOS use this).
+>>
+>> With this patch this won't work, you'll restore the EPROM content on
+>> each machine reset.
+>>
+>> I'd move the memcpy() call to the realize() function.
+>>
+>> What do you think?
+> 
+> There was some debate on this in the earlier patch set.  The general
+> principle
 
-On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-frequently hangs (~50% of the time) with this command:
+Hmm I missed it and can't find it (quick basic search). I only find
+references about VMState.
 
-qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+> is that a reset is the same as starting up qemu from scratch, so I added
+> this
+> code based on that principle.  But I'm not really sure.
+> 
+>>>       eeprom->offset = 0;
+>> This is correct, the offset reset belongs to the reset() function.
+> 
+> Actually, on a real system, a hardware reset will generally not affect the
+> eeprom current offset register.  So if we don't take the above code, then
+> IMHO this is wrong, too.
 
-Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-qcow2->qcow2 conversion happens to be something uvtool does every time
-it fetches images.
+Indeed cpu reset shouldn't affect the EEPROM, but a board powercycle would.
 
-Once hung, attaching gdb gives the following backtrace:
+Maybe we can argue QEMU system reset doesn't work correctly yet to use
+this feature. Personally I wouldn't expect the EEPROM content be be
+reset after a reset, but maybe I should rely on a block backend for a
+such feature, and not the current simple approach.
 
-(gdb) bt
-#0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D18765027=
-4213760, =
-
-    timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b95=
-0)
-    at ../sysdeps/unix/sysv/linux/ppoll.c:39
-#1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<opt=
-imized out>, =
-
-    __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2.h=
-:77
-#2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
-
-    timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
-#3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-    at util/main-loop.c:233
-#4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-#5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-img.=
-c:1980
-#6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-im=
-g.c:2456
-#7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu-i=
-mg.c:4975
-
-Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
-
-Title:
-  qemu-img hangs on high core count ARM system
-
-Status in QEMU:
-  New
-
-Bug description:
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760, =
-
-      timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
-950)
-      at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>, =
-
-      __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
-.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
-
-      timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-      at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
+> 
+> -corey
+> 
+> 
+>> Regards,
+>>
+>> Phil.
+>>
+>>>   }
+>>>   +static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+>>> +{
+>>> +    smbus_eeprom_reset(dev);
+>>> +}
+>>> +
+>>>   static Property smbus_eeprom_properties[] = {
+>>>       DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
+>>>       DEFINE_PROP_END_OF_LIST(),
+>>> @@ -126,6 +131,7 @@ static void smbus_eeprom_class_initfn(ObjectClass
+>>> *klass, void *data)
+>>>       SMBusDeviceClass *sc = SMBUS_DEVICE_CLASS(klass);
+>>>         dc->realize = smbus_eeprom_realize;
+>>> +    dc->reset = smbus_eeprom_reset;
+>>>       sc->receive_byte = eeprom_receive_byte;
+>>>       sc->write_data = eeprom_write_data;
+>>>       dc->props = smbus_eeprom_properties;
+>>>
+> 
