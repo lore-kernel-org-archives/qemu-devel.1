@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1gRCrv-0002eu-UP
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:07:52 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gRDA5-0007zB-UV
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:26:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linzhecheng@huawei.com>) id 1gRCrs-0003VX-1v
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:07:51 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2351 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
-	id 1gRCrq-0003T5-0W
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:07:47 -0500
-From: linzhecheng <linzhecheng@huawei.com>
-Date: Mon, 26 Nov 2018 09:07:32 +0000
-Message-ID: <D9DE8DBB19F2A24080482022C1DE758302D336E2@DGGEMM529-MBX.china.huawei.com>
-References: <D9DE8DBB19F2A24080482022C1DE758302D325DC@DGGEMM529-MBX.china.huawei.com>
-	<20181126064611.zgsxden3jemuglaj@sirius.home.kraxel.org>
-	<D9DE8DBB19F2A24080482022C1DE758302D336B2@DGGEMM529-MBX.china.huawei.com>
-	<20181126084933.jdlxzj6l7lq5kubg@sirius.home.kraxel.org>
-In-Reply-To: <20181126084933.jdlxzj6l7lq5kubg@sirius.home.kraxel.org>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <cohuck@redhat.com>) id 1gRDA1-0001Q9-Cr
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:26:37 -0500
+Date: Mon, 26 Nov 2018 10:26:23 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181126102623.0f8e9d3d.cohuck@redhat.com>
+In-Reply-To: <20181124220757.43560d50@oc2783563651>
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181124220757.43560d50@oc2783563651>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [question] live migration about redir-usb
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 0/3] vfio-ccw: support
+ hsch/csch (kernel part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
+On Sat, 24 Nov 2018 22:07:57 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
+> On Thu, 22 Nov 2018 17:54:29 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > [This is the Linux kernel part, git tree is available at
+> > https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git
+> > vfio-ccw-caps
+> > 
+> > The companion QEMU patches are available at
+> > https://github.com/cohuck/qemu vfio-ccw-caps]
+> > 
+> > Currently, vfio-ccw only relays START SUBCHANNEL requests to the real
+> > device. This tends to work well for the most common 'good path'
+> > scenarios; however, as we emulate {HALT,CLEAR} SUBCHANNEL in QEMU,
+> > things like clearing pending requests at the device is currently not
+> > supported. This may be a problem for e.g. error recovery.
+> > 
+> > This patch series introduces capabilities (similar to what vfio-pci
+> > uses) and exposes a new async region for handling hsch/csch.  
+> 
+> I'm on vacation and could not do more than skim over it real quick. FWIW
+> it looks very promising. I intend to give it an in depth review once I'm
+> back (i.e. second half of next week).
 
-> -----Original Message-----
-> From: Gerd Hoffmann [mailto:kraxel@redhat.com]
-> Sent: Monday, November 26, 2018 4:50 PM
-> To: linzhecheng <linzhecheng@huawei.com>
-> Cc: qemu-devel@nongnu.org; wangxin (U) <wangxinxin.wang@huawei.com>;
-> Zhoujian (jay) <jianjay.zhou@huawei.com>
-> Subject: Re: [Qemu-devel] [question] live migration about redir-usb
->=20
-> On Mon, Nov 26, 2018 at 06:53:23AM +0000, linzhecheng wrote:
-> >
-> >
-> > > -----Original Message-----
-> > > From: Gerd Hoffmann [mailto:kraxel@redhat.com]
-> > > Sent: Monday, November 26, 2018 2:46 PM
-> > > To: linzhecheng <linzhecheng@huawei.com>
-> > > Cc: qemu-devel@nongnu.org; wangxin (U)
-> <wangxinxin.wang@huawei.com>;
-> > > Zhoujian (jay) <jianjay.zhou@huawei.com>
-> > > Subject: Re: [Qemu-devel] [question] live migration about redir-usb
-> > >
-> > > On Mon, Nov 26, 2018 at 02:29:12AM +0000, linzhecheng wrote:
-> > > > Hi, Gerd
-> > > > I have read this discussion thread about live migration in tcp mode=
-.
-> > > > https://bugzilla.redhat.com/show_bug.cgi?id=3D1254971
-> > > > Only spice redirection supports live migration not, but why not tcp=
- mode?
-> > > > Does usbredirserver not support it or qemu?
-> > >
-> > > usbredirserver.
-> > >
-> > > spice client holds a connection to both source and target host for a
-> > > seamless connection handover, and usb-redir needs that too to hand
-> > > over the usb device without interruption.
-> > >
-> > > usbredirserver can't do that.
->=20
-> > So if we realize the handover between src and dst chardev of qemu, we
-> > can do live migration in tcp mode.
->=20
-> > Is it similar with openvswtich who both accept the connection of src an=
-d dst
-> qemu?
->=20
-> It is more complicated than just accepting two connections.  Network can =
-just
-> throw away packages if needed, typicaly they will be resent by the guest.=
-  That
-> doesn't work with usb, you must properly keep track of every in-flight us=
-b
-> transfer.
-Why will network throw away packets? I think inflight usb
- Packets have already been tracked by redir-usb in live migration. What's m=
-ore do we have to do?
+Thanks!
 
->=20
-> What exactly do you want do?
-Realize live migration for redir-usb in tcp mode.
->=20
-> Maybe it will be simpler to build a stripped-down spice client with only =
-the usb
-> redir code, which doesn't require a UI and which you can start from the
-> command line like usbredirserver?  Most spice client code is actually in =
-shared
-> libraries, so it should not be too much work.
->=20
-> cheers,
->   Gerd
+Please do not feel pressured, it did take me long enough to get this
+out :)
