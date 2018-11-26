@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gRDqT-0005yq-D6
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:10:30 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gRDsC-0006s9-Q4
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:12:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gRDqO-00063j-T2
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:10:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48900)
+	(envelope-from <kraxel@redhat.com>) id 1gRDs7-0007hT-Vm
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:12:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53274)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gRDqO-000638-OK
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:10:20 -0500
-Date: Mon, 26 Nov 2018 11:10:18 +0100
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gRDs7-0007gd-Qc
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:12:07 -0500
+Date: Mon, 26 Nov 2018 11:12:05 +0100
 From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181126101018.jnisucsvcxgmsbd3@sirius.home.kraxel.org>
-References: <20181123064646.23036-1-linzhecheng@huawei.com>
+Message-ID: <20181126101205.ybiqw6kjywdaylx7@sirius.home.kraxel.org>
+References: <20181120083419.17716-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181123064646.23036-1-linzhecheng@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] cirrus_vga/migration: update the bank
- offset before use
+In-Reply-To: <20181120083419.17716-1-linzhecheng@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v2] usb-host: set ifs.detached as true if
+ kernel driver is not active
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,13 +28,11 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: linzhecheng <linzhecheng@huawei.com>
-Cc: qemu-devel@nongnu.org, maoming.maoming@huawei.com, Wang Xin <wangxinxin.wang@huawei.com>
+Cc: qemu-devel@nongnu.org, jianjay.zhou@huawei.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com
 
-On Fri, Nov 23, 2018 at 02:46:46PM +0800, linzhecheng wrote:
-> From: Wang Xin <wangxinxin.wang@huawei.com>
-> 
-> The cirrus bank0/1 offset should be updated before we update the vram's alias
-> offset.
+On Tue, Nov 20, 2018 at 04:34:19PM +0800, linzhecheng wrote:
+> If no kernel driver is active, we can already claim and perform I/O on
+> it without detaching it.
 
 Queued for 3.1
 
