@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gRKSQ-00070C-VI
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:14:08 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1gRKXK-0008JB-Fw
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:19:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gRKSK-0001EX-VA
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:14:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56856)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gRKSI-0001Dc-VE
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:13:56 -0500
-References: <20181126152836.25379-1-rkagan@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a0ce0395-576b-8175-67ad-7116d021e39e@redhat.com>
-Date: Mon, 26 Nov 2018 18:13:49 +0100
+	(envelope-from <gengdongjiu@huawei.com>) id 1gRKXJ-0004ST-Fr
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:19:06 -0500
+From: gengdongjiu <gengdongjiu@huawei.com>
+Date: Mon, 26 Nov 2018 17:18:29 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201F96E93@dggema523-mbx.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20181126152836.25379-1-rkagan@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/hyperv: fix NULL dereference with
- pure-kvm SynIC
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH RESEND v15 10/10] target-arm:
+ kvm64: handle SIGBUS signal from kernel or KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +22,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Marcelo Tosatti <mtosatti@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, "zhengxiang (A)" <zhengxiang9@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 26/11/18 16:28, Roman Kagan wrote:
-> When started in compat configuration of SynIC, e.g.
-> 
-> qemu-system-x86_64 -machine pc-i440fx-2.10,accel=kvm \
->  -cpu host,-vmx,hv-relaxed,hv_spinlocks=0x1fff,hv-vpindex,hv-synic
-> 
-> or explicitly
-> 
-> qemu-system-x86_64 -enable-kvm -cpu host,hv-synic,x-hv-synic-kvm-only=on
-> 
-> QEMU crashes in hyperv_synic_reset() trying to access the non-present
-> qobject for SynIC.
-> 
-> Add the missing check for NULL.
-> 
-> Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Reported-by: Igor Mammedov <imammedo@redhat.com>
-> Fixes: 9b4cf107b09d18ac30f46fd1c4de8585ccba030c
-> Fixes: 4a93722f9c279184e95b1e1ad775c01deec05065
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-> ---
->  hw/hyperv/hyperv.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
-> index a28e7249d8..8758635227 100644
-> --- a/hw/hyperv/hyperv.c
-> +++ b/hw/hyperv/hyperv.c
-> @@ -136,7 +136,11 @@ void hyperv_synic_add(CPUState *cs)
->  
->  void hyperv_synic_reset(CPUState *cs)
->  {
-> -    device_reset(DEVICE(get_synic(cs)));
-> +    SynICState *synic = get_synic(cs);
-> +
-> +    if (synic) {
-> +        device_reset(DEVICE(synic));
-> +    }
->  }
->  
->  static const TypeInfo synic_type_info = {
-> 
-
-Queued, thanks.
-
-Paolo
+SGkgUGV0ZXIsDQogICBUaGFua3MgZm9yIHRoZSBjb21tZW50cy4NCg0KPiBPbiBGcmksIDIzIE5v
+diAyMDE4IGF0IDE0OjMxLCBnZW5nZG9uZ2ppdSA8Z2VuZ2RvbmdqaXVAaHVhd2VpLmNvbT4gd3Jv
+dGU6DQo+ID4NCj4gPiBIaSBQZXRlciwNCj4gPiAgIFRoYW5rcyBmb3IgdGhlIGNvbW1lbnRzIGFu
+ZCBtYWlsLg0KPiA+DQo+ID4gPg0KPiA+ID4gT24gMjIgTm92ZW1iZXIgMjAxOCBhdCAxMDoyOCwg
+UGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPiB3cm90ZToNCj4gPiA+ID4g
+T24gMjIgTm92ZW1iZXIgMjAxOCBhdCAwMzowNSwgZ2VuZ2RvbmdqaXUgPGdlbmdkb25naml1QGh1
+YXdlaS5jb20+IHdyb3RlOg0KPiA+ID4gPj4+ID4NCj4gPiA+ID4+PiBTaG91bGRuJ3QgdGhlcmUg
+YmUgc29tZXRoaW5nIGluIGhlcmUgdG8gc2F5ICJvbmx5IHJlcG9ydCB0aGlzIGVycm9yIHRvIHRo
+ZSBndWVzdCBpZiB3ZSBhcmUgYWN0dWFsbHkgcmVwb3J0aW5nIFJBUyBlcnJvcnMgdG8gdGhlDQo+
+IGd1ZXN0IiA/DQo+ID4gPiA+Pg0KPiA+ID4gPj4gWWVzLCBXZSBjYW4gc2F5IHNvbWV0aGluZyB0
+aGF0IHN1Y2ggYXMgInJlcG9ydCB0aGlzIGVycm9yIHRvIHRoZQ0KPiA+ID4gPj4gZ3Vlc3QiLCBi
+ZWNhdXNlIHRoaXMgZXJyb3IgaXMgaW5kZWVkIHRyaWdnZXJlZCBieSBndWVzdCwgd2hpY2ggaXMN
+Cj4gPiA+ID4+IGd1ZXN0DQo+ID4gPiBlcnJvci4NCj4gPiA+ID4NCj4gPiA+ID4gSSdtIGFmcmFp
+ZCBJIGRvbid0IHJlYWxseSB1bmRlcnN0YW5kIHdoYXQgeW91IG1lYW4uIENvdWxkIHlvdSB0cnkN
+Cj4gPiA+ID4gcmVwaHJhc2luZyBpdD8NCj4gPiA+ID4NCj4gPiA+ID4gTXkgdW5kZXJzdGFuZGlu
+ZyB3YXM6DQo+ID4gPiA+ICAqIHdlIGdldCB0aGlzIHNpZ25hbCBpZiB0aGVyZSBpcyBhIFJBUyBl
+cnJvciBpbiB0aGUgaG9zdCBtZW1vcnkNCj4gPiA+ID4gICogaWYgd2UgYXJlIGV4cG9zaW5nIFJB
+UyBlcnJvcnMgdG8gdGhlIGd1ZXN0IChpZSB3ZSBoYXZlDQo+ID4gPiA+ICAgIHRvbGQgaXQgdGhh
+dCBpbiB0aGUgQUNQSSB0YWJsZSB3ZSBwYXNzZWQgaXQgYXQgc3RhcnR1cCkNCj4gPiA+ID4gICAg
+dGhlbiB3ZSBzaG91bGQgcGFzcyBvbiB0aGlzIGVycm9yIHRvIHRoZSBndWVzdA0KPiA+ID4gPg0K
+PiA+ID4gPiBidXQgdGhhdCB0aGVzZSBhcmUgdHdvIGRpZmZlcmVudCBjb25kaXRpb25zLg0KPiA+
+ID4gPg0KPiA+ID4gPiBJZiB0aGUgaG9zdCBoYXJkd2FyZSBkZXRlY3RzIGEgUkFTIGVycm9yIGlu
+IG1lbW9yeSB1c2VkIGJ5IHRoZQ0KPiA+ID4gPiBndWVzdCBidXQgdGhlIGd1ZXN0IGlzIG5vdCBi
+ZWluZyB0b2xkIGFib3V0IFJBUyBlcnJvcnMsIHRoZW4gd2UNCj4gPiA+ID4gY2Fubm90IHJlcG9y
+dCB0aGUgZXJyb3I6IHdlIGhhdmUgbm8gbWVjaGFuaXNtIHRvIGRvIHNvLCBhbmQgdGhlDQo+ID4g
+PiA+IGd1ZXN0IGlzIG5vdCBleHBlY3RpbmcgaXQuDQo+ID4gPg0KPiA+ID4gSWYgeW91IGxvb2sg
+YXQgdGhlIHg4NiB2ZXJzaW9uIG9mIHRoaXMgZnVuY3Rpb24geW91IGNhbiBzZWUgdGhhdCBpdA0K
+PiA+ID4gdGVzdHMgKGVudi0+bWNnX2NhcCAmIE1DR19TRVJfUCksIHdoaWNoIEkgdGhpbmsgaXMg
+dGhlIGVxdWl2YWxlbnQgeDg2ICJpcyB0aGUgZ3Vlc3QgQ1BVL2NvbmZpZyBvbmUgd2UgY2FuIHJl
+cG9ydCB0aGVzZSBlcnJvcnMgdG8iDQo+IHRlc3QuDQo+ID4NCj4gPiBNQ0dfU0VSX1AgKHNvZnR3
+YXJlIGVycm9yIHJlY292ZXJ5IHN1cHBvcnQgcHJlc2VudCkgZmxhZyBpbmRpY2F0ZXMgKHdoZW4g
+c2V0KSB0aGF0IHRoZSBwcm9jZXNzb3Igc3VwcG9ydHMgc29mdHdhcmUgZXJyb3IgcmVjb3Zlcnku
+DQo+ID4gZW52LT5tY2dfY2FwICdzIHZhbHVlIHNob3VsZCBiZSBnb3QgZnJvbSBLVk0gYXMgc2hv
+d24gaW4gdGhlIFFFTVUgY29kZVsxXSwgaXQgaW5kaWNhdGVzIHdoZXRoZXIgdGhlIEtWTSBzdXBw
+b3J0IHNvZnR3YXJlIGVycm9yDQo+IHJlY292ZXJ5Lg0KPiA+DQo+ID4gWzFdOg0KPiA+IC0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gPiAgIHJl
+dCA9IGt2bV9nZXRfbWNlX2NhcF9zdXBwb3J0ZWQoY3MtPmt2bV9zdGF0ZSwgJm1jZ19jYXAsICZi
+YW5rcyk7DQo+ID4gICBpZiAocmV0IDwgMCkgew0KPiA+ICAgICAgICBmcHJpbnRmKHN0ZGVyciwg
+Imt2bV9nZXRfbWNlX2NhcF9zdXBwb3J0ZWQ6ICVzIiwgc3RyZXJyb3IoLXJldCkpOw0KPiA+ICAg
+ICAgICAgICAgcmV0dXJuIHJldDsNCj4gPiAgICB9DQo+ID4gLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiA+IC0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiANCj4gWWVzLCBidXQgaWYg
+eW91IGxvb2sgYXQgdGhlIGNvZGUgd2hpY2ggY2FsbHMgdGhhdCwgaXQgZ29lcyBvbiB0byBkbzoN
+Cj4gICAgICAgICBlbnYtPm1jZ19jYXAgJj0gbWNnX2NhcCB8IE1DR19DQVBfQkFOS1NfTUFTSzsN
+Cj4gDQo+IHdoaWNoIG1lYW5zIHRoYXQgaWYgdGhlIGhvc3Qga2VybmVsIGRvZXMgbm90IHN1cHBv
+cnQgdGhpcyBmZWF0dXJlIHRoZW4gd2Ugd2lsbCBjbGVhciB0aG9zZSBiaXRzIGluIHRoZSBlbnYt
+Pm1jZ19jYXAgZmllbGQsIHNvIHdlIGRvIG5vdA0KPiBhZHZlcnRpc2UgaXQgdG8gdGhlIGd1ZXN0
+LiBCdXQgd2UgbWlnaHQgYmUgbm90IGFkdmVydGlzaW5nIGl0IHRvIHRoZSBndWVzdCBhdCBhbGws
+IGlmIGVudi0+bWNnX2NhcCB3YXMgMCBiZWZvcmUgdGhpcyBjb2RlIHdhcyBjYWxsZWQuIFRoYXQN
+Cj4gaGFwcGVucyBpZiB3ZSBhcmUgcHJlc2VudGluZyB0aGUgZ3Vlc3Qgd2l0aCBhIGd1ZXN0IENQ
+VSB0eXBlIHdoaWNoIGRvZXMgbm90IGhhdmUgdGhlIGZlYXR1cmUuDQoNClNvIHlvdSBtZWFuICJl
+bnYtPm1jZ19jYXAiIHVzZXMgYSBiaXQgdG8gaW5kaWNhdGUgdGhhdCB3aGV0aGVyIGd1ZXN0IENQ
+VSBzdXBwb3J0IGVycm9yIHJlY292ZXJ5LCByaWdodD8gSWYgc28sIGhvdyB3ZSBrbm93IHdoZXRo
+ZXIgZ3Vlc3QgQ1BVIGhhdmUgdGhpcyBmZWF0dXJlPw0KU2hvdWxkIHdlIGluaXRpYWxpemVkIE1D
+R19TRVJfUCBiaXQgb2YgZW52LT5tY2dfY2FwIHRvIDEgb3IgMCBiZWZvcmUgaW5pdGlhbGl6aW5n
+IHRoZSB2Y3B1PyAgUGxlYXNlIHRvZ2V0aGVyIHNlZSB0aGUgcmVwbHkgaW4gdGhlIFsyXSwgdGhh
+bmtzLg0KDQoNCj4gDQo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tDQo+ID4gdm9pZCBrdm1fYXJjaF9vbl9zaWdidXNfdmNwdShDUFVTdGF0ZSAq
+YywgaW50IGNvZGUsIHZvaWQgKmFkZHIpIHsNCj4gPiAgICAgICAgIC4uLi4uLi4uLi4uLi4uLi4u
+Li4uLi4uLi4uLg0KPiA+DQo+ID4gICAgICAgICBpZiAocmFtX2FkZHIgIT0gUkFNX0FERFJfSU5W
+QUxJRCAmJg0KPiA+ICAgICAgICAgICAgIGt2bV9waHlzaWNhbF9tZW1vcnlfYWRkcl9mcm9tX2hv
+c3QoYy0+a3ZtX3N0YXRlLCBhZGRyLA0KPiA+ICZwYWRkcikpIHsNCj4gPg0KPiA+ICAgSWYgaXQg
+Z290IHRvIGhlcmUsIGl0IG1lYW5zIHRoZSBob3N0IGhhcmR3YXJlIGRldGVjdHMgYSBSQVMgZXJy
+b3IgaW4gbWVtb3J5IHVzZWQgYnkgdGhlIGd1ZXN0IHVzaW5nIGFib3ZlIHR3byBqdWRnbWVudHMu
+DQo+ID4gICBNYXliZSB3ZSBjYW4gdGVzdC9jaGVjayB3aGV0aGVyIEtWTSBzdXBwb3J0cyBzb2Z0
+d2FyZSBlcnJvciByZWNvdmVyeQ0KPiA+IGluIFszXQ0KPiA+DQo+IA0KPiBUaGUgcXVlc3Rpb24g
+aXMgbm90ICJkb2VzIHRoZSBob3N0IENQVSAvIEtWTSBzdXBwb3J0IGVycm9yIHJlcG9ydGluZyIu
+IEl0IGlzICJkb2VzIHRoZSAqZ3Vlc3QqIENQVSAvIHN5c3RlbSBzdXBwb3J0IGVycm9yIHJlcG9y
+dGluZyIuDQo+IFRoZXNlIGFyZSBkaXN0aW5jdCBxdWVzdGlvbnMgd2hpY2ggbWF5IG5vdCBoYXZl
+IHRoZSBzYW1lIGFuc3dlci4NCg0KWzJdOg0KQnV0IFFFTVUgc2hvdWxkIG5vdCBrbm93IHdoZXRo
+ZXIgKmd1ZXN0KiBDUFUgLyBzeXN0ZW0gc3VwcG9ydCBlcnJvciByZXBvcnRpbmcuIEZyb20gbXkg
+dW5kZXJzdGFuZGluZywgaW4gdGhlIFg4NiBwbGF0Zm9ybSwgaWYgaG9zdCBDUFUgLyBLVk0gc3Vw
+cG9ydCBlcnJvciByZXBvcnRpbmcsDQp0aGVuIGl0IHdpbGwgdGhpbmsgZ3Vlc3QgQ1BVIHN1cHBv
+cnRzIGVycm9yIHJlcG9ydGluZywgYW5kIHNldCB0aGUgTUNHX1NFUl9QIGJpdCBvZiBlbnYtPm1j
+Z19jYXAgdG8gMSANCg0KPiANCj4gDQo+IHRoYW5rcw0KPiAtLSBQTU0NCg==
