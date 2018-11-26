@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gRMkW-00087u-9y
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gRMkX-00088N-Mb
 	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:40:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gRMkV-0004kO-1d
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:40:52 -0500
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:41067)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gRMkW-0004nH-KM
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:40:53 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42859)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gRMkU-0004hN-RK
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:40:50 -0500
-Received: by mail-wr1-x429.google.com with SMTP id x10so20232527wrs.8
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 11:40:50 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	s139sm2412468wmd.3.2018.11.26.11.40.47 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 26 Nov 2018 11:40:48 -0800 (PST)
+	id 1gRMkW-0004mK-Cg
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:40:52 -0500
+Received: by mail-wr1-x442.google.com with SMTP id q18so20216916wrx.9
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 11:40:52 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 26 Nov 2018 20:40:29 +0100
-Message-Id: <1543261235-2834-10-git-send-email-pbonzini@redhat.com>
+Date: Mon, 26 Nov 2018 20:40:30 +0100
+Message-Id: <1543261235-2834-11-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543261235-2834-1-git-send-email-pbonzini@redhat.com>
 References: <1543261235-2834-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/15] checkpatch: g_test_message does not need
- a trailing newline
+Subject: [Qemu-devel] [PULL 10/15] target/i386: Generate #UD when applying
+ LOCK to a register destination
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,28 +32,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>
 
+From: Richard Henderson <richard.henderson@linaro.org>
+
+Fixes a TCG crash due to attempting the atomic operation without
+having set up the address first.  This does not attempt to fix
+all of the other missing checks for LOCK.
+
+Fixes: a7cee522f35
+Fixes: https://bugs.launchpad.net/qemu/+bug/1803160
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20181113193510.24862-1-richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/checkpatch.pl | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ target/i386/translate.c | 35 ++++++++++++++++++++---------------
+ 1 file changed, 20 insertions(+), 15 deletions(-)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 06ec14e..60f6f89 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -2752,7 +2752,8 @@ sub process {
- 				info_vreport|
- 				error_report|
- 				warn_report|
--				info_report}x;
-+				info_report|
-+				g_test_message}x;
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index f8bc768..0dd5fbe 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -1268,10 +1268,30 @@ static void gen_helper_fp_arith_STN_ST0(int op, int opreg)
+     }
+ }
  
- 	if ($rawline =~ /\b(?:$qemu_error_funcs)\s*\(.*\".*\\n/) {
- 		ERROR("Error messages should not contain newlines\n" . $herecurr);
++static void gen_exception(DisasContext *s, int trapno, target_ulong cur_eip)
++{
++    gen_update_cc_op(s);
++    gen_jmp_im(s, cur_eip);
++    gen_helper_raise_exception(cpu_env, tcg_const_i32(trapno));
++    s->base.is_jmp = DISAS_NORETURN;
++}
++
++/* Generate #UD for the current instruction.  The assumption here is that
++   the instruction is known, but it isn't allowed in the current cpu mode.  */
++static void gen_illegal_opcode(DisasContext *s)
++{
++    gen_exception(s, EXCP06_ILLOP, s->pc_start - s->cs_base);
++}
++
+ /* if d == OR_TMP0, it means memory operand (address in A0) */
+ static void gen_op(DisasContext *s1, int op, TCGMemOp ot, int d)
+ {
+     if (d != OR_TMP0) {
++        if (s1->prefix & PREFIX_LOCK) {
++            /* Lock prefix when destination is not memory.  */
++            gen_illegal_opcode(s1);
++            return;
++        }
+         gen_op_mov_v_reg(s1, ot, s1->T0, d);
+     } else if (!(s1->prefix & PREFIX_LOCK)) {
+         gen_op_ld_v(s1, ot, s1->T0, s1->A0);
+@@ -2469,21 +2489,6 @@ static void gen_leave(DisasContext *s)
+     gen_op_mov_reg_v(s, a_ot, R_ESP, s->T1);
+ }
+ 
+-static void gen_exception(DisasContext *s, int trapno, target_ulong cur_eip)
+-{
+-    gen_update_cc_op(s);
+-    gen_jmp_im(s, cur_eip);
+-    gen_helper_raise_exception(cpu_env, tcg_const_i32(trapno));
+-    s->base.is_jmp = DISAS_NORETURN;
+-}
+-
+-/* Generate #UD for the current instruction.  The assumption here is that
+-   the instruction is known, but it isn't allowed in the current cpu mode.  */
+-static void gen_illegal_opcode(DisasContext *s)
+-{
+-    gen_exception(s, EXCP06_ILLOP, s->pc_start - s->cs_base);
+-}
+-
+ /* Similarly, except that the assumption here is that we don't decode
+    the instruction at all -- either a missing opcode, an unimplemented
+    feature, or just a bogus instruction stream.  */
 -- 
 1.8.3.1
