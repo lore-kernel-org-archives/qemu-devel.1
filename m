@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gRGpB-0005Jy-Th
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:21:20 -0500
+	(envelope-from <agraf@suse.de>) id 1gRGpH-0005PJ-Dt
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:21:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gRGp6-0008Ni-T8
+	(envelope-from <agraf@suse.de>) id 1gRGpB-0008Qg-3b
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:21:23 -0500
+Received: from mx2.suse.de ([195.135.220.15]:34926 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1gRGpA-0008Pq-Pa
 	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:21:17 -0500
-Date: Mon, 26 Nov 2018 14:20:46 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181126142046.07c5e227@redhat.com>
-In-Reply-To: <20181107123652.23417-11-marcandre.lureau@redhat.com>
-References: <20181107123652.23417-1-marcandre.lureau@redhat.com>
-	<20181107123652.23417-11-marcandre.lureau@redhat.com>
+References: <20181106143213.536d3311@w520.home>
+	<0857657C-BEFF-4B65-A8A0-004CCE361FDB@nutanix.com>
+	<20181126125931.GH15869@stefanha-x1.localdomain>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <328fc96d-dbb4-5e2a-c768-cd8e6342a36b@suse.de>
+Date: Mon, 26 Nov 2018 14:21:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20181126125931.GH15869@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 10/14] qdev-props: call
- object_apply_global_props()
+Subject: Re: [Qemu-devel] KVM Forum VFIO BoF summary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +29,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, qemu-arm@nongnu.org, xen-devel@lists.xenproject.org, Artyom Tarasenko <atar4qemu@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Amit Shah <amit@kernel.org>, Stefan Berger <stefanb@linux.ibm.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <minyard@acm.org>, =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Felipe Franciosi <felipe@nutanix.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Jiang, Jerry (SW)" <Jerry.Jiang@amd.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, Changpeng Liu <changpeng.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "Xue, Ken" <Ken.Xue@amd.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, James R Harris <james.r.harris@intel.com>, "benjamin.walker@intel.com" <benjamin.walker@intel.com>
 
-On Wed,  7 Nov 2018 16:36:48 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+On 11/26/2018 01:59 PM, Stefan Hajnoczi wrote:
+> On Fri, Nov 23, 2018 at 10:09:53PM +0000, Felipe Franciosi wrote:
+>> Hi Alex,
+>>
+>> I'm also terribly sorry for the delay in responding to this. I'm only =
+now having the time resources to come back to this topic and figure out a=
+ way forward with my proposal. Please see my notes below (quoting only th=
+e relevant sections).
+>>
+>>> On Nov 6, 2018, at 9:32 PM, Alex Williamson <alex.williamson@redhat.c=
+om> wrote:
+>>>
+>>> There were mostly two main threads of discussion, the first was Filip=
+e's
+>>> discussion of a socket interface making use of the VFIO ABI to
+>>> implement a userspace device model.  For a VM use case, QEMU would be
+>>> modified to use a socket for the VFIO ABI, including shared memory fo=
+r
+>>> DMA.  Ideally this would be transparent for much of the QEMU vfio cod=
+e
+>>> outside of setup.  Effectively this becomes a userspace implementatio=
+n
+>>> of mdev as this could already be done using mdev, but it requires a
+>>> vendor driver to expose the userspace interface and likely a longer
+>>> round trip through the kernel and back to userspace. Either path
+>>> allows device models in userspace that can be open or proprietary, bu=
+t
+>>> this new proposal eliminates the vendor kernel driver component.  Of
+>>> course non-upstream kernel mdev vendor drivers do taint the host
+>>> kernel, so they at least leave a breadcrumb.
+>> Spot on. This can be done today via mdev, but it would unnecessarily i=
+nvolve the kernel in the setup of devices. Also, since vfio is the only e=
+xisting bus driver for mdev, it would make little sense to implement an m=
+dev "physical" driver (which wouldn't have a physical backing device) jus=
+t to talk a vfio-like abi back to userspace.
+>>
+>> This "vfio-user" proposal is a perfect fit for Qemu. I think the corre=
+ct design is to slightly rearchitect the vfio implementation in Qemu to a=
+llow for userspace backends through unix sockets, very much like vhost-us=
+er does it for virtio devices today.
+>>
+>> As a matter of fact, with something like this in place, I think the Qe=
+mu code could potentially be simplified by moving some of the existing vh=
+ost-user offloading code underneath it.
+>>
+>>> I believe Filipe
+>>> mentioned a conversation after the BoF with Alex Graf who had a relat=
+ed
+>>> concern about using the socket approach to use this as a non-GPL
+>>> backdoor for device models in QEMU and a suggested approach was a GPL
+>>> handshake via the socket interface.
+>> Not exactly. The GPL-violating concerns came from Paolo and Stefan (cc=
+'d). Alex Graf (cc'd) came up with a solution for the concern which invol=
+ves adding a copyrighted "poem" to the protocol handshake. Qemu would the=
+n grant the copyright for GPL applications, hence limiting who can use th=
+e protocol.
+>>
+>> Vendors can obviously bypass this by using a GPL proxy application tha=
+t talks to Qemu, but then uses a separate mechanism (possibly another uni=
+x socket) to talk to other non-GPL applications. Vendors which distribute=
+ Qemu can possibly also bypass this by modifying the protocol not to incl=
+ude the copyrighted messages. Using either legal loophole approach, howev=
+er, can lead to a lot of public point and shame.
+>>
+>> The point I would like to discuss more widely (before going forwards w=
+ith code) is whether vendors can actually make use of a GPL-only protocol=
+. I understand the community desire of gathering efforts into GPL softwar=
+e, Qemu code and Virtio. A non-GPL implementation means that maybe some v=
+endors cannot use this.
+>>
+>> I envision this protocol being used by userspace applications which _n=
+eed_ to emulate a device outside Qemu for performance reasons, not licens=
+e reasons (eg. a separate process can efficiently poll VQs from multiple =
+VMs from a single core). Applications that already do that today, albeit =
+open-source, are not GPL (eg. OVS, DPDK, SPDK).
+>>
+>> This is why I'd like to hear more from Paolo and Stefan on why making =
+this non-GPL is so bad. It is already possible today (via mdev), and simi=
+lar approaches already exist for a large number of device implementations=
+ via vhost-user. Additionally, I would also like to hear from willing ven=
+dors that feel they could _only_ benefit from this if it does not enforce=
+ GPL.
+>>
+>> Finally, I want to clarify I am not opposing making this GPL-only. I j=
+ust want to make sure the effort is justifiable (ie. there is reason for =
+this to enforce GPL peer applications given the existing vhost-user and m=
+dev alternatives) and not in vain (ie. there are GPL use cases for this o=
+ut there).
+> Device emulation is the core of what GPL QEMU does.  Mechanisms for
+> out-of-tree device emulation get rejected because they are likely to be
+> misused by parties who do not wish to contribute to QEMU.
 
-> It's now possible to use the common function.
->=20
-> Teach object_apply_global_props() to warn if Error argument is NULL.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/core/qdev-properties.c | 24 ++----------------------
->  qom/object.c              |  6 +++++-
->  2 files changed, 7 insertions(+), 23 deletions(-)
->=20
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index 8728cbab9f..239535a4cb 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -1223,28 +1223,8 @@ int qdev_prop_check_globals(void)
-> =20
->  void qdev_prop_set_globals(DeviceState *dev)
->  {
-> -    int i;
-> -
-> -    for (i =3D 0; i < global_props()->len; i++) {
-> -        GlobalProperty *prop;
-> -        Error *err =3D NULL;
-> -
-> -        prop =3D g_array_index(global_props(), GlobalProperty *, i);
-> -        if (object_dynamic_cast(OBJECT(dev), prop->driver) =3D=3D NULL) {
-> -            continue;
-> -        }
-> -        prop->used =3D true;
-> -        object_property_parse(OBJECT(dev), prop->value, prop->property, =
-&err);
-> -        if (err !=3D NULL) {
-> -            error_prepend(&err, "can't apply global %s.%s=3D%s: ",
-> -                          prop->driver, prop->property, prop->value);
-> -            if (!dev->hotplugged) {
-> -                error_propagate(&error_fatal, err);
-> -            } else {
-> -                warn_report_err(err);
-> -            }
-> -        }
-> -    }
-> +    object_apply_global_props(OBJECT(dev), global_props(),
-> +                              dev->hotplugged ? NULL : &error_fatal);
-arguably, it's up to caller to decide it warn or not.
-I'd leave it warning code out of object_apply_global_props() and let caller=
- do the job
+Are you sure? Maybe people just want to use out of tree device emulation=20
+because it allows for sophisticated use cases:
 
->  }
-> =20
->  /* --- 64bit unsigned int 'size' type --- */
-> diff --git a/qom/object.c b/qom/object.c
-> index 9acdf9e16d..b1a7f70550 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -392,7 +392,11 @@ void object_apply_global_props(Object *obj, GArray *=
-props, Error **errp)
->          if (err !=3D NULL) {
->              error_prepend(&err, "can't apply global %s.%s=3D%s: ",
->                            p->driver, p->property, p->value);
-> -            error_propagate(errp, err);
-> +            if (errp) {
-> +                error_propagate(errp, err);
-> +            } else {
-> +                warn_report_err(err);
-> +            }
->          }
->      }
->  }
+ =A0 * RTL simulation (see the Oracle talk on this from KVM Forum a few=20
+years back)
+ =A0 * Security isolation (eg an SPDK based target, you don't want to giv=
+e=20
+all of QEMU access to the SPDK device)
+ =A0 * Reuse other OSS projects (share device emulation between different=
+=20
+emulators)
+ =A0 * Share emulation with a big broker entity (which could then poll=20
+every VM on the entire system on 1 core, giving possibly lower latencies)
+ =A0 * Different programming language (say I want to implement a device i=
+n=20
+rust, because it's more secure, or easier to prototype with)
+
+I can see the FUD around closed source and terrible quality of out of=20
+tree devices, but that doesn't mean they are the only reason people want=20
+this. And I also don't think it's a good reason to hold back=20
+compartmented device emulation.
+
+> That would result in the QEMU community maintaining infrastructure for
+> third parties who ship code of questionable quality and profit from it.
+
+You mean like we do today for the Ceph block module? In-tree vs=20
+out-of-tree doesn't say too much about code quality. And I surely hope=20
+people understand that a separate host process from a separate entity=20
+means that the overall product can only be as good as its components.
+
+> That's not healthy for the QEMU community and there's no incentive to
+> allow it.
+
+I disagree - I think it's quite healthy, because it allows us to grow=20
+into use cases we currently neglect or have random downstream projects=20
+for at this point. There are numerous forks of QEMU to allow RTL=20
+simulation of external devices for example.
+
+> A bit more about specifics you mentioned:
+>
+> vhost-user is an exception for vhost devices.  They are based on the
+> open VIRTIO specification.  QEMU has in-tree implementations of these
+> devices so users can fall back to them if they need to request support
+> (otherwise it's impossible to support users with third-party devices).
+>
+> Generic out-of-tree PCI device emulation is way too big a loophole.  Th=
+e
+> QEMU community cannot support users who run arbitrary third-party PCI
+> devices.
+>
+> The fact that there are ways to get around this by writing software mde=
+v
+> devices doesn't mean it makes sense for QEMU to open a loophole itself.
+
+IMHO it would be much more sensible to give people a path we can support=20
+rather than encourage hacks, where hacks are either:
+
+ =A0 * downstream patches to do out of tree emulation
+ =A0 * mdev based implementations of the same
+
+So how about we give people a reasonable interface that allows them to=20
+support their sophisticated things without us getting penalized for it?=20
+What really are the problems you're seeing? From all discussions I know=20
+so far, it's mostly been:
+
+ =A0 1) Code Quality
+
+We can always have a tainted flag. IIRC Gerd already worked on bits for=20
+unmaintained code inside of QEMU itself. There's little reason to not=20
+extend this to external modules. We should treat "someone uses random=20
+emulated device nobody maintains" and "someone uses external code" the=20
+same way.
+
+ =A0 2) GPL
+
+One idea I had here was to enforce licensing via legal methods. Linux=20
+for example has an explicit tag that allows kernel modules to expose=20
+their license information to Linux. Based on that, it can expose=20
+interfaces or refuse to do so. We could do the same - and for starters=20
+only expose PCIe device emulation to GPL peers.
+
+
+Alex
