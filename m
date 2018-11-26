@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gRHA1-0001cW-CP
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:50 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gRHE2-0004Q1-4v
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:46:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gRH9y-0001Ji-2o
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:49 -0500
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:36203)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gRH9x-0001JT-T5
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:46 -0500
-Received: by mail-qt1-f194.google.com with SMTP id t13so17503966qtn.3
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 05:42:45 -0800 (PST)
+	(envelope-from <imammedo@redhat.com>) id 1gRHDy-0003pB-ST
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:46:58 -0500
+Date: Mon, 26 Nov 2018 14:46:40 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181126144640.361f21f0@redhat.com>
+In-Reply-To: <20181107123652.23417-12-marcandre.lureau@redhat.com>
+References: <20181107123652.23417-1-marcandre.lureau@redhat.com>
+	<20181107123652.23417-12-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <cover.1541507990.git.artem.k.pisarenko@gmail.com>
-	<7dde6abbd21682857f8294644013173c0b9949b3.1541507990.git.artem.k.pisarenko@gmail.com>
-In-Reply-To: <7dde6abbd21682857f8294644013173c0b9949b3.1541507990.git.artem.k.pisarenko@gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Mon, 26 Nov 2018 17:42:33 +0400
-Message-ID: <CAMxuvaz8aMnTP2w72BQ3fML-OVfv0=cNGvmnpdFM3VwU-KH8ag@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] chardev: fix mess in OPENED/CLOSED
- events when muxed
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 11/14] qom: teach interfaces to
+ implement post-init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,185 +24,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, peter.crosthwaite@xilinx.com, antonynpavlov@gmail.com, greg.bellows@linaro.org, wei@redhat.com, julian@codesourcery.com
 
-On Tue, Nov 6, 2018 at 4:41 PM Artem Pisarenko
-<artem.k.pisarenko@gmail.com> wrote:
->
-> When chardev is multiplexed (mux=3Don) there are a lot of cases where
-> CHR_EVENT_OPENED/CHR_EVENT_CLOSED events pairing (expected from
-> frontend side) is broken. There are either generation of multiple
-> repeated or extra CHR_EVENT_OPENED events, or CHR_EVENT_CLOSED just
-> isn't generated at all.
-> This is mostly because 'qemu_chr_fe_set_handlers()' function makes its
-> own (and often wrong) implicit decision on updated frontend state and
-> invokes 'fd_event' callback with 'CHR_EVENT_OPENED'. And even worse,
-> it doesn't do symmetric action in opposite direction, as someone may
-> expect (i.e. it doesn't invoke previously set 'fd_event' with
-> 'CHR_EVENT_CLOSED'). Muxed chardev uses trick by calling this function
-> again to replace callback handlers with its own ones, but it doesn't
-> account for such side effect.
-> Fix that using extended version of this function with added argument
-> for disabling side effect and keep original function for compatibility
-> with lots of frontends already using this interface and being
-> "tolerant" to its side effects.
-> One more source of event duplication is just line of code in
-> char-mux.c, which does far more than comment above says (obvious fix).
->
-> Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+On Wed,  7 Nov 2018 16:36:49 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> The following patches are going to implement post_init callbacks for
+> settings properties. The interface post_init are called before the
+> instance post_init, so the default interface behaviour can be
+> overriden if necessary.
 
+
+CCing ARM guys who touched arm_cpu_post_init() in the past,
+pls provide feedback if suggested below approach is acceptable.
+
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->
-> Notes:
->     v3:
->      - extended and improved commit message with 'why' and 'how' explanat=
-ion
->
->  chardev/char-fe.c         | 33 ++++++++++++++++++++++++---------
->  chardev/char-mux.c        | 16 ++++++++--------
->  include/chardev/char-fe.h | 18 +++++++++++++++++-
->  3 files changed, 49 insertions(+), 18 deletions(-)
->
-> diff --git a/chardev/char-fe.c b/chardev/char-fe.c
-> index a8931f7..b7bcbd5 100644
-> --- a/chardev/char-fe.c
-> +++ b/chardev/char-fe.c
-> @@ -246,14 +246,15 @@ void qemu_chr_fe_deinit(CharBackend *b, bool del)
+>  qom/object.c                |  8 +++++++-
+>  tests/check-qom-interface.c | 23 +++++++++++++++++++++--
+>  2 files changed, 28 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/qom/object.c b/qom/object.c
+> index b1a7f70550..980eeb8283 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -290,7 +290,6 @@ static void type_initialize(TypeImpl *ti)
+>          assert(ti->instance_size =3D=3D 0);
+>          assert(ti->abstract);
+>          assert(!ti->instance_init);
+> -        assert(!ti->instance_post_init);
+>          assert(!ti->instance_finalize);
+>          assert(!ti->num_interfaces);
 >      }
->  }
->
-> -void qemu_chr_fe_set_handlers(CharBackend *b,
-> -                              IOCanReadHandler *fd_can_read,
-> -                              IOReadHandler *fd_read,
-> -                              IOEventHandler *fd_event,
-> -                              BackendChangeHandler *be_change,
-> -                              void *opaque,
-> -                              GMainContext *context,
-> -                              bool set_open)
-> +void qemu_chr_fe_set_handlers_full(CharBackend *b,
-> +                                   IOCanReadHandler *fd_can_read,
-> +                                   IOReadHandler *fd_read,
-> +                                   IOEventHandler *fd_event,
-> +                                   BackendChangeHandler *be_change,
-> +                                   void *opaque,
-> +                                   GMainContext *context,
-> +                                   bool set_open,
-> +                                   bool sync_state)
+> @@ -363,6 +362,13 @@ static void object_init_with_type(Object *obj, TypeI=
+mpl *ti)
+> =20
+>  static void object_post_init_with_type(Object *obj, TypeImpl *ti)
 >  {
->      Chardev *s;
->      int fe_open;
-> @@ -285,7 +286,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
->          qemu_chr_fe_take_focus(b);
->          /* We're connecting to an already opened device, so let's make s=
-ure we
->             also get the open event */
-> -        if (s->be_open) {
-> +        if (sync_state && s->be_open) {
->              qemu_chr_be_event(s, CHR_EVENT_OPENED);
->          }
+> +    GSList *e;
+> +
+> +    for (e =3D ti->class->interfaces; e; e =3D e->next) {
+> +        TypeImpl *itype =3D OBJECT_CLASS(e->data)->type;
+> +        object_post_init_with_type(obj, itype);
+> +    }
+isn't arm_cpu_post_init() issue[1] still valid here?
+1) http://patchwork.ozlabs.org/patch/969002/
+
+probably cleanest/easiest way is to get rid of arm_cpu_post_init()
+by calling it from leaf classes and then drop device_post_init()
+along with switching to interface approach.
+
+CCing guys who touched arm_cpu_post_init() in the past
+
+>      if (ti->instance_post_init) {
+>          ti->instance_post_init(obj);
 >      }
-> @@ -295,6 +296,20 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
->      }
->  }
->
-> +void qemu_chr_fe_set_handlers(CharBackend *b,
-> +                              IOCanReadHandler *fd_can_read,
-> +                              IOReadHandler *fd_read,
-> +                              IOEventHandler *fd_event,
-> +                              BackendChangeHandler *be_change,
-> +                              void *opaque,
-> +                              GMainContext *context,
-> +                              bool set_open)
+> diff --git a/tests/check-qom-interface.c b/tests/check-qom-interface.c
+> index 2177f0dce5..cd2dd6dcee 100644
+> --- a/tests/check-qom-interface.c
+> +++ b/tests/check-qom-interface.c
+> @@ -31,9 +31,27 @@ typedef struct TestIfClass {
+>      uint32_t test;
+>  } TestIfClass;
+> =20
+> +typedef struct DirectImpl {
+> +    Object parent_obj;
+> +
+> +    bool if_post_init;
+> +} DirectImpl;
+> +
+> +#define TYPE_DIRECT_IMPL "direct-impl"
+> +#define DIRECT_IMPL(obj) \
+> +    OBJECT_CHECK(DirectImpl, (obj), TYPE_DIRECT_IMPL)
+> +
+> +static void test_if_post_init(Object *obj)
 > +{
-> +    qemu_chr_fe_set_handlers_full(b, fd_can_read, fd_read, fd_event, be_=
-change,
-> +                                  opaque, context, set_open,
-> +                                  true);
+> +    DirectImpl *d =3D DIRECT_IMPL(obj);
+> +
+> +    d->if_post_init =3D true;
 > +}
 > +
->  void qemu_chr_fe_take_focus(CharBackend *b)
+>  static const TypeInfo test_if_info =3D {
+>      .name          =3D TYPE_TEST_IF,
+>      .parent        =3D TYPE_INTERFACE,
+> +    .instance_post_init =3D test_if_post_init,
+>      .class_size =3D sizeof(TestIfClass),
+>  };
+> =20
+> @@ -47,11 +65,10 @@ static void test_class_init(ObjectClass *oc, void *da=
+ta)
+>      tc->test =3D PATTERN;
+>  }
+> =20
+> -#define TYPE_DIRECT_IMPL "direct-impl"
+> -
+>  static const TypeInfo direct_impl_info =3D {
+>      .name =3D TYPE_DIRECT_IMPL,
+>      .parent =3D TYPE_OBJECT,
+> +    .instance_size =3D sizeof(DirectImpl),
+>      .class_init =3D test_class_init,
+>      .interfaces =3D (InterfaceInfo[]) {
+>          { TYPE_TEST_IF },
+> @@ -70,10 +87,12 @@ static void test_interface_impl(const char *type)
 >  {
->      if (!b->chr) {
-> diff --git a/chardev/char-mux.c b/chardev/char-mux.c
-> index 6055e76..1199d32 100644
-> --- a/chardev/char-mux.c
-> +++ b/chardev/char-mux.c
-> @@ -283,13 +283,13 @@ void mux_chr_set_handlers(Chardev *chr, GMainContex=
-t *context)
->      MuxChardev *d =3D MUX_CHARDEV(chr);
->
->      /* Fix up the real driver with mux routines */
-> -    qemu_chr_fe_set_handlers(&d->chr,
-> -                             mux_chr_can_read,
-> -                             mux_chr_read,
-> -                             mux_chr_event,
-> -                             NULL,
-> -                             chr,
-> -                             context, true);
-> +    qemu_chr_fe_set_handlers_full(&d->chr,
-> +                                  mux_chr_can_read,
-> +                                  mux_chr_read,
-> +                                  mux_chr_event,
-> +                                  NULL,
-> +                                  chr,
-> +                                  context, true, false);
+>      Object *obj =3D object_new(type);
+>      TestIf *iobj =3D TEST_IF(obj);
+> +    DirectImpl *d =3D DIRECT_IMPL(obj);
+>      TestIfClass *ioc =3D TEST_IF_GET_CLASS(iobj);
+> =20
+>      g_assert(iobj);
+>      g_assert(ioc->test =3D=3D PATTERN);
+> +    g_assert(d->if_post_init =3D=3D true);
+>      object_unref(obj);
 >  }
->
->  void mux_set_focus(Chardev *chr, int focus)
-> @@ -367,7 +367,7 @@ static int open_muxes(Chardev *chr)
->       * mark mux as OPENED so any new FEs will immediately receive
->       * OPENED event
->       */
-> -    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
-> +    chr->be_open =3D 1;
->
->      return 0;
->  }
-> diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
-> index 46c997d..c1b7fd9 100644
-> --- a/include/chardev/char-fe.h
-> +++ b/include/chardev/char-fe.h
-> @@ -67,7 +67,7 @@ bool qemu_chr_fe_backend_connected(CharBackend *be);
->  bool qemu_chr_fe_backend_open(CharBackend *be);
->
->  /**
-> - * qemu_chr_fe_set_handlers:
-> + * qemu_chr_fe_set_handlers_full:
->   * @b: a CharBackend
->   * @fd_can_read: callback to get the amount of data the frontend may
->   *               receive
-> @@ -79,12 +79,28 @@ bool qemu_chr_fe_backend_open(CharBackend *be);
->   * @context: a main loop context or NULL for the default
->   * @set_open: whether to call qemu_chr_fe_set_open() implicitely when
->   * any of the handler is non-NULL
-> + * @sync_state: whether to issue event callback with updated state
->   *
->   * Set the front end char handlers. The front end takes the focus if
->   * any of the handler is non-NULL.
->   *
->   * Without associated Chardev, nothing is changed.
->   */
-> +void qemu_chr_fe_set_handlers_full(CharBackend *b,
-> +                                   IOCanReadHandler *fd_can_read,
-> +                                   IOReadHandler *fd_read,
-> +                                   IOEventHandler *fd_event,
-> +                                   BackendChangeHandler *be_change,
-> +                                   void *opaque,
-> +                                   GMainContext *context,
-> +                                   bool set_open,
-> +                                   bool sync_state);
-> +
-> +/**
-> + * qemu_chr_fe_set_handlers:
-> + *
-> + * Version of qemu_chr_fe_set_handlers_full() with sync_state =3D true.
-> + */
->  void qemu_chr_fe_set_handlers(CharBackend *b,
->                                IOCanReadHandler *fd_can_read,
->                                IOReadHandler *fd_read,
-> --
-> 2.7.4
->
+> =20
