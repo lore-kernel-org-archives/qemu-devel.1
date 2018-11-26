@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gRCG1-0006eF-PF
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 03:28:42 -0500
+	(envelope-from <pagupta@redhat.com>) id 1gRCXh-0002uD-CH
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 03:46:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gRCFx-00086h-RP
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 03:28:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37746)
+	(envelope-from <pagupta@redhat.com>) id 1gRCXe-0000EF-4D
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 03:46:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55482)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gRCFx-00086A-Lx
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 03:28:37 -0500
-Date: Mon, 26 Nov 2018 09:28:35 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181126082835.txegulyu6eciivh5@sirius.home.kraxel.org>
-References: <D965412A-A975-4660-BEC5-6FBF34E35C45@gmail.com>
-	<CAFEAcA983Q16B8y1j3msg31BtM5LXhUcB5ouyg6Dp1y-aUaDpw@mail.gmail.com>
-	<CAFEAcA8WMh8AnD8X5eMz7YX_c5z0Aw8_ydZ-0poY5Sv9mnxUHw@mail.gmail.com>
-	<20181122073202.zafys4gyewgjpgko@sirius.home.kraxel.org>
-	<CAFEAcA-NAbimZZ8=URgUb5hFe7LG72DRM05SwecARtJUcWL1zA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1gRCXd-0000Cs-Ns
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 03:46:54 -0500
+Date: Mon, 26 Nov 2018 03:46:50 -0500 (EST)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1649439383.36010013.1543222010591.JavaMail.zimbra@redhat.com>
+In-Reply-To: <cb65ee91dd31df303dcb7c0e28143542678c9891.1542699775.git.yi.z.zhang@linux.intel.com>
+References: <cover.1542699775.git.yi.z.zhang@linux.intel.com>
+	<cb65ee91dd31df303dcb7c0e28143542678c9891.1542699775.git.yi.z.zhang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-NAbimZZ8=URgUb5hFe7LG72DRM05SwecARtJUcWL1zA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] Fix for crashes and non-responsive UI on
- macOS Mojave
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V5_resend 7/7] hostmem-file: add 'sync'
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +28,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Berkus Decker <berkus@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
-
-  Hi,
-
-> What are the required semantics for update/switch/refresh?
-> These don't seem to be documented. Can we validly make
-> those be asychronous, or does the midlayer require that
-> the operation has completed and been reflected onscreen
-> before the update/switch/refresh callback returns ?
+To: Zhang Yi <yi.z.zhang@linux.intel.com>
+Cc: xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, dan j williams <dan.j.williams@intel.com>, stefanha@redhat.com, pbonzini@redhat.com, yu c zhang <yu.c.zhang@linux.intel.com>, imammedo@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com
 
 
-refresh
--------
+> 
+> This option controls whether QEMU mmap(2) the memory backend file with
+> MAP_SYNC flag, which can fully guarantee the guest write persistence
 
-refresh() is called at regular intervals, for guest display refresh.  By
-default it is called every 30 ms (GUI_REFRESH_INTERVAL_DEFAULT), UIs can
-ask for a different interval using update_displaychangelistener() though.
+Not sure 'persistence' is the right word here. I think it should be
+something like 'consistent filesystem metadata for every guest write' just 
+to avoid any confusion.
 
-Typically the refresh() callback will first call
-graphic_hw_update(vd->dcl.con), which in turn calls into the display
-device emulation for display update checks.  vga emulation will check
-dirty tracking here to figure whenever the guest has updated the
-display.
+> to the backend, if MAP_SYNC flag is supported by the host kernel
+> (Linux kernel 4.15 and later) and the backend is a file supporting
+> DAX (e.g., file on ext4/xfs file system mounted with '-o dax').
+> 
+> It can take one of following values:
+>  - on:  try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+>         'share=off', QEMU will abort
+>  - off: never pass MAP_SYNC to mmap(2)
+>  - auto (default): if MAP_SYNC is supported and 'share=on', work as if
+>         'sync=on'; otherwise, work as if 'sync=off'
+> 
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+> ---
+>  backends/hostmem-file.c | 39 +++++++++++++++++++++++++++++++++++++++
+>  docs/nvdimm.txt         | 20 +++++++++++++++++++-
+>  include/exec/memory.h   |  8 ++++++++
+>  qemu-options.hx         | 22 +++++++++++++++++++++-
+>  4 files changed, 87 insertions(+), 2 deletions(-)
+> 
+> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> index 0dd7a90..73cf181 100644
+> --- a/backends/hostmem-file.c
+> +++ b/backends/hostmem-file.c
+> @@ -16,6 +16,7 @@
+>  #include "sysemu/hostmem.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qom/object_interfaces.h"
+> +#include "qapi/qapi-visit.h"
+>  
+>  /* hostmem-file.c */
+>  /**
+> @@ -36,6 +37,7 @@ struct HostMemoryBackendFile {
+>      uint64_t align;
+>      bool discard_data;
+>      bool is_pmem;
+> +    OnOffAuto sync;
+>  };
+>  
+>  static void
+> @@ -62,6 +64,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error
+> **errp)
+>                                   path,
+>                                   backend->size, fb->align,
+>                                   (backend->share ? RAM_SHARED : 0) |
+> +                                 qemu_ram_sync_flags(fb->sync) |
+>                                   (fb->is_pmem ? RAM_PMEM : 0),
+>                                   fb->mem_path, errp);
+>          g_free(path);
+> @@ -136,6 +139,39 @@ static void file_memory_backend_set_align(Object *o,
+> Visitor *v,
+>      error_propagate(errp, local_err);
+>  }
+>  
+> +static void file_memory_backend_get_sync(
+> +    Object *obj, Visitor *v, const char *name, void *opaque, Error **errp)
+> +{
+> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(obj);
+> +    OnOffAuto value = fb->sync;
+> +
+> +    visit_type_OnOffAuto(v, name, &value, errp);
+> +}
+> +
+> +static void file_memory_backend_set_sync(
+> +    Object *obj, Visitor *v, const char *name, void *opaque, Error **errp)
+> +{
+> +    HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(obj);
+> +    Error *local_err = NULL;
+> +    OnOffAuto value;
+> +
+> +    if (host_memory_backend_mr_inited(backend)) {
+> +        error_setg(&local_err, "cannot change property '%s' of %s",
+> +                   name, object_get_typename(obj));
+> +        goto out;
+> +    }
+> +
+> +    visit_type_OnOffAuto(v, name, &value, &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +    fb->sync = value;
+> +
+> + out:
+> +    error_propagate(errp, local_err);
+> +}
+> +
+>  static bool file_memory_backend_get_pmem(Object *o, Error **errp)
+>  {
+>      return MEMORY_BACKEND_FILE(o)->is_pmem;
+> @@ -203,6 +239,9 @@ file_backend_class_init(ObjectClass *oc, void *data)
+>      object_class_property_add_bool(oc, "pmem",
+>          file_memory_backend_get_pmem, file_memory_backend_set_pmem,
+>          &error_abort);
+> +    object_class_property_add(oc, "sync", "OnOffAuto",
+> +        file_memory_backend_get_sync, file_memory_backend_set_sync,
+> +        NULL, NULL, &error_abort);
+>  }
+>  
+>  static void file_backend_instance_finalize(Object *o)
+> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> index 5f158a6..3d89174 100644
+> --- a/docs/nvdimm.txt
+> +++ b/docs/nvdimm.txt
+> @@ -142,11 +142,29 @@ backend of vNVDIMM:
+>  Guest Data Persistence
+>  ----------------------
+>  
+> +vNVDIMM is designed and implemented to guarantee the guest data
+> +persistence on the backends even on the host crash and power
+> +failures. However, there are still some requirements and limitations
+> +as explained below.
+> +
+>  Though QEMU supports multiple types of vNVDIMM backends on Linux,
+> -currently the only one that can guarantee the guest write persistence
+> +if MAP_SYNC is not supported by the host kernel and the backends,
+> +the only backend that can guarantee the guest write persistence
+>  is the device DAX on the real NVDIMM device (e.g., /dev/dax0.0), to
+>  which all guest access do not involve any host-side kernel cache.
+>  
+> +mmap(2) flag MAP_SYNC is added since Linux kernel 4.15. On such
+> +systems, QEMU can mmap(2) the backend with MAP_SYNC, which can
 
-Next is actually updating the UI (but see below).
+I think its important to clear about the type of backend. 
+i.e DAX file on real NVDIMM device backend.
 
+Thanks,
+Pankaj 
 
-switch
-------
-
-Notifies the UI that the DisplaySurface has changed.  Will happen when
-the guest switches the video mode.  Can also happen on pageflips.
-
-Can happen during the graphic_hw_update() call, but can also happen
-independant from that.
-
-Qemu will free the old DisplaySurface after the switch callback returns,
-so you must make sure you don't keep a reference.  These days the
-DisplaySurface is just a thin wrapper around a pixman image though, and
-pixman images are reference counted.  So if you want handle display
-updates outside the iothread the best way to do that is to grab the
-pixman image (DisplaySurface->image), get a reference to make sure it is
-not released under your feet (pixman_image_ref()) and run with that in
-your UI thread.
-
-
-update
-------
-
-Notifies the UI that the guest has updated a specific display rectangle
-and the UI should redraw it.
-
-Can happen during the graphic_hw_update() call, but can also happen
-independant from that.
-
-You can do the UI update right here, or you can just record the
-rectangles, then do a batched update in the refresh() callback.  Or
-you can pass on the rectangle to your UI thread for processing.
-
-HTH,
-  Gerd
+> +guarantee the guest write persistence to vNVDIMM. Besides the host
+> +kernel support, enabling MAP_SYNC in QEMU also requires:
+> +
+> + - the backend is a file supporting DAX, e.g., a file on an ext4 or
+> +   xfs file system mounted with '-o dax',
+> +
+> + - 'sync' option of memory-backend-file is not 'off', and
+> +
+> + - 'share' option of memory-backend-file is 'on'.
+> +
+>  When using other types of backends, it's suggested to set 'unarmed'
+>  option of '-device nvdimm' to 'on', which sets the unarmed flag of the
+>  guest NVDIMM region mapping structure.  This unarmed flag indicates
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index c74c467..b398abb 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -26,6 +26,7 @@
+>  #include "qom/object.h"
+>  #include "qemu/rcu.h"
+>  #include "hw/qdev-core.h"
+> +#include "qapi/error.h"
+>  
+>  #define RAM_ADDR_INVALID (~(ram_addr_t)0)
+>  
+> @@ -136,6 +137,13 @@ typedef struct IOMMUNotifier IOMMUNotifier;
+>  
+>  #define RAM_SYNC (RAM_SYNC_ON_OFF_AUTO_ON | RAM_SYNC_ON_OFF_AUTO_AUTO)
+>  
+> +static inline uint64_t qemu_ram_sync_flags(OnOffAuto v)
+> +{
+> +    return v == ON_OFF_AUTO_OFF ? RAM_SYNC_ON_OFF_AUTO_OFF :
+> +           v == ON_OFF_AUTO_ON ? RAM_SYNC_ON_OFF_AUTO_ON :
+> +           RAM_SYNC_ON_OFF_AUTO_AUTO;
+> +}
+> +
+>  static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+>                                         IOMMUNotifierFlag flags,
+>                                         hwaddr start, hwaddr end,
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 08f8516..77e8810 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3928,7 +3928,7 @@ property must be set.  These objects are placed in the
+>  
+>  @table @option
+>  
+> -@item -object
+> memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align}
+> +@item -object
+> memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off},merge=@var{on|off},dump=@var{on|off},prealloc=@var{on|off},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave},align=@var{align},sync=@var{on|off|auto}
+>  
+>  Creates a memory file backend object, which can be used to back
+>  the guest RAM with huge pages.
+> @@ -4003,6 +4003,26 @@ If @option{pmem} is set to 'on', QEMU will take
+> necessary operations to
+>  guarantee the persistence of its own writes to @option{mem-path}
+>  (e.g. in vNVDIMM label emulation and live migration).
+>  
+> +The @option{sync} option specifies whether QEMU mmap(2) @option{mem-path}
+> +with MAP_SYNC flag, which can guarantee the guest write persistence to
+> +@option{mem-path} even on the host crash and power failures. MAP_SYNC
+> +requires supports from both the host kernel (since Linux kernel 4.15)
+> +and @option{mem-path} (only files supporting DAX). It can take one of
+> +following values:
+> +
+> +@table @option
+> +@item @var{on}
+> +try to pass MAP_SYNC to mmap(2); if MAP_SYNC is not supported or
+> +@option{share}=@var{off}, QEMU will abort
+> +
+> +@item @var{off}
+> +never pass MAP_SYNC to mmap(2)
+> +
+> +@item @var{auto} (default)
+> +if MAP_SYNC is supported and @option{share}=@var{on}, work as if
+> +@option{sync}=@var{on}; otherwise, work as if @option{sync}=@var{off}
+> +@end table
+> +
+>  @item -object
+>  memory-backend-ram,id=@var{id},merge=@var{on|off},dump=@var{on|off},share=@var{on|off},prealloc=@var{on|off},size=@var{size},host-nodes=@var{host-nodes},policy=@var{default|preferred|bind|interleave}
+>  
+>  Creates a memory backend object, which can be used to back the guest RAM.
+> --
+> 2.7.4
+> 
+> 
+> 
