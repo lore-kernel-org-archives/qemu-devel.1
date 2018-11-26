@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gRN81-0001lR-Ek
+	(envelope-from <tcminyard@gmail.com>) id 1gRN81-0001lO-E6
 	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 15:05:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gRN7y-0001Kj-By
+	(envelope-from <tcminyard@gmail.com>) id 1gRN7y-0001Lu-Vw
 	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 15:05:09 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:38135)
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34630)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gRN7x-0001GL-7F
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gRN7y-0001Hr-K3
 	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 15:05:06 -0500
-Received: by mail-ot1-x342.google.com with SMTP id e12so13562635otl.5
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 12:04:50 -0800 (PST)
+Received: by mail-ot1-x343.google.com with SMTP id t5so17917349otk.1
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 12:04:59 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Mon, 26 Nov 2018 14:04:19 -0600
-Message-Id: <20181126200435.23408-1-minyard@acm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 00/16] Fix/add vmstate handling in some I2C
- code
+Date: Mon, 26 Nov 2018 14:04:29 -0600
+Message-Id: <20181126200435.23408-11-minyard@acm.org>
+In-Reply-To: <20181126200435.23408-1-minyard@acm.org>
+References: <20181126200435.23408-1-minyard@acm.org>
+Subject: [Qemu-devel] [PATCH v3 10/16] i2c:pm_smbus: Fix state transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +27,141 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <minyard@acm.org>, Corey Minyard <cminyard@mvista.com>
 
-I believe I've fixed all the issues pointed out by everyone, and I've
-tested migration between 2.12 and 3.0 and back on q35 and piix4
-(with the fix I posted earlier for piix4).
+From: Corey Minyard <cminyard@mvista.com>
 
-Changes since v2:
+Transfer the state information for the SMBus registers and
+internal data so it will work on a VM transfer.
 
-Added proper license headers for the newly created files.
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/acpi/piix4.c           |  7 +++++++
+ hw/i2c/pm_smbus.c         | 31 +++++++++++++++++++++++++++++++
+ hw/i2c/smbus_ich9.c       | 10 +++++++++-
+ include/hw/i2c/pm_smbus.h |  9 +++++++++
+ 4 files changed, 56 insertions(+), 1 deletion(-)
 
-Added myself as a maintainer of the i2c core files.
-
-Removed unneeded code in several places pointed out by Peter Maydell
-since i2c_recv() returns a uint8_t instead of an int.  These are
-in two separate patches.
-
-Added a patch from Philippe Mathieu-Daudé <philmd@redhat.com> to
-replace a magic number with a constant in the smbus_eeprom code and
-verify the count so there is no overflow.
-
-Updated the pm_smbus migration to not update the version numbers
-in the existing vmstate structures.  The needed field didn't
-accomplish what was needed because it is only called on the save
-side, not the load side of the migration.  So I'm using
-VMSTATE_STRUCT_TEST() to transfer the pm_smbus data now, that
-should be all that is required for backwards compatibility, and
-will be safer for falling back to an older version.
-
-I found the problem with the SMBus being broken on piix4 after a
-migration, but I sent it out as a separate patch since it has
-nothing to do with this series, and should probably go into the
-current release being worked on.
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index 2f4dd03b83..91fe4821d3 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -302,6 +302,11 @@ static const VMStateDescription vmstate_cpuhp_state = {
+     }
+ };
+ 
++static bool piix4_vmstate_need_smbus(void *opaque, int version_id)
++{
++    return pm_smbus_vmstate_needed();
++}
++
+ /* qemu-kvm 1.2 uses version 3 but advertised as 2
+  * To support incoming qemu-kvm 1.2 migration, change version_id
+  * and minimum_version_id to 2 below (which breaks migration from
+@@ -321,6 +326,8 @@ static const VMStateDescription vmstate_acpi = {
+         VMSTATE_UINT16(ar.pm1.evt.en, PIIX4PMState),
+         VMSTATE_UINT16(ar.pm1.cnt.cnt, PIIX4PMState),
+         VMSTATE_STRUCT(apm, PIIX4PMState, 0, vmstate_apm, APMState),
++        VMSTATE_STRUCT_TEST(smb, PIIX4PMState, piix4_vmstate_need_smbus, 3,
++                            pmsmb_vmstate, PMSMBus),
+         VMSTATE_TIMER_PTR(ar.tmr.timer, PIIX4PMState),
+         VMSTATE_INT64(ar.tmr.overflow_time, PIIX4PMState),
+         VMSTATE_STRUCT(ar.gpe, PIIX4PMState, 2, vmstate_gpe, ACPIGPE),
+diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+index 8793113c25..2a9bc6e8c0 100644
+--- a/hw/i2c/pm_smbus.c
++++ b/hw/i2c/pm_smbus.c
+@@ -19,6 +19,7 @@
+  */
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
++#include "hw/boards.h"
+ #include "hw/i2c/pm_smbus.h"
+ #include "hw/i2c/smbus_master.h"
+ 
+@@ -450,6 +451,36 @@ static const MemoryRegionOps pm_smbus_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
++bool pm_smbus_vmstate_needed(void)
++{
++    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
++
++    return !mc->smbus_no_migration_support;
++}
++
++const VMStateDescription pmsmb_vmstate = {
++    .name = "pmsmb",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT8(smb_stat, PMSMBus),
++        VMSTATE_UINT8(smb_ctl, PMSMBus),
++        VMSTATE_UINT8(smb_cmd, PMSMBus),
++        VMSTATE_UINT8(smb_addr, PMSMBus),
++        VMSTATE_UINT8(smb_data0, PMSMBus),
++        VMSTATE_UINT8(smb_data1, PMSMBus),
++        VMSTATE_UINT32(smb_index, PMSMBus),
++        VMSTATE_UINT8_ARRAY(smb_data, PMSMBus, PM_SMBUS_MAX_MSG_SIZE),
++        VMSTATE_UINT8(smb_auxctl, PMSMBus),
++        VMSTATE_UINT8(smb_blkdata, PMSMBus),
++        VMSTATE_BOOL(i2c_enable, PMSMBus),
++        VMSTATE_BOOL(op_done, PMSMBus),
++        VMSTATE_BOOL(in_i2c_block_read, PMSMBus),
++        VMSTATE_BOOL(start_transaction_on_status_read, PMSMBus),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk)
+ {
+     smb->op_done = true;
+diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+index e6d8d28194..7b24be8256 100644
+--- a/hw/i2c/smbus_ich9.c
++++ b/hw/i2c/smbus_ich9.c
+@@ -43,12 +43,20 @@ typedef struct ICH9SMBState {
+     PMSMBus smb;
+ } ICH9SMBState;
+ 
++static bool ich9_vmstate_need_smbus(void *opaque, int version_id)
++{
++    return pm_smbus_vmstate_needed();
++}
++
+ static const VMStateDescription vmstate_ich9_smbus = {
+     .name = "ich9_smb",
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+-        VMSTATE_PCI_DEVICE(dev, struct ICH9SMBState),
++        VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
++        VMSTATE_BOOL_TEST(irq_enabled, ICH9SMBState, ich9_vmstate_need_smbus),
++        VMSTATE_STRUCT_TEST(smb, ICH9SMBState, ich9_vmstate_need_smbus, 1,
++                            pmsmb_vmstate, PMSMBus),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
+index 7bcca97672..fb55c44444 100644
+--- a/include/hw/i2c/pm_smbus.h
++++ b/include/hw/i2c/pm_smbus.h
+@@ -43,4 +43,13 @@ typedef struct PMSMBus {
+ 
+ void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk);
+ 
++/*
++ * For backwards compatibility on migration, older versions don't have
++ * working migration for pm_smbus, this lets us ignore the migrations
++ * for older machine versions.
++ */
++bool pm_smbus_vmstate_needed(void);
++
++extern const VMStateDescription pmsmb_vmstate;
++
+ #endif /* PM_SMBUS_H */
+-- 
+2.17.1
