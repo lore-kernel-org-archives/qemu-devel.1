@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRQPb-0006cv-OV
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:35:32 -0500
+	(envelope-from <cota@braap.org>) id 1gRQkJ-0004SC-Jx
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:56:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRQPY-00012l-Kd
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:35:31 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44834)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gRQPY-00012f-FE
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:35:28 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gRQPX-00089i-3g
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 23:35:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 172282E80C7
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 23:35:27 +0000 (UTC)
+	(envelope-from <cota@braap.org>) id 1gRQkG-0003kA-FC
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:56:55 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:48107)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gRQkG-0003k4-8d
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:56:52 -0500
+Date: Mon, 26 Nov 2018 18:56:49 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181126235649.GB22108@flamenco>
+References: <20181025172057.20414-1-cota@braap.org>
+	<20181025172057.20414-11-cota@braap.org>
+	<874lc9hwe5.fsf@linaro.org> <20181123231948.GB13782@flamenco>
+	<87tvk43xfq.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 26 Nov 2018 23:26:10 -0000
-From: John Snow <1805256@bugs.launchpad.net>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <154327477015.473.14616316005458903610.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805256] Re: qemu-img hangs on high core count
- ARM system
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87tvk43xfq.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [RFC 10/48] exec: export do_tb_flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,64 +30,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
 
-Hi, can you do a `thread apply all bt` instead? If I were to bet, we're
-probably waiting for some slow call like lseek to return in another
-thread.
+On Mon, Nov 26, 2018 at 11:11:53 +0000, Alex Bennée wrote:
+> 
+> Emilio G. Cota <cota@braap.org> writes:
+> 
+> > On Thu, Nov 22, 2018 at 17:09:22 +0000, Alex Bennée wrote:
+> >>
+> >> Emilio G. Cota <cota@braap.org> writes:
+> >>
+> >> > This will be used by plugin code to flush the code cache as well
+> >> > as doing other bookkeeping in a safe work environment.
+> >>
+> >> This seems a little excessive given the plugin code could just call
+> >> tb_flush() directly. Wouldn't calling tb_flush after scheduling the
+> >> plugin_destroy be enough?
+> >>
+> >> If there is a race condition here maybe we could build some sort of
+> >> awareness into tb_flush as to the current run state. But having two
+> >> entry points to this rather fundamental action seems likely to either be
+> >> misused or misunderstood.
+> >
+> > We have to make sure that no callback left in the generated code is
+> > called once a plugin has been uninstalled. To me, using the same safe
+> > work window to both flush the TB and uninstall the plugin seems the
+> > simplest way to do this.
+> 
+> I still think making tb_flush() aware that it can run in an exclusive
+> period would be a better solution than exposing two functions for the
+> operation. So tb_flush could be something like:
+> 
+>   void tb_flush(CPUState *cpu)
+>   {
+>       if (tcg_enabled()) {
+>           unsigned tb_flush_count = atomic_mb_read(&tb_ctx.tb_flush_count);
+>           if (cpu_current_and_exclusive(cpu)) {
+>               do_tb_flush(RUN_ON_CPU_HOST_INT(tb_flush_count))
+>           } else {
+>               async_safe_run_on_cpu(cpu, do_tb_flush,
+>                                     RUN_ON_CPU_HOST_INT(tb_flush_count));
+>           }
+>       }
+>   }
+> 
+> Or possibly push that logic down into async_safe_run_on_cpu()?
 
-What filesystem/blockdevice is involved here?
+The latter option would be much harder, because in async_safe_run_on_cpu
+we always queue the work and kick the CPU (which could be ourselves).
+IOW the job is always asynchronous, as the name implies.
 
--- =
+I've thus implemented the former in v2, as follows (I'm using a hole
+in struct CPUState to add the bool):
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
+@@ -1277,8 +1277,13 @@ void tb_flush(CPUState *cpu)
+ {
+     if (tcg_enabled()) {
+         unsigned tb_flush_count = atomic_mb_read(&tb_ctx.tb_flush_count);
+-        async_safe_run_on_cpu(cpu, do_tb_flush,
+-                              RUN_ON_CPU_HOST_INT(tb_flush_count));
++
++        if (cpu_in_exclusive_work_context(cpu)) {
++            do_tb_flush(cpu, RUN_ON_CPU_HOST_INT(tb_flush_count));
++        } else {
++            async_safe_run_on_cpu(cpu, do_tb_flush,
++                                  RUN_ON_CPU_HOST_INT(tb_flush_count));
++        }
+     }
+ }
 
-Title:
-  qemu-img hangs on high core count ARM system
++++ b/cpus-common.c
+@@ -386,7 +386,9 @@ static void process_queued_cpu_work_locked(CPUState *cpu)
+                 qemu_mutex_unlock_iothread();
+             }
+             start_exclusive();
++            cpu->in_exclusive_work_context = true;
+             wi->func(cpu, wi->data);
++            cpu->in_exclusive_work_context = false;
+             end_exclusive();
 
-Status in QEMU:
-  New
+I've also fixed a couple of unrelated bugs when uninstalling a plugin
+with memory callbacks enabled.
 
-Bug description:
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
+Thanks,
 
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760, =
-
-      timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
-950)
-      at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>, =
-
-      __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
-.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
-
-      timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-      at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
+		Emilio
