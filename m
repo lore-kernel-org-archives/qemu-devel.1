@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gR4rw-0004i9-QO
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 19:35:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gR4u5-0005fU-3z
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 19:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gR4rt-0000fv-6r
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 19:35:20 -0500
-Received: from steffen-goertz.de ([88.198.119.201]:38834)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@steffen-goertz.de>) id 1gR4rt-0000fT-0V
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 19:35:17 -0500
-References: <20181112214224.31560-1-contrib@steffen-goertz.de>
-	<20181112214224.31560-8-contrib@steffen-goertz.de>
-	<3b9c8331-c84a-414a-8ff3-905a9e4b3779@redhat.com>
-From: =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
-Message-ID: <9768c404-0fb5-0128-0902-35979df95669@steffen-goertz.de>
-Date: Sun, 25 Nov 2018 19:35:13 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gR4u4-0001qr-7m
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 19:37:33 -0500
+Date: Mon, 26 Nov 2018 11:15:40 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181126001540.GF2251@umbus.fritz.box>
+References: <20181125205000.10324-1-philmd@redhat.com>
+	<20181125205000.10324-9-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3b9c8331-c84a-414a-8ff3-905a9e4b3779@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 07/14] tests: Add bbc:microbit / nRF51
- test suite
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="V4b9U9vrdWczvw78"
+Content-Disposition: inline
+In-Reply-To: <20181125205000.10324-9-philmd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.1 08/25] MAINTAINERS: Add a missing
+ entry for the Old World machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
 
-Hi Thomas,
 
-thank you for your remarks!
+--V4b9U9vrdWczvw78
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->> +int main(int argc, char **argv)
->> +{
->> +    int ret;
->> +
->> +    g_test_init(&argc, &argv, NULL);
->> +
->> +    global_qtest = qtest_initf("-machine microbit");
->> +
->> +    qtest_add_func("/microbit/nrf51/nvmc", test_nrf51_nvmc);
->> +
->> +    ret = g_test_run();
->> +
->> +    qtest_quit(global_qtest);
->> +    return ret;
->> +}
-> 
-> If you could do me a big favour, then please try to write new qtests
-> without the global_qtest variable. I.e. move the qtest_initf into the
-> test_nrf51_nvmc function and pass around the local test state variable
-> there to qtest_writel() and friends. I just started yet another clean up
-> attempt for some other files, e.g. see here:
-> 
->  https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg02196.html
-> 
-> (but if this is too much cumbersome right now for you, I also won't
-> object this patch in the current shape - we can still clean this up later)
-> 
+On Sun, Nov 25, 2018 at 09:49:43PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-I would like to leave the test like this at the moment. We will add additional devices in the future and i would like to postpone refactoring of the test until the current patch series is merged.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-Best,
-Steffen
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 81a22b2ccf..aa51ae813b 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -936,6 +936,7 @@ F: hw/ppc/mac_oldworld.c
+>  F: hw/pci-host/grackle.c
+>  F: hw/misc/macio/
+>  F: hw/intc/heathrow_pic.c
+> +F: include/hw/intc/heathrow_pic.h
+> =20
+>  PReP
+>  M: Herv=E9 Poussineau <hpoussin@reactos.org>
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--V4b9U9vrdWczvw78
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv7OycACgkQbDjKyiDZ
+s5KrZA//bhZPfoOo2Sy5yDgCtHH6Bqo0cSQgEYeFIb2GirVFwzsQ6I8UaDAW5dGV
+h6lk1Qe7n4PtPx6ZrwCpVEQStAdsWivGit0y49iMhQyz0ivAd9ySI/RZ82YOrKj1
+Z6BcAzDjx+PD85q19zYjSf2JqDv06hWk3DsHkAd0H0M6A4wiuI0zUwthcBYy7Cs4
+Vu+YBu6BcEqW3OuvYkYXxyFaBDo6x9Pp29kZzfnjUtAmE5Pb6xlyzr4dFJ+/mWQn
+R5zclKOSM7g0boT/bgW/NT8HC5KJ+9GsDRQp5pLuVGLpldmNgG0MY7uVAt25RTJ/
+JjF0TECmqwEBT5I3BFF6b6JhiN/FtvleBvy3p48hJxlY22ruFueUS1XnthD+dNVS
+OTSakLzeRgYaewMZeoV9Zo/S0eAliU/bh2rWdsVEgQIwv0KfbadR+RA6JQjWWxIR
+vX3lDqpiGqxX9eiNUJ2RjwoEJnxAZQFcV6d7o1VcTGAefQOoSZDMfezEpDxAKn/f
+KUXhQNoODZGNshkTpK5e9K/+DFpXmJVjcBalWCrxxqDpnmbAhJnuIhF43Ju1Xdeo
+fu0XJqv0Dex0vv5LcJGWU9M9zZHJsJC9XSer7g+WubIc1d6loTXjt2Z3XHqTtcSh
+sPfo2fwB8JKx7SHoAKbtDSEbhdWHQAmzb4+74pSS5wE1S22LNxI=
+=yl+G
+-----END PGP SIGNATURE-----
+
+--V4b9U9vrdWczvw78--
