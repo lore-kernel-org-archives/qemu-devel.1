@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gRKdW-00051m-3b
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:25:31 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gRKdj-0005C3-01
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:25:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1gRKdV-0000je-7Q
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:25:30 -0500
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Mon, 26 Nov 2018 17:25:09 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F201F96F02@dggema523-mbx.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1gRKdi-00012W-4g
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:25:42 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:38953)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gRKdh-00012A-VF
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:25:42 -0500
+Received: by mail-oi1-x243.google.com with SMTP id i6so4951807oia.6
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 09:25:41 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH RESEND v15 08/10] target-arm: kvm64: inject
- synchronous External Abort
+References: <0184EA26B2509940AA629AE1405DD7F201F96E93@dggema523-mbx.china.huawei.com>
+In-Reply-To: <0184EA26B2509940AA629AE1405DD7F201F96E93@dggema523-mbx.china.huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 26 Nov 2018 17:25:30 +0000
+Message-ID: <CAFEAcA-00K2y9Xknkxdtop5Yj7E_j9jd6zFe6n0hw=aOGz963A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH RESEND v15 10/10] target-arm:
+ kvm64: handle SIGBUS signal from kernel or KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,50 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard
-	Henderson <rth@twiddle.net>, "zhengxiang (A)" <zhengxiang9@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Marcelo Tosatti <mtosatti@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-PiA+Pg0KPiA+PiBIaSBQZXRlciwNCj4gPj4gICBUaGFua3MgZm9yIHRoZSByZXZpZXcgYW5kIGNv
-bW1lbnRzLg0KPiA+Pg0KPiA+PiA+DQo+ID4+ID4gT24gOCBOb3ZlbWJlciAyMDE4IGF0IDEwOjI5
-LCBEb25naml1IEdlbmcgPGdlbmdkb25naml1QGh1YXdlaS5jb20+IHdyb3RlOg0KPiA+PiA+ID4g
-K2Jvb2wgd3JpdGVfcGFydF9jcHVzdGF0ZV90b19saXN0KEFSTUNQVSAqY3B1LCBwdHJkaWZmX3QN
-Cj4gPj4gPiA+ICtmaWVsZG9mZnNldCkNCj4gPj4gPg0KPiA+PiA+IFdoYXQgaXMgdGhpcyBhYm91
-dD8gTm90aGluZyBlbHNlIGluIFFFTVUgbmVlZHMgdG8gbWVzcyB3aXRoIHRoZQ0KPiA+PiA+IGNw
-dXN0YXRlIHN5bmNocm9uaXphdGlvbi4gTXkgZmlyc3QgYXNzdW1wdGlvbiBpcyB0aGF0IHlvdSBz
-aG91bGQgbm90IG5lZWQgdG8gZG8gc28gZWl0aGVyLg0KPiA+Pg0KPiA+PiBXZSBzaG91bGQgY2hh
-bmdlIHRoZSBndWVzdCBDUDE1IEVTUl9FTDEncyB2YWx1ZSwgdGhlIG9ubHkgbWV0aG9kIGlzDQo+
-ID4+IHRvIGNoYW5nZSB0aGUgY3B1LT5jcHJlZ192YWx1ZXNbXSBpbiBRRU1VLCB0aGVuIFFFTVUg
-Y2FsbCB3cml0ZV9saXN0X3RvX2t2bXN0YXRlKCkgdG8gc2V0IHRoZSBjcHUtPmNwcmVnX3ZhbHVl
-c1tdIHRvIEtWTSB3aGljaA0KPiBpbmNsdWRlIHRoZSBzcGVjaWZpZWQgRVNSX0VMMSB2YWx1ZSwg
-S1ZNIGRvIHdvcmxkIHN3aXRjaCwgYW5kIHRoZW4gc2V0IHRoZSBzcGVjaWZpZWQgRVNSX0VMMSdz
-IHZhbHVlIHRvIGd1ZXN0IGtlcm5lbC4NCj4gPg0KPiA+IEFoLCBJIHNlZS4gVGhpcyBpcyBhIGJ1
-ZyBpbiBvdXIgY3VycmVudCBoYW5kbGluZyBvZiB0aGUgcmVnaXN0ZXINCj4gPiBzdGF0ZSwgd2hl
-cmUgd2UgaW1wbGljaXRseSBhc3N1bWUgdGhhdCBub3RoaW5nIGluIFFFTVUgd2lsbCBldmVyIHdh
-bnQNCj4gPiB0byBjaGFuZ2UgYW55IHN5c3RlbSByZWdpc3RlciB2YWx1ZXMuIFRoaXMgYXNzdW1w
-dGlvbiBpcyBub3cgZmFsc2UgLS0NCj4gPiBrdm1fYXJtX2hhbmRsZV9kZWJ1ZygpIGJyb2tlIGl0
-IC0tIHNvIHdlIG5lZWQgdG8gZml4IHRoZSBjb2RlIHRoYXQNCj4gPiBkb2VzIGt2bV9hcmNoX3B1
-dF9yZWdpc3RlcnMoKS4gVGhlcmUgaXMgYSBjb21tZW50IGluIHRoZSBrdm0zMi5jDQo+ID4gdmVy
-c2lvbiBvZiB0aGF0IGZ1bmN0aW9uIGFib3V0IHRoaXMuIChUaGUga3ZtNjQuYyB2ZXJzaW9uIGhh
-cyB0aGUgc2FtZQ0KPiA+IGFzc3VtcHRpb24gYnV0IGRvZXNuJ3QgY29tbWVudCBvbiBpdC4pDQo+
-ID4NCj4gPiBXZSBzaG91bGQgKGlkZWFsbHkpIGZpeCB0aGlzIGJ1ZyBpbiB0aGUgY29kZSB0aGF0
-IGRvZXMgcmVnaXN0ZXINCj4gPiBzeW5jaW5nLCB3aXRob3V0IHJlcXVpcmluZyBwbGFjZXMgaW4g
-UUVNVSB0aGF0IHVwZGF0ZSBzeXN0ZW0gcmVnaXN0ZXJzDQo+ID4gdG8gaGF2ZSB0byBtYW51YWxs
-eSBpbmRpY2F0ZSB3aGljaCByZWdpc3RlcnMgdGhleSBoYXZlIGNoYW5nZWQuIEknbGwNCj4gPiBo
-YXZlIGEgdGhpbmsgYWJvdXQgaG93IGJlc3QgdG8gZG8gdGhpcy4NCj4gPg0KPiA+PiBBYm91dCB0
-aGUgZGV0YWlsZWQgZXhwbGFuYXRpb24sIGFzIHNob3duIGluIFsyXS4NCj4gPj4NCj4gPj4ga3Zt
-X2FybV9oYW5kbGVfZGVidWcoKSBkb2VzIG5vdCBuZWVkIHRvIGRvIHRoaXMgYmVjYXVzZSBRRU1V
-IGRvZXMgbm90IG5lZWQgdG8gY2hhbmdlIENQMTUgcmVnaXN0ZXJzLCBzdWNoIGFzIEVTUl9FTDEu
-DQo+ID4NCj4gPiBrdm1fYXJtX2hhbmRsZV9kZWJ1ZyBkb2VzIGNoYW5nZSBFU1JfRUwxOiBpdCBp
-cyBpbmplY3RpbmcgYW4gZXhjZXB0aW9uDQo+ID4gYW5kIHNvIHNob3VsZCBzZXQgdGhlIGV4Y2Vw
-dGlvbiByZWdpc3Rlci4gVGhpcyBoYXBwZW5zIHdoZW4gaXQgY2FsbHMNCj4gPiB0aGUgZG9faW50
-ZXJydXB0KCkgaG9vaywgYmVjYXVzZSBhcm1fY3B1X2RvX2ludGVycnVwdF9hYXJjaDY0KCkgd3Jp
-dGVzDQo+ID4gdG8gZW52LT5jcDE1LmVzcl9lbFtuZXdfZWxdLg0KPiA+DQo+ID4gSSdtIG5vdCBl
-bnRpcmVseSBzdXJlIHdoeSB0aGlzIGlzIHdvcmtpbmcgdG9kYXksIGluIGZhY3QuDQo+ID4gQWxl
-eCwgZGlkIHlvdSB0ZXN0IHdoZXRoZXIgb3VyIGRlYnVnLWV4Y2VwdGlvbi1pbmplY3Rpb24gcmVw
-b3J0cyB0aGUNCj4gPiBjb3JyZWN0IEVTUl9FTDEgdG8gdGhlIGd1ZXN0ID8NCj4gPHNuaXA+DQo+
-IA0KPiBJIGRpZCBub3QgLSBJIHdhcyBtb3N0bHkgZm9jdXNpbmcgaW4gdGhlIGhvc3QtZGVidWdn
-aW5nLXRoZS1ndWVzdCB0ZXN0IGNhc2UuIEknbGwgZ2V0IGEgdGVzdCByaWcgdXAgYW5kIGNoZWNr
-Lg0KDQpUaGFua3MsIHBsZWFzZSB0ZXN0IGl0IGluIHRoZSBLVk0gbW9kZSwgbm90IGluIHRoZSBU
-Q0cgbW9kZS4gV2FpdGluZyBmb3IgeW91ciB0ZXN0IHJlc3VsdC4NCg0KPiANCj4gLS0NCj4gQWxl
-eCBCZW5uw6llDQo=
+On Mon, 26 Nov 2018 at 17:18, gengdongjiu <gengdongjiu@huawei.com> wrote:
+>
+> Hi Peter,
+>    Thanks for the comments.
+>
+> >
+> > Yes, but if you look at the code which calls that, it goes on to do:
+> >         env->mcg_cap &= mcg_cap | MCG_CAP_BANKS_MASK;
+> >
+> > which means that if the host kernel does not support this feature then we will clear those bits in the env->mcg_cap field, so we do not
+> > advertise it to the guest. But we might be not advertising it to the guest at all, if env->mcg_cap was 0 before this code was called. That
+> > happens if we are presenting the guest with a guest CPU type which does not have the feature.
+>
+> So you mean "env->mcg_cap" uses a bit to indicate that whether guest CPU support error recovery, right? If so, how we know whether guest CPU have this feature?
+> Should we initialized MCG_SER_P bit of env->mcg_cap to 1 or 0 before initializing the vcpu?  Please together see the reply in the [2], thanks.
+
+This is an x86-specific field. We need to identify the Arm
+equivalent.
+
+> > The question is not "does the host CPU / KVM support error reporting". It is "does the *guest* CPU / system support error reporting".
+> > These are distinct questions which may not have the same answer.
+>
+> [2]:
+> But QEMU should not know whether *guest* CPU / system support error reporting.
+
+It should and it must. Otherwise we will deliver
+an exception to a guest that cannot handle it.
+
+> From my understanding, in the X86 platform, if host CPU / KVM support error reporting,
+> then it will think guest CPU supports error reporting, and set the
+> MCG_SER_P bit of env->mcg_cap to 1
+
+No, this is not correct. If you look at the code quoted above.
+it ANDs in the mcg_cap value. This code is run after the
+CPU is initially created with a default env->mcg_cap which
+depends on what CPU model is being exposed to the guest.
+So we only set env->mcg_cap to 1 if the guest vCPU model
+supports error reporting AND the host KVM does.
+
+thanks
+-- PMM
