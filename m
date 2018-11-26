@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gRFdl-0007un-Ot
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:05:26 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gRFmn-0002bX-16
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:14:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gRFdk-0003ZR-RJ
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:05:25 -0500
-References: <20181126112828.23047-1-kwolf@redhat.com>
-	<20181126112828.23047-2-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <7b3288b3-f7f8-b6cf-d4b1-b0540205e3df@redhat.com>
-Date: Mon, 26 Nov 2018 13:05:05 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gRFmj-0005fK-UH
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:14:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56746)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gRFmj-0005eg-OX
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:14:41 -0500
+Date: Mon, 26 Nov 2018 13:14:38 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181126131438.6a54e565@redhat.com>
+In-Reply-To: <154309181512.10041.15816389425746279853.launchpad@chaenomeles.canonical.com>
+References: <154309137717.32238.5287661827417174062.malonedeb@wampee.canonical.com>
+	<154309181512.10041.15816389425746279853.launchpad@chaenomeles.canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <20181126112828.23047-2-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="aIPdFjsHT2Wq6qsHy6ZJ9AEzztZFBvy9S"
-Subject: Re: [Qemu-devel] [PATCH for-3.1 1/2] block: Don't inactivate
- children before parents
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Bug 1804961] Re: qemu-system-aarch64: Windows 10
+ ARM64 BSoD on boot while using virt-3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,116 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: GH Cao <1804961@bugs.launchpad.net>
 Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aIPdFjsHT2Wq6qsHy6ZJ9AEzztZFBvy9S
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <7b3288b3-f7f8-b6cf-d4b1-b0540205e3df@redhat.com>
-Subject: Re: [PATCH for-3.1 1/2] block: Don't inactivate children before
- parents
-References: <20181126112828.23047-1-kwolf@redhat.com>
- <20181126112828.23047-2-kwolf@redhat.com>
-In-Reply-To: <20181126112828.23047-2-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Sat, 24 Nov 2018 20:36:54 -0000
+GH Cao <1804961@bugs.launchpad.net> wrote:
 
-On 26.11.18 12:28, Kevin Wolf wrote:
-> bdrv_child_cb_inactivate() asserts that parents are already inactive
-> when children get inactivated. This precondition is necessary because
-> parents could still issue requests in their inactivation code.
->=20
-> When block nodes are created individually with -blockdev, all of them
-> are monitor owned and will be returned by bdrv_next() in an undefined
-> order (in practice, in the order of their creation, which is usually
-> children before parents), which obviously fails the assertion.
->=20
-> This patch fixes the ordering by skipping nodes with still active
-> parents in bdrv_inactivate_recurse() because we know that they will be
-> covered by recursion when the last active parent becomes inactive.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
->=20
-> diff --git a/block.c b/block.c
-> index 5ba3435f8f..0569275e31 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -4612,6 +4612,22 @@ void bdrv_invalidate_cache_all(Error **errp)
->      }
->  }
-> =20
-> +static bool bdrv_has_active_bds_parent(BlockDriverState *bs)
-> +{
-> +    BdrvChild *parent;
-> +
-> +    QLIST_FOREACH(parent, &bs->parents, next_parent) {
-> +        if (parent->role->parent_is_bds) {
-> +            BlockDriverState *parent_bs =3D parent->opaque;
-> +            if (!(parent_bs->open_flags & BDRV_O_INACTIVE)) {
-> +                return true;
-> +            }
-> +        }
-> +    }
+> ** Description changed:
+> 
+>   When I emulate a virt-3.0 machine, Windows 10 BSoD on boot, with the
+>   error code being ACPI_BIOS_ERROR(0x000000A5), virt-2.12 boots fine.
+>   
+>   Windows Build: 10.0.17134.1
+>   QEMU version: 3.0.0
+>   Commandline: qemu-system-aarch64 -M virt -accel tcg,thread=multi -cpu cortex-a57 -smp 2 -m 2048 -bios QEMU_EFI.fd -device ramfb -device nec-usb-xhci -device usb-kbd -device usb-tablet -hda disk.vhd -vnc :0
+>   
+>   By the way, the patch to add DBG2 table discussed here
+> - https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg02550.html
+> + https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg01719.html
+>   works (although minor change is required to adapt to the qemu 3.0.0
+>   code), the table is accepted by Windows (Windows require both DBG2 and
+>   SPCR to be valid for serial kernel debugging to work), so it may help
+>   further diagnosing this issue.
+> 
 
-Now I see why you say this might make sense as a permission.
-
-> +
-> +    return false;
-> +}
-> +
->  static int bdrv_inactivate_recurse(BlockDriverState *bs,
->                                     bool setting_flag)
->  {
-> @@ -4622,6 +4638,12 @@ static int bdrv_inactivate_recurse(BlockDriverSt=
-ate *bs,
->          return -ENOMEDIUM;
->      }
-> =20
-> +    /* Make sure that we don't inactivate a child before its parent.
-> +     * It will be covered by recursion from the yet active parent. */
-> +    if (bdrv_has_active_bds_parent(bs)) {
-> +        return 0;
-> +    }
-> +
-
-Hm.  Wouldn't it make more sense to always return early when there are
-any BDS parents?  Because if there are any BDS parents and none of them
-are active (anymore), then this child will have been inactivated
-already, and we can save ourselves the trouble of going through the rest
-of the function again.
-
-Do drivers support multiple calls to .bdrv_in_activate() at all?
-
-Max
-
->      if (!setting_flag && bs->drv->bdrv_inactivate) {
->          ret =3D bs->drv->bdrv_inactivate(bs);
->          if (ret < 0) {
->=20
-
-
-
---aIPdFjsHT2Wq6qsHy6ZJ9AEzztZFBvy9S
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlv74XIACgkQ9AfbAGHV
-z0B5jAgAuQAgeSWA5fSM+tX/OIIu/P+sR3enyZ+6NkQ0eYW98gm8GLUJwZ+2H1mf
-kfP3PGX1KO0kz9PCb4jmBmmauOk4M9HmcA2fJ/EeAu0ImunZ2Y7NNPCngGeS7/8Q
-VjlqqYlOFepuexAteSiBa4KL1imSKYrucmA93L+tQW+FA5UEDwUg/Q8x4BIK8+Zk
-kXMxAAOYy5d5Hxr/Fsa+WXGkSqNzn08iC//Ev21Jugjj1Pw0F6+jgSFcNMqSY1eo
-f0T+yJDiq+uuCuIg3ARZaHMiMDK3mdgH0CO82LXC+MpllEPeRps31nUhFQE3hll3
-BWKKx+q6HML8gOLZ0vf9Ejg4gYaH4A==
-=lCOQ
------END PGP SIGNATURE-----
-
---aIPdFjsHT2Wq6qsHy6ZJ9AEzztZFBvy9S--
+if you are able to attach a debugger early before guest BSODs,
+you can try to use AMIL Debugger
+https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/the-amli-debugger
+to find out what windows doesn't like in ACPI tables.
