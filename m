@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gRGQ8-0000E2-9I
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:55:25 -0500
+	(envelope-from <ccarrara@redhat.com>) id 1gRGT9-0002b2-SL
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:58:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gRGQ7-0001f8-35
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:55:24 -0500
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 26 Nov 2018 12:55:12 +0000
-Message-ID: <56f6a43e-3c8e-478b-da85-f95745b856d9@virtuozzo.com>
-References: <20181031113418.29796-1-anton.nefedov@virtuozzo.com>
-	<20181031113418.29796-10-anton.nefedov@virtuozzo.com>
-	<a45a5d93-0f96-83be-4239-841a6b3b2c22@virtuozzo.com>
-In-Reply-To: <a45a5d93-0f96-83be-4239-841a6b3b2c22@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9A4908FC68BA1541BBDC1DF368B8D7FF@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <ccarrara@redhat.com>) id 1gRGT6-0003xA-Ju
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:58:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42248)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gRGT4-0003uE-IP
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:58:28 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7A6C9305FCB2
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 12:58:23 +0000 (UTC)
+Date: Mon, 26 Nov 2018 10:58:08 -0200
+From: Caio Carrara <ccarrara@redhat.com>
+Message-ID: <20181126125807.GA14485@localhost.localdomain>
+References: <20181121183900.10364-1-wainersm@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 9/9] qapi: query-blockstat: add driver
- specific file-posix stats
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181121183900.10364-1-wainersm@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] scripts/qemu.py: allow to launch the VM
+ without a monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,148 +33,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, crosa@redhat.com, philmd@redhat.com
 
-T24gMjMvMTEvMjAxOCAxMDoyMSBQTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90
-ZToNCj4gMzEuMTAuMjAxOCAxNDozNSwgQW50b24gTmVmZWRvdiB3cm90ZToNCj4+IEEgYmxvY2sg
-ZHJpdmVyIGNhbiBwcm92aWRlIGEgY2FsbGJhY2sgdG8gcmVwb3J0IGRyaXZlci1zcGVjaWZpYw0K
-Pj4gc3RhdGlzdGljcy4NCj4+DQo+PiBmaWxlLXBvc2l4IGRyaXZlciBub3cgcmVwb3J0cyBkaXNj
-YXJkIHN0YXRpc3RpY3MNCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBBbnRvbiBOZWZlZG92IDxhbnRv
-bi5uZWZlZG92QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgIHFhcGkvYmxvY2stY29yZS5q
-c29uICAgICAgfCAzOSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+
-ICAgIGluY2x1ZGUvYmxvY2svYmxvY2suaCAgICAgfCAgMSArDQo+PiAgICBpbmNsdWRlL2Jsb2Nr
-L2Jsb2NrX2ludC5oIHwgIDEgKw0KPj4gICAgYmxvY2suYyAgICAgICAgICAgICAgICAgICB8ICA5
-ICsrKysrKysrKw0KPj4gICAgYmxvY2svZmlsZS1wb3NpeC5jICAgICAgICB8IDE3ICsrKysrKysr
-KysrKysrKysrDQo+PiAgICBibG9jay9xYXBpLmMgICAgICAgICAgICAgIHwgIDUgKysrKysNCj4+
-ICAgIDYgZmlsZXMgY2hhbmdlZCwgNzIgaW5zZXJ0aW9ucygrKQ0KPj4NCj4+IGRpZmYgLS1naXQg
-YS9xYXBpL2Jsb2NrLWNvcmUuanNvbiBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+PiBpbmRleCAw
-MWRhODRjYjYxLi5jZDAzNDQ0MzVlIDEwMDY0NA0KPj4gLS0tIGEvcWFwaS9ibG9jay1jb3JlLmpz
-b24NCj4+ICsrKyBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+PiBAQCAtODc3LDYgKzg3Nyw0MiBA
-QA0KPj4gICAgICAgICAgICAgICAnKnhfd3JfbGF0ZW5jeV9oaXN0b2dyYW0nOiAnQmxvY2tMYXRl
-bmN5SGlzdG9ncmFtSW5mbycsDQo+PiAgICAgICAgICAgICAgICcqeF9mbHVzaF9sYXRlbmN5X2hp
-c3RvZ3JhbSc6ICdCbG9ja0xhdGVuY3lIaXN0b2dyYW1JbmZvJyB9IH0NCj4+ICAgIA0KPj4gKyMj
-DQo+PiArIyBAQmxvY2tTdGF0c1NwZWNpZmljRmlsZToNCj4+ICsjDQo+PiArIyBGaWxlIGRyaXZl
-ciBzdGF0aXN0aWNzDQo+PiArIw0KPj4gKyMgQGRpc2NhcmQtbmItb2s6IFRoZSBudW1iZXIgb2Yg
-c3VjY2VlZGVkIGRpc2NhcmQgb3BlcmF0aW9ucyBwZXJmb3JtZWQgYnkNCj4+ICsjICAgICAgICAg
-ICAgICAgICB0aGUgZHJpdmVyLg0KPj4gKyMNCj4+ICsjIEBkaXNjYXJkLW5iLWZhaWxlZDogVGhl
-IG51bWJlciBvZiBmYWlsZWQgZGlzY2FyZCBvcGVyYXRpb25zIHBlcmZvcm1lZCBieQ0KPj4gKyMg
-ICAgICAgICAgICAgICAgICAgICB0aGUgZHJpdmVyLg0KPj4gKyMNCj4+ICsjIEBkaXNjYXJkLWJ5
-dGVzLW9rOiBUaGUgbnVtYmVyIG9mIGJ5dGVzIGRpc2NhcmRlZCBieSB0aGUgZHJpdmVyLg0KPj4g
-KyMNCj4+ICsjIFNpbmNlIDMuMQ0KPiANCj4gY29sb24gYWZ0ZXIgU2luY2U6DQo+IFNpbmNlOiAz
-LjENCj4gDQoNCmRvbmUNCg0KPj4gKyMjDQo+PiAreyAnc3RydWN0JzogJ0Jsb2NrU3RhdHNTcGVj
-aWZpY0ZpbGUnLA0KPj4gKyAgJ2RhdGEnOiB7DQo+PiArICAgICAgJ2Rpc2NhcmQtbmItb2snOiAn
-aW50JywNCj4+ICsgICAgICAnZGlzY2FyZC1uYi1mYWlsZWQnOiAnaW50JywNCj4+ICsgICAgICAn
-ZGlzY2FyZC1ieXRlcy1vayc6ICdpbnQnDQo+PiArICB9IH0NCj4gDQo+IHRoZSBjb21tb24gc3Rp
-bGUgaGVyZSBpcyBubyBleHRyYSBcbiBhcm91bmQgYnJhY2VzLCBsaWtlOg0KPiANCj4geyAnc3Ry
-dWN0JzogJ0Jsb2NrU3RhdHNTcGVjaWZpY0ZpbGUnLA0KPiAgICAgJ2RhdGEnOiB7ICdkaXNjYXJk
-LW5iLW9rJzogJ2ludCcsDQo+ICAgICAgICAgICAgICAgJ2Rpc2NhcmQtbmItZmFpbGVkJzogJ2lu
-dCcsDQo+ICAgICAgICAgICAgICAgJ2Rpc2NhcmQtYnl0ZXMtb2snOiAnaW50JyB9IH0NCj4gDQo+
-IA0KDQpPayB0aGlzIG9uZSBpcyBtb3JlIGZyZXF1ZW50LiBGaXhlZC4NCg0KPj4gKw0KPj4gKyMj
-DQo+PiArIyBAQmxvY2tTdGF0c1NwZWNpZmljOg0KPj4gKyMNCj4+ICsjIEJsb2NrIGRyaXZlciBz
-cGVjaWZpYyBzdGF0aXN0aWNzDQo+PiArIw0KPj4gKyMgU2luY2U6IDMuMQ0KPj4gKyMjDQo+PiAr
-eyAndW5pb24nOiAnQmxvY2tTdGF0c1NwZWNpZmljJywNCj4+ICsgICdiYXNlJzogeyAnZHJpdmVy
-JzogJ0Jsb2NrZGV2RHJpdmVyJyB9LA0KPj4gKyAgJ2Rpc2NyaW1pbmF0b3InOiAnZHJpdmVyJywN
-Cj4+ICsgICdkYXRhJzogew0KPj4gKyAgICAgICdmaWxlJzogJ0Jsb2NrU3RhdHNTcGVjaWZpY0Zp
-bGUnDQo+PiArICB9IH0NCj4gDQo+IGFuZCBoZXJlLg0KPiANCg0KZG9uZQ0KDQo+PiArDQo+PiAg
-ICAjIw0KPj4gICAgIyBAQmxvY2tTdGF0czoNCj4+ICAgICMNCj4+IEBAIC04OTIsNiArOTI4LDgg
-QEANCj4+ICAgICMNCj4+ICAgICMgQHN0YXRzOiAgQSBAQmxvY2tEZXZpY2VTdGF0cyBmb3IgdGhl
-IGRldmljZS4NCj4+ICAgICMNCj4+ICsjIEBkcml2ZXItc3BlY2lmaWM6IE9wdGlvbmFsIGRyaXZl
-ci1zcGVjaWZpYyBzdGF0cy4gKFNpbmNlIDMuMSkNCj4+ICsjDQo+PiAgICAjIEBwYXJlbnQ6IFRo
-aXMgZGVzY3JpYmVzIHRoZSBmaWxlIGJsb2NrIGRldmljZSBpZiBpdCBoYXMgb25lLg0KPj4gICAg
-IyAgICAgICAgICBDb250YWlucyByZWN1cnNpdmVseSB0aGUgc3RhdGlzdGljcyBvZiB0aGUgdW5k
-ZXJseWluZw0KPj4gICAgIyAgICAgICAgICBwcm90b2NvbCAoZS5nLiB0aGUgaG9zdCBmaWxlIGZv
-ciBhIHFjb3cyIGltYWdlKS4gSWYgdGhlcmUgaXMNCj4+IEBAIC05MDUsNiArOTQzLDcgQEANCj4+
-ICAgIHsgJ3N0cnVjdCc6ICdCbG9ja1N0YXRzJywNCj4+ICAgICAgJ2RhdGEnOiB7JypkZXZpY2Un
-OiAnc3RyJywgJypxZGV2JzogJ3N0cicsICcqbm9kZS1uYW1lJzogJ3N0cicsDQo+PiAgICAgICAg
-ICAgICAgICdzdGF0cyc6ICdCbG9ja0RldmljZVN0YXRzJywNCj4+ICsgICAgICAgICAgICcqZHJp
-dmVyLXNwZWNpZmljJzogJ0Jsb2NrU3RhdHNTcGVjaWZpYycsDQo+IA0KPiBbb2ZmdG9waWNdDQo+
-IGhtbSwgZG8gYW55b25lIGtub3csIHdoeSB0aHVuZGVyYmlyZCB3aGVuIHF1b3RpbmcgcGF0Y2hl
-cyBhZGRzICI+ICIgYmV0d2VlbiBhbGwgbGluZXMgZXhjZXB0IG9uZXMgc3RhcnRpbmcgd2l0aCBh
-IHNwYWNlLCBhbmQgZm9yIGxpbmVzLCBzdGFydGluZyB3aXRoIHNwYWNlLCBpdCBhZGRzICI+ICAi
-ICh0d28gZXh0cmEgc3BhY2VzLCBub3Qgb25lKSwgd2hpY2ggbGVhZHMgdG8gd3JvbmcgaW5kZW50
-aW5nIGluIHF1b3Rlcz8gQW5kIGhvdyB0byBmaXggdGhhdD8NCj4gWy9vZmZ0b3BpY10NCj4gDQo+
-PiAgICAgICAgICAgICAgICcqcGFyZW50JzogJ0Jsb2NrU3RhdHMnLA0KPj4gICAgICAgICAgICAg
-ICAnKmJhY2tpbmcnOiAnQmxvY2tTdGF0cyd9IH0NCj4+ICAgIA0KPj4gZGlmZiAtLWdpdCBhL2lu
-Y2x1ZGUvYmxvY2svYmxvY2suaCBiL2luY2x1ZGUvYmxvY2svYmxvY2suaA0KPj4gaW5kZXggYjE4
-OWNmNDIyZS4uMDdhM2IzMTM4NiAxMDA2NDQNCj4+IC0tLSBhL2luY2x1ZGUvYmxvY2svYmxvY2su
-aA0KPj4gKysrIGIvaW5jbHVkZS9ibG9jay9ibG9jay5oDQo+PiBAQCAtNDc1LDYgKzQ3NSw3IEBA
-IGNvbnN0IGNoYXIgKmJkcnZfZ2V0X2RldmljZV9vcl9ub2RlX25hbWUoY29uc3QgQmxvY2tEcml2
-ZXJTdGF0ZSAqYnMpOw0KPj4gICAgaW50IGJkcnZfZ2V0X2ZsYWdzKEJsb2NrRHJpdmVyU3RhdGUg
-KmJzKTsNCj4+ICAgIGludCBiZHJ2X2dldF9pbmZvKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBCbG9j
-a0RyaXZlckluZm8gKmJkaSk7DQo+PiAgICBJbWFnZUluZm9TcGVjaWZpYyAqYmRydl9nZXRfc3Bl
-Y2lmaWNfaW5mbyhCbG9ja0RyaXZlclN0YXRlICpicyk7DQo+PiArQmxvY2tTdGF0c1NwZWNpZmlj
-ICpiZHJ2X2dldF9zcGVjaWZpY19zdGF0cyhCbG9ja0RyaXZlclN0YXRlICpicyk7DQo+PiAgICB2
-b2lkIGJkcnZfcm91bmRfdG9fY2x1c3RlcnMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+PiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgaW50NjRfdCBvZmZzZXQsIGludDY0X3QgYnl0ZXMs
-DQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW50NjRfdCAqY2x1c3Rlcl9vZmZz
-ZXQsDQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ibG9jay9ibG9ja19pbnQuaCBiL2luY2x1ZGUv
-YmxvY2svYmxvY2tfaW50LmgNCj4+IGluZGV4IGY2MDU2MjIyMTYuLjIzNmQ0YWNlZWYgMTAwNjQ0
-DQo+PiAtLS0gYS9pbmNsdWRlL2Jsb2NrL2Jsb2NrX2ludC5oDQo+PiArKysgYi9pbmNsdWRlL2Js
-b2NrL2Jsb2NrX2ludC5oDQo+PiBAQCAtMzIwLDYgKzMyMCw3IEBAIHN0cnVjdCBCbG9ja0RyaXZl
-ciB7DQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJw
-KTsNCj4+ICAgICAgICBpbnQgKCpiZHJ2X2dldF9pbmZvKShCbG9ja0RyaXZlclN0YXRlICpicywg
-QmxvY2tEcml2ZXJJbmZvICpiZGkpOw0KPj4gICAgICAgIEltYWdlSW5mb1NwZWNpZmljICooKmJk
-cnZfZ2V0X3NwZWNpZmljX2luZm8pKEJsb2NrRHJpdmVyU3RhdGUgKmJzKTsNCj4+ICsgICAgQmxv
-Y2tTdGF0c1NwZWNpZmljICooKmJkcnZfZ2V0X3NwZWNpZmljX3N0YXRzKShCbG9ja0RyaXZlclN0
-YXRlICpicyk7DQo+PiAgICANCj4+ICAgICAgICBpbnQgY29yb3V0aW5lX2ZuICgqYmRydl9zYXZl
-X3Ztc3RhdGUpKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPj4gICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgUUVNVUlPVmVjdG9yICpxaW92LA0KPj4gZGlmZiAtLWdp
-dCBhL2Jsb2NrLmMgYi9ibG9jay5jDQo+PiBpbmRleCA5NWQ4NjM1YWExLi4xZTViYmE0YWM2IDEw
-MDY0NA0KPj4gLS0tIGEvYmxvY2suYw0KPj4gKysrIGIvYmxvY2suYw0KPj4gQEAgLTQyNDQsNiAr
-NDI0NCwxNSBAQCBJbWFnZUluZm9TcGVjaWZpYyAqYmRydl9nZXRfc3BlY2lmaWNfaW5mbyhCbG9j
-a0RyaXZlclN0YXRlICpicykNCj4+ICAgICAgICByZXR1cm4gTlVMTDsNCj4+ICAgIH0NCj4+ICAg
-IA0KPj4gK0Jsb2NrU3RhdHNTcGVjaWZpYyAqYmRydl9nZXRfc3BlY2lmaWNfc3RhdHMoQmxvY2tE
-cml2ZXJTdGF0ZSAqYnMpDQo+PiArew0KPj4gKyAgICBCbG9ja0RyaXZlciAqZHJ2ID0gYnMtPmRy
-djsNCj4+ICsgICAgaWYgKCFkcnYgfHwgIWRydi0+YmRydl9nZXRfc3BlY2lmaWNfc3RhdHMpIHsN
-Cj4+ICsgICAgICAgIHJldHVybiBOVUxMOw0KPj4gKyAgICB9DQo+PiArICAgIHJldHVybiBkcnYt
-PmJkcnZfZ2V0X3NwZWNpZmljX3N0YXRzKGJzKTsNCj4+ICt9DQo+PiArDQo+PiAgICB2b2lkIGJk
-cnZfZGVidWdfZXZlbnQoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEJsa2RlYnVnRXZlbnQgZXZlbnQp
-DQo+PiAgICB7DQo+PiAgICAgICAgaWYgKCFicyB8fCAhYnMtPmRydiB8fCAhYnMtPmRydi0+YmRy
-dl9kZWJ1Z19ldmVudCkgew0KPj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2ZpbGUtcG9zaXguYyBiL2Js
-b2NrL2ZpbGUtcG9zaXguYw0KPj4gaW5kZXggMWE3MTI2MDQ2Yy4uYTBhMDY1ODVhYiAxMDA2NDQN
-Cj4+IC0tLSBhL2Jsb2NrL2ZpbGUtcG9zaXguYw0KPj4gKysrIGIvYmxvY2svZmlsZS1wb3NpeC5j
-DQo+PiBAQCAtMjYzMCw2ICsyNjMwLDIxIEBAIHN0YXRpYyBpbnQgcmF3X2dldF9pbmZvKEJsb2Nr
-RHJpdmVyU3RhdGUgKmJzLCBCbG9ja0RyaXZlckluZm8gKmJkaSkNCj4+ICAgICAgICByZXR1cm4g
-MDsNCj4+ICAgIH0NCj4+ICAgIA0KPj4gK3N0YXRpYyBCbG9ja1N0YXRzU3BlY2lmaWMgKnJhd19n
-ZXRfc3BlY2lmaWNfc3RhdHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+PiArew0KPj4gKyAgICBC
-RFJWUmF3U3RhdGUgKnMgPSBicy0+b3BhcXVlOw0KPj4gKyAgICBCbG9ja1N0YXRzU3BlY2lmaWMg
-KnN0YXRzID0gZ19uZXcoQmxvY2tTdGF0c1NwZWNpZmljLCAxKTsNCj4+ICsNCj4+ICsgICAgc3Rh
-dHMtPmRyaXZlciA9IEJMT0NLREVWX0RSSVZFUl9GSUxFOw0KPiANCj4gaXQgc2hvdWxkIGJlIEJM
-T0NLREVWX0RSSVZFUl9IT1NUX0RFVklDRSBmb3IgYmRydl9ob3N0X2RldmljZSBkcml2ZXIgSSB0
-aGluay4NCj4gDQoNCkkgZ3Vlc3Mgc28uIEZpeGVkDQoNCj4+ICsgICAgc3RhdHMtPnUuZmlsZSA9
-IChCbG9ja1N0YXRzU3BlY2lmaWNGaWxlKXsNCj4gDQo+IGFuZCB0aGFuLCBoZXJlIHdlJ2xsIGhh
-dmUgImRpZmZlcmVudCIgdW5pb24gZmllbGQgLSBob3N0X2RldmljZS4gKGFuZCBmb3IgY29kZS1z
-dHlsZSwgd2hpdGVzcGFjZSBiZWZvcmUgYnJhY2UpDQo+IA0KDQpkb25lDQoNCj4+ICsgICAgICAg
-IC5kaXNjYXJkX25iX29rID0gcy0+c3RhdHMuZGlzY2FyZF9uYl9vaywNCj4+ICsgICAgICAgIC5k
-aXNjYXJkX25iX2ZhaWxlZCA9IHMtPnN0YXRzLmRpc2NhcmRfbmJfZmFpbGVkLA0KPj4gKyAgICAg
-ICAgLmRpc2NhcmRfYnl0ZXNfb2sgPSBzLT5zdGF0cy5kaXNjYXJkX2J5dGVzX29rLA0KPj4gKyAg
-ICB9Ow0KPj4gKw0KPj4gKyAgICByZXR1cm4gc3RhdHM7DQo+PiArfQ0KPj4gKw0KPj4gICAgc3Rh
-dGljIFFlbXVPcHRzTGlzdCByYXdfY3JlYXRlX29wdHMgPSB7DQo+PiAgICAgICAgLm5hbWUgPSAi
-cmF3LWNyZWF0ZS1vcHRzIiwNCj4+ICAgICAgICAuaGVhZCA9IFFUQUlMUV9IRUFEX0lOSVRJQUxJ
-WkVSKHJhd19jcmVhdGVfb3B0cy5oZWFkKSwNCj4+IEBAIC0yNzQxLDYgKzI3NTYsNyBAQCBCbG9j
-a0RyaXZlciBiZHJ2X2ZpbGUgPSB7DQo+PiAgICAgICAgLmJkcnZfZ2V0X2luZm8gPSByYXdfZ2V0
-X2luZm8sDQo+PiAgICAgICAgLmJkcnZfZ2V0X2FsbG9jYXRlZF9maWxlX3NpemUNCj4+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgID0gcmF3X2dldF9hbGxvY2F0ZWRfZmlsZV9zaXplLA0KPj4g
-KyAgICAuYmRydl9nZXRfc3BlY2lmaWNfc3RhdHMgPSByYXdfZ2V0X3NwZWNpZmljX3N0YXRzLA0K
-Pj4gICAgICAgIC5iZHJ2X2NoZWNrX3Blcm0gPSByYXdfY2hlY2tfcGVybSwNCj4+ICAgICAgICAu
-YmRydl9zZXRfcGVybSAgID0gcmF3X3NldF9wZXJtLA0KPj4gICAgICAgIC5iZHJ2X2Fib3J0X3Bl
-cm1fdXBkYXRlID0gcmF3X2Fib3J0X3Blcm1fdXBkYXRlLA0KPj4gQEAgLTMyMjYsNiArMzI0Miw3
-IEBAIHN0YXRpYyBCbG9ja0RyaXZlciBiZHJ2X2hvc3RfZGV2aWNlID0gew0KPj4gICAgICAgIC5i
-ZHJ2X2dldF9pbmZvID0gcmF3X2dldF9pbmZvLA0KPj4gICAgICAgIC5iZHJ2X2dldF9hbGxvY2F0
-ZWRfZmlsZV9zaXplDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICA9IHJhd19nZXRfYWxs
-b2NhdGVkX2ZpbGVfc2l6ZSwNCj4+ICsgICAgLmJkcnZfZ2V0X3NwZWNpZmljX3N0YXRzID0gcmF3
-X2dldF9zcGVjaWZpY19zdGF0cywNCj4+ICAgICAgICAuYmRydl9jaGVja19wZXJtID0gcmF3X2No
-ZWNrX3Blcm0sDQo+PiAgICAgICAgLmJkcnZfc2V0X3Blcm0gICA9IHJhd19zZXRfcGVybSwNCj4+
-ICAgICAgICAuYmRydl9hYm9ydF9wZXJtX3VwZGF0ZSA9IHJhd19hYm9ydF9wZXJtX3VwZGF0ZSwN
-Cj4+IGRpZmYgLS1naXQgYS9ibG9jay9xYXBpLmMgYi9ibG9jay9xYXBpLmMNCj4+IGluZGV4IGRm
-MzFmMzUxZDIuLjc0Zjc2MmVhNmMgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9xYXBpLmMNCj4+ICsr
-KyBiL2Jsb2NrL3FhcGkuYw0KPj4gQEAgLTUzNSw2ICs1MzUsMTEgQEAgc3RhdGljIEJsb2NrU3Rh
-dHMgKmJkcnZfcXVlcnlfYmRzX3N0YXRzKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPj4gICAgDQo+
-PiAgICAgICAgcy0+c3RhdHMtPndyX2hpZ2hlc3Rfb2Zmc2V0ID0gc3RhdDY0X2dldCgmYnMtPndy
-X2hpZ2hlc3Rfb2Zmc2V0KTsNCj4+ICAgIA0KPj4gKyAgICBzLT5kcml2ZXJfc3BlY2lmaWMgPSBi
-ZHJ2X2dldF9zcGVjaWZpY19zdGF0cyhicyk7DQo+PiArICAgIGlmIChzLT5kcml2ZXJfc3BlY2lm
-aWMpIHsNCj4+ICsgICAgICAgIHMtPmhhc19kcml2ZXJfc3BlY2lmaWMgPSB0cnVlOw0KPj4gKyAg
-ICB9DQo+PiArDQo+PiAgICAgICAgaWYgKGJzLT5maWxlKSB7DQo+PiAgICAgICAgICAgIHMtPmhh
-c19wYXJlbnQgPSB0cnVlOw0KPj4gICAgICAgICAgICBzLT5wYXJlbnQgPSBiZHJ2X3F1ZXJ5X2Jk
-c19zdGF0cyhicy0+ZmlsZS0+YnMsIGJsa19sZXZlbCk7DQo+Pg0KPiANCj4gDQo=
+On Wed, Nov 21, 2018 at 01:39:00PM -0500, Wainer dos Santos Moschetta wrote:
+> QEMUMachine launches the VM with a monitor enabled, afterwards
+> a qmp connection is attempted on _post_launch(). In case
+> the QEMU process exits with an error, qmp.accept() reaches
+> timeout and raises an exception.
+> 
+> But sometimes you don't need that monitor. As an example,
+> when a test launches the VM expects its immediate crash,
+> and only intend to check the process's return code. In this
+> case the fact that launch() tries to establish the qmp
+> connection (ending up in an exception) is troublesome.
+> 
+> So this patch adds the set_qmp_monitor() that allow to
+> launch the VM without creating the monitor machinery. The
+> method can be used to re-enable the monitor eventually.
+> 
+> Tested this change with the following Avocado test:
+> 
+> from avocado_qemu import Test
+> 
+> class DisableQmp(Test):
+
+I think it would be fine to have this test added as a real test instead
+of just let this here on commit message. Or at least we should have a
+real use case that uses this new feature.
+
+>     """
+>     :avocado: enable
+>     """
+>     def test(self):
+>         self.vm.add_args('--foobar')
+>         self.vm.set_qmp_monitor(disabled=True)
+>         self.vm.launch()
+>         self.vm.wait()
+>         self.assertEqual(self.vm.exitcode(), 1)
+>         self.vm.shutdown()
+> 
+>         self.vm.set_qmp_monitor(disabled=False)
+>         self.vm._args.remove('--foobar') # Hack
+>         self.vm.launch()
+>         res = self.vm.command('human-monitor-command',
+>                               command_line='info version')
+>         self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
+> 
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Changes in v2:
+>   * Major refactor: replaced disable_qmp() with set_qmp_monitor()
+>     that allow to disable the qmp monitor likewise, but also one can
+>     re-enable it (set_qmp_monitor(disabled=False)).
+>   * The logic to enabled/disable the monitor is back to
+>     _base_args(). [ccarrara, ehabkost]
+> ---
+>  scripts/qemu.py | 72 ++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 48 insertions(+), 24 deletions(-)
+> 
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 6e3b0e6771..54fe0e65d2 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -115,6 +115,7 @@ class QEMUMachine(object):
+>          self._events = []
+>          self._iolog = None
+>          self._socket_scm_helper = socket_scm_helper
+> +        self._with_qmp = True   # Enable QMP monitor by default.
+>          self._qmp = None
+>          self._qemu_full_args = None
+>          self._test_dir = test_dir
+> @@ -229,15 +230,7 @@ class QEMUMachine(object):
+>                  self._iolog = iolog.read()
+>  
+>      def _base_args(self):
+> -        if isinstance(self._monitor_address, tuple):
+> -            moncdev = "socket,id=mon,host=%s,port=%s" % (
+> -                self._monitor_address[0],
+> -                self._monitor_address[1])
+> -        else:
+> -            moncdev = 'socket,id=mon,path=%s' % self._vm_monitor
+> -        args = ['-chardev', moncdev,
+> -                '-mon', 'chardev=mon,mode=control',
+> -                '-display', 'none', '-vga', 'none']
+> +        args = ['-display', 'none', '-vga', 'none']
+>          if self._machine is not None:
+>              args.extend(['-machine', self._machine])
+>          if self._console_device_type is not None:
+> @@ -247,23 +240,33 @@ class QEMUMachine(object):
+>                         self._console_address)
+>              device = '%s,chardev=console' % self._console_device_type
+>              args.extend(['-chardev', chardev, '-device', device])
+> +        if self._with_qmp:
+> +            if isinstance(self._monitor_address, tuple):
+> +                moncdev = "socket,id=mon,host=%s,port=%s" % (
+> +                    self._monitor_address[0],
+> +                    self._monitor_address[1])
+> +            else:
+> +                moncdev = 'socket,id=mon,path=%s' % self._vm_monitor
+> +            args.extend(['-chardev', moncdev, '-mon', 'chardev=mon,mode=control'])
+> +
+>          return args
+>  
+>      def _pre_launch(self):
+>          self._temp_dir = tempfile.mkdtemp(dir=self._test_dir)
+> -        if self._monitor_address is not None:
+> -            self._vm_monitor = self._monitor_address
+> -        else:
+> -            self._vm_monitor = os.path.join(self._temp_dir,
+> -                                            self._name + "-monitor.sock")
+>          self._qemu_log_path = os.path.join(self._temp_dir, self._name + ".log")
+>          self._qemu_log_file = open(self._qemu_log_path, 'wb')
+>  
+> -        self._qmp = qmp.qmp.QEMUMonitorProtocol(self._vm_monitor,
+> -                                                server=True)
+> -
+> +        if self._with_qmp:
+> +            if self._monitor_address is not None:
+> +                self._vm_monitor = self._monitor_address
+> +            else:
+> +                self._vm_monitor = os.path.join(self._temp_dir,
+> +                                            self._name + "-monitor.sock")
+> +            self._qmp = qmp.qmp.QEMUMonitorProtocol(self._vm_monitor,
+> +                                                    server=True)
+>      def _post_launch(self):
+> -        self._qmp.accept()
+> +        if self._qmp:
+> +            self._qmp.accept()
+>  
+>      def _post_shutdown(self):
+>          if self._qemu_log_file is not None:
+> @@ -325,7 +328,8 @@ class QEMUMachine(object):
+>          Wait for the VM to power off
+>          """
+>          self._popen.wait()
+> -        self._qmp.close()
+> +        if self._qmp:
+
+Isn't the self._with_qmp attribute that should be used here? I think
+it's important to standardize the checks for qmp availability in
+`with_qmp` attribute and use the `qmp` only for qmp access itself. There
+are other places that uses qmp to this kind of check too.
+
+> +            self._qmp.close()
+>          self._load_io_log()
+>          self._post_shutdown()
+>  
+> @@ -334,11 +338,14 @@ class QEMUMachine(object):
+>          Terminate the VM and clean up
+>          """
+>          if self.is_running():
+> -            try:
+> -                self._qmp.cmd('quit')
+> -                self._qmp.close()
+> -            except:
+> -                self._popen.kill()
+> +            if self._qmp:
+> +                try:
+> +                    self._qmp.cmd('quit')
+> +                    self._qmp.close()
+> +                except:
+> +                    self._popen.kill()
+> +            else:
+> +                self._popen.terminate()
+>              self._popen.wait()
+>  
+>          self._load_io_log()
+> @@ -355,6 +362,23 @@ class QEMUMachine(object):
+>  
+>          self._launched = False
+>  
+> +    def set_qmp_monitor(self, disabled=False, monitor_address=None):
+
+Where is this new method being used?
+
+> +        """
+> +        Set the QMP monitor.
+> +
+> +        @param disabled: if True, qmp monitor options will be removed from the
+> +                         base arguments of the resulting QEMU command line.
+> +        @param monitor_address: address for the QMP monitor.
+> +        @note: call this function before launch().
+> +        """
+> +        if disabled:
+> +            self._with_qmp = False
+> +            self._qmp = None
+> +        else:
+> +            self._with_qmp = True
+> +            if monitor_address:
+> +                self._monitor_address = monitor_address
+> +
+>      def qmp(self, cmd, conv_keys=True, **args):
+>          """
+>          Invoke a QMP command and return the response dict
+> -- 
+> 2.19.1
+> 
+
+It would be nice see less scattered checks for qmp availability along
+the code. 
+
+Thanks.
+-- 
+Caio Carrara
+Software Engineer, Virt Team - Red Hat
+ccarrara@redhat.com
