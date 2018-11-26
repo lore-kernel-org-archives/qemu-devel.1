@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gRJmQ-0000lz-W7
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 11:30:39 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gRJmR-0000m1-J9
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 11:30:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gRJmM-0004PS-M8
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 11:30:38 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gRJmM-0004PW-MA
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 11:30:39 -0500
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Mon, 26 Nov 2018 17:29:35 +0100
-Message-Id: <20181126162942.21258-3-sameo@linux.intel.com>
-In-Reply-To: <20181126162942.21258-1-sameo@linux.intel.com>
-References: <20181126162942.21258-1-sameo@linux.intel.com>
+Date: Mon, 26 Nov 2018 17:29:33 +0100
+Message-Id: <20181126162942.21258-1-sameo@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 2/8] hw: arm: acpi: Fix incorrect checksums in
- RSDP
+Subject: [Qemu-devel] [PATCH 0/8] hw: acpi: RSDP fixes and refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +20,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-From: Igor Mammedov <imammedo@redhat.com>
+This patch serie fixes a couple of RSDP checksum related issues:
 
-When RSDP table was introduced (d4bec5d87), we calculated only legacy
-checksum, and that was incorrect as it
- - specified rev=2 and forgot about extended checksum.
- - legacy checksum calculated on full table instead of the 1st 20 bytes
+- On RSDP rev2, we are not adding the extended checksum and computing
+  the checksum on the full table instead of the first 20 bytes.
+- On RSDP rev1, we are computing the checksum on 36 bytes instead of 20.
+  We're lucky enough that this is only adding zeroes to the checksum.
 
-Fix it by adding extended checksum calculation and using correct
-size for legacy checksum.
+A guest Linux kernel does not seem to care about RSDP checksums, so
+those 2 fixes are mostly for correctness sake.
+Any machine type that generates rev2 RSDP will see its RSDP table
+modified but since x86 builds RSDP v1 and all ACPI tests only run on
+either pc or q35, the ACPI tests tables are not affected by this fix.
 
-While at it use explicit constants to specify sub/full tables
-sizes instead of relying on AcpiRsdpDescriptor size and fields offsets.
-The follow up commits will convert this table to build_append_int_noprefix() API,
-will use constants anyway and remove unused AcpiRsdpDescriptor structure.
+The serie also extends the ARM virt ACPI RSDP build routine to support
+both RSDP v1 and v2, in order to share this code between x86 and
+aarch64. While extending, we also convert the routine to the latest
+build_append_foo() API. The new implementation is a closer reflection of
+the ACPI spec itself, is endian agnostic and allows for getting rid of the
+AcpiRsdpDescriptor structure.
 
-Based on "[PATCH v5 05/24] hw: acpi: Implement XSDT support for  RSDP"
-by Samuel Ortiz, who did it right in his impl.
+Igor Mammedov (2):
+  hw: arm: acpi: Fix incorrect checksums in RSDP
+  hw: i386: Use correct RSDT length for checksum
 
-Fixes: d4bec5d87 (hw/arm/virt-acpi-build: Generate RSDP table)
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-CC: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-CC: Shannon Zhao <shannon.zhaosl@gmail.com>
-Reviewed-by: Samuel Ortiz <sameo@linux.intel.com>
----
- hw/arm/virt-acpi-build.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Samuel Ortiz (6):
+  hw: acpi: The RSDP build API can return void
+  hw: arm: Carry RSDP specific data through AcpiRsdpData
+  hw: arm: Convert the RSDP build to the buid_append_foo() API
+  hw: arm: Support both legacy and current RSDP build
+  hw: acpi: Export and share the ARM RSDP build
+  hw: acpi: Remove AcpiRsdpDescriptor and fix tests
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index fcaa350892..0835900052 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -390,8 +390,13 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
- 
-     /* Checksum to be filled by Guest linker */
-     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
--        (char *)rsdp - rsdp_table->data, sizeof *rsdp,
-+        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP size */,
-         (char *)&rsdp->checksum - rsdp_table->data);
-+
-+    /* Extended checksum to be filled by Guest linker */
-+    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-+        (char *)rsdp - rsdp_table->data, 36 /* ACPI rev 2.0 RSDP size */,
-+        (char *)&rsdp->extended_checksum - rsdp_table->data);
- }
- 
- static void
+ include/hw/acpi/acpi-defs.h | 44 ++++++++++++++------
+ include/hw/acpi/aml-build.h |  5 +++
+ tests/acpi-utils.h          |  5 ++-
+ hw/acpi/aml-build.c         | 81 +++++++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c    | 35 ++--------------
+ hw/i386/acpi-build.c        | 31 ++------------
+ tests/acpi-utils.c          | 48 +++++++++++++++++-----
+ tests/bios-tables-test.c    | 27 +++++++++----
+ tests/vmgenid-test.c        |  8 ++--
+ 9 files changed, 193 insertions(+), 91 deletions(-)
+
 -- 
 2.19.1
