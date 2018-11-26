@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gRKqN-0003qH-CW
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:38:47 -0500
+	(envelope-from <philmd@redhat.com>) id 1gRKum-000879-24
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:43:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gRKqM-0003oB-P7
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:38:47 -0500
-Date: Mon, 26 Nov 2018 18:38:38 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181126173838.GD6612@localhost.localdomain>
-References: <20181126171745.4673-1-keith.busch@intel.com>
+	(envelope-from <philmd@redhat.com>) id 1gRKui-0006cY-UN
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:43:20 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRKui-0006cE-OW
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 12:43:16 -0500
+Received: by mail-wr1-f67.google.com with SMTP id r10so19848068wrs.10
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 09:43:16 -0800 (PST)
+References: <20181126162942.21258-1-sameo@linux.intel.com>
+	<20181126162942.21258-5-sameo@linux.intel.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <bf544e63-764d-6c80-35fa-3813480edb25@redhat.com>
+Date: Mon, 26 Nov 2018 18:42:26 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181126171745.4673-1-keith.busch@intel.com>
-Subject: Re: [Qemu-devel] [PATCH] nvme: Fix spurious interrupts
+In-Reply-To: <20181126162942.21258-5-sameo@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/8] hw: arm: Carry RSDP specific data
+ through AcpiRsdpData
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,20 +31,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Keith Busch <keith.busch@intel.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Guenter Roeck <linux@roeck-us.net>
+To: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Am 26.11.2018 um 18:17 hat Keith Busch geschrieben:
-> The code had asserted an interrupt every time it was requested to check
-> for new completion queue entries.This can result in spurious interrupts
-> seen by the guest OS.
+On 26/11/18 17:29, Samuel Ortiz wrote:
+> That will allow us to generalize the ARM build_rsdp() routine to support
+> both legacy RSDP (The current i386 implementation) and extended RSDP
+> (The ARM implementation).
 > 
-> Fix this by asserting an interrupt only if there are un-acknowledged
-> completion queue entries available.
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  include/hw/acpi/acpi-defs.h | 11 +++++++++++
+>  hw/arm/virt-acpi-build.c    | 27 ++++++++++++++++++++++-----
+>  2 files changed, 33 insertions(+), 5 deletions(-)
 > 
-> Reported-by: Guenter Roeck <linux@roeck-us.net>
-> Signed-off-by: Keith Busch <keith.busch@intel.com>
-
-Thanks, applied to the block branch.
-
-Kevin
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index af8e023968..e7fd24c6c5 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -53,6 +53,17 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+>  } QEMU_PACKED;
+>  typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+>  
+> +typedef struct AcpiRsdpData {
+> +    uint8_t oem_id[6]; /* OEM identification */
+> +    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
+> +
+> +    unsigned *rsdt_tbl_offset;
+> +    unsigned *xsdt_tbl_offset;
+> +} AcpiRsdpData;
+> +
+> +#define ACPI_RSDP_REV_1 0
+> +#define ACPI_RSDP_REV_2 2
+> +
+>  /* Table structure from Linux kernel (the ACPI tables are under the
+>     BSD license) */
+>  
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 0835900052..2dad465ecf 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+>  
+>  /* RSDP */
+>  static void
+> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+>  {
+>      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+>      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
+> @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+>                               true /* fseg memory */);
+>  
+>      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
+> -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
+> +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
+>      rsdp->length = cpu_to_le32(sizeof(*rsdp));
+> -    rsdp->revision = 0x02;
+> +    rsdp->revision = rsdp_data->revision;
+>  
+>      /* Address to be filled by Guest linker */
+>      bios_linker_loader_add_pointer(linker,
+>          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
+> -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
+> +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
+>  
+>      /* Checksum to be filled by Guest linker */
+>      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> @@ -399,6 +399,20 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+>          (char *)&rsdp->extended_checksum - rsdp_table->data);
+>  }
+>  
+> +static void
+> +init_rsdp_data(AcpiRsdpData *data, const char *oem_id, uint8_t revision,
+> +               unsigned *rsdt_offset, unsigned *xsdt_offset)
+> +{
+> +    /* Caller must provide an OEM ID */
+> +    g_assert(oem_id);
+> +    g_assert(strlen(oem_id) >= 6);
+> +
+> +    memcpy(data->oem_id, oem_id, 6);
+> +    data->revision = revision;
+> +    data->rsdt_tbl_offset = rsdt_offset;
+> +    data->xsdt_tbl_offset = xsdt_offset;
+> +}
+> +
+>  static void
+>  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>  {
+> @@ -810,6 +824,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>      GArray *table_offsets;
+>      unsigned dsdt, xsdt;
+>      GArray *tables_blob = tables->table_data;
+> +    AcpiRsdpData rsdp;
+>  
+>      table_offsets = g_array_new(false, true /* clear */,
+>                                          sizeof(uint32_t));
+> @@ -857,7 +872,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
+>  
+>      /* RSDP is in FSEG memory, so allocate it separately */
+> -    build_rsdp(tables->rsdp, tables->linker, xsdt);
+> +    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
+> +                   NULL, &xsdt);
+> +    build_rsdp(tables->rsdp, tables->linker, &rsdp);
+>  
+>      /* Cleanup memory that's no longer used. */
+>      g_array_free(table_offsets, true);
+> 
