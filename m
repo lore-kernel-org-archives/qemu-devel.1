@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gRHab-0004Lf-ET
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 09:10:18 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gRHcM-0005ML-Oe
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 09:12:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gRHaV-0004e6-RX
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 09:10:17 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36006)
+	(envelope-from <tcminyard@gmail.com>) id 1gRHcJ-000622-Lo
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 09:12:06 -0500
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:37276)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRHaV-0004d2-Lc
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 09:10:11 -0500
-Received: by mail-wm1-f67.google.com with SMTP id s11so18667834wmh.1
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 06:10:11 -0800 (PST)
-References: <20181120005701.9304-1-samuel.thibault@ens-lyon.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b9c8191b-176b-5285-e9ca-8d4267fc5a89@redhat.com>
-Date: Mon, 26 Nov 2018 15:09:47 +0100
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gRHcJ-00061I-Gv
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 09:12:03 -0500
+Received: by mail-ot1-x335.google.com with SMTP id 40so16666786oth.4
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 06:12:03 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+Reply-To: minyard@acm.org
+References: <20181115192446.17187-1-minyard@acm.org>
+	<d23cb41c-b6a5-9573-32af-07a963f8f827@redhat.com>
+From: Corey Minyard <minyard@acm.org>
+Message-ID: <eaf8d37a-27a8-0c30-2ce8-31f651a5fdc7@acm.org>
+Date: Mon, 26 Nov 2018 08:11:59 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181120005701.9304-1-samuel.thibault@ens-lyon.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <d23cb41c-b6a5-9573-32af-07a963f8f827@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] slirp: Enable fork_exec support on Windows
+Content-Language: en-GB
+Subject: Re: [Qemu-devel] [PATCH v2 00/12] RFC: Fix/add vmstate handling in
+ some I2C code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +33,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
-Cc: jan.kiszka@siemens.com, stefanha@redhat.com, marcandre.lureau@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-Hi Samuel,
+On 11/15/18 5:01 PM, Philippe Mathieu-Daudé wrote:
+> Hi Corey,
+>
+> On 15/11/18 20:24, minyard@acm.org wrote:
+>> These changes allow SMBus access while doing a state transfer.
+>> Seems like a good idea to me in general.
+>>
+>>
+>>
+>> I'm primarily submitting this to make sure I'm doing the backwards
+>> compatability with .needed correctly.  I'm adding a new field in
+>> the machine class and setting it in the initialization code for
+>> older versions.  David, is this what you wanted?  It will have to
+>> be adjusted for the proper version if/when it really goes in, of
+>> course.  You can see those in the following commits:
+>>    boards.h: Ignore migration for SMBus devices on
+>>    i2c:pm_smbus: Fix state transfer
+>>    i2c: Add vmstate handling to the smbus eeprom
+>> I thought about adding a field to the pm_smbus code to only transfer
+>> if it was accessed, but I'm assuming that most modern OSes will
+>> at least initialized the device based on its presence on the PCI
+>> bus.  So that didn't seem like it would add any value.
+>>
+>> I'm also submitting to see if all the fixes and cleanups look ok.
+>> That's the first 5 commits.
+>
+> $ git diff origin/master --summary
+>  delete mode 100644 hw/i2c/smbus.c
+>  create mode 100644 hw/i2c/smbus_master.c
+>  create mode 100644 hw/i2c/smbus_slave.c
+>  create mode 100644 include/hw/i2c/smbus_eeprom.h
+>  rename include/hw/i2c/{smbus.h => smbus_master.h} (56%)
+>  create mode 100644 include/hw/i2c/smbus_slave.h
+>
+> Can you add the following files in the MAINTAINERS file:
+> - hw/i2c/smbus_master.c
+> - hw/i2c/smbus_slave.c
+> - include/hw/i2c/smbus_eeprom.h
+> - include/hw/i2c/smbus_master.h
+> - include/hw/i2c/smbus_slave.h
 
-On 20/11/18 1:57, Samuel Thibault wrote:
-> g_spawn_async_with_fds is portable on Windows, so we can now enable
-> fork_exec support there.
-> 
-> Thanks Daniel P. Berrangé for the notice!
+I'm almost ready to re-submit this series, but I'd like to do 3
+things:
 
-On x86_64 you can build locally using Docker:
+  * Add the proper person as the maintainer.  I can be the
+    maintainer, but I don't want to presume that's what you
+    meant.  No general I2C code has a maintainer at the moment.
+  * I'd like to get David's comments on the .needed addition, as
+    I mention above.
+  * I need to figure out why piix4 smbus does not work after a
+    migration.  I'll work on that today.
 
-$ make docker-test-build@debian-win32-cross
-  BUILD   debian-win32-cross
-  COPY    RUNNER
-    RUN test-build in qemu:debian-win32-cross
-Configure options:
---enable-werror --target-list=x86_64-softmmu,aarch64-softmmu
---prefix=/tmp/qemu-test/install --cross-prefix=i686-w64-mingw32.shared-
-  CC      qga/commands-win32.o
-  CC      qga/channel-win32.o
-  CC      qga/service-win32.o
-  CC      qga/vss-win32.o
-...
+Thanks,
 
->From the qemu source repository, you can also run once:
-$ docker run --rm -it \
-  -v $PWD:$PWD -w $PWD -v /tmp:/tmp \
-  -u $UID \
-  qemu:debian-win32-cross \
-    bash -c 'mkdir build_win32 && cd build_win32 && ../configure
-$QEMU_CONFIGURE_OPTS && make -j4'
+-corey
 
-Then to avoid rebuilding the world everytime, when you applied/modified
-win32 related patches:
-
-$ docker run --rm -it \
-  -v $PWD:$PWD -w $PWD -v /tmp:/tmp \
-  -u $UID \
-  qemu:debian-win32-cross \
-    bash -c 'make -C build_win32 -j4'
-
-You can not 'run' the binary, but at least you can verify
-compilation/linking steps.
-
-Regards,
-
-Phil.
-
-> 
-> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> ---
->   slirp/misc.c | 14 ++------------
->   1 file changed, 2 insertions(+), 12 deletions(-)
-> 
-> diff --git a/slirp/misc.c b/slirp/misc.c
-> index 7972b9b05b..59b4e8f31c 100644
-> --- a/slirp/misc.c
-> +++ b/slirp/misc.c
-> @@ -62,17 +62,6 @@ int add_exec(struct ex_list **ex_ptr, void *chardev, const char *cmdline,
->   }
->   
->   
-> -#ifdef _WIN32
-> -
-> -int
-> -fork_exec(struct socket *so, const char *ex)
-> -{
-> -    /* not implemented */
-> -    return 0;
-> -}
-> -
-> -#else
-> -
->   static int
->   slirp_socketpair_with_oob(int sv[2])
->   {
-> @@ -132,7 +121,9 @@ err:
->   static void
->   fork_exec_child_setup(gpointer data)
->   {
-> +#ifndef _WIN32
->       setsid();
-> +#endif
->   }
->   
->   int
-> @@ -177,7 +168,6 @@ fork_exec(struct socket *so, const char *ex)
->       qemu_set_nonblock(so->s);
->       return 1;
->   }
-> -#endif
->   
->   char *slirp_connection_info(Slirp *slirp)
->   {
-> 
+>
+> Thanks,
+>
+> Phil.
