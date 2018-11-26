@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gRDcz-0002Oe-JG
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:56:30 -0500
+	(envelope-from <armbru@redhat.com>) id 1gRDd1-0002QV-Jy
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:56:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gRDcy-0005hR-D5
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:56:29 -0500
-References: <20180921081819.9203-1-eric.auger@redhat.com>
-	<5FC3163CFD30C246ABAA99954A238FA8387E9A0C@FRAEML521-MBX.china.huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <02b79e89-5e98-5a7d-f42e-66c91029d1c6@redhat.com>
-Date: Mon, 26 Nov 2018 10:56:16 +0100
+	(envelope-from <armbru@redhat.com>) id 1gRDd1-0005m7-0F
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:56:31 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181125205000.10324-1-philmd@redhat.com>
+	<20181125205000.10324-20-philmd@redhat.com>
+Date: Mon, 26 Nov 2018 10:56:26 +0100
+In-Reply-To: <20181125205000.10324-20-philmd@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Sun,
+	25 Nov 2018 21:49:54 +0100")
+Message-ID: <87k1l0novp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA8387E9A0C@FRAEML521-MBX.china.huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 00/28] vSMMUv3/pSMMUv3 2 stage VFIO
- integration
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.1 19/25] MAINTAINERS: Add a missing
+ entry to the QMP section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,138 +26,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>
-Cc: "yi.l.liu@intel.com" <yi.l.liu@intel.com>, "cdall@kernel.org" <cdall@kernel.org>, "mst@redhat.com" <mst@redhat.com>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>, Linuxarm <linuxarm@huawei.com>, "peterx@redhat.com" <peterx@redhat.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "xuwei (O)" <xuwei5@huawei.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-Hi Shameer,
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-On 11/23/18 5:28 PM, Shameerali Kolothum Thodi wrote:
-> 
-> 
->> -----Original Message-----
->> From: Qemu-devel [mailto:qemu-devel-
->> bounces+shameerali.kolothum.thodi=huawei.com@nongnu.org] On Behalf Of
->> Eric Auger
->> Sent: 21 September 2018 09:18
->> To: eric.auger.pro@gmail.com; eric.auger@redhat.com; qemu-
->> devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org
->> Cc: yi.l.liu@intel.com; cdall@kernel.org; mst@redhat.com; jean-
->> philippe.brucker@arm.com; peterx@redhat.com; alex.williamson@redhat.com
->> Subject: [Qemu-devel] [RFC v2 00/28] vSMMUv3/pSMMUv3 2 stage VFIO
->> integration
->>
-> 
-> [...]
-> 
->> This series can be found at:
->> https://github.com/eauger/qemu/tree/v3.0.0_2stage-rfc-v2
->>
->> Testing:
->> - For testing use my kernel branch
->>   https://github.com/eauger/linux/tree/v4.19-rc4-2stage-rfc-v2 [1]
->> - Tested on Qualcomm HW with 1/2 assigned e1000e NICs. Hotplug
->>   was also tested OK.
->> - Known limitation:
->>   - currently sending an NH_ASID command instead of NH_VA
->>     upon guest NH_VA. This may cause important perf downgrade.
->>     Propagating NH_VA does not work at the moment.
-> 
-> Hi Eric,
-> 
-> I had a  go with this RFC on one of our platform and noted that when the Guest 
-> boots with ACPI , the ping doesn't work with the assigned ixgbevf NIC though 
-> the network device gets detected and added to the iommu group. 
-> 
-> It's all fine when I boot the Guest with DT. Have you tested this with ACPI yet or
-> am I missing anything obvious here?
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index ac5d25491f..c73dde10a5 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1887,6 +1887,7 @@ S: Supported
+>  F: qmp.c
+>  F: monitor.c
+>  F: docs/devel/*qmp-*
+> +F: docs/interop/*qmp-*
+>  F: scripts/qmp/
+>  F: tests/qmp-test.c
+>  F: tests/qmp-cmd-test.c
 
-Thank you for reporting. You are not missing anything obvious: I can
-reproduce the issue as well on one of my platform. I will debug and come
-back to you as soon as possible.
-
-Thanks
-
-Eric
-> 
-> Please let me know.
-> 
-> Thanks,
-> Shameer
->  
->> References:
->> - [1] [RFC v2 00/20] SMMUv3 Nested Stage Setup
->>   (https://lkml.org/lkml/2018/9/18/1087)
->>   The User API still is unstable and under discussion.
->>
->> History:
->> v1 -> v2:
->> - Fixed dual assignment (asid now correctly propagated on TLB invalidations)
->> - Integrated fault reporting
->>
->> Next Steps:
->> - Mature the user API with people involved in SVA work (KVM forum may be a
->>   good opportunity to meet)
->> - Submit the IOMMU cfg notifier changes and some VFIO changes separately,
->> to
->>   progress independently on the kernel dependency
->>
->> Eric Auger (28):
->>   hw/arm/smmu-common: Fix the name of the iommu memory regions
->>   hw/arm/smmuv3: fix eventq recording and IRQ triggerring
->>   update-linux-headers: Import iommu.h
->>   linux-headers: Partial header update
->>   memory: add IOMMU_ATTR_VFIO_NESTED IOMMU memory region attribute
->>   hw/arm/smmuv3: Implement get_attr API to report
->> IOMMU_ATTR_VFIO_NESTED
->>   hw/vfio/common: Refactor container initialization
->>   hw/vfio/common: Force nested if iommu requires it
->>   memory: Introduce IOMMUIOLTBNotifier
->>   memory: rename memory_region notify_iommu, notify_one
->>   memory: Add IOMMUConfigNotifier
->>   memory: Add arch_id in IOTLBEntry
->>   hw/arm/smmuv3: Store s1ctrptr in translation config data
->>   hw/arm/smmuv3: Implement dummy replay
->>   hw/arm/smmuv3: Notify on config changes
->>   hw/arm/smmuv3: Fill the IOTLBEntry arch_id on NH_VA invalidation
->>   hw/vfio/common: Introduce vfio_alloc_guest_iommu helper
->>   hw/vfio/common: Introduce vfio_dma_(un)map_ram_section helpers
->>   hw/vfio/common: Register specific nested mode notifiers and
->>     memory_listener
->>   hw/vfio/common: Register MAP notifier for MSI binding
->>   target/arm/kvm: Notifies IOMMU on MSI stage 1 binding
->>   vfio/pci: Always set up MSI route before enabling vectors
->>   hw/arm/smmuv3: Remove warning about unsupported MAP notifiers
->>   memory: Introduce IOMMU_NOTIFIER_INIT_CFG IOMMU Config Notifier
->>   memory: Introduce IOMMU Memory Region inject_faults API
->>   hw/vfio/common: Handle fault_handler
->>   hw/arm/smmuv3: Init fault handling
->>   hw/arm/smmuv3: Implement fault injection
->>
->>  exec.c                          |  12 +-
->>  hw/arm/smmu-common.c            |  12 +-
->>  hw/arm/smmuv3-internal.h        |  26 +-
->>  hw/arm/smmuv3.c                 | 189 +++++++--
->>  hw/i386/intel_iommu.c           |  16 +-
->>  hw/misc/tz-mpc.c                |   8 +-
->>  hw/ppc/spapr_iommu.c            |   2 +-
->>  hw/s390x/s390-pci-inst.c        |   4 +-
->>  hw/vfio/common.c                | 666 ++++++++++++++++++++++++--------
->>  hw/vfio/pci.c                   |   1 +
->>  hw/vfio/trace-events            |   4 +-
->>  hw/virtio/vhost.c               |  12 +-
->>  include/exec/memory.h           | 140 +++++--
->>  include/hw/arm/smmu-common.h    |   1 +
->>  include/hw/vfio/vfio-common.h   |   1 +
->>  linux-headers/linux/iommu.h     | 237 ++++++++++++
->>  linux-headers/linux/vfio.h      |  48 +++
->>  memory.c                        |  66 +++-
->>  scripts/update-linux-headers.sh |   2 +-
->>  target/arm/kvm.c                |  46 +--
->>  20 files changed, 1206 insertions(+), 287 deletions(-)
->>  create mode 100644 linux-headers/linux/iommu.h
->>
->> --
->> 2.17.1
->>
-> 
-> 
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
