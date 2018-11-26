@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gRDdA-0002Yp-Fg
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:56:41 -0500
+	(envelope-from <groug@kaod.org>) id 1gRDdz-0003D7-PY
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:57:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gRDd8-00060a-Hp
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:56:40 -0500
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 26 Nov 2018 01:56:19 -0800
-Message-Id: <1543226179-5135-1-git-send-email-liq3ea@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] target: hax: replace g_malloc with g_new0
+	(envelope-from <groug@kaod.org>) id 1gRDdu-0007qY-RM
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:57:31 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49686
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gRDdu-0007P4-Md
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:57:26 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wAQ9rhdR052036
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 04:57:19 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2p0bwyf1yv-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 04:57:19 -0500
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Mon, 26 Nov 2018 09:57:17 -0000
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 26 Nov 2018 10:57:09 +0100
+Message-Id: <20181126095710.380206-1-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 0/1] 9p fixes for v3.1.0-rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,53 +35,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, laurent@vivier.eu, alex.bennee@linaro.org, philmd@redhat.com, armbru@redhat.com
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-And also the g_malloc doesn't need check return value,
-remove it.
+The following changes since commit 5298f4d67a911dd9cefa4c4185eed242074d64c2:
 
-Cc: qemu-trivial@nongnu.org
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2018-11-23 08:54:52 +0000)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
----
- target/i386/hax-all.c | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
+are available in the Git repository at:
 
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index d2e512856b..502ce6f0af 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -154,13 +154,7 @@ int hax_vcpu_create(int id)
-         return 0;
-     }
- 
--    vcpu = g_malloc(sizeof(struct hax_vcpu_state));
--    if (!vcpu) {
--        fprintf(stderr, "Failed to alloc vcpu state\n");
--        return -ENOMEM;
--    }
--
--    memset(vcpu, 0, sizeof(struct hax_vcpu_state));
-+    vcpu = g_new0(struct hax_vcpu_state, 1);
- 
-     ret = hax_host_create_vcpu(hax_global.vm->fd, id);
-     if (ret) {
-@@ -250,11 +244,8 @@ struct hax_vm *hax_vm_create(struct hax_state *hax)
-         return hax->vm;
-     }
- 
--    vm = g_malloc(sizeof(struct hax_vm));
--    if (!vm) {
--        return NULL;
--    }
--    memset(vm, 0, sizeof(struct hax_vm));
-+    vm = g_new0(struct hax_vm, 1);
-+
-     ret = hax_host_create_vm(hax, &vm_id);
-     if (ret) {
-         fprintf(stderr, "Failed to create vm %x\n", ret);
+  https://github.com/gkurz/qemu.git tags/for-upstream
+
+for you to fetch changes up to 1d20398694a3b67a388d955b7a945ba4aa90a8a8:
+
+  9p: fix QEMU crash when renaming files (2018-11-23 13:28:03 +0100)
+
+----------------------------------------------------------------
+Fixes a QEMU crash triggerable by guest userspace (CVE-2018-19489).
+
+----------------------------------------------------------------
+Greg Kurz (1):
+      9p: fix QEMU crash when renaming files
+
+ hw/9pfs/9p.c | 3 +++
+ 1 file changed, 3 insertions(+)
 -- 
-2.11.0
+2.17.2
