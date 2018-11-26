@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gRHME-0002PC-Fc
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:55:29 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gRHNb-0003Um-Fp
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:56:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gRHMA-0001LY-Et
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:55:26 -0500
-Date: Mon, 26 Nov 2018 14:55:05 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181126145505.56fb6031@redhat.com>
-In-Reply-To: <20181107123652.23417-1-marcandre.lureau@redhat.com>
-References: <20181107123652.23417-1-marcandre.lureau@redhat.com>
+	(envelope-from <kraxel@redhat.com>) id 1gRHNY-0003eV-RJ
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:56:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gRHNW-0003dn-TG
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:56:48 -0500
+Date: Mon, 26 Nov 2018 14:56:43 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181126135643.442lbaj2dz35gdso@sirius.home.kraxel.org>
+References: <20181126100836.8805-1-kraxel@redhat.com>
+	<BN6PR18MB1220C6FD680DB5E2C2AEA9F09FD70@BN6PR18MB1220.namprd18.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <BN6PR18MB1220C6FD680DB5E2C2AEA9F09FD70@BN6PR18MB1220.namprd18.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v3 00/14] Generalize machine
- compatibility properties
+Subject: Re: [Qemu-devel] [PATCH] ehci: fix fetch qtd race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,127 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau <hpoussin@reactos.org>, "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, dgilbert@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: li qiang <liq3ea@outlook.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Wed,  7 Nov 2018 16:36:38 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+On Mon, Nov 26, 2018 at 10:34:13AM +0000, li qiang wrote:
+>=20
+> =E5=9C=A8 2018/11/26 18:08, Gerd Hoffmann =E5=86=99=E9=81=93:
+> > The token field contains the (guest-filled) state of the qtd, which
+> > indicates whenever the other fields are valid or not.  So make sure
+> > we read the token first, otherwise we may end up with an stale next
+> > pointer:
+> >
+> >    (1) ehci reads next
+> >    (2) guest writes next
+> >    (3) guest writes token
+> >    (4) ehci reads token
+> >    (5) ehci operates with stale next.
+>=20
+> Hello Gerd,
+>=20
+> Could you please explain how this can happen?
+>=20
+> IMO, the device emulation holds the BQL and the guest can't execute, ho=
+w=20
+> can the guest
 
-> Hi,
->=20
-> During "[PATCH v2 05/10] qom/globals: generalize
-> object_property_set_globals()" review, Eduardo suggested to rework the
-> GlobalProperty handling, so that -global is limited to QDev only and
-> we avoid mixing the machine compats and the user-provided -global
-> properties (instead of generalizing -global to various object kinds,
-> like I proposed in v2).
->=20
-> "qdev: do not mix compat props with global props" patch decouples a
-> bit user-provided -global from machine compat properties. This allows
-> to get rid of "user_provided" and "errp" fields in following patches.
->=20
-> Instead of explcitely calling object_apply_global_props() in the
-> various object post_init, I opted for creating a new TYPE_COMPAT_PROPS
-> interface. The interface approach gives a lot more flexibility on
-> which objects can have compat props. This requires some interface
-> improvments in "qom: teach interfaces to implement post-init".
->=20
-> A new compat property "x-use-canonical-path-for-ramblock-id" is added
-> to hostmem for legacy canonical path names, set to true for -file and
-> -memfd with qemu < 3.2.
->=20
-> (this series was initially titled "[PATCH v2 00/10] hostmem: use
-> object "id" for memory region name with >=3D 3.1", but its focus is more
-> in refactoring the global and compatilibity properties handling now)
-That probably all feedback I'm able to give on this round of review,
-so I'll wait till it will addressed.
+No.  vcpus can run in parallel to the iothread (at least as long as they
+are running in guest context, when they vmexit they have to wait for the
+BQL).
 
->=20
-> v3:
-> - GlobalProperties improvements/cleanups
-> - drop generalizing the -global idea
-> - "replace" the set_globals flag with a TYPE_COMPAT_PROPS interface
-> - update hw/i386 machine version to 3.2
-> - add "qom: make interface types abstract" interface cleanup
->=20
-> v2:
-> - replace "qom/user-creatable: add a few helper macros" patch for a
->   more optimized "qom: make user_creatable_complete() specific to
->   UserCreatable"
-> - rename register_global_list() to register_global_properties()
-> - call object_property_set_globals() after post-init
-> - add and use a ObjectClass.set_globals flag, instead of dynamically
->   check object class in object_property_set_globals()
-> - use object "id" in >=3D 3.1 instead of canonical path, add compat
->   property "x-use-canonical-path-for-ramblock-id" in base hostmem
->   class.
->=20
-> Marc-Andr=C3=A9 Lureau (14):
->   tests: qdev_prop_check_globals() doesn't return "all_used"
->   qom: make interface types abstract
->   qom: make user_creatable_complete() specific to UserCreatable
->   accel: register global_props like machine globals
->   qdev: move qdev_prop_register_global_list() to tests
->   qdev: do not mix compat props with global props
->   qdev: all globals are now user-provided
->   qdev-props: convert global_props to GArray
->   qdev-props: remove errp from GlobalProperty
->   qdev-props: call object_apply_global_props()
->   qom: teach interfaces to implement post-init
->   machine: add compat-props interface
->   hw/i386: add pc-i440fx-3.2 & pc-q35-3.2
->   hostmem: use object id for memory region name with >=3D 3.1
->=20
->  include/hw/acpi/acpi_dev_interface.h |  6 +--
->  include/hw/arm/linux-boot-if.h       |  5 +-
->  include/hw/boards.h                  |  3 +-
->  include/hw/compat.h                  | 11 ++++
->  include/hw/fw-path-provider.h        |  4 +-
->  include/hw/hotplug.h                 |  6 +--
->  include/hw/i386/pc.h                 |  3 ++
->  include/hw/intc/intc.h               |  4 +-
->  include/hw/ipmi/ipmi.h               |  4 +-
->  include/hw/isa/isa.h                 |  4 --
->  include/hw/mem/memory-device.h       |  4 +-
->  include/hw/nmi.h                     |  4 +-
->  include/hw/qdev-core.h               |  9 ----
->  include/hw/qdev-properties.h         | 30 -----------
->  include/hw/stream.h                  |  4 +-
->  include/hw/timer/m48t59.h            |  4 +-
->  include/qom/object.h                 |  2 +
->  include/qom/object_interfaces.h      | 10 ++--
->  include/sysemu/accel.h               |  4 +-
->  include/sysemu/hostmem.h             |  3 +-
->  include/sysemu/tpm.h                 |  4 +-
->  target/arm/idau.h                    |  4 +-
->  accel/accel.c                        |  7 +--
->  backends/hostmem-file.c              |  8 +--
->  backends/hostmem-memfd.c             |  2 +-
->  backends/hostmem-ram.c               |  9 ++--
->  backends/hostmem.c                   | 31 +++++++++++
->  hw/core/compat-props.c               | 43 +++++++++++++++
->  hw/core/machine.c                    | 18 -------
->  hw/core/qdev-properties.c            | 73 ++++++-------------------
->  hw/core/qdev.c                       |  4 ++
->  hw/i386/pc_piix.c                    | 21 ++++++--
->  hw/i386/pc_q35.c                     | 19 ++++++-
->  hw/misc/ivshmem.c                    |  2 +-
->  hw/virtio/virtio-rng.c               |  2 +-
->  hw/xen/xen-common.c                  |  9 +++-
->  qom/cpu.c                            |  1 -
->  qom/object.c                         | 49 +++++++++++++++--
->  qom/object_interfaces.c              | 14 ++---
->  stubs/machine.c                      |  4 ++
->  target/i386/cpu.c                    |  1 -
->  target/sparc/cpu.c                   |  1 -
->  tests/check-qom-interface.c          | 27 ++++++++--
->  tests/test-qdev-global-props.c       | 80 ++++++++--------------------
->  vl.c                                 |  4 --
->  MAINTAINERS                          |  1 +
->  hw/core/Makefile.objs                |  1 +
->  stubs/Makefile.objs                  |  1 +
->  tests/Makefile.include               |  1 +
->  49 files changed, 283 insertions(+), 282 deletions(-)
->  create mode 100644 hw/core/compat-props.c
->  create mode 100644 stubs/machine.c
->=20
+cheers,
+  Gerd
