@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gRN81-0001lG-Cb
+	(envelope-from <tcminyard@gmail.com>) id 1gRN81-0001lL-Dw
 	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 15:05:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gRN7w-0001Jb-8X
+	(envelope-from <tcminyard@gmail.com>) id 1gRN7y-0001Kw-Ef
 	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 15:05:09 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38136)
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:47029)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gRN7u-0001HR-7m
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 15:05:02 -0500
-Received: by mail-ot1-x343.google.com with SMTP id e12so13562976otl.5
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 12:04:56 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gRN7x-0001Gq-RB
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 15:05:06 -0500
+Received: by mail-oi1-x241.google.com with SMTP id x202so17049993oif.13
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 12:04:54 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Mon, 26 Nov 2018 14:04:26 -0600
-Message-Id: <20181126200435.23408-8-minyard@acm.org>
+Date: Mon, 26 Nov 2018 14:04:25 -0600
+Message-Id: <20181126200435.23408-7-minyard@acm.org>
 In-Reply-To: <20181126200435.23408-1-minyard@acm.org>
 References: <20181126200435.23408-1-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v3 07/16] i2c:pm_smbus: Fix pm_smbus handling
- of I2C block read
+Subject: [Qemu-devel] [PATCH v3 06/16] i2c: Add a length check to the SMBus
+ write handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,208 +32,30 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
 
 From: Corey Minyard <cminyard@mvista.com>
 
-The I2C block read function of pm_smbus was completely broken.  It
-required doing some direct I2C handling because it didn't have a
-defined size, the OS code just reads bytes until it marks the
-transaction finished.
-
-This also required adjusting how the AMIBIOS workaround code worked,
-the I2C block mode was setting STS_HOST_BUSY during a transaction,
-so that bit could no longer be used to inform the host status read
-code to start the transaction.  Create a explicit bool for that
-operation.
-
-Also, don't read the next byte from the device in byte-by-byte
-mode unless the OS is actually clearing the byte done bit.  Just
-assuming that's what the OS is doing is a bad idea.
+Avoid an overflow.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/i2c/pm_smbus.c         | 86 ++++++++++++++++++++++++++++++---------
- include/hw/i2c/pm_smbus.h |  6 +++
- 2 files changed, 73 insertions(+), 19 deletions(-)
+ hw/i2c/smbus_slave.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-index f3c6cc46f9..8793113c25 100644
---- a/hw/i2c/pm_smbus.c
-+++ b/hw/i2c/pm_smbus.c
-@@ -118,19 +118,30 @@ static void smb_transaction(PMSMBus *s)
-         }
-         break;
-     case PROT_I2C_BLOCK_READ:
--        if (read) {
--            int xfersize = s->smb_data0;
--            if (xfersize > sizeof(s->smb_data)) {
--                xfersize = sizeof(s->smb_data);
--            }
--            ret = smbus_read_block(bus, addr, s->smb_data1, s->smb_data,
--                                   xfersize, false, true);
--            goto data8;
--        } else {
--            /* The manual says the behavior is undefined, just set DEV_ERR. */
-+        /* According to the Linux i2c-i801 driver:
-+         *   NB: page 240 of ICH5 datasheet shows that the R/#W
-+         *   bit should be cleared here, even when reading.
-+         *   However if SPD Write Disable is set (Lynx Point and later),
-+         *   the read will fail if we don't set the R/#W bit.
-+         * So at least Linux may or may not set the read bit here.
-+         * So just ignore the read bit for this command.
-+         */
-+        if (i2c_start_transfer(bus, addr, 0)) {
-             goto error;
-         }
--        break;
-+        ret = i2c_send(bus, s->smb_data1);
-+        if (ret) {
-+            goto error;
+diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
+index 70ff29c095..d03f714608 100644
+--- a/hw/i2c/smbus_slave.c
++++ b/hw/i2c/smbus_slave.c
+@@ -182,7 +182,11 @@ static int smbus_i2c_send(I2CSlave *s, uint8_t data)
+     switch (dev->mode) {
+     case SMBUS_WRITE_DATA:
+         DPRINTF("Write data %02x\n", data);
+-        dev->data_buf[dev->data_len++] = data;
++        if (dev->data_len >= sizeof(dev->data_buf)) {
++            BADF("Too many bytes sent\n");
++        } else {
++            dev->data_buf[dev->data_len++] = data;
 +        }
-+        if (i2c_start_transfer(bus, addr, 1)) {
-+            goto error;
-+        }
-+        s->in_i2c_block_read = true;
-+        s->smb_blkdata = i2c_recv(s->smbus);
-+        s->op_done = false;
-+        s->smb_stat |= STS_HOST_BUSY | STS_BYTE_DONE;
-+        goto out;
-+
-     case PROT_BLOCK_DATA:
-         if (read) {
-             ret = smbus_read_block(bus, addr, cmd, s->smb_data,
-@@ -208,6 +219,7 @@ static void smb_transaction_start(PMSMBus *s)
- {
-     if (s->smb_ctl & CTL_INTREN) {
-         smb_transaction(s);
-+        s->start_transaction_on_status_read = false;
-     } else {
-         /* Do not execute immediately the command; it will be
-          * executed when guest will read SMB_STAT register.  This
-@@ -217,6 +229,7 @@ static void smb_transaction_start(PMSMBus *s)
-          * checking for status.  If STS_HOST_BUSY doesn't get
-          * set, it gets stuck. */
-         s->smb_stat |= STS_HOST_BUSY;
-+        s->start_transaction_on_status_read = true;
-     }
- }
- 
-@@ -226,19 +239,38 @@ smb_irq_value(PMSMBus *s)
-     return ((s->smb_stat & ~STS_HOST_BUSY) != 0) && (s->smb_ctl & CTL_INTREN);
- }
- 
-+static bool
-+smb_byte_by_byte(PMSMBus *s)
-+{
-+    if (s->op_done) {
-+        return false;
-+    }
-+    if (s->in_i2c_block_read) {
-+        return true;
-+    }
-+    return !(s->smb_auxctl & AUX_BLK);
-+}
-+
- static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-                               unsigned width)
- {
-     PMSMBus *s = opaque;
-+    uint8_t clear_byte_done;
- 
-     SMBUS_DPRINTF("SMB writeb port=0x%04" HWADDR_PRIx
-                   " val=0x%02" PRIx64 "\n", addr, val);
-     switch(addr) {
-     case SMBHSTSTS:
-+        clear_byte_done = s->smb_stat & val & STS_BYTE_DONE;
-         s->smb_stat &= ~(val & ~STS_HOST_BUSY);
--        if (!s->op_done && !(s->smb_auxctl & AUX_BLK)) {
-+        if (clear_byte_done && smb_byte_by_byte(s)) {
-             uint8_t read = s->smb_addr & 0x01;
- 
-+            if (s->in_i2c_block_read) {
-+                /* See comment below PROT_I2C_BLOCK_READ above. */
-+                read = 1;
-+            }
-+
-             s->smb_index++;
-             if (!read && s->smb_index == s->smb_data0) {
-                 uint8_t prot = (s->smb_ctl >> 2) & 0x07;
-@@ -265,12 +297,23 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-                 s->smb_stat |= STS_BYTE_DONE;
-             } else if (s->smb_ctl & CTL_LAST_BYTE) {
-                 s->op_done = true;
--                s->smb_blkdata = s->smb_data[s->smb_index];
-+                if (s->in_i2c_block_read) {
-+                    s->in_i2c_block_read = false;
-+                    s->smb_blkdata = i2c_recv(s->smbus);
-+                    i2c_nack(s->smbus);
-+                    i2c_end_transfer(s->smbus);
-+                } else {
-+                    s->smb_blkdata = s->smb_data[s->smb_index];
-+                }
-                 s->smb_index = 0;
-                 s->smb_stat |= STS_INTR;
-                 s->smb_stat &= ~STS_HOST_BUSY;
-             } else {
--                s->smb_blkdata = s->smb_data[s->smb_index];
-+                if (s->in_i2c_block_read) {
-+                    s->smb_blkdata = i2c_recv(s->smbus);
-+                } else {
-+                    s->smb_blkdata = s->smb_data[s->smb_index];
-+                }
-                 s->smb_stat |= STS_BYTE_DONE;
-             }
-         }
-@@ -281,6 +324,10 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-             if (!s->op_done) {
-                 s->smb_index = 0;
-                 s->op_done = true;
-+                if (s->in_i2c_block_read) {
-+                    s->in_i2c_block_read = false;
-+                    i2c_end_transfer(s->smbus);
-+                }
-             }
-             smb_transaction_start(s);
-         }
-@@ -334,8 +381,9 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-     switch(addr) {
-     case SMBHSTSTS:
-         val = s->smb_stat;
--        if (s->smb_stat & STS_HOST_BUSY) {
-+        if (s->start_transaction_on_status_read) {
-             /* execute command now */
-+            s->start_transaction_on_status_read = false;
-             s->smb_stat &= ~STS_HOST_BUSY;
-             smb_transaction(s);
-         }
-@@ -356,10 +404,10 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-         val = s->smb_data1;
          break;
-     case SMBBLKDAT:
--        if (s->smb_index >= PM_SMBUS_MAX_MSG_SIZE) {
--            s->smb_index = 0;
--        }
--        if (s->smb_auxctl & AUX_BLK) {
-+        if (s->smb_auxctl & AUX_BLK && !s->in_i2c_block_read) {
-+            if (s->smb_index >= PM_SMBUS_MAX_MSG_SIZE) {
-+                s->smb_index = 0;
-+            }
-             val = s->smb_data[s->smb_index++];
-             if (!s->op_done && s->smb_index == s->smb_data0) {
-                 s->op_done = true;
-diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
-index 6dd5b7040b..7bcca97672 100644
---- a/include/hw/i2c/pm_smbus.h
-+++ b/include/hw/i2c/pm_smbus.h
-@@ -33,6 +33,12 @@ typedef struct PMSMBus {
-     /* Set on block transfers after the last byte has been read, so the
-        INTR bit can be set at the right time. */
-     bool op_done;
-+
-+    /* Set during an I2C block read, so we know how to handle data. */
-+    bool in_i2c_block_read;
-+
-+    /* Used to work around a bug in AMIBIOS, see smb_transaction_start() */
-+    bool start_transaction_on_status_read;
- } PMSMBus;
  
- void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk);
+     default:
 -- 
 2.17.1
