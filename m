@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gRMlC-0000I3-9F
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:41:40 -0500
+	(envelope-from <quintela@redhat.com>) id 1gRN4k-0006eR-SO
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 15:01:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gRMl5-0004xS-V3
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:41:34 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:44729)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gRMl5-0004xG-MQ
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:41:27 -0500
-Received: by mail-oi1-x242.google.com with SMTP id m6so5342853oig.11
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 11:41:27 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-Reply-To: minyard@acm.org
-From: Corey Minyard <minyard@acm.org>
-References: <20181115192446.17187-1-minyard@acm.org>
-	<20181115192446.17187-8-minyard@acm.org>
-	<20181126172058.GI2547@work-vm>
-	<9d4437e4-c9ab-913d-5ac6-e9338b26a0a8@acm.org>
-Message-ID: <9b21748b-10b9-427b-2822-18b5c3cd5066@acm.org>
-Date: Mon, 26 Nov 2018 13:41:23 -0600
+	(envelope-from <quintela@redhat.com>) id 1gRN4g-00083m-T2
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 15:01:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32826)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gRN4g-00083P-Im
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 15:01:42 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 885DE9F722
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 20:01:41 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Mon, 26 Nov 2018 20:59:54 +0100
+Message-Id: <20181126200009.862-2-quintela@redhat.com>
+In-Reply-To: <20181126200009.862-1-quintela@redhat.com>
+References: <20181126200009.862-1-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9d4437e4-c9ab-913d-5ac6-e9338b26a0a8@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH v2 07/12] i2c:pm_smbus: Fix state transfer
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 01/16] virtio: split vhost vsock bits from
+ virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,165 +32,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On 11/26/18 12:24 PM, Corey Minyard wrote:
-> On 11/26/18 11:20 AM, Dr. David Alan Gilbert wrote:
->> * minyard@acm.org (minyard@acm.org) wrote:
->>> From: Corey Minyard <cminyard@mvista.com>
->>>
->>> Transfer the state information for the SMBus registers and
->>> internal data so it will work on a VM transfer.
->>>
->>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
->>> Cc: Michael S. Tsirkin <mst@redhat.com>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>> ---
->>>   hw/acpi/piix4.c           |  3 ++-
->>>   hw/i2c/pm_smbus.c         | 31 +++++++++++++++++++++++++++++++
->>>   hw/i2c/smbus_ich9.c       |  6 ++++--
->>>   include/hw/i2c/pm_smbus.h |  2 ++
->>>   4 files changed, 39 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
->>> index e330f24c71..313305f5a0 100644
->>> --- a/hw/acpi/piix4.c
->>> +++ b/hw/acpi/piix4.c
->>> @@ -309,7 +309,7 @@ static const VMStateDescription 
->>> vmstate_cpuhp_state = {
->>>    */
->>>   static const VMStateDescription vmstate_acpi = {
->>>       .name = "piix4_pm",
->>> -    .version_id = 3,
->>> +    .version_id = 4,
->> OK, so do we need to bump this version ?  Ideally you'd keep the version
->> as is and let the needed do the work.
->
->
-> Got it, that makes sense.  Same for the comments below, I'll get all 
-> those.
->
-Well, maybe not.  the .needed function is only called on the save side, 
-it is
-not called on the load side  So a 2.12 to 3.0 transfer fails.  So I've 
-exported
-the migration needed function and I'm using the VMSTATE_STRUCT_TEST()
-function to transfer it in each case.  With that I can migrate from 2.12 to
-3.0 and back without issue.
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 
--corey
+---
 
+Updated copyright info
+Also split virtio-pci.h bits
+---
+ hw/virtio/Makefile.objs     |  2 +-
+ hw/virtio/vhost-vsock-pci.c | 82 +++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c      | 51 -----------------------
+ hw/virtio/virtio-pci.h      | 18 --------
+ 4 files changed, 83 insertions(+), 70 deletions(-)
+ create mode 100644 hw/virtio/vhost-vsock-pci.c
 
-> Thanks,
->
-> -corey
->
->
->>>       .minimum_version_id = 3,
->>>       .minimum_version_id_old = 1,
->>>       .load_state_old = acpi_load_old,
->>> @@ -320,6 +320,7 @@ static const VMStateDescription vmstate_acpi = {
->>>           VMSTATE_UINT16(ar.pm1.evt.en, PIIX4PMState),
->>>           VMSTATE_UINT16(ar.pm1.cnt.cnt, PIIX4PMState),
->>>           VMSTATE_STRUCT(apm, PIIX4PMState, 0, vmstate_apm, APMState),
->>> +        VMSTATE_STRUCT(smb, PIIX4PMState, 4, pmsmb_vmstate, PMSMBus),
->>>           VMSTATE_TIMER_PTR(ar.tmr.timer, PIIX4PMState),
->>>           VMSTATE_INT64(ar.tmr.overflow_time, PIIX4PMState),
->>>           VMSTATE_STRUCT(ar.gpe, PIIX4PMState, 2, vmstate_gpe, 
->>> ACPIGPE),
->>> diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
->>> index 8793113c25..75907e1c22 100644
->>> --- a/hw/i2c/pm_smbus.c
->>> +++ b/hw/i2c/pm_smbus.c
->>> @@ -19,6 +19,7 @@
->>>    */
->>>   #include "qemu/osdep.h"
->>>   #include "hw/hw.h"
->>> +#include "hw/boards.h"
->>>   #include "hw/i2c/pm_smbus.h"
->>>   #include "hw/i2c/smbus_master.h"
->>>   @@ -450,6 +451,36 @@ static const MemoryRegionOps pm_smbus_ops = {
->>>       .endianness = DEVICE_LITTLE_ENDIAN,
->>>   };
->>>   +static bool pm_smbus_vmstate_needed(void *opaque)
->>> +{
->>> +    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
->>> +
->>> +    return !mc->smbus_no_migration_support;
->>> +}
->> OK
->>
->>> +const VMStateDescription pmsmb_vmstate = {
->>> +    .name = "pmsmb",
->>> +    .version_id = 1,
->>> +    .minimum_version_id = 1,
->>> +    .needed = pm_smbus_vmstate_needed,
->>> +    .fields = (VMStateField[]) {
->>> +        VMSTATE_UINT8(smb_stat, PMSMBus),
->>> +        VMSTATE_UINT8(smb_ctl, PMSMBus),
->>> +        VMSTATE_UINT8(smb_cmd, PMSMBus),
->>> +        VMSTATE_UINT8(smb_addr, PMSMBus),
->>> +        VMSTATE_UINT8(smb_data0, PMSMBus),
->>> +        VMSTATE_UINT8(smb_data1, PMSMBus),
->>> +        VMSTATE_UINT32(smb_index, PMSMBus),
->>> +        VMSTATE_UINT8_ARRAY(smb_data, PMSMBus, PM_SMBUS_MAX_MSG_SIZE),
->>> +        VMSTATE_UINT8(smb_auxctl, PMSMBus),
->>> +        VMSTATE_BOOL(i2c_enable, PMSMBus),
->>> +        VMSTATE_BOOL(op_done, PMSMBus),
->>> +        VMSTATE_BOOL(in_i2c_block_read, PMSMBus),
->>> +        VMSTATE_BOOL(start_transaction_on_status_read, PMSMBus),
->>> +        VMSTATE_END_OF_LIST()
->>> +    }
->>> +};
->>> +
->>>   void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool 
->>> force_aux_blk)
->>>   {
->>>       smb->op_done = true;
->>> diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
->>> index e6d8d28194..c9b7482a54 100644
->>> --- a/hw/i2c/smbus_ich9.c
->>> +++ b/hw/i2c/smbus_ich9.c
->>> @@ -45,10 +45,12 @@ typedef struct ICH9SMBState {
->>>     static const VMStateDescription vmstate_ich9_smbus = {
->>>       .name = "ich9_smb",
->>> -    .version_id = 1,
->>> +    .version_id = 2,
->> Again, do we need to bump this?
->>
->>>       .minimum_version_id = 1,
->>>       .fields = (VMStateField[]) {
->>> -        VMSTATE_PCI_DEVICE(dev, struct ICH9SMBState),
->>> +        VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
->>> +        VMSTATE_BOOL_V(irq_enabled, ICH9SMBState, 2),
->> Can we make this a VMSTATE_BOOL_TEST (see VMSTATE_UINT64_TEST for the
->> pattern) tied to the same .neede, and again we don't need to bump the
->> version.
->>
->>> +        VMSTATE_STRUCT(smb, ICH9SMBState, 2, pmsmb_vmstate, PMSMBus),
->> So that's taken care of by the .needed.
->>
->> Dave
->>
->>>           VMSTATE_END_OF_LIST()
->>>       }
->>>   };
->>> diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
->>> index 7bcca97672..5075fc64fa 100644
->>> --- a/include/hw/i2c/pm_smbus.h
->>> +++ b/include/hw/i2c/pm_smbus.h
->>> @@ -43,4 +43,6 @@ typedef struct PMSMBus {
->>>     void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool 
->>> force_aux_blk);
->>>   +extern const VMStateDescription pmsmb_vmstate;
->>> +
->>>   #endif /* PM_SMBUS_H */
->>> -- 
->>> 2.17.1
->>>
->> -- 
->> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
->
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 1b2799cfd8..4fbf7de84b 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -10,7 +10,7 @@ obj-$(CONFIG_VIRTIO_CRYPTO) +=3D virtio-crypto.o
+ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) +=3D virti=
+o-crypto-pci.o
+=20
+ obj-$(CONFIG_LINUX) +=3D vhost.o vhost-backend.o vhost-user.o
+-obj-$(CONFIG_VHOST_VSOCK) +=3D vhost-vsock.o
++obj-$(CONFIG_VHOST_VSOCK) +=3D vhost-vsock.o vhost-vsock-pci.o
+ endif
+=20
+ common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO),$(CONFIG_LINUX))) +=3D=
+ vhost-stub.o
+diff --git a/hw/virtio/vhost-vsock-pci.c b/hw/virtio/vhost-vsock-pci.c
+new file mode 100644
+index 0000000000..5cafa8335c
+--- /dev/null
++++ b/hw/virtio/vhost-vsock-pci.c
+@@ -0,0 +1,82 @@
++/*
++ * Vhost vsock PCI Bindings
++ *
++ * Copyright 2015 Red Hat, Inc.
++ *
++ * Authors:
++ *  Stefan Hajnoczi <stefanha@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "virtio-pci.h"
++#include "hw/virtio/vhost-vsock.h"
++
++typedef struct VHostVSockPCI VHostVSockPCI;
++
++/*
++ * vhost-vsock-pci: This extends VirtioPCIProxy.
++ */
++#define TYPE_VHOST_VSOCK_PCI "vhost-vsock-pci"
++#define VHOST_VSOCK_PCI(obj) \
++        OBJECT_CHECK(VHostVSockPCI, (obj), TYPE_VHOST_VSOCK_PCI)
++
++struct VHostVSockPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostVSock vdev;
++};
++
++static Property vhost_vsock_pci_properties[] =3D {
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 3),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_vsock_pci_realize(VirtIOPCIProxy *vpci_dev, Error **er=
+rp)
++{
++    VHostVSockPCI *dev =3D VHOST_VSOCK_PCI(vpci_dev);
++    DeviceState *vdev =3D DEVICE(&dev->vdev);
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void vhost_vsock_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    VirtioPCIClass *k =3D VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k =3D PCI_DEVICE_CLASS(klass);
++    k->realize =3D vhost_vsock_pci_realize;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    dc->props =3D vhost_vsock_pci_properties;
++    pcidev_k->vendor_id =3D PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id =3D PCI_DEVICE_ID_VIRTIO_VSOCK;
++    pcidev_k->revision =3D 0x00;
++    pcidev_k->class_id =3D PCI_CLASS_COMMUNICATION_OTHER;
++}
++
++static void vhost_vsock_pci_instance_init(Object *obj)
++{
++    VHostVSockPCI *dev =3D VHOST_VSOCK_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_VSOCK);
++}
++
++static const TypeInfo vhost_vsock_pci_info =3D {
++    .name          =3D TYPE_VHOST_VSOCK_PCI,
++    .parent        =3D TYPE_VIRTIO_PCI,
++    .instance_size =3D sizeof(VHostVSockPCI),
++    .instance_init =3D vhost_vsock_pci_instance_init,
++    .class_init    =3D vhost_vsock_pci_class_init,
++};
++
++static void virtio_pci_vhost_register(void)
++{
++    type_register_static(&vhost_vsock_pci_info);
++}
++
++type_init(virtio_pci_vhost_register)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index a954799267..56b39a3699 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2238,54 +2238,6 @@ static const TypeInfo vhost_user_scsi_pci_info =3D=
+ {
+ };
+ #endif
+=20
+-/* vhost-vsock-pci */
+-
+-#ifdef CONFIG_VHOST_VSOCK
+-static Property vhost_vsock_pci_properties[] =3D {
+-    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 3),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+-static void vhost_vsock_pci_realize(VirtIOPCIProxy *vpci_dev, Error **er=
+rp)
+-{
+-    VHostVSockPCI *dev =3D VHOST_VSOCK_PCI(vpci_dev);
+-    DeviceState *vdev =3D DEVICE(&dev->vdev);
+-
+-    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+-    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+-}
+-
+-static void vhost_vsock_pci_class_init(ObjectClass *klass, void *data)
+-{
+-    DeviceClass *dc =3D DEVICE_CLASS(klass);
+-    VirtioPCIClass *k =3D VIRTIO_PCI_CLASS(klass);
+-    PCIDeviceClass *pcidev_k =3D PCI_DEVICE_CLASS(klass);
+-    k->realize =3D vhost_vsock_pci_realize;
+-    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+-    dc->props =3D vhost_vsock_pci_properties;
+-    pcidev_k->vendor_id =3D PCI_VENDOR_ID_REDHAT_QUMRANET;
+-    pcidev_k->device_id =3D PCI_DEVICE_ID_VIRTIO_VSOCK;
+-    pcidev_k->revision =3D 0x00;
+-    pcidev_k->class_id =3D PCI_CLASS_COMMUNICATION_OTHER;
+-}
+-
+-static void vhost_vsock_pci_instance_init(Object *obj)
+-{
+-    VHostVSockPCI *dev =3D VHOST_VSOCK_PCI(obj);
+-
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VHOST_VSOCK);
+-}
+-
+-static const TypeInfo vhost_vsock_pci_info =3D {
+-    .name          =3D TYPE_VHOST_VSOCK_PCI,
+-    .parent        =3D TYPE_VIRTIO_PCI,
+-    .instance_size =3D sizeof(VHostVSockPCI),
+-    .instance_init =3D vhost_vsock_pci_instance_init,
+-    .class_init    =3D vhost_vsock_pci_class_init,
+-};
+-#endif
+-
+ /* virtio-balloon-pci */
+=20
+ static Property virtio_balloon_pci_properties[] =3D {
+@@ -2720,9 +2672,6 @@ static void virtio_pci_register_types(void)
+ #if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+     type_register_static(&vhost_user_scsi_pci_info);
+ #endif
+-#ifdef CONFIG_VHOST_VSOCK
+-    type_register_static(&vhost_vsock_pci_info);
+-#endif
+ }
+=20
+ type_init(virtio_pci_register_types)
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 813082b0d7..25d225bc7d 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -37,9 +37,6 @@
+ #ifdef CONFIG_VHOST_SCSI
+ #include "hw/virtio/vhost-scsi.h"
+ #endif
+-#ifdef CONFIG_VHOST_VSOCK
+-#include "hw/virtio/vhost-vsock.h"
+-#endif
+=20
+ typedef struct VirtIOPCIProxy VirtIOPCIProxy;
+ typedef struct VirtIOBlkPCI VirtIOBlkPCI;
+@@ -55,7 +52,6 @@ typedef struct VirtIOInputPCI VirtIOInputPCI;
+ typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
+ typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
+ typedef struct VirtIOGPUPCI VirtIOGPUPCI;
+-typedef struct VHostVSockPCI VHostVSockPCI;
+ typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
+=20
+ /* virtio-pci-bus */
+@@ -388,20 +384,6 @@ struct VirtIOGPUPCI {
+     VirtIOGPU vdev;
+ };
+=20
+-#ifdef CONFIG_VHOST_VSOCK
+-/*
+- * vhost-vsock-pci: This extends VirtioPCIProxy.
+- */
+-#define TYPE_VHOST_VSOCK_PCI "vhost-vsock-pci"
+-#define VHOST_VSOCK_PCI(obj) \
+-        OBJECT_CHECK(VHostVSockPCI, (obj), TYPE_VHOST_VSOCK_PCI)
+-
+-struct VHostVSockPCI {
+-    VirtIOPCIProxy parent_obj;
+-    VHostVSock vdev;
+-};
+-#endif
+-
+ /*
+  * virtio-crypto-pci: This extends VirtioPCIProxy.
+  */
+--=20
+2.19.1
