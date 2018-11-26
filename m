@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gRGFs-0008CO-4s
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:44:49 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gRGG1-0008K1-Vs
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:44:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gRGFo-0008IE-5l
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:44:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60000)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gRGFz-0008R8-2R
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:44:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55868)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gRGFn-0008HT-Rg
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:44:44 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1gRGFy-0008QM-TX
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:44:55 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3AB623099FC7
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 12:44:43 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 300754E8B7
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 12:44:54 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 26 Nov 2018 16:42:46 +0400
-Message-Id: <20181126124250.29985-8-marcandre.lureau@redhat.com>
+Date: Mon, 26 Nov 2018 16:42:47 +0400
+Message-Id: <20181126124250.29985-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20181126124250.29985-1-marcandre.lureau@redhat.com>
 References: <20181126124250.29985-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.2 07/11] vhost-user: add
- vhost_user_input_get_config()
+Subject: [Qemu-devel] [PATCH for-3.2 08/11] libvhost-user-glib: export
+ vug_source_new()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,151 +35,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Ask vhost user input backend the list of virtio_input_config.
+Simplify the creation of FD sources for other users. This is just
+convenience to avoid duplicating similar code elsewhere.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.h |  1 +
- include/hw/virtio/vhost-backend.h     |  4 ++
- hw/virtio/vhost-user.c                | 60 +++++++++++++++++++++++++++
- docs/interop/vhost-user.txt           |  8 ++++
- 4 files changed, 73 insertions(+)
+ contrib/libvhost-user/libvhost-user-glib.h |  3 +++
+ contrib/libvhost-user/libvhost-user-glib.c | 11 ++++++-----
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-index 4aa55b4d2d..a4afbc3a46 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -91,6 +91,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_POSTCOPY_ADVISE  =3D 28,
-     VHOST_USER_POSTCOPY_LISTEN  =3D 29,
-     VHOST_USER_POSTCOPY_END     =3D 30,
-+    VHOST_USER_INPUT_GET_CONFIG =3D 31,
-     VHOST_USER_MAX
- } VhostUserRequest;
+diff --git a/contrib/libvhost-user/libvhost-user-glib.h b/contrib/libvhos=
+t-user/libvhost-user-glib.h
+index 6b2110b94c..d3200f3afc 100644
+--- a/contrib/libvhost-user/libvhost-user-glib.h
++++ b/contrib/libvhost-user/libvhost-user-glib.h
+@@ -29,4 +29,7 @@ void vug_init(VugDev *dev, int socket,
+               vu_panic_cb panic, const VuDevIface *iface);
+ void vug_deinit(VugDev *dev);
 =20
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-=
-backend.h
-index 81283ec50f..1fca321d8a 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -12,6 +12,7 @@
- #define VHOST_BACKEND_H
-=20
- #include "exec/memory.h"
-+#include "standard-headers/linux/virtio_input.h"
-=20
- typedef enum VhostBackendType {
-     VHOST_BACKEND_TYPE_NONE =3D 0,
-@@ -160,4 +161,7 @@ int vhost_backend_invalidate_device_iotlb(struct vhos=
-t_dev *dev,
- int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
-                                           struct vhost_iotlb_msg *imsg);
-=20
-+int vhost_user_input_get_config(struct vhost_dev *dev,
-+                                struct virtio_input_config **config);
++GSource *vug_source_new(VugDev *dev, int fd, GIOCondition cond,
++                        vu_watch_cb vu_cb, gpointer data);
 +
- #endif /* VHOST_BACKEND_H */
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 9256364e30..d51d1087f6 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -89,6 +89,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_POSTCOPY_ADVISE  =3D 28,
-     VHOST_USER_POSTCOPY_LISTEN  =3D 29,
-     VHOST_USER_POSTCOPY_END     =3D 30,
-+    VHOST_USER_INPUT_GET_CONFIG =3D 31,
-     VHOST_USER_MAX
- } VhostUserRequest;
+ #endif /* LIBVHOST_USER_GLIB_H */
+diff --git a/contrib/libvhost-user/libvhost-user-glib.c b/contrib/libvhos=
+t-user/libvhost-user-glib.c
+index 545f089587..42660a1b36 100644
+--- a/contrib/libvhost-user/libvhost-user-glib.c
++++ b/contrib/libvhost-user/libvhost-user-glib.c
+@@ -68,15 +68,16 @@ static GSourceFuncs vug_src_funcs =3D {
+     NULL
+ };
 =20
-@@ -338,6 +339,65 @@ static int vhost_user_write(struct vhost_dev *dev, V=
-hostUserMsg *msg,
-     return 0;
+-static GSource *
+-vug_source_new(VuDev *dev, int fd, GIOCondition cond,
++GSource *
++vug_source_new(VugDev *gdev, int fd, GIOCondition cond,
+                vu_watch_cb vu_cb, gpointer data)
+ {
++    VuDev *dev =3D &gdev->parent;
+     GSource *gsrc;
+     VugSrc *src;
+     guint id;
+=20
+-    g_assert(dev);
++    g_assert(gdev);
+     g_assert(fd >=3D 0);
+     g_assert(vu_cb);
+=20
+@@ -106,7 +107,7 @@ set_watch(VuDev *vu_dev, int fd, int vu_evt, vu_watch=
+_cb cb, void *pvt)
+     g_assert(cb);
+=20
+     dev =3D container_of(vu_dev, VugDev, parent);
+-    src =3D vug_source_new(vu_dev, fd, vu_evt, cb, pvt);
++    src =3D vug_source_new(dev, fd, vu_evt, cb, pvt);
+     g_hash_table_replace(dev->fdmap, GINT_TO_POINTER(fd), src);
  }
 =20
-+static void *vhost_user_read_size(struct vhost_dev *dev, uint32_t size)
-+{
-+    struct vhost_user *u =3D dev->opaque;
-+    CharBackend *chr =3D u->user->chr;
-+    int r;
-+    uint8_t *p =3D g_malloc(size);
-+
-+    r =3D qemu_chr_fe_read_all(chr, p, size);
-+    if (r !=3D size) {
-+        error_report("Failed to read msg payload."
-+                     " Read %d instead of %u.", r, size);
-+        g_free(p);
-+        return NULL;
-+    }
-+
-+    return p;
-+}
-+
-+int vhost_user_input_get_config(struct vhost_dev *dev,
-+                                struct virtio_input_config **config)
-+{
-+    void *p =3D NULL;
-+    VhostUserMsg msg =3D {
-+        .hdr.request =3D VHOST_USER_INPUT_GET_CONFIG,
-+        .hdr.flags =3D VHOST_USER_VERSION,
-+    };
-+
-+    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-+        goto err;
-+    }
-+
-+    if (vhost_user_read_header(dev, &msg) < 0) {
-+        goto err;
-+    }
-+
-+    if (msg.hdr.request !=3D VHOST_USER_INPUT_GET_CONFIG) {
-+        error_report("Received unexpected msg type. Expected %d received=
- %d",
-+                     VHOST_USER_INPUT_GET_CONFIG, msg.hdr.request);
-+        goto err;
-+    }
-+
-+    if (msg.hdr.size % sizeof(struct virtio_input_config)) {
-+        error_report("Invalid msg size");
-+        goto err;
-+    }
-+
-+    p =3D vhost_user_read_size(dev, msg.hdr.size);
-+    if (!p) {
-+        goto err;
-+    }
-+
-+    *config =3D p;
-+    return msg.hdr.size / sizeof(struct virtio_input_config);
-+
-+err:
-+    g_free(p);
-+    return -1;
-+}
-+
- static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
-                                    struct vhost_log *log)
- {
-diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-index cefec9ffe1..95720be81b 100644
---- a/docs/interop/vhost-user.txt
-+++ b/docs/interop/vhost-user.txt
-@@ -766,6 +766,14 @@ Master message types
-       was previously sent.
-       The value returned is an error indication; 0 is success.
+@@ -141,7 +142,7 @@ vug_init(VugDev *dev, int socket,
+     dev->fdmap =3D g_hash_table_new_full(NULL, NULL, NULL,
+                                        (GDestroyNotify) g_source_destroy=
+);
 =20
-+ * VHOST_USER_INPUT_GET_CONFIG
-+      Id: 31
-+      Master payload: N/A
-+      Slave payload: (struct virtio_input_config)*
-+
-+      Ask vhost user input backend the list of virtio_input_config, in
-+      host endianness.
-+
- Slave message types
- -------------------
+-    dev->src =3D vug_source_new(&dev->parent, socket, G_IO_IN, vug_watch=
+, NULL);
++    dev->src =3D vug_source_new(dev, socket, G_IO_IN, vug_watch, NULL);
+ }
 =20
+ void
 --=20
 2.20.0.rc1
