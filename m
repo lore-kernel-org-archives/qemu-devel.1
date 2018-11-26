@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gRGT9-0002b2-SL
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:58:33 -0500
+	(envelope-from <stefanha@redhat.com>) id 1gRGUG-0003tb-ET
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:59:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gRGT6-0003xA-Ju
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:58:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42248)
+	(envelope-from <stefanha@redhat.com>) id 1gRGUF-0004jg-DF
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:59:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42650)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gRGT4-0003uE-IP
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:58:28 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7A6C9305FCB2
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 12:58:23 +0000 (UTC)
-Date: Mon, 26 Nov 2018 10:58:08 -0200
-From: Caio Carrara <ccarrara@redhat.com>
-Message-ID: <20181126125807.GA14485@localhost.localdomain>
-References: <20181121183900.10364-1-wainersm@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gRGUF-0004j0-51
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:59:39 -0500
+Date: Mon, 26 Nov 2018 12:59:31 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20181126125931.GH15869@stefanha-x1.localdomain>
+References: <20181106143213.536d3311@w520.home>
+	<0857657C-BEFF-4B65-A8A0-004CCE361FDB@nutanix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Rn7IEEq3VEzCw+ji"
 Content-Disposition: inline
-In-Reply-To: <20181121183900.10364-1-wainersm@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] scripts/qemu.py: allow to launch the VM
- without a monitor
+In-Reply-To: <0857657C-BEFF-4B65-A8A0-004CCE361FDB@nutanix.com>
+Subject: Re: [Qemu-devel] KVM Forum VFIO BoF summary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,211 +28,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, crosa@redhat.com, philmd@redhat.com
+To: Felipe Franciosi <felipe@nutanix.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Jiang, Jerry (SW)" <Jerry.Jiang@amd.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, Changpeng Liu <changpeng.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "Xue, Ken" <Ken.Xue@amd.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, James R Harris <james.r.harris@intel.com>, "benjamin.walker@intel.com" <benjamin.walker@intel.com>, Alexander Graf <agraf@suse.de>
 
-On Wed, Nov 21, 2018 at 01:39:00PM -0500, Wainer dos Santos Moschetta wrote:
-> QEMUMachine launches the VM with a monitor enabled, afterwards
-> a qmp connection is attempted on _post_launch(). In case
-> the QEMU process exits with an error, qmp.accept() reaches
-> timeout and raises an exception.
-> 
-> But sometimes you don't need that monitor. As an example,
-> when a test launches the VM expects its immediate crash,
-> and only intend to check the process's return code. In this
-> case the fact that launch() tries to establish the qmp
-> connection (ending up in an exception) is troublesome.
-> 
-> So this patch adds the set_qmp_monitor() that allow to
-> launch the VM without creating the monitor machinery. The
-> method can be used to re-enable the monitor eventually.
-> 
-> Tested this change with the following Avocado test:
-> 
-> from avocado_qemu import Test
-> 
-> class DisableQmp(Test):
 
-I think it would be fine to have this test added as a real test instead
-of just let this here on commit message. Or at least we should have a
-real use case that uses this new feature.
+--Rn7IEEq3VEzCw+ji
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->     """
->     :avocado: enable
->     """
->     def test(self):
->         self.vm.add_args('--foobar')
->         self.vm.set_qmp_monitor(disabled=True)
->         self.vm.launch()
->         self.vm.wait()
->         self.assertEqual(self.vm.exitcode(), 1)
->         self.vm.shutdown()
-> 
->         self.vm.set_qmp_monitor(disabled=False)
->         self.vm._args.remove('--foobar') # Hack
->         self.vm.launch()
->         res = self.vm.command('human-monitor-command',
->                               command_line='info version')
->         self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
-> 
-> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Changes in v2:
->   * Major refactor: replaced disable_qmp() with set_qmp_monitor()
->     that allow to disable the qmp monitor likewise, but also one can
->     re-enable it (set_qmp_monitor(disabled=False)).
->   * The logic to enabled/disable the monitor is back to
->     _base_args(). [ccarrara, ehabkost]
-> ---
->  scripts/qemu.py | 72 ++++++++++++++++++++++++++++++++-----------------
->  1 file changed, 48 insertions(+), 24 deletions(-)
-> 
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index 6e3b0e6771..54fe0e65d2 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -115,6 +115,7 @@ class QEMUMachine(object):
->          self._events = []
->          self._iolog = None
->          self._socket_scm_helper = socket_scm_helper
-> +        self._with_qmp = True   # Enable QMP monitor by default.
->          self._qmp = None
->          self._qemu_full_args = None
->          self._test_dir = test_dir
-> @@ -229,15 +230,7 @@ class QEMUMachine(object):
->                  self._iolog = iolog.read()
->  
->      def _base_args(self):
-> -        if isinstance(self._monitor_address, tuple):
-> -            moncdev = "socket,id=mon,host=%s,port=%s" % (
-> -                self._monitor_address[0],
-> -                self._monitor_address[1])
-> -        else:
-> -            moncdev = 'socket,id=mon,path=%s' % self._vm_monitor
-> -        args = ['-chardev', moncdev,
-> -                '-mon', 'chardev=mon,mode=control',
-> -                '-display', 'none', '-vga', 'none']
-> +        args = ['-display', 'none', '-vga', 'none']
->          if self._machine is not None:
->              args.extend(['-machine', self._machine])
->          if self._console_device_type is not None:
-> @@ -247,23 +240,33 @@ class QEMUMachine(object):
->                         self._console_address)
->              device = '%s,chardev=console' % self._console_device_type
->              args.extend(['-chardev', chardev, '-device', device])
-> +        if self._with_qmp:
-> +            if isinstance(self._monitor_address, tuple):
-> +                moncdev = "socket,id=mon,host=%s,port=%s" % (
-> +                    self._monitor_address[0],
-> +                    self._monitor_address[1])
-> +            else:
-> +                moncdev = 'socket,id=mon,path=%s' % self._vm_monitor
-> +            args.extend(['-chardev', moncdev, '-mon', 'chardev=mon,mode=control'])
-> +
->          return args
->  
->      def _pre_launch(self):
->          self._temp_dir = tempfile.mkdtemp(dir=self._test_dir)
-> -        if self._monitor_address is not None:
-> -            self._vm_monitor = self._monitor_address
-> -        else:
-> -            self._vm_monitor = os.path.join(self._temp_dir,
-> -                                            self._name + "-monitor.sock")
->          self._qemu_log_path = os.path.join(self._temp_dir, self._name + ".log")
->          self._qemu_log_file = open(self._qemu_log_path, 'wb')
->  
-> -        self._qmp = qmp.qmp.QEMUMonitorProtocol(self._vm_monitor,
-> -                                                server=True)
-> -
-> +        if self._with_qmp:
-> +            if self._monitor_address is not None:
-> +                self._vm_monitor = self._monitor_address
-> +            else:
-> +                self._vm_monitor = os.path.join(self._temp_dir,
-> +                                            self._name + "-monitor.sock")
-> +            self._qmp = qmp.qmp.QEMUMonitorProtocol(self._vm_monitor,
-> +                                                    server=True)
->      def _post_launch(self):
-> -        self._qmp.accept()
-> +        if self._qmp:
-> +            self._qmp.accept()
->  
->      def _post_shutdown(self):
->          if self._qemu_log_file is not None:
-> @@ -325,7 +328,8 @@ class QEMUMachine(object):
->          Wait for the VM to power off
->          """
->          self._popen.wait()
-> -        self._qmp.close()
-> +        if self._qmp:
+On Fri, Nov 23, 2018 at 10:09:53PM +0000, Felipe Franciosi wrote:
+> Hi Alex,
+>=20
+> I'm also terribly sorry for the delay in responding to this. I'm only now=
+ having the time resources to come back to this topic and figure out a way =
+forward with my proposal. Please see my notes below (quoting only the relev=
+ant sections).
+>=20
+> > On Nov 6, 2018, at 9:32 PM, Alex Williamson <alex.williamson@redhat.com=
+> wrote:
+> >=20
+> > There were mostly two main threads of discussion, the first was Filipe's
+> > discussion of a socket interface making use of the VFIO ABI to
+> > implement a userspace device model.  For a VM use case, QEMU would be
+> > modified to use a socket for the VFIO ABI, including shared memory for
+> > DMA.  Ideally this would be transparent for much of the QEMU vfio code
+> > outside of setup.  Effectively this becomes a userspace implementation
+> > of mdev as this could already be done using mdev, but it requires a
+> > vendor driver to expose the userspace interface and likely a longer
+> > round trip through the kernel and back to userspace. Either path
+> > allows device models in userspace that can be open or proprietary, but
+> > this new proposal eliminates the vendor kernel driver component.  Of
+> > course non-upstream kernel mdev vendor drivers do taint the host
+> > kernel, so they at least leave a breadcrumb.
+>=20
+> Spot on. This can be done today via mdev, but it would unnecessarily invo=
+lve the kernel in the setup of devices. Also, since vfio is the only existi=
+ng bus driver for mdev, it would make little sense to implement an mdev "ph=
+ysical" driver (which wouldn't have a physical backing device) just to talk=
+ a vfio-like abi back to userspace.
+>=20
+> This "vfio-user" proposal is a perfect fit for Qemu. I think the correct =
+design is to slightly rearchitect the vfio implementation in Qemu to allow =
+for userspace backends through unix sockets, very much like vhost-user does=
+ it for virtio devices today.
+>=20
+> As a matter of fact, with something like this in place, I think the Qemu =
+code could potentially be simplified by moving some of the existing vhost-u=
+ser offloading code underneath it.
+>=20
+> > I believe Filipe
+> > mentioned a conversation after the BoF with Alex Graf who had a related
+> > concern about using the socket approach to use this as a non-GPL
+> > backdoor for device models in QEMU and a suggested approach was a GPL
+> > handshake via the socket interface.
+>=20
+> Not exactly. The GPL-violating concerns came from Paolo and Stefan (cc'd)=
+=2E Alex Graf (cc'd) came up with a solution for the concern which involves=
+ adding a copyrighted "poem" to the protocol handshake. Qemu would then gra=
+nt the copyright for GPL applications, hence limiting who can use the proto=
+col.
+>=20
+> Vendors can obviously bypass this by using a GPL proxy application that t=
+alks to Qemu, but then uses a separate mechanism (possibly another unix soc=
+ket) to talk to other non-GPL applications. Vendors which distribute Qemu c=
+an possibly also bypass this by modifying the protocol not to include the c=
+opyrighted messages. Using either legal loophole approach, however, can lea=
+d to a lot of public point and shame.
+>=20
+> The point I would like to discuss more widely (before going forwards with=
+ code) is whether vendors can actually make use of a GPL-only protocol. I u=
+nderstand the community desire of gathering efforts into GPL software, Qemu=
+ code and Virtio. A non-GPL implementation means that maybe some vendors ca=
+nnot use this.
+>=20
+> I envision this protocol being used by userspace applications which _need=
+_ to emulate a device outside Qemu for performance reasons, not license rea=
+sons (eg. a separate process can efficiently poll VQs from multiple VMs fro=
+m a single core). Applications that already do that today, albeit open-sour=
+ce, are not GPL (eg. OVS, DPDK, SPDK).
+>=20
+> This is why I'd like to hear more from Paolo and Stefan on why making thi=
+s non-GPL is so bad. It is already possible today (via mdev), and similar a=
+pproaches already exist for a large number of device implementations via vh=
+ost-user. Additionally, I would also like to hear from willing vendors that=
+ feel they could _only_ benefit from this if it does not enforce GPL.
+>=20
+> Finally, I want to clarify I am not opposing making this GPL-only. I just=
+ want to make sure the effort is justifiable (ie. there is reason for this =
+to enforce GPL peer applications given the existing vhost-user and mdev alt=
+ernatives) and not in vain (ie. there are GPL use cases for this out there).
 
-Isn't the self._with_qmp attribute that should be used here? I think
-it's important to standardize the checks for qmp availability in
-`with_qmp` attribute and use the `qmp` only for qmp access itself. There
-are other places that uses qmp to this kind of check too.
+Device emulation is the core of what GPL QEMU does.  Mechanisms for
+out-of-tree device emulation get rejected because they are likely to be
+misused by parties who do not wish to contribute to QEMU.
 
-> +            self._qmp.close()
->          self._load_io_log()
->          self._post_shutdown()
->  
-> @@ -334,11 +338,14 @@ class QEMUMachine(object):
->          Terminate the VM and clean up
->          """
->          if self.is_running():
-> -            try:
-> -                self._qmp.cmd('quit')
-> -                self._qmp.close()
-> -            except:
-> -                self._popen.kill()
-> +            if self._qmp:
-> +                try:
-> +                    self._qmp.cmd('quit')
-> +                    self._qmp.close()
-> +                except:
-> +                    self._popen.kill()
-> +            else:
-> +                self._popen.terminate()
->              self._popen.wait()
->  
->          self._load_io_log()
-> @@ -355,6 +362,23 @@ class QEMUMachine(object):
->  
->          self._launched = False
->  
-> +    def set_qmp_monitor(self, disabled=False, monitor_address=None):
+That would result in the QEMU community maintaining infrastructure for
+third parties who ship code of questionable quality and profit from it.
+That's not healthy for the QEMU community and there's no incentive to
+allow it.
 
-Where is this new method being used?
+A bit more about specifics you mentioned:
 
-> +        """
-> +        Set the QMP monitor.
-> +
-> +        @param disabled: if True, qmp monitor options will be removed from the
-> +                         base arguments of the resulting QEMU command line.
-> +        @param monitor_address: address for the QMP monitor.
-> +        @note: call this function before launch().
-> +        """
-> +        if disabled:
-> +            self._with_qmp = False
-> +            self._qmp = None
-> +        else:
-> +            self._with_qmp = True
-> +            if monitor_address:
-> +                self._monitor_address = monitor_address
-> +
->      def qmp(self, cmd, conv_keys=True, **args):
->          """
->          Invoke a QMP command and return the response dict
-> -- 
-> 2.19.1
-> 
+vhost-user is an exception for vhost devices.  They are based on the
+open VIRTIO specification.  QEMU has in-tree implementations of these
+devices so users can fall back to them if they need to request support
+(otherwise it's impossible to support users with third-party devices).
 
-It would be nice see less scattered checks for qmp availability along
-the code. 
+Generic out-of-tree PCI device emulation is way too big a loophole.  The
+QEMU community cannot support users who run arbitrary third-party PCI
+devices.
 
-Thanks.
--- 
-Caio Carrara
-Software Engineer, Virt Team - Red Hat
-ccarrara@redhat.com
+The fact that there are ways to get around this by writing software mdev
+devices doesn't mean it makes sense for QEMU to open a loophole itself.
+
+Stefan
+
+--Rn7IEEq3VEzCw+ji
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJb++4zAAoJEJykq7OBq3PIx20IAJ1Rv0vzVIhoklHubQ5nhSdU
+benlHGq+XPHFyJovNgzIS/QIebkleGgpKNMuLWiOmHMpwxaW75JF+D0qvAVAMCJ0
+1bovuQMfcehdoHrYZE6C2ov9ydpiq+Mff/pdnvuTrf38mH6tQw9gkhRf7qn6Umzh
+RX29ZRsqfzb1Fx61vg5SqJGbRsI36VC+ndd9eBanEQ2Jrw6g2Fin+ivSX3dE2Q2E
+z/40yltJbTY6sqfioy+tzafCLbb+ioJ2/l96/3QNLUxJPPiBt1eg2FnvH+mu0yLy
+/BWaDRVd/Nvl/HfxAqyCdyX0bovFYuSKWKXZYQ9Y27Tbp3XunqxzeoyYAcnKmCA=
+=Bsfv
+-----END PGP SIGNATURE-----
+
+--Rn7IEEq3VEzCw+ji--
