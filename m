@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gREWG-0000CA-OY
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:53:37 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gREZO-0000yL-Nw
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:56:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gREWB-00029x-N9
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:53:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37336)
+	(envelope-from <dgilbert@redhat.com>) id 1gREZK-00043a-ME
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:56:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38692)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gREAt-0000fv-9T
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:31:31 -0500
-Date: Mon, 26 Nov 2018 11:31:25 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181126113125.30275735@redhat.com>
-In-Reply-To: <20181123111017-mutt-send-email-mst@kernel.org>
-References: <1542882574-109418-1-git-send-email-imammedo@redhat.com>
-	<20181123111017-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gREZK-000424-Gl
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:56:46 -0500
+Date: Mon, 26 Nov 2018 10:56:22 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181126105622.GB2547@work-vm>
+References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
+	<20181122072028.22819-3-xiaoguangrong@tencent.com>
+	<20181123110239.GC2373@work-vm>
+	<e60f648f-d475-a88b-b0c3-300f18a7d36d@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] acpi: RSDP: fix checksum calculations
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e60f648f-d475-a88b-b0c3-300f18a7d36d@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] util: introduce threaded workqueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, sameo@linux.intel.com, drjones@redhat.com, peter.maydell@linaro.org
+To: Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Fri, 23 Nov 2018 11:11:50 -0500
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+* Xiao Guangrong (guangrong.xiao@gmail.com) wrote:
+>=20
+>=20
+> On 11/23/18 7:02 PM, Dr. David Alan Gilbert wrote:
+>=20
+> > > +#include "qemu/osdep.h"
+> > > +#include "qemu/bitmap.h"
+> > > +#include "qemu/threaded-workqueue.h"
+> > > +
+> > > +#define SMP_CACHE_BYTES 64
+> >=20
+> > That's architecture dependent isn't it?
+> >=20
+>=20
+> Yes, it's arch dependent indeed.
+>=20
+> I just used 64 for simplification and i think it is <=3D 64 on most CPU=
+ arch-es
+> so that can work.
+>=20
+> Should i introduce statically defined CACHE LINE SIZE for all arch-es? =
+:(
 
-> On Thu, Nov 22, 2018 at 11:29:32AM +0100, Igor Mammedov wrote:
-> >  * arm/virt is broken but it looks like linux doesn't care, lets fix it anyways
-> >  * x86, got lucky since we didn't use extended fields,
-> >    fix it so that it will calculate checksum using correct length
-> >    so that it would be easier to unify arm/x86 into one impl.
-> >   
-> 
-> I'd say patch 2 should go into this release.
-> What about patch 1? It's cosmetic and it isn't the best we can do.
-> 
-> Let me know whether you agree.
-I'd say they are both 'cosmetic' as they don't cause guest
-failure nor even warning (linux doesn't care (so far) and
-we don't have windows for ARM to verify extended checksum). 
-So we don't have to delay release for both of them.
+I think it depends why you need it; but we shouldn't have a constant
+that is wrong, and we shouldn't define something architecture dependent
+in here.
 
-I assumed that Samuel, would include patches in his RSDP
-refactoring series and we would merge them as whole later on.
+> > > +   /*
+> > > +     * the bit in these two bitmaps indicates the index of the =EF=
+=BC=A0requests
+> > > +     * respectively. If it's the same, the corresponding request i=
+s free
+> > > +     * and owned by the user, i.e, where the user fills a request.=
+ Otherwise,
+> > > +     * it is valid and owned by the thread, i.e, where the thread =
+fetches
+> > > +     * the request and write the result.
+> > > +     */
+> > > +
+> > > +    /* after the user fills the request, the bit is flipped. */
+> > > +    uint64_t request_fill_bitmap QEMU_ALIGNED(SMP_CACHE_BYTES);
+> > > +    /* after handles the request, the thread flips the bit. */
+> > > +    uint64_t request_done_bitmap QEMU_ALIGNED(SMP_CACHE_BYTES);
+> >=20
+> > Patchew complained about some type mismatches; I think those are beca=
+use
+> > you're using the bitmap_* functions on these; those functions always
+> > operate on 'long' not on uint64_t - and on some platforms they're
+> > unfortunately not the same.
+>=20
+> I guess you were taking about this error:
+> ERROR: externs should be avoided in .c files
+> #233: FILE: util/threaded-workqueue.c:65:
+> +    uint64_t request_fill_bitmap QEMU_ALIGNED(SMP_CACHE_BYTES);
+>=20
+> The complained thing is "QEMU_ALIGNED(SMP_CACHE_BYTES)" as it gone
+> when the aligned thing is removed...
+>=20
+> The issue you pointed out can be avoid by using type-casting, like:
+> bitmap_xor(..., (void *)&thread->request_fill_bitmap)
+> cannot we?
 
+I thought the error was just due to long vs uint64_t ratehr than the
+qemu_aligned.  I don't think it's just a casting problem, since I don't
+think the long's are always 64bit.
 
-> 
-> > Igor Mammedov (2):
-> >   pc: acpi: use correct RSDT length for checksum
-> >   arm/virt: acpi: fix incorrect checksums in RSDP
-> > 
-> >  hw/arm/virt-acpi-build.c | 7 ++++++-
-> >  hw/i386/acpi-build.c     | 2 +-
-> >  2 files changed, 7 insertions(+), 2 deletions(-)
-> > 
-> > -- 
-> > 2.7.4  
+Dave
+
+> Thanks!
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
