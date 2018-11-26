@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gRGUG-0003tb-ET
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:59:41 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gRGZu-0007Z9-46
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1gRGUF-0004jg-DF
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:59:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42650)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1gRGUF-0004j0-51
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 07:59:39 -0500
-Date: Mon, 26 Nov 2018 12:59:31 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20181126125931.GH15869@stefanha-x1.localdomain>
-References: <20181106143213.536d3311@w520.home>
-	<0857657C-BEFF-4B65-A8A0-004CCE361FDB@nutanix.com>
+	(envelope-from <yuval.shaia@oracle.com>) id 1gRGZn-0001A8-Cs
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:05:30 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:41690)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gRGZn-00019V-1h
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:05:23 -0500
+Date: Mon, 26 Nov 2018 15:05:08 +0200
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Message-ID: <20181126130507.GA9218@lap1>
+References: <20181122121402.13764-1-yuval.shaia@oracle.com>
+	<20181122121402.13764-25-yuval.shaia@oracle.com>
+	<8b89bfaf-be29-e043-32fa-9615fb4ea0f7@gmail.com>
+	<25d71e93-c1ab-01c3-8f6c-145606d11a84@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Rn7IEEq3VEzCw+ji"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <0857657C-BEFF-4B65-A8A0-004CCE361FDB@nutanix.com>
-Subject: Re: [Qemu-devel] KVM Forum VFIO BoF summary
+In-Reply-To: <25d71e93-c1ab-01c3-8f6c-145606d11a84@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 24/24] docs: Update pvrdma device
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,134 +32,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Jiang, Jerry (SW)" <Jerry.Jiang@amd.com>, "ziye.yang@intel.com" <ziye.yang@intel.com>, Changpeng Liu <changpeng.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>, "Xue, Ken" <Ken.Xue@amd.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>, James R Harris <james.r.harris@intel.com>, "benjamin.walker@intel.com" <benjamin.walker@intel.com>, Alexander Graf <agraf@suse.de>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com, yuval.shaia@oracle.com
 
-
---Rn7IEEq3VEzCw+ji
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Nov 23, 2018 at 10:09:53PM +0000, Felipe Franciosi wrote:
-> Hi Alex,
+On Mon, Nov 26, 2018 at 12:34:41PM +0200, Marcel Apfelbaum wrote:
+> Re-sending the comments, some of the recipients didn't get it,
 >=20
-> I'm also terribly sorry for the delay in responding to this. I'm only now=
- having the time resources to come back to this topic and figure out a way =
-forward with my proposal. Please see my notes below (quoting only the relev=
-ant sections).
+> Thanks,
+> Marcel
 >=20
-> > On Nov 6, 2018, at 9:32 PM, Alex Williamson <alex.williamson@redhat.com=
-> wrote:
+> On 11/25/18 9:51 AM, Marcel Apfelbaum wrote:
 > >=20
-> > There were mostly two main threads of discussion, the first was Filipe's
-> > discussion of a socket interface making use of the VFIO ABI to
-> > implement a userspace device model.  For a VM use case, QEMU would be
-> > modified to use a socket for the VFIO ABI, including shared memory for
-> > DMA.  Ideally this would be transparent for much of the QEMU vfio code
-> > outside of setup.  Effectively this becomes a userspace implementation
-> > of mdev as this could already be done using mdev, but it requires a
-> > vendor driver to expose the userspace interface and likely a longer
-> > round trip through the kernel and back to userspace. Either path
-> > allows device models in userspace that can be open or proprietary, but
-> > this new proposal eliminates the vendor kernel driver component.  Of
-> > course non-upstream kernel mdev vendor drivers do taint the host
-> > kernel, so they at least leave a breadcrumb.
+> >=20
+> > On 11/22/18 2:14 PM, Yuval Shaia wrote:
+> > > Interface with the device is changed with the addition of support f=
+or
+> > > MAD packets.
+> > > Adjust documentation accordingly.
+> > >=20
+> > > While there fix a minor mistake which may lead to think that there =
+is a
+> > > relation between using RXE on host and the compatibility with bare-=
+metal
+> > > peers.
+> > >=20
+> > > Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > > ---
+> > > =A0 docs/pvrdma.txt | 103 +++++++++++++++++++++++++++++++++++++++--=
+-------
+> > > =A0 1 file changed, 84 insertions(+), 19 deletions(-)
+> > >=20
+> > > diff --git a/docs/pvrdma.txt b/docs/pvrdma.txt
+> > > index 5599318159..f82b2a69d2 100644
+> > > --- a/docs/pvrdma.txt
+> > > +++ b/docs/pvrdma.txt
+> > > @@ -9,8 +9,9 @@ It works with its Linux Kernel driver AS IS, no nee=
+d
+> > > for any special guest
+> > > =A0 modifications.
+> > > =A0 =A0 While it complies with the VMware device, it can also
+> > > communicate with bare
+> > > -metal RDMA-enabled machines and does not require an RDMA HCA in th=
+e
+> > > host, it
+> > > -can work with Soft-RoCE (rxe).
+> > > +metal RDMA-enabled machines as peers.
+> > > +
+> > > +It does not require an RDMA HCA in the host, it can work with
+> > > Soft-RoCE (rxe).
+> > > =A0 =A0 It does not require the whole guest RAM to be pinned allowi=
+ng memory
+> > > =A0 over-commit and, even if not implemented yet, migration support
+> > > will be
+> > > @@ -78,29 +79,93 @@ the required RDMA libraries.
+> > > =A0 =A0 3. Usage
+> > > =A0 =3D=3D=3D=3D=3D=3D=3D=3D
+> > > +
+> > > +
+> > > +3.1 VM Memory settings
+> > > +=3D=3D=3D=3D=3D=3D+++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > =A0 Currently the device is working only with memory backed RAM
+> > > =A0 and it must be mark as "shared":
+> > > =A0=A0=A0=A0 -m 1G \
+> > > =A0=A0=A0=A0 -object memory-backend-ram,id=3Dmb1,size=3D1G,share \
+> > > =A0=A0=A0=A0 -numa node,memdev=3Dmb1 \
+> > > =A0 -The pvrdma device is composed of two functions:
+> > > - - Function 0 is a vmxnet Ethernet Device which is redundant in Gu=
+est
+> > > -=A0=A0 but is required to pass the ibdevice GID using its MAC.
+> > > -=A0=A0 Examples:
+> > > -=A0=A0=A0=A0 For an rxe backend using eth0 interface it will use i=
+ts mac:
+> > > -=A0=A0=A0=A0=A0=A0 -device vmxnet3,addr=3D<slot>.0,multifunction=3D=
+on,mac=3D<eth0 MAC>
+> > > -=A0=A0=A0=A0 For an SRIOV VF, we take the Ethernet Interface expos=
+ed by it:
+> > > -=A0=A0=A0=A0=A0=A0 -device vmxnet3,multifunction=3Don,mac=3D<RoCE =
+eth MAC>
+> > > - - Function 1 is the actual device:
+> > > -=A0=A0=A0=A0=A0=A0 -device pvrdma,addr=3D<slot>.1,backend-dev=3D<i=
+bdevice>,backend-gid-idx=3D<gid>,backend-port=3D<port>
+> > > -=A0=A0 where the ibdevice can be rxe or RDMA VF (e.g. mlx5_4)
+> > > - Note: Pay special attention that the GID at backend-gid-idx
+> > > matches vmxnet's MAC.
+> > > - The rules of conversion are part of the RoCE spec, but since
+> > > manual conversion
+> > > - is not required, spotting problems is not hard:
+> > > -=A0=A0=A0 Example: GID: fe80:0000:0000:0000:7efe:90ff:fecb:743a
+> > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 MAC: 7c:fe:90:cb:74:3a
+> > > -=A0=A0=A0 Note the difference between the first byte of the MAC an=
+d the GID.
+> > > +
+> > > +3.2 MAD Multiplexer
+> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > +MAD Multiplexer is a service that exposes MAD-like interface for V=
+Ms in
+> > > +order to overcome the limitation where only single entity can
+> > > register with
+> > > +MAD layer to send and receive RDMA-CM MAD packets.
+> > > +
+> > > +To build rdmacm-mux run
+> > > +# make rdmacm-mux
+> > > +
+> > > +The application accepts 3 command line arguments and exposes a UNI=
+X
+> > > socket
+> > > +to pass control and data to it.
+> > > +-s unix-socket-path=A0=A0 Path to unix socket to listen on
+> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 (d=
+efault /var/run/rdmacm-mux)
+> > > +-d rdma-device-name=A0=A0 Name of RDMA device to register with
+> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 (d=
+efault rxe0)
+> >=20
+> > I would not default it to rxe0, but request to specify a RDMA interfa=
+ce.
+> > One can think the multiplexer may select the best available device
+> > and finish with an rxe instance instead of a bare-metal one...
+
+Done.
+
+> >=20
+> > > +-p rdma-device-port=A0=A0 Port number of RDMA device to register w=
+ith
+> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 (d=
+efault 1)
+> > > +The final UNIX socket file name is a concatenation of the 3
+> > > arguments so
+> > > +for example for device mlx5_0 on port 2 this
+> > > /var/run/rdmacm-mux-mlx5_0-2
+> > > +will be created.
+> > > +
+> > > +Please refer to contrib/rdmacm-mux for more details.
+> > > +
+> > > +
+> > > +3.3 PCI devices settings
+> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+> > > +RoCE device exposes two functions - an Ethernet and RDMA.
+> > > +To support it, pvrdma device is composed of two PCI functions, an
+> > > Ethernet
+> > > +device of type vmxnet3 on PCI slot 0 and a PVRDMA device on PCI
+> > > slot 1. The
+> > > +Ethernet function can be used for other Ethernet purposes such as =
+IP.
+> >=20
+> > Nice !
+> >=20
+> > > +
+> > > +
+> > > +3.4 Device parameters
+> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > +- netdev: Specifies the Ethernet device on host. For Soft-RoCE
+> > > (rxe) this
+> > > +=A0 would be the Ethernet device used to create it. For any other
+> > > physical
+> > > +=A0 RoCE device this would be the netdev name of the device.
+> >=20
+> > I don't fully understand the above explanation. Can you elaborate
+> > or give an exmaple?
+
+How about this:
+- netdev: Specifies the Ethernet device function name on the host for
+  example enp175s0f0. For Soft-RoCE device (rxe) this would be the Ethern=
+et
+  device used to create it.
+
+> >=20
+> > > +- ibdev: The IB device name on host for example rxe0, mlx5_0 etc.
+> > > +- mad-chardev: The name of the MAD multiplexer char device.
+> > > +- ibport: In case of multi-port device (such as Mellanox's HCA) th=
+is
+> > > +=A0 specify the port to use. If not set 1 will be used.
+> > > +- dev-caps-max-mr-size: The maximum size of MR.
+> > > +- dev-caps-max-qp: Maximum number of QPs.
+> > > +- dev-caps-max-sge: Maximum number of SGE elements in WR.
+> > > +- dev-caps-max-cq: Maximum number of CQs.
+> > > +- dev-caps-max-mr: Maximum number of MRs.
+> > > +- dev-caps-max-pd: Maximum number of PDs.
+> > > +- dev-caps-max-ah: Maximum number of AHs.
+> > > +
+> > > +Notes:
+> > > +- The first 3 parameters are mandatory settings, the rest have the=
+ir
+> > > +=A0 defaults.
+> > > +- The last 8 parameters (the ones that prefixed by dev-caps)
+> > > defines the top
+> > > +=A0 limits but the final values is adjusted by the backend device
+> > > limitations.
+> > > +
+> > > +3.5 Example
+> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > +Define bridge device with vmxnet3 network backend:
+> > > +<interface type=3D'bridge'>
+> > > +=A0 <mac address=3D'56:b4:44:e9:62:dc'/>
+> > > +=A0 <source bridge=3D'bridge1'/>
+> > > +=A0 <model type=3D'vmxnet3'/>
+> > > +=A0 <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0=
+x10'
+> > > function=3D'0x0' multifunction=3D'on'/>
+> > > +</interface>
+> > > +
+> > > +Define pvrdma device:
+> > > +<qemu:commandline>
+> > > +=A0 <qemu:arg value=3D'-object'/>
+> > > +=A0 <qemu:arg value=3D'memory-backend-ram,id=3Dmb1,size=3D1G,share=
+'/>
+> > > +=A0 <qemu:arg value=3D'-numa'/>
+> > > +=A0 <qemu:arg value=3D'node,memdev=3Dmb1'/>
+> > > +=A0 <qemu:arg value=3D'-chardev'/>
+> > > +=A0 <qemu:arg value=3D'socket,path=3D/var/run/rdmacm-mux-rxe0-1,id=
+=3Dmads'/>
+> > > +=A0 <qemu:arg value=3D'-device'/>
+> > > +=A0 <qemu:arg
+> > > value=3D'pvrdma,addr=3D10.1,ibdev=3Drxe0,netdev=3Dbridge0,mad-chard=
+ev=3Dmads'/>
+> > > +</qemu:commandline>
+> >=20
+> > Please be sure to emphasize that the pvrdma works only
+> > if the QEMU is operated by libvirt. The same about the multiplexer.
+
+Added this:
+
+3.3 Service exposed by libvirt daemon
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+The control over the RDMA device's GID table is done by updating the
+device's Ethernet function addresses.
+Usually the first GID entry is determined by the MAC address, the second =
+by
+the first IPv6 address and the third by the IPv4 address. Other entries c=
+an
+be added by adding more IP addresses. The opposite is the same, i.e.
+whenever an address is removed, the corresponding GID entry is removed.
+The process is done by the network and RDMA stacks. Whenever an address i=
+s
+added the ib_core driver is notified and calls the device driver add_gid
+function which in turn update the device.
+To support this in pvrdma device the device hooks into the create_bind an=
+d
+destroy_bind HW commands triggered by pvrdma driver in guest.
+
+Whenever changed is made to the pvrdma port's GID table a special QMP
+messages is sent to be processed by libvirt to update the address of the
+backend Ethernet device.
+
+pvrdma requires that libvirt service will be up.
+
+> >=20
+> > Thanks,
+> > Marcel
+> >=20
+> >=20
 >=20
-> Spot on. This can be done today via mdev, but it would unnecessarily invo=
-lve the kernel in the setup of devices. Also, since vfio is the only existi=
-ng bus driver for mdev, it would make little sense to implement an mdev "ph=
-ysical" driver (which wouldn't have a physical backing device) just to talk=
- a vfio-like abi back to userspace.
->=20
-> This "vfio-user" proposal is a perfect fit for Qemu. I think the correct =
-design is to slightly rearchitect the vfio implementation in Qemu to allow =
-for userspace backends through unix sockets, very much like vhost-user does=
- it for virtio devices today.
->=20
-> As a matter of fact, with something like this in place, I think the Qemu =
-code could potentially be simplified by moving some of the existing vhost-u=
-ser offloading code underneath it.
->=20
-> > I believe Filipe
-> > mentioned a conversation after the BoF with Alex Graf who had a related
-> > concern about using the socket approach to use this as a non-GPL
-> > backdoor for device models in QEMU and a suggested approach was a GPL
-> > handshake via the socket interface.
->=20
-> Not exactly. The GPL-violating concerns came from Paolo and Stefan (cc'd)=
-=2E Alex Graf (cc'd) came up with a solution for the concern which involves=
- adding a copyrighted "poem" to the protocol handshake. Qemu would then gra=
-nt the copyright for GPL applications, hence limiting who can use the proto=
-col.
->=20
-> Vendors can obviously bypass this by using a GPL proxy application that t=
-alks to Qemu, but then uses a separate mechanism (possibly another unix soc=
-ket) to talk to other non-GPL applications. Vendors which distribute Qemu c=
-an possibly also bypass this by modifying the protocol not to include the c=
-opyrighted messages. Using either legal loophole approach, however, can lea=
-d to a lot of public point and shame.
->=20
-> The point I would like to discuss more widely (before going forwards with=
- code) is whether vendors can actually make use of a GPL-only protocol. I u=
-nderstand the community desire of gathering efforts into GPL software, Qemu=
- code and Virtio. A non-GPL implementation means that maybe some vendors ca=
-nnot use this.
->=20
-> I envision this protocol being used by userspace applications which _need=
-_ to emulate a device outside Qemu for performance reasons, not license rea=
-sons (eg. a separate process can efficiently poll VQs from multiple VMs fro=
-m a single core). Applications that already do that today, albeit open-sour=
-ce, are not GPL (eg. OVS, DPDK, SPDK).
->=20
-> This is why I'd like to hear more from Paolo and Stefan on why making thi=
-s non-GPL is so bad. It is already possible today (via mdev), and similar a=
-pproaches already exist for a large number of device implementations via vh=
-ost-user. Additionally, I would also like to hear from willing vendors that=
- feel they could _only_ benefit from this if it does not enforce GPL.
->=20
-> Finally, I want to clarify I am not opposing making this GPL-only. I just=
- want to make sure the effort is justifiable (ie. there is reason for this =
-to enforce GPL peer applications given the existing vhost-user and mdev alt=
-ernatives) and not in vain (ie. there are GPL use cases for this out there).
-
-Device emulation is the core of what GPL QEMU does.  Mechanisms for
-out-of-tree device emulation get rejected because they are likely to be
-misused by parties who do not wish to contribute to QEMU.
-
-That would result in the QEMU community maintaining infrastructure for
-third parties who ship code of questionable quality and profit from it.
-That's not healthy for the QEMU community and there's no incentive to
-allow it.
-
-A bit more about specifics you mentioned:
-
-vhost-user is an exception for vhost devices.  They are based on the
-open VIRTIO specification.  QEMU has in-tree implementations of these
-devices so users can fall back to them if they need to request support
-(otherwise it's impossible to support users with third-party devices).
-
-Generic out-of-tree PCI device emulation is way too big a loophole.  The
-QEMU community cannot support users who run arbitrary third-party PCI
-devices.
-
-The fact that there are ways to get around this by writing software mdev
-devices doesn't mean it makes sense for QEMU to open a loophole itself.
-
-Stefan
-
---Rn7IEEq3VEzCw+ji
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJb++4zAAoJEJykq7OBq3PIx20IAJ1Rv0vzVIhoklHubQ5nhSdU
-benlHGq+XPHFyJovNgzIS/QIebkleGgpKNMuLWiOmHMpwxaW75JF+D0qvAVAMCJ0
-1bovuQMfcehdoHrYZE6C2ov9ydpiq+Mff/pdnvuTrf38mH6tQw9gkhRf7qn6Umzh
-RX29ZRsqfzb1Fx61vg5SqJGbRsI36VC+ndd9eBanEQ2Jrw6g2Fin+ivSX3dE2Q2E
-z/40yltJbTY6sqfioy+tzafCLbb+ioJ2/l96/3QNLUxJPPiBt1eg2FnvH+mu0yLy
-/BWaDRVd/Nvl/HfxAqyCdyX0bovFYuSKWKXZYQ9Y27Tbp3XunqxzeoyYAcnKmCA=
-=Bsfv
------END PGP SIGNATURE-----
-
---Rn7IEEq3VEzCw+ji--
