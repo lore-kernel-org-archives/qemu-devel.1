@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gRMkN-00081D-Uh
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:40:44 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gRMkP-00081Q-4K
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:40:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gRMkN-0004IE-31
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:40:43 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39727)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gRMkO-0004Ng-Ba
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:40:45 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:38096)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gRMkM-0004Hv-TT
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:40:43 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id t27so12265244wra.6
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 11:40:42 -0800 (PST)
+	id 1gRMkO-0004IV-5m
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 14:40:44 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id v13so16769491wrw.5
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 11:40:44 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
+	s139sm2412468wmd.3.2018.11.26.11.40.41 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 26 Nov 2018 11:40:41 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 26 Nov 2018 20:40:23 +0100
-Message-Id: <1543261235-2834-4-git-send-email-pbonzini@redhat.com>
+Date: Mon, 26 Nov 2018 20:40:24 +0100
+Message-Id: <1543261235-2834-5-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543261235-2834-1-git-send-email-pbonzini@redhat.com>
 References: <1543261235-2834-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 03/15] lsi: Reselection needed to remove pending
- commands from queue
+Subject: [Qemu-devel] [PULL 04/15] migration: savevm: consult migration
+ blockers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,122 +33,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: George Kennedy <george.kennedy@oracle.com>
 
-From: George Kennedy <george.kennedy@oracle.com>
+There is really no difference between live migration and savevm, except
+that savevm does not require bdrv_invalidate_cache to be implemented
+by all disks.  However, it is unlikely that savevm is used with anything
+except qcow2 disks, so the penalty is small and worth the improvement
+in catching bad usage of savevm.
 
-Under heavy IO (e.g. fio) the queue is not checked frequently enough for
-pending commands. As a result some pending commands are timed out by the
-linux sym53c8xx driver, which sends SCSI Abort messages for the timed out
-commands. The SCSI Abort messages result in linux errors, which show up
-on the console and in /var/log/messages.
+Only one place was taking care of savevm when adding a migration blocker,
+and it can be removed.
 
-e.g.
-sd 0:0:3:0: [sdd] tag#33 ABORT operation started
-scsi target0:0:3: control msgout:
-80 20 47 d
-sd 0:0:3:0: ABORT operation complete.
-scsi target0:0:4: message d sent on bad reselection
-
-Now following a WAIT DISCONNECT Script instruction, and if there is no
-current command, check for a pending command on the queue and if one
-exists call lsi_reselect().
-
-Signed-off-by: George Kennedy <george.kennedy@oracle.com>
-Message-Id: <1541776692-12271-1-git-send-email-george.kennedy@oracle.com>
-[For safety, add a s->current check in lsi_update_irq - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/lsi53c895a.c | 48 ++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 36 insertions(+), 12 deletions(-)
+ migration/savevm.c | 4 ++++
+ target/i386/kvm.c  | 3 ---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index 3f207f6..52a3893 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -298,6 +298,18 @@ static inline int lsi_irq_on_rsl(LSIState *s)
-     return (s->sien0 & LSI_SIST0_RSL) && (s->scid & LSI_SCID_RRE);
- }
+diff --git a/migration/savevm.c b/migration/savevm.c
+index ef707b8..1c49776 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2455,6 +2455,10 @@ int save_snapshot(const char *name, Error **errp)
+     struct tm tm;
+     AioContext *aio_context;
  
-+static lsi_request *get_pending_req(LSIState *s)
-+{
-+    lsi_request *p;
-+
-+    QTAILQ_FOREACH(p, &s->queue, next) {
-+        if (p->pending) {
-+            return p;
-+        }
++    if (migration_is_blocked(errp)) {
++        return false;
 +    }
-+    return NULL;
-+}
 +
- static void lsi_soft_reset(LSIState *s)
- {
-     trace_lsi_reset();
-@@ -446,7 +458,6 @@ static void lsi_update_irq(LSIState *s)
- {
-     int level;
-     static int last_level;
--    lsi_request *p;
- 
-     /* It's unclear whether the DIP/SIP bits should be cleared when the
-        Interrupt Status Registers are cleared or when istat0 is read.
-@@ -476,13 +487,13 @@ static void lsi_update_irq(LSIState *s)
-     }
-     lsi_set_irq(s, level);
- 
--    if (!level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
-+    if (!s->current && !level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
-+        lsi_request *p;
-+
-         trace_lsi_update_irq_disconnected();
--        QTAILQ_FOREACH(p, &s->queue, next) {
--            if (p->pending) {
--                lsi_reselect(s, p);
--                break;
--            }
-+        p = get_pending_req(s);
-+        if (p) {
-+            lsi_reselect(s, p);
+     if (!replay_can_snapshot()) {
+         error_setg(errp, "Record/replay does not allow making snapshot "
+                    "right now. Try once more later.");
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 27dcca5..77e44b6 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1265,7 +1265,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     if (!env->user_tsc_khz) {
+         if ((env->features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC) &&
+             invtsc_mig_blocker == NULL) {
+-            /* for migration */
+             error_setg(&invtsc_mig_blocker,
+                        "State blocked by non-migratable CPU device"
+                        " (invtsc flag)");
+@@ -1275,8 +1274,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 error_free(invtsc_mig_blocker);
+                 return r;
+             }
+-            /* for savevm */
+-            vmstate_x86_cpu.unmigratable = 1;
          }
      }
- }
-@@ -1065,11 +1076,12 @@ static void lsi_wait_reselect(LSIState *s)
  
-     trace_lsi_wait_reselect();
- 
--    QTAILQ_FOREACH(p, &s->queue, next) {
--        if (p->pending) {
--            lsi_reselect(s, p);
--            break;
--        }
-+    if (s->current) {
-+        return;
-+    }
-+    p = get_pending_req(s);
-+    if (p) {
-+        lsi_reselect(s, p);
-     }
-     if (s->current == NULL) {
-         s->waiting = 1;
-@@ -1259,6 +1271,18 @@ again:
-             case 1: /* Disconnect */
-                 trace_lsi_execute_script_io_disconnect();
-                 s->scntl1 &= ~LSI_SCNTL1_CON;
-+                /* FIXME: this is not entirely correct; the target need not ask
-+                 * for reselection until it has to send data, while here we force a
-+                 * reselection as soon as the bus is free.  The correct flow would
-+                 * reselect before lsi_transfer_data and disconnect as soon as
-+                 * DMA ends.
-+                 */
-+                if (!s->current) {
-+                    lsi_request *p = get_pending_req(s);
-+                    if (p) {
-+                        lsi_reselect(s, p);
-+                    }
-+                }
-                 break;
-             case 2: /* Wait Reselect */
-                 if (!lsi_irq_on_rsl(s)) {
 -- 
 1.8.3.1
