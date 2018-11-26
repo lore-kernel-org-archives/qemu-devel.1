@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRH8i-0000aF-ID
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:41:29 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gRH9n-000198-Aa
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRH8h-0008Bh-RF
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:41:28 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38247)
+	(envelope-from <mlureau@redhat.com>) id 1gRH9k-00018J-2N
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:35 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:45715)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gRH8h-0008BB-Dz
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:41:27 -0500
-Received: by mail-oi1-x244.google.com with SMTP id a77so15808398oii.5
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 05:41:27 -0800 (PST)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gRH9j-00015n-Qk
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:32 -0500
+Received: by mail-qk1-f195.google.com with SMTP id y78so1486189qka.12
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 05:42:30 -0800 (PST)
 MIME-Version: 1.0
-References: <20181122180143.14237-1-eric.auger@redhat.com>
-In-Reply-To: <20181122180143.14237-1-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Nov 2018 13:41:15 +0000
-Message-ID: <CAFEAcA-dFhqCOdp=FHVO1+2kZXS9-jPHcRXfRLpiaYs1jEExLg@mail.gmail.com>
+References: <cover.1541507990.git.artem.k.pisarenko@gmail.com>
+	<ac67ff2d27dd51a0075d5d634355c9e4f7bb53de.1541507990.git.artem.k.pisarenko@gmail.com>
+In-Reply-To: <ac67ff2d27dd51a0075d5d634355c9e4f7bb53de.1541507990.git.artem.k.pisarenko@gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 26 Nov 2018 17:42:18 +0400
+Message-ID: <CAMxuvawmnJ_7QUkLXV8tSAXmPjFyu_m31JZRWOfTMUiebegAFw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.1] MAINTAINERS: Add an ARM SMMU
- section
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] tests/test-char: add muxed chardev
+ testing for open/close
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +30,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Thomas Huth <thuth@redhat.com>
+To: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>
 
-On Thu, 22 Nov 2018 at 18:01, Eric Auger <eric.auger@redhat.com> wrote:
+On Tue, Nov 6, 2018 at 4:41 PM Artem Pisarenko
+<artem.k.pisarenko@gmail.com> wrote:
 >
-> Add a new ARM SMMU section and set Eric Auger as the maintainer
-> for ARM SMMU emulation sources.
+> Validate that frontend callbacks for CHR_EVENT_OPENED/CHR_EVENT_CLOSED
+> events are being issued when expected and in strictly pairing order.
 >
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 > ---
->  MAINTAINERS | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  tests/test-char.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++--
+>  1 file changed, 78 insertions(+), 2 deletions(-)
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 1032406c56..3cac9f0a0c 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -151,6 +151,13 @@ F: disas/arm.c
->  F: disas/arm-a64.cc
->  F: disas/libvixl/
+> diff --git a/tests/test-char.c b/tests/test-char.c
+> index 831e37f..657cb4c 100644
+> --- a/tests/test-char.c
+> +++ b/tests/test-char.c
+> @@ -16,6 +16,9 @@ static bool quit;
 >
-> +ARM SMMU
-> +M: Eric Auger <eric.auger@redhat.com>
-> +L: qemu-arm@nongnu.org
-> +S: Maintained
-> +F: hw/arm/smmu*
-> +F: include/hw/arm/smmu*
+>  typedef struct FeHandler {
+>      int read_count;
+> +    bool is_open;
+> +    int openclose_count;
+> +    bool openclose_mismatch;
+>      int last_event;
+>      char read_buf[128];
+>  } FeHandler;
+> @@ -49,10 +52,24 @@ static void fe_read(void *opaque, const uint8_t *buf,=
+ int size)
+>  static void fe_event(void *opaque, int event)
+>  {
+>      FeHandler *h =3D opaque;
+> +    bool new_open_state;
+>
+>      h->last_event =3D event;
+> -    if (event !=3D CHR_EVENT_BREAK) {
+> +    switch (event) {
+> +    case CHR_EVENT_BREAK:
+> +        break;
+> +    case CHR_EVENT_OPENED:
+> +    case CHR_EVENT_CLOSED:
+> +        h->openclose_count++;
+> +        new_open_state =3D (event =3D=3D CHR_EVENT_OPENED);
+> +        if (h->is_open =3D=3D new_open_state) {
+> +            h->openclose_mismatch =3D true;
+> +        }
+> +        h->is_open =3D new_open_state;
+> +        /* no break */
+> +    default:
+>          quit =3D true;
+> +        break;
+>      }
+>  }
+>
+> @@ -161,7 +178,7 @@ static void char_mux_test(void)
+>      QemuOpts *opts;
+>      Chardev *chr, *base;
+>      char *data;
+> -    FeHandler h1 =3D { 0, }, h2 =3D { 0, };
+> +    FeHandler h1 =3D { 0, false, 0, false, }, h2 =3D { 0, false, 0, fals=
+e, };
+>      CharBackend chr_be1, chr_be2;
+>
+>      opts =3D qemu_opts_create(qemu_find_opts("chardev"), "mux-label",
+> @@ -233,6 +250,65 @@ static void char_mux_test(void)
+>      g_assert_cmpint(h1.last_event, =3D=3D, CHR_EVENT_BREAK);
+>      g_assert_cmpint(h2.last_event, =3D=3D, CHR_EVENT_MUX_OUT);
+>
+> +    /* open/close state and corresponding events */
+> +    g_assert_true(qemu_chr_fe_backend_open(&chr_be1));
+> +    g_assert_true(qemu_chr_fe_backend_open(&chr_be2));
+> +    g_assert_true(h1.is_open);
+> +    g_assert_false(h1.openclose_mismatch);
+> +    g_assert_true(h2.is_open);
+> +    g_assert_false(h2.openclose_mismatch);
 > +
->  CRIS
->  M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
->  S: Maintained
-
-Applied to target-arm.next, thanks.
-
--- PMM
+> +    h1.openclose_count =3D h2.openclose_count =3D 0;
+> +
+> +    qemu_chr_fe_set_handlers(&chr_be1, NULL, NULL, NULL, NULL,
+> +                             NULL, NULL, false);
+> +    qemu_chr_fe_set_handlers(&chr_be2, NULL, NULL, NULL, NULL,
+> +                             NULL, NULL, false);
+> +    g_assert_cmpint(h1.openclose_count, =3D=3D, 0);
+> +    g_assert_cmpint(h2.openclose_count, =3D=3D, 0);
+> +
+> +    h1.is_open =3D h2.is_open =3D false;
+> +    qemu_chr_fe_set_handlers(&chr_be1,
+> +                             NULL,
+> +                             NULL,
+> +                             fe_event,
+> +                             NULL,
+> +                             &h1,
+> +                             NULL, false);
+> +    qemu_chr_fe_set_handlers(&chr_be2,
+> +                             NULL,
+> +                             NULL,
+> +                             fe_event,
+> +                             NULL,
+> +                             &h2,
+> +                             NULL, false);
+> +    g_assert_cmpint(h1.openclose_count, =3D=3D, 1);
+> +    g_assert_false(h1.openclose_mismatch);
+> +    g_assert_cmpint(h2.openclose_count, =3D=3D, 1);
+> +    g_assert_false(h2.openclose_mismatch);
+> +
+> +    qemu_chr_be_event(base, CHR_EVENT_CLOSED);
+> +    qemu_chr_be_event(base, CHR_EVENT_OPENED);
+> +    g_assert_cmpint(h1.openclose_count, =3D=3D, 3);
+> +    g_assert_false(h1.openclose_mismatch);
+> +    g_assert_cmpint(h2.openclose_count, =3D=3D, 3);
+> +    g_assert_false(h2.openclose_mismatch);
+> +
+> +    qemu_chr_fe_set_handlers(&chr_be2,
+> +                             fe_can_read,
+> +                             fe_read,
+> +                             fe_event,
+> +                             NULL,
+> +                             &h2,
+> +                             NULL, false);
+> +    qemu_chr_fe_set_handlers(&chr_be1,
+> +                             fe_can_read,
+> +                             fe_read,
+> +                             fe_event,
+> +                             NULL,
+> +                             &h1,
+> +                             NULL, false);
+> +
+>      /* remove first handler */
+>      qemu_chr_fe_set_handlers(&chr_be1, NULL, NULL, NULL, NULL,
+>                               NULL, NULL, true);
+> --
+> 2.7.4
+>
