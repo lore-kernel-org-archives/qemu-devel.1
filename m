@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gRK6d-0005hQ-6F
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 11:51:36 -0500
+	(envelope-from <philmd@redhat.com>) id 1gRKAO-000721-FR
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 11:55:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gRK6Z-000257-6r
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 11:51:31 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40043)
+	(envelope-from <philmd@redhat.com>) id 1gRKAL-0004wI-4G
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 11:55:24 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:38240)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRK6Z-00024k-0L
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 11:51:27 -0500
-Received: by mail-wr1-f66.google.com with SMTP id p4so19691158wrt.7
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 08:51:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRKAK-0004vy-Te
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 11:55:21 -0500
+Received: by mail-wm1-f65.google.com with SMTP id k198so19341150wmd.3
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 08:55:20 -0800 (PST)
 References: <1543238443-4993-1-git-send-email-pbonzini@redhat.com>
-	<1543238443-4993-4-git-send-email-pbonzini@redhat.com>
+	<1543238443-4993-5-git-send-email-pbonzini@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <df2493fa-76ce-272c-dd39-731654a76dba@redhat.com>
-Date: Mon, 26 Nov 2018 17:51:22 +0100
+Message-ID: <34a61aee-0368-08e0-f205-3520db81c88a@redhat.com>
+Date: Mon, 26 Nov 2018 17:55:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <1543238443-4993-4-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1543238443-4993-5-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/5] vhost: restrict Linux dependency to
- kernel vhost
+Subject: Re: [Qemu-devel] [PATCH 4/5] vhost-net: compile it on all targets
+ that have virtio-net.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,125 +35,92 @@ To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
 On 26/11/18 14:20, Paolo Bonzini wrote:
-> vhost-user does not depend on Linux; it can run on any POSIX system.  Restrict
-> vhost-kernel to Linux in hw/virtio/vhost-backend.c, everything else can be
-> compiled on all POSIX systems.
+> This shows a preexisting bug: if a KVM target did not have virtio-net enabled,
+> it would fail with undefined symbols when vhost was enabled.  This must now
+> be fixed, lest targets that have no virtio-net fail to compile.
 > 
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  backends/Makefile.objs     |  5 ++---
->  default-configs/virtio.mak |  4 ++--
->  hw/net/vhost_net.c         |  2 +-
->  hw/virtio/Makefile.objs    |  5 +++--
->  hw/virtio/vhost-backend.c  | 11 +++++++++--
->  5 files changed, 17 insertions(+), 10 deletions(-)
-> 
-> diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-> index 717fcbd..ff619d3 100644
-> --- a/backends/Makefile.objs
-> +++ b/backends/Makefile.objs
-> @@ -9,10 +9,9 @@ common-obj-$(CONFIG_POSIX) += hostmem-file.o
->  common-obj-y += cryptodev.o
->  common-obj-y += cryptodev-builtin.o
->  
-> -ifeq ($(CONFIG_VIRTIO),y)
-> +ifeq ($(CONFIG_VIRTIO_CRYPTO),y)
->  common-obj-y += cryptodev-vhost.o
-> -common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) += \
-> -    cryptodev-vhost-user.o
-> +common-obj-$(CONFIG_VHOST_CRYPTO) += cryptodev-vhost-user.o
->  endif
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+> ---
+>  configure              | 11 ++++-------
+>  hw/net/Makefile.objs   |  4 ++--
+>  include/exec/poison.h  |  1 -
+>  tests/Makefile.include |  5 +----
+>  4 files changed, 7 insertions(+), 14 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index cda17ef..b3b4464 100755
+> --- a/configure
+> +++ b/configure
+> @@ -6512,7 +6512,10 @@ fi
+>  if test "$vhost_scsi" = "yes" ; then
+>    echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
+>  fi
+> -if test "$vhost_net" = "yes" -a "$vhost_user" = "yes"; then
+> +if test "$vhost_net" = "yes" ; then
+> +  echo "CONFIG_VHOST_NET=y" >> $config_host_mak
+> +fi
+> +if test "$vhost_net_user" = "yes" ; then
+>    echo "CONFIG_VHOST_NET_USER=y" >> $config_host_mak
+>  fi
+>  if test "$vhost_crypto" = "yes" ; then
+> @@ -7275,12 +7278,6 @@ if supported_xen_target $target; then
+>  fi
+>  if supported_kvm_target $target; then
+>      echo "CONFIG_KVM=y" >> $config_target_mak
+> -    if test "$vhost_net" = "yes" ; then
+> -        echo "CONFIG_VHOST_NET=y" >> $config_target_mak
+> -        if test "$vhost_user" = "yes" ; then
+> -            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
+> -        fi
+> -    fi
+>  fi
+>  if supported_hax_target $target; then
+>      echo "CONFIG_HAX=y" >> $config_target_mak
+> diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+> index c2705e6..2d7ee0a 100644
+> --- a/hw/net/Makefile.objs
+> +++ b/hw/net/Makefile.objs
+> @@ -37,8 +37,8 @@ obj-$(CONFIG_PSERIES) += spapr_llan.o
+>  obj-$(CONFIG_XILINX_ETHLITE) += xilinx_ethlite.o
 >  
->  common-obj-$(CONFIG_LINUX) += hostmem-memfd.o
-> diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
-> index 1304849..340050a 100644
-> --- a/default-configs/virtio.mak
-> +++ b/default-configs/virtio.mak
-> @@ -1,5 +1,5 @@
-> -CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
-> -CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
-> +CONFIG_VHOST_USER_SCSI=$(CONFIG_VHOST_USER)
-> +CONFIG_VHOST_USER_BLK=$(CONFIG_VHOST_USER)
->  CONFIG_VIRTIO=y
->  CONFIG_VIRTIO_9P=y
->  CONFIG_VIRTIO_BALLOON=y
-> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> index fe6202a..2a300ee 100644
-> --- a/hw/net/vhost_net.c
-> +++ b/hw/net/vhost_net.c
-> @@ -193,7 +193,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions *options)
->      }
+>  obj-$(CONFIG_VIRTIO_NET) += virtio-net.o
+> -obj-$(CONFIG_VHOST_NET) += vhost_net.o
+> -common-obj-$(call lnot,$(CONFIG_VHOST_NET)) += vhost_net-stub.o
+> +common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET)) += vhost_net.o
+> +common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET))) += vhost_net-stub.o
+>  common-obj-$(CONFIG_ALL) += vhost_net-stub.o
 >  
->      /* Set sane init value. Override when guest acks. */
-> -#ifdef CONFIG_VHOST_USER
-> +#ifdef CONFIG_VHOST_NET_USER
->      if (net->nc->info->type == NET_CLIENT_DRIVER_VHOST_USER) {
->          features = vhost_user_get_acked_features(net->nc);
->          if (~net->dev.features & features) {
-> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-> index 1b2799c..e8eff80 100644
-> --- a/hw/virtio/Makefile.objs
-> +++ b/hw/virtio/Makefile.objs
-> @@ -9,9 +9,10 @@ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
->  obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
->  obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+>  obj-$(CONFIG_ETSEC) += fsl_etsec/etsec.o fsl_etsec/registers.o \
+> diff --git a/include/exec/poison.h b/include/exec/poison.h
+> index 32d5378..b158632 100644
+> --- a/include/exec/poison.h
+> +++ b/include/exec/poison.h
+> @@ -85,7 +85,6 @@
+>  #pragma GCC poison CONFIG_XTENSA_DIS
 >  
-> -obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
-> +obj-$(CONFIG_VHOST_USER) += vhost-user.o
->  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
-> +obj-$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) += vhost.o vhost-backend.o
-> +common-obj-$(call lnot,$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))) += vhost-stub.o
->  endif
+>  #pragma GCC poison CONFIG_LINUX_USER
+> -#pragma GCC poison CONFIG_VHOST_NET
+>  #pragma GCC poison CONFIG_KVM
+>  #pragma GCC poison CONFIG_SOFTMMU
 >  
-> -common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO),$(CONFIG_LINUX))) += vhost-stub.o
->  common-obj-$(CONFIG_ALL) += vhost-stub.o
-> diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-> index 7f09efa..b5d2e30 100644
-> --- a/hw/virtio/vhost-backend.c
-> +++ b/hw/virtio/vhost-backend.c
-> @@ -9,12 +9,14 @@
->   */
->  
->  #include "qemu/osdep.h"
-> -#include <linux/vhost.h>
-> -#include <sys/ioctl.h>
->  #include "hw/virtio/vhost.h"
->  #include "hw/virtio/vhost-backend.h"
->  #include "qemu/error-report.h"
->  
-> +#ifdef CONFIG_LINUX
-> +#include <linux/vhost.h>
-> +#include <sys/ioctl.h>
-> +
->  static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int request,
->                               void *arg)
->  {
-> @@ -265,18 +267,23 @@ static const VhostOps kernel_ops = {
->          .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
->          .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
->  };
-> +#endif
->  
->  int vhost_set_backend_type(struct vhost_dev *dev, VhostBackendType backend_type)
->  {
->      int r = 0;
->  
->      switch (backend_type) {
-> +#ifdef CONFIG_LINUX
->      case VHOST_BACKEND_TYPE_KERNEL:
->          dev->vhost_ops = &kernel_ops;
->          break;
-> +#endif
-> +#ifdef CONFIG_VHOST_USER
->      case VHOST_BACKEND_TYPE_USER:
->          dev->vhost_ops = &user_ops;
->          break;
-> +#endif
->      default:
->          error_report("Unknown vhost backend type");
->          r = -1;
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index fb0b449..03a64ce 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -204,10 +204,7 @@ check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += tests/usb-hcd-xhci-test$(EXESUF)
+>  check-qtest-i386-y += tests/cpu-plug-test$(EXESUF)
+>  check-qtest-i386-y += tests/q35-test$(EXESUF)
+>  check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+> -check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) += tests/vhost-user-test$(EXESUF)
+> -ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
+> -check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) += tests/vhost-user-test$(EXESUF)
+> -endif
+> +check-qtest-i386-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test$(EXESUF)
+>  check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-swtpm-test$(EXESUF)
+>  check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-test$(EXESUF)
+>  check-qtest-i386-$(CONFIG_TPM_TIS) += tests/tpm-tis-swtpm-test$(EXESUF)
 > 
