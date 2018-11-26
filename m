@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pizhenwei@bytedance.com>) id 1gR82E-0007sZ-5h
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 22:58:10 -0500
+	(envelope-from <bsd@redhat.com>) id 1gR8L4-0003zc-4W
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 23:17:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pizhenwei@bytedance.com>) id 1gR829-0003OJ-DW
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 22:58:10 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:43927)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pizhenwei@bytedance.com>)
-	id 1gR829-0003NG-4l
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 22:58:05 -0500
-Received: by mail-pl1-x644.google.com with SMTP id gn14so13196949plb.10
-	for <qemu-devel@nongnu.org>; Sun, 25 Nov 2018 19:58:04 -0800 (PST)
-From: zhenwei pi <pizhenwei@bytedance.com>
-Date: Mon, 26 Nov 2018 11:57:58 +0800
-Message-Id: <1543204678-26914-1-git-send-email-pizhenwei@bytedance.com>
-Subject: [Qemu-devel] [PATCH] file-posix: Check effective size in truncate
- operation
+	(envelope-from <bsd@redhat.com>) id 1gR8L0-0000l5-2K
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 23:17:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1gR8Kz-0000js-T6
+	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 23:17:34 -0500
+From: Bandan Das <bsd@redhat.com>
+References: <7280.1542702495@dschgrazlin2.units.it>
+	<jpgd0qz3vg4.fsf@linux.bootlegged.copy>
+	<20181121125008.GV4755@habkost.net>
+Date: Sun, 25 Nov 2018 23:17:28 -0500
+In-Reply-To: <20181121125008.GV4755@habkost.net> (Eduardo Habkost's message of
+	"Wed, 21 Nov 2018 10:50:08 -0200")
+Message-ID: <jpg4lc4iiav.fsf_-_@linux.bootlegged.copy>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] kvm: Use KVM_GET_MSR_INDEX_LIST for
+ MSR_IA32_ARCH_CAPABILITIES support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com, mreitz@redhat.com
-Cc: pizhenwei@bytedance.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: balducci@units.it, qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>, David Alan Gilbert <dgilbert@redhat.com>, Cole Robinson <crobinso@redhat.com>
 
-Function raw_co_truncate does not check effective size for BLK device file,
-and QEMU may notify guest without any size changing.
 
-Two cases can be reproduced easily by qmp command:
-CASE 1:
-1, create a logical volume(12M) by LVM, and guest uses this volume as "vdb"
-2, run qmp command : virsh qemu-monitor-command INSTANCE '{"execute":
-"block_resize", "arguments":{"device":"drive-virtio-disk1","size":12582912}}'
+When writing to guest's MSR_IA32_ARCH_CAPABILITIES, check whether it's
+supported in the guest using the KVM_GET_MSR_INDEX_LIST ioctl.
 
-The effective size(12M) is equal to the argument(12M) and the real device file
-size(12M). QEMU should ignore this command and has no need to notify guest.
-
-CASE 2:
-1, create a logical volume(12M) by LVM, and guest uses this volume as "vdb"
-2, resize LV to 16M by lvresize command
-3, run qmp command : virsh qemu-monitor-command INSTANCE '{"execute":
-"block_resize", "arguments":{"device":"drive-virtio-disk1","size":10485760}}'
-
-The device file size actually grew, but the argument(10M) is less than the
-effective size(12M). This command should fail, but QEMU still report success.
-
-Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+Fixes: d86f963694df27f11b3681ffd225c9362de1b634
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Tested-by: balducci@units.it
+Signed-off-by: Bandan Das <bsd@redhat.com>
 ---
- block/file-posix.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ target/i386/kvm.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 07bbdab953..951d910b0b 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1991,6 +1991,7 @@ static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t offset,
-     BDRVRawState *s = bs->opaque;
-     struct stat st;
-     int ret;
-+    int64_t sectors;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index f524e7d929..3d6739a2b2 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -95,6 +95,7 @@ static bool has_msr_xss;
+ static bool has_msr_spec_ctrl;
+ static bool has_msr_virt_ssbd;
+ static bool has_msr_smi_count;
++static bool has_msr_arch_capabs;
  
-     if (fstat(s->fd, &st)) {
-         ret = -errno;
-@@ -2013,6 +2014,20 @@ static int coroutine_fn raw_co_truncate(BlockDriverState *bs, int64_t offset,
-             error_setg(errp, "Cannot grow device files");
-             return -EINVAL;
+ static uint32_t has_architectural_pmu_version;
+ static uint32_t num_architectural_pmu_gp_counters;
+@@ -1481,6 +1482,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+                 case MSR_VIRT_SSBD:
+                     has_msr_virt_ssbd = true;
+                     break;
++                case MSR_IA32_ARCH_CAPABILITIES:
++                    has_msr_arch_capabs = true;
++                    break;
+                 }
+             }
          }
-+
-+        sectors = raw_getlength(bs) >> BDRV_SECTOR_BITS;
-+        if (sectors > bs->total_sectors) {
-+            /* device size actually grew */
-+            if (offset <= bs->total_sectors * BDRV_SECTOR_SIZE) {
-+                error_setg(errp, "The effective size of this device is "
-+                        "greater than or equal to the argument");
-+                return -EINVAL;
-+            }
-+        } else if (sectors == bs->total_sectors) {
-+            /* device size actually not changed */
-+            error_setg(errp, "Detect device file size not changing");
-+            return -EINVAL;
-+        }
-     } else {
-         error_setg(errp, "Resizing this file is not supported");
-         return -ENOTSUP;
+@@ -2002,14 +2006,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+ #endif
+ 
+     /* If host supports feature MSR, write down. */
+-    if (kvm_feature_msrs) {
+-        int i;
+-        for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
+-            if (kvm_feature_msrs->indices[i] == MSR_IA32_ARCH_CAPABILITIES) {
+-                kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
+-                              env->features[FEAT_ARCH_CAPABILITIES]);
+-                break;
+-            }
++    if (has_msr_arch_capabs) {
++        kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
++                          env->features[FEAT_ARCH_CAPABILITIES]);
+     }
+ 
+     /*
 -- 
-2.11.0
+2.14.5
