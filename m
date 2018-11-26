@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gRNzZ-0002u9-9p
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 16:00:29 -0500
+	(envelope-from <philmd@redhat.com>) id 1gROO0-0004q2-BH
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 16:25:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gRNzV-0004Bc-9B
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 16:00:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36306)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gRNzV-0004BB-2v
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 16:00:25 -0500
-Date: Mon, 26 Nov 2018 19:00:21 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181126210021.GS18284@habkost.net>
-References: <20181126152836.25379-1-rkagan@virtuozzo.com>
-	<a0ce0395-576b-8175-67ad-7116d021e39e@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gRONx-0001w7-6O
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 16:25:44 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36312)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRONx-0001uy-0K
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 16:25:41 -0500
+Received: by mail-wr1-f67.google.com with SMTP id t3so20504719wrr.3
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 13:25:40 -0800 (PST)
+References: <1543226303-5260-1-git-send-email-liq3ea@gmail.com>
+	<87mupw3vm2.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <733cd094-3775-ba2f-242d-e58bc7f2daaa@redhat.com>
+Date: Mon, 26 Nov 2018 22:25:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a0ce0395-576b-8175-67ad-7116d021e39e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/hyperv: fix NULL dereference with
- pure-kvm SynIC
+In-Reply-To: <87mupw3vm2.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target: hax: fix a typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Roman Kagan <rkagan@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
+Cc: ehabkost@redhat.com, qemu-trivial@nongnu.org, laurent@vivier.eu, pbonzini@redhat.com, rth@twiddle.net
 
-On Mon, Nov 26, 2018 at 06:13:49PM +0100, Paolo Bonzini wrote:
-> On 26/11/18 16:28, Roman Kagan wrote:
-> > When started in compat configuration of SynIC, e.g.
-> > 
-> > qemu-system-x86_64 -machine pc-i440fx-2.10,accel=kvm \
-> >  -cpu host,-vmx,hv-relaxed,hv_spinlocks=0x1fff,hv-vpindex,hv-synic
-> > 
-> > or explicitly
-> > 
-> > qemu-system-x86_64 -enable-kvm -cpu host,hv-synic,x-hv-synic-kvm-only=on
-> > 
-> > QEMU crashes in hyperv_synic_reset() trying to access the non-present
-> > qobject for SynIC.
-> > 
-> > Add the missing check for NULL.
-> > 
-> > Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > Reported-by: Igor Mammedov <imammedo@redhat.com>
-> > Fixes: 9b4cf107b09d18ac30f46fd1c4de8585ccba030c
-> > Fixes: 4a93722f9c279184e95b1e1ad775c01deec05065
-> > Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-> > ---
-> >  hw/hyperv/hyperv.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
-> > index a28e7249d8..8758635227 100644
-> > --- a/hw/hyperv/hyperv.c
-> > +++ b/hw/hyperv/hyperv.c
-> > @@ -136,7 +136,11 @@ void hyperv_synic_add(CPUState *cs)
-> >  
-> >  void hyperv_synic_reset(CPUState *cs)
-> >  {
-> > -    device_reset(DEVICE(get_synic(cs)));
-> > +    SynICState *synic = get_synic(cs);
-> > +
-> > +    if (synic) {
-> > +        device_reset(DEVICE(synic));
-> > +    }
-> >  }
-> >  
-> >  static const TypeInfo synic_type_info = {
-> > 
+Hi Li, Alex.
+
+On 26/11/18 12:51, Alex Bennée wrote:
 > 
-> Queued, thanks.
+> Li Qiang <liq3ea@gmail.com> writes:
+> 
+>> Cc: qemu-trivial@nongnu.org
+>>
+>> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> 
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+>> ---
+>>  target/i386/hax-all.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+>> index 502ce6f0af..464744a406 100644
+>> --- a/target/i386/hax-all.c
+>> +++ b/target/i386/hax-all.c
+>> @@ -205,7 +205,7 @@ int hax_vcpu_destroy(CPUState *cpu)
+>>      }
+>>
+>>      /*
+>> -     * 1. The hax_tunnel is also destroied when vcpu destroy
+>> +     * 1. The hax_tunnel is also destroyed when vcpu destroy
 
-Oops, I had queued it earlier today and just submitted a pull
-request.
+I'm not native english speaker. Isn't it:
 
--- 
-Eduardo
+'The hax_tunnel is also destroyed at vcpu destroy'
+
+or
+
+'The hax_tunnel is also destroyed when vcpu is destroyed'?
+
+>>       * 2. close fd will cause hax module vcpu be cleaned
+>>       */
+>>      hax_close_fd(vcpu->fd);
+> 
+> 
+> --
+> Alex Bennée
+> 
