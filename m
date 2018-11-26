@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gRPqZ-0007Ll-LZ
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 17:59:20 -0500
+	(envelope-from <bounces@canonical.com>) id 1gRPs7-0008Q7-NJ
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gRPqY-0005o5-Qm
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 17:59:19 -0500
+	(envelope-from <bounces@canonical.com>) id 1gRPs1-0006ut-Ss
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:00:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gRPs1-0006rq-Lb
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:00:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gRPs0-0002Qz-2z
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 23:00:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 118662E80C0
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 23:00:48 +0000 (UTC)
 MIME-Version: 1.0
-References: <cover.1542321076.git.alistair.francis@wdc.com>
-	<f1a7d2617c26c1745fafe13bbe3bc3b042c14217.1542321076.git.alistair.francis@wdc.com>
-	<23831afc-0ebf-5802-e8e2-6ce48dd340f9@linaro.org>
-	<CAKmqyKP5cCRZujTm+OvoNZWNwPhJirPLA7PjurbovnN8RYCcgQ@mail.gmail.com>
-	<8bacdaca-94c2-d2c7-3af7-b98517a98b64@linaro.org>
-In-Reply-To: <8bacdaca-94c2-d2c7-3af7-b98517a98b64@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 26 Nov 2018 14:58:50 -0800
-Message-ID: <CAKmqyKM-+HDbUGNjZjS5f0HaqzOpsms3j3+wVgo7gjvL-JT0CQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v1 15/23] riscv: tcg-target: Add branch and
- jump instructions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 26 Nov 2018 22:53:57 -0000
+From: dann frazier <dann.frazier@canonical.com>
+Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1805256] [NEW] qemu-img hangs on high core count
+ ARM system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +36,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Tue, Nov 20, 2018 at 11:40 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 11/21/18 12:49 AM, Alistair Francis wrote:
-> > On Fri, Nov 16, 2018 at 1:14 AM Richard Henderson
-> > <richard.henderson@linaro.org> wrote:
-> >>
-> >> On 11/15/18 11:36 PM, Alistair Francis wrote:
-> >>> +static void tcg_out_brcond(TCGContext *s, TCGCond cond, TCGReg arg1,
-> >>> +                           TCGReg arg2, TCGLabel *l)
-> >>> +{
-> >>> +    RISCVInsn op = tcg_brcond_to_riscv[cond].op;
-> >>> +    bool swap = tcg_brcond_to_riscv[cond].swap;
-> >>> +
-> >>> +    tcg_out_opc_branch(s, op, swap ? arg2 : arg1, swap ? arg1 : arg2, 0);
-> >>
-> >> You might want to tcg_debug_assert(op != 0) here.
-> >>
-> >>> +    if (l->has_value) {
-> >>> +        reloc_sbimm12(s->code_ptr - 1, l->u.value_ptr);
-> >>
-> >> I'm concerned about the conditional branch range.  +-4K isn't much to work
-> >> with.  The minimum we have for other hosts is +-32K.
-> >>
-> >> We have two options: (1) greatly reduce the max size of the TB for this host;
-> >> (2) be prepared to emit a 2 insn sequence: conditional branch across
-> >> unconditional branch, with forward branches that turn out to be small patched
-> >> with a nop.
-> >>
-> >> FWIW, the first case would be done via modification of tcg_op_buf_full.  You
-> >> might have to go as low as 500 opcodes, I'm not sure.
-> >
-> > How do we do option 2?
->
-> If l->has_value, just check the actual range.  But of course backward branching
-> isn't that common in tcg generated code.  Most branches within the TB are short
-> forward branches, but we also don't know how short is short.
->
-> But every TB begins with a test of env->exit_code and a conditional branch to
-> the end of the block, where we place some code to return to the main loop and
-> return the pointer to the TB at which we exited.  Thus every TB has a branch
-> that spans the size of the entire TB.
->
-> So, invent (or repurpose) an R_RISCV_FOO value.  It doesn't matter which
-> because it's private within tcg/riscv/.  Just add some commentary.  (See e.g.
-> tcg/sparc/ and its use of R_SPARC_13.)
->
-> While generating code, emit the conditional branch as normal; leave the unknown
-> destination 0 for now.  Emit a nop as the second insn.
->
-> When resolving R_RISCV_FOO, if the conditional branch is in range, great!  Just
-> patch it.  If it is out of range, then you need to edit the conditional branch
-> to reverse the condition (insn ^ (1 << 12)) and branch to pc+8, i.e. over the
-> next instruction.  Which was a nop during generation, but you will now install
-> jal r0,dest going to the real destination.
+Public bug reported:
 
-Ok, I think I have done this correctly. I have something that compiles and runs.
+On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+frequently hangs (~50% of the time) with this command:
 
-I'll send a second RFC out sometime this week. It won't be based on
-your latest patches and it's still missing some things but I want to
-keep this moving along.
+qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
 
-Thanks so much for your help Richard!
+Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+qcow2->qcow2 conversion happens to be something uvtool does every time
+it fetches images.
 
-Alistair
+Once hung, attaching gdb gives the following backtrace:
 
->
->
-> r~
+(gdb) bt
+#0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D18765027=
+4213760, =
+
+    timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b95=
+0)
+    at ../sysdeps/unix/sysv/linux/ppoll.c:39
+#1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<opt=
+imized out>, =
+
+    __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2.h=
+:77
+#2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
+
+    timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
+#3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+    at util/main-loop.c:233
+#4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+#5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-img.=
+c:1980
+#6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-im=
+g.c:2456
+#7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu-i=
+mg.c:4975
+
+Reproduced w/ latest QEMU git (@ 53744e0a182)
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805256
+
+Title:
+  qemu-img hangs on high core count ARM system
+
+Status in QEMU:
+  New
+
+Bug description:
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
+
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
+
+  Once hung, attaching gdb gives the following backtrace:
+
+  (gdb) bt
+  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760, =
+
+      timeout=3D<optimized out>, timeout@entry=3D0x0, sigmask=3D0xffffc123b=
+950)
+      at ../sysdeps/unix/sysv/linux/ppoll.c:39
+  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>, =
+
+      __fds=3D<optimized out>) at /usr/include/aarch64-linux-gnu/bits/poll2=
+.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, =
+
+      timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+      at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
+
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
