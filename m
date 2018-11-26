@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRRz4-0005f1-BM
+	(envelope-from <dgibson@ozlabs.org>) id 1gRRz4-0005f2-Bi
 	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 20:16:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRRz0-0007VJ-2d
+	(envelope-from <dgibson@ozlabs.org>) id 1gRRz0-0007VN-2f
 	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 20:16:14 -0500
-Date: Tue, 27 Nov 2018 11:11:18 +1100
+Date: Tue, 27 Nov 2018 10:48:18 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181127001118.GL2251@umbus.fritz.box>
+Message-ID: <20181126234818.GK2251@umbus.fritz.box>
 References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-5-clg@kaod.org>
-	<20181122044450.GF10448@umbus.fritz.box>
-	<121d4f915a03c2e734feebceda023947aedb78a3.camel@kernel.crashing.org>
-	<20181123011005.GU10448@umbus.fritz.box>
-	<12f3da3b-3761-a26f-4460-65d3c978f52d@kaod.org>
-	<20181126054429.GH2251@umbus.fritz.box>
-	<81ec65f1-f524-10af-8729-9abf890b4ee4@kaod.org>
+	<20181116105729.23240-3-clg@kaod.org>
+	<20181122031934.GC10448@umbus.fritz.box>
+	<75cdc1f3-f337-3c37-b234-d96222a370d2@kaod.org>
+	<20181123010852.GT10448@umbus.fritz.box>
+	<8270d5fc-ab20-f47d-37d8-1e2ba179fbfd@kaod.org>
+	<20181126053947.GG2251@umbus.fritz.box>
+	<23a938ba-d2bc-8a9d-07ef-6672a8cc3a93@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="YIleam+9adpUeYf+"
+	protocol="application/pgp-signature"; boundary="rnP2AJ7yb1j09OW/"
 Content-Disposition: inline
-In-Reply-To: <81ec65f1-f524-10af-8729-9abf890b4ee4@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 04/36] ppc/xive: introduce the
- XiveRouter model
+In-Reply-To: <23a938ba-d2bc-8a9d-07ef-6672a8cc3a93@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 02/36] ppc/xive: add support for the LSI
+ interrupt sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +32,158 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---YIleam+9adpUeYf+
+--rnP2AJ7yb1j09OW/
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 26, 2018 at 10:39:44AM +0100, C=E9dric Le Goater wrote:
-> On 11/26/18 6:44 AM, David Gibson wrote:
-> > On Fri, Nov 23, 2018 at 11:28:24AM +0100, C=E9dric Le Goater wrote:
-> >> On 11/23/18 2:10 AM, David Gibson wrote:
-> >>> On Thu, Nov 22, 2018 at 05:50:07PM +1100, Benjamin Herrenschmidt wrot=
-e:
-> >>>> On Thu, 2018-11-22 at 15:44 +1100, David Gibson wrote:
+On Mon, Nov 26, 2018 at 12:20:19PM +0100, C=E9dric Le Goater wrote:
+> On 11/26/18 6:39 AM, David Gibson wrote:
+> > On Fri, Nov 23, 2018 at 02:28:35PM +0100, C=E9dric Le Goater wrote:
+> >>
+> >>>>>> +/*
+> >>>>>> + * Returns whether the event notification should be forwarded.
+> >>>>>> + */
+> >>>>>> +static bool xive_source_lsi_trigger(XiveSource *xsrc, uint32_t
+> >>>>>> srcno)
 > >>>>>
-> >>>>> Sorry, didn't think of this in my first reply.
-> >>>>>
-> >>>>> 1) Does the hardware ever actually write back to the EAS?  I know it
-> >>>>> does for the END, but it's not clear why it would need to for the
-> >>>>> EAS.  If not, we don't need the setter.
+> >>>>> What exactly "trigger" means isn't entirely obvious for an LSI.  Mi=
+ght
+> >>>>> be clearer to have "lsi_assert" and "lsi_deassert" helpers instead.
 > >>>>
-> >>>> Nope, though the PAPR model will via hcalls
+> >>>> This is called only when the interrupt is asserted. So it is a=20
+> >>>> simplified LSI trigger depending only on the 'P' bit.
 > >>>
-> >>> Right, bit AIUI the set_eas hook is about abstracting PAPR vs bare
-> >>> metal details.  Since the hcall knows it's PAPR it can just update the
-> >>> backing information for the EAS directly, and no need for an
-> >>> abstracted hook.
+> >>> Yes, I see that.  But the result is that while the MSI logic is
+> >>> encapsulated in the MSI trigger function, this leaves the LSI logic
+> >>> split across the trigger function and set_irq() itself. I think it=20
+> >>> would be better to have assert and deassert helpers instead, which
+> >>> handle both the trigger/notification and also the updating of the
+> >>> ASSERTED bit.
 > >>
-> >> Indeed, the first versions of the XIVE patchset did not use such hooks=
-,=20
-> >> but when discussed we said we wanted abstract methods for the router=
-=20
-> >> to validate the overall XIVE model, which is useful for PowerNV.=20
-> >>
-> >> We can change again and have the hcalls get/set directly in the EAT
-> >> and ENDT. It would certainly simplify the sPAPR model.
+> >> Something like the xive_source_set_irq_lsi() below ?
 > >=20
-> > I think that's the better approach.
+> > Uh.. not exactly what I had in mind, but close enough.
+> >=20
+> > [snip]
+> > +/*
+> >> + * Returns whether the event notification should be forwarded.
+> >> + */
+> >>  static bool xive_source_esb_trigger(XiveSource *xsrc, uint32_t srcno)
+> >>  {
+> >> +    bool notify;
+> >> +
+> >>      assert(srcno < xsrc->nr_irqs);
+> >> =20
+> >> -    return xive_esb_trigger(&xsrc->status[srcno]);
+> >> +    notify =3D xive_esb_trigger(&xsrc->status[srcno]);
+> >> +
+> >> +    if (xive_source_irq_is_lsi(xsrc, srcno) &&
+> >=20
+> > Except that this block can go, since this function is no longer called
+> > for LSIs.
 >=20
-> ok. let's keep that in mind for  :=20
->=20
->  [PATCH v5 11/36] spapr/xive: use the VCPU id as a NVT identifier
->  [PATCH v5 16/36] spapr: add hcalls support for the XIVE exploitation
->=20
-> which are using the XiveRouter methods to access the controller EAT=20
-> and ENDT. I thought that was good practice to validate the model but=20
-> we can use direct sPAPR table accessors or none at all.
+> It still can be through the ESB MMIOs, if the guest does a load on the=20
+> trigger page.
 
-Ok.  Consistency is good as a general rule, but I don't think it makes
-sense to force the EAT and the ENDT into the same model.  The EAT is
-pure configuration, whereas the the ENDT has both configuration and
-status.  Or to look at it another way, the EAT is purely software
-controlled, whereas the ENDT is at least partially hardware
-controlled.
+Oh, good point.  That makes me rethink all my comments on this matter.
 
-(I realize that gets a bit fuzzy when considering PAPR, but I think
-=66rom the point of view of the XIVE model it makes sense to treat the
-PAPR hypervisor logic as "software", even though it's "hardware" from the
-guest point of view).
+In that case I think your original code was fine, except that I'd
+prefer to see the setting of the ASSERTED bit inside the trigger
+function, instead of in the set_irq() caller.
+
 
 >=20
+> C.
 >=20
-> I think these prereq patches could be merged now :
->=20
->  [PATCH v5 12/36] spapr: initialize VSMT before initializing the IRQ
->  [PATCH v5 13/36] spapr: introduce a spapr_irq_init() routine
->  [PATCH v5 14/36] spapr: modify the irq backend 'init' method
->=20
-> This one also :
->=20
->  [PATCH v5 21/36] spapr: extend the sPAPR IRQ backend for XICS
->=20
-> Thanks,
->=20
-> C.=20
+> =20
+> >=20
+> >> +        xive_source_esb_get(xsrc, srcno) =3D=3D XIVE_ESB_QUEUED) {
+> >> +        qemu_log_mask(LOG_GUEST_ERROR,
+> >> +                      "XIVE: queued an event on LSI IRQ %d\n", srcno);
+> >> +    }
+> >> +
+> >> +    return notify;
+> >>  }
+> >> =20
+> >>  /*
+> >> @@ -103,9 +127,22 @@ static bool xive_source_esb_trigger(Xive
+> >>   */
+> >>  static bool xive_source_esb_eoi(XiveSource *xsrc, uint32_t srcno)
+> >>  {
+> >> +    bool notify;
+> >> +
+> >>      assert(srcno < xsrc->nr_irqs);
+> >> =20
+> >> -    return xive_esb_eoi(&xsrc->status[srcno]);
+> >> +    notify =3D xive_esb_eoi(&xsrc->status[srcno]);
+> >> +
+> >> +    /* LSI sources do not set the Q bit but they can still be
+> >> +     * asserted, in which case we should forward a new event
+> >> +     * notification
+> >> +     */
+> >> +    if (xive_source_irq_is_lsi(xsrc, srcno)) {
+> >> +        bool level =3D xsrc->status[srcno] & XIVE_STATUS_ASSERTED;
+> >> +        notify =3D xive_source_set_irq_lsi(xsrc, srcno, level);
+> >> +    }
+> >> +
+> >> +    return notify;
+> >>  }
+> >> =20
+> >>  /*
+> >> @@ -268,8 +305,12 @@ static void xive_source_set_irq(void *op
+> >>      XiveSource *xsrc =3D XIVE_SOURCE(opaque);
+> >>      bool notify =3D false;
+> >> =20
+> >> -    if (val) {
+> >> -        notify =3D xive_source_esb_trigger(xsrc, srcno);
+> >> +    if (xive_source_irq_is_lsi(xsrc, srcno)) {
+> >> +        notify =3D xive_source_set_irq_lsi(xsrc, srcno, val);
+> >> +    } else {
+> >> +        if (val) {
+> >> +            notify =3D xive_source_esb_trigger(xsrc, srcno);
+> >> +        }
+> >>      }
+> >> =20
+> >>      /* Forward the source event notification for routing */
+> >> @@ -289,9 +330,11 @@ void xive_source_pic_print_info(XiveSour
+> >>              continue;
+> >>          }
+> >> =20
+> >> -        monitor_printf(mon, "  %08x %c%c\n", i + offset,
+> >> +        monitor_printf(mon, "  %08x %s %c%c%c\n", i + offset,
+> >> +                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : "MSI=
+",
+> >>                         pq & XIVE_ESB_VAL_P ? 'P' : '-',
+> >> -                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
+> >> +                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
+> >> +                       xsrc->status[i] & XIVE_STATUS_ASSERTED ? 'A' :=
+ ' ');
+> >>      }
+> >>  }
+> >> =20
+> >> @@ -299,6 +342,8 @@ static void xive_source_reset(DeviceStat
+> >>  {
+> >>      XiveSource *xsrc =3D XIVE_SOURCE(dev);
+> >> =20
+> >> +    /* Do not clear the LSI bitmap */
+> >> +
+> >>      /* PQs are initialized to 0b01 which corresponds to "ints off" */
+> >>      memset(xsrc->status, 0x1, xsrc->nr_irqs);
+> >>  }
+> >> @@ -324,6 +369,7 @@ static void xive_source_realize(DeviceSt
+> >>                                       xsrc->nr_irqs);
+> >> =20
+> >>      xsrc->status =3D g_malloc0(xsrc->nr_irqs);
+> >> +    xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
+> >> =20
+> >>      memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+> >>                            &xive_source_esb_ops, xsrc, "xive.esb",
+> >>
+> >=20
 >=20
 
 --=20
@@ -116,24 +192,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---YIleam+9adpUeYf+
+--rnP2AJ7yb1j09OW/
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv8i6QACgkQbDjKyiDZ
-s5JEtw/6Az5jf5CLfezP3c88Snuxjx06zfyeoKI9werM52RnGTbOIfNv5ls+RYvO
-lNVRDh83HQcW3qizXPIKrEBjwd5MW5ssJHdBcJLZgQPGSt4n7ifI1KAGTnxr9PLU
-yW3EjSeN9cZbFg11uOZ2DRt3xbiCnim8knlUc+XToRluy/aseSDhNnW7/UtLuY5K
-w79ay9HI/WB3jdA4q35YvPFi5C+0CafkovLoiAJAKu908WRlnyX9Wui6F83gHAln
-fwg6UmWE03NDRbRbWBFn9ISJ/PyOC34YBpu6NxskuJDDAAvjb0gSdpSvR0iBpf9P
-AhglIMl0Zpd2yX/prsU2QtZMt4Xcz6TOmzZDjzjB0nMSVmd6GoG/VbJLh1zVo0xD
-yZ98vNJYzJjYoIp5QO/Mc/ZzSIWUg4sorTd5ZVQQu0axRab9HgMoyY/YOfDEwKpu
-JjPqgJOkRSVP7rG8JaRCKv/qgtD9nv9u//VvZ8fuINwY+x0+58M3aZcm+GA9J4z+
-XhL/2EufjwHVTP4nCSuGCUAG/BTXARuRd1OzBoLqYeslgNQDE2SPUxRPvh3Dm2jl
-9d1p1iiqBlRVxk5l3tNyGfAXBoZnIPs2eIgvi3h6Ww9RVv4XgJC8JAJIPtfNQCyp
-Qy9XbShC4NkjRBbv3jPzc92o7p4RwgYYGWbuyNyFETafqcMyt4s=
-=Z0lW
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv8hkAACgkQbDjKyiDZ
+s5I5Pw/9HRATJIgI8WxK+BpNN4TyHEgixsa2cKP6li3VToJneRf0qkWiehOHLms0
+miVG/O/GAXovQIc3KhZHUmbTEXLviAY0Ntmmi2PZlJ8EXtREp+dEgtZRWakV4hoc
+sG1oAJGmuxsGxIn1cTnF4bDq4rvhOTXv0PVtLRNb9ijknQ5lsXDEFnpmw7qxSPgP
+U9AheQvj4PzkjDkmcIwqraIhBvPpr6LErpz30SV3m4/jPya2XR30xAJYVvZ+IQId
+dRJzPuD5BKcXKmRyMf6WQtrT3hLmM2PEgTUf1hXqIbGJQ8wnmcbpZMt7Dw3vbTWP
+5HMvrfSvsBnspawIknSBuzze8TrD2ezbUZx4DqEixxrgemSIx1O8OkcqqqXRiIFn
+mhlpRG263UyFFWrzokOCF8cI3dHIKD0pgzgQ8op8KdOPLRS6LDjZuaQTiJZP61XB
+hOXQe08/7GxhsLnJvH0m7Fz3G/JhjTCwpRJetq+pCvRGjriwXYrZ229/TycNUYCi
+kuCjkgaoJ/p5ffrcGRMkl5nHGcicxy+CVQEukOIUUFX1hV8GlFMRg2cXAW7G8D/8
+aHVdnqw9qJqbW23yWeqVB4Kp3FzxvENkh8KTqX2rNZEZspuksvllFZJt1vak1T7L
+jhj6+cmBz+dsBU4001UUEsuJunbA5UU2PY624LSHh70Q7vdpYN8=
+=A+3S
 -----END PGP SIGNATURE-----
 
---YIleam+9adpUeYf+--
+--rnP2AJ7yb1j09OW/--
