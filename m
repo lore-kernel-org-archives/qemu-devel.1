@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gRPnz-00054h-4E
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 17:56:43 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gRPqZ-0007Ll-LZ
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 17:59:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gRPnp-0004U3-J5
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 17:56:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55924)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gRPnp-0004Te-E5
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 17:56:29 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 583A0308AA13
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 22:56:26 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 26 Nov 2018 20:56:20 -0200
-Message-Id: <20181126225620.5301-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] apic: Make APIC ID limit error message clearer
+	(envelope-from <alistair23@gmail.com>) id 1gRPqY-0005o5-Qm
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 17:59:19 -0500
+MIME-Version: 1.0
+References: <cover.1542321076.git.alistair.francis@wdc.com>
+	<f1a7d2617c26c1745fafe13bbe3bc3b042c14217.1542321076.git.alistair.francis@wdc.com>
+	<23831afc-0ebf-5802-e8e2-6ce48dd340f9@linaro.org>
+	<CAKmqyKP5cCRZujTm+OvoNZWNwPhJirPLA7PjurbovnN8RYCcgQ@mail.gmail.com>
+	<8bacdaca-94c2-d2c7-3af7-b98517a98b64@linaro.org>
+In-Reply-To: <8bacdaca-94c2-d2c7-3af7-b98517a98b64@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 26 Nov 2018 14:58:50 -0800
+Message-ID: <CAKmqyKM-+HDbUGNjZjS5f0HaqzOpsms3j3+wVgo7gjvL-JT0CQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC v1 15/23] riscv: tcg-target: Add branch and
+ jump instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
 
-Remove the "apic initialization failed" prefix (it conveys no
-useful information), replace "invalid" with "too large", and add
-an error hint with two possible solutions for the problem.
+On Tue, Nov 20, 2018 at 11:40 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 11/21/18 12:49 AM, Alistair Francis wrote:
+> > On Fri, Nov 16, 2018 at 1:14 AM Richard Henderson
+> > <richard.henderson@linaro.org> wrote:
+> >>
+> >> On 11/15/18 11:36 PM, Alistair Francis wrote:
+> >>> +static void tcg_out_brcond(TCGContext *s, TCGCond cond, TCGReg arg1,
+> >>> +                           TCGReg arg2, TCGLabel *l)
+> >>> +{
+> >>> +    RISCVInsn op = tcg_brcond_to_riscv[cond].op;
+> >>> +    bool swap = tcg_brcond_to_riscv[cond].swap;
+> >>> +
+> >>> +    tcg_out_opc_branch(s, op, swap ? arg2 : arg1, swap ? arg1 : arg2, 0);
+> >>
+> >> You might want to tcg_debug_assert(op != 0) here.
+> >>
+> >>> +    if (l->has_value) {
+> >>> +        reloc_sbimm12(s->code_ptr - 1, l->u.value_ptr);
+> >>
+> >> I'm concerned about the conditional branch range.  +-4K isn't much to work
+> >> with.  The minimum we have for other hosts is +-32K.
+> >>
+> >> We have two options: (1) greatly reduce the max size of the TB for this host;
+> >> (2) be prepared to emit a 2 insn sequence: conditional branch across
+> >> unconditional branch, with forward branches that turn out to be small patched
+> >> with a nop.
+> >>
+> >> FWIW, the first case would be done via modification of tcg_op_buf_full.  You
+> >> might have to go as low as 500 opcodes, I'm not sure.
+> >
+> > How do we do option 2?
+>
+> If l->has_value, just check the actual range.  But of course backward branching
+> isn't that common in tcg generated code.  Most branches within the TB are short
+> forward branches, but we also don't know how short is short.
+>
+> But every TB begins with a test of env->exit_code and a conditional branch to
+> the end of the block, where we place some code to return to the main loop and
+> return the pointer to the TB at which we exited.  Thus every TB has a branch
+> that spans the size of the entire TB.
+>
+> So, invent (or repurpose) an R_RISCV_FOO value.  It doesn't matter which
+> because it's private within tcg/riscv/.  Just add some commentary.  (See e.g.
+> tcg/sparc/ and its use of R_SPARC_13.)
+>
+> While generating code, emit the conditional branch as normal; leave the unknown
+> destination 0 for now.  Emit a nop as the second insn.
+>
+> When resolving R_RISCV_FOO, if the conditional branch is in range, great!  Just
+> patch it.  If it is out of range, then you need to edit the conditional branch
+> to reverse the condition (insn ^ (1 << 12)) and branch to pc+8, i.e. over the
+> next instruction.  Which was a nop during generation, but you will now install
+> jal r0,dest going to the real destination.
 
-Before:
+Ok, I think I have done this correctly. I have something that compiles and runs.
 
-  $ qemu-system-x86_64 -machine q35 -smp 256
-  qemu-system-x86_64: apic initialization failed. APIC ID 255 is invalid
+I'll send a second RFC out sometime this week. It won't be based on
+your latest patches and it's still missing some things but I want to
+keep this moving along.
 
-After:
+Thanks so much for your help Richard!
 
-  $ qemu-system-x86_64 -machine q35 -smp 256 -display none
-  qemu-system-x86_64: APIC ID 255 is too large
-  Possible solutions:
-  * Lowering the number of VCPUs on the -smp option
-  * Using accel=kvm,kernel-irqchip=on or accel=kvm,kernel-irqchip=split
+Alistair
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-I'm not sure this is the best way to provide usage hints to the
-user.  Any suggestions?
----
- hw/intc/apic.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/hw/intc/apic.c b/hw/intc/apic.c
-index 97ffdd820f..f08006334d 100644
---- a/hw/intc/apic.c
-+++ b/hw/intc/apic.c
-@@ -886,8 +886,11 @@ static void apic_realize(DeviceState *dev, Error **errp)
-     APICCommonState *s = APIC(dev);
- 
-     if (s->id >= MAX_APICS) {
--        error_setg(errp, "%s initialization failed. APIC ID %d is invalid",
--                   object_get_typename(OBJECT(dev)), s->id);
-+        error_setg(errp, "APIC ID %d is too large", s->id);
-+        error_append_hint(errp,
-+            "Possible solutions:\n"
-+            "* Lowering the number of VCPUs on the -smp option\n"
-+            "* Using accel=kvm,kernel-irqchip=on or accel=kvm,kernel-irqchip=split\n");
-         return;
-     }
- 
--- 
-2.18.0.rc1.1.g3f1ff2140
+>
+>
+> r~
