@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gRF8k-0000NZ-Mi
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gRF8k-0000Na-Mq
 	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 06:33:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gRF8g-000205-Pa
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gRF8d-0001xU-Ua
 	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 06:33:22 -0500
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Tue, 27 Nov 2018 03:56:00 +0800
-Message-Id: <1543262162-6351-8-git-send-email-peng.hao2@zte.com.cn>
+Date: Tue, 27 Nov 2018 03:55:58 +0800
+Message-Id: <1543262162-6351-6-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1543262162-6351-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1543262162-6351-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V9 7/9] hw/misc/pvpanic: preparing for adding
- configure interface
+Subject: [Qemu-devel] [PATCH V9 5/9] hw/arm/virt: add pvpanic device in virt
+ acpi table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +23,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-Prepare for pvpanic-mmio configure interface.
+Add pvpanic device in virt acpi table, so when kenrel command line
+uses acpi=force, kernel can get info from acpi table.
 
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- hw/arm/sysbus-fdt.c |  2 ++
- hw/arm/virt.c       |  1 +
- hw/misc/pvpanic.c   | 10 +++++++++-
- 3 files changed, 12 insertions(+), 1 deletion(-)
+ hw/arm/virt-acpi-build.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index ad698d4..34577f3 100644
---- a/hw/arm/sysbus-fdt.c
-+++ b/hw/arm/sysbus-fdt.c
-@@ -38,6 +38,7 @@
- #include "hw/vfio/vfio-amd-xgbe.h"
- #include "hw/display/ramfb.h"
- #include "hw/arm/fdt.h"
-+#include "hw/misc/pvpanic.h"
- 
- /*
-  * internal struct that contains the information to create dynamic
-@@ -459,6 +460,7 @@ static const BindingEntry bindings[] = {
-     VFIO_PLATFORM_BINDING("amd,xgbe-seattle-v1a", add_amd_xgbe_fdt_node),
- #endif
-     TYPE_BINDING(TYPE_RAMFB_DEVICE, no_fdt_node),
-+    TYPE_BINDING(TYPE_PVPANIC_MMIO, no_fdt_node),
-     TYPE_BINDING("", NULL), /* last element */
- };
- 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index f2cb5de..bb756a6 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1783,6 +1783,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_RAMFB_DEVICE);
-+    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_PVPANIC_MMIO);
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_PLATFORM);
-     mc->block_default_type = IF_VIRTIO;
-     mc->no_cdrom = 1;
-diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
-index c9382a8..08263ed 100644
---- a/hw/misc/pvpanic.c
-+++ b/hw/misc/pvpanic.c
-@@ -67,7 +67,7 @@ typedef struct PVPanicISAState {
- typedef struct PVPanicMMIOState {
-     SysBusDevice parent_obj;
-     /*<private>*/
--
-+    uint32_t base;
-     /* public */
-     MemoryRegion mr;
- } PVPanicMMIOState;
-@@ -151,10 +151,18 @@ static void pvpanic_mmio_initfn(Object *obj)
-     sysbus_init_mmio(sbd, &s->mr);
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 5785fb6..2adba60 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -84,6 +84,20 @@ static void acpi_dsdt_add_uart(Aml *scope, const MemMapEntry *uart_memmap,
+     aml_append(scope, dev);
  }
  
-+static Property pvpanic_mmio_properties[] = {
-+    DEFINE_PROP_UINT32("mmio", PVPanicMMIOState, base, 0x09070000),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
++static void acpi_dsdt_add_pvpanic(Aml *scope, const MemMapEntry *pvpanic_memmap)
++{
++    Aml *dev = aml_device("PEVT");
++    aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0001")));
++    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
 +
++    Aml *crs = aml_resource_template();
++    aml_append(crs, aml_memory32_fixed(pvpanic_memmap->base,
++                                       pvpanic_memmap->size, AML_READ_WRITE));
 +
- static void pvpanic_mmio_class_init(ObjectClass *klass, void *data)
++    aml_append(dev, aml_name_decl("_CRS", crs));
++    aml_append(scope, dev);
++}
++
+ static void acpi_dsdt_add_fw_cfg(Aml *scope, const MemMapEntry *fw_cfg_memmap)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-+    dc->user_creatable = true;
-+    dc->props = pvpanic_mmio_properties;
-     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
- }
- 
+     Aml *dev = aml_device("FWCF");
+@@ -771,6 +785,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
+                        (irqmap[VIRT_UART] + ARM_SPI_BASE));
+     acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
++    acpi_dsdt_add_pvpanic(scope, &memmap[VIRT_PVPANIC]);
+     acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
+     acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
+                     (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
 -- 
 1.8.3.1
