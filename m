@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gRDN1-0004G0-Sc
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:40:01 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gRDUo-0007JF-5S
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:48:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gRDMw-0007CS-8i
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:39:59 -0500
-Received: from 5.mo68.mail-out.ovh.net ([46.105.62.179]:49488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gRDMw-0007BM-09
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:39:54 -0500
-Received: from player714.ha.ovh.net (unknown [10.109.146.175])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id CDD5A107C63
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 10:39:51 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-5-clg@kaod.org>
-	<20181122044450.GF10448@umbus.fritz.box>
-	<121d4f915a03c2e734feebceda023947aedb78a3.camel@kernel.crashing.org>
-	<20181123011005.GU10448@umbus.fritz.box>
-	<12f3da3b-3761-a26f-4460-65d3c978f52d@kaod.org>
-	<20181126054429.GH2251@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <81ec65f1-f524-10af-8729-9abf890b4ee4@kaod.org>
-Date: Mon, 26 Nov 2018 10:39:44 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gRDUl-0005Dm-0r
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 04:48:02 -0500
+Date: Mon, 26 Nov 2018 10:47:49 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181126104749.1bbff657.cohuck@redhat.com>
+In-Reply-To: <91b54c7e-a7b1-b721-89be-12a5706a0e21@linux.ibm.com>
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181122165432.4437-4-cohuck@redhat.com>
+	<91b54c7e-a7b1-b721-89be-12a5706a0e21@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20181126054429.GH2251@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 04/36] ppc/xive: introduce the
- XiveRouter model
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] vfio-ccw: add handling for asnyc
+ channel instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +25,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On 11/26/18 6:44 AM, David Gibson wrote:
-> On Fri, Nov 23, 2018 at 11:28:24AM +0100, C=E9dric Le Goater wrote:
->> On 11/23/18 2:10 AM, David Gibson wrote:
->>> On Thu, Nov 22, 2018 at 05:50:07PM +1100, Benjamin Herrenschmidt wrot=
-e:
->>>> On Thu, 2018-11-22 at 15:44 +1100, David Gibson wrote:
->>>>>
->>>>> Sorry, didn't think of this in my first reply.
->>>>>
->>>>> 1) Does the hardware ever actually write back to the EAS?  I know i=
-t
->>>>> does for the END, but it's not clear why it would need to for the
->>>>> EAS.  If not, we don't need the setter.
->>>>
->>>> Nope, though the PAPR model will via hcalls
->>>
->>> Right, bit AIUI the set_eas hook is about abstracting PAPR vs bare
->>> metal details.  Since the hcall knows it's PAPR it can just update th=
-e
->>> backing information for the EAS directly, and no need for an
->>> abstracted hook.
->>
->> Indeed, the first versions of the XIVE patchset did not use such hooks=
-,=20
->> but when discussed we said we wanted abstract methods for the router=20
->> to validate the overall XIVE model, which is useful for PowerNV.=20
->>
->> We can change again and have the hcalls get/set directly in the EAT
->> and ENDT. It would certainly simplify the sPAPR model.
->=20
-> I think that's the better approach.
+On Fri, 23 Nov 2018 14:08:03 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-ok. let's keep that in mind for  :=20
+> On 22/11/2018 17:54, Cornelia Huck wrote:
+> > Add a region to the vfio-ccw device that can be used to submit
+> > asynchronous I/O instructions. ssch continues to be handled by the
+> > existing I/O region; the new region handles hsch and csch.
+> > 
+> > Interrupt status continues to be reported through the same channels
+> > as for ssch.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >   drivers/s390/cio/Makefile           |   3 +-
+> >   drivers/s390/cio/vfio_ccw_async.c   |  88 ++++++++++++++++
+> >   drivers/s390/cio/vfio_ccw_drv.c     |  48 ++++++---
+> >   drivers/s390/cio/vfio_ccw_fsm.c     | 158 +++++++++++++++++++++++++++-
+> >   drivers/s390/cio/vfio_ccw_ops.c     |  13 ++-
+> >   drivers/s390/cio/vfio_ccw_private.h |   6 ++
+> >   include/uapi/linux/vfio.h           |   4 +
+> >   include/uapi/linux/vfio_ccw.h       |  12 +++
+> >   8 files changed, 313 insertions(+), 19 deletions(-)
+> >   create mode 100644 drivers/s390/cio/vfio_ccw_async.c
 
- [PATCH v5 11/36] spapr/xive: use the VCPU id as a NVT identifier
- [PATCH v5 16/36] spapr: add hcalls support for the XIVE exploitation
+(...)
 
-which are using the XiveRouter methods to access the controller EAT=20
-and ENDT. I thought that was good practice to validate the model but=20
-we can use direct sPAPR table accessors or none at all.
+> > +static int fsm_do_halt(struct vfio_ccw_private *private)
+> > +{
+> > +	struct subchannel *sch;
+> > +	unsigned long flags;
+> > +	int ccode;
+> > +	int ret;
+> > +
+> > +	sch = private->sch;
+> > +
+> > +	spin_lock_irqsave(sch->lock, flags);
+> > +	private->state = VFIO_CCW_STATE_BUSY;
+> > +
+> > +	/* Issue "Halt Subchannel" */
+> > +	ccode = hsch(sch->schid);
+> > +
+> > +	switch (ccode) {
+> > +	case 0:
+> > +		/*
+> > +		 * Initialize device status information
+> > +		 */
+> > +		sch->schib.scsw.cmd.actl |= SCSW_ACTL_HALT_PEND;
+> > +		ret = 0;
+> > +		break;
+> > +	case 1:		/* Status pending */
+> > +	case 2:		/* Busy */
+> > +		ret = -EBUSY;
+> > +		break;
+> > +	case 3:		/* Device not operational */
+> > +	{
+> > +		ret = -ENODEV;
+> > +		break;
+> > +	}
+> > +	default:
+> > +		ret = ccode;
+> > +	}  
+> 
+> Shouldn't you set the state back here?
 
+This is handled as for ssch, i.e. the state is restored by the caller.
 
-I think these prereq patches could be merged now :
+> 
+> > +	spin_unlock_irqrestore(sch->lock, flags);
+> > +	return ret;
+> > +}
+> > +
+> > +static int fsm_do_clear(struct vfio_ccw_private *private)
+> > +{
+> > +	struct subchannel *sch;
+> > +	unsigned long flags;
+> > +	int ccode;
+> > +	int ret;
+> > +
+> > +	sch = private->sch;
+> > +
+> > +	spin_lock_irqsave(sch->lock, flags);
+> > +	private->state = VFIO_CCW_STATE_BUSY;
+> > +
+> > +	/* Issue "Clear Subchannel" */
+> > +	ccode = csch(sch->schid);
+> > +
+> > +	switch (ccode) {
+> > +	case 0:
+> > +		/*
+> > +		 * Initialize device status information
+> > +		 */
+> > +		sch->schib.scsw.cmd.actl = SCSW_ACTL_CLEAR_PEND;
+> > +		/* TODO: check what else we might need to clear */
+> > +		ret = 0;
+> > +		break;
+> > +	case 3:		/* Device not operational */
+> > +	{
+> > +		ret = -ENODEV;
+> > +		break;
+> > +	}
+> > +	default:
+> > +		ret = ccode;
+> > +	}
+> > +	spin_unlock_irqrestore(sch->lock, flags);
+> > +	return ret;
 
- [PATCH v5 12/36] spapr: initialize VSMT before initializing the IRQ
- [PATCH v5 13/36] spapr: introduce a spapr_irq_init() routine
- [PATCH v5 14/36] spapr: modify the irq backend 'init' method
+Same here, btw.
 
-This one also :
+> > +}
+> > +
+> >   static void fsm_notoper(struct vfio_ccw_private *private,
+> >   			enum vfio_ccw_event event)
+> >   {
+> > @@ -102,6 +179,20 @@ static void fsm_io_busy(struct vfio_ccw_private *private,
+> >   	private->io_region->ret_code = -EBUSY;
+> >   }
+> >   
+> > +static void fsm_async_error(struct vfio_ccw_private *private,
+> > +			    enum vfio_ccw_event event)
+> > +{
+> > +	pr_err("vfio-ccw: FSM: halt/clear request from state:%d\n",
+> > +	       private->state);
+> > +	private->cmd_region->ret_code = -EIO;
+> > +}
+> > +
+> > +static void fsm_async_busy(struct vfio_ccw_private *private,
+> > +			   enum vfio_ccw_event event)
+> > +{
+> > +	private->cmd_region->ret_code = -EBUSY;
+> > +}
+> > +
+> >   static void fsm_disabled_irq(struct vfio_ccw_private *private,
+> >   			     enum vfio_ccw_event event)
+> >   {
+> > @@ -166,11 +257,11 @@ static void fsm_io_request(struct vfio_ccw_private *private,
+> >   		}
+> >   		return;
+> >   	} else if (scsw->cmd.fctl & SCSW_FCTL_HALT_FUNC) {
+> > -		/* XXX: Handle halt. */
+> > +		/* halt is handled via the async cmd region */
+> >   		io_region->ret_code = -EOPNOTSUPP;
+> >   		goto err_out;
+> >   	} else if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
+> > -		/* XXX: Handle clear. */
+> > +		/* clear is handled via the async cmd region */
+> >   		io_region->ret_code = -EOPNOTSUPP;
+> >   		goto err_out;  
+> 
+> What about filtering inside the vfio_ccw_mdev_write_io_region() before 
+> the call to the FSM?
 
- [PATCH v5 21/36] spapr: extend the sPAPR IRQ backend for XICS
+We can do that as well, maybe as a patch on top. What I like about
+doing it here is that all poking into the I/O region is done in one
+place. On the other hand, doing it beforehand saves us some churn.
 
-Thanks,
+> 
+> 
+> >   	}
+> > @@ -181,6 +272,59 @@ static void fsm_io_request(struct vfio_ccw_private *private,
+> >   			       io_region->ret_code, errstr);
+> >   }
+> >   
+> > +/*
+> > + * Deal with a halt request from userspace.
+> > + */
+> > +static void fsm_halt_request(struct vfio_ccw_private *private,
+> > +			     enum vfio_ccw_event event)
+> > +{
+> > +	struct ccw_cmd_region *cmd_region = private->cmd_region;
+> > +	int state = private->state;
+> > +
+> > +	private->state = VFIO_CCW_STATE_BOXED;
+> > +
+> > +	if (cmd_region->command != VFIO_CCW_ASYNC_CMD_HSCH) {
+> > +		/* should not happen? */  
+> 
+> I think we should make sure it does not happen before we get here.
+> Like serializing HALT and CLEAR before the FSM.
 
-C.=20
+Given that there's only one generator of that event, that really should
+not happen :) It would mean that we have messed up our code later on.
+Maybe complain loudly here?
+
+> 
+> > +		cmd_region->ret_code = -EINVAL;
+> > +		goto err_out;
+> > +	}
+> > +
+> > +	cmd_region->ret_code = fsm_do_halt(private);  
+> 
+> fsm_do_halt() set the state to BUSY.
+> Do we need a state change here and in fsm_do_halt ?
+> 
+> Why not only the BUSY state?
+
+I basically took the ssch implementation and adapted it for halt/clear
+handling. We can certainly think about doing state transitions in
+different places, but I'd like to do that for all channel instructions
+at the same time.
+
+[Also note that this is still based on a version that still contains
+the BOXED state.]
+
+> 
+> > +	if (cmd_region->ret_code)
+> > +		goto err_out;
+> > +
+> > +	return;
+> > +
+> > +err_out:
+> > +	private->state = state;
+> > +}
+> > +  
+> 
+> ...snip...
+> 
+> Regards,
+> Pierre
+> 
