@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gRDot-0004ty-RK
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:08:49 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gRDqT-0005yq-D6
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:10:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gRDon-0004hf-JM
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:08:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34012)
+	(envelope-from <kraxel@redhat.com>) id 1gRDqO-00063j-T2
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:10:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gRDon-0004gy-Dw
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:08:41 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B874C307CEBD
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 10:08:40 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gRDqO-000638-OK
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:10:20 -0500
+Date: Mon, 26 Nov 2018 11:10:18 +0100
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 26 Nov 2018 11:08:36 +0100
-Message-Id: <20181126100836.8805-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] ehci: fix fetch qtd race
+Message-ID: <20181126101018.jnisucsvcxgmsbd3@sirius.home.kraxel.org>
+References: <20181123064646.23036-1-linzhecheng@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181123064646.23036-1-linzhecheng@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] cirrus_vga/migration: update the bank
+ offset before use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +27,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: linzhecheng <linzhecheng@huawei.com>
+Cc: qemu-devel@nongnu.org, maoming.maoming@huawei.com, Wang Xin <wangxinxin.wang@huawei.com>
 
-The token field contains the (guest-filled) state of the qtd, which
-indicates whenever the other fields are valid or not.  So make sure
-we read the token first, otherwise we may end up with an stale next
-pointer:
+On Fri, Nov 23, 2018 at 02:46:46PM +0800, linzhecheng wrote:
+> From: Wang Xin <wangxinxin.wang@huawei.com>
+> 
+> The cirrus bank0/1 offset should be updated before we update the vram's alias
+> offset.
 
-  (1) ehci reads next
-  (2) guest writes next
-  (3) guest writes token
-  (4) ehci reads token
-  (5) ehci operates with stale next.
+Queued for 3.1
 
-Typical effect is that qemu doesn't notice that the guest appends new
-qtds to the end of the queue.  Looks like the usb device stopped
-responding.  Linux can recover from that, but leaves a message in the
-kernel log that it did reset the usb device in question.
-
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/usb/hcd-ehci.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-index e5acfc5ba5..8d44d483df 100644
---- a/hw/usb/hcd-ehci.c
-+++ b/hw/usb/hcd-ehci.c
-@@ -1783,9 +1783,17 @@ static int ehci_state_fetchqtd(EHCIQueue *q)
-     EHCIqtd qtd;
-     EHCIPacket *p;
-     int again = 1;
-+    uint32_t addr;
- 
--    if (get_dwords(q->ehci, NLPTR_GET(q->qtdaddr), (uint32_t *) &qtd,
--                   sizeof(EHCIqtd) >> 2) < 0) {
-+    addr = NLPTR_GET(q->qtdaddr);
-+    if (get_dwords(q->ehci, addr +  8, &qtd.token,   1) < 0) {
-+        return 0;
-+    }
-+    barrier();
-+    if (get_dwords(q->ehci, addr +  0, &qtd.next,    1) < 0 ||
-+        get_dwords(q->ehci, addr +  4, &qtd.altnext, 1) < 0 ||
-+        get_dwords(q->ehci, addr + 12, qtd.bufptr,
-+                   ARRAY_SIZE(qtd.bufptr)) < 0) {
-         return 0;
-     }
-     ehci_trace_qtd(q, NLPTR_GET(q->qtdaddr), &qtd);
--- 
-2.9.3
+thanks,
+  Gerd
