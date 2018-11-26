@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gRPwH-0002oC-G5
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:05:14 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gRPwH-0002oJ-Ir
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:05:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gRPw7-0000I4-IT
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:05:07 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39498)
+	(envelope-from <richard.henderson@linaro.org>) id 1gRPwC-0000Px-PD
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:05:13 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:33436)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gRPw3-0000H2-Pc
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:04:59 -0500
-Received: by mail-pg1-x543.google.com with SMTP id w6so6877520pgl.6
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 15:04:58 -0800 (PST)
+	id 1gRPw5-0000H5-NP
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 18:05:03 -0500
+Received: by mail-pf1-x442.google.com with SMTP id c123so6626614pfb.0
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 15:05:00 -0800 (PST)
 Received: from cloudburst.twiddle.net (97-113-170-180.tukw.qwest.net.
 	[97.113.170.180]) by smtp.gmail.com with ESMTPSA id
-	o13sm1798703pfk.57.2018.11.26.15.04.56 for <qemu-devel@nongnu.org>
+	o13sm1798703pfk.57.2018.11.26.15.04.57 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Mon, 26 Nov 2018 15:04:56 -0800 (PST)
+	Mon, 26 Nov 2018 15:04:57 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 26 Nov 2018 15:04:49 -0800
-Message-Id: <20181126230450.672-4-richard.henderson@linaro.org>
+Date: Mon, 26 Nov 2018 15:04:50 -0800
+Message-Id: <20181126230450.672-5-richard.henderson@linaro.org>
 In-Reply-To: <20181126230450.672-1-richard.henderson@linaro.org>
 References: <20181126230450.672-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 3/4] tcg: Reference count labels
+Subject: [Qemu-devel] [PATCH 4/4] tcg: Add reachable_code_pass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +33,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Increment when adding branches, and decrement when removing them.
+Delete trivially dead code that follows unconditional branches and
+noreturn helpers.  These can occur either via optimization or via
+the structure of a target's translator following an exception.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg-op.h |  1 +
- tcg/tcg.h    |  3 ++-
- tcg/tcg-op.c |  2 ++
- tcg/tcg.c    | 20 ++++++++++++++++++++
- 4 files changed, 25 insertions(+), 1 deletion(-)
+ tcg/tcg.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
 
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index db4e9188f4..7007ec0d4d 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -260,6 +260,7 @@ static inline void gen_set_label(TCGLabel *l)
- 
- static inline void tcg_gen_br(TCGLabel *l)
- {
-+    l->refs++;
-     tcg_gen_op1(INDEX_op_br, label_arg(l));
- }
- 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 6b6bc75c82..c6caeeb42b 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -246,7 +246,8 @@ typedef struct TCGRelocation {
- 
- typedef struct TCGLabel {
-     unsigned has_value : 1;
--    unsigned id : 31;
-+    unsigned id : 15;
-+    unsigned refs : 16;
-     union {
-         uintptr_t value;
-         tcg_insn_unit *value_ptr;
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 1ad095cc35..bab889662d 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -240,6 +240,7 @@ void tcg_gen_brcond_i32(TCGCond cond, TCGv_i32 arg1, TCGv_i32 arg2, TCGLabel *l)
-     if (cond == TCG_COND_ALWAYS) {
-         tcg_gen_br(l);
-     } else if (cond != TCG_COND_NEVER) {
-+        l->refs++;
-         tcg_gen_op4ii_i32(INDEX_op_brcond_i32, arg1, arg2, cond, label_arg(l));
-     }
- }
-@@ -1405,6 +1406,7 @@ void tcg_gen_brcond_i64(TCGCond cond, TCGv_i64 arg1, TCGv_i64 arg2, TCGLabel *l)
-     if (cond == TCG_COND_ALWAYS) {
-         tcg_gen_br(l);
-     } else if (cond != TCG_COND_NEVER) {
-+        l->refs++;
-         if (TCG_TARGET_REG_BITS == 32) {
-             tcg_gen_op6ii_i32(INDEX_op_brcond2_i32, TCGV_LOW(arg1),
-                               TCGV_HIGH(arg1), TCGV_LOW(arg2),
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 17c193791f..31b9b58240 100644
+index 31b9b58240..ffbf8f01ad 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -2191,6 +2191,26 @@ static void process_op_defs(TCGContext *s)
+@@ -2301,6 +2301,81 @@ static void tcg_la_bb_end(TCGContext *s)
+     }
+ }
  
- void tcg_op_remove(TCGContext *s, TCGOp *op)
- {
-+    TCGLabel *label;
++/* Reachable analysis : remove unreachable code.  */
++static void reachable_code_pass(TCGContext *s)
++{
++    TCGOp *op, *op_next;
++    bool dead = false;
 +
-+    switch (op->opc) {
-+    case INDEX_op_br:
-+        label = arg_label(op->args[0]);
-+        label->refs--;
-+        break;
-+    case INDEX_op_brcond_i32:
-+    case INDEX_op_brcond_i64:
-+        label = arg_label(op->args[3]);
-+        label->refs--;
-+        break;
-+    case INDEX_op_brcond2_i32:
-+        label = arg_label(op->args[5]);
-+        label->refs--;
-+        break;
-+    default:
-+        break;
++    QTAILQ_FOREACH_SAFE(op, &s->ops, link, op_next) {
++        bool remove = dead;
++        TCGLabel *label;
++        int call_flags;
++
++        switch (op->opc) {
++        case INDEX_op_set_label:
++            label = arg_label(op->args[0]);
++            if (label->refs == 0) {
++                /*
++                 * While there is an occasional backward branch, virtually
++                 * all branches generated by the translators are forward.
++                 * Which means that generally we will have already removed
++                 * all references to the label that will be, and there is
++                 * little to be gained by iterating.
++                 */
++                remove = true;
++            } else {
++                /* Once we see a label, insns become live again.  */
++                dead = false;
++                remove = false;
++
++                /*
++                 * Optimization can fold conditional branches to unconditional.
++                 * If we find a label with one reference which is preceeded by
++                 * an unconditional branch to it, remove both.  This needed to
++                 * wait until the dead code in between them was removed.
++                 */
++                if (label->refs == 1) {
++                    TCGOp *op_prev = QTAILQ_PREV(op, TCGOpHead, link);
++                    if (op_prev->opc == INDEX_op_br &&
++                        label == arg_label(op_prev->args[0])) {
++                        tcg_op_remove(s, op_prev);
++                        remove = true;
++                    }
++                }
++            }
++            break;
++
++        case INDEX_op_br:
++        case INDEX_op_exit_tb:
++        case INDEX_op_goto_ptr:
++            /* Unconditional branches; everything following is dead.  */
++            dead = true;
++            break;
++
++        case INDEX_op_call:
++            /* Notice noreturn helper calls, raising exceptions.  */
++            call_flags = op->args[TCGOP_CALLO(op) + TCGOP_CALLI(op) + 1];
++            if (call_flags & TCG_CALL_NO_RETURN) {
++                dead = true;
++            }
++            break;
++
++        case INDEX_op_insn_start:
++            /* Never remove -- we need to keep these for unwind.  */
++            remove = false;
++            break;
++
++        default:
++            break;
++        }
++
++        if (remove) {
++            tcg_op_remove(s, op);
++        }
 +    }
++}
 +
-     QTAILQ_REMOVE(&s->ops, op, link);
-     QTAILQ_INSERT_TAIL(&s->free_ops, op, link);
-     s->nb_ops--;
+ /* Liveness analysis : update the opc_arg_life array to tell if a
+    given input arguments is dead. Instructions updating dead
+    temporaries are removed. */
+@@ -3537,6 +3612,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+     atomic_set(&prof->la_time, prof->la_time - profile_getclock());
+ #endif
+ 
++    reachable_code_pass(s);
+     liveness_pass_1(s);
+ 
+     if (s->nb_indirects > 0) {
 -- 
 2.17.2
