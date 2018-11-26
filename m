@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1gR8L4-0003zc-4W
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 23:17:38 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gR9MW-0005eT-SW
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 00:23:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1gR8L0-0000l5-2K
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 23:17:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48436)
+	(envelope-from <ppandit@redhat.com>) id 1gR9MS-0001G6-DZ
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 00:23:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47404)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1gR8Kz-0000js-T6
-	for qemu-devel@nongnu.org; Sun, 25 Nov 2018 23:17:34 -0500
-From: Bandan Das <bsd@redhat.com>
-References: <7280.1542702495@dschgrazlin2.units.it>
-	<jpgd0qz3vg4.fsf@linux.bootlegged.copy>
-	<20181121125008.GV4755@habkost.net>
-Date: Sun, 25 Nov 2018 23:17:28 -0500
-In-Reply-To: <20181121125008.GV4755@habkost.net> (Eduardo Habkost's message of
-	"Wed, 21 Nov 2018 10:50:08 -0200")
-Message-ID: <jpg4lc4iiav.fsf_-_@linux.bootlegged.copy>
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gR9MS-0001FZ-6f
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 00:23:08 -0500
+Date: Mon, 26 Nov 2018 10:53:02 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <154288760588.186240.13570647308765699402.stgit@bahia.lan>
+Message-ID: <nycvar.YSQ.7.76.1811261050260.29418@xnncv>
+References: <154288760588.186240.13570647308765699402.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] kvm: Use KVM_GET_MSR_INDEX_LIST for
- MSR_IA32_ARCH_CAPABILITIES support
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] 9p: fix QEMU crash when renaming files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +25,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: balducci@units.it, qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>, David Alan Gilbert <dgilbert@redhat.com>, Cole Robinson <crobinso@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, zhibin hu <noirfate@gmail.com>
 
++-- On Thu, 22 Nov 2018, Greg Kurz wrote --+
+| When using the 9P2000.u version of the protocol, the following shell
+| command line in the guest can cause QEMU to crash:
+| 
+|     while true; do rm -rf aa; mkdir -p a/b & touch a/b/c & mv a aa; done
+| 
+| With 9P2000.u, file renaming is handled by the WSTAT command. The
+| v9fs_wstat() function calls v9fs_complete_rename(), which calls
+| v9fs_fix_path() for every fid whose path is affected by the change.
+| The involved calls to v9fs_path_copy() may race with any other access
+| to the fid path performed by some worker thread, causing a crash like
+| shown below:
+| 
+| Thread 12 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+| 0x0000555555a25da2 in local_open_nofollow (fs_ctx=0x555557d958b8, path=0x0,
+|  flags=65536, mode=0) at hw/9pfs/9p-local.c:59
+| 59          while (*path && fd != -1) {
+| (gdb) bt
+| #0  0x0000555555a25da2 in local_open_nofollow (fs_ctx=0x555557d958b8,
+|  path=0x0, flags=65536, mode=0) at hw/9pfs/9p-local.c:59
+| #1  0x0000555555a25e0c in local_opendir_nofollow (fs_ctx=0x555557d958b8,
+|  path=0x0) at hw/9pfs/9p-local.c:92
+| #2  0x0000555555a261b8 in local_lstat (fs_ctx=0x555557d958b8,
+|  fs_path=0x555556b56858, stbuf=0x7fff84830ef0) at hw/9pfs/9p-local.c:185
+| #3  0x0000555555a2b367 in v9fs_co_lstat (pdu=0x555557d97498,
+|  path=0x555556b56858, stbuf=0x7fff84830ef0) at hw/9pfs/cofile.c:53
+| #4  0x0000555555a1e9e2 in v9fs_stat (opaque=0x555557d97498)
+|  at hw/9pfs/9p.c:1083
+| #5  0x0000555555e060a2 in coroutine_trampoline (i0=-669165424, i1=32767)
+|  at util/coroutine-ucontext.c:116
+| #6  0x00007fffef4f5600 in __start_context () at /lib64/libc.so.6
+| #7  0x0000000000000000 in  ()
+| (gdb)
+| 
+| The fix is to take the path write lock when calling v9fs_complete_rename(),
+| like in v9fs_rename().
+| 
+| Impact:  DoS triggered by unprivileged guest users.
+| 
+| Cc: P J P <ppandit@redhat.com>
+| Reported-by: zhibin hu <noirfate@gmail.com>
+| Signed-off-by: Greg Kurz <groug@kaod.org>
+| ---
+|  hw/9pfs/9p.c |    3 +++
+|  1 file changed, 3 insertions(+)
+| 
+| diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+| index 267a25533b77..bdf7919abfc5 100644
+| --- a/hw/9pfs/9p.c
+| +++ b/hw/9pfs/9p.c
+| @@ -2855,6 +2855,7 @@ static void coroutine_fn v9fs_wstat(void *opaque)
+|      struct stat stbuf;
+|      V9fsFidState *fidp;
+|      V9fsPDU *pdu = opaque;
+| +    V9fsState *s = pdu->s;
+|  
+|      v9fs_stat_init(&v9stat);
+|      err = pdu_unmarshal(pdu, offset, "dwS", &fid, &unused, &v9stat);
+| @@ -2920,7 +2921,9 @@ static void coroutine_fn v9fs_wstat(void *opaque)
+|          }
+|      }
+|      if (v9stat.name.size != 0) {
+| +        v9fs_path_write_lock(s);
+|          err = v9fs_complete_rename(pdu, fidp, -1, &v9stat.name);
+| +        v9fs_path_unlock(s);
+|          if (err < 0) {
+|              goto out;
+|          }
 
-When writing to guest's MSR_IA32_ARCH_CAPABILITIES, check whether it's
-supported in the guest using the KVM_GET_MSR_INDEX_LIST ioctl.
+It works to fix the issue.
+Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
 
-Fixes: d86f963694df27f11b3681ffd225c9362de1b634
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Tested-by: balducci@units.it
-Signed-off-by: Bandan Das <bsd@redhat.com>
----
- target/i386/kvm.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
-
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index f524e7d929..3d6739a2b2 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -95,6 +95,7 @@ static bool has_msr_xss;
- static bool has_msr_spec_ctrl;
- static bool has_msr_virt_ssbd;
- static bool has_msr_smi_count;
-+static bool has_msr_arch_capabs;
- 
- static uint32_t has_architectural_pmu_version;
- static uint32_t num_architectural_pmu_gp_counters;
-@@ -1481,6 +1482,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-                 case MSR_VIRT_SSBD:
-                     has_msr_virt_ssbd = true;
-                     break;
-+                case MSR_IA32_ARCH_CAPABILITIES:
-+                    has_msr_arch_capabs = true;
-+                    break;
-                 }
-             }
-         }
-@@ -2002,14 +2006,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
- #endif
- 
-     /* If host supports feature MSR, write down. */
--    if (kvm_feature_msrs) {
--        int i;
--        for (i = 0; i < kvm_feature_msrs->nmsrs; i++)
--            if (kvm_feature_msrs->indices[i] == MSR_IA32_ARCH_CAPABILITIES) {
--                kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
--                              env->features[FEAT_ARCH_CAPABILITIES]);
--                break;
--            }
-+    if (has_msr_arch_capabs) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
-+                          env->features[FEAT_ARCH_CAPABILITIES]);
-     }
- 
-     /*
--- 
-2.14.5
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
