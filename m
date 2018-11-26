@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gRE8J-0005Fh-8I
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:28:54 -0500
+	(envelope-from <liq3ea@outlook.com>) id 1gREDl-00006c-RB
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:34:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gRE89-0005wd-VP
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:28:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40042)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gRE89-0005wB-OU
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:28:41 -0500
-References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
-	<20181122072028.22819-3-xiaoguangrong@tencent.com>
-	<20181124001734.GF17229@flamenco>
-	<122f7c3b-ebaf-a2c0-3181-cce82d857058@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e6a87a89-e667-5c8d-9016-1d6c2a65fc6a@redhat.com>
-Date: Mon, 26 Nov 2018 11:28:28 +0100
-MIME-Version: 1.0
-In-Reply-To: <122f7c3b-ebaf-a2c0-3181-cce82d857058@gmail.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <liq3ea@outlook.com>) id 1gREDf-0003Ob-My
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:34:29 -0500
+Received: from mail-oln040092003045.outbound.protection.outlook.com
+	([40.92.3.45]:41568
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liq3ea@outlook.com>) id 1gREDe-0003H8-Kk
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 05:34:23 -0500
+From: li qiang <liq3ea@outlook.com>
+Date: Mon, 26 Nov 2018 10:34:13 +0000
+Message-ID: <BN6PR18MB1220C6FD680DB5E2C2AEA9F09FD70@BN6PR18MB1220.namprd18.prod.outlook.com>
+References: <20181126100836.8805-1-kraxel@redhat.com>
+In-Reply-To: <20181126100836.8805-1-kraxel@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] util: introduce threaded workqueue
+Content-Type: text/plain; charset="gb2312"
+Content-ID: <D792E567124E8F448F575430815ADD61@namprd18.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] ehci: fix fetch qtd race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>, "Emilio G. Cota" <cota@braap.org>
-Cc: mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 26/11/18 09:18, Xiao Guangrong wrote:
->>
->>> +static uint64_t get_free_request_bitmap(Threads *threads,
->>> ThreadLocal *thread)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 uint64_t request_fill_bitmap, request_done_bitmap=
-, result_bitmap;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 request_fill_bitmap =3D
->>> atomic_rcu_read(&thread->request_fill_bitmap);
->>> +=C2=A0=C2=A0=C2=A0 request_done_bitmap =3D
->>> atomic_rcu_read(&thread->request_done_bitmap);
->>> +=C2=A0=C2=A0=C2=A0 bitmap_xor(&result_bitmap, &request_fill_bitmap,
->>> &request_done_bitmap,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 threads->thread_requests_nr);
->>
->> This is not wrong, but it's a big ugly. Instead, I would:
->>
->> - Introduce bitmap_xor_atomic in a previous patch
->> - Use bitmap_xor_atomic here, getting rid of the rcu reads
->=20
-> Hmm, however, we do not need atomic xor operation here... that should b=
-e
-> slower than
-> just two READ_ONCE calls.
-
-Yeah, I'd just go with Guangrong's version.  Alternatively, add
-find_{first,next}_{same,different}_bit functions (whatever subset of the
-4 you need).
-
-Paolo
+DQrU2iAyMDE4LzExLzI2IDE4OjA4LCBHZXJkIEhvZmZtYW5uINC0tcA6DQo+IFRoZSB0b2tlbiBm
+aWVsZCBjb250YWlucyB0aGUgKGd1ZXN0LWZpbGxlZCkgc3RhdGUgb2YgdGhlIHF0ZCwgd2hpY2gN
+Cj4gaW5kaWNhdGVzIHdoZW5ldmVyIHRoZSBvdGhlciBmaWVsZHMgYXJlIHZhbGlkIG9yIG5vdC4g
+IFNvIG1ha2Ugc3VyZQ0KPiB3ZSByZWFkIHRoZSB0b2tlbiBmaXJzdCwgb3RoZXJ3aXNlIHdlIG1h
+eSBlbmQgdXAgd2l0aCBhbiBzdGFsZSBuZXh0DQo+IHBvaW50ZXI6DQo+DQo+ICAgICgxKSBlaGNp
+IHJlYWRzIG5leHQNCj4gICAgKDIpIGd1ZXN0IHdyaXRlcyBuZXh0DQo+ICAgICgzKSBndWVzdCB3
+cml0ZXMgdG9rZW4NCj4gICAgKDQpIGVoY2kgcmVhZHMgdG9rZW4NCj4gICAgKDUpIGVoY2kgb3Bl
+cmF0ZXMgd2l0aCBzdGFsZSBuZXh0Lg0KDQpIZWxsbyBHZXJkLA0KDQpDb3VsZCB5b3UgcGxlYXNl
+IGV4cGxhaW4gaG93IHRoaXMgY2FuIGhhcHBlbj8NCg0KSU1PLCB0aGUgZGV2aWNlIGVtdWxhdGlv
+biBob2xkcyB0aGUgQlFMIGFuZCB0aGUgZ3Vlc3QgY2FuJ3QgZXhlY3V0ZSwgaG93IA0KY2FuIHRo
+ZSBndWVzdA0KDQp3cml0ZSB0aGlzIHdoZW4gUUVNVSBpcyBpbiAnZWhjaV9zdGF0ZV9mZXRjaHF0
+ZCc/DQoNCg0KVGhhbmtzLA0KDQpMaSBRaWFuZw0KDQoNCj4gVHlwaWNhbCBlZmZlY3QgaXMgdGhh
+dCBxZW11IGRvZXNuJ3Qgbm90aWNlIHRoYXQgdGhlIGd1ZXN0IGFwcGVuZHMgbmV3DQo+IHF0ZHMg
+dG8gdGhlIGVuZCBvZiB0aGUgcXVldWUuICBMb29rcyBsaWtlIHRoZSB1c2IgZGV2aWNlIHN0b3Bw
+ZWQNCj4gcmVzcG9uZGluZy4gIExpbnV4IGNhbiByZWNvdmVyIGZyb20gdGhhdCwgYnV0IGxlYXZl
+cyBhIG1lc3NhZ2UgaW4gdGhlDQo+IGtlcm5lbCBsb2cgdGhhdCBpdCBkaWQgcmVzZXQgdGhlIHVz
+YiBkZXZpY2UgaW4gcXVlc3Rpb24uDQo+DQo+IFNpZ25lZC1vZmYtYnk6IEdlcmQgSG9mZm1hbm4g
+PGtyYXhlbEByZWRoYXQuY29tPg0KPiAtLS0NCj4gICBody91c2IvaGNkLWVoY2kuYyB8IDEyICsr
+KysrKysrKystLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxMCBpbnNlcnRpb25zKCspLCAyIGRlbGV0
+aW9ucygtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvaHcvdXNiL2hjZC1laGNpLmMgYi9ody91c2IvaGNk
+LWVoY2kuYw0KPiBpbmRleCBlNWFjZmM1YmE1Li44ZDQ0ZDQ4M2RmIDEwMDY0NA0KPiAtLS0gYS9o
+dy91c2IvaGNkLWVoY2kuYw0KPiArKysgYi9ody91c2IvaGNkLWVoY2kuYw0KPiBAQCAtMTc4Myw5
+ICsxNzgzLDE3IEBAIHN0YXRpYyBpbnQgZWhjaV9zdGF0ZV9mZXRjaHF0ZChFSENJUXVldWUgKnEp
+DQo+ICAgICAgIEVIQ0lxdGQgcXRkOw0KPiAgICAgICBFSENJUGFja2V0ICpwOw0KPiAgICAgICBp
+bnQgYWdhaW4gPSAxOw0KPiArICAgIHVpbnQzMl90IGFkZHI7DQo+ICAgDQo+IC0gICAgaWYgKGdl
+dF9kd29yZHMocS0+ZWhjaSwgTkxQVFJfR0VUKHEtPnF0ZGFkZHIpLCAodWludDMyX3QgKikgJnF0
+ZCwNCj4gLSAgICAgICAgICAgICAgICAgICBzaXplb2YoRUhDSXF0ZCkgPj4gMikgPCAwKSB7DQo+
+ICsgICAgYWRkciA9IE5MUFRSX0dFVChxLT5xdGRhZGRyKTsNCj4gKyAgICBpZiAoZ2V0X2R3b3Jk
+cyhxLT5laGNpLCBhZGRyICsgIDgsICZxdGQudG9rZW4sICAgMSkgPCAwKSB7DQo+ICsgICAgICAg
+IHJldHVybiAwOw0KPiArICAgIH0NCj4gKyAgICBiYXJyaWVyKCk7DQo+ICsgICAgaWYgKGdldF9k
+d29yZHMocS0+ZWhjaSwgYWRkciArICAwLCAmcXRkLm5leHQsICAgIDEpIDwgMCB8fA0KPiArICAg
+ICAgICBnZXRfZHdvcmRzKHEtPmVoY2ksIGFkZHIgKyAgNCwgJnF0ZC5hbHRuZXh0LCAxKSA8IDAg
+fHwNCj4gKyAgICAgICAgZ2V0X2R3b3JkcyhxLT5laGNpLCBhZGRyICsgMTIsIHF0ZC5idWZwdHIs
+DQo+ICsgICAgICAgICAgICAgICAgICAgQVJSQVlfU0laRShxdGQuYnVmcHRyKSkgPCAwKSB7DQo+
+ICAgICAgICAgICByZXR1cm4gMDsNCj4gICAgICAgfQ0KPiAgICAgICBlaGNpX3RyYWNlX3F0ZChx
+LCBOTFBUUl9HRVQocS0+cXRkYWRkciksICZxdGQpOw0K
