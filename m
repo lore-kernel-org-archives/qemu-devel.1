@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gRF4J-0005Yq-Ur
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 06:28:49 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gRF8g-0000I5-KI
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 06:33:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gRF4I-0004vm-Jj
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 06:28:47 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 26 Nov 2018 12:28:28 +0100
-Message-Id: <20181126112828.23047-3-kwolf@redhat.com>
-In-Reply-To: <20181126112828.23047-1-kwolf@redhat.com>
-References: <20181126112828.23047-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.1 2/2] iotests: Test migration with
- -blockdev
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gRF8d-0001xb-Un
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 06:33:18 -0500
+From: Peng Hao <peng.hao2@zte.com.cn>
+Date: Tue, 27 Nov 2018 03:55:56 +0800
+Message-Id: <1543262162-6351-4-git-send-email-peng.hao2@zte.com.cn>
+In-Reply-To: <1543262162-6351-1-git-send-email-peng.hao2@zte.com.cn>
+References: <1543262162-6351-1-git-send-email-peng.hao2@zte.com.cn>
+Subject: [Qemu-devel] [PATCH V9 3/9] hw/misc/pvpanic: Add the MMIO interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,188 +19,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org
+To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-Check that block node activation and inactivation works with a block
-graph that is built with individually created nodes.
+Add pvpanic new type "TYPE_PVPANIC_MMIO"
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- tests/qemu-iotests/234     | 105 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/234.out |  27 ++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 133 insertions(+)
- create mode 100755 tests/qemu-iotests/234
- create mode 100644 tests/qemu-iotests/234.out
+ hw/misc/pvpanic.c         | 50 +++++++++++++++++++++++++++++++++++++++++++----
+ include/hw/misc/pvpanic.h |  1 +
+ 2 files changed, 47 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/234 b/tests/qemu-iotests/234
-new file mode 100755
-index 0000000000..1f695d337a
---- /dev/null
-+++ b/tests/qemu-iotests/234
-@@ -0,0 +1,105 @@
-+#!/usr/bin/env python
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: Kevin Wolf <kwolf@redhat.com>
-+#
-+# Check that block node activation and inactivation works with a block g=
-raph
-+# that is built with individually created nodes
+diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
+index 0f23a67..c9382a8 100644
+--- a/hw/misc/pvpanic.c
++++ b/hw/misc/pvpanic.c
+@@ -2,10 +2,12 @@
+  * QEMU simulated pvpanic device.
+  *
+  * Copyright Fujitsu, Corp. 2013
++ * Copyright (c) 2018 ZTE Ltd.
+  *
+  * Authors:
+  *     Wen Congyang <wency@cn.fujitsu.com>
+  *     Hu Tao <hutao@cn.fujitsu.com>
++ *     Peng Hao <peng.hao2@zte.com.cn>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or later.
+  * See the COPYING file in the top-level directory.
+@@ -28,6 +30,9 @@
+ #define PVPANIC_ISA_DEVICE(obj)    \
+     OBJECT_CHECK(PVPanicISAState, (obj), TYPE_PVPANIC)
+ 
++#define PVPANIC_MMIO_DEVICE(obj)    \
++    OBJECT_CHECK(PVPanicMMIOState, (obj), TYPE_PVPANIC_MMIO)
 +
-+import iotests
-+import os
+ static void handle_event(int event)
+ {
+     static bool logged;
+@@ -56,21 +61,32 @@ typedef struct PVPanicISAState {
+     MemoryRegion mr;
+ } PVPanicISAState;
+ 
++/* PVPanicMMIOState for sysbus device and
++ * use mmio.
++ */
++typedef struct PVPanicMMIOState {
++    SysBusDevice parent_obj;
++    /*<private>*/
 +
-+iotests.verify_image_format(supported_fmts=3D['raw', 'qcow2'])
-+iotests.verify_platform(['linux'])
++    /* public */
++    MemoryRegion mr;
++} PVPanicMMIOState;
 +
-+with iotests.FilePath('img') as img_path, \
-+     iotests.FilePath('mig_fifo_a') as fifo_a, \
-+     iotests.FilePath('mig_fifo_b') as fifo_b, \
-+     iotests.VM(path_suffix=3D'a') as vm_a, \
-+     iotests.VM(path_suffix=3D'b') as vm_b:
+ /* return supported events on read */
+-static uint64_t pvpanic_ioport_read(void *opaque, hwaddr addr, unsigned size)
++static uint64_t pvpanic_read(void *opaque, hwaddr addr, unsigned size)
+ {
+     return PVPANIC_PANICKED;
+ }
+ 
+-static void pvpanic_ioport_write(void *opaque, hwaddr addr, uint64_t val,
++static void pvpanic_write(void *opaque, hwaddr addr, uint64_t val,
+                                  unsigned size)
+ {
+     handle_event(val);
+ }
+ 
+ static const MemoryRegionOps pvpanic_ops = {
+-    .read = pvpanic_ioport_read,
+-    .write = pvpanic_ioport_write,
++    .read = pvpanic_read,
++    .write = pvpanic_write,
+     .impl = {
+         .min_access_size = 1,
+         .max_access_size = 1,
+@@ -125,9 +141,35 @@ static TypeInfo pvpanic_isa_info = {
+     .class_init    = pvpanic_isa_class_init,
+ };
+ 
++static void pvpanic_mmio_initfn(Object *obj)
++{
++    PVPanicMMIOState *s = PVPANIC_MMIO_DEVICE(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
 +
-+    iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, img_path, '64M=
-')
++    memory_region_init_io(&s->mr, OBJECT(s), &pvpanic_ops, s,
++                          TYPE_PVPANIC_MMIO, 2);
++    sysbus_init_mmio(sbd, &s->mr);
++}
 +
-+    os.mkfifo(fifo_a)
-+    os.mkfifo(fifo_b)
++static void pvpanic_mmio_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    iotests.log('Launching source VM...')
-+    (vm_a.add_blockdev('file,filename=3D%s,node-name=3Ddrive0-file' % (i=
-mg_path))
-+         .add_blockdev('%s,file=3Ddrive0-file,node-name=3Ddrive0' % (iot=
-ests.imgfmt))
-+         .launch())
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++}
 +
-+    iotests.log('Launching destination VM...')
-+    (vm_b.add_blockdev('file,filename=3D%s,node-name=3Ddrive0-file' % (i=
-mg_path))
-+         .add_blockdev('%s,file=3Ddrive0-file,node-name=3Ddrive0' % (iot=
-ests.imgfmt))
-+         .add_incoming("exec: cat '%s'" % (fifo_a))
-+         .launch())
++static TypeInfo pvpanic_mmio_info = {
++    .name          = TYPE_PVPANIC_MMIO,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(PVPanicMMIOState),
++    .instance_init = pvpanic_mmio_initfn,
++    .class_init    = pvpanic_mmio_class_init,
++};
 +
-+    iotests.log('Enabling migration QMP events on A...')
-+    iotests.log(vm_a.qmp('migrate-set-capabilities', capabilities=3D[
-+        {
-+            'capability': 'events',
-+            'state': True
-+        }
-+    ]))
-+
-+    iotests.log('Starting migration to B...')
-+    iotests.log(vm_a.qmp('migrate', uri=3D'exec:cat >%s' % (fifo_a)))
-+    with iotests.Timeout(3, 'Migration does not complete'):
-+        while True:
-+            event =3D vm_a.event_wait('MIGRATION')
-+            iotests.log(event, filters=3D[iotests.filter_qmp_event])
-+            if event['data']['status'] =3D=3D 'completed':
-+                break
-+
-+    iotests.log(vm_a.qmp('query-migrate')['return']['status'])
-+    iotests.log(vm_b.qmp('query-migrate')['return']['status'])
-+
-+    iotests.log(vm_a.qmp('query-status'))
-+    iotests.log(vm_b.qmp('query-status'))
-+
-+    iotests.log('Add a second parent to drive0-file...')
-+    iotests.log(vm_b.qmp('blockdev-add', driver=3D'raw', file=3D'drive0-=
-file',
-+                         node_name=3D'drive0-raw'))
-+
-+    iotests.log('Restart A with -incoming and second parent...')
-+    vm_a.shutdown()
-+    (vm_a.add_blockdev('raw,file=3Ddrive0-file,node-name=3Ddrive0-raw')
-+         .add_incoming("exec: cat '%s'" % (fifo_b))
-+         .launch())
-+
-+    iotests.log('Enabling migration QMP events on B...')
-+    iotests.log(vm_b.qmp('migrate-set-capabilities', capabilities=3D[
-+        {
-+            'capability': 'events',
-+            'state': True
-+        }
-+    ]))
-+
-+    iotests.log('Starting migration back to A...')
-+    iotests.log(vm_b.qmp('migrate', uri=3D'exec:cat >%s' % (fifo_b)))
-+    with iotests.Timeout(3, 'Migration does not complete'):
-+        while True:
-+            event =3D vm_b.event_wait('MIGRATION')
-+            iotests.log(event, filters=3D[iotests.filter_qmp_event])
-+            if event['data']['status'] =3D=3D 'completed':
-+                break
-+
-+    iotests.log(vm_a.qmp('query-migrate')['return']['status'])
-+    iotests.log(vm_b.qmp('query-migrate')['return']['status'])
-+
-+    iotests.log(vm_a.qmp('query-status'))
-+    iotests.log(vm_b.qmp('query-status'))
-diff --git a/tests/qemu-iotests/234.out b/tests/qemu-iotests/234.out
-new file mode 100644
-index 0000000000..115537cd5c
---- /dev/null
-+++ b/tests/qemu-iotests/234.out
-@@ -0,0 +1,27 @@
-+Launching source VM...
-+Launching destination VM...
-+Enabling migration QMP events on A...
-+{"return": {}}
-+Starting migration to B...
-+{"return": {}}
-+{"data": {"status": "setup"}, "event": "MIGRATION", "timestamp": {"micro=
-seconds": "USECS", "seconds": "SECS"}}
-+{"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
-oseconds": "USECS", "seconds": "SECS"}}
-+{"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
-icroseconds": "USECS", "seconds": "SECS"}}
-+completed
-+completed
-+{"return": {"running": false, "singlestep": false, "status": "postmigrat=
-e"}}
-+{"return": {"running": true, "singlestep": false, "status": "running"}}
-+Add a second parent to drive0-file...
-+{"return": {}}
-+Restart A with -incoming and second parent...
-+Enabling migration QMP events on B...
-+{"return": {}}
-+Starting migration back to A...
-+{"return": {}}
-+{"data": {"status": "setup"}, "event": "MIGRATION", "timestamp": {"micro=
-seconds": "USECS", "seconds": "SECS"}}
-+{"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
-oseconds": "USECS", "seconds": "SECS"}}
-+{"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
-icroseconds": "USECS", "seconds": "SECS"}}
-+completed
-+completed
-+{"return": {"running": true, "singlestep": false, "status": "running"}}
-+{"return": {"running": false, "singlestep": false, "status": "postmigrat=
-e"}}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index ddf1a5b549..8c56a0ad11 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -231,3 +231,4 @@
- 231 auto quick
- 232 auto quick
- 233 auto quick
-+234 auto quick migration
---=20
-2.19.1
+ static void pvpanic_register_types(void)
+ {
+     type_register_static(&pvpanic_isa_info);
++    type_register_static(&pvpanic_mmio_info);
+ }
+ 
+ type_init(pvpanic_register_types)
+diff --git a/include/hw/misc/pvpanic.h b/include/hw/misc/pvpanic.h
+index 1ee071a..f1a05b2 100644
+--- a/include/hw/misc/pvpanic.h
++++ b/include/hw/misc/pvpanic.h
+@@ -15,6 +15,7 @@
+ #define HW_MISC_PVPANIC_H
+ 
+ #define TYPE_PVPANIC "pvpanic"
++#define TYPE_PVPANIC_MMIO "pvpanic-mmio"
+ 
+ #define PVPANIC_IOPORT_PROP "ioport"
+ 
+-- 
+1.8.3.1
