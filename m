@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRH9u-0001Bo-PL
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:43 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gRHA1-0001cW-CP
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRH9u-0001IY-0q
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:42 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33308)
+	(envelope-from <mlureau@redhat.com>) id 1gRH9y-0001Ji-2o
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:49 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:36203)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gRH9t-0001I3-TE
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:41 -0500
-Received: by mail-ot1-x341.google.com with SMTP id i20so16617743otl.0
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 05:42:41 -0800 (PST)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gRH9x-0001JT-T5
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 08:42:46 -0500
+Received: by mail-qt1-f194.google.com with SMTP id t13so17503966qtn.3
+	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 05:42:45 -0800 (PST)
 MIME-Version: 1.0
-References: <20181123135450.24829-1-edgar.iglesias@gmail.com>
-	<20181123135450.24829-2-edgar.iglesias@gmail.com>
-	<75bcddbc-da2d-aeb3-71d3-52b635520d2a@redhat.com>
-	<20181123165945.GM1148@toto>
-	<CAFEAcA8vWT5sayyBzbU7S8BwA06Kj=G1izioufjHFJdsEkyq4g@mail.gmail.com>
-	<20181126125230.GO1148@toto>
-In-Reply-To: <20181126125230.GO1148@toto>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Nov 2018 13:42:29 +0000
-Message-ID: <CAFEAcA_AZWwW7uQFCScBSZnw23AOQFcqXGXDRfZKnz6E3-yCBg@mail.gmail.com>
+References: <cover.1541507990.git.artem.k.pisarenko@gmail.com>
+	<7dde6abbd21682857f8294644013173c0b9949b3.1541507990.git.artem.k.pisarenko@gmail.com>
+In-Reply-To: <7dde6abbd21682857f8294644013173c0b9949b3.1541507990.git.artem.k.pisarenko@gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 26 Nov 2018 17:42:33 +0400
+Message-ID: <CAMxuvaz8aMnTP2w72BQ3fML-OVfv0=cNGvmnpdFM3VwU-KH8ag@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] net: cadence_gem: Remove incorrect
- assert()
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] chardev: fix mess in OPENED/CLOSED
+ events when muxed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,24 +30,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, mbilal <muhammad_bilal@mentor.com>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>
+To: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>
 
-On Mon, 26 Nov 2018 at 12:52, Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
+On Tue, Nov 6, 2018 at 4:41 PM Artem Pisarenko
+<artem.k.pisarenko@gmail.com> wrote:
 >
-> On Fri, Nov 23, 2018 at 05:09:35PM +0000, Peter Maydell wrote:
-> > On Fri, 23 Nov 2018 at 16:59, Edgar E. Iglesias
-> > <edgar.iglesias@gmail.com> wrote:
-> > > Not sure if it's too late to even get the removal of the assert into this release? Peter?
-> >
-> > If you're happy that removing the assert is the correct fix,
-> > yes, this could go in before rc3 next week.
+> When chardev is multiplexed (mux=3Don) there are a lot of cases where
+> CHR_EVENT_OPENED/CHR_EVENT_CLOSED events pairing (expected from
+> frontend side) is broken. There are either generation of multiple
+> repeated or extra CHR_EVENT_OPENED events, or CHR_EVENT_CLOSED just
+> isn't generated at all.
+> This is mostly because 'qemu_chr_fe_set_handlers()' function makes its
+> own (and often wrong) implicit decision on updated frontend state and
+> invokes 'fd_event' callback with 'CHR_EVENT_OPENED'. And even worse,
+> it doesn't do symmetric action in opposite direction, as someone may
+> expect (i.e. it doesn't invoke previously set 'fd_event' with
+> 'CHR_EVENT_CLOSED'). Muxed chardev uses trick by calling this function
+> again to replace callback handlers with its own ones, but it doesn't
+> account for such side effect.
+> Fix that using extended version of this function with added argument
+> for disabling side effect and keep original function for compatibility
+> with lots of frontends already using this interface and being
+> "tolerant" to its side effects.
+> One more source of event duplication is just line of code in
+> char-mux.c, which does far more than comment above says (obvious fix).
 >
->
-> Yes, I think removing the assert is a suitable fix for the release.
+> Signed-off-by: Artem Pisarenko <artem.k.pisarenko@gmail.com>
 
-OK, I have applied this to target-arm.next for rc3.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-thanks
--- PMM
+> ---
+>
+> Notes:
+>     v3:
+>      - extended and improved commit message with 'why' and 'how' explanat=
+ion
+>
+>  chardev/char-fe.c         | 33 ++++++++++++++++++++++++---------
+>  chardev/char-mux.c        | 16 ++++++++--------
+>  include/chardev/char-fe.h | 18 +++++++++++++++++-
+>  3 files changed, 49 insertions(+), 18 deletions(-)
+>
+> diff --git a/chardev/char-fe.c b/chardev/char-fe.c
+> index a8931f7..b7bcbd5 100644
+> --- a/chardev/char-fe.c
+> +++ b/chardev/char-fe.c
+> @@ -246,14 +246,15 @@ void qemu_chr_fe_deinit(CharBackend *b, bool del)
+>      }
+>  }
+>
+> -void qemu_chr_fe_set_handlers(CharBackend *b,
+> -                              IOCanReadHandler *fd_can_read,
+> -                              IOReadHandler *fd_read,
+> -                              IOEventHandler *fd_event,
+> -                              BackendChangeHandler *be_change,
+> -                              void *opaque,
+> -                              GMainContext *context,
+> -                              bool set_open)
+> +void qemu_chr_fe_set_handlers_full(CharBackend *b,
+> +                                   IOCanReadHandler *fd_can_read,
+> +                                   IOReadHandler *fd_read,
+> +                                   IOEventHandler *fd_event,
+> +                                   BackendChangeHandler *be_change,
+> +                                   void *opaque,
+> +                                   GMainContext *context,
+> +                                   bool set_open,
+> +                                   bool sync_state)
+>  {
+>      Chardev *s;
+>      int fe_open;
+> @@ -285,7 +286,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+>          qemu_chr_fe_take_focus(b);
+>          /* We're connecting to an already opened device, so let's make s=
+ure we
+>             also get the open event */
+> -        if (s->be_open) {
+> +        if (sync_state && s->be_open) {
+>              qemu_chr_be_event(s, CHR_EVENT_OPENED);
+>          }
+>      }
+> @@ -295,6 +296,20 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+>      }
+>  }
+>
+> +void qemu_chr_fe_set_handlers(CharBackend *b,
+> +                              IOCanReadHandler *fd_can_read,
+> +                              IOReadHandler *fd_read,
+> +                              IOEventHandler *fd_event,
+> +                              BackendChangeHandler *be_change,
+> +                              void *opaque,
+> +                              GMainContext *context,
+> +                              bool set_open)
+> +{
+> +    qemu_chr_fe_set_handlers_full(b, fd_can_read, fd_read, fd_event, be_=
+change,
+> +                                  opaque, context, set_open,
+> +                                  true);
+> +}
+> +
+>  void qemu_chr_fe_take_focus(CharBackend *b)
+>  {
+>      if (!b->chr) {
+> diff --git a/chardev/char-mux.c b/chardev/char-mux.c
+> index 6055e76..1199d32 100644
+> --- a/chardev/char-mux.c
+> +++ b/chardev/char-mux.c
+> @@ -283,13 +283,13 @@ void mux_chr_set_handlers(Chardev *chr, GMainContex=
+t *context)
+>      MuxChardev *d =3D MUX_CHARDEV(chr);
+>
+>      /* Fix up the real driver with mux routines */
+> -    qemu_chr_fe_set_handlers(&d->chr,
+> -                             mux_chr_can_read,
+> -                             mux_chr_read,
+> -                             mux_chr_event,
+> -                             NULL,
+> -                             chr,
+> -                             context, true);
+> +    qemu_chr_fe_set_handlers_full(&d->chr,
+> +                                  mux_chr_can_read,
+> +                                  mux_chr_read,
+> +                                  mux_chr_event,
+> +                                  NULL,
+> +                                  chr,
+> +                                  context, true, false);
+>  }
+>
+>  void mux_set_focus(Chardev *chr, int focus)
+> @@ -367,7 +367,7 @@ static int open_muxes(Chardev *chr)
+>       * mark mux as OPENED so any new FEs will immediately receive
+>       * OPENED event
+>       */
+> -    qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+> +    chr->be_open =3D 1;
+>
+>      return 0;
+>  }
+> diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
+> index 46c997d..c1b7fd9 100644
+> --- a/include/chardev/char-fe.h
+> +++ b/include/chardev/char-fe.h
+> @@ -67,7 +67,7 @@ bool qemu_chr_fe_backend_connected(CharBackend *be);
+>  bool qemu_chr_fe_backend_open(CharBackend *be);
+>
+>  /**
+> - * qemu_chr_fe_set_handlers:
+> + * qemu_chr_fe_set_handlers_full:
+>   * @b: a CharBackend
+>   * @fd_can_read: callback to get the amount of data the frontend may
+>   *               receive
+> @@ -79,12 +79,28 @@ bool qemu_chr_fe_backend_open(CharBackend *be);
+>   * @context: a main loop context or NULL for the default
+>   * @set_open: whether to call qemu_chr_fe_set_open() implicitely when
+>   * any of the handler is non-NULL
+> + * @sync_state: whether to issue event callback with updated state
+>   *
+>   * Set the front end char handlers. The front end takes the focus if
+>   * any of the handler is non-NULL.
+>   *
+>   * Without associated Chardev, nothing is changed.
+>   */
+> +void qemu_chr_fe_set_handlers_full(CharBackend *b,
+> +                                   IOCanReadHandler *fd_can_read,
+> +                                   IOReadHandler *fd_read,
+> +                                   IOEventHandler *fd_event,
+> +                                   BackendChangeHandler *be_change,
+> +                                   void *opaque,
+> +                                   GMainContext *context,
+> +                                   bool set_open,
+> +                                   bool sync_state);
+> +
+> +/**
+> + * qemu_chr_fe_set_handlers:
+> + *
+> + * Version of qemu_chr_fe_set_handlers_full() with sync_state =3D true.
+> + */
+>  void qemu_chr_fe_set_handlers(CharBackend *b,
+>                                IOCanReadHandler *fd_can_read,
+>                                IOReadHandler *fd_read,
+> --
+> 2.7.4
+>
