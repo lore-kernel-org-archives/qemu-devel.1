@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gRdkS-0001jJ-0y
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:49:56 -0500
+	(envelope-from <i.maximets@samsung.com>) id 1gRdlF-0002JS-7s
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:50:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gRdkO-00071R-1n
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:49:55 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:33169)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRdkN-00070Y-P5
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:49:51 -0500
-Received: by mail-wm1-f67.google.com with SMTP id l3so52125wme.0
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 05:49:51 -0800 (PST)
-References: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<154332396179.541746.10027261414540930953.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2cd5fe2f-d01c-b195-318b-e08eede46cd6@redhat.com>
-Date: Tue, 27 Nov 2018 14:49:49 +0100
+	(envelope-from <i.maximets@samsung.com>) id 1gRdlB-000862-8D
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:50:45 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:51029)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
+	id 1gRdlA-000834-OL
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:50:41 -0500
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
+	20181127135038euoutp023174ad2240ea892c7d89e75a39cbc999~q-2ab1R4C2313823138euoutp02F
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 13:50:38 +0000 (GMT)
+From: Ilya Maximets <i.maximets@samsung.com>
+Date: Tue, 27 Nov 2018 16:50:26 +0300
+Message-Id: <20181127135030.1671-1-i.maximets@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <154332396179.541746.10027261414540930953.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 6/9] sam460ex: use g_new(T,
- n) instead of g_malloc(sizeof(T) * n)
+Content-Type: text/plain; charset="utf-8"
+References: <CGME20181127135037eucas1p18867a9ae8b1f2731ad4ce8d79fddae33@eucas1p1.samsung.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/4] memfd fixes.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Ilya Maximets <i.maximets@samsung.com>
 
-On 27/11/18 14:06, Greg Kurz wrote:
-> Because it is a recommended coding practice (see HACKING).
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Version 2:
+    * First patch changed to just drop the memfd backend
+      if seals are not supported.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Ilya Maximets (4):
+  hostmem-memfd: disable for systems wihtout sealing support
+  memfd: always check for MFD_CLOEXEC
+  memfd: set up correct errno if not supported
+  memfd: improve error messages
 
-> ---
->  hw/ppc/sam460ex.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-> index 5aac58f36ee1..4b051c0950a9 100644
-> --- a/hw/ppc/sam460ex.c
-> +++ b/hw/ppc/sam460ex.c
-> @@ -430,7 +430,7 @@ static void sam460ex_init(MachineState *machine)
->      ppc4xx_plb_init(env);
->  
->      /* interrupt controllers */
-> -    irqs = g_malloc0(sizeof(*irqs) * PPCUIC_OUTPUT_NB);
-> +    irqs = g_new0(qemu_irq, PPCUIC_OUTPUT_NB);
->      irqs[PPCUIC_OUTPUT_INT] = ((qemu_irq *)env->irq_inputs)[PPC40x_INPUT_INT];
->      irqs[PPCUIC_OUTPUT_CINT] = ((qemu_irq *)env->irq_inputs)[PPC40x_INPUT_CINT];
->      uic[0] = ppcuic_init(env, irqs, 0xc0, 0, 1);
-> 
-> 
+ backends/hostmem-memfd.c | 18 ++++++++----------
+ tests/vhost-user-test.c  |  6 +++---
+ util/memfd.c             | 10 ++++++++--
+ 3 files changed, 19 insertions(+), 15 deletions(-)
+
+--=20
+2.17.1
