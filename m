@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gRgDZ-0006PQ-QE
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:28:10 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gRgDg-0006ST-9T
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:28:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gRgDT-0003qA-Ui
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:28:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58880)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gRgDS-0003ow-Do
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:28:03 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9C71B308626B
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 16:28:01 +0000 (UTC)
-Date: Tue, 27 Nov 2018 11:27:53 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181127112541-mutt-send-email-mst@kernel.org>
-References: <1543238443-4993-1-git-send-email-pbonzini@redhat.com>
-	<20181126173604-mutt-send-email-mst@kernel.org>
-	<6cd98ced-a043-18c0-3aa5-4cda15c76ec5@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1gRgDf-0003y0-7P
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:28:16 -0500
+Date: Tue, 27 Nov 2018 17:27:49 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181127172749.75a036b4@redhat.com>
+In-Reply-To: <20181127154218.GA5677@caravaggio>
+References: <20181126162942.21258-1-sameo@linux.intel.com>
+	<20181126162942.21258-5-sameo@linux.intel.com>
+	<20181127162551.29608eeb@redhat.com>
+	<20181127154218.GA5677@caravaggio>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6cd98ced-a043-18c0-3aa5-4cda15c76ec5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/5] vhost: enable for all targets
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/8] hw: arm: Carry RSDP specific data
+ through AcpiRsdpData
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,38 +26,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Tue, Nov 27, 2018 at 10:04:59AM +0100, Paolo Bonzini wrote:
-> On 26/11/18 23:43, Michael S. Tsirkin wrote:
-> > On Mon, Nov 26, 2018 at 02:20:38PM +0100, Paolo Bonzini wrote:
-> >> vhost does not have to be supported only if KVM is present, in fact
-> >> vhost-user does not even need any kind of kernel support.  This series
-> >> changes this.  The rationale is that, when vhost-user-test.c will be
-> >> converted to qgraph, it will be able to test vhost-user support
-> >> for virtio-mmio backend even on x86.
-> > 
-> > The reason for limiting it to KVM was very simple:
-> > it has the same set of problems with ordering
-> > as mttcg.
-> > 
-> > So I guess it's fine but I think we must then limit it
-> > to when tcg emits fence instructions.
-> > 
-> > Otherwise we'll get subtle race conditions.
-> 
-> Got it, I'll take a look.  However, right now you _can_ use vhost with
-> tcg as long as e.g. qemu-system-x86_64 is compiled with KVM support, so
-> this patch is not changing anything in this respect; the bug is
-> independent of this series.
-> 
-> Paolo
-> 
+On Tue, 27 Nov 2018 16:42:18 +0100
+Samuel Ortiz <sameo@linux.intel.com> wrote:
 
-Well qemu built with KVM implies host architecture == guest
-architecture, right? That should ensure race conditions do not happen in
-a very hacky way.
+> Hi Igor,
+> 
+> On Tue, Nov 27, 2018 at 04:25:51PM +0100, Igor Mammedov wrote:
+> > On Mon, 26 Nov 2018 17:29:37 +0100
+> > Samuel Ortiz <sameo@linux.intel.com> wrote:
+> >   
+> > > That will allow us to generalize the ARM build_rsdp() routine to support
+> > > both legacy RSDP (The current i386 implementation) and extended RSDP
+> > > (The ARM implementation).
+> > > 
+> > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> > > ---
+> > >  include/hw/acpi/acpi-defs.h | 11 +++++++++++
+> > >  hw/arm/virt-acpi-build.c    | 27 ++++++++++++++++++++++-----
+> > >  2 files changed, 33 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> > > index af8e023968..e7fd24c6c5 100644
+> > > --- a/include/hw/acpi/acpi-defs.h
+> > > +++ b/include/hw/acpi/acpi-defs.h
+> > > @@ -53,6 +53,17 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+> > >  } QEMU_PACKED;
+> > >  typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+> > >  
+> > > +typedef struct AcpiRsdpData {
+> > > +    uint8_t oem_id[6]; /* OEM identification */
+> > > +    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
+> > > +
+> > > +    unsigned *rsdt_tbl_offset;
+> > > +    unsigned *xsdt_tbl_offset;
+> > > +} AcpiRsdpData;
+> > > +  
+> >   
+> > > +#define ACPI_RSDP_REV_1 0
+> > > +#define ACPI_RSDP_REV_2 2  
+> > it's one time used spec defined values so just use values directly
+> > in place with a comment, so reader won't have to jump around code
+> > when comparing to spec.  
+> It's also used in the ACPI tests fix patch.
+it's better to use in test it's own version (we just opencode them there)
+see fadt_fetch_facs_and_dsdt_ptrs()/sanitize_fadt_ptrs()
+same applies for length.
+that way if we break it in qemu's code test would catch the thing
 
--- 
-MST
+> Also the 0 for revision 1 is a little confusing, I feel the above
+> definition is clearer.
+that's confusion is in the spec, so we just mimic it, no need to add more on top
+
+> 
+> 
+> > > +
+> > >  /* Table structure from Linux kernel (the ACPI tables are under the
+> > >     BSD license) */
+> > >  
+> > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > > index 0835900052..2dad465ecf 100644
+> > > --- a/hw/arm/virt-acpi-build.c
+> > > +++ b/hw/arm/virt-acpi-build.c
+> > > @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+> > >  
+> > >  /* RSDP */
+> > >  static void
+> > > -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> > > +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+> > >  {
+> > >      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+> > >      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
+> > > @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> > >                               true /* fseg memory */);
+> > >  
+> > >      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
+> > > -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
+> > > +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
+> > >      rsdp->length = cpu_to_le32(sizeof(*rsdp));
+> > > -    rsdp->revision = 0x02;
+> > > +    rsdp->revision = rsdp_data->revision;
+> > >  
+> > >      /* Address to be filled by Guest linker */
+> > >      bios_linker_loader_add_pointer(linker,
+> > >          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
+> > > -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
+> > > +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
+> > >  
+> > >      /* Checksum to be filled by Guest linker */
+> > >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> > > @@ -399,6 +399,20 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> > >          (char *)&rsdp->extended_checksum - rsdp_table->data);
+> > >  }
+> > >  
+> > > +static void
+> > > +init_rsdp_data(AcpiRsdpData *data, const char *oem_id, uint8_t revision,
+> > > +               unsigned *rsdt_offset, unsigned *xsdt_offset)
+> > > +{
+> > > +    /* Caller must provide an OEM ID */
+> > > +    g_assert(oem_id);
+> > > +    g_assert(strlen(oem_id) >= 6);
+> > > +
+> > > +    memcpy(data->oem_id, oem_id, 6);
+> > > +    data->revision = revision;
+> > > +    data->rsdt_tbl_offset = rsdt_offset;
+> > > +    data->xsdt_tbl_offset = xsdt_offset;
+> > > +}
+> > > +
+> > >  static void
+> > >  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+> > >  {
+> > > @@ -810,6 +824,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+> > >      GArray *table_offsets;
+> > >      unsigned dsdt, xsdt;
+> > >      GArray *tables_blob = tables->table_data;
+> > > +    AcpiRsdpData rsdp;  
+> > s/rsdp/rsdp_info/
+> >   
+> > >  
+> > >      table_offsets = g_array_new(false, true /* clear */,
+> > >                                          sizeof(uint32_t));
+> > > @@ -857,7 +872,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+> > >      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
+> > >  
+> > >      /* RSDP is in FSEG memory, so allocate it separately */
+> > > -    build_rsdp(tables->rsdp, tables->linker, xsdt);
+> > > +    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
+> > > +                   NULL, &xsdt);  
+> > It would be more concise to use declarative style without extra clutter:
+> > 
+> > -    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
+> > -                   NULL, &xsdt);
+> > -    build_rsdp(tables->rsdp, tables->linker, &rsdp);
+> > +    {
+> > +       AcpiRsdpData rsdp = {
+> > +           .revision = 2,
+> > +           .oem_id = ACPI_BUILD_APPNAME6,
+> > +           .xsdt_tbl_offset = &xsdt,
+> > +           .rsdt_tbl_offset = NULL,
+> > +       };
+> > +       build_rsdp(tables->rsdp, tables->linker, &rsdp);
+> > +    }  
+> 2 things here, imo:
+> 
+> - This is not more concise.
+with function, one have to jump to it's definition/body to find out what
+each argument is, with declaration + initialization inplace it's clear
+what values mean as you see fields right there as well.
+
+If it's simple structure it is clearer to use initializer, instead of
+wrapper helper. With complex structure it could be other way around.
+
+> - It's code duplication as almost the same snippet is going to be used
+>   for i386/acpi-build.c
+the same goes for init_rsdp_data(...), the only difference
+the declaration isn't folded in 2 lines to be more readable and there is
+boiler plate helper function adds.
+
+> 
+> Cheers,
+> Samuel.
