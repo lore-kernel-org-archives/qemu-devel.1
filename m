@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1gRlxd-0008GZ-UG
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 17:36:06 -0500
+	(envelope-from <eblake@redhat.com>) id 1gRm6N-0003zC-Q2
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 17:45:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1gRlxZ-00073v-UJ
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 17:36:05 -0500
-References: <CAKmqyKMdNs4etff7rc0vDy_tmZf5deP1Geu0GchkENu+em5=+w@mail.gmail.com>
-	<mhng-b345219b-56ea-4aee-b25e-95c762c54b49@palmer-si-x1c4>
-	<CAKmqyKPtn-C5rm3ggj5CvAAXh+Gq=u8YDh1S8Wmsb=tsLjcsXA@mail.gmail.com>
-	<005a50f1-8270-ee52-d79e-321b03d841e4@suse.de>
-	<CAKmqyKOaECi3vEpe8GbdG1y80TODUMMBzmQbo4RVY_jC5PhibA@mail.gmail.com>
-	<CAKmqyKP7+GmD7zWDzfECEd7gQp9DQx0bmjpw4WQmMZjvw6R5Jg@mail.gmail.com>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <49ed96fb-85f9-bb74-7814-be09afbd2156@suse.de>
-Date: Tue, 27 Nov 2018 23:35:58 +0100
+	(envelope-from <eblake@redhat.com>) id 1gRm6M-0002vQ-Tb
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 17:45:07 -0500
+References: <1543322466-525229-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5f0a48b9-f735-4b70-6ebf-d83f4da90736@redhat.com>
+Date: Tue, 27 Nov 2018 16:44:58 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKP7+GmD7zWDzfECEd7gQp9DQx0bmjpw4WQmMZjvw6R5Jg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1543322466-525229-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] riscv: virt: Cast the initrd start
- address to target bit length
+Subject: Re: [Qemu-devel] [PATCH] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,166 +24,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
 
+On 11/27/18 6:41 AM, Andrey Shinkevich wrote:
+> The 'Format specific information' of qemu-img info command will show
+> the name, flags and granularity for every QCOW2 bitmap.
+> 
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+> Dear colleagues,
+> 
+> With this patch, qemu-img info will display a name, flags and granularity
+> information for every bitmap in the directory section of a QCOW2 image.
+> That information appears in the 'Format specific information' section as
+> it's shown in the following example:
+> 
+> image: /vz/vmprivate/VM1/harddisk.hdd
+> file format: qcow2
+> virtual size: 64G (68719476736 bytes)
+> disk size: 3.0M
+> cluster_size: 1048576
+> Format specific information:
+>      compat: 1.1
+>      lazy refcounts: true
+>      refcount bits: 16
+>      dirty bitmaps:
+>          [0]:
+>              flags:
+>                  [0]: in-use
+>                  [1]: auto
+>              name: {257b5ea5-38c5-410e-a457-71c76f763c60}
+>              granularity: 65536
+>          [1]:
+>              flags:
+>                  [0]: in-use
+>                  [1]: auto
+>              name: back-up
+>              granularity: 65536
+>      corrupt: false
 
+This example is worth including in the commit message proper (by putting 
+it above the Signed-off-by and --- lines).
 
-On 27.11.18 23:28, Alistair Francis wrote:
-> On Tue, Nov 27, 2018 at 2:24 PM Alistair Francis <alistair23@gmail.com> wrote:
->>
->> On Tue, Nov 27, 2018 at 2:12 PM Alexander Graf <agraf@suse.de> wrote:
->>>
->>>
->>>
->>> On 27.11.18 23:05, Alistair Francis wrote:
->>>> On Mon, Nov 26, 2018 at 11:02 AM Palmer Dabbelt <palmer@sifive.com> wrote:
->>>>>
->>>>> On Wed, 21 Nov 2018 18:09:27 PST (-0800), alistair23@gmail.com wrote:
->>>>>> On Wed, Nov 21, 2018 at 5:58 PM Palmer Dabbelt <palmer@sifive.com> wrote:
->>>>>>>
->>>>>>> On Wed, 21 Nov 2018 14:34:44 PST (-0800), Alistair Francis wrote:
->>>>>>>> Ensure that the calculate initrd offset points to a valid address for
->>>>>>>> the architecture.
->>>>>>>>
->>>>>>>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->>>>>>>> Suggested-by: Alexander Graf <agraf@suse.de>
->>>>>>>> Reported-by: Alexander Graf <agraf@suse.de>
->>>>>>>> ---
->>>>>>>>  hw/riscv/virt.c | 7 ++++++-
->>>>>>>>  1 file changed, 6 insertions(+), 1 deletion(-)
->>>>>>>>
->>>>>>>> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
->>>>>>>> index 2b38f89070..4467195fac 100644
->>>>>>>> --- a/hw/riscv/virt.c
->>>>>>>> +++ b/hw/riscv/virt.c
->>>>>>>> @@ -85,7 +85,12 @@ static hwaddr load_initrd(const char *filename, uint64_t mem_size,
->>>>>>>>       * halfway into RAM, and for boards with 256MB of RAM or more we put
->>>>>>>>       * the initrd at 128MB.
->>>>>>>>       */
->>>>>>>> -    *start = kernel_entry + MIN(mem_size / 2, 128 * MiB);
->>>>>>>> +    /* As hwaddr is a 64-bit number we need to cast it for 32-bit */
->>>>>>>> +#if defined(TARGET_RISCV32)
->>>>>>>> +    *start = (uint32_t) (kernel_entry + MIN(mem_size / 2, 128ULL * MiB));
->>>>>>>> +#elif defined(TARGET_RISCV64)
->>>>>>>> +    *start = (uint64_t) (kernel_entry + MIN(mem_size / 2, 128 * MiB));
->>>>>>>> +#endif
->>>>>>>>
->>>>>>>>      size = load_ramdisk(filename, *start, mem_size - *start);
->>>>>>>>      if (size == -1) {
->>>>>>>> --
->>>>>>>> 2.19.1
->>>>>>>
->>>>>>> Maybe I'm missing something, but wouldn't something like
->>>>>>>
->>>>>>>     uint64_t start_unclobbered = kernel_entry + MIN(mem_size / 2, 128ULL * MiB);
->>>>>>>     assert(start_unclobbered == (hwaddr)start_unclobbered);
->>>>>>>     *start = (hwaddr)start_unclobbered;
->>>>>>>
->>>>>>> work better?  That should actually check this all lines up, as opposed to just
->>>>>>> silently truncating a bad address.
->>>>>>
->>>>>> The problem is that hwaddr is always 64-bit.
->>>>>>
->>>>>> Stupidly I forgot about target_ulong, which should work basically the
->>>>>> same as above. An assert() seems a little harsh though, Alex reported
->>>>>> problem was fixed with just a cast.
->>>>>
->>>>> OK, I must be misunderstanding the problem, then.  With the current code, isn't
->>>>> it possible to end up causing start to overflow a 32-bit address?  This would
->>>>> happen if kernel_entry is high, with IIUC is coming from the ELF to load and is
->>>>> therefor user input.  I think that's worth some sort of assertion, as it'll
->>>>> definitely blow up trying to enter the kernel (and possible before that,
->>>>> assuming there's no target memory where it overflows into).
->>>>
->>>> I don't have a setup to reproduce this unfortunately, but Alex
->>>> reported that he saw start being excessively high (0xffffffff88000000)
->>>> when loading an initrd.
->>>
->>> Sorry for only jumping in so late.
->>>
->>> I didn't actually propose the cast as a solution. The problem must be
->>> sign extension of some variable in the mix. I didn't find out quickly
->>> which one it was, so I figured I'd leave it for someone else to debug :).
->>>
->>> The issue is very easy to reproduce: Build U-Boot for the virt machine
->>> for riscv32. Then run it with
->>>
->>>   $ qemu-system-riscv32 -M virt -kernel u-boot -nographic -initrd <a file>
->>
->> Ah, cool I can reproduce it now.
->>
->> It happens in load_elf32() (which is actually glue(load_elf, SZ)).
->>
->> This line ends up sign extending the value:
->>     *pentry = (uint64_t)(elf_sword)ehdr.e_entry;
->>
->> and we just continue it from there.
->>
->> So I think this diff is a much better solution:
->>
->> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
->> index e7f0716fb6..348ecc39d5 100644
->> --- a/hw/riscv/virt.c
->> +++ b/hw/riscv/virt.c
->> @@ -62,7 +62,7 @@ static const struct MemmapEntry {
->>      [VIRT_PCIE_ECAM] =   { 0x30000000,    0x10000000 },
->>  };
->>
->> -static uint64_t load_kernel(const char *kernel_filename)
->> +static target_ulong load_kernel(const char *kernel_filename)
->>  {
->>      uint64_t kernel_entry, kernel_high;
->>
->>
->>
->> Alistair
->>
->>>
->>> You can find the initrd address with
->>>
->>>   U-Boot# fdt addr $fdtcontroladdr
->>>   U-Boot# fdt ls /chosen
->>>
->>> Then take a peek at that address:
->>>
->>>   U-Boot# md.b <addr>
->>>
->>> and you will see that there is nothing there without this patch. The
->>> reason is that the binary was loaded to a negative address. Again,
->>> probably some misguided sign extension.
->>>
->>>> It looks like the kernel entry address ends up being converted to
->>>> 0xffffffff80000000 incorrectly instead of being a real overflow.
->>>
->>> Yeah, so we seem to cast from int32_t to int64_t somewhere. Can you spot
->>> where exactly? That's where the bug is :).
-> 
-> Actually this diff looks like a better more generic fix:
-> 
-> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-> index 81cecaf27e..7c1930e7a3 100644
-> --- a/include/hw/elf_ops.h
-> +++ b/include/hw/elf_ops.h
-> @@ -342,8 +342,9 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->              }
->      }
-> 
-> -    if (pentry)
-> -       *pentry = (uint64_t)(elf_sword)ehdr.e_entry;
-> +    if (pentry) {
-> +        *pentry = (uint64_t)(elf_word)ehdr.e_entry;
+In addition to Vladimir's review (he's correct about using 4.0),
+
+> +++ b/block/qcow2-bitmap.c
+> @@ -1008,6 +1008,56 @@ fail:
+>       return false;
+>   }
+>   
+> +static Qcow2BitmapInfoFlagsList *get_bitmap_info_flags(uint32_t flags)
+> +{
+> +    Qcow2BitmapInfoFlagsList *list = NULL;
+> +    Qcow2BitmapInfoFlagsList **plist = &list;
+> +
+> +    if (flags & BME_FLAG_IN_USE) {
+> +        Qcow2BitmapInfoFlagsList *entry = g_new0(Qcow2BitmapInfoFlagsList, 1);
+> +        entry->value = QCOW2_BITMAP_INFO_FLAGS_IN_USE;
+> +        *plist = entry;
+> +        plist = &entry->next;
 > +    }
-> 
->      glue(load_symbols, SZ)(&ehdr, fd, must_swab, clear_lsb, sym_cb);
-> 
-> My only concern is that it will break some other 32-bit guest. It
-> seems odd that no one else has seen this before.
+> +    if (flags & BME_FLAG_AUTO) {
+> +        Qcow2BitmapInfoFlagsList *entry = g_new0(Qcow2BitmapInfoFlagsList, 1);
+> +        entry->value = QCOW2_BITMAP_INFO_FLAGS_AUTO;
+> +        *plist = entry;
+> +    }
+> +    return list;
+> +}
 
-True. IIRC we were playing dirty tricks with sign extension with
-OpenBIOS back in the day.
+This implementation means that qemu won't report bits that are set but 
+which qemu doesn't recognize.  Is that a problem?  I wouldn't 
+over-engineer it unless we have a use case, but maybe one way would be 
+to have an optional integer field alongside the array of known flags, 
+where the integer is present only if there are unrecognized flags 
+present.  But by the time we encounter an image with more than the two 
+flags we currently recognize, we may have also patched this code to 
+recognize a new flag.
 
-So maybe a riscv (board) specific solution would be better.
+> @@ -4279,6 +4287,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
+>                                     QCOW2_INCOMPAT_CORRUPT,
+>               .has_corrupt        = true,
+>               .refcount_bits      = s->refcount_bits,
+> +            .has_bitmaps        = bitmaps ? true : false,
+
+This looks awkward; I'd write it ' = !!bitmaps'.
 
 
-Alex
+> +++ b/qapi/block-core.json
+> @@ -77,7 +77,8 @@
+>         '*lazy-refcounts': 'bool',
+>         '*corrupt': 'bool',
+>         'refcount-bits': 'int',
+> -      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
+> +      '*encrypt': 'ImageInfoSpecificQCow2Encryption',
+> +      '*bitmaps': ['Qcow2BitmapInfo']
+
+Missing documentation on the new member, including a '(since 4.0)' tag.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
