@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gRm6N-0003zC-Q2
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 17:45:08 -0500
+	(envelope-from <cota@braap.org>) id 1gRmc4-0006tw-Ad
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 18:17:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gRm6M-0002vQ-Tb
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 17:45:07 -0500
-References: <1543322466-525229-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5f0a48b9-f735-4b70-6ebf-d83f4da90736@redhat.com>
-Date: Tue, 27 Nov 2018 16:44:58 -0600
+	(envelope-from <cota@braap.org>) id 1gRmYM-0000T6-Ai
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 18:14:05 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:52295)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gRmYL-0000Op-Uv
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 18:14:02 -0500
+Date: Tue, 27 Nov 2018 18:13:57 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181127231357.GA19764@flamenco>
+References: <20181025172057.20414-1-cota@braap.org>
+	<20181025172057.20414-42-cota@braap.org>
+	<20181127124352.ll6quqc5xedvdqht@MacBook-Pro-Roman.local>
 MIME-Version: 1.0
-In-Reply-To: <1543322466-525229-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-img info lists bitmap directory
- entries
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181127124352.ll6quqc5xedvdqht@MacBook-Pro-Roman.local>
+Subject: Re: [Qemu-devel] [RFC 41/48] configure: add --enable-plugins
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,105 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: Roman Bolshakov <r.bolshakov@yadro.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Stefan Hajnoczi <stefanha@gmail.com>
 
-On 11/27/18 6:41 AM, Andrey Shinkevich wrote:
-> The 'Format specific information' of qemu-img info command will show
-> the name, flags and granularity for every QCOW2 bitmap.
+On Tue, Nov 27, 2018 at 15:43:52 +0300, Roman Bolshakov wrote:
+> ld64 on macOS has similar -exported_symbols_list option. Here's the reference:
 > 
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
-> Dear colleagues,
+>      -exported_symbols_list filename
+> 	The specified filename contains a list of global symbol names
+> 	that will remain as global symbols in the output file.  All other
+> 	global symbols will be treated as if they were marked as
+> 	__private_extern__ (aka visibility=hidden) and will not be global in
+> 	the output file. The symbol names listed in filename must be one per
+> 	line.  Leading and trailing white space are not part of the symbol
+> 	name.  Lines starting with # are ignored, as are lines with only white
+> 	space.  Some wildcards (similar to shell file matching) are supported.
+> 	The * matches zero or more characters.  The ?  matches one character.
+> 	[abc] matches one character which must be an 'a', 'b', or 'c'.
+> 	[a-z] matches any single lower case letter from 'a' to 'z'.
 > 
-> With this patch, qemu-img info will display a name, flags and granularity
-> information for every bitmap in the directory section of a QCOW2 image.
-> That information appears in the 'Format specific information' section as
-> it's shown in the following example:
 > 
-> image: /vz/vmprivate/VM1/harddisk.hdd
-> file format: qcow2
-> virtual size: 64G (68719476736 bytes)
-> disk size: 3.0M
-> cluster_size: 1048576
-> Format specific information:
->      compat: 1.1
->      lazy refcounts: true
->      refcount bits: 16
->      dirty bitmaps:
->          [0]:
->              flags:
->                  [0]: in-use
->                  [1]: auto
->              name: {257b5ea5-38c5-410e-a457-71c76f763c60}
->              granularity: 65536
->          [1]:
->              flags:
->                  [0]: in-use
->                  [1]: auto
->              name: back-up
->              granularity: 65536
->      corrupt: false
+> I can try your branch if you add support of the linker flag or send required
+> changes via GitHub.
 
-This example is worth including in the commit message proper (by putting 
-it above the Signed-off-by and --- lines).
+Can you please try this branch? I added a commit with the appended.
+  https://github.com/cota/qemu/tree/plugin-v2
 
-In addition to Vladimir's review (he's correct about using 4.0),
+You can inspect the symbols in the final binary with
+`readelf --dyn-syms' or `nm -D'.
 
-> +++ b/block/qcow2-bitmap.c
-> @@ -1008,6 +1008,56 @@ fail:
->       return false;
->   }
->   
-> +static Qcow2BitmapInfoFlagsList *get_bitmap_info_flags(uint32_t flags)
-> +{
-> +    Qcow2BitmapInfoFlagsList *list = NULL;
-> +    Qcow2BitmapInfoFlagsList **plist = &list;
-> +
-> +    if (flags & BME_FLAG_IN_USE) {
-> +        Qcow2BitmapInfoFlagsList *entry = g_new0(Qcow2BitmapInfoFlagsList, 1);
-> +        entry->value = QCOW2_BITMAP_INFO_FLAGS_IN_USE;
-> +        *plist = entry;
-> +        plist = &entry->next;
-> +    }
-> +    if (flags & BME_FLAG_AUTO) {
-> +        Qcow2BitmapInfoFlagsList *entry = g_new0(Qcow2BitmapInfoFlagsList, 1);
-> +        entry->value = QCOW2_BITMAP_INFO_FLAGS_AUTO;
-> +        *plist = entry;
-> +    }
-> +    return list;
-> +}
+Thanks,
 
-This implementation means that qemu won't report bits that are set but 
-which qemu doesn't recognize.  Is that a problem?  I wouldn't 
-over-engineer it unless we have a use case, but maybe one way would be 
-to have an optional integer field alongside the array of known flags, 
-where the integer is present only if there are unrecognized flags 
-present.  But by the time we encounter an image with more than the two 
-flags we currently recognize, we may have also patched this code to 
-recognize a new flag.
+		Emilio
 
-> @@ -4279,6 +4287,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
->                                     QCOW2_INCOMPAT_CORRUPT,
->               .has_corrupt        = true,
->               .refcount_bits      = s->refcount_bits,
-> +            .has_bitmaps        = bitmaps ? true : false,
-
-This looks awkward; I'd write it ' = !!bitmaps'.
-
-
-> +++ b/qapi/block-core.json
-> @@ -77,7 +77,8 @@
->         '*lazy-refcounts': 'bool',
->         '*corrupt': 'bool',
->         'refcount-bits': 'int',
-> -      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
-> +      '*encrypt': 'ImageInfoSpecificQCow2Encryption',
-> +      '*bitmaps': ['Qcow2BitmapInfo']
-
-Missing documentation on the new member, including a '(since 4.0)' tag.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+---
+diff --git a/configure b/configure
+index fe9707d951..3dc9c9697b 100755
+--- a/configure
++++ b/configure
+@@ -5176,15 +5176,31 @@ int main(void)
+ }
+ EOF
+ 
++ld_dynamic_list="no"
+ if compile_prog "" "-Wl,--dynamic-list=$TMPTXT" ; then
+   ld_dynamic_list="yes"
+-else
+-  if test "$plugins" = "yes" ; then
+-    error_exit \
+-        "Plugin support requires specifying a set of symbols that " \
+-        "are exported to plugins. Unfortunately your linker doesn't " \
+-        "support the flag (--dynamic-list) used for this purpose."
+-  fi
++fi
++
++#########################################
++# See if -exported_symbols_list is supported by the linker
++
++cat > $TMPTXT <<EOF
++  foo
++EOF
++
++ld_exported_symbols_list="no"
++if compile_prog "" "-Wl,-exported_symbols_list,$TMPTXT" ; then
++  ld_exported_symbols_list="yes"
++fi
++
++if  test "$plugins" = "yes" &&
++    test "$ld_dynamic_list" = "no" &&
++    test "$ld_exported_symbols_list" = "no" ; then
++  error_exit \
++      "Plugin support requires specifying a set of symbols that " \
++      "are exported to plugins. Unfortunately your linker doesn't " \
++      "support the flag (--dynamic-list or -exported_symbols_list) used " \
++      "for this purpose."
+ fi
+ 
+ ########################################
+@@ -6827,7 +6843,18 @@ fi
+ if test "$plugins" = "yes" ; then
+     echo "CONFIG_PLUGINS=y" >> $config_host_mak
+     LIBS="-ldl $LIBS"
+-    LDFLAGS="-Wl,--dynamic-list=\$(SRC_PATH)/qemu-plugins.symbols $LDFLAGS"
++    if test "$ld_dynamic_list" = "yes" ; then
++	LDFLAGS="-Wl,--dynamic-list=\$(SRC_PATH)/qemu-plugins.symbols $LDFLAGS"
++    elif test "$ld_exported_symbols_list" = "yes" ; then
++	ld64_symbols=qemu-plugins-ld64.symbols
++	echo "# Automatically generated by configure - do not modify" > $ld64_symbols
++	cat "$source_path/qemu-plugins.symbols" | grep qemu_ | sed 's/;//g' >> $ld64_symbols
++	LDFLAGS="-Wl,-exported_symbols_list,\$(BUILD_DIR)/$ld64_symbols $LDFLAGS"
++    else
++	error_exit \
++	    "If \$plugins=yes, either \$ld_dynamic_list or " \
++	    "\$ld_exported_symbols_list should have been set to 'yes'."
++    fi
+ fi
+ 
+ if test "$tcg_interpreter" = "yes"; then
