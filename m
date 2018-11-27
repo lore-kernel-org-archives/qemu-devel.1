@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRfWK-0006uq-FF
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:43:29 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gRfZT-0000b0-Uv
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:46:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRfWJ-0002Z1-6q
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:43:28 -0500
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:41920)
+	(envelope-from <peter.maydell@linaro.org>) id 1gRfZT-0003Ea-49
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:46:43 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36112)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gRfWI-0002Xq-W8
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:43:27 -0500
-Received: by mail-oi1-x235.google.com with SMTP id j21so19642910oii.8
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 07:43:26 -0800 (PST)
+	id 1gRfZS-0003C0-Vf
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:46:43 -0500
+Received: by mail-oi1-x242.google.com with SMTP id x23so19679532oix.3
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 07:46:42 -0800 (PST)
 MIME-Version: 1.0
-References: <1543329397-48407-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1543329397-48407-1-git-send-email-pbonzini@redhat.com>
+References: <20181113165247.4806-1-sameo@linux.intel.com>
+	<20181113165247.4806-5-sameo@linux.intel.com>
+	<CAFEAcA9wvrnshOTYz-jZ0n6m7SfusYY+bnB-iPnQuVNqqdg5Ww@mail.gmail.com>
+	<20181127153551.GC4393@caravaggio>
+In-Reply-To: <20181127153551.GC4393@caravaggio>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Nov 2018 15:43:14 +0000
-Message-ID: <CAFEAcA_W1-b+KheEXeEyFQOgnqfnw1KxqOoFBTMJFdN+iAfw6w@mail.gmail.com>
+Date: Tue, 27 Nov 2018 15:46:30 +0000
+Message-ID: <CAFEAcA9B5DPeot26-oGtR-h+xdfg+tmUPrYpKhaneaT1tr1yqQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/15] Misc patches for QEMU 3.1-rc3
+Subject: Re: [Qemu-devel] [PATCH 04/13] target: arm: Move all interrupt and
+ exception handlers into their own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,192 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Tue, 27 Nov 2018 at 14:38, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Tue, 27 Nov 2018 at 15:36, Samuel Ortiz <sameo@linux.intel.com> wrote:
 >
-> The following changes since commit 4822f1ee9efa8df56e29db0a68323b484bdb03=
-35:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/fixes-31-20181127-pul=
-l-request' into staging (2018-11-27 11:21:38 +0000)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to cb16c8466b6c62868aba47cd95fadcf316541f40:
->
->   hostmem: no need to check for host_memory_backend_mr_inited() in alloc(=
-) (2018-11-27 15:35:19 +0100)
->
-> ----------------------------------------------------------------
-> * lsi HBA reselection fix (George)
-> * Small cleanups (Li Qiang)
-> * bugfixes for vhost-user-bridge and hostmem (Marc-Andr=C3=A9)
-> * single-thread TCG fix (me)
-> * VMX migration blocker (me)
-> * target/i386 fix for LOCK (Richard)
-> * fix elf2dmp check (Roman)
-> * MAINTAINERS update (Philippe, Thomas)
->
-> ----------------------------------------------------------------
+> On Tue, Nov 20, 2018 at 01:45:03PM +0000, Peter Maydell wrote:
+> > What is your plan for dealing with the way that the KVM code
+> > for injecting a breakpoint exception into the guest works
+> > by calling the do_interrupt code ?
+> > (see target/arm/kvm64.c:kvm_arm_handle_debug(),
+> > which calls cc->do_interrupt(cs).) This patch moves those
+> > functions to a file which won't be compiled and a later one
+> > in the series seems to stop cc->do_interrupt being set at all
+> > if CONFIG_TCG is not defined. That will result in QEMU crashing
+> > when it tries to inject an exception, won't it?
+> Yes, indeed.
+> So it seems we need to inject an exception back into the guest when
+> doing hardware assisted debugging and when we have not set any
+> breakpoint from QEMU. So it's essentially handling the debugging from
+> the guest case.
+> Would returning an error when that happens be an acceptable solution? So
+> when building qemu for arm64 with TCG disabled, one would basically no
+> longer be able to debug from the guest.
 
-Hi; I'm afraid this has compile problems on 32-bit hosts and
-on the various BSDs.
+I don't think that's a good idea. --disable-tcg shouldn't imply
+"and you lose some features of KVM". This code is used in both TCG
+and KVM, so needs to still be in the binary for KVM.
 
-Format string issues, 32-bit hosts:
-
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c: In function 'get_kdbg':
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:90:52: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka
-long long unsigned int}' [-Werror=3Dformat=3D]
-         if (!SYM_RESOLVE(KernBase, pdb, KiWaitNever) ||
-                                                    ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:44:17: note: in
-definition of macro 'SYM_RESOLVE'
-     s ? printf(#s" =3D 0x%016lx\n", s) : eprintf("Failed to resolve "#s"\n=
-"), s)
-                 ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:91:57: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka
-long long unsigned int}' [-Werror=3Dformat=3D]
-                 !SYM_RESOLVE(KernBase, pdb, KiWaitAlways) ||
-                                                         ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:44:17: note: in
-definition of macro 'SYM_RESOLVE'
-     s ? printf(#s" =3D 0x%016lx\n", s) : eprintf("Failed to resolve "#s"\n=
-"), s)
-                 ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:92:64: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka
-long long unsigned int}' [-Werror=3Dformat=3D]
-                 !SYM_RESOLVE(KernBase, pdb, KdpDataBlockEncoded)) {
-                                                                ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:44:17: note: in
-definition of macro 'SYM_RESOLVE'
-     s ? printf(#s" =3D 0x%016lx\n", s) : eprintf("Failed to resolve "#s"\n=
-"), s)
-                 ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:101:16: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka
- long long unsigned int}' [-Werror=3Dformat=3D]
-         printf("[KiWaitNever] =3D 0x%016lx\n", kwn);
-                ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:102:16: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka
- long long unsigned int}' [-Werror=3Dformat=3D]
-         printf("[KiWaitAlways] =3D 0x%016lx\n", kwa);
-                ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c: In function 'fix_dtb':
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:205:20: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka
- long long unsigned int}' [-Werror=3Dformat=3D]
-             printf("DTB 0x%016lx has been found from CPU #%zu"
-                    ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:225:16: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka
- long long unsigned int}' [-Werror=3Dformat=3D]
-         printf("DirectoryTableBase =3D 0x%016lx has been found from CPU #0=
-"
-                ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c: In function 'main':
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:491:12: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka long long unsigned int}' [-Werror=3Dformat=3D]
-     printf("CPU #0 CR3 is 0x%016lx\n", state->cr[3]);
-            ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:500:12: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka long long unsigned int}' [-Werror=3Dformat=3D]
-     printf("CPU #0 IDT is at 0x%016lx\n", state->idt.base);
-            ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:508:12: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka long long unsigned int}' [-Werror=3Dformat=3D]
-     printf("CPU #0 IDT[0] -> 0x%016lx\n", idt_desc_addr(first_idt_desc));
-            ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:511:12: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka long long unsigned int}' [-Werror=3Dformat=3D]
-     printf("Searching kernel downwards from 0x%16lx...\n", KernBase);
-            ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:524:12: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka long long unsigned int}' [-Werror=3Dformat=3D]
-     printf("KernBase =3D 0x%16lx, signature is \'%.2s\'\n", KernBase,
-            ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:548:57: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka long long unsigned int}' [-Werror=3Dformat=3D]
-     if (!SYM_RESOLVE(KernBase, &pdb, KdDebuggerDataBlock) ||
-                                                         ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:44:17: note: in
-definition of macro 'SYM_RESOLVE'
-     s ? printf(#s" =3D 0x%016lx\n", s) : eprintf("Failed to resolve "#s"\n=
-"), s)
-                 ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:549:56: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 2 has
-type 'uint64_t {aka long long unsigned int}' [-Werror=3Dformat=3D]
-             !SYM_RESOLVE(KernBase, &pdb, KdVersionBlock)) {
-                                                        ^
-/home/peter.maydell/qemu/contrib/elf2dmp/main.c:44:17: note: in
-definition of macro 'SYM_RESOLVE'
-     s ? printf(#s" =3D 0x%016lx\n", s) : eprintf("Failed to resolve "#s"\n=
-"), s)
-                 ^
-/home/peter.maydell/qemu/contrib/elf2dmp/pdb.c: In function
-'pdb_find_public_v3_symbol':
-/home/peter.maydell/qemu/contrib/elf2dmp/pdb.c:69:20: error: format
-'%lx' expects argument of type 'long unsigned int', but argument 7 has
-type 'uint64_t {aka long long unsigned int}' [-Werror=3Dformat=3D]
-             printf("%s: 0x%016x(%d:\'%.8s\') + 0x%08x =3D 0x%09lx\n", name=
-,
-                    ^
-
-
-Compile failure, FreeBSD:
-
-backends/hostmem-file.c:61:5: error: use of undeclared identifier 'path'
-    path =3D object_get_canonical_path(OBJECT(backend));
-    ^
-backends/hostmem-file.c:63:38: error: use of undeclared identifier 'path'
-                                     path,
-                                     ^
-backends/hostmem-file.c:68:12: error: use of undeclared identifier 'path'
-    g_free(path);
-           ^
-
-(The variable declaration is in #ifdef CONFIG_LINUX, but the use is
-guarded by CONFIG_POSIX.)
-
-
-Compile failure, OpenBSD and OSX:
-In file included from contrib/elf2dmp/addrspace.h:11:0,
-                 from contrib/elf2dmp/main.c:10:
-contrib/elf2dmp/qemu_elf.h:12:17: fatal error: elf.h: No such file or direc=
-tory
- #include <elf.h>
-                 ^
-
-and a format-descriptor issue not in the 32-bit host lot above:
-contrib/elf2dmp/pdb.c: In function 'pdb_find_public_v3_symbol':
-contrib/elf2dmp/pdb.c:71:21: warning: format '%lx' expects argument of
-type 'long unsigned int', but argument 7 has type 'uint64_t'
-[-Wformat=3D]
-                     ((char *)segment - 8), sym->public_v3.offset, rva);
-                     ^
-
+NB that it will also be used by the codepath for injecting SErrors
+when the host detects a RAS memory error in RAM used by the guest
+and wants to inform the guest of that. There are patches on-list
+for that, currently undergoing code review.
 
 thanks
 -- PMM
