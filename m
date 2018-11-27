@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1gRcSx-0000uw-FD
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:27:49 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gRcVF-0002p8-Ih
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:30:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1gRcSs-0006nb-Ge
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:27:47 -0500
-Received: from smtp.mail.uni-mannheim.de ([134.155.96.80]:39753)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1gRcSs-0006mF-5N
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:27:42 -0500
-References: <1540498768-8736-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1540498768-8736-4-git-send-email-aleksandar.markovic@rt-rk.com>
-	<03cea7f3-cbb7-6e4d-3104-01aba47cde09@weilnetz.de>
-	<CAFEAcA_==cEJ0JTXdHZw3OVTywF0cJn_i62achSTLvSKA1OFoQ@mail.gmail.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <81e0d483-f446-fbf1-e113-8fd845bcbbdd@weilnetz.de>
-Date: Tue, 27 Nov 2018 13:27:48 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gRcVE-0000ob-FU
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:30:09 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43129)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gRcVE-0000oA-9T
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:30:08 -0500
+Received: by mail-wr1-x444.google.com with SMTP id r10so22476285wrs.10
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 04:30:08 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_==cEJ0JTXdHZw3OVTywF0cJn_i62achSTLvSKA1OFoQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PULL 3/3] target/mips: Add disassembler support
- for nanoMIPS
+References: <CGME20181127111109eucas1p2b1eae35e38e46c3f76c86a350ed41926@eucas1p2.samsung.com>
+	<20181127111050.18453-1-i.maximets@samsung.com>
+	<20181127111050.18453-2-i.maximets@samsung.com>
+	<CAMxuvay-6X2g1k8TbJR1NAW=Gb_tARb-wbr7H2RRoF9x+-F+aw@mail.gmail.com>
+	<78f31962-8d54-19c1-e8fb-c21f95a491f0@samsung.com>
+	<CAJ+F1C+XFs++Q044Y8CvVYFhtNpaEDS8qjx0BjsJN1yukZURkA@mail.gmail.com>
+	<2edee79d-4d23-913a-3536-a8794ee16528@samsung.com>
+In-Reply-To: <2edee79d-4d23-913a-3536-a8794ee16528@samsung.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 27 Nov 2018 16:29:54 +0400
+Message-ID: <CAJ+F1CK_WtcLCg+hi76J6x85zTvYkF1YN7b8hgP4-p-M_4-cag@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/4] hostmem-memfd: enable seals only if
+ supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +36,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Ilya Maximets <i.maximets@samsung.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-Am 27.11.2018 um 12:24 schrieb Peter Maydell:
-> On Thu, 8 Nov 2018 at 08:00, Stefan Weil <sw@weilnetz.de> wrote:
->> On 25.10.18 22:19, Aleksandar Markovic wrote:
->>> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->>>
->>> Add disassembler support for nanoMIPS.
->>>
->>> Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
->>> Signed-off-by: Matthew Fortune <matthew.fortune@mips.com>
->>> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
->>> ---
->>>  MAINTAINERS           |     2 +
->>>  configure             |     3 +
->>>  disas/Makefile.objs   |     1 +
->>>  disas/nanomips.cpp    | 22242 ++++++++++++++++++++++++++++++++++++++++++++++++
->>>  disas/nanomips.h      |  1099 +++
->>>  include/disas/bfd.h   |     1 +
->>>  include/exec/poison.h |     1 +
->>>  target/mips/cpu.c     |    13 +-
->>>  8 files changed, 23360 insertions(+), 2 deletions(-)
->>>  create mode 100644 disas/nanomips.cpp
->>>  create mode 100644 disas/nanomips.h
->>
->> Hi,
->>
->> the disassembler needs more work for the next QEMU release: it uses lots
->> of wrong format strings which will result in wrong output at least on
->> big endian hosts.
-> Hi Stefan; by "for the next QEMU release" do you mean:
-> (a) this is a release-critical bug which we need to fix for 3.1
-> (b) this is not critical for this release, but we should
-> fix it in the next release (4.0)
+Hi
+
+On Tue, Nov 27, 2018 at 4:02 PM Ilya Maximets <i.maximets@samsung.com> wrot=
+e:
 >
-> ?
+> On 27.11.2018 15:00, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> > On Tue, Nov 27, 2018 at 3:56 PM Ilya Maximets <i.maximets@samsung.com> =
+wrote:
+> >>
+> >> On 27.11.2018 14:49, Marc-Andr=C3=A9 Lureau wrote:
+> >>> Hi
+> >>> On Tue, Nov 27, 2018 at 3:11 PM Ilya Maximets <i.maximets@samsung.com=
+> wrote:
+> >>>>
+> >>>> If seals are not supported, memfd_create() will fail.
+> >>>> Furthermore, there is no way to disable it in this case because
+> >>>> '.seal' property is not registered.
+> >>>>
+> >>>> This issue leads to vhost-user-test failures on RHEL 7.2:
+> >>>>
+> >>>>   qemu-system-x86_64: -object memory-backend-memfd,id=3Dmem,size=3D2=
+M,: \
+> >>>>                       failed to create memfd: Invalid argument
+> >>>>
+> >>>> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+> >>>
+> >>>
+> >>> This will change the default behaviour of memfd backend, and may thus
+> >>> me considered a break.
+> >>
+> >> This will change the default behaviour only on systems without sealing
+> >> support. But current implementation is broken there anyway and does no=
+t
+> >> work.
+> >>
+> >>>
+> >>> Instead, memfd vhost-user-test should skipped (or tuned with
+> >>> sealed=3Dfalse if unsupported)
+> >>
+> >> vhost-user-test is just an example here. In fact memfd could not be
+> >> used at all on system without sealing support. And there is no way
+> >> to disable seals.
+> >
+> > which system supports memfd without sealing?
 >
-> thanks
-> -- PMM
+> RHEL 7.2. kernel version 3.10.0-327.el7.x86_64
+
+Correct, it was backported without sealing for some reason.
+
+I would rather have an explicit seal=3Doff argument on such system
+(because sealing is expected to be available with memfd in general)
+
+>
+> >
+> >>
+> >>>
+> >>>> ---
+> >>>>  backends/hostmem-memfd.c | 4 ++--
+> >>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+> >>>> index b6836b28e5..ee39bdbde6 100644
+> >>>> --- a/backends/hostmem-memfd.c
+> >>>> +++ b/backends/hostmem-memfd.c
+> >>>> @@ -129,8 +129,8 @@ memfd_backend_instance_init(Object *obj)
+> >>>>  {
+> >>>>      HostMemoryBackendMemfd *m =3D MEMORY_BACKEND_MEMFD(obj);
+> >>>>
+> >>>> -    /* default to sealed file */
+> >>>> -    m->seal =3D true;
+> >>>> +    /* default to sealed file if supported */
+> >>>> +    m->seal =3D qemu_memfd_check(MFD_ALLOW_SEALING);
+> >>>>  }
+> >>>>
+> >>>>  static void
+> >>>> --
+> >>>> 2.17.1
+> >>>>
+> >>>
+> >>>
+> >>
+> >
+> >
 
 
-Hi Peter,
 
-the fix is rather trivial. That's why I now have sent a patch series.
-
-I'm not sure whether it should be handled as "release-critical". Big
-endian Linux distributions would have a problem if users use nanomips
-with the disassembler: I expect that numbers in the disassembler output
-would be completely wrong.
-
-There would be no crash, and I don't think that use case is very common,
-so maybe a fix which avoids using 64 bit data types as suggested by
-Aleksandar could be postponed until 4.0.
-
-If you think that a fix for 3.1 would be better, you can use my fix. It
-is also used in my builds for Windows.
-
-Regards
-Stefan
+--=20
+Marc-Andr=C3=A9 Lureau
