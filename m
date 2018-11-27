@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRfBO-0004Eb-10
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:21:54 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gRfFY-0007ck-3h
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:26:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRf4y-00029s-0l
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:15:16 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49092)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gRf4x-00028b-R6
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:15:11 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gRf4w-0001wf-HG
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 15:15:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 584082E80C9
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 15:15:10 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1gRfFV-0000PC-JU
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:26:07 -0500
+Date: Tue, 27 Nov 2018 16:25:51 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181127162551.29608eeb@redhat.com>
+In-Reply-To: <20181126162942.21258-5-sameo@linux.intel.com>
+References: <20181126162942.21258-1-sameo@linux.intel.com>
+	<20181126162942.21258-5-sameo@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 27 Nov 2018 15:02:13 -0000
-From: Thomas Huth <1525123@bugs.launchpad.net>
-Reply-To: Bug 1525123 <1525123@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20151211084346.25665.93589.malonedeb@gac.canonical.com>
-Message-Id: <154333093385.16264.6600013014033543575.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1525123] Re: USB assert failure on hcd-uhci.c
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/8] hw: arm: Carry RSDP specific data
+ through AcpiRsdpData
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,80 +24,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+On Mon, 26 Nov 2018 17:29:37 +0100
+Samuel Ortiz <sameo@linux.intel.com> wrote:
 
--- =
+> That will allow us to generalize the ARM build_rsdp() routine to support
+> both legacy RSDP (The current i386 implementation) and extended RSDP
+> (The ARM implementation).
+> 
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> ---
+>  include/hw/acpi/acpi-defs.h | 11 +++++++++++
+>  hw/arm/virt-acpi-build.c    | 27 ++++++++++++++++++++++-----
+>  2 files changed, 33 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index af8e023968..e7fd24c6c5 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -53,6 +53,17 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+>  } QEMU_PACKED;
+>  typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+>  
+> +typedef struct AcpiRsdpData {
+> +    uint8_t oem_id[6]; /* OEM identification */
+> +    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
+> +
+> +    unsigned *rsdt_tbl_offset;
+> +    unsigned *xsdt_tbl_offset;
+> +} AcpiRsdpData;
+> +
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1525123
+> +#define ACPI_RSDP_REV_1 0
+> +#define ACPI_RSDP_REV_2 2
+it's one time used spec defined values so just use values directly
+in place with a comment, so reader won't have to jump around code
+when comparing to spec.
 
-Title:
-  USB assert failure on hcd-uhci.c
+> +
+>  /* Table structure from Linux kernel (the ACPI tables are under the
+>     BSD license) */
+>  
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 0835900052..2dad465ecf 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+>  
+>  /* RSDP */
+>  static void
+> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+>  {
+>      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+>      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
+> @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+>                               true /* fseg memory */);
+>  
+>      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
+> -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
+> +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
+>      rsdp->length = cpu_to_le32(sizeof(*rsdp));
+> -    rsdp->revision = 0x02;
+> +    rsdp->revision = rsdp_data->revision;
+>  
+>      /* Address to be filled by Guest linker */
+>      bios_linker_loader_add_pointer(linker,
+>          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
+> -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
+> +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
+>  
+>      /* Checksum to be filled by Guest linker */
+>      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> @@ -399,6 +399,20 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+>          (char *)&rsdp->extended_checksum - rsdp_table->data);
+>  }
+>  
+> +static void
+> +init_rsdp_data(AcpiRsdpData *data, const char *oem_id, uint8_t revision,
+> +               unsigned *rsdt_offset, unsigned *xsdt_offset)
+> +{
+> +    /* Caller must provide an OEM ID */
+> +    g_assert(oem_id);
+> +    g_assert(strlen(oem_id) >= 6);
+> +
+> +    memcpy(data->oem_id, oem_id, 6);
+> +    data->revision = revision;
+> +    data->rsdt_tbl_offset = rsdt_offset;
+> +    data->xsdt_tbl_offset = xsdt_offset;
+> +}
+> +
+>  static void
+>  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>  {
+> @@ -810,6 +824,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>      GArray *table_offsets;
+>      unsigned dsdt, xsdt;
+>      GArray *tables_blob = tables->table_data;
+> +    AcpiRsdpData rsdp;
+s/rsdp/rsdp_info/
 
-Status in QEMU:
-  Incomplete
+>  
+>      table_offsets = g_array_new(false, true /* clear */,
+>                                          sizeof(uint32_t));
+> @@ -857,7 +872,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
+>  
+>      /* RSDP is in FSEG memory, so allocate it separately */
+> -    build_rsdp(tables->rsdp, tables->linker, xsdt);
+> +    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
+> +                   NULL, &xsdt);
+It would be more concise to use declarative style without extra clutter:
 
-Bug description:
-  When inserting the attached kernel moudle in the guest OS, QEMU quits
-  with therse assert failure:
+-    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
+-                   NULL, &xsdt);
+-    build_rsdp(tables->rsdp, tables->linker, &rsdp);
++    {
++       AcpiRsdpData rsdp = {
++           .revision = 2,
++           .oem_id = ACPI_BUILD_APPNAME6,
++           .xsdt_tbl_offset = &xsdt,
++           .rsdt_tbl_offset = NULL,
++       };
++       build_rsdp(tables->rsdp, tables->linker, &rsdp);
++    }
 
-  [insert kernel module in guest root shell]
-  root@qemu:~# insmod mymod.ko
-  root@qemu:~#
-  Connection closed by foreign host.
-
-  [host message]
-  qemu-system-x86_64: hw/usb/core.c:718: usb_ep_get: Assertion `pid =3D=3D =
-0x69 || pid =3D=3D 0xe1' failed.
-  Aborted
-
-  The direct cause of this bug is due to misimplementation of UHCI.
-  According to Intel's UHCI design guide, packet identification in transfer=
- descriptor must be one of these three values : IN (69h), OUT (E1h), and SE=
-TUP (2Dh). Any other value in this field must cause the HALT of only HOST C=
-ONTROLLER.
-
-  However, due to misimplementation in uhci_handle_td, instead of host
-  controller being halted, QEMU itself dies with assertion failure. The
-  assertion code is in usb_ep_get():718, which is called during
-  uhci_handle_td().
-
-  Another issue resides in uhci_handle_td(). This function must check
-  that transfer descriptor's pid is one of IN, OUT, SETUP before calling
-  usb_ep_get() or other functions. If it does so, usb_ep_get() only
-  needs to check if pid is not SETUP.
-
-  This kind of assert failure can be misused by malwares to avoid being
-  analyzed by terminating only in the virtual environments and still
-  execute the malicious code in real machines.
-
-  =
-
-  [How to run exploit code]
-  Prepare linux kernel's source header, then type these lines in root shell.
-  # make
-  # insmod mymod.ko
-
-  It needs uhci-hcd.h from linux kernel source.
-  I attached linux 3.18.24's uhci-hcd.h for tempory measure; You should get=
- proper version of uhci-hcd.h.
-  In the following envrionment, this exploit worked, exiting whole QEMU, no=
-t only USB.
-
-  QEMU was running on these environment :
-  [CPU model] Intel(R) Core(TM) i5-4590 CPU @ 3.30GHz
-  [qemu version] QEMU 2.5.0-rc3 (compiled from source, gcc 4.8.4)
-  [host info] Ubuntu 14.04.3, x86_64, 3.19.0-32-generic
-  [guest info] Ubuntu 14.04.3, x86_64, 3.19.0-28-generic
-  [QEMU argument]
-  x86_64-softmmu/qemu-system-x86_64 -hda /media/hdd/img/ubuntu1404.qcow2 \
-  =C2=A0-m 512 \
-  =C2=A0--usbdevice disk:format=3Dqcow2:../usb.img \
-  =C2=A0--enable-kvm
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1525123/+subscriptions
+> +    build_rsdp(tables->rsdp, tables->linker, &rsdp);
+>  
+>      /* Cleanup memory that's no longer used. */
+>      g_array_free(table_offsets, true);
