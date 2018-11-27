@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRbQu-0000xK-6q
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 06:21:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gRbTa-0002g3-Oz
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 06:24:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRbQs-0006PD-FH
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 06:21:36 -0500
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:37478)
+	(envelope-from <peter.maydell@linaro.org>) id 1gRbTZ-0007Of-U3
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 06:24:22 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36476)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gRbQq-0006L9-Hq
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 06:21:34 -0500
-Received: by mail-ot1-x32f.google.com with SMTP id 40so19742650oth.4
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 03:21:30 -0800 (PST)
+	id 1gRbTZ-0007ON-Q6
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 06:24:21 -0500
+Received: by mail-oi1-x244.google.com with SMTP id x23so18944586oix.3
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 03:24:21 -0800 (PST)
 MIME-Version: 1.0
-References: <20181126205941.19021-1-ehabkost@redhat.com>
-In-Reply-To: <20181126205941.19021-1-ehabkost@redhat.com>
+References: <1540498768-8736-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1540498768-8736-4-git-send-email-aleksandar.markovic@rt-rk.com>
+	<03cea7f3-cbb7-6e4d-3104-01aba47cde09@weilnetz.de>
+In-Reply-To: <03cea7f3-cbb7-6e4d-3104-01aba47cde09@weilnetz.de>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Nov 2018 11:21:18 +0000
-Message-ID: <CAFEAcA_Swkik_WX0_qHgN0LnjZJNwb7KbGd=S0oMziT2tjWR5g@mail.gmail.com>
+Date: Tue, 27 Nov 2018 11:24:09 +0000
+Message-ID: <CAFEAcA_==cEJ0JTXdHZw3OVTywF0cJn_i62achSTLvSKA1OFoQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] x86 fixes for -rc3
+Subject: Re: [Qemu-devel] [PULL 3/3] target/mips: Add disassembler support
+ for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, kvm-devel <kvm@vger.kernel.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>
+To: Stefan Weil <sw@weilnetz.de>
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, QEMU Developers <qemu-devel@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-On Mon, 26 Nov 2018 at 20:59, Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Thu, 8 Nov 2018 at 08:00, Stefan Weil <sw@weilnetz.de> wrote:
 >
-> The following changes since commit d522fba24478474911b0e6e488b6d1dcf1af54f8:
+> On 25.10.18 22:19, Aleksandar Markovic wrote:
+> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> >
+> > Add disassembler support for nanoMIPS.
+> >
+> > Reviewed-by: Stefan Markovic <smarkovic@wavecomp.com>
+> > Signed-off-by: Matthew Fortune <matthew.fortune@mips.com>
+> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> > ---
+> >  MAINTAINERS           |     2 +
+> >  configure             |     3 +
+> >  disas/Makefile.objs   |     1 +
+> >  disas/nanomips.cpp    | 22242 ++++++++++++++++++++++++++++++++++++++++++++++++
+> >  disas/nanomips.h      |  1099 +++
+> >  include/disas/bfd.h   |     1 +
+> >  include/exec/poison.h |     1 +
+> >  target/mips/cpu.c     |    13 +-
+> >  8 files changed, 23360 insertions(+), 2 deletions(-)
+> >  create mode 100644 disas/nanomips.cpp
+> >  create mode 100644 disas/nanomips.h
 >
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20181126' into staging (2018-11-26 13:58:46 +0000)
 >
-> are available in the Git repository at:
+> Hi,
 >
->   git://github.com/ehabkost/qemu.git tags/x86-for-3.1-pull-request
->
-> for you to fetch changes up to 30a759b61a9247378a9cb84fbe4e437ae66e0461:
->
->   hw/hyperv: fix NULL dereference with pure-kvm SynIC (2018-11-26 14:14:38 -0200)
->
-> ----------------------------------------------------------------
-> x86 fixes for -rc3
->
-> * Fix SynIC crash
-> * Fix x86 crash on MSR code on AMD hosts
->
-> ----------------------------------------------------------------
+> the disassembler needs more work for the next QEMU release: it uses lots
+> of wrong format strings which will result in wrong output at least on
+> big endian hosts.
 
+Hi Stefan; by "for the next QEMU release" do you mean:
+(a) this is a release-critical bug which we need to fix for 3.1
+(b) this is not critical for this release, but we should
+fix it in the next release (4.0)
 
-Applied, thanks.
+?
 
+thanks
 -- PMM
