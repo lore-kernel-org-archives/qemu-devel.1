@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gReTp-0003jt-M7
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:50 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gReTx-0003nl-9i
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gReTo-0001Hw-MD
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:49 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:55851)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gReTv-0001Yq-5z
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:57 -0500
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:36380)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gReTo-0001Gu-Fo
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:48 -0500
-Received: by mail-wm1-x335.google.com with SMTP id y139so21952796wmc.5
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 06:36:48 -0800 (PST)
+	id 1gReTu-0001W2-SA
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:55 -0500
+Received: by mail-wm1-x32a.google.com with SMTP id s11so22522500wmh.1
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 06:36:54 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 27 Nov 2018 15:36:25 +0100
-Message-Id: <1543329397-48407-4-git-send-email-pbonzini@redhat.com>
+Date: Tue, 27 Nov 2018 15:36:29 +0100
+Message-Id: <1543329397-48407-8-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543329397-48407-1-git-send-email-pbonzini@redhat.com>
 References: <1543329397-48407-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 03/15] lsi: Reselection needed to remove pending
- commands from queue
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 07/15] vhost-user-bridge: fix recvmsg iovlen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,122 +31,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: George Kennedy <george.kennedy@oracle.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo BOnzini <pbonzini@redhat.com>
 
-From: George Kennedy <george.kennedy@oracle.com>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Under heavy IO (e.g. fio) the queue is not checked frequently enough for
-pending commands. As a result some pending commands are timed out by the
-linux sym53c8xx driver, which sends SCSI Abort messages for the timed out
-commands. The SCSI Abort messages result in linux errors, which show up
-on the console and in /var/log/messages.
+After iov_discard_front(), the iov may be smaller than its initial
+size. Fixes the heap-buffer-overflow spotted by ASAN:
 
-e.g.
-sd 0:0:3:0: [sdd] tag#33 ABORT operation started
-scsi target0:0:3: control msgout:
-80 20 47 d
-sd 0:0:3:0: ABORT operation complete.
-scsi target0:0:4: message d sent on bad reselection
+==9036==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6060000001e0 at pc 0x7fe632eca3f0 bp 0x7ffddc4a05a0 sp 0x7ffddc49fd48
+WRITE of size 32 at 0x6060000001e0 thread T0
+    #0 0x7fe632eca3ef  (/lib64/libasan.so.5+0x773ef)
+    #1 0x7fe632ecad23 in __interceptor_recvmsg (/lib64/libasan.so.5+0x77d23)
+    #2 0x561e7491936b in vubr_backend_recv_cb /home/elmarco/src/qemu/tests/vhost-user-bridge.c:333
+    #3 0x561e74917711 in dispatcher_wait /home/elmarco/src/qemu/tests/vhost-user-bridge.c:160
+    #4 0x561e7491c3b5 in vubr_run /home/elmarco/src/qemu/tests/vhost-user-bridge.c:725
+    #5 0x561e7491c85c in main /home/elmarco/src/qemu/tests/vhost-user-bridge.c:806
+    #6 0x7fe631a6c412 in __libc_start_main (/lib64/libc.so.6+0x24412)
+    #7 0x561e7491667d in _start (/home/elmarco/src/qemu/build/tests/vhost-user-bridge+0x3967d)
 
-Now following a WAIT DISCONNECT Script instruction, and if there is no
-current command, check for a pending command on the queue and if one
-exists call lsi_reselect().
+0x6060000001e0 is located 0 bytes to the right of 64-byte region [0x6060000001a0,0x6060000001e0)
+allocated by thread T0 here:
+    #0 0x7fe632f42848 in __interceptor_malloc (/lib64/libasan.so.5+0xef848)
+    #1 0x561e7493acd8 in virtqueue_alloc_element /home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c:1848
+    #2 0x561e7493c2a8 in vu_queue_pop /home/elmarco/src/qemu/contrib/libvhost-user/libvhost-user.c:1954
+    #3 0x561e749189bf in vubr_backend_recv_cb /home/elmarco/src/qemu/tests/vhost-user-bridge.c:297
+    #4 0x561e74917711 in dispatcher_wait /home/elmarco/src/qemu/tests/vhost-user-bridge.c:160
+    #5 0x561e7491c3b5 in vubr_run /home/elmarco/src/qemu/tests/vhost-user-bridge.c:725
+    #6 0x561e7491c85c in main /home/elmarco/src/qemu/tests/vhost-user-bridge.c:806
+    #7 0x7fe631a6c412 in __libc_start_main (/lib64/libc.so.6+0x24412)
 
-Signed-off-by: George Kennedy <george.kennedy@oracle.com>
-Message-Id: <1541776692-12271-1-git-send-email-george.kennedy@oracle.com>
-[For safety, add a s->current check in lsi_update_irq - Paolo]
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+SUMMARY: AddressSanitizer: heap-buffer-overflow (/lib64/libasan.so.5+0x773ef)
+Shadow bytes around the buggy address:
+  0x0c0c7fff7fe0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0c0c7fff7ff0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0c0c7fff8000: fa fa fa fa 00 00 00 00 00 00 05 fa fa fa fa fa
+  0x0c0c7fff8010: 00 00 00 00 00 00 00 00 fa fa fa fa fd fd fd fd
+  0x0c0c7fff8020: fd fd fd fd fa fa fa fa fd fd fd fd fd fd fd fd
+=>0x0c0c7fff8030: fa fa fa fa 00 00 00 00 00 00 00 00[fa]fa fa fa
+  0x0c0c7fff8040: fd fd fd fd fd fd fd fd fa fa fa fa fd fd fd fd
+  0x0c0c7fff8050: fd fd fd fd fa fa fa fa fd fd fd fd fd fd fd fd
+  0x0c0c7fff8060: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c0c7fff8070: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c0c7fff8080: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20181109173028.3372-1-marcandre.lureau@redhat.com>
+Signed-off-by: Paolo BOnzini <pbonzini@redhat.com>
 ---
- hw/scsi/lsi53c895a.c | 48 ++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 36 insertions(+), 12 deletions(-)
+ tests/vhost-user-bridge.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-index 3f207f6..52a3893 100644
---- a/hw/scsi/lsi53c895a.c
-+++ b/hw/scsi/lsi53c895a.c
-@@ -298,6 +298,18 @@ static inline int lsi_irq_on_rsl(LSIState *s)
-     return (s->sien0 & LSI_SIST0_RSL) && (s->scid & LSI_SCID_RRE);
- }
- 
-+static lsi_request *get_pending_req(LSIState *s)
-+{
-+    lsi_request *p;
-+
-+    QTAILQ_FOREACH(p, &s->queue, next) {
-+        if (p->pending) {
-+            return p;
-+        }
-+    }
-+    return NULL;
-+}
-+
- static void lsi_soft_reset(LSIState *s)
- {
-     trace_lsi_reset();
-@@ -446,7 +458,6 @@ static void lsi_update_irq(LSIState *s)
- {
-     int level;
-     static int last_level;
--    lsi_request *p;
- 
-     /* It's unclear whether the DIP/SIP bits should be cleared when the
-        Interrupt Status Registers are cleared or when istat0 is read.
-@@ -476,13 +487,13 @@ static void lsi_update_irq(LSIState *s)
-     }
-     lsi_set_irq(s, level);
- 
--    if (!level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
-+    if (!s->current && !level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
-+        lsi_request *p;
-+
-         trace_lsi_update_irq_disconnected();
--        QTAILQ_FOREACH(p, &s->queue, next) {
--            if (p->pending) {
--                lsi_reselect(s, p);
--                break;
--            }
-+        p = get_pending_req(s);
-+        if (p) {
-+            lsi_reselect(s, p);
-         }
-     }
- }
-@@ -1065,11 +1076,12 @@ static void lsi_wait_reselect(LSIState *s)
- 
-     trace_lsi_wait_reselect();
- 
--    QTAILQ_FOREACH(p, &s->queue, next) {
--        if (p->pending) {
--            lsi_reselect(s, p);
--            break;
--        }
-+    if (s->current) {
-+        return;
-+    }
-+    p = get_pending_req(s);
-+    if (p) {
-+        lsi_reselect(s, p);
-     }
-     if (s->current == NULL) {
-         s->waiting = 1;
-@@ -1259,6 +1271,18 @@ again:
-             case 1: /* Disconnect */
-                 trace_lsi_execute_script_io_disconnect();
-                 s->scntl1 &= ~LSI_SCNTL1_CON;
-+                /* FIXME: this is not entirely correct; the target need not ask
-+                 * for reselection until it has to send data, while here we force a
-+                 * reselection as soon as the bus is free.  The correct flow would
-+                 * reselect before lsi_transfer_data and disconnect as soon as
-+                 * DMA ends.
-+                 */
-+                if (!s->current) {
-+                    lsi_request *p = get_pending_req(s);
-+                    if (p) {
-+                        lsi_reselect(s, p);
-+                    }
-+                }
-                 break;
-             case 2: /* Wait Reselect */
-                 if (!lsi_irq_on_rsl(s)) {
+diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
+index 0884294..0cf8d0b 100644
+--- a/tests/vhost-user-bridge.c
++++ b/tests/vhost-user-bridge.c
+@@ -323,7 +323,7 @@ vubr_backend_recv_cb(int sock, void *ctx)
+             .msg_name = (struct sockaddr *) &vubr->backend_udp_dest,
+             .msg_namelen = sizeof(struct sockaddr_in),
+             .msg_iov = sg,
+-            .msg_iovlen = elem->in_num,
++            .msg_iovlen = num,
+             .msg_flags = MSG_DONTWAIT,
+         };
+         do {
 -- 
 1.8.3.1
