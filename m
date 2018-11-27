@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gRbun-0005yF-Tk
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 06:52:30 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gRbvb-0006kN-Eg
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 06:53:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1gRbun-0008TN-8u
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 06:52:29 -0500
-References: <20181125205000.10324-1-philmd@redhat.com>
-	<20181125205000.10324-22-philmd@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <769172b4-499c-c227-c36d-9394bd2df3bd@vivier.eu>
-Date: Tue, 27 Nov 2018 12:52:13 +0100
+	(envelope-from <mlureau@redhat.com>) id 1gRbvX-0001DZ-G3
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 06:53:19 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:42681)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gRbvX-0001Ab-CG
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 06:53:15 -0500
+Received: by mail-qk1-f195.google.com with SMTP id m5so14308079qka.9
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 03:53:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181125205000.10324-22-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH for-3.1 21/25] MAINTAINERS:
- Add a missing entry for the NVDIMM device
+References: <CGME20181127111123eucas1p15ecbe14062e47527e59ae7d219e3879c@eucas1p1.samsung.com>
+	<20181127111050.18453-1-i.maximets@samsung.com>
+	<20181127111050.18453-5-i.maximets@samsung.com>
+In-Reply-To: <20181127111050.18453-5-i.maximets@samsung.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Tue, 27 Nov 2018 15:53:03 +0400
+Message-ID: <CAMxuvazxg8HtUoqUpndk9RetgAVf7h1r+kDSiwfMVH=AKyzhNQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/4] memfd: improve error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: "Maximets, Ilya" <i.maximets@samsung.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 25/11/2018 21:49, Philippe Mathieu-Daudé wrote:
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Tue, Nov 27, 2018 at 3:11 PM Ilya Maximets <i.maximets@samsung.com> wrot=
+e:
+>
+> This gives more information about the failure.
+> Additionally 'ENOSYS' returned for a non-Linux platforms instead of
+> 'errno', which is not initilaized in this case.
+>
+> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 > ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 26727c1561..92691589b1 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1475,6 +1475,7 @@ S: Maintained
->  F: hw/acpi/nvdimm.c
->  F: hw/mem/nvdimm.c
->  F: include/hw/mem/nvdimm.h
-> +F: docs/nvdimm.txt
->  
->  e1000x
->  M: Dmitry Fleytman <dmitry.fleytman@gmail.com>
-> 
-
-Applied to my trivial-patches branch.
-
-Thanks,
-Laurent
+>  util/memfd.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/util/memfd.c b/util/memfd.c
+> index 393d23da96..00334e5b21 100644
+> --- a/util/memfd.c
+> +++ b/util/memfd.c
+> @@ -71,14 +71,18 @@ int qemu_memfd_create(const char *name, size_t size, =
+bool hugetlb,
+>      }
+>      mfd =3D memfd_create(name, flags);
+>      if (mfd < 0) {
+> +        error_setg_errno(errp, errno,
+> +                         "failed to create memfd with flags 0x%x", flags=
+);
+>          goto err;
+>      }
+>
+>      if (ftruncate(mfd, size) =3D=3D -1) {
+> +        error_setg_errno(errp, errno, "failed to resize memfd to %zu", s=
+ize);
+>          goto err;
+>      }
+>
+>      if (seals && fcntl(mfd, F_ADD_SEALS, seals) =3D=3D -1) {
+> +        error_setg_errno(errp, errno, "failed to add seals 0x%x", seals)=
+;
+>          goto err;
+>      }
+>
+> @@ -88,8 +92,9 @@ err:
+>      if (mfd >=3D 0) {
+>          close(mfd);
+>      }
+> +#else
+> +    error_setg_errno(errp, ENOSYS, "failed to create memfd");
+>  #endif
+> -    error_setg_errno(errp, errno, "failed to create memfd");
+>      return -1;
+>  }
+>
+> --
+> 2.17.1
+>
