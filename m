@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gRTef-0002Xn-VQ
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 22:03:18 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gRTi9-0003s1-DK
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 22:06:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gRTee-0002DS-Vy
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 22:03:17 -0500
-Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:56312)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gRTee-0002DM-RX
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 22:03:16 -0500
-Received: by mail-it1-x142.google.com with SMTP id o19so31944800itg.5
-	for <qemu-devel@nongnu.org>; Mon, 26 Nov 2018 19:03:16 -0800 (PST)
+	(envelope-from <wei.w.wang@intel.com>) id 1gRTi6-0004HF-9z
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 22:06:53 -0500
+Received: from mga11.intel.com ([192.55.52.93]:49499)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1gRTi6-0004Ga-0f
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 22:06:50 -0500
+Message-ID: <5BFCB5F1.1070300@intel.com>
+Date: Tue, 27 Nov 2018 11:11:45 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-References: <1541052148-28752-1-git-send-email-liq3ea@gmail.com>
-In-Reply-To: <1541052148-28752-1-git-send-email-liq3ea@gmail.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 27 Nov 2018 11:02:40 +0800
-Message-ID: <CAKXe6SJ6cF2jTBzRpPRULJFeE0Y6M7O=cET91BZ5kw4uu5UT-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw: fw_cfg: Improve error message when
- can't load splash file
+References: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v9 0/8] virtio-balloon: free page hint
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, philmd@redhat.com, Laszlo Ersek <lersek@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com
+Cc: peterx@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
 
-Hello Paolo, Philippe
-
-Seems this patch has been lost...
-
-I think Philippe can merge it for 4.0, right?
-Also pls notice the following fw_cfg patchset.
--->https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg04097.html
-
-Thanks,
-Li Qiang
-
-
-Li Qiang <liq3ea@gmail.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=881=E6=97=A5=E5=
-=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=882:02=E5=86=99=E9=81=93=EF=BC=9A
-
-> read_splashfile() reports "failed to read splash file" without
-> further details. Get the details from g_file_get_contents(), and
-> include them in the error message. Also remove unnecessary 'res'
-> variable.
+On 11/15/2018 06:07 PM, Wei Wang wrote:
+> This is the deivce part implementation to add a new feature,
+> VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
+> receives the guest free page hints from the driver and clears the
+> corresponding bits in the dirty bitmap, so that those free pages are
+> not sent by the migration thread to the destination.
 >
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> ---
->  hw/nvram/fw_cfg.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+> *Tests
+> 1 Test Environment
+>      Host: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
+>      Migration setup: migrate_set_speed 100G, migrate_set_downtime 400ms
 >
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 946f765..3fcfa35 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -68,15 +68,14 @@ static char *read_splashfile(char *filename, gsize
-> *file_sizep,
->                               int *file_typep)
->  {
->      GError *err =3D NULL;
-> -    gboolean res;
->      gchar *content;
->      int file_type;
->      unsigned int filehead;
->      int bmp_bpp;
+> 2 Test Results (results are averaged over several repeated runs)
+>      2.1 Guest setup: 8G RAM, 4 vCPU
+>          2.1.1 Idle guest live migration time
+>              Optimization v.s. Legacy = 620ms vs 2970ms
+>              --> ~79% reduction
+>          2.1.2 Guest live migration with Linux compilation workload
+>            (i.e. make bzImage -j4) running
+>            1) Live Migration Time:
+>               Optimization v.s. Legacy = 2273ms v.s. 4502ms
+>               --> ~50% reduction
+>            2) Linux Compilation Time:
+>               Optimization v.s. Legacy = 8min42s v.s. 8min43s
+>               --> no obvious difference
 >
-> -    res =3D g_file_get_contents(filename, &content, file_sizep, &err);
-> -    if (res =3D=3D FALSE) {
-> -        error_report("failed to read splash file '%s'", filename);
-> +    if (!g_file_get_contents(filename, &content, file_sizep, &err)) {
-> +        error_report("failed to read splash file '%s': %s",
-> +                     filename, err->message);
->          g_error_free(err);
->          return NULL;
->      }
-> --
-> 1.8.3.1
+>      2.2 Guest setup: 128G RAM, 4 vCPU
+>          2.2.1 Idle guest live migration time
+>              Optimization v.s. Legacy = 5294ms vs 41651ms
+>              --> ~87% reduction
+>          2.2.2 Guest live migration with Linux compilation workload
+>            1) Live Migration Time:
+>              Optimization v.s. Legacy = 8816ms v.s. 54201ms
+>              --> 84% reduction
+>            2) Linux Compilation Time:
+>               Optimization v.s. Legacy = 8min30s v.s. 8min36s
+>               --> no obvious difference
 >
->
+> ChangeLog:
+> v8->v9:
+> bitmap:
+>      - fix bitmap_count_one to handle the nbits=0 case
+> migration:
+>      - replace the ram save notifier chain with a more general precopy
+>        notifier chain, which is similar to the postcopy notifier chain.
+>      - Avoid exposing the RAMState struct, and add a function,
+>        precopy_disable_bulk_stage, to let the virtio-balloon notifier
+>        callback to disable the bulk stage flag.
+
+Hi Dave and Peter,
+
+Could you continue to review the patches? Thanks!
+
+Best,
+Wei
