@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gRcp1-0001BJ-QY
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:50:36 -0500
+	(envelope-from <david@redhat.com>) id 1gRcpJ-0001Pl-1v
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:50:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gRcoy-00006x-Gx
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:50:35 -0500
+	(envelope-from <david@redhat.com>) id 1gRcpG-0000Ir-Qh
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:50:52 -0500
 References: <20181127114102.4319-1-david@redhat.com>
-	<a632f840-f738-fd79-9f2d-5b51852c4726@redhat.com>
+	<20181127133819.52621d1c.cohuck@redhat.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <6aabbad7-885a-0ed9-15d9-fbfd89148e94@redhat.com>
-Date: Tue, 27 Nov 2018 13:50:29 +0100
+Message-ID: <5e05f435-cdc0-4eff-c61e-abb7fa097eb6@redhat.com>
+Date: Tue, 27 Nov 2018 13:50:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <a632f840-f738-fd79-9f2d-5b51852c4726@redhat.com>
+In-Reply-To: <20181127133819.52621d1c.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -25,11 +25,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On 27.11.18 13:19, Thomas Huth wrote:
-> On 2018-11-27 12:41, David Hildenbrand wrote:
+On 27.11.18 13:38, Cornelia Huck wrote:
+> On Tue, 27 Nov 2018 12:41:02 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
 >> Just like on other architectures, we should stop the clock while the guest
 >> is not running. This is already properly done for TCG. Right now, doing an
 >> offline migration (stop, migrate, cont) can easily trigger stalls in the
@@ -78,58 +80,23 @@ On 27.11.18 13:19, Thomas Huth wrote:
 >>  hw/s390x/tod-kvm.c     | 88 +++++++++++++++++++++++++++++++++++++++++-
 >>  include/hw/s390x/tod.h |  7 +++-
 >>  2 files changed, 92 insertions(+), 3 deletions(-)
-> [...]
->> @@ -49,10 +112,31 @@ static void kvm_s390_tod_class_init(ObjectClass *oc, void *data)
->>      tdc->set = kvm_s390_tod_set;
->>  }
->>  
->> +static void kvm_s390_tod_init(Object *obj)
->> +{
->> +    S390TODState *td = S390_TOD(obj);
->> +
->> +    /*
->> +     * The TOD is initially running (value stored in KVM). Avoid needless
->> +     * loading/storing of the TOD when starting a simple VM, so let it
->> +     * run although the (never started) VM is stopped. For migration, we
->> +     * will properly set the TOD later.
->> +     */
->> +    td->stopped = false;
->> +
->> +    /*
->> +     * We need to know when the VM gets started/stopped to start/stop the TOD.
->> +     * As we can never have more than one TOD instance (and that will never be
->> +     * removed), registering here and never unregistering is good enough.
->> +     */
->> +    qemu_add_vm_change_state_handler(kvm_s390_tod_vm_state_change, td);
+>>
+>> diff --git a/hw/s390x/tod-kvm.c b/hw/s390x/tod-kvm.c
+>> index df564ab89c..d4b12e1145 100644
+>> --- a/hw/s390x/tod-kvm.c
+>> +++ b/hw/s390x/tod-kvm.c
 > 
-> I think you should rather do this in a realize() function instead, since
-> instance_init can be called multiple times (during introspection of the
-> object, for example). See my blog article here for some details:
+>> @@ -38,6 +49,58 @@ static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
+>>      if (r) {
+>>          error_setg(errp, "Unable to set KVM guest TOD clock: %s",
+>>                     strerror(-r));
+>> +        return;
 > 
-> https://people.redhat.com/~thuth/blog/qemu/2018/09/10/instance-init-realize.html
+> I don't think you need this new 'return'.
 
-
-Even for types that cannot be created by the user?
-
-Anyhow, realize is the right thing to do, I just wanted to avoid
-introducing a realize callback for tod clocks.
+Yes, very right!
 
 Thanks!
-
-> 
->> +}
->> +
->>  static TypeInfo kvm_s390_tod_info = {
->>      .name = TYPE_KVM_S390_TOD,
->>      .parent = TYPE_S390_TOD,
->>      .instance_size = sizeof(S390TODState),
->> +    .instance_init = kvm_s390_tod_init,
->>      .class_init = kvm_s390_tod_class_init,
->>      .class_size = sizeof(S390TODClass),
->>  };
-> 
->  Thomas
-> 
 
 
 -- 
