@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=862abf4e0=Alistair.Francis@wdc.com>)
-	id 1gRkZr-0003Gx-BM
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:07:28 -0500
+	(envelope-from <bijan.mottahedeh@oracle.com>) id 1gRkZw-0003NW-Km
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:07:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=862abf4e0=Alistair.Francis@wdc.com>)
-	id 1gRkZo-0003k6-5B
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:07:27 -0500
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Tue, 27 Nov 2018 21:07:21 +0000
-Message-ID: <d8b4004e95370a8a95bab0506ad5385aa8633cfd.1543352682.git.alistair.francis@wdc.com>
-References: <cover.1543352682.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1543352682.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: [Qemu-devel] [RFC v2 05/24] riscv: Add the tcg-target header file
+	(envelope-from <bijan.mottahedeh@oracle.com>) id 1gRkZt-0003lb-Dl
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:07:32 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:44894)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bijan.mottahedeh@oracle.com>)
+	id 1gRkZt-0003ki-53
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:07:29 -0500
+From: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+Date: Tue, 27 Nov 2018 13:07:17 -0800
+Message-Id: <1543352837-21529-3-git-send-email-bijan.mottahedeh@oracle.com>
+In-Reply-To: <1543352837-21529-1-git-send-email-bijan.mottahedeh@oracle.com>
+References: <1543352837-21529-1-git-send-email-bijan.mottahedeh@oracle.com>
+Subject: [Qemu-devel] [RFC QEMU v2 2/2] arm/virt: Account for guest pause
+ time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,204 +25,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: kvmarm@lists.cs.columbia.edu
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
+Accumulate the total guest pause time and update the virtual counter
+offset register accordingly in order to account for that time before
+resuming the guest.
+
+Signed-off-by: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
 ---
- tcg/riscv/tcg-target.h | 173 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 173 insertions(+)
- create mode 100644 tcg/riscv/tcg-target.h
+ hw/intc/arm_gicv3_kvm.c | 39 +++++++++++++++++++++++++++++++++++++++
+ target/arm/cpu.h        |  3 +++
+ 2 files changed, 42 insertions(+)
 
-diff --git a/tcg/riscv/tcg-target.h b/tcg/riscv/tcg-target.h
-new file mode 100644
-index 0000000000..76ce2acfb5
---- /dev/null
-+++ b/tcg/riscv/tcg-target.h
-@@ -0,0 +1,173 @@
-+/*
-+ * Tiny Code Generator for QEMU
-+ *
-+ * Copyright (c) 2018 SiFive, Inc
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a=
- copy
-+ * of this software and associated documentation files (the "Software"), t=
-o deal
-+ * in the Software without restriction, including without limitation the r=
-ights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
-ll
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included=
- in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
- OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
-,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
-HER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
- FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
-IN
-+ * THE SOFTWARE.
-+ */
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index 1e11200..aabd508 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -30,6 +30,7 @@
+ #include "gicv3_internal.h"
+ #include "vgic_common.h"
+ #include "migration/blocker.h"
++#include "target/arm/internals.h"
+ 
+ #ifdef DEBUG_GICV3_KVM
+ #define DPRINTF(fmt, ...) \
+@@ -745,9 +746,38 @@ static void vm_change_state_handler(void *opaque, int running,
+ {
+     GICv3State *s = (GICv3State *)opaque;
+     Error *err = NULL;
++    CPUState *cpu;
++    CPUARMState *env;
++    struct kvm_one_reg reg;
+     int ret;
++    uint64_t cnt;
+ 
+     if (running) {
++        CPU_FOREACH(cpu) {
 +
-+#ifndef RISCV_TCG_TARGET_H
-+#define RISCV_TCG_TARGET_H
++            env = (CPUARMState *)(cpu->env_ptr);
 +
-+#if __riscv_xlen =3D=3D 32
-+# define TCG_TARGET_REG_BITS 32
-+#elif __riscv_xlen =3D=3D 64
-+# define TCG_TARGET_REG_BITS 64
-+#endif
++            if (!env->pause_start) {
++                continue;
++            }
 +
-+#define TCG_TARGET_INSN_UNIT_SIZE 4
-+#define TCG_TARGET_TLB_DISPLACEMENT_BITS 20
-+#define TCG_TARGET_NB_REGS 32
++            /*
++             * Accumulate the total pause time and set the
++             * counter virtual offset accordingly.
++             */
++            cnt = gt_get_countervalue(env);
++            env->pause_total += (cnt - env->pause_start);
++            env->cp15.cntvoff_el2 = cnt - env->pause_total;
 +
-+typedef enum {
-+    TCG_REG_ZERO,
-+    TCG_REG_RA,
-+    TCG_REG_SP,
-+    TCG_REG_GP,
-+    TCG_REG_TP,
-+    TCG_REG_T0,
-+    TCG_REG_T1,
-+    TCG_REG_T2,
-+    TCG_REG_S0,
-+    TCG_REG_S1,
-+    TCG_REG_A0,
-+    TCG_REG_A1,
-+    TCG_REG_A2,
-+    TCG_REG_A3,
-+    TCG_REG_A4,
-+    TCG_REG_A5,
-+    TCG_REG_A6,
-+    TCG_REG_A7,
-+    TCG_REG_S2,
-+    TCG_REG_S3,
-+    TCG_REG_S4,
-+    TCG_REG_S5,
-+    TCG_REG_S6,
-+    TCG_REG_S7,
-+    TCG_REG_S8,
-+    TCG_REG_S9,
-+    TCG_REG_S10,
-+    TCG_REG_S11,
-+    TCG_REG_T3,
-+    TCG_REG_T4,
-+    TCG_REG_T5,
-+    TCG_REG_T6,
++            env->pause_start = 0;   /* clear for next pause */
++            reg.id = KVM_REG_ARM_TIMER_CNT;
++            reg.addr = (uintptr_t) &env->cp15.cntvoff_el2;
++            ret = kvm_vcpu_ioctl(cpu, KVM_SET_ONE_REG, &reg);
++            if (ret) {
++                error_report("Set virtual counter offset failed: %d", ret);
++                abort();
++            }
++        }
+         return;
+     }
+ 
+@@ -760,6 +790,15 @@ static void vm_change_state_handler(void *opaque, int running,
+     if (ret < 0 && ret != -EFAULT) {
+         abort();
+     }
 +
-+    /* aliases */
-+    TCG_AREG0          =3D TCG_REG_S0,
-+    TCG_GUEST_BASE_REG =3D TCG_REG_S1,
-+    TCG_REG_TMP0       =3D TCG_REG_T6,
-+    TCG_REG_TMP1       =3D TCG_REG_T5,
-+    TCG_REG_TMP2       =3D TCG_REG_T4,
-+} TCGReg;
++    CPU_FOREACH(cpu) {
++        /*
++         * Record the current pause start time.
++         */
++        env = (CPUARMState *)(cpu->env_ptr);
++        cnt = gt_get_countervalue(env);
++        env->pause_start = cnt;
++    }
+ }
+ 
+ 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e310ffc..bd0a56e 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -602,6 +602,9 @@ typedef struct CPUARMState {
+     struct CPUBreakpoint *cpu_breakpoint[16];
+     struct CPUWatchpoint *cpu_watchpoint[16];
+ 
++    uint64_t pause_start;   /* start time of last pause */
++    uint64_t pause_total;   /* total pause time */
 +
-+/* used for function call generation */
-+#define TCG_REG_CALL_STACK              TCG_REG_SP
-+#define TCG_TARGET_STACK_ALIGN          16
-+#define TCG_TARGET_CALL_ALIGN_ARGS      1
-+#define TCG_TARGET_CALL_STACK_OFFSET    0
-+
-+/* optional instructions */
-+#define TCG_TARGET_HAS_goto_ptr         1
-+#define TCG_TARGET_HAS_movcond_i32      0
-+#define TCG_TARGET_HAS_div_i32          1
-+#define TCG_TARGET_HAS_rem_i32          1
-+#define TCG_TARGET_HAS_div2_i32         0
-+#define TCG_TARGET_HAS_rot_i32          0
-+#define TCG_TARGET_HAS_deposit_i32      0
-+#define TCG_TARGET_HAS_extract_i32      0
-+#define TCG_TARGET_HAS_sextract_i32     0
-+#define TCG_TARGET_HAS_add2_i32         1
-+#define TCG_TARGET_HAS_sub2_i32         1
-+#define TCG_TARGET_HAS_mulu2_i32        0
-+#define TCG_TARGET_HAS_muls2_i32        0
-+#define TCG_TARGET_HAS_muluh_i32        (TCG_TARGET_REG_BITS =3D=3D 32)
-+#define TCG_TARGET_HAS_mulsh_i32        (TCG_TARGET_REG_BITS =3D=3D 32)
-+#define TCG_TARGET_HAS_ext8s_i32        1
-+#define TCG_TARGET_HAS_ext16s_i32       1
-+#define TCG_TARGET_HAS_ext8u_i32        1
-+#define TCG_TARGET_HAS_ext16u_i32       1
-+#define TCG_TARGET_HAS_bswap16_i32      0
-+#define TCG_TARGET_HAS_bswap32_i32      0
-+#define TCG_TARGET_HAS_not_i32          1
-+#define TCG_TARGET_HAS_neg_i32          1
-+#define TCG_TARGET_HAS_andc_i32         0
-+#define TCG_TARGET_HAS_orc_i32          0
-+#define TCG_TARGET_HAS_eqv_i32          0
-+#define TCG_TARGET_HAS_nand_i32         0
-+#define TCG_TARGET_HAS_nor_i32          0
-+#define TCG_TARGET_HAS_clz_i32          0
-+#define TCG_TARGET_HAS_ctz_i32          0
-+#define TCG_TARGET_HAS_ctpop_i32        0
-+#define TCG_TARGET_HAS_direct_jump      0
-+#define TCG_TARGET_HAS_brcond2          1
-+#define TCG_TARGET_HAS_setcond2         1
-+
-+#if TCG_TARGET_REG_BITS =3D=3D 64
-+#define TCG_TARGET_HAS_movcond_i64      0
-+#define TCG_TARGET_HAS_div_i64          1
-+#define TCG_TARGET_HAS_rem_i64          1
-+#define TCG_TARGET_HAS_div2_i64         0
-+#define TCG_TARGET_HAS_rot_i64          0
-+#define TCG_TARGET_HAS_deposit_i64      0
-+#define TCG_TARGET_HAS_extract_i64      0
-+#define TCG_TARGET_HAS_sextract_i64     0
-+#define TCG_TARGET_HAS_extrl_i64_i32    1
-+#define TCG_TARGET_HAS_extrh_i64_i32    1
-+#define TCG_TARGET_HAS_ext8s_i64        1
-+#define TCG_TARGET_HAS_ext16s_i64       1
-+#define TCG_TARGET_HAS_ext32s_i64       1
-+#define TCG_TARGET_HAS_ext8u_i64        1
-+#define TCG_TARGET_HAS_ext16u_i64       1
-+#define TCG_TARGET_HAS_ext32u_i64       1
-+#define TCG_TARGET_HAS_bswap16_i64      0
-+#define TCG_TARGET_HAS_bswap32_i64      0
-+#define TCG_TARGET_HAS_bswap64_i64      0
-+#define TCG_TARGET_HAS_not_i64          1
-+#define TCG_TARGET_HAS_neg_i64          1
-+#define TCG_TARGET_HAS_andc_i64         0
-+#define TCG_TARGET_HAS_orc_i64          0
-+#define TCG_TARGET_HAS_eqv_i64          0
-+#define TCG_TARGET_HAS_nand_i64         0
-+#define TCG_TARGET_HAS_nor_i64          0
-+#define TCG_TARGET_HAS_clz_i64          0
-+#define TCG_TARGET_HAS_ctz_i64          0
-+#define TCG_TARGET_HAS_ctpop_i64        0
-+#define TCG_TARGET_HAS_add2_i64         1
-+#define TCG_TARGET_HAS_sub2_i64         1
-+#define TCG_TARGET_HAS_mulu2_i64        0
-+#define TCG_TARGET_HAS_muls2_i64        0
-+#define TCG_TARGET_HAS_muluh_i64        1
-+#define TCG_TARGET_HAS_mulsh_i64        1
-+#endif
-+
-+static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
-+{
-+    __builtin___clear_cache((char *)start, (char *)stop);
-+}
-+
-+void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
-+
-+#define TCG_TARGET_DEFAULT_MO (0)
-+
-+#ifdef CONFIG_SOFTMMU
-+#define TCG_TARGET_NEED_LDST_LABELS
-+#endif
-+
-+#endif
---=20
-2.19.1
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+-- 
+1.8.3.1
