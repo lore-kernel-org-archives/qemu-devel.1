@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRnRI-0002lc-NY
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:10:49 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gRnlD-00034a-0B
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:31:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRnRD-0006hd-Q8
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:10:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60204)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gRnRD-0006h9-KP
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:10:43 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gRnRB-0003qN-Vv
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 00:10:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E54182E80C0
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 00:10:41 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1gRnlC-00085a-0T
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:31:22 -0500
+Date: Wed, 28 Nov 2018 09:54:03 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181127225403.GP2251@umbus.fritz.box>
+References: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Nov 2018 00:01:30 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1805445 <1805445@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154332864629.32687.7125797278920412825.malonedeb@wampee.canonical.com>
-Message-Id: <154336329107.10506.9161973399719112398.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805445] Re: QEMU arm virt machine was stopped by
- STMFD command while debug process
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="FRaepaAnLTQkJ4tS"
+Content-Disposition: inline
+In-Reply-To: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 0/9] ppc: get rid of
+ g_malloc(sizeof(T) * n)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +24,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-No, that is not something that QEMU supports. There is no such thing as
-a "generic arm board". All arm boards are different hardware, and we
-model only a few boards. We don't provide "put together your own model
-from building blocks" functionality, I'm afraid, and it's unlikely we
-ever will in future.
 
--- =
+--FRaepaAnLTQkJ4tS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805445
+On Tue, Nov 27, 2018 at 02:04:53PM +0100, Greg Kurz wrote:
+> As explained in HACKING, the g_malloc(sizeof(T) * n) construct is unsafe
+> because it can't detect multiplication overflowing size_t and doesn't
+> allow type checking.
+>=20
+> It appears to be used in a bunch of places though:
+>=20
+> $ git grep -E 'malloc.*sizeof' | grep ' \* '  | wc -l
+> 101
+>=20
+> This series fixes the ppc target and ppc machine code. The changes are
+> mostly trivial. Only the mac99 and e500 machines required some more work
+> that should be reviewed carefully, as it was only compile-tested.
 
-Title:
-  QEMU arm virt machine was stopped by STMFD command while debug process
+Series applied, thanks.
 
-Status in QEMU:
-  New
 
-Bug description:
-  Hello, i have a big problem with QEMU arm virtual machine. So...
-  I run QEMU machine with bare-metal ThreadX fullflash from Texet TM-333 ph=
-one  (Spreadtrum platform)
-  [CODE]qemu-system-arm -S -gdb tcp::1234,ipv4 -drive file=3DC:\cygwin64\ho=
-me\flash.bin,if=3Dmtd,format=3Draw -M palmetto-bmc -cpu arm926 -m 64M[/CODE]
-  I use palmetto-bmc platform because it have ARM926EJ-S core and support S=
-PI Flash.
-  Then, i attach to gdb qemu process from IDA and run code step-by-step.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-  =
+--FRaepaAnLTQkJ4tS
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  When the IDA run 00032534 STR R11, [R10] command
+-----BEGIN PGP SIGNATURE-----
 
-  =
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv9ywkACgkQbDjKyiDZ
+s5KLqhAAkhpQjyG+j37aVS3C3AmihZDH7YoCR5eRGZ35FRN2H7vvlENRcWQDN2qy
+CxQNGhVjEghyYDs+IaQNomaBFQ5r7kwhp7y1f4+4DzHv4B+ZkLpCNgY1/hlL6yk4
+ZhyTlqoF3RkDR8q7lfZnTNNJ2Nj26sxsBrWFwNLJ3edP2jiaf0pUFefkZJqz4NM2
+A5A2+jlqu6BcwcS/JbntjcHGqwHphOM7fsbLhgaSJ/PdmHZDp/weq4xQKNJ5Wz68
+IpyIJe2gkIVDdwyzmHUadWD/CkrdWCaLpLIZTsv5QPdDAGMIba5C69iILBA9nh1P
+TxFHD+mZMiuEYS0VjsUFSJ6SQkh6BFsMy9q6FtcVBH6RqPF8RhZIKIckRxQNol/1
+HA5J7QKHJ27YwEdAX6tcuDIaWq8AxwEeaq9He8H6uEZ0bo2nutiJNBySzovAEfwW
+H69Cs/7A7qvero1wwYkzFepuW0ah0mfDdSbH6FnImf5EZK5Vl2GGlU/XOuvSv78i
+EocKRlQF20t0vu6smfgiXYFTntVG/LcE4rgzpXi0WxTQ0+0U0fm1Zbvisqv9J9AD
+5wZXfAfcUqDo7CsqsRpS8jlgaD+oBu6Bf0TFajX22o4AG5+nG1fR0HHhy9/a3Wh8
+msW5YboKA99ztcm+8DI3zvN+mXYKlPse4wXRBy8GiQX0ERheIYk=
+=QXbQ
+-----END PGP SIGNATURE-----
 
-  instead of store R11 on R10 adress, it jump 000328DC STMFD SP!, {R0-R12,L=
-R} instruction...
-
-  and virt machine not execute new instruction...
-  [IMG]https://pp.userapi.com/c850624/v850624111/528f3/N7FTpgloWVU.jpg[/IMG]
-
-  and why i did not change flash from n25q256a to n25q032a11 in aspeed.c
-  without rebuild qemu?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805445/+subscriptions
+--FRaepaAnLTQkJ4tS--
