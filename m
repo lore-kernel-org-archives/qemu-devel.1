@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gRdgL-0006LY-8x
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:45:41 -0500
+	(envelope-from <philmd@redhat.com>) id 1gRdi1-0007IP-OX
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:47:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gRdgH-0001wy-AN
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:45:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43034)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gRdgH-0001v2-4W
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:45:37 -0500
-Date: Tue, 27 Nov 2018 11:45:14 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181127134514.GN18284@habkost.net>
-References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
-	<20181127092801.21777-12-marcandre.lureau@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gRdhx-0003yW-Os
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:47:25 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:34300)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRdhv-0003va-OZ
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:47:21 -0500
+Received: by mail-wr1-f65.google.com with SMTP id j2so22783640wrw.1
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 05:47:19 -0800 (PST)
+References: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<154332397198.541746.6299446399761681597.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c53fd40e-fb41-25c9-5e6f-7a291f98319d@redhat.com>
+Date: Tue, 27 Nov 2018 14:47:16 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181127092801.21777-12-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 11/28] qom: make
- user_creatable_complete() specific to UserCreatable
+In-Reply-To: <154332397198.541746.6299446399761681597.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 7/9] virtex_ml507: use g_new(T,
+ n) instead of g_malloc(sizeof(T) * n)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Amit Shah <amit@kernel.org>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, Nov 27, 2018 at 01:27:44PM +0400, Marc-Andr=E9 Lureau wrote:
-> Instead of accepting any Object*, change user_creatable_complete() to
-> require a UserCreatable*. Modify the callers to pass the appropriate
-> argument, removing redundant dynamic cast checks in object creation.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+On 27/11/18 14:06, Greg Kurz wrote:
+> Because it is a recommended coding practice (see HACKING).
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/ppc/virtex_ml507.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+> index ee9b4b449086..517712057434 100644
+> --- a/hw/ppc/virtex_ml507.c
+> +++ b/hw/ppc/virtex_ml507.c
+> @@ -105,7 +105,7 @@ static PowerPCCPU *ppc440_init_xilinx(ram_addr_t *ram_size,
+>      ppc_dcr_init(env, NULL, NULL);
+>  
+>      /* interrupt controller */
+> -    irqs = g_malloc0(sizeof(qemu_irq) * PPCUIC_OUTPUT_NB);
+> +    irqs = g_new0(qemu_irq, PPCUIC_OUTPUT_NB);
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
---=20
-Eduardo
+>      irqs[PPCUIC_OUTPUT_INT] = ((qemu_irq *)env->irq_inputs)[PPC40x_INPUT_INT];
+>      irqs[PPCUIC_OUTPUT_CINT] = ((qemu_irq *)env->irq_inputs)[PPC40x_INPUT_CINT];
+>      ppcuic_init(env, irqs, 0x0C0, 0, 1);
+> 
+> 
