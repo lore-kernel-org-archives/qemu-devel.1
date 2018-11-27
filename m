@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gRdOu-0005rG-Bo
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:27:42 -0500
+	(envelope-from <philmd@redhat.com>) id 1gRdPK-0007Rk-TU
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:28:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gRdDr-0006Nw-Dp
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:16:18 -0500
-References: <20181127114102.4319-1-david@redhat.com>
-	<f31fb9d1-d1dd-7d06-7993-08e44bb77632@de.ibm.com>
-	<55d945eb-a9ba-9183-9c47-3a1e505d2d35@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <58cec8ba-8427-235e-c8e5-786360a284c3@redhat.com>
-Date: Tue, 27 Nov 2018 14:16:12 +0100
+	(envelope-from <philmd@redhat.com>) id 1gRdPG-0000qd-K5
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:28:06 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40628)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRdPG-0000pK-D5
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:28:02 -0500
+Received: by mail-wm1-f66.google.com with SMTP id q26so22116714wmf.5
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 05:28:02 -0800 (PST)
+References: <20181126200435.23408-1-minyard@acm.org>
+	<20181126200435.23408-17-minyard@acm.org>
+	<d588fce5-23ad-3b53-c88a-4dfb542353e8@redhat.com>
+	<192d9e99-a3e6-0ca3-7c23-bd5a0d2b44cb@acm.org>
+	<c9b8d4ab-dfd5-7ed0-4a45-df478fed24ca@redhat.com>
+	<663ea18c-4028-6eff-d69d-c8870effffa1@acm.org>
+	<285b12c9-af5b-f4fa-0c8a-f73e57dd9c75@redhat.com>
+	<521bc02a-c1ea-267f-6629-817d41bcc987@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <530148ec-d7ba-869f-8a72-452b26ebf461@redhat.com>
+Date: Tue, 27 Nov 2018 14:27:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <55d945eb-a9ba-9183-9c47-3a1e505d2d35@redhat.com>
+In-Reply-To: <521bc02a-c1ea-267f-6629-817d41bcc987@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/tod: properly stop the KVM TOD
- while the guest is not running
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 16/16] i2c:smbus_eeprom: Add a reset
+ function to smbus_eeprom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,68 +37,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: minyard@acm.org, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Corey Minyard <cminyard@mvista.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-On 27.11.18 14:06, Thomas Huth wrote:
-> On 2018-11-27 13:43, Christian Borntraeger wrote:
->> On 27.11.2018 12:41, David Hildenbrand wrote:
->>> Just like on other architectures, we should stop the clock while the =
-guest
->>> is not running. This is already properly done for TCG. Right now, doi=
-ng an
->>> offline migration (stop, migrate, cont) can easily trigger stalls in =
-the
->>> guest.
+On 27/11/18 13:58, Corey Minyard wrote:
+> On 11/27/18 4:54 AM, Philippe Mathieu-Daudé wrote:
+>> On 27/11/18 0:58, Corey Minyard wrote:
+>>> On 11/26/18 5:01 PM, Philippe Mathieu-Daudé wrote:
+>>>> On 26/11/18 23:41, Corey Minyard wrote:
+>>>>> On 11/26/18 2:42 PM, Philippe Mathieu-Daudé wrote:
+>>>>>> Hi Corey,
+>>>>>>
+>>>>>> On 26/11/18 21:04, minyard@acm.org wrote:
+>>>>>>> From: Corey Minyard <cminyard@mvista.com>
+>>>>>>>
+>>>>>>> Reset the contents to init data and reset the offset on a machine
+>>>>>>> reset.
+>>>>>>>
+>>>>>>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+>>>>>>> ---
+>>>>>>>     hw/i2c/smbus_eeprom.c | 8 +++++++-
+>>>>>>>     1 file changed, 7 insertions(+), 1 deletion(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+>>>>>>> index a0dcadbd60..de3a492df4 100644
+>>>>>>> --- a/hw/i2c/smbus_eeprom.c
+>>>>>>> +++ b/hw/i2c/smbus_eeprom.c
+>>>>>>> @@ -107,7 +107,7 @@ static const VMStateDescription
+>>>>>>> vmstate_smbus_eeprom = {
+>>>>>>>         }
+>>>>>>>     };
+>>>>>>>     -static void smbus_eeprom_realize(DeviceState *dev, Error
+>>>>>>> **errp)
+>>>>>>> +static void smbus_eeprom_reset(DeviceState *dev)
+>>>>>>>     {
+>>>>>>>         SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+>>>>>>>     
+>>>>>> 'git diff -U4' also shows this line:
+>>>>>>
+>>>>>>           memcpy(eeprom->data, eeprom->init_data, SMBUS_EEPROM_SIZE);
+>>>>>>
+>>>>>> I don't think this is correct.
+>>>>>>
+>>>>>> One test I'd like to have is a machine booting, updating the EPROM
+>>>>>> then
+>>>>>> rebooting calling hw reset() to use the new values (BIOS use this).
+>>>>>>
+>>>>>> With this patch this won't work, you'll restore the EPROM content on
+>>>>>> each machine reset.
+>>>>>>
+>>>>>> I'd move the memcpy() call to the realize() function.
+>>>>>>
+>>>>>> What do you think?
+>>>>> There was some debate on this in the earlier patch set.  The general
+>>>>> principle
+>>>> Hmm I missed it and can't find it (quick basic search). I only find
+>>>> references about VMState.
 >>>
->>> Even doing a
->>>     (hmp) stop
->>>     ... wait 2 minutes ...
->>>     (hmp) cont
->>> will already trigger stalls.
->>>
->>> So whenever the guest stops, backup the KVM TOD. When continuning to =
-run
->>> the guest, restore the KVM TOD.
+>>> It starts at
+>>> http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg01737.html
+>> Thank you, very helpful.
 >>
->> We do a similar thing for managedsave so it probably makes sense to so=
-lve
->> the stall warnings. Now: At the same time, we actually want to have th=
-e guest
->> see the real time and maybe even share the TOD clock with the host in =
-some
->> way, while at the same time avoid the stall warnings.
->=20
-> Hmm, by the way, do we also have to consider the "-rtc clock=3Dhost|rt|=
-vm"
-> option from the commandl line, or is this an orthogonal concept?
->=20
->  Thomas
->=20
+>>> The patch set was fairly different at that point.
+>>>
+>>>
+>>>>> is that a reset is the same as starting up qemu from scratch, so I
+>>>>> added
+>>>>> this
+>>>>> code based on that principle.  But I'm not really sure.
+>>>>>
+>>>>>>>         eeprom->offset = 0;
+>>>>>> This is correct, the offset reset belongs to the reset() function.
+>>>>> Actually, on a real system, a hardware reset will generally not
+>>>>> affect the
+>>>>> eeprom current offset register.  So if we don't take the above code,
+>>>>> then
+>>>>> IMHO this is wrong, too.
+>>>> Indeed cpu reset shouldn't affect the EEPROM, but a board powercycle
+>>>> would.
+>>>>
+>>>> Maybe we can argue QEMU system reset doesn't work correctly yet to use
+>>>> this feature. Personally I wouldn't expect the EEPROM content be be
+>>>> reset after a reset, but maybe I should rely on a block backend for a
+>>>> such feature, and not the current simple approach.
+>>>>
+>>> Yeah, it was mentioned that to do this correctly would require a block
+>>> backend.
+>>> I'll let others comment on the correctness of this, I guess.  It's a
+>>> separate patch
+>>> so it can be easily dropped.
+>> Since modelling eeprom data retention on hardware reset isn't the goal
+>> of your series, we can have a consensus, adding a comment explaining why
+>> we choose this simpler way, and eeprom retention simulation requieres
+>> more work with block backend.
+> 
+> Good idea, I've done that.  Thanks for the reviews.  Is this a
+> "reviewed-by"?
 
--rtc [base=3Dutc|localtime|date][,clock=3Dhost|vm][,driftfix=3Dnone|slew]
-       Specify base as "utc" or "localtime" to let the RTC start at the c=
-urrent UTC or local time, respectively. "localtime" is required for
-       correct date in MS-DOS or Windows. To start at a specific point in=
- time, provide date in the format "2006-06-17T16:01:21" or
-       "2006-06-17". The default base is UTC.
+Why not ;)
 
-       By default the RTC is driven by the host system time. This allows =
-using of the RTC as accurate reference clock inside the guest,
-       specifically if the host time is smoothly following an accurate ex=
-ternal reference clock, e.g. via NTP.  If you want to isolate the
-       guest time from the host, you can set clock to "rt" instead.  To e=
-ven prevent it from progressing during suspension, you can set it to
-       "vm".
+With a comment:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Most of the stuff here is not supported (should we error out if specified=
-?)
-and I think this is only considered for the RTC clock on x86, not "ordina=
-ry" clocks
-(e.g. kvmclock)
-
---=20
-
-Thanks,
-
-David / dhildenb
+> 
+> 
+> -corey
+> 
+>>> The current code is far too broken for anyone to be using it, so we
+>>> won't be
+>>> breaking any current users, I don't think.
+>>>
+>>> -corey
+>>>
+>>>>> -corey
+>>>>>
+>>>>>
+>>>>>> Regards,
+>>>>>>
+>>>>>> Phil.
+>>>>>>
+>>>>>>>     }
+>>>>>>>     +static void smbus_eeprom_realize(DeviceState *dev, Error
+>>>>>>> **errp)
+>>>>>>> +{
+>>>>>>> +    smbus_eeprom_reset(dev);
+>>>>>>> +}
+>>>>>>> +
+>>>>>>>     static Property smbus_eeprom_properties[] = {
+>>>>>>>         DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
+>>>>>>>         DEFINE_PROP_END_OF_LIST(),
+>>>>>>> @@ -126,6 +131,7 @@ static void
+>>>>>>> smbus_eeprom_class_initfn(ObjectClass
+>>>>>>> *klass, void *data)
+>>>>>>>         SMBusDeviceClass *sc = SMBUS_DEVICE_CLASS(klass);
+>>>>>>>           dc->realize = smbus_eeprom_realize;
+>>>>>>> +    dc->reset = smbus_eeprom_reset;
+>>>>>>>         sc->receive_byte = eeprom_receive_byte;
+>>>>>>>         sc->write_data = eeprom_write_data;
+>>>>>>>         dc->props = smbus_eeprom_properties;
+>>>>>>>
+> 
