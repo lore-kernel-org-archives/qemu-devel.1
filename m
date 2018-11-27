@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gRfVw-0006d6-PG
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:43:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1gRfVy-0006dw-Fk
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:43:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gRfVv-0001To-PG
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:43:04 -0500
-Date: Tue, 27 Nov 2018 16:42:18 +0100
-From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181127154218.GA5677@caravaggio>
-References: <20181126162942.21258-1-sameo@linux.intel.com>
-	<20181126162942.21258-5-sameo@linux.intel.com>
-	<20181127162551.29608eeb@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1gRfVx-0001ZE-Mg
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 10:43:06 -0500
+References: <20181116155325.22428-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <afa0af9d-1c0f-3dee-85e1-b10fef7b6bdf@redhat.com>
+Date: Tue, 27 Nov 2018 09:42:59 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181127162551.29608eeb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/8] hw: arm: Carry RSDP specific data
- through AcpiRsdpData
+In-Reply-To: <20181116155325.22428-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/6] Misc fixes to NBD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,144 +23,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Hi Igor,
+On 11/16/18 9:53 AM, Daniel P. Berrang=C3=A9 wrote:
+> This does two minor fixes to the NBD code and adds significant coverage
+> of the NBD TLS support to detect future problems.
+>=20
+> The first two patches should be for 3.1.
+>=20
+> The tests can wait till 4.0 if desired.
 
-On Tue, Nov 27, 2018 at 04:25:51PM +0100, Igor Mammedov wrote:
-> On Mon, 26 Nov 2018 17:29:37 +0100
-> Samuel Ortiz <sameo@linux.intel.com> wrote:
-> 
-> > That will allow us to generalize the ARM build_rsdp() routine to support
-> > both legacy RSDP (The current i386 implementation) and extended RSDP
-> > (The ARM implementation).
-> > 
-> > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > ---
-> >  include/hw/acpi/acpi-defs.h | 11 +++++++++++
-> >  hw/arm/virt-acpi-build.c    | 27 ++++++++++++++++++++++-----
-> >  2 files changed, 33 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> > index af8e023968..e7fd24c6c5 100644
-> > --- a/include/hw/acpi/acpi-defs.h
-> > +++ b/include/hw/acpi/acpi-defs.h
-> > @@ -53,6 +53,17 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
-> >  } QEMU_PACKED;
-> >  typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
-> >  
-> > +typedef struct AcpiRsdpData {
-> > +    uint8_t oem_id[6]; /* OEM identification */
-> > +    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
-> > +
-> > +    unsigned *rsdt_tbl_offset;
-> > +    unsigned *xsdt_tbl_offset;
-> > +} AcpiRsdpData;
-> > +
-> 
-> > +#define ACPI_RSDP_REV_1 0
-> > +#define ACPI_RSDP_REV_2 2
-> it's one time used spec defined values so just use values directly
-> in place with a comment, so reader won't have to jump around code
-> when comparing to spec.
-It's also used in the ACPI tests fix patch.
-Also the 0 for revision 1 is a little confusing, I feel the above
-definition is clearer.
+Although this series is now in 3.1, I can think of further enhancements=20
+we should add for 4.0 (summarizing an IRC conversation with Dan).=20
+Capturing it here to remember things...
 
+- we need iotests coverage of Pre-Shared Keys (PSK) as an alternative to=20
+certificates (either add on to 233, or a new test)
+- add an optional QMP parameter for specifying the hostname to validate=20
+a certificate against when using a Unix socket with TLS (compare=20
+tls-hostname added to 'migrate'), rather than the current restriction=20
+that using TLS with an NBD client requires TCP
 
-> > +
-> >  /* Table structure from Linux kernel (the ACPI tables are under the
-> >     BSD license) */
-> >  
-> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > index 0835900052..2dad465ecf 100644
-> > --- a/hw/arm/virt-acpi-build.c
-> > +++ b/hw/arm/virt-acpi-build.c
-> > @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
-> >  
-> >  /* RSDP */
-> >  static void
-> > -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> > +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
-> >  {
-> >      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
-> >      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
-> > @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> >                               true /* fseg memory */);
-> >  
-> >      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
-> > -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
-> > +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
-> >      rsdp->length = cpu_to_le32(sizeof(*rsdp));
-> > -    rsdp->revision = 0x02;
-> > +    rsdp->revision = rsdp_data->revision;
-> >  
-> >      /* Address to be filled by Guest linker */
-> >      bios_linker_loader_add_pointer(linker,
-> >          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
-> > -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
-> > +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
-> >  
-> >      /* Checksum to be filled by Guest linker */
-> >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> > @@ -399,6 +399,20 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> >          (char *)&rsdp->extended_checksum - rsdp_table->data);
-> >  }
-> >  
-> > +static void
-> > +init_rsdp_data(AcpiRsdpData *data, const char *oem_id, uint8_t revision,
-> > +               unsigned *rsdt_offset, unsigned *xsdt_offset)
-> > +{
-> > +    /* Caller must provide an OEM ID */
-> > +    g_assert(oem_id);
-> > +    g_assert(strlen(oem_id) >= 6);
-> > +
-> > +    memcpy(data->oem_id, oem_id, 6);
-> > +    data->revision = revision;
-> > +    data->rsdt_tbl_offset = rsdt_offset;
-> > +    data->xsdt_tbl_offset = xsdt_offset;
-> > +}
-> > +
-> >  static void
-> >  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> >  {
-> > @@ -810,6 +824,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-> >      GArray *table_offsets;
-> >      unsigned dsdt, xsdt;
-> >      GArray *tables_blob = tables->table_data;
-> > +    AcpiRsdpData rsdp;
-> s/rsdp/rsdp_info/
-> 
-> >  
-> >      table_offsets = g_array_new(false, true /* clear */,
-> >                                          sizeof(uint32_t));
-> > @@ -857,7 +872,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-> >      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
-> >  
-> >      /* RSDP is in FSEG memory, so allocate it separately */
-> > -    build_rsdp(tables->rsdp, tables->linker, xsdt);
-> > +    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
-> > +                   NULL, &xsdt);
-> It would be more concise to use declarative style without extra clutter:
-> 
-> -    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
-> -                   NULL, &xsdt);
-> -    build_rsdp(tables->rsdp, tables->linker, &rsdp);
-> +    {
-> +       AcpiRsdpData rsdp = {
-> +           .revision = 2,
-> +           .oem_id = ACPI_BUILD_APPNAME6,
-> +           .xsdt_tbl_offset = &xsdt,
-> +           .rsdt_tbl_offset = NULL,
-> +       };
-> +       build_rsdp(tables->rsdp, tables->linker, &rsdp);
-> +    }
-2 things here, imo:
-
-- This is not more concise.
-- It's code duplication as almost the same snippet is going to be used
-  for i386/acpi-build.c
-
-Cheers,
-Samuel.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
