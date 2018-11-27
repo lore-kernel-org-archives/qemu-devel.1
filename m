@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gRd4x-00040l-9V
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:07:12 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gRd58-00049G-KG
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:07:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gRd4s-0007Qr-S9
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:07:02 -0500
-References: <20181127114102.4319-1-david@redhat.com>
-	<f31fb9d1-d1dd-7d06-7993-08e44bb77632@de.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <55d945eb-a9ba-9183-9c47-3a1e505d2d35@redhat.com>
-Date: Tue, 27 Nov 2018 14:06:46 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1gRd55-0007YT-An
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:07:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52846)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gRd52-0007WI-OK
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:07:10 -0500
+Date: Tue, 27 Nov 2018 11:06:17 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181127130617.GD18284@habkost.net>
+References: <20181127024959.7060-1-ehabkost@redhat.com>
+	<20181127024959.7060-3-ehabkost@redhat.com>
+	<20181127125619.GD7857@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <f31fb9d1-d1dd-7d06-7993-08e44bb77632@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/tod: properly stop the KVM TOD
- while the guest is not running
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181127125619.GD7857@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 2/2] virtio: Provide
+ version-specific variants of virtio PCI devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +29,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Caio Carrara <ccarrara@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Fam Zheng <famz@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, libvir-list@redhat.com, Wainer dos Santos Moschetta <wainersm@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Amit Shah <amit@kernel.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 2018-11-27 13:43, Christian Borntraeger wrote:
-> On 27.11.2018 12:41, David Hildenbrand wrote:
->> Just like on other architectures, we should stop the clock while the guest
->> is not running. This is already properly done for TCG. Right now, doing an
->> offline migration (stop, migrate, cont) can easily trigger stalls in the
->> guest.
->>
->> Even doing a
->>     (hmp) stop
->>     ... wait 2 minutes ...
->>     (hmp) cont
->> will already trigger stalls.
->>
->> So whenever the guest stops, backup the KVM TOD. When continuning to run
->> the guest, restore the KVM TOD.
+On Tue, Nov 27, 2018 at 10:56:21AM -0200, Caio Carrara wrote:
+> Hello, Eduardo.
 > 
-> We do a similar thing for managedsave so it probably makes sense to solve
-> the stall warnings. Now: At the same time, we actually want to have the guest
-> see the real time and maybe even share the TOD clock with the host in some
-> way, while at the same time avoid the stall warnings.
+> Just some minor comments regarding the Python code.
+> 
+[...]
+> > +def devtype_implements(vm, devtype, implements):
+> > +    return devtype in [d['name'] for d in vm.command('qom-list-types', implements=implements)]
+> > +
+> > +def get_interfaces(vm, devtype, interfaces=['pci-express-device', 'conventional-pci-device']):
+> 
+> Usually is not a good idea to use a mutable (in this case a list)
+> default value as an argument:
+> 
+> def my_func(param=[1,2,3]):
+>      param.append(666)
+>      print(param)
+> 
+> my_func()
+> [1, 2, 3, 666]
+> my_func()
+> [1, 2, 3, 666, 666]
+> my_func()
+> [1, 2, 3, 666, 666, 666]
+> 
+> Yes, you're not changing the value right now, but it's something we can
+> not guarantee for the future when, for example, someone not Python
+> experienced have to change this code.
 
-Hmm, by the way, do we also have to consider the "-rtc clock=host|rt|vm"
-option from the commandl line, or is this an orthogonal concept?
+Oops, thanks for catching this!
 
- Thomas
+> 
+> Another way safer to write this function could be:
+> 
+> def get_interfaces(vm, devtype, interfaces=None):
+>     if not interfaces:
+>         interfaces = ['pci-express-device', 'conventional-pci-device']
+>     return [i for i in interfaces if devtype_implements(vm, devtype, i)]
+
+Maybe I should just use a tuple, then?
+
+    def get_interfaces(vm, devtype, interfaces=('pci-express-device', 'conventional-pci-device')):
+        return [i for i in interfaces if devtype_implements(vm, devtype, i)]
+
+but probably I can simply eliminate the parameter because nobody
+is using it:
+
+    def get_pci_interfaces(vm, devtype):
+        interfaces = ('pci-express-device', 'conventional-pci-device')
+        return [i for i in interfaces if devtype_implements(vm, devtype, i)]
+
+> 
+> > +    return [i for i in interfaces if devtype_implements(vm, devtype, i)]
+> > +
+> > +class VirtioVersionCheck(Test):
+> > +    """
+> > +    Check if virtio-version-specific device types result in the
+> > +    same device tree created by `disable-modern` and
+> > +    `disable-legacy`.
+> > +
+> > +    :avocado: enable
+> > +    :avocado: tags=x86_64
+> > +    """
+> > +
+> > +    # just in case there are failures, show larger diff:
+> > +    maxDiff = 4096
+> > +
+> > +    def run_device(self, devtype, opts=None, machine='pc'):
+> > +        """
+> > +        Run QEMU with `-device DEVTYPE`, return device info from `query-pci`
+> > +        """
+> > +        with QEMUMachine(self.qemu_bin) as vm:
+> > +            vm.set_machine(machine)
+> > +            if opts:
+> > +                devtype += ',' + opts
+> > +            vm.add_args('-device', '%s,id=devfortest' % (devtype))
+> > +            vm.add_args('-S')
+> > +            vm.launch()
+> > +
+> > +            pcibuses = vm.command('query-pci')
+> > +            alldevs = [dev for bus in pcibuses for dev in bus['devices']]
+> > +            import pprint
+> > +            pprint.pprint(alldevs)
+> 
+> I think it's an undesired print here, right?
+
+Oops!  Yes, debugging leftover.
+
+> 
+> > +            devfortest = [dev for dev in alldevs
+> > +                          if dev['qdev_id'] == 'devfortest']
+> > +            return devfortest[0], get_interfaces(vm, devtype)
+> > +
+> > +
+> > +    def assert_devids(self, dev, devid, non_transitional=False):
+> > +        self.assertEqual(dev['id']['vendor'], PCI_VENDOR_ID_REDHAT_QUMRANET)
+> > +        self.assertEqual(dev['id']['device'], devid)
+> > +        if non_transitional:
+> > +            self.assertTrue(0x1040 <= dev['id']['device'] <= 0x107f)
+> > +            self.assertGreaterEqual(dev['id']['subsystem'], 0x40)
+> > +
+> > +    def check_all_variants(self, qemu_devtype, virtio_devid):
+> > +        """Check if a virtio device type and its variants behave as expected"""
+> > +        # Force modern mode:
+> > +        dev_modern,_ = self.run_device(qemu_devtype,
+> 
+> s/dev_modern,_/dev_modern, _/ (blank space after comma. There are other
+> cases bellow)
+
+I will change it, thanks!
+
+> 
+> > +                                       'disable-modern=off,disable-legacy=on')
+> > +        self.assert_devids(dev_modern, pci_modern_device_id(virtio_devid),
+> > +                           non_transitional=True)
+[...]
+
+-- 
+Eduardo
