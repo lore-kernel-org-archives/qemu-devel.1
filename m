@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gRd8o-00007S-Ts
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:11:05 -0500
+	(envelope-from <groug@kaod.org>) id 1gRdO1-0005nZ-Bj
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:26:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gRd8l-0002Ug-PN
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:11:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48422)
+	(envelope-from <groug@kaod.org>) id 1gRdLA-0004S0-S5
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:23:51 -0500
+Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:49858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gRd8l-0002TS-Fk
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:10:59 -0500
-Date: Tue, 27 Nov 2018 11:10:49 -0200
-From: Caio Carrara <ccarrara@redhat.com>
-Message-ID: <20181127131048.GF7857@localhost.localdomain>
-References: <20181127024959.7060-1-ehabkost@redhat.com>
-	<20181127024959.7060-3-ehabkost@redhat.com>
-	<20181127125619.GD7857@localhost.localdomain>
-	<20181127130617.GD18284@habkost.net>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gRdLA-0004R5-ME
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:23:48 -0500
+Received: from player168.ha.ovh.net (unknown [10.109.160.253])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 2EA31146092
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 14:23:46 +0100 (CET)
+Date: Tue, 27 Nov 2018 14:23:37 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181127142337.4effe245@bahia.lan>
+In-Reply-To: <4c274aa6-90e9-bf8f-c0d0-55c7553e472b@redhat.com>
+References: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<4c274aa6-90e9-bf8f-c0d0-55c7553e472b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181127130617.GD18284@habkost.net>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 2/2] virtio: Provide
- version-specific variants of virtio PCI devices
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 0/9] ppc: get rid of
+ g_malloc(sizeof(T) * n)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,134 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Fam Zheng <famz@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Kevin Wolf <kwolf@redhat.com>, libvir-list@redhat.com, Wainer dos Santos Moschetta <wainersm@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Amit Shah <amit@kernel.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Nov 27, 2018 at 11:06:17AM -0200, Eduardo Habkost wrote:
-> On Tue, Nov 27, 2018 at 10:56:21AM -0200, Caio Carrara wrote:
-> > Hello, Eduardo.
-> > 
-> > Just some minor comments regarding the Python code.
-> > 
-> [...]
-> > > +def devtype_implements(vm, devtype, implements):
-> > > +    return devtype in [d['name'] for d in vm.command('qom-list-types', implements=implements)]
-> > > +
-> > > +def get_interfaces(vm, devtype, interfaces=['pci-express-device', 'conventional-pci-device']):
-> > 
-> > Usually is not a good idea to use a mutable (in this case a list)
-> > default value as an argument:
-> > 
-> > def my_func(param=[1,2,3]):
-> >      param.append(666)
-> >      print(param)
-> > 
-> > my_func()
-> > [1, 2, 3, 666]
-> > my_func()
-> > [1, 2, 3, 666, 666]
-> > my_func()
-> > [1, 2, 3, 666, 666, 666]
-> > 
-> > Yes, you're not changing the value right now, but it's something we can
-> > not guarantee for the future when, for example, someone not Python
-> > experienced have to change this code.
-> 
-> Oops, thanks for catching this!
-> 
-> > 
-> > Another way safer to write this function could be:
-> > 
-> > def get_interfaces(vm, devtype, interfaces=None):
-> >     if not interfaces:
-> >         interfaces = ['pci-express-device', 'conventional-pci-device']
-> >     return [i for i in interfaces if devtype_implements(vm, devtype, i)]
-> 
-> Maybe I should just use a tuple, then?
+On Tue, 27 Nov 2018 07:16:44 -0600
+Eric Blake <eblake@redhat.com> wrote:
 
-Yes. It should work as well.
+> On 11/27/18 7:04 AM, Greg Kurz wrote:
+> > As explained in HACKING, the g_malloc(sizeof(T) * n) construct is unsafe
+> > because it can't detect multiplication overflowing size_t and doesn't
+> > allow type checking.
+> > 
+> > It appears to be used in a bunch of places though:
+> > 
+> > $ git grep -E 'malloc.*sizeof' | grep ' \* '  | wc -l
+> > 101
+> > 
+> > This series fixes the ppc target and ppc machine code. The changes are
+> > mostly trivial. Only the mac99 and e500 machines required some more work
+> > that should be reviewed carefully, as it was only compile-tested.  
+> 
+> Did you do this all manually, or did you try to use Coccinelle?  Hmm - 
+> we have a Coccinelle script for this mentioned in commit b45c03f (most 
+> recently reused in bdd81add) - but it is not yet in scripts/coccinelle/. 
+>   Maybe that would be worth doing now.
+> 
 
-> 
->     def get_interfaces(vm, devtype, interfaces=('pci-express-device', 'conventional-pci-device')):
->         return [i for i in interfaces if devtype_implements(vm, devtype, i)]
-> 
-> but probably I can simply eliminate the parameter because nobody
-> is using it:
-> 
->     def get_pci_interfaces(vm, devtype):
->         interfaces = ('pci-express-device', 'conventional-pci-device')
->         return [i for i in interfaces if devtype_implements(vm, devtype, i)]
-> 
-> > 
-> > > +    return [i for i in interfaces if devtype_implements(vm, devtype, i)]
-> > > +
-> > > +class VirtioVersionCheck(Test):
-> > > +    """
-> > > +    Check if virtio-version-specific device types result in the
-> > > +    same device tree created by `disable-modern` and
-> > > +    `disable-legacy`.
-> > > +
-> > > +    :avocado: enable
-> > > +    :avocado: tags=x86_64
-> > > +    """
-> > > +
-> > > +    # just in case there are failures, show larger diff:
-> > > +    maxDiff = 4096
-> > > +
-> > > +    def run_device(self, devtype, opts=None, machine='pc'):
-> > > +        """
-> > > +        Run QEMU with `-device DEVTYPE`, return device info from `query-pci`
-> > > +        """
-> > > +        with QEMUMachine(self.qemu_bin) as vm:
-> > > +            vm.set_machine(machine)
-> > > +            if opts:
-> > > +                devtype += ',' + opts
-> > > +            vm.add_args('-device', '%s,id=devfortest' % (devtype))
-> > > +            vm.add_args('-S')
-> > > +            vm.launch()
-> > > +
-> > > +            pcibuses = vm.command('query-pci')
-> > > +            alldevs = [dev for bus in pcibuses for dev in bus['devices']]
-> > > +            import pprint
-> > > +            pprint.pprint(alldevs)
-> > 
-> > I think it's an undesired print here, right?
-> 
-> Oops!  Yes, debugging leftover.
-> 
-> > 
-> > > +            devfortest = [dev for dev in alldevs
-> > > +                          if dev['qdev_id'] == 'devfortest']
-> > > +            return devfortest[0], get_interfaces(vm, devtype)
-> > > +
-> > > +
-> > > +    def assert_devids(self, dev, devid, non_transitional=False):
-> > > +        self.assertEqual(dev['id']['vendor'], PCI_VENDOR_ID_REDHAT_QUMRANET)
-> > > +        self.assertEqual(dev['id']['device'], devid)
-> > > +        if non_transitional:
-> > > +            self.assertTrue(0x1040 <= dev['id']['device'] <= 0x107f)
-> > > +            self.assertGreaterEqual(dev['id']['subsystem'], 0x40)
-> > > +
-> > > +    def check_all_variants(self, qemu_devtype, virtio_devid):
-> > > +        """Check if a virtio device type and its variants behave as expected"""
-> > > +        # Force modern mode:
-> > > +        dev_modern,_ = self.run_device(qemu_devtype,
-> > 
-> > s/dev_modern,_/dev_modern, _/ (blank space after comma. There are other
-> > cases bellow)
-> 
-> I will change it, thanks!
-> 
-> > 
-> > > +                                       'disable-modern=off,disable-legacy=on')
-> > > +        self.assert_devids(dev_modern, pci_modern_device_id(virtio_devid),
-> > > +                           non_transitional=True)
-> [...]
-> 
-> -- 
-> Eduardo
+I did that manually because I didn't know about Markus's Coccinelle
+script... Also, I've only fixed the case involving a multiplication,
+since HACKING says "g_malloc(sizeof(*v)) are acceptable".
 
--- 
-Caio Carrara
-Software Engineer, Virt Team - Red Hat
-ccarrara@redhat.com
+I'll have a look at adding the script in scripts/coccinelle/.
+
+Cheers,
+
+--
+Greg
