@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gRczD-0008Fl-HG
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:01:16 -0500
+	(envelope-from <thuth@redhat.com>) id 1gRd21-0001wy-Ft
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:04:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gRczA-0000ve-4w
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:01:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:24804)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gRcz9-0000uq-VO
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:01:04 -0500
-Date: Tue, 27 Nov 2018 11:01:00 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181127130100.GC18284@habkost.net>
-References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
-	<20181127092801.21777-27-marcandre.lureau@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1gRd1y-0004kN-A2
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:04:01 -0500
+References: <20181127114102.4319-1-david@redhat.com>
+	<a632f840-f738-fd79-9f2d-5b51852c4726@redhat.com>
+	<6aabbad7-885a-0ed9-15d9-fbfd89148e94@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ed45438f-a388-c5d3-92b7-99b5010e6922@redhat.com>
+Date: Tue, 27 Nov 2018 14:03:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20181127092801.21777-27-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 26/28] hw/i386: add
- pc-i440fx-3.2 & pc-q35-3.2
+In-Reply-To: <6aabbad7-885a-0ed9-15d9-fbfd89148e94@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/tod: properly stop the KVM TOD
+ while the guest is not running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,16 +26,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Nov 27, 2018 at 01:27:59PM +0400, Marc-Andr=E9 Lureau wrote:
-> The following patch is going to add compatiblity parameters for
-> qemu <=3D 3.1.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+On 2018-11-27 13:50, David Hildenbrand wrote:
+> On 27.11.18 13:19, Thomas Huth wrote:
+>> On 2018-11-27 12:41, David Hildenbrand wrote:
+>>> Just like on other architectures, we should stop the clock while the guest
+>>> is not running. This is already properly done for TCG. Right now, doing an
+>>> offline migration (stop, migrate, cont) can easily trigger stalls in the
+>>> guest.
+>>>
+>>> Even doing a
+>>>     (hmp) stop
+>>>     ... wait 2 minutes ...
+>>>     (hmp) cont
+>>> will already trigger stalls.
+>>>
+>>> So whenever the guest stops, backup the KVM TOD. When continuning to run
+>>> the guest, restore the KVM TOD.
+>>>
+>>> One special case is starting a simple VM: Reading the TOD from KVM to
+>>> stop it right away until the guest is actually started means that the
+>>> time of any simple VM will already differ to the host time. We can
+>>> simply leave the TOD running and the guest won't be able to recognize
+>>> it.
+>>>
+>>> For migration, we actually want to keep the TOD stopped until really
+>>> starting the guest. To be able to catch most errors, we should however
+>>> try to set the TOD in addition to simply storing it. So we can still
+>>> catch basic migration problems.
+>>>
+>>> If anything goes wrong while backing up/restoring the TOD, we have to
+>>> ignore it (but print a warning). This is then basically a fallback to
+>>> old behavior (TOD remains running).
+>>>
+>>> I tested this very basically with an initrd:
+>>>     1. Start a simple VM. Observed that the TOD is kept running. Old
+>>>        behavior.
+>>>     2. Ordinary live migration. Observed that the TOD is temporarily
+>>>        stopped on the destination when setting the new value and
+>>>        correctly started when finally starting the guest.
+>>>     3. Offline live migration. (stop, migrate, cont). Observed that the
+>>>        TOD will be stopped on the source with the "stop" command. On the
+>>>        destination, the TOD is temporarily stopped when setting the new
+>>>        value and correctly started when finally starting the guest via
+>>>        "cont".
+>>>     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
+>>>        or conts in a row have no effect, so works as expected)
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>  hw/s390x/tod-kvm.c     | 88 +++++++++++++++++++++++++++++++++++++++++-
+>>>  include/hw/s390x/tod.h |  7 +++-
+>>>  2 files changed, 92 insertions(+), 3 deletions(-)
+>> [...]
+>>> @@ -49,10 +112,31 @@ static void kvm_s390_tod_class_init(ObjectClass *oc, void *data)
+>>>      tdc->set = kvm_s390_tod_set;
+>>>  }
+>>>  
+>>> +static void kvm_s390_tod_init(Object *obj)
+>>> +{
+>>> +    S390TODState *td = S390_TOD(obj);
+>>> +
+>>> +    /*
+>>> +     * The TOD is initially running (value stored in KVM). Avoid needless
+>>> +     * loading/storing of the TOD when starting a simple VM, so let it
+>>> +     * run although the (never started) VM is stopped. For migration, we
+>>> +     * will properly set the TOD later.
+>>> +     */
+>>> +    td->stopped = false;
+>>> +
+>>> +    /*
+>>> +     * We need to know when the VM gets started/stopped to start/stop the TOD.
+>>> +     * As we can never have more than one TOD instance (and that will never be
+>>> +     * removed), registering here and never unregistering is good enough.
+>>> +     */
+>>> +    qemu_add_vm_change_state_handler(kvm_s390_tod_vm_state_change, td);
+>>
+>> I think you should rather do this in a realize() function instead, since
+>> instance_init can be called multiple times (during introspection of the
+>> object, for example). See my blog article here for some details:
+>>
+>> https://people.redhat.com/~thuth/blog/qemu/2018/09/10/instance-init-realize.html
+> 
+> 
+> Even for types that cannot be created by the user?
 
-The next release will be 4.0.
+Yes, you still can run "device_add s390-tod-kvm,help" at the HMP prompt,
+or introspect the device via QMP. Both will trigger a temporary instance
+of the device, where instance_init is executed.
 
---=20
-Eduardo
+ Thomas
