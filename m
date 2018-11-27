@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRgi0-00033l-0G
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:59:39 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1gRgiI-0003Mc-H2
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 12:00:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRgUs-0003u3-FT
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:46:07 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36392)
+	(envelope-from <tcminyard@gmail.com>) id 1gRgi9-0007wy-4w
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:59:54 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:33916)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gRgUs-0003tl-9B
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:46:02 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gRgUr-0003N5-1b
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 16:46:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 082A62E80C9
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 16:46:01 +0000 (UTC)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gRgi8-0007vy-Su
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:59:45 -0500
+Received: by mail-oi1-x244.google.com with SMTP id h25so19946065oig.1
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 08:59:44 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+Reply-To: minyard@acm.org
+References: <20181115192446.17187-1-minyard@acm.org>
+	<20181115192446.17187-7-minyard@acm.org>
+	<20181126172308.GJ2547@work-vm>
+	<7055e173-6f4f-7954-69c7-47e0f26dfaf6@acm.org>
+	<20181127160144.GB2616@work-vm>
+From: Corey Minyard <minyard@acm.org>
+Message-ID: <d01dc051-f078-c703-bd19-e1874afdfc33@acm.org>
+Date: Tue, 27 Nov 2018 10:59:39 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 27 Nov 2018 16:32:51 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 757702 <757702@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110411161233.16764.21820.malonedeb@soybean.canonical.com>
-Message-Id: <154333637158.32610.3800553881369860223.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 757702] Re: ARM: singlestepping insn which UNDEFs
- should stop at UNDEF vector insn, not after it
+In-Reply-To: <20181127160144.GB2616@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+Subject: Re: [Qemu-devel] [PATCH v2 06/12] boards.h: Ignore migration for
+ SMBus devices on older machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +36,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-This is still a bug, we shouldn't have let it expire.
+On 11/27/18 10:01 AM, Dr. David Alan Gilbert wrote:
+> * Corey Minyard (minyard@acm.org) wrote:
+>> On 11/26/18 11:23 AM, Dr. David Alan Gilbert wrote:
+>>> * minyard@acm.org (minyard@acm.org) wrote:
+>>>> From: Corey Minyard <cminyard@mvista.com>
+>>>>
+>>>> Migration capability is being added for pm_smbus and SMBus devices.
+>>>> This change will allow backwards compatibility to be kept when
+>>>> migrating back to an old qemu version.  Add a bool to the machine
+>>>> class tho keep smbus migration from happening.  Future changes
+>>>> will use this.
+>>> So this is also going to have to be in the 3.0 and 3.1 machine options
+>>> and maybe some other architectures?
+>> I'm not sure why it would need to be in both the 3.0 and 3.1 machine
+>> options.
+>> If this goes in, I'm assuming it's for 3.1 and it should only need to be
+>> there.
+>> That's if it's too late for 3.0.
+> You're out by 1-2 releases;  3.0 shipped in August, 3.1 is in freeze at
+> the moment (hence you've missed it unless some part of this is
+> critical); so this will go in during the 4.0 release.
+
+Yes, you are right, this is for 4.0.
 
 
-** Changed in: qemu
-       Status: Expired =3D> Confirmed
+>
+>> The pm_smbus device is also used by mips fulong.  From what I can tell, that
+>> machine doesn't have any concept of backwards compatibility, so it seemed
+>> save to no worry about it there.  If it weren't for that, this bool could go
+>> into the
+> Yeh that's fine.
+>
+> What about the eeprom's are they used more widely?
 
--- =
+The only other I2C EEPROM I see is hw/nvram/eeprom_at24c.c.  That device 
+is only
+configured for PPC.  It has a block device backend, too.  This is a 
+little annoying
+because smbus_eeprom.c emulates an at24c02.  It would be nice to only have
+one of these.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/757702
+I can add it to that file, too, it wouldn't be hard to do and I could 
+put it into the
+x86 config to test.  It would be nicer to combine the two; smbus_eeprom 
+seems
+like a hack to me.  at24c.c is done as an SMBus slave, its done as a raw I2C
+device, which is IMHO is more correct since the at24cxx devices are not 
+SMBus
+devices, they are I2C devices.
 
-Title:
-  ARM: singlestepping insn which UNDEFs should stop at UNDEF vector
-  insn, not after it
+In fact, smbus_eeprom.c is the only thing currently using the 
+smbus_slave code.
+The IPMI interface on SMBus that I have pending uses the smbus_slave 
+code, too,
+so perhaps there's value, though it's no big deal either way.  It would 
+be nice to get
+this right the first time and not hack it up in the future.
 
-Status in QEMU:
-  Confirmed
+Thanks,
 
-Bug description:
-  ARMv7a has lot of undefined instruction from its instruction opcode
-  space. This undefined instructions are very useful for replacing
-  sensitive non-priviledged instructions of guest operating systems
-  (virtualization). The undefined instruction exception executes at
-  <exception_base> + 0x4, where <exception_base> can be 0x0 or
-  0xfff00000. Currently, in qemu 0.14.0 undefined instruction fault at
-  0x8 offset instead of 0x4. This was not a problem with qemu 0.13.0,
-  seems like this is a new bug. As as example, if we try to execute
-  value "0xec019800" in qemu 0.14.0 then it should cause undefined
-  exception at <exception_base>+0x4 since "0xec019800" is an undefined
-  instruction.
+-corey
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/757702/+subscriptions
+
+>
+> Dave
+>
+>> PC specific structure.
+>>
+>> Thanks,
+>>
+>> -corey
+>>
+>>> Dave
+>>>
+>>>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+>>>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>>>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+>>>> ---
+>>>>    hw/i386/pc_piix.c   | 1 +
+>>>>    hw/i386/pc_q35.c    | 1 +
+>>>>    include/hw/boards.h | 1 +
+>>>>    3 files changed, 3 insertions(+)
+>>>>
+>>>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+>>>> index cb28227cc3..3d1ccb1af1 100644
+>>>> --- a/hw/i386/pc_piix.c
+>>>> +++ b/hw/i386/pc_piix.c
+>>>> @@ -443,6 +443,7 @@ static void pc_i440fx_2_12_machine_options(MachineClass *m)
+>>>>        pc_i440fx_3_0_machine_options(m);
+>>>>        m->is_default = 0;
+>>>>        m->alias = NULL;
+>>>> +    m->smbus_no_migration_support = true;
+>>>>        SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
+>>>>    }
+>>>> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+>>>> index 90e88c9b28..0c6fca6a40 100644
+>>>> --- a/hw/i386/pc_q35.c
+>>>> +++ b/hw/i386/pc_q35.c
+>>>> @@ -324,6 +324,7 @@ static void pc_q35_2_12_machine_options(MachineClass *m)
+>>>>    {
+>>>>        pc_q35_3_0_machine_options(m);
+>>>>        m->alias = NULL;
+>>>> +    m->smbus_no_migration_support = true;
+>>>>        SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
+>>>>    }
+>>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+>>>> index f82f28468b..65314fbe2a 100644
+>>>> --- a/include/hw/boards.h
+>>>> +++ b/include/hw/boards.h
+>>>> @@ -207,6 +207,7 @@ struct MachineClass {
+>>>>        void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
+>>>>                                     int nb_nodes, ram_addr_t size);
+>>>>        bool ignore_boot_device_suffixes;
+>>>> +    bool smbus_no_migration_support;
+>>>>        HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+>>>>                                               DeviceState *dev);
+>>>> -- 
+>>>> 2.17.1
+>>>>
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
