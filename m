@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gRX9o-0008Mv-W9
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:47:41 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gRXBl-0001n5-SV
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:49:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gRX9l-0008J9-SS
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:47:40 -0500
-Received: from mga11.intel.com ([192.55.52.93]:3079)
+	(envelope-from <kraxel@redhat.com>) id 1gRXBi-0001L4-LB
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:49:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1gRX9l-0008Ik-J2
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:47:37 -0500
-Message-ID: <5BFCE9B3.4020605@intel.com>
-Date: Tue, 27 Nov 2018 14:52:35 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gRXBi-0001G3-C9
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:49:38 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 27 Nov 2018 07:49:28 +0100
+Message-Id: <20181127064932.7299-3-kraxel@redhat.com>
+In-Reply-To: <20181127064932.7299-1-kraxel@redhat.com>
+References: <20181127064932.7299-1-kraxel@redhat.com>
 MIME-Version: 1.0
-References: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
-	<1542276484-25508-5-git-send-email-wei.w.wang@intel.com>
-	<20181127060638.GB3205@xz-x1>
-In-Reply-To: <20181127060638.GB3205@xz-x1>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 4/8] migration: API to clear bits of
- guest free pages from the dirty bitmap
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/6] ps2kbd: default to scan enabled after reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +26,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-On 11/27/2018 02:06 PM, Peter Xu wrote:
-> On Thu, Nov 15, 2018 at 06:08:00PM +0800, Wei Wang wrote:
-> Again, is it possible to resize during migration?
->
-> So I think the check is fine, but uncertain about the comment.
+From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 
-Yes, resize would not happen with the current implementation.
-But heard it could just be a temporal implementation. Probably
-we could improve the comment like this:
+A check for scan_enabled has been added to ps2_keyboard_event in commit
+143c04c7e0639e53086519592ead15d2556bfbf2 to prevent stream corruption.
+This works well as long as operating system is resetting keyboard, or ena=
+bling it.
 
-"
-Though the implementation might not support ram resize currently,
-this could happen in theory with future updates. So the check here
-handles the case that RAMBLOCK is resized after the free page hint is
-reported.
-"
+This fixes IBM 40p firmware, which doesn't bother sending KBD_CMD_RESET,
+KBD_CMD_ENABLE or KBD_CMD_RESET_ENABLE before trying to use the keyboard.
 
->
-> And shall we print something if that happened?  We can use
-> error_report_once(), and squashing the above assert:
->
->    if (!block || offset > block->used_length) {
->      /* should never happen, but if it happens we ignore the hints and warn */
->      error_report_once("...");
->      return;
->    }
->
-> What do you think?
+Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-id: 20181021190721.2148-1-hpoussin@reactos.org
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/input/ps2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Sounds good.
-
->
->> +
->> +        if (len <= block->used_length - offset) {
->> +            used_len = len;
->> +        } else {
->> +            used_len = block->used_length - offset;
->> +            addr += used_len;
-> Maybe moving this line into the for() could be a bit better?
->
->    for (; len > 0; len -= used_len, addr += used_len) {
->
-
-Yes, I think it looks better, thanks.
-
-Best,
-Wei
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index 6c43fc2912..eb33ee9b6f 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -942,7 +942,7 @@ static void ps2_kbd_reset(void *opaque)
+=20
+     trace_ps2_kbd_reset(opaque);
+     ps2_common_reset(&s->common);
+-    s->scan_enabled =3D 0;
++    s->scan_enabled =3D 1;
+     s->translate =3D 0;
+     s->scancode_set =3D 2;
+     s->modifiers =3D 0;
+--=20
+2.9.3
