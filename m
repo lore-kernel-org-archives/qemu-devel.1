@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gReTm-0003i1-Vx
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:47 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gReTp-0003jt-M7
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gReTk-00018a-GR
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:46 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51313)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gReTo-0001Hw-MD
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:49 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:55851)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gReTk-000166-AB
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:44 -0500
-Received: by mail-wm1-x343.google.com with SMTP id j207so14987481wmj.1
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 06:36:44 -0800 (PST)
-Received: from 640k.localdomain ([93.56.166.5])
-	by smtp.gmail.com with ESMTPSA id
-	n62sm2821869wmd.25.2018.11.27.06.36.40 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 27 Nov 2018 06:36:40 -0800 (PST)
+	id 1gReTo-0001Gu-Fo
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:36:48 -0500
+Received: by mail-wm1-x335.google.com with SMTP id y139so21952796wmc.5
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 06:36:48 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 27 Nov 2018 15:36:23 +0100
-Message-Id: <1543329397-48407-2-git-send-email-pbonzini@redhat.com>
+Date: Tue, 27 Nov 2018 15:36:25 +0100
+Message-Id: <1543329397-48407-4-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543329397-48407-1-git-send-email-pbonzini@redhat.com>
 References: <1543329397-48407-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 01/15] target/i386: kvm: add VMX migration
- blocker
+Subject: [Qemu-devel] [PULL 03/15] lsi: Reselection needed to remove pending
+ commands from queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +29,122 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: George Kennedy <george.kennedy@oracle.com>
 
-Nested VMX does not support live migration yet.  Add a blocker
-until that is worked out.
+From: George Kennedy <george.kennedy@oracle.com>
 
-Nested SVM only does not support it, but unfortunately it is
-enabled by default for -cpu host so we cannot really disable it.
+Under heavy IO (e.g. fio) the queue is not checked frequently enough for
+pending commands. As a result some pending commands are timed out by the
+linux sym53c8xx driver, which sends SCSI Abort messages for the timed out
+commands. The SCSI Abort messages result in linux errors, which show up
+on the console and in /var/log/messages.
 
+e.g.
+sd 0:0:3:0: [sdd] tag#33 ABORT operation started
+scsi target0:0:3: control msgout:
+80 20 47 d
+sd 0:0:3:0: ABORT operation complete.
+scsi target0:0:4: message d sent on bad reselection
+
+Now following a WAIT DISCONNECT Script instruction, and if there is no
+current command, check for a pending command on the queue and if one
+exists call lsi_reselect().
+
+Signed-off-by: George Kennedy <george.kennedy@oracle.com>
+Message-Id: <1541776692-12271-1-git-send-email-george.kennedy@oracle.com>
+[For safety, add a s->current check in lsi_update_irq - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/kvm.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ hw/scsi/lsi53c895a.c | 48 ++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 36 insertions(+), 12 deletions(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 3d6739a..2724800 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -855,6 +855,7 @@ static int hyperv_init_vcpu(X86CPU *cpu)
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index 3f207f6..52a3893 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -298,6 +298,18 @@ static inline int lsi_irq_on_rsl(LSIState *s)
+     return (s->sien0 & LSI_SIST0_RSL) && (s->scid & LSI_SCID_RRE);
  }
  
- static Error *invtsc_mig_blocker;
-+static Error *vmx_mig_blocker;
- 
- #define KVM_MAX_CPUID_ENTRIES  100
- 
-@@ -1247,6 +1248,17 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                                   !!(c->ecx & CPUID_EXT_SMX);
-     }
- 
-+    if ((env->features[FEAT_1_ECX] & CPUID_EXT_VMX) && !vmx_mig_blocker) {
-+        error_setg(&vmx_mig_blocker,
-+                   "Nested VMX virtualization does not support live migration yet");
-+        r = migrate_add_blocker(vmx_mig_blocker, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            error_free(vmx_mig_blocker);
-+            return r;
++static lsi_request *get_pending_req(LSIState *s)
++{
++    lsi_request *p;
++
++    QTAILQ_FOREACH(p, &s->queue, next) {
++        if (p->pending) {
++            return p;
 +        }
 +    }
++    return NULL;
++}
 +
-     if (env->mcg_cap & MCG_LMCE_P) {
-         has_msr_mcg_ext_ctl = has_msr_feature_control = true;
+ static void lsi_soft_reset(LSIState *s)
+ {
+     trace_lsi_reset();
+@@ -446,7 +458,6 @@ static void lsi_update_irq(LSIState *s)
+ {
+     int level;
+     static int last_level;
+-    lsi_request *p;
+ 
+     /* It's unclear whether the DIP/SIP bits should be cleared when the
+        Interrupt Status Registers are cleared or when istat0 is read.
+@@ -476,13 +487,13 @@ static void lsi_update_irq(LSIState *s)
      }
+     lsi_set_irq(s, level);
+ 
+-    if (!level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
++    if (!s->current && !level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
++        lsi_request *p;
++
+         trace_lsi_update_irq_disconnected();
+-        QTAILQ_FOREACH(p, &s->queue, next) {
+-            if (p->pending) {
+-                lsi_reselect(s, p);
+-                break;
+-            }
++        p = get_pending_req(s);
++        if (p) {
++            lsi_reselect(s, p);
+         }
+     }
+ }
+@@ -1065,11 +1076,12 @@ static void lsi_wait_reselect(LSIState *s)
+ 
+     trace_lsi_wait_reselect();
+ 
+-    QTAILQ_FOREACH(p, &s->queue, next) {
+-        if (p->pending) {
+-            lsi_reselect(s, p);
+-            break;
+-        }
++    if (s->current) {
++        return;
++    }
++    p = get_pending_req(s);
++    if (p) {
++        lsi_reselect(s, p);
+     }
+     if (s->current == NULL) {
+         s->waiting = 1;
+@@ -1259,6 +1271,18 @@ again:
+             case 1: /* Disconnect */
+                 trace_lsi_execute_script_io_disconnect();
+                 s->scntl1 &= ~LSI_SCNTL1_CON;
++                /* FIXME: this is not entirely correct; the target need not ask
++                 * for reselection until it has to send data, while here we force a
++                 * reselection as soon as the bus is free.  The correct flow would
++                 * reselect before lsi_transfer_data and disconnect as soon as
++                 * DMA ends.
++                 */
++                if (!s->current) {
++                    lsi_request *p = get_pending_req(s);
++                    if (p) {
++                        lsi_reselect(s, p);
++                    }
++                }
+                 break;
+             case 2: /* Wait Reselect */
+                 if (!lsi_irq_on_rsl(s)) {
 -- 
 1.8.3.1
