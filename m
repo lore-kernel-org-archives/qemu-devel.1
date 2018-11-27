@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gRht4-0003H3-OI
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:15:13 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gRhyK-0006OD-BC
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:20:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gRhsw-00018q-A6
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:15:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:23887)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gRhst-00017F-GR
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:14:57 -0500
-Date: Tue, 27 Nov 2018 18:14:49 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181127181448.GC2616@work-vm>
-References: <20181115192446.17187-1-minyard@acm.org>
-	<20181115192446.17187-7-minyard@acm.org>
-	<20181126172308.GJ2547@work-vm>
-	<7055e173-6f4f-7954-69c7-47e0f26dfaf6@acm.org>
-	<20181127160144.GB2616@work-vm>
-	<d01dc051-f078-c703-bd19-e1874afdfc33@acm.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1gRhyG-000437-Cp
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:20:32 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:44326)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gRhyG-00042l-6k
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:20:28 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id z5so19405419wrt.11
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 10:20:28 -0800 (PST)
+References: <20181025172057.20414-1-cota@braap.org>
+	<20181025172057.20414-46-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181025172057.20414-46-cota@braap.org>
+Date: Tue, 27 Nov 2018 18:20:25 +0000
+Message-ID: <87efb64c2e.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <d01dc051-f078-c703-bd19-e1874afdfc33@acm.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 06/12] boards.h: Ignore migration for
- SMBus devices on older machines
+Subject: Re: [Qemu-devel] [RFC 45/48] plugin: lockstep execution support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,164 +30,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <minyard@acm.org>, lvivier@redhat.com, dgibson@redhat.com
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
 
-* Corey Minyard (minyard@acm.org) wrote:
-> On 11/27/18 10:01 AM, Dr. David Alan Gilbert wrote:
-> > * Corey Minyard (minyard@acm.org) wrote:
-> > > On 11/26/18 11:23 AM, Dr. David Alan Gilbert wrote:
-> > > > * minyard@acm.org (minyard@acm.org) wrote:
-> > > > > From: Corey Minyard <cminyard@mvista.com>
-> > > > >=20
-> > > > > Migration capability is being added for pm_smbus and SMBus devi=
-ces.
-> > > > > This change will allow backwards compatibility to be kept when
-> > > > > migrating back to an old qemu version.  Add a bool to the machi=
-ne
-> > > > > class tho keep smbus migration from happening.  Future changes
-> > > > > will use this.
-> > > > So this is also going to have to be in the 3.0 and 3.1 machine op=
-tions
-> > > > and maybe some other architectures?
-> > > I'm not sure why it would need to be in both the 3.0 and 3.1 machin=
-e
-> > > options.
-> > > If this goes in, I'm assuming it's for 3.1 and it should only need =
-to be
-> > > there.
-> > > That's if it's too late for 3.0.
-> > You're out by 1-2 releases;  3.0 shipped in August, 3.1 is in freeze =
-at
-> > the moment (hence you've missed it unless some part of this is
-> > critical); so this will go in during the 4.0 release.
->=20
-> Yes, you are right, this is for 4.0.
->=20
->=20
-> >=20
-> > > The pm_smbus device is also used by mips fulong.=A0 From what I can=
- tell, that
-> > > machine doesn't have any concept of backwards compatibility, so it =
-seemed
-> > > save to no worry about it there.=A0 If it weren't for that, this bo=
-ol could go
-> > > into the
-> > Yeh that's fine.
-> >=20
-> > What about the eeprom's are they used more widely?
->=20
-> The only other I2C EEPROM I see is hw/nvram/eeprom_at24c.c.=A0 That dev=
-ice is
-> only
-> configured for PPC.=A0 It has a block device backend, too.=A0 This is a=
- little
-> annoying
-> because smbus_eeprom.c emulates an at24c02.=A0 It would be nice to only=
- have
-> one of these.
 
-Added in David and Laurent for odd-ppc stuff;  if I'm reading it right
-it's not used by one of the versioned machines.
+Emilio G. Cota <cota@braap.org> writes:
 
-> I can add it to that file, too, it wouldn't be hard to do and I could p=
-ut it
-> into the
-> x86 config to test.=A0 It would be nicer to combine the two; smbus_eepr=
-om
-> seems
-> like a hack to me.=A0 at24c.c is done as an SMBus slave, its done as a =
-raw I2C
-> device, which is IMHO is more correct since the at24cxx devices are not
-> SMBus
-> devices, they are I2C devices.
->=20
-> In fact, smbus_eeprom.c is the only thing currently using the smbus_sla=
-ve
-> code.
-> The IPMI interface on SMBus that I have pending uses the smbus_slave co=
-de,
-> too,
-> so perhaps there's value, though it's no big deal either way.=A0 It wou=
-ld be
-> nice to get
-> this right the first time and not hack it up in the future.
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-Dave
->=20
-> Thanks,
->=20
-> -corey
->=20
->=20
-> >=20
-> > Dave
-> >=20
-> > > PC specific structure.
-> > >=20
-> > > Thanks,
-> > >=20
-> > > -corey
-> > >=20
-> > > > Dave
-> > > >=20
-> > > > > Signed-off-by: Corey Minyard <cminyard@mvista.com>
-> > > > > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > > > > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > > > > ---
-> > > > >    hw/i386/pc_piix.c   | 1 +
-> > > > >    hw/i386/pc_q35.c    | 1 +
-> > > > >    include/hw/boards.h | 1 +
-> > > > >    3 files changed, 3 insertions(+)
-> > > > >=20
-> > > > > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > > > > index cb28227cc3..3d1ccb1af1 100644
-> > > > > --- a/hw/i386/pc_piix.c
-> > > > > +++ b/hw/i386/pc_piix.c
-> > > > > @@ -443,6 +443,7 @@ static void pc_i440fx_2_12_machine_options(=
-MachineClass *m)
-> > > > >        pc_i440fx_3_0_machine_options(m);
-> > > > >        m->is_default =3D 0;
-> > > > >        m->alias =3D NULL;
-> > > > > +    m->smbus_no_migration_support =3D true;
-> > > > >        SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
-> > > > >    }
-> > > > > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> > > > > index 90e88c9b28..0c6fca6a40 100644
-> > > > > --- a/hw/i386/pc_q35.c
-> > > > > +++ b/hw/i386/pc_q35.c
-> > > > > @@ -324,6 +324,7 @@ static void pc_q35_2_12_machine_options(Mac=
-hineClass *m)
-> > > > >    {
-> > > > >        pc_q35_3_0_machine_options(m);
-> > > > >        m->alias =3D NULL;
-> > > > > +    m->smbus_no_migration_support =3D true;
-> > > > >        SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
-> > > > >    }
-> > > > > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > > > > index f82f28468b..65314fbe2a 100644
-> > > > > --- a/include/hw/boards.h
-> > > > > +++ b/include/hw/boards.h
-> > > > > @@ -207,6 +207,7 @@ struct MachineClass {
-> > > > >        void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo =
-*nodes,
-> > > > >                                     int nb_nodes, ram_addr_t si=
-ze);
-> > > > >        bool ignore_boot_device_suffixes;
-> > > > > +    bool smbus_no_migration_support;
-> > > > >        HotplugHandler *(*get_hotplug_handler)(MachineState *mac=
-hine,
-> > > > >                                               DeviceState *dev)=
-;
-> > > > > --=20
-> > > > > 2.17.1
-> > > > >=20
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
->=20
+There are no users of this for now so I don't think this qualifies for a
+first cut of the plugin API. Is the lockstep support only their for
+plugins? Is there any practical use that isn't handled by non-MTTCG
+round-robin and icount type scenarios?
+
+> ---
+>  include/qemu/plugin-api.h |  7 +++++++
+>  include/qemu/plugin.h     |  5 +++++
+>  cpus.c                    |  1 +
+>  plugin.c                  | 35 +++++++++++++++++++++++++++++++++++
+>  qemu-plugins.symbols      |  3 +++
+>  5 files changed, 51 insertions(+)
+>
+> diff --git a/include/qemu/plugin-api.h b/include/qemu/plugin-api.h
+> index 076353a2d2..5062e20e08 100644
+> --- a/include/qemu/plugin-api.h
+> +++ b/include/qemu/plugin-api.h
+> @@ -227,6 +227,13 @@ typedef int64_t (*qemu_plugin_clock_func_t)(void);
+>  bool qemu_plugin_register_virtual_clock(qemu_plugin_id_t id,
+>                                          qemu_plugin_clock_func_t clock);
+>
+> +void qemu_plugin_enable_lockstep_execution(void);
+> +
+> +void qemu_plugin_register_lockstep_cb(qemu_plugin_id_t id,
+> +                                      qemu_plugin_simple_cb_t cb);
+> +
+> +void qemu_plugin_end_time_slice(void);
+> +
+>  /* returns -1 in user-mode */
+>  int qemu_plugin_n_vcpus(void);
+>
+> diff --git a/include/qemu/plugin.h b/include/qemu/plugin.h
+> index 617161329f..c19071bdbe 100644
+> --- a/include/qemu/plugin.h
+> +++ b/include/qemu/plugin.h
+> @@ -58,6 +58,7 @@ enum qemu_plugin_event {
+>      QEMU_PLUGIN_EV_VCPU_RESUME,
+>      QEMU_PLUGIN_EV_VCPU_SYSCALL,
+>      QEMU_PLUGIN_EV_VCPU_SYSCALL_RET,
+> +    QEMU_PLUGIN_EV_LOCKSTEP,
+>      QEMU_PLUGIN_EV_FLUSH,
+>      QEMU_PLUGIN_EV_ATEXIT,
+>      QEMU_PLUGIN_EV_MAX,
+> @@ -194,6 +195,7 @@ void qemu_plugin_atexit_cb(void);
+>
+>  void qemu_plugin_add_dyn_cb_arr(struct qemu_plugin_dyn_cb_arr *arr);
+>  int64_t plugin_get_clock(void);
+> +void plugin_lockstep_cb(void);
+>
+>  #else /* !CONFIG_PLUGINS */
+>
+> @@ -237,6 +239,9 @@ static inline
+>  void qemu_plugin_add_dyn_cb_arr(struct qemu_plugin_dyn_cb_arr *arr)
+>  { }
+>
+> +static inline void plugin_lockstep_cb(void)
+> +{ }
+> +
+>  int64_t plugin_get_clock(void);
+>
+>  #endif /* !CONFIG_PLUGINS */
+> diff --git a/cpus.c b/cpus.c
+> index a446632a5c..8f490d1b11 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1359,6 +1359,7 @@ static void lockstep_check_stop(CPUState *cpu)
+>              /* wake up all waiting cpus */
+>              lockstep_ongoing_wakeup =3D true;
+>              n_lockstep_running_cpus =3D n_lockstep_cpus;
+> +            plugin_lockstep_cb();
+>              qemu_mutex_unlock(&lockstep_lock);
+>              cpu_mutex_unlock(cpu);
+>              for (i =3D 0; i < n_lockstep_cpus; i++) {
+> diff --git a/plugin.c b/plugin.c
+> index 291767f2bb..117f303249 100644
+> --- a/plugin.c
+> +++ b/plugin.c
+> @@ -472,6 +472,7 @@ static void plugin_cb__simple(enum qemu_plugin_event =
+ev)
+>
+>      switch (ev) {
+>      case QEMU_PLUGIN_EV_FLUSH:
+> +    case QEMU_PLUGIN_EV_LOCKSTEP:
+>          QLIST_FOREACH_SAFE_RCU(cb, &plugin.cb_lists[ev], entry, next) {
+>              qemu_plugin_simple_cb_t func =3D cb->f.simple;
+>
+> @@ -1043,6 +1044,40 @@ int64_t plugin_get_clock(void)
+>  }
+>  #endif
+>
+> +/*
+> + * We manage the CPU state changes; the plugin will control the length o=
+f the
+> + * execution windows.
+> + */
+> +void qemu_plugin_enable_lockstep_execution(void)
+> +{
+> +#ifdef CONFIG_USER_ONLY
+> +    abort();
+> +#else
+> +    cpu_lockstep_enable();
+> +#endif
+> +}
+> +
+> +void qemu_plugin_end_time_slice(void)
+> +{
+> +#ifdef CONFIG_USER_ONLY
+> +    abort();
+> +#else
+> +    g_assert(current_cpu);
+> +    cpu_lockstep_request_stop(current_cpu);
+> +#endif
+> +}
+> +
+> +void qemu_plugin_register_lockstep_cb(qemu_plugin_id_t id,
+> +                                      qemu_plugin_simple_cb_t cb)
+> +{
+> +    plugin_register_cb(id, QEMU_PLUGIN_EV_LOCKSTEP, cb);
+> +}
+> +
+> +void plugin_lockstep_cb(void)
+> +{
+> +    plugin_cb__simple(QEMU_PLUGIN_EV_LOCKSTEP);
+> +}
+> +
+>  static void __attribute__((__constructor__)) plugin_init(void)
+>  {
+>      int i;
+> diff --git a/qemu-plugins.symbols b/qemu-plugins.symbols
+> index 93587b07e1..a3268a40c7 100644
+> --- a/qemu-plugins.symbols
+> +++ b/qemu-plugins.symbols
+> @@ -1,5 +1,8 @@
+>  {
+>    qemu_plugin_uninstall;
+> +  qemu_plugin_enable_lockstep_execution;
+> +  qemu_plugin_end_time_slice;
+> +  qemu_plugin_register_lockstep_cb;
+>    qemu_plugin_register_vcpu_init_cb;
+>    qemu_plugin_register_vcpu_exit_cb;
+>    qemu_plugin_register_vcpu_idle_cb;
+
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
