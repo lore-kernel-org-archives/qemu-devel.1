@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48351)
+Received: from eggs.gnu.org ([208.118.235.92]:48597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gRZHy-0007yk-De
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:04:19 -0500
+	(envelope-from <armbru@redhat.com>) id 1gRZIy-0008Uw-UC
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:05:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gRZHu-00009u-Dt
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:04:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52650)
+	(envelope-from <armbru@redhat.com>) id 1gRZIv-000107-3M
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:05:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43531)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gRZHs-00007T-M2
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:04:10 -0500
-Date: Tue, 27 Nov 2018 10:04:00 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181127100400.186f7f33.cohuck@redhat.com>
-In-Reply-To: <20181127084143.1113-1-armbru@redhat.com>
-References: <20181127084143.1113-1-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gRZIu-0000wq-RG
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:05:13 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D4DB7804F0
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 09:05:10 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181122071613.2889-1-kraxel@redhat.com>
+	<87h8g4lyyh.fsf@dusky.pond.sub.org>
+	<20181126151325.2pfues2q7vuqin4y@sirius.home.kraxel.org>
+	<87zhtvixnr.fsf@dusky.pond.sub.org>
+	<20181127065808.ph7pv6brnaeuyqix@sirius.home.kraxel.org>
+Date: Tue, 27 Nov 2018 10:05:03 +0100
+In-Reply-To: <20181127065808.ph7pv6brnaeuyqix@sirius.home.kraxel.org> (Gerd
+	Hoffmann's message of "Tue, 27 Nov 2018 07:58:08 +0100")
+Message-ID: <87d0qquc00.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1] vfio-helpers: Fix
- qemu_vfio_open_pci() crash
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3] qapi: add query-display-options command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, fam@euphon.net, pbonzini@redhat.com, coli@redhat.com, stefanha@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, 27 Nov 2018 09:41:43 +0100
-Markus Armbruster <armbru@redhat.com> wrote:
+Gerd Hoffmann <kraxel@redhat.com> writes:
 
-> qemu_vfio_open_common() initializes s->lock only after passing s to
-> qemu_vfio_dma_map() via qemu_vfio_init_ramblock().
-> qemu_vfio_dma_map() tries to lock the uninitialized lock and crashes.
-> 
-> Fix by initializing s->lock first.
-> 
-> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1645840
-> Fixes: 418026ca43bc2626db092d7558258f9594366f28
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
-> Compile-tested only, as I lack suitable hardware.  Cong Li (cc'ed) is
-> going to test it for real.  It looks obvious enough to me to put it
-> into -rc3 without waiting for the test results.  We can also wait and
-> put it into -rc4.
+>   Hi,
+>
+>> If it's not too much trouble, please tweak the commit message to be a
+>> bit more explicit.  Perhaps:
+>> 
+>>     Add query-display-options command, which allows querying the qemu
+>>     display configuration.  This isn't particularly useful, except it
+>>     exposes QAPI type DisplayOptions in query-qmp-schema, so that
+>>     libvirt can discover recently added -display parameter rendernode
+>>     (commit d4dc4ab133b).  Works around lack of sufficiently powerful
+>>     command line introspection.
+>
+> Done, pull req with this and other 3.1 fixes sent.
+>
+>> This should give me a fighting chance to remember deprecating the
+>> command once we got sufficiently powerful command line introspection.
+>
+> I'm wondering how difficuilt it would be to add that when limiting that
+> to the command line switches which already use qapi parsers (-blockdev
+> and -display as far I know).  Might increase the motivation of others to
+> help moving parsers from whatever they do today (QemuOpts, ...) to qapi
+> to get introspection support ;)
 
-This looks obvious to me as well.
-
-> 
->  util/vfio-helpers.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-> index 1d9272efa4..cccc9cd42e 100644
-> --- a/util/vfio-helpers.c
-> +++ b/util/vfio-helpers.c
-> @@ -411,13 +411,13 @@ static int qemu_vfio_init_ramblock(const char *block_name, void *host_addr,
->  
->  static void qemu_vfio_open_common(QEMUVFIOState *s)
->  {
-> +    qemu_mutex_init(&s->lock);
->      s->ram_notifier.ram_block_added = qemu_vfio_ram_block_added;
->      s->ram_notifier.ram_block_removed = qemu_vfio_ram_block_removed;
->      ram_block_notifier_add(&s->ram_notifier);
->      s->low_water_mark = QEMU_VFIO_IOVA_MIN;
->      s->high_water_mark = QEMU_VFIO_IOVA_MAX;
->      qemu_ram_foreach_block(qemu_vfio_init_ramblock, s);
-> -    qemu_mutex_init(&s->lock);
->  }
->  
->  /**
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+I like the idea.  The clean way to do it would be a partial QAPIfication
+of the command line.  I'm wary of partial "we'll finish this eventually"
+conversions.  That said, the complete job may well be too large to
+tackle in one go, giving us no choice.
