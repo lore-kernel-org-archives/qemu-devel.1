@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gRjYw-0006V0-4Q
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:02:27 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gRjZ7-0006fY-VF
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:02:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gRjYu-0000UK-SO
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:02:26 -0500
-References: <20181127105034.21045-1-crosa@redhat.com>
-	<20181127190006.GC22880@localhost.localdomain>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <7359977f-3797-d78f-cd1a-a410e30c5357@redhat.com>
-Date: Tue, 27 Nov 2018 15:02:03 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gRjZ3-0000XO-Sr
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:02:37 -0500
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:42345)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gRjZ3-0000Wx-PD
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:02:33 -0500
+Received: by mail-qk1-f193.google.com with SMTP id m5so15361242qka.9
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 12:02:33 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181127190006.GC22880@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] Introduce Python module structure
+References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
+	<20181127092801.21777-16-marcandre.lureau@redhat.com>
+	<20181127194019.GQ18284@habkost.net>
+In-Reply-To: <20181127194019.GQ18284@habkost.net>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 28 Nov 2018 00:02:21 +0400
+Message-ID: <CAMxuvaz0FitnFiSD3Ma9r_7z0oM6A_Z3D2nbAh=YBp3mEC72rg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 15/28] hw: apply accel compat
+ properties without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,254 +31,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Caio Carrara <ccarrara@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, sstabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, "Bonzini, Paolo" <pbonzini@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
 
+Hi
 
-
-On 11/27/18 2:00 PM, Caio Carrara wrote:
-> Hi, Cleber.
-> 
-> On Tue, Nov 27, 2018 at 05:50:34AM -0500, Cleber Rosa wrote:
->> This is a simple move of Python code that wraps common QEMU
->> functionality, and are used by a number of different tests
->> and scripts.
->>
->> By treating that code as a real Python module, we can more easily,
->> among other things:
->>  * reuse more code
->>  * apply a more consistent style
->>  * add tests to that code
->>  * generate documentation
->>
->> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->> ---
->>  configure                                  |  1 +
->>  scripts/qemu.py => python/qemu/__init__.py | 11 ++++++-----
-> 
-> Well, we all know how difficult is to pick up names, but I would avoid
-> use `python` here. This is the name of python bin itself. Is there any
-> chance of a clash? I do not have a specific case right now, I'm just
-> wondering if it can happen we should avoid.
-> 
-
-The point of the "python" directory, is that it's not supposed to be the
-*module* name, but a holder for the Python module, which is "qemu".
-Given that "python is not a module", has no __init__.py, I don't think
-it'll ever clash.
-
-The reason for picking the name is that it makes it obvious, within the
-QEMU tree, that this is Python stuff.  I already have some tests, to
-test the "Python stuff", to put it under "python", probably in
-"python/tests".
-
-Anyway, it'd be nice to think of alternatives here.
-
->>  {scripts/qmp => python/qemu}/qmp.py        |  0
->>  {scripts => python/qemu}/qtest.py          |  5 +++--
->>  scripts/device-crash-test                  |  5 +++++
->>  scripts/qmp/__init__.py                    |  0
->>  tests/acceptance/avocado_qemu/__init__.py  |  9 +++++----
->>  tests/migration/guestperf/engine.py        | 10 +++++++---
->>  tests/qemu-iotests/iotests.py              |  8 ++++++--
->>  tests/vm/basevm.py                         |  9 +++++++--
->>  10 files changed, 40 insertions(+), 18 deletions(-)
->>  rename scripts/qemu.py => python/qemu/__init__.py (98%)
->>  rename {scripts/qmp => python/qemu}/qmp.py (100%)
->>  rename {scripts => python/qemu}/qtest.py (97%)
-> 
-> What if we keep `qmp.py` and `qtest.py` directly under `/python`
-> directory?  It seems it can be more semantic regarding the subject of
-> each module. I'm not completely sure about `qmp.py`, but definetly I
-> think qtest should be under python directly.
-> 
-
-I still think having a uniform starting point for the module, such as
-"qemu" is a good practice for all QEMU Python code.  Having independent
-first level modules will make it harder to understand where the code is
-coming from.  For instance, we have the option of coming up with a
-structure that would allow:
-
-
- import os
- import struct
- import qmp
- import urllib
-
-
-And the origin of "qmp" would go unnoticed.  Alternatively:
-
-
- import os
- import struct
- import urllib
- from qemu import qmp
-
-
-Is much clearer.  Now, with regards to "qmp", it's pretty much
-standalone, uses only Python libraries, while "qemu" consumes "qmp"
-functionality.  I believe having "qemu.qmp" is appropriate here.
-
-Now, for "qtest", you have a point, it uses QEMUMachine, and its content
-is very similar to what's available under "qemu" itself (that is,
-QEMUMachine itself).  IMO, it would make sense to just have the
-QEMUQtestProtocol and QEMUQtestMachine at the "qemu" level at this
-point, that is, fold their content into "qemu/__init__.py".
-
-The API usage would then become:
-
-
- from qemu import QEMUQTestMachine
-
-
-Similar to:
-
-
- from qemu import QEMUMachine
-
-
-I refrained from changing too much at the initial RFC time, though,
-exactly to make less biased discussions.
-
-
->>  delete mode 100644 scripts/qmp/__init__.py
->>
->> diff --git a/configure b/configure
->> index 0a3c6a72c3..2b64c51009 100755
-> [...]
->> rename from scripts/qemu.py
->> rename to python/qemu/__init__.py
-> [...]
->> diff --git a/scripts/qmp/qmp.py b/python/qemu/qmp.py
->> similarity index 100%
->> rename from scripts/qmp/qmp.py
->> rename to python/qemu/qmp.py
->> diff --git a/scripts/qtest.py b/python/qemu/qtest.py
->> similarity index 97%
->> rename from scripts/qtest.py
->> rename to python/qemu/qtest.py
->> index adf1fe3f26..bff79cdd13 100644
->> --- a/scripts/qtest.py
->> +++ b/python/qemu/qtest.py
-> [...]
->> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
->> index e93a7c0c84..c75ae0ecbc 100755
->> --- a/scripts/device-crash-test
->> +++ b/scripts/device-crash-test
->> @@ -35,6 +35,11 @@ import random
->>  import argparse
->>  from itertools import chain
->>  
->> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
->> +TOP_DIR = os.path.dirname(THIS_DIR)
->> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
->> +sys.path.append(PYTHON_MODULE_PATH)
-> 
-> This sys.path handling to use the new QEMU Python module is not good. I
-> understand it can be a first step, but to expect everyone knows/do it to
-> use the module is a bad assumption because it's not intuitive and can
-> cause some confusion.
-> 
-> If we need something available from a Python script/module that is not
-> directly acessible from PYTHONPATH we should install it so Python can
-> turn it available. So, probably we need to think make `python/qemu` a
-> proper installable module.
+On Tue, Nov 27, 2018 at 11:40 PM Eduardo Habkost <ehabkost@redhat.com> wrot=
+e:
 >
-
-It's something that is confusing for mode experienced Python developers,
-but I have some experience with way too many people not understanding at
-all why an extra step (the module installation), was necessary for using
-Python code from within a source tree.  We faced a LOT of questions, for
-a long time, when we did the switch in Avocado itself.
-
-To summarize, you're right about the end goal, and I hope we'll get
-there and remove this boiler plate code.  But, I think we need an
-intermediary step.
-
->> +
->>  from qemu import QEMUMachine
->>  
->>  logger = logging.getLogger('device-crash-test')
->> diff --git a/scripts/qmp/__init__.py b/scripts/qmp/__init__.py
->> deleted file mode 100644
+> On Tue, Nov 27, 2018 at 01:27:48PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Introduce object_apply_global_props() function, to apply compatibility
+> > properties from a GPtrArray.
+> >
+> > For accel compatibility properties, apply them during
+> > device_post_init(), after accel_register_compat_props() has set them.
+> >
+> > To populate the compatibility properties, introduce SET_COMPAT(), a
+> > more generic version of SET_MACHINE_COMPAT() that can set compat
+> > properties on other objects than Machine, and using GPtrArray.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  include/hw/qdev-core.h | 13 +++++++++++++
+> >  include/qom/object.h   |  3 +++
+> >  include/sysemu/accel.h |  4 +---
+> >  accel/accel.c          | 12 ------------
+> >  hw/core/qdev.c         | 11 +++++++++++
+> >  hw/xen/xen-common.c    | 38 +++++++++++++++++++-------------------
+> >  qom/object.c           | 25 +++++++++++++++++++++++++
+> >  vl.c                   |  2 +-
+> >  8 files changed, 73 insertions(+), 35 deletions(-)
+> >
+> > diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> > index a24d0dd566..82afd3c50d 100644
+> > --- a/include/hw/qdev-core.h
+> > +++ b/include/hw/qdev-core.h
+> > @@ -267,6 +267,19 @@ typedef struct GlobalProperty {
+> >      Error **errp;
+> >  } GlobalProperty;
+> >
+> > +#define SET_COMPAT(S, COMPAT)                                       \
+> > +    do {                                                            \
+> > +        int i;                                                      \
+> > +        static GlobalProperty props[] =3D {                           =
+\
+> > +            COMPAT                                                  \
+> > +        };                                                          \
+> > +        for (i =3D 0; i < G_N_ELEMENTS(props); i++) {                 =
+\
+> > +            g_ptr_array_add((S)->compat_props, (void *)&props[i]);  \
+> > +        }                                                           \
+> > +    } while (0)
+>
+> I think this macro would be an acceptable alternative to the
+> existing SET_MACHINE_COMPAT macro trickery, but:
+>
+> > +
+> > +void accel_register_compat_props(const GPtrArray *props);
 > [...]
->> diff --git a/tests/migration/guestperf/engine.py b/tests/migration/guestperf/engine.py
->> index 398e3f2706..73c9b66821 100644
->> --- a/tests/migration/guestperf/engine.py
->> +++ b/tests/migration/guestperf/engine.py
->> @@ -24,13 +24,17 @@ import re
->>  import sys
->>  import time
->>  
->> -sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'scripts'))
->> -import qemu
->> -import qmp.qmp
->>  from guestperf.progress import Progress, ProgressStats
->>  from guestperf.report import Report
->>  from guestperf.timings import TimingRecord, Timings
->>  
->> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
->> +TOP_DIR = os.path.dirname(os.path.dirname(os.path.dirname(THIS_DIR)))
->> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
->> +sys.path.append(PYTHON_MODULE_PATH)
->> +
->> +import qemu
-> 
-> Since `qemu` is a common word here, I would rather import the members
-> directly than only the module. Just like you did in
-> `/tests/vm/basevm,py`
-> 
+> > @@ -185,7 +183,9 @@ static void xen_accel_class_init(ObjectClass *oc, v=
+oid *data)
+> >      ac->init_machine =3D xen_init;
+> >      ac->setup_post =3D xen_setup_post;
+> >      ac->allowed =3D &xen_allowed;
+> > -    ac->global_props =3D xen_compat_props;
+> > +    ac->compat_props =3D g_ptr_array_new();
+> > +
+> > +    SET_COMPAT(ac, XEN_COMPAT);
+>
+> I think this is a step backwards.  I like us to be able to
+> register compat properties without macro magic.  The existence of
+> SET_MACHINE_COMPAT is a bug and not a feature.
+>
+> If you really want to use GPtrArray instead of a simple
+> GlobalProperty* field (I'm not sure I understand the reasoning
+> behind the choice to use GPtrArray), what about:
 
-Right, I avoided changing too much of the code using the modules, but I
-do agree with you here.
+Except in the Xen case, It needs to register multiple GlobalProperty*,
+not necessarily from contiguous in memory. That's why we have an array
+of ptr.
 
-Thanks for the feedback!
-- Cleber.
+>
+> static GPtrArray *build_compat_props_array(GlobalProperty *props)
+> {
+>     GlobalProperty *p =3D props;
+>     GPtrArray *array =3D g_ptr_array_new();
+>     while (p->driver) {
+>         g_ptr_array_add(array, (void *)p);
+>     }
+>     return array;
+> }
+>
+>
+> static void xen_accel_class_init(ObjectClass *oc, void *data)
+> {
+>     ...
+>     ac->compat_props =3D build_compat_props_array(xen_compat_props);
 
->> +
->>  
->>  class Engine(object):
->>  
->> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
->> index d537538ba0..92fddd2a58 100644
->> --- a/tests/qemu-iotests/iotests.py
->> +++ b/tests/qemu-iotests/iotests.py
->> @@ -31,8 +31,12 @@ import logging
-> [...]
->> --- a/tests/vm/basevm.py
->> +++ b/tests/vm/basevm.py
->> @@ -17,8 +17,6 @@ import sys
->>  import logging
->>  import time
->>  import datetime
->> -sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
->> -from qemu import QEMUMachine, kvm_available
->>  import subprocess
->>  import hashlib
->>  import optparse
->> @@ -28,6 +26,13 @@ import shutil
->>  import multiprocessing
->>  import traceback
->>  
->> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
->> +TOP_DIR = os.path.dirname(os.path.dirname(THIS_DIR))
->> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
->> +sys.path.append(PYTHON_MODULE_PATH)
->> +
->> +from qemu import QEMUMachine, kvm_available
->> +
->>  SSH_KEY = open(os.path.join(os.path.dirname(__file__),
->>                 "..", "keys", "id_rsa")).read()
->>  SSH_PUB_KEY = open(os.path.join(os.path.dirname(__file__),
->> -- 
->> 2.19.1
->>
-> 
-> Thanks,
-> 
+If we would register from one place, that would be fine.
 
--- 
-Cleber Rosa
-[ Sr Software Engineer - Virtualization Team - Red Hat ]
-[ Avocado Test Framework - avocado-framework.github.io ]
-[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+We could replace the macro by a function, then we would have to
+declare the GlobalProperty arrays manually basically.
+
+> }
+>
+>
+>
+> >  }
+> >
+> >  #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+> > diff --git a/qom/object.c b/qom/object.c
+> > index 17921c0a71..dbdab0aead 100644
+> > --- a/qom/object.c
+> > +++ b/qom/object.c
+> > @@ -370,6 +370,31 @@ static void object_post_init_with_type(Object *obj=
+, TypeImpl *ti)
+> >      }
+> >  }
+> >
+> > +void object_apply_global_props(Object *obj, const GPtrArray *props, Er=
+ror **errp)
+> > +{
+> > +    Error *err =3D NULL;
+> > +    int i;
+> > +
+> > +    if (!props) {
+> > +        return;
+> > +    }
+> > +
+> > +    for (i =3D 0; i < props->len; i++) {
+> > +        GlobalProperty *p =3D g_ptr_array_index(props, i);
+> > +
+> > +        if (object_dynamic_cast(obj, p->driver) =3D=3D NULL) {
+> > +            continue;
+> > +        }
+> > +        p->used =3D true;
+> > +        object_property_parse(obj, p->value, p->property, &err);
+> > +        if (err !=3D NULL) {
+> > +            error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+> > +                          p->driver, p->property, p->value);
+> > +            error_propagate(errp, err);
+> > +        }
+> > +    }
+> > +}
+> > +
+> >  static void object_initialize_with_type(void *data, size_t size, TypeI=
+mpl *type)
+> >  {
+> >      Object *obj =3D data;
+> > diff --git a/vl.c b/vl.c
+> > index fa25d1ae2d..c06e94271c 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -2963,7 +2963,7 @@ static void user_register_global_props(void)
+> >   */
+> >  static void register_global_properties(MachineState *ms)
+> >  {
+> > -    accel_register_compat_props(ms->accelerator);
+> > +    accel_register_compat_props(ACCEL_GET_CLASS(ms->accelerator)->comp=
+at_props);
+> >      machine_register_compat_props(ms);
+> >      user_register_global_props();
+> >  }
+> > --
+> > 2.20.0.rc1
+> >
+> >
+>
+> --
+> Eduardo
