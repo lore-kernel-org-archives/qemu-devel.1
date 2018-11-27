@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gRjUP-00044N-AU
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 14:57:47 -0500
+	(envelope-from <crosa@redhat.com>) id 1gRjYw-0006V0-4Q
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:02:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gRjUK-0006PP-5I
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 14:57:45 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51290)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gRjUJ-0006PC-Sm
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 14:57:40 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wARJtZEA015550
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 14:57:38 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p18y39g9d-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 14:57:38 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Tue, 27 Nov 2018 19:57:37 -0000
-References: <20181122165432.4437-1-cohuck@redhat.com>
-	<20181122165432.4437-4-cohuck@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Tue, 27 Nov 2018 14:57:31 -0500
+	(envelope-from <crosa@redhat.com>) id 1gRjYu-0000UK-SO
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:02:26 -0500
+References: <20181127105034.21045-1-crosa@redhat.com>
+	<20181127190006.GC22880@localhost.localdomain>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <7359977f-3797-d78f-cd1a-a410e30c5357@redhat.com>
+Date: Tue, 27 Nov 2018 15:02:03 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181122165432.4437-4-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181127190006.GC22880@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <d7084481-b638-e128-eb91-49911882e39e@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] vfio-ccw: add handling for asnyc
- channel instructions
+Subject: Re: [Qemu-devel] [RFC PATCH] Introduce Python module structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,31 +24,254 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: Caio Carrara <ccarrara@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
 
 
-On 11/22/2018 11:54 AM, Cornelia Huck wrote:
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 565669f95534..c01472ec77ea 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -304,6 +304,7 @@ struct vfio_region_info_cap_type {
->   #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
->   #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
->   
-> +
+On 11/27/18 2:00 PM, Caio Carrara wrote:
+> Hi, Cleber.
+> 
+> On Tue, Nov 27, 2018 at 05:50:34AM -0500, Cleber Rosa wrote:
+>> This is a simple move of Python code that wraps common QEMU
+>> functionality, and are used by a number of different tests
+>> and scripts.
+>>
+>> By treating that code as a real Python module, we can more easily,
+>> among other things:
+>>  * reuse more code
+>>  * apply a more consistent style
+>>  * add tests to that code
+>>  * generate documentation
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>  configure                                  |  1 +
+>>  scripts/qemu.py => python/qemu/__init__.py | 11 ++++++-----
+> 
+> Well, we all know how difficult is to pick up names, but I would avoid
+> use `python` here. This is the name of python bin itself. Is there any
+> chance of a clash? I do not have a specific case right now, I'm just
+> wondering if it can happen we should avoid.
+> 
 
-Whitespace error?
+The point of the "python" directory, is that it's not supposed to be the
+*module* name, but a holder for the Python module, which is "qemu".
+Given that "python is not a module", has no __init__.py, I don't think
+it'll ever clash.
 
->   #define VFIO_REGION_TYPE_GFX                    (1)
->   #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
->   
-> @@ -354,6 +355,9 @@ struct vfio_region_gfx_edid {
->   #define VFIO_DEVICE_GFX_LINK_STATE_DOWN  2
->   };
->   
-> +/* ccw sub-types */
-> +#define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
-> +
+The reason for picking the name is that it makes it obvious, within the
+QEMU tree, that this is Python stuff.  I already have some tests, to
+test the "Python stuff", to put it under "python", probably in
+"python/tests".
+
+Anyway, it'd be nice to think of alternatives here.
+
+>>  {scripts/qmp => python/qemu}/qmp.py        |  0
+>>  {scripts => python/qemu}/qtest.py          |  5 +++--
+>>  scripts/device-crash-test                  |  5 +++++
+>>  scripts/qmp/__init__.py                    |  0
+>>  tests/acceptance/avocado_qemu/__init__.py  |  9 +++++----
+>>  tests/migration/guestperf/engine.py        | 10 +++++++---
+>>  tests/qemu-iotests/iotests.py              |  8 ++++++--
+>>  tests/vm/basevm.py                         |  9 +++++++--
+>>  10 files changed, 40 insertions(+), 18 deletions(-)
+>>  rename scripts/qemu.py => python/qemu/__init__.py (98%)
+>>  rename {scripts/qmp => python/qemu}/qmp.py (100%)
+>>  rename {scripts => python/qemu}/qtest.py (97%)
+> 
+> What if we keep `qmp.py` and `qtest.py` directly under `/python`
+> directory?  It seems it can be more semantic regarding the subject of
+> each module. I'm not completely sure about `qmp.py`, but definetly I
+> think qtest should be under python directly.
+> 
+
+I still think having a uniform starting point for the module, such as
+"qemu" is a good practice for all QEMU Python code.  Having independent
+first level modules will make it harder to understand where the code is
+coming from.  For instance, we have the option of coming up with a
+structure that would allow:
+
+
+ import os
+ import struct
+ import qmp
+ import urllib
+
+
+And the origin of "qmp" would go unnoticed.  Alternatively:
+
+
+ import os
+ import struct
+ import urllib
+ from qemu import qmp
+
+
+Is much clearer.  Now, with regards to "qmp", it's pretty much
+standalone, uses only Python libraries, while "qemu" consumes "qmp"
+functionality.  I believe having "qemu.qmp" is appropriate here.
+
+Now, for "qtest", you have a point, it uses QEMUMachine, and its content
+is very similar to what's available under "qemu" itself (that is,
+QEMUMachine itself).  IMO, it would make sense to just have the
+QEMUQtestProtocol and QEMUQtestMachine at the "qemu" level at this
+point, that is, fold their content into "qemu/__init__.py".
+
+The API usage would then become:
+
+
+ from qemu import QEMUQTestMachine
+
+
+Similar to:
+
+
+ from qemu import QEMUMachine
+
+
+I refrained from changing too much at the initial RFC time, though,
+exactly to make less biased discussions.
+
+
+>>  delete mode 100644 scripts/qmp/__init__.py
+>>
+>> diff --git a/configure b/configure
+>> index 0a3c6a72c3..2b64c51009 100755
+> [...]
+>> rename from scripts/qemu.py
+>> rename to python/qemu/__init__.py
+> [...]
+>> diff --git a/scripts/qmp/qmp.py b/python/qemu/qmp.py
+>> similarity index 100%
+>> rename from scripts/qmp/qmp.py
+>> rename to python/qemu/qmp.py
+>> diff --git a/scripts/qtest.py b/python/qemu/qtest.py
+>> similarity index 97%
+>> rename from scripts/qtest.py
+>> rename to python/qemu/qtest.py
+>> index adf1fe3f26..bff79cdd13 100644
+>> --- a/scripts/qtest.py
+>> +++ b/python/qemu/qtest.py
+> [...]
+>> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+>> index e93a7c0c84..c75ae0ecbc 100755
+>> --- a/scripts/device-crash-test
+>> +++ b/scripts/device-crash-test
+>> @@ -35,6 +35,11 @@ import random
+>>  import argparse
+>>  from itertools import chain
+>>  
+>> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+>> +TOP_DIR = os.path.dirname(THIS_DIR)
+>> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
+>> +sys.path.append(PYTHON_MODULE_PATH)
+> 
+> This sys.path handling to use the new QEMU Python module is not good. I
+> understand it can be a first step, but to expect everyone knows/do it to
+> use the module is a bad assumption because it's not intuitive and can
+> cause some confusion.
+> 
+> If we need something available from a Python script/module that is not
+> directly acessible from PYTHONPATH we should install it so Python can
+> turn it available. So, probably we need to think make `python/qemu` a
+> proper installable module.
+>
+
+It's something that is confusing for mode experienced Python developers,
+but I have some experience with way too many people not understanding at
+all why an extra step (the module installation), was necessary for using
+Python code from within a source tree.  We faced a LOT of questions, for
+a long time, when we did the switch in Avocado itself.
+
+To summarize, you're right about the end goal, and I hope we'll get
+there and remove this boiler plate code.  But, I think we need an
+intermediary step.
+
+>> +
+>>  from qemu import QEMUMachine
+>>  
+>>  logger = logging.getLogger('device-crash-test')
+>> diff --git a/scripts/qmp/__init__.py b/scripts/qmp/__init__.py
+>> deleted file mode 100644
+> [...]
+>> diff --git a/tests/migration/guestperf/engine.py b/tests/migration/guestperf/engine.py
+>> index 398e3f2706..73c9b66821 100644
+>> --- a/tests/migration/guestperf/engine.py
+>> +++ b/tests/migration/guestperf/engine.py
+>> @@ -24,13 +24,17 @@ import re
+>>  import sys
+>>  import time
+>>  
+>> -sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'scripts'))
+>> -import qemu
+>> -import qmp.qmp
+>>  from guestperf.progress import Progress, ProgressStats
+>>  from guestperf.report import Report
+>>  from guestperf.timings import TimingRecord, Timings
+>>  
+>> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+>> +TOP_DIR = os.path.dirname(os.path.dirname(os.path.dirname(THIS_DIR)))
+>> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
+>> +sys.path.append(PYTHON_MODULE_PATH)
+>> +
+>> +import qemu
+> 
+> Since `qemu` is a common word here, I would rather import the members
+> directly than only the module. Just like you did in
+> `/tests/vm/basevm,py`
+> 
+
+Right, I avoided changing too much of the code using the modules, but I
+do agree with you here.
+
+Thanks for the feedback!
+- Cleber.
+
+>> +
+>>  
+>>  class Engine(object):
+>>  
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+>> index d537538ba0..92fddd2a58 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -31,8 +31,12 @@ import logging
+> [...]
+>> --- a/tests/vm/basevm.py
+>> +++ b/tests/vm/basevm.py
+>> @@ -17,8 +17,6 @@ import sys
+>>  import logging
+>>  import time
+>>  import datetime
+>> -sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
+>> -from qemu import QEMUMachine, kvm_available
+>>  import subprocess
+>>  import hashlib
+>>  import optparse
+>> @@ -28,6 +26,13 @@ import shutil
+>>  import multiprocessing
+>>  import traceback
+>>  
+>> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+>> +TOP_DIR = os.path.dirname(os.path.dirname(THIS_DIR))
+>> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
+>> +sys.path.append(PYTHON_MODULE_PATH)
+>> +
+>> +from qemu import QEMUMachine, kvm_available
+>> +
+>>  SSH_KEY = open(os.path.join(os.path.dirname(__file__),
+>>                 "..", "keys", "id_rsa")).read()
+>>  SSH_PUB_KEY = open(os.path.join(os.path.dirname(__file__),
+>> -- 
+>> 2.19.1
+>>
+> 
+> Thanks,
+> 
+
+-- 
+Cleber Rosa
+[ Sr Software Engineer - Virtualization Team - Red Hat ]
+[ Avocado Test Framework - avocado-framework.github.io ]
+[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
