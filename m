@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRdTS-0002aO-Hx
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:32:23 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gRdX0-00067U-ID
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:36:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRdTO-0005G6-Tf
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:32:20 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43824)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gRdTM-0005Dj-94
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:32:17 -0500
-Received: by mail-ot1-x341.google.com with SMTP id a11so20042969otr.10
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 05:32:16 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1gRdWy-0000Me-4F
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:36:02 -0500
+Date: Tue, 27 Nov 2018 11:35:27 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181127133527.GI18284@habkost.net>
+References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
+	<20181127092801.21777-17-marcandre.lureau@redhat.com>
+	<20181127125644.GB18284@habkost.net>
+	<CAMxuvaySoJ2TokV8M81CVU3Hp4dC25c+PW_p2kk+V88-88U-CQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20181126154616.18173-1-eric.auger@redhat.com>
-In-Reply-To: <20181126154616.18173-1-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Nov 2018 13:32:03 +0000
-Message-ID: <CAFEAcA9B_jLiHLzJZrKuhT3SfXB+pzj03D=NiVNWqRc+zc=qTA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/arm/virt-acpi-build: Fix SMMUv3
- ACPI integration
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAMxuvaySoJ2TokV8M81CVU3Hp4dC25c+PW_p2kk+V88-88U-CQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 16/28] hw: apply machine compat
+ properties without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +27,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Bonzini, Paolo" <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S . Tsirkin" <mst@redhat.com>, david@gibson.dropbear.id.au, cohuck@redhat.com, David Hildenbrand <david@redhat.com>, borntraeger@de.ibm.com, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-On Mon, 26 Nov 2018 at 15:46, Eric Auger <eric.auger@redhat.com> wrote:
->
-> The AcpiIortSmmu3 misses 2 32b fields corresponding to the
-> proximity domain and the device id mapping index.
->
-> Also let's report IO-coherent access is supported for
-> translation table walks, descriptor fetches and queues by
-> setting the COHACC override flag. Without that, we observe
-> wrong command opcodes. The DT description also advertises
-> the dma coherency.
->
-> Fixes a703b4f6c1ee ("hw/arm/virt-acpi-build: Add smmuv3 node in IORT table")
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reported-by: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+On Tue, Nov 27, 2018 at 05:10:05PM +0400, Marc-Andr=E9 Lureau wrote:
+> On Tue, Nov 27, 2018 at 4:57 PM Eduardo Habkost <ehabkost@redhat.com> w=
+rote:
+> >
+> > On Tue, Nov 27, 2018 at 01:27:49PM +0400, Marc-Andr=E9 Lureau wrote:
+> > > Similarly to accel properties, move compat properties out of global=
+s
+> > > registration, and apply the machine compat properties during
+> > > device_post_init().
+> > >
+> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > [...]
+> > > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > > index 7066d28271..3b31b2c025 100644
+> > > --- a/hw/core/qdev.c
+> > > +++ b/hw/core/qdev.c
+> > > @@ -971,17 +971,26 @@ static void device_initfn(Object *obj)
+> > >  }
+> > >
+> > >  static const GPtrArray *ac_compat_props;
+> > > +static const GPtrArray *mc_compat_props;
+> > >
+> > >  void accel_register_compat_props(const GPtrArray *props)
+> > >  {
+> > >      ac_compat_props =3D props;
+> > >  }
+> > >
+> > > +void machine_register_compat_props(const GPtrArray *props)
+> > > +{
+> > > +    mc_compat_props =3D props;
+> > > +}
+> > > +
+> > >  static void device_post_init(Object *obj)
+> > >  {
+> > >      if (ac_compat_props) {
+> > >          object_apply_global_props(obj, ac_compat_props, &error_abo=
+rt);
+> > >      }
+> >
+> > Why not just use MACHINE(qdev_get_machine())->accel->compat_props
+> > directly?
+> >
+> > > +    if (mc_compat_props) {
+> > > +        object_apply_global_props(obj, mc_compat_props, &error_abo=
+rt);
+> > > +    }
+> >
+> > Why not just use MACHINE(qdev_get_machine())->compat_props
+> > directly?
+>=20
+> This was the approach in v3, but Igor didn't quite like referencing
+> machine in qdev:
+> https://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg04774.html
 
-Hi; it looks (from looking at the code) like this isn't a
-regression from 3.0 -- is that right?
+I disagree with Igor, here.  Core qdev code already have multiple
+references to machine, I don't see any problem with that.
 
-I think this fix has missed rc3 (discussion seems to be ongoing
-and it needs more time on-list for review), which means it's
-likely to miss the 3.1 release. So at the moment I'm expecting
-it to go into 4.0. (Maybe if we need an rc4 for some other reason
-we might be able to put it in.)
+The previous code was clearer and easier to follow, and wasn't
+sensitive to subtle changes in initialization ordering (e.g. what
+happens if we create a device before *_register_compat_props() is
+called?).
 
-thanks
--- PMM
+
+>=20
+> >
+> > >
+> > >      qdev_prop_set_globals(DEVICE(obj));
+> > >  }
+> > [...]
+> >
+> > --
+> > Eduardo
+
+--=20
+Eduardo
