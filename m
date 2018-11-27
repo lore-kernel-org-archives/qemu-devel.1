@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gRd21-0001wy-Ft
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:04:07 -0500
+	(envelope-from <groug@kaod.org>) id 1gRd35-0002Ti-HD
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gRd1y-0004kN-A2
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:04:01 -0500
-References: <20181127114102.4319-1-david@redhat.com>
-	<a632f840-f738-fd79-9f2d-5b51852c4726@redhat.com>
-	<6aabbad7-885a-0ed9-15d9-fbfd89148e94@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ed45438f-a388-c5d3-92b7-99b5010e6922@redhat.com>
-Date: Tue, 27 Nov 2018 14:03:50 +0100
+	(envelope-from <groug@kaod.org>) id 1gRd32-0005KN-Cb
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:07 -0500
+Received: from 5.mo177.mail-out.ovh.net ([46.105.39.154]:38414)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gRd32-0005JY-31
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:04 -0500
+Received: from player758.ha.ovh.net (unknown [10.109.159.152])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id BF662D4F8B
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 14:05:01 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 27 Nov 2018 14:04:53 +0100
+Message-ID: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <6aabbad7-885a-0ed9-15d9-fbfd89148e94@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/tod: properly stop the KVM TOD
- while the guest is not running
+Subject: [Qemu-devel] [PATCH for-4.0 0/9] ppc: get rid of g_malloc(sizeof(T)
+ * n)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,95 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-On 2018-11-27 13:50, David Hildenbrand wrote:
-> On 27.11.18 13:19, Thomas Huth wrote:
->> On 2018-11-27 12:41, David Hildenbrand wrote:
->>> Just like on other architectures, we should stop the clock while the guest
->>> is not running. This is already properly done for TCG. Right now, doing an
->>> offline migration (stop, migrate, cont) can easily trigger stalls in the
->>> guest.
->>>
->>> Even doing a
->>>     (hmp) stop
->>>     ... wait 2 minutes ...
->>>     (hmp) cont
->>> will already trigger stalls.
->>>
->>> So whenever the guest stops, backup the KVM TOD. When continuning to run
->>> the guest, restore the KVM TOD.
->>>
->>> One special case is starting a simple VM: Reading the TOD from KVM to
->>> stop it right away until the guest is actually started means that the
->>> time of any simple VM will already differ to the host time. We can
->>> simply leave the TOD running and the guest won't be able to recognize
->>> it.
->>>
->>> For migration, we actually want to keep the TOD stopped until really
->>> starting the guest. To be able to catch most errors, we should however
->>> try to set the TOD in addition to simply storing it. So we can still
->>> catch basic migration problems.
->>>
->>> If anything goes wrong while backing up/restoring the TOD, we have to
->>> ignore it (but print a warning). This is then basically a fallback to
->>> old behavior (TOD remains running).
->>>
->>> I tested this very basically with an initrd:
->>>     1. Start a simple VM. Observed that the TOD is kept running. Old
->>>        behavior.
->>>     2. Ordinary live migration. Observed that the TOD is temporarily
->>>        stopped on the destination when setting the new value and
->>>        correctly started when finally starting the guest.
->>>     3. Offline live migration. (stop, migrate, cont). Observed that the
->>>        TOD will be stopped on the source with the "stop" command. On the
->>>        destination, the TOD is temporarily stopped when setting the new
->>>        value and correctly started when finally starting the guest via
->>>        "cont".
->>>     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
->>>        or conts in a row have no effect, so works as expected)
->>>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>  hw/s390x/tod-kvm.c     | 88 +++++++++++++++++++++++++++++++++++++++++-
->>>  include/hw/s390x/tod.h |  7 +++-
->>>  2 files changed, 92 insertions(+), 3 deletions(-)
->> [...]
->>> @@ -49,10 +112,31 @@ static void kvm_s390_tod_class_init(ObjectClass *oc, void *data)
->>>      tdc->set = kvm_s390_tod_set;
->>>  }
->>>  
->>> +static void kvm_s390_tod_init(Object *obj)
->>> +{
->>> +    S390TODState *td = S390_TOD(obj);
->>> +
->>> +    /*
->>> +     * The TOD is initially running (value stored in KVM). Avoid needless
->>> +     * loading/storing of the TOD when starting a simple VM, so let it
->>> +     * run although the (never started) VM is stopped. For migration, we
->>> +     * will properly set the TOD later.
->>> +     */
->>> +    td->stopped = false;
->>> +
->>> +    /*
->>> +     * We need to know when the VM gets started/stopped to start/stop the TOD.
->>> +     * As we can never have more than one TOD instance (and that will never be
->>> +     * removed), registering here and never unregistering is good enough.
->>> +     */
->>> +    qemu_add_vm_change_state_handler(kvm_s390_tod_vm_state_change, td);
->>
->> I think you should rather do this in a realize() function instead, since
->> instance_init can be called multiple times (during introspection of the
->> object, for example). See my blog article here for some details:
->>
->> https://people.redhat.com/~thuth/blog/qemu/2018/09/10/instance-init-realize.html
-> 
-> 
-> Even for types that cannot be created by the user?
+As explained in HACKING, the g_malloc(sizeof(T) * n) construct is unsafe
+because it can't detect multiplication overflowing size_t and doesn't
+allow type checking.
 
-Yes, you still can run "device_add s390-tod-kvm,help" at the HMP prompt,
-or introspect the device via QMP. Both will trigger a temporary instance
-of the device, where instance_init is executed.
+It appears to be used in a bunch of places though:
 
- Thomas
+$ git grep -E 'malloc.*sizeof' | grep ' \* '  | wc -l
+101
+
+This series fixes the ppc target and ppc machine code. The changes are
+mostly trivial. Only the mac99 and e500 machines required some more work
+that should be reviewed carefully, as it was only compile-tested.
+
+--
+Greg
+
+---
+
+Greg Kurz (9):
+      target/ppc: use g_new(T, n) instead of g_malloc(sizeof(T) * n)
+      spapr: use g_new(T, n) instead of g_malloc(sizeof(T) * n)
+      ppc405_boards: use g_new(T, n) instead of g_malloc(sizeof(T) * n)
+      ppc405_uc: use g_new(T, n) instead of g_malloc(sizeof(T) * n)
+      ppc440_bamboo: use g_new(T, n) instead of g_malloc(sizeof(T) * n)
+      sam460ex: use g_new(T, n) instead of g_malloc(sizeof(T) * n)
+      virtex_ml507: use g_new(T, n) instead of g_malloc(sizeof(T) * n)
+      mac_newworld: simplify IRQ wiring
+      e500: simplify IRQ wiring
+
+
+ hw/ppc/e500.c                   |   18 ++++++++----------
+ hw/ppc/mac_newworld.c           |   30 +++++++++++++-----------------
+ hw/ppc/ppc405_boards.c          |    4 ++--
+ hw/ppc/ppc405_uc.c              |    4 ++--
+ hw/ppc/ppc440_bamboo.c          |    5 ++---
+ hw/ppc/sam460ex.c               |    2 +-
+ hw/ppc/spapr_iommu.c            |    2 +-
+ hw/ppc/spapr_vio.c              |    2 +-
+ hw/ppc/virtex_ml507.c           |    2 +-
+ include/hw/ppc/openpic.h        |    2 ++
+ target/ppc/translate_init.inc.c |    6 +++---
+ 11 files changed, 36 insertions(+), 41 deletions(-)
