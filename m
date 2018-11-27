@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gRfoL-0001G0-7b
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:02:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1gReO2-0000J6-Rd
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:30:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gRfo9-0003Sp-3j
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:02:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41206)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gRfo8-0003S2-Sg
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:01:53 -0500
-Date: Tue, 27 Nov 2018 16:01:44 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181127160144.GB2616@work-vm>
-References: <20181115192446.17187-1-minyard@acm.org>
-	<20181115192446.17187-7-minyard@acm.org>
-	<20181126172308.GJ2547@work-vm>
-	<7055e173-6f4f-7954-69c7-47e0f26dfaf6@acm.org>
+	(envelope-from <bounces@canonical.com>) id 1gReNx-0002ST-D0
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:30:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60030)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gReNx-0002Nd-4P
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:30:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gReNv-0002sg-Lt
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 14:30:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9C0952E80C0
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 14:30:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <7055e173-6f4f-7954-69c7-47e0f26dfaf6@acm.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 06/12] boards.h: Ignore migration for
- SMBus devices on older machines
+Date: Tue, 27 Nov 2018 14:24:06 -0000
+From: Igor <generalrot@rambler.ru>
+Reply-To: Bug 1805445 <1805445@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154332864629.32687.7125797278920412825.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1805445] [NEW] QEMU arm virt machine was stopped
+ by STMFD command while debug process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,107 +36,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <minyard@acm.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: qemu-devel@nongnu.org
 
-* Corey Minyard (minyard@acm.org) wrote:
-> On 11/26/18 11:23 AM, Dr. David Alan Gilbert wrote:
-> > * minyard@acm.org (minyard@acm.org) wrote:
-> > > From: Corey Minyard <cminyard@mvista.com>
-> > >=20
-> > > Migration capability is being added for pm_smbus and SMBus devices.
-> > > This change will allow backwards compatibility to be kept when
-> > > migrating back to an old qemu version.  Add a bool to the machine
-> > > class tho keep smbus migration from happening.  Future changes
-> > > will use this.
-> > So this is also going to have to be in the 3.0 and 3.1 machine option=
-s
-> > and maybe some other architectures?
->=20
-> I'm not sure why it would need to be in both the 3.0 and 3.1 machine
-> options.
-> If this goes in, I'm assuming it's for 3.1 and it should only need to b=
-e
-> there.
-> That's if it's too late for 3.0.
+Public bug reported:
 
-You're out by 1-2 releases;  3.0 shipped in August, 3.1 is in freeze at
-the moment (hence you've missed it unless some part of this is
-critical); so this will go in during the 4.0 release.
+Hello, i have a big problem with QEMU arm virtual machine. So...
+I run QEMU machine with bare-metal ThreadX fullflash from Texet TM-333 phon=
+e  (Spreadtrum platform)
+[CODE]qemu-system-arm -S -gdb tcp::1234,ipv4 -drive file=3DC:\cygwin64\home=
+\flash.bin,if=3Dmtd,format=3Draw -M palmetto-bmc -cpu arm926 -m 64M[/CODE]
+I use palmetto-bmc platform because it have ARM926EJ-S core and support SPI=
+ Flash.
+Then, i attach to gdb qemu process from IDA and run code step-by-step.
+[IMG]https://pp.userapi.com/c847218/v847218546/13ec1c/iSIcre5-js4.jpg[/IMG]
 
-> The pm_smbus device is also used by mips fulong.=A0 From what I can tel=
-l, that
-> machine doesn't have any concept of backwards compatibility, so it seem=
-ed
-> save to no worry about it there.=A0 If it weren't for that, this bool c=
-ould go
-> into the
+When the IDA run 00032534 STR R11, [R10] command
+[IMG]https://pp.userapi.com/c846416/v846416708/133f60/GQzxORvf4Tg.jpg[/IMG]
 
-Yeh that's fine.
+instead of store R11 on R10 adress, it jump 000328DC STMFD SP!, {R0-R12,LR}=
+ instruction...
+[IMG]https://pp.userapi.com/c847218/v847218546/13ec26/32A0VcaJywg.jpg[/IMG]
+and virt machine not execute new instruction... =
 
-What about the eeprom's are they used more widely?
+[IMG]https://pp.userapi.com/c850624/v850624111/528f3/N7FTpgloWVU.jpg[/IMG]
 
-Dave
+and why i did not change flash from n25q256a to n25q032a11 in aspeed.c
+without rebuild qemu?
 
-> PC specific structure.
->=20
-> Thanks,
->=20
-> -corey
->=20
-> > Dave
-> >=20
-> > > Signed-off-by: Corey Minyard <cminyard@mvista.com>
-> > > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > > ---
-> > >   hw/i386/pc_piix.c   | 1 +
-> > >   hw/i386/pc_q35.c    | 1 +
-> > >   include/hw/boards.h | 1 +
-> > >   3 files changed, 3 insertions(+)
-> > >=20
-> > > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > > index cb28227cc3..3d1ccb1af1 100644
-> > > --- a/hw/i386/pc_piix.c
-> > > +++ b/hw/i386/pc_piix.c
-> > > @@ -443,6 +443,7 @@ static void pc_i440fx_2_12_machine_options(Mach=
-ineClass *m)
-> > >       pc_i440fx_3_0_machine_options(m);
-> > >       m->is_default =3D 0;
-> > >       m->alias =3D NULL;
-> > > +    m->smbus_no_migration_support =3D true;
-> > >       SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
-> > >   }
-> > > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> > > index 90e88c9b28..0c6fca6a40 100644
-> > > --- a/hw/i386/pc_q35.c
-> > > +++ b/hw/i386/pc_q35.c
-> > > @@ -324,6 +324,7 @@ static void pc_q35_2_12_machine_options(Machine=
-Class *m)
-> > >   {
-> > >       pc_q35_3_0_machine_options(m);
-> > >       m->alias =3D NULL;
-> > > +    m->smbus_no_migration_support =3D true;
-> > >       SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
-> > >   }
-> > > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > > index f82f28468b..65314fbe2a 100644
-> > > --- a/include/hw/boards.h
-> > > +++ b/include/hw/boards.h
-> > > @@ -207,6 +207,7 @@ struct MachineClass {
-> > >       void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *node=
-s,
-> > >                                    int nb_nodes, ram_addr_t size);
-> > >       bool ignore_boot_device_suffixes;
-> > > +    bool smbus_no_migration_support;
-> > >       HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-> > >                                              DeviceState *dev);
-> > > --=20
-> > > 2.17.1
-> > >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: arm emulation stop
+
+** Attachment added: "3.jpg"
+   https://bugs.launchpad.net/bugs/1805445/+attachment/5216795/+files/3.jpg
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805445
+
+Title:
+  QEMU arm virt machine was stopped by STMFD command while debug process
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello, i have a big problem with QEMU arm virtual machine. So...
+  I run QEMU machine with bare-metal ThreadX fullflash from Texet TM-333 ph=
+one  (Spreadtrum platform)
+  [CODE]qemu-system-arm -S -gdb tcp::1234,ipv4 -drive file=3DC:\cygwin64\ho=
+me\flash.bin,if=3Dmtd,format=3Draw -M palmetto-bmc -cpu arm926 -m 64M[/CODE]
+  I use palmetto-bmc platform because it have ARM926EJ-S core and support S=
+PI Flash.
+  Then, i attach to gdb qemu process from IDA and run code step-by-step.
+  [IMG]https://pp.userapi.com/c847218/v847218546/13ec1c/iSIcre5-js4.jpg[/IM=
+G]
+
+  When the IDA run 00032534 STR R11, [R10] command
+  [IMG]https://pp.userapi.com/c846416/v846416708/133f60/GQzxORvf4Tg.jpg[/IM=
+G]
+
+  instead of store R11 on R10 adress, it jump 000328DC STMFD SP!, {R0-R12,L=
+R} instruction...
+  [IMG]https://pp.userapi.com/c847218/v847218546/13ec26/32A0VcaJywg.jpg[/IM=
+G]
+  and virt machine not execute new instruction... =
+
+  [IMG]https://pp.userapi.com/c850624/v850624111/528f3/N7FTpgloWVU.jpg[/IMG]
+
+  and why i did not change flash from n25q256a to n25q032a11 in aspeed.c
+  without rebuild qemu?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805445/+subscriptions
