@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1gRj5E-0001fE-Pn
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 14:31:46 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gRjDq-0004r4-PD
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 14:40:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1gRj5B-00083N-07
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 14:31:44 -0500
-Received: from mail-eopbgr00093.outbound.protection.outlook.com
-	([40.107.0.93]:59808
-	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1gRj59-000815-8C
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 14:31:39 -0500
-From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Tue, 27 Nov 2018 19:31:32 +0000
-Message-ID: <20181127193128.GC5147@rkaganip.lan>
-References: <20181123090058.6931-1-rkagan@virtuozzo.com>
-	<43c4a5d5-9437-57b1-e557-e82dfa6c3af1@redhat.com>
-In-Reply-To: <43c4a5d5-9437-57b1-e557-e82dfa6c3af1@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <C068C01C7557634E90D1998BA7777859@eurprd08.prod.outlook.com>
+	(envelope-from <ehabkost@redhat.com>) id 1gRjDn-0005ne-Ge
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 14:40:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39112)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gRjDl-0005cO-E3
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 14:40:35 -0500
+Date: Tue, 27 Nov 2018 17:40:19 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181127194019.GQ18284@habkost.net>
+References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
+	<20181127092801.21777-16-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] configure: fix elf2dmp check
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181127092801.21777-16-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 15/28] hw: apply accel compat
+ properties without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +29,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, imammedo@redhat.com, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
 
-On Tue, Nov 27, 2018 at 07:50:54PM +0100, Paolo Bonzini wrote:
-> On 23/11/18 10:01, Roman Kagan wrote:
-> > elf2dmp is keyed on "$posix" = "yes", but "$posix" doesn't seem to be
-> > set anywhere.
-> > 
-> > The original intent was presumably to skip building it on Windows, so
-> > check for "$mingw32" = "no" instead.
-> > 
-> > Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-> > ---
-> >  configure | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/configure b/configure
-> > index 0a3c6a72c3..fc6ce0065d 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -5722,7 +5722,7 @@ if test "$want_tools" = "yes" ; then
-> >    if [ "$ivshmem" = "yes" ]; then
-> >      tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
-> >    fi
-> > -  if [ "$posix" = "yes" ] && [ "$curl" = "yes" ]; then
-> > +  if [ "$mingw32" = "no" ] && [ "$curl" = "yes" ]; then
-> >      tools="elf2dmp $tools"
-> >    fi
-> >  fi
-> > 
-> 
-> Unfortunately this shows that elf2dmp is not portable to 32-bit systems,
-> nor to non-Linux.  Can this be fixed?
+On Tue, Nov 27, 2018 at 01:27:48PM +0400, Marc-Andr=E9 Lureau wrote:
+> Introduce object_apply_global_props() function, to apply compatibility
+> properties from a GPtrArray.
+>=20
+> For accel compatibility properties, apply them during
+> device_post_init(), after accel_register_compat_props() has set them.
+>=20
+> To populate the compatibility properties, introduce SET_COMPAT(), a
+> more generic version of SET_MACHINE_COMPAT() that can set compat
+> properties on other objects than Machine, and using GPtrArray.
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/hw/qdev-core.h | 13 +++++++++++++
+>  include/qom/object.h   |  3 +++
+>  include/sysemu/accel.h |  4 +---
+>  accel/accel.c          | 12 ------------
+>  hw/core/qdev.c         | 11 +++++++++++
+>  hw/xen/xen-common.c    | 38 +++++++++++++++++++-------------------
+>  qom/object.c           | 25 +++++++++++++++++++++++++
+>  vl.c                   |  2 +-
+>  8 files changed, 73 insertions(+), 35 deletions(-)
+>=20
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index a24d0dd566..82afd3c50d 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -267,6 +267,19 @@ typedef struct GlobalProperty {
+>      Error **errp;
+>  } GlobalProperty;
+> =20
+> +#define SET_COMPAT(S, COMPAT)                                       \
+> +    do {                                                            \
+> +        int i;                                                      \
+> +        static GlobalProperty props[] =3D {                           =
+\
+> +            COMPAT                                                  \
+> +        };                                                          \
+> +        for (i =3D 0; i < G_N_ELEMENTS(props); i++) {                 =
+\
+> +            g_ptr_array_add((S)->compat_props, (void *)&props[i]);  \
+> +        }                                                           \
+> +    } while (0)
 
-I'm sure it can, but not in time for 3.2.  I'd rather drop this patch
-for now and leave the tool disabled in 3.2.
+I think this macro would be an acceptable alternative to the
+existing SET_MACHINE_COMPAT macro trickery, but:
 
-[ FWIW the format specifier mismatches were addressed by Viktor's
-patchset of some three weeks ago, "[PATCH 0/2] contrib/elf2dmp: elf2dmp
-for Windows hosts", but it hasn't made it yet. ]
+> +
+> +void accel_register_compat_props(const GPtrArray *props);
+[...]
+> @@ -185,7 +183,9 @@ static void xen_accel_class_init(ObjectClass *oc, v=
+oid *data)
+>      ac->init_machine =3D xen_init;
+>      ac->setup_post =3D xen_setup_post;
+>      ac->allowed =3D &xen_allowed;
+> -    ac->global_props =3D xen_compat_props;
+> +    ac->compat_props =3D g_ptr_array_new();
+> +
+> +    SET_COMPAT(ac, XEN_COMPAT);
 
-/me is wondering why patchew didn't scream at me for breaking 32-bit
-builds.  In the meantime I'll be setting up docker for testing 32-bit
-builds locally.
+I think this is a step backwards.  I like us to be able to
+register compat properties without macro magic.  The existence of
+SET_MACHINE_COMPAT is a bug and not a feature.
 
-Roman.
+If you really want to use GPtrArray instead of a simple
+GlobalProperty* field (I'm not sure I understand the reasoning
+behind the choice to use GPtrArray), what about:
+
+static GPtrArray *build_compat_props_array(GlobalProperty *props)
+{
+    GlobalProperty *p =3D props;
+    GPtrArray *array =3D g_ptr_array_new();
+    while (p->driver) {
+        g_ptr_array_add(array, (void *)p);
+    }
+    return array;
+}
+
+
+static void xen_accel_class_init(ObjectClass *oc, void *data)
+{
+    ...
+    ac->compat_props =3D build_compat_props_array(xen_compat_props);
+}
+
+
+
+>  }
+> =20
+>  #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+> diff --git a/qom/object.c b/qom/object.c
+> index 17921c0a71..dbdab0aead 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -370,6 +370,31 @@ static void object_post_init_with_type(Object *obj=
+, TypeImpl *ti)
+>      }
+>  }
+> =20
+> +void object_apply_global_props(Object *obj, const GPtrArray *props, Er=
+ror **errp)
+> +{
+> +    Error *err =3D NULL;
+> +    int i;
+> +
+> +    if (!props) {
+> +        return;
+> +    }
+> +
+> +    for (i =3D 0; i < props->len; i++) {
+> +        GlobalProperty *p =3D g_ptr_array_index(props, i);
+> +
+> +        if (object_dynamic_cast(obj, p->driver) =3D=3D NULL) {
+> +            continue;
+> +        }
+> +        p->used =3D true;
+> +        object_property_parse(obj, p->value, p->property, &err);
+> +        if (err !=3D NULL) {
+> +            error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+> +                          p->driver, p->property, p->value);
+> +            error_propagate(errp, err);
+> +        }
+> +    }
+> +}
+> +
+>  static void object_initialize_with_type(void *data, size_t size, TypeI=
+mpl *type)
+>  {
+>      Object *obj =3D data;
+> diff --git a/vl.c b/vl.c
+> index fa25d1ae2d..c06e94271c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2963,7 +2963,7 @@ static void user_register_global_props(void)
+>   */
+>  static void register_global_properties(MachineState *ms)
+>  {
+> -    accel_register_compat_props(ms->accelerator);
+> +    accel_register_compat_props(ACCEL_GET_CLASS(ms->accelerator)->comp=
+at_props);
+>      machine_register_compat_props(ms);
+>      user_register_global_props();
+>  }
+> --=20
+> 2.20.0.rc1
+>=20
+>=20
+
+--=20
+Eduardo
