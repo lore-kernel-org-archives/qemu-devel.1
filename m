@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ricardo.perez_blanco@nokia.com>) id 1gRk1B-0001gX-Vf
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:31:42 -0500
+	(envelope-from <ccarrara@redhat.com>) id 1gRk25-0002OT-3w
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:32:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ricardo.perez_blanco@nokia.com>) id 1gRjv1-0007TI-2y
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:25:16 -0500
-From: "Perez Blanco, Ricardo (Nokia - BE/Antwerp)"
-	<ricardo.perez_blanco@nokia.com>
-Date: Tue, 27 Nov 2018 20:25:06 +0000
-Message-ID: <20181127202422.32745-1-ricardo.perez_blanco@nokia.com>
-References: <20181126191454.9455-1-ricardo.perez_blanco@nokia.com>
-In-Reply-To: <20181126191454.9455-1-ricardo.perez_blanco@nokia.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <ccarrara@redhat.com>) id 1gRk21-0003Jq-48
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:32:31 -0500
+Date: Tue, 27 Nov 2018 18:32:05 -0200
+From: Caio Carrara <ccarrara@redhat.com>
+Message-ID: <20181127203204.GB22731@localhost.localdomain>
+References: <20181127105034.21045-1-crosa@redhat.com>
+	<20181127190006.GC22880@localhost.localdomain>
+	<7359977f-3797-d78f-cd1a-a410e30c5357@redhat.com>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2] Allow AArch64 processors to boot from a
- kernel placed over 4GB.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7359977f-3797-d78f-cd1a-a410e30c5357@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] Introduce Python module structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +24,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "ricardoperezblanco@gmail.com" <ricardoperezblanco@gmail.com>
-Cc: "Perez Blanco, Ricardo (Nokia - BE/Antwerp)" <ricardo.perez_blanco@nokia.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-Some machine based on AArch64 can have its main memory over 4GBs. With
-the current path, these machines can support "-kernel" in qemu.
+On Tue, Nov 27, 2018 at 03:02:03PM -0500, Cleber Rosa wrote:
+> 
+> 
+> On 11/27/18 2:00 PM, Caio Carrara wrote:
+> > Hi, Cleber.
+> > 
+> > On Tue, Nov 27, 2018 at 05:50:34AM -0500, Cleber Rosa wrote:
+> >> This is a simple move of Python code that wraps common QEMU
+> >> functionality, and are used by a number of different tests
+> >> and scripts.
+> >>
+> >> By treating that code as a real Python module, we can more easily,
+> >> among other things:
+> >>  * reuse more code
+> >>  * apply a more consistent style
+> >>  * add tests to that code
+> >>  * generate documentation
+> >>
+> >> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> >> ---
+> >>  configure                                  |  1 +
+> >>  scripts/qemu.py => python/qemu/__init__.py | 11 ++++++-----
+> > 
+> > Well, we all know how difficult is to pick up names, but I would avoid
+> > use `python` here. This is the name of python bin itself. Is there any
+> > chance of a clash? I do not have a specific case right now, I'm just
+> > wondering if it can happen we should avoid.
+> > 
+> 
+> The point of the "python" directory, is that it's not supposed to be the
+> *module* name, but a holder for the Python module, which is "qemu".
+> Given that "python is not a module", has no __init__.py, I don't think
+> it'll ever clash.
+> 
+> The reason for picking the name is that it makes it obvious, within the
+> QEMU tree, that this is Python stuff.  I already have some tests, to
+> test the "Python stuff", to put it under "python", probably in
+> "python/tests".
 
-Note that, currently, none of the QEMU machines have their main memory over
-4GBs.
+Ok, now I got your point. No problem.
 
-Signed-off-by: Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>
----
- hw/arm/boot.c | 33 ++++++++++++++++++++-------------
- 1 file changed, 20 insertions(+), 13 deletions(-)
+> 
+> Anyway, it'd be nice to think of alternatives here.
+> 
+> >>  {scripts/qmp => python/qemu}/qmp.py        |  0
+> >>  {scripts => python/qemu}/qtest.py          |  5 +++--
+> >>  scripts/device-crash-test                  |  5 +++++
+> >>  scripts/qmp/__init__.py                    |  0
+> >>  tests/acceptance/avocado_qemu/__init__.py  |  9 +++++----
+> >>  tests/migration/guestperf/engine.py        | 10 +++++++---
+> >>  tests/qemu-iotests/iotests.py              |  8 ++++++--
+> >>  tests/vm/basevm.py                         |  9 +++++++--
+> >>  10 files changed, 40 insertions(+), 18 deletions(-)
+> >>  rename scripts/qemu.py => python/qemu/__init__.py (98%)
+> >>  rename {scripts/qmp => python/qemu}/qmp.py (100%)
+> >>  rename {scripts => python/qemu}/qtest.py (97%)
+> > 
+> > What if we keep `qmp.py` and `qtest.py` directly under `/python`
+> > directory?  It seems it can be more semantic regarding the subject of
+> > each module. I'm not completely sure about `qmp.py`, but definetly I
+> > think qtest should be under python directly.
+> > 
+> 
+> I still think having a uniform starting point for the module, such as
+> "qemu" is a good practice for all QEMU Python code.  Having independent
+> first level modules will make it harder to understand where the code is
+> coming from.  For instance, we have the option of coming up with a
+> structure that would allow:
+> 
+> 
+>  import os
+>  import struct
+>  import qmp
+>  import urllib
+> 
+> 
+> And the origin of "qmp" would go unnoticed.  Alternatively:
+> 
+> 
+>  import os
+>  import struct
+>  import urllib
+>  from qemu import qmp
+> 
+> 
+> Is much clearer.  Now, with regards to "qmp", it's pretty much
+> standalone, uses only Python libraries, while "qemu" consumes "qmp"
+> functionality.  I believe having "qemu.qmp" is appropriate here.
+> 
+> Now, for "qtest", you have a point, it uses QEMUMachine, and its content
+> is very similar to what's available under "qemu" itself (that is,
+> QEMUMachine itself).  IMO, it would make sense to just have the
+> QEMUQtestProtocol and QEMUQtestMachine at the "qemu" level at this
+> point, that is, fold their content into "qemu/__init__.py".
+> 
+> The API usage would then become:
+> 
+> 
+>  from qemu import QEMUQTestMachine
+> 
+> 
+> Similar to:
+> 
+> 
+>  from qemu import QEMUMachine
+> 
+> 
+> I refrained from changing too much at the initial RFC time, though,
+> exactly to make less biased discussions.
 
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index 586baa9b64..2e443c2bd1 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -63,8 +63,10 @@ typedef enum {
-     FIXUP_TERMINATOR,   /* end of insns */
-     FIXUP_BOARDID,      /* overwrite with board ID number */
-     FIXUP_BOARD_SETUP,  /* overwrite with board specific setup code addres=
-s */
--    FIXUP_ARGPTR,       /* overwrite with pointer to kernel args */
--    FIXUP_ENTRYPOINT,   /* overwrite with kernel entry point */
-+    FIXUP_ARGPTR_LO,       /* overwrite with pointer to kernel args */
-+    FIXUP_ARGPTR_HI,       /* overwrite with pointer to kernel args (highe=
-r 32 bits) */
-+    FIXUP_ENTRYPOINT_LO,   /* overwrite with kernel entry point */
-+    FIXUP_ENTRYPOINT_HI,   /* overwrite with kernel entry point (higher 32=
- bits) */
-     FIXUP_GIC_CPU_IF,   /* overwrite with GIC CPU interface address */
-     FIXUP_BOOTREG,      /* overwrite with boot register address */
-     FIXUP_DSB,          /* overwrite with correct DSB insn for cpu */
-@@ -83,10 +85,10 @@ static const ARMInsnFixup bootloader_aarch64[] =3D {
-     { 0xaa1f03e3 }, /* mov x3, xzr */
-     { 0x58000084 }, /* ldr x4, entry ; Load the lower 32-bits of kernel en=
-try */
-     { 0xd61f0080 }, /* br x4      ; Jump to the kernel entry point */
--    { 0, FIXUP_ARGPTR }, /* arg: .word @DTB Lower 32-bits */
--    { 0 }, /* .word @DTB Higher 32-bits */
--    { 0, FIXUP_ENTRYPOINT }, /* entry: .word @Kernel Entry Lower 32-bits *=
-/
--    { 0 }, /* .word @Kernel Entry Higher 32-bits */
-+    { 0, FIXUP_ARGPTR_LO }, /* arg: .word @DTB Lower 32-bits */
-+    { 0, FIXUP_ARGPTR_HI}, /* .word @DTB Higher 32-bits */
-+    { 0, FIXUP_ENTRYPOINT_LO }, /* entry: .word @Kernel Entry Lower 32-bit=
-s */
-+    { 0, FIXUP_ENTRYPOINT_HI }, /* .word @Kernel Entry Higher 32-bits */
-     { 0, FIXUP_TERMINATOR }
- };
-=20
-@@ -106,8 +108,8 @@ static const ARMInsnFixup bootloader[] =3D {
-     { 0xe59f2004 }, /* ldr     r2, [pc, #4] */
-     { 0xe59ff004 }, /* ldr     pc, [pc, #4] */
-     { 0, FIXUP_BOARDID },
--    { 0, FIXUP_ARGPTR },
--    { 0, FIXUP_ENTRYPOINT },
-+    { 0, FIXUP_ARGPTR_LO },
-+    { 0, FIXUP_ENTRYPOINT_LO },
-     { 0, FIXUP_TERMINATOR }
- };
-=20
-@@ -174,8 +176,10 @@ static void write_bootloader(const char *name, hwaddr =
-addr,
-             break;
-         case FIXUP_BOARDID:
-         case FIXUP_BOARD_SETUP:
--        case FIXUP_ARGPTR:
--        case FIXUP_ENTRYPOINT:
-+        case FIXUP_ARGPTR_LO:
-+        case FIXUP_ARGPTR_HI:
-+        case FIXUP_ENTRYPOINT_LO:
-+        case FIXUP_ENTRYPOINT_HI:
-         case FIXUP_GIC_CPU_IF:
-         case FIXUP_BOOTREG:
-         case FIXUP_DSB:
-@@ -1152,9 +1156,11 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_in=
-fo *info)
-             /* Place the DTB after the initrd in memory with alignment. */
-             info->dtb_start =3D QEMU_ALIGN_UP(info->initrd_start + initrd_=
-size,
-                                            align);
--            fixupcontext[FIXUP_ARGPTR] =3D info->dtb_start;
-+            fixupcontext[FIXUP_ARGPTR_LO] =3D info->dtb_start;
-+            fixupcontext[FIXUP_ARGPTR_HI] =3D info->dtb_start >> 32;
-         } else {
--            fixupcontext[FIXUP_ARGPTR] =3D info->loader_start + KERNEL_ARG=
-S_ADDR;
-+            fixupcontext[FIXUP_ARGPTR_LO] =3D info->loader_start + KERNEL_=
-ARGS_ADDR;
-+            fixupcontext[FIXUP_ARGPTR_HI] =3D (info->loader_start + KERNEL=
-_ARGS_ADDR) >> 32;
-             if (info->ram_size >=3D (1ULL << 32)) {
-                 error_report("RAM size must be less than 4GB to boot"
-                              " Linux kernel using ATAGS (try passing a dev=
-ice tree"
-@@ -1162,7 +1168,8 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_inf=
-o *info)
-                 exit(1);
-             }
-         }
--        fixupcontext[FIXUP_ENTRYPOINT] =3D entry;
-+        fixupcontext[FIXUP_ENTRYPOINT_LO] =3D entry;
-+        fixupcontext[FIXUP_ENTRYPOINT_HI] =3D entry >> 32;
-=20
-         write_bootloader("bootloader", info->loader_start,
-                          primary_loader, fixupcontext, as);
---=20
-2.14.1
+Well, I agree with you here. For a first step we shouldn't be changing too
+much the structure. I'm ok moving forward this way for now.
+
+> 
+> 
+> >>  delete mode 100644 scripts/qmp/__init__.py
+> >>
+> >> diff --git a/configure b/configure
+> >> index 0a3c6a72c3..2b64c51009 100755
+> > [...]
+> >> rename from scripts/qemu.py
+> >> rename to python/qemu/__init__.py
+> > [...]
+> >> diff --git a/scripts/qmp/qmp.py b/python/qemu/qmp.py
+> >> similarity index 100%
+> >> rename from scripts/qmp/qmp.py
+> >> rename to python/qemu/qmp.py
+> >> diff --git a/scripts/qtest.py b/python/qemu/qtest.py
+> >> similarity index 97%
+> >> rename from scripts/qtest.py
+> >> rename to python/qemu/qtest.py
+> >> index adf1fe3f26..bff79cdd13 100644
+> >> --- a/scripts/qtest.py
+> >> +++ b/python/qemu/qtest.py
+> > [...]
+> >> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+> >> index e93a7c0c84..c75ae0ecbc 100755
+> >> --- a/scripts/device-crash-test
+> >> +++ b/scripts/device-crash-test
+> >> @@ -35,6 +35,11 @@ import random
+> >>  import argparse
+> >>  from itertools import chain
+> >>  
+> >> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+> >> +TOP_DIR = os.path.dirname(THIS_DIR)
+> >> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
+> >> +sys.path.append(PYTHON_MODULE_PATH)
+> > 
+> > This sys.path handling to use the new QEMU Python module is not good. I
+> > understand it can be a first step, but to expect everyone knows/do it to
+> > use the module is a bad assumption because it's not intuitive and can
+> > cause some confusion.
+> > 
+> > If we need something available from a Python script/module that is not
+> > directly acessible from PYTHONPATH we should install it so Python can
+> > turn it available. So, probably we need to think make `python/qemu` a
+> > proper installable module.
+> >
+> 
+> It's something that is confusing for mode experienced Python developers,
+> but I have some experience with way too many people not understanding at
+> all why an extra step (the module installation), was necessary for using
+> Python code from within a source tree.  We faced a LOT of questions, for
+> a long time, when we did the switch in Avocado itself.
+> 
+> To summarize, you're right about the end goal, and I hope we'll get
+> there and remove this boiler plate code.  But, I think we need an
+> intermediary step.
+> 
+> >> +
+> >>  from qemu import QEMUMachine
+> >>  
+> >>  logger = logging.getLogger('device-crash-test')
+> >> diff --git a/scripts/qmp/__init__.py b/scripts/qmp/__init__.py
+> >> deleted file mode 100644
+> > [...]
+> >> diff --git a/tests/migration/guestperf/engine.py b/tests/migration/guestperf/engine.py
+> >> index 398e3f2706..73c9b66821 100644
+> >> --- a/tests/migration/guestperf/engine.py
+> >> +++ b/tests/migration/guestperf/engine.py
+> >> @@ -24,13 +24,17 @@ import re
+> >>  import sys
+> >>  import time
+> >>  
+> >> -sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'scripts'))
+> >> -import qemu
+> >> -import qmp.qmp
+> >>  from guestperf.progress import Progress, ProgressStats
+> >>  from guestperf.report import Report
+> >>  from guestperf.timings import TimingRecord, Timings
+> >>  
+> >> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+> >> +TOP_DIR = os.path.dirname(os.path.dirname(os.path.dirname(THIS_DIR)))
+> >> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
+> >> +sys.path.append(PYTHON_MODULE_PATH)
+> >> +
+> >> +import qemu
+> > 
+> > Since `qemu` is a common word here, I would rather import the members
+> > directly than only the module. Just like you did in
+> > `/tests/vm/basevm,py`
+> > 
+> 
+> Right, I avoided changing too much of the code using the modules, but I
+> do agree with you here.
+> 
+> Thanks for the feedback!
+> - Cleber.
+> 
+> >> +
+> >>  
+> >>  class Engine(object):
+> >>  
+> >> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> >> index d537538ba0..92fddd2a58 100644
+> >> --- a/tests/qemu-iotests/iotests.py
+> >> +++ b/tests/qemu-iotests/iotests.py
+> >> @@ -31,8 +31,12 @@ import logging
+> > [...]
+> >> --- a/tests/vm/basevm.py
+> >> +++ b/tests/vm/basevm.py
+> >> @@ -17,8 +17,6 @@ import sys
+> >>  import logging
+> >>  import time
+> >>  import datetime
+> >> -sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
+> >> -from qemu import QEMUMachine, kvm_available
+> >>  import subprocess
+> >>  import hashlib
+> >>  import optparse
+> >> @@ -28,6 +26,13 @@ import shutil
+> >>  import multiprocessing
+> >>  import traceback
+> >>  
+> >> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+> >> +TOP_DIR = os.path.dirname(os.path.dirname(THIS_DIR))
+> >> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
+> >> +sys.path.append(PYTHON_MODULE_PATH)
+> >> +
+> >> +from qemu import QEMUMachine, kvm_available
+> >> +
+> >>  SSH_KEY = open(os.path.join(os.path.dirname(__file__),
+> >>                 "..", "keys", "id_rsa")).read()
+> >>  SSH_PUB_KEY = open(os.path.join(os.path.dirname(__file__),
+> >> -- 
+> >> 2.19.1
+> >>
+> > 
+> > Thanks,
+> > 
+> 
+> -- 
+> Cleber Rosa
+> [ Sr Software Engineer - Virtualization Team - Red Hat ]
+> [ Avocado Test Framework - avocado-framework.github.io ]
+> [  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+
+-- 
+Caio Carrara
+Software Engineer, Virt Team - Red Hat
+ccarrara@redhat.com
