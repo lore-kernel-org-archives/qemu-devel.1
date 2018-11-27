@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1gRccR-0005vi-CF
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:36 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gRccT-0005wi-9i
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1gRccM-0007OB-S8
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:34 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:49835)
+	(envelope-from <kraxel@redhat.com>) id 1gRccQ-0007Sj-Fp
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
-	id 1gRccM-0007Mt-EU
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:30 -0500
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
-	20181127123728euoutp02e2e59586e2b08255950b44689441c4e6~q_2iFQhDC1331713317euoutp02L
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 12:37:28 +0000 (GMT)
-From: Ilya Maximets <i.maximets@samsung.com>
-Message-ID: <00227750-5d8e-8375-dd93-b86990a786d8@samsung.com>
-Date: Tue, 27 Nov 2018 15:37:26 +0300
-MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CK_WtcLCg+hi76J6x85zTvYkF1YN7b8hgP4-p-M_4-cag@mail.gmail.com>
-Content-Language: en-GB
-Content-Type: text/plain; charset="utf-8"
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gRccQ-0007Rm-AS
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:34 -0500
+Date: Tue, 27 Nov 2018 13:37:29 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181127123729.m2vwgr2o5o3422ky@sirius.home.kraxel.org>
 References: <CGME20181127111109eucas1p2b1eae35e38e46c3f76c86a350ed41926@eucas1p2.samsung.com>
 	<20181127111050.18453-1-i.maximets@samsung.com>
 	<20181127111050.18453-2-i.maximets@samsung.com>
@@ -29,7 +20,10 @@ References: <CGME20181127111109eucas1p2b1eae35e38e46c3f76c86a350ed41926@eucas1p2
 	<CAJ+F1C+XFs++Q044Y8CvVYFhtNpaEDS8qjx0BjsJN1yukZURkA@mail.gmail.com>
 	<2edee79d-4d23-913a-3536-a8794ee16528@samsung.com>
 	<CAJ+F1CK_WtcLCg+hi76J6x85zTvYkF1YN7b8hgP4-p-M_4-cag@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CK_WtcLCg+hi76J6x85zTvYkF1YN7b8hgP4-p-M_4-cag@mail.gmail.com>
 Subject: Re: [Qemu-devel] [PATCH 1/4] hostmem-memfd: enable seals only if
  supported
 List-Id: <qemu-devel.nongnu.org>
@@ -40,110 +34,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Ilya Maximets <i.maximets@samsung.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 27.11.2018 15:29, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Tue, Nov 27, 2018 at 4:02 PM Ilya Maximets <i.maximets@samsung.com> =
-wrote:
->>
->> On 27.11.2018 15:00, Marc-Andr=C3=A9 Lureau wrote:
->>> Hi
->>> On Tue, Nov 27, 2018 at 3:56 PM Ilya Maximets <i.maximets@samsung.com=
-> wrote:
->>>>
->>>> On 27.11.2018 14:49, Marc-Andr=C3=A9 Lureau wrote:
->>>>> Hi
->>>>> On Tue, Nov 27, 2018 at 3:11 PM Ilya Maximets <i.maximets@samsung.c=
-om> wrote:
->>>>>>
->>>>>> If seals are not supported, memfd_create() will fail.
->>>>>> Furthermore, there is no way to disable it in this case because
->>>>>> '.seal' property is not registered.
->>>>>>
->>>>>> This issue leads to vhost-user-test failures on RHEL 7.2:
->>>>>>
->>>>>>   qemu-system-x86_64: -object memory-backend-memfd,id=3Dmem,size=3D=
-2M,: \
->>>>>>                       failed to create memfd: Invalid argument
->>>>>>
->>>>>> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
->>>>>
->>>>>
->>>>> This will change the default behaviour of memfd backend, and may th=
-us
->>>>> me considered a break.
->>>>
->>>> This will change the default behaviour only on systems without seali=
-ng
->>>> support. But current implementation is broken there anyway and does =
-not
->>>> work.
->>>>
->>>>>
->>>>> Instead, memfd vhost-user-test should skipped (or tuned with
->>>>> sealed=3Dfalse if unsupported)
->>>>
->>>> vhost-user-test is just an example here. In fact memfd could not be
->>>> used at all on system without sealing support. And there is no way
->>>> to disable seals.
->>>
->>> which system supports memfd without sealing?
->>
->> RHEL 7.2. kernel version 3.10.0-327.el7.x86_64
->=20
+  Hi,
+
+> > > which system supports memfd without sealing?
+> >
+> > RHEL 7.2. kernel version 3.10.0-327.el7.x86_64
+> 
 > Correct, it was backported without sealing for some reason.
->=20
-> I would rather have an explicit seal=3Doff argument on such system
+> 
+> I would rather have an explicit seal=off argument on such system
 > (because sealing is expected to be available with memfd in general)
->=20
 
-But '.seal' property registering is guarded by 'qemu_memfd_check(MFD_ALLO=
-W_SEALING)'.
-And you can not disable it:
+Or just drop support for memfd without sealing.
 
-qemu-system-x86_64: -object memory-backend-memfd,seal=3Doff,id=3Dmem,size=
-=3D2M,: Property '.seal' not found
-
-Enabling this option on system that does not support sealing will
-probably break some libvirt feature discovering or something similar.
-
-What about adding some warning to 'memfd_backend_instance_init' if
-sealing not supported before disabling it ?
-
->>
->>>
->>>>
->>>>>
->>>>>> ---
->>>>>>  backends/hostmem-memfd.c | 4 ++--
->>>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>>>>
->>>>>> diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
->>>>>> index b6836b28e5..ee39bdbde6 100644
->>>>>> --- a/backends/hostmem-memfd.c
->>>>>> +++ b/backends/hostmem-memfd.c
->>>>>> @@ -129,8 +129,8 @@ memfd_backend_instance_init(Object *obj)
->>>>>>  {
->>>>>>      HostMemoryBackendMemfd *m =3D MEMORY_BACKEND_MEMFD(obj);
->>>>>>
->>>>>> -    /* default to sealed file */
->>>>>> -    m->seal =3D true;
->>>>>> +    /* default to sealed file if supported */
->>>>>> +    m->seal =3D qemu_memfd_check(MFD_ALLOW_SEALING);
->>>>>>  }
->>>>>>
->>>>>>  static void
->>>>>> --
->>>>>> 2.17.1
->>>>>>
->>>>>
->>>>>
->>>>
->>>
->>>
->=20
->=20
->=20
+cheers,
+  Gerd
