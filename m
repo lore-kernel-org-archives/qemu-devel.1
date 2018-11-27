@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gRiT9-0001vu-Ro
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:52:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1gRiT9-0002Po-To
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:52:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gRiIW-0003OQ-Qn
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:41:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gRiIW-0003Nk-Jf
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:41:24 -0500
-References: <20181115192446.17187-1-minyard@acm.org>
-	<20181115192446.17187-7-minyard@acm.org>
-	<20181126172308.GJ2547@work-vm>
-	<7055e173-6f4f-7954-69c7-47e0f26dfaf6@acm.org>
-	<20181127160144.GB2616@work-vm>
-	<d01dc051-f078-c703-bd19-e1874afdfc33@acm.org>
-	<20181127181448.GC2616@work-vm>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <0b51df6b-d0e1-37a6-be32-a3f052ea9e4b@redhat.com>
-Date: Tue, 27 Nov 2018 19:41:15 +0100
+	(envelope-from <bounces@canonical.com>) id 1gRiI2-0003Ea-0V
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:40:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43938)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gRiI1-0003Dp-Om
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:40:53 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gRiHz-0004vD-67
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 18:40:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 25A4E2E80C0
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 18:40:51 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181127181448.GC2616@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 06/12] boards.h: Ignore migration for
- SMBus devices on older machines
+Date: Tue, 27 Nov 2018 18:26:21 -0000
+From: Igor <generalrot@rambler.ru>
+Reply-To: Bug 1805445 <1805445@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154332864629.32687.7125797278920412825.malonedeb@wampee.canonical.com>
+Message-Id: <154334318180.32121.7503722605509329923.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1805445] Re: QEMU arm virt machine was stopped by
+ STMFD command while debug process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,77 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Corey Minyard <minyard@acm.org>, dgibson@redhat.com
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: qemu-devel@nongnu.org
 
-On 27/11/2018 19:14, Dr. David Alan Gilbert wrote:
-> * Corey Minyard (minyard@acm.org) wrote:
->> On 11/27/18 10:01 AM, Dr. David Alan Gilbert wrote:
->>> * Corey Minyard (minyard@acm.org) wrote:
->>>> On 11/26/18 11:23 AM, Dr. David Alan Gilbert wrote:
->>>>> * minyard@acm.org (minyard@acm.org) wrote:
->>>>>> From: Corey Minyard <cminyard@mvista.com>
-...
->>>> The pm_smbus device is also used by mips fulong.=C2=A0 From what I c=
-an tell, that
->>>> machine doesn't have any concept of backwards compatibility, so it s=
-eemed
->>>> save to no worry about it there.=C2=A0 If it weren't for that, this =
-bool could go
->>>> into the
->>> Yeh that's fine.
->>>
->>> What about the eeprom's are they used more widely?
->>
->> The only other I2C EEPROM I see is hw/nvram/eeprom_at24c.c.=C2=A0 That=
- device is
->> only
->> configured for PPC.=C2=A0 It has a block device backend, too.=C2=A0 Th=
-is is a little
->> annoying
->> because smbus_eeprom.c emulates an at24c02.=C2=A0 It would be nice to =
-only have
->> one of these.
->=20
-> Added in David and Laurent for odd-ppc stuff;  if I'm reading it right
-> it's not used by one of the versioned machines.
+Okey, thank you for attentioned me to arm mode.
+The STR instruction is STR R11, [0x82000012]. Can I set rule for qemu to wr=
+ite RAM from 0x80000000 to 0x8FFFFFFF for execute basic arm instruction, Or=
+ need fix source and rebuild qemu?
 
-Yes, it seems unused.
+I have experience to rebuild source qemu for change spi flash from
+n25q256a to n25q032a11. Do you include to wishlist change flash-chip
+function?
 
-It has been introduced for the mvme31100 machine emulation, by:
+-- =
 
-commit 5d8424dbd3e8335ea3d57f64eaa603c8fc80706f
-Author: Michael Davidsaver <mdavidsaver@gmail.com>
-Date:   Sun Nov 19 21:24:17 2017 -0600
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805445
 
-    nvram: add AT24Cx i2c eeprom
+Title:
+  QEMU arm virt machine was stopped by STMFD command while debug process
 
-    Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
-    Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Status in QEMU:
+  New
 
-from the series:
+Bug description:
+  Hello, i have a big problem with QEMU arm virtual machine. So...
+  I run QEMU machine with bare-metal ThreadX fullflash from Texet TM-333 ph=
+one  (Spreadtrum platform)
+  [CODE]qemu-system-arm -S -gdb tcp::1234,ipv4 -drive file=3DC:\cygwin64\ho=
+me\flash.bin,if=3Dmtd,format=3Draw -M palmetto-bmc -cpu arm926 -m 64M[/CODE]
+  I use palmetto-bmc platform because it have ARM926EJ-S core and support S=
+PI Flash.
+  Then, i attach to gdb qemu process from IDA and run code step-by-step.
+  [IMG]https://pp.userapi.com/c847218/v847218546/13ec1c/iSIcre5-js4.jpg[/IM=
+G]
 
-[00/12] Add MVME3100 PPC SBC
-https://patchwork.ozlabs.org/cover/839400/
+  When the IDA run 00032534 STR R11, [R10] command
+  [IMG]https://pp.userapi.com/c846416/v846416708/133f60/GQzxORvf4Tg.jpg[/IM=
+G]
 
-[12/12] tests: add mvme3100-test=09
-[11/12] ppc: add mvme3100 machine
-[10/12] timer: add ds1375 RTC=09
-[09/12] nvram: add AT24Cx i2c eeprom=09
-[08/12] e500: add mpc8540 i2c controller to ccsr
-[07/12] qtest: add e500_i2c_create()
-[06/12] i2c: add mpc8540 i2c controller
-[05/12] e500: name openpic and pci host bridge
-[04/12] e500: additional CCSR registers
-[03/12] e500: note possible bug with host bridge=09
-[02/12] e500: consolidate mpc8540 guts with e500-ccsr
-[01/12] e500: add board config options
-https://patchwork.ozlabs.org/project/qemu-devel/list/?series=3D14303
+  instead of store R11 on R10 adress, it jump 000328DC STMFD SP!, {R0-R12,L=
+R} instruction...
+  [IMG]https://pp.userapi.com/c847218/v847218546/13ec26/32A0VcaJywg.jpg[/IM=
+G]
+  and virt machine not execute new instruction... =
 
-But the patch adding the machine type has never been commited:
+  [IMG]https://pp.userapi.com/c850624/v850624111/528f3/N7FTpgloWVU.jpg[/IMG]
 
-[11/12] ppc: add mvme3100 machine
-https://patchwork.ozlabs.org/patch/839407/
+  and why i did not change flash from n25q256a to n25q032a11 in aspeed.c
+  without rebuild qemu?
 
-Thanks,
-Laurent
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805445/+subscriptions
