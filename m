@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRRz4-0005f2-Bi
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 20:16:15 -0500
+	(envelope-from <cota@braap.org>) id 1gRRzo-0006B4-WC
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 20:17:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRRz0-0007VN-2f
-	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 20:16:14 -0500
-Date: Tue, 27 Nov 2018 10:48:18 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181126234818.GK2251@umbus.fritz.box>
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-3-clg@kaod.org>
-	<20181122031934.GC10448@umbus.fritz.box>
-	<75cdc1f3-f337-3c37-b234-d96222a370d2@kaod.org>
-	<20181123010852.GT10448@umbus.fritz.box>
-	<8270d5fc-ab20-f47d-37d8-1e2ba179fbfd@kaod.org>
-	<20181126053947.GG2251@umbus.fritz.box>
-	<23a938ba-d2bc-8a9d-07ef-6672a8cc3a93@kaod.org>
+	(envelope-from <cota@braap.org>) id 1gRRzk-0007kQ-3x
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 20:17:00 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:56337)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gRRzj-0007kD-Rp
+	for qemu-devel@nongnu.org; Mon, 26 Nov 2018 20:16:56 -0500
+Date: Mon, 26 Nov 2018 20:16:51 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181127011651.GC22108@flamenco>
+References: <20181025172057.20414-1-cota@braap.org>
+	<20181025172057.20414-13-cota@braap.org>
+	<871s7dhw8t.fsf@linaro.org> <20181124000938.GD17229@flamenco>
+	<87r2f83x06.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rnP2AJ7yb1j09OW/"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <23a938ba-d2bc-8a9d-07ef-6672a8cc3a93@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 02/36] ppc/xive: add support for the LSI
- interrupt sources
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87r2f83x06.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [RFC 12/48] atomic_template: define pre/post macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,185 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
 
-
---rnP2AJ7yb1j09OW/
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Nov 26, 2018 at 12:20:19PM +0100, C=E9dric Le Goater wrote:
-> On 11/26/18 6:39 AM, David Gibson wrote:
-> > On Fri, Nov 23, 2018 at 02:28:35PM +0100, C=E9dric Le Goater wrote:
+On Mon, Nov 26, 2018 at 11:21:13 +0000, Alex Bennée wrote:
+> 
+> Emilio G. Cota <cota@braap.org> writes:
+> 
+> > On Thu, Nov 22, 2018 at 17:12:34 +0000, Alex Bennée wrote:
 > >>
-> >>>>>> +/*
-> >>>>>> + * Returns whether the event notification should be forwarded.
-> >>>>>> + */
-> >>>>>> +static bool xive_source_lsi_trigger(XiveSource *xsrc, uint32_t
-> >>>>>> srcno)
-> >>>>>
-> >>>>> What exactly "trigger" means isn't entirely obvious for an LSI.  Mi=
-ght
-> >>>>> be clearer to have "lsi_assert" and "lsi_deassert" helpers instead.
-> >>>>
-> >>>> This is called only when the interrupt is asserted. So it is a=20
-> >>>> simplified LSI trigger depending only on the 'P' bit.
-> >>>
-> >>> Yes, I see that.  But the result is that while the MSI logic is
-> >>> encapsulated in the MSI trigger function, this leaves the LSI logic
-> >>> split across the trigger function and set_irq() itself. I think it=20
-> >>> would be better to have assert and deassert helpers instead, which
-> >>> handle both the trigger/notification and also the updating of the
-> >>> ASSERTED bit.
+> >> Emilio G. Cota <cota@braap.org> writes:
 > >>
-> >> Something like the xive_source_set_irq_lsi() below ?
-> >=20
-> > Uh.. not exactly what I had in mind, but close enough.
-> >=20
-> > [snip]
-> > +/*
-> >> + * Returns whether the event notification should be forwarded.
-> >> + */
-> >>  static bool xive_source_esb_trigger(XiveSource *xsrc, uint32_t srcno)
-> >>  {
-> >> +    bool notify;
-> >> +
-> >>      assert(srcno < xsrc->nr_irqs);
-> >> =20
-> >> -    return xive_esb_trigger(&xsrc->status[srcno]);
-> >> +    notify =3D xive_esb_trigger(&xsrc->status[srcno]);
-> >> +
-> >> +    if (xive_source_irq_is_lsi(xsrc, srcno) &&
-> >=20
-> > Except that this block can go, since this function is no longer called
-> > for LSIs.
->=20
-> It still can be through the ESB MMIOs, if the guest does a load on the=20
-> trigger page.
-
-Oh, good point.  That makes me rethink all my comments on this matter.
-
-In that case I think your original code was fine, except that I'd
-prefer to see the setting of the ASSERTED bit inside the trigger
-function, instead of in the set_irq() caller.
-
-
->=20
-> C.
->=20
-> =20
-> >=20
-> >> +        xive_source_esb_get(xsrc, srcno) =3D=3D XIVE_ESB_QUEUED) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                      "XIVE: queued an event on LSI IRQ %d\n", srcno);
-> >> +    }
-> >> +
-> >> +    return notify;
-> >>  }
-> >> =20
-> >>  /*
-> >> @@ -103,9 +127,22 @@ static bool xive_source_esb_trigger(Xive
-> >>   */
-> >>  static bool xive_source_esb_eoi(XiveSource *xsrc, uint32_t srcno)
-> >>  {
-> >> +    bool notify;
-> >> +
-> >>      assert(srcno < xsrc->nr_irqs);
-> >> =20
-> >> -    return xive_esb_eoi(&xsrc->status[srcno]);
-> >> +    notify =3D xive_esb_eoi(&xsrc->status[srcno]);
-> >> +
-> >> +    /* LSI sources do not set the Q bit but they can still be
-> >> +     * asserted, in which case we should forward a new event
-> >> +     * notification
-> >> +     */
-> >> +    if (xive_source_irq_is_lsi(xsrc, srcno)) {
-> >> +        bool level =3D xsrc->status[srcno] & XIVE_STATUS_ASSERTED;
-> >> +        notify =3D xive_source_set_irq_lsi(xsrc, srcno, level);
-> >> +    }
-> >> +
-> >> +    return notify;
-> >>  }
-> >> =20
-> >>  /*
-> >> @@ -268,8 +305,12 @@ static void xive_source_set_irq(void *op
-> >>      XiveSource *xsrc =3D XIVE_SOURCE(opaque);
-> >>      bool notify =3D false;
-> >> =20
-> >> -    if (val) {
-> >> -        notify =3D xive_source_esb_trigger(xsrc, srcno);
-> >> +    if (xive_source_irq_is_lsi(xsrc, srcno)) {
-> >> +        notify =3D xive_source_set_irq_lsi(xsrc, srcno, val);
-> >> +    } else {
-> >> +        if (val) {
-> >> +            notify =3D xive_source_esb_trigger(xsrc, srcno);
-> >> +        }
-> >>      }
-> >> =20
-> >>      /* Forward the source event notification for routing */
-> >> @@ -289,9 +330,11 @@ void xive_source_pic_print_info(XiveSour
-> >>              continue;
-> >>          }
-> >> =20
-> >> -        monitor_printf(mon, "  %08x %c%c\n", i + offset,
-> >> +        monitor_printf(mon, "  %08x %s %c%c%c\n", i + offset,
-> >> +                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : "MSI=
-",
-> >>                         pq & XIVE_ESB_VAL_P ? 'P' : '-',
-> >> -                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
-> >> +                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
-> >> +                       xsrc->status[i] & XIVE_STATUS_ASSERTED ? 'A' :=
- ' ');
-> >>      }
-> >>  }
-> >> =20
-> >> @@ -299,6 +342,8 @@ static void xive_source_reset(DeviceStat
-> >>  {
-> >>      XiveSource *xsrc =3D XIVE_SOURCE(dev);
-> >> =20
-> >> +    /* Do not clear the LSI bitmap */
-> >> +
-> >>      /* PQs are initialized to 0b01 which corresponds to "ints off" */
-> >>      memset(xsrc->status, 0x1, xsrc->nr_irqs);
-> >>  }
-> >> @@ -324,6 +369,7 @@ static void xive_source_realize(DeviceSt
-> >>                                       xsrc->nr_irqs);
-> >> =20
-> >>      xsrc->status =3D g_malloc0(xsrc->nr_irqs);
-> >> +    xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
-> >> =20
-> >>      memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
-> >>                            &xive_source_esb_ops, xsrc, "xive.esb",
+> >> > In preparation for plugin support.
+> >> >
+> >> > Signed-off-by: Emilio G. Cota <cota@braap.org>
 > >>
-> >=20
->=20
+> >> More macros for the macro-god. I guess this works but I wonder if it's
+> >> possible to do a clean-up ala softfloat and the experimental softmmu
+> >> re-factor that makes this less a mess of macros?
+> >
+> > Heh, point taken.
+> >
+> > I'll try to fix this once (and if!) the series graduates from RFC
+> > to proper patchset. BTW I'm planning to pick rth's softfloat
+> > cleanup soon, so that should help.
+> 
+> Yeah I was in the middle of re-spinning the softmmu demacro patches but
+> ran into a bug I didn't get time to track down. I'll get it re-spun once
+> I've finished going through this.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Nice!
 
---rnP2AJ7yb1j09OW/
-Content-Type: application/pgp-signature; name="signature.asc"
+> I assume the rth's softfloat cleanup is for hardfloat support? I stand
+> ready to review the next version. We should get it in well before the
+> 4.0 soft freeze (next release).
 
------BEGIN PGP SIGNATURE-----
+Yes I meant hardfloat, not softfloat :P
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv8hkAACgkQbDjKyiDZ
-s5I5Pw/9HRATJIgI8WxK+BpNN4TyHEgixsa2cKP6li3VToJneRf0qkWiehOHLms0
-miVG/O/GAXovQIc3KhZHUmbTEXLviAY0Ntmmi2PZlJ8EXtREp+dEgtZRWakV4hoc
-sG1oAJGmuxsGxIn1cTnF4bDq4rvhOTXv0PVtLRNb9ijknQ5lsXDEFnpmw7qxSPgP
-U9AheQvj4PzkjDkmcIwqraIhBvPpr6LErpz30SV3m4/jPya2XR30xAJYVvZ+IQId
-dRJzPuD5BKcXKmRyMf6WQtrT3hLmM2PEgTUf1hXqIbGJQ8wnmcbpZMt7Dw3vbTWP
-5HMvrfSvsBnspawIknSBuzze8TrD2ezbUZx4DqEixxrgemSIx1O8OkcqqqXRiIFn
-mhlpRG263UyFFWrzokOCF8cI3dHIKD0pgzgQ8op8KdOPLRS6LDjZuaQTiJZP61XB
-hOXQe08/7GxhsLnJvH0m7Fz3G/JhjTCwpRJetq+pCvRGjriwXYrZ229/TycNUYCi
-kuCjkgaoJ/p5ffrcGRMkl5nHGcicxy+CVQEukOIUUFX1hV8GlFMRg2cXAW7G8D/8
-aHVdnqw9qJqbW23yWeqVB4Kp3FzxvENkh8KTqX2rNZEZspuksvllFZJt1vak1T7L
-jhj6+cmBz+dsBU4001UUEsuJunbA5UU2PY624LSHh70Q7vdpYN8=
-=A+3S
------END PGP SIGNATURE-----
+I submitted v6 over the weekend. You'll be happy to hear that after
+applying rth's cleanups, the series only has four macros left,
+the largest of which only takes 8 lines :-)
 
---rnP2AJ7yb1j09OW/--
+		Emilio
