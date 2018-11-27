@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bijan.mottahedeh@oracle.com>) id 1gRkZy-0003PV-Qs
+	(envelope-from <prvs=862abf4e0=Alistair.Francis@wdc.com>)
+	id 1gRka0-0003Py-HU
 	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:07:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bijan.mottahedeh@oracle.com>) id 1gRkZv-0003mT-KB
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:07:34 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:44366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bijan.mottahedeh@oracle.com>)
-	id 1gRkZv-0003mD-B8
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:07:31 -0500
-From: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Date: Tue, 27 Nov 2018 13:07:16 -0800
-Message-Id: <1543352837-21529-2-git-send-email-bijan.mottahedeh@oracle.com>
-In-Reply-To: <1543352837-21529-1-git-send-email-bijan.mottahedeh@oracle.com>
-References: <1543352837-21529-1-git-send-email-bijan.mottahedeh@oracle.com>
-Subject: [Qemu-devel] [RFC QEMU v2 1/2] arm/virt: Initialize generic timer
- scale factor dynamically
+	(envelope-from <prvs=862abf4e0=Alistair.Francis@wdc.com>)
+	id 1gRkZx-0003nq-BK
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:07:36 -0500
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Tue, 27 Nov 2018 21:07:30 +0000
+Message-ID: <373429c7267117de35a56c6ec16405f5097b40c8.1543352682.git.alistair.francis@wdc.com>
+References: <cover.1543352682.git.alistair.francis@wdc.com>
+In-Reply-To: <cover.1543352682.git.alistair.francis@wdc.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: [Qemu-devel] [RFC v2 06/24] riscv: Add the tcg target registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,152 +25,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kvmarm@lists.cs.columbia.edu
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>
 
-Initialize the generic timer scale factor based on the counter frequency
-register cntfrq_el0, and default to the current static value if necessary.
-Always use the default value for TCG.
-
-Signed-off-by: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Michael Clark <mjc@sifive.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/arm/virt.c          | 17 +++++++++++++++++
- target/arm/helper.c    | 19 ++++++++++++++++---
- target/arm/internals.h |  8 ++++++--
- target/arm/kvm64.c     |  1 +
- 4 files changed, 40 insertions(+), 5 deletions(-)
+ tcg/riscv/tcg-target.inc.c | 116 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 116 insertions(+)
+ create mode 100644 tcg/riscv/tcg-target.inc.c
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 281ddcd..792d223 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -59,6 +59,7 @@
- #include "qapi/visitor.h"
- #include "standard-headers/linux/input.h"
- #include "hw/arm/smmuv3.h"
-+#include "target/arm/internals.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1710,6 +1711,21 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-     return NULL;
- }
- 
-+static void set_system_clock_scale(void)
-+{
-+    unsigned long cntfrq_el0 = 0;
+diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
+new file mode 100644
+index 0000000000..a4a1579440
+--- /dev/null
++++ b/tcg/riscv/tcg-target.inc.c
+@@ -0,0 +1,116 @@
++/*
++ * Tiny Code Generator for QEMU
++ *
++ * Copyright (c) 2018 SiFive, Inc
++ * Copyright (c) 2008-2009 Arnaud Patard <arnaud.patard@rtp-net.org>
++ * Copyright (c) 2009 Aurelien Jarno <aurelien@aurel32.net>
++ * Copyright (c) 2008 Fabrice Bellard
++ *
++ * Based on i386/tcg-target.c and mips/tcg-target.c
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a=
+ copy
++ * of this software and associated documentation files (the "Software"), t=
+o deal
++ * in the Software without restriction, including without limitation the r=
+ights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
+ll
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included=
+ in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
+ OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
+,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
+HER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
+ FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
+IN
++ * THE SOFTWARE.
++ */
 +
-+#ifdef  CONFIG_KVM
-+    asm volatile("mrs %0, cntfrq_el0" : "=r"(cntfrq_el0));
++#ifdef CONFIG_DEBUG_TCG
++static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] =3D {
++    "zero",
++    "ra",
++    "sp",
++    "gp",
++    "tp",
++    "t0",
++    "t1",
++    "t2",
++    "s0",
++    "s1",
++    "a0",
++    "a1",
++    "a2",
++    "a3",
++    "a4",
++    "a5",
++    "a6",
++    "a7",
++    "s2",
++    "s3",
++    "s4",
++    "s5",
++    "s6",
++    "s7",
++    "s8",
++    "s9",
++    "s10",
++    "s11",
++    "t3",
++    "t4",
++    "t5",
++    "t6"
++};
 +#endif
 +
-+    if (cntfrq_el0 == 0) {
-+        cntfrq_el0 = GTIMER_SCALE_DEF;
-+    }
++static const int tcg_target_reg_alloc_order[] =3D {
++    /* Call saved registers */
++    /* TCG_REG_S0 reservered for TCG_AREG0 */
++    TCG_REG_S1,
++    TCG_REG_S2,
++    TCG_REG_S3,
++    TCG_REG_S4,
++    TCG_REG_S5,
++    TCG_REG_S6,
++    TCG_REG_S7,
++    TCG_REG_S8,
++    TCG_REG_S9,
++    TCG_REG_S10,
++    TCG_REG_S11,
 +
-+    system_clock_scale = NANOSECONDS_PER_SECOND / (int)cntfrq_el0;
-+}
++    /* Call clobbered registers */
++    TCG_REG_T0,
++    TCG_REG_T1,
++    TCG_REG_T2,
++    TCG_REG_T3,
++    TCG_REG_T4,
++    TCG_REG_T5,
++    TCG_REG_T6,
 +
- static void virt_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -1736,6 +1752,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-     hc->plug = virt_machine_device_plug_cb;
-+    set_system_clock_scale();
- }
- 
- static const TypeInfo virt_machine_info = {
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 66afb08..6330586 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -18,6 +18,7 @@
- #include "sysemu/kvm.h"
- #include "fpu/softfloat.h"
- #include "qemu/range.h"
-+#include "hw/arm/arm.h"
- 
- #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
- 
-@@ -1614,6 +1615,18 @@ static CPAccessResult gt_cntfrq_access(CPUARMState *env, const ARMCPRegInfo *ri,
-     return CP_ACCESS_OK;
- }
- 
-+static void gt_cntfrq_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    assert(GTIMER_SCALE);
-+    assert(ri->fieldoffset);
++    /* Argument registers */
++    TCG_REG_A0,
++    TCG_REG_A1,
++    TCG_REG_A2,
++    TCG_REG_A3,
++    TCG_REG_A4,
++    TCG_REG_A5,
++    TCG_REG_A6,
++    TCG_REG_A7,
++};
 +
-+    if (cpreg_field_is_64bit(ri)) {
-+        CPREG_FIELD64(env, ri) = NANOSECONDS_PER_SECOND / GTIMER_SCALE;
-+    } else {
-+        CPREG_FIELD32(env, ri) = NANOSECONDS_PER_SECOND / GTIMER_SCALE;
-+    }
-+}
++static const int tcg_target_call_iarg_regs[] =3D {
++    TCG_REG_A0,
++    TCG_REG_A1,
++    TCG_REG_A2,
++    TCG_REG_A3,
++    TCG_REG_A4,
++    TCG_REG_A5,
++    TCG_REG_A6,
++    TCG_REG_A7,
++};
 +
- static CPAccessResult gt_counter_access(CPUARMState *env, int timeridx,
-                                         bool isread)
- {
-@@ -1709,7 +1722,7 @@ static CPAccessResult gt_stimer_access(CPUARMState *env,
-     }
- }
- 
--static uint64_t gt_get_countervalue(CPUARMState *env)
-+uint64_t gt_get_countervalue(CPUARMState *env)
- {
-     return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) / GTIMER_SCALE;
- }
-@@ -1996,7 +2009,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 0,
-       .access = PL1_RW | PL0_R, .accessfn = gt_cntfrq_access,
-       .fieldoffset = offsetof(CPUARMState, cp15.c14_cntfrq),
--      .resetvalue = (1000 * 1000 * 1000) / GTIMER_SCALE,
-+      .resetfn = gt_cntfrq_reset,
-     },
-     /* overall control: mostly access permissions */
-     { .name = "CNTKCTL", .state = ARM_CP_STATE_BOTH,
-@@ -2187,7 +2200,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 0,
-       .type = ARM_CP_CONST, .access = PL0_R /* no PL1_RW in linux-user */,
-       .fieldoffset = offsetof(CPUARMState, cp15.c14_cntfrq),
--      .resetvalue = NANOSECONDS_PER_SECOND / GTIMER_SCALE,
-+      .resetfn = gt_cntfrq_reset,
-     },
-     { .name = "CNTVCT_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 2,
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index dc93577..b66a1fa 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -52,9 +52,13 @@ static inline bool excp_is_internal(int excp)
- }
- 
- /* Scale factor for generic timers, ie number of ns per tick.
-- * This gives a 62.5MHz timer.
-+ * Calculated dynamically based on CNTFRQ with a default value
-+ * that gives a 62.5MHZ timer.
-  */
--#define GTIMER_SCALE 16
-+#define GTIMER_SCALE        system_clock_scale
-+#define GTIMER_SCALE_DEF    16
-+
-+uint64_t gt_get_countervalue(CPUARMState *);
- 
- /* Bit definitions for the v7M CONTROL register */
- FIELD(V7M_CONTROL, NPRIV, 0, 1)
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index e0b8246..5d1c394 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -485,6 +485,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-     set_feature(&features, ARM_FEATURE_NEON);
-     set_feature(&features, ARM_FEATURE_AARCH64);
-     set_feature(&features, ARM_FEATURE_PMU);
-+    set_feature(&features, ARM_FEATURE_GENERIC_TIMER);
- 
-     ahcf->features = features;
- 
--- 
-1.8.3.1
++static const int tcg_target_call_oarg_regs[] =3D {
++    TCG_REG_A0,
++    TCG_REG_A1,
++};
+--=20
+2.19.1
