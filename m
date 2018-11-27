@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1gRdw2-0003oy-8V
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:02:01 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gRdx5-0005Sy-Lm
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:03:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1gRdvw-00053j-9c
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:01:54 -0500
-Date: Tue, 27 Nov 2018 15:01:22 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20181127140122.GE20151@toto>
-References: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<154332395124.541746.2870681084595831920.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gRdx0-0003u4-D3
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:02:59 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42028)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gRdx0-0003mC-10
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:02:54 -0500
+Received: by mail-oi1-x241.google.com with SMTP id w13so19304217oiw.9
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 06:02:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <154332395124.541746.2870681084595831920.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 5/9] ppc440_bamboo: use g_new(T,
- n) instead of g_malloc(sizeof(T) * n)
+References: <20181127064932.7299-1-kraxel@redhat.com>
+In-Reply-To: <20181127064932.7299-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Nov 2018 14:02:41 +0000
+Message-ID: <CAFEAcA8e9duWheN3xApCFDwoa2++swCn6LVs+zei+iiWk3sfbQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/6] Fixes 31 20181127 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Nov 27, 2018 at 02:05:51PM +0100, Greg Kurz wrote:
-> Because it is a recommended coding practice (see HACKING).
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+On Tue, 27 Nov 2018 at 06:51, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit 5298f4d67a911dd9cefa4c4185eed242074d64c2:
+>
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2018-11-23 08:54:52 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/fixes-31-20181127-pull-request
+>
+> for you to fetch changes up to e1ca8f7e1915496148f6e0ce1f7c2309af013312:
+>
+>   qapi: add query-display-options command (2018-11-27 07:47:57 +0100)
+>
+> ----------------------------------------------------------------
+> various bugfixes for 3.1: fmops, ps2, cirrus, hda, usb-host, qapi
+>
+> ----------------------------------------------------------------
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Applied, thanks.
 
-
-> ---
->  hw/ppc/ppc440_bamboo.c |    5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-> index f5720f979e42..b8aa55d52669 100644
-> --- a/hw/ppc/ppc440_bamboo.c
-> +++ b/hw/ppc/ppc440_bamboo.c
-> @@ -169,8 +169,7 @@ static void bamboo_init(MachineState *machine)
->      unsigned int pci_irq_nrs[4] = { 28, 27, 26, 25 };
->      MemoryRegion *address_space_mem = get_system_memory();
->      MemoryRegion *isa = g_new(MemoryRegion, 1);
-> -    MemoryRegion *ram_memories
-> -        = g_malloc(PPC440EP_SDRAM_NR_BANKS * sizeof(*ram_memories));
-> +    MemoryRegion *ram_memories = g_new(MemoryRegion, PPC440EP_SDRAM_NR_BANKS);
->      hwaddr ram_bases[PPC440EP_SDRAM_NR_BANKS];
->      hwaddr ram_sizes[PPC440EP_SDRAM_NR_BANKS];
->      qemu_irq *pic;
-> @@ -200,7 +199,7 @@ static void bamboo_init(MachineState *machine)
->      ppc_dcr_init(env, NULL, NULL);
->  
->      /* interrupt controller */
-> -    irqs = g_malloc0(sizeof(qemu_irq) * PPCUIC_OUTPUT_NB);
-> +    irqs = g_new0(qemu_irq, PPCUIC_OUTPUT_NB);
->      irqs[PPCUIC_OUTPUT_INT] = ((qemu_irq *)env->irq_inputs)[PPC40x_INPUT_INT];
->      irqs[PPCUIC_OUTPUT_CINT] = ((qemu_irq *)env->irq_inputs)[PPC40x_INPUT_CINT];
->      pic = ppcuic_init(env, irqs, 0x0C0, 0, 1);
-> 
+-- PMM
