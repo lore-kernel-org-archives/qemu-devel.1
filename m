@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1gRaSW-0004DD-Mr
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 05:19:17 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gRaTo-0004tp-2s
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 05:20:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <darren.kenny@oracle.com>) id 1gRaST-0004Ez-I1
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 05:19:12 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:55572)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
-	id 1gRaSS-0004Cy-L2
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 05:19:08 -0500
-Date: Tue, 27 Nov 2018 10:18:44 +0000
-From: Darren Kenny <darren.kenny@oracle.com>
-Message-ID: <20181127101844.izug3qgjbleg3hlw@starbug-mbp.local>
-References: <1543312923-3074-1-git-send-email-liq3ea@gmail.com>
-	<1543312923-3074-2-git-send-email-liq3ea@gmail.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1gRaTl-0004qM-UA
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 05:20:32 -0500
+Date: Tue, 27 Nov 2018 16:07:36 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181127050736.GN2251@umbus.fritz.box>
+References: <20181116105729.23240-1-clg@kaod.org>
+	<20181116105729.23240-8-clg@kaod.org>
+	<20181123050858.GA10448@umbus.fritz.box>
+	<8f6de3b8-b1df-f5e6-cfd8-aeca93a521b6@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="/TUrtqMIkCP4YtJm"
 Content-Disposition: inline
-In-Reply-To: <1543312923-3074-2-git-send-email-liq3ea@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] hw: pc: use TYPE_XXX instead of
- constant strings
+In-Reply-To: <8f6de3b8-b1df-f5e6-cfd8-aeca93a521b6@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 07/36] ppc/xive: introduce the XIVE
+ interrupt thread context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +27,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, armbru@redhat.com, ehabkost@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Tue, Nov 27, 2018 at 02:02:02AM -0800, Li Qiang wrote:
->TYPE_VMMOUSE is defined in vmmouse.c currently, move it
->to pc.h in order to use it in pc.c.
->
->Signed-off-by: Li Qiang <liq3ea@gmail.com>
 
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+--/TUrtqMIkCP4YtJm
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->---
->
->Change since v1: remove the unnecessary change
->
-> hw/i386/pc.c         | 6 +++---
-> hw/i386/vmmouse.c    | 1 -
-> include/hw/i386/pc.h | 3 +++
-> 3 files changed, 6 insertions(+), 4 deletions(-)
->
->diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->index f095725dba..73c7b777a0 100644
->--- a/hw/i386/pc.c
->+++ b/hw/i386/pc.c
->@@ -1543,10 +1543,10 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
->         fdctrl_init_isa(isa_bus, fd);
->     }
->
->-    i8042 = isa_create_simple(isa_bus, "i8042");
->+    i8042 = isa_create_simple(isa_bus, TYPE_I8042);
->     if (!no_vmport) {
->         vmport_init(isa_bus);
->-        vmmouse = isa_try_create(isa_bus, "vmmouse");
->+        vmmouse = isa_try_create(isa_bus, TYPE_VMMOUSE);
->     } else {
->         vmmouse = NULL;
->     }
->@@ -1555,7 +1555,7 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
->         qdev_prop_set_ptr(dev, "ps2_mouse", i8042);
->         qdev_init_nofail(dev);
->     }
->-    port92 = isa_create_simple(isa_bus, "port92");
->+    port92 = isa_create_simple(isa_bus, TYPE_PORT92);
->
->     a20_line = qemu_allocate_irqs(handle_a20_line_change, first_cpu, 2);
->     i8042_setup_a20_line(i8042, a20_line[0]);
->diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
->index 5d2d278be4..4412eaf604 100644
->--- a/hw/i386/vmmouse.c
->+++ b/hw/i386/vmmouse.c
->@@ -52,7 +52,6 @@
-> #define DPRINTF(fmt, ...) do { } while (0)
-> #endif
->
->-#define TYPE_VMMOUSE "vmmouse"
-> #define VMMOUSE(obj) OBJECT_CHECK(VMMouseState, (obj), TYPE_VMMOUSE)
->
-> typedef struct VMMouseState
->diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
->index 136fe497b6..c708ac9265 100644
->--- a/include/hw/i386/pc.h
->+++ b/include/hw/i386/pc.h
->@@ -169,6 +169,9 @@ void gsi_handler(void *opaque, int n, int level);
-> #define TYPE_VMPORT "vmport"
-> typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
->
->+/* vmmouse.c */
->+#define TYPE_VMMOUSE "vmmouse"
->+
-> static inline void vmport_init(ISABus *bus)
-> {
->     isa_create_simple(bus, TYPE_VMPORT);
->-- 
->2.11.0
->
->
+On Sun, Nov 25, 2018 at 09:35:08PM +0100, C=E9dric Le Goater wrote:
+> On 11/23/18 6:08 AM, David Gibson wrote:
+> > On Fri, Nov 16, 2018 at 11:57:00AM +0100, C=E9dric Le Goater wrote:
+> >> Each POWER9 processor chip has a XIVE presenter that can generate four
+> >> different exceptions to its threads:
+> >>
+> >>   - hypervisor exception,
+> >>   - O/S exception
+> >>   - Event-Based Branch (EBB)
+> >>   - msgsnd (doorbell).
+> >>
+> >> Each exception has a state independent from the others called a Thread
+> >> Interrupt Management context. This context is a set of registers which
+> >> lets the thread handle priority management and interrupt acknowledgment
+> >> among other things. The most important ones being :
+> >>
+> >>   - Interrupt Priority Register  (PIPR)
+> >>   - Interrupt Pending Buffer     (IPB)
+> >>   - Current Processor Priority   (CPPR)
+> >>   - Notification Source Register (NSR)
+> >>
+> >> These registers are accessible through a specific MMIO region, called
+> >> the Thread Interrupt Management Area (TIMA), four aligned pages, each
+> >> exposing a different view of the registers. First page (page address
+> >> ending in 0b00) gives access to the entire context and is reserved for
+> >> the ring 0 security monitor. The second (page address ending in 0b01)
+> >> is for the hypervisor, ring 1. The third (page address ending in 0b10)
+> >> is for the operating system, ring 2. The fourth (page address ending
+> >> in 0b11) is for user level, ring 3.
+> >>
+> >> The thread interrupt context is modeled with a XiveTCTX object
+> >> containing the values of the different exception registers. The TIMA
+> >> region is mapped at the same address for each CPU.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  include/hw/ppc/xive.h      |  36 +++
+> >>  include/hw/ppc/xive_regs.h |  82 +++++++
+> >>  hw/intc/xive.c             | 443 +++++++++++++++++++++++++++++++++++++
+> >>  3 files changed, 561 insertions(+)
+> >>
+> >> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> >> index 24301bf2076d..5987f26ddb98 100644
+> >> --- a/include/hw/ppc/xive.h
+> >> +++ b/include/hw/ppc/xive.h
+> >> @@ -238,4 +238,40 @@ typedef struct XiveENDSource {
+> >>  void xive_end_reset(XiveEND *end);
+> >>  void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor =
+*mon);
+> >> =20
+> >> +/*
+> >> + * XIVE Thread interrupt Management (TM) context
+> >> + */
+> >> +
+> >> +#define TYPE_XIVE_TCTX "xive-tctx"
+> >> +#define XIVE_TCTX(obj) OBJECT_CHECK(XiveTCTX, (obj), TYPE_XIVE_TCTX)
+> >> +
+> >> +/*
+> >> + * XIVE Thread interrupt Management register rings :
+> >> + *
+> >> + *   QW-0  User       event-based exception state
+> >> + *   QW-1  O/S        OS context for priority management, interrupt a=
+cks
+> >> + *   QW-2  Pool       hypervisor context for virtual processor being =
+dispatched
+> >> + *   QW-3  Physical   for the security monitor to manage the entire c=
+ontext
+> >=20
+> > That last description is misleading, AIUI the hypervisor can and does
+> > make use of the physical ring as well as the pool ring.
+>=20
+> yes. The description is from the spec. I will rephrase.=20
+>=20
+> >=20
+> >> + */
+> >> +#define TM_RING_COUNT           4
+> >> +#define TM_RING_SIZE            0x10
+> >> +
+> >> +typedef struct XiveTCTX {
+> >> +    DeviceState parent_obj;
+> >> +
+> >> +    CPUState    *cs;
+> >> +    qemu_irq    output;
+> >> +
+> >> +    uint8_t     regs[TM_RING_COUNT * TM_RING_SIZE];
+> >=20
+> > I'm a bit dubious about representing the state with a full buffer like
+> > this.  Isn't a fair bit of this space reserved or derived values which
+> > aren't backed by real state?
+>=20
+> Under sPAPR only the TM_QW1_OS ring is accessed but the TM_QW0_USER=20
+> will also be when we support EBB.
+>=20
+> When running under the PowerNV machine, all rings could be accessed.
+> Today only 2 and 3 are.
+
+It's not the fact that all rings are exposed that I'm talking about.
+What I mean is that some of the logical register address space isn't
+actually by actually modifiable registers.  For example the HW CAM
+bits are hardwired to a value which can be derived from elsewhere.
+Likewise the "highest pending priority" register or whatever it's
+called is AFAICT calculated on read from the CPPR and IPB.
+
+So the thing I'm questioning is having actual storage bytes associated
+with logical registers which are actually derived from other state.
+
+> It seemed correct to expose all registers under the thread interrupt
+> context model and filter the accesses with the TIMA. It fits the HW
+> well.
+
+> >> +
+> >> +    XiveRouter  *xrtr;
+> >=20
+> > What's this for?  AFAIK a TCTX isn't associated with a particular
+> > routing unit.
+>=20
+> I should have added the pointer in patch 11 where it is used. This is=20
+> to let the sPAPR XIVE controller model reset the OS CAM line with the=20
+> VP identifier.
+
+> The TCTX belong to the IVPE XIVE subengine and as the IVRE and IVPE are=
+=20
+> modeled under the XiveRouter, it's not suprising to see this '*xrtr'=20
+> back pointer. But I agree we might not need.  Let's talk about it when=20
+> you reach patch 11.
+
+Ok.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--/TUrtqMIkCP4YtJm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv80RYACgkQbDjKyiDZ
+s5LXMxAAqAwal56hycPrdpD9Mtbzdq2lybkOBqPSdyKb7NofhERxFCTjPqTOK5ti
+V1fwTS57957FZ4jECuj2WxqvEYGdT1EUfVZEG3ffsFMDnsDrmmlhtxjzcKFsLi0n
+40jmM2xXwQzl6AL0N2xCWnpA0RkZedXpnjPKpE/CNp2hMVkcXbucFavQBd7kIYnV
+ceQA8CDrgzoRQc9bzBWydiU80qgDrS9yEvq4XGNxwAJADSgvNhoimJ92tO6EotRU
+UEzv14Hmi5jLOEdRg5ESJE8uKQ1UoK8BnFXS70FAIkQbxst4zskTmKWBukQYWGOz
+qYlpnM2sCOrlR0pA49IuszvmD2QAU+BG9MxYyXLuUal/4md0JZSVaqdotpSuQXqr
+IW//QtHGBJCE49n5L8YPYn2CKX73jiLdRPIORhx0JRunJhSSPaKiXJ6fGJbMuNEQ
+5CWdZ4doGEMEJT/aL+YkpTDDk0VIQK5EBtt4b1pbmuTe0fw3H070DdQnlDKz+yZj
+phtHFwo3xgH98kqVYKe5+e840AQdirSUlQOWvWVTTu9SAZM5hf9a/KqTHrXRPv9R
+wjss1ro7x6Rk6VKW8KUQLfJutzTZHO/op95VKay1qRaKvLXt2bdevV0Wobh8GWWM
+3/TkqPWezbARdrQEsJ3RQt8ajoeOBuiF9RhCf4c4ayDkvq+imhA=
+=+je3
+-----END PGP SIGNATURE-----
+
+--/TUrtqMIkCP4YtJm--
