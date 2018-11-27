@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gRZDY-0004Ob-Um
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 03:59:44 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gRZGA-0006G4-BD
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:02:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gRZDS-000445-Jj
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 03:59:40 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181125205000.10324-1-philmd@redhat.com>
-	<20181125205000.10324-26-philmd@redhat.com>
-	<5fedf421-a138-041a-638b-98f3fd3ffeef@redhat.com>
-Date: Tue, 27 Nov 2018 09:59:24 +0100
-In-Reply-To: <5fedf421-a138-041a-638b-98f3fd3ffeef@redhat.com> (Thomas Huth's
-	message of "Tue, 27 Nov 2018 08:26:53 +0100")
-Message-ID: <87h8g2uc9f.fsf@dusky.pond.sub.org>
+	(envelope-from <pbonzini@redhat.com>) id 1gRZG4-0006be-Dh
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:02:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44646)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gRZG4-0006aP-6B
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:02:16 -0500
+References: <20181126152836.25379-1-rkagan@virtuozzo.com>
+	<a0ce0395-576b-8175-67ad-7116d021e39e@redhat.com>
+	<20181126210021.GS18284@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fa54a6d9-c4c0-1522-674d-aec424eee6fe@redhat.com>
+Date: Tue, 27 Nov 2018 10:02:10 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181126210021.GS18284@habkost.net>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.1 25/25] MAINTAINERS: Remove
- duplicate entries of qemu-devel@nongnu.org
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/hyperv: fix NULL dereference with
+ pure-kvm SynIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Roman Kagan <rkagan@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Thomas Huth <thuth@redhat.com> writes:
+On 26/11/18 22:00, Eduardo Habkost wrote:
+> On Mon, Nov 26, 2018 at 06:13:49PM +0100, Paolo Bonzini wrote:
+>> On 26/11/18 16:28, Roman Kagan wrote:
+>>> When started in compat configuration of SynIC, e.g.
+>>>
+>>> qemu-system-x86_64 -machine pc-i440fx-2.10,accel=kvm \
+>>>  -cpu host,-vmx,hv-relaxed,hv_spinlocks=0x1fff,hv-vpindex,hv-synic
+>>>
+>>> or explicitly
+>>>
+>>> qemu-system-x86_64 -enable-kvm -cpu host,hv-synic,x-hv-synic-kvm-only=on
+>>>
+>>> QEMU crashes in hyperv_synic_reset() trying to access the non-present
+>>> qobject for SynIC.
+>>>
+>>> Add the missing check for NULL.
+>>>
+>>> Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>>> Reported-by: Igor Mammedov <imammedo@redhat.com>
+>>> Fixes: 9b4cf107b09d18ac30f46fd1c4de8585ccba030c
+>>> Fixes: 4a93722f9c279184e95b1e1ad775c01deec05065
+>>> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+>>> ---
+>>>  hw/hyperv/hyperv.c | 6 +++++-
+>>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
+>>> index a28e7249d8..8758635227 100644
+>>> --- a/hw/hyperv/hyperv.c
+>>> +++ b/hw/hyperv/hyperv.c
+>>> @@ -136,7 +136,11 @@ void hyperv_synic_add(CPUState *cs)
+>>>  
+>>>  void hyperv_synic_reset(CPUState *cs)
+>>>  {
+>>> -    device_reset(DEVICE(get_synic(cs)));
+>>> +    SynICState *synic = get_synic(cs);
+>>> +
+>>> +    if (synic) {
+>>> +        device_reset(DEVICE(synic));
+>>> +    }
+>>>  }
+>>>  
+>>>  static const TypeInfo synic_type_info = {
+>>>
+>>
+>> Queued, thanks.
+> 
+> Oops, I had queued it earlier today and just submitted a pull
+> request.
 
-> On 2018-11-25 21:50, Philippe Mathieu-Daud=C3=A9 wrote:
->> The list is always selected by the 'All patches CC here' section.
->>=20
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->>  MAINTAINERS | 13 -------------
->>  1 file changed, 13 deletions(-)
->>=20
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index c616861ca3..9d6dae71ff 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -109,7 +109,6 @@ L: qemu-s390x@nongnu.org
->>  Guest CPU cores (TCG):
->>  ----------------------
->>  Overall
->> -L: qemu-devel@nongnu.org
->>  M: Peter Crosthwaite <crosthwaite.peter@gmail.com>
->>  M: Richard Henderson <rth@twiddle.net>
->>  R: Paolo Bonzini <pbonzini@redhat.com>
->> @@ -403,30 +402,25 @@ Hosts:
->>  ------
->>=20=20
->>  LINUX
->> -L: qemu-devel@nongnu.org
->>  S: Maintained
->>  F: linux-*
->>  F: linux-headers/
->>=20=20
->>  POSIX
->> -L: qemu-devel@nongnu.org
->>  S: Maintained
->>  F: *posix*
->
-> I agree that we can remove the "L: qemu-devel" entries everywhere, but
-> for these subsystems that have no "M:" entry, but "S: Maintained", this
-> now looks somewhat strange - the subsystem is "Maintained" but has no
-> maintainer? I think we need somebody who feels responsible to pick up
-> patches here...?
+No big deal, it will be included twice. :)
 
-It looks strange because it *is* strange.  If we take the definition of
-S: in MAINTAINERS seriously, we need to appoint a maintainer (a person,
-not a mailing list), or downgrade to S: Orphan.
+Paolo
