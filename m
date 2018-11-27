@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gRdnk-000449-P4
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:53:21 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gRdp3-0005Ed-UD
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:54:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gRdng-0006Ar-Bw
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:53:20 -0500
-Received: from 19.mo3.mail-out.ovh.net ([178.32.98.231]:53395)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gRdnc-0005wI-JU
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:53:14 -0500
-Received: from player718.ha.ovh.net (unknown [10.109.160.46])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 936001E8F53
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 14:53:09 +0100 (CET)
-Date: Tue, 27 Nov 2018 14:52:58 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181127145258.606bf412@bahia.ttt.fr.ibm.com>
-In-Reply-To: <2ed1d297-abd8-8d33-fb9a-f89e2bfb3cff@redhat.com>
-References: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<154332392916.541746.3772338098005086592.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<2ed1d297-abd8-8d33-fb9a-f89e2bfb3cff@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1gRdp2-0008OX-Da
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:54:41 -0500
+Date: Tue, 27 Nov 2018 14:54:15 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181127145415.17b49d64@redhat.com>
+In-Reply-To: <20181121232106.GB4450@caravaggio>
+References: <20181105014047.26447-1-sameo@linux.intel.com>
+	<20181105014047.26447-13-sameo@linux.intel.com>
+	<20181115133658.2cdbd918@redhat.com>
+	<20181121232106.GB4450@caravaggio>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 3/9] ppc405_boards: use g_new(T,
- n) instead of g_malloc(sizeof(T) * n)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 12/24] hw: acpi: Export the MCFG getter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>
 
-On Tue, 27 Nov 2018 14:41:53 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On Thu, 22 Nov 2018 00:21:06 +0100
+Samuel Ortiz <sameo@linux.intel.com> wrote:
 
-> On 27/11/18 14:05, Greg Kurz wrote:
-> > Because it is a recommended coding practice (see HACKING).
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/ppc/ppc405_boards.c |    4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-> > index 3be3fe4432b4..f35b412c88dd 100644
-> > --- a/hw/ppc/ppc405_boards.c
-> > +++ b/hw/ppc/ppc405_boards.c
-> > @@ -149,7 +149,7 @@ static void ref405ep_init(MachineState *machine)
-> >      MemoryRegion *bios;
-> >      MemoryRegion *sram =3D g_new(MemoryRegion, 1);
-> >      ram_addr_t bdloc;
-> > -    MemoryRegion *ram_memories =3D g_malloc(2 * sizeof(*ram_memories));
-> > +    MemoryRegion *ram_memories =3D g_new(MemoryRegion, 2);
-> >      hwaddr ram_bases[2], ram_sizes[2];
-> >      target_ulong sram_size;
-> >      long bios_size;
-> > @@ -446,7 +446,7 @@ static void taihu_405ep_init(MachineState *machine)
-> >      qemu_irq *pic;
-> >      MemoryRegion *sysmem =3D get_system_memory();
-> >      MemoryRegion *bios;
-> > -    MemoryRegion *ram_memories =3D g_malloc(2 * sizeof(*ram_memories));
-> > +    MemoryRegion *ram_memories =3D g_new(MemoryRegion, 2);
-> >      MemoryRegion *ram =3D g_malloc0(sizeof(*ram)); =20
->=20
-> Why not change both lines here?
->=20
->        MemoryRegion *ram =3D g_new0(MemoryRegion, 1);
->=20
+> Hi Igor,
+> 
+> On Thu, Nov 15, 2018 at 01:36:58PM +0100, Igor Mammedov wrote:
+> > On Mon,  5 Nov 2018 02:40:35 +0100
+> > Samuel Ortiz <sameo@linux.intel.com> wrote:
+> >   
+> > > From: Yang Zhong <yang.zhong@intel.com>
+> > > 
+> > > The ACPI MCFG getter is not x86 specific and could be called from
+> > > anywhere within generic ACPI API, so let's export it.  
+> > So far it's x86 or more exactly q35 specific thing,  
+> It's property based, and it's using a generic PCIE property afaict.
+> So it's up to each machine type to define those properties.
+> I'm curious here: What's the idiomatic way to define a machine
+> setting/attribute/property, let each instance define it or not, and
+> make it available at run time?
+> Would you be getting the PCI host pointer from the ACPI build state and
+> getting that information back from there?
 
-Because HACKING says:
+Cleaner way would be make arm/virt board set PCIE_HOST_MCFG_BASE/
+PCIE_HOST_MCFG_SIZE properties and then use common build_mcfg()(in aml-build.c).
+Something like this:
+  acpi_setup_reduced()
+     AcpiMcfgInfo mcfg_info = {
+       .base = object_property_get_uint(pcie, PCIE_HOST_MCFG_BASE, NULL),
+       .size = object_property_get_uint(pcie, PCIE_HOST_MCFG_SIZE, NULL)
+     };
+     acpi_build() {
+         build_mcfg("MCFG", &info);
+     }
+  }
+and for legacy q35
+  acpi_build() {
+     if (pcie) {
+        AcpiMcfgInfo mcfg_info = {
+          .base = object_property_get_uint(pcie, PCIE_HOST_MCFG_BASE, NULL),
+          .size = object_property_get_uint(pcie, PCIE_HOST_MCFG_SIZE, NULL)
+        };
+        if (mcfg_info.base != PCIE_BASE_ADDR_UNMAPPED)
+            build_mcfg("MCFG", &info);
+        else
+            /* move comment here why we are doing it */
+            build_mcfg("QEMU", &info);
+     }
+  }
 
-Declarations like T *v =3D g_malloc(sizeof(*v)) are acceptable, though.
+The thing I don't like about acpi_get_mcfg() is that it
+does lookup acpi_get_i386_pci_host() each time it's called
+and judges if it's PCI-E host by presence of properties.
 
-but if there's a consensus on fixing these as well, I'll happily do
-it :)
+I'd rather be explicit where PCI host be fetched once somewhere
+in acpi_setup() or possibly passed down from the board as an argument
+and board telling to i386/acpi_setup() if it's PCI or PCI-E host
+so we don't have to guess it in acpi code.
 
-> >      hwaddr ram_bases[2], ram_sizes[2];
-> >      long bios_size;
-> >=20
-> >  =20
+
+> Cheers,
+> Samuel.
