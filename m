@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54447)
+Received: from eggs.gnu.org ([208.118.235.92]:41553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gRk25-0002OT-3w
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:32:34 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gRkOq-0005BG-Bv
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:56:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gRk21-0003Jq-48
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:32:31 -0500
-Date: Tue, 27 Nov 2018 18:32:05 -0200
-From: Caio Carrara <ccarrara@redhat.com>
-Message-ID: <20181127203204.GB22731@localhost.localdomain>
-References: <20181127105034.21045-1-crosa@redhat.com>
-	<20181127190006.GC22880@localhost.localdomain>
-	<7359977f-3797-d78f-cd1a-a410e30c5357@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gRkOo-0004lw-L7
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:56:04 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39341)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gRkOo-0004lP-Ej
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 15:56:02 -0500
+Received: by mail-ot1-x342.google.com with SMTP id g27so21465470oth.6
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 12:56:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7359977f-3797-d78f-cd1a-a410e30c5357@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH] Introduce Python module structure
+References: <20181127184929.20065-1-jsnow@redhat.com>
+	<f2257e95-b17c-55d4-1d5f-cc09db3d6a58@redhat.com>
+In-Reply-To: <f2257e95-b17c-55d4-1d5f-cc09db3d6a58@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Nov 2018 20:55:49 +0000
+Message-ID: <CAFEAcA8kROZgFPUxzmMEGX9h-RddWRsDoxmdYMBOrR+vbtB5Xg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] scsi: Address spurious clang warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,267 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Wainer dos Santos Moschetta <wainersm@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Nov 27, 2018 at 03:02:03PM -0500, Cleber Rosa wrote:
-> 
-> 
-> On 11/27/18 2:00 PM, Caio Carrara wrote:
-> > Hi, Cleber.
-> > 
-> > On Tue, Nov 27, 2018 at 05:50:34AM -0500, Cleber Rosa wrote:
-> >> This is a simple move of Python code that wraps common QEMU
-> >> functionality, and are used by a number of different tests
-> >> and scripts.
-> >>
-> >> By treating that code as a real Python module, we can more easily,
-> >> among other things:
-> >>  * reuse more code
-> >>  * apply a more consistent style
-> >>  * add tests to that code
-> >>  * generate documentation
-> >>
-> >> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> >> ---
-> >>  configure                                  |  1 +
-> >>  scripts/qemu.py => python/qemu/__init__.py | 11 ++++++-----
-> > 
-> > Well, we all know how difficult is to pick up names, but I would avoid
-> > use `python` here. This is the name of python bin itself. Is there any
-> > chance of a clash? I do not have a specific case right now, I'm just
-> > wondering if it can happen we should avoid.
-> > 
-> 
-> The point of the "python" directory, is that it's not supposed to be the
-> *module* name, but a holder for the Python module, which is "qemu".
-> Given that "python is not a module", has no __init__.py, I don't think
-> it'll ever clash.
-> 
-> The reason for picking the name is that it makes it obvious, within the
-> QEMU tree, that this is Python stuff.  I already have some tests, to
-> test the "Python stuff", to put it under "python", probably in
-> "python/tests".
-
-Ok, now I got your point. No problem.
-
-> 
-> Anyway, it'd be nice to think of alternatives here.
-> 
-> >>  {scripts/qmp => python/qemu}/qmp.py        |  0
-> >>  {scripts => python/qemu}/qtest.py          |  5 +++--
-> >>  scripts/device-crash-test                  |  5 +++++
-> >>  scripts/qmp/__init__.py                    |  0
-> >>  tests/acceptance/avocado_qemu/__init__.py  |  9 +++++----
-> >>  tests/migration/guestperf/engine.py        | 10 +++++++---
-> >>  tests/qemu-iotests/iotests.py              |  8 ++++++--
-> >>  tests/vm/basevm.py                         |  9 +++++++--
-> >>  10 files changed, 40 insertions(+), 18 deletions(-)
-> >>  rename scripts/qemu.py => python/qemu/__init__.py (98%)
-> >>  rename {scripts/qmp => python/qemu}/qmp.py (100%)
-> >>  rename {scripts => python/qemu}/qtest.py (97%)
-> > 
-> > What if we keep `qmp.py` and `qtest.py` directly under `/python`
-> > directory?  It seems it can be more semantic regarding the subject of
-> > each module. I'm not completely sure about `qmp.py`, but definetly I
-> > think qtest should be under python directly.
-> > 
-> 
-> I still think having a uniform starting point for the module, such as
-> "qemu" is a good practice for all QEMU Python code.  Having independent
-> first level modules will make it harder to understand where the code is
-> coming from.  For instance, we have the option of coming up with a
-> structure that would allow:
-> 
-> 
->  import os
->  import struct
->  import qmp
->  import urllib
-> 
-> 
-> And the origin of "qmp" would go unnoticed.  Alternatively:
-> 
-> 
->  import os
->  import struct
->  import urllib
->  from qemu import qmp
-> 
-> 
-> Is much clearer.  Now, with regards to "qmp", it's pretty much
-> standalone, uses only Python libraries, while "qemu" consumes "qmp"
-> functionality.  I believe having "qemu.qmp" is appropriate here.
-> 
-> Now, for "qtest", you have a point, it uses QEMUMachine, and its content
-> is very similar to what's available under "qemu" itself (that is,
-> QEMUMachine itself).  IMO, it would make sense to just have the
-> QEMUQtestProtocol and QEMUQtestMachine at the "qemu" level at this
-> point, that is, fold their content into "qemu/__init__.py".
-> 
-> The API usage would then become:
-> 
-> 
->  from qemu import QEMUQTestMachine
-> 
-> 
-> Similar to:
-> 
-> 
->  from qemu import QEMUMachine
-> 
-> 
-> I refrained from changing too much at the initial RFC time, though,
-> exactly to make less biased discussions.
-
-Well, I agree with you here. For a first step we shouldn't be changing too
-much the structure. I'm ok moving forward this way for now.
-
-> 
-> 
-> >>  delete mode 100644 scripts/qmp/__init__.py
-> >>
-> >> diff --git a/configure b/configure
-> >> index 0a3c6a72c3..2b64c51009 100755
-> > [...]
-> >> rename from scripts/qemu.py
-> >> rename to python/qemu/__init__.py
-> > [...]
-> >> diff --git a/scripts/qmp/qmp.py b/python/qemu/qmp.py
-> >> similarity index 100%
-> >> rename from scripts/qmp/qmp.py
-> >> rename to python/qemu/qmp.py
-> >> diff --git a/scripts/qtest.py b/python/qemu/qtest.py
-> >> similarity index 97%
-> >> rename from scripts/qtest.py
-> >> rename to python/qemu/qtest.py
-> >> index adf1fe3f26..bff79cdd13 100644
-> >> --- a/scripts/qtest.py
-> >> +++ b/python/qemu/qtest.py
-> > [...]
-> >> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-> >> index e93a7c0c84..c75ae0ecbc 100755
-> >> --- a/scripts/device-crash-test
-> >> +++ b/scripts/device-crash-test
-> >> @@ -35,6 +35,11 @@ import random
-> >>  import argparse
-> >>  from itertools import chain
-> >>  
-> >> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-> >> +TOP_DIR = os.path.dirname(THIS_DIR)
-> >> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
-> >> +sys.path.append(PYTHON_MODULE_PATH)
-> > 
-> > This sys.path handling to use the new QEMU Python module is not good. I
-> > understand it can be a first step, but to expect everyone knows/do it to
-> > use the module is a bad assumption because it's not intuitive and can
-> > cause some confusion.
-> > 
-> > If we need something available from a Python script/module that is not
-> > directly acessible from PYTHONPATH we should install it so Python can
-> > turn it available. So, probably we need to think make `python/qemu` a
-> > proper installable module.
+On Tue, 27 Nov 2018 at 19:02, Eric Blake <eblake@redhat.com> wrote:
+>
+> On 11/27/18 12:49 PM, John Snow wrote:
+> > Some versions of Clang prior to 6.0 (and some builds of clang after,
+> > such as 6.0.1-2.fc28) fail to recognize { 0 } as a valid initializer
+> > for a struct with subobjects when -Wmissing-braces is enabled.
 > >
-> 
-> It's something that is confusing for mode experienced Python developers,
-> but I have some experience with way too many people not understanding at
-> all why an extra step (the module installation), was necessary for using
-> Python code from within a source tree.  We faced a LOT of questions, for
-> a long time, when we did the switch in Avocado itself.
-> 
-> To summarize, you're right about the end goal, and I hope we'll get
-> there and remove this boiler plate code.  But, I think we need an
-> intermediary step.
-> 
-> >> +
-> >>  from qemu import QEMUMachine
-> >>  
-> >>  logger = logging.getLogger('device-crash-test')
-> >> diff --git a/scripts/qmp/__init__.py b/scripts/qmp/__init__.py
-> >> deleted file mode 100644
-> > [...]
-> >> diff --git a/tests/migration/guestperf/engine.py b/tests/migration/guestperf/engine.py
-> >> index 398e3f2706..73c9b66821 100644
-> >> --- a/tests/migration/guestperf/engine.py
-> >> +++ b/tests/migration/guestperf/engine.py
-> >> @@ -24,13 +24,17 @@ import re
-> >>  import sys
-> >>  import time
-> >>  
-> >> -sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'scripts'))
-> >> -import qemu
-> >> -import qmp.qmp
-> >>  from guestperf.progress import Progress, ProgressStats
-> >>  from guestperf.report import Report
-> >>  from guestperf.timings import TimingRecord, Timings
-> >>  
-> >> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-> >> +TOP_DIR = os.path.dirname(os.path.dirname(os.path.dirname(THIS_DIR)))
-> >> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
-> >> +sys.path.append(PYTHON_MODULE_PATH)
-> >> +
-> >> +import qemu
-> > 
-> > Since `qemu` is a common word here, I would rather import the members
-> > directly than only the module. Just like you did in
-> > `/tests/vm/basevm,py`
-> > 
-> 
-> Right, I avoided changing too much of the code using the modules, but I
-> do agree with you here.
-> 
-> Thanks for the feedback!
-> - Cleber.
-> 
-> >> +
-> >>  
-> >>  class Engine(object):
-> >>  
-> >> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> >> index d537538ba0..92fddd2a58 100644
-> >> --- a/tests/qemu-iotests/iotests.py
-> >> +++ b/tests/qemu-iotests/iotests.py
-> >> @@ -31,8 +31,12 @@ import logging
-> > [...]
-> >> --- a/tests/vm/basevm.py
-> >> +++ b/tests/vm/basevm.py
-> >> @@ -17,8 +17,6 @@ import sys
-> >>  import logging
-> >>  import time
-> >>  import datetime
-> >> -sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
-> >> -from qemu import QEMUMachine, kvm_available
-> >>  import subprocess
-> >>  import hashlib
-> >>  import optparse
-> >> @@ -28,6 +26,13 @@ import shutil
-> >>  import multiprocessing
-> >>  import traceback
-> >>  
-> >> +THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-> >> +TOP_DIR = os.path.dirname(os.path.dirname(THIS_DIR))
-> >> +PYTHON_MODULE_PATH = os.path.join(TOP_DIR, 'python')
-> >> +sys.path.append(PYTHON_MODULE_PATH)
-> >> +
-> >> +from qemu import QEMUMachine, kvm_available
-> >> +
-> >>  SSH_KEY = open(os.path.join(os.path.dirname(__file__),
-> >>                 "..", "keys", "id_rsa")).read()
-> >>  SSH_PUB_KEY = open(os.path.join(os.path.dirname(__file__),
-> >> -- 
-> >> 2.19.1
-> >>
-> > 
-> > Thanks,
-> > 
-> 
-> -- 
-> Cleber Rosa
-> [ Sr Software Engineer - Virtualization Team - Red Hat ]
-> [ Avocado Test Framework - avocado-framework.github.io ]
-> [  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+> > https://bugs.llvm.org/show_bug.cgi?id=21689 and
+> > https://reviews.llvm.org/rL314499 suggests this should be fixed in 6.0,
+> > but it might not be the case for older versions or downstream versions.
+> >
+> > For now, follow the precedent of ebf2a499 and replace the standard { 0 }
+> > with the accepted { } to silence this warning and allow the build to
+> > work under clang 6.0.1-2.fc28, and builds prior to 6.0.
+> >
+> > Signed-off-by: John Snow <jsnow@redhat.com>
+> >
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> I'm okay if this goes into -rc3 as a build-fix; I'm also okay if it
+> slips to 4.0.
+>
+> > ---
+> >
+> > What I am actually less clear on is why this appears to be a problem
+> > only now; since the introduction of { 0 } was in 2.11. It might be
+> > a regression only in the fedora distribution of Clang 6.0.
 
--- 
-Caio Carrara
-Software Engineer, Virt Team - Red Hat
-ccarrara@redhat.com
+Upstream clang 6.0 should have this bug fixed (ie it does
+not warn about this construct), so it is odd that Fedora's does not.
+
+> Or even a redefinition of struct dm_ioctl in some header where you are
+> just now picking up a new struct layout that tickles the Clang issue in
+> relation to the previous layout (since it is possible to have two
+> structs that are ABI-compatible but where only one of the two has a
+> nested substruct).
+>
+> > +++ b/scsi/qemu-pr-helper.c
+> > @@ -236,7 +236,7 @@ static void dm_init(void)
+> >           perror("Cannot open " CONTROL_PATH);
+> >           exit(1);
+> >       }
+> > -    struct dm_ioctl dm = { 0 };
+> > +    struct dm_ioctl dm = { };
+>
+> Random thought: would it be worth having "qemu/compiler.h" define a macro:
+>
+> #if ...broken clang
+> #define ZERO_INIT {}
+> #else
+> #define ZERO_INIT {0}
+> #endif
+>
+> and then rewrite all our '= { 0? }' initializers into '= ZERO_INIT'?  Or
+> is that aesthetically too ugly?
+
+I think that's worse than just writing {} everywhere (which
+does work on every compiler we need to support, including
+older gcc which also used to warn here).
+
+thanks
+-- PMM
