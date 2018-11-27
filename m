@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gRhE6-000461-R7
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 12:32:48 -0500
+	(envelope-from <cota@braap.org>) id 1gRhKm-00075C-HG
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 12:39:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gRhE2-0000IX-VF
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 12:32:46 -0500
-Resent-Message-Id: <E1gRhE2-0000IX-VF@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21424)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gRhE2-0000HN-J4
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 12:32:42 -0500
-In-Reply-To: <20181124235553.17371-1-cota@braap.org>
-Message-ID: <154333993431.11458.675656204679763093@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cota@braap.org>) id 1gRhKj-0004zH-Co
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 12:39:40 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:34457)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gRhKj-0004z2-44
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 12:39:37 -0500
+Date: Tue, 27 Nov 2018 12:39:34 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181127173934.GB12617@flamenco>
+References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
+	<20181122072028.22819-3-xiaoguangrong@tencent.com>
+	<BB9071C9-5BED-4763-99B3-7083B8EB49CF@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 27 Nov 2018 09:32:15 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v6 00/13] hardfloat
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BB9071C9-5BED-4763-99B3-7083B8EB49CF@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] util: introduce threaded workqueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,220 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, richard.henderson@linaro.org, alex.bennee@linaro.org
+To: Christophe de Dinechin <dinechin@redhat.com>
+Cc: Xiao Guangrong <guangrong.xiao@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-ODExMjQyMzU1NTMuMTczNzEtMS1jb3RhQGJyYWFwLm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0g
-W1BBVENIIHY2IDAwLzEzXSBoYXJkZmxvYXQKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9u
-ZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9n
-IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAg
-ICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0
-PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Njcmlw
-dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAg
-ICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
-ZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmZlMGNlZTMgaGFyZGZs
-b2F0OiBpbXBsZW1lbnQgZmxvYXQzMi82NCBjb21wYXJpc29uCmFjNTk2OGIgaGFyZGZsb2F0OiBp
-bXBsZW1lbnQgZmxvYXQzMi82NCBzcXVhcmUgcm9vdAowZjEwOTM3IGhhcmRmbG9hdDogaW1wbGVt
-ZW50IGZsb2F0MzIvNjQgZnVzZWQgbXVsdGlwbHktYWRkCmRlMzgwOTcgaGFyZGZsb2F0OiBpbXBs
-ZW1lbnQgZmxvYXQzMi82NCBkaXZpc2lvbgpmYmVhYjQ1IGhhcmRmbG9hdDogaW1wbGVtZW50IGZs
-b2F0MzIvNjQgbXVsdGlwbGljYXRpb24KODg5NGExNiBoYXJkZmxvYXQ6IGltcGxlbWVudCBmbG9h
-dDMyLzY0IGFkZGl0aW9uIGFuZCBzdWJ0cmFjdGlvbgo4MzRkNDAzIGZwdTogaW50cm9kdWNlIGhh
-cmRmbG9hdAo5NGIzZjliIHRlc3RzL2ZwOiBhZGQgZnAtYmVuY2gKZmUyZWY3OCBzb2Z0ZmxvYXQ6
-IGFkZCBmbG9hdHszMiwgNjR9X2lzX3plcm9fb3Jfbm9ybWFsCmEzNDM1Njcgc29mdGZsb2F0OiBy
-ZW5hbWUgY2Fub25pY2FsaXplIHRvIHNmX2Nhbm9uaWNhbGl6ZQo3M2U2YzBkIHRhcmdldC90cmlj
-b3JlOiB1c2UgZmxvYXQzMl9pc19kZW5vcm1hbApiZTA5YjMxIHNvZnRmbG9hdDogYWRkIGZsb2F0
-ezMyLCA2NH1faXNfe2RlLCB9bm9ybWFsCjMxOTA0MmEgZnAtdGVzdDogcGljayBUQVJHRVRfQVJN
-IHRvIGdldCBpdHMgc3BlY2lhbGl6YXRpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
-IFBBVENIIDEvMTM6IGZwLXRlc3Q6IHBpY2sgVEFSR0VUX0FSTSB0byBnZXQgaXRzIHNwZWNpYWxp
-emF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDIvMTM6IHNvZnRmbG9hdDogYWRkIGZsb2F0ezMyLCA2
-NH1faXNfe2RlLCB9bm9ybWFsLi4uCkNoZWNraW5nIFBBVENIIDMvMTM6IHRhcmdldC90cmljb3Jl
-OiB1c2UgZmxvYXQzMl9pc19kZW5vcm1hbC4uLgpDaGVja2luZyBQQVRDSCA0LzEzOiBzb2Z0Zmxv
-YXQ6IHJlbmFtZSBjYW5vbmljYWxpemUgdG8gc2ZfY2Fub25pY2FsaXplLi4uCkNoZWNraW5nIFBB
-VENIIDUvMTM6IHNvZnRmbG9hdDogYWRkIGZsb2F0ezMyLCA2NH1faXNfemVyb19vcl9ub3JtYWwu
-Li4KQ2hlY2tpbmcgUEFUQ0ggNi8xMzogdGVzdHMvZnA6IGFkZCBmcC1iZW5jaC4uLgpXQVJOSU5H
-OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
-dXBkYXRpbmc/CiM0OTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDY1MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDcvMTM6IGZwdTogaW50cm9kdWNlIGhhcmRmbG9hdC4u
-LgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzgyOiBG
-SUxFOiBmcHUvc29mdGZsb2F0LmM6MTMwOgorICAgIHN0YXRpYyBpbmxpbmUgdm9pZCBuYW1lKHNv
-ZnRfdCAqYSwgZmxvYXRfc3RhdHVzICpzKSAgICAgICAgICAgICAgICAgXAogICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojOTY6IEZJTEU6IGZwdS9zb2Z0Zmxv
-YXQuYzoxNDQ6CisgICAgc3RhdGljIGlubGluZSB2b2lkIG5hbWUoc29mdF90ICphLCBmbG9hdF9z
-dGF0dXMgKnMpIFwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4
-VikKIzEwOTogRklMRTogZnB1L3NvZnRmbG9hdC5jOjE1NzoKKyAgICBzdGF0aWMgaW5saW5lIHZv
-aWQgbmFtZShzb2Z0X3QgKmEsIHNvZnRfdCAqYiwgZmxvYXRfc3RhdHVzICpzKSAgICAgIFwKICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQoj
-MTIzOiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6MTcxOgorICAgIHN0YXRpYyBpbmxpbmUgdm9pZCBu
-YW1lKHNvZnRfdCAqYSwgc29mdF90ICpiLCBzb2Z0X3QgKmMsIGZsb2F0X3N0YXR1cyAqcykgXAog
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5l
-cyBzaG91bGQgYmUgYXZvaWRlZAojMTQyOiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6MTkwOgorI2lm
-IGRlZmluZWQoX194ODZfNjRfXykKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZp
-bmVzIHNob3VsZCBiZSBhdm9pZGVkCiMxNjQ6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoyMTI6Cisj
-aWYgZGVmaW5lZChfX3g4Nl82NF9fKSB8fCBkZWZpbmVkKF9fYWFyY2g2NF9fKQoKRVJST1I6IHNw
-YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxODM6IEZJTEU6IGZwdS9z
-b2Z0ZmxvYXQuYzoyMzE6CitzdGF0aWMgaW5saW5lIGJvb2wgY2FuX3VzZV9mcHUoY29uc3QgZmxv
-YXRfc3RhdHVzICpzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBeCgp0b3RhbDogNSBlcnJvcnMsIDIgd2FybmluZ3MsIDMyNyBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA4
-LzEzOiBoYXJkZmxvYXQ6IGltcGxlbWVudCBmbG9hdDMyLzY0IGFkZGl0aW9uIGFuZCBzdWJ0cmFj
-dGlvbi4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikK
-Izk4OiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6MTA2MzoKK3NvZnRfZjMyX2FkZHN1YihmbG9hdDMy
-IGEsIGZsb2F0MzIgYiwgYm9vbCBzdWJ0cmFjdCwgZmxvYXRfc3RhdHVzICpzdGF0dXMpCiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikK
-IzEwOTogRklMRTogZnB1L3NvZnRmbG9hdC5jOjEwNzI6CitzdGF0aWMgaW5saW5lIGZsb2F0MzIg
-c29mdF9mMzJfYWRkKGZsb2F0MzIgYSwgZmxvYXQzMiBiLCBmbG9hdF9zdGF0dXMgKnN0YXR1cykK
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAo
-Y3R4Old4VikKIzExNDogRklMRTogZnB1L3NvZnRmbG9hdC5jOjEwNzc6CitzdGF0aWMgaW5saW5l
-IGZsb2F0MzIgc29mdF9mMzJfc3ViKGZsb2F0MzIgYSwgZmxvYXQzMiBiLCBmbG9hdF9zdGF0dXMg
-KnN0YXR1cykKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0
-aGF0ICcqJyAoY3R4Old4VikKIzEyMDogRklMRTogZnB1L3NvZnRmbG9hdC5jOjEwODM6Citzb2Z0
-X2Y2NF9hZGRzdWIoZmxvYXQ2NCBhLCBmbG9hdDY0IGIsIGJvb2wgc3VidHJhY3QsIGZsb2F0X3N0
-YXR1cyAqc3RhdHVzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQg
-dGhhdCAnKicgKGN0eDpXeFYpCiMxMzA6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoxMDkyOgorc3Rh
-dGljIGlubGluZSBmbG9hdDY0IHNvZnRfZjY0X2FkZChmbG9hdDY0IGEsIGZsb2F0NjQgYiwgZmxv
-YXRfc3RhdHVzICpzdGF0dXMpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJl
-ZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxMzU6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzox
-MDk3Ogorc3RhdGljIGlubGluZSBmbG9hdDY0IHNvZnRfZjY0X3N1YihmbG9hdDY0IGEsIGZsb2F0
-NjQgYiwgZmxvYXRfc3RhdHVzICpzdGF0dXMpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNl
-cyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxNzc6IEZJTEU6IGZwdS9zb2Z0
-ZmxvYXQuYzoxMTM5Ogorc3RhdGljIGZsb2F0MzIgZmxvYXQzMl9hZGRzdWIoZmxvYXQzMiBhLCBm
-bG9hdDMyIGIsIGZsb2F0X3N0YXR1cyAqcywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1
-aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxODQ6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQu
-YzoxMTQ2Ogorc3RhdGljIGZsb2F0NjQgZmxvYXQ2NF9hZGRzdWIoZmxvYXQ2NCBhLCBmbG9hdDY0
-IGIsIGZsb2F0X3N0YXR1cyAqcywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
-cm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxOTI6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoxMTU0
-OgorZmxvYXQzMl9hZGQoZmxvYXQzMiBhLCBmbG9hdDMyIGIsIGZsb2F0X3N0YXR1cyAqcykKICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
-YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxOTg6IEZJTEU6IGZwdS9z
-b2Z0ZmxvYXQuYzoxMTYwOgorZmxvYXQzMl9zdWIoZmxvYXQzMiBhLCBmbG9hdDMyIGIsIGZsb2F0
-X3N0YXR1cyAqcykKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMy
-MDQ6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoxMTY2OgorZmxvYXQ2NF9hZGQoZmxvYXQ2NCBhLCBm
-bG9hdDY0IGIsIGZsb2F0X3N0YXR1cyAqcykKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAn
-KicgKGN0eDpXeFYpCiMyMTA6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoxMTcyOgorZmxvYXQ2NF9z
-dWIoZmxvYXQ2NCBhLCBmbG9hdDY0IGIsIGZsb2F0X3N0YXR1cyAqcykKICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEyIGVycm9ycywgMCB3
-YXJuaW5ncywgMTQ5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDkvMTM6IGhhcmRmbG9hdDogaW1wbGVtZW50IGZsb2F0
-MzIvNjQgbXVsdGlwbGljYXRpb24uLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhh
-dCAnKicgKGN0eDpXeFYpCiM0NTogRklMRTogZnB1L3NvZnRmbG9hdC5jOjEyMzY6Citzb2Z0X2Yz
-Ml9tdWwoZmxvYXQzMiBhLCBmbG9hdDMyIGIsIGZsb2F0X3N0YXR1cyAqc3RhdHVzKQogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNl
-cyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiM1NTogRklMRTogZnB1L3NvZnRm
-bG9hdC5jOjEyNDY6Citzb2Z0X2Y2NF9tdWwoZmxvYXQ2NCBhLCBmbG9hdDY0IGIsIGZsb2F0X3N0
-YXR1cyAqc3RhdHVzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYp
-CiM4MzogRklMRTogZnB1L3NvZnRmbG9hdC5jOjEyNzU6CitzdGF0aWMgZmxvYXQzMiBmMzJfbXVs
-X2Zhc3Rfb3AoZmxvYXQzMiBhLCBmbG9hdDMyIGIsIGZsb2F0X3N0YXR1cyAqcykKICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojOTA6
-IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoxMjgyOgorc3RhdGljIGZsb2F0NjQgZjY0X211bF9mYXN0
-X29wKGZsb2F0NjQgYSwgZmxvYXQ2NCBiLCBmbG9hdF9zdGF0dXMgKnMpCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
-UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzk4OiBGSUxF
-OiBmcHUvc29mdGZsb2F0LmM6MTI5MDoKK2Zsb2F0MzJfbXVsKGZsb2F0MzIgYSwgZmxvYXQzMiBi
-LCBmbG9hdF9zdGF0dXMgKnMpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6
-V3hWKQojMTA1OiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6MTI5NzoKK2Zsb2F0NjRfbXVsKGZsb2F0
-NjQgYSwgZmxvYXQ2NCBiLCBmbG9hdF9zdGF0dXMgKnMpCiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiA2IGVycm9ycywgMCB3YXJuaW5ncywg
-NzIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-Q2hlY2tpbmcgUEFUQ0ggMTAvMTM6IGhhcmRmbG9hdDogaW1wbGVtZW50IGZsb2F0MzIvNjQgZGl2
-aXNpb24uLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYp
-CiM0ODogRklMRTogZnB1L3NvZnRmbG9hdC5jOjE2Mjg6Citzb2Z0X2YzMl9kaXYoZmxvYXQzMiBh
-LCBmbG9hdDMyIGIsIGZsb2F0X3N0YXR1cyAqc3RhdHVzKQogICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91
-bmQgdGhhdCAnKicgKGN0eDpXeFYpCiM1ODogRklMRTogZnB1L3NvZnRmbG9hdC5jOjE2Mzg6Citz
-b2Z0X2Y2NF9kaXYoZmxvYXQ2NCBhLCBmbG9hdDY0IGIsIGZsb2F0X3N0YXR1cyAqc3RhdHVzKQog
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
-IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxMTE6IEZJTEU6IGZw
-dS9zb2Z0ZmxvYXQuYzoxNjkyOgorZmxvYXQzMl9kaXYoZmxvYXQzMiBhLCBmbG9hdDMyIGIsIGZs
-b2F0X3N0YXR1cyAqcykKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYp
-CiMxMTg6IEZJTEU6IGZwdS9zb2Z0ZmxvYXQuYzoxNjk5OgorZmxvYXQ2NF9kaXYoZmxvYXQ2NCBh
-LCBmbG9hdDY0IGIsIGZsb2F0X3N0YXR1cyAqcykKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCA4MiBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
-a2luZyBQQVRDSCAxMS8xMzogaGFyZGZsb2F0OiBpbXBsZW1lbnQgZmxvYXQzMi82NCBmdXNlZCBt
-dWx0aXBseS1hZGQuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0
-eDpXeFYpCiM1MDogRklMRTogZnB1L3NvZnRmbG9hdC5jOjE1MTk6CisgICAgICAgICAgICAgICAg
-ZmxvYXRfc3RhdHVzICpzdGF0dXMpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVS
-Uk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojNjI6IEZJTEU6
-IGZwdS9zb2Z0ZmxvYXQuYzoxNTMxOgorICAgICAgICAgICAgICAgIGZsb2F0X3N0YXR1cyAqc3Rh
-dHVzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVp
-cmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzcxOiBGSUxFOiBmcHUvc29mdGZsb2F0LmM6
-MTU0MjoKK2Zsb2F0MzJfbXVsYWRkKGZsb2F0MzIgeGEsIGZsb2F0MzIgeGIsIGZsb2F0MzIgeGMs
-IGludCBmbGFncywgZmxvYXRfc3RhdHVzICpzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
-IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxMzI6IEZJTEU6IGZw
-dS9zb2Z0ZmxvYXQuYzoxNjAzOgorZmxvYXQ2NF9tdWxhZGQoZmxvYXQ2NCB4YSwgZmxvYXQ2NCB4
-YiwgZmxvYXQ2NCB4YywgaW50IGZsYWdzLCBmbG9hdF9zdGF0dXMgKnMpCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeCgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDE1MCBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMi8x
-MzogaGFyZGZsb2F0OiBpbXBsZW1lbnQgZmxvYXQzMi82NCBzcXVhcmUgcm9vdC4uLgpFUlJPUjog
-c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzMyOiBGSUxFOiBmcHUv
-c29mdGZsb2F0LmM6MzA0NDoKK3NvZnRfZjMyX3NxcnQoZmxvYXQzMiBhLCBmbG9hdF9zdGF0dXMg
-KnN0YXR1cykKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
-IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiM0MTogRklMRTogZnB1
-L3NvZnRmbG9hdC5jOjMwNTI6Citzb2Z0X2Y2NF9zcXJ0KGZsb2F0NjQgYSwgZmxvYXRfc3RhdHVz
-ICpzdGF0dXMpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9S
-OiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojNDg6IEZJTEU6IGZw
-dS9zb2Z0ZmxvYXQuYzozMDU5OgorZmxvYXQzMiBRRU1VX0ZMQVRURU4gZmxvYXQzMl9zcXJ0KGZs
-b2F0MzIgeGEsIGZsb2F0X3N0YXR1cyAqcykKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
-cm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiM3NTogRklMRTogZnB1L3NvZnRmbG9hdC5jOjMwODY6
-CitmbG9hdDY0IFFFTVVfRkxBVFRFTiBmbG9hdDY0X3NxcnQoZmxvYXQ2NCB4YSwgZmxvYXRfc3Rh
-dHVzICpzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBeCgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDc4IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
-IDEzLzEzOiBoYXJkZmxvYXQ6IGltcGxlbWVudCBmbG9hdDMyLzY0IGNvbXBhcmlzb24uLi4KRVJS
-T1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiM4NzogRklMRTog
-ZnB1L3NvZnRmbG9hdC5jOjI5MDQ6CituYW1lKGZsb2F0ICMjIHN6IGEsIGZsb2F0ICMjIHN6IGIs
-IGJvb2wgaXNfcXVpZXQsIGZsb2F0X3N0YXR1cyAqcykgICAgICBcCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
-c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzExMTogRklMRTogZnB1
-L3NvZnRmbG9hdC5jOjI5MTc6CitpbnQgZmxvYXQxNl9jb21wYXJlKGZsb2F0MTYgYSwgZmxvYXQx
-NiBiLCBmbG9hdF9zdGF0dXMgKnMpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjMg
-bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+On Tue, Nov 27, 2018 at 13:49:13 +0100, Christophe de Dinechin wrote:
+> (I did not finish the review, but decided to send what I already had).
+> 
+> > On 22 Nov 2018, at 08:20, guangrong.xiao@gmail.com wrote:
+> > 
+> > From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > 
+> > This modules implements the lockless and efficient threaded workqueue.
+> 
+> I’m not entirely convinced that it’s either “lockless” or “efficient”
+> in the current iteration. I believe that it’s relatively easy to fix, though.
+(snip)
+> > 
+> >    All the requests are pre-allocated and carefully partitioned between
+> >    threads so there is no contention on the request, that make threads
+> >    be parallel as much as possible.
+> 
+> That sentence confused me (it’s also in a comment in the text).
+> I think I’m mostly confused by “there is no contention”. Perhaps you
+> meant “so as to avoid contention if possible”? If there is a reason
+> why there would never be any contention even if requests arrive faster than
+> completions, I did not figure it out.
+> 
+> I personally see serious contention on the fields in the Threads structure,
+> for example, but also possibly on the targets of the “modulo” operation in
+> thread_find_free_request. Specifically, if three CPUs are entering
+> thread_find_free_request at the same time, they will all run the same
+> loop and all, presumably, “attack” the same memory locations.
+> 
+> Sorry if I mis-read the code, but at the moment, it does not seem to
+> avoid contention as intended. I don’t see how it could without having
+> some way to discriminate between CPUs to start with, which I did not find.
+
+You might have missed that only one thread can request jobs. So contention
+should only happen between that thread and the worker threads, but
+not among worker threads (they should only share cache lines with the
+requester thread).
+
+> > - User, i.e, the submitter
+> >    It's the one fills the request and submits it to the workqueue,
+> the one -> the one who
+> >    the result will be collected after it is handled by the work queue.
+> > 
+> >    The user can consecutively submit requests without waiting the previous
+> waiting -> waiting for
+> >    requests been handled.
+> >    It only supports one submitter, you should do serial submission by
+> >    yourself if you want more, e.g, use lock on you side.
+> 
+> I’m also confused by this last statement. The proposal purports
+> to be “lockless”, which I read as working correctly without a lock…
+> Reading the code, I indeed see issues if different threads
+> try to place requests at the same time. So I believe the word
+> “lockless” is a bit misleading.
+
+ditto, it is lockless as presented here, i.e. one requester thread.
+
+> > +static void uninit_thread_requests(ThreadLocal *thread, int free_nr)
+> > +{
+> > +    Threads *threads = thread->threads;
+> > +    ThreadRequest *request = thread->requests;
+> > +    int i;
+> > +
+> > +    for (i = 0; i < free_nr; i++) {
+> > +        threads->ops->thread_request_uninit(request + 1);
+> > +        request = (void *)request + threads->request_size;
+> 
+> Despite GCC’s tolerance for it and rather lengthy debates,
+> pointer arithmetic on void * is illegal in C [1].
+> 
+> Consider using char * arithmetic, and using macros such as:
+> 
+> #define request_to_payload(req) (((ThreadRequest *) req) + 1)
+> #define payload_to_request(req) (((ThreadRequest *) req) - 1)
+> #define request_to_next(req,threads) ((ThreadRequest *) ((char *) req) + threads->request_size))
+> 
+> where appropriate, that would clarify the intent.
+> 
+> [1] https://stackoverflow.com/questions/3523145/pointer-arithmetic-for-void-pointer-in-c
+
+FWIW, we use void pointer arithmetic in other places in QEMU, so
+I wouldn't worry about it being illegal.
+
+I like those little macros though; even better as inlines.
+
+Thanks,
+
+		Emilio
