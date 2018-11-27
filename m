@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRgQ1-0004Ey-Rl
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:41:02 -0500
+	(envelope-from <bounces@canonical.com>) id 1gRgQ4-0004FK-Hn
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:41:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRgPy-0008Dh-OL
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:41:01 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33346)
+	(envelope-from <bounces@canonical.com>) id 1gRgPy-0008DX-Nj
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:41:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33368)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gRgPy-00087X-Fv
+	id 1gRgPy-00087v-Fs
 	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:40:58 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gRgPw-0001tO-HC
+	id 1gRgPw-0001t4-Uz
 	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 16:40:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 53EC12E80CB
+	by loganberry.canonical.com (Postfix) with ESMTP id B7D6E2E80CB
 	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 16:40:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 27 Nov 2018 16:29:08 -0000
+Date: Tue, 27 Nov 2018 16:32:29 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
 Reply-To: Bug 1805445 <1805445@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154332864629.32687.7125797278920412825.malonedeb@wampee.canonical.com>
-Message-Id: <154333614816.32547.11861270173620566288.malone@wampee.canonical.com>
+Message-Id: <154333634949.16019.11233318864113327085.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1805445] Re: QEMU arm virt machine was stopped by
  STMFD command while debug process
@@ -39,17 +39,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In your "before the STR" image the guest CPU is in mode 0x13, which is
-Supervisor. In the image afterwards, it is in Abort mode (0x17). I think
-therefore that what has happened is that the memory address the code is
-trying to store to is not accessible, and the guest has taken a Data
-Abort exception, so in the second image you are looking at your guest's
-exception handler code for the data abort.
-
-There is a long-standing bug where singlestepping an insn which takes an
-exception results in our stepping the insn at the exception vector entry
-point and then stopping, rather than stopping on the entry point, which
-may be confusing you here. (That's LP:757702.)
+As a more general note, you can't expect to be able to run a flash image
+from one Arm system (your phone) on a different Arm system. All Arm
+boards are completely different in their memory layout, where they put
+devices, what devices are present, and so on. Trying to run an image for
+the wrong machine will result in it crashing very early on, when the
+guest tries to read a device or RAM which isn't where it expects to be.
+The palmetto-bmc machine will only run code that's built for that
+system.
 
 -- =
 
