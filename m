@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gRdPK-0007Rk-TU
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:28:12 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gRdPM-00074b-Sf
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:28:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gRdPG-0000qd-K5
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:28:06 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:40628)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRdPG-0000pK-D5
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:28:02 -0500
-Received: by mail-wm1-f66.google.com with SMTP id q26so22116714wmf.5
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 05:28:02 -0800 (PST)
-References: <20181126200435.23408-1-minyard@acm.org>
-	<20181126200435.23408-17-minyard@acm.org>
-	<d588fce5-23ad-3b53-c88a-4dfb542353e8@redhat.com>
-	<192d9e99-a3e6-0ca3-7c23-bd5a0d2b44cb@acm.org>
-	<c9b8d4ab-dfd5-7ed0-4a45-df478fed24ca@redhat.com>
-	<663ea18c-4028-6eff-d69d-c8870effffa1@acm.org>
-	<285b12c9-af5b-f4fa-0c8a-f73e57dd9c75@redhat.com>
-	<521bc02a-c1ea-267f-6629-817d41bcc987@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <530148ec-d7ba-869f-8a72-452b26ebf461@redhat.com>
-Date: Tue, 27 Nov 2018 14:27:59 +0100
-MIME-Version: 1.0
-In-Reply-To: <521bc02a-c1ea-267f-6629-817d41bcc987@gmail.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gRdAu-0003yL-J0
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:13:14 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 27 Nov 2018 13:12:54 +0000
+Message-ID: <f9da827b-a487-4345-b791-e0a35c6887b3@virtuozzo.com>
+References: <1543322466-525229-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1543322466-525229-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 16/16] i2c:smbus_eeprom: Add a reset
- function to smbus_eeprom
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6D776333AF6E30408573B89209567506@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] qemu-img info lists bitmap directory
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,143 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: minyard@acm.org, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Corey Minyard <cminyard@mvista.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On 27/11/18 13:58, Corey Minyard wrote:
-> On 11/27/18 4:54 AM, Philippe Mathieu-Daudé wrote:
->> On 27/11/18 0:58, Corey Minyard wrote:
->>> On 11/26/18 5:01 PM, Philippe Mathieu-Daudé wrote:
->>>> On 26/11/18 23:41, Corey Minyard wrote:
->>>>> On 11/26/18 2:42 PM, Philippe Mathieu-Daudé wrote:
->>>>>> Hi Corey,
->>>>>>
->>>>>> On 26/11/18 21:04, minyard@acm.org wrote:
->>>>>>> From: Corey Minyard <cminyard@mvista.com>
->>>>>>>
->>>>>>> Reset the contents to init data and reset the offset on a machine
->>>>>>> reset.
->>>>>>>
->>>>>>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
->>>>>>> ---
->>>>>>>     hw/i2c/smbus_eeprom.c | 8 +++++++-
->>>>>>>     1 file changed, 7 insertions(+), 1 deletion(-)
->>>>>>>
->>>>>>> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
->>>>>>> index a0dcadbd60..de3a492df4 100644
->>>>>>> --- a/hw/i2c/smbus_eeprom.c
->>>>>>> +++ b/hw/i2c/smbus_eeprom.c
->>>>>>> @@ -107,7 +107,7 @@ static const VMStateDescription
->>>>>>> vmstate_smbus_eeprom = {
->>>>>>>         }
->>>>>>>     };
->>>>>>>     -static void smbus_eeprom_realize(DeviceState *dev, Error
->>>>>>> **errp)
->>>>>>> +static void smbus_eeprom_reset(DeviceState *dev)
->>>>>>>     {
->>>>>>>         SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
->>>>>>>     
->>>>>> 'git diff -U4' also shows this line:
->>>>>>
->>>>>>           memcpy(eeprom->data, eeprom->init_data, SMBUS_EEPROM_SIZE);
->>>>>>
->>>>>> I don't think this is correct.
->>>>>>
->>>>>> One test I'd like to have is a machine booting, updating the EPROM
->>>>>> then
->>>>>> rebooting calling hw reset() to use the new values (BIOS use this).
->>>>>>
->>>>>> With this patch this won't work, you'll restore the EPROM content on
->>>>>> each machine reset.
->>>>>>
->>>>>> I'd move the memcpy() call to the realize() function.
->>>>>>
->>>>>> What do you think?
->>>>> There was some debate on this in the earlier patch set.  The general
->>>>> principle
->>>> Hmm I missed it and can't find it (quick basic search). I only find
->>>> references about VMState.
->>>
->>> It starts at
->>> http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg01737.html
->> Thank you, very helpful.
->>
->>> The patch set was fairly different at that point.
->>>
->>>
->>>>> is that a reset is the same as starting up qemu from scratch, so I
->>>>> added
->>>>> this
->>>>> code based on that principle.  But I'm not really sure.
->>>>>
->>>>>>>         eeprom->offset = 0;
->>>>>> This is correct, the offset reset belongs to the reset() function.
->>>>> Actually, on a real system, a hardware reset will generally not
->>>>> affect the
->>>>> eeprom current offset register.  So if we don't take the above code,
->>>>> then
->>>>> IMHO this is wrong, too.
->>>> Indeed cpu reset shouldn't affect the EEPROM, but a board powercycle
->>>> would.
->>>>
->>>> Maybe we can argue QEMU system reset doesn't work correctly yet to use
->>>> this feature. Personally I wouldn't expect the EEPROM content be be
->>>> reset after a reset, but maybe I should rely on a block backend for a
->>>> such feature, and not the current simple approach.
->>>>
->>> Yeah, it was mentioned that to do this correctly would require a block
->>> backend.
->>> I'll let others comment on the correctness of this, I guess.  It's a
->>> separate patch
->>> so it can be easily dropped.
->> Since modelling eeprom data retention on hardware reset isn't the goal
->> of your series, we can have a consensus, adding a comment explaining why
->> we choose this simpler way, and eeprom retention simulation requieres
->> more work with block backend.
-> 
-> Good idea, I've done that.  Thanks for the reviews.  Is this a
-> "reviewed-by"?
-
-Why not ;)
-
-With a comment:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> 
-> 
-> -corey
-> 
->>> The current code is far too broken for anyone to be using it, so we
->>> won't be
->>> breaking any current users, I don't think.
->>>
->>> -corey
->>>
->>>>> -corey
->>>>>
->>>>>
->>>>>> Regards,
->>>>>>
->>>>>> Phil.
->>>>>>
->>>>>>>     }
->>>>>>>     +static void smbus_eeprom_realize(DeviceState *dev, Error
->>>>>>> **errp)
->>>>>>> +{
->>>>>>> +    smbus_eeprom_reset(dev);
->>>>>>> +}
->>>>>>> +
->>>>>>>     static Property smbus_eeprom_properties[] = {
->>>>>>>         DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
->>>>>>>         DEFINE_PROP_END_OF_LIST(),
->>>>>>> @@ -126,6 +131,7 @@ static void
->>>>>>> smbus_eeprom_class_initfn(ObjectClass
->>>>>>> *klass, void *data)
->>>>>>>         SMBusDeviceClass *sc = SMBUS_DEVICE_CLASS(klass);
->>>>>>>           dc->realize = smbus_eeprom_realize;
->>>>>>> +    dc->reset = smbus_eeprom_reset;
->>>>>>>         sc->receive_byte = eeprom_receive_byte;
->>>>>>>         sc->write_data = eeprom_write_data;
->>>>>>>         dc->props = smbus_eeprom_properties;
->>>>>>>
-> 
+MjcuMTEuMjAxOCAxNTo0MSwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IFRoZSAnRm9ybWF0
+IHNwZWNpZmljIGluZm9ybWF0aW9uJyBvZiBxZW11LWltZyBpbmZvIGNvbW1hbmQgd2lsbCBzaG93
+DQo+IHRoZSBuYW1lLCBmbGFncyBhbmQgZ3JhbnVsYXJpdHkgZm9yIGV2ZXJ5IFFDT1cyIGJpdG1h
+cC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtl
+dmljaEB2aXJ0dW96em8uY29tPg0KPiAtLS0NCj4gRGVhciBjb2xsZWFndWVzLA0KPiANCj4gV2l0
+aCB0aGlzIHBhdGNoLCBxZW11LWltZyBpbmZvIHdpbGwgZGlzcGxheSBhIG5hbWUsIGZsYWdzIGFu
+ZCBncmFudWxhcml0eQ0KPiBpbmZvcm1hdGlvbiBmb3IgZXZlcnkgYml0bWFwIGluIHRoZSBkaXJl
+Y3Rvcnkgc2VjdGlvbiBvZiBhIFFDT1cyIGltYWdlLg0KPiBUaGF0IGluZm9ybWF0aW9uIGFwcGVh
+cnMgaW4gdGhlICdGb3JtYXQgc3BlY2lmaWMgaW5mb3JtYXRpb24nIHNlY3Rpb24gYXMNCj4gaXQn
+cyBzaG93biBpbiB0aGUgZm9sbG93aW5nIGV4YW1wbGU6DQo+IA0KDQpbLi4uXQ0KDQo+IC0tLSBh
+L2Jsb2NrL3Fjb3cyLmMNCj4gKysrIGIvYmxvY2svcWNvdzIuYw0KPiBAQCAtNDI1NCw2ICs0MjU0
+LDEzIEBAIHN0YXRpYyBJbWFnZUluZm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8o
+QmxvY2tEcml2ZXJTdGF0ZSAqYnMpDQo+ICAgICAgIEJEUlZRY293MlN0YXRlICpzID0gYnMtPm9w
+YXF1ZTsNCj4gICAgICAgSW1hZ2VJbmZvU3BlY2lmaWMgKnNwZWNfaW5mbzsNCj4gICAgICAgUUNy
+eXB0b0Jsb2NrSW5mbyAqZW5jcnlwdF9pbmZvID0gTlVMTDsNCj4gKyAgICBFcnJvciAqbG9jYWxf
+ZXJyID0gTlVMTDsNCj4gKyAgICBRY293MkJpdG1hcEluZm9MaXN0ICpiaXRtYXBzOw0KPiArDQo+
+ICsgICAgYml0bWFwcyA9IHFjb3cyX2dldF9iaXRtYXBfaW5mb19saXN0KGJzLCAmbG9jYWxfZXJy
+KTsNCj4gKyAgICBpZiAobG9jYWxfZXJyICE9IE5VTEwpIHsNCj4gKyAgICAgICAgZXJyb3JfcmVw
+b3J0X2Vycihsb2NhbF9lcnIpOw0KPiArICAgIH0NCj4gICANCj4gICAgICAgaWYgKHMtPmNyeXB0
+byAhPSBOVUxMKSB7DQo+ICAgICAgICAgICBlbmNyeXB0X2luZm8gPSBxY3J5cHRvX2Jsb2NrX2dl
+dF9pbmZvKHMtPmNyeXB0bywgJmVycm9yX2Fib3J0KTsNCj4gQEAgLTQyNjgsNiArNDI3NSw3IEBA
+IHN0YXRpYyBJbWFnZUluZm9TcGVjaWZpYyAqcWNvdzJfZ2V0X3NwZWNpZmljX2luZm8oQmxvY2tE
+cml2ZXJTdGF0ZSAqYnMpDQo+ICAgICAgICAgICAqc3BlY19pbmZvLT51LnFjb3cyLmRhdGEgPSAo
+SW1hZ2VJbmZvU3BlY2lmaWNRQ293Mil7DQo+ICAgICAgICAgICAgICAgLmNvbXBhdCAgICAgICAg
+ICAgICA9IGdfc3RyZHVwKCIwLjEwIiksDQo+ICAgICAgICAgICAgICAgLnJlZmNvdW50X2JpdHMg
+ICAgICA9IHMtPnJlZmNvdW50X2JpdHMsDQo+ICsgICAgICAgICAgICAuYml0bWFwcyAgICAgICAg
+ICAgID0gYml0bWFwcywNCg0KQml0bWFwcyBhcmUgcG9zc2libGUgb25seSBpbiB2ZXJzaW9uID49
+Mywgc28gdGhpcyBsaW5lIHNob3VsZCBiZSBkcm9wcGVkDQoNCg0KDQo+ICAgICAgICAgICB9Ow0K
+PiAgICAgICB9IGVsc2UgaWYgKHMtPnFjb3dfdmVyc2lvbiA9PSAzKSB7DQo+ICAgICAgICAgICAq
+c3BlY19pbmZvLT51LnFjb3cyLmRhdGEgPSAoSW1hZ2VJbmZvU3BlY2lmaWNRQ293Mil7DQo+IEBA
+IC00Mjc5LDYgKzQyODcsOCBAQCBzdGF0aWMgSW1hZ2VJbmZvU3BlY2lmaWMgKnFjb3cyX2dldF9z
+cGVjaWZpY19pbmZvKEJsb2NrRHJpdmVyU3RhdGUgKmJzKQ0KPiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBRQ09XMl9JTkNPTVBBVF9DT1JSVVBULA0KPiAgICAgICAgICAgICAg
+IC5oYXNfY29ycnVwdCAgICAgICAgPSB0cnVlLA0KPiAgICAgICAgICAgICAgIC5yZWZjb3VudF9i
+aXRzICAgICAgPSBzLT5yZWZjb3VudF9iaXRzLA0KPiArICAgICAgICAgICAgLmhhc19iaXRtYXBz
+ICAgICAgICA9IGJpdG1hcHMgPyB0cnVlIDogZmFsc2UsDQo+ICsgICAgICAgICAgICAuYml0bWFw
+cyAgICAgICAgICAgID0gYml0bWFwcywNCj4gICAgICAgICAgIH07DQo+ICAgICAgIH0gZWxzZSB7
+DQo+ICAgICAgICAgICAvKiBpZiB0aGlzIGFzc2VydGlvbiBmYWlscywgdGhpcyBwcm9iYWJseSBt
+ZWFucyBhIG5ldyB2ZXJzaW9uIHdhcw0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzIuaCBiL2Js
+b2NrL3Fjb3cyLmgNCj4gaW5kZXggODY2MmI2OC4uMGVjMmIzZCAxMDA2NDQNCj4gLS0tIGEvYmxv
+Y2svcWNvdzIuaA0KPiArKysgYi9ibG9jay9xY293Mi5oDQo+IEBAIC02ODUsNiArNjg1LDggQEAg
+aW50IHFjb3cyX2NoZWNrX2JpdG1hcHNfcmVmY291bnRzKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBC
+ZHJ2Q2hlY2tSZXN1bHQgKnJlcywNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgdm9pZCAqKnJlZmNvdW50X3RhYmxlLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBpbnQ2NF90ICpyZWZjb3VudF90YWJsZV9zaXplKTsNCj4gICBib29sIHFjb3cyX2xv
+YWRfZGlydHlfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpicywgRXJyb3IgKiplcnJwKTsNCj4g
+K1Fjb3cyQml0bWFwSW5mb0xpc3QgKnFjb3cyX2dldF9iaXRtYXBfaW5mb19saXN0KEJsb2NrRHJp
+dmVyU3RhdGUgKmJzLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgRXJyb3IgKiplcnJwKTsNCj4gICBpbnQgcWNvdzJfcmVvcGVuX2JpdG1hcHNfcndf
+aGludChCbG9ja0RyaXZlclN0YXRlICpicywgYm9vbCAqaGVhZGVyX3VwZGF0ZWQsDQo+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKTsNCj4gICBpbnQgcWNv
+dzJfcmVvcGVuX2JpdG1hcHNfcncoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEVycm9yICoqZXJycCk7
+DQo+IGRpZmYgLS1naXQgYS9xYXBpL2Jsb2NrLWNvcmUuanNvbiBiL3FhcGkvYmxvY2stY29yZS5q
+c29uDQo+IGluZGV4IGY0NTM4ZmEuLmUwMjFlYWQgMTAwNjQ0DQo+IC0tLSBhL3FhcGkvYmxvY2st
+Y29yZS5qc29uDQo+ICsrKyBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+IEBAIC03Nyw3ICs3Nyw4
+IEBADQo+ICAgICAgICAgJypsYXp5LXJlZmNvdW50cyc6ICdib29sJywNCj4gICAgICAgICAnKmNv
+cnJ1cHQnOiAnYm9vbCcsDQo+ICAgICAgICAgJ3JlZmNvdW50LWJpdHMnOiAnaW50JywNCj4gLSAg
+ICAgICcqZW5jcnlwdCc6ICdJbWFnZUluZm9TcGVjaWZpY1FDb3cyRW5jcnlwdGlvbicNCj4gKyAg
+ICAgICcqZW5jcnlwdCc6ICdJbWFnZUluZm9TcGVjaWZpY1FDb3cyRW5jcnlwdGlvbicsDQo+ICsg
+ICAgICAnKmJpdG1hcHMnOiBbJ1Fjb3cyQml0bWFwSW5mbyddDQo+ICAgICB9IH0NCj4gICANCj4g
+ICAjIw0KPiBAQCAtNDU0LDYgKzQ1NSwzOCBAQA0KPiAgICAgICAgICAgICAgJ3N0YXR1cyc6ICdE
+aXJ0eUJpdG1hcFN0YXR1cyd9IH0NCj4gICANCj4gICAjIw0KPiArIyBAUWNvdzJCaXRtYXBJbmZv
+RmxhZ3M6DQo+ICsjDQo+ICsjIEFuIGVudW1lcmF0aW9uIG9mIHN0YXRlcyB0aGF0IGEgYml0bWFw
+IGNhbiByZXBvcnQgdG8gdGhlIHVzZXIuDQo+ICsjDQo+ICsjIEBpbi11c2U6IFRoZSBiaXRtYXAg
+d2FzIG5vdCBzYXZlZCBjb3JyZWN0bHkgYW5kIG1heSBiZSBpbmNvbnNpc3RlbnQuDQo+ICsjDQo+
+ICsjIEBhdXRvOiBUaGUgYml0bWFwIG11c3QgcmVmbGVjdCBhbGwgY2hhbmdlcyBvZiB0aGUgdmly
+dHVhbCBkaXNrIGJ5IGFueQ0KPiArIyAgICAgICAgYXBwbGljYXRpb24gdGhhdCB3b3VsZCB3cml0
+ZSB0byB0aGlzIHFjb3cyIGZpbGUuDQo+ICsjDQo+ICsjIFNpbmNlOiAzLjINCg0KSG0sIEkgaGVh
+cmQsIHRoZSBuZXh0IGlzIDQuMD8NCg0KPiArIyMNCj4gK3sgJ2VudW0nOiAnUWNvdzJCaXRtYXBJ
+bmZvRmxhZ3MnLA0KPiArICAnZGF0YSc6IFsnaW4tdXNlJywgJ2F1dG8nXSB9DQo+ICsNCj4gKyMj
+DQo+ICsjIEBRY293MkJpdG1hcEluZm86DQo+ICsjDQo+ICsjIEltYWdlIGJpdG1hcCBpbmZvcm1h
+dGlvbi4NCj4gKyMNCj4gKyMgQG5hbWU6IHRoZSBuYW1lIG9mIHRoZSBkaXJ0eSBiaXRtYXANCj4g
+KyMNCj4gKyMgQGdyYW51bGFyaXR5OiBncmFudWxhcml0eSBvZiB0aGUgZGlydHkgYml0bWFwIGlu
+IGJ5dGVzDQo+ICsjDQo+ICsjIEBmbGFnczogZmxhZ3Mgb2YgdGhlIGRpcnR5IGJpdG1hcA0KDQpk
+cm9wICJkaXJ0eSIgd29yZCwgdGhleSBhcmUganVzdCBiaXRtYXBzIGJ5IHNwZWMuDQoNCj4gKyMN
+Cj4gKyMgU2luY2U6IDMuMg0KDQphbmQgaGVyZSwgNC4wPw0KDQo+ICsjIw0KPiAreyAnc3RydWN0
+JzogJ1Fjb3cyQml0bWFwSW5mbycsDQo+ICsgICdkYXRhJzogeyduYW1lJzogJ3N0cicsICdncmFu
+dWxhcml0eSc6ICd1aW50MzInLA0KPiArICAgICAgICAgICAnZmxhZ3MnOiBbJ1Fjb3cyQml0bWFw
+SW5mb0ZsYWdzJ119IH0NCj4gKw0KPiArIyMNCj4gICAjIEBCbG9ja0xhdGVuY3lIaXN0b2dyYW1J
+bmZvOg0KPiAgICMNCj4gICAjIEJsb2NrIGxhdGVuY3kgaGlzdG9ncmFtLg0KPiANCg0KDQp3aXRo
+IHRoZXNlIHNtYWxsIGZpeGVzOg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9n
+aWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQoNCi0tIA0KQmVzdCByZWdhcmRz
+LA0KVmxhZGltaXINCg==
