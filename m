@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRlKX-0005r9-OA
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:55:42 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gRlUa-0002do-AW
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 17:06:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gRlKT-0006ux-E5
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:55:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41122)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gRlKT-0006ug-8H
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 16:55:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gRlKS-0000Es-6n
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 21:55:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 31F182E80C9
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 21:55:36 +0000 (UTC)
+	(envelope-from <alistair23@gmail.com>) id 1gRlUZ-0004P4-4u
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 17:06:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 27 Nov 2018 21:45:47 -0000
-From: Igor <generalrot@rambler.ru>
-Reply-To: Bug 1805445 <1805445@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154332864629.32687.7125797278920412825.malonedeb@wampee.canonical.com>
-Message-Id: <154335514746.9921.4677026400408837981.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805445] Re: QEMU arm virt machine was stopped by
- STMFD command while debug process
+References: <CAKmqyKMdNs4etff7rc0vDy_tmZf5deP1Geu0GchkENu+em5=+w@mail.gmail.com>
+	<mhng-b345219b-56ea-4aee-b25e-95c762c54b49@palmer-si-x1c4>
+In-Reply-To: <mhng-b345219b-56ea-4aee-b25e-95c762c54b49@palmer-si-x1c4>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 27 Nov 2018 14:05:33 -0800
+Message-ID: <CAKmqyKPtn-C5rm3ggj5CvAAXh+Gq=u8YDh1S8Wmsb=tsLjcsXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] riscv: virt: Cast the initrd start
+ address to target bit length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +23,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Palmer Dabbelt <palmer@sifive.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-riscv@nongnu.org, Alexander Graf <agraf@suse.de>
 
-Maybe this is correct for palmetto-board, but qemu user should be able
-to debug any basic arm instructions for generic arm board with general
-purpose SPI, I2C etc... My SPI Flash has 4 Mb, and RAM adress may start
-from 0x400000, This is impossible for 256 Mb Flash. It would be great,
-if qemu can build general arm device with var ram adr, cpu core and
-block dev.
+On Mon, Nov 26, 2018 at 11:02 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> On Wed, 21 Nov 2018 18:09:27 PST (-0800), alistair23@gmail.com wrote:
+> > On Wed, Nov 21, 2018 at 5:58 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+> >>
+> >> On Wed, 21 Nov 2018 14:34:44 PST (-0800), Alistair Francis wrote:
+> >> > Ensure that the calculate initrd offset points to a valid address for
+> >> > the architecture.
+> >> >
+> >> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> >> > Suggested-by: Alexander Graf <agraf@suse.de>
+> >> > Reported-by: Alexander Graf <agraf@suse.de>
+> >> > ---
+> >> >  hw/riscv/virt.c | 7 ++++++-
+> >> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> >> >
+> >> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> >> > index 2b38f89070..4467195fac 100644
+> >> > --- a/hw/riscv/virt.c
+> >> > +++ b/hw/riscv/virt.c
+> >> > @@ -85,7 +85,12 @@ static hwaddr load_initrd(const char *filename, uint64_t mem_size,
+> >> >       * halfway into RAM, and for boards with 256MB of RAM or more we put
+> >> >       * the initrd at 128MB.
+> >> >       */
+> >> > -    *start = kernel_entry + MIN(mem_size / 2, 128 * MiB);
+> >> > +    /* As hwaddr is a 64-bit number we need to cast it for 32-bit */
+> >> > +#if defined(TARGET_RISCV32)
+> >> > +    *start = (uint32_t) (kernel_entry + MIN(mem_size / 2, 128ULL * MiB));
+> >> > +#elif defined(TARGET_RISCV64)
+> >> > +    *start = (uint64_t) (kernel_entry + MIN(mem_size / 2, 128 * MiB));
+> >> > +#endif
+> >> >
+> >> >      size = load_ramdisk(filename, *start, mem_size - *start);
+> >> >      if (size == -1) {
+> >> > --
+> >> > 2.19.1
+> >>
+> >> Maybe I'm missing something, but wouldn't something like
+> >>
+> >>     uint64_t start_unclobbered = kernel_entry + MIN(mem_size / 2, 128ULL * MiB);
+> >>     assert(start_unclobbered == (hwaddr)start_unclobbered);
+> >>     *start = (hwaddr)start_unclobbered;
+> >>
+> >> work better?  That should actually check this all lines up, as opposed to just
+> >> silently truncating a bad address.
+> >
+> > The problem is that hwaddr is always 64-bit.
+> >
+> > Stupidly I forgot about target_ulong, which should work basically the
+> > same as above. An assert() seems a little harsh though, Alex reported
+> > problem was fixed with just a cast.
+>
+> OK, I must be misunderstanding the problem, then.  With the current code, isn't
+> it possible to end up causing start to overflow a 32-bit address?  This would
+> happen if kernel_entry is high, with IIUC is coming from the ELF to load and is
+> therefor user input.  I think that's worth some sort of assertion, as it'll
+> definitely blow up trying to enter the kernel (and possible before that,
+> assuming there's no target memory where it overflows into).
 
--- =
+I don't have a setup to reproduce this unfortunately, but Alex
+reported that he saw start being excessively high (0xffffffff88000000)
+when loading an initrd.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805445
+It looks like the kernel entry address ends up being converted to
+0xffffffff80000000 incorrectly instead of being a real overflow.
 
-Title:
-  QEMU arm virt machine was stopped by STMFD command while debug process
+Alistair
 
-Status in QEMU:
-  New
-
-Bug description:
-  Hello, i have a big problem with QEMU arm virtual machine. So...
-  I run QEMU machine with bare-metal ThreadX fullflash from Texet TM-333 ph=
-one  (Spreadtrum platform)
-  [CODE]qemu-system-arm -S -gdb tcp::1234,ipv4 -drive file=3DC:\cygwin64\ho=
-me\flash.bin,if=3Dmtd,format=3Draw -M palmetto-bmc -cpu arm926 -m 64M[/CODE]
-  I use palmetto-bmc platform because it have ARM926EJ-S core and support S=
-PI Flash.
-  Then, i attach to gdb qemu process from IDA and run code step-by-step.
-  [IMG]https://pp.userapi.com/c847218/v847218546/13ec1c/iSIcre5-js4.jpg[/IM=
-G]
-
-  When the IDA run 00032534 STR R11, [R10] command
-  [IMG]https://pp.userapi.com/c846416/v846416708/133f60/GQzxORvf4Tg.jpg[/IM=
-G]
-
-  instead of store R11 on R10 adress, it jump 000328DC STMFD SP!, {R0-R12,L=
-R} instruction...
-  [IMG]https://pp.userapi.com/c847218/v847218546/13ec26/32A0VcaJywg.jpg[/IM=
-G]
-  and virt machine not execute new instruction... =
-
-  [IMG]https://pp.userapi.com/c850624/v850624111/528f3/N7FTpgloWVU.jpg[/IMG]
-
-  and why i did not change flash from n25q256a to n25q032a11 in aspeed.c
-  without rebuild qemu?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805445/+subscriptions
+>
+> This won't happen with the default Linux setup, but could happen if users are
+> trying to do something weird.
