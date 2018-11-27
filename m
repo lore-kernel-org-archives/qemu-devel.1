@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRaqH-0008DE-Cf
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 05:43:46 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gRasV-0000cX-Q6
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 05:46:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRaqG-0003OY-Gz
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 05:43:45 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41476)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gRaqG-0003OA-CK
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 05:43:44 -0500
-Received: by mail-ot1-x341.google.com with SMTP id u16so19654089otk.8
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 02:43:44 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1gRasR-0004t3-P3
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 05:46:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46552)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1gRasR-0004rN-DU
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 05:45:59 -0500
+Date: Tue, 27 Nov 2018 11:45:23 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181127114523.646bcb29.cohuck@redhat.com>
+In-Reply-To: <20181127024959.7060-2-ehabkost@redhat.com>
+References: <20181127024959.7060-1-ehabkost@redhat.com>
+	<20181127024959.7060-2-ehabkost@redhat.com>
 MIME-Version: 1.0
-References: <20181126191454.9455-1-ricardo.perez_blanco@nokia.com>
-In-Reply-To: <20181126191454.9455-1-ricardo.perez_blanco@nokia.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Nov 2018 10:43:31 +0000
-Message-ID: <CAFEAcA9vDyVhj06oKDf=eFn_AkQk4MNRmeUf86OH3xJFaKNEqA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] [PATCH] Allow AArch64 processors to boot
- from a kernel placed over 4GB.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 1/2] virtio: Helper for
+ registering virtio device types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +28,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ricardo.perez_blanco@nokia.com
-Cc: ricardoperezblanco@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, libvir-list@redhat.com, Wainer dos Santos Moschetta <wainersm@redhat.com>, Markus Armbruster <armbru@redhat.com>, Laine Stump <laine@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Amit Shah <amit@kernel.org>, Cleber Rosa <crosa@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Max Reitz <mreitz@redhat.com>, Jason Wang <jasowang@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Caio Carrara <ccarrara@redhat.com>
 
-On Mon, 26 Nov 2018 at 19:15, Perez Blanco, Ricardo (Nokia -
-BE/Antwerp) <ricardo.perez_blanco@nokia.com> wrote:
->
-> Some machine based on AArch64 can have its main memory over 4GBs. With
-> the current path, these machines can support "-kernel" in qemu
->
-> Signed-off-by: Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>
+On Tue, 27 Nov 2018 00:49:58 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Hi; I think it would be worth noting in the commit message that
-this doesn't affect any machines QEMU currently emulates.
-
+> Introduce a helper for registering different flavours of virtio
+> devices.  Convert code to use the helper, but keep only the
+> existing generic types.  Transitional and non-transitional device
+> types will be added by another patch.
+> 
+> Acked-by: Andrea Bolognani <abologna@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
->  hw/arm/boot.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index 586baa9b64..183c5860bd 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -64,7 +64,9 @@ typedef enum {
->      FIXUP_BOARDID,      /* overwrite with board ID number */
->      FIXUP_BOARD_SETUP,  /* overwrite with board specific setup code address */
->      FIXUP_ARGPTR,       /* overwrite with pointer to kernel args */
-> +    FIXUP_ARGPTR_HIGHER_32BITS,       /* overwrite with pointer to kernel args (higher 32 bits) */
->      FIXUP_ENTRYPOINT,   /* overwrite with kernel entry point */
-> +    FIXUP_ENTRYPOINT_HIGHER_32BITS,   /* overwrite with kernel entry point (higher 32 bits) */
+> Changes v2 -> v3:
+> * Split into two separate patches (type registration helper
+>   and introduction of new types)
+> * Rewrote comments describing each flavour
+> * Rewrote virtio_pci_types_register() completely:
+>   * Replaced magic generation of type names with explicit fields in
+>     VirtioPCIDeviceTypeInfo
+>   * Removed modern_only field (won't be used anymore)
+>   * Don't register a separate base type unless it's required by
+>     the caller
+> ---
+>  hw/virtio/virtio-pci.h        |  54 ++++++++
+>  hw/display/virtio-gpu-pci.c   |   7 +-
+>  hw/display/virtio-vga.c       |   7 +-
+>  hw/virtio/virtio-crypto-pci.c |   7 +-
+>  hw/virtio/virtio-pci.c        | 231 ++++++++++++++++++++++++----------
+>  5 files changed, 228 insertions(+), 78 deletions(-)
+> 
+> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+> index 813082b0d7..b26731a305 100644
+> --- a/hw/virtio/virtio-pci.h
+> +++ b/hw/virtio/virtio-pci.h
+> @@ -417,4 +417,58 @@ struct VirtIOCryptoPCI {
+>  /* Virtio ABI version, if we increment this, we break the guest driver. */
+>  #define VIRTIO_PCI_ABI_VERSION          0
+>  
+> +/* Input for virtio_pci_types_register() */
+> +typedef struct VirtioPCIDeviceTypeInfo {
+> +    /*
+> +     * Common base class for the subclasses below.
+> +     *
+> +     * Required only if transitional_name or non_transitional_name is set.
+> +     *
+> +     * We need a separate base type instead of making all types
+> +     * inherit from generic_name for two reasons:
+> +     * 1) generic_name implements INTERFACE_PCIE_DEVICE, but
+> +     *    transitional_name don't.
 
-I recommend naming these FIXUP_ARGPTR_HI and FIXUP_ENTRYPOINT_HI.
-As a second followup patch we can then rename FIXUP_ARGPTR and
-FIXUP_ENTRYPOINT to FIXUP_ARGPTR_LO and FIXUP_ENTRYPOINT_LO.
+s/don't/does not/
 
->      FIXUP_GIC_CPU_IF,   /* overwrite with GIC CPU interface address */
->      FIXUP_BOOTREG,      /* overwrite with boot register address */
->      FIXUP_DSB,          /* overwrite with correct DSB insn for cpu */
-> @@ -84,9 +86,9 @@ static const ARMInsnFixup bootloader_aarch64[] = {
->      { 0x58000084 }, /* ldr x4, entry ; Load the lower 32-bits of kernel entry */
->      { 0xd61f0080 }, /* br x4      ; Jump to the kernel entry point */
->      { 0, FIXUP_ARGPTR }, /* arg: .word @DTB Lower 32-bits */
-> -    { 0 }, /* .word @DTB Higher 32-bits */
-> +    { 0, FIXUP_ARGPTR_HIGHER_32BITS}, /* .word @DTB Higher 32-bits */
->      { 0, FIXUP_ENTRYPOINT }, /* entry: .word @Kernel Entry Lower 32-bits */
-> -    { 0 }, /* .word @Kernel Entry Higher 32-bits */
-> +    { 0, FIXUP_ENTRYPOINT_HIGHER_32BITS }, /* .word @Kernel Entry Higher 32-bits */
->      { 0, FIXUP_TERMINATOR }
->  };
->
-> @@ -175,7 +177,9 @@ static void write_bootloader(const char *name, hwaddr addr,
->          case FIXUP_BOARDID:
->          case FIXUP_BOARD_SETUP:
->          case FIXUP_ARGPTR:
-> +        case FIXUP_ARGPTR_HIGHER_32BITS:
->          case FIXUP_ENTRYPOINT:
-> +        case FIXUP_ENTRYPOINT_HIGHER_32BITS:
->          case FIXUP_GIC_CPU_IF:
->          case FIXUP_BOOTREG:
->          case FIXUP_DSB:
-> @@ -939,7 +943,6 @@ static uint64_t load_aarch64_image(const char *filename, hwaddr mem_base,
->              }
->          }
->      }
-> -
->      *entry = mem_base + kernel_load_offset;
->      rom_add_blob_fixed_as(filename, buffer, size, *entry, as);
->
+> +     * 2) generic_name has the "disable-legacy" and "disable-modern"
+> +     *    properties, transitional_name and non_transitional name don't.
+> +     */
+> +    const char *base_name;
+> +    /*
+> +     * Generic device type.  Optional.
+> +     *
+> +     * Supports both transitional and non-transitional modes,
+> +     * using the disable-legacy and disable-modern properties.
+> +     * If disable-legacy=auto, (non-)transitional mode is selected
+> +     * depending on the bus where the device is plugged.
+> +     *
+> +     * Implements both INTERFACE_PCIE_DEVICE and INTERFACE_CONVENTIONAL_PCI_DEVICE,
+> +     * but PCI Express is supported only in non-transitional mode.
+> +     *
+> +     * The only type implemented by QEMU 3.1 and older.
+> +     */
+> +    const char *generic_name;
+> +    /*
+> +     * The non-transitional device type.  Optional.
 
-Stray whitespace change.
+That's transitional...
 
-> @@ -1153,8 +1156,10 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->              info->dtb_start = QEMU_ALIGN_UP(info->initrd_start + initrd_size,
->                                             align);
->              fixupcontext[FIXUP_ARGPTR] = info->dtb_start;
-> +            fixupcontext[FIXUP_ARGPTR_HIGHER_32BITS] = info->dtb_start >> 32;
->          } else {
->              fixupcontext[FIXUP_ARGPTR] = info->loader_start + KERNEL_ARGS_ADDR;
-> +            fixupcontext[FIXUP_ARGPTR_HIGHER_32BITS] = (info->loader_start + KERNEL_ARGS_ADDR) >> 32;
->              if (info->ram_size >= (1ULL << 32)) {
->                  error_report("RAM size must be less than 4GB to boot"
->                               " Linux kernel using ATAGS (try passing a device tree"
-> @@ -1163,6 +1168,7 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->              }
->          }
->          fixupcontext[FIXUP_ENTRYPOINT] = entry;
-> +        fixupcontext[FIXUP_ENTRYPOINT_HIGHER_32BITS] = entry >> 32;
->
->          write_bootloader("bootloader", info->loader_start,
->                           primary_loader, fixupcontext, as);
-> --
+> +     *
+> +     * Implements both INTERFACE_PCIE_DEVICE and INTERFACE_CONVENTIONAL_PCI_DEVICE.
+> +     */
+> +    const char *transitional_name;
+> +    /*
+> +     * The transitional device type.  Optional.
 
-Otherwise the patch looks good.
+...and that's non-transitional :)
 
-thanks
--- PMM
+> +     *
+> +     * Implements INTERFACE_CONVENTIONAL_PCI_DEVICE only.
+> +     */
+> +    const char *non_transitional_name;
+> +
+> +    /* Parent type.  If NULL, TYPE_VIRTIO_PCI is used */
+> +    const char *parent;
+> +
+> +    /* Same as TypeInfo fields: */
+> +    size_t instance_size;
+> +    void (*instance_init)(Object *obj);
+> +    void (*class_init)(ObjectClass *klass, void *data);
+> +} VirtioPCIDeviceTypeInfo;
+
+That's a bit of boilerplate, but the end result seems to be more
+greppable.
+
+> +
+> +/* Register virtio-pci type(s).  @t must be static. */
+> +void virtio_pci_types_register(const VirtioPCIDeviceTypeInfo *t);
+> +
+>  #endif
+
+(...)
+
+Looks sane to me. With the typos fixed,
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
