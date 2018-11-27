@@ -1,14 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gRcg5-0001c4-OD
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:41:22 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1gRciN-00047A-If
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:43:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gRcg0-0001hK-TO
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:41:21 -0500
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Tue, 27 Nov 2018 15:41:06 +0300
-Message-Id: <1543322466-525229-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] qemu-img info lists bitmap directory entries
+	(envelope-from <borntraeger@de.ibm.com>) id 1gRciK-0003dY-7v
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:43:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47834)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1gRciK-0003Z9-06
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:43:40 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wARCcOwr011394
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 07:43:33 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2p14a35a8t-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 07:43:33 -0500
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 27 Nov 2018 12:43:30 -0000
+References: <20181127114102.4319-1-david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 27 Nov 2018 13:43:24 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181127114102.4319-1-david@redhat.com>
+Content-Language: en-US
+Message-Id: <f31fb9d1-d1dd-7d06-7993-08e44bb77632@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/tod: properly stop the KVM TOD
+ while the guest is not running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,212 +42,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-The 'Format specific information' of qemu-img info command will show
-the name, flags and granularity for every QCOW2 bitmap.
+On 27.11.2018 12:41, David Hildenbrand wrote:
+> Just like on other architectures, we should stop the clock while the guest
+> is not running. This is already properly done for TCG. Right now, doing an
+> offline migration (stop, migrate, cont) can easily trigger stalls in the
+> guest.
+> 
+> Even doing a
+>     (hmp) stop
+>     ... wait 2 minutes ...
+>     (hmp) cont
+> will already trigger stalls.
+> 
+> So whenever the guest stops, backup the KVM TOD. When continuning to run
+> the guest, restore the KVM TOD.
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
-Dear colleagues,
+We do a similar thing for managedsave so it probably makes sense to solve
+the stall warnings. Now: At the same time, we actually want to have the guest
+see the real time and maybe even share the TOD clock with the host in some
+way, while at the same time avoid the stall warnings.
 
-With this patch, qemu-img info will display a name, flags and granularity
-information for every bitmap in the directory section of a QCOW2 image.
-That information appears in the 'Format specific information' section as
-it's shown in the following example:
-
-image: /vz/vmprivate/VM1/harddisk.hdd
-file format: qcow2
-virtual size: 64G (68719476736 bytes)
-disk size: 3.0M
-cluster_size: 1048576
-Format specific information:
-    compat: 1.1
-    lazy refcounts: true
-    refcount bits: 16
-    dirty bitmaps:
-        [0]:
-            flags:
-                [0]: in-use
-                [1]: auto
-            name: {257b5ea5-38c5-410e-a457-71c76f763c60}
-            granularity: 65536
-        [1]:
-            flags:
-                [0]: in-use
-                [1]: auto
-            name: back-up
-            granularity: 65536
-    corrupt: false
-
- block/qcow2-bitmap.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c        | 10 ++++++++++
- block/qcow2.h        |  2 ++
- qapi/block-core.json | 35 ++++++++++++++++++++++++++++++++++-
- 4 files changed, 96 insertions(+), 1 deletion(-)
-
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index accebef..dcc53db 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1008,6 +1008,56 @@ fail:
-     return false;
- }
- 
-+static Qcow2BitmapInfoFlagsList *get_bitmap_info_flags(uint32_t flags)
-+{
-+    Qcow2BitmapInfoFlagsList *list = NULL;
-+    Qcow2BitmapInfoFlagsList **plist = &list;
-+
-+    if (flags & BME_FLAG_IN_USE) {
-+        Qcow2BitmapInfoFlagsList *entry = g_new0(Qcow2BitmapInfoFlagsList, 1);
-+        entry->value = QCOW2_BITMAP_INFO_FLAGS_IN_USE;
-+        *plist = entry;
-+        plist = &entry->next;
-+    }
-+    if (flags & BME_FLAG_AUTO) {
-+        Qcow2BitmapInfoFlagsList *entry = g_new0(Qcow2BitmapInfoFlagsList, 1);
-+        entry->value = QCOW2_BITMAP_INFO_FLAGS_AUTO;
-+        *plist = entry;
-+    }
-+    return list;
-+}
-+
-+Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
-+                                                Error **errp)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    Qcow2BitmapList *bm_list;
-+    Qcow2Bitmap *bm;
-+    Qcow2BitmapInfoList *list = NULL;
-+    Qcow2BitmapInfoList **plist = &list;
-+
-+    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-+                               s->bitmap_directory_size, errp);
-+    if (bm_list == NULL) {
-+        return NULL;
-+    }
-+
-+    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-+        Qcow2BitmapInfo *info = g_new0(Qcow2BitmapInfo, 1);
-+        Qcow2BitmapInfoList *obj = g_new0(Qcow2BitmapInfoList, 1);
-+        info->granularity = 1U << bm->granularity_bits;
-+        info->name = g_strdup(bm->name);
-+        info->flags = get_bitmap_info_flags(bm->flags);
-+        obj->value = info;
-+        *plist = obj;
-+        plist = &obj->next;
-+    }
-+
-+    bitmap_list_free(bm_list);
-+
-+    return list;
-+}
-+
- int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-                                  Error **errp)
- {
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 991d6ac..6485f79 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4254,6 +4254,13 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
-     BDRVQcow2State *s = bs->opaque;
-     ImageInfoSpecific *spec_info;
-     QCryptoBlockInfo *encrypt_info = NULL;
-+    Error *local_err = NULL;
-+    Qcow2BitmapInfoList *bitmaps;
-+
-+    bitmaps = qcow2_get_bitmap_info_list(bs, &local_err);
-+    if (local_err != NULL) {
-+        error_report_err(local_err);
-+    }
- 
-     if (s->crypto != NULL) {
-         encrypt_info = qcrypto_block_get_info(s->crypto, &error_abort);
-@@ -4268,6 +4275,7 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
-         *spec_info->u.qcow2.data = (ImageInfoSpecificQCow2){
-             .compat             = g_strdup("0.10"),
-             .refcount_bits      = s->refcount_bits,
-+            .bitmaps            = bitmaps,
-         };
-     } else if (s->qcow_version == 3) {
-         *spec_info->u.qcow2.data = (ImageInfoSpecificQCow2){
-@@ -4279,6 +4287,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
-                                   QCOW2_INCOMPAT_CORRUPT,
-             .has_corrupt        = true,
-             .refcount_bits      = s->refcount_bits,
-+            .has_bitmaps        = bitmaps ? true : false,
-+            .bitmaps            = bitmaps,
-         };
-     } else {
-         /* if this assertion fails, this probably means a new version was
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 8662b68..0ec2b3d 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -685,6 +685,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                                   void **refcount_table,
-                                   int64_t *refcount_table_size);
- bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-+Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
-+                                                Error **errp);
- int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-                                  Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index f4538fa..e021ead 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -77,7 +77,8 @@
-       '*lazy-refcounts': 'bool',
-       '*corrupt': 'bool',
-       'refcount-bits': 'int',
--      '*encrypt': 'ImageInfoSpecificQCow2Encryption'
-+      '*encrypt': 'ImageInfoSpecificQCow2Encryption',
-+      '*bitmaps': ['Qcow2BitmapInfo']
-   } }
- 
- ##
-@@ -454,6 +455,38 @@
-            'status': 'DirtyBitmapStatus'} }
- 
- ##
-+# @Qcow2BitmapInfoFlags:
-+#
-+# An enumeration of states that a bitmap can report to the user.
-+#
-+# @in-use: The bitmap was not saved correctly and may be inconsistent.
-+#
-+# @auto: The bitmap must reflect all changes of the virtual disk by any
-+#        application that would write to this qcow2 file.
-+#
-+# Since: 3.2
-+##
-+{ 'enum': 'Qcow2BitmapInfoFlags',
-+  'data': ['in-use', 'auto'] }
-+
-+##
-+# @Qcow2BitmapInfo:
-+#
-+# Image bitmap information.
-+#
-+# @name: the name of the dirty bitmap
-+#
-+# @granularity: granularity of the dirty bitmap in bytes
-+#
-+# @flags: flags of the dirty bitmap
-+#
-+# Since: 3.2
-+##
-+{ 'struct': 'Qcow2BitmapInfo',
-+  'data': {'name': 'str', 'granularity': 'uint32',
-+           'flags': ['Qcow2BitmapInfoFlags']} }
-+
-+##
- # @BlockLatencyHistogramInfo:
- #
- # Block latency histogram.
--- 
-1.8.3.1
+One idea is to signal the guest on migration (and stop start events) and let
+the guest do a time sync with the host.
+In fact, it seems that by architecture we need to signal a special sclp signal 
+anyway if stsi information would change (e.g. on migration). Maybe we can 
+piggyback on that and do some time sync interface in the future.
+> 
+> One special case is starting a simple VM: Reading the TOD from KVM to
+> stop it right away until the guest is actually started means that the
+> time of any simple VM will already differ to the host time. We can
+> simply leave the TOD running and the guest won't be able to recognize
+> it.
+> 
+> For migration, we actually want to keep the TOD stopped until really
+> starting the guest. To be able to catch most errors, we should however
+> try to set the TOD in addition to simply storing it. So we can still
+> catch basic migration problems.
+> 
+> If anything goes wrong while backing up/restoring the TOD, we have to
+> ignore it (but print a warning). This is then basically a fallback to
+> old behavior (TOD remains running).
+> 
+> I tested this very basically with an initrd:
+>     1. Start a simple VM. Observed that the TOD is kept running. Old
+>        behavior.
+>     2. Ordinary live migration. Observed that the TOD is temporarily
+>        stopped on the destination when setting the new value and
+>        correctly started when finally starting the guest.
+>     3. Offline live migration. (stop, migrate, cont). Observed that the
+>        TOD will be stopped on the source with the "stop" command. On the
+>        destination, the TOD is temporarily stopped when setting the new
+>        value and correctly started when finally starting the guest via
+>        "cont".
+>     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
+>        or conts in a row have no effect, so works as expected)
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/tod-kvm.c     | 88 +++++++++++++++++++++++++++++++++++++++++-
+>  include/hw/s390x/tod.h |  7 +++-
+>  2 files changed, 92 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/s390x/tod-kvm.c b/hw/s390x/tod-kvm.c
+> index df564ab89c..d4b12e1145 100644
+> --- a/hw/s390x/tod-kvm.c
+> +++ b/hw/s390x/tod-kvm.c
+> @@ -10,10 +10,11 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+> +#include "sysemu/sysemu.h"
+>  #include "hw/s390x/tod.h"
+>  #include "kvm_s390x.h"
+>  
+> -static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
+> +static void kvm_s390_get_tod_raw(S390TOD *tod, Error **errp)
+>  {
+>      int r;
+>  
+> @@ -27,7 +28,17 @@ static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
+>      }
+>  }
+>  
+> -static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
+> +static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
+> +{
+> +    if (td->stopped) {
+> +        *tod = td->base;
+> +        return;
+> +    }
+> +
+> +    kvm_s390_get_tod_raw(tod, errp);
+> +}
+> +
+> +static void kvm_s390_set_tod_raw(const S390TOD *tod, Error **errp)
+>  {
+>      int r;
+>  
+> @@ -38,6 +49,58 @@ static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
+>      if (r) {
+>          error_setg(errp, "Unable to set KVM guest TOD clock: %s",
+>                     strerror(-r));
+> +        return;
+> +    }
+> +}
+> +
+> +static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
+> +{
+> +    Error *local_err = NULL;
+> +
+> +    /*
+> +     * Somebody (e.g. migration) set the TOD. We'll store it into KVM to
+> +     * properly detect errors now but take a look at the runstate to decide
+> +     * whether really to keep the tod running. E.g. during migration, this
+> +     * is the point where we want to stop the inititally running TOD to fire
+> +     * it back up when actually starting the migrated guest.
+> +     */
+> +    kvm_s390_set_tod_raw(tod, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    if (runstate_is_running()) {
+> +        td->stopped = false;
+> +    } else {
+> +        td->stopped = true;
+> +        td->base = *tod;
+> +    }
+> +}
+> +
+> +static void kvm_s390_tod_vm_state_change(void *opaque, int running,
+> +                                         RunState state)
+> +{
+> +    S390TODState *td = opaque;
+> +    Error *local_err = NULL;
+> +
+> +    if (running && td->stopped) {
+> +        /* set the old TOD when running the VM - start the TOD clock */
+> +        kvm_s390_set_tod_raw(&td->base, &local_err);
+> +        if (local_err) {
+> +            warn_report_err(local_err);
+> +        }
+> +        /* Treat errors like the TOD was running all the time. */
+> +        td->stopped = false;
+> +    } else if (!running && !td->stopped) {
+> +        /* store the TOD when stopping the VM - stop the TOD clock */
+> +        kvm_s390_get_tod_raw(&td->base, &local_err);
+> +        if (local_err) {
+> +            /* keep the TOD running in case we could not back it up */
+> +            warn_report_err(local_err);
+> +        } else {
+> +            td->stopped = true;
+> +        }
+>      }
+>  }
+>  
+> @@ -49,10 +112,31 @@ static void kvm_s390_tod_class_init(ObjectClass *oc, void *data)
+>      tdc->set = kvm_s390_tod_set;
+>  }
+>  
+> +static void kvm_s390_tod_init(Object *obj)
+> +{
+> +    S390TODState *td = S390_TOD(obj);
+> +
+> +    /*
+> +     * The TOD is initially running (value stored in KVM). Avoid needless
+> +     * loading/storing of the TOD when starting a simple VM, so let it
+> +     * run although the (never started) VM is stopped. For migration, we
+> +     * will properly set the TOD later.
+> +     */
+> +    td->stopped = false;
+> +
+> +    /*
+> +     * We need to know when the VM gets started/stopped to start/stop the TOD.
+> +     * As we can never have more than one TOD instance (and that will never be
+> +     * removed), registering here and never unregistering is good enough.
+> +     */
+> +    qemu_add_vm_change_state_handler(kvm_s390_tod_vm_state_change, td);
+> +}
+> +
+>  static TypeInfo kvm_s390_tod_info = {
+>      .name = TYPE_KVM_S390_TOD,
+>      .parent = TYPE_S390_TOD,
+>      .instance_size = sizeof(S390TODState),
+> +    .instance_init = kvm_s390_tod_init,
+>      .class_init = kvm_s390_tod_class_init,
+>      .class_size = sizeof(S390TODClass),
+>  };
+> diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
+> index 413c0d7c02..30558d4386 100644
+> --- a/include/hw/s390x/tod.h
+> +++ b/include/hw/s390x/tod.h
+> @@ -31,8 +31,13 @@ typedef struct S390TODState {
+>      /* private */
+>      DeviceState parent_obj;
+>  
+> -    /* unused by KVM implementation */
+> +    /*
+> +     * Used by TCG remember the time base. Used by KVM to backup the TOD
+> +     * while the TOD is stopped.
+> +     */
+>      S390TOD base;
+> +    /* Used by KVM to remember if the TOD is stopped and base is valid. */
+> +    bool stopped;
+>  } S390TODState;
+>  
+>  typedef struct S390TODClass {
+> 
