@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gRWWX-0001XZ-49
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:07:06 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gRWX8-0001tM-Gh
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:07:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gRWWR-00075f-K0
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:07:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47550)
+	(envelope-from <wei.w.wang@intel.com>) id 1gRWX3-0007Ii-Jm
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:07:42 -0500
+Received: from mga09.intel.com ([134.134.136.24]:15017)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gRWWM-0006zA-4J
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:06:54 -0500
-Date: Tue, 27 Nov 2018 14:06:38 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181127060638.GB3205@xz-x1>
-References: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
-	<1542276484-25508-5-git-send-email-wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1gRWX3-0007I4-BW
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 01:07:37 -0500
+Message-ID: <5BFCE052.8070705@intel.com>
+Date: Tue, 27 Nov 2018 14:12:34 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1542276484-25508-5-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v9 4/8] migration: API to clear bits of
- guest free pages from the dirty bitmap
+References: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
+	<1542276484-25508-4-git-send-email-wei.w.wang@intel.com>
+	<20181127054056.GA3205@xz-x1> <5BFCDE07.20707@intel.com>
+In-Reply-To: <5BFCDE07.20707@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v9 3/8] migration: use
+ bitmap_mutex in migration_bitmap_clear_dirty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,127 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
+To: Peter Xu <peterx@redhat.com>
 Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On Thu, Nov 15, 2018 at 06:08:00PM +0800, Wei Wang wrote:
-> This patch adds an API to clear bits corresponding to guest free pages
-> from the dirty bitmap. Spilt the free page block if it crosses the QEMU
-> RAMBlock boundary.
-> 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Peter Xu <peterx@redhat.com>
-> ---
->  include/migration/misc.h |  2 ++
->  migration/ram.c          | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 50 insertions(+)
-> 
-> diff --git a/include/migration/misc.h b/include/migration/misc.h
-> index 4ebf24c..113320e 100644
-> --- a/include/migration/misc.h
-> +++ b/include/migration/misc.h
-> @@ -14,11 +14,13 @@
->  #ifndef MIGRATION_MISC_H
->  #define MIGRATION_MISC_H
->  
-> +#include "exec/cpu-common.h"
->  #include "qemu/notify.h"
->  
->  /* migration/ram.c */
->  
->  void ram_mig_init(void);
-> +void qemu_guest_free_page_hint(void *addr, size_t len);
->  
->  /* migration/block.c */
->  
-> diff --git a/migration/ram.c b/migration/ram.c
-> index ef69dbe..229b791 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -3131,6 +3131,54 @@ static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
->  }
->  
->  /*
-> + * This function clears bits of the free pages reported by the caller from the
-> + * migration dirty bitmap. @addr is the host address corresponding to the
-> + * start of the continuous guest free pages, and @len is the total bytes of
-> + * those pages.
-> + */
-> +void qemu_guest_free_page_hint(void *addr, size_t len)
-> +{
-> +    RAMBlock *block;
-> +    ram_addr_t offset;
-> +    size_t used_len, start, npages;
-> +    MigrationState *s = migrate_get_current();
-> +
-> +    /* This function is currently expected to be used during live migration */
-> +    if (!migration_is_setup_or_active(s->state)) {
-> +        return;
-> +    }
-> +
-> +    for (; len > 0; len -= used_len) {
-> +        block = qemu_ram_block_from_host(addr, false, &offset);
-> +        assert(block);
-> +
-> +        /*
-> +         * This handles the case that the RAMBlock is resized after the free
-> +         * page hint is reported.
-> +         */
-> +        if (unlikely(offset > block->used_length)) {
-> +            return;
-> +        }
+On 11/27/2018 02:02 PM, Wei Wang wrote:
+> On 11/27/2018 01:40 PM, Peter Xu wrote:
+>> On Thu, Nov 15, 2018 at 06:07:59PM +0800, Wei Wang wrote:
+>>> The bitmap mutex is used to synchronize threads to update the dirty
+>>> bitmap and the migration_dirty_pages counter. For example, the free
+>>> page optimization clears bits of free pages from the bitmap in an
+>>> iothread context. This patch makes migration_bitmap_clear_dirty update
+>>> the bitmap and counter under the mutex.
+>>>
+>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>>> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>> CC: Juan Quintela <quintela@redhat.com>
+>>> CC: Michael S. Tsirkin <mst@redhat.com>
+>>> CC: Peter Xu <peterx@redhat.com>
+>>> ---
+>>>   migration/ram.c | 3 +++
+>>>   1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/migration/ram.c b/migration/ram.c
+>>> index 7e7deec..ef69dbe 100644
+>>> --- a/migration/ram.c
+>>> +++ b/migration/ram.c
+>>> @@ -1556,11 +1556,14 @@ static inline bool 
+>>> migration_bitmap_clear_dirty(RAMState *rs,
+>>>   {
+>>>       bool ret;
+>>>   +    qemu_mutex_lock(&rs->bitmap_mutex);
+>>>       ret = test_and_clear_bit(page, rb->bmap);
+>>>         if (ret) {
+>>>           rs->migration_dirty_pages--;
+>>>       }
+>>> +    qemu_mutex_unlock(&rs->bitmap_mutex);
+>>> +
+>>>       return ret;
+>>>   }
+>> It seems fine to me, but have you thought about
+>> test_and_clear_bit_atomic()?  Note that we just had
+>> test_and_set_bit_atomic() a few months ago.
+>
+> Thanks for sharing. I think we might also need to
+> mutex migration_dirty_pages.
+>
+>>
+>> And not related to this patch: I'm unclear on why we have had
+>> bitmap_mutex before, since it seems unnecessary.
+>
+> OK. This is because with the optimization we have a thread
+> which clears bits (of free pages) from the bitmap and updates
+> migration_dirty_pages. So we need to synchronization between
+> the migration thread and the optimization thread.
+>
 
-Again, is it possible to resize during migration?
+And before this feature, I think yes, that bitmap_mutex is not needed.
+It was left there due to some historical reasons.
+I remember Dave previous said he was about to remove it. But the new
+feature will need it again.
 
-So I think the check is fine, but uncertain about the comment.
-
-And shall we print something if that happened?  We can use
-error_report_once(), and squashing the above assert:
-
-  if (!block || offset > block->used_length) {
-    /* should never happen, but if it happens we ignore the hints and warn */
-    error_report_once("...");
-    return;
-  }
-
-What do you think?
-
-> +
-> +        if (len <= block->used_length - offset) {
-> +            used_len = len;
-> +        } else {
-> +            used_len = block->used_length - offset;
-> +            addr += used_len;
-
-Maybe moving this line into the for() could be a bit better?
-
-  for (; len > 0; len -= used_len, addr += used_len) {
-
-> +        }
-> +
-> +        start = offset >> TARGET_PAGE_BITS;
-> +        npages = used_len >> TARGET_PAGE_BITS;
-> +
-> +        qemu_mutex_lock(&ram_state->bitmap_mutex);
-> +        ram_state->migration_dirty_pages -=
-> +                      bitmap_count_one_with_offset(block->bmap, start, npages);
-> +        bitmap_clear(block->bmap, start, npages);
-> +        qemu_mutex_unlock(&ram_state->bitmap_mutex);
-> +    }
-> +}
-> +
-> +/*
->   * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
->   * long-running RCU critical section.  When rcu-reclaims in the code
->   * start to become numerous it will be necessary to reduce the
-> -- 
-> 1.8.3.1
-> 
-
-Regards,
-
--- 
-Peter Xu
+Best,
+Wei
