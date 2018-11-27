@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gRXpo-0002x6-5m
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 02:31:05 -0500
+	(envelope-from <peterx@redhat.com>) id 1gRXwo-0006zf-8b
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 02:38:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gRXpk-0002q4-4A
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 02:31:04 -0500
-Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:50697)
+	(envelope-from <peterx@redhat.com>) id 1gRXwk-00074H-9s
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 02:38:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gRXpj-0002pR-Ti
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 02:31:00 -0500
-Received: from player794.ha.ovh.net (unknown [10.109.159.222])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 07A90146B91
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 08:30:57 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-3-clg@kaod.org>
-	<20181122031934.GC10448@umbus.fritz.box>
-	<75cdc1f3-f337-3c37-b234-d96222a370d2@kaod.org>
-	<20181123010852.GT10448@umbus.fritz.box>
-	<8270d5fc-ab20-f47d-37d8-1e2ba179fbfd@kaod.org>
-	<20181126053947.GG2251@umbus.fritz.box>
-	<23a938ba-d2bc-8a9d-07ef-6672a8cc3a93@kaod.org>
-	<20181126234818.GK2251@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <de9a16b7-6086-0084-2f59-35004553083a@kaod.org>
-Date: Tue, 27 Nov 2018 08:30:52 +0100
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gRXwk-00074B-2f
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 02:38:14 -0500
+Date: Tue, 27 Nov 2018 15:38:02 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20181127073802.GC3205@xz-x1>
+References: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
+	<1542276484-25508-6-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20181126234818.GK2251@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 02/36] ppc/xive: add support for the LSI
- interrupt sources
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1542276484-25508-6-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v9 5/8] migration/ram.c: add a notifier
+ chain for precopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,167 +28,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On 11/27/18 12:48 AM, David Gibson wrote:
-> On Mon, Nov 26, 2018 at 12:20:19PM +0100, C=E9dric Le Goater wrote:
->> On 11/26/18 6:39 AM, David Gibson wrote:
->>> On Fri, Nov 23, 2018 at 02:28:35PM +0100, C=E9dric Le Goater wrote:
->>>>
->>>>>>>> +/*
->>>>>>>> + * Returns whether the event notification should be forwarded.
->>>>>>>> + */
->>>>>>>> +static bool xive_source_lsi_trigger(XiveSource *xsrc, uint32_t
->>>>>>>> srcno)
->>>>>>>
->>>>>>> What exactly "trigger" means isn't entirely obvious for an LSI.  =
-Might
->>>>>>> be clearer to have "lsi_assert" and "lsi_deassert" helpers instea=
-d.
->>>>>>
->>>>>> This is called only when the interrupt is asserted. So it is a=20
->>>>>> simplified LSI trigger depending only on the 'P' bit.
->>>>>
->>>>> Yes, I see that.  But the result is that while the MSI logic is
->>>>> encapsulated in the MSI trigger function, this leaves the LSI logic
->>>>> split across the trigger function and set_irq() itself. I think it=20
->>>>> would be better to have assert and deassert helpers instead, which
->>>>> handle both the trigger/notification and also the updating of the
->>>>> ASSERTED bit.
->>>>
->>>> Something like the xive_source_set_irq_lsi() below ?
->>>
->>> Uh.. not exactly what I had in mind, but close enough.
->>>
->>> [snip]
->>> +/*
->>>> + * Returns whether the event notification should be forwarded.
->>>> + */
->>>>  static bool xive_source_esb_trigger(XiveSource *xsrc, uint32_t srcn=
-o)
->>>>  {
->>>> +    bool notify;
->>>> +
->>>>      assert(srcno < xsrc->nr_irqs);
->>>> =20
->>>> -    return xive_esb_trigger(&xsrc->status[srcno]);
->>>> +    notify =3D xive_esb_trigger(&xsrc->status[srcno]);
->>>> +
->>>> +    if (xive_source_irq_is_lsi(xsrc, srcno) &&
->>>
->>> Except that this block can go, since this function is no longer calle=
-d
->>> for LSIs.
->>
->> It still can be through the ESB MMIOs, if the guest does a load on the=
-=20
->> trigger page.
->=20
-> Oh, good point.  That makes me rethink all my comments on this matter.
->=20
-> In that case I think your original code was fine, except that I'd
-> prefer to see the setting of the ASSERTED bit inside the trigger
-> function, instead of in the set_irq() caller.
+On Thu, Nov 15, 2018 at 06:08:01PM +0800, Wei Wang wrote:
+> This patch adds a notifier chain for the memory precopy. This enables various
+> precopy optimizations to be invoked at specific places.
+> 
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> CC: Peter Xu <peterx@redhat.com>
+> ---
+>  include/migration/misc.h | 12 ++++++++++++
+>  migration/ram.c          | 31 +++++++++++++++++++++++++++++++
+>  vl.c                     |  1 +
+>  3 files changed, 44 insertions(+)
+> 
+> diff --git a/include/migration/misc.h b/include/migration/misc.h
+> index 113320e..0bac623 100644
+> --- a/include/migration/misc.h
+> +++ b/include/migration/misc.h
+> @@ -19,6 +19,18 @@
+>  
+>  /* migration/ram.c */
+>  
+> +typedef enum PrecopyNotifyReason {
+> +    PRECOPY_NOTIFY_ERR = 0,
+> +    PRECOPY_NOTIFY_START_ITERATION = 1,
+> +    PRECOPY_NOTIFY_BEFORE_SYNC_BITMAP = 2,
+> +    PRECOPY_NOTIFY_AFTER_SYNC_BITMAP = 3,
+> +    PRECOPY_NOTIFY_MAX = 4,
 
-ok. I will change that.
+It would be nice to add some comments for each of the notify reason.
+E.g., from the name PRECOPY_NOTIFY_START_ITERATION seems more like a
+hook at the start of each iteration but according to [1] it should be
+at the start of migration rather than each iteration (or when
+migration restarts, though I'm not sure whether we really have this
+yet).
 
-Thanks,
+> +} PrecopyNotifyReason;
+> +
+> +void precopy_infrastructure_init(void);
+> +void precopy_add_notifier(Notifier *n);
+> +void precopy_remove_notifier(Notifier *n);
+> +
+>  void ram_mig_init(void);
+>  void qemu_guest_free_page_hint(void *addr, size_t len);
+>  
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 229b791..65b1223 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -292,6 +292,8 @@ struct RAMState {
+>      bool ram_bulk_stage;
+>      /* How many times we have dirty too many pages */
+>      int dirty_rate_high_cnt;
+> +    /* ram save states used for notifiers */
+> +    int ram_save_state;
 
-C.=20
+This can be removed?
 
+>      /* these variables are used for bitmap sync */
+>      /* last time we did a full bitmap_sync */
+>      int64_t time_last_bitmap_sync;
+> @@ -328,6 +330,28 @@ typedef struct RAMState RAMState;
+>  
+>  static RAMState *ram_state;
+>  
+> +static NotifierList precopy_notifier_list;
+> +
+> +void precopy_infrastructure_init(void)
+> +{
+> +    notifier_list_init(&precopy_notifier_list);
+> +}
+> +
+> +void precopy_add_notifier(Notifier *n)
+> +{
+> +    notifier_list_add(&precopy_notifier_list, n);
+> +}
+> +
+> +void precopy_remove_notifier(Notifier *n)
+> +{
+> +    notifier_remove(n);
+> +}
+> +
+> +static void precopy_notify(PrecopyNotifyReason reason)
+> +{
+> +    notifier_list_notify(&precopy_notifier_list, &reason);
+> +}
+> +
+>  uint64_t ram_bytes_remaining(void)
+>  {
+>      return ram_state ? (ram_state->migration_dirty_pages * TARGET_PAGE_SIZE) :
+> @@ -1642,6 +1666,8 @@ static void migration_bitmap_sync(RAMState *rs)
+>      int64_t end_time;
+>      uint64_t bytes_xfer_now;
+>  
+> +    precopy_notify(PRECOPY_NOTIFY_BEFORE_SYNC_BITMAP);
+> +
+>      ram_counters.dirty_sync_count++;
+>  
+>      if (!rs->time_last_bitmap_sync) {
+> @@ -1699,6 +1725,8 @@ static void migration_bitmap_sync(RAMState *rs)
+>      if (migrate_use_events()) {
+>          qapi_event_send_migration_pass(ram_counters.dirty_sync_count);
+>      }
+> +
+> +    precopy_notify(PRECOPY_NOTIFY_AFTER_SYNC_BITMAP);
+>  }
+>  
+>  /**
+> @@ -2555,6 +2583,8 @@ static void ram_state_reset(RAMState *rs)
+>      rs->last_page = 0;
+>      rs->last_version = ram_list.version;
+>      rs->ram_bulk_stage = true;
+> +
+> +    precopy_notify(PRECOPY_NOTIFY_START_ITERATION);
 
->=20
->=20
->>
->> C.
->>
->> =20
->>>
->>>> +        xive_source_esb_get(xsrc, srcno) =3D=3D XIVE_ESB_QUEUED) {
->>>> +        qemu_log_mask(LOG_GUEST_ERROR,
->>>> +                      "XIVE: queued an event on LSI IRQ %d\n", srcn=
-o);
->>>> +    }
->>>> +
->>>> +    return notify;
->>>>  }
->>>> =20
->>>>  /*
->>>> @@ -103,9 +127,22 @@ static bool xive_source_esb_trigger(Xive
->>>>   */
->>>>  static bool xive_source_esb_eoi(XiveSource *xsrc, uint32_t srcno)
->>>>  {
->>>> +    bool notify;
->>>> +
->>>>      assert(srcno < xsrc->nr_irqs);
->>>> =20
->>>> -    return xive_esb_eoi(&xsrc->status[srcno]);
->>>> +    notify =3D xive_esb_eoi(&xsrc->status[srcno]);
->>>> +
->>>> +    /* LSI sources do not set the Q bit but they can still be
->>>> +     * asserted, in which case we should forward a new event
->>>> +     * notification
->>>> +     */
->>>> +    if (xive_source_irq_is_lsi(xsrc, srcno)) {
->>>> +        bool level =3D xsrc->status[srcno] & XIVE_STATUS_ASSERTED;
->>>> +        notify =3D xive_source_set_irq_lsi(xsrc, srcno, level);
->>>> +    }
->>>> +
->>>> +    return notify;
->>>>  }
->>>> =20
->>>>  /*
->>>> @@ -268,8 +305,12 @@ static void xive_source_set_irq(void *op
->>>>      XiveSource *xsrc =3D XIVE_SOURCE(opaque);
->>>>      bool notify =3D false;
->>>> =20
->>>> -    if (val) {
->>>> -        notify =3D xive_source_esb_trigger(xsrc, srcno);
->>>> +    if (xive_source_irq_is_lsi(xsrc, srcno)) {
->>>> +        notify =3D xive_source_set_irq_lsi(xsrc, srcno, val);
->>>> +    } else {
->>>> +        if (val) {
->>>> +            notify =3D xive_source_esb_trigger(xsrc, srcno);
->>>> +        }
->>>>      }
->>>> =20
->>>>      /* Forward the source event notification for routing */
->>>> @@ -289,9 +330,11 @@ void xive_source_pic_print_info(XiveSour
->>>>              continue;
->>>>          }
->>>> =20
->>>> -        monitor_printf(mon, "  %08x %c%c\n", i + offset,
->>>> +        monitor_printf(mon, "  %08x %s %c%c%c\n", i + offset,
->>>> +                       xive_source_irq_is_lsi(xsrc, i) ? "LSI" : "M=
-SI",
->>>>                         pq & XIVE_ESB_VAL_P ? 'P' : '-',
->>>> -                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-');
->>>> +                       pq & XIVE_ESB_VAL_Q ? 'Q' : '-',
->>>> +                       xsrc->status[i] & XIVE_STATUS_ASSERTED ? 'A'=
- : ' ');
->>>>      }
->>>>  }
->>>> =20
->>>> @@ -299,6 +342,8 @@ static void xive_source_reset(DeviceStat
->>>>  {
->>>>      XiveSource *xsrc =3D XIVE_SOURCE(dev);
->>>> =20
->>>> +    /* Do not clear the LSI bitmap */
->>>> +
->>>>      /* PQs are initialized to 0b01 which corresponds to "ints off" =
-*/
->>>>      memset(xsrc->status, 0x1, xsrc->nr_irqs);
->>>>  }
->>>> @@ -324,6 +369,7 @@ static void xive_source_realize(DeviceSt
->>>>                                       xsrc->nr_irqs);
->>>> =20
->>>>      xsrc->status =3D g_malloc0(xsrc->nr_irqs);
->>>> +    xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
->>>> =20
->>>>      memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
->>>>                            &xive_source_esb_ops, xsrc, "xive.esb",
->>>>
->>>
->>
->=20
+[1]
+
+>  }
+>  
+>  #define MAX_WAIT 50 /* ms, half buffered_file limit */
+> @@ -3324,6 +3354,7 @@ out:
+>  
+>      ret = qemu_file_get_error(f);
+>      if (ret < 0) {
+> +        precopy_notify(PRECOPY_NOTIFY_ERR);
+
+Could you show me which function is this line in?
+
+Line 3324 here is ram_save_complete(), but I cannot find this exact
+place.
+
+Another thing to mention about the "reasons" (though I see it more
+like "events"): have you thought about adding a PRECOPY_NOTIFY_END?
+It might help in some cases:
+
+  - then you don't need to trickily export the migrate_postcopy()
+    since you'll notify that before postcopy starts
+
+  - you'll have a solid point that you'll 100% guarantee that we'll
+    stop the free page hinting and don't need to worry about whether
+    there is chance the hinting will be running without an end [2].
+
+Regarding [2] above: now the series only stops the hinting when
+PRECOPY_NOTIFY_BEFORE_SYNC_BITMAP is notified.  Could there be a case
+that it's missing?  E.g., what if we cancel/fail a migration during
+precopy?  Have you tried it?
+
+Regards,
+
+-- 
+Peter Xu
