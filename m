@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gRcie-0004ZR-Cn
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:44:01 -0500
+	(envelope-from <clg@kaod.org>) id 1gRcmU-0007VG-Lx
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:48:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gRcib-0003qA-3I
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:44:00 -0500
-Received: from mta-01.yadro.com ([89.207.88.251]:51356)
+	(envelope-from <clg@kaod.org>) id 1gRcmR-0006yL-B9
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:47:58 -0500
+Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:47357)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
-	id 1gRcia-0003op-MV
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:43:57 -0500
-Date: Tue, 27 Nov 2018 15:43:52 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-ID: <20181127124352.ll6quqc5xedvdqht@MacBook-Pro-Roman.local>
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-42-cota@braap.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gRcmR-0006xf-4t
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:47:55 -0500
+Received: from player738.ha.ovh.net (unknown [10.109.160.76])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id A620E1469C7
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 13:47:53 +0100 (CET)
+References: <20181116105729.23240-1-clg@kaod.org>
+	<20181116105729.23240-8-clg@kaod.org>
+	<20181123050858.GA10448@umbus.fritz.box>
+	<8f6de3b8-b1df-f5e6-cfd8-aeca93a521b6@kaod.org>
+	<20181127050736.GN2251@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <4a060507-35d4-c83d-1c11-b4f220d9fae9@kaod.org>
+Date: Tue, 27 Nov 2018 13:47:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20181025172057.20414-42-cota@braap.org>
-Subject: Re: [Qemu-devel] [RFC 41/48] configure: add --enable-plugins
+In-Reply-To: <20181127050736.GN2251@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 07/36] ppc/xive: introduce the XIVE
+ interrupt thread context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,150 +35,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, =?utf-8?B?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Stefan Hajnoczi <stefanha@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Thu, Oct 25, 2018 at 01:20:50PM -0400, Emilio G. Cota wrote:
-> For now only add it for ELF platforms, since we rely on the linker's
-> --dynamic-list flag to pass a list of symbols to be exported to the
-> executable. An alternative would be to use -rdynamic, but that would
-> expose all of QEMU's objects to plugins.
-> 
-> I have no experience with non-ELF systems but I suspect adding support
-> for those should be pretty easy.
-> 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  configure | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index 03bf719ca7..78e86098e5 100755
-> --- a/configure
-> +++ b/configure
-> @@ -30,6 +30,7 @@ TMPO="${TMPDIR1}/${TMPB}.o"
->  TMPCXX="${TMPDIR1}/${TMPB}.cxx"
->  TMPE="${TMPDIR1}/${TMPB}.exe"
->  TMPMO="${TMPDIR1}/${TMPB}.mo"
-> +TMPTXT="${TMPDIR1}/${TMPB}.txt"
->  
->  rm -f config.log
->  
-> @@ -477,6 +478,7 @@ libxml2=""
->  docker="no"
->  debug_mutex="no"
->  libpmem=""
-> +plugins="no"
->  
->  # cross compilers defaults, can be overridden with --cross-cc-ARCH
->  cross_cc_aarch64="aarch64-linux-gnu-gcc"
-> @@ -1443,6 +1445,10 @@ for opt do
->    ;;
->    --disable-libpmem) libpmem=no
->    ;;
-> +  --enable-plugins) plugins="yes"
-> +  ;;
-> +  --disable-plugins) plugins="no"
-> +  ;;
->    *)
->        echo "ERROR: unknown option $opt"
->        echo "Try '$0 --help' for more information"
-> @@ -1633,6 +1639,8 @@ Advanced options (experts only):
->                             xen pv domain builder
->    --enable-debug-stack-usage
->                             track the maximum stack usage of stacks created by qemu_alloc_stack
-> +  --enable-plugins
-> +                           enable plugins via shared library loading
->  
->  Optional features, enabled with --enable-FEATURE and
->  disabled with --disable-FEATURE, default is enabled if available:
-> @@ -5204,6 +5212,42 @@ if compile_prog "" "" ; then
->    atomic64=yes
->  fi
->  
-> +#########################################
-> +# See if --dynamic-list is supported by the linker
-> +
-> +cat > $TMPTXT <<EOF
-> +{
-> +  foo;
-> +};
-> +EOF
-> +
-> +cat > $TMPC <<EOF
-> +#include <stdio.h>
-> +void foo(void);
-> +
-> +void foo(void)
-> +{
-> +  printf("foo\n");
-> +}
-> +
-> +int main(void)
-> +{
-> +  foo();
-> +  return 0;
-> +}
-> +EOF
-> +
-> +if compile_prog "" "-Wl,--dynamic-list=$TMPTXT" ; then
-> +  ld_dynamic_list="yes"
-> +else
-> +  if test "$plugins" = "yes" ; then
-> +    error_exit \
-> +        "Plugin support requires specifying a set of symbols that " \
-> +        "are exported to plugins. Unfortunately your linker doesn't " \
-> +        "support the flag (--dynamic-list) used for this purpose."
-> +  fi
-> +fi
-> +
->  ########################################
->  # See if 16-byte vector operations are supported.
->  # Even without a vector unit the compiler may expand these.
-> @@ -6091,6 +6135,7 @@ echo "VxHS block device $vxhs"
->  echo "capstone          $capstone"
->  echo "docker            $docker"
->  echo "libpmem support   $libpmem"
-> +echo "plugin support    $plugins"
->  
->  if test "$sdl_too_old" = "yes"; then
->  echo "-> Your SDL version is too old - please upgrade to have SDL support"
-> @@ -6849,6 +6894,12 @@ if test "$libpmem" = "yes" ; then
->    echo "CONFIG_LIBPMEM=y" >> $config_host_mak
->  fi
->  
-> +if test "$plugins" = "yes" ; then
-> +    echo "CONFIG_PLUGINS=y" >> $config_host_mak
-> +    LIBS="-ldl $LIBS"
-> +    LDFLAGS="-Wl,--dynamic-list=\$(SRC_PATH)/qemu-plugins.symbols $LDFLAGS"
-> +fi
-> +
->  if test "$tcg_interpreter" = "yes"; then
->    QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
->  elif test "$ARCH" = "sparc64" ; then
-> -- 
-> 2.17.1
-> 
-> 
+On 11/27/18 6:07 AM, David Gibson wrote:
+> On Sun, Nov 25, 2018 at 09:35:08PM +0100, C=E9dric Le Goater wrote:
+>> On 11/23/18 6:08 AM, David Gibson wrote:
+>>> On Fri, Nov 16, 2018 at 11:57:00AM +0100, C=E9dric Le Goater wrote:
+>>>> Each POWER9 processor chip has a XIVE presenter that can generate fo=
+ur
+>>>> different exceptions to its threads:
+>>>>
+>>>>   - hypervisor exception,
+>>>>   - O/S exception
+>>>>   - Event-Based Branch (EBB)
+>>>>   - msgsnd (doorbell).
+>>>>
+>>>> Each exception has a state independent from the others called a Thre=
+ad
+>>>> Interrupt Management context. This context is a set of registers whi=
+ch
+>>>> lets the thread handle priority management and interrupt acknowledgm=
+ent
+>>>> among other things. The most important ones being :
+>>>>
+>>>>   - Interrupt Priority Register  (PIPR)
+>>>>   - Interrupt Pending Buffer     (IPB)
+>>>>   - Current Processor Priority   (CPPR)
+>>>>   - Notification Source Register (NSR)
+>>>>
+>>>> These registers are accessible through a specific MMIO region, calle=
+d
+>>>> the Thread Interrupt Management Area (TIMA), four aligned pages, eac=
+h
+>>>> exposing a different view of the registers. First page (page address
+>>>> ending in 0b00) gives access to the entire context and is reserved f=
+or
+>>>> the ring 0 security monitor. The second (page address ending in 0b01=
+)
+>>>> is for the hypervisor, ring 1. The third (page address ending in 0b1=
+0)
+>>>> is for the operating system, ring 2. The fourth (page address ending
+>>>> in 0b11) is for user level, ring 3.
+>>>>
+>>>> The thread interrupt context is modeled with a XiveTCTX object
+>>>> containing the values of the different exception registers. The TIMA
+>>>> region is mapped at the same address for each CPU.
+>>>>
+>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>> ---
+>>>>  include/hw/ppc/xive.h      |  36 +++
+>>>>  include/hw/ppc/xive_regs.h |  82 +++++++
+>>>>  hw/intc/xive.c             | 443 ++++++++++++++++++++++++++++++++++=
++++
+>>>>  3 files changed, 561 insertions(+)
+>>>>
+>>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>>>> index 24301bf2076d..5987f26ddb98 100644
+>>>> --- a/include/hw/ppc/xive.h
+>>>> +++ b/include/hw/ppc/xive.h
+>>>> @@ -238,4 +238,40 @@ typedef struct XiveENDSource {
+>>>>  void xive_end_reset(XiveEND *end);
+>>>>  void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monito=
+r *mon);
+>>>> =20
+>>>> +/*
+>>>> + * XIVE Thread interrupt Management (TM) context
+>>>> + */
+>>>> +
+>>>> +#define TYPE_XIVE_TCTX "xive-tctx"
+>>>> +#define XIVE_TCTX(obj) OBJECT_CHECK(XiveTCTX, (obj), TYPE_XIVE_TCTX=
+)
+>>>> +
+>>>> +/*
+>>>> + * XIVE Thread interrupt Management register rings :
+>>>> + *
+>>>> + *   QW-0  User       event-based exception state
+>>>> + *   QW-1  O/S        OS context for priority management, interrupt=
+ acks
+>>>> + *   QW-2  Pool       hypervisor context for virtual processor bein=
+g dispatched
+>>>> + *   QW-3  Physical   for the security monitor to manage the entire=
+ context
+>>>
+>>> That last description is misleading, AIUI the hypervisor can and does
+>>> make use of the physical ring as well as the pool ring.
+>>
+>> yes. The description is from the spec. I will rephrase.=20
+>>
+>>>
+>>>> + */
+>>>> +#define TM_RING_COUNT           4
+>>>> +#define TM_RING_SIZE            0x10
+>>>> +
+>>>> +typedef struct XiveTCTX {
+>>>> +    DeviceState parent_obj;
+>>>> +
+>>>> +    CPUState    *cs;
+>>>> +    qemu_irq    output;
+>>>> +
+>>>> +    uint8_t     regs[TM_RING_COUNT * TM_RING_SIZE];
+>>>
+>>> I'm a bit dubious about representing the state with a full buffer lik=
+e
+>>> this.  Isn't a fair bit of this space reserved or derived values whic=
+h
+>>> aren't backed by real state?
+>>
+>> Under sPAPR only the TM_QW1_OS ring is accessed but the TM_QW0_USER=20
+>> will also be when we support EBB.
+>>
+>> When running under the PowerNV machine, all rings could be accessed.
+>> Today only 2 and 3 are.
+>=20
+> It's not the fact that all rings are exposed that I'm talking about.
+> What I mean is that some of the logical register address space isn't
+> actually by actually modifiable registers.  For example the HW CAM
+> bits are hardwired to a value which can be derived from elsewhere.
 
-ld64 on macOS has similar -exported_symbols_list option. Here's the reference:
+yes indeed.
 
-     -exported_symbols_list filename
-	The specified filename contains a list of global symbol names
-	that will remain as global symbols in the output file.  All other
-	global symbols will be treated as if they were marked as
-	__private_extern__ (aka visibility=hidden) and will not be global in
-	the output file. The symbol names listed in filename must be one per
-	line.  Leading and trailing white space are not part of the symbol
-	name.  Lines starting with # are ignored, as are lines with only white
-	space.  Some wildcards (similar to shell file matching) are supported.
-	The * matches zero or more characters.  The ?  matches one character.
-	[abc] matches one character which must be an 'a', 'b', or 'c'.
-	[a-z] matches any single lower case letter from 'a' to 'z'.
+> Likewise the "highest pending priority" register or whatever it's
+> called is AFAICT calculated on read from the CPPR and IPB.
 
+yes. the PIPR is computed from the IPB. (patch 10)
 
-I can try your branch if you add support of the linker flag or send required
-changes via GitHub.
+> So the thing I'm questioning is having actual storage bytes associated
+> with logical registers which are actually derived from other state.
 
-Best regards,
-Roman
+having storage for word2 and word3 on all rings is questionable I agree,
+but I think the eight (NSR CPPR IPB LSMFB ACK# INC AGE PIPR) registers=20
+are good to have explicitly for the model. =20
+
+It fits well the HW and all the TIMA accessors which would be much
+more complex if we only represented the interesting bits we need
+to transfer.=20
+
+We also use the word0 and word1 to store the KVM state (os ring, maybe=20
+user one day) directly pulled from the KVM VCPU structure. word2 is also=20
+collected to print out the KVM VP identifier in the QEMU monitor. =20
+
+So, I think these four quad-words are useful and their storage is=20
+relatively small compared to the EAT (8bytes * nr_irqs) and ENDT=20
+(32bytes * 8 * nr_cpus).
+
+Thanks,
+
+C.=20
+
+>> It seemed correct to expose all registers under the thread interrupt
+>> context model and filter the accesses with the TIMA. It fits the HW
+>> well.
+>=20
+>>>> +
+>>>> +    XiveRouter  *xrtr;
+>>>
+>>> What's this for?  AFAIK a TCTX isn't associated with a particular
+>>> routing unit.
+>>
+>> I should have added the pointer in patch 11 where it is used. This is=20
+>> to let the sPAPR XIVE controller model reset the OS CAM line with the=20
+>> VP identifier.
+>=20
+>> The TCTX belong to the IVPE XIVE subengine and as the IVRE and IVPE ar=
+e=20
+>> modeled under the XiveRouter, it's not suprising to see this '*xrtr'=20
+>> back pointer. But I agree we might not need.  Let's talk about it when=
+=20
+>> you reach patch 11.
+>=20
+> Ok.
+>=20
