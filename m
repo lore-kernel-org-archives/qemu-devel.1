@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gReNn-0000Dv-PF
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:30:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gReSg-0003Bq-V2
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:35:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gReNj-0001lP-MC
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:30:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41242)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gReNj-0001gc-E2
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:30:31 -0500
-Date: Tue, 27 Nov 2018 15:30:10 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181127153010.2fd8c889@redhat.com>
-In-Reply-To: <1542049690-12826-6-git-send-email-thuth@redhat.com>
-References: <1542049690-12826-1-git-send-email-thuth@redhat.com>
-	<1542049690-12826-6-git-send-email-thuth@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gReSf-0006tx-MY
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:35:38 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:36662)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gReSf-0006oo-DS
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 09:35:37 -0500
+Received: by mail-oi1-x241.google.com with SMTP id x23so19452302oix.3
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 06:35:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.2 5/7] tests/acpi-utils: Drop
- dependence on global_qtest
+References: <1543316565-1101590-1-git-send-email-luzhipeng@uniudc.com>
+In-Reply-To: <1543316565-1101590-1-git-send-email-luzhipeng@uniudc.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Nov 2018 14:35:24 +0000
+Message-ID: <CAFEAcA-Ln_72bdLYSBg1ZLsPDg5UeXW++opU_5huUfpL3TUhnA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH RESEND] hw/virt/arm: Add support for
+ Cortex-A72 in virt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,465 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, John Snow <jsnow@redhat.com>, Ben Warren <ben@skyportsystems.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: luzhipeng@uniudc.com
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 12 Nov 2018 20:08:08 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
-> From: Eric Blake <eblake@redhat.com>
-> 
-> As a general rule, we prefer avoiding implicit global state
-> because it makes code harder to safely copy and paste without
-> thinking about the global state.  Adjust the helper code to
-> use explicit state instead, and update all callers.
-> 
-> bios-tables-test no longer depends on global_qtest, now that it
-> passes explicit state through the testsuite data; an assert
-> proves this fact (although we will get rid of it later, once
-> global_qtest is gone).
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> [thuth: adapted patch to current master branch]
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Acked-by/Tested-by: Igor Mammedov <imammedo@redhat.com>
-
+On Tue, 27 Nov 2018 at 11:02, <luzhipeng@uniudc.com> wrote:
+>
+> From: ZhiPeng Lu <luzhipeng@uniudc.com>
+>
+> Signed-off-by: ZhiPeng Lu <luzhipeng@uniudc.com>
 > ---
->  tests/acpi-utils.c       | 19 +++++------
->  tests/acpi-utils.h       | 63 +++++++++++++++++++------------------
->  tests/bios-tables-test.c | 82 +++++++++++++++++++++++++-----------------------
->  tests/vmgenid-test.c     | 24 +++++++-------
->  4 files changed, 96 insertions(+), 92 deletions(-)
-> 
-> diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-> index 41dc1ea..6dc8ca1 100644
-> --- a/tests/acpi-utils.c
-> +++ b/tests/acpi-utils.c
-> @@ -32,7 +32,7 @@ uint8_t acpi_calc_checksum(const uint8_t *data, int len)
->      return sum;
->  }
->  
-> -uint32_t acpi_find_rsdp_address(void)
-> +uint32_t acpi_find_rsdp_address(QTestState *qts)
->  {
->      uint32_t off;
->  
-> @@ -42,7 +42,7 @@ uint32_t acpi_find_rsdp_address(void)
->          int i;
->  
->          for (i = 0; i < sizeof sig - 1; ++i) {
-> -            sig[i] = readb(off + i);
-> +            sig[i] = qtest_readb(qts, off + i);
->          }
->  
->          if (!memcmp(sig, "RSD PTR ", sizeof sig)) {
-> @@ -52,14 +52,15 @@ uint32_t acpi_find_rsdp_address(void)
->      return off;
->  }
->  
-> -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table)
-> +void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr,
-> +                           AcpiRsdpDescriptor *rsdp_table)
->  {
-> -    ACPI_READ_FIELD(rsdp_table->signature, addr);
-> +    ACPI_READ_FIELD(qts, rsdp_table->signature, addr);
->      ACPI_ASSERT_CMP64(rsdp_table->signature, "RSD PTR ");
->  
-> -    ACPI_READ_FIELD(rsdp_table->checksum, addr);
-> -    ACPI_READ_ARRAY(rsdp_table->oem_id, addr);
-> -    ACPI_READ_FIELD(rsdp_table->revision, addr);
-> -    ACPI_READ_FIELD(rsdp_table->rsdt_physical_address, addr);
-> -    ACPI_READ_FIELD(rsdp_table->length, addr);
-> +    ACPI_READ_FIELD(qts, rsdp_table->checksum, addr);
-> +    ACPI_READ_ARRAY(qts, rsdp_table->oem_id, addr);
-> +    ACPI_READ_FIELD(qts, rsdp_table->revision, addr);
-> +    ACPI_READ_FIELD(qts, rsdp_table->rsdt_physical_address, addr);
-> +    ACPI_READ_FIELD(qts, rsdp_table->length, addr);
->  }
-> diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-> index ac52abd..a06a4ed 100644
-> --- a/tests/acpi-utils.h
-> +++ b/tests/acpi-utils.h
-> @@ -28,34 +28,34 @@ typedef struct {
->      bool tmp_files_retain;   /* do not delete the temp asl/aml */
->  } AcpiSdtTable;
->  
-> -#define ACPI_READ_FIELD(field, addr)            \
-> -    do {                                        \
-> -        memread(addr, &field, sizeof(field));   \
-> -        addr += sizeof(field);                  \
-> +#define ACPI_READ_FIELD(qts, field, addr)                \
-> +    do {                                                 \
-> +        qtest_memread(qts, addr, &field, sizeof(field)); \
-> +        addr += sizeof(field);                           \
->      } while (0)
->  
-> -#define ACPI_READ_ARRAY_PTR(arr, length, addr)  \
-> -    do {                                        \
-> -        int idx;                                \
-> -        for (idx = 0; idx < length; ++idx) {    \
-> -            ACPI_READ_FIELD(arr[idx], addr);    \
-> -        }                                       \
-> +#define ACPI_READ_ARRAY_PTR(qts, arr, length, addr)      \
-> +    do {                                                 \
-> +        int idx;                                         \
-> +        for (idx = 0; idx < length; ++idx) {             \
-> +            ACPI_READ_FIELD(qts, arr[idx], addr);        \
-> +        }                                                \
->      } while (0)
->  
-> -#define ACPI_READ_ARRAY(arr, addr)                               \
-> -    ACPI_READ_ARRAY_PTR(arr, sizeof(arr) / sizeof(arr[0]), addr)
-> +#define ACPI_READ_ARRAY(qts, arr, addr)                                 \
-> +    ACPI_READ_ARRAY_PTR(qts, arr, sizeof(arr) / sizeof(arr[0]), addr)
->  
-> -#define ACPI_READ_TABLE_HEADER(table, addr)                      \
-> +#define ACPI_READ_TABLE_HEADER(qts, table, addr)                 \
->      do {                                                         \
-> -        ACPI_READ_FIELD((table)->signature, addr);               \
-> -        ACPI_READ_FIELD((table)->length, addr);                  \
-> -        ACPI_READ_FIELD((table)->revision, addr);                \
-> -        ACPI_READ_FIELD((table)->checksum, addr);                \
-> -        ACPI_READ_ARRAY((table)->oem_id, addr);                  \
-> -        ACPI_READ_ARRAY((table)->oem_table_id, addr);            \
-> -        ACPI_READ_FIELD((table)->oem_revision, addr);            \
-> -        ACPI_READ_ARRAY((table)->asl_compiler_id, addr);         \
-> -        ACPI_READ_FIELD((table)->asl_compiler_revision, addr);   \
-> +        ACPI_READ_FIELD(qts, (table)->signature, addr);          \
-> +        ACPI_READ_FIELD(qts, (table)->length, addr);             \
-> +        ACPI_READ_FIELD(qts, (table)->revision, addr);           \
-> +        ACPI_READ_FIELD(qts, (table)->checksum, addr);           \
-> +        ACPI_READ_ARRAY(qts, (table)->oem_id, addr);             \
-> +        ACPI_READ_ARRAY(qts, (table)->oem_table_id, addr);       \
-> +        ACPI_READ_FIELD(qts, (table)->oem_revision, addr);       \
-> +        ACPI_READ_ARRAY(qts, (table)->asl_compiler_id, addr);    \
-> +        ACPI_READ_FIELD(qts, (table)->asl_compiler_revision, addr);     \
->      } while (0)
->  
->  #define ACPI_ASSERT_CMP(actual, expected) do { \
-> @@ -70,18 +70,19 @@ typedef struct {
->      g_assert_cmpstr(ACPI_ASSERT_CMP_str, ==, expected); \
->  } while (0)
->  
-> -#define ACPI_READ_GENERIC_ADDRESS(field, addr)       \
-> -    do {                                             \
-> -        ACPI_READ_FIELD((field).space_id, addr);     \
-> -        ACPI_READ_FIELD((field).bit_width, addr);    \
-> -        ACPI_READ_FIELD((field).bit_offset, addr);   \
-> -        ACPI_READ_FIELD((field).access_width, addr); \
-> -        ACPI_READ_FIELD((field).address, addr);      \
-> +#define ACPI_READ_GENERIC_ADDRESS(qts, field, addr)       \
-> +    do {                                                  \
-> +        ACPI_READ_FIELD(qts, (field).space_id, addr);     \
-> +        ACPI_READ_FIELD(qts, (field).bit_width, addr);    \
-> +        ACPI_READ_FIELD(qts, (field).bit_offset, addr);   \
-> +        ACPI_READ_FIELD(qts, (field).access_width, addr); \
-> +        ACPI_READ_FIELD(qts, (field).address, addr);      \
->      } while (0)
->  
->  
->  uint8_t acpi_calc_checksum(const uint8_t *data, int len);
-> -uint32_t acpi_find_rsdp_address(void);
-> -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
-> +uint32_t acpi_find_rsdp_address(QTestState *qts);
-> +void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr,
-> +                           AcpiRsdpDescriptor *rsdp_table);
->  
->  #endif  /* TEST_ACPI_UTILS_H */
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index d661d9b..fabbed9 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -39,6 +39,7 @@ typedef struct {
->      struct smbios_21_entry_point smbios_ep_table;
->      uint8_t *required_struct_types;
->      int required_struct_types_len;
-> +    QTestState *qts;
->  } test_data;
->  
->  static char disk[] = "tests/acpi-test-disk-XXXXXX";
-> @@ -78,7 +79,7 @@ static void free_test_data(test_data *data)
->  
->  static void test_acpi_rsdp_address(test_data *data)
->  {
-> -    uint32_t off = acpi_find_rsdp_address();
-> +    uint32_t off = acpi_find_rsdp_address(data->qts);
->      g_assert_cmphex(off, <, 0x100000);
->      data->rsdp_addr = off;
->  }
-> @@ -88,7 +89,7 @@ static void test_acpi_rsdp_table(test_data *data)
->      AcpiRsdpDescriptor *rsdp_table = &data->rsdp_table;
->      uint32_t addr = data->rsdp_addr;
->  
-> -    acpi_parse_rsdp_table(addr, rsdp_table);
-> +    acpi_parse_rsdp_table(data->qts, addr, rsdp_table);
->  
->      /* rsdp checksum is not for the whole table, but for the first 20 bytes */
->      g_assert(!acpi_calc_checksum((uint8_t *)rsdp_table, 20));
-> @@ -104,7 +105,7 @@ static void test_acpi_rsdt_table(test_data *data)
->      uint32_t rsdt_table_length;
->  
->      /* read the header */
-> -    ACPI_READ_TABLE_HEADER(rsdt_table, addr);
-> +    ACPI_READ_TABLE_HEADER(data->qts, rsdt_table, addr);
->      ACPI_ASSERT_CMP(rsdt_table->signature, "RSDT");
->  
->      rsdt_table_length = le32_to_cpu(rsdt_table->length);
-> @@ -116,7 +117,7 @@ static void test_acpi_rsdt_table(test_data *data)
->  
->      /* get the addresses of the tables pointed by rsdt */
->      tables = g_new0(uint32_t, tables_nr);
-> -    ACPI_READ_ARRAY_PTR(tables, tables_nr, addr);
-> +    ACPI_READ_ARRAY_PTR(data->qts, tables, tables_nr, addr);
->  
->      checksum = acpi_calc_checksum((uint8_t *)rsdt_table, rsdt_table_length) +
->                 acpi_calc_checksum((uint8_t *)tables,
-> @@ -135,11 +136,11 @@ static void fadt_fetch_facs_and_dsdt_ptrs(test_data *data)
->  
->      /* FADT table comes first */
->      addr = le32_to_cpu(data->rsdt_tables_addr[0]);
-> -    ACPI_READ_TABLE_HEADER(&hdr, addr);
-> +    ACPI_READ_TABLE_HEADER(data->qts, &hdr, addr);
->      ACPI_ASSERT_CMP(hdr.signature, "FACP");
->  
-> -    ACPI_READ_FIELD(data->facs_addr, addr);
-> -    ACPI_READ_FIELD(data->dsdt_addr, addr);
-> +    ACPI_READ_FIELD(data->qts, data->facs_addr, addr);
-> +    ACPI_READ_FIELD(data->qts, data->dsdt_addr, addr);
->  }
->  
->  static void sanitize_fadt_ptrs(test_data *data)
-> @@ -182,13 +183,13 @@ static void test_acpi_facs_table(test_data *data)
->      AcpiFacsDescriptorRev1 *facs_table = &data->facs_table;
->      uint32_t addr = le32_to_cpu(data->facs_addr);
->  
-> -    ACPI_READ_FIELD(facs_table->signature, addr);
-> -    ACPI_READ_FIELD(facs_table->length, addr);
-> -    ACPI_READ_FIELD(facs_table->hardware_signature, addr);
-> -    ACPI_READ_FIELD(facs_table->firmware_waking_vector, addr);
-> -    ACPI_READ_FIELD(facs_table->global_lock, addr);
-> -    ACPI_READ_FIELD(facs_table->flags, addr);
-> -    ACPI_READ_ARRAY(facs_table->resverved3, addr);
-> +    ACPI_READ_FIELD(data->qts, facs_table->signature, addr);
-> +    ACPI_READ_FIELD(data->qts, facs_table->length, addr);
-> +    ACPI_READ_FIELD(data->qts, facs_table->hardware_signature, addr);
-> +    ACPI_READ_FIELD(data->qts, facs_table->firmware_waking_vector, addr);
-> +    ACPI_READ_FIELD(data->qts, facs_table->global_lock, addr);
-> +    ACPI_READ_FIELD(data->qts, facs_table->flags, addr);
-> +    ACPI_READ_ARRAY(data->qts, facs_table->resverved3, addr);
->  
->      ACPI_ASSERT_CMP(facs_table->signature, "FACS");
->  }
-> @@ -197,17 +198,17 @@ static void test_acpi_facs_table(test_data *data)
->   *   load ACPI table at @addr into table descriptor @sdt_table
->   *   and check that header checksum matches actual one.
->   */
-> -static void fetch_table(AcpiSdtTable *sdt_table, uint32_t addr)
-> +static void fetch_table(QTestState *qts, AcpiSdtTable *sdt_table, uint32_t addr)
->  {
->      uint8_t checksum;
->  
->      memset(sdt_table, 0, sizeof(*sdt_table));
-> -    ACPI_READ_TABLE_HEADER(&sdt_table->header, addr);
-> +    ACPI_READ_TABLE_HEADER(qts, &sdt_table->header, addr);
->  
->      sdt_table->aml_len = le32_to_cpu(sdt_table->header.length)
->                           - sizeof(AcpiTableHeader);
->      sdt_table->aml = g_malloc0(sdt_table->aml_len);
-> -    ACPI_READ_ARRAY_PTR(sdt_table->aml, sdt_table->aml_len, addr);
-> +    ACPI_READ_ARRAY_PTR(qts, sdt_table->aml, sdt_table->aml_len, addr);
->  
->      checksum = acpi_calc_checksum((uint8_t *)sdt_table,
->                                    sizeof(AcpiTableHeader)) +
-> @@ -221,7 +222,7 @@ static void test_acpi_dsdt_table(test_data *data)
->      AcpiSdtTable dsdt_table;
->      uint32_t addr = le32_to_cpu(data->dsdt_addr);
->  
-> -    fetch_table(&dsdt_table, addr);
-> +    fetch_table(data->qts, &dsdt_table, addr);
->      ACPI_ASSERT_CMP(dsdt_table.header.signature, "DSDT");
->  
->      /* Since DSDT isn't in RSDT, add DSDT to ASL test tables list manually */
-> @@ -239,7 +240,7 @@ static void fetch_rsdt_referenced_tables(test_data *data)
->          uint32_t addr;
->  
->          addr = le32_to_cpu(data->rsdt_tables_addr[i]);
-> -        fetch_table(&ssdt_table, addr);
-> +        fetch_table(data->qts, &ssdt_table, addr);
->  
->          /* Add table to ASL test tables list */
->          g_array_append_val(data->tables, ssdt_table);
-> @@ -482,32 +483,32 @@ static bool smbios_ep_table_ok(test_data *data)
->      struct smbios_21_entry_point *ep_table = &data->smbios_ep_table;
->      uint32_t addr = data->smbios_ep_addr;
->  
-> -    ACPI_READ_ARRAY(ep_table->anchor_string, addr);
-> +    ACPI_READ_ARRAY(data->qts, ep_table->anchor_string, addr);
->      if (memcmp(ep_table->anchor_string, "_SM_", 4)) {
->          return false;
->      }
-> -    ACPI_READ_FIELD(ep_table->checksum, addr);
-> -    ACPI_READ_FIELD(ep_table->length, addr);
-> -    ACPI_READ_FIELD(ep_table->smbios_major_version, addr);
-> -    ACPI_READ_FIELD(ep_table->smbios_minor_version, addr);
-> -    ACPI_READ_FIELD(ep_table->max_structure_size, addr);
-> -    ACPI_READ_FIELD(ep_table->entry_point_revision, addr);
-> -    ACPI_READ_ARRAY(ep_table->formatted_area, addr);
-> -    ACPI_READ_ARRAY(ep_table->intermediate_anchor_string, addr);
-> +    ACPI_READ_FIELD(data->qts, ep_table->checksum, addr);
-> +    ACPI_READ_FIELD(data->qts, ep_table->length, addr);
-> +    ACPI_READ_FIELD(data->qts, ep_table->smbios_major_version, addr);
-> +    ACPI_READ_FIELD(data->qts, ep_table->smbios_minor_version, addr);
-> +    ACPI_READ_FIELD(data->qts, ep_table->max_structure_size, addr);
-> +    ACPI_READ_FIELD(data->qts, ep_table->entry_point_revision, addr);
-> +    ACPI_READ_ARRAY(data->qts, ep_table->formatted_area, addr);
-> +    ACPI_READ_ARRAY(data->qts, ep_table->intermediate_anchor_string, addr);
->      if (memcmp(ep_table->intermediate_anchor_string, "_DMI_", 5)) {
->          return false;
->      }
-> -    ACPI_READ_FIELD(ep_table->intermediate_checksum, addr);
-> -    ACPI_READ_FIELD(ep_table->structure_table_length, addr);
-> +    ACPI_READ_FIELD(data->qts, ep_table->intermediate_checksum, addr);
-> +    ACPI_READ_FIELD(data->qts, ep_table->structure_table_length, addr);
->      if (ep_table->structure_table_length == 0) {
->          return false;
->      }
-> -    ACPI_READ_FIELD(ep_table->structure_table_address, addr);
-> -    ACPI_READ_FIELD(ep_table->number_of_structures, addr);
-> +    ACPI_READ_FIELD(data->qts, ep_table->structure_table_address, addr);
-> +    ACPI_READ_FIELD(data->qts, ep_table->number_of_structures, addr);
->      if (ep_table->number_of_structures == 0) {
->          return false;
->      }
-> -    ACPI_READ_FIELD(ep_table->smbios_bcd_revision, addr);
-> +    ACPI_READ_FIELD(data->qts, ep_table->smbios_bcd_revision, addr);
->      if (acpi_calc_checksum((uint8_t *)ep_table, sizeof *ep_table) ||
->          acpi_calc_checksum((uint8_t *)ep_table + 0x10,
->                             sizeof *ep_table - 0x10)) {
-> @@ -526,7 +527,7 @@ static void test_smbios_entry_point(test_data *data)
->          int i;
->  
->          for (i = 0; i < sizeof sig - 1; ++i) {
-> -            sig[i] = readb(off + i);
-> +            sig[i] = qtest_readb(data->qts, off + i);
->          }
->  
->          if (!memcmp(sig, "_SM_", sizeof sig)) {
-> @@ -569,9 +570,9 @@ static void test_smbios_structs(test_data *data)
->      for (i = 0; i < le16_to_cpu(ep_table->number_of_structures); i++) {
->  
->          /* grab type and formatted area length from struct header */
-> -        type = readb(addr);
-> +        type = qtest_readb(data->qts, addr);
->          g_assert_cmpuint(type, <=, SMBIOS_MAX_TYPE);
-> -        len = readb(addr + 1);
-> +        len = qtest_readb(data->qts, addr + 1);
->  
->          /* single-instance structs must not have been encountered before */
->          if (smbios_single_instance(type)) {
-> @@ -583,7 +584,7 @@ static void test_smbios_structs(test_data *data)
->          prv = crt = 1;
->          while (prv || crt) {
->              prv = crt;
-> -            crt = readb(addr + len);
-> +            crt = qtest_readb(data->qts, addr + len);
->              len++;
->          }
->  
-> @@ -620,9 +621,9 @@ static void test_acpi_one(const char *params, test_data *data)
->                             data->machine, "kvm:tcg",
->                             params ? params : "", disk);
->  
-> -    qtest_start(args);
-> +    data->qts = qtest_init(args);
->  
-> -    boot_sector_test(global_qtest);
-> +    boot_sector_test(data->qts);
->  
->      data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
->      test_acpi_rsdp_address(data);
-> @@ -646,7 +647,8 @@ static void test_acpi_one(const char *params, test_data *data)
->      test_smbios_entry_point(data);
->      test_smbios_structs(data);
->  
-> -    qtest_quit(global_qtest);
-> +    assert(!global_qtest);
-> +    qtest_quit(data->qts);
->      g_free(args);
->  }
->  
-> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-> index 0a6fb55..c9c4f8c 100644
-> --- a/tests/vmgenid-test.c
-> +++ b/tests/vmgenid-test.c
-> @@ -31,7 +31,7 @@ typedef struct {
->      uint32_t vgia_val;
->  } QEMU_PACKED VgidTable;
->  
-> -static uint32_t acpi_find_vgia(void)
-> +static uint32_t acpi_find_vgia(QTestState *qts)
->  {
->      uint32_t rsdp_offset;
->      uint32_t guid_offset = 0;
-> @@ -45,18 +45,18 @@ static uint32_t acpi_find_vgia(void)
->      int i;
->  
->      /* Wait for guest firmware to finish and start the payload. */
-> -    boot_sector_test(global_qtest);
-> +    boot_sector_test(qts);
->  
->      /* Tables should be initialized now. */
-> -    rsdp_offset = acpi_find_rsdp_address();
-> +    rsdp_offset = acpi_find_rsdp_address(qts);
->  
->      g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
->  
-> -    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
-> +    acpi_parse_rsdp_table(qts, rsdp_offset, &rsdp_table);
->  
->      rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
->      /* read the header */
-> -    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-> +    ACPI_READ_TABLE_HEADER(qts, &rsdt_table, rsdt);
->      ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
->      rsdt_table_length = le32_to_cpu(rsdt_table.length);
->  
-> @@ -67,22 +67,22 @@ static uint32_t acpi_find_vgia(void)
->  
->      /* get the addresses of the tables pointed by rsdt */
->      tables = g_new0(uint32_t, tables_nr);
-> -    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
-> +    ACPI_READ_ARRAY_PTR(qts, tables, tables_nr, rsdt);
->  
->      for (i = 0; i < tables_nr; i++) {
->          uint32_t addr = le32_to_cpu(tables[i]);
-> -        ACPI_READ_TABLE_HEADER(&ssdt_table, addr);
-> +        ACPI_READ_TABLE_HEADER(qts, &ssdt_table, addr);
->          if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
->              /* the first entry in the table should be VGIA
->               * That's all we need
->               */
-> -            ACPI_READ_FIELD(vgid_table.name_op, addr);
-> +            ACPI_READ_FIELD(qts, vgid_table.name_op, addr);
->              g_assert(vgid_table.name_op == 0x08);  /* name */
-> -            ACPI_READ_ARRAY(vgid_table.vgia, addr);
-> +            ACPI_READ_ARRAY(qts, vgid_table.vgia, addr);
->              g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
-> -            ACPI_READ_FIELD(vgid_table.val_op, addr);
-> +            ACPI_READ_FIELD(qts, vgid_table.val_op, addr);
->              g_assert(vgid_table.val_op == 0x0C);  /* dword */
-> -            ACPI_READ_FIELD(vgid_table.vgia_val, addr);
-> +            ACPI_READ_FIELD(qts, vgid_table.vgia_val, addr);
->              /* The GUID is written at a fixed offset into the fw_cfg file
->               * in order to implement the "OVMF SDT Header probe suppressor"
->               * see docs/specs/vmgenid.txt for more details
-> @@ -100,7 +100,7 @@ static void read_guid_from_memory(QemuUUID *guid)
->      uint32_t vmgenid_addr;
->      int i;
->  
-> -    vmgenid_addr = acpi_find_vgia();
-> +    vmgenid_addr = acpi_find_vgia(global_qtest);
->      g_assert(vmgenid_addr);
->  
->      /* Read the GUID directly from guest memory */
+>  hw/arm/virt.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index a2b8d8f..f69e7eb 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -174,6 +174,7 @@ static const char *valid_cpus[] = {
+>      ARM_CPU_TYPE_NAME("cortex-a15"),
+>      ARM_CPU_TYPE_NAME("cortex-a53"),
+>      ARM_CPU_TYPE_NAME("cortex-a57"),
+> +    ARM_CPU_TYPE_NAME("cortex-a72"),
+>      ARM_CPU_TYPE_NAME("host"),
+>      ARM_CPU_TYPE_NAME("max"),
+>  };
+
+Applied, thanks.
+
+-- PMM
