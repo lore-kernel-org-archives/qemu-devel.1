@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gRZj6-0005Sz-U9
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:32:18 -0500
+	(envelope-from <armbru@redhat.com>) id 1gRZn7-00016h-8H
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:36:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gRZj4-0006dD-7w
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:32:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33512)
+	(envelope-from <armbru@redhat.com>) id 1gRZn4-0000Ss-3K
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:36:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60086)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gRZj3-0006d5-W6
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:32:14 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 389FBCAA80
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 09:32:13 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 27 Nov 2018 13:28:01 +0400
-Message-Id: <20181127092801.21777-29-marcandre.lureau@redhat.com>
-In-Reply-To: <20181127092801.21777-1-marcandre.lureau@redhat.com>
-References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gRZn3-0000SU-SR
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:36:22 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <CAFEAcA8RdNrbCLL7tXY=e95N2Y0LcZdCPr3EuQo1_hu08qJuaQ@mail.gmail.com>
+	<87sh0eyzb0.fsf@dusky.pond.sub.org> <20181107025628.GB17134@xz-x1>
+	<CAFEAcA_FhkA_1DiDM2PWDw27dupsAdP==kBUxRrw5rGDnLzMwg@mail.gmail.com>
+	<20181108024406.GB3170@xz-x1> <20181119061727.GA1901@xz-x1>
+	<20181119070558.GB1901@xz-x1> <87ftvxlz3m.fsf@dusky.pond.sub.org>
+	<20181120063143.GB24163@xz-x1> <874lcbbq4k.fsf@dusky.pond.sub.org>
+	<20181121032819.GC24163@xz-x1> <8736ru6hju.fsf@dusky.pond.sub.org>
+Date: Tue, 27 Nov 2018 10:36:19 +0100
+In-Reply-To: <8736ru6hju.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Wed, 21 Nov 2018 08:00:53 +0100")
+Message-ID: <87tvk2svzg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.2 v4 28/28] hostmem: use object id for
- memory region name with >= 3.1
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 0/8] Monitor patches for 2018-10-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,232 +32,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-hostmem-file and hostmem-memfd use the whole object path for the
-memory region name, and hostname-ram uses only the path component (the
-object id, or canonical path basename):
+Markus Armbruster <armbru@redhat.com> writes:
 
-qemu -m 1024 -object memory-backend-file,id=3Dmem,size=3D1G,mem-path=3D/t=
-mp/foo -numa node,memdev=3Dmem -monitor stdio
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used =
-             Total
-            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
-0x0000000040000000
+> Peter Xu <peterx@redhat.com> writes:
+>
+>> On Tue, Nov 20, 2018 at 06:44:27PM +0100, Markus Armbruster wrote:
+>>> 
+>>> We want the test to drive QEMU into the "queue full" state with an
+>>> out-of-band command unreceived, then watch the queue drain and the
+>>> out-of-band command overtaking part of it.
+>>> 
+>>> Driving QEMU into this state is easy enough: we can use a blocking
+>>> in-band command to plug the queue's drain.
+>>> 
+>>> Once we have QEMU in this state, we can unblock that command and watch
+>>> the show.  But we really have to wait until QEMU reaches this state
+>>> before we unblock.
+>>> 
+>>> Our problem is the test can't easily observe when QEMU reaches this
+>>> state.
+>>> 
+>>> You mentioned sending a "queue full" event, and that adding such an
+>>> event just for testing is hard to justify.  I agree.  Could such an
+>>> event have a non-testing use?  All I can think of is letting the
+>>> management application detect "we mismanaged the queue and compromised
+>>> monitor availability for out-of-band commands".  Doesn't sound
+>>> particularly convincing to me, but we can talk with libvirt guys to see
+>>> whether they want it.
+>>> 
+>>> Can the test observe the monitor is suspended just from the behavior of
+>>> its monitor socket?  Not reliably: sending lots of input eventually
+>>> fails with EAGAIN when the monitor is suspended, but it can also fail
+>>> when the monitor reads the input too slowly.
+>>> 
+>>> Can the test observe the monitor_suspend trace point?  Awkward, because
+>>> the trace backends are configurable.  We could have the test monitor the
+>>> "simple" backend's output file, skipping the test when "simple" isn't
+>>> available.  Hmm.
+>>> 
+>>> Here comes the heavy hammer: extend the qtest protocol.  When the
+>>> monitor suspends / resumes, send a suitable asynchronous message to the
+>>> qtest socket.  Have libqtest use that to track monitor suspend state.
+>>> The test can then busy-wait for the state to flip to suspended.
+>>> 
+>>> Other ideas?
+>>
+>> I don't have more to add (already a lot of ideas! :-).  I'd say I
+>> would prefer to start with the queue full event and we can discuss
+>> with libvirt on that after 3.1 when proper.  And besides libvirt
+>> (which I am not quite sure whether this event could be really useful
+>> in the near future) maybe it can also be used as a hint for any new
+>> QMP client when people want to complain about "hey, why my QMP client
+>> didn't get any respond from QEMU" - if the client didn't get any
+>> response but however it sees this event then we know the answer even
+>> before debugging more.
+>
+> Good point.
+>
+> Say we implement full flow control, i.e. we also suspend when the output
+> buffer becomes too large.  Then the event won't really help, because the
+> client won't see it until it fixed the situation by draining the output
+> buffer.  But it won't really hurt, either: even a client that misbehaves
+> in a really unfortunate way can't trigger many events without also
+> generating much more other output.  Orders of magnitude more.
+>
+>>> >> > Markus, do you want me to repost a new version with this change?  Is
+>>> >> > it still possible to have the oob-default series for 3.1?
+>>> >> 
+>>> >> We're trying to, but we need to get the test to work.
+>>> >> 
+>>> >> Two problems:
+>>> >> 
+>>> >> 1. The test doesn't seem to succed at testing "queue full".
+>>> >> 
+>>> >> 2. The test might still be racy.
+>>> >> 
+>>> >> I suspect the code we test is solid, and it's "only" the test we screwed
+>>> >> up.
+>>> >
+>>> > I agree.  Do you have better idea to test queue full?  I'd be more
+>>> > than glad to try any suggestions here, otherwise I am thinking whether
+>>> > we can just simply drop the queue full test (which is the last patch
+>>> > of the oob series) for now but merge the rest.  We can introduce new
+>>> > queue full test after 3.1 if we want, though again I really doubt
+>>> > whether we can without new things introduced into the procedure.
+>>> >
+>>> > Thoughts?
+>>> 
+>>> I'm afraid dropping the test (for now?) is what we have to do.
+>>
+>> Agreed.
+>
+> Okay, I'll prepare the pull request later today.
 
-qemu -m 1024 -object memory-backend-memfd,id=3Dmem,size=3D1G -numa node,m=
-emdev=3Dmem -monitor stdio
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used =
-             Total
-            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
-0x0000000040000000
+I didn't.  I decided it's too late for 3.1.  Sigh...
 
-qemu -m 1024 -object memory-backend-ram,id=3Dmem,size=3D1G -numa node,mem=
-dev=3Dmem -monitor stdio
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used =
-             Total
-                     mem    4 KiB  0x0000000000000000 0x0000000040000000 =
-0x0000000040000000
-
-Use the object id for -file and -memfd with >=3D 3.1 for consistency.
-Having a consistent naming allow to migrate to different hostmem
-backends.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- include/hw/compat.h      | 10 +++++++++-
- include/sysemu/hostmem.h |  3 ++-
- backends/hostmem-file.c  |  8 ++++----
- backends/hostmem-memfd.c |  2 +-
- backends/hostmem-ram.c   |  9 ++++-----
- backends/hostmem.c       | 31 +++++++++++++++++++++++++++++++
- 6 files changed, 51 insertions(+), 12 deletions(-)
-
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 70958328fe..99cf6b1e03 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -2,7 +2,15 @@
- #define HW_COMPAT_H
-=20
- #define HW_COMPAT_3_1 \
--    /* empty */
-+    {\
-+        .driver   =3D "memory-backend-file",\
-+        .property =3D "x-use-canonical-path-for-ramblock-id",\
-+        .value    =3D "true",\
-+    },{\
-+        .driver   =3D "memory-backend-memfd",\
-+        .property =3D "x-use-canonical-path-for-ramblock-id",\
-+        .value    =3D "true",\
-+    },
-=20
- #define HW_COMPAT_3_0 \
-     /* empty */
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index 6e6bd2c1cb..a023b372a4 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -53,7 +53,7 @@ struct HostMemoryBackend {
-=20
-     /* protected */
-     uint64_t size;
--    bool merge, dump;
-+    bool merge, dump, use_canonical_path;
-     bool prealloc, force_prealloc, is_mapped, share;
-     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
-     HostMemPolicy policy;
-@@ -67,5 +67,6 @@ MemoryRegion *host_memory_backend_get_memory(HostMemory=
-Backend *backend);
- void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool map=
-ped);
- bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
- size_t host_memory_backend_pagesize(HostMemoryBackend *memdev);
-+char *host_memory_backend_get_name(HostMemoryBackend *backend);
-=20
- #endif
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index 639c8d4307..c01a7cdf8d 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -55,16 +55,16 @@ file_backend_memory_alloc(HostMemoryBackend *backend,=
- Error **errp)
-     error_setg(errp, "-mem-path not supported on this host");
- #else
-     if (!host_memory_backend_mr_inited(backend)) {
--        gchar *path;
-+        gchar *name;
-         backend->force_prealloc =3D mem_prealloc;
--        path =3D object_get_canonical_path(OBJECT(backend));
-+        name =3D host_memory_backend_get_name(backend);
-         memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
--                                 path,
-+                                 name,
-                                  backend->size, fb->align,
-                                  (backend->share ? RAM_SHARED : 0) |
-                                  (fb->is_pmem ? RAM_PMEM : 0),
-                                  fb->mem_path, errp);
--        g_free(path);
-+        g_free(name);
-     }
- #endif
- }
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-index b6836b28e5..c5a4a9b530 100644
---- a/backends/hostmem-memfd.c
-+++ b/backends/hostmem-memfd.c
-@@ -57,7 +57,7 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, =
-Error **errp)
-         return;
-     }
-=20
--    name =3D object_get_canonical_path(OBJECT(backend));
-+    name =3D host_memory_backend_get_name(backend);
-     memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
-                                    name, backend->size, true, fd, errp);
-     g_free(name);
-diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
-index 7ddd08d370..24b65d9ae3 100644
---- a/backends/hostmem-ram.c
-+++ b/backends/hostmem-ram.c
-@@ -16,21 +16,20 @@
-=20
- #define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
-=20
--
- static void
- ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
- {
--    char *path;
-+    char *name;
-=20
-     if (!backend->size) {
-         error_setg(errp, "can't create backend with size 0");
-         return;
-     }
-=20
--    path =3D object_get_canonical_path_component(OBJECT(backend));
--    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
-), path,
-+    name =3D host_memory_backend_get_name(backend);
-+    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
-), name,
-                            backend->size, backend->share, errp);
--    g_free(path);
-+    g_free(name);
- }
-=20
- static void
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 1a89342039..35c665fca2 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -28,6 +28,16 @@ QEMU_BUILD_BUG_ON(HOST_MEM_POLICY_BIND !=3D MPOL_BIND)=
-;
- QEMU_BUILD_BUG_ON(HOST_MEM_POLICY_INTERLEAVE !=3D MPOL_INTERLEAVE);
- #endif
-=20
-+char *
-+host_memory_backend_get_name(HostMemoryBackend *self)
-+{
-+    if (!self->use_canonical_path) {
-+        return object_get_canonical_path_component(OBJECT(self));
-+    }
-+
-+    return object_get_canonical_path(OBJECT(self));
-+}
-+
- static void
- host_memory_backend_get_size(Object *obj, Visitor *v, const char *name,
-                              void *opaque, Error **errp)
-@@ -386,6 +396,23 @@ static void host_memory_backend_set_share(Object *o,=
- bool value, Error **errp)
-     backend->share =3D value;
- }
-=20
-+static bool
-+host_memory_backend_get_use_canonical_path(Object *obj, Error **errp)
-+{
-+    HostMemoryBackend *self =3D MEMORY_BACKEND(obj);
-+
-+    return self->use_canonical_path;
-+}
-+
-+static void
-+host_memory_backend_set_use_canonical_path(Object *obj, bool value,
-+                                           Error **errp)
-+{
-+    HostMemoryBackend *self =3D MEMORY_BACKEND(obj);
-+
-+    self->use_canonical_path =3D value;
-+}
-+
- static void
- host_memory_backend_class_init(ObjectClass *oc, void *data)
- {
-@@ -432,6 +459,9 @@ host_memory_backend_class_init(ObjectClass *oc, void =
-*data)
-         &error_abort);
-     object_class_property_set_description(oc, "share",
-         "Mark the memory as private to QEMU or shared", &error_abort);
-+    object_class_property_add_bool(oc, "x-use-canonical-path-for-rambloc=
-k-id",
-+        host_memory_backend_get_use_canonical_path,
-+        host_memory_backend_set_use_canonical_path, &error_abort);
- }
-=20
- static const TypeInfo host_memory_backend_info =3D {
-@@ -444,6 +474,7 @@ static const TypeInfo host_memory_backend_info =3D {
-     .instance_init =3D host_memory_backend_init,
-     .interfaces =3D (InterfaceInfo[]) {
-         { TYPE_USER_CREATABLE },
-+        { TYPE_COMPAT_PROPS },
-         { }
-     }
- };
---=20
-2.20.0.rc1
+I'm keeping it queued for 4.0.
