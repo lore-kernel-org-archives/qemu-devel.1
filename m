@@ -1,25 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRcc3-0005jM-2s
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:11 -0500
+	(envelope-from <i.maximets@samsung.com>) id 1gRccR-0005vi-CF
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRcc2-0007CY-Be
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:11 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35758)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gRcc2-0007CO-38
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:10 -0500
-Received: by mail-ot1-x343.google.com with SMTP id 81so19944751otj.2
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 04:37:10 -0800 (PST)
+	(envelope-from <i.maximets@samsung.com>) id 1gRccM-0007OB-S8
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:34 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:49835)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
+	id 1gRccM-0007Mt-EU
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:37:30 -0500
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
+	20181127123728euoutp02e2e59586e2b08255950b44689441c4e6~q_2iFQhDC1331713317euoutp02L
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 12:37:28 +0000 (GMT)
+From: Ilya Maximets <i.maximets@samsung.com>
+Message-ID: <00227750-5d8e-8375-dd93-b86990a786d8@samsung.com>
+Date: Tue, 27 Nov 2018 15:37:26 +0300
 MIME-Version: 1.0
-References: <20181127121724.19755-1-sw@weilnetz.de>
-In-Reply-To: <20181127121724.19755-1-sw@weilnetz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Nov 2018 12:36:57 +0000
-Message-ID: <CAFEAcA_gWYGnD2cAdGRWKKZRfddPvgQoS89nxM8=ro++fO+Gmw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.1 0/2] Fix disas/nanomips
+In-Reply-To: <CAJ+F1CK_WtcLCg+hi76J6x85zTvYkF1YN7b8hgP4-p-M_4-cag@mail.gmail.com>
+Content-Language: en-GB
+Content-Type: text/plain; charset="utf-8"
+References: <CGME20181127111109eucas1p2b1eae35e38e46c3f76c86a350ed41926@eucas1p2.samsung.com>
+	<20181127111050.18453-1-i.maximets@samsung.com>
+	<20181127111050.18453-2-i.maximets@samsung.com>
+	<CAMxuvay-6X2g1k8TbJR1NAW=Gb_tARb-wbr7H2RRoF9x+-F+aw@mail.gmail.com>
+	<78f31962-8d54-19c1-e8fb-c21f95a491f0@samsung.com>
+	<CAJ+F1C+XFs++Q044Y8CvVYFhtNpaEDS8qjx0BjsJN1yukZURkA@mail.gmail.com>
+	<2edee79d-4d23-913a-3536-a8794ee16528@samsung.com>
+	<CAJ+F1CK_WtcLCg+hi76J6x85zTvYkF1YN7b8hgP4-p-M_4-cag@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/4] hostmem-memfd: enable seals only if
+ supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +40,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Tue, 27 Nov 2018 at 12:17, Stefan Weil <sw@weilnetz.de> wrote:
->
-> These two patches fix wrong format strings used in disas/nanomips.
->
-> The first patch replaces proprietary data types by POSIX data types,
-> because otherwise the PRI... macros cannot be used in the second patch.
+On 27.11.2018 15:29, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Tue, Nov 27, 2018 at 4:02 PM Ilya Maximets <i.maximets@samsung.com> =
+wrote:
+>>
+>> On 27.11.2018 15:00, Marc-Andr=C3=A9 Lureau wrote:
+>>> Hi
+>>> On Tue, Nov 27, 2018 at 3:56 PM Ilya Maximets <i.maximets@samsung.com=
+> wrote:
+>>>>
+>>>> On 27.11.2018 14:49, Marc-Andr=C3=A9 Lureau wrote:
+>>>>> Hi
+>>>>> On Tue, Nov 27, 2018 at 3:11 PM Ilya Maximets <i.maximets@samsung.c=
+om> wrote:
+>>>>>>
+>>>>>> If seals are not supported, memfd_create() will fail.
+>>>>>> Furthermore, there is no way to disable it in this case because
+>>>>>> '.seal' property is not registered.
+>>>>>>
+>>>>>> This issue leads to vhost-user-test failures on RHEL 7.2:
+>>>>>>
+>>>>>>   qemu-system-x86_64: -object memory-backend-memfd,id=3Dmem,size=3D=
+2M,: \
+>>>>>>                       failed to create memfd: Invalid argument
+>>>>>>
+>>>>>> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+>>>>>
+>>>>>
+>>>>> This will change the default behaviour of memfd backend, and may th=
+us
+>>>>> me considered a break.
+>>>>
+>>>> This will change the default behaviour only on systems without seali=
+ng
+>>>> support. But current implementation is broken there anyway and does =
+not
+>>>> work.
+>>>>
+>>>>>
+>>>>> Instead, memfd vhost-user-test should skipped (or tuned with
+>>>>> sealed=3Dfalse if unsupported)
+>>>>
+>>>> vhost-user-test is just an example here. In fact memfd could not be
+>>>> used at all on system without sealing support. And there is no way
+>>>> to disable seals.
+>>>
+>>> which system supports memfd without sealing?
+>>
+>> RHEL 7.2. kernel version 3.10.0-327.el7.x86_64
+>=20
+> Correct, it was backported without sealing for some reason.
+>=20
+> I would rather have an explicit seal=3Doff argument on such system
+> (because sealing is expected to be available with memfd in general)
+>=20
 
-I think this is a good idea, but that first patch is a huge patch for
-this point in the 3.1 release cycle. Can we fix the warnings
-by just casting the arguments to the img::format() function ?
+But '.seal' property registering is guarded by 'qemu_memfd_check(MFD_ALLO=
+W_SEALING)'.
+And you can not disable it:
 
-> Those patches are only relevant for 3.1 if full nanomips support is considered
-> important enought and if QEMU is used on big endian machines (I think
-> the old code will work on little endian hosts even with wrong format
-> strings).
+qemu-system-x86_64: -object memory-backend-memfd,seal=3Doff,id=3Dmem,size=
+=3D2M,: Property '.seal' not found
 
-It only affects the disassembler, which is a debug tool.
-A week ago this would have been a fairly definite "yes, fix it"
-issue; at this point, with rc3 due to go out today, it's a bit
-trickier to justify. (rc3 will be the last rc unless any showstopper
-issues turn up.)
+Enabling this option on system that does not support sealing will
+probably break some libvirt feature discovering or something similar.
 
-> I use those patches for QEMU for Windows because that is compiled with
-> more compiler warnings, so compilation would fail without the fix.
+What about adding some warning to 'memfd_backend_instance_init' if
+sealing not supported before disabling it ?
 
-My Windows cross-compiler builds work OK, FWIW, and -Werror is
-only enabled by default for Linux builds, so warnings shouldn't
-result in build failures.
-
-thanks
--- PMM
+>>
+>>>
+>>>>
+>>>>>
+>>>>>> ---
+>>>>>>  backends/hostmem-memfd.c | 4 ++--
+>>>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>>>
+>>>>>> diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+>>>>>> index b6836b28e5..ee39bdbde6 100644
+>>>>>> --- a/backends/hostmem-memfd.c
+>>>>>> +++ b/backends/hostmem-memfd.c
+>>>>>> @@ -129,8 +129,8 @@ memfd_backend_instance_init(Object *obj)
+>>>>>>  {
+>>>>>>      HostMemoryBackendMemfd *m =3D MEMORY_BACKEND_MEMFD(obj);
+>>>>>>
+>>>>>> -    /* default to sealed file */
+>>>>>> -    m->seal =3D true;
+>>>>>> +    /* default to sealed file if supported */
+>>>>>> +    m->seal =3D qemu_memfd_check(MFD_ALLOW_SEALING);
+>>>>>>  }
+>>>>>>
+>>>>>>  static void
+>>>>>> --
+>>>>>> 2.17.1
+>>>>>>
+>>>>>
+>>>>>
+>>>>
+>>>
+>>>
+>=20
+>=20
+>=20
