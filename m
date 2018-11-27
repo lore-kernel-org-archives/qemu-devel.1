@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gRmc4-0006tw-Ad
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 18:17:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gRnAy-0005am-2Q
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 18:53:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gRmYM-0000T6-Ai
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 18:14:05 -0500
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:52295)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gRmYL-0000Op-Uv
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 18:14:02 -0500
-Date: Tue, 27 Nov 2018 18:13:57 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181127231357.GA19764@flamenco>
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-42-cota@braap.org>
-	<20181127124352.ll6quqc5xedvdqht@MacBook-Pro-Roman.local>
+	(envelope-from <peter.maydell@linaro.org>) id 1gRnAx-0000uw-DO
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 18:53:56 -0500
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:38046)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gRnAx-0000um-8r
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 18:53:55 -0500
+Received: by mail-ot1-x331.google.com with SMTP id e12so17593368otl.5
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 15:53:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181127124352.ll6quqc5xedvdqht@MacBook-Pro-Roman.local>
-Subject: Re: [Qemu-devel] [RFC 41/48] configure: add --enable-plugins
+References: <1543343886-816-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1543343886-816-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Nov 2018 23:53:42 +0000
+Message-ID: <CAFEAcA89chrHhitrFMmCzPuAHCJ1QLLy7udCtCgHESaspRc7Cw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v3 00/14] Misc patches for QEMU 3.1.0-rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Nov 27, 2018 at 15:43:52 +0300, Roman Bolshakov wrote:
-> ld64 on macOS has similar -exported_symbols_list option. Here's the reference:
-> 
->      -exported_symbols_list filename
-> 	The specified filename contains a list of global symbol names
-> 	that will remain as global symbols in the output file.  All other
-> 	global symbols will be treated as if they were marked as
-> 	__private_extern__ (aka visibility=hidden) and will not be global in
-> 	the output file. The symbol names listed in filename must be one per
-> 	line.  Leading and trailing white space are not part of the symbol
-> 	name.  Lines starting with # are ignored, as are lines with only white
-> 	space.  Some wildcards (similar to shell file matching) are supported.
-> 	The * matches zero or more characters.  The ?  matches one character.
-> 	[abc] matches one character which must be an 'a', 'b', or 'c'.
-> 	[a-z] matches any single lower case letter from 'a' to 'z'.
-> 
-> 
-> I can try your branch if you add support of the linker flag or send required
-> changes via GitHub.
+On Tue, 27 Nov 2018 at 19:00, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The following changes since commit 4822f1ee9efa8df56e29db0a68323b484bdb03=
+35:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/fixes-31-20181127-pul=
+l-request' into staging (2018-11-27 11:21:38 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 3fe2199833c47652a7e5dbf8b347d873820104b8:
+>
+>   hostmem: no need to check for host_memory_backend_mr_inited() in alloc(=
+) (2018-11-27 19:36:22 +0100)
+>
+> ----------------------------------------------------------------
+> * lsi HBA reselection fix (George)
+> * Small cleanups (Li Qiang)
+> * bugfixes for vhost-user-bridge and hostmem (Marc-Andr=C3=A9)
+> * single-thread TCG fix (me)
+> * VMX migration blocker (me)
+> * target/i386 fix for LOCK (Richard)
+> * MAINTAINERS update (Philippe, Thomas)
+>
+> ---------------------------------------------------------------
 
-Can you please try this branch? I added a commit with the appended.
-  https://github.com/cota/qemu/tree/plugin-v2
 
-You can inspect the symbols in the final binary with
-`readelf --dyn-syms' or `nm -D'.
+This still has the problem with backends/hostmem-file.c that
+means it doesn't build on the BSDs...
 
-Thanks,
+backends/hostmem-file.c: In function 'file_backend_memory_alloc':
+backends/hostmem-file.c:61:5: error: 'path' undeclared (first use in
+this function)
+     path =3D object_get_canonical_path(OBJECT(backend));
+     ^
+backends/hostmem-file.c:61:5: note: each undeclared identifier is
+reported only once for each function it appears in
 
-		Emilio
+(mismatch in #ifdef choice between declaration and use of variable)
 
----
-diff --git a/configure b/configure
-index fe9707d951..3dc9c9697b 100755
---- a/configure
-+++ b/configure
-@@ -5176,15 +5176,31 @@ int main(void)
- }
- EOF
- 
-+ld_dynamic_list="no"
- if compile_prog "" "-Wl,--dynamic-list=$TMPTXT" ; then
-   ld_dynamic_list="yes"
--else
--  if test "$plugins" = "yes" ; then
--    error_exit \
--        "Plugin support requires specifying a set of symbols that " \
--        "are exported to plugins. Unfortunately your linker doesn't " \
--        "support the flag (--dynamic-list) used for this purpose."
--  fi
-+fi
-+
-+#########################################
-+# See if -exported_symbols_list is supported by the linker
-+
-+cat > $TMPTXT <<EOF
-+  foo
-+EOF
-+
-+ld_exported_symbols_list="no"
-+if compile_prog "" "-Wl,-exported_symbols_list,$TMPTXT" ; then
-+  ld_exported_symbols_list="yes"
-+fi
-+
-+if  test "$plugins" = "yes" &&
-+    test "$ld_dynamic_list" = "no" &&
-+    test "$ld_exported_symbols_list" = "no" ; then
-+  error_exit \
-+      "Plugin support requires specifying a set of symbols that " \
-+      "are exported to plugins. Unfortunately your linker doesn't " \
-+      "support the flag (--dynamic-list or -exported_symbols_list) used " \
-+      "for this purpose."
- fi
- 
- ########################################
-@@ -6827,7 +6843,18 @@ fi
- if test "$plugins" = "yes" ; then
-     echo "CONFIG_PLUGINS=y" >> $config_host_mak
-     LIBS="-ldl $LIBS"
--    LDFLAGS="-Wl,--dynamic-list=\$(SRC_PATH)/qemu-plugins.symbols $LDFLAGS"
-+    if test "$ld_dynamic_list" = "yes" ; then
-+	LDFLAGS="-Wl,--dynamic-list=\$(SRC_PATH)/qemu-plugins.symbols $LDFLAGS"
-+    elif test "$ld_exported_symbols_list" = "yes" ; then
-+	ld64_symbols=qemu-plugins-ld64.symbols
-+	echo "# Automatically generated by configure - do not modify" > $ld64_symbols
-+	cat "$source_path/qemu-plugins.symbols" | grep qemu_ | sed 's/;//g' >> $ld64_symbols
-+	LDFLAGS="-Wl,-exported_symbols_list,\$(BUILD_DIR)/$ld64_symbols $LDFLAGS"
-+    else
-+	error_exit \
-+	    "If \$plugins=yes, either \$ld_dynamic_list or " \
-+	    "\$ld_exported_symbols_list should have been set to 'yes'."
-+    fi
- fi
- 
- if test "$tcg_interpreter" = "yes"; then
+thanks
+-- PMM
