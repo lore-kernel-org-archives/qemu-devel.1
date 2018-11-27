@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gRd3L-0002bh-5h
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:24 -0500
+	(envelope-from <groug@kaod.org>) id 1gRd3S-0002kb-SS
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gRd3H-0005TS-5c
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:23 -0500
-Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:50283)
+	(envelope-from <groug@kaod.org>) id 1gRd3P-0005g8-OH
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:30 -0500
+Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:52663)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gRd3F-0005Pb-2K
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:19 -0500
-Received: from player760.ha.ovh.net (unknown [10.109.146.82])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 2903BE46CA
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 14:05:12 +0100 (CET)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gRd3P-0005cV-HD
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:27 -0500
+Received: from player787.ha.ovh.net (unknown [10.109.143.3])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 469F2174F25
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 14:05:24 +0100 (CET)
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 27 Nov 2018 14:05:06 +0100
-Message-ID: <154332390658.541746.14345430389973192696.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Date: Tue, 27 Nov 2018 14:05:18 +0100
+Message-ID: <154332391807.541746.1568292963548614592.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 In-Reply-To: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 References: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH for-4.0 1/9] target/ppc: use g_new(T,
+Subject: [Qemu-devel] [PATCH for-4.0 2/9] spapr: use g_new(T,
  n) instead of g_malloc(sizeof(T) * n)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -37,27 +37,33 @@ Because it is a recommended coding practice (see HACKING).
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/translate_init.inc.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/ppc/spapr_iommu.c |    2 +-
+ hw/ppc/spapr_vio.c   |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 168d0cec28b7..03f1d34a9769 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -9081,13 +9081,13 @@ static void init_ppc_proc(PowerPCCPU *cpu)
-             nb_tlb *= 2;
-         switch (env->tlb_type) {
-         case TLB_6XX:
--            env->tlb.tlb6 = g_malloc0(nb_tlb * sizeof(ppc6xx_tlb_t));
-+            env->tlb.tlb6 = g_new0(ppc6xx_tlb_t, nb_tlb);
-             break;
-         case TLB_EMB:
--            env->tlb.tlbe = g_malloc0(nb_tlb * sizeof(ppcemb_tlb_t));
-+            env->tlb.tlbe = g_new0(ppcemb_tlb_t, nb_tlb);
-             break;
-         case TLB_MAS:
--            env->tlb.tlbm = g_malloc0(nb_tlb * sizeof(ppcmas_tlb_t));
-+            env->tlb.tlbm = g_new0(ppcmas_tlb_t, nb_tlb);
-             break;
-         }
-         /* Pre-compute some useful values */
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index 1b0880ac9edb..b56466f89a64 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -93,7 +93,7 @@ static uint64_t *spapr_tce_alloc_table(uint32_t liobn,
+ 
+     if (!table) {
+         *fd = -1;
+-        table = g_malloc0(nb_table * sizeof(uint64_t));
++        table = g_new0(uint64_t, nb_table);
+     }
+ 
+     trace_spapr_iommu_new_table(liobn, table, *fd);
+diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+index 840d4a3c451c..7e8a9ad09337 100644
+--- a/hw/ppc/spapr_vio.c
++++ b/hw/ppc/spapr_vio.c
+@@ -730,7 +730,7 @@ void spapr_dt_vdevice(VIOsPAPRBus *bus, void *fdt)
+     }
+ 
+     /* Copy out into an array of pointers */
+-    qdevs = g_malloc(sizeof(qdev) * num);
++    qdevs = g_new(DeviceState *, num);
+     num = 0;
+     QTAILQ_FOREACH(kid, &bus->bus.children, sibling) {
+         qdevs[num++] = kid->child;
