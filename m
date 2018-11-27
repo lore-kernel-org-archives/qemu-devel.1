@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gRd3d-0002v4-JF
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:51 -0500
+	(envelope-from <groug@kaod.org>) id 1gRd3r-00034d-Ej
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gRd3X-0005q3-Es
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:41 -0500
-Received: from 10.mo6.mail-out.ovh.net ([87.98.157.236]:48113)
+	(envelope-from <groug@kaod.org>) id 1gRd3n-0006OA-2B
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:55 -0500
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:57391)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gRd3X-0005oW-79
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:35 -0500
-Received: from player158.ha.ovh.net (unknown [10.109.146.132])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 8AF46196F14
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 14:05:33 +0100 (CET)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gRd3m-0006H2-Dq
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:05:50 -0500
+Received: from player695.ha.ovh.net (unknown [10.109.160.153])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 25E68174EFD
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 14:05:46 +0100 (CET)
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 27 Nov 2018 14:05:29 +0100
-Message-ID: <154332392916.541746.3772338098005086592.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Date: Tue, 27 Nov 2018 14:05:38 +0100
+Message-ID: <154332393835.541746.592813777514601908.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 In-Reply-To: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 References: <154332389387.541746.8099441653585015043.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH for-4.0 3/9] ppc405_boards: use g_new(T,
+Subject: [Qemu-devel] [PATCH for-4.0 4/9] ppc405_uc: use g_new(T,
  n) instead of g_malloc(sizeof(T) * n)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -37,28 +37,28 @@ Because it is a recommended coding practice (see HACKING).
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/ppc405_boards.c |    4 ++--
+ hw/ppc/ppc405_uc.c |    4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index 3be3fe4432b4..f35b412c88dd 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -149,7 +149,7 @@ static void ref405ep_init(MachineState *machine)
-     MemoryRegion *bios;
-     MemoryRegion *sram = g_new(MemoryRegion, 1);
-     ram_addr_t bdloc;
--    MemoryRegion *ram_memories = g_malloc(2 * sizeof(*ram_memories));
-+    MemoryRegion *ram_memories = g_new(MemoryRegion, 2);
-     hwaddr ram_bases[2], ram_sizes[2];
-     target_ulong sram_size;
-     long bios_size;
-@@ -446,7 +446,7 @@ static void taihu_405ep_init(MachineState *machine)
-     qemu_irq *pic;
-     MemoryRegion *sysmem = get_system_memory();
-     MemoryRegion *bios;
--    MemoryRegion *ram_memories = g_malloc(2 * sizeof(*ram_memories));
-+    MemoryRegion *ram_memories = g_new(MemoryRegion, 2);
-     MemoryRegion *ram = g_malloc0(sizeof(*ram));
-     hwaddr ram_bases[2], ram_sizes[2];
-     long bios_size;
+diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+index 5c58415cf1fd..e1aadf126d59 100644
+--- a/hw/ppc/ppc405_uc.c
++++ b/hw/ppc/ppc405_uc.c
+@@ -1519,7 +1519,7 @@ CPUPPCState *ppc405cr_init(MemoryRegion *address_space_mem,
+     /* OBP arbitrer */
+     ppc4xx_opba_init(0xef600600);
+     /* Universal interrupt controller */
+-    irqs = g_malloc0(sizeof(qemu_irq) * PPCUIC_OUTPUT_NB);
++    irqs = g_new0(qemu_irq, PPCUIC_OUTPUT_NB);
+     irqs[PPCUIC_OUTPUT_INT] =
+         ((qemu_irq *)env->irq_inputs)[PPC40x_INPUT_INT];
+     irqs[PPCUIC_OUTPUT_CINT] =
+@@ -1877,7 +1877,7 @@ CPUPPCState *ppc405ep_init(MemoryRegion *address_space_mem,
+     /* Initialize timers */
+     ppc_booke_timers_init(cpu, sysclk, 0);
+     /* Universal interrupt controller */
+-    irqs = g_malloc0(sizeof(qemu_irq) * PPCUIC_OUTPUT_NB);
++    irqs = g_new0(qemu_irq, PPCUIC_OUTPUT_NB);
+     irqs[PPCUIC_OUTPUT_INT] =
+         ((qemu_irq *)env->irq_inputs)[PPC40x_INPUT_INT];
+     irqs[PPCUIC_OUTPUT_CINT] =
