@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gRiTs-0004A4-1F
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:53:09 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gRiWd-0006JA-0c
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:55:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gRiTo-0000mV-S2
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:53:07 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:44018)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gRiTo-0000m3-LF
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:53:04 -0500
-Received: by mail-wr1-f65.google.com with SMTP id r10so23788337wrs.10
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 10:53:04 -0800 (PST)
-References: <20181123090058.6931-1-rkagan@virtuozzo.com>
+	(envelope-from <pbonzini@redhat.com>) id 1gRiWZ-0002hY-RT
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:55:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48962)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gRiWZ-0002hL-K9
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:55:55 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 17D203082133
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 18:55:55 +0000 (UTC)
+References: <1543343726-53531-1-git-send-email-pbonzini@redhat.com>
+	<CAMxuvawT9NgS6N769gmZ+kzSzefBcp1eYpa_h_OWJ2S12b_O=g@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <43c4a5d5-9437-57b1-e557-e82dfa6c3af1@redhat.com>
-Date: Tue, 27 Nov 2018 19:50:54 +0100
+Message-ID: <7d95c907-c3da-d992-8133-e4b65a17370c@redhat.com>
+Date: Tue, 27 Nov 2018 19:55:51 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181123090058.6931-1-rkagan@virtuozzo.com>
+In-Reply-To: <CAMxuvawT9NgS6N769gmZ+kzSzefBcp1eYpa_h_OWJ2S12b_O=g@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] configure: fix elf2dmp check
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] glib-compat: work around g_test_message
+ bug with subprocess tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +35,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On 23/11/18 10:01, Roman Kagan wrote:
-> elf2dmp is keyed on "$posix" = "yes", but "$posix" doesn't seem to be
-> set anywhere.
-> 
-> The original intent was presumably to skip building it on Windows, so
-> check for "$mingw32" = "no" instead.
-> 
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index 0a3c6a72c3..fc6ce0065d 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5722,7 +5722,7 @@ if test "$want_tools" = "yes" ; then
->    if [ "$ivshmem" = "yes" ]; then
->      tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
->    fi
-> -  if [ "$posix" = "yes" ] && [ "$curl" = "yes" ]; then
-> +  if [ "$mingw32" = "no" ] && [ "$curl" = "yes" ]; then
->      tools="elf2dmp $tools"
->    fi
->  fi
-> 
+On 27/11/18 19:49, Marc-Andr=C3=A9 Lureau wrote:
+> good catch! makes me wonder if g_test_message() is supposed to be
+> usable in a subprocess.. Let see the review comments on upstream bug.
+> At least, documentation should be updated.
+>=20
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Unfortunately this shows that elf2dmp is not portable to 32-bit systems,
-nor to non-Linux.  Can this be fixed?
+Considering that GLib goes to great lengths to pass the test log fd as
+--GTestFD, it definitely should.  So the alternative is not that that
+documentation should be updated, the test log file descriptor should not
+be passed.
 
 Paolo
