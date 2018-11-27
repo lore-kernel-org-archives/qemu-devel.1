@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gRgO3-0003U1-7k
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:39:00 -0500
+	(envelope-from <bounces@canonical.com>) id 1gRgQ1-0004Ey-Rl
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:41:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gRgO2-0005uZ-C4
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:38:59 -0500
-Date: Tue, 27 Nov 2018 17:38:48 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181127173848.0ea2b18a@redhat.com>
-In-Reply-To: <20181126162942.21258-7-sameo@linux.intel.com>
-References: <20181126162942.21258-1-sameo@linux.intel.com>
-	<20181126162942.21258-7-sameo@linux.intel.com>
+	(envelope-from <bounces@canonical.com>) id 1gRgPy-0008Dh-OL
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:41:01 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33346)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gRgPy-00087X-Fv
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:40:58 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gRgPw-0001tO-HC
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 16:40:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 53EC12E80CB
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 16:40:56 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/8] hw: arm: Support both legacy and
- current RSDP build
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 27 Nov 2018 16:29:08 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1805445 <1805445@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154332864629.32687.7125797278920412825.malonedeb@wampee.canonical.com>
+Message-Id: <154333614816.32547.11861270173620566288.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1805445] Re: QEMU arm virt machine was stopped by
+ STMFD command while debug process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +37,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Mon, 26 Nov 2018 17:29:39 +0100
-Samuel Ortiz <sameo@linux.intel.com> wrote:
+In your "before the STR" image the guest CPU is in mode 0x13, which is
+Supervisor. In the image afterwards, it is in Abort mode (0x17). I think
+therefore that what has happened is that the memory address the code is
+trying to store to is not accessible, and the guest has taken a Data
+Abort exception, so in the second image you are looking at your guest's
+exception handler code for the data abort.
 
-> We add the ability to build legacy or current RSDP tables, based on the
-> AcpiRsdpData revision field passed to build_rsdp().
-> Although arm/virt only uses RSDP v2, adding that capability to
-> build_rsdp will allow us to share the RSDP build code between ARM and x86.
-> 
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> ---
->  hw/arm/virt-acpi-build.c | 26 +++++++++++++++++++++-----
->  1 file changed, 21 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index d47978a55e..10f8388b63 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -389,6 +389,27 @@ build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
->      /* Space for the RSDT address (32 bit) */
->      build_append_int_noprefix(tbl, 0, 4);
->  
-> +    if (rsdp_data->rsdt_tbl_offset) {
-> +        /* RSDT address to be filled by guest linker */
-> +        bios_linker_loader_add_pointer(linker,
-> +                                       ACPI_BUILD_RSDP_FILE, 16, 4,
-> +                                       ACPI_BUILD_TABLE_FILE,
-> +                                       *rsdp_data->rsdt_tbl_offset);
-> +    }
-> +
-> +    /* Checksum to be filled by guest linker */
-> +    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE, 0,
-> +                                    ACPI_RSDP_REV_1_LEN,
-> +                                    ACPI_RSDP_CHECKSUM_OFFSET);
-> +
-> +    if (rsdp_data->revision == ACPI_RSDP_REV_1) {
-> +        /* Legacy RSDP, we're done */
-> +        return;
-> +    }
-> +
-> +    /* The RSDP revision is 2 and later, we must have an XSDT pointer */
-> +    g_assert(rsdp_data->xsdt_tbl_offset != NULL);
-> +
->      /* Length */
->      build_append_int_noprefix(tbl, ACPI_RSDP_REV_2_LEN, ACPI_RSDP_LEN_LEN);
->  
-> @@ -406,11 +427,6 @@ build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
->      /* Space for the reserved bytes */
->      build_append_int_noprefix(tbl, 0, ACPI_RSDP_RESERVED_LEN);
->  
-> -    /* Checksum to be filled by guest linker */
-> -    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE, 0,
-> -                                    ACPI_RSDP_REV_1_LEN,
-> -                                    ACPI_RSDP_CHECKSUM_OFFSET);
-> -
-maybe put this hunk in 5/8 at the place where are you moving it here, so you don't have to touch it twice
-(I'll leave it up to you)
-otherwise looks good 
+There is a long-standing bug where singlestepping an insn which takes an
+exception results in our stepping the insn at the exception vector entry
+point and then stopping, rather than stopping on the entry point, which
+may be confusing you here. (That's LP:757702.)
 
+-- =
 
->      /* Extended checksum to be filled by Guest linker */
->      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE, 0,
->                                      ACPI_RSDP_REV_2_LEN,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805445
+
+Title:
+  QEMU arm virt machine was stopped by STMFD command while debug process
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello, i have a big problem with QEMU arm virtual machine. So...
+  I run QEMU machine with bare-metal ThreadX fullflash from Texet TM-333 ph=
+one  (Spreadtrum platform)
+  [CODE]qemu-system-arm -S -gdb tcp::1234,ipv4 -drive file=3DC:\cygwin64\ho=
+me\flash.bin,if=3Dmtd,format=3Draw -M palmetto-bmc -cpu arm926 -m 64M[/CODE]
+  I use palmetto-bmc platform because it have ARM926EJ-S core and support S=
+PI Flash.
+  Then, i attach to gdb qemu process from IDA and run code step-by-step.
+  [IMG]https://pp.userapi.com/c847218/v847218546/13ec1c/iSIcre5-js4.jpg[/IM=
+G]
+
+  When the IDA run 00032534 STR R11, [R10] command
+  [IMG]https://pp.userapi.com/c846416/v846416708/133f60/GQzxORvf4Tg.jpg[/IM=
+G]
+
+  instead of store R11 on R10 adress, it jump 000328DC STMFD SP!, {R0-R12,L=
+R} instruction...
+  [IMG]https://pp.userapi.com/c847218/v847218546/13ec26/32A0VcaJywg.jpg[/IM=
+G]
+  and virt machine not execute new instruction... =
+
+  [IMG]https://pp.userapi.com/c850624/v850624111/528f3/N7FTpgloWVU.jpg[/IMG]
+
+  and why i did not change flash from n25q256a to n25q032a11 in aspeed.c
+  without rebuild qemu?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805445/+subscriptions
