@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gRiSx-0002Fo-TO
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:52:12 -0500
+	(envelope-from <lvivier@redhat.com>) id 1gRiT9-0001vu-Ro
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:52:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gRiLU-0004Iu-2V
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:44:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54114)
+	(envelope-from <lvivier@redhat.com>) id 1gRiIW-0003OQ-Qn
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:41:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45496)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gRiLT-0004Ik-TF
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:44:28 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5D0B54ACD6
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 18:44:27 +0000 (UTC)
-References: <1543343726-53531-1-git-send-email-pbonzini@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a7634330-8c47-459b-5aaa-1c4519a90dd6@redhat.com>
-Date: Tue, 27 Nov 2018 12:44:23 -0600
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gRiIW-0003Nk-Jf
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 13:41:24 -0500
+References: <20181115192446.17187-1-minyard@acm.org>
+	<20181115192446.17187-7-minyard@acm.org>
+	<20181126172308.GJ2547@work-vm>
+	<7055e173-6f4f-7954-69c7-47e0f26dfaf6@acm.org>
+	<20181127160144.GB2616@work-vm>
+	<d01dc051-f078-c703-bd19-e1874afdfc33@acm.org>
+	<20181127181448.GC2616@work-vm>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <0b51df6b-d0e1-37a6-be32-a3f052ea9e4b@redhat.com>
+Date: Tue, 27 Nov 2018 19:41:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <1543343726-53531-1-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181127181448.GC2616@work-vm>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] glib-compat: work around g_test_message
- bug with subprocess tests
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 06/12] boards.h: Ignore migration for
+ SMBus devices on older machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,52 +34,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Corey Minyard <minyard@acm.org>, dgibson@redhat.com
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-On 11/27/18 12:35 PM, Paolo Bonzini wrote:
-> Subprocesses are created by glib without leaving the file descriptors
-> open.  Therefore, g_test_message (and assertion failures, but those
-> trigger when things are going bad anyway) will think that it is writing
-> to the log file descriptor, but while actually stomping on the QMP
-> file descriptor or similar.  This causes spurious failures, which are
-> as nice to debug as the reader can imagine.  While I have opened a
-> pull request on GLib, this will probably take a while to propagate
-> to distros.
-> 
-> I found this while working on qgraph, but the fix is generic.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   include/glib-compat.h | 6 ++++++
->   1 file changed, 6 insertions(+)
+On 27/11/2018 19:14, Dr. David Alan Gilbert wrote:
+> * Corey Minyard (minyard@acm.org) wrote:
+>> On 11/27/18 10:01 AM, Dr. David Alan Gilbert wrote:
+>>> * Corey Minyard (minyard@acm.org) wrote:
+>>>> On 11/26/18 11:23 AM, Dr. David Alan Gilbert wrote:
+>>>>> * minyard@acm.org (minyard@acm.org) wrote:
+>>>>>> From: Corey Minyard <cminyard@mvista.com>
+...
+>>>> The pm_smbus device is also used by mips fulong.=C2=A0 From what I c=
+an tell, that
+>>>> machine doesn't have any concept of backwards compatibility, so it s=
+eemed
+>>>> save to no worry about it there.=C2=A0 If it weren't for that, this =
+bool could go
+>>>> into the
+>>> Yeh that's fine.
+>>>
+>>> What about the eeprom's are they used more widely?
+>>
+>> The only other I2C EEPROM I see is hw/nvram/eeprom_at24c.c.=C2=A0 That=
+ device is
+>> only
+>> configured for PPC.=C2=A0 It has a block device backend, too.=C2=A0 Th=
+is is a little
+>> annoying
+>> because smbus_eeprom.c emulates an at24c02.=C2=A0 It would be nice to =
+only have
+>> one of these.
+>=20
+> Added in David and Laurent for odd-ppc stuff;  if I'm reading it right
+> it's not used by one of the versioned machines.
 
-Wow. I don't envy the debug session that you went through to finally 
-realize this problem.
+Yes, it seems unused.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+It has been introduced for the mvme31100 machine emulation, by:
 
-I think this is safe for 3.1-rc3 if you want it there, as minimizing 
-spurious test failures is a good thing.
+commit 5d8424dbd3e8335ea3d57f64eaa603c8fc80706f
+Author: Michael Davidsaver <mdavidsaver@gmail.com>
+Date:   Sun Nov 19 21:24:17 2017 -0600
 
-> diff --git a/include/glib-compat.h b/include/glib-compat.h
-> index fdf95a2..989b9ef 100644
-> --- a/include/glib-compat.h
-> +++ b/include/glib-compat.h
-> @@ -113,4 +113,10 @@ gint g_poll_fixed(GPollFD *fds, guint nfds, gint timeout);
->   
->   #pragma GCC diagnostic pop
->   
-> +/* See https://gitlab.gnome.org/GNOME/glib/merge_requests/501 */
-> +#define g_test_message(...)							\
-> +	do {									\
-> +		if (!g_test_subprocess()) g_test_message(__VA_ARGS__);		\
+    nvram: add AT24Cx i2c eeprom
 
-I'm surprised checkpatch.pl doesn't complain about missing {} in this 
-macro expansion, but doing it right would mean 2 more lines, so I'm fine 
-overlooking the style.
+    Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+    Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+from the series:
+
+[00/12] Add MVME3100 PPC SBC
+https://patchwork.ozlabs.org/cover/839400/
+
+[12/12] tests: add mvme3100-test=09
+[11/12] ppc: add mvme3100 machine
+[10/12] timer: add ds1375 RTC=09
+[09/12] nvram: add AT24Cx i2c eeprom=09
+[08/12] e500: add mpc8540 i2c controller to ccsr
+[07/12] qtest: add e500_i2c_create()
+[06/12] i2c: add mpc8540 i2c controller
+[05/12] e500: name openpic and pci host bridge
+[04/12] e500: additional CCSR registers
+[03/12] e500: note possible bug with host bridge=09
+[02/12] e500: consolidate mpc8540 guts with e500-ccsr
+[01/12] e500: add board config options
+https://patchwork.ozlabs.org/project/qemu-devel/list/?series=3D14303
+
+But the patch adding the machine type has never been commited:
+
+[11/12] ppc: add mvme3100 machine
+https://patchwork.ozlabs.org/patch/839407/
+
+Thanks,
+Laurent
