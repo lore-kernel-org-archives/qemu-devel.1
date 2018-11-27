@@ -1,22 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gRghe-0002gP-6A
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:59:18 -0500
+	(envelope-from <laurent@vivier.eu>) id 1gRghh-0002gM-7J
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:59:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gRgZC-00076j-6E
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:50:35 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:35707)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gRgZC-000769-0l
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:50:30 -0500
-Received: by mail-wm1-f67.google.com with SMTP id c126so22886474wmh.0
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 08:50:29 -0800 (PST)
+	(envelope-from <laurent@vivier.eu>) id 1gRgZ5-00072Y-Qr
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:50:24 -0500
 References: <20181125205000.10324-1-philmd@redhat.com>
 	<20181125205000.10324-14-philmd@redhat.com>
 	<20181127093552.4f53790d@x1.home>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9225e792-010f-4882-4d82-477f6cb393e9@redhat.com>
-Date: Tue, 27 Nov 2018 17:50:24 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <a752d154-7158-7729-2ea4-3a1e1766efbc@vivier.eu>
+Date: Tue, 27 Nov 2018 17:50:11 +0100
 MIME-Version: 1.0
 In-Reply-To: <20181127093552.4f53790d@x1.home>
 Content-Type: text/plain; charset=utf-8
@@ -32,10 +26,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Fam Zheng <fam@euphon.net>, Fam Zheng <famz@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On 27/11/18 17:35, Alex Williamson wrote:
+On 27/11/2018 17:35, Alex Williamson wrote:
 > On Sun, 25 Nov 2018 21:49:48 +0100
 > Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
 > 
@@ -61,19 +55,7 @@ On 27/11/18 17:35, Alex Williamson wrote:
 > attention to them.  I'm not sure signing someone up for new files
 > they've never touched counts as trivial ;)  Thanks,
 
-OK (Cc'ed Fam).
-
-Laurent, can you unqueue this patch? (sorry).
+Un-applied to my trivial-patches branch...
 
 Thanks,
-
-Phil.
-
-> 
-> Alex
-> 
->> +F: docs/igd-assign.txt
->>  
->>  vfio-ccw
->>  M: Cornelia Huck <cohuck@redhat.com>
-> 
+Laurent
