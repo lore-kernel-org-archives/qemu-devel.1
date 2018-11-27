@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gRgiI-0003Mc-H2
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 12:00:01 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gRgj7-0003wI-5r
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 12:00:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gRgi9-0007wy-4w
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:59:54 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:33916)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gRgi8-0007vy-Su
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 11:59:45 -0500
-Received: by mail-oi1-x244.google.com with SMTP id h25so19946065oig.1
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 08:59:44 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-Reply-To: minyard@acm.org
-References: <20181115192446.17187-1-minyard@acm.org>
-	<20181115192446.17187-7-minyard@acm.org>
-	<20181126172308.GJ2547@work-vm>
-	<7055e173-6f4f-7954-69c7-47e0f26dfaf6@acm.org>
-	<20181127160144.GB2616@work-vm>
-From: Corey Minyard <minyard@acm.org>
-Message-ID: <d01dc051-f078-c703-bd19-e1874afdfc33@acm.org>
-Date: Tue, 27 Nov 2018 10:59:39 -0600
+	(envelope-from <pbonzini@redhat.com>) id 1gRgj1-0000E7-MT
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 12:00:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43066)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gRgj1-0000BA-1l
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 12:00:39 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 950B03002F95
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 17:00:37 +0000 (UTC)
+References: <1543238443-4993-1-git-send-email-pbonzini@redhat.com>
+	<20181126173604-mutt-send-email-mst@kernel.org>
+	<6cd98ced-a043-18c0-3aa5-4cda15c76ec5@redhat.com>
+	<20181127112541-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a39469b6-5b91-04b9-32f5-e0e2ba3ab363@redhat.com>
+Date: Tue, 27 Nov 2018 18:00:25 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181127160144.GB2616@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH v2 06/12] boards.h: Ignore migration for
- SMBus devices on older machines
+In-Reply-To: <20181127112541-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/5] vhost: enable for all targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,130 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-On 11/27/18 10:01 AM, Dr. David Alan Gilbert wrote:
-> * Corey Minyard (minyard@acm.org) wrote:
->> On 11/26/18 11:23 AM, Dr. David Alan Gilbert wrote:
->>> * minyard@acm.org (minyard@acm.org) wrote:
->>>> From: Corey Minyard <cminyard@mvista.com>
->>>>
->>>> Migration capability is being added for pm_smbus and SMBus devices.
->>>> This change will allow backwards compatibility to be kept when
->>>> migrating back to an old qemu version.  Add a bool to the machine
->>>> class tho keep smbus migration from happening.  Future changes
->>>> will use this.
->>> So this is also going to have to be in the 3.0 and 3.1 machine options
->>> and maybe some other architectures?
->> I'm not sure why it would need to be in both the 3.0 and 3.1 machine
->> options.
->> If this goes in, I'm assuming it's for 3.1 and it should only need to be
->> there.
->> That's if it's too late for 3.0.
-> You're out by 1-2 releases;  3.0 shipped in August, 3.1 is in freeze at
-> the moment (hence you've missed it unless some part of this is
-> critical); so this will go in during the 4.0 release.
-
-Yes, you are right, this is for 4.0.
-
-
->
->> The pm_smbus device is also used by mips fulong.  From what I can tell, that
->> machine doesn't have any concept of backwards compatibility, so it seemed
->> save to no worry about it there.  If it weren't for that, this bool could go
->> into the
-> Yeh that's fine.
->
-> What about the eeprom's are they used more widely?
-
-The only other I2C EEPROM I see is hw/nvram/eeprom_at24c.c.  That device 
-is only
-configured for PPC.  It has a block device backend, too.  This is a 
-little annoying
-because smbus_eeprom.c emulates an at24c02.  It would be nice to only have
-one of these.
-
-I can add it to that file, too, it wouldn't be hard to do and I could 
-put it into the
-x86 config to test.  It would be nicer to combine the two; smbus_eeprom 
-seems
-like a hack to me.  at24c.c is done as an SMBus slave, its done as a raw I2C
-device, which is IMHO is more correct since the at24cxx devices are not 
-SMBus
-devices, they are I2C devices.
-
-In fact, smbus_eeprom.c is the only thing currently using the 
-smbus_slave code.
-The IPMI interface on SMBus that I have pending uses the smbus_slave 
-code, too,
-so perhaps there's value, though it's no big deal either way.  It would 
-be nice to get
-this right the first time and not hack it up in the future.
-
-Thanks,
-
--corey
-
-
->
-> Dave
->
->> PC specific structure.
->>
->> Thanks,
->>
->> -corey
->>
->>> Dave
+On 27/11/18 17:27, Michael S. Tsirkin wrote:
+> On Tue, Nov 27, 2018 at 10:04:59AM +0100, Paolo Bonzini wrote:
+>> On 26/11/18 23:43, Michael S. Tsirkin wrote:
+>>> On Mon, Nov 26, 2018 at 02:20:38PM +0100, Paolo Bonzini wrote:
+>>>> vhost does not have to be supported only if KVM is present, in fact
+>>>> vhost-user does not even need any kind of kernel support.  This seri=
+es
+>>>> changes this.  The rationale is that, when vhost-user-test.c will be
+>>>> converted to qgraph, it will be able to test vhost-user support
+>>>> for virtio-mmio backend even on x86.
 >>>
->>>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
->>>> Cc: Eduardo Habkost <ehabkost@redhat.com>
->>>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->>>> ---
->>>>    hw/i386/pc_piix.c   | 1 +
->>>>    hw/i386/pc_q35.c    | 1 +
->>>>    include/hw/boards.h | 1 +
->>>>    3 files changed, 3 insertions(+)
->>>>
->>>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
->>>> index cb28227cc3..3d1ccb1af1 100644
->>>> --- a/hw/i386/pc_piix.c
->>>> +++ b/hw/i386/pc_piix.c
->>>> @@ -443,6 +443,7 @@ static void pc_i440fx_2_12_machine_options(MachineClass *m)
->>>>        pc_i440fx_3_0_machine_options(m);
->>>>        m->is_default = 0;
->>>>        m->alias = NULL;
->>>> +    m->smbus_no_migration_support = true;
->>>>        SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
->>>>    }
->>>> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
->>>> index 90e88c9b28..0c6fca6a40 100644
->>>> --- a/hw/i386/pc_q35.c
->>>> +++ b/hw/i386/pc_q35.c
->>>> @@ -324,6 +324,7 @@ static void pc_q35_2_12_machine_options(MachineClass *m)
->>>>    {
->>>>        pc_q35_3_0_machine_options(m);
->>>>        m->alias = NULL;
->>>> +    m->smbus_no_migration_support = true;
->>>>        SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
->>>>    }
->>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
->>>> index f82f28468b..65314fbe2a 100644
->>>> --- a/include/hw/boards.h
->>>> +++ b/include/hw/boards.h
->>>> @@ -207,6 +207,7 @@ struct MachineClass {
->>>>        void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
->>>>                                     int nb_nodes, ram_addr_t size);
->>>>        bool ignore_boot_device_suffixes;
->>>> +    bool smbus_no_migration_support;
->>>>        HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
->>>>                                               DeviceState *dev);
->>>> -- 
->>>> 2.17.1
->>>>
->>> --
->>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>> The reason for limiting it to KVM was very simple:
+>>> it has the same set of problems with ordering
+>>> as mttcg.
+>>>
+>>> So I guess it's fine but I think we must then limit it
+>>> to when tcg emits fence instructions.
+>>>
+>>> Otherwise we'll get subtle race conditions.
 >>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> Got it, I'll take a look.  However, right now you _can_ use vhost with
+>> tcg as long as e.g. qemu-system-x86_64 is compiled with KVM support, s=
+o
+>> this patch is not changing anything in this respect; the bug is
+>> independent of this series.
+>=20
+> Well qemu built with KVM implies host architecture =3D=3D guest
+> architecture, right? That should ensure race conditions do not happen i=
+n
+> a very hacky way.
+
+It's not enough, event_idx requires smp_mb and single-threaded TCG does
+not emit them.  It is enough for smp_rmb/smp_wmb however, that makes sens=
+e.
+
+Paolo
