@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gRa8k-0004zc-Dq
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:58:47 -0500
+	(envelope-from <amarkovic@wavecomp.com>) id 1gRa8o-00053x-QN
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:58:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gRa8f-0005qH-O3
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:58:46 -0500
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:33796)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gRa8f-0005q4-KS
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:58:41 -0500
-Received: by mail-qt1-f194.google.com with SMTP id r14so21018748qtp.1
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 01:58:41 -0800 (PST)
-MIME-Version: 1.0
-References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
-	<20181127105321.5c46713d@bahia.lan>
-In-Reply-To: <20181127105321.5c46713d@bahia.lan>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Tue, 27 Nov 2018 13:58:29 +0400
-Message-ID: <CAMxuvawxhoT4zDMCpvtY0VkHujqKSYrC6Mk5MVkkpnYHVfFP9w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <amarkovic@wavecomp.com>) id 1gRa8k-0005v8-Ei
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:58:50 -0500
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 27 Nov 2018 09:58:40 +0000
+Message-ID: <BN6PR2201MB12517471D0B4ADEE146C1414C6D00@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20181125205000.10324-1-philmd@redhat.com>
+	<20181125205000.10324-8-philmd@redhat.com>,
+	<19bfc512-65ac-9968-3930-8b423efde241@redhat.com>
+In-Reply-To: <19bfc512-65ac-9968-3930-8b423efde241@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 00/28] Generalize machine
- compatibility properties
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH for-3.1 07/25] MAINTAINERS: Add a missing
+ entry for the Fulong 2E machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,126 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: groug@kaod.org
-Cc: qemu-devel <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Stefan Markovic <smarkovic@wavecomp.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
 
-Hi
+I like better the patch that Thomas linked to. I think Philippe should have=
+ included Thomas' patch, rather than creating new, overlapping, patches. Co=
+nfusion about straitforward things! Aleksandar
 
-On Tue, Nov 27, 2018 at 1:53 PM Greg Kurz <groug@kaod.org> wrote:
->
-> Hi Marc-Andr=C3=A9,
->
-> Patches 1 to 8 don't seem to belong to this series, and they already got
-> merged in master actually. Also next release is expected to be 4.0.
+________________________________________
+From: Thomas Huth <thuth@redhat.com>
+Sent: Tuesday, November 27, 2018 10:49:27 AM
+To: Philippe Mathieu-Daud=E9; Aleksandar Markovic; Stefan Markovic
+Cc: qemu-devel@nongnu.org; qemu-trivial@nongnu.org
+Subject: Re: [PATCH for-3.1 07/25] MAINTAINERS: Add a missing entry for the=
+ Fulong 2E machine
 
-oops indeed, sorry. Please ignore 1-8.
+On 2018-11-25 21:49, Philippe Mathieu-Daud=E9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index aa17e9bbd3..81a22b2ccf 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -864,6 +864,7 @@ R: Stefan Markovic <smarkovic@wavecomp.com>
+>  S: Odd Fixes
+>  F: hw/mips/mips_fulong2e.c
+>  F: hw/isa/vt82c686.c
+> +F: hw/pci-host/bonito.c
+>
+>  F: include/hw/isa/vt82c686.h
 
-> Cheers,
->
-> --
-> Greg
->
-> On Tue, 27 Nov 2018 13:27:33 +0400
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
->
-> > Hi,
-> >
-> > During "[PATCH v2 05/10] qom/globals: generalize
-> > object_property_set_globals()" review, Eduardo suggested to rework the
-> > GlobalProperty handling, so that -global is limited to QDev only and
-> > we avoid mixing the machine compats and the user-provided -global
-> > properties (instead of generalizing -global to various object kinds,
-> > like I proposed in v2).
-> >
-> > "qdev: do not mix compat props with global props" patch decouples a
-> > bit user-provided -global from machine compat properties. This allows
-> > to get rid of "user_provided" and "errp" fields in following patches.
-> >
-> > Instead of explcitely calling object_apply_global_props() in the
-> > various object post_init, I opted for creating a new TYPE_COMPAT_PROPS
-> > interface. The interface approach gives a lot more flexibility on
-> > which objects can have compat props. This requires some interface
-> > improvments in "qom: teach interfaces to implement post-init".
-> >
-> > A new compat property "x-use-canonical-path-for-ramblock-id" is added
-> > to hostmem for legacy canonical path names, set to true for -file and
-> > -memfd with qemu < 3.2.
-> >
-> > (this series was initially titled "[PATCH v2 00/10] hostmem: use
-> > object "id" for memory region name with >=3D 3.1", but its focus is mor=
-e
-> > in refactoring the global and compatilibity properties handling now)
-> >
-> > v4:
-> > - fix accel/machine compat props apply order inversion
-> > - split "qdev: do not mix compat props with global props": replace
-> >   using current_machine by new compat_props global, introduce
-> >   SET_COMPAT() macro, use GPtrArray.
-> > - add a comment about "qdev-props: call object_apply_global_props()"
-> >   error reporting
-> > - add "arm: replace instance_post_init()", to solve the post-init
-> >   ordering issue
-> > - add "hw/arm/virt: add virt-3.2 machine type" for completeness
-> > - commit message improvements
-> > - rebased, add r-b tags
-> >
-> > v3:
-> > - GlobalProperties improvements/cleanups
-> > - drop generalizing the -global idea
-> > - "replace" the set_globals flag with a TYPE_COMPAT_PROPS interface
-> > - update hw/i386 machine version to 3.2
-> > - add "qom: make interface types abstract" interface cleanup
-> >
-> > v2:
-> > - replace "qom/user-creatable: add a few helper macros" patch for a
-> >   more optimized "qom: make user_creatable_complete() specific to
-> >   UserCreatable"
-> > - rename register_global_list() to register_global_properties()
-> > - call object_property_set_globals() after post-init
-> > - add and use a ObjectClass.set_globals flag, instead of dynamically
-> >   check object class in object_property_set_globals()
-> > - use object "id" in >=3D 3.1 instead of canonical path, add compat
-> >   property "x-use-canonical-path-for-ramblock-id" in base hostmem
-> >   class.
-> >
-> > Edgar E. Iglesias (1):
-> >   net: cadence_gem: Remove incorrect assert()
-> >
-> > Eric Auger (1):
-> >   MAINTAINERS: Add an ARM SMMU section
-> >
-> > Greg Kurz (1):
-> >   9p: fix QEMU crash when renaming files
-> >
-> > Marc-Andr=C3=A9 Lureau (20):
-> >   tests: qdev_prop_check_globals() doesn't return "all_used"
-> >   qom: make interface types abstract
-> >   qom: make user_creatable_complete() specific to UserCreatable
-> >   accel: register global_props like machine globals
-> >   qdev: move qdev_prop_register_global_list() to tests
-> >   qom: remove unimplemented class_finalize
-> >   hw: apply accel compat properties without touching globals
-> >   hw: apply machine compat properties without touching globals
-> >   hw: remove SET_MACHINE_COMPAT
-> >   qdev: all globals are now user-provided
-> >   qdev-props: convert global_props to GPtrArray
-> >   qdev-props: remove errp from GlobalProperty
-> >   qdev-props: call object_apply_global_props()
-> >   qom: teach interfaces to implement post-init
-> >   qom: add object_class_get_class_data()
-> >   arm: replace instance_post_init()
-> >   machine: add compat-props interface
-> >   hw/i386: add pc-i440fx-3.2 & pc-q35-3.2
-> >   hw/arm/virt: add virt-3.2 machine type
-> >   hostmem: use object id for memory region name with >=3D 3.1
-> >
-> > Max Filippov (4):
-> >   target/xtensa: gdbstub fix register counting
-> >   target/xtensa: drop num_[core_]regs from dc232b/dc233c configs
-> >   target/xtensa: xtfpga: provide default memory sizes
-> >   MAINTAINERS: add missing xtensa patterns
-> >
-> > Thomas Huth (1):
-> >   MAINTAINERS: Assign some more files in the hw/arm/ directory
-> >
->
+Please remove the empty line between bonito.c and vt82c686.h - or we
+could use my patch here from last Thursday instead:
+
+ https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg04526.html
+
+ Thomas
