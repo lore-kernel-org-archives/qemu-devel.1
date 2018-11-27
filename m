@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gRcxD-0006fg-Jb
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:59:07 -0500
+	(envelope-from <david@redhat.com>) id 1gRcyl-0007yL-Mp
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:00:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gRcx9-0005vh-L9
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:59:03 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41309)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gRcx9-0005v9-GZ
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:58:59 -0500
-Received: by mail-ot1-x343.google.com with SMTP id u16so19975548otk.8
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 04:58:59 -0800 (PST)
-Reply-To: minyard@acm.org
-References: <20181126200435.23408-1-minyard@acm.org>
-	<20181126200435.23408-17-minyard@acm.org>
-	<d588fce5-23ad-3b53-c88a-4dfb542353e8@redhat.com>
-	<192d9e99-a3e6-0ca3-7c23-bd5a0d2b44cb@acm.org>
-	<c9b8d4ab-dfd5-7ed0-4a45-df478fed24ca@redhat.com>
-	<663ea18c-4028-6eff-d69d-c8870effffa1@acm.org>
-	<285b12c9-af5b-f4fa-0c8a-f73e57dd9c75@redhat.com>
-From: Corey Minyard <tcminyard@gmail.com>
-Message-ID: <521bc02a-c1ea-267f-6629-817d41bcc987@gmail.com>
-Date: Tue, 27 Nov 2018 06:58:56 -0600
+	(envelope-from <david@redhat.com>) id 1gRcyj-00080S-TY
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:00:39 -0500
+References: <20181127114102.4319-1-david@redhat.com>
+	<f31fb9d1-d1dd-7d06-7993-08e44bb77632@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <2a028560-064c-b397-a318-0ec279d03a9d@redhat.com>
+Date: Tue, 27 Nov 2018 13:59:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <285b12c9-af5b-f4fa-0c8a-f73e57dd9c75@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH v3 16/16] i2c:smbus_eeprom: Add a reset
- function to smbus_eeprom
+In-Reply-To: <f31fb9d1-d1dd-7d06-7993-08e44bb77632@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/tod: properly stop the KVM TOD
+ while the guest is not running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,130 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, minyard@acm.org, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Corey Minyard <cminyard@mvista.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 11/27/18 4:54 AM, Philippe Mathieu-Daudé wrote:
-> On 27/11/18 0:58, Corey Minyard wrote:
->> On 11/26/18 5:01 PM, Philippe Mathieu-Daudé wrote:
->>> On 26/11/18 23:41, Corey Minyard wrote:
->>>> On 11/26/18 2:42 PM, Philippe Mathieu-Daudé wrote:
->>>>> Hi Corey,
->>>>>
->>>>> On 26/11/18 21:04, minyard@acm.org wrote:
->>>>>> From: Corey Minyard <cminyard@mvista.com>
->>>>>>
->>>>>> Reset the contents to init data and reset the offset on a machine
->>>>>> reset.
->>>>>>
->>>>>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
->>>>>> ---
->>>>>>     hw/i2c/smbus_eeprom.c | 8 +++++++-
->>>>>>     1 file changed, 7 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
->>>>>> index a0dcadbd60..de3a492df4 100644
->>>>>> --- a/hw/i2c/smbus_eeprom.c
->>>>>> +++ b/hw/i2c/smbus_eeprom.c
->>>>>> @@ -107,7 +107,7 @@ static const VMStateDescription
->>>>>> vmstate_smbus_eeprom = {
->>>>>>         }
->>>>>>     };
->>>>>>     -static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
->>>>>> +static void smbus_eeprom_reset(DeviceState *dev)
->>>>>>     {
->>>>>>         SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
->>>>>>     
->>>>> 'git diff -U4' also shows this line:
->>>>>
->>>>>           memcpy(eeprom->data, eeprom->init_data, SMBUS_EEPROM_SIZE);
->>>>>
->>>>> I don't think this is correct.
->>>>>
->>>>> One test I'd like to have is a machine booting, updating the EPROM then
->>>>> rebooting calling hw reset() to use the new values (BIOS use this).
->>>>>
->>>>> With this patch this won't work, you'll restore the EPROM content on
->>>>> each machine reset.
->>>>>
->>>>> I'd move the memcpy() call to the realize() function.
->>>>>
->>>>> What do you think?
->>>> There was some debate on this in the earlier patch set.  The general
->>>> principle
->>> Hmm I missed it and can't find it (quick basic search). I only find
->>> references about VMState.
+On 27.11.18 13:43, Christian Borntraeger wrote:
+> On 27.11.2018 12:41, David Hildenbrand wrote:
+>> Just like on other architectures, we should stop the clock while the g=
+uest
+>> is not running. This is already properly done for TCG. Right now, doin=
+g an
+>> offline migration (stop, migrate, cont) can easily trigger stalls in t=
+he
+>> guest.
 >>
->> It starts at
->> http://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg01737.html
-> Thank you, very helpful.
->
->> The patch set was fairly different at that point.
+>> Even doing a
+>>     (hmp) stop
+>>     ... wait 2 minutes ...
+>>     (hmp) cont
+>> will already trigger stalls.
 >>
->>
->>>> is that a reset is the same as starting up qemu from scratch, so I added
->>>> this
->>>> code based on that principle.  But I'm not really sure.
->>>>
->>>>>>         eeprom->offset = 0;
->>>>> This is correct, the offset reset belongs to the reset() function.
->>>> Actually, on a real system, a hardware reset will generally not
->>>> affect the
->>>> eeprom current offset register.  So if we don't take the above code,
->>>> then
->>>> IMHO this is wrong, too.
->>> Indeed cpu reset shouldn't affect the EEPROM, but a board powercycle
->>> would.
->>>
->>> Maybe we can argue QEMU system reset doesn't work correctly yet to use
->>> this feature. Personally I wouldn't expect the EEPROM content be be
->>> reset after a reset, but maybe I should rely on a block backend for a
->>> such feature, and not the current simple approach.
->>>
->> Yeah, it was mentioned that to do this correctly would require a block
->> backend.
->> I'll let others comment on the correctness of this, I guess.  It's a
->> separate patch
->> so it can be easily dropped.
-> Since modelling eeprom data retention on hardware reset isn't the goal
-> of your series, we can have a consensus, adding a comment explaining why
-> we choose this simpler way, and eeprom retention simulation requieres
-> more work with block backend.
+>> So whenever the guest stops, backup the KVM TOD. When continuning to r=
+un
+>> the guest, restore the KVM TOD.
+>=20
+> We do a similar thing for managedsave so it probably makes sense to sol=
+ve
+> the stall warnings. Now: At the same time, we actually want to have the=
+ guest
+> see the real time and maybe even share the TOD clock with the host in s=
+ome
+> way, while at the same time avoid the stall warnings.
 
-Good idea, I've done that.  Thanks for the reviews.  Is this a 
-"reviewed-by"?
+managedsave works right now because we save/restore the TOD. Making the
+guest TOD jump is never a good idea. At least not blindly (as you
+mention below, special SCLP signals eventually).
 
+>=20
+> One idea is to signal the guest on migration (and stop start events) an=
+d let
+> the guest do a time sync with the host.
 
--corey
+Doing so on stop events will most likely kill the ability to debug (e.g.
+single step) your guest. You will trap into the SCLP signal handler in
+the guest all the time. I don't think this is a good idea for the
+general case. It might be for migration. We might instead want to handle
+this in KVM directly and not in QEMU.
 
->> The current code is far too broken for anyone to be using it, so we
->> won't be
->> breaking any current users, I don't think.
->>
->> -corey
->>
->>>> -corey
->>>>
->>>>
->>>>> Regards,
->>>>>
->>>>> Phil.
->>>>>
->>>>>>     }
->>>>>>     +static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
->>>>>> +{
->>>>>> +    smbus_eeprom_reset(dev);
->>>>>> +}
->>>>>> +
->>>>>>     static Property smbus_eeprom_properties[] = {
->>>>>>         DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
->>>>>>         DEFINE_PROP_END_OF_LIST(),
->>>>>> @@ -126,6 +131,7 @@ static void smbus_eeprom_class_initfn(ObjectClass
->>>>>> *klass, void *data)
->>>>>>         SMBusDeviceClass *sc = SMBUS_DEVICE_CLASS(klass);
->>>>>>           dc->realize = smbus_eeprom_realize;
->>>>>> +    dc->reset = smbus_eeprom_reset;
->>>>>>         sc->receive_byte = eeprom_receive_byte;
->>>>>>         sc->write_data = eeprom_write_data;
->>>>>>         dc->props = smbus_eeprom_properties;
->>>>>>
+> In fact, it seems that by architecture we need to signal a special sclp=
+ signal=20
+> anyway if stsi information would change (e.g. on migration). Maybe we c=
+an=20
+> piggyback on that and do some time sync interface in the future.
+
+I like the idea but I rather consider it an addon feature and that
+shouldn't be the default.
+
+As SCLP documentation is (as far as I know, please correct me if I am
+wrong) not publicly available, I suggest going ahead with what I propose
+here (what other architectures do) and implementing what you describe on
+top later.
+
+Thanks!
+
+--=20
+
+Thanks,
+
+David / dhildenb
