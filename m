@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gRcVF-0002p8-Ih
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:30:10 -0500
+	(envelope-from <cfergeau@redhat.com>) id 1gRcaE-00055r-UL
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:35:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gRcVE-0000ob-FU
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:30:09 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43129)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gRcVE-0000oA-9T
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:30:08 -0500
-Received: by mail-wr1-x444.google.com with SMTP id r10so22476285wrs.10
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 04:30:08 -0800 (PST)
+	(envelope-from <cfergeau@redhat.com>) id 1gRca8-0004qJ-Rr
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:35:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37170)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cfergeau@redhat.com>) id 1gRca8-0004os-KC
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 07:35:12 -0500
+Date: Tue, 27 Nov 2018 13:35:02 +0100
+From: Christophe Fergeau <cfergeau@redhat.com>
+Message-ID: <20181127123502.GZ12172@natto.ory.fergeau.eu>
+References: <20181126153036.22414-1-fziglio@redhat.com>
 MIME-Version: 1.0
-References: <CGME20181127111109eucas1p2b1eae35e38e46c3f76c86a350ed41926@eucas1p2.samsung.com>
-	<20181127111050.18453-1-i.maximets@samsung.com>
-	<20181127111050.18453-2-i.maximets@samsung.com>
-	<CAMxuvay-6X2g1k8TbJR1NAW=Gb_tARb-wbr7H2RRoF9x+-F+aw@mail.gmail.com>
-	<78f31962-8d54-19c1-e8fb-c21f95a491f0@samsung.com>
-	<CAJ+F1C+XFs++Q044Y8CvVYFhtNpaEDS8qjx0BjsJN1yukZURkA@mail.gmail.com>
-	<2edee79d-4d23-913a-3536-a8794ee16528@samsung.com>
-In-Reply-To: <2edee79d-4d23-913a-3536-a8794ee16528@samsung.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 27 Nov 2018 16:29:54 +0400
-Message-ID: <CAJ+F1CK_WtcLCg+hi76J6x85zTvYkF1YN7b8hgP4-p-M_4-cag@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] hostmem-memfd: enable seals only if
- supported
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="KC8n6y+EC4k2kdZR"
+Content-Disposition: inline
+In-Reply-To: <20181126153036.22414-1-fziglio@redhat.com>
+Subject: Re: [Qemu-devel] [Spice-devel] [PATCH] spice: Use new
+ SpiceImageCompression definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,95 +28,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ilya Maximets <i.maximets@samsung.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
-
-Hi
-
-On Tue, Nov 27, 2018 at 4:02 PM Ilya Maximets <i.maximets@samsung.com> wrot=
-e:
->
-> On 27.11.2018 15:00, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> > On Tue, Nov 27, 2018 at 3:56 PM Ilya Maximets <i.maximets@samsung.com> =
-wrote:
-> >>
-> >> On 27.11.2018 14:49, Marc-Andr=C3=A9 Lureau wrote:
-> >>> Hi
-> >>> On Tue, Nov 27, 2018 at 3:11 PM Ilya Maximets <i.maximets@samsung.com=
-> wrote:
-> >>>>
-> >>>> If seals are not supported, memfd_create() will fail.
-> >>>> Furthermore, there is no way to disable it in this case because
-> >>>> '.seal' property is not registered.
-> >>>>
-> >>>> This issue leads to vhost-user-test failures on RHEL 7.2:
-> >>>>
-> >>>>   qemu-system-x86_64: -object memory-backend-memfd,id=3Dmem,size=3D2=
-M,: \
-> >>>>                       failed to create memfd: Invalid argument
-> >>>>
-> >>>> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
-> >>>
-> >>>
-> >>> This will change the default behaviour of memfd backend, and may thus
-> >>> me considered a break.
-> >>
-> >> This will change the default behaviour only on systems without sealing
-> >> support. But current implementation is broken there anyway and does no=
-t
-> >> work.
-> >>
-> >>>
-> >>> Instead, memfd vhost-user-test should skipped (or tuned with
-> >>> sealed=3Dfalse if unsupported)
-> >>
-> >> vhost-user-test is just an example here. In fact memfd could not be
-> >> used at all on system without sealing support. And there is no way
-> >> to disable seals.
-> >
-> > which system supports memfd without sealing?
->
-> RHEL 7.2. kernel version 3.10.0-327.el7.x86_64
-
-Correct, it was backported without sealing for some reason.
-
-I would rather have an explicit seal=3Doff argument on such system
-(because sealing is expected to be available with memfd in general)
-
->
-> >
-> >>
-> >>>
-> >>>> ---
-> >>>>  backends/hostmem-memfd.c | 4 ++--
-> >>>>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-> >>>> index b6836b28e5..ee39bdbde6 100644
-> >>>> --- a/backends/hostmem-memfd.c
-> >>>> +++ b/backends/hostmem-memfd.c
-> >>>> @@ -129,8 +129,8 @@ memfd_backend_instance_init(Object *obj)
-> >>>>  {
-> >>>>      HostMemoryBackendMemfd *m =3D MEMORY_BACKEND_MEMFD(obj);
-> >>>>
-> >>>> -    /* default to sealed file */
-> >>>> -    m->seal =3D true;
-> >>>> +    /* default to sealed file if supported */
-> >>>> +    m->seal =3D qemu_memfd_check(MFD_ALLOW_SEALING);
-> >>>>  }
-> >>>>
-> >>>>  static void
-> >>>> --
-> >>>> 2.17.1
-> >>>>
-> >>>
-> >>>
-> >>
-> >
-> >
+To: Frediano Ziglio <fziglio@redhat.com>
+Cc: spice-devel@lists.freedesktop.org, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
 
+--KC8n6y+EC4k2kdZR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
---=20
-Marc-Andr=C3=A9 Lureau
+hey,
+
+On Mon, Nov 26, 2018 at 03:30:36PM +0000, Frediano Ziglio wrote:
+> Definitions were updated by spice-server in patch de66161 included
+> in 0.12.6 released on 12th June 2015.
+
+QEMU's configure only checks for spice-server 0.12.0:
+
+$pkg_config --atleast-version=3D0.12.0 spice-server
+
+  if $pkg_config --atleast-version=3D0.12.0 spice-server && \
+     $pkg_config --atleast-version=3D0.12.3 spice-protocol && \
+     compile_prog "$spice_cflags" "$spice_libs" ; then
+    spice=3D"yes"
+    libs_softmmu=3D"$libs_softmmu $spice_libs"
+    QEMU_CFLAGS=3D"$QEMU_CFLAGS $spice_cflags"
+    spice_protocol_version=3D$($pkg_config --modversion spice-protocol)
+    spice_server_version=3D$($pkg_config --modversion spice-server)
+  else
+    if test "$spice" =3D "yes" ; then
+      feature_not_found "spice" \
+          "Install spice-server(>=3D0.12.0) and spice-protocol(>=3D0.12.3) =
+devel"
+    fi
+    spice=3D"no"
+  fi
+
+I don't know how far back QEMU wants to support spice-server.
+Apart from this, the patch looks good to me.
+
+Christophe
+
+>=20
+> Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+> ---
+>  ui/spice-core.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/ui/spice-core.c b/ui/spice-core.c
+> index ebaae24643..2e6a255a35 100644
+> --- a/ui/spice-core.c
+> +++ b/ui/spice-core.c
+> @@ -331,12 +331,12 @@ static const char *stream_video_names[] =3D {
+>                 stream_video_names, ARRAY_SIZE(stream_video_names))
+> =20
+>  static const char *compression_names[] =3D {
+> -    [ SPICE_IMAGE_COMPRESS_OFF ]      =3D "off",
+> -    [ SPICE_IMAGE_COMPRESS_AUTO_GLZ ] =3D "auto_glz",
+> -    [ SPICE_IMAGE_COMPRESS_AUTO_LZ ]  =3D "auto_lz",
+> -    [ SPICE_IMAGE_COMPRESS_QUIC ]     =3D "quic",
+> -    [ SPICE_IMAGE_COMPRESS_GLZ ]      =3D "glz",
+> -    [ SPICE_IMAGE_COMPRESS_LZ ]       =3D "lz",
+> +    [ SPICE_IMAGE_COMPRESSION_OFF ]      =3D "off",
+> +    [ SPICE_IMAGE_COMPRESSION_AUTO_GLZ ] =3D "auto_glz",
+> +    [ SPICE_IMAGE_COMPRESSION_AUTO_LZ ]  =3D "auto_lz",
+> +    [ SPICE_IMAGE_COMPRESSION_QUIC ]     =3D "quic",
+> +    [ SPICE_IMAGE_COMPRESSION_GLZ ]      =3D "glz",
+> +    [ SPICE_IMAGE_COMPRESSION_LZ ]       =3D "lz",
+>  };
+>  #define parse_compression(_name)                                        \
+>      parse_name(_name, "image compression",                              \
+> @@ -643,7 +643,7 @@ void qemu_spice_init(void)
+>          *x509_cert_file =3D NULL,
+>          *x509_cacert_file =3D NULL;
+>      int port, tls_port, addr_flags;
+> -    spice_image_compression_t compression;
+> +    SpiceImageCompression compression;
+>      spice_wan_compression_t wan_compr;
+>      bool seamless_migration;
+> =20
+> @@ -754,7 +754,7 @@ void qemu_spice_init(void)
+>  #endif
+>      }
+> =20
+> -    compression =3D SPICE_IMAGE_COMPRESS_AUTO_GLZ;
+> +    compression =3D SPICE_IMAGE_COMPRESSION_AUTO_GLZ;
+>      str =3D qemu_opt_get(opts, "image-compression");
+>      if (str) {
+>          compression =3D parse_compression(str);
+> --=20
+> 2.17.2
+>=20
+> _______________________________________________
+> Spice-devel mailing list
+> Spice-devel@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/spice-devel
+
+--KC8n6y+EC4k2kdZR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEElKn3VmH3emFoZJsjqdjCFCmsbIIFAlv9OfIACgkQqdjCFCms
+bIIR8A/+PvoYahGC9eIouMEVjarByWXktB0ZBs3uBItZMoxtXCsFKEFDZMs6TfXV
+3QuXPS2kYCkht9dsm5gIcYmpQ20Khpc7Vf2GgJzn1ChtfGVhVUMXSV8gFYDRUOf1
+h/JjcssNDY+WV6xvDoKBpNwQfNv6RSJAFfyAYCdHSRM8IfjA4ABmE0ffMEoFZjlu
+Q1b66U9r+C6JUYXLyDZcfEG4YkXV6oyIAeX1g3VFLfsg0lBKsMepdC6naNBXrYIw
+RJHGaxjBTfsffZYxoIYA/00BNZbfmYORLD0nYOo6REY0wFBRoB/Zhl9h5eCA/1Zc
+OBQ0LVsA21Os7hRb97S8yQdR10OshK8xYE3ROlnK+OL0dqis96SjxoD9cvFi9wsz
+5GxRC2raXKoNcoi6SCpU4OQlFdfd5uiZFfgGOXGipGSiGLKAhU3YPV2DlDTx25Ju
+Nz/S7xTGmy3lO3A+DA9sr/x57Vz5/rTtz/W9qPVfnmIhRyzMT3L7jAxd7T2aBfYf
+elRg8NUf3iwB0LSR+YDkgOKE9zu5lCjvgj5KmUHr35DQGBU+bGZ8rqp2ezlXaG9N
+O5JMIX42GE+04Kk76vzaWMX8PGHLwMI1sCX8/fI+fPF6x7D58/U8WQbWDpQ2odyV
+WD9QJD6WBkX97bLfrCb1mystv4AilXoWxPsVxp2PqvaTzxdp9nk=
+=gkas
+-----END PGP SIGNATURE-----
+
+--KC8n6y+EC4k2kdZR--
