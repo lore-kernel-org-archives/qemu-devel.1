@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRa4X-00010P-Ss
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:54:26 -0500
+	(envelope-from <robert.bradford@intel.com>) id 1gRa7T-0003k6-Qs
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:57:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gRa4X-0003Be-1Q
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:54:25 -0500
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:35645)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gRa4W-0003BK-Rx
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:54:24 -0500
-Received: by mail-oi1-x231.google.com with SMTP id v6so18743157oif.2
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 01:54:24 -0800 (PST)
-MIME-Version: 1.0
-References: <1543261235-2834-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1543261235-2834-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Nov 2018 09:54:13 +0000
-Message-ID: <CAFEAcA9azv5Anx6BZ8kieVbo3=QWshb2FK2+Cee2e17eV_KzKQ@mail.gmail.com>
+	(envelope-from <robert.bradford@intel.com>) id 1gRa7O-0005H5-Ri
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:57:27 -0500
+Received: from mga04.intel.com ([192.55.52.120]:56516)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <robert.bradford@intel.com>)
+	id 1gRa7O-0005Fw-JK
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 04:57:22 -0500
+Message-ID: <938a2f54426dc059428fcfe1882bbb3b2d5cbc99.camel@intel.com>
+From: Rob Bradford <robert.bradford@intel.com>
+Date: Tue, 27 Nov 2018 09:57:18 +0000
+In-Reply-To: <CAGxU2F7+NZUS-BQ1hCnKynVxfsVUYTHRCWQvJwBA12bYmg0ZJA@mail.gmail.com>
+References: <CAGxU2F7+NZUS-BQ1hCnKynVxfsVUYTHRCWQvJwBA12bYmg0ZJA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/15] Misc patches for QEMU 3.1-rc3
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] QEMU/NEMU boot time with several x86 firmwares
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +27,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Stefano Garzarella <sgarzare@redhat.com>, Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, 26 Nov 2018 at 19:45, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit d522fba24478474911b0e6e488b6d1dcf1af54=
-f8:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-81126' into staging (2018-11-26 13:58:46 +0000)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to b6a1ae97bad8dbad43d5614e4c88c1f50e9ee737:
->
->   hostmem: no need to check for host_memory_backend_mr_inited() in alloc(=
-) (2018-11-26 20:35:19 +0100)
->
-> ----------------------------------------------------------------
-> * lsi HBA reselection fix (George)
-> * Small cleanups (Li Qiang)
-> * bugfixes for vhost-user-bridge and hostmem (Marc-Andr=C3=A9)
-> * single-thread TCG fix (me)
-> * VMX migration blocker (me)
-> * target/i386 fix for LOCK (Richard)
-> * fix elf2dmp check (Roman)
-> * MAINTAINERS update (Philippe, Thomas)
->
-> ----------------------------------------------------------------
+Hi Stefano,
 
+On Mon, 2018-11-26 at 17:40 +0100, Stefano Garzarella wrote:
+> Hi Samuel, Rob,
+> I'm proceeding to compare several x86 firmwares in order to
+> understand
+> which suits better with -kernel option to have a fast boot with
+> QEMU/NEMU.
+> 
+> For your use cases, what boot time do you expect?
+> 
 
-[staging 0c3280bba9] Merge remote-tracking branch
-'remotes/bonzini/tags/for-upstream' into staging
- Date: Tue Nov 27 09:48:10 2018 +0000
-    Signed-off-by: Marc-Andr=C3=83=C2=A9 Lureau <marcandre.lureau@redhat.co=
-m>
-    Signed-off-by: Marc-Andr=C3=83=C2=A9 Lureau <marcandre.lureau@redhat.co=
-m>
-ERROR: pull request includes tag with UTF-8 error in person name
+Kata Containers, one of the use cases we're looking at, is very
+sensitive to boot time, although it is configurable, the default
+configuration is to use qemu-lite with it's direct to kernel loader.
 
-Can you fix up and respin, please?
+That is probably a baseline we should be comparing with.
 
-thanks
--- PMM
+As an aside, yesterday I posted the Seabios patches for enabling on
+NEMU/virt:
+
+https://github.com/rbradford/seabios/tree/virt-x86
+
+I didn't yet start optimising the configuration file we use for it
+beyond getting it < 128KiB or apply any optimisation patches.
+
+And I also have some qboot patches too:
+
+https://github.com/rbradford/qboot/tree/virt-x86
+
+So we're in a situation where we can start comparing other machine
+types against virt too.
+
+> 
+> I compared SeaBIOS, qboot, and OVMF. I started each test using this
+> qemu parameters: "./qemu-system-x86_64 -bios path/to/bios.bin -m 1G
+> -cpu host -M accel=kvm -vga none -kernel path/to/bzImage -initrd
+> path/to/rootfs.cpio ..."
+> 
+> As Samuel suggested, I added the total time to userspace adding a
+> probe in the kernel_init(), so the times (in msec) that I measured
+> are:
+> - qemu_init_end: first kvm_entry (i.e. QEMU initialized has finished)
+> - fw_start: first entry of the firmware
+> - fw_do_boot: after the firmware initialization (e.g. PCI setup,
+> etc.)
+> - linux_start_boot: before the jump to the Linux kernel
+> - linux_start_user: before starting the init process
+> 
+> * SeaBIOS
+> Default configuration without debug messages (CONFIG_DEBUG_LEVEL=0) +
+> Stephen's patch (tpm: Check for TPM related ACPI tables before
+> attempting hw) + my patch (qemu: fast boot when linuxboot optionrom
+> is
+> used).
+>  qemu_init_end: 41.634812
+>  fw_start: 41.857374 (+0.222562)
+>  fw_do_boot: 52.754109 (+10.896735)
+>  linux_start_boot: 54.117220 (+1.363111)
+>  linux_start_user: 495.684199 (+441.566979)
+> 
+> * qboot
+> Default configuration + my patch (pci: reduce pci_foreach() calls).
+>  qemu_init_end: 40.233717
+>  fw_start: 40.384048 (+0.150331)
+>  fw_do_boot: 45.660497 (+5.276449)
+>  linux_start_boot: 47.252119 (+1.591622)
+>  linux_start_user: 509.173886 (+461.921767)
+> 
+> * OVMF (https://github.com/intel/ovmf-virt)
+> I followed this script
+> (
+> https://github.com/intel/nemu/blob/topic/virt-x86/tools/CI/run_nats.sh
+> )
+> to build OVMF.
+> Note: I put the "fw_start" probe in the BdsEntry()
+> [MdeModulePkg/Universal/BdsDxe/BdsEntry.c], I'm not sure if it is
+> "near" to the real entry point.
+>  qemu_init_end: 42.734555
+>  fw_start: 163.611506 (+120.876951)
+>  fw_do_boot: 369.713760 (+206.102254)
+>  linux_start_boot: 370.960364 (+1.246604)
+>  linux_start_user: 796.799667 (+425.839303)
+> 
+> For OVMF case, are reasonable the times that I measured? Do you use a
+> different configuration?
+> 
+
+That is the same OVMF configuration as we normally use, I have the
+configuration file checked in. Those numbers look like the ones I
+expect.
+
+> Thanks,
+> Stefano
+> 
+
+Great work,
+
+Rob
