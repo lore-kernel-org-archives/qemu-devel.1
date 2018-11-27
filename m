@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1gRdlh-0002bl-5A
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:51:17 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gRdmB-0002un-Ar
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:51:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <i.maximets@samsung.com>) id 1gRdlc-0000XZ-RQ
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:51:13 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:51237)
+	(envelope-from <pbonzini@redhat.com>) id 1gRdm5-0001Zb-IT
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:51:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47116)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
-	id 1gRdlc-0000Wd-Kc
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:51:08 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
-	20181127135107euoutp02ffe370c8134f9759dc5fc0461961b33a~q-21uOOKj2313823138euoutp02W
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 13:51:07 +0000 (GMT)
-From: Ilya Maximets <i.maximets@samsung.com>
-Date: Tue, 27 Nov 2018 16:50:30 +0300
-Message-Id: <20181127135030.1671-5-i.maximets@samsung.com>
-In-Reply-To: <20181127135030.1671-1-i.maximets@samsung.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gRdm3-0001Tl-Ln
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 08:51:37 -0500
+References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
+	<20181122072028.22819-3-xiaoguangrong@tencent.com>
+	<BB9071C9-5BED-4763-99B3-7083B8EB49CF@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3a17b878-9a1c-7cdc-0250-187e82e2faf3@redhat.com>
+Date: Tue, 27 Nov 2018 14:51:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-References: <20181127135030.1671-1-i.maximets@samsung.com>
-	<CGME20181127135106eucas1p119ab7de9758f13ea52adc0f4829ab9cb@eucas1p1.samsung.com>
+In-Reply-To: <BB9071C9-5BED-4763-99B3-7083B8EB49CF@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 4/4] memfd: improve error messages
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] util: introduce threaded workqueue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,56 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Ilya Maximets <i.maximets@samsung.com>
+To: Christophe de Dinechin <dinechin@redhat.com>, Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-This gives more information about the failure.
-Additionally 'ENOSYS' returned for a non-Linux platforms instead of
-'errno', which is not initilaized in this case.
+On 27/11/18 13:49, Christophe de Dinechin wrote:
+> So this is not really
+> helping. Also, the ThreadLocal structure itself is not necessarily alig=
+ned
+> within struct Threads. Therefore, it=E2=80=99s possible that =E2=80=9Cr=
+equests=E2=80=9D for example
+> could be on the same cache line as request_fill_bitmap if planets align
+> the wrong way.
 
-Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- util/memfd.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+I think this is a bit exaggerated.  Linux and QEMU's own qht work just
+fine with compile-time directives.
 
-diff --git a/util/memfd.c b/util/memfd.c
-index 393d23da96..00334e5b21 100644
---- a/util/memfd.c
-+++ b/util/memfd.c
-@@ -71,14 +71,18 @@ int qemu_memfd_create(const char *name, size_t size, =
-bool hugetlb,
-     }
-     mfd =3D memfd_create(name, flags);
-     if (mfd < 0) {
-+        error_setg_errno(errp, errno,
-+                         "failed to create memfd with flags 0x%x", flags=
-);
-         goto err;
-     }
-=20
-     if (ftruncate(mfd, size) =3D=3D -1) {
-+        error_setg_errno(errp, errno, "failed to resize memfd to %zu", s=
-ize);
-         goto err;
-     }
-=20
-     if (seals && fcntl(mfd, F_ADD_SEALS, seals) =3D=3D -1) {
-+        error_setg_errno(errp, errno, "failed to add seals 0x%x", seals)=
-;
-         goto err;
-     }
-=20
-@@ -88,8 +92,9 @@ err:
-     if (mfd >=3D 0) {
-         close(mfd);
-     }
-+#else
-+    error_setg_errno(errp, ENOSYS, "failed to create memfd");
- #endif
--    error_setg_errno(errp, errno, "failed to create memfd");
-     return -1;
- }
-=20
---=20
-2.17.1
+> In order to mitigate these effects, I would group the data that the use=
+r
+> writes and the data that the thread writes, i.e. reorder declarations,
+> put request_fill_bitmap and request_valid_ev together, and try
+> to put them in the same cache line so that only one cache line is inval=
+idated
+> from within mark_request_valid instead of two.
+>=20
+> Then you end up with a single alignment directive instead of 4, to
+> separate requests from completions.
+
+Yeah, I agree with this.
+
+> That being said, I=E2=80=99m not sure why you use a bitmap here. What i=
+s the
+> expected benefit relative to atomic lists (which would also make it rea=
+lly
+> lock-free)?
+>=20
+
+I don't think lock-free lists are easier.  Bitmaps smaller than 64
+elements are both faster and easier to manage.
+
+Paolo
