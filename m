@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gS7tJ-0005j1-6W
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:01:06 -0500
+	(envelope-from <cota@braap.org>) id 1gS87S-0003fl-83
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:15:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gS7tB-0001ox-Nr
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:01:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52486)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gS7t9-0001n5-OR
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:00:56 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gS7t7-0006cL-4j
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 22:00:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2283B2E80C8
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 22:00:53 +0000 (UTC)
+	(envelope-from <cota@braap.org>) id 1gS87N-0000dp-Hf
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:15:41 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:41229)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gS87J-0000W6-Od
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:15:35 -0500
+Date: Wed, 28 Nov 2018 17:15:30 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181128221530.GA32160@flamenco>
+References: <20181128053834.10861-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Nov 2018 21:53:31 -0000
-From: Igor <generalrot@rambler.ru>
-Reply-To: Bug 1805445 <1805445@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154332864629.32687.7125797278920412825.malonedeb@wampee.canonical.com>
-Message-Id: <154344201117.10002.17688761335470201785.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805445] Re: QEMU arm virt machine was stopped by
- STMFD command while debug process
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181128053834.10861-1-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 00/12] tcg: Improve register allocation for
+ calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,75 +27,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-/*
-     * Allocate RAM after the memory controller has checked the size
-     * was valid. If not, a default value is used.
-     */
-    ram_size =3D object_property_get_uint(OBJECT(&bmc->soc), "ram-size", &e=
-rror_abort);
+On Tue, Nov 27, 2018 at 21:38:22 -0800, Richard Henderson wrote:
+> The intent here is to remove several move insns putting the
+> function arguments into the proper place.  I'm hoping that
+> this will solve the skylake regression with spec2006, as
+> seen with the ool softmmu patch set.
+> 
+> Emilio, all of this is present on my tcg-next-for-4.0 branch.
 
-    memory_region_allocate_system_memory(&bmc->ram1, NULL, "ram1", ram_size=
-);
-    memory_region_allocate_system_memory(&bmc->ram2, NULL, "ram2", ram_size=
-);
-    memory_region_allocate_system_memory(&bmc->ram3, NULL, "ram3", ram_size=
-);
+Thanks for this.
 
-      memory_region_add_subregion(get_system_memory(), sc->info->sdram_base=
-[1], &bmc->ram1);
-      memory_region_add_subregion(get_system_memory(), sc->info->sdram_base=
-[0], &bmc->ram2);
-      memory_region_add_subregion(get_system_memory(), sc->info->sdram_base=
-[2], &bmc->ram3);
+Unfortunately, it doesn't seem to help, performance-wise.
 
-    object_property_add_const_link(OBJECT(&bmc->soc), "ram1", OBJECT(&bmc->=
-ram1), &error_abort);
-    object_property_add_const_link(OBJECT(&bmc->soc), "ram2", OBJECT(&bmc->=
-ram2), &error_abort);
-    object_property_add_const_link(OBJECT(&bmc->soc), "ram3", OBJECT(&bmc->=
-ram3), &error_abort);
+I've benchmarked this on three different machines: Sandy
+Bridge, Haswell and Skylake. The average slowdown vs.
+the baseline is ~0%, ~5%, and ~10%, respectively.
 
-And I can create 3 RAM section for avoid exeption handler! Maybe any
-devices from this adress does not appear in qemu...
+So it seems the more modern the microarchitecture, the more
+severe the slowdown (this is consistent with the assumption
+that processors are getting better at caching over time).
 
--- =
+Here are all the bar charts:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805445
+  https://imgur.com/a/k7vmjVd
 
-Title:
-  QEMU arm virt machine was stopped by STMFD command while debug process
+- baseline: tcg-next-for-4.0's parent from master, i.e.
+  4822f1e ("Merge remote-tracking branch
+  'remotes/kraxel/tags/fixes-31-20181127-pull-request'
+  into staging", 2018-11-27)
 
-Status in QEMU:
-  New
+- ool: dc93c4a ("tcg/ppc: Use TCG_TARGET_NEED_LDST_OOL_LABELS",
+  2018-11-27)
 
-Bug description:
-  Hello, i have a big problem with QEMU arm virtual machine. So...
-  I run QEMU machine with bare-metal ThreadX fullflash from Texet TM-333 ph=
-one  (Spreadtrum platform)
-  [CODE]qemu-system-arm -S -gdb tcp::1234,ipv4 -drive file=3DC:\cygwin64\ho=
-me\flash.bin,if=3Dmtd,format=3Draw -M palmetto-bmc -cpu arm926 -m 64M[/CODE]
-  I use palmetto-bmc platform because it have ARM926EJ-S core and support S=
-PI Flash.
-  Then, i attach to gdb qemu process from IDA and run code step-by-step.
+- ool-regs: a9bac58 ("tcg: Record register preferences during
+  liveness", 2018-11-27)
 
-  =
+I've also looked at hardware event counts on Skylake for
+the above three commits. It seems that the indirection of
+the (very) frequent ool calls/rets are what cause the large
+reduction in IPC (results for bootup + hmmer):
 
-  When the IDA run 00032534 STR R11, [R10] command
+- baseline:
+   291,451,142,426      instructions              #    2.94  insn per cycle           (71.45%)
+    99,050,829,190      cycles                                                        (71.49%)
+     2,678,751,743      br_inst_retired.near_call                                     (71.43%)
+     2,674,367,278      br_inst_retired.near_return                                   (71.42%)
+    34,065,079,963      branches                                                      (57.09%)
+       161,441,496      branch-misses             #    0.47% of all branches          (57.17%)
+      29.916874137 seconds time elapsed
 
-  =
+- ool:
+   312,368,465,806      instructions              #    2.79  insn per cycle           (71.45%)
+   111,863,014,212      cycles                                                        (71.31%)
+    11,751,151,140      br_inst_retired.near_call                                     (71.30%)
+    11,736,770,191      br_inst_retired.near_return                                   (71.41%)
+        24,660,597      br_misp_retired.near_call                                     (71.49%)
+    52,096,512,558      branches                                                      (57.28%)
+       176,951,727      branch-misses             #    0.34% of all branches          (57.20%)
+      33.285149773 seconds time elapsed
 
-  instead of store R11 on R10 adress, it jump 000328DC STMFD SP!, {R0-R12,L=
-R} instruction...
+- ool-regs:
+   309,253,149,588      instructions              #    2.71  insn per cycle           (71.47%)
+   113,938,069,597      cycles                                                        (71.50%)
+    11,735,199,530      br_inst_retired.near_call                                     (71.51%)
+    11,725,686,909      br_inst_retired.near_return                                   (71.54%)
+        24,885,204      br_misp_retired.near_call                                     (71.46%)
+    52,768,150,694      branches                                                      (56.97%)
+       184,421,824      branch-misses             #    0.35% of all branches          (57.03%)
+      33.867122498 seconds time elapsed 
 
-  and virt machine not execute new instruction...
-  [IMG]https://pp.userapi.com/c850624/v850624111/528f3/N7FTpgloWVU.jpg[/IMG]
+The additional branches are all from call/ret. I double-checked the generated
+code and these are all well-matched (no jmp's instead of ret's), so
+I don't think we can optimize anything there; it seems to me that this
+is just a code size vs. speed trade-off.
 
-  and why i did not change flash from n25q256a to n25q032a11 in aspeed.c
-  without rebuild qemu?
+ool-regs has even lower IPC, but it also uses less instructions, which
+mitigates the slowdown due to lower IPC. The bottleneck in the ool
+calls/rets remains, which explains why there isn't much to
+be gained from the lower number of insns.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805445/+subscriptions
+Let me know if you want me to do any other data collection.
+
+Thanks,
+
+		Emilio
