@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gS1sD-0001NF-P4
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:35:35 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gS1sZ-0001Xa-KK
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:35:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gS1sA-0008TW-LW
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:35:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54871)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gS1sA-0008Sr-Ec
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:35:30 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8198C30023FD
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 15:35:29 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Wed, 28 Nov 2018 15:35:26 +0000
-Message-Id: <20181128153526.10948-1-berrange@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1gS1sW-0000rm-FU
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:35:55 -0500
+Date: Wed, 28 Nov 2018 16:35:47 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181128163547.7eb33873.cohuck@redhat.com>
+In-Reply-To: <1feb66c0-ce80-2853-1522-e7d787471fd3@linux.ibm.com>
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181122165432.4437-4-cohuck@redhat.com>
+	<b5066f7a-7024-ac3e-a91d-938fd845e1d9@linux.ibm.com>
+	<20181128100249.72d4299a.cohuck@redhat.com>
+	<25021742-a7a8-a90c-a2a3-eb8a78bf1fb0@linux.ibm.com>
+	<20181128155201.5be1d582.cohuck@redhat.com>
+	<1feb66c0-ce80-2853-1522-e7d787471fd3@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [qemu-web PATCH] Document how to test the site with
- jekyll locally
+Subject: Re: [Qemu-devel] [PATCH 3/3] vfio-ccw: add handling for asnyc
+ channel instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +29,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Farhan Ali <alifm@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-Add a README file that tells people this is a jekyll based static
-website, and shows people how to run jekyll for testing purposes.
+On Wed, 28 Nov 2018 10:00:59 -0500
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> On 11/28/2018 09:52 AM, Cornelia Huck wrote:
+> > On Wed, 28 Nov 2018 09:31:51 -0500
+> > Farhan Ali <alifm@linux.ibm.com> wrote:
+> >  =20
+> >> On 11/28/2018 04:02 AM, Cornelia Huck wrote: =20
+> >>> On Tue, 27 Nov 2018 14:09:49 -0500
+> >>> Farhan Ali <alifm@linux.ibm.com> wrote:
+> >>>     =20
+> >>>> On 11/22/2018 11:54 AM, Cornelia Huck wrote: =20
+> >>>>> Add a region to the vfio-ccw device that can be used to submit
+> >>>>> asynchronous I/O instructions. ssch continues to be handled by the
+> >>>>> existing I/O region; the new region handles hsch and csch.
+> >>>>>
+> >>>>> Interrupt status continues to be reported through the same channels
+> >>>>> as for ssch.
+> >>>>>
+> >>>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >>>>> ---
+> >>>>>     drivers/s390/cio/Makefile           |   3 +-
+> >>>>>     drivers/s390/cio/vfio_ccw_async.c   |  88 ++++++++++++++++
+> >>>>>     drivers/s390/cio/vfio_ccw_drv.c     |  48 ++++++---
+> >>>>>     drivers/s390/cio/vfio_ccw_fsm.c     | 158 +++++++++++++++++++++=
+++++++-
+> >>>>>     drivers/s390/cio/vfio_ccw_ops.c     |  13 ++-
+> >>>>>     drivers/s390/cio/vfio_ccw_private.h |   6 ++
+> >>>>>     include/uapi/linux/vfio.h           |   4 +
+> >>>>>     include/uapi/linux/vfio_ccw.h       |  12 +++
+> >>>>>     8 files changed, 313 insertions(+), 19 deletions(-)
+> >>>>>     create mode 100644 drivers/s390/cio/vfio_ccw_async.c
+> >>>>>    =20
+> >>>     =20
+> >>>>> @@ -76,7 +79,8 @@ static void vfio_ccw_sch_io_todo(struct work_stru=
+ct *work)
+> >>>>>     	private =3D container_of(work, struct vfio_ccw_private, io_wor=
+k);
+> >>>>>     	irb =3D &private->irb;
+> >>>>>    =20
+> >>>>> -	if (scsw_is_solicited(&irb->scsw)) {
+> >>>>> +	if (scsw_is_solicited(&irb->scsw) &&
+> >>>>> +	    (scsw_fctl(&irb->scsw) & SCSW_FCTL_START_FUNC)) {
+> >>>>>     		cp_update_scsw(&private->cp, &irb->scsw);
+> >>>>>     		cp_free(&private->cp);
+> >>>>>     	} =20
+> >>>>
+> >>>> I am a little confused about this. Why do we need to update the scsw=
+.cpa
+> >>>> if we have the start function function control bit set? Is it an
+> >>>> optimization? =20
+> >>>
+> >>> No, it's not an optimization. This is the work function that is
+> >>> scheduled if we get an interrupt for the device. Previously, we only
+> >>> got an interrupt if either the device presented us an unsolicited
+> >>> status or if we got an interrupt as a response to the channel program
+> >>> we submitted. Now, we can get an interrupt for halt/clear subchannel =
+as
+> >>> well, and in that case, we don't necessarily have a cp.
+> >>>
+> >>> [Thinking some more about it, we need to verify if the start function
+> >>> actually remains set if we try to terminate a running channel program
+> >>> with halt/clear. A clear might scrub too much. If that's the case, we
+> >>> also need to free the cp if the start function is not set.]
+> >>>
+> >>>     =20
+> >>
+> >> According to PoPs (Chapter 16: I/O interruptions, under function contr=
+ol):
+> >>
+> >> The start-function indication is also cleared at
+> >> the subchannel during the execution of CLEAR SUB-
+> >> CHANNEL.
+> >>
+> >> So maybe we do need to free the cp. =20
+> >=20
+> > Hm... so we need to make sure that cp_update_scsw() and cp_free() only
+> > do something when there's actually a valid cp around and call them
+> > unconditionally.  =20
+>=20
+> Yes, I agree.
+>=20
+> > Maybe add a ->valid flag to struct channel_program?
+>=20
+> We could do that. So we would set the flag once we have copied the=20
+> channel program to kernel memory? since that's when we should care about=
+=20
+> freeing it.
+
+I hacked up the following (still untested):
+
+=46rom e771c8dc5abbfbd19688b452096bab9d032e0df5 Mon Sep 17 00:00:00 2001
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Wed, 28 Nov 2018 16:30:51 +0100
+Subject: [PATCH] vfio-ccw: make it safe to access channel programs
+
+When we get a solicited interrupt, the start function may have
+been cleared by a csch, but we still have a channel program
+structure allocated. Make it safe to call the cp accessors in
+any case, so we can call them unconditionally.
+
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
+ drivers/s390/cio/vfio_ccw_cp.c  | 9 ++++++++-
+ drivers/s390/cio/vfio_ccw_cp.h  | 2 ++
+ drivers/s390/cio/vfio_ccw_drv.c | 3 +--
+ 3 files changed, 11 insertions(+), 3 deletions(-)
 
-NB, we should really mention a license in the README too, but I don't
-see info about what license we consider qemu-web to be covered by...
-
- README      | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- _config.yml |  2 ++
- 2 files changed, 55 insertions(+)
- create mode 100644 README
-
-diff --git a/README b/README
-new file mode 100644
-index 0000000..d06606a
---- /dev/null
-+++ b/README
-@@ -0,0 +1,53 @@
-+QEMU Webite
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+index 70a006ba4d05..35f87514276b 100644
+--- a/drivers/s390/cio/vfio_ccw_cp.c
++++ b/drivers/s390/cio/vfio_ccw_cp.c
+@@ -335,6 +335,7 @@ static void cp_unpin_free(struct channel_program *cp)
+ 	struct ccwchain *chain, *temp;
+ 	int i;
+=20
++	cp->initialized =3D false;
+ 	list_for_each_entry_safe(chain, temp, &cp->ccwchain_list, next) {
+ 		for (i =3D 0; i < chain->ch_len; i++) {
+ 			pfn_array_table_unpin_free(chain->ch_pat + i,
+@@ -701,6 +702,8 @@ int cp_init(struct channel_program *cp, struct device *=
+mdev, union orb *orb)
+ 	 */
+ 	cp->orb.cmd.c64 =3D 1;
+=20
++	cp->initialized =3D true;
 +
-+This repository provides content for the QEMU website.
+ 	return ret;
+ }
+=20
+@@ -715,7 +718,8 @@ int cp_init(struct channel_program *cp, struct device *=
+mdev, union orb *orb)
+  */
+ void cp_free(struct channel_program *cp)
+ {
+-	cp_unpin_free(cp);
++	if (cp->initialized)
++		cp_unpin_free(cp);
+ }
+=20
+ /**
+@@ -831,6 +835,9 @@ void cp_update_scsw(struct channel_program *cp, union s=
+csw *scsw)
+ 	u32 cpa =3D scsw->cmd.cpa;
+ 	u32 ccw_head, ccw_tail;
+=20
++	if (!cp->initialized)
++		return;
 +
-+It uses the Jekyll site generator for turning the static content into
-+a format which can then be directly hosted by a regular HTTP server
-+such as Apache.
-+
-+
-+Testing locally with Jekyll
-+---------------------------
-+
-+When adding/changing content on this site, it is possible to run a
-+local Jekyll service to test the result.
-+
-+QEMU requires a specific version of Jekyll which may not match that
-+provided by your OS vendor. Thus as a one time step the Jekyll software
-+must be installed locally as follows:
-+
-+* Install OS vendor ruby with development headers
-+
-+   # sudo dnf install ruby ruby-devel  (Fedora)
-+   # sudo yum install ruby ruby-devel  (RHEL)
-+   # sudo apt-get install ruby ruby-dev (Debian / Ubuntu)
-+
-+* Install OS vendor ruby gem bundler
-+
-+   # sudo dnf install rubygem-bundler  (Fedora)
-+   # sudo yum install rubygem-bundler  (RHEL)
-+   # sudo apt-get install bundler (Debian / Ubuntu)
-+
-+* Install Jekyll and its dependencies
-+
-+   # bundle install --path vendor
-+
-+Jekyll is now installed into the 'vendor/' directory of the git checkout=
-.
-+Note the 'vendor/' path has been explicitly excluded from the web conten=
-t
-+in _config.yml, so don't try to use a different path within the git
-+checkout.
-+
-+
-+To test the site launch jeykll
-+
-+  # bundle exec jekyll serve
-+
-+Now simply point a local web browser to http://127.0.0.1:4000 to browse
-+the generated site.
-+
-+Jekyll will usually automatically detect changes to files in the git
-+checkout and regenerate the site. It is thus not normally neccessary
-+to restart jekyll after changing content, unless it shows signs of being
-+confused / stale.
-diff --git a/_config.yml b/_config.yml
-index 0a0201c..576b0a5 100644
---- a/_config.yml
-+++ b/_config.yml
-@@ -37,3 +37,5 @@ gems:
- exclude:
-   - Gemfile
-   - Gemfile.lock
-+  - vendor/
-+  - README
+ 	/*
+ 	 * LATER:
+ 	 * For now, only update the cmd.cpa part. We may need to deal with
+diff --git a/drivers/s390/cio/vfio_ccw_cp.h b/drivers/s390/cio/vfio_ccw_cp.h
+index a4b74fb1aa57..3c20cd208da5 100644
+--- a/drivers/s390/cio/vfio_ccw_cp.h
++++ b/drivers/s390/cio/vfio_ccw_cp.h
+@@ -21,6 +21,7 @@
+  * @ccwchain_list: list head of ccwchains
+  * @orb: orb for the currently processed ssch request
+  * @mdev: the mediated device to perform page pinning/unpinning
++ * @initialized: whether this instance is actually initialized
+  *
+  * @ccwchain_list is the head of a ccwchain list, that contents the
+  * translated result of the guest channel program that pointed out by
+@@ -30,6 +31,7 @@ struct channel_program {
+ 	struct list_head ccwchain_list;
+ 	union orb orb;
+ 	struct device *mdev;
++	bool initialized;
+ };
+=20
+ extern int cp_init(struct channel_program *cp, struct device *mdev,
+diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_dr=
+v.c
+index 890c588a3a61..83d6f43792b6 100644
+--- a/drivers/s390/cio/vfio_ccw_drv.c
++++ b/drivers/s390/cio/vfio_ccw_drv.c
+@@ -79,8 +79,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+ 	private =3D container_of(work, struct vfio_ccw_private, io_work);
+ 	irb =3D &private->irb;
+=20
+-	if (scsw_is_solicited(&irb->scsw) &&
+-	    (scsw_fctl(&irb->scsw) & SCSW_FCTL_START_FUNC)) {
++	if (scsw_is_solicited(&irb->scsw)) {
+ 		cp_update_scsw(&private->cp, &irb->scsw);
+ 		cp_free(&private->cp);
+ 	}
 --=20
-2.19.2
+2.17.2
