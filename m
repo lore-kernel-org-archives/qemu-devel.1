@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1gS1jd-0004St-Mk
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:26:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gS1pU-0006kK-HF
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:32:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1gS1jZ-00065T-Va
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:26:41 -0500
-Received: from smtp.mail.uni-mannheim.de ([134.155.96.80]:54788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1gS1jZ-000643-I2
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:26:37 -0500
-References: <20181122141741.11108-1-marcandre.lureau@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <0432176d-72a6-2dd4-ccc7-8486ea49be7b@weilnetz.de>
-Date: Wed, 28 Nov 2018 16:26:46 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1gS1pT-0003ql-N7
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:32:44 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42672)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gS1pT-0003q1-EW
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:32:43 -0500
+Received: by mail-ot1-x341.google.com with SMTP id v23so18445937otk.9
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 07:32:43 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181122141741.11108-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] docs: apply some qemu.org-like CSS style
- to HTML
+References: <1543399094-2260-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1543399094-2260-1-git-send-email-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 28 Nov 2018 15:32:30 +0000
+Message-ID: <CAFEAcA8jBUhbUjixnXkFo8H9KMfFfZknG5HMxchp6UGEKBueKQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.1?] target/arm/sve_helper: Fix
+ compilation with clang 3.4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +29,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: pbonzini@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, qemu-arm <qemu-arm@nongnu.org>
 
-Am 22.11.2018 um 15:17 schrieb Marc-Andr=C3=A9 Lureau:
-> Style a bit the HTML documents, to make them look like qemu.org pages.
+On Wed, 28 Nov 2018 at 09:58, Thomas Huth <thuth@redhat.com> wrote:
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  Makefile                     |   2 +
->  docs/texinfo-extra-head.html |   7 ++
->  docs/texinfo.css             | 226 +++++++++++++++++++++++++++++++++++
->  3 files changed, 235 insertions(+)
->  create mode 100644 docs/texinfo-extra-head.html
->  create mode 100644 docs/texinfo.css
+> Clang 3.4 does not know the "flatten" attribute yet. We've already
+> introduced the QEMU_FLATTEN macro for this in commit 97ff87c0ed020c2,
+> so use this macro now here, too, to fix this issue.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
+Applied to master, thanks.
 
-I tried this patch, and here are the results without the patch and with
-the patch, so everybody can compare both looks:
-
-old: https://qemu.weilnetz.de/doc/qemu-doc.html
-new: https://qemu.weilnetz.de/doc/3.1/qemu-doc.html
-
-I like the new look and can use it from now on, no matter whether it is
-merged into QEMU 3.1 or delayed for release 4.
-
-Tested-by: Stefan Weil <sw@weilnetz.de>
-
-PS: https://qemu.weilnetz.de/doc/3.1/qemu-ga-ref.html and
-https://qemu.weilnetz.de/doc/3.1/qemu-qmp-ref.html are also candidates
-for the new look.
+-- PMM
