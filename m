@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gS0CI-0001Rb-G5
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 08:48:11 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gS0Lk-0007L1-GE
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 08:57:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gS0CH-0004D6-KP
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 08:48:10 -0500
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:42416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gS0CH-0004Cv-Cy
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 08:48:09 -0500
-Received: by mail-oi1-x22f.google.com with SMTP id w13so22542543oiw.9
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 05:48:09 -0800 (PST)
+	(envelope-from <sameo@linux.intel.com>) id 1gS0Lh-0006EX-8B
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 08:57:56 -0500
+Date: Wed, 28 Nov 2018 14:57:19 +0100
+From: Samuel Ortiz <sameo@linux.intel.com>
+Message-ID: <20181128135719.GE4393@caravaggio>
+References: <20181113165247.4806-1-sameo@linux.intel.com>
+	<20181113165247.4806-5-sameo@linux.intel.com>
+	<CAFEAcA9wvrnshOTYz-jZ0n6m7SfusYY+bnB-iPnQuVNqqdg5Ww@mail.gmail.com>
+	<20181127153551.GC4393@caravaggio>
+	<CAFEAcA9B5DPeot26-oGtR-h+xdfg+tmUPrYpKhaneaT1tr1yqQ@mail.gmail.com>
+	<20181128104024.GD4393@caravaggio>
+	<CAFEAcA-G3_uhH134_n8yobkJQJ7pOvu-vpLe9MkwVp5DmJOeag@mail.gmail.com>
 MIME-Version: 1.0
-References: <1543402390-3754-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1543402390-3754-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 28 Nov 2018 13:47:57 +0000
-Message-ID: <CAFEAcA9Va5eS0A93=UMs0YYMUwewSvkkz2BjXX_gweQ4YnKL9Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v4 00/14] Misc patches for QEMU 3.1.0-rc3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-G3_uhH134_n8yobkJQJ7pOvu-vpLe9MkwVp5DmJOeag@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 04/13] target: arm: Move all interrupt and
+ exception handlers into their own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, 28 Nov 2018 at 10:54, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit 4822f1ee9efa8df56e29db0a68323b484bdb03=
-35:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/fixes-31-20181127-pul=
-l-request' into staging (2018-11-27 11:21:38 +0000)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 86100290cb6600b3d65e0794b45c1b82ead99411:
->
->   hostmem: no need to check for host_memory_backend_mr_inited() in alloc(=
-) (2018-11-28 11:51:24 +0100)
->
-> ----------------------------------------------------------------
-> * lsi HBA reselection fix (George)
-> * Small cleanups (Li Qiang)
-> * bugfixes for vhost-user-bridge and hostmem (Marc-Andr=C3=A9)
-> * single-thread TCG fix (me)
-> * VMX migration blocker (me)
-> * target/i386 fix for LOCK (Richard)
-> * MAINTAINERS update (Philippe, Thomas)
->
-> ----------------------------------------------------------------
+On Wed, Nov 28, 2018 at 11:39:57AM +0000, Peter Maydell wrote:
+> On Wed, 28 Nov 2018 at 10:40, Samuel Ortiz <sameo@linux.intel.com> wrote:
+> > Given that this piece of code effectively builds a dependency to TCG
+> > from the KVM code, I see a few solutions but I need your input here. We
+> > could:
+> >
+> > - Decide we don't want to support --disable-tcg for ARM. We'd then carry
+> >   this patch serie from the NEMU code repo. Worst case scenario, at
+> >   least for us.
+> > - Manage to implement exception injection from userspace without TCG.
+> >   Would it even be possible?
+> > - Offload exception injections back to the kernel in those cases. I feel
+> >   this would be the cleanest solution but may need kernel changes.
+> 
+> The kernel folk were firmly against 3, IIRC, but you can go
+> and have the discussion if you like.
+> 
+> I don't really see what the problem is. This is just a bit
+> of code that's used by both TCG and KVM. Therefore it goes
+> in the binary whether TCG is enabled or not. Other functions
+> and bits of code are TCG only and therefore don't go in a
+> KVM-only binary.
+Keeping this code with --disable-tcg means:
 
-Applied, thanks.
+Keep arm_cpu_do_interrupt -> Keep check_for_semihosting -> Keep the arm
+instruction loading code -> Keep a large chunk of the TCG core code
+itself. Does that dependency chain looks fine to you?
 
--- PMM
+Cheers,
+Samuel.
