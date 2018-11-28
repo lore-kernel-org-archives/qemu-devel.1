@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gS3VR-00082e-Gs
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:20:11 -0500
+	(envelope-from <fziglio@redhat.com>) id 1gS3XQ-0001Pu-4J
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:22:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gS3VO-0007CZ-Qd
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:20:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54852)
+	(envelope-from <fziglio@redhat.com>) id 1gS3XN-00052k-Ps
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:22:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38554)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gS3VO-0007Bm-JC
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:20:06 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1gS2d1-0001C9-JN
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:23:55 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E2344659AC
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 17:20:05 +0000 (UTC)
-Date: Wed, 28 Nov 2018 17:20:01 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181128172001.GV24355@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181128153526.10948-1-berrange@redhat.com>
-	<31667b3c-0071-e2b3-63d1-2fdc0c96c98f@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 90F4A30A81B8
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 16:23:44 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 66928709E7
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 16:23:44 +0000 (UTC)
+Date: Wed, 28 Nov 2018 11:23:43 -0500 (EST)
+From: Frediano Ziglio <fziglio@redhat.com>
+Message-ID: <838252057.46224930.1543422223781.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20181128155932.16171-1-marcandre.lureau@redhat.com>
+References: <20181128155932.16171-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <31667b3c-0071-e2b3-63d1-2fdc0c96c98f@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Document how to test the site
- with jekyll locally
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v3] configure: bump spice-server
+ required version to 0.12.5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,135 +37,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
-
-On Wed, Nov 28, 2018 at 11:15:11AM -0600, Eric Blake wrote:
-> On 11/28/18 9:35 AM, Daniel P. Berrang=C3=A9 wrote:
-> > Add a README file that tells people this is a jekyll based static
-> > website, and shows people how to run jekyll for testing purposes.
-> >=20
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > ---
-> >=20
-> > NB, we should really mention a license in the README too, but I don't
-> > see info about what license we consider qemu-web to be covered by...
-> >=20
-> >   README      | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-+++
-> >   _config.yml |  2 ++
-> >   2 files changed, 55 insertions(+)
-> >   create mode 100644 README
-> >=20
-> > diff --git a/README b/README
-> > new file mode 100644
-> > index 0000000..d06606a
-> > --- /dev/null
-> > +++ b/README
-> > @@ -0,0 +1,53 @@
-> > +QEMU Webite
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> s/Webite/Website/ (and the corresponding =3D line lengthening)
->=20
->=20
-> > +* Install Jekyll and its dependencies
-> > +
-> > +   # bundle install --path vendor
-> > +
->=20
-> $ pwd
-> /home/eblake
-> $ bundle install --path vendor
-> Could not locate Gemfile
->=20
-> What am I missing?
->=20
-> > +Jekyll is now installed into the 'vendor/' directory of the git chec=
-kout.
->=20
-> Oh - this step must be run within the top-level directory of the
-> qemu-web.git checkout (which might be obvious for someone reading the R=
-EADME
-> from a fresh qemu-web git checkout, but wasn't for me while reviewing t=
-he
-> patch).  So I repeated the command in the right directory, and it appea=
-rs to
-> work:
->=20
-> $ bundle install --path vendor
-> Fetching gem metadata from https://rubygems.org/..............
-> Fetching gem metadata from https://rubygems.org/..
-> Resolving dependencies...
-> Fetching public_suffix 2.0.5
-> ...
-> Installing jekyll 3.3.0
-> ...
-> Bundle complete! 9 Gemfile dependencies, 25 gems now installed.
-> Bundled gems are installed into `./vendor`
-> ...
->=20
-> but I don't know if it is the same version of Jekyll that the documenta=
-tion
-> wanted ("QEMU requires a specific version of Jekyll which may not match=
- that
-> provided by your OS vendor" doesn't actually say WHICH specific version=
-).
-
-Yes,  'bundle install' reads the versions from Gemfile, so it should
-get the right version that qemu-web wants. Thus I preferred not to
-duplicate the version in the docs too.
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kraxel@redhat.com
 
 >=20
-> > +Note the 'vendor/' path has been explicitly excluded from the web co=
-ntent
-> > +in _config.yml, so don't try to use a different path within the git
-> > +checkout.
-> > +
-> > +
-> > +To test the site launch jeykll
-> > +
-> > +  # bundle exec jekyll serve
+> Looking at chardev/spice.c code, I realize compilation was broken for
+> a while with spice-server < 0.12.3. Let's bump required version
+> to 0.12.5, released May 19 2014, instead of adding more #ifdef.
 >=20
-> $ bundle exec jekyll serve
-> Configuration file: /home/eblake/qemu-web/_config.yml
-> Configuration file: /home/eblake/qemu-web/_config.yml
->             Source: /home/eblake/qemu-web
->        Destination: /home/eblake/qemu-web/_site
->  Incremental build: disabled. Enable with --incremental
->       Generating...
->              ERROR: YOUR SITE COULD NOT BE BUILT:
->                     ------------------------------------
->                     Invalid date '<%=3D Time.now.strftime('%Y-%m-%d %H:=
-%M:%S
-> %z') %>': Document 'vendor/ruby/2.5.0/gems/jekyll-3.3.0/lib/site_templa=
-te/_posts/0000-00-00-welcome-to-jekyll.markdown.erb'
-> does not have a valid date in the YAML front matter.
+> (this patch combines changes from an early version and some of
+> Frediano "[PATCH 2/2] spice: Bump required spice-server version to
+> 0.12.6")
 >=20
-> Did I do things right?
 
-Yes, but this error is what the addition in _config.yml.....
+Minor, I didn't do much, you can remove this last paragraph
 
-> > diff --git a/_config.yml b/_config.yml
-> > index 0a0201c..576b0a5 100644
-> > --- a/_config.yml
-> > +++ b/_config.yml
-> > @@ -37,3 +37,5 @@ gems:
-> >   exclude:
-> >     - Gemfile
-> >     - Gemfile.lock
-> > +  - vendor/
-> > +  - README
+> According to repology, all the distros that are build target platforms
+> for QEMU include it:
+>=20
+>       RHEL-7: 0.14.0
+>       Debian (Stretch): 0.12.8
+>       Debian (Jessie): 0.12.5
+>       FreeBSD (ports): 0.14.0
+>       OpenSUSE Leap 15: 0.14.0
+>       Ubuntu (Xenial): 0.12.6
+>=20
+> Note that a previous version of this patch was bumping version to
+> 0.12.6. Unfortunately, Debian Jessie (oldstable) is stuck with spice
+> server 0.12.5, and QEMU should keep building until after 2y of current
+> stable (Stretch), which will be around June 17th 2019. Qemu 4.1
+> should thus be free of bumping to spice-server 0.12.6 during 4.1
+> development cycle.
+>=20
 
-...here is supposed to fix, so I'm puzzelled why you'd still get that
-error message
+I would not refer to previous patch version, kind of starting with
+the "Debian Jessie "...
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/ui/qemu-spice.h |  6 ------
+>  chardev/spice.c         | 10 ----------
+>  hw/display/qxl.c        |  2 --
+>  ui/spice-core.c         |  8 --------
+>  configure               |  4 ++--
+>  5 files changed, 2 insertions(+), 28 deletions(-)
+>=20
+> diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
+> index c6d50eb87a..8c23dfe717 100644
+> --- a/include/ui/qemu-spice.h
+> +++ b/include/ui/qemu-spice.h
+> @@ -46,13 +46,7 @@ int qemu_spice_migrate_info(const char *hostname, int
+> port, int tls_port,
+>  #else
+>  #define SPICE_NEEDS_SET_MM_TIME 0
+>  #endif
+> -
+
+Really minor, an empty line would not be bad.
+
+> -#if SPICE_SERVER_VERSION >=3D 0x000c02
+>  void qemu_spice_register_ports(void);
+> -#else
+> -static inline Chardev *qemu_chr_open_spice_port(const char *name)
+> -{ return NULL; }
+> -#endif
+> =20
+>  #else  /* CONFIG_SPICE */
+> =20
+> diff --git a/chardev/spice.c b/chardev/spice.c
+> index e66e3ad568..173c257949 100644
+> --- a/chardev/spice.c
+> +++ b/chardev/spice.c
+> @@ -77,7 +77,6 @@ static int vmc_read(SpiceCharDeviceInstance *sin, uint8=
+_t
+> *buf, int len)
+>      return bytes;
+>  }
+> =20
+> -#if SPICE_SERVER_VERSION >=3D 0x000c02
+>  static void vmc_event(SpiceCharDeviceInstance *sin, uint8_t event)
+>  {
+>      SpiceChardev *scd =3D container_of(sin, SpiceChardev, sin);
+> @@ -95,7 +94,6 @@ static void vmc_event(SpiceCharDeviceInstance *sin, uin=
+t8_t
+> event)
+>      trace_spice_vmc_event(chr_event);
+>      qemu_chr_be_event(chr, chr_event);
+>  }
+> -#endif
+> =20
+>  static void vmc_state(SpiceCharDeviceInstance *sin, int connected)
+>  {
+> @@ -119,9 +117,7 @@ static SpiceCharDeviceInterface vmc_interface =3D {
+>      .state              =3D vmc_state,
+>      .write              =3D vmc_write,
+>      .read               =3D vmc_read,
+> -#if SPICE_SERVER_VERSION >=3D 0x000c02
+>      .event              =3D vmc_event,
+> -#endif
+>  #if SPICE_SERVER_VERSION >=3D 0x000c06
+>      .flags              =3D SPICE_CHAR_DEVICE_NOTIFY_WRITABLE,
+>  #endif
+> @@ -223,9 +219,7 @@ static void char_spice_finalize(Object *obj)
+>      }
+> =20
+>      g_free((char *)s->sin.subtype);
+> -#if SPICE_SERVER_VERSION >=3D 0x000c02
+>      g_free((char *)s->sin.portname);
+> -#endif
+>  }
+> =20
+>  static void spice_vmc_set_fe_open(struct Chardev *chr, int fe_open)
+> @@ -240,7 +234,6 @@ static void spice_vmc_set_fe_open(struct Chardev *chr=
+,
+> int fe_open)
+> =20
+>  static void spice_port_set_fe_open(struct Chardev *chr, int fe_open)
+>  {
+> -#if SPICE_SERVER_VERSION >=3D 0x000c02
+>      SpiceChardev *s =3D SPICE_CHARDEV(chr);
+> =20
+>      if (fe_open) {
+> @@ -248,7 +241,6 @@ static void spice_port_set_fe_open(struct Chardev *ch=
+r,
+> int fe_open)
+>      } else {
+>          spice_server_port_event(&s->sin, SPICE_PORT_EVENT_CLOSED);
+>      }
+> -#endif
+>  }
+> =20
+>  static void spice_chr_accept_input(struct Chardev *chr)
+> @@ -298,7 +290,6 @@ static void qemu_chr_open_spice_vmc(Chardev *chr,
+>      chr_open(chr, type);
+>  }
+> =20
+> -#if SPICE_SERVER_VERSION >=3D 0x000c02
+>  static void qemu_chr_open_spice_port(Chardev *chr,
+>                                       ChardevBackend *backend,
+>                                       bool *be_opened,
+> @@ -331,7 +322,6 @@ void qemu_spice_register_ports(void)
+>          vmc_register_interface(s);
+>      }
+>  }
+> -#endif
+> =20
+>  static void qemu_chr_parse_spice_vmc(QemuOpts *opts, ChardevBackend
+>  *backend,
+>                                       Error **errp)
+> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+> index 9087db5dee..8e9a65e75b 100644
+> --- a/hw/display/qxl.c
+> +++ b/hw/display/qxl.c
+> @@ -1189,9 +1189,7 @@ static void qxl_enter_vga_mode(PCIQXLDevice *d)
+>          return;
+>      }
+>      trace_qxl_enter_vga_mode(d->id);
+> -#if SPICE_SERVER_VERSION >=3D 0x000c03 /* release 0.12.3 */
+>      spice_qxl_driver_unload(&d->ssd.qxl);
+> -#endif
+>      graphic_console_set_hwops(d->ssd.dcl.con, d->vga.hw_ops, &d->vga);
+>      update_displaychangelistener(&d->ssd.dcl, GUI_REFRESH_INTERVAL_DEFAU=
+LT);
+>      qemu_spice_create_host_primary(&d->ssd);
+> diff --git a/ui/spice-core.c b/ui/spice-core.c
+> index ebaae24643..fc850b3f50 100644
+> --- a/ui/spice-core.c
+> +++ b/ui/spice-core.c
+> @@ -745,13 +745,7 @@ void qemu_spice_init(void)
+>      }
+> =20
+>      if (qemu_opt_get_bool(opts, "disable-agent-file-xfer", 0)) {
+> -#if SPICE_SERVER_VERSION >=3D 0x000c04
+>          spice_server_set_agent_file_xfer(spice_server, false);
+> -#else
+> -        error_report("this qemu build does not support the "
+> -                     "\"disable-agent-file-xfer\" option");
+> -        exit(1);
+> -#endif
+>      }
+> =20
+>      compression =3D SPICE_IMAGE_COMPRESS_AUTO_GLZ;
+> @@ -817,9 +811,7 @@ void qemu_spice_init(void)
+>      g_free(x509_cert_file);
+>      g_free(x509_cacert_file);
+> =20
+> -#if SPICE_SERVER_VERSION >=3D 0x000c02
+>      qemu_spice_register_ports();
+> -#endif
+> =20
+>  #ifdef HAVE_SPICE_GL
+>      if (qemu_opt_get_bool(opts, "gl", 0)) {
+> diff --git a/configure b/configure
+> index 8c292ef994..97288044c7 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4560,7 +4560,7 @@ int main(void) { spice_server_new(); return 0; }
+>  EOF
+>    spice_cflags=3D$($pkg_config --cflags spice-protocol spice-server
+>    2>/dev/null)
+>    spice_libs=3D$($pkg_config --libs spice-protocol spice-server 2>/dev/n=
+ull)
+> -  if $pkg_config --atleast-version=3D0.12.0 spice-server && \
+> +  if $pkg_config --atleast-version=3D0.12.5 spice-server && \
+>       $pkg_config --atleast-version=3D0.12.3 spice-protocol && \
+>       compile_prog "$spice_cflags" "$spice_libs" ; then
+>      spice=3D"yes"
+> @@ -4571,7 +4571,7 @@ EOF
+>    else
+>      if test "$spice" =3D "yes" ; then
+>        feature_not_found "spice" \
+> -          "Install spice-server(>=3D0.12.0) and spice-protocol(>=3D0.12.=
+3)
+> devel"
+> +          "Install spice-server(>=3D0.12.5) and spice-protocol(>=3D0.12.=
+3)
+> devel"
+>      fi
+>      spice=3D"no"
+>    fi
+
+Otherwise fine for me,
+
+Frediano
