@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gRwUf-0006Hg-Pc
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:50:55 -0500
+	(envelope-from <thuth@redhat.com>) id 1gRwbz-00023n-UT
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:58:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gRwUe-0000oI-H6
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:50:53 -0500
-Date: Wed, 28 Nov 2018 10:50:38 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181128105038.592f50a0@redhat.com>
-In-Reply-To: <20181126162942.21258-9-sameo@linux.intel.com>
-References: <20181126162942.21258-1-sameo@linux.intel.com>
-	<20181126162942.21258-9-sameo@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 8/8] hw: acpi: Remove AcpiRsdpDescriptor
- and fix tests
+	(envelope-from <thuth@redhat.com>) id 1gRwbz-0006Vw-2z
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:58:27 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 28 Nov 2018 10:58:14 +0100
+Message-Id: <1543399094-2260-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.1?] target/arm/sve_helper: Fix
+ compilation with clang 3.4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,227 +18,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org
 
-On Mon, 26 Nov 2018 17:29:41 +0100
-Samuel Ortiz <sameo@linux.intel.com> wrote:
+Clang 3.4 does not know the "flatten" attribute yet. We've already
+introduced the QEMU_FLATTEN macro for this in commit 97ff87c0ed020c2,
+so use this macro now here, too, to fix this issue.
 
-> We switched to the build_append_*() API for all RSDP callers, and this
-> patch converts all existing tests depending on this structure.
-> It is no longer needed and we can thus remove it.
-I'd rephrase it as following:
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ target/arm/sve_helper.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-The sole user of AcpiRsdpDescriptor structure is test,
-drop test dependency on it and remove no longer used structure.
-
-
-> 
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> ---
->  include/hw/acpi/acpi-defs.h | 13 ----------
->  tests/acpi-utils.h          |  5 +++-
->  tests/acpi-utils.c          | 48 ++++++++++++++++++++++++++++++-------
->  tests/bios-tables-test.c    | 27 ++++++++++++++-------
->  tests/vmgenid-test.c        |  8 ++++---
->  5 files changed, 67 insertions(+), 34 deletions(-)
-> 
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index 9b2f6b8043..abef1d57ae 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -40,19 +40,6 @@ enum {
->      ACPI_FADT_F_LOW_POWER_S0_IDLE_CAPABLE,
->  };
->  
-> -struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
-> -    uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
-> -    uint8_t  checksum;               /* To make sum of struct == 0 */
-> -    uint8_t  oem_id [6];             /* OEM identification */
-> -    uint8_t  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
-> -    uint32_t rsdt_physical_address;  /* 32-bit physical address of RSDT */
-> -    uint32_t length;                 /* XSDT Length in bytes including hdr */
-> -    uint64_t xsdt_physical_address;  /* 64-bit physical address of XSDT */
-> -    uint8_t  extended_checksum;      /* Checksum of entire table */
-> -    uint8_t  reserved [3];           /* Reserved field must be 0 */
-> -} QEMU_PACKED;
-> -typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
-> -
->  typedef struct AcpiRsdpData {
->      uint8_t oem_id[6]; /* OEM identification */
->      uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
-> diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-> index ac52abd0dd..fb1a67a21f 100644
-> --- a/tests/acpi-utils.h
-> +++ b/tests/acpi-utils.h
-> @@ -82,6 +82,9 @@ typedef struct {
->  
->  uint8_t acpi_calc_checksum(const uint8_t *data, int len);
->  uint32_t acpi_find_rsdp_address(void);
-> -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
-> +uint32_t acpi_find_rsdt_address(uint8_t *rsdp_table);
-> +uint64_t acpi_find_xsdt_address(uint8_t *rsdp_table);
-> +void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table,
-> +                           uint8_t revision);
->  
->  #endif  /* TEST_ACPI_UTILS_H */
-> diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-> index 41dc1ea9b4..c8fe2d1342 100644
-> --- a/tests/acpi-utils.c
-> +++ b/tests/acpi-utils.c
-> @@ -52,14 +52,44 @@ uint32_t acpi_find_rsdp_address(void)
->      return off;
->  }
->  
-> -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table)
-> +uint32_t acpi_find_rsdt_address(uint8_t *rsdp_table)
-s/acpi_find_rsdt_address/acpi_get_rsdt_address/
-likewise for xsdt
-
->  {
-> -    ACPI_READ_FIELD(rsdp_table->signature, addr);
-> -    ACPI_ASSERT_CMP64(rsdp_table->signature, "RSD PTR ");
-> -
-> -    ACPI_READ_FIELD(rsdp_table->checksum, addr);
-> -    ACPI_READ_ARRAY(rsdp_table->oem_id, addr);
-> -    ACPI_READ_FIELD(rsdp_table->revision, addr);
-> -    ACPI_READ_FIELD(rsdp_table->rsdt_physical_address, addr);
-> -    ACPI_READ_FIELD(rsdp_table->length, addr);
-> +    uint32_t rsdt_physical_address = *((uint32_t *)(rsdp_table +
-> +                                                    ACPI_RSDP_RSDT_OFFSET));
-above cast looks pretty ugly and on some hw it might trigger SIGBUS
-maybe:
-
-       memcpy(addr, &rsdp_table[16 /* RsdtAddress offset */], 4);
-
-> +    uint8_t revision = rsdp_table[ACPI_RSDP_REVISION_OFFSET];
-> +
-> +    if (revision != ACPI_RSDP_REV_1) {
-theoretically not rev1 might have rsdt pointer as well for legacy OS
-but we don't do this in QEMU, so it doesn't really matter
-
-> +        return 0;
-> +    }
-> +
-> +    return le32_to_cpu(rsdt_physical_address);
-> +}
-> +
-> +uint64_t acpi_find_xsdt_address(uint8_t *rsdp_table)
-> +{
-> +    uint64_t xsdt_physical_address = *((uint64_t *)(rsdp_table +
-> +                                                    ACPI_RSDP_XSDT_OFFSET));
-access to uninitialized data if not rev2,
-here it's not harmful but it's better not to confuse tools and fetch value after revision check
-
-> +    uint8_t revision = rsdp_table[ACPI_RSDP_REVISION_OFFSET];
-> +
-> +    if (revision != ACPI_RSDP_REV_2) {
-> +        return 0;
-> +    }
-> +
-> +    return le64_to_cpu(xsdt_physical_address);
-> +}
-> +
-> +void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table, uint8_t revision)
-> +{
-> +    switch (revision) {
-> +    case ACPI_RSDP_REV_1:
-> +        memread(addr, rsdp_table, ACPI_RSDP_REV_1_LEN);
-> +        break;
-> +    case ACPI_RSDP_REV_2:
-> +        memread(addr, rsdp_table, ACPI_RSDP_REV_2_LEN);
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +
-> +    ACPI_ASSERT_CMP64(*((uint64_t *)(rsdp_table)), ACPI_RSDP_SIGNATURE);
->  }
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index d661d9be62..8cde404bda 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -27,7 +27,8 @@ typedef struct {
->      const char *machine;
->      const char *variant;
->      uint32_t rsdp_addr;
-> -    AcpiRsdpDescriptor rsdp_table;
-> +    uint8_t rsdp_table[ACPI_RSDP_REV_2_LEN];
-> +    uint32_t rsdt_physical_address;
->      AcpiRsdtDescriptorRev1 rsdt_table;
->      uint32_t dsdt_addr;
->      uint32_t facs_addr;
-> @@ -83,21 +84,31 @@ static void test_acpi_rsdp_address(test_data *data)
->      data->rsdp_addr = off;
->  }
->  
-> -static void test_acpi_rsdp_table(test_data *data)
-> +static void test_acpi_rsdp_table(test_data *data, uint8_t revision)
->  {
-> -    AcpiRsdpDescriptor *rsdp_table = &data->rsdp_table;
-> +    uint8_t *rsdp_table = data->rsdp_table;
->      uint32_t addr = data->rsdp_addr;
->  
-> -    acpi_parse_rsdp_table(addr, rsdp_table);
-> +    acpi_parse_rsdp_table(addr, rsdp_table, revision);
->  
-> -    /* rsdp checksum is not for the whole table, but for the first 20 bytes */
-> -    g_assert(!acpi_calc_checksum((uint8_t *)rsdp_table, 20));
-> +    switch (revision) {
-> +    case ACPI_RSDP_REV_1:
-> +        /* With rev 1, checksum is only for the first 20 bytes */
-> +        g_assert(!acpi_calc_checksum(rsdp_table,  ACPI_RSDP_REV_1_LEN));
-> +        break;
-> +    case ACPI_RSDP_REV_2:
-> +        /* With revision 2, we have 2 checksums */
-> +        g_assert(!acpi_calc_checksum(rsdp_table, ACPI_RSDP_REV_1_LEN));
-> +        g_assert(!acpi_calc_checksum(rsdp_table, ACPI_RSDP_REV_2_LEN));
-> +    default:
-> +        g_assert_not_reached();
-> +    }
->  }
->  
->  static void test_acpi_rsdt_table(test_data *data)
->  {
->      AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
-> -    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
-> +    uint32_t addr = acpi_find_rsdt_address(data->rsdp_table);
->      uint32_t *tables;
->      int tables_nr;
->      uint8_t checksum;
-> @@ -626,7 +637,7 @@ static void test_acpi_one(const char *params, test_data *data)
->  
->      data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
->      test_acpi_rsdp_address(data);
-> -    test_acpi_rsdp_table(data);
-> +    test_acpi_rsdp_table(data, ACPI_RSDP_REV_1);
->      test_acpi_rsdt_table(data);
->      fadt_fetch_facs_and_dsdt_ptrs(data);
->      test_acpi_facs_table(data);
-> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-> index 0a6fb55f2e..db5b084c18 100644
-> --- a/tests/vmgenid-test.c
-> +++ b/tests/vmgenid-test.c
-> @@ -35,7 +35,7 @@ static uint32_t acpi_find_vgia(void)
->  {
->      uint32_t rsdp_offset;
->      uint32_t guid_offset = 0;
-> -    AcpiRsdpDescriptor rsdp_table;
-> +    uint8_t rsdp_table[ACPI_RSDP_REV_2_LEN];
->      uint32_t rsdt, rsdt_table_length;
->      AcpiRsdtDescriptorRev1 rsdt_table;
->      size_t tables_nr;
-> @@ -52,9 +52,11 @@ static uint32_t acpi_find_vgia(void)
->  
->      g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
->  
-> -    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
-> +    acpi_parse_rsdp_table(rsdp_offset, rsdp_table, ACPI_RSDP_REV_1);
-> +
-> +    rsdt = acpi_find_rsdt_address(rsdp_table);
-> +    g_assert(rsdt);
->  
-> -    rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
->      /* read the header */
->      ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
->      ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 8cbc651..bc84725 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -4382,20 +4382,20 @@ static void sve_ld4_r(CPUARMState *env, void *vg, target_ulong addr,
+ }
+ 
+ #define DO_LDN_1(N) \
+-void __attribute__((flatten)) HELPER(sve_ld##N##bb_r)               \
++void QEMU_FLATTEN HELPER(sve_ld##N##bb_r) \
+     (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)  \
+ {                                                                   \
+     sve_ld##N##_r(env, vg, addr, desc, 1, GETPC(), sve_ld1bb_tlb);  \
+ }
+ 
+ #define DO_LDN_2(N, SUFF, SIZE)                                       \
+-void __attribute__((flatten)) HELPER(sve_ld##N##SUFF##_le_r)          \
++void QEMU_FLATTEN HELPER(sve_ld##N##SUFF##_le_r)                      \
+     (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
+ {                                                                     \
+     sve_ld##N##_r(env, vg, addr, desc, SIZE, GETPC(),                 \
+                   sve_ld1##SUFF##_le_tlb);                            \
+ }                                                                     \
+-void __attribute__((flatten)) HELPER(sve_ld##N##SUFF##_be_r)          \
++void QEMU_FLATTEN HELPER(sve_ld##N##SUFF##_be_r)                      \
+     (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
+ {                                                                     \
+     sve_ld##N##_r(env, vg, addr, desc, SIZE, GETPC(),                 \
+@@ -4832,7 +4832,7 @@ static void sve_st4_r(CPUARMState *env, void *vg, target_ulong addr,
+ }
+ 
+ #define DO_STN_1(N, NAME, ESIZE) \
+-void __attribute__((flatten)) HELPER(sve_st##N##NAME##_r)           \
++void QEMU_FLATTEN HELPER(sve_st##N##NAME##_r) \
+     (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)  \
+ {                                                                   \
+     sve_st##N##_r(env, vg, addr, desc, GETPC(), ESIZE, 1,           \
+@@ -4840,13 +4840,13 @@ void __attribute__((flatten)) HELPER(sve_st##N##NAME##_r)           \
+ }
+ 
+ #define DO_STN_2(N, NAME, ESIZE, MSIZE) \
+-void __attribute__((flatten)) HELPER(sve_st##N##NAME##_le_r)          \
++void QEMU_FLATTEN HELPER(sve_st##N##NAME##_le_r) \
+     (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
+ {                                                                     \
+     sve_st##N##_r(env, vg, addr, desc, GETPC(), ESIZE, MSIZE,         \
+                   sve_st1##NAME##_le_tlb);                            \
+ }                                                                     \
+-void __attribute__((flatten)) HELPER(sve_st##N##NAME##_be_r)          \
++void QEMU_FLATTEN HELPER(sve_st##N##NAME##_be_r)                      \
+     (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
+ {                                                                     \
+     sve_st##N##_r(env, vg, addr, desc, GETPC(), ESIZE, MSIZE,         \
+@@ -4966,7 +4966,7 @@ static void sve_ld1_zd(CPUARMState *env, void *vd, void *vg, void *vm,
+ }
+ 
+ #define DO_LD1_ZPZ_S(MEM, OFS) \
+-void __attribute__((flatten)) HELPER(sve_ld##MEM##_##OFS)    \
++void QEMU_FLATTEN HELPER(sve_ld##MEM##_##OFS) \
+     (CPUARMState *env, void *vd, void *vg, void *vm,         \
+      target_ulong base, uint32_t desc)                       \
+ {                                                            \
+@@ -4975,7 +4975,7 @@ void __attribute__((flatten)) HELPER(sve_ld##MEM##_##OFS)    \
+ }
+ 
+ #define DO_LD1_ZPZ_D(MEM, OFS) \
+-void __attribute__((flatten)) HELPER(sve_ld##MEM##_##OFS)    \
++void QEMU_FLATTEN HELPER(sve_ld##MEM##_##OFS) \
+     (CPUARMState *env, void *vd, void *vg, void *vm,         \
+      target_ulong base, uint32_t desc)                       \
+ {                                                            \
+@@ -5326,7 +5326,7 @@ static void sve_st1_zd(CPUARMState *env, void *vd, void *vg, void *vm,
+ }
+ 
+ #define DO_ST1_ZPZ_S(MEM, OFS) \
+-void __attribute__((flatten)) HELPER(sve_st##MEM##_##OFS)    \
++void QEMU_FLATTEN HELPER(sve_st##MEM##_##OFS) \
+     (CPUARMState *env, void *vd, void *vg, void *vm,         \
+      target_ulong base, uint32_t desc)                       \
+ {                                                            \
+@@ -5335,7 +5335,7 @@ void __attribute__((flatten)) HELPER(sve_st##MEM##_##OFS)    \
+ }
+ 
+ #define DO_ST1_ZPZ_D(MEM, OFS) \
+-void __attribute__((flatten)) HELPER(sve_st##MEM##_##OFS)    \
++void QEMU_FLATTEN HELPER(sve_st##MEM##_##OFS) \
+     (CPUARMState *env, void *vd, void *vg, void *vm,         \
+      target_ulong base, uint32_t desc)                       \
+ {                                                            \
+-- 
+1.8.3.1
