@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRqWb-0002px-Im
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:28:30 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gRqWd-0002q2-Nt
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:28:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRqWa-00036j-L3
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:28:29 -0500
-Date: Wed, 28 Nov 2018 13:59:23 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gRqWa-00036b-Jp
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:28:31 -0500
+Date: Wed, 28 Nov 2018 13:57:14 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181128025923.GX2251@umbus.fritz.box>
+Message-ID: <20181128025714.GW2251@umbus.fritz.box>
 References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-14-clg@kaod.org>
+	<20181116105729.23240-13-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="mlvFMpb4NrD3AMcD"
+	protocol="application/pgp-signature"; boundary="sL7C0a98p/u5aVah"
 Content-Disposition: inline
-In-Reply-To: <20181116105729.23240-14-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 13/36] spapr: introduce a
- spapr_irq_init() routine
+In-Reply-To: <20181116105729.23240-13-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 12/36] spapr: initialize VSMT before
+ initializing the IRQ backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +29,57 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---mlvFMpb4NrD3AMcD
+--sL7C0a98p/u5aVah
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 16, 2018 at 11:57:06AM +0100, C=E9dric Le Goater wrote:
-> Initialize the MSI bitmap from it as this will be necessary for the
-> sPAPR IRQ backend for XIVE.
+On Fri, Nov 16, 2018 at 11:57:05AM +0100, C=E9dric Le Goater wrote:
+> We will need to use xics_max_server_number() to create the sPAPRXive
+> object modeling the interrupt controller of the machine which is
+> created before the CPUs.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+My only concern here is that this moves the spapr_set_vsmt_mode()
+before some of the sanity checks in spapr_init_cpus().  Are we certain
+there are no edge cases that could cause badness?
 
 > ---
->  include/hw/ppc/spapr_irq.h |  1 +
->  hw/ppc/spapr.c             |  2 +-
->  hw/ppc/spapr_irq.c         | 16 +++++++++++-----
->  3 files changed, 13 insertions(+), 6 deletions(-)
+>  hw/ppc/spapr.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index a467ce696ee4..bd7301e6d9c6 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -43,6 +43,7 @@ typedef struct sPAPRIrq {
->  extern sPAPRIrq spapr_irq_xics;
->  extern sPAPRIrq spapr_irq_xics_legacy;
-> =20
-> +void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
->  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp);
->  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
->  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 50cb9f9f4a02..e470efe7993c 100644
+> index 7afd1a175bf2..50cb9f9f4a02 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -2594,7 +2594,7 @@ static void spapr_machine_init(MachineState *machin=
-e)
->      spapr_set_vsmt_mode(spapr, &error_fatal);
+> @@ -2466,11 +2466,6 @@ static void spapr_init_cpus(sPAPRMachineState *spa=
+pr)
+>          boot_cores_nr =3D possible_cpus->len;
+>      }
 > =20
->      /* Set up Interrupt Controller before we create the VCPUs */
-> -    smc->irq->init(spapr, &error_fatal);
-> +    spapr_irq_init(spapr, &error_fatal);
-> =20
->      /* Set up containers for ibm,client-architecture-support negotiated =
-options
->       */
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index e77b94cc685e..f8b651de0ec9 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -97,11 +97,6 @@ static void spapr_irq_init_xics(sPAPRMachineState *spa=
-pr, Error **errp)
->      int nr_irqs =3D smc->irq->nr_irqs;
->      Error *local_err =3D NULL;
-> =20
-> -    /* Initialize the MSI IRQ allocator. */
-> -    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> -        spapr_irq_msi_init(spapr, smc->irq->nr_msis);
-> -    }
+> -    /* VSMT must be set in order to be able to compute VCPU ids, ie to
+> -     * call xics_max_server_number() or spapr_vcpu_id().
+> -     */
+> -    spapr_set_vsmt_mode(spapr, &error_fatal);
 > -
->      if (kvm_enabled()) {
->          if (machine_kernel_irqchip_allowed(machine) &&
->              !xics_kvm_init(spapr, &local_err)) {
-> @@ -213,6 +208,17 @@ sPAPRIrq spapr_irq_xics =3D {
->  /*
->   * sPAPR IRQ frontend routines for devices
->   */
-> +void spapr_irq_init(sPAPRMachineState *spapr, Error **errp)
-> +{
-> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> +
-> +    /* Initialize the MSI IRQ allocator. */
-> +    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +        spapr_irq_msi_init(spapr, smc->irq->nr_msis);
-> +    }
-> +
-> +    smc->irq->init(spapr, errp);
-> +}
+>      if (smc->pre_2_10_has_unused_icps) {
+>          int i;
 > =20
->  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp)
->  {
+> @@ -2593,6 +2588,11 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+>      /* Setup a load limit for the ramdisk leaving room for SLOF and FDT =
+*/
+>      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
+> =20
+> +    /* VSMT must be set in order to be able to compute VCPU ids, ie to
+> +     * call xics_max_server_number() or spapr_vcpu_id().
+> +     */
+> +    spapr_set_vsmt_mode(spapr, &error_fatal);
+> +
+>      /* Set up Interrupt Controller before we create the VCPUs */
+>      smc->irq->init(spapr, &error_fatal);
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -119,24 +87,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---mlvFMpb4NrD3AMcD
+--sL7C0a98p/u5aVah
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv+BIsACgkQbDjKyiDZ
-s5JI0Q/7BUz0fNgeJe1KWwpv1qokBM98mN5CsgJCu5jT5tFe5VYf+S0aa9AGL8Zr
-Y7yE+shahb1R6hbzBluOdG/RvhRh3ecDIkAD/WaKdj5q34AAyuvMdoAipbHDct4A
-hBVJrmeT2hPJ1LKO4Xr27XizwloEoCSjddFXmbZKMDD62w1WV/7FKiln2Oumlr6d
-bmo2tAHASvAvyTxw5/ckXzDdZubLaYU8uof3kz2z9u+TIzX/PQtYsiKoemxMMgZL
-0StutCKB+Vo5j5gWGFWbhA8xz2XNu49qUzH7T3UNTkY9jlyR76lh5PRaCYpRlaHd
-0ggz6OVWDXG17vUidi/AVVOqMmO1vGhQ1svxebMEwtu26A6l3KifPh2t9XW5bz/4
-tBUYA/eskdWhcSpp/xUsJHM26GdcaXpwUOhEjVDzMHLpV+ZzOCFnDecL/2q1CQF3
-7q8RDkFR8eRZgi7eb60vrcPj73VHgcoCt2r2wVswuYqXMnkOyLOlTqhxofSPOqsh
-pmih4swiEUCANLeUbXQ8ymW1ytLoPmkjJuzUAFMpcq9WUlmwAzeQWyYJZSMfqYH4
-8jjYw/nes8FO9QVyyGeQ/BOsR5W3ab9zAeciJ6r1bXBfCCVFQG8Kn6w7vQR5myAp
-ZUW8BSf5T1GcTJDUpIBRZq0FNI3g1IiWce01zYGOpE2d2yzCf0s=
-=6sRT
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv+BAcACgkQbDjKyiDZ
+s5IrYBAA3hM6JppEOhZ6OxVmMXH035/2VaPVVzH1uOZfr/S8aG7XZmsKOGSB5zor
+4Wio9m1Nv0956m+4GpXT431IBE9EFNuvMGze1WLjiCNrVUNU4ArzZpgy/khK6OyK
+4HTDXKbD4HXjtjNavc8VMAtcTwQexM5C+uELE3Dq3scJtokhi0pwfnLYx76ttcXQ
+nPev8Jh7KqyPXEXzKPKpC4UvgThAFEL/SN3aapH7tbcbHbFAMmxEbPYpHclysvyT
+FfzfU1Y04Nri6TYHUDIpozRxhPjRvT8WyHDnWj7aSe21ZmtoPdNb5xLniYa2YA25
+USM3r426THqTnoCyUzYdyGSFVafgAExN73SZFS75kIM5r7lnaFBTMM4jFSoX4TMB
+mNBF3/RVnEUz5aAZZq/0li2QhzFjAKdfwslbqNmx77YHNHEnc1Sz1D4xfjCDB+A2
+XF63PJJAOtgbpQ6hqkStEipSPQbaYlvR/LnlNXztdJau/kh6IAhB17iWTt9Hoovn
+/hI2HH7emLSuVdqGzjekKhpZMJv0ODsIH7G0A+UPzXaFGHF7gNFLEhmi8GWMnApI
+4rWHYexxWkYQ6rLygtGt6ILVLXSjTbK0m3Lu4nw4julpDDMsSHXghrZconPlLz8d
+JVexlU1VIKWhLmi+gLe6mLgAXd3bkYKAhohK8RCpinGmV0JMoqU=
+=6uUo
 -----END PGP SIGNATURE-----
 
---mlvFMpb4NrD3AMcD--
+--sL7C0a98p/u5aVah--
