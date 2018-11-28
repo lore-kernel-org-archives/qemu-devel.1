@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gRsYl-000416-Rb
+	(envelope-from <richard.henderson@linaro.org>) id 1gRsYl-000415-RZ
 	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 00:38:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gRsYi-0004Mt-OD
+	(envelope-from <richard.henderson@linaro.org>) id 1gRsYi-0004N5-T8
 	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 00:38:51 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:43688)
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:34803)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gRsYi-0004Lv-G2
+	id 1gRsYi-0004MH-N2
 	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 00:38:48 -0500
-Received: by mail-pg1-x543.google.com with SMTP id v28so8963261pgk.10
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 21:38:47 -0800 (PST)
+Received: by mail-pl1-x643.google.com with SMTP id f12-v6so16824726plo.1
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 21:38:48 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 27 Nov 2018 21:38:30 -0800
-Message-Id: <20181128053834.10861-9-richard.henderson@linaro.org>
+Date: Tue, 27 Nov 2018 21:38:31 -0800
+Message-Id: <20181128053834.10861-10-richard.henderson@linaro.org>
 In-Reply-To: <20181128053834.10861-1-richard.henderson@linaro.org>
 References: <20181128053834.10861-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 08/12] tcg: Reindent parts of liveness_pass_1
+Subject: [Qemu-devel] [PATCH 09/12] tcg: Rename and adjust liveness_pass_1
+ helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,190 +30,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: cota@braap.org
 
-There are two blocks of the form
-
-    if (foo) {
-        stuff1;
-        goto bar;
-    } else {
-    baz:
-        stuff2;
-    }
-
-which have unnecessary and confusing indentation.
-Remove the else and unindent stuff2.
+No need for a "tcg_" prefix for a static function; we already
+have another "la_" prefix for indicating liveness analysis.
+Pass in nb_globals and nb_temps, as we will already have them
+in registers for other loops within the parent function.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg.c | 139 ++++++++++++++++++++++++++++--------------------------
- 1 file changed, 71 insertions(+), 68 deletions(-)
+ tcg/tcg.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 27d081e11a..82f9a66d31 100644
+index 82f9a66d31..27814df882 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -2458,47 +2458,46 @@ static void liveness_pass_1(TCGContext *s)
-                         }
-                     }
-                     goto do_remove;
--                } else {
--                do_not_remove_call:
-+                }
-+            do_not_remove_call:
+@@ -2389,10 +2389,8 @@ static void reachable_code_pass(TCGContext *s)
  
--                    /* output args are dead */
--                    for (i = 0; i < nb_oargs; i++) {
--                        arg_ts = arg_temp(op->args[i]);
--                        if (arg_ts->state & TS_DEAD) {
--                            arg_life |= DEAD_ARG << i;
--                        }
--                        if (arg_ts->state & TS_MEM) {
--                            arg_life |= SYNC_ARG << i;
--                        }
--                        arg_ts->state = TS_DEAD;
-+                /* output args are dead */
-+                for (i = 0; i < nb_oargs; i++) {
-+                    arg_ts = arg_temp(op->args[i]);
-+                    if (arg_ts->state & TS_DEAD) {
-+                        arg_life |= DEAD_ARG << i;
-                     }
-+                    if (arg_ts->state & TS_MEM) {
-+                        arg_life |= SYNC_ARG << i;
-+                    }
-+                    arg_ts->state = TS_DEAD;
-+                }
+ /* liveness analysis: end of function: all temps are dead, and globals
+    should be in memory. */
+-static void tcg_la_func_end(TCGContext *s)
++static void la_func_end(TCGContext *s, int ng, int nt)
+ {
+-    int ng = s->nb_globals;
+-    int nt = s->nb_temps;
+     int i;
  
--                    if (!(call_flags & (TCG_CALL_NO_WRITE_GLOBALS |
--                                        TCG_CALL_NO_READ_GLOBALS))) {
--                        /* globals should go back to memory */
--                        for (i = 0; i < nb_globals; i++) {
--                            s->temps[i].state = TS_DEAD | TS_MEM;
--                        }
--                    } else if (!(call_flags & TCG_CALL_NO_READ_GLOBALS)) {
--                        /* globals should be synced to memory */
--                        for (i = 0; i < nb_globals; i++) {
--                            s->temps[i].state |= TS_MEM;
--                        }
-+                if (!(call_flags & (TCG_CALL_NO_WRITE_GLOBALS |
-+                                    TCG_CALL_NO_READ_GLOBALS))) {
-+                    /* globals should go back to memory */
-+                    for (i = 0; i < nb_globals; i++) {
-+                        s->temps[i].state = TS_DEAD | TS_MEM;
-                     }
-+                } else if (!(call_flags & TCG_CALL_NO_READ_GLOBALS)) {
-+                    /* globals should be synced to memory */
-+                    for (i = 0; i < nb_globals; i++) {
-+                        s->temps[i].state |= TS_MEM;
-+                    }
-+                }
+     for (i = 0; i < ng; ++i) {
+@@ -2405,10 +2403,8 @@ static void tcg_la_func_end(TCGContext *s)
  
--                    /* record arguments that die in this helper */
--                    for (i = nb_oargs; i < nb_iargs + nb_oargs; i++) {
--                        arg_ts = arg_temp(op->args[i]);
--                        if (arg_ts && arg_ts->state & TS_DEAD) {
--                            arg_life |= DEAD_ARG << i;
--                        }
-+                /* record arguments that die in this helper */
-+                for (i = nb_oargs; i < nb_iargs + nb_oargs; i++) {
-+                    arg_ts = arg_temp(op->args[i]);
-+                    if (arg_ts && arg_ts->state & TS_DEAD) {
-+                        arg_life |= DEAD_ARG << i;
-                     }
--                    /* input arguments are live for preceding opcodes */
--                    for (i = nb_oargs; i < nb_iargs + nb_oargs; i++) {
--                        arg_ts = arg_temp(op->args[i]);
--                        if (arg_ts) {
--                            arg_ts->state &= ~TS_DEAD;
--                        }
-+                }
-+                /* input arguments are live for preceding opcodes */
-+                for (i = nb_oargs; i < nb_iargs + nb_oargs; i++) {
-+                    arg_ts = arg_temp(op->args[i]);
-+                    if (arg_ts) {
-+                        arg_ts->state &= ~TS_DEAD;
-                     }
-                 }
-             }
-@@ -2602,43 +2601,47 @@ static void liveness_pass_1(TCGContext *s)
-                         goto do_not_remove;
-                     }
-                 }
--            do_remove:
--                tcg_op_remove(s, op);
--            } else {
--            do_not_remove:
--                /* output args are dead */
--                for (i = 0; i < nb_oargs; i++) {
--                    arg_ts = arg_temp(op->args[i]);
--                    if (arg_ts->state & TS_DEAD) {
--                        arg_life |= DEAD_ARG << i;
--                    }
--                    if (arg_ts->state & TS_MEM) {
--                        arg_life |= SYNC_ARG << i;
--                    }
--                    arg_ts->state = TS_DEAD;
--                }
-+                goto do_remove;
-+            }
-+            goto do_not_remove;
+ /* liveness analysis: end of basic block: all temps are dead, globals
+    and local temps should be in memory. */
+-static void tcg_la_bb_end(TCGContext *s)
++static void la_bb_end(TCGContext *s, int ng, int nt)
+ {
+-    int ng = s->nb_globals;
+-    int nt = s->nb_temps;
+     int i;
  
--                /* if end of basic block, update */
--                if (def->flags & TCG_OPF_BB_END) {
--                    tcg_la_bb_end(s);
--                } else if (def->flags & TCG_OPF_SIDE_EFFECTS) {
--                    /* globals should be synced to memory */
--                    for (i = 0; i < nb_globals; i++) {
--                        s->temps[i].state |= TS_MEM;
--                    }
--                }
-+        do_remove:
-+            tcg_op_remove(s, op);
-+            break;
+     for (i = 0; i < ng; ++i) {
+@@ -2427,9 +2423,10 @@ static void tcg_la_bb_end(TCGContext *s)
+ static void liveness_pass_1(TCGContext *s)
+ {
+     int nb_globals = s->nb_globals;
++    int nb_temps = s->nb_temps;
+     TCGOp *op, *op_prev;
  
--                /* record arguments that die in this opcode */
--                for (i = nb_oargs; i < nb_oargs + nb_iargs; i++) {
--                    arg_ts = arg_temp(op->args[i]);
--                    if (arg_ts->state & TS_DEAD) {
--                        arg_life |= DEAD_ARG << i;
--                    }
-+        do_not_remove:
-+            /* output args are dead */
-+            for (i = 0; i < nb_oargs; i++) {
-+                arg_ts = arg_temp(op->args[i]);
-+                if (arg_ts->state & TS_DEAD) {
-+                    arg_life |= DEAD_ARG << i;
-                 }
--                /* input arguments are live for preceding opcodes */
--                for (i = nb_oargs; i < nb_oargs + nb_iargs; i++) {
--                    arg_temp(op->args[i])->state &= ~TS_DEAD;
-+                if (arg_ts->state & TS_MEM) {
-+                    arg_life |= SYNC_ARG << i;
-                 }
-+                arg_ts->state = TS_DEAD;
-+            }
-+
-+            /* if end of basic block, update */
-+            if (def->flags & TCG_OPF_BB_END) {
-+                tcg_la_bb_end(s);
-+            } else if (def->flags & TCG_OPF_SIDE_EFFECTS) {
-+                /* globals should be synced to memory */
-+                for (i = 0; i < nb_globals; i++) {
-+                    s->temps[i].state |= TS_MEM;
-+                }
-+            }
-+
-+            /* record arguments that die in this opcode */
-+            for (i = nb_oargs; i < nb_oargs + nb_iargs; i++) {
-+                arg_ts = arg_temp(op->args[i]);
-+                if (arg_ts->state & TS_DEAD) {
-+                    arg_life |= DEAD_ARG << i;
-+                }
-+            }
-+            /* input arguments are live for preceding opcodes */
-+            for (i = nb_oargs; i < nb_oargs + nb_iargs; i++) {
-+                arg_temp(op->args[i])->state &= ~TS_DEAD;
-             }
-             break;
-         }
+-    tcg_la_func_end(s);
++    la_func_end(s, nb_globals, nb_temps);
+ 
+     QTAILQ_FOREACH_REVERSE_SAFE(op, &s->ops, TCGOpHead, link, op_prev) {
+         int i, nb_iargs, nb_oargs;
+@@ -2624,7 +2621,7 @@ static void liveness_pass_1(TCGContext *s)
+ 
+             /* if end of basic block, update */
+             if (def->flags & TCG_OPF_BB_END) {
+-                tcg_la_bb_end(s);
++                la_bb_end(s, nb_globals, nb_temps);
+             } else if (def->flags & TCG_OPF_SIDE_EFFECTS) {
+                 /* globals should be synced to memory */
+                 for (i = 0; i < nb_globals; i++) {
 -- 
 2.17.2
