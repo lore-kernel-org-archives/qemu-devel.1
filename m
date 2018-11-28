@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8631c8a8c=anthony.perard@citrix.com>)
-	id 1gS3xZ-0001VY-O6
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:49:16 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gS3y7-0002Vp-Mz
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:49:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8631c8a8c=anthony.perard@citrix.com>)
-	id 1gS3hV-0001TK-Hk
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:32:38 -0500
-Date: Wed, 28 Nov 2018 17:32:01 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181128173201.GD14786@perard.uk.xensource.com>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-3-paul.durrant@citrix.com>
-	<20181128171001.GC14786@perard.uk.xensource.com>
-	<79c7ea5f1b8041d7828240ec18f881f4@AMSPEX02CL03.citrite.net>
+	(envelope-from <imammedo@redhat.com>) id 1gS3y2-0004ux-LU
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:49:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39185)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gS3y0-0004gV-Oi
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:49:42 -0500
+Date: Wed, 28 Nov 2018 18:49:33 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181128184933.66391782@redhat.com>
+In-Reply-To: <20181127092801.21777-16-marcandre.lureau@redhat.com>
+References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
+	<20181127092801.21777-16-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <79c7ea5f1b8041d7828240ec18f881f4@AMSPEX02CL03.citrite.net>
-Subject: Re: [Qemu-devel] [PATCH 02/18] xen: introduce new 'XenBus' and
- 'XenDevice' object hierarchy
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 15/28] hw: apply accel compat
+ properties without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Andreas =?UTF-8?B?RsOkcmJl?= =?UTF-8?B?cg==?= <afaerber@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>
 
-On Wed, Nov 28, 2018 at 05:17:10PM +0000, Paul Durrant wrote:
-> > Will we need a hotplug handler for this bus, like it is done with
-> > TYPE_XENSYSBUS?
-> 
-> I didn't seem to need one even doing 'xl block-attach' after the VM had booted. I'm really not sure what that does.
+On Tue, 27 Nov 2018 13:27:48 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-Indeed, that works fine, and I think I've tested block-detach as well.
-Maybe we will need something if we initiate attach of a block device via
-QMP instead of xenstore, but we can fix that later.
+> Introduce object_apply_global_props() function, to apply compatibility
+> properties from a GPtrArray.
+>=20
+> For accel compatibility properties, apply them during
+> device_post_init(), after accel_register_compat_props() has set them.
+>=20
+> To populate the compatibility properties, introduce SET_COMPAT(), a
+> more generic version of SET_MACHINE_COMPAT() that can set compat
+> properties on other objects than Machine, and using GPtrArray.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/hw/qdev-core.h | 13 +++++++++++++
+>  include/qom/object.h   |  3 +++
+>  include/sysemu/accel.h |  4 +---
+>  accel/accel.c          | 12 ------------
+>  hw/core/qdev.c         | 11 +++++++++++
+>  hw/xen/xen-common.c    | 38 +++++++++++++++++++-------------------
+>  qom/object.c           | 25 +++++++++++++++++++++++++
+>  vl.c                   |  2 +-
+>  8 files changed, 73 insertions(+), 35 deletions(-)
+>=20
+[...]
 
--- 
-Anthony PERARD
+> diff --git a/vl.c b/vl.c
+> index fa25d1ae2d..c06e94271c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2963,7 +2963,7 @@ static void user_register_global_props(void)
+>   */
+>  static void register_global_properties(MachineState *ms)
+>  {
+> -    accel_register_compat_props(ms->accelerator);
+> +    accel_register_compat_props(ACCEL_GET_CLASS(ms->accelerator)->compat=
+_props);
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Acceptable way to do above is:
+ Foo *foo =3DCAST(something)
+ FUNC(foo->member)
+if I recall correctly
+
+>      machine_register_compat_props(ms);
+>      user_register_global_props();
+>  }
