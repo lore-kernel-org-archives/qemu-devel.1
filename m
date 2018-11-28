@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRrWA-0004X5-LM
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 23:32:07 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gRrgr-0001R7-7H
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 23:43:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRrW9-0000qj-AX
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 23:32:06 -0500
-Date: Wed, 28 Nov 2018 15:31:55 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gRrgq-0006no-3i
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 23:43:09 -0500
+Date: Wed, 28 Nov 2018 15:42:57 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181128043155.GA2251@umbus.fritz.box>
+Message-ID: <20181128044257.GC2251@umbus.fritz.box>
 References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-18-clg@kaod.org>
+	<20181116105729.23240-20-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="1y/7ip9Z0l6NTTti"
+	protocol="application/pgp-signature"; boundary="pgNHpQPJFoUYTAIP"
 Content-Disposition: inline
-In-Reply-To: <20181116105729.23240-18-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 17/36] spapr: add device tree support
- for the XIVE exploitation mode
+In-Reply-To: <20181116105729.23240-20-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 19/36] spapr: add a 'pseries-3.1-xive'
+ machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,237 +29,164 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---1y/7ip9Z0l6NTTti
+--pgNHpQPJFoUYTAIP
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 16, 2018 at 11:57:10AM +0100, C=E9dric Le Goater wrote:
-> The XIVE interface for the guest is described in the device tree under
-> the "interrupt-controller" node. A couple of new properties are
-> specific to XIVE :
->=20
->  - "reg"
->=20
->    contains the base address and size of the thread interrupt
->    managnement areas (TIMA), for the User level and for the Guest OS
->    level. Only the Guest OS level is taken into account today.
->=20
->  - "ibm,xive-eq-sizes"
->=20
->    the size of the event queues. One cell per size supported, contains
->    log2 of size, in ascending order.
->=20
->  - "ibm,xive-lisn-ranges"
->=20
->    the IRQ interrupt number ranges assigned to the guest for the IPIs.
->=20
-> and also under the root node :
->=20
->  - "ibm,plat-res-int-priorities"
->=20
->    contains a list of priorities that the hypervisor has reserved for
->    its own use. OPAL uses the priority 7 queue to automatically
->    escalate interrupts for all other queues (DD2.X POWER9). So only
->    priorities [0..6] are allowed for the guest.
->=20
-> Extend the sPAPR IRQ backend with a new handler to populate the DT
-> with the appropriate "interrupt-controller" node.
+On Fri, Nov 16, 2018 at 11:57:12AM +0100, C=E9dric Le Goater wrote:
+> The interrupt mode is statically defined to XIVE only for this machine.
+> The guest OS is required to have support for the XIVE exploitation
+> mode of the POWER9 interrupt controller.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > ---
->  include/hw/ppc/spapr_irq.h  |  2 ++
->  include/hw/ppc/spapr_xive.h |  2 ++
->  hw/intc/spapr_xive_hcall.c  | 62 +++++++++++++++++++++++++++++++++++++
->  hw/ppc/spapr.c              |  3 +-
->  hw/ppc/spapr_irq.c          | 17 ++++++++++
->  5 files changed, 85 insertions(+), 1 deletion(-)
+>  include/hw/ppc/spapr_irq.h |  1 +
+>  hw/ppc/spapr.c             | 36 +++++++++++++++++++++++++++++++-----
+>  hw/ppc/spapr_irq.c         |  3 +++
+>  3 files changed, 35 insertions(+), 5 deletions(-)
 >=20
 > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index c854ae527808..cfdc1f86e713 100644
+> index c3b4c38145eb..b299dd794bff 100644
 > --- a/include/hw/ppc/spapr_irq.h
 > +++ b/include/hw/ppc/spapr_irq.h
-> @@ -40,6 +40,8 @@ typedef struct sPAPRIrq {
->      void (*free)(sPAPRMachineState *spapr, int irq, int num);
->      qemu_irq (*qirq)(sPAPRMachineState *spapr, int irq);
->      void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
-> +    void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_servers,
-> +                        void *fdt, uint32_t phandle);
->  } sPAPRIrq;
-> =20
->  extern sPAPRIrq spapr_irq_xics;
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 418511f3dc10..5b3fab192d41 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -65,5 +65,7 @@ bool spapr_xive_priority_is_valid(uint8_t priority);
->  typedef struct sPAPRMachineState sPAPRMachineState;
-> =20
->  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
-> +void spapr_dt_xive(sPAPRXive *xive, int nr_servers, void *fdt,
-> +                   uint32_t phandle);
-> =20
->  #endif /* PPC_SPAPR_XIVE_H */
-> diff --git a/hw/intc/spapr_xive_hcall.c b/hw/intc/spapr_xive_hcall.c
-> index 52e4e23995f5..66c78aa88500 100644
-> --- a/hw/intc/spapr_xive_hcall.c
-> +++ b/hw/intc/spapr_xive_hcall.c
-> @@ -890,3 +890,65 @@ void spapr_xive_hcall_init(sPAPRMachineState *spapr)
->      spapr_register_hypercall(H_INT_SYNC, h_int_sync);
->      spapr_register_hypercall(H_INT_RESET, h_int_reset);
->  }
-> +
-> +void spapr_dt_xive(sPAPRXive *xive, int nr_servers, void *fdt, uint32_t =
-phandle)
-> +{
-> +    int node;
-> +    uint64_t timas[2 * 2];
-> +    /* Interrupt number ranges for the IPIs */
-> +    uint32_t lisn_ranges[] =3D {
-> +        cpu_to_be32(0),
-> +        cpu_to_be32(nr_servers),
-> +    };
-> +    uint32_t eq_sizes[] =3D {
-> +        cpu_to_be32(12), /* 4K */
-> +        cpu_to_be32(16), /* 64K */
-> +        cpu_to_be32(21), /* 2M */
-> +        cpu_to_be32(24), /* 16M */
-> +    };
-> +    /* The following array is in sync with the 'spapr_xive_priority_is_v=
-alid'
-> +     * routine above. The O/S is expected to choose priority 6.
-> +     */
-> +    uint32_t plat_res_int_priorities[] =3D {
-> +        cpu_to_be32(7),    /* start */
-> +        cpu_to_be32(0xf8), /* count */
-> +    };
-> +    gchar *nodename;
-> +
-> +    /* Thread Interrupt Management Area : User (ring 3) and OS (ring 2) =
-*/
-> +    timas[0] =3D cpu_to_be64(xive->tm_base + 3 * (1ull << TM_SHIFT));
-> +    timas[1] =3D cpu_to_be64(1ull << TM_SHIFT);
-> +    timas[2] =3D cpu_to_be64(xive->tm_base + 2 * (1ull << TM_SHIFT));
+> @@ -33,6 +33,7 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr);
+>  typedef struct sPAPRIrq {
+>      uint32_t    nr_irqs;
+>      uint32_t    nr_msis;
+> +    uint8_t     ov5;
 
-Don't you have symbolic constants for the ring numbers, instead of '2'
-and '3' above?
+I'm a bit confused as to what exactly this represents..
 
-> +    timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
-> +
-> +    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
-> +                               xive->tm_base + 3 * (1 << TM_SHIFT));
-> +    _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
-> +    g_free(nodename);
-> +
-> +    _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
-> +    _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
-> +
-> +    _FDT(fdt_setprop_string(fdt, node, "compatible", "ibm,power-ivpe"));
-> +    _FDT(fdt_setprop(fdt, node, "ibm,xive-eq-sizes", eq_sizes,
-> +                     sizeof(eq_sizes)));
-> +    _FDT(fdt_setprop(fdt, node, "ibm,xive-lisn-ranges", lisn_ranges,
-> +                     sizeof(lisn_ranges)));
-> +
-> +    /* For Linux to link the LSIs to the main interrupt controller.
-
-What's the "main interrupt controller" in this context?
-
-> +     * These properties are not in XIVE exploitation mode sPAPR
-> +     * specs
-> +     */
-> +    _FDT(fdt_setprop(fdt, node, "interrupt-controller", NULL, 0));
-> +    _FDT(fdt_setprop_cell(fdt, node, "#interrupt-cells", 2));
-> +
-> +    /* For SLOF */
-> +    _FDT(fdt_setprop_cell(fdt, node, "linux,phandle", phandle));
-> +    _FDT(fdt_setprop_cell(fdt, node, "phandle", phandle));
-> +
-> +    /* The "ibm,plat-res-int-priorities" property defines the priority
-> +     * ranges reserved by the hypervisor
-> +     */
-> +    _FDT(fdt_setprop(fdt, 0, "ibm,plat-res-int-priorities",
-> +                     plat_res_int_priorities, sizeof(plat_res_int_priori=
-ties)));
-> +}
+>      void (*init)(sPAPRMachineState *spapr, int nr_irqs, int nr_servers,
+>                   Error **errp);
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 9f8c19e56e7a..ad1692cdcd0f 100644
+> index ad1692cdcd0f..8fbb743769db 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -1270,7 +1270,8 @@ static void *spapr_build_fdt(sPAPRMachineState *spa=
-pr,
->      _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
+> @@ -1097,12 +1097,14 @@ static void spapr_dt_rtas(sPAPRMachineState *spap=
+r, void *fdt)
+>      spapr_dt_rtas_tokens(fdt, rtas);
+>  }
 > =20
->      /* /interrupt controller */
-> -    spapr_dt_xics(xics_max_server_number(spapr), fdt, PHANDLE_XICP);
-> +    smc->irq->dt_populate(spapr, xics_max_server_number(spapr), fdt,
-> +                          PHANDLE_XICP);
+> -/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU feat=
+ures
+> - * that the guest may request and thus the valid values for bytes 24..26=
+ of
+> - * option vector 5: */
+> -static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
+> +/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU
+> + * and the XIVE features that the guest may request and thus the valid
+> + * values for bytes 23..26 of option vector 5: */
+> +static void spapr_dt_ov5_platform_support(sPAPRMachineState *spapr, void=
+ *fdt,
+> +                                          int chosen)
+>  {
+>      PowerPCCPU *first_ppc_cpu =3D POWERPC_CPU(first_cpu);
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
 > =20
->      ret =3D spapr_populate_memory(spapr, fdt);
->      if (ret < 0) {
+>      char val[2 * 4] =3D {
+>          23, 0x00, /* Xive mode, filled in below. */
+> @@ -1123,7 +1125,11 @@ static void spapr_dt_ov5_platform_support(void *fd=
+t, int chosen)
+>          } else {
+>              val[3] =3D 0x00; /* Hash */
+>          }
+> +        /* TODO: test KVM support */
+> +        val[1] =3D smc->irq->ov5;
+>      } else {
+> +        val[1] =3D smc->irq->ov5;
+
+=2E.here it seems to be a specific value for this OV5 byte, indicating the
+supported intc...
+
+> +
+>          /* V3 MMU supports both hash and radix in tcg (with dynamic swit=
+ching) */
+>          val[3] =3D 0xC0;
+>      }
+> @@ -1191,7 +1197,7 @@ static void spapr_dt_chosen(sPAPRMachineState *spap=
+r, void *fdt)
+>          _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_path)=
+);
+>      }
+> =20
+> -    spapr_dt_ov5_platform_support(fdt, chosen);
+> +    spapr_dt_ov5_platform_support(spapr, fdt, chosen);
+> =20
+>      g_free(stdout_path);
+>      g_free(bootlist);
+> @@ -2622,6 +2628,11 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+>      /* advertise support for ibm,dyamic-memory-v2 */
+>      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
+> =20
+> +    /* advertise XIVE */
+> +    if (smc->irq->ov5) {
+
+=2E.but here it seems to be a bool indicating XIVE support specifically.
+
+> +        spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
+> +    }
+> +
+>      /* init CPUs */
+>      spapr_init_cpus(spapr);
+> =20
+> @@ -3971,6 +3982,21 @@ static void spapr_machine_3_1_class_options(Machin=
+eClass *mc)
+> =20
+>  DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
+> =20
+> +static void spapr_machine_3_1_xive_instance_options(MachineState *machin=
+e)
+> +{
+> +    spapr_machine_3_1_instance_options(machine);
+> +}
+> +
+> +static void spapr_machine_3_1_xive_class_options(MachineClass *mc)
+> +{
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> +
+> +    spapr_machine_3_1_class_options(mc);
+> +    smc->irq =3D &spapr_irq_xive;
+> +}
+> +
+> +DEFINE_SPAPR_MACHINE(3_1_xive, "3.1-xive", false);
+> +
+>  /*
+>   * pseries-3.0
+>   */
 > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index da6fcfaa3c52..d88a029d8c5c 100644
+> index 253abc10e780..42e73851b174 100644
 > --- a/hw/ppc/spapr_irq.c
 > +++ b/hw/ppc/spapr_irq.c
-> @@ -190,6 +190,13 @@ static void spapr_irq_print_info_xics(sPAPRMachineSt=
-ate *spapr, Monitor *mon)
->      ics_pic_print_info(spapr->ics, mon);
->  }
+> @@ -210,6 +210,7 @@ static Object *spapr_irq_cpu_intc_create_xics(sPAPRMa=
+chineState *spapr,
+>  sPAPRIrq spapr_irq_xics =3D {
+>      .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
+>      .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
+> +    .ov5         =3D 0x0, /* XICS only */
 > =20
-> +static void spapr_irq_dt_populate_xics(sPAPRMachineState *spapr,
-> +                                       uint32_t nr_servers, void *fdt,
-> +                                       uint32_t phandle)
-> +{
-> +    spapr_dt_xics(nr_servers, fdt, phandle);
-> +}
-> +
-
-It'd be nicer to change the signature of spapr_dt_xics, rather than
-having this one line wrapper.
-
->  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
->  #define SPAPR_IRQ_XICS_NR_MSIS     \
->      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-> @@ -203,6 +210,7 @@ sPAPRIrq spapr_irq_xics =3D {
->      .free        =3D spapr_irq_free_xics,
->      .qirq        =3D spapr_qirq_xics,
->      .print_info  =3D spapr_irq_print_info_xics,
-> +    .dt_populate =3D spapr_irq_dt_populate_xics,
->  };
+>      .init        =3D spapr_irq_init_xics,
+>      .claim       =3D spapr_irq_claim_xics,
+> @@ -341,6 +342,7 @@ static Object *spapr_irq_cpu_intc_create_xive(sPAPRMa=
+chineState *spapr,
+>  sPAPRIrq spapr_irq_xive =3D {
+>      .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
+>      .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
+> +    .ov5         =3D 0x40, /* XIVE exploitation mode only */
 > =20
->   /*
-> @@ -300,6 +308,13 @@ static void spapr_irq_print_info_xive(sPAPRMachineSt=
-ate *spapr,
->      spapr_xive_pic_print_info(spapr->xive, mon);
->  }
+>      .init        =3D spapr_irq_init_xive,
+>      .claim       =3D spapr_irq_claim_xive,
+> @@ -447,6 +449,7 @@ int spapr_irq_find(sPAPRMachineState *spapr, int num,=
+ bool align, Error **errp)
+>  sPAPRIrq spapr_irq_xics_legacy =3D {
+>      .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+>      .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+> +    .ov5         =3D 0x0, /* XICS only */
 > =20
-> +static void spapr_irq_dt_populate_xive(sPAPRMachineState *spapr,
-> +                                       uint32_t nr_servers, void *fdt,
-> +                                       uint32_t phandle)
-> +{
-> +    spapr_dt_xive(spapr->xive, nr_servers, fdt, phandle);
-
-Uh.. and to make the hook signature just match what we need rather
-than having to have trivial wrappers in both cases.
-
-> +}
-> +
->  /*
->   * XIVE uses the full IRQ number space. Set it to 8K to be compatible
->   * with XICS.
-> @@ -317,6 +332,7 @@ sPAPRIrq spapr_irq_xive =3D {
->      .free        =3D spapr_irq_free_xive,
->      .qirq        =3D spapr_qirq_xive,
->      .print_info  =3D spapr_irq_print_info_xive,
-> +    .dt_populate =3D spapr_irq_dt_populate_xive,
->  };
-> =20
->  /*
-> @@ -421,4 +437,5 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
->      .free        =3D spapr_irq_free_xics,
->      .qirq        =3D spapr_qirq_xics,
->      .print_info  =3D spapr_irq_print_info_xics,
-> +    .dt_populate =3D spapr_irq_dt_populate_xics,
->  };
+>      .init        =3D spapr_irq_init_xics,
+>      .claim       =3D spapr_irq_claim_xics,
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -267,24 +194,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---1y/7ip9Z0l6NTTti
+--pgNHpQPJFoUYTAIP
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv+GjsACgkQbDjKyiDZ
-s5LNlA//XQCzct6/3OO/PAk28WReBO+G7OOhIuu8chvUvNmeiPDy1rRbrmi6cQW+
-ku9KfT27yLQ+d99bpEpfVSyRj6ycBbgBA0um1eVfX3dpeZzVHPGd0RSRgJHgHuXQ
-QyEnE0eWYpvLGqevI3LDJD4coMF1/WQ9xb25A8fG0EN+iXsdmYxOPrmA08YmJVhN
-4mTayIzq77JG1QIOz9qcRW/zErKDyvjPYOZU6ON6IRpgEhMSUl9upMYY/7VmeEIy
-K35BqAercTzlxKsCFzK/OM3i9eTjeVmicIIB2+4BLLo6KUGmNw8Rgnjf4vDNcS6j
-dOoor7xBR9XM5dXNomxdjSK09S5bfKRPk9OyR7xJgfZn4LCo25AXx6wj475QKYbE
-IsviS6kMDzEDcTIwUEiRtUw/NE+hrczW7oVSS5hHzL7Wrqrm/W3Ov8EZfD9JiTG9
-bUoPe7Z+UrLo5mi9fA/7dF2zSug0idWr1ugUpF9vl/Ao1wwWjxM26pyVieu+Kq4x
-b0cFaZLpBG+Qvd9Kp2+unN02PaUUtxtiHe2IfpYX9X0v1p4sQKvI6RuWR2Voew4L
-DWkyTI4ksP40NYWV3EofF22DsC1LIe/FS9tqX1uk8wILn5XUEB95kyqQrpCuZO2g
-H3V+IwpHmYYbRmsh+p3kB4NN4FaYQ1UdySgisRHcCJwOFhlPfhk=
-=4thP
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv+HNEACgkQbDjKyiDZ
+s5ITHxAAgO6lcCgPWmIjON55JbojfxdysEttTrdR1lwPPThvfKzbvBgiTbTfnpJA
+rUfA+UT6QWxYnOy2A/YwYsnOwLsRcITG2eqnC04CE+e//BRkvqdoART8F1ZMIANO
+tV7zW5vjeQiefN3JPFqsAqAVQJvEDhcYFipH82x0AwiSX/kygDxZLFa/O6yq0gOK
+gFqySNmFZFUgOHIbq1HDZJ8LUmyQlk1Alwg+NTHpvJx6khYTafiVAbS1XPFjD2AD
+4x66vtMlqvdV0gq36sag6FfcWE9k4Ri3mIk2qCmmvm6vD4rM0uuVHHRpf0D+eDLl
+ImGX6Y2fdoMMHC6CwPqAc1RASn7i55NQLSGxa4ds0NoMjaf5LCYKmaL7lvMvpesf
+EbYt8+13DgXYKCTYjFLxymzGZjmycpyLKX+tnZMoR41oMx8s9nvTY4BJoPfn4yaz
+0FLgV+9IxcZ6+2eiiGpMko8mKNPcZ/vJe95iijTGlge7nd/M0Rf61ji9bHkiGh2U
++FulGN33LIuRZlu8mzVhHxWHfLyEAXC9YNT5Cp8BR9TvgMldOJAhw6lBOJsqNFEQ
+rBzVR8V2CDGO3dep2ps/Ib4X15Rqu+f7VUT1sEIY8VEtNtWK3Kg+eWCBbC+fkvOT
+JbjwjPRH0vOrCVzSR1PHnJ+jhL4gN5T4aG8q/StRIdqzWzdL0oA=
+=AKnv
 -----END PGP SIGNATURE-----
 
---1y/7ip9Z0l6NTTti--
+--pgNHpQPJFoUYTAIP--
