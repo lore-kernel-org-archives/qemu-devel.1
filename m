@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gS8DQ-0006Br-Fx
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:21:56 -0500
+	(envelope-from <clg@kaod.org>) id 1gS8Id-0000aQ-Rv
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:27:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gS8DM-0000xm-70
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:21:52 -0500
-Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:34904)
+	(envelope-from <clg@kaod.org>) id 1gS8IZ-0007C4-W0
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:27:15 -0500
+Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:50066)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gS8DL-0000vn-NC
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:21:48 -0500
-Received: from player734.ha.ovh.net (unknown [10.109.146.137])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 0A69E107544
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 23:21:45 +0100 (CET)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gS8IX-00074s-7N
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:27:09 -0500
+Received: from player696.ha.ovh.net (unknown [10.109.146.5])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 57E8D171568
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 23:27:06 +0100 (CET)
 References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-17-clg@kaod.org>
-	<20181128042547.GZ2251@umbus.fritz.box>
+	<20181116105729.23240-18-clg@kaod.org>
+	<20181128043155.GA2251@umbus.fritz.box>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a57f6b4b-414e-efe7-475d-e6cbb87f61a8@kaod.org>
-Date: Wed, 28 Nov 2018 23:21:37 +0100
+Message-ID: <5877e247-5fcd-2939-adce-ed4492c5950b@kaod.org>
+Date: Wed, 28 Nov 2018 23:26:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181128042547.GZ2251@umbus.fritz.box>
+In-Reply-To: <20181128043155.GA2251@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 16/36] spapr: add hcalls support for the
- XIVE exploitation interrupt mode
+Subject: Re: [Qemu-devel] [PATCH v5 17/36] spapr: add device tree support
+ for the XIVE exploitation mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,1298 +36,256 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 11/28/18 5:25 AM, David Gibson wrote:
-> On Fri, Nov 16, 2018 at 11:57:09AM +0100, C=E9dric Le Goater wrote:
->> The different XIVE virtualization structures (sources and event queues=
-)
->> are configured with a set of Hypervisor calls :
+On 11/28/18 5:31 AM, David Gibson wrote:
+> On Fri, Nov 16, 2018 at 11:57:10AM +0100, C=E9dric Le Goater wrote:
+>> The XIVE interface for the guest is described in the device tree under
+>> the "interrupt-controller" node. A couple of new properties are
+>> specific to XIVE :
 >>
->>  - H_INT_GET_SOURCE_INFO
+>>  - "reg"
 >>
->>    used to obtain the address of the MMIO page of the Event State
->>    Buffer (ESB) entry associated with the source.
+>>    contains the base address and size of the thread interrupt
+>>    managnement areas (TIMA), for the User level and for the Guest OS
+>>    level. Only the Guest OS level is taken into account today.
 >>
->>  - H_INT_SET_SOURCE_CONFIG
+>>  - "ibm,xive-eq-sizes"
 >>
->>    assigns a source to a "target".
+>>    the size of the event queues. One cell per size supported, contains
+>>    log2 of size, in ascending order.
 >>
->>  - H_INT_GET_SOURCE_CONFIG
+>>  - "ibm,xive-lisn-ranges"
 >>
->>    determines which "target" and "priority" is assigned to a source
+>>    the IRQ interrupt number ranges assigned to the guest for the IPIs.
 >>
->>  - H_INT_GET_QUEUE_INFO
+>> and also under the root node :
 >>
->>    returns the address of the notification management page associated
->>    with the specified "target" and "priority".
+>>  - "ibm,plat-res-int-priorities"
 >>
->>  - H_INT_SET_QUEUE_CONFIG
+>>    contains a list of priorities that the hypervisor has reserved for
+>>    its own use. OPAL uses the priority 7 queue to automatically
+>>    escalate interrupts for all other queues (DD2.X POWER9). So only
+>>    priorities [0..6] are allowed for the guest.
 >>
->>    sets or resets the event queue for a given "target" and "priority".
->>    It is also used to set the notification configuration associated
->>    with the queue, only unconditional notification is supported for
->>    the moment. Reset is performed with a queue size of 0 and queueing
->>    is disabled in that case.
->>
->>  - H_INT_GET_QUEUE_CONFIG
->>
->>    returns the queue settings for a given "target" and "priority".
->>
->>  - H_INT_RESET
->>
->>    resets all of the guest's internal interrupt structures to their
->>    initial state, losing all configuration set via the hcalls
->>    H_INT_SET_SOURCE_CONFIG and H_INT_SET_QUEUE_CONFIG.
->>
->>  - H_INT_SYNC
->>
->>    issue a synchronisation on a source to make sure all notifications
->>    have reached their queue.
->>
->> Calls that still need to be addressed :
->>
->>    H_INT_SET_OS_REPORTING_LINE
->>    H_INT_GET_OS_REPORTING_LINE
->>
->> See the code for more documentation on each hcall.
+>> Extend the sPAPR IRQ backend with a new handler to populate the DT
+>> with the appropriate "interrupt-controller" node.
 >>
 >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 >> ---
->>  include/hw/ppc/spapr.h      |  15 +-
->>  include/hw/ppc/spapr_xive.h |   6 +
->>  hw/intc/spapr_xive_hcall.c  | 892 +++++++++++++++++++++++++++++++++++=
+>>  include/hw/ppc/spapr_irq.h  |  2 ++
+>>  include/hw/ppc/spapr_xive.h |  2 ++
+>>  hw/intc/spapr_xive_hcall.c  | 62 ++++++++++++++++++++++++++++++++++++=
 +
->>  hw/ppc/spapr_irq.c          |   2 +
->>  hw/intc/Makefile.objs       |   2 +-
->>  5 files changed, 915 insertions(+), 2 deletions(-)
->>  create mode 100644 hw/intc/spapr_xive_hcall.c
+>>  hw/ppc/spapr.c              |  3 +-
+>>  hw/ppc/spapr_irq.c          | 17 ++++++++++
+>>  5 files changed, 85 insertions(+), 1 deletion(-)
 >>
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 1fbc2663e06c..8415faea7b82 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -452,7 +452,20 @@ struct sPAPRMachineState {
->>  #define H_INVALIDATE_PID        0x378
->>  #define H_REGISTER_PROC_TBL     0x37C
->>  #define H_SIGNAL_SYS_RESET      0x380
->> -#define MAX_HCALL_OPCODE        H_SIGNAL_SYS_RESET
->> +
->> +#define H_INT_GET_SOURCE_INFO   0x3A8
->> +#define H_INT_SET_SOURCE_CONFIG 0x3AC
->> +#define H_INT_GET_SOURCE_CONFIG 0x3B0
->> +#define H_INT_GET_QUEUE_INFO    0x3B4
->> +#define H_INT_SET_QUEUE_CONFIG  0x3B8
->> +#define H_INT_GET_QUEUE_CONFIG  0x3BC
->> +#define H_INT_SET_OS_REPORTING_LINE 0x3C0
->> +#define H_INT_GET_OS_REPORTING_LINE 0x3C4
->> +#define H_INT_ESB               0x3C8
->> +#define H_INT_SYNC              0x3CC
->> +#define H_INT_RESET             0x3D0
->> +
->> +#define MAX_HCALL_OPCODE        H_INT_RESET
+>> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+>> index c854ae527808..cfdc1f86e713 100644
+>> --- a/include/hw/ppc/spapr_irq.h
+>> +++ b/include/hw/ppc/spapr_irq.h
+>> @@ -40,6 +40,8 @@ typedef struct sPAPRIrq {
+>>      void (*free)(sPAPRMachineState *spapr, int irq, int num);
+>>      qemu_irq (*qirq)(sPAPRMachineState *spapr, int irq);
+>>      void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
+>> +    void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_servers=
+,
+>> +                        void *fdt, uint32_t phandle);
+>>  } sPAPRIrq;
 >> =20
->>  /* The hcalls above are standardized in PAPR and implemented by pHyp
->>   * as well.
+>>  extern sPAPRIrq spapr_irq_xics;
 >> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
->> index 3f65b8f485fd..418511f3dc10 100644
+>> index 418511f3dc10..5b3fab192d41 100644
 >> --- a/include/hw/ppc/spapr_xive.h
 >> +++ b/include/hw/ppc/spapr_xive.h
->> @@ -60,4 +60,10 @@ int spapr_xive_target_to_end(sPAPRXive *xive, uint3=
-2_t target, uint8_t prio,
->>  int spapr_xive_cpu_to_end(sPAPRXive *xive, PowerPCCPU *cpu, uint8_t p=
-rio,
->>                            uint8_t *out_end_blk, uint32_t *out_end_idx=
-);
+>> @@ -65,5 +65,7 @@ bool spapr_xive_priority_is_valid(uint8_t priority);
+>>  typedef struct sPAPRMachineState sPAPRMachineState;
 >> =20
->> +bool spapr_xive_priority_is_valid(uint8_t priority);
->=20
-> AFAICT this could be a local function.
-
-the KVM model uses it also, when collecting state from the KVM device=20
-to build the QEMU ENDT.
-
->> +
->> +typedef struct sPAPRMachineState sPAPRMachineState;
->> +
->> +void spapr_xive_hcall_init(sPAPRMachineState *spapr);
->> +
+>>  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
+>> +void spapr_dt_xive(sPAPRXive *xive, int nr_servers, void *fdt,
+>> +                   uint32_t phandle);
+>> =20
 >>  #endif /* PPC_SPAPR_XIVE_H */
 >> diff --git a/hw/intc/spapr_xive_hcall.c b/hw/intc/spapr_xive_hcall.c
->> new file mode 100644
->> index 000000000000..52e4e23995f5
->> --- /dev/null
+>> index 52e4e23995f5..66c78aa88500 100644
+>> --- a/hw/intc/spapr_xive_hcall.c
 >> +++ b/hw/intc/spapr_xive_hcall.c
->> @@ -0,0 +1,892 @@
->> +/*
->> + * QEMU PowerPC sPAPR XIVE interrupt controller model
->> + *
->> + * Copyright (c) 2017-2018, IBM Corporation.
->> + *
->> + * This code is licensed under the GPL version 2 or later. See the
->> + * COPYING file in the top-level directory.
->> + */
+>> @@ -890,3 +890,65 @@ void spapr_xive_hcall_init(sPAPRMachineState *spa=
+pr)
+>>      spapr_register_hypercall(H_INT_SYNC, h_int_sync);
+>>      spapr_register_hypercall(H_INT_RESET, h_int_reset);
+>>  }
 >> +
->> +#include "qemu/osdep.h"
->> +#include "qemu/log.h"
->> +#include "qapi/error.h"
->> +#include "cpu.h"
->> +#include "hw/ppc/fdt.h"
->> +#include "hw/ppc/spapr.h"
->> +#include "hw/ppc/spapr_xive.h"
->> +#include "hw/ppc/xive_regs.h"
->> +#include "monitor/monitor.h"
->=20
-> Fwiw, I don't think it's particularly necessary to split the hcall
-> handling out into a separate .c file.
-
-ok. let's move it to spapr_xive then ? It might help in reducing the=20
-exported funtions.=20
-
->> +/*
->> + * OPAL uses the priority 7 EQ to automatically escalate interrupts
->> + * for all other queues (DD2.X POWER9). So only priorities [0..6] are
->> + * available for the guest.
->=20
-> Referencing OPAL behaviour doesn't really make sense in the context of
-> PAPR. =20
-
-It's an OPAL constraint which pHyp doesn't have. So its a QEMU/KVM=20
-constraint also.
-
-> What I think you're getting at is that the PAPR spec only
-> allows a PAPR guest to use priorities 0..6 (or at least it will if the
-> XIVE updated spec ever gets published). =20
-
-It's not in the spec. the XIVE sPAPR spec should be frozen soon btw.=20
-=20
-> The fact that this allows the
-> host use 7 for escalations is a design rationale=20
-> but not really relevant to the guest device itself.=20
-
-The guest should be aware of which priorities are reserved for
-the hypervisor though.
-
->> + */
->> +bool spapr_xive_priority_is_valid(uint8_t priority)
+>> +void spapr_dt_xive(sPAPRXive *xive, int nr_servers, void *fdt, uint32=
+_t phandle)
 >> +{
->> +    switch (priority) {
->> +    case 0 ... 6:
->> +        return true;
->> +    case 7: /* OPAL escalation queue */
->> +    default:
->> +        return false;
->> +    }
->> +}
->> +
->> +/*
->> + * The H_INT_GET_SOURCE_INFO hcall() is used to obtain the logical
->> + * real address of the MMIO page through which the Event State Buffer
->> + * entry associated with the value of the "lisn" parameter is managed=
-.
->> + *
->> + * Parameters:
->> + * Input
->> + * - "flags"
->> + *       Bits 0-63 reserved
->> + * - "lisn" is per "interrupts", "interrupt-map", or
->> + *       "ibm,xive-lisn-ranges" properties, or as returned by the
->> + *       ibm,query-interrupt-source-number RTAS call, or as returned
->> + *       by the H_ALLOCATE_VAS_WINDOW hcall
->=20
-> I've not heard of H_ALLOCATE_VAS_WINDOW.  Is that something we intend
-> to implement in kvm/qemu, or is it only of interest for PowerVM?
-
-The hcall is part of the PAPR NX Interfaces and it returns interrupt
-numbers. I don't know if any work has been done on the topic. =20
-=20
-> Also, putting the register numbers on the inputs as well as the
-> outputs would be helpful.
-
-yes. I will add them.
-
->> + *
->> + * Output
->> + * - R4: "flags"
->> + *       Bits 0-59: Reserved
->> + *       Bit 60: H_INT_ESB must be used for Event State Buffer
->> + *               management
->> + *       Bit 61: 1 =3D=3D LSI  0 =3D=3D MSI
->> + *       Bit 62: the full function page supports trigger
->> + *       Bit 63: Store EOI Supported
->> + * - R5: Logical Real address of full function Event State Buffer
->> + *       management page, -1 if ESB hcall flag is set to 1.
->=20
-> You've defined what H_INT_ESB means above, so it will be clearer if
-> you reference that by name here.
-
-yes.=20
-
->> + * - R6: Logical Real Address of trigger only Event State Buffer
->> + *       management page or -1.
->> + * - R7: Power of 2 page size for the ESB management pages returned i=
-n
->> + *       R5 and R6.
->> + */
->> +
->> +#define SPAPR_XIVE_SRC_H_INT_ESB     PPC_BIT(60) /* ESB manage with H=
-_INT_ESB */
->> +#define SPAPR_XIVE_SRC_LSI           PPC_BIT(61) /* Virtual LSI type =
-*/
->> +#define SPAPR_XIVE_SRC_TRIGGER       PPC_BIT(62) /* Trigger and manag=
-ement
->> +                                                    on same page */
->> +#define SPAPR_XIVE_SRC_STORE_EOI     PPC_BIT(63) /* Store EOI support=
- */
->=20
-> Probably makes sense to put these #defines in spapr.h since they form
-> part of the PAPR interface definition.
-
-ok.
-
->=20
->> +static target_ulong h_int_get_source_info(PowerPCCPU *cpu,
->> +                                          sPAPRMachineState *spapr,
->> +                                          target_ulong opcode,
->> +                                          target_ulong *args)
->> +{
->> +    sPAPRXive *xive =3D spapr->xive;
->> +    XiveSource *xsrc =3D &xive->source;
->> +    XiveEAS eas;
->> +    target_ulong flags  =3D args[0];
->> +    target_ulong lisn   =3D args[1];
->> +
->> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        return H_FUNCTION;
->> +    }
->> +
->> +    if (flags) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    if (xive_router_get_eas(XIVE_ROUTER(xive), lisn, &eas)) {
->> +        return H_P2;
->> +    }
->> +
->> +    if (!(eas.w & EAS_VALID)) {
->> +        return H_P2;
->> +    }
->> +
->> +    /* All sources are emulated under the main XIVE object and share
->> +     * the same characteristics.
+>> +    int node;
+>> +    uint64_t timas[2 * 2];
+>> +    /* Interrupt number ranges for the IPIs */
+>> +    uint32_t lisn_ranges[] =3D {
+>> +        cpu_to_be32(0),
+>> +        cpu_to_be32(nr_servers),
+>> +    };
+>> +    uint32_t eq_sizes[] =3D {
+>> +        cpu_to_be32(12), /* 4K */
+>> +        cpu_to_be32(16), /* 64K */
+>> +        cpu_to_be32(21), /* 2M */
+>> +        cpu_to_be32(24), /* 16M */
+>> +    };
+>> +    /* The following array is in sync with the 'spapr_xive_priority_i=
+s_valid'
+>> +     * routine above. The O/S is expected to choose priority 6.
 >> +     */
->> +    args[0] =3D 0;
->> +    if (!xive_source_esb_has_2page(xsrc)) {
->> +        args[0] |=3D SPAPR_XIVE_SRC_TRIGGER;
->> +    }
->> +    if (xsrc->esb_flags & XIVE_SRC_STORE_EOI) {
->> +        args[0] |=3D SPAPR_XIVE_SRC_STORE_EOI;
->> +    }
+>> +    uint32_t plat_res_int_priorities[] =3D {
+>> +        cpu_to_be32(7),    /* start */
+>> +        cpu_to_be32(0xf8), /* count */
+>> +    };
+>> +    gchar *nodename;
 >> +
->> +    /*
->> +     * Force the use of the H_INT_ESB hcall in case of an LSI
->> +     * interrupt. This is necessary under KVM to re-trigger the
->> +     * interrupt if the level is still asserted
+>> +    /* Thread Interrupt Management Area : User (ring 3) and OS (ring =
+2) */
+>> +    timas[0] =3D cpu_to_be64(xive->tm_base + 3 * (1ull << TM_SHIFT));
+>> +    timas[1] =3D cpu_to_be64(1ull << TM_SHIFT);
+>> +    timas[2] =3D cpu_to_be64(xive->tm_base + 2 * (1ull << TM_SHIFT));
+>=20
+> Don't you have symbolic constants for the ring numbers, instead of '2'
+> and '3' above?
+
+I have offsets in the TIMA, 0x0, 0x10, ... We could add constants
+for the ring numbers as they are used in the TIMA memory ops.
+=20
+>=20
+>> +    timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
+>> +
+>> +    nodename =3D g_strdup_printf("interrupt-controller@%" PRIx64,
+>> +                               xive->tm_base + 3 * (1 << TM_SHIFT));
+>> +    _FDT(node =3D fdt_add_subnode(fdt, 0, nodename));
+>> +    g_free(nodename);
+>> +
+>> +    _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
+>> +    _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
+>> +
+>> +    _FDT(fdt_setprop_string(fdt, node, "compatible", "ibm,power-ivpe"=
+));
+>> +    _FDT(fdt_setprop(fdt, node, "ibm,xive-eq-sizes", eq_sizes,
+>> +                     sizeof(eq_sizes)));
+>> +    _FDT(fdt_setprop(fdt, node, "ibm,xive-lisn-ranges", lisn_ranges,
+>> +                     sizeof(lisn_ranges)));
+>> +
+>> +    /* For Linux to link the LSIs to the main interrupt controller.
+>=20
+> What's the "main interrupt controller" in this context?
+
+There is only one. This is just how it is reference in the Linux code. =20
+I will remove the comment.
+
+>=20
+>> +     * These properties are not in XIVE exploitation mode sPAPR
+>> +     * specs
+
+These properties have been added now.
+
 >> +     */
->> +    if (xive_source_irq_is_lsi(xsrc, lisn)) {
->> +        args[0] |=3D SPAPR_XIVE_SRC_H_INT_ESB | SPAPR_XIVE_SRC_LSI;
->> +    }
+>> +    _FDT(fdt_setprop(fdt, node, "interrupt-controller", NULL, 0));
+>> +    _FDT(fdt_setprop_cell(fdt, node, "#interrupt-cells", 2));
 >> +
->> +    if (!(args[0] & SPAPR_XIVE_SRC_H_INT_ESB)) {
->> +        args[1] =3D xive->vc_base + xive_source_esb_mgmt(xsrc, lisn);
->> +    } else {
->> +        args[1] =3D -1;
->> +    }
+>> +    /* For SLOF */
+>> +    _FDT(fdt_setprop_cell(fdt, node, "linux,phandle", phandle));
+>> +    _FDT(fdt_setprop_cell(fdt, node, "phandle", phandle));
 >> +
->> +    if (xive_source_esb_has_2page(xsrc)) {
->> +        args[2] =3D xive->vc_base + xive_source_esb_page(xsrc, lisn);
->> +    } else {
->> +        args[2] =3D -1;
->> +    }
->=20
-> Do we also need to keep this address clear in the H_INT_ESB case?
-
-I think not, but the specs are not very clear on that topic. I will
-ask for clarification and use a -1 for now. We can not do loads on
-the trigger page so it can not be used by the H_INT_ESB hcall.
-
->=20
->> +    args[3] =3D TARGET_PAGE_SIZE;
->=20
-> That seems wrong. =20
-
-This is utterly wrong. it should be a power of 2 number ... I got
-it right under KVM though. I guess that ioremap() under Linux rounds=20
-up the size to the page size in use, so, that's why it didn't blow
-up under TCG.
-
-> TARGET_PAGE_SIZE is generally 4kiB, but won't these usually
-> actually be 64kiB?
-
-yes. So what should I use to get a PAGE_SHIFT instead ?=20
-=20
->> +
->> +    return H_SUCCESS;
->> +}
->> +
->> +/*
->> + * The H_INT_SET_SOURCE_CONFIG hcall() is used to assign a Logical
->> + * Interrupt Source to a target. The Logical Interrupt Source is
->> + * designated with the "lisn" parameter and the target is designated
->> + * with the "target" and "priority" parameters.  Upon return from the
->> + * hcall(), no additional interrupts will be directed to the old EQ.
->> + *
->> + * TODO: The old EQ should be investigated for interrupts that
->> + * occurred prior to or during the hcall().
->=20
-> Isn't that the responsibility of the guest?
-
-It should yes.
-
->=20
->> + *
->> + * Parameters:
->> + * Input:
->> + * - "flags"
->> + *      Bits 0-61: Reserved
->> + *      Bit 62: set the "eisn" in the EA
->=20
-> What's the "EA"?  Do you mean the EAS?
-
-Another XIVE acronym, EA for Event Assignment. I think we can forget
-this one and just use EAS.
-=20
->=20
->> + *      Bit 63: masks the interrupt source in the hardware interrupt
->> + *      control structure. An interrupt masked by this mechanism will
->> + *      be dropped, but it's source state bits will still be
->> + *      set. There is no race-free way of unmasking and restoring the
->> + *      source. Thus this should only be used in interrupts that are
->> + *      also masked at the source, and only in cases where the
->> + *      interrupt is not meant to be used for a large amount of time
->> + *      because no valid target exists for it for example
->> + * - "lisn" is per "interrupts", "interrupt-map", or
->> + *      "ibm,xive-lisn-ranges" properties, or as returned by the
->> + *      ibm,query-interrupt-source-number RTAS call, or as returned b=
+>> +    /* The "ibm,plat-res-int-priorities" property defines the priorit=
 y
->> + *      the H_ALLOCATE_VAS_WINDOW hcall
->> + * - "target" is per "ibm,ppc-interrupt-server#s" or
->> + *      "ibm,ppc-interrupt-gserver#s"
->> + * - "priority" is a valid priority not in
->> + *      "ibm,plat-res-int-priorities"
->> + * - "eisn" is the guest EISN associated with the "lisn"
->=20
-> I don't think the EISN term has been used before in the series. =20
-
-Effective Interrupt Source Number, which is the event data enqueued
-in the OS EQ.
-
-I'm planning on adding some more acronyms used by the sPAPR hcalls
-in this file. There are only a couple.
-=20
-> I'm guessing this is the guest-assigned global interrupt number?
-
-yes=20
-
->> + *
->> + * Output:
->> + * - None
->> + */
->> +
->> +#define SPAPR_XIVE_SRC_SET_EISN PPC_BIT(62)
->> +#define SPAPR_XIVE_SRC_MASK     PPC_BIT(63)
->> +
->> +static target_ulong h_int_set_source_config(PowerPCCPU *cpu,
->> +                                            sPAPRMachineState *spapr,
->> +                                            target_ulong opcode,
->> +                                            target_ulong *args)
->> +{
->> +    sPAPRXive *xive =3D spapr->xive;
->> +    XiveRouter *xrtr =3D XIVE_ROUTER(xive);
->> +    XiveEAS eas, new_eas;
->> +    target_ulong flags    =3D args[0];
->> +    target_ulong lisn     =3D args[1];
->> +    target_ulong target   =3D args[2];
->> +    target_ulong priority =3D args[3];
->> +    target_ulong eisn     =3D args[4];
->> +    uint8_t end_blk;
->> +    uint32_t end_idx;
->> +
->> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        return H_FUNCTION;
->> +    }
->> +
->> +    if (flags & ~(SPAPR_XIVE_SRC_SET_EISN | SPAPR_XIVE_SRC_MASK)) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    if (xive_router_get_eas(xrtr, lisn, &eas)) {
->> +        return H_P2;
->> +    }
->> +
->> +    if (!(eas.w & EAS_VALID)) {
->> +        return H_P2;
->> +    }
->> +
->> +    /* priority 0xff is used to reset the EAS */
->> +    if (priority =3D=3D 0xff) {
->> +        new_eas.w =3D EAS_VALID | EAS_MASKED;
->> +        goto out;
->> +    }
->> +
->> +    if (flags & SPAPR_XIVE_SRC_MASK) {
->> +        new_eas.w =3D eas.w | EAS_MASKED;
->> +    } else {
->> +        new_eas.w =3D eas.w & ~EAS_MASKED;
->> +    }
->> +
->> +    if (!spapr_xive_priority_is_valid(priority)) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid priority %ld re=
-quested\n",
->> +                      priority);
->> +        return H_P4;
->> +    }
->> +
->> +    /* Validate that "target" is part of the list of threads allocate=
-d
->> +     * to the partition. For that, find the END corresponding to the
->> +     * target.
+>> +     * ranges reserved by the hypervisor
 >> +     */
->> +    if (spapr_xive_target_to_end(xive, target, priority, &end_blk, &e=
-nd_idx)) {
->> +        return H_P3;
->> +    }
->> +
->> +    new_eas.w =3D SETFIELD(EAS_END_BLOCK, new_eas.w, end_blk);
->> +    new_eas.w =3D SETFIELD(EAS_END_INDEX, new_eas.w, end_idx);
->> +
->> +    if (flags & SPAPR_XIVE_SRC_SET_EISN) {
->> +        new_eas.w =3D SETFIELD(EAS_END_DATA, new_eas.w, eisn);
->> +    }
->> +
->> +out:
->> +    if (xive_router_set_eas(xrtr, lisn, &new_eas)) {
->> +        return H_HARDWARE;
->> +    }
->=20
-> As noted earlier in the series, the spapr specific code owns the
-> memory backing the EAT, so you can just access it directly rather than
-> using a method here.
-
-Yes. I will give a try. I wonder if I need accessors for the tables ?=20
-
->=20
->> +
->> +    return H_SUCCESS;
+>> +    _FDT(fdt_setprop(fdt, 0, "ibm,plat-res-int-priorities",
+>> +                     plat_res_int_priorities, sizeof(plat_res_int_pri=
+orities)));
 >> +}
->> +
->> +/*
->> + * The H_INT_GET_SOURCE_CONFIG hcall() is used to determine to which
->> + * target/priority pair is assigned to the specified Logical Interrup=
-t
->> + * Source.
->> + *
->> + * Parameters:
->> + * Input:
->> + * - "flags"
->> + *      Bits 0-63 Reserved
->> + * - "lisn" is per "interrupts", "interrupt-map", or
->> + *      "ibm,xive-lisn-ranges" properties, or as returned by the
->> + *      ibm,query-interrupt-source-number RTAS call, or as
->> + *      returned by the H_ALLOCATE_VAS_WINDOW hcall
->> + *
->> + * Output:
->> + * - R4: Target to which the specified Logical Interrupt Source is
->> + *       assigned
->> + * - R5: Priority to which the specified Logical Interrupt Source is
->> + *       assigned
->> + * - R6: EISN for the specified Logical Interrupt Source (this will b=
-e
->> + *       equivalent to the LISN if not changed by H_INT_SET_SOURCE_CO=
-NFIG)
->> + */
->> +static target_ulong h_int_get_source_config(PowerPCCPU *cpu,
->> +                                            sPAPRMachineState *spapr,
->> +                                            target_ulong opcode,
->> +                                            target_ulong *args)
->> +{
->> +    sPAPRXive *xive =3D spapr->xive;
->> +    XiveRouter *xrtr =3D XIVE_ROUTER(xive);
->> +    target_ulong flags =3D args[0];
->> +    target_ulong lisn =3D args[1];
->> +    XiveEAS eas;
->> +    XiveEND end;
->> +    uint8_t end_blk, nvt_blk;
->> +    uint32_t end_idx, nvt_idx;
->> +
->> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        return H_FUNCTION;
->> +    }
->> +
->> +    if (flags) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    if (xive_router_get_eas(xrtr, lisn, &eas)) {
->> +        return H_P2;
->> +    }
->> +
->> +    if (!(eas.w & EAS_VALID)) {
->> +        return H_P2;
->> +    }
->> +
->> +    end_blk =3D GETFIELD(EAS_END_BLOCK, eas.w);
->> +    end_idx =3D GETFIELD(EAS_END_INDEX, eas.w);
->> +    if (xive_router_get_end(xrtr, end_blk, end_idx, &end)) {
->> +        /* Not sure what to return here */
->> +        return H_HARDWARE;
->=20
-> IIUC this indicates a bug in the PAPR specific code, not the guest, so
-> an assert() is probably the right answer.
-
-ok
-
->> +    }
->> +
->> +    nvt_blk =3D GETFIELD(END_W6_NVT_BLOCK, end.w6);
->> +    nvt_idx =3D GETFIELD(END_W6_NVT_INDEX, end.w6);
->> +    args[0] =3D spapr_xive_nvt_to_target(xive, nvt_blk, nvt_idx);
->=20
-> AIUI there's a specific END for each target & priority, so you could
-> avoid this second level lookup,=20
-
-yes=20
-
-> although I guess this might be
-> valuable if we do more complicated internal routing in the future.
-
-I am not sure of that but I'd rather keep these converting helpers
-for the moment.
-=20
->> +    if (eas.w & EAS_MASKED) {
->> +        args[1] =3D 0xff;
->> +    } else {
->> +        args[1] =3D GETFIELD(END_W7_F0_PRIORITY, end.w7);
->> +    }
->> +
->> +    args[2] =3D GETFIELD(EAS_END_DATA, eas.w);
->> +
->> +    return H_SUCCESS;
->> +}
->> +
->> +/*
->> + * The H_INT_GET_QUEUE_INFO hcall() is used to get the logical real
->> + * address of the notification management page associated with the
->> + * specified target and priority.
->> + *
->> + * Parameters:
->> + * Input:
->> + * - "flags"
->> + *       Bits 0-63 Reserved
->> + * - "target" is per "ibm,ppc-interrupt-server#s" or
->> + *       "ibm,ppc-interrupt-gserver#s"
->> + * - "priority" is a valid priority not in
->> + *       "ibm,plat-res-int-priorities"
->> + *
->> + * Output:
->> + * - R4: Logical real address of notification page
->> + * - R5: Power of 2 page size of the notification page
->> + */
->> +static target_ulong h_int_get_queue_info(PowerPCCPU *cpu,
->> +                                         sPAPRMachineState *spapr,
->> +                                         target_ulong opcode,
->> +                                         target_ulong *args)
->> +{
->> +    sPAPRXive *xive =3D spapr->xive;
->> +    XiveENDSource *end_xsrc =3D &xive->end_source;
->> +    target_ulong flags =3D args[0];
->> +    target_ulong target =3D args[1];
->> +    target_ulong priority =3D args[2];
->> +    XiveEND end;
->> +    uint8_t end_blk;
->> +    uint32_t end_idx;
->> +
->> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        return H_FUNCTION;
->> +    }
->> +
->> +    if (flags) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    /*
->> +     * H_STATE should be returned if a H_INT_RESET is in progress.
->> +     * This is not needed when running the emulation under QEMU
->> +     */
->> +
->> +    if (!spapr_xive_priority_is_valid(priority)) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid priority %ld re=
-quested\n",
->> +                      priority);
->> +        return H_P3;
->> +    }
->> +
->> +    /* Validate that "target" is part of the list of threads allocate=
-d
->> +     * to the partition. For that, find the END corresponding to the
->> +     * target.
->> +     */
->> +    if (spapr_xive_target_to_end(xive, target, priority, &end_blk, &e=
-nd_idx)) {
->> +        return H_P2;
->> +    }
->> +
->> +    if (xive_router_get_end(XIVE_ROUTER(xive), end_blk, end_idx, &end=
-)) {
->> +        return H_HARDWARE;
->> +    }
->> +
->> +    args[0] =3D xive->end_base + (1ull << (end_xsrc->esb_shift + 1)) =
-* end_idx;
->> +    if (end.w0 & END_W0_ENQUEUE) {
->> +        args[1] =3D GETFIELD(END_W0_QSIZE, end.w0) + 12;
->> +    } else {
->> +        args[1] =3D 0;
->> +    }
->> +    return H_SUCCESS;
->> +}
->> +
->> +/*
->> + * The H_INT_SET_QUEUE_CONFIG hcall() is used to set or reset a EQ fo=
-r
->> + * a given "target" and "priority".  It is also used to set the
->> + * notification config associated with the EQ.  An EQ size of 0 is
->> + * used to reset the EQ config for a given target and priority. If
->> + * resetting the EQ config, the END associated with the given "target=
-"
->> + * and "priority" will be changed to disable queueing.
->> + *
->> + * Upon return from the hcall(), no additional interrupts will be
->> + * directed to the old EQ (if one was set). The old EQ (if one was
->> + * set) should be investigated for interrupts that occurred prior to
->> + * or during the hcall().
->> + *
->> + * Parameters:
->> + * Input:
->> + * - "flags"
->> + *      Bits 0-62: Reserved
->> + *      Bit 63: Unconditional Notify (n) per the XIVE spec
->> + * - "target" is per "ibm,ppc-interrupt-server#s" or
->> + *       "ibm,ppc-interrupt-gserver#s"
->> + * - "priority" is a valid priority not in
->> + *       "ibm,plat-res-int-priorities"
->> + * - "eventQueue": The logical real address of the start of the EQ
->> + * - "eventQueueSize": The power of 2 EQ size per "ibm,xive-eq-sizes"
->> + *
->> + * Output:
->> + * - None
->> + */
->> +
->> +#define SPAPR_XIVE_END_ALWAYS_NOTIFY PPC_BIT(63)
->> +
->> +static target_ulong h_int_set_queue_config(PowerPCCPU *cpu,
->> +                                           sPAPRMachineState *spapr,
->> +                                           target_ulong opcode,
->> +                                           target_ulong *args)
->> +{
->> +    sPAPRXive *xive =3D spapr->xive;
->> +    XiveRouter *xrtr =3D XIVE_ROUTER(xive);
->> +    target_ulong flags =3D args[0];
->> +    target_ulong target =3D args[1];
->> +    target_ulong priority =3D args[2];
->> +    target_ulong qpage =3D args[3];
->> +    target_ulong qsize =3D args[4];
->> +    XiveEND end;
->> +    uint8_t end_blk, nvt_blk;
->> +    uint32_t end_idx, nvt_idx;
->> +    uint32_t qdata;
->> +
->> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        return H_FUNCTION;
->> +    }
->> +
->> +    if (flags & ~SPAPR_XIVE_END_ALWAYS_NOTIFY) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    /*
->> +     * H_STATE should be returned if a H_INT_RESET is in progress.
->> +     * This is not needed when running the emulation under QEMU
->> +     */
->> +
->> +    if (!spapr_xive_priority_is_valid(priority)) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid priority %ld re=
-quested\n",
->> +                      priority);
->> +        return H_P3;
->> +    }
->> +
->> +    /* Validate that "target" is part of the list of threads allocate=
-d
->> +     * to the partition. For that, find the END corresponding to the
->> +     * target.
->> +     */
->> +
->> +    if (spapr_xive_target_to_end(xive, target, priority, &end_blk, &e=
-nd_idx)) {
->> +        return H_P2;
->> +    }
->> +
->> +    if (xive_router_get_end(xrtr, end_blk, end_idx, &end)) {
->> +        return H_HARDWARE;
->=20
-> Again, I think this indicates a qemu (spapr) code bug, so could be an a=
-ssert().
-
-ok
-
->=20
->> +    }
->> +
->> +    switch (qsize) {
->> +    case 12:
->> +    case 16:
->> +    case 21:
->> +    case 24:
->> +        end.w3 =3D ((uint64_t)qpage) & 0xffffffff;
->=20
-> It just occurred to me that I haven't been looking for this across any
-> of these reviews.  Don't you need byteswaps when accessing these
-> in-memory structures?
-
-yes this is done when some event data is enqueued in the EQ.
-
->=20
->> +        end.w2 =3D (((uint64_t)qpage)) >> 32 & 0x0fffffff;
->> +        end.w0 |=3D END_W0_ENQUEUE;
->> +        end.w0 =3D SETFIELD(END_W0_QSIZE, end.w0, qsize - 12);
->> +        break;
->> +    case 0:
->> +        /* reset queue and disable queueing */
->> +        xive_end_reset(&end);
->> +        goto out;
->> +
->> +    default:
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid EQ size %"PRIx6=
-4"\n",
->> +                      qsize);
->> +        return H_P5;
->> +    }
->> +
->> +    if (qsize) {
->> +        /*
->> +         * Let's validate the EQ address with a read of the first EQ
->> +         * entry. We could also check that the full queue has been
->> +         * zeroed by the OS.
->> +         */
->> +        if (address_space_read(&address_space_memory, qpage,
->> +                               MEMTXATTRS_UNSPECIFIED,
->> +                               (uint8_t *) &qdata, sizeof(qdata))) {
->> +            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to read EQ d=
-ata @0x%"
->> +                          HWADDR_PRIx "\n", qpage);
->> +            return H_P4;
->=20
-> Just checking the first entry doesn't seem entirely safe.  Using
-> address_space_map() and making sure the returned plen doesn't get
-> reduced below the queue size might be a better option.
-
-ok. That was on my todo list.
-
->=20
->> +        }
->> +    }
->> +
->> +    if (spapr_xive_target_to_nvt(xive, target, &nvt_blk, &nvt_idx)) {
->> +        return H_HARDWARE;
->=20
-> That could be caused by a bogus 'target' value, couldn't it? =20
-
-yes. It should have returned H_P2 above when spapr_xive_target_to_end()=20
-is called.
-
-> In which
-> case it a) should probably be checked earlier and b) should be
-> H_PARAMETER or similar, not H_HARDWARE, yes?
-
-H_P2 may be again. It should be checked earlier
-
->=20
->> +    }
->> +
->> +    /* Ensure the priority and target are correctly set (they will no=
-t
->> +     * be right after allocation)
->=20
-> AIUI there's a static association from END to target in the PAPR
-> model.=20
-
-yes. 8 priorities per cpu.
-
-> So it seems to make more sense to get that set up right at
-> initialization / reset, rather than doing it lazily when the=20
-> queue is configured.
-
-Ah. You would preconfigure the word6 and word7 then. Yes, it would
-save us some of the conversion fuss. I will look at it.
-
->> +     */
->> +    end.w6 =3D SETFIELD(END_W6_NVT_BLOCK, 0ul, nvt_blk) |
->> +        SETFIELD(END_W6_NVT_INDEX, 0ul, nvt_idx);
->> +    end.w7 =3D SETFIELD(END_W7_F0_PRIORITY, 0ul, priority);
->> +
->> +    if (flags & SPAPR_XIVE_END_ALWAYS_NOTIFY) {
->> +        end.w0 |=3D END_W0_UCOND_NOTIFY;
->> +    } else {
->> +        end.w0 &=3D ~END_W0_UCOND_NOTIFY;
->> +    }
->> +
->> +    /* The generation bit for the END starts at 1 and The END page
->> +     * offset counter starts at 0.
->> +     */
->> +    end.w1 =3D END_W1_GENERATION | SETFIELD(END_W1_PAGE_OFF, 0ul, 0ul=
-);
->> +    end.w0 |=3D END_W0_VALID;
->> +
->> +    /* TODO: issue syncs required to ensure all in-flight interrupts
->> +     * are complete on the old END */
->> +out:
->> +    /* Update END */
->> +    if (xive_router_set_end(xrtr, end_blk, end_idx, &end)) {
->> +        return H_HARDWARE;
->> +    }
->=20
-> Again the PAPR code owns the ENDs, so it can update them directly
-> rather than going through an abstraction.
-
-ok.
-
->=20
->> +
->> +    return H_SUCCESS;
->> +}
->> +
->> +/*
->> + * The H_INT_GET_QUEUE_CONFIG hcall() is used to get a EQ for a given
->> + * target and priority.
->> + *
->> + * Parameters:
->> + * Input:
->> + * - "flags"
->> + *      Bits 0-62: Reserved
->> + *      Bit 63: Debug: Return debug data
->> + * - "target" is per "ibm,ppc-interrupt-server#s" or
->> + *       "ibm,ppc-interrupt-gserver#s"
->> + * - "priority" is a valid priority not in
->> + *       "ibm,plat-res-int-priorities"
->> + *
->> + * Output:
->> + * - R4: "flags":
->> + *       Bits 0-61: Reserved
->> + *       Bit 62: The value of Event Queue Generation Number (g) per
->> + *              the XIVE spec if "Debug" =3D 1
->> + *       Bit 63: The value of Unconditional Notify (n) per the XIVE s=
-pec
->> + * - R5: The logical real address of the start of the EQ
->> + * - R6: The power of 2 EQ size per "ibm,xive-eq-sizes"
->> + * - R7: The value of Event Queue Offset Counter per XIVE spec
->> + *       if "Debug" =3D 1, else 0
->> + *
->> + */
->> +
->> +#define SPAPR_XIVE_END_DEBUG     PPC_BIT(63)
->> +
->> +static target_ulong h_int_get_queue_config(PowerPCCPU *cpu,
->> +                                           sPAPRMachineState *spapr,
->> +                                           target_ulong opcode,
->> +                                           target_ulong *args)
->> +{
->> +    sPAPRXive *xive =3D spapr->xive;
->> +    target_ulong flags =3D args[0];
->> +    target_ulong target =3D args[1];
->> +    target_ulong priority =3D args[2];
->> +    XiveEND end;
->> +    uint8_t end_blk;
->> +    uint32_t end_idx;
->> +
->> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        return H_FUNCTION;
->> +    }
->> +
->> +    if (flags & ~SPAPR_XIVE_END_DEBUG) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    /*
->> +     * H_STATE should be returned if a H_INT_RESET is in progress.
->> +     * This is not needed when running the emulation under QEMU
->> +     */
->> +
->> +    if (!spapr_xive_priority_is_valid(priority)) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid priority %ld re=
-quested\n",
->> +                      priority);
->> +        return H_P3;
->> +    }
->> +
->> +    /* Validate that "target" is part of the list of threads allocate=
-d
->> +     * to the partition. For that, find the END corresponding to the
->> +     * target.
->> +     */
->> +    if (spapr_xive_target_to_end(xive, target, priority, &end_blk, &e=
-nd_idx)) {
->> +        return H_P2;
->> +    }
->> +
->> +    if (xive_router_get_end(XIVE_ROUTER(xive), end_blk, end_idx, &end=
-)) {
->> +        return H_HARDWARE;
->=20
-> Again, assert() seems appropriate here.
-
-ok
-
->=20
->> +    }
->> +
->> +    args[0] =3D 0;
->> +    if (end.w0 & END_W0_UCOND_NOTIFY) {
->> +        args[0] |=3D SPAPR_XIVE_END_ALWAYS_NOTIFY;
->> +    }
->> +
->> +    if (end.w0 & END_W0_ENQUEUE) {
->> +        args[1] =3D
->> +            (((uint64_t)(end.w2 & 0x0fffffff)) << 32) | end.w3;
->> +        args[2] =3D GETFIELD(END_W0_QSIZE, end.w0) + 12;
->> +    } else {
->> +        args[1] =3D 0;
->> +        args[2] =3D 0;
->> +    }
->> +
->> +    /* TODO: do we need any locking on the END ? */
->> +    if (flags & SPAPR_XIVE_END_DEBUG) {
->> +        /* Load the event queue generation number into the return fla=
-gs */
->> +        args[0] |=3D (uint64_t)GETFIELD(END_W1_GENERATION, end.w1) <<=
- 62;
->> +
->> +        /* Load R7 with the event queue offset counter */
->> +        args[3] =3D GETFIELD(END_W1_PAGE_OFF, end.w1);
->> +    } else {
->> +        args[3] =3D 0;
->> +    }
->> +
->> +    return H_SUCCESS;
->> +}
->> +
->> +/*
->> + * The H_INT_SET_OS_REPORTING_LINE hcall() is used to set the
->> + * reporting cache line pair for the calling thread.  The reporting
->> + * cache lines will contain the OS interrupt context when the OS
->> + * issues a CI store byte to @TIMA+0xC10 to acknowledge the OS
->> + * interrupt. The reporting cache lines can be reset by inputting -1
->> + * in "reportingLine".  Issuing the CI store byte without reporting
->> + * cache lines registered will result in the data not being accessibl=
-e
->> + * to the OS.
->> + *
->> + * Parameters:
->> + * Input:
->> + * - "flags"
->> + *      Bits 0-63: Reserved
->> + * - "reportingLine": The logical real address of the reporting cache
->> + *    line pair
->> + *
->> + * Output:
->> + * - None
->> + */
->> +static target_ulong h_int_set_os_reporting_line(PowerPCCPU *cpu,
->> +                                                sPAPRMachineState *sp=
-apr,
->> +                                                target_ulong opcode,
->> +                                                target_ulong *args)
->> +{
->> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        return H_FUNCTION;
->> +    }
->> +
->> +    /*
->> +     * H_STATE should be returned if a H_INT_RESET is in progress.
->> +     * This is not needed when running the emulation under QEMU
->> +     */
->> +
->> +    /* TODO: H_INT_SET_OS_REPORTING_LINE */
->> +    return H_FUNCTION;
->> +}
->> +
->> +/*
->> + * The H_INT_GET_OS_REPORTING_LINE hcall() is used to get the logical
->> + * real address of the reporting cache line pair set for the input
->> + * "target".  If no reporting cache line pair has been set, -1 is
->> + * returned.
->> + *
->> + * Parameters:
->> + * Input:
->> + * - "flags"
->> + *      Bits 0-63: Reserved
->> + * - "target" is per "ibm,ppc-interrupt-server#s" or
->> + *       "ibm,ppc-interrupt-gserver#s"
->> + * - "reportingLine": The logical real address of the reporting cache
->> + *   line pair
->> + *
->> + * Output:
->> + * - R4: The logical real address of the reporting line if set, else =
--1
->> + */
->> +static target_ulong h_int_get_os_reporting_line(PowerPCCPU *cpu,
->> +                                                sPAPRMachineState *sp=
-apr,
->> +                                                target_ulong opcode,
->> +                                                target_ulong *args)
->> +{
->> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        return H_FUNCTION;
->> +    }
->> +
->> +    /*
->> +     * H_STATE should be returned if a H_INT_RESET is in progress.
->> +     * This is not needed when running the emulation under QEMU
->> +     */
->> +
->> +    /* TODO: H_INT_GET_OS_REPORTING_LINE */
->> +    return H_FUNCTION;
->> +}
->> +
->> +/*
->> + * The H_INT_ESB hcall() is used to issue a load or store to the ESB
->> + * page for the input "lisn".  This hcall is only supported for LISNs
->> + * that have the ESB hcall flag set to 1 when returned from hcall()
->> + * H_INT_GET_SOURCE_INFO.
->=20
-> Is there a reason for specifically restricting this to LISNs which
-> advertise it, rather than allowing it for anything?=20
-
-It's in the specs but I did not implement the check. So H_INT_ESB can be=20
-used today by the OS for any interrupt number. Same under KVM.
-
-But I should say so somewhere.
-
-> Obviously using
-> the direct MMIOs will generally be a faster option when possible, but
-> I could see occasions where it might be simpler for the guest to
-> always use H_INT_ESB (e.g. for micro-guests like kvm-unit-tests).
-
-can not you use direct load and stores in these guests ? I haven't=20
-looked at how they are implemented.
-
->=20
->> + * Parameters:
->> + * Input:
->> + * - "flags"
->> + *      Bits 0-62: Reserved
->> + *      bit 63: Store: Store=3D1, store operation, else load operatio=
-n
->> + * - "lisn" is per "interrupts", "interrupt-map", or
->> + *      "ibm,xive-lisn-ranges" properties, or as returned by the
->> + *      ibm,query-interrupt-source-number RTAS call, or as
->> + *      returned by the H_ALLOCATE_VAS_WINDOW hcall
->> + * - "esbOffset" is the offset into the ESB page for the load or stor=
-e operation
->> + * - "storeData" is the data to write for a store operation
->> + *
->> + * Output:
->> + * - R4: R4: The value of the load if load operation, else -1
->> + */
->> +
->> +#define SPAPR_XIVE_ESB_STORE PPC_BIT(63)
->> +
->> +static target_ulong h_int_esb(PowerPCCPU *cpu,
->> +                              sPAPRMachineState *spapr,
->> +                              target_ulong opcode,
->> +                              target_ulong *args)
->> +{
->> +    sPAPRXive *xive =3D spapr->xive;
->> +    XiveEAS eas;
->> +    target_ulong flags  =3D args[0];
->> +    target_ulong lisn   =3D args[1];
->> +    target_ulong offset =3D args[2];
->> +    target_ulong data   =3D args[3];
->> +    hwaddr mmio_addr;
->> +    XiveSource *xsrc =3D &xive->source;
->> +
->> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        return H_FUNCTION;
->> +    }
->> +
->> +    if (flags & ~SPAPR_XIVE_ESB_STORE) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    if (xive_router_get_eas(XIVE_ROUTER(xive), lisn, &eas)) {
->> +        return H_P2;
->> +    }
->> +
->> +    if (!(eas.w & EAS_VALID)) {
->> +        return H_P2;
->> +    }
->> +
->> +    if (offset > (1ull << xsrc->esb_shift)) {
->> +        return H_P3;
->> +    }
->> +
->> +    mmio_addr =3D xive->vc_base + xive_source_esb_mgmt(xsrc, lisn) + =
-offset;
->> +
->> +    if (dma_memory_rw(&address_space_memory, mmio_addr, &data, 8,
->> +                      (flags & SPAPR_XIVE_ESB_STORE))) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to access ESB @0=
-x%"
->> +                      HWADDR_PRIx "\n", mmio_addr);
->> +        return H_HARDWARE;
->> +    }
->> +    args[0] =3D (flags & SPAPR_XIVE_ESB_STORE) ? -1 : data;
->> +    return H_SUCCESS;
->> +}
->> +
->> +/*
->> + * The H_INT_SYNC hcall() is used to issue hardware syncs that will
->> + * ensure any in flight events for the input lisn are in the event
->> + * queue.
->> + *
->> + * Parameters:
->> + * Input:
->> + * - "flags"
->> + *      Bits 0-63: Reserved
->> + * - "lisn" is per "interrupts", "interrupt-map", or
->> + *      "ibm,xive-lisn-ranges" properties, or as returned by the
->> + *      ibm,query-interrupt-source-number RTAS call, or as
->> + *      returned by the H_ALLOCATE_VAS_WINDOW hcall
->> + *
->> + * Output:
->> + * - None
->> + */
->> +static target_ulong h_int_sync(PowerPCCPU *cpu,
->> +                               sPAPRMachineState *spapr,
->> +                               target_ulong opcode,
->> +                               target_ulong *args)
->> +{
->> +    sPAPRXive *xive =3D spapr->xive;
->> +    XiveEAS eas;
->> +    target_ulong flags =3D args[0];
->> +    target_ulong lisn =3D args[1];
->> +
->> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        return H_FUNCTION;
->> +    }
->> +
->> +    if (flags) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    if (xive_router_get_eas(XIVE_ROUTER(xive), lisn, &eas)) {
->> +        return H_P2;
->> +    }
->> +
->> +    if (!(eas.w & EAS_VALID)) {
->> +        return H_P2;
->> +    }
->> +
->> +    /*
->> +     * H_STATE should be returned if a H_INT_RESET is in progress.
->> +     * This is not needed when running the emulation under QEMU
->> +     */
->> +
->> +    /* This is not real hardware. Nothing to be done */
->=20
-> At least, not as long as all the XIVE operations are under the BQL.
-
-yes.
-
->=20
->> +    return H_SUCCESS;
->> +}
->> +
->> +/*
->> + * The H_INT_RESET hcall() is used to reset all of the partition's
->> + * interrupt exploitation structures to their initial state.  This
->> + * means losing all previously set interrupt state set via
->> + * H_INT_SET_SOURCE_CONFIG and H_INT_SET_QUEUE_CONFIG.
->> + *
->> + * Parameters:
->> + * Input:
->> + * - "flags"
->> + *      Bits 0-63: Reserved
->> + *
->> + * Output:
->> + * - None
->> + */
->> +static target_ulong h_int_reset(PowerPCCPU *cpu,
->> +                                sPAPRMachineState *spapr,
->> +                                target_ulong opcode,
->> +                                target_ulong *args)
->> +{
->> +    sPAPRXive *xive =3D spapr->xive;
->> +    target_ulong flags   =3D args[0];
->> +
->> +    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->> +        return H_FUNCTION;
->> +    }
->> +
->> +    if (flags) {
->> +        return H_PARAMETER;
->> +    }
->> +
->> +    device_reset(DEVICE(xive));
->> +    return H_SUCCESS;
->> +}
->> +
->> +void spapr_xive_hcall_init(sPAPRMachineState *spapr)
->> +{
->> +    spapr_register_hypercall(H_INT_GET_SOURCE_INFO, h_int_get_source_=
-info);
->> +    spapr_register_hypercall(H_INT_SET_SOURCE_CONFIG, h_int_set_sourc=
-e_config);
->> +    spapr_register_hypercall(H_INT_GET_SOURCE_CONFIG, h_int_get_sourc=
-e_config);
->> +    spapr_register_hypercall(H_INT_GET_QUEUE_INFO, h_int_get_queue_in=
-fo);
->> +    spapr_register_hypercall(H_INT_SET_QUEUE_CONFIG, h_int_set_queue_=
-config);
->> +    spapr_register_hypercall(H_INT_GET_QUEUE_CONFIG, h_int_get_queue_=
-config);
->> +    spapr_register_hypercall(H_INT_SET_OS_REPORTING_LINE,
->> +                             h_int_set_os_reporting_line);
->> +    spapr_register_hypercall(H_INT_GET_OS_REPORTING_LINE,
->> +                             h_int_get_os_reporting_line);
->> +    spapr_register_hypercall(H_INT_ESB, h_int_esb);
->> +    spapr_register_hypercall(H_INT_SYNC, h_int_sync);
->> +    spapr_register_hypercall(H_INT_RESET, h_int_reset);
->> +}
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 9f8c19e56e7a..ad1692cdcd0f 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -1270,7 +1270,8 @@ static void *spapr_build_fdt(sPAPRMachineState *=
+spapr,
+>>      _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
+>> =20
+>>      /* /interrupt controller */
+>> -    spapr_dt_xics(xics_max_server_number(spapr), fdt, PHANDLE_XICP);
+>> +    smc->irq->dt_populate(spapr, xics_max_server_number(spapr), fdt,
+>> +                          PHANDLE_XICP);
+>> =20
+>>      ret =3D spapr_populate_memory(spapr, fdt);
+>>      if (ret < 0) {
 >> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->> index 2569ae1bc7f8..da6fcfaa3c52 100644
+>> index da6fcfaa3c52..d88a029d8c5c 100644
 >> --- a/hw/ppc/spapr_irq.c
 >> +++ b/hw/ppc/spapr_irq.c
->> @@ -258,6 +258,8 @@ static void spapr_irq_init_xive(sPAPRMachineState =
-*spapr, int nr_irqs,
->>          error_propagate(errp, local_err);
->>          return;
->>      }
->> +
->> +    spapr_xive_hcall_init(spapr);
+>> @@ -190,6 +190,13 @@ static void spapr_irq_print_info_xics(sPAPRMachin=
+eState *spapr, Monitor *mon)
+>>      ics_pic_print_info(spapr->ics, mon);
 >>  }
 >> =20
->>  static int spapr_irq_claim_xive(sPAPRMachineState *spapr, int irq, bo=
-ol lsi,
->> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
->> index 301a8e972d91..eacd26836ebf 100644
->> --- a/hw/intc/Makefile.objs
->> +++ b/hw/intc/Makefile.objs
->> @@ -38,7 +38,7 @@ obj-$(CONFIG_XICS) +=3D xics.o
->>  obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
->>  obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
->>  obj-$(CONFIG_XIVE) +=3D xive.o
->> -obj-$(CONFIG_XIVE_SPAPR) +=3D spapr_xive.o
->> +obj-$(CONFIG_XIVE_SPAPR) +=3D spapr_xive.o spapr_xive_hcall.o
->>  obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
->>  obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
->>  obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
+>> +static void spapr_irq_dt_populate_xics(sPAPRMachineState *spapr,
+>> +                                       uint32_t nr_servers, void *fdt=
+,
+>> +                                       uint32_t phandle)
+>> +{
+>> +    spapr_dt_xics(nr_servers, fdt, phandle);
+>> +}
+>> +
+>=20
+> It'd be nicer to change the signature of spapr_dt_xics, rather than
+> having this one line wrapper.
+
+but this is a sPAPR IRQ method. So you would use spapr_dt_xics directly=20
+for the definition of the backend ? if you prefer, it's fine with me.
+
+>=20
+>>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+>>  #define SPAPR_IRQ_XICS_NR_MSIS     \
+>>      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
+>> @@ -203,6 +210,7 @@ sPAPRIrq spapr_irq_xics =3D {
+>>      .free        =3D spapr_irq_free_xics,
+>>      .qirq        =3D spapr_qirq_xics,
+>>      .print_info  =3D spapr_irq_print_info_xics,
+>> +    .dt_populate =3D spapr_irq_dt_populate_xics,
+>>  };
+>> =20
+>>   /*
+>> @@ -300,6 +308,13 @@ static void spapr_irq_print_info_xive(sPAPRMachin=
+eState *spapr,
+>>      spapr_xive_pic_print_info(spapr->xive, mon);
+>>  }
+>> =20
+>> +static void spapr_irq_dt_populate_xive(sPAPRMachineState *spapr,
+>> +                                       uint32_t nr_servers, void *fdt=
+,
+>> +                                       uint32_t phandle)
+>> +{
+>> +    spapr_dt_xive(spapr->xive, nr_servers, fdt, phandle);
+>=20
+> Uh.. and to make the hook signature just match what we need rather
+> than having to have trivial wrappers in both cases.
+
+ok.
+
+>=20
+>> +}
+>> +
+>>  /*
+>>   * XIVE uses the full IRQ number space. Set it to 8K to be compatible
+>>   * with XICS.
+>> @@ -317,6 +332,7 @@ sPAPRIrq spapr_irq_xive =3D {
+>>      .free        =3D spapr_irq_free_xive,
+>>      .qirq        =3D spapr_qirq_xive,
+>>      .print_info  =3D spapr_irq_print_info_xive,
+>> +    .dt_populate =3D spapr_irq_dt_populate_xive,
+>>  };
+>> =20
+>>  /*
+>> @@ -421,4 +437,5 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
+>>      .free        =3D spapr_irq_free_xics,
+>>      .qirq        =3D spapr_qirq_xics,
+>>      .print_info  =3D spapr_irq_print_info_xics,
+>> +    .dt_populate =3D spapr_irq_dt_populate_xics,
+>>  };
 >=20
