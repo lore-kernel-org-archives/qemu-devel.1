@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1gRxHU-0002lx-U5
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:41:25 -0500
+	(envelope-from <fli@suse.com>) id 1gRxHZ-00033B-Cr
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:41:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1gRxBJ-0000A8-R2
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:35:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46198)
+	(envelope-from <fli@suse.com>) id 1gRxA8-0007j8-Kf
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:33:45 -0500
+Received: from smtp.nue.novell.com ([195.135.221.5]:52263)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1gRxBJ-00009c-IX
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:34:57 -0500
-References: <1542895581-10721-1-git-send-email-wexu@redhat.com>
-	<1542895581-10721-14-git-send-email-wexu@redhat.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <5b06d5dd-9aa4-ac2d-1be4-47aed98b5dfd@redhat.com>
-Date: Wed, 28 Nov 2018 11:34:46 +0100
-MIME-Version: 1.0
-In-Reply-To: <1542895581-10721-14-git-send-email-wexu@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 13/16] virtio: add vhost-net migration
- of packed ring
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gRxA8-0007ic-Ax
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:33:44 -0500
+From: Fei Li <fli@suse.com>
+Date: Wed, 28 Nov 2018 18:33:07 +0800
+Message-Id: <20181128103308.26755-5-fli@suse.com>
+In-Reply-To: <20181128103308.26755-1-fli@suse.com>
+References: <20181128103308.26755-1-fli@suse.com>
+Subject: [Qemu-devel] [PATCH RFC 4/5] migration: remove unused &local_err
+ parameter in multifd_save_cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +24,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wexu@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
-Cc: mst@redhat.com, jfreimann@redhat.com, tiwei.bie@intel.com
+To: qemu-devel@nongnu.org
 
+Always call migrate_set_error() to set the error state without relying
+on whether multifd_save_cleanup() succeeds.  As the passed &local_err
+is never used in multifd_save_cleanup(), remove it. And make the
+function be: void multifd_save_cleanup(void).
 
+Signed-off-by: Fei Li <fli@suse.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/migration.c |  5 +----
+ migration/ram.c       | 11 ++++-------
+ migration/ram.h       |  2 +-
+ 3 files changed, 6 insertions(+), 12 deletions(-)
 
-On 11/22/18 3:06 PM, wexu@redhat.com wrote:
-> From: Wei Xu <wexu@redhat.com>
-> 
-> tweaked vhost-net code to test migration.
-> 
-> @@ -1414,64 +1430,20 @@ long vhost_vring_ioctl(struct vhost_dev
->              r = -EFAULT;
->              break;
->          }
-> +               vq->last_avail_idx = s.num & 0x7FFF;
-> +               /* Forget the cached index value. */
-> +               vq->avail_idx = vq->last_avail_idx;
-> +               if (vhost_has_feature(vq, VIRTIO_F_RING_PACKED)) {
-> +                       vq->last_avail_wrap_counter = !!(s.num & 0x8000);
-> +                       vq->avail_wrap_counter = vq->last_avail_wrap_counter;
-> +
-> +                       vq->last_used_idx = (s.num & 0x7fFF0000) >> 16;
-> +                       vq->last_used_wrap_counter = !!(s.num & 0x80000000);
-> +               }
-> +               break;
-> +       case VHOST_GET_VRING_BASE:
-> +               s.index = idx;
-> +                s.num = vq->last_avail_idx;
-> +               if (vhost_has_feature(vq, VIRTIO_F_RING_PACKED)) {
-> +                       s.num |= vq->last_avail_wrap_counter << 15;
-> +                       s.num |= vq->last_used_idx << 16;
-> +                       s.num |= vq->last_used_wrap_counter << 31;
-> +               }
-> +               if (copy_to_user(argp, &s, sizeof(s)))
-> +                       r = -EFAULT;
-> +               break;
-> 
-> Signed-off-by: Wei Xu <wexu@redhat.com>
-> ---
->   hw/virtio/virtio.c         | 35 ++++++++++++++++++++++++++++++-----
->   include/hw/virtio/virtio.h |  4 ++--
->   2 files changed, 32 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 64d5c04..7487d3d 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2963,19 +2963,40 @@ hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
->       }
->   }
->   
-> -uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
-> +int virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
->   {
-> -    return vdev->vq[n].last_avail_idx;
-> +    int idx;
-> +
-> +    if (virtio_host_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-
-Also, I think you want to use virtio_vdev_has_feature() here instead,
-else it will set wrap counter in the case ring_packed=on in the QEMU
-command line but the feature has not been negotiated.
-
-
-For example, with ring_packed=on and with stock Fedora 28 kernel, which
-does not support packed ring, I get this warning with DPDK vhost user
-backend:
-
-VHOST_CONFIG: last_used_idx (32768) and vq->used->idx (0) mismatches;
-some packets maybe resent for Tx and dropped for Rx
-
-> +        idx = vdev->vq[n].last_avail_idx;
-> +        idx |= ((int)vdev->vq[n].avail_wrap_counter) << 15;
-> +        idx |= (vdev->vq[n].used_idx) << 16;
-> +        idx |= ((int)vdev->vq[n].used_wrap_counter) << 31;
-> +    } else {
-> +        idx = (int)vdev->vq[n].last_avail_idx;
-> +    }
-> +    return idx;
->   }
->   
-> -void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint16_t idx)
-> +void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, int idx)
->   {
-> -    vdev->vq[n].last_avail_idx = idx;
-> -    vdev->vq[n].shadow_avail_idx = idx;
-> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> +        vdev->vq[n].last_avail_idx = idx & 0x7fff;
-> +        vdev->vq[n].avail_wrap_counter = !!(idx & 0x8000);
-> +        vdev->vq[n].used_idx = (idx & 0x7fff0000) >> 16;
-> +        vdev->vq[n].used_wrap_counter = !!(idx & 0x80000000);
-> +    } else {
-> +        vdev->vq[n].last_avail_idx = idx;
-> +        vdev->vq[n].shadow_avail_idx = idx;
-> +    }
->   }
->   
->   void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
->   {
-> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> +        return;
-> +    }
-> +
->       rcu_read_lock();
->       if (vdev->vq[n].vring.desc) {
->           vdev->vq[n].last_avail_idx = vring_used_idx(&vdev->vq[n]);
-> @@ -2986,6 +3007,10 @@ void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
->   
->   void virtio_queue_update_used_idx(VirtIODevice *vdev, int n)
->   {
-> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> +        return;
-> +    }
-> +
->       rcu_read_lock();
->       if (vdev->vq[n].vring.desc) {
->           vdev->vq[n].used_idx = vring_used_idx(&vdev->vq[n]);
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index 9c1fa07..a6fdf3f 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -272,8 +272,8 @@ hwaddr virtio_queue_get_used_addr(VirtIODevice *vdev, int n);
->   hwaddr virtio_queue_get_desc_size(VirtIODevice *vdev, int n);
->   hwaddr virtio_queue_get_avail_size(VirtIODevice *vdev, int n);
->   hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n);
-> -uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n);
-> -void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint16_t idx);
-> +int virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n);
-> +void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, int idx);
->   void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n);
->   void virtio_queue_invalidate_signalled_used(VirtIODevice *vdev, int n);
->   void virtio_queue_update_used_idx(VirtIODevice *vdev, int n);
-> 
+diff --git a/migration/migration.c b/migration/migration.c
+index 72106bddf0..0537fc0c26 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1386,7 +1386,6 @@ static void migrate_fd_cleanup(void *opaque)
+     qemu_savevm_state_cleanup();
+ 
+     if (s->to_dst_file) {
+-        Error *local_err = NULL;
+         QEMUFile *tmp;
+ 
+         trace_migrate_fd_cleanup();
+@@ -1397,9 +1396,7 @@ static void migrate_fd_cleanup(void *opaque)
+         }
+         qemu_mutex_lock_iothread();
+ 
+-        if (multifd_save_cleanup(&local_err) != 0) {
+-            error_report_err(local_err);
+-        }
++        multifd_save_cleanup();
+         qemu_mutex_lock(&s->qemu_file_lock);
+         tmp = s->to_dst_file;
+         s->to_dst_file = NULL;
+diff --git a/migration/ram.c b/migration/ram.c
+index e13b9349d0..c44cb6f56d 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -917,13 +917,12 @@ static void multifd_send_terminate_threads(Error *err)
+     }
+ }
+ 
+-int multifd_save_cleanup(Error **errp)
++void multifd_save_cleanup(void)
+ {
+     int i;
+-    int ret = 0;
+ 
+     if (!migrate_use_multifd()) {
+-        return 0;
++        return;
+     }
+     multifd_send_terminate_threads(NULL);
+     for (i = 0; i < migrate_multifd_channels(); i++) {
+@@ -953,7 +952,6 @@ int multifd_save_cleanup(Error **errp)
+     multifd_send_state->pages = NULL;
+     g_free(multifd_send_state);
+     multifd_send_state = NULL;
+-    return ret;
+ }
+ 
+ static void multifd_send_sync_main(void)
+@@ -1071,9 +1069,8 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+     Error *local_err = NULL;
+ 
+     if (qio_task_propagate_error(task, &local_err)) {
+-        if (multifd_save_cleanup(&local_err) != 0) {
+-            migrate_set_error(migrate_get_current(), local_err);
+-        }
++        migrate_set_error(migrate_get_current(), local_err);
++        multifd_save_cleanup();
+     } else {
+         p->c = QIO_CHANNEL(sioc);
+         qio_channel_set_delay(p->c, false);
+diff --git a/migration/ram.h b/migration/ram.h
+index 046d3074be..936177b3e9 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -43,7 +43,7 @@ uint64_t ram_bytes_remaining(void);
+ uint64_t ram_bytes_total(void);
+ 
+ int multifd_save_setup(void);
+-int multifd_save_cleanup(Error **errp);
++void multifd_save_cleanup(void);
+ int multifd_load_setup(void);
+ int multifd_load_cleanup(Error **errp);
+ bool multifd_recv_all_channels_created(void);
+-- 
+2.13.7
