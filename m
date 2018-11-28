@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gRyps-0006KR-FB
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 07:21:02 -0500
+	(envelope-from <armbru@redhat.com>) id 1gRz5y-0007Ga-09
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 07:37:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gRyhw-0000or-FU
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 07:12:45 -0500
-Date: Wed, 28 Nov 2018 13:12:30 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181128131230.0a8306f2@redhat.com>
-In-Reply-To: <20181128094640.GB5677@caravaggio>
-References: <20181126162942.21258-1-sameo@linux.intel.com>
-	<20181126162942.21258-5-sameo@linux.intel.com>
-	<20181127162551.29608eeb@redhat.com>
-	<20181127154218.GA5677@caravaggio>
-	<20181127172749.75a036b4@redhat.com>
-	<20181128094640.GB5677@caravaggio>
+	(envelope-from <armbru@redhat.com>) id 1gRz5u-0001f1-Pe
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 07:37:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57801)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gRz5u-0001aA-Hr
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 07:37:30 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1542290622.git.simon@ruderich.org>
+	<0e061333411f8e64a6e53f14c4c067e5e3e1c91e.1542290622.git.simon@ruderich.org>
+Date: Wed, 28 Nov 2018 13:37:22 +0100
+In-Reply-To: <0e061333411f8e64a6e53f14c4c067e5e3e1c91e.1542290622.git.simon@ruderich.org>
+	(Simon Ruderich's message of "Thu, 15 Nov 2018 15:07:17 +0100")
+Message-ID: <87r2f5fke5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/8] hw: arm: Carry RSDP specific data
- through AcpiRsdpData
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v8 6/7] qmp: add pmemload command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,203 +27,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S.
-	Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Simon Ruderich <simon@ruderich.org>
+Cc: qemu-devel@nongnu.org, David Alan Gilbert <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 28 Nov 2018 10:46:41 +0100
-Samuel Ortiz <sameo@linux.intel.com> wrote:
+Simon Ruderich <simon@ruderich.org> writes:
 
-> On Tue, Nov 27, 2018 at 05:27:49PM +0100, Igor Mammedov wrote:
-> > On Tue, 27 Nov 2018 16:42:18 +0100
-> > Samuel Ortiz <sameo@linux.intel.com> wrote:
-> >   
-> > > Hi Igor,
-> > > 
-> > > On Tue, Nov 27, 2018 at 04:25:51PM +0100, Igor Mammedov wrote:  
-> > > > On Mon, 26 Nov 2018 17:29:37 +0100
-> > > > Samuel Ortiz <sameo@linux.intel.com> wrote:
-> > > >     
-> > > > > That will allow us to generalize the ARM build_rsdp() routine to support
-> > > > > both legacy RSDP (The current i386 implementation) and extended RSDP
-> > > > > (The ARM implementation).
-> > > > > 
-> > > > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > > > > ---
-> > > > >  include/hw/acpi/acpi-defs.h | 11 +++++++++++
-> > > > >  hw/arm/virt-acpi-build.c    | 27 ++++++++++++++++++++++-----
-> > > > >  2 files changed, 33 insertions(+), 5 deletions(-)
-> > > > > 
-> > > > > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> > > > > index af8e023968..e7fd24c6c5 100644
-> > > > > --- a/include/hw/acpi/acpi-defs.h
-> > > > > +++ b/include/hw/acpi/acpi-defs.h
-> > > > > @@ -53,6 +53,17 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
-> > > > >  } QEMU_PACKED;
-> > > > >  typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
-> > > > >  
-> > > > > +typedef struct AcpiRsdpData {
-> > > > > +    uint8_t oem_id[6]; /* OEM identification */
-> > > > > +    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
-> > > > > +
-> > > > > +    unsigned *rsdt_tbl_offset;
-> > > > > +    unsigned *xsdt_tbl_offset;
-> > > > > +} AcpiRsdpData;
-> > > > > +    
-> > > >     
-> > > > > +#define ACPI_RSDP_REV_1 0
-> > > > > +#define ACPI_RSDP_REV_2 2    
-> > > > it's one time used spec defined values so just use values directly
-> > > > in place with a comment, so reader won't have to jump around code
-> > > > when comparing to spec.    
-> > > It's also used in the ACPI tests fix patch.  
-> > it's better to use in test it's own version (we just opencode them there)
-> > see fadt_fetch_facs_and_dsdt_ptrs()/sanitize_fadt_ptrs()
-> > same applies for length.  
-> 
-> I think you're trying to explain to me that this:
-> 
-> 	/* sdt->aml field offset := spec offset - header size */
->         memset(sdt->aml + 0, 0, 4); /* sanitize FIRMWARE_CTRL(36) ptr */
->         memset(sdt->aml + 4, 0, 4); /* sanitize DSDT(40) ptr */
->         if (sdt->header.revision >= 3) {
->             memset(sdt->aml + 96, 0, 8); /* sanitize X_FIRMWARE_CTRL(132) ptr */
->             memset(sdt->aml + 104, 0, 8); /* sanitize X_DSDT(140) ptr */
->         }
-> 
-> is good coding practice. I'm having a hard time internalizing that
-> hard coded constants and comments not directly mapping the code (How do
-> I map "sanitize X_FIRMWARE_CTRL(132) ptr" to "sdt->aml + 96, 0, 8"?) is
-> indeed good practice. But I'll take the pragmatic route and follow what
-> you guys advice for.
-Even though it's ugly, constants directly comparable to spec table
-definitions and comments are supposed to hep locate relevant field/table,
-macro isn't making it better in this case (just a bit more obscure).
+> Adapted patch from Baojun Wang [1] with the following commit message:
+>
+>     I found this could be useful to have qemu-softmmu as a cross
+>     debugger (launch with -s -S command line option), then if we can
+>     have a command to load guest physical memory, we can use cross gdb
+>     to do some target debug which gdb cannot do directly.
+>
+> This patch contains only the qmp changes of the original patch.
+>
+> pmemload is necessary to directly write physical memory which is not
+> possible with gdb alone as it uses only logical addresses.
+>
+> The QAPI for pmemload uses "val" as parameter name for the physical
+> address. This name is not very descriptive but is consistent with the
+> existing pmemsave. Changing the parameter name of pmemsave is not
+> possible without breaking the existing API.
 
-At least for ACPI spec bound code, it's consensus that we reached
-after discussing how to better to handle this usecase (from maintainability pov).
+As much as I dislike the name "val" for a base address, I agree with you
+to prioritize consistency.
 
-> > that way if we break it in qemu's code test would catch the thing
-> >   
-> > > Also the 0 for revision 1 is a little confusing, I feel the above
-> > > definition is clearer.  
-> > that's confusion is in the spec, so we just mimic it, no need to add more on top
-> >   
-> > > 
-> > >   
-> > > > > +
-> > > > >  /* Table structure from Linux kernel (the ACPI tables are under the
-> > > > >     BSD license) */
-> > > > >  
-> > > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > > > index 0835900052..2dad465ecf 100644
-> > > > > --- a/hw/arm/virt-acpi-build.c
-> > > > > +++ b/hw/arm/virt-acpi-build.c
-> > > > > @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
-> > > > >  
-> > > > >  /* RSDP */
-> > > > >  static void
-> > > > > -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> > > > > +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
-> > > > >  {
-> > > > >      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
-> > > > >      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
-> > > > > @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> > > > >                               true /* fseg memory */);
-> > > > >  
-> > > > >      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
-> > > > > -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
-> > > > > +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
-> > > > >      rsdp->length = cpu_to_le32(sizeof(*rsdp));
-> > > > > -    rsdp->revision = 0x02;
-> > > > > +    rsdp->revision = rsdp_data->revision;
-> > > > >  
-> > > > >      /* Address to be filled by Guest linker */
-> > > > >      bios_linker_loader_add_pointer(linker,
-> > > > >          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
-> > > > > -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
-> > > > > +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
-> > > > >  
-> > > > >      /* Checksum to be filled by Guest linker */
-> > > > >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> > > > > @@ -399,6 +399,20 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> > > > >          (char *)&rsdp->extended_checksum - rsdp_table->data);
-> > > > >  }
-> > > > >  
-> > > > > +static void
-> > > > > +init_rsdp_data(AcpiRsdpData *data, const char *oem_id, uint8_t revision,
-> > > > > +               unsigned *rsdt_offset, unsigned *xsdt_offset)
-> > > > > +{
-> > > > > +    /* Caller must provide an OEM ID */
-> > > > > +    g_assert(oem_id);
-> > > > > +    g_assert(strlen(oem_id) >= 6);
-> > > > > +
-> > > > > +    memcpy(data->oem_id, oem_id, 6);
-> > > > > +    data->revision = revision;
-> > > > > +    data->rsdt_tbl_offset = rsdt_offset;
-> > > > > +    data->xsdt_tbl_offset = xsdt_offset;
-> > > > > +}
-> > > > > +
-> > > > >  static void
-> > > > >  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> > > > >  {
-> > > > > @@ -810,6 +824,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-> > > > >      GArray *table_offsets;
-> > > > >      unsigned dsdt, xsdt;
-> > > > >      GArray *tables_blob = tables->table_data;
-> > > > > +    AcpiRsdpData rsdp;    
-> > > > s/rsdp/rsdp_info/
-> > > >     
-> > > > >  
-> > > > >      table_offsets = g_array_new(false, true /* clear */,
-> > > > >                                          sizeof(uint32_t));
-> > > > > @@ -857,7 +872,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-> > > > >      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
-> > > > >  
-> > > > >      /* RSDP is in FSEG memory, so allocate it separately */
-> > > > > -    build_rsdp(tables->rsdp, tables->linker, xsdt);
-> > > > > +    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
-> > > > > +                   NULL, &xsdt);    
-> > > > It would be more concise to use declarative style without extra clutter:
-> > > > 
-> > > > -    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
-> > > > -                   NULL, &xsdt);
-> > > > -    build_rsdp(tables->rsdp, tables->linker, &rsdp);
-> > > > +    {
-> > > > +       AcpiRsdpData rsdp = {
-> > > > +           .revision = 2,
-> > > > +           .oem_id = ACPI_BUILD_APPNAME6,
-> > > > +           .xsdt_tbl_offset = &xsdt,
-> > > > +           .rsdt_tbl_offset = NULL,
-> > > > +       };
-> > > > +       build_rsdp(tables->rsdp, tables->linker, &rsdp);
-> > > > +    }    
-> > > 2 things here, imo:
-> > > 
-> > > - This is not more concise.  
-> > with function, one have to jump to it's definition/body to find out what
-> > each argument is, with declaration + initialization inplace it's clear
-> > what values mean as you see fields right there as well.  
-> With a structure you need to go and look at the structure definition to
-> know which fields you need to initialize and what their names are. And
-> no, you can't safely copy paste the above snippet and rest assured your
-> code is safe, because C allows you to leave some structure fields
-> uninitialized.
-true, one has to be more careful with initializing.
-I don't have a strong opinion here, I'll leave it up to you.
+> [1]: https://lists.gnu.org/archive/html/qemu-trivial/2014-04/msg00074.html
+>
+> Based-on-patch-by: Baojun Wang <wangbj@gmail.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Simon Ruderich <simon@ruderich.org>
+> ---
+>  cpus.c         | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  qapi/misc.json | 20 ++++++++++++++++++
+>  2 files changed, 75 insertions(+)
+>
+> diff --git a/cpus.c b/cpus.c
+> index ee54595733..b80f331596 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -2445,6 +2445,61 @@ exit:
+>      qemu_close(fd);
+>  }
+>  
+> +void qmp_pmemload(int64_t addr, const char *filename,
 
-> > If it's simple structure it is clearer to use initializer, instead of
-> > wrapper helper. With complex structure it could be other way around.
-> >  
-> > > - It's code duplication as almost the same snippet is going to be used
-> > >   for i386/acpi-build.c  
-> > the same goes for init_rsdp_data(...)  
-> I disagree here as well. But I'd like to see this code being merged,
-> I'll comply. Do you have any comments on the tests part of that serie,
-> besides the fact that it's using defined constants as opposed to hard
-> coded ones?
-> 
-> Cheers,
-> Samuel.
-> 
-> 
+I first parameter is called @val in the schema, and @addr here.  I hate
+that, but it also matches memsave.
+
+> +                  bool has_size, int64_t size,
+> +                  bool has_offset, int64_t offset,
+> +                  Error **errp)
+> +{
+> +    int fd;
+> +    size_t l;
+> +    ssize_t r;
+> +    uint8_t buf[1024];
+> +
+> +    fd = qemu_open(filename, O_RDONLY | O_BINARY);
+> +    if (fd < 0) {
+> +        error_setg_file_open(errp, errno, filename);
+> +        return;
+> +    }
+> +    if (has_offset && offset > 0) {
+> +        if (lseek(fd, offset, SEEK_SET) != offset) {
+> +            error_setg_errno(errp, errno,
+> +                             "could not seek to offset %" PRIx64, offset);
+
+I think the value of @filename is more interesting than the value of
+@offset here.
+
+> +            goto exit;
+> +        }
+> +    }
+> +    if (!has_size) {
+> +        struct stat s;
+> +        if (fstat(fd, &s)) {
+> +            error_setg_errno(errp, errno, "could not fstat fd to get size");
+> +            goto exit;
+> +        }
+
+TOCTTOU: the size can change while you read the file.  I figure nothing
+truly terrible can happen here that way, but it does set a bad example.
+
+> +        if (S_ISCHR(s.st_mode) || S_ISBLK(s.st_mode)) {
+> +            error_setg(errp, "pmemload doesn't support char/block devices");
+> +            goto exit;
+> +        }
+
+Any particular reason for rejecting character and block devices when
+@size is absent, yet accepting them when @size is present?
+
+> +        size = s.st_size;
+> +    }
+> +
+> +    while (size != 0) {
+> +        l = sizeof(buf);
+> +        if (l > size) {
+> +            l = size;
+> +        }
+> +        r = read(fd, buf, l);
+> +        if (r <= 0) {
+> +            error_setg(errp, QERR_IO_ERROR);
+> +            goto exit;
+
+Please avoid the QERR_ macros, as requested by qerror.h.
+
+Two ways to get r == 0:
+
+* If has_size: the file is shorter than the user's size value.
+
+* If !has_size: the file has shrunk since fstat().
+
+In both cases, reporting an I/O error is not nice.
+
+> +        }
+> +        l = r; /* in case of short read */
+> +        cpu_physical_memory_write(addr, buf, l);
+> +        addr += l;
+> +        size -= l;
+> +    }
+
+This reads and copies in chunks of at most 1KiB.  Feels rather small.  I
+figure 4KiB would still be conservative enough, and at least matches
+common page and block sizes.  Paolo, what do you think?
+
+> +
+> +exit:
+> +    qemu_close(fd);
+> +}
+> +
+
+Here's my (compile-tested) attempt to sidestep TOCTTOU:
+
+    int fd;
+    uint64_t limit, ofs;
+    ssize_t n;
+    uint8_t buf[4096];
+
+    fd = qemu_open(filename, O_RDONLY | O_BINARY);
+    if (fd < 0) {
+        error_setg_file_open(errp, errno, filename);
+        return;
+    }
+
+    if (has_offset && offset > 0) {
+        if (lseek(fd, offset, SEEK_SET) != offset) {
+            error_setg_errno(errp, errno, "could not seek '%s'", filename);
+            goto exit;
+        }
+    }
+
+    limit = has_size ? size : UINT64_MAX;
+    ofs = 0;
+    while (ofs < limit) {
+        n = MIN(sizeof(buf), limit - ofs);
+        n = read(fd, buf, n);
+        if (n < 0) {
+            error_setg_errno(errp, errno, "could not read from '%s'",
+                             filename);
+            goto exit;
+        }
+        if (n == 0) {
+            break;
+        }
+        cpu_physical_memory_write(addr + ofs, buf, n);
+        ofs += n;
+    }
+
+exit:
+    qemu_close(fd);
+
+Note that this *silently* reads less than @size when the file isn't big
+enough.  If we decide that's what we want, then the command's contract
+in misc.json has to be updated accordingly.
+
+If it isn't, we can turn the break into an error_setg(); goto exit.  Not
+terribly satisfying, since we already changed the physical memory.
+
+>  void qmp_inject_nmi(Error **errp)
+>  {
+>      nmi_monitor_handle(monitor_get_cpu_index(), errp);
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 6c1c5c0a37..e4f39e31e5 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1186,6 +1186,26 @@
+>  { 'command': 'pmemsave',
+>    'data': {'val': 'int', 'size': 'int', 'filename': 'str'} }
+>  
+> +##
+> +# @pmemload:
+> +#
+> +# Load a portion of guest physical memory from a file.
+> +#
+> +# @val: the physical address of the guest to start from
+> +#
+> +# @filename: the file to load the memory from as binary data
+> +#
+> +# @size: the size of memory region to load (defaults to whole file)
+> +#
+> +# @offset: the offset in the file to start from (defaults to 0)
+> +#
+> +# Returns: Nothing on success
+> +#
+> +# Since: 4.0
+> +##
+> +{ 'command': 'pmemload',
+> +  'data': {'val': 'int', 'filename': 'str', '*size': 'int', '*offset': 'int'} }
+> +
+>  ##
+>  # @cont:
+>  #
+
+Using 'int' for a physical address is problematic, because it requires
+users to express the upper half of the 64-bit address space as negative
+numbers.  I started to fix up these things some time ago, but got stuck.
+Here's the relevant part:
+
+    Message-ID: <87fud26pfi.fsf@dusky.pond.sub.org>
+    https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01114.html
+
+Perhaps we should cherry-pick just that patch from the series into this
+series, with the format string bug David pointed out fixed.
+
+@offset and @size feel a bit like overengineering to me.  If this work
+was still at the design stage, I'd advise to start without them, then
+see whether there's a genuine need.  At v5, I'm li
