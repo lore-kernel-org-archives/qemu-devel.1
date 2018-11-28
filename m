@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gS1ps-0008CZ-MH
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:33:09 -0500
+	(envelope-from <cota@braap.org>) id 1gS1rC-0000aw-Da
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:34:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gS1pr-0004Zj-Df
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:33:08 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36993)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gS1pq-0004V7-MW
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:33:06 -0500
-Received: by mail-ot1-x343.google.com with SMTP id 40so23877468oth.4
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 07:33:03 -0800 (PST)
-MIME-Version: 1.0
-References: <1543397736-8198-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <1543397736-8198-1-git-send-email-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 28 Nov 2018 15:32:51 +0000
-Message-ID: <CAFEAcA8gA7_jHyZKu_SnE9YqULKvtv39RBcoAx=zdGRGSm5Tkw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.1?] hw/arm/aspeed: Fix build issue
- with clang 3.4
+	(envelope-from <cota@braap.org>) id 1gS1r9-0007AE-9h
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:34:30 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Wed, 28 Nov 2018 10:34:23 -0500
+Message-Id: <20181128153423.11916-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH trivial] docs/devel/build-system: fix 'softmu'
+ typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +18,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-trivial@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On Wed, 28 Nov 2018 at 09:35, Thomas Huth <thuth@redhat.com> wrote:
->
-> When using clang 3.4.2, compilation of QEMU fails like this:
->
->   CC      aarch64-softmmu/hw/arm/aspeed.o
-> hw/arm/aspeed.c:36:3: error: redefinition of typedef 'AspeedBoardState' is a C11
->       feature [-Werror,-Wtypedef-redefinition]
-> } AspeedBoardState;
->   ^
-> include/hw/arm/aspeed.h:14:33: note: previous definition is here
-> typedef struct AspeedBoardState AspeedBoardState;
->                                 ^
-> 1 error generated.
-> make[1]: *** [hw/arm/aspeed.o] Error 1
-> make: *** [subdir-aarch64-softmmu] Error 2
->
-> Remove the duplicated typedef to fix this issue.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ docs/devel/build-system.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-Applied, thanks.
-
--- PMM
+diff --git a/docs/devel/build-system.txt b/docs/devel/build-system.txt
+index 52501f2ad9..f9fd27fab0 100644
+--- a/docs/devel/build-system.txt
++++ b/docs/devel/build-system.txt
+@@ -393,7 +393,7 @@ all use $(obj) as a prefix to the target, e.g.
+ This file provides the entry point used to build each individual system
+ or userspace emulator target. Each enabled target has its own
+ subdirectory. For example if configure is run with the argument
+-'--target-list=x86_64-softmmu', then a sub-directory 'x86_64-softmu'
++'--target-list=x86_64-softmmu', then a sub-directory 'x86_64-softmmu'
+ will be created, containing a 'Makefile' which symlinks back to
+ Makefile.target
+ 
+-- 
+2.17.1
