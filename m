@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gS1EP-0006Qp-Pg
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:54:27 -0500
+	(envelope-from <david@redhat.com>) id 1gS1FE-00078F-CU
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:55:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gS1EO-0008Ib-Uz
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:54:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59118)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gS1EO-0008IG-P0
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:54:24 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1EC8E8830A
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 14:54:24 +0000 (UTC)
-Date: Wed, 28 Nov 2018 14:54:09 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181128145409.GN24355@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181128142135.15900-1-marcandre.lureau@redhat.com>
-	<20181128143307.GM24355@redhat.com>
-	<CAMxuvayS9ja1H-ftsahECEJU+T6EE8-KcYTpDnii8KdJHwaYmw@mail.gmail.com>
+	(envelope-from <david@redhat.com>) id 1gS1F9-00015h-9G
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:55:16 -0500
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 28 Nov 2018 15:54:55 +0100
+Message-Id: <20181128145455.11733-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAMxuvayS9ja1H-ftsahECEJU+T6EE8-KcYTpDnii8KdJHwaYmw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] configure: bump spice-server
- required version to 0.12.6
+Subject: [Qemu-devel] [PATCH RFC] qdev: Let the hotplug_unplug() caller
+ delete the device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,65 +21,351 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>, "Hoffmann, Gerd" <kraxel@redhat.com>, Frediano Ziglio <fziglio@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>, Collin Walling <walling@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>
 
-On Wed, Nov 28, 2018 at 06:46:37PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Wed, Nov 28, 2018 at 6:33 PM Daniel P. Berrang=C3=A9 <berrange@redha=
-t.com> wrote:
-> >
-> > On Wed, Nov 28, 2018 at 06:21:35PM +0400, Marc-Andr=C3=A9 Lureau wrot=
-e:
-> > > Looking at chardev/spice.c code, I realize compilation was broken f=
-or
-> > > a while with spice-server < 0.12.3. I propose to bump required vers=
-ion
-> > > to 0.12.6, released 3y ago, instead of adding more #ifdef.
-> >
-> > As mentioned last time this patch was posted[1], any changes in the
-> > min required versions should follow our supported build platforms
-> > support statement:
->=20
-> Sorry, I totally forgot that.
->=20
-> >
-> >   https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-platform=
-s
-> >
-> > Preferrably the commit message should list the version in each of the
-> > main distros, such as in a0722409bcb980ecdab8330d4c716a73c9fcb489
-> >
-> > At a glance it looks like Debian Jessie is likely to be the determini=
-ng
-> > vote with 0.12.5 as its newest version.
->=20
-> https://repology.org/metapackage/spice/versions
->=20
-> Debian Oldstable
-> oldstable/main spice 0.12.5
->=20
-> https://wiki.debian.org/DebianReleases
->=20
-> ~June 6th 2020 (LTS)
->=20
-> But the current stable, Stretch, was released on June 17th 2017.
->=20
-> So we are stuck with spice server 0.12.5 until +2y, June 17th 2019 ?
+When unplugging a device, at one point the device will be destroyed
+via object_unparent(). This will, one the one hand, unrealize the
+device hierarchy to be removed, and on the other hand, destroy/free the
+device hierarchy.
 
-Yep, but that means one more dev cycle - 4.0
+When chaining interrupt handlers, we want to overwrite a bus hotplug
+handler by the machine hotplug handler, to be able to perform
+some part of the plug/unplug and to forward the calls to the bus hotplug
+handler.
 
-We're free to drop Jessie once QEMU 4.1 opens for development at
-end of April / early May.
+For now, the bus hotplug handler would trigger an object_unparent(), not
+allowing us to perform some unplug action on a device after we forwarded
+the call to the bus hotplug handler. The device would be gone at that
+point.
+
+hotplug_handler_unplug(dev) -> calls machine_unplug_handler()
+    machine_unplug_handler(dev) {
+        /* eventually do unplug stuff */
+        bus_unplug_handler(dev) -> calls object_unparent(dev)
+        /* dev is gone, we can't do more unplug stuff */
+    }
+
+So move the object_unparent() to the original caller of the unplug. For
+now, keep the unrealize() at the original places of the
+object_unparent().
+
+hotplug_handler_unplug(dev) -> calls machine_unplug_handler()
+    machine_unplug_handler(dev) {
+        /* eventually do unplug stuff */
+        bus_unplug_handler(dev) -> calls unrealize(dev)
+        /* we can do more unplug stuff but device already unrealized */
+    }
+object_unparent(dev)
+
+In the long run, every unplug action should be factored out of the
+unrealize() function into the unplug handler (especially for PCI). Then
+we can get rid of the additonal unrealize() calls and object_unparent()
+will properly unrealize the device hierarchy after the device has been
+unplugged.
+
+hotplug_handler_unplug(dev) -> calls machine_unplug_handler()
+    machine_unplug_handler(dev) {
+        /* eventually do unplug stuff */
+        bus_unplug_handler(dev) -> only unplugs, does not unrealize
+        /* we can do more unplug stuff */
+    }
+object_unparent(dev) -> will unrealize
 
 
-Regards,
-Daniel
+The original approach was suggested by Igor Mammedov for the PCI
+part, but I extended it to all hotplug handlers. I consider this one
+step into the right direction.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+
+I might still be missing some cases, but I want to get some feedback firs=
+t
+if this makes sense.
+
+This is based on the series:
+    [PATCH v3 00/11] pci: hotplug handler reworks=E2=80=8B
+
+ hw/acpi/cpu.c            |  1 +
+ hw/acpi/memory_hotplug.c |  1 +
+ hw/acpi/pcihp.c          |  3 ++-
+ hw/core/qdev.c           |  3 +--
+ hw/i386/pc.c             |  5 ++---
+ hw/pci/pcie.c            |  3 ++-
+ hw/pci/shpc.c            |  3 ++-
+ hw/ppc/spapr.c           |  4 ++--
+ hw/ppc/spapr_pci.c       |  3 ++-
+ hw/s390x/css-bridge.c    |  2 +-
+ hw/s390x/s390-pci-bus.c  | 12 ++++++++++--
+ qdev-monitor.c           |  9 +++++++--
+ 12 files changed, 33 insertions(+), 16 deletions(-)
+
+diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+index f10b190019..37703a8806 100644
+--- a/hw/acpi/cpu.c
++++ b/hw/acpi/cpu.c
+@@ -126,6 +126,7 @@ static void cpu_hotplug_wr(void *opaque, hwaddr addr,=
+ uint64_t data,
+             dev =3D DEVICE(cdev->cpu);
+             hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
+             hotplug_handler_unplug(hotplug_ctrl, dev, NULL);
++            object_unparent(OBJECT(dev));
+         }
+         break;
+     case ACPI_CPU_CMD_OFFSET_WR:
+diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+index 8c7c1013f3..9fbf032c15 100644
+--- a/hw/acpi/memory_hotplug.c
++++ b/hw/acpi/memory_hotplug.c
+@@ -189,6 +189,7 @@ static void acpi_memory_hotplug_write(void *opaque, h=
+waddr addr, uint64_t data,
+                 error_free(local_err);
+                 break;
+             }
++            object_unparent(OBJECT(dev));
+             trace_mhp_acpi_pc_dimm_deleted(mem_st->selector);
+         }
+         break;
+diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+index 7bc7a72340..31b1a8fe58 100644
+--- a/hw/acpi/pcihp.c
++++ b/hw/acpi/pcihp.c
+@@ -174,6 +174,7 @@ static void acpi_pcihp_eject_slot(AcpiPciHpState *s, =
+unsigned bsel, unsigned slo
+             if (!acpi_pcihp_pc_no_hotplug(s, dev)) {
+                 hotplug_ctrl =3D qdev_get_hotplug_handler(qdev);
+                 hotplug_handler_unplug(hotplug_ctrl, qdev, &error_abort)=
+;
++                object_unparent(OBJECT(qdev));
+             }
+         }
+     }
+@@ -269,7 +270,7 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplu=
+g_dev, AcpiPciHpState *s,
+ void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpS=
+tate *s,
+                                  DeviceState *dev, Error **errp)
+ {
+-    object_unparent(OBJECT(dev));
++    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+ }
+=20
+ void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 6b3cc55b27..0d9da06c7b 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -286,8 +286,7 @@ void qbus_reset_all_fn(void *opaque)
+ void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
+                                   DeviceState *dev, Error **errp)
+ {
+-    /* just zap it */
+-    object_unparent(OBJECT(dev));
++    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+ }
+=20
+ /*
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f095725dba..3880f23ff2 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1777,8 +1777,7 @@ static void pc_memory_unplug(HotplugHandler *hotplu=
+g_dev,
+     }
+=20
+     pc_dimm_unplug(PC_DIMM(dev), MACHINE(pcms));
+-    object_unparent(OBJECT(dev));
+-
++    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+  out:
+     error_propagate(errp, local_err);
+ }
+@@ -1891,7 +1890,7 @@ static void pc_cpu_unplug_cb(HotplugHandler *hotplu=
+g_dev,
+=20
+     found_cpu =3D pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, NULL);
+     found_cpu->cpu =3D NULL;
+-    object_unparent(OBJECT(dev));
++    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+=20
+     /* decrement the number of CPUs */
+     pcms->boot_cpus--;
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index ba3ea925e9..d6d2722d49 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -367,7 +367,7 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_de=
+v, DeviceState *dev,
+ void pcie_cap_slot_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *d=
+ev,
+                              Error **errp)
+ {
+-    object_unparent(OBJECT(dev));
++    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+ }
+=20
+ static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque=
+)
+@@ -375,6 +375,7 @@ static void pcie_unplug_device(PCIBus *bus, PCIDevice=
+ *dev, void *opaque)
+     HotplugHandler *hotplug_ctrl =3D qdev_get_hotplug_handler(DEVICE(dev=
+));
+=20
+     hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
++    object_unparent(OBJECT(dev));
+ }
+=20
+ void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
+diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
+index 5de905cb56..0e6e42a899 100644
+--- a/hw/pci/shpc.c
++++ b/hw/pci/shpc.c
+@@ -249,6 +249,7 @@ static void shpc_free_devices_in_slot(SHPCDevice *shp=
+c, int slot)
+             hotplug_ctrl =3D qdev_get_hotplug_handler(DEVICE(affected_de=
+v));
+             hotplug_handler_unplug(hotplug_ctrl, DEVICE(affected_dev),
+                                    &error_abort);
++            object_unparent(OBJECT(affected_dev));
+         }
+     }
+ }
+@@ -546,7 +547,7 @@ void shpc_device_plug_cb(HotplugHandler *hotplug_dev,=
+ DeviceState *dev,
+ void shpc_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev=
+,
+                            Error **errp)
+ {
+-    object_unparent(OBJECT(dev));
++    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+ }
+=20
+ void shpc_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 7afd1a175b..f4ce612d6b 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3334,7 +3334,7 @@ static void spapr_memory_unplug(HotplugHandler *hot=
+plug_dev, DeviceState *dev)
+     sPAPRDIMMState *ds =3D spapr_pending_dimm_unplugs_find(spapr, PC_DIM=
+M(dev));
+=20
+     pc_dimm_unplug(PC_DIMM(dev), MACHINE(hotplug_dev));
+-    object_unparent(OBJECT(dev));
++    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+     spapr_pending_dimm_unplugs_remove(spapr, ds);
+ }
+=20
+@@ -3441,7 +3441,7 @@ static void spapr_core_unplug(HotplugHandler *hotpl=
+ug_dev, DeviceState *dev)
+=20
+     assert(core_slot);
+     core_slot->cpu =3D NULL;
+-    object_unparent(OBJECT(dev));
++    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+ }
+=20
+ static
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index bfb02ee96b..c230f6a8b0 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1373,6 +1373,7 @@ void spapr_phb_remove_pci_device_cb(DeviceState *de=
+v)
+     HotplugHandler *hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
+=20
+     hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
++    object_unparent(OBJECT(dev));
+ }
+=20
+ static sPAPRDRConnector *spapr_phb_get_pci_func_drc(sPAPRPHBState *phb,
+@@ -1495,7 +1496,7 @@ static void spapr_pci_unplug(HotplugHandler *plug_h=
+andler,
+      * an 'idle' state, as the device cleanup code expects.
+      */
+     pci_device_reset(PCI_DEVICE(plugged_dev));
+-    object_unparent(OBJECT(plugged_dev));
++    object_property_set_bool(OBJECT(plugged_dev), false, "realized", NUL=
+L);
+ }
+=20
+ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
+diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
+index 1bd6c8b458..614c2a3b8b 100644
+--- a/hw/s390x/css-bridge.c
++++ b/hw/s390x/css-bridge.c
+@@ -51,7 +51,7 @@ static void ccw_device_unplug(HotplugHandler *hotplug_d=
+ev,
+=20
+     css_generate_sch_crws(sch->cssid, sch->ssid, sch->schid, 1, 0);
+=20
+-    object_unparent(OBJECT(dev));
++    object_property_set_bool(OBJECT(dev), false, "realized", NULL);
+ }
+=20
+ static void virtual_css_bus_reset(BusState *qbus)
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 9abd49a9dc..a84e80f6dd 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -988,7 +988,11 @@ static void s390_pcihost_unplug(HotplugHandler *hotp=
+lug_dev, DeviceState *dev,
+                                  pbdev->fh, pbdev->fid);
+     bus =3D pci_get_bus(pci_dev);
+     devfn =3D pci_dev->devfn;
+-    object_unparent(OBJECT(pci_dev));
++    if (OBJECT(pci_dev) =3D=3D OBJECT(dev)) {
++        object_property_set_bool(OBJECT(pci_dev), false, "realized", NUL=
+L);
++    } else {
++        object_unparent(OBJECT(pci_dev));
++    }
+     s390_pci_msix_free(pbdev);
+     s390_pci_iommu_free(s, bus, devfn);
+     pbdev->pdev =3D NULL;
+@@ -997,7 +1001,11 @@ out:
+     pbdev->fid =3D 0;
+     QTAILQ_REMOVE(&s->zpci_devs, pbdev, link);
+     g_hash_table_remove(s->zpci_table, &pbdev->idx);
+-    object_unparent(OBJECT(pbdev));
++    if (OBJECT(pbdev) =3D=3D OBJECT(dev)) {
++        object_property_set_bool(OBJECT(pbdev), false, "realized", NULL)=
+;
++    } else {
++        object_unparent(OBJECT(pbdev));
++    }
+ }
+=20
+ static void s390_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 07147c63bf..7705acd6c7 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -862,6 +862,7 @@ void qdev_unplug(DeviceState *dev, Error **errp)
+     DeviceClass *dc =3D DEVICE_GET_CLASS(dev);
+     HotplugHandler *hotplug_ctrl;
+     HotplugHandlerClass *hdc;
++    Error *local_err =3D NULL;
+=20
+     if (dev->parent_bus && !qbus_is_hotpluggable(dev->parent_bus)) {
+         error_setg(errp, QERR_BUS_NO_HOTPLUG, dev->parent_bus->name);
+@@ -890,10 +891,14 @@ void qdev_unplug(DeviceState *dev, Error **errp)
+      * otherwise just remove it synchronously */
+     hdc =3D HOTPLUG_HANDLER_GET_CLASS(hotplug_ctrl);
+     if (hdc->unplug_request) {
+-        hotplug_handler_unplug_request(hotplug_ctrl, dev, errp);
++        hotplug_handler_unplug_request(hotplug_ctrl, dev, &local_err);
+     } else {
+-        hotplug_handler_unplug(hotplug_ctrl, dev, errp);
++        hotplug_handler_unplug(hotplug_ctrl, dev, &local_err);
++        if (!local_err) {
++            object_unparent(OBJECT(dev));
++        }
+     }
++    error_propagate(errp, local_err);
+ }
+=20
+ void qmp_device_del(const char *id, Error **errp)
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+2.17.2
