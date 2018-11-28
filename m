@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gRxT4-0005z7-Kf
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gRxT4-0005z8-Kh
 	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:53:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gRxT0-0007F7-VI
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gRxT0-0007CG-CY
 	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:53:18 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:46593)
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:41366)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gRxT0-0007C4-P2
+	id 1gRxT0-0007Bn-6f
 	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:53:14 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id l9so25782188wrt.13
+Received: by mail-wr1-x430.google.com with SMTP id x10so25795774wrs.8
 	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 02:53:14 -0800 (PST)
+Received: from 640k.localdomain ([93.56.166.5])
+	by smtp.gmail.com with ESMTPSA id
+	125-v6sm1688301wmr.22.2018.11.28.02.53.11 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 28 Nov 2018 02:53:11 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 28 Nov 2018 11:53:10 +0100
-Message-Id: <1543402390-3754-2-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1543402390-3754-1-git-send-email-pbonzini@redhat.com>
-References: <1543402390-3754-1-git-send-email-pbonzini@redhat.com>
+Date: Wed, 28 Nov 2018 11:53:09 +0100
+Message-Id: <1543402390-3754-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 14/14] hostmem: no need to check for
- host_memory_backend_mr_inited() in alloc()
+Subject: [Qemu-devel] [PULL v4 00/14] Misc patches for QEMU 3.1.0-rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,80 +34,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+The following changes since commit 4822f1ee9efa8df56e29db0a68323b484bdb0335:
 
-memfd_backend_memory_alloc/file_backend_memory_alloc both needlessly
-are are calling host_memory_backend_mr_inited() which creates an
-illusion that alloc could be called multiple times but it isn't, it's
-called once from UserCreatable complete().
+  Merge remote-tracking branch 'remotes/kraxel/tags/fixes-31-20181127-pull-request' into staging (2018-11-27 11:21:38 +0000)
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- backends/hostmem-file.c  | 24 ++++++++++++------------
- backends/hostmem-memfd.c |  4 ----
- 2 files changed, 12 insertions(+), 16 deletions(-)
+are available in the git repository at:
 
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index 639c8d4..6630021 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -42,6 +42,9 @@ static void
- file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
- {
-     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(backend);
-+#ifdef CONFIG_POSIX
-+    gchar *path;
-+#endif
- 
-     if (!backend->size) {
-         error_setg(errp, "can't create backend with size 0");
-@@ -54,18 +57,15 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
- #ifndef CONFIG_POSIX
-     error_setg(errp, "-mem-path not supported on this host");
- #else
--    if (!host_memory_backend_mr_inited(backend)) {
--        gchar *path;
--        backend->force_prealloc = mem_prealloc;
--        path = object_get_canonical_path(OBJECT(backend));
--        memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
--                                 path,
--                                 backend->size, fb->align,
--                                 (backend->share ? RAM_SHARED : 0) |
--                                 (fb->is_pmem ? RAM_PMEM : 0),
--                                 fb->mem_path, errp);
--        g_free(path);
--    }
-+    backend->force_prealloc = mem_prealloc;
-+    path = object_get_canonical_path(OBJECT(backend));
-+    memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
-+                                     path,
-+                                     backend->size, fb->align,
-+                                     (backend->share ? RAM_SHARED : 0) |
-+                                     (fb->is_pmem ? RAM_PMEM : 0),
-+                                     fb->mem_path, errp);
-+    g_free(path);
- #endif
- }
- 
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-index 1c3579e..2eb9c82 100644
---- a/backends/hostmem-memfd.c
-+++ b/backends/hostmem-memfd.c
-@@ -44,10 +44,6 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-         return;
-     }
- 
--    if (host_memory_backend_mr_inited(backend)) {
--        return;
--    }
--
-     backend->force_prealloc = mem_prealloc;
-     fd = qemu_memfd_create(TYPE_MEMORY_BACKEND_MEMFD, backend->size,
-                            m->hugetlb, m->hugetlbsize, m->seal ?
+
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 86100290cb6600b3d65e0794b45c1b82ead99411:
+
+  hostmem: no need to check for host_memory_backend_mr_inited() in alloc() (2018-11-28 11:51:24 +0100)
+
+----------------------------------------------------------------
+* lsi HBA reselection fix (George)
+* Small cleanups (Li Qiang)
+* bugfixes for vhost-user-bridge and hostmem (Marc-André)
+* single-thread TCG fix (me)
+* VMX migration blocker (me)
+* target/i386 fix for LOCK (Richard)
+* MAINTAINERS update (Philippe, Thomas)
+
+----------------------------------------------------------------
+George Kennedy (1):
+      lsi: Reselection needed to remove pending commands from queue
+
+Li Qiang (2):
+      vl: Improve error message when we can't load fw_cfg from file
+      vl.c: remove outdated comment
+
+Marc-André Lureau (4):
+      vmstate: constify VMStateField
+      vhost-user-bridge: fix recvmsg iovlen
+      hostmem-memfd: honour share=on/off property
+      hostmem: no need to check for host_memory_backend_mr_inited() in alloc()
+
+Paolo Bonzini (4):
+      target/i386: kvm: add VMX migration blocker
+      cpus: run work items for all vCPUs if single-threaded
+      migration: savevm: consult migration blockers
+      checkpatch: g_test_message does not need a trailing newline
+
+Philippe Mathieu-Daudé (1):
+      MAINTAINERS: Add an entry for the Firmware Configuration (fw_cfg) device
+
+Richard Henderson (1):
+      target/i386: Generate #UD when applying LOCK to a register destination
+
+Thomas Huth (1):
+      MAINTAINERS: Add some missing entries related to accelerators
+
+ MAINTAINERS                 |  18 +++++++
+ backends/hostmem-file.c     |  24 ++++-----
+ backends/hostmem-memfd.c    |   8 ++-
+ cpus.c                      |  12 +++--
+ hw/display/virtio-gpu.c     |   4 +-
+ hw/intc/s390_flic_kvm.c     |   4 +-
+ hw/nvram/eeprom93xx.c       |   6 +--
+ hw/nvram/fw_cfg.c           |   6 +--
+ hw/pci/msix.c               |   4 +-
+ hw/pci/pci.c                |   8 +--
+ hw/pci/shpc.c               |   7 +--
+ hw/scsi/lsi53c895a.c        |  48 +++++++++++++-----
+ hw/scsi/scsi-bus.c          |   4 +-
+ hw/timer/twl92230.c         |   4 +-
+ hw/usb/redirect.c           |  12 ++---
+ hw/virtio/virtio.c          |   8 +--
+ include/migration/vmstate.h |   6 +--
+ migration/savevm.c          |  11 ++--
+ migration/vmstate-types.c   | 119 ++++++++++++++++++++++++--------------------
+ migration/vmstate.c         |  31 ++++++------
+ qemu-options.hx             |   4 +-
+ scripts/checkpatch.pl       |   3 +-
+ target/alpha/machine.c      |   5 +-
+ target/arm/machine.c        |  12 ++---
+ target/hppa/machine.c       |  10 ++--
+ target/i386/kvm.c           |  15 ++++--
+ target/i386/translate.c     |  35 +++++++------
+ target/mips/machine.c       |  14 +++---
+ target/openrisc/machine.c   |   5 +-
+ target/ppc/machine.c        |  14 +++---
+ target/sparc/machine.c      |   7 +--
+ tests/vhost-user-bridge.c   |   2 +-
+ vl.c                        |   9 ++--
+ 33 files changed, 285 insertions(+), 194 deletions(-)
 -- 
 1.8.3.1
