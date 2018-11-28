@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gS1N7-0007am-JT
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:03:27 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gS1TH-0003BD-Ff
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:09:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gS1N1-0000Jo-BA
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:03:25 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:43145)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gS1N1-0000II-1V
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:03:19 -0500
-Date: Wed, 28 Nov 2018 10:03:14 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181128150314.GC1763@flamenco>
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-39-cota@braap.org>
-	<87k1kz50pb.fsf@linaro.org> <20181127021612.GF22108@flamenco>
-	<87ftvm4lw4.fsf@linaro.org> <20181127190657.GB8956@flamenco>
-	<20181128023020.GA25013@flamenco> <878t1d4b8w.fsf@linaro.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1gS1TB-00008k-Pe
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:09:46 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33851)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gS1T8-0008L3-0e
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:09:41 -0500
+Received: by mail-wr1-x441.google.com with SMTP id j2so26691787wrw.1
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 07:09:37 -0800 (PST)
+References: <20181123230206.12629-1-cota@braap.org>
+	<20181123230206.12629-5-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181123230206.12629-5-cota@braap.org>
+Date: Wed, 28 Nov 2018 15:09:34 +0000
+Message-ID: <875zwh44sx.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <878t1d4b8w.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [RFC 38/48] translator: implement 2-pass
- translation
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/4] xxhash: match output against the
+ original xxhash32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 
-On Wed, Nov 28, 2018 at 12:50:23 +0000, Alex Bennée wrote:
-> Emilio G. Cota <cota@braap.org> writes:
-> > I just wrote some code to go over the list and add TB callbacks,
-> > which go right before the first insn_start Op. The code is hack-ish
-> > in that we first generate the TCG ops we need, which get added to
-> > the end of the ops list, and then we go over those and move them
-> > to where we want them to be (before insn_start, in this case).
-> > But it works and it's less of a hack than doing the whole 2nd pass.
-> 
-> But we should be able to insert the ops directly in the right place.
-> That is the whole point of being a list right ;-)
 
-Right, it's just hard sometimes to know exactly where to insert.
+Emilio G. Cota <cota@braap.org> writes:
 
-> > Insn callbacks will be trivial to implement this way; memory
-> > callbacks should be harder because there are several qemu_ld/st
-> > opcodes, but it should be doable;
-> 
-> I was thinking about this last night. I wonder if we need to tag the
-> memory tcg ops so we can find them afterwards during the insertion
-> phase - but maybe the opcode itself provides enough information.
+> Change the order in which we extract a/b and c/d to
+> match the output of the upstream xxhash32.
+>
+> Tested with:
+>   https://github.com/cota/xxhash/tree/qemu
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-We should be able to extract the info from the memop argument,
-I think.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-> > last, memory instrumentation
-> > of helpers might actually be easier than with the 2 passes, because here
-> > we just have to look for a Call TCG op to know whether a guest
-> > instruction uses helpers, and if it does we can wrap the call
-> > with the helpers to generate the setting/resetting of
-> > CPUState.plugin_mem_cbs.
-> 
-> So merging the two helper calls into one from the target code?
+> ---
+>  include/qemu/xxhash.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/qemu/xxhash.h b/include/qemu/xxhash.h
+> index fe35dde328..076f1f6054 100644
+> --- a/include/qemu/xxhash.h
+> +++ b/include/qemu/xxhash.h
+> @@ -55,10 +55,10 @@ qemu_xxhash7(uint64_t ab, uint64_t cd, uint32_t e, ui=
+nt32_t f, uint32_t g)
+>      uint32_t v2 =3D QEMU_XXHASH_SEED + PRIME32_2;
+>      uint32_t v3 =3D QEMU_XXHASH_SEED + 0;
+>      uint32_t v4 =3D QEMU_XXHASH_SEED - PRIME32_1;
+> -    uint32_t a =3D ab >> 32;
+> -    uint32_t b =3D ab;
+> -    uint32_t c =3D cd >> 32;
+> -    uint32_t d =3D cd;
+> +    uint32_t a =3D ab;
+> +    uint32_t b =3D ab >> 32;
+> +    uint32_t c =3D cd;
+> +    uint32_t d =3D cd >> 32;
+>      uint32_t h32;
+>
+>      v1 +=3D a * PRIME32_2;
 
-Actually we don't need helpers to set/reset CPUState.plugin_mem_cbs;
-we do that in TCG directly. So here we could just add the "set"
-code right after "insn_start", and the "reset" code at the very
-end of the translation (right before tb_exit/goto_tb etc).
-The "reset" might still be dead code, but that is unavoidable
-because the helper might do a longjmp. But we can fix that by
-resetting the variable when returning from the jump.
 
-Thanks,
-
-		E.
+--
+Alex Benn=C3=A9e
