@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gRwFZ-0004hQ-MF
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:35:18 -0500
+	(envelope-from <thuth@redhat.com>) id 1gRwG6-0004z8-Hi
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:35:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gRwFZ-0008MB-2L
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:35:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38337)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gRwFY-0008LU-TR
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:35:17 -0500
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20181122072028.22819-2-xiaoguangrong@tencent.com> (guangrong
-	xiao's message of "Thu, 22 Nov 2018 15:20:24 +0800")
-References: <20181122072028.22819-1-xiaoguangrong@tencent.com>
-	<20181122072028.22819-2-xiaoguangrong@tencent.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 28 Nov 2018 10:35:08 +0100
-Message-ID: <87zhtt1r5f.fsf@trasno.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] bitops: introduce change_bit_atomic
+	(envelope-from <thuth@redhat.com>) id 1gRwG5-0000TX-Tg
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:35:50 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 28 Nov 2018 10:35:36 +0100
+Message-Id: <1543397736-8198-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.1?] hw/arm/aspeed: Fix build issue with
+ clang 3.4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,14 +18,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, cota@braap.org, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, qemu-arm@nongnu.org
 
-guangrong.xiao@gmail.com wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
->
-> It will be used by threaded workqueue
->
-> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+When using clang 3.4.2, compilation of QEMU fails like this:
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+  CC      aarch64-softmmu/hw/arm/aspeed.o
+hw/arm/aspeed.c:36:3: error: redefinition of typedef 'AspeedBoardState' is a C11
+      feature [-Werror,-Wtypedef-redefinition]
+} AspeedBoardState;
+  ^
+include/hw/arm/aspeed.h:14:33: note: previous definition is here
+typedef struct AspeedBoardState AspeedBoardState;
+                                ^
+1 error generated.
+make[1]: *** [hw/arm/aspeed.o] Error 1
+make: *** [subdir-aarch64-softmmu] Error 2
+
+Remove the duplicated typedef to fix this issue.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/arm/aspeed.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 6b33ecd..5158985 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -29,11 +29,11 @@ static struct arm_boot_info aspeed_board_binfo = {
+     .nb_cpus = 1,
+ };
+ 
+-typedef struct AspeedBoardState {
++struct AspeedBoardState {
+     AspeedSoCState soc;
+     MemoryRegion ram;
+     MemoryRegion max_ram;
+-} AspeedBoardState;
++};
+ 
+ /* Palmetto hardware value: 0x120CE416 */
+ #define PALMETTO_BMC_HW_STRAP1 (                                        \
+-- 
+1.8.3.1
