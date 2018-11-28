@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gS32u-0006Ul-5y
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:50:41 -0500
+	(envelope-from <thuth@redhat.com>) id 1gS334-0006d8-Ur
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:50:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gS32o-0004pP-N3
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:50:40 -0500
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:52017)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gS32o-0004ZK-8l
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:50:34 -0500
-Received: from player690.ha.ovh.net (unknown [10.109.160.12])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id E8AC0E0F81
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 17:50:26 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-13-clg@kaod.org>
-	<20181128025714.GW2251@umbus.fritz.box>
-	<20181128103551.42397998@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <128a0c2a-2f7e-55cf-1216-80266ac8a8a9@kaod.org>
-Date: Wed, 28 Nov 2018 17:50:21 +0100
+	(envelope-from <thuth@redhat.com>) id 1gS333-0005Nr-MG
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:50:50 -0500
+References: <1543399094-2260-1-git-send-email-thuth@redhat.com>
+	<20181128160525.GP24355@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <3d95da16-5f2a-2ec8-a674-189b44eab222@redhat.com>
+Date: Wed, 28 Nov 2018 17:50:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181128103551.42397998@bahia.lan>
+In-Reply-To: <20181128160525.GP24355@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v5 12/36] spapr: initialize VSMT
- before initializing the IRQ backend
+Subject: Re: [Qemu-devel] [PATCH for-3.1?] target/arm/sve_helper: Fix
+ compilation with clang 3.4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,81 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 11/28/18 10:35 AM, Greg Kurz wrote:
-> On Wed, 28 Nov 2018 13:57:14 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
->> On Fri, Nov 16, 2018 at 11:57:05AM +0100, C=C3=A9dric Le Goater wrote:
->>> We will need to use xics_max_server_number() to create the sPAPRXive
->>> object modeling the interrupt controller of the machine which is
->>> created before the CPUs.
->>>
->>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org> =20
+On 2018-11-28 17:05, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Nov 28, 2018 at 10:58:14AM +0100, Thomas Huth wrote:
+>> Clang 3.4 does not know the "flatten" attribute yet. We've already
+>> introduced the QEMU_FLATTEN macro for this in commit 97ff87c0ed020c2,
+>> so use this macro now here, too, to fix this issue.
 >>
->> My only concern here is that this moves the spapr_set_vsmt_mode()
->> before some of the sanity checks in spapr_init_cpus().  Are we certain
->> there are no edge cases that could cause badness?
->>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
 >=20
-> The early checks in spapr_init_cpus() filter out topologies that would
-> result in partially filled cores. They're only related to the rest of
-> the code that creates the boot CPUs. Before commit 1a5008fc17,
-> spapr_set_vsmt_mode() was even being called before spapr_init_cpus().
-> The rationale to move it there was to ensure it is called before the
-> first user of spapr->vsmt, which happens to be a call to
-> xics_max_server_number().
+> Although we currently only aim to support CLang and GCC, we don't have
+> any checks for a minimum version of these two tools in configure.
 >=20
-> Now that xics_max_server_number() needs to be called even earlier, I th=
-ink a
-> better change is to have xics_max_server_number() to call spapr_set_vsm=
-t_mode()
-> if spapr->vsmt isn't set.
+> So I was wondering if we actually still need to support CLang 3.4 at al=
+l
+> in QEMU, given our targetted build platforms.
+>=20
+> Unfortunately repology.org is failing me in reporting clang versions
+> for most distros, so I don't have an answer yet. I do see that Debian
+> Jessie however ships clang =3D=3D 3.5 and that's usually the oldest dis=
+tro
+> if RHEL hasn't got something older.
 
-That 'smt' routine is black magic to me and I would not dare touching it.
+I'm using RHEL7 and the clang that I get "for free" is 3.4.2 via EPEL.
 
-C.
-=20
->=20
->>> ---
->>>  hw/ppc/spapr.c | 10 +++++-----
->>>  1 file changed, 5 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>> index 7afd1a175bf2..50cb9f9f4a02 100644
->>> --- a/hw/ppc/spapr.c
->>> +++ b/hw/ppc/spapr.c
->>> @@ -2466,11 +2466,6 @@ static void spapr_init_cpus(sPAPRMachineState =
-*spapr)
->>>          boot_cores_nr =3D possible_cpus->len;
->>>      }
->>> =20
->>> -    /* VSMT must be set in order to be able to compute VCPU ids, ie =
-to
->>> -     * call xics_max_server_number() or spapr_vcpu_id().
->>> -     */
->>> -    spapr_set_vsmt_mode(spapr, &error_fatal);
->>> -
->>>      if (smc->pre_2_10_has_unused_icps) {
->>>          int i;
->>> =20
->>> @@ -2593,6 +2588,11 @@ static void spapr_machine_init(MachineState *m=
-achine)
->>>      /* Setup a load limit for the ramdisk leaving room for SLOF and =
-FDT */
->>>      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD=
-;
->>> =20
->>> +    /* VSMT must be set in order to be able to compute VCPU ids, ie =
-to
->>> +     * call xics_max_server_number() or spapr_vcpu_id().
->>> +     */
->>> +    spapr_set_vsmt_mode(spapr, &error_fatal);
->>> +
->>>      /* Set up Interrupt Controller before we create the VCPUs */
->>>      smc->irq->init(spapr, &error_fatal);
->>>   =20
->>
->=20
+> If we did explicitly check min gcc + clang versions, we could sanitize
+> stuff such as hacks for ancient clang 3.2 which lacks int128 support.
+
+I guess we could try to force the minimum version to 3.4 and see whether
+somebody complains afterwards...
+
+ Thomas
+
+
+PS: That reminds me that I also wanted to send a patch for compiler.h to
+properly fail there if the minimum version of GCC is not met (v4.1)...
