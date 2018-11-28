@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1gS7on-0002rE-Qt
+	(envelope-from <groeck7@gmail.com>) id 1gS7on-0002rD-Qs
 	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 16:56:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groeck7@gmail.com>) id 1gS7oj-0006Ya-39
+	(envelope-from <groeck7@gmail.com>) id 1gS7oj-0006YU-2M
 	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 16:56:24 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40057)
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46750)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1gS7oh-0006VO-4K
+	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1gS7oh-0006Vl-4L
 	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 16:56:19 -0500
-Received: by mail-pl1-x641.google.com with SMTP id u18so5467983plq.7
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 13:56:16 -0800 (PST)
+Received: by mail-pf1-x443.google.com with SMTP id c73so10811355pfe.13
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 13:56:17 -0800 (PST)
 Sender: Guenter Roeck <groeck7@gmail.com>
 From: Guenter Roeck <linux@roeck-us.net>
-Date: Wed, 28 Nov 2018 13:56:10 -0800
-Message-Id: <1543442171-24863-1-git-send-email-linux@roeck-us.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/2] esp-pci: Fix status register write erase
- control
+Date: Wed, 28 Nov 2018 13:56:11 -0800
+Message-Id: <1543442171-24863-2-git-send-email-linux@roeck-us.net>
+In-Reply-To: <1543442171-24863-1-git-send-email-linux@roeck-us.net>
+References: <1543442171-24863-1-git-send-email-linux@roeck-us.net>
+Subject: [Qemu-devel] [PATCH 2/2] scsi: esp: Improve consistency of RSTAT,
+ RSEQ, and RINTR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +30,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Guenter Roeck <linux@roeck-us.net>
 
-Per AM53C974 datasheet, definition of "SCSI Bus and Control (SBAC)"
-register:
+The guest OS reads RSTAT, RSEQ, and RINTR, and expects those registers
+to reflect a consistent state. However, it is possible that the registers
+can change after RSTAT was read, but before RINTR is read.
 
-Bit 24 – STATUS – Write Erase Control
+Guest OS		qemu
+--------		----
+Read RSTAT
+			esp_command_complete()
+			 RSTAT = STAT_ST
+			 esp_dma_done()
+			  RSTAT |= STAT_TC
+			  RSEQ = 0
+			  RINTR = INTR_BS
 
-This bit controls the Write Erase feature on bits 3:1 and bit 6 of the DMA
-Status Register ((B)+54h). When this bit is programmed to ‘1’, the state
-of bits 3:1 are preserved when read. Bits 3:1 are only cleared when a ‘1’
-is written to the corresponding bit location. For example, to clear bit 1,
-the value of ‘0000_0010b’ should be written to the register. When the DMA
-Status Preserve bit is ‘0’, bits 3:1 are cleared when read.
+Read RSEQ
+Read RINTR		RINTR = 0
+			RSTAT &= ~STAT_TC
+			RSEQ = SEQ_CD
 
-The status register is currently defined to bit 12, not bit 24.
-Also, its implementation is reversed: The status is auto-cleared if
-the bit is set to 1, and must be cleared explicitly when the bit is
-set to 0. This results in spurious interrupts reported by the Linux
-kernel, and in some cases even results in stalled SCSI operations.
+The guest OS would then try to handle INTR_BS combined with an old
+value of RSTAT. This sometimes resulted in lost events, spurious
+interrupts, guest OS confusion, and stalled SCSI operations.
+A typical guest error log (observed with various versions of Linux)
+looks as follows.
 
-Set SBAC_STATUS to bit 24 and reverse the logic to fix the problem.
+scsi host1: Spurious irq, sreg=13.
+...
+scsi host1: Aborting command [84531f10:2a]
+scsi host1: Current command [f882eea8:35]
+scsi host1: Queued command [84531f10:2a]
+scsi host1:  Active command [f882eea8:35]
+scsi host1: Dumping command log
+scsi host1: ent[15] CMD val[44] sreg[90] seqreg[00] sreg2[00] ireg[20] ss[00] event[0c]
+scsi host1: ent[16] CMD val[01] sreg[90] seqreg[00] sreg2[00] ireg[20] ss[02] event[0c]
+scsi host1: ent[17] CMD val[43] sreg[90] seqreg[00] sreg2[00] ireg[20] ss[02] event[0c]
+scsi host1: ent[18] EVENT val[0d] sreg[92] seqreg[04] sreg2[00] ireg[18] ss[00] event[0c]
+...
+
+Adress the situation by caching RINTR and RSEQ when RSTAT is read and
+using the cached values when the respective registers are read.
 
 Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
- hw/scsi/esp-pci.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I am not too happy with this solution (it looks kludgy to me), but it does
+work. With this series applied, I have not seen a single spurious interrupt
+after hundreds of boots, and no stalls. Prior to that, spurious interrupts
+were seen with pretty much every boot, and the stall occurred on a regular
+basis (roughly every other boot with qemu-system-hppa, less with others).
 
-diff --git a/hw/scsi/esp-pci.c b/hw/scsi/esp-pci.c
-index 419fc66..d956909 100644
---- a/hw/scsi/esp-pci.c
-+++ b/hw/scsi/esp-pci.c
-@@ -59,7 +59,7 @@
- #define DMA_STAT_SCSIINT 0x10
- #define DMA_STAT_BCMBLT  0x20
- 
--#define SBAC_STATUS 0x1000
-+#define SBAC_STATUS (1 << 24)
- 
- typedef struct PCIESPState {
-     /*< private >*/
-@@ -136,7 +136,7 @@ static void esp_pci_dma_write(PCIESPState *pci, uint32_t saddr, uint32_t val)
-         pci->dma_regs[saddr] = val;
+If anyone has a better idea, please let me know, and I'll be happy to
+test it.
+
+ hw/scsi/esp.c         | 40 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/scsi/esp.h |  2 ++
+ 2 files changed, 42 insertions(+)
+
+diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
+index 630d923..6af74bc 100644
+--- a/hw/scsi/esp.c
++++ b/hw/scsi/esp.c
+@@ -415,6 +415,16 @@ uint64_t esp_reg_read(ESPState *s, uint32_t saddr)
+         }
          break;
-     case DMA_STAT:
--        if (!(pci->sbac & SBAC_STATUS)) {
-+        if (pci->sbac & SBAC_STATUS) {
-             /* clear some bits on write */
-             uint32_t mask = DMA_STAT_ERROR | DMA_STAT_ABORT | DMA_STAT_DONE;
-             pci->dma_regs[DMA_STAT] &= ~(val & mask);
-@@ -157,7 +157,7 @@ static uint32_t esp_pci_dma_read(PCIESPState *pci, uint32_t saddr)
-         if (pci->esp.rregs[ESP_RSTAT] & STAT_INT) {
-             val |= DMA_STAT_SCSIINT;
+     case ESP_RINTR:
++        if (s->rintr_saved) {
++            old_val = s->rintr_saved;
++            s->rintr_saved = 0;
++            if (!(s->rregs[ESP_RINTR])) {
++                s->rregs[ESP_RSTAT] &= ~STAT_TC;
++                s->rregs[ESP_RSEQ] = SEQ_CD;
++                esp_lower_irq(s);
++            }
++            return old_val;
++        }
+         /* Clear sequence step, interrupt register and all status bits
+            except TC */
+         old_val = s->rregs[ESP_RINTR];
+@@ -429,6 +439,34 @@ uint64_t esp_reg_read(ESPState *s, uint32_t saddr)
+         if (!s->tchi_written) {
+             return s->chip_id;
          }
--        if (pci->sbac & SBAC_STATUS) {
-+        if (!(pci->sbac & SBAC_STATUS)) {
-             pci->dma_regs[DMA_STAT] &= ~(DMA_STAT_ERROR | DMA_STAT_ABORT |
-                                          DMA_STAT_DONE);
-         }
++    case ESP_RSTAT:
++        /*
++         * After receiving an interrupt, the guest OS reads
++         * RSTAT, RSEQ, and RINTR. When reading RINTR,
++         * RSTAT and RSEQ are updated. It was observed that
++         * esp_command_complete() and with it esp_dma_done()
++         * was called after the guest OS reads RSTAT, but
++         * before it was able to read RINTR. In other words,
++         * the host would read RINTR associated with the
++         * old value of RSTAT, not the new value. Since RSTAT
++         * was supposed to reflect STAT_ST in this situation,
++         * the host OS got confused, and the operation stalled.
++         * Remedy the situation by caching both ESP_RINTR and
++         * ESP_RSEQ. Return those values until ESP_RINTR is read.
++         * Only do this if an interrupt is pending to limit its
++         * impact.
++         */
++        if (s->rregs[ESP_RSTAT] & STAT_INT) {
++            s->rintr_saved = s->rregs[ESP_RINTR];
++            s->rseq_saved =  s->rregs[ESP_RSEQ];
++            s->rregs[ESP_RINTR] = 0;
++        }
++        break;
++    case ESP_RSEQ:
++        if (s->rintr_saved) {
++            return s->rseq_saved;
++        }
++        break;
+     default:
+         break;
+     }
+@@ -577,6 +615,8 @@ const VMStateDescription vmstate_esp = {
+     .fields = (VMStateField[]) {
+         VMSTATE_BUFFER(rregs, ESPState),
+         VMSTATE_BUFFER(wregs, ESPState),
++        VMSTATE_UINT8(rintr_saved, ESPState),
++        VMSTATE_UINT8(rseq_saved, ESPState),
+         VMSTATE_INT32(ti_size, ESPState),
+         VMSTATE_UINT32(ti_rptr, ESPState),
+         VMSTATE_UINT32(ti_wptr, ESPState),
+diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
+index 682a0d2..342f607 100644
+--- a/include/hw/scsi/esp.h
++++ b/include/hw/scsi/esp.h
+@@ -17,6 +17,8 @@ typedef struct ESPState ESPState;
+ struct ESPState {
+     uint8_t rregs[ESP_REGS];
+     uint8_t wregs[ESP_REGS];
++    uint8_t rintr_saved;
++    uint8_t rseq_saved;
+     qemu_irq irq;
+     uint8_t chip_id;
+     bool tchi_written;
 -- 
 2.7.4
