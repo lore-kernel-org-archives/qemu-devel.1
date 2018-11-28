@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gS3AR-0005n3-LJ
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:58:29 -0500
+	(envelope-from <groug@kaod.org>) id 1gS3BX-00074u-Be
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:59:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gS3AN-0001p4-DP
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:58:27 -0500
-Date: Wed, 28 Nov 2018 16:58:03 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181128165803.GT24355@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1543399094-2260-1-git-send-email-thuth@redhat.com>
-	<20181128160525.GP24355@redhat.com>
-	<3d95da16-5f2a-2ec8-a674-189b44eab222@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1gS3BQ-0003q4-2p
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:59:33 -0500
+Received: from 7.mo3.mail-out.ovh.net ([46.105.57.200]:40774)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gS3BP-0003ZP-Pe
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:59:27 -0500
+Received: from player718.ha.ovh.net (unknown [10.109.143.246])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id AC0B61EB379
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 17:59:18 +0100 (CET)
+Date: Wed, 28 Nov 2018 17:59:10 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181128175910.4831a578@bahia.lan>
+In-Reply-To: <128a0c2a-2f7e-55cf-1216-80266ac8a8a9@kaod.org>
+References: <20181116105729.23240-1-clg@kaod.org>
+	<20181116105729.23240-13-clg@kaod.org>
+	<20181128025714.GW2251@umbus.fritz.box>
+	<20181128103551.42397998@bahia.lan>
+	<128a0c2a-2f7e-55cf-1216-80266ac8a8a9@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3d95da16-5f2a-2ec8-a674-189b44eab222@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.1?] target/arm/sve_helper: Fix
- compilation with clang 3.4
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v5 12/36] spapr: initialize VSMT
+ before initializing the IRQ backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +34,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Wed, Nov 28, 2018 at 05:50:38PM +0100, Thomas Huth wrote:
-> On 2018-11-28 17:05, Daniel P. Berrang=C3=A9 wrote:
-> > On Wed, Nov 28, 2018 at 10:58:14AM +0100, Thomas Huth wrote:
-> >> Clang 3.4 does not know the "flatten" attribute yet. We've already
-> >> introduced the QEMU_FLATTEN macro for this in commit 97ff87c0ed020c2=
-,
-> >> so use this macro now here, too, to fix this issue.
+On Wed, 28 Nov 2018 17:50:21 +0100
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+
+> On 11/28/18 10:35 AM, Greg Kurz wrote:
+> > On Wed, 28 Nov 2018 13:57:14 +1100
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >  =20
+> >> On Fri, Nov 16, 2018 at 11:57:05AM +0100, C=C3=A9dric Le Goater wrote:=
+ =20
+> >>> We will need to use xics_max_server_number() to create the sPAPRXive
+> >>> object modeling the interrupt controller of the machine which is
+> >>> created before the CPUs.
+> >>>
+> >>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>   =20
 > >>
-> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> My only concern here is that this moves the spapr_set_vsmt_mode()
+> >> before some of the sanity checks in spapr_init_cpus().  Are we certain
+> >> there are no edge cases that could cause badness?
+> >> =20
 > >=20
-> > Although we currently only aim to support CLang and GCC, we don't hav=
-e
-> > any checks for a minimum version of these two tools in configure.
+> > The early checks in spapr_init_cpus() filter out topologies that would
+> > result in partially filled cores. They're only related to the rest of
+> > the code that creates the boot CPUs. Before commit 1a5008fc17,
+> > spapr_set_vsmt_mode() was even being called before spapr_init_cpus().
+> > The rationale to move it there was to ensure it is called before the
+> > first user of spapr->vsmt, which happens to be a call to
+> > xics_max_server_number().
 > >=20
-> > So I was wondering if we actually still need to support CLang 3.4 at =
-all
-> > in QEMU, given our targetted build platforms.
-> >=20
-> > Unfortunately repology.org is failing me in reporting clang versions
-> > for most distros, so I don't have an answer yet. I do see that Debian
-> > Jessie however ships clang =3D=3D 3.5 and that's usually the oldest d=
-istro
-> > if RHEL hasn't got something older.
+> > Now that xics_max_server_number() needs to be called even earlier, I th=
+ink a
+> > better change is to have xics_max_server_number() to call spapr_set_vsm=
+t_mode()
+> > if spapr->vsmt isn't set. =20
 >=20
-> I'm using RHEL7 and the clang that I get "for free" is 3.4.2 via EPEL.
+> That 'smt' routine is black magic to me and I would not dare touching it.
+>=20
 
-Hmm, raises interesting question of whether we should consider 3rd
-party repos for purposes of determining our min versions.
+I don't suggest to change it, just to ensure it gets called before spapr->v=
+smt
+gets used. But don't worry, I'll have a deeper look and send a patch :)
 
-I'd pretty much intended to only care about vendor provided repos,
-in which case RHEL7 would be considered to lack clang, for purposes
-of deciding min versions.
-
-EPEL is a bit murky because while it is a 3rd party repo, many users
-of RHEL consider to be a defacto standard repo.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> C.
+> =20
+> >  =20
+> >>> ---
+> >>>  hw/ppc/spapr.c | 10 +++++-----
+> >>>  1 file changed, 5 insertions(+), 5 deletions(-)
+> >>>
+> >>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >>> index 7afd1a175bf2..50cb9f9f4a02 100644
+> >>> --- a/hw/ppc/spapr.c
+> >>> +++ b/hw/ppc/spapr.c
+> >>> @@ -2466,11 +2466,6 @@ static void spapr_init_cpus(sPAPRMachineState =
+*spapr)
+> >>>          boot_cores_nr =3D possible_cpus->len;
+> >>>      }
+> >>> =20
+> >>> -    /* VSMT must be set in order to be able to compute VCPU ids, ie =
+to
+> >>> -     * call xics_max_server_number() or spapr_vcpu_id().
+> >>> -     */
+> >>> -    spapr_set_vsmt_mode(spapr, &error_fatal);
+> >>> -
+> >>>      if (smc->pre_2_10_has_unused_icps) {
+> >>>          int i;
+> >>> =20
+> >>> @@ -2593,6 +2588,11 @@ static void spapr_machine_init(MachineState *m=
+achine)
+> >>>      /* Setup a load limit for the ramdisk leaving room for SLOF and =
+FDT */
+> >>>      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
+> >>> =20
+> >>> +    /* VSMT must be set in order to be able to compute VCPU ids, ie =
+to
+> >>> +     * call xics_max_server_number() or spapr_vcpu_id().
+> >>> +     */
+> >>> +    spapr_set_vsmt_mode(spapr, &error_fatal);
+> >>> +
+> >>>      /* Set up Interrupt Controller before we create the VCPUs */
+> >>>      smc->irq->init(spapr, &error_fatal);
+> >>>     =20
+> >> =20
+> >  =20
+>=20
