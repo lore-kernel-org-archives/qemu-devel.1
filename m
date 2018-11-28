@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gS8Qv-0004lb-P5
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:35:50 -0500
+	(envelope-from <clg@kaod.org>) id 1gS8SN-0005eE-Bk
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:37:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gS8Qt-0000Ya-34
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:35:49 -0500
-Resent-Message-Id: <E1gS8Qt-0000Ya-34@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21352)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gS8Qs-0000R4-Sv
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:35:47 -0500
-In-Reply-To: <20181127024959.7060-1-ehabkost@redhat.com>
-Message-ID: <154344449471.20638.181108432869418230@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <clg@kaod.org>) id 1gS8SJ-0002xz-C0
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:37:19 -0500
+Received: from 8.mo3.mail-out.ovh.net ([87.98.172.249]:44757)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gS8SH-0002ac-HX
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:37:15 -0500
+Received: from player157.ha.ovh.net (unknown [10.109.146.32])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id AF3181E9C8F
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 23:37:11 +0100 (CET)
+References: <20181116105729.23240-1-clg@kaod.org>
+	<20181116105729.23240-20-clg@kaod.org>
+	<20181128044257.GC2251@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <62423058-3603-942a-915f-f9e6afd7b4cc@kaod.org>
+Date: Wed, 28 Nov 2018 23:37:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 28 Nov 2018 14:34:57 -0800 (PST)
-Subject: Re: [Qemu-devel] [libvirt] [PATCH for-4.0 v3 0/2] virtio: Provide
- version-specific variants of virtio PCI devices
+In-Reply-To: <20181128044257.GC2251@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 19/36] spapr: add a 'pseries-3.1-xive'
+ machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +33,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ehabkost@redhat.com
-Cc: famz@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.comfamz@redhat.com, stefanha@redhat.com, amit@kernel.org, libvir-list@redhat.com, jasowang@redhat.com, cohuck@redhat.com, abologna@redhat.com, wainersm@redhat.com, ccarrara@redhat.com, arei.gonglei@huawei.com, laine@redhat.com, crosa@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, philmd@redhat.com, marcel.apfelbaum@gmail.com, kraxel@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtsaWJ2aXJ0XSBbUEFUQ0ggZm9yLTQuMCB2MyAwLzJdIHZpcnRpbzogUHJvdmlkZSB2
-ZXJzaW9uLXNwZWNpZmljIHZhcmlhbnRzIG9mIHZpcnRpbyBQQ0kgZGV2aWNlcwpNZXNzYWdlLWlk
-OiAyMDE4MTEyNzAyNDk1OS43MDYwLTEtZWhhYmtvc3RAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cg
-LS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0
-IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
-bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
-cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
-Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
-ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
-IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
-ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0MjFkOTNkIHZp
-cnRpbzogUHJvdmlkZSB2ZXJzaW9uLXNwZWNpZmljIHZhcmlhbnRzIG9mIHZpcnRpbyBQQ0kgZGV2
-aWNlcwpiZWYxMjIzIHZpcnRpbzogSGVscGVyIGZvciByZWdpc3RlcmluZyB2aXJ0aW8gZGV2aWNl
-IHR5cGVzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IHZpcnRpbzog
-SGVscGVyIGZvciByZWdpc3RlcmluZyB2aXJ0aW8gZGV2aWNlIHR5cGVzLi4uCldBUk5JTkc6IGxp
-bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0OTU6IEZJTEU6IGh3L3ZpcnRpby92aXJ0aW8tcGNpLmg6
-NDQzOgorICAgICAqIEltcGxlbWVudHMgYm90aCBJTlRFUkZBQ0VfUENJRV9ERVZJQ0UgYW5kIElO
-VEVSRkFDRV9DT05WRU5USU9OQUxfUENJX0RFVklDRSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiM1MDQ6IEZJTEU6IGh3L3ZpcnRpby92aXJ0aW8tcGNpLmg6NDUyOgorICAgICAq
-IEltcGxlbWVudHMgYm90aCBJTlRFUkZBQ0VfUENJRV9ERVZJQ0UgYW5kIElOVEVSRkFDRV9DT05W
-RU5USU9OQUxfUENJX0RFVklDRS4KCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgNDY5IGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tp
-bmcgUEFUQ0ggMi8yOiB2aXJ0aW86IFByb3ZpZGUgdmVyc2lvbi1zcGVjaWZpYyB2YXJpYW50cyBv
-ZiB2aXJ0aW8gUENJIGRldmljZXMuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
-ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzE1OiAKbmV3IGZpbGUg
-bW9kZSAxMDA2NDQKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzcxOiBGSUxFOiB0
-ZXN0cy9hY2NlcHRhbmNlL3ZpcnRpb192ZXJzaW9uLnB5OjUyOgorICAgIHJldHVybiBkZXZ0eXBl
-IGluIFtkWyduYW1lJ10gZm9yIGQgaW4gdm0uY29tbWFuZCgncW9tLWxpc3QtdHlwZXMnLCBpbXBs
-ZW1lbnRzPWltcGxlbWVudHMpXQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNzM6
-IEZJTEU6IHRlc3RzL2FjY2VwdGFuY2UvdmlydGlvX3ZlcnNpb24ucHk6NTQ6CitkZWYgZ2V0X2lu
-dGVyZmFjZXModm0sIGRldnR5cGUsIGludGVyZmFjZXM9WydwY2ktZXhwcmVzcy1kZXZpY2UnLCAn
-Y29udmVudGlvbmFsLXBjaS1kZXZpY2UnXSk6CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojNDI3OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3ZpcnRpb192ZXJzaW9uLnB5OjEwODoK
-KyAgICAgICAgZGV2XzFfMCxudF9pZmFjZXMgPSBzZWxmLnJ1bl9kZXZpY2UoJyVzLW5vbi10cmFu
-c2l0aW9uYWwnICUgKHFlbXVfZGV2dHlwZSkpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojNDUxOiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL3ZpcnRpb192ZXJzaW9uLnB5OjEzMjoK
-KyAgICAgICAgZGV2X3RyYW5zLHRyYW5zX2lmYWNlcyA9IHNlbGYucnVuX2RldmljZSgnJXMtdHJh
-bnNpdGlvbmFsJyAlIChxZW11X2RldnR5cGUpKQoKdG90YWw6IDIgZXJyb3JzLCAzIHdhcm5pbmdz
-LCA0MDUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+On 11/28/18 5:42 AM, David Gibson wrote:
+> On Fri, Nov 16, 2018 at 11:57:12AM +0100, C=E9dric Le Goater wrote:
+>> The interrupt mode is statically defined to XIVE only for this machine=
+.
+>> The guest OS is required to have support for the XIVE exploitation
+>> mode of the POWER9 interrupt controller.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/spapr_irq.h |  1 +
+>>  hw/ppc/spapr.c             | 36 +++++++++++++++++++++++++++++++-----
+>>  hw/ppc/spapr_irq.c         |  3 +++
+>>  3 files changed, 35 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+>> index c3b4c38145eb..b299dd794bff 100644
+>> --- a/include/hw/ppc/spapr_irq.h
+>> +++ b/include/hw/ppc/spapr_irq.h
+>> @@ -33,6 +33,7 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr);
+>>  typedef struct sPAPRIrq {
+>>      uint32_t    nr_irqs;
+>>      uint32_t    nr_msis;
+>> +    uint8_t     ov5;
+>=20
+> I'm a bit confused as to what exactly this represents..
+
+The option vector 5 bits advertised by CAS for the platform. What the
+hypervisor supports.
+=20
+>=20
+>>      void (*init)(sPAPRMachineState *spapr, int nr_irqs, int nr_server=
+s,
+>>                   Error **errp);
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index ad1692cdcd0f..8fbb743769db 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -1097,12 +1097,14 @@ static void spapr_dt_rtas(sPAPRMachineState *s=
+papr, void *fdt)
+>>      spapr_dt_rtas_tokens(fdt, rtas);
+>>  }
+>> =20
+>> -/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU f=
+eatures
+>> - * that the guest may request and thus the valid values for bytes 24.=
+.26 of
+>> - * option vector 5: */
+>> -static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
+>> +/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU
+>> + * and the XIVE features that the guest may request and thus the vali=
+d
+>> + * values for bytes 23..26 of option vector 5: */
+>> +static void spapr_dt_ov5_platform_support(sPAPRMachineState *spapr, v=
+oid *fdt,
+>> +                                          int chosen)
+>>  {
+>>      PowerPCCPU *first_ppc_cpu =3D POWERPC_CPU(first_cpu);
+>> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+>> =20
+>>      char val[2 * 4] =3D {
+>>          23, 0x00, /* Xive mode, filled in below. */
+>> @@ -1123,7 +1125,11 @@ static void spapr_dt_ov5_platform_support(void =
+*fdt, int chosen)
+>>          } else {
+>>              val[3] =3D 0x00; /* Hash */
+>>          }
+>> +        /* TODO: test KVM support */
+>> +        val[1] =3D smc->irq->ov5;
+>>      } else {
+>> +        val[1] =3D smc->irq->ov5;
+>=20
+> ..here it seems to be a specific value for this OV5 byte, indicating th=
+e
+> supported intc...
+
+yes.
+
+>=20
+>> +
+>>          /* V3 MMU supports both hash and radix in tcg (with dynamic s=
+witching) */
+>>          val[3] =3D 0xC0;
+>>      }
+>> @@ -1191,7 +1197,7 @@ static void spapr_dt_chosen(sPAPRMachineState *s=
+papr, void *fdt)
+>>          _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_pa=
+th));
+>>      }
+>> =20
+>> -    spapr_dt_ov5_platform_support(fdt, chosen);
+>> +    spapr_dt_ov5_platform_support(spapr, fdt, chosen);
+>> =20
+>>      g_free(stdout_path);
+>>      g_free(bootlist);
+>> @@ -2622,6 +2628,11 @@ static void spapr_machine_init(MachineState *ma=
+chine)
+>>      /* advertise support for ibm,dyamic-memory-v2 */
+>>      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
+>> =20
+>> +    /* advertise XIVE */
+>> +    if (smc->irq->ov5) {
+>=20
+> ..but here it seems to be a bool indicating XIVE support specifically.
+
+ah. yes. I need to check this part. That was a while ago.
+
+>> +        spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
+>> +    }
+>> +
+>>      /* init CPUs */
+>>      spapr_init_cpus(spapr);
+>> =20
+>> @@ -3971,6 +3982,21 @@ static void spapr_machine_3_1_class_options(Mac=
+hineClass *mc)
+>> =20
+>>  DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
+>> =20
+>> +static void spapr_machine_3_1_xive_instance_options(MachineState *mac=
+hine)
+>> +{
+>> +    spapr_machine_3_1_instance_options(machine);
+>> +}
+>> +
+>> +static void spapr_machine_3_1_xive_class_options(MachineClass *mc)
+>> +{
+>> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+>> +
+>> +    spapr_machine_3_1_class_options(mc);
+>> +    smc->irq =3D &spapr_irq_xive;
+>> +}
+>> +
+>> +DEFINE_SPAPR_MACHINE(3_1_xive, "3.1-xive", false);
+>> +
+>>  /*
+>>   * pseries-3.0
+>>   */
+>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+>> index 253abc10e780..42e73851b174 100644
+>> --- a/hw/ppc/spapr_irq.c
+>> +++ b/hw/ppc/spapr_irq.c
+>> @@ -210,6 +210,7 @@ static Object *spapr_irq_cpu_intc_create_xics(sPAP=
+RMachineState *spapr,
+>>  sPAPRIrq spapr_irq_xics =3D {
+>>      .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
+>>      .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
+>> +    .ov5         =3D 0x0, /* XICS only */
+>> =20
+>>      .init        =3D spapr_irq_init_xics,
+>>      .claim       =3D spapr_irq_claim_xics,
+>> @@ -341,6 +342,7 @@ static Object *spapr_irq_cpu_intc_create_xive(sPAP=
+RMachineState *spapr,
+>>  sPAPRIrq spapr_irq_xive =3D {
+>>      .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
+>>      .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
+>> +    .ov5         =3D 0x40, /* XIVE exploitation mode only */
+>> =20
+>>      .init        =3D spapr_irq_init_xive,
+>>      .claim       =3D spapr_irq_claim_xive,
+>> @@ -447,6 +449,7 @@ int spapr_irq_find(sPAPRMachineState *spapr, int n=
+um, bool align, Error **errp)
+>>  sPAPRIrq spapr_irq_xics_legacy =3D {
+>>      .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+>>      .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+>> +    .ov5         =3D 0x0, /* XICS only */
+>> =20
+>>      .init        =3D spapr_irq_init_xics,
+>>      .claim       =3D spapr_irq_claim_xics,
+>=20
