@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gS2A1-0006wl-9N
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:53:58 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gS2B3-0007hv-Vm
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:55:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gS29w-0001iw-A1
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:53:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39982)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gS29w-0001ha-12
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:53:52 -0500
-Date: Wed, 28 Nov 2018 16:53:45 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181128155345.GC4222@dhcp-200-186.str.redhat.com>
-References: <20181010133333.24538.53169.stgit@pasha-VirtualBox>
-	<20181010133414.24538.21966.stgit@pasha-VirtualBox>
+	(envelope-from <peter.maydell@linaro.org>) id 1gS2B2-0002nb-JG
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:55:01 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gS2B0-0002ju-N9
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:55:00 -0500
+Received: by mail-oi1-x241.google.com with SMTP id x202so22932084oif.13
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 07:54:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181010133414.24538.21966.stgit@pasha-VirtualBox>
-Subject: Re: [Qemu-devel] [PATCH v7 07/19] migration: introduce icount field
- for snapshots
+References: <1543399094-2260-1-git-send-email-thuth@redhat.com>
+	<2ac07515-10f3-ed38-c022-e583cd1cd36a@redhat.com>
+	<ed0252f7-e74c-46e1-b47b-8d0c2e8dd73e@redhat.com>
+	<0d74ecc6-419e-0b93-c0a9-4a4ce37a7ca5@redhat.com>
+In-Reply-To: <0d74ecc6-419e-0b93-c0a9-4a4ce37a7ca5@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 28 Nov 2018 15:54:44 +0000
+Message-ID: <CAFEAcA-q+kJT-pzTxWPwREPsTviAjd-EA51VoSSNEtPPP-N8yQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.1?] target/arm/sve_helper: Fix
+ compilation with clang 3.4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, mst@redhat.com, jasowang@redhat.com, zuban32s@gmail.com, kraxel@redhat.com, thomas.dullien@googlemail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, armbru@redhat.com, dovgaluk@ispras.ru, dgilbert@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org, rth@twiddle.net, crosthwaite.peter@gmail.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, pbonzini@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-Am 10.10.2018 um 15:34 hat Pavel Dovgalyuk geschrieben:
-> Saving icount as a parameters of the snapshot allows navigation between
-> them in the execution replay scenario.
-> This information can be used for finding a specific snapshot for rewinding
-> the recorded execution to the specific moment of the time.
-> E.g., 'reverse step' action needs to load the nearest snapshot which is
-> prior to the current moment of time .
-> 
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+On Wed, 28 Nov 2018 at 15:50, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> On 28/11/18 15:39, Thomas Huth wrote:
+> > On 2018-11-28 15:34, Philippe Mathieu-Daud=C3=A9 wrote:
+> >> On 28/11/18 10:58, Thomas Huth wrote:
+> >>> Clang 3.4 does not know the "flatten" attribute yet. We've already
+> >>> introduced the QEMU_FLATTEN macro for this in commit 97ff87c0ed020c2,
+> >>> so use this macro now here, too, to fix this issue.
+> >>
+> >> checkpatch candidate?
+> >
+> > I think we'd rather need a docker-based test with such an old version o=
+f
+> > Clang... (since there are also other issues like the double-typedef
+> > problem that regularly occurs there).
+>
+> I was thinking of something such (broken code!):
+>
+>   if ($line =3D~ /.*__attribute__\w+\(\(flatten\)\)/) {
+>     ERROR("Use QEMU_FLATTEN ...\n");
+>   }
 
-> diff --git a/block/qapi.c b/block/qapi.c
-> index c66f949..9f2ccfa 100644
-> --- a/block/qapi.c
-> +++ b/block/qapi.c
-> @@ -210,6 +210,7 @@ int bdrv_query_snapshot_info_list(BlockDriverState *bs,
->          info->date_nsec     = sn_tab[i].date_nsec;
->          info->vm_clock_sec  = sn_tab[i].vm_clock_nsec / 1000000000;
->          info->vm_clock_nsec = sn_tab[i].vm_clock_nsec % 1000000000;
-> +        info->icount        = sn_tab[i].icount;
+If you wanted to go down that path then it might be best to
+opt for "warn about any use of __attribute__ outside compiler.h,
+perhaps with a whitelist of known-ok attributes".
 
-Now that it's optional, info->has_icount needs to be set, too.
-
->          info_list = g_new0(SnapshotInfoList, 1);
->          info_list->value = info;
-
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index cfb37f8..34dc9f1 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -26,13 +26,18 @@
->  #
->  # @vm-clock-nsec: fractional part in nano seconds to be used with vm-clock-sec
->  #
-> +# @icount: Current instruction count. Appears when execution record/replay
-> +#          is enabled. Used for "time-traveling" to match the moment
-> +#          in the recorded execution with the snapshots (since 3.1)
-
-"(since 4.0)" now.
-
-Kevin
+thanks
+-- PMM
