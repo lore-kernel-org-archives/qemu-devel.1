@@ -1,38 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gS2ux-000610-Ip
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:42:32 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gS2v2-0006Ab-IP
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:42:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gS2p2-0004Sq-40
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:36:25 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18437)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gS2p1-0004NP-43
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:36:19 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wASGO8sO036074
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 11:36:14 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p1vrg6j7t-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 11:36:13 -0500
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Wed, 28 Nov 2018 16:36:10 -0000
-Date: Wed, 28 Nov 2018 17:36:04 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <20181122165432.4437-4-cohuck@redhat.com>
-References: <20181122165432.4437-1-cohuck@redhat.com>
-	<20181122165432.4437-4-cohuck@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gS2nh-000351-H4
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:34:59 -0500
+Date: Wed, 28 Nov 2018 17:34:47 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181128163447.GF4222@dhcp-200-186.str.redhat.com>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	<20181121151211.15997-15-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20181128173604.24b301a3@oc2783563651>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 3/3] vfio-ccw: add handling
- for asnyc channel instructions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181121151211.15997-15-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH 14/18] xen: add implementations of
+ xen-qdisk connect and disconnect functions...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,124 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Max Reitz <mreitz@redhat.com>
 
-On Thu, 22 Nov 2018 17:54:32 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> Add a region to the vfio-ccw device that can be used to submit
-> asynchronous I/O instructions. ssch continues to be handled by the
-> existing I/O region; the new region handles hsch and csch.
+Am 21.11.2018 um 16:12 hat Paul Durrant geschrieben:
+> ...and wire in the dataplane.
 > 
-> Interrupt status continues to be reported through the same channels
-> as for ssch.
+> This patch adds the remaining code to make the xen-qdisk XenDevice
+> functional. The parameters that a block frontend expects to find are
+> populated in the backend xenstore area, and the 'ring-ref' and
+> 'event-channel' values specified in the frontend xenstore area are
+> mapped/bound and used to set up the dataplane.
 > 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 > ---
->  drivers/s390/cio/Makefile           |   3 +-
->  drivers/s390/cio/vfio_ccw_async.c   |  88 ++++++++++++++++
->  drivers/s390/cio/vfio_ccw_drv.c     |  48 ++++++---
->  drivers/s390/cio/vfio_ccw_fsm.c     | 158 +++++++++++++++++++++++++++-
->  drivers/s390/cio/vfio_ccw_ops.c     |  13 ++-
->  drivers/s390/cio/vfio_ccw_private.h |   6 ++
->  include/uapi/linux/vfio.h           |   4 +
->  include/uapi/linux/vfio_ccw.h       |  12 +++
->  8 files changed, 313 insertions(+), 19 deletions(-)
->  create mode 100644 drivers/s390/cio/vfio_ccw_async.c
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> ---
+>  hw/block/xen-qdisk.c       | 140 +++++++++++++++++++++++++++++++++++++++++++++
+>  hw/xen/xen-bus.c           |  12 ++--
+>  include/hw/xen/xen-bus.h   |   8 +++
+>  include/hw/xen/xen-qdisk.h |  12 ++++
+>  4 files changed, 166 insertions(+), 6 deletions(-)
 > 
-> diff --git a/drivers/s390/cio/Makefile b/drivers/s390/cio/Makefile
-> index f230516abb96..f6a8db04177c 100644
-> --- a/drivers/s390/cio/Makefile
-> +++ b/drivers/s390/cio/Makefile
-> @@ -20,5 +20,6 @@ obj-$(CONFIG_CCWGROUP) += ccwgroup.o
->  qdio-objs := qdio_main.o qdio_thinint.o qdio_debug.o qdio_setup.o
->  obj-$(CONFIG_QDIO) += qdio.o
+> diff --git a/hw/block/xen-qdisk.c b/hw/block/xen-qdisk.c
+> index 35f7b70480..8c88393832 100644
+> --- a/hw/block/xen-qdisk.c
+> +++ b/hw/block/xen-qdisk.c
+> @@ -9,6 +9,10 @@
+>  #include "qapi/visitor.h"
+>  #include "hw/hw.h"
+>  #include "hw/xen/xen-qdisk.h"
+> +#include "sysemu/blockdev.h"
+> +#include "sysemu/block-backend.h"
+> +#include "sysemu/iothread.h"
+> +#include "dataplane/xen-qdisk.h"
+>  #include "trace.h"
 >  
-> -vfio_ccw-objs += vfio_ccw_drv.o vfio_ccw_cp.o vfio_ccw_ops.o vfio_ccw_fsm.o
-> +vfio_ccw-objs += vfio_ccw_drv.o vfio_ccw_cp.o vfio_ccw_ops.o vfio_ccw_fsm.o \
-> +	vfio_ccw_async.o
->  obj-$(CONFIG_VFIO_CCW) += vfio_ccw.o
-> diff --git a/drivers/s390/cio/vfio_ccw_async.c b/drivers/s390/cio/vfio_ccw_async.c
-> new file mode 100644
-> index 000000000000..8c7f51d17d70
-> --- /dev/null
-> +++ b/drivers/s390/cio/vfio_ccw_async.c
-> @@ -0,0 +1,88 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Async I/O region for vfio_ccw
-> + *
-> + * Copyright Red Hat, Inc. 2018
-> + *
-> + * Author(s): Cornelia Huck <cohuck@redhat.com>
-> + */
+>  static char *xen_qdisk_get_name(XenDevice *xendev, Error **errp)
+> @@ -23,6 +27,11 @@ static void xen_qdisk_realize(XenDevice *xendev, Error **errp)
+>  {
+>      XenQdiskDevice *qdiskdev = XEN_QDISK_DEVICE(xendev);
+>      XenQdiskVdev *vdev = &qdiskdev->vdev;
+> +    BlockConf *conf = &qdiskdev->conf;
+> +    DriveInfo *dinfo;
+> +    bool is_cdrom;
+> +    unsigned int info;
+> +    int64_t size;
+>  
+>      if (!vdev->valid) {
+>          error_setg(errp, "vdev property not set");
+> @@ -30,13 +39,134 @@ static void xen_qdisk_realize(XenDevice *xendev, Error **errp)
+>      }
+>  
+>      trace_xen_qdisk_realize(vdev->disk, vdev->partition);
 > +
-> +#include <linux/vfio.h>
-> +#include <linux/mdev.h>
+> +    if (!conf->blk) {
+> +        error_setg(errp, "drive property not set");
+> +        return;
+> +    }
 > +
-> +#include "vfio_ccw_private.h"
-> +
-> +static size_t vfio_ccw_async_region_read(struct vfio_ccw_private *private,
-> +					 char __user *buf, size_t count,
-> +					 loff_t *ppos)
-> +{
-> +	unsigned int i = VFIO_CCW_OFFSET_TO_INDEX(*ppos) - VFIO_CCW_NUM_REGIONS;
-> +	loff_t pos = *ppos & VFIO_CCW_OFFSET_MASK;
-> +	struct ccw_cmd_region *region;
-> +
-> +	if (pos + count > sizeof(*region))
-> +		return -EINVAL;
-> +
-> +	region = private->region[i].data;
-> +	if (copy_to_user(buf, (void *)region + pos, count))
-> +		return -EFAULT;
-> +
-> +	return count;
-> +
-> +}
-> +
-> +static size_t vfio_ccw_async_region_write(struct vfio_ccw_private *private,
-> +					  const char __user *buf, size_t count,
-> +					  loff_t *ppos)
-> +{
-> +	unsigned int i = VFIO_CCW_OFFSET_TO_INDEX(*ppos) - VFIO_CCW_NUM_REGIONS;
-> +	loff_t pos = *ppos & VFIO_CCW_OFFSET_MASK;
-> +	struct ccw_cmd_region *region;
-> +
-> +	if (pos + count > sizeof(*region))
-> +		return -EINVAL;
-> +
-> +	if (private->state == VFIO_CCW_STATE_NOT_OPER ||
-> +	    private->state == VFIO_CCW_STATE_STANDBY)
-> +		return -EACCES;
-> +
-> +	region = private->region[i].data;
-> +	if (copy_from_user((void *)region + pos, buf, count))
-> +		return -EFAULT;
+> +    if (!blk_is_inserted(conf->blk)) {
+> +        error_setg(errp, "device needs media, but drive is empty");
+> +        return;
+> +    }
 
-I guess vfio_ccw_async_region_write() is supposed to be reentrant in a
-sense that there may be more that one 'instances' of the function
-executing at the same time, or am I wrong?
+Hm, the code below suggests that you support CD-ROMs. Don't you want to
+support media change as well then? Which would mean that you need to
+support empty drives.
 
-If it is reenarant, I wonder what protects private->region[i].data from
-corruption or simply being changed 'while at it'?
+> +    if (!blkconf_apply_backend_options(conf, blk_is_read_only(conf->blk),
+> +                                       false, errp)) {
+> +        return;
+> +    }
+> +
+> +    if (!blkconf_geometry(conf, NULL, 65535, 255, 255, errp)) {
+> +        return;
+> +    }
+> +
+> +    dinfo = blk_legacy_dinfo(conf->blk);
+> +    is_cdrom = (dinfo && dinfo->media_cd);
 
-Regards,
-Halil
+It's called legacy for a reason. Don't use this in new devices.
 
-> +
-> +	switch (region->command) {
-> +	case VFIO_CCW_ASYNC_CMD_HSCH:
-> +		vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_HALT_REQ);
-> +		break;
-> +	case VFIO_CCW_ASYNC_CMD_CSCH:
-> +		vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLEAR_REQ);
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	return region->ret_code ? region->ret_code : count;
-> +}
-> +
+The proper way is to have two different devices for hard disks and CDs
+(like scsi-hd and scsi-cd).
+
+Kevin
