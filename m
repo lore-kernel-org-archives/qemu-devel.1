@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gS5Xx-0003qK-Cv
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 14:30:54 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gS5aS-0004dc-Ar
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 14:33:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gS5Xu-0001aG-8s
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 14:30:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46160)
+	(envelope-from <richard.henderson@linaro.org>) id 1gS5aP-0004WQ-4f
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 14:33:28 -0500
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:34100)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gS5Xu-0001Y5-1x
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 14:30:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gS5Xs-0004Pd-A3
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 19:30:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 313492E80CB
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 19:30:48 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gS5aM-0004P0-IS
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 14:33:22 -0500
+Received: by mail-pf1-x42c.google.com with SMTP id h3so10672852pfg.1
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 11:33:18 -0800 (PST)
+References: <cover.1543352682.git.alistair.francis@wdc.com>
+	<67303db03721ef2e4d9737379312681543a0ba0c.1543352682.git.alistair.francis@wdc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e48d8e2c-3399-06cf-e4bb-fb73f5b1dba1@linaro.org>
+Date: Wed, 28 Nov 2018 11:33:14 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Nov 2018 19:25:07 -0000
-From: GH Cao <1804961@bugs.launchpad.net>
-Reply-To: Bug 1804961 <1804961@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154309137717.32238.5287661827417174062.malonedeb@wampee.canonical.com>
-Message-Id: <154343310809.15899.18151397339030117558.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1804961] Re: qemu-system-aarch64: Windows 10
- ARM64 BSoD on boot while using virt-3.0
+In-Reply-To: <67303db03721ef2e4d9737379312681543a0ba0c.1543352682.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 07/24] riscv: tcg-target: Add support for
+ the constraints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 
-@imammedo:
-I am new to kernel debugging, but I managed to get some traces, hope that w=
-ill help you. =
+On 11/27/18 1:07 PM, Alistair Francis wrote:
+> +    OPC_FENCE_RW_RW = 0x0330000f,
+> +    OPC_FENCE_R_R = 0x0220000f,
+> +    OPC_FENCE_W_R = 0x0120000f,
+> +    OPC_FENCE_R_W = 0x0210000f,
+> +    OPC_FENCE_W_W = 0x0110000f,
+> +    OPC_FENCE_R_RW = 0x0230000f,
+> +    OPC_FENCE_RW_W = 0x0310000f,
+
+A full compliment would have 9 alternatives, surely?
+Perhaps better to just fill in the fields when emitting?
+
+Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-https://pastebin.com/shWUC1Pk
-https://pastebin.com/n0gnSaVx
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1804961
-
-Title:
-  qemu-system-aarch64: Windows 10 ARM64 BSoD on boot while using
-  virt-3.0
-
-Status in QEMU:
-  New
-
-Bug description:
-  When I emulate a virt-3.0 machine, Windows 10 BSoD on boot, with the
-  error code being ACPI_BIOS_ERROR(0x000000A5), virt-2.12 boots fine.
-
-  Windows Build: 10.0.17134.1
-  QEMU version: 3.0.0
-  Commandline: qemu-system-aarch64 -M virt -accel tcg,thread=3Dmulti -cpu c=
-ortex-a57 -smp 2 -m 2048 -bios QEMU_EFI.fd -device ramfb -device nec-usb-xh=
-ci -device usb-kbd -device usb-tablet -hda disk.vhd -vnc :0
-
-  By the way, the patch to add DBG2 table discussed here
-  https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg01719.html
-  works (although minor change is required to adapt to the qemu 3.0.0
-  code), the table is accepted by Windows (Windows require both DBG2 and
-  SPCR to be valid for serial kernel debugging to work), so it may help
-  further diagnosing this issue.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1804961/+subscriptions
+r~
