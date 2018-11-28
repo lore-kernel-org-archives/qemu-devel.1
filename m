@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gS3Sq-0005Q1-TK
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:17:36 -0500
+	(envelope-from <prvs=863a5f629=Paul.Durrant@citrix.com>)
+	id 1gS3T4-0005ap-EU
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:17:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gS3Sm-0000aW-F0
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:17:28 -0500
-Received: from 14.mo6.mail-out.ovh.net ([46.105.56.113]:60025)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gS3Sk-0008RV-BQ
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:17:22 -0500
-Received: from player716.ha.ovh.net (unknown [10.109.143.249])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 10F6919BEEE
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 18:17:06 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-16-clg@kaod.org>
-	<20181128032819.GY2251@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <c8f9532c-a27d-0071-0023-25f8b70cb31d@kaod.org>
-Date: Wed, 28 Nov 2018 18:16:58 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181128032819.GY2251@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+	(envelope-from <prvs=863a5f629=Paul.Durrant@citrix.com>)
+	id 1gS3T2-0001Wr-Ou
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:17:42 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Wed, 28 Nov 2018 17:17:10 +0000
+Message-ID: <79c7ea5f1b8041d7828240ec18f881f4@AMSPEX02CL03.citrite.net>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	<20181121151211.15997-3-paul.durrant@citrix.com>
+	<20181128171001.GC14786@perard.uk.xensource.com>
+In-Reply-To: <20181128171001.GC14786@perard.uk.xensource.com>
 Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 15/36] spapr: introdude a new machine
- IRQ backend for XIVE
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 02/18] xen: introduce new 'XenBus' and
+ 'XenDevice' object hierarchy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,354 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Anthony Perard <anthony.perard@citrix.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel
+	Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 11/28/18 4:28 AM, David Gibson wrote:
-> On Fri, Nov 16, 2018 at 11:57:08AM +0100, C=E9dric Le Goater wrote:
->> The XIVE IRQ backend uses the same layout as the new XICS backend but
->> covers the full range of the IRQ number space. The IRQ numbers for the
->> CPU IPIs are allocated at the bottom of this space, below 4K, to
->> preserve compatibility with XICS which does not use that range.
->>
->> This should be enough given that the maximum number of CPUs is 1024
->> for the sPAPR machine under QEMU. For the record, the biggest POWER8
->> or POWER9 system has a maximum of 1536 HW threads (16 sockets, 192
->> cores, SMT8).
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  include/hw/ppc/spapr.h     |   2 +
->>  include/hw/ppc/spapr_irq.h |   7 ++-
->>  hw/ppc/spapr.c             |   2 +-
->>  hw/ppc/spapr_irq.c         | 119 ++++++++++++++++++++++++++++++++++++=
--
->>  4 files changed, 124 insertions(+), 6 deletions(-)
->>
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 6279711fe8f7..1fbc2663e06c 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -16,6 +16,7 @@ typedef struct sPAPREventLogEntry sPAPREventLogEntry=
-;
->>  typedef struct sPAPREventSource sPAPREventSource;
->>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
->>  typedef struct ICSState ICSState;
->> +typedef struct sPAPRXive sPAPRXive;
->> =20
->>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
->>  #define SPAPR_ENTRY_POINT       0x100
->> @@ -175,6 +176,7 @@ struct sPAPRMachineState {
->>      const char *icp_type;
->>      int32_t irq_map_nr;
->>      unsigned long *irq_map;
->> +    sPAPRXive  *xive;
->> =20
->>      bool cmd_line_caps[SPAPR_CAP_NUM];
->>      sPAPRCapabilities def, eff, mig;
->> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
->> index 0e9229bf219e..c854ae527808 100644
->> --- a/include/hw/ppc/spapr_irq.h
->> +++ b/include/hw/ppc/spapr_irq.h
->> @@ -13,6 +13,7 @@
->>  /*
->>   * IRQ range offsets per device type
->>   */
->> +#define SPAPR_IRQ_IPI        0x0
->>  #define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
->>  #define SPAPR_IRQ_HOTPLUG    0x1001
->>  #define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
->> @@ -33,7 +34,8 @@ typedef struct sPAPRIrq {
->>      uint32_t    nr_irqs;
->>      uint32_t    nr_msis;
->> =20
->> -    void (*init)(sPAPRMachineState *spapr, int nr_irqs, Error **errp)=
-;
->> +    void (*init)(sPAPRMachineState *spapr, int nr_irqs, int nr_server=
-s,
->> +                 Error **errp);
->>      int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp);
->>      void (*free)(sPAPRMachineState *spapr, int irq, int num);
->>      qemu_irq (*qirq)(sPAPRMachineState *spapr, int irq);
->> @@ -42,8 +44,9 @@ typedef struct sPAPRIrq {
->> =20
->>  extern sPAPRIrq spapr_irq_xics;
->>  extern sPAPRIrq spapr_irq_xics_legacy;
->> +extern sPAPRIrq spapr_irq_xive;
->> =20
->> -void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
->> +void spapr_irq_init(sPAPRMachineState *spapr, int nr_servers, Error *=
-*errp);
+> -----Original Message-----
+> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> Sent: 28 November 2018 17:10
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
+> devel@lists.xenproject.org; Stefano Stabellini <sstabellini@kernel.org>;
+> Michael S. Tsirkin <mst@redhat.com>; Marcel Apfelbaum
+> <marcel.apfelbaum@gmail.com>; Paolo Bonzini <pbonzini@redhat.com>; Richar=
+d
+> Henderson <rth@twiddle.net>; Eduardo Habkost <ehabkost@redhat.com>
+> Subject: Re: [PATCH 02/18] xen: introduce new 'XenBus' and 'XenDevice'
+> object hierarchy
 >=20
-> I don't see why nr_servers needs to become a parameter, since it can
-> be derived from spapr within this routine.
-
-ok. This is true. We can use directly xics_max_server_number(spapr).
-
->>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Erro=
-r **errp);
->>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
->>  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index e470efe7993c..9f8c19e56e7a 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -2594,7 +2594,7 @@ static void spapr_machine_init(MachineState *mac=
-hine)
->>      spapr_set_vsmt_mode(spapr, &error_fatal);
->> =20
->>      /* Set up Interrupt Controller before we create the VCPUs */
->> -    spapr_irq_init(spapr, &error_fatal);
->> +    spapr_irq_init(spapr, xics_max_server_number(spapr), &error_fatal=
-);
+> On Wed, Nov 21, 2018 at 03:11:55PM +0000, Paul Durrant wrote:
+> > diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+> > new file mode 100644
+> > index 0000000000..dede2d914a
+> > --- /dev/null
+> > +++ b/hw/xen/xen-bus.c
+> > @@ -0,0 +1,125 @@
+> > +/*
+> > + * Copyright (c) Citrix Systems Inc.
+> > + * All rights reserved.
 >=20
-> We should rename xics_max_server_number() since it's no longer xics
-> specific.
-
-yes.
-
->>      /* Set up containers for ibm,client-architecture-support negotiat=
-ed options
->>       */
->> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->> index bac450ffff23..2569ae1bc7f8 100644
->> --- a/hw/ppc/spapr_irq.c
->> +++ b/hw/ppc/spapr_irq.c
->> @@ -12,6 +12,7 @@
->>  #include "qemu/error-report.h"
->>  #include "qapi/error.h"
->>  #include "hw/ppc/spapr.h"
->> +#include "hw/ppc/spapr_xive.h"
->>  #include "hw/ppc/xics.h"
->>  #include "sysemu/kvm.h"
->> =20
->> @@ -91,7 +92,7 @@ error:
->>  }
->> =20
->>  static void spapr_irq_init_xics(sPAPRMachineState *spapr, int nr_irqs=
-,
->> -                                Error **errp)
->> +                                int nr_servers, Error **errp)
->>  {
->>      MachineState *machine =3D MACHINE(spapr);
->>      Error *local_err =3D NULL;
->> @@ -204,10 +205,122 @@ sPAPRIrq spapr_irq_xics =3D {
->>      .print_info  =3D spapr_irq_print_info_xics,
->>  };
->> =20
->> + /*
->> + * XIVE IRQ backend.
->> + */
->> +static sPAPRXive *spapr_xive_create(sPAPRMachineState *spapr,
->> +                                    const char *type_xive, int nr_irq=
-s,
->> +                                    int nr_servers, Error **errp)
->> +{
->> +    sPAPRXive *xive;
->> +    Error *local_err =3D NULL;
->> +    Object *obj;
->> +    uint32_t nr_ends =3D nr_servers << 3; /* 8 priority ENDs per CPU =
-*/
->> +    int i;
->> +
->> +    obj =3D object_new(type_xive);
+> You probably should include:
+>   This work is licensed under the terms of the GNU GPL, version 2 or
+> later.
+>   See the COPYING file in the top-level directory.
 >=20
-> What's the reason for making the type a parameter, rather than just
-> using the #define here.
-
-KVM.
-
->> +    object_property_set_int(obj, nr_irqs, "nr-irqs", &error_abort);
->> +    object_property_set_int(obj, nr_ends, "nr-ends", &error_abort);
+> As this seems to be a boilerplate used in recent new files, there are
+> other similair boilerplates.
 >=20
-> This is still within the sPAPR code, and you have a pointer to the
-> MachineState, so I don't see why you could't just derive nr_irqs and
-> nr_servers from that, rather than having them passed in.
+> Also, I think the copyright line should include a year.
 
-for nr_servers I agree. nr_irqs comes from the machine class and it will
-not make any sense using the machine class in the init routine of the
-'dual' sPAPR IRQ backend supporting both modes. See patch 34 which
-initializes both backend for the 'dual' machine.
-=20
->> +    object_property_set_bool(obj, true, "realized", &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return NULL;
->> +    }
->> +    qdev_set_parent_bus(DEVICE(obj), sysbus_get_default());
->=20
-> Whereas the XiveSource and XiveRouter I think make more sense as
-> "device components" rather than SysBusDevice subclasses,=20
-
-Yes. I changed that.
-
-> I think it
-> *does* make sense for the PAPR-XIVE object to be a full fledged
-> SysBusDevice.
-
-Ah. That I didn't do but thinking of it, it makes sense as it is the
-object managing the TIMA and ESB memory region mapping for the machine.=20
-
-> And for that reason, I think it makes more sense to create it with
-> qdev_create(), which should avoid having to manually fiddle with the
-> parent bus.
-
-OK. I will give it a try.=20
-
->> +    xive =3D SPAPR_XIVE(obj);
->> +
->> +    /* Enable the CPU IPIs */
->> +    for (i =3D 0; i < nr_servers; ++i) {
->> +        spapr_xive_irq_enable(xive, SPAPR_IRQ_IPI + i, false);
->=20
-> This comment possibly belonged on an earlier patch.  I don't love the
-> "..._enable" name - to me that suggests something runtime rather than
-> configuration time.  A better option isn't quickly occurring to me
-> though :/.
-
-Instead, I could call the sPAPR IRQ claim method  :=20
-
-    for (i =3D 0; i < nr_servers; ++i) {
-	spapr_irq_xive.claim(spapr, SPAPR_IRQ_IPI + i, false, &local_err);
-    }
-
-
-What it does is to set the EAS_VALID bit in the EAT (it also sets the=20
-LSI bit). what about :
-=09
-	spapr_xive_irq_validate()=20
-	spapr_xive_irq_invalidate()=20
-
-or to map the sPAPR IRQ backend names :
-
-	spapr_xive_irq_claim()=20
-	spapr_xive_irq_free()=20
-
+Ok.
 
 >=20
->> +    }
->> +
->> +    return xive;
->> +}
->> +
->> +static void spapr_irq_init_xive(sPAPRMachineState *spapr, int nr_irqs=
-,
->> +                                int nr_servers, Error **errp)
->> +{
->> +    MachineState *machine =3D MACHINE(spapr);
->> +    Error *local_err =3D NULL;
->> +
->> +    /* KVM XIVE support */
->> +    if (kvm_enabled()) {
->> +        if (machine_kernel_irqchip_required(machine)) {
->> +            error_setg(errp, "kernel_irqchip requested. no XIVE suppo=
-rt");
->> +            return;
->> +        }
->> +    }
->> +
->> +    /* QEMU XIVE support */
->> +    spapr->xive =3D spapr_xive_create(spapr, TYPE_SPAPR_XIVE, nr_irqs=
-, nr_servers,
->> +                                    &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +}
->> +
->> +static int spapr_irq_claim_xive(sPAPRMachineState *spapr, int irq, bo=
-ol lsi,
->> +                                Error **errp)
->> +{
->> +    if (!spapr_xive_irq_enable(spapr->xive, irq, lsi)) {
->> +        error_setg(errp, "IRQ %d is invalid", irq);
->> +        return -1;
->> +    }
->> +    return 0;
->> +}
->> +
->> +static void spapr_irq_free_xive(sPAPRMachineState *spapr, int irq, in=
-t num)
->> +{
->> +    int i;
->> +
->> +    for (i =3D irq; i < irq + num; ++i) {
->> +        spapr_xive_irq_disable(spapr->xive, i);
->> +    }
->> +}
->> +
->> +static qemu_irq spapr_qirq_xive(sPAPRMachineState *spapr, int irq)
->> +{
->> +    return spapr_xive_qirq(spapr->xive, irq);
->> +}
->> +
->> +static void spapr_irq_print_info_xive(sPAPRMachineState *spapr,
->> +                                      Monitor *mon)
->> +{
->> +    CPUState *cs;
->> +
->> +    CPU_FOREACH(cs) {
->> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->> +
->> +        xive_tctx_pic_print_info(XIVE_TCTX(cpu->intc), mon);
->> +    }
->> +
->> +    spapr_xive_pic_print_info(spapr->xive, mon);
+> > +void xen_bus_init(void)
+> > +{
+> > +    DeviceState *dev =3D qdev_create(NULL, TYPE_XEN_BRIDGE);
+> > +
+> > +    qbus_create(TYPE_XEN_BUS, dev, NULL);
+> > +    qdev_init_nofail(dev);
 >=20
-> Any reason the info dumping routines are split into two?
+> Will we need a hotplug handler for this bus, like it is done with
+> TYPE_XENSYSBUS?
 
-Not the same objects. Are you suggesting that we could print all the info=
-=20
-from the sPAPR XIVE model ? including the XiveTCTX. I thought of doing=20
-that also. Fine for me if it's ok for you.
+I didn't seem to need one even doing 'xl block-attach' after the VM had boo=
+ted. I'm really not sure what that does.
 
-Thanks,
-
-C.
+  Paul
 
 >=20
->> +}
->> +
->> +/*
->> + * XIVE uses the full IRQ number space. Set it to 8K to be compatible
->> + * with XICS.
->> + */
->> +
->> +#define SPAPR_IRQ_XIVE_NR_IRQS     0x2000
->> +#define SPAPR_IRQ_XIVE_NR_MSIS     (SPAPR_IRQ_XIVE_NR_IRQS - SPAPR_IR=
-Q_MSI)
->> +
->> +sPAPRIrq spapr_irq_xive =3D {
->> +    .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
->> +    .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
->> +
->> +    .init        =3D spapr_irq_init_xive,
->> +    .claim       =3D spapr_irq_claim_xive,
->> +    .free        =3D spapr_irq_free_xive,
->> +    .qirq        =3D spapr_qirq_xive,
->> +    .print_info  =3D spapr_irq_print_info_xive,
->> +};
->> +
->>  /*
->>   * sPAPR IRQ frontend routines for devices
->>   */
->> -void spapr_irq_init(sPAPRMachineState *spapr, Error **errp)
->> +void spapr_irq_init(sPAPRMachineState *spapr, int nr_servers, Error *=
-*errp)
->>  {
->>      sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->> =20
->> @@ -216,7 +329,7 @@ void spapr_irq_init(sPAPRMachineState *spapr, Erro=
-r **errp)
->>          spapr_irq_msi_init(spapr, smc->irq->nr_msis);
->>      }
->> =20
->> -    smc->irq->init(spapr, smc->irq->nr_irqs, errp);
->> +    smc->irq->init(spapr, smc->irq->nr_irqs, nr_servers, errp);
->>  }
->> =20
->>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Erro=
-r **errp)
 >=20
+> The rest looks good,
+> Thanks,
+>=20
+> --
+> Anthony PERARD
