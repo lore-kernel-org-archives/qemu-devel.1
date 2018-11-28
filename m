@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gS0v7-0005A9-Gv
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:34:31 -0500
+	(envelope-from <berrange@redhat.com>) id 1gS1Bh-0003Xt-EP
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:51:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gS0v4-0002Fz-8V
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:34:29 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:37907)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gS0v3-0002F6-WB
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:34:26 -0500
-Received: by mail-wr1-f66.google.com with SMTP id v13so23067898wrw.5
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 06:34:24 -0800 (PST)
-References: <1543399094-2260-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2ac07515-10f3-ed38-c022-e583cd1cd36a@redhat.com>
-Date: Wed, 28 Nov 2018 15:34:21 +0100
+	(envelope-from <berrange@redhat.com>) id 1gS1Ag-000548-OD
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:50:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47568)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gS1AR-0004XD-2v
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:50:34 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1BF33356F6
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 14:50:18 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 28 Nov 2018 14:50:08 +0000
+Message-Id: <20181128145008.6574-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1543399094-2260-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1?] target/arm/sve_helper: Fix
- compilation with clang 3.4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [qemu-web PATCH] download: document version numbering
+ scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +31,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-On 28/11/18 10:58, Thomas Huth wrote:
-> Clang 3.4 does not know the "flatten" attribute yet. We've already
-> introduced the QEMU_FLATTEN macro for this in commit 97ff87c0ed020c2,
-> so use this macro now here, too, to fix this issue.
+The new version numbering scheme was mentioned in the blog post
+announcing 3.0 previously, but this will fall out of view over
+time. It is thus preferrable to mention this on the download page
+too.
 
-checkpatch candidate?
+Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ download.html | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  target/arm/sve_helper.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-> index 8cbc651..bc84725 100644
-> --- a/target/arm/sve_helper.c
-> +++ b/target/arm/sve_helper.c
-> @@ -4382,20 +4382,20 @@ static void sve_ld4_r(CPUARMState *env, void *vg, target_ulong addr,
->  }
->  
->  #define DO_LDN_1(N) \
-> -void __attribute__((flatten)) HELPER(sve_ld##N##bb_r)               \
-> +void QEMU_FLATTEN HELPER(sve_ld##N##bb_r) \
->      (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)  \
->  {                                                                   \
->      sve_ld##N##_r(env, vg, addr, desc, 1, GETPC(), sve_ld1bb_tlb);  \
->  }
->  
->  #define DO_LDN_2(N, SUFF, SIZE)                                       \
-> -void __attribute__((flatten)) HELPER(sve_ld##N##SUFF##_le_r)          \
-> +void QEMU_FLATTEN HELPER(sve_ld##N##SUFF##_le_r)                      \
->      (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
->  {                                                                     \
->      sve_ld##N##_r(env, vg, addr, desc, SIZE, GETPC(),                 \
->                    sve_ld1##SUFF##_le_tlb);                            \
->  }                                                                     \
-> -void __attribute__((flatten)) HELPER(sve_ld##N##SUFF##_be_r)          \
-> +void QEMU_FLATTEN HELPER(sve_ld##N##SUFF##_be_r)                      \
->      (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
->  {                                                                     \
->      sve_ld##N##_r(env, vg, addr, desc, SIZE, GETPC(),                 \
-> @@ -4832,7 +4832,7 @@ static void sve_st4_r(CPUARMState *env, void *vg, target_ulong addr,
->  }
->  
->  #define DO_STN_1(N, NAME, ESIZE) \
-> -void __attribute__((flatten)) HELPER(sve_st##N##NAME##_r)           \
-> +void QEMU_FLATTEN HELPER(sve_st##N##NAME##_r) \
->      (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)  \
->  {                                                                   \
->      sve_st##N##_r(env, vg, addr, desc, GETPC(), ESIZE, 1,           \
-> @@ -4840,13 +4840,13 @@ void __attribute__((flatten)) HELPER(sve_st##N##NAME##_r)           \
->  }
->  
->  #define DO_STN_2(N, NAME, ESIZE, MSIZE) \
-> -void __attribute__((flatten)) HELPER(sve_st##N##NAME##_le_r)          \
-> +void QEMU_FLATTEN HELPER(sve_st##N##NAME##_le_r) \
->      (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
->  {                                                                     \
->      sve_st##N##_r(env, vg, addr, desc, GETPC(), ESIZE, MSIZE,         \
->                    sve_st1##NAME##_le_tlb);                            \
->  }                                                                     \
-> -void __attribute__((flatten)) HELPER(sve_st##N##NAME##_be_r)          \
-> +void QEMU_FLATTEN HELPER(sve_st##N##NAME##_be_r)                      \
->      (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
->  {                                                                     \
->      sve_st##N##_r(env, vg, addr, desc, GETPC(), ESIZE, MSIZE,         \
-> @@ -4966,7 +4966,7 @@ static void sve_ld1_zd(CPUARMState *env, void *vd, void *vg, void *vm,
->  }
->  
->  #define DO_LD1_ZPZ_S(MEM, OFS) \
-> -void __attribute__((flatten)) HELPER(sve_ld##MEM##_##OFS)    \
-> +void QEMU_FLATTEN HELPER(sve_ld##MEM##_##OFS) \
->      (CPUARMState *env, void *vd, void *vg, void *vm,         \
->       target_ulong base, uint32_t desc)                       \
->  {                                                            \
-> @@ -4975,7 +4975,7 @@ void __attribute__((flatten)) HELPER(sve_ld##MEM##_##OFS)    \
->  }
->  
->  #define DO_LD1_ZPZ_D(MEM, OFS) \
-> -void __attribute__((flatten)) HELPER(sve_ld##MEM##_##OFS)    \
-> +void QEMU_FLATTEN HELPER(sve_ld##MEM##_##OFS) \
->      (CPUARMState *env, void *vd, void *vg, void *vm,         \
->       target_ulong base, uint32_t desc)                       \
->  {                                                            \
-> @@ -5326,7 +5326,7 @@ static void sve_st1_zd(CPUARMState *env, void *vd, void *vg, void *vm,
->  }
->  
->  #define DO_ST1_ZPZ_S(MEM, OFS) \
-> -void __attribute__((flatten)) HELPER(sve_st##MEM##_##OFS)    \
-> +void QEMU_FLATTEN HELPER(sve_st##MEM##_##OFS) \
->      (CPUARMState *env, void *vd, void *vg, void *vm,         \
->       target_ulong base, uint32_t desc)                       \
->  {                                                            \
-> @@ -5335,7 +5335,7 @@ void __attribute__((flatten)) HELPER(sve_st##MEM##_##OFS)    \
->  }
->  
->  #define DO_ST1_ZPZ_D(MEM, OFS) \
-> -void __attribute__((flatten)) HELPER(sve_st##MEM##_##OFS)    \
-> +void QEMU_FLATTEN HELPER(sve_st##MEM##_##OFS) \
->      (CPUARMState *env, void *vd, void *vg, void *vm,         \
->       target_ulong base, uint32_t desc)                       \
->  {                                                            \
-> 
+diff --git a/download.html b/download.html
+index 5a1e4ea..59db880 100644
+--- a/download.html
++++ b/download.html
+@@ -39,6 +39,31 @@ permalink: /download/
+ 	{% include_relative _download/source.html %}
+ </article>
+ </div>
++
++<h2>Version numbering</h2>
++<div>
++  <p>
++  In 2018, for the QEMU 3.0 release, a time based version numbering sche=
+me was
++  adopted:
++  </p>
++<ul>
++<dt>major</dt>
++<dd>incremented by 1 for the first release of the year</dd>
++<dt>minor</dt>
++<dd>reset to 0 with every major increment, otherwise incremented by 1 fo=
+r each release from git master</dd>
++<dt>micro</dt>
++<dd>always 0 for releases from git master, incremented by 1 for each sta=
+ble branch release</dd>
++</ul>
++  <p>
++    The implication of this is that changes in major version number
++    <strong>do not</strong> have any bearing on the scope of changes
++    included in the release. Non-backward compatible changes may be made
++    in any master branch release, provided they have followed the
++    <a href=3D"https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-fea=
+tures">deprecation policy</a>
++    which calls for warnings to be emitted for a minimum of two releases
++    prior to the change.
++  </p>
++</div>
+ <script>
+ function animateOnClick(jqThis, slide) {
+    $('.horiz-menu li').removeClass('active');
+--=20
+2.19.2
