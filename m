@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gS6nC-0006AW-NP
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:50:43 -0500
+	(envelope-from <raimue@macports.org>) id 1gS70m-0004Iw-Ow
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 16:04:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gS6n9-00082w-FB
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:50:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60754)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gS6n9-0007ze-5V
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:50:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gS6n8-0004BF-3d
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 20:50:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 120062E80D2
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 20:50:38 +0000 (UTC)
+	(envelope-from <raimue@macports.org>) id 1gS70l-000771-Ti
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 16:04:44 -0500
+Received: from donkey.codingfarm.de ([2a01:4f8:190:12cf::d:1]:60176)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <raimue@macports.org>) id 1gS70l-00073p-Mq
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 16:04:43 -0500
+References: <20181128153526.10948-1-berrange@redhat.com>
+	<165bc19e-8ed2-8979-aea7-0f6031fc6df2@redhat.com>
+From: =?UTF-8?Q?Rainer_M=c3=bcller?= <raimue@macports.org>
+Message-ID: <a6ad246f-b674-56d9-8c82-bb80880932a8@macports.org>
+Date: Wed, 28 Nov 2018 22:04:39 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <165bc19e-8ed2-8979-aea7-0f6031fc6df2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Nov 2018 20:31:53 -0000
-From: Anton Sharpaev <1805697@bugs.launchpad.net>
-Reply-To: Bug 1805697 <1805697@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154343711336.10463.14315631936822945059.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805697] [NEW] egl-headless crashes
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Document how to test the site
+ with jekyll locally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,67 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, alex.bennee@linaro.org, Yu Ning <yu.ning@intel.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Public bug reported:
+On 28.11.18 17:44, Paolo Bonzini wrote:
+> On 28/11/18 16:35, Daniel P. Berrang=C3=A9 wrote:
+>> Add a README file that tells people this is a jekyll based static
+>> website, and shows people how to run jekyll for testing purposes.
+>>
+>> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>> ---
+>>
+>> NB, we should really mention a license in the README too, but I don't
+>> see info about what license we consider qemu-web to be covered by...
 
-egl-headless crashes when it is trying change the resolution. After XFCE
-login, for example.
+>      1	Rainer M=C3=BCller <raimue@macports.org>
 
-I tryed it on 2.12, 3.0 and 3.1.0-rc2 versions.
+> Anybody (especially non-RH people) disagrees with dual-license CC-BY-SA
+> 4.0 and GPLv2+?  (So that we can copy from blog posts to manuals)?
 
-# qemu-system-x86_64 -enable-kvm -enable-kvm -M q35 -smp 8 -vga virtio
--spice port=3D59011,addr=3D0.0.0.0,disable-ticketing -hda image.qcow2 -m 4G
--display egl-headless -chardev spicevmc,name=3Dvdagent,id=3Dvdagent
+No objections from my side.
 
-main_channel_link: add main channel client
-main_channel_client_handle_pong: net test: latency 6.942000 ms, bitrate 849=
-7925311 bps (8104.253112 Mbps)
-inputs_connect: inputs channel client create
-red_qxl_set_cursor_peer:
-gl_version 31 - compat profile
-qemu-system-x86_64: ui/egl-headless.c:128: egl_scanout_flush: Assertion `su=
-rface_width(edpy->ds) =3D=3D edpy->guest_fb.width' failed.
-Aborted (core dumped)
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: egl-headless virgl
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805697
-
-Title:
-  egl-headless crashes
-
-Status in QEMU:
-  New
-
-Bug description:
-  egl-headless crashes when it is trying change the resolution. After
-  XFCE login, for example.
-
-  I tryed it on 2.12, 3.0 and 3.1.0-rc2 versions.
-
-  # qemu-system-x86_64 -enable-kvm -enable-kvm -M q35 -smp 8 -vga virtio
-  -spice port=3D59011,addr=3D0.0.0.0,disable-ticketing -hda image.qcow2 -m
-  4G -display egl-headless -chardev spicevmc,name=3Dvdagent,id=3Dvdagent
-
-  main_channel_link: add main channel client
-  main_channel_client_handle_pong: net test: latency 6.942000 ms, bitrate 8=
-497925311 bps (8104.253112 Mbps)
-  inputs_connect: inputs channel client create
-  red_qxl_set_cursor_peer:
-  gl_version 31 - compat profile
-  qemu-system-x86_64: ui/egl-headless.c:128: egl_scanout_flush: Assertion `=
-surface_width(edpy->ds) =3D=3D edpy->guest_fb.width' failed.
-  Aborted (core dumped)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805697/+subscriptions
+Rainer
