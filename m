@@ -1,27 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gS0sK-00022m-5X
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:31:37 -0500
+	(envelope-from <alifm@linux.ibm.com>) id 1gS0si-0002Ks-Ca
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:32:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gS0sG-0000I0-V8
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:31:36 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:33707)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gS0sG-0000H9-OI
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:31:32 -0500
-Received: by mail-wr1-f68.google.com with SMTP id c14so20883421wrr.0
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 06:31:32 -0800 (PST)
-References: <1543412590-29716-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1543412590-29716-2-git-send-email-stefan.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3ef23076-d0b4-4df3-d023-bf18ba33aade@redhat.com>
-Date: Wed, 28 Nov 2018 15:31:28 +0100
+	(envelope-from <alifm@linux.ibm.com>) id 1gS0sf-0000Xk-5v
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:32:00 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44002
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gS0se-0000XJ-WD
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:31:57 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wASENxEa117897
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 09:31:56 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2p1u9av6c0-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 09:31:55 -0500
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Wed, 28 Nov 2018 14:31:55 -0000
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181122165432.4437-4-cohuck@redhat.com>
+	<b5066f7a-7024-ac3e-a91d-938fd845e1d9@linux.ibm.com>
+	<20181128100249.72d4299a.cohuck@redhat.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Wed, 28 Nov 2018 09:31:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <1543412590-29716-2-git-send-email-stefan.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181128100249.72d4299a.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-doc: Add nanoMIPS ISA information
+Message-Id: <25021742-a7a8-a90c-a2a3-eb8a78bf1fb0@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] vfio-ccw: add handling for asnyc
+ channel instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +45,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Markovic <stefan.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, pburton@wavecomp.com, smarkovic@wavecomp.com, jhogan@kernel.org, huth@tuxfamily.org, hpoussin@reactos.org, amarkovic@wavecomp.com, pjovanovic@wavecomp.com, Richard Henderson <richard.henderson@linaro.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-Hi Stefan,
 
-On 28/11/18 14:43, Stefan Markovic wrote:
-> From: Stefan Markovic <smarkovic@wavecomp.com>
+
+On 11/28/2018 04:02 AM, Cornelia Huck wrote:
+> On Tue, 27 Nov 2018 14:09:49 -0500
+> Farhan Ali <alifm@linux.ibm.com> wrote:
 > 
-> Add nanoMIPS information in qemu-doc.texi with example of usage
-> included.
+>> On 11/22/2018 11:54 AM, Cornelia Huck wrote:
+>>> Add a region to the vfio-ccw device that can be used to submit
+>>> asynchronous I/O instructions. ssch continues to be handled by the
+>>> existing I/O region; the new region handles hsch and csch.
+>>>
+>>> Interrupt status continues to be reported through the same channels
+>>> as for ssch.
+>>>
+>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>> ---
+>>>    drivers/s390/cio/Makefile           |   3 +-
+>>>    drivers/s390/cio/vfio_ccw_async.c   |  88 ++++++++++++++++
+>>>    drivers/s390/cio/vfio_ccw_drv.c     |  48 ++++++---
+>>>    drivers/s390/cio/vfio_ccw_fsm.c     | 158 +++++++++++++++++++++++++++-
+>>>    drivers/s390/cio/vfio_ccw_ops.c     |  13 ++-
+>>>    drivers/s390/cio/vfio_ccw_private.h |   6 ++
+>>>    include/uapi/linux/vfio.h           |   4 +
+>>>    include/uapi/linux/vfio_ccw.h       |  12 +++
+>>>    8 files changed, 313 insertions(+), 19 deletions(-)
+>>>    create mode 100644 drivers/s390/cio/vfio_ccw_async.c
+>>>
 > 
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-> ---
->  qemu-doc.texi | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
+>>> @@ -76,7 +79,8 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+>>>    	private = container_of(work, struct vfio_ccw_private, io_work);
+>>>    	irb = &private->irb;
+>>>    
+>>> -	if (scsw_is_solicited(&irb->scsw)) {
+>>> +	if (scsw_is_solicited(&irb->scsw) &&
+>>> +	    (scsw_fctl(&irb->scsw) & SCSW_FCTL_START_FUNC)) {
+>>>    		cp_update_scsw(&private->cp, &irb->scsw);
+>>>    		cp_free(&private->cp);
+>>>    	}
+>>
+>> I am a little confused about this. Why do we need to update the scsw.cpa
+>> if we have the start function function control bit set? Is it an
+>> optimization?
 > 
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index f7ad1df..6ef593d 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -1994,6 +1994,10 @@ Set the emulated machine type. The default is sun4u.
->  @section MIPS System emulator
->  @cindex system emulation (MIPS)
->  
-> +@menu
-> +* nanoMIPS System emulator ::
-> +@end menu
-> +
->  Four executables cover simulation of 32 and 64-bit MIPS systems in
->  both endian options, @file{qemu-system-mips}, @file{qemu-system-mipsel}
->  @file{qemu-system-mips64} and @file{qemu-system-mips64el}.
-> @@ -2085,6 +2089,31 @@ SCSI controller
->  G364 framebuffer
->  @end itemize
->  
-> +@node nanoMIPS System emulator
-> +@subsection nanoMIPS System emulator
-> +@cindex system emulation (nanoMIPS)
-> +
-> +Executable @file{qemu-system-mipsel} also covers simulation of
-> +32-bit nanoMIPS system in little endian mode:
-> +
-> +@itemize @minus
-> +@item
-> +nanoMIPS I7200 CPU
-> +@end itemize
-> +
-> +Example of @file{qemu-system-mipsel} usage for nanoMIPS is shown below:
-> +
-> +Download @code{<disk_image_file>} from @url{https://mipsdistros.mips.com/LinuxDistro/nanomips/buildroot/index.html}.
-> +
-> +Download @code{<kernel_image_file>} from @url{https://mipsdistros.mips.com/LinuxDistro/nanomips/kernels/v4.15.18-432-gb2eb9a8b07a1-20180627102142/index.html}.
-> +
-> +Start system emulation of Malta board with nanoMIPS I7200 CPU:
-> +@example
-> +qemu-system-mipsel -cpu I7200 -kernel @code{<kernel_image_file>} \
-> +    -M malta -serial stdio -m @code{<memory_size>} -hda @code{<disk_image_file>} \
-> +    -append "mem=256m@@0x0 rw console=ttyS0 vga=cirrus vesa=0x111 root=/dev/sda"
-
-Trying your example with generic_nano32r6el_page64k_dbg current master
-(c56606684) I'm getting:
-
-IN: cgroup_init_early
-0x8087ae64:  84f0 8050      LW a3, 0x50(s0)
-0x8087ae68:  a630 2c48      SWM s1, 72(s0), 0x2
-0x8087ae6c:  bb84           BNEZC a3, 0x8087ae72
-
-OP:
- ld_i32 tmp0,env,$0xffffffffffffffe4
- movi_i32 tmp1,$0x0
- brcond_i32 tmp0,tmp1,lt,$L0
-
- ---- 8087ae64 00000000 00000000
- movi_i32 tmp0,$0x50
- add_i32 tmp0,s0,tmp0
- qemu_ld_i32 tmp0,tmp0,un+leul,0
- mov_i32 a3,tmp0
-
- ---- 8087ae68 00000000 00000000
- movi_i32 tmp0,$0x48
- add_i32 tmp0,s0,tmp0
- mov_i32 tmp1,s1
- qemu_st_i32 tmp1,tmp0,leul,0
- movi_i32 tmp0,$0x4c
- add_i32 tmp0,s0,tmp0
- mov_i32 tmp1,s2
- qemu_st_i32 tmp1,tmp0,leul,0
-
- ---- 8087ae6c 00000000 00000000
- mov_i32 tmp0,a3
- movi_i32 tmp1,$0x0
- setcond_i32 bcond,tmp0,tmp1,ne
- movi_i32 tmp0,$0x0
- brcond_i32 bcond,tmp0,ne,$L1
- goto_tb $0x1
- movi_i32 PC,$0xffffffff8087ae6e
- exit_tb $0x7f80a2005f01
- set_label $L1
- goto_tb $0x0
- movi_i32 PC,$0xffffffff8087ae72
- exit_tb $0x7f80a2005f00
- set_label $L0
- exit_tb $0x7f80a2005f03
-
-qemu-system-mipsel: tcg/tcg-op.c:2607: tcg_gen_goto_tb: Assertion
-`(tcg_ctx->goto_tb_issue_mask & (1 << idx)) == 0' failed.
-
-Richard said on IRC "it means that it has issued two goto_tb with the
-same idx."
-
-I built QEMU on a x86_64 host, using the following options:
-
-./configure --disable-user \
- --enable-vnc-sasl --enable-trace-backends=log \
- --extra-cflags=-ggdb --enable-debug
-
-Regards,
-
-Phil.
-
-> +@end example
-> +
->  
->  @node ARM System emulator
->  @section ARM System emulator
+> No, it's not an optimization. This is the work function that is
+> scheduled if we get an interrupt for the device. Previously, we only
+> got an interrupt if either the device presented us an unsolicited
+> status or if we got an interrupt as a response to the channel program
+> we submitted. Now, we can get an interrupt for halt/clear subchannel as
+> well, and in that case, we don't necessarily have a cp.
 > 
+> [Thinking some more about it, we need to verify if the start function
+> actually remains set if we try to terminate a running channel program
+> with halt/clear. A clear might scrub too much. If that's the case, we
+> also need to free the cp if the start function is not set.]
+> 
+> 
+
+According to PoPs (Chapter 16: I/O interruptions, under function control):
+
+The start-function indication is also cleared at
+the subchannel during the execution of CLEAR SUB-
+CHANNEL.
+
+So maybe we do need to free the cp.
