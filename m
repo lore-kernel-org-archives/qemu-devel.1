@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gRtcK-0003d4-5k
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 01:46:37 -0500
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gRtgB-0005c9-5z
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 01:50:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gRtcH-0000Nh-0j
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 01:46:36 -0500
-Resent-Message-Id: <E1gRtcH-0000Nh-0j@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21330)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gRtcG-0000N7-Qt
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 01:46:32 -0500
-In-Reply-To: <20181126153036.22414-1-fziglio@redhat.com>
-Message-ID: <154338756859.16466.16271953105629903851@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gRtgA-0002MB-6Z
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 01:50:35 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45140)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1gRtgA-0002Kc-1P
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 01:50:34 -0500
+Received: by mail-oi1-x241.google.com with SMTP id b141so21642300oii.12
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 22:50:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 27 Nov 2018 22:46:09 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] spice: Use new SpiceImageCompression
- definition
+In-Reply-To: <20181127121724.19755-1-sw@weilnetz.de>
+References: <20181127121724.19755-1-sw@weilnetz.de>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 28 Nov 2018 07:50:32 +0100
+Message-ID: <CAL1e-=hqEy3zuEeh12UiqLaw9uxJLvq2ndTjoOg-sE1YHNNBgA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.1 0/2] Fix disas/nanomips
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: fziglio@redhat.com
-Cc: famz@redhat.com, spice-devel@lists.freedesktop.org, kraxel@redhat.com, qemu-devel@nongnu.org
+To: Stefan Weil <sw@weilnetz.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-devel@nongnu.org, Stefan Markovic <smarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-ODExMjYxNTMwMzYuMjI0MTQtMS1memlnbGlvQHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2
-ZWxdIFtQQVRDSF0gc3BpY2U6IFVzZSBuZXcgU3BpY2VJbWFnZUNvbXByZXNzaW9uIGRlZmluaXRp
-b24KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
-QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
-YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
-dGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAk
-QkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAk
-bi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0
-IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQo
-KG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBh
-IG5ldyBicmFuY2ggJ3Rlc3QnCjBkYjQ3OWQgc3BpY2U6IFVzZSBuZXcgU3BpY2VJbWFnZUNvbXBy
-ZXNzaW9uIGRlZmluaXRpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEv
-MTogc3BpY2U6IFVzZSBuZXcgU3BpY2VJbWFnZUNvbXByZXNzaW9uIGRlZmluaXRpb24uLi4KRVJS
-T1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwoj
-MjY6IEZJTEU6IHVpL3NwaWNlLWNvcmUuYzozMzQ6CisgICAgWyBTUElDRV9JTUFHRV9DT01QUkVT
-U0lPTl9PRkYgXSAgICAgID0gIm9mZiIsCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUg
-dGhhdCBjbG9zZSBzcXVhcmUgYnJhY2tldCAnXScKIzI2OiBGSUxFOiB1aS9zcGljZS1jb3JlLmM6
-MzM0OgorICAgIFsgU1BJQ0VfSU1BR0VfQ09NUFJFU1NJT05fT0ZGIF0gICAgICA9ICJvZmYiLAoK
-RVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHNxdWFyZSBicmFja2V0ICdb
-JwojMjc6IEZJTEU6IHVpL3NwaWNlLWNvcmUuYzozMzU6CisgICAgWyBTUElDRV9JTUFHRV9DT01Q
-UkVTU0lPTl9BVVRPX0dMWiBdID0gImF1dG9fZ2x6IiwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVk
-IGJlZm9yZSB0aGF0IGNsb3NlIHNxdWFyZSBicmFja2V0ICddJwojMjc6IEZJTEU6IHVpL3NwaWNl
-LWNvcmUuYzozMzU6CisgICAgWyBTUElDRV9JTUFHRV9DT01QUkVTU0lPTl9BVVRPX0dMWiBdID0g
-ImF1dG9fZ2x6IiwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBzcXVh
-cmUgYnJhY2tldCAnWycKIzI4OiBGSUxFOiB1aS9zcGljZS1jb3JlLmM6MzM2OgorICAgIFsgU1BJ
-Q0VfSU1BR0VfQ09NUFJFU1NJT05fQVVUT19MWiBdICA9ICJhdXRvX2x6IiwKCkVSUk9SOiBzcGFj
-ZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHNxdWFyZSBicmFja2V0ICddJwojMjg6IEZJ
-TEU6IHVpL3NwaWNlLWNvcmUuYzozMzY6CisgICAgWyBTUElDRV9JTUFHRV9DT01QUkVTU0lPTl9B
-VVRPX0xaIF0gID0gImF1dG9fbHoiLAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhh
-dCBvcGVuIHNxdWFyZSBicmFja2V0ICdbJwojMjk6IEZJTEU6IHVpL3NwaWNlLWNvcmUuYzozMzc6
-CisgICAgWyBTUElDRV9JTUFHRV9DT01QUkVTU0lPTl9RVUlDIF0gICAgID0gInF1aWMiLAoKRVJS
-T1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2Ugc3F1YXJlIGJyYWNrZXQgJ10n
-CiMyOTogRklMRTogdWkvc3BpY2UtY29yZS5jOjMzNzoKKyAgICBbIFNQSUNFX0lNQUdFX0NPTVBS
-RVNTSU9OX1FVSUMgXSAgICAgPSAicXVpYyIsCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRl
-ciB0aGF0IG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMzMDogRklMRTogdWkvc3BpY2UtY29yZS5j
-OjMzODoKKyAgICBbIFNQSUNFX0lNQUdFX0NPTVBSRVNTSU9OX0dMWiBdICAgICAgPSAiZ2x6IiwK
-CkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHNxdWFyZSBicmFja2V0
-ICddJwojMzA6IEZJTEU6IHVpL3NwaWNlLWNvcmUuYzozMzg6CisgICAgWyBTUElDRV9JTUFHRV9D
-T01QUkVTU0lPTl9HTFogXSAgICAgID0gImdseiIsCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBh
-ZnRlciB0aGF0IG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMzMTogRklMRTogdWkvc3BpY2UtY29y
-ZS5jOjMzOToKKyAgICBbIFNQSUNFX0lNQUdFX0NPTVBSRVNTSU9OX0xaIF0gICAgICAgPSAibHoi
-LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2Ugc3F1YXJlIGJyYWNr
-ZXQgJ10nCiMzMTogRklMRTogdWkvc3BpY2UtY29yZS5jOjMzOToKKyAgICBbIFNQSUNFX0lNQUdF
-X0NPTVBSRVNTSU9OX0xaIF0gICAgICAgPSAibHoiLAoKdG90YWw6IDEyIGVycm9ycywgMCB3YXJu
-aW5ncywgMzQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+Stefan Weil wrote:
+
+> These two patches fix wrong format strings used in disas/nanomips.
+
+Stefan,
+
+I truly appreciate your interest in nanoMIPS dissasembler.
+
+In my opinion, this series comes too late in 3.1 development cycle to be
+accepted. The described severity of undesired behavior is just way too low
+for rc3 phase.
+
+Also, as a general remark, in this series, there is no example of wrong
+output for big endian host, only some belief or opinion - referent test
+example would be helpful, and much better justification for the series.
+Some build errors are mentioned, but they are not a part for official
+builds. Related to these errors, certain additional build options are said
+to cause build warnings, but such build options were not identified.
+
+All in all, my judgement is that we should deal with these issues after 3.1
+release.
+
+However, I am still grateful to you for bringing these issues up, and you
+are welcome to participate in any way in future development of this and
+other segments of QEMU for MIPS.
+
+Yours,
+Aleksandar
+On Nov 27, 2018 1:19 PM, "Stefan Weil" <sw@weilnetz.de> wrote:
+
+> These two patches fix wrong format strings used in disas/nanomips.
+>
+> The first patch replaces proprietary data types by POSIX data types,
+> because otherwise the PRI... macros cannot be used in the second patch.
+>
+> Those patches are only relevant for 3.1 if full nanomips support is
+> considered
+> important enought and if QEMU is used on big endian machines (I think
+> the old code will work on little endian hosts even with wrong format
+> strings).
+>
+> I use those patches for QEMU for Windows because that is compiled with
+> more compiler warnings, so compilation would fail without the fix.
+>
+> Regards
+> Stefan
+>
+>
+>
