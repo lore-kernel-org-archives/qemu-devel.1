@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gS1TH-0003BD-Ff
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:09:52 -0500
+	(envelope-from <thuth@redhat.com>) id 1gS1Tc-0003MY-HY
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:10:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gS1TB-00008k-Pe
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:09:46 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33851)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gS1T8-0008L3-0e
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:09:41 -0500
-Received: by mail-wr1-x441.google.com with SMTP id j2so26691787wrw.1
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 07:09:37 -0800 (PST)
-References: <20181123230206.12629-1-cota@braap.org>
-	<20181123230206.12629-5-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181123230206.12629-5-cota@braap.org>
-Date: Wed, 28 Nov 2018 15:09:34 +0000
-Message-ID: <875zwh44sx.fsf@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1gS1TY-0000qD-Hp
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:10:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58560)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gS1TY-0000mb-9e
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:10:04 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7CA6130014AD
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 15:10:03 +0000 (UTC)
+References: <20181128145008.6574-1-berrange@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <75c4897e-f24a-e1ef-bece-a6d54541b157@redhat.com>
+Date: Wed, 28 Nov 2018 16:10:00 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181128145008.6574-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/4] xxhash: match output against the
- original xxhash32
+Subject: Re: [Qemu-devel] [qemu-web PATCH] download: document version
+ numbering scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +34,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-
-Emilio G. Cota <cota@braap.org> writes:
-
-> Change the order in which we extract a/b and c/d to
-> match the output of the upstream xxhash32.
->
-> Tested with:
->   https://github.com/cota/xxhash/tree/qemu
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On 2018-11-28 15:50, Daniel P. Berrang=C3=A9 wrote:
+> The new version numbering scheme was mentioned in the blog post
+> announcing 3.0 previously, but this will fall out of view over
+> time. It is thus preferrable to mention this on the download page
+> too.
+>=20
+> Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 > ---
->  include/qemu/xxhash.h | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/include/qemu/xxhash.h b/include/qemu/xxhash.h
-> index fe35dde328..076f1f6054 100644
-> --- a/include/qemu/xxhash.h
-> +++ b/include/qemu/xxhash.h
-> @@ -55,10 +55,10 @@ qemu_xxhash7(uint64_t ab, uint64_t cd, uint32_t e, ui=
-nt32_t f, uint32_t g)
->      uint32_t v2 =3D QEMU_XXHASH_SEED + PRIME32_2;
->      uint32_t v3 =3D QEMU_XXHASH_SEED + 0;
->      uint32_t v4 =3D QEMU_XXHASH_SEED - PRIME32_1;
-> -    uint32_t a =3D ab >> 32;
-> -    uint32_t b =3D ab;
-> -    uint32_t c =3D cd >> 32;
-> -    uint32_t d =3D cd;
-> +    uint32_t a =3D ab;
-> +    uint32_t b =3D ab >> 32;
-> +    uint32_t c =3D cd;
-> +    uint32_t d =3D cd >> 32;
->      uint32_t h32;
->
->      v1 +=3D a * PRIME32_2;
+>  download.html | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
+>=20
+> diff --git a/download.html b/download.html
+> index 5a1e4ea..59db880 100644
+> --- a/download.html
+> +++ b/download.html
+> @@ -39,6 +39,31 @@ permalink: /download/
+>  	{% include_relative _download/source.html %}
+>  </article>
+>  </div>
+> +
+> +<h2>Version numbering</h2>
+> +<div>
+> +  <p>
+> +  In 2018, for the QEMU 3.0 release, a time based version numbering sc=
+heme was
+> +  adopted:
 
+I'd maybe drop the "2018" here, and use a three digit version number
+(since you describe the three digits below) ... maybe rather write it
+like this:
 
---
-Alex Benn=C3=A9e
+ Since version 3.0.0, QEMU uses a time based version numbering scheme:
+
+?
+
+> +  </p>
+> +<ul>
+> +<dt>major</dt>
+> +<dd>incremented by 1 for the first release of the year</dd>
+> +<dt>minor</dt>
+> +<dd>reset to 0 with every major increment, otherwise incremented by 1 =
+for each release from git master</dd>
+> +<dt>micro</dt>
+> +<dd>always 0 for releases from git master, incremented by 1 for each s=
+table branch release</dd>
+> +</ul>
+> +  <p>
+> +    The implication of this is that changes in major version number
+> +    <strong>do not</strong> have any bearing on the scope of changes
+> +    included in the release. Non-backward compatible changes may be ma=
+de
+> +    in any master branch release, provided they have followed the
+> +    <a href=3D"https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-f=
+eatures">deprecation policy</a>
+> +    which calls for warnings to be emitted for a minimum of two releas=
+es
+> +    prior to the change.
+> +  </p>
+> +</div>
+>  <script>
+>  function animateOnClick(jqThis, slide) {
+>     $('.horiz-menu li').removeClass('active');
+>=20
+
+ Thomas
