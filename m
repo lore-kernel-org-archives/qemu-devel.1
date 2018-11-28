@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gRqUy-00011G-2C
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:26:51 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gRqWb-0002px-Im
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:28:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gRqUu-0001v6-C6
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:26:46 -0500
-Date: Tue, 27 Nov 2018 22:26:30 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181127221515-mutt-send-email-mst@kernel.org>
-References: <20181126162942.21258-1-sameo@linux.intel.com>
-	<20181126162942.21258-5-sameo@linux.intel.com>
-	<20181127162551.29608eeb@redhat.com>
-	<20181127154218.GA5677@caravaggio>
-	<20181127172749.75a036b4@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1gRqWa-00036j-L3
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:28:29 -0500
+Date: Wed, 28 Nov 2018 13:59:23 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181128025923.GX2251@umbus.fritz.box>
+References: <20181116105729.23240-1-clg@kaod.org>
+	<20181116105729.23240-14-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="mlvFMpb4NrD3AMcD"
 Content-Disposition: inline
-In-Reply-To: <20181127172749.75a036b4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/8] hw: arm: Carry RSDP specific data
- through AcpiRsdpData
+In-Reply-To: <20181116105729.23240-14-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 13/36] spapr: introduce a
+ spapr_irq_init() routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,190 +25,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On Tue, Nov 27, 2018 at 05:27:49PM +0100, Igor Mammedov wrote:
-> On Tue, 27 Nov 2018 16:42:18 +0100
-> Samuel Ortiz <sameo@linux.intel.com> wrote:
-> 
-> > Hi Igor,
-> > 
-> > On Tue, Nov 27, 2018 at 04:25:51PM +0100, Igor Mammedov wrote:
-> > > On Mon, 26 Nov 2018 17:29:37 +0100
-> > > Samuel Ortiz <sameo@linux.intel.com> wrote:
-> > >   
-> > > > That will allow us to generalize the ARM build_rsdp() routine to support
-> > > > both legacy RSDP (The current i386 implementation) and extended RSDP
-> > > > (The ARM implementation).
-> > > > 
-> > > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > > > ---
-> > > >  include/hw/acpi/acpi-defs.h | 11 +++++++++++
-> > > >  hw/arm/virt-acpi-build.c    | 27 ++++++++++++++++++++++-----
-> > > >  2 files changed, 33 insertions(+), 5 deletions(-)
-> > > > 
-> > > > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> > > > index af8e023968..e7fd24c6c5 100644
-> > > > --- a/include/hw/acpi/acpi-defs.h
-> > > > +++ b/include/hw/acpi/acpi-defs.h
-> > > > @@ -53,6 +53,17 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
-> > > >  } QEMU_PACKED;
-> > > >  typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
-> > > >  
-> > > > +typedef struct AcpiRsdpData {
-> > > > +    uint8_t oem_id[6]; /* OEM identification */
-> > > > +    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
-> > > > +
-> > > > +    unsigned *rsdt_tbl_offset;
-> > > > +    unsigned *xsdt_tbl_offset;
-> > > > +} AcpiRsdpData;
-> > > > +  
-> > >   
-> > > > +#define ACPI_RSDP_REV_1 0
-> > > > +#define ACPI_RSDP_REV_2 2  
-> > > it's one time used spec defined values so just use values directly
-> > > in place with a comment, so reader won't have to jump around code
-> > > when comparing to spec.  
-> > It's also used in the ACPI tests fix patch.
-> it's better to use in test it's own version (we just opencode them there)
-> see fadt_fetch_facs_and_dsdt_ptrs()/sanitize_fadt_ptrs()
-> same applies for length.
-> that way if we break it in qemu's code test would catch the thing
-> 
-> > Also the 0 for revision 1 is a little confusing, I feel the above
-> > definition is clearer.
-> that's confusion is in the spec, so we just mimic it, no need to add more on top
 
-To be more precise, there is a huge number of constants in ACPI
-such that adding defines for them all would be a huge burden,
-and will not make it easy to check values against the
-spec at all (case in point ACPI_RSDP_REV_2 is actually wrong,
-2 is version 3 and up).
+--mlvFMpb4NrD3AMcD
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thus the preferred style is to add a comment near the value
-matching spec name verbatim, so one can copy it and
-look it up in the spec. Sometimes one needs to reference
-specific spec version.
+On Fri, Nov 16, 2018 at 11:57:06AM +0100, C=E9dric Le Goater wrote:
+> Initialize the MSI bitmap from it as this will be necessary for the
+> sPAPR IRQ backend for XIVE.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-0 /* Revision: ACPI version 1.0 */
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-and
+> ---
+>  include/hw/ppc/spapr_irq.h |  1 +
+>  hw/ppc/spapr.c             |  2 +-
+>  hw/ppc/spapr_irq.c         | 16 +++++++++++-----
+>  3 files changed, 13 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index a467ce696ee4..bd7301e6d9c6 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -43,6 +43,7 @@ typedef struct sPAPRIrq {
+>  extern sPAPRIrq spapr_irq_xics;
+>  extern sPAPRIrq spapr_irq_xics_legacy;
+> =20
+> +void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
+>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp);
+>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+>  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 50cb9f9f4a02..e470efe7993c 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2594,7 +2594,7 @@ static void spapr_machine_init(MachineState *machin=
+e)
+>      spapr_set_vsmt_mode(spapr, &error_fatal);
+> =20
+>      /* Set up Interrupt Controller before we create the VCPUs */
+> -    smc->irq->init(spapr, &error_fatal);
+> +    spapr_irq_init(spapr, &error_fatal);
+> =20
+>      /* Set up containers for ibm,client-architecture-support negotiated =
+options
+>       */
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index e77b94cc685e..f8b651de0ec9 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -97,11 +97,6 @@ static void spapr_irq_init_xics(sPAPRMachineState *spa=
+pr, Error **errp)
+>      int nr_irqs =3D smc->irq->nr_irqs;
+>      Error *local_err =3D NULL;
+> =20
+> -    /* Initialize the MSI IRQ allocator. */
+> -    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> -        spapr_irq_msi_init(spapr, smc->irq->nr_msis);
+> -    }
+> -
+>      if (kvm_enabled()) {
+>          if (machine_kernel_irqchip_allowed(machine) &&
+>              !xics_kvm_init(spapr, &local_err)) {
+> @@ -213,6 +208,17 @@ sPAPRIrq spapr_irq_xics =3D {
+>  /*
+>   * sPAPR IRQ frontend routines for devices
+>   */
+> +void spapr_irq_init(sPAPRMachineState *spapr, Error **errp)
+> +{
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +
+> +    /* Initialize the MSI IRQ allocator. */
+> +    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+> +        spapr_irq_msi_init(spapr, smc->irq->nr_msis);
+> +    }
+> +
+> +    smc->irq->init(spapr, errp);
+> +}
+> =20
+>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp)
+>  {
 
-1 /* Revision: ACPI 2.0 */
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-and
+--mlvFMpb4NrD3AMcD
+Content-Type: application/pgp-signature; name="signature.asc"
 
-2 /* Revision: ACPI 3.0a */
+-----BEGIN PGP SIGNATURE-----
 
-For style consistency, if the value is used multiple times, we avoid
-duplication by using an inline function and not a macro.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv+BIsACgkQbDjKyiDZ
+s5JI0Q/7BUz0fNgeJe1KWwpv1qokBM98mN5CsgJCu5jT5tFe5VYf+S0aa9AGL8Zr
+Y7yE+shahb1R6hbzBluOdG/RvhRh3ecDIkAD/WaKdj5q34AAyuvMdoAipbHDct4A
+hBVJrmeT2hPJ1LKO4Xr27XizwloEoCSjddFXmbZKMDD62w1WV/7FKiln2Oumlr6d
+bmo2tAHASvAvyTxw5/ckXzDdZubLaYU8uof3kz2z9u+TIzX/PQtYsiKoemxMMgZL
+0StutCKB+Vo5j5gWGFWbhA8xz2XNu49qUzH7T3UNTkY9jlyR76lh5PRaCYpRlaHd
+0ggz6OVWDXG17vUidi/AVVOqMmO1vGhQ1svxebMEwtu26A6l3KifPh2t9XW5bz/4
+tBUYA/eskdWhcSpp/xUsJHM26GdcaXpwUOhEjVDzMHLpV+ZzOCFnDecL/2q1CQF3
+7q8RDkFR8eRZgi7eb60vrcPj73VHgcoCt2r2wVswuYqXMnkOyLOlTqhxofSPOqsh
+pmih4swiEUCANLeUbXQ8ymW1ytLoPmkjJuzUAFMpcq9WUlmwAzeQWyYJZSMfqYH4
+8jjYw/nes8FO9QVyyGeQ/BOsR5W3ab9zAeciJ6r1bXBfCCVFQG8Kn6w7vQR5myAp
+ZUW8BSf5T1GcTJDUpIBRZq0FNI3g1IiWce01zYGOpE2d2yzCf0s=
+=6sRT
+-----END PGP SIGNATURE-----
 
-> > 
-> > 
-> > > > +
-> > > >  /* Table structure from Linux kernel (the ACPI tables are under the
-> > > >     BSD license) */
-> > > >  
-> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > > index 0835900052..2dad465ecf 100644
-> > > > --- a/hw/arm/virt-acpi-build.c
-> > > > +++ b/hw/arm/virt-acpi-build.c
-> > > > @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
-> > > >  
-> > > >  /* RSDP */
-> > > >  static void
-> > > > -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> > > > +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
-> > > >  {
-> > > >      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
-> > > >      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
-> > > > @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> > > >                               true /* fseg memory */);
-> > > >  
-> > > >      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
-> > > > -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
-> > > > +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
-> > > >      rsdp->length = cpu_to_le32(sizeof(*rsdp));
-> > > > -    rsdp->revision = 0x02;
-> > > > +    rsdp->revision = rsdp_data->revision;
-> > > >  
-> > > >      /* Address to be filled by Guest linker */
-> > > >      bios_linker_loader_add_pointer(linker,
-> > > >          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
-> > > > -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
-> > > > +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
-> > > >  
-> > > >      /* Checksum to be filled by Guest linker */
-> > > >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> > > > @@ -399,6 +399,20 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> > > >          (char *)&rsdp->extended_checksum - rsdp_table->data);
-> > > >  }
-> > > >  
-> > > > +static void
-> > > > +init_rsdp_data(AcpiRsdpData *data, const char *oem_id, uint8_t revision,
-> > > > +               unsigned *rsdt_offset, unsigned *xsdt_offset)
-> > > > +{
-> > > > +    /* Caller must provide an OEM ID */
-> > > > +    g_assert(oem_id);
-> > > > +    g_assert(strlen(oem_id) >= 6);
-> > > > +
-> > > > +    memcpy(data->oem_id, oem_id, 6);
-> > > > +    data->revision = revision;
-> > > > +    data->rsdt_tbl_offset = rsdt_offset;
-> > > > +    data->xsdt_tbl_offset = xsdt_offset;
-> > > > +}
-> > > > +
-> > > >  static void
-> > > >  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> > > >  {
-> > > > @@ -810,6 +824,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-> > > >      GArray *table_offsets;
-> > > >      unsigned dsdt, xsdt;
-> > > >      GArray *tables_blob = tables->table_data;
-> > > > +    AcpiRsdpData rsdp;  
-> > > s/rsdp/rsdp_info/
-> > >   
-> > > >  
-> > > >      table_offsets = g_array_new(false, true /* clear */,
-> > > >                                          sizeof(uint32_t));
-> > > > @@ -857,7 +872,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-> > > >      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
-> > > >  
-> > > >      /* RSDP is in FSEG memory, so allocate it separately */
-> > > > -    build_rsdp(tables->rsdp, tables->linker, xsdt);
-> > > > +    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
-> > > > +                   NULL, &xsdt);  
-> > > It would be more concise to use declarative style without extra clutter:
-> > > 
-> > > -    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
-> > > -                   NULL, &xsdt);
-> > > -    build_rsdp(tables->rsdp, tables->linker, &rsdp);
-> > > +    {
-> > > +       AcpiRsdpData rsdp = {
-> > > +           .revision = 2,
-> > > +           .oem_id = ACPI_BUILD_APPNAME6,
-> > > +           .xsdt_tbl_offset = &xsdt,
-> > > +           .rsdt_tbl_offset = NULL,
-> > > +       };
-> > > +       build_rsdp(tables->rsdp, tables->linker, &rsdp);
-> > > +    }  
-> > 2 things here, imo:
-> > 
-> > - This is not more concise.
-> with function, one have to jump to it's definition/body to find out what
-> each argument is, with declaration + initialization inplace it's clear
-> what values mean as you see fields right there as well.
-> 
-> If it's simple structure it is clearer to use initializer, instead of
-> wrapper helper. With complex structure it could be other way around.
-> 
-> > - It's code duplication as almost the same snippet is going to be used
-> >   for i386/acpi-build.c
-> the same goes for init_rsdp_data(...), the only difference
-> the declaration isn't folded in 2 lines to be more readable and there is
-> boiler plate helper function adds.
-> 
-> > 
-> > Cheers,
-> > Samuel.
+--mlvFMpb4NrD3AMcD--
