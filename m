@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gS1HN-0000Lo-LC
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:57:30 -0500
+	(envelope-from <sw@weilnetz.de>) id 1gS1JH-0001zn-H2
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:59:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gS1HJ-0003nm-6w
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:57:29 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37801)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gS1HI-0003nJ-VD
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:57:25 -0500
-Received: by mail-wr1-x443.google.com with SMTP id j10so26613732wru.4
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 06:57:24 -0800 (PST)
-References: <20181123230206.12629-1-cota@braap.org>
-	<20181123230206.12629-2-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181123230206.12629-2-cota@braap.org>
-Date: Wed, 28 Nov 2018 14:57:22 +0000
-Message-ID: <877egx45d9.fsf@linaro.org>
+	(envelope-from <sw@weilnetz.de>) id 1gS1JC-00059s-Ed
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:59:27 -0500
+Received: from smtp.mail.uni-mannheim.de ([134.155.96.80]:40724)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1gS1J3-00051J-Ky
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:59:17 -0500
+References: <20181127145043.18545-1-f4bug@amsat.org>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <c23486c2-e55e-4b88-7a70-76a77f6de1eb@weilnetz.de>
+Date: Wed, 28 Nov 2018 15:59:17 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181127145043.18545-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] qht-bench: document -p flag
+Subject: Re: [Qemu-devel] [PATCH for-3.1] configure: Disable the nanoMIPS
+ disassembler on big endian hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-
-Emilio G. Cota <cota@braap.org> writes:
-
-> Which we forgot to do in bd224fce60 ("qht-bench: add -p flag
-> to precompute hash values", 2018-09-26).
+Am 27.11.2018 um 15:50 schrieb Philippe Mathieu-Daud=C3=A9:
+> Stefan noticed the nanoMIPS disassembler uses incorrect format strings
+> on big endian hosts.
 >
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+> On big endian hosts, the output will appear as:
+>
+> $ qemu-system-mipsel -M malta -cpu I7200 -semihosting \
+>   -bios nanoboot.bin -d in_asm
+> 0xbfc0000: Asm output not supported on this arch
+>
+> Reported-by: Stefan Weil <sw@weilnetz.de>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  tests/qht-bench.c | 1 +
->  1 file changed, 1 insertion(+)
+>  configure | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 >
-> diff --git a/tests/qht-bench.c b/tests/qht-bench.c
-> index 2089e2bed1..636750d39f 100644
-> --- a/tests/qht-bench.c
-> +++ b/tests/qht-bench.c
-> @@ -72,6 +72,7 @@ static const char commands_string[] =3D
->      " -n =3D number of threads\n"
->      "\n"
->      " -o =3D offset at which keys start\n"
-> +    " -p =3D precompute hashes\n"
->      "\n"
->      " -g =3D set -s,-k,-K,-l,-r to the same value\n"
->      " -s =3D initial size hint\n"
+> diff --git a/configure b/configure
+> index 0a3c6a72c3..83a7c4746e 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7382,7 +7382,11 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+>    mips*)
+>      disas_config "MIPS"
+>      if test -n "${cxx}"; then
+> -      disas_config "NANOMIPS"
+> +      # The nanomips disassembler currently does not work correctly
+> +      # on big endian host.
+> +      if test "$bigendian" =3D "no" ; then
+> +        disas_config "NANOMIPS"
+> +      fi
+>      fi
+>    ;;
+>    moxie*)
 
 
---
-Alex Benn=C3=A9e
+Thank you. This looks like a patch which might be acceptable for 3.1.
+
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
