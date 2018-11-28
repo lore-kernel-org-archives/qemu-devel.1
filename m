@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gRz5y-0007Ga-09
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 07:37:35 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gRz8p-0008JG-R1
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 07:40:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gRz5u-0001f1-Pe
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 07:37:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57801)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gRz5u-0001aA-Hr
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 07:37:30 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1542290622.git.simon@ruderich.org>
-	<0e061333411f8e64a6e53f14c4c067e5e3e1c91e.1542290622.git.simon@ruderich.org>
-Date: Wed, 28 Nov 2018 13:37:22 +0100
-In-Reply-To: <0e061333411f8e64a6e53f14c4c067e5e3e1c91e.1542290622.git.simon@ruderich.org>
-	(Simon Ruderich's message of "Thu, 15 Nov 2018 15:07:17 +0100")
-Message-ID: <87r2f5fke5.fsf@dusky.pond.sub.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1gRz8m-0004IN-LD
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 07:40:31 -0500
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:50623)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gRz8m-0004G8-Cc
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 07:40:28 -0500
+Received: by mail-wm1-x32e.google.com with SMTP id 125so2478446wmh.0
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 04:40:27 -0800 (PST)
+References: <20181025172057.20414-1-cota@braap.org>
+	<20181025172057.20414-24-cota@braap.org>
+	<87lg5f51sz.fsf@linaro.org>
+	<e1160c9a-454d-5c55-1295-fb1ab977b2a5@linaro.org>
+	<20181126190733.GC6688@flamenco>
+	<7ff01881-3130-ef72-217d-511b4de0cd3c@linaro.org>
+	<20181127013825.GE22108@flamenco> <20181128005402.GA1523@flamenco>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181128005402.GA1523@flamenco>
+Date: Wed, 28 Nov 2018 12:40:23 +0000
+Message-ID: <87a7lt4bpk.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v8 6/7] qmp: add pmemload command
+Subject: Re: [Qemu-devel] [RFC 23/48] translator: add plugin_insn argument
+ to translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,230 +35,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Simon Ruderich <simon@ruderich.org>
-Cc: qemu-devel@nongnu.org, David Alan Gilbert <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>
 
-Simon Ruderich <simon@ruderich.org> writes:
 
-> Adapted patch from Baojun Wang [1] with the following commit message:
->
->     I found this could be useful to have qemu-softmmu as a cross
->     debugger (launch with -s -S command line option), then if we can
->     have a command to load guest physical memory, we can use cross gdb
->     to do some target debug which gdb cannot do directly.
->
-> This patch contains only the qmp changes of the original patch.
->
-> pmemload is necessary to directly write physical memory which is not
-> possible with gdb alone as it uses only logical addresses.
->
-> The QAPI for pmemload uses "val" as parameter name for the physical
-> address. This name is not very descriptive but is consistent with the
-> existing pmemsave. Changing the parameter name of pmemsave is not
-> possible without breaking the existing API.
+Emilio G. Cota <cota@braap.org> writes:
 
-As much as I dislike the name "val" for a base address, I agree with you
-to prioritize consistency.
-
-> [1]: https://lists.gnu.org/archive/html/qemu-trivial/2014-04/msg00074.html
+> On Mon, Nov 26, 2018 at 20:38:25 -0500, Emilio G. Cota wrote:
+>> On Mon, Nov 26, 2018 at 11:30:25 -0800, Richard Henderson wrote:
+>> > On 11/26/18 11:07 AM, Emilio G. Cota wrote:
+>> > > The main reason why I added the qemu_plugin_insn_append calls
+>> > > was to avoid reading the instructions twice from guest memory,
+>> > > because I was worried that doing so might somehow alter the
+>> > > guest's execution, e.g. what if we read a cross-page instruction,
+>> > > and both pages mapped to the same TLB entry? We'd end up having
+>> > > more TLB misses because instrumentation was enabled.
+>> >
+>> > A better solution for this, I think is to change direct calls from
+>> >
+>> >   cpu_ldl_code(env, pc);
+>> > to
+>> >   translator_ldl_code(dc_base, env, pc);
+>> >
+>> > instead of passing around a new argument separate from DisasContextBase?
+>>
+>> I think this + diff'ing pc_next should work to figure out the
+>> contents and size of each instruction.
 >
-> Based-on-patch-by: Baojun Wang <wangbj@gmail.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Simon Ruderich <simon@ruderich.org>
-> ---
->  cpus.c         | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  qapi/misc.json | 20 ++++++++++++++++++
->  2 files changed, 75 insertions(+)
+> I just tried doing things this way.
 >
-> diff --git a/cpus.c b/cpus.c
-> index ee54595733..b80f331596 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -2445,6 +2445,61 @@ exit:
->      qemu_close(fd);
+> For some targets like i386, the translator_ld* helpers work
+> great; the instruction contents are copied, and through
+> the helpers we get the sizes of the instructions as well.
+>
+> For ARM though (and maybe others, I haven't gone
+> through all of them yet), arm_ldl_code does the following:
+>
+> /* Load an instruction and return it in the standard little-endian order */
+> static inline uint32_t arm_ldl_code(CPUARMState *env, target_ulong addr,
+>                                     bool sctlr_b)
+> {
+>     uint32_t insn = cpu_ldl_code(env, addr);
+>     if (bswap_code(sctlr_b)) {
+>         return bswap32(insn);
+>     }
+>     return insn;
+> }
+>
+> To avoid altering the signature of .translate_insn, I've modified
+> arm_ldl_code directly, as follows:
+>
+>      uint32_t insn = cpu_ldl_code(env, addr);
+> +
+>      if (bswap_code(sctlr_b)) {
+> -        return bswap32(insn);
+> +        insn = bswap32(insn);
+> +    }
+> +    if (tcg_ctx->plugin_insn) {
+> +        qemu_plugin_insn_append(tcg_ctx->plugin_insn, &insn, sizeof(insn));
+>      }
+>      return insn;
 >  }
->  
-> +void qmp_pmemload(int64_t addr, const char *filename,
+>
+> (NB. tcg_ctx->plugin_insn is updated by translator_loop
+> on every iteration.)
+>
+> Let me know if you think I should do this differently.
 
-I first parameter is called @val in the schema, and @addr here.  I hate
-that, but it also matches memsave.
+I was envisioning something more like the following so all the plugin
+gubins could be kept in the core code:
 
-> +                  bool has_size, int64_t size,
-> +                  bool has_offset, int64_t offset,
-> +                  Error **errp)
-> +{
-> +    int fd;
-> +    size_t l;
-> +    ssize_t r;
-> +    uint8_t buf[1024];
-> +
-> +    fd = qemu_open(filename, O_RDONLY | O_BINARY);
-> +    if (fd < 0) {
-> +        error_setg_file_open(errp, errno, filename);
-> +        return;
-> +    }
-> +    if (has_offset && offset > 0) {
-> +        if (lseek(fd, offset, SEEK_SET) != offset) {
-> +            error_setg_errno(errp, errno,
-> +                             "could not seek to offset %" PRIx64, offset);
+accel/tcg/translator.c    | 25 +++++++++++++++++++++++++
+include/exec/translator.h | 10 ++++++++++
+target/arm/arm_ldst.h     | 16 +++-------------
 
-I think the value of @filename is more interesting than the value of
-@offset here.
+modified   accel/tcg/translator.c
+@@ -10,6 +10,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qemu/error-report.h"
++#include "qemu/bswap.h"
+ #include "cpu.h"
+ #include "tcg/tcg.h"
+ #include "tcg/tcg-op.h"
+@@ -18,6 +19,30 @@
+ #include "exec/log.h"
+ #include "exec/translator.h"
+ #include "exec/plugin-gen.h"
++#include "exec/cpu_ldst.h"
++
++/*
++ * Translator Code Load Helpers
++ */
++
++uint16_t translator_ld16(CPUArchState *env, target_ulong ptr, bool bswap)
++{
++    uint16_t insn = cpu_lduw_code(env, ptr);
++    if (bswap) {
++        insn = bswap16(insn);
++    }
++    return insn;
++}
++
++uint32_t translator_ld32(CPUArchState *env, target_ulong ptr, bool bswap)
++{
++    uint32_t insn = cpu_ldl_code(env, ptr);
++    if (bswap) {
++        insn = bswap32(insn);
++    }
++    return insn;
++}
++
 
-> +            goto exit;
-> +        }
-> +    }
-> +    if (!has_size) {
-> +        struct stat s;
-> +        if (fstat(fd, &s)) {
-> +            error_setg_errno(errp, errno, "could not fstat fd to get size");
-> +            goto exit;
-> +        }
+ /* Pairs with tcg_clear_temp_count.
+    To be called by #TranslatorOps.{translate_insn,tb_stop} if
+modified   include/exec/translator.h
+@@ -147,4 +147,14 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
 
-TOCTTOU: the size can change while you read the file.  I figure nothing
-truly terrible can happen here that way, but it does set a bad example.
+ void translator_loop_temp_check(DisasContextBase *db);
 
-> +        if (S_ISCHR(s.st_mode) || S_ISBLK(s.st_mode)) {
-> +            error_setg(errp, "pmemload doesn't support char/block devices");
-> +            goto exit;
-> +        }
++/*
++ * Translator Code Load Helpers
++ *
++ * These allow the core translator code to track where code is being
++ * loaded from.
++ */
++
++uint16_t translator_ld16(CPUArchState *env, target_ulong ptr, bool bswap);
++uint32_t translator_ld32(CPUArchState *env, target_ulong ptr, bool bswap);
++
+ #endif  /* EXEC__TRANSLATOR_H */
+modified   target/arm/arm_ldst.h
+@@ -20,25 +20,19 @@
+ #ifndef ARM_LDST_H
+ #define ARM_LDST_H
 
-Any particular reason for rejecting character and block devices when
-@size is absent, yet accepting them when @size is present?
+-#include "exec/cpu_ldst.h"
+-#include "qemu/bswap.h"
++#include "exec/translator.h"
 
-> +        size = s.st_size;
-> +    }
-> +
-> +    while (size != 0) {
-> +        l = sizeof(buf);
-> +        if (l > size) {
-> +            l = size;
-> +        }
-> +        r = read(fd, buf, l);
-> +        if (r <= 0) {
-> +            error_setg(errp, QERR_IO_ERROR);
-> +            goto exit;
+ /* Load an instruction and return it in the standard little-endian order */
+ static inline uint32_t arm_ldl_code(CPUARMState *env, target_ulong addr,
+                                     bool sctlr_b)
+ {
+-    uint32_t insn = cpu_ldl_code(env, addr);
+-    if (bswap_code(sctlr_b)) {
+-        return bswap32(insn);
+-    }
+-    return insn;
++    return translator_ld32(env, addr, bswap_code(sctlr_b));
+ }
 
-Please avoid the QERR_ macros, as requested by qerror.h.
+ /* Ditto, for a halfword (Thumb) instruction */
+ static inline uint16_t arm_lduw_code(CPUARMState *env, target_ulong addr,
+                                      bool sctlr_b)
+ {
+-    uint16_t insn;
+ #ifndef CONFIG_USER_ONLY
+     /* In big-endian (BE32) mode, adjacent Thumb instructions have been swapped
+        within each word.  Undo that now.  */
+@@ -46,11 +40,7 @@ static inline uint16_t arm_lduw_code(CPUARMState *env, target_ulong addr,
+         addr ^= 2;
+     }
+ #endif
+-    insn = cpu_lduw_code(env, addr);
+-    if (bswap_code(sctlr_b)) {
+-        return bswap16(insn);
+-    }
+-    return insn;
++    return translator_ld16(env, addr, bswap_code(sctlr_b));
+ }
 
-Two ways to get r == 0:
-
-* If has_size: the file is shorter than the user's size value.
-
-* If !has_size: the file has shrunk since fstat().
-
-In both cases, reporting an I/O error is not nice.
-
-> +        }
-> +        l = r; /* in case of short read */
-> +        cpu_physical_memory_write(addr, buf, l);
-> +        addr += l;
-> +        size -= l;
-> +    }
-
-This reads and copies in chunks of at most 1KiB.  Feels rather small.  I
-figure 4KiB would still be conservative enough, and at least matches
-common page and block sizes.  Paolo, what do you think?
-
-> +
-> +exit:
-> +    qemu_close(fd);
-> +}
-> +
-
-Here's my (compile-tested) attempt to sidestep TOCTTOU:
-
-    int fd;
-    uint64_t limit, ofs;
-    ssize_t n;
-    uint8_t buf[4096];
-
-    fd = qemu_open(filename, O_RDONLY | O_BINARY);
-    if (fd < 0) {
-        error_setg_file_open(errp, errno, filename);
-        return;
-    }
-
-    if (has_offset && offset > 0) {
-        if (lseek(fd, offset, SEEK_SET) != offset) {
-            error_setg_errno(errp, errno, "could not seek '%s'", filename);
-            goto exit;
-        }
-    }
-
-    limit = has_size ? size : UINT64_MAX;
-    ofs = 0;
-    while (ofs < limit) {
-        n = MIN(sizeof(buf), limit - ofs);
-        n = read(fd, buf, n);
-        if (n < 0) {
-            error_setg_errno(errp, errno, "could not read from '%s'",
-                             filename);
-            goto exit;
-        }
-        if (n == 0) {
-            break;
-        }
-        cpu_physical_memory_write(addr + ofs, buf, n);
-        ofs += n;
-    }
-
-exit:
-    qemu_close(fd);
-
-Note that this *silently* reads less than @size when the file isn't big
-enough.  If we decide that's what we want, then the command's contract
-in misc.json has to be updated accordingly.
-
-If it isn't, we can turn the break into an error_setg(); goto exit.  Not
-terribly satisfying, since we already changed the physical memory.
-
->  void qmp_inject_nmi(Error **errp)
->  {
->      nmi_monitor_handle(monitor_get_cpu_index(), errp);
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 6c1c5c0a37..e4f39e31e5 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -1186,6 +1186,26 @@
->  { 'command': 'pmemsave',
->    'data': {'val': 'int', 'size': 'int', 'filename': 'str'} }
->  
-> +##
-> +# @pmemload:
-> +#
-> +# Load a portion of guest physical memory from a file.
-> +#
-> +# @val: the physical address of the guest to start from
-> +#
-> +# @filename: the file to load the memory from as binary data
-> +#
-> +# @size: the size of memory region to load (defaults to whole file)
-> +#
-> +# @offset: the offset in the file to start from (defaults to 0)
-> +#
-> +# Returns: Nothing on success
-> +#
-> +# Since: 4.0
-> +##
-> +{ 'command': 'pmemload',
-> +  'data': {'val': 'int', 'filename': 'str', '*size': 'int', '*offset': 'int'} }
-> +
->  ##
->  # @cont:
->  #
-
-Using 'int' for a physical address is problematic, because it requires
-users to express the upper half of the 64-bit address space as negative
-numbers.  I started to fix up these things some time ago, but got stuck.
-Here's the relevant part:
-
-    Message-ID: <87fud26pfi.fsf@dusky.pond.sub.org>
-    https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01114.html
-
-Perhaps we should cherry-pick just that patch from the series into this
-series, with the format string bug David pointed out fixed.
-
-@offset and @size feel a bit like overengineering to me.  If this work
-was still at the design stage, I'd advise to start without them, then
-see whether there's a genuine need.  At v5, I'm li
+ #endif
