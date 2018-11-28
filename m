@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gRtgB-0005c9-5z
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 01:50:36 -0500
+	(envelope-from <ppandit@redhat.com>) id 1gRtvz-0002Up-L8
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 02:06:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1gRtgA-0002MB-6Z
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 01:50:35 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45140)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1gRtgA-0002Kc-1P
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 01:50:34 -0500
-Received: by mail-oi1-x241.google.com with SMTP id b141so21642300oii.12
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 22:50:33 -0800 (PST)
+	(envelope-from <ppandit@redhat.com>) id 1gRtvw-0006MK-Hj
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 02:06:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45294)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gRtvw-0006KZ-Bt
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 02:06:52 -0500
+Date: Wed, 28 Nov 2018 12:36:39 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20181119110757.2692-1-ppandit@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1811281235310.9905@xnncv>
+References: <20181119110757.2692-1-ppandit@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181127121724.19755-1-sw@weilnetz.de>
-References: <20181127121724.19755-1-sw@weilnetz.de>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 28 Nov 2018 07:50:32 +0100
-Message-ID: <CAL1e-=hqEy3zuEeh12UiqLaw9uxJLvq2ndTjoOg-sE1YHNNBgA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.1 0/2] Fix disas/nanomips
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2] bt: use size_t type for length
+ parameters instead of int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-devel@nongnu.org, Stefan Markovic <smarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Arash TC <tohidi.arash@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
 
-Stefan Weil wrote:
++-- On Mon, 19 Nov 2018, P J P wrote --+
+| From: Prasad J Pandit <pjp@fedoraproject.org>
+| 
+| The length parameter values are not negative, thus use an unsigned
+| type 'size_t' for them. Many routines pass 'len' values to memcpy(3)
+| calls. If it was negative, it could lead to memory corruption issues.
+| Add check to avoid it.
+| 
+| Reported-by: Arash TC <tohidi.arash@gmail.com>
+| Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+| ---
+|  bt-host.c              |  8 +++---
+|  bt-vhci.c              |  7 +++---
+|  hw/bt/core.c           |  2 +-
+|  hw/bt/hci-csr.c        | 32 ++++++++++++------------
+|  hw/bt/hci.c            | 38 ++++++++++++++--------------
+|  hw/bt/hid.c            | 10 ++++----
+|  hw/bt/l2cap.c          | 56 ++++++++++++++++++++++--------------------
+|  hw/bt/sdp.c            |  6 ++---
+|  hw/usb/dev-bluetooth.c | 12 ++++-----
+|  include/hw/bt.h        |  8 +++---
+|  include/sysemu/bt.h    | 10 ++++----
+|  11 files changed, 96 insertions(+), 93 deletions(-)
+| 
+| Update v2: modify assert calls
+|   -> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg01036.html
+| 
 
-> These two patches fix wrong format strings used in disas/nanomips.
-
-Stefan,
-
-I truly appreciate your interest in nanoMIPS dissasembler.
-
-In my opinion, this series comes too late in 3.1 development cycle to be
-accepted. The described severity of undesired behavior is just way too low
-for rc3 phase.
-
-Also, as a general remark, in this series, there is no example of wrong
-output for big endian host, only some belief or opinion - referent test
-example would be helpful, and much better justification for the series.
-Some build errors are mentioned, but they are not a part for official
-builds. Related to these errors, certain additional build options are said
-to cause build warnings, but such build options were not identified.
-
-All in all, my judgement is that we should deal with these issues after 3.1
-release.
-
-However, I am still grateful to you for bringing these issues up, and you
-are welcome to participate in any way in future development of this and
-other segments of QEMU for MIPS.
-
-Yours,
-Aleksandar
-On Nov 27, 2018 1:19 PM, "Stefan Weil" <sw@weilnetz.de> wrote:
-
-> These two patches fix wrong format strings used in disas/nanomips.
->
-> The first patch replaces proprietary data types by POSIX data types,
-> because otherwise the PRI... macros cannot be used in the second patch.
->
-> Those patches are only relevant for 3.1 if full nanomips support is
-> considered
-> important enought and if QEMU is used on big endian machines (I think
-> the old code will work on little endian hosts even with wrong format
-> strings).
->
-> I use those patches for QEMU for Windows because that is compiled with
-> more compiler warnings, so compilation would fail without the fix.
->
-> Regards
-> Stefan
->
->
->
+Ping...!
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
