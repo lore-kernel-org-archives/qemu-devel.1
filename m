@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gRqIJ-0004lR-1k
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:13:43 -0500
+	(envelope-from <mst@redhat.com>) id 1gRqUy-00011G-2C
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:26:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gRqIF-00022U-Vo
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:13:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55094)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gRqIF-000212-N9
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:13:39 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B838F30832DC
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 03:13:36 +0000 (UTC)
-Date: Tue, 27 Nov 2018 22:13:33 -0500
+	(envelope-from <mst@redhat.com>) id 1gRqUu-0001v6-C6
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 22:26:46 -0500
+Date: Tue, 27 Nov 2018 22:26:30 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181127221219-mutt-send-email-mst@kernel.org>
-References: <20181126200009.862-1-quintela@redhat.com>
+Message-ID: <20181127221515-mutt-send-email-mst@kernel.org>
+References: <20181126162942.21258-1-sameo@linux.intel.com>
+	<20181126162942.21258-5-sameo@linux.intel.com>
+	<20181127162551.29608eeb@redhat.com>
+	<20181127154218.GA5677@caravaggio>
+	<20181127172749.75a036b4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181126200009.862-1-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/16] Virtio devices split from
- virtio-pci
+In-Reply-To: <20181127172749.75a036b4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/8] hw: arm: Carry RSDP specific data
+ through AcpiRsdpData
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,93 +27,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Mon, Nov 26, 2018 at 08:59:53PM +0100, Juan Quintela wrote:
-> Hi
+On Tue, Nov 27, 2018 at 05:27:49PM +0100, Igor Mammedov wrote:
+> On Tue, 27 Nov 2018 16:42:18 +0100
+> Samuel Ortiz <sameo@linux.intel.com> wrote:
 > 
-> V2:
+> > Hi Igor,
+> > 
+> > On Tue, Nov 27, 2018 at 04:25:51PM +0100, Igor Mammedov wrote:
+> > > On Mon, 26 Nov 2018 17:29:37 +0100
+> > > Samuel Ortiz <sameo@linux.intel.com> wrote:
+> > >   
+> > > > That will allow us to generalize the ARM build_rsdp() routine to support
+> > > > both legacy RSDP (The current i386 implementation) and extended RSDP
+> > > > (The ARM implementation).
+> > > > 
+> > > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> > > > ---
+> > > >  include/hw/acpi/acpi-defs.h | 11 +++++++++++
+> > > >  hw/arm/virt-acpi-build.c    | 27 ++++++++++++++++++++++-----
+> > > >  2 files changed, 33 insertions(+), 5 deletions(-)
+> > > > 
+> > > > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> > > > index af8e023968..e7fd24c6c5 100644
+> > > > --- a/include/hw/acpi/acpi-defs.h
+> > > > +++ b/include/hw/acpi/acpi-defs.h
+> > > > @@ -53,6 +53,17 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+> > > >  } QEMU_PACKED;
+> > > >  typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+> > > >  
+> > > > +typedef struct AcpiRsdpData {
+> > > > +    uint8_t oem_id[6]; /* OEM identification */
+> > > > +    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
+> > > > +
+> > > > +    unsigned *rsdt_tbl_offset;
+> > > > +    unsigned *xsdt_tbl_offset;
+> > > > +} AcpiRsdpData;
+> > > > +  
+> > >   
+> > > > +#define ACPI_RSDP_REV_1 0
+> > > > +#define ACPI_RSDP_REV_2 2  
+> > > it's one time used spec defined values so just use values directly
+> > > in place with a comment, so reader won't have to jump around code
+> > > when comparing to spec.  
+> > It's also used in the ACPI tests fix patch.
+> it's better to use in test it's own version (we just opencode them there)
+> see fadt_fetch_facs_and_dsdt_ptrs()/sanitize_fadt_ptrs()
+> same applies for length.
+> that way if we break it in qemu's code test would catch the thing
 > 
-> - Rebase on top of master
-> 
-> Please review.
-> 
-> Later, Juan.
+> > Also the 0 for revision 1 is a little confusing, I feel the above
+> > definition is clearer.
+> that's confusion is in the spec, so we just mimic it, no need to add more on top
 
-And just making sure the point is so that one
-can disable virtio-pci and still build virtio?
+To be more precise, there is a huge number of constants in ACPI
+such that adding defines for them all would be a huge burden,
+and will not make it easy to check values against the
+spec at all (case in point ACPI_RSDP_REV_2 is actually wrong,
+2 is version 3 and up).
 
-And the point of that is mostly as a cleanup on
-generic principles, right? Or is there a project that
-actually wants to do it?
+Thus the preferred style is to add a comment near the value
+matching spec name verbatim, so one can copy it and
+look it up in the spec. Sometimes one needs to reference
+specific spec version.
 
+0 /* Revision: ACPI version 1.0 */
+
+and
+
+1 /* Revision: ACPI 2.0 */
+
+and
+
+2 /* Revision: ACPI 3.0a */
+
+For style consistency, if the value is used multiple times, we avoid
+duplication by using an inline function and not a macro.
+
+> > 
+> > 
+> > > > +
+> > > >  /* Table structure from Linux kernel (the ACPI tables are under the
+> > > >     BSD license) */
+> > > >  
+> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > > > index 0835900052..2dad465ecf 100644
+> > > > --- a/hw/arm/virt-acpi-build.c
+> > > > +++ b/hw/arm/virt-acpi-build.c
+> > > > @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+> > > >  
+> > > >  /* RSDP */
+> > > >  static void
+> > > > -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> > > > +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+> > > >  {
+> > > >      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+> > > >      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
+> > > > @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> > > >                               true /* fseg memory */);
+> > > >  
+> > > >      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
+> > > > -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
+> > > > +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
+> > > >      rsdp->length = cpu_to_le32(sizeof(*rsdp));
+> > > > -    rsdp->revision = 0x02;
+> > > > +    rsdp->revision = rsdp_data->revision;
+> > > >  
+> > > >      /* Address to be filled by Guest linker */
+> > > >      bios_linker_loader_add_pointer(linker,
+> > > >          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
+> > > > -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
+> > > > +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
+> > > >  
+> > > >      /* Checksum to be filled by Guest linker */
+> > > >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> > > > @@ -399,6 +399,20 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> > > >          (char *)&rsdp->extended_checksum - rsdp_table->data);
+> > > >  }
+> > > >  
+> > > > +static void
+> > > > +init_rsdp_data(AcpiRsdpData *data, const char *oem_id, uint8_t revision,
+> > > > +               unsigned *rsdt_offset, unsigned *xsdt_offset)
+> > > > +{
+> > > > +    /* Caller must provide an OEM ID */
+> > > > +    g_assert(oem_id);
+> > > > +    g_assert(strlen(oem_id) >= 6);
+> > > > +
+> > > > +    memcpy(data->oem_id, oem_id, 6);
+> > > > +    data->revision = revision;
+> > > > +    data->rsdt_tbl_offset = rsdt_offset;
+> > > > +    data->xsdt_tbl_offset = xsdt_offset;
+> > > > +}
+> > > > +
+> > > >  static void
+> > > >  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+> > > >  {
+> > > > @@ -810,6 +824,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+> > > >      GArray *table_offsets;
+> > > >      unsigned dsdt, xsdt;
+> > > >      GArray *tables_blob = tables->table_data;
+> > > > +    AcpiRsdpData rsdp;  
+> > > s/rsdp/rsdp_info/
+> > >   
+> > > >  
+> > > >      table_offsets = g_array_new(false, true /* clear */,
+> > > >                                          sizeof(uint32_t));
+> > > > @@ -857,7 +872,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+> > > >      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
+> > > >  
+> > > >      /* RSDP is in FSEG memory, so allocate it separately */
+> > > > -    build_rsdp(tables->rsdp, tables->linker, xsdt);
+> > > > +    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
+> > > > +                   NULL, &xsdt);  
+> > > It would be more concise to use declarative style without extra clutter:
+> > > 
+> > > -    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
+> > > -                   NULL, &xsdt);
+> > > -    build_rsdp(tables->rsdp, tables->linker, &rsdp);
+> > > +    {
+> > > +       AcpiRsdpData rsdp = {
+> > > +           .revision = 2,
+> > > +           .oem_id = ACPI_BUILD_APPNAME6,
+> > > +           .xsdt_tbl_offset = &xsdt,
+> > > +           .rsdt_tbl_offset = NULL,
+> > > +       };
+> > > +       build_rsdp(tables->rsdp, tables->linker, &rsdp);
+> > > +    }  
+> > 2 things here, imo:
+> > 
+> > - This is not more concise.
+> with function, one have to jump to it's definition/body to find out what
+> each argument is, with declaration + initialization inplace it's clear
+> what values mean as you see fields right there as well.
 > 
-> [v1]
-> >From previous verision (in the middle of make check tests):
-> - split also the bits of virtio-pci.h (mst suggestion)
-> - add gpu, crypt and gpg bits
-> - more cleanups
-> - fix all the copyrights (the ones not changed have been there
->   foverever)
-> - be consistent with naming, vhost-* or virtio-*
+> If it's simple structure it is clearer to use initializer, instead of
+> wrapper helper. With complex structure it could be other way around.
 > 
-> Please review, Juan.
+> > - It's code duplication as almost the same snippet is going to be used
+> >   for i386/acpi-build.c
+> the same goes for init_rsdp_data(...), the only difference
+> the declaration isn't folded in 2 lines to be more readable and there is
+> boiler plate helper function adds.
 > 
-> Juan Quintela (16):
->   virtio: split vhost vsock bits from virtio-pci
->   virtio: split virtio input host bits from virtio-pci
->   virtio: split virtio input bits from virtio-pci
->   virtio: split virtio rng bits from virtio-pci
->   virtio: split virtio balloon bits from virtio-pci
->   virtio: split virtio 9p bits from virtio-pci
->   virtio: split vhost user blk bits from virtio-pci
->   virtio: split vhost user scsi bits from virtio-pci
->   virtio: split vhost scsi bits from virtio-pci
->   virtio: split virtio scsi bits from virtio-pci
->   virtio: split virtio blk bits rom virtio-pci
->   virtio: split virtio net bits rom virtio-pci
->   virtio: split virtio serial bits rom virtio-pci
->   virtio: split virtio gpu bits rom virtio-pci.h
->   virtio: split virtio crypto bits rom virtio-pci.h
->   virtio: virtio 9p really requires CONFIG_VIRTFS to work
-> 
->  default-configs/virtio.mak        |   3 +-
->  hw/display/virtio-gpu-pci.c       |  14 +
->  hw/display/virtio-vga.c           |   1 +
->  hw/virtio/Makefile.objs           |  14 +-
->  hw/virtio/vhost-scsi-pci.c        |  95 ++++
->  hw/virtio/vhost-user-blk-pci.c    | 101 ++++
->  hw/virtio/vhost-user-scsi-pci.c   | 101 ++++
->  hw/virtio/vhost-vsock-pci.c       |  82 ++++
->  hw/virtio/virtio-9p-pci.c         |  86 ++++
->  hw/virtio/virtio-balloon-pci.c    |  94 ++++
->  hw/virtio/virtio-blk-pci.c        |  97 ++++
->  hw/virtio/virtio-crypto-pci.c     |  14 +
->  hw/virtio/virtio-input-host-pci.c |  45 ++
->  hw/virtio/virtio-input-pci.c      | 154 ++++++
->  hw/virtio/virtio-net-pci.c        |  96 ++++
->  hw/virtio/virtio-pci.c            | 783 ------------------------------
->  hw/virtio/virtio-pci.h            | 234 ---------
->  hw/virtio/virtio-rng-pci.c        |  86 ++++
->  hw/virtio/virtio-scsi-pci.c       | 106 ++++
->  hw/virtio/virtio-serial-pci.c     | 112 +++++
->  tests/Makefile.include            |  18 +-
->  21 files changed, 1308 insertions(+), 1028 deletions(-)
->  create mode 100644 hw/virtio/vhost-scsi-pci.c
->  create mode 100644 hw/virtio/vhost-user-blk-pci.c
->  create mode 100644 hw/virtio/vhost-user-scsi-pci.c
->  create mode 100644 hw/virtio/vhost-vsock-pci.c
->  create mode 100644 hw/virtio/virtio-9p-pci.c
->  create mode 100644 hw/virtio/virtio-balloon-pci.c
->  create mode 100644 hw/virtio/virtio-blk-pci.c
->  create mode 100644 hw/virtio/virtio-input-host-pci.c
->  create mode 100644 hw/virtio/virtio-input-pci.c
->  create mode 100644 hw/virtio/virtio-net-pci.c
->  create mode 100644 hw/virtio/virtio-rng-pci.c
->  create mode 100644 hw/virtio/virtio-scsi-pci.c
->  create mode 100644 hw/virtio/virtio-serial-pci.c
-> 
-> -- 
-> 2.19.1
-> 
+> > 
+> > Cheers,
+> > Samuel.
