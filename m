@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gS1YF-0007Qb-40
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:14:57 -0500
+	(envelope-from <mst@redhat.com>) id 1gS1a8-0008JF-AH
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:16:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gS1YA-00043x-26
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:14:55 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:45182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gS1Y9-0003wS-M6
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:14:49 -0500
-Received: by mail-qt1-f196.google.com with SMTP id e5so26198400qtr.12
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 07:14:45 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1gS1a5-0007LG-2r
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:16:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43728)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gS1a4-0007KG-RN
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:16:49 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1F28589AE8
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 15:16:48 +0000 (UTC)
+Date: Wed, 28 Nov 2018 10:16:44 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181128101603-mutt-send-email-mst@kernel.org>
+References: <20181126200009.862-1-quintela@redhat.com>
+	<20181127221219-mutt-send-email-mst@kernel.org>
+	<874lc13arc.fsf@trasno.org>
 MIME-Version: 1.0
-References: <20181128145008.6574-1-berrange@redhat.com>
-In-Reply-To: <20181128145008.6574-1-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 28 Nov 2018 19:14:34 +0400
-Message-ID: <CAMxuvaz8ZmbdxtQhQi4+Zi6XEN_Oz_nqnEGkqu5w3frY7estvQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-web PATCH] download: document version
- numbering scheme
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <874lc13arc.fsf@trasno.org>
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] Virtio devices split from
+ virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +35,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "P. Berrange, Daniel" <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On Wed, Nov 28, 2018 at 6:50 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
->
-> The new version numbering scheme was mentioned in the blog post
-> announcing 3.0 previously, but this will fall out of view over
-> time. It is thus preferrable to mention this on the download page
-> too.
->
-> Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On Wed, Nov 28, 2018 at 08:46:15AM +0100, Juan Quintela wrote:
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Mon, Nov 26, 2018 at 08:59:53PM +0100, Juan Quintela wrote:
+> >> Hi
+> >> 
+> >> V2:
+> >> 
+> >> - Rebase on top of master
+> >> 
+> >> Please review.
+> >> 
+> >> Later, Juan.
+> >
+> > And just making sure the point is so that one
+> > can disable virtio-pci and still build virtio?
+> >
+> > And the point of that is mostly as a cleanup on
+> > generic principles, right? Or is there a project that
+> > actually wants to do it?
+> 
+> This allows "make check" to work with them disabled.  Without this
+> changes, introspection fails, because we have the "name" (kind of)
+> "virtio-pci-blk", but not the real virtio device, so it tries to use it
+> while it is not there.  See the equivalent change for virtio-ccw-*.
+> 
+> Thanks, Juan.
+> 
+> PD.  Without this change, you can build a qemu with virtio devices
+>      disabled (i.e. not compiled in), but it fails "make check".  With
+>      the changes, it also works for "make check".
 
-Thanks for the clarification. (It should be displayed under the os
-menu/carousel on https://www.qemu.org/download/)
+And just to complete the picture the point of that is I guess enabling
+testing of random configs?
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-> ---
->  download.html | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
->
-> diff --git a/download.html b/download.html
-> index 5a1e4ea..59db880 100644
-> --- a/download.html
-> +++ b/download.html
-> @@ -39,6 +39,31 @@ permalink: /download/
->         {% include_relative _download/source.html %}
->  </article>
->  </div>
-> +
-> +<h2>Version numbering</h2>
-> +<div>
-> +  <p>
-> +  In 2018, for the QEMU 3.0 release, a time based version numbering sche=
-me was
-> +  adopted:
-> +  </p>
-> +<ul>
-> +<dt>major</dt>
-> +<dd>incremented by 1 for the first release of the year</dd>
-> +<dt>minor</dt>
-> +<dd>reset to 0 with every major increment, otherwise incremented by 1 fo=
-r each release from git master</dd>
-> +<dt>micro</dt>
-> +<dd>always 0 for releases from git master, incremented by 1 for each sta=
-ble branch release</dd>
-> +</ul>
-> +  <p>
-> +    The implication of this is that changes in major version number
-> +    <strong>do not</strong> have any bearing on the scope of changes
-> +    included in the release. Non-backward compatible changes may be made
-> +    in any master branch release, provided they have followed the
-> +    <a href=3D"https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-fea=
-tures">deprecation policy</a>
-> +    which calls for warnings to be emitted for a minimum of two releases
-> +    prior to the change.
-> +  </p>
-> +</div>
->  <script>
->  function animateOnClick(jqThis, slide) {
->     $('.horiz-menu li').removeClass('active');
-> --
-> 2.19.2
->
+> 
+> >
+> >> 
+> >> [v1]
+> >> >From previous verision (in the middle of make check tests):
+> >> - split also the bits of virtio-pci.h (mst suggestion)
+> >> - add gpu, crypt and gpg bits
+> >> - more cleanups
+> >> - fix all the copyrights (the ones not changed have been there
+> >>   foverever)
+> >> - be consistent with naming, vhost-* or virtio-*
+> >> 
+> >> Please review, Juan.
+> >> 
+> >> Juan Quintela (16):
+> >>   virtio: split vhost vsock bits from virtio-pci
+> >>   virtio: split virtio input host bits from virtio-pci
+> >>   virtio: split virtio input bits from virtio-pci
+> >>   virtio: split virtio rng bits from virtio-pci
+> >>   virtio: split virtio balloon bits from virtio-pci
+> >>   virtio: split virtio 9p bits from virtio-pci
+> >>   virtio: split vhost user blk bits from virtio-pci
+> >>   virtio: split vhost user scsi bits from virtio-pci
+> >>   virtio: split vhost scsi bits from virtio-pci
+> >>   virtio: split virtio scsi bits from virtio-pci
+> >>   virtio: split virtio blk bits rom virtio-pci
+> >>   virtio: split virtio net bits rom virtio-pci
+> >>   virtio: split virtio serial bits rom virtio-pci
+> >>   virtio: split virtio gpu bits rom virtio-pci.h
+> >>   virtio: split virtio crypto bits rom virtio-pci.h
+> >>   virtio: virtio 9p really requires CONFIG_VIRTFS to work
+> >> 
+> >>  default-configs/virtio.mak        |   3 +-
+> >>  hw/display/virtio-gpu-pci.c       |  14 +
+> >>  hw/display/virtio-vga.c           |   1 +
+> >>  hw/virtio/Makefile.objs           |  14 +-
+> >>  hw/virtio/vhost-scsi-pci.c        |  95 ++++
+> >>  hw/virtio/vhost-user-blk-pci.c    | 101 ++++
+> >>  hw/virtio/vhost-user-scsi-pci.c   | 101 ++++
+> >>  hw/virtio/vhost-vsock-pci.c       |  82 ++++
+> >>  hw/virtio/virtio-9p-pci.c         |  86 ++++
+> >>  hw/virtio/virtio-balloon-pci.c    |  94 ++++
+> >>  hw/virtio/virtio-blk-pci.c        |  97 ++++
+> >>  hw/virtio/virtio-crypto-pci.c     |  14 +
+> >>  hw/virtio/virtio-input-host-pci.c |  45 ++
+> >>  hw/virtio/virtio-input-pci.c      | 154 ++++++
+> >>  hw/virtio/virtio-net-pci.c        |  96 ++++
+> >>  hw/virtio/virtio-pci.c            | 783 ------------------------------
+> >>  hw/virtio/virtio-pci.h            | 234 ---------
+> >>  hw/virtio/virtio-rng-pci.c        |  86 ++++
+> >>  hw/virtio/virtio-scsi-pci.c       | 106 ++++
+> >>  hw/virtio/virtio-serial-pci.c     | 112 +++++
+> >>  tests/Makefile.include            |  18 +-
+> >>  21 files changed, 1308 insertions(+), 1028 deletions(-)
+> >>  create mode 100644 hw/virtio/vhost-scsi-pci.c
+> >>  create mode 100644 hw/virtio/vhost-user-blk-pci.c
+> >>  create mode 100644 hw/virtio/vhost-user-scsi-pci.c
+> >>  create mode 100644 hw/virtio/vhost-vsock-pci.c
+> >>  create mode 100644 hw/virtio/virtio-9p-pci.c
+> >>  create mode 100644 hw/virtio/virtio-balloon-pci.c
+> >>  create mode 100644 hw/virtio/virtio-blk-pci.c
+> >>  create mode 100644 hw/virtio/virtio-input-host-pci.c
+> >>  create mode 100644 hw/virtio/virtio-input-pci.c
+> >>  create mode 100644 hw/virtio/virtio-net-pci.c
+> >>  create mode 100644 hw/virtio/virtio-rng-pci.c
+> >>  create mode 100644 hw/virtio/virtio-scsi-pci.c
+> >>  create mode 100644 hw/virtio/virtio-serial-pci.c
+> >> 
+> >> -- 
+> >> 2.19.1
+> >> 
