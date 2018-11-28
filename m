@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRnlF-00034m-Aj
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:31:27 -0500
+	(envelope-from <prvs=863bfe0f3=Alistair.Francis@wdc.com>)
+	id 1gRnnt-00067P-VZ
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:34:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRnlC-00085k-18
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:31:25 -0500
-Date: Wed, 28 Nov 2018 10:49:56 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181127234956.GR2251@umbus.fritz.box>
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-9-clg@kaod.org>
+	(envelope-from <prvs=863bfe0f3=Alistair.Francis@wdc.com>)
+	id 1gRnnt-0001Az-2m
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:34:09 -0500
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Wed, 28 Nov 2018 00:33:59 +0000
+Message-ID: <e351b95659a0fc50d6f7122552f41d38987bbe86.1543365187.git.alistair.francis@wdc.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="foM9DbudB2CcldhH"
-Content-Disposition: inline
-In-Reply-To: <20181116105729.23240-9-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 08/36] ppc/xive: introduce a simplified
- XIVE presenter
+Subject: [Qemu-devel] [PATCH v1 1/1] riscv: Ensure the kernel start address
+ is correctly cast
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,450 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "agraf@suse.de" <agraf@suse.de>
 
+Cast the kernel start address to the target bit length.
 
---foM9DbudB2CcldhH
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This ensures that we calculate the initrd offset to a valid address for
+the architecture.
 
-On Fri, Nov 16, 2018 at 11:57:01AM +0100, C=E9dric Le Goater wrote:
-> The last sub-engine of the XIVE architecture is the Interrupt
-> Virtualization Presentation Engine (IVPE). On HW, they share elements,
-> the Power Bus interface (CQ), the routing table descriptors, and they
-> can be combined in the same HW logic. We do the same in QEMU and
-> combine both engines in the XiveRouter for simplicity.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Suggested-by: Alexander Graf <agraf@suse.de>
+Reported-by: Alexander Graf <agraf@suse.de>
+---
+ hw/riscv/sifive_e.c | 2 +-
+ hw/riscv/sifive_u.c | 2 +-
+ hw/riscv/spike.c    | 2 +-
+ hw/riscv/virt.c     | 3 ++-
+ 4 files changed, 5 insertions(+), 4 deletions(-)
 
-Ok, I'm not entirely convinced combining the IVPE and IVRE into a
-single object is a good idea, but we can probably discuss that once
-I've read further.
-
-> When the IVRE has completed its job of matching an event source with a
-> Notification Virtual Target (NVT) to notify, it forwards the event
-> notification to the IVPE sub-engine. The IVPE scans the thread
-> interrupt contexts of the Notification Virtual Targets (NVT)
-> dispatched on the HW processor threads and if a match is found, it
-> signals the thread. If not, the IVPE escalates the notification to
-> some other targets and records the notification in a backlog queue.
->=20
-> The IVPE maintains the thread interrupt context state for each of its
-> NVTs not dispatched on HW processor threads in the Notification
-> Virtual Target table (NVTT).
->=20
-> The model currently only supports single NVT notifications.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/xive.h      |  13 +++
->  include/hw/ppc/xive_regs.h |  22 ++++
->  hw/intc/xive.c             | 223 +++++++++++++++++++++++++++++++++++++
->  3 files changed, 258 insertions(+)
->=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index 5987f26ddb98..e715a6c6923d 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -197,6 +197,10 @@ typedef struct XiveRouterClass {
->                     XiveEND *end);
->      int (*set_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_idx,
->                     XiveEND *end);
-> +    int (*get_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
-> +                   XiveNVT *nvt);
-> +    int (*set_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
-> +                   XiveNVT *nvt);
-
-As with the ENDs, I don't think get/set is a good interface for a
-bigger-than-word-size object.
-
->  } XiveRouterClass;
-> =20
->  void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mon);
-> @@ -207,6 +211,10 @@ int xive_router_get_end(XiveRouter *xrtr, uint8_t en=
-d_blk, uint32_t end_idx,
->                          XiveEND *end);
->  int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_=
-idx,
->                          XiveEND *end);
-> +int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
-idx,
-> +                        XiveNVT *nvt);
-> +int xive_router_set_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
-idx,
-> +                        XiveNVT *nvt);
-> =20
->  /*
->   * XIVE END ESBs
-> @@ -274,4 +282,9 @@ extern const MemoryRegionOps xive_tm_ops;
-> =20
->  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
-> =20
-> +static inline uint32_t xive_tctx_cam_line(uint8_t nvt_blk, uint32_t nvt_=
-idx)
-> +{
-> +    return (nvt_blk << 19) | nvt_idx;
-
-I'm guessing this formula is the standard way of combining the NVT
-block and index into a single word?  If so, I think we should
-standardize on passing a single word "nvt_id" around and only
-splitting it when we need to use the block separately.  Same goes for
-the end_id, assuming there's a standard way of putting that into a
-single word.  That will address the point I raised earlier about lisn
-being passed around as a single word, but these later stage ids being
-split.
-
-We'll probably want some inlines or macros to build an
-nvt/end/lisn/whatever id from block and index as well.
-
-> +}
-> +
->  #endif /* PPC_XIVE_H */
-> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-> index 2e3d6cb507da..05cb992d2815 100644
-> --- a/include/hw/ppc/xive_regs.h
-> +++ b/include/hw/ppc/xive_regs.h
-> @@ -158,4 +158,26 @@ typedef struct XiveEND {
->  #define END_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
->  } XiveEND;
-> =20
-> +/* Notification Virtual Target (NVT) */
-> +typedef struct XiveNVT {
-> +        uint32_t        w0;
-> +#define NVT_W0_VALID             PPC_BIT32(0)
-> +        uint32_t        w1;
-> +        uint32_t        w2;
-> +        uint32_t        w3;
-> +        uint32_t        w4;
-> +        uint32_t        w5;
-> +        uint32_t        w6;
-> +        uint32_t        w7;
-> +        uint32_t        w8;
-> +#define NVT_W8_GRP_VALID         PPC_BIT32(0)
-> +        uint32_t        w9;
-> +        uint32_t        wa;
-> +        uint32_t        wb;
-> +        uint32_t        wc;
-> +        uint32_t        wd;
-> +        uint32_t        we;
-> +        uint32_t        wf;
-> +} XiveNVT;
-> +
->  #endif /* PPC_XIVE_REGS_H */
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 4c6cb5d52975..5ba3b06e6e25 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -373,6 +373,32 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monito=
-r *mon)
->      }
->  }
-> =20
-> +/* The HW CAM (23bits) is hardwired to :
-> + *
-> + *   0x000||0b1||4Bit chip number||7Bit Thread number.
-> + *
-> + * and when the block grouping extension is enabled :
-> + *
-> + *   4Bit chip number||0x001||7Bit Thread number.
-> + */
-> +static uint32_t tctx_hw_cam_line(bool block_group, uint8_t chip_id, uint=
-8_t tid)
-> +{
-> +    if (block_group) {
-> +        return 1 << 11 | (chip_id & 0xf) << 7 | (tid & 0x7f);
-> +    } else {
-> +        return (chip_id & 0xf) << 11 | 1 << 7 | (tid & 0x7f);
-> +    }
-> +}
-> +
-> +static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tctx, bool block_group)
-> +{
-> +    PowerPCCPU *cpu =3D POWERPC_CPU(tctx->cs);
-> +    CPUPPCState *env =3D &cpu->env;
-> +    uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
-
-I don't much like reaching into the cpu state itself.  I think a
-better idea would be to have the TCTX have its HW CAM id set during
-initialization (via a property) and then use that.  This will mean
-less mucking about if future cpu revisions don't split the PIR into
-chip and tid ids in the same way.
-
-> +    return tctx_hw_cam_line(block_group, (pir >> 8) & 0xf, pir & 0x7f);
-> +}
-> +
->  static void xive_tctx_reset(void *dev)
->  {
->      XiveTCTX *tctx =3D XIVE_TCTX(dev);
-> @@ -1013,6 +1039,195 @@ int xive_router_set_end(XiveRouter *xrtr, uint8_t=
- end_blk, uint32_t end_idx,
->     return xrc->set_end(xrtr, end_blk, end_idx, end);
->  }
-> =20
-> +int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
-idx,
-> +                        XiveNVT *nvt)
-> +{
-> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
-> +
-> +   return xrc->get_nvt(xrtr, nvt_blk, nvt_idx, nvt);
-> +}
-> +
-> +int xive_router_set_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_=
-idx,
-> +                        XiveNVT *nvt)
-> +{
-> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
-> +
-> +   return xrc->set_nvt(xrtr, nvt_blk, nvt_idx, nvt);
-> +}
-> +
-> +static bool xive_tctx_ring_match(XiveTCTX *tctx, uint8_t ring,
-> +                                 uint8_t nvt_blk, uint32_t nvt_idx,
-> +                                 bool cam_ignore, uint32_t logic_serv)
-> +{
-> +    uint8_t *regs =3D &tctx->regs[ring];
-> +    uint32_t w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
-> +    uint32_t cam =3D xive_tctx_cam_line(nvt_blk, nvt_idx);
-> +    bool block_group =3D false; /* TODO (PowerNV) */
-> +
-> +    /* TODO (PowerNV): ignore low order bits of nvt id */
-> +
-> +    switch (ring) {
-> +    case TM_QW3_HV_PHYS:
-> +        return (w2 & TM_QW3W2_VT) && xive_tctx_hw_cam_line(tctx, block_g=
-roup) =3D=3D
-> +            tctx_hw_cam_line(block_group, nvt_blk, nvt_idx);
-
-The difference between "xive_tctx_hw_cam_line" and "tctx_hw_cam_line"
-here is far from obvious.  Remember that namespacing prefixes aren't
-necessary for static functions, which can let you give more
-descriptive names without getting excessively long.
-
-> +    case TM_QW2_HV_POOL:
-> +        return (w2 & TM_QW2W2_VP) && (cam =3D=3D GETFIELD(TM_QW2W2_POOL_=
-CAM, w2));
-> +
-> +    case TM_QW1_OS:
-> +        return (w2 & TM_QW1W2_VO) && (cam =3D=3D GETFIELD(TM_QW1W2_OS_CA=
-M, w2));
-> +
-> +    case TM_QW0_USER:
-> +        return ((w2 & TM_QW1W2_VO) && (cam =3D=3D GETFIELD(TM_QW1W2_OS_C=
-AM, w2)) &&
-> +                (w2 & TM_QW0W2_VU) &&
-> +                (logic_serv =3D=3D GETFIELD(TM_QW0W2_LOGIC_SERV, w2)));
-> +
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +}
-> +
-> +static int xive_presenter_tctx_match(XiveTCTX *tctx, uint8_t format,
-> +                                     uint8_t nvt_blk, uint32_t nvt_idx,
-> +                                     bool cam_ignore, uint32_t logic_ser=
-v)
-> +{
-> +    if (format =3D=3D 0) {
-> +        /* F=3D0 & i=3D1: Logical server notification */
-> +        if (cam_ignore =3D=3D true) {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: no support for LS "
-> +                          "NVT %x/%x\n", nvt_blk, nvt_idx);
-> +             return -1;
-> +        }
-> +
-> +        /* F=3D0 & i=3D0: Specific NVT notification */
-> +        if (xive_tctx_ring_match(tctx, TM_QW3_HV_PHYS,
-> +                                nvt_blk, nvt_idx, false, 0)) {
-> +            return TM_QW3_HV_PHYS;
-> +        }
-> +        if (xive_tctx_ring_match(tctx, TM_QW2_HV_POOL,
-> +                                nvt_blk, nvt_idx, false, 0)) {
-> +            return TM_QW2_HV_POOL;
-> +        }
-> +        if (xive_tctx_ring_match(tctx, TM_QW1_OS,
-> +                                nvt_blk, nvt_idx, false, 0)) {
-> +            return TM_QW1_OS;
-> +        }
-
-Hm.  It's a bit pointless to iterate through each ring calling a
-common function, when that "common" function consists entirely of a
-switch which makes it not really common at all.
-
-So I think you want separate helper functions for each ring's match,
-or even just fold the previous function into this one.
-
-> +    } else {
-> +        /* F=3D1 : User level Event-Based Branch (EBB) notification */
-> +        if (xive_tctx_ring_match(tctx, TM_QW0_USER,
-> +                                nvt_blk, nvt_idx, false, logic_serv)) {
-> +            return TM_QW0_USER;
-> +        }
-> +    }
-> +    return -1;
-> +}
-> +
-> +typedef struct XiveTCTXMatch {
-> +    XiveTCTX *tctx;
-> +    uint8_t ring;
-> +} XiveTCTXMatch;
-> +
-> +static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
-> +                                 uint8_t nvt_blk, uint32_t nvt_idx,
-> +                                 bool cam_ignore, uint8_t priority,
-> +                                 uint32_t logic_serv, XiveTCTXMatch *mat=
-ch)
-> +{
-> +    CPUState *cs;
-> +
-> +    /* TODO (PowerNV): handle chip_id overwrite of block field for
-> +     * hardwired CAM compares */
-> +
-> +    CPU_FOREACH(cs) {
-> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> +        XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
-> +        int ring;
-> +
-> +        /*
-> +         * HW checks that the CPU is enabled in the Physical Thread
-> +         * Enable Register (PTER).
-> +         */
-> +
-> +        /*
-> +         * Check the thread context CAM lines and record matches. We
-> +         * will handle CPU exception delivery later
-> +         */
-> +        ring =3D xive_presenter_tctx_match(tctx, format, nvt_blk, nvt_id=
-x,
-> +                                         cam_ignore, logic_serv);
-> +        /*
-> +         * Save the context and follow on to catch duplicates, that we
-> +         * don't support yet.
-> +         */
-> +        if (ring !=3D -1) {
-> +            if (match->tctx) {
-> +                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a th=
-read "
-> +                              "context NVT %x/%x\n", nvt_blk, nvt_idx);
-> +                return false;
-> +            }
-> +
-> +            match->ring =3D ring;
-> +            match->tctx =3D tctx;
-> +        }
-> +    }
-> +
-> +    if (!match->tctx) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: NVT %x/%x is not dispatche=
-d\n",
-> +                      nvt_blk, nvt_idx);
-> +        return false;
-
-Hmm.. this isn't actually an error isn't it?  At least not for powernv
-- that just means the NVT isn't currently dispatched, so we'll need to
-trigger the escalation interrupt.  Does this get changed later in the
-series?
-
-> +    }
-> +
-> +    return true;
-> +}
-> +
-> +/*
-> + * This is our simple Xive Presenter Engine model. It is merged in the
-> + * Router as it does not require an extra object.
-> + *
-> + * It receives notification requests sent by the IVRE to find one
-> + * matching NVT (or more) dispatched on the processor threads. In case
-> + * of a single NVT notification, the process is abreviated and the
-> + * thread is signaled if a match is found. In case of a logical server
-> + * notification (bits ignored at the end of the NVT identifier), the
-> + * IVPE and IVRE select a winning thread using different filters. This
-> + * involves 2 or 3 exchanges on the PowerBus that the model does not
-> + * support.
-> + *
-> + * The parameters represent what is sent on the PowerBus
-> + */
-> +static void xive_presenter_notify(XiveRouter *xrtr, uint8_t format,
-> +                                  uint8_t nvt_blk, uint32_t nvt_idx,
-> +                                  bool cam_ignore, uint8_t priority,
-> +                                  uint32_t logic_serv)
-> +{
-> +    XiveNVT nvt;
-> +    XiveTCTXMatch match =3D { 0 };
-> +    bool found;
-> +
-> +    /* NVT cache lookup */
-> +    if (xive_router_get_nvt(xrtr, nvt_blk, nvt_idx, &nvt)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: no NVT %x/%x\n",
-> +                      nvt_blk, nvt_idx);
-> +        return;
-> +    }
-> +
-> +    if (!(nvt.w0 & NVT_W0_VALID)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: NVT %x/%x is invalid\n",
-> +                      nvt_blk, nvt_idx);
-> +        return;
-> +    }
-> +
-> +    found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, cam_i=
-gnore,
-> +                                 priority, logic_serv, &match);
-> +    if (found) {
-> +        return;
-> +    }
-> +
-> +    /* If no matching NVT is dispatched on a HW thread :
-> +     * - update the NVT structure if backlog is activated
-> +     * - escalate (ESe PQ bits and EAS in w4-5) if escalation is
-> +     *   activated
-> +     */
-> +}
-> +
->  /*
->   * An END trigger can come from an event trigger (IPI or HW) or from
->   * another chip. We don't model the PowerBus but the END trigger
-> @@ -1081,6 +1296,14 @@ static void xive_router_end_notify(XiveRouter *xrt=
-r, uint8_t end_blk,
->      /*
->       * Follows IVPE notification
->       */
-> +    xive_presenter_notify(xrtr, format,
-> +                          GETFIELD(END_W6_NVT_BLOCK, end.w6),
-> +                          GETFIELD(END_W6_NVT_INDEX, end.w6),
-> +                          GETFIELD(END_W7_F0_IGNORE, end.w7),
-> +                          priority,
-> +                          GETFIELD(END_W7_F1_LOG_SERVER_ID, end.w7));
-> +
-> +    /* TODO: Auto EOI. */
->  }
-> =20
->  static void xive_router_notify(XiveFabric *xf, uint32_t lisn)
-
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index cb513cc3bb..3427b840cb 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -74,7 +74,7 @@ static const struct MemmapEntry {
+     [SIFIVE_E_DTIM] =3D     { 0x80000000,     0x4000 }
+ };
+=20
+-static uint64_t load_kernel(const char *kernel_filename)
++static target_ulong load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+=20
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index ef07df2442..5d03a76a28 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -65,7 +65,7 @@ static const struct MemmapEntry {
+=20
+ #define GEM_REVISION        0x10070109
+=20
+-static uint64_t load_kernel(const char *kernel_filename)
++static target_ulong load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+=20
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index 268df04c3c..79cb4c1282 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -53,7 +53,7 @@ static const struct MemmapEntry {
+     [SPIKE_DRAM] =3D     { 0x80000000,        0x0 },
+ };
+=20
+-static uint64_t load_kernel(const char *kernel_filename)
++static target_ulong load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+=20
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 2b38f89070..f4cbf6aa21 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -57,7 +57,7 @@ static const struct MemmapEntry {
+     [VIRT_DRAM] =3D     { 0x80000000,        0x0 },
+ };
+=20
+-static uint64_t load_kernel(const char *kernel_filename)
++static target_ulong load_kernel(const char *kernel_filename)
+ {
+     uint64_t kernel_entry, kernel_high;
+=20
+@@ -85,6 +85,7 @@ static hwaddr load_initrd(const char *filename, uint64_t =
+mem_size,
+      * halfway into RAM, and for boards with 256MB of RAM or more we put
+      * the initrd at 128MB.
+      */
++    /* As hwaddr is a 64-bit number we need to cast it for 32-bit */
+     *start =3D kernel_entry + MIN(mem_size / 2, 128 * MiB);
+=20
+     size =3D load_ramdisk(filename, *start, mem_size - *start);
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---foM9DbudB2CcldhH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv92CEACgkQbDjKyiDZ
-s5INLBAAmClT6yasc3i7l80JgiCnOfBEoCSGp1PB/5zP8rxTCUkDrzelikrvVtFR
-ifRZf41+a06KayHwCv+BE2ku3PC03os8i73NHm1QeSVruQ7NiSZFXMCS2iZDZZX0
-cgT+5zK6LyaSlzzREyLExkqMAn+e8mfubVtNQj6l7Z3k7jAvMlCSn0ih8vs0O7LI
-ktPjaxxRfIJuIwwXSNqNV/5sJVY2CV4C2PkHQ8dgmhsCjpG1v15AbgOaI382pW/I
-NrogwuFIqQyRt2Z7VXgWPdZ/gv7HMKfF6KIK0e0Cgcsm+Qug995+o3NpB9rNdLv0
-0yrCiqVI7UfkYd6gnmTKxoXk/gKY5oqxHURAHN3+gbd4VYbR2Cn3MvE3/gUlLgcy
-AdQaYzhcy7RkU8qlPknAcrhivzwHIbrYe5ad/M9MdH9p9Siug2oagQYbaSjVJDLQ
-iEE9S94DFYq5EjLgULFCZ9HFfdFo/OSptwkdOnzYczJ0Z2glvuuiUlfFdTq8G0nX
-oNiPjXA1A4Mx5X3aigDyn2okHe/tXkeP1VSrqrtvMVeHqqV1H2sThFuYuAm/hcdG
-71ctqKSUXhjWah81HoxuaqHwgKg2f38pHEy7CXwYLg5oJDMpWXnk7HGgitjbRtl7
-f/xXxnM1gG1i8rVTQWNHjIGw8SDQa7t3OilWmjXrGPNFoSAKfTA=
-=l0R2
------END PGP SIGNATURE-----
-
---foM9DbudB2CcldhH--
+2.19.1
