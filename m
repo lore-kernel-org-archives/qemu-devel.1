@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gRy3W-000877-S7
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 06:31:00 -0500
+	(envelope-from <quintela@redhat.com>) id 1gRy6d-0002kT-Sk
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 06:34:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gRy3S-0000iR-LT
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 06:30:58 -0500
-Received: from 20.mo4.mail-out.ovh.net ([46.105.33.73]:50644)
+	(envelope-from <quintela@redhat.com>) id 1gRy6Z-0002aL-Le
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 06:34:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53704)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gRy3S-0000hZ-FW
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 06:30:54 -0500
-Received: from player159.ha.ovh.net (unknown [10.109.159.136])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 96D301C3531
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 12:30:52 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-10-clg@kaod.org>
-	<20181128001324.GS2251@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <04ec9b85-1fb3-e011-738c-077e32ab4d0f@kaod.org>
-Date: Wed, 28 Nov 2018 12:30:45 +0100
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gRy6Z-0002a3-EG
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 06:34:07 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B630DC075D7B
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 11:34:06 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 28 Nov 2018 12:33:32 +0100
+Message-Id: <20181128113337.7238-1-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181128001324.GS2251@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 09/36] ppc/xive: notify the CPU when the
- interrupt priority is more privileged
+Subject: [Qemu-devel] [PATCH v10 0/5] Add make check tests for Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,210 +29,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
-On 11/28/18 1:13 AM, David Gibson wrote:
-> On Fri, Nov 16, 2018 at 11:57:02AM +0100, C=E9dric Le Goater wrote:
->> After the event data was pushed in the O/S Event Queue, the IVPE
->> raises the bit corresponding to the priority of the pending interrupt
->> in the register IBP (Interrupt Pending Buffer) to indicate there is an
->> event pending in one of the 8 priority queues. The Pending Interrupt
->> Priority Register (PIPR) is also updated using the IPB. This register
->> represent the priority of the most favored pending notification.
->>
->> The PIPR is then compared to the the Current Processor Priority
->> Register (CPPR). If it is more favored (numerically less than), the
->> CPU interrupt line is raised and the EO bit of the Notification Source
->> Register (NSR) is updated to notify the presence of an exception for
->> the O/S. The check needs to be done whenever the PIPR or the CPPR are
->> changed.
->>
->> The O/S acknowledges the interrupt with a special load in the Thread
->> Interrupt Management Area. If the EO bit of the NSR is set, the CPPR
->> takes the value of PIPR. The bit number in the IBP corresponding to
->> the priority of the pending interrupt is reseted and so is the EO bit
->> of the NSR.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/intc/xive.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++=
--
->>  1 file changed, 93 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index 5ba3b06e6e25..c49932d2b799 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -21,9 +21,73 @@
->>   * XIVE Thread Interrupt Management context
->>   */
->> =20
->> +/* Convert a priority number to an Interrupt Pending Buffer (IPB)
->> + * register, which indicates a pending interrupt at the priority
->> + * corresponding to the bit number
->> + */
->> +static uint8_t priority_to_ipb(uint8_t priority)
->> +{
->> +    return priority > XIVE_PRIORITY_MAX ?
->> +        0 : 1 << (XIVE_PRIORITY_MAX - priority);
->> +}
->> +
->> +/* Convert an Interrupt Pending Buffer (IPB) register to a Pending
->> + * Interrupt Priority Register (PIPR), which contains the priority of
->> + * the most favored pending notification.
->> + */
->> +static uint8_t ipb_to_pipr(uint8_t ibp)
->> +{
->> +    return ibp ? clz32((uint32_t)ibp << 24) : 0xff;
->> +}
->> +
->> +static void ipb_update(uint8_t *regs, uint8_t priority)
->> +{
->> +    regs[TM_IPB] |=3D priority_to_ipb(priority);
->> +    regs[TM_PIPR] =3D ipb_to_pipr(regs[TM_IPB]);
->> +}
->> +
->> +static uint8_t exception_mask(uint8_t ring)
->> +{
->> +    switch (ring) {
->> +    case TM_QW1_OS:
->> +        return TM_QW1_NSR_EO;
->> +    default:
->> +        g_assert_not_reached();
->> +    }
->> +}
->> +
->>  static uint64_t xive_tctx_accept(XiveTCTX *tctx, uint8_t ring)
->>  {
->> -    return 0;
->> +    uint8_t *regs =3D &tctx->regs[ring];
->> +    uint8_t nsr =3D regs[TM_NSR];
->> +    uint8_t mask =3D exception_mask(ring);
->> +
->> +    qemu_irq_lower(tctx->output);
->> +
->> +    if (regs[TM_NSR] & mask) {
->> +        uint8_t cppr =3D regs[TM_PIPR];
->> +
->> +        regs[TM_CPPR] =3D cppr;
->> +
->> +        /* Reset the pending buffer bit */
->> +        regs[TM_IPB] &=3D ~priority_to_ipb(cppr);
->> +        regs[TM_PIPR] =3D ipb_to_pipr(regs[TM_IPB]);
->> +
->> +        /* Drop Exception bit */
->> +        regs[TM_NSR] &=3D ~mask;
->> +    }
->> +
->> +    return (nsr << 8) | regs[TM_CPPR];
->=20
-> Don't you need a cast to avoid (nsr << 8) being a shift-wider-than-size=
-?
 
-I will check.=20
+Hi
 
->=20
->> +}
->> +
->> +static void xive_tctx_notify(XiveTCTX *tctx, uint8_t ring)
->> +{
->> +    uint8_t *regs =3D &tctx->regs[ring];
->> +
->> +    if (regs[TM_PIPR] < regs[TM_CPPR]) {
->> +        regs[TM_NSR] |=3D exception_mask(ring);
->> +        qemu_irq_raise(tctx->output);
->> +    }
->>  }
->> =20
->>  static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8_t ring, uint8_t =
-cppr)
->> @@ -33,6 +97,9 @@ static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8=
-_t ring, uint8_t cppr)
->>      }
->> =20
->>      tctx->regs[ring + TM_CPPR] =3D cppr;
->> +
->> +    /* CPPR has changed, check if we need to raise a pending exceptio=
-n */
->> +    xive_tctx_notify(tctx, ring);
->>  }
->> =20
->>  /*
->> @@ -198,6 +265,17 @@ static void xive_tm_set_os_cppr(XiveTCTX *tctx, h=
-waddr offset,
->>      xive_tctx_set_cppr(tctx, TM_QW1_OS, value & 0xff);
->>  }
->> =20
->> +/*
->> + * Adjust the IPB to allow a CPU to process event queues of other
->> + * priorities during one physical interrupt cycle.
->> + */
->> +static void xive_tm_set_os_pending(XiveTCTX *tctx, hwaddr offset,
->> +                                   uint64_t value, unsigned size)
->> +{
->> +    ipb_update(&tctx->regs[TM_QW1_OS], value & 0xff);
->> +    xive_tctx_notify(tctx, TM_QW1_OS);
->> +}
->> +
->>  /*
->>   * Define a mapping of "special" operations depending on the TIMA pag=
-e
->>   * offset and the size of the operation.
->> @@ -220,6 +298,7 @@ static const XiveTmOp xive_tm_operations[] =3D {
->> =20
->>      /* MMIOs above 2K : special operations with side effects */
->>      { XIVE_TM_OS_PAGE, TM_SPC_ACK_OS_REG,     2, NULL, xive_tm_ack_os=
-_reg },
->> +    { XIVE_TM_OS_PAGE, TM_SPC_SET_OS_PENDING, 1, xive_tm_set_os_pendi=
-ng, NULL },
->>  };
->> =20
->>  static const XiveTmOp *xive_tm_find_op(hwaddr offset, unsigned size, =
-bool write)
->> @@ -409,6 +488,13 @@ static void xive_tctx_reset(void *dev)
->>      tctx->regs[TM_QW1_OS + TM_LSMFB] =3D 0xFF;
->>      tctx->regs[TM_QW1_OS + TM_ACK_CNT] =3D 0xFF;
->>      tctx->regs[TM_QW1_OS + TM_AGE] =3D 0xFF;
->> +
->> +    /*
->> +     * Initialize PIPR to 0xFF to avoid phantom interrupts when the
->> +     * CPPR is first set.
->> +     */
->> +    tctx->regs[TM_QW1_OS + TM_PIPR] =3D
->> +        ipb_to_pipr(tctx->regs[TM_QW1_OS + TM_IPB]);
->>  }
->> =20
->>  static void xive_tctx_realize(DeviceState *dev, Error **errp)
->> @@ -1218,9 +1304,15 @@ static void xive_presenter_notify(XiveRouter *x=
-rtr, uint8_t format,
->>      found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, ca=
-m_ignore,
->>                                   priority, logic_serv, &match);
->>      if (found) {
->> +        ipb_update(&match.tctx->regs[match.ring], priority);
->> +        xive_tctx_notify(match.tctx, match.ring);
->>          return;
->>      }
->> =20
->> +    /* Record the IPB in the associated NVT structure */
->> +    ipb_update((uint8_t *) &nvt.w4, priority);
->> +    xive_router_set_nvt(xrtr, nvt_blk, nvt_idx, &nvt);
->=20
-> You're only writing back the NVT in the !found case.  Don't you still
-> need to update it in the found case?
+In v10:
+- rebase to latest upstream
+- code changed quite a bit with qmp refactorings
+  apllied them
+- make it work again
+- compress threads test, continue working there, not trivial.
 
-I would say no unless we add support for redistribution which would
-mean the model supports logical servers.=20
+Two question-:
+- should we integrate them on this cycle?
+  they are tests
+- should we enable them only on baremetal, and not on emulation?
+  There is still a problem on TCG that sometimes fails the migration
+  thread
 
-These are much more complex scenarios in which the IPVE returns multiple=20
-matching targets, the IVRE selects one but then the context changes.
-=20
+ToDo:
+- Finish debug compress test
+  Still stuck why the test wonk when I launch qemu by hand but not
+  trough qtest.  Creatuve uses of launching gdb through launched
+  guests have not help so far.
 
-C.
+- Finish fd transport test
+  Not very difficult in principle, need more checking to see if it
+  don't fail in other setups.
 
->=20
->>      /* If no matching NVT is dispatched on a HW thread :
->>       * - update the NVT structure if backlog is activated
->>       * - escalate (ESe PQ bits and EAS in w4-5) if escalation is
->=20
+- Finish tl trasport test
+  I already knew that I hate certificates, but this is too much.  Trying
+  to understand how to use them.
+
+Please commet, Juan.
+
+
+
+In v9:
+- Dropp Export SocketAddress_to_str
+  just create the functions where I need them.
+- drop precopy test and xbzrle (on pull requset)
+  Use 100M for cache as dave suggests
+- drop ppc improvemnet (on pull request)
+- drop RFH, will work on tha later
+- move socket_address to info migrate
+
+Please, review.
+
+Later, Juan.
+
+
+v8:
+- just rebase to make things continue to wonk
+
+
+New in the other v7:
+- SocketAddress is now a list (a.k.a make happy danp)
+- Rebase on top of upstream
+  network listener is *interesting*
+- *HACK* to make SocketAddress list in common
+  see patch: create-socket-paramenter
+
+Please review, Juan.
+
+CC: berrange@redhat.com
+
+[v7]
+This is v6, it differest from the patches that I sent with previous
+multifd post:
+- Rename x-tcp-port to x-socket-address
+  This is more *complicated* that it looks as:
+
+  * it is a pointer, so I need to use QAPI_CLONE() to make info
+    migrate work
+
+  * this is an union of structs.  In QAPI. So, a dict of strings.  The
+    only way that I was able to make things work is parsing the qdict
+    to a SocketAddress and then output a SocketAddress as an str.  It
+    needs to be an easier way, for sure.
+
+  * Cleanups here andthere.
+
+Please, review, Juan.
+
+[v5]
+- Several patches moved to pull request
+- merge info_migrate and migration_tests
+  only missing bit is tcp_port, needed for tcp tests
+- Rename tcp-port to x-tcp-port
+  We will get better naming from David at some point, and we will use tha=
+t bit
+- ppc: use inline code as suggested by lvivier
+
+Please, review.
+
+It is based on my previous pull request
+
+Based-on: 20180129120932.12874-1-quintela@redhat.com
+
+[v4]
+- rebase on top on v4 info_migrate patches
+- Tune sleeps to make patches fast
+- Create a deprecated test for deprecated commands (i.e. make peterxu hap=
+py)
+- create migrate_start_postcopy function
+- fix naming/sizes between power and x86
+- cleanup comments to match code
+
+[v3]
+
+- No more tests for deprecated parameters. Now I only use
+  migrate_set_parameter.  If there is a deprecated command for that,
+  we tests it there.
+- free "result" string, always good to return memory (Peter found it)
+- use the new tcp_port parameter from info migrate.  So we are
+  handling well the tcp case.
+- lots of code movement around to make everything consistent.
+- Several patches already integrated upstream.
+
+[v2]
+- to make review easier, I started renaming postcopy-test.c to migration-=
+test.c
+- Did cleanups/refactoring there
+- Don't use global-qtest anymore
+- check that the parameters that we sent got really set
+- RFH: comrpress threads tests is not working for some weird reason.  Usi=
+ng the same code on command line works.
+  still investigating why.
+
+ToDoo:
+
+- tcp: after discussions with dave, we ended in conclusion that we
+  need to use the 0 port and let the system gives us a free one
+
+  But .... that means that we need to be able to get that port back someh=
+ow.
+  "info migrate" woring on destination side?
+
+- compression threads.  There is some weird interaction with the test
+  hardness and every migration thread get waiting in a different
+  semaphore.  Investigating if it is a race/bug/whateverr
+
+- deprecated commands: There was a suggestion to make
+  migrate_set_parameter look at the parameter name and test old/new
+  depending on something.  Not sure what to do here.
+
+- testing commands: Is there a way to launch qemu and just sent
+  qmp/hmp commands without having to really run anything else?
+
+[v1]
+- add test for precopy for unix/tcp
+  exec and fd to came, don't know how to test rdma without hardware
+- add tests using deprecated interfaces
+- add test for xbzrle
+  Note to myself, there is no way to set the cache size with migraton_set=
+_parameters
+- Add test for compress threads
+  disabled on the series, right now it appears that compression is not wo=
+rking at all
+- Move postcopy to use new results
+  Idea is to move it on top of migration-test.c, but first I want some re=
+views on basic idea
+
+Juan Quintela (5):
+  tests: Add migration xbzrle test
+  migration: Create socket-address parameter
+  tests: Add basic migration precopy tcp test
+  tests: Add migration multifd test
+  [RFH] tests: Add migration compress threads tests
+
+ hmp.c                  |  31 +++++
+ migration/migration.c  |  24 ++++
+ migration/migration.h  |   4 +
+ migration/socket.c     |  11 ++
+ qapi/migration.json    |   6 +-
+ qapi/sockets.json      |  13 ++
+ tests/migration-test.c | 275 ++++++++++++++++++++++++++++++++++++++++-
+ 7 files changed, 358 insertions(+), 6 deletions(-)
+
+--=20
+2.19.1
