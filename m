@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gS1C1-0003VZ-SY
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:52:02 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gS1CB-0003Xt-5f
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:52:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gS18g-0003KX-J0
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:48:35 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:59855)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gS18g-0003Jh-6U
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:48:30 -0500
-Date: Wed, 28 Nov 2018 09:48:25 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181128144825.GB1763@flamenco>
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-49-cota@braap.org>
-	<87bm694f1w.fsf@linaro.org>
+	(envelope-from <mlureau@redhat.com>) id 1gS178-0002IW-8m
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:47:02 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:43334)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gS176-0002G7-Fx
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:46:53 -0500
+Received: by mail-qt1-f195.google.com with SMTP id i7so26068300qtj.10
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 06:46:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87bm694f1w.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [RFC 48/48] plugin: add a couple of very simple
- examples
+References: <20181128142135.15900-1-marcandre.lureau@redhat.com>
+	<20181128143307.GM24355@redhat.com>
+In-Reply-To: <20181128143307.GM24355@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 28 Nov 2018 18:46:37 +0400
+Message-ID: <CAMxuvayS9ja1H-ftsahECEJU+T6EE8-KcYTpDnii8KdJHwaYmw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] configure: bump spice-server
+ required version to 0.12.6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
+To: "P. Berrange, Daniel" <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>, "Hoffmann, Gerd" <kraxel@redhat.com>, Frediano Ziglio <fziglio@redhat.com>
 
-On Wed, Nov 28, 2018 at 11:28:11 +0000, Alex Bennée wrote:
-> 
-> Emilio G. Cota <cota@braap.org> writes:
-> 
-> > Signed-off-by: Emilio G. Cota <cota@braap.org>
-> > ---
-> >  plugin-examples/bbcount_avgsize_racy.c | 50 ++++++++++++++++++++++
-> >  plugin-examples/mem_count_racy_both.c  | 58 ++++++++++++++++++++++++++
-> >  plugin-examples/Makefile               | 31 ++++++++++++++
-> 
-> So I think we need to be putting these somewhere else and also building
-> the examples by default. As plugins only make sense with tcg guests
+Hi
 
-Most of plugin functionality is related to TCG, but some of
-it is not. For instance, one could use a plugin to just control
-the guest clock, and nothing else. This would work with KVM.
+On Wed, Nov 28, 2018 at 6:33 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>
+> On Wed, Nov 28, 2018 at 06:21:35PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Looking at chardev/spice.c code, I realize compilation was broken for
+> > a while with spice-server < 0.12.3. I propose to bump required version
+> > to 0.12.6, released 3y ago, instead of adding more #ifdef.
+>
+> As mentioned last time this patch was posted[1], any changes in the
+> min required versions should follow our supported build platforms
+> support statement:
 
-This is why I think $SRC_PATH/plugin.c makes sense.
+Sorry, I totally forgot that.
 
-Wrt the examples, I just included them here for reviewing purposes.
-If we end up adding them, I think tests/plugin[s] would be an appropriate
-place for them.
+>
+>   https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-platforms
+>
+> Preferrably the commit message should list the version in each of the
+> main distros, such as in a0722409bcb980ecdab8330d4c716a73c9fcb489
+>
+> At a glance it looks like Debian Jessie is likely to be the determining
+> vote with 0.12.5 as its newest version.
 
-> > +# QEMU installed path, set by --prefix during configure
-> > +QEMU_PATH ?= /data/src/qemu-inst/plugin-test
-> 
-> I guess we should use SRC_PATH (or maybe QEMU_SRC_PATH) if we want the
-> Makefile to be both invoked as a sub-make from a normal QEMU build and
-> to be used as an example for out-of-tree builds.
+https://repology.org/metapackage/spice/versions
 
-(As I said, this was a quick hack just to get the RFC out :P)
+Debian Oldstable
+oldstable/main spice 0.12.5
 
-Thanks,
+https://wiki.debian.org/DebianReleases
 
-		Emilio
+~June 6th 2020 (LTS)
+
+But the current stable, Stretch, was released on June 17th 2017.
+
+So we are stuck with spice server 0.12.5 until +2y, June 17th 2019 ?
+
+
+>
+> Regards,
+> Daniel
+>
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg00905.html
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
