@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gRxxY-0003mC-5T
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 06:24:49 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1gRxzV-0004su-Pa
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 06:26:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gRxxW-0004Ij-6a
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 06:24:48 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38372)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gRxxV-0004Hu-VG
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 06:24:46 -0500
-Received: by mail-wm1-x344.google.com with SMTP id k198so2193387wmd.3
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 03:24:45 -0800 (PST)
+	(envelope-from <balaton@eik.bme.hu>) id 1gRxzT-0006DV-4m
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 06:26:49 -0500
+Date: Wed, 28 Nov 2018 12:26:37 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <0bb0d399-bec9-f653-5d2c-3f9f72e42ee1@redhat.com>
+Message-ID: <alpine.BSF.2.21.9999.1811281207320.57349@zero.eik.bme.hu>
+References: <cover.1529398335.git.balaton@eik.bme.hu>
+	<ce619ddd11a875caae4c221c18ebf7c6a6f4bd4f.1529398335.git.balaton@eik.bme.hu>
+	<0bb0d399-bec9-f653-5d2c-3f9f72e42ee1@redhat.com>
 MIME-Version: 1.0
-References: <20181128082243.29841-1-fziglio@redhat.com>
-	<20181128082243.29841-2-fziglio@redhat.com>
-	<20181128093753.6ssuq7dh7zqv3g6d@sirius.home.kraxel.org>
-In-Reply-To: <20181128093753.6ssuq7dh7zqv3g6d@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 28 Nov 2018 15:24:32 +0400
-Message-ID: <CAJ+F1CLqzR+=djD+LfBRZwMAKPO9TkUK_OUOWWS00jnTZr+SRQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Spice-devel] [PATCH 2/2] spice: Bump required
- spice-server version to 0.12.6
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] ppc4xx_i2c: Implement directcntl
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Frediano Ziglio <fziglio@redhat.com>, spice-devel <spice-devel@lists.freedesktop.org>, QEMU <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
-Hi
-On Wed, Nov 28, 2018 at 1:37 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+On Wed, 28 Nov 2018, Thomas Huth wrote:
+> On 2018-06-19 10:52, BALATON Zoltan wrote:
+>> As well as being able to generate its own i2c transactions, the ppc4xx
+>> i2c controller has a DIRECTCNTL register which allows explicit control
+>> of the i2c lines.
+>>
+>> Using this register an OS can directly bitbang i2c operations. In
+>> order to let emulated i2c devices respond to this, we need to wire up
+>> the DIRECTCNTL register to qemu's bitbanged i2c handling code.
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> ---
+> [...]
+>> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
+>> index e4b6ded..ea6c8e1 100644
+>> --- a/include/hw/i2c/ppc4xx_i2c.h
+>> +++ b/include/hw/i2c/ppc4xx_i2c.h
+>> @@ -31,6 +31,9 @@
+>>  #include "hw/sysbus.h"
+>>  #include "hw/i2c/i2c.h"
+>>
+>> +/* from hw/i2c/bitbang_i2c.h */
+>> +typedef struct bitbang_i2c_interface bitbang_i2c_interface;
 >
-> On Wed, Nov 28, 2018 at 08:22:43AM +0000, Frediano Ziglio wrote:
-> > Version 0.12.6 was released on 12th June 2015.
+> This breaks compilation with clang 3.4:
 >
-> That patch should be first, can you reorder them please?
+> In file included from /home/thuth/devel/qemu/hw/i2c/ppc4xx_i2c.c:33:
+> hw/i2c/bitbang_i2c.h:6:38: error: redefinition of typedef
+> 'bitbang_i2c_interface'
+>      is a C11 feature [-Werror,-Wtypedef-redefinition]
+> typedef struct bitbang_i2c_interface bitbang_i2c_interface;
+>                                     ^
+> include/hw/i2c/ppc4xx_i2c.h:35:38: note: previous definition is here
+> typedef struct bitbang_i2c_interface bitbang_i2c_interface;
+>                                     ^
+> 1 error generated.
+> make[1]: *** [hw/i2c/ppc4xx_i2c.o] Error 1
 >
+> Not sure about the best way to fix this ... move the typedef to
+> include/qemu/typedefs.h maybe? Or include the "hw/i2c/bitbang_i2c.h"
+> header instead of "i2c.h" here?
 
-I will resend my series with the 0.12.6 bump first/early.
+Not sure either but I could not include bitbang_i2c.h here because that's 
+a private header in hw/i2c, whereas ppc4xx_i2c.h is a public header in 
+include/hw/i2c. That's why it had to be duplicated here. I had it 
+differently in first version but this was thought to be simpler way, see 
+http://lists.nongnu.org/archive/html/qemu-ppc/2018-06/msg00374.html
 
-> thanks,
->   Gerd
->
-> PS: Tried to just reverse ordering when queuing up, but #2 doesn't apply
->     to master, seems there is some dependency ...
->
-> _______________________________________________
-> Spice-devel mailing list
-> Spice-devel@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/spice-devel
+Maybe we could move this typedef to include/hw/i2c/i2c.h which both 
+ppc4xx_i2c.h and bitbang_i2c.h include?
 
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Regards,
+BALATON Zoltan
