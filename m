@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shannon.zhaosl@gmail.com>) id 1gS2uL-00060y-3d
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:41:53 -0500
+	(envelope-from <prvs=863a5f629=Paul.Durrant@citrix.com>)
+	id 1gS2uW-000610-Jd
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:42:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shannon.zhaosl@gmail.com>) id 1gS2u6-0001vM-Ca
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:41:35 -0500
-References: <20181126154616.18173-1-eric.auger@redhat.com>
-	<b3c22264-2a95-b851-025c-b8ff0f38f269@redhat.com>
-From: Shannon Zhao <shannon.zhaosl@gmail.com>
-Message-ID: <65b68704-2c0b-e9b9-2cde-fea5c32161b3@gmail.com>
-Date: Thu, 29 Nov 2018 00:39:58 +0800
-MIME-Version: 1.0
-In-Reply-To: <b3c22264-2a95-b851-025c-b8ff0f38f269@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <prvs=863a5f629=Paul.Durrant@citrix.com>)
+	id 1gS2t3-00018n-00
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:40:30 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Wed, 28 Nov 2018 16:40:20 +0000
+Message-ID: <a2cd391e72a24547a3565515e8d39d27@AMSPEX02CL03.citrite.net>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	<20181121151211.15997-15-paul.durrant@citrix.com>
+	<20181128163447.GF4222@dhcp-200-186.str.redhat.com>
+In-Reply-To: <20181128163447.GF4222@dhcp-200-186.str.redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/arm/virt-acpi-build: Fix SMMUv3
- ACPI integration
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 14/18] xen: add implementations of
+ xen-qdisk connect and disconnect functions...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,138 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: shameerali.kolothum.thodi@huawei.com
+To: 'Kevin Wolf' <kwolf@redhat.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Max
+	Reitz <mreitz@redhat.com>
 
+> -----Original Message-----
+> From: Kevin Wolf [mailto:kwolf@redhat.com]
+> Sent: 28 November 2018 16:35
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
+> devel@lists.xenproject.org; Stefano Stabellini <sstabellini@kernel.org>;
+> Anthony Perard <anthony.perard@citrix.com>; Max Reitz <mreitz@redhat.com>
+> Subject: Re: [PATCH 14/18] xen: add implementations of xen-qdisk connect
+> and disconnect functions...
+>=20
+> Am 21.11.2018 um 16:12 hat Paul Durrant geschrieben:
+> > ...and wire in the dataplane.
+> >
+> > This patch adds the remaining code to make the xen-qdisk XenDevice
+> > functional. The parameters that a block frontend expects to find are
+> > populated in the backend xenstore area, and the 'ring-ref' and
+> > 'event-channel' values specified in the frontend xenstore area are
+> > mapped/bound and used to set up the dataplane.
+> >
+> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > ---
+> > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > Cc: Anthony Perard <anthony.perard@citrix.com>
+> > Cc: Kevin Wolf <kwolf@redhat.com>
+> > Cc: Max Reitz <mreitz@redhat.com>
+> > ---
+> >  hw/block/xen-qdisk.c       | 140
+> +++++++++++++++++++++++++++++++++++++++++++++
+> >  hw/xen/xen-bus.c           |  12 ++--
+> >  include/hw/xen/xen-bus.h   |   8 +++
+> >  include/hw/xen/xen-qdisk.h |  12 ++++
+> >  4 files changed, 166 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/hw/block/xen-qdisk.c b/hw/block/xen-qdisk.c
+> > index 35f7b70480..8c88393832 100644
+> > --- a/hw/block/xen-qdisk.c
+> > +++ b/hw/block/xen-qdisk.c
+> > @@ -9,6 +9,10 @@
+> >  #include "qapi/visitor.h"
+> >  #include "hw/hw.h"
+> >  #include "hw/xen/xen-qdisk.h"
+> > +#include "sysemu/blockdev.h"
+> > +#include "sysemu/block-backend.h"
+> > +#include "sysemu/iothread.h"
+> > +#include "dataplane/xen-qdisk.h"
+> >  #include "trace.h"
+> >
+> >  static char *xen_qdisk_get_name(XenDevice *xendev, Error **errp)
+> > @@ -23,6 +27,11 @@ static void xen_qdisk_realize(XenDevice *xendev,
+> Error **errp)
+> >  {
+> >      XenQdiskDevice *qdiskdev =3D XEN_QDISK_DEVICE(xendev);
+> >      XenQdiskVdev *vdev =3D &qdiskdev->vdev;
+> > +    BlockConf *conf =3D &qdiskdev->conf;
+> > +    DriveInfo *dinfo;
+> > +    bool is_cdrom;
+> > +    unsigned int info;
+> > +    int64_t size;
+> >
+> >      if (!vdev->valid) {
+> >          error_setg(errp, "vdev property not set");
+> > @@ -30,13 +39,134 @@ static void xen_qdisk_realize(XenDevice *xendev,
+> Error **errp)
+> >      }
+> >
+> >      trace_xen_qdisk_realize(vdev->disk, vdev->partition);
+> > +
+> > +    if (!conf->blk) {
+> > +        error_setg(errp, "drive property not set");
+> > +        return;
+> > +    }
+> > +
+> > +    if (!blk_is_inserted(conf->blk)) {
+> > +        error_setg(errp, "device needs media, but drive is empty");
+> > +        return;
+> > +    }
+>=20
+> Hm, the code below suggests that you support CD-ROMs. Don't you want to
+> support media change as well then? Which would mean that you need to
+> support empty drives.
 
+Yes, that's a good point. I should get rid of that check.
 
-On 2018/11/27 13:53, Auger Eric wrote:
-> Hi Shannon,
-> 
-> On 11/26/18 4:46 PM, Eric Auger wrote:
->> The AcpiIortSmmu3 misses 2 32b fields corresponding to the
->> proximity domain and the device id mapping index.
-> I fail to understand how we currently track the evolutions of the IORT
-> structures:
-> 
-> Looking at the smmuv3 node in kernel include/acpi/actbl2.h
-> 
-> - the following fields were added in c944230064eb  ACPICA: iasl: Update
-> to IORT SMMUv3 disassembling (1 year, 4 months ago)
-> 	u8 pxm;
-> 	u8 reserved1;
-> 	u16 reserved2;
-> - id_mapping_index was added in 4c106aa411ee  ACPICA: iasl: Add SMMUv3
-> device ID mapping index support (1 year ago)
-> - current u32 pxm was introduced in d87be0438e3d  ACPICA: IORT: Update
-> for revision D (6 months ago)
-> 
-> I would have expected each of those evolutions to be tagged by a
-> revision increment in the acpi_iort_node.revision field but this is not
-> done. Also I fail to see any enum for encoding the revision.
-> 
-> The smmuv3 struct that has been exposed until now corresponds to Rev C
-> https://lists.linuxfoundation.org/pipermail/iommu/2017-May/022000.html
-> (0c2021c047ba  ACPICA: IORT: Update SMMU models for revision C (1 year,
-> 4 months ago)
-> 
-> Also I noticed that in rev D, new fields were added in struct
-> acpi_iort_root_complex. We miss them at the moment in the IORT description.
-> 
-> How does the guest kernel know which revision of the IORT is exposed?
-> What do I miss?
-> 
-Look at the kernel code in iort.c it checks if the flags field has set 
-ACPI_IORT_SMMU_V3_PXM_VALID bit.
+>=20
+> > +    if (!blkconf_apply_backend_options(conf, blk_is_read_only(conf-
+> >blk),
+> > +                                       false, errp)) {
+> > +        return;
+> > +    }
+> > +
+> > +    if (!blkconf_geometry(conf, NULL, 65535, 255, 255, errp)) {
+> > +        return;
+> > +    }
+> > +
+> > +    dinfo =3D blk_legacy_dinfo(conf->blk);
+> > +    is_cdrom =3D (dinfo && dinfo->media_cd);
+>=20
+> It's called legacy for a reason. Don't use this in new devices.
+>=20
+> The proper way is to have two different devices for hard disks and CDs
+> (like scsi-hd and scsi-cd).
 
-	if (smmu->flags & ACPI_IORT_SMMU_V3_PXM_VALID) {
-		set_dev_node(dev, acpi_map_pxm_to_node(smmu->pxm));
-		pr_info("SMMU-v3[%llx] Mapped to Proximity domain %d\n",
-			smmu->base_address,
-			smmu->pxm);
-	}
+...or presumably I could have a property? The legacy init code could then s=
+et it based on the drive info.
 
-But it doesn't check the revision I think the reason is that revision 1 
-& 2 just use the next reserved fields. No matter u8 or u32, kernel 
-driver get the same value.
+  Paul
 
-The code handling id_mapping_index does check the revision.
-
-static int iort_get_id_mapping_index(struct acpi_iort_node *node)
-{
-	struct acpi_iort_smmu_v3 *smmu;
-
-	switch (node->type) {
-	case ACPI_IORT_NODE_SMMU_V3:
-		/*
-		 * SMMUv3 dev ID mapping index was introduced in revision 1
-		 * table, not available in revision 0
-		 */
-		if (node->revision < 1)
-			return -EINVAL;
-
-> Thanks
-> 
-> Eric
-> 
->>
->> Also let's report IO-coherent access is supported for
->> translation table walks, descriptor fetches and queues by
->> setting the COHACC override flag. Without that, we observe
->> wrong command opcodes. The DT description also advertises
->> the dma coherency.
->>
->> Fixes a703b4f6c1ee ("hw/arm/virt-acpi-build: Add smmuv3 node in IORT table")
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Reported-by: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
->> ---
->>   hw/arm/virt-acpi-build.c    | 1 +
->>   include/hw/acpi/acpi-defs.h | 8 ++++++++
->>   2 files changed, 9 insertions(+)
->>
->> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->> index 5785fb697c..aa177ba64d 100644
->> --- a/hw/arm/virt-acpi-build.c
->> +++ b/hw/arm/virt-acpi-build.c
->> @@ -448,6 +448,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->>           smmu->mapping_count = cpu_to_le32(1);
->>           smmu->mapping_offset = cpu_to_le32(sizeof(*smmu));
->>           smmu->base_address = cpu_to_le64(vms->memmap[VIRT_SMMU].base);
->> +        smmu->flags = ACPI_IORT_SMMU_V3_COHACC_OVERRIDE;
->>           smmu->event_gsiv = cpu_to_le32(irq);
->>           smmu->pri_gsiv = cpu_to_le32(irq + 1);
->>           smmu->gerr_gsiv = cpu_to_le32(irq + 2);
->> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
->> index af8e023968..c3ee1f517b 100644
->> --- a/include/hw/acpi/acpi-defs.h
->> +++ b/include/hw/acpi/acpi-defs.h
->> @@ -628,6 +628,12 @@ struct AcpiIortItsGroup {
->>   } QEMU_PACKED;
->>   typedef struct AcpiIortItsGroup AcpiIortItsGroup;
->>   
->> +enum {
->> +    ACPI_IORT_SMMU_V3_COHACC_OVERRIDE = 1 << 0,
->> +    ACPI_IORT_SMMU_V3_HTTU_OVERRIDE   = 3 << 1,
->> +    ACPI_IORT_SMMU_V3_PXM_VALID       = 1 << 3
->> +};
->> +
->>   struct AcpiIortSmmu3 {
->>       ACPI_IORT_NODE_HEADER_DEF
->>       uint64_t base_address;
->> @@ -639,6 +645,8 @@ struct AcpiIortSmmu3 {
->>       uint32_t pri_gsiv;
->>       uint32_t gerr_gsiv;
->>       uint32_t sync_gsiv;
->> +    uint32_t pxm;
-So if we use this field ,we need to set the flags with 
-ACPI_IORT_SMMU_V3_PXM_VALID.
->> +    uint32_t id_mapping_index;
-And if we use this field, it needs to set the revision to at least 1.
-
-Thanks,
-Shannon
->>       AcpiIortIdMapping id_mapping_array[0];
->>   } QEMU_PACKED;
->>   typedef struct AcpiIortSmmu3 AcpiIortSmmu3;
->>
+>=20
+> Kevin
