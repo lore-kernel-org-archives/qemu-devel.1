@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gS2zp-0002x5-1S
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:47:31 -0500
+	(envelope-from <prvs=863a5f629=Paul.Durrant@citrix.com>)
+	id 1gS2zz-00034x-Hn
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:47:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gS2zk-0000Jj-Vs
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:47:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56282)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gS2zk-0000I9-Oh
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:47:24 -0500
-Date: Wed, 28 Nov 2018 16:47:13 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181128164713.GS24355@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181128153526.10948-1-berrange@redhat.com>
-	<165bc19e-8ed2-8979-aea7-0f6031fc6df2@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <165bc19e-8ed2-8979-aea7-0f6031fc6df2@redhat.com>
+	(envelope-from <prvs=863a5f629=Paul.Durrant@citrix.com>)
+	id 1gS2zx-0000Xx-Hn
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 11:47:39 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Wed, 28 Nov 2018 16:46:57 +0000
+Message-ID: <a0104a7b4f874c31bda9d854bf254b0d@AMSPEX02CL03.citrite.net>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	<20181121151211.15997-3-paul.durrant@citrix.com>
+	<20181128161917.GE4222@dhcp-200-186.str.redhat.com>
+	<48596f1fe100419c8b28ed54bda0117b@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1811280827330.4577@sstabellini-ThinkPad-X260>
+	<65af28818a724749839dcb6576e0413d@AMSPEX02CL03.citrite.net>
+	<20181128163900.GG4222@dhcp-200-186.str.redhat.com>
+	<5327ba765089439caf8119de49c3a399@AMSPEX02CL03.citrite.net>
+In-Reply-To: <5327ba765089439caf8119de49c3a399@AMSPEX02CL03.citrite.net>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Document how to test the site
- with jekyll locally
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 02/18] xen: introduce new
+ 'XenBus' and 'XenDevice' object hierarchy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +33,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, raimue@macports.org, alex.bennee@linaro.org, Yu Ning <yu.ning@intel.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: 'Kevin Wolf' <kwolf@redhat.com>
+Cc: 'Stefano Stabellini' <sstabellini@kernel.org>, "'qemu-block@nongnu.org'" <qemu-block@nongnu.org>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>, "'xen-devel@lists.xenproject.org'" <xen-devel@lists.xenproject.org>, 'Eduardo Habkost' <ehabkost@redhat.com>, "'Michael S. Tsirkin'" <mst@redhat.com>, 'Marcel Apfelbaum' <marcel.apfelbaum@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Richard Henderson' <rth@twiddle.net>
 
-On Wed, Nov 28, 2018 at 05:44:09PM +0100, Paolo Bonzini wrote:
-> On 28/11/18 16:35, Daniel P. Berrang=C3=A9 wrote:
-> > Add a README file that tells people this is a jekyll based static
-> > website, and shows people how to run jekyll for testing purposes.
-> >=20
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > ---
-> >=20
-> > NB, we should really mention a license in the README too, but I don't
-> > see info about what license we consider qemu-web to be covered by...
+> -----Original Message-----
+> From: Paul Durrant
+> Sent: 28 November 2018 16:46
+> To: 'Kevin Wolf' <kwolf@redhat.com>
+> Cc: 'Stefano Stabellini' <sstabellini@kernel.org>; qemu-block@nongnu.org;
+> qemu-devel@nongnu.org; xen-devel@lists.xenproject.org; Eduardo Habkost
+> <ehabkost@redhat.com>; Michael S. Tsirkin <mst@redhat.com>; Marcel
+> Apfelbaum <marcel.apfelbaum@gmail.com>; Anthony Perard
+> <anthony.perard@citrix.com>; Paolo Bonzini <pbonzini@redhat.com>; Richard
+> Henderson <rth@twiddle.net>
+> Subject: RE: [Qemu-block] [PATCH 02/18] xen: introduce new 'XenBus' and
+> 'XenDevice' object hierarchy
 >=20
->     47	Paolo Bonzini <pbonzini@redhat.com>
->     44	Michael Roth <mdroth@linux.vnet.ibm.com>
->     13	Thomas Huth <thuth@redhat.com>
->      3	Eric Blake <eblake@redhat.com>
->      2	Daniel P. Berrange <berrange@redhat.com>
->      2	Jeff Cody <jcody@redhat.com>
->      1	Alex Benn=C3=A9e <alex.bennee@linaro.org>
->      1	Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->      1	Fam Zheng <famz@redhat.com>
->      1	Rainer M=C3=BCller <raimue@macports.org>
->      1	Stefan Hajnoczi <stefanha@gmail.com>
->      1	Yu Ning <yu.ning@intel.com>
+> > -----Original Message-----
+> > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > Sent: 28 November 2018 16:39
+> > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > Cc: 'Stefano Stabellini' <sstabellini@kernel.org>; qemu-
+> block@nongnu.org;
+> > qemu-devel@nongnu.org; xen-devel@lists.xenproject.org; Eduardo Habkost
+> > <ehabkost@redhat.com>; Michael S. Tsirkin <mst@redhat.com>; Marcel
+> > Apfelbaum <marcel.apfelbaum@gmail.com>; Anthony Perard
+> > <anthony.perard@citrix.com>; Paolo Bonzini <pbonzini@redhat.com>;
+> Richard
+> > Henderson <rth@twiddle.net>
+> > Subject: Re: [Qemu-block] [PATCH 02/18] xen: introduce new 'XenBus' and
+> > 'XenDevice' object hierarchy
+> >
+> > Am 28.11.2018 um 17:29 hat Paul Durrant geschrieben:
+> > > > -----Original Message-----
+> > > > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> > > > Sent: 28 November 2018 16:28
+> > > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > Cc: 'Kevin Wolf' <kwolf@redhat.com>; qemu-block@nongnu.org; qemu-
+> > > > devel@nongnu.org; xen-devel@lists.xenproject.org; Stefano Stabellin=
+i
+> > > > <sstabellini@kernel.org>; Eduardo Habkost <ehabkost@redhat.com>;
+> > Michael
+> > > > S. Tsirkin <mst@redhat.com>; Marcel Apfelbaum
+> > > > <marcel.apfelbaum@gmail.com>; Anthony Perard
+> > <anthony.perard@citrix.com>;
+> > > > Paolo Bonzini <pbonzini@redhat.com>; Richard Henderson
+> > <rth@twiddle.net>
+> > > > Subject: RE: [Qemu-block] [PATCH 02/18] xen: introduce new 'XenBus'
+> > and
+> > > > 'XenDevice' object hierarchy
+> > > >
+> > > > On Wed, 28 Nov 2018, Paul Durrant wrote:
+> > > > > > -----Original Message-----
+> > > > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > > > > > Sent: 28 November 2018 16:19
+> > > > > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > > > Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
+> > > > > > devel@lists.xenproject.org; Stefano Stabellini
+> > > > <sstabellini@kernel.org>;
+> > > > > > Eduardo Habkost <ehabkost@redhat.com>; Michael S. Tsirkin
+> > > > > > <mst@redhat.com>; Marcel Apfelbaum <marcel.apfelbaum@gmail.com>=
+;
+> > > > Anthony
+> > > > > > Perard <anthony.perard@citrix.com>; Paolo Bonzini
+> > > > <pbonzini@redhat.com>;
+> > > > > > Richard Henderson <rth@twiddle.net>
+> > > > > > Subject: Re: [Qemu-block] [PATCH 02/18] xen: introduce new
+> > 'XenBus'
+> > > > and
+> > > > > > 'XenDevice' object hierarchy
+> > > > > >
+> > > > > > Am 21.11.2018 um 16:11 hat Paul Durrant geschrieben:
+> > > > > > > This patch adds the basic boilerplate for a 'XenBus' object
+> that
+> > > > will
+> > > > > > act
+> > > > > > > as a parent to 'XenDevice' PV backends.
+> > > > > > > A new 'XenBridge' object is also added to connect XenBus to
+> the
+> > > > system
+> > > > > > bus.
+> > > > > > >
+> > > > > > > The XenBus object is instantiated by a new xen_bus_init()
+> > function
+> > > > > > called
+> > > > > > > from the same sites as the legacy xen_be_init() function.
+> > > > > > >
+> > > > > > > Subsequent patches will flesh-out the functionality of these
+> > > > objects.
+> > > > > > >
+> > > > > > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > > > > >
+> > > > > > > diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+> > > > > > > new file mode 100644
+> > > > > > > index 0000000000..dede2d914a
+> > > > > > > --- /dev/null
+> > > > > > > +++ b/hw/xen/xen-bus.c
+> > > > > > > @@ -0,0 +1,125 @@
+> > > > > > > +/*
+> > > > > > > + * Copyright (c) Citrix Systems Inc.
+> > > > > > > + * All rights reserved.
+> > > > > > > + */
+> > > > > >
+> > > > > > This doesn't look very compatible with the GPL. In fact it migh=
+t
+> > even
+> > > > > > make it illegal for the QEMU project to distribute this code. :=
+-
+> )
+> > > > > >
+> > > > > > Other files you add throughout the series seem to have the same
+> > > > problem.
+> > > > > >
+> > > > >
+> > > > > I was working on the assumption that a lack of explicit license
+> > meant
+> > > > that the overall project license as described in item 2 in LICENSE.
+> > Did I
+> > > > misinterpret that text?
+> > > >
+> > > > It's "All rights reserved." the problem
+> > >
+> > > Oh, I see. I'm happy to remove that.
+> >
+> > That would be better at least. I'm not sure about files that have a
+> > copyright header, but no license statement. Do such files exist yet in
+> > the source tree?
 >=20
-> Anybody (especially non-RH people) disagrees with dual-license CC-BY-SA
-> 4.0 and GPLv2+?  (So that we can copy from blog posts to manuals)?
+> Yes, there's quite a few... e.g. (first ones I tripped over)
+> hw/rdma/rdma_backend.c, hw/virtio/vhost-backend.c, ...
 
-This dual license is exactly what I would have suggested too, as CC-BY-SA
-is common place for collaborative web content projects & formal docs
-efforts.
+Oh... I see they have a license statement but no boilerplate... is that sta=
+tement enough?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+  Paul
+
+>=20
+> > To be on the safe side, I'd just stick with the
+> > established practice, which is having a license header in every file.
+>=20
+> Ok... if that is established practice. It really wasn't clear.
+>=20
+> >
+> > By the way, in a later patch you remove the existing license header,
+> > which is different from the default license (because parts of the sourc=
+e
+> > file are GPL 2 only). If you can't prove that all such parts (and parts
+> > derived from them) have been removed, this is also a problem.
+> >
+>=20
+> What should I do? I am duplicating xen_disk, and then heavily modifying
+> it. Should I just leave the old boilerplate in place?
+>=20
+>   Paul
+>=20
+> > Kevin
