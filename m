@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gS61l-0006UH-P0
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:01:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1gS63F-0007gH-HL
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:03:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gS61g-0005I0-5R
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:01:41 -0500
+	(envelope-from <eblake@redhat.com>) id 1gS63E-0001d1-MQ
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:03:13 -0500
 References: <20181128195802.B6A6C7456B9@zero.eik.bme.hu>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <934641ce-3d90-ef9d-5c2a-20244f5cbb23@redhat.com>
-Date: Wed, 28 Nov 2018 21:01:30 +0100
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2bdbd7b4-c1de-4ab4-7057-f87a535838e0@redhat.com>
+Date: Wed, 28 Nov 2018 14:03:10 -0600
 MIME-Version: 1.0
 In-Reply-To: <20181128195802.B6A6C7456B9@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] i2c: Move typedef of bitbang_i2c_interface
@@ -25,9 +25,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 2018-11-28 20:27, BALATON Zoltan wrote:
+On 11/28/18 1:27 PM, BALATON Zoltan wrote:
 > Clang 3.4 considers duplicate typedef in ppc4xx_i2c.h and
 > bitbang_i2c.h an error even if they are identical. Move it to a common
 > place to allow building with this clang version.
@@ -35,55 +35,25 @@ On 2018-11-28 20:27, BALATON Zoltan wrote:
 > Reported-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > ---
->  hw/i2c/bitbang_i2c.h        | 2 --
->  include/hw/i2c/i2c.h        | 2 ++
->  include/hw/i2c/ppc4xx_i2c.h | 3 ---
->  3 files changed, 2 insertions(+), 5 deletions(-)
+>   hw/i2c/bitbang_i2c.h        | 2 --
+>   include/hw/i2c/i2c.h        | 2 ++
+>   include/hw/i2c/ppc4xx_i2c.h | 3 ---
+>   3 files changed, 2 insertions(+), 5 deletions(-)
 > 
 > diff --git a/hw/i2c/bitbang_i2c.h b/hw/i2c/bitbang_i2c.h
 > index 3a7126d5de..9443021710 100644
 > --- a/hw/i2c/bitbang_i2c.h
 > +++ b/hw/i2c/bitbang_i2c.h
 > @@ -3,8 +3,6 @@
->  
->  #include "hw/i2c/i2c.h"
->  
+>   
+>   #include "hw/i2c/i2c.h"
+>   
 > -typedef struct bitbang_i2c_interface bitbang_i2c_interface;
-> -
->  #define BITBANG_I2C_SDA 0
->  #define BITBANG_I2C_SCL 1
->  
-> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-> index 5dc166158b..cf4c45a98f 100644
-> --- a/include/hw/i2c/i2c.h
-> +++ b/include/hw/i2c/i2c.h
-> @@ -82,6 +82,8 @@ int i2c_recv(I2CBus *bus);
->  
->  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr);
->  
-> +typedef struct bitbang_i2c_interface bitbang_i2c_interface;
-> +
->  /* lm832x.c */
->  void lm832x_key_event(DeviceState *dev, int key, int state);
->  
-> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
-> index 0891a9c948..b3450bacf7 100644
-> --- a/include/hw/i2c/ppc4xx_i2c.h
-> +++ b/include/hw/i2c/ppc4xx_i2c.h
-> @@ -31,9 +31,6 @@
->  #include "hw/sysbus.h"
->  #include "hw/i2c/i2c.h"
->  
-> -/* from hw/i2c/bitbang_i2c.h */
-> -typedef struct bitbang_i2c_interface bitbang_i2c_interface;
-> -
->  #define TYPE_PPC4xx_I2C "ppc4xx-i2c"
->  #define PPC4xx_I2C(obj) OBJECT_CHECK(PPC4xxI2CState, (obj), TYPE_PPC4xx_I2C)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Would this also be an opportunity to rename the struct to something 
+CamelCase to match our coding conventions?
 
-Peter, in case you've got to roll another rc, I think this should be
-included, too. Otherwise, I think this can also be included later via
-qemu-stable (for the few people like me who still use clang 3.4).
-
- Thomas
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
