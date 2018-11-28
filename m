@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gS1Cl-0003nn-LW
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:52:49 -0500
+	(envelope-from <berrange@redhat.com>) id 1gS1EP-0006Qp-Pg
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:54:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gS0xV-0003wH-2X
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:37:00 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:33328)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gS0xU-0003vZ-SM
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:36:57 -0500
-Received: by mail-wr1-f67.google.com with SMTP id c14so20902754wrr.0
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 06:36:56 -0800 (PST)
-References: <1543412590-29716-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1543412590-29716-3-git-send-email-stefan.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <bea9f668-e0ee-1dde-4dfd-c6f45f6e17e1@redhat.com>
-Date: Wed, 28 Nov 2018 15:36:50 +0100
+	(envelope-from <berrange@redhat.com>) id 1gS1EO-0008Ib-Uz
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:54:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59118)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gS1EO-0008IG-P0
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:54:24 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1EC8E8830A
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 14:54:24 +0000 (UTC)
+Date: Wed, 28 Nov 2018 14:54:09 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181128145409.GN24355@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181128142135.15900-1-marcandre.lureau@redhat.com>
+	<20181128143307.GM24355@redhat.com>
+	<CAMxuvayS9ja1H-ftsahECEJU+T6EE8-KcYTpDnii8KdJHwaYmw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1543412590-29716-3-git-send-email-stefan.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] docs/qemu-cpu-models: Add
- MIPS/nanoMIPS QEMU supported CPU models
+Content-Disposition: inline
+In-Reply-To: <CAMxuvayS9ja1H-ftsahECEJU+T6EE8-KcYTpDnii8KdJHwaYmw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2] configure: bump spice-server
+ required version to 0.12.6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,202 +37,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Markovic <stefan.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, pburton@wavecomp.com, smarkovic@wavecomp.com, jhogan@kernel.org, huth@tuxfamily.org, hpoussin@reactos.org, amarkovic@wavecomp.com, pjovanovic@wavecomp.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Bonzini, Paolo" <pbonzini@redhat.com>, "Hoffmann, Gerd" <kraxel@redhat.com>, Frediano Ziglio <fziglio@redhat.com>
 
-On 28/11/18 14:43, Stefan Markovic wrote:
-> From: Stefan Markovic <smarkovic@wavecomp.com>
-> 
-> Add list of supported and preferred CPU models for MIPS32, MIPS64
-> and nanoMIPS hosts.
-> 
-> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+On Wed, Nov 28, 2018 at 06:46:37PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Wed, Nov 28, 2018 at 6:33 PM Daniel P. Berrang=C3=A9 <berrange@redha=
+t.com> wrote:
+> >
+> > On Wed, Nov 28, 2018 at 06:21:35PM +0400, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > Looking at chardev/spice.c code, I realize compilation was broken f=
+or
+> > > a while with spice-server < 0.12.3. I propose to bump required vers=
+ion
+> > > to 0.12.6, released 3y ago, instead of adding more #ifdef.
+> >
+> > As mentioned last time this patch was posted[1], any changes in the
+> > min required versions should follow our supported build platforms
+> > support statement:
+>=20
+> Sorry, I totally forgot that.
+>=20
+> >
+> >   https://qemu.weilnetz.de/doc/qemu-doc.html#Supported-build-platform=
+s
+> >
+> > Preferrably the commit message should list the version in each of the
+> > main distros, such as in a0722409bcb980ecdab8330d4c716a73c9fcb489
+> >
+> > At a glance it looks like Debian Jessie is likely to be the determini=
+ng
+> > vote with 0.12.5 as its newest version.
+>=20
+> https://repology.org/metapackage/spice/versions
+>=20
+> Debian Oldstable
+> oldstable/main spice 0.12.5
+>=20
+> https://wiki.debian.org/DebianReleases
+>=20
+> ~June 6th 2020 (LTS)
+>=20
+> But the current stable, Stretch, was released on June 17th 2017.
+>=20
+> So we are stuck with spice server 0.12.5 until +2y, June 17th 2019 ?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Yep, but that means one more dev cycle - 4.0
 
-> ---
->  docs/qemu-cpu-models.texi | 163 +++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 161 insertions(+), 2 deletions(-)
-> 
-> diff --git a/docs/qemu-cpu-models.texi b/docs/qemu-cpu-models.texi
-> index 1935f98..475d434 100644
-> --- a/docs/qemu-cpu-models.texi
-> +++ b/docs/qemu-cpu-models.texi
-> @@ -5,8 +5,9 @@ QEMU / KVM CPU model configuration
->  @c man begin DESCRIPTION
->  
->  @menu
-> -* recommendations_cpu_models_x86:: Recommendations for KVM CPU model configuration on x86 hosts
-> -* cpu_model_syntax_apps::          Syntax for configuring CPU models
-> +* recommendations_cpu_models_x86::  Recommendations for KVM CPU model configuration on x86 hosts
-> +* recommendations_cpu_models_MIPS:: Supported CPU model configurations on MIPS hosts
-> +* cpu_model_syntax_apps::           Syntax for configuring CPU models
->  @end menu
->  
->  QEMU / KVM virtualization supports two ways to configure CPU models
-> @@ -368,6 +369,164 @@ hardware assisted virtualization, that should thus not be required for
->  running virtual machines.
->  @end table
->  
-> +@node recommendations_cpu_models_MIPS
-> +@subsection Supported CPU model configurations on MIPS hosts
-> +
-> +QEMU supports variety of MIPS CPU models:
-> +
-> +@menu
-> +* cpu_models_MIPS32::               Supported CPU models for MIPS32 hosts
-> +* cpu_models_MIPS64::               Supported CPU models for MIPS64 hosts
-> +* cpu_models_nanoMIPS::             Supported CPU models for nanoMIPS hosts
-> +* preferred_cpu_models_MIPS::       Preferred CPU models for MIPS hosts
-> +@end menu
-> +
-> +@node cpu_models_MIPS32
-> +@subsubsection Supported CPU models for MIPS32 hosts
-> +
-> +The following CPU models are supported for use on MIPS32 hosts. Administrators /
-> +applications are recommended to use the CPU model that matches the generation
-> +of the host CPUs in use. In a deployment with a mixture of host CPU models
-> +between machines, if live migration compatibility is required, use the newest
-> +CPU model that is compatible across all desired hosts.
-> +
-> +@table @option
-> +@item @code{mips32r6-generic}
-> +
-> +MIPS32 Processor (Release 6, 2015)
-> +
-> +
-> +@item @code{P5600}
-> +
-> +MIPS32 Processor (P5600, 2014)
-> +
-> +
-> +@item @code{M14K}
-> +@item @code{M14Kc}
-> +
-> +MIPS32 Processor (M14K, 2009)
-> +
-> +
-> +@item @code{74Kf}
-> +
-> +MIPS32 Processor (74K, 2007)
-> +
-> +
-> +@item @code{34Kf}
-> +
-> +MIPS32 Processor (34K, 2006)
-> +
-> +
-> +@item @code{24Kc}
-> +@item @code{24KEc}
-> +@item @code{24Kf}
-> +
-> +MIPS32 Processor (24K, 2003)
-> +
-> +
-> +@item @code{4Kc}
-> +@item @code{4Km}
-> +@item @code{4KEcR1}
-> +@item @code{4KEmR1}
-> +@item @code{4KEc}
-> +@item @code{4KEm}
-> +
-> +MIPS32 Processor (4K, 1999)
-> +@end table
-> +
-> +@node cpu_models_MIPS64
-> +@subsubsection Supported CPU models for MIPS64 hosts
-> +
-> +The following CPU models are supported for use on MIPS64 hosts. Administrators /
-> +applications are recommended to use the CPU model that matches the generation
-> +of the host CPUs in use. In a deployment with a mixture of host CPU models
-> +between machines, if live migration compatibility is required, use the newest
-> +CPU model that is compatible across all desired hosts.
-> +
-> +@table @option
-> +@item @code{I6400}
-> +
-> +MIPS64 Processor (Release 6, 2014)
-> +
-> +
-> +@item @code{Loongson-2F}
-> +
-> +MIPS64 Processor (Longsoon 2, 2008)
-> +
-> +
-> +@item @code{Loongson-2E}
-> +
-> +MIPS64 Processor (Loongson 2, 2006)
-> +
-> +
-> +@item @code{mips64dspr2}
-> +
-> +MIPS64 Processor (Release 2, 2006)
-> +
-> +
-> +@item @code{MIPS64R2-generic}
-> +@item @code{5KEc}
-> +@item @code{5KEf}
-> +
-> +MIPS64 Processor (Release 2, 2002)
-> +
-> +
-> +@item @code{20Kc}
-> +
-> +MIPS64 Processor (20K, 2000)
-> +
-> +
-> +@item @code{5Kc}
-> +@item @code{5Kf}
-> +
-> +MIPS64 Processor (5K, 1999)
-> +
-> +
-> +@item @code{VR5432}
-> +
-> +MIPS64 Processor (VR, 1998)
-> +
-> +
-> +@item @code{R4000}
-> +
-> +MIPS64 Processor (MIPS III, 1991)
-> +@end table
-> +
-> +@node cpu_models_nanoMIPS
-> +@subsubsection Supported CPU models for nanoMIPS hosts
-> +
-> +The following CPU models are supported for use on nanoMIPS hosts. Administrators /
-> +applications are recommended to use the CPU model that matches the generation
-> +of the host CPUs in use. In a deployment with a mixture of host CPU models
-> +between machines, if live migration compatibility is required, use the newest
-> +CPU model that is compatible across all desired hosts.
-> +
-> +@table @option
-> +@item @code{I7200}
-> +
-> +MIPS I7200 (nanoMIPS, 2018)
-> +
-> +@end table
-> +
-> +@node preferred_cpu_models_MIPS
-> +@subsubsection Preferred CPU models for MIPS hosts
-> +
-> +The following CPU models are preferred for use on different MIPS hosts:
-> +
-> +@table @option
-> +@item @code{MIPS III}
-> +R4000
-> +
-> +@item @code{MIPS32R2}
-> +34Kf
-> +
-> +@item @code{MIPS64R6}
-> +I6400
-> +
-> +@item @code{nanoMIPS}
-> +I7200
-> +@end table
-> +
->  @node cpu_model_syntax_apps
->  @subsection Syntax for configuring CPU models
->  
-> 
+We're free to drop Jessie once QEMU 4.1 opens for development at
+end of April / early May.
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
