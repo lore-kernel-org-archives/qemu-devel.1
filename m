@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gS1x5-0003xg-Qj
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:40:38 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gS1zn-0005Ym-9f
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gS1x4-0006ie-BO
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:40:35 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41440)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gS1x2-0006Li-Al
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:40:32 -0500
-Received: by mail-wr1-x441.google.com with SMTP id x10so26765480wrs.8
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 07:40:23 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1gS1zk-0001i0-5T
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:43:23 -0500
+Resent-Message-Id: <E1gS1zk-0001i0-5T@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gS1zj-0001gr-U1
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:43:20 -0500
+In-Reply-To: <20181126230450.672-1-richard.henderson@linaro.org>
+Message-ID: <154341886395.18710.2013085867507201063@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-References: <20181122141741.11108-1-marcandre.lureau@redhat.com>
-	<0432176d-72a6-2dd4-ccc7-8486ea49be7b@weilnetz.de>
-In-Reply-To: <0432176d-72a6-2dd4-ccc7-8486ea49be7b@weilnetz.de>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 28 Nov 2018 19:40:09 +0400
-Message-ID: <CAJ+F1C+iGrQFRyQdxyWM7rF8wx8kt48C6aUuqQ6RaMU=r3MW_g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] docs: apply some qemu.org-like CSS style
- to HTML
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 28 Nov 2018 07:27:45 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/4] tcg: Remove unreachable code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: QEMU <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Hi
-
-On Wed, Nov 28, 2018 at 7:27 PM Stefan Weil <sw@weilnetz.de> wrote:
->
-> Am 22.11.2018 um 15:17 schrieb Marc-Andr=C3=A9 Lureau:
-> > Style a bit the HTML documents, to make them look like qemu.org pages.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  Makefile                     |   2 +
-> >  docs/texinfo-extra-head.html |   7 ++
-> >  docs/texinfo.css             | 226 +++++++++++++++++++++++++++++++++++
-> >  3 files changed, 235 insertions(+)
-> >  create mode 100644 docs/texinfo-extra-head.html
-> >  create mode 100644 docs/texinfo.css
->
->
-> I tried this patch, and here are the results without the patch and with
-> the patch, so everybody can compare both looks:
->
-> old: https://qemu.weilnetz.de/doc/qemu-doc.html
-> new: https://qemu.weilnetz.de/doc/3.1/qemu-doc.html
->
-> I like the new look and can use it from now on, no matter whether it is
-> merged into QEMU 3.1 or delayed for release 4.
-
-With my limited knowledge of CSS, I tried to apply a style close to
-what qemu.org already uses. Further tweaks would be welcome, but
-better left to someone with more web design skills.
-
->
-> Tested-by: Stefan Weil <sw@weilnetz.de>
->
-> PS: https://qemu.weilnetz.de/doc/3.1/qemu-ga-ref.html and
-> https://qemu.weilnetz.de/doc/3.1/qemu-qmp-ref.html are also candidates
-> for the new look.
-
-Oh, but the style is also applied for them, as they are also generated
-from the same texinfo->html process.
-
-I wonder if the generated pages could be somehow uploaded on release
-on qemu.org, or simply committed to qemu-web?
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+ODExMjYyMzA0NTAuNjcyLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTdWJqZWN0OiBb
+UWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gdGNnOiBSZW1vdmUgdW5yZWFjaGFibGUgY29kZQpUeXBl
+OiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
+ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
+CgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
+dG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4p
+Igpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3Rh
+bDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAk
+YyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsg
+dGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkK
+ZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
+ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
+Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAx
+ODExMjguMTgxNzAwLjEwMzg3ODI1NTY5NjU4ODcyMjMuYXRzdXNoaS5uZW1vdG9Ac29yZC5jby5q
+cCAtPiBwYXRjaGV3LzIwMTgxMTI4LjE4MTcwMC4xMDM4NzgyNTU2OTY1ODg3MjIzLmF0c3VzaGku
+bmVtb3RvQHNvcmQuY28uanAKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpmNzZiM2Jk
+IHRjZzogQWRkIHJlYWNoYWJsZV9jb2RlX3Bhc3MKODFiYjE4NCB0Y2c6IFJlZmVyZW5jZSBjb3Vu
+dCBsYWJlbHMKNTU5OWI0MyB0Y2c6IEFkZCBUQ0dfQ0FMTF9OT19SRVRVUk4KZDI3ZWM4MyB0Y2c6
+IFJlbnVtYmVyIFRDR19DQUxMXyogZmxhZ3MKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
+IFBBVENIIDEvNDogdGNnOiBSZW51bWJlciBUQ0dfQ0FMTF8qIGZsYWdzLi4uCkNoZWNraW5nIFBB
+VENIIDIvNDogdGNnOiBBZGQgVENHX0NBTExfTk9fUkVUVVJOLi4uCkNoZWNraW5nIFBBVENIIDMv
+NDogdGNnOiBSZWZlcmVuY2UgY291bnQgbGFiZWxzLi4uCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRl
+ZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiM4MzogRklMRTogdGNnL3RjZy5oOjI0OToKKyAg
+ICB1bnNpZ25lZCBpZCA6IDE1OwogICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJv
+aGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiM4NDogRklMRTogdGNnL3RjZy5oOjI1
+MDoKKyAgICB1bnNpZ25lZCByZWZzIDogMTY7CiAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDog
+MiBlcnJvcnMsIDAgd2FybmluZ3MsIDU2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNDogdGNnOiBBZGQgcmVhY2hh
+YmxlX2NvZGVfcGFzcy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
+d2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
+dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
