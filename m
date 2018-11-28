@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gS66a-0001Ms-Ij
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:06:41 -0500
+	(envelope-from <lvivier@redhat.com>) id 1gS698-0004r6-6B
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:09:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gS66W-0003Vv-KA
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:06:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42562)
+	(envelope-from <lvivier@redhat.com>) id 1gS692-00037F-4z
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:09:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43940)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gS66W-0003Se-Cl
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:06:36 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gS691-000354-SM
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:09:12 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2A53223E6CE
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 20:06:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1308A2CE90B
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 20:09:11 +0000 (UTC)
 References: <20181126200009.862-1-quintela@redhat.com>
-	<20181126200009.862-5-quintela@redhat.com>
+	<20181126200009.862-6-quintela@redhat.com>
 From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <b80018fd-e849-9b3e-5d46-886dbb9da847@redhat.com>
-Date: Wed, 28 Nov 2018 21:06:30 +0100
+Message-ID: <8dba0aa2-1647-c67f-3db8-1a981159f57e@redhat.com>
+Date: Wed, 28 Nov 2018 21:09:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181126200009.862-5-quintela@redhat.com>
+In-Reply-To: <20181126200009.862-6-quintela@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 04/16] virtio: split virtio rng bits
+Subject: Re: [Qemu-devel] [PATCH v2 05/16] virtio: split virtio balloon bits
  from virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -40,35 +40,16 @@ Cc: dgilbert@redhat.com, peterx@redhat.com
 
 On 26/11/2018 20:59, Juan Quintela wrote:
 > Signed-off-by: Juan Quintela <quintela@redhat.com>
-> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
+>  hw/virtio/Makefile.objs        |  1 +
+>  hw/virtio/virtio-balloon-pci.c | 94 ++++++++++++++++++++++++++++++++++
+>  hw/virtio/virtio-pci.c         | 58 ---------------------
+>  hw/virtio/virtio-pci.h         | 14 -----
+>  tests/Makefile.include         |  2 +-
+>  5 files changed, 96 insertions(+), 73 deletions(-)
+>  create mode 100644 hw/virtio/virtio-balloon-pci.c
 > 
-> Remove the "contributions after" clause.  This is based on
-> 
-> commit 59ccd20a9ac719cff82180429458728f03ec612f
-> Author: KONRAD Frederic <fred.konrad@greensocs.com>
-> Date:   Wed Apr 24 10:07:56 2013 +0200
-> ---
->  hw/virtio/Makefile.objs    |  1 +
->  hw/virtio/virtio-pci.c     | 52 -----------------------
->  hw/virtio/virtio-pci.h     | 14 -------
->  hw/virtio/virtio-rng-pci.c | 86 ++++++++++++++++++++++++++++++++++++++
->  tests/Makefile.include     |  1 +
->  5 files changed, 88 insertions(+), 66 deletions(-)
->  create mode 100644 hw/virtio/virtio-rng-pci.c
-...
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index fb0b449c02..e8235890ec 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -149,6 +149,7 @@ check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
->  check-qtest-virtio-y += tests/virtio-balloon-test$(EXESUF)
->  check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
->  check-qtest-virtio-y += tests/virtio-rng-test$(EXESUF)
-> +check-qtest-virtio-$(CONFIG_VIRTIO_RNG) += tests/virtio-rng-test$(EXESUF)
-
-I think you should remove the line just above.
-
-except that:
 
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
