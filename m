@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gS8ap-0002Nh-Br
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:46:05 -0500
+	(envelope-from <benh@kernel.crashing.org>) id 1gS93W-0006hT-NU
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 18:15:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gS8ak-0002cz-OL
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:46:01 -0500
-Received: from 15.mo7.mail-out.ovh.net ([87.98.180.21]:39055)
+	(envelope-from <benh@kernel.crashing.org>) id 1gS93P-0002lv-CO
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 18:15:40 -0500
+Received: from gate.crashing.org ([63.228.1.57]:43617)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gS8aj-0002Z5-BY
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 17:45:57 -0500
-Received: from player778.ha.ovh.net (unknown [10.109.159.222])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id D0D43ECE4A
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 23:45:53 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-23-clg@kaod.org>
-	<20181128055221.GE2251@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <c41e5f96-c1f4-6baf-d069-c598b6ca3b03@kaod.org>
-Date: Wed, 28 Nov 2018 23:45:46 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181128055221.GE2251@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 22/36] spapr/xive: add models for KVM
- support
+	(Exim 4.71) (envelope-from <benh@kernel.crashing.org>)
+	id 1gS93L-0002eN-H2
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 18:15:33 -0500
+Message-ID: <f4349b9ee95cbd9d5b16e9033fdf0d7c9e99aebf.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Thu, 29 Nov 2018 10:15:20 +1100
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [RFC/PATCH] i386: Atomically update PTEs with mttcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,756 +25,304 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-On 11/28/18 6:52 AM, David Gibson wrote:
-> On Fri, Nov 16, 2018 at 11:57:15AM +0100, C=E9dric Le Goater wrote:
->> This introduces a set of XIVE models specific to KVM which derive from
->> the XIVE base models. The interfaces with KVM are a new capability and
->> a new KVM device for the XIVE native exploitation interrupt mode.
->>
->> They handle the initialization of the TIMA and the source ESB memory
->> regions which have a different type under KVM. These are 'ram device'
->> memory mappings, similarly to VFIO, exposed to the guest and the
->> associated VMAs on the host are populated dynamically with the
->> appropriate pages using a fault handler.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> The logic here looks fine, but I think it would be better to activate
-> it with explicit if (kvm) type logic rather than using a subclass.
+Afaik, this isn't well documented (at least it wasn't when I last looked)
+but OSes such as Linux rely on this behaviour:
 
-ok. ARM has taken a different path, the one proposed below, but it should=
-=20
-be possible to use a "if (kvm)" type logic. There should be less noise=20
-in the object design.
+The HW updates to the page tables need to be done atomically with the
+checking of the present bit (and other permissions).
 
-=20
->> ---
->>  default-configs/ppc64-softmmu.mak |   1 +
->>  include/hw/ppc/spapr_xive.h       |  18 ++
->>  include/hw/ppc/xive.h             |   3 +
->>  linux-headers/asm-powerpc/kvm.h   |  12 +
->>  linux-headers/linux/kvm.h         |   4 +
->>  target/ppc/kvm_ppc.h              |   6 +
->>  hw/intc/spapr_xive_kvm.c          | 430 +++++++++++++++++++++++++++++=
+This is what allows Linux to do simple xchg of PTEs with 0 and assume
+the value read has "final" stable dirty and accessed bits (the TLB
+invalidation is deferred).
+
+Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+---
+
+This is lightly tested at this point, mostly to gather comments on the
+approach.
+
+I noticed that RiscV is attempting to do something similar but with endian
+bugs, at least from my reading of the code.
+
+ include/exec/memory_ldst.inc.h |   3 +
+ memory_ldst.inc.c              |  38 ++++++++++++
+ target/i386/excp_helper.c      | 104 +++++++++++++++++++++++++--------
+ 3 files changed, 121 insertions(+), 24 deletions(-)
+
+diff --git a/include/exec/memory_ldst.inc.h b/include/exec/memory_ldst.inc.h
+index 272c20f02e..b7a41a0ad4 100644
+--- a/include/exec/memory_ldst.inc.h
++++ b/include/exec/memory_ldst.inc.h
+@@ -28,6 +28,9 @@ extern uint64_t glue(address_space_ldq, SUFFIX)(ARG1_DECL,
+     hwaddr addr, MemTxAttrs attrs, MemTxResult *result);
+ extern void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
+     hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result);
++extern uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DECL,
++    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs,
++    MemTxResult *result);
+ extern void glue(address_space_stw, SUFFIX)(ARG1_DECL,
+     hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result);
+ extern void glue(address_space_stl, SUFFIX)(ARG1_DECL,
+diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
+index acf865b900..63af8f7dd2 100644
+--- a/memory_ldst.inc.c
++++ b/memory_ldst.inc.c
+@@ -320,6 +320,44 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
+     RCU_READ_UNLOCK();
+ }
+ 
++/* This is meant to be used for atomic PTE updates under MT-TCG */
++uint32_t glue(address_space_cmpxchgl_notdirty, SUFFIX)(ARG1_DECL,
++    hwaddr addr, uint32_t old, uint32_t new, MemTxAttrs attrs, MemTxResult *result)
++{
++    uint8_t *ptr;
++    MemoryRegion *mr;
++    hwaddr l = 4;
++    hwaddr addr1;
++    MemTxResult r;
++    uint8_t dirty_log_mask;
 +
->>  hw/ppc/spapr.c                    |   7 +-
->>  hw/ppc/spapr_irq.c                |  19 +-
->>  target/ppc/kvm.c                  |   7 +
->>  hw/intc/Makefile.objs             |   1 +
->>  11 files changed, 503 insertions(+), 5 deletions(-)
->>  create mode 100644 hw/intc/spapr_xive_kvm.c
->>
->> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64=
--softmmu.mak
->> index 7f34ad0528ed..c1bf5cd951f5 100644
->> --- a/default-configs/ppc64-softmmu.mak
->> +++ b/default-configs/ppc64-softmmu.mak
->> @@ -18,6 +18,7 @@ CONFIG_XICS_SPAPR=3D$(CONFIG_PSERIES)
->>  CONFIG_XICS_KVM=3D$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
->>  CONFIG_XIVE=3D$(CONFIG_PSERIES)
->>  CONFIG_XIVE_SPAPR=3D$(CONFIG_PSERIES)
->> +CONFIG_XIVE_KVM=3D$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
->>  CONFIG_MEM_DEVICE=3Dy
->>  CONFIG_DIMM=3Dy
->>  CONFIG_SPAPR_RNG=3Dy
->> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
->> index aca2969a09ab..9c817bb7ae74 100644
->> --- a/include/hw/ppc/spapr_xive.h
->> +++ b/include/hw/ppc/spapr_xive.h
->> @@ -40,6 +40,10 @@ typedef struct sPAPRXive {
->>      /* TIMA mapping address */
->>      hwaddr        tm_base;
->>      MemoryRegion  tm_mmio;
->> +
->> +    /* KVM support */
->> +    int           fd;
->> +    void          *tm_mmap;
->>  } sPAPRXive;
->> =20
->>  #define SPAPR_XIVE_BASE_CLASS(klass) \
->> @@ -83,4 +87,18 @@ void spapr_xive_hcall_init(sPAPRMachineState *spapr=
-);
->>  void spapr_dt_xive(sPAPRXive *xive, int nr_servers, void *fdt,
->>                     uint32_t phandle);
->> =20
->> +/*
->> + * XIVE KVM models
->> + */
->> +
->> +#define TYPE_SPAPR_XIVE_KVM  "spapr-xive-kvm"
->> +#define SPAPR_XIVE_KVM(obj)  OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAP=
-R_XIVE_KVM)
->> +
->> +#define TYPE_XIVE_SOURCE_KVM "xive-source-kvm"
->> +#define XIVE_SOURCE_KVM(obj) \
->> +    OBJECT_CHECK(XiveSource, (obj), TYPE_XIVE_SOURCE_KVM)
->> +
->> +#define TYPE_XIVE_TCTX_KVM   "xive-tctx-kvm"
->> +#define XIVE_TCTX_KVM(obj)   OBJECT_CHECK(XiveTCTX, (obj), TYPE_XIVE_=
-TCTX_KVM)
->> +
->>  #endif /* PPC_SPAPR_XIVE_H */
->> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->> index 281ed370121c..7aaf5a182cb3 100644
->> --- a/include/hw/ppc/xive.h
->> +++ b/include/hw/ppc/xive.h
->> @@ -69,6 +69,9 @@ typedef struct XiveSource {
->>      uint32_t        esb_shift;
->>      MemoryRegion    esb_mmio;
->> =20
->> +    /* KVM support */
->> +    void            *esb_mmap;
->> +
->>      XiveFabric      *xive;
->>  } XiveSource;
->> =20
->> diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-power=
-pc/kvm.h
->> index 8c876c166ef2..f34c971491dd 100644
->> --- a/linux-headers/asm-powerpc/kvm.h
->> +++ b/linux-headers/asm-powerpc/kvm.h
->=20
-> Updates to linux-headers need to be split out into a separate patch.
-> Eventually (i.e. by the time we merge) they should be just "update
-> headers to SHA XXX" not picking and choosing pieces.
-
-ok. I am starting to separate the KVM definition from the patch now
-that the interface is stabilizing.=20
-
->> @@ -675,4 +675,16 @@ struct kvm_ppc_cpu_char {
->>  #define  KVM_XICS_PRESENTED		(1ULL << 43)
->>  #define  KVM_XICS_QUEUED		(1ULL << 44)
->> =20
->> +/* POWER9 XIVE Native Interrupt Controller */
->> +#define KVM_DEV_XIVE_GRP_CTRL		1
->> +#define   KVM_DEV_XIVE_GET_ESB_FD	1
->> +#define   KVM_DEV_XIVE_GET_TIMA_FD	2
->> +#define   KVM_DEV_XIVE_VC_BASE		3
->> +#define KVM_DEV_XIVE_GRP_SOURCES	2	/* 64-bit source attributes */
->> +
->> +/* Layout of 64-bit XIVE source attribute values */
->> +#define KVM_XIVE_LEVEL_SENSITIVE	(1ULL << 0)
->> +#define KVM_XIVE_LEVEL_ASSERTED		(1ULL << 1)
->> +
->> +
->>  #endif /* __LINUX_KVM_POWERPC_H */
->> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
->> index f11a7eb49cfa..59fa8d8d7f39 100644
->> --- a/linux-headers/linux/kvm.h
->> +++ b/linux-headers/linux/kvm.h
->> @@ -965,6 +965,8 @@ struct kvm_ppc_resize_hpt {
->>  #define KVM_CAP_COALESCED_PIO 162
->>  #define KVM_CAP_HYPERV_ENLIGHTENED_VMCS 163
->>  #define KVM_CAP_EXCEPTION_PAYLOAD 164
->> +#define KVM_CAP_ARM_VM_IPA_SIZE 165
->> +#define KVM_CAP_PPC_IRQ_XIVE 166
->> =20
->>  #ifdef KVM_CAP_IRQ_ROUTING
->> =20
->> @@ -1188,6 +1190,8 @@ enum kvm_device_type {
->>  #define KVM_DEV_TYPE_ARM_VGIC_V3	KVM_DEV_TYPE_ARM_VGIC_V3
->>  	KVM_DEV_TYPE_ARM_VGIC_ITS,
->>  #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
->> +	KVM_DEV_TYPE_XIVE,
->> +#define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
->>  	KVM_DEV_TYPE_MAX,
->>  };
->> =20
->> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
->> index bdfaa4e70a83..d2159660f9f2 100644
->> --- a/target/ppc/kvm_ppc.h
->> +++ b/target/ppc/kvm_ppc.h
->> @@ -59,6 +59,7 @@ bool kvmppc_has_cap_fixup_hcalls(void);
->>  bool kvmppc_has_cap_htm(void);
->>  bool kvmppc_has_cap_mmu_radix(void);
->>  bool kvmppc_has_cap_mmu_hash_v3(void);
->> +bool kvmppc_has_cap_xive(void);
->>  int kvmppc_get_cap_safe_cache(void);
->>  int kvmppc_get_cap_safe_bounds_check(void);
->>  int kvmppc_get_cap_safe_indirect_branch(void);
->> @@ -307,6 +308,11 @@ static inline bool kvmppc_has_cap_mmu_hash_v3(voi=
-d)
->>      return false;
->>  }
->> =20
->> +static inline bool kvmppc_has_cap_xive(void)
->> +{
->> +    return false;
->> +}
->> +
->>  static inline int kvmppc_get_cap_safe_cache(void)
->>  {
->>      return 0;
->> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
->> new file mode 100644
->> index 000000000000..767f90826e43
->> --- /dev/null
->> +++ b/hw/intc/spapr_xive_kvm.c
->> @@ -0,0 +1,430 @@
->> +/*
->> + * QEMU PowerPC sPAPR XIVE interrupt controller model
->> + *
->> + * Copyright (c) 2017-2018, IBM Corporation.
->> + *
->> + * This code is licensed under the GPL version 2 or later. See the
->> + * COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qemu/log.h"
->> +#include "qemu/error-report.h"
->> +#include "qapi/error.h"
->> +#include "target/ppc/cpu.h"
->> +#include "sysemu/cpus.h"
->> +#include "sysemu/kvm.h"
->> +#include "hw/ppc/spapr.h"
->> +#include "hw/ppc/spapr_xive.h"
->> +#include "hw/ppc/xive.h"
->> +#include "kvm_ppc.h"
->> +
->> +#include <sys/ioctl.h>
->> +
->> +/*
->> + * Helpers for CPU hotplug
->> + */
->> +typedef struct KVMEnabledCPU {
->> +    unsigned long vcpu_id;
->> +    QLIST_ENTRY(KVMEnabledCPU) node;
->> +} KVMEnabledCPU;
->> +
->> +static QLIST_HEAD(, KVMEnabledCPU)
->> +    kvm_enabled_cpus =3D QLIST_HEAD_INITIALIZER(&kvm_enabled_cpus);
->> +
->> +static bool kvm_cpu_is_enabled(CPUState *cs)
->> +{
->> +    KVMEnabledCPU *enabled_cpu;
->> +    unsigned long vcpu_id =3D kvm_arch_vcpu_id(cs);
->> +
->> +    QLIST_FOREACH(enabled_cpu, &kvm_enabled_cpus, node) {
->> +        if (enabled_cpu->vcpu_id =3D=3D vcpu_id) {
->> +            return true;
->> +        }
->> +    }
->> +    return false;
->> +}
->> +
->> +static void kvm_cpu_enable(CPUState *cs)
->> +{
->> +    KVMEnabledCPU *enabled_cpu;
->> +    unsigned long vcpu_id =3D kvm_arch_vcpu_id(cs);
->> +
->> +    enabled_cpu =3D g_malloc(sizeof(*enabled_cpu));
->> +    enabled_cpu->vcpu_id =3D vcpu_id;
->> +    QLIST_INSERT_HEAD(&kvm_enabled_cpus, enabled_cpu, node);
->> +}
->=20
-> Blech, I hope we can find a better way of tracking this than an ugly
-> list.
-
-yes ... We have one similar for XICS.
-
->> +
->> +/*
->> + * XIVE Thread Interrupt Management context (KVM)
->> + */
->> +
->> +static void xive_tctx_kvm_init(XiveTCTX *tctx, Error **errp)
->> +{
->> +    sPAPRXive *xive;
->> +    unsigned long vcpu_id;
->> +    int ret;
->> +
->> +    /* Check if CPU was hot unplugged and replugged. */
->> +    if (kvm_cpu_is_enabled(tctx->cs)) {
->> +        return;
->> +    }
->> +
->> +    vcpu_id =3D kvm_arch_vcpu_id(tctx->cs);
->> +    xive =3D SPAPR_XIVE_KVM(tctx->xrtr);
->=20
-> Is this the first use of tctx->xrtr?
-
-No, the second. the first is the reset_tctx() ops doing the CAM reset.
-But we said that we could remove it.
-
->=20
->> +    ret =3D kvm_vcpu_enable_cap(tctx->cs, KVM_CAP_PPC_IRQ_XIVE, 0, xi=
-ve->fd,
->> +                              vcpu_id, 0);
->> +    if (ret < 0) {
->> +        error_setg(errp, "Unable to connect CPU%ld to KVM XIVE device=
-: %s",
->> +                   vcpu_id, strerror(errno));
->> +        return;
->> +    }
->> +
->> +    kvm_cpu_enable(tctx->cs);
->> +}
->> +
->> +static void xive_tctx_kvm_realize(DeviceState *dev, Error **errp)
->> +{
->> +    XiveTCTX *tctx =3D XIVE_TCTX_KVM(dev);
->> +    XiveTCTXClass *xtc =3D XIVE_TCTX_BASE_GET_CLASS(dev);
->> +    Error *local_err =3D NULL;
->> +
->> +    xtc->parent_realize(dev, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->> +    xive_tctx_kvm_init(tctx, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +}
->> +
->> +static void xive_tctx_kvm_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +    XiveTCTXClass *xtc =3D XIVE_TCTX_BASE_CLASS(klass);
->> +
->> +    dc->desc =3D "sPAPR XIVE KVM Interrupt Thread Context";
->> +
->> +    device_class_set_parent_realize(dc, xive_tctx_kvm_realize,
->> +                                    &xtc->parent_realize);
->> +}
->> +
->> +static const TypeInfo xive_tctx_kvm_info =3D {
->> +    .name          =3D TYPE_XIVE_TCTX_KVM,
->> +    .parent        =3D TYPE_XIVE_TCTX_BASE,
->> +    .instance_size =3D sizeof(XiveTCTX),
->> +    .class_init    =3D xive_tctx_kvm_class_init,
->> +    .class_size    =3D sizeof(XiveTCTXClass),
->> +};
->> +
->> +/*
->> + * XIVE Interrupt Source (KVM)
->> + */
->> +
->> +static void xive_source_kvm_init(XiveSource *xsrc, Error **errp)
->> +{
->> +    sPAPRXive *xive =3D SPAPR_XIVE_KVM(xsrc->xive);
->> +    int i;
->> +
->> +    /*
->> +     * At reset, interrupt sources are simply created and MASKED. We
->> +     * only need to inform the KVM device about their type: LSI or
->> +     * MSI.
->> +     */
->> +    for (i =3D 0; i < xsrc->nr_irqs; i++) {
->> +        Error *local_err =3D NULL;
->> +        uint64_t state =3D 0;
->> +
->> +        if (xive_source_irq_is_lsi(xsrc, i)) {
->> +            state |=3D KVM_XIVE_LEVEL_SENSITIVE;
->> +            if (xsrc->status[i] & XIVE_STATUS_ASSERTED) {
->> +                state |=3D KVM_XIVE_LEVEL_ASSERTED;
->> +            }
->> +        }
->> +
->> +        kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCES, i, &sta=
-te,
->> +                          true, &local_err);
->> +        if (local_err) {
->> +            error_propagate(errp, local_err);
->> +            return;
->> +        }
->> +    }
->> +}
->> +
->> +static void xive_source_kvm_reset(DeviceState *dev)
->> +{
->> +    XiveSource *xsrc =3D XIVE_SOURCE_KVM(dev);
->> +    XiveSourceClass *xsc =3D XIVE_SOURCE_BASE_GET_CLASS(dev);
->> +
->> +    xsc->parent_reset(dev);
->> +
->> +    xive_source_kvm_init(xsrc, &error_fatal);
->> +}
->> +
->> +static void xive_source_kvm_set_irq(void *opaque, int srcno, int val)
->> +{
->> +    XiveSource *xsrc =3D opaque;
->> +    struct kvm_irq_level args;
->> +    int rc;
->> +
->> +    args.irq =3D srcno;
->> +    if (!xive_source_irq_is_lsi(xsrc, srcno)) {
->> +        if (!val) {
->> +            return;
->> +        }
->> +        args.level =3D KVM_INTERRUPT_SET;
->> +    } else {
->> +        if (val) {
->> +            xsrc->status[srcno] |=3D XIVE_STATUS_ASSERTED;
->> +            args.level =3D KVM_INTERRUPT_SET_LEVEL;
->> +        } else {
->> +            xsrc->status[srcno] &=3D ~XIVE_STATUS_ASSERTED;
->> +            args.level =3D KVM_INTERRUPT_UNSET;
->> +        }
->> +    }
->> +    rc =3D kvm_vm_ioctl(kvm_state, KVM_IRQ_LINE, &args);
->> +    if (rc < 0) {
->> +        error_report("kvm_irq_line() failed : %s", strerror(errno));
->> +    }
->> +}
->> +
->> +static void *spapr_xive_kvm_mmap(sPAPRXive *xive, int ctrl, size_t le=
-n,
->> +                                 Error **errp)
->> +{
->> +    Error *local_err =3D NULL;
->> +    void *addr;
->> +    int fd;
->> +
->> +    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_CTRL, ctrl, &fd, fal=
-se,
->> +                      &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return NULL;
->> +    }
->> +
->> +    addr =3D mmap(NULL, len, PROT_WRITE | PROT_READ, MAP_SHARED, fd, =
-0);
->> +    close(fd);
->> +    if (addr =3D=3D MAP_FAILED) {
->> +        error_setg_errno(errp, errno, "Unable to set XIVE mmaping");
->> +        return NULL;
->> +    }
->> +
->> +    return addr;
->> +}
->> +
->> +/*
->> + * The sPAPRXive KVM model should have initialized the KVM device
->> + * before initializing the source
->> + */
->> +static void xive_source_kvm_mmap(XiveSource *xsrc, Error **errp)
->> +{
->> +    sPAPRXive *xive =3D SPAPR_XIVE_KVM(xsrc->xive);
->> +    Error *local_err =3D NULL;
->> +    size_t esb_len;
->> +
->> +    esb_len =3D (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
->> +    xsrc->esb_mmap =3D spapr_xive_kvm_mmap(xive, KVM_DEV_XIVE_GET_ESB=
-_FD,
->> +                                         esb_len, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->> +    memory_region_init_ram_device_ptr(&xsrc->esb_mmio, OBJECT(xsrc),
->> +                                      "xive.esb", esb_len, xsrc->esb_=
-mmap);
->> +    sysbus_init_mmio(SYS_BUS_DEVICE(xsrc), &xsrc->esb_mmio);
->> +}
->> +
->> +static void xive_source_kvm_realize(DeviceState *dev, Error **errp)
->> +{
->> +    XiveSource *xsrc =3D XIVE_SOURCE_KVM(dev);
->> +    XiveSourceClass *xsc =3D XIVE_SOURCE_BASE_GET_CLASS(dev);
->> +    Error *local_err =3D NULL;
->> +
->> +    xsc->parent_realize(dev, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->> +    xsrc->qirqs =3D qemu_allocate_irqs(xive_source_kvm_set_irq, xsrc,
->> +                                     xsrc->nr_irqs);
->> +
->> +    xive_source_kvm_mmap(xsrc, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +}
->> +
->> +static void xive_source_kvm_unrealize(DeviceState *dev, Error **errp)
->> +{
->> +    XiveSource *xsrc =3D XIVE_SOURCE_KVM(dev);
->> +    size_t esb_len =3D (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
->> +
->> +    munmap(xsrc->esb_mmap, esb_len);
->> +}
->> +
->> +static void xive_source_kvm_class_init(ObjectClass *klass, void *data=
-)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +    XiveSourceClass *xsc =3D XIVE_SOURCE_BASE_CLASS(klass);
->> +
->> +    device_class_set_parent_realize(dc, xive_source_kvm_realize,
->> +                                    &xsc->parent_realize);
->> +    device_class_set_parent_reset(dc, xive_source_kvm_reset,
->> +                                  &xsc->parent_reset);
->> +
->> +    dc->desc =3D "sPAPR XIVE KVM Interrupt Source";
->> +    dc->unrealize =3D xive_source_kvm_unrealize;
->> +}
->> +
->> +static const TypeInfo xive_source_kvm_info =3D {
->> +    .name =3D TYPE_XIVE_SOURCE_KVM,
->> +    .parent =3D TYPE_XIVE_SOURCE_BASE,
->> +    .instance_size =3D sizeof(XiveSource),
->> +    .class_init    =3D xive_source_kvm_class_init,
->> +    .class_size    =3D sizeof(XiveSourceClass),
->> +};
->> +
->> +/*
->> + * sPAPR XIVE Router (KVM)
->> + */
->> +
->> +static void spapr_xive_kvm_instance_init(Object *obj)
->> +{
->> +    sPAPRXive *xive =3D SPAPR_XIVE_KVM(obj);
->> +
->> +    xive->fd =3D -1;
->> +
->> +    /* We need a KVM flavored source */
->> +    object_initialize(&xive->source, sizeof(xive->source),
->> +                      TYPE_XIVE_SOURCE_KVM);
->> +    object_property_add_child(obj, "source", OBJECT(&xive->source), N=
-ULL);
->> +
->> +    /* No KVM support for END ESBs. OPAL doesn't either */
->> +    object_initialize(&xive->end_source, sizeof(xive->end_source),
->> +                      TYPE_XIVE_END_SOURCE);
->> +    object_property_add_child(obj, "end_source", OBJECT(&xive->end_so=
-urce),
->> +                              NULL);
->> +}
->> +
->> +static void spapr_xive_kvm_init(sPAPRXive *xive, Error **errp)
->> +{
->> +    Error *local_err =3D NULL;
->> +    size_t tima_len;
->> +
->> +    if (!kvm_enabled() || !kvmppc_has_cap_xive()) {
->> +        error_setg(errp,
->> +                   "IRQ_XIVE capability must be present for KVM XIVE =
-device");
->> +        return;
->> +    }
->> +
->> +    /* First, create the KVM XIVE device */
->> +    xive->fd =3D kvm_create_device(kvm_state, KVM_DEV_TYPE_XIVE, fals=
-e);
->> +    if (xive->fd < 0) {
->> +        error_setg_errno(errp, -xive->fd, "error creating KVM XIVE de=
-vice");
->> +        return;
->> +    }
->> +
->> +    /* Source ESBs KVM mapping
->> +     *
->> +     * Inform KVM where we will map the ESB pages. This is needed by
->> +     * the H_INT_GET_SOURCE_INFO hcall which returns the source
->> +     * characteristics, among which the ESB page address.
->> +     */
->> +    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_CTRL, KVM_DEV_XIVE_V=
-C_BASE,
->> +                      &xive->vc_base, true, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->> +    /* Let the XiveSource KVM model handle the mapping for the moment=
- */
->> +
->> +    /* TIMA KVM mapping
->> +     *
->> +     * We could also inform KVM where the TIMA will be mapped but as
->> +     * this is a fixed MMIO address for the system it does not seem
->> +     * necessary to provide a KVM ioctl to change it.
->> +     */
->> +    tima_len =3D 4ull << TM_SHIFT;
->> +    xive->tm_mmap =3D spapr_xive_kvm_mmap(xive, KVM_DEV_XIVE_GET_TIMA=
-_FD,
->> +                                        tima_len, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +    memory_region_init_ram_device_ptr(&xive->tm_mmio, OBJECT(xive),
->> +                                      "xive.tima", tima_len, xive->tm=
-_mmap);
->> +    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
->> +
->> +    kvm_kernel_irqchip =3D true;
->> +    kvm_msi_via_irqfd_allowed =3D true;
->> +    kvm_gsi_direct_mapping =3D true;
->> +}
->> +
->> +static void spapr_xive_kvm_realize(DeviceState *dev, Error **errp)
->> +{
->> +    sPAPRXive *xive =3D SPAPR_XIVE_KVM(dev);
->> +    sPAPRXiveClass *sxc =3D SPAPR_XIVE_BASE_GET_CLASS(dev);
->> +    Error *local_err =3D NULL;
->> +
->> +    spapr_xive_kvm_init(xive, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->> +    /* Initialize the source and the local routing tables */
->> +    sxc->parent_realize(dev, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +}
->> +
->> +static void spapr_xive_kvm_unrealize(DeviceState *dev, Error **errp)
->> +{
->> +    sPAPRXive *xive =3D SPAPR_XIVE_KVM(dev);
->> +
->> +    close(xive->fd);
->> +    xive->fd =3D -1;
->> +
->> +    munmap(xive->tm_mmap, 4ull << TM_SHIFT);
->> +}
->> +
->> +static void spapr_xive_kvm_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +    sPAPRXiveClass *sxc =3D SPAPR_XIVE_BASE_CLASS(klass);
->> +
->> +    device_class_set_parent_realize(dc, spapr_xive_kvm_realize,
->> +                                    &sxc->parent_realize);
->> +
->> +    dc->desc =3D "sPAPR XIVE KVM Interrupt Controller";
->> +    dc->unrealize =3D spapr_xive_kvm_unrealize;
->> +}
->> +
->> +static const TypeInfo spapr_xive_kvm_info =3D {
->> +    .name =3D TYPE_SPAPR_XIVE_KVM,
->> +    .parent =3D TYPE_SPAPR_XIVE_BASE,
->> +    .instance_init =3D spapr_xive_kvm_instance_init,
->> +    .instance_size =3D sizeof(sPAPRXive),
->> +    .class_init =3D spapr_xive_kvm_class_init,
->> +    .class_size =3D sizeof(sPAPRXiveClass),
->> +};
->> +
->> +static void xive_kvm_register_types(void)
->> +{
->> +    type_register_static(&spapr_xive_kvm_info);
->> +    type_register_static(&xive_source_kvm_info);
->> +    type_register_static(&xive_tctx_kvm_info);
->> +}
->> +
->> +type_init(xive_kvm_register_types)
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index f9cf2debff5a..d1be2579cd9b 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1125,8 +1125,11 @@ static void spapr_dt_ov5_platform_support(sPAPR=
-MachineState *spapr, void *fdt,
->>          } else {
->>              val[3] =3D 0x00; /* Hash */
->>          }
->> -        /* TODO: test KVM support */
->> -        val[1] =3D smc->irq->ov5;
->> +        if (kvmppc_has_cap_xive()) {
->> +            val[1] =3D smc->irq->ov5;
->> +        } else {
->> +            val[1] =3D 0x00;
->> +        }
->>      } else {
->>          val[1] =3D smc->irq->ov5;
->> =20
->> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->> index 33dd5da7d255..92ef53743b64 100644
->> --- a/hw/ppc/spapr_irq.c
->> +++ b/hw/ppc/spapr_irq.c
->> @@ -273,9 +273,22 @@ static void spapr_irq_init_xive(sPAPRMachineState=
- *spapr, int nr_irqs,
->>      Error *local_err =3D NULL;
->> =20
->>      /* KVM XIVE support */
->> -    if (kvm_enabled()) {
->> -        if (machine_kernel_irqchip_required(machine)) {
->> -            error_setg(errp, "kernel_irqchip requested. no XIVE suppo=
-rt");
->> +    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
->> +        spapr->xive_tctx_type =3D TYPE_XIVE_TCTX_KVM;
->> +        spapr->xive =3D spapr_xive_create(spapr, TYPE_SPAPR_XIVE_KVM,=
- nr_irqs,
->> +                                        nr_servers, &local_err);
->> +
->> +        if (local_err && machine_kernel_irqchip_required(machine)) {
->> +            error_propagate(errp, local_err);
->> +            error_prepend(errp, "kernel_irqchip requested but init fa=
-iled : ");
->> +            return;
->> +        }
->> +
->> +        /*
->> +         * XIVE support is activated under KVM. No need to initialize
->> +         * the fallback mode under QEMU
->> +         */
->> +        if (spapr->xive) {
->>              return;
->>          }
->>      }
->> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
->> index f81327d6cd47..3b7cf106242b 100644
->> --- a/target/ppc/kvm.c
->> +++ b/target/ppc/kvm.c
->> @@ -86,6 +86,7 @@ static int cap_fixup_hcalls;
->>  static int cap_htm;             /* Hardware transactional memory supp=
-ort */
->>  static int cap_mmu_radix;
->>  static int cap_mmu_hash_v3;
->> +static int cap_xive;
->>  static int cap_resize_hpt;
->>  static int cap_ppc_pvr_compat;
->>  static int cap_ppc_safe_cache;
->> @@ -149,6 +150,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->>      cap_htm =3D kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
->>      cap_mmu_radix =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX=
-);
->>      cap_mmu_hash_v3 =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HAS=
-H_V3);
->> +    cap_xive =3D kvm_vm_check_extension(s, KVM_CAP_PPC_IRQ_XIVE);
->>      cap_resize_hpt =3D kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE=
-_HPT);
->>      kvmppc_get_cpu_characteristics(s);
->>      cap_ppc_nested_kvm_hv =3D kvm_vm_check_extension(s, KVM_CAP_PPC_N=
-ESTED_HV);
->> @@ -2385,6 +2387,11 @@ static int parse_cap_ppc_safe_indirect_branch(s=
-truct kvm_ppc_cpu_char c)
->>      return 0;
->>  }
->> =20
->> +bool kvmppc_has_cap_xive(void)
->> +{
->> +    return cap_xive;
->> +}
->> +
->>  static void kvmppc_get_cpu_characteristics(KVMState *s)
->>  {
->>      struct kvm_ppc_cpu_char c;
->> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
->> index eacd26836ebf..dd4d69db2bdd 100644
->> --- a/hw/intc/Makefile.objs
->> +++ b/hw/intc/Makefile.objs
->> @@ -39,6 +39,7 @@ obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
->>  obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
->>  obj-$(CONFIG_XIVE) +=3D xive.o
->>  obj-$(CONFIG_XIVE_SPAPR) +=3D spapr_xive.o spapr_xive_hcall.o
->> +obj-$(CONFIG_XIVE_KVM) +=3D spapr_xive_kvm.o
->>  obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
->>  obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
->>  obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
->=20
++    /* Must test result */
++    assert(result);
++
++    RCU_READ_LOCK();
++    mr = TRANSLATE(addr, &addr1, &l, true, attrs);
++    if (l < 4 || !memory_access_is_direct(mr, true)) {
++        r = MEMTX_ERROR;
++    } else {
++        uint32_t orig = old;
++
++        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
++        old = atomic_cmpxchg(ptr, orig, new);
++
++        if (old == orig) {
++            dirty_log_mask = memory_region_get_dirty_log_mask(mr);
++            dirty_log_mask &= ~(1 << DIRTY_MEMORY_CODE);
++            cpu_physical_memory_set_dirty_range(memory_region_get_ram_addr(mr) + addr,
++                                                4, dirty_log_mask);
++        }
++        r = MEMTX_OK;
++    }
++    *result = r;
++    RCU_READ_UNLOCK();
++
++    return old;
++}
++
+ /* warning: addr must be aligned */
+ static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
+     hwaddr addr, uint32_t val, MemTxAttrs attrs,
+diff --git a/target/i386/excp_helper.c b/target/i386/excp_helper.c
+index 49231f6b69..5ccb9d6d6a 100644
+--- a/target/i386/excp_helper.c
++++ b/target/i386/excp_helper.c
+@@ -157,11 +157,45 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+ 
+ #else
+ 
++static inline uint64_t update_entry(CPUState *cs, target_ulong addr,
++                                    uint64_t orig_entry, uint32_t bits)
++{
++    uint64_t new_entry = orig_entry | bits;
++
++    /* Write the updated bottom 32-bits */
++    if (qemu_tcg_mttcg_enabled()) {
++        uint32_t old_le = cpu_to_le32(orig_entry);
++        uint32_t new_le = cpu_to_le32(new_entry);
++        MemTxResult result;
++        uint32_t old_ret;
++
++        old_ret = address_space_cmpxchgl_notdirty(cs->as, addr,
++                                                  old_le, new_le,
++                                                  MEMTXATTRS_UNSPECIFIED,
++                                                  &result);
++        if (result == MEMTX_OK) {
++            if (old_ret != old_le) {
++                new_entry = 0;
++            }
++            return new_entry;
++        }
++
++        /* Do we need to support this case where PTEs aren't in RAM ?
++         *
++         * For now fallback to non-atomic case
++         */
++    }
++
++    x86_stl_phys_notdirty(cs, addr, new_entry);
++
++    return new_entry;
++}
++
+ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
+                         int *prot)
+ {
+     CPUX86State *env = &X86_CPU(cs)->env;
+-    uint64_t rsvd_mask = PG_HI_RSVD_MASK;
++    uint64_t rsvd_mask;
+     uint64_t ptep, pte;
+     uint64_t exit_info_1 = 0;
+     target_ulong pde_addr, pte_addr;
+@@ -172,6 +206,8 @@ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
+         return gphys;
+     }
+ 
++ restart:
++    rsvd_mask = PG_HI_RSVD_MASK;
+     if (!(env->nested_pg_mode & SVM_NPT_NXE)) {
+         rsvd_mask |= PG_NX_MASK;
+     }
+@@ -198,8 +234,10 @@ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
+                 goto do_fault_rsvd;
+             }
+             if (!(pml4e & PG_ACCESSED_MASK)) {
+-                pml4e |= PG_ACCESSED_MASK;
+-                x86_stl_phys_notdirty(cs, pml4e_addr, pml4e);
++                pml4e = update_entry(cs, pml4e_addr, pml4e, PG_ACCESSED_MASK);
++                if (!pml4e) {
++                    goto restart;
++                }
+             }
+             ptep &= pml4e ^ PG_NX_MASK;
+             pdpe_addr = (pml4e & PG_ADDRESS_MASK) +
+@@ -213,8 +251,10 @@ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
+             }
+             ptep &= pdpe ^ PG_NX_MASK;
+             if (!(pdpe & PG_ACCESSED_MASK)) {
+-                pdpe |= PG_ACCESSED_MASK;
+-                x86_stl_phys_notdirty(cs, pdpe_addr, pdpe);
++                pdpe = update_entry(cs, pdpe_addr, pdpe, PG_ACCESSED_MASK);
++                if (!pdpe) {
++                    goto restart;
++                }
+             }
+             if (pdpe & PG_PSE_MASK) {
+                 /* 1 GB page */
+@@ -256,8 +296,10 @@ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
+         }
+         /* 4 KB page */
+         if (!(pde & PG_ACCESSED_MASK)) {
+-            pde |= PG_ACCESSED_MASK;
+-            x86_stl_phys_notdirty(cs, pde_addr, pde);
++            pde = update_entry(cs, pde_addr, pde, PG_ACCESSED_MASK);
++            if (!pde) {
++                goto restart;
++            }
+         }
+         pte_addr = (pde & PG_ADDRESS_MASK) + (((gphys >> 12) & 0x1ff) << 3);
+         pte = x86_ldq_phys(cs, pte_addr);
+@@ -295,8 +337,10 @@ static hwaddr get_hphys(CPUState *cs, hwaddr gphys, MMUAccessType access_type,
+         }
+ 
+         if (!(pde & PG_ACCESSED_MASK)) {
+-            pde |= PG_ACCESSED_MASK;
+-            x86_stl_phys_notdirty(cs, pde_addr, pde);
++            pde = update_entry(cs, pde_addr, pde, PG_ACCESSED_MASK);
++            if (!pde) {
++                goto restart;
++            }
+         }
+ 
+         /* page directory entry */
+@@ -376,7 +420,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+     int error_code = 0;
+     int is_dirty, prot, page_size, is_write, is_user;
+     hwaddr paddr;
+-    uint64_t rsvd_mask = PG_HI_RSVD_MASK;
++    uint64_t rsvd_mask;
+     uint32_t page_offset;
+     target_ulong vaddr;
+ 
+@@ -401,6 +445,8 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+         goto do_mapping;
+     }
+ 
++ restart:
++    rsvd_mask = PG_HI_RSVD_MASK;
+     if (!(env->efer & MSR_EFER_NXE)) {
+         rsvd_mask |= PG_NX_MASK;
+     }
+@@ -436,8 +482,10 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+                     goto do_fault_rsvd;
+                 }
+                 if (!(pml5e & PG_ACCESSED_MASK)) {
+-                    pml5e |= PG_ACCESSED_MASK;
+-                    x86_stl_phys_notdirty(cs, pml5e_addr, pml5e);
++                    pml5e = update_entry(cs, pml5e_addr, pml5e, PG_ACCESSED_MASK);
++                    if (!pml5e) {
++                        goto restart;
++                    }
+                 }
+                 ptep = pml5e ^ PG_NX_MASK;
+             } else {
+@@ -456,8 +504,10 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+                 goto do_fault_rsvd;
+             }
+             if (!(pml4e & PG_ACCESSED_MASK)) {
+-                pml4e |= PG_ACCESSED_MASK;
+-                x86_stl_phys_notdirty(cs, pml4e_addr, pml4e);
++                pml4e = update_entry(cs, pml4e_addr, pml4e, PG_ACCESSED_MASK);
++                if (!pml4e) {
++                    goto restart;
++                }
+             }
+             ptep &= pml4e ^ PG_NX_MASK;
+             pdpe_addr = ((pml4e & PG_ADDRESS_MASK) + (((addr >> 30) & 0x1ff) << 3)) &
+@@ -472,8 +522,10 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+             }
+             ptep &= pdpe ^ PG_NX_MASK;
+             if (!(pdpe & PG_ACCESSED_MASK)) {
+-                pdpe |= PG_ACCESSED_MASK;
+-                x86_stl_phys_notdirty(cs, pdpe_addr, pdpe);
++                pdpe = update_entry(cs, pdpe_addr, pdpe, PG_ACCESSED_MASK);
++                if (!pdpe) {
++                    goto restart;
++                }
+             }
+             if (pdpe & PG_PSE_MASK) {
+                 /* 1 GB page */
+@@ -520,8 +572,10 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+         }
+         /* 4 KB page */
+         if (!(pde & PG_ACCESSED_MASK)) {
+-            pde |= PG_ACCESSED_MASK;
+-            x86_stl_phys_notdirty(cs, pde_addr, pde);
++            pde = update_entry(cs, pde_addr, pde, PG_ACCESSED_MASK);
++            if (!pde) {
++                goto restart;
++            }
+         }
+         pte_addr = ((pde & PG_ADDRESS_MASK) + (((addr >> 12) & 0x1ff) << 3)) &
+             a20_mask;
+@@ -563,8 +617,10 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr, int size,
+         }
+ 
+         if (!(pde & PG_ACCESSED_MASK)) {
+-            pde |= PG_ACCESSED_MASK;
+-            x86_stl_phys_notdirty(cs, pde_addr, pde);
++            pde = update_entry(cs, pde_addr, pde, PG_ACCESSED_MASK);
++            if (!pde) {
++                goto restart;
++            }
+         }
+ 
+         /* page directory entry */
+@@ -634,11 +690,11 @@ do_check_protect_pse36:
+     /* yes, it can! */
+     is_dirty = is_write && !(pte & PG_DIRTY_MASK);
+     if (!(pte & PG_ACCESSED_MASK) || is_dirty) {
+-        pte |= PG_ACCESSED_MASK;
+-        if (is_dirty) {
+-            pte |= PG_DIRTY_MASK;
++        pte = update_entry(cs, pte_addr, pte,
++                           PG_ACCESSED_MASK | (is_dirty ? PG_DIRTY_MASK : 0));
++        if (!pte) {
++            goto restart;
+         }
+-        x86_stl_phys_notdirty(cs, pte_addr, pte);
+     }
+ 
+     if (!(pte & PG_DIRTY_MASK)) {
