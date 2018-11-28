@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gS26T-0003z5-P0
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:50:24 -0500
+	(envelope-from <philmd@redhat.com>) id 1gS26j-0004CY-CE
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:50:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gS26R-00075U-UL
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:50:17 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46476)
+	(envelope-from <philmd@redhat.com>) id 1gS26e-0007Hn-Ea
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:50:33 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:33495)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gS26R-00074G-On
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:50:15 -0500
-Received: by mail-oi1-x242.google.com with SMTP id x202so22917042oif.13
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 07:50:14 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gS26e-0007H8-8S
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 10:50:28 -0500
+Received: by mail-wr1-f65.google.com with SMTP id c14so21164524wrr.0
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 07:50:28 -0800 (PST)
+References: <1543399094-2260-1-git-send-email-thuth@redhat.com>
+	<2ac07515-10f3-ed38-c022-e583cd1cd36a@redhat.com>
+	<ed0252f7-e74c-46e1-b47b-8d0c2e8dd73e@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0d74ecc6-419e-0b93-c0a9-4a4ce37a7ca5@redhat.com>
+Date: Wed, 28 Nov 2018 16:50:25 +0100
 MIME-Version: 1.0
-References: <20181127145043.18545-1-f4bug@amsat.org>
-	<c23486c2-e55e-4b88-7a70-76a77f6de1eb@weilnetz.de>
-In-Reply-To: <c23486c2-e55e-4b88-7a70-76a77f6de1eb@weilnetz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 28 Nov 2018 15:50:02 +0000
-Message-ID: <CAFEAcA9JWR41fi=3+E452+K1G2toCnygV8aFpa1O_7K87B6zfw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.1] configure: Disable the nanoMIPS
- disassembler on big endian hosts
+In-Reply-To: <ed0252f7-e74c-46e1-b47b-8d0c2e8dd73e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1?] target/arm/sve_helper: Fix
+ compilation with clang 3.4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>, Stefan Markovic <smarkovic@wavecomp.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Wed, 28 Nov 2018 at 14:59, Stefan Weil <sw@weilnetz.de> wrote:
->
-> Am 27.11.2018 um 15:50 schrieb Philippe Mathieu-Daud=C3=A9:
-> > Stefan noticed the nanoMIPS disassembler uses incorrect format strings
-> > on big endian hosts.
-> >
-> > On big endian hosts, the output will appear as:
-> >
-> > $ qemu-system-mipsel -M malta -cpu I7200 -semihosting \
-> >   -bios nanoboot.bin -d in_asm
-> > 0xbfc0000: Asm output not supported on this arch
-> >
-> > Reported-by: Stefan Weil <sw@weilnetz.de>
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > ---
-> >  configure | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/configure b/configure
-> > index 0a3c6a72c3..83a7c4746e 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -7382,7 +7382,11 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-> >    mips*)
-> >      disas_config "MIPS"
-> >      if test -n "${cxx}"; then
-> > -      disas_config "NANOMIPS"
-> > +      # The nanomips disassembler currently does not work correctly
-> > +      # on big endian host.
-> > +      if test "$bigendian" =3D "no" ; then
-> > +        disas_config "NANOMIPS"
-> > +      fi
-> >      fi
-> >    ;;
-> >    moxie*)
->
->
-> Thank you. This looks like a patch which might be acceptable for 3.1.
->
-> Reviewed-by: Stefan Weil <sw@weilnetz.de>
+On 28/11/18 15:39, Thomas Huth wrote:
+> On 2018-11-28 15:34, Philippe Mathieu-Daudé wrote:
+>> On 28/11/18 10:58, Thomas Huth wrote:
+>>> Clang 3.4 does not know the "flatten" attribute yet. We've already
+>>> introduced the QEMU_FLATTEN macro for this in commit 97ff87c0ed020c2,
+>>> so use this macro now here, too, to fix this issue.
+>>
+>> checkpatch candidate?
+> 
+> I think we'd rather need a docker-based test with such an old version of
+> Clang... (since there are also other issues like the double-typedef
+> problem that regularly occurs there).
 
-It seems a bit like overkill to me. We could just mark it
-as a known issue for 3.1. After all it seems unlikely that
-many people will be running TCG MIPS on a big-endian host,
-and if they are then "debug disassembly with some immediate
-values incorrect" might be more useful than "none at all".
+I was thinking of something such (broken code!):
 
-thanks
--- PMM
+  if ($line =~ /.*__attribute__\w+\(\(flatten\)\)/) {
+    ERROR("Use QEMU_FLATTEN ...\n");
+  }
