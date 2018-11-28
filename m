@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gRwjd-0005ru-5q
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:06:22 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gRwtz-0002uG-4k
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:17:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gRwjb-0002iu-6g
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:06:21 -0500
-Date: Wed, 28 Nov 2018 11:05:36 +0100
+	(envelope-from <sameo@linux.intel.com>) id 1gRwtx-0007ph-Ub
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:17:03 -0500
+Date: Wed, 28 Nov 2018 11:16:22 +0100
 From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181128100536.GC5677@caravaggio>
+Message-ID: <20181128101622.GD5677@caravaggio>
 References: <20181126162942.21258-1-sameo@linux.intel.com>
 	<20181126162942.21258-5-sameo@linux.intel.com>
 	<20181127162551.29608eeb@redhat.com>
 	<20181127154218.GA5677@caravaggio>
 	<20181127172749.75a036b4@redhat.com>
-	<20181127221515-mutt-send-email-mst@kernel.org>
+	<20181128094640.GB5677@caravaggio>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181127221515-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20181128094640.GB5677@caravaggio>
 Subject: Re: [Qemu-devel] [PATCH 4/8] hw: arm: Carry RSDP specific data
  through AcpiRsdpData
 List-Id: <qemu-devel.nongnu.org>
@@ -28,12 +28,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Michael,
-
-On Tue, Nov 27, 2018 at 10:26:30PM -0500, Michael S. Tsirkin wrote:
+On Wed, Nov 28, 2018 at 10:46:41AM +0100, Samuel Ortiz wrote:
 > On Tue, Nov 27, 2018 at 05:27:49PM +0100, Igor Mammedov wrote:
 > > On Tue, 27 Nov 2018 16:42:18 +0100
 > > Samuel Ortiz <sameo@linux.intel.com> wrote:
@@ -80,53 +78,142 @@ On Tue, Nov 27, 2018 at 10:26:30PM -0500, Michael S. Tsirkin wrote:
 > > it's better to use in test it's own version (we just opencode them there)
 > > see fadt_fetch_facs_and_dsdt_ptrs()/sanitize_fadt_ptrs()
 > > same applies for length.
+> 
+> I think you're trying to explain to me that this:
+> 
+> 	/* sdt->aml field offset := spec offset - header size */
+>         memset(sdt->aml + 0, 0, 4); /* sanitize FIRMWARE_CTRL(36) ptr */
+>         memset(sdt->aml + 4, 0, 4); /* sanitize DSDT(40) ptr */
+>         if (sdt->header.revision >= 3) {
+>             memset(sdt->aml + 96, 0, 8); /* sanitize X_FIRMWARE_CTRL(132) ptr */
+>             memset(sdt->aml + 104, 0, 8); /* sanitize X_DSDT(140) ptr */
+>         }
+> 
+> is good coding practice. I'm having a hard time internalizing that
+> hard coded constants and comments not directly mapping the code (How do
+> I map "sanitize X_FIRMWARE_CTRL(132) ptr" to "sdt->aml + 96, 0, 8"?) is
+> indeed good practice. But I'll take the pragmatic route and follow what
+> you guys advice for.
+> 
+> 
 > > that way if we break it in qemu's code test would catch the thing
 > > 
 > > > Also the 0 for revision 1 is a little confusing, I feel the above
 > > > definition is clearer.
 > > that's confusion is in the spec, so we just mimic it, no need to add more on top
+> > 
+> > > 
+> > > 
+> > > > > +
+> > > > >  /* Table structure from Linux kernel (the ACPI tables are under the
+> > > > >     BSD license) */
+> > > > >  
+> > > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > > > > index 0835900052..2dad465ecf 100644
+> > > > > --- a/hw/arm/virt-acpi-build.c
+> > > > > +++ b/hw/arm/virt-acpi-build.c
+> > > > > @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+> > > > >  
+> > > > >  /* RSDP */
+> > > > >  static void
+> > > > > -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> > > > > +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+> > > > >  {
+> > > > >      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+> > > > >      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
+> > > > > @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> > > > >                               true /* fseg memory */);
+> > > > >  
+> > > > >      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
+> > > > > -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
+> > > > > +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
+> > > > >      rsdp->length = cpu_to_le32(sizeof(*rsdp));
+> > > > > -    rsdp->revision = 0x02;
+> > > > > +    rsdp->revision = rsdp_data->revision;
+> > > > >  
+> > > > >      /* Address to be filled by Guest linker */
+> > > > >      bios_linker_loader_add_pointer(linker,
+> > > > >          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
+> > > > > -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
+> > > > > +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
+> > > > >  
+> > > > >      /* Checksum to be filled by Guest linker */
+> > > > >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> > > > > @@ -399,6 +399,20 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> > > > >          (char *)&rsdp->extended_checksum - rsdp_table->data);
+> > > > >  }
+> > > > >  
+> > > > > +static void
+> > > > > +init_rsdp_data(AcpiRsdpData *data, const char *oem_id, uint8_t revision,
+> > > > > +               unsigned *rsdt_offset, unsigned *xsdt_offset)
+> > > > > +{
+> > > > > +    /* Caller must provide an OEM ID */
+> > > > > +    g_assert(oem_id);
+> > > > > +    g_assert(strlen(oem_id) >= 6);
+> > > > > +
+> > > > > +    memcpy(data->oem_id, oem_id, 6);
+> > > > > +    data->revision = revision;
+> > > > > +    data->rsdt_tbl_offset = rsdt_offset;
+> > > > > +    data->xsdt_tbl_offset = xsdt_offset;
+> > > > > +}
+> > > > > +
+> > > > >  static void
+> > > > >  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+> > > > >  {
+> > > > > @@ -810,6 +824,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+> > > > >      GArray *table_offsets;
+> > > > >      unsigned dsdt, xsdt;
+> > > > >      GArray *tables_blob = tables->table_data;
+> > > > > +    AcpiRsdpData rsdp;  
+> > > > s/rsdp/rsdp_info/
+> > > >   
+> > > > >  
+> > > > >      table_offsets = g_array_new(false, true /* clear */,
+> > > > >                                          sizeof(uint32_t));
+> > > > > @@ -857,7 +872,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+> > > > >      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
+> > > > >  
+> > > > >      /* RSDP is in FSEG memory, so allocate it separately */
+> > > > > -    build_rsdp(tables->rsdp, tables->linker, xsdt);
+> > > > > +    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
+> > > > > +                   NULL, &xsdt);  
+> > > > It would be more concise to use declarative style without extra clutter:
+> > > > 
+> > > > -    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
+> > > > -                   NULL, &xsdt);
+> > > > -    build_rsdp(tables->rsdp, tables->linker, &rsdp);
+> > > > +    {
+> > > > +       AcpiRsdpData rsdp = {
+> > > > +           .revision = 2,
+> > > > +           .oem_id = ACPI_BUILD_APPNAME6,
+> > > > +           .xsdt_tbl_offset = &xsdt,
+> > > > +           .rsdt_tbl_offset = NULL,
+> > > > +       };
+> > > > +       build_rsdp(tables->rsdp, tables->linker, &rsdp);
+> > > > +    }  
+> > > 2 things here, imo:
+> > > 
+> > > - This is not more concise.
+> > with function, one have to jump to it's definition/body to find out what
+> > each argument is, with declaration + initialization inplace it's clear
+> > what values mean as you see fields right there as well.
+> With a structure you need to go and look at the structure definition to
+> know which fields you need to initialize and what their names are. And
+> no, you can't safely copy paste the above snippet and rest assured your
+> code is safe, because C allows you to leave some structure fields
+> uninitialized.
 > 
-> To be more precise, there is a huge number of constants in ACPI
-> such that adding defines for them all would be a huge burden,
-I find that defining a set of well named constants is a lot less painful
-than maintaining code with at least the same amount of hard coded
-constants. That's a personal opinion, for sure.
-
-> and will not make it easy to check values against the
-> spec at all (case in point ACPI_RSDP_REV_2 is actually wrong,
-> 2 is version 3 and up).
-I may be misreading the spec, but I understand 0 is for ACPI 1.0 and 2
-is for ACPI 2.0+. The latest spec is a little confusing with regard to
-this field, but when looking at the 2.0a ACPI spec for RSDP:
-
-"The ACPI version 1.0 revision number of this table is zero. The ACPI 2.0
-value for this field is 2."
-
-> Thus the preferred style is to add a comment near the value
-> matching spec name verbatim, so one can copy it and
-> look it up in the spec. Sometimes one needs to reference
-> specific spec version.
-> 
-> 0 /* Revision: ACPI version 1.0 */
-> 
-> and
-> 
-> 1 /* Revision: ACPI 2.0 */
-> 
-> and
-> 
-> 2 /* Revision: ACPI 3.0a */
-> 
-> For style consistency, if the value is used multiple times, we avoid
-> duplication by using an inline function and not a macro.
-Not entirely sure how this materializes. Do you mean that e.g. if I want
-to check for an RSDP revision I'd have to define inline functions of
-that kind:
-
-bool is_rsdp_revision_0(uint8_t *rsdp_table);
-bool is_rsdp_revision_2(uint8_t *rsdp_table);
-
-or do you have something else in mind?
+> > If it's simple structure it is clearer to use initializer, instead of
+> > wrapper helper. With complex structure it could be other way around.
+> >
+> > > - It's code duplication as almost the same snippet is going to be used
+> > >   for i386/acpi-build.c
+> > the same goes for init_rsdp_data(...)
+> I disagree here as well. But I'd like to see this code being merged,
+> I'll comply. Do you have any comments on the tests part of that serie,
+> besides the fact that it's using defined constants as opposed to hard
+> coded ones?
+I just saw your comments on patch #8, thanks.
 
 Cheers,
 Samuel.
