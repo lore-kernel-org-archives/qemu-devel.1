@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gRv4o-0007iE-Kn
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 03:20:12 -0500
+	(envelope-from <fziglio@redhat.com>) id 1gRv7m-0001F3-TY
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 03:23:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gRv4n-0000uQ-RE
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 03:20:06 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41565)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gRv4n-0000u1-Ke
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 03:20:05 -0500
-Received: by mail-wr1-x444.google.com with SMTP id x10so25302037wrs.8
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 00:20:05 -0800 (PST)
-MIME-Version: 1.0
-References: <20181126153036.22414-1-fziglio@redhat.com>
-	<20181127123502.GZ12172@natto.ory.fergeau.eu>
-	<20181128054850.exrlih6zqskaw7a7@sirius.home.kraxel.org>
-In-Reply-To: <20181128054850.exrlih6zqskaw7a7@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 28 Nov 2018 12:19:51 +0400
-Message-ID: <CAJ+F1CKbLZuivyqcDCWxfBJY=VscGGeR7Cp5uFDvXduGxbocpA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Spice-devel] [PATCH] spice: Use new
- SpiceImageCompression definition
+	(envelope-from <fziglio@redhat.com>) id 1gRv7i-0002Zf-LM
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 03:23:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1gRv7i-0002Z7-G6
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 03:23:06 -0500
+From: Frediano Ziglio <fziglio@redhat.com>
+Date: Wed, 28 Nov 2018 08:22:42 +0000
+Message-Id: <20181128082243.29841-1-fziglio@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] spice: Use new SpiceImageCompression
+ definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +22,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Christophe Fergeau <cfergeau@redhat.com>, spice-devel <spice-devel@lists.freedesktop.org>, QEMU <qemu-devel@nongnu.org>
+To: spice-devel@lists.freedesktop.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Frediano Ziglio <fziglio@redhat.com>
 
-Hi
-On Wed, Nov 28, 2018 at 9:48 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On Tue, Nov 27, 2018 at 01:35:02PM +0100, Christophe Fergeau wrote:
-> > hey,
-> >
-> > On Mon, Nov 26, 2018 at 03:30:36PM +0000, Frediano Ziglio wrote:
-> > > Definitions were updated by spice-server in patch de66161 included
-> > > in 0.12.6 released on 12th June 2015.
-> >
-> > QEMU's configure only checks for spice-server 0.12.0:
->
-> > I don't know how far back QEMU wants to support spice-server.
-> > Apart from this, the patch looks good to me.
->
-> 0.12.6 is more than three years old, so this or something newer should
-> be available in most distros meanwhile.  Raising the bar to that version
-> looks ok to me (separate patch please, and please also drop #ifdefs we
-> don't need any more then).
+Definitions were updated by spice-server in patch de66161 included
+in 0.12.6 released on 12th June 2015.
 
-See https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg00486.html
-"bump spice-server required version to 0.12.6"
+Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+---
+ ui/spice-core.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-> thanks,
->   Gerd
->
-> _______________________________________________
-> Spice-devel mailing list
-> Spice-devel@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/spice-devel
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index ebaae24643..9d45d895ed 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -331,12 +331,12 @@ static const char *stream_video_names[] = {
+                stream_video_names, ARRAY_SIZE(stream_video_names))
+ 
+ static const char *compression_names[] = {
+-    [ SPICE_IMAGE_COMPRESS_OFF ]      = "off",
+-    [ SPICE_IMAGE_COMPRESS_AUTO_GLZ ] = "auto_glz",
+-    [ SPICE_IMAGE_COMPRESS_AUTO_LZ ]  = "auto_lz",
+-    [ SPICE_IMAGE_COMPRESS_QUIC ]     = "quic",
+-    [ SPICE_IMAGE_COMPRESS_GLZ ]      = "glz",
+-    [ SPICE_IMAGE_COMPRESS_LZ ]       = "lz",
++    [SPICE_IMAGE_COMPRESSION_OFF]      = "off",
++    [SPICE_IMAGE_COMPRESSION_AUTO_GLZ] = "auto_glz",
++    [SPICE_IMAGE_COMPRESSION_AUTO_LZ]  = "auto_lz",
++    [SPICE_IMAGE_COMPRESSION_QUIC]     = "quic",
++    [SPICE_IMAGE_COMPRESSION_GLZ]      = "glz",
++    [SPICE_IMAGE_COMPRESSION_LZ]       = "lz",
+ };
+ #define parse_compression(_name)                                        \
+     parse_name(_name, "image compression",                              \
+@@ -643,7 +643,7 @@ void qemu_spice_init(void)
+         *x509_cert_file = NULL,
+         *x509_cacert_file = NULL;
+     int port, tls_port, addr_flags;
+-    spice_image_compression_t compression;
++    SpiceImageCompression compression;
+     spice_wan_compression_t wan_compr;
+     bool seamless_migration;
+ 
+@@ -754,7 +754,7 @@ void qemu_spice_init(void)
+ #endif
+     }
+ 
+-    compression = SPICE_IMAGE_COMPRESS_AUTO_GLZ;
++    compression = SPICE_IMAGE_COMPRESSION_AUTO_GLZ;
+     str = qemu_opt_get(opts, "image-compression");
+     if (str) {
+         compression = parse_compression(str);
+-- 
+2.17.2
