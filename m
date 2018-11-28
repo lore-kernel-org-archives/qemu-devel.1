@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gS3Yg-00049w-HT
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:23:32 -0500
+	(envelope-from <cota@braap.org>) id 1gS3Z1-0004hj-92
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:23:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gS3Yd-0000Uu-MJ
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:23:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:64473)
+	(envelope-from <cota@braap.org>) id 1gS3Yu-0001Gn-Nv
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:23:48 -0500
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:34491)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gS3Yd-0000Rg-EE
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:23:27 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7F6FE30832C1
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 17:23:26 +0000 (UTC)
-References: <20181128153526.10948-1-berrange@redhat.com>
-	<31667b3c-0071-e2b3-63d1-2fdc0c96c98f@redhat.com>
-	<20181128172001.GV24355@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f027ff7a-de22-ba85-5737-68599cddadce@redhat.com>
-Date: Wed, 28 Nov 2018 11:23:25 -0600
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gS3Yq-0000sj-FI
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:23:42 -0500
+Date: Wed, 28 Nov 2018 12:23:32 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181128172332.GA16387@flamenco>
+References: <20181025172057.20414-1-cota@braap.org>
+	<20181025172057.20414-42-cota@braap.org>
+	<20181127124352.ll6quqc5xedvdqht@MacBook-Pro-Roman.local>
+	<20181127231357.GA19764@flamenco>
+	<20181128104330.qkqnfttswihjur6g@MacBook-Pro-Roman.local>
 MIME-Version: 1.0
-In-Reply-To: <20181128172001.GV24355@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-web PATCH] Document how to test the site
- with jekyll locally
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181128104330.qkqnfttswihjur6g@MacBook-Pro-Roman.local>
+Subject: Re: [Qemu-devel] [RFC 41/48] configure: add --enable-plugins
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,62 +30,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Roman Bolshakov <r.bolshakov@yadro.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
 
-On 11/28/18 11:20 AM, Daniel P. Berrang=C3=A9 wrote:
->>> +Note the 'vendor/' path has been explicitly excluded from the web co=
-ntent
->>> +in _config.yml, so don't try to use a different path within the git
->>> +checkout.
->>> +
->>> +
->>> +To test the site launch jeykll
->>> +
->>> +  # bundle exec jekyll serve
->>
->> $ bundle exec jekyll serve
->> Configuration file: /home/eblake/qemu-web/_config.yml
->> Configuration file: /home/eblake/qemu-web/_config.yml
->>              Source: /home/eblake/qemu-web
->>         Destination: /home/eblake/qemu-web/_site
->>   Incremental build: disabled. Enable with --incremental
->>        Generating...
->>               ERROR: YOUR SITE COULD NOT BE BUILT:
->>                      ------------------------------------
->>                      Invalid date '<%=3D Time.now.strftime('%Y-%m-%d %=
-H:%M:%S
->> %z') %>': Document 'vendor/ruby/2.5.0/gems/jekyll-3.3.0/lib/site_templ=
-ate/_posts/0000-00-00-welcome-to-jekyll.markdown.erb'
->> does not have a valid date in the YAML front matter.
->>
->> Did I do things right?
->=20
-> Yes, but this error is what the addition in _config.yml.....
+On Wed, Nov 28, 2018 at 13:43:30 +0300, Roman Bolshakov wrote:
+> The test of -exported_symbols_list fails:
+> Undefined symbols for architecture x86_64:
+>   "foo", referenced from:
+>        -exported_symbol[s_list] command line option
+>             (maybe you meant: _foo)
+> 
+> All functions on macOS are prefixed with underscore [1]:
+> "The name of a symbol representing a function that conforms to standard C
+> calling conventions is the name of the function with an underscore prefix.
+> Thus, the name of the symbol representing the function main would be _main."
+> 
+> So it can be fixed by prepending foo and qemu-plugins-ld64.symbols with
+> underscore:
 
-Ah, my fault for not actually applying the patch before trying the=20
-commands.  With the patched _config.yml,...
+Ah I see, thanks!
 
->=20
->>> diff --git a/_config.yml b/_config.yml
->>> index 0a0201c..576b0a5 100644
->>> --- a/_config.yml
->>> +++ b/_config.yml
->>> @@ -37,3 +37,5 @@ gems:
->>>    exclude:
->>>      - Gemfile
->>>      - Gemfile.lock
->>> +  - vendor/
->>> +  - README
->=20
-> ...here is supposed to fix, so I'm puzzelled why you'd still get that
-> error message
+(snip)
+> qemu-ga fails to link because it doesn't have symbols declared in
+> qemu-plugins-ld64.symbols. Perhaps "-Wl,-exported_symbols_list" should
+> be applied only to qemu-system?
 
-...I have a live local server.
+I just pushed to the same github branch the appended fixup.
+The idea is to only add the linker flags when the output
+binary links plugin.o.
 
-Tested-by: Eric Blake <eblake@redhat.com>
+Can you please test?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks,
+
+		Emilio
+
+---
+commit 8f45416b79765b66e5ce0fca7db93b97bbcfcfbb
+Author: Emilio G. Cota <cota@braap.org>
+Date:   Wed Nov 28 12:11:23 2018 -0500
+
+    configure: ld64 fixup
+    
+    And copy the file to the build dir also for !ld64.
+    
+    Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+diff --git a/Makefile.target b/Makefile.target
+index 719699696d..7ea17d71cb 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -107,7 +107,23 @@ obj-y += target/$(TARGET_BASE_ARCH)/
+ obj-y += disas.o
+ obj-$(call notempty,$(TARGET_XML_FILES)) += gdbstub-xml.o
+ 
+-obj-$(CONFIG_PLUGINS) += plugin.o
++ifdef CONFIG_PLUGINS
++obj-y += plugin.o
++# Abuse -libs suffix to only link with --dynamic-list/-exported_symbols_list
++# when the final binary includes the plugin object.
++#
++# Note that simply setting LDFLAGS is not enough: we build binaries that
++# never link plugin.o, and the linker might fail (at least ld64 does)
++# if the symbols in the list are not in the output binary.
++ ifdef CONFIG_HAS_LD_DYNAMIC_LIST
++ plugin.o-libs := -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
++ else
++  ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
++  plugin.o-libs := \
++	-Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
++  endif
++ endif
++endif
+ 
+ #########################################################
+ # Linux user emulator target
+diff --git a/configure b/configure
+index 3dc9c9697b..395acf831e 100755
+--- a/configure
++++ b/configure
+@@ -5185,7 +5185,7 @@ fi
+ # See if -exported_symbols_list is supported by the linker
+ 
+ cat > $TMPTXT <<EOF
+-  foo
++  _foo
+ EOF
+ 
+ ld_exported_symbols_list="no"
+@@ -6843,13 +6843,17 @@ fi
+ if test "$plugins" = "yes" ; then
+     echo "CONFIG_PLUGINS=y" >> $config_host_mak
+     LIBS="-ldl $LIBS"
++    # Copy the export object list to the build dir
+     if test "$ld_dynamic_list" = "yes" ; then
+-	LDFLAGS="-Wl,--dynamic-list=\$(SRC_PATH)/qemu-plugins.symbols $LDFLAGS"
++	echo "CONFIG_HAS_LD_DYNAMIC_LIST=yes" >> $config_host_mak
++	ld_symbols=qemu-plugins-ld.symbols
++	cp "$source_path/qemu-plugins.symbols" $ld_symbols
+     elif test "$ld_exported_symbols_list" = "yes" ; then
++	echo "CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST=yes" >> $config_host_mak
+ 	ld64_symbols=qemu-plugins-ld64.symbols
+ 	echo "# Automatically generated by configure - do not modify" > $ld64_symbols
+-	cat "$source_path/qemu-plugins.symbols" | grep qemu_ | sed 's/;//g' >> $ld64_symbols
+-	LDFLAGS="-Wl,-exported_symbols_list,\$(BUILD_DIR)/$ld64_symbols $LDFLAGS"
++	grep 'qemu_' "$source_path/qemu-plugins.symbols" | sed 's/;//g' | \
++	    sed -E 's/^\s*(.*)/_\1/' >> $ld64_symbols
+     else
+ 	error_exit \
+ 	    "If \$plugins=yes, either \$ld_dynamic_list or " \
