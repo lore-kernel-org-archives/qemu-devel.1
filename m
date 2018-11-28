@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gRwhS-00047w-PJ
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:04:08 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1gRwij-0004q1-IL
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:05:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gRwhO-0001JS-Q5
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:04:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44578)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1gRwih-0001yf-1I
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:05:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gRwhO-0001IN-CD
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:04:02 -0500
-References: <20181128.181700.1038782556965887223.atsushi.nemoto@sord.co.jp>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c6bc70d3-7fdb-5c38-3846-10b36830a446@redhat.com>
-Date: Wed, 28 Nov 2018 11:03:53 +0100
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1gRwig-0001xq-P9
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 05:05:22 -0500
+References: <1542895581-10721-1-git-send-email-wexu@redhat.com>
+	<1542895581-10721-14-git-send-email-wexu@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <2004bf63-622e-6241-f3a4-3ce50723e9ec@redhat.com>
+Date: Wed, 28 Nov 2018 11:05:07 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181128.181700.1038782556965887223.atsushi.nemoto@sord.co.jp>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1542895581-10721-14-git-send-email-wexu@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] memory: update coalesced_range on
- transaction_commit
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 13/16] virtio: add vhost-net migration
+ of packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +30,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Atsushi Nemoto <atsushi.nemoto@sord.co.jp>, qemu-devel@nongnu.org
+To: wexu@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
+Cc: mst@redhat.com, jfreimann@redhat.com, tiwei.bie@intel.com
 
-On 28/11/18 10:17, Atsushi Nemoto wrote:
-> The e1000 driver calls memory_region_add_coalescing but
-> kvm_coalesce_mmio_region never been called for those regions.
->=20
-> Update coalesced_range on memory_region_transaction_commit to fix this.
->=20
-> It seems very old bug since memory region API
-> was merged on commit 093bc2cd885e ("Hierarchical memory region API").
->=20
-> Signed-off-by: Atsushi Nemoto <atsushi.nemoto@sord.co.jp>
-> ---
->  memory.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->=20
-> diff --git a/memory.c b/memory.c
-> index d14c6dec1d..f773b0be50 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1021,6 +1021,8 @@ void memory_region_transaction_begin(void)
->      ++memory_region_transaction_depth;
->  }
-> =20
-> +static void memory_region_update_coalesced_range_as(MemoryRegion *mr, =
-AddressSpace *as);
+
+
+On 11/22/18 3:06 PM, wexu@redhat.com wrote:
+> From: Wei Xu <wexu@redhat.com>
+> 
+> tweaked vhost-net code to test migration.
+> 
+> @@ -1414,64 +1430,20 @@ long vhost_vring_ioctl(struct vhost_dev
+>              r = -EFAULT;
+>              break;
+>          }
+> +               vq->last_avail_idx = s.num & 0x7FFF;
+> +               /* Forget the cached index value. */
+> +               vq->avail_idx = vq->last_avail_idx;
+> +               if (vhost_has_feature(vq, VIRTIO_F_RING_PACKED)) {
+> +                       vq->last_avail_wrap_counter = !!(s.num & 0x8000);
+> +                       vq->avail_wrap_counter = vq->last_avail_wrap_counter;
 > +
->  void memory_region_transaction_commit(void)
->  {
->      AddressSpace *as;
-> @@ -1038,6 +1040,7 @@ void memory_region_transaction_commit(void)
->              QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
->                  address_space_set_flatview(as);
->                  address_space_update_ioeventfds(as);
-> +                memory_region_update_coalesced_range_as(NULL, as);
->              }
->              memory_region_update_pending =3D false;
->              ioeventfd_update_pending =3D false;
-> @@ -2142,7 +2145,7 @@ static void memory_region_update_coalesced_range_=
-as(MemoryRegion *mr, AddressSpa
-> =20
->      view =3D address_space_get_flatview(as);
->      FOR_EACH_FLAT_RANGE(fr, view) {
-> -        if (fr->mr =3D=3D mr) {
-> +        if (fr->mr =3D=3D mr || (!mr && !QTAILQ_EMPTY(&fr->mr->coalesc=
-ed))) {
->              section =3D (MemoryRegionSection) {
->                  .fv =3D view,
->                  .offset_within_address_space =3D int128_get64(fr->addr=
-.start),
+> +                       vq->last_used_idx = (s.num & 0x7fFF0000) >> 16;
+> +                       vq->last_used_wrap_counter = !!(s.num & 0x80000000);
+> +               }
+> +               break;
+> +       case VHOST_GET_VRING_BASE:
+> +               s.index = idx;
+> +                s.num = vq->last_avail_idx;
+> +               if (vhost_has_feature(vq, VIRTIO_F_RING_PACKED)) {
+> +                       s.num |= vq->last_avail_wrap_counter << 15;
+> +                       s.num |= vq->last_used_idx << 16;
+> +                       s.num |= vq->last_used_wrap_counter << 31;
 
-I'm worried that coalesced_io_del would be skipped when the region is
-deleted.  I think the right place to add the coalesced_io_{add,del}
-calls is address_space_update_topology_pass.
+We agreed to only have avail idx and its wrap counter for vhost-user,
+I guess we should have the same for Kernel backend?
 
-Let me test an alternative fix and post it; thanks for the report in the
-meanwhile!
+This is what we have for vhost-user backend:
+bit[0:14] last_avail_idx
+bit[15] last_avail_wrap_counter
 
-Paolo
-
-> @@ -2152,7 +2155,7 @@ static void memory_region_update_coalesced_range_=
-as(MemoryRegion *mr, AddressSpa
->              MEMORY_LISTENER_CALL(as, coalesced_io_del, Reverse, &secti=
-on,
->                                   int128_get64(fr->addr.start),
->                                   int128_get64(fr->addr.size));
-> -            QTAILQ_FOREACH(cmr, &mr->coalesced, link) {
-> +            QTAILQ_FOREACH(cmr, &fr->mr->coalesced, link) {
->                  tmp =3D addrrange_shift(cmr->addr,
->                                        int128_sub(fr->addr.start,
->                                                   int128_make64(fr->off=
-set_in_region)));
->=20
+> +               }
+> +               if (copy_to_user(argp, &s, sizeof(s)))
+> +                       r = -EFAULT;
+> +               break;
+> 
+> Signed-off-by: Wei Xu <wexu@redhat.com>
+> ---
+>   hw/virtio/virtio.c         | 35 ++++++++++++++++++++++++++++++-----
+>   include/hw/virtio/virtio.h |  4 ++--
+>   2 files changed, 32 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 64d5c04..7487d3d 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -2963,19 +2963,40 @@ hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
+>       }
+>   }
+>   
+> -uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
+> +int virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
+>   {
+> -    return vdev->vq[n].last_avail_idx;
+> +    int idx;
+> +
+> +    if (virtio_host_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> +        idx = vdev->vq[n].last_avail_idx;
+> +        idx |= ((int)vdev->vq[n].avail_wrap_counter) << 15;
+> +        idx |= (vdev->vq[n].used_idx) << 16;
+> +        idx |= ((int)vdev->vq[n].used_wrap_counter) << 31;
+> +    } else {
+> +        idx = (int)vdev->vq[n].last_avail_idx;
+> +    }
+> +    return idx;
+>   }
+>   
+> -void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint16_t idx)
+> +void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, int idx)
+>   {
+> -    vdev->vq[n].last_avail_idx = idx;
+> -    vdev->vq[n].shadow_avail_idx = idx;
+> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> +        vdev->vq[n].last_avail_idx = idx & 0x7fff;
+> +        vdev->vq[n].avail_wrap_counter = !!(idx & 0x8000);
+> +        vdev->vq[n].used_idx = (idx & 0x7fff0000) >> 16;
+> +        vdev->vq[n].used_wrap_counter = !!(idx & 0x80000000);
+> +    } else {
+> +        vdev->vq[n].last_avail_idx = idx;
+> +        vdev->vq[n].shadow_avail_idx = idx;
+> +    }
+>   }
+>   
+>   void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
+>   {
+> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> +        return;
+> +    }
+> +
+>       rcu_read_lock();
+>       if (vdev->vq[n].vring.desc) {
+>           vdev->vq[n].last_avail_idx = vring_used_idx(&vdev->vq[n]);
+> @@ -2986,6 +3007,10 @@ void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
+>   
+>   void virtio_queue_update_used_idx(VirtIODevice *vdev, int n)
+>   {
+> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> +        return;
+> +    }
+> +
+>       rcu_read_lock();
+>       if (vdev->vq[n].vring.desc) {
+>           vdev->vq[n].used_idx = vring_used_idx(&vdev->vq[n]);
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index 9c1fa07..a6fdf3f 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -272,8 +272,8 @@ hwaddr virtio_queue_get_used_addr(VirtIODevice *vdev, int n);
+>   hwaddr virtio_queue_get_desc_size(VirtIODevice *vdev, int n);
+>   hwaddr virtio_queue_get_avail_size(VirtIODevice *vdev, int n);
+>   hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n);
+> -uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n);
+> -void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint16_t idx);
+> +int virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n);
+> +void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, int idx);
+>   void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n);
+>   void virtio_queue_invalidate_signalled_used(VirtIODevice *vdev, int n);
+>   void virtio_queue_update_used_idx(VirtIODevice *vdev, int n);
+> 
