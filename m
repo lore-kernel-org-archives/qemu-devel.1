@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gS63F-0007gH-HL
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:03:14 -0500
+	(envelope-from <lvivier@redhat.com>) id 1gS66a-0001Ms-Ij
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:06:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gS63E-0001d1-MQ
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:03:13 -0500
-References: <20181128195802.B6A6C7456B9@zero.eik.bme.hu>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2bdbd7b4-c1de-4ab4-7057-f87a535838e0@redhat.com>
-Date: Wed, 28 Nov 2018 14:03:10 -0600
+	(envelope-from <lvivier@redhat.com>) id 1gS66W-0003Vv-KA
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:06:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42562)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gS66W-0003Se-Cl
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:06:36 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2A53223E6CE
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 20:06:35 +0000 (UTC)
+References: <20181126200009.862-1-quintela@redhat.com>
+	<20181126200009.862-5-quintela@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <b80018fd-e849-9b3e-5d46-886dbb9da847@redhat.com>
+Date: Wed, 28 Nov 2018 21:06:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181128195802.B6A6C7456B9@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181126200009.862-5-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] i2c: Move typedef of bitbang_i2c_interface
- to i2c.h
+Subject: Re: [Qemu-devel] [PATCH v2 04/16] virtio: split virtio rng bits
+ from virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +35,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, peterx@redhat.com
 
-On 11/28/18 1:27 PM, BALATON Zoltan wrote:
-> Clang 3.4 considers duplicate typedef in ppc4xx_i2c.h and
-> bitbang_i2c.h an error even if they are identical. Move it to a common
-> place to allow building with this clang version.
+On 26/11/2018 20:59, Juan Quintela wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > ---
->   hw/i2c/bitbang_i2c.h        | 2 --
->   include/hw/i2c/i2c.h        | 2 ++
->   include/hw/i2c/ppc4xx_i2c.h | 3 ---
->   3 files changed, 2 insertions(+), 5 deletions(-)
 > 
-> diff --git a/hw/i2c/bitbang_i2c.h b/hw/i2c/bitbang_i2c.h
-> index 3a7126d5de..9443021710 100644
-> --- a/hw/i2c/bitbang_i2c.h
-> +++ b/hw/i2c/bitbang_i2c.h
-> @@ -3,8 +3,6 @@
->   
->   #include "hw/i2c/i2c.h"
->   
-> -typedef struct bitbang_i2c_interface bitbang_i2c_interface;
+> Remove the "contributions after" clause.  This is based on
+> 
+> commit 59ccd20a9ac719cff82180429458728f03ec612f
+> Author: KONRAD Frederic <fred.konrad@greensocs.com>
+> Date:   Wed Apr 24 10:07:56 2013 +0200
+> ---
+>  hw/virtio/Makefile.objs    |  1 +
+>  hw/virtio/virtio-pci.c     | 52 -----------------------
+>  hw/virtio/virtio-pci.h     | 14 -------
+>  hw/virtio/virtio-rng-pci.c | 86 ++++++++++++++++++++++++++++++++++++++
+>  tests/Makefile.include     |  1 +
+>  5 files changed, 88 insertions(+), 66 deletions(-)
+>  create mode 100644 hw/virtio/virtio-rng-pci.c
+...
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index fb0b449c02..e8235890ec 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -149,6 +149,7 @@ check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
+>  check-qtest-virtio-y += tests/virtio-balloon-test$(EXESUF)
+>  check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
+>  check-qtest-virtio-y += tests/virtio-rng-test$(EXESUF)
+> +check-qtest-virtio-$(CONFIG_VIRTIO_RNG) += tests/virtio-rng-test$(EXESUF)
 
-Would this also be an opportunity to rename the struct to something 
-CamelCase to match our coding conventions?
+I think you should remove the line just above.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+except that:
+
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
