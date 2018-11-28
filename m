@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRrgu-0001Ro-7c
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 23:43:13 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gRsAo-0003Vx-S1
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 00:14:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRrgq-0006nj-3G
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 23:43:12 -0500
-Date: Wed, 28 Nov 2018 15:39:53 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gRsAk-0003eX-Kx
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 00:14:06 -0500
+Date: Wed, 28 Nov 2018 16:13:52 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181128043953.GB2251@umbus.fritz.box>
+Message-ID: <20181128051352.GD2251@umbus.fritz.box>
 References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-19-clg@kaod.org>
+	<20181116105729.23240-21-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="avNtfD0ffNO6L/9g"
+	protocol="application/pgp-signature"; boundary="qKojvbh47KHQqxue"
 Content-Disposition: inline
-In-Reply-To: <20181116105729.23240-19-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 18/36] spapr: allocate the interrupt
- thread context under the CPU core
+In-Reply-To: <20181116105729.23240-21-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 20/36] spapr: add classes for the XIVE
+ models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,200 +29,605 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---avNtfD0ffNO6L/9g
+--qKojvbh47KHQqxue
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 16, 2018 at 11:57:11AM +0100, C=E9dric Le Goater wrote:
-> Each interrupt mode has its own specific interrupt presenter object,
-> that we store under the CPU object, one for XICS and one for XIVE.
+On Fri, Nov 16, 2018 at 11:57:13AM +0100, C=E9dric Le Goater wrote:
+> The XIVE models for the QEMU and KVM accelerators will have a lot in
+> common. Introduce an abstract class for the source, the thread context
+> and the interrupt controller object to handle the differences in the
+> object initialization. These classes will also be used to define state
+> synchronization handlers for the monitor and migration usage.
 >=20
-> Extend the sPAPR IRQ backend with a new handler to support them both.
->=20
+> This is very much like the XICS models.
+
+Yeah.. so I know it's my code, but in hindsight I think making
+separate subclasses for TCG and KVM was a mistake.  The distinction
+between emulated and KVM version is supposed to be invisible to both
+guest and (almost) to user, whereas a subclass usually indicates a
+visibly different device.
+
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
 > ---
->  include/hw/ppc/spapr.h     |  1 +
->  include/hw/ppc/spapr_irq.h |  2 ++
->  include/hw/ppc/xive.h      |  2 ++
->  hw/intc/xive.c             | 21 +++++++++++++++++++++
->  hw/ppc/spapr_cpu_core.c    |  5 ++---
->  hw/ppc/spapr_irq.c         | 17 +++++++++++++++++
->  6 files changed, 45 insertions(+), 3 deletions(-)
+>  include/hw/ppc/spapr_xive.h |  15 +++++
+>  include/hw/ppc/xive.h       |  30 ++++++++++
+>  hw/intc/spapr_xive.c        |  86 +++++++++++++++++++---------
+>  hw/intc/xive.c              | 109 +++++++++++++++++++++++++-----------
+>  hw/ppc/spapr_irq.c          |   4 +-
+>  5 files changed, 182 insertions(+), 62 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 8415faea7b82..f43ef69d61bc 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -177,6 +177,7 @@ struct sPAPRMachineState {
->      int32_t irq_map_nr;
->      unsigned long *irq_map;
->      sPAPRXive  *xive;
-> +    const char *xive_tctx_type;
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 5b3fab192d41..aca2969a09ab 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -13,6 +13,10 @@
+>  #include "hw/sysbus.h"
+>  #include "hw/ppc/xive.h"
 > =20
->      bool cmd_line_caps[SPAPR_CAP_NUM];
->      sPAPRCapabilities def, eff, mig;
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index cfdc1f86e713..c3b4c38145eb 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -42,6 +42,8 @@ typedef struct sPAPRIrq {
->      void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
->      void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_servers,
->                          void *fdt, uint32_t phandle);
-> +    Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
-> +                               Error **errp);
->  } sPAPRIrq;
+> +#define TYPE_SPAPR_XIVE_BASE "spapr-xive-base"
+> +#define SPAPR_XIVE_BASE(obj) \
+> +    OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIVE_BASE)
+> +
+>  #define TYPE_SPAPR_XIVE "spapr-xive"
+>  #define SPAPR_XIVE(obj) OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIVE)
 > =20
->  extern sPAPRIrq spapr_irq_xics;
+> @@ -38,6 +42,17 @@ typedef struct sPAPRXive {
+>      MemoryRegion  tm_mmio;
+>  } sPAPRXive;
+> =20
+> +#define SPAPR_XIVE_BASE_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(sPAPRXiveClass, (klass), TYPE_SPAPR_XIVE_BASE)
+> +#define SPAPR_XIVE_BASE_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(sPAPRXiveClass, (obj), TYPE_SPAPR_XIVE_BASE)
+> +
+> +typedef struct sPAPRXiveClass {
+> +    XiveRouterClass parent_class;
+> +
+> +    DeviceRealize   parent_realize;
+> +} sPAPRXiveClass;
+> +
+>  bool spapr_xive_irq_enable(sPAPRXive *xive, uint32_t lisn, bool lsi);
+>  bool spapr_xive_irq_disable(sPAPRXive *xive, uint32_t lisn);
+>  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
 > diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index e6931ddaa83f..b74eb326dcd1 100644
+> index b74eb326dcd1..281ed370121c 100644
 > --- a/include/hw/ppc/xive.h
 > +++ b/include/hw/ppc/xive.h
-> @@ -284,6 +284,8 @@ typedef struct XiveTCTX {
->  extern const MemoryRegionOps xive_tm_ops;
+> @@ -38,6 +38,10 @@ typedef struct XiveFabricClass {
+>   * XIVE Interrupt Source
+>   */
 > =20
->  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
-> +Object *xive_tctx_create(Object *cpu, const char *type, XiveRouter *xrtr,
-> +                         Error **errp);
-> =20
->  static inline uint32_t xive_tctx_cam_line(uint8_t nvt_blk, uint32_t nvt_=
-idx)
->  {
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index fc6ef5895e6d..7d921023e2ee 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -579,6 +579,27 @@ static const TypeInfo xive_tctx_info =3D {
->      .class_init    =3D xive_tctx_class_init,
->  };
-> =20
-> +Object *xive_tctx_create(Object *cpu, const char *type, XiveRouter *xrtr,
-> +                         Error **errp)
-> +{
-> +    Error *local_err =3D NULL;
-> +    Object *obj;
+> +#define TYPE_XIVE_SOURCE_BASE "xive-source-base"
+> +#define XIVE_SOURCE_BASE(obj) \
+> +    OBJECT_CHECK(XiveSource, (obj), TYPE_XIVE_SOURCE_BASE)
 > +
-> +    obj =3D object_new(type);
-> +    object_property_add_child(cpu, type, obj, &error_abort);
-> +    object_unref(obj);
-> +    object_property_add_const_link(obj, "cpu", cpu, &error_abort);
-> +    object_property_add_const_link(obj, "xive", OBJECT(xrtr), &error_abo=
-rt);
-> +    object_property_set_bool(obj, true, "realized", &local_err);
-> +    if (local_err) {
-> +        object_unparent(obj);
-> +        error_propagate(errp, local_err);
-> +        return NULL;
-> +    }
+>  #define TYPE_XIVE_SOURCE "xive-source"
+>  #define XIVE_SOURCE(obj) OBJECT_CHECK(XiveSource, (obj), TYPE_XIVE_SOURC=
+E)
+> =20
+> @@ -68,6 +72,18 @@ typedef struct XiveSource {
+>      XiveFabric      *xive;
+>  } XiveSource;
+> =20
+> +#define XIVE_SOURCE_BASE_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(XiveSourceClass, (klass), TYPE_XIVE_SOURCE_BASE)
+> +#define XIVE_SOURCE_BASE_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(XiveSourceClass, (obj), TYPE_XIVE_SOURCE_BASE)
 > +
-> +    return obj;
-> +}
+> +typedef struct XiveSourceClass {
+> +    SysBusDeviceClass parent_class;
+> +
+> +    DeviceRealize     parent_realize;
+> +    DeviceReset       parent_reset;
+> +} XiveSourceClass;
 > +
 >  /*
->   * XIVE ESB helpers
+>   * ESB MMIO setting. Can be one page, for both source triggering and
+>   * source management, or two different pages. See below for magic
+> @@ -253,6 +269,9 @@ void xive_end_pic_print_info(XiveEND *end, uint32_t e=
+nd_idx, Monitor *mon);
+>   * XIVE Thread interrupt Management (TM) context
 >   */
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 2398ce62c0e7..1811cd48db90 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -11,7 +11,6 @@
->  #include "hw/ppc/spapr_cpu_core.h"
->  #include "target/ppc/cpu.h"
->  #include "hw/ppc/spapr.h"
-> -#include "hw/ppc/xics.h" /* for icp_create() - to be removed */
->  #include "hw/boards.h"
->  #include "qapi/error.h"
->  #include "sysemu/cpus.h"
-> @@ -215,6 +214,7 @@ static void spapr_cpu_core_unrealize(DeviceState *dev=
-, Error **errp)
->  static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->                                 sPAPRCPUCore *sc, Error **errp)
->  {
-> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->      CPUPPCState *env =3D &cpu->env;
->      CPUState *cs =3D CPU(cpu);
->      Error *local_err =3D NULL;
-> @@ -233,8 +233,7 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPR=
-MachineState *spapr,
->      qemu_register_reset(spapr_cpu_reset, cpu);
->      spapr_cpu_reset(cpu);
 > =20
-> -    cpu->intc =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC(s=
-papr),
-> -                           &local_err);
-> +    cpu->intc =3D smc->irq->cpu_intc_create(spapr, OBJECT(cpu), &local_e=
-rr);
->      if (local_err) {
->          goto error_unregister;
->      }
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index d88a029d8c5c..253abc10e780 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -197,6 +197,12 @@ static void spapr_irq_dt_populate_xics(sPAPRMachineS=
-tate *spapr,
->      spapr_dt_xics(nr_servers, fdt, phandle);
+> +#define TYPE_XIVE_TCTX_BASE "xive-tctx-base"
+> +#define XIVE_TCTX_BASE(obj) OBJECT_CHECK(XiveTCTX, (obj), TYPE_XIVE_TCTX=
+_BASE)
+> +
+>  #define TYPE_XIVE_TCTX "xive-tctx"
+>  #define XIVE_TCTX(obj) OBJECT_CHECK(XiveTCTX, (obj), TYPE_XIVE_TCTX)
+> =20
+> @@ -278,6 +297,17 @@ typedef struct XiveTCTX {
+>      XiveRouter  *xrtr;
+>  } XiveTCTX;
+> =20
+> +#define XIVE_TCTX_BASE_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(XiveTCTXClass, (klass), TYPE_XIVE_TCTX_BASE)
+> +#define XIVE_TCTX_BASE_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(XiveTCTXClass, (obj), TYPE_XIVE_TCTX_BASE)
+> +
+> +typedef struct XiveTCTXClass {
+> +    DeviceClass       parent_class;
+> +
+> +    DeviceRealize     parent_realize;
+> +} XiveTCTXClass;
+> +
+>  /*
+>   * XIVE Thread Interrupt Management Aera (TIMA)
+>   */
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 3bf77ace11a2..ec85f7e4f88d 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -53,9 +53,9 @@ static void spapr_xive_mmio_map(sPAPRXive *xive)
+>      sysbus_mmio_map(SYS_BUS_DEVICE(xive), 0, xive->tm_base);
 >  }
 > =20
-> +static Object *spapr_irq_cpu_intc_create_xics(sPAPRMachineState *spapr,
-> +                                              Object *cpu, Error **errp)
-> +{
-> +    return icp_create(cpu, spapr->icp_type, XICS_FABRIC(spapr), errp);
-> +}
-> +
->  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
->  #define SPAPR_IRQ_XICS_NR_MSIS     \
->      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-> @@ -211,6 +217,7 @@ sPAPRIrq spapr_irq_xics =3D {
->      .qirq        =3D spapr_qirq_xics,
->      .print_info  =3D spapr_irq_print_info_xics,
->      .dt_populate =3D spapr_irq_dt_populate_xics,
-> +    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+> -static void spapr_xive_reset(DeviceState *dev)
+> +static void spapr_xive_base_reset(DeviceState *dev)
+>  {
+> -    sPAPRXive *xive =3D SPAPR_XIVE(dev);
+> +    sPAPRXive *xive =3D SPAPR_XIVE_BASE(dev);
+>      int i;
+> =20
+>      /* Xive Source reset is done through SysBus, it should put all
+> @@ -76,9 +76,9 @@ static void spapr_xive_reset(DeviceState *dev)
+>      spapr_xive_mmio_map(xive);
+>  }
+> =20
+> -static void spapr_xive_instance_init(Object *obj)
+> +static void spapr_xive_base_instance_init(Object *obj)
+>  {
+> -    sPAPRXive *xive =3D SPAPR_XIVE(obj);
+> +    sPAPRXive *xive =3D SPAPR_XIVE_BASE(obj);
+> =20
+>      object_initialize(&xive->source, sizeof(xive->source), TYPE_XIVE_SOU=
+RCE);
+>      object_property_add_child(obj, "source", OBJECT(&xive->source), NULL=
+);
+> @@ -89,9 +89,9 @@ static void spapr_xive_instance_init(Object *obj)
+>                                NULL);
+>  }
+> =20
+> -static void spapr_xive_realize(DeviceState *dev, Error **errp)
+> +static void spapr_xive_base_realize(DeviceState *dev, Error **errp)
+>  {
+> -    sPAPRXive *xive =3D SPAPR_XIVE(dev);
+> +    sPAPRXive *xive =3D SPAPR_XIVE_BASE(dev);
+>      XiveSource *xsrc =3D &xive->source;
+>      XiveENDSource *end_xsrc =3D &xive->end_source;
+>      Error *local_err =3D NULL;
+> @@ -142,16 +142,11 @@ static void spapr_xive_realize(DeviceState *dev, Er=
+ror **errp)
+>       */
+>      xive->eat =3D g_new0(XiveEAS, xive->nr_irqs);
+>      xive->endt =3D g_new0(XiveEND, xive->nr_ends);
+> -
+> -    /* TIMA initialization */
+> -    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
+ve,
+> -                          "xive.tima", 4ull << TM_SHIFT);
+> -    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &xive->tm_mmio);
+>  }
+> =20
+>  static int spapr_xive_get_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *=
+eas)
+>  {
+> -    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
+> +    sPAPRXive *xive =3D SPAPR_XIVE_BASE(xrtr);
+> =20
+>      if (lisn >=3D xive->nr_irqs) {
+>          return -1;
+> @@ -163,7 +158,7 @@ static int spapr_xive_get_eas(XiveRouter *xrtr, uint3=
+2_t lisn, XiveEAS *eas)
+> =20
+>  static int spapr_xive_set_eas(XiveRouter *xrtr, uint32_t lisn, XiveEAS *=
+eas)
+>  {
+> -    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
+> +    sPAPRXive *xive =3D SPAPR_XIVE_BASE(xrtr);
+> =20
+>      if (lisn >=3D xive->nr_irqs) {
+>          return -1;
+> @@ -176,7 +171,7 @@ static int spapr_xive_set_eas(XiveRouter *xrtr, uint3=
+2_t lisn, XiveEAS *eas)
+>  static int spapr_xive_get_end(XiveRouter *xrtr,
+>                                uint8_t end_blk, uint32_t end_idx, XiveEND=
+ *end)
+>  {
+> -    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
+> +    sPAPRXive *xive =3D SPAPR_XIVE_BASE(xrtr);
+> =20
+>      if (end_idx >=3D xive->nr_ends) {
+>          return -1;
+> @@ -189,7 +184,7 @@ static int spapr_xive_get_end(XiveRouter *xrtr,
+>  static int spapr_xive_set_end(XiveRouter *xrtr,
+>                                uint8_t end_blk, uint32_t end_idx, XiveEND=
+ *end)
+>  {
+> -    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
+> +    sPAPRXive *xive =3D SPAPR_XIVE_BASE(xrtr);
+> =20
+>      if (end_idx >=3D xive->nr_ends) {
+>          return -1;
+> @@ -202,7 +197,7 @@ static int spapr_xive_set_end(XiveRouter *xrtr,
+>  static int spapr_xive_get_nvt(XiveRouter *xrtr,
+>                                uint8_t nvt_blk, uint32_t nvt_idx, XiveNVT=
+ *nvt)
+>  {
+> -    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
+> +    sPAPRXive *xive =3D SPAPR_XIVE_BASE(xrtr);
+>      uint32_t vcpu_id =3D spapr_xive_nvt_to_target(xive, nvt_blk, nvt_idx=
+);
+>      PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
+> =20
+> @@ -236,7 +231,7 @@ static void spapr_xive_reset_tctx(XiveRouter *xrtr, X=
+iveTCTX *tctx)
+>      uint32_t nvt_idx;
+>      uint32_t nvt_cam;
+> =20
+> -    spapr_xive_cpu_to_nvt(SPAPR_XIVE(xrtr), POWERPC_CPU(tctx->cs),
+> +    spapr_xive_cpu_to_nvt(SPAPR_XIVE_BASE(xrtr), POWERPC_CPU(tctx->cs),
+>                            &nvt_blk, &nvt_idx);
+> =20
+>      nvt_cam =3D cpu_to_be32(TM_QW1W2_VO | xive_tctx_cam_line(nvt_blk, nv=
+t_idx));
+> @@ -359,7 +354,7 @@ static const VMStateDescription vmstate_spapr_xive_ea=
+s =3D {
+>      },
 >  };
 > =20
->   /*
-> @@ -267,6 +274,7 @@ static void spapr_irq_init_xive(sPAPRMachineState *sp=
-apr, int nr_irqs,
+> -static const VMStateDescription vmstate_spapr_xive =3D {
+> +static const VMStateDescription vmstate_spapr_xive_base =3D {
+>      .name =3D TYPE_SPAPR_XIVE,
+>      .version_id =3D 1,
+>      .minimum_version_id =3D 1,
+> @@ -373,7 +368,7 @@ static const VMStateDescription vmstate_spapr_xive =
+=3D {
+>      },
+>  };
+> =20
+> -static Property spapr_xive_properties[] =3D {
+> +static Property spapr_xive_base_properties[] =3D {
+>      DEFINE_PROP_UINT32("nr-irqs", sPAPRXive, nr_irqs, 0),
+>      DEFINE_PROP_UINT32("nr-ends", sPAPRXive, nr_ends, 0),
+>      DEFINE_PROP_UINT64("vc-base", sPAPRXive, vc_base, SPAPR_XIVE_VC_BASE=
+),
+> @@ -381,16 +376,16 @@ static Property spapr_xive_properties[] =3D {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> -static void spapr_xive_class_init(ObjectClass *klass, void *data)
+> +static void spapr_xive_base_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>      XiveRouterClass *xrc =3D XIVE_ROUTER_CLASS(klass);
+> =20
+>      dc->desc    =3D "sPAPR XIVE Interrupt Controller";
+> -    dc->props   =3D spapr_xive_properties;
+> -    dc->realize =3D spapr_xive_realize;
+> -    dc->reset   =3D spapr_xive_reset;
+> -    dc->vmsd    =3D &vmstate_spapr_xive;
+> +    dc->props   =3D spapr_xive_base_properties;
+> +    dc->realize =3D spapr_xive_base_realize;
+> +    dc->reset   =3D spapr_xive_base_reset;
+> +    dc->vmsd    =3D &vmstate_spapr_xive_base;
+> =20
+>      xrc->get_eas =3D spapr_xive_get_eas;
+>      xrc->set_eas =3D spapr_xive_set_eas;
+> @@ -401,16 +396,55 @@ static void spapr_xive_class_init(ObjectClass *klas=
+s, void *data)
+>      xrc->reset_tctx =3D spapr_xive_reset_tctx;
+>  }
+> =20
+> +static const TypeInfo spapr_xive_base_info =3D {
+> +    .name =3D TYPE_SPAPR_XIVE_BASE,
+> +    .parent =3D TYPE_XIVE_ROUTER,
+> +    .abstract =3D true,
+> +    .instance_init =3D spapr_xive_base_instance_init,
+> +    .instance_size =3D sizeof(sPAPRXive),
+> +    .class_init =3D spapr_xive_base_class_init,
+> +    .class_size =3D sizeof(sPAPRXiveClass),
+> +};
+> +
+> +static void spapr_xive_realize(DeviceState *dev, Error **errp)
+> +{
+> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
+> +    sPAPRXiveClass *sxc =3D SPAPR_XIVE_BASE_GET_CLASS(dev);
+> +    Error *local_err =3D NULL;
+> +
+> +    sxc->parent_realize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    /* TIMA */
+> +    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
+ve,
+> +                          "xive.tima", 4ull << TM_SHIFT);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &xive->tm_mmio);
+> +}
+> +
+> +static void spapr_xive_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +    sPAPRXiveClass *sxc =3D SPAPR_XIVE_BASE_CLASS(klass);
+> +
+> +    device_class_set_parent_realize(dc, spapr_xive_realize,
+> +                                    &sxc->parent_realize);
+> +}
+> +
+>  static const TypeInfo spapr_xive_info =3D {
+>      .name =3D TYPE_SPAPR_XIVE,
+> -    .parent =3D TYPE_XIVE_ROUTER,
+> -    .instance_init =3D spapr_xive_instance_init,
+> +    .parent =3D TYPE_SPAPR_XIVE_BASE,
+> +    .instance_init =3D spapr_xive_base_instance_init,
+>      .instance_size =3D sizeof(sPAPRXive),
+>      .class_init =3D spapr_xive_class_init,
+> +    .class_size =3D sizeof(sPAPRXiveClass),
+>  };
+> =20
+>  static void spapr_xive_register_types(void)
+>  {
+> +    type_register_static(&spapr_xive_base_info);
+>      type_register_static(&spapr_xive_info);
+>  }
+> =20
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 7d921023e2ee..9bb37553c9ec 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -478,9 +478,9 @@ static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tctx,=
+ bool block_group)
+>      return tctx_hw_cam_line(block_group, (pir >> 8) & 0xf, pir & 0x7f);
+>  }
+> =20
+> -static void xive_tctx_reset(void *dev)
+> +static void xive_tctx_base_reset(void *dev)
+>  {
+> -    XiveTCTX *tctx =3D XIVE_TCTX(dev);
+> +    XiveTCTX *tctx =3D XIVE_TCTX_BASE(dev);
+>      XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(tctx->xrtr);
+> =20
+>      memset(tctx->regs, 0, sizeof(tctx->regs));
+> @@ -506,9 +506,9 @@ static void xive_tctx_reset(void *dev)
+>      }
+>  }
+> =20
+> -static void xive_tctx_realize(DeviceState *dev, Error **errp)
+> +static void xive_tctx_base_realize(DeviceState *dev, Error **errp)
+>  {
+> -    XiveTCTX *tctx =3D XIVE_TCTX(dev);
+> +    XiveTCTX *tctx =3D XIVE_TCTX_BASE(dev);
+>      PowerPCCPU *cpu;
+>      CPUPPCState *env;
+>      Object *obj;
+> @@ -544,15 +544,15 @@ static void xive_tctx_realize(DeviceState *dev, Err=
+or **errp)
 >          return;
 >      }
 > =20
-> +    spapr->xive_tctx_type =3D TYPE_XIVE_TCTX;
->      spapr_xive_hcall_init(spapr);
+> -    qemu_register_reset(xive_tctx_reset, dev);
+> +    qemu_register_reset(xive_tctx_base_reset, dev);
 >  }
 > =20
-> @@ -315,6 +323,13 @@ static void spapr_irq_dt_populate_xive(sPAPRMachineS=
-tate *spapr,
->      spapr_dt_xive(spapr->xive, nr_servers, fdt, phandle);
+> -static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
+> +static void xive_tctx_base_unrealize(DeviceState *dev, Error **errp)
+>  {
+> -    qemu_unregister_reset(xive_tctx_reset, dev);
+> +    qemu_unregister_reset(xive_tctx_base_reset, dev);
 >  }
 > =20
-> +static Object *spapr_irq_cpu_intc_create_xive(sPAPRMachineState *spapr,
-> +                                              Object *cpu, Error **errp)
-> +{
-> +    return xive_tctx_create(cpu, spapr->xive_tctx_type,
-> +                            XIVE_ROUTER(spapr->xive), errp);
+> -static const VMStateDescription vmstate_xive_tctx =3D {
+> +static const VMStateDescription vmstate_xive_tctx_base =3D {
+>      .name =3D TYPE_XIVE_TCTX,
+>      .version_id =3D 1,
+>      .minimum_version_id =3D 1,
+> @@ -562,21 +562,28 @@ static const VMStateDescription vmstate_xive_tctx =
+=3D {
+>      },
+>  };
+> =20
+> -static void xive_tctx_class_init(ObjectClass *klass, void *data)
+> +static void xive_tctx_base_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> =20
+> -    dc->realize =3D xive_tctx_realize;
+> -    dc->unrealize =3D xive_tctx_unrealize;
+> +    dc->realize =3D xive_tctx_base_realize;
+> +    dc->unrealize =3D xive_tctx_base_unrealize;
+>      dc->desc =3D "XIVE Interrupt Thread Context";
+> -    dc->vmsd =3D &vmstate_xive_tctx;
+> +    dc->vmsd =3D &vmstate_xive_tctx_base;
+>  }
+> =20
+> -static const TypeInfo xive_tctx_info =3D {
+> -    .name          =3D TYPE_XIVE_TCTX,
+> +static const TypeInfo xive_tctx_base_info =3D {
+> +    .name          =3D TYPE_XIVE_TCTX_BASE,
+>      .parent        =3D TYPE_DEVICE,
+> +    .abstract      =3D true,
+>      .instance_size =3D sizeof(XiveTCTX),
+> -    .class_init    =3D xive_tctx_class_init,
+> +    .class_init    =3D xive_tctx_base_class_init,
+> +    .class_size    =3D sizeof(XiveTCTXClass),
+> +};
+> +
+> +static const TypeInfo xive_tctx_info =3D {
+> +    .name          =3D TYPE_XIVE_TCTX,
+> +    .parent        =3D TYPE_XIVE_TCTX_BASE,
+>  };
+> =20
+>  Object *xive_tctx_create(Object *cpu, const char *type, XiveRouter *xrtr,
+> @@ -933,9 +940,9 @@ void xive_source_pic_print_info(XiveSource *xsrc, uin=
+t32_t offset, Monitor *mon)
+>      }
+>  }
+> =20
+> -static void xive_source_reset(DeviceState *dev)
+> +static void xive_source_base_reset(DeviceState *dev)
+>  {
+> -    XiveSource *xsrc =3D XIVE_SOURCE(dev);
+> +    XiveSource *xsrc =3D XIVE_SOURCE_BASE(dev);
+> =20
+>      /* Do not clear the LSI bitmap */
+> =20
+> @@ -943,9 +950,9 @@ static void xive_source_reset(DeviceState *dev)
+>      memset(xsrc->status, 0x1, xsrc->nr_irqs);
+>  }
+> =20
+> -static void xive_source_realize(DeviceState *dev, Error **errp)
+> +static void xive_source_base_realize(DeviceState *dev,  Error **errp)
+>  {
+> -    XiveSource *xsrc =3D XIVE_SOURCE(dev);
+> +    XiveSource *xsrc =3D XIVE_SOURCE_BASE(dev);
+>      Object *obj;
+>      Error *local_err =3D NULL;
+> =20
+> @@ -971,21 +978,14 @@ static void xive_source_realize(DeviceState *dev, E=
+rror **errp)
+>          return;
+>      }
+> =20
+> -    xsrc->qirqs =3D qemu_allocate_irqs(xive_source_set_irq, xsrc,
+> -                                     xsrc->nr_irqs);
+> -
+>      xsrc->status =3D g_malloc0(xsrc->nr_irqs);
+> =20
+>      xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
+>      xsrc->lsi_map_size =3D xsrc->nr_irqs;
+> =20
+> -    memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+> -                          &xive_source_esb_ops, xsrc, "xive.esb",
+> -                          (1ull << xsrc->esb_shift) * xsrc->nr_irqs);
+> -    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &xsrc->esb_mmio);
+>  }
+> =20
+> -static const VMStateDescription vmstate_xive_source =3D {
+> +static const VMStateDescription vmstate_xive_source_base =3D {
+>      .name =3D TYPE_XIVE_SOURCE,
+>      .version_id =3D 1,
+>      .minimum_version_id =3D 1,
+> @@ -1001,29 +1001,68 @@ static const VMStateDescription vmstate_xive_sour=
+ce =3D {
+>   * The default XIVE interrupt source setting for the ESB MMIOs is two
+>   * 64k pages without Store EOI, to be in sync with KVM.
+>   */
+> -static Property xive_source_properties[] =3D {
+> +static Property xive_source_base_properties[] =3D {
+>      DEFINE_PROP_UINT64("flags", XiveSource, esb_flags, 0),
+>      DEFINE_PROP_UINT32("nr-irqs", XiveSource, nr_irqs, 0),
+>      DEFINE_PROP_UINT32("shift", XiveSource, esb_shift, XIVE_ESB_64K_2PAG=
+E),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> -static void xive_source_class_init(ObjectClass *klass, void *data)
+> +static void xive_source_base_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> =20
+>      dc->desc    =3D "XIVE Interrupt Source";
+> -    dc->props   =3D xive_source_properties;
+> -    dc->realize =3D xive_source_realize;
+> -    dc->reset   =3D xive_source_reset;
+> -    dc->vmsd    =3D &vmstate_xive_source;
+> +    dc->props   =3D xive_source_base_properties;
+> +    dc->realize =3D xive_source_base_realize;
+> +    dc->reset   =3D xive_source_base_reset;
+> +    dc->vmsd    =3D &vmstate_xive_source_base;
 > +}
 > +
->  /*
->   * XIVE uses the full IRQ number space. Set it to 8K to be compatible
->   * with XICS.
-> @@ -333,6 +348,7 @@ sPAPRIrq spapr_irq_xive =3D {
->      .qirq        =3D spapr_qirq_xive,
->      .print_info  =3D spapr_irq_print_info_xive,
->      .dt_populate =3D spapr_irq_dt_populate_xive,
-> +    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
+> +static const TypeInfo xive_source_base_info =3D {
+> +    .name          =3D TYPE_XIVE_SOURCE_BASE,
+> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> +    .abstract      =3D true,
+> +    .instance_size =3D sizeof(XiveSource),
+> +    .class_init    =3D xive_source_base_class_init,
+> +    .class_size    =3D sizeof(XiveSourceClass),
+> +};
+> +
+> +static void xive_source_realize(DeviceState *dev, Error **errp)
+> +{
+> +    XiveSource *xsrc =3D XIVE_SOURCE(dev);
+> +    XiveSourceClass *xsc =3D XIVE_SOURCE_BASE_GET_CLASS(dev);
+> +    Error *local_err =3D NULL;
+> +
+> +    xsc->parent_realize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    xsrc->qirqs =3D qemu_allocate_irqs(xive_source_set_irq, xsrc, xsrc->=
+nr_irqs);
+> +
+> +    memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+> +                          &xive_source_esb_ops, xsrc, "xive.esb",
+> +                          (1ull << xsrc->esb_shift) * xsrc->nr_irqs);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &xsrc->esb_mmio);
+> +}
+> +
+> +static void xive_source_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +    XiveSourceClass *xsc =3D XIVE_SOURCE_BASE_CLASS(klass);
+> +
+> +    device_class_set_parent_realize(dc, xive_source_realize,
+> +                                    &xsc->parent_realize);
+>  }
+> =20
+>  static const TypeInfo xive_source_info =3D {
+>      .name          =3D TYPE_XIVE_SOURCE,
+> -    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> +    .parent        =3D TYPE_XIVE_SOURCE_BASE,
+>      .instance_size =3D sizeof(XiveSource),
+>      .class_init    =3D xive_source_class_init,
+> +    .class_size    =3D sizeof(XiveSourceClass),
 >  };
 > =20
 >  /*
-> @@ -438,4 +454,5 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
->      .qirq        =3D spapr_qirq_xics,
->      .print_info  =3D spapr_irq_print_info_xics,
->      .dt_populate =3D spapr_irq_dt_populate_xics,
-> +    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
->  };
+> @@ -1659,10 +1698,12 @@ static const TypeInfo xive_fabric_info =3D {
+> =20
+>  static void xive_register_types(void)
+>  {
+> +    type_register_static(&xive_source_base_info);
+>      type_register_static(&xive_source_info);
+>      type_register_static(&xive_fabric_info);
+>      type_register_static(&xive_router_info);
+>      type_register_static(&xive_end_source_info);
+> +    type_register_static(&xive_tctx_base_info);
+>      type_register_static(&xive_tctx_info);
+>  }
+> =20
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 42e73851b174..f6e9e44d4cf9 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -243,7 +243,7 @@ static sPAPRXive *spapr_xive_create(sPAPRMachineState=
+ *spapr,
+>          return NULL;
+>      }
+>      qdev_set_parent_bus(DEVICE(obj), sysbus_get_default());
+> -    xive =3D SPAPR_XIVE(obj);
+> +    xive =3D SPAPR_XIVE_BASE(obj);
+> =20
+>      /* Enable the CPU IPIs */
+>      for (i =3D 0; i < nr_servers; ++i) {
+> @@ -311,7 +311,7 @@ static void spapr_irq_print_info_xive(sPAPRMachineSta=
+te *spapr,
+>      CPU_FOREACH(cs) {
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> =20
+> -        xive_tctx_pic_print_info(XIVE_TCTX(cpu->intc), mon);
+> +        xive_tctx_pic_print_info(XIVE_TCTX_BASE(cpu->intc), mon);
+>      }
+> =20
+>      spapr_xive_pic_print_info(spapr->xive, mon);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -230,24 +635,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---avNtfD0ffNO6L/9g
+--qKojvbh47KHQqxue
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv+HBkACgkQbDjKyiDZ
-s5LkwQ//QMdtQ+UwFRWFDVF72AqNVH4yxOC5g+mugse7lNTCfgBYRe2Gxb8Z9wv7
-JJLrrSzPo+QAEQFQ03XtGCHL7PHh/BheEKCjSRPMGRdkx+OU6gGmh7fTemVqCKKF
-wp8Bp1h1H1kbEATUbVENKTIbqD0VykdsAUhpRvlvYZE6w9a/EGsddMnb9IfLjfAv
-FHrOk47ZgPWTzq/5dowYkEmZr1BQhf/eawsLWgOcCUazLhlF/tAvwdH/GWZwKle6
-iYSa6BLNbEJbgmUc5ghbNMWKVNNv9tfhwn5sYcj38GDPQSouH1FaVbgz2bgoe8aA
-TLP+BTY10v0a3359SP5uU6zNTng5OVivGDmeVClBcXiLfbD2ydDFReRRFcpdbJOj
-QV311UCsAmIIzSR0v95CmXlWFw7n4JD1qtcNBZWnAOHTTCdvswxqg3QEaeTyOGpm
-Klp0dvagvX0/f04iafDZRuQP6FkGB0O++HS/Z7GtI20CYJ/5cjray/b0XcsuqtAa
-AgKaDhaGGj8ahzVfZCo4/aCtUcxfJqti54RpszipsXlgaRikLDG/CVGnxMRYijj4
-n2qsoAROkOZcJ9RusGacyt6bK4spaQ+6OTswtaGfWlF7PD98P0zTBhVBMMRPBI6O
-zXWx+lK5FhL54F92itUCi0xyVMvU6IrgiHQ1P9s7T2Ag5GFtrBI=
-=Y8by
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv+JA4ACgkQbDjKyiDZ
+s5J5kxAA4+O0pv0aWDWUWZ0A5X2lS9ccV5IF5CJJq+b/i7H0guOC44su0CY+4Zf/
+HA5/EUC432ysBkZtSR8ucpD8n2iwJqGIZt/thkLug1QXvP0dxObn8R4jjjgvI/pV
+L0OGrXFAbLP1+SaNuHptSlPwVxs32Y0q75lHz8jaaGkyb4CB4KpRYuhDf/ciFSOR
+hCimhpVl6ZYmtLBw5ZLQhyxB53F+Bv0mAvxFesJ6hrYfgtcntypXMdnSJsv6tfi1
+bs0nkX7sC0ggPzWcMfiHaasfwlTT9YME5Qtuv6WXaIeez2NCcZdWQK7iCHljOZuB
+CxMovMSTSddecOD0MIDBq7FdmGDdMCYsgAWobs1jdbkXkowqQoM8PpYqojkAgZaZ
+Wq3CzTTdiL2KN0IiydjOfQh/k1OJTQjNv/CAdlICl4mcibwPeyqptOITeSD6NlWZ
+FzF5SgoGZn2H3EQ3E01rrmWiRusr9w9oaXjA2G5ZcG2VKEQQD6psO8QvcKGdPisv
+j+7iquZiyqsmujtDzG9v4nVVyi6A8BzZC49SYWEuvW3qca2KQjClWtD3hK4KmBcy
+vL0pnFSOI+YCqlK34cvDWTB1v7EpbM4nR4y2aLkMZTq/B9APhY7m+gXZeOX1IkoW
+QG7CfFNjVdLPaVlleNB0O+RBGO3a9RCEDm3pbU0Fb8jmQaI0S6Y=
+=aX+0
 -----END PGP SIGNATURE-----
 
---avNtfD0ffNO6L/9g--
+--qKojvbh47KHQqxue--
