@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gRwRH-0003H8-Ve
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:47:25 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gRwUf-0006Hg-Pc
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:50:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gRwRG-0006IW-P9
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:47:23 -0500
-Date: Wed, 28 Nov 2018 10:46:41 +0100
-From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181128094640.GB5677@caravaggio>
+	(envelope-from <imammedo@redhat.com>) id 1gRwUe-0000oI-H6
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:50:53 -0500
+Date: Wed, 28 Nov 2018 10:50:38 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181128105038.592f50a0@redhat.com>
+In-Reply-To: <20181126162942.21258-9-sameo@linux.intel.com>
 References: <20181126162942.21258-1-sameo@linux.intel.com>
-	<20181126162942.21258-5-sameo@linux.intel.com>
-	<20181127162551.29608eeb@redhat.com>
-	<20181127154218.GA5677@caravaggio>
-	<20181127172749.75a036b4@redhat.com>
+	<20181126162942.21258-9-sameo@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181127172749.75a036b4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/8] hw: arm: Carry RSDP specific data
- through AcpiRsdpData
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 8/8] hw: acpi: Remove AcpiRsdpDescriptor
+ and fix tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,190 +24,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, Thomas Huth <thuth@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Nov 27, 2018 at 05:27:49PM +0100, Igor Mammedov wrote:
-> On Tue, 27 Nov 2018 16:42:18 +0100
-> Samuel Ortiz <sameo@linux.intel.com> wrote:
+On Mon, 26 Nov 2018 17:29:41 +0100
+Samuel Ortiz <sameo@linux.intel.com> wrote:
+
+> We switched to the build_append_*() API for all RSDP callers, and this
+> patch converts all existing tests depending on this structure.
+> It is no longer needed and we can thus remove it.
+I'd rephrase it as following:
+
+The sole user of AcpiRsdpDescriptor structure is test,
+drop test dependency on it and remove no longer used structure.
+
+
 > 
-> > Hi Igor,
-> > 
-> > On Tue, Nov 27, 2018 at 04:25:51PM +0100, Igor Mammedov wrote:
-> > > On Mon, 26 Nov 2018 17:29:37 +0100
-> > > Samuel Ortiz <sameo@linux.intel.com> wrote:
-> > >   
-> > > > That will allow us to generalize the ARM build_rsdp() routine to support
-> > > > both legacy RSDP (The current i386 implementation) and extended RSDP
-> > > > (The ARM implementation).
-> > > > 
-> > > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > > > ---
-> > > >  include/hw/acpi/acpi-defs.h | 11 +++++++++++
-> > > >  hw/arm/virt-acpi-build.c    | 27 ++++++++++++++++++++++-----
-> > > >  2 files changed, 33 insertions(+), 5 deletions(-)
-> > > > 
-> > > > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> > > > index af8e023968..e7fd24c6c5 100644
-> > > > --- a/include/hw/acpi/acpi-defs.h
-> > > > +++ b/include/hw/acpi/acpi-defs.h
-> > > > @@ -53,6 +53,17 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
-> > > >  } QEMU_PACKED;
-> > > >  typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
-> > > >  
-> > > > +typedef struct AcpiRsdpData {
-> > > > +    uint8_t oem_id[6]; /* OEM identification */
-> > > > +    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
-> > > > +
-> > > > +    unsigned *rsdt_tbl_offset;
-> > > > +    unsigned *xsdt_tbl_offset;
-> > > > +} AcpiRsdpData;
-> > > > +  
-> > >   
-> > > > +#define ACPI_RSDP_REV_1 0
-> > > > +#define ACPI_RSDP_REV_2 2  
-> > > it's one time used spec defined values so just use values directly
-> > > in place with a comment, so reader won't have to jump around code
-> > > when comparing to spec.  
-> > It's also used in the ACPI tests fix patch.
-> it's better to use in test it's own version (we just opencode them there)
-> see fadt_fetch_facs_and_dsdt_ptrs()/sanitize_fadt_ptrs()
-> same applies for length.
-
-I think you're trying to explain to me that this:
-
-	/* sdt->aml field offset := spec offset - header size */
-        memset(sdt->aml + 0, 0, 4); /* sanitize FIRMWARE_CTRL(36) ptr */
-        memset(sdt->aml + 4, 0, 4); /* sanitize DSDT(40) ptr */
-        if (sdt->header.revision >= 3) {
-            memset(sdt->aml + 96, 0, 8); /* sanitize X_FIRMWARE_CTRL(132) ptr */
-            memset(sdt->aml + 104, 0, 8); /* sanitize X_DSDT(140) ptr */
-        }
-
-is good coding practice. I'm having a hard time internalizing that
-hard coded constants and comments not directly mapping the code (How do
-I map "sanitize X_FIRMWARE_CTRL(132) ptr" to "sdt->aml + 96, 0, 8"?) is
-indeed good practice. But I'll take the pragmatic route and follow what
-you guys advice for.
-
-
-> that way if we break it in qemu's code test would catch the thing
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> ---
+>  include/hw/acpi/acpi-defs.h | 13 ----------
+>  tests/acpi-utils.h          |  5 +++-
+>  tests/acpi-utils.c          | 48 ++++++++++++++++++++++++++++++-------
+>  tests/bios-tables-test.c    | 27 ++++++++++++++-------
+>  tests/vmgenid-test.c        |  8 ++++---
+>  5 files changed, 67 insertions(+), 34 deletions(-)
 > 
-> > Also the 0 for revision 1 is a little confusing, I feel the above
-> > definition is clearer.
-> that's confusion is in the spec, so we just mimic it, no need to add more on top
-> 
-> > 
-> > 
-> > > > +
-> > > >  /* Table structure from Linux kernel (the ACPI tables are under the
-> > > >     BSD license) */
-> > > >  
-> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > > index 0835900052..2dad465ecf 100644
-> > > > --- a/hw/arm/virt-acpi-build.c
-> > > > +++ b/hw/arm/virt-acpi-build.c
-> > > > @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
-> > > >  
-> > > >  /* RSDP */
-> > > >  static void
-> > > > -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> > > > +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
-> > > >  {
-> > > >      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
-> > > >      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
-> > > > @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> > > >                               true /* fseg memory */);
-> > > >  
-> > > >      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
-> > > > -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
-> > > > +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
-> > > >      rsdp->length = cpu_to_le32(sizeof(*rsdp));
-> > > > -    rsdp->revision = 0x02;
-> > > > +    rsdp->revision = rsdp_data->revision;
-> > > >  
-> > > >      /* Address to be filled by Guest linker */
-> > > >      bios_linker_loader_add_pointer(linker,
-> > > >          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
-> > > > -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
-> > > > +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
-> > > >  
-> > > >      /* Checksum to be filled by Guest linker */
-> > > >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> > > > @@ -399,6 +399,20 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> > > >          (char *)&rsdp->extended_checksum - rsdp_table->data);
-> > > >  }
-> > > >  
-> > > > +static void
-> > > > +init_rsdp_data(AcpiRsdpData *data, const char *oem_id, uint8_t revision,
-> > > > +               unsigned *rsdt_offset, unsigned *xsdt_offset)
-> > > > +{
-> > > > +    /* Caller must provide an OEM ID */
-> > > > +    g_assert(oem_id);
-> > > > +    g_assert(strlen(oem_id) >= 6);
-> > > > +
-> > > > +    memcpy(data->oem_id, oem_id, 6);
-> > > > +    data->revision = revision;
-> > > > +    data->rsdt_tbl_offset = rsdt_offset;
-> > > > +    data->xsdt_tbl_offset = xsdt_offset;
-> > > > +}
-> > > > +
-> > > >  static void
-> > > >  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> > > >  {
-> > > > @@ -810,6 +824,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-> > > >      GArray *table_offsets;
-> > > >      unsigned dsdt, xsdt;
-> > > >      GArray *tables_blob = tables->table_data;
-> > > > +    AcpiRsdpData rsdp;  
-> > > s/rsdp/rsdp_info/
-> > >   
-> > > >  
-> > > >      table_offsets = g_array_new(false, true /* clear */,
-> > > >                                          sizeof(uint32_t));
-> > > > @@ -857,7 +872,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-> > > >      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
-> > > >  
-> > > >      /* RSDP is in FSEG memory, so allocate it separately */
-> > > > -    build_rsdp(tables->rsdp, tables->linker, xsdt);
-> > > > +    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
-> > > > +                   NULL, &xsdt);  
-> > > It would be more concise to use declarative style without extra clutter:
-> > > 
-> > > -    init_rsdp_data(&rsdp, ACPI_BUILD_APPNAME6, ACPI_RSDP_REV_2,
-> > > -                   NULL, &xsdt);
-> > > -    build_rsdp(tables->rsdp, tables->linker, &rsdp);
-> > > +    {
-> > > +       AcpiRsdpData rsdp = {
-> > > +           .revision = 2,
-> > > +           .oem_id = ACPI_BUILD_APPNAME6,
-> > > +           .xsdt_tbl_offset = &xsdt,
-> > > +           .rsdt_tbl_offset = NULL,
-> > > +       };
-> > > +       build_rsdp(tables->rsdp, tables->linker, &rsdp);
-> > > +    }  
-> > 2 things here, imo:
-> > 
-> > - This is not more concise.
-> with function, one have to jump to it's definition/body to find out what
-> each argument is, with declaration + initialization inplace it's clear
-> what values mean as you see fields right there as well.
-With a structure you need to go and look at the structure definition to
-know which fields you need to initialize and what their names are. And
-no, you can't safely copy paste the above snippet and rest assured your
-code is safe, because C allows you to leave some structure fields
-uninitialized.
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index 9b2f6b8043..abef1d57ae 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -40,19 +40,6 @@ enum {
+>      ACPI_FADT_F_LOW_POWER_S0_IDLE_CAPABLE,
+>  };
+>  
+> -struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+> -    uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
+> -    uint8_t  checksum;               /* To make sum of struct == 0 */
+> -    uint8_t  oem_id [6];             /* OEM identification */
+> -    uint8_t  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
+> -    uint32_t rsdt_physical_address;  /* 32-bit physical address of RSDT */
+> -    uint32_t length;                 /* XSDT Length in bytes including hdr */
+> -    uint64_t xsdt_physical_address;  /* 64-bit physical address of XSDT */
+> -    uint8_t  extended_checksum;      /* Checksum of entire table */
+> -    uint8_t  reserved [3];           /* Reserved field must be 0 */
+> -} QEMU_PACKED;
+> -typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+> -
+>  typedef struct AcpiRsdpData {
+>      uint8_t oem_id[6]; /* OEM identification */
+>      uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
+> diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+> index ac52abd0dd..fb1a67a21f 100644
+> --- a/tests/acpi-utils.h
+> +++ b/tests/acpi-utils.h
+> @@ -82,6 +82,9 @@ typedef struct {
+>  
+>  uint8_t acpi_calc_checksum(const uint8_t *data, int len);
+>  uint32_t acpi_find_rsdp_address(void);
+> -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
+> +uint32_t acpi_find_rsdt_address(uint8_t *rsdp_table);
+> +uint64_t acpi_find_xsdt_address(uint8_t *rsdp_table);
+> +void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table,
+> +                           uint8_t revision);
+>  
+>  #endif  /* TEST_ACPI_UTILS_H */
+> diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
+> index 41dc1ea9b4..c8fe2d1342 100644
+> --- a/tests/acpi-utils.c
+> +++ b/tests/acpi-utils.c
+> @@ -52,14 +52,44 @@ uint32_t acpi_find_rsdp_address(void)
+>      return off;
+>  }
+>  
+> -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table)
+> +uint32_t acpi_find_rsdt_address(uint8_t *rsdp_table)
+s/acpi_find_rsdt_address/acpi_get_rsdt_address/
+likewise for xsdt
 
-> If it's simple structure it is clearer to use initializer, instead of
-> wrapper helper. With complex structure it could be other way around.
->
-> > - It's code duplication as almost the same snippet is going to be used
-> >   for i386/acpi-build.c
-> the same goes for init_rsdp_data(...)
-I disagree here as well. But I'd like to see this code being merged,
-I'll comply. Do you have any comments on the tests part of that serie,
-besides the fact that it's using defined constants as opposed to hard
-coded ones?
+>  {
+> -    ACPI_READ_FIELD(rsdp_table->signature, addr);
+> -    ACPI_ASSERT_CMP64(rsdp_table->signature, "RSD PTR ");
+> -
+> -    ACPI_READ_FIELD(rsdp_table->checksum, addr);
+> -    ACPI_READ_ARRAY(rsdp_table->oem_id, addr);
+> -    ACPI_READ_FIELD(rsdp_table->revision, addr);
+> -    ACPI_READ_FIELD(rsdp_table->rsdt_physical_address, addr);
+> -    ACPI_READ_FIELD(rsdp_table->length, addr);
+> +    uint32_t rsdt_physical_address = *((uint32_t *)(rsdp_table +
+> +                                                    ACPI_RSDP_RSDT_OFFSET));
+above cast looks pretty ugly and on some hw it might trigger SIGBUS
+maybe:
 
-Cheers,
-Samuel.
+       memcpy(addr, &rsdp_table[16 /* RsdtAddress offset */], 4);
+
+> +    uint8_t revision = rsdp_table[ACPI_RSDP_REVISION_OFFSET];
+> +
+> +    if (revision != ACPI_RSDP_REV_1) {
+theoretically not rev1 might have rsdt pointer as well for legacy OS
+but we don't do this in QEMU, so it doesn't really matter
+
+> +        return 0;
+> +    }
+> +
+> +    return le32_to_cpu(rsdt_physical_address);
+> +}
+> +
+> +uint64_t acpi_find_xsdt_address(uint8_t *rsdp_table)
+> +{
+> +    uint64_t xsdt_physical_address = *((uint64_t *)(rsdp_table +
+> +                                                    ACPI_RSDP_XSDT_OFFSET));
+access to uninitialized data if not rev2,
+here it's not harmful but it's better not to confuse tools and fetch value after revision check
+
+> +    uint8_t revision = rsdp_table[ACPI_RSDP_REVISION_OFFSET];
+> +
+> +    if (revision != ACPI_RSDP_REV_2) {
+> +        return 0;
+> +    }
+> +
+> +    return le64_to_cpu(xsdt_physical_address);
+> +}
+> +
+> +void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table, uint8_t revision)
+> +{
+> +    switch (revision) {
+> +    case ACPI_RSDP_REV_1:
+> +        memread(addr, rsdp_table, ACPI_RSDP_REV_1_LEN);
+> +        break;
+> +    case ACPI_RSDP_REV_2:
+> +        memread(addr, rsdp_table, ACPI_RSDP_REV_2_LEN);
+> +        break;
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+> +
+> +    ACPI_ASSERT_CMP64(*((uint64_t *)(rsdp_table)), ACPI_RSDP_SIGNATURE);
+>  }
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index d661d9be62..8cde404bda 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -27,7 +27,8 @@ typedef struct {
+>      const char *machine;
+>      const char *variant;
+>      uint32_t rsdp_addr;
+> -    AcpiRsdpDescriptor rsdp_table;
+> +    uint8_t rsdp_table[ACPI_RSDP_REV_2_LEN];
+> +    uint32_t rsdt_physical_address;
+>      AcpiRsdtDescriptorRev1 rsdt_table;
+>      uint32_t dsdt_addr;
+>      uint32_t facs_addr;
+> @@ -83,21 +84,31 @@ static void test_acpi_rsdp_address(test_data *data)
+>      data->rsdp_addr = off;
+>  }
+>  
+> -static void test_acpi_rsdp_table(test_data *data)
+> +static void test_acpi_rsdp_table(test_data *data, uint8_t revision)
+>  {
+> -    AcpiRsdpDescriptor *rsdp_table = &data->rsdp_table;
+> +    uint8_t *rsdp_table = data->rsdp_table;
+>      uint32_t addr = data->rsdp_addr;
+>  
+> -    acpi_parse_rsdp_table(addr, rsdp_table);
+> +    acpi_parse_rsdp_table(addr, rsdp_table, revision);
+>  
+> -    /* rsdp checksum is not for the whole table, but for the first 20 bytes */
+> -    g_assert(!acpi_calc_checksum((uint8_t *)rsdp_table, 20));
+> +    switch (revision) {
+> +    case ACPI_RSDP_REV_1:
+> +        /* With rev 1, checksum is only for the first 20 bytes */
+> +        g_assert(!acpi_calc_checksum(rsdp_table,  ACPI_RSDP_REV_1_LEN));
+> +        break;
+> +    case ACPI_RSDP_REV_2:
+> +        /* With revision 2, we have 2 checksums */
+> +        g_assert(!acpi_calc_checksum(rsdp_table, ACPI_RSDP_REV_1_LEN));
+> +        g_assert(!acpi_calc_checksum(rsdp_table, ACPI_RSDP_REV_2_LEN));
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+>  }
+>  
+>  static void test_acpi_rsdt_table(test_data *data)
+>  {
+>      AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
+> -    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
+> +    uint32_t addr = acpi_find_rsdt_address(data->rsdp_table);
+>      uint32_t *tables;
+>      int tables_nr;
+>      uint8_t checksum;
+> @@ -626,7 +637,7 @@ static void test_acpi_one(const char *params, test_data *data)
+>  
+>      data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
+>      test_acpi_rsdp_address(data);
+> -    test_acpi_rsdp_table(data);
+> +    test_acpi_rsdp_table(data, ACPI_RSDP_REV_1);
+>      test_acpi_rsdt_table(data);
+>      fadt_fetch_facs_and_dsdt_ptrs(data);
+>      test_acpi_facs_table(data);
+> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+> index 0a6fb55f2e..db5b084c18 100644
+> --- a/tests/vmgenid-test.c
+> +++ b/tests/vmgenid-test.c
+> @@ -35,7 +35,7 @@ static uint32_t acpi_find_vgia(void)
+>  {
+>      uint32_t rsdp_offset;
+>      uint32_t guid_offset = 0;
+> -    AcpiRsdpDescriptor rsdp_table;
+> +    uint8_t rsdp_table[ACPI_RSDP_REV_2_LEN];
+>      uint32_t rsdt, rsdt_table_length;
+>      AcpiRsdtDescriptorRev1 rsdt_table;
+>      size_t tables_nr;
+> @@ -52,9 +52,11 @@ static uint32_t acpi_find_vgia(void)
+>  
+>      g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
+>  
+> -    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
+> +    acpi_parse_rsdp_table(rsdp_offset, rsdp_table, ACPI_RSDP_REV_1);
+> +
+> +    rsdt = acpi_find_rsdt_address(rsdp_table);
+> +    g_assert(rsdt);
+>  
+> -    rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
+>      /* read the header */
+>      ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
+>      ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
