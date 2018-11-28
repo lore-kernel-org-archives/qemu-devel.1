@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRrgr-0001R7-7H
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 23:43:10 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gRrgu-0001Ro-7c
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 23:43:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gRrgq-0006no-3i
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 23:43:09 -0500
-Date: Wed, 28 Nov 2018 15:42:57 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gRrgq-0006nj-3G
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 23:43:12 -0500
+Date: Wed, 28 Nov 2018 15:39:53 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181128044257.GC2251@umbus.fritz.box>
+Message-ID: <20181128043953.GB2251@umbus.fritz.box>
 References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-20-clg@kaod.org>
+	<20181116105729.23240-19-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pgNHpQPJFoUYTAIP"
+	protocol="application/pgp-signature"; boundary="avNtfD0ffNO6L/9g"
 Content-Disposition: inline
-In-Reply-To: <20181116105729.23240-20-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 19/36] spapr: add a 'pseries-3.1-xive'
- machine type
+In-Reply-To: <20181116105729.23240-19-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 18/36] spapr: allocate the interrupt
+ thread context under the CPU core
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,164 +29,200 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---pgNHpQPJFoUYTAIP
+--avNtfD0ffNO6L/9g
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 16, 2018 at 11:57:12AM +0100, C=E9dric Le Goater wrote:
-> The interrupt mode is statically defined to XIVE only for this machine.
-> The guest OS is required to have support for the XIVE exploitation
-> mode of the POWER9 interrupt controller.
+On Fri, Nov 16, 2018 at 11:57:11AM +0100, C=E9dric Le Goater wrote:
+> Each interrupt mode has its own specific interrupt presenter object,
+> that we store under the CPU object, one for XICS and one for XIVE.
+>=20
+> Extend the sPAPR IRQ backend with a new handler to support them both.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
->  include/hw/ppc/spapr_irq.h |  1 +
->  hw/ppc/spapr.c             | 36 +++++++++++++++++++++++++++++++-----
->  hw/ppc/spapr_irq.c         |  3 +++
->  3 files changed, 35 insertions(+), 5 deletions(-)
+>  include/hw/ppc/spapr.h     |  1 +
+>  include/hw/ppc/spapr_irq.h |  2 ++
+>  include/hw/ppc/xive.h      |  2 ++
+>  hw/intc/xive.c             | 21 +++++++++++++++++++++
+>  hw/ppc/spapr_cpu_core.c    |  5 ++---
+>  hw/ppc/spapr_irq.c         | 17 +++++++++++++++++
+>  6 files changed, 45 insertions(+), 3 deletions(-)
 >=20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 8415faea7b82..f43ef69d61bc 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -177,6 +177,7 @@ struct sPAPRMachineState {
+>      int32_t irq_map_nr;
+>      unsigned long *irq_map;
+>      sPAPRXive  *xive;
+> +    const char *xive_tctx_type;
+> =20
+>      bool cmd_line_caps[SPAPR_CAP_NUM];
+>      sPAPRCapabilities def, eff, mig;
 > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index c3b4c38145eb..b299dd794bff 100644
+> index cfdc1f86e713..c3b4c38145eb 100644
 > --- a/include/hw/ppc/spapr_irq.h
 > +++ b/include/hw/ppc/spapr_irq.h
-> @@ -33,6 +33,7 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr);
->  typedef struct sPAPRIrq {
->      uint32_t    nr_irqs;
->      uint32_t    nr_msis;
-> +    uint8_t     ov5;
-
-I'm a bit confused as to what exactly this represents..
-
->      void (*init)(sPAPRMachineState *spapr, int nr_irqs, int nr_servers,
->                   Error **errp);
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ad1692cdcd0f..8fbb743769db 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1097,12 +1097,14 @@ static void spapr_dt_rtas(sPAPRMachineState *spap=
-r, void *fdt)
->      spapr_dt_rtas_tokens(fdt, rtas);
->  }
+> @@ -42,6 +42,8 @@ typedef struct sPAPRIrq {
+>      void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
+>      void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_servers,
+>                          void *fdt, uint32_t phandle);
+> +    Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
+> +                               Error **errp);
+>  } sPAPRIrq;
 > =20
-> -/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU feat=
-ures
-> - * that the guest may request and thus the valid values for bytes 24..26=
- of
-> - * option vector 5: */
-> -static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
-> +/* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU
-> + * and the XIVE features that the guest may request and thus the valid
-> + * values for bytes 23..26 of option vector 5: */
-> +static void spapr_dt_ov5_platform_support(sPAPRMachineState *spapr, void=
- *fdt,
-> +                                          int chosen)
+>  extern sPAPRIrq spapr_irq_xics;
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index e6931ddaa83f..b74eb326dcd1 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -284,6 +284,8 @@ typedef struct XiveTCTX {
+>  extern const MemoryRegionOps xive_tm_ops;
+> =20
+>  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
+> +Object *xive_tctx_create(Object *cpu, const char *type, XiveRouter *xrtr,
+> +                         Error **errp);
+> =20
+>  static inline uint32_t xive_tctx_cam_line(uint8_t nvt_blk, uint32_t nvt_=
+idx)
 >  {
->      PowerPCCPU *first_ppc_cpu =3D POWERPC_CPU(first_cpu);
-> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index fc6ef5895e6d..7d921023e2ee 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -579,6 +579,27 @@ static const TypeInfo xive_tctx_info =3D {
+>      .class_init    =3D xive_tctx_class_init,
+>  };
 > =20
->      char val[2 * 4] =3D {
->          23, 0x00, /* Xive mode, filled in below. */
-> @@ -1123,7 +1125,11 @@ static void spapr_dt_ov5_platform_support(void *fd=
-t, int chosen)
->          } else {
->              val[3] =3D 0x00; /* Hash */
->          }
-> +        /* TODO: test KVM support */
-> +        val[1] =3D smc->irq->ov5;
->      } else {
-> +        val[1] =3D smc->irq->ov5;
-
-=2E.here it seems to be a specific value for this OV5 byte, indicating the
-supported intc...
-
+> +Object *xive_tctx_create(Object *cpu, const char *type, XiveRouter *xrtr,
+> +                         Error **errp)
+> +{
+> +    Error *local_err =3D NULL;
+> +    Object *obj;
 > +
->          /* V3 MMU supports both hash and radix in tcg (with dynamic swit=
-ching) */
->          val[3] =3D 0xC0;
->      }
-> @@ -1191,7 +1197,7 @@ static void spapr_dt_chosen(sPAPRMachineState *spap=
-r, void *fdt)
->          _FDT(fdt_setprop_string(fdt, chosen, "stdout-path", stdout_path)=
-);
->      }
-> =20
-> -    spapr_dt_ov5_platform_support(fdt, chosen);
-> +    spapr_dt_ov5_platform_support(spapr, fdt, chosen);
-> =20
->      g_free(stdout_path);
->      g_free(bootlist);
-> @@ -2622,6 +2628,11 @@ static void spapr_machine_init(MachineState *machi=
-ne)
->      /* advertise support for ibm,dyamic-memory-v2 */
->      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
-> =20
-> +    /* advertise XIVE */
-> +    if (smc->irq->ov5) {
-
-=2E.but here it seems to be a bool indicating XIVE support specifically.
-
-> +        spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
+> +    obj =3D object_new(type);
+> +    object_property_add_child(cpu, type, obj, &error_abort);
+> +    object_unref(obj);
+> +    object_property_add_const_link(obj, "cpu", cpu, &error_abort);
+> +    object_property_add_const_link(obj, "xive", OBJECT(xrtr), &error_abo=
+rt);
+> +    object_property_set_bool(obj, true, "realized", &local_err);
+> +    if (local_err) {
+> +        object_unparent(obj);
+> +        error_propagate(errp, local_err);
+> +        return NULL;
 > +    }
 > +
->      /* init CPUs */
->      spapr_init_cpus(spapr);
-> =20
-> @@ -3971,6 +3982,21 @@ static void spapr_machine_3_1_class_options(Machin=
-eClass *mc)
-> =20
->  DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
-> =20
-> +static void spapr_machine_3_1_xive_instance_options(MachineState *machin=
-e)
-> +{
-> +    spapr_machine_3_1_instance_options(machine);
+> +    return obj;
 > +}
-> +
-> +static void spapr_machine_3_1_xive_class_options(MachineClass *mc)
-> +{
-> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> +
-> +    spapr_machine_3_1_class_options(mc);
-> +    smc->irq =3D &spapr_irq_xive;
-> +}
-> +
-> +DEFINE_SPAPR_MACHINE(3_1_xive, "3.1-xive", false);
 > +
 >  /*
->   * pseries-3.0
+>   * XIVE ESB helpers
 >   */
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 2398ce62c0e7..1811cd48db90 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -11,7 +11,6 @@
+>  #include "hw/ppc/spapr_cpu_core.h"
+>  #include "target/ppc/cpu.h"
+>  #include "hw/ppc/spapr.h"
+> -#include "hw/ppc/xics.h" /* for icp_create() - to be removed */
+>  #include "hw/boards.h"
+>  #include "qapi/error.h"
+>  #include "sysemu/cpus.h"
+> @@ -215,6 +214,7 @@ static void spapr_cpu_core_unrealize(DeviceState *dev=
+, Error **errp)
+>  static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+>                                 sPAPRCPUCore *sc, Error **errp)
+>  {
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+>      CPUPPCState *env =3D &cpu->env;
+>      CPUState *cs =3D CPU(cpu);
+>      Error *local_err =3D NULL;
+> @@ -233,8 +233,7 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPR=
+MachineState *spapr,
+>      qemu_register_reset(spapr_cpu_reset, cpu);
+>      spapr_cpu_reset(cpu);
+> =20
+> -    cpu->intc =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC(s=
+papr),
+> -                           &local_err);
+> +    cpu->intc =3D smc->irq->cpu_intc_create(spapr, OBJECT(cpu), &local_e=
+rr);
+>      if (local_err) {
+>          goto error_unregister;
+>      }
 > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 253abc10e780..42e73851b174 100644
+> index d88a029d8c5c..253abc10e780 100644
 > --- a/hw/ppc/spapr_irq.c
 > +++ b/hw/ppc/spapr_irq.c
-> @@ -210,6 +210,7 @@ static Object *spapr_irq_cpu_intc_create_xics(sPAPRMa=
-chineState *spapr,
->  sPAPRIrq spapr_irq_xics =3D {
->      .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
->      .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
-> +    .ov5         =3D 0x0, /* XICS only */
+> @@ -197,6 +197,12 @@ static void spapr_irq_dt_populate_xics(sPAPRMachineS=
+tate *spapr,
+>      spapr_dt_xics(nr_servers, fdt, phandle);
+>  }
 > =20
->      .init        =3D spapr_irq_init_xics,
->      .claim       =3D spapr_irq_claim_xics,
-> @@ -341,6 +342,7 @@ static Object *spapr_irq_cpu_intc_create_xive(sPAPRMa=
-chineState *spapr,
->  sPAPRIrq spapr_irq_xive =3D {
->      .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
->      .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
-> +    .ov5         =3D 0x40, /* XIVE exploitation mode only */
+> +static Object *spapr_irq_cpu_intc_create_xics(sPAPRMachineState *spapr,
+> +                                              Object *cpu, Error **errp)
+> +{
+> +    return icp_create(cpu, spapr->icp_type, XICS_FABRIC(spapr), errp);
+> +}
+> +
+>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+>  #define SPAPR_IRQ_XICS_NR_MSIS     \
+>      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
+> @@ -211,6 +217,7 @@ sPAPRIrq spapr_irq_xics =3D {
+>      .qirq        =3D spapr_qirq_xics,
+>      .print_info  =3D spapr_irq_print_info_xics,
+>      .dt_populate =3D spapr_irq_dt_populate_xics,
+> +    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+>  };
 > =20
->      .init        =3D spapr_irq_init_xive,
->      .claim       =3D spapr_irq_claim_xive,
-> @@ -447,6 +449,7 @@ int spapr_irq_find(sPAPRMachineState *spapr, int num,=
- bool align, Error **errp)
->  sPAPRIrq spapr_irq_xics_legacy =3D {
->      .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
->      .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
-> +    .ov5         =3D 0x0, /* XICS only */
+>   /*
+> @@ -267,6 +274,7 @@ static void spapr_irq_init_xive(sPAPRMachineState *sp=
+apr, int nr_irqs,
+>          return;
+>      }
 > =20
->      .init        =3D spapr_irq_init_xics,
->      .claim       =3D spapr_irq_claim_xics,
+> +    spapr->xive_tctx_type =3D TYPE_XIVE_TCTX;
+>      spapr_xive_hcall_init(spapr);
+>  }
+> =20
+> @@ -315,6 +323,13 @@ static void spapr_irq_dt_populate_xive(sPAPRMachineS=
+tate *spapr,
+>      spapr_dt_xive(spapr->xive, nr_servers, fdt, phandle);
+>  }
+> =20
+> +static Object *spapr_irq_cpu_intc_create_xive(sPAPRMachineState *spapr,
+> +                                              Object *cpu, Error **errp)
+> +{
+> +    return xive_tctx_create(cpu, spapr->xive_tctx_type,
+> +                            XIVE_ROUTER(spapr->xive), errp);
+> +}
+> +
+>  /*
+>   * XIVE uses the full IRQ number space. Set it to 8K to be compatible
+>   * with XICS.
+> @@ -333,6 +348,7 @@ sPAPRIrq spapr_irq_xive =3D {
+>      .qirq        =3D spapr_qirq_xive,
+>      .print_info  =3D spapr_irq_print_info_xive,
+>      .dt_populate =3D spapr_irq_dt_populate_xive,
+> +    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
+>  };
+> =20
+>  /*
+> @@ -438,4 +454,5 @@ sPAPRIrq spapr_irq_xics_legacy =3D {
+>      .qirq        =3D spapr_qirq_xics,
+>      .print_info  =3D spapr_irq_print_info_xics,
+>      .dt_populate =3D spapr_irq_dt_populate_xics,
+> +    .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+>  };
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -194,24 +230,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---pgNHpQPJFoUYTAIP
+--avNtfD0ffNO6L/9g
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv+HNEACgkQbDjKyiDZ
-s5ITHxAAgO6lcCgPWmIjON55JbojfxdysEttTrdR1lwPPThvfKzbvBgiTbTfnpJA
-rUfA+UT6QWxYnOy2A/YwYsnOwLsRcITG2eqnC04CE+e//BRkvqdoART8F1ZMIANO
-tV7zW5vjeQiefN3JPFqsAqAVQJvEDhcYFipH82x0AwiSX/kygDxZLFa/O6yq0gOK
-gFqySNmFZFUgOHIbq1HDZJ8LUmyQlk1Alwg+NTHpvJx6khYTafiVAbS1XPFjD2AD
-4x66vtMlqvdV0gq36sag6FfcWE9k4Ri3mIk2qCmmvm6vD4rM0uuVHHRpf0D+eDLl
-ImGX6Y2fdoMMHC6CwPqAc1RASn7i55NQLSGxa4ds0NoMjaf5LCYKmaL7lvMvpesf
-EbYt8+13DgXYKCTYjFLxymzGZjmycpyLKX+tnZMoR41oMx8s9nvTY4BJoPfn4yaz
-0FLgV+9IxcZ6+2eiiGpMko8mKNPcZ/vJe95iijTGlge7nd/M0Rf61ji9bHkiGh2U
-+FulGN33LIuRZlu8mzVhHxWHfLyEAXC9YNT5Cp8BR9TvgMldOJAhw6lBOJsqNFEQ
-rBzVR8V2CDGO3dep2ps/Ib4X15Rqu+f7VUT1sEIY8VEtNtWK3Kg+eWCBbC+fkvOT
-JbjwjPRH0vOrCVzSR1PHnJ+jhL4gN5T4aG8q/StRIdqzWzdL0oA=
-=AKnv
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv+HBkACgkQbDjKyiDZ
+s5LkwQ//QMdtQ+UwFRWFDVF72AqNVH4yxOC5g+mugse7lNTCfgBYRe2Gxb8Z9wv7
+JJLrrSzPo+QAEQFQ03XtGCHL7PHh/BheEKCjSRPMGRdkx+OU6gGmh7fTemVqCKKF
+wp8Bp1h1H1kbEATUbVENKTIbqD0VykdsAUhpRvlvYZE6w9a/EGsddMnb9IfLjfAv
+FHrOk47ZgPWTzq/5dowYkEmZr1BQhf/eawsLWgOcCUazLhlF/tAvwdH/GWZwKle6
+iYSa6BLNbEJbgmUc5ghbNMWKVNNv9tfhwn5sYcj38GDPQSouH1FaVbgz2bgoe8aA
+TLP+BTY10v0a3359SP5uU6zNTng5OVivGDmeVClBcXiLfbD2ydDFReRRFcpdbJOj
+QV311UCsAmIIzSR0v95CmXlWFw7n4JD1qtcNBZWnAOHTTCdvswxqg3QEaeTyOGpm
+Klp0dvagvX0/f04iafDZRuQP6FkGB0O++HS/Z7GtI20CYJ/5cjray/b0XcsuqtAa
+AgKaDhaGGj8ahzVfZCo4/aCtUcxfJqti54RpszipsXlgaRikLDG/CVGnxMRYijj4
+n2qsoAROkOZcJ9RusGacyt6bK4spaQ+6OTswtaGfWlF7PD98P0zTBhVBMMRPBI6O
+zXWx+lK5FhL54F92itUCi0xyVMvU6IrgiHQ1P9s7T2Ag5GFtrBI=
+=Y8by
 -----END PGP SIGNATURE-----
 
---pgNHpQPJFoUYTAIP--
+--avNtfD0ffNO6L/9g--
