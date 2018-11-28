@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1gS0Xg-0007wr-NQ
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:10:21 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gS0k1-0006Jv-IG
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1gS0Xf-0000SP-2h
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:10:16 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1543399094-2260-1-git-send-email-thuth@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <cd4d71e5-e24a-17c6-d49d-27ed87bc7f9d@twiddle.net>
-Date: Wed, 28 Nov 2018 06:09:59 -0800
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gS0jx-0000MI-IT
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:23:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35714)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1gS0jx-0000IQ-BH
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 09:22:57 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2EEC3084038
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 14:22:55 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 28 Nov 2018 18:21:35 +0400
+Message-Id: <20181128142135.15900-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1543399094-2260-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1?] target/arm/sve_helper: Fix
- compilation with clang 3.4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-4.0 v2] configure: bump spice-server
+ required version to 0.12.6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,19 +32,323 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, fziglio@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 11/28/18 1:58 AM, Thomas Huth wrote:
-> Clang 3.4 does not know the "flatten" attribute yet. We've already
-> introduced the QEMU_FLATTEN macro for this in commit 97ff87c0ed020c2,
-> so use this macro now here, too, to fix this issue.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  target/arm/sve_helper.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
+Looking at chardev/spice.c code, I realize compilation was broken for
+a while with spice-server < 0.12.3. I propose to bump required version
+to 0.12.6, released 3y ago, instead of adding more #ifdef.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+(this patch combines changes from an early version and some of
+Frediano "[PATCH 2/2] spice: Bump required spice-server version to
+0.12.6")
 
-r~
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/display/qxl.h        |  2 --
+ include/ui/qemu-spice.h | 11 -----------
+ chardev/spice.c         | 12 ------------
+ hw/display/qxl.c        | 27 ---------------------------
+ ui/spice-core.c         |  8 --------
+ ui/spice-display.c      | 10 ----------
+ configure               |  4 ++--
+ 7 files changed, 2 insertions(+), 72 deletions(-)
+
+diff --git a/hw/display/qxl.h b/hw/display/qxl.h
+index 6f9d1f21fa..0cba6c1875 100644
+--- a/hw/display/qxl.h
++++ b/hw/display/qxl.h
+@@ -102,9 +102,7 @@ typedef struct PCIQXLDevice {
+     QXLModes           *modes;
+     uint32_t           rom_size;
+     MemoryRegion       rom_bar;
+-#if SPICE_SERVER_VERSION >=3D 0x000c06 /* release 0.12.6 */
+     uint16_t           max_outputs;
+-#endif
+=20
+     /* vram pci bar */
+     uint64_t           vram_size;
+diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
+index c6d50eb87a..443220fe64 100644
+--- a/include/ui/qemu-spice.h
++++ b/include/ui/qemu-spice.h
+@@ -41,18 +41,7 @@ int qemu_spice_set_pw_expire(time_t expires);
+ int qemu_spice_migrate_info(const char *hostname, int port, int tls_port=
+,
+                             const char *subject);
+=20
+-#if !defined(SPICE_SERVER_VERSION) || (SPICE_SERVER_VERSION < 0xc06)
+-#define SPICE_NEEDS_SET_MM_TIME 1
+-#else
+-#define SPICE_NEEDS_SET_MM_TIME 0
+-#endif
+-
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+ void qemu_spice_register_ports(void);
+-#else
+-static inline Chardev *qemu_chr_open_spice_port(const char *name)
+-{ return NULL; }
+-#endif
+=20
+ #else  /* CONFIG_SPICE */
+=20
+diff --git a/chardev/spice.c b/chardev/spice.c
+index e66e3ad568..e0b44474f5 100644
+--- a/chardev/spice.c
++++ b/chardev/spice.c
+@@ -77,7 +77,6 @@ static int vmc_read(SpiceCharDeviceInstance *sin, uint8=
+_t *buf, int len)
+     return bytes;
+ }
+=20
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+ static void vmc_event(SpiceCharDeviceInstance *sin, uint8_t event)
+ {
+     SpiceChardev *scd =3D container_of(sin, SpiceChardev, sin);
+@@ -95,7 +94,6 @@ static void vmc_event(SpiceCharDeviceInstance *sin, uin=
+t8_t event)
+     trace_spice_vmc_event(chr_event);
+     qemu_chr_be_event(chr, chr_event);
+ }
+-#endif
+=20
+ static void vmc_state(SpiceCharDeviceInstance *sin, int connected)
+ {
+@@ -119,12 +117,8 @@ static SpiceCharDeviceInterface vmc_interface =3D {
+     .state              =3D vmc_state,
+     .write              =3D vmc_write,
+     .read               =3D vmc_read,
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+     .event              =3D vmc_event,
+-#endif
+-#if SPICE_SERVER_VERSION >=3D 0x000c06
+     .flags              =3D SPICE_CHAR_DEVICE_NOTIFY_WRITABLE,
+-#endif
+ };
+=20
+=20
+@@ -223,9 +217,7 @@ static void char_spice_finalize(Object *obj)
+     }
+=20
+     g_free((char *)s->sin.subtype);
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+     g_free((char *)s->sin.portname);
+-#endif
+ }
+=20
+ static void spice_vmc_set_fe_open(struct Chardev *chr, int fe_open)
+@@ -240,7 +232,6 @@ static void spice_vmc_set_fe_open(struct Chardev *chr=
+, int fe_open)
+=20
+ static void spice_port_set_fe_open(struct Chardev *chr, int fe_open)
+ {
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+     SpiceChardev *s =3D SPICE_CHARDEV(chr);
+=20
+     if (fe_open) {
+@@ -248,7 +239,6 @@ static void spice_port_set_fe_open(struct Chardev *ch=
+r, int fe_open)
+     } else {
+         spice_server_port_event(&s->sin, SPICE_PORT_EVENT_CLOSED);
+     }
+-#endif
+ }
+=20
+ static void spice_chr_accept_input(struct Chardev *chr)
+@@ -298,7 +288,6 @@ static void qemu_chr_open_spice_vmc(Chardev *chr,
+     chr_open(chr, type);
+ }
+=20
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+ static void qemu_chr_open_spice_port(Chardev *chr,
+                                      ChardevBackend *backend,
+                                      bool *be_opened,
+@@ -331,7 +320,6 @@ void qemu_spice_register_ports(void)
+         vmc_register_interface(s);
+     }
+ }
+-#endif
+=20
+ static void qemu_chr_parse_spice_vmc(QemuOpts *opts, ChardevBackend *bac=
+kend,
+                                      Error **errp)
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index 9087db5dee..9387061ecb 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -276,11 +276,9 @@ static void qxl_spice_monitors_config_async(PCIQXLDe=
+vice *qxl, int replay)
+                     QXL_COOKIE_TYPE_POST_LOAD_MONITORS_CONFIG,
+                     0));
+     } else {
+-#if SPICE_SERVER_VERSION >=3D 0x000c06 /* release 0.12.6 */
+         if (qxl->max_outputs) {
+             spice_qxl_set_max_monitors(&qxl->ssd.qxl, qxl->max_outputs);
+         }
+-#endif
+         qxl->guest_monitors_config =3D qxl->ram->monitors_config;
+         spice_qxl_monitors_config_async(&qxl->ssd.qxl,
+                 qxl->ram->monitors_config,
+@@ -544,22 +542,6 @@ static void interface_set_compression_level(QXLInsta=
+nce *sin, int level)
+     qxl_rom_set_dirty(qxl);
+ }
+=20
+-#if SPICE_NEEDS_SET_MM_TIME
+-static void interface_set_mm_time(QXLInstance *sin, uint32_t mm_time)
+-{
+-    PCIQXLDevice *qxl =3D container_of(sin, PCIQXLDevice, ssd.qxl);
+-
+-    if (!qemu_spice_display_is_running(&qxl->ssd)) {
+-        return;
+-    }
+-
+-    trace_qxl_interface_set_mm_time(qxl->id, mm_time);
+-    qxl->shadow_rom.mm_clock =3D cpu_to_le32(mm_time);
+-    qxl->rom->mm_clock =3D cpu_to_le32(mm_time);
+-    qxl_rom_set_dirty(qxl);
+-}
+-#endif
+-
+ static void interface_get_init_info(QXLInstance *sin, QXLDevInitInfo *in=
+fo)
+ {
+     PCIQXLDevice *qxl =3D container_of(sin, PCIQXLDevice, ssd.qxl);
+@@ -1106,12 +1088,10 @@ static int interface_client_monitors_config(QXLIn=
+stance *sin,
+         return 1;
+     }
+=20
+-#if SPICE_SERVER_VERSION >=3D 0x000c06 /* release 0.12.6 */
+     /* limit number of outputs based on setting limit */
+     if (qxl->max_outputs && qxl->max_outputs <=3D max_outputs) {
+         max_outputs =3D qxl->max_outputs;
+     }
+-#endif
+=20
+     config_changed =3D qxl_rom_monitors_config_changed(rom,
+                                                      monitors_config,
+@@ -1160,9 +1140,6 @@ static const QXLInterface qxl_interface =3D {
+=20
+     .attache_worker          =3D interface_attach_worker,
+     .set_compression_level   =3D interface_set_compression_level,
+-#if SPICE_NEEDS_SET_MM_TIME
+-    .set_mm_time             =3D interface_set_mm_time,
+-#endif
+     .get_init_info           =3D interface_get_init_info,
+=20
+     /* the callbacks below are called from spice server thread context *=
+/
+@@ -1189,9 +1166,7 @@ static void qxl_enter_vga_mode(PCIQXLDevice *d)
+         return;
+     }
+     trace_qxl_enter_vga_mode(d->id);
+-#if SPICE_SERVER_VERSION >=3D 0x000c03 /* release 0.12.3 */
+     spice_qxl_driver_unload(&d->ssd.qxl);
+-#endif
+     graphic_console_set_hwops(d->ssd.dcl.con, d->vga.hw_ops, &d->vga);
+     update_displaychangelistener(&d->ssd.dcl, GUI_REFRESH_INTERVAL_DEFAU=
+LT);
+     qemu_spice_create_host_primary(&d->ssd);
+@@ -2443,9 +2418,7 @@ static Property qxl_properties[] =3D {
+         DEFINE_PROP_UINT32("vram64_size_mb", PCIQXLDevice, vram_size_mb,=
+ -1),
+         DEFINE_PROP_UINT32("vgamem_mb", PCIQXLDevice, vgamem_size_mb, 16=
+),
+         DEFINE_PROP_INT32("surfaces", PCIQXLDevice, ssd.num_surfaces, 10=
+24),
+-#if SPICE_SERVER_VERSION >=3D 0x000c06 /* release 0.12.6 */
+         DEFINE_PROP_UINT16("max_outputs", PCIQXLDevice, max_outputs, 0),
+-#endif
+         DEFINE_PROP_UINT32("xres", PCIQXLDevice, xres, 0),
+         DEFINE_PROP_UINT32("yres", PCIQXLDevice, yres, 0),
+         DEFINE_PROP_BOOL("global-vmstate", PCIQXLDevice, vga.global_vmst=
+ate, false),
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index ebaae24643..fc850b3f50 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -745,13 +745,7 @@ void qemu_spice_init(void)
+     }
+=20
+     if (qemu_opt_get_bool(opts, "disable-agent-file-xfer", 0)) {
+-#if SPICE_SERVER_VERSION >=3D 0x000c04
+         spice_server_set_agent_file_xfer(spice_server, false);
+-#else
+-        error_report("this qemu build does not support the "
+-                     "\"disable-agent-file-xfer\" option");
+-        exit(1);
+-#endif
+     }
+=20
+     compression =3D SPICE_IMAGE_COMPRESS_AUTO_GLZ;
+@@ -817,9 +811,7 @@ void qemu_spice_init(void)
+     g_free(x509_cert_file);
+     g_free(x509_cacert_file);
+=20
+-#if SPICE_SERVER_VERSION >=3D 0x000c02
+     qemu_spice_register_ports();
+-#endif
+=20
+ #ifdef HAVE_SPICE_GL
+     if (qemu_opt_get_bool(opts, "gl", 0)) {
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index 52f8cb5ae1..15a3796d58 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -509,13 +509,6 @@ static void interface_set_compression_level(QXLInsta=
+nce *sin, int level)
+     /* nothing to do */
+ }
+=20
+-#if SPICE_NEEDS_SET_MM_TIME
+-static void interface_set_mm_time(QXLInstance *sin, uint32_t mm_time)
+-{
+-    /* nothing to do */
+-}
+-#endif
+-
+ static void interface_get_init_info(QXLInstance *sin, QXLDevInitInfo *in=
+fo)
+ {
+     SimpleSpiceDisplay *ssd =3D container_of(sin, SimpleSpiceDisplay, qx=
+l);
+@@ -711,9 +704,6 @@ static const QXLInterface dpy_interface =3D {
+=20
+     .attache_worker          =3D interface_attach_worker,
+     .set_compression_level   =3D interface_set_compression_level,
+-#if SPICE_NEEDS_SET_MM_TIME
+-    .set_mm_time             =3D interface_set_mm_time,
+-#endif
+     .get_init_info           =3D interface_get_init_info,
+=20
+     /* the callbacks below are called from spice server thread context *=
+/
+diff --git a/configure b/configure
+index 0a3c6a72c3..ebdfece10a 100755
+--- a/configure
++++ b/configure
+@@ -4563,7 +4563,7 @@ int main(void) { spice_server_new(); return 0; }
+ EOF
+   spice_cflags=3D$($pkg_config --cflags spice-protocol spice-server 2>/d=
+ev/null)
+   spice_libs=3D$($pkg_config --libs spice-protocol spice-server 2>/dev/n=
+ull)
+-  if $pkg_config --atleast-version=3D0.12.0 spice-server && \
++  if $pkg_config --atleast-version=3D0.12.6 spice-server && \
+      $pkg_config --atleast-version=3D0.12.3 spice-protocol && \
+      compile_prog "$spice_cflags" "$spice_libs" ; then
+     spice=3D"yes"
+@@ -4574,7 +4574,7 @@ EOF
+   else
+     if test "$spice" =3D "yes" ; then
+       feature_not_found "spice" \
+-          "Install spice-server(>=3D0.12.0) and spice-protocol(>=3D0.12.=
+3) devel"
++          "Install spice-server(>=3D0.12.6) and spice-protocol(>=3D0.12.=
+3) devel"
+     fi
+     spice=3D"no"
+   fi
+--=20
+2.20.0.rc1
