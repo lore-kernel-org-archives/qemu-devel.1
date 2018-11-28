@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gS9iV-0007go-3V
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 18:58:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gS9v3-0004sl-49
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 19:11:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gS9iM-0008Tl-Sx
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 18:58:01 -0500
-Resent-Message-Id: <E1gS9iM-0008Tl-Sx@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21446)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gS9iM-0008Ro-Gr
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 18:57:54 -0500
-In-Reply-To: <20181127064932.7299-1-kraxel@redhat.com>
-Message-ID: <154344944806.20718.10720778827818798142@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1gS9v1-0005M3-D0
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 19:11:00 -0500
+Date: Thu, 29 Nov 2018 09:59:41 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181128225941.GH2251@umbus.fritz.box>
+References: <20181128195802.B6A6C7456B9@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 28 Nov 2018 15:57:29 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/6] Fixes 31 20181127 patches
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="9gXqgVhKaPB5h51M"
+Content-Disposition: inline
+In-Reply-To: <20181128195802.B6A6C7456B9@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH] i2c: Move typedef of bitbang_i2c_interface
+ to i2c.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +24,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzZdIEZpeGVzIDMxIDIwMTgxMTI3IHBhdGNoZXMK
-TWVzc2FnZS1pZDogMjAxODExMjcwNjQ5MzIuNzI5OS0xLWtyYXhlbEByZWRoYXQuY29tCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
-Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0
-cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
-bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
-biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
-aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
-YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
-aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjQ3
-ZThiN2IgcWFwaTogYWRkIHF1ZXJ5LWRpc3BsYXktb3B0aW9ucyBjb21tYW5kCmIzODI2OGQgdXNi
-LWhvc3Q6IHNldCBpZnMuZGV0YWNoZWQgYXMgdHJ1ZSBpZiBrZXJuZWwgZHJpdmVyIGlzIG5vdCBh
-Y3RpdmUKMzYyNzViOCBhdWRpby9oZGE6IGZpeCBndWVzdCB0cmlnZ2VyYWJsZSBhc3NlcnQKYTIw
-ODE2ZSBjaXJydXNfdmdhL21pZ3JhdGlvbjogdXBkYXRlIHRoZSBiYW5rIG9mZnNldCBiZWZvcmUg
-dXNlCjkzZDNlYTIgcHMya2JkOiBkZWZhdWx0IHRvIHNjYW4gZW5hYmxlZCBhZnRlciByZXNldAow
-ZDU1MmRkIGZtb3BzOiBmaXggb2ZmLWJ5LW9uZSBpbiBBUl9UQUJMRSBhbmQgRFJfVEFCTEUgYXJy
-YXkgc2l6ZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS82OiBmbW9wczog
-Zml4IG9mZi1ieS1vbmUgaW4gQVJfVEFCTEUgYW5kIERSX1RBQkxFIGFycmF5IHNpemUuLi4KRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjg6IEZJTEU6IGh3L2F1ZGlv
-L2Ztb3BsLmg6NzU6CiteSWludDMyX3QgQVJfVEFCTEVbNzZdO15JLyogYXR0YWNrIHJhdGUgdGFi
-bGVzICAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI5OiBG
-SUxFOiBody9hdWRpby9mbW9wbC5oOjc2OgorXklpbnQzMl90IERSX1RBQkxFWzc2XTteSS8qIGRl
-Y2F5IHJhdGUgdGFibGVzICAgKi8kCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDEwIGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
-aW5nIFBBVENIIDIvNjogcHMya2JkOiBkZWZhdWx0IHRvIHNjYW4gZW5hYmxlZCBhZnRlciByZXNl
-dC4uLgpDaGVja2luZyBQQVRDSCAzLzY6IGNpcnJ1c192Z2EvbWlncmF0aW9uOiB1cGRhdGUgdGhl
-IGJhbmsgb2Zmc2V0IGJlZm9yZSB1c2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNC82OiBhdWRpby9oZGE6
-IGZpeCBndWVzdCB0cmlnZ2VyYWJsZSBhc3NlcnQuLi4KQ2hlY2tpbmcgUEFUQ0ggNS82OiB1c2It
-aG9zdDogc2V0IGlmcy5kZXRhY2hlZCBhcyB0cnVlIGlmIGtlcm5lbCBkcml2ZXIgaXMgbm90IGFj
-dGl2ZS4uLgpDaGVja2luZyBQQVRDSCA2LzY6IHFhcGk6IGFkZCBxdWVyeS1kaXNwbGF5LW9wdGlv
-bnMgY29tbWFuZC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+
+--9gXqgVhKaPB5h51M
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Nov 28, 2018 at 08:27:06PM +0100, BALATON Zoltan wrote:
+> Clang 3.4 considers duplicate typedef in ppc4xx_i2c.h and
+> bitbang_i2c.h an error even if they are identical. Move it to a common
+> place to allow building with this clang version.
+>=20
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  hw/i2c/bitbang_i2c.h        | 2 --
+>  include/hw/i2c/i2c.h        | 2 ++
+>  include/hw/i2c/ppc4xx_i2c.h | 3 ---
+>  3 files changed, 2 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/hw/i2c/bitbang_i2c.h b/hw/i2c/bitbang_i2c.h
+> index 3a7126d5de..9443021710 100644
+> --- a/hw/i2c/bitbang_i2c.h
+> +++ b/hw/i2c/bitbang_i2c.h
+> @@ -3,8 +3,6 @@
+> =20
+>  #include "hw/i2c/i2c.h"
+> =20
+> -typedef struct bitbang_i2c_interface bitbang_i2c_interface;
+> -
+>  #define BITBANG_I2C_SDA 0
+>  #define BITBANG_I2C_SCL 1
+> =20
+> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+> index 5dc166158b..cf4c45a98f 100644
+> --- a/include/hw/i2c/i2c.h
+> +++ b/include/hw/i2c/i2c.h
+> @@ -82,6 +82,8 @@ int i2c_recv(I2CBus *bus);
+> =20
+>  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t add=
+r);
+> =20
+> +typedef struct bitbang_i2c_interface bitbang_i2c_interface;
+> +
+>  /* lm832x.c */
+>  void lm832x_key_event(DeviceState *dev, int key, int state);
+> =20
+> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
+> index 0891a9c948..b3450bacf7 100644
+> --- a/include/hw/i2c/ppc4xx_i2c.h
+> +++ b/include/hw/i2c/ppc4xx_i2c.h
+> @@ -31,9 +31,6 @@
+>  #include "hw/sysbus.h"
+>  #include "hw/i2c/i2c.h"
+> =20
+> -/* from hw/i2c/bitbang_i2c.h */
+> -typedef struct bitbang_i2c_interface bitbang_i2c_interface;
+> -
+>  #define TYPE_PPC4xx_I2C "ppc4xx-i2c"
+>  #define PPC4xx_I2C(obj) OBJECT_CHECK(PPC4xxI2CState, (obj), TYPE_PPC4xx_=
+I2C)
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--9gXqgVhKaPB5h51M
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv/Hd0ACgkQbDjKyiDZ
+s5KlSA/+NHUfZ8I4kU4anN7+DE+G0YXYfW0XoHyn/tq+NACr0wG9a87k7nS/pN+F
+gAlrX7g7iMgbW9q06rSlEZiJP/yR/19ShSRc1Ymi5bNIXfVMsPKIWBy/oh1YmxQK
+N4MHOZjiKpl3aD0BPRW6myM9bWyIjNF7j6E25vY/J6OEBmZM8gc01qMtL3C1BUA4
+VwpVepjwwd+Qf15cjUueozM3uyCsXi149tv4hgVXp5vHcbe6/u+smWFQKuJFNMx+
+rGXu1gFFVLlufiO7/pICyFHkWikOVt4RlrUM63cGcRfwl3vGK8ydaazz9FfVewaQ
+9W7j0U/RJoUsLgrTrBLzmZjK6XsgBrUSCbkGkYzreMVNfNN3TnT2aNEwQvuFILIZ
+xaqSFkBFPnLzSYTmDbjXKolW19FHDpo0vXnL/DY8iRrlb1x0D6d9P2+BwBlF7x/M
+7kl4IbVmG+S6TNL6CUw8xOG9TDW1tJAsFhMxLHamVmP/3ozj+4kipWIUqnSUj+nJ
+GQ3ld+maXxjMQnhsKO/U4TFYeooxX277ql9iCPmiIXfeRwQRxJGfQNTC49bk0fX4
+t+PU7DkHCQ/z6cbLESKyBa5KdNHuHljv8bDvz391cAAPH4pxuGKz1XvMF9VwoU8O
+8eSn5rfqvciTirySRgQRb49Ub4b94jMsvcGH64GbGpBJ/hINXCQ=
+=sLA6
+-----END PGP SIGNATURE-----
+
+--9gXqgVhKaPB5h51M--
