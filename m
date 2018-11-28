@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gRsYl-000417-Rk
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 00:38:53 -0500
+	(envelope-from <coli@redhat.com>) id 1gRsgw-0003Tm-7R
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 00:47:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gRsYi-0004MV-Ho
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 00:38:51 -0500
-Received: from mail-pf1-x436.google.com ([2607:f8b0:4864:20::436]:44339)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gRsYg-0004Ku-GE
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 00:38:48 -0500
-Received: by mail-pf1-x436.google.com with SMTP id u6so9604940pfh.11
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 21:38:46 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 27 Nov 2018 21:38:29 -0800
-Message-Id: <20181128053834.10861-8-richard.henderson@linaro.org>
-In-Reply-To: <20181128053834.10861-1-richard.henderson@linaro.org>
-References: <20181128053834.10861-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 07/12] tcg: Dump register preference info with
- liveness
+	(envelope-from <coli@redhat.com>) id 1gRsgt-00018p-2i
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 00:47:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <coli@redhat.com>) id 1gRsgs-00018L-TD
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 00:47:15 -0500
+Date: Wed, 28 Nov 2018 00:47:12 -0500 (EST)
+From: Cong Li <coli@redhat.com>
+Message-ID: <2053358166.79400709.1543384032966.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20181127084143.1113-1-armbru@redhat.com>
+References: <20181127084143.1113-1-armbru@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1] vfio-helpers: Fix
+ qemu_vfio_open_pci() crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,121 +27,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cota@braap.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, fam@euphon.net, stefanha@redhat.com, pbonzini@redhat.com
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg.h |  3 ---
- tcg/tcg.c | 44 +++++++++++++++++++++++++++++++++++++-------
- 2 files changed, 37 insertions(+), 10 deletions(-)
 
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index b2e274b7af..ac5d01c223 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -1089,9 +1089,6 @@ TCGOp *tcg_op_insert_after(TCGContext *s, TCGOp *op, TCGOpcode opc, int narg);
- 
- void tcg_optimize(TCGContext *s);
- 
--/* only used for debugging purposes */
--void tcg_dump_ops(TCGContext *s);
--
- TCGv_i32 tcg_const_i32(int32_t val);
- TCGv_i64 tcg_const_i64(int64_t val);
- TCGv_i32 tcg_const_local_i32(int32_t val);
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index adf6570c36..27d081e11a 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -1921,7 +1921,7 @@ static inline TCGReg tcg_regset_first(TCGRegSet d)
-     }
- }
- 
--void tcg_dump_ops(TCGContext *s)
-+static void tcg_dump_ops(TCGContext *s, bool have_prefs)
- {
-     char buf[128];
-     TCGOp *op;
-@@ -2056,12 +2056,15 @@ void tcg_dump_ops(TCGContext *s)
-                 col += qemu_log("%s$0x%" TCG_PRIlx, k ? "," : "", op->args[k]);
-             }
-         }
--        if (op->life) {
--            unsigned life = op->life;
- 
--            for (; col < 48; ++col) {
-+        if (have_prefs || op->life) {
-+            for (; col < 40; ++col) {
-                 putc(' ', qemu_logfile);
-             }
-+        }
-+
-+        if (op->life) {
-+            unsigned life = op->life;
- 
-             if (life & (SYNC_ARG * 3)) {
-                 qemu_log("  sync:");
-@@ -2081,6 +2084,33 @@ void tcg_dump_ops(TCGContext *s)
-                 }
-             }
-         }
-+
-+        if (have_prefs) {
-+            for (i = 0; i < nb_oargs; ++i) {
-+                TCGRegSet set = op->output_pref[i];
-+
-+                if (i == 0) {
-+                    qemu_log("  pref=");
-+                } else {
-+                    qemu_log(",");
-+                }
-+                if (set == 0) {
-+                    qemu_log("none");
-+                } else if (set == MAKE_64BIT_MASK(0, TCG_TARGET_NB_REGS)) {
-+                    qemu_log("all");
-+#ifdef CONFIG_DEBUG_TCG
-+                } else if (tcg_regset_single(set)) {
-+                    TCGReg reg = tcg_regset_first(set);
-+                    qemu_log("%s", tcg_target_reg_names[reg]);
-+#endif
-+                } else if (TCG_TARGET_NB_REGS <= 32) {
-+                    qemu_log("%#x", (uint32_t)set);
-+                } else {
-+                    qemu_log("%#" PRIx64, (uint64_t)set);
-+                }
-+            }
-+        }
-+
-         qemu_log("\n");
-     }
- }
-@@ -3669,7 +3699,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
-                  && qemu_log_in_addr_range(tb->pc))) {
-         qemu_log_lock();
-         qemu_log("OP:\n");
--        tcg_dump_ops(s);
-+        tcg_dump_ops(s, false);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-@@ -3697,7 +3727,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
-                      && qemu_log_in_addr_range(tb->pc))) {
-             qemu_log_lock();
-             qemu_log("OP before indirect lowering:\n");
--            tcg_dump_ops(s);
-+            tcg_dump_ops(s, false);
-             qemu_log("\n");
-             qemu_log_unlock();
-         }
-@@ -3718,7 +3748,7 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
-                  && qemu_log_in_addr_range(tb->pc))) {
-         qemu_log_lock();
-         qemu_log("OP after optimization and liveness analysis:\n");
--        tcg_dump_ops(s);
-+        tcg_dump_ops(s, true);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
--- 
-2.17.2
+----- Original Message -----
+> From: "Markus Armbruster" <armbru@redhat.com>
+> To: qemu-devel@nongnu.org
+> Cc: coli@redhat.com, fam@euphon.net, stefanha@redhat.com, pbonzini@redhat.com
+> Sent: Tuesday, November 27, 2018 4:41:43 PM
+> Subject: [PATCH for-3.1] vfio-helpers: Fix qemu_vfio_open_pci() crash
+> 
+> qemu_vfio_open_common() initializes s->lock only after passing s to
+> qemu_vfio_dma_map() via qemu_vfio_init_ramblock().
+> qemu_vfio_dma_map() tries to lock the uninitialized lock and crashes.
+> 
+> Fix by initializing s->lock first.
+> 
+> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1645840
+> Fixes: 418026ca43bc2626db092d7558258f9594366f28
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+> Compile-tested only, as I lack suitable hardware.  Cong Li (cc'ed) is
+> going to test it for real.  It looks obvious enough to me to put it
+> into -rc3 without waiting for the test results.  We can also wait and
+> put it into -rc4.
+
+Smoke test of nvme:// pass with this patch.
+
+Ack.
+
+> 
+>  util/vfio-helpers.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+> index 1d9272efa4..cccc9cd42e 100644
+> --- a/util/vfio-helpers.c
+> +++ b/util/vfio-helpers.c
+> @@ -411,13 +411,13 @@ static int qemu_vfio_init_ramblock(const char
+> *block_name, void *host_addr,
+>  
+>  static void qemu_vfio_open_common(QEMUVFIOState *s)
+>  {
+> +    qemu_mutex_init(&s->lock);
+>      s->ram_notifier.ram_block_added = qemu_vfio_ram_block_added;
+>      s->ram_notifier.ram_block_removed = qemu_vfio_ram_block_removed;
+>      ram_block_notifier_add(&s->ram_notifier);
+>      s->low_water_mark = QEMU_VFIO_IOVA_MIN;
+>      s->high_water_mark = QEMU_VFIO_IOVA_MAX;
+>      qemu_ram_foreach_block(qemu_vfio_init_ramblock, s);
+> -    qemu_mutex_init(&s->lock);
+>  }
+>  
+>  /**
+> --
+> 2.17.2
+> 
+> 
