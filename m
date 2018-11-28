@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gRveC-0006Of-4O
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 03:56:41 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gRvkK-00041n-D1
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:03:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gRve8-0004JN-8h
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 03:56:40 -0500
-Received: from mga07.intel.com ([134.134.136.100]:6693)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1gRve7-0004HK-JP
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 03:56:36 -0500
-Message-ID: <5BFE596B.1080807@intel.com>
-Date: Wed, 28 Nov 2018 17:01:31 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <cohuck@redhat.com>) id 1gRvkE-0001nC-IV
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:03:00 -0500
+Date: Wed, 28 Nov 2018 10:02:49 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181128100249.72d4299a.cohuck@redhat.com>
+In-Reply-To: <b5066f7a-7024-ac3e-a91d-938fd845e1d9@linux.ibm.com>
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181122165432.4437-4-cohuck@redhat.com>
+	<b5066f7a-7024-ac3e-a91d-938fd845e1d9@linux.ibm.com>
 MIME-Version: 1.0
-References: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
-	<1542276484-25508-6-git-send-email-wei.w.wang@intel.com>
-	<20181127073802.GC3205@xz-x1> <5BFD1BA4.5040202@intel.com>
-	<20181128052655.GC12839@xz-x1>
-In-Reply-To: <20181128052655.GC12839@xz-x1>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 5/8] migration/ram.c: add a notifier
- chain for precopy
+Subject: Re: [Qemu-devel] [PATCH 3/3] vfio-ccw: add handling for asnyc
+ channel instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Farhan Ali <alifm@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On 11/28/2018 01:26 PM, Peter Xu wrote:
->
-> Ok thanks.  Please just make sure you will capture all the error
-> cases, e.g., I also see path like this (a few lines below):
->
->          if (pages < 0) {
->              qemu_file_set_error(f, pages);
->              break;
->          }
->
-> It seems that you missed that one.
+On Tue, 27 Nov 2018 14:09:49 -0500
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
-I think that one should be fine. This notification is actually put at the
-bottom of ram_save_iterate. All the above error will bail out to the "out:"
-path and then go to call precopy_notify(PRECOPY_NOTIFY_ERR).
+> On 11/22/2018 11:54 AM, Cornelia Huck wrote:
+> > Add a region to the vfio-ccw device that can be used to submit
+> > asynchronous I/O instructions. ssch continues to be handled by the
+> > existing I/O region; the new region handles hsch and csch.
+> > 
+> > Interrupt status continues to be reported through the same channels
+> > as for ssch.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >   drivers/s390/cio/Makefile           |   3 +-
+> >   drivers/s390/cio/vfio_ccw_async.c   |  88 ++++++++++++++++
+> >   drivers/s390/cio/vfio_ccw_drv.c     |  48 ++++++---
+> >   drivers/s390/cio/vfio_ccw_fsm.c     | 158 +++++++++++++++++++++++++++-
+> >   drivers/s390/cio/vfio_ccw_ops.c     |  13 ++-
+> >   drivers/s390/cio/vfio_ccw_private.h |   6 ++
+> >   include/uapi/linux/vfio.h           |   4 +
+> >   include/uapi/linux/vfio_ccw.h       |  12 +++
+> >   8 files changed, 313 insertions(+), 19 deletions(-)
+> >   create mode 100644 drivers/s390/cio/vfio_ccw_async.c
+> > 
 
->
-> I would even suggest that you capture the error with higher level.
-> E.g., in migration_iteration_run() after qemu_savevm_state_iterate().
-> Or we can just check the return value of qemu_savevm_state_iterate(),
-> which we have had ignored so far.
+> > @@ -76,7 +79,8 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+> >   	private = container_of(work, struct vfio_ccw_private, io_work);
+> >   	irb = &private->irb;
+> >   
+> > -	if (scsw_is_solicited(&irb->scsw)) {
+> > +	if (scsw_is_solicited(&irb->scsw) &&
+> > +	    (scsw_fctl(&irb->scsw) & SCSW_FCTL_START_FUNC)) {
+> >   		cp_update_scsw(&private->cp, &irb->scsw);
+> >   		cp_free(&private->cp);
+> >   	}  
+> 
+> I am a little confused about this. Why do we need to update the scsw.cpa 
+> if we have the start function function control bit set? Is it an 
+> optimization?
 
-Not very sure about the higher level, because other SaveStateEntry may cause
-errors that this feature don't need to care, I think we may only need it 
-in ram_save.
+No, it's not an optimization. This is the work function that is
+scheduled if we get an interrupt for the device. Previously, we only
+got an interrupt if either the device presented us an unsolicited
+status or if we got an interrupt as a response to the channel program
+we submitted. Now, we can get an interrupt for halt/clear subchannel as
+well, and in that case, we don't necessarily have a cp.
 
-
-> [1]
->
->>
->>> Another thing to mention about the "reasons" (though I see it more
->>> like "events"): have you thought about adding a PRECOPY_NOTIFY_END?
->>> It might help in some cases:
->>>
->>>     - then you don't need to trickily export the migrate_postcopy()
->>>       since you'll notify that before postcopy starts
->> I'm thinking probably we don't need to export migrate_postcopy even now.
->> It's more like a sanity check, and not needed because now we have the
->> notifier registered to the precopy specific callchain, which has ensured
->> that
->> it is invoked via precopy.
-> But postcopy will always start with precopy, no?
-
-Yes, but I think we could add the check in precopy_notify()
-
-
->
->>>     - you'll have a solid point that you'll 100% guarantee that we'll
->>>       stop the free page hinting and don't need to worry about whether
->>>       there is chance the hinting will be running without an end [2].
->> Thanks, I think it makes sense. Plan to add PRECOPY_NOTIFY_END in
->> ram_save_complete.
-> Yeah you can.
->
-> Btw, if you're mostly adding the notifies only in RAM-only codes, then
-> you can consider add the "RAM" into the names of events too to be
-> clear.
-
-Sounds good, will try and see if the name would become too long :)
-
->
-> My suggestion at [1] is precopy general, but you can still capture it
-> at the end of ram_save_iterate, then they are RAM-only again.  Please
-> feel free to choose what fits more...
-
-OK, thanks.
-
-Best,
-Wei
+[Thinking some more about it, we need to verify if the start function
+actually remains set if we try to terminate a running channel program
+with halt/clear. A clear might scrub too much. If that's the case, we
+also need to free the cp if the start function is not set.]
