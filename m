@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gRw63-0007NH-6C
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:25:28 -0500
+	(envelope-from <thuth@redhat.com>) id 1gRw6u-0007kL-Ba
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:26:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gRw60-0006cN-06
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:25:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:4469)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gRw5w-0006Yv-6y
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:25:22 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1542384802.git.xiezhide@huawei.com>
-	<a4bc041444fd76d5da1d8e5321007f416df4ab84.1542384802.git.xiezhide@huawei.com>
-Date: Wed, 28 Nov 2018 10:25:15 +0100
-In-Reply-To: <a4bc041444fd76d5da1d8e5321007f416df4ab84.1542384802.git.xiezhide@huawei.com>
-	(xiezhide's message of "Fri, 16 Nov 2018 15:59:35 +0800")
-Message-ID: <87ftvlh7us.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1gRw6t-0007Sm-3L
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 04:26:20 -0500
+References: <20180921161939.822-1-clg@kaod.org>
+	<20180921161939.822-4-clg@kaod.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7291a08c-a291-c2b4-f520-71a516b391d7@redhat.com>
+Date: Wed, 28 Nov 2018 10:26:06 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 2/6] fsdev-throttle-qmp: Rename the
- ThrottleLimits member names
+In-Reply-To: <20180921161939.822-4-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 03/11] hw/arm/aspeed: Add an Aspeed
+ machine class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +25,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xiezhide <xiezhide@huawei.com>
-Cc: qemu-devel@nongnu.org, berto@igalia.com, armbru@redhat.com, zengcanfu@huawei.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, jinxuefeng@huawei.com, chenhui.rtos@huawei.com
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Andrew Jeffery <andrew@aj.id.au>, Alistair Francis <alistair@alistair23.me>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
 
-xiezhide <xiezhide@huawei.com> writes:
-
-> Rename the ThrottleLimits member names and modify related code
->
-> Signed-off-by: xiezhide <xiezhide@huawei.com>
+On 2018-09-21 18:19, C=C3=A9dric Le Goater wrote:
+> The code looks better, it removes duplicated lines and it will ease
+> the introduction of common properties for the Aspeed machines.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  qapi/block-core.json |  70 +++++++++++-----------
->  util/throttle.c      | 163 +++++++++++++++++++++++++--------------------------
->  2 files changed, 116 insertions(+), 117 deletions(-)
->
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index d4fe710..4ffaaea 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2240,45 +2240,45 @@
->  # transaction. All fields are optional. When setting limits, if a field is
->  # missing the current value is not changed.
->  #
-> -# @iops-total:             limit total I/O operations per second
-> -# @iops-total-max:         I/O operations burst
-> -# @iops-total-max-length:  length of the iops-total-max burst period, in seconds
-> -#                          It must only be set if @iops-total-max is set as well.
-> -# @iops-read:              limit read operations per second
-> -# @iops-read-max:          I/O operations read burst
-> -# @iops-read-max-length:   length of the iops-read-max burst period, in seconds
-> -#                          It must only be set if @iops-read-max is set as well.
-> -# @iops-write:             limit write operations per second
-> -# @iops-write-max:         I/O operations write burst
-> -# @iops-write-max-length:  length of the iops-write-max burst period, in seconds
-> -#                          It must only be set if @iops-write-max is set as well.
-> -# @bps-total:              limit total bytes per second
-> -# @bps-total-max:          total bytes burst
-> -# @bps-total-max-length:   length of the bps-total-max burst period, in seconds.
-> -#                          It must only be set if @bps-total-max is set as well.
-> -# @bps-read:               limit read bytes per second
-> -# @bps-read-max:           total bytes read burst
-> -# @bps-read-max-length:    length of the bps-read-max burst period, in seconds
-> -#                          It must only be set if @bps-read-max is set as well.
-> -# @bps-write:              limit write bytes per second
-> -# @bps-write-max:          total bytes write burst
-> -# @bps-write-max-length:   length of the bps-write-max burst period, in seconds
-> -#                          It must only be set if @bps-write-max is set as well.
-> -# @iops-size:              when limiting by iops max size of an I/O in bytes
-> +# @iops:             limit total I/O operations per second
-> +# @iops_max:         I/O operations burst
-> +# @iops_max_length:  length of the iops_total_max burst period, in seconds
-> +#                          It must only be set if @iops_total_max is set as well.
-> +# @iops_rd:              limit read operations per second
-> +# @iops_rd_max:          I/O operations read burst
-> +# @iops_rd_max_length:   length of the iops_read_max burst period, in seconds
-> +#                          It must only be set if @iops_read_max is set as well.
-> +# @iops_wr:             limit write operations per second
-> +# @iops_wr_max:         I/O operations write burst
-> +# @iops_wr_max_length:  length of the iops_write_max burst period, in seconds
-> +#                          It must only be set if @iops_write_max is set as well.
-> +# @bps:              limit total bytes per second
-> +# @bps_max:          total bytes burst
-> +# @bps_max_length:   length of the bps_total_max burst period, in seconds.
-> +#                          It must only be set if @bps_total_max is set as well.
-> +# @bps_rd:               limit read bytes per second
-> +# @bps_rd_max:           total bytes read burst
-> +# @bps_rd_max_length:    length of the bps_read_max burst period, in seconds
-> +#                          It must only be set if @bps_read_max is set as well.
-> +# @bps_wr:              limit write bytes per second
-> +# @bps_wr_max:          total bytes write burst
-> +# @bps_wr_max_length:   length of the bps_write_max burst period, in seconds
-> +#                          It must only be set if @bps_write_max is set as well.
-> +# @iops_size:              when limiting by iops max size of an I/O in bytes
->  #
->  # Since: 2.11
->  ##
->  { 'struct': 'ThrottleLimits',
-> -  'data': { '*iops-total' : 'int', '*iops-total-max' : 'int',
-> -            '*iops-total-max-length' : 'int', '*iops-read' : 'int',
-> -            '*iops-read-max' : 'int', '*iops-read-max-length' : 'int',
-> -            '*iops-write' : 'int', '*iops-write-max' : 'int',
-> -            '*iops-write-max-length' : 'int', '*bps-total' : 'int',
-> -            '*bps-total-max' : 'int', '*bps-total-max-length' : 'int',
-> -            '*bps-read' : 'int', '*bps-read-max' : 'int',
-> -            '*bps-read-max-length' : 'int', '*bps-write' : 'int',
-> -            '*bps-write-max' : 'int', '*bps-write-max-length' : 'int',
-> -            '*iops-size' : 'int' } }
-> +  'data': { '*iops' : 'int', '*iops_max' : 'int',
-> +            '*iops_max_length' : 'int', '*iops_rd' : 'int',
-> +            '*iops_rd_max' : 'int', '*iops_rd_max_length' : 'int',
-> +            '*iops_wr' : 'int', '*iops_wr_max' : 'int',
-> +            '*iops_wr_max_length' : 'int', '*bps' : 'int',
-> +            '*bps_max' : 'int', '*bps_max_length' : 'int',
-> +            '*bps_rd' : 'int', '*bps_rd_max' : 'int',
-> +            '*bps_rd_max_length' : 'int', '*bps_wr' : 'int',
-> +            '*bps_wr_max' : 'int', '*bps_wr_max_length' : 'int',
-> +            '*iops_size' : 'int' } }
+>  include/hw/arm/aspeed.h |  46 +++++++++
+>  hw/arm/aspeed.c         | 212 +++++++++++++---------------------------
+>  2 files changed, 116 insertions(+), 142 deletions(-)
+>  create mode 100644 include/hw/arm/aspeed.h
+>=20
+> diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
+> new file mode 100644
+> index 000000000000..325c091d09e4
+> --- /dev/null
+> +++ b/include/hw/arm/aspeed.h
+> @@ -0,0 +1,46 @@
+> +/*
+> + * Aspeed Machines
+> + *
+> + * Copyright 2018 IBM Corp.
+> + *
+> + * This code is licensed under the GPL version 2 or later.  See
+> + * the COPYING file in the top-level directory.
+> + */
+> +#ifndef ARM_ASPEED_H
+> +#define ARM_ASPEED_H
+> +
+> +#include "hw/boards.h"
+> +
+> +typedef struct AspeedBoardState AspeedBoardState;
 
-Compatibility break.  Why is that okay?
+ Hi C=C3=A9dric,
 
-Even if it is, you still run afoul of docs/devel/qapi-code-gen.txt:
+this patch breaks compiling with clang v3.4.2 here:
 
-    Command names, and member names within a type, should be all lower
-    case with words separated by a hyphen.  However, some existing older
-    commands and complex types use underscore; when extending such
-    expressions, consistency is preferred over blindly avoiding
-    underscore.
+ CC      aarch64-softmmu/hw/arm/aspeed.o
+hw/arm/aspeed.c:36:3: error: redefinition of typedef 'AspeedBoardState' i=
+s a C11
+      feature [-Werror,-Wtypedef-redefinition]
+} AspeedBoardState;
+  ^
+include/hw/arm/aspeed.h:14:33: note: previous definition is here
+typedef struct AspeedBoardState AspeedBoardState;
+                                ^
+1 error generated.
+make[1]: *** [hw/arm/aspeed.o] Error 1
+make: *** [subdir-aarch64-softmmu] Error 2
 
-The exception doesn't apply here.
+Seems like it can be fixed like this:
 
->  
->  ##
->  # @block-stream:
-[...]
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -29,11 +29,11 @@ static struct arm_boot_info aspeed_board_binfo =3D {
+     .nb_cpus =3D 1,
+ };
+=20
+-typedef struct AspeedBoardState {
++struct AspeedBoardState {
+     AspeedSoCState soc;
+     MemoryRegion ram;
+     MemoryRegion max_ram;
+-} AspeedBoardState;
++};
+
+... does that look OK for you, too?
+
+> +typedef struct AspeedBoardConfig {
+> +    const char *name;
+> +    const char *desc;
+> +    const char *soc_name;
+> +    uint32_t hw_strap1;
+> +    const char *fmc_model;
+> +    const char *spi_model;
+> +    uint32_t num_cs;
+> +    void (*i2c_init)(AspeedBoardState *bmc);
+> +} AspeedBoardConfig;
+> +
+> +#define TYPE_ASPEED_MACHINE       MACHINE_TYPE_NAME("aspeed")
+> +#define ASPEED_MACHINE(obj) \
+> +    OBJECT_CHECK(AspeedMachine, (obj), TYPE_ASPEED_MACHINE)
+> +
+> +typedef struct AspeedMachine {
+> +    MachineState parent_obj;
+> +} AspeedMachine;
+> +
+> +#define ASPEED_MACHINE_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(AspeedMachineClass, (klass), TYPE_ASPEED_MACHI=
+NE)
+> +#define ASPEED_MACHINE_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(AspeedMachineClass, (obj), TYPE_ASPEED_MACHINE)
+> +
+> +typedef struct AspeedMachineClass {
+> +    MachineClass parent_obj;
+> +    const AspeedBoardConfig *board;
+> +} AspeedMachineClass;
+> +
+> +
+> +#endif
+
+ Thomas
