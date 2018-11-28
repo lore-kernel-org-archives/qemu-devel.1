@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gS3Z1-0004hj-92
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:23:56 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gS3bI-0008AD-EL
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:26:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gS3Yu-0001Gn-Nv
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:23:48 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:34491)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gS3Yq-0000sj-FI
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:23:42 -0500
-Date: Wed, 28 Nov 2018 12:23:32 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181128172332.GA16387@flamenco>
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-42-cota@braap.org>
-	<20181127124352.ll6quqc5xedvdqht@MacBook-Pro-Roman.local>
-	<20181127231357.GA19764@flamenco>
-	<20181128104330.qkqnfttswihjur6g@MacBook-Pro-Roman.local>
+	(envelope-from <ehabkost@redhat.com>) id 1gS3bB-0007ZX-Ji
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 12:26:12 -0500
+Date: Wed, 28 Nov 2018 15:25:34 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181128172534.GW18284@habkost.net>
+References: <20181031003120.26771-1-ehabkost@redhat.com>
+	<20181031003120.26771-13-ehabkost@redhat.com>
+	<824abd40-2e3b-f40d-d995-394d84d8d20c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181128104330.qkqnfttswihjur6g@MacBook-Pro-Roman.local>
-Subject: Re: [Qemu-devel] [RFC 41/48] configure: add --enable-plugins
+In-Reply-To: <824abd40-2e3b-f40d-d995-394d84d8d20c@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 12/15] Acceptance tests: add make rule for
+ running them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +25,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-On Wed, Nov 28, 2018 at 13:43:30 +0300, Roman Bolshakov wrote:
-> The test of -exported_symbols_list fails:
-> Undefined symbols for architecture x86_64:
->   "foo", referenced from:
->        -exported_symbol[s_list] command line option
->             (maybe you meant: _foo)
+On Wed, Nov 07, 2018 at 12:24:55AM +0100, Paolo Bonzini wrote:
+> On 31/10/2018 01:31, Eduardo Habkost wrote:
+> > From: Cleber Rosa <crosa@redhat.com>
+> > 
+> > The acceptance (aka functional, aka Avocado-based) tests are
+> > Python files located in "tests/acceptance" that need to be run
+> > with the Avocado libs and test runner.
+> > 
+> > Let's provide a convenient way for QEMU developers to run them,
+> > by making use of the tests-venv with the required setup.
+> > 
+> > Also, while the Avocado test runner will take care of creating a
+> > location to save test results to, it was understood that it's better
+> > if the results are kept within the build tree.
+> > 
+> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> > Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Acked-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> > Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+> > Message-Id: <20181018153134.8493-3-crosa@redhat.com>
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  docs/devel/testing.rst | 43 +++++++++++++++++++++++++++++++++++++-----
+> >  tests/requirements.txt |  1 +
+> >  tests/Makefile.include | 21 +++++++++++++++++++--
+> >  3 files changed, 58 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+> > index a227754f86..18e2c0868a 100644
+> > --- a/docs/devel/testing.rst
+> > +++ b/docs/devel/testing.rst
+> > @@ -545,10 +545,39 @@ Tests based on ``avocado_qemu.Test`` can easily:
+> >     - http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test
+> >     - http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html
+> >  
+> > -Installation
+> > -------------
+> > +Running tests
+> > +-------------
+> > +
+> > +You can run the acceptance tests simply by executing:
+> > +
+> > +.. code::
+> > +
+> > +  make check-acceptance
+> > +
+> > +This involves the automatic creation of Python virtual environment
+> > +within the build tree (at ``tests/venv``) which will have all the
+> > +right dependencies, and will save tests results also within the
+> > +build tree (at ``tests/results``).
+> >  
+> > -To install Avocado and its dependencies, run:
+> > +Note: the build environment must be using a Python 3 stack, and have
+> > +the ``venv`` and ``pip`` packages installed.  If necessary, make sure
+> > +``configure`` is called with ``--python=`` and that those modules are
+> > +available.  On Debian and Ubuntu based systems, depending on the
+> > +specific version, they may be on packages named ``python3-venv`` and
+> > +``python3-pip``.
+> > +
+> > +The scripts installed inside the virtual environment may be used
+> > +without an "activation".  For instance, the Avocado test runner
+> > +may be invoked by running:
+> > +
+> > + .. code::
+> > +
+> > +  tests/venv/bin/avocado run $OPTION1 $OPTION2 tests/acceptance/
+> > +
+> > +Manual Installation
+> > +-------------------
+> > +
+> > +To manually install Avocado and its dependencies, run:
+> >  
+> >  .. code::
+> >  
+> > @@ -689,11 +718,15 @@ The exact QEMU binary to be used on QEMUMachine.
+> >  Uninstalling Avocado
+> >  --------------------
+> >  
+> > -If you've followed the installation instructions above, you can easily
+> > -uninstall Avocado.  Start by listing the packages you have installed::
+> > +If you've followed the manual installation instructions above, you can
+> > +easily uninstall Avocado.  Start by listing the packages you have
+> > +installed::
+> >  
+> >    pip list --user
+> >  
+> >  And remove any package you want with::
+> >  
+> >    pip uninstall <package_name>
+> > +
+> > +If you've used ``make check-acceptance``, the Python virtual environment where
+> > +Avocado is installed will be cleaned up as part of ``make check-clean``.
+> > diff --git a/tests/requirements.txt b/tests/requirements.txt
+> > index d39f9d1576..64c6e27a94 100644
+> > --- a/tests/requirements.txt
+> > +++ b/tests/requirements.txt
+> > @@ -1,3 +1,4 @@
+> >  # Add Python module requirements, one per line, to be installed
+> >  # in the tests/venv Python virtual environment. For more info,
+> >  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+> > +avocado-framework==65.0
+> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > index eabc1da2f3..d2e577eabb 100644
+> > --- a/tests/Makefile.include
+> > +++ b/tests/Makefile.include
+> > @@ -11,6 +11,7 @@ check-help:
+> >  	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
+> >  	@echo " $(MAKE) check-block          Run block tests"
+> >  	@echo " $(MAKE) check-tcg            Run TCG tests"
+> > +	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) tests"
+> >  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+> >  	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+> >  	@echo " $(MAKE) check-clean          Clean the tests"
+> > @@ -902,10 +903,15 @@ check-decodetree:
+> >  
+> >  # Python venv for running tests
+> >  
+> > -.PHONY: check-venv
+> > +.PHONY: check-venv check-acceptance
+> >  
+> >  TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
+> >  TESTS_VENV_REQ=$(SRC_PATH)/tests/requirements.txt
+> > +TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+> > +# Controls the output generated by Avocado when running tests.
+> > +# Any number of command separated loggers are accepted.  For more
+> > +# information please refer to "avocado --help".
+> > +AVOCADO_SHOW=none
+> >  
+> >  $(shell $(PYTHON) -c 'import sys; assert sys.version_info >= (3,0)' >/dev/null 2>&1)
+> >  ifeq ($(.SHELLSTATUS),0)
+> > @@ -922,8 +928,19 @@ $(TESTS_VENV_DIR):
+> >  	$(error "venv directory for tests requires Python 3")
+> >  endif
+> >  
+> > +$(TESTS_RESULTS_DIR):
+> > +	$(call quiet-command, mkdir -p $@, \
+> > +            MKDIR, $@)
+> > +
+> >  check-venv: $(TESTS_VENV_DIR)
+> >  
+> > +check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+> > +	$(call quiet-command, \
+> > +            $(TESTS_VENV_DIR)/bin/python -m avocado \
+> > +            --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
+> > +            --failfast=on $(SRC_PATH)/tests/acceptance, \
+> > +            "AVOCADO", "tests/acceptance")
 > 
-> All functions on macOS are prefixed with underscore [1]:
-> "The name of a symbol representing a function that conforms to standard C
-> calling conventions is the name of the function with an underscore prefix.
-> Thus, the name of the symbol representing the function main would be _main."
+> Right now it seems like anything that is target-dependent should be
+> developed under qtest, rather than as an acceptance test.  On the other
+> hand this results in qtests that actually do not use the qtest protocol
+> at all---only the libqtest function to interact with QMP etc.---and as
+> such would look like a perfect match for "make check-acceptance".
+> drive_del-test is already an example of this.
 > 
-> So it can be fixed by prepending foo and qemu-plugins-ld64.symbols with
-> underscore:
+> How hard would it be to make it run tests for all supported targets,
+> rather than just the host architecture?  Perhaps using a tag such as
+> "all-targets".
 
-Ah I see, thanks!
+I shouldn't be difficult, and I think Cleber and Philippe are
+working on it.  See
+<https://trello.com/c/CmxAb30X/56-make-check-acceptance-a-way-to-test-all-architectures>
+and <https://trello.com/c/tWhq0eXT/54-basic-multi-arch-support>.
 
-(snip)
-> qemu-ga fails to link because it doesn't have symbols declared in
-> qemu-plugins-ld64.symbols. Perhaps "-Wl,-exported_symbols_list" should
-> be applied only to qemu-system?
-
-I just pushed to the same github branch the appended fixup.
-The idea is to only add the linker flags when the output
-binary links plugin.o.
-
-Can you please test?
-
-Thanks,
-
-		Emilio
-
----
-commit 8f45416b79765b66e5ce0fca7db93b97bbcfcfbb
-Author: Emilio G. Cota <cota@braap.org>
-Date:   Wed Nov 28 12:11:23 2018 -0500
-
-    configure: ld64 fixup
-    
-    And copy the file to the build dir also for !ld64.
-    
-    Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-diff --git a/Makefile.target b/Makefile.target
-index 719699696d..7ea17d71cb 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -107,7 +107,23 @@ obj-y += target/$(TARGET_BASE_ARCH)/
- obj-y += disas.o
- obj-$(call notempty,$(TARGET_XML_FILES)) += gdbstub-xml.o
- 
--obj-$(CONFIG_PLUGINS) += plugin.o
-+ifdef CONFIG_PLUGINS
-+obj-y += plugin.o
-+# Abuse -libs suffix to only link with --dynamic-list/-exported_symbols_list
-+# when the final binary includes the plugin object.
-+#
-+# Note that simply setting LDFLAGS is not enough: we build binaries that
-+# never link plugin.o, and the linker might fail (at least ld64 does)
-+# if the symbols in the list are not in the output binary.
-+ ifdef CONFIG_HAS_LD_DYNAMIC_LIST
-+ plugin.o-libs := -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
-+ else
-+  ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
-+  plugin.o-libs := \
-+	-Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
-+  endif
-+ endif
-+endif
- 
- #########################################################
- # Linux user emulator target
-diff --git a/configure b/configure
-index 3dc9c9697b..395acf831e 100755
---- a/configure
-+++ b/configure
-@@ -5185,7 +5185,7 @@ fi
- # See if -exported_symbols_list is supported by the linker
- 
- cat > $TMPTXT <<EOF
--  foo
-+  _foo
- EOF
- 
- ld_exported_symbols_list="no"
-@@ -6843,13 +6843,17 @@ fi
- if test "$plugins" = "yes" ; then
-     echo "CONFIG_PLUGINS=y" >> $config_host_mak
-     LIBS="-ldl $LIBS"
-+    # Copy the export object list to the build dir
-     if test "$ld_dynamic_list" = "yes" ; then
--	LDFLAGS="-Wl,--dynamic-list=\$(SRC_PATH)/qemu-plugins.symbols $LDFLAGS"
-+	echo "CONFIG_HAS_LD_DYNAMIC_LIST=yes" >> $config_host_mak
-+	ld_symbols=qemu-plugins-ld.symbols
-+	cp "$source_path/qemu-plugins.symbols" $ld_symbols
-     elif test "$ld_exported_symbols_list" = "yes" ; then
-+	echo "CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST=yes" >> $config_host_mak
- 	ld64_symbols=qemu-plugins-ld64.symbols
- 	echo "# Automatically generated by configure - do not modify" > $ld64_symbols
--	cat "$source_path/qemu-plugins.symbols" | grep qemu_ | sed 's/;//g' >> $ld64_symbols
--	LDFLAGS="-Wl,-exported_symbols_list,\$(BUILD_DIR)/$ld64_symbols $LDFLAGS"
-+	grep 'qemu_' "$source_path/qemu-plugins.symbols" | sed 's/;//g' | \
-+	    sed -E 's/^\s*(.*)/_\1/' >> $ld64_symbols
-     else
- 	error_exit \
- 	    "If \$plugins=yes, either \$ld_dynamic_list or " \
+-- 
+Eduardo
