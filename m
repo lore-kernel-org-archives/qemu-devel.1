@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gRnoM-0006VA-HD
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:34:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gRnrX-0000nF-PT
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:37:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@sifive.com>) id 1gRnoJ-0001PT-9T
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:34:38 -0500
-Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:38224)
+	(envelope-from <peter.maydell@linaro.org>) id 1gRnrW-0003ZJ-VF
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:37:55 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35830)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gRnoJ-0001Nk-1z
-	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:34:35 -0500
-Received: by mail-pl1-x633.google.com with SMTP id e5so16448633plb.5
-	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 16:34:33 -0800 (PST)
-Date: Tue, 27 Nov 2018 16:34:32 -0800 (PST)
-In-Reply-To: <d17b7767-a72f-a84a-a65d-d848db42d030@mail.uni-paderborn.de>
-From: Palmer Dabbelt <palmer@sifive.com>
-Message-ID: <mhng-22cf4e89-cf9f-4a1d-b254-72b66e51dd82@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] riscv/cpu: use
- device_class_set_parent_realize
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gRnrW-0003YW-Mu
+	for qemu-devel@nongnu.org; Tue, 27 Nov 2018 19:37:54 -0500
+Received: by mail-ot1-x343.google.com with SMTP id 81so21999733otj.2
+	for <qemu-devel@nongnu.org>; Tue, 27 Nov 2018 16:37:54 -0800 (PST)
+MIME-Version: 1.0
+References: <20181127184929.20065-1-jsnow@redhat.com>
+In-Reply-To: <20181127184929.20065-1-jsnow@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 28 Nov 2018 00:37:42 +0000
+Message-ID: <CAFEAcA8Rn7MyFCPYCthLG_3YXGBLV_duQ961i4Ew_8dRL+E8tA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] scsi: Address spurious clang warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: maozhongyi@cmss.chinamobile.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu, Michael Clark <mjc@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, philmd@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-On Mon, 26 Nov 2018 01:06:33 PST (-0800), Bastian Koppelmann wrote:
-> On 11/26/18 4:20 AM, Mao Zhongyi wrote:
->> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
->> ---
->>   target/riscv/cpu.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
+On Tue, 27 Nov 2018 at 18:49, John Snow <jsnow@redhat.com> wrote:
 >
-> Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Some versions of Clang prior to 6.0 (and some builds of clang after,
+> such as 6.0.1-2.fc28) fail to recognize { 0 } as a valid initializer
+> for a struct with subobjects when -Wmissing-braces is enabled.
+>
+> https://bugs.llvm.org/show_bug.cgi?id=21689 and
+> https://reviews.llvm.org/rL314499 suggests this should be fixed in 6.0,
+> but it might not be the case for older versions or downstream versions.
+>
+> For now, follow the precedent of ebf2a499 and replace the standard { 0 }
+> with the accepted { } to silence this warning and allow the build to
+> work under clang 6.0.1-2.fc28, and builds prior to 6.0.
+>
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
-Shouldn't we also use device_class_set_parent_reset right below this?  Either
-way, I'll queue this one for 3.2.
+Applied to master as a build fix for rc3, thanks.
 
-Thanks!
+-- PMM
