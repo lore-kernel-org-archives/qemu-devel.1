@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gS6ko-0004xx-1b
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:48:14 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gS6l8-00059Q-CC
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:48:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1gS6kk-00043A-S0
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:48:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59244)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1gS6kk-00042b-Ke
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:48:10 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EAFE53002891
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 20:48:09 +0000 (UTC)
-References: <20181126200009.862-1-quintela@redhat.com>
-	<20181126200009.862-17-quintela@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <c52f04d6-dced-1cb7-23b8-f301254dc366@redhat.com>
-Date: Wed, 28 Nov 2018 21:48:04 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1gS6l4-00051a-8k
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:48:34 -0500
+Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:34398)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gS6l3-0004y0-SD
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 15:48:30 -0500
+Received: by mail-pg1-x532.google.com with SMTP id 17so10030233pgg.1
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 12:48:29 -0800 (PST)
+References: <cover.1543352682.git.alistair.francis@wdc.com>
+	<7beac896a4d4ffd873c24a74f7f7be4118ba7e5d.1543352682.git.alistair.francis@wdc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e8d57887-7650-ac7c-e4ae-f35acf3251ea@linaro.org>
+Date: Wed, 28 Nov 2018 12:48:25 -0800
 MIME-Version: 1.0
-In-Reply-To: <20181126200009.862-17-quintela@redhat.com>
+In-Reply-To: <7beac896a4d4ffd873c24a74f7f7be4118ba7e5d.1543352682.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 16/16] virtio: virtio 9p really requires
- CONFIG_VIRTFS to work
+Subject: Re: [Qemu-devel] [RFC v2 19/24] riscv: tcg-target: Add the target
+ init code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +32,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, peterx@redhat.com
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>
 
-On 26/11/2018 21:00, Juan Quintela wrote:
-> Otherwise, it has no implementation.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On 11/27/18 1:09 PM, Alistair Francis wrote:
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
 > ---
->  default-configs/virtio.mak | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
-> index 5ae4a61018..ecb4420e74 100644
-> --- a/default-configs/virtio.mak
-> +++ b/default-configs/virtio.mak
-> @@ -1,7 +1,7 @@
->  CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
->  CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
->  CONFIG_VIRTIO=y
-> -CONFIG_VIRTIO_9P=y
-> +CONFIG_VIRTIO_9P=$(CONFIG_VIRTFS)
->  CONFIG_VIRTIO_BALLOON=y
->  CONFIG_VIRTIO_BLK=y
->  CONFIG_VIRTIO_CRYPTO=y
-> 
+>  tcg/riscv/tcg-target.inc.c | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
 
-I think you should also replace "#ifdef CONFIG_VIRTFS" by "#ifdef
-CONFIG_VIRTIO_9P" in:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-hw/s390x/virtio-ccw.h
-include/hw/xen/xen_backend.h
-hw/xen/xen_backend.c
 
-Thanks,
-Laurent
+r~
