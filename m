@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSKUg-00018s-Lu
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:28:33 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gSKhj-00075G-UC
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:42:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSKMo-0004H8-J7
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:20:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51576)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gSKMo-0004Gm-BP
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:20:22 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0ABD3091791
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 11:20:21 +0000 (UTC)
-References: <20181129110334.27721-1-berrange@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e7e922c5-e8f3-a06d-a62d-a1eb27f31dcb@redhat.com>
-Date: Thu, 29 Nov 2018 12:20:17 +0100
+	(envelope-from <cohuck@redhat.com>) id 1gSKhg-0003mK-8a
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:41:59 -0500
+Date: Thu, 29 Nov 2018 12:41:25 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181129124125.10c418d4.cohuck@redhat.com>
+In-Reply-To: <1542904555-1136-2-git-send-email-pmorel@linux.ibm.com>
+References: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
+	<1542904555-1136-2-git-send-email-pmorel@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20181129110334.27721-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-web PATCH v3] download: document version
- numbering scheme
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] s390x/vfio: ap: Finding the AP
+ bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,21 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com
 
-On 2018-11-29 12:03, Daniel P. Berrang=C3=A9 wrote:
-> The new version numbering scheme was mentioned in the blog post
-> announcing 3.0 previously, but this will fall out of view over
-> time. It is thus preferrable to mention this on the download page
-> too.
->=20
-> Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On Thu, 22 Nov 2018 17:35:50 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> In the case we will enter QEMU through interception of instructions,
+> we will need to retrieve the AP devices.
+> The base device is the AP bridge.
+> 
+> Let us implement a way to retrieve the AP Bridge from qtree.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  download.html | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
+>  hw/s390x/ap-bridge.c         | 12 ++++++++++++
+>  include/hw/s390x/ap-bridge.h |  1 +
+>  2 files changed, 13 insertions(+)
+> 
+> diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
+> index 3795d30..831ad5d 100644
+> --- a/hw/s390x/ap-bridge.c
+> +++ b/hw/s390x/ap-bridge.c
+> @@ -14,6 +14,18 @@
+>  #include "hw/s390x/ap-bridge.h"
+>  #include "cpu.h"
+>  
+> +DeviceState *s390_get_ap_bridge(void)
+> +{
+> +    static DeviceState *apb;
+> +
+> +    if (!apb) {
+> +        apb = DEVICE(object_resolve_path(TYPE_AP_BRIDGE, NULL));
+> +        assert(apb != NULL);
 
-Thanks, applied now.
+As you won't have an ap bridge if the ap feature is not provided,
+better do a quick exit if the feature bit is not set? I'd naively
+assume that this function can return NULL as well.
 
- Thomas
+> +    }
+> +
+> +    return apb;
+> +}
+> +
+>  static char *ap_bus_get_dev_path(DeviceState *dev)
+>  {
+>      /* at most one */
