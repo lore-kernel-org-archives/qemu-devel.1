@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gSOjj-0006Wj-Or
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:00:26 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gSOlb-0000mJ-E9
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:02:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gSOjb-0006HR-HU
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:00:19 -0500
-References: <20181128095939.5684-1-david@redhat.com>
-	<e036b52f-abe7-4b13-1c5f-d084a8b7a491@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <2c47fc65-ae2d-13cd-9b94-6392e59a77f5@redhat.com>
-Date: Thu, 29 Nov 2018 17:00:06 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1gSOlZ-0007NL-SK
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:02:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52718)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gSOlZ-0007Ma-I1
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:02:13 -0500
+Date: Thu, 29 Nov 2018 14:02:06 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181129160206.GL18284@habkost.net>
+References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
+	<20181127092801.21777-16-marcandre.lureau@redhat.com>
+	<20181127194019.GQ18284@habkost.net>
+	<CAMxuvaz0FitnFiSD3Ma9r_7z0oM6A_Z3D2nbAh=YBp3mEC72rg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <e036b52f-abe7-4b13-1c5f-d084a8b7a491@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/tod: Properly stop the KVM TOD
- while the guest is not running
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAMxuvaz0FitnFiSD3Ma9r_7z0oM6A_Z3D2nbAh=YBp3mEC72rg@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 15/28] hw: apply accel compat
+ properties without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,247 +31,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, sstabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, "Bonzini, Paolo" <pbonzini@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, Igor Mammedov <imammedo@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
 
-On 29.11.18 16:32, Thomas Huth wrote:
-> On 2018-11-28 10:59, David Hildenbrand wrote:
->> Just like on other architectures, we should stop the clock while the guest
->> is not running. This is already properly done for TCG. Right now, doing an
->> offline migration (stop, migrate, cont) can easily trigger stalls in the
->> guest.
->>
->> Even doing a
->>     (hmp) stop
->>     ... wait 2 minutes ...
->>     (hmp) cont
->> will already trigger stalls.
->>
->> So whenever the guest stops, backup the KVM TOD. When continuing to run
->> the guest, restore the KVM TOD.
->>
->> One special case is starting a simple VM: Reading the TOD from KVM to
->> stop it right away until the guest is actually started means that the
->> time of any simple VM will already differ to the host time. We can
->> simply leave the TOD running and the guest won't be able to recognize
->> it.
->>
->> For migration, we actually want to keep the TOD stopped until really
->> starting the guest. To be able to catch most errors, we should however
->> try to set the TOD in addition to simply storing it. So we can still
->> catch basic migration problems.
->>
->> If anything goes wrong while backing up/restoring the TOD, we have to
->> ignore it (but print a warning). This is then basically a fallback to
->> old behavior (TOD remains running).
->>
->> I tested this very basically with an initrd:
->>     1. Start a simple VM. Observed that the TOD is kept running. Old
->>        behavior.
->>     2. Ordinary live migration. Observed that the TOD is temporarily
->>        stopped on the destination when setting the new value and
->>        correctly started when finally starting the guest.
->>     3. Offline live migration. (stop, migrate, cont). Observed that the
->>        TOD will be stopped on the source with the "stop" command. On the
->>        destination, the TOD is temporarily stopped when setting the new
->>        value and correctly started when finally starting the guest via
->>        "cont".
->>     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
->>        or conts in a row have no effect, so works as expected)
->>
->> In the future, we might want to send the guest a special kind of time sync
->> interrupt under some conditions, so it can synchronize its tod to the
->> host tod. This is interesting for migration scenarios but also when we
->> get time sync interrupts ourselves. This however will most probably have
->> to be handled in KVM (e.g. when the tods differ too much) and is not
->> desired e.g. when debugging the guest. (single stepping should not
->> result in permanent time syncs). I consider something like that an add-on
->> on top of this basic "don't break the guest" handling.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>
->> v1 -> v2:
->> - Add time sync idea suggested by Christian to description
->> - Drop one unnecessary "return"
->> - Register in realize() and not in instance_init()
->>
->>
->>  hw/s390x/tod-kvm.c     | 91 +++++++++++++++++++++++++++++++++++++++++-
->>  hw/s390x/tod.c         |  5 +++
->>  include/hw/s390x/tod.h |  8 +++-
->>  3 files changed, 101 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/s390x/tod-kvm.c b/hw/s390x/tod-kvm.c
->> index df564ab89c..87717d0be1 100644
->> --- a/hw/s390x/tod-kvm.c
->> +++ b/hw/s390x/tod-kvm.c
->> @@ -10,10 +10,11 @@
->>  
->>  #include "qemu/osdep.h"
->>  #include "qapi/error.h"
->> +#include "sysemu/sysemu.h"
->>  #include "hw/s390x/tod.h"
->>  #include "kvm_s390x.h"
->>  
->> -static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
->> +static void kvm_s390_get_tod_raw(S390TOD *tod, Error **errp)
->>  {
->>      int r;
->>  
->> @@ -27,7 +28,17 @@ static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
->>      }
->>  }
->>  
->> -static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
->> +static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
->> +{
->> +    if (td->stopped) {
->> +        *tod = td->base;
->> +        return;
->> +    }
->> +
->> +    kvm_s390_get_tod_raw(tod, errp);
->> +}
->> +
->> +static void kvm_s390_set_tod_raw(const S390TOD *tod, Error **errp)
->>  {
->>      int r;
->>  
->> @@ -41,18 +52,94 @@ static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
->>      }
->>  }
->>  
->> +static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
->> +{
->> +    Error *local_err = NULL;
->> +
->> +    /*
->> +     * Somebody (e.g. migration) set the TOD. We'll store it into KVM to
->> +     * properly detect errors now but take a look at the runstate to decide
->> +     * whether really to keep the tod running. E.g. during migration, this
->> +     * is the point where we want to stop the initially running TOD to fire
->> +     * it back up when actually starting the migrated guest.
->> +     */
->> +    kvm_s390_set_tod_raw(tod, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->> +    if (runstate_is_running()) {
->> +        td->stopped = false;
->> +    } else {
->> +        td->stopped = true;
->> +        td->base = *tod;
->> +    }
->> +}
->> +
->> +static void kvm_s390_tod_vm_state_change(void *opaque, int running,
->> +                                         RunState state)
->> +{
->> +    S390TODState *td = opaque;
->> +    Error *local_err = NULL;
->> +
->> +    if (running && td->stopped) {
->> +        /* Set the old TOD when running the VM - start the TOD clock. */
->> +        kvm_s390_set_tod_raw(&td->base, &local_err);
->> +        if (local_err) {
->> +            warn_report_err(local_err);
->> +        }
->> +        /* Treat errors like the TOD was running all the time. */
->> +        td->stopped = false;
->> +    } else if (!running && !td->stopped) {
->> +        /* Store the TOD when stopping the VM - stop the TOD clock. */
->> +        kvm_s390_get_tod_raw(&td->base, &local_err);
->> +        if (local_err) {
->> +            /* Keep the TOD running in case we could not back it up. */
->> +            warn_report_err(local_err);
->> +        } else {
->> +            td->stopped = true;
->> +        }
->> +    }
->> +}
->> +
->> +static void kvm_s390_tod_realize(S390TODState *td, Error **errp)
->> +{
->> +    /*
->> +     * We need to know when the VM gets started/stopped to start/stop the TOD.
->> +     * As we can never have more than one TOD instance (and that will never be
->> +     * removed), registering here and never unregistering is good enough.
->> +     */
->> +    qemu_add_vm_change_state_handler(kvm_s390_tod_vm_state_change, td);
->> +}
->> +
->>  static void kvm_s390_tod_class_init(ObjectClass *oc, void *data)
->>  {
->>      S390TODClass *tdc = S390_TOD_CLASS(oc);
->>  
->> +    tdc->realize = kvm_s390_tod_realize;
->>      tdc->get = kvm_s390_tod_get;
->>      tdc->set = kvm_s390_tod_set;
->>  }
->>  
->> +static void kvm_s390_tod_init(Object *obj)
->> +{
->> +    S390TODState *td = S390_TOD(obj);
->> +
->> +    /*
->> +     * The TOD is initially running (value stored in KVM). Avoid needless
->> +     * loading/storing of the TOD when starting a simple VM, so let it
->> +     * run although the (never started) VM is stopped. For migration, we
->> +     * will properly set the TOD later.
->> +     */
->> +    td->stopped = false;
->> +}
->> +
->>  static TypeInfo kvm_s390_tod_info = {
->>      .name = TYPE_KVM_S390_TOD,
->>      .parent = TYPE_S390_TOD,
->>      .instance_size = sizeof(S390TODState),
->> +    .instance_init = kvm_s390_tod_init,
->>      .class_init = kvm_s390_tod_class_init,
->>      .class_size = sizeof(S390TODClass),
->>  };
->> diff --git a/hw/s390x/tod.c b/hw/s390x/tod.c
->> index 1c63f411e6..82ea6554ba 100644
->> --- a/hw/s390x/tod.c
->> +++ b/hw/s390x/tod.c
->> @@ -97,9 +97,14 @@ static SaveVMHandlers savevm_tod = {
->>  static void s390_tod_realize(DeviceState *dev, Error **errp)
->>  {
->>      S390TODState *td = S390_TOD(dev);
->> +    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
->>  
->>      /* Legacy migration interface */
->>      register_savevm_live(NULL, "todclock", 0, 1, &savevm_tod, td);
->> +
->> +    if (tdc->realize) {
->> +        tdc->realize(td, errp);
->> +    }
->>  }
-> 
-> I think the more usual way to deal with this, is to use
-> device_class_set_parent_realize() in the child's class init function,
-> and then to call ->parent_realize() from the child's realize function.
-> 
-> I guess it doesn't really matter in the end which way we do it here, but
-> it would be nice to be consistent with the other devices, so I'd prefer
-> to use device_class_set_parent_realize() for this here, too.
-> 
-> Apart from that, the patch looks fine to me.
+On Wed, Nov 28, 2018 at 12:02:21AM +0400, Marc-Andr=E9 Lureau wrote:
+> Hi
+>=20
+> On Tue, Nov 27, 2018 at 11:40 PM Eduardo Habkost <ehabkost@redhat.com> =
+wrote:
+> >
+> > On Tue, Nov 27, 2018 at 01:27:48PM +0400, Marc-Andr=E9 Lureau wrote:
+> > > Introduce object_apply_global_props() function, to apply compatibil=
+ity
+> > > properties from a GPtrArray.
+> > >
+> > > For accel compatibility properties, apply them during
+> > > device_post_init(), after accel_register_compat_props() has set the=
+m.
+> > >
+> > > To populate the compatibility properties, introduce SET_COMPAT(), a
+> > > more generic version of SET_MACHINE_COMPAT() that can set compat
+> > > properties on other objects than Machine, and using GPtrArray.
+> > >
+> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > > ---
+> > >  include/hw/qdev-core.h | 13 +++++++++++++
+> > >  include/qom/object.h   |  3 +++
+> > >  include/sysemu/accel.h |  4 +---
+> > >  accel/accel.c          | 12 ------------
+> > >  hw/core/qdev.c         | 11 +++++++++++
+> > >  hw/xen/xen-common.c    | 38 +++++++++++++++++++-------------------
+> > >  qom/object.c           | 25 +++++++++++++++++++++++++
+> > >  vl.c                   |  2 +-
+> > >  8 files changed, 73 insertions(+), 35 deletions(-)
+> > >
+> > > diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> > > index a24d0dd566..82afd3c50d 100644
+> > > --- a/include/hw/qdev-core.h
+> > > +++ b/include/hw/qdev-core.h
+> > > @@ -267,6 +267,19 @@ typedef struct GlobalProperty {
+> > >      Error **errp;
+> > >  } GlobalProperty;
+> > >
+> > > +#define SET_COMPAT(S, COMPAT)                                     =
+  \
+> > > +    do {                                                          =
+  \
+> > > +        int i;                                                    =
+  \
+> > > +        static GlobalProperty props[] =3D {                       =
+    \
+> > > +            COMPAT                                                =
+  \
+> > > +        };                                                        =
+  \
+> > > +        for (i =3D 0; i < G_N_ELEMENTS(props); i++) {             =
+    \
+> > > +            g_ptr_array_add((S)->compat_props, (void *)&props[i]);=
+  \
+> > > +        }                                                         =
+  \
+> > > +    } while (0)
+> >
+> > I think this macro would be an acceptable alternative to the
+> > existing SET_MACHINE_COMPAT macro trickery, but:
+> >
+> > > +
+> > > +void accel_register_compat_props(const GPtrArray *props);
+> > [...]
+> > > @@ -185,7 +183,9 @@ static void xen_accel_class_init(ObjectClass *o=
+c, void *data)
+> > >      ac->init_machine =3D xen_init;
+> > >      ac->setup_post =3D xen_setup_post;
+> > >      ac->allowed =3D &xen_allowed;
+> > > -    ac->global_props =3D xen_compat_props;
+> > > +    ac->compat_props =3D g_ptr_array_new();
+> > > +
+> > > +    SET_COMPAT(ac, XEN_COMPAT);
+> >
+> > I think this is a step backwards.  I like us to be able to
+> > register compat properties without macro magic.  The existence of
+> > SET_MACHINE_COMPAT is a bug and not a feature.
+> >
+> > If you really want to use GPtrArray instead of a simple
+> > GlobalProperty* field (I'm not sure I understand the reasoning
+> > behind the choice to use GPtrArray), what about:
+>=20
+> Except in the Xen case, It needs to register multiple GlobalProperty*,
+> not necessarily from contiguous in memory. That's why we have an array
+> of ptr.
 
-Alright, I will resend tomorrow with your suggested change.
-
-Thanks!
-
-> 
->  Thomas
-> 
+If you also need to register multiple properties not from a
+contiguous array, would a simple wrapper that does a single
+g_ptr_array_add() call be enough?
 
 
--- 
+>=20
+> >
+> > static GPtrArray *build_compat_props_array(GlobalProperty *props)
+> > {
+> >     GlobalProperty *p =3D props;
+> >     GPtrArray *array =3D g_ptr_array_new();
+> >     while (p->driver) {
+> >         g_ptr_array_add(array, (void *)p);
+> >     }
+> >     return array;
+> > }
+> >
+> >
+> > static void xen_accel_class_init(ObjectClass *oc, void *data)
+> > {
+> >     ...
+> >     ac->compat_props =3D build_compat_props_array(xen_compat_props);
+>=20
+> If we would register from one place, that would be fine.
+>=20
+> We could replace the macro by a function, then we would have to
+> declare the GlobalProperty arrays manually basically.
 
-Thanks,
+I would prefer to replace the macro with a function, if possible.
+What do you mean by declaring the GlobalProperty arrays manually?
 
-David / dhildenb
+
+>=20
+> > }
+> >
+> >
+> >
+> > >  }
+> > >
+> > >  #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+> > > diff --git a/qom/object.c b/qom/object.c
+> > > index 17921c0a71..dbdab0aead 100644
+> > > --- a/qom/object.c
+> > > +++ b/qom/object.c
+> > > @@ -370,6 +370,31 @@ static void object_post_init_with_type(Object =
+*obj, TypeImpl *ti)
+> > >      }
+> > >  }
+> > >
+> > > +void object_apply_global_props(Object *obj, const GPtrArray *props=
+, Error **errp)
+> > > +{
+> > > +    Error *err =3D NULL;
+> > > +    int i;
+> > > +
+> > > +    if (!props) {
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    for (i =3D 0; i < props->len; i++) {
+> > > +        GlobalProperty *p =3D g_ptr_array_index(props, i);
+> > > +
+> > > +        if (object_dynamic_cast(obj, p->driver) =3D=3D NULL) {
+> > > +            continue;
+> > > +        }
+> > > +        p->used =3D true;
+> > > +        object_property_parse(obj, p->value, p->property, &err);
+> > > +        if (err !=3D NULL) {
+> > > +            error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+> > > +                          p->driver, p->property, p->value);
+> > > +            error_propagate(errp, err);
+> > > +        }
+> > > +    }
+> > > +}
+> > > +
+> > >  static void object_initialize_with_type(void *data, size_t size, T=
+ypeImpl *type)
+> > >  {
+> > >      Object *obj =3D data;
+> > > diff --git a/vl.c b/vl.c
+> > > index fa25d1ae2d..c06e94271c 100644
+> > > --- a/vl.c
+> > > +++ b/vl.c
+> > > @@ -2963,7 +2963,7 @@ static void user_register_global_props(void)
+> > >   */
+> > >  static void register_global_properties(MachineState *ms)
+> > >  {
+> > > -    accel_register_compat_props(ms->accelerator);
+> > > +    accel_register_compat_props(ACCEL_GET_CLASS(ms->accelerator)->=
+compat_props);
+> > >      machine_register_compat_props(ms);
+> > >      user_register_global_props();
+> > >  }
+> > > --
+> > > 2.20.0.rc1
+> > >
+> > >
+> >
+> > --
+> > Eduardo
+
+--=20
+Eduardo
