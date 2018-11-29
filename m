@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSNC3-0004hd-WE
+	(envelope-from <drjones@redhat.com>) id 1gSNC7-0004D8-Ve
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:21:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSN14-0000Hn-SM
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:10:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gSN14-0000HM-Kt
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:10:06 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D3437811D5
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 14:10:05 +0000 (UTC)
-References: <20181129123502.30129-1-kraxel@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b647b71a-ac53-f256-3e16-efa4806b4f7d@redhat.com>
-Date: Thu, 29 Nov 2018 08:09:56 -0600
+	(envelope-from <drjones@redhat.com>) id 1gSN0t-0000Be-HS
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:10:01 -0500
+Date: Thu, 29 Nov 2018 15:09:32 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20181129140932.2yl75vsq2ohmuzx6@kamzik.brq.redhat.com>
+References: <20181129132428.333-1-sameo@linux.intel.com>
+	<20181129132428.333-5-sameo@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20181129123502.30129-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-devel for-3.1?] [PATCH] egl-headless: add
- egl_create_context
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181129132428.333-5-sameo@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/8] hw: arm: Carry RSDP specific data
+ through AcpiRsdpData
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,23 +24,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 11/29/18 6:35 AM, Gerd Hoffmann wrote:
-> We must set the correct context (via eglMakeCurrent) before
-> calling qemu_egl_create_context, so we need a thin wrapper and can't
-> hook qemu_egl_create_context directly as ->dpy_gl_ctx_create callback.
+On Thu, Nov 29, 2018 at 02:24:24PM +0100, Samuel Ortiz wrote:
+> That will allow us to generalize the ARM build_rsdp() routine to support
+> both legacy RSDP (The current i386 implementation) and extended RSDP
+> (The ARM implementation).
 > 
-> Reported-by: Frederik Carlier <frederik.carlier@quamotion.mobi>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 > ---
->   ui/egl-headless.c | 10 +++++++++-
->   1 file changed, 9 insertions(+), 1 deletion(-)
+>  include/hw/acpi/acpi-defs.h |  8 ++++++++
+>  hw/arm/virt-acpi-build.c    | 18 +++++++++++++-----
+>  2 files changed, 21 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index af8e023968..8425ecb8c6 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -53,6 +53,14 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+>  } QEMU_PACKED;
+>  typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+>  
+> +typedef struct AcpiRsdpData {
+> +    uint8_t oem_id[6]; /* OEM identification */
+> +    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
+> +
+> +    unsigned *rsdt_tbl_offset;
+> +    unsigned *xsdt_tbl_offset;
 
-How severe is this? Is it something that would warrant 3.1-rc4, or are 
-we safe deferring it to 4.0?
+Why use pointers?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> +} AcpiRsdpData;
+> +
+>  /* Table structure from Linux kernel (the ACPI tables are under the
+>     BSD license) */
+>  
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 0835900052..ce8bfa5a37 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+>  
+>  /* RSDP */
+>  static void
+> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+>  {
+>      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+>      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
+> @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+>                               true /* fseg memory */);
+>  
+>      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
+> -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
+> +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
+
+sizeof(rsdp_data->oem_id)
+
+>      rsdp->length = cpu_to_le32(sizeof(*rsdp));
+> -    rsdp->revision = 0x02;
+> +    rsdp->revision = rsdp_data->revision;
+>  
+>      /* Address to be filled by Guest linker */
+>      bios_linker_loader_add_pointer(linker,
+>          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
+> -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
+> +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
+>  
+>      /* Checksum to be filled by Guest linker */
+>      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> @@ -857,7 +857,15 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
+>  
+>      /* RSDP is in FSEG memory, so allocate it separately */
+> -    build_rsdp(tables->rsdp, tables->linker, xsdt);
+> +    {
+> +        AcpiRsdpData rsdp_data = {
+> +            .revision = 2,
+> +            .oem_id = ACPI_BUILD_APPNAME6,
+> +            .xsdt_tbl_offset = &xsdt,
+> +            .rsdt_tbl_offset = NULL,
+
+nit: no need for this explicit NULLing
+
+> +        };
+> +        build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
+> +    }
+>  
+>      /* Cleanup memory that's no longer used. */
+>      g_array_free(table_offsets, true);
+> -- 
+> 2.19.2
+> 
+>
+
+Thanks,
+drew 
