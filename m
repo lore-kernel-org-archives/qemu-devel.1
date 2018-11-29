@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSLku-0005QZ-MK
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:49:21 -0500
+	(envelope-from <armbru@redhat.com>) id 1gSLnN-0006Yl-Oa
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:51:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSLkt-0003VK-T1
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:49:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41204)
+	(envelope-from <armbru@redhat.com>) id 1gSLnI-00056D-QM
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:51:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41814)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSLkt-0003VC-ND
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:49:19 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSLnI-000565-Kv
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:51:48 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20181129100340.13823-1-fli@suse.com>
-	<20181129100340.13823-2-fli@suse.com>
-Date: Thu, 29 Nov 2018 13:49:14 +0100
-In-Reply-To: <20181129100340.13823-2-fli@suse.com> (Fei Li's message of "Thu,
-	29 Nov 2018 18:03:36 +0800")
-Message-ID: <87r2f482wl.fsf@dusky.pond.sub.org>
+References: <5BE31F76020000760003D33A@prv-mh.provo.novell.com>
+Date: Thu, 29 Nov 2018 13:51:46 +0100
+In-Reply-To: <5BE31F76020000760003D33A@prv-mh.provo.novell.com> (Kirk Allan's
+	message of "Wed, 07 Nov 2018 10:23:02 -0700")
+Message-ID: <87mups82sd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC v2 1/5] Fix segmentation fault when
- qemu_signal_init fails
+Subject: Re: [Qemu-devel] getting link errors when building for qga-vss.dll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Kirk Allan <kallan@suse.com>
+Cc: qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-You neglected to cc the maintainer.  I'm doing that for you now.  Cc'ing
-maintainers is important to maximize your chances at getting your
-patches picked up.  Use scripts/get_maintainer.pl to find them.
+Cc'ing folks who might be able to help.
 
-Fei Li <fli@suse.com> writes:
+"Kirk Allan" <kallan@suse.com> writes:
 
-> When qemu_signal_init() fails in qemu_init_main_loop(), we return
-> without setting an error.  Its callers crash then when they try to
-> report the error with error_report_err().
+> When I try to build qga-vss.dll I get the following link error:
 >
-> To avoid such segmentation fault, add a new Error parameter to make
-> the call trace to propagate the err to the final caller.
+> LINK    qga/vss-win32/qga-vss.dll
+> /usr/lib64/gcc/i686-w64-mingw32/8.2.0/../../../../i686-w64-mingw32/bin/ld: qga/vss-win32/requester.o: in function `requester_freeze':
+> /src/qemu/qga/vss-win32/requester.cpp:284: undefined reference to `g_assertion_message_expr'
 >
-> Fixes: 2f78e491d7b46542158ce0b8132ee4e05bc0ade4
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Fam Zheng <famz@redhat.com>
-> Signed-off-by: Fei Li <fli@suse.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  util/main-loop.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+> I started getting this link error with commit 3ebee3b191e755d3f7311a6a62eea5c9628b221b where assert is redefined to g_assert.
 >
-> diff --git a/util/main-loop.c b/util/main-loop.c
-> index affe0403c5..443cb4cfe8 100644
-> --- a/util/main-loop.c
-> +++ b/util/main-loop.c
-> @@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
->      }
->  }
->  
-> -static int qemu_signal_init(void)
-> +static int qemu_signal_init(Error **errp)
->  {
->      int sigfd;
->      sigset_t set;
-> @@ -96,7 +96,7 @@ static int qemu_signal_init(void)
->      sigdelset(&set, SIG_IPI);
->      sigfd = qemu_signalfd(&set);
->      if (sigfd == -1) {
-> -        fprintf(stderr, "failed to create signalfd\n");
-> +        error_setg_errno(errp, errno, "failed to create signalfd");
->          return -errno;
->      }
->  
-> @@ -109,7 +109,7 @@ static int qemu_signal_init(void)
->  
->  #else /* _WIN32 */
->  
-> -static int qemu_signal_init(void)
-> +static int qemu_signal_init(Error **errp)
->  {
->      return 0;
->  }
-> @@ -148,7 +148,7 @@ int qemu_init_main_loop(Error **errp)
->  
->      init_clocks(qemu_timer_notify_cb);
->  
-> -    ret = qemu_signal_init();
-> +    ret = qemu_signal_init(errp);
->      if (ret) {
->          return ret;
->      }
+> Is there something additional I need to add to my configure or make commands to resolve g_assertion_message_expr?
+>
+> My configure command is: ./configure --cross-prefix=i686-w64-mingw32- --enable-guest-agent --with-vss-sdk
+>
+> My make command is: make qemu-ga.exe qga/vss-win32/qga-vss.dll
+>
+> Thanks,
+> Kirk
