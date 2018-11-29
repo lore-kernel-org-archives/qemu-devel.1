@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gSMJf-0000BY-88
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:25:20 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gSMJf-0000Ba-95
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:25:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gSMJZ-0001Om-MV
+	(envelope-from <sameo@linux.intel.com>) id 1gSMJb-0001bd-7q
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:25:15 -0500
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Thu, 29 Nov 2018 14:24:20 +0100
-Message-Id: <20181129132428.333-1-sameo@linux.intel.com>
+Date: Thu, 29 Nov 2018 14:24:21 +0100
+Message-Id: <20181129132428.333-2-sameo@linux.intel.com>
+In-Reply-To: <20181129132428.333-1-sameo@linux.intel.com>
+References: <20181129132428.333-1-sameo@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 0/8] hw: acpi: RSDP fixes and refactoring
+Subject: [Qemu-devel] [PATCH v2 1/8] hw: acpi: The RSDP build API can return
+ void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +26,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-This patch serie fixes a couple of RSDP checksum related issues:
+For both x86 and ARM architectures, the internal RSDP build API can
+return void as the current return value is unused.
 
-- On RSDP rev2, we are not adding the extended checksum and computing
-  the checksum on the full table instead of the first 20 bytes.
-- On RSDP rev1, we are computing the checksum on 36 bytes instead of 20.
-  We're lucky enough that this is only adding zeroes to the checksum.
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/arm/virt-acpi-build.c | 4 +---
+ hw/i386/acpi-build.c     | 4 +---
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-A guest Linux kernel does not seem to care about RSDP checksums, so
-those 2 fixes are mostly for correctness sake.
-Any machine type that generates rev2 RSDP will see its RSDP table
-modified but since x86 builds RSDP v1 and all ACPI tests only run on
-either pc or q35, the ACPI tests tables are not affected by this fix.
-
-The serie also extends the ARM virt ACPI RSDP build routine to support
-both RSDP v1 and v2, in order to share this code between x86 and
-aarch64. While extending, we also convert the routine to the latest
-build_append_foo() API. The new implementation is a closer reflection of
-the ACPI spec itself, is endian agnostic and allows for getting rid of the
-AcpiRsdpDescriptor structure.
-
-v1 -> v2:
-  * Add missing SOBs.
-  * Rephrase some commit messages according to the maintainer's input.
-  * Replace ACPI spec definitions with hard coded constants.
-  * Replace init_rsdp_data() helper with open coded rsdp variable init.
-  * Rename acpi_find_[rx]sdt_address to acpi_get_[rx]sdt_address.
-
-Igor Mammedov (2):
-  hw: arm: acpi: Fix incorrect checksums in RSDP
-  hw: i386: Use correct RSDT length for checksum
-
-Samuel Ortiz (6):
-  hw: acpi: The RSDP build API can return void
-  hw: arm: Carry RSDP specific data through AcpiRsdpData
-  hw: arm: Convert the RSDP build to the buid_append_foo() API
-  hw: arm: Support both legacy and current RSDP build
-  hw: acpi: Export and share the ARM RSDP build
-  hw: acpi: Remove AcpiRsdpDescriptor and fix tests
-
- include/hw/acpi/acpi-defs.h | 19 ++++++--------
- include/hw/acpi/aml-build.h |  2 ++
- tests/acpi-utils.h          |  5 +++-
- hw/acpi/aml-build.c         | 50 +++++++++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c    | 40 +++++++----------------------
- hw/i386/acpi-build.c        | 36 +++++++-------------------
- tests/acpi-utils.c          | 46 ++++++++++++++++++++++++++++------
- tests/bios-tables-test.c    | 27 ++++++++++++++------
- tests/vmgenid-test.c        |  8 +++---
- 9 files changed, 143 insertions(+), 90 deletions(-)
-
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 5785fb697c..fcaa350892 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -367,7 +367,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+ }
+ 
+ /* RSDP */
+-static GArray *
++static void
+ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+ {
+     AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+@@ -392,8 +392,6 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+         (char *)rsdp - rsdp_table->data, sizeof *rsdp,
+         (char *)&rsdp->checksum - rsdp_table->data);
+-
+-    return rsdp_table;
+ }
+ 
+ static void
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 236a20eaa8..35f17d0d91 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2547,7 +2547,7 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
+                  "IVRS", table_data->len - iommu_start, 1, NULL, NULL);
+ }
+ 
+-static GArray *
++static void
+ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
+ {
+     AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+@@ -2569,8 +2569,6 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
+     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+         (char *)rsdp - rsdp_table->data, sizeof *rsdp,
+         (char *)&rsdp->checksum - rsdp_table->data);
+-
+-    return rsdp_table;
+ }
+ 
+ typedef
 -- 
 2.19.2
