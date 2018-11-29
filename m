@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSJTY-0003wO-Ku
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:23:17 -0500
+	(envelope-from <berrange@redhat.com>) id 1gSJTb-0003zN-QU
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:23:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSJTX-00080X-R1
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:23:16 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36869)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gSJTX-000807-M1
+	(envelope-from <berrange@redhat.com>) id 1gSJTX-00080h-TJ
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:23:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39312)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gSJTX-0007zz-Ne
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:23:15 -0500
-Received: by mail-oi1-x242.google.com with SMTP id y23so1171063oia.4
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 02:23:15 -0800 (PST)
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D0FF9307CDF4
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 10:23:14 +0000 (UTC)
+Date: Thu, 29 Nov 2018 10:23:08 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181129102308.GA25007@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181128113337.7238-1-quintela@redhat.com>
 MIME-Version: 1.0
-References: <1543412590-29716-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1543412590-29716-2-git-send-email-stefan.markovic@rt-rk.com>
-	<3ef23076-d0b4-4df3-d023-bf18ba33aade@redhat.com>
-	<266d7143-54e7-86d7-e29b-64cb923edceb@wavecomp.com>
-In-Reply-To: <266d7143-54e7-86d7-e29b-64cb923edceb@wavecomp.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 29 Nov 2018 10:23:03 +0000
-Message-ID: <CAFEAcA937xXC2mHpM=wmjrU8Rx-dAG6_duAGM9jTzgEScq7PUg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-doc: Add nanoMIPS ISA information
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181128113337.7238-1-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v10 0/5] Add make check tests for Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Markovic <smarkovic@wavecomp.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Stefan Markovic <stefan.markovic@rt-rk.com>, QEMU Developers <qemu-devel@nongnu.org>, Paul Burton <pburton@wavecomp.com>, James Hogan <jhogan@kernel.org>, Thomas Huth <huth@tuxfamily.org>, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On Thu, 29 Nov 2018 at 10:18, Stefan Markovic <smarkovic@wavecomp.com> wrote:
-> I'll investigate further running with  --enable-debug option to fix this
-> issue.
->
-> In the meantime, we could note enable-debug as 'To Be Done/Work In
-> Progress' for nanoMIPS in qemu docs .
+On Wed, Nov 28, 2018 at 12:33:32PM +0100, Juan Quintela wrote:
+> - Finish tl trasport test
+>   I already knew that I hate certificates, but this is too much.  Trying
+>   to understand how to use them.
 
-This isn't just "--enable-debug doesn't work", it means there's a
-definite bug because you've tripped an assert (that's only enabled
-in the debug config). It's quite possible that the code will misbehave
-at runtime even on the non-debug config...
+I'll happily contribute TLS tests on top of your basic series here
+if you want. Just let me know...
 
-thanks
--- PMM
+If you prefer to try to do it yourself though, take a look at the
+test-io-channel-tls.c  test which goes through the process of
+creating certificates and loading the QEMU TLS credential objets
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
