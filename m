@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gSPBF-0002VS-8Q
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:28:46 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gSPHJ-0005vt-N7
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:35:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gSPBC-0000R1-1b
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:28:45 -0500
-Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:41322)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gSPBB-0000QO-J2
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:28:41 -0500
-Received: from player157.ha.ovh.net (unknown [10.109.143.249])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id CD68E207E3D
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 17:28:39 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-26-clg@kaod.org>
-	<20181129040302.GD14697@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a6fecb88-f643-55fa-d66b-c02ae9d11588@kaod.org>
-Date: Thu, 29 Nov 2018 17:28:34 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1gSPHE-0004v1-O5
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:35:01 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46230)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gSPHE-0004rh-Gm
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:34:56 -0500
+Received: by mail-wr1-x441.google.com with SMTP id l9so2532049wrt.13
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 08:34:56 -0800 (PST)
+References: <20181123144558.5048-1-richard.henderson@linaro.org>
+	<20181123144558.5048-7-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181123144558.5048-7-richard.henderson@linaro.org>
+Date: Thu, 29 Nov 2018 16:34:40 +0000
+Message-ID: <87woov3krj.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181129040302.GD14697@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 25/36] spapr: set the interrupt
- presenter at reset
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2 06/37] tcg/i386: Return a base
+ register from tcg_out_tlb_load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,124 +31,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-devel@nongnu.org
+Cc: Alistair.Francis@wdc.com
 
-On 11/29/18 5:03 AM, David Gibson wrote:
-> On Fri, Nov 16, 2018 at 11:57:18AM +0100, C=E9dric Le Goater wrote:
->> Currently, the interrupt presenter of the VPCU is set at realize
->> time. Setting it at reset will become useful when the new machine
->> supporting both interrupt modes is introduced. In this machine, the
->> interrupt mode is chosen at CAS time and activated after a reset.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  include/hw/ppc/spapr_cpu_core.h |  2 ++
->>  hw/ppc/spapr_cpu_core.c         | 26 ++++++++++++++++++++++++++
->>  hw/ppc/spapr_irq.c              | 11 +++++++++++
->>  3 files changed, 39 insertions(+)
->>
->> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cp=
-u_core.h
->> index 9e2821e4b31f..fc8ea9021656 100644
->> --- a/include/hw/ppc/spapr_cpu_core.h
->> +++ b/include/hw/ppc/spapr_cpu_core.h
->> @@ -53,4 +53,6 @@ static inline sPAPRCPUState *spapr_cpu_state(PowerPC=
-CPU *cpu)
->>      return (sPAPRCPUState *)cpu->machine_data;
->>  }
->> =20
->> +void spapr_cpu_core_set_intc(PowerPCCPU *cpu, const char *intc_type);
->> +
->>  #endif
->> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
->> index 1811cd48db90..529de0b6b9c8 100644
->> --- a/hw/ppc/spapr_cpu_core.c
->> +++ b/hw/ppc/spapr_cpu_core.c
->> @@ -398,3 +398,29 @@ static const TypeInfo spapr_cpu_core_type_infos[]=
- =3D {
->>  };
->> =20
->>  DEFINE_TYPES(spapr_cpu_core_type_infos)
->> +
->> +typedef struct ForeachFindIntCArgs {
->> +    const char *intc_type;
->> +    Object *intc;
->> +} ForeachFindIntCArgs;
->> +
->> +static int spapr_cpu_core_find_intc(Object *child, void *opaque)
->> +{
->> +    ForeachFindIntCArgs *args =3D opaque;
->> +
->> +    if (object_dynamic_cast(child, args->intc_type)) {
->> +        args->intc =3D child;
->> +    }
->> +
->> +    return args->intc !=3D NULL;
->> +}
->> +
->> +void spapr_cpu_core_set_intc(PowerPCCPU *cpu, const char *intc_type)
->> +{
->> +    ForeachFindIntCArgs args =3D { intc_type, NULL };
->> +
->> +    object_child_foreach(OBJECT(cpu), spapr_cpu_core_find_intc, &args=
-);
->> +    g_assert(args.intc);
->=20
-> We could create some extra links on the cpu to avoid scanning all the
-> children, but I guess that's a refinement.
 
-yes. Like an extra ->intc for xive. but as we can have only one interrupt
-controller active, having only one presenter per CPU seems reasonable.=20
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> Then again.. what do we actually use the cpu->intc pointer for in XIVE
-> context? =20
-
-yes for the TIMA MMIOs and also when running the matching algo in the XIV=
-E=20
-presenter.
-
-C.
-
-> I had a feeling because of the different way notifications
-> are handled we might not ever need to go from a cpu handle to the
-> associated TCTX.
+> We will shortly be asking the hot path not to assume TCG_REG_L1
+> for the host base address.
 >
->=20
->> +    cpu->intc =3D args.intc;
->> +}
->> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->> index 984c6d60cd9f..969efad7e6e9 100644
->> --- a/hw/ppc/spapr_irq.c
->> +++ b/hw/ppc/spapr_irq.c
->> @@ -218,6 +218,11 @@ static int spapr_irq_post_load_xics(sPAPRMachineS=
-tate *spapr, int version_id)
->> =20
->>  static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **er=
-rp)
->>  {
->> +    CPUState *cs;
->> +
->> +    CPU_FOREACH(cs) {
->> +        spapr_cpu_core_set_intc(POWERPC_CPU(cs), spapr->icp_type);
->> +    }
->>  }
->> =20
->>  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
->> @@ -370,6 +375,12 @@ static int spapr_irq_post_load_xive(sPAPRMachineS=
-tate *spapr, int version_id)
->> =20
->>  static void spapr_irq_reset_xive(sPAPRMachineState *spapr, Error **er=
-rp)
->>  {
->> +    CPUState *cs;
->> +
->> +    CPU_FOREACH(cs) {
->> +        spapr_cpu_core_set_intc(POWERPC_CPU(cs), spapr->xive_tctx_typ=
-e);
->> +    }
->> +
->>      spapr_xive_mmio_map(spapr->xive);
->>  }
->> =20
->=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  tcg/i386/tcg-target.inc.c | 56 ++++++++++++++++++++-------------------
+>  1 file changed, 29 insertions(+), 27 deletions(-)
+>
+> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+> index 8aef66e430..3234a8d8bf 100644
+> --- a/tcg/i386/tcg-target.inc.c
+> +++ b/tcg/i386/tcg-target.inc.c
+> @@ -1614,9 +1614,9 @@ static void * const qemu_st_helpers[16] =3D {
+>
+>     First argument register is clobbered.  */
+>
+> -static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg=
+ addrhi,
+> -                                    int mem_index, TCGMemOp opc,
+> -                                    tcg_insn_unit **label_ptr, int which)
+> +static TCGReg tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addr=
+hi,
+> +                               int mem_index, TCGMemOp opc,
+> +                               tcg_insn_unit **label_ptr, int which)
+>  {
+>      const TCGReg r0 =3D TCG_REG_L0;
+>      const TCGReg r1 =3D TCG_REG_L1;
+> @@ -1696,6 +1696,8 @@ static inline void tcg_out_tlb_load(TCGContext *s, =
+TCGReg addrlo, TCGReg addrhi,
+>      /* add addend(r0), r1 */
+>      tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r1, r0,
+>                           offsetof(CPUTLBEntry, addend) - which);
+> +
+> +    return r1;
+>  }
+>
+>  /*
+> @@ -2001,10 +2003,6 @@ static void tcg_out_qemu_ld(TCGContext *s, const T=
+CGArg *args, bool is64)
+>      TCGReg addrhi __attribute__((unused));
+>      TCGMemOpIdx oi;
+>      TCGMemOp opc;
+> -#if defined(CONFIG_SOFTMMU)
+> -    int mem_index;
+> -    tcg_insn_unit *label_ptr[2];
+> -#endif
+>
+>      datalo =3D *args++;
+>      datahi =3D (TCG_TARGET_REG_BITS =3D=3D 32 && is64 ? *args++ : 0);
+> @@ -2014,17 +2012,21 @@ static void tcg_out_qemu_ld(TCGContext *s, const =
+TCGArg *args, bool is64)
+>      opc =3D get_memop(oi);
+>
+>  #if defined(CONFIG_SOFTMMU)
+> -    mem_index =3D get_mmuidx(oi);
+> +    {
+> +        int mem_index =3D get_mmuidx(oi);
+> +        tcg_insn_unit *label_ptr[2];
+> +        TCGReg base;
+>
+> -    tcg_out_tlb_load(s, addrlo, addrhi, mem_index, opc,
+> -                     label_ptr, offsetof(CPUTLBEntry, addr_read));
+> +        base =3D tcg_out_tlb_load(s, addrlo, addrhi, mem_index, opc,
+> +                                label_ptr, offsetof(CPUTLBEntry, addr_re=
+ad));
+>
+> -    /* TLB Hit.  */
+> -    tcg_out_qemu_ld_direct(s, datalo, datahi, TCG_REG_L1, -1, 0, 0, opc);
+> +        /* TLB Hit.  */
+> +        tcg_out_qemu_ld_direct(s, datalo, datahi, base, -1, 0, 0, opc);
+>
+> -    /* Record the current context of a load into ldst label */
+> -    add_qemu_ldst_label(s, true, oi, datalo, datahi, addrlo, addrhi,
+> -                        s->code_ptr, label_ptr);
+> +        /* Record the current context of a load into ldst label */
+> +        add_qemu_ldst_label(s, true, oi, datalo, datahi, addrlo, addrhi,
+> +                            s->code_ptr, label_ptr);
+> +    }
+>  #else
+>      {
+>          int32_t offset =3D guest_base;
+> @@ -2141,10 +2143,6 @@ static void tcg_out_qemu_st(TCGContext *s, const T=
+CGArg *args, bool is64)
+>      TCGReg addrhi __attribute__((unused));
+>      TCGMemOpIdx oi;
+>      TCGMemOp opc;
+> -#if defined(CONFIG_SOFTMMU)
+> -    int mem_index;
+> -    tcg_insn_unit *label_ptr[2];
+> -#endif
+>
+>      datalo =3D *args++;
+>      datahi =3D (TCG_TARGET_REG_BITS =3D=3D 32 && is64 ? *args++ : 0);
+> @@ -2154,17 +2152,21 @@ static void tcg_out_qemu_st(TCGContext *s, const =
+TCGArg *args, bool is64)
+>      opc =3D get_memop(oi);
+>
+>  #if defined(CONFIG_SOFTMMU)
+> -    mem_index =3D get_mmuidx(oi);
+> +    {
+> +        int mem_index =3D get_mmuidx(oi);
+> +        tcg_insn_unit *label_ptr[2];
+> +        TCGReg base;
+>
+> -    tcg_out_tlb_load(s, addrlo, addrhi, mem_index, opc,
+> -                     label_ptr, offsetof(CPUTLBEntry, addr_write));
+> +        base =3D tcg_out_tlb_load(s, addrlo, addrhi, mem_index, opc,
+> +                                label_ptr, offsetof(CPUTLBEntry, addr_wr=
+ite));
+>
+> -    /* TLB Hit.  */
+> -    tcg_out_qemu_st_direct(s, datalo, datahi, TCG_REG_L1, 0, 0, opc);
+> +        /* TLB Hit.  */
+> +        tcg_out_qemu_st_direct(s, datalo, datahi, base, 0, 0, opc);
+>
+> -    /* Record the current context of a store into ldst label */
+> -    add_qemu_ldst_label(s, false, oi, datalo, datahi, addrlo, addrhi,
+> -                        s->code_ptr, label_ptr);
+> +        /* Record the current context of a store into ldst label */
+> +        add_qemu_ldst_label(s, false, oi, datalo, datahi, addrlo, addrhi,
+> +                            s->code_ptr, label_ptr);
+> +    }
+>  #else
+>      {
+>          int32_t offset =3D guest_base;
+
+
+--
+Alex Benn=C3=A9e
