@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berkus@gmail.com>) id 1gSBoH-0000wx-1T
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 21:12:11 -0500
+	(envelope-from <yu.ning@intel.com>) id 1gSBvm-00051r-G1
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 21:19:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berkus@gmail.com>) id 1gSBo5-0001Ad-G4
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 21:12:04 -0500
-Received: from mail-lf1-x131.google.com ([2a00:1450:4864:20::131]:33434)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berkus@gmail.com>) id 1gSBnx-00013C-Au
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 21:11:51 -0500
-Received: by mail-lf1-x131.google.com with SMTP id i26so262573lfc.0
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 18:11:46 -0800 (PST)
+	(envelope-from <yu.ning@intel.com>) id 1gSBvh-0001sk-Mf
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 21:19:54 -0500
+Received: from mga02.intel.com ([134.134.136.20]:24506)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yu.ning@intel.com>) id 1gSBvf-0001m8-5u
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 21:19:49 -0500
+From: "Ning, Yu" <yu.ning@intel.com>
+Date: Thu, 29 Nov 2018 02:19:39 +0000
+Message-ID: <C29659EAAA3E0143B583467412621C605E3E6CFF@SHSMSX101.ccr.corp.intel.com>
+References: <20181128153526.10948-1-berrange@redhat.com>
+	<165bc19e-8ed2-8979-aea7-0f6031fc6df2@redhat.com>
+In-Reply-To: <165bc19e-8ed2-8979-aea7-0f6031fc6df2@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20181128010817.6191-1-programmingkidx@gmail.com>
-	<CAFEAcA_C3BtOvEFrSOntma4GtreJNEmtg3pxkB+2iCYKVFQinA@mail.gmail.com>
-	<AFD02114-6C8E-441B-87C0-469BE693601E@gmail.com>
-In-Reply-To: <AFD02114-6C8E-441B-87C0-469BE693601E@gmail.com>
-From: berkus infinitus <berkus@gmail.com>
-Date: Thu, 29 Nov 2018 04:11:34 +0200
-Message-ID: <CABsm=W35aFrF=cTJD74E6d9Ugau=PwPQ9wrjCDZueJwhMGVHgA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] (no subject)
+Subject: Re: [Qemu-devel] [qemu-web PATCH] Document how to test the site
+ with jekyll locally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +29,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, "raimue@macports.org" <raimue@macports.org>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-I suspect the main problem is the blocking call to qemu_main from the UI
-thread in the app delegate didFinishLoadingWithOptions if i=E2=80=99m not m=
-istaken
-and everything else grows from there. Going to build and run it now, since
-I woke up in the middle of the night anyway for reasons unexplainable)
-On Thu, 29 Nov 2018 at 02:21, Programmingkid <programmingkidx@gmail.com>
-wrote:
-
->
-> > On Nov 28, 2018, at 2:39 PM, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
-> >
-> > On Wed, 28 Nov 2018 at 01:12, John Arbuckle <programmingkidx@gmail.com>
-> wrote:
-> >>
-> >> From af4497f2b161bb4165acb8eee5cae3f2a7ea2227 Mon Sep 17 00:00:00 2001
-> >> From: John Arbuckle <programmingkidx@gmail.com>
-> >> Date: Tue, 27 Nov 2018 20:01:20 -0500
-> >> Subject: [PATCH] ui/cocoa.m: fix crash due to cocoa_refresh() on Mac O=
-S
-> 10.14
-> >
-> > Something seems to have got the formatting of this patch email
-> > wrong -- it's got all this in the body and the actual Subject
-> > line of the email is blank.
->
-> I don't know what happened.
->
-> >
-> >> Mac OS 10.14 only wants UI code to be called from the main thread. The
-> >> cocoa_refresh() function is called on another thread and this causes a
-> >> crash to take place. To fix this problem the cocoa_refresh() code is
-> >> called from the main thread only.
-> >>
-> >> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
-> >> ---
-> >> ui/cocoa.m | 59
-> ++++++++++++++++++++++++++++++++++-------------------------
-> >> 1 file changed, 34 insertions(+), 25 deletions(-)
-> >
-> > I get a compile warning with this patch:
-> > /Users/pm215/src/qemu/ui/cocoa.m:1615:23: warning: instance method
-> > '-cocoa_refresh' not found (return type defaults to 'id')
-> > [-Wobjc-method-access]
-> >    [[NSApp delegate] cocoa_refresh];
-> >                      ^~~~~~~~~~~~~
->
-> This will fix the problem:
->
-> static void cocoa_refresh(DisplayChangeListener *dcl)
-> {
->     QemuCocoaAppController *controller =3D (QemuCocoaAppController *)[NSA=
-pp
-> delegate];
->     [controller cocoa_refresh];
-> }
->
-> > To be honest, I'm still confused about what is causing the
-> > problems on Mojave. The refresh method should be being called
-> > on the main thread even with the code on master -- it's just
-> > that that is the iothread and it's running the event pumping
-> > code in the refresh callback rather than a standard OSX
-> > event loop. I'm hoping that the backtrace with symbols of
-> > the Mojave assertion failure will help there, since I
-> > can't currently see where refresh gets called from some
-> > non-main thread.
->
-> This might be a Mojave issue and not a QEMU issue.
-> I'm on Mac OS 10.12 so I can't confirm anything.
->
-> > I also think that this patch doesn't address the problems
-> > of locking that I mention on the discussion thread for
-> > Berkus' patch. It also doesn't handle any of the other
-> > callbacks from QEMU to the cocoa UI -- surely we need to
-> > handle all of them if there is a problem here?
->
-> To answer this question I would have to know how my patch
-> does on Mac OS 10.14. Does it stop the crashing issue? If
-> this patch does fix that problem then I think sticking to
-> a simple solution may be the answer. The use of locks may
-> not be needed.
->
-> > (I have some prototype patches which I've been working
-> > on which address the locking problem and also make all
-> > the QEMU callbacks run their work on the main thread.
-> > I may be able get those into shape to post those next week.)
->
-> Please CC me when do release it. I will test it on Mac OS 10.12
-> and Mac OS 10.6.
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWls
+dG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2VudDogVGh1cnNkYXksIE5vdmVtYmVyIDI5LCAy
+MDE4IDA6NDQNCj4gVG86IERhbmllbCBQLiBCZXJyYW5nw6kgPGJlcnJhbmdlQHJlZGhhdC5jb20+
+OyBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQ2M6IFRob21hcyBIdXRoIDx0aHV0aEByZWRoYXQu
+Y29tPjsgcmFpbXVlQG1hY3BvcnRzLm9yZzsNCj4gYWxleC5iZW5uZWVAbGluYXJvLm9yZzsgTmlu
+ZywgWXUgPHl1Lm5pbmdAaW50ZWwuY29tPjsgRXJpYyBCbGFrZQ0KPiA8ZWJsYWtlQHJlZGhhdC5j
+b20+OyBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+DQo+IFN1YmplY3Q6IFJl
+OiBbcWVtdS13ZWIgUEFUQ0hdIERvY3VtZW50IGhvdyB0byB0ZXN0IHRoZSBzaXRlIHdpdGggamVr
+eWxsDQo+IGxvY2FsbHkNCj4gDQo+IFsuLi5dDQo+IA0KPiBBbnlib2R5IChlc3BlY2lhbGx5IG5v
+bi1SSCBwZW9wbGUpIGRpc2FncmVlcyB3aXRoIGR1YWwtbGljZW5zZSBDQy1CWS1TQQ0KPiA0LjAg
+YW5kIEdQTHYyKz8gIChTbyB0aGF0IHdlIGNhbiBjb3B5IGZyb20gYmxvZyBwb3N0cyB0byBtYW51
+YWxzKT8NCg0KSSBhZ3JlZSB3aXRoIHVzaW5nIHRoaXMgZHVhbCBsaWNlbnNlLg0KDQpUaGFua3Ms
+DQpZdQ0K
