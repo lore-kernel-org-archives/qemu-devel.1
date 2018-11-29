@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJK-0004rG-Kq
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:04 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJW-00052e-Iz
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJF-0006FU-7r
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:28:58 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:39494)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJQ-0006rh-FW
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:10 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:39556)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJE-0006Eh-UD
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:28:53 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJP-0006lc-Rg
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:04 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Thu, 29 Nov 2018 17:28:49 +0300
-Message-ID: <154350172915.8036.4007286063450172231.stgit@Misha-PC.lan02.inno>
+Date: Thu, 29 Nov 2018 17:29:00 +0300
+Message-ID: <154350174045.8036.18007260100806768232.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 References: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 14/39] windbg: send data and control packets
+Subject: [Qemu-devel] [PATCH 16/39] windbg: init DBGKD_ANY_WAIT_STATE_CHANGE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +29,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
+Add function for init DBGKD_ANY_WAIT_STATE_CHANGE. It is a header of
+'state change' packets.
+
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- windbgstub.c |   59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ target/i386/windbgstub.c |   45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/windbgstub.c b/windbgstub.c
-index 2869d94389..c45faec43f 100644
---- a/windbgstub.c
-+++ b/windbgstub.c
-@@ -71,6 +71,65 @@ static void windbg_state_clean(WindbgState *state)
-     state->ctx.result = RESULT_NONE;
- }
+diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
+index f1bab10b10..b2ac7a6d5f 100644
+--- a/target/i386/windbgstub.c
++++ b/target/i386/windbgstub.c
+@@ -15,9 +15,13 @@
+ #ifdef TARGET_X86_64
+ #define OFFSET_KPCR_SELF 0x18
+ #define OFFSET_KPCR_LOCK_ARRAY 0x28
++#define OFFSET_KPRCB 0x20
++#define OFFSET_KPRCB_CURRTHREAD 0x8
+ #else  /* TARGET_I386 */
+ #define OFFSET_KPCR_SELF 0x1C
+ #define OFFSET_KPCR_VERSION 0x34
++#define OFFSET_KPRCB 0x20
++#define OFFSET_KPRCB_CURRTHREAD 0x4
+ #endif /* TARGET_I386 */
  
-+static uint32_t compute_checksum(uint8_t *data, uint16_t len)
-+{
-+    uint32_t checksum = 0;
-+    while (len) {
-+        --len;
-+        checksum += *data++;
-+    }
-+    return checksum;
-+}
-+
-+static void windbg_store_packet(KD_PACKET *packet)
-+{
-+    stw_p(&packet->PacketLeader, packet->PacketLeader);
-+    stw_p(&packet->PacketType, packet->PacketType);
-+    stw_p(&packet->ByteCount, packet->ByteCount);
-+    stl_p(&packet->PacketId, packet->PacketId);
-+    stl_p(&packet->Checksum, packet->Checksum);
-+}
-+
-+__attribute__ ((unused)) /* unused yet */
-+static void windbg_send_data_packet(WindbgState *state, uint8_t *data,
-+                                    uint16_t byte_count, uint16_t type)
-+{
-+    const uint8_t trailing_byte = PACKET_TRAILING_BYTE;
-+
-+    KD_PACKET packet = {
-+        .PacketLeader = PACKET_LEADER,
-+        .PacketType = type,
-+        .ByteCount = byte_count,
-+        .PacketId = state->curr_packet_id,
-+        .Checksum = compute_checksum(data, byte_count),
-+    };
-+
-+    windbg_store_packet(&packet);
-+
-+    qemu_chr_fe_write(&state->chr, PTR(packet), sizeof(packet));
-+    qemu_chr_fe_write(&state->chr, data, byte_count);
-+    qemu_chr_fe_write(&state->chr, &trailing_byte, sizeof(trailing_byte));
-+
-+    state->wait_packet_type = PACKET_TYPE_KD_ACKNOWLEDGE;
-+}
-+
-+__attribute__ ((unused)) /* unused yet */
-+static void windbg_send_control_packet(WindbgState *state, uint16_t type,
-+                                       uint32_t id)
-+{
-+    KD_PACKET packet = {
-+        .PacketLeader = CONTROL_PACKET_LEADER,
-+        .PacketType = type,
-+        .ByteCount = 0,
-+        .PacketId = id,
-+        .Checksum = 0,
-+    };
-+
-+    windbg_store_packet(&packet);
-+
-+    qemu_chr_fe_write(&state->chr, PTR(packet), sizeof(packet));
-+}
-+
- static void windbg_ctx_handler(WindbgState *state)
- {
+ #ifdef TARGET_X86_64
+@@ -156,3 +160,44 @@ void windbg_on_reset(void)
+     kdVersion.is_init = false;
+ #endif
  }
++
++__attribute__ ((unused)) /* unused yet */
++static void kd_init_state_change(CPUState *cs, DBGKD_ANY_WAIT_STATE_CHANGE *sc)
++{
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
++    DBGKD_CONTROL_REPORT *cr = &sc->ControlReport;
++    target_ulong KPRCB = VMEM_ADDR(cs, KPCR.addr + OFFSET_KPRCB);
++    target_ulong thread = VMEM_ADDR(cs, KPRCB + OFFSET_KPRCB_CURRTHREAD);
++    int number_processors = 0;
++
++    CPUState *cpu_tmp;
++    CPU_FOREACH(cpu_tmp) {
++        ++number_processors;
++    }
++
++    /* HEADER */
++
++    /* TODO: Fix this hardcoded value. */
++    stw_p(&sc->ProcessorLevel, 0);
++    /* TODO: Fix this hardcoded value. */
++    stw_p(&sc->Processor, 0);
++    stl_p(&sc->NumberProcessors, number_processors);
++    sttul_p(&sc->Thread, thread);
++    sttul_p(&sc->ProgramCounter, env->eip);
++
++    /* CONTROL REPORT */
++
++    sttul_p(&cr->Dr6, env->dr[6]);
++    sttul_p(&cr->Dr7, env->dr[7]);
++    stw_p(&cr->ReportFlags, REPORT_INCLUDES_SEGS | REPORT_STANDARD_CS);
++    stw_p(&cr->SegCs, env->segs[R_CS].selector);
++    stw_p(&cr->SegDs, env->segs[R_DS].selector);
++    stw_p(&cr->SegEs, env->segs[R_ES].selector);
++    stw_p(&cr->SegFs, env->segs[R_FS].selector);
++    stl_p(&cr->EFlags, env->eflags);
++
++    /* This is a feature */
++    memset(cr->InstructionStream, 0, DBGKD_MAXSTREAM);
++    stw_p(&cr->InstructionCount, 0);
++}
