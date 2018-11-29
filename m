@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gSUBD-0002QW-EP
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:49:04 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gSUBD-0002Qt-UG
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:49:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gSUBA-0000yw-46
+	(envelope-from <yuval.shaia@oracle.com>) id 1gSUBA-0000zi-9E
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:49:03 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:40014)
+Received: from userp2130.oracle.com ([156.151.31.86]:40060)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gSUB6-0000sG-7K
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:48:57 -0500
+	id 1gSUB6-0000uM-8x
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:48:58 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 29 Nov 2018 23:47:48 +0200
-Message-Id: <20181129214805.2749-7-yuval.shaia@oracle.com>
+Date: Thu, 29 Nov 2018 23:47:49 +0200
+Message-Id: <20181129214805.2749-8-yuval.shaia@oracle.com>
 In-Reply-To: <20181129214805.2749-1-yuval.shaia@oracle.com>
 References: <20181129214805.2749-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v6 06/23] hw/pvrdma: Make function reset_device
- return void
+Subject: [Qemu-devel] [PATCH v6 07/23] hw/pvrdma: Make default pkey 0xFFFF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +26,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-This function cannot fail - fix it to return void
+Commit 6e7dba23af ("hw/pvrdma: Make default pkey 0xFFFF") exports
+default pkey as external definition but omit the change from 0x7FFF to
+0xFFFF.
+
+Fixes: 6e7dba23af ("hw/pvrdma: Make default pkey 0xFFFF")
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/vmw/pvrdma_main.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ hw/rdma/vmw/pvrdma.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 6c8c0154fa..fc2abd34af 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -369,13 +369,11 @@ static int unquiesce_device(PVRDMADev *dev)
-     return 0;
- }
+diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
+index e3742d893a..15c3f28b86 100644
+--- a/hw/rdma/vmw/pvrdma.h
++++ b/hw/rdma/vmw/pvrdma.h
+@@ -52,7 +52,7 @@
+ #define PVRDMA_FW_VERSION    14
  
--static int reset_device(PVRDMADev *dev)
-+static void reset_device(PVRDMADev *dev)
- {
-     pvrdma_stop(dev);
+ /* Some defaults */
+-#define PVRDMA_PKEY          0x7FFF
++#define PVRDMA_PKEY          0xFFFF
  
-     pr_dbg("Device reset complete\n");
--
--    return 0;
- }
- 
- static uint64_t regs_read(void *opaque, hwaddr addr, unsigned size)
+ typedef struct DSRInfo {
+     dma_addr_t dma;
 -- 
 2.17.2
