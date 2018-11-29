@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNKc-00068L-Lo
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:21 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNKZ-00065Z-Rw
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNKb-0001Or-K0
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:18 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:39920)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNKV-0001Fd-R1
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:15 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:39898)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNKb-0001LO-4U
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:17 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNKV-0001Du-EN
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:11 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Thu, 29 Nov 2018 17:30:14 +0300
-Message-ID: <154350181379.8036.15953115127582911299.stgit@Misha-PC.lan02.inno>
+Date: Thu, 29 Nov 2018 17:30:08 +0300
+Message-ID: <154350180810.8036.6259045508996849140.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 References: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 29/39] windbg: implement
- kd_api_write_breakpoint and kd_api_restore_breakpoint
+Subject: [Qemu-devel] [PATCH 28/39] windbg: implement
+ kd_api_read_control_space and kd_api_write_control_space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,139 +33,131 @@ Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    3 ++
- windbgstub-utils.c              |   68 +++++++++++++++++++++++++++++++++++++++
- windbgstub.c                    |   12 +++++++
- 3 files changed, 83 insertions(+)
+ include/exec/windbgstub-utils.h |    2 +
+ target/i386/windbgstub.c        |   81 +++++++++++++++++++++++++++++++++++++++
+ windbgstub.c                    |    8 ++++
+ 3 files changed, 91 insertions(+)
 
 diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index 2781a54044..85b7322b82 100644
+index 6936fd0ffb..2781a54044 100644
 --- a/include/exec/windbgstub-utils.h
 +++ b/include/exec/windbgstub-utils.h
-@@ -71,8 +71,11 @@ void kd_api_read_virtual_memory(CPUState *cs, PacketData *pd);
+@@ -71,6 +71,8 @@ void kd_api_read_virtual_memory(CPUState *cs, PacketData *pd);
  void kd_api_write_virtual_memory(CPUState *cs, PacketData *pd);
  void kd_api_get_context(CPUState *cs, PacketData *pd);
  void kd_api_set_context(CPUState *cs, PacketData *pd);
-+void kd_api_write_breakpoint(CPUState *cs, PacketData *pd);
-+void kd_api_restore_breakpoint(CPUState *cs, PacketData *pd);
- void kd_api_read_control_space(CPUState *cs, PacketData *pd);
- void kd_api_write_control_space(CPUState *cs, PacketData *pd);
-+void kd_api_clear_all_internal_breakpoints(CPUState *cs, PacketData *pd);
++void kd_api_read_control_space(CPUState *cs, PacketData *pd);
++void kd_api_write_control_space(CPUState *cs, PacketData *pd);
  void kd_api_get_context_ex(CPUState *cs, PacketData *pd);
  void kd_api_set_context_ex(CPUState *cs, PacketData *pd);
  void kd_api_unsupported(CPUState *cs, PacketData *pd);
-diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-index 006101d8a1..67934442d9 100644
---- a/windbgstub-utils.c
-+++ b/windbgstub-utils.c
-@@ -80,6 +80,8 @@ static const char *kd_packet_type_names[] = {
-     "PACKET_TYPE_MAX",
- };
- 
-+static InitedAddr bps[KD_BREAKPOINT_MAX];
-+
- static void prep_bmbc(const uint8_t *pattern, int pLen, int bmBc[])
- {
-     int i;
-@@ -244,6 +246,72 @@ void kd_api_write_virtual_memory(CPUState *cs, PacketData *pd)
-     stl_p(&mem->ActualBytesWritten, len);
+diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
+index 946f5cdb6a..c982eff590 100644
+--- a/target/i386/windbgstub.c
++++ b/target/i386/windbgstub.c
+@@ -962,6 +962,87 @@ void kd_api_set_context(CPUState *cs, PacketData *pd)
+     }
  }
  
-+void kd_api_write_breakpoint(CPUState *cs, PacketData *pd)
++void kd_api_read_control_space(CPUState *cs, PacketData *pd)
 +{
-+    DBGKD_WRITE_BREAKPOINT64 *m64c = &pd->m64.u.WriteBreakPoint;
-+    target_ulong addr;
-+    int i, err = 0;
++    DBGKD_READ_MEMORY64 *mem = &pd->m64.u.ReadMemory;
++    target_ulong addr = ldtul_p(&mem->TargetBaseAddress);
++    uint32_t len = MIN(ldl_p(&mem->TransferCount),
++                       PACKET_MAX_SIZE - sizeof(DBGKD_MANIPULATE_STATE64));
++    int err = 0;
 +
-+    addr = ldtul_p(&m64c->BreakPointAddress);
++#ifdef TARGET_X86_64
 +
-+    for (i = 0; i < KD_BREAKPOINT_MAX; ++i) {
-+        if (!bps[i].is_init) {
-+            err = cpu_breakpoint_insert(cs, addr, BP_GDB, NULL);
-+            if (!err) {
-+                bps[i].addr = addr;
-+                bps[i].is_init = true;
-+                DPRINTF("write_breakpoint: " FMT_ADDR ", index(%d)\n",
-+                        addr, i);
-+                break;
-+            } else {
-+                WINDBG_ERROR("write_breakpoint: " FMT_ADDR ", " FMT_ERR, addr,
-+                             err);
-+                pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
-+                return;
-+            }
-+        } else if (addr == bps[i].addr) {
-+            break;
-+        }
++    switch (addr) {
++    case AMD64_DEBUG_CONTROL_SPACE_KPCR:
++        addr = KPCR.addr;
++        len = sizeof(target_ulong);
++        err = cpu_memory_rw_debug(cs, addr, pd->extra, len, 0);
++        break;
++
++    case AMD64_DEBUG_CONTROL_SPACE_KPRCB:
++        addr = VMEM_ADDR(cs, KPCR.addr + OFFSET_KPRCB);
++        len = sizeof(target_ulong);
++        err = cpu_memory_rw_debug(cs, addr, pd->extra, len, 0);
++        break;
++
++    case AMD64_DEBUG_CONTROL_SPACE_KSPECIAL:
++        len = MIN(len, sizeof(CPU_KSPECIAL_REGISTERS));
++        err = windbg_read_ks_regs(cs, pd->extra, len, 0, len);
++        break;
++
++    case AMD64_DEBUG_CONTROL_SPACE_KTHREAD:
++        addr = VMEM_ADDR(cs, addr + OFFSET_KPRCB_CURRTHREAD);
++        len = sizeof(target_ulong);
++        err = cpu_memory_rw_debug(cs, addr, pd->extra, len, 0);
++        break;
 +    }
 +
-+    if (!err) {
-+        stl_p(&m64c->BreakPointHandle, i + 1);
-+        pd->m64.ReturnStatus = STATUS_SUCCESS;
-+    } else {
-+        WINDBG_ERROR("write_breakpoint: All breakpoints occupied");
++#else /* TARGET_I386 */
++
++    err = windbg_rw_context_ex(cs, pd->extra, len, addr, len, true);
++
++#endif /* TARGET_I386 */
++
++    if (err) {
++        len = 0;
 +        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
 +    }
++
++    pd->extra_size = len;
++    stl_p(&mem->ActualBytesRead, len);
 +}
 +
-+void kd_api_restore_breakpoint(CPUState *cs, PacketData *pd)
++void kd_api_write_control_space(CPUState *cs, PacketData *pd)
 +{
-+    DBGKD_RESTORE_BREAKPOINT *m64c = &pd->m64.u.RestoreBreakPoint;
-+    uint8_t index;
-+    int err = -1;
++    DBGKD_WRITE_MEMORY64 *mem = &pd->m64.u.WriteMemory;
++    target_ulong addr = ldtul_p(&mem->TargetBaseAddress);
++    uint32_t len = MIN(ldl_p(&mem->TransferCount), pd->extra_size);
++    int err = 0;
 +
-+    index = ldtul_p(&m64c->BreakPointHandle) - 1;
++#ifdef TARGET_X86_64
 +
-+    if (bps[index].is_init) {
-+        err = cpu_breakpoint_remove(cs, bps[index].addr, BP_GDB);
-+        if (!err) {
-+            DPRINTF("restore_breakpoint: " FMT_ADDR ", index(%d)\n",
-+                    bps[index].addr, index);
-+        } else {
-+            WINDBG_ERROR("restore_breakpoint: " FMT_ADDR
-+                         ", index(%d), " FMT_ERR,
-+                         bps[index].addr, index, err);
-+        }
-+        bps[index].is_init = false;
-+        pd->m64.ReturnStatus = STATUS_SUCCESS;
++    if (addr == AMD64_DEBUG_CONTROL_SPACE_KSPECIAL) {
++        len = MIN(len, sizeof(CPU_KSPECIAL_REGISTERS));
++        err = windbg_write_ks_regs(cs, pd->extra, len, 0, len);
 +    } else {
-+        pd->m64.ReturnStatus = STATUS_SUCCESS;
++        err = 1;
 +    }
++
++#else /* TARGET_I386 */
++
++    err = windbg_rw_context_ex(cs, pd->extra, len, addr, len, false);
++
++#endif /* TARGET_I386 */
++
++    if (err) {
++        len = 0;
++        pd->m64.ReturnStatus = STATUS_UNSUCCESSFUL;
++    }
++
++    pd->extra_size = 0;
++    stl_p(&mem->ActualBytesWritten, len);
 +}
 +
-+void kd_api_clear_all_internal_breakpoints(CPUState *cs, PacketData *pd)
-+{
-+}
-+
- void kd_api_unsupported(CPUState *cs, PacketData *pd)
+ void kd_api_get_context_ex(CPUState *cs, PacketData *pd)
  {
-     WINDBG_ERROR("Caught unimplemented api %s", kd_api_name(pd->m64.ApiNumber));
+     DBGKD_CONTEXT_EX *ctx = &pd->m64.u.ContextEx;
 diff --git a/windbgstub.c b/windbgstub.c
-index 328a04735f..a1c013cd8c 100644
+index e9d759cddf..328a04735f 100644
 --- a/windbgstub.c
 +++ b/windbgstub.c
 @@ -165,6 +165,14 @@ static void windbg_process_manipulate_packet(WindbgState *state)
          kd_api_set_context(cs, data);
          break;
  
-+    case DbgKdWriteBreakPointApi:
-+        kd_api_write_breakpoint(cs, data);
++    case DbgKdReadControlSpaceApi:
++        kd_api_read_control_space(cs, data);
 +        break;
 +
-+    case DbgKdRestoreBreakPointApi:
-+        kd_api_restore_breakpoint(cs, data);
++    case DbgKdWriteControlSpaceApi:
++        kd_api_write_control_space(cs, data);
 +        break;
-+
-     case DbgKdReadControlSpaceApi:
-         kd_api_read_control_space(cs, data);
-         break;
-@@ -173,6 +181,10 @@ static void windbg_process_manipulate_packet(WindbgState *state)
-         kd_api_write_control_space(cs, data);
-         break;
- 
-+    case DbgKdClearAllInternalBreakpointsApi:
-+        kd_api_clear_all_internal_breakpoints(cs, data);
-+        return;
 +
      case DbgKdGetContextExApi:
          kd_api_get_context_ex(cs, data);
