@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gSHbB-0006PA-9M
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:23:02 -0500
+	(envelope-from <mlureau@redhat.com>) id 1gSHbI-0006S3-8W
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:23:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gSHb6-0002Ch-Vo
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:23:01 -0500
-Resent-Message-Id: <E1gSHb6-0002Ch-Vo@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21351)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gSHb6-00028h-In
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:22:56 -0500
-In-Reply-To: <20181127121724.19755-1-sw@weilnetz.de>
-Message-ID: <154347339950.22411.9693778256872225453@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <mlureau@redhat.com>) id 1gSHbE-0002WS-2h
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:23:08 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:35208)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gSHbD-0002Uz-Of
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:23:03 -0500
+Received: by mail-qt1-f194.google.com with SMTP id v11so1073565qtc.2
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 00:23:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 28 Nov 2018 22:36:40 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH for-3.1 0/2] Fix disas/nanomips
+References: <20181128155932.16171-1-marcandre.lureau@redhat.com>
+	<20181129080926.qyji6olhjqzkkcuz@sirius.home.kraxel.org>
+In-Reply-To: <20181129080926.qyji6olhjqzkkcuz@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 29 Nov 2018 12:22:51 +0400
+Message-ID: <CAMxuvaywjHiBPLuaqhV1H_0XnariFHm=JLeo3fptSKLaZbFo9g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v3] configure: bump spice-server
+ required version to 0.12.5
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sw@weilnetz.de
-Cc: famz@redhat.com, qemu-devel@nongnu.org, aurelien@aurel32.net, amarkovic@wavecomp.com, smarkovic@wavecomp.com, peter.maydell@linaro.org
+To: "Hoffmann, Gerd" <kraxel@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Frediano Ziglio <fziglio@redhat.com>, "Bonzini, Paolo" <pbonzini@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggZm9yLTMuMSAwLzJdIEZpeCBkaXNhcy9uYW5vbWlw
-cwpNZXNzYWdlLWlkOiAyMDE4MTEyNzEyMTcyNC4xOTc1NS0xLXN3QHdlaWxuZXR6LmRlCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
-Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0
-cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
-bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
-biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
-aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
-YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
-aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmNl
-ZGI2YmEgZGlzYXMvbmFub21pcHM6IEZpeCBmb3JtYXQgc3RyaW5ncwoxYzdlMDZiIGRpc2FzL25h
-bm9taXBzOiBSZXBsYWNlIHByb3ByaWV0YXJ5IGJ5IFBPU0lYIGRhdGEgdHlwZXMKCj09PSBPVVRQ
-VVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjogZGlzYXMvbmFub21pcHM6IFJlcGxhY2Ug
-cHJvcHJpZXRhcnkgYnkgUE9TSVggZGF0YSB0eXBlcy4uLgpFUlJPUjogImZvbyAqIGJhciIgc2hv
-dWxkIGJlICJmb28gKmJhciIKIzM2MTogRklMRTogZGlzYXMvbmFub21pcHMuY3BwOjU2OToKK3Vp
-bnQ2NF90IE5NRDo6ZXh0cmFjdF9vcF9jb2RlX3ZhbHVlKGNvbnN0IHVpbnQxNl90ICogZGF0YSwg
-aW50IHNpemUpCgpFUlJPUjogImZvbyAqIGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzM3OTog
-RklMRTogZGlzYXMvbmFub21pcHMuY3BwOjU4NDoKK2ludCBOTUQ6OkRpc2Fzc2VtYmxlKGNvbnN0
-IHVpbnQxNl90ICogZGF0YSwgc3RkOjpzdHJpbmcgJiBkaXMsCgpFUlJPUjogImZvbyAqIGJhciIg
-c2hvdWxkIGJlICJmb28gKmJhciIKIzM4ODogRklMRTogZGlzYXMvbmFub21pcHMuY3BwOjYwMjoK
-K2ludCBOTUQ6OkRpc2Fzc2VtYmxlKGNvbnN0IHVpbnQxNl90ICogZGF0YSwgc3RkOjpzdHJpbmcg
-JiBkaXMsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTU5OiBGSUxFOiBkaXNh
-cy9uYW5vbWlwcy5jcHA6NzkzOgoraW50NjRfdCBOTUQ6OmV4dHJfc2lsMGlsMzFiczFfaWwyaWwy
-MWJzMTBfaWwxMmlsMTJiczlUbXNiMzEodWludDY0X3QgaW5zdHJ1Y3Rpb24pCgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjM5MzogRklMRTogZGlzYXMvbmFub21pcHMuY3BwOjI2
-ODE6CisgICAgaW50NjRfdCBzX3ZhbHVlID0gZXh0cl9zaWwwaWwzMWJzMV9pbDJpbDIxYnMxMF9p
-bDEyaWwxMmJzOVRtc2IzMShpbnN0cnVjdGlvbik7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojNjYxMDogRklMRTogZGlzYXMvbmFub21pcHMuY3BwOjkxMjY6CisgICAgaW50NjRf
-dCBzX3ZhbHVlID0gZXh0cl9zaWwwaWwzMWJzMV9pbDJpbDIxYnMxMF9pbDEyaWwxMmJzOVRtc2Iz
-MShpbnN0cnVjdGlvbik7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTEzNjU6
-IEZJTEU6IGRpc2FzL25hbm9taXBzLmNwcDoxNjQwNzoKKyAgICB1aW50NjRfdCBjb2RlX3ZhbHVl
-ID0gZXh0cmFjdF9jb2RlXzI1XzI0XzIzXzIyXzIxXzIwXzE5XzE4XzE3XzE2KGluc3RydWN0aW9u
-KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTYwNzogRklMRTogZGlzYXMv
-bmFub21pcHMuaDoxNDg6CisgICAgaW50NjRfdCBleHRyX3NpbDBpbDMxYnMxX2lsMmlsMjFiczEw
-X2lsMTJpbDEyYnM5VG1zYjMxKHVpbnQ2NF90IGluc3RydWN0aW9uKTsKCnRvdGFsOiAzIGVycm9y
-cywgNSB3YXJuaW5ncywgMTI0NTEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8yOiBkaXNhcy9uYW5vbWlwczogRml4
-IGZvcm1hdCBzdHJpbmdzLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Thu, Nov 29, 2018 at 12:09 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> On Wed, Nov 28, 2018 at 07:59:32PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Looking at chardev/spice.c code, I realize compilation was broken for
+> > a while with spice-server < 0.12.3. Let's bump required version
+> > to 0.12.5, released May 19 2014, instead of adding more #ifdef.
+>
+> Oh, you did the 0.12.5 patch already.  Scratch my other reply then.
+>
+> > -  if $pkg_config --atleast-version=3D0.12.0 spice-server && \
+> > +  if $pkg_config --atleast-version=3D0.12.5 spice-server && \
+> >       $pkg_config --atleast-version=3D0.12.3 spice-protocol && \
+>
+> I think we should adjust spice-protocol too to whatever 0.12.5 requires
+> to build.
+>
+
+Why not leave that responsibility to pkg-config, and only require in
+qemu what is required there?
