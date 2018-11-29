@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gSMKG-0000li-Jk
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:25:54 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gSMOJ-00040q-BS
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:30:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gSMKC-0002q2-Qp
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:25:52 -0500
-From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Thu, 29 Nov 2018 14:24:28 +0100
-Message-Id: <20181129132428.333-9-sameo@linux.intel.com>
-In-Reply-To: <20181129132428.333-1-sameo@linux.intel.com>
-References: <20181129132428.333-1-sameo@linux.intel.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gSMOE-0000gH-5s
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:30:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49614)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gSMOD-0000er-Ti
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:29:58 -0500
+Date: Thu, 29 Nov 2018 13:29:40 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181129132939.GH2333@work-vm>
+References: <20181126200435.23408-1-minyard@acm.org>
+	<20181126200435.23408-15-minyard@acm.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 8/8] hw: acpi: Remove AcpiRsdpDescriptor and
- fix tests
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181126200435.23408-15-minyard@acm.org>
+Subject: Re: [Qemu-devel] [PATCH v3 14/16] i2c:smbus_eeprom: Add vmstate
+ handling to the smbus eeprom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,205 +28,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: minyard@acm.org
+Cc: qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
 
-The only remaining AcpiRsdpDescriptor users are the ACPI utils for the
-BIOS table tests.
-We remove that dependency and can thus remove the structure itself.
+* minyard@acm.org (minyard@acm.org) wrote:
+> From: Corey Minyard <cminyard@mvista.com>
+> 
+> Transfer the state of the EEPROM on a migration.  This way the
+> data remains consistent on migration.
+> 
+> This required moving the actual data to a separate array and
+> using the data provided in the init function as a separate
+> initialization array, since a pointer property has to be a
+> void * and the array needs to be uint8_t[].
 
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
----
- include/hw/acpi/acpi-defs.h | 13 -----------
- tests/acpi-utils.h          |  5 +++-
- tests/acpi-utils.c          | 46 ++++++++++++++++++++++++++++++-------
- tests/bios-tables-test.c    | 27 +++++++++++++++-------
- tests/vmgenid-test.c        |  8 ++++---
- 5 files changed, 66 insertions(+), 33 deletions(-)
+So I think I'm OK with this, but I'd like other peoples comments as
+well; see comments.
 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 8425ecb8c6..5021cb9e79 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -40,19 +40,6 @@ enum {
-     ACPI_FADT_F_LOW_POWER_S0_IDLE_CAPABLE,
- };
- 
--struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
--    uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
--    uint8_t  checksum;               /* To make sum of struct == 0 */
--    uint8_t  oem_id [6];             /* OEM identification */
--    uint8_t  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
--    uint32_t rsdt_physical_address;  /* 32-bit physical address of RSDT */
--    uint32_t length;                 /* XSDT Length in bytes including hdr */
--    uint64_t xsdt_physical_address;  /* 64-bit physical address of XSDT */
--    uint8_t  extended_checksum;      /* Checksum of entire table */
--    uint8_t  reserved [3];           /* Reserved field must be 0 */
--} QEMU_PACKED;
--typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
--
- typedef struct AcpiRsdpData {
-     uint8_t oem_id[6]; /* OEM identification */
-     uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
-diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index ac52abd0dd..c26c8976a6 100644
---- a/tests/acpi-utils.h
-+++ b/tests/acpi-utils.h
-@@ -82,6 +82,9 @@ typedef struct {
- 
- uint8_t acpi_calc_checksum(const uint8_t *data, int len);
- uint32_t acpi_find_rsdp_address(void);
--void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
-+uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table);
-+uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
-+void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table,
-+                           uint8_t revision);
- 
- #endif  /* TEST_ACPI_UTILS_H */
-diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-index 41dc1ea9b4..b1113bda8b 100644
---- a/tests/acpi-utils.c
-+++ b/tests/acpi-utils.c
-@@ -52,14 +52,44 @@ uint32_t acpi_find_rsdp_address(void)
-     return off;
- }
- 
--void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table)
-+uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table)
- {
--    ACPI_READ_FIELD(rsdp_table->signature, addr);
--    ACPI_ASSERT_CMP64(rsdp_table->signature, "RSD PTR ");
-+    uint32_t rsdt_physical_address;
-+    uint8_t revision = rsdp_table[15 /* Revision offset */];
- 
--    ACPI_READ_FIELD(rsdp_table->checksum, addr);
--    ACPI_READ_ARRAY(rsdp_table->oem_id, addr);
--    ACPI_READ_FIELD(rsdp_table->revision, addr);
--    ACPI_READ_FIELD(rsdp_table->rsdt_physical_address, addr);
--    ACPI_READ_FIELD(rsdp_table->length, addr);
-+    if (revision != 0) { /* ACPI 1.0 RSDP */
-+        return 0;
-+    }
-+
-+    memcpy(&rsdt_physical_address, &rsdp_table[16 /* RsdtAddress offset */], 4);
-+    return le32_to_cpu(rsdt_physical_address);
-+}
-+
-+uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
-+{
-+    uint64_t xsdt_physical_address;
-+    uint8_t revision = rsdp_table[15 /* Revision offset */];
-+
-+    if (revision != 2) { /* ACPI 2.0+ RSDP */
-+        return 0;
-+    }
-+
-+    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
-+    return le64_to_cpu(xsdt_physical_address);
-+}
-+
-+void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table, uint8_t revision)
-+{
-+    switch (revision) {
-+    case 0: /* ACPI 1.0 RSDP */
-+        memread(addr, rsdp_table, 20);
-+        break;
-+    case 2: /* ACPI 2.0+ RSDP */
-+        memread(addr, rsdp_table, 36);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    ACPI_ASSERT_CMP64(*((uint64_t *)(rsdp_table)), "RSD PTR ");
- }
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index d661d9be62..84f1500920 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -27,7 +27,8 @@ typedef struct {
-     const char *machine;
-     const char *variant;
-     uint32_t rsdp_addr;
--    AcpiRsdpDescriptor rsdp_table;
-+    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
-+    uint32_t rsdt_physical_address;
-     AcpiRsdtDescriptorRev1 rsdt_table;
-     uint32_t dsdt_addr;
-     uint32_t facs_addr;
-@@ -83,21 +84,31 @@ static void test_acpi_rsdp_address(test_data *data)
-     data->rsdp_addr = off;
- }
- 
--static void test_acpi_rsdp_table(test_data *data)
-+static void test_acpi_rsdp_table(test_data *data, uint8_t revision)
- {
--    AcpiRsdpDescriptor *rsdp_table = &data->rsdp_table;
-+    uint8_t *rsdp_table = data->rsdp_table;
-     uint32_t addr = data->rsdp_addr;
- 
--    acpi_parse_rsdp_table(addr, rsdp_table);
-+    acpi_parse_rsdp_table(addr, rsdp_table, revision);
- 
--    /* rsdp checksum is not for the whole table, but for the first 20 bytes */
--    g_assert(!acpi_calc_checksum((uint8_t *)rsdp_table, 20));
-+    switch (revision) {
-+    case 0: /* ACPI 1.0 RSDP */
-+        /* With rev 1, checksum is only for the first 20 bytes */
-+        g_assert(!acpi_calc_checksum(rsdp_table,  20));
-+        break;
-+    case 2: /* ACPI 2.0+ RSDP */
-+        /* With revision 2, we have 2 checksums */
-+        g_assert(!acpi_calc_checksum(rsdp_table, 20));
-+        g_assert(!acpi_calc_checksum(rsdp_table, 36));
-+    default:
-+        g_assert_not_reached();
-+    }
- }
- 
- static void test_acpi_rsdt_table(test_data *data)
- {
-     AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
--    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
-+    uint32_t addr = acpi_get_rsdt_address(data->rsdp_table);
-     uint32_t *tables;
-     int tables_nr;
-     uint8_t checksum;
-@@ -626,7 +637,7 @@ static void test_acpi_one(const char *params, test_data *data)
- 
-     data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
-     test_acpi_rsdp_address(data);
--    test_acpi_rsdp_table(data);
-+    test_acpi_rsdp_table(data, 0); /* ACPI 1.0 RSDP */
-     test_acpi_rsdt_table(data);
-     fadt_fetch_facs_and_dsdt_ptrs(data);
-     test_acpi_facs_table(data);
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index 0a6fb55f2e..5f30dee059 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -35,7 +35,7 @@ static uint32_t acpi_find_vgia(void)
- {
-     uint32_t rsdp_offset;
-     uint32_t guid_offset = 0;
--    AcpiRsdpDescriptor rsdp_table;
-+    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
-     uint32_t rsdt, rsdt_table_length;
-     AcpiRsdtDescriptorRev1 rsdt_table;
-     size_t tables_nr;
-@@ -52,9 +52,11 @@ static uint32_t acpi_find_vgia(void)
- 
-     g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
- 
--    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
-+    acpi_parse_rsdp_table(rsdp_offset, rsdp_table, 0);
-+
-+    rsdt = acpi_get_rsdt_address(rsdp_table);
-+    g_assert(rsdt);
- 
--    rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
-     /* read the header */
-     ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-     ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
--- 
-2.19.2
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/i2c/smbus_eeprom.c | 34 ++++++++++++++++++++++++++++++++--
+>  1 file changed, 32 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+> index 8e9b734c09..942057dc10 100644
+> --- a/hw/i2c/smbus_eeprom.c
+> +++ b/hw/i2c/smbus_eeprom.c
+> @@ -24,6 +24,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "hw/hw.h"
+> +#include "hw/boards.h"
+>  #include "hw/i2c/i2c.h"
+>  #include "hw/i2c/smbus_slave.h"
+>  #include "hw/i2c/smbus_eeprom.h"
+> @@ -39,8 +40,10 @@
+>  
+>  typedef struct SMBusEEPROMDevice {
+>      SMBusDevice smbusdev;
+> -    void *data;
+> +    uint8_t data[SMBUS_EEPROM_SIZE];
+> +    void *init_data;
+>      uint8_t offset;
+> +    bool accessed;
+>  } SMBusEEPROMDevice;
+>  
+>  static uint8_t eeprom_receive_byte(SMBusDevice *dev)
+> @@ -49,6 +52,7 @@ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
+>      uint8_t *data = eeprom->data;
+>      uint8_t val = data[eeprom->offset++];
+>  
+> +    eeprom->accessed = true;
+>  #ifdef DEBUG
+>      printf("eeprom_receive_byte: addr=0x%02x val=0x%02x\n",
+>             dev->i2c.address, val);
+> @@ -61,6 +65,7 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+>      SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+>      uint8_t *data = eeprom->data;
+>  
+> +    eeprom->accessed = true;
+>  #ifdef DEBUG
+>      printf("eeprom_write_byte: addr=0x%02x cmd=0x%02x val=0x%02x\n",
+>             dev->i2c.address, cmd, buf[0]);
+> @@ -78,15 +83,39 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
+>      return 0;
+>  }
+>  
+> +static bool smbus_eeprom_vmstate_needed(void *opaque)
+> +{
+> +    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
+> +    SMBusEEPROMDevice *eeprom = opaque;
+> +
+> +    return (eeprom->accessed || smbus_vmstate_needed(&eeprom->smbusdev)) &&
+> +        !mc->smbus_no_migration_support;
+
+That's a little complx, but OK.
+
+> +}
+> +
+> +static const VMStateDescription vmstate_smbus_eeprom = {
+> +    .name = "smbus-eeprom",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = smbus_eeprom_vmstate_needed,
+> +    .fields      = (VMStateField[]) {
+> +        VMSTATE_SMBUS_DEVICE(smbusdev, SMBusEEPROMDevice),
+> +        VMSTATE_UINT8_ARRAY(data, SMBusEEPROMDevice, SMBUS_EEPROM_SIZE),
+> +        VMSTATE_UINT8(offset, SMBusEEPROMDevice),
+> +        VMSTATE_BOOL(accessed, SMBusEEPROMDevice),
+
+OK, good - including 'accessed' means that if we migrate a->b->c and
+it's not changed while it's on b, then 'c' still gets the updated
+version.
+
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+>  {
+>      SMBusEEPROMDevice *eeprom = SMBUS_EEPROM(dev);
+>  
+> +    memcpy(eeprom->data, eeprom->init_data, SMBUS_EEPROM_SIZE);
+>      eeprom->offset = 0;
+>  }
+>  
+>  static Property smbus_eeprom_properties[] = {
+> -    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, data),
+> +    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -99,6 +128,7 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+>      sc->receive_byte = eeprom_receive_byte;
+>      sc->write_data = eeprom_write_data;
+>      dc->props = smbus_eeprom_properties;
+> +    dc->vmsd = &vmstate_smbus_eeprom;
+>      /* Reason: pointer property "data" */
+>      dc->user_creatable = false;
+>  }
+
+so from migration side:
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
