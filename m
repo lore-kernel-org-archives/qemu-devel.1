@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gSMsG-0001q8-TD
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:01:06 -0500
+	(envelope-from <drjones@redhat.com>) id 1gSMu0-00035y-CV
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:02:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gSMs5-0003mC-4B
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:01:00 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:38602)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gSMs4-0003XQ-TF
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:00:49 -0500
-Received: by mail-wm1-f65.google.com with SMTP id k198so2348472wmd.3
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 06:00:46 -0800 (PST)
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-18-paul.durrant@citrix.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a247dae0-a766-7f97-c16d-07a32572f35d@redhat.com>
-Date: Thu, 29 Nov 2018 15:00:43 +0100
+	(envelope-from <drjones@redhat.com>) id 1gSMtw-0004yO-WD
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:02:48 -0500
+Date: Thu, 29 Nov 2018 15:02:16 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20181129135853.prrfozwknvmmvqg4@kamzik.brq.redhat.com>
+References: <20181129132428.333-1-sameo@linux.intel.com>
+	<20181129132428.333-2-sameo@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20181121151211.15997-18-paul.durrant@citrix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 17/18] MAINTAINERS: add myself as a Xen
- maintainer
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181129132428.333-2-sameo@linux.intel.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/8] hw: acpi: The RSDP build API can
+ return void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +25,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 21/11/18 16:12, Paul Durrant wrote:
-> I have made many significant contributions to the Xen code in QEMU,
-> particularly the recent patches introducing a new PV device framework.
-> I intend to make further significant contributions, porting other PV back-
-> ends to the new framework with the intent of eventually removing the
-> legacy code. It therefore seems reasonable that I become a maintiner of
-
-"a maintainer of"
-
-> the Xen code.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+On Thu, Nov 29, 2018 at 02:24:21PM +0100, Samuel Ortiz wrote:
+> For both x86 and ARM architectures, the internal RSDP build API can
+> return void as the current return value is unused.
+>=20
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 5871f035c3..0b668dd205 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -382,6 +382,7 @@ Guest CPU Cores (Xen):
->  X86
->  M: Stefano Stabellini <sstabellini@kernel.org>
->  M: Anthony Perard <anthony.perard@citrix.com>
-> +M: Paul Durrant <paul.durrant@citrix.com>
->  L: xen-devel@lists.xenproject.org
->  S: Supported
->  F: */xen*
-> 
+>  hw/arm/virt-acpi-build.c | 4 +---
+>  hw/i386/acpi-build.c     | 4 +---
+>  2 files changed, 2 insertions(+), 6 deletions(-)
+>
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
