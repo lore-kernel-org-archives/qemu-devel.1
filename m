@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSOOf-0000zV-H5
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:38:34 -0500
+	(envelope-from <groeck7@gmail.com>) id 1gSOSR-0003H0-R7
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:42:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSOOc-0001re-Bw
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:38:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:18809)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSOOc-0001rC-37
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:38:30 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1541156463-2730-1-git-send-email-liq3ea@gmail.com>
-	<64f88d81-8de1-a4b3-196f-c5c95a45e4e5@redhat.com>
-Date: Thu, 29 Nov 2018 16:38:26 +0100
-In-Reply-To: <64f88d81-8de1-a4b3-196f-c5c95a45e4e5@redhat.com> (Eric Blake's
-	message of "Mon, 5 Nov 2018 17:01:50 -0600")
-Message-ID: <877egv99n1.fsf_-_@dusky.pond.sub.org>
+	(envelope-from <groeck7@gmail.com>) id 1gSOSP-0003Zf-TN
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:42:27 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:42143)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1gSOSP-0003Z7-Ji
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:42:25 -0500
+Received: by mail-pg1-x543.google.com with SMTP id d72so1092692pga.9
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 07:42:25 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Thu, 29 Nov 2018 07:42:20 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20181129154220.GA2891@roeck-us.net>
+References: <1543442171-24863-1-git-send-email-linux@roeck-us.net>
+	<1543442171-24863-2-git-send-email-linux@roeck-us.net>
+	<3d1287e7-29c1-dbb1-c0f9-273b7b31645c@redhat.com>
+	<734e8388-2f0f-1c5b-7767-29e43d261bcb@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] QAPI 'size' vs. 'uint64' (was: [PATCH] qapi: misc:
- change the 'pc' to unsinged 64 in CpuInfo)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <734e8388-2f0f-1c5b-7767-29e43d261bcb@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 2/2] scsi: esp: Improve consistency of
+ RSTAT, RSEQ, and RINTR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +34,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Li Qiang <liq3ea@gmail.com>, armbru@redhat.com, qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
+On Thu, Nov 29, 2018 at 11:56:39AM +0000, Mark Cave-Ayland wrote:
+> On 29/11/2018 09:58, Paolo Bonzini wrote:
+> 
+> > On 28/11/18 22:56, Guenter Roeck wrote:
+> >> The guest OS reads RSTAT, RSEQ, and RINTR, and expects those registers
+> >> to reflect a consistent state. However, it is possible that the registers
+> >> can change after RSTAT was read, but before RINTR is read.
+> >>
+> >> Guest OS		qemu
+> >> --------		----
+> >> Read RSTAT
+> >> 			esp_command_complete()
+> >> 			 RSTAT = STAT_ST
+> >> 			 esp_dma_done()
+> >> 			  RSTAT |= STAT_TC
+> >> 			  RSEQ = 0
+> >> 			  RINTR = INTR_BS
+> >>
+> >> Read RSEQ
+> >> Read RINTR		RINTR = 0
+> >> 			RSTAT &= ~STAT_TC
+> >> 			RSEQ = SEQ_CD
+> >>
+> >> The guest OS would then try to handle INTR_BS combined with an old
+> >> value of RSTAT. This sometimes resulted in lost events, spurious
+> >> interrupts, guest OS confusion, and stalled SCSI operations.
+> > 
+> > The question is, why was the guest running the interrupt routine before
+> > STAT_INT was set in RSTAT?  The code in esp_raise_irq seems good:
+> > 
+> >     if (!(s->rregs[ESP_RSTAT] & STAT_INT)) {
+> >         s->rregs[ESP_RSTAT] |= STAT_INT;
+> >         qemu_irq_raise(s->irq);
+> >         trace_esp_raise_irq();
+> >     }
+> > 
+> > Paolo
+> 
+> This patch is very interesting, as I have a long-running regression trying to boot
+> NextSTEP 3.3 on qemu-system-sparc which I eventually bisected down to the commit that
+> turned on iothread by default in QEMU.
+> 
+Makes me wonder: Is there a means to hold up processing esp_command_complete()
+until a pending interrupt has been handled ? That might be a cleaner solution.
+I could try to implement that in the driver, but maybe there is a means to do
+that using the infrastructure.
 
-> On 11/2/18 6:01 AM, Li Qiang wrote:
->> When trigger a 'query-cpus' qmp, the pc is an signed value like
->> following:
->> {"arch": "x86", ...  "pc": -1732653994, "halted": true,...}
->> It is strange. Change it to uint64_t.
->>
->> Signed-off-by: Li Qiang <liq3ea@gmail.com>
->> ---
->>   qapi/misc.json | 12 ++++++------
->>   1 file changed, 6 insertions(+), 6 deletions(-)
->
-> I don't see this as causing any major backwards-incompatible behavior
-> to clients that can parse full 64-bit unsigned numbers (note that not
-> all JSON parsers do so - here's frowning at you, jansson - but libvirt
-> is okay).
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+Thanks,
+Guenter
 
-Client breakage is possible, but feels unlikely.  To break, a client has
-to (a) accept negative numbers modulo 2^64, and (b) don't accept numbers
->= 2^63.  That's extra work.  Clients that simply use strtoul() are
-unaffected.  We accepted this very risk when we fixed the QObject
-visitor for unsigned integers in commit 5923f85fb82.  Relevant part of
-the commit message:
-
-    Note: before the patch, uint64_t values above INT64_MAX are sent over
-    json QMP as negative values, e.g. UINT64_MAX is sent as -1. After the
-    patch, they are sent unmodified.  Clearly a bug fix, but we have to
-    consider compatibility issues anyway.  libvirt should cope fine,
-    because its parsing of unsigned integers accepts negative values
-    modulo 2^64.  There's hope that other clients will, too.
-
-This patch needs to discuss the risk, too.  Suggest to steal from the
-commit message I quoted.
-
-
-There's another question: 'uint64' or 'size'?
-
-Short answer: I think we better stick to 'uint64' here.  Long answer
-follows.
-
-Both QAPI types map to uint64_t in C.  The difference is twofold:
-
-* It serves as a documentation of intent in the QAPI schema.  Or rather
-  it would, if we used it more consistently.
-
-  Related:
-  [RFC PATCH 00/56] qapi: Use 'size' for byte counts & offsets
-  https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01089.html
-  Message-Id: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-
-  From its cover letter:
-
-      Byte sizes, offsets and the like should use QAPI type 'size'
-      (uint64_t).  This rule is more honored in the breach than in the
-      observance.  Fix the obvious offenders.
-
-  The series doesn't fix the program counters in the CpuInfoFOO.
-
-* A few visitors treat 'size' differently:
-
-  - The opts visitor parses with qemu_strtosz() instead of parse_uint(),
-    and it doesn't support ranges.  Let's ignore ranges.  qemu_strtosz()
-    accepts convenience syntax like 1.5M for 1.5 * 1024 * 1024.
-
-    This visitor is used for parsing CLI options -numa, -netdev,
-    -object, -acpitable, HMP netdev_add, object_add, and the -object
-    equivalents of qemu-img, qemu-io, qemu-nbd.
-    
-  - The QObject input visitor's keyval flavour parses with
-    qemu_strtosz() instead of qemu_strtou64().
-
-    This visitor is used for parsing CLI options -display (except for
-    its legacy forms), -blockdev, and by block layer in ways that are
-    too complex to explain here.
-
-  - The string input visitor[*] parses with qemu_strtosz() (via
-    parse_option_size()) instead of qemu_strtou64(), and it doesn't
-    support ranges.
-
-    This visitor is used for parsing HMP migrate_set_parameter and QOM
-    property values.  It's also used for getting QOM property values
-    (don't ask, it's terrible).
-
-  - The string output visitor uses format PRIu64 instead of PRId64 and
-    optionally PRIx64 as well, and it doesn't support ranges.  This
-    visitor is used for HMP info migrate, info memdev, info network,
-    info qtree.  It's also used for getting QOM property values
-    (terrible).
-
-  Yes, this stuff could have used adult design supervision.
-
-  As far as I can tell, none of the 'size' differences is relevant for
-  this patch.
-
-So, on the one hand, program counters are byte counts, so 'size' feels
-more appropriate.  On the other hand, the important part is changing to
-unsigned, and 'uint64' gets us there without the additional baggage of
-'size'.
-
-The additional baggage looks irrelevant for this patch.  But perhaps we
-should make up our mind on usage of 'size' in general.
-
-The true reason it exists is the desire for convenience syntax at the
-human interface.  Fair enough, but it doesn't scale: we could use
-convenience syntax in many other places, but creating a special type for
-each kind is an awful way to get it.  If we had a better, more general
-way to specify "use this convenience syntax for human interfaces" in the
-schema, we could get rid of size.
-
-
-[*] With David Hildenbrand's patches applied.
+> The symptom is that ESP SCSI requests hang/timeout before the kernel is able to get
+> to the userspace installer: however if you launch QEMU with "taskset –cpu-list 1
+> qemu-system-sparc ..." then it works and you can complete the installation.
+> 
+> So certainly this suggests that there is a race condition still present in ESP
+> somewhere. I've given this patch a spin, and in a few quick tests here I was able to
+> consistently get further in kernel boot, but it still doesn't completely solve issue
+> for me :/
+> 
+> 
+> ATB,
+> 
+> Mark.
