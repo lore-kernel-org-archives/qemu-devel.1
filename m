@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNIk-0004La-M2
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:28:23 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNIn-0004N8-0d
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:28:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNIg-00052Q-Ly
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:28:22 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:39290)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNIm-0005Bd-Ad
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:28:24 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:39328)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNIg-00051w-DQ
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:28:18 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNIm-00059K-2C
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:28:24 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Thu, 29 Nov 2018 17:28:15 +0300
-Message-ID: <154350169512.8036.9719902630921998126.stgit@Misha-PC.lan02.inno>
+Date: Thu, 29 Nov 2018 17:28:21 +0300
+Message-ID: <154350170076.8036.9044616893263975778.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 References: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 08/39] windbg: implement windbg_on_load
+Subject: [Qemu-devel] [PATCH 09/39] windbg: implement find_KPCR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +29,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Define addresses that must be found on loading stage.
-
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- target/i386/windbgstub.c |   48 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 47 insertions(+), 1 deletion(-)
+ target/i386/windbgstub.c |   32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index e55054c63d..1c1631d7c1 100644
+index 1c1631d7c1..15a90e521c 100644
 --- a/target/i386/windbgstub.c
 +++ b/target/i386/windbgstub.c
-@@ -12,11 +12,57 @@
+@@ -12,6 +12,18 @@
  #include "qemu/osdep.h"
  #include "exec/windbgstub-utils.h"
  
-+static InitedAddr KPCR;
 +#ifdef TARGET_X86_64
-+static InitedAddr kdDebuggerDataBlock;
++#define OFFSET_KPCR_SELF 0x18
 +#else  /* TARGET_I386 */
-+static InitedAddr kdVersion;
++#define OFFSET_KPCR_SELF 0x1C
 +#endif /* TARGET_I386 */
 +
-+static bool find_KPCR(CPUState *cs)
-+{
-+    return KPCR.is_init;
-+}
-+
 +#ifdef TARGET_X86_64
-+static bool find_kdDebuggerDataBlock(CPUState *cs)
-+{
-+    return kdDebuggerDataBlock.is_init;
-+}
++#define TARGET_SAFE(i386_obj, x86_64_obj) x86_64_obj
 +#else  /* TARGET_I386 */
-+static bool find_kdVersion(CPUState *cs)
-+{
-+    return kdVersion.is_init;
-+}
++#define TARGET_SAFE(i386_obj, x86_64_obj) i386_obj
 +#endif /* TARGET_I386 */
 +
- bool windbg_on_load(void)
+ static InitedAddr KPCR;
+ #ifdef TARGET_X86_64
+ static InitedAddr kdDebuggerDataBlock;
+@@ -21,6 +33,26 @@ static InitedAddr kdVersion;
+ 
+ static bool find_KPCR(CPUState *cs)
  {
--    return false;
-+    CPUState *cs = qemu_get_cpu(0);
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
 +
-+    if (!find_KPCR(cs)) {
-+        return false;
++    if (!KPCR.is_init) {
++        KPCR.addr = env->segs[TARGET_SAFE(R_FS, R_GS)].base;
++
++        static target_ulong prev_KPCR;
++        if (!KPCR.addr || prev_KPCR == KPCR.addr) {
++            return false;
++        }
++        prev_KPCR = KPCR.addr;
++
++        if (KPCR.addr != VMEM_ADDR(cs, KPCR.addr + OFFSET_KPCR_SELF)) {
++            return false;
++        }
++        KPCR.is_init = true;
++
++        DPRINTF("find KPCR " FMT_ADDR "\n", KPCR.addr);
 +    }
 +
-+#ifdef TARGET_X86_64
-+    if (!find_kdDebuggerDataBlock(cs)) {
-+        return false;
-+    }
-+#else
-+    if (!find_kdVersion(cs)) {
-+        return false;
-+    }
-+#endif
-+
-+    return true;
+     return KPCR.is_init;
  }
  
- void windbg_on_reset(void)
- {
-+    KPCR.is_init = false;
-+#ifdef TARGET_X86_64
-+    kdDebuggerDataBlock.is_init = false;
-+#else
-+    kdVersion.is_init = false;
-+#endif
- }
