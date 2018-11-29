@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gSNC7-0004D8-Ve
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:21:32 -0500
+	(envelope-from <philmd@redhat.com>) id 1gSNCA-0004Jd-Fs
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:21:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gSN0t-0000Be-HS
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:10:01 -0500
-Date: Thu, 29 Nov 2018 15:09:32 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20181129140932.2yl75vsq2ohmuzx6@kamzik.brq.redhat.com>
-References: <20181129132428.333-1-sameo@linux.intel.com>
-	<20181129132428.333-5-sameo@linux.intel.com>
+	(envelope-from <philmd@redhat.com>) id 1gSN0j-00005L-UN
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:09:52 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:41882)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gSN0j-0008Ts-IT
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:09:45 -0500
+Received: by mail-wr1-f67.google.com with SMTP id x10so2033009wrs.8
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 06:09:40 -0800 (PST)
+References: <20181129090120.28828-1-pbonzini@redhat.com>
+	<20181129090120.28828-5-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2eed95c3-4598-6b4c-674c-4eef2dc598bc@redhat.com>
+Date: Thu, 29 Nov 2018 15:09:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181129132428.333-5-sameo@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/8] hw: arm: Carry RSDP specific data
- through AcpiRsdpData
+In-Reply-To: <20181129090120.28828-5-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 4/4] checkpatch: colorize output to
+ terminal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,100 +31,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Thu, Nov 29, 2018 at 02:24:24PM +0100, Samuel Ortiz wrote:
-> That will allow us to generalize the ARM build_rsdp() routine to support
-> both legacy RSDP (The current i386 implementation) and extended RSDP
-> (The ARM implementation).
+On 29/11/18 10:01, Paolo Bonzini wrote:
+> Add optional colors to make seeing message types a bit easier.
+> The default is to show them on a tty.  The chosen colors should resemble
+> gcc's.
 > 
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> Inspired by Linux commit 57230297116faf5b0a995916d5dd5fedab54cba3
+> ("checkpatch: colorize output to terminal").
 > ---
->  include/hw/acpi/acpi-defs.h |  8 ++++++++
->  hw/arm/virt-acpi-build.c    | 18 +++++++++++++-----
->  2 files changed, 21 insertions(+), 5 deletions(-)
+>  scripts/checkpatch.pl | 51 +++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 44 insertions(+), 7 deletions(-)
 > 
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index af8e023968..8425ecb8c6 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -53,6 +53,14 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
->  } QEMU_PACKED;
->  typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index f5284d910c..14be11719c 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -7,6 +7,7 @@
 >  
-> +typedef struct AcpiRsdpData {
-> +    uint8_t oem_id[6]; /* OEM identification */
-> +    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
+>  use strict;
+>  use warnings;
+> +use Term::ANSIColor qw(:constants);
+>  
+>  my $P = $0;
+>  $P =~ s@.*/@@g;
+> @@ -26,6 +27,7 @@ my $tst_only;
+>  my $emacs = 0;
+>  my $terse = 0;
+>  my $file = undef;
+> +my $color = "auto";
+>  my $no_warnings = 0;
+>  my $summary = 1;
+>  my $mailback = 0;
+> @@ -64,6 +66,8 @@ Options:
+>                               is all off)
+>    --test-only=WORD           report only warnings/errors containing WORD
+>                               literally
+> +  --color[=WHEN]             Use colors 'always', 'never', or only when output
+> +                             is a terminal ('auto'). Default is 'auto'.
+>    -h, --help, --version      display this help and exit
+>  
+>  When FILE is - read standard input.
+> @@ -72,6 +76,14 @@ EOM
+>  	exit($exitcode);
+>  }
+>  
+> +# Perl's Getopt::Long allows options to take optional arguments after a space.
+> +# Prevent --color by itself from consuming other arguments
+> +foreach (@ARGV) {
+> +	if ($_ eq "--color" || $_ eq "-color") {
+> +		$_ = "--color=$color";
+> +	}
+> +}
 > +
-> +    unsigned *rsdt_tbl_offset;
-> +    unsigned *xsdt_tbl_offset;
+>  GetOptions(
+>  	'q|quiet+'	=> \$quiet,
+>  	'tree!'		=> \$tree,
+> @@ -89,6 +101,8 @@ GetOptions(
+>  
+>  	'debug=s'	=> \%debug,
+>  	'test-only=s'	=> \$tst_only,
+> +	'color=s'       => \$color,
+> +	'no-color'      => sub { $color = 'never'; },
+>  	'h|help'	=> \$help,
+>  	'version'	=> \$help
+>  ) or help(1);
+> @@ -144,6 +158,18 @@ if (!$chk_patch && !$chk_branch && !$file) {
+>  	die "One of --file, --branch, --patch is required\n";
+>  }
+>  
+> +if ($color =~ /^[01]$/) {
+> +	$color = !$color;
 
-Why use pointers?
+Without this if:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> +} AcpiRsdpData;
+> +} elsif ($color =~ /^always$/i) {
+> +	$color = 1;
+> +} elsif ($color =~ /^never$/i) {
+> +	$color = 0;
+> +} elsif ($color =~ /^auto$/i) {
+> +	$color = (-t STDOUT);
+> +} else {
+> +	die "Invalid color mode: $color\n";
+> +}
 > +
->  /* Table structure from Linux kernel (the ACPI tables are under the
->     BSD license) */
+>  my $dbg_values = 0;
+>  my $dbg_possible = 0;
+>  my $dbg_type = 0;
+> @@ -372,7 +398,9 @@ if ($chk_branch) {
+>  		close($FILE);
+>  		$vname = substr($hash, 0, 12) . ' (' . $git_commits{$hash} . ')';
+>  		if ($num_patches > 1 && $quiet == 0) {
+> -			print "$i/$num_patches Checking commit $vname\n";
+> +			my $prefix = "$i/$num_patches";
+> +			$prefix = BLUE . BOLD . $prefix . RESET if $color;
+> +			print "$prefix Checking commit $vname\n";
+>  			$vname = "Patch $i/$num_patches";
+>  		} else {
+>  			$vname = "Commit " . $vname;
+> @@ -1182,14 +1210,23 @@ sub possible {
+>  my $prefix = '';
 >  
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 0835900052..ce8bfa5a37 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+>  sub report {
+> -	if (defined $tst_only && $_[0] !~ /\Q$tst_only\E/) {
+> +	my ($level, $msg) = @_;
+> +	if (defined $tst_only && $msg !~ /\Q$tst_only\E/) {
+>  		return 0;
+>  	}
+> -	my $line = $prefix . $_[0];
 >  
->  /* RSDP */
->  static void
-> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
-> +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
->  {
->      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
->      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
-> @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
->                               true /* fseg memory */);
+> -	$line = (split('\n', $line))[0] . "\n" if ($terse);
+> +	my $output = '';
+> +	$output .= BOLD if $color;
+> +	$output .= $prefix;
+> +	$output .= RED if $color && $level eq 'ERROR';
+> +	$output .= MAGENTA if $color && $level eq 'WARNING';
+> +	$output .= $level . ':';
+> +	$output .= RESET if $color;
+> +	$output .= ' ' . $msg . "\n";
+> +
+> +	$output = (split('\n', $output))[0] . "\n" if ($terse);
 >  
->      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
-> -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
-> +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
-
-sizeof(rsdp_data->oem_id)
-
->      rsdp->length = cpu_to_le32(sizeof(*rsdp));
-> -    rsdp->revision = 0x02;
-> +    rsdp->revision = rsdp_data->revision;
+> -	push(our @report, $line);
+> +	push(our @report, $output);
 >  
->      /* Address to be filled by Guest linker */
->      bios_linker_loader_add_pointer(linker,
->          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
-> -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
-> +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
->  
->      /* Checksum to be filled by Guest linker */
->      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> @@ -857,7 +857,15 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
->  
->      /* RSDP is in FSEG memory, so allocate it separately */
-> -    build_rsdp(tables->rsdp, tables->linker, xsdt);
-> +    {
-> +        AcpiRsdpData rsdp_data = {
-> +            .revision = 2,
-> +            .oem_id = ACPI_BUILD_APPNAME6,
-> +            .xsdt_tbl_offset = &xsdt,
-> +            .rsdt_tbl_offset = NULL,
-
-nit: no need for this explicit NULLing
-
-> +        };
-> +        build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
-> +    }
->  
->      /* Cleanup memory that's no longer used. */
->      g_array_free(table_offsets, true);
-> -- 
-> 2.19.2
+>  	return 1;
+>  }
+> @@ -1197,13 +1234,13 @@ sub report_dump {
+>  	our @report;
+>  }
+>  sub ERROR {
+> -	if (report("ERROR: $_[0]\n")) {
+> +	if (report("ERROR", $_[0])) {
+>  		our $clean = 0;
+>  		our $cnt_error++;
+>  	}
+>  }
+>  sub WARN {
+> -	if (report("WARNING: $_[0]\n")) {
+> +	if (report("WARNING", $_[0])) {
+>  		our $clean = 0;
+>  		our $cnt_warn++;
+>  	}
 > 
->
-
-Thanks,
-drew 
