@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gSOLH-0007GF-Hc
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:35:05 -0500
+	(envelope-from <armbru@redhat.com>) id 1gSOOf-0000zV-H5
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:38:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gSOLE-0007nW-8t
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:35:03 -0500
-Received: from 14.mo7.mail-out.ovh.net ([178.33.251.19]:33699)
+	(envelope-from <armbru@redhat.com>) id 1gSOOc-0001re-Bw
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:38:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:18809)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gSOLD-0007kw-Sl
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:35:00 -0500
-Received: from player770.ha.ovh.net (unknown [10.109.159.68])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 01B38E9EB9
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 16:34:57 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-16-clg@kaod.org>
-	<20181128032819.GY2251@umbus.fritz.box>
-	<c8f9532c-a27d-0071-0023-25f8b70cb31d@kaod.org>
-	<20181129010758.GO2251@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <aff0fc45-46b0-fdd0-525c-1ab7923b7e90@kaod.org>
-Date: Thu, 29 Nov 2018 16:34:51 +0100
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSOOc-0001rC-37
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:38:30 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1541156463-2730-1-git-send-email-liq3ea@gmail.com>
+	<64f88d81-8de1-a4b3-196f-c5c95a45e4e5@redhat.com>
+Date: Thu, 29 Nov 2018 16:38:26 +0100
+In-Reply-To: <64f88d81-8de1-a4b3-196f-c5c95a45e4e5@redhat.com> (Eric Blake's
+	message of "Mon, 5 Nov 2018 17:01:50 -0600")
+Message-ID: <877egv99n1.fsf_-_@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181129010758.GO2251@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 15/36] spapr: introdude a new machine
- IRQ backend for XIVE
+Content-Type: text/plain
+Subject: [Qemu-devel] QAPI 'size' vs. 'uint64' (was: [PATCH] qapi: misc:
+ change the 'pc' to unsinged 64 in CpuInfo)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,391 +28,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Li Qiang <liq3ea@gmail.com>, armbru@redhat.com, qemu-devel@nongnu.org
 
-On 11/29/18 2:07 AM, David Gibson wrote:
-> On Wed, Nov 28, 2018 at 06:16:58PM +0100, C=E9dric Le Goater wrote:
->> On 11/28/18 4:28 AM, David Gibson wrote:
->>> On Fri, Nov 16, 2018 at 11:57:08AM +0100, C=E9dric Le Goater wrote:
->>>> The XIVE IRQ backend uses the same layout as the new XICS backend bu=
-t
->>>> covers the full range of the IRQ number space. The IRQ numbers for t=
-he
->>>> CPU IPIs are allocated at the bottom of this space, below 4K, to
->>>> preserve compatibility with XICS which does not use that range.
->>>>
->>>> This should be enough given that the maximum number of CPUs is 1024
->>>> for the sPAPR machine under QEMU. For the record, the biggest POWER8
->>>> or POWER9 system has a maximum of 1536 HW threads (16 sockets, 192
->>>> cores, SMT8).
->>>>
->>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>> ---
->>>>  include/hw/ppc/spapr.h     |   2 +
->>>>  include/hw/ppc/spapr_irq.h |   7 ++-
->>>>  hw/ppc/spapr.c             |   2 +-
->>>>  hw/ppc/spapr_irq.c         | 119 ++++++++++++++++++++++++++++++++++=
-++-
->>>>  4 files changed, 124 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->>>> index 6279711fe8f7..1fbc2663e06c 100644
->>>> --- a/include/hw/ppc/spapr.h
->>>> +++ b/include/hw/ppc/spapr.h
->>>> @@ -16,6 +16,7 @@ typedef struct sPAPREventLogEntry sPAPREventLogEnt=
-ry;
->>>>  typedef struct sPAPREventSource sPAPREventSource;
->>>>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
->>>>  typedef struct ICSState ICSState;
->>>> +typedef struct sPAPRXive sPAPRXive;
->>>> =20
->>>>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
->>>>  #define SPAPR_ENTRY_POINT       0x100
->>>> @@ -175,6 +176,7 @@ struct sPAPRMachineState {
->>>>      const char *icp_type;
->>>>      int32_t irq_map_nr;
->>>>      unsigned long *irq_map;
->>>> +    sPAPRXive  *xive;
->>>> =20
->>>>      bool cmd_line_caps[SPAPR_CAP_NUM];
->>>>      sPAPRCapabilities def, eff, mig;
->>>> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
->>>> index 0e9229bf219e..c854ae527808 100644
->>>> --- a/include/hw/ppc/spapr_irq.h
->>>> +++ b/include/hw/ppc/spapr_irq.h
->>>> @@ -13,6 +13,7 @@
->>>>  /*
->>>>   * IRQ range offsets per device type
->>>>   */
->>>> +#define SPAPR_IRQ_IPI        0x0
->>>>  #define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
->>>>  #define SPAPR_IRQ_HOTPLUG    0x1001
->>>>  #define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
->>>> @@ -33,7 +34,8 @@ typedef struct sPAPRIrq {
->>>>      uint32_t    nr_irqs;
->>>>      uint32_t    nr_msis;
->>>> =20
->>>> -    void (*init)(sPAPRMachineState *spapr, int nr_irqs, Error **err=
-p);
->>>> +    void (*init)(sPAPRMachineState *spapr, int nr_irqs, int nr_serv=
-ers,
->>>> +                 Error **errp);
->>>>      int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error=
- **errp);
->>>>      void (*free)(sPAPRMachineState *spapr, int irq, int num);
->>>>      qemu_irq (*qirq)(sPAPRMachineState *spapr, int irq);
->>>> @@ -42,8 +44,9 @@ typedef struct sPAPRIrq {
->>>> =20
->>>>  extern sPAPRIrq spapr_irq_xics;
->>>>  extern sPAPRIrq spapr_irq_xics_legacy;
->>>> +extern sPAPRIrq spapr_irq_xive;
->>>> =20
->>>> -void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
->>>> +void spapr_irq_init(sPAPRMachineState *spapr, int nr_servers, Error=
- **errp);
->>>
->>> I don't see why nr_servers needs to become a parameter, since it can
->>> be derived from spapr within this routine.
->>
->> ok. This is true. We can use directly xics_max_server_number(spapr).
->>
->>>>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Er=
-ror **errp);
->>>>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
->>>>  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
->>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>>> index e470efe7993c..9f8c19e56e7a 100644
->>>> --- a/hw/ppc/spapr.c
->>>> +++ b/hw/ppc/spapr.c
->>>> @@ -2594,7 +2594,7 @@ static void spapr_machine_init(MachineState *m=
-achine)
->>>>      spapr_set_vsmt_mode(spapr, &error_fatal);
->>>> =20
->>>>      /* Set up Interrupt Controller before we create the VCPUs */
->>>> -    spapr_irq_init(spapr, &error_fatal);
->>>> +    spapr_irq_init(spapr, xics_max_server_number(spapr), &error_fat=
-al);
->>>
->>> We should rename xics_max_server_number() since it's no longer xics
->>> specific.
->>
->> yes.
->>
->>>>      /* Set up containers for ibm,client-architecture-support negoti=
-ated options
->>>>       */
->>>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->>>> index bac450ffff23..2569ae1bc7f8 100644
->>>> --- a/hw/ppc/spapr_irq.c
->>>> +++ b/hw/ppc/spapr_irq.c
->>>> @@ -12,6 +12,7 @@
->>>>  #include "qemu/error-report.h"
->>>>  #include "qapi/error.h"
->>>>  #include "hw/ppc/spapr.h"
->>>> +#include "hw/ppc/spapr_xive.h"
->>>>  #include "hw/ppc/xics.h"
->>>>  #include "sysemu/kvm.h"
->>>> =20
->>>> @@ -91,7 +92,7 @@ error:
->>>>  }
->>>> =20
->>>>  static void spapr_irq_init_xics(sPAPRMachineState *spapr, int nr_ir=
-qs,
->>>> -                                Error **errp)
->>>> +                                int nr_servers, Error **errp)
->>>>  {
->>>>      MachineState *machine =3D MACHINE(spapr);
->>>>      Error *local_err =3D NULL;
->>>> @@ -204,10 +205,122 @@ sPAPRIrq spapr_irq_xics =3D {
->>>>      .print_info  =3D spapr_irq_print_info_xics,
->>>>  };
->>>> =20
->>>> + /*
->>>> + * XIVE IRQ backend.
->>>> + */
->>>> +static sPAPRXive *spapr_xive_create(sPAPRMachineState *spapr,
->>>> +                                    const char *type_xive, int nr_i=
-rqs,
->>>> +                                    int nr_servers, Error **errp)
->>>> +{
->>>> +    sPAPRXive *xive;
->>>> +    Error *local_err =3D NULL;
->>>> +    Object *obj;
->>>> +    uint32_t nr_ends =3D nr_servers << 3; /* 8 priority ENDs per CP=
-U */
->>>> +    int i;
->>>> +
->>>> +    obj =3D object_new(type_xive);
->>>
->>> What's the reason for making the type a parameter, rather than just
->>> using the #define here.
->>
->> KVM.
->=20
-> Yeah, I realised that when I'd read a few patches further on.  As I
-> commented there, I don't think the separate KVM/TCG subclasses is
-> actually a good pattern to follow.
+Eric Blake <eblake@redhat.com> writes:
 
-I will use the simple pattern in next spin: if (kvm) { }=20
+> On 11/2/18 6:01 AM, Li Qiang wrote:
+>> When trigger a 'query-cpus' qmp, the pc is an signed value like
+>> following:
+>> {"arch": "x86", ...  "pc": -1732653994, "halted": true,...}
+>> It is strange. Change it to uint64_t.
+>>
+>> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+>> ---
+>>   qapi/misc.json | 12 ++++++------
+>>   1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> I don't see this as causing any major backwards-incompatible behavior
+> to clients that can parse full 64-bit unsigned numbers (note that not
+> all JSON parsers do so - here's frowning at you, jansson - but libvirt
+> is okay).
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-We might want to do that for XICS also but it would break migratibility. =
-=20
+Client breakage is possible, but feels unlikely.  To break, a client has
+to (a) accept negative numbers modulo 2^64, and (b) don't accept numbers
+>= 2^63.  That's extra work.  Clients that simply use strtoul() are
+unaffected.  We accepted this very risk when we fixed the QObject
+visitor for unsigned integers in commit 5923f85fb82.  Relevant part of
+the commit message:
 
->>>> +    object_property_set_int(obj, nr_irqs, "nr-irqs", &error_abort);
->>>> +    object_property_set_int(obj, nr_ends, "nr-ends", &error_abort);
->>>
->>> This is still within the sPAPR code, and you have a pointer to the
->>> MachineState, so I don't see why you could't just derive nr_irqs and
->>> nr_servers from that, rather than having them passed in.
->>
->> for nr_servers I agree. nr_irqs comes from the machine class and it wi=
-ll
->> not make any sense using the machine class in the init routine of the
->> 'dual' sPAPR IRQ backend supporting both modes. See patch 34 which
->> initializes both backend for the 'dual' machine.
->=20
-> Uh.. I guess I'll comment when I get to that patch, but I don't see
-> why accessing the machine class would be a problem.  If we have the
-> MachineState we can get to the MachineClass.>=20
->>>> +    object_property_set_bool(obj, true, "realized", &local_err);
->>>> +    if (local_err) {
->>>> +        error_propagate(errp, local_err);
->>>> +        return NULL;
->>>> +    }
->>>> +    qdev_set_parent_bus(DEVICE(obj), sysbus_get_default());
->>>
->>> Whereas the XiveSource and XiveRouter I think make more sense as
->>> "device components" rather than SysBusDevice subclasses,=20
->>
->> Yes. I changed that.
->>
->>> I think it
->>> *does* make sense for the PAPR-XIVE object to be a full fledged
->>> SysBusDevice.
->>
->> Ah. That I didn't do but thinking of it, it makes sense as it is the
->> object managing the TIMA and ESB memory region mapping for the machine=
-.=20
->>
->>> And for that reason, I think it makes more sense to create it with
->>> qdev_create(), which should avoid having to manually fiddle with the
->>> parent bus.
->>
->> OK. I will give it a try.=20
->>
->>>> +    xive =3D SPAPR_XIVE(obj);
->>>> +
->>>> +    /* Enable the CPU IPIs */
->>>> +    for (i =3D 0; i < nr_servers; ++i) {
->>>> +        spapr_xive_irq_enable(xive, SPAPR_IRQ_IPI + i, false);
->>>
->>> This comment possibly belonged on an earlier patch.  I don't love the
->>> "..._enable" name - to me that suggests something runtime rather than
->>> configuration time.  A better option isn't quickly occurring to me
->>> though :/.
->>
->> Instead, I could call the sPAPR IRQ claim method  :=20
->>
->>     for (i =3D 0; i < nr_servers; ++i) {
->> 	spapr_irq_xive.claim(spapr, SPAPR_IRQ_IPI + i, false, &local_err);
->>     }
->>
->>
->> What it does is to set the EAS_VALID bit in the EAT (it also sets the=20
->> LSI bit). what about :
->> =09
->> 	spapr_xive_irq_validate()=20
->> 	spapr_xive_irq_invalidate()=20
->>
->> or to map the sPAPR IRQ backend names :
->>
->> 	spapr_xive_irq_claim()=20
->> 	spapr_xive_irq_free()
->=20
-> Let's use claim/free to match the terms spapr already uses.
+    Note: before the patch, uint64_t values above INT64_MAX are sent over
+    json QMP as negative values, e.g. UINT64_MAX is sent as -1. After the
+    patch, they are sent unmodified.  Clearly a bug fix, but we have to
+    consider compatibility issues anyway.  libvirt should cope fine,
+    because its parsing of unsigned integers accepts negative values
+    modulo 2^64.  There's hope that other clients will, too.
 
-OK.
+This patch needs to discuss the risk, too.  Suggest to steal from the
+commit message I quoted.
 
-Thanks,
 
-C.
+There's another question: 'uint64' or 'size'?
 
->=20
->=20
->>
->>
->>>
->>>> +    }
->>>> +
->>>> +    return xive;
->>>> +}
->>>> +
->>>> +static void spapr_irq_init_xive(sPAPRMachineState *spapr, int nr_ir=
-qs,
->>>> +                                int nr_servers, Error **errp)
->>>> +{
->>>> +    MachineState *machine =3D MACHINE(spapr);
->>>> +    Error *local_err =3D NULL;
->>>> +
->>>> +    /* KVM XIVE support */
->>>> +    if (kvm_enabled()) {
->>>> +        if (machine_kernel_irqchip_required(machine)) {
->>>> +            error_setg(errp, "kernel_irqchip requested. no XIVE sup=
-port");
->>>> +            return;
->>>> +        }
->>>> +    }
->>>> +
->>>> +    /* QEMU XIVE support */
->>>> +    spapr->xive =3D spapr_xive_create(spapr, TYPE_SPAPR_XIVE, nr_ir=
-qs, nr_servers,
->>>> +                                    &local_err);
->>>> +    if (local_err) {
->>>> +        error_propagate(errp, local_err);
->>>> +        return;
->>>> +    }
->>>> +}
->>>> +
->>>> +static int spapr_irq_claim_xive(sPAPRMachineState *spapr, int irq, =
-bool lsi,
->>>> +                                Error **errp)
->>>> +{
->>>> +    if (!spapr_xive_irq_enable(spapr->xive, irq, lsi)) {
->>>> +        error_setg(errp, "IRQ %d is invalid", irq);
->>>> +        return -1;
->>>> +    }
->>>> +    return 0;
->>>> +}
->>>> +
->>>> +static void spapr_irq_free_xive(sPAPRMachineState *spapr, int irq, =
-int num)
->>>> +{
->>>> +    int i;
->>>> +
->>>> +    for (i =3D irq; i < irq + num; ++i) {
->>>> +        spapr_xive_irq_disable(spapr->xive, i);
->>>> +    }
->>>> +}
->>>> +
->>>> +static qemu_irq spapr_qirq_xive(sPAPRMachineState *spapr, int irq)
->>>> +{
->>>> +    return spapr_xive_qirq(spapr->xive, irq);
->>>> +}
->>>> +
->>>> +static void spapr_irq_print_info_xive(sPAPRMachineState *spapr,
->>>> +                                      Monitor *mon)
->>>> +{
->>>> +    CPUState *cs;
->>>> +
->>>> +    CPU_FOREACH(cs) {
->>>> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->>>> +
->>>> +        xive_tctx_pic_print_info(XIVE_TCTX(cpu->intc), mon);
->>>> +    }
->>>> +
->>>> +    spapr_xive_pic_print_info(spapr->xive, mon);
->>>
->>> Any reason the info dumping routines are split into two?
->>
->> Not the same objects. Are you suggesting that we could print all the i=
-nfo=20
->> from the sPAPR XIVE model ? including the XiveTCTX. I thought of doing=
-=20
->> that also. Fine for me if it's ok for you.
->=20
-> Ah.. I think I got xive_pic_print_info() and
-> xive_tctx_pic_print_info() mixed up.  Never mind.
->=20
->>
->> Thanks,
->>
->> C.
->>
->>>
->>>> +}
->>>> +
->>>> +/*
->>>> + * XIVE uses the full IRQ number space. Set it to 8K to be compatib=
-le
->>>> + * with XICS.
->>>> + */
->>>> +
->>>> +#define SPAPR_IRQ_XIVE_NR_IRQS     0x2000
->>>> +#define SPAPR_IRQ_XIVE_NR_MSIS     (SPAPR_IRQ_XIVE_NR_IRQS - SPAPR_=
-IRQ_MSI)
->>>> +
->>>> +sPAPRIrq spapr_irq_xive =3D {
->>>> +    .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
->>>> +    .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
->>>> +
->>>> +    .init        =3D spapr_irq_init_xive,
->>>> +    .claim       =3D spapr_irq_claim_xive,
->>>> +    .free        =3D spapr_irq_free_xive,
->>>> +    .qirq        =3D spapr_qirq_xive,
->>>> +    .print_info  =3D spapr_irq_print_info_xive,
->>>> +};
->>>> +
->>>>  /*
->>>>   * sPAPR IRQ frontend routines for devices
->>>>   */
->>>> -void spapr_irq_init(sPAPRMachineState *spapr, Error **errp)
->>>> +void spapr_irq_init(sPAPRMachineState *spapr, int nr_servers, Error=
- **errp)
->>>>  {
->>>>      sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->>>> =20
->>>> @@ -216,7 +329,7 @@ void spapr_irq_init(sPAPRMachineState *spapr, Er=
-ror **errp)
->>>>          spapr_irq_msi_init(spapr, smc->irq->nr_msis);
->>>>      }
->>>> =20
->>>> -    smc->irq->init(spapr, smc->irq->nr_irqs, errp);
->>>> +    smc->irq->init(spapr, smc->irq->nr_irqs, nr_servers, errp);
->>>>  }
->>>> =20
->>>>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Er=
-ror **errp)
->>>
->>
->=20
+Short answer: I think we better stick to 'uint64' here.  Long answer
+follows.
+
+Both QAPI types map to uint64_t in C.  The difference is twofold:
+
+* It serves as a documentation of intent in the QAPI schema.  Or rather
+  it would, if we used it more consistently.
+
+  Related:
+  [RFC PATCH 00/56] qapi: Use 'size' for byte counts & offsets
+  https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01089.html
+  Message-Id: <1502117160-24655-1-git-send-email-armbru@redhat.com>
+
+  From its cover letter:
+
+      Byte sizes, offsets and the like should use QAPI type 'size'
+      (uint64_t).  This rule is more honored in the breach than in the
+      observance.  Fix the obvious offenders.
+
+  The series doesn't fix the program counters in the CpuInfoFOO.
+
+* A few visitors treat 'size' differently:
+
+  - The opts visitor parses with qemu_strtosz() instead of parse_uint(),
+    and it doesn't support ranges.  Let's ignore ranges.  qemu_strtosz()
+    accepts convenience syntax like 1.5M for 1.5 * 1024 * 1024.
+
+    This visitor is used for parsing CLI options -numa, -netdev,
+    -object, -acpitable, HMP netdev_add, object_add, and the -object
+    equivalents of qemu-img, qemu-io, qemu-nbd.
+    
+  - The QObject input visitor's keyval flavour parses with
+    qemu_strtosz() instead of qemu_strtou64().
+
+    This visitor is used for parsing CLI options -display (except for
+    its legacy forms), -blockdev, and by block layer in ways that are
+    too complex to explain here.
+
+  - The string input visitor[*] parses with qemu_strtosz() (via
+    parse_option_size()) instead of qemu_strtou64(), and it doesn't
+    support ranges.
+
+    This visitor is used for parsing HMP migrate_set_parameter and QOM
+    property values.  It's also used for getting QOM property values
+    (don't ask, it's terrible).
+
+  - The string output visitor uses format PRIu64 instead of PRId64 and
+    optionally PRIx64 as well, and it doesn't support ranges.  This
+    visitor is used for HMP info migrate, info memdev, info network,
+    info qtree.  It's also used for getting QOM property values
+    (terrible).
+
+  Yes, this stuff could have used adult design supervision.
+
+  As far as I can tell, none of the 'size' differences is relevant for
+  this patch.
+
+So, on the one hand, program counters are byte counts, so 'size' feels
+more appropriate.  On the other hand, the important part is changing to
+unsigned, and 'uint64' gets us there without the additional baggage of
+'size'.
+
+The additional baggage looks irrelevant for this patch.  But perhaps we
+should make up our mind on usage of 'size' in general.
+
+The true reason it exists is the desire for convenience syntax at the
+human interface.  Fair enough, but it doesn't scale: we could use
+convenience syntax in many other places, but creating a special type for
+each kind is an awful way to get it.  If we had a better, more general
+way to specify "use this convenience syntax for human interfaces" in the
+schema, we could get rid of size.
+
+
+[*] With David Hildenbrand's patches applied.
