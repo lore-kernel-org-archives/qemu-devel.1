@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gSHu1-000100-0H
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:42:30 -0500
+	(envelope-from <armbru@redhat.com>) id 1gSIAp-0001CM-Jt
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:59:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1gSHu0-00055c-1o
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:42:28 -0500
-References: <20181126154616.18173-1-eric.auger@redhat.com>
-	<b3c22264-2a95-b851-025c-b8ff0f38f269@redhat.com>
-	<65b68704-2c0b-e9b9-2cde-fea5c32161b3@gmail.com>
-	<a6e27638-1695-9608-366a-83bbbe873e55@redhat.com>
-	<2c6469e1-4da1-7f9d-4525-892287c4c5c1@gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8061b3b9-8857-221f-0d43-cbac25baf3e4@redhat.com>
-Date: Thu, 29 Nov 2018 09:42:15 +0100
+	(envelope-from <armbru@redhat.com>) id 1gSIAh-0001hN-Tq
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:59:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59512)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSIAf-0001ff-5A
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:59:43 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1542384802.git.xiezhide@huawei.com>
+	<a4bc041444fd76d5da1d8e5321007f416df4ab84.1542384802.git.xiezhide@huawei.com>
+	<87ftvlh7us.fsf@dusky.pond.sub.org>
+	<1a77a48a-7160-8282-7c8f-de0b6dfe68f3@redhat.com>
+Date: Thu, 29 Nov 2018 09:59:33 +0100
+In-Reply-To: <1a77a48a-7160-8282-7c8f-de0b6dfe68f3@redhat.com> (Eric Blake's
+	message of "Wed, 28 Nov 2018 07:09:05 -0600")
+Message-ID: <875zwgcl8q.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <2c6469e1-4da1-7f9d-4525-892287c4c5c1@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/arm/virt-acpi-build: Fix SMMUv3
- ACPI integration
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 2/6] fsdev-throttle-qmp: Rename the
+ ThrottleLimits member names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <shannon.zhaosl@gmail.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: shameerali.kolothum.thodi@huawei.com
+To: Eric Blake <eblake@redhat.com>
+Cc: xiezhide <xiezhide@huawei.com>, berto@igalia.com, qemu-devel@nongnu.org, zengcanfu@huawei.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, jinxuefeng@huawei.com, chenhui.rtos@huawei.com
 
-Hi Shannon,
+Eric Blake <eblake@redhat.com> writes:
 
-On 11/29/18 3:24 AM, Shannon Zhao wrote:
->=20
->=20
-> On 2018/11/29 1:26, Auger Eric wrote:
->>>>> =C2=A0=C2=A0 struct AcpiIortSmmu3 {
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ACPI_IORT_NODE_HEADER_DEF
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t base_address;
->>>>> @@ -639,6 +645,8 @@ struct AcpiIortSmmu3 {
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t pri_gsiv;
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t gerr_gsiv;
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t sync_gsiv;
->>>>> +=C2=A0=C2=A0=C2=A0 uint32_t pxm;
->>> So if we use this field ,we need to set the flags with
->>> ACPI_IORT_SMMU_V3_PXM_VALID
->>>>> +=C2=A0=C2=A0=C2=A0 uint32_t id_mapping_index;
->>> And if we use this field, it needs to set the revision to at least 1.
->> But is it harmful to add those fields in the struct as this patch does=
-?
+> On 11/28/18 3:25 AM, Markus Armbruster wrote:
+>> xiezhide <xiezhide@huawei.com> writes:
 >>
->> - in our case ACPI_IORT_SMMU_V3_PXM_VALID flag is not set so the field
->> value is ignored according to the spec and arm_smmu_v3_set_proximity()
->> will not do anything.
+>>> Rename the ThrottleLimits member names and modify related code
+>>>
+>>> Signed-off-by: xiezhide <xiezhide@huawei.com>
+>>> ---
+>>>   qapi/block-core.json |  70 +++++++++++-----------
+>>>   util/throttle.c      | 163 +++++++++++++++++++++++++--------------------------
+>>>   2 files changed, 116 insertions(+), 117 deletions(-)
+>>>
+>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>>> index d4fe710..4ffaaea 100644
+>>> --- a/qapi/block-core.json
+>>> +++ b/qapi/block-core.json
+>
+>>>   ##
+>>>   { 'struct': 'ThrottleLimits',
+>>> -  'data': { '*iops-total' : 'int', '*iops-total-max' : 'int',
+>
+>>> +  'data': { '*iops' : 'int', '*iops_max' : 'int',
+>>> +            '*iops_max_length' : 'int', '*iops_rd' : 'int',
+>>> +            '*iops_rd_max' : 'int', '*iops_rd_max_length' : 'int',
+>>> +            '*iops_wr' : 'int', '*iops_wr_max' : 'int',
+>>> +            '*iops_wr_max_length' : 'int', '*bps' : 'int',
+>>> +            '*bps_max' : 'int', '*bps_max_length' : 'int',
+>>> +            '*bps_rd' : 'int', '*bps_rd_max' : 'int',
+>>> +            '*bps_rd_max_length' : 'int', '*bps_wr' : 'int',
+>>> +            '*bps_wr_max' : 'int', '*bps_wr_max_length' : 'int',
+>>> +            '*iops_size' : 'int' } }
 >>
->> - SMMU control interrupts are all GSIV based so spec says that deviceI=
-D
->> index is ignored.
->>
->> So eventually the fact the struct size is changing over the revisions
->> does not look a problem because the node length is part of the struct
->> and the offset to the ID array also is part of the structure.
->>
->> So I could have left the structure as before (because we don't use the
->> functionalities associated to those fields). But on the other hand it'=
-s
->> good to upgrade the struct according to Rev D now.
->>
->> So I think the patch is correct, isn't?
-> Yes, I think it's not harmful but it would be better to add some
-> comments to explain why we don't increase the revision number ATM.
-OK thank you for your input. I will repost for 3.2 and will upgrade the
-table structs and their associated revision fields.
+>> Compatibility break.  Why is that okay?
+>
+> Grepping qapi/qapi-introspection.c shows 0 hits for either
+> ThrottleLimits or for iops-total, so there are no QMP commands
+> affected.
 
-Thanks
+I see.
 
-Eric
->=20
-> Thanks,
-> Shannon
->=20
+>           There might, however, be command line and/or QOM paths
+> affected, which is harder to audit since those don't affect
+> instrospection.
+
+Yet another argument for QAPIfication...
+
+Let's check.  git-grep ThrottleLimits finds:
+
+* block/throttle-groups.c: getter and setter for QOM class
+  "throttle-group" property "limits".  This class is user-creatable.
+  Therefore, this is an externally visible interface.
+
+  The question is whether it's a *stable* interface.  The status of QOM
+  properties in that regard is not clear to me.  If I remember
+  correctly, we treated it as "just for debugging and such" at least
+  initially.  But is that still a defensible position?  It ceases to be
+  one as soon as you need QOM properties to do something users ought to
+  be able to do.  Like configuring stuff that is meant to be configured.
+  If that's the case, we need to examine the situation, and clarify our
+  ABI promises.  Recommend a separate thread.
+
+* util/throttle.c: Functions to convert to and from ThrottleConfig.  The
+  conversion to ThrottleConfig uses hardcoded member names in error
+  messages.  Relevant only insofar we need to remember to change them
+  when we rename members.
+
+>> Even if it is, you still run afoul of docs/devel/qapi-code-gen.txt:
+>>
+>>      Command names, and member names within a type, should be all lower
+>>      case with words separated by a hyphen.  However, some existing older
+>>      commands and complex types use underscore; when extending such
+>>      expressions, consistency is preferred over blindly avoiding
+>>      underscore.
+>>
+>> The exception doesn't apply here.
+>
+> Ah, but it does, because we are refactoring code to share a common
+> QAPI struct in a later patch, where we need this exact naming to avoid
+> breaking that command.
+>
+> So the REAL problem with this commit is that the commit message does
+> not give enough details, either why this is safe (because it does not
+> impact existing QMP commands) or needed (because we will be using it
+> to rewrite an existing QMP command that needs this spelling).
+
+Yes, the commit message needs to make explain why the change is useful,
+and why it is safe.
