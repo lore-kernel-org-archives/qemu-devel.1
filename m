@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gSICR-0002CT-QC
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:01:41 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gSIFn-000670-48
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:05:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gSICM-0002qT-1y
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:01:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42626)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gSICL-0002pD-QD
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:01:25 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2BA6781DFA
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 09:01:25 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 29 Nov 2018 10:01:18 +0100
-Message-Id: <20181129090120.28828-3-pbonzini@redhat.com>
-In-Reply-To: <20181129090120.28828-1-pbonzini@redhat.com>
-References: <20181129090120.28828-1-pbonzini@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1gSIFj-00056i-4j
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:04:59 -0500
+Date: Thu, 29 Nov 2018 10:04:38 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181129090438.GB4797@linux.fritz.box>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	<20181121151211.15997-3-paul.durrant@citrix.com>
+	<20181128161917.GE4222@dhcp-200-186.str.redhat.com>
+	<48596f1fe100419c8b28ed54bda0117b@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1811280827330.4577@sstabellini-ThinkPad-X260>
+	<65af28818a724749839dcb6576e0413d@AMSPEX02CL03.citrite.net>
+	<20181128163900.GG4222@dhcp-200-186.str.redhat.com>
+	<5327ba765089439caf8119de49c3a399@AMSPEX02CL03.citrite.net>
+	<a0104a7b4f874c31bda9d854bf254b0d@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-4.0 2/4] checkpatch: check Signed-off-by in
- --mailback mode
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a0104a7b4f874c31bda9d854bf254b0d@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 02/18] xen: introduce new
+ 'XenBus' and 'XenDevice' object hierarchy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +31,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: 'Stefano Stabellini' <sstabellini@kernel.org>, "'qemu-block@nongnu.org'" <qemu-block@nongnu.org>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>, "'xen-devel@lists.xenproject.org'" <xen-devel@lists.xenproject.org>, 'Eduardo Habkost' <ehabkost@redhat.com>, "'Michael S. Tsirkin'" <mst@redhat.com>, 'Marcel Apfelbaum' <marcel.apfelbaum@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Richard Henderson' <rth@twiddle.net>
 
-Pull the test before the anticipated exits from the process sub.
+Am 28.11.2018 um 17:46 hat Paul Durrant geschrieben:
+> > -----Original Message-----
+> > From: Paul Durrant
+> > Sent: 28 November 2018 16:46
+> > To: 'Kevin Wolf' <kwolf@redhat.com>
+> > Cc: 'Stefano Stabellini' <sstabellini@kernel.org>; qemu-block@nongnu.org;
+> > qemu-devel@nongnu.org; xen-devel@lists.xenproject.org; Eduardo Habkost
+> > <ehabkost@redhat.com>; Michael S. Tsirkin <mst@redhat.com>; Marcel
+> > Apfelbaum <marcel.apfelbaum@gmail.com>; Anthony Perard
+> > <anthony.perard@citrix.com>; Paolo Bonzini <pbonzini@redhat.com>; Richard
+> > Henderson <rth@twiddle.net>
+> > Subject: RE: [Qemu-block] [PATCH 02/18] xen: introduce new 'XenBus' and
+> > 'XenDevice' object hierarchy
+> > 
+> > > -----Original Message-----
+> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > > Sent: 28 November 2018 16:39
+> > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > Cc: 'Stefano Stabellini' <sstabellini@kernel.org>; qemu-
+> > block@nongnu.org;
+> > > qemu-devel@nongnu.org; xen-devel@lists.xenproject.org; Eduardo Habkost
+> > > <ehabkost@redhat.com>; Michael S. Tsirkin <mst@redhat.com>; Marcel
+> > > Apfelbaum <marcel.apfelbaum@gmail.com>; Anthony Perard
+> > > <anthony.perard@citrix.com>; Paolo Bonzini <pbonzini@redhat.com>;
+> > Richard
+> > > Henderson <rth@twiddle.net>
+> > > Subject: Re: [Qemu-block] [PATCH 02/18] xen: introduce new 'XenBus' and
+> > > 'XenDevice' object hierarchy
+> > >
+> > > Am 28.11.2018 um 17:29 hat Paul Durrant geschrieben:
+> > > > > -----Original Message-----
+> > > > > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> > > > > Sent: 28 November 2018 16:28
+> > > > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > > Cc: 'Kevin Wolf' <kwolf@redhat.com>; qemu-block@nongnu.org; qemu-
+> > > > > devel@nongnu.org; xen-devel@lists.xenproject.org; Stefano Stabellini
+> > > > > <sstabellini@kernel.org>; Eduardo Habkost <ehabkost@redhat.com>;
+> > > Michael
+> > > > > S. Tsirkin <mst@redhat.com>; Marcel Apfelbaum
+> > > > > <marcel.apfelbaum@gmail.com>; Anthony Perard
+> > > <anthony.perard@citrix.com>;
+> > > > > Paolo Bonzini <pbonzini@redhat.com>; Richard Henderson
+> > > <rth@twiddle.net>
+> > > > > Subject: RE: [Qemu-block] [PATCH 02/18] xen: introduce new 'XenBus'
+> > > and
+> > > > > 'XenDevice' object hierarchy
+> > > > >
+> > > > > On Wed, 28 Nov 2018, Paul Durrant wrote:
+> > > > > > > -----Original Message-----
+> > > > > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > > > > > > Sent: 28 November 2018 16:19
+> > > > > > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > > > > Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
+> > > > > > > devel@lists.xenproject.org; Stefano Stabellini
+> > > > > <sstabellini@kernel.org>;
+> > > > > > > Eduardo Habkost <ehabkost@redhat.com>; Michael S. Tsirkin
+> > > > > > > <mst@redhat.com>; Marcel Apfelbaum <marcel.apfelbaum@gmail.com>;
+> > > > > Anthony
+> > > > > > > Perard <anthony.perard@citrix.com>; Paolo Bonzini
+> > > > > <pbonzini@redhat.com>;
+> > > > > > > Richard Henderson <rth@twiddle.net>
+> > > > > > > Subject: Re: [Qemu-block] [PATCH 02/18] xen: introduce new
+> > > 'XenBus'
+> > > > > and
+> > > > > > > 'XenDevice' object hierarchy
+> > > > > > >
+> > > > > > > Am 21.11.2018 um 16:11 hat Paul Durrant geschrieben:
+> > > > > > > > This patch adds the basic boilerplate for a 'XenBus' object
+> > that
+> > > > > will
+> > > > > > > act
+> > > > > > > > as a parent to 'XenDevice' PV backends.
+> > > > > > > > A new 'XenBridge' object is also added to connect XenBus to
+> > the
+> > > > > system
+> > > > > > > bus.
+> > > > > > > >
+> > > > > > > > The XenBus object is instantiated by a new xen_bus_init()
+> > > function
+> > > > > > > called
+> > > > > > > > from the same sites as the legacy xen_be_init() function.
+> > > > > > > >
+> > > > > > > > Subsequent patches will flesh-out the functionality of these
+> > > > > objects.
+> > > > > > > >
+> > > > > > > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > > > > > >
+> > > > > > > > diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+> > > > > > > > new file mode 100644
+> > > > > > > > index 0000000000..dede2d914a
+> > > > > > > > --- /dev/null
+> > > > > > > > +++ b/hw/xen/xen-bus.c
+> > > > > > > > @@ -0,0 +1,125 @@
+> > > > > > > > +/*
+> > > > > > > > + * Copyright (c) Citrix Systems Inc.
+> > > > > > > > + * All rights reserved.
+> > > > > > > > + */
+> > > > > > >
+> > > > > > > This doesn't look very compatible with the GPL. In fact it might
+> > > even
+> > > > > > > make it illegal for the QEMU project to distribute this code. :-
+> > )
+> > > > > > >
+> > > > > > > Other files you add throughout the series seem to have the same
+> > > > > problem.
+> > > > > > >
+> > > > > >
+> > > > > > I was working on the assumption that a lack of explicit license
+> > > meant
+> > > > > that the overall project license as described in item 2 in LICENSE.
+> > > Did I
+> > > > > misinterpret that text?
+> > > > >
+> > > > > It's "All rights reserved." the problem
+> > > >
+> > > > Oh, I see. I'm happy to remove that.
+> > >
+> > > That would be better at least. I'm not sure about files that have a
+> > > copyright header, but no license statement. Do such files exist yet in
+> > > the source tree?
+> > 
+> > Yes, there's quite a few... e.g. (first ones I tripped over)
+> > hw/rdma/rdma_backend.c, hw/virtio/vhost-backend.c, ...
+> 
+> Oh... I see they have a license statement but no boilerplate... is
+> that statement enough?
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- scripts/checkpatch.pl | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Yes, this is good enough.
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index d58fcb1efd..c216c55e01 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -2866,6 +2866,10 @@ sub process {
- 		}
- 	}
-=20
-+	if ($is_patch && $chk_signoff && $signoff =3D=3D 0) {
-+		ERROR("Missing Signed-off-by: line(s)\n");
-+	}
-+
- 	# If we have no input at all, then there is nothing to report on
- 	# so just keep quiet.
- 	if ($#rawlines =3D=3D -1) {
-@@ -2887,9 +2891,6 @@ sub process {
- 	if (!$is_patch) {
- 		ERROR("Does not appear to be a unified-diff format patch\n");
- 	}
--	if ($is_patch && $chk_signoff && $signoff =3D=3D 0) {
--		ERROR("Missing Signed-off-by: line(s)\n");
--	}
-=20
- 	print report_dump();
- 	if ($summary && !($clean =3D=3D 1 && $quiet =3D=3D 1)) {
---=20
-2.19.1
+> > > To be on the safe side, I'd just stick with the
+> > > established practice, which is having a license header in every file.
+> > 
+> > Ok... if that is established practice. It really wasn't clear.
+> > 
+> > >
+> > > By the way, in a later patch you remove the existing license header,
+> > > which is different from the default license (because parts of the source
+> > > file are GPL 2 only). If you can't prove that all such parts (and parts
+> > > derived from them) have been removed, this is also a problem.
+> > >
+> > 
+> > What should I do? I am duplicating xen_disk, and then heavily modifying
+> > it. Should I just leave the old boilerplate in place?
+
+Yes. Feel free to add your own copyright line right below Gerd's, but
+leave the old stuff intact.
+
+Kevin
