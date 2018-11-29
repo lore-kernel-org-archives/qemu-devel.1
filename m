@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gSM57-00005j-Q0
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:10:20 -0500
+	(envelope-from <ccarrara@redhat.com>) id 1gSMCz-0004FA-T1
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:18:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gSM4z-0000SN-R4
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:10:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53822)
+	(envelope-from <ccarrara@redhat.com>) id 1gSMCu-0000bR-Qz
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:18:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48120)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gSM4z-0000RS-Ix
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:10:05 -0500
-Date: Thu, 29 Nov 2018 13:09:55 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181129130955.GG2333@work-vm>
-References: <20181126200435.23408-1-minyard@acm.org>
-	<20181126200435.23408-12-minyard@acm.org>
+	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gSMCr-0000ZE-O1
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:18:14 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ACB08C05B028
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 13:18:06 +0000 (UTC)
+Date: Thu, 29 Nov 2018 11:17:53 -0200
+From: Caio Carrara <ccarrara@redhat.com>
+Message-ID: <20181129131752.GA19233@localhost.localdomain>
+References: <20181121183900.10364-1-wainersm@redhat.com>
+	<20181126125807.GA14485@localhost.localdomain>
+	<cd57c38b-13c2-68b3-b924-b87ce65628d2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20181126200435.23408-12-minyard@acm.org>
-Subject: Re: [Qemu-devel] [PATCH v3 11/16] i2c:smbus_slave: Add an SMBus
- vmstate structure
+In-Reply-To: <cd57c38b-13c2-68b3-b924-b87ce65628d2@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] scripts/qemu.py: allow to launch the VM
+ without a monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +36,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: minyard@acm.org
-Cc: qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, crosa@redhat.com, philmd@redhat.com
 
-* minyard@acm.org (minyard@acm.org) wrote:
-> From: Corey Minyard <cminyard@mvista.com>
-> 
-> There is no vmstate handling for SMBus, so no device sitting on SMBus
-> can have a state transfer that works reliably.  So add it.
-> 
-> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+Hi Wainer,
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Thanks for your reply. I pretty much agreed with most of it. I just
+added a comment about that new method that is not used anywere.
 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hw/i2c/smbus_slave.c         | 18 ++++++++++++++++++
->  include/hw/i2c/smbus_slave.h | 24 +++++++++++++++++++++---
->  2 files changed, 39 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/i2c/smbus_slave.c b/hw/i2c/smbus_slave.c
-> index d03f714608..e839c1dd11 100644
-> --- a/hw/i2c/smbus_slave.c
-> +++ b/hw/i2c/smbus_slave.c
-> @@ -206,6 +206,24 @@ static void smbus_device_class_init(ObjectClass *klass, void *data)
->      sc->send = smbus_i2c_send;
->  }
->  
-> +bool smbus_vmstate_needed(SMBusDevice *dev)
-> +{
-> +    return dev->mode != SMBUS_IDLE;
-> +}
-> +
-> +const VMStateDescription vmstate_smbus_device = {
-> +    .name = TYPE_SMBUS_DEVICE,
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields      = (VMStateField[]) {
-> +        VMSTATE_I2C_SLAVE(i2c, SMBusDevice),
-> +        VMSTATE_INT32(mode, SMBusDevice),
-> +        VMSTATE_INT32(data_len, SMBusDevice),
-> +        VMSTATE_UINT8_ARRAY(data_buf, SMBusDevice, SMBUS_DATA_MAX_LEN),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static const TypeInfo smbus_device_type_info = {
->      .name = TYPE_SMBUS_DEVICE,
->      .parent = TYPE_I2C_SLAVE,
-> diff --git a/include/hw/i2c/smbus_slave.h b/include/hw/i2c/smbus_slave.h
-> index fad2db9c76..78fd45cb51 100644
-> --- a/include/hw/i2c/smbus_slave.h
-> +++ b/include/hw/i2c/smbus_slave.h
-> @@ -75,14 +75,32 @@ typedef struct SMBusDeviceClass
->      void (*transaction_complete)(SMBusDevice *dev);
->  } SMBusDeviceClass;
->  
-> +#define SMBUS_DATA_MAX_LEN 34  /* command + len + 32 bytes of data.  */
-> +
->  struct SMBusDevice {
->      /* The SMBus protocol is implemented on top of I2C.  */
->      I2CSlave i2c;
->  
->      /* Remaining fields for internal use only.  */
-> -    int mode;
-> -    int data_len;
-> -    uint8_t data_buf[34]; /* command + len + 32 bytes of data.  */
-> +    int32_t mode;
-> +    int32_t data_len;
-> +    uint8_t data_buf[SMBUS_DATA_MAX_LEN];
->  };
->  
-> +extern const VMStateDescription vmstate_smbus_device;
-> +
-> +#define VMSTATE_SMBUS_DEVICE(_field, _state) {                       \
-> +    .name       = (stringify(_field)),                               \
-> +    .size       = sizeof(SMBusDevice),                               \
-> +    .vmsd       = &vmstate_smbus_device,                             \
-> +    .flags      = VMS_STRUCT,                                        \
-> +    .offset     = vmstate_offset_value(_state, _field, SMBusDevice), \
-> +}
-> +
-> +/*
-> + * Users should call this in their .needed functions to know if the
-> + * SMBus slave data needs to be transferred.
-> + */
-> +bool smbus_vmstate_needed(SMBusDevice *dev);
-> +
->  #endif
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+On Thu, Nov 29, 2018 at 10:45:33AM -0200, Wainer dos Santos Moschetta wro=
+te:
+>=20
+> On 11/26/2018 10:58 AM, Caio Carrara wrote:
+> > On Wed, Nov 21, 2018 at 01:39:00PM -0500, Wainer dos Santos Moschetta=
+ wrote:
+> > > QEMUMachine launches the VM with a monitor enabled, afterwards
+> > > a qmp connection is attempted on _post_launch(). In case
+> > > the QEMU process exits with an error, qmp.accept() reaches
+> > > timeout and raises an exception.
+> > >=20
+> > > But sometimes you don't need that monitor. As an example,
+> > > when a test launches the VM expects its immediate crash,
+> > > and only intend to check the process's return code. In this
+> > > case the fact that launch() tries to establish the qmp
+> > > connection (ending up in an exception) is troublesome.
+> > >=20
+> > > So this patch adds the set_qmp_monitor() that allow to
+> > > launch the VM without creating the monitor machinery. The
+> > > method can be used to re-enable the monitor eventually.
+> > >=20
+> > > Tested this change with the following Avocado test:
+> > >=20
+> > > from avocado_qemu import Test
+> > >=20
+> > > class DisableQmp(Test):
+> > I think it would be fine to have this test added as a real test inste=
+ad
+> > of just let this here on commit message. Or at least we should have a
+> > real use case that uses this new feature.
+>=20
+> Currently we don't have a proper place to put tests for scripts/qemu.py=
+, but
+> [1] opens the opportunity to create a self-test structure for the
+> avocado_qemu API. For now I suggest to keep that (self)test just on the
+> commit message.
+>=20
+> The feature I am introducing on this patch could have used on [2], so t=
+hat
+> it wouldn't need to call the qemu binary directly. I'm not changing tha=
+t
+> test on this patch because it was not merged into master yet, so I don'=
+t
+> know exactly how it could be done.
+>=20
+> [1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg576435.html
+> [2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg572744.html
+>=20
+> >=20
+> > >      """
+> > >      :avocado: enable
+> > >      """
+> > >      def test(self):
+> > >          self.vm.add_args('--foobar')
+> > >          self.vm.set_qmp_monitor(disabled=3DTrue)
+> > >          self.vm.launch()
+> > >          self.vm.wait()
+> > >          self.assertEqual(self.vm.exitcode(), 1)
+> > >          self.vm.shutdown()
+> > >=20
+> > >          self.vm.set_qmp_monitor(disabled=3DFalse)
+> > >          self.vm._args.remove('--foobar') # Hack
+> > >          self.vm.launch()
+> > >          res =3D self.vm.command('human-monitor-command',
+> > >                                command_line=3D'info version')
+> > >          self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
+> > >=20
+> > > Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> > > Reviewed-by: Caio Carrara <ccarrara@redhat.com>
+> > > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > ---
+> > > Changes in v2:
+> > >    * Major refactor: replaced disable_qmp() with set_qmp_monitor()
+> > >      that allow to disable the qmp monitor likewise, but also one c=
+an
+> > >      re-enable it (set_qmp_monitor(disabled=3DFalse)).
+> > >    * The logic to enabled/disable the monitor is back to
+> > >      _base_args(). [ccarrara, ehabkost]
+> > > ---
+> > >   scripts/qemu.py | 72 ++++++++++++++++++++++++++++++++------------=
+-----
+> > >   1 file changed, 48 insertions(+), 24 deletions(-)
+> > >=20
+> > > diff --git a/scripts/qemu.py b/scripts/qemu.py
+> > > index 6e3b0e6771..54fe0e65d2 100644
+> > > --- a/scripts/qemu.py
+> > > +++ b/scripts/qemu.py
+> > > @@ -115,6 +115,7 @@ class QEMUMachine(object):
+> > >           self._events =3D []
+> > >           self._iolog =3D None
+> > >           self._socket_scm_helper =3D socket_scm_helper
+[...]
+> > >       def _post_launch(self):
+> > > -        self._qmp.accept()
+> > > +        if self._qmp:
+> > > +            self._qmp.accept()
+> > >       def _post_shutdown(self):
+> > >           if self._qemu_log_file is not None:
+> > > @@ -325,7 +328,8 @@ class QEMUMachine(object):
+> > >           Wait for the VM to power off
+> > >           """
+> > >           self._popen.wait()
+> > > -        self._qmp.close()
+> > > +        if self._qmp:
+> > Isn't the self._with_qmp attribute that should be used here? I think
+> > it's important to standardize the checks for qmp availability in
+> > `with_qmp` attribute and use the `qmp` only for qmp access itself. Th=
+ere
+> > are other places that uses qmp to this kind of check too.
+>=20
+> Checking self._qmp has same result as self._with_qmp given that self._q=
+mp
+> object is only created with qmp enabled. But I agree with you that for =
+the
+> sake of readability it would be better to check with self._with_qmp.=A0=
+ I will
+> send a v2.
+>=20
+> >=20
+> > > +            self._qmp.close()
+> > >           self._load_io_log()
+> > >           self._post_shutdown()
+> > > @@ -334,11 +338,14 @@ class QEMUMachine(object):
+> > >           Terminate the VM and clean up
+> > >           """
+> > >           if self.is_running():
+> > > -            try:
+> > > -                self._qmp.cmd('quit')
+> > > -                self._qmp.close()
+> > > -            except:
+> > > -                self._popen.kill()
+> > > +            if self._qmp:
+> > > +                try:
+> > > +                    self._qmp.cmd('quit')
+> > > +                    self._qmp.close()
+> > > +                except:
+> > > +                    self._popen.kill()
+> > > +            else:
+> > > +                self._popen.terminate()
+> > >               self._popen.wait()
+> > >           self._load_io_log()
+> > > @@ -355,6 +362,23 @@ class QEMUMachine(object):
+> > >           self._launched =3D False
+> > > +    def set_qmp_monitor(self, disabled=3DFalse, monitor_address=3D=
+None):
+> > Where is this new method being used?
+>=20
+> It's not used yet, but we will need this on some type of tests (e.g. la=
+unch
+> the VM and expect an immediate crash) very often. I mentioned above one=
+ test
+> that I could have used it already.
+
+As you mentioned, for the sake of keeping this patch as simple as
+possible and also reduce the amount of unused code in the repository, I
+would suggest you to only send this new method with a patch that
+actually use it.
+
+>=20
+> > .
+> >=20
+> > > +        """
+> > > +        Set the QMP monitor.
+> > > +
+> > > +        @param disabled: if True, qmp monitor options will be remo=
+ved from the
+> > > +                         base arguments of the resulting QEMU comm=
+and line.
+> > > +        @param monitor_address: address for the QMP monitor.
+> > > +        @note: call this function before launch().
+> > > +        """
+> > > +        if disabled:
+> > > +            self._with_qmp =3D False
+> > > +            self._qmp =3D None
+> > > +        else:
+> > > +            self._with_qmp =3D True
+> > > +            if monitor_address:
+> > > +                self._monitor_address =3D monitor_address
+> > > +
+> > >       def qmp(self, cmd, conv_keys=3DTrue, **args):
+> > >           """
+> > >           Invoke a QMP command and return the response dict
+> > > --=20
+> > > 2.19.1
+> > >=20
+> > It would be nice see less scattered checks for qmp availability along
+> > the code.
+>=20
+> I agree. It will need a major refactor on scripts/qemu.py though. I wan=
+t to
+> keep this patch=A0 as simple as possible so that it can be used on the =
+ongoing
+> tests implementation.
+>=20
+> Thanks for the review!
+>=20
+> - Wainer
+>=20
+>=20
+> >=20
+> > Thanks.
+>=20
+
+Thanks,
+--=20
+Caio Carrara
+Software Engineer, Virt Team - Red Hat
+ccarrara@redhat.com
