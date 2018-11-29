@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gSR60-00073t-V7
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:31:31 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gSR9Y-0000XF-00
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:35:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gSR5w-00022L-P8
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:31:28 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46372)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gSR5w-00021h-Gm
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:31:24 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gSR5t-0000lh-Mz
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 18:31:21 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9E8952E807B
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 18:31:21 +0000 (UTC)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gSR9U-0003A2-FH
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:35:07 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:39845
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1gSR9U-00039V-45
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:35:04 -0500
+References: <1543442171-24863-1-git-send-email-linux@roeck-us.net>
+	<1543442171-24863-2-git-send-email-linux@roeck-us.net>
+	<3d1287e7-29c1-dbb1-c0f9-273b7b31645c@redhat.com>
+	<734e8388-2f0f-1c5b-7767-29e43d261bcb@ilande.co.uk>
+	<20181129173845.GA2929@roeck-us.net>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <be4173c3-353b-1bd7-b937-b0d39a7bba26@ilande.co.uk>
+Date: Thu, 29 Nov 2018 18:34:54 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 29 Nov 2018 18:18:56 -0000
-From: inactive <1802684@bugs.launchpad.net>
-Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
-	<154350222438.511.11449221962274356299.malone@wampee.canonical.com>
-Message-Id: <CABsm=W0gAdtWst+6MHm5W7JfJRWns3QUgzhHbn5gWWTYKdWpsA@mail.gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
+In-Reply-To: <20181129173845.GA2929@roeck-us.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] scsi: esp: Improve consistency of
+ RSTAT, RSEQ, and RINTR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,149 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-I tried building the latest git master and get weird results - it seems to
-work, at least not crashing with any checks that were there before (built
-using plain cocoa ui, no sdl or gtk). I will check back at the original
-master that caused me issues and report.
-On Thu, 29 Nov 2018 at 16:46, Peter Maydell <peter.maydell@linaro.org>
-wrote:
+On 29/11/2018 17:38, Guenter Roeck wrote:
 
-> I've had a report from another user that the OSX GUI code works fine for
-> them on Mojave, so maybe the problem you're running into here is more
-> specific than just "doesn't work on this OS". That backtrace might help
-> in narrowing down what is different for you.
->
-> --
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1802684
->
-> Title:
->   QEMU gui crashes on macOS Mojave
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1802684/+subscriptions
->
+> Can you try the attached patch ? It is a bit cleaner than the first version,
+> and works for me as well.
+> 
+> Note that this isn't perfect. Specifically, I see differences in handling
+> STAT_TC. The controller specification is a bit ambiguous in that regard,
+> but comparing the qemu code with real controller behavior shows that the
+> real controller does not reset STAT_TC when reading the interrupt status
+> register. That doesn't seem to matter for Linux, but it may influence
+> other guests.
 
--- =
+I've now completed a boot test of all my SPARC32 OpenBIOS CDROM images with this
+patch, and whilst it doesn't solve my NextSTEP issue, I don't see any obvious
+regressions.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1802684
+Note that NetBSD SPARC32 tends to spit out the occasional "!TC on data xfer" message
+to the console during periods of disk access, however that is something that has
+always happened and isn't something new introduced by this patch.
 
-Title:
-  QEMU gui crashes on macOS Mojave
 
-Status in QEMU:
-  New
+ATB,
 
-Bug description:
-  QEMU release 3.0.0 as well as a recent head build
-
-  /usr/local/Cellar/qemu/HEAD-03c1ca1 (147 files, 257.2MB)
-    Built from source on 2018-11-06 at 13:41:32 with: --with-gtk+3 --with-s=
-dl2 --with-libusb
-  /usr/local/Cellar/qemu/3.0.0 (137 files, 261.6MB) *
-    Poured from bottle on 2018-11-10 at 22:58:32 with: --with-gtk+3 --with-=
-libusb --with-sdl2
-
-  Crashes when attempting to use any gui interface (tried SDL and
-  default Cocoa):
-
-  2018-11-10 22:58:41.799 qemu-system-aarch64[42982:1102466] *** Terminatin=
-g app due to uncaught exception 'NSInternalInconsistencyException', reason:=
- 'NSWindow drag regions should only be invalidated on the Main Thread!'
-  *** First throw call stack:
-  (
-  	0   CoreFoundation                      0x00007fff3ea96ecd __exceptionPr=
-eprocess + 256
-  	1   libobjc.A.dylib                     0x00007fff6ab49720 objc_exceptio=
-n_throw + 48
-  	2   CoreFoundation                      0x00007fff3eab095d -[NSException=
- raise] + 9
-  	3   AppKit                              0x00007fff3bfb13fa -[NSWindow(NS=
-Window_Theme) _postWindowNeedsToResetDragMarginsUnlessPostingDisabled] + 324
-  	4   AppKit                              0x00007fff3bfb6850 -[NSView setF=
-rameSize:] + 2082
-  	5   AppKit                              0x00007fff3c02747d -[NSVisualEff=
-ectView setFrameSize:] + 171
-  	6   AppKit                              0x00007fff3c0811b1 -[NSTitlebarV=
-iew setFrameSize:] + 84
-  	7   AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	8   AppKit                              0x00007fff3c081154 -[NSTitlebarV=
-iew resizeWithOldSuperviewSize:] + 100
-  	9   AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	10  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	11  AppKit                              0x00007fff3c9773c0 -[NSTitlebarC=
-ontainerView setFrameSize:] + 142
-  	12  AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	13  AppKit                              0x00007fff3bfbcdb5 -[NSView resi=
-zeWithOldSuperviewSize:] + 776
-  	14  AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	15  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	16  AppKit                              0x00007fff3c024570 -[NSThemeFram=
-e setFrameSize:] + 495
-  	17  AppKit                              0x00007fff3c011223 -[NSWindow _s=
-etFrame:updateBorderViewSize:] + 966
-  	18  AppKit                              0x00007fff3c010b46 -[NSWindow _o=
-ldPlaceWindow:] + 547
-  	19  AppKit                              0x00007fff3c010151 -[NSWindow _s=
-etFrameCommon:display:stashSize:] + 3006
-  	20  AppKit                              0x00007fff3c00f57d -[NSWindow _s=
-etFrame:display:allowImplicitAnimation:stashSize:] + 192
-  	21  AppKit                              0x00007fff3c019ff8 -[NSWindow se=
-tFrame:display:animate:] + 567
-  	22  qemu-system-aarch64                 0x000000010b7b2abf qemu-system-a=
-arch64 + 3668671
-  	23  qemu-system-aarch64                 0x000000010b7b6356 qemu-system-a=
-arch64 + 3683158
-  	24  qemu-system-aarch64                 0x000000010b7ad836 qemu-system-a=
-arch64 + 3647542
-  	25  qemu-system-aarch64                 0x000000010b4ce769 qemu-system-a=
-arch64 + 636777
-  	26  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	27  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	28  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	29  qemu-system-aarch64                 0x000000010b4414aa qemu-system-a=
-arch64 + 58538
-  	30  qemu-system-aarch64                 0x000000010b4f78c3 qemu-system-a=
-arch64 + 805059
-  	31  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	32  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	33  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	34  qemu-system-aarch64                 0x000000010b4b8f57 qemu-system-a=
-arch64 + 548695
-  	35  qemu-system-aarch64                 0x000000010b49c3af qemu-system-a=
-arch64 + 431023
-  	36  ???                                 0x00000001117891f3 0x0 + 4588081=
-651
-  )
-  libc++abi.dylib: terminating with uncaught exception of type NSException
-  fish: 'qemu-system-aarch64 -M raspi3 -=E2=80=A6' terminated by signal SIG=
-ABRT (Abort)
-
-  =
-
-  macOS Mojave 10.14.2 Beta (18C38b)
-  Qemu in the same configuration used to work in High Sierra, started crash=
-ing only after upgrade to Mojave.
-
-  Command line:
-  `qemu-system-aarch64 -M raspi3 -d in_asm -serial stdio -kernel $1.bin`
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1802684/+subscriptions
+Mark.
