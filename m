@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1gSDBf-0002Ln-G5
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 22:40:24 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1gSDEy-0004ji-Ui
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 22:43:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1gSDBc-0002Jv-8N
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 22:40:23 -0500
-Message-ID: <39eb027df3340121ba9877e689e4d0a2747c5e43.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Thu, 29 Nov 2018 14:39:55 +1100
-In-Reply-To: <20181129004718.GJ2251@umbus.fritz.box>
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-9-clg@kaod.org>
-	<20181127234956.GR2251@umbus.fritz.box>
-	<c16b55c5-8144-82bc-37f7-70427c6460a4@kaod.org>
-	<20181129004718.GJ2251@umbus.fritz.box>
+	(envelope-from <liq3ea@gmail.com>) id 1gSDEx-0005tC-UM
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 22:43:48 -0500
+MIME-Version: 1.0
+References: <20181129031230.31082-1-jasowang@redhat.com>
+	<20181129031230.31082-2-jasowang@redhat.com>
+In-Reply-To: <20181129031230.31082-2-jasowang@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 29 Nov 2018 11:43:10 +0800
+Message-ID: <CAKXe6SLMOoMD3s_G9f7W0EiwOXM=LmUTWXGrae1p29A_tUqHzA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 08/36] ppc/xive: introduce a simplified
- XIVE presenter
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for 3.1 1/4] net: drop too large packet
+ early
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,23 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, mst@redhat.com, P J P <ppandit@redhat.com>, =?UTF-8?B?5p2O5by6?= <liq3ea@163.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
 
-On Thu, 2018-11-29 at 11:47 +1100, David Gibson wrote:
-> 
-> 1) read/write accessors which take a word number
-> 
-> 2) A "get" accessor which copies the whole structure, but "write"
-> accessor which takes a word number.  The asymmetry is a bit ugly, but
-> it's the non-atomic writeback of the whole structure which I'm most
-> uncomfortable with.
+Jason Wang <jasowang@redhat.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=8829=E6=97=
+=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=8811:12=E5=86=99=E9=81=93=EF=BC=9A
 
-It shouldn't be a big deal though, there are HW facilities to access
-the structures "atomically" anyway, due to the caching done by the
-XIVE.
+> We try to detect and drop too large packet (>INT_MAX) in 1592a9947036
+> ("net: ignore packet size greater than INT_MAX") during packet
+> delivering. Unfortunately, this is not sufficient as we may hit
+> another integer overflow when trying to queue such large packet in
+> qemu_net_queue_append_iov():
+>
+> - size of the allocation may overflow on 32bit
+> - packet->size is integer which may overflow even on 64bit
+>
+> Fixing this by move the check to qemu_sendv_packet_async() which is
+> the entrance of all networking codes and reduce the limit to
+> NET_BUFSIZE to be more conservative.
+>
+> Cc: qemu-stable@nongnu.org
+> Cc: Li Qiang <liq3ea@163.com>
+> Reported-by: Li Qiang <liq3ea@gmail.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>
 
-> 3) A map/unmap interface which gives you / releases a pointer to the
-> "live" structure.  For powernv that would become
-> address_space_map()/unmap().  For PAPR it would just be reutn pointer
-> / no-op.
+Looks ok to me.
+
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+
+
+> ---
+>  net/net.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+>
+> diff --git a/net/net.c b/net/net.c
+> index 07c194a8f6..affe1877cf 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -712,15 +712,11 @@ ssize_t qemu_deliver_packet_iov(NetClientState
+> *sender,
+>                                  void *opaque)
+>  {
+>      NetClientState *nc =3D opaque;
+> -    size_t size =3D iov_size(iov, iovcnt);
+>      int ret;
+>
+> -    if (size > INT_MAX) {
+> -        return size;
+> -    }
+>
+>      if (nc->link_down) {
+> -        return size;
+> +        return iov_size(iov, iovcnt);
+>      }
+>
+>      if (nc->receive_disabled) {
+> @@ -745,10 +741,15 @@ ssize_t qemu_sendv_packet_async(NetClientState
+> *sender,
+>                                  NetPacketSent *sent_cb)
+>  {
+>      NetQueue *queue;
+> +    size_t size =3D iov_size(iov, iovcnt);
+>      int ret;
+>
+> +    if (size > NET_BUFSIZE) {
+> +        return size;
+> +    }
+> +
+>      if (sender->link_down || !sender->peer) {
+> -        return iov_size(iov, iovcnt);
+> +        return size;
+>      }
+>
+>      /* Let filters handle the packet first */
+> --
+> 2.17.1
+>
+>
