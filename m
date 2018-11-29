@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gSFAs-0005F5-Uq
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 00:47:45 -0500
+	(envelope-from <thuth@redhat.com>) id 1gSFcg-0000C3-PZ
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 01:16:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gSFAm-0007r8-Eb
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 00:47:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36414)
+	(envelope-from <thuth@redhat.com>) id 1gSFcb-0001R9-P3
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 01:16:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:24269)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gSFAi-0007aK-IT
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 00:47:34 -0500
-Date: Thu, 29 Nov 2018 13:47:22 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181129054722.GD29246@xz-x1>
-References: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
-	<1542276484-25508-6-git-send-email-wei.w.wang@intel.com>
-	<20181127073802.GC3205@xz-x1> <5BFD1BA4.5040202@intel.com>
-	<20181128052655.GC12839@xz-x1> <5BFE596B.1080807@intel.com>
-	<20181128093220.GF12839@xz-x1> <5BFF5FC9.2020402@intel.com>
-	<20181129051014.GC29246@xz-x1>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gSFcb-0001KH-6W
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 01:16:21 -0500
+References: <20181129031230.31082-1-jasowang@redhat.com>
+	<20181129031230.31082-4-jasowang@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fd21ea2f-0e8b-5b1b-929d-8bd1f96eed4c@redhat.com>
+Date: Thu, 29 Nov 2018 07:16:10 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181129031230.31082-4-jasowang@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181129051014.GC29246@xz-x1>
-Subject: Re: [Qemu-devel] [PATCH v9 5/8] migration/ram.c: add a notifier
- chain for precopy
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for 3.1 3/4] virtio-net-test: accept
+ variable length argument in pci_test_start()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,196 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, quintela@redhat.com, liliang.opensource@gmail.com, mst@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, pbonzini@redhat.com, nilal@redhat.com
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: mst@redhat.com, liq3ea@163.com, liq3ea@gmail.com, ppandit@redhat.com, pbonzini@redhat.com
 
-On Thu, Nov 29, 2018 at 01:10:14PM +0800, Peter Xu wrote:
-> On Thu, Nov 29, 2018 at 11:40:57AM +0800, Wei Wang wrote:
-> > On 11/28/2018 05:32 PM, Peter Xu wrote:
-> > > 
-> > > So what I am worrying here are corner cases where we might forget to
-> > > stop the hinting.  I'm fabricating one example sequence of events:
-> > > 
-> > >    (start migration)
-> > >    START_MIGRATION
-> > >    BEFORE_SYNC
-> > >    AFTER_SYNC
-> > >    ...
-> > >    BEFORE_SYNC
-> > >    AFTER_SYNC
-> > >    (some SaveStateEntry failed rather than RAM, then
-> > >     migration_detect_error returned MIG_THR_ERR_FATAL so we need to
-> > >     fail the migration, however when running the previous
-> > >     ram_save_iterate for RAM's specific SaveStateEntry we didn't see
-> > >     any error so no ERROR event detected)
-> > > 
-> > > Then it seems the hinting will last forever.  Considering that now I'm
-> > > not sure whether this can be done ram-only, since even if you capture
-> > > ram_save_complete() and at the same time you introduce PRECOPY_END you
-> > > may still miss the PRECOPY_END event since AFAIU ram_save_complete()
-> > > won't be called at all in this case.
-> > > 
-> > > Could this happen?
-> > 
-> > Thanks, indeed this case could happen if we add PRECOPY_END in
-> > ram_save_complete.
-> > 
-> > How about putting PRECOPY_END in ram_save_cleanup?
-> > I think it would be called in any case.
+On 2018-11-29 04:12, Jason Wang wrote:
+> This allows flexibility to be reused for all kinds of command line
+> used by other tests.
 > 
-> Sounds good.
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  tests/virtio-net-test.c | 17 +++++++++++------
+>  1 file changed, 11 insertions(+), 6 deletions(-)
 > 
-> > 
-> > I'm also thinking probably we don't need PRECOPY_ERR when we have
-> > PRECOPY_END,
-> > and what do you think of the notifier names below:
-> > 
-> > +typedef enum PrecopyNotifyReason {
-> > +    PRECOPY_NOTIFY_RAM_SAVE_END = 0,
-> > +    PRECOPY_NOTIFY_RAM_SAVE_START = 1,
-> > +    PRECOPY_NOTIFY_RAM_SAVE_BEFORE_SYNC_BITMAP = 2,
-> > +    PRECOPY_NOTIFY_RAM_SAVE_AFTER_SYNC_BITMAP = 3,
-> > +    PRECOPY_NOTIFY_RAM_SAVE_MAX = 4,
-> > +} PrecopyNotifyReason;
-> 
-> (please see below [1]...)
-> 
-> > 
-> > 
-> > > 
-> > > > 
-> > > > > [1]
-> > > > > 
-> > > > > > > Another thing to mention about the "reasons" (though I see it more
-> > > > > > > like "events"): have you thought about adding a PRECOPY_NOTIFY_END?
-> > > > > > > It might help in some cases:
-> > > > > > > 
-> > > > > > >      - then you don't need to trickily export the migrate_postcopy()
-> > > > > > >        since you'll notify that before postcopy starts
-> > > > > > I'm thinking probably we don't need to export migrate_postcopy even now.
-> > > > > > It's more like a sanity check, and not needed because now we have the
-> > > > > > notifier registered to the precopy specific callchain, which has ensured
-> > > > > > that
-> > > > > > it is invoked via precopy.
-> > > > > But postcopy will always start with precopy, no?
-> > > > Yes, but I think we could add the check in precopy_notify()
-> > > I'm not sure that's good.  If the notifier could potentially have
-> > > other user, they might still work with postcopy, and they might expect
-> > > e.g. BEFORE_SYNC to be called for every sync, even if it's at the
-> > > precopy stage of a postcopy.
-> > 
-> > I think this precopy notifier callchain is expected to be used only for
-> > the precopy mode. Postcopy has its dedicated notifier callchain that
-> > users could use.
-> > 
-> > How about changing the migrate_postcopy() check to "ms->start_postcopy":
-> > 
-> > bool migration_postcopy_start(void)
-> > {
-> >     MigrationState *s;
-> > 
-> >     s = migrate_get_current();
-> > 
-> >     return atomic_read(&s->start_postcopy);
-> > }
-> > 
-> > 
-> > static void precopy_notify(PrecopyNotifyReason reason)
-> > {
-> >     if (migration_postcopy_start())
-> >         return;
-> > 
-> >     notifier_list_notify(&precopy_notifier_list, &reason);
-> > }
-> > 
-> > If postcopy started with precopy, the precopy optimization feature
-> > could still be used until it switches to the postcopy mode.
-> 
-> I'm not sure we can use start_postcopy.  It's a variable being set in
-> the QMP handler but it does not mean postcopy has started.  I'm afraid
-> there can be race where it's still precopy but the variable is set so
-> event could be missed...
-> 
-> IMHO the problem is not that complicated.  How about this proposal:
-> 
-> [1]
-> 
->   typedef enum PrecopyNotifyReason {
->     PRECOPY_NOTIFY_RAM_START,
->     PRECOPY_NOTIFY_RAM_BEFORE_SYNC,
->     PRECOPY_NOTIFY_RAM_AFTER_SYNC,
->     PRECOPY_NOTIFY_COMPLETE,
->     PRECOPY_NOTIFY_RAM_CLEANUP,
->   };
-> 
-> The first three keep the same as your old ones.  Notify RAM_CLEANUP in
-> ram_save_cleanup() to make sure it'll always be cleaned up (the same
-> as PRECOPY_END, just another name).  Notify COMPLETE in
-> qemu_savevm_state_complete_precopy() to show that precopy is
-> completed.  Meanwhile on balloon side you should stop the hinting for
-> either RAM_CLEANUP or COMPLETE event.  Then either:
-> 
->   - precopy is switching to postcopy, or
->   - precopy completed, or
->   - precopy failed/cancelled
-> 
-> You should always get at least a notification to stop the balloon.
-> Though you could also get one RAM_CLEANUP after one COMPLETE, but
-> the balloon should easily handle it (stop the hinting twice).
-> 
-> Here maybe you can even remove the "RAM_" in both RAM_START and
-> RAM_CLEANUP if we're going to have COMPLETE since after all it'll be
-> not only limited to RAM.
-
-Oh maybe we can remove all the RAM_ prefix to make it precopy
-general...
-
-  typedef enum PrecopyNotifyReason {
-    PRECOPY_NOTIFY_SETUP,
-    PRECOPY_NOTIFY_BEFORE_SYNC,
-    PRECOPY_NOTIFY_AFTER_SYNC,
-    PRECOPY_NOTIFY_COMPLETE,
-    PRECOPY_NOTIFY_CLEANUP,
-  };
-
-Then we can just hook everything with the corresponding names:
-
-  SETUP:    hooks with qemu_savevm_state_setup
-  COMPLETE: hooks with qemu_savevm_state_complete_precopy
-  CLEANUP:  hooks with qemu_savevm_state_cleanup
-
-I'm not sure whether you'll need another hook in ram_state_reset in
-the future but for now I don't see it necessary since I don't thnk
-ram_list.version would change during migration for now, so
-ram_state_reset should only be called during setup.
-
-> 
-> Another suggestion is that you can add an Error into the notify hooks,
-> please refer to the postcopy one:
-> 
->   int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp);
-> 
-> So the hook functions have a way to even stop the migration (though
-> for balloon hinting it'll be always optional so no error should be
-> reported...), then the two interfaces are matched.
-> 
-> > 
-> > 
-> > 
-> > > In that sense I still feel the
-> > > PRECOPY_END is better (so contantly call it at the end of precopy, no
-> > > matter whether there's another postcopy afterwards).  It sounds like a
-> > > cleaner interface.
-> > 
-> > Probably I still haven't got the point how PRECOPY_END could help above yet.
-> 
-> Please have a look at above proposal.  Thanks,
-> 
-> -- 
-> Peter Xu
+> diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
+> index 231e7c767e..33d26ab079 100644
+> --- a/tests/virtio-net-test.c
+> +++ b/tests/virtio-net-test.c
+> @@ -51,17 +51,20 @@ static QVirtioPCIDevice *virtio_net_pci_init(QPCIBus *bus, int slot)
+>      return dev;
+>  }
+>  
+> -static QOSState *pci_test_start(int socket)
+> +static QOSState *pci_test_start(const char *cmd, ...)
+>  {
+>      QOSState *qs;
+> +    va_list ap;
+>      const char *arch = qtest_get_arch();
+> -    const char *cmd = "-netdev socket,fd=%d,id=hs0 -device "
+> -                      "virtio-net-pci,netdev=hs0";
+>  
+>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+> -        qs = qtest_pc_boot(cmd, socket);
+> +        va_start(ap, cmd);
+> +        qs = qtest_pc_vboot(cmd, ap);
+> +        va_end(ap);
+>      } else if (strcmp(arch, "ppc64") == 0) {
+> -        qs = qtest_spapr_boot(cmd, socket);
+> +        va_start(ap, cmd);
+> +        qs = qtest_spapr_vboot(cmd, ap);
+> +        va_end(ap);
+>      } else {
+>          g_printerr("virtio-net tests are only available on x86 or ppc64\n");
+>          exit(EXIT_FAILURE);
+> @@ -218,11 +221,13 @@ static void pci_basic(gconstpointer data)
+>                    QVirtQueue *tvq,
+>                    int socket) = data;
+>      int sv[2], ret;
+> +    const char *cmd = "-netdev socket,fd=%d,id=hs0 -device "
+> +                      "virtio-net-pci,netdev=hs0";
+>  
+>      ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
+>      g_assert_cmpint(ret, !=, -1);
+>  
+> -    qs = pci_test_start(sv[1]);
+> +    qs = pci_test_start(cmd, sv[1]);
+>      dev = virtio_net_pci_init(qs->pcibus, PCI_SLOT);
+>  
+>      rx = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
 > 
 
-Regards,
-
--- 
-Peter Xu
+Reviewed-by: Thomas Huth <thuth@redhat.com>
