@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gSJ4Z-0008Mq-S3
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:57:28 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gSJ5R-0000Tg-Vd
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:58:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gSJ4W-0000Cn-Mq
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:57:27 -0500
-Received: from mta-01.yadro.com ([89.207.88.251]:48116)
+	(envelope-from <pbonzini@redhat.com>) id 1gSJ5O-0000aC-RQ
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:58:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38880)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
-	id 1gSJ4V-0000BT-KC
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:57:24 -0500
-Date: Thu, 29 Nov 2018 12:57:16 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-ID: <20181129095716.fvkr6cv6ltjcvccy@SPB-NB-133.local>
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-42-cota@braap.org>
-	<20181127124352.ll6quqc5xedvdqht@MacBook-Pro-Roman.local>
-	<20181127231357.GA19764@flamenco>
-	<20181128104330.qkqnfttswihjur6g@MacBook-Pro-Roman.local>
-	<20181128172332.GA16387@flamenco>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gSJ5O-0000Zr-Jx
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:58:18 -0500
+References: <1543442171-24863-1-git-send-email-linux@roeck-us.net>
+	<1543442171-24863-2-git-send-email-linux@roeck-us.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3d1287e7-29c1-dbb1-c0f9-273b7b31645c@redhat.com>
+Date: Thu, 29 Nov 2018 10:58:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20181128172332.GA16387@flamenco>
-Subject: Re: [Qemu-devel] [RFC 41/48] configure: add --enable-plugins
+In-Reply-To: <1543442171-24863-2-git-send-email-linux@roeck-us.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] scsi: esp: Improve consistency of
+ RSTAT, RSEQ, and RINTR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,121 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, =?utf-8?B?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Nov 28, 2018 at 12:23:32PM -0500, Emilio G. Cota wrote:
-> On Wed, Nov 28, 2018 at 13:43:30 +0300, Roman Bolshakov wrote:
-> > qemu-ga fails to link because it doesn't have symbols declared in
-> > qemu-plugins-ld64.symbols. Perhaps "-Wl,-exported_symbols_list" should
-> > be applied only to qemu-system?
-> 
-> I just pushed to the same github branch the appended fixup.
-> The idea is to only add the linker flags when the output
-> binary links plugin.o.
-> 
-> Can you please test?
-> 
-> Thanks,
-> 
-> 		Emilio
-> 
-> ---
-> commit 8f45416b79765b66e5ce0fca7db93b97bbcfcfbb
-> Author: Emilio G. Cota <cota@braap.org>
-> Date:   Wed Nov 28 12:11:23 2018 -0500
-> 
->     configure: ld64 fixup
->     
->     And copy the file to the build dir also for !ld64.
->     
->     Signed-off-by: Emilio G. Cota <cota@braap.org>
-> 
-> diff --git a/Makefile.target b/Makefile.target
-> index 719699696d..7ea17d71cb 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -107,7 +107,23 @@ obj-y += target/$(TARGET_BASE_ARCH)/
->  obj-y += disas.o
->  obj-$(call notempty,$(TARGET_XML_FILES)) += gdbstub-xml.o
->  
-> -obj-$(CONFIG_PLUGINS) += plugin.o
-> +ifdef CONFIG_PLUGINS
-> +obj-y += plugin.o
-> +# Abuse -libs suffix to only link with --dynamic-list/-exported_symbols_list
-> +# when the final binary includes the plugin object.
-> +#
-> +# Note that simply setting LDFLAGS is not enough: we build binaries that
-> +# never link plugin.o, and the linker might fail (at least ld64 does)
-> +# if the symbols in the list are not in the output binary.
-> + ifdef CONFIG_HAS_LD_DYNAMIC_LIST
-> + plugin.o-libs := -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
-> + else
-> +  ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
-> +  plugin.o-libs := \
-> +	-Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
-> +  endif
-> + endif
-> +endif
->  
->  #########################################################
->  # Linux user emulator target
-> diff --git a/configure b/configure
-> index 3dc9c9697b..395acf831e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5185,7 +5185,7 @@ fi
->  # See if -exported_symbols_list is supported by the linker
->  
->  cat > $TMPTXT <<EOF
-> -  foo
-> +  _foo
->  EOF
->  
->  ld_exported_symbols_list="no"
-> @@ -6843,13 +6843,17 @@ fi
->  if test "$plugins" = "yes" ; then
->      echo "CONFIG_PLUGINS=y" >> $config_host_mak
->      LIBS="-ldl $LIBS"
-> +    # Copy the export object list to the build dir
->      if test "$ld_dynamic_list" = "yes" ; then
-> -	LDFLAGS="-Wl,--dynamic-list=\$(SRC_PATH)/qemu-plugins.symbols $LDFLAGS"
-> +	echo "CONFIG_HAS_LD_DYNAMIC_LIST=yes" >> $config_host_mak
-> +	ld_symbols=qemu-plugins-ld.symbols
-> +	cp "$source_path/qemu-plugins.symbols" $ld_symbols
->      elif test "$ld_exported_symbols_list" = "yes" ; then
-> +	echo "CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST=yes" >> $config_host_mak
->  	ld64_symbols=qemu-plugins-ld64.symbols
->  	echo "# Automatically generated by configure - do not modify" > $ld64_symbols
-> -	cat "$source_path/qemu-plugins.symbols" | grep qemu_ | sed 's/;//g' >> $ld64_symbols
-> -	LDFLAGS="-Wl,-exported_symbols_list,\$(BUILD_DIR)/$ld64_symbols $LDFLAGS"
-> +	grep 'qemu_' "$source_path/qemu-plugins.symbols" | sed 's/;//g' | \
-> +	    sed -E 's/^\s*(.*)/_\1/' >> $ld64_symbols
->      else
->  	error_exit \
->  	    "If \$plugins=yes, either \$ld_dynamic_list or " \
-> 
-Hi Emilio,
+On 28/11/18 22:56, Guenter Roeck wrote:
+> The guest OS reads RSTAT, RSEQ, and RINTR, and expects those registers
+> to reflect a consistent state. However, it is possible that the registe=
+rs
+> can change after RSTAT was read, but before RINTR is read.
+>=20
+> Guest OS		qemu
+> --------		----
+> Read RSTAT
+> 			esp_command_complete()
+> 			 RSTAT =3D STAT_ST
+> 			 esp_dma_done()
+> 			  RSTAT |=3D STAT_TC
+> 			  RSEQ =3D 0
+> 			  RINTR =3D INTR_BS
+>=20
+> Read RSEQ
+> Read RINTR		RINTR =3D 0
+> 			RSTAT &=3D ~STAT_TC
+> 			RSEQ =3D SEQ_CD
+>=20
+> The guest OS would then try to handle INTR_BS combined with an old
+> value of RSTAT. This sometimes resulted in lost events, spurious
+> interrupts, guest OS confusion, and stalled SCSI operations.
 
-I think there's an issue with "\s" character class, it's not recognized
-by macOS sed  and I'm getting incorrect lines in
-qemu-plugins-ld64.symbols:
-_  qemu_xxx
-_  qemu_xyz
+The question is, why was the guest running the interrupt routine before
+STAT_INT was set in RSTAT?  The code in esp_raise_irq seems good:
 
-After I replaced "\s" with "[[:space:]]", linking proceeds further, but
-doesn't succeed because of an unresolved reference for qemu-system cris,
-lm32, m68k, microblaze, microblazeel, moxie, nios2, or1k, riscv32,
-riscv64, sparc, unicore32, tricore, xtensa, xtensaeb:
+    if (!(s->rregs[ESP_RSTAT] & STAT_INT)) {
+        s->rregs[ESP_RSTAT] |=3D STAT_INT;
+        qemu_irq_raise(s->irq);
+        trace_esp_raise_irq();
+    }
 
-Undefined symbols for architecture x86_64:
-  "_pci_register_bar", referenced from:
-      _plugin_chan_realize in plugin-chan.o
+Paolo
 
-It probably has nothing to do with macOS per-se and shouldn't link on
-Linux as well. If I disable the aforementioned targets the build
-succeeds and I can see the symbols from qemu-plugins-ld64.symbols in
-compiled qemu-system binaries.
-
-Best regards,
-Roman
+> A typical guest error log (observed with various versions of Linux)
+> looks as follows.
+>=20
+> scsi host1: Spurious irq, sreg=3D13.
+> ...
+> scsi host1: Aborting command [84531f10:2a]
+> scsi host1: Current command [f882eea8:35]
+> scsi host1: Queued command [84531f10:2a]
+> scsi host1:  Active command [f882eea8:35]
+> scsi host1: Dumping command log
+> scsi host1: ent[15] CMD val[44] sreg[90] seqreg[00] sreg2[00] ireg[20] =
+ss[00] event[0c]
+> scsi host1: ent[16] CMD val[01] sreg[90] seqreg[00] sreg2[00] ireg[20] =
+ss[02] event[0c]
+> scsi host1: ent[17] CMD val[43] sreg[90] seqreg[00] sreg2[00] ireg[20] =
+ss[02] event[0c]
+> scsi host1: ent[18] EVENT val[0d] sreg[92] seqreg[04] sreg2[00] ireg[18=
+] ss[00] event[0c]
+> ...
