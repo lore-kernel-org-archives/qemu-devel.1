@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gSB40-0002Nw-Na
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:23 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gSB3z-0002Mu-37
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gSB3v-0001Ni-Fu
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:20 -0500
-Date: Thu, 29 Nov 2018 12:00:47 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gSB3v-0001NL-F3
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:18 -0500
+Date: Thu, 29 Nov 2018 11:47:18 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181129010047.GM2251@umbus.fritz.box>
+Message-ID: <20181129004718.GJ2251@umbus.fritz.box>
 References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-12-clg@kaod.org>
-	<20181128023902.GU2251@umbus.fritz.box>
-	<dbd8810e-09b9-7344-92d2-faddebf30c10@kaod.org>
+	<20181116105729.23240-9-clg@kaod.org>
+	<20181127234956.GR2251@umbus.fritz.box>
+	<c16b55c5-8144-82bc-37f7-70427c6460a4@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="t3tFFy74pA5/PEcJ"
+	protocol="application/pgp-signature"; boundary="mjUDp/cLGeqUhYyE"
 Content-Disposition: inline
-In-Reply-To: <dbd8810e-09b9-7344-92d2-faddebf30c10@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 11/36] spapr/xive: use the VCPU id as a
- NVT identifier
+In-Reply-To: <c16b55c5-8144-82bc-37f7-70427c6460a4@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 08/36] ppc/xive: introduce a simplified
+ XIVE presenter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,373 +31,462 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---t3tFFy74pA5/PEcJ
+--mjUDp/cLGeqUhYyE
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 28, 2018 at 05:48:32PM +0100, C=E9dric Le Goater wrote:
-> On 11/28/18 3:39 AM, David Gibson wrote:
-> > On Fri, Nov 16, 2018 at 11:57:04AM +0100, C=E9dric Le Goater wrote:
-> >> The IVPE scans the O/S CAM line of the XIVE thread interrupt contexts
-> >> to find a matching Notification Virtual Target (NVT) among the NVTs
-> >> dispatched on the HW processor threads.
+On Wed, Nov 28, 2018 at 11:59:58AM +0100, C=E9dric Le Goater wrote:
+> On 11/28/18 12:49 AM, David Gibson wrote:
+> > On Fri, Nov 16, 2018 at 11:57:01AM +0100, C=E9dric Le Goater wrote:
+> >> The last sub-engine of the XIVE architecture is the Interrupt
+> >> Virtualization Presentation Engine (IVPE). On HW, they share elements,
+> >> the Power Bus interface (CQ), the routing table descriptors, and they
+> >> can be combined in the same HW logic. We do the same in QEMU and
+> >> combine both engines in the XiveRouter for simplicity.
+> >=20
+> > Ok, I'm not entirely convinced combining the IVPE and IVRE into a
+> > single object is a good idea, but we can probably discuss that once
+> > I've read further.
+>=20
+> We could introduce a simplified presenter for sPAPR but I am not even
+> sure of that as it will get more complex if we support the EBB one day.=
+=20
+
+I wasn't really thinking about PAPR for this comment.
+
+> >> When the IVRE has completed its job of matching an event source with a
+> >> Notification Virtual Target (NVT) to notify, it forwards the event
+> >> notification to the IVPE sub-engine. The IVPE scans the thread
+> >> interrupt contexts of the Notification Virtual Targets (NVT)
+> >> dispatched on the HW processor threads and if a match is found, it
+> >> signals the thread. If not, the IVPE escalates the notification to
+> >> some other targets and records the notification in a backlog queue.
 > >>
-> >> On a real system, the thread interrupt contexts are updated by the
-> >> hypervisor when a Virtual Processor is scheduled to run on a HW
-> >> thread. Under QEMU, the model emulates the same behavior by hardwiring
-> >> the NVT identifier in the thread context registers at reset.
+> >> The IVPE maintains the thread interrupt context state for each of its
+> >> NVTs not dispatched on HW processor threads in the Notification
+> >> Virtual Target table (NVTT).
 > >>
-> >> The NVT identifier used by the sPAPRXive model is the VCPU id. The END
-> >> identifier is also derived from the VCPU id. A set of helpers doing
-> >> the conversion between identifiers are provided for the hcalls
-> >> configuring the sources and the ENDs.
-> >>
-> >> The model does not need a NVT table but The XiveRouter NVT operations
-> >> are provided to perform some extra checks in the routing algorithm.
+> >> The model currently only supports single NVT notifications.
 > >>
 > >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > >> ---
-> >>  include/hw/ppc/spapr_xive.h |  17 +++++
-> >>  include/hw/ppc/xive.h       |   3 +
-> >>  hw/intc/spapr_xive.c        | 136 ++++++++++++++++++++++++++++++++++++
-> >>  hw/intc/xive.c              |   9 +++
-> >>  4 files changed, 165 insertions(+)
+> >>  include/hw/ppc/xive.h      |  13 +++
+> >>  include/hw/ppc/xive_regs.h |  22 ++++
+> >>  hw/intc/xive.c             | 223 +++++++++++++++++++++++++++++++++++++
+> >>  3 files changed, 258 insertions(+)
 > >>
-> >> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> >> index 06727bd86aa9..3f65b8f485fd 100644
-> >> --- a/include/hw/ppc/spapr_xive.h
-> >> +++ b/include/hw/ppc/spapr_xive.h
-> >> @@ -43,4 +43,21 @@ bool spapr_xive_irq_disable(sPAPRXive *xive, uint32=
-_t lisn);
-> >>  void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
-> >>  qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn);
-> >> =20
-> >> +/*
-> >> + * sPAPR NVT and END indexing helpers
-> >> + */
-> >> +uint32_t spapr_xive_nvt_to_target(sPAPRXive *xive, uint8_t nvt_blk,
-> >> +                                  uint32_t nvt_idx);
-> >> +int spapr_xive_target_to_nvt(sPAPRXive *xive, uint32_t target,
-> >> +                            uint8_t *out_nvt_blk, uint32_t *out_nvt_i=
-dx);
-> >> +int spapr_xive_cpu_to_nvt(sPAPRXive *xive, PowerPCCPU *cpu,
-> >> +                          uint8_t *out_nvt_blk, uint32_t *out_nvt_idx=
-);
-> >> +
-> >> +int spapr_xive_end_to_target(sPAPRXive *xive, uint8_t end_blk, uint32=
-_t end_idx,
-> >> +                             uint32_t *out_server, uint8_t *out_prio);
-> >> +int spapr_xive_target_to_end(sPAPRXive *xive, uint32_t target, uint8_=
-t prio,
-> >> +                             uint8_t *out_end_blk, uint32_t *out_end_=
-idx);
-> >> +int spapr_xive_cpu_to_end(sPAPRXive *xive, PowerPCCPU *cpu, uint8_t p=
-rio,
-> >> +                          uint8_t *out_end_blk, uint32_t *out_end_idx=
-);
-> >> +
-> >>  #endif /* PPC_SPAPR_XIVE_H */
 > >> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> >> index e715a6c6923d..e6931ddaa83f 100644
+> >> index 5987f26ddb98..e715a6c6923d 100644
 > >> --- a/include/hw/ppc/xive.h
 > >> +++ b/include/hw/ppc/xive.h
-> >> @@ -187,6 +187,8 @@ typedef struct XiveRouter {
-> >>  #define XIVE_ROUTER_GET_CLASS(obj)                              \
-> >>      OBJECT_GET_CLASS(XiveRouterClass, (obj), TYPE_XIVE_ROUTER)
-> >> =20
-> >> +typedef struct XiveTCTX XiveTCTX;
-> >> +
-> >>  typedef struct XiveRouterClass {
-> >>      SysBusDeviceClass parent;
-> >> =20
-> >> @@ -201,6 +203,7 @@ typedef struct XiveRouterClass {
-> >>                     XiveNVT *nvt);
-> >>      int (*set_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_id=
+> >> @@ -197,6 +197,10 @@ typedef struct XiveRouterClass {
+> >>                     XiveEND *end);
+> >>      int (*set_end)(XiveRouter *xrtr, uint8_t end_blk, uint32_t end_id=
 x,
-> >>                     XiveNVT *nvt);
-> >> +    void (*reset_tctx)(XiveRouter *xrtr, XiveTCTX *tctx);
+> >>                     XiveEND *end);
+> >> +    int (*get_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_id=
+x,
+> >> +                   XiveNVT *nvt);
+> >> +    int (*set_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_id=
+x,
+> >> +                   XiveNVT *nvt);
+> >=20
+> > As with the ENDs, I don't think get/set is a good interface for a
+> > bigger-than-word-size object.
+>=20
+> We need to agree on this interface before I respin. So you would like=20
+> to add a extra argument specifying the word being accessed ?
+
+Yes.  Ok, 3 options I can see at this point:
+
+1) read/write accessors which take a word number
+
+2) A "get" accessor which copies the whole structure, but "write"
+accessor which takes a word number.  The asymmetry is a bit ugly, but
+it's the non-atomic writeback of the whole structure which I'm most
+uncomfortable with.
+
+3) A map/unmap interface which gives you / releases a pointer to the
+"live" structure.  For powernv that would become
+address_space_map()/unmap().  For PAPR it would just be reutn pointer
+/ no-op.
+
+>=20
+> >=20
 > >>  } XiveRouterClass;
 > >> =20
 > >>  void xive_eas_pic_print_info(XiveEAS *eas, uint32_t lisn, Monitor *mo=
 n);
-> >> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> >> index 5d038146c08e..3bf77ace11a2 100644
-> >> --- a/hw/intc/spapr_xive.c
-> >> +++ b/hw/intc/spapr_xive.c
-> >> @@ -199,6 +199,139 @@ static int spapr_xive_set_end(XiveRouter *xrtr,
-> >>      return 0;
-> >>  }
+> >> @@ -207,6 +211,10 @@ int xive_router_get_end(XiveRouter *xrtr, uint8_t=
+ end_blk, uint32_t end_idx,
+> >>                          XiveEND *end);
+> >>  int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t e=
+nd_idx,
+> >>                          XiveEND *end);
+> >> +int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t n=
+vt_idx,
+> >> +                        XiveNVT *nvt);
+> >> +int xive_router_set_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t n=
+vt_idx,
+> >> +                        XiveNVT *nvt);
 > >> =20
-> >> +static int spapr_xive_get_nvt(XiveRouter *xrtr,
-> >> +                              uint8_t nvt_blk, uint32_t nvt_idx, Xive=
-NVT *nvt)
+> >>  /*
+> >>   * XIVE END ESBs
+> >> @@ -274,4 +282,9 @@ extern const MemoryRegionOps xive_tm_ops;
+> >> =20
+> >>  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
+> >> =20
+> >> +static inline uint32_t xive_tctx_cam_line(uint8_t nvt_blk, uint32_t n=
+vt_idx)
 > >> +{
-> >> +    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
-> >> +    uint32_t vcpu_id =3D spapr_xive_nvt_to_target(xive, nvt_blk, nvt_=
-idx);
-> >> +    PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
-> >> +
-> >> +    if (!cpu) {
-> >> +        return -1;
-> >> +    }
-> >> +
-> >> +    /*
-> >> +     * sPAPR does not maintain a NVT table. Return that the NVT is
-> >> +     * valid if we have found a matching CPU
-> >> +     */
-> >> +    nvt->w0 =3D NVT_W0_VALID;
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +static int spapr_xive_set_nvt(XiveRouter *xrtr,
-> >> +                              uint8_t nvt_blk, uint32_t nvt_idx, Xive=
-NVT *nvt)
-> >> +{
-> >> +    /* no NVT table */
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +/*
-> >> + * When a Virtual Processor is scheduled to run on a HW thread, the
-> >> + * hypervisor pushes its identifier in the OS CAM line. Under QEMU, we
-> >> + * need to emulate the same behavior.
-> >> + */
-> >> +static void spapr_xive_reset_tctx(XiveRouter *xrtr, XiveTCTX *tctx)
-> >> +{
-> >> +    uint8_t  nvt_blk;
-> >> +    uint32_t nvt_idx;
-> >> +    uint32_t nvt_cam;
-> >> +
-> >> +    spapr_xive_cpu_to_nvt(SPAPR_XIVE(xrtr), POWERPC_CPU(tctx->cs),
-> >> +                          &nvt_blk, &nvt_idx);
-> >> +
-> >> +    nvt_cam =3D cpu_to_be32(TM_QW1W2_VO | xive_tctx_cam_line(nvt_blk,=
- nvt_idx));
-> >> +    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
-> >> +}
-> >> +
-> >> +/*
-> >> + * The allocation of VP blocks is a complex operation in OPAL and the
-> >> + * VP identifiers have a relation with the number of HW chips, the
-> >> + * size of the VP blocks, VP grouping, etc. The QEMU sPAPR XIVE
-> >> + * controller model does not have the same constraints and can use a
-> >> + * simple mapping scheme of the CPU vcpu_id
-> >> + *
-> >> + * These identifiers are never returned to the OS.
-> >> + */
-> >> +
-> >> +#define SPAPR_XIVE_VP_BASE 0x400
+> >> +    return (nvt_blk << 19) | nvt_idx;
 > >=20
-> > 0x400 =3D=3D 1024.  Could we ever have the possibility of needing to
-> > consider both physical NVTs and PAPR NVTs at the same time? =20
+> > I'm guessing this formula is the standard way of combining the NVT
+> > block and index into a single word? =20
 >=20
-> They would not be in the same CAM line: OS ring vs. PHYS ring.=20
-
-Hm.  They still inhabit the same NVT number space though, don't they?
-I'm thinking about the END->NVT stage of the process here, rather than
-the NVT->TCTX stage.
-
-Oh, also, you're using "VP" here which IIUC =3D=3D "NVT".  Can we
-standardize on one, please.
-
-> > If so, does this base leave enough space for the physical ones?
->=20
-> I only used 0x400 to map the VP identifier to the ones allocated by KVM.=
+> That number is the VP/NVT identifier which is written in the CAM value.=
 =20
-> 0x0 would be fine but to exercise the model, it's better having a differe=
-nt=20
-> base.=20
+> The index is on 19 bits because of the NVT  definition in the END=20
+> structure. It is being increased to 24 bits on Power10=20
 >=20
-> >> +uint32_t spapr_xive_nvt_to_target(sPAPRXive *xive, uint8_t nvt_blk,
-> >> +                                  uint32_t nvt_idx)
-> >> +{
-> >> +    return nvt_idx - SPAPR_XIVE_VP_BASE;
-> >> +}
-> >> +
-> >> +int spapr_xive_cpu_to_nvt(sPAPRXive *xive, PowerPCCPU *cpu,
-> >> +                          uint8_t *out_nvt_blk, uint32_t *out_nvt_idx)
-> >=20
-> > A number of these conversions will come out a bit simpler if we pass
-> > the block and index around as a single word in most places.
+> > If so, I think we should
+> > standardize on passing a single word "nvt_id" around and only
+> > splitting it when we need to use the block separately. =20
 >=20
-> Yes I have to check the whole patchset first. These prototype changes
-> are not too difficult in terms of code complexity but they do break
-> how patches apply and PowerNV is also using the idx and blk much more=20
-> explicitly. the block has a meaning on bare metal. So I am a bit=20
-> reluctant to do so. I will check.
+> This is really the only place where we concatenate the two NVT values,
+> block and index.=20
 
-Yeah, based on your comments here and earlier, I'm not sure that's a
-good idea any more either.
+Hm, ok.  I know we don't model them (yet, maybe ever) but could
+combined values appear in the PowerBUS messages that handle remote
+notifications?
 
-> >> +{
-> >> +    XiveRouter *xrtr =3D XIVE_ROUTER(xive);
-> >> +
-> >> +    if (!cpu) {
-> >> +        return -1;
-> >> +    }
-> >> +
-> >> +    if (out_nvt_blk) {
-> >> +        /* For testing purpose, we could use 0 for nvt_blk */
-> >> +        *out_nvt_blk =3D xrtr->chip_id;
-> >=20
-> > I don't see any point using the chip_id here, which is currently
-> > always set to 0 for PAPR anyway.  If we just hardwire this to 0 it
-> > removes the only use here of xrtr, which will allow some further
-> > simplifications in the caller, I think.
+> > Same goes for
+> > the end_id, assuming there's a standard way of putting that into a
+> > single word.  That will address the point I raised earlier about lisn
+> > being passed around as a single word, but these later stage ids being
+> > split.
 >=20
-> You are right about the simplification. It was one way to exercise=20
-> the router model and remove any shortcuts in the indexing. I kept=20
-> it to be sure I was not tempted to invent new ones. I think we can
-> remove it before merging.=20
->=20
-> >=20
-> >> +    }
-> >> +
-> >> +    if (out_nvt_blk) {
-> >> +        *out_nvt_idx =3D SPAPR_XIVE_VP_BASE + cpu->vcpu_id;
-> >> +    }
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +int spapr_xive_target_to_nvt(sPAPRXive *xive, uint32_t target,
-> >> +                             uint8_t *out_nvt_blk, uint32_t *out_nvt_=
-idx)
-> >=20
-> > I suspect some, maybe most of these conversion functions could be stati=
-c.
->=20
-> static inline ?=20
+> Hmm, I am not sure this is a good option. It is not how the PowerNV=20
+> model would use it, skiboot is very much aware of these blocks and=20
+> indexes and for remote accesses chips are identified using the block.=20
+> I will take a look at it but I am not found of it. I can add helpers=20
+> in some places though.   =20
 
-It's in a .c file so you don't need the "inline" - the compiler can
-work out whether it's a good idea to inline on its own.
+Hm, ok.  Do the block and index appear as an (effectively) single
+field in the EAS?
 
+> I agree we have some kind of issue linking the HW model with the sPAPR=20
+> machine. The guest interface is only  about IRQ numbers, priorities and
+> cpu numbers. We really don't care about XIVE blocks and indexes in that=
+=20
+> case. we can clarify the code by bypassing the XiveRouter interfaces
+> to the table and directly use the sPAPR interrupt controller. That=20
+> should help a bit for the hcalls but we would still have to fill in=20
+> the EAT and the END with some index values if we want to use the router
+> algorithm.
+
+I don't think this is too much of a problem.  These are essentially
+machine internal details so we can choose an allocation to suit us.
+The obvious one is to put everything in a single block, at least as
+long as that won't limit our numbers too much.
+
+> > We'll probably want some inlines or macros to build an
+> > nvt/end/lisn/whatever id from block and index as well.
 > >=20
-> >> +{
-> >> +    return spapr_xive_cpu_to_nvt(xive, spapr_find_cpu(target), out_nv=
-t_blk,
-> >> +                                 out_nvt_idx);
 > >> +}
 > >> +
-> >> +/*
-> >> + * sPAPR END indexing uses a simple mapping of the CPU vcpu_id, 8
-> >> + * priorities per CPU
-> >> + */
-> >> +int spapr_xive_end_to_target(sPAPRXive *xive, uint8_t end_blk, uint32=
-_t end_idx,
-> >> +                             uint32_t *out_server, uint8_t *out_prio)
-> >> +{
-> >> +    if (out_server) {
-> >> +        *out_server =3D end_idx >> 3;
-> >> +    }
-> >> +
-> >> +    if (out_prio) {
-> >> +        *out_prio =3D end_idx & 0x7;
-> >> +    }
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +int spapr_xive_cpu_to_end(sPAPRXive *xive, PowerPCCPU *cpu, uint8_t p=
-rio,
-> >> +                          uint8_t *out_end_blk, uint32_t *out_end_idx)
-> >> +{
-> >> +    XiveRouter *xrtr =3D XIVE_ROUTER(xive);
-> >> +
-> >> +    if (!cpu) {
-> >> +        return -1;
-> >=20
-> > Is there ever a reason this would be called with cpu =3D=3D NULL?  If n=
-ot
-> > might as well just assert() here rather than pushing the error
-> > handling back to the caller.
->=20
-> ok. yes.
->=20
-> >=20
-> >> +    }
-> >> +
-> >> +    if (out_end_blk) {
-> >> +        /* For testing purpose, we could use 0 for nvt_blk */
-> >> +        *out_end_blk =3D xrtr->chip_id;
-> >=20
-> > Again, I don't see any point to using the chip_id, which is pretty
-> > meaningless for PAPR.
-> >=20
-> >> +    }
-> >> +
-> >> +    if (out_end_idx) {
-> >> +        *out_end_idx =3D (cpu->vcpu_id << 3) + prio;
-> >> +    }
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +int spapr_xive_target_to_end(sPAPRXive *xive, uint32_t target, uint8_=
-t prio,
-> >> +                             uint8_t *out_end_blk, uint32_t *out_end_=
-idx)
-> >> +{
-> >> +    return spapr_xive_cpu_to_end(xive, spapr_find_cpu(target), prio,
-> >> +                                 out_end_blk, out_end_idx);
-> >> +}
-> >> +
-> >>  static const VMStateDescription vmstate_spapr_xive_end =3D {
-> >>      .name =3D TYPE_SPAPR_XIVE "/end",
-> >>      .version_id =3D 1,
-> >> @@ -263,6 +396,9 @@ static void spapr_xive_class_init(ObjectClass *kla=
-ss, void *data)
-> >>      xrc->set_eas =3D spapr_xive_set_eas;
-> >>      xrc->get_end =3D spapr_xive_get_end;
-> >>      xrc->set_end =3D spapr_xive_set_end;
-> >> +    xrc->get_nvt =3D spapr_xive_get_nvt;
-> >> +    xrc->set_nvt =3D spapr_xive_set_nvt;
-> >> +    xrc->reset_tctx =3D spapr_xive_reset_tctx;
-> >>  }
+> >>  #endif /* PPC_XIVE_H */
+> >> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+> >> index 2e3d6cb507da..05cb992d2815 100644
+> >> --- a/include/hw/ppc/xive_regs.h
+> >> +++ b/include/hw/ppc/xive_regs.h
+> >> @@ -158,4 +158,26 @@ typedef struct XiveEND {
+> >>  #define END_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
+> >>  } XiveEND;
 > >> =20
-> >>  static const TypeInfo spapr_xive_info =3D {
+> >> +/* Notification Virtual Target (NVT) */
+> >> +typedef struct XiveNVT {
+> >> +        uint32_t        w0;
+> >> +#define NVT_W0_VALID             PPC_BIT32(0)
+> >> +        uint32_t        w1;
+> >> +        uint32_t        w2;
+> >> +        uint32_t        w3;
+> >> +        uint32_t        w4;
+> >> +        uint32_t        w5;
+> >> +        uint32_t        w6;
+> >> +        uint32_t        w7;
+> >> +        uint32_t        w8;
+> >> +#define NVT_W8_GRP_VALID         PPC_BIT32(0)
+> >> +        uint32_t        w9;
+> >> +        uint32_t        wa;
+> >> +        uint32_t        wb;
+> >> +        uint32_t        wc;
+> >> +        uint32_t        wd;
+> >> +        uint32_t        we;
+> >> +        uint32_t        wf;
+> >> +} XiveNVT;
+> >> +
+> >>  #endif /* PPC_XIVE_REGS_H */
 > >> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> >> index c49932d2b799..fc6ef5895e6d 100644
+> >> index 4c6cb5d52975..5ba3b06e6e25 100644
 > >> --- a/hw/intc/xive.c
 > >> +++ b/hw/intc/xive.c
-> >> @@ -481,6 +481,7 @@ static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tc=
-tx, bool block_group)
+> >> @@ -373,6 +373,32 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Mon=
+itor *mon)
+> >>      }
+> >>  }
+> >> =20
+> >> +/* The HW CAM (23bits) is hardwired to :
+> >> + *
+> >> + *   0x000||0b1||4Bit chip number||7Bit Thread number.
+> >> + *
+> >> + * and when the block grouping extension is enabled :
+> >> + *
+> >> + *   4Bit chip number||0x001||7Bit Thread number.
+> >> + */
+> >> +static uint32_t tctx_hw_cam_line(bool block_group, uint8_t chip_id, u=
+int8_t tid)
+> >> +{
+> >> +    if (block_group) {
+> >> +        return 1 << 11 | (chip_id & 0xf) << 7 | (tid & 0x7f);
+> >> +    } else {
+> >> +        return (chip_id & 0xf) << 11 | 1 << 7 | (tid & 0x7f);
+> >> +    }
+> >> +}
+> >> +
+> >> +static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tctx, bool block_grou=
+p)
+> >> +{
+> >> +    PowerPCCPU *cpu =3D POWERPC_CPU(tctx->cs);
+> >> +    CPUPPCState *env =3D &cpu->env;
+> >> +    uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
+> >=20
+> > I don't much like reaching into the cpu state itself.  I think a
+> > better idea would be to have the TCTX have its HW CAM id set during
+> > initialization (via a property) and then use that.  This will mean
+> > less mucking about if future cpu revisions don't split the PIR into
+> > chip and tid ids in the same way.
+>=20
+> yes good idea. I will see how to handle the block_group boolean. may be we
+> can leave it out of the model for now as it is not used.
+
+Yes, it would be nice to leave the block_group stuff as a later
+extensions when/if we need it.  If we put it in as a stub and nothing
+is using/testing it, it's likely it will be broken if we ever do
+actually try to use it.
+
+>=20
+> >=20
+> >> +    return tctx_hw_cam_line(block_group, (pir >> 8) & 0xf, pir & 0x7f=
+);
+> >> +}
+> >> +
 > >>  static void xive_tctx_reset(void *dev)
 > >>  {
 > >>      XiveTCTX *tctx =3D XIVE_TCTX(dev);
-> >> +    XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(tctx->xrtr);
-> >> =20
-> >>      memset(tctx->regs, 0, sizeof(tctx->regs));
-> >> =20
-> >> @@ -495,6 +496,14 @@ static void xive_tctx_reset(void *dev)
-> >>       */
-> >>      tctx->regs[TM_QW1_OS + TM_PIPR] =3D
-> >>          ipb_to_pipr(tctx->regs[TM_QW1_OS + TM_IPB]);
-> >> +
-> >> +    /*
-> >> +     * QEMU sPAPR XIVE only. To let the controller model reset the OS
-> >> +     * CAM line with the VP identifier.
-> >> +     */
-> >> +    if (xrc->reset_tctx) {
-> >> +        xrc->reset_tctx(tctx->xrtr, tctx);
-> >> +    }
-> >=20
-> > AFAICT this whole function is only used from PAPR, so you can just
-> > move the whole thing to the papr code and avoid the hook function.
->=20
-> Yes we could add a loop on all CPUs and reset all the XiveTCTX from
-> the machine or a spapr_irq->reset handler. We will need at some time
-> anyhow.
->=20
-> Thanks,
->=20
-> C.
->=20
->=20
-> >=20
+> >> @@ -1013,6 +1039,195 @@ int xive_router_set_end(XiveRouter *xrtr, uint=
+8_t end_blk, uint32_t end_idx,
+> >>     return xrc->set_end(xrtr, end_blk, end_idx, end);
 > >>  }
 > >> =20
-> >>  static void xive_tctx_realize(DeviceState *dev, Error **errp)
+> >> +int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t n=
+vt_idx,
+> >> +                        XiveNVT *nvt)
+> >> +{
+> >> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
+> >> +
+> >> +   return xrc->get_nvt(xrtr, nvt_blk, nvt_idx, nvt);
+> >> +}
+> >> +
+> >> +int xive_router_set_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t n=
+vt_idx,
+> >> +                        XiveNVT *nvt)
+> >> +{
+> >> +   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
+> >> +
+> >> +   return xrc->set_nvt(xrtr, nvt_blk, nvt_idx, nvt);
+> >> +}
+> >> +
+> >> +static bool xive_tctx_ring_match(XiveTCTX *tctx, uint8_t ring,
+> >> +                                 uint8_t nvt_blk, uint32_t nvt_idx,
+> >> +                                 bool cam_ignore, uint32_t logic_serv)
+> >> +{
+> >> +    uint8_t *regs =3D &tctx->regs[ring];
+> >> +    uint32_t w2 =3D be32_to_cpu(*((uint32_t *) &regs[TM_WORD2]));
+> >> +    uint32_t cam =3D xive_tctx_cam_line(nvt_blk, nvt_idx);
+> >> +    bool block_group =3D false; /* TODO (PowerNV) */
+> >> +
+> >> +    /* TODO (PowerNV): ignore low order bits of nvt id */
+> >> +
+> >> +    switch (ring) {
+> >> +    case TM_QW3_HV_PHYS:
+> >> +        return (w2 & TM_QW3W2_VT) && xive_tctx_hw_cam_line(tctx, bloc=
+k_group) =3D=3D
+> >> +            tctx_hw_cam_line(block_group, nvt_blk, nvt_idx);
 > >=20
+> > The difference between "xive_tctx_hw_cam_line" and "tctx_hw_cam_line"
+> > here is far from obvious. =20
 >=20
+> yes. I lacked inspiration ...
+
+I'd suggest that the one which takes the tctx as a parameter be
+tctx_hw_cam_line() and the other be nvt_hw_cam_line() or similar.  The
+crucial difference here is that one is what the thread is looking for,
+the other is what the NVT is advertising.
+
+> > Remember that namespacing prefixes aren't
+> > necessary for static functions, which can let you give more
+> > descriptive names without getting excessively long.
+>=20
+> OK.
+> =20
+> >> +    case TM_QW2_HV_POOL:
+> >> +        return (w2 & TM_QW2W2_VP) && (cam =3D=3D GETFIELD(TM_QW2W2_PO=
+OL_CAM, w2));
+> >> +
+> >> +    case TM_QW1_OS:
+> >> +        return (w2 & TM_QW1W2_VO) && (cam =3D=3D GETFIELD(TM_QW1W2_OS=
+_CAM, w2));
+> >> +
+> >> +    case TM_QW0_USER:
+> >> +        return ((w2 & TM_QW1W2_VO) && (cam =3D=3D GETFIELD(TM_QW1W2_O=
+S_CAM, w2)) &&
+> >> +                (w2 & TM_QW0W2_VU) &&
+> >> +                (logic_serv =3D=3D GETFIELD(TM_QW0W2_LOGIC_SERV, w2))=
+);
+> >> +
+> >> +    default:
+> >> +        g_assert_not_reached();
+> >> +    }
+> >> +}
+> >> +
+> >> +static int xive_presenter_tctx_match(XiveTCTX *tctx, uint8_t format,
+> >> +                                     uint8_t nvt_blk, uint32_t nvt_id=
+x,
+> >> +                                     bool cam_ignore, uint32_t logic_=
+serv)
+> >> +{
+> >> +    if (format =3D=3D 0) {
+> >> +        /* F=3D0 & i=3D1: Logical server notification */
+> >> +        if (cam_ignore =3D=3D true) {
+> >> +            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: no support for LS "
+> >> +                          "NVT %x/%x\n", nvt_blk, nvt_idx);
+> >> +             return -1;
+> >> +        }
+> >> +
+> >> +        /* F=3D0 & i=3D0: Specific NVT notification */
+> >> +        if (xive_tctx_ring_match(tctx, TM_QW3_HV_PHYS,
+> >> +                                nvt_blk, nvt_idx, false, 0)) {
+> >> +            return TM_QW3_HV_PHYS;
+> >> +        }
+> >> +        if (xive_tctx_ring_match(tctx, TM_QW2_HV_POOL,
+> >> +                                nvt_blk, nvt_idx, false, 0)) {
+> >> +            return TM_QW2_HV_POOL;
+> >> +        }
+> >> +        if (xive_tctx_ring_match(tctx, TM_QW1_OS,
+> >> +                                nvt_blk, nvt_idx, false, 0)) {
+> >> +            return TM_QW1_OS;
+> >> +        }
+> >=20
+> > Hm.  It's a bit pointless to iterate through each ring calling a
+> > common function, when that "common" function consists entirely of a
+> > switch which makes it not really common at all.
+> >=20
+> > So I think you want separate helper functions for each ring's match,
+> > or even just fold the previous function into this one.
+>=20
+> yes. It can be improved. I did try different layouts. I might just fold=
+=20
+> both routine in one as you propose. =20
+>=20
+> >> +    } else {
+> >> +        /* F=3D1 : User level Event-Based Branch (EBB) notification */
+> >> +        if (xive_tctx_ring_match(tctx, TM_QW0_USER,
+> >> +                                nvt_blk, nvt_idx, false, logic_serv))=
+ {
+> >> +            return TM_QW0_USER;
+> >> +        }
+> >> +    }
+> >> +    return -1;
+> >> +}
+> >> +
+> >> +typedef struct XiveTCTXMatch {
+> >> +    XiveTCTX *tctx;
+> >> +    uint8_t ring;
+> >> +} XiveTCTXMatch;
+> >> +
+> >> +static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
+> >> +                                 uint8_t nvt_blk, uint32_t nvt_idx,
+> >> +                                 bool cam_ignore, uint8_t priority,
+> >> +                                 uint32_t logic_serv, XiveTCTXMatch *=
+match)
+> >> +{
+> >> +    CPUState *cs;
+> >> +
+> >> +    /* TODO (PowerNV): handle chip_id overwrite of block field for
+> >> +     * hardwired CAM compares */
+> >> +
+> >> +    CPU_FOREACH(cs) {
+> >> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> >> +        XiveTCTX *tctx =3D XIVE_TCTX(cpu->intc);
+> >> +        int ring;
+> >> +
+> >> +        /*
+> >> +         * HW checks that the CPU is enabled in the Physical Thread
+> >> +         * Enable Register (PTER).
+> >> +         */
+> >> +
+> >> +        /*
+> >> +         * Check the thread context CAM lines and record matches. We
+> >> +         * will handle CPU exception delivery later
+> >> +         */
+> >> +        ring =3D xive_presenter_tctx_match(tctx, format, nvt_blk, nvt=
+_idx,
+> >> +                                         cam_ignore, logic_serv);
+> >> +        /*
+> >> +         * Save the context and follow on to catch duplicates, that we
+> >> +         * don't support yet.
+> >> +         */
+> >> +        if (ring !=3D -1) {
+> >> +            if (match->tctx) {
+> >> +                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a=
+ thread "
+> >> +                              "context NVT %x/%x\n", nvt_blk, nvt_idx=
+);
+> >> +                return false;
+> >> +            }
+> >> +
+> >> +            match->ring =3D ring;
+> >> +            match->tctx =3D tctx;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    if (!match->tctx) {
+> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: NVT %x/%x is not dispat=
+ched\n",
+> >> +                      nvt_blk, nvt_idx);
+> >> +        return false;
+> >=20
+> > Hmm.. this isn't actually an error isn't it? At least not for powernv
+>=20
+> It is on sPAPR, it would mean the END was configured with an unknow CPU.=
+=20
+
+Right.
+
+> It is not error on PowerNV, when we support escalations.
+>=20
+> > - that just means the NVT isn't currently dispatched, so we'll need to
+> > trigger the escalation interrupt. =20
+>=20
+> Yes.
+>=20
+> > Does this get changed later in the series?
+>=20
+> No.
+
+But this code is common to PAPR and powernv, yes, so it will need to?
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -405,24 +494,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---t3tFFy74pA5/PEcJ
+--mjUDp/cLGeqUhYyE
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv/Oj4ACgkQbDjKyiDZ
-s5KWjA//erLROfC1wejYdventV7ECP2APNWVSdj6RJrHv/IC65Dji5JbuuTpH/sV
-rC+hVaKh3pNvPItsV+4iv3UNUW8lWuFRJ4Cctt/LyIB7GzvyP0F6gdmiHeiqW1Gw
-i8MNOLAsM1Jb5ClxiOdioJQIk4zusvxP9LOVQvql2xue98AzTmQLZN5a4nOH0bKW
-lBZP6Za14wQr+Xa47Omv8VlcxqCNUX34Jwr7/CKS2AaMaMrRLlwud/y643AGZkO0
-k5299J47o/Cu8uaNxXnr/t0bRGp3VgSC9HK0FNeQgTlseGRB4+av/8Y4nQTPyro6
-u9HFNRc7Mtd5Ttn9LhH3HwaNJAOmKoIg3cxO7VmazvhRxPmvq6d3iEC7BCRaz19m
-3qLsCXHcrwSt6uPftBzurvR8eLZFELT1WsbmuXIUV6WxDoif3GWQlwsb0pBHxfnl
-KIylWNe+5vnEj5UuJf+HpUFmgh7husmJOluQ4b2t6MRVcepRTcqHBZ5NV7w9w2Ix
-gWkXEHJkGgxpYftTYasTnwx5MXUDPnEXLijtrzJoqVWDQ0yHcf/jEGdAa01d69O/
-/+cAIuWto8noFDN8kDWN0SmJ2EyCzRWSEZJuwGOsMw2eqSWleXGtc9lHOt4ANRUt
-6eSKmBiAnOOViJYb595QFfmBUzRwg+Xab5ORW8xj4DZ1A+YxmcQ=
-=xPgC
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv/NxQACgkQbDjKyiDZ
+s5IT3xAAil1SZfWxSg2Clk52haP/kIXVubpbC11b/OFxPKaaazGbYxXnqeMp35a9
+tVjqT543rdqT/110DFXI0caZl/ecJLOELRYZRBS7ftOVVSXHYhsXnDDXFcWvnNYU
+sP2P3A1xRmd3O/W4Qto1EzmeAum4qK0P1nYPj5w5EJA+IS3avspfUR8bst6gObpi
+lUq8NJlbedM9ZvTLIFaI98dMZtO2k9BL6IvtD0IIcSJHbmY3M2G6aOnxue4jjwgH
+NNvgL4Fx/ndbx2j7y4co2UGS3K1+FCc/bnp9MkJtDljQJwKE/RUXNV9AnaxvYI3u
+FWroWpXBYwm2Rh827AsTvpmXNLUHQkwgYMjHbAk6cwub6XKMjRFUVIkUOze87UHz
+pk25gi6WSq7U8Xp1NBcIkgu8s8ClA+e62H0VFW+hQSD5cGWfKd2FiKQTldu0zrWC
+2QNiLoAEIul+sVnlswBvUATQX0JcUvcsPwlc8vW+G6KRe4IrtHu4YWqUiSjf4YdU
+vz3e1PcWZ2SRMLkZZa5Te+9txoNSvn/HXdP62Hf/XHis6SPg0LhxyH6fJiEThOO7
+aQg+HPng+3LWwZJ4uZz2r0TxxRUZG172pbJd5jW66pc29BUTTalK+vSSBdL/gLyS
+LItlKffX0gmpQ3T8ZshV8DGSqKKAJ0pJgDVErFZ1QUO3zHkWhNE=
+=lC+M
 -----END PGP SIGNATURE-----
 
---t3tFFy74pA5/PEcJ--
+--mjUDp/cLGeqUhYyE--
