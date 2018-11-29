@@ -1,37 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gSOfM-0004ML-BC
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:55:49 -0500
+	(envelope-from <david@redhat.com>) id 1gSOjj-0006Wj-Or
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:00:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1gSOfH-0003v4-7f
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:55:48 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56518)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gSOfG-0003rr-Si
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:55:43 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wATFpFBI137961
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 10:55:40 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p2k018pxy-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 10:55:40 -0500
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Thu, 29 Nov 2018 15:55:37 -0000
-Date: Thu, 29 Nov 2018 16:55:30 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-In-Reply-To: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
-References: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
+	(envelope-from <david@redhat.com>) id 1gSOjb-0006HR-HU
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:00:19 -0500
+References: <20181128095939.5684-1-david@redhat.com>
+	<e036b52f-abe7-4b13-1c5f-d084a8b7a491@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <2c47fc65-ae2d-13cd-9b94-6392e59a77f5@redhat.com>
+Date: Thu, 29 Nov 2018 17:00:06 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <e036b52f-abe7-4b13-1c5f-d084a8b7a491@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <20181129165530.5bf723fc@oc2783563651>
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] s390x/vfio: VFIO-AP interrupt
- control interception
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/tod: Properly stop the KVM TOD
+ while the guest is not running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,95 +25,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>
-Cc: borntraeger@de.ibm.com, akrowiak@linux.ibm.com, peter.maydell@linaro.org, david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, agraf@suse.de, eric.auger@redhat.com, qemu-s390x@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 22 Nov 2018 17:35:49 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+On 29.11.18 16:32, Thomas Huth wrote:
+> On 2018-11-28 10:59, David Hildenbrand wrote:
+>> Just like on other architectures, we should stop the clock while the guest
+>> is not running. This is already properly done for TCG. Right now, doing an
+>> offline migration (stop, migrate, cont) can easily trigger stalls in the
+>> guest.
+>>
+>> Even doing a
+>>     (hmp) stop
+>>     ... wait 2 minutes ...
+>>     (hmp) cont
+>> will already trigger stalls.
+>>
+>> So whenever the guest stops, backup the KVM TOD. When continuing to run
+>> the guest, restore the KVM TOD.
+>>
+>> One special case is starting a simple VM: Reading the TOD from KVM to
+>> stop it right away until the guest is actually started means that the
+>> time of any simple VM will already differ to the host time. We can
+>> simply leave the TOD running and the guest won't be able to recognize
+>> it.
+>>
+>> For migration, we actually want to keep the TOD stopped until really
+>> starting the guest. To be able to catch most errors, we should however
+>> try to set the TOD in addition to simply storing it. So we can still
+>> catch basic migration problems.
+>>
+>> If anything goes wrong while backing up/restoring the TOD, we have to
+>> ignore it (but print a warning). This is then basically a fallback to
+>> old behavior (TOD remains running).
+>>
+>> I tested this very basically with an initrd:
+>>     1. Start a simple VM. Observed that the TOD is kept running. Old
+>>        behavior.
+>>     2. Ordinary live migration. Observed that the TOD is temporarily
+>>        stopped on the destination when setting the new value and
+>>        correctly started when finally starting the guest.
+>>     3. Offline live migration. (stop, migrate, cont). Observed that the
+>>        TOD will be stopped on the source with the "stop" command. On the
+>>        destination, the TOD is temporarily stopped when setting the new
+>>        value and correctly started when finally starting the guest via
+>>        "cont".
+>>     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
+>>        or conts in a row have no effect, so works as expected)
+>>
+>> In the future, we might want to send the guest a special kind of time sync
+>> interrupt under some conditions, so it can synchronize its tod to the
+>> host tod. This is interesting for migration scenarios but also when we
+>> get time sync interrupts ourselves. This however will most probably have
+>> to be handled in KVM (e.g. when the tods differ too much) and is not
+>> desired e.g. when debugging the guest. (single stepping should not
+>> result in permanent time syncs). I consider something like that an add-on
+>> on top of this basic "don't break the guest" handling.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>
+>> v1 -> v2:
+>> - Add time sync idea suggested by Christian to description
+>> - Drop one unnecessary "return"
+>> - Register in realize() and not in instance_init()
+>>
+>>
+>>  hw/s390x/tod-kvm.c     | 91 +++++++++++++++++++++++++++++++++++++++++-
+>>  hw/s390x/tod.c         |  5 +++
+>>  include/hw/s390x/tod.h |  8 +++-
+>>  3 files changed, 101 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/s390x/tod-kvm.c b/hw/s390x/tod-kvm.c
+>> index df564ab89c..87717d0be1 100644
+>> --- a/hw/s390x/tod-kvm.c
+>> +++ b/hw/s390x/tod-kvm.c
+>> @@ -10,10 +10,11 @@
+>>  
+>>  #include "qemu/osdep.h"
+>>  #include "qapi/error.h"
+>> +#include "sysemu/sysemu.h"
+>>  #include "hw/s390x/tod.h"
+>>  #include "kvm_s390x.h"
+>>  
+>> -static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
+>> +static void kvm_s390_get_tod_raw(S390TOD *tod, Error **errp)
+>>  {
+>>      int r;
+>>  
+>> @@ -27,7 +28,17 @@ static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
+>>      }
+>>  }
+>>  
+>> -static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
+>> +static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
+>> +{
+>> +    if (td->stopped) {
+>> +        *tod = td->base;
+>> +        return;
+>> +    }
+>> +
+>> +    kvm_s390_get_tod_raw(tod, errp);
+>> +}
+>> +
+>> +static void kvm_s390_set_tod_raw(const S390TOD *tod, Error **errp)
+>>  {
+>>      int r;
+>>  
+>> @@ -41,18 +52,94 @@ static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
+>>      }
+>>  }
+>>  
+>> +static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
+>> +{
+>> +    Error *local_err = NULL;
+>> +
+>> +    /*
+>> +     * Somebody (e.g. migration) set the TOD. We'll store it into KVM to
+>> +     * properly detect errors now but take a look at the runstate to decide
+>> +     * whether really to keep the tod running. E.g. during migration, this
+>> +     * is the point where we want to stop the initially running TOD to fire
+>> +     * it back up when actually starting the migrated guest.
+>> +     */
+>> +    kvm_s390_set_tod_raw(tod, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>> +
+>> +    if (runstate_is_running()) {
+>> +        td->stopped = false;
+>> +    } else {
+>> +        td->stopped = true;
+>> +        td->base = *tod;
+>> +    }
+>> +}
+>> +
+>> +static void kvm_s390_tod_vm_state_change(void *opaque, int running,
+>> +                                         RunState state)
+>> +{
+>> +    S390TODState *td = opaque;
+>> +    Error *local_err = NULL;
+>> +
+>> +    if (running && td->stopped) {
+>> +        /* Set the old TOD when running the VM - start the TOD clock. */
+>> +        kvm_s390_set_tod_raw(&td->base, &local_err);
+>> +        if (local_err) {
+>> +            warn_report_err(local_err);
+>> +        }
+>> +        /* Treat errors like the TOD was running all the time. */
+>> +        td->stopped = false;
+>> +    } else if (!running && !td->stopped) {
+>> +        /* Store the TOD when stopping the VM - stop the TOD clock. */
+>> +        kvm_s390_get_tod_raw(&td->base, &local_err);
+>> +        if (local_err) {
+>> +            /* Keep the TOD running in case we could not back it up. */
+>> +            warn_report_err(local_err);
+>> +        } else {
+>> +            td->stopped = true;
+>> +        }
+>> +    }
+>> +}
+>> +
+>> +static void kvm_s390_tod_realize(S390TODState *td, Error **errp)
+>> +{
+>> +    /*
+>> +     * We need to know when the VM gets started/stopped to start/stop the TOD.
+>> +     * As we can never have more than one TOD instance (and that will never be
+>> +     * removed), registering here and never unregistering is good enough.
+>> +     */
+>> +    qemu_add_vm_change_state_handler(kvm_s390_tod_vm_state_change, td);
+>> +}
+>> +
+>>  static void kvm_s390_tod_class_init(ObjectClass *oc, void *data)
+>>  {
+>>      S390TODClass *tdc = S390_TOD_CLASS(oc);
+>>  
+>> +    tdc->realize = kvm_s390_tod_realize;
+>>      tdc->get = kvm_s390_tod_get;
+>>      tdc->set = kvm_s390_tod_set;
+>>  }
+>>  
+>> +static void kvm_s390_tod_init(Object *obj)
+>> +{
+>> +    S390TODState *td = S390_TOD(obj);
+>> +
+>> +    /*
+>> +     * The TOD is initially running (value stored in KVM). Avoid needless
+>> +     * loading/storing of the TOD when starting a simple VM, so let it
+>> +     * run although the (never started) VM is stopped. For migration, we
+>> +     * will properly set the TOD later.
+>> +     */
+>> +    td->stopped = false;
+>> +}
+>> +
+>>  static TypeInfo kvm_s390_tod_info = {
+>>      .name = TYPE_KVM_S390_TOD,
+>>      .parent = TYPE_S390_TOD,
+>>      .instance_size = sizeof(S390TODState),
+>> +    .instance_init = kvm_s390_tod_init,
+>>      .class_init = kvm_s390_tod_class_init,
+>>      .class_size = sizeof(S390TODClass),
+>>  };
+>> diff --git a/hw/s390x/tod.c b/hw/s390x/tod.c
+>> index 1c63f411e6..82ea6554ba 100644
+>> --- a/hw/s390x/tod.c
+>> +++ b/hw/s390x/tod.c
+>> @@ -97,9 +97,14 @@ static SaveVMHandlers savevm_tod = {
+>>  static void s390_tod_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      S390TODState *td = S390_TOD(dev);
+>> +    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
+>>  
+>>      /* Legacy migration interface */
+>>      register_savevm_live(NULL, "todclock", 0, 1, &savevm_tod, td);
+>> +
+>> +    if (tdc->realize) {
+>> +        tdc->realize(td, errp);
+>> +    }
+>>  }
+> 
+> I think the more usual way to deal with this, is to use
+> device_class_set_parent_realize() in the child's class init function,
+> and then to call ->parent_realize() from the child's realize function.
+> 
+> I guess it doesn't really matter in the end which way we do it here, but
+> it would be nice to be consistent with the other devices, so I'd prefer
+> to use device_class_set_parent_realize() for this here, too.
+> 
+> Apart from that, the patch looks fine to me.
 
-> This series has 3 different type of patches:
-> 
-> The first two:
->   s390x/vfio: ap: Finding the AP bridge
->   s390x/vfio: ap: Use the APdevice as a child of the APBus
-> 
-> Are dealing with the QEMU Object Model and how we retrieve the
-> AP devices from instruction interception.
-> A lifting of the AP bridge, bus and device was necessary to
-> ease the process and allow future extensions.
-> 
-> The third one is a place holder to ease reviewing:
->   s390x/vfio: ap: Linux uapi VFIO place holder
-> 
-> The last three are really dealing with PQAP/AQIC instruction
-> interception and associate IOCTL calls to the VFIO AP device
-> driver.
->   s390x/cpumodel: Set up CPU model for AQIC interception
->   s390x/vfio: ap: Definition for AP Adapter type
->   s390x/vfio: ap: Implementing AP Queue Interrupt Control
-> 
-> The S390 APQP/AQIC instruction is intercepted by the host
-> to configure the AP queues interruption redirection.
-> It retrieves the ISC used by the host and the one used
-> by the guest and setup the indicator address.
-> 
-> This patch series
-> - define the AQIC feature in the cpumodel,
-> - extend the APDevice type for per card and queue interrupt handling,
-> - intercept the APQP/AQIC instruction, uses the S390 adapter interface
->   to setup the adapter 
-> - and use a VFIO ioctl to let the VFIO-AP driver handle the host
->   instruction associated with the intercepted guest instruction.
-> 
-> This patch serie can be tested with the Linux/KVM patch series
-> for the VFIO-AP driver: "s390: vfio: ap: Using GISA for AP Interrupt"
-> 
+Alright, I will resend tomorrow with your suggested change.
 
-Sorry for raising concern this late, I hope it's better late than
-never.
-
-I have strong doubts that handling PQAP/AQCI via userspace is worth
-the effort. IMHO we could do what we have to do on AQCI in kernel
-iff the ap is done SIE interpreted, the appropriate feature is presented
-to the guest, and the queue in question belongs to the given guest. Or
-am I wrong?
-
-I do understand that doing it like this *may* end up being beneficial
-*if* we decide to do some sort of ap virtualization in QEMU. But I don't
-see it coming in the foreseeable future, and for ap virtualization we
-would need a solution for making the host do an NQAP and an DQAP on
-behalf of the guest/emulator, and not only to do the same for PQAP/QCI.
-
-In my understanding, with this, we would end up with an infrastructure
-that only makes sense in a perspective of some 'future features' which
-may never come to existence.
-
-What I ask for is, please, let us examine the other option.
-
-Regards,
-Halil
-
+Thanks!
 
 > 
-> Pierre Morel (6):
->   s390x/vfio: ap: Finding the AP bridge
->   s390x/vfio: ap: Use the APdevice as a child of the APBus
->   s390x/vfio: ap: Linux uapi VFIO place holder
->   s390x/cpumodel: Set up CPU model for AQIC interception
->   s390x/vfio: ap: Definition for AP Adapter type
->   s390x/vfio: ap: Implementing AP Queue Interrupt Control
+>  Thomas
 > 
->  hw/s390x/ap-bridge.c            |  12 ++++
->  hw/s390x/ap-device.c            |  22 +++++++
->  hw/vfio/ap.c                    | 131 +++++++++++++++++++++++++++++++++++++---
->  include/hw/s390x/ap-bridge.h    |   1 +
->  include/hw/s390x/ap-device.h    |  65 ++++++++++++++++++++
->  include/hw/s390x/css.h          |   1 +
->  linux-headers/linux/vfio.h      |  25 ++++++++
->  target/s390x/cpu_features.c     |   1 +
->  target/s390x/cpu_features_def.h |   1 +
->  target/s390x/cpu_models.c       |   1 +
->  target/s390x/gen-features.c     |   1 +
->  target/s390x/kvm.c              |  31 ++++++++++
->  12 files changed, 282 insertions(+), 10 deletions(-)
-> 
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
