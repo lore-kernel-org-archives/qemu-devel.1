@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJa-00056R-CS
+	(envelope-from <drjones@redhat.com>) id 1gSNJa-00056U-Eu
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJW-00078k-UY
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:12 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:39592)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJW-00075Z-HU
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:10 -0500
-From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Thu, 29 Nov 2018 17:29:06 +0300
-Message-ID: <154350174606.8036.1192124629967069868.stgit@Misha-PC.lan02.inno>
-In-Reply-To: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
-References: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
+	(envelope-from <drjones@redhat.com>) id 1gSNJY-0007AJ-IZ
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:14 -0500
+Date: Thu, 29 Nov 2018 15:28:57 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20181129142857.f6k343h2zys2zkor@kamzik.brq.redhat.com>
+References: <20181129132428.333-1-sameo@linux.intel.com>
+	<20181129132428.333-6-sameo@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 17/39] windbg: generate ExceptionStateChange
- and LoadSymbolsStateChange
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181129132428.333-6-sameo@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 5/8] hw: arm: Convert the RSDP build to
+ the buid_append_foo() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +24,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
----
- include/exec/windbgstub-utils.h |    3 +++
- target/i386/windbgstub.c        |   33 ++++++++++++++++++++++++++++++++-
- 2 files changed, 35 insertions(+), 1 deletion(-)
+On Thu, Nov 29, 2018 at 02:24:25PM +0100, Samuel Ortiz wrote:
+> Instead of filling a mapped and packed C structure field in random order
+> and being careful about endianness and sizes, build_rsdp() now uses
+> build_append_int_noprefix() to compose RSDP table.
+> 
+> This makes for an easier to review and maintain code that is almost
+> matching 1:1 the ACPI spec itself.
+> 
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> ---
+>  hw/arm/virt-acpi-build.c | 42 +++++++++++++++++++++-------------------
+>  1 file changed, 22 insertions(+), 20 deletions(-)
 
-diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index a28068eecd..794cb387b0 100644
---- a/include/exec/windbgstub-utils.h
-+++ b/include/exec/windbgstub-utils.h
-@@ -67,6 +67,9 @@ typedef struct PacketData {
- const char *kd_api_name(int id);
- const char *kd_pkt_type_name(int id);
- 
-+DBGKD_ANY_WAIT_STATE_CHANGE *kd_state_change_exc(CPUState *cs);
-+DBGKD_ANY_WAIT_STATE_CHANGE *kd_state_change_ls(CPUState *cs);
-+
- bool windbg_on_load(void);
- void windbg_on_reset(void);
- 
-diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index b2ac7a6d5f..37c5805818 100644
---- a/target/i386/windbgstub.c
-+++ b/target/i386/windbgstub.c
-@@ -161,7 +161,6 @@ void windbg_on_reset(void)
- #endif
- }
- 
--__attribute__ ((unused)) /* unused yet */
- static void kd_init_state_change(CPUState *cs, DBGKD_ANY_WAIT_STATE_CHANGE *sc)
- {
-     X86CPU *cpu = X86_CPU(cs);
-@@ -201,3 +200,35 @@ static void kd_init_state_change(CPUState *cs, DBGKD_ANY_WAIT_STATE_CHANGE *sc)
-     memset(cr->InstructionStream, 0, DBGKD_MAXSTREAM);
-     stw_p(&cr->InstructionCount, 0);
- }
-+
-+DBGKD_ANY_WAIT_STATE_CHANGE *kd_state_change_exc(CPUState *cs)
-+{
-+    DBGKD_ANY_WAIT_STATE_CHANGE *sc = g_new0(DBGKD_ANY_WAIT_STATE_CHANGE, 1);
-+    DBGKM_EXCEPTION_RECORD64 *exc = &sc->u.Exception.ExceptionRecord;
-+    X86CPU *cpu = X86_CPU(cs);
-+    CPUX86State *env = &cpu->env;
-+
-+    kd_init_state_change(cs, sc);
-+
-+    stl_p(&sc->NewState, DbgKdExceptionStateChange);
-+    sttul_p(&exc->ExceptionAddress, env->eip);
-+
-+    /* TODO: Fix this hardcoded value. */
-+    stl_p(&exc->ExceptionCode, 0x80000003);
-+
-+    return sc;
-+}
-+
-+DBGKD_ANY_WAIT_STATE_CHANGE *kd_state_change_ls(CPUState *cs)
-+{
-+    DBGKD_ANY_WAIT_STATE_CHANGE *sc = g_new0(DBGKD_ANY_WAIT_STATE_CHANGE, 1);
-+
-+    kd_init_state_change(cs, sc);
-+
-+    stl_p(&sc->NewState, DbgKdLoadSymbolsStateChange);
-+
-+    /* TODO: Path to load symbold (with extra array). */
-+    stl_p(&sc->u.LoadSymbols.PathNameLength, 0);
-+
-+    return sc;
-+}
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
