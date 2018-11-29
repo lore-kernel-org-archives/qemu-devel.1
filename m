@@ -1,40 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gSU8W-00009T-At
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:46:17 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gSUAq-0002FE-W4
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:48:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gSU8T-0006mP-4H
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:46:16 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45302
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gSUAn-0000ZK-Ji
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:48:40 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:41686)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gSU8S-0006lp-To
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:46:13 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wATLhvFN056517
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 16:46:12 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2p2q2fjycb-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 16:46:12 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Thu, 29 Nov 2018 21:46:11 -0000
-References: <faeb4b80-e191-d670-d057-28eb4ac11d11@linux.ibm.com>
-	<79b674dd-d5b5-ff7c-7497-6fce2cb31b8a@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Thu, 29 Nov 2018 16:46:07 -0500
-MIME-Version: 1.0
-In-Reply-To: <79b674dd-d5b5-ff7c-7497-6fce2cb31b8a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <d72e0106-2395-5154-68bf-b7ed55551c1e@linux.ibm.com>
-Subject: Re: [Qemu-devel] qemu-iotests 232 fails when running the test as
- root user
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1gSUAn-0000XM-8G
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:48:37 -0500
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Date: Thu, 29 Nov 2018 23:47:42 +0200
+Message-Id: <20181129214805.2749-1-yuval.shaia@oracle.com>
+Subject: [Qemu-devel] [PATCH v6 00/23] Add support for RDMA MAD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,40 +22,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>
+To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
+Hi all.
 
+This is a major enhancement to the pvrdma device to allow it to work with
+state of the art applications such as MPI.
 
-On 11/29/2018 04:07 PM, Eric Blake wrote:
-> On 11/29/18 3:03 PM, Farhan Ali wrote:
->> Hi,
->>
->> I am seeing a failure of the qemu-iotest number 232 when running the 
->> test as a root user. Is this the expected behavior?
->>
->> Here is the output of the failure:
->>
-> 
->> -QEMU_PROG: -drive 
->> driver=file,file=TEST_DIR/t.IMGFMT,if=none,read-only=off,auto-read-only=off: 
->> Could not open 'TEST_DIR/t.IMGFMT': Permission denied
->> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
->> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
->> -
->> -QEMU_PROG: -drive 
->> driver=file,file=TEST_DIR/t.IMGFMT,if=none,auto-read-only=off: Could 
->> not open 'TEST_DIR/t.IMGFMT': Permission denied
->> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
->> -NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
->> +NODE_NAME: TEST_DIR/t.IMGFMT (file)
-> 
-> Not entirely unexpected (since root can read what are otherwise 
-> read-only files), but obviously unexpected by the test. The test should 
-> probably refuse to run as root.
-> 
+As described in patch #5, MAD packets are management packets that are used
+for many purposes including but not limited to communication layer above IB
+verbs API.
 
-Yes, I believe it would be better if there was a check to prevent 
-running this test as root.
+Patch 1 exposes new external executable (under contrib) that aims to
+address a specific limitation in the RDMA usrespace MAD stack.
 
-Thanks
-Farhan
+This patch-set mainly present MAD enhancement but during the work on it i
+came across some bugs and enhancement needed to be implemented before doing
+any MAD coding. This is the role of patches 2 to 4, 7 to 9 and 15 to 17.
+
+Patches 6 and 18 are cosmetic changes while not relevant to this patchset
+still introduce with it since (at least for 6) hard to decouple.
+
+Patches 12 to 15 couple pvrdma device with vmxnet3 device as this is the
+configuration enforced by pvrdma driver in guest - a vmxnet3 device in
+function 0 and pvrdma device in function 1 in the same PCI slot. Patch 12
+moves needed code from vmxnet3 device to a new header file that can be used
+by pvrdma code while Patches 13 to 15 use of it.
+
+Along with this patch-set there is a parallel patch posted to libvirt to
+apply the change needed there as part of the process implemented in patches
+10 and 11. This change is needed so that guest would be able to configure
+any IP to the Ethernet function of the pvrdma device.
+https://www.redhat.com/archives/libvir-list/2018-November/msg00135.html
+
+Since we maintain external resources such as GIDs on host GID table we need
+to do some cleanup before going down. This is the job of patches 19 and 20.
+
+Patches 21 to 22 contain a fixes for bugs detected during the work on
+processing VM shutdown notification.
+
+Patch 23 fixes documentation.
+
+Review is needed for:
+[11] hw/pvrdma: Add support to allow guest to configure GID table
+[23] docs: Update pvrdma device documentation
+
+And second review is needed for:
+[10] qapi: Define new QMP message for pvrdma
+[17] hw/pvrdma: Fill error code in command's response
+
+v1 -> v2:
+    * Fix compilation issue detected when compiling for mingw
+    * Address comment from Eric Blake re version of QEMU in json
+      message
+    * Fix example from QMP message in json file
+    * Fix case where a VM tries to remove an invalid GID from GID table
+    * rdmacm-mux: Cleanup entries in socket-gids table when socket is
+      closed
+    * Cleanup resources (GIDs, QPs etc) when VM goes down
+
+v2 -> v3:
+    * Address comment from Cornelia Huck for patch #19
+    * Add some R-Bs from Marcel Apfelbaum and Dmitry Fleytman
+    * Update docs/pvrdma.txt with the changes made by this patchset
+    * Address comments from Shamir Rabinovitch for UMAD multiplexer
+
+v3 -> v4:
+    * Address some comments from Marcel
+    * Add some R-Bs from Cornelia Huck and Shamir Rabinovitch
+
+v4 -> v5:
+    * Add one more patch that deletes code that performs unneeded (and
+      buggy) cleanup of resources during VM shutdown.
+    * Fix race condition that might happen when MAD response arrive before
+      ack for the send is received.
+    * Based qapi patch on Eric Blake's patch "qapi: Reduce Makefile
+      boilerplate" per Markus Armbruster's suggestion.
+      Please note that this will cause build error until Eric's patch will
+      be applied.
+    * Add some debug log messages to rdmacm-mux
+
+v5 -> v6
+    * Add some R-Bs from Marcel
+    * Set hop_limit to 0xFF in mad_send
+    * Accept comment from Marcel re clearing response in execute_command
+    * Change version for QMP message per Eric Blake comment
+    * Add some notes to docs/pvrdma.txt as suggested by Marcel
+    * in rdmacm-mux, do not default to rxe0
+
+Yuval Shaia (23):
+  contrib/rdmacm-mux: Add implementation of RDMA User MAD multiplexer
+  hw/rdma: Add ability to force notification without re-arm
+  hw/rdma: Return qpn 1 if ibqp is NULL
+  hw/rdma: Abort send-op if fail to create addr handler
+  hw/rdma: Add support for MAD packets
+  hw/pvrdma: Make function reset_device return void
+  hw/pvrdma: Make default pkey 0xFFFF
+  hw/pvrdma: Set the correct opcode for recv completion
+  hw/pvrdma: Set the correct opcode for send completion
+  qapi: Define new QMP message for pvrdma
+  hw/pvrdma: Add support to allow guest to configure GID table
+  vmxnet3: Move some definitions to header file
+  hw/pvrdma: Make sure PCI function 0 is vmxnet3
+  hw/rdma: Initialize node_guid from vmxnet3 mac address
+  hw/pvrdma: Make device state depend on Ethernet function state
+  hw/pvrdma: Fill all CQE fields
+  hw/pvrdma: Fill error code in command's response
+  hw/rdma: Remove unneeded code that handles more that one port
+  vl: Introduce shutdown_notifiers
+  hw/pvrdma: Clean device's resource when system is shutdown
+  hw/rdma: Do not use bitmap_zero_extend to free bitmap
+  hw/rdma: Do not call rdma_backend_del_gid on an empty gid
+  docs: Update pvrdma device documentation
+
+ MAINTAINERS                      |   2 +
+ Makefile                         |   3 +
+ Makefile.objs                    |   4 +-
+ contrib/rdmacm-mux/Makefile.objs |   4 +
+ contrib/rdmacm-mux/main.c        | 798 +++++++++++++++++++++++++++++++
+ contrib/rdmacm-mux/rdmacm-mux.h  |  61 +++
+ docs/pvrdma.txt                  | 126 ++++-
+ hw/net/vmxnet3.c                 | 116 +----
+ hw/net/vmxnet3_defs.h            | 133 ++++++
+ hw/rdma/rdma_backend.c           | 515 +++++++++++++++++---
+ hw/rdma/rdma_backend.h           |  28 +-
+ hw/rdma/rdma_backend_defs.h      |  19 +-
+ hw/rdma/rdma_rm.c                | 120 ++++-
+ hw/rdma/rdma_rm.h                |  17 +-
+ hw/rdma/rdma_rm_defs.h           |  21 +-
+ hw/rdma/rdma_utils.h             |  25 +
+ hw/rdma/vmw/pvrdma.h             |  10 +-
+ hw/rdma/vmw/pvrdma_cmd.c         | 228 +++++----
+ hw/rdma/vmw/pvrdma_main.c        |  61 ++-
+ hw/rdma/vmw/pvrdma_qp_ops.c      |  62 ++-
+ include/sysemu/sysemu.h          |   1 +
+ qapi/qapi-schema.json            |   1 +
+ qapi/rdma.json                   |  38 ++
+ vl.c                             |  15 +-
+ 24 files changed, 2024 insertions(+), 384 deletions(-)
+ create mode 100644 contrib/rdmacm-mux/Makefile.objs
+ create mode 100644 contrib/rdmacm-mux/main.c
+ create mode 100644 contrib/rdmacm-mux/rdmacm-mux.h
+ create mode 100644 hw/net/vmxnet3_defs.h
+ create mode 100644 qapi/rdma.json
+
+-- 
+2.17.2
