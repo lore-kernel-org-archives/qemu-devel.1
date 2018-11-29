@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gSUBA-0002Nx-7x
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:49:03 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gSUBD-0002QW-EP
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:49:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gSUB4-0000sx-6J
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:48:58 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:54416)
+	(envelope-from <yuval.shaia@oracle.com>) id 1gSUBA-0000yw-46
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:49:03 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:40014)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gSUB2-0000oR-4s
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:48:54 -0500
+	id 1gSUB6-0000sG-7K
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:48:57 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 29 Nov 2018 23:47:45 +0200
-Message-Id: <20181129214805.2749-4-yuval.shaia@oracle.com>
+Date: Thu, 29 Nov 2018 23:47:48 +0200
+Message-Id: <20181129214805.2749-7-yuval.shaia@oracle.com>
 In-Reply-To: <20181129214805.2749-1-yuval.shaia@oracle.com>
 References: <20181129214805.2749-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v6 03/23] hw/rdma: Return qpn 1 if ibqp is NULL
+Subject: [Qemu-devel] [PATCH v6 06/23] hw/pvrdma: Make function reset_device
+ return void
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +27,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-Device is not supporting QP0, only QP1.
+This function cannot fail - fix it to return void
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/rdma_backend.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/rdma/vmw/pvrdma_main.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/hw/rdma/rdma_backend.h b/hw/rdma/rdma_backend.h
-index 86e8fe8ab6..3ccc9a2494 100644
---- a/hw/rdma/rdma_backend.h
-+++ b/hw/rdma/rdma_backend.h
-@@ -33,7 +33,7 @@ static inline union ibv_gid *rdma_backend_gid(RdmaBackendDev *dev)
- 
- static inline uint32_t rdma_backend_qpn(const RdmaBackendQP *qp)
- {
--    return qp->ibqp ? qp->ibqp->qp_num : 0;
-+    return qp->ibqp ? qp->ibqp->qp_num : 1;
+diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+index 6c8c0154fa..fc2abd34af 100644
+--- a/hw/rdma/vmw/pvrdma_main.c
++++ b/hw/rdma/vmw/pvrdma_main.c
+@@ -369,13 +369,11 @@ static int unquiesce_device(PVRDMADev *dev)
+     return 0;
  }
  
- static inline uint32_t rdma_backend_mr_lkey(const RdmaBackendMR *mr)
+-static int reset_device(PVRDMADev *dev)
++static void reset_device(PVRDMADev *dev)
+ {
+     pvrdma_stop(dev);
+ 
+     pr_dbg("Device reset complete\n");
+-
+-    return 0;
+ }
+ 
+ static uint64_t regs_read(void *opaque, hwaddr addr, unsigned size)
 -- 
 2.17.2
