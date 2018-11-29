@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gSNnx-0002jv-Pb
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:00:43 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gSNoB-0002us-8Q
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:00:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gSNnp-0007ZG-Sy
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:00:36 -0500
-Date: Thu, 29 Nov 2018 15:59:42 +0100
-From: Samuel Ortiz <sameo@linux.intel.com>
-Message-ID: <20181129145942.GB4691@caravaggio>
-References: <20181129132428.333-1-sameo@linux.intel.com>
-	<20181129132428.333-7-sameo@linux.intel.com>
-	<20181129144243.so22d2igis7a24xp@kamzik.brq.redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1gSNo5-0007sN-Jp
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:00:51 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39141)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gSNo4-0007pt-Rk
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:00:45 -0500
+Received: by mail-wm1-x343.google.com with SMTP id n133so2555444wmd.4
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 07:00:44 -0800 (PST)
+References: <20181123144558.5048-1-richard.henderson@linaro.org>
+	<20181123144558.5048-6-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181123144558.5048-6-richard.henderson@linaro.org>
+Date: Thu, 29 Nov 2018 15:00:41 +0000
+Message-ID: <87y39c2ajq.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181129144243.so22d2igis7a24xp@kamzik.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/8] hw: arm: Support both legacy and
- current RSDP build
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2 05/37] tcg/i386: Add constraints
+ for r8 and r9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
-
-On Thu, Nov 29, 2018 at 03:42:43PM +0100, Andrew Jones wrote:
-> On Thu, Nov 29, 2018 at 02:24:26PM +0100, Samuel Ortiz wrote:
-> > We add the ability to build legacy or current RSDP tables, based on the
-> > AcpiRsdpData revision field passed to build_rsdp().
-> > Although arm/virt only uses RSDP v2, adding that capability to
-> > build_rsdp will allow us to share the RSDP build code between ARM and x86.
-> > 
-> > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > ---
-> >  hw/arm/virt-acpi-build.c | 37 ++++++++++++++++++++++++++-----------
-> >  1 file changed, 26 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > index 4782aea4fe..e1338b6f5a 100644
-> > --- a/hw/arm/virt-acpi-build.c
-> > +++ b/hw/arm/virt-acpi-build.c
-> > @@ -378,23 +378,38 @@ build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
-> >      g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
-> >      build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision */
-> >      build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
-> > -    build_append_int_noprefix(tbl, 36, 4); /* Length */
-> > -
-> > -    /* XSDT address to be filled by guest linker */
-> > -    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
-> > -    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
-> > -                                   24, 8,
-> > -                                   ACPI_BUILD_TABLE_FILE,
-> > -                                   *rsdp_data->xsdt_tbl_offset);
-> > -
-> > -    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
-> > -    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
-> > +    if (rsdp_data->rsdt_tbl_offset) {
-> 
-> I see why a pointer was used now. Using a pointer ensures a zero
-> offset won't fail this test. However the test could be replaced with
-> rsdp_data->revision == 0.
-> 
-> > +        /* RSDT address to be filled by guest linker */
-> > +        bios_linker_loader_add_pointer(linker,
-> > +                                       ACPI_BUILD_RSDP_FILE, 16, 4,
-> > +                                       ACPI_BUILD_TABLE_FILE,
-> > +                                       *rsdp_data->rsdt_tbl_offset);
-> > +    }
-> >  
-> >      /* Checksum to be filled by guest linker */
-> >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> >                                      0, 20, /* ACPI rev 1.0 RSDP size */
-> >                                      8);
-> >  
-> > +    if (rsdp_data->revision == 0) {
-> > +        /* ACPI 1.0 RSDP, we're done */
-> > +        return;
-> > +    }
-> > +
-> > +    /* The RSDP revision is 2 and later, we must have an XSDT pointer */
-> > +    g_assert(rsdp_data->xsdt_tbl_offset != NULL);
-> 
-> So here's the justification for the pointers. We sanity check the callers.
-We could sanity check the callers without pointers as well, I don't
-think there's a strong advantage for pointers here, except consistence.
+To: qemu-devel@nongnu.org
+Cc: Alistair.Francis@wdc.com
 
 
-> We're missing the (rsdp_data->revision == 0 && rsdp_data->rsdt_tbl_offset)
-> sanity check though.
-I think there's nothing preventing a caller to include both rsdt and
-xsdt if it wants to be able to run on both < 2.0 and 2.0+ platforms with
-the same table. So if rsdt is set we should add it, regardless of the revision.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Cheers,
-Samuel.
+> These are function call arguments for x86_64 we will need soon.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tcg/i386/tcg-target.inc.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+> index 4f66a0c5ae..8aef66e430 100644
+> --- a/tcg/i386/tcg-target.inc.c
+> +++ b/tcg/i386/tcg-target.inc.c
+> @@ -233,6 +233,14 @@ static const char *target_parse_constraint(TCGArgCon=
+straint *ct,
+>          ct->ct |=3D TCG_CT_REG;
+>          tcg_regset_set_reg(ct->u.regs, TCG_REG_EDI);
+>          break;
+> +    case 'E': /* "Eight", r8 */
+> +        ct->ct |=3D TCG_CT_REG;
+> +        tcg_regset_set_reg(ct->u.regs, TCG_REG_R8);
+> +        break;
+> +    case 'N': /* "Nine", r9 */
+> +        ct->ct |=3D TCG_CT_REG;
+> +        tcg_regset_set_reg(ct->u.regs, TCG_REG_R9);
+> +        break;
+
+I would be nice to flesh out the missing comments in tcg.h:
+
+#define TCG_CT_ALIAS  0x80
+#define TCG_CT_IALIAS 0x40
+#define TCG_CT_NEWREG 0x20 /* output requires a new register */
+#define TCG_CT_REG    0x01
+#define TCG_CT_CONST  0x02 /* any constant of register size */
+
+Anyway:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+>      case 'q':
+>          /* A register that can be used as a byte operand.  */
+>          ct->ct |=3D TCG_CT_REG;
+
+
+--
+Alex Benn=C3=A9e
