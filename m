@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gSEBG-0004a0-Fb
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:44:04 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gSEBG-0004Zz-Et
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:44:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gSEBC-0008K1-Qp
+	(envelope-from <dgibson@ozlabs.org>) id 1gSEBC-0008K3-R1
 	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:44:02 -0500
-Date: Thu, 29 Nov 2018 14:47:32 +1100
+Date: Thu, 29 Nov 2018 15:08:06 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181129034732.GC14697@umbus.fritz.box>
+Message-ID: <20181129040806.GE14697@umbus.fritz.box>
 References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-25-clg@kaod.org>
+	<20181116105729.23240-29-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="CblX+4bnyfN0pR09"
+	protocol="application/pgp-signature"; boundary="RpqchZ26BWispMcB"
 Content-Disposition: inline
-In-Reply-To: <20181116105729.23240-25-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 24/36] spapr: add a 'reset' method to
- the sPAPR IRQ backend
+In-Reply-To: <20181116105729.23240-29-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 28/36] ppc/xics: introduce a
+ icp_kvm_init() routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,178 +29,82 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---CblX+4bnyfN0pR09
+--RpqchZ26BWispMcB
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 16, 2018 at 11:57:17AM +0100, C=E9dric Le Goater wrote:
-> This method will become useful when the new machine supporting both
-> interrupt modes, XIVE and XICS, is introduced. In this machine, the
-> interrupt mode is chosen by the CAS negotiation process and activated
-> after a reset.
->=20
-> For the time being, the only thing that can be done in the XIVE reset
-> handler is to map the pages for the TIMA and for the source ESBs.
+On Fri, Nov 16, 2018 at 11:57:21AM +0100, C=E9dric Le Goater wrote:
+> This routine gathers all the KVM initialization of the XICS KVM
+> presenter. It will be useful when the initialization of the KVM XICS
+> device is moved to a global routine.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+I dislike calling things *_init() because it's not clear which of
+qemu's many "init" hooks it belongs with.
+
 > ---
->  include/hw/ppc/spapr_irq.h  |  2 ++
->  include/hw/ppc/spapr_xive.h |  1 +
->  hw/intc/spapr_xive.c        |  4 +---
->  hw/ppc/spapr.c              |  2 ++
->  hw/ppc/spapr_irq.c          | 21 +++++++++++++++++++++
->  5 files changed, 27 insertions(+), 3 deletions(-)
+>  hw/intc/xics_kvm.c | 29 +++++++++++++++++++----------
+>  1 file changed, 19 insertions(+), 10 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index 4e36c0984e1a..34128976e21c 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -46,6 +46,7 @@ typedef struct sPAPRIrq {
->      Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
->                                 Error **errp);
->      int (*post_load)(sPAPRMachineState *spapr, int version_id);
-> +    void (*reset)(sPAPRMachineState *spapr, Error **errp);
->  } sPAPRIrq;
-> =20
->  extern sPAPRIrq spapr_irq_xics;
-> @@ -57,6 +58,7 @@ int spapr_irq_claim(sPAPRMachineState *spapr, int irq, =
-bool lsi, Error **errp);
->  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
->  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
->  int spapr_irq_post_load(sPAPRMachineState *spapr, int version_id);
-> +void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp);
-> =20
->  /*
->   * XICS legacy routines
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index d2517c040958..fa7f3d7718da 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -91,6 +91,7 @@ typedef struct sPAPRMachineState sPAPRMachineState;
->  void spapr_xive_hcall_init(sPAPRMachineState *spapr);
->  void spapr_dt_xive(sPAPRXive *xive, int nr_servers, void *fdt,
->                     uint32_t phandle);
-> +void spapr_xive_mmio_map(sPAPRXive *xive);
-> =20
->  /*
->   * XIVE KVM models
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index c5c0e063dc33..def43160e12a 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -51,7 +51,7 @@ void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor=
- *mon)
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index e8fa9a53aeba..efad1b19d821 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -123,11 +123,8 @@ static void icp_kvm_reset(DeviceState *dev)
+>      icp_set_kvm_state(ICP(dev), 1);
 >  }
 > =20
->  /* Map the ESB pages and the TIMA pages */
-> -static void spapr_xive_mmio_map(sPAPRXive *xive)
-> +void spapr_xive_mmio_map(sPAPRXive *xive)
+> -static void icp_kvm_realize(DeviceState *dev, Error **errp)
+> +static void icp_kvm_init(ICPState *icp, Error **errp)
 >  {
->      sysbus_mmio_map(SYS_BUS_DEVICE(&xive->source), 0, xive->vc_base);
->      sysbus_mmio_map(SYS_BUS_DEVICE(&xive->end_source), 0, xive->end_base=
-);
-> @@ -77,8 +77,6 @@ static void spapr_xive_base_reset(DeviceState *dev)
->      for (i =3D 0; i < xive->nr_ends; i++) {
->          xive_end_reset(&xive->endt[i]);
+> -    ICPState *icp =3D ICP(dev);
+> -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
+> -    Error *local_err =3D NULL;
+>      CPUState *cs;
+>      KVMEnabledICP *enabled_icp;
+>      unsigned long vcpu_id;
+> @@ -137,12 +134,6 @@ static void icp_kvm_realize(DeviceState *dev, Error =
+**errp)
+>          abort();
 >      }
+> =20
+> -    icpc->parent_realize(dev, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
 > -
-> -    spapr_xive_mmio_map(xive);
+>      cs =3D icp->cs;
+>      vcpu_id =3D kvm_arch_vcpu_id(cs);
+> =20
+> @@ -168,6 +159,24 @@ static void icp_kvm_realize(DeviceState *dev, Error =
+**errp)
+>      QLIST_INSERT_HEAD(&kvm_enabled_icps, enabled_icp, node);
 >  }
 > =20
->  static void spapr_xive_base_instance_init(Object *obj)
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index d1be2579cd9b..013e6ea8aa64 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1628,6 +1628,8 @@ static void spapr_machine_reset(void)
->          spapr_irq_msi_reset(spapr);
->      }
-> =20
-> +    spapr_irq_reset(spapr, &error_fatal);
-> +
->      qemu_devices_reset();
-> =20
->      /* DRC reset may cause a device to be unplugged. This will cause tro=
-ubles
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 6fac6ca70595..984c6d60cd9f 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -13,6 +13,7 @@
->  #include "qapi/error.h"
->  #include "hw/ppc/spapr.h"
->  #include "hw/ppc/spapr_xive.h"
-> +#include "hw/ppc/spapr_cpu_core.h"
->  #include "hw/ppc/xics.h"
->  #include "sysemu/kvm.h"
-> =20
-> @@ -215,6 +216,10 @@ static int spapr_irq_post_load_xics(sPAPRMachineStat=
-e *spapr, int version_id)
->      return 0;
->  }
-> =20
-> +static void spapr_irq_reset_xics(sPAPRMachineState *spapr, Error **errp)
+> +static void icp_kvm_realize(DeviceState *dev, Error **errp)
 > +{
-> +}
+> +    ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
+> +    Error *local_err =3D NULL;
 > +
->  #define SPAPR_IRQ_XICS_NR_IRQS     0x1000
->  #define SPAPR_IRQ_XICS_NR_MSIS     \
->      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-> @@ -232,6 +237,7 @@ sPAPRIrq spapr_irq_xics =3D {
->      .dt_populate =3D spapr_irq_dt_populate_xics,
->      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
->      .post_load   =3D spapr_irq_post_load_xics,
-> +    .reset       =3D spapr_irq_reset_xics,
->  };
-> =20
->   /*
-> @@ -362,6 +368,11 @@ static int spapr_irq_post_load_xive(sPAPRMachineStat=
-e *spapr, int version_id)
->      return spapr_xive_post_load(spapr->xive, version_id);
->  }
-> =20
-> +static void spapr_irq_reset_xive(sPAPRMachineState *spapr, Error **errp)
-> +{
-> +    spapr_xive_mmio_map(spapr->xive);
-
-It's usually not a good idea to actually construct different
-MemoryRegion's at run time.  Instead map them all in, but disable the
-ones you don't want (with memory_region_set_enabled()).
-
-I think your current version will also leave the TIMA etc. still
-mapped if you reboot from a XIVE guest to a XICS guest.
-
-> +}
+> +    icpc->parent_realize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
 > +
->  /*
->   * XIVE uses the full IRQ number space. Set it to 8K to be compatible
->   * with XICS.
-> @@ -383,6 +394,7 @@ sPAPRIrq spapr_irq_xive =3D {
->      .dt_populate =3D spapr_irq_dt_populate_xive,
->      .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
->      .post_load   =3D spapr_irq_post_load_xive,
-> +    .reset       =3D spapr_irq_reset_xive,
->  };
-> =20
->  /*
-> @@ -428,6 +440,15 @@ int spapr_irq_post_load(sPAPRMachineState *spapr, in=
-t version_id)
->      return smc->irq->post_load(spapr, version_id);
->  }
-> =20
-> +void spapr_irq_reset(sPAPRMachineState *spapr, Error **errp)
-> +{
-> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> +
-> +    if (smc->irq->reset) {
-> +        smc->irq->reset(spapr, errp);
+> +    icp_kvm_init(ICP(dev), &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
 > +    }
 > +}
 > +
->  /*
->   * XICS legacy routines - to deprecate one day
->   */
+>  static void icp_kvm_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -208,24 +112,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---CblX+4bnyfN0pR09
+--RpqchZ26BWispMcB
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv/YVQACgkQbDjKyiDZ
-s5IwOxAAxM7yXOKjb6yttgGr6v0idB9czpTtG8d9Uza6WOPLjPHBxgQKX+A2X57o
-+WYi0T3sgBeyNazlgAyFb/Ine34BNaKw8iTNjhKL2yLHNIdha0oHLA7vDbq4ig1g
-ZP0MIOmnq5TQkaGJTlvF5P4IlKfsx4Jncr0w57EVKHujG8izx83uFil6SonqAWB+
-Pb3u7q4gW7rgcV2fcpV9Ri6ifdQzzHqVnhGWBOmA136HHZrthjvkD5GG4P+V5vUv
-XYVqTHzxxovrXau/hSMci0mQnMsUYxmboYQrmzRxH+XB/fDUxuCWc1Rj3Qa7Jhb1
-CLOXROJ+/1sKK+CdvrSC4vkNan0+huXIKa1GH+I3JoAZCbnjklB9NnLBAlrZTGRM
-CIxu0agcaHGbdnyIvQFY9rjZ7Q7hOcBOnaZs6p9FjU1EkkSuDbTfkztQnhDh4bp/
-IA0lCmH+Iyj5UuDTsSXr/H0FKMwycH38+ehD7C4+22C+hakaaPniQqF8/fRUFgfu
-DcCmIo5jN7XA0p8y33sxsovZE4556AZfajsIzbCxjilzSApxFL92pYpBATHBC72b
-/4eu4oTktDeVMmihtWN9f9qqGt6TYKVD1l5jxBqa2irW7TJYlhKM7jSbFFw9aToM
-D+fEMFXwt9NVk0f1f8Rdtod716jtmt2uHb8vwo1IsW6neDwm2qs=
-=eyQm
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv/ZiYACgkQbDjKyiDZ
+s5JU3hAAy8WwErLS5jha2/TR2BiE6oCfyLcKKyFZOW7VimQWJbapBeVBHEsHKLO1
+la/3I1L/6NXeijv5nZBw1vjuek9VHQkS3fVPLx8AefV9eMtv1Uay0qTDb/+SjPr5
+PEyQTq0SplPHfVOqvFIXOHfTmZ1sogQFTvfEsyGqreVUSoMIauj5An1ZuuZ7UgTI
+qBQHMUYxCN8DGlvwTPzH3w4MafNiFUS3rUpyPIdKBHJu+xdhTyow0sBhS1BU5NAD
+5eAqJHY2ed/tk1HQbpEL7FhugZm6H2ZHLVrKdbzlIBkgZ4ctzZHrqbmxk3oXu9/Q
+t4vSkC6bwuGOC7ledUNyQaJbJ3wNMsfV0ARGK2Pquh+b609HCe2+O/ObVBfoxYLh
+E5AKATjpR/YOhobAU/1t2MgL1nyhCdTJFh2zz3S4XhPpmOcOY1ULg4693GqHT5CA
+dehN5L543IL4qTaEh85z4ZjN8T62cbodKXAkrjilbLLbuIUywBcSsvZgKLkUJ8LO
+W4RAHXsHa4XfZV+bhBI9m3ajZ95sxvjkrk/f5QCuNflL7MGJcRvopFu9mnz71yMl
+16RH84/chAcSerl2vZ7+acBmetfKshVaPB5Ok1mdkBJW+zDDpEcrhFPCcZNKPv1W
+6jNLNTvetaUHfIw6pSFcIZGxZhf0Vkkc0rSU86LYRPrLzocloFU=
+=b5MX
 -----END PGP SIGNATURE-----
 
---CblX+4bnyfN0pR09--
+--RpqchZ26BWispMcB--
