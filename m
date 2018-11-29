@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gSGjN-0003m7-Ny
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 02:27:30 -0500
+	(envelope-from <jing2.liu@linux.intel.com>) id 1gSGpR-0002Rc-QO
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 02:33:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiezhide@huawei.com>) id 1gSGfj-0005y4-I7
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 02:23:43 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2354 helo=huawei.com)
+	(envelope-from <jing2.liu@linux.intel.com>) id 1gSGpN-0002m0-Pv
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 02:33:41 -0500
+Received: from mga02.intel.com ([134.134.136.20]:29817)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xiezhide@huawei.com>) id 1gSGfi-0005rb-WD
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 02:23:39 -0500
-From: xiezhide <xiezhide@huawei.com>
-Date: Thu, 29 Nov 2018 07:23:26 +0000
-Message-ID: <A02D6AA901860840B46E751C5E9E38B43CC9D5A5@dggeml512-mbs.china.huawei.com>
-References: <cover.1542384802.git.xiezhide@huawei.com>
-	<a4bc041444fd76d5da1d8e5321007f416df4ab84.1542384802.git.xiezhide@huawei.com>
-	<87ftvlh7us.fsf@dusky.pond.sub.org>
-	<1a77a48a-7160-8282-7c8f-de0b6dfe68f3@redhat.com>
-In-Reply-To: <1a77a48a-7160-8282-7c8f-de0b6dfe68f3@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
+	id 1gSGpI-0001g3-KY
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 02:33:35 -0500
+From: "Liu, Jing2" <jing2.liu@linux.intel.com>
+Message-ID: <62de590c-b752-1946-1a53-b0e94a4022d3@linux.intel.com>
+Date: Thu, 29 Nov 2018 15:32:21 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 2/6] fsdev-throttle-qmp: Rename the
- ThrottleLimits member names
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [Question] Hotplug rescan/remove by manual
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +26,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: "berto@igalia.com" <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "groug@kaod.org" <groug@kaod.org>, zengcanfu
-	00215970 <zengcanfu@huawei.com>, "aneesh.kumar@linux.vnet.ibm.com" <aneesh.kumar@linux.vnet.ibm.com>, Jinxuefeng <jinxuefeng@huawei.com>, "Chenhui (Felix, Euler)" <chenhui.rtos@huawei.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: jing2.liu@intel.com
 
-DQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1IDIvNl0gZnNkZXYtdGhyb3R0
-bGUtcW1wOiBSZW5hbWUgdGhlDQo+IFRocm90dGxlTGltaXRzIG1lbWJlciBuYW1lcw0KPiANCj4g
-T24gMTEvMjgvMTggMzoyNSBBTSwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+ID4geGllemhp
-ZGUgPHhpZXpoaWRlQGh1YXdlaS5jb20+IHdyaXRlczoNCj4gPg0KPiA+PiBSZW5hbWUgdGhlIFRo
-cm90dGxlTGltaXRzIG1lbWJlciBuYW1lcyBhbmQgbW9kaWZ5IHJlbGF0ZWQgY29kZQ0KPiA+Pg0K
-PiA+PiBTaWduZWQtb2ZmLWJ5OiB4aWV6aGlkZSA8eGllemhpZGVAaHVhd2VpLmNvbT4NCj4gPj4g
-LS0tDQo+ID4+ICAgcWFwaS9ibG9jay1jb3JlLmpzb24gfCAgNzAgKysrKysrKysrKystLS0tLS0t
-LS0tLQ0KPiA+PiAgIHV0aWwvdGhyb3R0bGUuYyAgICAgIHwgMTYzDQo+ICsrKysrKysrKysrKysr
-KysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiA+PiAgIDIgZmlsZXMgY2hh
-bmdlZCwgMTE2IGluc2VydGlvbnMoKyksIDExNyBkZWxldGlvbnMoLSkNCj4gPj4NCj4gPj4gZGlm
-ZiAtLWdpdCBhL3FhcGkvYmxvY2stY29yZS5qc29uIGIvcWFwaS9ibG9jay1jb3JlLmpzb24gaW5k
-ZXgNCj4gPj4gZDRmZTcxMC4uNGZmYWFlYSAxMDA2NDQNCj4gPj4gLS0tIGEvcWFwaS9ibG9jay1j
-b3JlLmpzb24NCj4gPj4gKysrIGIvcWFwaS9ibG9jay1jb3JlLmpzb24NCj4gDQo+ID4+ICAgIyMN
-Cj4gPj4gICB7ICdzdHJ1Y3QnOiAnVGhyb3R0bGVMaW1pdHMnLA0KPiA+PiAtICAnZGF0YSc6IHsg
-Jyppb3BzLXRvdGFsJyA6ICdpbnQnLCAnKmlvcHMtdG90YWwtbWF4JyA6ICdpbnQnLA0KPiANCj4g
-Pj4gKyAgJ2RhdGEnOiB7ICcqaW9wcycgOiAnaW50JywgJyppb3BzX21heCcgOiAnaW50JywNCj4g
-Pj4gKyAgICAgICAgICAgICcqaW9wc19tYXhfbGVuZ3RoJyA6ICdpbnQnLCAnKmlvcHNfcmQnIDog
-J2ludCcsDQo+ID4+ICsgICAgICAgICAgICAnKmlvcHNfcmRfbWF4JyA6ICdpbnQnLCAnKmlvcHNf
-cmRfbWF4X2xlbmd0aCcgOiAnaW50JywNCj4gPj4gKyAgICAgICAgICAgICcqaW9wc193cicgOiAn
-aW50JywgJyppb3BzX3dyX21heCcgOiAnaW50JywNCj4gPj4gKyAgICAgICAgICAgICcqaW9wc193
-cl9tYXhfbGVuZ3RoJyA6ICdpbnQnLCAnKmJwcycgOiAnaW50JywNCj4gPj4gKyAgICAgICAgICAg
-ICcqYnBzX21heCcgOiAnaW50JywgJypicHNfbWF4X2xlbmd0aCcgOiAnaW50JywNCj4gPj4gKyAg
-ICAgICAgICAgICcqYnBzX3JkJyA6ICdpbnQnLCAnKmJwc19yZF9tYXgnIDogJ2ludCcsDQo+ID4+
-ICsgICAgICAgICAgICAnKmJwc19yZF9tYXhfbGVuZ3RoJyA6ICdpbnQnLCAnKmJwc193cicgOiAn
-aW50JywNCj4gPj4gKyAgICAgICAgICAgICcqYnBzX3dyX21heCcgOiAnaW50JywgJypicHNfd3Jf
-bWF4X2xlbmd0aCcgOiAnaW50JywNCj4gPj4gKyAgICAgICAgICAgICcqaW9wc19zaXplJyA6ICdp
-bnQnIH0gfQ0KPiA+DQo+ID4gQ29tcGF0aWJpbGl0eSBicmVhay4gIFdoeSBpcyB0aGF0IG9rYXk/
-DQo+IA0KPiBHcmVwcGluZyBxYXBpL3FhcGktaW50cm9zcGVjdGlvbi5jIHNob3dzIDAgaGl0cyBm
-b3IgZWl0aGVyIFRocm90dGxlTGltaXRzIG9yIGZvcg0KPiBpb3BzLXRvdGFsLCBzbyB0aGVyZSBh
-cmUgbm8gUU1QIGNvbW1hbmRzIGFmZmVjdGVkLg0KPiBUaGVyZSBtaWdodCwgaG93ZXZlciwgYmUg
-Y29tbWFuZCBsaW5lIGFuZC9vciBRT00gcGF0aHMgYWZmZWN0ZWQsIHdoaWNoIGlzDQo+IGhhcmRl
-ciB0byBhdWRpdCBzaW5jZSB0aG9zZSBkb24ndCBhZmZlY3QgaW5zdHJvc3BlY3Rpb24uDQo+IA0K
-PiA+DQo+ID4gRXZlbiBpZiBpdCBpcywgeW91IHN0aWxsIHJ1biBhZm91bCBvZiBkb2NzL2RldmVs
-L3FhcGktY29kZS1nZW4udHh0Og0KPiA+DQo+ID4gICAgICBDb21tYW5kIG5hbWVzLCBhbmQgbWVt
-YmVyIG5hbWVzIHdpdGhpbiBhIHR5cGUsIHNob3VsZCBiZSBhbGwNCj4gbG93ZXINCj4gPiAgICAg
-IGNhc2Ugd2l0aCB3b3JkcyBzZXBhcmF0ZWQgYnkgYSBoeXBoZW4uICBIb3dldmVyLCBzb21lIGV4
-aXN0aW5nDQo+IG9sZGVyDQo+ID4gICAgICBjb21tYW5kcyBhbmQgY29tcGxleCB0eXBlcyB1c2Ug
-dW5kZXJzY29yZTsgd2hlbiBleHRlbmRpbmcgc3VjaA0KPiA+ICAgICAgZXhwcmVzc2lvbnMsIGNv
-bnNpc3RlbmN5IGlzIHByZWZlcnJlZCBvdmVyIGJsaW5kbHkgYXZvaWRpbmcNCj4gPiAgICAgIHVu
-ZGVyc2NvcmUuDQo+ID4NCj4gPiBUaGUgZXhjZXB0aW9uIGRvZXNuJ3QgYXBwbHkgaGVyZS4NCj4g
-DQo+IEFoLCBidXQgaXQgZG9lcywgYmVjYXVzZSB3ZSBhcmUgcmVmYWN0b3JpbmcgY29kZSB0byBz
-aGFyZSBhIGNvbW1vbiBRQVBJDQo+IHN0cnVjdCBpbiBhIGxhdGVyIHBhdGNoLCB3aGVyZSB3ZSBu
-ZWVkIHRoaXMgZXhhY3QgbmFtaW5nIHRvIGF2b2lkIGJyZWFraW5nIHRoYXQNCj4gY29tbWFuZC4N
-Cj4gDQo+IFNvIHRoZSBSRUFMIHByb2JsZW0gd2l0aCB0aGlzIGNvbW1pdCBpcyB0aGF0IHRoZSBj
-b21taXQgbWVzc2FnZSBkb2VzIG5vdA0KPiBnaXZlIGVub3VnaCBkZXRhaWxzLCBlaXRoZXIgd2h5
-IHRoaXMgaXMgc2FmZSAoYmVjYXVzZSBpdCBkb2VzIG5vdCBpbXBhY3QgZXhpc3RpbmcNCj4gUU1Q
-IGNvbW1hbmRzKSBvciBuZWVkZWQgKGJlY2F1c2Ugd2Ugd2lsbCBiZSB1c2luZyBpdCB0byByZXdy
-aXRlIGFuIGV4aXN0aW5nDQo+IFFNUCBjb21tYW5kIHRoYXQgbmVlZHMgdGhpcyBzcGVsbGluZyku
-DQo+IA0KDQpARXJpY2ssIHRoYW5rcyBmb3IgeW91ciBzaW1wbGUgYnV0IGV4YWN0IGV4cGxhaW5p
-bmcgZm9yIHB1cnBvc2Ugb2YgdGhpcyBwYXRjaA0KDQpUaGFua3MNCnhpZXpoaWRlDQoNCg0KPiAt
-LQ0KPiBFcmljIEJsYWtlLCBQcmluY2lwYWwgU29mdHdhcmUgRW5naW5lZXINCj4gUmVkIEhhdCwg
-SW5jLiAgICAgICAgICAgKzEtOTE5LTMwMS0zMjY2DQo+IFZpcnR1YWxpemF0aW9uOiAgcWVtdS5v
-cmcgfCBsaWJ2aXJ0Lm9yZw0K
+Hi guys,
+When I tested hotplug on pci.0 on pc platform, it seems that we have to
+echo 1 > /sys/bus/pci/rescan manually in guest? Is this a non-complete 
+feature because of something like gpe interrupt issue?
+For hot-unplug, I uses echo 1 > /sys/bus/pci/<device>/remove but this
+seems only remove the device in guest but we still can see it in qemu 
+monitor by "info pci". I guess this is not a right way to unplug. I'm
+not sure if I missed something?
+
+Looking forwards to your response.
+Thanks!
+
+Jing
