@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shannon.zhaosl@gmail.com>) id 1gSC0p-0007gq-LC
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 21:25:12 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gSC6K-00018H-40
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 21:30:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shannon.zhaosl@gmail.com>) id 1gSC0k-0006pF-2A
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 21:25:07 -0500
-References: <20181126154616.18173-1-eric.auger@redhat.com>
-	<b3c22264-2a95-b851-025c-b8ff0f38f269@redhat.com>
-	<65b68704-2c0b-e9b9-2cde-fea5c32161b3@gmail.com>
-	<a6e27638-1695-9608-366a-83bbbe873e55@redhat.com>
-From: Shannon Zhao <shannon.zhaosl@gmail.com>
-Message-ID: <2c6469e1-4da1-7f9d-4525-892287c4c5c1@gmail.com>
-Date: Thu, 29 Nov 2018 10:24:50 +0800
+	(envelope-from <no-reply@patchew.org>) id 1gSC6D-0004xM-Oj
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 21:30:47 -0500
+Resent-Message-Id: <E1gSC6D-0004xM-Oj@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21440)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gSC69-0004pg-Li
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 21:30:38 -0500
+In-Reply-To: <20181127092801.21777-1-marcandre.lureau@redhat.com>
+Message-ID: <154345590685.21467.17449935892623973020@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <a6e27638-1695-9608-366a-83bbbe873e55@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/arm/virt-acpi-build: Fix SMMUv3
- ACPI integration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 28 Nov 2018 17:45:08 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 00/28] Generalize machine
+ compatibility properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +29,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: shameerali.kolothum.thodi@huawei.com
+To: marcandre.lureau@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com
 
-
-
-On 2018/11/29 1:26, Auger Eric wrote:
->>>>    struct AcpiIortSmmu3 {
->>>>        ACPI_IORT_NODE_HEADER_DEF
->>>>        uint64_t base_address;
->>>> @@ -639,6 +645,8 @@ struct AcpiIortSmmu3 {
->>>>        uint32_t pri_gsiv;
->>>>        uint32_t gerr_gsiv;
->>>>        uint32_t sync_gsiv;
->>>> +    uint32_t pxm;
->> So if we use this field ,we need to set the flags with
->> ACPI_IORT_SMMU_V3_PXM_VALID
->>>> +    uint32_t id_mapping_index;
->> And if we use this field, it needs to set the revision to at least 1.
-> But is it harmful to add those fields in the struct as this patch does?
-> 
-> - in our case ACPI_IORT_SMMU_V3_PXM_VALID flag is not set so the field
-> value is ignored according to the spec and arm_smmu_v3_set_proximity()
-> will not do anything.
-> 
-> - SMMU control interrupts are all GSIV based so spec says that deviceID
-> index is ignored.
-> 
-> So eventually the fact the struct size is changing over the revisions
-> does not look a problem because the node length is part of the struct
-> and the offset to the ID array also is part of the structure.
-> 
-> So I could have left the structure as before (because we don't use the
-> functionalities associated to those fields). But on the other hand it's
-> good to upgrade the struct according to Rev D now.
-> 
-> So I think the patch is correct, isn't?
-Yes, I think it's not harmful but it would be better to add some 
-comments to explain why we don't increase the revision number ATM.
-
-Thanks,
-Shannon
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggZm9yLTMuMiB2NCAwMC8yOF0gR2VuZXJhbGl6ZSBt
+YWNoaW5lIGNvbXBhdGliaWxpdHkgcHJvcGVydGllcwpNZXNzYWdlLWlkOiAyMDE4MTEyNzA5Mjgw
+MS4yMTc3Ny0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVs
+aW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAt
+LWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAg
+ZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0l
+cyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRz
+L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAg
+ICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4
+ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkYzkyNTNkIGhvc3RtZW06
+IHVzZSBvYmplY3QgaWQgZm9yIG1lbW9yeSByZWdpb24gbmFtZSB3aXRoID49IDMuMQpmZTNiZjY3
+IGh3L2FybS92aXJ0OiBhZGQgdmlydC0zLjIgbWFjaGluZSB0eXBlCjMxZjViZDYgaHcvaTM4Njog
+YWRkIHBjLWk0NDBmeC0zLjIgJiBwYy1xMzUtMy4yCjNiMGI4ZTYgbWFjaGluZTogYWRkIGNvbXBh
+dC1wcm9wcyBpbnRlcmZhY2UKNGExNGVkNSBhcm06IHJlcGxhY2UgaW5zdGFuY2VfcG9zdF9pbml0
+KCkKZjNkNTMyNyBxb206IGFkZCBvYmplY3RfY2xhc3NfZ2V0X2NsYXNzX2RhdGEoKQpjMjliMjM5
+IHFvbTogdGVhY2ggaW50ZXJmYWNlcyB0byBpbXBsZW1lbnQgcG9zdC1pbml0CjljYzVhZDQgcWRl
+di1wcm9wczogY2FsbCBvYmplY3RfYXBwbHlfZ2xvYmFsX3Byb3BzKCkKNzBlOWQ0NiBxZGV2LXBy
+b3BzOiByZW1vdmUgZXJycCBmcm9tIEdsb2JhbFByb3BlcnR5CjBlM2Q5ODEgcWRldi1wcm9wczog
+Y29udmVydCBnbG9iYWxfcHJvcHMgdG8gR1B0ckFycmF5CjJhMmVjNmEgcWRldjogYWxsIGdsb2Jh
+bHMgYXJlIG5vdyB1c2VyLXByb3ZpZGVkCjBiYzViN2IgaHc6IHJlbW92ZSBTRVRfTUFDSElORV9D
+T01QQVQKODUxZTcwYiBodzogYXBwbHkgbWFjaGluZSBjb21wYXQgcHJvcGVydGllcyB3aXRob3V0
+IHRvdWNoaW5nIGdsb2JhbHMKYWNkNTU3NiBodzogYXBwbHkgYWNjZWwgY29tcGF0IHByb3BlcnRp
+ZXMgd2l0aG91dCB0b3VjaGluZyBnbG9iYWxzCmM0YWY2YmQgcW9tOiByZW1vdmUgdW5pbXBsZW1l
+bnRlZCBjbGFzc19maW5hbGl6ZQpkYjYxOTlmIHFkZXY6IG1vdmUgcWRldl9wcm9wX3JlZ2lzdGVy
+X2dsb2JhbF9saXN0KCkgdG8gdGVzdHMKZmFlMzI2MSBhY2NlbDogcmVnaXN0ZXIgZ2xvYmFsX3By
+b3BzIGxpa2UgbWFjaGluZSBnbG9iYWxzCmU4NmIwOTUgcW9tOiBtYWtlIHVzZXJfY3JlYXRhYmxl
+X2NvbXBsZXRlKCkgc3BlY2lmaWMgdG8gVXNlckNyZWF0YWJsZQo3NThhYmI1IHFvbTogbWFrZSBp
+bnRlcmZhY2UgdHlwZXMgYWJzdHJhY3QKZjJiMGY5YiB0ZXN0czogcWRldl9wcm9wX2NoZWNrX2ds
+b2JhbHMoKSBkb2Vzbid0IHJldHVybiAiYWxsX3VzZWQiCjY1ZDEzYTkgTWVyZ2UgcmVtb3RlLXRy
+YWNraW5nIGJyYW5jaCAncmVtb3Rlcy9wbWF5ZGVsbC90YWdzL3B1bGwtdGFyZ2V0LWFybS0yMDE4
+MTEyNicgaW50byBzdGFnaW5nCjEzNGUyMTYgbmV0OiBjYWRlbmNlX2dlbTogUmVtb3ZlIGluY29y
+cmVjdCBhc3NlcnQoKQo0MjE4NDJlIE1BSU5UQUlORVJTOiBBZGQgYW4gQVJNIFNNTVUgc2VjdGlv
+bgpjZGEwZDFkIE1BSU5UQUlORVJTOiBBc3NpZ24gc29tZSBtb3JlIGZpbGVzIGluIHRoZSBody9h
+cm0vIGRpcmVjdG9yeQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yNDog
+TUFJTlRBSU5FUlM6IEFzc2lnbiBzb21lIG1vcmUgZmlsZXMgaW4gdGhlIGh3L2FybS8gZGlyZWN0
+b3J5Li4uCkNoZWNraW5nIFBBVENIIDIvMjQ6IE1BSU5UQUlORVJTOiBBZGQgYW4gQVJNIFNNTVUg
+c2VjdGlvbi4uLgpDaGVja2luZyBQQVRDSCAzLzI0OiBuZXQ6IGNhZGVuY2VfZ2VtOiBSZW1vdmUg
+aW5jb3JyZWN0IGFzc2VydCgpLi4uCkNoZWNraW5nIFBBVENIIDQvMjQ6IE1lcmdlIHJlbW90ZS10
+cmFja2luZyBicmFuY2ggJ3JlbW90ZXMvcG1heWRlbGwvdGFncy9wdWxsLXRhcmdldC1hcm0tMjAx
+ODExMjYnIGludG8gc3RhZ2luZy4uLgpDaGVja2luZyBQQVRDSCA1LzI0OiB0ZXN0czogcWRldl9w
+cm9wX2NoZWNrX2dsb2JhbHMoKSBkb2Vzbid0IHJldHVybiAiYWxsX3VzZWQiLi4uCkNoZWNraW5n
+IFBBVENIIDYvMjQ6IHFvbTogbWFrZSBpbnRlcmZhY2UgdHlwZXMgYWJzdHJhY3QuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNy8yNDogcW9tOiBtYWtlIHVzZXJfY3JlYXRhYmxlX2NvbXBsZXRlKCkgc3BlY2lm
+aWMgdG8gVXNlckNyZWF0YWJsZS4uLgpDaGVja2luZyBQQVRDSCA4LzI0OiBhY2NlbDogcmVnaXN0
+ZXIgZ2xvYmFsX3Byb3BzIGxpa2UgbWFjaGluZSBnbG9iYWxzLi4uCkNoZWNraW5nIFBBVENIIDkv
+MjQ6IHFkZXY6IG1vdmUgcWRldl9wcm9wX3JlZ2lzdGVyX2dsb2JhbF9saXN0KCkgdG8gdGVzdHMu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTAvMjQ6IHFvbTogcmVtb3ZlIHVuaW1wbGVtZW50ZWQgY2xhc3Nf
+ZmluYWxpemUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjQ6IGh3OiBhcHBseSBhY2NlbCBjb21wYXQg
+cHJvcGVydGllcyB3aXRob3V0IHRvdWNoaW5nIGdsb2JhbHMuLi4KRVJST1I6IE1hY3JvcyB3aXRo
+IG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBs
+b29wCiM5NTogRklMRTogaHcveGVuL3hlbi1jb21tb24uYzoxNjI6CisjZGVmaW5lIFhFTl9DT01Q
+QVQgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5kcml2ZXIgPSAibWlncmF0aW9u
+IiwgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5wcm9wZXJ0eSA9ICJzdG9yZS1nbG9iYWwt
+c3RhdGUiLCAgICAgICBcCisgICAgICAgIC52YWx1ZSA9ICJvZmYiLCAgICAgICAgICAgICAgICAg
+ICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisg
+ICAgICAgIC5kcml2ZXIgPSAibWlncmF0aW9uIiwgICAgICAgICAgICAgICAgICBcCisgICAgICAg
+IC5wcm9wZXJ0eSA9ICJzZW5kLWNvbmZpZ3VyYXRpb24iLCAgICAgICBcCisgICAgICAgIC52YWx1
+ZSA9ICJvZmYiLCAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5kcml2ZXIgPSAibWlncmF0aW9uIiwg
+ICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5wcm9wZXJ0eSA9ICJzZW5kLXNlY3Rpb24tZm9v
+dGVyIiwgICAgICBcCisgICAgICAgIC52YWx1ZSA9ICJvZmYiLCAgICAgICAgICAgICAgICAgICAg
+ICAgICBcCisgICAgfQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE5MzogRklM
+RTogcW9tL29iamVjdC5jOjM3MzoKK3ZvaWQgb2JqZWN0X2FwcGx5X2dsb2JhbF9wcm9wcyhPYmpl
+Y3QgKm9iaiwgY29uc3QgR1B0ckFycmF5ICpwcm9wcywgRXJyb3IgKiplcnJwKQoKdG90YWw6IDEg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAxNzAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTIvMjQ6IGh3OiBhcHBseSBtYWNo
+aW5lIGNvbXBhdCBwcm9wZXJ0aWVzIHdpdGhvdXQgdG91Y2hpbmcgZ2xvYmFscy4uLgpDaGVja2lu
+ZyBQQVRDSCAxMy8yNDogaHc6IHJlbW92ZSBTRVRfTUFDSElORV9DT01QQVQuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTQvMjQ6IHFkZXY6IGFsbCBnbG9iYWxzIGFyZSBub3cgdXNlci1wcm92aWRlZC4uLgpD
+aGVja2luZyBQQVRDSCAxNS8yNDogcWRldi1wcm9wczogY29udmVydCBnbG9iYWxfcHJvcHMgdG8g
+R1B0ckFycmF5Li4uCkNoZWNraW5nIFBBVENIIDE2LzI0OiBxZGV2LXByb3BzOiByZW1vdmUgZXJy
+cCBmcm9tIEdsb2JhbFByb3BlcnR5Li4uCkNoZWNraW5nIFBBVENIIDE3LzI0OiBxZGV2LXByb3Bz
+OiBjYWxsIG9iamVjdF9hcHBseV9nbG9iYWxfcHJvcHMoKS4uLgpDaGVja2luZyBQQVRDSCAxOC8y
+NDogcW9tOiB0ZWFjaCBpbnRlcmZhY2VzIHRvIGltcGxlbWVudCBwb3N0LWluaXQuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTkvMjQ6IHFvbTogYWRkIG9iamVjdF9jbGFzc19nZXRfY2xhc3NfZGF0YSgpLi4u
+CkNoZWNraW5nIFBBVENIIDIwLzI0OiBhcm06IHJlcGxhY2UgaW5zdGFuY2VfcG9zdF9pbml0KCku
+Li4KQ2hlY2tpbmcgUEFUQ0ggMjEvMjQ6IG1hY2hpbmU6IGFkZCBjb21wYXQtcHJvcHMgaW50ZXJm
+YWNlLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJ
+TlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM5OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFs
+OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTIxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
+IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
+cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
+Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjQ6IGh3L2kzODY6IGFk
+ZCBwYy1pNDQwZngtMy4yICYgcGMtcTM1LTMuMi4uLgpDaGVja2luZyBQQVRDSCAyMy8yNDogaHcv
+YXJtL3ZpcnQ6IGFkZCB2aXJ0LTMuMiBtYWNoaW5lIHR5cGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjQv
+MjQ6IGhvc3RtZW06IHVzZSBvYmplY3QgaWQgZm9yIG1lbW9yeSByZWdpb24gbmFtZSB3aXRoID49
+IDMuMS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
+OiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAcmVkaGF0LmNvbQ==
