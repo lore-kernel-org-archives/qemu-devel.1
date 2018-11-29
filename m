@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gSB3y-0002Mo-Ts
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:21 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gSB44-0002RN-Al
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gSB3v-0001Nc-G8
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:18 -0500
-Date: Thu, 29 Nov 2018 11:54:02 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gSB41-0001US-6T
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:23 -0500
+Date: Thu, 29 Nov 2018 12:07:59 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181129005402.GL2251@umbus.fritz.box>
+Message-ID: <20181129010758.GO2251@umbus.fritz.box>
 References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-11-clg@kaod.org>
-	<20181128005255.GT2251@umbus.fritz.box>
-	<64aef78f-e374-9c6d-1a1f-892c4e3b0677@kaod.org>
+	<20181116105729.23240-16-clg@kaod.org>
+	<20181128032819.GY2251@umbus.fritz.box>
+	<c8f9532c-a27d-0071-0023-25f8b70cb31d@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="smEuXhZLKnMjT4Ht"
+	protocol="application/pgp-signature"; boundary="MO4t1VgQTCtsHhID"
 Content-Disposition: inline
-In-Reply-To: <64aef78f-e374-9c6d-1a1f-892c4e3b0677@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v5 10/36] spapr/xive: introduce a XIVE
- interrupt controller
+In-Reply-To: <c8f9532c-a27d-0071-0023-25f8b70cb31d@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 15/36] spapr: introdude a new machine
+ IRQ backend for XIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,578 +31,371 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---smEuXhZLKnMjT4Ht
+--MO4t1VgQTCtsHhID
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 28, 2018 at 05:27:29PM +0100, C=E9dric Le Goater wrote:
-> On 11/28/18 1:52 AM, David Gibson wrote:
-> > On Fri, Nov 16, 2018 at 11:57:03AM +0100, C=E9dric Le Goater wrote:
-> >> sPAPRXive models the XIVE interrupt controller of the sPAPR machine.
-> >> It inherits from the XiveRouter and provisions storage for the routing
-> >> tables :
+On Wed, Nov 28, 2018 at 06:16:58PM +0100, C=E9dric Le Goater wrote:
+> On 11/28/18 4:28 AM, David Gibson wrote:
+> > On Fri, Nov 16, 2018 at 11:57:08AM +0100, C=E9dric Le Goater wrote:
+> >> The XIVE IRQ backend uses the same layout as the new XICS backend but
+> >> covers the full range of the IRQ number space. The IRQ numbers for the
+> >> CPU IPIs are allocated at the bottom of this space, below 4K, to
+> >> preserve compatibility with XICS which does not use that range.
 > >>
-> >>   - Event Assignment Structure (EAS)
-> >>   - Event Notification Descriptor (END)
-> >>
-> >> The sPAPRXive model incorporates an internal XiveSource for the IPIs
-> >> and for the interrupts of the virtual devices of the guest. This model
-> >> is consistent with XIVE architecture which also incorporates an
-> >> internal IVSE for IPIs and accelerator interrupts in the IVRE
-> >> sub-engine.
-> >>
-> >> The sPAPRXive model exports two memory regions, one for the ESB
-> >> trigger and management pages used to control the sources and one for
-> >> the TIMA pages. They are mapped by default at the addresses found on
-> >> chip 0 of a baremetal system. This is also consistent with the XIVE
-> >> architecture which defines a Virtualization Controller BAR for the
-> >> internal IVSE ESB pages and a Thread Managment BAR for the TIMA.
+> >> This should be enough given that the maximum number of CPUs is 1024
+> >> for the sPAPR machine under QEMU. For the record, the biggest POWER8
+> >> or POWER9 system has a maximum of 1536 HW threads (16 sockets, 192
+> >> cores, SMT8).
 > >>
 > >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > >> ---
-> >>  default-configs/ppc64-softmmu.mak |   1 +
-> >>  include/hw/ppc/spapr_xive.h       |  46 +++++
-> >>  hw/intc/spapr_xive.c              | 323 ++++++++++++++++++++++++++++++
-> >>  hw/intc/Makefile.objs             |   1 +
-> >>  4 files changed, 371 insertions(+)
-> >>  create mode 100644 include/hw/ppc/spapr_xive.h
-> >>  create mode 100644 hw/intc/spapr_xive.c
+> >>  include/hw/ppc/spapr.h     |   2 +
+> >>  include/hw/ppc/spapr_irq.h |   7 ++-
+> >>  hw/ppc/spapr.c             |   2 +-
+> >>  hw/ppc/spapr_irq.c         | 119 ++++++++++++++++++++++++++++++++++++-
+> >>  4 files changed, 124 insertions(+), 6 deletions(-)
 > >>
-> >> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64=
--softmmu.mak
-> >> index 2d1e7c5c4668..7f34ad0528ed 100644
-> >> --- a/default-configs/ppc64-softmmu.mak
-> >> +++ b/default-configs/ppc64-softmmu.mak
-> >> @@ -17,6 +17,7 @@ CONFIG_XICS=3D$(CONFIG_PSERIES)
-> >>  CONFIG_XICS_SPAPR=3D$(CONFIG_PSERIES)
-> >>  CONFIG_XICS_KVM=3D$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
-> >>  CONFIG_XIVE=3D$(CONFIG_PSERIES)
-> >> +CONFIG_XIVE_SPAPR=3D$(CONFIG_PSERIES)
-> >>  CONFIG_MEM_DEVICE=3Dy
-> >>  CONFIG_DIMM=3Dy
-> >>  CONFIG_SPAPR_RNG=3Dy
-> >> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> >> new file mode 100644
-> >> index 000000000000..06727bd86aa9
-> >> --- /dev/null
-> >> +++ b/include/hw/ppc/spapr_xive.h
-> >> @@ -0,0 +1,46 @@
-> >> +/*
-> >> + * QEMU PowerPC sPAPR XIVE interrupt controller model
-> >> + *
-> >> + * Copyright (c) 2017-2018, IBM Corporation.
-> >> + *
-> >> + * This code is licensed under the GPL version 2 or later. See the
-> >> + * COPYING file in the top-level directory.
-> >> + */
-> >> +
-> >> +#ifndef PPC_SPAPR_XIVE_H
-> >> +#define PPC_SPAPR_XIVE_H
-> >> +
-> >> +#include "hw/sysbus.h"
-> >> +#include "hw/ppc/xive.h"
-> >> +
-> >> +#define TYPE_SPAPR_XIVE "spapr-xive"
-> >> +#define SPAPR_XIVE(obj) OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIV=
-E)
-> >> +
-> >> +typedef struct sPAPRXive {
-> >> +    XiveRouter    parent;
-> >> +
-> >> +    /* Internal interrupt source for IPIs and virtual devices */
-> >> +    XiveSource    source;
-> >> +    hwaddr        vc_base;
-> >> +
-> >> +    /* END ESB MMIOs */
-> >> +    XiveENDSource end_source;
-> >> +    hwaddr        end_base;
-> >> +
-> >> +    /* Routing table */
-> >> +    XiveEAS       *eat;
-> >> +    uint32_t      nr_irqs;
-> >> +    XiveEND       *endt;
-> >> +    uint32_t      nr_ends;
-> >> +
-> >> +    /* TIMA mapping address */
-> >> +    hwaddr        tm_base;
-> >> +    MemoryRegion  tm_mmio;
-> >> +} sPAPRXive;
-> >> +
-> >> +bool spapr_xive_irq_enable(sPAPRXive *xive, uint32_t lisn, bool lsi);
-> >> +bool spapr_xive_irq_disable(sPAPRXive *xive, uint32_t lisn);
-> >> +void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
-> >> +qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn);
-> >> +
-> >> +#endif /* PPC_SPAPR_XIVE_H */
-> >> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> >> new file mode 100644
-> >> index 000000000000..5d038146c08e
-> >> --- /dev/null
-> >> +++ b/hw/intc/spapr_xive.c
-> >> @@ -0,0 +1,323 @@
-> >> +/*
-> >> + * QEMU PowerPC sPAPR XIVE interrupt controller model
-> >> + *
-> >> + * Copyright (c) 2017-2018, IBM Corporation.
-> >> + *
-> >> + * This code is licensed under the GPL version 2 or later. See the
-> >> + * COPYING file in the top-level directory.
-> >> + */
-> >> +
-> >> +#include "qemu/osdep.h"
-> >> +#include "qemu/log.h"
-> >> +#include "qapi/error.h"
-> >> +#include "target/ppc/cpu.h"
-> >> +#include "sysemu/cpus.h"
-> >> +#include "monitor/monitor.h"
-> >> +#include "hw/ppc/spapr.h"
+> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> >> index 6279711fe8f7..1fbc2663e06c 100644
+> >> --- a/include/hw/ppc/spapr.h
+> >> +++ b/include/hw/ppc/spapr.h
+> >> @@ -16,6 +16,7 @@ typedef struct sPAPREventLogEntry sPAPREventLogEntry;
+> >>  typedef struct sPAPREventSource sPAPREventSource;
+> >>  typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+> >>  typedef struct ICSState ICSState;
+> >> +typedef struct sPAPRXive sPAPRXive;
+> >> =20
+> >>  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+> >>  #define SPAPR_ENTRY_POINT       0x100
+> >> @@ -175,6 +176,7 @@ struct sPAPRMachineState {
+> >>      const char *icp_type;
+> >>      int32_t irq_map_nr;
+> >>      unsigned long *irq_map;
+> >> +    sPAPRXive  *xive;
+> >> =20
+> >>      bool cmd_line_caps[SPAPR_CAP_NUM];
+> >>      sPAPRCapabilities def, eff, mig;
+> >> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> >> index 0e9229bf219e..c854ae527808 100644
+> >> --- a/include/hw/ppc/spapr_irq.h
+> >> +++ b/include/hw/ppc/spapr_irq.h
+> >> @@ -13,6 +13,7 @@
+> >>  /*
+> >>   * IRQ range offsets per device type
+> >>   */
+> >> +#define SPAPR_IRQ_IPI        0x0
+> >>  #define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
+> >>  #define SPAPR_IRQ_HOTPLUG    0x1001
+> >>  #define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
+> >> @@ -33,7 +34,8 @@ typedef struct sPAPRIrq {
+> >>      uint32_t    nr_irqs;
+> >>      uint32_t    nr_msis;
+> >> =20
+> >> -    void (*init)(sPAPRMachineState *spapr, int nr_irqs, Error **errp);
+> >> +    void (*init)(sPAPRMachineState *spapr, int nr_irqs, int nr_server=
+s,
+> >> +                 Error **errp);
+> >>      int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp);
+> >>      void (*free)(sPAPRMachineState *spapr, int irq, int num);
+> >>      qemu_irq (*qirq)(sPAPRMachineState *spapr, int irq);
+> >> @@ -42,8 +44,9 @@ typedef struct sPAPRIrq {
+> >> =20
+> >>  extern sPAPRIrq spapr_irq_xics;
+> >>  extern sPAPRIrq spapr_irq_xics_legacy;
+> >> +extern sPAPRIrq spapr_irq_xive;
+> >> =20
+> >> -void spapr_irq_init(sPAPRMachineState *spapr, Error **errp);
+> >> +void spapr_irq_init(sPAPRMachineState *spapr, int nr_servers, Error *=
+*errp);
+> >=20
+> > I don't see why nr_servers needs to become a parameter, since it can
+> > be derived from spapr within this routine.
+>=20
+> ok. This is true. We can use directly xics_max_server_number(spapr).
+>=20
+> >>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Erro=
+r **errp);
+> >>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+> >>  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >> index e470efe7993c..9f8c19e56e7a 100644
+> >> --- a/hw/ppc/spapr.c
+> >> +++ b/hw/ppc/spapr.c
+> >> @@ -2594,7 +2594,7 @@ static void spapr_machine_init(MachineState *mac=
+hine)
+> >>      spapr_set_vsmt_mode(spapr, &error_fatal);
+> >> =20
+> >>      /* Set up Interrupt Controller before we create the VCPUs */
+> >> -    spapr_irq_init(spapr, &error_fatal);
+> >> +    spapr_irq_init(spapr, xics_max_server_number(spapr), &error_fatal=
+);
+> >=20
+> > We should rename xics_max_server_number() since it's no longer xics
+> > specific.
+>=20
+> yes.
+>=20
+> >>      /* Set up containers for ibm,client-architecture-support negotiat=
+ed options
+> >>       */
+> >> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> >> index bac450ffff23..2569ae1bc7f8 100644
+> >> --- a/hw/ppc/spapr_irq.c
+> >> +++ b/hw/ppc/spapr_irq.c
+> >> @@ -12,6 +12,7 @@
+> >>  #include "qemu/error-report.h"
+> >>  #include "qapi/error.h"
+> >>  #include "hw/ppc/spapr.h"
 > >> +#include "hw/ppc/spapr_xive.h"
-> >> +#include "hw/ppc/xive.h"
-> >> +#include "hw/ppc/xive_regs.h"
-> >> +
-> >> +/*
-> >> + * XIVE Virtualization Controller BAR and Thread Managment BAR that we
-> >> + * use for the ESB pages and the TIMA pages
+> >>  #include "hw/ppc/xics.h"
+> >>  #include "sysemu/kvm.h"
+> >> =20
+> >> @@ -91,7 +92,7 @@ error:
+> >>  }
+> >> =20
+> >>  static void spapr_irq_init_xics(sPAPRMachineState *spapr, int nr_irqs,
+> >> -                                Error **errp)
+> >> +                                int nr_servers, Error **errp)
+> >>  {
+> >>      MachineState *machine =3D MACHINE(spapr);
+> >>      Error *local_err =3D NULL;
+> >> @@ -204,10 +205,122 @@ sPAPRIrq spapr_irq_xics =3D {
+> >>      .print_info  =3D spapr_irq_print_info_xics,
+> >>  };
+> >> =20
+> >> + /*
+> >> + * XIVE IRQ backend.
 > >> + */
-> >> +#define SPAPR_XIVE_VC_BASE   0x0006010000000000ull
-> >> +#define SPAPR_XIVE_TM_BASE   0x0006030203180000ull
-> >> +
-> >> +void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon)
+> >> +static sPAPRXive *spapr_xive_create(sPAPRMachineState *spapr,
+> >> +                                    const char *type_xive, int nr_irq=
+s,
+> >> +                                    int nr_servers, Error **errp)
 > >> +{
-> >> +    int i;
-> >> +    uint32_t offset =3D 0;
-> >> +
-> >> +    monitor_printf(mon, "XIVE Source %08x .. %08x\n", offset,
-> >> +                   offset + xive->source.nr_irqs - 1);
-> >> +    xive_source_pic_print_info(&xive->source, offset, mon);
-> >> +
-> >> +    monitor_printf(mon, "XIVE EAT %08x .. %08x\n", 0, xive->nr_irqs -=
- 1);
-> >> +    for (i =3D 0; i < xive->nr_irqs; i++) {
-> >> +        xive_eas_pic_print_info(&xive->eat[i], i, mon);
-> >> +    }
-> >> +
-> >> +    monitor_printf(mon, "XIVE ENDT %08x .. %08x\n", 0, xive->nr_ends =
-- 1);
-> >> +    for (i =3D 0; i < xive->nr_ends; i++) {
-> >> +        xive_end_pic_print_info(&xive->endt[i], i, mon);
-> >> +    }
-> >=20
-> > AIUI the PAPR model hides the details of ENDs, EQs and NVTs - instead
-> > each logical EAS just points at a (thread, priority) pair, which under
-> > the hood has exactly one END and one NVT bound to it.
-> >=20
-> > Given that, would it make more sense to reformat the info here to show
-> > things in terms of those (thread, priority) pairs, rather than the
-> > internal EAS and END details?
->=20
-> Yes. I had a version doing something like that before. I will rework
-> the ouput a little for sPAPR. =20
->=20
->=20
-> >> +}
-> >> +
-> >> +/* Map the ESB pages and the TIMA pages */
-> >> +static void spapr_xive_mmio_map(sPAPRXive *xive)
-> >> +{
-> >> +    sysbus_mmio_map(SYS_BUS_DEVICE(&xive->source), 0, xive->vc_base);
-> >> +    sysbus_mmio_map(SYS_BUS_DEVICE(&xive->end_source), 0, xive->end_b=
-ase);
-> >=20
-> > Uh.. I didn't think the PAPR model exposed the END sources to the guest?
->=20
-> Well, it should if it was being used but it's not the case for any of the=
-=20
-> sPAPR guest OS today. So I think it's preferable to remove the mapping un=
-til=20
-> someone wants to experiment with it. We can keep the XiveENDSource object=
-=20
-> though. This is harmless.
-
-So, having now read later patches I see that the model does at least
-theoretically expose these.  And yes, it makes sense to keep the
-ENDSource objects internally whether or not we expose them.
-
-> There is no KVM side to the END ESBs either as OPAL does not use them.=20
-
-Ah.. that's a pretty good argument for not exposing them for now.
-
-> >> +    sysbus_mmio_map(SYS_BUS_DEVICE(xive), 0, xive->tm_base);
-> >> +}
-> >> +
-> >> +static void spapr_xive_reset(DeviceState *dev)
-> >> +{
-> >> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
+> >> +    sPAPRXive *xive;
+> >> +    Error *local_err =3D NULL;
+> >> +    Object *obj;
+> >> +    uint32_t nr_ends =3D nr_servers << 3; /* 8 priority ENDs per CPU =
+*/
 > >> +    int i;
 > >> +
-> >> +    /* Xive Source reset is done through SysBus, it should put all
-> >> +     * IRQs to OFF (!P|Q) */
-> >> +
-> >> +    /* Mask all valid EASs in the IRQ number space. */
-> >> +    for (i =3D 0; i < xive->nr_irqs; i++) {
-> >> +        XiveEAS *eas =3D &xive->eat[i];
-> >> +        if (eas->w & EAS_VALID) {
-> >> +            eas->w |=3D EAS_MASKED;
+> >> +    obj =3D object_new(type_xive);
 > >=20
-> > To ensure consistent behaviour across reboots, it would be better to
-> > reset the whole of the EAS, except those which have to be preserved
-> > across reboots (which would be VALID, and maybe nothing else?).
+> > What's the reason for making the type a parameter, rather than just
+> > using the #define here.
 >=20
-> VALID EAS corresponds to IRQ numbers claimed by the devices of the machin=
-e.
-> So we should keep the valid bit but reset all other settings which this
-> reset method is not doing. I will fix.
+> KVM.
 
-Ok.
+Yeah, I realised that when I'd read a few patches further on.  As I
+commented there, I don't think the separate KVM/TCG subclasses is
+actually a good pattern to follow.
 
+> >> +    object_property_set_int(obj, nr_irqs, "nr-irqs", &error_abort);
+> >> +    object_property_set_int(obj, nr_ends, "nr-ends", &error_abort);
+> >=20
+> > This is still within the sPAPR code, and you have a pointer to the
+> > MachineState, so I don't see why you could't just derive nr_irqs and
+> > nr_servers from that, rather than having them passed in.
+>=20
+> for nr_servers I agree. nr_irqs comes from the machine class and it will
+> not make any sense using the machine class in the init routine of the
+> 'dual' sPAPR IRQ backend supporting both modes. See patch 34 which
+> initializes both backend for the 'dual' machine.
+
+Uh.. I guess I'll comment when I get to that patch, but I don't see
+why accessing the machine class would be a problem.  If we have the
+MachineState we can get to the MachineClass.
+
+> >> +    object_property_set_bool(obj, true, "realized", &local_err);
+> >> +    if (local_err) {
+> >> +        error_propagate(errp, local_err);
+> >> +        return NULL;
+> >> +    }
+> >> +    qdev_set_parent_bus(DEVICE(obj), sysbus_get_default());
+> >=20
+> > Whereas the XiveSource and XiveRouter I think make more sense as
+> > "device components" rather than SysBusDevice subclasses,=20
+>=20
+> Yes. I changed that.
+>=20
+> > I think it
+> > *does* make sense for the PAPR-XIVE object to be a full fledged
+> > SysBusDevice.
+>=20
+> Ah. That I didn't do but thinking of it, it makes sense as it is the
+> object managing the TIMA and ESB memory region mapping for the machine.=
+=20
+>=20
+> > And for that reason, I think it makes more sense to create it with
+> > qdev_create(), which should avoid having to manually fiddle with the
+> > parent bus.
+>=20
+> OK. I will give it a try.=20
+>=20
+> >> +    xive =3D SPAPR_XIVE(obj);
+> >> +
+> >> +    /* Enable the CPU IPIs */
+> >> +    for (i =3D 0; i < nr_servers; ++i) {
+> >> +        spapr_xive_irq_enable(xive, SPAPR_IRQ_IPI + i, false);
+> >=20
+> > This comment possibly belonged on an earlier patch.  I don't love the
+> > "..._enable" name - to me that suggests something runtime rather than
+> > configuration time.  A better option isn't quickly occurring to me
+> > though :/.
+>=20
+> Instead, I could call the sPAPR IRQ claim method  :=20
+>=20
+>     for (i =3D 0; i < nr_servers; ++i) {
+> 	spapr_irq_xive.claim(spapr, SPAPR_IRQ_IPI + i, false, &local_err);
+>     }
+>=20
+>=20
+> What it does is to set the EAS_VALID bit in the EAT (it also sets the=20
+> LSI bit). what about :
+> =09
+> 	spapr_xive_irq_validate()=20
+> 	spapr_xive_irq_invalidate()=20
+>=20
+> or to map the sPAPR IRQ backend names :
+>=20
+> 	spapr_xive_irq_claim()=20
+> 	spapr_xive_irq_free()
+
+Let's use claim/free to match the terms spapr already uses.
+
+
+>=20
+>=20
+> >=20
+> >> +    }
+> >> +
+> >> +    return xive;
+> >> +}
+> >> +
+> >> +static void spapr_irq_init_xive(sPAPRMachineState *spapr, int nr_irqs,
+> >> +                                int nr_servers, Error **errp)
+> >> +{
+> >> +    MachineState *machine =3D MACHINE(spapr);
+> >> +    Error *local_err =3D NULL;
+> >> +
+> >> +    /* KVM XIVE support */
+> >> +    if (kvm_enabled()) {
+> >> +        if (machine_kernel_irqchip_required(machine)) {
+> >> +            error_setg(errp, "kernel_irqchip requested. no XIVE suppo=
+rt");
+> >> +            return;
 > >> +        }
 > >> +    }
 > >> +
-> >> +    for (i =3D 0; i < xive->nr_ends; i++) {
-> >> +        xive_end_reset(&xive->endt[i]);
-> >> +    }
-> >> +
-> >> +    spapr_xive_mmio_map(xive);
-> >=20
-> > You shouldn't need to re-etablish MMIO mappings at reset time, only
-> > during initialization.
->=20
-> Yes. Not for now indeed, but the patch is anticipating the switch=20
-> of the interrupt mode at reset. I will move the mapping to the=20
-> realize method in that patch and re-move it again in reset when=20
-> we reach that part of the patchset (dual machine) =20
-
-Ok.
-
-> >> +}
-> >> +
-> >> +static void spapr_xive_instance_init(Object *obj)
-> >> +{
-> >> +    sPAPRXive *xive =3D SPAPR_XIVE(obj);
-> >> +
-> >> +    object_initialize(&xive->source, sizeof(xive->source), TYPE_XIVE_=
-SOURCE);
-> >=20
-> > Yeah, embedding the source here makes sense, but it's a strong
-> > indication that XiveSource should not be a SysBusDevice subclass.  I
-> > really think it wants to be a TYPE_DEVICE subclass - and, in fact, I
-> > think it can be object_initialize() embedded everywhere it's used.
->=20
-> I have changed XiveSource to be a TYPE_DEVICE.
-
-Great.
-
-> > I've also said elswhere that I suspect XiveRouter should also not be a
-> > SysBusDevice. =20
->=20
-> I have changed XiveRouter to be a TYPE_DEVICE.
-
-Great.
-
-> > With that approach it might make sense to embed it
-> > here, rather than subclassing it=20
->=20
-> ah. why not indeed. I have to think about it.=20
->=20
-> > (the old composition vs. inheritance debate).
->=20
-> he. but then the XiveRouter needs to become a QOM interface if we=20
-> want to be able to define XIVE table accessors for sPAPRXive. See
-> the  spapr_xive_class_init() routine.
-
-Erm.. I'm not really sure what you're getting at here.
-
->=20
-> >> +    object_property_add_child(obj, "source", OBJECT(&xive->source), N=
-ULL);
-> >> +
-> >> +    object_initialize(&xive->end_source, sizeof(xive->end_source),
-> >> +                      TYPE_XIVE_END_SOURCE);
-> >> +    object_property_add_child(obj, "end_source", OBJECT(&xive->end_so=
-urce),
-> >> +                              NULL);
-> >> +}
-> >> +
-> >> +static void spapr_xive_realize(DeviceState *dev, Error **errp)
-> >> +{
-> >> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
-> >> +    XiveSource *xsrc =3D &xive->source;
-> >> +    XiveENDSource *end_xsrc =3D &xive->end_source;
-> >> +    Error *local_err =3D NULL;
-> >> +
-> >> +    if (!xive->nr_irqs) {
-> >> +        error_setg(errp, "Number of interrupt needs to be greater 0");
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if (!xive->nr_ends) {
-> >> +        error_setg(errp, "Number of interrupt needs to be greater 0");
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    /*
-> >> +     * Initialize the internal sources, for IPIs and virtual devices.
-> >> +     */
-> >> +    object_property_set_int(OBJECT(xsrc), xive->nr_irqs, "nr-irqs",
-> >> +                            &error_fatal);
-> >> +    object_property_add_const_link(OBJECT(xsrc), "xive", OBJECT(xive),
-> >> +                                   &error_fatal);
-> >> +    object_property_set_bool(OBJECT(xsrc), true, "realized", &local_e=
-rr);
+> >> +    /* QEMU XIVE support */
+> >> +    spapr->xive =3D spapr_xive_create(spapr, TYPE_SPAPR_XIVE, nr_irqs=
+, nr_servers,
+> >> +                                    &local_err);
 > >> +    if (local_err) {
 > >> +        error_propagate(errp, local_err);
 > >> +        return;
 > >> +    }
-> >> +    qdev_set_parent_bus(DEVICE(xsrc), sysbus_get_default());
-> >> +
-> >> +    /*
-> >> +     * Initialize the END ESB source
-> >> +     */
-> >> +    object_property_set_int(OBJECT(end_xsrc), xive->nr_irqs, "nr-ends=
-",
-> >> +                            &error_fatal);
-> >> +    object_property_add_const_link(OBJECT(end_xsrc), "xive", OBJECT(x=
-ive),
-> >> +                                   &error_fatal);
-> >> +    object_property_set_bool(OBJECT(end_xsrc), true, "realized", &loc=
-al_err);
-> >> +    if (local_err) {
-> >> +        error_propagate(errp, local_err);
-> >> +        return;
-> >> +    }
-> >> +    qdev_set_parent_bus(DEVICE(end_xsrc), sysbus_get_default());
-> >> +
-> >> +    /* Set the mapping address of the END ESB pages after the source =
-ESBs */
-> >> +    xive->end_base =3D xive->vc_base + (1ull << xsrc->esb_shift) * xs=
-rc->nr_irqs;
-> >> +
-> >> +    /*
-> >> +     * Allocate the routing tables
-> >> +     */
-> >> +    xive->eat =3D g_new0(XiveEAS, xive->nr_irqs);
-> >> +    xive->endt =3D g_new0(XiveEND, xive->nr_ends);
-> >> +
-> >> +    /* TIMA initialization */
-> >> +    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops,=
- xive,
-> >> +                          "xive.tima", 4ull << TM_SHIFT);
-> >> +    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &xive->tm_mmio);
 > >> +}
 > >> +
-> >> +static int spapr_xive_get_eas(XiveRouter *xrtr, uint32_t lisn, XiveEA=
-S *eas)
+> >> +static int spapr_irq_claim_xive(sPAPRMachineState *spapr, int irq, bo=
+ol lsi,
+> >> +                                Error **errp)
 > >> +{
-> >> +    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
-> >> +
-> >> +    if (lisn >=3D xive->nr_irqs) {
+> >> +    if (!spapr_xive_irq_enable(spapr->xive, irq, lsi)) {
+> >> +        error_setg(errp, "IRQ %d is invalid", irq);
 > >> +        return -1;
 > >> +    }
-> >> +
-> >> +    *eas =3D xive->eat[lisn];
 > >> +    return 0;
 > >> +}
 > >> +
-> >> +static int spapr_xive_set_eas(XiveRouter *xrtr, uint32_t lisn, XiveEA=
-S *eas)
+> >> +static void spapr_irq_free_xive(sPAPRMachineState *spapr, int irq, in=
+t num)
 > >> +{
-> >> +    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
+> >> +    int i;
 > >> +
-> >> +    if (lisn >=3D xive->nr_irqs) {
-> >> +        return -1;
+> >> +    for (i =3D irq; i < irq + num; ++i) {
+> >> +        spapr_xive_irq_disable(spapr->xive, i);
+> >> +    }
+> >> +}
+> >> +
+> >> +static qemu_irq spapr_qirq_xive(sPAPRMachineState *spapr, int irq)
+> >> +{
+> >> +    return spapr_xive_qirq(spapr->xive, irq);
+> >> +}
+> >> +
+> >> +static void spapr_irq_print_info_xive(sPAPRMachineState *spapr,
+> >> +                                      Monitor *mon)
+> >> +{
+> >> +    CPUState *cs;
+> >> +
+> >> +    CPU_FOREACH(cs) {
+> >> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> >> +
+> >> +        xive_tctx_pic_print_info(XIVE_TCTX(cpu->intc), mon);
 > >> +    }
 > >> +
-> >> +    xive->eat[lisn] =3D *eas;
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +static int spapr_xive_get_end(XiveRouter *xrtr,
-> >> +                              uint8_t end_blk, uint32_t end_idx, Xive=
-END *end)
-> >> +{
-> >> +    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
-> >> +
-> >> +    if (end_idx >=3D xive->nr_ends) {
-> >> +        return -1;
-> >> +    }
-> >> +
-> >> +    memcpy(end, &xive->endt[end_idx], sizeof(XiveEND));
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +static int spapr_xive_set_end(XiveRouter *xrtr,
-> >> +                              uint8_t end_blk, uint32_t end_idx, Xive=
-END *end)
-> >> +{
-> >> +    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
-> >> +
-> >> +    if (end_idx >=3D xive->nr_ends) {
-> >> +        return -1;
-> >> +    }
-> >> +
-> >> +    memcpy(&xive->endt[end_idx], end, sizeof(XiveEND));
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +static const VMStateDescription vmstate_spapr_xive_end =3D {
-> >> +    .name =3D TYPE_SPAPR_XIVE "/end",
-> >> +    .version_id =3D 1,
-> >> +    .minimum_version_id =3D 1,
-> >> +    .fields =3D (VMStateField []) {
-> >> +        VMSTATE_UINT32(w0, XiveEND),
-> >> +        VMSTATE_UINT32(w1, XiveEND),
-> >> +        VMSTATE_UINT32(w2, XiveEND),
-> >> +        VMSTATE_UINT32(w3, XiveEND),
-> >> +        VMSTATE_UINT32(w4, XiveEND),
-> >> +        VMSTATE_UINT32(w5, XiveEND),
-> >> +        VMSTATE_UINT32(w6, XiveEND),
-> >> +        VMSTATE_UINT32(w7, XiveEND),
-> >> +        VMSTATE_END_OF_LIST()
-> >> +    },
-> >> +};
-> >> +
-> >> +static const VMStateDescription vmstate_spapr_xive_eas =3D {
-> >> +    .name =3D TYPE_SPAPR_XIVE "/eas",
-> >> +    .version_id =3D 1,
-> >> +    .minimum_version_id =3D 1,
-> >> +    .fields =3D (VMStateField []) {
-> >> +        VMSTATE_UINT64(w, XiveEAS),
-> >> +        VMSTATE_END_OF_LIST()
-> >> +    },
-> >> +};
-> >> +
-> >> +static const VMStateDescription vmstate_spapr_xive =3D {
-> >> +    .name =3D TYPE_SPAPR_XIVE,
-> >> +    .version_id =3D 1,
-> >> +    .minimum_version_id =3D 1,
-> >> +    .fields =3D (VMStateField[]) {
-> >> +        VMSTATE_UINT32_EQUAL(nr_irqs, sPAPRXive, NULL),
-> >> +        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(eat, sPAPRXive, nr_irqs,
-> >> +                                     vmstate_spapr_xive_eas, XiveEAS),
-> >> +        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(endt, sPAPRXive, nr_ends,
-> >> +                                             vmstate_spapr_xive_end, =
-XiveEND),
-> >> +        VMSTATE_END_OF_LIST()
-> >> +    },
-> >> +};
-> >> +
-> >> +static Property spapr_xive_properties[] =3D {
-> >> +    DEFINE_PROP_UINT32("nr-irqs", sPAPRXive, nr_irqs, 0),
-> >> +    DEFINE_PROP_UINT32("nr-ends", sPAPRXive, nr_ends, 0),
-> >> +    DEFINE_PROP_UINT64("vc-base", sPAPRXive, vc_base, SPAPR_XIVE_VC_B=
-ASE),
-> >> +    DEFINE_PROP_UINT64("tm-base", sPAPRXive, tm_base, SPAPR_XIVE_TM_B=
-ASE),
-> >> +    DEFINE_PROP_END_OF_LIST(),
-> >> +};
-> >> +
-> >> +static void spapr_xive_class_init(ObjectClass *klass, void *data)
-> >> +{
-> >> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> >> +    XiveRouterClass *xrc =3D XIVE_ROUTER_CLASS(klass);
-> >> +
-> >> +    dc->desc    =3D "sPAPR XIVE Interrupt Controller";
-> >> +    dc->props   =3D spapr_xive_properties;
-> >> +    dc->realize =3D spapr_xive_realize;
-> >> +    dc->reset   =3D spapr_xive_reset;
-> >> +    dc->vmsd    =3D &vmstate_spapr_xive;
-> >> +
-> >> +    xrc->get_eas =3D spapr_xive_get_eas;
-> >> +    xrc->set_eas =3D spapr_xive_set_eas;
-> >> +    xrc->get_end =3D spapr_xive_get_end;
-> >> +    xrc->set_end =3D spapr_xive_set_end;
-> >> +}
-> >> +
-> >> +static const TypeInfo spapr_xive_info =3D {
-> >> +    .name =3D TYPE_SPAPR_XIVE,
-> >> +    .parent =3D TYPE_XIVE_ROUTER,
-> >> +    .instance_init =3D spapr_xive_instance_init,
-> >> +    .instance_size =3D sizeof(sPAPRXive),
-> >> +    .class_init =3D spapr_xive_class_init,
-> >> +};
-> >> +
-> >> +static void spapr_xive_register_types(void)
-> >> +{
-> >> +    type_register_static(&spapr_xive_info);
-> >> +}
-> >> +
-> >> +type_init(spapr_xive_register_types)
-> >> +
-> >> +bool spapr_xive_irq_enable(sPAPRXive *xive, uint32_t lisn, bool lsi)
-> >> +{
-> >> +    XiveSource *xsrc =3D &xive->source;
-> >> +
-> >> +    if (lisn >=3D xive->nr_irqs) {
-> >> +        return false;
-> >> +    }
-> >> +
-> >> +    xive->eat[lisn].w |=3D EAS_VALID;
-> >> +    xive_source_irq_set(xsrc, lisn, lsi);
-> >> +    return true;
-> >> +}
-> >> +
-> >> +bool spapr_xive_irq_disable(sPAPRXive *xive, uint32_t lisn)
-> >> +{
-> >> +    XiveSource *xsrc =3D &xive->source;
-> >> +
-> >> +    if (lisn >=3D xive->nr_irqs) {
-> >> +        return false;
-> >> +    }
-> >> +
-> >> +    xive->eat[lisn].w &=3D ~EAS_VALID;
-> >> +    xive_source_irq_set(xsrc, lisn, false);
-> >> +    return true;
-> >> +}
-> >> +
-> >> +qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn)
-> >> +{
-> >> +    XiveSource *xsrc =3D &xive->source;
-> >> +
-> >> +    if (lisn >=3D xive->nr_irqs) {
-> >> +        return NULL;
-> >> +    }
-> >> +
-> >> +    if (!(xive->eat[lisn].w & EAS_VALID)) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %x\n", lis=
-n);
+> >> +    spapr_xive_pic_print_info(spapr->xive, mon);
 > >=20
-> > I don't think this is a guest error - gettint the qirq by number
-> > should generally be something qemu code does.
+> > Any reason the info dumping routines are split into two?
 >=20
-> Even if the IRQ was not defined by the machine ? The EAS_VALID bit is
-> raised when the IRQ is enabled at the XIVE level, which means that the
-> IRQ number has been claimed by some device of the machine. You cannot
-> get a qirq by number for  some random IRQ number. Can you ?
+> Not the same objects. Are you suggesting that we could print all the info=
+=20
+> from the sPAPR XIVE model ? including the XiveTCTX. I thought of doing=20
+> that also. Fine for me if it's ok for you.
 
-Well, you shouldn't.  The point is that it is qemu code (specifically
-the machine setup stuff) that will be calling this, and it shouldn't
-be calling it with irq numbers that haven't been
-enabled/claimed/whatever.
+Ah.. I think I got xive_pic_print_info() and
+xive_tctx_pic_print_info() mixed up.  Never mind.
 
 >=20
 > Thanks,
 >=20
-> C.=20
+> C.
 >=20
 > >=20
-> >> +        return NULL;
-> >> +    }
-> >> +
-> >> +    return xive_source_qirq(xsrc, lisn);
 > >> +}
-> >> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-> >> index 72a46ed91c31..301a8e972d91 100644
-> >> --- a/hw/intc/Makefile.objs
-> >> +++ b/hw/intc/Makefile.objs
-> >> @@ -38,6 +38,7 @@ obj-$(CONFIG_XICS) +=3D xics.o
-> >>  obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
-> >>  obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
-> >>  obj-$(CONFIG_XIVE) +=3D xive.o
-> >> +obj-$(CONFIG_XIVE_SPAPR) +=3D spapr_xive.o
-> >>  obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
-> >>  obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
-> >>  obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
+> >> +
+> >> +/*
+> >> + * XIVE uses the full IRQ number space. Set it to 8K to be compatible
+> >> + * with XICS.
+> >> + */
+> >> +
+> >> +#define SPAPR_IRQ_XIVE_NR_IRQS     0x2000
+> >> +#define SPAPR_IRQ_XIVE_NR_MSIS     (SPAPR_IRQ_XIVE_NR_IRQS - SPAPR_IR=
+Q_MSI)
+> >> +
+> >> +sPAPRIrq spapr_irq_xive =3D {
+> >> +    .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
+> >> +    .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
+> >> +
+> >> +    .init        =3D spapr_irq_init_xive,
+> >> +    .claim       =3D spapr_irq_claim_xive,
+> >> +    .free        =3D spapr_irq_free_xive,
+> >> +    .qirq        =3D spapr_qirq_xive,
+> >> +    .print_info  =3D spapr_irq_print_info_xive,
+> >> +};
+> >> +
+> >>  /*
+> >>   * sPAPR IRQ frontend routines for devices
+> >>   */
+> >> -void spapr_irq_init(sPAPRMachineState *spapr, Error **errp)
+> >> +void spapr_irq_init(sPAPRMachineState *spapr, int nr_servers, Error *=
+*errp)
+> >>  {
+> >>      sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> >> =20
+> >> @@ -216,7 +329,7 @@ void spapr_irq_init(sPAPRMachineState *spapr, Erro=
+r **errp)
+> >>          spapr_irq_msi_init(spapr, smc->irq->nr_msis);
+> >>      }
+> >> =20
+> >> -    smc->irq->init(spapr, smc->irq->nr_irqs, errp);
+> >> +    smc->irq->init(spapr, smc->irq->nr_irqs, nr_servers, errp);
+> >>  }
+> >> =20
+> >>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Erro=
+r **errp)
 > >=20
 >=20
 
@@ -612,24 +405,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---smEuXhZLKnMjT4Ht
+--MO4t1VgQTCtsHhID
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv/OKkACgkQbDjKyiDZ
-s5LiiBAA3VNDtWKt0banPhr5nuBJY0ET1juneYSjpqgdqpmqBQA94anI4GlzH2/y
-SbFrlHsj4WwM/ClqjxOtyyP8S7an0Mgz3YJz1YdeqL8hxnnUBeU7BY3d4eKuECd8
-sVrmRnq8L+gI2+tbAcxPIObhnpnvjqMtD80Z96IJJ9Ggpbz5BWYBUhy1/iS9khfW
-cuTI9MfIvCKLipK4NFQKeXD+A2dh5EDRl7f2w6DEhB/SeBAEDW2QSb6dE4aXLas+
-T1Y2zjtee3KRFpQ3MirN36R/udPIwsJojPr8GgSFR/sH1lRpXFAMrWjKn3ccXMZi
-IND6WQQfzsJALz6FBp98zdrK9HhWF8o3k1ymWLpdFXMNG9vhZ7eLsfB9f9K7K5Ef
-iqf/yDukFIDifkx152pxPnT4F6HERpfsWVFJF9XxWdxCttHo7aNs3c1m2MQ6rWvD
-o/XVL4znvHn7X3KT0jN+JIHtSyHImQSeNwTF1B3R+mXBQGAqILf27t5YD5bfvXKZ
-QkQs7FUQfdrT956w5oCp9cW3yJ80PMrUJI4Ey/4EygkA3YZlbe7aVC2xVMywIVhz
-ieAVAIQBL/0Dj54z0KX3s3ZflP06djyAVe/5pzQrqBy0o6SJhhVfZxuQL7z62zzA
-UEAQPvYpwCuyOqQAPgukUC2cl6ck4+7GMNR2aCa5RH5rGOWeoYo=
-=ii8f
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv/O+4ACgkQbDjKyiDZ
+s5IFnRAAwpYi7rVaum8U+90kchfjQJ/FnSmrIP3TU4s9+XTdcBbZteDTMz7q8ad0
+dDHcr3G3zqT1KrbSjzQtR4fElp+F5+e/PWqVcl8nLQf07mwekI/mcQxZz06akhIf
+3R7p+sVEteHMhVvbHFYamqr1lt87YlGghpr4IVOoERmRUWATnai2N9108NMAaim4
+qqZ9UWN8bapsPueSQ6MFI3yR4ZH8Sy09bzStYqZMnlKu7nVfaqNPdGYuECLueJnB
+8PgawTJz5HwStjcYTz2BMWLt+q/xBq0XiJ52dMJjd0w7b0pmJ/TFwRYI/n//VROr
+bStLgXRzR8unevjg5Z8z4eQ67ZuPG37s9jqxx2Zb/zGqcPJXIN3W/XDeVLi8neru
+4y5+VB52KXfpNw/RtX9S3hRzXScYPbMxmTIcOG2y4IOZKGWT33x5ig8Sluu61/uS
+9Foj59pHi1Oig1ZJZbTBzBm8FgwhwkbLfSQuufoQSdHeh2bVB6Y02bqwR1EbeQ6s
+msE/g7nHHpmthygwmIFDGDf1pUe06MAbXjQEYod3TLEc8ln8eufc80ttmE0jcesD
+y5DjTYcyJD2VAQcAzmuxZOQPICeuco/hLrJesaHKeh4dMzn0apGhAVkOr+/v0VtI
+QmKbAQ8JrOlbPJWhcPhIS0nHU4bv8cYgN7rFxRIOLmrhtTv3qhk=
+=jTIs
 -----END PGP SIGNATURE-----
 
---smEuXhZLKnMjT4Ht--
+--MO4t1VgQTCtsHhID--
