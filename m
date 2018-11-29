@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSRTX-00018G-Nr
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:55:48 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gSRVj-00034f-Nr
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:58:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSRTU-000550-VN
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:55:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46440)
+	(envelope-from <ehabkost@redhat.com>) id 1gSRVg-0007gY-Vb
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:58:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59750)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSRTU-00054q-NK
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:55:44 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181109173309.25212-1-danielhb413@gmail.com>
-	<20181109173309.25212-4-danielhb413@gmail.com>
-	<87bm689ien.fsf@dusky.pond.sub.org>
-Date: Thu, 29 Nov 2018 19:55:30 +0100
-In-Reply-To: <87bm689ien.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Thu, 29 Nov 2018 13:29:04 +0100")
-Message-ID: <87va4f4st9.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v10 3/3] qmp hmp: Make
- system_wakeup check wake-up support and run state
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gSRVg-0007gL-Ob
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:58:00 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7449EA04B3
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 18:57:59 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Thu, 29 Nov 2018 16:57:54 -0200
+Message-Id: <20181129185754.7009-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH] hostmem: Validate host-nodes before setting
+ bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, mdroth@linux.vnet.ibm.com, imammedo@redhat.com
+To: qemu-devel@nongnu.org
+Cc: David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-One more thing...
+host_memory_backend_set_host_nodes() was not validating
+host-nodes before writing to backend->host_nodes, making QEMU
+write beyond the end of the bitmap.
 
-Markus Armbruster <armbru@redhat.com> writes:
+Fix the crash and add a simple regression test for the fix.
 
-> Daniel Henrique Barboza <danielhb413@gmail.com> writes:
->
->> The qmp/hmp command 'system_wakeup' is simply a direct call to
->> 'qemu_system_wakeup_request' from vl.c. This function verifies if
->> runstate is SUSPENDED and if the wake up reason is valid before
->> proceeding. However, no error or warning is thrown if any of those
->> pre-requirements isn't met. There is no way for the caller to
->> differentiate between a successful wakeup or an error state caused
->> when trying to wake up a guest that wasn't suspended.
->>
->> This means that system_wakeup is silently failing, which can be
->> considered a bug. Adding error handling isn't an API break in this
->> case - applications that didn't check the result will remain broken,
->> the ones that check it will have a chance to deal with it.
->>
->> Adding to that, the commit before previous created a new QMP API called
->> query-current-machine, with a new flag called wakeup-suspend-support,
->> that indicates if the guest has the capability of waking up from suspended
->> state. Although such guest will never reach SUSPENDED state and erroring
->> it out in this scenario would suffice, it is more informative for the user
->> to differentiate between a failure because the guest isn't suspended versus
->> a failure because the guest does not have support for wake up at all.
->>
->> All this considered, this patch changes qmp_system_wakeup to check if
->> the guest is capable of waking up from suspend, and if it is suspended.
->> After this patch, this is the output of system_wakeup in a guest that
->> does not have wake-up from suspend support (ppc64):
->>
->> (qemu) system_wakeup
->> wake-up from suspend is not supported by this guest
->> (qemu)
->>
->> And this is the output of system_wakeup in a x86 guest that has the
->> support but isn't suspended:
->>
->> (qemu) system_wakeup
->> Unable to wake up: guest is not in suspended state
->> (qemu)
->>
->> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
->> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
->> ---
->>  hmp.c                   |  5 ++++-
->>  hw/acpi/core.c          |  4 +++-
->>  hw/char/serial.c        |  3 ++-
->>  hw/input/ps2.c          |  9 ++++++---
->>  hw/timer/mc146818rtc.c  |  3 ++-
->>  include/sysemu/sysemu.h |  3 ++-
->>  migration/migration.c   |  7 +++++--
->>  qapi/misc.json          |  8 +++++++-
->>  qmp.c                   | 13 ++++++++++++-
->>  vl.c                    |  6 ++++--
->>  10 files changed, 47 insertions(+), 14 deletions(-)
->>
->> diff --git a/hmp.c b/hmp.c
->> index 7828f93a39..0f5d943413 100644
->> --- a/hmp.c
->> +++ b/hmp.c
->> @@ -1220,7 +1220,10 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
->>  
->>  void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
->>  {
->> -    qmp_system_wakeup(NULL);
->> +    Error *err = NULL;
->> +
->> +    qmp_system_wakeup(&err);
->> +    hmp_handle_error(mon, &err);
->>  }
->>  
->>  void hmp_nmi(Monitor *mon, const QDict *qdict)
->> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
->> index 52e18d7810..a7073dd435 100644
->> --- a/hw/acpi/core.c
->> +++ b/hw/acpi/core.c
->> @@ -514,7 +514,9 @@ static uint32_t acpi_pm_tmr_get(ACPIREGS *ar)
->>  static void acpi_pm_tmr_timer(void *opaque)
->>  {
->>      ACPIREGS *ar = opaque;
->> -    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_PMTIMER);
->> +    Error *err = NULL;
->> +
->> +    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_PMTIMER, &err);
->>      ar->tmr.update_sci(ar);
->>  }
+Reported-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ backends/hostmem.c                   | 13 +++++++---
+ tests/acceptance/host-nodes-limit.py | 36 ++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+), 3 deletions(-)
+ create mode 100644 tests/acceptance/host-nodes-limit.py
 
-Leaks the error object when qemu_system_wakeup_request() fails.
-
-If it cannot fail here, pass &error_abort.
-
-If it can fail, but you want to ignore failure, pass NULL.
-
-More of the same elsewhere.
-
-[...]
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index 1a89342039..ef199d32fd 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -103,11 +103,18 @@ host_memory_backend_set_host_nodes(Object *obj, Visitor *v, const char *name,
+ {
+ #ifdef CONFIG_NUMA
+     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+-    uint16List *l = NULL;
++    uint16List *l, *host_nodes = NULL;
+ 
+-    visit_type_uint16List(v, name, &l, errp);
++    visit_type_uint16List(v, name, &host_nodes, errp);
++
++    for (l = host_nodes; l; l = l->next) {
++        if (l->value >= MAX_NODES) {
++            error_setg(errp, "Invalid host-nodes value: %d", l->value);
++            return;
++        }
++    }
+ 
+-    while (l) {
++    for (l = host_nodes; l; l = l->next) {
+         bitmap_set(backend->host_nodes, l->value, 1);
+         l = l->next;
+     }
+diff --git a/tests/acceptance/host-nodes-limit.py b/tests/acceptance/host-nodes-limit.py
+new file mode 100644
+index 0000000000..e803e10104
+--- /dev/null
++++ b/tests/acceptance/host-nodes-limit.py
+@@ -0,0 +1,36 @@
++# Regression test for host-nodes limit validation
++#
++# Copyright (c) 2018 Red Hat, Inc.
++#
++# Author:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
++
++from avocado_qemu import Test
++from subprocess import Popen, PIPE
++
++MAX_NODES = 128
++
++class HostNodesValidation(Test):
++    def test_large_host_nodes(self):
++        p = Popen([self.qemu_bin, '-display', 'none', '-nodefaults',
++                   '-object', 'memory-backend-ram,id=m0,'
++                              'size=4096,host-nodes=%d' % (MAX_NODES)],
++                  stderr=PIPE, stdout=PIPE)
++        stdout,stderr = p.communicate()
++
++        self.assertIn(b'Invalid host-nodes', stderr)
++        self.assertEquals(stdout, b'')
++        self.assertEquals(p.returncode, 1)
++
++    def test_valid_host_nodes(self):
++        p = Popen([self.qemu_bin, '-display', 'none', '-nodefaults',
++                   '-object', 'memory-backend-ram,id=m0,'
++                              'size=4096,host-nodes=%d' % (MAX_NODES - 1)],
++                  stderr=PIPE, stdout=PIPE)
++        stdout,stderr = p.communicate()
++
++        self.assertIn(b'host-nodes must be empty', stderr)
++        self.assertEquals(p.returncode, 1)
+-- 
+2.18.0.rc1.1.g3f1ff2140
