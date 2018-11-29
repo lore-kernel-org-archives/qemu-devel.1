@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gSNm9-0000Zc-FJ
+	(envelope-from <bounces@canonical.com>) id 1gSNmA-0008GY-Bg
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:58:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gSNaQ-0000tR-Bb
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:46:41 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:38906)
+	(envelope-from <bounces@canonical.com>) id 1gSNZp-0000gU-Rs
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:46:05 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48716)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gSNaQ-0000sn-1l
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:46:38 -0500
-Received: by mail-wr1-f67.google.com with SMTP id v13so2172263wrw.5
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 06:46:37 -0800 (PST)
-References: <20181129100340.13823-1-fli@suse.com>
-	<20181129100340.13823-4-fli@suse.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9e1bf8ec-8b2a-088b-2a5d-d946c1139e59@redhat.com>
-Date: Thu, 29 Nov 2018 15:46:33 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gSNZp-0000g9-Jx
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:46:01 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gSNZo-00045B-LR
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 14:46:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9A1712E807C
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 14:46:00 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20181129100340.13823-4-fli@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v2 3/5] migration: fix the multifd code
- when receiving less channels
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 29 Nov 2018 14:38:47 -0000
+From: Roman Bolshakov <1802684@bugs.launchpad.net>
+Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
+Message-Id: <154350232773.9672.6081778773132567265.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,155 +36,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Hi Fei,
+Can you try to build it without SDL/GTK support? I'm not having any
+issues with Cocoa display.
 
-On 29/11/18 11:03, Fei Li wrote:
-> In our current code, when multifd is used during migration, if there
-> is an error before the destination receives all new channels, the
-> source keeps running, however the destination does not exit but keeps
-> waiting until the source is killed deliberately.
-> 
-> Fix this by dumping the specific error and let users decide whether
-> to quit from the destination side when failing to receive packet via
-> some channel.
-> 
-> Signed-off-by: Fei Li <fli@suse.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/channel.c   | 11 ++++++-----
->  migration/migration.c |  9 +++++++--
->  migration/migration.h |  2 +-
->  migration/ram.c       |  7 ++++++-
->  migration/ram.h       |  2 +-
->  5 files changed, 21 insertions(+), 10 deletions(-)
-> 
-> diff --git a/migration/channel.c b/migration/channel.c
-> index 33e0e9b82f..20e4c8e2dc 100644
-> --- a/migration/channel.c
-> +++ b/migration/channel.c
-> @@ -30,6 +30,7 @@
->  void migration_channel_process_incoming(QIOChannel *ioc)
->  {
->      MigrationState *s = migrate_get_current();
-> +    Error *local_err = NULL;
->  
->      trace_migration_set_incoming_channel(
->          ioc, object_get_typename(OBJECT(ioc)));
-> @@ -38,13 +39,13 @@ void migration_channel_process_incoming(QIOChannel *ioc)
->          *s->parameters.tls_creds &&
->          !object_dynamic_cast(OBJECT(ioc),
->                               TYPE_QIO_CHANNEL_TLS)) {
-> -        Error *local_err = NULL;
->          migration_tls_channel_process_incoming(s, ioc, &local_err);
-> -        if (local_err) {
-> -            error_report_err(local_err);
-> -        }
->      } else {
-> -        migration_ioc_process_incoming(ioc);
-> +        migration_ioc_process_incoming(ioc, &local_err);
-> +    }
-> +
-> +    if (local_err) {
-> +        error_report_err(local_err);
->      }
->  }
->  
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 49ffb9997a..72106bddf0 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -541,7 +541,7 @@ void migration_fd_process_incoming(QEMUFile *f)
->      migration_incoming_process();
->  }
->  
-> -void migration_ioc_process_incoming(QIOChannel *ioc)
-> +void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp)
->  {
->      MigrationIncomingState *mis = migration_incoming_get_current();
->      bool start_migration;
-> @@ -563,9 +563,14 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
->           */
->          start_migration = !migrate_use_multifd();
->      } else {
-> +        Error *local_err = NULL;
->          /* Multiple connections */
->          assert(migrate_use_multifd());
-> -        start_migration = multifd_recv_new_channel(ioc);
-> +        start_migration = multifd_recv_new_channel(ioc, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
->      }
->  
->      if (start_migration) {
-> diff --git a/migration/migration.h b/migration/migration.h
-> index e413d4d8b6..02b7304610 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -229,7 +229,7 @@ struct MigrationState
->  void migrate_set_state(int *state, int old_state, int new_state);
->  
->  void migration_fd_process_incoming(QEMUFile *f);
-> -void migration_ioc_process_incoming(QIOChannel *ioc);
-> +void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp);
->  void migration_incoming_process(void);
->  
->  bool  migration_has_all_channels(void);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 7e7deec4d8..e13b9349d0 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1323,7 +1323,7 @@ bool multifd_recv_all_channels_created(void)
->  }
->  
->  /* Return true if multifd is ready for the migration, otherwise false */
-> -bool multifd_recv_new_channel(QIOChannel *ioc)
-> +bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp)
->  {
->      MultiFDRecvParams *p;
->      Error *local_err = NULL;
-> @@ -1331,6 +1331,10 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
->  
->      id = multifd_recv_initial_packet(ioc, &local_err);
->      if (id < 0) {
-> +        error_propagate_prepend(errp, local_err,
-> +                                "failed to receive packet"
-> +                                " via multifd channel %d: ",
-> +                                multifd_recv_state->count);
+-- =
 
-Shouldn't we use atomic_read(&multifd_recv_state->count) here?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1802684
 
-Patch looks good otherwise.
+Title:
+  QEMU gui crashes on macOS Mojave
 
-Regards,
+Status in QEMU:
+  New
 
-Phil.
+Bug description:
+  QEMU release 3.0.0 as well as a recent head build
 
->          multifd_recv_terminate_threads(local_err);
->          return false;
->      }
-> @@ -1340,6 +1344,7 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
->          error_setg(&local_err, "multifd: received id '%d' already setup'",
->                     id);
->          multifd_recv_terminate_threads(local_err);
-> +        error_propagate(errp, local_err);
->          return false;
->      }
->      p->c = ioc;
-> diff --git a/migration/ram.h b/migration/ram.h
-> index 83ff1bc11a..046d3074be 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -47,7 +47,7 @@ int multifd_save_cleanup(Error **errp);
->  int multifd_load_setup(void);
->  int multifd_load_cleanup(Error **errp);
->  bool multifd_recv_all_channels_created(void);
-> -bool multifd_recv_new_channel(QIOChannel *ioc);
-> +bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp);
->  
->  uint64_t ram_pagesize_summary(void);
->  int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
-> 
+  /usr/local/Cellar/qemu/HEAD-03c1ca1 (147 files, 257.2MB)
+    Built from source on 2018-11-06 at 13:41:32 with: --with-gtk+3 --with-s=
+dl2 --with-libusb
+  /usr/local/Cellar/qemu/3.0.0 (137 files, 261.6MB) *
+    Poured from bottle on 2018-11-10 at 22:58:32 with: --with-gtk+3 --with-=
+libusb --with-sdl2
+
+  Crashes when attempting to use any gui interface (tried SDL and
+  default Cocoa):
+
+  2018-11-10 22:58:41.799 qemu-system-aarch64[42982:1102466] *** Terminatin=
+g app due to uncaught exception 'NSInternalInconsistencyException', reason:=
+ 'NSWindow drag regions should only be invalidated on the Main Thread!'
+  *** First throw call stack:
+  (
+  	0   CoreFoundation                      0x00007fff3ea96ecd __exceptionPr=
+eprocess + 256
+  	1   libobjc.A.dylib                     0x00007fff6ab49720 objc_exceptio=
+n_throw + 48
+  	2   CoreFoundation                      0x00007fff3eab095d -[NSException=
+ raise] + 9
+  	3   AppKit                              0x00007fff3bfb13fa -[NSWindow(NS=
+Window_Theme) _postWindowNeedsToResetDragMarginsUnlessPostingDisabled] + 324
+  	4   AppKit                              0x00007fff3bfb6850 -[NSView setF=
+rameSize:] + 2082
+  	5   AppKit                              0x00007fff3c02747d -[NSVisualEff=
+ectView setFrameSize:] + 171
+  	6   AppKit                              0x00007fff3c0811b1 -[NSTitlebarV=
+iew setFrameSize:] + 84
+  	7   AppKit                              0x00007fff3bfb5859 -[NSView setF=
+rame:] + 478
+  	8   AppKit                              0x00007fff3c081154 -[NSTitlebarV=
+iew resizeWithOldSuperviewSize:] + 100
+  	9   AppKit                              0x00007fff3bfbc95e -[NSView resi=
+zeSubviewsWithOldSize:] + 502
+  	10  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
+rameSize:] + 1707
+  	11  AppKit                              0x00007fff3c9773c0 -[NSTitlebarC=
+ontainerView setFrameSize:] + 142
+  	12  AppKit                              0x00007fff3bfb5859 -[NSView setF=
+rame:] + 478
+  	13  AppKit                              0x00007fff3bfbcdb5 -[NSView resi=
+zeWithOldSuperviewSize:] + 776
+  	14  AppKit                              0x00007fff3bfbc95e -[NSView resi=
+zeSubviewsWithOldSize:] + 502
+  	15  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
+rameSize:] + 1707
+  	16  AppKit                              0x00007fff3c024570 -[NSThemeFram=
+e setFrameSize:] + 495
+  	17  AppKit                              0x00007fff3c011223 -[NSWindow _s=
+etFrame:updateBorderViewSize:] + 966
+  	18  AppKit                              0x00007fff3c010b46 -[NSWindow _o=
+ldPlaceWindow:] + 547
+  	19  AppKit                              0x00007fff3c010151 -[NSWindow _s=
+etFrameCommon:display:stashSize:] + 3006
+  	20  AppKit                              0x00007fff3c00f57d -[NSWindow _s=
+etFrame:display:allowImplicitAnimation:stashSize:] + 192
+  	21  AppKit                              0x00007fff3c019ff8 -[NSWindow se=
+tFrame:display:animate:] + 567
+  	22  qemu-system-aarch64                 0x000000010b7b2abf qemu-system-a=
+arch64 + 3668671
+  	23  qemu-system-aarch64                 0x000000010b7b6356 qemu-system-a=
+arch64 + 3683158
+  	24  qemu-system-aarch64                 0x000000010b7ad836 qemu-system-a=
+arch64 + 3647542
+  	25  qemu-system-aarch64                 0x000000010b4ce769 qemu-system-a=
+arch64 + 636777
+  	26  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
+arch64 + 347172
+  	27  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
+arch64 + 346645
+  	28  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
+arch64 + 346353
+  	29  qemu-system-aarch64                 0x000000010b4414aa qemu-system-a=
+arch64 + 58538
+  	30  qemu-system-aarch64                 0x000000010b4f78c3 qemu-system-a=
+arch64 + 805059
+  	31  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
+arch64 + 347172
+  	32  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
+arch64 + 346645
+  	33  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
+arch64 + 346353
+  	34  qemu-system-aarch64                 0x000000010b4b8f57 qemu-system-a=
+arch64 + 548695
+  	35  qemu-system-aarch64                 0x000000010b49c3af qemu-system-a=
+arch64 + 431023
+  	36  ???                                 0x00000001117891f3 0x0 + 4588081=
+651
+  )
+  libc++abi.dylib: terminating with uncaught exception of type NSException
+  fish: 'qemu-system-aarch64 -M raspi3 -=E2=80=A6' terminated by signal SIG=
+ABRT (Abort)
+
+  =
+
+  macOS Mojave 10.14.2 Beta (18C38b)
+  Qemu in the same configuration used to work in High Sierra, started crash=
+ing only after upgrade to Mojave.
+
+  Command line:
+  `qemu-system-aarch64 -M raspi3 -d in_asm -serial stdio -kernel $1.bin`
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1802684/+subscriptions
