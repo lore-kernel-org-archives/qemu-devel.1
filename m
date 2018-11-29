@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gSEKG-0005L9-KO
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:53:23 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1gSEMC-0006jC-EY
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:55:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gSEKC-0007ZC-Bl
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:53:18 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44232)
+	(envelope-from <liq3ea@gmail.com>) id 1gSEM8-0001n5-GQ
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:55:18 -0500
+Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:39359)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gSEKC-0007Wf-2W
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:53:16 -0500
-Received: by mail-pl1-x641.google.com with SMTP id k8so383705pls.11
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 20:53:15 -0800 (PST)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gSEM4-0001jD-Nx
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:55:14 -0500
+Received: by mail-it1-x143.google.com with SMTP id a6so1659730itl.4
+	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 20:55:11 -0800 (PST)
+MIME-Version: 1.0
+References: <1543312923-3074-1-git-send-email-liq3ea@gmail.com>
+	<1543312923-3074-3-git-send-email-liq3ea@gmail.com>
+	<20181127102736.q2322bc6uw4wvvif@starbug-mbp.local>
+	<87a7lur8z8.fsf@dusky.pond.sub.org>
+In-Reply-To: <87a7lur8z8.fsf@dusky.pond.sub.org>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 28 Nov 2018 20:52:12 -0800
-Message-Id: <1543467132-2873-3-git-send-email-liq3ea@gmail.com>
-In-Reply-To: <1543467132-2873-1-git-send-email-liq3ea@gmail.com>
-References: <1543467132-2873-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] hw: vmmouse: Use link instead of
- pointer property
+Date: Thu, 29 Nov 2018 12:54:33 +0800
+Message-ID: <CAKXe6SLN2Av95SONvaT3C4sV5zvsxi8HFHXojWT0VQDwt8nCTA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw: vmmouse: drop DEFINE_PROP_PTR()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
-Cc: darren.kenny@oracle.com, armbru@redhat.com, qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Qemu Developers <qemu-devel@nongnu.org>
 
-According to qdev-properties.h, properties of pointer type should
-be avoided. Turn "ps2_mouse" into a link.
+Markus Armbruster <armbru@redhat.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=8827=
+=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=888:38=E5=86=99=E9=81=93=EF=BC=
+=9A
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
----
+> Darren Kenny <darren.kenny@oracle.com> writes:
+>
+> > Hi Li Qiang,
+> >
+> > This is only a suggestion, I'm sure someone else might also correct
+> > me, but I'm not sure the subject above really describes what is
+> > happening in the commit as a whole.
+> >
+> > It seems to miss the point that the main change here is to use a
+> > link type property, so maybe it might be better written as something
+> > along the lines of:
+> >
+> >  Subject: [PATCH v2 2/2] hw: vmmouse: use link property instead of
+> pointer
+> >  Drop DEFINE_PROP_PTR() and replace with a link pointer via an
+> >  instance init function (vmmouse_instance_initfn).
+>
+> Yes, that's better.  Or take inspiration from recent similar work, such
+> as commit a8299ec1b24, and say something like
+>
+>     vmmouse: Use link instead of pointer property
+>
+>     According to qdev-properties.h, properties of pointer type should
+>     be avoided.  Turn "ps2_mouse" into a link.
+>
+> Preferably with the commit message improved along these lines:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>
 
-Change since v2: detailed commit message
 
-Change since v1: use error_abort in object_property_set_link()
+Hi Darren and Markus,
 
- hw/i386/pc.c      |  3 ++-
- hw/i386/vmmouse.c | 17 +++++++++++------
- 2 files changed, 13 insertions(+), 7 deletions(-)
+Thanks so much for your advice.
+A new revision has been sent out.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 73c7b777a0..64f0f233b8 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1552,7 +1552,8 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
-     }
-     if (vmmouse) {
-         DeviceState *dev = DEVICE(vmmouse);
--        qdev_prop_set_ptr(dev, "ps2_mouse", i8042);
-+        object_property_set_link(OBJECT(dev), OBJECT(i8042),
-+                                 "ps2_mouse", &error_abort);
-         qdev_init_nofail(dev);
-     }
-     port92 = isa_create_simple(isa_bus, TYPE_PORT92);
-diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
-index 4412eaf604..f63aac6673 100644
---- a/hw/i386/vmmouse.c
-+++ b/hw/i386/vmmouse.c
-@@ -27,6 +27,7 @@
- #include "hw/i386/pc.h"
- #include "hw/input/i8042.h"
- #include "hw/qdev.h"
-+#include "qapi/error.h"
- 
- /* debug only vmmouse */
- //#define DEBUG_VMMOUSE
-@@ -271,10 +272,15 @@ static void vmmouse_realizefn(DeviceState *dev, Error **errp)
-     vmport_register(VMMOUSE_DATA, vmmouse_ioport_read, s);
- }
- 
--static Property vmmouse_properties[] = {
--    DEFINE_PROP_PTR("ps2_mouse", VMMouseState, ps2_mouse),
--    DEFINE_PROP_END_OF_LIST(),
--};
-+static void vmmouse_instance_initfn(Object *obj)
-+{
-+    VMMouseState *s = VMMOUSE(obj);
-+
-+    object_property_add_link(obj, "ps2_mouse", TYPE_I8042,
-+                             (Object **)&s->ps2_mouse,
-+                             qdev_prop_allow_set_link_before_realize,
-+                             0, &error_abort);
-+}
- 
- static void vmmouse_class_initfn(ObjectClass *klass, void *data)
- {
-@@ -283,8 +289,6 @@ static void vmmouse_class_initfn(ObjectClass *klass, void *data)
-     dc->realize = vmmouse_realizefn;
-     dc->reset = vmmouse_reset;
-     dc->vmsd = &vmstate_vmmouse;
--    dc->props = vmmouse_properties;
--    /* Reason: pointer property "ps2_mouse" */
-     dc->user_creatable = false;
- }
- 
-@@ -292,6 +296,7 @@ static const TypeInfo vmmouse_info = {
-     .name          = TYPE_VMMOUSE,
-     .parent        = TYPE_ISA_DEVICE,
-     .instance_size = sizeof(VMMouseState),
-+    .instance_init = vmmouse_instance_initfn,
-     .class_init    = vmmouse_class_initfn,
- };
- 
--- 
-2.11.0
+
+Thanks,
+Li Qiang
+
+
+>
+> [...]
+>
