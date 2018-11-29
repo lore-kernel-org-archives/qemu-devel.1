@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gSJY8-0007uS-B2
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:28:01 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gSJcY-00021O-Oz
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:32:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gSJY7-00058p-Ho
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:28:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58514)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gSJY7-00058Q-7d
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:27:59 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 85AB73C2CD9
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 10:27:58 +0000 (UTC)
-References: <1543487139-28462-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dba3373f-0709-2734-ae90-930573db83c9@redhat.com>
-Date: Thu, 29 Nov 2018 11:27:54 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gSJcX-00009h-Ji
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:32:34 -0500
 MIME-Version: 1.0
-In-Reply-To: <1543487139-28462-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0] tests/Makefile: Use some more
- CONFIG switches for x86 tests
+References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
+	<20181127092801.21777-17-marcandre.lureau@redhat.com>
+	<20181127125644.GB18284@habkost.net>
+	<CAMxuvaySoJ2TokV8M81CVU3Hp4dC25c+PW_p2kk+V88-88U-CQ@mail.gmail.com>
+	<20181127133527.GI18284@habkost.net>
+	<20181128184027.7d584eaa@redhat.com>
+In-Reply-To: <20181128184027.7d584eaa@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 29 Nov 2018 14:32:18 +0400
+Message-ID: <CAJ+F1CK5NkgsJWFGZ7kvR81KyeOPE_ytk=tOjKqTUGtbfywmJQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 16/28] hw: apply machine compat
+ properties without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +28,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, mrezanin@redhat.com, Laurent Vivier <lvivier@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Qemu-s390x list <qemu-s390x@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:sPAPR pseries" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 29/11/18 11:25, Thomas Huth wrote:
-> To be able to build and test QEMU binaries where certain devices are
-> disabled, we have to use the right CONFIG_* switches to run certain
-> tests only if the corresponding device really has been compiled into
-> the binary.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Hi
+On Wed, Nov 28, 2018 at 9:53 PM Igor Mammedov <imammedo@redhat.com> wrote:
+>
+> On Tue, 27 Nov 2018 11:35:27 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> > On Tue, Nov 27, 2018 at 05:10:05PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > > On Tue, Nov 27, 2018 at 4:57 PM Eduardo Habkost <ehabkost@redhat.com>=
+ wrote:
+> > > >
+> > > > On Tue, Nov 27, 2018 at 01:27:49PM +0400, Marc-Andr=C3=A9 Lureau wr=
+ote:
+> > > > > Similarly to accel properties, move compat properties out of glob=
+als
+> > > > > registration, and apply the machine compat properties during
+> > > > > device_post_init().
+> > > > >
+> > > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
+m>
+> > > > [...]
+> > > > > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > > > > index 7066d28271..3b31b2c025 100644
+> > > > > --- a/hw/core/qdev.c
+> > > > > +++ b/hw/core/qdev.c
+> > > > > @@ -971,17 +971,26 @@ static void device_initfn(Object *obj)
+> > > > >  }
+> > > > >
+> > > > >  static const GPtrArray *ac_compat_props;
+> > > > > +static const GPtrArray *mc_compat_props;
+> why you didn't use just 'compat_props' for both?
+> (it would be cleaner have single registry for compat
+> properties, and the place that takes care of registration
+> will take care of necessary ordering)
 
-No objection, but CONFIG_VIRTIO and CONFIG_MEGASAS_SCSI_PCI would not be
-needed with qgraph (which I'm going to post Real Soon Now).
+There are two arrays, one from the accelerator class, the other from
+the machine class. We can't make it a singleton (all compats props for
+the various machines would be mixed).
 
-Paolo
+We could create a third array that would be the set of both, but that
+would require more copy/allocation.
 
-> ---
->  tests/Makefile.include | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index fb0b449..d87b403 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -165,13 +165,13 @@ check-qtest-pci-$(CONFIG_NE2000_PCI) += tests/ne2000-test$(EXESUF)
->  check-qtest-pci-$(CONFIG_NVME_PCI) += tests/nvme-test$(EXESUF)
->  check-qtest-pci-$(CONFIG_AC97) += tests/ac97-test$(EXESUF)
->  check-qtest-pci-$(CONFIG_ES1370) += tests/es1370-test$(EXESUF)
-> -check-qtest-pci-y += $(check-qtest-virtio-y)
-> +check-qtest-pci-$(CONFIG_VIRTIO) += $(check-qtest-virtio-y)
->  check-qtest-pci-$(CONFIG_IPACK) += tests/tpci200-test$(EXESUF)
->  check-qtest-pci-$(CONFIG_IPACK) += $(check-qtest-ipack-y)
-> -check-qtest-pci-y += tests/display-vga-test$(EXESUF)
-> +check-qtest-pci-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
->  check-qtest-pci-$(CONFIG_HDA) += tests/intel-hda-test$(EXESUF)
->  check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) += tests/ivshmem-test$(EXESUF)
-> -check-qtest-pci-y += tests/megasas-test$(EXESUF)
-> +check-qtest-pci-$(CONFIG_MEGASAS_SCSI_PCI) += tests/megasas-test$(EXESUF)
->  
->  check-qtest-i386-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
->  check-qtest-i386-y += tests/fdc-test$(EXESUF)
-> @@ -183,8 +183,8 @@ check-qtest-i386-y += tests/bios-tables-test$(EXESUF)
->  check-qtest-i386-$(CONFIG_SGA) += tests/boot-serial-test$(EXESUF)
->  check-qtest-i386-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
->  check-qtest-i386-y += tests/rtc-test$(EXESUF)
-> -check-qtest-i386-y += tests/ipmi-kcs-test$(EXESUF)
-> -check-qtest-i386-y += tests/ipmi-bt-test$(EXESUF)
-> +check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) += tests/ipmi-kcs-test$(EXESUF)
-> +check-qtest-i386-$(CONFIG_ISA_IPMI_BT) += tests/ipmi-bt-test$(EXESUF)
->  check-qtest-i386-y += tests/i440fx-test$(EXESUF)
->  check-qtest-i386-y += tests/fw_cfg-test$(EXESUF)
->  check-qtest-i386-y += tests/drive_del-test$(EXESUF)
-> 
+>
+> > > > >
+> > > > >  void accel_register_compat_props(const GPtrArray *props)
+> > > > >  {
+> > > > >      ac_compat_props =3D props;
+> > > > >  }
+> > > > >
+> > > > > +void machine_register_compat_props(const GPtrArray *props)
+> > > > > +{
+> > > > > +    mc_compat_props =3D props;
+> > > > > +}
+> > > > > +
+> > > > >  static void device_post_init(Object *obj)
+> > > > >  {
+> > > > >      if (ac_compat_props) {
+> > > > >          object_apply_global_props(obj, ac_compat_props, &error_a=
+bort);
+> > > > >      }
+> > > >
+> > > > Why not just use MACHINE(qdev_get_machine())->accel->compat_props
+> > > > directly?
+> > > >
+> > > > > +    if (mc_compat_props) {
+> > > > > +        object_apply_global_props(obj, mc_compat_props, &error_a=
+bort);
+> > > > > +    }
+> > > >
+> > > > Why not just use MACHINE(qdev_get_machine())->compat_props
+> > > > directly?
+> > >
+> > > This was the approach in v3, but Igor didn't quite like referencing
+> > > machine in qdev:
+> > > https://lists.nongnu.org/archive/html/qemu-devel/2018-11/msg04774.htm=
+l
+> >
+> > I disagree with Igor, here.  Core qdev code already have multiple
+> > references to machine, I don't see any problem with that.
+> (There are only 3 calls to qdev_get_machine() in core qdev.c
+> blame me for adding one there. Which were hacks so we won't
+> have to re-factor core qdev code. But that doesn't justify adding more.)
+>
+> This patch is an interim one and later in 25/28
+> device_post_init() content is moved to a more generic compat interface
+> implementation. That intended for use with types derived from Object
+> (i.e. not only qdev stuff). Hence I'd like to decouple it from
+> machine as a standalone feature as much as possible. So that
+> machine (or whatever else) will opt in in using facility.
+>
+> > The previous code was clearer and easier to follow, and wasn't
+> > sensitive to subtle changes in initialization ordering (e.g. what
+> > happens if we create a device before *_register_compat_props() is
+> > called?).
+> Indeed It seems clearer to follow (that was my first impression as well),
+> until I went through whole series and thought it's basically the same,
+> So my choice was to use cleaner approach that we won't have to rewrite
+> in near future.
+>
+> Thanks for bringing up ordering issue, we probably have one in this serie=
+s.
+>
+> But beside possible issue here, even with v3 variant we would still have
+> issues if objects are created before machine and accelerator instances ar=
+e
+> created.
+> More correct way could be to register compat properties right away at
+> select_machine() time, we don't really need an instance for that, just ac=
+cess
+> to machine_class and do the same for 'accel' option. (that's probably doa=
+ble
+> within this series) + some time later (on top of this series) a check tha=
+t
+> no TYPE_COMPAT_PROPS were created at the moment compat properties are reg=
+istered
+> so we would notice when we write something wrong.
+
+ok, I can look at that
+
+>
+> If it's too much of refactoring (series is already big as it is), I would
+> compromise on qdev_get_machine() and adding TODO comments (or a series on=
+ top)
+> to make it correct and "race-resistant".
+>
+> Marc are you sure it actually will work as expected with Object derived t=
+ypes?
+>    register_global_properties()
+> is being called after
+>    qemu_opts_foreach(... user_creatable_add_opts_foreach, object_create_i=
+nitial ...)
+> so there is no compat properties registered when objects are created.
+
+Good point, but in the case of hostmem, it works because
+object_create_initial delays its creation.
+
+> > >
+> > > >
+> > > > >
+> > > > >      qdev_prop_set_globals(DEVICE(obj));
+> > > > >  }
+> > > > [...]
+> > > >
+> > > > --
+> > > > Eduardo
+> >
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
