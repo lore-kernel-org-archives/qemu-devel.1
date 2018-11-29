@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSMey-0001M3-6k
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:47:19 -0500
+	(envelope-from <thuth@redhat.com>) id 1gSMki-0005Gz-JS
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:53:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSMeu-0004vc-7Q
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:47:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53552)
+	(envelope-from <thuth@redhat.com>) id 1gSMkh-0000dj-Rh
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:53:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38666)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gSMet-0004vC-Vy
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:47:12 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4F16930A3AC4
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 13:47:11 +0000 (UTC)
-References: <20181129104658.26585-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gSMkh-0000dC-IX
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:53:11 -0500
+References: <20181129121449.4322-1-jasowang@redhat.com>
+	<20181129121449.4322-5-jasowang@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <569735e2-9aa2-1f10-412d-c1850fb26660@redhat.com>
-Date: Thu, 29 Nov 2018 14:47:08 +0100
+Message-ID: <026ee7b1-80d7-c762-599d-aa3275212458@redhat.com>
+Date: Thu, 29 Nov 2018 14:53:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181129104658.26585-1-berrange@redhat.com>
+In-Reply-To: <20181129121449.4322-5-jasowang@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-web PATCH v2] Document how to test the site
- with jekyll locally
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2 for 3.1 4/4] virtio-net-test: add large
+ tx buffer test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,22 +29,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: mst@redhat.com, liq3ea@163.com, liq3ea@gmail.com, ppandit@redhat.com, pbonzini@redhat.com
 
-On 2018-11-29 11:46, Daniel P. Berrang=C3=A9 wrote:
-> Add a README file that tells people this is a jekyll based static
-> website, and shows people how to run jekyll for testing purposes.
->=20
-> Tested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On 2018-11-29 13:14, Jason Wang wrote:
+> This test tries to build a packet whose size is greater than INT_MAX
+> which tries to trigger integer overflow in qemu_net_queue_append_iov()
+> which may result OOB.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 > ---
->  .gitignore  |  2 ++
->  README      | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  _config.yml |  2 ++
->  3 files changed, 59 insertions(+)
->  create mode 100644 README
+>  tests/virtio-net-test.c | 45 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 45 insertions(+)
 
-Thanks, applied (with the typo fixed).
-
- Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
