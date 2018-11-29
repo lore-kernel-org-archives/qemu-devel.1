@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gSK6i-0007C4-QJ
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:03:49 -0500
+	(envelope-from <berrange@redhat.com>) id 1gSK7G-0007YL-58
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:04:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gSK6e-0002Al-Md
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:03:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51828)
+	(envelope-from <berrange@redhat.com>) id 1gSK7C-0002YH-0x
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:04:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55242)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gSK6e-0002AO-FK
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:03:40 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gSK7B-0002Wk-Qi
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:04:13 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 95049C058CB0
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 11:03:39 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Thu, 29 Nov 2018 11:03:34 +0000
-Message-Id: <20181129110334.27721-1-berrange@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 3B4E53002C6D
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 11:04:13 +0000 (UTC)
+Date: Thu, 29 Nov 2018 11:04:07 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181129110407.GC25007@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181128153858.11845-1-berrange@redhat.com>
+	<f73a6661-83a1-73fa-d087-a8d9c9aaaff5@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f73a6661-83a1-73fa-d087-a8d9c9aaaff5@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [qemu-web PATCH v3] download: document version
+Subject: Re: [Qemu-devel] [qemu-web PATCH v2] download: document version
  numbering scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,57 +36,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-The new version numbering scheme was mentioned in the blog post
-announcing 3.0 previously, but this will fall out of view over
-time. It is thus preferrable to mention this on the download page
-too.
+On Thu, Nov 29, 2018 at 11:58:22AM +0100, Thomas Huth wrote:
+> On 2018-11-28 16:38, Daniel P. Berrang=C3=A9 wrote:
+> > The new version numbering scheme was mentioned in the blog post
+> > announcing 3.0 previously, but this will fall out of view over
+> > time. It is thus preferrable to mention this on the download page
+> > too.
+> >=20
+> > Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  download.html | 24 ++++++++++++++++++++++++
+> >  1 file changed, 24 insertions(+)
+> >=20
+> > diff --git a/download.html b/download.html
+> > index 5a1e4ea..bbdc00c 100644
+> > --- a/download.html
+> > +++ b/download.html
+> > @@ -39,6 +39,30 @@ permalink: /download/
+> >  	{% include_relative _download/source.html %}
+> >  </article>
+> >  </div>
+> > +
+> > +<h2>Version numbering</h2>
+> > +<div>
+> > +  <p>
+> > +  Since version 3.0.0, QEMU uses a time based version numbering sche=
+me:
+> > +  </p>
+> > +<ul>
+> > +<dt>major</dt>
+> > +<dd>incremented by 1 for the first release of the year</dd>
+> > +<dt>minor</dt>
+> > +<dd>reset to 0 with every major increment, otherwise incremented by =
+1 for each release from git master</dd>
+> > +<dt>micro</dt>
+> > +<dd>always 0 for releases from git master, incremented by 1 for each=
+ stable branch release</dd>
+> > +</ul>
+>=20
+> HTML validator (https://validator.w3.org) complains here:
+>=20
+> * Element dt not allowed as child of element ul in this context.
+>=20
+> * Element dt not allowed as child of element ul in this context.
 
-Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- download.html | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+Oh fun, browsers still rendered it correctly despite being wrong :-)
 
-diff --git a/download.html b/download.html
-index 5a1e4ea..3c2df66 100644
---- a/download.html
-+++ b/download.html
-@@ -39,6 +39,30 @@ permalink: /download/
- 	{% include_relative _download/source.html %}
- </article>
- </div>
-+
-+<h2>Version numbering</h2>
-+<div>
-+  <p>
-+  Since version 3.0.0, QEMU uses a time based version numbering scheme:
-+  </p>
-+<dl>
-+<dt>major</dt>
-+<dd>incremented by 1 for the first release of the year</dd>
-+<dt>minor</dt>
-+<dd>reset to 0 with every major increment, otherwise incremented by 1 fo=
-r each release from git master</dd>
-+<dt>micro</dt>
-+<dd>always 0 for releases from git master, incremented by 1 for each sta=
-ble branch release</dd>
-+</dl>
-+  <p>
-+    The implication of this is that changes in major version number
-+    <strong>do not</strong> have any bearing on the scope of changes
-+    included in the release. Non-backward compatible changes may be made
-+    in any master branch release, provided they have followed the
-+    <a href=3D"https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-fea=
-tures">deprecation policy</a>
-+    which calls for warnings to be emitted for a minimum of two releases
-+    prior to the change.
-+  </p>
-+</div>
- <script>
- function animateOnClick(jqThis, slide) {
-    $('.horiz-menu li').removeClass('active');
+>=20
+> Since I don't want to mess up your intended formatting, could you pleas=
+e
+> fix it on your own and send a v3?
+
+I've sent a v3 with s/ul/dl/=20
+
+
+Regards,
+Daniel
 --=20
-2.19.2
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
