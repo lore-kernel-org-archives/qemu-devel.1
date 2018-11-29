@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gSJBC-0005E9-05
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:04:21 -0500
+	(envelope-from <fli@suse.com>) id 1gSJBA-0005Co-98
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:04:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gSJB6-0004Jf-3Z
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:04:17 -0500
-Received: from smtp.nue.novell.com ([195.135.221.5]:60170)
+	(envelope-from <fli@suse.com>) id 1gSJB4-0004JB-Hp
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:04:16 -0500
+Received: from smtp.nue.novell.com ([195.135.221.5]:45507)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gSJB5-0004JM-PQ
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:04:12 -0500
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gSJB4-0004In-7g
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:04:10 -0500
 From: Fei Li <fli@suse.com>
-Date: Thu, 29 Nov 2018 18:03:39 +0800
-Message-Id: <20181129100340.13823-5-fli@suse.com>
+Date: Thu, 29 Nov 2018 18:03:38 +0800
+Message-Id: <20181129100340.13823-4-fli@suse.com>
 In-Reply-To: <20181129100340.13823-1-fli@suse.com>
 References: <20181129100340.13823-1-fli@suse.com>
-Subject: [Qemu-devel] [PATCH RFC v2 4/5] migration: remove unused &local_err
- parameter in multifd_save_cleanup
+Subject: [Qemu-devel] [PATCH RFC v2 3/5] migration: fix the multifd code
+ when receiving less channels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +26,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Always call migrate_set_error() to set the error state without relying
-on whether multifd_save_cleanup() succeeds.  As the passed &local_err
-is never used in multifd_save_cleanup(), remove it. And make the
-function be: void multifd_save_cleanup(void).
+In our current code, when multifd is used during migration, if there
+is an error before the destination receives all new channels, the
+source keeps running, however the destination does not exit but keeps
+waiting until the source is killed deliberately.
+
+Fix this by dumping the specific error and let users decide whether
+to quit from the destination side when failing to receive packet via
+some channel.
 
 Signed-off-by: Fei Li <fli@suse.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c |  5 +----
- migration/ram.c       | 11 ++++-------
+ migration/channel.c   | 11 ++++++-----
+ migration/migration.c |  9 +++++++--
+ migration/migration.h |  2 +-
+ migration/ram.c       |  7 ++++++-
  migration/ram.h       |  2 +-
- 3 files changed, 6 insertions(+), 12 deletions(-)
+ 5 files changed, 21 insertions(+), 10 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 72106bddf0..0537fc0c26 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1386,7 +1386,6 @@ static void migrate_fd_cleanup(void *opaque)
-     qemu_savevm_state_cleanup();
+diff --git a/migration/channel.c b/migration/channel.c
+index 33e0e9b82f..20e4c8e2dc 100644
+--- a/migration/channel.c
++++ b/migration/channel.c
+@@ -30,6 +30,7 @@
+ void migration_channel_process_incoming(QIOChannel *ioc)
+ {
+     MigrationState *s = migrate_get_current();
++    Error *local_err = NULL;
  
-     if (s->to_dst_file) {
+     trace_migration_set_incoming_channel(
+         ioc, object_get_typename(OBJECT(ioc)));
+@@ -38,13 +39,13 @@ void migration_channel_process_incoming(QIOChannel *ioc)
+         *s->parameters.tls_creds &&
+         !object_dynamic_cast(OBJECT(ioc),
+                              TYPE_QIO_CHANNEL_TLS)) {
 -        Error *local_err = NULL;
-         QEMUFile *tmp;
- 
-         trace_migrate_fd_cleanup();
-@@ -1397,9 +1396,7 @@ static void migrate_fd_cleanup(void *opaque)
-         }
-         qemu_mutex_lock_iothread();
- 
--        if (multifd_save_cleanup(&local_err) != 0) {
+         migration_tls_channel_process_incoming(s, ioc, &local_err);
+-        if (local_err) {
 -            error_report_err(local_err);
 -        }
-+        multifd_save_cleanup();
-         qemu_mutex_lock(&s->qemu_file_lock);
-         tmp = s->to_dst_file;
-         s->to_dst_file = NULL;
+     } else {
+-        migration_ioc_process_incoming(ioc);
++        migration_ioc_process_incoming(ioc, &local_err);
++    }
++
++    if (local_err) {
++        error_report_err(local_err);
+     }
+ }
+ 
+diff --git a/migration/migration.c b/migration/migration.c
+index 49ffb9997a..72106bddf0 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -541,7 +541,7 @@ void migration_fd_process_incoming(QEMUFile *f)
+     migration_incoming_process();
+ }
+ 
+-void migration_ioc_process_incoming(QIOChannel *ioc)
++void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp)
+ {
+     MigrationIncomingState *mis = migration_incoming_get_current();
+     bool start_migration;
+@@ -563,9 +563,14 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
+          */
+         start_migration = !migrate_use_multifd();
+     } else {
++        Error *local_err = NULL;
+         /* Multiple connections */
+         assert(migrate_use_multifd());
+-        start_migration = multifd_recv_new_channel(ioc);
++        start_migration = multifd_recv_new_channel(ioc, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
+     }
+ 
+     if (start_migration) {
+diff --git a/migration/migration.h b/migration/migration.h
+index e413d4d8b6..02b7304610 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -229,7 +229,7 @@ struct MigrationState
+ void migrate_set_state(int *state, int old_state, int new_state);
+ 
+ void migration_fd_process_incoming(QEMUFile *f);
+-void migration_ioc_process_incoming(QIOChannel *ioc);
++void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp);
+ void migration_incoming_process(void);
+ 
+ bool  migration_has_all_channels(void);
 diff --git a/migration/ram.c b/migration/ram.c
-index e13b9349d0..c44cb6f56d 100644
+index 7e7deec4d8..e13b9349d0 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -917,13 +917,12 @@ static void multifd_send_terminate_threads(Error *err)
-     }
+@@ -1323,7 +1323,7 @@ bool multifd_recv_all_channels_created(void)
  }
  
--int multifd_save_cleanup(Error **errp)
-+void multifd_save_cleanup(void)
+ /* Return true if multifd is ready for the migration, otherwise false */
+-bool multifd_recv_new_channel(QIOChannel *ioc)
++bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp)
  {
-     int i;
--    int ret = 0;
- 
-     if (!migrate_use_multifd()) {
--        return 0;
-+        return;
-     }
-     multifd_send_terminate_threads(NULL);
-     for (i = 0; i < migrate_multifd_channels(); i++) {
-@@ -953,7 +952,6 @@ int multifd_save_cleanup(Error **errp)
-     multifd_send_state->pages = NULL;
-     g_free(multifd_send_state);
-     multifd_send_state = NULL;
--    return ret;
- }
- 
- static void multifd_send_sync_main(void)
-@@ -1071,9 +1069,8 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+     MultiFDRecvParams *p;
      Error *local_err = NULL;
+@@ -1331,6 +1331,10 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
  
-     if (qio_task_propagate_error(task, &local_err)) {
--        if (multifd_save_cleanup(&local_err) != 0) {
--            migrate_set_error(migrate_get_current(), local_err);
--        }
-+        migrate_set_error(migrate_get_current(), local_err);
-+        multifd_save_cleanup();
-     } else {
-         p->c = QIO_CHANNEL(sioc);
-         qio_channel_set_delay(p->c, false);
+     id = multifd_recv_initial_packet(ioc, &local_err);
+     if (id < 0) {
++        error_propagate_prepend(errp, local_err,
++                                "failed to receive packet"
++                                " via multifd channel %d: ",
++                                multifd_recv_state->count);
+         multifd_recv_terminate_threads(local_err);
+         return false;
+     }
+@@ -1340,6 +1344,7 @@ bool multifd_recv_new_channel(QIOChannel *ioc)
+         error_setg(&local_err, "multifd: received id '%d' already setup'",
+                    id);
+         multifd_recv_terminate_threads(local_err);
++        error_propagate(errp, local_err);
+         return false;
+     }
+     p->c = ioc;
 diff --git a/migration/ram.h b/migration/ram.h
-index 046d3074be..936177b3e9 100644
+index 83ff1bc11a..046d3074be 100644
 --- a/migration/ram.h
 +++ b/migration/ram.h
-@@ -43,7 +43,7 @@ uint64_t ram_bytes_remaining(void);
- uint64_t ram_bytes_total(void);
- 
- int multifd_save_setup(void);
--int multifd_save_cleanup(Error **errp);
-+void multifd_save_cleanup(void);
+@@ -47,7 +47,7 @@ int multifd_save_cleanup(Error **errp);
  int multifd_load_setup(void);
  int multifd_load_cleanup(Error **errp);
  bool multifd_recv_all_channels_created(void);
+-bool multifd_recv_new_channel(QIOChannel *ioc);
++bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp);
+ 
+ uint64_t ram_pagesize_summary(void);
+ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
 -- 
 2.13.7
