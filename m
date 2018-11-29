@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gSNmA-0008GY-Bg
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:58:51 -0500
+	(envelope-from <drjones@redhat.com>) id 1gSNmL-0000g4-To
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:59:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gSNZp-0000gU-Rs
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:46:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gSNZp-0000g9-Jx
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:46:01 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gSNZo-00045B-LR
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 14:46:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9A1712E807C
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 14:46:00 +0000 (UTC)
+	(envelope-from <drjones@redhat.com>) id 1gSNWp-0005un-V3
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:42:56 -0500
+Date: Thu, 29 Nov 2018 15:42:43 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20181129144243.so22d2igis7a24xp@kamzik.brq.redhat.com>
+References: <20181129132428.333-1-sameo@linux.intel.com>
+	<20181129132428.333-7-sameo@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 29 Nov 2018 14:38:47 -0000
-From: Roman Bolshakov <1802684@bugs.launchpad.net>
-Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
-Message-Id: <154350232773.9672.6081778773132567265.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181129132428.333-7-sameo@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] hw: arm: Support both legacy and
+ current RSDP build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,128 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Can you try to build it without SDL/GTK support? I'm not having any
-issues with Cocoa display.
+On Thu, Nov 29, 2018 at 02:24:26PM +0100, Samuel Ortiz wrote:
+> We add the ability to build legacy or current RSDP tables, based on the
+> AcpiRsdpData revision field passed to build_rsdp().
+> Although arm/virt only uses RSDP v2, adding that capability to
+> build_rsdp will allow us to share the RSDP build code between ARM and x86.
+> 
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> ---
+>  hw/arm/virt-acpi-build.c | 37 ++++++++++++++++++++++++++-----------
+>  1 file changed, 26 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 4782aea4fe..e1338b6f5a 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -378,23 +378,38 @@ build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+>      g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
+>      build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision */
+>      build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
+> -    build_append_int_noprefix(tbl, 36, 4); /* Length */
+> -
+> -    /* XSDT address to be filled by guest linker */
+> -    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
+> -    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
+> -                                   24, 8,
+> -                                   ACPI_BUILD_TABLE_FILE,
+> -                                   *rsdp_data->xsdt_tbl_offset);
+> -
+> -    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
+> -    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
+> +    if (rsdp_data->rsdt_tbl_offset) {
 
--- =
+I see why a pointer was used now. Using a pointer ensures a zero
+offset won't fail this test. However the test could be replaced with
+rsdp_data->revision == 0.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1802684
+> +        /* RSDT address to be filled by guest linker */
+> +        bios_linker_loader_add_pointer(linker,
+> +                                       ACPI_BUILD_RSDP_FILE, 16, 4,
+> +                                       ACPI_BUILD_TABLE_FILE,
+> +                                       *rsdp_data->rsdt_tbl_offset);
+> +    }
+>  
+>      /* Checksum to be filled by guest linker */
+>      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+>                                      0, 20, /* ACPI rev 1.0 RSDP size */
+>                                      8);
+>  
+> +    if (rsdp_data->revision == 0) {
+> +        /* ACPI 1.0 RSDP, we're done */
+> +        return;
+> +    }
+> +
+> +    /* The RSDP revision is 2 and later, we must have an XSDT pointer */
+> +    g_assert(rsdp_data->xsdt_tbl_offset != NULL);
 
-Title:
-  QEMU gui crashes on macOS Mojave
+So here's the justification for the pointers. We sanity check the callers.
+We're missing the (rsdp_data->revision == 0 && rsdp_data->rsdt_tbl_offset)
+sanity check though.
 
-Status in QEMU:
-  New
+> +
+> +    build_append_int_noprefix(tbl, 36, 4); /* Length */
+> +
+> +    /* XSDT address to be filled by guest linker */
+> +    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
+> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE, 24, 8,
+> +                                   ACPI_BUILD_TABLE_FILE,
+> +                                   *rsdp_data->xsdt_tbl_offset);
+> +
+> +    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
+> +    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
+> +
+>      /* Extended checksum to be filled by Guest linker */
+>      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+>                                      0, 36, /* ACPI rev 2.0 RSDP size */
+> -- 
+> 2.19.2
+> 
+>
 
-Bug description:
-  QEMU release 3.0.0 as well as a recent head build
-
-  /usr/local/Cellar/qemu/HEAD-03c1ca1 (147 files, 257.2MB)
-    Built from source on 2018-11-06 at 13:41:32 with: --with-gtk+3 --with-s=
-dl2 --with-libusb
-  /usr/local/Cellar/qemu/3.0.0 (137 files, 261.6MB) *
-    Poured from bottle on 2018-11-10 at 22:58:32 with: --with-gtk+3 --with-=
-libusb --with-sdl2
-
-  Crashes when attempting to use any gui interface (tried SDL and
-  default Cocoa):
-
-  2018-11-10 22:58:41.799 qemu-system-aarch64[42982:1102466] *** Terminatin=
-g app due to uncaught exception 'NSInternalInconsistencyException', reason:=
- 'NSWindow drag regions should only be invalidated on the Main Thread!'
-  *** First throw call stack:
-  (
-  	0   CoreFoundation                      0x00007fff3ea96ecd __exceptionPr=
-eprocess + 256
-  	1   libobjc.A.dylib                     0x00007fff6ab49720 objc_exceptio=
-n_throw + 48
-  	2   CoreFoundation                      0x00007fff3eab095d -[NSException=
- raise] + 9
-  	3   AppKit                              0x00007fff3bfb13fa -[NSWindow(NS=
-Window_Theme) _postWindowNeedsToResetDragMarginsUnlessPostingDisabled] + 324
-  	4   AppKit                              0x00007fff3bfb6850 -[NSView setF=
-rameSize:] + 2082
-  	5   AppKit                              0x00007fff3c02747d -[NSVisualEff=
-ectView setFrameSize:] + 171
-  	6   AppKit                              0x00007fff3c0811b1 -[NSTitlebarV=
-iew setFrameSize:] + 84
-  	7   AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	8   AppKit                              0x00007fff3c081154 -[NSTitlebarV=
-iew resizeWithOldSuperviewSize:] + 100
-  	9   AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	10  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	11  AppKit                              0x00007fff3c9773c0 -[NSTitlebarC=
-ontainerView setFrameSize:] + 142
-  	12  AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	13  AppKit                              0x00007fff3bfbcdb5 -[NSView resi=
-zeWithOldSuperviewSize:] + 776
-  	14  AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	15  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	16  AppKit                              0x00007fff3c024570 -[NSThemeFram=
-e setFrameSize:] + 495
-  	17  AppKit                              0x00007fff3c011223 -[NSWindow _s=
-etFrame:updateBorderViewSize:] + 966
-  	18  AppKit                              0x00007fff3c010b46 -[NSWindow _o=
-ldPlaceWindow:] + 547
-  	19  AppKit                              0x00007fff3c010151 -[NSWindow _s=
-etFrameCommon:display:stashSize:] + 3006
-  	20  AppKit                              0x00007fff3c00f57d -[NSWindow _s=
-etFrame:display:allowImplicitAnimation:stashSize:] + 192
-  	21  AppKit                              0x00007fff3c019ff8 -[NSWindow se=
-tFrame:display:animate:] + 567
-  	22  qemu-system-aarch64                 0x000000010b7b2abf qemu-system-a=
-arch64 + 3668671
-  	23  qemu-system-aarch64                 0x000000010b7b6356 qemu-system-a=
-arch64 + 3683158
-  	24  qemu-system-aarch64                 0x000000010b7ad836 qemu-system-a=
-arch64 + 3647542
-  	25  qemu-system-aarch64                 0x000000010b4ce769 qemu-system-a=
-arch64 + 636777
-  	26  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	27  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	28  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	29  qemu-system-aarch64                 0x000000010b4414aa qemu-system-a=
-arch64 + 58538
-  	30  qemu-system-aarch64                 0x000000010b4f78c3 qemu-system-a=
-arch64 + 805059
-  	31  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	32  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	33  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	34  qemu-system-aarch64                 0x000000010b4b8f57 qemu-system-a=
-arch64 + 548695
-  	35  qemu-system-aarch64                 0x000000010b49c3af qemu-system-a=
-arch64 + 431023
-  	36  ???                                 0x00000001117891f3 0x0 + 4588081=
-651
-  )
-  libc++abi.dylib: terminating with uncaught exception of type NSException
-  fish: 'qemu-system-aarch64 -M raspi3 -=E2=80=A6' terminated by signal SIG=
-ABRT (Abort)
-
-  =
-
-  macOS Mojave 10.14.2 Beta (18C38b)
-  Qemu in the same configuration used to work in High Sierra, started crash=
-ing only after upgrade to Mojave.
-
-  Command line:
-  `qemu-system-aarch64 -M raspi3 -d in_asm -serial stdio -kernel $1.bin`
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1802684/+subscriptions
+Thanks,
+drew
