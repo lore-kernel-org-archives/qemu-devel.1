@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gSPyX-0002DX-Oh
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:19:43 -0500
+	(envelope-from <pasic@linux.ibm.com>) id 1gSQ3A-0004nf-Fb
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:24:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gSPyT-0006ql-Bj
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:19:41 -0500
-Resent-Message-Id: <E1gSPyT-0006ql-Bj@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21487)
+	(envelope-from <pasic@linux.ibm.com>) id 1gSQ35-0001gM-BK
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:24:28 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36002)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gSPyT-0006qO-21
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:19:37 -0500
-In-Reply-To: <cover.1543352682.git.alistair.francis@wdc.com>
-Message-ID: <154350561947.25047.6851106790362028197@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1gSQ34-0001fM-Tl
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:24:23 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wATHMWpp056832
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 12:24:20 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2p2k01d0vb-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 12:24:19 -0500
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Thu, 29 Nov 2018 17:24:17 -0000
+Date: Thu, 29 Nov 2018 18:24:11 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+In-Reply-To: <20181129175234.5e8d9f7b.cohuck@redhat.com>
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181122165432.4437-4-cohuck@redhat.com>
+	<20181128173604.24b301a3@oc2783563651>
+	<20181129175234.5e8d9f7b.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 29 Nov 2018 07:33:40 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC v2 00/24]  Add RISC-V TCG backend support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20181129182411.1a2913dc@oc2783563651>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 3/3] vfio-ccw: add handling
+ for asnyc channel instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,122 +43,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair.Francis@wdc.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org, alistair23@gmail.com, richard.henderson@linaro.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIHYyIDAwLzI0XSAgQWRkIFJJU0MtViBUQ0cgYmFja2Vu
-ZCBzdXBwb3J0Ck1lc3NhZ2UtaWQ6IGNvdmVyLjE1NDMzNTI2ODIuZ2l0LmFsaXN0YWlyLmZyYW5j
-aXNAd2RjLmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
-YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
-PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
-aXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0Uu
-LikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRv
-dGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93
-ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAt
-OyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEp
-KQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
-OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcg
-YnJhbmNoICd0ZXN0JwpjYjc0ZjIwIFdJUDogVHJ5IHRvIHBhdGNoIGxvbmdlciBicmFuY2hlcwow
-YjI0M2YzIFdJUDogQWRkIG1pc3NpbmcgaW5zdHJ1Y3Rpb25zCjFhNTlmYmUgY29uZmlndXJlOiBB
-ZGQgc3VwcG9ydCBmb3IgYnVpbGRpbmcgUklTQy1WIGhvc3QKZTcxZjU3ZCBkaWFzOiBBZGQgUklT
-Qy1WIHN1cHBvcnQKZTRkZWE0YyB0Y2c6IEFkZCBSSVNDLVYgY3B1IHNpZ25hbCBoYW5kbGVyCjI0
-YWFiMDcgcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCB0aGUgdGFyZ2V0IGluaXQgY29kZQoxZTBiYjFm
-IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQgdGhlIHByb2xvZ3VlIGdlbmVyYXRpb24gYW5kIHJlZ2lz
-dGVyIHRoZSBKSVQKNTAxMDMyMyByaXNjdjogdGNnLXRhcmdldDogQWRkIHRoZSBvdXQgb3AgZGVj
-b2RlcgoxYWFmYWQ2IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQgZGlyZWN0IGxvYWQgYW5kIHN0b3Jl
-IGluc3RydWN0aW9ucwo4MGI0ZTU1IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQgc2xvd3BhdGggbG9h
-ZCBhbmQgc3RvcmUgaW5zdHJ1Y3Rpb25zCmI0Y2I1NzMgcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCBi
-cmFuY2ggYW5kIGp1bXAgaW5zdHJ1Y3Rpb25zCmVmNThhYjQgcmlzY3Y6IHRjZy10YXJnZXQ6IEFk
-ZCB0aGUgb3V0IGxvYWQgYW5kIHN0b3JlIGluc3RydWN0aW9ucwpiMmVlNGQ3IHJpc2N2OiB0Y2ct
-dGFyZ2V0OiBBZGQgdGhlIGV4dHJhY3QgaW5zdHJ1Y3Rpb25zCjFiM2I3YTEgcmlzY3Y6IHRjZy10
-YXJnZXQ6IEFkZCB0aGUgbW92IGFuZCBtb3ZpIGluc3RydWN0aW9uCjk4MzY2NzYgcmlzY3Y6IHRj
-Zy10YXJnZXQ6IEFkZCB0aGUgcmVsb2NhdGlvbiBmdW5jdGlvbnMKYTY1ZmM5ZCByaXNjdjogdGNn
-LXRhcmdldDogQWRkIHRoZSBpbnN0cnVjdGlvbiBlbWl0dGVycwo3MzQ4NGQwIHJpc2N2OiB0Y2ct
-dGFyZ2V0OiBBZGQgdGhlIGltbWVkaWF0ZSBlbmNvZGVycwo5ZDRiMGEyIHJpc2N2OiB0Y2ctdGFy
-Z2V0OiBBZGQgc3VwcG9ydCBmb3IgdGhlIGNvbnN0cmFpbnRzCjcwYjc4ZmMgcmlzY3Y6IEFkZCB0
-aGUgdGNnIHRhcmdldCByZWdpc3RlcnMKODMwYTRiNSByaXNjdjogQWRkIHRoZSB0Y2ctdGFyZ2V0
-IGhlYWRlciBmaWxlCjA0OWM0MjYgZXhlYzogQWRkIFJJU0MtViBHQ0MgcG9pc29uIG1hY3JvCjYw
-NjU3YzMgbGludXgtdXNlcjogQWRkIGhvc3QgZGVwZW5kZW5jeSBmb3IgUklTQy1WIDY0LWJpdAo0
-NjNiZTE1IGxpbnV4LXVzZXI6IEFkZCBob3N0IGRlcGVuZGVuY3kgZm9yIFJJU0MtViAzMi1iaXQK
-ZDZkNmIxYyBlbGYuaDogQWRkIHRoZSBSSVNDViBFTEYgbWFnaWMgbnVtYmVycwoKPT09IE9VVFBV
-VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yNDogZWxmLmg6IEFkZCB0aGUgUklTQ1YgRUxG
-IG1hZ2ljIG51bWJlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8yNDogbGludXgtdXNlcjogQWRkIGhv
-c3QgZGVwZW5kZW5jeSBmb3IgUklTQy1WIDMyLWJpdC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
-b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMjog
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDExIGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tp
-bmcgUEFUQ0ggMy8yNDogbGludXgtdXNlcjogQWRkIGhvc3QgZGVwZW5kZW5jeSBmb3IgUklTQy1W
-IDY0LWJpdC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0
-b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDExIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNC8yNDogZXhlYzogQWRk
-IFJJU0MtViBHQ0MgcG9pc29uIG1hY3JvLi4uCkNoZWNraW5nIFBBVENIIDUvMjQ6IHJpc2N2OiBB
-ZGQgdGhlIHRjZy10YXJnZXQgaGVhZGVyIGZpbGUuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
-IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTE6IApu
-ZXcgZmlsZSBtb2RlIDEwMDY0NAoKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmlu
-ZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzQzOiBGSUxFOiB0Y2cvcmlzY3YvdGNnLXRhcmdldC5oOjI4
-OgorI2lmIF9fcmlzY3ZfeGxlbiA9PSAzMgoKdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAx
-NzMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpD
-aGVja2luZyBQQVRDSCA2LzI0OiByaXNjdjogQWRkIHRoZSB0Y2cgdGFyZ2V0IHJlZ2lzdGVycy4u
-LgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlO
-RVJTIG5lZWQgdXBkYXRpbmc/CiMxMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDExNiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDcvMjQ6IHJpc2N2OiB0Y2ctdGFyZ2V0
-OiBBZGQgc3VwcG9ydCBmb3IgdGhlIGNvbnN0cmFpbnRzLi4uCkNoZWNraW5nIFBBVENIIDgvMjQ6
-IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQgdGhlIGltbWVkaWF0ZSBlbmNvZGVycy4uLgpDaGVja2lu
-ZyBQQVRDSCA5LzI0OiByaXNjdjogdGNnLXRhcmdldDogQWRkIHRoZSBpbnN0cnVjdGlvbiBlbWl0
-dGVycy4uLgpDaGVja2luZyBQQVRDSCAxMC8yNDogcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCB0aGUg
-cmVsb2NhdGlvbiBmdW5jdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjQ6IHJpc2N2OiB0Y2ct
-dGFyZ2V0OiBBZGQgdGhlIG1vdiBhbmQgbW92aSBpbnN0cnVjdGlvbi4uLgpDaGVja2luZyBQQVRD
-SCAxMi8yNDogcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCB0aGUgZXh0cmFjdCBpbnN0cnVjdGlvbnMu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTMvMjQ6IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQgdGhlIG91dCBs
-b2FkIGFuZCBzdG9yZSBpbnN0cnVjdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjQ6IHJpc2N2
-OiB0Y2ctdGFyZ2V0OiBBZGQgYnJhbmNoIGFuZCBqdW1wIGluc3RydWN0aW9ucy4uLgpDaGVja2lu
-ZyBQQVRDSCAxNS8yNDogcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCBzbG93cGF0aCBsb2FkIGFuZCBz
-dG9yZSBpbnN0cnVjdGlvbnMuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE2
-MTogRklMRTogdGNnL3Jpc2N2L3RjZy10YXJnZXQuaW5jLmM6ODkzOgorICAgICAqIHNlZTogaHR0
-cHM6Ly9saXN0cy5ub25nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMTEvbXNn
-MDIyMzQuaHRtbAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyNTAgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAx
-Ni8yNDogcmlzY3Y6IHRjZy10YXJnZXQ6IEFkZCBkaXJlY3QgbG9hZCBhbmQgc3RvcmUgaW5zdHJ1
-Y3Rpb25zLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hW
-KQojODc6IEZJTEU6IHRjZy9yaXNjdi90Y2ctdGFyZ2V0LmluYy5jOjEwNDQ6CisgICAgdGNnX2lu
-c25fdW5pdCAqbGFiZWxfcHRyWzFdOwogICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNl
-cyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxNTg6IEZJTEU6IHRjZy9yaXNj
-di90Y2ctdGFyZ2V0LmluYy5jOjExMTU6CisgICAgdGNnX2luc25fdW5pdCAqbGFiZWxfcHRyWzFd
-OwogICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNzgg
-bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hl
-Y2tpbmcgUEFUQ0ggMTcvMjQ6IHJpc2N2OiB0Y2ctdGFyZ2V0OiBBZGQgdGhlIG91dCBvcCBkZWNv
-ZGVyLi4uCkNoZWNraW5nIFBBVENIIDE4LzI0OiByaXNjdjogdGNnLXRhcmdldDogQWRkIHRoZSBw
-cm9sb2d1ZSBnZW5lcmF0aW9uIGFuZCByZWdpc3RlciB0aGUgSklULi4uCkNoZWNraW5nIFBBVENI
-IDE5LzI0OiByaXNjdjogdGNnLXRhcmdldDogQWRkIHRoZSB0YXJnZXQgaW5pdCBjb2RlLi4uCkNo
-ZWNraW5nIFBBVENIIDIwLzI0OiB0Y2c6IEFkZCBSSVNDLVYgY3B1IHNpZ25hbCBoYW5kbGVyLi4u
-CkNoZWNraW5nIFBBVENIIDIxLzI0OiBkaWFzOiBBZGQgUklTQy1WIHN1cHBvcnQuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMjIvMjQ6IGNvbmZpZ3VyZTogQWRkIHN1cHBvcnQgZm9yIGJ1aWxkaW5nIFJJU0Mt
-ViBob3N0Li4uCkNoZWNraW5nIFBBVENIIDIzLzI0OiBXSVA6IEFkZCBtaXNzaW5nIGluc3RydWN0
-aW9ucy4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNjI6IEZJTEU6IHRjZy9y
-aXNjdi90Y2ctdGFyZ2V0LmluYy5jOjY1NDoKKyAgICAgICAgICAgIHRjZ19vdXRfb3BjX3JlZyhz
-LCBPUENfU0xMSSwgVENHX1JFR19UTVAwLCBybCwgKHJsID09IGJsID8gYWwgOiBibCkpOwoKdG90
-YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMTMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAyNC8yNDogV0lQOiBUcnkg
-dG8gcGF0Y2ggbG9uZ2VyIGJyYW5jaGVzLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Thu, 29 Nov 2018 17:52:34 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Wed, 28 Nov 2018 17:36:04 +0100
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+> > On Thu, 22 Nov 2018 17:54:32 +0100
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> > 
+> > > Add a region to the vfio-ccw device that can be used to submit
+> > > asynchronous I/O instructions. ssch continues to be handled by the
+> > > existing I/O region; the new region handles hsch and csch.
+> > > 
+> > > Interrupt status continues to be reported through the same channels
+> > > as for ssch.
+> > > 
+> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > > ---
+> > >  drivers/s390/cio/Makefile           |   3 +-
+> > >  drivers/s390/cio/vfio_ccw_async.c   |  88 ++++++++++++++++
+> > >  drivers/s390/cio/vfio_ccw_drv.c     |  48 ++++++---
+> > >  drivers/s390/cio/vfio_ccw_fsm.c     | 158 +++++++++++++++++++++++++++-
+> > >  drivers/s390/cio/vfio_ccw_ops.c     |  13 ++-
+> > >  drivers/s390/cio/vfio_ccw_private.h |   6 ++
+> > >  include/uapi/linux/vfio.h           |   4 +
+> > >  include/uapi/linux/vfio_ccw.h       |  12 +++
+> > >  8 files changed, 313 insertions(+), 19 deletions(-)
+> > >  create mode 100644 drivers/s390/cio/vfio_ccw_async.c
+> 
+> > > +static size_t vfio_ccw_async_region_read(struct vfio_ccw_private *private,
+> > > +					 char __user *buf, size_t count,
+> > > +					 loff_t *ppos)
+> > > +{
+> > > +	unsigned int i = VFIO_CCW_OFFSET_TO_INDEX(*ppos) - VFIO_CCW_NUM_REGIONS;
+> > > +	loff_t pos = *ppos & VFIO_CCW_OFFSET_MASK;
+> > > +	struct ccw_cmd_region *region;
+> > > +
+> > > +	if (pos + count > sizeof(*region))
+> > > +		return -EINVAL;
+> > > +
+> > > +	region = private->region[i].data;
+> > > +	if (copy_to_user(buf, (void *)region + pos, count))
+> > > +		return -EFAULT;
+> > > +
+> > > +	return count;
+> > > +
+> > > +}
+> > > +
+> > > +static size_t vfio_ccw_async_region_write(struct vfio_ccw_private *private,
+> > > +					  const char __user *buf, size_t count,
+> > > +					  loff_t *ppos)
+> > > +{
+> > > +	unsigned int i = VFIO_CCW_OFFSET_TO_INDEX(*ppos) - VFIO_CCW_NUM_REGIONS;
+> > > +	loff_t pos = *ppos & VFIO_CCW_OFFSET_MASK;
+> > > +	struct ccw_cmd_region *region;
+> > > +
+> > > +	if (pos + count > sizeof(*region))
+> > > +		return -EINVAL;
+> > > +
+> > > +	if (private->state == VFIO_CCW_STATE_NOT_OPER ||
+> > > +	    private->state == VFIO_CCW_STATE_STANDBY)
+> > > +		return -EACCES;
+> > > +
+> > > +	region = private->region[i].data;
+> > > +	if (copy_from_user((void *)region + pos, buf, count))
+> > > +		return -EFAULT;  
+> > 
+> > I guess vfio_ccw_async_region_write() is supposed to be reentrant in a
+> > sense that there may be more that one 'instances' of the function
+> > executing at the same time, or am I wrong?
+> > 
+> > If it is reenarant, I wonder what protects private->region[i].data from
+> > corruption or simply being changed 'while at it'?
+> 
+> Interesting question. AFAICS this same issue applies to the existing
+> I/O region as well.
+>
+
+I'm aware of this. IMHO the answer to this question as quite some
+implications, but I wanted to start with something simple and tangible.
+
+One difference between async and existing I/O region is, that we, kind
+of, do implement mutex of io requests using private->state and the state
+machine. It is racy, but AFAIU the idea of at most one io request is
+processed at any time is recognizable in the the state machine.
+
+Frankly I never understood how synchronization worked for vfio-ccw.
+
+BTW considering current QEMU, I guess we kind of do have one event at
+a time situation (not quite sure about stuff that is not triggered by
+a channel instruction interpreted by QEMU). But the documentation does
+not say anything, and I don't think relying on QEMU implementation
+details is a good idea.
+
+Pierre had a patch called '[PATCH v3 6/6] vfio: ccw: serialize the write
+system calls' which  makes all the write calls mutually exclusive but
+I'm not sure if that is what we want. In the end, it is a design
+decision: making it one at the time simplifies implementation but makes
+us different.
+
+One way or the other, IMHO, it is a decision that needs to be made soon.
+
+
+> There's nothing in common code enforcing any exclusivity. 
+
+Nod.
+
+> If I
+> understand the code correctly, the common vfio-pci code reads/writes in
+> 1/2/4 byte chunks for most accesses. There's igd code that does not do
+> that, though.
+> 
+
+I didn't examine the vfio-pci stuff jet because my understanding of pci
+is very limited.
+
+Regards,
+Halli
