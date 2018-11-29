@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gSCuE-0006X8-Sw
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 22:22:25 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gSCuJ-0006VP-8c
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 22:22:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gSCl7-00074r-RP
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 22:13:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42016)
+	(envelope-from <jasowang@redhat.com>) id 1gSCl4-0006zx-R4
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 22:12:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41966)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gSCl7-00072d-In
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 22:12:57 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gSCl2-0006xw-WC
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 22:12:53 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 29 Nov 2018 11:12:29 +0800
-Message-Id: <20181129031230.31082-4-jasowang@redhat.com>
+Date: Thu, 29 Nov 2018 11:12:28 +0800
+Message-Id: <20181129031230.31082-3-jasowang@redhat.com>
 In-Reply-To: <20181129031230.31082-1-jasowang@redhat.com>
 References: <20181129031230.31082-1-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH for 3.1 3/4] virtio-net-test: accept variable
- length argument in pci_test_start()
+Subject: [Qemu-devel] [PATCH for 3.1 2/4] virtio-net-test: remove unused
+ macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +27,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: mst@redhat.com, ppandit@redhat.com, liq3ea@163.com, liq3ea@gmail.com, pbonzini@redhat.com, Jason Wang <jasowang@redhat.com>
 
-This allows flexibility to be reused for all kinds of command line
-used by other tests.
-
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- tests/virtio-net-test.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ tests/virtio-net-test.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index 231e7c767e..33d26ab079 100644
+index dcb87a8b6e..231e7c767e 100644
 --- a/tests/virtio-net-test.c
 +++ b/tests/virtio-net-test.c
-@@ -51,17 +51,20 @@ static QVirtioPCIDevice *virtio_net_pci_init(QPCIBus *bus, int slot)
-     return dev;
- }
+@@ -24,7 +24,6 @@
  
--static QOSState *pci_test_start(int socket)
-+static QOSState *pci_test_start(const char *cmd, ...)
- {
-     QOSState *qs;
-+    va_list ap;
-     const char *arch = qtest_get_arch();
--    const char *cmd = "-netdev socket,fd=%d,id=hs0 -device "
--                      "virtio-net-pci,netdev=hs0";
+ #define PCI_SLOT_HP             0x06
+ #define PCI_SLOT                0x04
+-#define PCI_FN                  0x00
  
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        qs = qtest_pc_boot(cmd, socket);
-+        va_start(ap, cmd);
-+        qs = qtest_pc_vboot(cmd, ap);
-+        va_end(ap);
-     } else if (strcmp(arch, "ppc64") == 0) {
--        qs = qtest_spapr_boot(cmd, socket);
-+        va_start(ap, cmd);
-+        qs = qtest_spapr_vboot(cmd, ap);
-+        va_end(ap);
-     } else {
-         g_printerr("virtio-net tests are only available on x86 or ppc64\n");
-         exit(EXIT_FAILURE);
-@@ -218,11 +221,13 @@ static void pci_basic(gconstpointer data)
-                   QVirtQueue *tvq,
-                   int socket) = data;
-     int sv[2], ret;
-+    const char *cmd = "-netdev socket,fd=%d,id=hs0 -device "
-+                      "virtio-net-pci,netdev=hs0";
- 
-     ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sv);
-     g_assert_cmpint(ret, !=, -1);
- 
--    qs = pci_test_start(sv[1]);
-+    qs = pci_test_start(cmd, sv[1]);
-     dev = virtio_net_pci_init(qs->pcibus, PCI_SLOT);
- 
-     rx = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
+ #define QVIRTIO_NET_TIMEOUT_US (30 * 1000 * 1000)
+ #define VNET_HDR_SIZE sizeof(struct virtio_net_hdr_mrg_rxbuf)
 -- 
 2.17.1
