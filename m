@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gSS57-0007HP-JT
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 14:34:38 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gSS9L-0001XK-51
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 14:38:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <r.bolshakov@yadro.com>) id 1gSS54-0005CL-FB
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 14:34:37 -0500
-Received: from mta-01.yadro.com ([89.207.88.251]:35230)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <r.bolshakov@yadro.com>)
-	id 1gSS54-0005Bw-21
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 14:34:34 -0500
-Date: Thu, 29 Nov 2018 22:34:22 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-ID: <20181129193422.tcsauhqarfghpkqf@MacBook-Pro-Roman.local>
-References: <20181025172057.20414-1-cota@braap.org>
-	<20181025172057.20414-42-cota@braap.org>
-	<20181127124352.ll6quqc5xedvdqht@MacBook-Pro-Roman.local>
-	<20181127231357.GA19764@flamenco>
-	<20181128104330.qkqnfttswihjur6g@MacBook-Pro-Roman.local>
-	<20181128172332.GA16387@flamenco>
-	<20181129095716.fvkr6cv6ltjcvccy@SPB-NB-133.local>
-	<20181129170055.GA27757@flamenco> <20181129174927.GA30917@flamenco>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gSS9I-0007Or-0H
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 14:38:59 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:40047
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1gSS9H-0007OG-OI
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 14:38:55 -0500
+References: <1543442171-24863-1-git-send-email-linux@roeck-us.net>
+	<1543442171-24863-2-git-send-email-linux@roeck-us.net>
+	<3d1287e7-29c1-dbb1-c0f9-273b7b31645c@redhat.com>
+	<734e8388-2f0f-1c5b-7767-29e43d261bcb@ilande.co.uk>
+	<20181129173845.GA2929@roeck-us.net>
+	<be4173c3-353b-1bd7-b937-b0d39a7bba26@ilande.co.uk>
+	<20181129190709.GB6064@roeck-us.net>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <400af659-af6a-24e4-4ce4-d66d6769cc6c@ilande.co.uk>
+Date: Thu, 29 Nov 2018 19:38:47 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20181129174927.GA30917@flamenco>
-Subject: Re: [Qemu-devel] [RFC 41/48] configure: add --enable-plugins
+In-Reply-To: <20181129190709.GB6064@roeck-us.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] scsi: esp: Improve consistency of
+ RSTAT, RSEQ, and RINTR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,49 +36,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, =?utf-8?B?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-On Thu, Nov 29, 2018 at 12:49:27PM -0500, Emilio G. Cota wrote:
-> On Thu, Nov 29, 2018 at 12:00:55 -0500, Emilio G. Cota wrote:
-> > On Thu, Nov 29, 2018 at 12:57:16 +0300, Roman Bolshakov wrote:
-> > > Hi Emilio,
-> > > 
-> > > I think there's an issue with "\s" character class, it's not recognized
-> > > by macOS sed  and I'm getting incorrect lines in
-> > > qemu-plugins-ld64.symbols:
-> > > _  qemu_xxx
-> > > _  qemu_xyz
-> > > 
-> > > After I replaced "\s" with "[[:space:]]", linking proceeds further
-> > 
-> > Nice, thanks. Will update.
-> > 
-> > > , but doesn't succeed because of an unresolved reference for qemu-system cris,
-> > > lm32, m68k, microblaze, microblazeel, moxie, nios2, or1k, riscv32,
-> > > riscv64, sparc, unicore32, tricore, xtensa, xtensaeb:
-> > > 
-> > > Undefined symbols for architecture x86_64:
-> > >   "_pci_register_bar", referenced from:
-> > >       _plugin_chan_realize in plugin-chan.o
-> > > 
-> > > It probably has nothing to do with macOS per-se and shouldn't link on
-> > > Linux as well. If I disable the aforementioned targets the build
-> > > succeeds and I can see the symbols from qemu-plugins-ld64.symbols in
-> > > compiled qemu-system binaries.
-> > 
-> > Yes, that's because plugin-chan should only be built if the guest has PCI
-> > support. Will fix.
+On 29/11/2018 19:07, Guenter Roeck wrote:
+
+>> I've now completed a boot test of all my SPARC32 OpenBIOS CDROM images with this
+>> patch, and whilst it doesn't solve my NextSTEP issue, I don't see any obvious
+>> regressions.
+>>
+>> Note that NetBSD SPARC32 tends to spit out the occasional "!TC on data xfer" message
+>> to the console during periods of disk access, however that is something that has
+>> always happened and isn't something new introduced by this patch.
+>>
 > 
-> Pushed the fixes to the github branch. Hope it works for you now!
+> That may be because reading the interrupt status resets the TC bit.
+> As mentioned above, I think it shouldn't do that. Just a wild guess, but
+> it might be worth a try. Can you remove "s->rregs[ESP_RSTAT] &= ~STAT_TC;"
+> from the ESP_RINTR case in esp_reg_read() and see what happens ?
 > 
+> [That may expose situations where STAT_TC _should_ be cleared but isn't,
+>  so we may hit other problems when doing that.]
 
-Thank you Emilio,
-the build succeded with the set of declared symbols exposed in
-qemu-system.
+I've tried that, and over a number of boots it does seem to allow the boot to get
+further: with this change I'd say around 95% of the time NextSTEP now gets past the
+SCSI bus enumeration and hangs at the point where it tries to mount the root filesystem.
 
-I've just noticed qemu-plugins-ld64.symbols should be added to
-.gitignore.
+Interestingly enough even if I comment out that line I still see the "!TC on data
+xfer" messages appearing on the NetBSD console...
 
-Best regards,
-Roman
+
+ATB,
+
+Mark.
