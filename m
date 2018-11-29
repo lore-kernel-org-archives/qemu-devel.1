@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gSKhj-00075G-UC
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:42:01 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gSKz6-0006Tm-Pt
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:00:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gSKhg-0003mK-8a
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:41:59 -0500
-Date: Thu, 29 Nov 2018 12:41:25 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181129124125.10c418d4.cohuck@redhat.com>
-In-Reply-To: <1542904555-1136-2-git-send-email-pmorel@linux.ibm.com>
-References: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
-	<1542904555-1136-2-git-send-email-pmorel@linux.ibm.com>
+	(envelope-from <no-reply@patchew.org>) id 1gSKxZ-0007vs-R0
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:58:24 -0500
+Resent-Message-Id: <E1gSKxZ-0007vs-R0@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21317)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gSKxZ-0007uo-IG
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:58:21 -0500
+In-Reply-To: <1543343726-53531-1-git-send-email-pbonzini@redhat.com>
+Message-ID: <154349266655.23684.4566538376541629747@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] s390x/vfio: ap: Finding the AP
- bridge
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 29 Nov 2018 03:57:47 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] glib-compat: work around g_test_message
+ bug with subprocess tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>
-Cc: borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, marcandre.lureau@redhat.com
 
-On Thu, 22 Nov 2018 17:35:50 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> In the case we will enter QEMU through interception of instructions,
-> we will need to retrieve the AP devices.
-> The base device is the AP bridge.
-> 
-> Let us implement a way to retrieve the AP Bridge from qtree.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  hw/s390x/ap-bridge.c         | 12 ++++++++++++
->  include/hw/s390x/ap-bridge.h |  1 +
->  2 files changed, 13 insertions(+)
-> 
-> diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
-> index 3795d30..831ad5d 100644
-> --- a/hw/s390x/ap-bridge.c
-> +++ b/hw/s390x/ap-bridge.c
-> @@ -14,6 +14,18 @@
->  #include "hw/s390x/ap-bridge.h"
->  #include "cpu.h"
->  
-> +DeviceState *s390_get_ap_bridge(void)
-> +{
-> +    static DeviceState *apb;
-> +
-> +    if (!apb) {
-> +        apb = DEVICE(object_resolve_path(TYPE_AP_BRIDGE, NULL));
-> +        assert(apb != NULL);
-
-As you won't have an ap bridge if the ap feature is not provided,
-better do a quick exit if the feature bit is not set? I'd naively
-assume that this function can return NULL as well.
-
-> +    }
-> +
-> +    return apb;
-> +}
-> +
->  static char *ap_bus_get_dev_path(DeviceState *dev)
->  {
->      /* at most one */
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGdsaWItY29tcGF0OiB3b3JrIGFyb3VuZCBnX3Rl
+c3RfbWVzc2FnZSBidWcgd2l0aCBzdWJwcm9jZXNzIHRlc3RzCk1lc3NhZ2UtaWQ6IDE1NDMzNDM3
+MjYtNTM1MzEtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxv
+ZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChn
+aXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7
+IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0t
+Zm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAu
+L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9
+MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA2MmU2NTkg
+Z2xpYi1jb21wYXQ6IHdvcmsgYXJvdW5kIGdfdGVzdF9tZXNzYWdlIGJ1ZyB3aXRoIHN1YnByb2Nl
+c3MgdGVzdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogZ2xpYi1j
+b21wYXQ6IHdvcmsgYXJvdW5kIGdfdGVzdF9tZXNzYWdlIGJ1ZyB3aXRoIHN1YnByb2Nlc3MgdGVz
+dHMuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMwOiBGSUxFOiBpbmNsdWRl
+L2dsaWItY29tcGF0Lmg6MTE3OgorI2RlZmluZSBnX3Rlc3RfbWVzc2FnZSguLi4pCQkJCQkJCVwK
+CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMwOiBGSUxFOiBpbmNs
+dWRlL2dsaWItY29tcGF0Lmg6MTE3OgorI2RlZmluZSBnX3Rlc3RfbWVzc2FnZSguLi4pXkleSV5J
+XkleSV5JXklcJAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMxOiBGSUxFOiBp
+bmNsdWRlL2dsaWItY29tcGF0Lmg6MTE4OgorCWRvIHsJCQkJCQkJCQlcCgpFUlJPUjogY29kZSBp
+bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMTogRklMRTogaW5jbHVkZS9nbGliLWNvbXBh
+dC5oOjExODoKK15JZG8ge15JXkleSV5JXkleSV5JXkleSVwkCgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojMzI6IEZJTEU6IGluY2x1ZGUvZ2xpYi1jb21wYXQuaDoxMTk6CisJCWlm
+ICghZ190ZXN0X3N1YnByb2Nlc3MoKSkgZ190ZXN0X21lc3NhZ2UoX19WQV9BUkdTX18pOwkJXAoK
+RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzI6IEZJTEU6IGluY2x1
+ZGUvZ2xpYi1jb21wYXQuaDoxMTk6CiteSV5JaWYgKCFnX3Rlc3Rfc3VicHJvY2VzcygpKSBnX3Rl
+c3RfbWVzc2FnZShfX1ZBX0FSR1NfXyk7XkleSVwkCgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50
+cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMzMjogRklMRTogaW5jbHVkZS9nbGliLWNvbXBhdC5o
+OjExOToKKwkJaWYgKCFnX3Rlc3Rfc3VicHJvY2VzcygpKSBnX3Rlc3RfbWVzc2FnZShfX1ZBX0FS
+R1NfXyk7CQlcCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9m
+IHRoaXMgc3RhdGVtZW50CiMzMjogRklMRTogaW5jbHVkZS9nbGliLWNvbXBhdC5oOjExOToKKwkJ
+aWYgKCFnX3Rlc3Rfc3VicHJvY2VzcygpKSBnX3Rlc3RfbWVzc2FnZShfX1ZBX0FSR1NfXyk7CQlc
+ClsuLi5dCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMzogRklM
+RTogaW5jbHVkZS9nbGliLWNvbXBhdC5oOjEyMDoKK15JfSB3aGlsZSAoMCkkCgp0b3RhbDogNiBl
+cnJvcnMsIDMgd2FybmluZ3MsIDEwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
