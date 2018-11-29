@@ -1,33 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gSMCz-0004FA-T1
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:18:23 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gSMJf-0000BY-88
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:25:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ccarrara@redhat.com>) id 1gSMCu-0000bR-Qz
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:18:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ccarrara@redhat.com>) id 1gSMCr-0000ZE-O1
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:18:14 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ACB08C05B028
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 13:18:06 +0000 (UTC)
-Date: Thu, 29 Nov 2018 11:17:53 -0200
-From: Caio Carrara <ccarrara@redhat.com>
-Message-ID: <20181129131752.GA19233@localhost.localdomain>
-References: <20181121183900.10364-1-wainersm@redhat.com>
-	<20181126125807.GA14485@localhost.localdomain>
-	<cd57c38b-13c2-68b3-b924-b87ce65628d2@redhat.com>
+	(envelope-from <sameo@linux.intel.com>) id 1gSMJZ-0001Om-MV
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 08:25:15 -0500
+From: Samuel Ortiz <sameo@linux.intel.com>
+Date: Thu, 29 Nov 2018 14:24:20 +0100
+Message-Id: <20181129132428.333-1-sameo@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <cd57c38b-13c2-68b3-b924-b87ce65628d2@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] scripts/qemu.py: allow to launch the VM
- without a monitor
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/8] hw: acpi: RSDP fixes and refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,219 +20,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, crosa@redhat.com, philmd@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-Hi Wainer,
+This patch serie fixes a couple of RSDP checksum related issues:
 
-Thanks for your reply. I pretty much agreed with most of it. I just
-added a comment about that new method that is not used anywere.
+- On RSDP rev2, we are not adding the extended checksum and computing
+  the checksum on the full table instead of the first 20 bytes.
+- On RSDP rev1, we are computing the checksum on 36 bytes instead of 20.
+  We're lucky enough that this is only adding zeroes to the checksum.
 
-On Thu, Nov 29, 2018 at 10:45:33AM -0200, Wainer dos Santos Moschetta wro=
-te:
->=20
-> On 11/26/2018 10:58 AM, Caio Carrara wrote:
-> > On Wed, Nov 21, 2018 at 01:39:00PM -0500, Wainer dos Santos Moschetta=
- wrote:
-> > > QEMUMachine launches the VM with a monitor enabled, afterwards
-> > > a qmp connection is attempted on _post_launch(). In case
-> > > the QEMU process exits with an error, qmp.accept() reaches
-> > > timeout and raises an exception.
-> > >=20
-> > > But sometimes you don't need that monitor. As an example,
-> > > when a test launches the VM expects its immediate crash,
-> > > and only intend to check the process's return code. In this
-> > > case the fact that launch() tries to establish the qmp
-> > > connection (ending up in an exception) is troublesome.
-> > >=20
-> > > So this patch adds the set_qmp_monitor() that allow to
-> > > launch the VM without creating the monitor machinery. The
-> > > method can be used to re-enable the monitor eventually.
-> > >=20
-> > > Tested this change with the following Avocado test:
-> > >=20
-> > > from avocado_qemu import Test
-> > >=20
-> > > class DisableQmp(Test):
-> > I think it would be fine to have this test added as a real test inste=
-ad
-> > of just let this here on commit message. Or at least we should have a
-> > real use case that uses this new feature.
->=20
-> Currently we don't have a proper place to put tests for scripts/qemu.py=
-, but
-> [1] opens the opportunity to create a self-test structure for the
-> avocado_qemu API. For now I suggest to keep that (self)test just on the
-> commit message.
->=20
-> The feature I am introducing on this patch could have used on [2], so t=
-hat
-> it wouldn't need to call the qemu binary directly. I'm not changing tha=
-t
-> test on this patch because it was not merged into master yet, so I don'=
-t
-> know exactly how it could be done.
->=20
-> [1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg576435.html
-> [2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg572744.html
->=20
-> >=20
-> > >      """
-> > >      :avocado: enable
-> > >      """
-> > >      def test(self):
-> > >          self.vm.add_args('--foobar')
-> > >          self.vm.set_qmp_monitor(disabled=3DTrue)
-> > >          self.vm.launch()
-> > >          self.vm.wait()
-> > >          self.assertEqual(self.vm.exitcode(), 1)
-> > >          self.vm.shutdown()
-> > >=20
-> > >          self.vm.set_qmp_monitor(disabled=3DFalse)
-> > >          self.vm._args.remove('--foobar') # Hack
-> > >          self.vm.launch()
-> > >          res =3D self.vm.command('human-monitor-command',
-> > >                                command_line=3D'info version')
-> > >          self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
-> > >=20
-> > > Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> > > Reviewed-by: Caio Carrara <ccarrara@redhat.com>
-> > > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > ---
-> > > Changes in v2:
-> > >    * Major refactor: replaced disable_qmp() with set_qmp_monitor()
-> > >      that allow to disable the qmp monitor likewise, but also one c=
-an
-> > >      re-enable it (set_qmp_monitor(disabled=3DFalse)).
-> > >    * The logic to enabled/disable the monitor is back to
-> > >      _base_args(). [ccarrara, ehabkost]
-> > > ---
-> > >   scripts/qemu.py | 72 ++++++++++++++++++++++++++++++++------------=
------
-> > >   1 file changed, 48 insertions(+), 24 deletions(-)
-> > >=20
-> > > diff --git a/scripts/qemu.py b/scripts/qemu.py
-> > > index 6e3b0e6771..54fe0e65d2 100644
-> > > --- a/scripts/qemu.py
-> > > +++ b/scripts/qemu.py
-> > > @@ -115,6 +115,7 @@ class QEMUMachine(object):
-> > >           self._events =3D []
-> > >           self._iolog =3D None
-> > >           self._socket_scm_helper =3D socket_scm_helper
-[...]
-> > >       def _post_launch(self):
-> > > -        self._qmp.accept()
-> > > +        if self._qmp:
-> > > +            self._qmp.accept()
-> > >       def _post_shutdown(self):
-> > >           if self._qemu_log_file is not None:
-> > > @@ -325,7 +328,8 @@ class QEMUMachine(object):
-> > >           Wait for the VM to power off
-> > >           """
-> > >           self._popen.wait()
-> > > -        self._qmp.close()
-> > > +        if self._qmp:
-> > Isn't the self._with_qmp attribute that should be used here? I think
-> > it's important to standardize the checks for qmp availability in
-> > `with_qmp` attribute and use the `qmp` only for qmp access itself. Th=
-ere
-> > are other places that uses qmp to this kind of check too.
->=20
-> Checking self._qmp has same result as self._with_qmp given that self._q=
-mp
-> object is only created with qmp enabled. But I agree with you that for =
-the
-> sake of readability it would be better to check with self._with_qmp.=A0=
- I will
-> send a v2.
->=20
-> >=20
-> > > +            self._qmp.close()
-> > >           self._load_io_log()
-> > >           self._post_shutdown()
-> > > @@ -334,11 +338,14 @@ class QEMUMachine(object):
-> > >           Terminate the VM and clean up
-> > >           """
-> > >           if self.is_running():
-> > > -            try:
-> > > -                self._qmp.cmd('quit')
-> > > -                self._qmp.close()
-> > > -            except:
-> > > -                self._popen.kill()
-> > > +            if self._qmp:
-> > > +                try:
-> > > +                    self._qmp.cmd('quit')
-> > > +                    self._qmp.close()
-> > > +                except:
-> > > +                    self._popen.kill()
-> > > +            else:
-> > > +                self._popen.terminate()
-> > >               self._popen.wait()
-> > >           self._load_io_log()
-> > > @@ -355,6 +362,23 @@ class QEMUMachine(object):
-> > >           self._launched =3D False
-> > > +    def set_qmp_monitor(self, disabled=3DFalse, monitor_address=3D=
-None):
-> > Where is this new method being used?
->=20
-> It's not used yet, but we will need this on some type of tests (e.g. la=
-unch
-> the VM and expect an immediate crash) very often. I mentioned above one=
- test
-> that I could have used it already.
+A guest Linux kernel does not seem to care about RSDP checksums, so
+those 2 fixes are mostly for correctness sake.
+Any machine type that generates rev2 RSDP will see its RSDP table
+modified but since x86 builds RSDP v1 and all ACPI tests only run on
+either pc or q35, the ACPI tests tables are not affected by this fix.
 
-As you mentioned, for the sake of keeping this patch as simple as
-possible and also reduce the amount of unused code in the repository, I
-would suggest you to only send this new method with a patch that
-actually use it.
+The serie also extends the ARM virt ACPI RSDP build routine to support
+both RSDP v1 and v2, in order to share this code between x86 and
+aarch64. While extending, we also convert the routine to the latest
+build_append_foo() API. The new implementation is a closer reflection of
+the ACPI spec itself, is endian agnostic and allows for getting rid of the
+AcpiRsdpDescriptor structure.
 
->=20
-> > .
-> >=20
-> > > +        """
-> > > +        Set the QMP monitor.
-> > > +
-> > > +        @param disabled: if True, qmp monitor options will be remo=
-ved from the
-> > > +                         base arguments of the resulting QEMU comm=
-and line.
-> > > +        @param monitor_address: address for the QMP monitor.
-> > > +        @note: call this function before launch().
-> > > +        """
-> > > +        if disabled:
-> > > +            self._with_qmp =3D False
-> > > +            self._qmp =3D None
-> > > +        else:
-> > > +            self._with_qmp =3D True
-> > > +            if monitor_address:
-> > > +                self._monitor_address =3D monitor_address
-> > > +
-> > >       def qmp(self, cmd, conv_keys=3DTrue, **args):
-> > >           """
-> > >           Invoke a QMP command and return the response dict
-> > > --=20
-> > > 2.19.1
-> > >=20
-> > It would be nice see less scattered checks for qmp availability along
-> > the code.
->=20
-> I agree. It will need a major refactor on scripts/qemu.py though. I wan=
-t to
-> keep this patch=A0 as simple as possible so that it can be used on the =
-ongoing
-> tests implementation.
->=20
-> Thanks for the review!
->=20
-> - Wainer
->=20
->=20
-> >=20
-> > Thanks.
->=20
+v1 -> v2:
+  * Add missing SOBs.
+  * Rephrase some commit messages according to the maintainer's input.
+  * Replace ACPI spec definitions with hard coded constants.
+  * Replace init_rsdp_data() helper with open coded rsdp variable init.
+  * Rename acpi_find_[rx]sdt_address to acpi_get_[rx]sdt_address.
 
-Thanks,
---=20
-Caio Carrara
-Software Engineer, Virt Team - Red Hat
-ccarrara@redhat.com
+Igor Mammedov (2):
+  hw: arm: acpi: Fix incorrect checksums in RSDP
+  hw: i386: Use correct RSDT length for checksum
+
+Samuel Ortiz (6):
+  hw: acpi: The RSDP build API can return void
+  hw: arm: Carry RSDP specific data through AcpiRsdpData
+  hw: arm: Convert the RSDP build to the buid_append_foo() API
+  hw: arm: Support both legacy and current RSDP build
+  hw: acpi: Export and share the ARM RSDP build
+  hw: acpi: Remove AcpiRsdpDescriptor and fix tests
+
+ include/hw/acpi/acpi-defs.h | 19 ++++++--------
+ include/hw/acpi/aml-build.h |  2 ++
+ tests/acpi-utils.h          |  5 +++-
+ hw/acpi/aml-build.c         | 50 +++++++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c    | 40 +++++++----------------------
+ hw/i386/acpi-build.c        | 36 +++++++-------------------
+ tests/acpi-utils.c          | 46 ++++++++++++++++++++++++++++------
+ tests/bios-tables-test.c    | 27 ++++++++++++++------
+ tests/vmgenid-test.c        |  8 +++---
+ 9 files changed, 143 insertions(+), 90 deletions(-)
+
+-- 
+2.19.2
