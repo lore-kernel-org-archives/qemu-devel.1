@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gSQNh-0005gB-9x
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:45:44 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gSQQs-0000hU-Qx
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:49:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gSQNe-0004UJ-0F
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:45:41 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46050)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gSQNd-0004SI-E9
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:45:37 -0500
-Received: by mail-wr1-x443.google.com with SMTP id v6so2754969wrr.12
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 09:45:37 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 29 Nov 2018 18:45:31 +0100
-Message-Id: <1543513531-1151-3-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1543513531-1151-1-git-send-email-pbonzini@redhat.com>
-References: <1543513531-1151-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] test: replace gtester with a TAP driver
+	(envelope-from <sameo@linux.intel.com>) id 1gSQQm-0006sR-0i
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:48:56 -0500
+Date: Thu, 29 Nov 2018 18:48:01 +0100
+From: Samuel Ortiz <sameo@linux.intel.com>
+Message-ID: <20181129174801.GA4195@caravaggio>
+References: <20181129132428.333-1-sameo@linux.intel.com>
+	<20181129132428.333-7-sameo@linux.intel.com>
+	<20181129144243.so22d2igis7a24xp@kamzik.brq.redhat.com>
+	<20181129145942.GB4691@caravaggio>
+	<20181129150947.hqsnpf653vs53uci@kamzik.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181129150947.hqsnpf653vs53uci@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] hw: arm: Support both legacy and
+ current RSDP build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,749 +27,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, eblake@redhat.com, berrange@redhat.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-gtester is deprecated by upstream glib and it does not support tests
-that call g_test_skip in some glib stable releases.
+On Thu, Nov 29, 2018 at 04:09:47PM +0100, Andrew Jones wrote:
+> On Thu, Nov 29, 2018 at 03:59:42PM +0100, Samuel Ortiz wrote:
+> > On Thu, Nov 29, 2018 at 03:42:43PM +0100, Andrew Jones wrote:
+> > > On Thu, Nov 29, 2018 at 02:24:26PM +0100, Samuel Ortiz wrote:
+> > > > We add the ability to build legacy or current RSDP tables, based on the
+> > > > AcpiRsdpData revision field passed to build_rsdp().
+> > > > Although arm/virt only uses RSDP v2, adding that capability to
+> > > > build_rsdp will allow us to share the RSDP build code between ARM and x86.
+> > > > 
+> > > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> > > > ---
+> > > >  hw/arm/virt-acpi-build.c | 37 ++++++++++++++++++++++++++-----------
+> > > >  1 file changed, 26 insertions(+), 11 deletions(-)
+> > > > 
+> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > > > index 4782aea4fe..e1338b6f5a 100644
+> > > > --- a/hw/arm/virt-acpi-build.c
+> > > > +++ b/hw/arm/virt-acpi-build.c
+> > > > @@ -378,23 +378,38 @@ build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+> > > >      g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
+> > > >      build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision */
+> > > >      build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
+> > > > -    build_append_int_noprefix(tbl, 36, 4); /* Length */
+> > > > -
+> > > > -    /* XSDT address to be filled by guest linker */
+> > > > -    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
+> > > > -    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
+> > > > -                                   24, 8,
+> > > > -                                   ACPI_BUILD_TABLE_FILE,
+> > > > -                                   *rsdp_data->xsdt_tbl_offset);
+> > > > -
+> > > > -    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
+> > > > -    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
+> > > > +    if (rsdp_data->rsdt_tbl_offset) {
+> > > 
+> > > I see why a pointer was used now. Using a pointer ensures a zero
+> > > offset won't fail this test. However the test could be replaced with
+> > > rsdp_data->revision == 0.
+> > > 
+> > > > +        /* RSDT address to be filled by guest linker */
+> > > > +        bios_linker_loader_add_pointer(linker,
+> > > > +                                       ACPI_BUILD_RSDP_FILE, 16, 4,
+> > > > +                                       ACPI_BUILD_TABLE_FILE,
+> > > > +                                       *rsdp_data->rsdt_tbl_offset);
+> > > > +    }
+> > > >  
+> > > >      /* Checksum to be filled by guest linker */
+> > > >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> > > >                                      0, 20, /* ACPI rev 1.0 RSDP size */
+> > > >                                      8);
+> > > >  
+> > > > +    if (rsdp_data->revision == 0) {
+> > > > +        /* ACPI 1.0 RSDP, we're done */
+> > > > +        return;
+> > > > +    }
+> > > > +
+> > > > +    /* The RSDP revision is 2 and later, we must have an XSDT pointer */
+> > > > +    g_assert(rsdp_data->xsdt_tbl_offset != NULL);
+> > > 
+> > > So here's the justification for the pointers. We sanity check the callers.
+> > We could sanity check the callers without pointers as well, I don't
+> > think there's a strong advantage for pointers here, except consistence.
+> > 
+> > 
+> > > We're missing the (rsdp_data->revision == 0 && rsdp_data->rsdt_tbl_offset)
+> > > sanity check though.
+> > I think there's nothing preventing a caller to include both rsdt and
+> > xsdt if it wants to be able to run on both < 2.0 and 2.0+ platforms with
+> > the same table. So if rsdt is set we should add it, regardless of the revision.
+> 
+> True, but if revision is zero, then we *must* have it. Otherwise we'll
+> silently return from this function with neither an rsdt nor xsdt linked.
+Correct, thanks. With v3 I'm adding a small piece of code at the start
+of build_rsdp() that checks for valid rsdt and xsdt pointers (for rev 0
+and 2, respectively).
 
-glib suggests instead using Automake's TAP support.  We do not support
-Automake, but we can copy the code that beautifies the TAP output and
-use it.  I chose to use the Perl copy rather than the shell/awk one,
-in order to reuse Perl's TAP parsing package, but I'm open to suggestions
-about which language to use.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- scripts/gtester-cat                          |  26 --
- scripts/tap-driver.pl                        | 386 +++++++++++++++++++++++++++
- scripts/tap-merge.pl                         | 108 ++++++++
- tests/Makefile.include                       |  54 ++--
- tests/docker/dockerfiles/centos7.docker      |   1 +
- tests/docker/dockerfiles/debian-amd64.docker |   1 +
- tests/docker/dockerfiles/debian-ports.docker |   1 +
- tests/docker/dockerfiles/debian-sid.docker   |   1 +
- tests/docker/dockerfiles/debian8.docker      |   1 +
- tests/docker/dockerfiles/debian9.docker      |   1 +
- tests/docker/dockerfiles/fedora.docker       |   1 +
- tests/docker/dockerfiles/ubuntu.docker       |   1 +
- 12 files changed, 535 insertions(+), 47 deletions(-)
- delete mode 100755 scripts/gtester-cat
- create mode 100755 scripts/tap-driver.pl
- create mode 100755 scripts/tap-merge.pl
-
-diff --git a/scripts/gtester-cat b/scripts/gtester-cat
-deleted file mode 100755
-index 061a952..0000000
---- a/scripts/gtester-cat
-+++ /dev/null
-@@ -1,26 +0,0 @@
--#!/bin/sh
--#
--# Copyright IBM, Corp. 2012
--#
--# Authors:
--#  Anthony Liguori <aliguori@us.ibm.com>
--#
--# This work is licensed under the terms of the GNU GPLv2 or later.
--# See the COPYING file in the top-level directory.
--
--cat <<EOF
--<?xml version="1.0"?>
--<gtester>
-- <info>
--  <package>qemu</package>
--  <version>0.0</version>
--  <revision>rev</revision>
-- </info>
--EOF
--
--sed \
--  -e '/<?xml/d' \
--  -e '/^<gtester>$/d' \
--  -e '/<info>/,/<\/info>/d' \
--  -e '$b' \
--  -e '/^<\/gtester>$/d' "$@"
-diff --git a/scripts/tap-driver.pl b/scripts/tap-driver.pl
-new file mode 100755
-index 0000000..2e674c0
---- /dev/null
-+++ b/scripts/tap-driver.pl
-@@ -0,0 +1,386 @@
-+#! /usr/bin/env perl
-+# Copyright (C) 2011-2013 Free Software Foundation, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2, or (at your option)
-+# any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+# As a special exception to the GNU General Public License, if you
-+# distribute this file as part of a program that contains a
-+# configuration script generated by Autoconf, you may include it under
-+# the same distribution terms that you use for the rest of that program.
-+
-+# ---------------------------------- #
-+#  Imports, static data, and setup.  #
-+# ---------------------------------- #
-+
-+use warnings FATAL => 'all';
-+use strict;
-+use Getopt::Long ();
-+use TAP::Parser;
-+use Term::ANSIColor qw(:constants);
-+
-+my $VERSION = '2012-02-01.19'; # UTC
-+
-+my $ME = "tap-driver.pl";
-+
-+my $USAGE = <<'END';
-+Usage:
-+  tap-driver [--color={always|never|auto}]
-+             [--verbose]
-+END
-+
-+my $HELP = "$ME: TAP-aware test driver for QEMU testsuite harness." .
-+           "\n" . $USAGE;
-+
-+# It's important that NO_PLAN evaluates "false" as a boolean.
-+use constant NO_PLAN => 0;
-+use constant EARLY_PLAN => 1;
-+use constant LATE_PLAN => 2;
-+
-+# ------------------- #
-+#  Global variables.  #
-+# ------------------- #
-+
-+my $testno = 0;     # Number of test results seen so far.
-+my $bailed_out = 0; # Whether a "Bail out!" directive has been seen.
-+
-+# Whether the TAP plan has been seen or not, and if yes, which kind
-+# it is ("early" is seen before any test result, "late" otherwise).
-+my $plan_seen = NO_PLAN;
-+
-+# ----------------- #
-+#  Option parsing.  #
-+# ----------------- #
-+
-+my %cfg = (
-+  "color" => 0,
-+  "verbose" => 0,
-+);
-+
-+my $diag_string = "#";
-+my $color = "auto";
-+
-+# Perl's Getopt::Long allows options to take optional arguments after a space.
-+# Prevent --color by itself from consuming other arguments
-+foreach (@ARGV) {
-+  if ($_ eq "--color" || $_ eq "-color") {
-+    $_ = "--color=$color";
-+  }
-+}
-+
-+Getopt::Long::GetOptions
-+  (
-+    'help' => sub { print $HELP; exit 0; },
-+    'version' => sub { print "$ME $VERSION\n"; exit 0; },
-+    'color=s'  => \$color,
-+    'verbose' => sub { $cfg{"verbose"} = 1; },
-+  ) or exit 1;
-+
-+if ($color =~ /^always$/i) {
-+  $cfg{'color'} = 1;
-+} elsif ($color =~ /^never$/i) {
-+  $cfg{'color'} = 0;
-+} elsif ($color =~ /^auto$/i) {
-+  $cfg{'color'} = (-t STDOUT);
-+} else {
-+  die "Invalid color mode: $color\n";
-+}
-+
-+# ------------- #
-+#  Prototypes.  #
-+# ------------- #
-+
-+sub bool_opt ($$);
-+sub colored ($$);
-+sub decorate_result ($);
-+sub extract_tap_comment ($);
-+sub handle_tap_bailout ($);
-+sub handle_tap_plan ($);
-+sub handle_tap_result ($);
-+sub is_null_string ($);
-+sub main (@);
-+sub report ($;$);
-+sub stringify_result_obj ($);
-+sub testsuite_error ($);
-+
-+# -------------- #
-+#  Subroutines.  #
-+# -------------- #
-+
-+sub bool_opt ($$)
-+{
-+  my ($opt, $val) = @_;
-+  if ($val =~ /^(?:y|yes)\z/i)
-+    {
-+      $cfg{$opt} = 1;
-+    }
-+  elsif ($val =~ /^(?:n|no)\z/i)
-+    {
-+      $cfg{$opt} = 0;
-+    }
-+  else
-+    {
-+      die "$ME: invalid argument '$val' for option '$opt'\n";
-+    }
-+}
-+
-+# If the given string is undefined or empty, return true, otherwise
-+# return false.  This function is useful to avoid pitfalls like:
-+#   if ($message) { print "$message\n"; }
-+# which wouldn't print anything if $message is the literal "0".
-+sub is_null_string ($)
-+{
-+  my $str = shift;
-+  return ! (defined $str and length $str);
-+}
-+
-+sub stringify_result_obj ($)
-+{
-+  my $result_obj = shift;
-+  if ($result_obj->is_unplanned || $result_obj->number != $testno)
-+    {
-+      return "ERROR";
-+    }
-+  elsif ($plan_seen == LATE_PLAN)
-+    {
-+      return "ERROR";
-+    }
-+  elsif (!$result_obj->directive)
-+    {
-+      return $result_obj->is_ok ? "PASS" : "FAIL";
-+    }
-+  elsif ($result_obj->has_todo)
-+    {
-+      return $result_obj->is_actual_ok ? "XPASS" : "XFAIL";
-+    }
-+  elsif ($result_obj->has_skip)
-+    {
-+      return $result_obj->is_ok ? "SKIP" : "FAIL";
-+    }
-+  die "$ME: INTERNAL ERROR"; # NOTREACHED
-+}
-+
-+sub colored ($$)
-+{
-+  my ($color_string, $text) = @_;
-+  return $color_string . $text . RESET;
-+}
-+
-+sub decorate_result ($)
-+{
-+  my $result = shift;
-+  return $result unless $cfg{"color"};
-+  my %color_for_result =
-+    (
-+      "ERROR" => MAGENTA,
-+      "PASS"  => GREEN,
-+      "XPASS" => RED,
-+      "FAIL"  => BOLD.RED,
-+      "XFAIL" => BOLD.GREEN,
-+      "SKIP"  => BLUE,
-+    );
-+  if (my $color = $color_for_result{$result})
-+    {
-+      return colored ($color, $result);
-+    }
-+  else
-+    {
-+      return $result; # Don't colorize unknown stuff.
-+    }
-+}
-+
-+sub report ($;$)
-+{
-+  my ($msg, $result, $explanation) = (undef, @_);
-+  if ($result =~ /^(?:X?(?:PASS|FAIL)|SKIP|ERROR)/)
-+    {
-+      # Output on console might be colorized.
-+      $msg = decorate_result($result);
-+    }
-+  elsif ($result eq "#")
-+    {
-+      $msg = "  ";
-+    }
-+  else
-+    {
-+      die "$ME: INTERNAL ERROR"; # NOTREACHED
-+    }
-+  $msg .= " $explanation" if defined $explanation;
-+  print $msg . "\n";
-+}
-+
-+sub testsuite_error ($)
-+{
-+  report "ERROR", "- $_[0]";
-+}
-+
-+sub handle_tap_result ($)
-+{
-+  $testno++;
-+  my $result_obj = shift;
-+
-+  my $test_result = stringify_result_obj $result_obj;
-+  my $string = $result_obj->number;
-+
-+  my $description = $result_obj->description;
-+  $string .= " $description"
-+    unless is_null_string $description;
-+
-+  if ($plan_seen == LATE_PLAN)
-+    {
-+      $string .= " # AFTER LATE PLAN";
-+    }
-+  elsif ($result_obj->is_unplanned)
-+    {
-+      $string .= " # UNPLANNED";
-+    }
-+  elsif ($result_obj->number != $testno)
-+    {
-+      $string .= " # OUT-OF-ORDER (expecting $testno)";
-+    }
-+  elsif (my $directive = $result_obj->directive)
-+    {
-+      $string .= " # $directive";
-+      my $explanation = $result_obj->explanation;
-+      $string .= " $explanation"
-+        unless is_null_string $explanation;
-+    }
-+
-+  report $test_result, $string;
-+}
-+
-+sub handle_tap_plan ($)
-+{
-+  my $plan = shift;
-+  if ($plan_seen)
-+    {
-+      # Error, only one plan per stream is acceptable.
-+      testsuite_error "multiple test plans";
-+      return;
-+    }
-+  # The TAP plan can come before or after *all* the TAP results; we speak
-+  # respectively of an "early" or a "late" plan.  If we see the plan line
-+  # after at least one TAP result has been seen, assume we have a late
-+  # plan; in this case, any further test result seen after the plan will
-+  # be flagged as an error.
-+  $plan_seen = ($testno >= 1 ? LATE_PLAN : EARLY_PLAN);
-+  # If $testno > 0, we have an error ("too many tests run") that will be
-+  # automatically dealt with later, so don't worry about it here.  If
-+  # $plan_seen is true, we have an error due to a repeated plan, and that
-+  # has already been dealt with above.  Otherwise, we have a valid "plan
-+  # with SKIP" specification, and should report it as a particular kind
-+  # of SKIP result.
-+  if ($plan->directive && $testno == 0)
-+    {
-+      my $explanation = is_null_string ($plan->explanation) ?
-+                        undef : "- " . $plan->explanation;
-+      report "SKIP", $explanation;
-+    }
-+}
-+
-+sub handle_tap_bailout ($)
-+{
-+  my ($bailout, $msg) = ($_[0], "Bail out!");
-+  $bailed_out = 1;
-+  $msg .= " " . $bailout->explanation
-+    unless is_null_string $bailout->explanation;
-+  testsuite_error $msg;
-+}
-+
-+sub extract_tap_comment ($)
-+{
-+  my $line = shift;
-+  if (index ($line, $diag_string) == 0)
-+    {
-+      # Strip leading `$diag_string' from `$line'.
-+      $line = substr ($line, length ($diag_string));
-+      # And strip any leading and trailing whitespace left.
-+      $line =~ s/(?:^\s*|\s*$)//g;
-+      # Return what is left (if any).
-+      return $line;
-+    }
-+  return "";
-+}
-+
-+sub main (@)
-+{
-+  my $iterator = TAP::Parser::Iterator::Stream->new(\*STDIN);
-+  my $parser = TAP::Parser->new ({iterator => $iterator });
-+
-+  while (defined (my $cur = $parser->next))
-+    {
-+      # Parsing of TAP input should stop after a "Bail out!" directive.
-+      next if $bailed_out;
-+
-+      if ($cur->is_plan)
-+        {
-+          handle_tap_plan ($cur);
-+        }
-+      elsif ($cur->is_test)
-+        {
-+          handle_tap_result ($cur);
-+        }
-+      elsif ($cur->is_bailout)
-+        {
-+          handle_tap_bailout ($cur);
-+        }
-+      elsif ($cfg{"verbose"})
-+        {
-+          my $comment = extract_tap_comment ($cur->raw);
-+          report "#", "$comment" if length $comment;
-+       }
-+    }
-+  # A "Bail out!" directive should cause us to ignore any following TAP
-+  # error, as well as a non-zero exit status from the TAP producer.
-+  if (!$bailed_out)
-+    {
-+      if (!$plan_seen)
-+        {
-+          testsuite_error "missing test plan";
-+        }
-+      elsif ($parser->tests_planned != $parser->tests_run)
-+        {
-+          my ($planned, $run) = ($parser->tests_planned, $parser->tests_run);
-+          my $bad_amount = $run > $planned ? "many" : "few";
-+          testsuite_error (sprintf "too %s tests run (expected %d, got %d)",
-+                                   $bad_amount, $planned, $run);
-+        }
-+    }
-+}
-+
-+# ----------- #
-+#  Main code. #
-+# ----------- #
-+
-+main @ARGV;
-+
-+# Local Variables:
-+# perl-indent-level: 2
-+# perl-continued-statement-offset: 2
-+# perl-continued-brace-offset: 0
-+# perl-brace-offset: 0
-+# perl-brace-imaginary-offset: 0
-+# perl-label-offset: -2
-+# cperl-indent-level: 2
-+# cperl-brace-offset: 0
-+# cperl-continued-brace-offset: 0
-+# cperl-label-offset: -2
-+# cperl-extra-newline-before-brace: t
-+# cperl-merge-trailing-else: nil
-+# cperl-continued-statement-offset: 2
-+# eval: (add-hook 'write-file-hooks 'time-stamp)
-+# time-stamp-start: "my $VERSION = "
-+# time-stamp-format: "'%:y-%02m-%02d.%02H'"
-+# time-stamp-time-zone: "UTC"
-+# time-stamp-end: "; # UTC"
-+# End:
-diff --git a/scripts/tap-merge.pl b/scripts/tap-merge.pl
-new file mode 100755
-index 0000000..7e0de90
---- /dev/null
-+++ b/scripts/tap-merge.pl
-@@ -0,0 +1,108 @@
-+#! /usr/bin/env perl
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# Author: Paolo Bonzini <pbonzini@redhat.com>
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2, or (at your option)
-+# any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+
-+# ---------------------------------- #
-+#  Imports, static data, and setup.  #
-+# ---------------------------------- #
-+
-+use warnings FATAL => 'all';
-+use strict;
-+use Getopt::Long ();
-+use TAP::Parser;
-+
-+my $ME = "tap-merge.pl";
-+my $VERSION = "2018-11-29";
-+
-+my $HELP = "$ME: merge multiple TAP inputs from stdin.";
-+
-+# ----------------- #
-+#  Option parsing.  #
-+# ----------------- #
-+
-+Getopt::Long::GetOptions
-+  (
-+    'help' => sub { print $HELP; exit 0; },
-+    'version' => sub { print "$ME $VERSION\n"; exit 0; },
-+  );
-+
-+# -------------- #
-+#  Subroutines.  #
-+# -------------- #
-+
-+sub main ()
-+{
-+  my $iterator = TAP::Parser::Iterator::Stream->new(\*STDIN);
-+  my $parser = TAP::Parser->new ({iterator => $iterator });
-+  my $testno = 0;     # Number of test results seen so far.
-+  my $bailed_out = 0; # Whether a "Bail out!" directive has been seen.
-+
-+  while (defined (my $cur = $parser->next))
-+    {
-+      if ($cur->is_bailout)
-+        {
-+          $bailed_out = 1;
-+          next;
-+        }
-+      if ($cur->is_plan)
-+        {
-+          $bailed_out = 0;
-+          next;
-+        }
-+      if ($cur->is_test)
-+        {
-+          $bailed_out = 0 if $cur->number == 1;
-+          $testno++;
-+          $cur = TAP::Parser::Result::Test->new({
-+                          ok => $cur->ok,
-+                          test_num => $testno,
-+                          directive => $cur->directive,
-+                          explanation => $cur->explanation,
-+                          description => $cur->description
-+                  });
-+        }
-+      print $cur->as_string . "\n" unless $bailed_out;
-+    }
-+  print "1..$testno\n";
-+}
-+
-+# ----------- #
-+#  Main code. #
-+# ----------- #
-+
-+main;
-+
-+# Local Variables:
-+# perl-indent-level: 2
-+# perl-continued-statement-offset: 2
-+# perl-continued-brace-offset: 0
-+# perl-brace-offset: 0
-+# perl-brace-imaginary-offset: 0
-+# perl-label-offset: -2
-+# cperl-indent-level: 2
-+# cperl-brace-offset: 0
-+# cperl-continued-brace-offset: 0
-+# cperl-label-offset: -2
-+# cperl-extra-newline-before-brace: t
-+# cperl-merge-trailing-else: nil
-+# cperl-continued-statement-offset: 2
-+# eval: (add-hook 'write-file-hooks 'time-stamp)
-+# time-stamp-start: "my $VERSION = "
-+# time-stamp-format: "'%:y-%02m-%02d.%02H'"
-+# time-stamp-time-zone: "UTC"
-+# time-stamp-end: "; # UTC"
-+# End:
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index fb0b449..d27e137 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -799,41 +799,53 @@ tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
- tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
- 
- SPEED = quick
--GTESTER_OPTIONS = -k $(if $(V),--verbose,-q)
--GCOV_OPTIONS = -n $(if $(V),-f,)
- 
- # gtester tests, possibly with verbose output
- 
-+do_test_human = \
-+	$(call quiet-command, \
-+	  { $(foreach COMMAND, $1, \
-+	    $(if $(V), echo $(notdir $(COMMAND)):;) \
-+	    MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
-+	      $2 $(COMMAND) -m=$(SPEED) -k $(if $(V), --tap | ./scripts/tap-driver.pl, \
-+		   >/dev/null );) }, \
-+	  "TEST","$@")
-+
-+do_test_tap = \
-+	$(call quiet-command, \
-+	  { $(foreach COMMAND, $1, \
-+	    MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
-+	      $2 $(COMMAND) -m=$(SPEED) -k --tap | sed "s/^[a-z][a-z]* [0-9]* /&$(notdir $(COMMAND)) /" ;) } \
-+	      | $(SRC_PATH)/scripts/tap-merge.pl \
-+	      $(if $(V), | tee "$@" | ./scripts/tap-driver.pl, >"$@"), \
-+	  "TAP","$@")
-+
- .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
- $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-softmmu $(check-qtest-y)
--	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
--		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
--		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
--		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
-+	$(call do_test_human,$(check-qtest-$*-y) $(check-qtest-generic-y), \
-+	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
-+	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
- 
- .PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
- $(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
--	$(call quiet-command, \
--		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
--		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $*,"GTESTER","$*")
-+	$(call do_test_human, $*)
- 
--# gtester tests with XML output
-+# gtester tests with TAP output
- 
--$(patsubst %, check-report-qtest-%.xml, $(QTEST_TARGETS)): check-report-qtest-%.xml: $(check-qtest-y)
--	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
--		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
--	  gtester -q $(GTESTER_OPTIONS) -o $@ -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
-+$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-qtest-%.tap: $(check-qtest-y)
-+	$(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y), \
-+	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
-+	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
- 
--check-report-unit.xml: $(check-unit-y)
--	$(call quiet-command,gtester -q $(GTESTER_OPTIONS) -o $@ -m=$(SPEED) $^,"GTESTER","$@")
-+check-report-unit.tap: $(check-unit-y)
-+	$(call do_test_tap,$^, \
-+	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
-+	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
- 
- # Reports and overall runs
- 
--check-report.xml: $(patsubst %,check-report-qtest-%.xml, $(QTEST_TARGETS)) check-report-unit.xml
--	$(call quiet-command,$(SRC_PATH)/scripts/gtester-cat $^ > $@,"GEN","$@")
--
--check-report.html: check-report.xml
--	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
-+check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS)) check-report-unit.tap
-+	$(call quiet-command,$(SRC_PATH)/scripts/tap-merge.py $^ > $@,"GEN","$@")
- 
- # Per guest TCG tests
- 
-diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
-index 0a04bfb..e0f18f5 100644
---- a/tests/docker/dockerfiles/centos7.docker
-+++ b/tests/docker/dockerfiles/centos7.docker
-@@ -22,6 +22,7 @@ ENV PACKAGES \
-     mesa-libEGL-devel \
-     mesa-libgbm-devel \
-     nettle-devel \
-+    perl-Test-Harness \
-     pixman-devel \
-     SDL-devel \
-     spice-glib-devel \
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index 24b113b..c66e341 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -16,6 +16,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         liblzo2-dev \
-         librdmacm-dev \
-         libsnappy-dev \
-+        libtest-harness-perl \
-         libvte-dev
- 
- # virgl
-diff --git a/tests/docker/dockerfiles/debian-ports.docker b/tests/docker/dockerfiles/debian-ports.docker
-index e05a9a9..514ab53 100644
---- a/tests/docker/dockerfiles/debian-ports.docker
-+++ b/tests/docker/dockerfiles/debian-ports.docker
-@@ -29,6 +29,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         flex \
-         gettext \
-         git \
-+        libtest-harness-perl \
-         pkg-config \
-         psmisc \
-         python \
-diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
-index 9a3d168..b30cbe7 100644
---- a/tests/docker/dockerfiles/debian-sid.docker
-+++ b/tests/docker/dockerfiles/debian-sid.docker
-@@ -26,6 +26,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         ca-certificates \
-         flex \
-         git \
-+        libtest-harness-perl \
-         pkg-config \
-         psmisc \
-         python \
-diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/dockerfiles/debian8.docker
-index 5294563..cdc3f11 100644
---- a/tests/docker/dockerfiles/debian8.docker
-+++ b/tests/docker/dockerfiles/debian8.docker
-@@ -29,6 +29,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         gettext \
-         git \
-         gnupg \
-+        libtest-harness-perl \
-         pkg-config \
-         python-minimal
- 
-diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
-index 154ae2a..9561d4f 100644
---- a/tests/docker/dockerfiles/debian9.docker
-+++ b/tests/docker/dockerfiles/debian9.docker
-@@ -24,6 +24,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         flex \
-         gettext \
-         git \
-+        libtest-harness-perl \
-         pkg-config \
-         psmisc \
-         python \
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 0c4eb9e..1d0e3dc 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -70,6 +70,7 @@ ENV PACKAGES \
-     nss-devel \
-     numactl-devel \
-     perl \
-+    perl-Test-Harness \
-     pixman-devel \
-     python3 \
-     PyYAML \
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-index 36e2b17..229add5 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -45,6 +45,7 @@ ENV PACKAGES flex bison \
-     libspice-protocol-dev \
-     libspice-server-dev \
-     libssh2-1-dev \
-+    libtest-harness-perl \
-     libusb-1.0-0-dev \
-     libusbredirhost-dev \
-     libvdeplug-dev \
--- 
-1.8.3.1
+Cheers,
+Samuel.
