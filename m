@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gSUBG-0002TX-Sj
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:49:07 -0500
+	(envelope-from <yuval.shaia@oracle.com>) id 1gSUBG-0002TZ-Tr
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:49:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuval.shaia@oracle.com>) id 1gSUBE-00016Y-GP
+	(envelope-from <yuval.shaia@oracle.com>) id 1gSUBD-00015K-H9
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:49:06 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:42186)
+Received: from userp2120.oracle.com ([156.151.31.85]:42166)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
-	id 1gSUBE-00014U-4i
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:49:04 -0500
+	id 1gSUBD-000136-6G
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:49:03 -0500
 From: Yuval Shaia <yuval.shaia@oracle.com>
-Date: Thu, 29 Nov 2018 23:47:50 +0200
-Message-Id: <20181129214805.2749-9-yuval.shaia@oracle.com>
+Date: Thu, 29 Nov 2018 23:47:51 +0200
+Message-Id: <20181129214805.2749-10-yuval.shaia@oracle.com>
 In-Reply-To: <20181129214805.2749-1-yuval.shaia@oracle.com>
 References: <20181129214805.2749-1-yuval.shaia@oracle.com>
-Subject: [Qemu-devel] [PATCH v6 08/23] hw/pvrdma: Set the correct opcode for
- recv completion
+Subject: [Qemu-devel] [PATCH v6 09/23] hw/pvrdma: Set the correct opcode for
+ send completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +27,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, dmitry.fleytman@gmail.com, jasowang@redhat.com, eblake@redhat.com, armbru@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, shamir.rabinovitch@oracle.com, cohuck@redhat.com
 
-The function pvrdma_post_cqe populates CQE entry with opcode from the
-given completion element. For receive operation value was not set. Fix
-it by setting it to IBV_WC_RECV.
+opcode for WC should be set by the device and not taken from work
+element.
 
 Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
 Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/rdma/vmw/pvrdma_qp_ops.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/rdma/vmw/pvrdma_qp_ops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/rdma/vmw/pvrdma_qp_ops.c b/hw/rdma/vmw/pvrdma_qp_ops.c
-index 762700a205..7b0f440fda 100644
+index 7b0f440fda..3388be1926 100644
 --- a/hw/rdma/vmw/pvrdma_qp_ops.c
 +++ b/hw/rdma/vmw/pvrdma_qp_ops.c
-@@ -196,8 +196,9 @@ int pvrdma_qp_recv(PVRDMADev *dev, uint32_t qp_handle)
-         comp_ctx = g_malloc(sizeof(CompHandlerCtx));
-         comp_ctx->dev = dev;
-         comp_ctx->cq_handle = qp->recv_cq_handle;
--        comp_ctx->cqe.qp = qp_handle;
+@@ -154,7 +154,7 @@ int pvrdma_qp_send(PVRDMADev *dev, uint32_t qp_handle)
+         comp_ctx->cq_handle = qp->send_cq_handle;
          comp_ctx->cqe.wr_id = wqe->hdr.wr_id;
-+        comp_ctx->cqe.qp = qp_handle;
-+        comp_ctx->cqe.opcode = IBV_WC_RECV;
+         comp_ctx->cqe.qp = qp_handle;
+-        comp_ctx->cqe.opcode = wqe->hdr.opcode;
++        comp_ctx->cqe.opcode = IBV_WC_SEND;
  
-         rdma_backend_post_recv(&dev->backend_dev, &dev->rdma_dev_res,
-                                &qp->backend_qp, qp->qp_type,
+         rdma_backend_post_send(&dev->backend_dev, &qp->backend_qp, qp->qp_type,
+                                (struct ibv_sge *)&wqe->sge[0], wqe->hdr.num_sge,
 -- 
 2.17.2
