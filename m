@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNLa-0006uv-7V
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:31:23 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNLj-00074H-Q3
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:31:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNLU-0002KG-HH
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:31:18 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNLf-0002dD-NV
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:31:27 -0500
 Received: from mail.ispras.ru ([83.149.199.45]:40030)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNLU-0001pE-74
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:31:12 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNLf-0001pE-DM
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:31:23 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Thu, 29 Nov 2018 17:30:59 +0300
-Message-ID: <154350185918.8036.9954005878918332833.stgit@Misha-PC.lan02.inno>
+Date: Thu, 29 Nov 2018 17:31:10 +0300
+Message-ID: <154350187043.8036.10772397990057740477.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 References: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 37/39] windbg: implement kd_api_fill_memory
+Subject: [Qemu-devel] [PATCH 39/39] windbg: maintainers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +29,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
+Add WinDbg stub to the MAINTAINERS.
+
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- include/exec/windbgstub-utils.h |    1 +
- windbgstub-utils.c              |   41 +++++++++++++++++++++++++++++++++++++++
- windbgstub.c                    |    4 ++++
- 3 files changed, 46 insertions(+)
+ MAINTAINERS |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
-index 4eb976260b..8192a7b849 100644
---- a/include/exec/windbgstub-utils.h
-+++ b/include/exec/windbgstub-utils.h
-@@ -85,6 +85,7 @@ void kd_api_read_msr(CPUState *cs, PacketData *pd);
- void kd_api_write_msr(CPUState *cs, PacketData *pd);
- void kd_api_search_memory(CPUState *cs, PacketData *pd);
- void kd_api_clear_all_internal_breakpoints(CPUState *cs, PacketData *pd);
-+void kd_api_fill_memory(CPUState *cs, PacketData *pd);
- void kd_api_get_context_ex(CPUState *cs, PacketData *pd);
- void kd_api_set_context_ex(CPUState *cs, PacketData *pd);
- void kd_api_unsupported(CPUState *cs, PacketData *pd);
-diff --git a/windbgstub-utils.c b/windbgstub-utils.c
-index d77908fb45..007fea7223 100644
---- a/windbgstub-utils.c
-+++ b/windbgstub-utils.c
-@@ -435,6 +435,47 @@ void kd_api_clear_all_internal_breakpoints(CPUState *cs, PacketData *pd)
- {
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1032406c56..dffbd267be 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1689,6 +1689,18 @@ S: Odd Fixes
+ F: gdbstub*
+ F: gdb-xml/
  
-+void kd_api_fill_memory(CPUState *cs, PacketData *pd)
-+{
-+    DBGKD_FILL_MEMORY *m64c = &pd->m64.u.FillMemory;
-+    uint32_t len = ldl_p(&m64c->Length);
-+    target_ulong addr = ldq_p(&m64c->Address);
-+    uint16_t pattern = MIN(ldl_p(&m64c->PatternLength), pd->extra_size);
-+    uint16_t flags = ldl_p(&m64c->Flags);
-+    int err, offset = 0;
++WinDbg stub
++M: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
++R: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
++S: Supported
++F: include/exec/windbgstub.h
++F: include/exec/windbgstub-utils.h
++F: include/exec/windbgkd.h
++F: windbgstub.c
++F: windbgstub-utils.c
++F: stubs/windbgstub.c
++F: target/i386/windbgstub.c
 +
-+    uint8_t *mem = g_new(uint8_t, pattern);
-+    memcpy(mem, pd->extra, pattern);
-+
-+    pd->extra_size = 0;
-+
-+    switch (flags) {
-+    case DBGKD_FILL_MEMORY_VIRTUAL:
-+        while (offset < len) {
-+            err = cpu_memory_rw_debug(cs, addr + offset, mem,
-+                                      MIN(pattern, len - offset), 1);
-+            offset += pattern;
-+            if (err) {
-+                DPRINTF("fill_memory: No physical page mapped: " FMT_ADDR "\n",
-+                        addr);
-+            }
-+        }
-+        break;
-+
-+    case DBGKD_FILL_MEMORY_PHYSICAL:
-+        while (offset < len) {
-+            cpu_physical_memory_rw(addr, mem, MIN(pattern, len - offset), 1);
-+            offset += pattern;
-+        }
-+        break;
-+
-+    default:
-+        break;
-+    }
-+
-+    g_free(mem);
-+}
-+
- void kd_api_unsupported(CPUState *cs, PacketData *pd)
- {
-     WINDBG_ERROR("Caught unimplemented api %s", kd_api_name(pd->m64.ApiNumber));
-diff --git a/windbgstub.c b/windbgstub.c
-index a50de68db5..daf6d37aa1 100644
---- a/windbgstub.c
-+++ b/windbgstub.c
-@@ -232,6 +232,10 @@ static void windbg_process_manipulate_packet(WindbgState *state)
-         kd_api_clear_all_internal_breakpoints(cs, data);
-         return;
- 
-+    case DbgKdFillMemoryApi:
-+        kd_api_fill_memory(cs, data);
-+        break;
-+
-     case DbgKdGetContextExApi:
-         kd_api_get_context_ex(cs, data);
-         break;
+ Memory API
+ M: Paolo Bonzini <pbonzini@redhat.com>
+ S: Supported
