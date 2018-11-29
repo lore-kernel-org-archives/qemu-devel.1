@@ -1,20 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gSTJ3-0000r6-Oa
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 15:53:06 -0500
+	(envelope-from <alifm@linux.ibm.com>) id 1gSTSs-000629-VY
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:03:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gSTJ3-0008Aq-4P
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 15:53:05 -0500
+	(envelope-from <alifm@linux.ibm.com>) id 1gSTSo-0001dz-Oa
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:03:14 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50090
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gSTSo-0001XE-I1
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 16:03:10 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wATKwoUX045685
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 16:03:08 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2p2qcmrubf-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 16:03:08 -0500
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Thu, 29 Nov 2018 21:03:07 -0000
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Thu, 29 Nov 2018 16:03:02 -0500
 MIME-Version: 1.0
-References: <20181129163655.20370-1-edgar.iglesias@gmail.com>
-	<20181129163655.20370-3-edgar.iglesias@gmail.com>
-In-Reply-To: <20181129163655.20370-3-edgar.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 29 Nov 2018 12:52:36 -0800
-Message-ID: <CAKmqyKPu-8T=vxdr6fN+2iZMBhBqAu60M7YuRkLnCySaPGqK4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 2/4] hw/arm: versal: Reduce number of
- virtio-mmio instances
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <faeb4b80-e191-d670-d057-28eb4ac11d11@linux.ibm.com>
+Subject: [Qemu-devel] qemu-iotests 232 fails when running the test as root
+ user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +40,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Edgar Iglesias <edgar.iglesias@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, KONRAD Frederic <frederic.konrad@adacore.com>, muhammad_bilal@mentor.com, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Luc Michel <luc.michel@greensocs.com>
+To: qemu-block@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Thu, Nov 29, 2018 at 8:37 AM Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
->
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Reduce number of virtio-mmio instances. This is in preparation
-> for correcting the interrupt setup for Versal.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Hi,
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+I am seeing a failure of the qemu-iotest number 232 when running the 
+test as a root user. Is this the expected behavior?
 
-Alistair
+Here is the output of the failure:
 
-> ---
->  hw/arm/xlnx-versal-virt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
-> index 41b8d801c8..2ed6ee9934 100644
-> --- a/hw/arm/xlnx-versal-virt.c
-> +++ b/hw/arm/xlnx-versal-virt.c
-> @@ -342,7 +342,7 @@ static void *versal_virt_get_dtb(const struct arm_boot_info *binfo,
->      return board->fdt;
->  }
->
-> -#define NUM_VIRTIO_TRANSPORT 32
-> +#define NUM_VIRTIO_TRANSPORT 8
->  static void create_virtio_regions(VersalVirt *s)
->  {
->      int virtio_mmio_size = 0x200;
-> --
-> 2.17.1
->
->
+sudo ./check -qcow2 232
+
+QEMU          -- 
+"/home/alifm/kvmdev/qemu/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64" 
+-nodefaults -machine accel=qtest
+QEMU_IMG      -- 
+"/home/alifm/kvmdev/qemu/tests/qemu-iotests/../../qemu-img"
+QEMU_IO       -- 
+"/home/alifm/kvmdev/qemu/tests/qemu-iotests/../../qemu-io"  --cache 
+writeback -f qcow2
+QEMU_NBD      -- 
+"/home/alifm/kvmdev/qemu/tests/qemu-iotests/../../qemu-nbd"
+IMGFMT        -- qcow2 (compat=1.1)
+IMGPROTO      -- file
+PLATFORM      -- Linux/x86_64 alifm-ThinkPad-T470p 4.10.0-40-generic
+TEST_DIR      -- /home/alifm/kvmdev/qemu/tests/qemu-iotests/scratch
+SOCKET_SCM_HELPER -- 
+/home/alifm/kvmdev/qemu/tests/qemu-iotests/socket_scm_helper
+
+232 1s ... - output mismatch (see 232.out.bad)
+--- /home/alifm/kvmdev/qemu/tests/qemu-iotests/232.out	2018-11-26 
+11:45:58.368023999 -0500
++++ /home/alifm/kvmdev/qemu/tests/qemu-iotests/232.out.bad	2018-11-29 
+15:58:41.768561694 -0500
+@@ -21,13 +21,13 @@
+  NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+  NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+
+-QEMU_PROG: -drive 
+driver=file,file=TEST_DIR/t.IMGFMT,if=none,read-only=off,auto-read-only=off: 
+Could not open 'TEST_DIR/t.IMGFMT': Permission denied
+-NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+-NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+-
+-QEMU_PROG: -drive 
+driver=file,file=TEST_DIR/t.IMGFMT,if=none,auto-read-only=off: Could not 
+open 'TEST_DIR/t.IMGFMT': Permission denied
+-NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
+-NODE_NAME: TEST_DIR/t.IMGFMT (file, read-only)
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
++
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
++NODE_NAME: TEST_DIR/t.IMGFMT (file)
+
+  === -blockdev with read-write image: read-only/auto-read-only 
+combinations ===
+
+@@ -49,11 +49,11 @@
+  node0: TEST_DIR/t.IMGFMT (file, read-only)
+  node0: TEST_DIR/t.IMGFMT (file, read-only)
+
+-QEMU_PROG: -blockdev 
+driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0,read-only=off,auto-read-only=off: 
+Could not open 'TEST_DIR/t.IMGFMT': Permission denied
+-node0: TEST_DIR/t.IMGFMT (file, read-only)
+-QEMU_PROG: -blockdev 
+driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0,read-only=off: 
+Could not open 'TEST_DIR/t.IMGFMT': Permission denied
++node0: TEST_DIR/t.IMGFMT (file)
++node0: TEST_DIR/t.IMGFMT (file)
++node0: TEST_DIR/t.IMGFMT (file)
+
+-QEMU_PROG: -blockdev 
+driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0,auto-read-only=off: 
+Could not open 'TEST_DIR/t.IMGFMT': Permission denied
+-node0: TEST_DIR/t.IMGFMT (file, read-only)
+-QEMU_PROG: -blockdev 
+driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0: Could not open 
+'TEST_DIR/t.IMGFMT': Permission denied
++node0: TEST_DIR/t.IMGFMT (file)
++node0: TEST_DIR/t.IMGFMT (file)
++node0: TEST_DIR/t.IMGFMT (file)
+  *** done
+Failures: 232
+Failed 1 of 1 tests
+
+
+Thank you
+Farhan
