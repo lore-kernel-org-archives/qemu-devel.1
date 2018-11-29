@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gSJP1-0007t2-MX
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:37 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gSJPB-00081p-Nb
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gSJOx-0005Cw-O1
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:35 -0500
-Date: Thu, 29 Nov 2018 11:18:21 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181129111821.1c04e68d.cohuck@redhat.com>
-In-Reply-To: <20181128095939.5684-1-david@redhat.com>
-References: <20181128095939.5684-1-david@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gSJP9-0005IY-Bg
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:45 -0500
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:36370)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gSJP8-0005Hz-VC
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:43 -0500
+Received: by mail-ot1-x332.google.com with SMTP id k98so1255930otk.3
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 02:18:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/tod: Properly stop the KVM TOD
- while the guest is not running
+References: <20181128010817.6191-1-programmingkidx@gmail.com>
+	<CAFEAcA_C3BtOvEFrSOntma4GtreJNEmtg3pxkB+2iCYKVFQinA@mail.gmail.com>
+	<AFD02114-6C8E-441B-87C0-469BE693601E@gmail.com>
+	<CABsm=W35aFrF=cTJD74E6d9Ugau=PwPQ9wrjCDZueJwhMGVHgA@mail.gmail.com>
+In-Reply-To: <CABsm=W35aFrF=cTJD74E6d9Ugau=PwPQ9wrjCDZueJwhMGVHgA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 29 Nov 2018 10:18:30 +0000
+Message-ID: <CAFEAcA-dqKpce+odLb=BG5ypUEuQyhYTE9sdZsm0T_LzB6muyw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] (no subject)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,99 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Berkus Decker <berkus@gmail.com>
+Cc: G 3 <programmingkidx@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, 28 Nov 2018 10:59:39 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Thu, 29 Nov 2018 at 02:11, berkus infinitus <berkus@gmail.com> wrote:
+>
+> I suspect the main problem is the blocking call to qemu_main
+> from the UI thread in the app delegate didFinishLoadingWithOptions
+> if i=E2=80=99m not mistaken and everything else grows from there.
 
-> Just like on other architectures, we should stop the clock while the guest
-> is not running. This is already properly done for TCG. Right now, doing an
-> offline migration (stop, migrate, cont) can easily trigger stalls in the
-> guest.
-> 
-> Even doing a
->     (hmp) stop
->     ... wait 2 minutes ...
->     (hmp) cont
-> will already trigger stalls.
-> 
-> So whenever the guest stops, backup the KVM TOD. When continuing to run
-> the guest, restore the KVM TOD.
-> 
-> One special case is starting a simple VM: Reading the TOD from KVM to
-> stop it right away until the guest is actually started means that the
-> time of any simple VM will already differ to the host time. We can
-> simply leave the TOD running and the guest won't be able to recognize
-> it.
-> 
-> For migration, we actually want to keep the TOD stopped until really
-> starting the guest. To be able to catch most errors, we should however
-> try to set the TOD in addition to simply storing it. So we can still
-> catch basic migration problems.
-> 
-> If anything goes wrong while backing up/restoring the TOD, we have to
-> ignore it (but print a warning). This is then basically a fallback to
-> old behavior (TOD remains running).
-> 
-> I tested this very basically with an initrd:
->     1. Start a simple VM. Observed that the TOD is kept running. Old
->        behavior.
->     2. Ordinary live migration. Observed that the TOD is temporarily
->        stopped on the destination when setting the new value and
->        correctly started when finally starting the guest.
->     3. Offline live migration. (stop, migrate, cont). Observed that the
->        TOD will be stopped on the source with the "stop" command. On the
->        destination, the TOD is temporarily stopped when setting the new
->        value and correctly started when finally starting the guest via
->        "cont".
->     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
->        or conts in a row have no effect, so works as expected)
-> 
-> In the future, we might want to send the guest a special kind of time sync
-> interrupt under some conditions, so it can synchronize its tod to the
-> host tod. This is interesting for migration scenarios but also when we
-> get time sync interrupts ourselves. This however will most probably have
-> to be handled in KVM (e.g. when the tods differ too much) and is not
-> desired e.g. when debugging the guest. (single stepping should not
+Yes; if there's no way that Mojave will allow us to run
+qemu_main directly on the main thread, then we have to
+create a 2nd thread to run qemu_main on (which then becomes
+what QEMU thinks of as the "main loop thread"), and then
+we run into the need to make all the UI calls be forwarded
+from the main loop thread to the main thread, and to get
+QEMU locks when making calls into qemu from the main thread.
 
-I'll drop the period after 'guest' when applying.
+I think the code we have in git currently will already do
+all the UI calls on the main thread -- it just does it by
+doing a blocking call into qemu_main which later does
+event processing itself. (It's a shame OSX doesn't document
+what you need to do to write code that way, it's a fairly
+common paradigm for other GUIs.)
 
-> result in permanent time syncs). I consider something like that an add-on
-> on top of this basic "don't break the guest" handling.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
-> 
-> v1 -> v2:
-> - Add time sync idea suggested by Christian to description
-> - Drop one unnecessary "return"
-> - Register in realize() and not in instance_init()
-> 
-> 
->  hw/s390x/tod-kvm.c     | 91 +++++++++++++++++++++++++++++++++++++++++-
->  hw/s390x/tod.c         |  5 +++
->  include/hw/s390x/tod.h |  8 +++-
->  3 files changed, 101 insertions(+), 3 deletions(-)
-> 
+For High Sierra there is apparently a "main thread checker"
+utility: https://developer.apple.com/documentation/code_diagnostics/main_th=
+read_checker
+so running
+DYLD_INSERT_LIBRARIES=3D/Applications/Xcode.app/Contents/Developer/usr/lib/=
+libMainThreadChecker.dylib
+qemu-system-x86_64 args...
 
-(...)
+will let us check for violations of the "do things on main
+thread" principle even without Mohave. For me with current
+QEMU it doesn't report any issues.
 
-> +static void kvm_s390_tod_realize(S390TODState *td, Error **errp)
-> +{
-> +    /*
-> +     * We need to know when the VM gets started/stopped to start/stop the TOD.
-> +     * As we can never have more than one TOD instance (and that will never be
-> +     * removed), registering here and never unregistering is good enough.
-> +     */
-> +    qemu_add_vm_change_state_handler(kvm_s390_tod_vm_state_change, td);
-> +}
-> +
-
-Yes, this should work. If we were really paranoid, we could add some
-code that fails realizing a second instance, but that's probably
-overkill.
-
-(...)
-
-Patch looks good to me, but I'd like to have a review before queuing.
+thanks
+-- PMM
