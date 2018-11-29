@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNKl-0006GH-Ma
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:33 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNL0-0006UW-Mz
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNKh-0001S8-4l
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:27 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:39946)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNKw-0001ot-Lx
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:42 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:39966)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNKg-0001Rt-OC
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:23 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNKw-0001Ux-DD
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:30:38 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Thu, 29 Nov 2018 17:30:19 +0300
-Message-ID: <154350181948.8036.8727258852694962422.stgit@Misha-PC.lan02.inno>
+Date: Thu, 29 Nov 2018 17:30:25 +0300
+Message-ID: <154350182511.8036.1553484225754583581.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 References: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 30/39] windbg: debug exception subscribing
+Subject: [Qemu-devel] [PATCH 31/39] windbg: implement kd_api_continue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,117 +29,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Add handler registration of gdb debug exception. Its exception also can be used
-for windbg.
-
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- cpus.c                  |   19 ++++++++++++++++++-
- gdbstub.c               |    4 ++++
- include/sysemu/sysemu.h |    2 ++
- windbgstub.c            |   14 ++++++++++++++
- 4 files changed, 38 insertions(+), 1 deletion(-)
+ include/exec/windbgstub-utils.h |    1 +
+ windbgstub-utils.c              |   15 +++++++++++++++
+ windbgstub.c                    |    5 +++++
+ 3 files changed, 21 insertions(+)
 
-diff --git a/cpus.c b/cpus.c
-index a2b33ccb29..c8b05260b4 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -79,6 +79,8 @@ int64_t max_advance;
- static QEMUTimer *throttle_timer;
- static unsigned int throttle_percentage;
+diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
+index 85b7322b82..2843ad055e 100644
+--- a/include/exec/windbgstub-utils.h
++++ b/include/exec/windbgstub-utils.h
+@@ -73,6 +73,7 @@ void kd_api_get_context(CPUState *cs, PacketData *pd);
+ void kd_api_set_context(CPUState *cs, PacketData *pd);
+ void kd_api_write_breakpoint(CPUState *cs, PacketData *pd);
+ void kd_api_restore_breakpoint(CPUState *cs, PacketData *pd);
++void kd_api_continue(CPUState *cs, PacketData *pd);
+ void kd_api_read_control_space(CPUState *cs, PacketData *pd);
+ void kd_api_write_control_space(CPUState *cs, PacketData *pd);
+ void kd_api_clear_all_internal_breakpoints(CPUState *cs, PacketData *pd);
+diff --git a/windbgstub-utils.c b/windbgstub-utils.c
+index 67934442d9..ab88e36e2e 100644
+--- a/windbgstub-utils.c
++++ b/windbgstub-utils.c
+@@ -10,6 +10,7 @@
+  */
  
-+static void (*excp_debug_handler)(CPUState *cpu);
-+
- #define CPU_THROTTLE_PCT_MIN 1
- #define CPU_THROTTLE_PCT_MAX 99
- #define CPU_THROTTLE_TIMESLICE_NS 10000000
-@@ -1103,9 +1105,24 @@ static bool cpu_can_run(CPUState *cpu)
-     return true;
+ #include "exec/windbgstub-utils.h"
++#include "sysemu/sysemu.h"
+ 
+ static const char *kd_api_names[] = {
+     "DbgKdReadVirtualMemoryApi",
+@@ -308,6 +309,20 @@ void kd_api_restore_breakpoint(CPUState *cs, PacketData *pd)
+     }
  }
  
-+bool register_excp_debug_handler(void (*handler)(CPUState *cpu))
++void kd_api_continue(CPUState *cs, PacketData *pd)
 +{
-+    if (excp_debug_handler == NULL) {
-+        excp_debug_handler = handler;
-+        return true;
-+    } else {
-+        error_report("Something debugger is already in use. '-gdb' and "
-+                     "'-windbg' cannot be used at the same time");
-+        return false;
++    uint32_t status = ldl_p(&pd->m64.u.Continue2.ContinueStatus);
++    uint32_t trace = ldl_p(&pd->m64.u.Continue2.ControlSet.TraceFlag);
++    int ssFlag = trace ? SSTEP_ENABLE | SSTEP_NOIRQ | SSTEP_NOTIMER : 0;
++
++    if (NT_SUCCESS(status)) {
++        cpu_single_step(cs, ssFlag);
++        if (!runstate_needs_reset()) {
++            vm_start();
++        }
 +    }
 +}
 +
- static void cpu_handle_guest_debug(CPUState *cpu)
+ void kd_api_clear_all_internal_breakpoints(CPUState *cs, PacketData *pd)
  {
--    gdb_set_stop_cpu(cpu);
-+    if (excp_debug_handler != NULL) {
-+        excp_debug_handler(cpu);
-+    }
-+
-     qemu_system_debug_request();
-     cpu->stopped = true;
  }
-diff --git a/gdbstub.c b/gdbstub.c
-index c4e4f9f082..9ed4fe2e8e 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -2074,6 +2074,10 @@ int gdbserver_start(const char *device)
-     s->mon_chr = mon_chr;
-     s->current_syscall_cb = NULL;
- 
-+    if (!register_excp_debug_handler(gdb_set_stop_cpu)) {
-+        exit(1);
-+    }
-+
-     return 0;
- }
- 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 8d6095d98b..826b701bfa 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -203,6 +203,8 @@ QemuOpts *qemu_get_machine_opts(void);
- 
- bool defaults_enabled(void);
- 
-+bool register_excp_debug_handler(void (*handler)(CPUState *cpu));
-+
- extern QemuOptsList qemu_legacy_drive_opts;
- extern QemuOptsList qemu_common_drive_opts;
- extern QemuOptsList qemu_drive_opts;
 diff --git a/windbgstub.c b/windbgstub.c
-index a1c013cd8c..0e4ad6d009 100644
+index 0e4ad6d009..d64bbc3f34 100644
 --- a/windbgstub.c
 +++ b/windbgstub.c
-@@ -129,9 +129,19 @@ static void windbg_send_control_packet(WindbgState *state, uint16_t type,
-     qemu_chr_fe_write(&state->chr, PTR(packet), sizeof(packet));
- }
+@@ -183,6 +183,11 @@ static void windbg_process_manipulate_packet(WindbgState *state)
+         kd_api_restore_breakpoint(cs, data);
+         break;
  
-+static void windbg_bp_handler(CPUState *cs)
-+{
-+    DBGKD_ANY_WAIT_STATE_CHANGE *sc = kd_state_change_exc(cs);
-+    windbg_send_data_packet(windbg_state, (uint8_t *) sc,
-+                            sizeof(DBGKD_ANY_WAIT_STATE_CHANGE),
-+                            PACKET_TYPE_KD_STATE_CHANGE64);
-+}
++    case DbgKdContinueApi:
++    case DbgKdContinueApi2:
++        kd_api_continue(cs, data);
++        return;
 +
- static void windbg_vm_stop(void)
- {
-+    CPUState *cs = qemu_get_cpu(0);
-     vm_stop(RUN_STATE_PAUSED);
-+    windbg_bp_handler(cs);
- }
- 
- static void windbg_process_manipulate_packet(WindbgState *state)
-@@ -481,6 +491,10 @@ int windbg_server_start(const char *device)
- 
-     qemu_register_reset(windbg_handle_reset, NULL);
- 
-+    if (!register_excp_debug_handler(windbg_bp_handler)) {
-+        exit(1);
-+    }
-+
-     atexit(windbg_exit);
-     return 0;
- }
+     case DbgKdReadControlSpaceApi:
+         kd_api_read_control_space(cs, data);
+         break;
