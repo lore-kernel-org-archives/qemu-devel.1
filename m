@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSKzq-0006VG-Qe
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:00:51 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gSL18-0007Vc-0z
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:02:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSKqO-0001oD-QJ
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:50:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59746)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gSKqO-0001np-IY
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:50:56 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D400930A3AC1
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 11:50:55 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 29 Nov 2018 12:50:48 +0100
-Message-Id: <1543492248-28356-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH for-4.0] tests/display-vga: Enable virtio-vga
- test
+	(envelope-from <cohuck@redhat.com>) id 1gSKlb-00070i-Ow
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:46:02 -0500
+Date: Thu, 29 Nov 2018 12:45:45 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181129124545.18e74622.cohuck@redhat.com>
+In-Reply-To: <1542904555-1136-3-git-send-email-pmorel@linux.ibm.com>
+References: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
+	<1542904555-1136-3-git-send-email-pmorel@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] s390x/vfio: ap: Use the APdevice as
+ a child of the APBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, kraxel@redhat.com, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com
 
-There are some "#ifdef CONFIG_VIRTIO_VGA" in the code here which
-do not work as expected: CONFIG_VIRTIO_VGA is a Makefile switch,
-but not a CPP macro, so the "guarded" code currently simply never
-gets enabled.
+On Thu, 22 Nov 2018 17:35:51 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-So enable this code now unconditionally, with some runtime switches
-for the architectures that have the VIRTIO_VGA device enabled by
-default. Looking at the other if-statement in the main function here,
-it also seems like this test was originally supposed to be running
-on "mips" and "alpha", too, so enable it now for these architectures
-in the Makefile, too.
+> Two good reasons to use the base device as a child of the
+> AP BUS:
+> - We can easily find the device without traversing the qtree.
+> - In case we have different APdevice instantiation, VFIO with
+>   interception or emulation, we will need the APDevice as
+>   a parent device.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  hw/s390x/ap-device.c         | 22 ++++++++++++++++++++++
+>  hw/vfio/ap.c                 | 16 ++++++----------
+>  include/hw/s390x/ap-device.h |  2 ++
+>  3 files changed, 30 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
+> index f5ac8db..554d5aa 100644
+> --- a/hw/s390x/ap-device.c
+> +++ b/hw/s390x/ap-device.c
+> @@ -11,13 +11,35 @@
+>  #include "qemu/module.h"
+>  #include "qapi/error.h"
+>  #include "hw/qdev.h"
+> +#include "hw/s390x/ap-bridge.h"
+>  #include "hw/s390x/ap-device.h"
+>  
+> +APDevice *s390_get_ap(void)
+> +{
+> +    static DeviceState *apb;
+> +    BusState *bus;
+> +    BusChild *child;
+> +    static APDevice *ap;
+> +
+> +    if (ap) {
+> +        return ap;
+> +    }
+> +
+> +    apb = s390_get_ap_bridge();
+> +    /* We have only a single child on the BUS */
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- Yes, I know, this will likely also be done in a better way once
- "qgraph" gets merged ... but for the time being, it's a simple
- fix to get some more test coverage...
+So, there'll never a mixed environment? Or would that have a 'hybrid'
+ap device?
 
- tests/Makefile.include   |  5 +++++
- tests/display-vga-test.c | 10 +++++-----
- 2 files changed, 10 insertions(+), 5 deletions(-)
+> +    bus = qdev_get_child_bus(apb, TYPE_AP_BUS);
+> +    child = QTAILQ_FIRST(&bus->children);
+> +    assert(child != NULL);
+> +    ap = DO_UPCAST(APDevice, parent_obj, child->child);
+> +    return ap;
+> +}
+> +
+>  static void ap_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+>      dc->desc = "AP device class";
+> +    dc->bus_type = TYPE_AP_BUS;
+>      dc->hotpluggable = false;
+>  }
+>  
+> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+> index 65de952..94e5a1a 100644
+> --- a/hw/vfio/ap.c
+> +++ b/hw/vfio/ap.c
+> @@ -35,9 +35,6 @@ typedef struct VFIOAPDevice {
+>      VFIODevice vdev;
+>  } VFIOAPDevice;
+>  
+> -#define VFIO_AP_DEVICE(obj) \
+> -        OBJECT_CHECK(VFIOAPDevice, (obj), VFIO_AP_DEVICE_TYPE)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 9b26116..9336029 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -222,18 +222,23 @@ check-qtest-x86_64-y += $(check-qtest-i386-y)
- check-qtest-x86_64-$(CONFIG_SDHCI) += tests/sdhci-test$(EXESUF)
- 
- check-qtest-alpha-y += tests/boot-serial-test$(EXESUF)
-+check-qtest-alpha-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
- 
- check-qtest-hppa-y += tests/boot-serial-test$(EXESUF)
-+check-qtest-hppa-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
- 
- check-qtest-m68k-y = tests/boot-serial-test$(EXESUF)
- 
- check-qtest-microblaze-y += tests/boot-serial-test$(EXESUF)
- 
- check-qtest-mips-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
-+check-qtest-mips-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
- 
- check-qtest-mips64-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
-+check-qtest-mips64-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
- 
- check-qtest-mips64el-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
-+check-qtest-mips64el-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
- 
- check-qtest-moxie-y += tests/boot-serial-test$(EXESUF)
- 
-diff --git a/tests/display-vga-test.c b/tests/display-vga-test.c
-index 2d7d24e..bd176dc 100644
---- a/tests/display-vga-test.c
-+++ b/tests/display-vga-test.c
-@@ -40,13 +40,11 @@ static void pci_virtio_gpu(void)
-     qtest_end();
- }
- 
--#ifdef CONFIG_VIRTIO_VGA
- static void pci_virtio_vga(void)
- {
-     qtest_start("-vga none -device virtio-vga");
-     qtest_end();
- }
--#endif
- 
- int main(int argc, char **argv)
- {
-@@ -62,8 +60,10 @@ int main(int argc, char **argv)
-     qtest_add_func("/display/pci/secondary", pci_secondary);
-     qtest_add_func("/display/pci/multihead", pci_multihead);
-     qtest_add_func("/display/pci/virtio-gpu", pci_virtio_gpu);
--#ifdef CONFIG_VIRTIO_VGA
--    qtest_add_func("/display/pci/virtio-vga", pci_virtio_vga);
--#endif
-+    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64") ||
-+        g_str_equal(arch, "hppa") || g_str_equal(arch, "ppc64")) {
-+        qtest_add_func("/display/pci/virtio-vga", pci_virtio_vga);
-+    }
-+
-     return g_test_run();
- }
--- 
-1.8.3.1
+Hm?
+
+> -
+>  static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
+>  {
+>      vdev->needs_reset = false;
