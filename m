@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gSMua-0004W5-ML
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:03:28 -0500
+	(envelope-from <philmd@redhat.com>) id 1gSMvL-0004xU-KH
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:04:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1gSMuW-0005Iq-Bv
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:03:23 -0500
-Date: Thu, 29 Nov 2018 15:02:46 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20181129135301.l5dyvmjtpsrfjhdw@kamzik.brq.redhat.com>
-References: <20181129132428.333-1-sameo@linux.intel.com>
-	<20181129132428.333-3-sameo@linux.intel.com>
+	(envelope-from <philmd@redhat.com>) id 1gSMvG-0005fO-0n
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:04:11 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:35735)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gSMvF-0005eX-MH
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:04:05 -0500
+Received: by mail-wr1-f68.google.com with SMTP id 96so2040879wrb.2
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 06:04:05 -0800 (PST)
+References: <20181129090120.28828-1-pbonzini@redhat.com>
+	<20181129090120.28828-2-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c4b4eb4f-e879-1e97-e596-f2209115ca3c@redhat.com>
+Date: Thu, 29 Nov 2018 15:03:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181129132428.333-3-sameo@linux.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] hw: arm: acpi: Fix incorrect
- checksums in RSDP
+In-Reply-To: <20181129090120.28828-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 1/4] checkpatch: fix premature exit
+ when no input or --mailback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Thu, Nov 29, 2018 at 02:24:22PM +0100, Samuel Ortiz wrote:
-> From: Igor Mammedov <imammedo@redhat.com>
+On 29/11/18 10:01, Paolo Bonzini wrote:
+> In some cases, checkpatch's process subroutine is exiting the
+> whole process.  This is wrong, just return from the subroutine
+> instead.
 > 
-> When RSDP table was introduced (d4bec5d87), we calculated only legacy
-> checksum, and that was incorrect as it
->  - specified rev=2 and forgot about extended checksum.
->  - legacy checksum calculated on full table instead of the 1st 20 bytes
-> 
-> Fix it by adding extended checksum calculation and using correct
-> size for legacy checksum.
-> 
-> While at it use explicit constants to specify sub/full tables
-> sizes instead of relying on AcpiRsdpDescriptor size and fields offsets.
-> The follow up commits will convert this table to build_append_int_noprefix() API,
-> will use constants anyway and remove unused AcpiRsdpDescriptor structure.
-> 
-> Based on "[PATCH v5 05/24] hw: acpi: Implement XSDT support for  RSDP"
-> by Samuel Ortiz, who did it right in his impl.
-> 
-> Fixes: d4bec5d87 (hw/arm/virt-acpi-build: Generate RSDP table)
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> CC: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> CC: Shannon Zhao <shannon.zhaosl@gmail.com>
-> Reviewed-by: Samuel Ortiz <sameo@linux.intel.com>
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I don't see my R-b here, but this patch doesn't appear to have changed
-since I reviewed it. Here it is again
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  hw/arm/virt-acpi-build.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  scripts/checkpatch.pl | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index fcaa350892..0835900052 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -390,8 +390,13 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index eccd656c41..d58fcb1efd 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2869,19 +2869,19 @@ sub process {
+>  	# If we have no input at all, then there is nothing to report on
+>  	# so just keep quiet.
+>  	if ($#rawlines == -1) {
+> -		exit(0);
+> +		return 1;
+>  	}
 >  
->      /* Checksum to be filled by Guest linker */
->      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> -        (char *)rsdp - rsdp_table->data, sizeof *rsdp,
-> +        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP size */,
->          (char *)&rsdp->checksum - rsdp_table->data);
-> +
-> +    /* Extended checksum to be filled by Guest linker */
-> +    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> +        (char *)rsdp - rsdp_table->data, 36 /* ACPI rev 2.0 RSDP size */,
-> +        (char *)&rsdp->extended_checksum - rsdp_table->data);
->  }
+>  	# In mailback mode only produce a report in the negative, for
+>  	# things that appear to be patches.
+>  	if ($mailback && ($clean == 1 || !$is_patch)) {
+> -		exit(0);
+> +		return 1;
+>  	}
 >  
->  static void
-> -- 
-> 2.19.2
+>  	# This is not a patch, and we are are in 'no-patch' mode so
+>  	# just keep quiet.
+>  	if (!$chk_patch && !$is_patch) {
+> -		exit(0);
+> +		return 1;
+>  	}
+>  
+>  	if (!$is_patch) {
 > 
->
