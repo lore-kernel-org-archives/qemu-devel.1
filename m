@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gSJq1-0002ph-TS
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:46:30 -0500
+	(envelope-from <berrange@redhat.com>) id 1gSJqd-00038Z-Kd
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:47:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gSJq0-00071T-MT
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:46:29 -0500
-Date: Thu, 29 Nov 2018 11:46:19 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181129104619.GD4797@linux.fritz.box>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-15-paul.durrant@citrix.com>
-	<20181128163447.GF4222@dhcp-200-186.str.redhat.com>
-	<a2cd391e72a24547a3565515e8d39d27@AMSPEX02CL03.citrite.net>
-	<20181129090046.GA4797@linux.fritz.box>
-	<bdee6326dd3041f58202220a50abf9c8@AMSPEX02CL03.citrite.net>
+	(envelope-from <berrange@redhat.com>) id 1gSJqa-0007GL-AW
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:47:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gSJqa-0007Fl-4e
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:47:04 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 998AA3086269
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 10:47:02 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Thu, 29 Nov 2018 10:46:58 +0000
+Message-Id: <20181129104658.26585-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bdee6326dd3041f58202220a50abf9c8@AMSPEX02CL03.citrite.net>
-Subject: Re: [Qemu-devel] [PATCH 14/18] xen: add implementations of
- xen-qdisk connect and disconnect functions...
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [qemu-web PATCH v2] Document how to test the site with
+ jekyll locally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,153 +31,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-Am 29.11.2018 um 10:33 hat Paul Durrant geschrieben:
-> > -----Original Message-----
-> > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > Sent: 29 November 2018 09:01
-> > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
-> > devel@lists.xenproject.org; Stefano Stabellini <sstabellini@kernel.org>;
-> > Anthony Perard <anthony.perard@citrix.com>; Max Reitz <mreitz@redhat.com>
-> > Subject: Re: [PATCH 14/18] xen: add implementations of xen-qdisk connect
-> > and disconnect functions...
-> > 
-> > Am 28.11.2018 um 17:40 hat Paul Durrant geschrieben:
-> > > > -----Original Message-----
-> > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > > Sent: 28 November 2018 16:35
-> > > > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > > > Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
-> > > > devel@lists.xenproject.org; Stefano Stabellini
-> > <sstabellini@kernel.org>;
-> > > > Anthony Perard <anthony.perard@citrix.com>; Max Reitz
-> > <mreitz@redhat.com>
-> > > > Subject: Re: [PATCH 14/18] xen: add implementations of xen-qdisk
-> > connect
-> > > > and disconnect functions...
-> > > >
-> > > > Am 21.11.2018 um 16:12 hat Paul Durrant geschrieben:
-> > > > > ...and wire in the dataplane.
-> > > > >
-> > > > > This patch adds the remaining code to make the xen-qdisk XenDevice
-> > > > > functional. The parameters that a block frontend expects to find are
-> > > > > populated in the backend xenstore area, and the 'ring-ref' and
-> > > > > 'event-channel' values specified in the frontend xenstore area are
-> > > > > mapped/bound and used to set up the dataplane.
-> > > > >
-> > > > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> > > > > ---
-> > > > > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > > > > Cc: Anthony Perard <anthony.perard@citrix.com>
-> > > > > Cc: Kevin Wolf <kwolf@redhat.com>
-> > > > > Cc: Max Reitz <mreitz@redhat.com>
-> > > > > ---
-> > > > >  hw/block/xen-qdisk.c       | 140
-> > > > +++++++++++++++++++++++++++++++++++++++++++++
-> > > > >  hw/xen/xen-bus.c           |  12 ++--
-> > > > >  include/hw/xen/xen-bus.h   |   8 +++
-> > > > >  include/hw/xen/xen-qdisk.h |  12 ++++
-> > > > >  4 files changed, 166 insertions(+), 6 deletions(-)
-> > > > >
-> > > > > diff --git a/hw/block/xen-qdisk.c b/hw/block/xen-qdisk.c
-> > > > > index 35f7b70480..8c88393832 100644
-> > > > > --- a/hw/block/xen-qdisk.c
-> > > > > +++ b/hw/block/xen-qdisk.c
-> > > > > @@ -9,6 +9,10 @@
-> > > > >  #include "qapi/visitor.h"
-> > > > >  #include "hw/hw.h"
-> > > > >  #include "hw/xen/xen-qdisk.h"
-> > > > > +#include "sysemu/blockdev.h"
-> > > > > +#include "sysemu/block-backend.h"
-> > > > > +#include "sysemu/iothread.h"
-> > > > > +#include "dataplane/xen-qdisk.h"
-> > > > >  #include "trace.h"
-> > > > >
-> > > > >  static char *xen_qdisk_get_name(XenDevice *xendev, Error **errp)
-> > > > > @@ -23,6 +27,11 @@ static void xen_qdisk_realize(XenDevice *xendev,
-> > > > Error **errp)
-> > > > >  {
-> > > > >      XenQdiskDevice *qdiskdev = XEN_QDISK_DEVICE(xendev);
-> > > > >      XenQdiskVdev *vdev = &qdiskdev->vdev;
-> > > > > +    BlockConf *conf = &qdiskdev->conf;
-> > > > > +    DriveInfo *dinfo;
-> > > > > +    bool is_cdrom;
-> > > > > +    unsigned int info;
-> > > > > +    int64_t size;
-> > > > >
-> > > > >      if (!vdev->valid) {
-> > > > >          error_setg(errp, "vdev property not set");
-> > > > > @@ -30,13 +39,134 @@ static void xen_qdisk_realize(XenDevice
-> > *xendev,
-> > > > Error **errp)
-> > > > >      }
-> > > > >
-> > > > >      trace_xen_qdisk_realize(vdev->disk, vdev->partition);
-> > > > > +
-> > > > > +    if (!conf->blk) {
-> > > > > +        error_setg(errp, "drive property not set");
-> > > > > +        return;
-> > > > > +    }
-> > > > > +
-> > > > > +    if (!blk_is_inserted(conf->blk)) {
-> > > > > +        error_setg(errp, "device needs media, but drive is empty");
-> > > > > +        return;
-> > > > > +    }
-> > > >
-> > > > Hm, the code below suggests that you support CD-ROMs. Don't you want
-> > to
-> > > > support media change as well then? Which would mean that you need to
-> > > > support empty drives.
-> > >
-> > > Yes, that's a good point. I should get rid of that check.
-> > 
-> > Or rather apply it only to hard disks. And for empty CDs, you'll
-> > probably need to create an empty BlockBackend (the !conf->blk case).
-> > Just check the IDE and/or SCSI code for comparison.
-> > 
-> > > >
-> > > > > +    if (!blkconf_apply_backend_options(conf, blk_is_read_only(conf-
-> > > > >blk),
-> > > > > +                                       false, errp)) {
-> > > > > +        return;
-> > > > > +    }
-> > > > > +
-> > > > > +    if (!blkconf_geometry(conf, NULL, 65535, 255, 255, errp)) {
-> > > > > +        return;
-> > > > > +    }
-> > > > > +
-> > > > > +    dinfo = blk_legacy_dinfo(conf->blk);
-> > > > > +    is_cdrom = (dinfo && dinfo->media_cd);
-> > > >
-> > > > It's called legacy for a reason. Don't use this in new devices.
-> > > >
-> > > > The proper way is to have two different devices for hard disks and CDs
-> > > > (like scsi-hd and scsi-cd).
-> > >
-> > > ...or presumably I could have a property? The legacy init code could
-> > > then set it based on the drive info.
-> > 
-> > Technically yes, but why would that be a good way to model things? I
-> > mean, it's true that xen-qdisk is not real hardware, but I've never seen
-> > any hardware that has a switch to decide whether it should behave as a
-> > CD drive or a hard disk.
-> > 
-> > Both have very different characteristics (read-only with removable
-> > media, or a single read-write disk), and the existing implementations
-> > use two separate devices. So even if you're not convinced that users
-> > will consider them different concepts (I am; and if they weren't
-> > different concepts, you wouldn't need an is_cdrom variable), consistency
-> > is still a good thing.
-> 
-> Ok. I'll split the device as you suggest... it may mean duplicated
-> code, but the datapath can still be common.
+Add a README file that tells people this is a jekyll based static
+website, and shows people how to run jekyll for testing purposes.
 
-If you have a look at IDE and SCSI, they don't really duplicate a lot of
-code. Basically it's just a second QOM class definition, the rest is
-shared. Even the realize functions are essentially shared, with just two
-small wrappers for each device type around the common code.
+Tested-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ .gitignore  |  2 ++
+ README      | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ _config.yml |  2 ++
+ 3 files changed, 59 insertions(+)
+ create mode 100644 README
 
-Kevin
+diff --git a/.gitignore b/.gitignore
+index 29949d4..c744144 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,2 +1,4 @@
+ /_site
+ /Gemfile.lock
++/vendor
++/.bundle
+diff --git a/README b/README
+new file mode 100644
+index 0000000..2e591fe
+--- /dev/null
++++ b/README
+@@ -0,0 +1,55 @@
++QEMU Website
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++This repository provides content for the QEMU website.
++
++It uses the Jekyll site generator for turning the static content into
++a format which can then be directly hosted by a regular HTTP server
++such as Apache.
++
++
++Testing locally with Jekyll
++---------------------------
++
++When adding/changing content on this site, it is possible to run a
++local Jekyll service to test the result.
++
++QEMU requires a specific version of Jekyll (listedin Gemfile) which may
++not match that provided by your OS vendor. Thus as a one time step the
++required Jekyll software should be installed locally:
++
++* Install OS vendor ruby with development headers
++
++   # sudo dnf install ruby ruby-devel   (Fedora)
++   # sudo yum install ruby ruby-devel   (RHEL)
++   # sudo apt-get install ruby ruby-dev (Debian / Ubuntu)
++
++* Install OS vendor ruby gem bundler
++
++   # sudo dnf install rubygem-bundler  (Fedora)
++   # sudo yum install rubygem-bundler  (RHEL)
++   # sudo apt-get install bundler      (Debian / Ubuntu)
++
++* Install Jekyll and its dependencies
++
++   # bundle install --path vendor
++
++  NB this last command must be run from the qemu-web.git checkout
++  root directory.
++
++Jekyll is now installed into the 'vendor/' directory of the git checkout=
+.
++Note the 'vendor/' path has been explicitly excluded from the web conten=
+t
++in '_config.yml', so don't try to use a different path within the git
++checkout.
++
++To test the site launch jeykll
++
++  # bundle exec jekyll serve
++
++Now simply point a local web browser to http://127.0.0.1:4000 to browse
++the generated site.
++
++Jekyll will usually automatically detect changes to files in the git
++checkout and regenerate the site. It is thus not normally necessary
++to restart jekyll after changing content, unless it shows signs of being
++confused / stale.
+diff --git a/_config.yml b/_config.yml
+index 0a0201c..576b0a5 100644
+--- a/_config.yml
++++ b/_config.yml
+@@ -37,3 +37,5 @@ gems:
+ exclude:
+   - Gemfile
+   - Gemfile.lock
++  - vendor/
++  - README
+--=20
+2.19.2
