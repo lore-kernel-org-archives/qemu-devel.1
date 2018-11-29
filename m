@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gSKzC-0006VG-2w
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:00:07 -0500
+	(envelope-from <kde@carewolf.com>) id 1gSKzJ-0006VH-Ar
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:00:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gSKwF-0006kq-GG
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:57:02 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:38384
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1gSKwF-0006Zo-8c
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:56:59 -0500
-References: <1543442171-24863-1-git-send-email-linux@roeck-us.net>
-	<1543442171-24863-2-git-send-email-linux@roeck-us.net>
-	<3d1287e7-29c1-dbb1-c0f9-273b7b31645c@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <734e8388-2f0f-1c5b-7767-29e43d261bcb@ilande.co.uk>
-Date: Thu, 29 Nov 2018 11:56:39 +0000
+	(envelope-from <kde@carewolf.com>) id 1gSKtk-0003if-GM
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:54:27 -0500
+Received: from mailrelay2-3.pub.mailoutpod1-cph3.one.com ([46.30.212.11]:56406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kde@carewolf.com>) id 1gSKtj-0003gf-Rw
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:54:24 -0500
+From: Allan Sandfeld Jensen <kde@carewolf.com>
+Date: Thu, 29 Nov 2018 12:54:19 +0100
+Message-ID: <4110462.LvFx2qVVIh@twilight>
 MIME-Version: 1.0
-In-Reply-To: <3d1287e7-29c1-dbb1-c0f9-273b7b31645c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] scsi: esp: Improve consistency of
- RSTAT, RSEQ, and RINTR
+Content-Type: multipart/mixed; boundary="nextPart2094052.ElGaqSPkdT"
+Content-Transfer-Encoding: 7Bit
+Subject: [Qemu-devel] Support for Intel GPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +24,572 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Guenter Roeck <linux@roeck-us.net>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 29/11/2018 09:58, Paolo Bonzini wrote:
+This is a multi-part message in MIME format.
 
-> On 28/11/18 22:56, Guenter Roeck wrote:
->> The guest OS reads RSTAT, RSEQ, and RINTR, and expects those registers
->> to reflect a consistent state. However, it is possible that the registers
->> can change after RSTAT was read, but before RINTR is read.
->>
->> Guest OS		qemu
->> --------		----
->> Read RSTAT
->> 			esp_command_complete()
->> 			 RSTAT = STAT_ST
->> 			 esp_dma_done()
->> 			  RSTAT |= STAT_TC
->> 			  RSEQ = 0
->> 			  RINTR = INTR_BS
->>
->> Read RSEQ
->> Read RINTR		RINTR = 0
->> 			RSTAT &= ~STAT_TC
->> 			RSEQ = SEQ_CD
->>
->> The guest OS would then try to handle INTR_BS combined with an old
->> value of RSTAT. This sometimes resulted in lost events, spurious
->> interrupts, guest OS confusion, and stalled SCSI operations.
-> 
-> The question is, why was the guest running the interrupt routine before
-> STAT_INT was set in RSTAT?  The code in esp_raise_irq seems good:
-> 
->     if (!(s->rregs[ESP_RSTAT] & STAT_INT)) {
->         s->rregs[ESP_RSTAT] |= STAT_INT;
->         qemu_irq_raise(s->irq);
->         trace_esp_raise_irq();
->     }
-> 
-> Paolo
+--nextPart2094052.ElGaqSPkdT
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-This patch is very interesting, as I have a long-running regression trying to boot
-NextSTEP 3.3 on qemu-system-sparc which I eventually bisected down to the commit that
-turned on iothread by default in QEMU.
+I have attached a patch that enables support for direct use of Intel GPUs in 
+QEMU. With this you can build the libdrm and mesa on for instance an AArch64 
+emulated system and have native OpenGL support inside QEMU.
 
-The symptom is that ESP SCSI requests hang/timeout before the kernel is able to get
-to the userspace installer: however if you launch QEMU with "taskset –cpu-list 1
-qemu-system-sparc ..." then it works and you can complete the installation.
+The code has been sitting around on my drive for a year, and isn't quite as 
+polished as I would like it to be, but I thought it would better to get it out 
+there and see what people think.
 
-So certainly this suggests that there is a race condition still present in ESP
-somewhere. I've given this patch a spin, and in a few quick tests here I was able to
-consistently get further in kernel boot, but it still doesn't completely solve issue
-for me :/
+I have other patches for Radeon drivers, but it untested, and many of the 
+other DRM drivers are must harder to support as they have their own subcommand 
+systems on top of IOCTL that makes it hard to support with existing IOCTL 
+mapping in QEMU.  I can share those too if there is interest, I am just 
+starting with the one I have tested and know works at least for me.
+
+Best regards
+'Allan
+--nextPart2094052.ElGaqSPkdT
+Content-Disposition: attachment; filename="0001-Add-support-for-drm-ioctls.patch"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/x-patch; charset="UTF-8"; name="0001-Add-support-for-drm-ioctls.patch"
+
+>From 2ce0dc997c1ebc7a63dbd3ba3b7638b3a5f8432e Mon Sep 17 00:00:00 2001
+From: Allan Sandfeld Jensen <allan.jensen@qt.io>
+Date: Thu, 22 Feb 2018 12:42:13 +0100
+Subject: [PATCH 1/2] Add support for drm ioctls
+
+Tested with mesa on i915. Support for other drivers missing.
+---
+ configure                  |  19 +++
+ linux-user/ioctls.h        |  60 ++++++++
+ linux-user/syscall.c       |   5 +
+ linux-user/syscall_defs.h  |  84 +++++++++++
+ linux-user/syscall_types.h | 292 +++++++++++++++++++++++++++++++++++++
+ 5 files changed, 460 insertions(+)
+
+diff --git a/configure b/configure
+index 0a3c6a72c3..b67cd624bb 100755
+--- a/configure
++++ b/configure
+@@ -5386,6 +5386,20 @@ if compile_prog "" "" ; then
+     have_rtnetlink=yes
+ fi
+ 
++##########################################
++# check if we have libdrm available
++have_libdrm=no
++cat > $TMPC << EOF
++#include <libdrm/drm.h>
++#include <libdrm/i915_drm.h>
++int main(void) {
++  return DRM_IOCTL_PRIME_FD_TO_HANDLE | DRM_IOCTL_I915_GET_RESET_STATS;
++}
++EOF
++if compile_prog "" "" ; then
++    have_libdrm=yes
++fi
++
+ ##########################################
+ # check for usable AF_VSOCK environment
+ have_af_vsock=no
+@@ -6027,6 +6041,7 @@ echo "PIE               $pie"
+ echo "vde support       $vde"
+ echo "netmap support    $netmap"
+ echo "Linux AIO support $linux_aio"
++echo "Linux drm support (i915) $have_libdrm"
+ echo "ATTR/XATTR support $attr"
+ echo "Install blobs     $blobs"
+ echo "KVM support       $kvm"
+@@ -6813,6 +6828,10 @@ if test "$libxml2" = "yes" ; then
+   echo "LIBXML2_LIBS=$libxml2_libs" >> $config_host_mak
+ fi
+ 
++if test "$have_libdrm" = "yes" ; then
++  echo "CONFIG_LIBDRM=y" >> $config_host_mak
++fi
++
+ if test "$replication" = "yes" ; then
+   echo "CONFIG_REPLICATION=y" >> $config_host_mak
+ fi
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index ae8951625f..85f7c265b5 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -489,3 +489,63 @@
+   IOCTL_IGNORE(TIOCSTART)
+   IOCTL_IGNORE(TIOCSTOP)
+ #endif
++
++#if defined(CONFIG_LIBDRM) && HOST_LONG_BITS == TARGET_ABI_BITS && (defined(HOST_WORDS_BIGENDIAN) == defined(TARGET_WORDS_BIGENDIAN))
++  IOCTL(DRM_IOCTL_VERSION, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_version)))
++  IOCTL(DRM_IOCTL_GET_UNIQUE, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_unique)))
++  IOCTL(DRM_IOCTL_GET_MAGIC, IOC_R, MK_PTR(MK_STRUCT(STRUCT_drm_auth)))
++  IOCTL(DRM_IOCTL_IRQ_BUSID, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_irq_busid)))
++  IOCTL(DRM_IOCTL_GET_MAP, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_map)))
++  IOCTL(DRM_IOCTL_GET_CLIENT, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_client)))
++  IOCTL(DRM_IOCTL_SET_VERSION, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_set_version)))
++  IOCTL(DRM_IOCTL_MODESET_CTL, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_modeset_ctl)))
++  IOCTL(DRM_IOCTL_GEM_CLOSE, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_gem_close)))
++  IOCTL(DRM_IOCTL_GEM_FLINK, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_gem_flink)))
++  IOCTL(DRM_IOCTL_GEM_OPEN, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_gem_open)))
++  IOCTL(DRM_IOCTL_GET_CAP, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_get_cap)))
++  IOCTL(DRM_IOCTL_SET_CLIENT_CAP, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_set_client_cap)))
++  IOCTL(DRM_IOCTL_SET_UNIQUE, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_unique)))
++  IOCTL(DRM_IOCTL_AUTH_MAGIC, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_auth)))
++  IOCTL(DRM_IOCTL_BLOCK, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_block)))
++  IOCTL(DRM_IOCTL_UNBLOCK, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_block)))
++  IOCTL(DRM_IOCTL_CONTROL, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_control)))
++  IOCTL(DRM_IOCTL_ADD_MAP, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_map)))
++  IOCTL(DRM_IOCTL_RM_MAP, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_map)))
++
++  IOCTL(DRM_IOCTL_PRIME_HANDLE_TO_FD, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_prime_handle)))
++  IOCTL(DRM_IOCTL_PRIME_FD_TO_HANDLE, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_prime_handle)))
++
++  IOCTL(DRM_IOCTL_I915_INIT, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_i915_init_t)))
++  IOCTL(DRM_IOCTL_I915_FLUSH, 0, TYPE_NULL)
++  IOCTL(DRM_IOCTL_I915_FLIP, 0, TYPE_NULL)
++  IOCTL(DRM_IOCTL_I915_GETPARAM, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_getparam_t)))
++  IOCTL(DRM_IOCTL_I915_SETPARAM, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_i915_setparam_t)))
++  IOCTL(DRM_IOCTL_I915_GEM_EXECBUFFER, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_execbuffer)))
++  IOCTL(DRM_IOCTL_I915_GEM_EXECBUFFER2, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_execbuffer2)))
++  IOCTL(DRM_IOCTL_I915_GEM_EXECBUFFER2_WR, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_execbuffer2)))
++  IOCTL(DRM_IOCTL_I915_GEM_BUSY, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_busy)))
++  IOCTL(DRM_IOCTL_I915_GEM_THROTTLE, 0, TYPE_NULL)
++  IOCTL(DRM_IOCTL_I915_GEM_ENTERVT, 0, TYPE_NULL)
++  IOCTL(DRM_IOCTL_I915_GEM_LEAVEVT, 0, TYPE_NULL)
++  IOCTL(DRM_IOCTL_I915_GEM_PREAD, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_pread)))
++  IOCTL(DRM_IOCTL_I915_GEM_PWRITE, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_pwrite)))
++  IOCTL(DRM_IOCTL_I915_GEM_MMAP, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_mmap)))
++  IOCTL(DRM_IOCTL_I915_GEM_MMAP_GTT, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_mmap_gtt)))
++  IOCTL(DRM_IOCTL_I915_GEM_SET_DOMAIN, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_set_domain)))
++  IOCTL(DRM_IOCTL_I915_GEM_SW_FINISH, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_sw_finish)))
++  IOCTL(DRM_IOCTL_I915_GEM_CREATE, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_create)))
++  IOCTL(DRM_IOCTL_I915_GEM_SET_TILING, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_set_tiling)))
++  IOCTL(DRM_IOCTL_I915_GEM_GET_TILING, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_get_tiling)))
++  IOCTL(DRM_IOCTL_I915_GEM_GET_APERTURE, IOC_R, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_get_aperture)))
++  IOCTL(DRM_IOCTL_I915_GEM_MADVISE, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_madvise)))
++  IOCTL(DRM_IOCTL_I915_GEM_CONTEXT_CREATE, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_context_create)))
++  IOCTL(DRM_IOCTL_I915_GEM_CONTEXT_DESTROY, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_context_destroy)))
++  IOCTL(DRM_IOCTL_I915_GEM_SET_CACHING, IOC_W, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_caching)))
++  IOCTL(DRM_IOCTL_I915_GEM_GET_CACHING, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_caching)))
++  IOCTL(DRM_IOCTL_I915_REG_READ, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_reg_read)))
++  IOCTL(DRM_IOCTL_I915_GET_RESET_STATS, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_reset_stats)))
++  IOCTL(DRM_IOCTL_I915_GEM_USERPTR, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_userptr)))
++  IOCTL(DRM_IOCTL_I915_GEM_CONTEXT_GETPARAM, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_context_param)))
++  IOCTL(DRM_IOCTL_I915_GEM_CONTEXT_SETPARAM, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_drm_i915_gem_context_param)))
++
++#endif
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 280137da8c..695ab0251c 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -109,6 +109,11 @@
+ #include "linux_loop.h"
+ #include "uname.h"
+ 
++#ifdef CONFIG_LIBDRM
++#include <libdrm/drm.h>
++#include <libdrm/i915_drm.h>
++#endif
++
+ #include "qemu.h"
+ #include "fd-trans.h"
+ 
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 99bbce083c..70fe4a255b 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -2516,4 +2516,88 @@ struct target_user_cap_data {
+ /* Return size of the log buffer */
+ #define TARGET_SYSLOG_ACTION_SIZE_BUFFER   10
+ 
++#if defined(CONFIG_LIBDRM) && HOST_LONG_BITS == TARGET_ABI_BITS && (defined(HOST_WORDS_BIGENDIAN) == defined(TARGET_WORDS_BIGENDIAN))
++
++#define TARGET_DRM_IOCTL_BASE       'd'
++#define TARGET_DRM_IO(nr)           TARGET_IO(TARGET_DRM_IOCTL_BASE,nr)
++#define TARGET_DRM_IOR(nr,type)     TARGET_IOR(TARGET_DRM_IOCTL_BASE,nr,type)
++#define TARGET_DRM_IOW(nr,type)     TARGET_IOW(TARGET_DRM_IOCTL_BASE,nr,type)
++#define TARGET_DRM_IOWR(nr,type)    TARGET_IOWR(TARGET_DRM_IOCTL_BASE,nr,type)
++
++#define TARGET_DRM_IOCTL_VERSION        TARGET_DRM_IOWR(0x00, struct drm_version)
++#define TARGET_DRM_IOCTL_GET_UNIQUE     TARGET_DRM_IOWR(0x01, struct drm_unique)
++#define TARGET_DRM_IOCTL_GET_MAGIC      TARGET_DRM_IOR( 0x02, struct drm_auth)
++#define TARGET_DRM_IOCTL_IRQ_BUSID      TARGET_DRM_IOWR(0x03, struct drm_irq_busid)
++#define TARGET_DRM_IOCTL_GET_MAP        TARGET_DRM_IOWR(0x04, struct drm_map)
++#define TARGET_DRM_IOCTL_GET_CLIENT     TARGET_DRM_IOWR(0x05, struct drm_client)
++#define TARGET_DRM_IOCTL_GET_STATS      TARGET_DRM_IOR( 0x06, struct drm_stats)
++#define TARGET_DRM_IOCTL_SET_VERSION    TARGET_DRM_IOWR(0x07, struct drm_set_version)
++#define TARGET_DRM_IOCTL_MODESET_CTL    TARGET_DRM_IOW( 0x08, struct drm_modeset_ctl)
++#define TARGET_DRM_IOCTL_GEM_CLOSE      TARGET_DRM_IOW (0x09, struct drm_gem_close)
++#define TARGET_DRM_IOCTL_GEM_FLINK      TARGET_DRM_IOWR(0x0a, struct drm_gem_flink)
++#define TARGET_DRM_IOCTL_GEM_OPEN       TARGET_DRM_IOWR(0x0b, struct drm_gem_open)
++#define TARGET_DRM_IOCTL_GET_CAP        TARGET_DRM_IOWR(0x0c, struct drm_get_cap)
++#define TARGET_DRM_IOCTL_SET_CLIENT_CAP TARGET_DRM_IOW( 0x0d, struct drm_set_client_cap)
++#define TARGET_DRM_IOCTL_SET_UNIQUE     TARGET_DRM_IOW( 0x10, struct drm_unique)
++#define TARGET_DRM_IOCTL_AUTH_MAGIC     TARGET_DRM_IOW( 0x11, struct drm_auth)
++#define TARGET_DRM_IOCTL_BLOCK          TARGET_DRM_IOWR(0x12, struct drm_block)
++#define TARGET_DRM_IOCTL_UNBLOCK        TARGET_DRM_IOWR(0x13, struct drm_block)
++#define TARGET_DRM_IOCTL_CONTROL        TARGET_DRM_IOW( 0x14, struct drm_control)
++#define TARGET_DRM_IOCTL_ADD_MAP        TARGET_DRM_IOWR(0x15, struct drm_map)
++#define TARGET_DRM_IOCTL_RM_MAP         TARGET_DRM_IOW( 0x1b, struct drm_map)
++
++#define TARGET_DRM_IOCTL_PRIME_HANDLE_TO_FD TARGET_DRM_IOWR(0x2d, struct drm_prime_handle)
++#define TARGET_DRM_IOCTL_PRIME_FD_TO_HANDLE TARGET_DRM_IOWR(0x2e, struct drm_prime_handle)
++
++#define TARGET_DRM_IOCTL_I915_INIT              TARGET_DRM_IOW( 0x40, drm_i915_init_t)
++#define TARGET_DRM_IOCTL_I915_FLUSH             TARGET_DRM_IO ( 0x41)
++#define TARGET_DRM_IOCTL_I915_FLIP              TARGET_DRM_IO ( 0x42)
++#define TARGET_DRM_IOCTL_I915_BATCHBUFFER       TARGET_DRM_IOW( 0x43, drm_i915_batchbuffer_t)
++#define TARGET_DRM_IOCTL_I915_IRQ_EMIT          TARGET_DRM_IOWR(0x44, drm_i915_irq_emit_t)
++#define TARGET_DRM_IOCTL_I915_IRQ_WAIT          TARGET_DRM_IOW( 0x45, drm_i915_irq_wait_t)
++#define TARGET_DRM_IOCTL_I915_GETPARAM          TARGET_DRM_IOWR(0x46, drm_i915_getparam_t)
++#define TARGET_DRM_IOCTL_I915_SETPARAM          TARGET_DRM_IOW( 0x47, drm_i915_setparam_t)
++#define TARGET_DRM_IOCTL_I915_ALLOC             TARGET_DRM_IOWR(0x48, drm_i915_mem_alloc_t)
++#define TARGET_DRM_IOCTL_I915_FREE              TARGET_DRM_IOW( 0x49, drm_i915_mem_free_t)
++#define TARGET_DRM_IOCTL_I915_INIT_HEAP         TARGET_DRM_IOW( 0x4a, drm_i915_mem_init_heap_t)
++#define TARGET_DRM_IOCTL_I915_CMDBUFFER         TARGET_DRM_IOW( 0x4b, drm_i915_cmdbuffer_t)
++#define TARGET_DRM_IOCTL_I915_DESTROY_HEAP      TARGET_DRM_IOW( 0x4c, drm_i915_mem_destroy_heap_t)
++#define TARGET_DRM_IOCTL_I915_SET_VBLANK_PIPE   TARGET_DRM_IOW( 0x4d, drm_i915_vblank_pipe_t)
++#define TARGET_DRM_IOCTL_I915_GET_VBLANK_PIPE   TARGET_DRM_IOR( 0x4e, drm_i915_vblank_pipe_t)
++#define TARGET_DRM_IOCTL_I915_VBLANK_SWAP       TARGET_DRM_IOWR(0x4f, drm_i915_vblank_swap_t)
++#define TARGET_DRM_IOCTL_I915_HWS_ADDR          TARGET_DRM_IOW( 0x51, struct drm_i915_gem_init)
++#define TARGET_DRM_IOCTL_I915_GEM_INIT          TARGET_DRM_IOW( 0x53, struct drm_i915_gem_init)
++#define TARGET_DRM_IOCTL_I915_GEM_EXECBUFFER    TARGET_DRM_IOW( 0x54, struct drm_i915_gem_execbuffer)
++#define TARGET_DRM_IOCTL_I915_GEM_EXECBUFFER2   TARGET_DRM_IOW( 0x69, struct drm_i915_gem_execbuffer2)
++#define TARGET_DRM_IOCTL_I915_GEM_EXECBUFFER2_WR    TARGET_DRM_IOWR( 0x69, struct drm_i915_gem_execbuffer2)
++#define TARGET_DRM_IOCTL_I915_GEM_PIN           TARGET_DRM_IOWR(0x55, struct drm_i915_gem_pin)
++#define TARGET_DRM_IOCTL_I915_GEM_UNPIN         TARGET_DRM_IOW( 0x56, struct drm_i915_gem_unpin)
++#define TARGET_DRM_IOCTL_I915_GEM_BUSY          TARGET_DRM_IOWR(0x57, struct drm_i915_gem_busy)
++#define TARGET_DRM_IOCTL_I915_GEM_THROTTLE      TARGET_DRM_IO ( 0x58)
++#define TARGET_DRM_IOCTL_I915_GEM_ENTERVT       TARGET_DRM_IO ( 0x59)
++#define TARGET_DRM_IOCTL_I915_GEM_LEAVEVT       TARGET_DRM_IO ( 0x5a)
++#define TARGET_DRM_IOCTL_I915_GEM_CREATE        TARGET_DRM_IOWR(0x5b, struct drm_i915_gem_create)
++#define TARGET_DRM_IOCTL_I915_GEM_PREAD         TARGET_DRM_IOW (0x5c, struct drm_i915_gem_pread)
++#define TARGET_DRM_IOCTL_I915_GEM_PWRITE        TARGET_DRM_IOW (0x5d, struct drm_i915_gem_pwrite)
++#define TARGET_DRM_IOCTL_I915_GEM_MMAP          TARGET_DRM_IOWR(0x5e, struct drm_i915_gem_mmap)
++#define TARGET_DRM_IOCTL_I915_GEM_MMAP_GTT      TARGET_DRM_IOWR(0x64, struct drm_i915_gem_mmap_gtt)
++#define TARGET_DRM_IOCTL_I915_GEM_SET_DOMAIN    TARGET_DRM_IOW (0x5f, struct drm_i915_gem_set_domain)
++#define TARGET_DRM_IOCTL_I915_GEM_SW_FINISH     TARGET_DRM_IOW (0x60, struct drm_i915_gem_sw_finish)
++#define TARGET_DRM_IOCTL_I915_GEM_SET_TILING    TARGET_DRM_IOWR(0x61, struct drm_i915_gem_set_tiling)
++#define TARGET_DRM_IOCTL_I915_GEM_GET_TILING    TARGET_DRM_IOWR(0x62, struct drm_i915_gem_get_tiling)
++#define TARGET_DRM_IOCTL_I915_GEM_GET_APERTURE  TARGET_DRM_IOR (0x63, struct drm_i915_gem_get_aperture)
++#define TARGET_DRM_IOCTL_I915_GEM_MADVISE       TARGET_DRM_IOWR(0x66, struct drm_i915_gem_madvise)
++
++#define TARGET_DRM_IOCTL_I915_GEM_CONTEXT_CREATE    TARGET_DRM_IOWR(0x6d, struct drm_i915_gem_context_create)
++#define TARGET_DRM_IOCTL_I915_GEM_CONTEXT_DESTROY   TARGET_DRM_IOW (0x6e, struct drm_i915_gem_context_destroy)
++#define TARGET_DRM_IOCTL_I915_GEM_SET_CACHING       TARGET_DRM_IOW( 0x6f, struct drm_i915_gem_caching)
++#define TARGET_DRM_IOCTL_I915_GEM_GET_CACHING       TARGET_DRM_IOWR(0x70, struct drm_i915_gem_caching)
++#define TARGET_DRM_IOCTL_I915_REG_READ              TARGET_DRM_IOWR(0x71, struct drm_i915_reg_read)
++#define TARGET_DRM_IOCTL_I915_GET_RESET_STATS       TARGET_DRM_IOWR(0x72, struct drm_i915_reset_stats)
++#define TARGET_DRM_IOCTL_I915_GEM_USERPTR           TARGET_DRM_IOWR(0x73, struct drm_i915_gem_userptr)
++#define TARGET_DRM_IOCTL_I915_GEM_CONTEXT_GETPARAM  TARGET_DRM_IOWR(0x74, struct drm_i915_gem_context_param)
++#define TARGET_DRM_IOCTL_I915_GEM_CONTEXT_SETPARAM  TARGET_DRM_IOWR(0x75, struct drm_i915_gem_context_param)
++
++#endif /* CONFIG_LIBDRM */
++
+ #endif
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index b98a23b0f1..80954c7817 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -334,3 +334,295 @@ STRUCT(usbdevfs_disconnect_claim,
+         TYPE_INT, /* flags */
+         MK_ARRAY(TYPE_CHAR, USBDEVFS_MAXDRIVERNAME + 1)) /* driver */
+ #endif /* CONFIG_USBFS */
++
++#if defined(CONFIG_LIBDRM) && HOST_LONG_BITS == TARGET_ABI_BITS && (defined(HOST_WORDS_BIGENDIAN) == defined(TARGET_WORDS_BIGENDIAN))
++STRUCT(drm_version,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_ULONG,
++       TYPE_PTRVOID,
++       TYPE_ULONG,
++       TYPE_PTRVOID,
++       TYPE_ULONG,
++       TYPE_PTRVOID
++)
++
++STRUCT(drm_unique,
++       TYPE_ULONG,
++       TYPE_PTRVOID
++)
++
++STRUCT(drm_block,
++       TYPE_INT
++)
++
++STRUCT(drm_control,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_auth,
++       TYPE_INT
++)
++
++STRUCT(drm_irq_busid,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_map,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_PTRVOID,
++       TYPE_INT
++)
++
++STRUCT(drm_client,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_set_version,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_modeset_ctl,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_gem_close,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_gem_flink,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_gem_open,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_get_cap,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_set_client_cap,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_prime_handle,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_init_t,
++       TYPE_INT, /*func*/
++       TYPE_INT, /*mmio_offset*/
++       TYPE_INT, /*sarea_priv_offset*/
++       TYPE_INT, /*ring_start*/
++       TYPE_INT, /*ring_end*/
++       TYPE_INT, /*ring_size*/
++       TYPE_INT, /*front_offset*/
++       TYPE_INT, /*back_offset*/
++       TYPE_INT, /*depth_offset*/
++       TYPE_INT, /*w*/
++       TYPE_INT, /*h*/
++       TYPE_INT, /*pitch*/
++       TYPE_INT, /*pitch_bits*/
++       TYPE_INT, /*back_pitch*/
++       TYPE_INT, /*depth_pitch*/
++       TYPE_INT, /*cpp*/
++       TYPE_INT  /*chipset*/
++)
++
++STRUCT(drm_i915_gem_init,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_i915_gem_create,
++       TYPE_ULONGLONG,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_getparam_t,
++       TYPE_INT,
++       TYPE_PTRVOID
++)
++
++STRUCT(drm_i915_setparam_t,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_gem_execbuffer,
++       TYPE_ULONGLONG,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_i915_gem_exec_object2,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_i915_gem_execbuffer2,
++       TYPE_ULONGLONG,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_i915_gem_busy,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_gem_pread,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_i915_gem_pwrite,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_i915_gem_mmap,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_i915_gem_mmap_gtt,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_i915_gem_set_domain,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_gem_sw_finish,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_gem_caching,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_gem_set_tiling,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_gem_get_tiling,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_gem_get_aperture,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_i915_gem_madvise,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_gem_context_create,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_gem_context_destroy,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_reg_read,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++
++STRUCT(drm_i915_reset_stats,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_gem_userptr,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG,
++       TYPE_INT,
++       TYPE_INT
++)
++
++STRUCT(drm_i915_gem_context_param,
++       TYPE_INT,
++       TYPE_INT,
++       TYPE_ULONGLONG,
++       TYPE_ULONGLONG
++)
++#endif
+-- 
+2.20.0.rc1
 
 
-ATB,
-
-Mark.
+--nextPart2094052.ElGaqSPkdT--
