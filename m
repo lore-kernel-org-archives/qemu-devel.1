@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gSKz6-0006Tm-Pt
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:00:00 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gSKzC-0006VG-2w
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:00:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gSKxZ-0007vs-R0
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:58:24 -0500
-Resent-Message-Id: <E1gSKxZ-0007vs-R0@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21317)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1gSKwF-0006kq-GG
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:57:02 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:38384
+	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gSKxZ-0007uo-IG
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:58:21 -0500
-In-Reply-To: <1543343726-53531-1-git-send-email-pbonzini@redhat.com>
-Message-ID: <154349266655.23684.4566538376541629747@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1gSKwF-0006Zo-8c
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 06:56:59 -0500
+References: <1543442171-24863-1-git-send-email-linux@roeck-us.net>
+	<1543442171-24863-2-git-send-email-linux@roeck-us.net>
+	<3d1287e7-29c1-dbb1-c0f9-273b7b31645c@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <734e8388-2f0f-1c5b-7767-29e43d261bcb@ilande.co.uk>
+Date: Thu, 29 Nov 2018 11:56:39 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 29 Nov 2018 03:57:47 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] glib-compat: work around g_test_message
- bug with subprocess tests
+In-Reply-To: <3d1287e7-29c1-dbb1-c0f9-273b7b31645c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] scsi: esp: Improve consistency of
+ RSTAT, RSEQ, and RINTR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Guenter Roeck <linux@roeck-us.net>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGdsaWItY29tcGF0OiB3b3JrIGFyb3VuZCBnX3Rl
-c3RfbWVzc2FnZSBidWcgd2l0aCBzdWJwcm9jZXNzIHRlc3RzCk1lc3NhZ2UtaWQ6IDE1NDMzNDM3
-MjYtNTM1MzEtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxv
-ZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChn
-aXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7
-IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0t
-Zm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAu
-L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9
-MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA2MmU2NTkg
-Z2xpYi1jb21wYXQ6IHdvcmsgYXJvdW5kIGdfdGVzdF9tZXNzYWdlIGJ1ZyB3aXRoIHN1YnByb2Nl
-c3MgdGVzdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogZ2xpYi1j
-b21wYXQ6IHdvcmsgYXJvdW5kIGdfdGVzdF9tZXNzYWdlIGJ1ZyB3aXRoIHN1YnByb2Nlc3MgdGVz
-dHMuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMwOiBGSUxFOiBpbmNsdWRl
-L2dsaWItY29tcGF0Lmg6MTE3OgorI2RlZmluZSBnX3Rlc3RfbWVzc2FnZSguLi4pCQkJCQkJCVwK
-CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMwOiBGSUxFOiBpbmNs
-dWRlL2dsaWItY29tcGF0Lmg6MTE3OgorI2RlZmluZSBnX3Rlc3RfbWVzc2FnZSguLi4pXkleSV5J
-XkleSV5JXklcJAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMxOiBGSUxFOiBp
-bmNsdWRlL2dsaWItY29tcGF0Lmg6MTE4OgorCWRvIHsJCQkJCQkJCQlcCgpFUlJPUjogY29kZSBp
-bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMTogRklMRTogaW5jbHVkZS9nbGliLWNvbXBh
-dC5oOjExODoKK15JZG8ge15JXkleSV5JXkleSV5JXkleSVwkCgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojMzI6IEZJTEU6IGluY2x1ZGUvZ2xpYi1jb21wYXQuaDoxMTk6CisJCWlm
-ICghZ190ZXN0X3N1YnByb2Nlc3MoKSkgZ190ZXN0X21lc3NhZ2UoX19WQV9BUkdTX18pOwkJXAoK
-RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzI6IEZJTEU6IGluY2x1
-ZGUvZ2xpYi1jb21wYXQuaDoxMTk6CiteSV5JaWYgKCFnX3Rlc3Rfc3VicHJvY2VzcygpKSBnX3Rl
-c3RfbWVzc2FnZShfX1ZBX0FSR1NfXyk7XkleSVwkCgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50
-cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMzMjogRklMRTogaW5jbHVkZS9nbGliLWNvbXBhdC5o
-OjExOToKKwkJaWYgKCFnX3Rlc3Rfc3VicHJvY2VzcygpKSBnX3Rlc3RfbWVzc2FnZShfX1ZBX0FS
-R1NfXyk7CQlcCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9m
-IHRoaXMgc3RhdGVtZW50CiMzMjogRklMRTogaW5jbHVkZS9nbGliLWNvbXBhdC5oOjExOToKKwkJ
-aWYgKCFnX3Rlc3Rfc3VicHJvY2VzcygpKSBnX3Rlc3RfbWVzc2FnZShfX1ZBX0FSR1NfXyk7CQlc
-ClsuLi5dCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMzogRklM
-RTogaW5jbHVkZS9nbGliLWNvbXBhdC5oOjEyMDoKK15JfSB3aGlsZSAoMCkkCgp0b3RhbDogNiBl
-cnJvcnMsIDMgd2FybmluZ3MsIDEwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 29/11/2018 09:58, Paolo Bonzini wrote:
+
+> On 28/11/18 22:56, Guenter Roeck wrote:
+>> The guest OS reads RSTAT, RSEQ, and RINTR, and expects those registers
+>> to reflect a consistent state. However, it is possible that the registers
+>> can change after RSTAT was read, but before RINTR is read.
+>>
+>> Guest OS		qemu
+>> --------		----
+>> Read RSTAT
+>> 			esp_command_complete()
+>> 			 RSTAT = STAT_ST
+>> 			 esp_dma_done()
+>> 			  RSTAT |= STAT_TC
+>> 			  RSEQ = 0
+>> 			  RINTR = INTR_BS
+>>
+>> Read RSEQ
+>> Read RINTR		RINTR = 0
+>> 			RSTAT &= ~STAT_TC
+>> 			RSEQ = SEQ_CD
+>>
+>> The guest OS would then try to handle INTR_BS combined with an old
+>> value of RSTAT. This sometimes resulted in lost events, spurious
+>> interrupts, guest OS confusion, and stalled SCSI operations.
+> 
+> The question is, why was the guest running the interrupt routine before
+> STAT_INT was set in RSTAT?  The code in esp_raise_irq seems good:
+> 
+>     if (!(s->rregs[ESP_RSTAT] & STAT_INT)) {
+>         s->rregs[ESP_RSTAT] |= STAT_INT;
+>         qemu_irq_raise(s->irq);
+>         trace_esp_raise_irq();
+>     }
+> 
+> Paolo
+
+This patch is very interesting, as I have a long-running regression trying to boot
+NextSTEP 3.3 on qemu-system-sparc which I eventually bisected down to the commit that
+turned on iothread by default in QEMU.
+
+The symptom is that ESP SCSI requests hang/timeout before the kernel is able to get
+to the userspace installer: however if you launch QEMU with "taskset –cpu-list 1
+qemu-system-sparc ..." then it works and you can complete the installation.
+
+So certainly this suggests that there is a race condition still present in ESP
+somewhere. I've given this patch a spin, and in a few quick tests here I was able to
+consistently get further in kernel boot, but it still doesn't completely solve issue
+for me :/
+
+
+ATB,
+
+Mark.
