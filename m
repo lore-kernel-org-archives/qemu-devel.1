@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gSHtK-0000Dy-CI
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:41:46 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1gSHu1-000100-0H
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:42:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1gSHtG-0004Y5-5I
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:41:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38336)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1gSHtC-0004SQ-4h
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:41:40 -0500
-Date: Thu, 29 Nov 2018 03:41:33 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <2086832273.37377459.1543480893515.JavaMail.zimbra@redhat.com>
-In-Reply-To: <4773dd7667ce53e3894ac705badd6e580808c6ce.1542699775.git.yi.z.zhang@linux.intel.com>
-References: <cover.1542699775.git.yi.z.zhang@linux.intel.com>
-	<4773dd7667ce53e3894ac705badd6e580808c6ce.1542699775.git.yi.z.zhang@linux.intel.com>
+	(envelope-from <eric.auger@redhat.com>) id 1gSHu0-00055c-1o
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:42:28 -0500
+References: <20181126154616.18173-1-eric.auger@redhat.com>
+	<b3c22264-2a95-b851-025c-b8ff0f38f269@redhat.com>
+	<65b68704-2c0b-e9b9-2cde-fea5c32161b3@gmail.com>
+	<a6e27638-1695-9608-366a-83bbbe873e55@redhat.com>
+	<2c6469e1-4da1-7f9d-4525-892287c4c5c1@gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8061b3b9-8857-221f-0d43-cbac25baf3e4@redhat.com>
+Date: Thu, 29 Nov 2018 09:42:15 +0100
 MIME-Version: 1.0
+In-Reply-To: <2c6469e1-4da1-7f9d-4525-892287c4c5c1@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V5_resend 1/7] numa: Fixed the memory leak
- of numa error message
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.1] hw/arm/virt-acpi-build: Fix SMMUv3
+ ACPI integration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Yi <yi.z.zhang@linux.intel.com>
-Cc: xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, dan j williams <dan.j.williams@intel.com>, stefanha@redhat.com, pbonzini@redhat.com, yu c zhang <yu.c.zhang@linux.intel.com>, imammedo@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com
+To: Shannon Zhao <shannon.zhaosl@gmail.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
+Cc: shameerali.kolothum.thodi@huawei.com
 
+Hi Shannon,
 
-> 
-> object_get_canonical_path_component() returns a string which
-> must be freed using g_free().
-> 
-> Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
-> ---
->  numa.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/numa.c b/numa.c
-> index 50ec016..3875e1e 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -533,6 +533,7 @@ void memory_region_allocate_system_memory(MemoryRegion
-> *mr, Object *owner,
->              error_report("memory backend %s is used multiple times. Each "
->                           "-numa option must use a different memdev value.",
->                           path);
-> +            g_free(path);
->              exit(1);
->          }
->  
-> --
+On 11/29/18 3:24 AM, Shannon Zhao wrote:
+>=20
+>=20
+> On 2018/11/29 1:26, Auger Eric wrote:
+>>>>> =C2=A0=C2=A0 struct AcpiIortSmmu3 {
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ACPI_IORT_NODE_HEADER_DEF
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t base_address;
+>>>>> @@ -639,6 +645,8 @@ struct AcpiIortSmmu3 {
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t pri_gsiv;
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t gerr_gsiv;
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t sync_gsiv;
+>>>>> +=C2=A0=C2=A0=C2=A0 uint32_t pxm;
+>>> So if we use this field ,we need to set the flags with
+>>> ACPI_IORT_SMMU_V3_PXM_VALID
+>>>>> +=C2=A0=C2=A0=C2=A0 uint32_t id_mapping_index;
+>>> And if we use this field, it needs to set the revision to at least 1.
+>> But is it harmful to add those fields in the struct as this patch does=
+?
+>>
+>> - in our case ACPI_IORT_SMMU_V3_PXM_VALID flag is not set so the field
+>> value is ignored according to the spec and arm_smmu_v3_set_proximity()
+>> will not do anything.
+>>
+>> - SMMU control interrupts are all GSIV based so spec says that deviceI=
+D
+>> index is ignored.
+>>
+>> So eventually the fact the struct size is changing over the revisions
+>> does not look a problem because the node length is part of the struct
+>> and the offset to the ID array also is part of the structure.
+>>
+>> So I could have left the structure as before (because we don't use the
+>> functionalities associated to those fields). But on the other hand it'=
+s
+>> good to upgrade the struct according to Rev D now.
+>>
+>> So I think the patch is correct, isn't?
+> Yes, I think it's not harmful but it would be better to add some
+> comments to explain why we don't increase the revision number ATM.
+OK thank you for your input. I will repost for 3.2 and will upgrade the
+table structs and their associated revision fields.
 
-Reviewed-by: Pankaj gupta <pagupta@redhat.com>
+Thanks
 
-> 2.7.4
+Eric
+>=20
+> Thanks,
+> Shannon
+>=20
