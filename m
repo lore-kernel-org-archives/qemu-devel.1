@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gSEMC-0006jC-EY
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:55:21 -0500
+	(envelope-from <bounces@canonical.com>) id 1gSEW5-0003co-OK
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 00:05:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gSEM8-0001n5-GQ
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:55:18 -0500
-Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:39359)
+	(envelope-from <bounces@canonical.com>) id 1gSEW2-0006RS-Ie
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 00:05:33 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40440)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gSEM4-0001jD-Nx
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 23:55:14 -0500
-Received: by mail-it1-x143.google.com with SMTP id a6so1659730itl.4
-	for <qemu-devel@nongnu.org>; Wed, 28 Nov 2018 20:55:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gSEW2-0006QJ-9p
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 00:05:30 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gSEW1-0007ac-7O
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 05:05:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1608E2E80CB
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 05:05:29 +0000 (UTC)
 MIME-Version: 1.0
-References: <1543312923-3074-1-git-send-email-liq3ea@gmail.com>
-	<1543312923-3074-3-git-send-email-liq3ea@gmail.com>
-	<20181127102736.q2322bc6uw4wvvif@starbug-mbp.local>
-	<87a7lur8z8.fsf@dusky.pond.sub.org>
-In-Reply-To: <87a7lur8z8.fsf@dusky.pond.sub.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 29 Nov 2018 12:54:33 +0800
-Message-ID: <CAKXe6SLN2Av95SONvaT3C4sV5zvsxi8HFHXojWT0VQDwt8nCTA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw: vmmouse: drop DEFINE_PROP_PTR()
+Date: Thu, 29 Nov 2018 04:57:15 -0000
+From: GH Cao <1804961@bugs.launchpad.net>
+Reply-To: Bug 1804961 <1804961@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154309137717.32238.5287661827417174062.malonedeb@wampee.canonical.com>
+Message-Id: <154346743526.16870.13148512763185660507.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1804961] Re: qemu-system-aarch64: Windows 10
+ ARM64 BSoD on boot while using virt-3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +37,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Qemu Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Markus Armbruster <armbru@redhat.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=8827=
-=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=888:38=E5=86=99=E9=81=93=EF=BC=
-=9A
+And the namespace objects tree of virt-2.12 is this.
+https://pastebin.com/GybigJ9r
 
-> Darren Kenny <darren.kenny@oracle.com> writes:
->
-> > Hi Li Qiang,
-> >
-> > This is only a suggestion, I'm sure someone else might also correct
-> > me, but I'm not sure the subject above really describes what is
-> > happening in the commit as a whole.
-> >
-> > It seems to miss the point that the main change here is to use a
-> > link type property, so maybe it might be better written as something
-> > along the lines of:
-> >
-> >  Subject: [PATCH v2 2/2] hw: vmmouse: use link property instead of
-> pointer
-> >  Drop DEFINE_PROP_PTR() and replace with a link pointer via an
-> >  instance init function (vmmouse_instance_initfn).
->
-> Yes, that's better.  Or take inspiration from recent similar work, such
-> as commit a8299ec1b24, and say something like
->
->     vmmouse: Use link instead of pointer property
->
->     According to qdev-properties.h, properties of pointer type should
->     be avoided.  Turn "ps2_mouse" into a link.
->
-> Preferably with the commit message improved along these lines:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1804961
 
-Hi Darren and Markus,
+Title:
+  qemu-system-aarch64: Windows 10 ARM64 BSoD on boot while using
+  virt-3.0
 
-Thanks so much for your advice.
-A new revision has been sent out.
+Status in QEMU:
+  New
 
+Bug description:
+  When I emulate a virt-3.0 machine, Windows 10 BSoD on boot, with the
+  error code being ACPI_BIOS_ERROR(0x000000A5), virt-2.12 boots fine.
 
-Thanks,
-Li Qiang
+  Windows Build: 10.0.17134.1
+  QEMU version: 3.0.0
+  Commandline: qemu-system-aarch64 -M virt -accel tcg,thread=3Dmulti -cpu c=
+ortex-a57 -smp 2 -m 2048 -bios QEMU_EFI.fd -device ramfb -device nec-usb-xh=
+ci -device usb-kbd -device usb-tablet -hda disk.vhd -vnc :0
 
+  By the way, the patch to add DBG2 table discussed here
+  https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg01719.html
+  works (although minor change is required to adapt to the qemu 3.0.0
+  code), the table is accepted by Windows (Windows require both DBG2 and
+  SPCR to be valid for serial kernel debugging to work), so it may help
+  further diagnosing this issue.
 
->
-> [...]
->
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1804961/+subscriptions
