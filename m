@@ -1,41 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gSNpv-00044L-1M
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:02:40 -0500
+	(envelope-from <drjones@redhat.com>) id 1gSNvF-0000hq-7n
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:08:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gSNpr-00017l-7I
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:02:38 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:16357)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
-	id 1gSNpq-000177-V0
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:02:35 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wATEx2jB058870
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 10:02:34 -0500
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p2g4x6yag-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 10:02:32 -0500
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
-	Thu, 29 Nov 2018 15:02:29 -0000
-References: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
-	<1542904555-1136-3-git-send-email-pmorel@linux.ibm.com>
-	<20181129124545.18e74622.cohuck@redhat.com>
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Date: Thu, 29 Nov 2018 10:02:24 -0500
+	(envelope-from <drjones@redhat.com>) id 1gSNvE-0006iD-1f
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:08:09 -0500
+Date: Thu, 29 Nov 2018 16:07:43 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20181129150743.rsrrtsplzvzqie7o@kamzik.brq.redhat.com>
+References: <20181129132428.333-1-sameo@linux.intel.com>
+	<20181129132428.333-9-sameo@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20181129124545.18e74622.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <b56b8efd-2532-5028-d4c4-94d163104dd5@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] s390x/vfio: ap: Use the APdevice as
- a child of the APBus
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181129132428.333-9-sameo@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] hw: acpi: Remove AcpiRsdpDescriptor
+ and fix tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,98 +24,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>
-Cc: borntraeger@de.ibm.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, pasic@linux.ibm.com
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 11/29/18 6:45 AM, Cornelia Huck wrote:
-> On Thu, 22 Nov 2018 17:35:51 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Thu, Nov 29, 2018 at 02:24:28PM +0100, Samuel Ortiz wrote:
+> The only remaining AcpiRsdpDescriptor users are the ACPI utils for the
+> BIOS table tests.
+> We remove that dependency and can thus remove the structure itself.
 > 
->> Two good reasons to use the base device as a child of the
->> AP BUS:
->> - We can easily find the device without traversing the qtree.
->> - In case we have different APdevice instantiation, VFIO with
->>    interception or emulation, we will need the APDevice as
->>    a parent device.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   hw/s390x/ap-device.c         | 22 ++++++++++++++++++++++
->>   hw/vfio/ap.c                 | 16 ++++++----------
->>   include/hw/s390x/ap-device.h |  2 ++
->>   3 files changed, 30 insertions(+), 10 deletions(-)
->>
->> diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
->> index f5ac8db..554d5aa 100644
->> --- a/hw/s390x/ap-device.c
->> +++ b/hw/s390x/ap-device.c
->> @@ -11,13 +11,35 @@
->>   #include "qemu/module.h"
->>   #include "qapi/error.h"
->>   #include "hw/qdev.h"
->> +#include "hw/s390x/ap-bridge.h"
->>   #include "hw/s390x/ap-device.h"
->>   
->> +APDevice *s390_get_ap(void)
->> +{
->> +    static DeviceState *apb;
->> +    BusState *bus;
->> +    BusChild *child;
->> +    static APDevice *ap;
->> +
->> +    if (ap) {
->> +        return ap;
->> +    }
->> +
->> +    apb = s390_get_ap_bridge();
->> +    /* We have only a single child on the BUS */
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> ---
+>  include/hw/acpi/acpi-defs.h | 13 -----------
+>  tests/acpi-utils.h          |  5 +++-
+>  tests/acpi-utils.c          | 46 ++++++++++++++++++++++++++++++-------
+>  tests/bios-tables-test.c    | 27 +++++++++++++++-------
+>  tests/vmgenid-test.c        |  8 ++++---
+>  5 files changed, 66 insertions(+), 33 deletions(-)
 > 
-> So, there'll never a mixed environment? Or would that have a 'hybrid'
-> ap device?
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index 8425ecb8c6..5021cb9e79 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -40,19 +40,6 @@ enum {
+>      ACPI_FADT_F_LOW_POWER_S0_IDLE_CAPABLE,
+>  };
+>  
+> -struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+> -    uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
+> -    uint8_t  checksum;               /* To make sum of struct == 0 */
+> -    uint8_t  oem_id [6];             /* OEM identification */
+> -    uint8_t  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
+> -    uint32_t rsdt_physical_address;  /* 32-bit physical address of RSDT */
+> -    uint32_t length;                 /* XSDT Length in bytes including hdr */
+> -    uint64_t xsdt_physical_address;  /* 64-bit physical address of XSDT */
+> -    uint8_t  extended_checksum;      /* Checksum of entire table */
+> -    uint8_t  reserved [3];           /* Reserved field must be 0 */
+> -} QEMU_PACKED;
+> -typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+> -
+>  typedef struct AcpiRsdpData {
+>      uint8_t oem_id[6]; /* OEM identification */
+>      uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
+> diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+> index ac52abd0dd..c26c8976a6 100644
+> --- a/tests/acpi-utils.h
+> +++ b/tests/acpi-utils.h
+> @@ -82,6 +82,9 @@ typedef struct {
+>  
+>  uint8_t acpi_calc_checksum(const uint8_t *data, int len);
+>  uint32_t acpi_find_rsdp_address(void);
+> -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
+> +uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table);
+> +uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
+> +void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table,
+> +                           uint8_t revision);
+>  
+>  #endif  /* TEST_ACPI_UTILS_H */
+> diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
+> index 41dc1ea9b4..b1113bda8b 100644
+> --- a/tests/acpi-utils.c
+> +++ b/tests/acpi-utils.c
+> @@ -52,14 +52,44 @@ uint32_t acpi_find_rsdp_address(void)
+>      return off;
+>  }
+>  
+> -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table)
+> +uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table)
+>  {
+> -    ACPI_READ_FIELD(rsdp_table->signature, addr);
+> -    ACPI_ASSERT_CMP64(rsdp_table->signature, "RSD PTR ");
+> +    uint32_t rsdt_physical_address;
+> +    uint8_t revision = rsdp_table[15 /* Revision offset */];
+>  
+> -    ACPI_READ_FIELD(rsdp_table->checksum, addr);
+> -    ACPI_READ_ARRAY(rsdp_table->oem_id, addr);
+> -    ACPI_READ_FIELD(rsdp_table->revision, addr);
+> -    ACPI_READ_FIELD(rsdp_table->rsdt_physical_address, addr);
+> -    ACPI_READ_FIELD(rsdp_table->length, addr);
+> +    if (revision != 0) { /* ACPI 1.0 RSDP */
+> +        return 0;
+> +    }
 
-It is not possible to have interpretation and interception. I suppose
-one could mix emulated and virtual AP devices, but that seems highly
-unlikely; in fact, I think it is highly unlikely that emulation is ever
-implemented.
+So now we assume a zero offset can't be valid, which means we don't need
+pointers in the struct. Your answer that pointers are used for consistency
+is good enough for me though.
 
-> 
->> +    bus = qdev_get_child_bus(apb, TYPE_AP_BUS);
->> +    child = QTAILQ_FIRST(&bus->children);
->> +    assert(child != NULL);
->> +    ap = DO_UPCAST(APDevice, parent_obj, child->child);
->> +    return ap;
->> +}
->> +
->>   static void ap_class_init(ObjectClass *klass, void *data)
->>   {
->>       DeviceClass *dc = DEVICE_CLASS(klass);
->>   
->>       dc->desc = "AP device class";
->> +    dc->bus_type = TYPE_AP_BUS;
->>       dc->hotpluggable = false;
->>   }
->>   
->> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
->> index 65de952..94e5a1a 100644
->> --- a/hw/vfio/ap.c
->> +++ b/hw/vfio/ap.c
->> @@ -35,9 +35,6 @@ typedef struct VFIOAPDevice {
->>       VFIODevice vdev;
->>   } VFIOAPDevice;
->>   
->> -#define VFIO_AP_DEVICE(obj) \
->> -        OBJECT_CHECK(VFIOAPDevice, (obj), VFIO_AP_DEVICE_TYPE)
-> 
-> Hm?
+> +
+> +    memcpy(&rsdt_physical_address, &rsdp_table[16 /* RsdtAddress offset */], 4);
+> +    return le32_to_cpu(rsdt_physical_address);
+> +}
+> +
+> +uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
+> +{
+> +    uint64_t xsdt_physical_address;
+> +    uint8_t revision = rsdp_table[15 /* Revision offset */];
+> +
+> +    if (revision != 2) { /* ACPI 2.0+ RSDP */
 
-I received a comment from Thomas Huth in Message ID
-<2291104a-4cbf-e4fd-3496-fa0910beb96a@redhat.com>
-that DO_UPCAST should be avoided in new code. This macro
-should probably be restored and an AP_DEVICE() macro added.
+revision < 2
 
+> +        return 0;
+> +    }
+> +
+> +    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
+> +    return le64_to_cpu(xsdt_physical_address);
+> +}
+> +
+> +void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table, uint8_t revision)
+> +{
+> +    switch (revision) {
+> +    case 0: /* ACPI 1.0 RSDP */
+> +        memread(addr, rsdp_table, 20);
+> +        break;
+> +    case 2: /* ACPI 2.0+ RSDP */
+> +        memread(addr, rsdp_table, 36);
+> +        break;
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+> +
+> +    ACPI_ASSERT_CMP64(*((uint64_t *)(rsdp_table)), "RSD PTR ");
+>  }
+> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> index d661d9be62..84f1500920 100644
+> --- a/tests/bios-tables-test.c
+> +++ b/tests/bios-tables-test.c
+> @@ -27,7 +27,8 @@ typedef struct {
+>      const char *machine;
+>      const char *variant;
+>      uint32_t rsdp_addr;
+> -    AcpiRsdpDescriptor rsdp_table;
+> +    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
+> +    uint32_t rsdt_physical_address;
+
+I don't see rsdt_physical_address getting used anyway.
+
+>      AcpiRsdtDescriptorRev1 rsdt_table;
+>      uint32_t dsdt_addr;
+>      uint32_t facs_addr;
+> @@ -83,21 +84,31 @@ static void test_acpi_rsdp_address(test_data *data)
+>      data->rsdp_addr = off;
+>  }
+>  
+> -static void test_acpi_rsdp_table(test_data *data)
+> +static void test_acpi_rsdp_table(test_data *data, uint8_t revision)
+>  {
+> -    AcpiRsdpDescriptor *rsdp_table = &data->rsdp_table;
+> +    uint8_t *rsdp_table = data->rsdp_table;
+>      uint32_t addr = data->rsdp_addr;
+>  
+> -    acpi_parse_rsdp_table(addr, rsdp_table);
+> +    acpi_parse_rsdp_table(addr, rsdp_table, revision);
+>  
+> -    /* rsdp checksum is not for the whole table, but for the first 20 bytes */
+> -    g_assert(!acpi_calc_checksum((uint8_t *)rsdp_table, 20));
+> +    switch (revision) {
+> +    case 0: /* ACPI 1.0 RSDP */
+> +        /* With rev 1, checksum is only for the first 20 bytes */
+> +        g_assert(!acpi_calc_checksum(rsdp_table,  20));
+> +        break;
+> +    case 2: /* ACPI 2.0+ RSDP */
+> +        /* With revision 2, we have 2 checksums */
+> +        g_assert(!acpi_calc_checksum(rsdp_table, 20));
+> +        g_assert(!acpi_calc_checksum(rsdp_table, 36));
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+>  }
+>  
+>  static void test_acpi_rsdt_table(test_data *data)
+>  {
+>      AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
+> -    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
+> +    uint32_t addr = acpi_get_rsdt_address(data->rsdp_table);
+>      uint32_t *tables;
+>      int tables_nr;
+>      uint8_t checksum;
+> @@ -626,7 +637,7 @@ static void test_acpi_one(const char *params, test_data *data)
+>  
+>      data->tables = g_array_new(false, true, sizeof(AcpiSdtTable));
+>      test_acpi_rsdp_address(data);
+> -    test_acpi_rsdp_table(data);
+> +    test_acpi_rsdp_table(data, 0); /* ACPI 1.0 RSDP */
+>      test_acpi_rsdt_table(data);
+>      fadt_fetch_facs_and_dsdt_ptrs(data);
+>      test_acpi_facs_table(data);
+> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+> index 0a6fb55f2e..5f30dee059 100644
+> --- a/tests/vmgenid-test.c
+> +++ b/tests/vmgenid-test.c
+> @@ -35,7 +35,7 @@ static uint32_t acpi_find_vgia(void)
+>  {
+>      uint32_t rsdp_offset;
+>      uint32_t guid_offset = 0;
+> -    AcpiRsdpDescriptor rsdp_table;
+> +    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
+>      uint32_t rsdt, rsdt_table_length;
+>      AcpiRsdtDescriptorRev1 rsdt_table;
+>      size_t tables_nr;
+> @@ -52,9 +52,11 @@ static uint32_t acpi_find_vgia(void)
+>  
+>      g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
+>  
+> -    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
+> +    acpi_parse_rsdp_table(rsdp_offset, rsdp_table, 0);
+> +
+> +    rsdt = acpi_get_rsdt_address(rsdp_table);
+> +    g_assert(rsdt);
+>  
+> -    rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
+>      /* read the header */
+>      ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
+>      ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
+> -- 
+> 2.19.2
 > 
->> -
->>   static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
->>   {
->>       vdev->needs_reset = false;
-> 
+>
+
+Thanks,
+drew 
