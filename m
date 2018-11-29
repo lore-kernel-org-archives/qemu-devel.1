@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSQR3-0000na-5B
+	(envelope-from <ehabkost@redhat.com>) id 1gSQR3-0000ni-A0
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:49:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSQQz-00073m-ES
+	(envelope-from <ehabkost@redhat.com>) id 1gSQR1-00074Z-3d
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:49:08 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181106102335.20027-1-kraxel@redhat.com>
-	<20181106102335.20027-4-kraxel@redhat.com>
-Date: Thu, 29 Nov 2018 18:48:49 +0100
-In-Reply-To: <20181106102335.20027-4-kraxel@redhat.com> (Gerd Hoffmann's
-	message of "Tue, 6 Nov 2018 11:23:32 +0100")
-Message-ID: <87in0f6agu.fsf@dusky.pond.sub.org>
+Received: from mx1.redhat.com ([209.132.183.28]:38634)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gSQR0-000746-TW
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:49:07 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A12B2308219A
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 17:49:05 +0000 (UTC)
+Date: Thu, 29 Nov 2018 15:49:00 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181129174900.GP18284@habkost.net>
+References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
+	<20181127092801.21777-26-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] Use QemuSupportState for machine
- types.
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181127092801.21777-26-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 25/28] machine: add compat-props
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +35,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael
-	S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com
 
-Gerd Hoffmann <kraxel@redhat.com> writes:
-
-> Switch over the current deprecation_reason users to use
-> the QemuSupportState field in ObjectClass instead.
->
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  include/hw/boards.h | 3 ---
->  hw/i386/pc_piix.c   | 5 ++++-
->  hw/ppc/prep.c       | 5 ++++-
->  vl.c                | 7 ++++---
->  4 files changed, 12 insertions(+), 8 deletions(-)
->
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index f82f28468b..b7bb181fc8 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -106,8 +106,6 @@ typedef struct {
->  
->  /**
->   * MachineClass:
-> - * @deprecation_reason: If set, the machine is marked as deprecated. The
-> - *    string should provide some clear information about what to use instead.
->   * @max_cpus: maximum number of CPUs supported. Default: 1
->   * @min_cpus: minimum number of CPUs supported. Default: 1
->   * @default_cpus: number of CPUs instantiated if none are specified. Default: 1
-> @@ -167,7 +165,6 @@ struct MachineClass {
->      char *name;
->      const char *alias;
->      const char *desc;
-> -    const char *deprecation_reason;
->  
->      void (*init)(MachineState *state);
->      void (*reset)(void);
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index dc09466b3e..407f4503a3 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -955,9 +955,12 @@ DEFINE_I440FX_MACHINE(v0_12, "pc-0.12", pc_compat_0_13,
->  
->  static void pc_i440fx_0_11_machine_options(MachineClass *m)
->  {
-> +    ObjectClass *oc = OBJECT_CLASS(m);
-> +
->      pc_i440fx_0_12_machine_options(m);
->      m->hw_version = "0.11";
-> -    m->deprecation_reason = "use a newer machine type instead";
-> +    oc->supported.state = SUPPORT_STATE_DEPRECATED;
-> +    oc->supported.help = "use a newer machine type instead";
->      SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
+On Tue, Nov 27, 2018 at 01:27:58PM +0400, Marc-Andr=E9 Lureau wrote:
+> Let's make compatiblity properties an interface, so that objects other
+> than QDev can benefit from having machine compatiblity properties.
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+[...]
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 3b31b2c025..b0ee05f837 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -970,28 +970,8 @@ static void device_initfn(Object *obj)
+>      QLIST_INIT(&dev->gpios);
 >  }
->  
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 2afb7f437e..260700847b 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -588,7 +588,10 @@ static void ppc_prep_init(MachineState *machine)
->  
->  static void prep_machine_init(MachineClass *mc)
+> =20
+> -static const GPtrArray *ac_compat_props;
+> -static const GPtrArray *mc_compat_props;
+> -
+> -void accel_register_compat_props(const GPtrArray *props)
+> -{
+> -    ac_compat_props =3D props;
+> -}
+> -
+> -void machine_register_compat_props(const GPtrArray *props)
+> -{
+> -    mc_compat_props =3D props;
+> -}
+> -
+>  static void device_post_init(Object *obj)
 >  {
-> -    mc->deprecation_reason = "use 40p machine type instead";
-> +    ObjectClass *oc = OBJECT_CLASS(mc);
-> +
-> +    oc->supported.state = SUPPORT_STATE_DEPRECATED;
-> +    oc->supported.help = "use 40p machine type instead";
->      mc->desc = "PowerPC PREP platform";
->      mc->init = ppc_prep_init;
->      mc->block_default_type = IF_IDE;
-> diff --git a/vl.c b/vl.c
-> index 1fcacc5caa..ba81fefb66 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2573,7 +2573,7 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
->              }
->              printf("%-20s %s%s%s\n", mc->name, mc->desc,
->                     mc->is_default ? " (default)" : "",
-> -                   mc->deprecation_reason ? " (deprecated)" : "");
-> +                   qemu_is_deprecated(OBJECT_CLASS(mc)) ? " (deprecated)" : "");
->          }
->      }
->  
-> @@ -4290,9 +4290,10 @@ int main(int argc, char **argv, char **envp)
->  
->      configure_accelerator(current_machine);
->  
-> -    if (!qtest_enabled() && machine_class->deprecation_reason) {
-> +    if (!qtest_enabled() && qemu_is_deprecated(OBJECT_CLASS(machine_class))) {
->          error_report("Machine type '%s' is deprecated: %s",
-> -                     machine_class->name, machine_class->deprecation_reason);
-> +                     machine_class->name,
-> +                     OBJECT_CLASS(machine_class)->supported.help);
->      }
->  
->      /*
+> -    if (ac_compat_props) {
+> -        object_apply_global_props(obj, ac_compat_props, &error_abort);
+> -    }
+> -    if (mc_compat_props) {
+> -        object_apply_global_props(obj, mc_compat_props, &error_abort);
+> -    }
+> -
+>      qdev_prop_set_globals(DEVICE(obj));
+>  }
+> =20
+> @@ -1124,6 +1104,10 @@ static const TypeInfo device_type_info =3D {
+>      .class_init =3D device_class_init,
+>      .abstract =3D true,
+>      .class_size =3D sizeof(DeviceClass),
+> +    .interfaces =3D (InterfaceInfo[]) {
+> +        { TYPE_COMPAT_PROPS },
+> +        { }
+> +    }
 
-Let's switch to warn_report() while we're touching it.
+At first I thought TYPE_COMPAT_PROPS was a practical way to
+implement this feature, but now I'm worried: the ordering between
+compat_props_post_init() qdev_prop_set_globals() is very
+important (user-provided globals must always be set after compat
+props), and here the ordering is implicit and easy to break
+accidentally.
+
+What if instead of a QOM interface we just provide a simple
+object_apply_compat_props() function?  e.g.:
+
+qdev.c:
+
+  static void device_post_init(Object *obj)
+  {
+      object_apply_compat_props(obj);
+      apply_user_provided_globals(obj);
+  }
+
+object_interface.c:
+
+  void user_creatable_complete(Object *obj, Error **errp)
+  {
+      object_apply_compat_props(obj);
+      ...
+      ucc->complete(...)
+  }
+
+Most people don't understand QOM interfaces and their
+initialization ordering rules.  Everybody understands C function
+calls.
+
+> [...]
+
+--=20
+Eduardo
