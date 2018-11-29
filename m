@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gSLfn-0000PO-OK
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:44:06 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gSLg7-0000bn-3N
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:44:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gSLXD-0004Sy-8Q
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:35:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59752)
+	(envelope-from <dgilbert@redhat.com>) id 1gSLQb-0000ca-8I
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:28:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58010)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gSLXD-0004Sn-2R
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:35:11 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4EA843001FE7
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 12:35:10 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 29 Nov 2018 13:35:02 +0100
-Message-Id: <20181129123502.30129-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] egl-headless: add egl_create_context
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gSLQb-0000aw-02
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:28:21 -0500
+Date: Thu, 29 Nov 2018 12:28:10 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181129122810.GE2333@work-vm>
+References: <20181126200435.23408-1-minyard@acm.org>
+	<20181126200435.23408-11-minyard@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181126200435.23408-11-minyard@acm.org>
+Subject: Re: [Qemu-devel] [PATCH v3 10/16] i2c:pm_smbus: Fix state transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +27,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: minyard@acm.org
+Cc: qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
 
-We must set the correct context (via eglMakeCurrent) before
-calling qemu_egl_create_context, so we need a thin wrapper and can't
-hook qemu_egl_create_context directly as ->dpy_gl_ctx_create callback.
+* minyard@acm.org (minyard@acm.org) wrote:
+> From: Corey Minyard <cminyard@mvista.com>
+> 
+> Transfer the state information for the SMBus registers and
+> internal data so it will work on a VM transfer.
+> 
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Reported-by: Frederik Carlier <frederik.carlier@quamotion.mobi>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/egl-headless.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-diff --git a/ui/egl-headless.c b/ui/egl-headless.c
-index 4cf3bbc0e4..519e7bad32 100644
---- a/ui/egl-headless.c
-+++ b/ui/egl-headless.c
-@@ -38,6 +38,14 @@ static void egl_gfx_switch(DisplayChangeListener *dcl,
-     edpy->ds = new_surface;
- }
- 
-+static QEMUGLContext egl_create_context(DisplayChangeListener *dcl,
-+                                        QEMUGLParams *params)
-+{
-+    eglMakeCurrent(qemu_egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE,
-+                   qemu_egl_rn_ctx);
-+    return qemu_egl_create_context(dcl, params);
-+}
-+
- static void egl_scanout_disable(DisplayChangeListener *dcl)
- {
-     egl_dpy *edpy = container_of(dcl, egl_dpy, dcl);
-@@ -150,7 +158,7 @@ static const DisplayChangeListenerOps egl_ops = {
-     .dpy_gfx_update          = egl_gfx_update,
-     .dpy_gfx_switch          = egl_gfx_switch,
- 
--    .dpy_gl_ctx_create       = qemu_egl_create_context,
-+    .dpy_gl_ctx_create       = egl_create_context,
-     .dpy_gl_ctx_destroy      = qemu_egl_destroy_context,
-     .dpy_gl_ctx_make_current = qemu_egl_make_context_current,
-     .dpy_gl_ctx_get_current  = qemu_egl_get_current_context,
--- 
-2.9.3
+> ---
+>  hw/acpi/piix4.c           |  7 +++++++
+>  hw/i2c/pm_smbus.c         | 31 +++++++++++++++++++++++++++++++
+>  hw/i2c/smbus_ich9.c       | 10 +++++++++-
+>  include/hw/i2c/pm_smbus.h |  9 +++++++++
+>  4 files changed, 56 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index 2f4dd03b83..91fe4821d3 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -302,6 +302,11 @@ static const VMStateDescription vmstate_cpuhp_state = {
+>      }
+>  };
+>  
+> +static bool piix4_vmstate_need_smbus(void *opaque, int version_id)
+> +{
+> +    return pm_smbus_vmstate_needed();
+> +}
+> +
+>  /* qemu-kvm 1.2 uses version 3 but advertised as 2
+>   * To support incoming qemu-kvm 1.2 migration, change version_id
+>   * and minimum_version_id to 2 below (which breaks migration from
+> @@ -321,6 +326,8 @@ static const VMStateDescription vmstate_acpi = {
+>          VMSTATE_UINT16(ar.pm1.evt.en, PIIX4PMState),
+>          VMSTATE_UINT16(ar.pm1.cnt.cnt, PIIX4PMState),
+>          VMSTATE_STRUCT(apm, PIIX4PMState, 0, vmstate_apm, APMState),
+> +        VMSTATE_STRUCT_TEST(smb, PIIX4PMState, piix4_vmstate_need_smbus, 3,
+> +                            pmsmb_vmstate, PMSMBus),
+>          VMSTATE_TIMER_PTR(ar.tmr.timer, PIIX4PMState),
+>          VMSTATE_INT64(ar.tmr.overflow_time, PIIX4PMState),
+>          VMSTATE_STRUCT(ar.gpe, PIIX4PMState, 2, vmstate_gpe, ACPIGPE),
+> diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+> index 8793113c25..2a9bc6e8c0 100644
+> --- a/hw/i2c/pm_smbus.c
+> +++ b/hw/i2c/pm_smbus.c
+> @@ -19,6 +19,7 @@
+>   */
+>  #include "qemu/osdep.h"
+>  #include "hw/hw.h"
+> +#include "hw/boards.h"
+>  #include "hw/i2c/pm_smbus.h"
+>  #include "hw/i2c/smbus_master.h"
+>  
+> @@ -450,6 +451,36 @@ static const MemoryRegionOps pm_smbus_ops = {
+>      .endianness = DEVICE_LITTLE_ENDIAN,
+>  };
+>  
+> +bool pm_smbus_vmstate_needed(void)
+> +{
+> +    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
+> +
+> +    return !mc->smbus_no_migration_support;
+> +}
+> +
+> +const VMStateDescription pmsmb_vmstate = {
+> +    .name = "pmsmb",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT8(smb_stat, PMSMBus),
+> +        VMSTATE_UINT8(smb_ctl, PMSMBus),
+> +        VMSTATE_UINT8(smb_cmd, PMSMBus),
+> +        VMSTATE_UINT8(smb_addr, PMSMBus),
+> +        VMSTATE_UINT8(smb_data0, PMSMBus),
+> +        VMSTATE_UINT8(smb_data1, PMSMBus),
+> +        VMSTATE_UINT32(smb_index, PMSMBus),
+> +        VMSTATE_UINT8_ARRAY(smb_data, PMSMBus, PM_SMBUS_MAX_MSG_SIZE),
+> +        VMSTATE_UINT8(smb_auxctl, PMSMBus),
+> +        VMSTATE_UINT8(smb_blkdata, PMSMBus),
+> +        VMSTATE_BOOL(i2c_enable, PMSMBus),
+> +        VMSTATE_BOOL(op_done, PMSMBus),
+> +        VMSTATE_BOOL(in_i2c_block_read, PMSMBus),
+> +        VMSTATE_BOOL(start_transaction_on_status_read, PMSMBus),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk)
+>  {
+>      smb->op_done = true;
+> diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+> index e6d8d28194..7b24be8256 100644
+> --- a/hw/i2c/smbus_ich9.c
+> +++ b/hw/i2c/smbus_ich9.c
+> @@ -43,12 +43,20 @@ typedef struct ICH9SMBState {
+>      PMSMBus smb;
+>  } ICH9SMBState;
+>  
+> +static bool ich9_vmstate_need_smbus(void *opaque, int version_id)
+> +{
+> +    return pm_smbus_vmstate_needed();
+> +}
+> +
+>  static const VMStateDescription vmstate_ich9_smbus = {
+>      .name = "ich9_smb",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_PCI_DEVICE(dev, struct ICH9SMBState),
+> +        VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
+> +        VMSTATE_BOOL_TEST(irq_enabled, ICH9SMBState, ich9_vmstate_need_smbus),
+> +        VMSTATE_STRUCT_TEST(smb, ICH9SMBState, ich9_vmstate_need_smbus, 1,
+> +                            pmsmb_vmstate, PMSMBus),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+> diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
+> index 7bcca97672..fb55c44444 100644
+> --- a/include/hw/i2c/pm_smbus.h
+> +++ b/include/hw/i2c/pm_smbus.h
+> @@ -43,4 +43,13 @@ typedef struct PMSMBus {
+>  
+>  void pm_smbus_init(DeviceState *parent, PMSMBus *smb, bool force_aux_blk);
+>  
+> +/*
+> + * For backwards compatibility on migration, older versions don't have
+> + * working migration for pm_smbus, this lets us ignore the migrations
+> + * for older machine versions.
+> + */
+> +bool pm_smbus_vmstate_needed(void);
+> +
+> +extern const VMStateDescription pmsmb_vmstate;
+> +
+>  #endif /* PM_SMBUS_H */
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
