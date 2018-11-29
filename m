@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSIAp-0001CM-Jt
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:59:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1gSIC0-0001mx-AB
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:01:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSIAh-0001hN-Tq
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:59:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59512)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSIAf-0001ff-5A
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 03:59:43 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1542384802.git.xiezhide@huawei.com>
-	<a4bc041444fd76d5da1d8e5321007f416df4ab84.1542384802.git.xiezhide@huawei.com>
-	<87ftvlh7us.fsf@dusky.pond.sub.org>
-	<1a77a48a-7160-8282-7c8f-de0b6dfe68f3@redhat.com>
-Date: Thu, 29 Nov 2018 09:59:33 +0100
-In-Reply-To: <1a77a48a-7160-8282-7c8f-de0b6dfe68f3@redhat.com> (Eric Blake's
-	message of "Wed, 28 Nov 2018 07:09:05 -0600")
-Message-ID: <875zwgcl8q.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1gSIBw-0002Uw-KQ
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:01:02 -0500
+Date: Thu, 29 Nov 2018 10:00:46 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181129090046.GA4797@linux.fritz.box>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	<20181121151211.15997-15-paul.durrant@citrix.com>
+	<20181128163447.GF4222@dhcp-200-186.str.redhat.com>
+	<a2cd391e72a24547a3565515e8d39d27@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 2/6] fsdev-throttle-qmp: Rename the
- ThrottleLimits member names
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a2cd391e72a24547a3565515e8d39d27@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] [PATCH 14/18] xen: add implementations of
+ xen-qdisk connect and disconnect functions...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,94 +26,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: xiezhide <xiezhide@huawei.com>, berto@igalia.com, qemu-devel@nongnu.org, zengcanfu@huawei.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, jinxuefeng@huawei.com, chenhui.rtos@huawei.com
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Max Reitz <mreitz@redhat.com>
 
-Eric Blake <eblake@redhat.com> writes:
+Am 28.11.2018 um 17:40 hat Paul Durrant geschrieben:
+> > -----Original Message-----
+> > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > Sent: 28 November 2018 16:35
+> > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
+> > devel@lists.xenproject.org; Stefano Stabellini <sstabellini@kernel.org>;
+> > Anthony Perard <anthony.perard@citrix.com>; Max Reitz <mreitz@redhat.com>
+> > Subject: Re: [PATCH 14/18] xen: add implementations of xen-qdisk connect
+> > and disconnect functions...
+> > 
+> > Am 21.11.2018 um 16:12 hat Paul Durrant geschrieben:
+> > > ...and wire in the dataplane.
+> > >
+> > > This patch adds the remaining code to make the xen-qdisk XenDevice
+> > > functional. The parameters that a block frontend expects to find are
+> > > populated in the backend xenstore area, and the 'ring-ref' and
+> > > 'event-channel' values specified in the frontend xenstore area are
+> > > mapped/bound and used to set up the dataplane.
+> > >
+> > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > > ---
+> > > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > > Cc: Anthony Perard <anthony.perard@citrix.com>
+> > > Cc: Kevin Wolf <kwolf@redhat.com>
+> > > Cc: Max Reitz <mreitz@redhat.com>
+> > > ---
+> > >  hw/block/xen-qdisk.c       | 140
+> > +++++++++++++++++++++++++++++++++++++++++++++
+> > >  hw/xen/xen-bus.c           |  12 ++--
+> > >  include/hw/xen/xen-bus.h   |   8 +++
+> > >  include/hw/xen/xen-qdisk.h |  12 ++++
+> > >  4 files changed, 166 insertions(+), 6 deletions(-)
+> > >
+> > > diff --git a/hw/block/xen-qdisk.c b/hw/block/xen-qdisk.c
+> > > index 35f7b70480..8c88393832 100644
+> > > --- a/hw/block/xen-qdisk.c
+> > > +++ b/hw/block/xen-qdisk.c
+> > > @@ -9,6 +9,10 @@
+> > >  #include "qapi/visitor.h"
+> > >  #include "hw/hw.h"
+> > >  #include "hw/xen/xen-qdisk.h"
+> > > +#include "sysemu/blockdev.h"
+> > > +#include "sysemu/block-backend.h"
+> > > +#include "sysemu/iothread.h"
+> > > +#include "dataplane/xen-qdisk.h"
+> > >  #include "trace.h"
+> > >
+> > >  static char *xen_qdisk_get_name(XenDevice *xendev, Error **errp)
+> > > @@ -23,6 +27,11 @@ static void xen_qdisk_realize(XenDevice *xendev,
+> > Error **errp)
+> > >  {
+> > >      XenQdiskDevice *qdiskdev = XEN_QDISK_DEVICE(xendev);
+> > >      XenQdiskVdev *vdev = &qdiskdev->vdev;
+> > > +    BlockConf *conf = &qdiskdev->conf;
+> > > +    DriveInfo *dinfo;
+> > > +    bool is_cdrom;
+> > > +    unsigned int info;
+> > > +    int64_t size;
+> > >
+> > >      if (!vdev->valid) {
+> > >          error_setg(errp, "vdev property not set");
+> > > @@ -30,13 +39,134 @@ static void xen_qdisk_realize(XenDevice *xendev,
+> > Error **errp)
+> > >      }
+> > >
+> > >      trace_xen_qdisk_realize(vdev->disk, vdev->partition);
+> > > +
+> > > +    if (!conf->blk) {
+> > > +        error_setg(errp, "drive property not set");
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    if (!blk_is_inserted(conf->blk)) {
+> > > +        error_setg(errp, "device needs media, but drive is empty");
+> > > +        return;
+> > > +    }
+> > 
+> > Hm, the code below suggests that you support CD-ROMs. Don't you want to
+> > support media change as well then? Which would mean that you need to
+> > support empty drives.
+> 
+> Yes, that's a good point. I should get rid of that check.
 
-> On 11/28/18 3:25 AM, Markus Armbruster wrote:
->> xiezhide <xiezhide@huawei.com> writes:
->>
->>> Rename the ThrottleLimits member names and modify related code
->>>
->>> Signed-off-by: xiezhide <xiezhide@huawei.com>
->>> ---
->>>   qapi/block-core.json |  70 +++++++++++-----------
->>>   util/throttle.c      | 163 +++++++++++++++++++++++++--------------------------
->>>   2 files changed, 116 insertions(+), 117 deletions(-)
->>>
->>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>> index d4fe710..4ffaaea 100644
->>> --- a/qapi/block-core.json
->>> +++ b/qapi/block-core.json
->
->>>   ##
->>>   { 'struct': 'ThrottleLimits',
->>> -  'data': { '*iops-total' : 'int', '*iops-total-max' : 'int',
->
->>> +  'data': { '*iops' : 'int', '*iops_max' : 'int',
->>> +            '*iops_max_length' : 'int', '*iops_rd' : 'int',
->>> +            '*iops_rd_max' : 'int', '*iops_rd_max_length' : 'int',
->>> +            '*iops_wr' : 'int', '*iops_wr_max' : 'int',
->>> +            '*iops_wr_max_length' : 'int', '*bps' : 'int',
->>> +            '*bps_max' : 'int', '*bps_max_length' : 'int',
->>> +            '*bps_rd' : 'int', '*bps_rd_max' : 'int',
->>> +            '*bps_rd_max_length' : 'int', '*bps_wr' : 'int',
->>> +            '*bps_wr_max' : 'int', '*bps_wr_max_length' : 'int',
->>> +            '*iops_size' : 'int' } }
->>
->> Compatibility break.  Why is that okay?
->
-> Grepping qapi/qapi-introspection.c shows 0 hits for either
-> ThrottleLimits or for iops-total, so there are no QMP commands
-> affected.
+Or rather apply it only to hard disks. And for empty CDs, you'll
+probably need to create an empty BlockBackend (the !conf->blk case).
+Just check the IDE and/or SCSI code for comparison.
 
-I see.
+> > 
+> > > +    if (!blkconf_apply_backend_options(conf, blk_is_read_only(conf-
+> > >blk),
+> > > +                                       false, errp)) {
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    if (!blkconf_geometry(conf, NULL, 65535, 255, 255, errp)) {
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    dinfo = blk_legacy_dinfo(conf->blk);
+> > > +    is_cdrom = (dinfo && dinfo->media_cd);
+> > 
+> > It's called legacy for a reason. Don't use this in new devices.
+> > 
+> > The proper way is to have two different devices for hard disks and CDs
+> > (like scsi-hd and scsi-cd).
+> 
+> ...or presumably I could have a property? The legacy init code could
+> then set it based on the drive info.
 
->           There might, however, be command line and/or QOM paths
-> affected, which is harder to audit since those don't affect
-> instrospection.
+Technically yes, but why would that be a good way to model things? I
+mean, it's true that xen-qdisk is not real hardware, but I've never seen
+any hardware that has a switch to decide whether it should behave as a
+CD drive or a hard disk.
 
-Yet another argument for QAPIfication...
+Both have very different characteristics (read-only with removable
+media, or a single read-write disk), and the existing implementations
+use two separate devices. So even if you're not convinced that users
+will consider them different concepts (I am; and if they weren't
+different concepts, you wouldn't need an is_cdrom variable), consistency
+is still a good thing.
 
-Let's check.  git-grep ThrottleLimits finds:
-
-* block/throttle-groups.c: getter and setter for QOM class
-  "throttle-group" property "limits".  This class is user-creatable.
-  Therefore, this is an externally visible interface.
-
-  The question is whether it's a *stable* interface.  The status of QOM
-  properties in that regard is not clear to me.  If I remember
-  correctly, we treated it as "just for debugging and such" at least
-  initially.  But is that still a defensible position?  It ceases to be
-  one as soon as you need QOM properties to do something users ought to
-  be able to do.  Like configuring stuff that is meant to be configured.
-  If that's the case, we need to examine the situation, and clarify our
-  ABI promises.  Recommend a separate thread.
-
-* util/throttle.c: Functions to convert to and from ThrottleConfig.  The
-  conversion to ThrottleConfig uses hardcoded member names in error
-  messages.  Relevant only insofar we need to remember to change them
-  when we rename members.
-
->> Even if it is, you still run afoul of docs/devel/qapi-code-gen.txt:
->>
->>      Command names, and member names within a type, should be all lower
->>      case with words separated by a hyphen.  However, some existing older
->>      commands and complex types use underscore; when extending such
->>      expressions, consistency is preferred over blindly avoiding
->>      underscore.
->>
->> The exception doesn't apply here.
->
-> Ah, but it does, because we are refactoring code to share a common
-> QAPI struct in a later patch, where we need this exact naming to avoid
-> breaking that command.
->
-> So the REAL problem with this commit is that the commit message does
-> not give enough details, either why this is safe (because it does not
-> impact existing QMP commands) or needed (because we will be using it
-> to rewrite an existing QMP command that needs this spelling).
-
-Yes, the commit message needs to make explain why the change is useful,
-and why it is safe.
+Kevin
