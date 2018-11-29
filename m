@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cminyard@mvista.com>) id 1gSOVK-0006oX-AX
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:45:31 -0500
+	(envelope-from <groug@kaod.org>) id 1gSOXE-0007TZ-Cj
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:47:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cminyard@mvista.com>) id 1gSOVF-0005V7-Cx
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:45:26 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44192)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1gSOVF-0005Uh-19
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:45:21 -0500
-Received: by mail-ot1-x342.google.com with SMTP id f18so2122251otl.11
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 07:45:20 -0800 (PST)
-References: <20181126182844.23109-1-minyard@acm.org>
-From: Corey Minyard <cminyard@mvista.com>
-Message-ID: <d7a7cb4a-a55d-ec84-4bd8-89ef3fad7ebf@mvista.com>
-Date: Thu, 29 Nov 2018 09:45:17 -0600
+	(envelope-from <groug@kaod.org>) id 1gSOXB-0006Tn-7k
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:47:24 -0500
+Received: from 10.mo179.mail-out.ovh.net ([46.105.79.46]:44059)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gSOXA-0006TF-Tm
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:47:21 -0500
+Received: from player734.ha.ovh.net (unknown [10.109.146.106])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 12FA010A8B6
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 16:47:17 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 29 Nov 2018 16:47:12 +0100
+Message-ID: <154350643288.788685.710801848628732800.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20181126182844.23109-1-minyard@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH] pc:piix4: Update smbus I/O space after a
- migration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH for 4.0 1/2] 9p: use g_new(T,
+ n) instead of g_malloc(sizeof(T) * n)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: minyard@acm.org, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-On 11/26/18 12:28 PM, minyard@acm.org wrote:
-> From: Corey Minyard <cminyard@mvista.com>
->
-> Otherwise it won't be set up correctly and won't work after
-> miigration.
+Because it is a recommended coding practice (see HACKING).
 
-Any opinions on this?  I think this would be good for 3.1. Without
-this when a migration occurs on piix4 the SMBus address space
-appears in the wrong place.  I'm not sure how bad that is, but
-SMBus certainly ceases to work.
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
--corey
-
-
-> Signed-off-by: Corey Minyard <cminyard@mvista.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> ---
->   hw/acpi/piix4.c | 1 +
->   1 file changed, 1 insertion(+)
->
-> A rather obvious fix, in hindsight :).
->
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index e330f24c71..2f4dd03b83 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -173,6 +173,7 @@ static int vmstate_acpi_post_load(void *opaque, int version_id)
->       PIIX4PMState *s = opaque;
->   
->       pm_io_space_update(s);
-> +    smbus_io_space_update(s);
->       return 0;
->   }
->   
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index bdf7919abfc5..55821343e594 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -1331,8 +1331,8 @@ static void coroutine_fn v9fs_walk(void *opaque)
+     trace_v9fs_walk(pdu->tag, pdu->id, fid, newfid, nwnames);
+ 
+     if (nwnames && nwnames <= P9_MAXWELEM) {
+-        wnames = g_malloc0(sizeof(wnames[0]) * nwnames);
+-        qids   = g_malloc0(sizeof(qids[0]) * nwnames);
++        wnames = g_new0(V9fsString, nwnames);
++        qids   = g_new0(V9fsQID, nwnames);
+         for (i = 0; i < nwnames; i++) {
+             err = pdu_unmarshal(pdu, offset, "s", &wnames[i]);
+             if (err < 0) {
