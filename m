@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSQYZ-0007dm-9F
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:56:56 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gSQcQ-0001fd-Mp
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:00:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSQYV-0003Ia-TD
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 12:56:55 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181106102335.20027-1-kraxel@redhat.com>
-	<20181106102335.20027-5-kraxel@redhat.com>
-Date: Thu, 29 Nov 2018 18:56:43 +0100
-In-Reply-To: <20181106102335.20027-5-kraxel@redhat.com> (Gerd Hoffmann's
-	message of "Tue, 6 Nov 2018 11:23:33 +0100")
-Message-ID: <87a7lr6a3o.fsf@dusky.pond.sub.org>
+	(envelope-from <pbonzini@redhat.com>) id 1gSQcP-0006lh-NX
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:00:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57029)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gSQcP-0006l9-G2
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 13:00:53 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C9D6531408E7
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 18:00:52 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 29 Nov 2018 19:00:50 +0100
+Message-Id: <20181129180050.17797-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] Warn on obsolete and deprecated
- devices.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] glib-compat: work around g_test_message bug
+ with subprocess tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael
-	S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-Gerd Hoffmann <kraxel@redhat.com> writes:
+Subprocesses are created by glib without leaving the file descriptors
+open.  Therefore, g_test_message (and assertion failures, but those
+trigger when things are going bad anyway) will think that it is writing
+to the log file descriptor, but while actually stomping on the QMP
+file descriptor or similar.  This causes spurious failures, which are
+as nice to debug as the reader can imagine.  While I have opened a
+pull request on GLib, this will probably take a while to propagate
+to distros.
 
-> Print a warning for deprecated and obsolete devices.
-> Also add support state to device listing.
->
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/core/qdev.c | 8 +++++++-
->  qdev-monitor.c | 9 +++++++++
->  2 files changed, 16 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 6b3cc55b27..6205522c3e 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -133,11 +133,17 @@ DeviceState *qdev_create(BusState *bus, const char *name)
->  
->  DeviceState *qdev_try_create(BusState *bus, const char *type)
->  {
-> +    ObjectClass *oc;
->      DeviceState *dev;
->  
-> -    if (object_class_by_name(type) == NULL) {
-> +    oc = object_class_by_name(type);
-> +    if (oc == NULL) {
->          return NULL;
->      }
-> +    if (qemu_is_deprecated(oc) ||
-> +        qemu_is_obsolete(oc)) {
-> +        qemu_warn_support_state("device", type, oc);
+I found this while working on qgraph, but the fix is generic.
 
-Looks like this:
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <1543343726-53531-1-git-send-email-pbonzini@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/glib-compat.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-    $ qemu-system-x86_64 -nodefaults -S -display none -device cirrus-vga
-    qemu-system-x86_64: -device cirrus-vga: warning: device cirrus-vga is obsolete (use "-vga std" instead, see https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful/)
-
-I'd prefer:
-
-    $ qemu-system-x86_64 -nodefaults -S -display none -device cirrus-vga
-    qemu-system-x86_64: -device cirrus-vga: warning: device cirrus-vga is obsolete
-    Use "-vga std" instead, see
-    https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful/
-
-The obvious way to get it:
-
-   void warn_support_state(const char *type, const char *name,
-                           ObjectClass *oc)
-   {
-       const char *help = oc->supported.help;
-
-       warn_report("%s %s is %s", type, name,
-                   SupportState_str(oc->supported.state));
-       if (help) {
-           error_printf("%s\n", help);
-       }
-   }
-
-with the ->help suitably capitalized and formatted.
-
-That should make qemu_warn_support_state() usable for the previous
-patch, too.
-
-Note I scratched the qemu_ prefix.  Matter of taste, I guess.
-
-
-> +    }
->      dev = DEVICE(object_new(type));
->      if (!dev) {
->          return NULL;
-[...]
+diff --git a/include/glib-compat.h b/include/glib-compat.h
+index fdf95a255d..f675c7328f 100644
+--- a/include/glib-compat.h
++++ b/include/glib-compat.h
+@@ -113,4 +113,12 @@ gint g_poll_fixed(GPollFD *fds, guint nfds, gint tim=
+eout);
+=20
+ #pragma GCC diagnostic pop
+=20
++/* See https://gitlab.gnome.org/GNOME/glib/merge_requests/501 */
++#define g_test_message(...)                                     \
++    do {                                                        \
++        if (!g_test_subprocess()) {                             \
++            g_test_message(__VA_ARGS__);                        \
++        }                                                       \
++    } while (0)
++
+ #endif
+--=20
+2.19.1
