@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gSPJI-0006pv-Oq
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gSPJI-0006px-Ps
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gSPJD-0007Ez-N9
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gSPJF-0007Fk-CQ
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:37:04 -0500
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Thu, 29 Nov 2018 17:36:51 +0100
-Message-Id: <20181129163655.20370-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v1 0/4] hw/arm: versal: Correct number of IRQs
- in GIC setup
+Date: Thu, 29 Nov 2018 17:36:52 +0100
+Message-Id: <20181129163655.20370-2-edgar.iglesias@gmail.com>
+In-Reply-To: <20181129163655.20370-1-edgar.iglesias@gmail.com>
+References: <20181129163655.20370-1-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PATCH v1 1/4] hw/arm: versal: Remove bogus
+ virtio-mmio creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,26 +25,25 @@ Cc: peter.maydell@linaro.org, muhammad_bilal@mentor.com, frederic.konrad@adacore
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-The Versal GIC has 192 IRQs not 256 as we previously had setup.
-This series fixes the setup and moves the virtio-mmio nodes
-to use other reserved interrupts.
+Remove bogus virtio-mmio creation. This was an accidental
+left-over an experiment.
 
-Since we don't have 32 reserved lines, we also reduce the number of
-virtio-mmio regions to 8 (we do have some more lines free but let's
-leave some for future use).
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ hw/arm/xlnx-versal-virt.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Cheers,
-Edgar
-
-Edgar E. Iglesias (4):
-  hw/arm: versal: Remove bogus virtio-mmio creation
-  hw/arm: versal: Reduce number of virtio-mmio instances
-  hw/arm: versal: Use IRQs 111 - 118 for virtio-mmio
-  hw/arm: versal: Correct the nr of IRQs to 192
-
- hw/arm/xlnx-versal-virt.c    | 7 +++----
- include/hw/arm/xlnx-versal.h | 8 ++++----
- 2 files changed, 7 insertions(+), 8 deletions(-)
-
+diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+index 1e31a3f442..41b8d801c8 100644
+--- a/hw/arm/xlnx-versal-virt.c
++++ b/hw/arm/xlnx-versal-virt.c
+@@ -364,7 +364,6 @@ static void create_virtio_regions(VersalVirt *s)
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic_irq);
+         mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+         memory_region_add_subregion(&s->soc.mr_ps, base, mr);
+-        sysbus_create_simple("virtio-mmio", base, pic_irq);
+     }
+ 
+     for (i = 0; i < NUM_VIRTIO_TRANSPORT; i++) {
 -- 
 2.17.1
