@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gSJP4-0007uQ-Mx
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:40 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gSJP1-0007t2-MX
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <smarkovic@wavecomp.com>) id 1gSJP0-0005F4-IJ
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:38 -0500
-Received: from mail-eopbgr780138.outbound.protection.outlook.com
-	([40.107.78.138]:2094
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <smarkovic@wavecomp.com>)
-	id 1gSJP0-0005DM-4R
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:34 -0500
-From: Stefan Markovic <smarkovic@wavecomp.com>
-Date: Thu, 29 Nov 2018 10:18:28 +0000
-Message-ID: <266d7143-54e7-86d7-e29b-64cb923edceb@wavecomp.com>
-References: <1543412590-29716-1-git-send-email-stefan.markovic@rt-rk.com>
-	<1543412590-29716-2-git-send-email-stefan.markovic@rt-rk.com>
-	<3ef23076-d0b4-4df3-d023-bf18ba33aade@redhat.com>
-In-Reply-To: <3ef23076-d0b4-4df3-d023-bf18ba33aade@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FF488DE566A75F4D919FAB1F7AE0A3C7@namprd22.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <cohuck@redhat.com>) id 1gSJOx-0005Cw-O1
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:35 -0500
+Date: Thu, 29 Nov 2018 11:18:21 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181129111821.1c04e68d.cohuck@redhat.com>
+In-Reply-To: <20181128095939.5684-1-david@redhat.com>
+References: <20181128095939.5684-1-david@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-doc: Add nanoMIPS ISA information
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/tod: Properly stop the KVM TOD
+ while the guest is not running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,79 +23,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Stefan Markovic <stefan.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Paul Burton <pburton@wavecomp.com>, "jhogan@kernel.org" <jhogan@kernel.org>, "huth@tuxfamily.org" <huth@tuxfamily.org>, "hpoussin@reactos.org" <hpoussin@reactos.org>, Aleksandar Markovic <amarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-SGkgUGhpbGlwcGUsDQoNCg0KSSdsbCBpbnZlc3RpZ2F0ZSBmdXJ0aGVyIHJ1bm5pbmcgd2l0aMKg
-IC0tZW5hYmxlLWRlYnVnIG9wdGlvbiB0byBmaXggdGhpcyANCmlzc3VlLg0KDQpJbiB0aGUgbWVh
-bnRpbWUsIHdlIGNvdWxkIG5vdGUgZW5hYmxlLWRlYnVnIGFzICdUbyBCZSBEb25lL1dvcmsgSW4g
-DQpQcm9ncmVzcycgZm9yIG5hbm9NSVBTIGluIHFlbXUgZG9jcyAuDQoNCg0KVGhhbmtzLA0KDQpT
-dGVmYW4NCg0KT24gMjguMTEuMTguIDE1OjMxLCBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSB3cm90
-ZToNCj4gSGkgU3RlZmFuLA0KPg0KPiBPbiAyOC8xMS8xOCAxNDo0MywgU3RlZmFuIE1hcmtvdmlj
-IHdyb3RlOg0KPj4gRnJvbTogU3RlZmFuIE1hcmtvdmljIDxzbWFya292aWNAd2F2ZWNvbXAuY29t
-Pg0KPj4NCj4+IEFkZCBuYW5vTUlQUyBpbmZvcm1hdGlvbiBpbiBxZW11LWRvYy50ZXhpIHdpdGgg
-ZXhhbXBsZSBvZiB1c2FnZQ0KPj4gaW5jbHVkZWQuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogU3Rl
-ZmFuIE1hcmtvdmljIDxzbWFya292aWNAd2F2ZWNvbXAuY29tPg0KPj4gLS0tDQo+PiAgIHFlbXUt
-ZG9jLnRleGkgfCAyOSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPj4gICAxIGZpbGUg
-Y2hhbmdlZCwgMjkgaW5zZXJ0aW9ucygrKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9xZW11LWRvYy50
-ZXhpIGIvcWVtdS1kb2MudGV4aQ0KPj4gaW5kZXggZjdhZDFkZi4uNmVmNTkzZCAxMDA2NDQNCj4+
-IC0tLSBhL3FlbXUtZG9jLnRleGkNCj4+ICsrKyBiL3FlbXUtZG9jLnRleGkNCj4+IEBAIC0xOTk0
-LDYgKzE5OTQsMTAgQEAgU2V0IHRoZSBlbXVsYXRlZCBtYWNoaW5lIHR5cGUuIFRoZSBkZWZhdWx0
-IGlzIHN1bjR1Lg0KPj4gICBAc2VjdGlvbiBNSVBTIFN5c3RlbSBlbXVsYXRvcg0KPj4gICBAY2lu
-ZGV4IHN5c3RlbSBlbXVsYXRpb24gKE1JUFMpDQo+PiAgIA0KPj4gK0BtZW51DQo+PiArKiBuYW5v
-TUlQUyBTeXN0ZW0gZW11bGF0b3IgOjoNCj4+ICtAZW5kIG1lbnUNCj4+ICsNCj4+ICAgRm91ciBl
-eGVjdXRhYmxlcyBjb3ZlciBzaW11bGF0aW9uIG9mIDMyIGFuZCA2NC1iaXQgTUlQUyBzeXN0ZW1z
-IGluDQo+PiAgIGJvdGggZW5kaWFuIG9wdGlvbnMsIEBmaWxle3FlbXUtc3lzdGVtLW1pcHN9LCBA
-ZmlsZXtxZW11LXN5c3RlbS1taXBzZWx9DQo+PiAgIEBmaWxle3FlbXUtc3lzdGVtLW1pcHM2NH0g
-YW5kIEBmaWxle3FlbXUtc3lzdGVtLW1pcHM2NGVsfS4NCj4+IEBAIC0yMDg1LDYgKzIwODksMzEg
-QEAgU0NTSSBjb250cm9sbGVyDQo+PiAgIEczNjQgZnJhbWVidWZmZXINCj4+ICAgQGVuZCBpdGVt
-aXplDQo+PiAgIA0KPj4gK0Bub2RlIG5hbm9NSVBTIFN5c3RlbSBlbXVsYXRvcg0KPj4gK0BzdWJz
-ZWN0aW9uIG5hbm9NSVBTIFN5c3RlbSBlbXVsYXRvcg0KPj4gK0BjaW5kZXggc3lzdGVtIGVtdWxh
-dGlvbiAobmFub01JUFMpDQo+PiArDQo+PiArRXhlY3V0YWJsZSBAZmlsZXtxZW11LXN5c3RlbS1t
-aXBzZWx9IGFsc28gY292ZXJzIHNpbXVsYXRpb24gb2YNCj4+ICszMi1iaXQgbmFub01JUFMgc3lz
-dGVtIGluIGxpdHRsZSBlbmRpYW4gbW9kZToNCj4+ICsNCj4+ICtAaXRlbWl6ZSBAbWludXMNCj4+
-ICtAaXRlbQ0KPj4gK25hbm9NSVBTIEk3MjAwIENQVQ0KPj4gK0BlbmQgaXRlbWl6ZQ0KPj4gKw0K
-Pj4gK0V4YW1wbGUgb2YgQGZpbGV7cWVtdS1zeXN0ZW0tbWlwc2VsfSB1c2FnZSBmb3IgbmFub01J
-UFMgaXMgc2hvd24gYmVsb3c6DQo+PiArDQo+PiArRG93bmxvYWQgQGNvZGV7PGRpc2tfaW1hZ2Vf
-ZmlsZT59IGZyb20gQHVybHtodHRwczovL21pcHNkaXN0cm9zLm1pcHMuY29tL0xpbnV4RGlzdHJv
-L25hbm9taXBzL2J1aWxkcm9vdC9pbmRleC5odG1sfS4NCj4+ICsNCj4+ICtEb3dubG9hZCBAY29k
-ZXs8a2VybmVsX2ltYWdlX2ZpbGU+fSBmcm9tIEB1cmx7aHR0cHM6Ly9taXBzZGlzdHJvcy5taXBz
-LmNvbS9MaW51eERpc3Ryby9uYW5vbWlwcy9rZXJuZWxzL3Y0LjE1LjE4LTQzMi1nYjJlYjlhOGIw
-N2ExLTIwMTgwNjI3MTAyMTQyL2luZGV4Lmh0bWx9Lg0KPj4gKw0KPj4gK1N0YXJ0IHN5c3RlbSBl
-bXVsYXRpb24gb2YgTWFsdGEgYm9hcmQgd2l0aCBuYW5vTUlQUyBJNzIwMCBDUFU6DQo+PiArQGV4
-YW1wbGUNCj4+ICtxZW11LXN5c3RlbS1taXBzZWwgLWNwdSBJNzIwMCAta2VybmVsIEBjb2Rlezxr
-ZXJuZWxfaW1hZ2VfZmlsZT59IFwNCj4+ICsgICAgLU0gbWFsdGEgLXNlcmlhbCBzdGRpbyAtbSBA
-Y29kZXs8bWVtb3J5X3NpemU+fSAtaGRhIEBjb2RlezxkaXNrX2ltYWdlX2ZpbGU+fSBcDQo+PiAr
-ICAgIC1hcHBlbmQgIm1lbT0yNTZtQEAweDAgcncgY29uc29sZT10dHlTMCB2Z2E9Y2lycnVzIHZl
-c2E9MHgxMTEgcm9vdD0vZGV2L3NkYSINCj4gVHJ5aW5nIHlvdXIgZXhhbXBsZSB3aXRoIGdlbmVy
-aWNfbmFubzMycjZlbF9wYWdlNjRrX2RiZyBjdXJyZW50IG1hc3Rlcg0KPiAoYzU2NjA2Njg0KSBJ
-J20gZ2V0dGluZzoNCj4NCj4gSU46IGNncm91cF9pbml0X2Vhcmx5DQo+IDB4ODA4N2FlNjQ6ICA4
-NGYwIDgwNTAgICAgICBMVyBhMywgMHg1MChzMCkNCj4gMHg4MDg3YWU2ODogIGE2MzAgMmM0OCAg
-ICAgIFNXTSBzMSwgNzIoczApLCAweDINCj4gMHg4MDg3YWU2YzogIGJiODQgICAgICAgICAgIEJO
-RVpDIGEzLCAweDgwODdhZTcyDQo+DQo+IE9QOg0KPiAgIGxkX2kzMiB0bXAwLGVudiwkMHhmZmZm
-ZmZmZmZmZmZmZmU0DQo+ICAgbW92aV9pMzIgdG1wMSwkMHgwDQo+ICAgYnJjb25kX2kzMiB0bXAw
-LHRtcDEsbHQsJEwwDQo+DQo+ICAgLS0tLSA4MDg3YWU2NCAwMDAwMDAwMCAwMDAwMDAwMA0KPiAg
-IG1vdmlfaTMyIHRtcDAsJDB4NTANCj4gICBhZGRfaTMyIHRtcDAsczAsdG1wMA0KPiAgIHFlbXVf
-bGRfaTMyIHRtcDAsdG1wMCx1bitsZXVsLDANCj4gICBtb3ZfaTMyIGEzLHRtcDANCj4NCj4gICAt
-LS0tIDgwODdhZTY4IDAwMDAwMDAwIDAwMDAwMDAwDQo+ICAgbW92aV9pMzIgdG1wMCwkMHg0OA0K
-PiAgIGFkZF9pMzIgdG1wMCxzMCx0bXAwDQo+ICAgbW92X2kzMiB0bXAxLHMxDQo+ICAgcWVtdV9z
-dF9pMzIgdG1wMSx0bXAwLGxldWwsMA0KPiAgIG1vdmlfaTMyIHRtcDAsJDB4NGMNCj4gICBhZGRf
-aTMyIHRtcDAsczAsdG1wMA0KPiAgIG1vdl9pMzIgdG1wMSxzMg0KPiAgIHFlbXVfc3RfaTMyIHRt
-cDEsdG1wMCxsZXVsLDANCj4NCj4gICAtLS0tIDgwODdhZTZjIDAwMDAwMDAwIDAwMDAwMDAwDQo+
-ICAgbW92X2kzMiB0bXAwLGEzDQo+ICAgbW92aV9pMzIgdG1wMSwkMHgwDQo+ICAgc2V0Y29uZF9p
-MzIgYmNvbmQsdG1wMCx0bXAxLG5lDQo+ICAgbW92aV9pMzIgdG1wMCwkMHgwDQo+ICAgYnJjb25k
-X2kzMiBiY29uZCx0bXAwLG5lLCRMMQ0KPiAgIGdvdG9fdGIgJDB4MQ0KPiAgIG1vdmlfaTMyIFBD
-LCQweGZmZmZmZmZmODA4N2FlNmUNCj4gICBleGl0X3RiICQweDdmODBhMjAwNWYwMQ0KPiAgIHNl
-dF9sYWJlbCAkTDENCj4gICBnb3RvX3RiICQweDANCj4gICBtb3ZpX2kzMiBQQywkMHhmZmZmZmZm
-ZjgwODdhZTcyDQo+ICAgZXhpdF90YiAkMHg3ZjgwYTIwMDVmMDANCj4gICBzZXRfbGFiZWwgJEww
-DQo+ICAgZXhpdF90YiAkMHg3ZjgwYTIwMDVmMDMNCj4NCj4gcWVtdS1zeXN0ZW0tbWlwc2VsOiB0
-Y2cvdGNnLW9wLmM6MjYwNzogdGNnX2dlbl9nb3RvX3RiOiBBc3NlcnRpb24NCj4gYCh0Y2dfY3R4
-LT5nb3RvX3RiX2lzc3VlX21hc2sgJiAoMSA8PCBpZHgpKSA9PSAwJyBmYWlsZWQuDQo+DQo+IFJp
-Y2hhcmQgc2FpZCBvbiBJUkMgIml0IG1lYW5zIHRoYXQgaXQgaGFzIGlzc3VlZCB0d28gZ290b190
-YiB3aXRoIHRoZQ0KPiBzYW1lIGlkeC4iDQo+DQo+IEkgYnVpbHQgUUVNVSBvbiBhIHg4Nl82NCBo
-b3N0LCB1c2luZyB0aGUgZm9sbG93aW5nIG9wdGlvbnM6DQo+DQo+IC4vY29uZmlndXJlIC0tZGlz
-YWJsZS11c2VyIFwNCj4gICAtLWVuYWJsZS12bmMtc2FzbCAtLWVuYWJsZS10cmFjZS1iYWNrZW5k
-cz1sb2cgXA0KPiAgIC0tZXh0cmEtY2ZsYWdzPS1nZ2RiIC0tZW5hYmxlLWRlYnVnDQo+DQo+IFJl
-Z2FyZHMsDQo+DQo+IFBoaWwuDQo+DQo+PiArQGVuZCBleGFtcGxlDQo+PiArDQo+PiAgIA0KPj4g
-ICBAbm9kZSBBUk0gU3lzdGVtIGVtdWxhdG9yDQo+PiAgIEBzZWN0aW9uIEFSTSBTeXN0ZW0gZW11
-bGF0b3INCj4+DQo=
+On Wed, 28 Nov 2018 10:59:39 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> Just like on other architectures, we should stop the clock while the guest
+> is not running. This is already properly done for TCG. Right now, doing an
+> offline migration (stop, migrate, cont) can easily trigger stalls in the
+> guest.
+> 
+> Even doing a
+>     (hmp) stop
+>     ... wait 2 minutes ...
+>     (hmp) cont
+> will already trigger stalls.
+> 
+> So whenever the guest stops, backup the KVM TOD. When continuing to run
+> the guest, restore the KVM TOD.
+> 
+> One special case is starting a simple VM: Reading the TOD from KVM to
+> stop it right away until the guest is actually started means that the
+> time of any simple VM will already differ to the host time. We can
+> simply leave the TOD running and the guest won't be able to recognize
+> it.
+> 
+> For migration, we actually want to keep the TOD stopped until really
+> starting the guest. To be able to catch most errors, we should however
+> try to set the TOD in addition to simply storing it. So we can still
+> catch basic migration problems.
+> 
+> If anything goes wrong while backing up/restoring the TOD, we have to
+> ignore it (but print a warning). This is then basically a fallback to
+> old behavior (TOD remains running).
+> 
+> I tested this very basically with an initrd:
+>     1. Start a simple VM. Observed that the TOD is kept running. Old
+>        behavior.
+>     2. Ordinary live migration. Observed that the TOD is temporarily
+>        stopped on the destination when setting the new value and
+>        correctly started when finally starting the guest.
+>     3. Offline live migration. (stop, migrate, cont). Observed that the
+>        TOD will be stopped on the source with the "stop" command. On the
+>        destination, the TOD is temporarily stopped when setting the new
+>        value and correctly started when finally starting the guest via
+>        "cont".
+>     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
+>        or conts in a row have no effect, so works as expected)
+> 
+> In the future, we might want to send the guest a special kind of time sync
+> interrupt under some conditions, so it can synchronize its tod to the
+> host tod. This is interesting for migration scenarios but also when we
+> get time sync interrupts ourselves. This however will most probably have
+> to be handled in KVM (e.g. when the tods differ too much) and is not
+> desired e.g. when debugging the guest. (single stepping should not
+
+I'll drop the period after 'guest' when applying.
+
+> result in permanent time syncs). I consider something like that an add-on
+> on top of this basic "don't break the guest" handling.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+> 
+> v1 -> v2:
+> - Add time sync idea suggested by Christian to description
+> - Drop one unnecessary "return"
+> - Register in realize() and not in instance_init()
+> 
+> 
+>  hw/s390x/tod-kvm.c     | 91 +++++++++++++++++++++++++++++++++++++++++-
+>  hw/s390x/tod.c         |  5 +++
+>  include/hw/s390x/tod.h |  8 +++-
+>  3 files changed, 101 insertions(+), 3 deletions(-)
+> 
+
+(...)
+
+> +static void kvm_s390_tod_realize(S390TODState *td, Error **errp)
+> +{
+> +    /*
+> +     * We need to know when the VM gets started/stopped to start/stop the TOD.
+> +     * As we can never have more than one TOD instance (and that will never be
+> +     * removed), registering here and never unregistering is good enough.
+> +     */
+> +    qemu_add_vm_change_state_handler(kvm_s390_tod_vm_state_change, td);
+> +}
+> +
+
+Yes, this should work. If we were really paranoid, we could add some
+code that fails realizing a second instance, but that's probably
+overkill.
+
+(...)
+
+Patch looks good to me, but I'd like to have a review before queuing.
