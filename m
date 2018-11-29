@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gSJtr-0006xw-5K
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:50:27 -0500
+	(envelope-from <thuth@redhat.com>) id 1gSK1j-0004yU-Qi
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:58:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1gSJtm-0000Sl-82
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:50:27 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:45116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1gSJtm-0000SO-3C
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:50:22 -0500
-Received: by mail-qt1-f196.google.com with SMTP id e5so1370952qtr.12
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 02:50:21 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1gSK1e-00067F-43
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:58:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42712)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gSK1c-000650-BS
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:58:29 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 231FF309178F
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 10:58:27 +0000 (UTC)
+References: <20181128153858.11845-1-berrange@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f73a6661-83a1-73fa-d087-a8d9c9aaaff5@redhat.com>
+Date: Thu, 29 Nov 2018 11:58:22 +0100
 MIME-Version: 1.0
-References: <20181122110039.15972-1-marcandre.lureau@redhat.com>
-	<2a53c96f-a712-5719-6e29-4df04b7256af@redhat.com>
-	<da361a05-a31f-9ae1-f268-589f632ca9cf@weilnetz.de>
-In-Reply-To: <da361a05-a31f-9ae1-f268-589f632ca9cf@weilnetz.de>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 29 Nov 2018 14:50:09 +0400
-Message-ID: <CAMxuvayaXHhGs1V1FysNBbHH62XfoH-9gpRytNFOjdE9bimuzg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20181128153858.11845-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 0/4] build-sys: require Vista API
- by default globally
+Subject: Re: [Qemu-devel] [qemu-web PATCH v2] download: document version
+ numbering scheme
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +34,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: "Bonzini, Paolo" <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Michael Roth <mdroth@linux.vnet.ibm.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On Thu, Nov 29, 2018 at 2:45 PM Stefan Weil <sw@weilnetz.de> wrote:
->
-> Am 29.11.2018 um 11:16 schrieb Paolo Bonzini:
-> > On 22/11/18 12:00, Marc-Andr=C3=A9 Lureau wrote:
-> >>  include/qemu/osdep.h      | 17 ++++++++++
-> >>  accel/tcg/translate-all.c |  4 ---
-> >>  qga/commands-win32.c      | 70 +-------------------------------------=
--
-> >>  util/qemu-thread-win32.c  |  4 ---
-> >>  configure                 |  3 --
-> >>  roms/seabios              |  2 +-
-> >>  6 files changed, 19 insertions(+), 81 deletions(-)
-> >>
-> > Queued, thanks.
-> >
-> > Paolo
->
->
-> Was the change for roms/seabios intentional?
+On 2018-11-28 16:38, Daniel P. Berrang=C3=A9 wrote:
+> The new version numbering scheme was mentioned in the blog post
+> announcing 3.0 previously, but this will fall out of view over
+> time. It is thus preferrable to mention this on the download page
+> too.
+>=20
+> Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  download.html | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+>=20
+> diff --git a/download.html b/download.html
+> index 5a1e4ea..bbdc00c 100644
+> --- a/download.html
+> +++ b/download.html
+> @@ -39,6 +39,30 @@ permalink: /download/
+>  	{% include_relative _download/source.html %}
+>  </article>
+>  </div>
+> +
+> +<h2>Version numbering</h2>
+> +<div>
+> +  <p>
+> +  Since version 3.0.0, QEMU uses a time based version numbering scheme=
+:
+> +  </p>
+> +<ul>
+> +<dt>major</dt>
+> +<dd>incremented by 1 for the first release of the year</dd>
+> +<dt>minor</dt>
+> +<dd>reset to 0 with every major increment, otherwise incremented by 1 =
+for each release from git master</dd>
+> +<dt>micro</dt>
+> +<dd>always 0 for releases from git master, incremented by 1 for each s=
+table branch release</dd>
+> +</ul>
 
-oh no! sorry Paolo
+HTML validator (https://validator.w3.org) complains here:
+
+* Element dt not allowed as child of element ul in this context.
+
+* Element dt not allowed as child of element ul in this context.
+
+Since I don't want to mess up your intended formatting, could you please
+fix it on your own and send a v3?
+
+ Thanks,
+  Thomas
