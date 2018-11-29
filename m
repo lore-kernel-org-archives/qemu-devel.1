@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJW-00052e-Iz
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:13 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJa-00056R-CS
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJQ-0006rh-FW
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:10 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:39556)
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJW-00078k-UY
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:12 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:39592)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJP-0006lc-Rg
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:04 -0500
+	(envelope-from <mikhail.abakumov@ispras.ru>) id 1gSNJW-00075Z-HU
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 09:29:10 -0500
 From: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
-Date: Thu, 29 Nov 2018 17:29:00 +0300
-Message-ID: <154350174045.8036.18007260100806768232.stgit@Misha-PC.lan02.inno>
+Date: Thu, 29 Nov 2018 17:29:06 +0300
+Message-ID: <154350174606.8036.1192124629967069868.stgit@Misha-PC.lan02.inno>
 In-Reply-To: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 References: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 16/39] windbg: init DBGKD_ANY_WAIT_STATE_CHANGE
+Subject: [Qemu-devel] [PATCH 17/39] windbg: generate ExceptionStateChange
+ and LoadSymbolsStateChange
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +30,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
 
-Add function for init DBGKD_ANY_WAIT_STATE_CHANGE. It is a header of
-'state change' packets.
-
 Signed-off-by: Mikhail Abakumov <mikhail.abakumov@ispras.ru>
 Signed-off-by: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 ---
- target/i386/windbgstub.c |   45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ include/exec/windbgstub-utils.h |    3 +++
+ target/i386/windbgstub.c        |   33 ++++++++++++++++++++++++++++++++-
+ 2 files changed, 35 insertions(+), 1 deletion(-)
 
+diff --git a/include/exec/windbgstub-utils.h b/include/exec/windbgstub-utils.h
+index a28068eecd..794cb387b0 100644
+--- a/include/exec/windbgstub-utils.h
++++ b/include/exec/windbgstub-utils.h
+@@ -67,6 +67,9 @@ typedef struct PacketData {
+ const char *kd_api_name(int id);
+ const char *kd_pkt_type_name(int id);
+ 
++DBGKD_ANY_WAIT_STATE_CHANGE *kd_state_change_exc(CPUState *cs);
++DBGKD_ANY_WAIT_STATE_CHANGE *kd_state_change_ls(CPUState *cs);
++
+ bool windbg_on_load(void);
+ void windbg_on_reset(void);
+ 
 diff --git a/target/i386/windbgstub.c b/target/i386/windbgstub.c
-index f1bab10b10..b2ac7a6d5f 100644
+index b2ac7a6d5f..37c5805818 100644
 --- a/target/i386/windbgstub.c
 +++ b/target/i386/windbgstub.c
-@@ -15,9 +15,13 @@
- #ifdef TARGET_X86_64
- #define OFFSET_KPCR_SELF 0x18
- #define OFFSET_KPCR_LOCK_ARRAY 0x28
-+#define OFFSET_KPRCB 0x20
-+#define OFFSET_KPRCB_CURRTHREAD 0x8
- #else  /* TARGET_I386 */
- #define OFFSET_KPCR_SELF 0x1C
- #define OFFSET_KPCR_VERSION 0x34
-+#define OFFSET_KPRCB 0x20
-+#define OFFSET_KPRCB_CURRTHREAD 0x4
- #endif /* TARGET_I386 */
- 
- #ifdef TARGET_X86_64
-@@ -156,3 +160,44 @@ void windbg_on_reset(void)
-     kdVersion.is_init = false;
+@@ -161,7 +161,6 @@ void windbg_on_reset(void)
  #endif
  }
+ 
+-__attribute__ ((unused)) /* unused yet */
+ static void kd_init_state_change(CPUState *cs, DBGKD_ANY_WAIT_STATE_CHANGE *sc)
+ {
+     X86CPU *cpu = X86_CPU(cs);
+@@ -201,3 +200,35 @@ static void kd_init_state_change(CPUState *cs, DBGKD_ANY_WAIT_STATE_CHANGE *sc)
+     memset(cr->InstructionStream, 0, DBGKD_MAXSTREAM);
+     stw_p(&cr->InstructionCount, 0);
+ }
 +
-+__attribute__ ((unused)) /* unused yet */
-+static void kd_init_state_change(CPUState *cs, DBGKD_ANY_WAIT_STATE_CHANGE *sc)
++DBGKD_ANY_WAIT_STATE_CHANGE *kd_state_change_exc(CPUState *cs)
 +{
++    DBGKD_ANY_WAIT_STATE_CHANGE *sc = g_new0(DBGKD_ANY_WAIT_STATE_CHANGE, 1);
++    DBGKM_EXCEPTION_RECORD64 *exc = &sc->u.Exception.ExceptionRecord;
 +    X86CPU *cpu = X86_CPU(cs);
 +    CPUX86State *env = &cpu->env;
-+    DBGKD_CONTROL_REPORT *cr = &sc->ControlReport;
-+    target_ulong KPRCB = VMEM_ADDR(cs, KPCR.addr + OFFSET_KPRCB);
-+    target_ulong thread = VMEM_ADDR(cs, KPRCB + OFFSET_KPRCB_CURRTHREAD);
-+    int number_processors = 0;
 +
-+    CPUState *cpu_tmp;
-+    CPU_FOREACH(cpu_tmp) {
-+        ++number_processors;
-+    }
++    kd_init_state_change(cs, sc);
 +
-+    /* HEADER */
++    stl_p(&sc->NewState, DbgKdExceptionStateChange);
++    sttul_p(&exc->ExceptionAddress, env->eip);
 +
 +    /* TODO: Fix this hardcoded value. */
-+    stw_p(&sc->ProcessorLevel, 0);
-+    /* TODO: Fix this hardcoded value. */
-+    stw_p(&sc->Processor, 0);
-+    stl_p(&sc->NumberProcessors, number_processors);
-+    sttul_p(&sc->Thread, thread);
-+    sttul_p(&sc->ProgramCounter, env->eip);
++    stl_p(&exc->ExceptionCode, 0x80000003);
 +
-+    /* CONTROL REPORT */
++    return sc;
++}
 +
-+    sttul_p(&cr->Dr6, env->dr[6]);
-+    sttul_p(&cr->Dr7, env->dr[7]);
-+    stw_p(&cr->ReportFlags, REPORT_INCLUDES_SEGS | REPORT_STANDARD_CS);
-+    stw_p(&cr->SegCs, env->segs[R_CS].selector);
-+    stw_p(&cr->SegDs, env->segs[R_DS].selector);
-+    stw_p(&cr->SegEs, env->segs[R_ES].selector);
-+    stw_p(&cr->SegFs, env->segs[R_FS].selector);
-+    stl_p(&cr->EFlags, env->eflags);
++DBGKD_ANY_WAIT_STATE_CHANGE *kd_state_change_ls(CPUState *cs)
++{
++    DBGKD_ANY_WAIT_STATE_CHANGE *sc = g_new0(DBGKD_ANY_WAIT_STATE_CHANGE, 1);
 +
-+    /* This is a feature */
-+    memset(cr->InstructionStream, 0, DBGKD_MAXSTREAM);
-+    stw_p(&cr->InstructionCount, 0);
++    kd_init_state_change(cs, sc);
++
++    stl_p(&sc->NewState, DbgKdLoadSymbolsStateChange);
++
++    /* TODO: Path to load symbold (with extra array). */
++    stl_p(&sc->u.LoadSymbols.PathNameLength, 0);
++
++    return sc;
 +}
