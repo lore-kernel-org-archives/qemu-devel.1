@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSLnN-0006Yl-Oa
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:51:54 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gSLnp-0006nn-Av
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:52:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSLnI-00056D-QM
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:51:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41814)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSLnI-000565-Kv
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:51:48 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <5BE31F76020000760003D33A@prv-mh.provo.novell.com>
-Date: Thu, 29 Nov 2018 13:51:46 +0100
-In-Reply-To: <5BE31F76020000760003D33A@prv-mh.provo.novell.com> (Kirk Allan's
-	message of "Wed, 07 Nov 2018 10:23:02 -0700")
-Message-ID: <87mups82sd.fsf@dusky.pond.sub.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1gSLnk-0005Fh-AI
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:52:21 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37692)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gSLnk-0005FK-2q
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 07:52:16 -0500
+Received: by mail-wr1-x444.google.com with SMTP id j10so1784079wru.4
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 04:52:15 -0800 (PST)
+References: <20181123144558.5048-1-richard.henderson@linaro.org>
+	<20181123144558.5048-2-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181123144558.5048-2-richard.henderson@linaro.org>
+Date: Thu, 29 Nov 2018 12:52:13 +0000
+Message-ID: <8736rk3v2a.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] getting link errors when building for qga-vss.dll
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v2 01/37] tcg/i386: Always use %ebp
+ for TCG_AREG0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kirk Allan <kallan@suse.com>
-Cc: qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Alistair.Francis@wdc.com
 
-Cc'ing folks who might be able to help.
 
-"Kirk Allan" <kallan@suse.com> writes:
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> When I try to build qga-vss.dll I get the following link error:
+> For x86_64, this can result in smaller code when manipulating
+> TCG_TYPE_I32, as we can omit a REX prefix.
+
+I take it you mean passing TCG_TYPE_I32 back and forth from the register
+backing store in CPUEnv which TCG_AREG0 points at?
+
+Anyway:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+
 >
-> LINK    qga/vss-win32/qga-vss.dll
-> /usr/lib64/gcc/i686-w64-mingw32/8.2.0/../../../../i686-w64-mingw32/bin/ld: qga/vss-win32/requester.o: in function `requester_freeze':
-> /src/qemu/qga/vss-win32/requester.cpp:284: undefined reference to `g_assertion_message_expr'
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tcg/i386/tcg-target.h | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
 >
-> I started getting this link error with commit 3ebee3b191e755d3f7311a6a62eea5c9628b221b where assert is redefined to g_assert.
+> diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+> index 9fdf37f23c..7488c3d869 100644
+> --- a/tcg/i386/tcg-target.h
+> +++ b/tcg/i386/tcg-target.h
+> @@ -84,6 +84,8 @@ typedef enum {
+>      TCG_REG_RBP =3D TCG_REG_EBP,
+>      TCG_REG_RSI =3D TCG_REG_ESI,
+>      TCG_REG_RDI =3D TCG_REG_EDI,
+> +
+> +    TCG_AREG0 =3D TCG_REG_EBP,
+>  } TCGReg;
 >
-> Is there something additional I need to add to my configure or make commands to resolve g_assertion_message_expr?
+>  /* used for function call generation */
+> @@ -194,12 +196,6 @@ extern bool have_avx2;
+>  #define TCG_TARGET_extract_i64_valid(ofs, len) \
+>      (((ofs) =3D=3D 8 && (len) =3D=3D 8) || ((ofs) + (len)) =3D=3D 32)
 >
-> My configure command is: ./configure --cross-prefix=i686-w64-mingw32- --enable-guest-agent --with-vss-sdk
->
-> My make command is: make qemu-ga.exe qga/vss-win32/qga-vss.dll
->
-> Thanks,
-> Kirk
+> -#if TCG_TARGET_REG_BITS =3D=3D 64
+> -# define TCG_AREG0 TCG_REG_R14
+> -#else
+> -# define TCG_AREG0 TCG_REG_EBP
+> -#endif
+> -
+>  static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+>  {
+>  }
+
+
+--
+Alex Benn=C3=A9e
