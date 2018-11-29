@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gSIPs-00051c-87
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:15:26 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gSIXu-0001xT-3D
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:23:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gSIPo-00039s-4y
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:15:24 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51138 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gSIPn-00038U-Rt
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:15:20 -0500
-References: <20181128103308.26755-1-fli@suse.com>
-	<20181128103308.26755-2-fli@suse.com>
-	<87sgzle527.fsf@dusky.pond.sub.org>
-	<13916895-daeb-15ad-5540-be15d1dd7e73@suse.com>
-	<87ftvkcmdc.fsf@dusky.pond.sub.org>
-From: Fei Li <fli@suse.com>
-Message-ID: <8d282aca-57c3-422f-5186-2214f790721a@suse.com>
-Date: Thu, 29 Nov 2018 17:15:12 +0800
+	(envelope-from <pbonzini@redhat.com>) id 1gSIXs-0007S0-Pq
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 04:23:42 -0500
+References: <20180203061621.7033-1-stefanha@redhat.com>
+	<20180215103721.GG23321@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e0b23d2b-6627-4f4a-d9c1-0b4221150ef4@redhat.com>
+Date: Thu, 29 Nov 2018 10:23:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <87ftvkcmdc.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH RFC 1/5] Fix segmentation fault when
- qemu_signal_init fails
+In-Reply-To: <20180215103721.GG23321@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UtXVF43qus4mZpUdUOnRR8zCdMi5ZRQKT"
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] block/iscsi: fix ioctl cancel
+ use-after-free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Felipe Franciosi <felipe@nutanix.com>, qemu-block@nongnu.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UtXVF43qus4mZpUdUOnRR8zCdMi5ZRQKT
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Felipe Franciosi <felipe@nutanix.com>, qemu-block@nongnu.org,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>
+Message-ID: <e0b23d2b-6627-4f4a-d9c1-0b4221150ef4@redhat.com>
+Subject: Re: [PATCH v2 0/3] block/iscsi: fix ioctl cancel use-after-free
+References: <20180203061621.7033-1-stefanha@redhat.com>
+ <20180215103721.GG23321@stefanha-x1.localdomain>
+In-Reply-To: <20180215103721.GG23321@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+
+On 15/02/18 11:37, Stefan Hajnoczi wrote:
+> On Sat, Feb 03, 2018 at 07:16:18AM +0100, Stefan Hajnoczi wrote:
+>> v2:
+>>  * It was unnecessary to avoid duplicate iscsi_schedule_bh() calls sin=
+ce this
+>>    function already protects against duplicate calls internally [Stefa=
+n]
+>>
+>> Patches 1 & 2 are cleanups.
+>>
+>> Patch 3 fixes cancellation of ioctls.  Felipe showed me a trace where =
+an acb is
+>> cancelled and then completes twice.  The second time around crashes QE=
+MU.
+>>
+>> Compile-tested only.
+>>
+>> Felipe: Please let us know if this fixes the issue you are seeing.  Th=
+anks!
+>>
+>> Stefan Hajnoczi (3):
+>>   block/iscsi: drop unused IscsiAIOCB->buf field
+>>   block/iscsi: take iscsilun->mutex in iscsi_timed_check_events()
+>>   block/iscsi: fix ioctl cancel use-after-free
+>>
+>>  block/iscsi.c | 33 ++++++++++++++++++++++-----------
+>>  1 file changed, 22 insertions(+), 11 deletions(-)
+>=20
+> Thanks for the reviews, Paolo and Felipe.
+>=20
+> Paolo: Please merge this, I'll send an additional patch that works
+> around libiscsi's missing cancellation callback.
+>=20
+
+Queued now for 4.0.  It's only been 9 months...
+
+I also queued "block/iscsi: cancel libiscsi task when ABORT TASK TMF
+completes".
+
+Paolo
 
 
+--UtXVF43qus4mZpUdUOnRR8zCdMi5ZRQKT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 11/29/2018 04:35 PM, Markus Armbruster wrote:
-> Fei Li <fli@suse.com> writes:
->
->> On 11/28/2018 08:53 PM, Markus Armbruster wrote:
->>> Fei Li <fli@suse.com> writes:
->>>
->>>> When qemu_signal_init() fails in qemu_init_main_loop(), we return
->>>> without setting an error.  Its callers crash then when they try to
->>>> report the error with error_report_err().
->>> Yes, that's a bug.  Broken in 2f78e491d7b, v2.2.0.  Has escaped notice
->>> since qemu_signalfd() is quite unlikely to fail.  Could go into 3.1 as a
->>> bug fix, but I think punting it to the next release is just fine.
->> Thanks. :) BTW, should I send the next version only includes patch 1/5
->> and 2/5 separately so that you can merge? (I guess Dave will help to
->> merge the other three migration related patches)
-> I can pick patches out of a series for merging, and I trust Dave can,
-> too.  But keeping unrelated fixes separate is a good idea.  I can see
-> three groups: PATCH 1 (main loop), PATCH 2 (thread abstraction), PATCH
-> 3-5 (migration).
->
-> [...]
-Ok, thanks for the detail explanation. I once thought the first two patches
-are belong to one group, that's why I tried to separate them.
-But considering too many groups they are belong to and maintainers are
-willing to pick, I'd like to keep sending them within one patch series in
-the next version. :)
+-----BEGIN PGP SIGNATURE-----
 
-Have a nice day, thanks a lot
-Fei
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlv/sAUACgkQv/vSX3jH
+roPisAf/RVRt3tUM108/Yr86rnO5T0viE5s2IiBjQLhz1DqIksIGH7LJJ+jEidIr
+3qmzHQx3qsoMZQv1kbYwHc3acXL/dnQ3KCHO2Mu9HtomBxazCbpZx9+3wu9qPzn/
+xVcW/ISl0SLjbmG691dKUHBrJUkbVl63Ucq1UIFiFPeXBeCOQIO2bWr5ik6Z1+82
+LwwR8fGkHXraJjKV5jUwpDUrHxSwF9J7SA4BcZ92G4ynMPXOqGzP2jqQRUrU9YuO
+NZ+BgxWV1yyeTAYOJo7Ov4WBy4vhMN7yTrhPN3iqzqgVDoCsBzE2vTPoQK9Wt/5K
+160aDUtgEXOd3B5t+sf+SZWbqPT8tQ==
+=AYNE
+-----END PGP SIGNATURE-----
+
+--UtXVF43qus4mZpUdUOnRR8zCdMi5ZRQKT--
