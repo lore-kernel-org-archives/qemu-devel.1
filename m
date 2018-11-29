@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gSPIq-0006dK-2b
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:36:37 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gSPJI-0006pv-Oq
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gSPIk-0006XM-3H
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:36:35 -0500
-Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:52252)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gSPIj-0006WI-Py
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:36:29 -0500
-Received: from player695.ha.ovh.net (unknown [10.109.159.157])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 7F80A1080C1
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 17:36:27 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-29-clg@kaod.org>
-	<20181129040806.GE14697@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <59605f25-7208-1b57-874b-282c39120b18@kaod.org>
-Date: Thu, 29 Nov 2018 17:36:19 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181129040806.GE14697@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 28/36] ppc/xics: introduce a
- icp_kvm_init() routine
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gSPJD-0007Ez-N9
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 11:37:04 -0500
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Thu, 29 Nov 2018 17:36:51 +0100
+Message-Id: <20181129163655.20370-1-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PATCH v1 0/4] hw/arm: versal: Correct number of IRQs
+ in GIC setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,85 +18,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, muhammad_bilal@mentor.com, frederic.konrad@adacore.com, alistair@alistair23.me, luc.michel@greensocs.com, philmd@redhat.com, frasse.iglesias@gmail.com, figlesia@xilinx.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-On 11/29/18 5:08 AM, David Gibson wrote:
-> On Fri, Nov 16, 2018 at 11:57:21AM +0100, C=E9dric Le Goater wrote:
->> This routine gathers all the KVM initialization of the XICS KVM
->> presenter. It will be useful when the initialization of the KVM XICS
->> device is moved to a global routine.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> I dislike calling things *_init() because it's not clear which of
-> qemu's many "init" hooks it belongs with.
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-we could use 'icp_kvm_connect' instead. Which was QEMU is doing,=20
-connecting a QEMU model to a KVM one.
+The Versal GIC has 192 IRQs not 256 as we previously had setup.
+This series fixes the setup and moves the virtio-mmio nodes
+to use other reserved interrupts.
 
-C.
+Since we don't have 32 reserved lines, we also reduce the number of
+virtio-mmio regions to 8 (we do have some more lines free but let's
+leave some for future use).
 
-=20
->> ---
->>  hw/intc/xics_kvm.c | 29 +++++++++++++++++++----------
->>  1 file changed, 19 insertions(+), 10 deletions(-)
->>
->> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
->> index e8fa9a53aeba..efad1b19d821 100644
->> --- a/hw/intc/xics_kvm.c
->> +++ b/hw/intc/xics_kvm.c
->> @@ -123,11 +123,8 @@ static void icp_kvm_reset(DeviceState *dev)
->>      icp_set_kvm_state(ICP(dev), 1);
->>  }
->> =20
->> -static void icp_kvm_realize(DeviceState *dev, Error **errp)
->> +static void icp_kvm_init(ICPState *icp, Error **errp)
->>  {
->> -    ICPState *icp =3D ICP(dev);
->> -    ICPStateClass *icpc =3D ICP_GET_CLASS(icp);
->> -    Error *local_err =3D NULL;
->>      CPUState *cs;
->>      KVMEnabledICP *enabled_icp;
->>      unsigned long vcpu_id;
->> @@ -137,12 +134,6 @@ static void icp_kvm_realize(DeviceState *dev, Err=
-or **errp)
->>          abort();
->>      }
->> =20
->> -    icpc->parent_realize(dev, &local_err);
->> -    if (local_err) {
->> -        error_propagate(errp, local_err);
->> -        return;
->> -    }
->> -
->>      cs =3D icp->cs;
->>      vcpu_id =3D kvm_arch_vcpu_id(cs);
->> =20
->> @@ -168,6 +159,24 @@ static void icp_kvm_realize(DeviceState *dev, Err=
-or **errp)
->>      QLIST_INSERT_HEAD(&kvm_enabled_icps, enabled_icp, node);
->>  }
->> =20
->> +static void icp_kvm_realize(DeviceState *dev, Error **errp)
->> +{
->> +    ICPStateClass *icpc =3D ICP_GET_CLASS(dev);
->> +    Error *local_err =3D NULL;
->> +
->> +    icpc->parent_realize(dev, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->> +    icp_kvm_init(ICP(dev), &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +}
->> +
->>  static void icp_kvm_class_init(ObjectClass *klass, void *data)
->>  {
->>      DeviceClass *dc =3D DEVICE_CLASS(klass);
->=20
+Cheers,
+Edgar
+
+Edgar E. Iglesias (4):
+  hw/arm: versal: Remove bogus virtio-mmio creation
+  hw/arm: versal: Reduce number of virtio-mmio instances
+  hw/arm: versal: Use IRQs 111 - 118 for virtio-mmio
+  hw/arm: versal: Correct the nr of IRQs to 192
+
+ hw/arm/xlnx-versal-virt.c    | 7 +++----
+ include/hw/arm/xlnx-versal.h | 8 ++++----
+ 2 files changed, 7 insertions(+), 8 deletions(-)
+
+-- 
+2.17.1
