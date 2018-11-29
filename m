@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSJNZ-000643-Ix
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:17:12 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gSJOp-0007Pw-Pr
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSJNW-0004Z2-EC
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:17:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:12976)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSJNW-0004YO-5U
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:17:02 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181109173309.25212-1-danielhb413@gmail.com>
-	<20181109173309.25212-2-danielhb413@gmail.com>
-Date: Thu, 29 Nov 2018 11:16:56 +0100
-In-Reply-To: <20181109173309.25212-2-danielhb413@gmail.com> (Daniel Henrique
-	Barboza's message of "Fri, 9 Nov 2018 15:33:07 -0200")
-Message-ID: <87pnuo9oiv.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v10 1/3] qmp: query-current-machine
- with wakeup-suspend-support
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gSJOo-00059j-UX
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 05:18:23 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 29 Nov 2018 13:18:01 +0300
+Message-Id: <20181129101801.6421-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20181129101801.6421-1-vsementsov@virtuozzo.com>
+References: <20181129101801.6421-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 2/2] iotests: simple mirror test with kvm on
+ 1G image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,219 +20,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, imammedo@redhat.com
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, pbonzini@redhat.com, dplotnikov@virtuozzo.com, den@openvz.org, vsementsov@virtuozzo.com, qemu-stable@nongnu.org
 
-Daniel Henrique Barboza <danielhb413@gmail.com> writes:
+This test is broken without previous commit fixing dead-lock in mirror.
 
-> When issuing the qmp/hmp 'system_wakeup' command, what happens in a
-> nutshell is:
->
-> - qmp_system_wakeup_request set runstate to RUNNING, sets a wakeup_reason
-> and notify the event
-> - in the main_loop, all vcpus are paused, a system reset is issued, all
-> subscribers of wakeup_notifiers receives a notification, vcpus are then
-> resumed and the wake up QAPI event is fired
->
-> Note that this procedure alone doesn't ensure that the guest will awake
-> from SUSPENDED state - the subscribers of the wake up event must take
-> action to resume the guest, otherwise the guest will simply reboot. At
-> this moment, only the ACPI machines via acpi_pm1_cnt_init has wake-up
-> from suspend support.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/qemu-iotests/235     | 59 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/235.out |  1 +
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 61 insertions(+)
+ create mode 100755 tests/qemu-iotests/235
+ create mode 100644 tests/qemu-iotests/235.out
 
-the ACPI machines via acpi_pm1_cnt_init have
-
->
-> However, only the presence of 'system_wakeup' is required for QGA to
-> support 'guest-suspend-ram' and 'guest-suspend-hybrid' at this moment.
-> This means that the user/management will expect to suspend the guest using
-> one of those suspend commands and then resume execution using system_wakeup,
-> regardless of the support offered in system_wakeup in the first place.
->
-> This patch creates a new API called query-current-machine [1], that holds
-> a new flag called 'wakeup-suspend-support' that indicates if the guest
-> supports wake up from suspend via system_wakeup. The machine is considered
-> to implement wake-up support if a call to a new 'qemu_register_wakeup_support'
-> is made during its init, as it is now being done inside acpi_pm1_cnt_init.
-
-In xen_hvm_init(), too.
-
-Doesn't that contradict "only the ACPI machines via acpi_pm1_cnt_init
-has wake-up from suspend support"?
-
-> This allows for any other machine type to declare wake-up support regardless
-> of ACPI state or wakeup_notifiers subscription, making easier for
-> newer implementations that might have its own mechanisms in the future.
-
-their own mechanisms
-
->
-> This is the expected output of query-current-machine when running a x86
-> guest:
->
-> {"execute" : "query-current-machine"}
-> {"return": {"wakeup-suspend-support": true}}
->
-> Running the same x86 guest, but with the --no-acpi option:
->
-> {"execute" : "query-current-machine"}
-> {"return": {"wakeup-suspend-support": false}}
->
-> This is the output when running a pseries guest:
->
-> {"execute" : "query-current-machine"}
-> {"return": {"wakeup-suspend-support": false}}
->
-> With this extra tool, management can avoid situations where a guest
-> that does not have proper suspend/wake capabilities ends up in
-> inconsistent state (e.g.
-> https://github.com/open-power-host-os/qemu/issues/31).
->
-> [1] the decision of creating the query-current-machine API is based
-> on discussions in the QEMU mailing list where it was decided that
-> query-target wasn't a proper place to store the wake-up flag, neither
-> was query-machines because this isn't a static property of the
-> machine object. This new API can then be used to store other
-> dynamic machine properties that are scattered around the code
-> ATM. More info at:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04235.html
->
-> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
->  hw/acpi/core.c          |  6 ++++++
->  hw/i386/xen/xen-hvm.c   |  5 +++++
->  include/sysemu/sysemu.h |  1 +
->  qapi/misc.json          | 24 ++++++++++++++++++++++++
->  vl.c                    | 19 +++++++++++++++++++
->  5 files changed, 55 insertions(+)
->
-> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-> index aafdc61648..52e18d7810 100644
-> --- a/hw/acpi/core.c
-> +++ b/hw/acpi/core.c
-> @@ -617,6 +617,12 @@ void acpi_pm1_cnt_init(ACPIREGS *ar, MemoryRegion *parent,
->      ar->pm1.cnt.s4_val = s4_val;
->      ar->wakeup.notify = acpi_notify_wakeup;
->      qemu_register_wakeup_notifier(&ar->wakeup);
-> +
-> +    /*
-> +     * Register wake-up support in QMP query-current-machine API
-> +     */
-> +    qemu_register_wakeup_support();
-> +
-
-Not sure we really need the comment.  Up to the maintainer.
-
->      memory_region_init_io(&ar->pm1.cnt.io, memory_region_owner(parent),
->                            &acpi_pm_cnt_ops, ar, "acpi-cnt", 2);
->      memory_region_add_subregion(parent, 4, &ar->pm1.cnt.io);
-> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-> index 935a3676c8..2143d33b18 100644
-> --- a/hw/i386/xen/xen-hvm.c
-> +++ b/hw/i386/xen/xen-hvm.c
-> @@ -1405,6 +1405,11 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
->      state->wakeup.notify = xen_wakeup_notifier;
->      qemu_register_wakeup_notifier(&state->wakeup);
->  
-> +    /*
-> +     * Register wake-up support in QMP query-current-machine API
-> +     */
-> +    qemu_register_wakeup_support();
-> +
-
-Likewise.
-
->      rc = xen_map_ioreq_server(state);
->      if (rc < 0) {
->          goto err;
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 8d6095d98b..0446adacc6 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -77,6 +77,7 @@ void qemu_register_suspend_notifier(Notifier *notifier);
->  void qemu_system_wakeup_request(WakeupReason reason);
->  void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
->  void qemu_register_wakeup_notifier(Notifier *notifier);
-> +void qemu_register_wakeup_support(void);
->  void qemu_system_shutdown_request(ShutdownCause reason);
->  void qemu_system_powerdown_request(void);
->  void qemu_register_powerdown_notifier(Notifier *notifier);
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 6c1c5c0a37..9b86576e61 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -2008,6 +2008,30 @@
->  ##
->  { 'command': 'query-machines', 'returns': ['MachineInfo'] }
->  
-> +##
-> +# @CurrentMachineParams:
-> +#
-> +# Information describing the running machine parameters.
-> +#
-> +# @wakeup-suspend-support: true if the machine supports wake up from
-> +#                          suspend
-> +#
-> +# Since: 3.2.0
-
-The next release is going to be named 4.0.  Perhaps the maintainer can
-fix that up for you.
-
-> +##
-> +{ 'struct': 'CurrentMachineParams',
-> +  'data': { 'wakeup-suspend-support': 'bool'} }
-> +
-> +##
-> +# @query-current-machine:
-> +#
-> +# Return information on the current virtual machine.
-> +#
-> +# Returns: CurrentMachineParams
-> +#
-> +# Since: 3.2.0
-> +##
-> +{ 'command': 'query-current-machine', 'returns': 'CurrentMachineParams' }
-> +
->  ##
->  # @CpuDefinitionInfo:
->  #
-> diff --git a/vl.c b/vl.c
-> index 55bab005b6..5813a8785f 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -191,6 +191,7 @@ bool boot_strict;
->  uint8_t *boot_splash_filedata;
->  size_t boot_splash_filedata_size;
->  uint8_t qemu_extra_params_fw[2];
-> +bool wakeup_suspend_enabled;
->  
->  int icount_align_option;
->  
-> @@ -1782,6 +1783,24 @@ void qemu_register_wakeup_notifier(Notifier *notifier)
->      notifier_list_add(&wakeup_notifiers, notifier);
->  }
->  
-> +void qemu_register_wakeup_support(void)
-> +{
-> +    wakeup_suspend_enabled = true;
-> +}
-> +
-> +static bool qemu_wakeup_suspend_enabled(void)
-> +{
-> +    return wakeup_suspend_enabled;
-> +}
-> +
-> +CurrentMachineParams *qmp_query_current_machine(Error **errp)
-> +{
-> +    CurrentMachineParams *params = g_malloc0(sizeof(*params));
-> +    params->wakeup_suspend_support = qemu_wakeup_suspend_enabled();
-> +
-> +    return params;
-> +}
-> +
->  void qemu_system_killed(int signal, pid_t pid)
->  {
->      shutdown_signal = signal;
-
-Patch looks good to me.
+diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
+new file mode 100755
+index 0000000000..e5d1ae6593
+--- /dev/null
++++ b/tests/qemu-iotests/235
+@@ -0,0 +1,59 @@
++#!/usr/bin/env python
++#
++# Simple mirror test
++#
++# Copyright (c) 2018 Virtuozzo International GmbH. All rights reserved.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import sys
++import os
++import iotests
++from iotests import qemu_img_create, qemu_io, file_path
++
++sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
++
++from qemu import QEMUMachine
++
++# Note:
++# This test was added to check that mirror dead-lock was fixed (see previous
++# commit before this test addition).
++# And it didn't reproduce if at least one of the following:
++# 1. use small image size
++# 2. use raw format (not qcow2)
++# 3. drop kvm and use iotests.VM() (maybe, because of qtest) (however, it still
++#    reproduces, if just drop kvm, but gdb failed to produce full backtraces
++#    for me)
++# 4. add iothread
++
++size = '1G'
++
++iotests.verify_image_format(supported_fmts=['raw', 'qcow2'])
++
++disk, target = file_path('disk', 'target')
++
++# prepare source image
++qemu_img_create('-f', iotests.imgfmt, disk, size)
++qemu_io('-f', iotests.imgfmt, '-c', 'write 0 ' + size, disk)
++
++vm = QEMUMachine(iotests.qemu_prog)
++vm.add_args('-machine', 'pc,accel=kvm')
++vm.add_args('-drive', 'id=src,file=' + disk)
++vm.launch()
++
++print(vm.qmp('drive-mirror', device='src', target=target, sync='full'))
++vm.event_wait('BLOCK_JOB_READY')
++
++vm.shutdown()
+diff --git a/tests/qemu-iotests/235.out b/tests/qemu-iotests/235.out
+new file mode 100644
+index 0000000000..d6ccbad8fa
+--- /dev/null
++++ b/tests/qemu-iotests/235.out
+@@ -0,0 +1 @@
++{u'return': {}}
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 8c56a0ad11..61a6d98ebd 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -232,3 +232,4 @@
+ 232 auto quick
+ 233 auto quick
+ 234 auto quick migration
++235 auto quick
+-- 
+2.18.0
