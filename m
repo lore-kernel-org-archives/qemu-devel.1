@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gSB3x-0002Lo-DJ
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:18 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1gSB40-0002Nh-DH
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1gSB3v-0001NU-FT
-	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:16 -0500
-Date: Thu, 29 Nov 2018 12:02:48 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1gSB3v-0001NQ-FU
+	for qemu-devel@nongnu.org; Wed, 28 Nov 2018 20:24:19 -0500
+Date: Thu, 29 Nov 2018 11:49:39 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181129010248.GN2251@umbus.fritz.box>
+Message-ID: <20181129004939.GK2251@umbus.fritz.box>
 References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-13-clg@kaod.org>
-	<20181128025714.GW2251@umbus.fritz.box>
-	<20181128103551.42397998@bahia.lan>
+	<20181116105729.23240-10-clg@kaod.org>
+	<20181128001324.GS2251@umbus.fritz.box>
+	<04ec9b85-1fb3-e011-738c-077e32ab4d0f@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AO7xfgsPaN7qs9GL"
+	protocol="application/pgp-signature"; boundary="2XUWoe1nmt7t49kG"
 Content-Disposition: inline
-In-Reply-To: <20181128103551.42397998@bahia.lan>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v5 12/36] spapr: initialize VSMT
- before initializing the IRQ backend
+In-Reply-To: <04ec9b85-1fb3-e011-738c-077e32ab4d0f@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v5 09/36] ppc/xive: notify the CPU when the
+ interrupt priority is more privileged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +27,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 
---AO7xfgsPaN7qs9GL
+--2XUWoe1nmt7t49kG
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 28, 2018 at 10:35:51AM +0100, Greg Kurz wrote:
-> On Wed, 28 Nov 2018 13:57:14 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Fri, Nov 16, 2018 at 11:57:05AM +0100, C=E9dric Le Goater wrote:
-> > > We will need to use xics_max_server_number() to create the sPAPRXive
-> > > object modeling the interrupt controller of the machine which is
-> > > created before the CPUs.
-> > >=20
-> > > Signed-off-by: C=E9dric Le Goater <clg@kaod.org> =20
+On Wed, Nov 28, 2018 at 12:30:45PM +0100, C=E9dric Le Goater wrote:
+> On 11/28/18 1:13 AM, David Gibson wrote:
+> > On Fri, Nov 16, 2018 at 11:57:02AM +0100, C=E9dric Le Goater wrote:
+> >> After the event data was pushed in the O/S Event Queue, the IVPE
+> >> raises the bit corresponding to the priority of the pending interrupt
+> >> in the register IBP (Interrupt Pending Buffer) to indicate there is an
+> >> event pending in one of the 8 priority queues. The Pending Interrupt
+> >> Priority Register (PIPR) is also updated using the IPB. This register
+> >> represent the priority of the most favored pending notification.
+> >>
+> >> The PIPR is then compared to the the Current Processor Priority
+> >> Register (CPPR). If it is more favored (numerically less than), the
+> >> CPU interrupt line is raised and the EO bit of the Notification Source
+> >> Register (NSR) is updated to notify the presence of an exception for
+> >> the O/S. The check needs to be done whenever the PIPR or the CPPR are
+> >> changed.
+> >>
+> >> The O/S acknowledges the interrupt with a special load in the Thread
+> >> Interrupt Management Area. If the EO bit of the NSR is set, the CPPR
+> >> takes the value of PIPR. The bit number in the IBP corresponding to
+> >> the priority of the pending interrupt is reseted and so is the EO bit
+> >> of the NSR.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  hw/intc/xive.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++-
+> >>  1 file changed, 93 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> >> index 5ba3b06e6e25..c49932d2b799 100644
+> >> --- a/hw/intc/xive.c
+> >> +++ b/hw/intc/xive.c
+> >> @@ -21,9 +21,73 @@
+> >>   * XIVE Thread Interrupt Management context
+> >>   */
+> >> =20
+> >> +/* Convert a priority number to an Interrupt Pending Buffer (IPB)
+> >> + * register, which indicates a pending interrupt at the priority
+> >> + * corresponding to the bit number
+> >> + */
+> >> +static uint8_t priority_to_ipb(uint8_t priority)
+> >> +{
+> >> +    return priority > XIVE_PRIORITY_MAX ?
+> >> +        0 : 1 << (XIVE_PRIORITY_MAX - priority);
+> >> +}
+> >> +
+> >> +/* Convert an Interrupt Pending Buffer (IPB) register to a Pending
+> >> + * Interrupt Priority Register (PIPR), which contains the priority of
+> >> + * the most favored pending notification.
+> >> + */
+> >> +static uint8_t ipb_to_pipr(uint8_t ibp)
+> >> +{
+> >> +    return ibp ? clz32((uint32_t)ibp << 24) : 0xff;
+> >> +}
+> >> +
+> >> +static void ipb_update(uint8_t *regs, uint8_t priority)
+> >> +{
+> >> +    regs[TM_IPB] |=3D priority_to_ipb(priority);
+> >> +    regs[TM_PIPR] =3D ipb_to_pipr(regs[TM_IPB]);
+> >> +}
+> >> +
+> >> +static uint8_t exception_mask(uint8_t ring)
+> >> +{
+> >> +    switch (ring) {
+> >> +    case TM_QW1_OS:
+> >> +        return TM_QW1_NSR_EO;
+> >> +    default:
+> >> +        g_assert_not_reached();
+> >> +    }
+> >> +}
+> >> +
+> >>  static uint64_t xive_tctx_accept(XiveTCTX *tctx, uint8_t ring)
+> >>  {
+> >> -    return 0;
+> >> +    uint8_t *regs =3D &tctx->regs[ring];
+> >> +    uint8_t nsr =3D regs[TM_NSR];
+> >> +    uint8_t mask =3D exception_mask(ring);
+> >> +
+> >> +    qemu_irq_lower(tctx->output);
+> >> +
+> >> +    if (regs[TM_NSR] & mask) {
+> >> +        uint8_t cppr =3D regs[TM_PIPR];
+> >> +
+> >> +        regs[TM_CPPR] =3D cppr;
+> >> +
+> >> +        /* Reset the pending buffer bit */
+> >> +        regs[TM_IPB] &=3D ~priority_to_ipb(cppr);
+> >> +        regs[TM_PIPR] =3D ipb_to_pipr(regs[TM_IPB]);
+> >> +
+> >> +        /* Drop Exception bit */
+> >> +        regs[TM_NSR] &=3D ~mask;
+> >> +    }
+> >> +
+> >> +    return (nsr << 8) | regs[TM_CPPR];
 > >=20
-> > My only concern here is that this moves the spapr_set_vsmt_mode()
-> > before some of the sanity checks in spapr_init_cpus().  Are we certain
-> > there are no edge cases that could cause badness?
+> > Don't you need a cast to avoid (nsr << 8) being a shift-wider-than-size?
+>=20
+> I will check.
+
+According to Eric, it doesn't, and given the compiler isn't
+complaining I'm pretty sure that's right.  Makes me a bit nervous
+though.
+
+>=20
+> >=20
+> >> +}
+> >> +
+> >> +static void xive_tctx_notify(XiveTCTX *tctx, uint8_t ring)
+> >> +{
+> >> +    uint8_t *regs =3D &tctx->regs[ring];
+> >> +
+> >> +    if (regs[TM_PIPR] < regs[TM_CPPR]) {
+> >> +        regs[TM_NSR] |=3D exception_mask(ring);
+> >> +        qemu_irq_raise(tctx->output);
+> >> +    }
+> >>  }
+> >> =20
+> >>  static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8_t ring, uint8_t =
+cppr)
+> >> @@ -33,6 +97,9 @@ static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8=
+_t ring, uint8_t cppr)
+> >>      }
+> >> =20
+> >>      tctx->regs[ring + TM_CPPR] =3D cppr;
+> >> +
+> >> +    /* CPPR has changed, check if we need to raise a pending exceptio=
+n */
+> >> +    xive_tctx_notify(tctx, ring);
+> >>  }
+> >> =20
+> >>  /*
+> >> @@ -198,6 +265,17 @@ static void xive_tm_set_os_cppr(XiveTCTX *tctx, h=
+waddr offset,
+> >>      xive_tctx_set_cppr(tctx, TM_QW1_OS, value & 0xff);
+> >>  }
+> >> =20
+> >> +/*
+> >> + * Adjust the IPB to allow a CPU to process event queues of other
+> >> + * priorities during one physical interrupt cycle.
+> >> + */
+> >> +static void xive_tm_set_os_pending(XiveTCTX *tctx, hwaddr offset,
+> >> +                                   uint64_t value, unsigned size)
+> >> +{
+> >> +    ipb_update(&tctx->regs[TM_QW1_OS], value & 0xff);
+> >> +    xive_tctx_notify(tctx, TM_QW1_OS);
+> >> +}
+> >> +
+> >>  /*
+> >>   * Define a mapping of "special" operations depending on the TIMA page
+> >>   * offset and the size of the operation.
+> >> @@ -220,6 +298,7 @@ static const XiveTmOp xive_tm_operations[] =3D {
+> >> =20
+> >>      /* MMIOs above 2K : special operations with side effects */
+> >>      { XIVE_TM_OS_PAGE, TM_SPC_ACK_OS_REG,     2, NULL, xive_tm_ack_os=
+_reg },
+> >> +    { XIVE_TM_OS_PAGE, TM_SPC_SET_OS_PENDING, 1, xive_tm_set_os_pendi=
+ng, NULL },
+> >>  };
+> >> =20
+> >>  static const XiveTmOp *xive_tm_find_op(hwaddr offset, unsigned size, =
+bool write)
+> >> @@ -409,6 +488,13 @@ static void xive_tctx_reset(void *dev)
+> >>      tctx->regs[TM_QW1_OS + TM_LSMFB] =3D 0xFF;
+> >>      tctx->regs[TM_QW1_OS + TM_ACK_CNT] =3D 0xFF;
+> >>      tctx->regs[TM_QW1_OS + TM_AGE] =3D 0xFF;
+> >> +
+> >> +    /*
+> >> +     * Initialize PIPR to 0xFF to avoid phantom interrupts when the
+> >> +     * CPPR is first set.
+> >> +     */
+> >> +    tctx->regs[TM_QW1_OS + TM_PIPR] =3D
+> >> +        ipb_to_pipr(tctx->regs[TM_QW1_OS + TM_IPB]);
+> >>  }
+> >> =20
+> >>  static void xive_tctx_realize(DeviceState *dev, Error **errp)
+> >> @@ -1218,9 +1304,15 @@ static void xive_presenter_notify(XiveRouter *x=
+rtr, uint8_t format,
+> >>      found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, ca=
+m_ignore,
+> >>                                   priority, logic_serv, &match);
+> >>      if (found) {
+> >> +        ipb_update(&match.tctx->regs[match.ring], priority);
+> >> +        xive_tctx_notify(match.tctx, match.ring);
+> >>          return;
+> >>      }
+> >> =20
+> >> +    /* Record the IPB in the associated NVT structure */
+> >> +    ipb_update((uint8_t *) &nvt.w4, priority);
+> >> +    xive_router_set_nvt(xrtr, nvt_blk, nvt_idx, &nvt);
+> >=20
+> > You're only writing back the NVT in the !found case.  Don't you still
+> > need to update it in the found case?
+>=20
+> I would say no unless we add support for redistribution which would
+> mean the model supports logical servers.=20
+
+Oh, sorry, I think I missed that the ipb_update() was only touching
+the NVT in the !found case.
+
+> These are much more complex scenarios in which the IPVE returns multiple=
+=20
+> matching targets, the IVRE selects one but then the context changes.
+> =20
+>=20
+> C.
+>=20
+> >=20
+> >>      /* If no matching NVT is dispatched on a HW thread :
+> >>       * - update the NVT structure if backlog is activated
+> >>       * - escalate (ESe PQ bits and EAS in w4-5) if escalation is
 > >=20
 >=20
-> The early checks in spapr_init_cpus() filter out topologies that would
-> result in partially filled cores. They're only related to the rest of
-> the code that creates the boot CPUs. Before commit 1a5008fc17,
-> spapr_set_vsmt_mode() was even being called before spapr_init_cpus().
-> The rationale to move it there was to ensure it is called before the
-> first user of spapr->vsmt, which happens to be a call to
-> xics_max_server_number().
-
-Ok.
-
-> Now that xics_max_server_number() needs to be called even earlier, I thin=
-k a
-> better change is to have xics_max_server_number() to call spapr_set_vsmt_=
-mode()
-> if spapr->vsmt isn't set.
-
-I'd rather not do that, but instead move it statically to where it
-needs to be.  That sort of lazy/on-demand initialization can result in
-really confusing behaviours depending on when a seemingly innocuous
-data-returning function is called, so I consider it a code smell.
-
->=20
-> > > ---
-> > >  hw/ppc/spapr.c | 10 +++++-----
-> > >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 7afd1a175bf2..50cb9f9f4a02 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2466,11 +2466,6 @@ static void spapr_init_cpus(sPAPRMachineState =
-*spapr)
-> > >          boot_cores_nr =3D possible_cpus->len;
-> > >      }
-> > > =20
-> > > -    /* VSMT must be set in order to be able to compute VCPU ids, ie =
-to
-> > > -     * call xics_max_server_number() or spapr_vcpu_id().
-> > > -     */
-> > > -    spapr_set_vsmt_mode(spapr, &error_fatal);
-> > > -
-> > >      if (smc->pre_2_10_has_unused_icps) {
-> > >          int i;
-> > > =20
-> > > @@ -2593,6 +2588,11 @@ static void spapr_machine_init(MachineState *m=
-achine)
-> > >      /* Setup a load limit for the ramdisk leaving room for SLOF and =
-FDT */
-> > >      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
-> > > =20
-> > > +    /* VSMT must be set in order to be able to compute VCPU ids, ie =
-to
-> > > +     * call xics_max_server_number() or spapr_vcpu_id().
-> > > +     */
-> > > +    spapr_set_vsmt_mode(spapr, &error_fatal);
-> > > +
-> > >      /* Set up Interrupt Controller before we create the VCPUs */
-> > >      smc->irq->init(spapr, &error_fatal);
-> > >   =20
-> >=20
->=20
-
-
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -122,24 +255,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---AO7xfgsPaN7qs9GL
+--2XUWoe1nmt7t49kG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv/OrgACgkQbDjKyiDZ
-s5KBiBAA2UBuEfgUwy2BytS580YiXUEML25R8V3pJ5xobyC8k9OSjRtI1JCYlHKC
-6fJKspUwI+6gOws6niHrosTu/j5axYfzm+xuQqwlZROxR+TiqpRPIbiuxuVZOD1w
-I9rQE30wzJqPpVY3UV6JY8hrJpDqbAHY3I0TMHAhwwRfwg0mH4Re4w5lkYPOJRO7
-oC6RYdUM5eAQIpCKi2DAOY7ztGkibKVfnJcV9A1kZsQh/SC3qSwa559NJeaUpA+D
-jNsgUg6fGQk6yM+2M5KfMRFy5dp5vvAMBbxUtps9ATbj3xCkOODXrEKhyL59EE+b
-fgb9Oa+TTsfvibxE9gwW8ohu/WhAMG01twTJL1cKtJf3kg+wimlZejJQclGG20Ue
-kYPoUac5XSDS11ADC7Ps5iciDlCQ96fkXIVQZln0wGaJ3zcOO0SYslB42+LowXmO
-Ecjth7ZFG5Ck+clUfIPEV/FbmqRBquVHja3MkpipGZ93U5n2EoZUhJFiQsGpuOZz
-dJCyg/XKQskHbzhkTF4bGZwTRKaqCDHVtz3KsUJzX4OLmaI9d2o4enPZ2a/9xy5L
-cVsihimDOJPEOGbA1MVoazVbYxVNkIG5Kz6593VPxVGeAYYuUE+22DpZmMMkDmTM
-7ox1Ywd+N61d1nqqHU/hRgAg/FjPFLhf3aJbr1A6vgGS9mWppsU=
-=MHF4
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlv/N6MACgkQbDjKyiDZ
+s5LD8hAAzLTmrJcMb45B8R/0AvuEyg+EAqKQNn99fE3HaNfncLy1l1pfRiTTnJOh
+7eznB0fAfOgsayvSkNtsT5x3wlLwlA1O7vI1xF/aaJfQmD9MEX5xNN6Awzo9eTKM
+Tbw3TbduKaqH7iZfP5No11zQCv1Z/Z6SK8uYwZ0AL/zpOR3SgRsxc+MoT2XBJWxG
+zUONs/i+IiCSAfGCgnMotUTxcmZqW5xtcRiCfEm2jyApSBfTgEDG7+R6sdLPgGhl
+KTGrQL0/KhhybP4Kb9DiLuEdk02N8RAPoMRjCRDz29Fi7GkvYsflHqEOk0Y730DE
+lny5vSJ5KENWP4ddJKFfAX3FI/JXkHUk2GumWX7G+F+1FMrKuc0owOmDx/kmZxva
+OEaQYikEsfhSF4tyrkn/ex77wwbKkUVB+91LlDgY1akapDB8f92iC4fhmS/eFmum
+Frxm+Alw0SIBtG34Ach7hUaTwEuC7pCNMihHfvRlK08LI/kkmtAYCOMyu3+0QKOj
+ZJgcbqvQRYkO2SIWjcE2RnfnNJLsI04i2MYyKQHO0+2y9lGOGZ0gRCnuU6uw49S0
+v6jFj/MC1Qe9G8IOezuRxfBmWLn/Ay6d9q5E0vnEBmC09iP87KbavLxxAci4Em3S
+Ixg/arCRwpm9LlRGdY0+ljetGdxAkpU1DqdE+6kJGWnIFBmhc4w=
+=lEsB
 -----END PGP SIGNATURE-----
 
---AO7xfgsPaN7qs9GL--
+--2XUWoe1nmt7t49kG--
