@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gSOED-0001NJ-9t
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:27:47 -0500
+	(envelope-from <thuth@redhat.com>) id 1gSOJI-0006Bg-CT
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:33:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gSOE8-0002DP-MF
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:27:45 -0500
-Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:37525)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gSOE8-0002C3-5E
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:27:40 -0500
-Received: from player758.ha.ovh.net (unknown [10.109.143.24])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 509831076C6
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 16:27:38 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-12-clg@kaod.org>
-	<20181128023902.GU2251@umbus.fritz.box>
-	<dbd8810e-09b9-7344-92d2-faddebf30c10@kaod.org>
-	<20181129010047.GM2251@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <cde0bf38-a766-deab-8d46-41fa7e776185@kaod.org>
-Date: Thu, 29 Nov 2018 16:27:31 +0100
+	(envelope-from <thuth@redhat.com>) id 1gSOJ6-0005pu-E2
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 10:32:54 -0500
+References: <20181128095939.5684-1-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e036b52f-abe7-4b13-1c5f-d084a8b7a491@redhat.com>
+Date: Thu, 29 Nov 2018 16:32:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181129010047.GM2251@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20181128095939.5684-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 11/36] spapr/xive: use the VCPU id as a
- NVT identifier
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/tod: Properly stop the KVM TOD
+ while the guest is not running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,233 +24,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-[ ... ] 
+On 2018-11-28 10:59, David Hildenbrand wrote:
+> Just like on other architectures, we should stop the clock while the gu=
+est
+> is not running. This is already properly done for TCG. Right now, doing=
+ an
+> offline migration (stop, migrate, cont) can easily trigger stalls in th=
+e
+> guest.
+>=20
+> Even doing a
+>     (hmp) stop
+>     ... wait 2 minutes ...
+>     (hmp) cont
+> will already trigger stalls.
+>=20
+> So whenever the guest stops, backup the KVM TOD. When continuing to run
+> the guest, restore the KVM TOD.
+>=20
+> One special case is starting a simple VM: Reading the TOD from KVM to
+> stop it right away until the guest is actually started means that the
+> time of any simple VM will already differ to the host time. We can
+> simply leave the TOD running and the guest won't be able to recognize
+> it.
+>=20
+> For migration, we actually want to keep the TOD stopped until really
+> starting the guest. To be able to catch most errors, we should however
+> try to set the TOD in addition to simply storing it. So we can still
+> catch basic migration problems.
+>=20
+> If anything goes wrong while backing up/restoring the TOD, we have to
+> ignore it (but print a warning). This is then basically a fallback to
+> old behavior (TOD remains running).
+>=20
+> I tested this very basically with an initrd:
+>     1. Start a simple VM. Observed that the TOD is kept running. Old
+>        behavior.
+>     2. Ordinary live migration. Observed that the TOD is temporarily
+>        stopped on the destination when setting the new value and
+>        correctly started when finally starting the guest.
+>     3. Offline live migration. (stop, migrate, cont). Observed that the
+>        TOD will be stopped on the source with the "stop" command. On th=
+e
+>        destination, the TOD is temporarily stopped when setting the new
+>        value and correctly started when finally starting the guest via
+>        "cont".
+>     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
+>        or conts in a row have no effect, so works as expected)
+>=20
+> In the future, we might want to send the guest a special kind of time s=
+ync
+> interrupt under some conditions, so it can synchronize its tod to the
+> host tod. This is interesting for migration scenarios but also when we
+> get time sync interrupts ourselves. This however will most probably hav=
+e
+> to be handled in KVM (e.g. when the tods differ too much) and is not
+> desired e.g. when debugging the guest. (single stepping should not
+> result in permanent time syncs). I consider something like that an add-=
+on
+> on top of this basic "don't break the guest" handling.
+>=20
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>=20
+> v1 -> v2:
+> - Add time sync idea suggested by Christian to description
+> - Drop one unnecessary "return"
+> - Register in realize() and not in instance_init()
+>=20
+>=20
+>  hw/s390x/tod-kvm.c     | 91 +++++++++++++++++++++++++++++++++++++++++-
+>  hw/s390x/tod.c         |  5 +++
+>  include/hw/s390x/tod.h |  8 +++-
+>  3 files changed, 101 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/s390x/tod-kvm.c b/hw/s390x/tod-kvm.c
+> index df564ab89c..87717d0be1 100644
+> --- a/hw/s390x/tod-kvm.c
+> +++ b/hw/s390x/tod-kvm.c
+> @@ -10,10 +10,11 @@
+> =20
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+> +#include "sysemu/sysemu.h"
+>  #include "hw/s390x/tod.h"
+>  #include "kvm_s390x.h"
+> =20
+> -static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Err=
+or **errp)
+> +static void kvm_s390_get_tod_raw(S390TOD *tod, Error **errp)
+>  {
+>      int r;
+> =20
+> @@ -27,7 +28,17 @@ static void kvm_s390_tod_get(const S390TODState *td,=
+ S390TOD *tod, Error **errp)
+>      }
+>  }
+> =20
+> -static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Err=
+or **errp)
+> +static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Err=
+or **errp)
+> +{
+> +    if (td->stopped) {
+> +        *tod =3D td->base;
+> +        return;
+> +    }
+> +
+> +    kvm_s390_get_tod_raw(tod, errp);
+> +}
+> +
+> +static void kvm_s390_set_tod_raw(const S390TOD *tod, Error **errp)
+>  {
+>      int r;
+> =20
+> @@ -41,18 +52,94 @@ static void kvm_s390_tod_set(S390TODState *td, cons=
+t S390TOD *tod, Error **errp)
+>      }
+>  }
+> =20
+> +static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Err=
+or **errp)
+> +{
+> +    Error *local_err =3D NULL;
+> +
+> +    /*
+> +     * Somebody (e.g. migration) set the TOD. We'll store it into KVM =
+to
+> +     * properly detect errors now but take a look at the runstate to d=
+ecide
+> +     * whether really to keep the tod running. E.g. during migration, =
+this
+> +     * is the point where we want to stop the initially running TOD to=
+ fire
+> +     * it back up when actually starting the migrated guest.
+> +     */
+> +    kvm_s390_set_tod_raw(tod, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    if (runstate_is_running()) {
+> +        td->stopped =3D false;
+> +    } else {
+> +        td->stopped =3D true;
+> +        td->base =3D *tod;
+> +    }
+> +}
+> +
+> +static void kvm_s390_tod_vm_state_change(void *opaque, int running,
+> +                                         RunState state)
+> +{
+> +    S390TODState *td =3D opaque;
+> +    Error *local_err =3D NULL;
+> +
+> +    if (running && td->stopped) {
+> +        /* Set the old TOD when running the VM - start the TOD clock. =
+*/
+> +        kvm_s390_set_tod_raw(&td->base, &local_err);
+> +        if (local_err) {
+> +            warn_report_err(local_err);
+> +        }
+> +        /* Treat errors like the TOD was running all the time. */
+> +        td->stopped =3D false;
+> +    } else if (!running && !td->stopped) {
+> +        /* Store the TOD when stopping the VM - stop the TOD clock. */
+> +        kvm_s390_get_tod_raw(&td->base, &local_err);
+> +        if (local_err) {
+> +            /* Keep the TOD running in case we could not back it up. *=
+/
+> +            warn_report_err(local_err);
+> +        } else {
+> +            td->stopped =3D true;
+> +        }
+> +    }
+> +}
+> +
+> +static void kvm_s390_tod_realize(S390TODState *td, Error **errp)
+> +{
+> +    /*
+> +     * We need to know when the VM gets started/stopped to start/stop =
+the TOD.
+> +     * As we can never have more than one TOD instance (and that will =
+never be
+> +     * removed), registering here and never unregistering is good enou=
+gh.
+> +     */
+> +    qemu_add_vm_change_state_handler(kvm_s390_tod_vm_state_change, td)=
+;
+> +}
+> +
+>  static void kvm_s390_tod_class_init(ObjectClass *oc, void *data)
+>  {
+>      S390TODClass *tdc =3D S390_TOD_CLASS(oc);
+> =20
+> +    tdc->realize =3D kvm_s390_tod_realize;
+>      tdc->get =3D kvm_s390_tod_get;
+>      tdc->set =3D kvm_s390_tod_set;
+>  }
+> =20
+> +static void kvm_s390_tod_init(Object *obj)
+> +{
+> +    S390TODState *td =3D S390_TOD(obj);
+> +
+> +    /*
+> +     * The TOD is initially running (value stored in KVM). Avoid needl=
+ess
+> +     * loading/storing of the TOD when starting a simple VM, so let it
+> +     * run although the (never started) VM is stopped. For migration, =
+we
+> +     * will properly set the TOD later.
+> +     */
+> +    td->stopped =3D false;
+> +}
+> +
+>  static TypeInfo kvm_s390_tod_info =3D {
+>      .name =3D TYPE_KVM_S390_TOD,
+>      .parent =3D TYPE_S390_TOD,
+>      .instance_size =3D sizeof(S390TODState),
+> +    .instance_init =3D kvm_s390_tod_init,
+>      .class_init =3D kvm_s390_tod_class_init,
+>      .class_size =3D sizeof(S390TODClass),
+>  };
+> diff --git a/hw/s390x/tod.c b/hw/s390x/tod.c
+> index 1c63f411e6..82ea6554ba 100644
+> --- a/hw/s390x/tod.c
+> +++ b/hw/s390x/tod.c
+> @@ -97,9 +97,14 @@ static SaveVMHandlers savevm_tod =3D {
+>  static void s390_tod_realize(DeviceState *dev, Error **errp)
+>  {
+>      S390TODState *td =3D S390_TOD(dev);
+> +    S390TODClass *tdc =3D S390_TOD_GET_CLASS(td);
+> =20
+>      /* Legacy migration interface */
+>      register_savevm_live(NULL, "todclock", 0, 1, &savevm_tod, td);
+> +
+> +    if (tdc->realize) {
+> +        tdc->realize(td, errp);
+> +    }
+>  }
 
->>>> +/*
->>>> + * The allocation of VP blocks is a complex operation in OPAL and the
->>>> + * VP identifiers have a relation with the number of HW chips, the
->>>> + * size of the VP blocks, VP grouping, etc. The QEMU sPAPR XIVE
->>>> + * controller model does not have the same constraints and can use a
->>>> + * simple mapping scheme of the CPU vcpu_id
->>>> + *
->>>> + * These identifiers are never returned to the OS.
->>>> + */
->>>> +
->>>> +#define SPAPR_XIVE_VP_BASE 0x400
->>>
->>> 0x400 == 1024.  Could we ever have the possibility of needing to
->>> consider both physical NVTs and PAPR NVTs at the same time?  
->>
->> They would not be in the same CAM line: OS ring vs. PHYS ring. 
-> 
-> Hm.  They still inhabit the same NVT number space though, don't they?
+I think the more usual way to deal with this, is to use
+device_class_set_parent_realize() in the child's class init function,
+and then to call ->parent_realize() from the child's realize function.
 
-No. skiboot reserves the range of VPs for the HW at init.
+I guess it doesn't really matter in the end which way we do it here, but
+it would be nice to be consistent with the other devices, so I'd prefer
+to use device_class_set_parent_realize() for this here, too.
 
-https://github.com/open-power/skiboot/blob/master/hw/xive.c#L1093
+Apart from that, the patch looks fine to me.
 
-> I'm thinking about the END->NVT stage of the process here, rather than
-> the NVT->TCTX stage.
->
-> Oh, also, you're using "VP" here which IIUC == "NVT".  Can we
-> standardize on one, please.
-
-VP is used in Linux/KVM Linux/Native and skiboot. Yes. it's a mess. 
-Let's have consistent naming in QEMU and use NVT. 
-
->>> If so, does this base leave enough space for the physical ones?
->>
->> I only used 0x400 to map the VP identifier to the ones allocated by KVM. 
->> 0x0 would be fine but to exercise the model, it's better having a different 
->> base. 
->>
->>>> +uint32_t spapr_xive_nvt_to_target(sPAPRXive *xive, uint8_t nvt_blk,
->>>> +                                  uint32_t nvt_idx)
->>>> +{
->>>> +    return nvt_idx - SPAPR_XIVE_VP_BASE;
->>>> +}
->>>> +
->>>> +int spapr_xive_cpu_to_nvt(sPAPRXive *xive, PowerPCCPU *cpu,
->>>> +                          uint8_t *out_nvt_blk, uint32_t *out_nvt_idx)
->>>
->>> A number of these conversions will come out a bit simpler if we pass
->>> the block and index around as a single word in most places.
->>
->> Yes I have to check the whole patchset first. These prototype changes
->> are not too difficult in terms of code complexity but they do break
->> how patches apply and PowerNV is also using the idx and blk much more 
->> explicitly. the block has a meaning on bare metal. So I am a bit 
->> reluctant to do so. I will check.
-> 
-> Yeah, based on your comments here and earlier, I'm not sure that's a
-> good idea any more either.
-> 
->>>> +{
->>>> +    XiveRouter *xrtr = XIVE_ROUTER(xive);
->>>> +
->>>> +    if (!cpu) {
->>>> +        return -1;
->>>> +    }
->>>> +
->>>> +    if (out_nvt_blk) {
->>>> +        /* For testing purpose, we could use 0 for nvt_blk */
->>>> +        *out_nvt_blk = xrtr->chip_id;
->>>
->>> I don't see any point using the chip_id here, which is currently
->>> always set to 0 for PAPR anyway.  If we just hardwire this to 0 it
->>> removes the only use here of xrtr, which will allow some further
->>> simplifications in the caller, I think.
->>
->> You are right about the simplification. It was one way to exercise 
->> the router model and remove any shortcuts in the indexing. I kept 
->> it to be sure I was not tempted to invent new ones. I think we can
->> remove it before merging. 
->>
->>>
->>>> +    }
->>>> +
->>>> +    if (out_nvt_blk) {
->>>> +        *out_nvt_idx = SPAPR_XIVE_VP_BASE + cpu->vcpu_id;
->>>> +    }
->>>> +    return 0;
->>>> +}
->>>> +
->>>> +int spapr_xive_target_to_nvt(sPAPRXive *xive, uint32_t target,
->>>> +                             uint8_t *out_nvt_blk, uint32_t *out_nvt_idx)
->>>
->>> I suspect some, maybe most of these conversion functions could be static.
->>
->> static inline ? 
-> 
-> It's in a .c file so you don't need the "inline" - the compiler can
-> work out whether it's a good idea to inline on its own.
-
-It is used in the hcall file also. But we are going to change that.
-
-Thanks,
-
-C.
-
-> 
->>>
->>>> +{
->>>> +    return spapr_xive_cpu_to_nvt(xive, spapr_find_cpu(target), out_nvt_blk,
->>>> +                                 out_nvt_idx);
->>>> +}
->>>> +
->>>> +/*
->>>> + * sPAPR END indexing uses a simple mapping of the CPU vcpu_id, 8
->>>> + * priorities per CPU
->>>> + */
->>>> +int spapr_xive_end_to_target(sPAPRXive *xive, uint8_t end_blk, uint32_t end_idx,
->>>> +                             uint32_t *out_server, uint8_t *out_prio)
->>>> +{
->>>> +    if (out_server) {
->>>> +        *out_server = end_idx >> 3;
->>>> +    }
->>>> +
->>>> +    if (out_prio) {
->>>> +        *out_prio = end_idx & 0x7;
->>>> +    }
->>>> +    return 0;
->>>> +}
->>>> +
->>>> +int spapr_xive_cpu_to_end(sPAPRXive *xive, PowerPCCPU *cpu, uint8_t prio,
->>>> +                          uint8_t *out_end_blk, uint32_t *out_end_idx)
->>>> +{
->>>> +    XiveRouter *xrtr = XIVE_ROUTER(xive);
->>>> +
->>>> +    if (!cpu) {
->>>> +        return -1;
->>>
->>> Is there ever a reason this would be called with cpu == NULL?  If not
->>> might as well just assert() here rather than pushing the error
->>> handling back to the caller.
->>
->> ok. yes.
->>
->>>
->>>> +    }
->>>> +
->>>> +    if (out_end_blk) {
->>>> +        /* For testing purpose, we could use 0 for nvt_blk */
->>>> +        *out_end_blk = xrtr->chip_id;
->>>
->>> Again, I don't see any point to using the chip_id, which is pretty
->>> meaningless for PAPR.
->>>
->>>> +    }
->>>> +
->>>> +    if (out_end_idx) {
->>>> +        *out_end_idx = (cpu->vcpu_id << 3) + prio;
->>>> +    }
->>>> +    return 0;
->>>> +}
->>>> +
->>>> +int spapr_xive_target_to_end(sPAPRXive *xive, uint32_t target, uint8_t prio,
->>>> +                             uint8_t *out_end_blk, uint32_t *out_end_idx)
->>>> +{
->>>> +    return spapr_xive_cpu_to_end(xive, spapr_find_cpu(target), prio,
->>>> +                                 out_end_blk, out_end_idx);
->>>> +}
->>>> +
->>>>  static const VMStateDescription vmstate_spapr_xive_end = {
->>>>      .name = TYPE_SPAPR_XIVE "/end",
->>>>      .version_id = 1,
->>>> @@ -263,6 +396,9 @@ static void spapr_xive_class_init(ObjectClass *klass, void *data)
->>>>      xrc->set_eas = spapr_xive_set_eas;
->>>>      xrc->get_end = spapr_xive_get_end;
->>>>      xrc->set_end = spapr_xive_set_end;
->>>> +    xrc->get_nvt = spapr_xive_get_nvt;
->>>> +    xrc->set_nvt = spapr_xive_set_nvt;
->>>> +    xrc->reset_tctx = spapr_xive_reset_tctx;
->>>>  }
->>>>  
->>>>  static const TypeInfo spapr_xive_info = {
->>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->>>> index c49932d2b799..fc6ef5895e6d 100644
->>>> --- a/hw/intc/xive.c
->>>> +++ b/hw/intc/xive.c
->>>> @@ -481,6 +481,7 @@ static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tctx, bool block_group)
->>>>  static void xive_tctx_reset(void *dev)
->>>>  {
->>>>      XiveTCTX *tctx = XIVE_TCTX(dev);
->>>> +    XiveRouterClass *xrc = XIVE_ROUTER_GET_CLASS(tctx->xrtr);
->>>>  
->>>>      memset(tctx->regs, 0, sizeof(tctx->regs));
->>>>  
->>>> @@ -495,6 +496,14 @@ static void xive_tctx_reset(void *dev)
->>>>       */
->>>>      tctx->regs[TM_QW1_OS + TM_PIPR] =
->>>>          ipb_to_pipr(tctx->regs[TM_QW1_OS + TM_IPB]);
->>>> +
->>>> +    /*
->>>> +     * QEMU sPAPR XIVE only. To let the controller model reset the OS
->>>> +     * CAM line with the VP identifier.
->>>> +     */
->>>> +    if (xrc->reset_tctx) {
->>>> +        xrc->reset_tctx(tctx->xrtr, tctx);
->>>> +    }
->>>
->>> AFAICT this whole function is only used from PAPR, so you can just
->>> move the whole thing to the papr code and avoid the hook function.
->>
->> Yes we could add a loop on all CPUs and reset all the XiveTCTX from
->> the machine or a spapr_irq->reset handler. We will need at some time
->> anyhow.
->>
->> Thanks,
->>
->> C.
->>
->>
->>>
->>>>  }
->>>>  
->>>>  static void xive_tctx_realize(DeviceState *dev, Error **errp)
->>>
->>
-> 
+ Thomas
