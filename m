@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSYbp-0007qe-3q
+	(envelope-from <eblake@redhat.com>) id 1gSYbp-0007r6-KY
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 21:32:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSYbn-0005nk-Rf
+	(envelope-from <eblake@redhat.com>) id 1gSYbo-0005o5-CD
 	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 21:32:49 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 29 Nov 2018 20:32:30 -0600
-Message-Id: <20181130023232.3079982-2-eblake@redhat.com>
+Date: Thu, 29 Nov 2018 20:32:31 -0600
+Message-Id: <20181130023232.3079982-3-eblake@redhat.com>
 In-Reply-To: <20181130023232.3079982-1-eblake@redhat.com>
 References: <20181130023232.3079982-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] nbd/server: Advertise all contexts in
- response to bare LIST
+Subject: [Qemu-devel] [PATCH 2/3] nbd/client: Make x-dirty-bitmap more
+ reliable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,30 +21,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-stable@nongnu.org, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-The NBD spec, and even our code comment, says that if the client
-asks for NBD_OPT_LIST_META_CONTEXT with 0 queries, then we should
-reply with (a possibly-compressed representation of) ALL contexts
-that we are willing to let them try.  But commit 3d068aff forgot
-to advertise qemu:dirty-bitmap:FOO.
+The implementation of x-dirty-bitmap in qemu 3.0 silently
+falls back to treating the server as not supporting
+NBD_CMD_BLOCK_STATUS if a requested meta_context name was not
+negotiated, which in turn means treating the _entire_ image as
+data. Since our hack relied on using 'qemu-img map' to view
+which portions of the image were dirty by seeing what the
+redirected bdrv_block_status() treats as holes, this means
+that our fallback treats the entire image as clean.  Better
+would have been to treat the entire image as dirty, or to fail
+to connect because the user's request for a specific context
+could not be honored. This patch goes with the latter.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c | 1 +
- 1 file changed, 1 insertion(+)
+ block/nbd-client.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index dc04513de70..7af0ddffb20 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -978,6 +978,7 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
-     if (client->opt == NBD_OPT_LIST_META_CONTEXT && !nb_queries) {
-         /* enable all known contexts */
-         meta->base_allocation = true;
-+        meta->bitmap = !!meta->exp->export_bitmap;
-     } else {
-         for (i = 0; i < nb_queries; ++i) {
-             ret = nbd_negotiate_meta_query(client, meta, errp);
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 76e9ca3abeb..e6e27dafa6a 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -992,6 +992,11 @@ int nbd_client_init(BlockDriverState *bs,
+         logout("Failed to negotiate with the NBD server\n");
+         return ret;
+     }
++    if (x_dirty_bitmap && !client->info.base_allocation) {
++        error_setg(errp, "requested x-dirty-bitmap %s not found",
++                   x_dirty_bitmap);
++        return -EINVAL;
++    }
+     if (client->info.flags & NBD_FLAG_READ_ONLY) {
+         ret = bdrv_apply_auto_read_only(bs, "NBD export is read-only", errp);
+         if (ret < 0) {
 -- 
 2.17.2
