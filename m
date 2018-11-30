@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gSnvT-0005ax-Vx
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:54:13 -0500
+	(envelope-from <philmd@redhat.com>) id 1gSo9y-0003Kb-OZ
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:09:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gSnvL-0002HE-L8
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:54:07 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39623)
+	(envelope-from <philmd@redhat.com>) id 1gSo9u-0000Vz-Qb
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:09:06 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41527)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gSnvL-0002H3-F0
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:53:59 -0500
-Received: by mail-oi1-x241.google.com with SMTP id i6so5595687oia.6
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 10:53:59 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-Reply-To: minyard@acm.org
-References: <20181126200435.23408-1-minyard@acm.org>
-	<20181126200435.23408-5-minyard@acm.org>
-	<CAFEAcA93S-9ujYS1jTw8g-sn+FMofxQmajM7nrfORNh_3rkbLA@mail.gmail.com>
-From: Corey Minyard <minyard@acm.org>
-Message-ID: <ef3ef7cc-4801-c054-c4c4-e585e8881bcb@acm.org>
-Date: Fri, 30 Nov 2018 12:53:55 -0600
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gSo9u-0000VH-KP
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:09:02 -0500
+Received: by mail-wr1-f68.google.com with SMTP id x10so6283852wrs.8
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 11:09:01 -0800 (PST)
+References: <20181130111222.25386-1-kraxel@redhat.com>
+	<20181130111222.25386-3-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <75c973a5-f571-e69e-e2fd-72d3b3b118b2@redhat.com>
+Date: Fri, 30 Nov 2018 20:08:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA93S-9ujYS1jTw8g-sn+FMofxQmajM7nrfORNh_3rkbLA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181130111222.25386-3-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH v3 04/16] i2c: Don't check return value
- from i2c_recv()
+Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] usb-mtp: outlaw slashes in
+ filenames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,55 +31,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On 11/30/18 11:25 AM, Peter Maydell wrote:
-> On Mon, 26 Nov 2018 at 20:04, <minyard@acm.org> wrote:
->> From: Corey Minyard <cminyard@mvista.com>
->>
->> i2c_recv() cannot fail, so there is no need to check the return
->> value.  It also returns unt8_t, so comparing with < 0 is not
->> meaningful.
->>
->> Fix up various I2C controllers to remove the unneeded code.
->>
->> Signed-off-by: Corey Minyard <cminyard@mvista.com>
->> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> diff --git a/hw/i2c/exynos4210_i2c.c b/hw/i2c/exynos4210_i2c.c
->> index c96fa7d7be..43f284eab7 100644
->> --- a/hw/i2c/exynos4210_i2c.c
->> +++ b/hw/i2c/exynos4210_i2c.c
->> @@ -106,12 +106,12 @@ static inline void exynos4210_i2c_raise_interrupt(Exynos4210I2CState *s)
->>   static void exynos4210_i2c_data_receive(void *opaque)
->>   {
->>       Exynos4210I2CState *s = (Exynos4210I2CState *)opaque;
->> -    int ret;
->> +    uint8_t ret;
->>
->>       s->i2cstat &= ~I2CSTAT_LAST_BIT;
->>       s->scl_free = false;
->>       ret = i2c_recv(s->bus);
->> -    if (ret < 0 && (s->i2ccon & I2CCON_ACK_GEN)) {
->> +    if (s->i2ccon & I2CCON_ACK_GEN) {
->>           s->i2cstat |= I2CSTAT_LAST_BIT;  /* Data is not acknowledged */
-> Previously the code was doing this only if i2c_recv()
-> failed (returned a negative value) and ACK_GEN was set.
-> i2c_recv() can never fail, so this if() {} branch should
-> be deleted entirely ("false && something" simplifies
-> to "false", not "something").
+On 30/11/18 12:12, Gerd Hoffmann wrote:
+> Slash is unix directory separator, so they are not allowed in filenames.
+> Note this also stops the classic escape via "../".
+> 
+> Fixes: CVE-2018-16867
+> Reported-by: Michael Hanselmann (hansmi.ch)
 
-Oops, yes.  Plus you can just remove the ret variable and simplify
-this a lot.  Thanks for finding this.
+It's common for scripts to match '<email>', can you write this one as
+Michael Hanselmann <hansmi.ch>?
 
--corey
+(Same suggestion applies for patch 1/2).
 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/usb/dev-mtp.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+> index fbe1ace035..87eeac1084 100644
+> --- a/hw/usb/dev-mtp.c
+> +++ b/hw/usb/dev-mtp.c
+> @@ -1718,6 +1718,12 @@ static void usb_mtp_write_metadata(MTPState *s)
+>  
+>      filename = utf16_to_str(dataset->length, dataset->filename);
+>  
+> +    if (strchr(filename, '/')) {
+> +        usb_mtp_queue_result(s, RES_INVALID_PARAMETER, d->trans,
+> +                             0, 0, 0, 0);
+> +        return;
+> +    }
 
->
->>       } else {
->>           s->i2cds = ret;
-> The rest of the patch looks good.
->
-> thanks
-> -- PMM
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> +
+>      o = usb_mtp_object_lookup_name(p, filename, dataset->length);
+>      if (o != NULL) {
+>          next_handle = o->handle;
+> 
