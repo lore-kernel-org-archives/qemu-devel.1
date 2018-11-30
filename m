@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gSfQF-00084w-Bl
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:49:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gSfQr-00007o-1k
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:49:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gSfQE-0002GF-6O
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:49:19 -0500
-Date: Fri, 30 Nov 2018 09:48:47 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181130094847.GB8101@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1bc34791-6ae3-cbcd-222f-468b89205f64@virtuozzo.com>
-	<50b00028-9f75-743b-cdec-58cd367a268a@virtuozzo.com>
-	<20181127160841.GJ18381@redhat.com>
-	<22fee90b-8144-212e-ad19-94480491f05b@virtuozzo.com>
+	(envelope-from <dgilbert@redhat.com>) id 1gSfQn-0002fO-S7
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:49:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58149)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gSfQn-0002f6-Ly
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:49:53 -0500
+Date: Fri, 30 Nov 2018 09:49:49 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181130094949.GB2603@work-vm>
+References: <20181129100340.13823-1-fli@suse.com>
+	<20181129100340.13823-6-fli@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <22fee90b-8144-212e-ad19-94480491f05b@virtuozzo.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] encrypt in threads
+In-Reply-To: <20181129100340.13823-6-fli@suse.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 5/5] migration: add more error
+ handling for postcopy_ram_enable_notify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org
 
-On Thu, Nov 29, 2018 at 06:28:44PM +0000, Vladimir Sementsov-Ogievskiy wr=
-ote:
->=20
-> On 27.11.2018 16:08, Daniel P. Berrang=C3=A9 wrote:
-> > On Thu, Nov 22, 2018 at 01:01:20PM +0000, Vladimir Sementsov-Ogievski=
-y wrote:
-> >> 21.11.2018 20:30, Vladimir Sementsov-Ogievskiy wrote:
-> >>> Hi Daniel!
-> >>>
-> >>> After moving compression to threads in Qcow2 it's an obvious next s=
-tep to
-> >>> "threadyfy" encryption in Qcow2 too.
-> >>>
-> >>> But it turned out to be not as simple as I assumed. If I call qcryp=
-to_block_encrypt
-> >>> in parallel threads with the same first argument (block), it just p=
-roduce wrong
-> >>> things (pattern verification fails in iotests)..
-> >>>
-> >>> So, can you advise the way to parallelize encryption/decryption?
-> >>>
-> >> Hmm, just creating QCryptoBlock per each thread helped. Is it correc=
-t thing to do?
-> > That's rather a heavy weight approach and would cause pain when we wa=
-nt
-> > to support future options such as keyslot updates, and in the future,
-> > LUKSv2 with master key changes.
-> >
-> > Probably what's needed is change to QCryptoBlock struct so that there
-> > can be multiple QCryptoCipher instances allocated - one per thread.
-> >
-> > We might also need to introduce some locking around usage of the
-> > QCryptoIVGen object, since that has a QCryptoCipher handle too.
->=20
->=20
-> Can we also create QCryptoIVGen per thread, as QCryptoCipher? Or it=20
-> should be one? If one, why my implementation with QCryptoBlock per=20
-> thread works (at least it passes iotests, hmm)
+* Fei Li (fli@suse.com) wrote:
+> Call postcopy_ram_incoming_cleanup() to do the cleanup when
+> postcopy_ram_enable_notify fails. Besides, report the error
+> message when qemu_ram_foreach_migratable_block() fails.
+> 
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Fei Li <fli@suse.com>
 
-The only IV generator that uses ciphers is the "essiv" one. Even that
-one uses the cipher in ECB mode, so there is no initialization vector
-required for its internal cipher. This means there's no critical
-shared state that would be overwritten by threads. Thus using a
-separate QCryptoCipher per thread for the essiv IV gen is overkill.
-None the less I think we should protect the IV generator calls with
-a mutex just to be safe. I don't think the mutex would have a notable
-impact on performance of the iv generator.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> ---
+>  migration/postcopy-ram.c | 1 +
+>  migration/savevm.c       | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index e5c02a32c5..fa09dba534 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -1117,6 +1117,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>  
+>      /* Mark so that we get notified of accesses to unwritten areas */
+>      if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis)) {
+> +        error_report("ram_block_enable_notify failed");
+>          return -1;
+>      }
+>  
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 9e45fb4f3f..d784e8aa40 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1729,6 +1729,7 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+>       */
+>      if (migrate_postcopy_ram()) {
+>          if (postcopy_ram_enable_notify(mis)) {
+> +            postcopy_ram_incoming_cleanup(mis);
+>              return -1;
+>          }
+>      }
+> -- 
+> 2.13.7
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
