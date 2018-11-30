@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gSkXt-0004dW-95
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:33 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gSkXu-0004fB-Ch
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gSkXs-0005Vs-Jl
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:33 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gSkXt-0005WU-Kb
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:34 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Nov 2018 15:17:05 +0000
-Message-Id: <20181130151712.2312-4-peter.maydell@linaro.org>
+Date: Fri, 30 Nov 2018 15:17:09 +0000
+Message-Id: <20181130151712.2312-8-peter.maydell@linaro.org>
 In-Reply-To: <20181130151712.2312-1-peter.maydell@linaro.org>
 References: <20181130151712.2312-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 03/10] hw/smbios/smbios.c: Don't use
+Subject: [Qemu-devel] [PATCH 07/10] hw/block/tc58128.c: Don't use
  load_image()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,21 +31,22 @@ Instead use load_image_size().
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/smbios/smbios.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/block/tc58128.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index 920939454e7..04811279a08 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -982,7 +982,7 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
-         header = (struct smbios_structure_header *)(smbios_tables +
-                                                     smbios_tables_len);
- 
--        if (load_image(val, (uint8_t *)header) != size) {
-+        if (load_image_size(val, (uint8_t *)header, size) != size) {
-             error_setg(errp, "Failed to load SMBIOS file %s", val);
-             return;
-         }
+diff --git a/hw/block/tc58128.c b/hw/block/tc58128.c
+index 808ad76ba60..d0fae248dcc 100644
+--- a/hw/block/tc58128.c
++++ b/hw/block/tc58128.c
+@@ -38,7 +38,8 @@ static void init_dev(tc58128_dev * dev, const char *filename)
+     memset(dev->flash_contents, 0xff, FLASH_SIZE);
+     if (filename) {
+ 	/* Load flash image skipping the first block */
+-	ret = load_image(filename, dev->flash_contents + 528 * 32);
++        ret = load_image_size(filename, dev->flash_contents + 528 * 32,
++                              FLASH_SIZE - 528 * 32);
+ 	if (ret < 0) {
+             if (!qtest_enabled()) {
+                 error_report("Could not load flash image %s", filename);
 -- 
 2.19.1
