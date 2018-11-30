@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gSkZa-0007SF-DC
+	(envelope-from <berto@igalia.com>) id 1gSkZc-0007Sz-BQ
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gSkZW-0006Vx-Bp
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:18 -0500
+	(envelope-from <berto@igalia.com>) id 1gSkZY-0006XH-E1
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:20 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 30 Nov 2018 17:17:43 +0200
-Message-Id: <7547fa10fe3bbbda2919ba5499e00cfcb223aa2b.1543590618.git.berto@igalia.com>
+Date: Fri, 30 Nov 2018 17:17:49 +0200
+Message-Id: <19f8c53d020fa7b71b5e129791bb556b4678f468.1543590618.git.berto@igalia.com>
 In-Reply-To: <cover.1543590618.git.berto@igalia.com>
 References: <cover.1543590618.git.berto@igalia.com>
 In-Reply-To: <cover.1543590618.git.berto@igalia.com>
 References: <cover.1543590618.git.berto@igalia.com>
-Subject: [Qemu-devel] [RFC PATCH v2 05/12] block: Add 'keep_old_opts'
- parameter to bdrv_reopen_queue()
+Subject: [Qemu-devel] [RFC PATCH v2 11/12] block: Add an 'x-blockdev-reopen'
+ QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,161 +25,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-The bdrv_reopen_queue() function is used to create a queue with
-the BDSs that are going to be reopened and their new options. Once
-the queue is ready bdrv_reopen_multiple() is called to perform the
-operation.
+This command allows reopening an arbitrary BlockDriverState with a
+new set of options. Some options (e.g node-name) cannot be changed
+and some block drivers don't allow reopening, but otherwise this
+command is modelled after 'blockdev-add' and the state of the reopened
+BlockDriverState should generally be the same as if it had just been
+added by 'blockdev-add' with the same set of options.
 
-The original options from each one of the BDSs are kept, with the new
-options passed to bdrv_reopen_queue() applied on top of them.
+One notable exception is the 'backing' option: 'x-blockdev-reopen'
+requires that it is always present unless the BlockDriverState in
+question doesn't have a current or default backing file.
 
-For "x-blockdev-reopen" we want a function that behaves much like
-"blockdev-add". We want to ignore the previous set of options so that
-only the ones actually specified by the user are applied, with the
-rest having their default values.
+This command allows reconfiguring the graph by using the appropriate
+options to change the children of a node. At the moment it's possible
+to change a backing file by setting the 'backing' option to the name
+of the new node, but it should also be possible to add a similar
+functionality to other block drivers (e.g. Quorum, blkverify).
 
-One of the things that we need is a way to tell bdrv_reopen_queue()
-whether we want to keep the old set of options or not, and that's what
-this patch does. All current callers are setting this new parameter to
-true and x-blockdev-reopen will set it to false.
+Although the API is unlikely to change, this command is marked
+experimental for the time being so there's room to see if the
+semantics need changes.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c               | 34 +++++++++++++++++++---------------
- block/replication.c   |  4 ++--
- include/block/block.h |  3 ++-
- qemu-io-cmds.c        |  2 +-
- 4 files changed, 24 insertions(+), 19 deletions(-)
+ blockdev.c           | 43 +++++++++++++++++++++++++++++++++++++++++++
+ qapi/block-core.json | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 85 insertions(+)
 
-diff --git a/block.c b/block.c
-index 4f55fb339a..da4e062178 100644
---- a/block.c
-+++ b/block.c
-@@ -2935,7 +2935,8 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-                                                  QDict *options,
-                                                  const BdrvChildRole *role,
-                                                  QDict *parent_options,
--                                                 int parent_flags)
-+                                                 int parent_flags,
-+                                                 bool keep_old_opts)
- {
-     assert(bs != NULL);
- 
-@@ -2975,13 +2976,13 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-      */
- 
-     /* Old explicitly set values (don't overwrite by inherited value) */
--    if (bs_entry) {
--        old_options = qdict_clone_shallow(bs_entry->state.explicit_options);
--    } else {
--        old_options = qdict_clone_shallow(bs->explicit_options);
-+    if (bs_entry || keep_old_opts) {
-+        old_options = qdict_clone_shallow(bs_entry ?
-+                                          bs_entry->state.explicit_options :
-+                                          bs->explicit_options);
-+        bdrv_join_options(bs, options, old_options);
-+        qobject_unref(old_options);
-     }
--    bdrv_join_options(bs, options, old_options);
--    qobject_unref(old_options);
- 
-     explicit_options = qdict_clone_shallow(options);
- 
-@@ -2993,10 +2994,12 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-         flags = bdrv_get_flags(bs);
-     }
- 
--    /* Old values are used for options that aren't set yet */
--    old_options = qdict_clone_shallow(bs->options);
--    bdrv_join_options(bs, options, old_options);
--    qobject_unref(old_options);
-+    if (keep_old_opts) {
-+        /* Old values are used for options that aren't set yet */
-+        old_options = qdict_clone_shallow(bs->options);
-+        bdrv_join_options(bs, options, old_options);
-+        qobject_unref(old_options);
-+    }
- 
-     /* We have the final set of options so let's update the flags */
-     options_copy = qdict_clone_shallow(options);
-@@ -3046,7 +3049,7 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-         g_free(child_key_dot);
- 
-         bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options,
--                                child->role, options, flags);
-+                                child->role, options, flags, keep_old_opts);
-     }
- 
-     return bs_queue;
-@@ -3054,9 +3057,10 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
- 
- BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
-                                     BlockDriverState *bs,
--                                    QDict *options)
-+                                    QDict *options, bool keep_old_opts)
- {
--    return bdrv_reopen_queue_child(bs_queue, bs, options, NULL, NULL, 0);
-+    return bdrv_reopen_queue_child(bs_queue, bs, options, NULL, NULL, 0,
-+                                   keep_old_opts);
+diff --git a/blockdev.c b/blockdev.c
+index e6c8349409..a95017df54 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -4233,6 +4233,49 @@ fail:
+     visit_free(v);
  }
  
- /*
-@@ -3128,7 +3132,7 @@ int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-     qdict_put_bool(opts, BDRV_OPT_READ_ONLY, read_only);
++void qmp_x_blockdev_reopen(BlockdevOptions *options, Error **errp)
++{
++    BlockDriverState *bs;
++    QObject *obj;
++    Visitor *v = qobject_output_visitor_new(&obj);
++    Error *local_err = NULL;
++    BlockReopenQueue *queue;
++    QDict *qdict;
++
++    /* Check for the selected node name */
++    if (!options->has_node_name) {
++        error_setg(errp, "Node name not specified");
++        goto fail;
++    }
++
++    bs = bdrv_find_node(options->node_name);
++    if (!bs) {
++        error_setg(errp, "Cannot find node named '%s'", options->node_name);
++        goto fail;
++    }
++
++    /* Put all options in a QDict and flatten it */
++    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        goto fail;
++    }
++
++    visit_complete(v, &obj);
++    qdict = qobject_to(QDict, obj);
++
++    qdict_flatten(qdict);
++
++    /* Perform the reopen operation */
++    bdrv_subtree_drained_begin(bs);
++    queue = bdrv_reopen_queue(NULL, bs, qdict, false);
++    bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, errp);
++    bdrv_subtree_drained_end(bs);
++
++fail:
++    visit_free(v);
++}
++
+ void qmp_blockdev_del(const char *node_name, Error **errp)
+ {
+     AioContext *aio_context;
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index d4fe710836..6afcd243b1 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3808,6 +3808,48 @@
+ { 'command': 'blockdev-add', 'data': 'BlockdevOptions', 'boxed': true }
  
-     bdrv_subtree_drained_begin(bs);
--    queue = bdrv_reopen_queue(NULL, bs, opts);
-+    queue = bdrv_reopen_queue(NULL, bs, opts, true);
-     ret = bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, errp);
-     bdrv_subtree_drained_end(bs);
- 
-diff --git a/block/replication.c b/block/replication.c
-index fdbfe47fa4..027cc02542 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -396,14 +396,14 @@ static void reopen_backing_file(BlockDriverState *bs, bool writable,
-         QDict *opts = qdict_new();
-         qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
-         reopen_queue = bdrv_reopen_queue(reopen_queue, s->hidden_disk->bs,
--                                         opts);
-+                                         opts, true);
-     }
- 
-     if (s->orig_secondary_read_only) {
-         QDict *opts = qdict_new();
-         qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !writable);
-         reopen_queue = bdrv_reopen_queue(reopen_queue, s->secondary_disk->bs,
--                                         opts);
-+                                         opts, true);
-     }
- 
-     if (reopen_queue) {
-diff --git a/include/block/block.h b/include/block/block.h
-index 6f10a8fcfc..a061ef3944 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -299,7 +299,8 @@ BlockDriverState *bdrv_open(const char *filename, const char *reference,
- BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
-                                        int flags, Error **errp);
- BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
--                                    BlockDriverState *bs, QDict *options);
-+                                    BlockDriverState *bs, QDict *options,
-+                                    bool keep_old_opts);
- int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **errp);
- int bdrv_reopen_set_read_only(BlockDriverState *bs, bool read_only,
-                               Error **errp);
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 2c39124036..db8887205e 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -2075,7 +2075,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
-     }
- 
-     bdrv_subtree_drained_begin(bs);
--    brq = bdrv_reopen_queue(NULL, bs, opts);
-+    brq = bdrv_reopen_queue(NULL, bs, opts, true);
-     bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, &local_err);
-     bdrv_subtree_drained_end(bs);
- 
+ ##
++# @x-blockdev-reopen:
++#
++# Reopens a block device using the given set of options. Any option
++# not specified will be reset to its default value regardless of its
++# previous status. If an option cannot be changed or a particular
++# driver does not support reopening then the command will return an
++# error.
++#
++# The top-level @node-name option (from BlockdevOptions) must be
++# specified and is used to select the block device to be reopened.
++# Other @node-name options must be either omitted or set to the
++# current name of the appropriate node. This command won't change any
++# node name and any attempt to do it will result in an error.
++#
++# In the case of options that refer to child nodes, the behavior of
++# this command depends on the value:
++#
++#  1) A set of options (BlockdevOptions): the child is reopened with
++#     the specified set of options.
++#
++#  2) A reference to the current child: the child is reopened using
++#     its existing set of options.
++#
++#  3) A reference to a different node: the current child is replaced
++#     with the specified one.
++#
++#  4) NULL: the current child (if any) is detached.
++#
++# Options (1) and (2) are supported in all cases, but at the moment
++# only @backing allows replacing or detaching an existing child.
++#
++# Unlike with blockdev-add, the @backing option must always be present
++# unless the node being reopened does not have a backing file and its
++# image does not have a default backing file name as part of its
++# metadata.
++#
++# Since: 3.2
++##
++{ 'command': 'x-blockdev-reopen',
++  'data': 'BlockdevOptions', 'boxed': true }
++
++##
+ # @blockdev-del:
+ #
+ # Deletes a block device that has been added using blockdev-add.
 -- 
 2.11.0
