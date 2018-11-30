@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSmY8-0004XI-Hx
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:26:00 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gSmYc-0004rF-JO
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:26:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSmY4-0002cL-IG
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:25:56 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35956)
+	(envelope-from <peter.maydell@linaro.org>) id 1gSmYY-0002sn-L8
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:26:26 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45175)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gSmY4-0002cF-CO
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:25:52 -0500
-Received: by mail-oi1-x243.google.com with SMTP id x23so5375867oix.3
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 09:25:52 -0800 (PST)
+	id 1gSmYW-0002rT-If
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:26:20 -0500
+Received: by mail-oi1-x241.google.com with SMTP id b141so5343151oii.12
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 09:26:19 -0800 (PST)
 MIME-Version: 1.0
 References: <20181126200435.23408-1-minyard@acm.org>
-	<20181126200435.23408-5-minyard@acm.org>
-In-Reply-To: <20181126200435.23408-5-minyard@acm.org>
+	<20181126200435.23408-4-minyard@acm.org>
+In-Reply-To: <20181126200435.23408-4-minyard@acm.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Nov 2018 17:25:40 +0000
-Message-ID: <CAFEAcA93S-9ujYS1jTw8g-sn+FMofxQmajM7nrfORNh_3rkbLA@mail.gmail.com>
+Date: Fri, 30 Nov 2018 17:26:08 +0000
+Message-ID: <CAFEAcA9RcGMUb_sMkGZ3ORWpug1V5XwWuA66MNAV-npna-hN-g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 04/16] i2c: Don't check return value
- from i2c_recv()
+Subject: Re: [Qemu-devel] [PATCH v3 03/16] arm:i2c: Don't mask return from
+ i2c_recv()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +37,29 @@ On Mon, 26 Nov 2018 at 20:04, <minyard@acm.org> wrote:
 >
 > From: Corey Minyard <cminyard@mvista.com>
 >
-> i2c_recv() cannot fail, so there is no need to check the return
-> value.  It also returns unt8_t, so comparing with < 0 is not
-> meaningful.
->
-> Fix up various I2C controllers to remove the unneeded code.
+> It can't fail, and now that it returns a uint8_t a 0xff mask
+> is unnecessary.
 >
 > Signed-off-by: Corey Minyard <cminyard@mvista.com>
 > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
-
-> diff --git a/hw/i2c/exynos4210_i2c.c b/hw/i2c/exynos4210_i2c.c
-> index c96fa7d7be..43f284eab7 100644
-> --- a/hw/i2c/exynos4210_i2c.c
-> +++ b/hw/i2c/exynos4210_i2c.c
-> @@ -106,12 +106,12 @@ static inline void exynos4210_i2c_raise_interrupt(Exynos4210I2CState *s)
->  static void exynos4210_i2c_data_receive(void *opaque)
->  {
->      Exynos4210I2CState *s = (Exynos4210I2CState *)opaque;
-> -    int ret;
-> +    uint8_t ret;
+>  hw/arm/stellaris.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
->      s->i2cstat &= ~I2CSTAT_LAST_BIT;
->      s->scl_free = false;
->      ret = i2c_recv(s->bus);
-> -    if (ret < 0 && (s->i2ccon & I2CCON_ACK_GEN)) {
-> +    if (s->i2ccon & I2CCON_ACK_GEN) {
->          s->i2cstat |= I2CSTAT_LAST_BIT;  /* Data is not acknowledged */
+> diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+> index 6c69ce79b2..638b649911 100644
+> --- a/hw/arm/stellaris.c
+> +++ b/hw/arm/stellaris.c
+> @@ -811,7 +811,7 @@ static void stellaris_i2c_write(void *opaque, hwaddr offset,
+>              /* TODO: Handle errors.  */
+>              if (s->msa & 1) {
+>                  /* Recv */
+> -                s->mdr = i2c_recv(s->bus) & 0xff;
+> +                s->mdr = i2c_recv(s->bus);
+>              } else {
+>                  /* Send */
 
-Previously the code was doing this only if i2c_recv()
-failed (returned a negative value) and ACK_GEN was set.
-i2c_recv() can never fail, so this if() {} branch should
-be deleted entirely ("false && something" simplifies
-to "false", not "something").
-
->      } else {
->          s->i2cds = ret;
-
-The rest of the patch looks good.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
