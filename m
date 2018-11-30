@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gSojS-0000VH-O5
-	for Qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:45:47 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gSonW-0001V2-E3
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:49:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gSojN-0007bc-FP
-	for Qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:45:46 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44952
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <no-reply@patchew.org>) id 1gSonR-000535-FV
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:49:58 -0500
+Resent-Message-Id: <E1gSonR-000535-FV@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21809)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gSojN-0007bD-AJ
-	for Qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:45:41 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wAUJeBTd014418
-	for <Qemu-devel@nongnu.org>; Fri, 30 Nov 2018 14:45:40 -0500
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2p3a3nuu8j-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <Qemu-devel@nongnu.org>; Fri, 30 Nov 2018 14:45:39 -0500
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <Qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Fri, 30 Nov 2018 19:45:39 -0000
-References: <cover.1543593569.git.alifm@linux.ibm.com>
-	<cb554c04ee50ac970fa10edaa090982bef18f673.1543593569.git.alifm@linux.ibm.com>
-	<eaba14ba-5c92-34d4-ab7c-3cc5aefdcccb@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Fri, 30 Nov 2018 14:45:35 -0500
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gSonR-00052L-71
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:49:53 -0500
+In-Reply-To: <20181129090120.28828-1-pbonzini@redhat.com>
+Message-ID: <154360647082.28958.13050320188370262292@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-In-Reply-To: <eaba14ba-5c92-34d4-ab7c-3cc5aefdcccb@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <0f3919ee-ff47-6552-1f13-6c2cb68ba27b@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC for 3.1? or 4 v2 1/1] qemu-iotests: Don't run
- the test when user is root
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 30 Nov 2018 11:34:31 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH for-4.0 0/4] Small checkpatch fixes and
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,64 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-
-
-On 11/30/2018 12:50 PM, Eric Blake wrote:
-> Adding qemu-devel - all patches should go there, especially if you want=
-=20
-> to get Peter's attention that this might be a 3.1 candidate if we have=20
-> other reasons to spin -rc4.
->=20
-> On 11/30/18 10:04 AM, Farhan Ali wrote:
->> Test 232 creates image files with read-only permission and
->> expects an error message when trying to access the image
->> files with read-only and auto-read-only turned off.
->>
->> Don't run as root user, since root can open files with read/write
->> access for read-only files.
->>
->> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
->> ---
->> =C2=A0 tests/qemu-iotests/232 | 8 ++++++++
->> =C2=A0 1 file changed, 8 insertions(+)
->>
->> diff --git a/tests/qemu-iotests/232 b/tests/qemu-iotests/232
->> index 0708b8b..05d5f2f 100755
->> --- a/tests/qemu-iotests/232
->> +++ b/tests/qemu-iotests/232
->> @@ -41,6 +41,14 @@ _supported_fmt generic
->> =C2=A0 _supported_proto file
->> =C2=A0 _supported_os Linux
->> +tmp=3D'file'
->> +touch $tmp
->> +chmod a-w $tmp
->> +if [ -w $tmp ]
->> +then
->> +=C2=A0=C2=A0=C2=A0 _notrun "Cannot run this test as root user"
->> +fi
->> +
->=20
-> I know you just copied from my suggestion, but now looking at it, this=20
-> leaves 'tmp' around in the directory for both success and skip. Better=20
-> might be to just check whether $TEST_IMG is writable, immediately after=
-=20
-> the existing 'chmod a-w $TEST_IMG' line (Hmm - that line is already=20
-> broken for not quoting "$TEST_IMG" in case it contains whitespace).
-
-Ah yes, I forgot about the fact the 'file' will linger around. I will=20
-spin up a v3.
-
->=20
-> I don't see this being a reason for -rc4 on its own (most people don't=20
-> run iotests as root); and the fact that we're still working on the fina=
-l=20
-> contents of what the patch should contain, as well as the fact that the=
-=20
-> patch doesn't affect the main binaries, means that if it were up to me,=
-=20
-> I'd defer it to 4.0. Kevin may have a different opinion, though, since=20
-> it is his test, and new to 3.1.
->=20
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKCgpUeXBlOiBzZXJpZXMK
+U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBmb3ItNC4wIDAvNF0gU21hbGwgY2hlY2twYXRj
+aCBmaXhlcyBhbmQgaW1wcm92ZW1lbnRzCk1lc3NhZ2UtaWQ6IDIwMTgxMTI5MDkwMTIwLjI4ODI4
+LTEtcGJvbnppbmlAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
+YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
+dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
+UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
+ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
+ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
+dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAg
+ICAgcGF0Y2hldy8yMDE4MTEzMDE5MjIxNi4yNjk4Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
+by5vcmcgLT4gcGF0Y2hldy8yMDE4MTEzMDE5MjIxNi4yNjk4Ny0xLXJpY2hhcmQuaGVuZGVyc29u
+QGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4MmNhZjk1IGNoZWNr
+cGF0Y2g6IGNvbG9yaXplIG91dHB1dCB0byB0ZXJtaW5hbApkZjgzOTNhIGNoZWNrcGF0Y2g6IGlt
+cHJvdmUgaGFuZGxpbmcgb2YgbXVsdGlwbGUgcGF0Y2hlcyBvciBmaWxlcwpiOTgwMzlhIGNoZWNr
+cGF0Y2g6IGNoZWNrIFNpZ25lZC1vZmYtYnkgaW4gLS1tYWlsYmFjayBtb2RlCmYyYzMzYzIgY2hl
+Y2twYXRjaDogZml4IHByZW1hdHVyZSBleGl0IHdoZW4gbm8gaW5wdXQgb3IgLS1tYWlsYmFjawoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBjaGVja3BhdGNoOiBmaXgg
+cHJlbWF0dXJlIGV4aXQgd2hlbiBubyBpbnB1dCBvciAtLW1haWxiYWNrLi4uCkNoZWNraW5nIFBB
+VENIIDIvNDogY2hlY2twYXRjaDogY2hlY2sgU2lnbmVkLW9mZi1ieSBpbiAtLW1haWxiYWNrIG1v
+ZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy80OiBjaGVja3BhdGNoOiBpbXByb3ZlIGhhbmRsaW5nIG9m
+IG11bHRpcGxlIHBhdGNoZXMgb3IgZmlsZXMuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0
+ZXJzCiMzMzogRklMRTogc2NyaXB0cy9jaGVja3BhdGNoLnBsOjM0NToKKyAgICAgICBvcGVuKCRI
+QVNILCAiLXwiLCAiZ2l0IiwgImxvZyIsICItLXJldmVyc2UiLCAiLS1uby1tZXJnZXMiLCAiLS1m
+b3JtYXQ9JUggJXMiLCAkQVJHVlswXSkgfHwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
+cwojMzQ6IEZJTEU6IHNjcmlwdHMvY2hlY2twYXRjaC5wbDozNDY6CisgICAgICAgICAgICAgICBk
+aWUgIiRQOiBnaXQgbG9nIC0tcmV2ZXJzZSAtLW5vLW1lcmdlcyAtLWZvcm1hdD0nJUggJXMnICRB
+UkdWWzBdIGZhaWxlZCAtICQhXG4iOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
+IzY1OiBGSUxFOiBzY3JpcHRzL2NoZWNrcGF0Y2gucGw6MzczOgorICAgICAgICAgICAgICAgJHZu
+YW1lID0gc3Vic3RyKCRoYXNoLCAwLCAxMikgLiAnICgnIC4gJGdpdF9jb21taXRzeyRoYXNofSAu
+ICcpJzsKCnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywgNjIgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC80OiBj
+aGVja3BhdGNoOiBjb2xvcml6ZSBvdXRwdXQgdG8gdGVybWluYWwuLi4KRVJST1I6IE1pc3Npbmcg
+U2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMTQg
+bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
