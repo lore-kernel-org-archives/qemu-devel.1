@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGj-0006Av-OY
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGj-0006At-OR
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGg-0002Sn-88
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGg-0002Sf-5d
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:29 -0500
-Received: from cmccmta3.chinamobile.com ([221.176.66.81]:34279)
+Received: from cmccmta3.chinamobile.com ([221.176.66.81]:23267)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGf-0002Ov-E4
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGf-0002Nl-Cf
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:26 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 30 Nov 2018 17:38:43 +0800
-Message-Id: <20181130093852.20739-13-maozhongyi@cmss.chinamobile.com>
+Date: Fri, 30 Nov 2018 17:38:38 +0800
+Message-Id: <20181130093852.20739-8-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
 References: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 12/21] milkymist-pfpu: Convert sysbus init
+Subject: [Qemu-devel] [PATCH v3 07/21] gpio/puv3_gpio: Convert sysbus init
  function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,56 +28,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, michael@walle.cc, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, gxt@mprc.pku.edu.cn, peter.maydell@linaro.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-milkymist_pfpu_class_init().
+puv3_gpio_class_init().
 
-Cc: michael@walle.cc
+Cc: gxt@mprc.pku.edu.cn
+Cc: peter.maydell@linaro.org
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/misc/milkymist-pfpu.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ hw/gpio/puv3_gpio.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/hw/misc/milkymist-pfpu.c b/hw/misc/milkymist-pfpu.c
-index 86f5e383b0..4a03c7ee63 100644
---- a/hw/misc/milkymist-pfpu.c
-+++ b/hw/misc/milkymist-pfpu.c
-@@ -497,17 +497,16 @@ static void milkymist_pfpu_reset(DeviceState *d)
-     }
- }
+diff --git a/hw/gpio/puv3_gpio.c b/hw/gpio/puv3_gpio.c
+index 445afccf9f..33241b8564 100644
+--- a/hw/gpio/puv3_gpio.c
++++ b/hw/gpio/puv3_gpio.c
+@@ -99,36 +99,35 @@ static const MemoryRegionOps puv3_gpio_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
  
--static int milkymist_pfpu_init(SysBusDevice *dev)
-+static void milkymist_pfpu_realize(DeviceState *dev, Error **errp)
+-static int puv3_gpio_init(SysBusDevice *dev)
++static void puv3_gpio_realize(DeviceState *dev, Error **errp)
  {
-     MilkymistPFPUState *s = MILKYMIST_PFPU(dev);
+     PUV3GPIOState *s = PUV3_GPIO(dev);
 +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
  
--    sysbus_init_irq(dev, &s->irq);
-+    sysbus_init_irq(sbd, &s->irq);
+     s->reg_GPLR = 0;
+     s->reg_GPDR = 0;
  
-     memory_region_init_io(&s->regs_region, OBJECT(dev), &pfpu_mmio_ops, s,
-             "milkymist-pfpu", MICROCODE_END * 4);
--    sysbus_init_mmio(dev, &s->regs_region);
+     /* FIXME: these irqs not handled yet */
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW0]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW1]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW2]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW3]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW4]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW5]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW6]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOLOW7]);
+-    sysbus_init_irq(dev, &s->irq[PUV3_IRQS_GPIOHIGH]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW0]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW1]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW2]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW3]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW4]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW5]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW6]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOLOW7]);
++    sysbus_init_irq(sbd, &s->irq[PUV3_IRQS_GPIOHIGH]);
+ 
+     memory_region_init_io(&s->iomem, OBJECT(s), &puv3_gpio_ops, s, "puv3_gpio",
+             PUV3_REGS_OFFSET);
+-    sysbus_init_mmio(dev, &s->iomem);
 -
 -    return 0;
-+    sysbus_init_mmio(sbd, &s->regs_region);
++    sysbus_init_mmio(sbd, &s->iomem);
  }
  
- static const VMStateDescription vmstate_milkymist_pfpu = {
-@@ -527,9 +526,8 @@ static const VMStateDescription vmstate_milkymist_pfpu = {
- static void milkymist_pfpu_class_init(ObjectClass *klass, void *data)
+ static void puv3_gpio_class_init(ObjectClass *klass, void *data)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+-    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
  
--    k->init = milkymist_pfpu_init;
-+    dc->realize = milkymist_pfpu_realize;
-     dc->reset = milkymist_pfpu_reset;
-     dc->vmsd = &vmstate_milkymist_pfpu;
+-    sdc->init = puv3_gpio_init;
++    dc->realize = puv3_gpio_realize;
  }
+ 
+ static const TypeInfo puv3_gpio_info = {
 -- 
 2.17.1
