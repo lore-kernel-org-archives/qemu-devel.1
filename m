@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSiHI-0001tx-E6
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:52:17 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gSiHs-0003kF-VM
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:52:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSiHE-0003iZ-Ev
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:52:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gSiHC-0003gu-HI
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:52:11 -0500
-References: <1543574620-17506-1-git-send-email-thuth@redhat.com>
-	<20181130111555.GA9162@redhat.com>
-	<2acf4de2-d826-c2a4-c826-8c966b5cce9e@redhat.com>
-	<eb933208-6ee6-7f2a-dc14-bffbfa76cfad@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4f5aef94-3d6d-ebf2-f1ec-35467c8e29c8@redhat.com>
-Date: Fri, 30 Nov 2018 13:52:05 +0100
+	(envelope-from <mreitz@redhat.com>) id 1gSiHs-000471-4y
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:52:52 -0500
+References: <20181129101801.6421-1-vsementsov@virtuozzo.com>
+	<d8fdd816-90a1-29d7-cdab-0efe3e9abeda@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1ef7a489-a944-fb18-3032-228a51ec7ee2@redhat.com>
+Date: Fri, 30 Nov 2018 13:52:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <eb933208-6ee6-7f2a-dc14-bffbfa76cfad@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0] compiler.h: Add an explicit check
- for the compiler version
+In-Reply-To: <d8fdd816-90a1-29d7-cdab-0efe3e9abeda@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pETgukdsNhBK0sNS3XuAm5p19Qq5lM5p7"
+Subject: Re: [Qemu-devel] [Qemu-devel for-3.1?] [PATCH v2 0/2] mirror
+ dead-lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, peter.maydell@linaro.org
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, qemu-stable@nongnu.org, dplotnikov@virtuozzo.com, den@openvz.org, pbonzini@redhat.com, Peter Maydell <peter.maydell@linaro.org>
 
-On 2018-11-30 13:46, Paolo Bonzini wrote:
-> On 30/11/18 13:30, Thomas Huth wrote:
->> Do we really want to artificially limit our support here without any
->> further reasons? If the users want to compile QEMU on an older system,
->> and one of the libraries does not quite match anymore, it's often easy
->> enough to recompile a newer version of the library to get things going
->> again. Recompiling a whole compiler is way more cumbersome, though...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pETgukdsNhBK0sNS3XuAm5p19Qq5lM5p7
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, qemu-stable@nongnu.org,
+ dplotnikov@virtuozzo.com, den@openvz.org, pbonzini@redhat.com,
+ Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <1ef7a489-a944-fb18-3032-228a51ec7ee2@redhat.com>
+Subject: Re: [Qemu-devel for-3.1?] [PATCH v2 0/2] mirror dead-lock
+References: <20181129101801.6421-1-vsementsov@virtuozzo.com>
+ <d8fdd816-90a1-29d7-cdab-0efe3e9abeda@redhat.com>
+In-Reply-To: <d8fdd816-90a1-29d7-cdab-0efe3e9abeda@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 29.11.18 15:14, Eric Blake wrote:
+> On 11/29/18 4:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all!
 >>
->> OTOH, we could get rid of some more #if QEMU_GNUC_PREREQ spots in the
->> source code if we bump the minimum version to 4.8 ... so that might be a
->> real reason to increase the minimum.
-> 
-> Of all of them, I think, if we bump to 4.7?
-> 
-> Older 4.6 and 4.7 version have the PR55489 bug that we're checking for
-> in configure, too ("we should be able to delete this at the end of 2013"
-> :)).  Bumping to 4.8 would let us remove TRANSLATE_OPT_CFLAGS for good.
+>> v2: add fix:)
+>>
+>> We've faced the following mirror bug:
+>>
+>> Just run mirror on qcow2 image more than 1G, and qemu is in dead lock.=
 
-Ok, sounds like bumping to 4.8 would really help to get rid of some
-legacy stuff ... so please drop this patch for compiler.h, I'll try to
-come up with some other patches for checking the GCC version and Clang
-version in the configure script already instead.
+>=20
+> How long has the bug been present?=C2=A0 Based on patch 1 mentioning co=
+mmit
+> 2e1990b26e5 (in 3.0), I'm guessing that this bug is not a regression
+> specific to 3.1?=C2=A0 If so, then maybe we're better off deferring thi=
+s to
+> 4.0 just relying on qemu-stable (already cc'd); on the other hand, if i=
+t
+> is an easy-to-trigger deadlock on something the user is likely to do,
+> can we justify it being severe enough to warrant -rc4?
 
- Thomas
+The test does indeed break on 3.0.0 (and passes on 2.12.0).  But mirror
+just not working from non-trivial qcow2 images?  To me, that is a reason
+to delay the release, even though it is not a regression.
+
+Max
+
+
+--pETgukdsNhBK0sNS3XuAm5p19Qq5lM5p7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlwBMpcACgkQ9AfbAGHV
+z0CijwgAodUrJryYB3c+GyJB8elfaZF6QnkwhYEBT9P4Zv0zSU5fv59rtruJsiyV
+w3exK1/9tSHUru6/jOI9MC1yQj49Fp9ApfFf4C043Sbz5zv+0jYM/t8hvbWnAq3g
+j/XkVAGdokZG49lHhJVWW18eUmFFCgT30fDEB/wK0bJM77oeqV+InFOX2EGEyYWc
+Qv9dOsNPNySauI3RIC0SFjLxXCCEhVBzjBesaLsOWPpGjEBNBOyOaqfdF2ivDy3X
+xRHBWlDcz/dPg/Kw3cPycoLZBFf4z8Y5kHI5/TkEkWNcYo5hlIv2/YJBHux7Hk8N
+iHZTk39wLWBykxQC4d/8NpsOKFYymA==
+=tQGg
+-----END PGP SIGNATURE-----
+
+--pETgukdsNhBK0sNS3XuAm5p19Qq5lM5p7--
