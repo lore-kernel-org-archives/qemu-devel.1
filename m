@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSnNi-0007Qn-64
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:19:15 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gSnNu-0007VN-Ci
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:19:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSnNd-0007OC-Ex
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:19:14 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33379)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gSnNc-0007MD-TU
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:19:09 -0500
-Received: by mail-pg1-x542.google.com with SMTP id z11so2853437pgu.0
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 10:19:08 -0800 (PST)
-References: <20181120212553.8480-1-aaron@os.amperecomputing.com>
-	<20181120212553.8480-14-aaron@os.amperecomputing.com>
-	<d6fde9c7-b72e-ae9d-817b-71c3d6369dbc@linaro.org>
-	<20181130175629.GB24714@quinoa.localdomain>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <fb2e45b2-463d-aefe-e3d7-f3027f662c12@linaro.org>
-Date: Fri, 30 Nov 2018 10:19:03 -0800
+	(envelope-from <ehabkost@redhat.com>) id 1gSnNo-0007jO-9Q
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:19:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43894)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gSnNo-0007i4-25
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:19:20 -0500
+Date: Fri, 30 Nov 2018 16:19:13 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181130181913.GP18284@habkost.net>
+References: <20181130122844.29103-1-ehabkost@redhat.com>
+	<5c35ebae-9ddf-c544-57d8-62f2e344c800@redhat.com>
+	<87ftvie9gk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20181130175629.GB24714@quinoa.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 13/13] target/arm: Send interrupts on
- PMU counter overflow
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ftvie9gk.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH for-3.1? v2] hostmem: Validate host-nodes
+ before setting bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <aaron@os.amperecomputing.com>
-Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>, SM-Aaron Lindsay <alindsay@os.amperecomputing.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
 
-On 11/30/18 9:56 AM, Aaron Lindsay wrote:
-> On Nov 30 09:13, Richard Henderson wrote:
->> On 11/20/18 1:26 PM, Aaron Lindsay wrote:
->>> Setup a QEMUTimer to get a callback when we expect counters to next
->>> overflow and trigger an interrupt at that time.
->>>
->>> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
->>> Signed-off-by: Aaron Lindsay <alindsay@os.amperecomputing.com>
->>> ---
->>>  target/arm/cpu.c    |  12 +++++
->>>  target/arm/cpu.h    |   7 +++
->>>  target/arm/helper.c | 126 +++++++++++++++++++++++++++++++++++++++++---
->>>  3 files changed, 139 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
->>> index 208a08e867..7311a48e3c 100644
->>> --- a/target/arm/cpu.c
->>> +++ b/target/arm/cpu.c
->>> @@ -827,6 +827,13 @@ static void arm_cpu_finalizefn(Object *obj)
->>>          QLIST_REMOVE(hook, node);
->>>          g_free(hook);
->>>      }
->>> +#ifndef CONFIG_USER_ONLY
->>> +    if (arm_feature(&cpu->env, ARM_FEATURE_PMU) && cpu->pmu_timer) {
->>
->> No need for two tests here.  Just check cpu->pmu_timer.
->> (If it's set for any reason it should be freed, surely.)
->>
->>> @@ -1305,7 +1338,18 @@ void pmccntr_op_start(CPUARMState *env)
->>>              eff_cycles /= 64;
->>>          }
->>>  
->>> -        env->cp15.c15_ccnt = eff_cycles - env->cp15.c15_ccnt_delta;
->>> +        uint64_t new_pmccntr = eff_cycles - env->cp15.c15_ccnt_delta;
->>> +
->>> +        unsigned int overflow_bit = (env->cp15.c9_pmcr & PMCRLC) ? 63 : 31;
->>> +        uint64_t overflow_mask = (uint64_t)1 << overflow_bit;
->>> +        if (!(new_pmccntr & overflow_mask) &&
->>> +                (env->cp15.c15_ccnt & overflow_mask)) {
->>
->> Fyi, this expression is
->>
->>     env->cp15.c15_ccnt & ~new_pmccntr & overflow_mask
->>
->>> +            env->cp15.c9_pmovsr |= (1 << 31);
->>> +            new_pmccntr &= ~overflow_mask;
->>
->> Why this line?  You just checked that overflow_mask was unset in new_pmccntr above.
+On Fri, Nov 30, 2018 at 06:55:39PM +0100, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
 > 
-> This ensures that when overflow_bit == 31 (because PMCR.LC is not set)
-> the high 32 bits remain 0 even after an overflow has occurred. As you
-> point out, it's silly when overflow_bit == 64, but I didn't think it was
-> worth the extra conditional to avoid it.
+> > On 11/30/18 6:28 AM, Eduardo Habkost wrote:
+> >> host_memory_backend_set_host_nodes() was not validating
+> >> host-nodes before writing to backend->host_nodes, making QEMU
+> >> write beyond the end of the bitmap.
+> >>
+> >> Fix the crash and add a simple regression test for the fix.
+> >>
+> >> While at it, fix memory leak of the list returned by
+> >> visit_type_uint16List().
+> >>
+> >> Reported-by: Markus Armbruster <armbru@redhat.com>
+> >> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> >> ---
+> >
+> > Looks like we may have 3.1-rc4 due to some CVE fixes; is this worth
+> > including in 3.1 as well?
+> 
+> You could conceivably crash a running VM with object-add.  On the other
+> hand, the bug has been around for a while, and was only found by code
+> inspection.
 
-Eh?  But we've set overflow_mask based on PMCR.LC, so what you say here doesn't
-make sense.
+I think the fix would be appropriate for -rc2 or -rc3, but I
+don't think it's critical enough for -rc4.
 
-> Thanks for your review. I'll take a look at your suggested logic
-> simplifications for v9, do you think that this patch looks OK at the
-> big-picture level?
-
-Yes, big picture looks good.
-
-
-r~
+-- 
+Eduardo
