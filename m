@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gShUU-0007v9-VY
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:01:54 -0500
+	(envelope-from <philmd@redhat.com>) id 1gShVQ-0008RM-1U
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:02:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gShUP-00032O-A0
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:01:50 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53366)
+	(envelope-from <philmd@redhat.com>) id 1gShVK-0003wf-3s
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:02:46 -0500
+Received: from mail-wr1-f45.google.com ([209.85.221.45]:39640)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gShUO-00031P-IU
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:01:45 -0500
-Received: by mail-wm1-f67.google.com with SMTP id y1so5510813wmi.3
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 04:01:43 -0800 (PST)
-References: <1543571638-2892-1-git-send-email-liq3ea@gmail.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gShVJ-0003vq-9r
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:02:42 -0500
+Received: by mail-wr1-f45.google.com with SMTP id t27so5044906wra.6
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 04:02:40 -0800 (PST)
+References: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
+	<20181130093852.20739-16-maozhongyi@cmss.chinamobile.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <16fc13de-778b-430e-d734-bbc802d25ba8@redhat.com>
-Date: Fri, 30 Nov 2018 13:01:39 +0100
+Message-ID: <3ae3d7bf-e594-008d-fc84-31307f4422e2@redhat.com>
+Date: Fri, 30 Nov 2018 13:02:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <1543571638-2892-1-git-send-email-liq3ea@gmail.com>
+In-Reply-To: <20181130093852.20739-16-maozhongyi@cmss.chinamobile.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] util: vfio-helpers: use ARRAY_SIZE in
- qemu_vfio_init_pci()
+Subject: Re: [Qemu-devel] [PATCH v3 15/21] pci-bridge/dec: Convert sysbus
+ init function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, laurent@vivier.eu
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, qemu-ppc@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>, david@gibson.dropbear.id.au
 
-On 30/11/18 10:53, Li Qiang wrote:
-> Cc: qemu-trivial@nongnu.org
+On 30/11/18 10:38, Mao Zhongyi wrote:
+> Use DeviceClass rather than SysBusDeviceClass in
+> pci_dec_21154_device_class_init().
 > 
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> Cc: david@gibson.dropbear.id.au
+> Cc: mst@redhat.com
+> Cc: marcel.apfelbaum@gmail.com
+> Cc: qemu-ppc@nongnu.org
+> 
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+> Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  util/vfio-helpers.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/pci-bridge/dec.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 > 
-> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-> index cccc9cd42e..342d4a2285 100644
-> --- a/util/vfio-helpers.c
-> +++ b/util/vfio-helpers.c
-> @@ -348,7 +348,7 @@ static int qemu_vfio_init_pci(QEMUVFIOState *s, const char *device,
->          goto fail;
->      }
+> diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
+> index 84492d5e5f..8484bfd434 100644
+> --- a/hw/pci-bridge/dec.c
+> +++ b/hw/pci-bridge/dec.c
+> @@ -98,9 +98,10 @@ PCIBus *pci_dec_21154_init(PCIBus *parent_bus, int devfn)
+>      return pci_bridge_get_sec_bus(br);
+>  }
 >  
-> -    for (i = 0; i < 6; i++) {
-> +    for (i = 0; i < ARRAY_SIZE(s->bar_region_info); i++) {
->          ret = qemu_vfio_pci_init_bar(s, i, errp);
->          if (ret) {
->              goto fail;
+> -static int pci_dec_21154_device_init(SysBusDevice *dev)
+> +static void pci_dec_21154_device_realize(DeviceState *dev, Error **errp)
+>  {
+>      PCIHostState *phb;
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+>  
+>      phb = PCI_HOST_BRIDGE(dev);
+>  
+> @@ -108,9 +109,8 @@ static int pci_dec_21154_device_init(SysBusDevice *dev)
+>                            dev, "pci-conf-idx", 0x1000);
+>      memory_region_init_io(&phb->data_mem, OBJECT(dev), &pci_host_data_le_ops,
+>                            dev, "pci-data-idx", 0x1000);
+> -    sysbus_init_mmio(dev, &phb->conf_mem);
+> -    sysbus_init_mmio(dev, &phb->data_mem);
+> -    return 0;
+> +    sysbus_init_mmio(sbd, &phb->conf_mem);
+> +    sysbus_init_mmio(sbd, &phb->data_mem);
+>  }
+>  
+>  static void dec_21154_pci_host_realize(PCIDevice *d, Error **errp)
+> @@ -150,9 +150,9 @@ static const TypeInfo dec_21154_pci_host_info = {
+>  
+>  static void pci_dec_21154_device_class_init(ObjectClass *klass, void *data)
+>  {
+> -    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+> -    sdc->init = pci_dec_21154_device_init;
+> +    dc->realize = pci_dec_21154_device_realize;
+>  }
+>  
+>  static const TypeInfo pci_dec_21154_device_info = {
 > 
