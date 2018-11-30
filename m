@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gSonW-0001V2-E3
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:49:59 -0500
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gSovX-00088R-RB
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:58:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gSonR-000535-FV
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:49:58 -0500
-Resent-Message-Id: <E1gSonR-000535-FV@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21809)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gSonR-00052L-71
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:49:53 -0500
-In-Reply-To: <20181129090120.28828-1-pbonzini@redhat.com>
-Message-ID: <154360647082.28958.13050320188370262292@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <aaron@os.amperecomputing.com>) id 1gSovU-0002PY-2z
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:58:13 -0500
+From: Aaron Lindsay <aaron@os.amperecomputing.com>
+Date: Fri, 30 Nov 2018 19:57:55 +0000
+Message-ID: <20181130195742.GC24714@quinoa.localdomain>
+References: <20181120212553.8480-1-aaron@os.amperecomputing.com>
+	<20181120212553.8480-14-aaron@os.amperecomputing.com>
+	<d6fde9c7-b72e-ae9d-817b-71c3d6369dbc@linaro.org>
+	<20181130175629.GB24714@quinoa.localdomain>
+	<fb2e45b2-463d-aefe-e3d7-f3027f662c12@linaro.org>
+In-Reply-To: <fb2e45b2-463d-aefe-e3d7-f3027f662c12@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <0EB9EB3CA4B2EE40BAEEB6D2661B5D14@prod.exchangelabs.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 30 Nov 2018 11:34:31 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/4] Small checkpatch fixes and
- improvements
+Subject: Re: [Qemu-devel] [PATCH v8 13/13] target/arm: Send interrupts on
+ PMU counter overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>, SM-Aaron Lindsay <alindsay@os.amperecomputing.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKCgpUeXBlOiBzZXJpZXMK
-U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBmb3ItNC4wIDAvNF0gU21hbGwgY2hlY2twYXRj
-aCBmaXhlcyBhbmQgaW1wcm92ZW1lbnRzCk1lc3NhZ2UtaWQ6IDIwMTgxMTI5MDkwMTIwLjI4ODI4
-LTEtcGJvbnppbmlAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
-dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
-UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
-ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
-ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
-dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAg
-ICAgcGF0Y2hldy8yMDE4MTEzMDE5MjIxNi4yNjk4Ny0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
-by5vcmcgLT4gcGF0Y2hldy8yMDE4MTEzMDE5MjIxNi4yNjk4Ny0xLXJpY2hhcmQuaGVuZGVyc29u
-QGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4MmNhZjk1IGNoZWNr
-cGF0Y2g6IGNvbG9yaXplIG91dHB1dCB0byB0ZXJtaW5hbApkZjgzOTNhIGNoZWNrcGF0Y2g6IGlt
-cHJvdmUgaGFuZGxpbmcgb2YgbXVsdGlwbGUgcGF0Y2hlcyBvciBmaWxlcwpiOTgwMzlhIGNoZWNr
-cGF0Y2g6IGNoZWNrIFNpZ25lZC1vZmYtYnkgaW4gLS1tYWlsYmFjayBtb2RlCmYyYzMzYzIgY2hl
-Y2twYXRjaDogZml4IHByZW1hdHVyZSBleGl0IHdoZW4gbm8gaW5wdXQgb3IgLS1tYWlsYmFjawoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBjaGVja3BhdGNoOiBmaXgg
-cHJlbWF0dXJlIGV4aXQgd2hlbiBubyBpbnB1dCBvciAtLW1haWxiYWNrLi4uCkNoZWNraW5nIFBB
-VENIIDIvNDogY2hlY2twYXRjaDogY2hlY2sgU2lnbmVkLW9mZi1ieSBpbiAtLW1haWxiYWNrIG1v
-ZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy80OiBjaGVja3BhdGNoOiBpbXByb3ZlIGhhbmRsaW5nIG9m
-IG11bHRpcGxlIHBhdGNoZXMgb3IgZmlsZXMuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0
-ZXJzCiMzMzogRklMRTogc2NyaXB0cy9jaGVja3BhdGNoLnBsOjM0NToKKyAgICAgICBvcGVuKCRI
-QVNILCAiLXwiLCAiZ2l0IiwgImxvZyIsICItLXJldmVyc2UiLCAiLS1uby1tZXJnZXMiLCAiLS1m
-b3JtYXQ9JUggJXMiLCAkQVJHVlswXSkgfHwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
-cwojMzQ6IEZJTEU6IHNjcmlwdHMvY2hlY2twYXRjaC5wbDozNDY6CisgICAgICAgICAgICAgICBk
-aWUgIiRQOiBnaXQgbG9nIC0tcmV2ZXJzZSAtLW5vLW1lcmdlcyAtLWZvcm1hdD0nJUggJXMnICRB
-UkdWWzBdIGZhaWxlZCAtICQhXG4iOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzY1OiBGSUxFOiBzY3JpcHRzL2NoZWNrcGF0Y2gucGw6MzczOgorICAgICAgICAgICAgICAgJHZu
-YW1lID0gc3Vic3RyKCRoYXNoLCAwLCAxMikgLiAnICgnIC4gJGdpdF9jb21taXRzeyRoYXNofSAu
-ICcpJzsKCnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywgNjIgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC80OiBj
-aGVja3BhdGNoOiBjb2xvcml6ZSBvdXRwdXQgdG8gdGVybWluYWwuLi4KRVJST1I6IE1pc3Npbmcg
-U2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMTQg
-bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Nov 30 10:19, Richard Henderson wrote:
+> On 11/30/18 9:56 AM, Aaron Lindsay wrote:
+> > On Nov 30 09:13, Richard Henderson wrote:
+> >> On 11/20/18 1:26 PM, Aaron Lindsay wrote:
+> >>> Setup a QEMUTimer to get a callback when we expect counters to next
+> >>> overflow and trigger an interrupt at that time.
+> >>>
+> >>> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> >>> Signed-off-by: Aaron Lindsay <alindsay@os.amperecomputing.com>
+> >>> ---
+> >>>  target/arm/cpu.c    |  12 +++++
+> >>>  target/arm/cpu.h    |   7 +++
+> >>>  target/arm/helper.c | 126 +++++++++++++++++++++++++++++++++++++++++-=
+--
+> >>>  3 files changed, 139 insertions(+), 6 deletions(-)
+> >>>
+> >>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> >>> index 208a08e867..7311a48e3c 100644
+> >>> --- a/target/arm/cpu.c
+> >>> +++ b/target/arm/cpu.c
+> >>> @@ -827,6 +827,13 @@ static void arm_cpu_finalizefn(Object *obj)
+> >>>          QLIST_REMOVE(hook, node);
+> >>>          g_free(hook);
+> >>>      }
+> >>> +#ifndef CONFIG_USER_ONLY
+> >>> +    if (arm_feature(&cpu->env, ARM_FEATURE_PMU) && cpu->pmu_timer) {
+> >>
+> >> No need for two tests here.  Just check cpu->pmu_timer.
+> >> (If it's set for any reason it should be freed, surely.)
+> >>
+> >>> @@ -1305,7 +1338,18 @@ void pmccntr_op_start(CPUARMState *env)
+> >>>              eff_cycles /=3D 64;
+> >>>          }
+> >>> =20
+> >>> -        env->cp15.c15_ccnt =3D eff_cycles - env->cp15.c15_ccnt_delta=
+;
+> >>> +        uint64_t new_pmccntr =3D eff_cycles - env->cp15.c15_ccnt_del=
+ta;
+> >>> +
+> >>> +        unsigned int overflow_bit =3D (env->cp15.c9_pmcr & PMCRLC) ?=
+ 63 : 31;
+> >>> +        uint64_t overflow_mask =3D (uint64_t)1 << overflow_bit;
+> >>> +        if (!(new_pmccntr & overflow_mask) &&
+> >>> +                (env->cp15.c15_ccnt & overflow_mask)) {
+> >>
+> >> Fyi, this expression is
+> >>
+> >>     env->cp15.c15_ccnt & ~new_pmccntr & overflow_mask
+> >>
+> >>> +            env->cp15.c9_pmovsr |=3D (1 << 31);
+> >>> +            new_pmccntr &=3D ~overflow_mask;
+> >>
+> >> Why this line?  You just checked that overflow_mask was unset in new_p=
+mccntr above.
+> >=20
+> > This ensures that when overflow_bit =3D=3D 31 (because PMCR.LC is not s=
+et)
+> > the high 32 bits remain 0 even after an overflow has occurred. As you
+> > point out, it's silly when overflow_bit =3D=3D 64, but I didn't think i=
+t was
+> > worth the extra conditional to avoid it.
+>=20
+> Eh?  But we've set overflow_mask based on PMCR.LC, so what you say here d=
+oesn't
+> make sense.
+
+Sorry, I had an off-by-one-bit think-o I couldn't get past until I
+started typing a concrete example to explain myself. I'll change this
+line to be:
+
+if (!(env->cp15.c9_pmcr & PMCRLC))
+	new_pmccntr &=3D 0xffffffff;
+
+-Aaron
