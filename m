@@ -1,24 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gSewY-0002if-0Q
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:18:38 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1gSf1F-0003y2-IT
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:23:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1gSewT-0005vr-4J
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:18:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58856)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1gSewS-0005uz-Qa
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:18:33 -0500
-Date: Fri, 30 Nov 2018 14:48:19 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <44516b60-dafd-70e3-1638-ea38a804c8a4@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.1811301446050.9903@xnncv>
-References: <20181129121449.4322-1-jasowang@redhat.com>
-	<44516b60-dafd-70e3-1638-ea38a804c8a4@redhat.com>
+	(envelope-from <pmorel@linux.ibm.com>) id 1gSf1B-0000g5-Kr
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:23:29 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49022)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gSf1B-0000fj-6T
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:23:25 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wAU9Ijvc053189
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 04:23:23 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2p31f7aumm-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 04:23:23 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Fri, 30 Nov 2018 09:23:21 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <20181022090255.19671-1-zyimin@linux.ibm.com>
+	<698a7fdd-47cc-cb3e-a280-3c4b656d92ef@redhat.com>
+	<20181023232517.6b93085b.cohuck@redhat.com>
+	<494ff50b-8b0f-1393-fbc5-bf5033a246ce@linux.ibm.com>
+	<20181031114954.5e51d0c2.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Fri, 30 Nov 2018 10:23:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH V2 for 3.1 0/4] Fix possible OOB during
- queuing packets
+In-Reply-To: <20181031114954.5e51d0c2.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <d8e0621a-d11e-a172-e40e-ec96dd92d5cd@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/pci: add common fmb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,26 +46,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, mst@redhat.com, liq3ea@gmail.com, pbonzini@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, Yi Min Zhao <zyimin@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org
 
-+-- On Thu, 29 Nov 2018, Eric Blake wrote --+
-| How important is this for 3.1?  We've missed -rc3.  Is this CVE quality 
-| because of a guest being able to cause mayhem by intentionally getting into 
-| this condition (in which case, we need it, as well as a CVE assigned)? Is it 
-| pre-existing in 3.0 at which point waiting for 4.0 is no worse off than what 
-| we already are?
+On 31/10/2018 11:49, Cornelia Huck wrote:
+> On Wed, 24 Oct 2018 11:58:33 +0800
+> Yi Min Zhao <zyimin@linux.ibm.com> wrote:
+>=20
+>> =E5=9C=A8 2018/10/24 =E4=B8=8A=E5=8D=885:25, Cornelia Huck =E5=86=99=E9=
+=81=93:
+>>> On Mon, 22 Oct 2018 13:17:34 +0100
+>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>  =20
 
-It is a revised patch to fix 'CVE-2018-17963' issue. Earlier patch was 
-included in -rc0.
+...snip...
 
-$ git tag --contains 1592a9947036d60dde5404204a5d45975133caf5
-v3.1.0-rc0
-v3.1.0-rc1
-v3.1.0-rc2
-v3.1.0-rc3
+>> If endianness has error, I think the values must looks wrong.
+>> The right thing is that values increase from 0 and intervally.
+>>
+>=20
+> Thanks for pointing me to that file; when I run under tcg, the values
+> indeed look like they have an endianness issue:
+>=20
+> Update interval: 4000 ms
+> Samples: 637534208
+> Last update TOD: f4c01d0098000000
+>             Load operations:	10520408729537478656
+>            Store operations:	5980780305148018688
+>      Store block operations:	0
+>          Refresh operations:	0
+>             Allocated pages:	0
+>                Mapped pages:	0
+>              Unmapped pages:	0
+>=20
+> (virtio-net-pci device on a just-booted guest)
+>=20
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Hy Conny,
+
+I saw we lack a response to Thomas.
+Otherwise have you any remark?
+
+Regards,
+Pierre
+
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
