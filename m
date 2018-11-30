@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:44532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gSbp6-0001Je-4c
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 00:58:47 -0500
+	(envelope-from <fli@suse.com>) id 1gSc5X-0007DF-32
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 01:15:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gSboG-0006RB-H6
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 00:57:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41398)
+	(envelope-from <fli@suse.com>) id 1gSc5S-0007TE-65
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 01:15:43 -0500
+Received: from mx2.suse.de ([195.135.220.15]:60870 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gSboG-0006Qd-B1
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 00:57:52 -0500
-Date: Fri, 30 Nov 2018 13:57:36 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181130055736.GA15865@xz-x1>
-References: <1542276484-25508-1-git-send-email-wei.w.wang@intel.com>
-	<1542276484-25508-6-git-send-email-wei.w.wang@intel.com>
-	<20181127073802.GC3205@xz-x1> <5BFD1BA4.5040202@intel.com>
-	<20181128052655.GC12839@xz-x1> <5BFE596B.1080807@intel.com>
-	<20181128093220.GF12839@xz-x1> <5BFF5FC9.2020402@intel.com>
-	<20181129051014.GC29246@xz-x1> <5C00C52F.20606@intel.com>
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gSc5R-0007Sc-VZ
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 01:15:38 -0500
+References: <20181129100340.13823-1-fli@suse.com>
+	<4031aa35-a9f0-dd87-ad2a-0cc35546f7af@redhat.com>
+From: Fei Li <fli@suse.com>
+Message-ID: <27e46dfa-f874-8b20-7522-f933d0dda897@suse.com>
+Date: Fri, 30 Nov 2018 14:15:28 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5C00C52F.20606@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v9 5/8] migration/ram.c: add a notifier
- chain for precopy
+In-Reply-To: <4031aa35-a9f0-dd87-ad2a-0cc35546f7af@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.1? RFC v2 0/5] fix some segmentation
+ faults and migration issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Nov 30, 2018 at 01:05:51PM +0800, Wei Wang wrote:
-> On 11/29/2018 01:10 PM, Peter Xu wrote:
-> > On Thu, Nov 29, 2018 at 11:40:57AM +0800, Wei Wang wrote:
-> > I think this precopy notifier callchain is expected to be used only for
-> > the precopy mode. Postcopy has its dedicated notifier callchain that
-> > users could use.
-> > 
-> > How about changing the migrate_postcopy() check to "ms->start_postcopy":
-> > 
-> > bool migration_postcopy_start(void)
-> > {
-> >      MigrationState *s;
-> > 
-> >      s = migrate_get_current();
-> > 
-> >      return atomic_read(&s->start_postcopy);
-> > }
-> > 
-> > 
-> > static void precopy_notify(PrecopyNotifyReason reason)
-> > {
-> >      if (migration_postcopy_start())
-> >          return;
-> > 
-> >      notifier_list_notify(&precopy_notifier_list, &reason);
-> > }
-> > 
-> > If postcopy started with precopy, the precopy optimization feature
-> > could still be used until it switches to the postcopy mode.
-> > I'm not sure we can use start_postcopy.  It's a variable being set in
-> > the QMP handler but it does not mean postcopy has started.  I'm afraid
-> > there can be race where it's still precopy but the variable is set so
-> > event could be missed...
-> 
-> Peter,
-> I just found that migration_bitmap_sync is also called by
-> ram_postcopy_send_discard_bitmap().
-> But we don't expect notifier_list_notify to be called in the postcopy mode.
-> 
-> So, probably we still need the start_postcopy check in notifier_list_notify
-> though we have
-> the COMPLETE notifier.
 
-I still don't think using start_postcopy is a good idea, as
-explained in my previous reply.
 
-Maybe move the notify()s outside migration_bitmap_sync() but only at
-the call sites in precopy?  Say these three:
+On 11/29/2018 10:20 PM, Eric Blake wrote:
+> On 11/29/18 4:03 AM, Fei Li wrote:
+>> These five patches almost get the Reviewed-by and are extracted from
+>> previous "[PATCH RFC v7 0/9] qemu_thread_create: propagate errors to
+>> callers to check."=C2=A0 The mentioned patch series have waited on one
+>> multifd issue for a while and still needs a further discussion.
+>>
+>> Thus separate(send) these five almost-done patches and hope they can
+>> be merged for the next tag. Thanks for the review. :)
+>
+> How likely are any of these crashers to affect an end user?=20
+IMHO, they are not easily triggered.
+> Are any of them regressions over 3.0?
+I do not think so.
+> I'm trying to gauge if any of this is serious enough to warrant a=20
+> -rc4, or if we are okay just documenting them as known corner-case=20
+> bugs and deferring the fix to 4.0 and qemu-stable.
+Emm, actually not so emergency to be included in -rc4.
+And I think it is ok to wait for maintainers to do the pick for the=20
+appropriate release.
+BTW, why 4.0, but not 3.2 or 3.3 (I mean 3.minor version)?
+> The fact that the series is still titled RFC is also an argument in=20
+> favor of deferral.
+Sorry that I forgot to remove the RFC..
 
-ram_init_bitmaps[3508]         migration_bitmap_sync(rs);
-ram_save_complete[3731]        migration_bitmap_sync(rs);
-ram_save_pending[3776]         migration_bitmap_sync(rs);
-
-Or you can introduce migration_bitmap_sync_precopy() and let precopy
-code call that one instead.
-
-PS. I'm a bit unsure on why we need to sync bitmap in ram_init_bitmaps.
-I feel like it can be removed...
-
-Regards,
-
--- 
-Peter Xu
+Have a nice day, thanks :)
+Fei
+>
+>>
+>> v2:
+>> - Update the commit message for patch 1/5, and get one more
+>> =C2=A0=C2=A0 Reviewed-by.
+>> - Get one Reviewed-by for patch 3/5.
+>>
+>>
+>> Fei Li (5):
+>> =C2=A0=C2=A0 Fix segmentation fault when qemu_signal_init fails
+>> =C2=A0=C2=A0 qemu_thread_join: fix segmentation fault
+>> =C2=A0=C2=A0 migration: fix the multifd code when receiving less chann=
+els
+>> =C2=A0=C2=A0 migration: remove unused &local_err parameter in multifd_=
+save_cleanup
+>> =C2=A0=C2=A0 migration: add more error handling for postcopy_ram_enabl=
+e_notify
+>
