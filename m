@@ -1,25 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSejo-00036N-Ss
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:05:30 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1gSeoJ-0004wQ-BI
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:10:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSejl-00052M-7i
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:05:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gSeji-0004tn-Vl
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:05:23 -0500
-References: <154356772378.66975.13711686652368325931.stgit@bahia.lan>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f814fd63-64a2-a464-7022-2c8f5bac4af6@redhat.com>
-Date: Fri, 30 Nov 2018 10:05:07 +0100
+	(envelope-from <pmorel@linux.ibm.com>) id 1gSeoE-00008h-T7
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:10:07 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46948)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gSeoE-00008U-Km
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:10:02 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wAU93UIG098742
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 04:10:01 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2p30mrvh4n-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 04:10:01 -0500
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Fri, 30 Nov 2018 09:09:58 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
+	<1542904555-1136-2-git-send-email-pmorel@linux.ibm.com>
+	<91b8a21b-5dea-f944-1200-4491ad1d69f2@linux.ibm.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Fri, 30 Nov 2018 10:09:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <154356772378.66975.13711686652368325931.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <91b8a21b-5dea-f944-1200-4491ad1d69f2@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0] 9p: remove support for the
- "handle" backend
+Message-Id: <07fbdb99-be94-1bf0-3ee8-769e49a61aff@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] s390x/vfio: ap: Finding the AP
+ bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +45,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+To: Tony Krowiak <akrowiak@linux.ibm.com>, borntraeger@de.ibm.com
+Cc: cohuck@redhat.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, pasic@linux.ibm.com
 
-On 2018-11-30 09:49, Greg Kurz wrote:
-> The "handle" fsdev backend was deprecated in QEMU 2.12.0 with:
-> 
-> commit db3b3c7281ca82e2647e072a1f97db111313dd73
-> Author: Greg Kurz <groug@kaod.org>
-> Date:   Mon Jan 8 11:18:23 2018 +0100
-> 
->     9pfs: deprecate handle backend
-> 
->     This backend raise some concerns:
-> 
->     - doesn't support symlinks
->     - fails +100 tests in the PJD POSIX file system test suite [1]
->     - requires the QEMU process to run with the CAP_DAC_READ_SEARCH
->       capability, which isn't recommended for security reasons
-> 
->     This backend should not be used and wil be removed. The 'local'
->     backend is the recommended alternative.
-> 
->     [1] https://www.tuxera.com/community/posix-test-suite/
-> 
->     Signed-off-by: Greg Kurz <groug@kaod.org>
->     Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
->     Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-> 
-> It has passed the two release cooling period without any complaint.
-> 
-> Remove it now.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
-> 
-> It could have been removed for 3.1.0, but I woke up too late, so moving
-> this to 4.0.
-> 
-> ---
->  fsdev/qemu-fsdev.c    |    3 
->  hw/9pfs/9p-handle.c   |  710 -------------------------------------------------
->  hw/9pfs/Makefile.objs |    1 
->  qemu-deprecated.texi  |    8 -
->  qemu-options.hx       |    8 -
->  5 files changed, 4 insertions(+), 726 deletions(-)
->  delete mode 100644 hw/9pfs/9p-handle.c
+On 29/11/2018 21:30, Tony Krowiak wrote:
+> On 11/22/18 11:35 AM, Pierre Morel wrote:
+>> In the case we will enter QEMU through interception of instructions,
+>> we will need to retrieve the AP devices.
+>> The base device is the AP bridge.
+>>
+>> Let us implement a way to retrieve the AP Bridge from qtree.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>> =C2=A0 hw/s390x/ap-bridge.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 | 12 ++++++++++++
+>> =C2=A0 include/hw/s390x/ap-bridge.h |=C2=A0 1 +
+>> =C2=A0 2 files changed, 13 insertions(+)
+>>
+>> diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
+>> index 3795d30..831ad5d 100644
+>> --- a/hw/s390x/ap-bridge.c
+>> +++ b/hw/s390x/ap-bridge.c
+>> @@ -14,6 +14,18 @@
+>> =C2=A0 #include "hw/s390x/ap-bridge.h"
+>> =C2=A0 #include "cpu.h"
+>> +DeviceState *s390_get_ap_bridge(void)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 static DeviceState *apb;
+>=20
+> Since you are caching a reference to the bridge after
+> retrieving it, why not make apb a global scope variable
+> and initialize it in s390_init_ap() when the bridge is
+> created. You can then declare it as an extern in the
+> ap-bridge.h header file and you eliminate the need for
+> this function. If you do make it a global var, I would
+> name it ap_bridge;
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+We already had this discussion when implementing zPCI.
+I use a similar solution as it was decided at that time.
+
+
+Regards,
+Pierre
+
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
