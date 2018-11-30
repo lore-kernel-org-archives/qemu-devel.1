@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gShue-0005pz-9R
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:28:53 -0500
+	(envelope-from <thuth@redhat.com>) id 1gShw6-0006fj-Jq
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:30:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gShua-0007Sb-U0
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:28:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53860)
+	(envelope-from <thuth@redhat.com>) id 1gShw3-0008MK-A4
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:30:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47502)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gShua-0007SA-MG
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:28:48 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E7A7168F
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 12:28:47 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 30 Nov 2018 10:28:44 -0200
-Message-Id: <20181130122844.29103-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] hostmem: Validate host-nodes before setting
- bitmap
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gShw2-0008Li-Td
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:30:19 -0500
+References: <1543574620-17506-1-git-send-email-thuth@redhat.com>
+	<20181130111555.GA9162@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2acf4de2-d826-c2a4-c826-8c966b5cce9e@redhat.com>
+Date: Fri, 30 Nov 2018 13:30:12 +0100
+MIME-Version: 1.0
+In-Reply-To: <20181130111555.GA9162@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0] compiler.h: Add an explicit check
+ for the compiler version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, pbonzini@redhat.com, peter.maydell@linaro.org
 
-host_memory_backend_set_host_nodes() was not validating
-host-nodes before writing to backend->host_nodes, making QEMU
-write beyond the end of the bitmap.
+On 2018-11-30 12:15, Daniel P. Berrang=C3=A9 wrote:
+> On Fri, Nov 30, 2018 at 11:43:40AM +0100, Thomas Huth wrote:
+>> The questions about our minimum compiler requirement pops up every
+>> couple of months, and we then have to recall the details each time.
+>> So let's document this in a proper way, by adding a comment and
+>> check for the right compiler version to our compiler.h header.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  include/qemu/compiler.h | 8 ++++++++
+>>  1 file changed, 8 insertions(+)
+>>
+>> diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+>> index ca9bc85..775446b 100644
+>> --- a/include/qemu/compiler.h
+>> +++ b/include/qemu/compiler.h
+>> @@ -22,6 +22,14 @@
+>>  # define QEMU_GNUC_PREREQ(maj, min) 0
+>>  #endif
+>> =20
+>> +/*
+>> + * We need at least GCC 4.1 for atomics support. Clang also supports =
+these,
+>> + * and reports itself as GCC 4.2, so it passes this check, too.
+>> + */
+>> +#if !QEMU_GNUC_PREREQ(4, 1)
+>> +#error QEMU needs a compiler that is compatible with GCC v4.1 or newe=
+r
+>> +#endif
+>=20
+> This encodes our current minimum which is fine as a first step.
+>=20
+> I think we could reasonably increase our min version now that we
+> have declared explicitly what platforms we intend to support
 
-Fix the crash and add a simple regression test for the fix.
+Do we really want to artificially limit our support here without any
+further reasons? If the users want to compile QEMU on an older system,
+and one of the libraries does not quite match anymore, it's often easy
+enough to recompile a newer version of the library to get things going
+again. Recompiling a whole compiler is way more cumbersome, though...
 
-While at it, fix memory leak of the list returned by
-visit_type_uint16List().
+OTOH, we could get rid of some more #if QEMU_GNUC_PREREQ spots in the
+source code if we bump the minimum version to 4.8 ... so that might be a
+real reason to increase the minimum.
 
-Reported-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes v1 -> v2:
-* Remove extra `l = l->next` statement
-  (reported by Stefano Garzarella)
-* Fix (existing) leak of `host_nodes`
-  (reported by Markus Armbruster)
----
- backends/hostmem.c                   | 17 +++++++++----
- tests/acceptance/host-nodes-limit.py | 36 ++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+), 4 deletions(-)
- create mode 100644 tests/acceptance/host-nodes-limit.py
+> We would need an explicit check for clang, however, instead of
+> relying on it claiming gcc 4.2 support - that's a way inaccurate
+> claim anyway so detecting a specific clang version would be
+> better regardless IMHO
 
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 1a89342039..af800284e0 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -103,14 +103,23 @@ host_memory_backend_set_host_nodes(Object *obj, Visitor *v, const char *name,
- {
- #ifdef CONFIG_NUMA
-     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
--    uint16List *l = NULL;
-+    uint16List *l, *host_nodes = NULL;
- 
--    visit_type_uint16List(v, name, &l, errp);
-+    visit_type_uint16List(v, name, &host_nodes, errp);
- 
--    while (l) {
-+    for (l = host_nodes; l; l = l->next) {
-+        if (l->value >= MAX_NODES) {
-+            error_setg(errp, "Invalid host-nodes value: %d", l->value);
-+            goto out;
-+        }
-+    }
-+
-+    for (l = host_nodes; l; l = l->next) {
-         bitmap_set(backend->host_nodes, l->value, 1);
--        l = l->next;
-     }
-+
-+out:
-+    qapi_free_uint16List(host_nodes);
- #else
-     error_setg(errp, "NUMA node binding are not supported by this QEMU");
- #endif
-diff --git a/tests/acceptance/host-nodes-limit.py b/tests/acceptance/host-nodes-limit.py
-new file mode 100644
-index 0000000000..e803e10104
---- /dev/null
-+++ b/tests/acceptance/host-nodes-limit.py
-@@ -0,0 +1,36 @@
-+# Regression test for host-nodes limit validation
-+#
-+# Copyright (c) 2018 Red Hat, Inc.
-+#
-+# Author:
-+#  Eduardo Habkost <ehabkost@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+from avocado_qemu import Test
-+from subprocess import Popen, PIPE
-+
-+MAX_NODES = 128
-+
-+class HostNodesValidation(Test):
-+    def test_large_host_nodes(self):
-+        p = Popen([self.qemu_bin, '-display', 'none', '-nodefaults',
-+                   '-object', 'memory-backend-ram,id=m0,'
-+                              'size=4096,host-nodes=%d' % (MAX_NODES)],
-+                  stderr=PIPE, stdout=PIPE)
-+        stdout,stderr = p.communicate()
-+
-+        self.assertIn(b'Invalid host-nodes', stderr)
-+        self.assertEquals(stdout, b'')
-+        self.assertEquals(p.returncode, 1)
-+
-+    def test_valid_host_nodes(self):
-+        p = Popen([self.qemu_bin, '-display', 'none', '-nodefaults',
-+                   '-object', 'memory-backend-ram,id=m0,'
-+                              'size=4096,host-nodes=%d' % (MAX_NODES - 1)],
-+                  stderr=PIPE, stdout=PIPE)
-+        stdout,stderr = p.communicate()
-+
-+        self.assertIn(b'host-nodes must be empty', stderr)
-+        self.assertEquals(p.returncode, 1)
--- 
-2.18.0.rc1.1.g3f1ff2140
+Fine for me if we bump the minimum Clang version to 3.4 ... then we
+could get rid of the the CONFIG_INT128 hacks that we have in various
+parts of the code.
+
+ Thomas
