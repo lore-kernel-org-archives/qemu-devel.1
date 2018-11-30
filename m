@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gSf3k-0005tV-Uj
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:26:06 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gSf51-0006Uw-77
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:27:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gSf3i-0002Wg-Vc
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:26:04 -0500
-Date: Fri, 30 Nov 2018 10:25:46 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181130102546.42c1f0f2@redhat.com>
-In-Reply-To: <20181129132428.333-6-sameo@linux.intel.com>
-References: <20181129132428.333-1-sameo@linux.intel.com>
-	<20181129132428.333-6-sameo@linux.intel.com>
+	(envelope-from <cohuck@redhat.com>) id 1gSf4v-0004LI-MO
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:27:22 -0500
+Date: Fri, 30 Nov 2018 10:27:08 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181130102708.5d6ca0e0.cohuck@redhat.com>
+In-Reply-To: <d8e0621a-d11e-a172-e40e-ec96dd92d5cd@linux.ibm.com>
+References: <20181022090255.19671-1-zyimin@linux.ibm.com>
+	<698a7fdd-47cc-cb3e-a280-3c4b656d92ef@redhat.com>
+	<20181023232517.6b93085b.cohuck@redhat.com>
+	<494ff50b-8b0f-1393-fbc5-bf5033a246ce@linux.ibm.com>
+	<20181031114954.5e51d0c2.cohuck@redhat.com>
+	<d8e0621a-d11e-a172-e40e-ec96dd92d5cd@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 5/8] hw: arm: Convert the RSDP build to
- the buid_append_foo() API
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/pci: add common fmb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,100 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: Yi Min Zhao <zyimin@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org
 
-On Thu, 29 Nov 2018 14:24:25 +0100
-Samuel Ortiz <sameo@linux.intel.com> wrote:
+On Fri, 30 Nov 2018 10:23:14 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-> Instead of filling a mapped and packed C structure field in random order
-> and being careful about endianness and sizes, build_rsdp() now uses
-> build_append_int_noprefix() to compose RSDP table.
-> 
-> This makes for an easier to review and maintain code that is almost
-> matching 1:1 the ACPI spec itself.
-nit if you happen to respin:
- This makes review and maintaining code easier and ..
+> On 31/10/2018 11:49, Cornelia Huck wrote:
+> > On Wed, 24 Oct 2018 11:58:33 +0800
+> > Yi Min Zhao <zyimin@linux.ibm.com> wrote:
+> >  =20
+> >> =E5=9C=A8 2018/10/24 =E4=B8=8A=E5=8D=885:25, Cornelia Huck =E5=86=99=
+=E9=81=93: =20
+> >>> On Mon, 22 Oct 2018 13:17:34 +0100
+> >>> Thomas Huth <thuth@redhat.com> wrote:
+> >>>    =20
+>=20
+> ...snip...
+>=20
+> >> If endianness has error, I think the values must looks wrong.
+> >> The right thing is that values increase from 0 and intervally.
+> >> =20
+> >=20
+> > Thanks for pointing me to that file; when I run under tcg, the values
+> > indeed look like they have an endianness issue:
+> >=20
+> > Update interval: 4000 ms
+> > Samples: 637534208
+> > Last update TOD: f4c01d0098000000
+> >             Load operations:	10520408729537478656
+> >            Store operations:	5980780305148018688
+> >      Store block operations:	0
+> >          Refresh operations:	0
+> >             Allocated pages:	0
+> >                Mapped pages:	0
+> >              Unmapped pages:	0
+> >=20
+> > (virtio-net-pci device on a just-booted guest)
+> >  =20
+>=20
+> Hy Conny,
+>=20
+> I saw we lack a response to Thomas.
+> Otherwise have you any remark?
 
-> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> ---
->  hw/arm/virt-acpi-build.c | 42 +++++++++++++++++++++-------------------
->  1 file changed, 22 insertions(+), 20 deletions(-)
-> 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index ce8bfa5a37..4782aea4fe 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -368,35 +368,37 @@ static void acpi_dsdt_add_power_button(Aml *scope)
->  
->  /* RSDP */
->  static void
-> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
-> +build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
->  {
-> -    AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
-> -    unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
-> -    unsigned xsdt_pa_offset =
-> -        (char *)&rsdp->xsdt_physical_address - rsdp_table->data;
-> -
-> -    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 16,
-> +    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, tbl, 16,
->                               true /* fseg memory */);
->  
-> -    memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
-> -    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));
-> -    rsdp->length = cpu_to_le32(sizeof(*rsdp));
-> -    rsdp->revision = rsdp_data->revision;
-> +    g_array_append_vals(tbl, "RSD PTR ", 8); /* Signature */
-> +    build_append_int_noprefix(tbl, 0, 1); /* Checksum */
-> +    g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
-> +    build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision */
-> +    build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
-> +    build_append_int_noprefix(tbl, 36, 4); /* Length */
->  
-> -    /* Address to be filled by Guest linker */
-> -    bios_linker_loader_add_pointer(linker,
-> -        ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
-> -        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
-> +    /* XSDT address to be filled by guest linker */
-> +    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
-> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
-> +                                   24, 8,
-> +                                   ACPI_BUILD_TABLE_FILE,
-> +                                   *rsdp_data->xsdt_tbl_offset);
->  
-> -    /* Checksum to be filled by Guest linker */
-> +    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
-> +    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
-> +
-> +    /* Checksum to be filled by guest linker */
->      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> -        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP size */,
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-this is always 0 with all current users and you a replacing it with 0
-constant. That's fine but that assumes that above condition stays always true.
-I'd add assert at the beginning of function to make sure that
-tbl length is 0
-or as an alternative
- build_rsdp(...)
- {
-   start_off = tbl->len;
-   ...
-   bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE, start_off, 20 ...
-
-so it won't explode even if RSDP isn't at the beginning of file.
-If you go for the later than bios_linker_loader_add_pointer() will also need similar treatment
-
-> -        (char *)&rsdp->checksum - rsdp_table->data);
-> +                                    0, 20, /* ACPI rev 1.0 RSDP size */
-> +                                    8);
->  
->      /* Extended checksum to be filled by Guest linker */
->      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> -        (char *)rsdp - rsdp_table->data, 36 /* ACPI rev 2.0 RSDP size */,
-> -        (char *)&rsdp->extended_checksum - rsdp_table->data);
-> +                                    0, 36, /* ACPI rev 2.0 RSDP size */
-> +                                    32);
->  }
->  
->  static void
+I don't remember anything beyond the endianess issue.
