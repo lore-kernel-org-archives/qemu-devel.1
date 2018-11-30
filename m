@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSd6w-0003xO-Dg
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 02:21:15 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gSdC7-0006BS-6h
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 02:26:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gSd6r-0003gN-Ik
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 02:21:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36532)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gSd6r-0003c0-Am
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 02:21:09 -0500
-References: <1543513531-1151-1-git-send-email-pbonzini@redhat.com>
-	<1389c712-2e02-80c0-b9e1-4c45b54d35df@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <69af56c7-413d-857f-829b-37d4747d0d96@redhat.com>
-Date: Fri, 30 Nov 2018 08:21:02 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gSdC6-0001IC-96
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 02:26:35 -0500
+Date: Fri, 30 Nov 2018 08:26:21 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181130082621.6afb2d0a@redhat.com>
+In-Reply-To: <20181129142627.GA4691@caravaggio>
+References: <20181129132428.333-1-sameo@linux.intel.com>
+	<20181129132428.333-5-sameo@linux.intel.com>
+	<20181129140932.2yl75vsq2ohmuzx6@kamzik.brq.redhat.com>
+	<20181129142627.GA4691@caravaggio>
 MIME-Version: 1.0
-In-Reply-To: <1389c712-2e02-80c0-b9e1-4c45b54d35df@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/2] test: replace gtester with a
- TAP driver
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/8] hw: arm: Carry RSDP specific data
+ through AcpiRsdpData
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +26,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 2018-11-29 21:43, Eric Blake wrote:
-> On 11/29/18 11:45 AM, Paolo Bonzini wrote:
->> gtester is deprecated by upstream glib and it does not support tests
->> that call g_test_skip in some glib stable releases.
->>
->> glib suggests instead using Automake's TAP support.=C2=A0 We do not su=
-pport
->> Automake, but we can copy the code that beautifies the TAP output and
->> use it.=C2=A0 I chose to use the Perl copy rather than the shell/awk o=
-ne,
->> in order to reuse Perl's TAP parsing package, but I'm open to suggesti=
-ons
->> about which language to use.
->=20
-> I'm less familiar with the TAP protocol than I'd like to admit, but I
-> did find:
->=20
-> https://blog.gtk.org/2018/07/11/news-from-glib-2-58/
->=20
-> which corroborates your claim that switching to Automake's TAP parser i=
-s
-> indeed a recommended approach to avoid the now-deprecated gtester.
+On Thu, 29 Nov 2018 15:26:27 +0100
+Samuel Ortiz <sameo@linux.intel.com> wrote:
 
-Hmm, do we really have to maintain our own version of a test runner now?
-There's already some effort going on to use avocado in "make
-check-acceptance" ... maybe we could use avocado as replacement for
-gtester, too?
+> On Thu, Nov 29, 2018 at 03:09:32PM +0100, Andrew Jones wrote:
+> > On Thu, Nov 29, 2018 at 02:24:24PM +0100, Samuel Ortiz wrote:  
+> > > That will allow us to generalize the ARM build_rsdp() routine to support
+> > > both legacy RSDP (The current i386 implementation) and extended RSDP
+> > > (The ARM implementation).
+> > > 
+> > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> > > ---
+> > >  include/hw/acpi/acpi-defs.h |  8 ++++++++
+> > >  hw/arm/virt-acpi-build.c    | 18 +++++++++++++-----
+> > >  2 files changed, 21 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> > > index af8e023968..8425ecb8c6 100644
+> > > --- a/include/hw/acpi/acpi-defs.h
+> > > +++ b/include/hw/acpi/acpi-defs.h
+> > > @@ -53,6 +53,14 @@ struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+> > >  } QEMU_PACKED;
+> > >  typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+> > >  
+> > > +typedef struct AcpiRsdpData {
+> > > +    uint8_t oem_id[6]; /* OEM identification */
+> > > +    uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
+> > > +
+> > > +    unsigned *rsdt_tbl_offset;
+> > > +    unsigned *xsdt_tbl_offset;  
+> > 
+> > Why use pointers?  
+> Mostly to be consistent with the FADT data structure (AcpiFadtData).
+My guess would be that's for detecting an optional field and
+skipping setting it in build_rsdp(). But it's mostly for
+consistence with current code.
 
- Thomas
+> 
+> > > +} AcpiRsdpData;
+> > > +
+> > >  /* Table structure from Linux kernel (the ACPI tables are under the
+> > >     BSD license) */
+> > >  
+> > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > > index 0835900052..ce8bfa5a37 100644
+> > > --- a/hw/arm/virt-acpi-build.c
+> > > +++ b/hw/arm/virt-acpi-build.c
+> > > @@ -368,7 +368,7 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+> > >  
+> > >  /* RSDP */
+> > >  static void
+> > > -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> > > +build_rsdp(GArray *rsdp_table, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+> > >  {
+> > >      AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+> > >      unsigned xsdt_pa_size = sizeof(rsdp->xsdt_physical_address);
+> > > @@ -379,14 +379,14 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
+> > >                               true /* fseg memory */);
+> > >  
+> > >      memcpy(&rsdp->signature, "RSD PTR ", sizeof(rsdp->signature));
+> > > -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, sizeof(rsdp->oem_id));
+> > > +    memcpy(rsdp->oem_id, rsdp_data->oem_id, sizeof(rsdp->oem_id));  
+> > 
+> > sizeof(rsdp_data->oem_id)  
+> Which is the same thing. Note that this piece of code eventually gets
+> removed later in the serie.
+> 
+> 
+> 
+> > >      rsdp->length = cpu_to_le32(sizeof(*rsdp));
+> > > -    rsdp->revision = 0x02;
+> > > +    rsdp->revision = rsdp_data->revision;
+> > >  
+> > >      /* Address to be filled by Guest linker */
+> > >      bios_linker_loader_add_pointer(linker,
+> > >          ACPI_BUILD_RSDP_FILE, xsdt_pa_offset, xsdt_pa_size,
+> > > -        ACPI_BUILD_TABLE_FILE, xsdt_tbl_offset);
+> > > +        ACPI_BUILD_TABLE_FILE, *rsdp_data->xsdt_tbl_offset);
+> > >  
+> > >      /* Checksum to be filled by Guest linker */
+> > >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> > > @@ -857,7 +857,15 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+> > >      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
+> > >  
+> > >      /* RSDP is in FSEG memory, so allocate it separately */
+> > > -    build_rsdp(tables->rsdp, tables->linker, xsdt);
+> > > +    {
+> > > +        AcpiRsdpData rsdp_data = {
+> > > +            .revision = 2,
+> > > +            .oem_id = ACPI_BUILD_APPNAME6,
+> > > +            .xsdt_tbl_offset = &xsdt,
+> > > +            .rsdt_tbl_offset = NULL,  
+> > 
+> > nit: no need for this explicit NULLing  
+then one would get random junk from the stack this variable is allocate from
+in this field.
+
+> Unfortunately, yes.
+> 
+> Cheers,
+> Samuel.
