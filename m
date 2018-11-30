@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gSlA4-0001hD-63
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:57:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSlAL-0001sh-C3
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:57:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gSl9y-0000aa-Hx
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:56:58 -0500
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:42685)
+	(envelope-from <eblake@redhat.com>) id 1gSlAI-0000nj-2a
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:57:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54194)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gSl9x-0000ZL-Ac
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:56:53 -0500
-Date: Fri, 30 Nov 2018 10:56:50 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181130155650.GA7766@flamenco>
-References: <20181128053834.10861-1-richard.henderson@linaro.org>
-	<20181128221530.GA32160@flamenco>
-	<9d890088-8dd6-517d-52a7-a6166f0cd8a6@linaro.org>
-	<20181130003915.GA3323@flamenco> <20181130030009.GA14990@flamenco>
-	<CABoDooOcT-Yp__TJMj4roHMeq_T20=14-kf4L1gGNemv-gRoZg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gSlAH-0000nH-Ss
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:57:14 -0500
+References: <20181129100340.13823-1-fli@suse.com>
+	<4031aa35-a9f0-dd87-ad2a-0cc35546f7af@redhat.com>
+	<27e46dfa-f874-8b20-7522-f933d0dda897@suse.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0f774e48-892a-de5b-74d2-2a1694e6022f@redhat.com>
+Date: Fri, 30 Nov 2018 09:57:12 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABoDooOcT-Yp__TJMj4roHMeq_T20=14-kf4L1gGNemv-gRoZg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 00/12] tcg: Improve register allocation for
- calls
+In-Reply-To: <27e46dfa-f874-8b20-7522-f933d0dda897@suse.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.1? RFC v2 0/5] fix some segmentation
+ faults and migration issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Desnogues <laurent.desnogues@gmail.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Fei Li <fli@suse.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Nov 30, 2018 at 08:15:56 +0100, Laurent Desnogues wrote:
-> On Fri, Nov 30, 2018 at 4:00 AM Emilio G. Cota <cota@braap.org> wrote:
-> >
-> > On Thu, Nov 29, 2018 at 19:39:15 -0500, Emilio G. Cota wrote:
-> > > A64 and POWER9 host numbers:
-> > >
-> > >   https://imgur.com/a/m6Pss99
-> > >
-> > > There's quite a bit of noise in the P9 measurements, but it's
-> > > a shared machine so I can't do much about that.
-> > >
-> > > I'll update the A64 results with error bars later tonight,
-> > > when I get further results.
-> >
-> > Here they are:
-> >
-> >   https://imgur.com/a/EAAapSW
-> 
-> What is a X-Gene A57? It's either X-Gene or A57 :-)
+On 11/30/18 12:15 AM, Fei Li wrote:
+>=20
+>=20
+> On 11/29/2018 10:20 PM, Eric Blake wrote:
+>> On 11/29/18 4:03 AM, Fei Li wrote:
+>>> These five patches almost get the Reviewed-by and are extracted from
+>>> previous "[PATCH RFC v7 0/9] qemu_thread_create: propagate errors to
+>>> callers to check."=C2=A0 The mentioned patch series have waited on on=
+e
+>>> multifd issue for a while and still needs a further discussion.
+>>>
+>>> Thus separate(send) these five almost-done patches and hope they can
+>>> be merged for the next tag. Thanks for the review. :)
+>>
+>> How likely are any of these crashers to affect an end user?=20
+> IMHO, they are not easily triggered.
 
-You're right -- this is an X-Gene (xgene 1).
+A crash at the command line is annoying, but not too bad (because you=20
+didn't start the guest after all).  A crash after the guest has been=20
+running for some time, though, is worth considering (data loss should be=20
+avoided).  I won't make the final determination on this series, but hope=20
+that my questions are helpful to the maintainers for this code in=20
+ranking the severity of these crashes.
 
-The A57 reference came from here:
+>> Are any of them regressions over 3.0?
+> I do not think so.
+>> I'm trying to gauge if any of this is serious enough to warrant a=20
+>> -rc4, or if we are okay just documenting them as known corner-case=20
+>> bugs and deferring the fix to 4.0 and qemu-stable.
+> Emm, actually not so emergency to be included in -rc4.
+> And I think it is ok to wait for maintainers to do the pick for the=20
+> appropriate release.
+> BTW, why 4.0, but not 3.2 or 3.3 (I mean 3.minor version)?
 
- https://www.cloudlab.us/hardware.php
- m400 nodes: 45 per chassis, 315 total
- Processor/Chipset: Applied Micro X-Gene system-on-chip
- Eight 64-bit ARMv8 (Atlas/A57) cores at 2.4 GHz
-                           ^^^
+See https://www.qemu.org/download/ for the explanation on version numberi=
+ng
 
-I'm not familiar with ARMv8's commercial offerings, so I
-just quoted the above--which turns out to be wrong,
-since A57 is an ARM design and X-Gene is not.
-
-Thanks,
-
-		E.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
