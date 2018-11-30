@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSfIm-0007vO-2k
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:41:37 -0500
+	(envelope-from <armbru@redhat.com>) id 1gSfKX-00017W-3m
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:43:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gSfIi-0004pH-Ri
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:41:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47770)
+	(envelope-from <armbru@redhat.com>) id 1gSfKT-0006m5-VN
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:43:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40386)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSfIi-0004om-Hy
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:41:32 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSfKT-0006lb-P8
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:43:21 -0500
 From: Markus Armbruster <armbru@redhat.com>
 References: <20181031115242.6558-1-d.csapak@proxmox.com>
-	<20181031115242.6558-3-d.csapak@proxmox.com>
-Date: Fri, 30 Nov 2018 10:41:29 +0100
-In-Reply-To: <20181031115242.6558-3-d.csapak@proxmox.com> (Dominik Csapak's
-	message of "Wed, 31 Oct 2018 12:52:41 +0100")
-Message-ID: <87sgzilx6e.fsf@dusky.pond.sub.org>
+	<20181031115242.6558-4-d.csapak@proxmox.com>
+Date: Fri, 30 Nov 2018 10:43:19 +0100
+In-Reply-To: <20181031115242.6558-4-d.csapak@proxmox.com> (Dominik Csapak's
+	message of "Wed, 31 Oct 2018 12:52:42 +0100")
+Message-ID: <87o9a6lx3c.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/3] qapi: split host-qmp into quit and
- system-reset
+Subject: Re: [Qemu-devel] [PATCH 3/3] qapi: add reason to SHUTDOWN and RESET
+ events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +29,19 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Dominik Csapak <d.csapak@proxmox.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, armbru@redhat.com, mreitz@redhat.com, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Eric Blake <eblake@redhat.com>
-
-Cc: Pavel to assess possible impact on replay.
-
-Cc: Eric to give him a chance to correct misunderstandings of
-ShutdownCause.
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, mreitz@redhat.com
 
 Dominik Csapak <d.csapak@proxmox.com> writes:
 
-> it is interesting to know whether the shutdown cause was 'quit' or
-> 'reset', especially when using --no-reboot
+> this makes it possible to determine what the exact reason was for
+> a RESET or a SHUTDOWN
 
-Are you sure it *is* interesting?  I suspect it *will be* only after the
-next patch.
+Yes, but why is that useful?  I can guess, but the commit shouldn't make
+me guess.
 
 Please start your sentences with a capital letter and end them with
 punctuation.
 
+> this patch also fixes the iotests
+
 > Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
-> ---
->  qapi/run-state.json | 10 ++++++----
->  qmp.c               |  4 ++--
->  2 files changed, 8 insertions(+), 6 deletions(-)
->
-> diff --git a/qapi/run-state.json b/qapi/run-state.json
-> index 883bed167c..c215b6ef83 100644
-> --- a/qapi/run-state.json
-> +++ b/qapi/run-state.json
-> @@ -68,7 +68,9 @@
->  #
->  # @host-error: An error prevented further use of guest
->  #
-> -# @host-qmp: Reaction to a QMP command, like 'quit'
-> +# @host-qmp-quit: Reaction to the QMP command 'quit'
-> +#
-> +# @host-qmp-system-reset: Reaction to the QMP command 'system_reset'
->  #
->  # @host-signal: Reaction to a signal, such as SIGINT
->  #
-> @@ -88,9 +90,9 @@
->  #
->  ##
->  { 'enum': 'ShutdownCause',
-> -  'data': [ 'none', 'host-error', 'host-qmp', 'host-signal', 'host-ui',
-> -            'guest-shutdown', 'guest-reset', 'guest-panic',
-> -            'subsystem-reset'] }
-> +  'data': [ 'none', 'host-error', 'host-qmp-quit', 'host-qmp-system-reset',
-> +            'host-signal', 'host-ui', 'guest-shutdown', 'guest-reset',
-> +            'guest-panic', 'subsystem-reset'] }
->  
->  ##
->  # @StatusInfo:
-> diff --git a/qmp.c b/qmp.c
-> index e7c0a2fd60..82298f6cb0 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -88,7 +88,7 @@ UuidInfo *qmp_query_uuid(Error **errp)
->  void qmp_quit(Error **errp)
->  {
->      no_shutdown = 0;
-> -    qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_QMP);
-> +    qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_QMP_QUIT);
->  }
->  
->  void qmp_stop(Error **errp)
-> @@ -109,7 +109,7 @@ void qmp_stop(Error **errp)
->  
->  void qmp_system_reset(Error **errp)
->  {
-> -    qemu_system_reset_request(SHUTDOWN_CAUSE_HOST_QMP);
-> +    qemu_system_reset_request(SHUTDOWN_CAUSE_HOST_QMP_SYSTEM_RESET);
->  }
->  
->  void qmp_system_powerdown(Error **erp)
-
-Let's see how these guys are used.
-
-qemu_system_shutdown_request() and qemu_system_reset_request() put their
-argument in @shutdown_requested or @reset_requested.  There's some
-replay magic going on in qemu_system_shutdown_request().
-
-main_loop_should_exit() retrieves them with qemu_shutdown_requested()
-and qemu_reset_requested().  @shutdown_requested is only passed to
-shutdown_caused_by_guest().  @reset_requested is only passed to
-qemu_system_reset().  None of these functions is affected by your
-change.  There's some replay magic going on in
-qemu_system_reset_requested().
-
-Xen's cpu_handle_ioreq() retrieves them with
-qemu_shutdown_requested_get() and qemu_reset_requested_get().  None of
-these functions is affected by your change.
-
-Looks like ShutdownCause is overengineered[*]: we're only ever
-interested in none, host, guest.  Your PATCH 3 will change that.  Okay,
-but your commit message is misleading: this patch has no interesting
-effect now.  The change becomes visible only after PATCH 3.
-
-I'd swap PATCH 2 and 3, because that would make writing non-misleading
-commit messages easier for me.
-
-
-[*] Goes back to Eric's commit 7af88279e49..08fba7ac9b6, which were
-surely done for a reason.  Perhaps I'm just confused.
