@@ -1,42 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gSlBn-0003xr-MV
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:58:48 -0500
+	(envelope-from <drjones@redhat.com>) id 1gSlEk-0005u4-8c
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 11:01:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1gSlBk-0002Kf-8r
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:58:47 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42006)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
-	id 1gSlBj-0002HZ-RO
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:58:44 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wAUFqeCI037312
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 10:58:40 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p36j3w95e-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 10:58:40 -0500
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
-	Fri, 30 Nov 2018 15:58:38 -0000
-References: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
-	<1542904555-1136-3-git-send-email-pmorel@linux.ibm.com>
-	<07102a0f-d37e-b9a6-047e-370bc3209686@linux.ibm.com>
-	<b2e78d9d-a939-1b5f-df6d-cdc143dfe380@linux.ibm.com>
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Date: Fri, 30 Nov 2018 10:58:32 -0500
+	(envelope-from <drjones@redhat.com>) id 1gSlEe-00050a-Md
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 11:01:48 -0500
+Date: Fri, 30 Nov 2018 17:00:57 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20181130160057.i2ucjyprf5t3vs5l@kamzik.brq.redhat.com>
+References: <1543407172-16175-1-git-send-email-peng.hao2@zte.com.cn>
+	<1543407172-16175-10-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <b2e78d9d-a939-1b5f-df6d-cdc143dfe380@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <49c28e28-9380-474b-b5d3-5ab61dd0af9e@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] s390x/vfio: ap: Use the APdevice as
- a child of the APBus
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1543407172-16175-10-git-send-email-peng.hao2@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH V10 9/9] pvpanic : update pvpanic document
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,86 +23,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pmorel@linux.ibm.com, borntraeger@de.ibm.com
-Cc: cohuck@redhat.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, pasic@linux.ibm.com
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: peter.maydell@linaro.org, philmd@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On 11/30/18 4:31 AM, Pierre Morel wrote:
-> On 29/11/2018 21:42, Tony Krowiak wrote:
->> On 11/22/18 11:35 AM, Pierre Morel wrote:
->>> Two good reasons to use the base device as a child of the
->>> AP BUS:
->>> - We can easily find the device without traversing the qtree.
->>> - In case we have different APdevice instantiation, VFIO with
->>> =C2=A0=C2=A0 interception or emulation, we will need the APDevice as
->>> =C2=A0=C2=A0 a parent device.
->>>
->>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>> ---
->>> =C2=A0 hw/s390x/ap-device.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 22 ++++++++++++++++++++++
->>> =C2=A0 hw/vfio/ap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 16 ++++++----------
->>> =C2=A0 include/hw/s390x/ap-device.h |=C2=A0 2 ++
->>> =C2=A0 3 files changed, 30 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
->>> index f5ac8db..554d5aa 100644
->>> --- a/hw/s390x/ap-device.c
->>> +++ b/hw/s390x/ap-device.c
->>> @@ -11,13 +11,35 @@
->>> =C2=A0 #include "qemu/module.h"
->>> =C2=A0 #include "qapi/error.h"
->>> =C2=A0 #include "hw/qdev.h"
->>> +#include "hw/s390x/ap-bridge.h"
->>> =C2=A0 #include "hw/s390x/ap-device.h"
->>> +APDevice *s390_get_ap(void)
->>
->> How about ap_get_device(void)?
->=20
-> Yes, keep same conventions.
->=20
->>
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 static DeviceState *apb;
->>
->> Why static if you call s390_get_ap_bridge()
->> to retrieve it without first checking for NULL?
->=20
-> static are initialized as NULL.
+On Wed, Nov 28, 2018 at 08:12:52PM +0800, Peng Hao wrote:
+> Add mmio support info in docs/specs/pvpanic.txt.
+> 
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> ---
+>  docs/specs/pvpanic.txt | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/docs/specs/pvpanic.txt b/docs/specs/pvpanic.txt
+> index c7bbacc..b1beea3 100644
+> --- a/docs/specs/pvpanic.txt
+> +++ b/docs/specs/pvpanic.txt
+> @@ -1,14 +1,17 @@
+>  PVPANIC DEVICE
+>  ==============
+>  
+> -pvpanic device is a simulated ISA device, through which a guest panic
+> -event is sent to qemu, and a QMP event is generated. This allows
+> +pvpanic device is a simulated ISA/SYSBUS device, through which a guest
 
-Yes, but down below, you call s390_get_ap_bridge() to set apb
-regardless of whether apb is NULL or not. It makes no sense to
-declare is as static here. It is also redundant because the=20
-s390_get_ap_bridge() function already caches it in a static
-variable.
+Why add the ISA/SYSBUS here? It's not really the best use of '/', IMO,
+I'd just drop that as the ISA and SYSBUS is pointed out later.
 
->=20
->>
->>> +=C2=A0=C2=A0=C2=A0 BusState *bus;
->>> +=C2=A0=C2=A0=C2=A0 BusChild *child;
->>> +=C2=A0=C2=A0=C2=A0 static APDevice *ap;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (ap) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ap;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 apb =3D s390_get_ap_bridge();
->>> +=C2=A0=C2=A0=C2=A0 /* We have only a single child on the BUS */
->>> +=C2=A0=C2=A0=C2=A0 bus =3D qdev_get_child_bus(apb, TYPE_AP_BUS
->>> +=C2=A0=C2=A0=C2=A0 child =3D QTAILQ_FIRST(&bus->children);
->>> +=C2=A0=C2=A0=C2=A0 assert(child !=3D NULL);
->>> +=C2=A0=C2=A0=C2=A0 ap =3D DO_UPCAST(APDevice, parent_obj, child->chi=
-ld);
->>
->> I received a comment from Thomas Huth in Message ID
->> <2291104a-4cbf-e4fd-3496-fa0910beb96a@redhat.com>
->> that DO_UPCAST should be avoided in new code. You should
->> create an AP_DEVICE macro for this in ap-device.h
->>
->=20
-> Thanks I will do.
->=20
-> Regards,
-> Pierre
->=20
->=20
+> +panic event is sent to qemu, and a QMP event is generated. This allows
+>  management apps (e.g. libvirt) to be notified and respond to the event.
+>  
+>  The management app has the option of waiting for GUEST_PANICKED events,
+>  and/or polling for guest-panicked RunState, to learn when the pvpanic
+>  device has fired a panic event.
+>  
+> +The pvpanic device can be implemented as an ISA device (using IOPORT), 
+> +or, since qemu 4.0, as a SYSBUS device (using MMIO).
+> +
+>  ISA Interface
+>  -------------
+>  
+> @@ -19,6 +22,13 @@ Software should set only bits both itself and the device recognize.
+>  Currently, only bit 0 is recognized, setting it indicates a guest panic
+>  has happened.
+>  
+> +SYSBUS Interface
+> +----------------
+> +
+> +The SYSBUS interface is similar to the ISA interface except that it uses
+> +MMIO. For example, the arm virt machine could put the pvpanic device at
+> +[0x9070000, 0x9070001] and currently only the first byte is used.
+
+instead of '] and currently'. I'd write '], where currently'
+
+> +
+>  ACPI Interface
+>  --------------
+>  
+> -- 
+> 1.8.3.1
+> 
+> 
+
+Otherwise 
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
