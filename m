@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gSo9y-0003Kb-OZ
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:09:07 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gSoMt-0007j0-AT
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:22:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gSo9u-0000Vz-Qb
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:09:06 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:41527)
+	(envelope-from <richard.henderson@linaro.org>) id 1gSoMo-00083y-SN
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:22:27 -0500
+Received: from mail-pg1-x531.google.com ([2607:f8b0:4864:20::531]:37728)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gSo9u-0000VH-KP
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:09:02 -0500
-Received: by mail-wr1-f68.google.com with SMTP id x10so6283852wrs.8
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 11:09:01 -0800 (PST)
-References: <20181130111222.25386-1-kraxel@redhat.com>
-	<20181130111222.25386-3-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <75c973a5-f571-e69e-e2fd-72d3b3b118b2@redhat.com>
-Date: Fri, 30 Nov 2018 20:08:58 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181130111222.25386-3-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] usb-mtp: outlaw slashes in
- filenames
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gSoMo-00083L-Mf
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:22:22 -0500
+Received: by mail-pg1-x531.google.com with SMTP id 80so2907734pge.4
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 11:22:22 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 30 Nov 2018 11:22:16 -0800
+Message-Id: <20181130192216.26987-3-richard.henderson@linaro.org>
+In-Reply-To: <20181130192216.26987-1-richard.henderson@linaro.org>
+References: <20181130192216.26987-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH for-4.0 2/2] target/s390x: Implement STCK et al
+ for CONFIG_USER_ONLY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +27,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, david@redhat.com, qemu-s390x@nongnu.org
 
-On 30/11/18 12:12, Gerd Hoffmann wrote:
-> Slash is unix directory separator, so they are not allowed in filenames.
-> Note this also stops the classic escape via "../".
-> 
-> Fixes: CVE-2018-16867
-> Reported-by: Michael Hanselmann (hansmi.ch)
+This is a non-privileged instruction that was only implemented
+for system mode.  However, the stck instruction is used by glibc,
+so this was causing SIGILL for programs run under debian stretch.
 
-It's common for scripts to match '<email>', can you write this one as
-Michael Hanselmann <hansmi.ch>?
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/s390x/helper.h      |  2 +-
+ target/s390x/misc_helper.c | 13 ++++++++++++-
+ target/s390x/translate.c   |  2 ++
+ target/s390x/insn-data.def | 11 ++++++-----
+ 4 files changed, 21 insertions(+), 7 deletions(-)
 
-(Same suggestion applies for patch 1/2).
-
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/usb/dev-mtp.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-> index fbe1ace035..87eeac1084 100644
-> --- a/hw/usb/dev-mtp.c
-> +++ b/hw/usb/dev-mtp.c
-> @@ -1718,6 +1718,12 @@ static void usb_mtp_write_metadata(MTPState *s)
->  
->      filename = utf16_to_str(dataset->length, dataset->filename);
->  
-> +    if (strchr(filename, '/')) {
-> +        usb_mtp_queue_result(s, RES_INVALID_PARAMETER, d->trans,
-> +                             0, 0, 0, 0);
-> +        return;
-> +    }
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> +
->      o = usb_mtp_object_lookup_name(p, filename, dataset->length);
->      if (o != NULL) {
->          next_handle = o->handle;
-> 
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 018e9dd414..6260b50496 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -121,13 +121,13 @@ DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
+ DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
+ DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
+ DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
++DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+ 
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
+ DEF_HELPER_4(diag, void, env, i32, i32, i32)
+ DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
+ DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
+-DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+ DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
+ DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
+ DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 3f91579570..c2940afecb 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -76,8 +76,19 @@ uint64_t HELPER(stpt)(CPUS390XState *env)
+ #endif
+ }
+ 
+-#ifndef CONFIG_USER_ONLY
++#ifdef CONFIG_USER_ONLY
++/* Store Clock */
++uint64_t HELPER(stck)(CPUS390XState *env)
++{
++    struct timespec ts;
++    uint64_t ms;
+ 
++    clock_gettime(CLOCK_REALTIME, &ts);
++    ms = (ts.tv_nsec / 1000) + (ts.tv_sec * 100000ull);
++
++    return TOD_UNIX_EPOCH + ms;
++}
++#else
+ /* SCLP service call */
+ uint32_t HELPER(servc)(CPUS390XState *env, uint64_t r1, uint64_t r2)
+ {
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index b5bd56b7ee..8bb9c0529a 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4010,6 +4010,7 @@ static DisasJumpType op_stap(DisasContext *s, DisasOps *o)
+     tcg_gen_ld32u_i64(o->out, cpu_env, offsetof(CPUS390XState, core_id));
+     return DISAS_NEXT;
+ }
++#endif
+ 
+ static DisasJumpType op_stck(DisasContext *s, DisasOps *o)
+ {
+@@ -4046,6 +4047,7 @@ static DisasJumpType op_stcke(DisasContext *s, DisasOps *o)
+     return DISAS_NEXT;
+ }
+ 
++#ifndef CONFIG_USER_ONLY
+ static DisasJumpType op_sck(DisasContext *s, DisasOps *o)
+ {
+     tcg_gen_qemu_ld_i64(o->in1, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 54e39df831..922227bada 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -837,6 +837,12 @@
+     C(0xe33e, STRV,    RXY_a, Z,   la2, r1_32u, new, m1_32, rev32, 0)
+     C(0xe32f, STRVG,   RXY_a, Z,   la2, r1_o, new, m1_64, rev64, 0)
+ 
++/* STORE CLOCK */
++    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
++    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
++/* STORE CLOCK EXTENDED */
++    C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
++
+ /* STORE FACILITY LIST EXTENDED */
+     C(0xb2b0, STFLE,   S,  SFLE,   0, a2, 0, 0, stfle, 0)
+ /* STORE FPC */
+@@ -1020,11 +1026,6 @@
+     F(0x8000, SSM,     S,     Z,   0, m2_8u, 0, 0, ssm, 0, IF_PRIV)
+ /* SIGNAL PROCESSOR */
+     F(0xae00, SIGP,    RS_a,  Z,   0, a2, 0, 0, sigp, 0, IF_PRIV)
+-/* STORE CLOCK */
+-    C(0xb205, STCK,    S,     Z,   la2, 0, new, m1_64, stck, 0)
+-    C(0xb27c, STCKF,   S,     SCF, la2, 0, new, m1_64, stck, 0)
+-/* STORE CLOCK EXTENDED */
+-    C(0xb278, STCKE,   S,     Z,   0, a2, 0, 0, stcke, 0)
+ /* STORE CLOCK COMPARATOR */
+     F(0xb207, STCKC,   S,     Z,   la2, 0, new, m1_64a, stckc, 0, IF_PRIV)
+ /* STORE CONTROL */
+-- 
+2.17.2
