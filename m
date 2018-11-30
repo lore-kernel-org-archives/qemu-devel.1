@@ -1,28 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSlAV-00020O-KO
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:57:28 -0500
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gSlBn-0003xr-MV
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:58:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSlAT-0000vk-Dj
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:57:27 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43477)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gSlAS-0000vC-RI
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:57:25 -0500
-Received: by mail-ot1-x344.google.com with SMTP id a11so5481992otr.10
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 07:57:24 -0800 (PST)
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gSlBk-0002Kf-8r
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:58:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1gSlBj-0002HZ-RO
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:58:44 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wAUFqeCI037312
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 10:58:40 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2p36j3w95e-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 10:58:40 -0500
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Fri, 30 Nov 2018 15:58:38 -0000
+References: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
+	<1542904555-1136-3-git-send-email-pmorel@linux.ibm.com>
+	<07102a0f-d37e-b9a6-047e-370bc3209686@linux.ibm.com>
+	<b2e78d9d-a939-1b5f-df6d-cdc143dfe380@linux.ibm.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Fri, 30 Nov 2018 10:58:32 -0500
 MIME-Version: 1.0
-References: <1543407172-16175-1-git-send-email-peng.hao2@zte.com.cn>
-	<1543407172-16175-8-git-send-email-peng.hao2@zte.com.cn>
-	<CAFEAcA83C_Eic3K4yY5bGeEKJpY2uf26diFtDJ5r+W71jcX2DQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA83C_Eic3K4yY5bGeEKJpY2uf26diFtDJ5r+W71jcX2DQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Nov 2018 15:57:13 +0000
-Message-ID: <CAFEAcA8nfp0ueLMJHhgRyf+mqG1QbakjKJiqSnLF-MFkjkDhZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V10 7/9] hw/misc/pvpanic: preparing for
- adding configure interface
+In-Reply-To: <b2e78d9d-a939-1b5f-df6d-cdc143dfe380@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <49c28e28-9380-474b-b5d3-5ab61dd0af9e@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] s390x/vfio: ap: Use the APdevice as
+ a child of the APBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +45,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peng Hao <peng.hao2@zte.com.cn>
-Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: pmorel@linux.ibm.com, borntraeger@de.ibm.com
+Cc: cohuck@redhat.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, pasic@linux.ibm.com
 
-On Fri, 30 Nov 2018 at 15:56, Peter Maydell <peter.maydell@linaro.org> wrote:
-> I suspect the reason you've done this is that you're
-> trying to get "-device pvpanic" to work on the command
-> line. I recommend not trying to get that to work.
-> MMIO devices are not pluggable devices, and -device
-> is not expected to work with them.
+On 11/30/18 4:31 AM, Pierre Morel wrote:
+> On 29/11/2018 21:42, Tony Krowiak wrote:
+>> On 11/22/18 11:35 AM, Pierre Morel wrote:
+>>> Two good reasons to use the base device as a child of the
+>>> AP BUS:
+>>> - We can easily find the device without traversing the qtree.
+>>> - In case we have different APdevice instantiation, VFIO with
+>>> =C2=A0=C2=A0 interception or emulation, we will need the APDevice as
+>>> =C2=A0=C2=A0 a parent device.
+>>>
+>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>> ---
+>>> =C2=A0 hw/s390x/ap-device.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 | 22 ++++++++++++++++++++++
+>>> =C2=A0 hw/vfio/ap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 16 ++++++----------
+>>> =C2=A0 include/hw/s390x/ap-device.h |=C2=A0 2 ++
+>>> =C2=A0 3 files changed, 30 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
+>>> index f5ac8db..554d5aa 100644
+>>> --- a/hw/s390x/ap-device.c
+>>> +++ b/hw/s390x/ap-device.c
+>>> @@ -11,13 +11,35 @@
+>>> =C2=A0 #include "qemu/module.h"
+>>> =C2=A0 #include "qapi/error.h"
+>>> =C2=A0 #include "hw/qdev.h"
+>>> +#include "hw/s390x/ap-bridge.h"
+>>> =C2=A0 #include "hw/s390x/ap-device.h"
+>>> +APDevice *s390_get_ap(void)
+>>
+>> How about ap_get_device(void)?
+>=20
+> Yes, keep same conventions.
+>=20
+>>
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 static DeviceState *apb;
+>>
+>> Why static if you call s390_get_ap_bridge()
+>> to retrieve it without first checking for NULL?
+>=20
+> static are initialized as NULL.
 
-If you do want a pluggable pvpanic device for the virt
-board then you should implement it as a PCI device,
-incidentally.
+Yes, but down below, you call s390_get_ap_bridge() to set apb
+regardless of whether apb is NULL or not. It makes no sense to
+declare is as static here. It is also redundant because the=20
+s390_get_ap_bridge() function already caches it in a static
+variable.
 
-thanks
--- PMM
+>=20
+>>
+>>> +=C2=A0=C2=A0=C2=A0 BusState *bus;
+>>> +=C2=A0=C2=A0=C2=A0 BusChild *child;
+>>> +=C2=A0=C2=A0=C2=A0 static APDevice *ap;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (ap) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ap;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 apb =3D s390_get_ap_bridge();
+>>> +=C2=A0=C2=A0=C2=A0 /* We have only a single child on the BUS */
+>>> +=C2=A0=C2=A0=C2=A0 bus =3D qdev_get_child_bus(apb, TYPE_AP_BUS
+>>> +=C2=A0=C2=A0=C2=A0 child =3D QTAILQ_FIRST(&bus->children);
+>>> +=C2=A0=C2=A0=C2=A0 assert(child !=3D NULL);
+>>> +=C2=A0=C2=A0=C2=A0 ap =3D DO_UPCAST(APDevice, parent_obj, child->chi=
+ld);
+>>
+>> I received a comment from Thomas Huth in Message ID
+>> <2291104a-4cbf-e4fd-3496-fa0910beb96a@redhat.com>
+>> that DO_UPCAST should be avoided in new code. You should
+>> create an AP_DEVICE macro for this in ap-device.h
+>>
+>=20
+> Thanks I will do.
+>=20
+> Regards,
+> Pierre
+>=20
+>=20
