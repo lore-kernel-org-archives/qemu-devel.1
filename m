@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSpHc-00035w-Mm
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:21:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSpIT-0003Sw-18
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:22:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSpHb-0003HC-S4
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:21:04 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSpIS-0005uD-DR
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:21:57 -0500
 References: <20181130151712.2312-1-peter.maydell@linaro.org>
-	<20181130151712.2312-3-peter.maydell@linaro.org>
+	<20181130151712.2312-4-peter.maydell@linaro.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <429b4f43-2a6d-c0b8-b81e-474b2fcde5f6@redhat.com>
-Date: Fri, 30 Nov 2018 14:20:50 -0600
+Message-ID: <2a8a2197-4b50-0907-343b-29acfcf97da3@redhat.com>
+Date: Fri, 30 Nov 2018 14:21:42 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181130151712.2312-3-peter.maydell@linaro.org>
+In-Reply-To: <20181130151712.2312-4-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/10] hw/ppc/ppc405_boards: Don't use
+Subject: Re: [Qemu-devel] [PATCH 03/10] hw/smbios/smbios.c: Don't use
  load_image()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,35 +35,26 @@ On 11/30/18 9:17 AM, Peter Maydell wrote:
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->   hw/ppc/ppc405_boards.c | 12 ++++++++----
->   1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-> index 3be3fe4432b..1b0a0a8ba3a 100644
-> --- a/hw/ppc/ppc405_boards.c
-> +++ b/hw/ppc/ppc405_boards.c
-> @@ -219,9 +219,11 @@ static void ref405ep_init(MachineState *machine)
->               bios_name = BIOS_FILENAME;
->           filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
->           if (filename) {
-> -            bios_size = load_image(filename, memory_region_get_ram_ptr(bios));
-> +            bios_size = load_image_size(filename,
-> +                                        memory_region_get_ram_ptr(bios),
-> +                                        BIOS_SIZE);
->               g_free(filename);
-> -            if (bios_size < 0 || bios_size > BIOS_SIZE) {
+>   hw/smbios/smbios.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
-That old code is so wrong - "if we already overflowed the destination, 
-possibly allowing for RCE in the meantime which might not even return to 
-executing this code, THEN check and report the overflow".
-
-> +            if (bios_size < 0) {
->                   error_report("Could not load PowerPC BIOS '%s'", bios_name);
->                   exit(1);
->               }
-
-MUCH safer, even if silent truncation happens.
 Reviewed-by: Eric Blake <eblake@redhat.com>
+
+> 
+> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+> index 920939454e7..04811279a08 100644
+> --- a/hw/smbios/smbios.c
+> +++ b/hw/smbios/smbios.c
+> @@ -982,7 +982,7 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+>           header = (struct smbios_structure_header *)(smbios_tables +
+>                                                       smbios_tables_len);
+>   
+> -        if (load_image(val, (uint8_t *)header) != size) {
+> +        if (load_image_size(val, (uint8_t *)header, size) != size) {
+>               error_setg(errp, "Failed to load SMBIOS file %s", val);
+>               return;
+>           }
+> 
 
 -- 
 Eric Blake, Principal Software Engineer
