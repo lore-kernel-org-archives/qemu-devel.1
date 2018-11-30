@@ -1,27 +1,27 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:58111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gSiFI-0008JY-0N
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:50:12 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1gSiFI-0008JY-TG
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:50:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gSiBy-0006jQ-TK
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:46:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44426)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1gSiAm-0006J0-8I
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:45:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gSiBy-0006iJ-L7
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:46:46 -0500
-References: <1543574620-17506-1-git-send-email-thuth@redhat.com>
-	<20181130111555.GA9162@redhat.com>
-	<2acf4de2-d826-c2a4-c826-8c966b5cce9e@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eb933208-6ee6-7f2a-dc14-bffbfa76cfad@redhat.com>
-Date: Fri, 30 Nov 2018 13:46:42 +0100
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1gSiAm-0006If-0G
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:45:32 -0500
+References: <1542895581-10721-1-git-send-email-wexu@redhat.com>
+	<1542895581-10721-10-git-send-email-wexu@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <d0059b46-34c0-86d9-0840-ebe20bbdd561@redhat.com>
+Date: Fri, 30 Nov 2018 13:45:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <2acf4de2-d826-c2a4-c826-8c966b5cce9e@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1542895581-10721-10-git-send-email-wexu@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0] compiler.h: Add an explicit check
- for the compiler version
+Subject: Re: [Qemu-devel] [PATCH v1 09/16] virtio: fill/flush/pop for packed
+ ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +30,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, peter.maydell@linaro.org
+To: wexu@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org
+Cc: mst@redhat.com, jfreimann@redhat.com, tiwei.bie@intel.com
 
-On 30/11/18 13:30, Thomas Huth wrote:
-> Do we really want to artificially limit our support here without any
-> further reasons? If the users want to compile QEMU on an older system,
-> and one of the libraries does not quite match anymore, it's often easy
-> enough to recompile a newer version of the library to get things going
-> again. Recompiling a whole compiler is way more cumbersome, though...
-> 
-> OTOH, we could get rid of some more #if QEMU_GNUC_PREREQ spots in the
-> source code if we bump the minimum version to 4.8 ... so that might be a
-> real reason to increase the minimum.
+Hi Wei,
 
-Of all of them, I think, if we bump to 4.7?
+On 11/22/18 3:06 PM, wexu@redhat.com wrote:
+> +void virtqueue_flush(VirtQueue *vq, unsigned int count)
+> +{
+> +    if (unlikely(vq->vdev->broken)) {
+> +        vq->inuse -= count;
+> +        return;
+> +    }
+> +
+> +    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
+> +        virtqueue_packed_flush(vq, count);
+> +    } else {
+> +        virtqueue_split_flush(vq, count);
+> +    }
+> +}
+> +
+>   void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
+>                       unsigned int len)
+>   {
+> @@ -1074,7 +1180,7 @@ static void *virtqueue_alloc_element(size_t sz, unsigned out_num, unsigned in_nu
+>       return elem;
+>   }
+>   
+> -void *virtqueue_pop(VirtQueue *vq, size_t sz)
+> +static void *virtqueue_split_pop(VirtQueue *vq, size_t sz)
+>   {
+>       unsigned int i, head, max;
+>       VRingMemoryRegionCaches *caches;
+> @@ -1089,9 +1195,6 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+>       VRingDesc desc;
+>       int rc;
+>   
+> -    if (unlikely(vdev->broken)) {
+> -        return NULL;
+> -    }
+>       rcu_read_lock();
+>       if (virtio_queue_empty_rcu(vq)) {
+>           goto done;
+> @@ -1209,6 +1312,159 @@ err_undo_map:
+>       goto done;
+>   }
+>   
+> +static void *virtqueue_packed_pop(VirtQueue *vq, size_t sz)
+> +{
+> +    unsigned int i, head, max;
+> +    VRingMemoryRegionCaches *caches;
+> +    MemoryRegionCache indirect_desc_cache = MEMORY_REGION_CACHE_INVALID;
+> +    MemoryRegionCache *cache;
+> +    int64_t len;
+> +    VirtIODevice *vdev = vq->vdev;
+> +    VirtQueueElement *elem = NULL;
+> +    unsigned out_num, in_num, elem_entries;
+> +    hwaddr addr[VIRTQUEUE_MAX_SIZE];
+> +    struct iovec iov[VIRTQUEUE_MAX_SIZE];
+> +    VRingPackedDesc desc;
+> +    uint16_t id;
+> +
+> +    rcu_read_lock();
+> +    if (virtio_queue_packed_empty_rcu(vq)) {
+> +        goto done;
+> +    }
+> +
+> +    /* When we start there are none of either input nor output. */
+> +    out_num = in_num = elem_entries = 0;
+> +
+> +    max = vq->vring.num;
+> +
+> +    if (vq->inuse >= vq->vring.num) {
+> +        virtio_error(vdev, "Virtqueue size exceeded");
+> +        goto done;
+> +    }
+> +
+> +    head = vq->last_avail_idx;
+> +    i = head;
+> +
+> +    caches = vring_get_region_caches(vq);
+> +    cache = &caches->desc;
+> +
+> +    /* Empty check has been done at the beginning, so it is an available
+> +     * entry already, make sure all fields has been exposed by guest */
+> +    smp_rmb();
+> +    vring_packed_desc_read(vdev, &desc, cache, i);
+> +
+> +    id = desc.id;
+> +    if (desc.flags & VRING_DESC_F_INDIRECT) {
+> +
+> +        if (desc.len % sizeof(VRingPackedDesc)) {
+> +            virtio_error(vdev, "Invalid size for indirect buffer table");
+> +            goto done;
+> +        }
+> +
+> +        /* loop over the indirect descriptor table */
+> +        len = address_space_cache_init(&indirect_desc_cache, vdev->dma_as,
+> +                                       desc.addr, desc.len, false);
+> +        cache = &indirect_desc_cache;
+> +        if (len < desc.len) {
+> +            virtio_error(vdev, "Cannot map indirect buffer");
+> +            goto done;
+> +        }
+> +
+> +        max = desc.len / sizeof(VRingPackedDesc);
+> +        i = 0;
+> +        vring_packed_desc_read(vdev, &desc, cache, i);
+> +        /* Make sure we see all the fields*/
+> +        smp_rmb();
+> +    }
+> +
+> +    /* Collect all the descriptors */
+> +    while (1) {
+> +        bool map_ok;
+> +
+> +        if (desc.flags & VRING_DESC_F_WRITE) {
+> +            map_ok = virtqueue_map_desc(vdev, &in_num, addr + out_num,
+> +                                        iov + out_num,
+> +                                        VIRTQUEUE_MAX_SIZE - out_num, true,
+> +                                        desc.addr, desc.len);
+> +        } else {
+> +            if (in_num) {
+> +                virtio_error(vdev, "Incorrect order for descriptors");
+> +                goto err_undo_map;
+> +            }
+> +            map_ok = virtqueue_map_desc(vdev, &out_num, addr, iov,
+> +                                        VIRTQUEUE_MAX_SIZE, false,
+> +                                        desc.addr, desc.len);
+> +        }
+> +        if (!map_ok) {
+> +            goto err_undo_map;
+> +        }
+> +
+> +        /* If we've got too many, that implies a descriptor loop. */
+> +        if (++elem_entries > max) {
+> +            virtio_error(vdev, "Looped descriptor");
+> +            goto err_undo_map;
+> +        }
+> +
+> +        if (++i >= vq->vring.num) {
+> +            i -= vq->vring.num;
+> +        }
+> +
+> +        if (desc.flags & VRING_DESC_F_NEXT) {
+> +            vring_packed_desc_read(vq->vdev, &desc, cache, i);
+> +        } else {
+> +            break;
+> +        }
+> +    }
+> +
+> +    /* Now copy what we have collected and mapped */
+> +    elem = virtqueue_alloc_element(sz, out_num, in_num);
+> +    elem->index = id;
+> +    for (i = 0; i < out_num; i++) {
+> +        elem->out_addr[i] = addr[i];
+> +        elem->out_sg[i] = iov[i];
+> +    }
+> +    for (i = 0; i < in_num; i++) {
+> +        elem->in_addr[i] = addr[head + out_num + i];
+> +        elem->in_sg[i] = iov[out_num + i];
+> +    }
+> +
+> +    vq->last_avail_idx += (cache == &indirect_desc_cache) ?
+> +                          1 : out_num + in_num;
 
-Older 4.6 and 4.7 version have the PR55489 bug that we're checking for
-in configure, too ("we should be able to delete this at the end of 2013"
-:)).  Bumping to 4.8 would let us remove TRANSLATE_OPT_CFLAGS for good.
+I think you cannot rely on out_num and in_num to deduce the number of 
+descriptors.
 
-Paolo
-
->> We would need an explicit check for clang, however, instead of
->> relying on it claiming gcc 4.2 support - that's a way inaccurate
->> claim anyway so detecting a specific clang version would be
->> better regardless IMHO
-> 
-> Fine for me if we bump the minimum Clang version to 3.4 ... then we
-> could get rid of the the CONFIG_INT128 hacks that we have in various
-> parts of the code.
-> 
->  Thomas
-> 
+Indeed, in virtqueue_map_desc(), in_num and out_num can be incremented
+by more than one for a single descriptor, when the desc buffer is not
+contiguous in the QEMU address space.
