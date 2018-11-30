@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gShAk-0004ES-OQ
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:41:27 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gShBF-0004t1-1Z
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:41:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gShAh-0003EG-4t
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:41:26 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44532)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gShAg-0003E3-UY
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:41:23 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gShAe-0005Yx-Ia
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 11:41:20 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7F8142E80CF
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 11:41:20 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1gShBE-0003Ru-6p
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:41:57 -0500
+Date: Fri, 30 Nov 2018 09:41:42 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181130114142.GV18284@habkost.net>
+References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
+	<20181127092801.21777-17-marcandre.lureau@redhat.com>
+	<20181127125644.GB18284@habkost.net>
+	<CAMxuvaySoJ2TokV8M81CVU3Hp4dC25c+PW_p2kk+V88-88U-CQ@mail.gmail.com>
+	<20181127133527.GI18284@habkost.net>
+	<20181128184027.7d584eaa@redhat.com>
+	<CAJ+F1CK5NkgsJWFGZ7kvR81KyeOPE_ytk=tOjKqTUGtbfywmJQ@mail.gmail.com>
+	<20181129175055.GQ18284@habkost.net>
+	<CAJ+F1CJBKVibRrgjiNKjSJ5ufK=CUodx26aHnKzeL3Cs7adbeA@mail.gmail.com>
+	<20181130115526.5974ca7a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181130115526.5974ca7a@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Nov 2018 11:32:56 -0000
-From: Roman Bolshakov <1802684@bugs.launchpad.net>
-Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
-Message-Id: <154357757644.15640.12036803767608975873.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 16/28] hw: apply machine compat
+ properties without touching globals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,133 +33,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Qemu-s390x list <qemu-s390x@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:sPAPR pseries" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
-I've tried to run two x86 guests with Cocoa display on 3.1 rc3, the GUI
-doesn't crash. I've tried to change screen resolution on openSUSE 15, it
-also works without an issue.
+On Fri, Nov 30, 2018 at 11:55:26AM +0100, Igor Mammedov wrote:
+> On Fri, 30 Nov 2018 01:36:03 +0400
+> Marc-Andr=E9 Lureau <marcandre.lureau@gmail.com> wrote:
+>=20
+> > Hi
+> >=20
+> > On Thu, Nov 29, 2018 at 9:51 PM Eduardo Habkost <ehabkost@redhat.com>=
+ wrote:
+> > >
+> > > On Thu, Nov 29, 2018 at 02:32:18PM +0400, Marc-Andr=E9 Lureau wrote=
+: =20
+> > > > Hi
+> > > > On Wed, Nov 28, 2018 at 9:53 PM Igor Mammedov <imammedo@redhat.co=
+m> wrote: =20
+> > > > >
+> > > > > On Tue, 27 Nov 2018 11:35:27 -0200
+> > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > > > =20
+> > > > > > On Tue, Nov 27, 2018 at 05:10:05PM +0400, Marc-Andr=E9 Lureau=
+ wrote: =20
+> > > > > > > On Tue, Nov 27, 2018 at 4:57 PM Eduardo Habkost <ehabkost@r=
+edhat.com> wrote: =20
+> > > > > > > >
+> > > > > > > > On Tue, Nov 27, 2018 at 01:27:49PM +0400, Marc-Andr=E9 Lu=
+reau wrote: =20
+> > > > > > > > > Similarly to accel properties, move compat properties o=
+ut of globals
+> > > > > > > > > registration, and apply the machine compat properties d=
+uring
+> > > > > > > > > device_post_init().
+> > > > > > > > >
+> > > > > > > > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@re=
+dhat.com> =20
+> > > > > > > > [...] =20
+> > > > > > > > > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > > > > > > > > index 7066d28271..3b31b2c025 100644
+> > > > > > > > > --- a/hw/core/qdev.c
+> > > > > > > > > +++ b/hw/core/qdev.c
+> > > > > > > > > @@ -971,17 +971,26 @@ static void device_initfn(Object =
+*obj)
+> > > > > > > > >  }
+> > > > > > > > >
+> > > > > > > > >  static const GPtrArray *ac_compat_props;
+> > > > > > > > > +static const GPtrArray *mc_compat_props; =20
+> > > > > why you didn't use just 'compat_props' for both?
+> > > > > (it would be cleaner have single registry for compat
+> > > > > properties, and the place that takes care of registration
+> > > > > will take care of necessary ordering) =20
+> > > >
+> > > > There are two arrays, one from the accelerator class, the other f=
+rom
+> > > > the machine class. We can't make it a singleton (all compats prop=
+s for
+> > > > the various machines would be mixed).
+> > > >
+> > > > We could create a third array that would be the set of both, but =
+that
+> > > > would require more copy/allocation. =20
+> > >
+> > > I am failing to see the advantage of replacing the `global_props`
+> > > static variable from qdev-properties.c with a collection of
+> > > separate static variables scattered around the code.  I thought
+> > > the main point of the changes was to reduce the amount of
+> > > duplicate data stored in static variables.
+> Main point was to use compats for backends then on top of that=20
+> we added split global from compat properties goal.
+>=20
+> > > I was expecting something like this:
+> > >
+> > > accel.c:
+> > >
+> > >   void accel_apply_compat_props(AccelState *accel, Object *obj)
+> > >   {
+> > >       object_apply_global_props(obj, ACCEL_GET_CLASS(accel)->compat=
+_props, &error_abort);
+> > >   }
+> > >
+> > > machine.c:
+> > >
+> > >   /* Apply compat properties and global properties to an object */
+> > >   void machine_apply_compat_props(MachineState *ms, Object *obj)
+> > >   {
+> > >       accel_apply_compat_props(ms->accel, obj);
+> > >       object_apply_global_props(obj, MACHINE_GET_CLASS(ms)->compat_=
+props, &error_abort);
+> > >   }
+> > >
+> > > compat-props.c:
+> > >
+> > >   static void object_apply_compat_props(Object *obj)
+> > >   {
+> > >       MachineState *machine =3D MACHINE(qdev_get_machine());
+> > >       machine_apply_compat_props(machine, obj);
+> > >   }
+> > >
+> > > qdev.c:
+> > >
+> > >   static void device_post_init(Object *obj)
+> > >   {
+> > >       object_apply_compat_props(obj);
+> > >       apply_user_provided_globals(obj);
+> > >   }
+> > >
+> > > object_interface.c:
+> > >
+> > >   void user_creatable_complete(Object *obj, Error **errp)
+> > >   {
+> > >       object_apply_compat_props(obj);
+> > >       ...
+> > >       ucc->complete(...)
+> > >   }
+> > > =20
+> >=20
+> > I like that solution too (which you also proposed in the other
+> > thread). But we have to decide whether it's acceptable to reference
+> > MachineState, or if the compat properties should be registered.
+> I dislike pulling in machine into basic object code and
+> I think a separate compats would be cleaner interface without
+> layer violation. But to unstuck, lets go with qdev_get_machine()
+> for now.
 
-My command line is:
-./x86_64-softmmu/qemu-system-x86_64 -accel hvf -cpu host -hda /path/to/disk=
- -m MEMORY
+Which basic object code?  The only reference to machine above is
+at compat-props.c.  I don't see any layering violation here.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1802684
-
-Title:
-  QEMU gui crashes on macOS Mojave
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU release 3.0.0 as well as a recent head build
-
-  /usr/local/Cellar/qemu/HEAD-03c1ca1 (147 files, 257.2MB)
-    Built from source on 2018-11-06 at 13:41:32 with: --with-gtk+3 --with-s=
-dl2 --with-libusb
-  /usr/local/Cellar/qemu/3.0.0 (137 files, 261.6MB) *
-    Poured from bottle on 2018-11-10 at 22:58:32 with: --with-gtk+3 --with-=
-libusb --with-sdl2
-
-  Crashes when attempting to use any gui interface (tried SDL and
-  default Cocoa):
-
-  2018-11-10 22:58:41.799 qemu-system-aarch64[42982:1102466] *** Terminatin=
-g app due to uncaught exception 'NSInternalInconsistencyException', reason:=
- 'NSWindow drag regions should only be invalidated on the Main Thread!'
-  *** First throw call stack:
-  (
-  	0   CoreFoundation                      0x00007fff3ea96ecd __exceptionPr=
-eprocess + 256
-  	1   libobjc.A.dylib                     0x00007fff6ab49720 objc_exceptio=
-n_throw + 48
-  	2   CoreFoundation                      0x00007fff3eab095d -[NSException=
- raise] + 9
-  	3   AppKit                              0x00007fff3bfb13fa -[NSWindow(NS=
-Window_Theme) _postWindowNeedsToResetDragMarginsUnlessPostingDisabled] + 324
-  	4   AppKit                              0x00007fff3bfb6850 -[NSView setF=
-rameSize:] + 2082
-  	5   AppKit                              0x00007fff3c02747d -[NSVisualEff=
-ectView setFrameSize:] + 171
-  	6   AppKit                              0x00007fff3c0811b1 -[NSTitlebarV=
-iew setFrameSize:] + 84
-  	7   AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	8   AppKit                              0x00007fff3c081154 -[NSTitlebarV=
-iew resizeWithOldSuperviewSize:] + 100
-  	9   AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	10  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	11  AppKit                              0x00007fff3c9773c0 -[NSTitlebarC=
-ontainerView setFrameSize:] + 142
-  	12  AppKit                              0x00007fff3bfb5859 -[NSView setF=
-rame:] + 478
-  	13  AppKit                              0x00007fff3bfbcdb5 -[NSView resi=
-zeWithOldSuperviewSize:] + 776
-  	14  AppKit                              0x00007fff3bfbc95e -[NSView resi=
-zeSubviewsWithOldSize:] + 502
-  	15  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
-rameSize:] + 1707
-  	16  AppKit                              0x00007fff3c024570 -[NSThemeFram=
-e setFrameSize:] + 495
-  	17  AppKit                              0x00007fff3c011223 -[NSWindow _s=
-etFrame:updateBorderViewSize:] + 966
-  	18  AppKit                              0x00007fff3c010b46 -[NSWindow _o=
-ldPlaceWindow:] + 547
-  	19  AppKit                              0x00007fff3c010151 -[NSWindow _s=
-etFrameCommon:display:stashSize:] + 3006
-  	20  AppKit                              0x00007fff3c00f57d -[NSWindow _s=
-etFrame:display:allowImplicitAnimation:stashSize:] + 192
-  	21  AppKit                              0x00007fff3c019ff8 -[NSWindow se=
-tFrame:display:animate:] + 567
-  	22  qemu-system-aarch64                 0x000000010b7b2abf qemu-system-a=
-arch64 + 3668671
-  	23  qemu-system-aarch64                 0x000000010b7b6356 qemu-system-a=
-arch64 + 3683158
-  	24  qemu-system-aarch64                 0x000000010b7ad836 qemu-system-a=
-arch64 + 3647542
-  	25  qemu-system-aarch64                 0x000000010b4ce769 qemu-system-a=
-arch64 + 636777
-  	26  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	27  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	28  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	29  qemu-system-aarch64                 0x000000010b4414aa qemu-system-a=
-arch64 + 58538
-  	30  qemu-system-aarch64                 0x000000010b4f78c3 qemu-system-a=
-arch64 + 805059
-  	31  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
-arch64 + 347172
-  	32  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
-arch64 + 346645
-  	33  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
-arch64 + 346353
-  	34  qemu-system-aarch64                 0x000000010b4b8f57 qemu-system-a=
-arch64 + 548695
-  	35  qemu-system-aarch64                 0x000000010b49c3af qemu-system-a=
-arch64 + 431023
-  	36  ???                                 0x00000001117891f3 0x0 + 4588081=
-651
-  )
-  libc++abi.dylib: terminating with uncaught exception of type NSException
-  fish: 'qemu-system-aarch64 -M raspi3 -=E2=80=A6' terminated by signal SIG=
-ABRT (Abort)
-
-  =
-
-  macOS Mojave 10.14.2 Beta (18C38b)
-  Qemu in the same configuration used to work in High Sierra, started crash=
-ing only after upgrade to Mojave.
-
-  Command line:
-  `qemu-system-aarch64 -M raspi3 -d in_asm -serial stdio -kernel $1.bin`
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1802684/+subscriptions
+--=20
+Eduardo
