@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gSeaI-0001d2-5G
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gSeaI-0001cz-4j
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:55:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gSeaE-0000TJ-Iw
+	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1gSeaE-0000TV-Jh
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:55:37 -0500
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Date: Fri, 30 Nov 2018 11:55:23 +0300
-Message-Id: <1543568126-727235-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Fri, 30 Nov 2018 11:55:25 +0300
+Message-Id: <1543568126-727235-5-git-send-email-andrey.shinkevich@virtuozzo.com>
 In-Reply-To: <1543568126-727235-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1543568126-727235-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 2/5] The discard flag for block stream
- operation
+Subject: [Qemu-devel] [PATCH v4 4/5] iotests: prepare 030 for graph change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,136 +22,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, andrey.shinkevich@virtuozzo.com
 
-Adding a parameter to QMP block-stream command to allow discarding
-blocks in the backing chain while blocks are being copied to the
-active layer.
+The discard option for block-stream command requires insertion of the
+filter to write into the backing chain. In that case, the job will not
+resume by device name. So, the node name is specified.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/stream.c            | 3 +--
- blockdev.c                | 8 +++++++-
- hmp-commands.hx           | 4 ++--
- hmp.c                     | 4 +++-
- include/block/block_int.h | 2 +-
- qapi/block-core.json      | 5 ++++-
- 6 files changed, 18 insertions(+), 8 deletions(-)
+ tests/qemu-iotests/030 | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/block/stream.c b/block/stream.c
-index 9e85954..e844e94 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -584,10 +584,9 @@ static const BlockJobDriver stream_job_driver = {
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 276e06b..5d148b0 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -36,7 +36,8 @@ class TestSingleDrive(iotests.QMPTestCase):
+         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % mid_img, test_img)
+         qemu_io('-f', 'raw', '-c', 'write -P 0x1 0 512', backing_img)
+         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0x1 524288 512', mid_img)
+-        self.vm = iotests.VM().add_drive("blkdebug::" + test_img, "backing.node-name=mid")
++        self.vm = iotests.VM().add_drive("blkdebug::" + test_img,
++                               "node-name=source,backing.node-name=mid")
+         self.vm.launch()
  
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
--                  int creation_flags, int64_t speed,
-+                  int creation_flags, int64_t speed, bool discard,
-                   BlockdevOnError on_error, Error **errp)
- {
--    const bool discard = false;
-     StreamBlockJob *s = NULL;
-     BlockDriverState *iter;
-     int orig_bs_flags;
-diff --git a/blockdev.c b/blockdev.c
-index 81f95d9..333592e 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3141,6 +3141,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-                       bool has_base_node, const char *base_node,
-                       bool has_backing_file, const char *backing_file,
-                       bool has_speed, int64_t speed,
-+                      bool has_discard, bool discard,
-                       bool has_on_error, BlockdevOnError on_error,
-                       bool has_auto_finalize, bool auto_finalize,
-                       bool has_auto_dismiss, bool auto_dismiss,
-@@ -3157,6 +3158,10 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         on_error = BLOCKDEV_ON_ERROR_REPORT;
-     }
+     def tearDown(self):
+@@ -87,7 +88,7 @@ class TestSingleDrive(iotests.QMPTestCase):
+         self.assert_qmp(result, 'return', {})
  
-+    if (!has_discard) {
-+        discard = false;
-+    }
+         self.pause_job('drive0', wait=False)
+-        self.vm.resume_drive('drive0')
++        self.vm.resume_drive('source')
+         self.pause_wait('drive0')
+ 
+         result = self.vm.qmp('query-block-jobs')
+@@ -743,7 +744,8 @@ class TestStreamStop(iotests.QMPTestCase):
+         qemu_io('-f', 'raw', '-c', 'write -P 0x1 0 32M', backing_img)
+         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, test_img)
+         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0x1 32M 32M', test_img)
+-        self.vm = iotests.VM().add_drive("blkdebug::" + test_img)
++        self.vm = iotests.VM().add_drive("blkdebug::" + test_img,
++                                         "node-name=source")
+         self.vm.launch()
+ 
+     def tearDown(self):
+@@ -764,7 +766,7 @@ class TestStreamStop(iotests.QMPTestCase):
+             self.assert_qmp(e, 'event', 'JOB_STATUS_CHANGE')
+             self.assert_qmp(e, 'data/id', 'drive0')
+ 
+-        self.cancel_and_wait(resume=True)
++        self.cancel_and_wait(resume=True, resume_node='source')
+ 
+ class TestSetSpeed(iotests.QMPTestCase):
+     image_len = 80 * 1024 * 1024 # MB
+@@ -774,7 +776,8 @@ class TestSetSpeed(iotests.QMPTestCase):
+         qemu_io('-f', 'raw', '-c', 'write -P 0x1 0 32M', backing_img)
+         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, test_img)
+         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0x1 32M 32M', test_img)
+-        self.vm = iotests.VM().add_drive('blkdebug::' + test_img)
++        self.vm = iotests.VM().add_drive('blkdebug::' + test_img,
++                                         "node-name=source")
+         self.vm.launch()
+ 
+     def tearDown(self):
+@@ -817,7 +820,7 @@ class TestSetSpeed(iotests.QMPTestCase):
+         self.assert_qmp(result, 'return[0]/device', 'drive0')
+         self.assert_qmp(result, 'return[0]/speed', 8 * 1024 * 1024)
+ 
+-        self.cancel_and_wait(resume=True)
++        self.cancel_and_wait(resume=True, resume_node='source')
+         self.vm.pause_drive('drive0')
+ 
+         # Check setting speed in block-stream works
+@@ -828,7 +831,7 @@ class TestSetSpeed(iotests.QMPTestCase):
+         self.assert_qmp(result, 'return[0]/device', 'drive0')
+         self.assert_qmp(result, 'return[0]/speed', 4 * 1024 * 1024)
+ 
+-        self.cancel_and_wait(resume=True)
++        self.cancel_and_wait(resume=True, resume_node='source')
+ 
+     def test_set_speed_invalid(self):
+         self.assert_no_active_block_jobs()
+@@ -845,7 +848,8 @@ class TestSetSpeed(iotests.QMPTestCase):
+         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=-1)
+         self.assert_qmp(result, 'error/class', 'GenericError')
+ 
+-        self.cancel_and_wait(resume=True)
++        self.cancel_and_wait(resume=True, resume_node='source')
 +
-     bs = bdrv_lookup_bs(device, device, errp);
-     if (!bs) {
-         return;
-@@ -3221,7 +3226,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-     }
  
-     stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
--                 job_flags, has_speed ? speed : 0, on_error, &local_err);
-+                 job_flags, has_speed ? speed : 0,
-+                 discard, on_error, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto out;
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index db0c681..a7e2a10 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -95,8 +95,8 @@ ETEXI
- 
-     {
-         .name       = "block_stream",
--        .args_type  = "device:B,speed:o?,base:s?",
--        .params     = "device [speed [base]]",
-+        .args_type  = "device:B,speed:o?,base:s?,discard:-d",
-+        .params     = "device [speed [base]] [-d]",
-         .help       = "copy data from a backing file into a block device",
-         .cmd        = hmp_block_stream,
-     },
-diff --git a/hmp.c b/hmp.c
-index 7828f93..0d263e4 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1920,9 +1920,11 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
-     const char *device = qdict_get_str(qdict, "device");
-     const char *base = qdict_get_try_str(qdict, "base");
-     int64_t speed = qdict_get_try_int(qdict, "speed", 0);
-+    bool discard = qdict_get_try_bool(qdict, "discard", false);
- 
-     qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
--                     false, NULL, qdict_haskey(qdict, "speed"), speed, true,
-+                     false, NULL, qdict_haskey(qdict, "speed"), speed,
-+                     true, discard, true,
-                      BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
-                      &error);
- 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index f605622..2660336 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -970,7 +970,7 @@ int is_windows_drive(const char *filename);
-  */
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
--                  int creation_flags, int64_t speed,
-+                  int creation_flags, int64_t speed, bool discard,
-                   BlockdevOnError on_error, Error **errp);
- 
- /**
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d4fe710..f4538fa 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2334,6 +2334,9 @@
- #
- # @speed:  the maximum speed, in bytes per second
- #
-+# @discard: true to delete blocks duplicated in old backing files.
-+#           (default: false). Since 4.0.
-+#
- # @on-error: the action to take on an error (default report).
- #            'stop' and 'enospc' can only be used if the block device
- #            supports io-status (see BlockInfo).  Since 1.3.
-@@ -2366,7 +2369,7 @@
- { 'command': 'block-stream',
-   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
-             '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
--            '*on-error': 'BlockdevOnError',
-+            '*discard': 'bool', '*on-error': 'BlockdevOnError',
-             '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
- 
- ##
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2', 'qed'])
 -- 
 1.8.3.1
