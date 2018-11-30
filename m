@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSlY1-0007tB-4N
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 11:21:45 -0500
+	(envelope-from <groug@kaod.org>) id 1gSlvS-00042G-MO
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 11:45:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSlY0-0004Rp-BE
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 11:21:45 -0500
-Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:38135)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gSlY0-0004RV-4u
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 11:21:44 -0500
-Received: by mail-oi1-x22b.google.com with SMTP id a77so5179939oii.5
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 08:21:44 -0800 (PST)
+	(envelope-from <groug@kaod.org>) id 1gSlvP-0002np-BV
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 11:45:58 -0500
+Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:55697)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gSlvP-0002n9-45
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 11:45:55 -0500
+Received: from player759.ha.ovh.net (unknown [10.109.146.137])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 31C4CE1D5F
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 17:45:53 +0100 (CET)
+Date: Fri, 30 Nov 2018 17:45:48 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181130174548.247d293c@bahia.lan>
+In-Reply-To: <cf3f805a-4991-04d6-2cbb-6c1cca8bd238@redhat.com>
+References: <154356772378.66975.13711686652368325931.stgit@bahia.lan>
+	<cf3f805a-4991-04d6-2cbb-6c1cca8bd238@redhat.com>
 MIME-Version: 1.0
-References: <1543407172-16175-1-git-send-email-peng.hao2@zte.com.cn>
-	<1543407172-16175-8-git-send-email-peng.hao2@zte.com.cn>
-	<CAFEAcA83C_Eic3K4yY5bGeEKJpY2uf26diFtDJ5r+W71jcX2DQ@mail.gmail.com>
-	<CAFEAcA8nfp0ueLMJHhgRyf+mqG1QbakjKJiqSnLF-MFkjkDhZA@mail.gmail.com>
-	<20181130161449.dg2yxiac5lnk7mbb@kamzik.brq.redhat.com>
-In-Reply-To: <20181130161449.dg2yxiac5lnk7mbb@kamzik.brq.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Nov 2018 16:21:31 +0000
-Message-ID: <CAFEAcA9Od4vjo2EeEXhP1iE_XONaK8H22L9eq1qw3w6C2nR_cQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V10 7/9] hw/misc/pvpanic: preparing for
- adding configure interface
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-3.1?] 9p: remove support for the
+ "handle" backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Peng Hao <peng.hao2@zte.com.cn>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, 30 Nov 2018 at 16:14, Andrew Jones <drjones@redhat.com> wrote:
->
-> On Fri, Nov 30, 2018 at 03:57:13PM +0000, Peter Maydell wrote:
-> > On Fri, 30 Nov 2018 at 15:56, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > > I suspect the reason you've done this is that you're
-> > > trying to get "-device pvpanic" to work on the command
-> > > line. I recommend not trying to get that to work.
-> > > MMIO devices are not pluggable devices, and -device
-> > > is not expected to work with them.
-> >
-> > If you do want a pluggable pvpanic device for the virt
-> > board then you should implement it as a PCI device,
-> > incidentally.
-> >
->
-> We'd have to allocate it a PCI device ID, but I guess that's OK as
-> there are plenty of IDs left for 1b36. I'm not sure it's worth it
-> though. Phil asked that this device by user creatable, but maybe
-> that's not necessary. Maybe we just need a mach-virt compat boolean
-> and then to always provide this device for 4.0 and later machines?
+On Fri, 30 Nov 2018 09:52:18 -0600
+Eric Blake <eblake@redhat.com> wrote:
 
-Yes, if it's just an mmio device then we should either:
- * default to providing it, with the usual flag to say "don't create
-   in older virt board versions", and also a machine property to
-   disable it manually (like we do with the ITS)
- * default to not providing it at all, and have a machine
-   property to enable it (like we do with the IOMMU)
-Which is all doable, but every time we do that it makes the
-virt board code that extra bit more complicated (we have
-half a dozen machine properties on it already).
+> On 11/30/18 2:49 AM, Greg Kurz wrote:
+> > The "handle" fsdev backend was deprecated in QEMU 2.12.0 with:
+> > 
+> > commit db3b3c7281ca82e2647e072a1f97db111313dd73
+> > Author: Greg Kurz <groug@kaod.org>
+> > Date:   Mon Jan 8 11:18:23 2018 +0100
+> > 
+> >      9pfs: deprecate handle backend  
+> 
+> > It has passed the two release cooling period without any complaint.
+> > 
+> > Remove it now.
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> > 
+> > It could have been removed for 3.1.0, but I woke up too late, so moving
+> > this to 4.0.
+> > 
+> > ---
+> >   fsdev/qemu-fsdev.c    |    3
+> >   hw/9pfs/9p-handle.c   |  710 -------------------------------------------------
+> >   hw/9pfs/Makefile.objs |    1
+> >   qemu-deprecated.texi  |    8 -
+> >   qemu-options.hx       |    8 -
+> >   5 files changed, 4 insertions(+), 726 deletions(-)
+> >   delete mode 100644 hw/9pfs/9p-handle.c  
+> 
+> Well, it certainly doesn't drive -rc4 on its own, but as we may have an 
+> -rc4 for other reasons, maybe it could still be argued that this is 3.1 
+> material on the grounds of removing questionable code for less attack 
+> exposure?
+> 
 
-This kind of thing is why a PCI device is cleaner -- it just
-works on any machine with a PCI controller, it by default is
-something that the user can provide if they want to and not if
-they don't, and it's not a custom UI that management layers
-might need to special-case. The guest does need to do a bit
-of PCI probing and setup initially, but then it can just leave
-the MMIO BAR permanently mapped and write to that address
-when the guest panics.
+Makes sense, as this is precisely the reason that led me to
+deprecate this in the first place.
 
-thanks
--- PMM
+Peter,
+
+Any thoughts ?
+
+Cheers,
+
+--
+Greg
