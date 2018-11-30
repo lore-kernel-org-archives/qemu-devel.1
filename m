@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSl5k-00065X-59
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:52:32 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gSl7M-0008ET-4M
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:54:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSl5g-0005yM-Gc
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:52:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39906)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gSl5c-0005vf-Iu
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:52:26 -0500
-References: <154356772378.66975.13711686652368325931.stgit@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cf3f805a-4991-04d6-2cbb-6c1cca8bd238@redhat.com>
-Date: Fri, 30 Nov 2018 09:52:18 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1gSl7L-0007BO-9p
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:54:12 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34063)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gSl7L-0007B6-3a
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:54:11 -0500
+Received: by mail-oi1-x241.google.com with SMTP id h25so5120004oig.1
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 07:54:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <154356772378.66975.13711686652368325931.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1?] 9p: remove support for the
- "handle" backend
+References: <1543407172-16175-1-git-send-email-peng.hao2@zte.com.cn>
+	<1543407172-16175-9-git-send-email-peng.hao2@zte.com.cn>
+In-Reply-To: <1543407172-16175-9-git-send-email-peng.hao2@zte.com.cn>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 30 Nov 2018 15:53:59 +0000
+Message-ID: <CAFEAcA91j803VhAKrey3pvHC+L139EGVvkN1rULbUD-JAFWBdA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V10 8/9] hw/misc/pvpanic: realize the
+ configure interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 11/30/18 2:49 AM, Greg Kurz wrote:
-> The "handle" fsdev backend was deprecated in QEMU 2.12.0 with:
-> 
-> commit db3b3c7281ca82e2647e072a1f97db111313dd73
-> Author: Greg Kurz <groug@kaod.org>
-> Date:   Mon Jan 8 11:18:23 2018 +0100
-> 
->      9pfs: deprecate handle backend
-
-> It has passed the two release cooling period without any complaint.
-> 
-> Remove it now.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+On Wed, 28 Nov 2018 at 03:50, Peng Hao <peng.hao2@zte.com.cn> wrote:
+>
+> Add configure interface for pvpanic-mmio. In qemu command line
+> use -device pvpanic-mmio to enable the device.
+>
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 > ---
-> 
-> It could have been removed for 3.1.0, but I woke up too late, so moving
-> this to 4.0.
-> 
-> ---
->   fsdev/qemu-fsdev.c    |    3
->   hw/9pfs/9p-handle.c   |  710 -------------------------------------------------
->   hw/9pfs/Makefile.objs |    1
->   qemu-deprecated.texi  |    8 -
->   qemu-options.hx       |    8 -
->   5 files changed, 4 insertions(+), 726 deletions(-)
->   delete mode 100644 hw/9pfs/9p-handle.c
+>  hw/arm/virt-acpi-build.c | 5 ++++-
+>  hw/arm/virt.c            | 7 +++----
+>  hw/misc/pvpanic.c        | 1 +
+>  3 files changed, 8 insertions(+), 5 deletions(-)
 
-Well, it certainly doesn't drive -rc4 on its own, but as we may have an 
--rc4 for other reasons, maybe it could still be argued that this is 3.1 
-material on the grounds of removing questionable code for less attack 
-exposure?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> @@ -1330,6 +1328,9 @@ void virt_machine_done(Notifier *notifier, void *data)
+>      struct arm_boot_info *info = &vms->bootinfo;
+>      AddressSpace *as = arm_boot_address_space(cpu, info);
+>
+> +    if (pvpanic_mmio()) {
+> +        create_pvpanic_device(vms);
+> +    }
+>      /*
+>       * If the user provided a dtb, we assume the dynamic sysbus nodes
+>       * already are integrated there. This corresponds to a use case where
+> @@ -1551,8 +1552,6 @@ static void machvirt_init(MachineState *machine)
+>
+>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>
+> -    create_pvpanic_device(vms);
+> -
+
+Please don't make changes in on patch of a patchset
+and then undo them in a later patch. It makes the
+patchset harder to read and review.
+
+thanks
+-- PMM
