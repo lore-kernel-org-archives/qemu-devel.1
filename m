@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSoMs-0007iX-10
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:22:29 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1gSocl-0007lP-Ty
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:38:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSoMm-00082g-Hy
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:22:25 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:32868)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gSoMm-00082Q-3L
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:22:20 -0500
-Received: by mail-pl1-x644.google.com with SMTP id z23so3275028plo.0
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 11:22:20 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 30 Nov 2018 11:22:14 -0800
-Message-Id: <20181130192216.26987-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH for-4.0 0/2] target/s390x: Implement STCK et al
- for CONFIG_USER_ONLY
+	(envelope-from <mjt@tls.msk.ru>) id 1gSocg-0001yV-SI
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 14:38:51 -0500
+References: <1543571638-2892-1-git-send-email-liq3ea@gmail.com>
+	<16fc13de-778b-430e-d734-bbc802d25ba8@redhat.com>
+	<8f24cfdf-061b-75e8-9d89-e2b0b5196115@vivier.eu>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <94576180-9b50-f913-a22a-385114282879@msgid.tls.msk.ru>
+Date: Fri, 30 Nov 2018 22:38:34 +0300
+MIME-Version: 1.0
+In-Reply-To: <8f24cfdf-061b-75e8-9d89-e2b0b5196115@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] util: vfio-helpers: use ARRAY_SIZE in
+ qemu_vfio_init_pci()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +26,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, david@redhat.com, qemu-s390x@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Li Qiang <liq3ea@gmail.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-This is a non-privileged instruction that was only implemented
-for system mode.  However, the stck instruction is used by glibc,
-so this was causing SIGILL for programs run under debian stretch.
+30.11.2018 15:58, Laurent Vivier wrote:
 
+>>> -    for (i = 0; i < 6; i++) {
+>>> +    for (i = 0; i < ARRAY_SIZE(s->bar_region_info); i++) {
 
-r~
+> I'm wondering if adding a #define to define the size of the array and
+> then using it with the for() loop wouldn't be better?
 
+On the other side, it doesn't really matter, one way or another..
+It's so.. trivial.. ;)
 
-Richard Henderson (2):
-  target/s390x: Move TOD_UNIX_EPOCH to cpu.h
-  target/s390x: Implement STCK et al for CONFIG_USER_ONLY
-
- include/hw/s390x/tod.h     |  3 ---
- target/s390x/cpu.h         |  3 +++
- target/s390x/helper.h      |  2 +-
- target/s390x/misc_helper.c | 13 ++++++++++++-
- target/s390x/translate.c   |  2 ++
- target/s390x/insn-data.def | 11 ++++++-----
- 6 files changed, 24 insertions(+), 10 deletions(-)
-
--- 
-2.17.2
+/mjt
