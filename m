@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSpPA-0000lz-0W
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:28:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSpQm-0001yW-5z
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:30:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSpP9-0001xL-BI
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:28:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSpQl-0008Sz-Dj
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:30:32 -0500
 References: <20181130151712.2312-1-peter.maydell@linaro.org>
-	<20181130151712.2312-7-peter.maydell@linaro.org>
+	<20181130151712.2312-8-peter.maydell@linaro.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <35e43c91-25b0-c1c8-0950-975fb83e7e9b@redhat.com>
-Date: Fri, 30 Nov 2018 14:28:35 -0600
+Message-ID: <af8f6615-9bf8-e2c8-1acb-6ffe28a7c3d8@redhat.com>
+Date: Fri, 30 Nov 2018 14:30:18 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181130151712.2312-7-peter.maydell@linaro.org>
+In-Reply-To: <20181130151712.2312-8-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/10] hw/i386/multiboot.c: Don't use
+Subject: Re: [Qemu-devel] [PATCH 07/10] hw/block/tc58128.c: Don't use
  load_image()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,13 +33,10 @@ On 11/30/18 9:17 AM, Peter Maydell wrote:
 > caller specify how large the buffer to read the file into is.
 > Instead use load_image_size().
 > 
-
-Commit message should mention the added error checking.
-
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->   hw/i386/multiboot.c | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
+>   hw/block/tc58128.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
