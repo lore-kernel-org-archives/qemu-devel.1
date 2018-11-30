@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gSpwY-0004n4-FT
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:03:23 -0500
+	(envelope-from <bounces@canonical.com>) id 1gSoyG-0001cp-Ef
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:01:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1gSpwU-00071A-8H
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:03:22 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45113)
+	(envelope-from <bounces@canonical.com>) id 1gSoyA-00009U-84
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:01:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50894)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1gSpwT-0006tt-S2
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:03:18 -0500
-Received: by mail-ot1-x344.google.com with SMTP id 32so6349300ota.12
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 13:03:16 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-Reply-To: minyard@acm.org
-References: <20181126200435.23408-1-minyard@acm.org>
-	<20181126200435.23408-6-minyard@acm.org>
-	<CAFEAcA8NC2hODB45v7apNvjsEQ=GavBDnJR=bV+djdd8QjH34w@mail.gmail.com>
-From: Corey Minyard <minyard@acm.org>
-Message-ID: <63788cfa-3cb2-1c26-ead3-03cc2b81b784@acm.org>
-Date: Fri, 30 Nov 2018 15:03:12 -0600
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gSoy9-0008QA-04
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:00:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gSoy3-0008Co-Vn
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 20:00:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id ED8662E8031
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 20:00:51 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8NC2hODB45v7apNvjsEQ=GavBDnJR=bV+djdd8QjH34w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH v3 05/16] i2c: Simplify and correct the
- SMBus state machine
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 30 Nov 2018 19:51:45 -0000
+From: Jacek Wieczorek <mrjjot@gmail.com>
+Reply-To: Bug 1806114 <1806114@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <154360750589.15722.2632161476309150045.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1806114] [NEW] Reading sectors from floppy with
+ BIOS INT 13h is broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,70 +36,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: qemu-devel@nongnu.org
 
-On 11/30/18 12:13 PM, Peter Maydell wrote:
-> On Mon, 26 Nov 2018 at 20:04, <minyard@acm.org> wrote:
->> From: Corey Minyard <cminyard@mvista.com>
->>
->> The SMBus slave code had an unneeded state, unnecessary function
->> pointers and incorrectly handled quick commands.  Rewrite it
->> to simplify the code and make it work correctly.
->>
->> smbus_eeprom is the only user, so no other effects and the eeprom
->> code also gets a significant simplification.
->>
->> Signed-off-by: Corey Minyard <cminyard@mvista.com>
->> ---
->>   hw/i2c/smbus_eeprom.c        | 58 ++++++-----------------
->>   hw/i2c/smbus_slave.c         | 91 ++++++++++++++++--------------------
->>   include/hw/i2c/smbus_slave.h | 45 +++++++++++++-----
->>   3 files changed, 86 insertions(+), 108 deletions(-)
-> I'm finding this patch difficult to understand -- it
-> feels like it's trying to do too many things at once.
-> Is it possible to split it? For instance it looks like
-> we're getting rid of send_byte and just handling
-> all writes to the device with write_data -- is that
-> right? That sounds like it should be its own patch.
-> Whatever the change is that means that we don't pass in
-> the cmd argument to the various methods is probably its
-> own patch. And fixing quick commands sounds like something
-> that goes in its own patch.
->
-> Stray whitespace change (there are more of these below too).
-> If you want to do formatting tidyups please put those in
-> their own patch.
+Public bug reported:
+
+I'm developing a game bootable from a floppy disk, written in i386
+assembly. I found out it doesn't work on newer QEMU versions. I managed
+to isolate the issue and it seems that there's a problem with handling
+of BIOS interrupt 13h when it comes to reading disk sectors (AH=3D02).
+
+I've written a simple test in assembly. It simply accesses four
+different floppy disk sectors and prints out the strings they contain.
+The problem is, the two latter strings don't show up at all nor the BIOS
+interrupt returns an error (CF set). I've attached the code to this bug
+report. I use following commands to compile it and run:
+
+$ nasm disk-test.asm -o disk-test.bin
+$ qemu-system-i386 -boot a -fda disk-test.bin
+
+After running, the expected output is:
+
+    I am a test string from boot sector
+    C:H:S 0:0:2 - Hello
+    C:H:S 0:0:3 - there!
+    C:H:S 0:1:4 - In QEMU you can't
+    C:H:S 1:0:5 - see these two lines! :(
+
+while the actual output is:
+
+    I am a test string from boot sector
+    C:H:S 0:0:2 - Hello
+    C:H:S 0:0:3 - there!
 
 
-Ok, I've split this up into separate patches, as they should have been.
+So far, I found this problem in the current QEMU version for Ubuntu 18.04 (=
+Debian 1:2.11+dfsg-1ubuntu7.8), as well as in the 3.1.0-rc3 and 2.12.1 vers=
+ions, available on the www.qemu.org website. Thus, the issue doesn't seem t=
+o be very recent.
 
-Thanks,
+To be sure, I ran the program on my other machine with older QEMU
+version (Debian 2.0.0+dfsg-2ubuntu1.43) and on my RaspberryPi 2 (Debian
+1.1.2+dfsg-6+deb7u25) and everything works as expected there. It also
+works well in VirtualBox.
 
--corey
+I hope these information are useful to you, however, I feel like this
+bug may be more related to Seabios. If so, please let me know and I will
+report it somewhere else.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 
->
->>   #ifdef DEBUG
->>       printf("eeprom_receive_byte: addr=0x%02x val=0x%02x\n",
->>              dev->i2c.address, val);
->> @@ -65,37 +49,26 @@ static uint8_t eeprom_receive_byte(SMBusDevice *dev)
->>       return val;
->>   }
->>
->> -static void eeprom_write_data(SMBusDevice *dev, uint8_t cmd, uint8_t *buf, int len)
->> +static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
->>   {
->>       SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *) dev;
->> -    int n;
->> +    uint8_t *data = eeprom->data;
->> +
->>   #ifdef DEBUG
->>       printf("eeprom_write_byte: addr=0x%02x cmd=0x%02x val=0x%02x\n",
->>              dev->i2c.address, cmd, buf[0]);
-> The "cmd" argument has been removed from the prototype
-> but is still used in this debug printf.
->
->>   #endif
-> thanks
-> -- PMM
+** Tags: bios disk floppy interrupt
+
+** Attachment added: "disk-test.asm"
+   https://bugs.launchpad.net/bugs/1806114/+attachment/5217760/+files/disk-=
+test.asm
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1806114
+
+Title:
+  Reading sectors from floppy with BIOS INT 13h is broken
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm developing a game bootable from a floppy disk, written in i386
+  assembly. I found out it doesn't work on newer QEMU versions. I
+  managed to isolate the issue and it seems that there's a problem with
+  handling of BIOS interrupt 13h when it comes to reading disk sectors
+  (AH=3D02).
+
+  I've written a simple test in assembly. It simply accesses four
+  different floppy disk sectors and prints out the strings they contain.
+  The problem is, the two latter strings don't show up at all nor the
+  BIOS interrupt returns an error (CF set). I've attached the code to
+  this bug report. I use following commands to compile it and run:
+
+  $ nasm disk-test.asm -o disk-test.bin
+  $ qemu-system-i386 -boot a -fda disk-test.bin
+
+  After running, the expected output is:
+
+      I am a test string from boot sector
+      C:H:S 0:0:2 - Hello
+      C:H:S 0:0:3 - there!
+      C:H:S 0:1:4 - In QEMU you can't
+      C:H:S 1:0:5 - see these two lines! :(
+
+  while the actual output is:
+
+      I am a test string from boot sector
+      C:H:S 0:0:2 - Hello
+      C:H:S 0:0:3 - there!
+
+  =
+
+  So far, I found this problem in the current QEMU version for Ubuntu 18.04=
+ (Debian 1:2.11+dfsg-1ubuntu7.8), as well as in the 3.1.0-rc3 and 2.12.1 ve=
+rsions, available on the www.qemu.org website. Thus, the issue doesn't seem=
+ to be very recent.
+
+  To be sure, I ran the program on my other machine with older QEMU
+  version (Debian 2.0.0+dfsg-2ubuntu1.43) and on my RaspberryPi 2
+  (Debian 1.1.2+dfsg-6+deb7u25) and everything works as expected there.
+  It also works well in VirtualBox.
+
+  I hope these information are useful to you, however, I feel like this
+  bug may be more related to Seabios. If so, please let me know and I
+  will report it somewhere else.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1806114/+subscriptions
