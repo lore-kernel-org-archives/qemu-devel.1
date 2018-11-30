@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gSYlR-0005J8-Jo
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 21:42:46 -0500
+	(envelope-from <cota@braap.org>) id 1gSZ2M-00040b-S6
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 22:00:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gSYlQ-0003Nk-Fc
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 21:42:45 -0500
-Date: Fri, 30 Nov 2018 03:42:36 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <71296170-f917-2b24-e1e6-1c525265c2a6@roeck-us.net>
-Message-ID: <alpine.BSF.2.21.9999.1811300305450.787@zero.eik.bme.hu>
-References: <alpine.BSF.2.21.9999.1811292101280.5887@zero.eik.bme.hu>
-	<a05ba14f-b261-bb8c-12a1-4c91d005961f@redhat.com>
-	<71296170-f917-2b24-e1e6-1c525265c2a6@roeck-us.net>
+	(envelope-from <cota@braap.org>) id 1gSZ2K-0001Qf-2n
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 22:00:14 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:60985)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gSZ2J-0001Q2-Sf
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 22:00:12 -0500
+Date: Thu, 29 Nov 2018 22:00:10 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181130030009.GA14990@flamenco>
+References: <20181128053834.10861-1-richard.henderson@linaro.org>
+	<20181128221530.GA32160@flamenco>
+	<9d890088-8dd6-517d-52a7-a6166f0cd8a6@linaro.org>
+	<20181130003915.GA3323@flamenco>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Booting Raspbian on RPi emulation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181130003915.GA3323@flamenco>
+Subject: Re: [Qemu-devel] [PATCH 00/12] tcg: Improve register allocation for
+ calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Clement Deschamps <clement.deschamps@antfield.fr>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On Thu, 29 Nov 2018, Guenter Roeck wrote:
-> On 11/29/18 4:43 PM, Philippe Mathieu-Daud=E9 wrote:
->> Hi Zoltan,
->>=20
->> On 29/11/18 21:29, BALATON Zoltan wrote:
->>> Hello,
->>>=20
->>> I could not boot Raspbian on QEMU's raspi emulation and I'm not sure =
-why
->>> it fails. So question is if this is supposed to work or am I doing
->>> something wrong or any clues what may be missing? I'm trying with thi=
-s
->>> command line with v3.1.0-rc3:
->>>=20
->>> qemu-system-arm -M raspi2 -serial stdio \
->>> -kernel rpi-kernel7.img -dtb bcm2709-rpi-2-b.dtb \
->>> -append "rw earlyprintk loglevel=3D8 console=3DttyAMA0,115200
->>> dwc_otg.lpm_enable=3D0 root=3D/dev/mmcblk0p2" \
->>> -drive file=3D2018-10-09-raspbian-stretch-lite.img,format=3Draw,if=3D=
-sd
->>>=20
->>> Kernel starts to boot, I see raspberries on the guest screen and log
->>> output to serial:
->>>=20
->>> Booting Linux on physical CPU 0xf00
->>> Linux version 4.14.71-v7+ (dc4@dc4-XPS13-9333) (gcc version 4.9.3
->>> (crosstool-NG crosstool-ng-1.22.0-88-g8460611)) #1145 SMP Fri Sep 21
->>> 15:38:35 BST 2018
->>> CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=3D10c5387d
->>> [...]
->>>=20
->>=20
->
-> My version (https://github.com/groeck/qemu) seems to work, using
+On Thu, Nov 29, 2018 at 19:39:15 -0500, Emilio G. Cota wrote:
+> A64 and POWER9 host numbers:
+> 
+>   https://imgur.com/a/m6Pss99
+> 
+> There's quite a bit of noise in the P9 measurements, but it's
+> a shared machine so I can't do much about that.
+> 
+> I'll update the A64 results with error bars later tonight,
+> when I get further results.
 
-Tried with your v3.1.0-local branch but got same results (does not find=20
-mmcblk0 on raspi2, nothing on raspi3) so probably it's not one of the=20
-patches in your tree that's missing.
+Here they are:
 
-> multi_v7_defconfig.
+  https://imgur.com/a/EAAapSW
 
-Then maybe it's your kernel config that's different? Do you have compiled=
-=20
-kernels available that I could try?
+The second image is the same results, but zoomed in. I could
+bring the confidence intervals down by running this many times,
+but each run takes 2h and I only have access to the
+machine for a few hours at a time.
 
-Thank you,
-BALATON Zoltan
+Those confidence intervals are generated from only 2 runs per benchmark,
+which explains why they're so large.
 
-> Logs from boots with qemu 3.0 and 3.1 attached.
->
-> Command line:
->
-> /opt/buildbot/qemu-install/v3.0/bin/qemu-system-arm \
-> 	-M raspi2 -kernel arch/arm/boot/zImage -no-reboot \
-> 	-snapshot -drive=20
-> file=3Dcore-image-minimal-qemuarm.ext3,format=3Draw,if=3Dsd \
-> 	--append 'earlycon=3Dpl011,0x3f201000 root=3D/dev/mmcblk0 rootwait rw=20
-> console=3DttyAMA0 noreboot' \
-> 	-dtb arch/arm/boot/dts/bcm2836-rpi-2-b.dtb \
-> 	-nographic -monitor null -serial stdio
->
-> Guenter
->
+		E.
