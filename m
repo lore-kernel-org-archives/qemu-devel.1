@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSmO2-0004qd-PJ
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:15:35 -0500
+	(envelope-from <groug@kaod.org>) id 1gSmON-0004yv-4Q
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:15:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSmLj-0000J3-N9
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:13:10 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35252)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gSmLj-0000HE-F4
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:13:07 -0500
-Received: by mail-pg1-x543.google.com with SMTP id s198so2778524pgs.2
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 09:13:06 -0800 (PST)
-References: <20181120212553.8480-1-aaron@os.amperecomputing.com>
-	<20181120212553.8480-14-aaron@os.amperecomputing.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d6fde9c7-b72e-ae9d-817b-71c3d6369dbc@linaro.org>
-Date: Fri, 30 Nov 2018 09:13:01 -0800
+	(envelope-from <groug@kaod.org>) id 1gSmJ9-00058g-Mu
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:10:30 -0500
+Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:51225)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gSmJ9-00058H-FL
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:10:27 -0500
+Received: from player792.ha.ovh.net (unknown [10.109.143.216])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id F24B0D5EF9
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 18:10:24 +0100 (CET)
+Date: Fri, 30 Nov 2018 18:10:20 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20181130181020.11a4bcec@bahia.lan>
+In-Reply-To: <CAFEAcA_Z9WqjyikYO9CrvP_sM11NU6F7J0xgEimLzNTN7SKaSQ@mail.gmail.com>
+References: <154356772378.66975.13711686652368325931.stgit@bahia.lan>
+	<cf3f805a-4991-04d6-2cbb-6c1cca8bd238@redhat.com>
+	<20181130174548.247d293c@bahia.lan>
+	<CAFEAcA_Z9WqjyikYO9CrvP_sM11NU6F7J0xgEimLzNTN7SKaSQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20181120212553.8480-14-aaron@os.amperecomputing.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 13/13] target/arm: Send interrupts on
- PMU counter overflow
+Subject: Re: [Qemu-devel] [PATCH for-3.1?] 9p: remove support for the
+ "handle" backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +33,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Lindsay <aaron@os.amperecomputing.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>, SM-Aaron Lindsay <alindsay@os.amperecomputing.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
 
-On 11/20/18 1:26 PM, Aaron Lindsay wrote:
-> Setup a QEMUTimer to get a callback when we expect counters to next
-> overflow and trigger an interrupt at that time.
+On Fri, 30 Nov 2018 17:00:29 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
+
+> On Fri, 30 Nov 2018 at 16:45, Greg Kurz <groug@kaod.org> wrote:
+> >
+> > On Fri, 30 Nov 2018 09:52:18 -0600
+> > Eric Blake <eblake@redhat.com> wrote:
+> >  
+> > > On 11/30/18 2:49 AM, Greg Kurz wrote:  
+> > > > The "handle" fsdev backend was deprecated in QEMU 2.12.0 with:
+> > > >
+> > > > commit db3b3c7281ca82e2647e072a1f97db111313dd73
+> > > > Author: Greg Kurz <groug@kaod.org>
+> > > > Date:   Mon Jan 8 11:18:23 2018 +0100
+> > > >
+> > > >      9pfs: deprecate handle backend  
+> > >  
+> > > > It has passed the two release cooling period without any complaint.
+> > > >
+> > > > Remove it now.
+> > > >
+> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > ---
+> > > >
+> > > > It could have been removed for 3.1.0, but I woke up too late, so moving
+> > > > this to 4.0.
+> > > >
+> > > > ---
+> > > >   fsdev/qemu-fsdev.c    |    3
+> > > >   hw/9pfs/9p-handle.c   |  710 -------------------------------------------------
+> > > >   hw/9pfs/Makefile.objs |    1
+> > > >   qemu-deprecated.texi  |    8 -
+> > > >   qemu-options.hx       |    8 -
+> > > >   5 files changed, 4 insertions(+), 726 deletions(-)
+> > > >   delete mode 100644 hw/9pfs/9p-handle.c  
+> > >
+> > > Well, it certainly doesn't drive -rc4 on its own, but as we may have an
+> > > -rc4 for other reasons, maybe it could still be argued that this is 3.1
+> > > material on the grounds of removing questionable code for less attack
+> > > exposure?
+> > >  
+> >
+> > Makes sense, as this is precisely the reason that led me to
+> > deprecate this in the first place.  
 > 
-> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-> Signed-off-by: Aaron Lindsay <alindsay@os.amperecomputing.com>
-> ---
->  target/arm/cpu.c    |  12 +++++
->  target/arm/cpu.h    |   7 +++
->  target/arm/helper.c | 126 +++++++++++++++++++++++++++++++++++++++++---
->  3 files changed, 139 insertions(+), 6 deletions(-)
+> I would prefer not to have a 700-line patch in rc4, even
+> a negative-diffstat one. If it's not a definite problem
+> then we shouldn't put the change in at this stage in the
+> release process.
 > 
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 208a08e867..7311a48e3c 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -827,6 +827,13 @@ static void arm_cpu_finalizefn(Object *obj)
->          QLIST_REMOVE(hook, node);
->          g_free(hook);
->      }
-> +#ifndef CONFIG_USER_ONLY
-> +    if (arm_feature(&cpu->env, ARM_FEATURE_PMU) && cpu->pmu_timer) {
 
-No need for two tests here.  Just check cpu->pmu_timer.
-(If it's set for any reason it should be freed, surely.)
+I understand, and it's ok for me if this gets merged in 4.0.
 
-> @@ -1305,7 +1338,18 @@ void pmccntr_op_start(CPUARMState *env)
->              eff_cycles /= 64;
->          }
->  
-> -        env->cp15.c15_ccnt = eff_cycles - env->cp15.c15_ccnt_delta;
-> +        uint64_t new_pmccntr = eff_cycles - env->cp15.c15_ccnt_delta;
-> +
-> +        unsigned int overflow_bit = (env->cp15.c9_pmcr & PMCRLC) ? 63 : 31;
-> +        uint64_t overflow_mask = (uint64_t)1 << overflow_bit;
-> +        if (!(new_pmccntr & overflow_mask) &&
-> +                (env->cp15.c15_ccnt & overflow_mask)) {
+Cheers,
 
-Fyi, this expression is
+--
+Greg
 
-    env->cp15.c15_ccnt & ~new_pmccntr & overflow_mask
-
-> +            env->cp15.c9_pmovsr |= (1 << 31);
-> +            new_pmccntr &= ~overflow_mask;
-
-Why this line?  You just checked that overflow_mask was unset in new_pmccntr above.
-
-> @@ -1318,13 +1362,28 @@ void pmccntr_op_start(CPUARMState *env)
->  void pmccntr_op_finish(CPUARMState *env)
->  {
->      if (pmu_counter_enabled(env, 31)) {
-> -        uint64_t prev_cycles = env->cp15.c15_ccnt_delta;
-> +#ifndef CONFIG_USER_ONLY
-> +        uint64_t delta;
-> +        if (env->cp15.c9_pmcr & PMCRLC) {
-> +            delta = UINT64_MAX - env->cp15.c15_ccnt + 1;
-> +        } else {
-> +            delta = UINT32_MAX - (uint32_t)env->cp15.c15_ccnt + 1;
-> +        }
-
-FWIW, this is the same as
-
-    delta = -env->cp15.c15_ccnt;
-    if (!(env->cp15.c9_pmcr & PMCRLC)) {
-        delta = (uint32_t)delta;
-    }
-
-
-r~
+> thanks
+> -- PMM
