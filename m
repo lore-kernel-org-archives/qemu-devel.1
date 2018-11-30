@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gSqgt-0007E2-Cw
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:51:16 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gSqi4-0007qG-6n
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:52:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.ibm.com>) id 1gSqgq-0000Tm-7d
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:51:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53898)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1gSqgp-0000MU-Qf
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:51:12 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wAULhncd112077
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 16:51:09 -0500
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p3cewajh3-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 16:51:09 -0500
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
-	Fri, 30 Nov 2018 21:51:08 -0000
-References: <cover.1543610035.git.alifm@linux.ibm.com>
-	<3130ecca88d5f7d97860c05cf1346164938cb15d.1543610035.git.alifm@linux.ibm.com>
-	<cbd1ca87-b547-5649-7449-2f4de203dfd9@redhat.com>
-From: Farhan Ali <alifm@linux.ibm.com>
-Date: Fri, 30 Nov 2018 16:51:04 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gSqi2-0006Ea-9H
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:52:28 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:43975)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gSqi2-00069c-2G
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:52:26 -0500
+Received: by mail-pg1-x543.google.com with SMTP id v28so3044248pgk.10
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 13:52:25 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 30 Nov 2018 13:52:06 -0800
+Message-Id: <20181130215221.20554-2-richard.henderson@linaro.org>
+In-Reply-To: <20181130215221.20554-1-richard.henderson@linaro.org>
+References: <20181130215221.20554-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <cbd1ca87-b547-5649-7449-2f4de203dfd9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <4337f943-4a18-87f2-b67a-880db4e2e564@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC for 3.1? or 4 v3 1/1] qemu-iotests: Don't run
- the test when user is root
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 01/16] tcg/i386: Always use %ebp for
+ TCG_AREG0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,34 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, kwolf@redhat.com
+To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org
 
+For x86_64, this can remove a REX prefix resulting in smaller code
+when manipulating globals of type i32, as we move them between backing
+store via cpu_env, aka TCG_AREG0.
 
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tcg/i386/tcg-target.h | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-On 11/30/2018 03:52 PM, Eric Blake wrote:
-> On 11/30/18 2:37 PM, Farhan Ali wrote:
->> Test 232 creates image files with read-only permission and
->> expects an error message when trying to access the image
->> files with read-only and auto-read-only turned off.
->>
->> Don't run as root user, since root can open files with read/write
->> access for read-only files.
->>
->> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
->> ---
->> =C2=A0 tests/qemu-iotests/232 | 5 +++++
->> =C2=A0 1 file changed, 5 insertions(+)
->=20
-> Did you mean to keep RFC in the subject line?=C2=A0 Will patchew even s=
-pot it=20
-> without PATCH in the subject line?
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-Thanks for reviewing the patch. I am not sure if patchew will pick it=20
-up; I have no problem in spinning another patch but I will wait till=20
-Monday to see if anyone else has any feedback.
-
-Thanks
-Farhan
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 9fdf37f23c..7488c3d869 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -84,6 +84,8 @@ typedef enum {
+     TCG_REG_RBP = TCG_REG_EBP,
+     TCG_REG_RSI = TCG_REG_ESI,
+     TCG_REG_RDI = TCG_REG_EDI,
++
++    TCG_AREG0 = TCG_REG_EBP,
+ } TCGReg;
+ 
+ /* used for function call generation */
+@@ -194,12 +196,6 @@ extern bool have_avx2;
+ #define TCG_TARGET_extract_i64_valid(ofs, len) \
+     (((ofs) == 8 && (len) == 8) || ((ofs) + (len)) == 32)
+ 
+-#if TCG_TARGET_REG_BITS == 64
+-# define TCG_AREG0 TCG_REG_R14
+-#else
+-# define TCG_AREG0 TCG_REG_EBP
+-#endif
+-
+ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+ {
+ }
+-- 
+2.17.2
