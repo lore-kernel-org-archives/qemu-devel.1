@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gSoyG-0001cp-Ef
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:01:07 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gSqb9-0004So-OZ
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:45:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gSoyA-00009U-84
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:01:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50894)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gSqb6-0003Vk-J7
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:45:19 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35513)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gSoy9-0008QA-04
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:00:57 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gSoy3-0008Co-Vn
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 20:00:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ED8662E8031
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 20:00:51 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Nov 2018 19:51:45 -0000
-From: Jacek Wieczorek <mrjjot@gmail.com>
-Reply-To: Bug 1806114 <1806114@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <154360750589.15722.2632161476309150045.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1806114] [NEW] Reading sectors from floppy with
- BIOS INT 13h is broken
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gSqb6-0003Sa-Ch
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:45:16 -0500
+Received: by mail-wm1-x344.google.com with SMTP id c126so354390wmh.0
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 13:45:16 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 30 Nov 2018 22:45:12 +0100
+Message-Id: <1543614312-54253-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH for-4.0] usb: move
+ ehci_create_ich9_with_companions to hw/i386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,120 +27,166 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-Public bug reported:
+This function is only needed when Q35 is in use.  Moving it to
+the same file that uses it lets you disable the entire USB
+subsystem in x86_64-softmmu.mak; of course doing that will
+cause -usb to break horribly, but one thing at a time.
 
-I'm developing a game bootable from a floppy disk, written in i386
-assembly. I found out it doesn't work on newer QEMU versions. I managed
-to isolate the issue and it seems that there's a problem with handling
-of BIOS interrupt 13h when it comes to reading disk sectors (AH=3D02).
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/i386/pc_q35.c      | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ hw/usb/hcd-ehci-pci.c | 53 -------------------------------------------------
+ include/hw/usb.h      |  2 --
+ 3 files changed, 54 insertions(+), 56 deletions(-)
 
-I've written a simple test in assembly. It simply accesses four
-different floppy disk sectors and prints out the strings they contain.
-The problem is, the two latter strings don't show up at all nor the BIOS
-interrupt returns an error (CF set). I've attached the code to this bug
-report. I use following commands to compile it and run:
-
-$ nasm disk-test.asm -o disk-test.bin
-$ qemu-system-i386 -boot a -fda disk-test.bin
-
-After running, the expected output is:
-
-    I am a test string from boot sector
-    C:H:S 0:0:2 - Hello
-    C:H:S 0:0:3 - there!
-    C:H:S 0:1:4 - In QEMU you can't
-    C:H:S 1:0:5 - see these two lines! :(
-
-while the actual output is:
-
-    I am a test string from boot sector
-    C:H:S 0:0:2 - Hello
-    C:H:S 0:0:3 - there!
-
-
-So far, I found this problem in the current QEMU version for Ubuntu 18.04 (=
-Debian 1:2.11+dfsg-1ubuntu7.8), as well as in the 3.1.0-rc3 and 2.12.1 vers=
-ions, available on the www.qemu.org website. Thus, the issue doesn't seem t=
-o be very recent.
-
-To be sure, I ran the program on my other machine with older QEMU
-version (Debian 2.0.0+dfsg-2ubuntu1.43) and on my RaspberryPi 2 (Debian
-1.1.2+dfsg-6+deb7u25) and everything works as expected there. It also
-works well in VirtualBox.
-
-I hope these information are useful to you, however, I feel like this
-bug may be more related to Seabios. If so, please let me know and I will
-report it somewhere else.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: bios disk floppy interrupt
-
-** Attachment added: "disk-test.asm"
-   https://bugs.launchpad.net/bugs/1806114/+attachment/5217760/+files/disk-=
-test.asm
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1806114
-
-Title:
-  Reading sectors from floppy with BIOS INT 13h is broken
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm developing a game bootable from a floppy disk, written in i386
-  assembly. I found out it doesn't work on newer QEMU versions. I
-  managed to isolate the issue and it seems that there's a problem with
-  handling of BIOS interrupt 13h when it comes to reading disk sectors
-  (AH=3D02).
-
-  I've written a simple test in assembly. It simply accesses four
-  different floppy disk sectors and prints out the strings they contain.
-  The problem is, the two latter strings don't show up at all nor the
-  BIOS interrupt returns an error (CF set). I've attached the code to
-  this bug report. I use following commands to compile it and run:
-
-  $ nasm disk-test.asm -o disk-test.bin
-  $ qemu-system-i386 -boot a -fda disk-test.bin
-
-  After running, the expected output is:
-
-      I am a test string from boot sector
-      C:H:S 0:0:2 - Hello
-      C:H:S 0:0:3 - there!
-      C:H:S 0:1:4 - In QEMU you can't
-      C:H:S 1:0:5 - see these two lines! :(
-
-  while the actual output is:
-
-      I am a test string from boot sector
-      C:H:S 0:0:2 - Hello
-      C:H:S 0:0:3 - there!
-
-  =
-
-  So far, I found this problem in the current QEMU version for Ubuntu 18.04=
- (Debian 1:2.11+dfsg-1ubuntu7.8), as well as in the 3.1.0-rc3 and 2.12.1 ve=
-rsions, available on the www.qemu.org website. Thus, the issue doesn't seem=
- to be very recent.
-
-  To be sure, I ran the program on my other machine with older QEMU
-  version (Debian 2.0.0+dfsg-2ubuntu1.43) and on my RaspberryPi 2
-  (Debian 1.1.2+dfsg-6+deb7u25) and everything works as expected there.
-  It also works well in VirtualBox.
-
-  I hope these information are useful to you, however, I feel like this
-  bug may be more related to Seabios. If so, please let me know and I
-  will report it somewhere else.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1806114/+subscriptions
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index ce38129..d2c80c9 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -58,6 +58,59 @@
+ /* ICH9 AHCI has 6 ports */
+ #define MAX_SATA_PORTS     6
+ 
++struct ehci_companions {
++    const char *name;
++    int func;
++    int port;
++};
++
++static const struct ehci_companions ich9_1d[] = {
++    { .name = "ich9-usb-uhci1", .func = 0, .port = 0 },
++    { .name = "ich9-usb-uhci2", .func = 1, .port = 2 },
++    { .name = "ich9-usb-uhci3", .func = 2, .port = 4 },
++};
++
++static const struct ehci_companions ich9_1a[] = {
++    { .name = "ich9-usb-uhci4", .func = 0, .port = 0 },
++    { .name = "ich9-usb-uhci5", .func = 1, .port = 2 },
++    { .name = "ich9-usb-uhci6", .func = 2, .port = 4 },
++};
++
++static int ehci_create_ich9_with_companions(PCIBus *bus, int slot)
++{
++    const struct ehci_companions *comp;
++    PCIDevice *ehci, *uhci;
++    BusState *usbbus;
++    const char *name;
++    int i;
++
++    switch (slot) {
++    case 0x1d:
++        name = "ich9-usb-ehci1";
++        comp = ich9_1d;
++        break;
++    case 0x1a:
++        name = "ich9-usb-ehci2";
++        comp = ich9_1a;
++        break;
++    default:
++        return -1;
++    }
++
++    ehci = pci_create_multifunction(bus, PCI_DEVFN(slot, 7), true, name);
++    qdev_init_nofail(&ehci->qdev);
++    usbbus = QLIST_FIRST(&ehci->qdev.child_bus);
++
++    for (i = 0; i < 3; i++) {
++        uhci = pci_create_multifunction(bus, PCI_DEVFN(slot, comp[i].func),
++                                        true, comp[i].name);
++        qdev_prop_set_string(&uhci->qdev, "masterbus", usbbus->name);
++        qdev_prop_set_uint32(&uhci->qdev, "firstport", comp[i].port);
++        qdev_init_nofail(&uhci->qdev);
++    }
++    return 0;
++}
++
+ /* PC hardware initialisation */
+ static void pc_q35_init(MachineState *machine)
+ {
+@@ -257,7 +310,7 @@ static void pc_q35_init(MachineState *machine)
+         idebus[0] = idebus[1] = NULL;
+     }
+ 
+-    if (0 && machine_usb(machine)) {
++    if (machine_usb(machine)) {
+         /* Should we create 6 UHCI according to ich9 spec? */
+         ehci_create_ich9_with_companions(host_bus, 0x1d);
+     }
+diff --git a/hw/usb/hcd-ehci-pci.c b/hw/usb/hcd-ehci-pci.c
+index 8c0fc53..69abbf7 100644
+--- a/hw/usb/hcd-ehci-pci.c
++++ b/hw/usb/hcd-ehci-pci.c
+@@ -230,56 +230,3 @@ static void ehci_pci_register_types(void)
+ }
+ 
+ type_init(ehci_pci_register_types)
+-
+-struct ehci_companions {
+-    const char *name;
+-    int func;
+-    int port;
+-};
+-
+-static const struct ehci_companions ich9_1d[] = {
+-    { .name = "ich9-usb-uhci1", .func = 0, .port = 0 },
+-    { .name = "ich9-usb-uhci2", .func = 1, .port = 2 },
+-    { .name = "ich9-usb-uhci3", .func = 2, .port = 4 },
+-};
+-
+-static const struct ehci_companions ich9_1a[] = {
+-    { .name = "ich9-usb-uhci4", .func = 0, .port = 0 },
+-    { .name = "ich9-usb-uhci5", .func = 1, .port = 2 },
+-    { .name = "ich9-usb-uhci6", .func = 2, .port = 4 },
+-};
+-
+-int ehci_create_ich9_with_companions(PCIBus *bus, int slot)
+-{
+-    const struct ehci_companions *comp;
+-    PCIDevice *ehci, *uhci;
+-    BusState *usbbus;
+-    const char *name;
+-    int i;
+-
+-    switch (slot) {
+-    case 0x1d:
+-        name = "ich9-usb-ehci1";
+-        comp = ich9_1d;
+-        break;
+-    case 0x1a:
+-        name = "ich9-usb-ehci2";
+-        comp = ich9_1a;
+-        break;
+-    default:
+-        return -1;
+-    }
+-
+-    ehci = pci_create_multifunction(bus, PCI_DEVFN(slot, 7), true, name);
+-    qdev_init_nofail(&ehci->qdev);
+-    usbbus = QLIST_FIRST(&ehci->qdev.child_bus);
+-
+-    for (i = 0; i < 3; i++) {
+-        uhci = pci_create_multifunction(bus, PCI_DEVFN(slot, comp[i].func),
+-                                        true, comp[i].name);
+-        qdev_prop_set_string(&uhci->qdev, "masterbus", usbbus->name);
+-        qdev_prop_set_uint32(&uhci->qdev, "firstport", comp[i].port);
+-        qdev_init_nofail(&uhci->qdev);
+-    }
+-    return 0;
+-}
+diff --git a/include/hw/usb.h b/include/hw/usb.h
+index a5080ad..4961405 100644
+--- a/include/hw/usb.h
++++ b/include/hw/usb.h
+@@ -593,8 +593,6 @@ const char *usb_device_get_product_desc(USBDevice *dev);
+ 
+ const USBDesc *usb_device_get_usb_desc(USBDevice *dev);
+ 
+-int ehci_create_ich9_with_companions(PCIBus *bus, int slot);
+-
+ /* quirks.c */
+ 
+ /* In bulk endpoints are streaming data sources (iow behave like isoc eps) */
+-- 
+1.8.3.1
