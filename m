@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gSfeW-0006qT-OL
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:04:05 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gSffj-0007gn-IX
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:05:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gSfeU-0007tt-N8
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:04:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44262)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gSfeS-0007hu-W0
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:04:02 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A926130BCD9D
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 10:03:59 +0000 (UTC)
-References: <20181129180050.17797-1-pbonzini@redhat.com>
-	<8fcdeb08-d87c-a236-de94-f5129aa3b99b@redhat.com>
-	<20181130095830.GD8101@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d2c9486a-e05b-b62e-d9d1-65a2b022c4d2@redhat.com>
-Date: Fri, 30 Nov 2018 11:03:54 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181130095830.GD8101@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gSffi-0000Tv-99
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:05:19 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 30 Nov 2018 10:04:57 +0000
+Message-ID: <9e19d16b-b1a3-30cf-3687-620e22ce1fb9@virtuozzo.com>
+References: <1bc34791-6ae3-cbcd-222f-468b89205f64@virtuozzo.com>
+	<50b00028-9f75-743b-cdec-58cd367a268a@virtuozzo.com>
+	<20181127160841.GJ18381@redhat.com>
+	<22fee90b-8144-212e-ad19-94480491f05b@virtuozzo.com>
+	<20181130094847.GB8101@redhat.com>
+In-Reply-To: <20181130094847.GB8101@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] glib-compat: work around g_test_message
- bug with subprocess tests
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6A8A4BFB2C30054CAB457C16AC6920C1@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] encrypt in threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 30/11/18 10:58, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Nov 30, 2018 at 01:08:29AM +0100, Paolo Bonzini wrote:
->> On 29/11/18 19:00, Paolo Bonzini wrote:
->>> Subprocesses are created by glib without leaving the file descriptors
->>> open.  Therefore, g_test_message (and assertion failures, but those
->>> trigger when things are going bad anyway) will think that it is writi=
-ng
->>> to the log file descriptor, but while actually stomping on the QMP
->>> file descriptor or similar.  This causes spurious failures, which are
->>> as nice to debug as the reader can imagine.  While I have opened a
->>> pull request on GLib, this will probably take a while to propagate
->>> to distros.
->>>
->>> I found this while working on qgraph, but the fix is generic.
->>
->> This is not a problem anymore if we switch from gtester to tap.  Do we
->> want it fixed anyway or not?
->=20
-> IMHO the change to tap is not really something  we shoudl be doing
-> at this point in the release cycle.
-
-Of course---I wasn't suggesting that, the TAP switch is for 4.0.
-However, this fix is not needed for 3.1 as far as I know, and we're
-pretty late in 3.1's rc period too.
-
-Paolo
-
-> So I'd favour taking this fix
-> for 3.1, even if it becomes redundant when we switch to tap in 4.0
+MzAuMTEuMjAxOCAxMjo0OCwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4gT24gVGh1LCBO
+b3YgMjksIDIwMTggYXQgMDY6Mjg6NDRQTSArMDAwMCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2
+c2tpeSB3cm90ZToNCj4+DQo+PiBPbiAyNy4xMS4yMDE4IDE2OjA4LCBEYW5pZWwgUC4gQmVycmFu
+Z8OpIHdyb3RlOg0KPj4+IE9uIFRodSwgTm92IDIyLCAyMDE4IGF0IDAxOjAxOjIwUE0gKzAwMDAs
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4+IDIxLjExLjIwMTggMjA6
+MzAsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4+PiBIaSBEYW5pZWwh
+DQo+Pj4+Pg0KPj4+Pj4gQWZ0ZXIgbW92aW5nIGNvbXByZXNzaW9uIHRvIHRocmVhZHMgaW4gUWNv
+dzIgaXQncyBhbiBvYnZpb3VzIG5leHQgc3RlcCB0bw0KPj4+Pj4gInRocmVhZHlmeSIgZW5jcnlw
+dGlvbiBpbiBRY293MiB0b28uDQo+Pj4+Pg0KPj4+Pj4gQnV0IGl0IHR1cm5lZCBvdXQgdG8gYmUg
+bm90IGFzIHNpbXBsZSBhcyBJIGFzc3VtZWQuIElmIEkgY2FsbCBxY3J5cHRvX2Jsb2NrX2VuY3J5
+cHQNCj4+Pj4+IGluIHBhcmFsbGVsIHRocmVhZHMgd2l0aCB0aGUgc2FtZSBmaXJzdCBhcmd1bWVu
+dCAoYmxvY2spLCBpdCBqdXN0IHByb2R1Y2Ugd3JvbmcNCj4+Pj4+IHRoaW5ncyAocGF0dGVybiB2
+ZXJpZmljYXRpb24gZmFpbHMgaW4gaW90ZXN0cykuLg0KPj4+Pj4NCj4+Pj4+IFNvLCBjYW4geW91
+IGFkdmlzZSB0aGUgd2F5IHRvIHBhcmFsbGVsaXplIGVuY3J5cHRpb24vZGVjcnlwdGlvbj8NCj4+
+Pj4+DQo+Pj4+IEhtbSwganVzdCBjcmVhdGluZyBRQ3J5cHRvQmxvY2sgcGVyIGVhY2ggdGhyZWFk
+IGhlbHBlZC4gSXMgaXQgY29ycmVjdCB0aGluZyB0byBkbz8NCj4+PiBUaGF0J3MgcmF0aGVyIGEg
+aGVhdnkgd2VpZ2h0IGFwcHJvYWNoIGFuZCB3b3VsZCBjYXVzZSBwYWluIHdoZW4gd2Ugd2FudA0K
+Pj4+IHRvIHN1cHBvcnQgZnV0dXJlIG9wdGlvbnMgc3VjaCBhcyBrZXlzbG90IHVwZGF0ZXMsIGFu
+ZCBpbiB0aGUgZnV0dXJlLA0KPj4+IExVS1N2MiB3aXRoIG1hc3RlciBrZXkgY2hhbmdlcy4NCj4+
+Pg0KPj4+IFByb2JhYmx5IHdoYXQncyBuZWVkZWQgaXMgY2hhbmdlIHRvIFFDcnlwdG9CbG9jayBz
+dHJ1Y3Qgc28gdGhhdCB0aGVyZQ0KPj4+IGNhbiBiZSBtdWx0aXBsZSBRQ3J5cHRvQ2lwaGVyIGlu
+c3RhbmNlcyBhbGxvY2F0ZWQgLSBvbmUgcGVyIHRocmVhZC4NCj4+Pg0KPj4+IFdlIG1pZ2h0IGFs
+c28gbmVlZCB0byBpbnRyb2R1Y2Ugc29tZSBsb2NraW5nIGFyb3VuZCB1c2FnZSBvZiB0aGUNCj4+
+PiBRQ3J5cHRvSVZHZW4gb2JqZWN0LCBzaW5jZSB0aGF0IGhhcyBhIFFDcnlwdG9DaXBoZXIgaGFu
+ZGxlIHRvby4NCj4+DQo+Pg0KPj4gQ2FuIHdlIGFsc28gY3JlYXRlIFFDcnlwdG9JVkdlbiBwZXIg
+dGhyZWFkLCBhcyBRQ3J5cHRvQ2lwaGVyPyBPciBpdA0KPj4gc2hvdWxkIGJlIG9uZT8gSWYgb25l
+LCB3aHkgbXkgaW1wbGVtZW50YXRpb24gd2l0aCBRQ3J5cHRvQmxvY2sgcGVyDQo+PiB0aHJlYWQg
+d29ya3MgKGF0IGxlYXN0IGl0IHBhc3NlcyBpb3Rlc3RzLCBobW0pDQo+IA0KPiBUaGUgb25seSBJ
+ViBnZW5lcmF0b3IgdGhhdCB1c2VzIGNpcGhlcnMgaXMgdGhlICJlc3NpdiIgb25lLiBFdmVuIHRo
+YXQNCj4gb25lIHVzZXMgdGhlIGNpcGhlciBpbiBFQ0IgbW9kZSwgc28gdGhlcmUgaXMgbm8gaW5p
+dGlhbGl6YXRpb24gdmVjdG9yDQo+IHJlcXVpcmVkIGZvciBpdHMgaW50ZXJuYWwgY2lwaGVyLiBU
+aGlzIG1lYW5zIHRoZXJlJ3Mgbm8gY3JpdGljYWwNCj4gc2hhcmVkIHN0YXRlIHRoYXQgd291bGQg
+YmUgb3ZlcndyaXR0ZW4gYnkgdGhyZWFkcy4gVGh1cyB1c2luZyBhDQo+IHNlcGFyYXRlIFFDcnlw
+dG9DaXBoZXIgcGVyIHRocmVhZCBmb3IgdGhlIGVzc2l2IElWIGdlbiBpcyBvdmVya2lsbC4NCj4g
+Tm9uZSB0aGUgbGVzcyBJIHRoaW5rIHdlIHNob3VsZCBwcm90ZWN0IHRoZSBJViBnZW5lcmF0b3Ig
+Y2FsbHMgd2l0aA0KPiBhIG11dGV4IGp1c3QgdG8gYmUgc2FmZS4gSSBkb24ndCB0aGluayB0aGUg
+bXV0ZXggd291bGQgaGF2ZSBhIG5vdGFibGUNCj4gaW1wYWN0IG9uIHBlcmZvcm1hbmNlIG9mIHRo
+ZSBpdiBnZW5lcmF0b3IuDQoNCkJ1dCBpZiB3ZSB1c2UgbXV0ZXgsIGl0IG1lYW5zIHRoYXQgd2Ug
+Y2FuJ3QgZ2VuZXJhdGUgdHdvIGl2cyBpbiBwYXJhbGxlbCwNCmFuZCB0aGVuLCBpdCBiZWNvbWVz
+IGJldHRlciB0byBoYXZlIHNlcGFyYXRlIGl2LWdlbiBwZXIgdGhyZWFkLCBpbnN0ZWFkDQpvZiBv
+bmx5IG9uZSwgcHJvdGVjdGVkIGJ5IG11dGV4LiAob3IgSSBkb24ndCBmb2xsb3cpDQoNCj4gDQo+
+IFJlZ2FyZHMsDQo+IERhbmllbA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWly
+DQo=
