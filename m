@@ -1,19 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gSiQo-0004UD-Pm
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:02:13 -0500
+	(envelope-from <pmorel@linux.ibm.com>) id 1gSiSb-0007H7-K0
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gSiQa-0005S5-RV
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:02:01 -0500
-From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Fri, 30 Nov 2018 14:00:32 +0100
-Message-Id: <20181130130032.11835-9-sameo@linux.intel.com>
-In-Reply-To: <20181130130032.11835-1-sameo@linux.intel.com>
-References: <20181130130032.11835-1-sameo@linux.intel.com>
+	(envelope-from <pmorel@linux.ibm.com>) id 1gSiSY-0007Yy-FH
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:03:57 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47858
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gSiSY-0007Ya-8M
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:03:54 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wAUD19xm041085
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 08:03:53 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2p33ykmbj0-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 08:03:46 -0500
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Fri, 30 Nov 2018 13:01:49 -0000
+Reply-To: pmorel@linux.ibm.com
+References: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
+	<20181129165530.5bf723fc@oc2783563651>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Fri, 30 Nov 2018 14:01:42 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 8/8] hw: acpi: Remove AcpiRsdpDescriptor and
- fix tests
+In-Reply-To: <20181129165530.5bf723fc@oc2783563651>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <d2ac761b-d936-6da7-9f0a-5cfa3043319d@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] s390x/vfio: VFIO-AP interrupt
+ control interception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,191 +45,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: borntraeger@de.ibm.com, akrowiak@linux.ibm.com, peter.maydell@linaro.org, david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, agraf@suse.de, eric.auger@redhat.com, qemu-s390x@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
-The only remaining AcpiRsdpDescriptor users are the ACPI utils for the
-BIOS table tests.
-We remove that dependency and can thus remove the structure itself.
+On 29/11/2018 16:55, Halil Pasic wrote:
+> On Thu, 22 Nov 2018 17:35:49 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>=20
+>> This series has 3 different type of patches:
+>>
+>> The first two:
+>>    s390x/vfio: ap: Finding the AP bridge
+>>    s390x/vfio: ap: Use the APdevice as a child of the APBus
+>>
+>> Are dealing with the QEMU Object Model and how we retrieve the
+>> AP devices from instruction interception.
+>> A lifting of the AP bridge, bus and device was necessary to
+>> ease the process and allow future extensions.
+>>
+>> The third one is a place holder to ease reviewing:
+>>    s390x/vfio: ap: Linux uapi VFIO place holder
+>>
+>> The last three are really dealing with PQAP/AQIC instruction
+>> interception and associate IOCTL calls to the VFIO AP device
+>> driver.
+>>    s390x/cpumodel: Set up CPU model for AQIC interception
+>>    s390x/vfio: ap: Definition for AP Adapter type
+>>    s390x/vfio: ap: Implementing AP Queue Interrupt Control
+>>
+>> The S390 APQP/AQIC instruction is intercepted by the host
+>> to configure the AP queues interruption redirection.
+>> It retrieves the ISC used by the host and the one used
+>> by the guest and setup the indicator address.
+>>
+>> This patch series
+>> - define the AQIC feature in the cpumodel,
+>> - extend the APDevice type for per card and queue interrupt handling,
+>> - intercept the APQP/AQIC instruction, uses the S390 adapter interface
+>>    to setup the adapter
+>> - and use a VFIO ioctl to let the VFIO-AP driver handle the host
+>>    instruction associated with the intercepted guest instruction.
+>>
+>> This patch serie can be tested with the Linux/KVM patch series
+>> for the VFIO-AP driver: "s390: vfio: ap: Using GISA for AP Interrupt"
+>>
+>=20
+> Sorry for raising concern this late, I hope it's better late than
+> never.
+>=20
+> I have strong doubts that handling PQAP/AQCI via userspace is worth
+> the effort. IMHO we could do what we have to do on AQCI in kernel
+> iff the ap is done SIE interpreted, the appropriate feature is presente=
+d
+> to the guest, and the queue in question belongs to the given guest. Or
+> am I wrong?
+>=20
+> I do understand that doing it like this *may* end up being beneficial
+> *if* we decide to do some sort of ap virtualization in QEMU. But I don'=
+t
+> see it coming in the foreseeable future, and for ap virtualization we
+> would need a solution for making the host do an NQAP and an DQAP on
+> behalf of the guest/emulator, and not only to do the same for PQAP/QCI.
+>=20
+> In my understanding, with this, we would end up with an infrastructure
+> that only makes sense in a perspective of some 'future features' which
+> may never come to existence.
+>=20
+> What I ask for is, please, let us examine the other option.
+>=20
+> Regards,
+> Halil
+>=20
+>=20
 
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
----
- include/hw/acpi/acpi-defs.h | 13 -----------
- tests/acpi-utils.h          |  4 +++-
- tests/acpi-utils.c          | 46 ++++++++++++++++++++++++++++++-------
- tests/bios-tables-test.c    | 21 +++++++++++++----
- tests/vmgenid-test.c        |  8 ++++---
- 5 files changed, 62 insertions(+), 30 deletions(-)
+As we discussed offline, I already began to implement prototypes for=20
+both options.
+This is a clear design choice.
 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 8425ecb8c6..5021cb9e79 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -40,19 +40,6 @@ enum {
-     ACPI_FADT_F_LOW_POWER_S0_IDLE_CAPABLE,
- };
- 
--struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
--    uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
--    uint8_t  checksum;               /* To make sum of struct == 0 */
--    uint8_t  oem_id [6];             /* OEM identification */
--    uint8_t  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
--    uint32_t rsdt_physical_address;  /* 32-bit physical address of RSDT */
--    uint32_t length;                 /* XSDT Length in bytes including hdr */
--    uint64_t xsdt_physical_address;  /* 64-bit physical address of XSDT */
--    uint8_t  extended_checksum;      /* Checksum of entire table */
--    uint8_t  reserved [3];           /* Reserved field must be 0 */
--} QEMU_PACKED;
--typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
--
- typedef struct AcpiRsdpData {
-     uint8_t oem_id[6]; /* OEM identification */
-     uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
-diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
-index ac52abd0dd..4f4899deb5 100644
---- a/tests/acpi-utils.h
-+++ b/tests/acpi-utils.h
-@@ -82,6 +82,8 @@ typedef struct {
- 
- uint8_t acpi_calc_checksum(const uint8_t *data, int len);
- uint32_t acpi_find_rsdp_address(void);
--void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
-+uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table);
-+uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
-+void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table);
- 
- #endif  /* TEST_ACPI_UTILS_H */
-diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
-index 41dc1ea9b4..d07f7487e2 100644
---- a/tests/acpi-utils.c
-+++ b/tests/acpi-utils.c
-@@ -52,14 +52,44 @@ uint32_t acpi_find_rsdp_address(void)
-     return off;
- }
- 
--void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table)
-+uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table)
- {
--    ACPI_READ_FIELD(rsdp_table->signature, addr);
--    ACPI_ASSERT_CMP64(rsdp_table->signature, "RSD PTR ");
-+    uint32_t rsdt_physical_address;
- 
--    ACPI_READ_FIELD(rsdp_table->checksum, addr);
--    ACPI_READ_ARRAY(rsdp_table->oem_id, addr);
--    ACPI_READ_FIELD(rsdp_table->revision, addr);
--    ACPI_READ_FIELD(rsdp_table->rsdt_physical_address, addr);
--    ACPI_READ_FIELD(rsdp_table->length, addr);
-+    memcpy(&rsdt_physical_address, &rsdp_table[16 /* RsdtAddress offset */], 4);
-+    return le32_to_cpu(rsdt_physical_address);
-+}
-+
-+uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
-+{
-+    uint64_t xsdt_physical_address;
-+    uint8_t revision = rsdp_table[15 /* Revision offset */];
-+
-+    /* We must have revision 2 if we're looking for an XSDT pointer */
-+    g_assert(revision == 2);
-+
-+    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
-+    return le64_to_cpu(xsdt_physical_address);
-+}
-+
-+void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table)
-+{
-+    uint8_t revision;
-+
-+    /* Read mandatory revision 0 table data (20 bytes) first */
-+    memread(addr, rsdp_table, 20);
-+    revision = rsdp_table[15 /* Revision offset */];
-+
-+    switch (revision) {
-+    case 0: /* ACPI 1.0 RSDP */
-+        break;
-+    case 2: /* ACPI 2.0+ RSDP */
-+        /* Read the rest of the RSDP table */
-+        memread(addr + 20, rsdp_table + 20, 16);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    ACPI_ASSERT_CMP64(*((uint64_t *)(rsdp_table)), "RSD PTR ");
- }
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index d661d9be62..8749b77b36 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -27,7 +27,7 @@ typedef struct {
-     const char *machine;
-     const char *variant;
-     uint32_t rsdp_addr;
--    AcpiRsdpDescriptor rsdp_table;
-+    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
-     AcpiRsdtDescriptorRev1 rsdt_table;
-     uint32_t dsdt_addr;
-     uint32_t facs_addr;
-@@ -85,19 +85,30 @@ static void test_acpi_rsdp_address(test_data *data)
- 
- static void test_acpi_rsdp_table(test_data *data)
- {
--    AcpiRsdpDescriptor *rsdp_table = &data->rsdp_table;
-+    uint8_t *rsdp_table = data->rsdp_table, revision;
-     uint32_t addr = data->rsdp_addr;
- 
-     acpi_parse_rsdp_table(addr, rsdp_table);
-+    revision = rsdp_table[15 /* Revision offset */];
- 
--    /* rsdp checksum is not for the whole table, but for the first 20 bytes */
--    g_assert(!acpi_calc_checksum((uint8_t *)rsdp_table, 20));
-+    switch (revision) {
-+    case 0: /* ACPI 1.0 RSDP */
-+        /* With rev 1, checksum is only for the first 20 bytes */
-+        g_assert(!acpi_calc_checksum(rsdp_table,  20));
-+        break;
-+    case 2: /* ACPI 2.0+ RSDP */
-+        /* With revision 2, we have 2 checksums */
-+        g_assert(!acpi_calc_checksum(rsdp_table, 20));
-+        g_assert(!acpi_calc_checksum(rsdp_table, 36));
-+    default:
-+        g_assert_not_reached();
-+    }
- }
- 
- static void test_acpi_rsdt_table(test_data *data)
- {
-     AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
--    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
-+    uint32_t addr = acpi_get_rsdt_address(data->rsdp_table);
-     uint32_t *tables;
-     int tables_nr;
-     uint8_t checksum;
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index 0a6fb55f2e..97219ae86c 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -35,7 +35,7 @@ static uint32_t acpi_find_vgia(void)
- {
-     uint32_t rsdp_offset;
-     uint32_t guid_offset = 0;
--    AcpiRsdpDescriptor rsdp_table;
-+    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
-     uint32_t rsdt, rsdt_table_length;
-     AcpiRsdtDescriptorRev1 rsdt_table;
-     size_t tables_nr;
-@@ -52,9 +52,11 @@ static uint32_t acpi_find_vgia(void)
- 
-     g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
- 
--    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
-+    acpi_parse_rsdp_table(rsdp_offset, rsdp_table);
-+
-+    rsdt = acpi_get_rsdt_address(rsdp_table);
-+    g_assert(rsdt);
- 
--    rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
-     /* read the header */
-     ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-     ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
--- 
-2.19.2
+If we examine the pro and contra, I can list:
+
+1- Pro kernel implementation of the PQAP/AQIC
+-> rapidity of the reaction
+
+Question: is this important?
+Answer: NO,
+Why: The PQAP/AQIC is rarely used by the AP driver of the guest.=20
+exclusively during RESET of the AP queue.
+I do not think we need a rapid reaction there.
+
+
+2- Pro userland implementation of PQAP/AQIC
+-> standard implementation, already used by PCI, CCW
+
+Question: is it important?
+Answer: YES
+Why:  like following the standard
+It is easily extend-able to other virtualization implementation like=20
+interception based VFIO and emulation
+
+
+There is no implementation which would be really more complicated as the=20
+other, for both we will need to introduce new pro APQN (queue)=20
+structures to hold the interrupt information (ISC, NIB), for both we=20
+will need to ping the NIB in memory.
+
+So as long as there are no other opinion against the design I presented=20
+here I will continue this way while considering the comments I got on=20
+this series.
+
+Regards,
+Pierre
+
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
