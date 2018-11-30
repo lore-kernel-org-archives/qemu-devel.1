@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSpJu-0005j9-4Q
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:23:26 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSpNE-0006p3-0W
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSpJp-0001gA-R4
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:23:25 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSpND-0003iw-5H
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:26:51 -0500
 References: <20181130151712.2312-1-peter.maydell@linaro.org>
-	<20181130151712.2312-5-peter.maydell@linaro.org>
+	<20181130151712.2312-6-peter.maydell@linaro.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <df2fa1f0-c4e7-3bba-2572-9016c82165c0@redhat.com>
-Date: Fri, 30 Nov 2018 14:22:47 -0600
+Message-ID: <9c7c7dd4-5243-b64a-f406-e196dcf1a60c@redhat.com>
+Date: Fri, 30 Nov 2018 14:26:40 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181130151712.2312-5-peter.maydell@linaro.org>
+In-Reply-To: <20181130151712.2312-6-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/10] hw/pci/pci.c: Don't use load_image()
+Subject: Re: [Qemu-devel] [PATCH 05/10] hw/i386/pc.c: Don't use load_image()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +30,51 @@ Cc: patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P . Berra
 On 11/30/18 9:17 AM, Peter Maydell wrote:
 > The load_image() function is deprecated, as it does not let the
 > caller specify how large the buffer to read the file into is.
-> Instead use load_image_size().
-
-Commit message should mention the addition of error checking.
-
+> Use the glib g_file_get_contents() function instead, which does
+> the whole "allocate memory for the file and read it in" operation.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->   hw/pci/pci.c | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
+>   hw/i386/pc.c | 22 ++++++++++++----------
+>   1 file changed, 12 insertions(+), 10 deletions(-)
 > 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 56b13b3320e..efb5ce196ff 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -2261,7 +2261,11 @@ static void pci_add_option_rom(PCIDevice *pdev, bool is_default_rom,
->       pdev->has_rom = true;
->       memory_region_init_rom(&pdev->rom, OBJECT(pdev), name, size, &error_fatal);
->       ptr = memory_region_get_ram_ptr(&pdev->rom);
-> -    load_image(path, ptr);
-> +    if (load_image_size(path, ptr, size) < 0) {
-> +        error_setg(errp, "failed to load romfile \"%s\"", pdev->romfile);
-> +        g_free(path);
-> +        return;
-> +    }
->       g_free(path);
 
-But the code change itself is fine:
+> +++ b/hw/i386/pc.c
+> @@ -839,10 +839,9 @@ static void load_linux(PCMachineState *pcms,
+>   {
+>       uint16_t protocol;
+>       int setup_size, kernel_size, cmdline_size;
+> -    int64_t initrd_size = 0;
+>       int dtb_size, setup_data_offset;
+>       uint32_t initrd_max;
+> -    uint8_t header[8192], *setup, *kernel, *initrd_data;
+> +    uint8_t header[8192], *setup, *kernel;
+
+Unrelated - but 'header' at 8k is larger than I like for an auto 
+variable.  Some OSs put guard pages at only 4k granularity, so this much 
+stack allocation can miss stack overflow.
+
+
+> -        initrd_size = get_image_size(initrd_filename);
+> -        if (initrd_size < 0) {
+> +        if (!g_file_get_contents(initrd_filename, &initrd_data,
+> +                                 &initrd_size, &gerr)) {
+>               fprintf(stderr, "qemu: error reading initrd %s: %s\n",
+> -                    initrd_filename, strerror(errno));
+> +                    initrd_filename, gerr->message);
+>               exit(1);
+> -        } else if (initrd_size >= initrd_max) {
+> +        }
+> +        if (initrd_size >= initrd_max) {
+>               fprintf(stderr, "qemu: initrd is too large, cannot support."
+> -                    "(max: %"PRIu32", need %"PRId64")\n", initrd_max, initrd_size);
+> +                    "(max: %"PRIu32", need %"PRId64")\n",
+> +                    initrd_max, initrd_size);
+>               exit(1);
+
+You're exiting anyway, so it doesn't matter, but free'ing initrd_data 
+might satisfy a lint-checker.
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
