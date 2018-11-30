@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSqi4-0007qG-6n
+	(envelope-from <richard.henderson@linaro.org>) id 1gSqi4-0007qB-4n
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:52:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSqi2-0006Ea-9H
+	(envelope-from <richard.henderson@linaro.org>) id 1gSqi0-00068a-VE
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:52:28 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:43975)
+Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:44623)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gSqi2-00069c-2G
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:52:26 -0500
-Received: by mail-pg1-x543.google.com with SMTP id v28so3044248pgk.10
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 13:52:25 -0800 (PST)
+	id 1gSqi0-00063z-Nh
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:52:24 -0500
+Received: by mail-pg1-x533.google.com with SMTP id t13so3035959pgr.11
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 13:52:24 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 30 Nov 2018 13:52:06 -0800
-Message-Id: <20181130215221.20554-2-richard.henderson@linaro.org>
-In-Reply-To: <20181130215221.20554-1-richard.henderson@linaro.org>
-References: <20181130215221.20554-1-richard.henderson@linaro.org>
+Date: Fri, 30 Nov 2018 13:52:05 -0800
+Message-Id: <20181130215221.20554-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 01/16] tcg/i386: Always use %ebp for
- TCG_AREG0
+Subject: [Qemu-devel] [PATCH v3 00/16] tcg: Assorted cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +30,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org
 
-For x86_64, this can remove a REX prefix resulting in smaller code
-when manipulating globals of type i32, as we move them between backing
-store via cpu_env, aka TCG_AREG0.
+In review of v2, Alex asked for patch 3 to be broken apart.
+Here, patches 3-16 are that breakup.  I've omitted the rest
+of the v2 patchset for now; I have yet to make substantive
+changes to those.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/i386/tcg-target.h | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 9fdf37f23c..7488c3d869 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -84,6 +84,8 @@ typedef enum {
-     TCG_REG_RBP = TCG_REG_EBP,
-     TCG_REG_RSI = TCG_REG_ESI,
-     TCG_REG_RDI = TCG_REG_EDI,
-+
-+    TCG_AREG0 = TCG_REG_EBP,
- } TCGReg;
- 
- /* used for function call generation */
-@@ -194,12 +196,6 @@ extern bool have_avx2;
- #define TCG_TARGET_extract_i64_valid(ofs, len) \
-     (((ofs) == 8 && (len) == 8) || ((ofs) + (len)) == 32)
- 
--#if TCG_TARGET_REG_BITS == 64
--# define TCG_AREG0 TCG_REG_R14
--#else
--# define TCG_AREG0 TCG_REG_EBP
--#endif
--
- static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
- {
- }
+r~
+
+
+Richard Henderson (16):
+  tcg/i386: Always use %ebp for TCG_AREG0
+  tcg/i386: Move TCG_REG_CALL_STACK from define to enum
+  tcg/aarch64: Remove reloc_pc26_atomic
+  tcg/aarch64: Fold away "noaddr" branch routines
+  tcg/arm: Remove reloc_pc24_atomic
+  tcg/arm: Fold away "noaddr" branch routines
+  tcg/ppc: Fold away "noaddr" branch routines
+  tcg/s390: Remove retranslation code
+  tcg/sparc: Remove retranslation code
+  tcg/mips: Remove retranslation code
+  tcg: Return success from patch_reloc
+  tcg/i386: Return false on failure from patch_reloc
+  tcg/aarch64: Return false on failure from patch_reloc
+  tcg/arm: Return false on failure from patch_reloc
+  tcg/ppc: Return false on failure from patch_reloc
+  tcg/s390x: Return false on failure from patch_reloc
+
+ tcg/i386/tcg-target.h        | 10 ++----
+ tcg/aarch64/tcg-target.inc.c | 69 ++++++++++++------------------------
+ tcg/arm/tcg-target.inc.c     | 55 +++++++++++-----------------
+ tcg/i386/tcg-target.inc.c    |  7 ++--
+ tcg/mips/tcg-target.inc.c    | 10 ++----
+ tcg/ppc/tcg-target.inc.c     | 60 +++++++++++++++----------------
+ tcg/s390/tcg-target.inc.c    | 45 +++++++++++++----------
+ tcg/sparc/tcg-target.inc.c   | 13 +++----
+ tcg/tcg.c                    |  8 +++--
+ tcg/tci/tcg-target.inc.c     |  3 +-
+ 10 files changed, 122 insertions(+), 158 deletions(-)
+
 -- 
 2.17.2
