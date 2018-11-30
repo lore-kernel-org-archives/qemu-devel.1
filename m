@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gSnJ8-0004S8-TF
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:14:31 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gSnNi-0007Qn-64
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:19:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gSnJ8-0003Ax-3L
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:14:30 -0500
-Date: Fri, 30 Nov 2018 16:14:15 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181130181415.GN18284@habkost.net>
-References: <20181123091729.29921-1-luc.michel@greensocs.com>
-	<20181123091729.29921-2-luc.michel@greensocs.com>
-	<20181123181059.GN18284@habkost.net>
-	<65d3a572-9a80-f332-1f88-69e43e8a3663@redhat.com>
-	<20181126132731.GJ18284@habkost.net>
-	<CAFEAcA8D7ZjO059Sgrx-4i0iT+V3gxT4f=DvdmUAJS7KomtyOg@mail.gmail.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gSnNd-0007OC-Ex
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:19:14 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33379)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gSnNc-0007MD-TU
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 13:19:09 -0500
+Received: by mail-pg1-x542.google.com with SMTP id z11so2853437pgu.0
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 10:19:08 -0800 (PST)
+References: <20181120212553.8480-1-aaron@os.amperecomputing.com>
+	<20181120212553.8480-14-aaron@os.amperecomputing.com>
+	<d6fde9c7-b72e-ae9d-817b-71c3d6369dbc@linaro.org>
+	<20181130175629.GB24714@quinoa.localdomain>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <fb2e45b2-463d-aefe-e3d7-f3027f662c12@linaro.org>
+Date: Fri, 30 Nov 2018 10:19:03 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8D7ZjO059Sgrx-4i0iT+V3gxT4f=DvdmUAJS7KomtyOg@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
+In-Reply-To: <20181130175629.GB24714@quinoa.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 13/13] target/arm: Send interrupts on
+ PMU counter overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +34,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Luc Michel <luc.michel@greensocs.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
+To: Aaron Lindsay <aaron@os.amperecomputing.com>
+Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <alindsay@codeaurora.org>, SM-Aaron Lindsay <alindsay@os.amperecomputing.com>
 
-On Fri, Nov 30, 2018 at 04:52:31PM +0000, Peter Maydell wrote:
-> On Mon, 26 Nov 2018 at 13:27, Eduardo Habkost <ehabkost@redhat.com> wro=
-te:
-> >
-> > On Sun, Nov 25, 2018 at 10:27:04PM +0100, Philippe Mathieu-Daud=E9 wr=
-ote:
-> > > Hi Eduardo,
-> > >
-> > > On 23/11/18 19:10, Eduardo Habkost wrote:
-> > > > If you really want to do this and assign cluster_id
-> > > > automatically, please do it on realize, where it won't have
-> > > > unexpected side-effects after a simple `qom-list-properties` QMP
-> > > > command.
-> > >
-> > > This looks clean enough to me.
-> > > Do you prefer we don't use static auto_increment at all?
-> >
-> > I would prefer to avoid the static variable if possible, but I
-> > won't reject it if the alternatives make the API too complex to
-> > use.
->=20
-> I guess the alternative would be to require the cluster ID
-> to be a QOM property on the cluster object. Usage would then
-> be something like
->     object_initialize_child(OBJECT(s), "rpu-cluster", &s->rpu_cluster,
->                             sizeof(s->rpu_cluster), TYPE_CPU_CLUSTER,
->                             &error_abort, NULL);
->     object_property_set_int(OBJECT(s), 1, "cluster-id", &error_abort);
->     qdev_init_nofail(DEVICE(&s->rpu_cluster));
->=20
-> (ie one extra line setting the cluster ID explicitly).
->=20
-> SoC objects can probably reasonably assume that they are
-> the only SoC in the system, ie that they can just assign
-> cluster IDs themselves). If that turns out not to be true
-> we can make the SoC take a property to specify a cluster ID
-> base or something.
->=20
-> I guess if we've been bitten by cpu-ID auto-assignment
-> in the past, starting out with "user picks the cluster ID"
-> would be safer, and it's not too much pain at the callsite.
-> Plus it avoids the gdbstub changing its mind about which
-> order the cluster "processes" appear in if we refactor the
-> board code.
+On 11/30/18 9:56 AM, Aaron Lindsay wrote:
+> On Nov 30 09:13, Richard Henderson wrote:
+>> On 11/20/18 1:26 PM, Aaron Lindsay wrote:
+>>> Setup a QEMUTimer to get a callback when we expect counters to next
+>>> overflow and trigger an interrupt at that time.
+>>>
+>>> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+>>> Signed-off-by: Aaron Lindsay <alindsay@os.amperecomputing.com>
+>>> ---
+>>>  target/arm/cpu.c    |  12 +++++
+>>>  target/arm/cpu.h    |   7 +++
+>>>  target/arm/helper.c | 126 +++++++++++++++++++++++++++++++++++++++++---
+>>>  3 files changed, 139 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+>>> index 208a08e867..7311a48e3c 100644
+>>> --- a/target/arm/cpu.c
+>>> +++ b/target/arm/cpu.c
+>>> @@ -827,6 +827,13 @@ static void arm_cpu_finalizefn(Object *obj)
+>>>          QLIST_REMOVE(hook, node);
+>>>          g_free(hook);
+>>>      }
+>>> +#ifndef CONFIG_USER_ONLY
+>>> +    if (arm_feature(&cpu->env, ARM_FEATURE_PMU) && cpu->pmu_timer) {
+>>
+>> No need for two tests here.  Just check cpu->pmu_timer.
+>> (If it's set for any reason it should be freed, surely.)
+>>
+>>> @@ -1305,7 +1338,18 @@ void pmccntr_op_start(CPUARMState *env)
+>>>              eff_cycles /= 64;
+>>>          }
+>>>  
+>>> -        env->cp15.c15_ccnt = eff_cycles - env->cp15.c15_ccnt_delta;
+>>> +        uint64_t new_pmccntr = eff_cycles - env->cp15.c15_ccnt_delta;
+>>> +
+>>> +        unsigned int overflow_bit = (env->cp15.c9_pmcr & PMCRLC) ? 63 : 31;
+>>> +        uint64_t overflow_mask = (uint64_t)1 << overflow_bit;
+>>> +        if (!(new_pmccntr & overflow_mask) &&
+>>> +                (env->cp15.c15_ccnt & overflow_mask)) {
+>>
+>> Fyi, this expression is
+>>
+>>     env->cp15.c15_ccnt & ~new_pmccntr & overflow_mask
+>>
+>>> +            env->cp15.c9_pmovsr |= (1 << 31);
+>>> +            new_pmccntr &= ~overflow_mask;
+>>
+>> Why this line?  You just checked that overflow_mask was unset in new_pmccntr above.
+> 
+> This ensures that when overflow_bit == 31 (because PMCR.LC is not set)
+> the high 32 bits remain 0 even after an overflow has occurred. As you
+> point out, it's silly when overflow_bit == 64, but I didn't think it was
+> worth the extra conditional to avoid it.
 
-Agreed.
+Eh?  But we've set overflow_mask based on PMCR.LC, so what you say here doesn't
+make sense.
 
->=20
-> > In either case, I'd like to ensure the caveats of the cluster_id
-> > field are clearly documented: no guarantees about ordering or
-> > predictability, making it not appropriate for external
-> > interfaces.
->=20
-> The gdb stub is sort of an external interface, of course...
+> Thanks for your review. I'll take a look at your suggested logic
+> simplifications for v9, do you think that this patch looks OK at the
+> big-picture level?
 
-Right, and it works if you treat it as just an opaque identifier.
-It won't work only if you need it to be stable and/or
-predictable.
+Yes, big picture looks good.
 
-Letting the board set "cluster-id" seems to be safer, and not too
-complex.
 
->=20
-> Luc: what are the requirements on boards using CPU cluster
-> objects? I assume these are both OK:
->  * does not use cluster objects at all
->    (the gdbstub puts all the CPUs in one process?)
->  * all CPUs created are in some CPU cluster
->    (the gdbstub uses one process per CPU cluster)
-> but what about
->  * some CPUs are created in a CPU cluster, but some
->    are "loose", not in any cluster at all
-> ?
-> Is that just invalid, or do the "loose" CPUs end up in
-> a default cluster (gdbstub process), or do they get
-> one cluster each?
->=20
-> If it's invalid (which doesn't seem like a bad idea),
-> is there an assert somewhere so that getting it wrong
-> results in the board failing to start (ie a "make check"
-> failure) ?
-
-I'm having the impression that "cluster" has a very clear meaning
-and purpose in this discussion, but this is not being documented
-anywhere.  Can we clarify at cpu/cluster.c what exactly a cluster
-is, and when it's appropriate (or necessary) to group the CPUs
-into clusters?
-
-Is it really possible describe the meaning of "cluster" in a way
-that doesn't refer to GDB at all?  Is this all about memory
-address spaces?  If this is all about memory address spaces,
-can't the GDB code detect that automatically by looking at the
-address space objects?
-
---=20
-Eduardo
+r~
