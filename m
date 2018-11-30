@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gSkZa-0007S3-CL
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:21 -0500
+	(envelope-from <berto@igalia.com>) id 1gSkZa-0007S1-BY
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gSkZW-0006Va-8Y
+	(envelope-from <berto@igalia.com>) id 1gSkZW-0006WF-CI
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:18 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 30 Nov 2018 17:17:44 +0200
-Message-Id: <8f88f59eee7e9b7882fc4f6d0e6ff57bd8754375.1543590618.git.berto@igalia.com>
+Date: Fri, 30 Nov 2018 17:17:40 +0200
+Message-Id: <3a01a1e6b2d21077f92cb880c9f6600d278b4aed.1543590618.git.berto@igalia.com>
 In-Reply-To: <cover.1543590618.git.berto@igalia.com>
 References: <cover.1543590618.git.berto@igalia.com>
 In-Reply-To: <cover.1543590618.git.berto@igalia.com>
 References: <cover.1543590618.git.berto@igalia.com>
-Subject: [Qemu-devel] [RFC PATCH v2 06/12] block: Handle child references in
- bdrv_reopen_queue()
+Subject: [Qemu-devel] [RFC PATCH v2 02/12] block: Freeze the backing chain
+ for the duration of the commit job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,135 +25,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Children in QMP are specified with BlockdevRef / BlockdevRefOrNull,
-which can contain a set of child options, a child reference, or
-NULL. In optional attributes like "backing" it can also be missing.
-
-Only the first case (set of child options) is being handled properly
-by bdrv_reopen_queue(). This patch deals with all the others.
-
-Here's how these cases should be handled when bdrv_reopen_queue() is
-deciding what to do with each child of a BlockDriverState:
-
-   1) Set of child options: the options are removed from the parent's
-      options QDict and are passed to the child with a recursive
-      bdrv_reopen_queue() call. This case was already working fine.
-
-   2) Child reference: there's two possibilites here.
-
-      2a) Reference to the current child: the child is put in the
-          reopen queue, keeping its current set of options (since this
-          was a child reference there was no way to specify a
-          different set of options).
-
-      2b) Reference to a different BDS: the current child is not put
-          in the reopen queue at all. Passing a reference to a
-          different BDS can be used to replace a child, although at
-          the moment no driver implements this, so it results in an
-          error. In any case, the current child is not going to be
-          reopened (and might in fact disappear if it's replaced)
-
-   3) NULL: This is similar to (2b). Although no driver allows this
-      yet it can be used to detach the current child so it should not
-      be put in the reopen queue.
-
-   4) Missing option: at the moment "backing" is the only case where
-      this can happen. With "blockdev-add", leaving "backing" out
-      means that the default backing file is opened. We don't want to
-      open a new image during reopen, so we require that "backing" is
-      always present. We'll relax this requirement a bit in the next
-      patch.
-
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c               | 45 ++++++++++++++++++++++++++++++++++++++-------
- include/block/block.h |  1 +
- 2 files changed, 39 insertions(+), 7 deletions(-)
+ block/commit.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/block.c b/block.c
-index da4e062178..4a2f81b129 100644
---- a/block.c
-+++ b/block.c
-@@ -3032,9 +3032,19 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-     bs_entry->state.perm = UINT64_MAX;
-     bs_entry->state.shared_perm = 0;
+diff --git a/block/commit.c b/block/commit.c
+index 53148e610b..8824d135e0 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -73,6 +73,8 @@ static int commit_prepare(Job *job)
+ {
+     CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
  
-+    /* If keep_old_opts is false then it means that unspecified
-+     * options must be reset to its original value. We don't allow
-+     * resetting 'backing' but we need to know if the option is
-+     * missing in order to decide if we have to return an error. */
-+    if (!keep_old_opts) {
-+        bs_entry->state.backing_missing =
-+            !qdict_haskey(options, "backing") &&
-+            !qdict_haskey(options, "backing.driver");
-+    }
++    bdrv_unfreeze_backing_chain(s->commit_top_bs, s->base_bs);
 +
-     QLIST_FOREACH(child, &bs->children, next) {
--        QDict *new_child_options;
--        char *child_key_dot;
-+        QDict *new_child_options = NULL;
-+        bool child_keep_old = keep_old_opts;
+     /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
+      * the normal backing chain can be restored. */
+     blk_unref(s->base);
+@@ -89,6 +91,8 @@ static void commit_abort(Job *job)
+     CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
+     BlockDriverState *top_bs = blk_bs(s->top);
  
-         /* reopen can only change the options of block devices that were
-          * implicitly created and inherited options. For other (referenced)
-@@ -3043,13 +3053,27 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-             continue;
++    bdrv_unfreeze_backing_chain(s->commit_top_bs, s->base_bs);
++
+     /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
+     bdrv_ref(top_bs);
+     bdrv_ref(s->commit_top_bs);
+@@ -336,6 +340,10 @@ void commit_start(const char *job_id, BlockDriverState *bs,
          }
- 
--        child_key_dot = g_strdup_printf("%s.", child->name);
--        qdict_extract_subqdict(explicit_options, NULL, child_key_dot);
--        qdict_extract_subqdict(options, &new_child_options, child_key_dot);
--        g_free(child_key_dot);
-+        /* Check if the options contain a child reference */
-+        if (qdict_haskey(options, child->name)) {
-+            const char *childref = qdict_get_try_str(options, child->name);
-+            /* The current child must not be reopened if the child
-+             * reference does not point to it. */
-+            if (g_strcmp0(childref, child->bs->node_name)) {
-+                continue;
-+            }
-+            /* If the child reference points to the current child then
-+             * reopen it with its existing set of options. */
-+            child_keep_old = true;
-+        } else {
-+            /* Extract child options ("child-name.*") */
-+            char *child_key_dot = g_strdup_printf("%s.", child->name);
-+            qdict_extract_subqdict(explicit_options, NULL, child_key_dot);
-+            qdict_extract_subqdict(options, &new_child_options, child_key_dot);
-+            g_free(child_key_dot);
-+        }
- 
-         bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options,
--                                child->role, options, flags, keep_old_opts);
-+                                child->role, options, flags, child_keep_old);
      }
  
-     return bs_queue;
-@@ -3306,6 +3330,13 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
- 
-     drv_prepared = true;
- 
-+    if (reopen_state->backing_missing) {
-+        error_setg(errp, "backing is missing for '%s'",
-+                   reopen_state->bs->node_name);
-+        ret = -EINVAL;
-+        goto error;
++    if (bdrv_freeze_backing_chain(commit_top_bs, base, errp) < 0) {
++        goto fail;
 +    }
 +
-     /* Options that are not handled are only okay if they are unchanged
-      * compared to the old state. It is expected that some options are only
-      * used for the initial open, but not reopen (e.g. filename) */
-diff --git a/include/block/block.h b/include/block/block.h
-index a061ef3944..e21616a038 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -187,6 +187,7 @@ typedef struct BDRVReopenState {
-     BlockDriverState *bs;
-     int flags;
-     BlockdevDetectZeroesOptions detect_zeroes;
-+    bool backing_missing;
-     uint64_t perm, shared_perm;
-     QDict *options;
-     QDict *explicit_options;
+     ret = block_job_add_bdrv(&s->common, "base", base, 0, BLK_PERM_ALL, errp);
+     if (ret < 0) {
+         goto fail;
 -- 
 2.11.0
