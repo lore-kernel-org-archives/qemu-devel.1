@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gSjRU-00053I-Io
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 09:06:59 -0500
+	(envelope-from <berrange@redhat.com>) id 1gSjRe-00059j-Bk
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 09:07:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gSjRR-0005N7-CE
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 09:06:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47914)
+	(envelope-from <berrange@redhat.com>) id 1gSjRY-0005Q5-5n
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 09:07:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52902)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gSjRR-0005Mr-3u
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 09:06:49 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gSjRX-0005Pp-U2
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 09:06:56 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7A0DD3154862
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 14:06:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 51DC685541
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 14:06:55 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri, 30 Nov 2018 14:06:09 +0000
-Message-Id: <20181130140615.19937-6-berrange@redhat.com>
+Date: Fri, 30 Nov 2018 14:06:11 +0000
+Message-Id: <20181130140615.19937-8-berrange@redhat.com>
 In-Reply-To: <20181130140615.19937-1-berrange@redhat.com>
 References: <20181130140615.19937-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 05/11] hw/usb: switch MTP to use new inotify
- APIs
+Subject: [Qemu-devel] [PATCH v7 07/11] authz: add QAuthZSimple object type
+ for easy whitelist auth checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,502 +35,403 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 
-The internal inotify APIs allow a lot of conditional statements to be
-cleared out, and provide a simpler callback for handling events.
+In many cases a single VM will just need to whilelist a single identity
+as the allowed user of network services. This is especially the case for
+TLS live migration (optionally with NBD storage) where we just need to
+whitelist the x509 certificate distinguished name of the source QEMU
+host.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Via QMP this can be configured with:
+
+  {
+    "execute": "object-add",
+    "arguments": {
+      "qom-type": "authz-simple",
+      "id": "authz0",
+      "parameters": {
+        "identity": "fred"
+      }
+    }
+  }
+
+Or via the command line
+
+  -object authz-simple,id=3Dauthz0,identity=3Dfred
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- hw/usb/dev-mtp.c    | 271 +++++++++++++++++---------------------------
- hw/usb/trace-events |   2 +-
- 2 files changed, 108 insertions(+), 165 deletions(-)
+ authz/Makefile.objs       |   1 +
+ authz/simple.c            | 115 ++++++++++++++++++++++++++++++++++++++
+ authz/trace-events        |   3 +
+ include/authz/simple.h    |  84 ++++++++++++++++++++++++++++
+ qemu-options.hx           |  24 ++++++++
+ tests/Makefile.include    |   3 +
+ tests/test-authz-simple.c |  50 +++++++++++++++++
+ 7 files changed, 280 insertions(+)
+ create mode 100644 authz/simple.c
+ create mode 100644 include/authz/simple.h
+ create mode 100644 tests/test-authz-simple.c
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index ccbe25820b..b9d03244b8 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -11,17 +11,16 @@
-=20
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qemu/error-report.h"
- #include <wchar.h>
- #include <dirent.h>
-=20
- #include <sys/statvfs.h>
--#ifdef CONFIG_INOTIFY1
--#include <sys/inotify.h>
--#include "qemu/main-loop.h"
--#endif
+diff --git a/authz/Makefile.objs b/authz/Makefile.objs
+index 12597c9528..2a75d53840 100644
+--- a/authz/Makefile.objs
++++ b/authz/Makefile.objs
+@@ -1 +1,2 @@
+ authz-obj-y +=3D base.o
++authz-obj-y +=3D simple.o
+diff --git a/authz/simple.c b/authz/simple.c
+new file mode 100644
+index 0000000000..8ab718803e
+--- /dev/null
++++ b/authz/simple.c
+@@ -0,0 +1,115 @@
++/*
++ * QEMU simple authorization driver
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
++ *
++ */
 +
-=20
- #include "qemu-common.h"
- #include "qemu/iov.h"
-+#include "qemu/filemonitor.h"
- #include "trace.h"
- #include "hw/usb.h"
- #include "desc.h"
-@@ -124,7 +123,6 @@ enum {
-     EP_EVENT,
- };
-=20
--#ifdef CONFIG_INOTIFY1
- typedef struct MTPMonEntry MTPMonEntry;
-=20
- struct MTPMonEntry {
-@@ -133,7 +131,6 @@ struct MTPMonEntry {
-=20
-     QTAILQ_ENTRY(MTPMonEntry) next;
- };
--#endif
-=20
- struct MTPControl {
-     uint16_t     code;
-@@ -162,10 +159,8 @@ struct MTPObject {
-     char         *name;
-     char         *path;
-     struct stat  stat;
--#ifdef CONFIG_INOTIFY1
--    /* inotify watch cookie */
--    int          watchfd;
--#endif
-+    /* file monitor watch id */
-+    int          watchid;
-     MTPObject    *parent;
-     uint32_t     nchildren;
-     QLIST_HEAD(, MTPObject) children;
-@@ -188,11 +183,8 @@ struct MTPState {
-     bool         readonly;
-=20
-     QTAILQ_HEAD(, MTPObject) objects;
--#ifdef CONFIG_INOTIFY1
--    /* inotify descriptor */
--    int          inotifyfd;
-+    QFileMonitor *file_monitor;
-     QTAILQ_HEAD(events, MTPMonEntry) events;
--#endif
-     /* Responder is expecting a write operation */
-     bool write_pending;
-     struct {
-@@ -380,6 +372,7 @@ static MTPObject *usb_mtp_object_alloc(MTPState *s, u=
-int32_t handle,
-         goto ignore;
-     }
-=20
-+    o->watchid =3D -1;
-     o->handle =3D handle;
-     o->parent =3D parent;
-     o->name =3D g_strdup(name);
-@@ -426,6 +419,10 @@ static void usb_mtp_object_free(MTPState *s, MTPObje=
-ct *o)
-=20
-     trace_usb_mtp_object_free(s->dev.addr, o->handle, o->path);
-=20
-+    if (o->watchid !=3D -1 && s->file_monitor) {
-+        qemu_file_monitor_remove_watch(s->file_monitor, o->path, o->watc=
-hid);
++#include "qemu/osdep.h"
++#include "authz/simple.h"
++#include "authz/trace.h"
++#include "qom/object_interfaces.h"
++
++static bool qauthz_simple_is_allowed(QAuthZ *authz,
++                                     const char *identity,
++                                     Error **errp)
++{
++    QAuthZSimple *sauthz =3D QAUTHZ_SIMPLE(authz);
++
++    trace_qauthz_simple_is_allowed(authz, sauthz->identity, identity);
++    return g_str_equal(identity, sauthz->identity);
++}
++
++static void
++qauthz_simple_prop_set_identity(Object *obj,
++                                const char *value,
++                                Error **errp G_GNUC_UNUSED)
++{
++    QAuthZSimple *sauthz =3D QAUTHZ_SIMPLE(obj);
++
++    g_free(sauthz->identity);
++    sauthz->identity =3D g_strdup(value);
++}
++
++
++static char *
++qauthz_simple_prop_get_identity(Object *obj,
++                                Error **errp G_GNUC_UNUSED)
++{
++    QAuthZSimple *sauthz =3D QAUTHZ_SIMPLE(obj);
++
++    return g_strdup(sauthz->identity);
++}
++
++
++static void
++qauthz_simple_finalize(Object *obj)
++{
++    QAuthZSimple *sauthz =3D QAUTHZ_SIMPLE(obj);
++
++    g_free(sauthz->identity);
++}
++
++
++static void
++qauthz_simple_class_init(ObjectClass *oc, void *data)
++{
++    QAuthZClass *authz =3D QAUTHZ_CLASS(oc);
++
++    authz->is_allowed =3D qauthz_simple_is_allowed;
++
++    object_class_property_add_str(oc, "identity",
++                                  qauthz_simple_prop_get_identity,
++                                  qauthz_simple_prop_set_identity,
++                                  NULL);
++}
++
++
++QAuthZSimple *qauthz_simple_new(const char *id,
++                                const char *identity,
++                                Error **errp)
++{
++    return QAUTHZ_SIMPLE(
++        object_new_with_props(TYPE_QAUTHZ_SIMPLE,
++                              object_get_objects_root(),
++                              id, errp,
++                              "identity", identity,
++                              NULL));
++}
++
++
++static const TypeInfo qauthz_simple_info =3D {
++    .parent =3D TYPE_QAUTHZ,
++    .name =3D TYPE_QAUTHZ_SIMPLE,
++    .instance_size =3D sizeof(QAuthZSimple),
++    .instance_finalize =3D qauthz_simple_finalize,
++    .class_size =3D sizeof(QAuthZSimpleClass),
++    .class_init =3D qauthz_simple_class_init,
++    .interfaces =3D (InterfaceInfo[]) {
++        { TYPE_USER_CREATABLE },
++        { }
 +    }
++};
 +
-     QTAILQ_REMOVE(&s->objects, o, next);
-     if (o->parent) {
-         QLIST_REMOVE(o, list);
-@@ -477,6 +474,10 @@ static MTPObject *usb_mtp_object_lookup_name(MTPObje=
-ct *parent,
- {
-     MTPObject *iter;
-=20
-+    if (len =3D=3D -1) {
-+        len =3D strlen(name);
-+    }
 +
-     QLIST_FOREACH(iter, &parent->children, list) {
-         if (strncmp(iter->name, name, len) =3D=3D 0) {
-             return iter;
-@@ -486,13 +487,12 @@ static MTPObject *usb_mtp_object_lookup_name(MTPObj=
-ect *parent,
-     return NULL;
- }
-=20
--#ifdef CONFIG_INOTIFY1
--static MTPObject *usb_mtp_object_lookup_wd(MTPState *s, int wd)
-+static MTPObject *usb_mtp_object_lookup_id(MTPState *s, int id)
- {
-     MTPObject *iter;
-=20
-     QTAILQ_FOREACH(iter, &s->objects, next) {
--        if (iter->watchfd =3D=3D wd) {
-+        if (iter->watchid =3D=3D id) {
-             return iter;
-         }
-     }
-@@ -500,158 +500,99 @@ static MTPObject *usb_mtp_object_lookup_wd(MTPStat=
-e *s, int wd)
-     return NULL;
- }
-=20
--static void inotify_watchfn(void *arg)
-+static void file_monitor_event(int id,
-+                               QFileMonitorEvent ev,
-+                               const char *name,
-+                               void *opaque)
- {
--    MTPState *s =3D arg;
--    ssize_t bytes;
--    /* From the man page: atleast one event can be read */
--    int pos;
--    char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
--
--    for (;;) {
--        bytes =3D read(s->inotifyfd, buf, sizeof(buf));
--        pos =3D 0;
--
--        if (bytes <=3D 0) {
--            /* Better luck next time */
-+    MTPState *s =3D opaque;
-+    MTPObject *parent =3D usb_mtp_object_lookup_id(s, id);
-+    MTPMonEntry *entry =3D NULL;
-+    MTPObject *o;
++static void
++qauthz_simple_register_types(void)
++{
++    type_register_static(&qauthz_simple_info);
++}
 +
-+    if (!parent) {
-+        return;
-+    }
 +
-+    switch (ev) {
-+    case QFILE_MONITOR_EVENT_CREATED:
-+        if (usb_mtp_object_lookup_name(parent, name, -1)) {
-+            /* Duplicate create event */
-             return;
-         }
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D s->next_handle;
-+        entry->event =3D EVT_OBJ_ADDED;
-+        o =3D usb_mtp_add_child(s, parent, name);
-+        if (!o) {
-+            g_free(entry);
-+            return;
-+        }
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, name, "Obj Added")=
++type_init(qauthz_simple_register_types);
+diff --git a/authz/trace-events b/authz/trace-events
+index 481c90f511..1ef796c1e1 100644
+--- a/authz/trace-events
++++ b/authz/trace-events
+@@ -2,3 +2,6 @@
+=20
+ # authz/base.c
+ qauthz_is_allowed(void *authz, const char *identity, bool allowed) "Auth=
+Z %p check identity=3D%s allowed=3D%d"
++
++# auth/simple.c
++qauthz_simple_is_allowed(void *authz, const char *wantidentity, const ch=
+ar *gotidentity) "AuthZ simple %p check want identity=3D%s got identity=3D=
+%s"
+diff --git a/include/authz/simple.h b/include/authz/simple.h
+new file mode 100644
+index 0000000000..4686e7676d
+--- /dev/null
++++ b/include/authz/simple.h
+@@ -0,0 +1,84 @@
++/*
++ * QEMU simple authorization driver
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
++ *
++ */
++
++#ifndef QAUTHZ_SIMPLE_H__
++#define QAUTHZ_SIMPLE_H__
++
++#include "authz/base.h"
++
++#define TYPE_QAUTHZ_SIMPLE "authz-simple"
++
++#define QAUTHZ_SIMPLE_CLASS(klass)                        \
++    OBJECT_CLASS_CHECK(QAuthZSimpleClass, (klass),        \
++                       TYPE_QAUTHZ_SIMPLE)
++#define QAUTHZ_SIMPLE_GET_CLASS(obj)              \
++    OBJECT_GET_CLASS(QAuthZSimpleClass, (obj),    \
++                      TYPE_QAUTHZ_SIMPLE)
++#define QAUTHZ_SIMPLE(obj) \
++    INTERFACE_CHECK(QAuthZSimple, (obj),          \
++                    TYPE_QAUTHZ_SIMPLE)
++
++typedef struct QAuthZSimple QAuthZSimple;
++typedef struct QAuthZSimpleClass QAuthZSimpleClass;
++
++
++/**
++ * QAuthZSimple:
++ *
++ * This authorization driver provides a simple mechanism
++ * for granting access based on an exact matched username.
++ *
++ * To create an instance of this class via QMP:
++ *
++ *  {
++ *    "execute": "object-add",
++ *    "arguments": {
++ *      "qom-type": "authz-simple",
++ *      "id": "authz0",
++ *      "parameters": {
++ *        "identity": "fred"
++ *      }
++ *    }
++ *  }
++ *
++ * Or via the command line
++ *
++ *   -object authz-simple,id=3Dauthz0,identity=3Dfred
++ *
++ */
++struct QAuthZSimple {
++    QAuthZ parent_obj;
++
++    char *identity;
++};
++
++
++struct QAuthZSimpleClass {
++    QAuthZClass parent_class;
++};
++
++
++QAuthZSimple *qauthz_simple_new(const char *id,
++                                const char *identity,
++                                Error **errp);
++
++
++#endif /* QAUTHZ_SIMPLE_H__ */
++
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 269eda7a5d..7732881e7a 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4403,6 +4403,30 @@ e.g to launch a SEV guest
+      .....
+=20
+ @end example
++
++
++@item -object authz-simple,id=3D@var{id},identity=3D@var{string}
++
++Create an authorization object that will control access to network servi=
+ces.
++
++The @option{identity} parameter is identifies the user and its format
++depends on the network service that authorization object is associated
++with. For authorizing based on TLS x509 certificates, the identity must
++be the x509 distinguished name. Note that care must be taken to escape
++any commas in the distinguished name.
++
++An example authorization object to validate a x509 distinguished name
++would look like:
++@example
++ # $QEMU \
++     ...
++     -object 'authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.example.com=
+,,O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DGB' \
++     ...
++@end example
++
++Note the use of quotes due to the x509 distinguished name containing
++whitespace, and escaping of ','.
++
+ @end table
+=20
+ ETEXI
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index e339287021..6dda623607 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -112,6 +112,7 @@ endif
+ check-unit-y +=3D tests/test-timed-average$(EXESUF)
+ check-unit-$(CONFIG_INOTIFY1) +=3D tests/test-util-filemonitor$(EXESUF)
+ check-unit-y +=3D tests/test-util-sockets$(EXESUF)
++check-unit-y +=3D tests/test-authz-simple$(EXESUF)
+ check-unit-y +=3D tests/test-io-task$(EXESUF)
+ check-unit-y +=3D tests/test-io-channel-socket$(EXESUF)
+ check-unit-y +=3D tests/test-io-channel-file$(EXESUF)
+@@ -516,6 +517,7 @@ test-qapi-obj-y =3D tests/test-qapi-visit.o tests/tes=
+t-qapi-types.o \
+ benchmark-crypto-obj-y =3D $(crypto-obj-y) $(test-qom-obj-y)
+ test-crypto-obj-y =3D $(crypto-obj-y) $(test-qom-obj-y)
+ test-io-obj-y =3D $(io-obj-y) $(test-crypto-obj-y)
++test-authz-obj-y =3D $(test-qom-obj-y) $(authz-obj-y)
+ test-block-obj-y =3D $(block-obj-y) $(test-io-obj-y) tests/iothread.o
+=20
+ tests/check-qnum$(EXESUF): tests/check-qnum.o $(test-util-obj-y)
+@@ -641,6 +643,7 @@ tests/test-util-filemonitor$(EXESUF): tests/test-util=
+-filemonitor.o \
+ 	$(test-util-obj-y)
+ tests/test-util-sockets$(EXESUF): tests/test-util-sockets.o \
+ 	tests/socket-helpers.o $(test-util-obj-y)
++tests/test-authz-simple$(EXESUF): tests/test-authz-simple.o $(test-authz=
+-obj-y)
+ tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
+ tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
+         tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-=
+y)
+diff --git a/tests/test-authz-simple.c b/tests/test-authz-simple.c
+new file mode 100644
+index 0000000000..2cf14fb87e
+--- /dev/null
++++ b/tests/test-authz-simple.c
+@@ -0,0 +1,50 @@
++/*
++ * QEMU simple authorization object testing
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++
++#include "authz/simple.h"
++
++
++static void test_authz_simple(void)
++{
++    QAuthZSimple *authz =3D qauthz_simple_new("authz0",
++                                            "cthulu",
++                                            &error_abort);
++
++    g_assert(!qauthz_is_allowed(QAUTHZ(authz), "cthul", &error_abort));
++    g_assert(qauthz_is_allowed(QAUTHZ(authz), "cthulu", &error_abort));
++    g_assert(!qauthz_is_allowed(QAUTHZ(authz), "cthuluu", &error_abort))=
 ;
-+        break;
-=20
-+    case QFILE_MONITOR_EVENT_DELETED:
-         /*
--         * TODO: Ignore initiator initiated events.
--         * For now we are good because the store is RO
-+         * The kernel issues a IN_IGNORED event
-+         * when a dir containing a watchpoint is
-+         * deleted, so we don't have to delete the
-+         * watchpoint
-          */
--        while (bytes > 0) {
--            char *p =3D buf + pos;
--            struct inotify_event *event =3D (struct inotify_event *)p;
--            int watchfd =3D 0;
--            uint32_t mask =3D event->mask & (IN_CREATE | IN_DELETE |
--                                           IN_MODIFY | IN_IGNORED);
--            MTPObject *parent =3D usb_mtp_object_lookup_wd(s, event->wd)=
-;
--            MTPMonEntry *entry =3D NULL;
--            MTPObject *o;
--
--            pos =3D pos + sizeof(struct inotify_event) + event->len;
--            bytes =3D bytes - pos;
--
--            if (!parent) {
--                continue;
--            }
--
--            switch (mask) {
--            case IN_CREATE:
--                if (usb_mtp_object_lookup_name
--                    (parent, event->name, event->len)) {
--                    /* Duplicate create event */
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D s->next_handle;
--                entry->event =3D EVT_OBJ_ADDED;
--                o =3D usb_mtp_add_child(s, parent, event->name);
--                if (!o) {
--                    g_free(entry);
--                    continue;
--                }
--                o->watchfd =3D watchfd;
--                trace_usb_mtp_inotify_event(s->dev.addr, event->name,
--                                            event->mask, "Obj Added");
--                break;
--
--            case IN_DELETE:
--                /*
--                 * The kernel issues a IN_IGNORED event
--                 * when a dir containing a watchpoint is
--                 * deleted, so we don't have to delete the
--                 * watchpoint
--                 */
--                o =3D usb_mtp_object_lookup_name(parent, event->name, ev=
-ent->len);
--                if (!o) {
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D o->handle;
--                entry->event =3D EVT_OBJ_REMOVED;
--                trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                      event->mask, "Obj Deleted");
--                usb_mtp_object_free(s, o);
--                break;
--
--            case IN_MODIFY:
--                o =3D usb_mtp_object_lookup_name(parent, event->name, ev=
-ent->len);
--                if (!o) {
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D o->handle;
--                entry->event =3D EVT_OBJ_INFO_CHANGED;
--                trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                      event->mask, "Obj Modified");
--                break;
--
--            case IN_IGNORED:
--                trace_usb_mtp_inotify_event(s->dev.addr, parent->path,
--                                      event->mask, "Obj parent dir ignor=
-ed");
--                break;
--
--            default:
--                fprintf(stderr, "usb-mtp: failed to parse inotify event\=
-n");
--                continue;
--            }
-+        o =3D usb_mtp_object_lookup_name(parent, name, -1);
-+        if (!o) {
-+            return;
-+        }
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D o->handle;
-+        entry->event =3D EVT_OBJ_REMOVED;
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, o->path, "Obj Dele=
-ted");
-+        usb_mtp_object_free(s, o);
-+        break;
-=20
--            if (entry) {
--                QTAILQ_INSERT_HEAD(&s->events, entry, next);
--            }
-+    case QFILE_MONITOR_EVENT_MODIFIED:
-+        o =3D usb_mtp_object_lookup_name(parent, name, -1);
-+        if (!o) {
-+            return;
-         }
--    }
--}
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D o->handle;
-+        entry->event =3D EVT_OBJ_INFO_CHANGED;
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, o->path, "Obj Modi=
-fied");
-+        break;
-=20
--static int usb_mtp_inotify_init(MTPState *s)
--{
--    int fd;
-+    case QFILE_MONITOR_EVENT_IGNORED:
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, parent->path,
-+                                    "Obj parent dir ignored");
-+        break;
-=20
--    fd =3D inotify_init1(IN_NONBLOCK);
--    if (fd =3D=3D -1) {
--        return 1;
-+    default:
-+        g_assert_not_reached();
-     }
-=20
--    QTAILQ_INIT(&s->events);
--    s->inotifyfd =3D fd;
--
--    qemu_set_fd_handler(fd, inotify_watchfn, NULL, s);
--
--    return 0;
-+    if (entry) {
-+        QTAILQ_INSERT_HEAD(&s->events, entry, next);
-+    }
- }
-=20
--static void usb_mtp_inotify_cleanup(MTPState *s)
-+static void usb_mtp_file_monitor_cleanup(MTPState *s)
- {
-     MTPMonEntry *e, *p;
-=20
--    if (!s->inotifyfd) {
--        return;
--    }
--
--    qemu_set_fd_handler(s->inotifyfd, NULL, NULL, s);
--    close(s->inotifyfd);
--
-     QTAILQ_FOREACH_SAFE(e, &s->events, next, p) {
-         QTAILQ_REMOVE(&s->events, e, next);
-         g_free(e);
-     }
--}
--
--static int usb_mtp_add_watch(int inotifyfd, const char *path)
--{
--    uint32_t mask =3D IN_CREATE | IN_DELETE | IN_MODIFY;
-=20
--    return inotify_add_watch(inotifyfd, path, mask);
-+    qemu_file_monitor_free(s->file_monitor);
-+    s->file_monitor =3D NULL;
- }
--#endif
++    g_assert(!qauthz_is_allowed(QAUTHZ(authz), "fred", &error_abort));
 +
-=20
- static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
- {
-     struct dirent *entry;
-     DIR *dir;
-+    Error *err =3D NULL;
-=20
-     if (o->have_children) {
-         return;
-@@ -662,16 +603,21 @@ static void usb_mtp_object_readdir(MTPState *s, MTP=
-Object *o)
-     if (!dir) {
-         return;
-     }
--#ifdef CONFIG_INOTIFY1
--    int watchfd =3D usb_mtp_add_watch(s->inotifyfd, o->path);
--    if (watchfd =3D=3D -1) {
--        fprintf(stderr, "usb-mtp: failed to add watch for %s\n", o->path=
-);
--    } else {
--        trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                    0, "Watch Added");
--        o->watchfd =3D watchfd;
++    object_unparent(OBJECT(authz));
++}
 +
-+    if (s->file_monitor) {
-+        int id =3D qemu_file_monitor_add_watch(s->file_monitor, o->path,=
- NULL,
-+                                             file_monitor_event, s, &err=
-);
-+        if (id =3D=3D -1) {
-+            error_report("usb-mtp: failed to add watch for %s: %s", o->p=
-ath,
-+                         error_get_pretty(err));
-+            error_free(err);
-+        } else {
-+            trace_usb_mtp_file_monitor_event(s->dev.addr, o->path,
-+                                             "Watch Added");
-+            o->watchid =3D id;
-+        }
-     }
--#endif
 +
-     while ((entry =3D readdir(dir)) !=3D NULL) {
-         usb_mtp_add_child(s, o, entry->d_name);
-     }
-@@ -1179,13 +1125,11 @@ enum {
- /* Assumes that children, if any, have been already freed */
- static void usb_mtp_object_free_one(MTPState *s, MTPObject *o)
- {
--#ifndef CONFIG_INOTIFY1
-     assert(o->nchildren =3D=3D 0);
-     QTAILQ_REMOVE(&s->objects, o, next);
-     g_free(o->name);
-     g_free(o->path);
-     g_free(o);
--#endif
- }
-=20
- static int usb_mtp_deletefn(MTPState *s, MTPObject *o, uint32_t trans)
-@@ -1284,6 +1228,7 @@ static void usb_mtp_command(MTPState *s, MTPControl=
- *c)
-     MTPData *data_in =3D NULL;
-     MTPObject *o =3D NULL;
-     uint32_t nres =3D 0, res0 =3D 0;
-+    Error *err =3D NULL;
-=20
-     /* sanity checks */
-     if (c->code >=3D CMD_CLOSE_SESSION && s->session =3D=3D 0) {
-@@ -1311,19 +1256,21 @@ static void usb_mtp_command(MTPState *s, MTPContr=
-ol *c)
-         trace_usb_mtp_op_open_session(s->dev.addr);
-         s->session =3D c->argv[0];
-         usb_mtp_object_alloc(s, s->next_handle++, NULL, s->root);
--#ifdef CONFIG_INOTIFY1
--        if (usb_mtp_inotify_init(s)) {
--            fprintf(stderr, "usb-mtp: file monitoring init failed\n");
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++    module_call_init(MODULE_INIT_QOM);
 +
-+        s->file_monitor =3D qemu_file_monitor_new(&err);
-+        if (err) {
-+            error_report("usb-mtp: file monitoring init failed: %s",
-+                         error_get_pretty(err));
-+            error_free(err);
-+        } else {
-+            QTAILQ_INIT(&s->events);
-         }
--#endif
-         break;
-     case CMD_CLOSE_SESSION:
-         trace_usb_mtp_op_close_session(s->dev.addr);
-         s->session =3D 0;
-         s->next_handle =3D 0;
--#ifdef CONFIG_INOTIFY1
--        usb_mtp_inotify_cleanup(s);
--#endif
-+        usb_mtp_file_monitor_cleanup(s);
-         usb_mtp_object_free(s, QTAILQ_FIRST(&s->objects));
-         assert(QTAILQ_EMPTY(&s->objects));
-         break;
-@@ -1536,9 +1483,7 @@ static void usb_mtp_handle_reset(USBDevice *dev)
-=20
-     trace_usb_mtp_reset(s->dev.addr);
-=20
--#ifdef CONFIG_INOTIFY1
--    usb_mtp_inotify_cleanup(s);
--#endif
-+    usb_mtp_file_monitor_cleanup(s);
-     usb_mtp_object_free(s, QTAILQ_FIRST(&s->objects));
-     s->session =3D 0;
-     usb_mtp_data_free(s->data_in);
-@@ -1967,7 +1912,6 @@ static void usb_mtp_handle_data(USBDevice *dev, USB=
-Packet *p)
-         }
-         break;
-     case EP_EVENT:
--#ifdef CONFIG_INOTIFY1
-         if (!QTAILQ_EMPTY(&s->events)) {
-             struct MTPMonEntry *e =3D QTAILQ_LAST(&s->events, events);
-             uint32_t handle;
-@@ -1991,7 +1935,6 @@ static void usb_mtp_handle_data(USBDevice *dev, USB=
-Packet *p)
-             g_free(e);
-             return;
-         }
--#endif
-         p->status =3D USB_RET_NAK;
-         return;
-     default:
-diff --git a/hw/usb/trace-events b/hw/usb/trace-events
-index 2c18770ca5..99b1e8b8ce 100644
---- a/hw/usb/trace-events
-+++ b/hw/usb/trace-events
-@@ -237,7 +237,7 @@ usb_mtp_op_unknown(int dev, uint32_t code) "dev %d, c=
-ommand code 0x%x"
- usb_mtp_object_alloc(int dev, uint32_t handle, const char *path) "dev %d=
-, handle 0x%x, path %s"
- usb_mtp_object_free(int dev, uint32_t handle, const char *path) "dev %d,=
- handle 0x%x, path %s"
- usb_mtp_add_child(int dev, uint32_t handle, const char *path) "dev %d, h=
-andle 0x%x, path %s"
--usb_mtp_inotify_event(int dev, const char *path, uint32_t mask, const ch=
-ar *s) "dev %d, path %s mask 0x%x event %s"
-+usb_mtp_file_monitor_event(int dev, const char *path, const char *s) "de=
-v %d, path %s event %s"
-=20
- # hw/usb/host-libusb.c
- usb_host_open_started(int bus, int addr) "dev %d:%d"
++    g_test_add_func("/authz/simple", test_authz_simple);
++
++    return g_test_run();
++}
 --=20
 2.19.2
