@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGj-0006Ay-OX
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:31 -0500
+	(envelope-from <armbru@redhat.com>) id 1gSfIm-0007vO-2k
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:41:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGg-0002UB-QC
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:29 -0500
-From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 30 Nov 2018 17:38:46 +0800
-Message-Id: <20181130093852.20739-16-maozhongyi@cmss.chinamobile.com>
-In-Reply-To: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
-References: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH v3 15/21] pci-bridge/dec: Convert sysbus init
- function to realize function
+	(envelope-from <armbru@redhat.com>) id 1gSfIi-0004pH-Ri
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:41:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47770)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSfIi-0004om-Hy
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:41:32 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181031115242.6558-1-d.csapak@proxmox.com>
+	<20181031115242.6558-3-d.csapak@proxmox.com>
+Date: Fri, 30 Nov 2018 10:41:29 +0100
+In-Reply-To: <20181031115242.6558-3-d.csapak@proxmox.com> (Dominik Csapak's
+	message of "Wed, 31 Oct 2018 12:52:41 +0100")
+Message-ID: <87sgzilx6e.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/3] qapi: split host-qmp into quit and
+ system-reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,64 +28,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, david@gibson.dropbear.id.au, mst@redhat.com, marcel.apfelbaum@gmail.com, qemu-ppc@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+To: Dominik Csapak <d.csapak@proxmox.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, armbru@redhat.com, mreitz@redhat.com, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Eric Blake <eblake@redhat.com>
 
-Use DeviceClass rather than SysBusDeviceClass in
-pci_dec_21154_device_class_init().
+Cc: Pavel to assess possible impact on replay.
 
-Cc: david@gibson.dropbear.id.au
-Cc: mst@redhat.com
-Cc: marcel.apfelbaum@gmail.com
-Cc: qemu-ppc@nongnu.org
+Cc: Eric to give him a chance to correct misunderstandings of
+ShutdownCause.
 
-Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/pci-bridge/dec.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Dominik Csapak <d.csapak@proxmox.com> writes:
 
-diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
-index 84492d5e5f..8484bfd434 100644
---- a/hw/pci-bridge/dec.c
-+++ b/hw/pci-bridge/dec.c
-@@ -98,9 +98,10 @@ PCIBus *pci_dec_21154_init(PCIBus *parent_bus, int devfn)
-     return pci_bridge_get_sec_bus(br);
- }
- 
--static int pci_dec_21154_device_init(SysBusDevice *dev)
-+static void pci_dec_21154_device_realize(DeviceState *dev, Error **errp)
- {
-     PCIHostState *phb;
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
- 
-     phb = PCI_HOST_BRIDGE(dev);
- 
-@@ -108,9 +109,8 @@ static int pci_dec_21154_device_init(SysBusDevice *dev)
-                           dev, "pci-conf-idx", 0x1000);
-     memory_region_init_io(&phb->data_mem, OBJECT(dev), &pci_host_data_le_ops,
-                           dev, "pci-data-idx", 0x1000);
--    sysbus_init_mmio(dev, &phb->conf_mem);
--    sysbus_init_mmio(dev, &phb->data_mem);
--    return 0;
-+    sysbus_init_mmio(sbd, &phb->conf_mem);
-+    sysbus_init_mmio(sbd, &phb->data_mem);
- }
- 
- static void dec_21154_pci_host_realize(PCIDevice *d, Error **errp)
-@@ -150,9 +150,9 @@ static const TypeInfo dec_21154_pci_host_info = {
- 
- static void pci_dec_21154_device_class_init(ObjectClass *klass, void *data)
- {
--    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
- 
--    sdc->init = pci_dec_21154_device_init;
-+    dc->realize = pci_dec_21154_device_realize;
- }
- 
- static const TypeInfo pci_dec_21154_device_info = {
--- 
-2.17.1
+> it is interesting to know whether the shutdown cause was 'quit' or
+> 'reset', especially when using --no-reboot
+
+Are you sure it *is* interesting?  I suspect it *will be* only after the
+next patch.
+
+Please start your sentences with a capital letter and end them with
+punctuation.
+
+> Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
+> ---
+>  qapi/run-state.json | 10 ++++++----
+>  qmp.c               |  4 ++--
+>  2 files changed, 8 insertions(+), 6 deletions(-)
+>
+> diff --git a/qapi/run-state.json b/qapi/run-state.json
+> index 883bed167c..c215b6ef83 100644
+> --- a/qapi/run-state.json
+> +++ b/qapi/run-state.json
+> @@ -68,7 +68,9 @@
+>  #
+>  # @host-error: An error prevented further use of guest
+>  #
+> -# @host-qmp: Reaction to a QMP command, like 'quit'
+> +# @host-qmp-quit: Reaction to the QMP command 'quit'
+> +#
+> +# @host-qmp-system-reset: Reaction to the QMP command 'system_reset'
+>  #
+>  # @host-signal: Reaction to a signal, such as SIGINT
+>  #
+> @@ -88,9 +90,9 @@
+>  #
+>  ##
+>  { 'enum': 'ShutdownCause',
+> -  'data': [ 'none', 'host-error', 'host-qmp', 'host-signal', 'host-ui',
+> -            'guest-shutdown', 'guest-reset', 'guest-panic',
+> -            'subsystem-reset'] }
+> +  'data': [ 'none', 'host-error', 'host-qmp-quit', 'host-qmp-system-reset',
+> +            'host-signal', 'host-ui', 'guest-shutdown', 'guest-reset',
+> +            'guest-panic', 'subsystem-reset'] }
+>  
+>  ##
+>  # @StatusInfo:
+> diff --git a/qmp.c b/qmp.c
+> index e7c0a2fd60..82298f6cb0 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -88,7 +88,7 @@ UuidInfo *qmp_query_uuid(Error **errp)
+>  void qmp_quit(Error **errp)
+>  {
+>      no_shutdown = 0;
+> -    qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_QMP);
+> +    qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_QMP_QUIT);
+>  }
+>  
+>  void qmp_stop(Error **errp)
+> @@ -109,7 +109,7 @@ void qmp_stop(Error **errp)
+>  
+>  void qmp_system_reset(Error **errp)
+>  {
+> -    qemu_system_reset_request(SHUTDOWN_CAUSE_HOST_QMP);
+> +    qemu_system_reset_request(SHUTDOWN_CAUSE_HOST_QMP_SYSTEM_RESET);
+>  }
+>  
+>  void qmp_system_powerdown(Error **erp)
+
+Let's see how these guys are used.
+
+qemu_system_shutdown_request() and qemu_system_reset_request() put their
+argument in @shutdown_requested or @reset_requested.  There's some
+replay magic going on in qemu_system_shutdown_request().
+
+main_loop_should_exit() retrieves them with qemu_shutdown_requested()
+and qemu_reset_requested().  @shutdown_requested is only passed to
+shutdown_caused_by_guest().  @reset_requested is only passed to
+qemu_system_reset().  None of these functions is affected by your
+change.  There's some replay magic going on in
+qemu_system_reset_requested().
+
+Xen's cpu_handle_ioreq() retrieves them with
+qemu_shutdown_requested_get() and qemu_reset_requested_get().  None of
+these functions is affected by your change.
+
+Looks like ShutdownCause is overengineered[*]: we're only ever
+interested in none, host, guest.  Your PATCH 3 will change that.  Okay,
+but your commit message is misleading: this patch has no interesting
+effect now.  The change becomes visible only after PATCH 3.
+
+I'd swap PATCH 2 and 3, because that would make writing non-misleading
+commit messages easier for me.
+
+
+[*] Goes back to Eric's commit 7af88279e49..08fba7ac9b6, which were
+surely done for a reason.  Perhaps I'm just confused.
