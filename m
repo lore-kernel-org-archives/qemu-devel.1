@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gSkZa-0007SE-Cp
+	(envelope-from <berto@igalia.com>) id 1gSkZa-0007S4-CQ
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gSkZW-0006Vl-9c
+	(envelope-from <berto@igalia.com>) id 1gSkZY-0006Wi-6L
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:18 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 30 Nov 2018 17:17:42 +0200
-Message-Id: <b4c480153cfe95140ef0d191945f1fd0f0bc08bc.1543590618.git.berto@igalia.com>
+Date: Fri, 30 Nov 2018 17:17:39 +0200
+Message-Id: <5ed36dbab081a599ba9dcbeb7d43aa101461450d.1543590618.git.berto@igalia.com>
 In-Reply-To: <cover.1543590618.git.berto@igalia.com>
 References: <cover.1543590618.git.berto@igalia.com>
 In-Reply-To: <cover.1543590618.git.berto@igalia.com>
 References: <cover.1543590618.git.berto@igalia.com>
-Subject: [Qemu-devel] [RFC PATCH v2 04/12] block: Freeze the backing chain
- for the duration of the stream job
+Subject: [Qemu-devel] [RFC PATCH v2 01/12] block: Allow freezing BdrvChild
+ links
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +25,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
+Our permission system is useful to define what operations are allowed
+on a certain block node and includes things like BLK_PERM_WRITE or
+BLK_PERM_RESIZE among others.
+
+One of the permissions is BLK_PERM_GRAPH_MOD which allows "changing
+the node that this BdrvChild points to". The exact meaning of this has
+never been very clear, but it can be understood as "change any of the
+links connected to the node". This can be used to prevent changing a
+backing link, but it's too coarse.
+
+This patch adds a new 'frozen' attribute to BdrvChild, which forbids
+detaching the link from the node it points to, and new API to freeze
+and unfreeze a backing chain.
+
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/stream.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ block.c                   | 62 +++++++++++++++++++++++++++++++++++++++++++++++
+ include/block/block.h     |  5 ++++
+ include/block/block_int.h |  5 ++++
+ 3 files changed, 72 insertions(+)
 
-diff --git a/block/stream.c b/block/stream.c
-index 7a49ac0992..39a2e10892 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -54,6 +54,14 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
-     return blk_co_preadv(blk, offset, qiov.size, &qiov, BDRV_REQ_COPY_ON_READ);
- }
+diff --git a/block.c b/block.c
+index 4f5ff2cc12..4f55fb339a 100644
+--- a/block.c
++++ b/block.c
+@@ -2062,6 +2062,8 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
+     BlockDriverState *old_bs = child->bs;
+     int i;
  
-+static void stream_abort(Job *job)
-+{
-+    StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
-+    BlockJob *bjob = &s->common;
++    assert(!child->frozen);
 +
-+    bdrv_unfreeze_backing_chain(blk_bs(bjob->blk), s->base);
-+}
-+
- static int stream_prepare(Job *job)
- {
-     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
-@@ -63,6 +71,8 @@ static int stream_prepare(Job *job)
-     Error *local_err = NULL;
-     int ret = 0;
- 
-+    bdrv_unfreeze_backing_chain(bs, base);
-+
-     if (bs->backing) {
-         const char *base_id = NULL, *base_fmt = NULL;
-         if (base) {
-@@ -213,6 +223,7 @@ static const BlockJobDriver stream_job_driver = {
-         .free          = block_job_free,
-         .run           = stream_run,
-         .prepare       = stream_prepare,
-+        .abort         = stream_abort,
-         .clean         = stream_clean,
-         .user_resume   = block_job_user_resume,
-         .drain         = block_job_drain,
-@@ -259,6 +270,11 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-                            &error_abort);
+     if (old_bs && new_bs) {
+         assert(bdrv_get_aio_context(old_bs) == bdrv_get_aio_context(new_bs));
      }
+@@ -2278,6 +2280,10 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
+     bool update_inherits_from = bdrv_chain_contains(bs, backing_hd) &&
+         bdrv_inherits_from_recursive(backing_hd, bs);
  
-+    if (bdrv_freeze_backing_chain(bs, base, errp) < 0) {
-+        job_early_fail(&s->common.job);
-+        goto fail;
++    if (bdrv_is_backing_chain_frozen(bs, backing_bs(bs), errp)) {
++        return;
 +    }
 +
-     s->base = base;
-     s->backing_file_str = g_strdup(backing_file_str);
-     s->bs_read_only = bs_read_only;
+     if (backing_hd) {
+         bdrv_ref(backing_hd);
+     }
+@@ -3812,6 +3818,58 @@ BlockDriverState *bdrv_find_base(BlockDriverState *bs)
+     return bdrv_find_overlay(bs, NULL);
+ }
+ 
++/* Return true if at least one of the backing links between @bs and
++ * @base is frozen. @errp is set if that's the case. */
++bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
++                                  Error **errp)
++{
++    BlockDriverState *i;
++
++    for (i = bs; i != base && i->backing; i = backing_bs(i)) {
++        if (i->backing->frozen) {
++            error_setg(errp, "Cannot remove link from '%s' to '%s'",
++                       i->node_name, backing_bs(i)->node_name);
++            return true;
++        }
++    }
++
++    return false;
++}
++
++/*
++ * Freeze all backing links between @bs and @base.
++ * If any of the links is already frozen the operation is aborted and
++ * none of the links are modified.
++ * Returns 0 on success. On failure returns < 0 and sets @errp.
++ */
++int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
++                              Error **errp)
++{
++    BlockDriverState *i;
++
++    if (bdrv_is_backing_chain_frozen(bs, base, errp)) {
++        return -EPERM;
++    }
++
++    for (i = bs; i != base && i->backing; i = backing_bs(i)) {
++        i->backing->frozen = true;
++    }
++
++    return 0;
++}
++
++/* Unfreeze all backing links between @bs and @base. The caller must
++ * ensure that all links are frozen before using this function. */
++void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverState *base)
++{
++    BlockDriverState *i;
++
++    for (i = bs; i != base && i->backing; i = backing_bs(i)) {
++        assert(i->backing->frozen);
++        i->backing->frozen = false;
++    }
++}
++
+ /*
+  * Drops images above 'base' up to and including 'top', and sets the image
+  * above 'top' to have base as its backing file.
+@@ -3861,6 +3919,10 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
+         goto exit;
+     }
+ 
++    if (bdrv_is_backing_chain_frozen(top, base, NULL)) {
++        goto exit;
++    }
++
+     /* If 'base' recursively inherits from 'top' then we should set
+      * base->inherits_from to top->inherits_from after 'top' and all
+      * other intermediate nodes have been dropped.
+diff --git a/include/block/block.h b/include/block/block.h
+index f70a843b72..6f10a8fcfc 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -353,6 +353,11 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
+ BlockDriverState *bdrv_find_overlay(BlockDriverState *active,
+                                     BlockDriverState *bs);
+ BlockDriverState *bdrv_find_base(BlockDriverState *bs);
++bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
++                                  Error **errp);
++int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
++                              Error **errp);
++void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverState *base);
+ 
+ 
+ typedef struct BdrvCheckResult {
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index f605622216..05d925227a 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -661,6 +661,11 @@ struct BdrvChild {
+      */
+     uint64_t shared_perm;
+ 
++    /**
++     * This link is frozen: the child cannot be detached from the parent.
++     */
++    bool frozen;
++
+     QLIST_ENTRY(BdrvChild) next;
+     QLIST_ENTRY(BdrvChild) next_parent;
+ };
 -- 
 2.11.0
