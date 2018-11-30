@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGj-0006Ax-OX
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGj-0006Az-Ob
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGh-0002Up-6p
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGg-0002TP-Cw
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:29 -0500
+Received: from cmccmta1.chinamobile.com ([221.176.66.79]:35148)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGf-0002PF-Ee
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:26 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 30 Nov 2018 17:38:40 +0800
-Message-Id: <20181130093852.20739-10-maozhongyi@cmss.chinamobile.com>
+Date: Fri, 30 Nov 2018 17:38:45 +0800
+Message-Id: <20181130093852.20739-15-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
 References: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 09/21] input/pl050: Convert sysbus init
+Subject: [Qemu-devel] [PATCH v3 14/21] nvram/ds1225y: Convert sysbus init
  function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,59 +28,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, peter.maydell@linaro.org, qemu-arm@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, pbonzini@redhat.com, marcandre.lureau@redhat.com, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
 Use DeviceClass rather than SysBusDeviceClass in
-pl050_class_init().
+nvram_sysbus_class_init().
 
-Cc: peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org
+Cc: pbonzini@redhat.com
+Cc: marcandre.lureau@redhat.com
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/input/pl050.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ hw/nvram/ds1225y.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/hw/input/pl050.c b/hw/input/pl050.c
-index be9cd57b17..15bffbfcad 100644
---- a/hw/input/pl050.c
-+++ b/hw/input/pl050.c
-@@ -139,19 +139,19 @@ static const MemoryRegionOps pl050_ops = {
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
+diff --git a/hw/nvram/ds1225y.c b/hw/nvram/ds1225y.c
+index ad7345f288..b6ef463db0 100644
+--- a/hw/nvram/ds1225y.c
++++ b/hw/nvram/ds1225y.c
+@@ -25,6 +25,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/sysbus.h"
+ #include "trace.h"
++#include "qemu/error-report.h"
  
--static int pl050_initfn(SysBusDevice *dev)
-+static void pl050_realize(DeviceState *dev, Error **errp)
+ typedef struct {
+     MemoryRegion iomem;
+@@ -113,7 +114,7 @@ typedef struct {
+     NvRamState nvram;
+ } SysBusNvRamState;
+ 
+-static int nvram_sysbus_initfn(SysBusDevice *dev)
++static void nvram_sysbus_realize(DeviceState *dev, Error **errp)
  {
-     PL050State *s = PL050(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     SysBusNvRamState *sys = DS1225Y(dev);
+     NvRamState *s = &sys->nvram;
+@@ -123,20 +124,18 @@ static int nvram_sysbus_initfn(SysBusDevice *dev)
  
-     memory_region_init_io(&s->iomem, OBJECT(s), &pl050_ops, s, "pl050", 0x1000);
+     memory_region_init_io(&s->iomem, OBJECT(s), &nvram_ops, s,
+                           "nvram", s->chip_size);
 -    sysbus_init_mmio(dev, &s->iomem);
--    sysbus_init_irq(dev, &s->irq);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->irq);
-     if (s->is_mouse) {
-         s->dev = ps2_mouse_init(pl050_update, s);
-     } else {
-         s->dev = ps2_kbd_init(pl050_update, s);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
+ 
+     /* Read current file */
+     file = s->filename ? fopen(s->filename, "rb") : NULL;
+     if (file) {
+         /* Read nvram contents */
+         if (fread(s->contents, s->chip_size, 1, file) != 1) {
+-            printf("nvram_sysbus_initfn: short read\n");
++            error_report("nvram_sysbus_realize: short read");
+         }
+         fclose(file);
      }
+     nvram_post_load(s, 0);
+-
 -    return 0;
  }
  
- static void pl050_keyboard_init(Object *obj)
-@@ -183,9 +183,8 @@ static const TypeInfo pl050_mouse_info = {
- static void pl050_class_init(ObjectClass *oc, void *data)
+ static Property nvram_sysbus_properties[] = {
+@@ -148,9 +147,8 @@ static Property nvram_sysbus_properties[] = {
+ static void nvram_sysbus_class_init(ObjectClass *klass, void *data)
  {
-     DeviceClass *dc = DEVICE_CLASS(oc);
--    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(oc);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
  
--    sdc->init = pl050_initfn;
-+    dc->realize = pl050_realize;
-     dc->vmsd = &vmstate_pl050;
+-    k->init = nvram_sysbus_initfn;
++    dc->realize = nvram_sysbus_realize;
+     dc->vmsd = &vmstate_nvram;
+     dc->props = nvram_sysbus_properties;
  }
- 
 -- 
 2.17.1
