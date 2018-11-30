@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gShVQ-0008RM-1U
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:02:49 -0500
+	(envelope-from <philmd@redhat.com>) id 1gShW7-0001dm-NC
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:03:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gShVK-0003wf-3s
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:02:46 -0500
-Received: from mail-wr1-f45.google.com ([209.85.221.45]:39640)
+	(envelope-from <philmd@redhat.com>) id 1gShW1-0004p9-N1
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:03:30 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36199)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gShVJ-0003vq-9r
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:02:42 -0500
-Received: by mail-wr1-f45.google.com with SMTP id t27so5044906wra.6
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 04:02:40 -0800 (PST)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gShW1-0004oQ-G0
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:03:25 -0500
+Received: by mail-wr1-f67.google.com with SMTP id u3so5041537wrs.3
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 04:03:25 -0800 (PST)
 References: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
-	<20181130093852.20739-16-maozhongyi@cmss.chinamobile.com>
+	<20181130093852.20739-20-maozhongyi@cmss.chinamobile.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3ae3d7bf-e594-008d-fc84-31307f4422e2@redhat.com>
-Date: Fri, 30 Nov 2018 13:02:37 +0100
+Message-ID: <18506233-17cd-27cc-6d95-8a71e0e7ae22@redhat.com>
+Date: Fri, 30 Nov 2018 13:03:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181130093852.20739-16-maozhongyi@cmss.chinamobile.com>
+In-Reply-To: <20181130093852.20739-20-maozhongyi@cmss.chinamobile.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 15/21] pci-bridge/dec: Convert sysbus
- init function to realize function
+Subject: Re: [Qemu-devel] [PATCH v3 19/21] usb/tusb6010: Convert sysbus init
+ function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +32,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, qemu-ppc@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>, david@gibson.dropbear.id.au
+Cc: kraxel@redhat.com, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
 On 30/11/18 10:38, Mao Zhongyi wrote:
 > Use DeviceClass rather than SysBusDeviceClass in
-> pci_dec_21154_device_class_init().
+> tusb6010_class_init().
 > 
-> Cc: david@gibson.dropbear.id.au
-> Cc: mst@redhat.com
-> Cc: marcel.apfelbaum@gmail.com
-> Cc: qemu-ppc@nongnu.org
+> Cc: kraxel@redhat.com
 > 
 > Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 > Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  hw/pci-bridge/dec.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+>  hw/usb/tusb6010.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
 > 
-> diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
-> index 84492d5e5f..8484bfd434 100644
-> --- a/hw/pci-bridge/dec.c
-> +++ b/hw/pci-bridge/dec.c
-> @@ -98,9 +98,10 @@ PCIBus *pci_dec_21154_init(PCIBus *parent_bus, int devfn)
->      return pci_bridge_get_sec_bus(br);
+> diff --git a/hw/usb/tusb6010.c b/hw/usb/tusb6010.c
+> index a2128024c1..501706e2b2 100644
+> --- a/hw/usb/tusb6010.c
+> +++ b/hw/usb/tusb6010.c
+> @@ -808,10 +808,10 @@ static void tusb6010_reset(DeviceState *dev)
+>      musb_reset(s->musb);
 >  }
 >  
-> -static int pci_dec_21154_device_init(SysBusDevice *dev)
-> +static void pci_dec_21154_device_realize(DeviceState *dev, Error **errp)
+> -static int tusb6010_init(SysBusDevice *sbd)
+> +static void tusb6010_realize(DeviceState *dev, Error **errp)
 >  {
->      PCIHostState *phb;
+> -    DeviceState *dev = DEVICE(sbd);
+>      TUSBState *s = TUSB(dev);
 > +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
 >  
->      phb = PCI_HOST_BRIDGE(dev);
->  
-> @@ -108,9 +109,8 @@ static int pci_dec_21154_device_init(SysBusDevice *dev)
->                            dev, "pci-conf-idx", 0x1000);
->      memory_region_init_io(&phb->data_mem, OBJECT(dev), &pci_host_data_le_ops,
->                            dev, "pci-data-idx", 0x1000);
-> -    sysbus_init_mmio(dev, &phb->conf_mem);
-> -    sysbus_init_mmio(dev, &phb->data_mem);
+>      s->otg_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, tusb_otg_tick, s);
+>      s->pwr_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, tusb_power_tick, s);
+> @@ -822,15 +822,13 @@ static int tusb6010_init(SysBusDevice *sbd)
+>      sysbus_init_irq(sbd, &s->irq);
+>      qdev_init_gpio_in(dev, tusb6010_irq, musb_irq_max + 1);
+>      s->musb = musb_init(dev, 1);
 > -    return 0;
-> +    sysbus_init_mmio(sbd, &phb->conf_mem);
-> +    sysbus_init_mmio(sbd, &phb->data_mem);
 >  }
 >  
->  static void dec_21154_pci_host_realize(PCIDevice *d, Error **errp)
-> @@ -150,9 +150,9 @@ static const TypeInfo dec_21154_pci_host_info = {
->  
->  static void pci_dec_21154_device_class_init(ObjectClass *klass, void *data)
+>  static void tusb6010_class_init(ObjectClass *klass, void *data)
 >  {
-> -    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
 >  
-> -    sdc->init = pci_dec_21154_device_init;
-> +    dc->realize = pci_dec_21154_device_realize;
+> -    k->init = tusb6010_init;
+> +    dc->realize = tusb6010_realize;
+>      dc->reset = tusb6010_reset;
 >  }
 >  
->  static const TypeInfo pci_dec_21154_device_info = {
 > 
