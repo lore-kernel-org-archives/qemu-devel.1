@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gSk5I-0006WP-A9
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 09:48:02 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gSk8X-0001BQ-OA
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 09:51:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gSk5D-0004Ku-MK
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 09:48:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gSk5D-0004KF-Ct
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 09:47:55 -0500
-References: <1543513531-1151-1-git-send-email-pbonzini@redhat.com>
-	<1389c712-2e02-80c0-b9e1-4c45b54d35df@redhat.com>
-	<69af56c7-413d-857f-829b-37d4747d0d96@redhat.com>
-	<852011bf-424c-4215-2cef-f7456e8ab9aa@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <b0d86936-bd72-56f3-7485-10c4f1cb6cd9@redhat.com>
-Date: Fri, 30 Nov 2018 09:47:49 -0500
-MIME-Version: 1.0
-In-Reply-To: <852011bf-424c-4215-2cef-f7456e8ab9aa@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gSk8W-00062d-PE
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 09:51:21 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 30 Nov 2018 14:51:09 +0000
+Message-ID: <97939091-38e2-565b-7aa3-cfb9ebf239cb@virtuozzo.com>
+References: <20181129101801.6421-1-vsementsov@virtuozzo.com>
+	<20181129101801.6421-3-vsementsov@virtuozzo.com>
+	<2f4c1bec-b5ca-e97f-88f9-75f3d2cb210c@redhat.com>
+	<e9e07da0-0cd8-9820-642a-ab4fe227afc8@virtuozzo.com>
+	<abcad6d9-2d40-15b4-9bce-964f6a3141a0@redhat.com>
+	<73cb2885-3a40-6d2b-24fa-c528decdbc9b@virtuozzo.com>
+	<20181130141017.GF5106@localhost.localdomain>
+In-Reply-To: <20181130141017.GF5106@localhost.localdomain>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/2] test: replace gtester with a
- TAP driver
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F6A1C5C06886F24CAA7C467F49CB5F16@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] iotests: simple mirror test with
+ kvm on 1G image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jcody@redhat.com" <jcody@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
 
-
-
-On 11/30/18 4:58 AM, Paolo Bonzini wrote:
-> On 30/11/18 08:21, Thomas Huth wrote:
->> On 2018-11-29 21:43, Eric Blake wrote:
->>> On 11/29/18 11:45 AM, Paolo Bonzini wrote:
->>>> gtester is deprecated by upstream glib and it does not support tests
->>>> that call g_test_skip in some glib stable releases.
->>>>
->>>> glib suggests instead using Automake's TAP support.=C2=A0 We do not =
-support
->>>> Automake, but we can copy the code that beautifies the TAP output an=
-d
->>>> use it.=C2=A0 I chose to use the Perl copy rather than the shell/awk=
- one,
->>>> in order to reuse Perl's TAP parsing package, but I'm open to sugges=
-tions
->>>> about which language to use.
->>>
->>> I'm less familiar with the TAP protocol than I'd like to admit, but I
->>> did find:
->>>
->>> https://blog.gtk.org/2018/07/11/news-from-glib-2-58/
->>>
->>> which corroborates your claim that switching to Automake's TAP parser=
- is
->>> indeed a recommended approach to avoid the now-deprecated gtester.
->>
->> Hmm, do we really have to maintain our own version of a test runner no=
-w?
->=20
-> Well, that's what you get for using a custom build system but it's
-> "just" an output beautifier really.  I could just "grep -ve ^# -e ^ok"
-> but it wouldn't look very nice (plus things that start as 1-line shell
-> scripts end up being the same as the thing you're trying to replace).
->=20
-> I don't think it will be a big maintenance headache---just like most
-> other files in scripts/, some of which have had exactly zero commits
-> since they were added.  In fact, Automake has hardly changed its driver
-> since the first commit.
->=20
->> There's already some effort going on to use avocado in "make
->> check-acceptance" ... maybe we could use avocado as replacement for
->> gtester, too?
->=20
-> Avocado does not have the required functionality, unfortunately.  It ca=
-n
-> produce TAP, but not consume it.  Also, Python libraries for TAP do not
-> abound and are generally not shipped with the OS (apart from Perl, whic=
-h
-> basically invented TAP, the language with the most TAP libraries seem t=
-o
-> be JavaScript!).
->=20
-
-Avocado can't currently consume TAP (it produces it, though), but it has
-some integration with glib based tests:
-
-https://avocado-framework.readthedocs.io/en/66.0/optional_plugins/glib.ht=
-ml
-
-But, there may be bits missing to fully replae gtests.  Given that we
-have been adding features to Avocado based on QEMU requirements, we can
-certainly look at adding missing pieces there.  If this sounds like
-something you'd be interested in, I can come up with an integration
-proposal.
-
-> Paolo
->=20
-
-Cheers,
-- Cleber.
+MzAuMTEuMjAxOCAxNzoxMCwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMzAuMTEuMjAxOCB1bSAx
+NDo0OCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDMw
+LjExLjIwMTggMTY6MTMsIE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAzMC4xMS4xOCAxNDowNiwg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gMzAuMTEuMjAxOCAxNToz
+MCwgTWF4IFJlaXR6IHdyb3RlOg0KPj4+Pj4gT24gMjkuMTEuMTggMTE6MTgsIFZsYWRpbWlyIFNl
+bWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4+Pj4gVGhpcyB0ZXN0IGlzIGJyb2tlbiB3aXRo
+b3V0IHByZXZpb3VzIGNvbW1pdCBmaXhpbmcgZGVhZC1sb2NrIGluIG1pcnJvci4NCj4+Pj4+Pg0K
+Pj4+Pj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXk8dnNlbWVu
+dHNvdkB2aXJ0dW96em8uY29tPg0KPj4+Pj4+IC0tLQ0KPj4+Pj4+ICAgICB0ZXN0cy9xZW11LWlv
+dGVzdHMvMjM1ICAgICB8IDU5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+DQo+Pj4+Pj4gICAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yMzUub3V0IHwgIDEgKw0KPj4+Pj4+ICAg
+ICB0ZXN0cy9xZW11LWlvdGVzdHMvZ3JvdXAgICB8ICAxICsNCj4+Pj4+PiAgICAgMyBmaWxlcyBj
+aGFuZ2VkLCA2MSBpbnNlcnRpb25zKCspDQo+Pj4+Pj4gICAgIGNyZWF0ZSBtb2RlIDEwMDc1NSB0
+ZXN0cy9xZW11LWlvdGVzdHMvMjM1DQo+Pj4+Pj4gICAgIGNyZWF0ZSBtb2RlIDEwMDY0NCB0ZXN0
+cy9xZW11LWlvdGVzdHMvMjM1Lm91dA0KPj4+Pj4gSSdsbCBnZXQgdG8gdGhlIGZpcnN0IHBhdGNo
+IGluIGEgc2Vjb25kLCBidXQgZmlyc3QgYSBzdWdnZXN0aW9uIGZvciB0aGlzDQo+Pj4+PiBwYXRj
+aDogSSB0aGluayBpdCdzIG5vdCBzbyBnb29kIHRvIHVzZSAyIEdCIG9mIHNwYWNlIGZvciBhIHRl
+c3QgKDEgR0INCj4+Pj4+IGZvciB0aGUgc291cmNlLCAxIEdCIGZvciB0aGUgdGFyZ2V0KS4gIFNv
+IEkgdHJpZWQgbXkgbHVjayBhbmQgZm91bmQgdGhhdA0KPj4+Pj4gdGhlIHRlc3Qgd29ya3MsIHRv
+bywgaWYgeW91IGp1c3QgdXNlIHByZWFsbG9jYXRpb249bWV0YWRhdGEgZm9yIHRoZQ0KPj4+Pj4g
+c291cmNlIChpbnN0ZWFkIG9mIGFjdHVhbGx5IHdyaXRpbmcgZGF0YSkgYW5kIGJsb2NrZGV2LW1p
+cnJvcidpbmcgdGhlDQo+Pj4+PiBkYXRhIHRvIGEgdGhyb3R0bGVkIG51bGwtY28gZGV2aWNlLg0K
+Pj4+Pg0KPj4+PiBIbW0sIHNvIHBhcnNpbmcgbWV0YWRhdGEgaXMgZW5vdWdoIGZvciBxY293MiB0
+byB5aWVsZCBvbiB3cml0ZSwgeWVzPw0KPj4+DQo+Pj4gQXBwYXJlbnRseSBzby4gIElmIHlvdSBj
+YW4gY29uZmlybSB0aGF0IGFwcGx5aW5nIHRob3NlIGNoYW5nZXMgdG8gdGhlDQo+Pj4gdGVzdCBz
+dGlsbCBtYWtlIGl0IHdvcmsgKGkuZS4sIGZhaWwgYmVmb3JlIHBhdGNoIDEsIHBhc3MgYWZ0ZXJ3
+YXJkcyksDQo+Pj4gdGhlbiBJIHRoaW5rIGl0IGlzIGp1c3QgYXMgZ29vZC4NCj4+DQo+PiBPaywg
+SSd2ZSBjaGVja2VkIHRoYXQgeW91ciBjaGFuZ2VzIHdvcmtzIGZvciBtZS4NCj4+DQo+PiBobSwg
+YnV0IHdlIHdyaXRlIHRvIG51bGwsIHNvLCB5aWVsZCBvbiB3cml0ZSBjb21lcyBmcm9tIHRocm90
+dGxpbmcsIGhvd2V2ZXIsDQo+PiB3aXRob3V0IHByZWFsbG9jYXRpb249bWV0YWRhdGEsIGl0IGRv
+bid0IHdvcmsuLiwgZG8geW91IGtub3csIHdoeSB3ZSBuZWVkDQo+PiBwcmVhbGxvY2F0aW9uIHRv
+IHJlcHJvZHVjZT8NCj4gDQo+IElmIEkgc2hvdWxkIHRha2UgYSBndWVzcywgcHJvYmFibHkgYmVj
+YXVzZSBtaXJyb3Igb25seSBjb3BpZXMgYWxsb2NhdGVkDQo+IGNsdXN0ZXJzPw0KPiANCj4gS2V2
+aW4NCj4gDQoNCmhtLCBzbywgd2hhdCBwcmVhbGxvY2F0aW9uPW1ldGFkYXRhIGRvZXM/IEkgdGhv
+dWdodCwgaXQgcHJlYWxsb2NhdGVzIHRhYmxlcywgYnV0IGFsbCBxY293MiBjbHVzdGVycyB3b3Vs
+ZCBiZSB1bmFsbG9jYXRlZC4uDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
