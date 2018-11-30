@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gSh7t-0001cx-1w
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:38:30 -0500
+	(envelope-from <bounces@canonical.com>) id 1gShAk-0004ES-OQ
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:41:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gSh7p-0001Uz-5u
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:38:28 -0500
-Received: from mx2.suse.de ([195.135.220.15]:48162 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gSh7n-0001Th-40
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:38:25 -0500
-References: <20181128103308.26755-1-fli@suse.com>
-	<20181128103308.26755-3-fli@suse.com>
-	<a4a3753d-8986-85c4-f098-395bc4379506@redhat.com>
-From: Fei Li <fli@suse.com>
-Message-ID: <088f213c-0fe8-8444-6311-8fbcfc80da30@suse.com>
-Date: Fri, 30 Nov 2018 19:38:16 +0800
+	(envelope-from <bounces@canonical.com>) id 1gShAh-0003EG-4t
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:41:26 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44532)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gShAg-0003E3-UY
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:41:23 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gShAe-0005Yx-Ia
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 11:41:20 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7F8142E80CF
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 11:41:20 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <a4a3753d-8986-85c4-f098-395bc4379506@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 2/5] qemu_thread_join: fix segmentation
- fault
+Date: Fri, 30 Nov 2018 11:32:56 -0000
+From: Roman Bolshakov <1802684@bugs.launchpad.net>
+Reply-To: Bug 1802684 <1802684@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154188862302.10366.13833780699115467264.malonedeb@wampee.canonical.com>
+Message-Id: <154357757644.15640.12036803767608975873.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1802684] Re: QEMU gui crashes on macOS Mojave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +36,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+I've tried to run two x86 guests with Cocoa display on 3.1 rc3, the GUI
+doesn't crash. I've tried to change screen resolution on openSUSE 15, it
+also works without an issue.
 
+My command line is:
+./x86_64-softmmu/qemu-system-x86_64 -accel hvf -cpu host -hda /path/to/disk=
+ -m MEMORY
 
-On 11/29/2018 10:32 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Fei,
->
-> On 28/11/18 11:33, Fei Li wrote:
->> To avoid the segmentation fault in qemu_thread_join(), just directly
->> return when the QemuThread *thread failed to be created in either
->> qemu-thread-posix.c or qemu-thread-win32.c.
->>
->> Signed-off-by: Fei Li <fli@suse.com>
->> Reviewed-by: Fam Zheng <famz@redhat.com>
->> ---
->>   util/qemu-thread-posix.c | 3 +++
->>   util/qemu-thread-win32.c | 2 +-
->>   2 files changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
->> index 865e476df5..b9ab5a4711 100644
->> --- a/util/qemu-thread-posix.c
->> +++ b/util/qemu-thread-posix.c
->> @@ -558,6 +558,9 @@ void *qemu_thread_join(QemuThread *thread)
->>       int err;
->>       void *ret;
->>  =20
->> +    if (!thread->thread) {
->> +        return NULL;
->> +    }
->>       err =3D pthread_join(thread->thread, &ret);
->>       if (err) {
->>           error_exit(err, __func__);
->> diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
->> index 4a363ca675..1a27e1cf6f 100644
->> --- a/util/qemu-thread-win32.c
->> +++ b/util/qemu-thread-win32.c
->> @@ -366,7 +366,7 @@ void *qemu_thread_join(QemuThread *thread)
->>       HANDLE handle;
->>  =20
->>       data =3D thread->data;
->> -    if (data->mode =3D=3D QEMU_THREAD_DETACHED) {
->> +    if (data =3D=3D NULL || data->mode =3D=3D QEMU_THREAD_DETACHED) {
-> Isn't it a way to hide a problem from the caller?
->
-> qemu_thread_create() always initializes thread->data.
->
-> If the thread doesn't exist you shouldn't try to join() it.
->
-> If you try to fix a bug, I'd use here:
->
->         assert(thread->data);
->
-> Regards,
->
-> Phil.
-Emm, this patch is actually should not be abstracted separately...
-It should be along with the "[PATCH RFC v7 9/9] qemu_thread_create:
-propagate errors to callers to check."
+-- =
 
-For the 9/9 patch, when qemu_thread_create() fails, we would like
-the callers to handle the error instead of directly abort in order to rob=
-ust
-our qemu code (e.g. do not let qemu crash when fails to hot-plug a cpu).
-And only within that patch, we need to check whether the thread has been
-created: if not just return NULL, which means no handling for that thread=
-.
-This is because for many cleanups, we just use a loop to join() all the
-thread_count. e.g. when compress_threads_save_setup() fails while
-trying to create the second/third do_data_compress thread. (Supposing
-there are more than three compress threads).
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1802684
 
-I will remove this patch in next version. Thanks for pointing this out. :=
-)
+Title:
+  QEMU gui crashes on macOS Mojave
 
-Have a nice day
-Fei
->
->>           return NULL;
->>       }
->>  =20
->>
->
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU release 3.0.0 as well as a recent head build
+
+  /usr/local/Cellar/qemu/HEAD-03c1ca1 (147 files, 257.2MB)
+    Built from source on 2018-11-06 at 13:41:32 with: --with-gtk+3 --with-s=
+dl2 --with-libusb
+  /usr/local/Cellar/qemu/3.0.0 (137 files, 261.6MB) *
+    Poured from bottle on 2018-11-10 at 22:58:32 with: --with-gtk+3 --with-=
+libusb --with-sdl2
+
+  Crashes when attempting to use any gui interface (tried SDL and
+  default Cocoa):
+
+  2018-11-10 22:58:41.799 qemu-system-aarch64[42982:1102466] *** Terminatin=
+g app due to uncaught exception 'NSInternalInconsistencyException', reason:=
+ 'NSWindow drag regions should only be invalidated on the Main Thread!'
+  *** First throw call stack:
+  (
+  	0   CoreFoundation                      0x00007fff3ea96ecd __exceptionPr=
+eprocess + 256
+  	1   libobjc.A.dylib                     0x00007fff6ab49720 objc_exceptio=
+n_throw + 48
+  	2   CoreFoundation                      0x00007fff3eab095d -[NSException=
+ raise] + 9
+  	3   AppKit                              0x00007fff3bfb13fa -[NSWindow(NS=
+Window_Theme) _postWindowNeedsToResetDragMarginsUnlessPostingDisabled] + 324
+  	4   AppKit                              0x00007fff3bfb6850 -[NSView setF=
+rameSize:] + 2082
+  	5   AppKit                              0x00007fff3c02747d -[NSVisualEff=
+ectView setFrameSize:] + 171
+  	6   AppKit                              0x00007fff3c0811b1 -[NSTitlebarV=
+iew setFrameSize:] + 84
+  	7   AppKit                              0x00007fff3bfb5859 -[NSView setF=
+rame:] + 478
+  	8   AppKit                              0x00007fff3c081154 -[NSTitlebarV=
+iew resizeWithOldSuperviewSize:] + 100
+  	9   AppKit                              0x00007fff3bfbc95e -[NSView resi=
+zeSubviewsWithOldSize:] + 502
+  	10  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
+rameSize:] + 1707
+  	11  AppKit                              0x00007fff3c9773c0 -[NSTitlebarC=
+ontainerView setFrameSize:] + 142
+  	12  AppKit                              0x00007fff3bfb5859 -[NSView setF=
+rame:] + 478
+  	13  AppKit                              0x00007fff3bfbcdb5 -[NSView resi=
+zeWithOldSuperviewSize:] + 776
+  	14  AppKit                              0x00007fff3bfbc95e -[NSView resi=
+zeSubviewsWithOldSize:] + 502
+  	15  AppKit                              0x00007fff3bfb66d9 -[NSView setF=
+rameSize:] + 1707
+  	16  AppKit                              0x00007fff3c024570 -[NSThemeFram=
+e setFrameSize:] + 495
+  	17  AppKit                              0x00007fff3c011223 -[NSWindow _s=
+etFrame:updateBorderViewSize:] + 966
+  	18  AppKit                              0x00007fff3c010b46 -[NSWindow _o=
+ldPlaceWindow:] + 547
+  	19  AppKit                              0x00007fff3c010151 -[NSWindow _s=
+etFrameCommon:display:stashSize:] + 3006
+  	20  AppKit                              0x00007fff3c00f57d -[NSWindow _s=
+etFrame:display:allowImplicitAnimation:stashSize:] + 192
+  	21  AppKit                              0x00007fff3c019ff8 -[NSWindow se=
+tFrame:display:animate:] + 567
+  	22  qemu-system-aarch64                 0x000000010b7b2abf qemu-system-a=
+arch64 + 3668671
+  	23  qemu-system-aarch64                 0x000000010b7b6356 qemu-system-a=
+arch64 + 3683158
+  	24  qemu-system-aarch64                 0x000000010b7ad836 qemu-system-a=
+arch64 + 3647542
+  	25  qemu-system-aarch64                 0x000000010b4ce769 qemu-system-a=
+arch64 + 636777
+  	26  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
+arch64 + 347172
+  	27  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
+arch64 + 346645
+  	28  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
+arch64 + 346353
+  	29  qemu-system-aarch64                 0x000000010b4414aa qemu-system-a=
+arch64 + 58538
+  	30  qemu-system-aarch64                 0x000000010b4f78c3 qemu-system-a=
+arch64 + 805059
+  	31  qemu-system-aarch64                 0x000000010b487c24 qemu-system-a=
+arch64 + 347172
+  	32  qemu-system-aarch64                 0x000000010b487a15 qemu-system-a=
+arch64 + 346645
+  	33  qemu-system-aarch64                 0x000000010b4878f1 qemu-system-a=
+arch64 + 346353
+  	34  qemu-system-aarch64                 0x000000010b4b8f57 qemu-system-a=
+arch64 + 548695
+  	35  qemu-system-aarch64                 0x000000010b49c3af qemu-system-a=
+arch64 + 431023
+  	36  ???                                 0x00000001117891f3 0x0 + 4588081=
+651
+  )
+  libc++abi.dylib: terminating with uncaught exception of type NSException
+  fish: 'qemu-system-aarch64 -M raspi3 -=E2=80=A6' terminated by signal SIG=
+ABRT (Abort)
+
+  =
+
+  macOS Mojave 10.14.2 Beta (18C38b)
+  Qemu in the same configuration used to work in High Sierra, started crash=
+ing only after upgrade to Mojave.
+
+  Command line:
+  `qemu-system-aarch64 -M raspi3 -d in_asm -serial stdio -kernel $1.bin`
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1802684/+subscriptions
