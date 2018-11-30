@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gSedV-0005ci-7W
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:59:01 -0500
+	(envelope-from <armbru@redhat.com>) id 1gSefL-000799-CX
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:00:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gSedR-0001wV-RJ
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:58:57 -0500
-Resent-Message-Id: <E1gSedR-0001wV-RJ@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gSedR-0001vV-E1
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:58:53 -0500
-In-Reply-To: <20181129090120.28828-1-pbonzini@redhat.com>
-Message-ID: <154355474395.27426.15595332645977644525@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <armbru@redhat.com>) id 1gSefB-0002fX-FS
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:00:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSef7-0002ar-GO
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:00:38 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181031115242.6558-1-d.csapak@proxmox.com>
+	<20181031115242.6558-2-d.csapak@proxmox.com>
+Date: Fri, 30 Nov 2018 10:00:28 +0100
+In-Reply-To: <20181031115242.6558-2-d.csapak@proxmox.com> (Dominik Csapak's
+	message of "Wed, 31 Oct 2018 12:52:40 +0100")
+Message-ID: <87efb3lz2r.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 29 Nov 2018 21:12:24 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/4] Small checkpatch fixes and
- improvements
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/3] qapi: move ShutdownCause to
+ qapi/run-state.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +28,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Dominik Csapak <d.csapak@proxmox.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, mreitz@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKCgpUeXBlOiBzZXJpZXMK
-U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBmb3ItNC4wIDAvNF0gU21hbGwgY2hlY2twYXRj
-aCBmaXhlcyBhbmQgaW1wcm92ZW1lbnRzCk1lc3NhZ2UtaWQ6IDIwMTgxMTI5MDkwMTIwLjI4ODI4
-LTEtcGJvbnppbmlAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
-dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
-UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
-ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
-ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4MmNhZjk1IGNoZWNrcGF0Y2g6IGNvbG9yaXplIG91
-dHB1dCB0byB0ZXJtaW5hbApkZjgzOTNhIGNoZWNrcGF0Y2g6IGltcHJvdmUgaGFuZGxpbmcgb2Yg
-bXVsdGlwbGUgcGF0Y2hlcyBvciBmaWxlcwpiOTgwMzlhIGNoZWNrcGF0Y2g6IGNoZWNrIFNpZ25l
-ZC1vZmYtYnkgaW4gLS1tYWlsYmFjayBtb2RlCmYyYzMzYzIgY2hlY2twYXRjaDogZml4IHByZW1h
-dHVyZSBleGl0IHdoZW4gbm8gaW5wdXQgb3IgLS1tYWlsYmFjawoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBjaGVja3BhdGNoOiBmaXggcHJlbWF0dXJlIGV4aXQgd2hl
-biBubyBpbnB1dCBvciAtLW1haWxiYWNrLi4uCkNoZWNraW5nIFBBVENIIDIvNDogY2hlY2twYXRj
-aDogY2hlY2sgU2lnbmVkLW9mZi1ieSBpbiAtLW1haWxiYWNrIG1vZGUuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMy80OiBjaGVja3BhdGNoOiBpbXByb3ZlIGhhbmRsaW5nIG9mIG11bHRpcGxlIHBhdGNoZXMg
-b3IgZmlsZXMuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzMzogRklMRTogc2Ny
-aXB0cy9jaGVja3BhdGNoLnBsOjM0NToKKyAgICAgICBvcGVuKCRIQVNILCAiLXwiLCAiZ2l0Iiwg
-ImxvZyIsICItLXJldmVyc2UiLCAiLS1uby1tZXJnZXMiLCAiLS1mb3JtYXQ9JUggJXMiLCAkQVJH
-VlswXSkgfHwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHNjcmlw
-dHMvY2hlY2twYXRjaC5wbDozNDY6CisgICAgICAgICAgICAgICBkaWUgIiRQOiBnaXQgbG9nIC0t
-cmV2ZXJzZSAtLW5vLW1lcmdlcyAtLWZvcm1hdD0nJUggJXMnICRBUkdWWzBdIGZhaWxlZCAtICQh
-XG4iOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzY1OiBGSUxFOiBzY3JpcHRz
-L2NoZWNrcGF0Y2gucGw6MzczOgorICAgICAgICAgICAgICAgJHZuYW1lID0gc3Vic3RyKCRoYXNo
-LCAwLCAxMikgLiAnICgnIC4gJGdpdF9jb21taXRzeyRoYXNofSAuICcpJzsKCnRvdGFsOiAyIGVy
-cm9ycywgMSB3YXJuaW5ncywgNjIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC80OiBjaGVja3BhdGNoOiBjb2xvcml6
-ZSBvdXRwdXQgdG8gdGVybWluYWwuLi4KRVJST1I6IE1pc3NpbmcgU2lnbmVkLW9mZi1ieTogbGlu
-ZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMTQgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Dominik Csapak <d.csapak@proxmox.com> writes:
+
+> this makes it possible to use the reason as return value
+> in a QMP event, such as SHUTDOWN
+
+Please start your sentences with a capital letter and end them with
+punctuation.
+
+The patch's purpose could perhaps be stated a bit more clearly.  Let me
+try:
+
+  qapi: Turn ShutdownCause into a QAPI enum
+
+  Needed so the patch after next can add ShutdownCause to QMP events
+  SHUTDOWN and RESET.
+
+> Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
+> ---
+>  include/sysemu/sysemu.h | 20 --------------------
+>  qapi/run-state.json     | 33 +++++++++++++++++++++++++++++++++
+>  2 files changed, 33 insertions(+), 20 deletions(-)
+>
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 8d6095d98b..f83522c7e7 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -31,26 +31,6 @@ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandler *cb,
+>  void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
+>  void vm_state_notify(int running, RunState state);
+>  
+> -/* Enumeration of various causes for shutdown. */
+> -typedef enum ShutdownCause {
+> -    SHUTDOWN_CAUSE_NONE,          /* No shutdown request pending */
+> -    SHUTDOWN_CAUSE_HOST_ERROR,    /* An error prevents further use of guest */
+> -    SHUTDOWN_CAUSE_HOST_QMP,      /* Reaction to a QMP command, like 'quit' */
+> -    SHUTDOWN_CAUSE_HOST_SIGNAL,   /* Reaction to a signal, such as SIGINT */
+> -    SHUTDOWN_CAUSE_HOST_UI,       /* Reaction to UI event, like window close */
+> -    SHUTDOWN_CAUSE_GUEST_SHUTDOWN,/* Guest shutdown/suspend request, via
+> -                                     ACPI or other hardware-specific means */
+> -    SHUTDOWN_CAUSE_GUEST_RESET,   /* Guest reset request, and command line
+> -                                     turns that into a shutdown */
+> -    SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
+> -                                     that into a shutdown */
+> -    SHUTDOWN_CAUSE_SUBSYSTEM_RESET,/* Partial guest reset that does not trigger
+> -                                      QMP events and ignores --no-reboot. This
+> -                                      is useful for sanitize hypercalls on s390
+> -                                      that are used during kexec/kdump/boot */
+> -    SHUTDOWN_CAUSE__MAX,
+> -} ShutdownCause;
+> -
+>  static inline bool shutdown_caused_by_guest(ShutdownCause cause)
+>  {
+>      return cause >= SHUTDOWN_CAUSE_GUEST_SHUTDOWN;
+> diff --git a/qapi/run-state.json b/qapi/run-state.json
+> index 332e44897b..883bed167c 100644
+> --- a/qapi/run-state.json
+> +++ b/qapi/run-state.json
+> @@ -60,6 +60,39 @@
+>              'guest-panicked', 'colo', 'preconfig' ] }
+>  
+>  ##
+> +# @ShutdownCause:
+> +#
+> +# An enumeration of reasons for a Shutdown.
+> +#
+> +# @none: No shutdown request pending
+> +#
+> +# @host-error: An error prevented further use of guest
+
+Any particular reason for changing the tense from "prevents" to
+"prevented"?
+
+> +#
+> +# @host-qmp: Reaction to a QMP command, like 'quit'
+> +#
+> +# @host-signal: Reaction to a signal, such as SIGINT
+> +#
+> +# @host-ui: Reaction to a UI event, like window close
+> +#
+> +# @guest-shutdown: Guest shutdown/suspend request, via ACPI or other
+> +#                  hardware-specific means
+> +#
+> +# @guest-reset: Guest reset request, and command line turns that into
+> +#               a shutdown
+> +#
+> +# @guest-panic: Guest panicked, and command line turns that into a shutdown
+> +#
+> +# @subsystem-reset: Partial guest reset that does not trigger QMP events and
+> +#                  ignores --no-reboot. This is useful for sanitizing
+> +#                  hypercalls on s390 that are used during kexec/kdump/boot
+> +#
+> +##
+> +{ 'enum': 'ShutdownCause',
+> +  'data': [ 'none', 'host-error', 'host-qmp', 'host-signal', 'host-ui',
+> +            'guest-shutdown', 'guest-reset', 'guest-panic',
+> +            'subsystem-reset'] }
+> +
+> +##
+>  # @StatusInfo:
+>  #
+>  # Information about VCPU run state
