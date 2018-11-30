@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gShCV-0007Am-Iz
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:43:16 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gShHc-0001z1-W6
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:48:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gShCS-0004Qj-F1
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:43:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52898)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gShCS-0004Qa-8v
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:43:12 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 97DBFC0C0565
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 11:43:11 +0000 (UTC)
-Date: Fri, 30 Nov 2018 09:43:07 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181130114307.GW18284@habkost.net>
-References: <20181129185754.7009-1-ehabkost@redhat.com>
-	<CAGxU2F46CNfEeRNbD59sJmZE5W9nrCcZcQgr-ZQTcXb8mqeq5A@mail.gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1gShHc-0007sf-48
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:48:32 -0500
+Date: Fri, 30 Nov 2018 12:48:21 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181130124821.292bd5c9@redhat.com>
+In-Reply-To: <20181127092801.21777-25-marcandre.lureau@redhat.com>
+References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
+	<20181127092801.21777-25-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGxU2F46CNfEeRNbD59sJmZE5W9nrCcZcQgr-ZQTcXb8mqeq5A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] hostmem: Validate host-nodes before
- setting bitmap
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 24/28] arm: replace
+ instance_post_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +24,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, Markus Armbruster <armbru@redhat.com>, david@redhat.com
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "open
+	list:ARM" <qemu-arm@nongnu.org>
 
-On Fri, Nov 30, 2018 at 09:32:21AM +0100, Stefano Garzarella wrote:
-> On Thu, Nov 29, 2018 at 7:59 PM Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >
-> > host_memory_backend_set_host_nodes() was not validating
-> > host-nodes before writing to backend->host_nodes, making QEMU
-> > write beyond the end of the bitmap.
-> >
-> > Fix the crash and add a simple regression test for the fix.
-> >
-> > Reported-by: Markus Armbruster <armbru@redhat.com>
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  backends/hostmem.c                   | 13 +++++++---
-> >  tests/acceptance/host-nodes-limit.py | 36 ++++++++++++++++++++++++++++
-> >  2 files changed, 46 insertions(+), 3 deletions(-)
-> >  create mode 100644 tests/acceptance/host-nodes-limit.py
-> >
-> > diff --git a/backends/hostmem.c b/backends/hostmem.c
-> > index 1a89342039..ef199d32fd 100644
-> > --- a/backends/hostmem.c
-> > +++ b/backends/hostmem.c
-> > @@ -103,11 +103,18 @@ host_memory_backend_set_host_nodes(Object *obj, Visitor *v, const char *name,
-> >  {
-> >  #ifdef CONFIG_NUMA
-> >      HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-> > -    uint16List *l = NULL;
-> > +    uint16List *l, *host_nodes = NULL;
-> >
-> > -    visit_type_uint16List(v, name, &l, errp);
-> > +    visit_type_uint16List(v, name, &host_nodes, errp);
-> > +
-> > +    for (l = host_nodes; l; l = l->next) {
-> > +        if (l->value >= MAX_NODES) {
-> > +            error_setg(errp, "Invalid host-nodes value: %d", l->value);
-> > +            return;
-> > +        }
-> > +    }
-> >
-> > -    while (l) {
-> > +    for (l = host_nodes; l; l = l->next) {
-> >          bitmap_set(backend->host_nodes, l->value, 1);
-> >          l = l->next;
-> >      }
-> 
-> Using the for loop instead of the while, maybe we need to remove the l
-> = l->next in the for body.
+On Tue, 27 Nov 2018 13:27:57 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-Yeah, we must remove it.  I did remove it locally but I think I
-forgot to amend the commit before submitting.  Thanks for
-catching!
+> Replace arm_cpu_post_init() instance callback by calling it from leaf
+> classes, to avoid potential the ordering issue with interfaces
+> post-init.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  target/arm/cpu.h   |  2 ++
+>  target/arm/cpu.c   | 15 ++++++++++++---
+>  target/arm/cpu64.c | 11 ++++++++++-
+>  3 files changed, 24 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 2a73fed9a0..84fba2b24b 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -884,6 +884,8 @@ static inline ARMCPU *arm_env_get_cpu(CPUARMState *en=
+v)
+>      return container_of(env, ARMCPU, env);
+>  }
+> =20
+> +void arm_cpu_post_init(Object *obj);
+> +
+>  uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz);
+> =20
+>  #define ENV_GET_CPU(e) CPU(arm_env_get_cpu(e))
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 60411f6bfe..8a4aae7438 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -734,7 +734,7 @@ static Property arm_cpu_pmsav7_dregion_property =3D
+>  static Property arm_cpu_initsvtor_property =3D
+>              DEFINE_PROP_UINT32("init-svtor", ARMCPU, init_svtor, 0);
+> =20
+> -static void arm_cpu_post_init(Object *obj)
+> +void arm_cpu_post_init(Object *obj)
+>  {
+>      ARMCPU *cpu =3D ARM_CPU(obj);
+> =20
+> @@ -2094,6 +2094,7 @@ static void arm_host_initfn(Object *obj)
+>      ARMCPU *cpu =3D ARM_CPU(obj);
+> =20
+>      kvm_arm_set_cpu_features_from_host(cpu);
+> +    arm_cpu_post_init(ARM_CPU(obj));
+>  }
+> =20
+>  static const TypeInfo host_arm_cpu_type_info =3D {
+> @@ -2108,14 +2109,23 @@ static const TypeInfo host_arm_cpu_type_info =3D {
+> =20
+>  #endif
+> =20
+> +static void arm_cpu_instance_init(Object *obj)
+> +{
+> +    const ARMCPUInfo *info =3D object_class_get_class_data(object_get_cl=
+ass(obj));
+> +
+> +    info->initfn(obj);
+> +    arm_cpu_post_init(obj);
+> +}
+now imagine leaf cpu class call chain:
+before patch:
+   arm-cpu::initfn()
+   cortex-a8::initfn()
+      set feature AAA
+   device_post_init()
+     -> arm_cpu_post_init()
+          if (AAA)
+             do something  =20
 
--- 
-Eduardo
+after patch:
+   arm-cpu::initfn()
+      -> arm_cpu_post_init()
+            if (AAA)
+               do something  <--- won't happen anymore
+   cortex-a8::initfn()
+
+arm_cpu_post_init() helper has to go to leaf classes only
+
+> +
+>  static void cpu_register(const ARMCPUInfo *info)
+>  {
+>      TypeInfo type_info =3D {
+>          .parent =3D TYPE_ARM_CPU,
+>          .instance_size =3D sizeof(ARMCPU),
+> -        .instance_init =3D info->initfn,
+> +        .instance_init =3D arm_cpu_instance_init,
+>          .class_size =3D sizeof(ARMCPUClass),
+>          .class_init =3D info->class_init,
+> +        .class_data =3D (void *)info,
+>      };
+> =20
+>      type_info.name =3D g_strdup_printf("%s-" TYPE_ARM_CPU, info->name);
+> @@ -2128,7 +2138,6 @@ static const TypeInfo arm_cpu_type_info =3D {
+>      .parent =3D TYPE_CPU,
+>      .instance_size =3D sizeof(ARMCPU),
+>      .instance_init =3D arm_cpu_initfn,
+> -    .instance_post_init =3D arm_cpu_post_init,
+>      .instance_finalize =3D arm_cpu_finalizefn,
+>      .abstract =3D true,
+>      .class_size =3D sizeof(ARMCPUClass),
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 873f059bf2..dbfc3ee490 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -447,14 +447,23 @@ static void aarch64_cpu_class_init(ObjectClass *oc,=
+ void *data)
+>      cc->gdb_arch_name =3D aarch64_gdb_arch_name;
+>  }
+> =20
+> +static void aarch64_cpu_instance_init(Object *obj)
+> +{
+> +    const ARMCPUInfo *info =3D object_class_get_class_data(object_get_cl=
+ass(obj));
+> +
+> +    info->initfn(obj);
+> +    arm_cpu_post_init(obj);
+> +}
+> +
+>  static void aarch64_cpu_register(const ARMCPUInfo *info)
+>  {
+>      TypeInfo type_info =3D {
+>          .parent =3D TYPE_AARCH64_CPU,
+>          .instance_size =3D sizeof(ARMCPU),
+> -        .instance_init =3D info->initfn,
+> +        .instance_init =3D aarch64_cpu_instance_init,
+>          .class_size =3D sizeof(ARMCPUClass),
+>          .class_init =3D info->class_init,
+> +        .class_data =3D (void *)info,
+>      };
+> =20
+>      type_info.name =3D g_strdup_printf("%s-" TYPE_ARM_CPU, info->name);
