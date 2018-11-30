@@ -1,15 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gSkZa-0007SC-Cj
+	(envelope-from <berto@igalia.com>) id 1gSkZa-0007S9-Ci
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gSkZY-0006Ws-6H
+	(envelope-from <berto@igalia.com>) id 1gSkZY-0006Wm-6G
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:18 -0500
 From: Alberto Garcia <berto@igalia.com>
-Date: Fri, 30 Nov 2018 17:17:38 +0200
-Message-Id: <cover.1543590618.git.berto@igalia.com>
-Subject: [Qemu-devel] [RFC PATCH v2 00/12] Add a 'x-blockdev-reopen' QMP
- command
+Date: Fri, 30 Nov 2018 17:17:46 +0200
+Message-Id: <290118caaf7b7247cf2d29e47041af0cf09c4835.1543590618.git.berto@igalia.com>
+In-Reply-To: <cover.1543590618.git.berto@igalia.com>
+References: <cover.1543590618.git.berto@igalia.com>
+In-Reply-To: <cover.1543590618.git.berto@igalia.com>
+References: <cover.1543590618.git.berto@igalia.com>
+Subject: [Qemu-devel] [RFC PATCH v2 08/12] block: Allow changing the backing
+ file on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,179 +25,188 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Hi,
+This patch allows the user to change the backing file of an image that
+is being reopened. Here's what it does:
 
-here's a new attempt to implement a bdrv_reopen() QMP command. The
-first attempt happened some months ago and the code has changed
-significantly since then (including two additional patch series), but
-here's the link to the previous version for reference:
+ - In bdrv_reopen_prepare(): check that the value of 'backing' points
+   to an existing node or is null. If it points to an existing node it
+   also needs to make sure that replacing the backing file will not
+   create a cycle in the node graph (i.e. you cannot reach the parent
+   from the new backing file).
 
-   https://lists.gnu.org/archive/html/qemu-block/2018-06/msg00794.html
+ - In bdrv_reopen_commit(): perform the actual node replacement by
+   calling bdrv_set_backing_hd(). It may happen that there are
+   temporary implicit nodes between the BDS that we are reopening and
+   the backing file that we want to replace (e.g. a commit fiter node),
+   so we must skip them.
 
-I'm still tagging this as RFC because I expect that there will be some
-more debate but I think the patches themselves are in pretty good
-shape, so if there are no major concerns I think the final version
-will be very similar to this one.
+Although x-blockdev-reopen is meant to be used like blockdev-add,
+there's an important thing that must be taken into account: the only
+way to set a new backing file is by using a reference to an existing
+node (previously added with e.g. blockdev-add).  If 'backing' contains
+a dictionary with a new set of options ({"driver": "qcow2", "file": {
+... }}) then it is interpreted that the _existing_ backing file must
+be reopened with those options.
 
-This is based on my "Don't pass flags to bdrv_reopen_queue()" v5
-series, available on Kevin's block-next branch and originally
-published here:
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block.c | 108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 106 insertions(+), 2 deletions(-)
 
-   https://lists.gnu.org/archive/html/qemu-block/2018-11/msg00329.html
-
-The new command is called x-blockdev-reopen, and it's designed to be
-similar to blockdev-add. It also takes BlockdevOptions as a
-parameter. The "node-name" field of BlockdevOptions must be set, and
-it is used to select the BlockDriverState to reopen.
-
-In this example "hd0" is reopened with the given set of options:
-
-    { "execute": "x-blockdev-reopen",
-      "arguments": {
-          "driver": "qcow2",
-          "node-name": "hd0",
-          "file": {
-              "driver": "file",
-              "filename": "hd0.qcow2",
-              "node-name": "hd0f"
-          },
-          "l2-cache-size": 524288
-       }
-    }
-
-Changing options
-================
-The general idea is quite straightforward, but the devil is in the
-details. Since this command tries to mimic blockdev-add, the state of
-the block device after being reopened should generally be equivalent
-to that of a block device added with the same set of options.
-
-There are two important things with this:
-
-  a) Some options cannot be changed (most drivers don't allow that, in
-     fact).
-  b) If an option is missing, it should be reset to its default value
-     (rather than keeping its previous value).
-
-Example: the default value of l2-cache-size is 1MB. If we set a
-different value (2MB) on blockdev-add but then omit the option in
-x-blockdev-reopen, then it should be reset back to 1MB. The current
-bdrv_reopen() code keeps the previous value.
-
-Trying to change an option that doesn't allow it is already being
-handled by the code. The loop at the end of bdrv_reopen_prepare()
-checks all options that were not handled by the block driver and sees
-if any of them has been modified.
-
-However, as I explained earlier in (b), omitting an option is supposed
-to reset it to its default value, so it's also a way of changing
-it. If the option cannot be changed then we should detect it and
-return an error. What I'm doing in this series is making every driver
-publish its list of run-time options, and which ones of them can be
-modified.
-
-Backing files
-=============
-This command allows reconfigurations in the node graph. Currently it
-only allows changing an image's backing file, but it should be
-possible to implement similar functionalities in drivers that have
-other children, like blkverify or quorum.
-
-Let's add an image with its backing file (hd1 <- hd0) like this:
-
-    { "execute": "blockdev-add",
-      "arguments": {
-          "driver": "qcow2",
-          "node-name": "hd0",
-          "file": {
-              "driver": "file",
-              "filename": "hd0.qcow2",
-              "node-name": "hd0f"
-          },
-          "backing": {
-              "driver": "qcow2",
-              "node-name": "hd1",
-              "file": {
-                  "driver": "file",
-                  "filename": "hd1.qcow2",
-                  "node-name": "hd1f"
-              }
-          }
-       }
-    }
-
-Removing the backing file can be done by simply passing the option {
-..., "backing": null } to x-blockdev-reopen.
-
-Replacing it is not so straightforward. If we pass something like {
-..., "backing": { "driver": "foo" ... } } then x-blockdev-reopen will
-assume that we're trying to change the options of the existing backing
-file (and it will fail in most cases because it'll likely think that
-we're trying to change the node name, among other options).
-
-So I decided to use a reference instead: { ..., "backing": "hd2" },
-where "hd2" is of an existing node that has been added previously.
-
-Leaving out the "backing" option can be ambiguous on some cases (what
-should it do? keep the current backing file? open the default one
-specified in the image file?) so x-blockdev-reopen requires that this
-option is present. For convenience, if the BDS doesn't have a backing
-file then we allow leaving the option out.
-
-As you can see in the patch series, I wrote a relatively large amount
-of tests for many different scenarios, including some tricky ones.
-
-Perhaps the part that I'm still not convinced about is the one about
-freezing backing links to prevent them from being removed, but the
-implementation was quite simple so I decided to give it a go. As
-you'll see in the patches I chose to use a bool instead of a counter
-because I couldn't think of a case where it would make sense to have
-two users freezing the same backing link.
-
-Thanks,
-
-Berto
-
-Alberto Garcia (12):
-  block: Allow freezing BdrvChild links
-  block: Freeze the backing chain for the duration of the commit job
-  block: Freeze the backing chain for the duration of the mirror job
-  block: Freeze the backing chain for the duration of the stream job
-  block: Add 'keep_old_opts' parameter to bdrv_reopen_queue()
-  block: Handle child references in bdrv_reopen_queue()
-  block: Allow omitting the 'backing' option in certain cases
-  block: Allow changing the backing file on reopen
-  block: Add 'runtime_opts' and 'mutable_opts' fields to BlockDriver
-  block: Add bdrv_reset_options_allowed()
-  block: Add an 'x-blockdev-reopen' QMP command
-  qemu-iotests: Test the x-blockdev-reopen QMP command
-
- block.c                    | 299 ++++++++++++--
- block/blkdebug.c           |   1 +
- block/commit.c             |   8 +
- block/crypto.c             |   1 +
- block/file-posix.c         |  10 +
- block/iscsi.c              |   2 +
- block/mirror.c             |   8 +
- block/null.c               |   2 +
- block/nvme.c               |   1 +
- block/qcow.c               |   1 +
- block/rbd.c                |   1 +
- block/replication.c        |   4 +-
- block/sheepdog.c           |   2 +
- block/stream.c             |  16 +
- block/vpc.c                |   1 +
- blockdev.c                 |  43 ++
- include/block/block.h      |   9 +-
- include/block/block_int.h  |  10 +
- qapi/block-core.json       |  42 ++
- qemu-io-cmds.c             |   2 +-
- tests/qemu-iotests/224     | 970 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/224.out |   5 +
- tests/qemu-iotests/group   |   1 +
- 23 files changed, 1412 insertions(+), 27 deletions(-)
- create mode 100644 tests/qemu-iotests/224
- create mode 100644 tests/qemu-iotests/224.out
-
+diff --git a/block.c b/block.c
+index 5ecdbbac9e..e8babee971 100644
+--- a/block.c
++++ b/block.c
+@@ -2909,6 +2909,27 @@ BlockDriverState *bdrv_open(const char *filename, const char *reference,
+ }
+ 
+ /*
++ * Returns true if @child can be reached recursively from @bs
++ */
++static bool bdrv_recurse_has_child(BlockDriverState *bs,
++                                   BlockDriverState *child)
++{
++    BdrvChild *c;
++
++    if (bs == child) {
++        return true;
++    }
++
++    QLIST_FOREACH(c, &bs->children, next) {
++        if (bdrv_recurse_has_child(c->bs, child)) {
++            return true;
++        }
++    }
++
++    return false;
++}
++
++/*
+  * Adds a BlockDriverState to a simple queue for an atomic, transactional
+  * reopen of multiple devices.
+  *
+@@ -3210,6 +3231,51 @@ static void bdrv_reopen_perm(BlockReopenQueue *q, BlockDriverState *bs,
+     *shared = cumulative_shared_perms;
+ }
+ 
++/* Return 0 if the 'backing' option of @bs can be replaced with
++ * @value, otherwise return < 0 and set @errp. */
++static int bdrv_reopen_parse_backing(BlockDriverState *bs, QObject *value,
++                                     Error **errp)
++{
++    BlockDriverState *overlay_bs, *new_backing_bs;
++    const char *str;
++
++    switch (qobject_type(value)) {
++    case QTYPE_QNULL:
++        new_backing_bs = NULL;
++        break;
++    case QTYPE_QSTRING:
++        str = qobject_get_try_str(value);
++        new_backing_bs = bdrv_lookup_bs(NULL, str, errp);
++        if (new_backing_bs == NULL) {
++            return -EINVAL;
++        } else if (bdrv_recurse_has_child(new_backing_bs, bs)) {
++            error_setg(errp, "Making '%s' a backing file of '%s' "
++                       "would create a cycle", str, bs->node_name);
++            return -EINVAL;
++        }
++        break;
++    default:
++        /* 'backing' does not allow any other data type */
++        g_assert_not_reached();
++    }
++
++    /* Skip all links that point to an implicit node, if any
++     * (e.g. a commit filter node). We don't want to change those. */
++    overlay_bs = bs;
++    while (backing_bs(overlay_bs) && backing_bs(overlay_bs)->implicit) {
++        overlay_bs = backing_bs(overlay_bs);
++    }
++
++    if (new_backing_bs != backing_bs(overlay_bs)) {
++        if (bdrv_is_backing_chain_frozen(overlay_bs, backing_bs(overlay_bs),
++                                         errp)) {
++            return -EPERM;
++        }
++    }
++
++    return 0;
++}
++
+ /*
+  * Prepares a BlockDriverState for reopen. All changes are staged in the
+  * 'opaque' field of the BDRVReopenState, which is used and allocated by
+@@ -3351,6 +3417,19 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+             QObject *new = entry->value;
+             QObject *old = qdict_get(reopen_state->bs->options, entry->key);
+ 
++            /*
++             * Allow changing the 'backing' option. The new value can be
++             * either a reference to an existing node (using its node name)
++             * or NULL to simply detach the current backing file.
++             */
++            if (!strcmp(entry->key, "backing")) {
++                ret = bdrv_reopen_parse_backing(reopen_state->bs, new, errp);
++                if (ret < 0) {
++                    goto error;
++                }
++                continue; /* 'backing' option processed, go to the next one */
++            }
++
+             /* Allow child references (child_name=node_name) as long as they
+              * point to the current child (i.e. everything stays the same). */
+             if (qobject_type(new) == QTYPE_QSTRING) {
+@@ -3429,9 +3508,10 @@ error:
+ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+ {
+     BlockDriver *drv;
+-    BlockDriverState *bs;
++    BlockDriverState *bs, *new_backing_bs;
+     BdrvChild *child;
+-    bool old_can_write, new_can_write;
++    bool old_can_write, new_can_write, change_backing_bs;
++    QObject *qobj;
+ 
+     assert(reopen_state != NULL);
+     bs = reopen_state->bs;
+@@ -3456,6 +3536,15 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+     bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
+     bs->detect_zeroes      = reopen_state->detect_zeroes;
+ 
++    qobj = qdict_get(bs->options, "backing");
++    change_backing_bs = (qobj != NULL);
++    if (change_backing_bs) {
++        const char *str = qobject_get_try_str(qobj);
++        new_backing_bs = str ? bdrv_find_node(str) : NULL;
++        qdict_del(bs->explicit_options, "backing");
++        qdict_del(bs->options, "backing");
++    }
++
+     /* Remove child references from bs->options and bs->explicit_options.
+      * Child options were already removed in bdrv_reopen_queue_child() */
+     QLIST_FOREACH(child, &bs->children, next) {
+@@ -3463,6 +3552,21 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+         qdict_del(bs->options, child->name);
+     }
+ 
++    /* Change the backing file if a new one was specified. We do this
++     * after updating bs->options, so bdrv_refresh_filename() (called
++     * from bdrv_set_backing_hd()) has the new values. */
++    if (change_backing_bs) {
++        BlockDriverState *overlay = bs;
++        /* Skip all links that point to an implicit node, if any
++         * (e.g. a commit filter node). We don't want to change those. */
++        while (backing_bs(overlay) && backing_bs(overlay)->implicit) {
++            overlay = backing_bs(overlay);
++        }
++        if (new_backing_bs != backing_bs(overlay)) {
++            bdrv_set_backing_hd(overlay, new_backing_bs, &error_abort);
++        }
++    }
++
+     bdrv_refresh_limits(bs, NULL);
+ 
+     bdrv_set_perm(reopen_state->bs, reopen_state->perm,
 -- 
 2.11.0
