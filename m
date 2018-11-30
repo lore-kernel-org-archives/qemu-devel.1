@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSX8u-00043J-U5
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 19:58:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSXLT-0000CC-C4
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 20:11:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSX8q-0006HS-TF
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 19:58:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39512)
+	(envelope-from <eblake@redhat.com>) id 1gSXLQ-0004Jv-84
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 20:11:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45114)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gSX8q-0006Fa-N3
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 19:58:48 -0500
-References: <20181129180050.17797-1-pbonzini@redhat.com>
-	<8fcdeb08-d87c-a236-de94-f5129aa3b99b@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gSXLP-0004Gx-VS
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 20:11:48 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3999CC05000A
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 01:11:47 +0000 (UTC)
+Received: from red.redhat.com (ovpn-117-105.phx2.redhat.com [10.3.117.105])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 010E26A6AB
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 01:11:46 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <4464faa8-7191-8898-e5fb-8e4700bd2693@redhat.com>
-Date: Thu, 29 Nov 2018 18:58:47 -0600
-MIME-Version: 1.0
-In-Reply-To: <8fcdeb08-d87c-a236-de94-f5129aa3b99b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] glib-compat: work around g_test_message
- bug with subprocess tests
+Date: Thu, 29 Nov 2018 19:11:44 -0600
+Message-Id: <20181130011146.3065277-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.1? 0/2] NBD dirty bitmap cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 11/29/18 6:08 PM, Paolo Bonzini wrote:
-> On 29/11/18 19:00, Paolo Bonzini wrote:
->> Subprocesses are created by glib without leaving the file descriptors
->> open.  Therefore, g_test_message (and assertion failures, but those
->> trigger when things are going bad anyway) will think that it is writing
->> to the log file descriptor, but while actually stomping on the QMP
->> file descriptor or similar.  This causes spurious failures, which are
->> as nice to debug as the reader can imagine.  While I have opened a
->> pull request on GLib, this will probably take a while to propagate
->> to distros.
->>
->> I found this while working on qgraph, but the fix is generic.
-> 
-> This is not a problem anymore if we switch from gtester to tap.  Do we
-> want it fixed anyway or not?
+I'm working on a bigger series to add 'qemu-nbd --list' that shows
+all details about all exports of a given server. In the process,
+it turned up a couple of bugs. By themselves, these are not enough
+to cause -rc4 (the bugs already existed in 3.0; this is not a
+regression fix), but if we have -rc4 for any other reason, both
+of these would be nice to have as it makes incremental backups
+easier to manage.
 
-If there is no -rc4, I'm fine if we drop this patch in favor of your 
-other patches for TAP. But if we have -rc4, this may still be useful for 
-inclusion in 3.1 for testsuite robustness.
+Eric Blake (2):
+  nbd/server: Advertise all contexts in response to bare LIST
+  nbd/client: Make x-dirty-bitmap more reliable
+
+ nbd/client.c | 21 +++++++++++++++++++++
+ nbd/server.c |  1 +
+ 2 files changed, 22 insertions(+)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.2
