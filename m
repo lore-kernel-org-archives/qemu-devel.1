@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gSffj-0007gn-IX
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:05:25 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gSflR-0004tv-H9
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:11:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gSffi-0000Tv-99
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:05:19 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 30 Nov 2018 10:04:57 +0000
-Message-ID: <9e19d16b-b1a3-30cf-3687-620e22ce1fb9@virtuozzo.com>
-References: <1bc34791-6ae3-cbcd-222f-468b89205f64@virtuozzo.com>
-	<50b00028-9f75-743b-cdec-58cd367a268a@virtuozzo.com>
-	<20181127160841.GJ18381@redhat.com>
-	<22fee90b-8144-212e-ad19-94480491f05b@virtuozzo.com>
-	<20181130094847.GB8101@redhat.com>
-In-Reply-To: <20181130094847.GB8101@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6A8A4BFB2C30054CAB457C16AC6920C1@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pbonzini@redhat.com>) id 1gSflG-0004Yr-V6
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:11:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49290)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gSflD-0004Po-GT
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:11:01 -0500
+References: <20181122110039.15972-1-marcandre.lureau@redhat.com>
+	<2a53c96f-a712-5719-6e29-4df04b7256af@redhat.com>
+	<da361a05-a31f-9ae1-f268-589f632ca9cf@weilnetz.de>
+	<CAMxuvayaXHhGs1V1FysNBbHH62XfoH-9gpRytNFOjdE9bimuzg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2d82537e-3322-5d0a-5fdb-03a23cdcb827@redhat.com>
+Date: Fri, 30 Nov 2018 11:10:41 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] encrypt in threads
+In-Reply-To: <CAMxuvayaXHhGs1V1FysNBbHH62XfoH-9gpRytNFOjdE9bimuzg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-3.2 0/4] build-sys: require Vista API
+ by default globally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Stefan Weil <sw@weilnetz.de>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Michael Roth <mdroth@linux.vnet.ibm.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-MzAuMTEuMjAxOCAxMjo0OCwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4gT24gVGh1LCBO
-b3YgMjksIDIwMTggYXQgMDY6Mjg6NDRQTSArMDAwMCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2
-c2tpeSB3cm90ZToNCj4+DQo+PiBPbiAyNy4xMS4yMDE4IDE2OjA4LCBEYW5pZWwgUC4gQmVycmFu
-Z8OpIHdyb3RlOg0KPj4+IE9uIFRodSwgTm92IDIyLCAyMDE4IGF0IDAxOjAxOjIwUE0gKzAwMDAs
-IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4+IDIxLjExLjIwMTggMjA6
-MzAsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4+PiBIaSBEYW5pZWwh
-DQo+Pj4+Pg0KPj4+Pj4gQWZ0ZXIgbW92aW5nIGNvbXByZXNzaW9uIHRvIHRocmVhZHMgaW4gUWNv
-dzIgaXQncyBhbiBvYnZpb3VzIG5leHQgc3RlcCB0bw0KPj4+Pj4gInRocmVhZHlmeSIgZW5jcnlw
-dGlvbiBpbiBRY293MiB0b28uDQo+Pj4+Pg0KPj4+Pj4gQnV0IGl0IHR1cm5lZCBvdXQgdG8gYmUg
-bm90IGFzIHNpbXBsZSBhcyBJIGFzc3VtZWQuIElmIEkgY2FsbCBxY3J5cHRvX2Jsb2NrX2VuY3J5
-cHQNCj4+Pj4+IGluIHBhcmFsbGVsIHRocmVhZHMgd2l0aCB0aGUgc2FtZSBmaXJzdCBhcmd1bWVu
-dCAoYmxvY2spLCBpdCBqdXN0IHByb2R1Y2Ugd3JvbmcNCj4+Pj4+IHRoaW5ncyAocGF0dGVybiB2
-ZXJpZmljYXRpb24gZmFpbHMgaW4gaW90ZXN0cykuLg0KPj4+Pj4NCj4+Pj4+IFNvLCBjYW4geW91
-IGFkdmlzZSB0aGUgd2F5IHRvIHBhcmFsbGVsaXplIGVuY3J5cHRpb24vZGVjcnlwdGlvbj8NCj4+
-Pj4+DQo+Pj4+IEhtbSwganVzdCBjcmVhdGluZyBRQ3J5cHRvQmxvY2sgcGVyIGVhY2ggdGhyZWFk
-IGhlbHBlZC4gSXMgaXQgY29ycmVjdCB0aGluZyB0byBkbz8NCj4+PiBUaGF0J3MgcmF0aGVyIGEg
-aGVhdnkgd2VpZ2h0IGFwcHJvYWNoIGFuZCB3b3VsZCBjYXVzZSBwYWluIHdoZW4gd2Ugd2FudA0K
-Pj4+IHRvIHN1cHBvcnQgZnV0dXJlIG9wdGlvbnMgc3VjaCBhcyBrZXlzbG90IHVwZGF0ZXMsIGFu
-ZCBpbiB0aGUgZnV0dXJlLA0KPj4+IExVS1N2MiB3aXRoIG1hc3RlciBrZXkgY2hhbmdlcy4NCj4+
-Pg0KPj4+IFByb2JhYmx5IHdoYXQncyBuZWVkZWQgaXMgY2hhbmdlIHRvIFFDcnlwdG9CbG9jayBz
-dHJ1Y3Qgc28gdGhhdCB0aGVyZQ0KPj4+IGNhbiBiZSBtdWx0aXBsZSBRQ3J5cHRvQ2lwaGVyIGlu
-c3RhbmNlcyBhbGxvY2F0ZWQgLSBvbmUgcGVyIHRocmVhZC4NCj4+Pg0KPj4+IFdlIG1pZ2h0IGFs
-c28gbmVlZCB0byBpbnRyb2R1Y2Ugc29tZSBsb2NraW5nIGFyb3VuZCB1c2FnZSBvZiB0aGUNCj4+
-PiBRQ3J5cHRvSVZHZW4gb2JqZWN0LCBzaW5jZSB0aGF0IGhhcyBhIFFDcnlwdG9DaXBoZXIgaGFu
-ZGxlIHRvby4NCj4+DQo+Pg0KPj4gQ2FuIHdlIGFsc28gY3JlYXRlIFFDcnlwdG9JVkdlbiBwZXIg
-dGhyZWFkLCBhcyBRQ3J5cHRvQ2lwaGVyPyBPciBpdA0KPj4gc2hvdWxkIGJlIG9uZT8gSWYgb25l
-LCB3aHkgbXkgaW1wbGVtZW50YXRpb24gd2l0aCBRQ3J5cHRvQmxvY2sgcGVyDQo+PiB0aHJlYWQg
-d29ya3MgKGF0IGxlYXN0IGl0IHBhc3NlcyBpb3Rlc3RzLCBobW0pDQo+IA0KPiBUaGUgb25seSBJ
-ViBnZW5lcmF0b3IgdGhhdCB1c2VzIGNpcGhlcnMgaXMgdGhlICJlc3NpdiIgb25lLiBFdmVuIHRo
-YXQNCj4gb25lIHVzZXMgdGhlIGNpcGhlciBpbiBFQ0IgbW9kZSwgc28gdGhlcmUgaXMgbm8gaW5p
-dGlhbGl6YXRpb24gdmVjdG9yDQo+IHJlcXVpcmVkIGZvciBpdHMgaW50ZXJuYWwgY2lwaGVyLiBU
-aGlzIG1lYW5zIHRoZXJlJ3Mgbm8gY3JpdGljYWwNCj4gc2hhcmVkIHN0YXRlIHRoYXQgd291bGQg
-YmUgb3ZlcndyaXR0ZW4gYnkgdGhyZWFkcy4gVGh1cyB1c2luZyBhDQo+IHNlcGFyYXRlIFFDcnlw
-dG9DaXBoZXIgcGVyIHRocmVhZCBmb3IgdGhlIGVzc2l2IElWIGdlbiBpcyBvdmVya2lsbC4NCj4g
-Tm9uZSB0aGUgbGVzcyBJIHRoaW5rIHdlIHNob3VsZCBwcm90ZWN0IHRoZSBJViBnZW5lcmF0b3Ig
-Y2FsbHMgd2l0aA0KPiBhIG11dGV4IGp1c3QgdG8gYmUgc2FmZS4gSSBkb24ndCB0aGluayB0aGUg
-bXV0ZXggd291bGQgaGF2ZSBhIG5vdGFibGUNCj4gaW1wYWN0IG9uIHBlcmZvcm1hbmNlIG9mIHRo
-ZSBpdiBnZW5lcmF0b3IuDQoNCkJ1dCBpZiB3ZSB1c2UgbXV0ZXgsIGl0IG1lYW5zIHRoYXQgd2Ug
-Y2FuJ3QgZ2VuZXJhdGUgdHdvIGl2cyBpbiBwYXJhbGxlbCwNCmFuZCB0aGVuLCBpdCBiZWNvbWVz
-IGJldHRlciB0byBoYXZlIHNlcGFyYXRlIGl2LWdlbiBwZXIgdGhyZWFkLCBpbnN0ZWFkDQpvZiBv
-bmx5IG9uZSwgcHJvdGVjdGVkIGJ5IG11dGV4LiAob3IgSSBkb24ndCBmb2xsb3cpDQoNCj4gDQo+
-IFJlZ2FyZHMsDQo+IERhbmllbA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWly
-DQo=
+On 29/11/18 11:50, Marc-Andr=C3=A9 Lureau wrote:
+> On Thu, Nov 29, 2018 at 2:45 PM Stefan Weil <sw@weilnetz.de> wrote:
+>>
+>> Am 29.11.2018 um 11:16 schrieb Paolo Bonzini:
+>>> On 22/11/18 12:00, Marc-Andr=C3=A9 Lureau wrote:
+>>>>  include/qemu/osdep.h      | 17 ++++++++++
+>>>>  accel/tcg/translate-all.c |  4 ---
+>>>>  qga/commands-win32.c      | 70 +-----------------------------------=
+---
+>>>>  util/qemu-thread-win32.c  |  4 ---
+>>>>  configure                 |  3 --
+>>>>  roms/seabios              |  2 +-
+>>>>  6 files changed, 19 insertions(+), 81 deletions(-)
+>>>>
+>>> Queued, thanks.
+>>>
+>>> Paolo
+>>
+>>
+>> Was the change for roms/seabios intentional?
+>=20
+> oh no! sorry Paolo
+
+Removed, no problem.
+
+Paolo
