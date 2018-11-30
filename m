@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gSiFj-0008JY-L5
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:50:42 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gSiFm-0008I7-UN
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:50:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1gSi2P-0003JF-97
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:36:54 -0500
-Date: Fri, 30 Nov 2018 13:36:45 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <a1b3027f-702a-5abb-ad93-8499f1e5e890@roeck-us.net>
-Message-ID: <alpine.BSF.2.21.9999.1811301330340.67368@zero.eik.bme.hu>
-References: <alpine.BSF.2.21.9999.1811292101280.5887@zero.eik.bme.hu>
-	<a05ba14f-b261-bb8c-12a1-4c91d005961f@redhat.com>
-	<71296170-f917-2b24-e1e6-1c525265c2a6@roeck-us.net>
-	<alpine.BSF.2.21.9999.1811300305450.787@zero.eik.bme.hu>
-	<a1b3027f-702a-5abb-ad93-8499f1e5e890@roeck-us.net>
+	(envelope-from <mreitz@redhat.com>) id 1gSi25-00037B-B2
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:36:34 -0500
+References: <20181129101801.6421-1-vsementsov@virtuozzo.com>
+	<20181129101801.6421-2-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3329707d-d16b-716e-88ac-e40ecfdd7290@redhat.com>
+Date: Fri, 30 Nov 2018 13:36:24 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Booting Raspbian on RPi emulation
+In-Reply-To: <20181129101801.6421-2-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="N5DUwsBA3V6bTFnOg9RrvNtPxzksiezlW"
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] mirror: fix dead-lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +24,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Clement Deschamps <clement.deschamps@antfield.fr>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, pbonzini@redhat.com, dplotnikov@virtuozzo.com, den@openvz.org, qemu-stable@nongnu.org
 
-On Thu, 29 Nov 2018, Guenter Roeck wrote:
-> On 11/29/18 6:42 PM, BALATON Zoltan wrote:
->> On Thu, 29 Nov 2018, Guenter Roeck wrote:
->>> On 11/29/18 4:43 PM, Philippe Mathieu-Daud=E9 wrote:
->>>> Hi Zoltan,
->>>>=20
->>>> On 29/11/18 21:29, BALATON Zoltan wrote:
->>>>> Hello,
->>>>>=20
->>>>> I could not boot Raspbian on QEMU's raspi emulation and I'm not sur=
-e why
->>>>> it fails. So question is if this is supposed to work or am I doing
->>>>> something wrong or any clues what may be missing? I'm trying with t=
-his
->>>>> command line with v3.1.0-rc3:
->>>>>=20
->>>>> qemu-system-arm -M raspi2 -serial stdio \
->>>>> -kernel rpi-kernel7.img -dtb bcm2709-rpi-2-b.dtb \
->>>>> -append "rw earlyprintk loglevel=3D8 console=3DttyAMA0,115200
->>>>> dwc_otg.lpm_enable=3D0 root=3D/dev/mmcblk0p2" \
->>>>> -drive file=3D2018-10-09-raspbian-stretch-lite.img,format=3Draw,if=3D=
-sd
->>>>>=20
->>>>> Kernel starts to boot, I see raspberries on the guest screen and lo=
-g
->>>>> output to serial:
->>>>>=20
->>>>> Booting Linux on physical CPU 0xf00
->>>>> Linux version 4.14.71-v7+ (dc4@dc4-XPS13-9333) (gcc version 4.9.3
->>>>> (crosstool-NG crosstool-ng-1.22.0-88-g8460611)) #1145 SMP Fri Sep 2=
-1
->>>>> 15:38:35 BST 2018
->>>>> CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=3D10c5387d
->>>>> [...]
->>>>>=20
->>>>=20
->>>=20
->>> My version (https://github.com/groeck/qemu) seems to work, using
->>=20
->> Tried with your v3.1.0-local branch but got same results (does not fin=
-d=20
->> mmcblk0 on raspi2, nothing on raspi3) so probably it's not one of the=20
->> patches in your tree that's missing.
->>=20
->>> multi_v7_defconfig.
->>=20
->> Then maybe it's your kernel config that's different? Do you have compi=
-led=20
->> kernels available that I could try?
->>=20
->
-> Shouldn't be, but I attached my configuration. This time with v4.14.84 =
-and
-> "make ARCH-arm savedefconfig" after building the image. The output is=20
-> identical
-> to "make ARCH=3Darm multi_v7_defconfig; make ARCH=3Darm savedefconfig".
->
-> Oh, and here is my qemu configuration.
->
-> --disable-user --disable-gnutls --disable-docs \
->        --disable-nettle --disable-gcrypt --disable-vnc-png \
->        --disable-xen --disable-xen-pci-passthrough \
->        --enable-debug --disable-strip
->
-> That should not make a difference either, but who knows.
-> Just to be sure, I copied a kernel and a root file system
-> to http://server.roeck-us.net/qemu/arm-raspi2/
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--N5DUwsBA3V6bTFnOg9RrvNtPxzksiezlW
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, pbonzini@redhat.com,
+ dplotnikov@virtuozzo.com, den@openvz.org, qemu-stable@nongnu.org
+Message-ID: <3329707d-d16b-716e-88ac-e40ecfdd7290@redhat.com>
+Subject: Re: [PATCH v2 1/2] mirror: fix dead-lock
+References: <20181129101801.6421-1-vsementsov@virtuozzo.com>
+ <20181129101801.6421-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20181129101801.6421-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It boots with your kernel (also the raspbian-lite image) so it's likely=20
-that the config of the Raspbian kernel is different and that causes the=20
-problem. Unfortunately I don't know what config their kernels use. If I'm=
-=20
-not mistaken this is the raspbian kernel repo:
+On 29.11.18 11:18, Vladimir Sementsov-Ogievskiy wrote:
+> Let start from the beginning:
+>=20
+> Commit b9e413dd375 (in 2.9)
+> "block: explicitly acquire aiocontext in aio callbacks that need it"
+> added pairs of aio_context_acquire/release to mirror_write_complete and=
 
-https://github.com/raspberrypi/linux/
+> mirror_read_complete, when they were aio callbacks for blk_aio_* calls.=
 
-My guesses would be bcm2835_defconfig or some other bcm*config? Or=20
-something completely different?
+>=20
+> Then, commit 2e1990b26e5 (in 3.0) "block/mirror: Convert to coroutines"=
 
-Regards,
-BALATON Zoltan
+> dropped these blk_aio_* calls, than mirror_write_complete and
+> mirror_read_complete are not callbacks more, and don't need additional
+> aiocontext acquiring.
+
+Yes, that alone makes enough sense to me.
+
+> Furthermore, mirror_read_complete calls
+> blk_co_pwritev inside these pair of aio_context_acquire/release, which
+> leads to the following dead-lock with mirror:
+>=20
+>  (gdb) info thr
+>    Id   Target Id         Frame
+>    3    Thread (LWP 145412) "qemu-system-x86" syscall ()
+>    2    Thread (LWP 145416) "qemu-system-x86" __lll_lock_wait ()
+>  * 1    Thread (LWP 145411) "qemu-system-x86" __lll_lock_wait ()
+>=20
+>  (gdb) bt
+>  #0  __lll_lock_wait ()
+>  #1  _L_lock_812 ()
+>  #2  __GI___pthread_mutex_lock
+>  #3  qemu_mutex_lock_impl (mutex=3D0x561032dce420 <qemu_global_mutex>,
+>      file=3D0x5610327d8654 "util/main-loop.c", line=3D236) at
+>      util/qemu-thread-posix.c:66
+>  #4  qemu_mutex_lock_iothread_impl
+>  #5  os_host_main_loop_wait (timeout=3D480116000) at util/main-loop.c:2=
+36
+>  #6  main_loop_wait (nonblocking=3D0) at util/main-loop.c:497
+>  #7  main_loop () at vl.c:1892
+>  #8  main
+>=20
+> Printing contents of qemu_global_mutex, I see that "__owner =3D 145416"=
+,
+> so, thr1 is main loop, and now it wants BQL, which is owned by thr2.
+>=20
+>  (gdb) thr 2
+>  (gdb) bt
+>  #0  __lll_lock_wait ()
+>  #1  _L_lock_870 ()
+>  #2  __GI___pthread_mutex_lock
+>  #3  qemu_mutex_lock_impl (mutex=3D0x561034d25dc0, ...
+>  #4  aio_context_acquire (ctx=3D0x561034d25d60)
+>  #5  dma_blk_cb
+>  #6  dma_blk_io
+>  #7  dma_blk_read
+>  #8  ide_dma_cb
+>  #9  bmdma_cmd_writeb
+>  #10 bmdma_write
+>  #11 memory_region_write_accessor
+>  #12 access_with_adjusted_size
+>  #15 flatview_write
+>  #16 address_space_write
+>  #17 address_space_rw
+>  #18 kvm_handle_io
+>  #19 kvm_cpu_exec
+>  #20 qemu_kvm_cpu_thread_fn
+>  #21 qemu_thread_start
+>  #22 start_thread
+>  #23 clone ()
+>=20
+> Printing mutex in fr 2, I see "__owner =3D 145411", so thr2 wants aio
+> context mutex, which is owned by thr1. Classic dead-lock.
+>=20
+> Then, let's check that aio context is hold by mirror coroutine: just
+> print coroutine stack of first tracked request in mirror job target:
+>=20
+>  (gdb) [...]
+>  (gdb) qemu coroutine 0x561035dd0860
+>  #0  qemu_coroutine_switch
+>  #1  qemu_coroutine_yield
+>  #2  qemu_co_mutex_lock_slowpath
+>  #3  qemu_co_mutex_lock
+>  #4  qcow2_co_pwritev
+>  #5  bdrv_driver_pwritev
+>  #6  bdrv_aligned_pwritev
+>  #7  bdrv_co_pwritev
+>  #8  blk_co_pwritev
+>  #9  mirror_read_complete () at block/mirror.c:232
+>  #10 mirror_co_read () at block/mirror.c:370
+>  #11 coroutine_trampoline
+>  #12 __start_context
+>=20
+> Yes it is mirror_read_complete calling blk_co_pwritev after acquiring
+> aio context.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/mirror.c | 13 +++++--------
+>  1 file changed, 5 insertions(+), 8 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--N5DUwsBA3V6bTFnOg9RrvNtPxzksiezlW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlwBLsgACgkQ9AfbAGHV
+z0D2MggAqN6L5sqsqT5LFTtTAwSP6bXUG9gCzmaIqhswWkQwv1jQxq7cu0vLyPob
+vlGPlK+Iemp4MLUiEpFCtXSPJza91cx+NHAp8Fzx10U9sLB4dZgjGCVi3lNpSKhg
+/HdJFrThFLN59KCToMuwfXhOZIg0dyEtkdeoHJZgPJm3oAEOpNTSHbx1eICeyaww
+NRkX+IyLrWT4KoRU/vf0AFq1DjonWE2+Rd3L2vlpG0uxU/D/vZ1FRorM0RwHWNX2
+pNc5MNbbr2tte58gLormemWRX9jynSj9Ouj4f99+jhb2IgbZEj8iF9ZCs8GNGF07
+q6r82Cvys9u+AHxC9k/K2BjLZ8Ow9g==
+=HreZ
+-----END PGP SIGNATURE-----
+
+--N5DUwsBA3V6bTFnOg9RrvNtPxzksiezlW--
