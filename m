@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gSiVh-0001BS-E7
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:07:10 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gSic7-0000LX-P4
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:13:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gSiVg-0001eG-IJ
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:07:09 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 30 Nov 2018 13:06:57 +0000
-Message-ID: <e9e07da0-0cd8-9820-642a-ab4fe227afc8@virtuozzo.com>
+	(envelope-from <mreitz@redhat.com>) id 1gSic7-0002wU-02
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:13:47 -0500
 References: <20181129101801.6421-1-vsementsov@virtuozzo.com>
 	<20181129101801.6421-3-vsementsov@virtuozzo.com>
 	<2f4c1bec-b5ca-e97f-88f9-75f3d2cb210c@redhat.com>
-In-Reply-To: <2f4c1bec-b5ca-e97f-88f9-75f3d2cb210c@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6725701EAA8CCA4981C08620D29BB0D7@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	<e9e07da0-0cd8-9820-642a-ab4fe227afc8@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <abcad6d9-2d40-15b4-9bce-964f6a3141a0@redhat.com>
+Date: Fri, 30 Nov 2018 14:13:32 +0100
 MIME-Version: 1.0
+In-Reply-To: <e9e07da0-0cd8-9820-642a-ab4fe227afc8@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GVY38ggGQnLBHGc06C9oSJD6Q5Va1m3lg"
 Subject: Re: [Qemu-devel] [PATCH v2 2/2] iotests: simple mirror test with
  kvm on 1G image
 List-Id: <qemu-devel.nongnu.org>
@@ -27,71 +27,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
 
-MzAuMTEuMjAxOCAxNTozMCwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyOS4xMS4xOCAxMToxOCwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IFRoaXMgdGVzdCBpcyBicm9r
-ZW4gd2l0aG91dCBwcmV2aW91cyBjb21taXQgZml4aW5nIGRlYWQtbG9jayBpbiBtaXJyb3IuDQo+
-Pg0KPj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeTx2c2VtZW50
-c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNSAg
-ICAgfCA1OSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPj4gICB0ZXN0
-cy9xZW11LWlvdGVzdHMvMjM1Lm91dCB8ICAxICsNCj4+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzL2dy
-b3VwICAgfCAgMSArDQo+PiAgIDMgZmlsZXMgY2hhbmdlZCwgNjEgaW5zZXJ0aW9ucygrKQ0KPj4g
-ICBjcmVhdGUgbW9kZSAxMDA3NTUgdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNQ0KPj4gICBjcmVhdGUg
-bW9kZSAxMDA2NDQgdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNS5vdXQNCj4gSSdsbCBnZXQgdG8gdGhl
-IGZpcnN0IHBhdGNoIGluIGEgc2Vjb25kLCBidXQgZmlyc3QgYSBzdWdnZXN0aW9uIGZvciB0aGlz
-DQo+IHBhdGNoOiBJIHRoaW5rIGl0J3Mgbm90IHNvIGdvb2QgdG8gdXNlIDIgR0Igb2Ygc3BhY2Ug
-Zm9yIGEgdGVzdCAoMSBHQg0KPiBmb3IgdGhlIHNvdXJjZSwgMSBHQiBmb3IgdGhlIHRhcmdldCku
-ICBTbyBJIHRyaWVkIG15IGx1Y2sgYW5kIGZvdW5kIHRoYXQNCj4gdGhlIHRlc3Qgd29ya3MsIHRv
-bywgaWYgeW91IGp1c3QgdXNlIHByZWFsbG9jYXRpb249bWV0YWRhdGEgZm9yIHRoZQ0KPiBzb3Vy
-Y2UgKGluc3RlYWQgb2YgYWN0dWFsbHkgd3JpdGluZyBkYXRhKSBhbmQgYmxvY2tkZXYtbWlycm9y
-J2luZyB0aGUNCj4gZGF0YSB0byBhIHRocm90dGxlZCBudWxsLWNvIGRldmljZS4NCg0KSG1tLCBz
-byBwYXJzaW5nIG1ldGFkYXRhIGlzIGVub3VnaCBmb3IgcWNvdzIgdG8geWllbGQgb24gd3JpdGUs
-IHllcz8NCg0KPiANCj4gKEFsc28sIHRoZSB0ZXN0IGFzLWlzIHBhc3NlcyBldmVuIHdpdGhvdXQg
-cGF0Y2ggMSBvbiB0bXBmcywgYXQgbGVhc3QgZm9yDQo+IG1lLiAgQnV0IHdpdGggdGhlIGNvbmZp
-Z3VyYXRpb24gZGVzY3JpYmVkIGFib3ZlLCBpdCBmYWlscyB0aGVyZSwgdG9vLikNCj4gDQo+IEkn
-dmUgYXR0YWNoZWQgYSBkaWZmLg0KPiANCj4gTWF4DQo+IA0KDQpbLi4uXQ0KDQo+DQo+IA0KPiAy
-MzUuZGlmZg0KPiANCj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzUgYi90ZXN0
-cy9xZW11LWlvdGVzdHMvMjM1DQo+IGluZGV4IGU1ZDFhZTY1OTMuLmM1MjY0OTcyYjkgMTAwNzU1
-DQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMzUNCj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rl
-c3RzLzIzNQ0KPiBAQCAtMjEsNyArMjEsNyBAQA0KPiAgIGltcG9ydCBzeXMNCj4gICBpbXBvcnQg
-b3MNCj4gICBpbXBvcnQgaW90ZXN0cw0KPiAtZnJvbSBpb3Rlc3RzIGltcG9ydCBxZW11X2ltZ19j
-cmVhdGUsIHFlbXVfaW8sIGZpbGVfcGF0aA0KPiArZnJvbSBpb3Rlc3RzIGltcG9ydCBxZW11X2lt
-Z19jcmVhdGUsIHFlbXVfaW8sIGZpbGVfcGF0aCwgbG9nDQo+ICAgDQo+ICAgc3lzLnBhdGguYXBw
-ZW5kKG9zLnBhdGguam9pbihvcy5wYXRoLmRpcm5hbWUoX19maWxlX18pLCAnLi4nLCAnLi4nLCAn
-c2NyaXB0cycpKQ0KPiAgIA0KPiBAQCAtMzgsMjIgKzM4LDM0IEBAIGZyb20gcWVtdSBpbXBvcnQg
-UUVNVU1hY2hpbmUNCj4gICAjICAgIGZvciBtZSkNCj4gICAjIDQuIGFkZCBpb3RocmVhZA0KPiAg
-IA0KPiAtc2l6ZSA9ICcxRycNCj4gK3NpemUgPSAxICogMTAyNCAqIDEwMjQgKiAxMDI0DQo+ICAg
-DQo+ICAgaW90ZXN0cy52ZXJpZnlfaW1hZ2VfZm9ybWF0KHN1cHBvcnRlZF9mbXRzPVsncmF3Jywg
-J3Fjb3cyJ10pDQo+ICAgDQo+IC1kaXNrLCB0YXJnZXQgPSBmaWxlX3BhdGgoJ2Rpc2snLCAndGFy
-Z2V0JykNCj4gK2Rpc2sgPSBmaWxlX3BhdGgoJ2Rpc2snKQ0KPiAgIA0KPiAgICMgcHJlcGFyZSBz
-b3VyY2UgaW1hZ2UNCj4gLXFlbXVfaW1nX2NyZWF0ZSgnLWYnLCBpb3Rlc3RzLmltZ2ZtdCwgZGlz
-aywgc2l6ZSkNCj4gLXFlbXVfaW8oJy1mJywgaW90ZXN0cy5pbWdmbXQsICctYycsICd3cml0ZSAw
-ICcgKyBzaXplLCBkaXNrKQ0KPiArcWVtdV9pbWdfY3JlYXRlKCctZicsIGlvdGVzdHMuaW1nZm10
-LCAnLW8nLCAncHJlYWxsb2NhdGlvbj1tZXRhZGF0YScsIGRpc2ssDQo+ICsgICAgICAgICAgICAg
-ICAgc3RyKHNpemUpKQ0KPiAgIA0KPiAgIHZtID0gUUVNVU1hY2hpbmUoaW90ZXN0cy5xZW11X3By
-b2cpDQo+ICAgdm0uYWRkX2FyZ3MoJy1tYWNoaW5lJywgJ3BjLGFjY2VsPWt2bScpDQo+ICAgdm0u
-YWRkX2FyZ3MoJy1kcml2ZScsICdpZD1zcmMsZmlsZT0nICsgZGlzaykNCj4gICB2bS5sYXVuY2go
-KQ0KPiAgIA0KPiAtcHJpbnQodm0ucW1wKCdkcml2ZS1taXJyb3InLCBkZXZpY2U9J3NyYycsIHRh
-cmdldD10YXJnZXQsIHN5bmM9J2Z1bGwnKSkNCj4gK2xvZyh2bS5xbXAoJ29iamVjdC1hZGQnLCBx
-b21fdHlwZT0ndGhyb3R0bGUtZ3JvdXAnLCBpZD0ndGcwJywNCj4gKyAgICAgICAgICAgcHJvcHM9
-eyAneC1icHMtdG90YWwnOiA2NCAqIDEwNDg1NzYgfSkpDQoNCmFuZCB5b3UgYWRkIHRocm90dGxp
-bmcuIGludGVyZXN0aW5nLCBpc24ndCBlbm91Z2ggdG8gbWlycm9yIGVtcHR5IHFjb3cyKG5vIHBy
-ZWFsbG9jYXRpb24pDQpvciBldmVuIHplcm8gZHJpdmVyICh3aXRob3V0IGEgcWNvdzIgYXQgYWxs
-KSB0byBudWxsIHdpdGggdGhyb3R0bGluZz8gT3IsIG90aGVyd2lzZSwgd2h5IHdlIG5lZWQgdGhy
-b3R0bGluZyBoZXJlPw0KDQo+ICsNCj4gK2xvZyh2bS5xbXAoJ2Jsb2NrZGV2LWFkZCcsDQo+ICsg
-ICAgICAgICAgICoqeyAnbm9kZS1uYW1lJzogJ3RhcmdldCcsDQo+ICsgICAgICAgICAgICAgICAn
-ZHJpdmVyJzogJ3Rocm90dGxlJywNCj4gKyAgICAgICAgICAgICAgICd0aHJvdHRsZS1ncm91cCc6
-ICd0ZzAnLA0KPiArICAgICAgICAgICAgICAgJ2ZpbGUnOiB7DQo+ICsgICAgICAgICAgICAgICAg
-ICAgJ2RyaXZlcic6ICdudWxsLWNvJywNCj4gKyAgICAgICAgICAgICAgICAgICAnc2l6ZSc6IHNp
-emUNCj4gKyAgICAgICAgICAgICAgICB9IH0pKQ0KPiArDQo+ICtsb2codm0ucW1wKCdibG9ja2Rl
-di1taXJyb3InLCBkZXZpY2U9J3NyYycsIHRhcmdldD0ndGFyZ2V0Jywgc3luYz0nZnVsbCcpKQ0K
-PiAgIHZtLmV2ZW50X3dhaXQoJ0JMT0NLX0pPQl9SRUFEWScpDQo+ICAgDQo+ICAgdm0uc2h1dGRv
-d24oKQ0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzIzNS5vdXQgYi90ZXN0cy9x
-ZW11LWlvdGVzdHMvMjM1Lm91dA0KPiBpbmRleCBkNmNjYmFkOGZhLi4zOWRiNjIxZTA0IDEwMDY0
-NA0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvMjM1Lm91dA0KPiArKysgYi90ZXN0cy9xZW11
-LWlvdGVzdHMvMjM1Lm91dA0KPiBAQCAtMSArMSwzIEBADQo+IC17dSdyZXR1cm4nOiB7fX0NCj4g
-K3sicmV0dXJuIjoge319DQo+ICt7InJldHVybiI6IHt9fQ0KPiAreyJyZXR1cm4iOiB7fX0NCj4g
-DQoNCg0KYW55d2F5LCBpdCdzIGdvb2QgdGhpbmcgdG8gYXZvaWQgMkcgYWxsb2NhdGlvbiBpbiB0
-ZXN0LCBJIGFncmVlLg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GVY38ggGQnLBHGc06C9oSJD6Q5Va1m3lg
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com"
+ <jcody@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
+Message-ID: <abcad6d9-2d40-15b4-9bce-964f6a3141a0@redhat.com>
+Subject: Re: [PATCH v2 2/2] iotests: simple mirror test with kvm on 1G image
+References: <20181129101801.6421-1-vsementsov@virtuozzo.com>
+ <20181129101801.6421-3-vsementsov@virtuozzo.com>
+ <2f4c1bec-b5ca-e97f-88f9-75f3d2cb210c@redhat.com>
+ <e9e07da0-0cd8-9820-642a-ab4fe227afc8@virtuozzo.com>
+In-Reply-To: <e9e07da0-0cd8-9820-642a-ab4fe227afc8@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 30.11.18 14:06, Vladimir Sementsov-Ogievskiy wrote:
+> 30.11.2018 15:30, Max Reitz wrote:
+>> On 29.11.18 11:18, Vladimir Sementsov-Ogievskiy wrote:
+>>> This test is broken without previous commit fixing dead-lock in mirro=
+r.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>=
+
+>>> ---
+>>>   tests/qemu-iotests/235     | 59 +++++++++++++++++++++++++++++++++++=
++++
+>>>   tests/qemu-iotests/235.out |  1 +
+>>>   tests/qemu-iotests/group   |  1 +
+>>>   3 files changed, 61 insertions(+)
+>>>   create mode 100755 tests/qemu-iotests/235
+>>>   create mode 100644 tests/qemu-iotests/235.out
+>> I'll get to the first patch in a second, but first a suggestion for th=
+is
+>> patch: I think it's not so good to use 2 GB of space for a test (1 GB
+>> for the source, 1 GB for the target).  So I tried my luck and found th=
+at
+>> the test works, too, if you just use preallocation=3Dmetadata for the
+>> source (instead of actually writing data) and blockdev-mirror'ing the
+>> data to a throttled null-co device.
+>=20
+> Hmm, so parsing metadata is enough for qcow2 to yield on write, yes?
+
+Apparently so.  If you can confirm that applying those changes to the
+test still make it work (i.e., fail before patch 1, pass afterwards),
+then I think it is just as good.
+
+[...]
+
+> anyway, it's good thing to avoid 2G allocation in test, I agree.
+
+And if for some reason the test needs to keep doing that, I'd propose
+adding some new test group for tests that do use such a large amount of
+disk space so it can be excluded if people don't want that to happen.
+
+Max
+
+
+--GVY38ggGQnLBHGc06C9oSJD6Q5Va1m3lg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlwBN3wACgkQ9AfbAGHV
+z0Birgf+IFxaCyff4DTpvAYT6cxoy1u6/2j/624K7XSpxZ3JiWSY4dyc6/Fzqnhv
+JU5Ky6ixh8yCqOaGH4OBj+4+hNguJ9M7FD7iCFxIAk3FVxJKyE+sqR5ZhmnBBOOr
+pjd4zGN9UhJJcC5FKd86bPC5CYQPz1O7RaKtWPhS5ABzeyWiM0srKLzTcvYX1GT6
+3Kr9QmGN2tbM2WEsQ5QMXk6wXJnC/y17mW2XNqVDqZ/36q8HP4T6oElahR8RXLTa
+Gvx0FDFbb8vzGFLa0Dpey7VbaN/fkDqOwTlLuaKzJiBtZN4sJooLCECV3sPzfz0n
+6Q4A4YVUyoua3s6/NhnWdJ8xgDAgxQ==
+=jHAs
+-----END PGP SIGNATURE-----
+
+--GVY38ggGQnLBHGc06C9oSJD6Q5Va1m3lg--
