@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gSkY1-0004nM-Q5
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:42 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gSkXw-0004jI-SU
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gSkY1-0005cF-2e
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:41 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gSkXv-0005YD-Ql
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:36 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Nov 2018 15:17:11 +0000
-Message-Id: <20181130151712.2312-10-peter.maydell@linaro.org>
+Date: Fri, 30 Nov 2018 15:17:03 +0000
+Message-Id: <20181130151712.2312-2-peter.maydell@linaro.org>
 In-Reply-To: <20181130151712.2312-1-peter.maydell@linaro.org>
 References: <20181130151712.2312-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 09/10] hw/core/loader.c: Remove load_image()
+Subject: [Qemu-devel] [PATCH 01/10] hw/ppc/mac_newworld,
+ mac_oldworld: Don't use load_image()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +25,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Philip Li <philip.li@intel.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, qemu-block@nongnu.org, qemu-ppc@nongnu.org
 
-The load_image() function is now no longer used anywhere, so
-we can remove it completely. (Use load_image_size() or
-g_file_get_contents() instead.)
+The load_image() function is deprecated, as it does not let the
+caller specify how large the buffer to read the file into is.
+Use the glib g_file_get_contents() function instead, which does
+the whole "allocate memory for the file and read it in" operation.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/loader.h |  1 -
- hw/core/loader.c    | 25 -------------------------
- 2 files changed, 26 deletions(-)
+ hw/ppc/mac_newworld.c | 10 ++++------
+ hw/ppc/mac_oldworld.c | 10 ++++------
+ 2 files changed, 8 insertions(+), 12 deletions(-)
 
-diff --git a/include/hw/loader.h b/include/hw/loader.h
-index 67a0af84ac3..3766559bc24 100644
---- a/include/hw/loader.h
-+++ b/include/hw/loader.h
-@@ -11,7 +11,6 @@
-  * On error, errno is also set as appropriate.
-  */
- int64_t get_image_size(const char *filename);
--int load_image(const char *filename, uint8_t *addr); /* deprecated */
- ssize_t load_image_size(const char *filename, void *addr, size_t size);
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 14273a123e5..7e45afae7c5 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -127,8 +127,7 @@ static void ppc_core99_init(MachineState *machine)
+     MACIOIDEState *macio_ide;
+     BusState *adb_bus;
+     MacIONVRAMState *nvr;
+-    int bios_size, ndrv_size;
+-    uint8_t *ndrv_file;
++    int bios_size;
+     int ppc_boot_device;
+     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+     void *fw_cfg;
+@@ -510,11 +509,10 @@ static void ppc_core99_init(MachineState *machine)
+     /* MacOS NDRV VGA driver */
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, NDRV_VGA_FILENAME);
+     if (filename) {
+-        ndrv_size = get_image_size(filename);
+-        if (ndrv_size != -1) {
+-            ndrv_file = g_malloc(ndrv_size);
+-            ndrv_size = load_image(filename, ndrv_file);
++        gchar *ndrv_file;
++        gsize ndrv_size;
  
- /**load_image_targphys_as:
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index aa0b3fc8679..180d891b19c 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -73,31 +73,6 @@ int64_t get_image_size(const char *filename)
-     return size;
- }
++        if (g_file_get_contents(filename, &ndrv_file, &ndrv_size, NULL)) {
+             fw_cfg_add_file(fw_cfg, "ndrv/qemu_vga.ndrv", ndrv_file, ndrv_size);
+         }
+         g_free(filename);
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 9891c325a9b..817f70e52cf 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -99,8 +99,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     SysBusDevice *s;
+     DeviceState *dev, *pic_dev;
+     BusState *adb_bus;
+-    int bios_size, ndrv_size;
+-    uint8_t *ndrv_file;
++    int bios_size;
+     uint16_t ppc_boot_device;
+     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+     void *fw_cfg;
+@@ -361,11 +360,10 @@ static void ppc_heathrow_init(MachineState *machine)
+     /* MacOS NDRV VGA driver */
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, NDRV_VGA_FILENAME);
+     if (filename) {
+-        ndrv_size = get_image_size(filename);
+-        if (ndrv_size != -1) {
+-            ndrv_file = g_malloc(ndrv_size);
+-            ndrv_size = load_image(filename, ndrv_file);
++        gchar *ndrv_file;
++        gsize ndrv_size;
  
--/* return the size or -1 if error */
--/* deprecated, because caller does not specify buffer size! */
--int load_image(const char *filename, uint8_t *addr)
--{
--    int fd, size;
--    fd = open(filename, O_RDONLY | O_BINARY);
--    if (fd < 0)
--        return -1;
--    size = lseek(fd, 0, SEEK_END);
--    if (size == -1) {
--        fprintf(stderr, "file %-20s: get size error: %s\n",
--                filename, strerror(errno));
--        close(fd);
--        return -1;
--    }
--
--    lseek(fd, 0, SEEK_SET);
--    if (read(fd, addr, size) != size) {
--        close(fd);
--        return -1;
--    }
--    close(fd);
--    return size;
--}
--
- /* return the size or -1 if error */
- ssize_t load_image_size(const char *filename, void *addr, size_t size)
- {
++        if (g_file_get_contents(filename, &ndrv_file, &ndrv_size, NULL)) {
+             fw_cfg_add_file(fw_cfg, "ndrv/qemu_vga.ndrv", ndrv_file, ndrv_size);
+         }
+         g_free(filename);
 -- 
 2.19.1
