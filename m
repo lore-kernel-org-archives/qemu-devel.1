@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGj-0006B8-R3
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:32 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGm-0006EH-SH
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGg-0002TV-CJ
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:29 -0500
-Received: from cmccmta2.chinamobile.com ([221.176.66.80]:55555)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGk-0002Yc-8e
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:32 -0500
+Received: from cmccmta3.chinamobile.com ([221.176.66.81]:21654)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGf-0002LV-EV
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:26 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGj-0002W0-F1
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:30 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 30 Nov 2018 17:38:34 +0800
-Message-Id: <20181130093852.20739-4-maozhongyi@cmss.chinamobile.com>
+Date: Fri, 30 Nov 2018 17:38:51 +0800
+Message-Id: <20181130093852.20739-21-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
 References: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 03/21] char/grlib_apbuart: Convert sysbus
- init function to realize function
+Subject: [Qemu-devel] [PATCH v3 20/21] xen_backend: remove xen_sysdev_init()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +25,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, chouteau@adacore.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, sstabellini@kernel.org, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, peter.maydell@linaro.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
-Use DeviceClass rather than SysBusDeviceClass in
-grlib_apbuart_class_init().
+The init function doesn't do anything at all, so we
+just omit it.
 
-Cc: chouteau@adacore.com
-Cc: marcandre.lureau@redhat.com
-Cc: pbonzini@redhat.com
+Cc: sstabellini@kernel.org
+Cc: anthony.perard@citrix.com
+Cc: xen-devel@lists.xenproject.org
+Cc: peter.maydell@linaro.org
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 ---
- hw/char/grlib_apbuart.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ hw/xen/xen_backend.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/hw/char/grlib_apbuart.c b/hw/char/grlib_apbuart.c
-index bac11bec58..e1d258b611 100644
---- a/hw/char/grlib_apbuart.c
-+++ b/hw/char/grlib_apbuart.c
-@@ -239,9 +239,10 @@ static const MemoryRegionOps grlib_apbuart_ops = {
-     .endianness = DEVICE_NATIVE_ENDIAN,
+diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+index 9a8e8771ec..0bc6b1de60 100644
+--- a/hw/xen/xen_backend.c
++++ b/hw/xen/xen_backend.c
+@@ -809,11 +809,6 @@ static const TypeInfo xensysbus_info = {
+     }
  };
  
--static int grlib_apbuart_init(SysBusDevice *dev)
-+static void grlib_apbuart_realize(DeviceState *dev, Error **errp)
- {
-     UART *uart = GRLIB_APB_UART(dev);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
- 
-     qemu_chr_fe_set_handlers(&uart->chr,
-                              grlib_apbuart_can_receive,
-@@ -249,14 +250,12 @@ static int grlib_apbuart_init(SysBusDevice *dev)
-                              grlib_apbuart_event,
-                              NULL, uart, NULL, true);
- 
--    sysbus_init_irq(dev, &uart->irq);
-+    sysbus_init_irq(sbd, &uart->irq);
- 
-     memory_region_init_io(&uart->iomem, OBJECT(uart), &grlib_apbuart_ops, uart,
-                           "uart", UART_REG_SIZE);
- 
--    sysbus_init_mmio(dev, &uart->iomem);
--
+-static int xen_sysdev_init(SysBusDevice *dev)
+-{
 -    return 0;
-+    sysbus_init_mmio(sbd, &uart->iomem);
- }
- 
- static void grlib_apbuart_reset(DeviceState *d)
-@@ -280,9 +279,8 @@ static Property grlib_apbuart_properties[] = {
- static void grlib_apbuart_class_init(ObjectClass *klass, void *data)
+-}
+-
+ static Property xen_sysdev_properties[] = {
+     {/* end of property list */},
+ };
+@@ -821,9 +816,7 @@ static Property xen_sysdev_properties[] = {
+ static void xen_sysdev_class_init(ObjectClass *klass, void *data)
  {
      DeviceClass *dc = DEVICE_CLASS(klass);
 -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
  
--    k->init = grlib_apbuart_init;
-+    dc->realize = grlib_apbuart_realize;
-     dc->reset = grlib_apbuart_reset;
-     dc->props = grlib_apbuart_properties;
+-    k->init = xen_sysdev_init;
+     dc->props = xen_sysdev_properties;
+     dc->bus_type = TYPE_XENSYSBUS;
  }
 -- 
 2.17.1
