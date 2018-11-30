@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gShd5-0005Y6-4e
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:10:44 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gShdi-0005tH-FT
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:11:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gShd1-0000AD-2T
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:10:43 -0500
-Resent-Message-Id: <E1gShd1-0000AD-2T@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21455)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gShd0-00009n-Po
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:10:38 -0500
-In-Reply-To: <154350164526.8036.12623669071583857903.stgit@Misha-PC.lan02.inno>
-Message-ID: <154357890486.28958.4372390105293987631@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cohuck@redhat.com>) id 1gShdd-0000JR-2x
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:11:22 -0500
+Date: Fri, 30 Nov 2018 13:11:02 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181130131102.0c9d1275.cohuck@redhat.com>
+In-Reply-To: <20181130094957.4121-1-david@redhat.com>
+References: <20181130094957.4121-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 30 Nov 2018 03:55:06 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/39] Windbg supporting
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] s390x/tod: Properly stop the KVM TOD
+ while the guest is not running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,128 +23,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mikhail.abakumov@ispras.ru
-Cc: famz@redhat.com, qemu-devel@nongnu.org, sw@weilnetz.de, lprosek@redhat.com, dovgaluk@ispras.ru, rkagan@virtuozzo.com, pbonzini@redhat.com, den@openvz.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKCgpUeXBlOiBzZXJpZXMK
-U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8zOV0gV2luZGJnIHN1cHBvcnRpbmcKTWVz
-c2FnZS1pZDogMTU0MzUwMTY0NTI2LjgwMzYuMTI2MjM2NjkwNzE1ODM4NTc5MDMuc3RnaXRATWlz
-aGEtUEMubGFuMDIuaW5ubwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
-QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
-ZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
-aXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
-JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
-JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
-dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
-YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
-KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
-aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0JwoxN2Y2YzdmIHdpbmRiZzogbWFpbnRhaW5lcnMKOTdiMjBhZiB3
-aW5kYmc6IGltcGxlbWVudCBrZF9hcGlfcXVlcnlfbWVtb3J5CjU2MzU3Mjcgd2luZGJnOiBpbXBs
-ZW1lbnQga2RfYXBpX2ZpbGxfbWVtb3J5CjY2NzcxODAgd2luZGJnOiBpbXBsZW1lbnQga2RfYXBp
-X3NlYXJjaF9tZW1vcnkKOTk3M2Y2MSB3aW5kYmc6IGltcGxlbWVudCBrZF9hcGlfcmVhZF9tc3Ig
-YW5kIGtkX2FwaV93cml0ZV9tc3IKM2MwODNkYyB3aW5kYmc6IGltcGxlbWVudCBrZF9hcGlfZ2V0
-X3ZlcnNpb24KZmNhNTljYSB3aW5kYmc6IGltcGxlbWVudCBrZF9hcGlfcmVhZF9waHlzaWNhbF9t
-ZW1vcnkgYW5kIGtkX2FwaV93cml0ZV9waHlzaWNhbF9tZW1vcnkKYzNlNDk1ZCB3aW5kYmc6IGlt
-cGxlbWVudCBrZF9hcGlfcmVhZF9pb19zcGFjZSBhbmQga2RfYXBpX3dyaXRlX2lvX3NwYWNlCjRl
-MjlhMzMgd2luZGJnOiBpbXBsZW1lbnQga2RfYXBpX2NvbnRpbnVlCjVjYTJmMmYgd2luZGJnOiBk
-ZWJ1ZyBleGNlcHRpb24gc3Vic2NyaWJpbmcKZGMzMWM4NCB3aW5kYmc6IGltcGxlbWVudCBrZF9h
-cGlfd3JpdGVfYnJlYWtwb2ludCBhbmQga2RfYXBpX3Jlc3RvcmVfYnJlYWtwb2ludAowZTkxNWNj
-IHdpbmRiZzogaW1wbGVtZW50IGtkX2FwaV9yZWFkX2NvbnRyb2xfc3BhY2UgYW5kIGtkX2FwaV93
-cml0ZV9jb250cm9sX3NwYWNlCjkxNWYzNTUgd2luZGJnOiBpbXBsZW1lbnQga2RfYXBpX2dldF9j
-b250ZXh0X2V4IGFuZCBrZF9hcGlfc2V0X2NvbnRleHRfZXgKOTdjZDZlMiB3aW5kYmc6IGltcGxl
-bWVudCBrZF9hcGlfZ2V0X2NvbnRleHQgYW5kIGtkX2FwaV9zZXRfY29udGV4dAo2YmYwY2YxIHdp
-bmRiZzogW2RlXXNlcmlhbGl6YXRpb24gY3B1IHNwZWMgcmVnaXN0ZXJzCmZhYzNkNzQgd2luZGJn
-OiBbZGVdc2VyaWFsaXphdGlvbiBjcHUgY29udGV4dApiMGJlNWU1IHdpbmRiZzogYWRkIGhlbHBl
-ciBmdW5jdGlvbnMKMGMyZGFjYyB3aW5kYmc6IHNvbWUga2VybmVsIHN0cnVjdHVyZXMKNzUzNDY1
-ZSB3aW5kYmc6IGltcGxlbWVudCBrZF9hcGlfcmVhZF92aXJ0dWFsX21lbW9yeSBhbmQga2RfYXBp
-X3dyaXRlX3ZpcnR1YWxfbWVtb3J5CjhlYjJlYTIgd2luZGJnOiBpbXBsZW1lbnQgd2luZGJnX3By
-b2Nlc3NfbWFuaXB1bGF0ZV9wYWNrZXQKMDVhNTNlNSB3aW5kYmc6IGltcGxlbWVudCB3aW5kYmdf
-cHJvY2Vzc19kYXRhX3BhY2tldApiNDFhYjU1IHdpbmRiZzogaW1wbGVtZW50IHdpbmRiZ19wcm9j
-ZXNzX2NvbnRyb2xfcGFja2V0CjAwOGE2ZGEgd2luZGJnOiBnZW5lcmF0ZSBFeGNlcHRpb25TdGF0
-ZUNoYW5nZSBhbmQgTG9hZFN5bWJvbHNTdGF0ZUNoYW5nZQplMWJmZjRmIHdpbmRiZzogaW5pdCBE
-QkdLRF9BTllfV0FJVF9TVEFURV9DSEFOR0UKNDAyMmI5OSB3aW5kYmc6IGhhbmRsZXIgb2YgcGFy
-c2luZyBjb250ZXh0CmJmYzJlNjYgd2luZGJnOiBzZW5kIGRhdGEgYW5kIGNvbnRyb2wgcGFja2V0
-cwpiODRmNDRlIHdpbmRiZzogcGFyc2luZyBkYXRhIHN0cmVhbQo4NmNmMzVlIHdpbmRiZzogaW1w
-bGVtZW50IGZpbmRfa2REZWJ1Z2dlckRhdGFCbG9jawplOWFmZDFmIHdpbmRiZzogYWRkIHdpbmRi
-Z19zZWFyY2hfdm1hZGRyCjcwZDZmYmUgd2luZGJnOiBpbXBsZW1lbnQgZmluZF9rZFZlcnNpb24K
-MzBlYjExOCB3aW5kYmc6IGltcGxlbWVudCBmaW5kX0tQQ1IKYzkwOTc4NiB3aW5kYmc6IGltcGxl
-bWVudCB3aW5kYmdfb25fbG9hZAoxNjUzMWFiIHdpbmRiZzogaG9vayB0byB3cm1zciBvcGVyYXRp
-b24KYmZjOWZiNSB3aW5kYmc6IGFkZCBjaGFyZGV2CmE4ZDg3ODcgd2luZGJnOiBhZGQgV2luZGJn
-U3RhdGUKM2E1YjViZiB3aW5kYmc6IGFkZCBoZWxwZXIgZmVhdHVyZXMKZTUzYTUxOSB3aW5kYmc6
-IGFkZCAtd2luZGJnIG9wdGlvbgo3OTk1YWRlIHdpbmRiZzogYWRkIHdpbmRiZydzIEtEIGhlYWRl
-ciBmaWxlCjVlZDI2YjUgd2luZGJnOiBhZGQgZW1wdHkgd2luZGJnc3R1YiBmaWxlcwoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zOTogd2luZGJnOiBhZGQgZW1wdHkgd2lu
-ZGJnc3R1YiBmaWxlcy4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
-LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzNTogCm5ldyBmaWxlIG1vZGUgMTAw
-NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEyMSBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDIvMzk6IHdp
-bmRiZzogYWRkIHdpbmRiZydzIEtEIGhlYWRlciBmaWxlLi4uCldBUk5JTkc6IGFkZGVkLCBtb3Zl
-ZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE0
-OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgOTM0
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hl
-Y2tpbmcgUEFUQ0ggMy8zOTogd2luZGJnOiBhZGQgLXdpbmRiZyBvcHRpb24uLi4KQ2hlY2tpbmcg
-UEFUQ0ggNC8zOTogd2luZGJnOiBhZGQgaGVscGVyIGZlYXR1cmVzLi4uCkNoZWNraW5nIFBBVENI
-IDUvMzk6IHdpbmRiZzogYWRkIFdpbmRiZ1N0YXRlLi4uCkNoZWNraW5nIFBBVENIIDYvMzk6IHdp
-bmRiZzogYWRkIGNoYXJkZXYuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8zOTogd2luZGJnOiBob29rIHRv
-IHdybXNyIG9wZXJhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA4LzM5OiB3aW5kYmc6IGltcGxlbWVu
-dCB3aW5kYmdfb25fbG9hZC4uLgpDaGVja2luZyBQQVRDSCA5LzM5OiB3aW5kYmc6IGltcGxlbWVu
-dCBmaW5kX0tQQ1IuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMzk6IHdpbmRiZzogaW1wbGVtZW50IGZp
-bmRfa2RWZXJzaW9uLi4uCkNoZWNraW5nIFBBVENIIDExLzM5OiB3aW5kYmc6IGFkZCB3aW5kYmdf
-c2VhcmNoX3ZtYWRkci4uLgpDaGVja2luZyBQQVRDSCAxMi8zOTogd2luZGJnOiBpbXBsZW1lbnQg
-ZmluZF9rZERlYnVnZ2VyRGF0YUJsb2NrLi4uCkNoZWNraW5nIFBBVENIIDEzLzM5OiB3aW5kYmc6
-IHBhcnNpbmcgZGF0YSBzdHJlYW0uLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMzk6IHdpbmRiZzogc2Vu
-ZCBkYXRhIGFuZCBjb250cm9sIHBhY2tldHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMzk6IHdpbmRi
-ZzogaGFuZGxlciBvZiBwYXJzaW5nIGNvbnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMzk6IHdp
-bmRiZzogaW5pdCBEQkdLRF9BTllfV0FJVF9TVEFURV9DSEFOR0UuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTcvMzk6IHdpbmRiZzogZ2VuZXJhdGUgRXhjZXB0aW9uU3RhdGVDaGFuZ2UgYW5kIExvYWRTeW1i
-b2xzU3RhdGVDaGFuZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMzk6IHdpbmRiZzogaW1wbGVtZW50
-IHdpbmRiZ19wcm9jZXNzX2NvbnRyb2xfcGFja2V0Li4uCkNoZWNraW5nIFBBVENIIDE5LzM5OiB3
-aW5kYmc6IGltcGxlbWVudCB3aW5kYmdfcHJvY2Vzc19kYXRhX3BhY2tldC4uLgpDaGVja2luZyBQ
-QVRDSCAyMC8zOTogd2luZGJnOiBpbXBsZW1lbnQgd2luZGJnX3Byb2Nlc3NfbWFuaXB1bGF0ZV9w
-YWNrZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvMzk6IHdpbmRiZzogaW1wbGVtZW50IGtkX2FwaV9y
-ZWFkX3ZpcnR1YWxfbWVtb3J5IGFuZCBrZF9hcGlfd3JpdGVfdmlydHVhbF9tZW1vcnkuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMjIvMzk6IHdpbmRiZzogc29tZSBrZXJuZWwgc3RydWN0dXJlcy4uLgpDaGVj
-a2luZyBQQVRDSCAyMy8zOTogd2luZGJnOiBhZGQgaGVscGVyIGZ1bmN0aW9ucy4uLgpFUlJPUjog
-TWFjcm9zIHdpdGggbXVsdGlwbGUgc3RhdGVtZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBk
-byAtIHdoaWxlIGxvb3AKIzEyNjogRklMRTogdGFyZ2V0L2kzODYvd2luZGJnc3R1Yi5jOjM4NzoK
-KyNkZWZpbmUgQ0FTRV9GSUVMRChzcmN0LCBmaWVsZCwgZmllbGRfc2l6ZSwgYmxvY2spICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgY2FzZSBvZmZzZXRvZihzcmN0LCBmaWVsZCk6
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAg
-ICBmaWVsZF9zaXplID0gc2l6ZW9mX2ZpZWxkKHNyY3QsIGZpZWxkKTsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIFwKKyAgICAgICAgYmxvY2s7ICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIGJyZWFr
-OwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjkgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMjQvMzk6IHdp
-bmRiZzogW2RlXXNlcmlhbGl6YXRpb24gY3B1IGNvbnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjUv
-Mzk6IHdpbmRiZzogW2RlXXNlcmlhbGl6YXRpb24gY3B1IHNwZWMgcmVnaXN0ZXJzLi4uCkNoZWNr
-aW5nIFBBVENIIDI2LzM5OiB3aW5kYmc6IGltcGxlbWVudCBrZF9hcGlfZ2V0X2NvbnRleHQgYW5k
-IGtkX2FwaV9zZXRfY29udGV4dC4uLgpDaGVja2luZyBQQVRDSCAyNy8zOTogd2luZGJnOiBpbXBs
-ZW1lbnQga2RfYXBpX2dldF9jb250ZXh0X2V4IGFuZCBrZF9hcGlfc2V0X2NvbnRleHRfZXguLi4K
-Q2hlY2tpbmcgUEFUQ0ggMjgvMzk6IHdpbmRiZzogaW1wbGVtZW50IGtkX2FwaV9yZWFkX2NvbnRy
-b2xfc3BhY2UgYW5kIGtkX2FwaV93cml0ZV9jb250cm9sX3NwYWNlLi4uCkNoZWNraW5nIFBBVENI
-IDI5LzM5OiB3aW5kYmc6IGltcGxlbWVudCBrZF9hcGlfd3JpdGVfYnJlYWtwb2ludCBhbmQga2Rf
-YXBpX3Jlc3RvcmVfYnJlYWtwb2ludC4uLgpDaGVja2luZyBQQVRDSCAzMC8zOTogd2luZGJnOiBk
-ZWJ1ZyBleGNlcHRpb24gc3Vic2NyaWJpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMzEvMzk6IHdpbmRi
-ZzogaW1wbGVtZW50IGtkX2FwaV9jb250aW51ZS4uLgpDaGVja2luZyBQQVRDSCAzMi8zOTogd2lu
-ZGJnOiBpbXBsZW1lbnQga2RfYXBpX3JlYWRfaW9fc3BhY2UgYW5kIGtkX2FwaV93cml0ZV9pb19z
-cGFjZS4uLgpDaGVja2luZyBQQVRDSCAzMy8zOTogd2luZGJnOiBpbXBsZW1lbnQga2RfYXBpX3Jl
-YWRfcGh5c2ljYWxfbWVtb3J5IGFuZCBrZF9hcGlfd3JpdGVfcGh5c2ljYWxfbWVtb3J5Li4uCkNo
-ZWNraW5nIFBBVENIIDM0LzM5OiB3aW5kYmc6IGltcGxlbWVudCBrZF9hcGlfZ2V0X3ZlcnNpb24u
-Li4KQ2hlY2tpbmcgUEFUQ0ggMzUvMzk6IHdpbmRiZzogaW1wbGVtZW50IGtkX2FwaV9yZWFkX21z
-ciBhbmQga2RfYXBpX3dyaXRlX21zci4uLgpDaGVja2luZyBQQVRDSCAzNi8zOTogd2luZGJnOiBp
-bXBsZW1lbnQga2RfYXBpX3NlYXJjaF9tZW1vcnkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzcvMzk6IHdp
-bmRiZzogaW1wbGVtZW50IGtkX2FwaV9maWxsX21lbW9yeS4uLgpDaGVja2luZyBQQVRDSCAzOC8z
-OTogd2luZGJnOiBpbXBsZW1lbnQga2RfYXBpX3F1ZXJ5X21lbW9yeS4uLgpDaGVja2luZyBQQVRD
-SCAzOS8zOTogd2luZGJnOiBtYWludGFpbmVycy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
-Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Fri, 30 Nov 2018 10:49:57 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> Just like on other architectures, we should stop the clock while the guest
+> is not running. This is already properly done for TCG. Right now, doing an
+> offline migration (stop, migrate, cont) can easily trigger stalls in the
+> guest.
+> 
+> Even doing a
+>     (hmp) stop
+>     ... wait 2 minutes ...
+>     (hmp) cont
+> will already trigger stalls.
+> 
+> So whenever the guest stops, backup the KVM TOD. When continuing to run
+> the guest, restore the KVM TOD.
+> 
+> One special case is starting a simple VM: Reading the TOD from KVM to
+> stop it right away until the guest is actually started means that the
+> time of any simple VM will already differ to the host time. We can
+> simply leave the TOD running and the guest won't be able to recognize
+> it.
+> 
+> For migration, we actually want to keep the TOD stopped until really
+> starting the guest. To be able to catch most errors, we should however
+> try to set the TOD in addition to simply storing it. So we can still
+> catch basic migration problems.
+> 
+> If anything goes wrong while backing up/restoring the TOD, we have to
+> ignore it (but print a warning). This is then basically a fallback to
+> old behavior (TOD remains running).
+> 
+> I tested this very basically with an initrd:
+>     1. Start a simple VM. Observed that the TOD is kept running. Old
+>        behavior.
+>     2. Ordinary live migration. Observed that the TOD is temporarily
+>        stopped on the destination when setting the new value and
+>        correctly started when finally starting the guest.
+>     3. Offline live migration. (stop, migrate, cont). Observed that the
+>        TOD will be stopped on the source with the "stop" command. On the
+>        destination, the TOD is temporarily stopped when setting the new
+>        value and correctly started when finally starting the guest via
+>        "cont".
+>     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
+>        or conts in a row have no effect, so works as expected)
+> 
+> In the future, we might want to send the guest a special kind of time sync
+> interrupt under some conditions, so it can synchronize its tod to the
+> host tod. This is interesting for migration scenarios but also when we
+> get time sync interrupts ourselves. This however will most probably have
+> to be handled in KVM (e.g. when the tods differ too much) and is not
+> desired e.g. when debugging the guest. (single stepping should not
+
+I still plan to drop the extra '.' :)
+
+> result in permanent time syncs). I consider something like that an add-on
+> on top of this basic "don't break the guest" handling.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+> 
+> v2 -> v3:
+> - use device_class_set_parent_realize() to implement a child realize
+>   function
+
+Yes, that looks more idiomatic.
+
+> 
+>  hw/s390x/tod-kvm.c     | 102 ++++++++++++++++++++++++++++++++++++++++-
+>  include/hw/s390x/tod.h |   8 +++-
+>  2 files changed, 107 insertions(+), 3 deletions(-)
+
+Passes my smoke tests. Will queue after I get reviews.
