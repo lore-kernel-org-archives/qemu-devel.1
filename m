@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGk-0006BH-3D
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:32 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGj-0006Ay-OX
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGh-0002VV-NI
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:30 -0500
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gSfGg-0002UB-QC
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:39:29 -0500
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Fri, 30 Nov 2018 17:38:31 +0800
-Message-Id: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH v3 00/21] QOM'ify SysBusDeviceClass->init
+Date: Fri, 30 Nov 2018 17:38:46 +0800
+Message-Id: <20181130093852.20739-16-maozhongyi@cmss.chinamobile.com>
+In-Reply-To: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
+References: <20181130093852.20739-1-maozhongyi@cmss.chinamobile.com>
+Subject: [Qemu-devel] [PATCH v3 15/21] pci-bridge/dec: Convert sysbus init
+ function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,100 +21,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, alistair.francis@wdc.com, anthony.perard@citrix.com, armbru@redhat.com, borntraeger@de.ibm.com, chouteau@adacore.com, cohuck@redhat.com, david@gibson.dropbear.id.au, david@redhat.com, edgar.iglesias@gmail.com, ehabkost@redhat.com, f4bug@amsat.org, gxt@mprc.pku.edu.cn, jan.kiszka@web.de, kraxel@redhat.com, kwolf@redhat.com, marcandre.lureau@redhat.com, marcel.apfelbaum@gmail.com, michael@walle.cc, mreitz@redhat.com, mst@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-block@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, richard.henderson@linaro.org, rth@twiddle.net, sstabellini@kernel.org, thuth@redhat.com, xen-devel@lists.xenproject.org
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, david@gibson.dropbear.id.au, mst@redhat.com, marcel.apfelbaum@gmail.com, qemu-ppc@nongnu.org, Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 
-v3 -> v2:
+Use DeviceClass rather than SysBusDeviceClass in
+pci_dec_21154_device_class_init().
 
-- rebase to the HEAD
-- use SysBusDevice *sbd variable in patch15
-
-v2 -> v1:
-
-- SYS_BUS_DEVICE(dev) was used in a function several
-  times, so use a variable 'sbd' to replace it, like:
-  SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-- remove the xen_sysdev_init() function
-- drop the patch21 in v1
-- fix the broken in sysbus_realize of patch22
-
-Cc: alistair.francis@wdc.com
-Cc: anthony.perard@citrix.com
-Cc: armbru@redhat.com
-Cc: borntraeger@de.ibm.com
-Cc: chouteau@adacore.com
-Cc: cohuck@redhat.com
 Cc: david@gibson.dropbear.id.au
-Cc: david@redhat.com
-Cc: edgar.iglesias@gmail.com
-Cc: ehabkost@redhat.com
-Cc: f4bug@amsat.org
-Cc: gxt@mprc.pku.edu.cn
-Cc: jan.kiszka@web.de
-Cc: kraxel@redhat.com
-Cc: kwolf@redhat.com
-Cc: marcandre.lureau@redhat.com
-Cc: marcel.apfelbaum@gmail.com
-Cc: michael@walle.cc
-Cc: mreitz@redhat.com
 Cc: mst@redhat.com
-Cc: pbonzini@redhat.com
-Cc: peter.maydell@linaro.org                                                                                                                                                                  
-Cc: qemu-arm@nongnu.org
-Cc: qemu-block@nongnu.org
+Cc: marcel.apfelbaum@gmail.com
 Cc: qemu-ppc@nongnu.org
-Cc: qemu-s390x@nongnu.org
-Cc: richard.henderson@linaro.org
-Cc: rth@twiddle.net
-Cc: sstabellini@kernel.org
-Cc: thuth@redhat.com
-Cc: xen-devel@lists.xenproject.org
 
-Mao Zhongyi (21):
-  musicpal: Convert sysbus init function to realize function
-  block/noenand: Convert sysbus init function to realize function
-  char/grlib_apbuart: Convert sysbus init function to realize function
-  core/empty_slot: Convert sysbus init function to realize function
-  display/g364fb: Convert sysbus init function to realize function
-  dma/puv3_dma: Convert sysbus init function to realize function
-  gpio/puv3_gpio: Convert sysbus init function to realize function
-  milkymist-softusb: Convert sysbus init function to realize function
-  input/pl050: Convert sysbus init function to realize function
-  intc/puv3_intc: Convert sysbus init function to realize function
-  milkymist-hpdmc: Convert sysbus init function to realize function
-  milkymist-pfpu: Convert sysbus init function to realize function
-  puv3_pm.c: Convert sysbus init function to realize function
-  nvram/ds1225y: Convert sysbus init function to realize function
-  pci-bridge/dec: Convert sysbus init function to realize function
-  timer/etraxfs_timer: Convert sysbus init function to realize function
-  timer/grlib_gptimer: Convert sysbus init function to realize function
-  timer/puv3_ost: Convert sysbus init function to realize function
-  usb/tusb6010: Convert sysbus init function to realize function
-  xen_backend: remove xen_sysdev_init() function
-  core/sysbus: remove the SysBusDeviceClass::init path
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/pci-bridge/dec.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
- hw/arm/musicpal.c            |  9 ++++-----
- hw/block/onenand.c           | 16 +++++++---------
- hw/char/grlib_apbuart.c      | 12 +++++-------
- hw/core/empty_slot.c         |  9 ++++-----
- hw/core/sysbus.c             | 15 +++++----------
- hw/display/g364fb.c          |  9 +++------
- hw/dma/puv3_dma.c            | 10 ++++------
- hw/gpio/puv3_gpio.c          | 29 ++++++++++++++---------------
- hw/input/milkymist-softusb.c | 16 +++++++---------
- hw/input/pl050.c             | 11 +++++------
- hw/intc/puv3_intc.c          | 11 ++++-------
- hw/misc/milkymist-hpdmc.c    |  9 +++------
- hw/misc/milkymist-pfpu.c     | 12 +++++-------
- hw/misc/puv3_pm.c            | 10 ++++------
- hw/nvram/ds1225y.c           | 12 +++++-------
- hw/pci-bridge/dec.c          | 12 ++++++------
- hw/timer/etraxfs_timer.c     | 14 +++++++-------
- hw/timer/grlib_gptimer.c     | 11 +++++------
- hw/timer/puv3_ost.c          | 13 ++++++-------
- hw/usb/tusb6010.c            |  8 +++-----
- hw/xen/xen_backend.c         |  7 -------
- include/hw/sysbus.h          |  3 ---
- 22 files changed, 106 insertions(+), 152 deletions(-)
-
+diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
+index 84492d5e5f..8484bfd434 100644
+--- a/hw/pci-bridge/dec.c
++++ b/hw/pci-bridge/dec.c
+@@ -98,9 +98,10 @@ PCIBus *pci_dec_21154_init(PCIBus *parent_bus, int devfn)
+     return pci_bridge_get_sec_bus(br);
+ }
+ 
+-static int pci_dec_21154_device_init(SysBusDevice *dev)
++static void pci_dec_21154_device_realize(DeviceState *dev, Error **errp)
+ {
+     PCIHostState *phb;
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+ 
+     phb = PCI_HOST_BRIDGE(dev);
+ 
+@@ -108,9 +109,8 @@ static int pci_dec_21154_device_init(SysBusDevice *dev)
+                           dev, "pci-conf-idx", 0x1000);
+     memory_region_init_io(&phb->data_mem, OBJECT(dev), &pci_host_data_le_ops,
+                           dev, "pci-data-idx", 0x1000);
+-    sysbus_init_mmio(dev, &phb->conf_mem);
+-    sysbus_init_mmio(dev, &phb->data_mem);
+-    return 0;
++    sysbus_init_mmio(sbd, &phb->conf_mem);
++    sysbus_init_mmio(sbd, &phb->data_mem);
+ }
+ 
+ static void dec_21154_pci_host_realize(PCIDevice *d, Error **errp)
+@@ -150,9 +150,9 @@ static const TypeInfo dec_21154_pci_host_info = {
+ 
+ static void pci_dec_21154_device_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    sdc->init = pci_dec_21154_device_init;
++    dc->realize = pci_dec_21154_device_realize;
+ }
+ 
+ static const TypeInfo pci_dec_21154_device_info = {
 -- 
 2.17.1
