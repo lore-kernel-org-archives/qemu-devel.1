@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSmP1-0005El-2S
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:16:31 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gSmR2-0007iW-RC
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:18:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSm9i-00068g-GX
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:00:43 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46044)
+	(envelope-from <peter.maydell@linaro.org>) id 1gSmR1-0006SH-OH
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:18:36 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43818)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gSm9i-00068N-AI
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:00:42 -0500
-Received: by mail-oi1-x242.google.com with SMTP id b141so5268839oii.12
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 09:00:42 -0800 (PST)
+	id 1gSmR1-0006Rr-IX
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:18:35 -0500
+Received: by mail-oi1-x243.google.com with SMTP id u18so5337119oie.10
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 09:18:35 -0800 (PST)
 MIME-Version: 1.0
-References: <154356772378.66975.13711686652368325931.stgit@bahia.lan>
-	<cf3f805a-4991-04d6-2cbb-6c1cca8bd238@redhat.com>
-	<20181130174548.247d293c@bahia.lan>
-In-Reply-To: <20181130174548.247d293c@bahia.lan>
+References: <fe1367d1-33f7-21fa-be84-20b9795a2157@gmail.com>
+In-Reply-To: <fe1367d1-33f7-21fa-be84-20b9795a2157@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Nov 2018 17:00:29 +0000
-Message-ID: <CAFEAcA_Z9WqjyikYO9CrvP_sM11NU6F7J0xgEimLzNTN7SKaSQ@mail.gmail.com>
+Date: Fri, 30 Nov 2018 17:18:23 +0000
+Message-ID: <CAFEAcA_K6S2pB6cP+RHDZjeACU_ROJ6jkkG-2h7TCyiCkejRug@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-3.1?] 9p: remove support for the
- "handle" backend
+Subject: Re: [Qemu-devel] [PATCH v2] Support u-boot noload images for arm as
+ used by, NetBSD/evbarm GENERIC kernel.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
+To: Nick Hudson <nicholas.a.hudson@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Fri, 30 Nov 2018 at 16:45, Greg Kurz <groug@kaod.org> wrote:
+On Thu, 29 Nov 2018 at 20:22, Nick Hudson <nicholas.a.hudson@gmail.com> wrote:
 >
-> On Fri, 30 Nov 2018 09:52:18 -0600
-> Eric Blake <eblake@redhat.com> wrote:
+> noload kernels are loaded with the u-boot image header and as a result
+> the header size needs adding to the entry point.  Fake up a hdr so the
+> kernel image is loaded at the right address and the entry point is
+> adjusted appropriately.
 >
-> > On 11/30/18 2:49 AM, Greg Kurz wrote:
-> > > The "handle" fsdev backend was deprecated in QEMU 2.12.0 with:
-> > >
-> > > commit db3b3c7281ca82e2647e072a1f97db111313dd73
-> > > Author: Greg Kurz <groug@kaod.org>
-> > > Date:   Mon Jan 8 11:18:23 2018 +0100
-> > >
-> > >      9pfs: deprecate handle backend
-> >
-> > > It has passed the two release cooling period without any complaint.
-> > >
-> > > Remove it now.
-> > >
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > ---
-> > >
-> > > It could have been removed for 3.1.0, but I woke up too late, so moving
-> > > this to 4.0.
-> > >
-> > > ---
-> > >   fsdev/qemu-fsdev.c    |    3
-> > >   hw/9pfs/9p-handle.c   |  710 -------------------------------------------------
-> > >   hw/9pfs/Makefile.objs |    1
-> > >   qemu-deprecated.texi  |    8 -
-> > >   qemu-options.hx       |    8 -
-> > >   5 files changed, 4 insertions(+), 726 deletions(-)
-> > >   delete mode 100644 hw/9pfs/9p-handle.c
-> >
-> > Well, it certainly doesn't drive -rc4 on its own, but as we may have an
-> > -rc4 for other reasons, maybe it could still be argued that this is 3.1
-> > material on the grounds of removing questionable code for less attack
-> > exposure?
-> >
+> The bootloader fits in the space that the uboot header would have occupied.
 >
-> Makes sense, as this is precisely the reason that led me to
-> deprecate this in the first place.
+> Update the load_uimage API to allow passing of load address when an image
+> doesn't specify one.
+>
+> Signed-off-by: Nick Hudson <skrll@netbsd.org>
+> ---
 
-I would prefer not to have a 700-line patch in rc4, even
-a negative-diffstat one. If it's not a definite problem
-then we shouldn't put the change in at this stage in the
-release process.
+> diff --git a/include/hw/loader.h b/include/hw/loader.h
+> index 67a0af84ac..10ff0ff76d 100644
+> --- a/include/hw/loader.h
+> +++ b/include/hw/loader.h
+> @@ -163,7 +163,8 @@ int load_aout(const char *filename, hwaddr addr, int max_sz,
+>  /** load_uimage_as:
+>   * @filename: Path of uimage file
+>   * @ep: Populated with program entry point. Ignored if NULL.
+> - * @loadaddr: Populated with the load address. Ignored if NULL.
+> + * @loadaddr: load address if none specified in the image. Populated with the
+> + *            load address. Ignored if NULL.
+
+This API change will break some existing users. For instance
+hw/microblaze/boot.c does this:
+            hwaddr uentry, loadaddr;
+
+            kernel_size = load_uimage(kernel_filename, &uentry, &loadaddr, 0,
+                                      NULL, NULL);
+
+which is a legitimate use of the current API, but your changes will
+mean that load_uboot_image() will be using an uninitialized
+variable. Getting every call site that cares about the returned
+result from loadaddr to also provide a valid default load
+address as input is going to be really painful, so I think we
+need to figure out an API for this function that doesn't
+make the input (default load address) argument the same
+parameter as the output (where we actually loaded the image)
+argument.
+
+Off the top of my head, the first thing that comes to mind is
+adding another argument to the function:
+ @defaultloadaddr: Load address to use if none specified in
+          the image. If NULL, no default address is available
+          (and images which do not specify a load address will
+          not be loadable).
+but there might be a neater approach than that that I haven't
+thought of.
+
+We should also make the load_uboot_image() function print an
+error message if we don't load the file because it needs a
+default load address and the caller didn't pass one
+("this image format cannot be loaded on this machine type",
+or similar).
+
+PS: our coding style wants {} on all if()s -- scripts/checkpatch.pl
+can help catch this kind of nit.
 
 thanks
 -- PMM
