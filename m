@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSqtO-0004Ru-2G
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 17:04:11 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSqtQ-0004VK-Kt
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 17:04:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSqtJ-0004TZ-FL
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 17:04:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSqtP-00056H-GL
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 17:04:12 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 30 Nov 2018 16:03:38 -0600
-Message-Id: <20181130220344.3350618-10-eblake@redhat.com>
+Date: Fri, 30 Nov 2018 16:03:43 -0600
+Message-Id: <20181130220344.3350618-15-eblake@redhat.com>
 In-Reply-To: <20181130220344.3350618-1-eblake@redhat.com>
 References: <20181130220344.3350618-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/14] nbd/client: Refactor return of
- nbd_receive_negotiate()
+Subject: [Qemu-devel] [PATCH 14/14] iotests: Enhance 223,
+ 233 to cover 'qemu-nbd --list'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,203 +21,159 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, nsoffer@redhat.com, rjones@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+Cc: jsnow@redhat.com, nsoffer@redhat.com, rjones@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-The function could only ever return 0 or -EINVAL; make this
-clearer by dropping a useless 'fail:' label.
+Any good new feature deserves some regression testing :)
+Coverage includes:
+- 223: what happens when there are 0 or more than 1 export,
+proof that we can see multiple contexts including qemu:dirty-bitmap
+- 233: proof that we can list over TLS, and that mix-and-match of
+plain/TLS listings sanely
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/client.c | 51 +++++++++++++++++++++++----------------------------
- 1 file changed, 23 insertions(+), 28 deletions(-)
+ tests/qemu-iotests/223     |  2 ++
+ tests/qemu-iotests/223.out | 20 ++++++++++++++++++++
+ tests/qemu-iotests/233     | 10 ++++++++++
+ tests/qemu-iotests/233.out | 15 +++++++++++++++
+ 4 files changed, 47 insertions(+)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index 27785c55d0a..1ed5009642e 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -773,7 +773,6 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-                           NBDExportInfo *info, Error **errp)
- {
-     uint64_t magic;
--    int rc;
-     bool zeroes = true;
-     bool structured_reply = info->structured_reply;
-     bool base_allocation = info->base_allocation;
-@@ -784,31 +783,30 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-     trace_nbd_receive_negotiate_name(info->name);
-     info->structured_reply = false;
-     info->base_allocation = false;
--    rc = -EINVAL;
+diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
+index 397b865d347..e64747a9a61 100755
+--- a/tests/qemu-iotests/223
++++ b/tests/qemu-iotests/223
+@@ -119,6 +119,7 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-block-dirty-bitmap-disable",
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-start",
+   "arguments":{"addr":{"type":"unix",
+     "data":{"path":"'"$TEST_DIR/nbd"'"}}}}' "return"
++$QEMU_NBD_PROG -L -k "$TEST_DIR/nbd"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
+   "arguments":{"device":"n"}}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
+@@ -127,6 +128,7 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
+   "arguments":{"device":"n", "name":"n2"}}' "return"
+ _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
+   "arguments":{"name":"n2", "bitmap":"b2"}}' "return"
++$QEMU_NBD_PROG -L -k "$TEST_DIR/nbd"
 
-     if (outioc) {
-         *outioc = NULL;
-     }
-     if (tlscreds && !outioc) {
-         error_setg(errp, "Output I/O channel required for TLS");
--        goto fail;
-+        return -EINVAL;
-     }
+ echo
+ echo "=== Contrast normal status to large granularity dirty-bitmap ==="
+diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
+index de417477de0..3342bff3447 100644
+--- a/tests/qemu-iotests/223.out
++++ b/tests/qemu-iotests/223.out
+@@ -29,10 +29,30 @@ wrote 2097152/2097152 bytes at offset 2097152
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
++exports available: 0
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
++exports available: 2
++ export: 'n'
++  size:  4194304
++  flags: 0x4ef ( readonly flush fua trim zeroes df cache )
++  min block: 512
++  opt block: 4096
++  max block: 33554432
++  available meta contexts: 2
++   base:allocation
++   qemu:dirty-bitmap:b
++ export: 'n2'
++  size:  4194304
++  flags: 0x4ef ( readonly flush fua trim zeroes df cache )
++  min block: 512
++  opt block: 4096
++  max block: 33554432
++  available meta contexts: 2
++   base:allocation
++   qemu:dirty-bitmap:b2
 
-     if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
-         error_prepend(errp, "Failed to read data: ");
--        goto fail;
-+        return -EINVAL;
-     }
-     magic = be64_to_cpu(magic);
-     trace_nbd_receive_negotiate_magic(magic);
+ === Contrast normal status to large granularity dirty-bitmap ===
 
-     if (magic != NBD_INIT_MAGIC) {
-         error_setg(errp, "Invalid magic received");
--        goto fail;
-+        return -EINVAL;
-     }
+diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
+index 1814efe3333..5d694d9d242 100755
+--- a/tests/qemu-iotests/233
++++ b/tests/qemu-iotests/233
+@@ -72,6 +72,9 @@ $QEMU_IMG info --image-opts \
+     --object tls-creds-x509,dir=${tls_dir}/client1,endpoint=client,id=tls0 \
+     driver=nbd,host=$nbd_tcp_addr,port=$nbd_tcp_port,tls-creds=tls0 \
+     2>&1 | sed "s/$nbd_tcp_port/PORT/g"
++$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port \
++    --object tls-creds-x509,dir=${tls_dir}/client1,endpoint=client,id=tls0 \
++    --tls-creds=tls0
 
-     if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
-         error_prepend(errp, "Failed to read magic: ");
--        goto fail;
-+        return -EINVAL;
-     }
-     magic = be64_to_cpu(magic);
-     trace_nbd_receive_negotiate_magic(magic);
-@@ -820,7 +818,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+ nbd_server_stop
 
-         if (nbd_read(ioc, &globalflags, sizeof(globalflags), errp) < 0) {
-             error_prepend(errp, "Failed to read server flags: ");
--            goto fail;
-+            return -EINVAL;
-         }
-         globalflags = be16_to_cpu(globalflags);
-         trace_nbd_receive_negotiate_server_flags(globalflags);
-@@ -836,18 +834,18 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-         clientflags = cpu_to_be32(clientflags);
-         if (nbd_write(ioc, &clientflags, sizeof(clientflags), errp) < 0) {
-             error_prepend(errp, "Failed to send clientflags field: ");
--            goto fail;
-+            return -EINVAL;
-         }
-         if (tlscreds) {
-             if (fixedNewStyle) {
-                 *outioc = nbd_receive_starttls(ioc, tlscreds, hostname, errp);
-                 if (!*outioc) {
--                    goto fail;
-+                    return -EINVAL;
-                 }
-                 ioc = *outioc;
-             } else {
-                 error_setg(errp, "Server does not support STARTTLS");
--                goto fail;
-+                return -EINVAL;
-             }
-         }
-         if (fixedNewStyle) {
-@@ -858,7 +856,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-                                                    NBD_OPT_STRUCTURED_REPLY,
-                                                    errp);
-                 if (result < 0) {
--                    goto fail;
-+                    return -EINVAL;
-                 }
-                 info->structured_reply = result == 1;
-             }
-@@ -869,7 +867,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-                         info->x_dirty_bitmap ?: "base:allocation",
-                         info, errp);
-                 if (result < 0) {
--                    goto fail;
-+                    return -EINVAL;
-                 }
-                 info->base_allocation = result == 1;
-             }
-@@ -881,7 +879,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-              * export, then use NBD_OPT_EXPORT_NAME.  */
-             result = nbd_opt_go(ioc, info, errp);
-             if (result < 0) {
--                goto fail;
-+                return -EINVAL;
-             }
-             if (result > 0) {
-                 return 0;
-@@ -893,25 +891,25 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
-              * export name is not available.
-              */
-             if (nbd_receive_query_exports(ioc, info->name, errp) < 0) {
--                goto fail;
-+                return -EINVAL;
-             }
-         }
-         /* write the export name request */
-         if (nbd_send_option_request(ioc, NBD_OPT_EXPORT_NAME, -1, info->name,
-                                     errp) < 0) {
--            goto fail;
-+            return -EINVAL;
-         }
+@@ -84,6 +87,7 @@ nbd_server_start_tcp_socket \
+     -f $IMGFMT "$TEST_IMG"
 
-         /* Read the response */
-         if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
-             error_prepend(errp, "Failed to read export length: ");
--            goto fail;
-+            return -EINVAL;
-         }
-         info->size = be64_to_cpu(info->size);
+ $QEMU_IMG info nbd://localhost:$nbd_tcp_port 2>&1 | sed "s/$nbd_tcp_port/PORT/g"
++$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port
 
-         if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
-             error_prepend(errp, "Failed to read export flags: ");
--            goto fail;
-+            return -EINVAL;
-         }
-         info->flags = be16_to_cpu(info->flags);
-     } else if (magic == NBD_CLIENT_MAGIC) {
-@@ -919,43 +917,40 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+ echo
+ echo "== check TLS works =="
+@@ -91,6 +95,9 @@ $QEMU_IMG info --image-opts \
+     --object tls-creds-x509,dir=${tls_dir}/client1,endpoint=client,id=tls0 \
+     driver=nbd,host=$nbd_tcp_addr,port=$nbd_tcp_port,tls-creds=tls0 \
+     2>&1 | sed "s/$nbd_tcp_port/PORT/g"
++$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port \
++    --object tls-creds-x509,dir=${tls_dir}/client1,endpoint=client,id=tls0 \
++    --tls-creds=tls0
 
-         if (*info->name) {
-             error_setg(errp, "Server does not support non-empty export names");
--            goto fail;
-+            return -EINVAL;
-         }
-         if (tlscreds) {
-             error_setg(errp, "Server does not support STARTTLS");
--            goto fail;
-+            return -EINVAL;
-         }
+ echo
+ echo "== check TLS with different CA fails =="
+@@ -98,6 +105,9 @@ $QEMU_IMG info --image-opts \
+     --object tls-creds-x509,dir=${tls_dir}/client2,endpoint=client,id=tls0 \
+     driver=nbd,host=$nbd_tcp_addr,port=$nbd_tcp_port,tls-creds=tls0 \
+     2>&1 | sed "s/$nbd_tcp_port/PORT/g"
++$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port \
++    --object tls-creds-x509,dir=${tls_dir}/client2,endpoint=client,id=tls0 \
++    --tls-creds=tls0
 
-         if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
-             error_prepend(errp, "Failed to read export length: ");
--            goto fail;
-+            return -EINVAL;
-         }
-         info->size = be64_to_cpu(info->size);
+ echo
+ echo "== perform I/O over TLS =="
+diff --git a/tests/qemu-iotests/233.out b/tests/qemu-iotests/233.out
+index 5f416721b03..ab669488669 100644
+--- a/tests/qemu-iotests/233.out
++++ b/tests/qemu-iotests/233.out
+@@ -15,20 +15,35 @@ wrote 1048576/1048576 bytes at offset 1048576
+ == check TLS client to plain server fails ==
+ qemu-img: Could not open 'driver=nbd,host=127.0.0.1,port=PORT,tls-creds=tls0': Denied by server for option 5 (starttls)
+ server reported: TLS not configured
++qemu-nbd: Denied by server for option 5 (starttls)
++server reported: TLS not configured
 
-         if (nbd_read(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
-             error_prepend(errp, "Failed to read export flags: ");
--            goto fail;
-+            return -EINVAL;
-         }
-         oldflags = be32_to_cpu(oldflags);
-         if (oldflags & ~0xffff) {
-             error_setg(errp, "Unexpected export flags %0x" PRIx32, oldflags);
--            goto fail;
-+            return -EINVAL;
-         }
-         info->flags = oldflags;
-     } else {
-         error_setg(errp, "Bad magic received");
--        goto fail;
-+        return -EINVAL;
-     }
+ == check plain client to TLS server fails ==
+ qemu-img: Could not open 'nbd://localhost:PORT': TLS negotiation required before option 8 (structured reply)
+ server reported: Option 0x8 not permitted before TLS
++qemu-nbd: TLS negotiation required before option 8 (structured reply)
++server reported: Option 0x8 not permitted before TLS
 
-     trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
-     if (zeroes && nbd_drop(ioc, 124, errp) < 0) {
-         error_prepend(errp, "Failed to read reserved block: ");
--        goto fail;
-+        return -EINVAL;
-     }
--    rc = 0;
--
--fail:
--    return rc;
-+    return 0;
- }
+ == check TLS works ==
+ image: nbd://127.0.0.1:PORT
+ file format: nbd
+ virtual size: 64M (67108864 bytes)
+ disk size: unavailable
++exports available: 1
++ export: ''
++  size:  67108864
++  flags: 0x4ed ( flush fua trim zeroes df cache )
++  min block: 512
++  opt block: 4096
++  max block: 33554432
++  available meta contexts: 1
++   base:allocation
 
- #ifdef __linux__
+ == check TLS with different CA fails ==
+ qemu-nbd: option negotiation failed: Verify failed: No certificate was found.
+ qemu-img: Could not open 'driver=nbd,host=127.0.0.1,port=PORT,tls-creds=tls0': The certificate hasn't got a known issuer
++qemu-nbd: option negotiation failed: Verify failed: No certificate was found.
++qemu-nbd: The certificate hasn't got a known issuer
+
+ == perform I/O over TLS ==
+ read 1048576/1048576 bytes at offset 1048576
 -- 
 2.17.2
