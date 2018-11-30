@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gScwU-0005lb-Uk
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 02:10:27 -0500
+	(envelope-from <laurent.desnogues@gmail.com>) id 1gSd21-0001Mw-KC
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 02:16:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gScwQ-0003lT-PM
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 02:10:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48954)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gScwQ-0003kR-Ez
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 02:10:22 -0500
-References: <1543513531-1151-1-git-send-email-pbonzini@redhat.com>
-	<1543513531-1151-2-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <548a82cc-c514-e8b4-1a8d-6cab8e5def3b@redhat.com>
-Date: Fri, 30 Nov 2018 08:10:18 +0100
+	(envelope-from <laurent.desnogues@gmail.com>) id 1gSd20-0007xm-Qx
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 02:16:09 -0500
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:42426)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
+	id 1gSd20-0007ws-Ll
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 02:16:08 -0500
+Received: by mail-qk1-x743.google.com with SMTP id m5so2609849qka.9
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 23:16:08 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1543513531-1151-2-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] test: execute g_test_run when tests
- are skipped
+References: <20181128053834.10861-1-richard.henderson@linaro.org>
+	<20181128221530.GA32160@flamenco>
+	<9d890088-8dd6-517d-52a7-a6166f0cd8a6@linaro.org>
+	<20181130003915.GA3323@flamenco> <20181130030009.GA14990@flamenco>
+In-Reply-To: <20181130030009.GA14990@flamenco>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Fri, 30 Nov 2018 08:15:56 +0100
+Message-ID: <CABoDooOcT-Yp__TJMj4roHMeq_T20=14-kf4L1gGNemv-gRoZg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 00/12] tcg: Improve register allocation for
+ calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 2018-11-29 18:45, Paolo Bonzini wrote:
-> Sometimes a test's main() function recognizes that the environment
-> does not support the test, and therefore exits.  In this case, we
-> still should run g_test_run() so that a TAP harness will print the
-> test plan ("1..0") and the test will be marked as skipped.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/cdrom-test.c     | 2 +-
->  tests/migration-test.c | 8 ++++----
->  2 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
-> index 9b43dc9..14bd981 100644
-> --- a/tests/cdrom-test.c
-> +++ b/tests/cdrom-test.c
-> @@ -169,7 +169,7 @@ int main(int argc, char **argv)
->  
->      if (exec_genisoimg(genisocheck)) {
->          /* genisoimage not available - so can't run tests */
-> -        return 0;
-> +        return g_test_run();
->      }
->  
->      ret = prepare_image(arch, isoimage);
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 06ca506..8352612 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -789,7 +789,7 @@ int main(int argc, char **argv)
->      g_test_init(&argc, &argv, NULL);
->  
->      if (!ufd_version_check()) {
-> -        return 0;
-> +        return g_test_run();
->      }
->  
->      /*
-> @@ -800,7 +800,7 @@ int main(int argc, char **argv)
->      if (g_str_equal(qtest_get_arch(), "ppc64") &&
->          access("/sys/module/kvm_hv", F_OK)) {
->          g_test_message("Skipping test: kvm_hv not available");
-> -        return 0;
-> +        return g_test_run();
->      }
->  
->      /*
-> @@ -811,11 +811,11 @@ int main(int argc, char **argv)
->  #if defined(HOST_S390X)
->          if (access("/dev/kvm", R_OK | W_OK)) {
->              g_test_message("Skipping test: kvm not available");
-> -            return 0;
-> +            return g_test_run();
->          }
->  #else
->          g_test_message("Skipping test: Need s390x host to work properly");
-> -        return 0;
-> +        return g_test_run();
->  #endif
->      }
+On Fri, Nov 30, 2018 at 4:00 AM Emilio G. Cota <cota@braap.org> wrote:
+>
+> On Thu, Nov 29, 2018 at 19:39:15 -0500, Emilio G. Cota wrote:
+> > A64 and POWER9 host numbers:
+> >
+> >   https://imgur.com/a/m6Pss99
+> >
+> > There's quite a bit of noise in the P9 measurements, but it's
+> > a shared machine so I can't do much about that.
+> >
+> > I'll update the A64 results with error bars later tonight,
+> > when I get further results.
+>
+> Here they are:
+>
+>   https://imgur.com/a/EAAapSW
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+What is a X-Gene A57? It's either X-Gene or A57 :-)
+
+Thanks,
+
+Laurent
+
+> The second image is the same results, but zoomed in. I could
+> bring the confidence intervals down by running this many times,
+> but each run takes 2h and I only have access to the
+> machine for a few hours at a time.
+>
+> Those confidence intervals are generated from only 2 runs per benchmark,
+> which explains why they're so large.
+>
+>                 E.
+>
