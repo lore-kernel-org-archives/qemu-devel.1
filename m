@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gSfWu-0006Q6-UG
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:56:14 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gSfYD-0007WA-Mw
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:57:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gSfWr-0006j6-CJ
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:56:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51460)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gSfWr-0006hF-10
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:56:09 -0500
-References: <1543513531-1151-1-git-send-email-pbonzini@redhat.com>
-	<1389c712-2e02-80c0-b9e1-4c45b54d35df@redhat.com>
-	<20181130095450.GC8101@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0070dd1f-eb02-53a9-ca20-a98a50cf0bce@redhat.com>
-Date: Fri, 30 Nov 2018 10:56:01 +0100
+	(envelope-from <imammedo@redhat.com>) id 1gSfYC-0007f7-PW
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:57:33 -0500
+Date: Fri, 30 Nov 2018 10:57:16 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181130105716.2131be19@redhat.com>
+In-Reply-To: <20181129145942.GB4691@caravaggio>
+References: <20181129132428.333-1-sameo@linux.intel.com>
+	<20181129132428.333-7-sameo@linux.intel.com>
+	<20181129144243.so22d2igis7a24xp@kamzik.brq.redhat.com>
+	<20181129145942.GB4691@caravaggio>
 MIME-Version: 1.0
-In-Reply-To: <20181130095450.GC8101@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/2] test: replace gtester with a
- TAP driver
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 6/8] hw: arm: Support both legacy and
+ current RSDP build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +26,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 30/11/18 10:54, Daniel P. Berrang=C3=A9 wrote:
-> FYI, for docs about the TAP protocol see:
->=20
->    https://testanything.org/tap-specification.html
->=20
-> I've always liked the TAP protocol approach to test output where you pr=
-int
-> an ok/not ok  status for each piece of the test, as opposed to assertio=
-n
-> style tests where you just abort at the first piece that fails.=20
+On Thu, 29 Nov 2018 15:59:42 +0100
+Samuel Ortiz <sameo@linux.intel.com> wrote:
 
-FWIW, this is not what this series does.  Each ok/not ok line
-corresponds to one assertion-style test.
+> On Thu, Nov 29, 2018 at 03:42:43PM +0100, Andrew Jones wrote:
+> > On Thu, Nov 29, 2018 at 02:24:26PM +0100, Samuel Ortiz wrote:  
+> > > We add the ability to build legacy or current RSDP tables, based on the
+> > > AcpiRsdpData revision field passed to build_rsdp().
+> > > Although arm/virt only uses RSDP v2, adding that capability to
+> > > build_rsdp will allow us to share the RSDP build code between ARM and x86.
+> > > 
+> > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> > > ---
+> > >  hw/arm/virt-acpi-build.c | 37 ++++++++++++++++++++++++++-----------
+> > >  1 file changed, 26 insertions(+), 11 deletions(-)
+> > > 
+> > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > > index 4782aea4fe..e1338b6f5a 100644
+> > > --- a/hw/arm/virt-acpi-build.c
+> > > +++ b/hw/arm/virt-acpi-build.c
+> > > @@ -378,23 +378,38 @@ build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+> > >      g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
+> > >      build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision */
+> > >      build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
+> > > -    build_append_int_noprefix(tbl, 36, 4); /* Length */
+> > > -
+> > > -    /* XSDT address to be filled by guest linker */
+> > > -    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
+> > > -    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
+> > > -                                   24, 8,
+> > > -                                   ACPI_BUILD_TABLE_FILE,
+> > > -                                   *rsdp_data->xsdt_tbl_offset);
+> > > -
+> > > -    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
+> > > -    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
+> > > +    if (rsdp_data->rsdt_tbl_offset) {  
+> > 
+> > I see why a pointer was used now. Using a pointer ensures a zero
+> > offset won't fail this test. However the test could be replaced with
+> > rsdp_data->revision == 0.
+> >   
+> > > +        /* RSDT address to be filled by guest linker */
+> > > +        bios_linker_loader_add_pointer(linker,
+> > > +                                       ACPI_BUILD_RSDP_FILE, 16, 4,
+> > > +                                       ACPI_BUILD_TABLE_FILE,
+> > > +                                       *rsdp_data->rsdt_tbl_offset);
+> > > +    }
+> > >  
+> > >      /* Checksum to be filled by guest linker */
+> > >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> > >                                      0, 20, /* ACPI rev 1.0 RSDP size */
+> > >                                      8);
+> > >  
+> > > +    if (rsdp_data->revision == 0) {
+> > > +        /* ACPI 1.0 RSDP, we're done */
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    /* The RSDP revision is 2 and later, we must have an XSDT pointer */
+> > > +    g_assert(rsdp_data->xsdt_tbl_offset != NULL);  
+> > 
+> > So here's the justification for the pointers. We sanity check the callers.  
+> We could sanity check the callers without pointers as well, I don't
+> think there's a strong advantage for pointers here, except consistence.
+I remember now,
+we need pointer to RSDT offset here so that we could skip bios_linker_loader_add_pointer(rsdt)
+when RSDT isn't provided (0 is also a valid offset), as for xsdt field it follows
+rsdt one for consistency and we can do sanity checks on it.
 
-Paolo
+assert here seems not really necessary as it guarantied to SIGSEGV
+on NULL point dereference at bios_linker_loader_add_pointer(*xdst) callsite.
+But I don't care here, so I'll leave it up to Samuel.
+
+> > We're missing the (rsdp_data->revision == 0 && rsdp_data->rsdt_tbl_offset)
+> > sanity check though.  
+> I think there's nothing preventing a caller to include both rsdt and
+> xsdt if it wants to be able to run on both < 2.0 and 2.0+ platforms with
+> the same table. So if rsdt is set we should add it, regardless of the revision.
+agreed,
+we don't do this in QEMU but it's correct, there could be both and it's better
+follow better document spec in this case.
+
+> 
+> Cheers,
+> Samuel.
