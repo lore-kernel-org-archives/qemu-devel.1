@@ -1,29 +1,27 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:42742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSWRH-0000DL-A5
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 19:13:52 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gSWRq-0000DL-Sq
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 19:14:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSWPp-0000Ax-65
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 19:12:22 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:35348)
+	(envelope-from <pbonzini@redhat.com>) id 1gSWMD-0005vU-1m
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 19:08:38 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:33498)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gSWPo-0000AK-V4
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 19:12:17 -0500
-Received: by mail-pf1-x441.google.com with SMTP id z9so1862429pfi.2
-	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 16:12:16 -0800 (PST)
-References: <f4349b9ee95cbd9d5b16e9033fdf0d7c9e99aebf.camel@kernel.crashing.org>
-	<a9dd602b-9eb1-f57a-ef21-31f08fc18729@linaro.org>
-	<408ef3b1c0bab7d26cffeb366a5ee87bb8448fa4.camel@kernel.crashing.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b8130aae-5158-bb31-73c0-82beee0ad176@linaro.org>
-Date: Thu, 29 Nov 2018 16:12:12 -0800
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gSWMC-0005un-QZ
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 19:08:32 -0500
+Received: by mail-wr1-f67.google.com with SMTP id c14so3644060wrr.0
+	for <qemu-devel@nongnu.org>; Thu, 29 Nov 2018 16:08:32 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+References: <20181129180050.17797-1-pbonzini@redhat.com>
+Message-ID: <8fcdeb08-d87c-a236-de94-f5129aa3b99b@redhat.com>
+Date: Fri, 30 Nov 2018 01:08:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <408ef3b1c0bab7d26cffeb366a5ee87bb8448fa4.camel@kernel.crashing.org>
+In-Reply-To: <20181129180050.17797-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC/PATCH] i386: Atomically update PTEs with mttcg
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] glib-compat: work around g_test_message
+ bug with subprocess tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
-On 11/29/18 2:54 PM, Benjamin Herrenschmidt wrote:
->>     pdpe_addr = (pml4e & PG_ADDRESS_MASK) +
->>                 (((gphys >> 30) & 0x1ff) << 3);
->>     pdpe = x86_ldq_phys(cs, pdpe_addr);
->>     do {
->>         if (!(pdpe & PG_PRESENT_MASK)) {
->>             goto do_fault;
->>         }
->>         if (pdpe & rsvd_mask) {
->>             goto do_fault_rsvd;
->>         }
->>         if (pdpe & PG_ACCESSED_MASK) {
->>             break;
->>         }
->>     } while (!update_entry(cs, pdpe_addr, &pdpe, PG_ACCESSED_MASK));
->>     ptep &= pdpe ^ PG_NX_MASK;
->>
->> ....
+On 29/11/18 19:00, Paolo Bonzini wrote:
+> Subprocesses are created by glib without leaving the file descriptors
+> open.  Therefore, g_test_message (and assertion failures, but those
+> trigger when things are going bad anyway) will think that it is writing
+> to the log file descriptor, but while actually stomping on the QMP
+> file descriptor or similar.  This causes spurious failures, which are
+> as nice to debug as the reader can imagine.  While I have opened a
+> pull request on GLib, this will probably take a while to propagate
+> to distros.
 > 
-> Hrm.. I see. So not re-do the full walk. Not sure it's really worth it
-> though, how often do we expect to hit the failing case ?
+> I found this while working on qgraph, but the fix is generic.
 
-It is probably rare-ish, I admit.
+This is not a problem anymore if we switch from gtester to tap.  Do we
+want it fixed anyway or not?
 
-I suppose we could also signal "success" from update_entry if the cmpxchg
-fails, but the value that was reloaded only differs in setting PG_ACCESSED_MASK
-| PG_DIRTY_MASK, as long as 'bits' itself was set.
+Paolo
 
->> Although I think it would be really great if we could figure out something that
->> allows us to promote this whole load/cmpxchg loop into a primitive that avoids
->> multiple translations of the address.
->>
->> No, I don't know what that primitive would look like.  :-)
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Message-Id: <1543343726-53531-1-git-send-email-pbonzini@redhat.com>
+> Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  include/glib-compat.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> You mean translating once for the load and for the udpate ? Do you
-> expect that translation to have such a significant cost considering
-> that all it needs should be in L1 at that point ?
-
-I guess if the update is rare-ish, the re-translating isn't a big deal.  And I
-suppose we'd have to retain the RCU lock to hold on to the translation, which
-probably isn't the best idea.
-
-Nevermind on this.
-
-
-r~
+> diff --git a/include/glib-compat.h b/include/glib-compat.h
+> index fdf95a255d..f675c7328f 100644
+> --- a/include/glib-compat.h
+> +++ b/include/glib-compat.h
+> @@ -113,4 +113,12 @@ gint g_poll_fixed(GPollFD *fds, guint nfds, gint timeout);
+>  
+>  #pragma GCC diagnostic pop
+>  
+> +/* See https://gitlab.gnome.org/GNOME/glib/merge_requests/501 */
+> +#define g_test_message(...)                                     \
+> +    do {                                                        \
+> +        if (!g_test_subprocess()) {                             \
+> +            g_test_message(__VA_ARGS__);                        \
+> +        }                                                       \
+> +    } while (0)
+> +
+>  #endif
+> 
