@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gSkXr-0004c3-BG
+	(envelope-from <pm215@archaic.org.uk>) id 1gSkXs-0004cg-9G
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gSkXq-0005UB-Ik
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:31 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gSkXr-0005Ui-Ip
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:32 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Nov 2018 15:17:10 +0000
-Message-Id: <20181130151712.2312-9-peter.maydell@linaro.org>
+Date: Fri, 30 Nov 2018 15:17:08 +0000
+Message-Id: <20181130151712.2312-7-peter.maydell@linaro.org>
 In-Reply-To: <20181130151712.2312-1-peter.maydell@linaro.org>
 References: <20181130151712.2312-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 08/10] device_tree.c: Don't use load_image()
+Subject: [Qemu-devel] [PATCH 06/10] hw/i386/multiboot.c: Don't use
+ load_image()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +31,25 @@ Instead use load_image_size().
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- device_tree.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/i386/multiboot.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/device_tree.c b/device_tree.c
-index 6d9c9726f66..296278e12ae 100644
---- a/device_tree.c
-+++ b/device_tree.c
-@@ -91,7 +91,7 @@ void *load_device_tree(const char *filename_path, int *sizep)
-     /* First allocate space in qemu for device tree */
-     fdt = g_malloc0(dt_size);
+diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+index 1a4344f5fc3..62340687e8e 100644
+--- a/hw/i386/multiboot.c
++++ b/hw/i386/multiboot.c
+@@ -343,7 +343,11 @@ int load_multiboot(FWCfgState *fw_cfg,
+             mbs.mb_buf_size = TARGET_PAGE_ALIGN(mb_mod_length + mbs.mb_buf_size);
+             mbs.mb_buf = g_realloc(mbs.mb_buf, mbs.mb_buf_size);
  
--    dt_file_load_size = load_image(filename_path, fdt);
-+    dt_file_load_size = load_image_size(filename_path, fdt, dt_size);
-     if (dt_file_load_size < 0) {
-         error_report("Unable to open device tree file '%s'",
-                      filename_path);
+-            load_image(one_file, (unsigned char *)mbs.mb_buf + offs);
++            if (load_image_size(one_file, (unsigned char *)mbs.mb_buf + offs,
++                                mbs.mb_buf_size - offs) < 0) {
++                error_report("Error loading file '%s'", one_file);
++                exit(1);
++            }
+             mb_add_mod(&mbs, mbs.mb_buf_phys + offs,
+                        mbs.mb_buf_phys + offs + mb_mod_length, c);
+ 
 -- 
 2.19.1
