@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gSkXx-0004kR-Lm
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:38 -0500
+	(envelope-from <berto@igalia.com>) id 1gSkZa-0007S3-CL
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gSkXw-0005ZD-Sf
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:17:37 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Nov 2018 15:17:06 +0000
-Message-Id: <20181130151712.2312-5-peter.maydell@linaro.org>
-In-Reply-To: <20181130151712.2312-1-peter.maydell@linaro.org>
-References: <20181130151712.2312-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 04/10] hw/pci/pci.c: Don't use load_image()
+	(envelope-from <berto@igalia.com>) id 1gSkZW-0006Va-8Y
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:19:18 -0500
+From: Alberto Garcia <berto@igalia.com>
+Date: Fri, 30 Nov 2018 17:17:44 +0200
+Message-Id: <8f88f59eee7e9b7882fc4f6d0e6ff57bd8754375.1543590618.git.berto@igalia.com>
+In-Reply-To: <cover.1543590618.git.berto@igalia.com>
+References: <cover.1543590618.git.berto@igalia.com>
+In-Reply-To: <cover.1543590618.git.berto@igalia.com>
+References: <cover.1543590618.git.berto@igalia.com>
+Subject: [Qemu-devel] [RFC PATCH v2 06/12] block: Handle child references in
+ bdrv_reopen_queue()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,33 +23,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Philip Li <philip.li@intel.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, qemu-block@nongnu.org, qemu-ppc@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-The load_image() function is deprecated, as it does not let the
-caller specify how large the buffer to read the file into is.
-Instead use load_image_size().
+Children in QMP are specified with BlockdevRef / BlockdevRefOrNull,
+which can contain a set of child options, a child reference, or
+NULL. In optional attributes like "backing" it can also be missing.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Only the first case (set of child options) is being handled properly
+by bdrv_reopen_queue(). This patch deals with all the others.
+
+Here's how these cases should be handled when bdrv_reopen_queue() is
+deciding what to do with each child of a BlockDriverState:
+
+   1) Set of child options: the options are removed from the parent's
+      options QDict and are passed to the child with a recursive
+      bdrv_reopen_queue() call. This case was already working fine.
+
+   2) Child reference: there's two possibilites here.
+
+      2a) Reference to the current child: the child is put in the
+          reopen queue, keeping its current set of options (since this
+          was a child reference there was no way to specify a
+          different set of options).
+
+      2b) Reference to a different BDS: the current child is not put
+          in the reopen queue at all. Passing a reference to a
+          different BDS can be used to replace a child, although at
+          the moment no driver implements this, so it results in an
+          error. In any case, the current child is not going to be
+          reopened (and might in fact disappear if it's replaced)
+
+   3) NULL: This is similar to (2b). Although no driver allows this
+      yet it can be used to detach the current child so it should not
+      be put in the reopen queue.
+
+   4) Missing option: at the moment "backing" is the only case where
+      this can happen. With "blockdev-add", leaving "backing" out
+      means that the default backing file is opened. We don't want to
+      open a new image during reopen, so we require that "backing" is
+      always present. We'll relax this requirement a bit in the next
+      patch.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- hw/pci/pci.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ block.c               | 45 ++++++++++++++++++++++++++++++++++++++-------
+ include/block/block.h |  1 +
+ 2 files changed, 39 insertions(+), 7 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 56b13b3320e..efb5ce196ff 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -2261,7 +2261,11 @@ static void pci_add_option_rom(PCIDevice *pdev, bool is_default_rom,
-     pdev->has_rom = true;
-     memory_region_init_rom(&pdev->rom, OBJECT(pdev), name, size, &error_fatal);
-     ptr = memory_region_get_ram_ptr(&pdev->rom);
--    load_image(path, ptr);
-+    if (load_image_size(path, ptr, size) < 0) {
-+        error_setg(errp, "failed to load romfile \"%s\"", pdev->romfile);
-+        g_free(path);
-+        return;
-+    }
-     g_free(path);
+diff --git a/block.c b/block.c
+index da4e062178..4a2f81b129 100644
+--- a/block.c
++++ b/block.c
+@@ -3032,9 +3032,19 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
+     bs_entry->state.perm = UINT64_MAX;
+     bs_entry->state.shared_perm = 0;
  
-     if (is_default_rom) {
++    /* If keep_old_opts is false then it means that unspecified
++     * options must be reset to its original value. We don't allow
++     * resetting 'backing' but we need to know if the option is
++     * missing in order to decide if we have to return an error. */
++    if (!keep_old_opts) {
++        bs_entry->state.backing_missing =
++            !qdict_haskey(options, "backing") &&
++            !qdict_haskey(options, "backing.driver");
++    }
++
+     QLIST_FOREACH(child, &bs->children, next) {
+-        QDict *new_child_options;
+-        char *child_key_dot;
++        QDict *new_child_options = NULL;
++        bool child_keep_old = keep_old_opts;
+ 
+         /* reopen can only change the options of block devices that were
+          * implicitly created and inherited options. For other (referenced)
+@@ -3043,13 +3053,27 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
+             continue;
+         }
+ 
+-        child_key_dot = g_strdup_printf("%s.", child->name);
+-        qdict_extract_subqdict(explicit_options, NULL, child_key_dot);
+-        qdict_extract_subqdict(options, &new_child_options, child_key_dot);
+-        g_free(child_key_dot);
++        /* Check if the options contain a child reference */
++        if (qdict_haskey(options, child->name)) {
++            const char *childref = qdict_get_try_str(options, child->name);
++            /* The current child must not be reopened if the child
++             * reference does not point to it. */
++            if (g_strcmp0(childref, child->bs->node_name)) {
++                continue;
++            }
++            /* If the child reference points to the current child then
++             * reopen it with its existing set of options. */
++            child_keep_old = true;
++        } else {
++            /* Extract child options ("child-name.*") */
++            char *child_key_dot = g_strdup_printf("%s.", child->name);
++            qdict_extract_subqdict(explicit_options, NULL, child_key_dot);
++            qdict_extract_subqdict(options, &new_child_options, child_key_dot);
++            g_free(child_key_dot);
++        }
+ 
+         bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options,
+-                                child->role, options, flags, keep_old_opts);
++                                child->role, options, flags, child_keep_old);
+     }
+ 
+     return bs_queue;
+@@ -3306,6 +3330,13 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+ 
+     drv_prepared = true;
+ 
++    if (reopen_state->backing_missing) {
++        error_setg(errp, "backing is missing for '%s'",
++                   reopen_state->bs->node_name);
++        ret = -EINVAL;
++        goto error;
++    }
++
+     /* Options that are not handled are only okay if they are unchanged
+      * compared to the old state. It is expected that some options are only
+      * used for the initial open, but not reopen (e.g. filename) */
+diff --git a/include/block/block.h b/include/block/block.h
+index a061ef3944..e21616a038 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -187,6 +187,7 @@ typedef struct BDRVReopenState {
+     BlockDriverState *bs;
+     int flags;
+     BlockdevDetectZeroesOptions detect_zeroes;
++    bool backing_missing;
+     uint64_t perm, shared_perm;
+     QDict *options;
+     QDict *explicit_options;
 -- 
-2.19.1
+2.11.0
