@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gSZ2M-00040b-S6
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 22:00:15 -0500
+	(envelope-from <fli@suse.com>) id 1gSZUQ-0004l1-Q5
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 22:29:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1gSZ2K-0001Qf-2n
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 22:00:14 -0500
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:60985)
+	(envelope-from <fli@suse.com>) id 1gSZUN-0000T8-Kx
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 22:29:14 -0500
+Received: from mx2.suse.de ([195.135.220.15]:46062 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gSZ2J-0001Q2-Sf
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 22:00:12 -0500
-Date: Thu, 29 Nov 2018 22:00:10 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181130030009.GA14990@flamenco>
-References: <20181128053834.10861-1-richard.henderson@linaro.org>
-	<20181128221530.GA32160@flamenco>
-	<9d890088-8dd6-517d-52a7-a6166f0cd8a6@linaro.org>
-	<20181130003915.GA3323@flamenco>
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gSZUN-0000QN-DR
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 22:29:11 -0500
+References: <20181129100340.13823-1-fli@suse.com>
+	<20181129100340.13823-2-fli@suse.com>
+	<87r2f482wl.fsf@dusky.pond.sub.org>
+From: Fei Li <fli@suse.com>
+Message-ID: <e3928af6-29ab-d1c1-e312-1bfd15b15d01@suse.com>
+Date: Fri, 30 Nov 2018 11:29:02 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181130003915.GA3323@flamenco>
-Subject: Re: [Qemu-devel] [PATCH 00/12] tcg: Improve register allocation for
- calls
+In-Reply-To: <87r2f482wl.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH RFC v2 1/5] Fix segmentation fault when
+ qemu_signal_init fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Nov 29, 2018 at 19:39:15 -0500, Emilio G. Cota wrote:
-> A64 and POWER9 host numbers:
-> 
->   https://imgur.com/a/m6Pss99
-> 
-> There's quite a bit of noise in the P9 measurements, but it's
-> a shared machine so I can't do much about that.
-> 
-> I'll update the A64 results with error bars later tonight,
-> when I get further results.
 
-Here they are:
 
-  https://imgur.com/a/EAAapSW
+On 11/29/2018 08:49 PM, Markus Armbruster wrote:
+> You neglected to cc the maintainer.  I'm doing that for you now.  Cc'ing
+> maintainers is important to maximize your chances at getting your
+> patches picked up.  Use scripts/get_maintainer.pl to find them.
+Got it, thanks so much for this tip! :)
 
-The second image is the same results, but zoomed in. I could
-bring the confidence intervals down by running this many times,
-but each run takes 2h and I only have access to the
-machine for a few hours at a time.
-
-Those confidence intervals are generated from only 2 runs per benchmark,
-which explains why they're so large.
-
-		E.
+Have a nice day
+Fei
+>
+> Fei Li <fli@suse.com> writes:
+>
+>> When qemu_signal_init() fails in qemu_init_main_loop(), we return
+>> without setting an error.  Its callers crash then when they try to
+>> report the error with error_report_err().
+>>
+>> To avoid such segmentation fault, add a new Error parameter to make
+>> the call trace to propagate the err to the final caller.
+>>
+>> Fixes: 2f78e491d7b46542158ce0b8132ee4e05bc0ade4
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> Cc: Fam Zheng <famz@redhat.com>
+>> Signed-off-by: Fei Li <fli@suse.com>
+>> Reviewed-by: Fam Zheng <famz@redhat.com>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   util/main-loop.c | 8 ++++----
+>>   1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/util/main-loop.c b/util/main-loop.c
+>> index affe0403c5..443cb4cfe8 100644
+>> --- a/util/main-loop.c
+>> +++ b/util/main-loop.c
+>> @@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
+>>       }
+>>   }
+>>   
+>> -static int qemu_signal_init(void)
+>> +static int qemu_signal_init(Error **errp)
+>>   {
+>>       int sigfd;
+>>       sigset_t set;
+>> @@ -96,7 +96,7 @@ static int qemu_signal_init(void)
+>>       sigdelset(&set, SIG_IPI);
+>>       sigfd = qemu_signalfd(&set);
+>>       if (sigfd == -1) {
+>> -        fprintf(stderr, "failed to create signalfd\n");
+>> +        error_setg_errno(errp, errno, "failed to create signalfd");
+>>           return -errno;
+>>       }
+>>   
+>> @@ -109,7 +109,7 @@ static int qemu_signal_init(void)
+>>   
+>>   #else /* _WIN32 */
+>>   
+>> -static int qemu_signal_init(void)
+>> +static int qemu_signal_init(Error **errp)
+>>   {
+>>       return 0;
+>>   }
+>> @@ -148,7 +148,7 @@ int qemu_init_main_loop(Error **errp)
+>>   
+>>       init_clocks(qemu_timer_notify_cb);
+>>   
+>> -    ret = qemu_signal_init();
+>> +    ret = qemu_signal_init(errp);
+>>       if (ret) {
+>>           return ret;
+>>       }
+>
