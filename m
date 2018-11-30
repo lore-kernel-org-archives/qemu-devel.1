@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <d.csapak@proxmox.com>) id 1gSijE-0006Bd-Gn
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:21:09 -0500
+	(envelope-from <armbru@redhat.com>) id 1gSikZ-00070f-9A
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:22:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <d.csapak@proxmox.com>) id 1gSij9-0002Ow-Mc
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:21:08 -0500
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:60559)
+	(envelope-from <armbru@redhat.com>) id 1gSikV-0002vk-B9
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:22:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51034)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <d.csapak@proxmox.com>)
-	id 1gSij9-0002L8-AH
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:21:03 -0500
-References: <20181031115242.6558-1-d.csapak@proxmox.com>
-	<20181031115242.6558-3-d.csapak@proxmox.com>
-	<87sgzilx6e.fsf@dusky.pond.sub.org>
-From: Dominik Csapak <d.csapak@proxmox.com>
-Message-ID: <c38bb4f9-54cf-9348-a607-b8f0e9506904@proxmox.com>
-Date: Fri, 30 Nov 2018 14:20:37 +0100
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gSikV-0002vQ-3x
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:22:27 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 076D23297
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 13:22:26 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181130122844.29103-1-ehabkost@redhat.com>
+Date: Fri, 30 Nov 2018 14:22:21 +0100
+In-Reply-To: <20181130122844.29103-1-ehabkost@redhat.com> (Eduardo Habkost's
+	message of "Fri, 30 Nov 2018 10:28:44 -0200")
+Message-ID: <87in0ek8du.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87sgzilx6e.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] qapi: split host-qmp into quit and
- system-reset
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] hostmem: Validate host-nodes before
+ setting bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,123 +33,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, pbonzini@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On 11/30/18 10:41 AM, Markus Armbruster wrote:
-> Cc: Pavel to assess possible impact on replay.
-> 
-> Cc: Eric to give him a chance to correct misunderstandings of
-> ShutdownCause.
-> 
-> Dominik Csapak <d.csapak@proxmox.com> writes:
-> 
->> it is interesting to know whether the shutdown cause was 'quit' or
->> 'reset', especially when using --no-reboot
-> 
-> Are you sure it *is* interesting?  I suspect it *will be* only after the
-> next patch.
-> 
-> Please start your sentences with a capital letter and end them with
-> punctuation.
-> 
->> Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
->> ---
->>   qapi/run-state.json | 10 ++++++----
->>   qmp.c               |  4 ++--
->>   2 files changed, 8 insertions(+), 6 deletions(-)
->>
->> diff --git a/qapi/run-state.json b/qapi/run-state.json
->> index 883bed167c..c215b6ef83 100644
->> --- a/qapi/run-state.json
->> +++ b/qapi/run-state.json
->> @@ -68,7 +68,9 @@
->>   #
->>   # @host-error: An error prevented further use of guest
->>   #
->> -# @host-qmp: Reaction to a QMP command, like 'quit'
->> +# @host-qmp-quit: Reaction to the QMP command 'quit'
->> +#
->> +# @host-qmp-system-reset: Reaction to the QMP command 'system_reset'
->>   #
->>   # @host-signal: Reaction to a signal, such as SIGINT
->>   #
->> @@ -88,9 +90,9 @@
->>   #
->>   ##
->>   { 'enum': 'ShutdownCause',
->> -  'data': [ 'none', 'host-error', 'host-qmp', 'host-signal', 'host-ui',
->> -            'guest-shutdown', 'guest-reset', 'guest-panic',
->> -            'subsystem-reset'] }
->> +  'data': [ 'none', 'host-error', 'host-qmp-quit', 'host-qmp-system-reset',
->> +            'host-signal', 'host-ui', 'guest-shutdown', 'guest-reset',
->> +            'guest-panic', 'subsystem-reset'] }
->>   
->>   ##
->>   # @StatusInfo:
->> diff --git a/qmp.c b/qmp.c
->> index e7c0a2fd60..82298f6cb0 100644
->> --- a/qmp.c
->> +++ b/qmp.c
->> @@ -88,7 +88,7 @@ UuidInfo *qmp_query_uuid(Error **errp)
->>   void qmp_quit(Error **errp)
->>   {
->>       no_shutdown = 0;
->> -    qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_QMP);
->> +    qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_QMP_QUIT);
->>   }
->>   
->>   void qmp_stop(Error **errp)
->> @@ -109,7 +109,7 @@ void qmp_stop(Error **errp)
->>   
->>   void qmp_system_reset(Error **errp)
->>   {
->> -    qemu_system_reset_request(SHUTDOWN_CAUSE_HOST_QMP);
->> +    qemu_system_reset_request(SHUTDOWN_CAUSE_HOST_QMP_SYSTEM_RESET);
->>   }
->>   
->>   void qmp_system_powerdown(Error **erp)
-> 
-> Let's see how these guys are used.
-> 
-> qemu_system_shutdown_request() and qemu_system_reset_request() put their
-> argument in @shutdown_requested or @reset_requested.  There's some
-> replay magic going on in qemu_system_shutdown_request().
-> 
-> main_loop_should_exit() retrieves them with qemu_shutdown_requested()
-> and qemu_reset_requested().  @shutdown_requested is only passed to
-> shutdown_caused_by_guest().  @reset_requested is only passed to
-> qemu_system_reset().  None of these functions is affected by your
-> change.  There's some replay magic going on in
-> qemu_system_reset_requested().
-> 
-> Xen's cpu_handle_ioreq() retrieves them with
-> qemu_shutdown_requested_get() and qemu_reset_requested_get().  None of
-> these functions is affected by your change.
-> 
-> Looks like ShutdownCause is overengineered[*]: we're only ever
-> interested in none, host, guest.  Your PATCH 3 will change that.  Okay,
-> but your commit message is misleading: this patch has no interesting
-> effect now.  The change becomes visible only after PATCH 3.
-> 
-> I'd swap PATCH 2 and 3, because that would make writing non-misleading
-> commit messages easier for me.
-> 
-> 
-> [*] Goes back to Eric's commit 7af88279e49..08fba7ac9b6, which were
-> surely done for a reason.  Perhaps I'm just confused.
-> 
-> 
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
+> host_memory_backend_set_host_nodes() was not validating
+> host-nodes before writing to backend->host_nodes, making QEMU
+> write beyond the end of the bitmap.
+>
+> Fix the crash and add a simple regression test for the fix.
+>
+> While at it, fix memory leak of the list returned by
+> visit_type_uint16List().
+>
+> Reported-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Changes v1 -> v2:
+> * Remove extra `l = l->next` statement
+>   (reported by Stefano Garzarella)
+> * Fix (existing) leak of `host_nodes`
+>   (reported by Markus Armbruster)
+> ---
+>  backends/hostmem.c                   | 17 +++++++++----
+>  tests/acceptance/host-nodes-limit.py | 36 ++++++++++++++++++++++++++++
+>  2 files changed, 49 insertions(+), 4 deletions(-)
+>  create mode 100644 tests/acceptance/host-nodes-limit.py
+>
+> diff --git a/backends/hostmem.c b/backends/hostmem.c
+> index 1a89342039..af800284e0 100644
+> --- a/backends/hostmem.c
+> +++ b/backends/hostmem.c
+> @@ -103,14 +103,23 @@ host_memory_backend_set_host_nodes(Object *obj, Visitor *v, const char *name,
+>  {
+>  #ifdef CONFIG_NUMA
+>      HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+> -    uint16List *l = NULL;
+> +    uint16List *l, *host_nodes = NULL;
+>  
+> -    visit_type_uint16List(v, name, &l, errp);
+> +    visit_type_uint16List(v, name, &host_nodes, errp);
+>  
+> -    while (l) {
+> +    for (l = host_nodes; l; l = l->next) {
+> +        if (l->value >= MAX_NODES) {
+> +            error_setg(errp, "Invalid host-nodes value: %d", l->value);
+> +            goto out;
+> +        }
+> +    }
+> +
+> +    for (l = host_nodes; l; l = l->next) {
+>          bitmap_set(backend->host_nodes, l->value, 1);
+> -        l = l->next;
+>      }
+> +
+> +out:
+> +    qapi_free_uint16List(host_nodes);
+>  #else
+>      error_setg(errp, "NUMA node binding are not supported by this QEMU");
+>  #endif
 
-hi,
+Care to fix the leak in host_memory_backend_get_host_nodes(), too?
 
-yeah switching 2 and 3 makes sense, i guess i did it this way so that
-i only have to touch the iotests one time
+[...]
 
-should i fix the iotests in both 2 and 3 when i switch them ?
-(with 2 the reason gets added there, and 3 changes the reason)
-or should i send an extra patch (4/4) that fixes only the iotests?
-or only change them in 3/3 ?
-
-when this is clear, i will send a v2 with all your remarks fixed
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
