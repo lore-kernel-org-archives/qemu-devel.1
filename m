@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSqiL-0008BT-Tu
+	(envelope-from <richard.henderson@linaro.org>) id 1gSqiL-0008BX-UA
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:52:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gSqiI-0007Uw-Cg
+	(envelope-from <richard.henderson@linaro.org>) id 1gSqiJ-0007cP-Jf
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:52:45 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:33625)
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:35352)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gSqiI-0007Rn-7P
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:52:42 -0500
-Received: by mail-pf1-x442.google.com with SMTP id c123so3445805pfb.0
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 13:52:42 -0800 (PST)
+	id 1gSqiJ-0007XU-Dn
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 16:52:43 -0500
+Received: by mail-pg1-x542.google.com with SMTP id s198so3064345pgs.2
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 13:52:43 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 30 Nov 2018 13:52:19 -0800
-Message-Id: <20181130215221.20554-15-richard.henderson@linaro.org>
+Date: Fri, 30 Nov 2018 13:52:20 -0800
+Message-Id: <20181130215221.20554-16-richard.henderson@linaro.org>
 In-Reply-To: <20181130215221.20554-1-richard.henderson@linaro.org>
 References: <20181130215221.20554-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 14/16] tcg/arm: Return false on failure from
+Subject: [Qemu-devel] [PATCH v3 15/16] tcg/ppc: Return false on failure from
  patch_reloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,76 +30,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org
 
-This does require an extra two checks within the slow paths
-to replace the assert that we're moving.
+The reloc_pc{14,24}_val routines retain their asserts.
+Use these directly within the slow paths.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/arm/tcg-target.inc.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+ tcg/ppc/tcg-target.inc.c | 32 +++++++++++++++++++++-----------
+ 1 file changed, 21 insertions(+), 11 deletions(-)
 
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index deefa20fbf..49f57d655e 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -187,10 +187,14 @@ static const uint8_t tcg_cond_to_arm_cond[] = {
-     [TCG_COND_GTU] = COND_HI,
- };
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 860b0d36e1..8c1cfdd7ac 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -193,9 +193,14 @@ static uint32_t reloc_pc24_val(tcg_insn_unit *pc, tcg_insn_unit *target)
+     return disp & 0x3fffffc;
+ }
  
--static inline void reloc_pc24(tcg_insn_unit *code_ptr, tcg_insn_unit *target)
-+static inline bool reloc_pc24(tcg_insn_unit *code_ptr, tcg_insn_unit *target)
+-static void reloc_pc24(tcg_insn_unit *pc, tcg_insn_unit *target)
++static bool reloc_pc24(tcg_insn_unit *pc, tcg_insn_unit *target)
  {
-     ptrdiff_t offset = (tcg_ptr_byte_diff(target, code_ptr) - 8) >> 2;
--    *code_ptr = (*code_ptr & ~0xffffff) | (offset & 0xffffff);
-+    if (offset == sextract32(offset, 0, 24)) {
-+        *code_ptr = (*code_ptr & ~0xffffff) | (offset & 0xffffff);
+-    *pc = (*pc & ~0x3fffffc) | reloc_pc24_val(pc, target);
++    ptrdiff_t disp = tcg_ptr_byte_diff(target, pc);
++    if (in_range_b(disp)) {
++        *pc = (*pc & ~0x3fffffc) | (disp & 0x3fffffc);
 +        return true;
 +    }
 +    return false;
  }
  
- static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
-@@ -199,7 +203,7 @@ static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
-     tcg_debug_assert(addend == 0);
+ static uint16_t reloc_pc14_val(tcg_insn_unit *pc, tcg_insn_unit *target)
+@@ -205,9 +210,14 @@ static uint16_t reloc_pc14_val(tcg_insn_unit *pc, tcg_insn_unit *target)
+     return disp & 0xfffc;
+ }
  
-     if (type == R_ARM_PC24) {
--        reloc_pc24(code_ptr, (tcg_insn_unit *)value);
-+        return reloc_pc24(code_ptr, (tcg_insn_unit *)value);
-     } else if (type == R_ARM_PC13) {
-         intptr_t diff = value - (uintptr_t)(code_ptr + 2);
-         tcg_insn_unit insn = *code_ptr;
-@@ -213,7 +217,11 @@ static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
+-static void reloc_pc14(tcg_insn_unit *pc, tcg_insn_unit *target)
++static bool reloc_pc14(tcg_insn_unit *pc, tcg_insn_unit *target)
+ {
+-    *pc = (*pc & ~0xfffc) | reloc_pc14_val(pc, target);
++    ptrdiff_t disp = tcg_ptr_byte_diff(target, pc);
++    if (disp == (int16_t) disp) {
++        *pc = (*pc & ~0xfffc) | (disp & 0xfffc);
++        return true;
++    }
++    return false;
+ }
+ 
+ /* parse target specific constraints */
+@@ -524,11 +534,9 @@ static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
+ 
+     switch (type) {
+     case R_PPC_REL14:
+-        reloc_pc14(code_ptr, target);
+-        break;
++        return reloc_pc14(code_ptr, target);
+     case R_PPC_REL24:
+-        reloc_pc24(code_ptr, target);
+-        break;
++        return reloc_pc24(code_ptr, target);
+     case R_PPC_ADDR16:
+         /* We are abusing this relocation type.  This points to a pair
+            of insns, addis + load.  If the displacement is small, we
+@@ -540,7 +548,9 @@ static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
          } else {
-             int rd = extract32(insn, 12, 4);
-             int rt = rd == TCG_REG_PC ? TCG_REG_TMP : rd;
--            assert(diff >= 0x1000 && diff < 0x100000);
-+
-+            if (diff < 0x1000 || diff >= 0x100000) {
+             int16_t lo = value;
+             int hi = value - lo;
+-            assert(hi + lo == value);
++            if (hi + lo != value) {
 +                return false;
 +            }
-+
-             /* add rt, pc, #high */
-             *code_ptr++ = ((insn & 0xf0000000) | (1 << 25) | ARITH_ADD
-                            | (TCG_REG_PC << 16) | (rt << 12)
-@@ -1372,7 +1380,8 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+             code_ptr[0] = deposit32(code_ptr[0], 0, 16, hi >> 16);
+             code_ptr[1] = deposit32(code_ptr[1], 0, 16, lo);
+         }
+@@ -1638,7 +1648,7 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
      TCGMemOp opc = get_memop(oi);
-     void *func;
+     TCGReg hi, lo, arg = TCG_REG_R3;
  
--    reloc_pc24(lb->label_ptr[0], s->code_ptr);
-+    bool ok = reloc_pc24(lb->label_ptr[0], s->code_ptr);
-+    tcg_debug_assert(ok);
+-    reloc_pc14(lb->label_ptr[0], s->code_ptr);
++    **lb->label_ptr |= reloc_pc14_val(*lb->label_ptr, s->code_ptr);
  
-     argreg = tcg_out_arg_reg32(s, TCG_REG_R0, TCG_AREG0);
-     if (TARGET_LONG_BITS == 64) {
-@@ -1432,7 +1441,8 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
-     TCGMemOpIdx oi = lb->oi;
-     TCGMemOp opc = get_memop(oi);
+     tcg_out_mov(s, TCG_TYPE_PTR, arg++, TCG_AREG0);
  
--    reloc_pc24(lb->label_ptr[0], s->code_ptr);
-+    bool ok = reloc_pc24(lb->label_ptr[0], s->code_ptr);
-+    tcg_debug_assert(ok);
+@@ -1683,7 +1693,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     TCGMemOp s_bits = opc & MO_SIZE;
+     TCGReg hi, lo, arg = TCG_REG_R3;
  
-     argreg = TCG_REG_R0;
-     argreg = tcg_out_arg_reg32(s, argreg, TCG_AREG0);
+-    reloc_pc14(lb->label_ptr[0], s->code_ptr);
++    **lb->label_ptr |= reloc_pc14_val(*lb->label_ptr, s->code_ptr);
+ 
+     tcg_out_mov(s, TCG_TYPE_PTR, arg++, TCG_AREG0);
+ 
 -- 
 2.17.2
