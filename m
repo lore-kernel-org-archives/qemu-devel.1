@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSqtH-0004Nq-UA
+	(envelope-from <eblake@redhat.com>) id 1gSqtI-0004Nx-1C
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 17:04:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSqtG-0004C5-D8
+	(envelope-from <eblake@redhat.com>) id 1gSqtG-0004CB-F6
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 17:04:03 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 30 Nov 2018 16:03:33 -0600
-Message-Id: <20181130220344.3350618-5-eblake@redhat.com>
+Date: Fri, 30 Nov 2018 16:03:34 -0600
+Message-Id: <20181130220344.3350618-6-eblake@redhat.com>
 In-Reply-To: <20181130220344.3350618-1-eblake@redhat.com>
 References: <20181130220344.3350618-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/14] qemu-nbd: Simplify --partition handling
+Subject: [Qemu-devel] [PATCH 05/14] nbd/client: Drop pointless buf variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,55 +22,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: jsnow@redhat.com, nsoffer@redhat.com, rjones@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Our open-coding of strtol handling forgot to handle overflow
-conditions. What's more, since we insiste on a user-supplied
-partition to be non-zero, we can use 0 rather than -1 for our
-initial value to distinguish when a partition is not being
-served, for slightly more optimal code.
+There's no need to read into a temporary buffer (oversized
+since commit 7d3123e1) followed by a byteswap into a uint64_t
+to check for a magic number via memcmp(), when the code
+immediately below demonstrates reading into the uint64_t then
+byteswapping in place and checking for a magic number via
+integer math.  What's more, having a different error message
+when the server's first reply byte is 0 is unusual - it's no
+different from any other wrong magic number, and we already
+detected short reads.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- qemu-nbd.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+ nbd/nbd-internal.h |  1 +
+ nbd/client.c       | 14 +++-----------
+ 2 files changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 55e29bd9a7e..866e64779f1 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -546,7 +546,7 @@ int main(int argc, char **argv)
-     int opt_ind = 0;
-     char *end;
-     int flags = BDRV_O_RDWR;
--    int partition = -1;
-+    int partition = 0;
-     int ret = 0;
-     bool seen_cache = false;
-     bool seen_discard = false;
-@@ -685,13 +685,9 @@ int main(int argc, char **argv)
-             flags &= ~BDRV_O_RDWR;
-             break;
-         case 'P':
--            partition = strtol(optarg, &end, 0);
--            if (*end) {
--                error_report("Invalid partition `%s'", optarg);
--                exit(EXIT_FAILURE);
--            }
--            if (partition < 1 || partition > 8) {
--                error_report("Invalid partition %d", partition);
-+            if (qemu_strtoi(optarg, NULL, 0, &partition) < 0 ||
-+                partition < 1 || partition > 8) {
-+                error_report("Invalid partition %s", optarg);
-                 exit(EXIT_FAILURE);
-             }
-             break;
-@@ -1004,7 +1000,7 @@ int main(int argc, char **argv)
+diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
+index eeff78d3c98..306a533dcd1 100644
+--- a/nbd/nbd-internal.h
++++ b/nbd/nbd-internal.h
+@@ -46,6 +46,7 @@
+ /* Size of oldstyle negotiation */
+ #define NBD_OLDSTYLE_NEGOTIATE_SIZE (8 + 8 + 8 + 4 + 124)
+
++#define NBD_INIT_MAGIC              0x4e42444d41474943LL
+ #define NBD_REQUEST_MAGIC           0x25609513
+ #define NBD_OPTS_MAGIC              0x49484156454F5054LL
+ #define NBD_CLIENT_MAGIC            0x0000420281861253LL
+diff --git a/nbd/client.c b/nbd/client.c
+index 0be89f9e641..17ee24492a4 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -731,7 +731,6 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+                           QIOChannel **outioc, NBDExportInfo *info,
+                           Error **errp)
+ {
+-    char buf[256];
+     uint64_t magic;
+     int rc;
+     bool zeroes = true;
+@@ -752,21 +751,14 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
+         goto fail;
      }
-     fd_size -= dev_offset;
 
--    if (partition != -1) {
-+    if (partition) {
-         ret = find_partition(blk, partition, &dev_offset, &fd_size);
-         if (ret < 0) {
-             error_report("Could not find partition %d: %s", partition,
+-    if (nbd_read(ioc, buf, 8, errp) < 0) {
++    if (nbd_read(ioc, &magic, sizeof(magic), errp) < 0) {
+         error_prepend(errp, "Failed to read data: ");
+         goto fail;
+     }
+-
+-    buf[8] = '\0';
+-    if (strlen(buf) == 0) {
+-        error_setg(errp, "Server connection closed unexpectedly");
+-        goto fail;
+-    }
+-
+-    magic = ldq_be_p(buf);
++    magic = be64_to_cpu(magic);
+     trace_nbd_receive_negotiate_magic(magic);
+
+-    if (memcmp(buf, "NBDMAGIC", 8) != 0) {
++    if (magic != NBD_INIT_MAGIC) {
+         error_setg(errp, "Invalid magic received");
+         goto fail;
+     }
 -- 
 2.17.2
