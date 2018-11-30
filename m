@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gSePp-00011K-8U
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:44:52 -0500
+	(envelope-from <groug@kaod.org>) id 1gSeU7-0005oZ-Fh
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:49:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gSeB8-00064P-3l
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:29:38 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 30 Nov 2018 08:29:29 +0000
-Message-ID: <ae3778cc-5a97-0cc0-c5a0-4c5f070b805d@virtuozzo.com>
-References: <20181130023232.3079982-1-eblake@redhat.com>
-	<20181130023232.3079982-4-eblake@redhat.com>
-In-Reply-To: <20181130023232.3079982-4-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D16467DFC633DF4780FCDB42025FE7F5@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <groug@kaod.org>) id 1gSeU4-0005Xu-5A
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:49:15 -0500
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:58092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gSeU3-0005UM-PF
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:49:12 -0500
+Received: from player696.ha.ovh.net (unknown [10.109.146.106])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 252A8108419
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 09:49:03 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 30 Nov 2018 09:49:00 +0100
+Message-ID: <154356772378.66975.13711686652368325931.stgit@bahia.lan>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/3] nbd/client: Send NBD_CMD_DISC if open
- fails after connect
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH for-4.0] 9p: remove support for the "handle"
+ backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +28,850 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>
 
-MzAuMTEuMjAxOCA1OjMyLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBJZiBuYmRfY2xpZW50X2luaXQo
-KSBmYWlscyBhZnRlciB3ZSBhcmUgYWxyZWFkeSBjb25uZWN0ZWQsDQo+IHRoZW4gdGhlIHNlcnZl
-ciB3aWxsIHNwYW0gbG9ncyB3aXRoOg0KPiANCj4gRGlzY29ubmVjdCBjbGllbnQsIGR1ZSB0bzog
-VW5leHBlY3RlZCBlbmQtb2YtZmlsZSBiZWZvcmUgYWxsIGJ5dGVzIHdlcmUgcmVhZA0KPiANCj4g
-dW5sZXNzIHdlIGdyYWNlZnVsbHkgZGlzY29ubmVjdCBiZWZvcmUgY2xvc2luZyB0aGUgY29ubmVj
-dGlvbi4NCj4gDQo+IFdheXMgdG8gdHJpZ2dlciB0aGlzOg0KPiANCj4gJCBvcHRzPWRyaXZlcj1u
-YmQsZXhwb3J0PWZvbyxzZXJ2ZXIudHlwZT1pbmV0LHNlcnZlci5ob3N0PWxvY2FsaG9zdCxzZXJ2
-ZXIucG9ydD0xMDgwOQ0KPiAkICBxZW11LWltZyBtYXAgLS1vdXRwdXQ9anNvbiAtLWltYWdlLW9w
-dHMgJG9wdHMscmVhZC1vbmx5PW9mZg0KPiAkICBxZW11LWltZyBtYXAgLS1vdXRwdXQ9anNvbiAt
-LWltYWdlLW9wdHMgJG9wdHMseC1kaXJ0eS1iaXRtYXA9bm9zdWNoOg0KPiANCj4gU2lnbmVkLW9m
-Zi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQoNClJldmlld2VkLWJ5OiBWbGFk
-aW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCj4g
-LS0tDQo+ICAgYmxvY2svbmJkLWNsaWVudC5jIHwgMTggKysrKysrKysrKysrKysrKy0tDQo+ICAg
-MSBmaWxlIGNoYW5nZWQsIDE2IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBk
-aWZmIC0tZ2l0IGEvYmxvY2svbmJkLWNsaWVudC5jIGIvYmxvY2svbmJkLWNsaWVudC5jDQo+IGlu
-ZGV4IGU2ZTI3ZGFmYTZhLi5mYzViN2VkYThlZSAxMDA2NDQNCj4gLS0tIGEvYmxvY2svbmJkLWNs
-aWVudC5jDQo+ICsrKyBiL2Jsb2NrL25iZC1jbGllbnQuYw0KPiBAQCAtOTk1LDEyICs5OTUsMTMg
-QEAgaW50IG5iZF9jbGllbnRfaW5pdChCbG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAgaWYg
-KHhfZGlydHlfYml0bWFwICYmICFjbGllbnQtPmluZm8uYmFzZV9hbGxvY2F0aW9uKSB7DQo+ICAg
-ICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJyZXF1ZXN0ZWQgeC1kaXJ0eS1iaXRtYXAgJXMgbm90
-IGZvdW5kIiwNCj4gICAgICAgICAgICAgICAgICAgICAgeF9kaXJ0eV9iaXRtYXApOw0KPiAtICAg
-ICAgICByZXR1cm4gLUVJTlZBTDsNCj4gKyAgICAgICAgcmV0ID0gLUVJTlZBTDsNCj4gKyAgICAg
-ICAgZ290byBmYWlsOw0KPiAgICAgICB9DQo+ICAgICAgIGlmIChjbGllbnQtPmluZm8uZmxhZ3Mg
-JiBOQkRfRkxBR19SRUFEX09OTFkpIHsNCj4gICAgICAgICAgIHJldCA9IGJkcnZfYXBwbHlfYXV0
-b19yZWFkX29ubHkoYnMsICJOQkQgZXhwb3J0IGlzIHJlYWQtb25seSIsIGVycnApOw0KPiAgICAg
-ICAgICAgaWYgKHJldCA8IDApIHsNCj4gLSAgICAgICAgICAgIHJldHVybiByZXQ7DQo+ICsgICAg
-ICAgICAgICBnb3RvIGZhaWw7DQo+ICAgICAgICAgICB9DQo+ICAgICAgIH0NCj4gICAgICAgaWYg
-KGNsaWVudC0+aW5mby5mbGFncyAmIE5CRF9GTEFHX1NFTkRfRlVBKSB7DQo+IEBAIC0xMDI5LDQg
-KzEwMzAsMTcgQEAgaW50IG5iZF9jbGllbnRfaW5pdChCbG9ja0RyaXZlclN0YXRlICpicywNCj4g
-DQo+ICAgICAgIGxvZ291dCgiRXN0YWJsaXNoZWQgY29ubmVjdGlvbiB3aXRoIE5CRCBzZXJ2ZXJc
-biIpOw0KPiAgICAgICByZXR1cm4gMDsNCj4gKw0KPiArIGZhaWw6DQo+ICsgICAgLyoNCj4gKyAg
-ICAgKiBXZSBoYXZlIGNvbm5lY3RlZCwgYnV0IG11c3QgZmFpbCBmb3Igb3RoZXIgcmVhc29ucy4g
-VGhlDQo+ICsgICAgICogY29ubmVjdGlvbiBpcyBzdGlsbCBibG9ja2luZzsgc2VuZCBOQkRfQ01E
-X0RJU0MgYXMgYSBjb3VydGVzeQ0KPiArICAgICAqIHRvIHRoZSBzZXJ2ZXIuDQo+ICsgICAgICov
-DQo+ICsgICAgew0KPiArICAgICAgICBOQkRSZXF1ZXN0IHJlcXVlc3QgPSB7IC50eXBlID0gTkJE
-X0NNRF9ESVNDIH07DQo+ICsNCj4gKyAgICAgICAgbmJkX3NlbmRfcmVxdWVzdChjbGllbnQtPmlv
-YyA/OiBRSU9fQ0hBTk5FTChzaW9jKSwgJnJlcXVlc3QpOw0KPiArICAgICAgICByZXR1cm4gcmV0
-Ow0KPiArICAgIH0NCj4gICB9DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXIN
-Cg==
+The "handle" fsdev backend was deprecated in QEMU 2.12.0 with:
+
+commit db3b3c7281ca82e2647e072a1f97db111313dd73
+Author: Greg Kurz <groug@kaod.org>
+Date:   Mon Jan 8 11:18:23 2018 +0100
+
+    9pfs: deprecate handle backend
+
+    This backend raise some concerns:
+
+    - doesn't support symlinks
+    - fails +100 tests in the PJD POSIX file system test suite [1]
+    - requires the QEMU process to run with the CAP_DAC_READ_SEARCH
+      capability, which isn't recommended for security reasons
+
+    This backend should not be used and wil be removed. The 'local'
+    backend is the recommended alternative.
+
+    [1] https://www.tuxera.com/community/posix-test-suite/
+
+    Signed-off-by: Greg Kurz <groug@kaod.org>
+    Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+    Reviewed-by: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
+
+It has passed the two release cooling period without any complaint.
+
+Remove it now.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+
+It could have been removed for 3.1.0, but I woke up too late, so moving
+this to 4.0.
+
+---
+ fsdev/qemu-fsdev.c    |    3 
+ hw/9pfs/9p-handle.c   |  710 -------------------------------------------------
+ hw/9pfs/Makefile.objs |    1 
+ qemu-deprecated.texi  |    8 -
+ qemu-options.hx       |    8 -
+ 5 files changed, 4 insertions(+), 726 deletions(-)
+ delete mode 100644 hw/9pfs/9p-handle.c
+
+diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
+index 7a3b87cc9e38..4536fd977d50 100644
+--- a/fsdev/qemu-fsdev.c
++++ b/fsdev/qemu-fsdev.c
+@@ -23,9 +23,6 @@ static QTAILQ_HEAD(FsDriverEntry_head, FsDriverListEntry) fsdriver_entries =
+ 
+ static FsDriverTable FsDrivers[] = {
+     { .name = "local", .ops = &local_ops},
+-#ifdef CONFIG_OPEN_BY_HANDLE
+-    { .name = "handle", .ops = &handle_ops},
+-#endif
+     { .name = "synth", .ops = &synth_ops},
+     { .name = "proxy", .ops = &proxy_ops},
+ };
+diff --git a/hw/9pfs/9p-handle.c b/hw/9pfs/9p-handle.c
+deleted file mode 100644
+index 3465b1ef3063..000000000000
+--- a/hw/9pfs/9p-handle.c
++++ /dev/null
+@@ -1,710 +0,0 @@
+-/*
+- * 9p handle callback
+- *
+- * Copyright IBM, Corp. 2011
+- *
+- * Authors:
+- *    Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2.  See
+- * the COPYING file in the top-level directory.
+- *
+- */
+-
+-#include "qemu/osdep.h"
+-#include "9p.h"
+-#include "9p-xattr.h"
+-#include <arpa/inet.h>
+-#include <pwd.h>
+-#include <grp.h>
+-#include <sys/socket.h>
+-#include <sys/un.h>
+-#include "qapi/error.h"
+-#include "qemu/xattr.h"
+-#include "qemu/cutils.h"
+-#include "qemu/error-report.h"
+-#include "qemu/option.h"
+-#include <linux/fs.h>
+-#ifdef CONFIG_LINUX_MAGIC_H
+-#include <linux/magic.h>
+-#endif
+-#include <sys/ioctl.h>
+-
+-#ifndef XFS_SUPER_MAGIC
+-#define XFS_SUPER_MAGIC  0x58465342
+-#endif
+-#ifndef EXT2_SUPER_MAGIC
+-#define EXT2_SUPER_MAGIC 0xEF53
+-#endif
+-#ifndef REISERFS_SUPER_MAGIC
+-#define REISERFS_SUPER_MAGIC 0x52654973
+-#endif
+-#ifndef BTRFS_SUPER_MAGIC
+-#define BTRFS_SUPER_MAGIC 0x9123683E
+-#endif
+-
+-typedef struct HandleData {
+-    int mountfd;
+-    int handle_bytes;
+-} HandleData;
+-
+-static inline int name_to_handle(int dirfd, const char *name,
+-                                 struct file_handle *fh, int *mnt_id, int flags)
+-{
+-    return name_to_handle_at(dirfd, name, fh, mnt_id, flags);
+-}
+-
+-static inline int open_by_handle(int mountfd, const char *fh, int flags)
+-{
+-    return open_by_handle_at(mountfd, (struct file_handle *)fh, flags);
+-}
+-
+-static int handle_update_file_cred(int dirfd, const char *name, FsCred *credp)
+-{
+-    int fd, ret;
+-    fd = openat(dirfd, name, O_NONBLOCK | O_NOFOLLOW);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = fchownat(fd, "", credp->fc_uid, credp->fc_gid, AT_EMPTY_PATH);
+-    if (ret < 0) {
+-        goto err_out;
+-    }
+-    ret = fchmod(fd, credp->fc_mode & 07777);
+-err_out:
+-    close(fd);
+-    return ret;
+-}
+-
+-
+-static int handle_lstat(FsContext *fs_ctx, V9fsPath *fs_path,
+-                        struct stat *stbuf)
+-{
+-    int fd, ret;
+-    HandleData *data = (HandleData *) fs_ctx->private;
+-
+-    fd = open_by_handle(data->mountfd, fs_path->data, O_PATH);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = fstatat(fd, "", stbuf, AT_EMPTY_PATH);
+-    close(fd);
+-    return ret;
+-}
+-
+-static ssize_t handle_readlink(FsContext *fs_ctx, V9fsPath *fs_path,
+-                               char *buf, size_t bufsz)
+-{
+-    int fd, ret;
+-    HandleData *data = (HandleData *) fs_ctx->private;
+-
+-    fd = open_by_handle(data->mountfd, fs_path->data, O_PATH);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = readlinkat(fd, "", buf, bufsz);
+-    close(fd);
+-    return ret;
+-}
+-
+-static int handle_close(FsContext *ctx, V9fsFidOpenState *fs)
+-{
+-    return close(fs->fd);
+-}
+-
+-static int handle_closedir(FsContext *ctx, V9fsFidOpenState *fs)
+-{
+-    return closedir(fs->dir.stream);
+-}
+-
+-static int handle_open(FsContext *ctx, V9fsPath *fs_path,
+-                       int flags, V9fsFidOpenState *fs)
+-{
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    fs->fd = open_by_handle(data->mountfd, fs_path->data, flags);
+-    return fs->fd;
+-}
+-
+-static int handle_opendir(FsContext *ctx,
+-                          V9fsPath *fs_path, V9fsFidOpenState *fs)
+-{
+-    int ret;
+-    ret = handle_open(ctx, fs_path, O_DIRECTORY, fs);
+-    if (ret < 0) {
+-        return -1;
+-    }
+-    fs->dir.stream = fdopendir(ret);
+-    if (!fs->dir.stream) {
+-        return -1;
+-    }
+-    return 0;
+-}
+-
+-static void handle_rewinddir(FsContext *ctx, V9fsFidOpenState *fs)
+-{
+-    rewinddir(fs->dir.stream);
+-}
+-
+-static off_t handle_telldir(FsContext *ctx, V9fsFidOpenState *fs)
+-{
+-    return telldir(fs->dir.stream);
+-}
+-
+-static struct dirent *handle_readdir(FsContext *ctx, V9fsFidOpenState *fs)
+-{
+-    return readdir(fs->dir.stream);
+-}
+-
+-static void handle_seekdir(FsContext *ctx, V9fsFidOpenState *fs, off_t off)
+-{
+-    seekdir(fs->dir.stream, off);
+-}
+-
+-static ssize_t handle_preadv(FsContext *ctx, V9fsFidOpenState *fs,
+-                             const struct iovec *iov,
+-                             int iovcnt, off_t offset)
+-{
+-#ifdef CONFIG_PREADV
+-    return preadv(fs->fd, iov, iovcnt, offset);
+-#else
+-    int err = lseek(fs->fd, offset, SEEK_SET);
+-    if (err == -1) {
+-        return err;
+-    } else {
+-        return readv(fs->fd, iov, iovcnt);
+-    }
+-#endif
+-}
+-
+-static ssize_t handle_pwritev(FsContext *ctx, V9fsFidOpenState *fs,
+-                              const struct iovec *iov,
+-                              int iovcnt, off_t offset)
+-{
+-    ssize_t ret;
+-#ifdef CONFIG_PREADV
+-    ret = pwritev(fs->fd, iov, iovcnt, offset);
+-#else
+-    int err = lseek(fs->fd, offset, SEEK_SET);
+-    if (err == -1) {
+-        return err;
+-    } else {
+-        ret = writev(fs->fd, iov, iovcnt);
+-    }
+-#endif
+-#ifdef CONFIG_SYNC_FILE_RANGE
+-    if (ret > 0 && ctx->export_flags & V9FS_IMMEDIATE_WRITEOUT) {
+-        /*
+-         * Initiate a writeback. This is not a data integrity sync.
+-         * We want to ensure that we don't leave dirty pages in the cache
+-         * after write when writeout=immediate is sepcified.
+-         */
+-        sync_file_range(fs->fd, offset, ret,
+-                        SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE);
+-    }
+-#endif
+-    return ret;
+-}
+-
+-static int handle_chmod(FsContext *fs_ctx, V9fsPath *fs_path, FsCred *credp)
+-{
+-    int fd, ret;
+-    HandleData *data = (HandleData *) fs_ctx->private;
+-
+-    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = fchmod(fd, credp->fc_mode);
+-    close(fd);
+-    return ret;
+-}
+-
+-static int handle_mknod(FsContext *fs_ctx, V9fsPath *dir_path,
+-                       const char *name, FsCred *credp)
+-{
+-    int dirfd, ret;
+-    HandleData *data = (HandleData *) fs_ctx->private;
+-
+-    dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
+-    if (dirfd < 0) {
+-        return dirfd;
+-    }
+-    ret = mknodat(dirfd, name, credp->fc_mode, credp->fc_rdev);
+-    if (!ret) {
+-        ret = handle_update_file_cred(dirfd, name, credp);
+-    }
+-    close(dirfd);
+-    return ret;
+-}
+-
+-static int handle_mkdir(FsContext *fs_ctx, V9fsPath *dir_path,
+-                       const char *name, FsCred *credp)
+-{
+-    int dirfd, ret;
+-    HandleData *data = (HandleData *) fs_ctx->private;
+-
+-    dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
+-    if (dirfd < 0) {
+-        return dirfd;
+-    }
+-    ret = mkdirat(dirfd, name, credp->fc_mode);
+-    if (!ret) {
+-        ret = handle_update_file_cred(dirfd, name, credp);
+-    }
+-    close(dirfd);
+-    return ret;
+-}
+-
+-static int handle_fstat(FsContext *fs_ctx, int fid_type,
+-                        V9fsFidOpenState *fs, struct stat *stbuf)
+-{
+-    int fd;
+-
+-    if (fid_type == P9_FID_DIR) {
+-        fd = dirfd(fs->dir.stream);
+-    } else {
+-        fd = fs->fd;
+-    }
+-    return fstat(fd, stbuf);
+-}
+-
+-static int handle_open2(FsContext *fs_ctx, V9fsPath *dir_path, const char *name,
+-                        int flags, FsCred *credp, V9fsFidOpenState *fs)
+-{
+-    int ret;
+-    int dirfd, fd;
+-    HandleData *data = (HandleData *) fs_ctx->private;
+-
+-    dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
+-    if (dirfd < 0) {
+-        return dirfd;
+-    }
+-    fd = openat(dirfd, name, flags | O_NOFOLLOW, credp->fc_mode);
+-    if (fd >= 0) {
+-        ret = handle_update_file_cred(dirfd, name, credp);
+-        if (ret < 0) {
+-            close(fd);
+-            fd = ret;
+-        } else {
+-            fs->fd = fd;
+-        }
+-    }
+-    close(dirfd);
+-    return fd;
+-}
+-
+-
+-static int handle_symlink(FsContext *fs_ctx, const char *oldpath,
+-                          V9fsPath *dir_path, const char *name, FsCred *credp)
+-{
+-    int fd, dirfd, ret;
+-    HandleData *data = (HandleData *) fs_ctx->private;
+-
+-    dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
+-    if (dirfd < 0) {
+-        return dirfd;
+-    }
+-    ret = symlinkat(oldpath, dirfd, name);
+-    if (!ret) {
+-        fd = openat(dirfd, name, O_PATH | O_NOFOLLOW);
+-        if (fd < 0) {
+-            ret = fd;
+-            goto err_out;
+-        }
+-        ret = fchownat(fd, "", credp->fc_uid, credp->fc_gid, AT_EMPTY_PATH);
+-        close(fd);
+-    }
+-err_out:
+-    close(dirfd);
+-    return ret;
+-}
+-
+-static int handle_link(FsContext *ctx, V9fsPath *oldpath,
+-                       V9fsPath *dirpath, const char *name)
+-{
+-    int oldfd, newdirfd, ret;
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    oldfd = open_by_handle(data->mountfd, oldpath->data, O_PATH);
+-    if (oldfd < 0) {
+-        return oldfd;
+-    }
+-    newdirfd = open_by_handle(data->mountfd, dirpath->data, O_PATH);
+-    if (newdirfd < 0) {
+-        close(oldfd);
+-        return newdirfd;
+-    }
+-    ret = linkat(oldfd, "", newdirfd, name, AT_EMPTY_PATH);
+-    close(newdirfd);
+-    close(oldfd);
+-    return ret;
+-}
+-
+-static int handle_truncate(FsContext *ctx, V9fsPath *fs_path, off_t size)
+-{
+-    int fd, ret;
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK | O_WRONLY);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = ftruncate(fd, size);
+-    close(fd);
+-    return ret;
+-}
+-
+-static int handle_rename(FsContext *ctx, const char *oldpath,
+-                         const char *newpath)
+-{
+-    errno = EOPNOTSUPP;
+-    return -1;
+-}
+-
+-static int handle_chown(FsContext *fs_ctx, V9fsPath *fs_path, FsCred *credp)
+-{
+-    int fd, ret;
+-    HandleData *data = (HandleData *) fs_ctx->private;
+-
+-    fd = open_by_handle(data->mountfd, fs_path->data, O_PATH);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = fchownat(fd, "", credp->fc_uid, credp->fc_gid, AT_EMPTY_PATH);
+-    close(fd);
+-    return ret;
+-}
+-
+-static int handle_utimensat(FsContext *ctx, V9fsPath *fs_path,
+-                            const struct timespec *buf)
+-{
+-    int ret;
+-    int fd;
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = futimens(fd, buf);
+-    close(fd);
+-    return ret;
+-}
+-
+-static int handle_remove(FsContext *ctx, const char *path)
+-{
+-    errno = EOPNOTSUPP;
+-    return -1;
+-}
+-
+-static int handle_fsync(FsContext *ctx, int fid_type,
+-                        V9fsFidOpenState *fs, int datasync)
+-{
+-    int fd;
+-
+-    if (fid_type == P9_FID_DIR) {
+-        fd = dirfd(fs->dir.stream);
+-    } else {
+-        fd = fs->fd;
+-    }
+-
+-    if (datasync) {
+-        return qemu_fdatasync(fd);
+-    } else {
+-        return fsync(fd);
+-    }
+-}
+-
+-static int handle_statfs(FsContext *ctx, V9fsPath *fs_path,
+-                         struct statfs *stbuf)
+-{
+-    int fd, ret;
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = fstatfs(fd, stbuf);
+-    close(fd);
+-    return ret;
+-}
+-
+-static ssize_t handle_lgetxattr(FsContext *ctx, V9fsPath *fs_path,
+-                                const char *name, void *value, size_t size)
+-{
+-    int fd, ret;
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = fgetxattr(fd, name, value, size);
+-    close(fd);
+-    return ret;
+-}
+-
+-static ssize_t handle_llistxattr(FsContext *ctx, V9fsPath *fs_path,
+-                                 void *value, size_t size)
+-{
+-    int fd, ret;
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = flistxattr(fd, value, size);
+-    close(fd);
+-    return ret;
+-}
+-
+-static int handle_lsetxattr(FsContext *ctx, V9fsPath *fs_path, const char *name,
+-                            void *value, size_t size, int flags)
+-{
+-    int fd, ret;
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = fsetxattr(fd, name, value, size, flags);
+-    close(fd);
+-    return ret;
+-}
+-
+-static int handle_lremovexattr(FsContext *ctx, V9fsPath *fs_path,
+-                               const char *name)
+-{
+-    int fd, ret;
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    fd = open_by_handle(data->mountfd, fs_path->data, O_NONBLOCK);
+-    if (fd < 0) {
+-        return fd;
+-    }
+-    ret = fremovexattr(fd, name);
+-    close(fd);
+-    return ret;
+-}
+-
+-static int handle_name_to_path(FsContext *ctx, V9fsPath *dir_path,
+-                              const char *name, V9fsPath *target)
+-{
+-    char *buffer;
+-    struct file_handle *fh;
+-    int dirfd, ret, mnt_id;
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    /* "." and ".." are not allowed */
+-    if (!strcmp(name, ".") || !strcmp(name, "..")) {
+-        errno = EINVAL;
+-        return -1;
+-
+-    }
+-    if (dir_path) {
+-        dirfd = open_by_handle(data->mountfd, dir_path->data, O_PATH);
+-    } else {
+-        /* relative to export root */
+-        buffer = rpath(ctx, ".");
+-        dirfd = open(buffer, O_DIRECTORY);
+-        g_free(buffer);
+-    }
+-    if (dirfd < 0) {
+-        return dirfd;
+-    }
+-    fh = g_malloc(sizeof(struct file_handle) + data->handle_bytes);
+-    fh->handle_bytes = data->handle_bytes;
+-    /* add a "./" at the beginning of the path */
+-    buffer = g_strdup_printf("./%s", name);
+-    /* flag = 0 imply don't follow symlink */
+-    ret = name_to_handle(dirfd, buffer, fh, &mnt_id, 0);
+-    if (!ret) {
+-        target->data = (char *)fh;
+-        target->size = sizeof(struct file_handle) + data->handle_bytes;
+-    } else {
+-        g_free(fh);
+-    }
+-    close(dirfd);
+-    g_free(buffer);
+-    return ret;
+-}
+-
+-static int handle_renameat(FsContext *ctx, V9fsPath *olddir,
+-                           const char *old_name, V9fsPath *newdir,
+-                           const char *new_name)
+-{
+-    int olddirfd, newdirfd, ret;
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    olddirfd = open_by_handle(data->mountfd, olddir->data, O_PATH);
+-    if (olddirfd < 0) {
+-        return olddirfd;
+-    }
+-    newdirfd = open_by_handle(data->mountfd, newdir->data, O_PATH);
+-    if (newdirfd < 0) {
+-        close(olddirfd);
+-        return newdirfd;
+-    }
+-    ret = renameat(olddirfd, old_name, newdirfd, new_name);
+-    close(newdirfd);
+-    close(olddirfd);
+-    return ret;
+-}
+-
+-static int handle_unlinkat(FsContext *ctx, V9fsPath *dir,
+-                           const char *name, int flags)
+-{
+-    int dirfd, ret;
+-    HandleData *data = (HandleData *) ctx->private;
+-
+-    dirfd = open_by_handle(data->mountfd, dir->data, O_PATH);
+-    if (dirfd < 0) {
+-        return dirfd;
+-    }
+-
+-    ret = unlinkat(dirfd, name, flags);
+-
+-    close(dirfd);
+-    return ret;
+-}
+-
+-static int handle_ioc_getversion(FsContext *ctx, V9fsPath *path,
+-                                 mode_t st_mode, uint64_t *st_gen)
+-{
+-#ifdef FS_IOC_GETVERSION
+-    int err;
+-    V9fsFidOpenState fid_open;
+-
+-    /*
+-     * Do not try to open special files like device nodes, fifos etc
+-     * We can get fd for regular files and directories only
+-     */
+-    if (!S_ISREG(st_mode) && !S_ISDIR(st_mode)) {
+-        errno = ENOTTY;
+-        return -1;
+-    }
+-    err = handle_open(ctx, path, O_RDONLY, &fid_open);
+-    if (err < 0) {
+-        return err;
+-    }
+-    err = ioctl(fid_open.fd, FS_IOC_GETVERSION, st_gen);
+-    handle_close(ctx, &fid_open);
+-    return err;
+-#else
+-    errno = ENOTTY;
+-    return -1;
+-#endif
+-}
+-
+-static int handle_init(FsContext *ctx, Error **errp)
+-{
+-    int ret, mnt_id;
+-    struct statfs stbuf;
+-    struct file_handle fh;
+-    HandleData *data = g_malloc(sizeof(HandleData));
+-
+-    data->mountfd = open(ctx->fs_root, O_DIRECTORY);
+-    if (data->mountfd < 0) {
+-        ret = data->mountfd;
+-        goto err_out;
+-    }
+-    ret = statfs(ctx->fs_root, &stbuf);
+-    if (!ret) {
+-        switch (stbuf.f_type) {
+-        case EXT2_SUPER_MAGIC:
+-        case BTRFS_SUPER_MAGIC:
+-        case REISERFS_SUPER_MAGIC:
+-        case XFS_SUPER_MAGIC:
+-            ctx->exops.get_st_gen = handle_ioc_getversion;
+-            break;
+-        }
+-    }
+-    memset(&fh, 0, sizeof(struct file_handle));
+-    ret = name_to_handle(data->mountfd, ".", &fh, &mnt_id, 0);
+-    if (ret && errno == EOVERFLOW) {
+-        data->handle_bytes = fh.handle_bytes;
+-        ctx->private = data;
+-        ret = 0;
+-        goto out;
+-    }
+-    /* we got 0 byte handle ? */
+-    ret = -1;
+-    close(data->mountfd);
+-err_out:
+-    g_free(data);
+-out:
+-    return ret;
+-}
+-
+-static void handle_cleanup(FsContext *ctx)
+-{
+-    HandleData *data = ctx->private;
+-
+-    close(data->mountfd);
+-    g_free(data);
+-}
+-
+-static int handle_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+-{
+-    const char *sec_model = qemu_opt_get(opts, "security_model");
+-    const char *path = qemu_opt_get(opts, "path");
+-
+-    warn_report("handle backend is deprecated");
+-
+-    if (sec_model) {
+-        error_setg(errp,
+-                   "Invalid argument security_model specified with handle fsdriver");
+-        return -1;
+-    }
+-
+-    if (!path) {
+-        error_setg(errp, "fsdev: No path specified");
+-        return -1;
+-    }
+-    fse->path = g_strdup(path);
+-    return 0;
+-
+-}
+-
+-FileOperations handle_ops = {
+-    .parse_opts   = handle_parse_opts,
+-    .init         = handle_init,
+-    .cleanup      = handle_cleanup,
+-    .lstat        = handle_lstat,
+-    .readlink     = handle_readlink,
+-    .close        = handle_close,
+-    .closedir     = handle_closedir,
+-    .open         = handle_open,
+-    .opendir      = handle_opendir,
+-    .rewinddir    = handle_rewinddir,
+-    .telldir      = handle_telldir,
+-    .readdir      = handle_readdir,
+-    .seekdir      = handle_seekdir,
+-    .preadv       = handle_preadv,
+-    .pwritev      = handle_pwritev,
+-    .chmod        = handle_chmod,
+-    .mknod        = handle_mknod,
+-    .mkdir        = handle_mkdir,
+-    .fstat        = handle_fstat,
+-    .open2        = handle_open2,
+-    .symlink      = handle_symlink,
+-    .link         = handle_link,
+-    .truncate     = handle_truncate,
+-    .rename       = handle_rename,
+-    .chown        = handle_chown,
+-    .utimensat    = handle_utimensat,
+-    .remove       = handle_remove,
+-    .fsync        = handle_fsync,
+-    .statfs       = handle_statfs,
+-    .lgetxattr    = handle_lgetxattr,
+-    .llistxattr   = handle_llistxattr,
+-    .lsetxattr    = handle_lsetxattr,
+-    .lremovexattr = handle_lremovexattr,
+-    .name_to_path = handle_name_to_path,
+-    .renameat     = handle_renameat,
+-    .unlinkat     = handle_unlinkat,
+-};
+diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
+index e3fa673665e4..8ac04962bd13 100644
+--- a/hw/9pfs/Makefile.objs
++++ b/hw/9pfs/Makefile.objs
+@@ -4,7 +4,6 @@ common-obj-y += 9p-local.o 9p-xattr.o
+ common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
+ common-obj-y += coth.o cofs.o codir.o cofile.o
+ common-obj-y += coxattr.o 9p-synth.o
+-common-obj-$(CONFIG_OPEN_BY_HANDLE) +=  9p-handle.o
+ common-obj-y += 9p-proxy.o
+ endif
+ 
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index cb4291f1e5bc..d1d04de2c114 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -46,14 +46,6 @@ would automatically enable USB support on the machine type.
+ If using the new syntax, USB support must be explicitly
+ enabled via the ``-machine usb=on'' argument.
+ 
+-@subsection -fsdev handle (since 2.12.0)
+-
+-The ``handle'' fsdev backend does not support symlinks and causes the 9p
+-filesystem in the guest to fail a fair amount of tests from the PJD POSIX
+-filesystem test suite. Also it requires the CAP_DAC_READ_SEARCH capability,
+-which is not the recommended way to run QEMU. This backend should not be
+-used and it will be removed with no replacement.
+-
+ @subsection -no-frame (since 2.12.0)
+ 
+ The @code{--no-frame} argument works with SDL 1.2 only. The other user
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 269eda7a5da3..df42116eccc7 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1019,7 +1019,7 @@ Define a new file system device. Valid options are:
+ @table @option
+ @item @var{fsdriver}
+ This option specifies the fs driver backend to use.
+-Currently "local", "handle" and "proxy" file system drivers are supported.
++Currently "local" and "proxy" file system drivers are supported.
+ @item id=@var{id}
+ Specifies identifier for this device
+ @item path=@var{path}
+@@ -1037,7 +1037,7 @@ hidden .virtfs_metadata directory. Directories exported by this security model c
+ interact with other unix tools. "none" security model is same as
+ passthrough except the sever won't report failures if it fails to
+ set file attributes like ownership. Security model is mandatory
+-only for local fsdriver. Other fsdrivers (like handle, proxy) don't take
++only for local fsdriver. Other fsdrivers (like proxy) don't take
+ security model as a parameter.
+ @item writeout=@var{writeout}
+ This is an optional argument. The only supported value is "immediate".
+@@ -1088,7 +1088,7 @@ The general form of a Virtual File system pass-through options are:
+ @table @option
+ @item @var{fsdriver}
+ This option specifies the fs driver backend to use.
+-Currently "local", "handle" and "proxy" file system drivers are supported.
++Currently "local" and "proxy" file system drivers are supported.
+ @item id=@var{id}
+ Specifies identifier for this device
+ @item path=@var{path}
+@@ -1106,7 +1106,7 @@ hidden .virtfs_metadata directory. Directories exported by this security model c
+ interact with other unix tools. "none" security model is same as
+ passthrough except the sever won't report failures if it fails to
+ set file attributes like ownership. Security model is mandatory only
+-for local fsdriver. Other fsdrivers (like handle, proxy) don't take security
++for local fsdriver. Other fsdrivers (like proxy) don't take security
+ model as a parameter.
+ @item writeout=@var{writeout}
+ This is an optional argument. The only supported value is "immediate".
