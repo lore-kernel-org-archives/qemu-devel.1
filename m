@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gSgil-00057o-54
+	(envelope-from <kraxel@redhat.com>) id 1gSgil-00057n-4T
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:12:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gSgih-0006mS-O7
+	(envelope-from <kraxel@redhat.com>) id 1gSgih-0006mB-3O
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:12:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37884)
+Received: from mx1.redhat.com ([209.132.183.28]:59925)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gSgih-0006m3-HS
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gSgig-0006ls-U3
 	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 06:12:27 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D35A53001567
+	by mx1.redhat.com (Postfix) with ESMTPS id 27ABE3002883
 	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 11:12:26 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 30 Nov 2018 12:12:21 +0100
-Message-Id: <20181130111222.25386-2-kraxel@redhat.com>
+Date: Fri, 30 Nov 2018 12:12:22 +0100
+Message-Id: <20181130111222.25386-3-kraxel@redhat.com>
 In-Reply-To: <20181130111222.25386-1-kraxel@redhat.com>
 References: <20181130111222.25386-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH for-3.1 1/2] usb-mtp: fix utf16_to_str
+Subject: [Qemu-devel] [PATCH for-3.1 2/2] usb-mtp: outlaw slashes in
+ filenames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +33,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Make utf16_to_str return an allocated string.  Remove the assumtion that
-the number of string bytes equals the number of utf16 chars (which is
-only true for ascii chars).  Instead call wcstombs twice, once to figure
-the storage size and once for the actual conversion (as suggested by the
-wcstombs manpage).
+Slash is unix directory separator, so they are not allowed in filenames.
+Note this also stops the classic escape via "../".
 
+Fixes: CVE-2018-16867
 Reported-by: Michael Hanselmann (hansmi.ch)
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/dev-mtp.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ hw/usb/dev-mtp.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 00a3691bae..fbe1ace035 100644
+index fbe1ace035..87eeac1084 100644
 --- a/hw/usb/dev-mtp.c
 +++ b/hw/usb/dev-mtp.c
-@@ -1593,17 +1593,22 @@ static void usb_mtp_cancel_packet(USBDevice *dev, USBPacket *p)
-     fprintf(stderr, "%s\n", __func__);
- }
+@@ -1718,6 +1718,12 @@ static void usb_mtp_write_metadata(MTPState *s)
  
--static void utf16_to_str(uint8_t len, uint16_t *arr, char *name)
-+static char *utf16_to_str(uint8_t len, uint16_t *arr)
- {
--    int count;
--    wchar_t *wstr = g_new0(wchar_t, len);
-+    wchar_t *wstr = g_new0(wchar_t, len + 1);
-+    int count, dlen;
-+    char *dest;
+     filename = utf16_to_str(dataset->length, dataset->filename);
  
-     for (count = 0; count < len; count++) {
-         wstr[count] = (wchar_t)arr[count];
-     }
-+    wstr[count] = 0;
- 
--    wcstombs(name, wstr, len);
-+    dlen = wcstombs(NULL, wstr, 0) + 1;
-+    dest = g_malloc(dlen);
-+    wcstombs(dest, wstr, dlen);
-     g_free(wstr);
-+    return dest;
- }
- 
- /* Wrapper around write, returns 0 on failure */
-@@ -1703,7 +1708,7 @@ static void usb_mtp_write_metadata(MTPState *s)
- {
-     MTPData *d = s->data_out;
-     ObjectInfo *dataset = (ObjectInfo *)d->data;
--    char *filename = g_new0(char, dataset->length);
-+    char *filename;
-     MTPObject *o;
-     MTPObject *p = usb_mtp_object_lookup(s, s->dataset.parent_handle);
-     uint32_t next_handle = s->next_handle;
-@@ -1711,7 +1716,7 @@ static void usb_mtp_write_metadata(MTPState *s)
-     assert(!s->write_pending);
-     assert(p != NULL);
- 
--    utf16_to_str(dataset->length, dataset->filename, filename);
-+    filename = utf16_to_str(dataset->length, dataset->filename);
- 
++    if (strchr(filename, '/')) {
++        usb_mtp_queue_result(s, RES_INVALID_PARAMETER, d->trans,
++                             0, 0, 0, 0);
++        return;
++    }
++
      o = usb_mtp_object_lookup_name(p, filename, dataset->length);
      if (o != NULL) {
+         next_handle = o->handle;
 -- 
 2.9.3
