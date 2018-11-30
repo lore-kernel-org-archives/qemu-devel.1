@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gSiQ2-0003qX-5k
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:01:23 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gSiQH-00042v-S5
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:01:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameo@linux.intel.com>) id 1gSiPw-0004e1-5J
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:01:16 -0500
+	(envelope-from <sameo@linux.intel.com>) id 1gSiQE-0004x9-OD
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 08:01:33 -0500
 From: Samuel Ortiz <sameo@linux.intel.com>
-Date: Fri, 30 Nov 2018 14:00:24 +0100
-Message-Id: <20181130130032.11835-1-sameo@linux.intel.com>
+Date: Fri, 30 Nov 2018 14:00:27 +0100
+Message-Id: <20181130130032.11835-4-sameo@linux.intel.com>
+In-Reply-To: <20181130130032.11835-1-sameo@linux.intel.com>
+References: <20181130130032.11835-1-sameo@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 0/8] hw: acpi: RSDP fixes and refactoring
+Subject: [Qemu-devel] [PATCH v3 3/8] hw: i386: Use correct RSDT length for
+ checksum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +25,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, Ben Warren <ben@skyportsystems.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-This patch serie fixes a couple of RSDP checksum related issues:
+From: Igor Mammedov <imammedo@redhat.com>
 
-- On RSDP rev2, we are not adding the extended checksum and computing
-  the checksum on the full table instead of the first 20 bytes.
-- On RSDP rev1, we are computing the checksum on 36 bytes instead of 20.
-  We're lucky enough that this is only adding zeroes to the checksum.
+AcpiRsdpDescriptor describes revision 2 RSDP table so using sizeof(*rsdp)
+for checksum calculation isn't correct since we are adding extra 16 bytes.
+But acpi_data_push() zeroes out table, so just by luck we are summing up
+exta zeros which still yelds correct checksum.
 
-A guest Linux kernel does not seem to care about RSDP checksums, so
-those 2 fixes are mostly for correctness sake.
-Any machine type that generates rev2 RSDP will see its RSDP table
-modified but since x86 builds RSDP v1 and all ACPI tests only run on
-either pc or q35, the ACPI tests tables are not affected by this fix.
+Fix it up by explicitly stating table size instead of using
+pointer arithmetics on stucture.
 
-The serie also extends the ARM virt ACPI RSDP build routine to support
-both RSDP v1 and v2, in order to share this code between x86 and
-aarch64. While extending, we also convert the routine to the latest
-build_append_foo() API. The new implementation is a closer reflection of
-the ACPI spec itself, is endian agnostic and allows for getting rid of the
-AcpiRsdpDescriptor structure.
+PS:
+Extra 16 bytes are still wasted, but droping them will break migration
+for machines older than 2.3 due to size mismatch, for 2.3 and older it's
+not an issue since they are using resizable memory regions (a1666142d)
+for ACPI blobs. So keep wasting memory to avoid breaking old machines.
 
-V2 -> V3:
-  * Add Reviewed-Bys from Igor and Andrew.
-  * Check for valid RSDP and XSDT pointers depending on the revision.
-  * Use RSDP initial table len as offset for checksum and pointer
-    insertion.
-  * Do not explictly pass RSDP revision as the RSDP table parsing test
-    utility.
+Fixes: 72c194f7e (i386: ACPI table generation code from seabios)
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Samuel Ortiz <sameo@linux.intel.com>
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+---
+ hw/i386/acpi-build.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-v1 -> v2:
-  * Add missing SOBs.
-  * Rephrase some commit messages according to the maintainer's input.
-  * Replace ACPI spec definitions with hard coded constants.
-  * Replace init_rsdp_data() helper with open coded rsdp variable init.
-  * Rename acpi_find_[rx]sdt_address to acpi_get_[rx]sdt_address.
-
-Igor Mammedov (2):
-  hw: arm: acpi: Fix incorrect checksums in RSDP
-  hw: i386: Use correct RSDT length for checksum
-
-Samuel Ortiz (6):
-  hw: acpi: The RSDP build API can return void
-  hw: arm: Carry RSDP specific data through AcpiRsdpData
-  hw: arm: Convert the RSDP build to the buid_append_foo() API
-  hw: arm: Support both legacy and current RSDP build
-  hw: acpi: Export and share the ARM RSDP build
-  hw: acpi: Remove AcpiRsdpDescriptor and fix tests
-
- include/hw/acpi/acpi-defs.h | 19 ++++-------
- include/hw/acpi/aml-build.h |  2 ++
- tests/acpi-utils.h          |  4 ++-
- hw/acpi/aml-build.c         | 68 +++++++++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c    | 40 +++++-----------------
- hw/i386/acpi-build.c        | 36 +++++---------------
- tests/acpi-utils.c          | 46 ++++++++++++++++++++-----
- tests/bios-tables-test.c    | 21 +++++++++---
- tests/vmgenid-test.c        |  8 +++--
- 9 files changed, 157 insertions(+), 87 deletions(-)
-
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 35f17d0d91..fb877648ac 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2550,6 +2550,11 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
+ static void
+ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
+ {
++    /* AcpiRsdpDescriptor describes revision 2 RSDP table and as result we
++     * allocate extra 16 bytes for pc/q35 RSDP rev1 as well. Keep extra 16 bytes
++     * wasted to make sure we won't breake migration for machine types older
++     * than 2.3 due to size mismatch.
++     */
+     AcpiRsdpDescriptor *rsdp = acpi_data_push(rsdp_table, sizeof *rsdp);
+     unsigned rsdt_pa_size = sizeof(rsdp->rsdt_physical_address);
+     unsigned rsdt_pa_offset =
+@@ -2567,7 +2572,7 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
+ 
+     /* Checksum to be filled by Guest linker */
+     bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+-        (char *)rsdp - rsdp_table->data, sizeof *rsdp,
++        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP size */,
+         (char *)&rsdp->checksum - rsdp_table->data);
+ }
+ 
 -- 
 2.19.2
