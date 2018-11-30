@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gSfYD-0007WA-Mw
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:57:34 -0500
+	(envelope-from <berrange@redhat.com>) id 1gSfZG-00008R-5H
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:58:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gSfYC-0007f7-PW
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:57:33 -0500
-Date: Fri, 30 Nov 2018 10:57:16 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181130105716.2131be19@redhat.com>
-In-Reply-To: <20181129145942.GB4691@caravaggio>
-References: <20181129132428.333-1-sameo@linux.intel.com>
-	<20181129132428.333-7-sameo@linux.intel.com>
-	<20181129144243.so22d2igis7a24xp@kamzik.brq.redhat.com>
-	<20181129145942.GB4691@caravaggio>
+	(envelope-from <berrange@redhat.com>) id 1gSfZC-0008FS-SY
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:58:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gSfZC-0008FE-JM
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 04:58:34 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EA314DD9CA
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 09:58:33 +0000 (UTC)
+Date: Fri, 30 Nov 2018 09:58:30 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181130095830.GD8101@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20181129180050.17797-1-pbonzini@redhat.com>
+	<8fcdeb08-d87c-a236-de94-f5129aa3b99b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 6/8] hw: arm: Support both legacy and
- current RSDP build
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8fcdeb08-d87c-a236-de94-f5129aa3b99b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] glib-compat: work around g_test_message
+ bug with subprocess tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Ortiz <sameo@linux.intel.com>
-Cc: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
-On Thu, 29 Nov 2018 15:59:42 +0100
-Samuel Ortiz <sameo@linux.intel.com> wrote:
-
-> On Thu, Nov 29, 2018 at 03:42:43PM +0100, Andrew Jones wrote:
-> > On Thu, Nov 29, 2018 at 02:24:26PM +0100, Samuel Ortiz wrote:  
-> > > We add the ability to build legacy or current RSDP tables, based on the
-> > > AcpiRsdpData revision field passed to build_rsdp().
-> > > Although arm/virt only uses RSDP v2, adding that capability to
-> > > build_rsdp will allow us to share the RSDP build code between ARM and x86.
-> > > 
-> > > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-> > > ---
-> > >  hw/arm/virt-acpi-build.c | 37 ++++++++++++++++++++++++++-----------
-> > >  1 file changed, 26 insertions(+), 11 deletions(-)
-> > > 
-> > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > index 4782aea4fe..e1338b6f5a 100644
-> > > --- a/hw/arm/virt-acpi-build.c
-> > > +++ b/hw/arm/virt-acpi-build.c
-> > > @@ -378,23 +378,38 @@ build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
-> > >      g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
-> > >      build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision */
-> > >      build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
-> > > -    build_append_int_noprefix(tbl, 36, 4); /* Length */
-> > > -
-> > > -    /* XSDT address to be filled by guest linker */
-> > > -    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
-> > > -    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE,
-> > > -                                   24, 8,
-> > > -                                   ACPI_BUILD_TABLE_FILE,
-> > > -                                   *rsdp_data->xsdt_tbl_offset);
-> > > -
-> > > -    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
-> > > -    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
-> > > +    if (rsdp_data->rsdt_tbl_offset) {  
+On Fri, Nov 30, 2018 at 01:08:29AM +0100, Paolo Bonzini wrote:
+> On 29/11/18 19:00, Paolo Bonzini wrote:
+> > Subprocesses are created by glib without leaving the file descriptors
+> > open.  Therefore, g_test_message (and assertion failures, but those
+> > trigger when things are going bad anyway) will think that it is writing
+> > to the log file descriptor, but while actually stomping on the QMP
+> > file descriptor or similar.  This causes spurious failures, which are
+> > as nice to debug as the reader can imagine.  While I have opened a
+> > pull request on GLib, this will probably take a while to propagate
+> > to distros.
 > > 
-> > I see why a pointer was used now. Using a pointer ensures a zero
-> > offset won't fail this test. However the test could be replaced with
-> > rsdp_data->revision == 0.
-> >   
-> > > +        /* RSDT address to be filled by guest linker */
-> > > +        bios_linker_loader_add_pointer(linker,
-> > > +                                       ACPI_BUILD_RSDP_FILE, 16, 4,
-> > > +                                       ACPI_BUILD_TABLE_FILE,
-> > > +                                       *rsdp_data->rsdt_tbl_offset);
-> > > +    }
-> > >  
-> > >      /* Checksum to be filled by guest linker */
-> > >      bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
-> > >                                      0, 20, /* ACPI rev 1.0 RSDP size */
-> > >                                      8);
-> > >  
-> > > +    if (rsdp_data->revision == 0) {
-> > > +        /* ACPI 1.0 RSDP, we're done */
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    /* The RSDP revision is 2 and later, we must have an XSDT pointer */
-> > > +    g_assert(rsdp_data->xsdt_tbl_offset != NULL);  
-> > 
-> > So here's the justification for the pointers. We sanity check the callers.  
-> We could sanity check the callers without pointers as well, I don't
-> think there's a strong advantage for pointers here, except consistence.
-I remember now,
-we need pointer to RSDT offset here so that we could skip bios_linker_loader_add_pointer(rsdt)
-when RSDT isn't provided (0 is also a valid offset), as for xsdt field it follows
-rsdt one for consistency and we can do sanity checks on it.
-
-assert here seems not really necessary as it guarantied to SIGSEGV
-on NULL point dereference at bios_linker_loader_add_pointer(*xdst) callsite.
-But I don't care here, so I'll leave it up to Samuel.
-
-> > We're missing the (rsdp_data->revision == 0 && rsdp_data->rsdt_tbl_offset)
-> > sanity check though.  
-> I think there's nothing preventing a caller to include both rsdt and
-> xsdt if it wants to be able to run on both < 2.0 and 2.0+ platforms with
-> the same table. So if rsdt is set we should add it, regardless of the revision.
-agreed,
-we don't do this in QEMU but it's correct, there could be both and it's better
-follow better document spec in this case.
-
+> > I found this while working on qgraph, but the fix is generic.
 > 
-> Cheers,
-> Samuel.
+> This is not a problem anymore if we switch from gtester to tap.  Do we
+> want it fixed anyway or not?
+
+IMHO the change to tap is not really something  we shoudl be doing
+at this point in the release cycle. So I'd favour taking this fix
+for 3.1, even if it becomes redundant when we switch to tap in 4.0
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
