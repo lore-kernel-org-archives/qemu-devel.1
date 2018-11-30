@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gSfd6-0004YD-I8
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:02:37 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gSfeE-0006ed-S2
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:03:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gSfd3-0005d3-Bt
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:02:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46040)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gSfd3-0005cE-3m
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:02:33 -0500
-Date: Fri, 30 Nov 2018 11:01:57 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181130100157.GB5106@localhost.localdomain>
-References: <20181010133333.24538.53169.stgit@pasha-VirtualBox>
-	<20181010133357.24538.19180.stgit@pasha-VirtualBox>
-	<20181128154538.GB4222@dhcp-200-186.str.redhat.com>
-	<002101d48882$0905fb60$1b11f220$@ru>
+	(envelope-from <imammedo@redhat.com>) id 1gSfeB-0006nb-B9
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 05:03:46 -0500
+Date: Fri, 30 Nov 2018 11:03:17 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181130110317.08192149@redhat.com>
+In-Reply-To: <20181129132428.333-8-sameo@linux.intel.com>
+References: <20181129132428.333-1-sameo@linux.intel.com>
+	<20181129132428.333-8-sameo@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <002101d48882$0905fb60$1b11f220$@ru>
-Subject: Re: [Qemu-devel] [PATCH v7 04/19] replay: don't drain/flush bdrv
- queue while RR is working
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 7/8] hw: acpi: Export and share the ARM
+ RSDP build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +24,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, war2jordan@live.com, mst@redhat.com, jasowang@redhat.com, zuban32s@gmail.com, kraxel@redhat.com, thomas.dullien@googlemail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, armbru@redhat.com, dgilbert@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org, rth@twiddle.net, crosthwaite.peter@gmail.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, pbonzini@redhat.com
+To: Samuel Ortiz <sameo@linux.intel.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Shannon Zhao <shannon.zhaosl@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-Am 30.11.2018 um 08:55 hat Pavel Dovgalyuk geschrieben:
-> > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > Am 10.10.2018 um 15:33 hat Pavel Dovgalyuk geschrieben:
-> > > In record/replay mode bdrv queue is controlled by replay mechanism.
-> > > It does not allow saving or loading the snapshots
-> > > when bdrv queue is not empty. Stopping the VM is not blocked by nonempty
-> > > queue, but flushing the queue is still impossible there,
-> > > because it may cause deadlocks in replay mode.
-> > > This patch disables bdrv_drain_all and bdrv_flush_all in
-> > > record/replay mode.
-> > >
-> > > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> > 
-> > Disabling bdrv_flush_all() shouldn't make a big difference in replay
-> > mode, so I agree with that.
-> > 
-> > But does the bdrv_drain_all() change mean that bdrv_drain_all_begin()
-> > can return while there are still requests in flight? This sounds like
-> > something that could break some existing code, because the meaning of
-> > the function is that if it returns success, no requests are in flight
-> > any more.
-> > 
-> > What would move the request forward in the replay case once it has been
-> > created? Does this also involve some user interaction? Or may we process
-> > the next event in a drain callback of blkreplay or something?
-> 
-> You are right - there are some operation that can't be performed at any
-> time during the replay, because of unfinished block requests.
-> 
-> One of these is creating the VM snapshot. I've added a check in another
-> patch, which prevents snapshotting while the event queue (which holds
-> the block requests) is not empty.
-> 
-> There could also be other things, that will be fixed when we try to use it.
-> 
-> Moving replay forward until the queue is empty is not a good idea, because
-> step-by-step debugging should be available and work without skipping the instructions.
+On Thu, 29 Nov 2018 14:24:27 +0100
+Samuel Ortiz <sameo@linux.intel.com> wrote:
 
-So if the idea is that in replay mode, bdrv_drain_all_begin() is only
-called when there are no requests in flight anyway (because callers
-catch this situation earler), can we make this an assertion that the
-block device is already quiesced?
+> Now that build_rsdp() supports building both legacy and current RSDP
+> tables, we can move it to a generic folder (hw/acpi) and have the i386
+> ACPI code reuse it in order to reduce code duplication.
+>=20
+> Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+with nit below fixed
 
-Skipping drain without knowing that there are no requests in flight
-feels simply wrong, and I'm almost sure it will result in bugs. On the
-other hand, if we know that no requests are in flight, there's no real
-point in skipping.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-So I think I still don't understand the situation where skipping a drain
-is the correct solution.
+> ---
+>  include/hw/acpi/aml-build.h |  2 ++
+>  hw/acpi/aml-build.c         | 50 +++++++++++++++++++++++++++++++++++++
+>  hw/arm/virt-acpi-build.c    | 50 -------------------------------------
+>  hw/i386/acpi-build.c        | 39 +++++++----------------------
+>  4 files changed, 61 insertions(+), 80 deletions(-)
+>=20
+> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> index 6c36903c0a..1a563ad756 100644
+> --- a/include/hw/acpi/aml-build.h
+> +++ b/include/hw/acpi/aml-build.h
+> @@ -388,6 +388,8 @@ void acpi_add_table(GArray *table_offsets, GArray *ta=
+ble_data);
+>  void acpi_build_tables_init(AcpiBuildTables *tables);
+>  void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre);
+>  void
+> +build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data);
+> +void
+>  build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+>             const char *oem_id, const char *oem_table_id);
+>  void
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index 1e43cd736d..3d5f77e02b 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -1589,6 +1589,56 @@ void acpi_build_tables_cleanup(AcpiBuildTables *ta=
+bles, bool mfre)
+>      g_array_free(tables->vmgenid, mfre);
+>  }
+> =20
+> +/* RSDP */
+> +void
+> +build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+> +{
+> +    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, tbl, 16,
+> +                             true /* fseg memory */);
+> +
+> +    g_array_append_vals(tbl, "RSD PTR ", 8); /* Signature */
+> +    build_append_int_noprefix(tbl, 0, 1); /* Checksum */
+> +    g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
+> +    build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision =
+*/
+> +    build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
+> +    if (rsdp_data->rsdt_tbl_offset) {
+> +        /* RSDT address to be filled by guest linker */
+> +        bios_linker_loader_add_pointer(linker,
+> +                                       ACPI_BUILD_RSDP_FILE, 16, 4,
+> +                                       ACPI_BUILD_TABLE_FILE,
+> +                                       *rsdp_data->rsdt_tbl_offset);
+> +    }
+> +
+> +    /* Checksum to be filled by guest linker */
+> +    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> +                                    0, 20, /* ACPI rev 1.0 RSDP size */
+> +                                    8);
+> +
+> +    if (rsdp_data->revision =3D=3D 0) {
+> +        /* ACPI 1.0 RSDP, we're done */
+> +        return;
+> +    }
+> +
+> +    /* The RSDP revision is 2 and later, we must have an XSDT pointer */
+> +    g_assert(rsdp_data->xsdt_tbl_offset !=3D NULL);
+> +
+> +    build_append_int_noprefix(tbl, 36, 4); /* Length */
+> +
+> +    /* XSDT address to be filled by guest linker */
+> +    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
+> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE, 24, 8,
+> +                                   ACPI_BUILD_TABLE_FILE,
+> +                                   *rsdp_data->xsdt_tbl_offset);
+> +
+> +    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
+> +    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
+> +
+> +    /* Extended checksum to be filled by Guest linker */
+> +    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> +                                    0, 36, /* ACPI rev 2.0 RSDP size */
+> +                                    32);
+> +}
+> +
+>  /* Build rsdt table */
+>  void
+>  build_rsdt(GArray *table_data, BIOSLinker *linker, GArray *table_offsets,
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index e1338b6f5a..95fad6f0ce 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -366,56 +366,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+>      aml_append(scope, dev);
+>  }
+> =20
+> -/* RSDP */
+I'd make comment more descriptive, see build_slit() for example
 
-Kevin
+> -static void
+> -build_rsdp(GArray *tbl, BIOSLinker *linker, AcpiRsdpData *rsdp_data)
+> -{
+> -    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, tbl, 16,
+> -                             true /* fseg memory */);
+> -
+> -    g_array_append_vals(tbl, "RSD PTR ", 8); /* Signature */
+> -    build_append_int_noprefix(tbl, 0, 1); /* Checksum */
+> -    g_array_append_vals(tbl, rsdp_data->oem_id, 6); /* OEMID */
+> -    build_append_int_noprefix(tbl, rsdp_data->revision, 1); /* Revision =
+*/
+> -    build_append_int_noprefix(tbl, 0, 4); /* RsdtAddress */
+> -    if (rsdp_data->rsdt_tbl_offset) {
+> -        /* RSDT address to be filled by guest linker */
+> -        bios_linker_loader_add_pointer(linker,
+> -                                       ACPI_BUILD_RSDP_FILE, 16, 4,
+> -                                       ACPI_BUILD_TABLE_FILE,
+> -                                       *rsdp_data->rsdt_tbl_offset);
+> -    }
+> -
+> -    /* Checksum to be filled by guest linker */
+> -    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> -                                    0, 20, /* ACPI rev 1.0 RSDP size */
+> -                                    8);
+> -
+> -    if (rsdp_data->revision =3D=3D 0) {
+> -        /* ACPI 1.0 RSDP, we're done */
+> -        return;
+> -    }
+> -
+> -    /* The RSDP revision is 2 and later, we must have an XSDT pointer */
+> -    g_assert(rsdp_data->xsdt_tbl_offset !=3D NULL);
+> -
+> -    build_append_int_noprefix(tbl, 36, 4); /* Length */
+> -
+> -    /* XSDT address to be filled by guest linker */
+> -    build_append_int_noprefix(tbl, 0, 8); /* XsdtAddress */
+> -    bios_linker_loader_add_pointer(linker, ACPI_BUILD_RSDP_FILE, 24, 8,
+> -                                   ACPI_BUILD_TABLE_FILE,
+> -                                   *rsdp_data->xsdt_tbl_offset);
+> -
+> -    build_append_int_noprefix(tbl, 0, 1); /* Extended Checksum */
+> -    build_append_int_noprefix(tbl, 0, 3); /* Reserved */
+> -
+> -    /* Extended checksum to be filled by Guest linker */
+> -    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> -                                    0, 36, /* ACPI rev 2.0 RSDP size */
+> -                                    32);
+> -}
+> -
+>  static void
+>  build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>  {
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index fb877648ac..528a5fd4ed 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2547,35 +2547,6 @@ build_amd_iommu(GArray *table_data, BIOSLinker *li=
+nker)
+>                   "IVRS", table_data->len - iommu_start, 1, NULL, NULL);
+>  }
+> =20
+> -static void
+> -build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_off=
+set)
+> -{
+> -    /* AcpiRsdpDescriptor describes revision 2 RSDP table and as result =
+we
+> -     * allocate extra 16 bytes for pc/q35 RSDP rev1 as well. Keep extra =
+16 bytes
+> -     * wasted to make sure we won't breake migration for machine types o=
+lder
+> -     * than 2.3 due to size mismatch.
+> -     */
+> -    AcpiRsdpDescriptor *rsdp =3D acpi_data_push(rsdp_table, sizeof *rsdp=
+);
+> -    unsigned rsdt_pa_size =3D sizeof(rsdp->rsdt_physical_address);
+> -    unsigned rsdt_pa_offset =3D
+> -        (char *)&rsdp->rsdt_physical_address - rsdp_table->data;
+> -
+> -    bios_linker_loader_alloc(linker, ACPI_BUILD_RSDP_FILE, rsdp_table, 1=
+6,
+> -                             true /* fseg memory */);
+> -
+> -    memcpy(&rsdp->signature, "RSD PTR ", 8);
+> -    memcpy(rsdp->oem_id, ACPI_BUILD_APPNAME6, 6);
+> -    /* Address to be filled by Guest linker */
+> -    bios_linker_loader_add_pointer(linker,
+> -        ACPI_BUILD_RSDP_FILE, rsdt_pa_offset, rsdt_pa_size,
+> -        ACPI_BUILD_TABLE_FILE, rsdt_tbl_offset);
+> -
+> -    /* Checksum to be filled by Guest linker */
+> -    bios_linker_loader_add_checksum(linker, ACPI_BUILD_RSDP_FILE,
+> -        (char *)rsdp - rsdp_table->data, 20 /* ACPI rev 1.0 RSDP size */,
+> -        (char *)&rsdp->checksum - rsdp_table->data);
+> -}
+> -
+>  typedef
+>  struct AcpiBuildState {
+>      /* Copy of table in RAM (for patching). */
+> @@ -2732,7 +2703,15 @@ void acpi_build(AcpiBuildTables *tables, MachineSt=
+ate *machine)
+>                 slic_oem.id, slic_oem.table_id);
+> =20
+>      /* RSDP is in FSEG memory, so allocate it separately */
+> -    build_rsdp(tables->rsdp, tables->linker, rsdt);
+> +    {
+> +        AcpiRsdpData rsdp_data =3D {
+> +            .revision =3D 0,
+> +            .oem_id =3D ACPI_BUILD_APPNAME6,
+> +            .xsdt_tbl_offset =3D NULL,
+> +            .rsdt_tbl_offset =3D &rsdt,
+> +        };
+> +        build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
+> +    }
+> =20
+>      /* We'll expose it all to Guest so we want to reduce
+>       * chance of size changes.
