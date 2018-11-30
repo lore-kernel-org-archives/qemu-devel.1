@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1gSp5G-0004aA-Nx
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:08:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1gSp5Q-0005AI-7e
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:08:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1gSp5D-0005ep-GL
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:08:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40118)
+	(envelope-from <dgilbert@redhat.com>) id 1gSp5M-0005sx-Oc
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:08:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40162)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1gSp5D-0005b4-7T
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:08:15 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gSp5M-0005pY-Fu
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:08:24 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 08D1330821C3
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 20:08:13 +0000 (UTC)
-From: Bandan Das <bsd@redhat.com>
-References: <20181130111222.25386-1-kraxel@redhat.com>
-	<20181130111222.25386-3-kraxel@redhat.com>
-Date: Fri, 30 Nov 2018 15:08:09 -0500
-In-Reply-To: <20181130111222.25386-3-kraxel@redhat.com> (Gerd Hoffmann's
-	message of "Fri, 30 Nov 2018 12:12:22 +0100")
-Message-ID: <jpg1s7272hi.fsf@linux.bootlegged.copy>
+	by mx1.redhat.com (Postfix) with ESMTPS id 62E833002F9A
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 20:08:22 +0000 (UTC)
+Date: Fri, 30 Nov 2018 20:08:16 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181130200815.GG2603@work-vm>
+References: <20181114133139.27346-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] usb-mtp: outlaw slashes in
- filenames
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20181114133139.27346-1-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] vmstate: constify SaveVMHandlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 
-Gerd Hoffmann <kraxel@redhat.com> writes:
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 
-> Slash is unix directory separator, so they are not allowed in filenames.
-> Note this also stops the classic escape via "../".
->
-> Fixes: CVE-2018-16867
-> Reported-by: Michael Hanselmann (hansmi.ch)
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  hw/usb/dev-mtp.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-> index fbe1ace035..87eeac1084 100644
-> --- a/hw/usb/dev-mtp.c
-> +++ b/hw/usb/dev-mtp.c
-> @@ -1718,6 +1718,12 @@ static void usb_mtp_write_metadata(MTPState *s)
->  
->      filename = utf16_to_str(dataset->length, dataset->filename);
->  
-> +    if (strchr(filename, '/')) {
-> +        usb_mtp_queue_result(s, RES_INVALID_PARAMETER, d->trans,
-> +                             0, 0, 0, 0);
-> +        return;
-> +    }
-> +
->      o = usb_mtp_object_lookup_name(p, filename, dataset->length);
->      if (o != NULL) {
->          next_handle = o->handle;
-
-Should we return PARAMETER_NOT_SUPPORTED instead of INVALID_PARAMETER ?
-That's a valid response code for SendObjectInfo acc to the spec.
-
-Bandan
+>  include/migration/register.h | 2 +-
+>  migration/savevm.c           | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/include/migration/register.h b/include/migration/register.=
+h
+> index d287f4c317..3d0b9833c6 100644
+> --- a/include/migration/register.h
+> +++ b/include/migration/register.h
+> @@ -72,7 +72,7 @@ int register_savevm_live(DeviceState *dev,
+>                           const char *idstr,
+>                           int instance_id,
+>                           int version_id,
+> -                         SaveVMHandlers *ops,
+> +                         const SaveVMHandlers *ops,
+>                           void *opaque);
+> =20
+>  void unregister_savevm(DeviceState *dev, const char *idstr, void *opaq=
+ue);
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 236b242642..00a054721a 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -303,7 +303,7 @@ typedef struct SaveStateEntry {
+>      int section_id;
+>      /* section id read from the stream */
+>      int load_section_id;
+> -    SaveVMHandlers *ops;
+> +    const SaveVMHandlers *ops;
+>      const VMStateDescription *vmsd;
+>      void *opaque;
+>      CompatEntry *compat;
+> @@ -614,7 +614,7 @@ int register_savevm_live(DeviceState *dev,
+>                           const char *idstr,
+>                           int instance_id,
+>                           int version_id,
+> -                         SaveVMHandlers *ops,
+> +                         const SaveVMHandlers *ops,
+>                           void *opaque)
+>  {
+>      SaveStateEntry *se;
+> --=20
+> 2.19.1.708.g4ede3d42df
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
