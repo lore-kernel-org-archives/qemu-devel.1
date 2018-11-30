@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gSebR-0002Su-8q
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:56:50 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gSedV-0005ci-7W
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:59:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1gSebO-000135-2x
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:56:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1gSebN-00012n-Sj
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:56:46 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A4ED689AE9
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 08:56:44 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <63ab2448-5e57-6d0a-8218-664e9da86b55@redhat.com> (Thomas Huth's
-	message of "Thu, 29 Nov 2018 07:32:41 +0100")
-References: <20181126200009.862-1-quintela@redhat.com>
-	<20181126200009.862-2-quintela@redhat.com>
-	<a48b8028-6127-dabd-e9e5-8e90fa0d7360@redhat.com>
-	<63ab2448-5e57-6d0a-8218-664e9da86b55@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Fri, 30 Nov 2018 09:56:26 +0100
-Message-ID: <875zwf0wqt.fsf@trasno.org>
+	(envelope-from <no-reply@patchew.org>) id 1gSedR-0001wV-RJ
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:58:57 -0500
+Resent-Message-Id: <E1gSedR-0001wV-RJ@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21842)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gSedR-0001vV-E1
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 03:58:53 -0500
+In-Reply-To: <20181129090120.28828-1-pbonzini@redhat.com>
+Message-ID: <154355474395.27426.15595332645977644525@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 01/16] virtio: split vhost vsock bits
- from virtio-pci
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 29 Nov 2018 21:12:24 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH for-4.0 0/4] Small checkpatch fixes and
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,46 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, "Michael S . Tsirkin" <mst@redhat.com>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Thomas Huth <thuth@redhat.com> wrote:
-> On 2018-11-29 07:30, Thomas Huth wrote:
->> On 2018-11-26 20:59, Juan Quintela wrote:
->>> Signed-off-by: Juan Quintela <quintela@redhat.com>
->>>
->>> ---
->>>
->>> Updated copyright info
->>> Also split virtio-pci.h bits
->>> ---
->>>  hw/virtio/Makefile.objs     |  2 +-
->>>  hw/virtio/vhost-vsock-pci.c | 82 +++++++++++++++++++++++++++++++++++++
->>>  hw/virtio/virtio-pci.c      | 51 -----------------------
->>>  hw/virtio/virtio-pci.h      | 18 --------
->>>  4 files changed, 83 insertions(+), 70 deletions(-)
->>>  create mode 100644 hw/virtio/vhost-vsock-pci.c
->>>
->>> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
->>> index 1b2799cfd8..4fbf7de84b 100644
->>> --- a/hw/virtio/Makefile.objs
->>> +++ b/hw/virtio/Makefile.objs
->>> @@ -10,7 +10,7 @@ obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
->>>  obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) +=
->>> virtio-crypto-pci.o
->>>  
->>>  obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
->>> -obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
->>> +obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o vhost-vsock-pci.o
->> 
->> Please change this into:
->> 
->> obj-$(call land,$(CONFIG_VHOST_VSOCK),$(CONFIG_VIRTIO_PCI)) += vhost-vsock-pci.o
->
-> ... or alternatively, wrap the new lines in a "ifeq
-> ($(CONFIG_VIRTIO_PCI),y)" block, that's maybe easier.
-
-Good catch.
-Agreed that the ifeq is the best approach.
-
-Thanks, Juan.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKCgpUeXBlOiBzZXJpZXMK
+U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBmb3ItNC4wIDAvNF0gU21hbGwgY2hlY2twYXRj
+aCBmaXhlcyBhbmQgaW1wcm92ZW1lbnRzCk1lc3NhZ2UtaWQ6IDIwMTgxMTI5MDkwMTIwLjI4ODI4
+LTEtcGJvbnppbmlAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
+YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
+dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
+UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
+ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
+ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4MmNhZjk1IGNoZWNrcGF0Y2g6IGNvbG9yaXplIG91
+dHB1dCB0byB0ZXJtaW5hbApkZjgzOTNhIGNoZWNrcGF0Y2g6IGltcHJvdmUgaGFuZGxpbmcgb2Yg
+bXVsdGlwbGUgcGF0Y2hlcyBvciBmaWxlcwpiOTgwMzlhIGNoZWNrcGF0Y2g6IGNoZWNrIFNpZ25l
+ZC1vZmYtYnkgaW4gLS1tYWlsYmFjayBtb2RlCmYyYzMzYzIgY2hlY2twYXRjaDogZml4IHByZW1h
+dHVyZSBleGl0IHdoZW4gbm8gaW5wdXQgb3IgLS1tYWlsYmFjawoKPT09IE9VVFBVVCBCRUdJTiA9
+PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBjaGVja3BhdGNoOiBmaXggcHJlbWF0dXJlIGV4aXQgd2hl
+biBubyBpbnB1dCBvciAtLW1haWxiYWNrLi4uCkNoZWNraW5nIFBBVENIIDIvNDogY2hlY2twYXRj
+aDogY2hlY2sgU2lnbmVkLW9mZi1ieSBpbiAtLW1haWxiYWNrIG1vZGUuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMy80OiBjaGVja3BhdGNoOiBpbXByb3ZlIGhhbmRsaW5nIG9mIG11bHRpcGxlIHBhdGNoZXMg
+b3IgZmlsZXMuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzMzogRklMRTogc2Ny
+aXB0cy9jaGVja3BhdGNoLnBsOjM0NToKKyAgICAgICBvcGVuKCRIQVNILCAiLXwiLCAiZ2l0Iiwg
+ImxvZyIsICItLXJldmVyc2UiLCAiLS1uby1tZXJnZXMiLCAiLS1mb3JtYXQ9JUggJXMiLCAkQVJH
+VlswXSkgfHwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHNjcmlw
+dHMvY2hlY2twYXRjaC5wbDozNDY6CisgICAgICAgICAgICAgICBkaWUgIiRQOiBnaXQgbG9nIC0t
+cmV2ZXJzZSAtLW5vLW1lcmdlcyAtLWZvcm1hdD0nJUggJXMnICRBUkdWWzBdIGZhaWxlZCAtICQh
+XG4iOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzY1OiBGSUxFOiBzY3JpcHRz
+L2NoZWNrcGF0Y2gucGw6MzczOgorICAgICAgICAgICAgICAgJHZuYW1lID0gc3Vic3RyKCRoYXNo
+LCAwLCAxMikgLiAnICgnIC4gJGdpdF9jb21taXRzeyRoYXNofSAuICcpJzsKCnRvdGFsOiAyIGVy
+cm9ycywgMSB3YXJuaW5ncywgNjIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC80OiBjaGVja3BhdGNoOiBjb2xvcml6
+ZSBvdXRwdXQgdG8gdGVybWluYWwuLi4KRVJST1I6IE1pc3NpbmcgU2lnbmVkLW9mZi1ieTogbGlu
+ZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMTQgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
