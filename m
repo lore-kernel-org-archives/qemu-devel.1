@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSpSl-00033Q-GH
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:32:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSpTh-0004Qm-3J
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:33:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSpSk-0008Ru-Ns
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:32:35 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSpTf-0003Yu-UG
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:33:33 -0500
 References: <20181130151712.2312-1-peter.maydell@linaro.org>
-	<20181130151712.2312-10-peter.maydell@linaro.org>
+	<20181130151712.2312-11-peter.maydell@linaro.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a0252202-f508-a4e4-b77e-11198ab42917@redhat.com>
-Date: Fri, 30 Nov 2018 14:32:17 -0600
+Message-ID: <105d441b-1b28-d3a8-7f9f-bead9b042720@redhat.com>
+Date: Fri, 30 Nov 2018 14:33:18 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181130151712.2312-10-peter.maydell@linaro.org>
+In-Reply-To: <20181130151712.2312-11-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 09/10] hw/core/loader.c: Remove load_image()
+Subject: Re: [Qemu-devel] [PATCH 10/10] include/hw/loader.h: Document
+ load_image_size()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,19 +29,13 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Philip Li <philip.li@intel.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Igor Mammedov <imammedo@redhat.com>, qemu-block@nongnu.org, qemu-ppc@nongnu.org
 
 On 11/30/18 9:17 AM, Peter Maydell wrote:
-> The load_image() function is now no longer used anywhere, so
-> we can remove it completely. (Use load_image_size() or
-> g_file_get_contents() instead.)
+> Add a documentation comment for load_image_size().
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->   include/hw/loader.h |  1 -
->   hw/core/loader.c    | 25 -------------------------
->   2 files changed, 26 deletions(-)
+>   include/hw/loader.h | 16 ++++++++++++++++
+>   1 file changed, 16 insertions(+)
 > 
-
-Good riddance.
-
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
