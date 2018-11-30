@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gSmOx-0005Ej-P9
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:16:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gSmP1-0005El-2S
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:16:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gSmAL-0006Rw-20
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:01:23 -0500
-Received: from indium.canonical.com ([91.189.90.7]:54212)
+	(envelope-from <peter.maydell@linaro.org>) id 1gSm9i-00068g-GX
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:00:43 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46044)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gSmAJ-0006Pz-1D
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:01:20 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gSmAG-0005eG-KA
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 17:01:16 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 966312E80CD
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 17:01:16 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gSm9i-00068N-AI
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 12:00:42 -0500
+Received: by mail-oi1-x242.google.com with SMTP id b141so5268839oii.12
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 09:00:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Nov 2018 16:47:58 -0000
-From: Andreas Gustafsson <gson@gson.org>
-Reply-To: Bug 1774677 <1774677@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152787131775.31828.3557775502793493947.malonedeb@soybean.canonical.com>
-Message-Id: <154359647858.15110.9808827152352245825.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1774677] Re: -icount increases boot time by >10x
+References: <154356772378.66975.13711686652368325931.stgit@bahia.lan>
+	<cf3f805a-4991-04d6-2cbb-6c1cca8bd238@redhat.com>
+	<20181130174548.247d293c@bahia.lan>
+In-Reply-To: <20181130174548.247d293c@bahia.lan>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 30 Nov 2018 17:00:29 +0000
+Message-ID: <CAFEAcA_Z9WqjyikYO9CrvP_sM11NU6F7J0xgEimLzNTN7SKaSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.1?] 9p: remove support for the
+ "handle" backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,67 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
 
-Looks like the bug was fixed by this commit:
+On Fri, 30 Nov 2018 at 16:45, Greg Kurz <groug@kaod.org> wrote:
+>
+> On Fri, 30 Nov 2018 09:52:18 -0600
+> Eric Blake <eblake@redhat.com> wrote:
+>
+> > On 11/30/18 2:49 AM, Greg Kurz wrote:
+> > > The "handle" fsdev backend was deprecated in QEMU 2.12.0 with:
+> > >
+> > > commit db3b3c7281ca82e2647e072a1f97db111313dd73
+> > > Author: Greg Kurz <groug@kaod.org>
+> > > Date:   Mon Jan 8 11:18:23 2018 +0100
+> > >
+> > >      9pfs: deprecate handle backend
+> >
+> > > It has passed the two release cooling period without any complaint.
+> > >
+> > > Remove it now.
+> > >
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > ---
+> > >
+> > > It could have been removed for 3.1.0, but I woke up too late, so moving
+> > > this to 4.0.
+> > >
+> > > ---
+> > >   fsdev/qemu-fsdev.c    |    3
+> > >   hw/9pfs/9p-handle.c   |  710 -------------------------------------------------
+> > >   hw/9pfs/Makefile.objs |    1
+> > >   qemu-deprecated.texi  |    8 -
+> > >   qemu-options.hx       |    8 -
+> > >   5 files changed, 4 insertions(+), 726 deletions(-)
+> > >   delete mode 100644 hw/9pfs/9p-handle.c
+> >
+> > Well, it certainly doesn't drive -rc4 on its own, but as we may have an
+> > -rc4 for other reasons, maybe it could still be argued that this is 3.1
+> > material on the grounds of removing questionable code for less attack
+> > exposure?
+> >
+>
+> Makes sense, as this is precisely the reason that led me to
+> deprecate this in the first place.
 
-commit 013aabdc665e4256b38d8875a1a7b5e030ba98f1
-Author: Clement Deschamps <clement.deschamps@greensocs.com>
-Date:   Sun Oct 21 16:21:03 2018 +0200
+I would prefer not to have a 700-line patch in rc4, even
+a negative-diffstat one. If it's not a definite problem
+then we shouldn't put the change in at this stage in the
+release process.
 
-    icount: fix deadlock when all cpus are sleeping
-
-    When all cpus are sleeping (e.g in WFI), to avoid a deadlock
-    in the main_loop, wake it up in order to start the warp timer.
-
-    Signed-off-by: Clement Deschamps <clement.deschamps@greensocs.com>
-    Message-Id: <20181021142103.19014-1-clement.deschamps@greensocs.com>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Committed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1774677
-
-Title:
-  -icount increases boot time by >10x
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  When I specify the -icount option, some guest operations such as
-  booting a Linux kernel take more than 10 times longer than otherwise.
-  For example, the following will boot Aboriginal Linux to the login
-  prompt about 6 seconds on my system (using TCG, not KVM):
-
-  wget http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-im=
-age-i686.tar.gz
-  gunzip <system-image-i686.tar.gz | tar xfv -
-  cd system-image-i686
-  sh run-emulator.sh
-
-  If I replace the last line with
-
-  QEMU_EXTRA=3D"-icount shift=3Dauto" sh run-emulator.sh
-
-  booting to the login prompt takes about 1 minute 20 seconds.
-
-  I have tried different values for "shift" other than the "auto" used
-  above, but have not been able to find one that gives reasonable
-  performance.  Specifying "sleep=3Doff" also did not help.
-
-  During the slow boots, qemu appears to spend most of its time
-  sleeping, not using the host CPU.
-
-  I see this with multiple versions of qemu, including current git
-  sources (c181ddaa176856b3cd2dfd12bbcf25fa9c884a97), and on multiple
-  host OSes, including Debian 9 on x86_64.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1774677/+subscriptions
+thanks
+-- PMM
