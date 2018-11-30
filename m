@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSl2B-0003ey-2c
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:48:51 -0500
+	(envelope-from <berrange@redhat.com>) id 1gSl3a-00050I-Tg
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:50:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gSl2A-0003wU-1I
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:48:50 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42787)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gSl29-0003vs-QV
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:48:49 -0500
-Received: by mail-ot1-x342.google.com with SMTP id v23so5462802otk.9
-	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 07:48:49 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1gSl3W-0004vh-Oj
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:50:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43242)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gSl3W-0004vK-GM
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 10:50:14 -0500
+Date: Fri, 30 Nov 2018 15:50:03 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181130155003.GG9162@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1543513531-1151-1-git-send-email-pbonzini@redhat.com>
+	<1543513531-1151-3-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <1543407172-16175-1-git-send-email-peng.hao2@zte.com.cn>
-	<1543407172-16175-5-git-send-email-peng.hao2@zte.com.cn>
-In-Reply-To: <1543407172-16175-5-git-send-email-peng.hao2@zte.com.cn>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 30 Nov 2018 15:48:37 +0000
-Message-ID: <CAFEAcA-D==grLysFf9Mm2iwQ1uUm7hf+OUtx5QKje9tGyu9SFw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V10 4/9] hw/arm/virt: Use the pvpanic device
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1543513531-1151-3-git-send-email-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] test: replace gtester with a TAP driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +28,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peng Hao <peng.hao2@zte.com.cn>
-Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, eblake@redhat.com
 
-On Wed, 28 Nov 2018 at 03:50, Peng Hao <peng.hao2@zte.com.cn> wrote:
->
-> Add pvpanic device in arm virt machine.
->
-> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> ---
->  default-configs/arm-softmmu.mak |  1 +
->  hw/arm/virt.c                   | 21 +++++++++++++++++++++
->  include/hw/arm/virt.h           |  1 +
->  3 files changed, 23 insertions(+)
->
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 2420491..50345df 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -159,3 +159,4 @@ CONFIG_PCI_DESIGNWARE=y
->  CONFIG_STRONGARM=y
->  CONFIG_HIGHBANK=y
->  CONFIG_MUSICPAL=y
-> +CONFIG_PVPANIC=y
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index a2b8d8f..f2cb5de 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -143,6 +143,7 @@ static const MemMapEntry a15memmap[] = {
->      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
->      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
->      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
-> +    [VIRT_PVPANIC] =            { 0x09070000, 0x00000002 },
->      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
->      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
->      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-> @@ -190,6 +191,24 @@ static bool cpu_type_valid(const char *cpu)
->      return false;
->  }
->
-> +static void create_pvpanic_device(const VirtMachineState *vms)
-> +{
-> +     char *nodename;
-> +     hwaddr base = vms->memmap[VIRT_PVPANIC].base;
-> +     hwaddr size = vms->memmap[VIRT_PVPANIC].size;
-> +
-> +     sysbus_create_simple(TYPE_PVPANIC_MMIO, base, NULL);
-> +
-> +     nodename = g_strdup_printf("/pvpanic-mmio@%" PRIx64, base);
-> +     qemu_fdt_add_subnode(vms->fdt, nodename);
-> +     qemu_fdt_setprop_string(vms->fdt, nodename,
-> +                             "compatible", "qemu,pvpanic-mmio");
-> +     qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-> +                                  2, base, 2, size);
-> +
-> +     g_free(nodename);
-> +}
+On Thu, Nov 29, 2018 at 06:45:31PM +0100, Paolo Bonzini wrote:
+> gtester is deprecated by upstream glib and it does not support tests
+> that call g_test_skip in some glib stable releases.
+> 
+> glib suggests instead using Automake's TAP support.  We do not support
+> Automake, but we can copy the code that beautifies the TAP output and
+> use it.  I chose to use the Perl copy rather than the shell/awk one,
+> in order to reuse Perl's TAP parsing package, but I'm open to suggestions
+> about which language to use.
 
-Just a note that the binding documentation for this still doesn't
-seem to be in the mainline kernel git repo yet; I won't take
-the patchset until it is.
+Do we even need the beutifier ?
 
-thanks
--- PMM
+IIUC, this output is only seen when you with 'make check' passing V=1,
+so most people won't see it.
+
+When V=1 is set, it just changes:
+
+$ ./tests/test-io-channel-socket -k --tap
+# random seed: R02Sb9d02d2a9658ae1be211540f5ceebc01
+1..9
+# Start of io tests
+# Start of channel tests
+# Start of socket tests
+ok 1 /io/channel/socket/ipv4-sync
+ok 2 /io/channel/socket/ipv4-async
+ok 3 /io/channel/socket/ipv4-fd
+ok 4 /io/channel/socket/ipv6-sync
+ok 5 /io/channel/socket/ipv6-async
+ok 6 /io/channel/socket/unix-sync
+ok 7 /io/channel/socket/unix-async
+**
+ERROR:tests/test-io-channel-socket.c:424:test_io_channel_unix_fd_pass: assertion failed: (0)
+Bail out! ERROR:tests/test-io-channel-socket.c:424:test_io_channel_unix_fd_pass: assertion failed: (0)
+Aborted (core dumped)
+
+
+To look like:
+
+$ ./tests/test-io-channel-socket -k --tap | ./scripts/tap-driver.pl 
+PASS 1 /io/channel/socket/ipv4-sync
+PASS 2 /io/channel/socket/ipv4-async
+PASS 3 /io/channel/socket/ipv4-fd
+PASS 4 /io/channel/socket/ipv6-sync
+PASS 5 /io/channel/socket/ipv6-async
+PASS 6 /io/channel/socket/unix-sync
+PASS 7 /io/channel/socket/unix-async
+ERROR - Bail out! ERROR:tests/test-io-channel-socket.c:424:test_io_channel_unix_fd_pass: assertion failed: (0)
+
+where 'PASS' is coloured in green and 'ERROR' is red. I'm not
+convinced this change justifies having the tap-driver.pl script
+
+Since this commit already proposes a dep on the perl-Test-Harness
+package, the host will have the 'prove' command, which can be used
+for invoking tests.
+
+Prove just needs a wrapper to know how to invoke glib tests:
+
+  $ cat glibharness.sh 
+  #!/bin/sh
+
+  exec "$@" -k --tap
+
+Now you can run :
+
+$ prove -v -e ./glibharness.sh  tests/test-io-channel-socket
+tests/test-io-channel-socket .. 
+# random seed: R02S7b47ca0de1bc27cbbcf22dcc130c2b7f
+1..9
+# Start of io tests
+# Start of channel tests
+# Start of socket tests
+ok 1 /io/channel/socket/ipv4-sync
+ok 2 /io/channel/socket/ipv4-async
+ok 3 /io/channel/socket/ipv4-fd
+ok 4 /io/channel/socket/ipv6-sync
+ok 5 /io/channel/socket/ipv6-async
+ok 6 /io/channel/socket/unix-sync
+ok 7 /io/channel/socket/unix-async
+**
+ERROR:tests/test-io-channel-socket.c:424:test_io_channel_unix_fd_pass: assertion failed: (0)
+Bailout called.  Further testing stopped:  ERROR:tests/test-io-channel-socket.c:424:test_io_channel_unix_fd_pass: assertion failed: (0)
+Bail out! ERROR:tests/test-io-channel-socket.c:424:test_io_channel_unix_fd_pass: assertion failed: (0)
+FAILED--Further testing stopped: ERROR:tests/test-io-channel-socket.c:424:test_io_channel_unix_fd_pass: assertion failed: (0)
+
+
+Where the failure line is now coloured in Red (or sucess is coloured
+in green)
+
+prove can also run tests in batches, giving progress of execution of
+each test as it runs
+
+$ prove  -e ./glibharness.sh  tests/test-io-channel-{buffer,command,file,socket,tls} 
+tests/test-io-channel-buffer ... ok   
+tests/test-io-channel-command .. ok   
+tests/test-io-channel-file ..... ok   
+tests/test-io-channel-socket ... 1/? **
+ERROR:tests/test-io-channel-socket.c:424:test_io_channel_unix_fd_pass: assertion failed: (0)
+Bailout called.  Further testing stopped:  ERROR:tests/test-io-channel-socket.c:424:test_io_channel_unix_fd_pass: assertion failed: (0)
+FAILED--Further testing stopped: ERROR:tests/test-io-channel-socket.c:424:test_io_channel_unix_fd_pass: assertion failed: (0)
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
