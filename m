@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gSiFb-00006F-MB
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:50:36 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1gSiFg-0008HI-BR
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:50:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gSi4y-0004EH-3t
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:39:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gSi4x-0004E0-Rw
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:39:32 -0500
-Date: Fri, 30 Nov 2018 13:39:26 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181130133926.77ba2051@redhat.com>
-In-Reply-To: <20181127092801.21777-26-marcandre.lureau@redhat.com>
-References: <20181127092801.21777-1-marcandre.lureau@redhat.com>
-	<20181127092801.21777-26-marcandre.lureau@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1gSi4c-00048P-8V
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:39:13 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56342
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1gSi4b-00047a-Bp
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 07:39:10 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	wAUCctiu026336
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 07:39:07 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2p3421bepn-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 07:39:07 -0500
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 30 Nov 2018 12:39:05 -0000
+References: <20181130094957.4121-1-david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 30 Nov 2018 13:39:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 25/28] machine: add compat-props
- interface
+In-Reply-To: <20181130094957.4121-1-david@redhat.com>
+Content-Language: en-US
+Message-Id: <946aa813-c854-0c99-8721-e04ed755c6da@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3] s390x/tod: Properly stop
+ the KVM TOD while the guest is not running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,183 +43,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Tue, 27 Nov 2018 13:27:58 +0400
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-> Let's make compatiblity properties an interface, so that objects other
-> than QDev can benefit from having machine compatiblity properties.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+On 30.11.2018 10:49, David Hildenbrand wrote:
+> Just like on other architectures, we should stop the clock while the guest
+> is not running. This is already properly done for TCG. Right now, doing an
+> offline migration (stop, migrate, cont) can easily trigger stalls in the
+> guest.
+> 
+> Even doing a
+>     (hmp) stop
+>     ... wait 2 minutes ...
+>     (hmp) cont
+> will already trigger stalls.
+> 
+> So whenever the guest stops, backup the KVM TOD. When continuing to run
+> the guest, restore the KVM TOD.
+> 
+> One special case is starting a simple VM: Reading the TOD from KVM to
+> stop it right away until the guest is actually started means that the
+> time of any simple VM will already differ to the host time. We can
+> simply leave the TOD running and the guest won't be able to recognize
+> it.
+> 
+> For migration, we actually want to keep the TOD stopped until really
+> starting the guest. To be able to catch most errors, we should however
+> try to set the TOD in addition to simply storing it. So we can still
+> catch basic migration problems.
+> 
+> If anything goes wrong while backing up/restoring the TOD, we have to
+> ignore it (but print a warning). This is then basically a fallback to
+> old behavior (TOD remains running).
+> 
+> I tested this very basically with an initrd:
+>     1. Start a simple VM. Observed that the TOD is kept running. Old
+>        behavior.
+>     2. Ordinary live migration. Observed that the TOD is temporarily
+>        stopped on the destination when setting the new value and
+>        correctly started when finally starting the guest.
+>     3. Offline live migration. (stop, migrate, cont). Observed that the
+>        TOD will be stopped on the source with the "stop" command. On the
+>        destination, the TOD is temporarily stopped when setting the new
+>        value and correctly started when finally starting the guest via
+>        "cont".
+>     4. Simple stop/cont correctly stops/starts the TOD. (multiple stops
+>        or conts in a row have no effect, so works as expected)
+> 
+> In the future, we might want to send the guest a special kind of time sync
+> interrupt under some conditions, so it can synchronize its tod to the
+> host tod. This is interesting for migration scenarios but also when we
+> get time sync interrupts ourselves. This however will most probably have
+> to be handled in KVM (e.g. when the tods differ too much) and is not
+> desired e.g. when debugging the guest. (single stepping should not
+> result in permanent time syncs). I consider something like that an add-on
+> on top of this basic "don't break the guest" handling.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  include/hw/boards.h    |  2 ++
->  hw/core/compat-props.c | 55 ++++++++++++++++++++++++++++++++++++++++++
->  hw/core/qdev.c         | 24 +++---------------
->  MAINTAINERS            |  1 +
->  hw/core/Makefile.objs  |  1 +
->  tests/Makefile.include |  1 +
->  6 files changed, 64 insertions(+), 20 deletions(-)
->  create mode 100644 hw/core/compat-props.c
->=20
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index f743d9d4a4..77d1fc1bef 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -9,6 +9,8 @@
->  #include "qom/object.h"
->  #include "qom/cpu.h"
-> =20
-> +#define TYPE_COMPAT_PROPS "compat-props"
-> +
->  /**
->   * memory_region_allocate_system_memory - Allocate a board's main memory
->   * @mr: the #MemoryRegion to be initialized
-> diff --git a/hw/core/compat-props.c b/hw/core/compat-props.c
-> new file mode 100644
-> index 0000000000..538378e71f
-> --- /dev/null
-> +++ b/hw/core/compat-props.c
-> @@ -0,0 +1,55 @@
-> +/*
-> + * QEMU Machine compat properties
-> + *
-> + * Copyright (C) 2018 Red Hat Inc
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/boards.h"
-> +#include "qapi/error.h"
-> +
-> +typedef struct CompatProps CompatProps;
-> +
-> +typedef struct CompatPropsClass {
-> +    InterfaceClass parent_class;
-> +} CompatPropsClass;
-> +
-> +static const GPtrArray *ac_compat_props;
-> +static const GPtrArray *mc_compat_props;
-> +
-> +void accel_register_compat_props(const GPtrArray *props)
-> +{
-> +    ac_compat_props =3D props;
-> +}
-> +
-> +void machine_register_compat_props(const GPtrArray *props)
-> +{
-> +    mc_compat_props =3D props;
-> +}
-> +
-> +static void compat_props_post_init(Object *obj)
-> +{
-> +    if (ac_compat_props) {
-> +        object_apply_global_props(obj, ac_compat_props, &error_abort);
-> +    }
-> +    if (mc_compat_props) {
-> +        object_apply_global_props(obj, mc_compat_props, &error_abort);
-> +    }
-> +}
-> +
-> +static void compat_props_register_types(void)
-> +{
-> +    static const TypeInfo cp_interface_info =3D {
-> +        .name          =3D TYPE_COMPAT_PROPS,
-> +        .parent        =3D TYPE_INTERFACE,
-> +        .class_size =3D sizeof(CompatPropsClass),
-> +        .instance_post_init =3D compat_props_post_init,
-you went here for implict way to set compat props compared to v3
-could elaborate in what order .instance_post_init() hooks
-will be called in this case for a Device?
-(I mean compat_props_post_init vs device_post_init)
-
-> +    };
-> +
-> +    type_register_static(&cp_interface_info);
-> +}
-> +
-> +type_init(compat_props_register_types)
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 3b31b2c025..b0ee05f837 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -970,28 +970,8 @@ static void device_initfn(Object *obj)
->      QLIST_INIT(&dev->gpios);
->  }
-> =20
-> -static const GPtrArray *ac_compat_props;
-> -static const GPtrArray *mc_compat_props;
-> -
-> -void accel_register_compat_props(const GPtrArray *props)
-> -{
-> -    ac_compat_props =3D props;
-> -}
-> -
-> -void machine_register_compat_props(const GPtrArray *props)
-> -{
-> -    mc_compat_props =3D props;
-> -}
-> -
->  static void device_post_init(Object *obj)
+> 
+> v2 -> v3:
+> - use device_class_set_parent_realize() to implement a child realize
+>   function
+> 
+>  hw/s390x/tod-kvm.c     | 102 ++++++++++++++++++++++++++++++++++++++++-
+>  include/hw/s390x/tod.h |   8 +++-
+>  2 files changed, 107 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/s390x/tod-kvm.c b/hw/s390x/tod-kvm.c
+> index df564ab89c..2456bf7b24 100644
+> --- a/hw/s390x/tod-kvm.c
+> +++ b/hw/s390x/tod-kvm.c
+> @@ -10,10 +10,11 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+> +#include "sysemu/sysemu.h"
+>  #include "hw/s390x/tod.h"
+>  #include "kvm_s390x.h"
+>  
+> -static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
+> +static void kvm_s390_get_tod_raw(S390TOD *tod, Error **errp)
 >  {
-> -    if (ac_compat_props) {
-> -        object_apply_global_props(obj, ac_compat_props, &error_abort);
-> -    }
-> -    if (mc_compat_props) {
-> -        object_apply_global_props(obj, mc_compat_props, &error_abort);
-> -    }
-> -
->      qdev_prop_set_globals(DEVICE(obj));
+>      int r;
+>  
+> @@ -27,7 +28,17 @@ static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
+>      }
 >  }
-> =20
-> @@ -1124,6 +1104,10 @@ static const TypeInfo device_type_info =3D {
->      .class_init =3D device_class_init,
->      .abstract =3D true,
->      .class_size =3D sizeof(DeviceClass),
-> +    .interfaces =3D (InterfaceInfo[]) {
-> +        { TYPE_COMPAT_PROPS },
-> +        { }
+>  
+> -static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
+> +static void kvm_s390_tod_get(const S390TODState *td, S390TOD *tod, Error **errp)
+> +{
+> +    if (td->stopped) {
+> +        *tod = td->base;
+> +        return;
 > +    }
->  };
-> =20
->  static void qdev_register_types(void)
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 9410bbb7cf..adff09627f 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1145,6 +1145,7 @@ Machine core
->  M: Eduardo Habkost <ehabkost@redhat.com>
->  M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->  S: Supported
-> +F: hw/core/compat-props.c
->  F: hw/core/machine.c
->  F: hw/core/null-machine.c
->  F: include/hw/boards.h
-> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> index a799c83815..f15b3c970a 100644
-> --- a/hw/core/Makefile.objs
-> +++ b/hw/core/Makefile.objs
-> @@ -1,5 +1,6 @@
->  # core qdev-related obj files, also used by *-user:
->  common-obj-y +=3D qdev.o qdev-properties.o
-> +common-obj-y +=3D compat-props.o
->  common-obj-y +=3D bus.o reset.o
->  common-obj-$(CONFIG_SOFTMMU) +=3D qdev-fw.o
->  common-obj-$(CONFIG_SOFTMMU) +=3D fw-path-provider.o
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index fb0b449c02..fc74358c0a 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -567,6 +567,7 @@ tests/test-qdev-global-props$(EXESUF): tests/test-qde=
-v-global-props.o \
->  	hw/core/irq.o \
->  	hw/core/fw-path-provider.o \
->  	hw/core/reset.o \
-> +	hw/core/compat-props.o \
->  	$(test-qapi-obj-y)
->  tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
->  	migration/vmstate.o migration/vmstate-types.o migration/qemu-file.o \
+> +
+> +    kvm_s390_get_tod_raw(tod, errp);
+> +}
+> +
+> +static void kvm_s390_set_tod_raw(const S390TOD *tod, Error **errp)
+>  {
+>      int r;
+>  
+> @@ -41,18 +52,105 @@ static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
+>      }
+>  }
+>  
+> +static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
+> +{
+> +    Error *local_err = NULL;
+> +
+> +    /*
+> +     * Somebody (e.g. migration) set the TOD. We'll store it into KVM to
+> +     * properly detect errors now but take a look at the runstate to decide
+> +     * whether really to keep the tod running. E.g. during migration, this
+> +     * is the point where we want to stop the initially running TOD to fire
+> +     * it back up when actually starting the migrated guest.
+> +     */
+> +    kvm_s390_set_tod_raw(tod, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    if (runstate_is_running()) {
+> +        td->stopped = false;
+> +    } else {
+> +        td->stopped = true;
+> +        td->base = *tod;
+> +    }
+> +}
+> +
+> +static void kvm_s390_tod_vm_state_change(void *opaque, int running,
+> +                                         RunState state)
+> +{
+> +    S390TODState *td = opaque;
+> +    Error *local_err = NULL;
+> +
+> +    if (running && td->stopped) {
+> +        /* Set the old TOD when running the VM - start the TOD clock. */
+> +        kvm_s390_set_tod_raw(&td->base, &local_err);
+> +        if (local_err) {
+> +            warn_report_err(local_err);
+> +        }
+> +        /* Treat errors like the TOD was running all the time. */
+> +        td->stopped = false;
+> +    } else if (!running && !td->stopped) {
+> +        /* Store the TOD when stopping the VM - stop the TOD clock. */
+> +        kvm_s390_get_tod_raw(&td->base, &local_err);
+> +        if (local_err) {
+> +            /* Keep the TOD running in case we could not back it up. */
+> +            warn_report_err(local_err);
+> +        } else {
+> +            td->stopped = true;
+> +        }
+> +    }
+> +}
+> +
+> +static void kvm_s390_tod_realize(DeviceState *dev, Error **errp)
+> +{
+> +    S390TODState *td = S390_TOD(dev);
+> +    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
+> +    Error *local_err = NULL;
+> +
+> +    tdc->parent_realize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * We need to know when the VM gets started/stopped to start/stop the TOD.
+> +     * As we can never have more than one TOD instance (and that will never be
+> +     * removed), registering here and never unregistering is good enough.
+> +     */
+> +    qemu_add_vm_change_state_handler(kvm_s390_tod_vm_state_change, td);
+> +}
+> +
+>  static void kvm_s390_tod_class_init(ObjectClass *oc, void *data)
+>  {
+>      S390TODClass *tdc = S390_TOD_CLASS(oc);
+>  
+> +    device_class_set_parent_realize(DEVICE_CLASS(oc), kvm_s390_tod_realize,
+> +                                    &tdc->parent_realize);
+>      tdc->get = kvm_s390_tod_get;
+>      tdc->set = kvm_s390_tod_set;
+>  }
+>  
+> +static void kvm_s390_tod_init(Object *obj)
+> +{
+> +    S390TODState *td = S390_TOD(obj);
+> +
+> +    /*
+> +     * The TOD is initially running (value stored in KVM). Avoid needless
+> +     * loading/storing of the TOD when starting a simple VM, so let it
+> +     * run although the (never started) VM is stopped. For migration, we
+> +     * will properly set the TOD later.
+> +     */
+> +    td->stopped = false;
+
+
+Do we have to migrate the td->stopped during migration?
