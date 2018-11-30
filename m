@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSYbp-0007r6-KY
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 21:32:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSYbt-0007s4-7c
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 21:32:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSYbo-0005o5-CD
-	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 21:32:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSYbp-0005oU-6C
+	for qemu-devel@nongnu.org; Thu, 29 Nov 2018 21:32:53 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 29 Nov 2018 20:32:31 -0600
-Message-Id: <20181130023232.3079982-3-eblake@redhat.com>
+Date: Thu, 29 Nov 2018 20:32:32 -0600
+Message-Id: <20181130023232.3079982-4-eblake@redhat.com>
 In-Reply-To: <20181130023232.3079982-1-eblake@redhat.com>
 References: <20181130023232.3079982-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] nbd/client: Make x-dirty-bitmap more
- reliable
+Subject: [Qemu-devel] [PATCH 3/3] nbd/client: Send NBD_CMD_DISC if open
+ fails after connect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +23,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-The implementation of x-dirty-bitmap in qemu 3.0 silently
-falls back to treating the server as not supporting
-NBD_CMD_BLOCK_STATUS if a requested meta_context name was not
-negotiated, which in turn means treating the _entire_ image as
-data. Since our hack relied on using 'qemu-img map' to view
-which portions of the image were dirty by seeing what the
-redirected bdrv_block_status() treats as holes, this means
-that our fallback treats the entire image as clean.  Better
-would have been to treat the entire image as dirty, or to fail
-to connect because the user's request for a specific context
-could not be honored. This patch goes with the latter.
+If nbd_client_init() fails after we are already connected,
+then the server will spam logs with:
+
+Disconnect client, due to: Unexpected end-of-file before all bytes were read
+
+unless we gracefully disconnect before closing the connection.
+
+Ways to trigger this:
+
+$ opts=driver=nbd,export=foo,server.type=inet,server.host=localhost,server.port=10809
+$  qemu-img map --output=json --image-opts $opts,read-only=off
+$  qemu-img map --output=json --image-opts $opts,x-dirty-bitmap=nosuch:
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/nbd-client.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/nbd-client.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 76e9ca3abeb..e6e27dafa6a 100644
+index e6e27dafa6a..fc5b7eda8ee 100644
 --- a/block/nbd-client.c
 +++ b/block/nbd-client.c
-@@ -992,6 +992,11 @@ int nbd_client_init(BlockDriverState *bs,
-         logout("Failed to negotiate with the NBD server\n");
-         return ret;
+@@ -995,12 +995,13 @@ int nbd_client_init(BlockDriverState *bs,
+     if (x_dirty_bitmap && !client->info.base_allocation) {
+         error_setg(errp, "requested x-dirty-bitmap %s not found",
+                    x_dirty_bitmap);
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto fail;
      }
-+    if (x_dirty_bitmap && !client->info.base_allocation) {
-+        error_setg(errp, "requested x-dirty-bitmap %s not found",
-+                   x_dirty_bitmap);
-+        return -EINVAL;
-+    }
      if (client->info.flags & NBD_FLAG_READ_ONLY) {
          ret = bdrv_apply_auto_read_only(bs, "NBD export is read-only", errp);
          if (ret < 0) {
+-            return ret;
++            goto fail;
+         }
+     }
+     if (client->info.flags & NBD_FLAG_SEND_FUA) {
+@@ -1029,4 +1030,17 @@ int nbd_client_init(BlockDriverState *bs,
+
+     logout("Established connection with NBD server\n");
+     return 0;
++
++ fail:
++    /*
++     * We have connected, but must fail for other reasons. The
++     * connection is still blocking; send NBD_CMD_DISC as a courtesy
++     * to the server.
++     */
++    {
++        NBDRequest request = { .type = NBD_CMD_DISC };
++
++        nbd_send_request(client->ioc ?: QIO_CHANNEL(sioc), &request);
++        return ret;
++    }
+ }
 -- 
 2.17.2
