@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSpQm-0001yW-5z
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:30:32 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSpRz-0002Zh-7Q
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:31:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gSpQl-0008Sz-Dj
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:30:32 -0500
+	(envelope-from <eblake@redhat.com>) id 1gSpRy-0005Oz-8a
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 15:31:47 -0500
 References: <20181130151712.2312-1-peter.maydell@linaro.org>
-	<20181130151712.2312-8-peter.maydell@linaro.org>
+	<20181130151712.2312-9-peter.maydell@linaro.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <af8f6615-9bf8-e2c8-1acb-6ffe28a7c3d8@redhat.com>
-Date: Fri, 30 Nov 2018 14:30:18 -0600
+Message-ID: <808823a3-f808-27bd-9d8e-d8020ec08ac7@redhat.com>
+Date: Fri, 30 Nov 2018 14:31:21 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181130151712.2312-8-peter.maydell@linaro.org>
+In-Reply-To: <20181130151712.2312-9-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 07/10] hw/block/tc58128.c: Don't use
- load_image()
+Subject: Re: [Qemu-devel] [PATCH 08/10] device_tree.c: Don't use load_image()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,8 +34,9 @@ On 11/30/18 9:17 AM, Peter Maydell wrote:
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->   hw/block/tc58128.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+>   device_tree.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
