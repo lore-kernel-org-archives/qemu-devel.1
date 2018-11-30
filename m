@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gSc5X-0007DF-32
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 01:15:43 -0500
+	(envelope-from <clg@kaod.org>) id 1gScVt-0008V0-Vm
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 01:42:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gSc5S-0007TE-65
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 01:15:43 -0500
-Received: from mx2.suse.de ([195.135.220.15]:60870 helo=mx1.suse.de)
+	(envelope-from <clg@kaod.org>) id 1gScVq-0005m9-Mn
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 01:42:57 -0500
+Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:48825)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gSc5R-0007Sc-VZ
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 01:15:38 -0500
-References: <20181129100340.13823-1-fli@suse.com>
-	<4031aa35-a9f0-dd87-ad2a-0cc35546f7af@redhat.com>
-From: Fei Li <fli@suse.com>
-Message-ID: <27e46dfa-f874-8b20-7522-f933d0dda897@suse.com>
-Date: Fri, 30 Nov 2018 14:15:28 +0800
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gScVq-0005KM-DC
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 01:42:54 -0500
+Received: from player731.ha.ovh.net (unknown [10.109.159.69])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 4F1B41E7F88
+	for <qemu-devel@nongnu.org>; Fri, 30 Nov 2018 07:42:52 +0100 (CET)
+References: <20181116105729.23240-1-clg@kaod.org>
+	<20181116105729.23240-7-clg@kaod.org>
+	<20181122051302.GG10448@umbus.fritz.box>
+	<390808b9-250e-e1ae-ea54-fcf47b309833@kaod.org>
+	<20181130010410.GE30479@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d8ba2082-625f-b547-47af-416148c04e9c@kaod.org>
+Date: Fri, 30 Nov 2018 07:41:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <4031aa35-a9f0-dd87-ad2a-0cc35546f7af@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181130010410.GE30479@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.1? RFC v2 0/5] fix some segmentation
- faults and migration issues
+Subject: Re: [Qemu-devel] [PATCH v5 06/36] ppc/xive: add support for the END
+ Event State buffers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +35,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
+On 11/30/18 2:04 AM, David Gibson wrote:
+> On Thu, Nov 29, 2018 at 11:06:13PM +0100, C=E9dric Le Goater wrote:
+>> On 11/22/18 6:13 AM, David Gibson wrote:
+>>> On Fri, Nov 16, 2018 at 11:56:59AM +0100, C=E9dric Le Goater wrote:
+>>>> The Event Notification Descriptor also contains two Event State
+>>>> Buffers providing further coalescing of interrupts, one for the
+>>>> notification event (ESn) and one for the escalation events (ESe). A
+>>>> MMIO page is assigned for each to control the EOI through loads
+>>>> only. Stores are not allowed.
+>>>>
+>>>> The END ESBs are modeled through an object resembling the 'XiveSourc=
+e'
+>>>> It is stateless as the END state bits are backed into the XiveEND
+>>>> structure under the XiveRouter and the MMIO accesses follow the same
+>>>> rules as for the standard source ESBs.
+>>>>
+>>>> END ESBs are not supported by the Linux drivers neither on OPAL nor =
+on
+>>>> sPAPR. Nevetherless, it provides a mean to study the question in the
+>>>> future and validates a bit more the XIVE model.
+>>>>
+>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>> ---
+>>>>  include/hw/ppc/xive.h |  20 ++++++
+>>>>  hw/intc/xive.c        | 160 +++++++++++++++++++++++++++++++++++++++=
+++-
+>>>>  2 files changed, 178 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>>>> index ce62aaf28343..24301bf2076d 100644
+>>>> --- a/include/hw/ppc/xive.h
+>>>> +++ b/include/hw/ppc/xive.h
+>>>> @@ -208,6 +208,26 @@ int xive_router_get_end(XiveRouter *xrtr, uint8=
+_t end_blk, uint32_t end_idx,
+>>>>  int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32_t=
+ end_idx,
+>>>>                          XiveEND *end);
+>>>> =20
+>>>> +/*
+>>>> + * XIVE END ESBs
+>>>> + */
+>>>> +
+>>>> +#define TYPE_XIVE_END_SOURCE "xive-end-source"
+>>>> +#define XIVE_END_SOURCE(obj) \
+>>>> +    OBJECT_CHECK(XiveENDSource, (obj), TYPE_XIVE_END_SOURCE)
+>>>
+>>> Is there a particular reason to make this a full QOM object, rather
+>>> than just embedding it in the XiveRouter?
+>>
+>> Coming back on this question because removing the chip_id from the
+>> router is a problem for the END triggering. At least with the current
+>> design. See below for the comment.
+>>
+>>>> +typedef struct XiveENDSource {
+>>>> +    SysBusDevice parent;
+>>>> +
+>>>> +    uint32_t        nr_ends;
+>>>> +
+>>>> +    /* ESB memory region */
+>>>> +    uint32_t        esb_shift;
+>>>> +    MemoryRegion    esb_mmio;
+>>>> +
+>>>> +    XiveRouter      *xrtr;
+>>>> +} XiveENDSource;
+>>>> +
+>>>>  /*
+>>>>   * For legacy compatibility, the exceptions define up to 256 differ=
+ent
+>>>>   * priorities. P9 implements only 9 levels : 8 active levels [0 - 7=
+]
+>>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>>>> index 9cb001e7b540..5a8882d47a98 100644
+>>>> --- a/hw/intc/xive.c
+>>>> +++ b/hw/intc/xive.c
+>>>> @@ -622,8 +622,18 @@ static void xive_router_end_notify(XiveRouter *=
+xrtr, uint8_t end_blk,
+>>>>       * even futher coalescing in the Router
+>>>>       */
+>>>>      if (!(end.w0 & END_W0_UCOND_NOTIFY)) {
+>>>> -        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implement=
+ed\n");
+>>>> -        return;
+>>>> +        uint8_t pq =3D GETFIELD(END_W1_ESn, end.w1);
+>>>> +        bool notify =3D xive_esb_trigger(&pq);
+>>>> +
+>>>> +        if (pq !=3D GETFIELD(END_W1_ESn, end.w1)) {
+>>>> +            end.w1 =3D SETFIELD(END_W1_ESn, end.w1, pq);
+>>>> +            xive_router_set_end(xrtr, end_blk, end_idx, &end);
+>>>> +        }
+>>>> +
+>>>> +        /* ESn[Q]=3D1 : end of notification */
+>>>> +        if (!notify) {
+>>>> +            return;
+>>>> +        }
+>>>>      }
+>>>> =20
+>>>>      /*
+>>>> @@ -706,6 +716,151 @@ void xive_eas_pic_print_info(XiveEAS *eas, uin=
+t32_t lisn, Monitor *mon)
+>>>>                     (uint32_t) GETFIELD(EAS_END_DATA, eas->w));
+>>>>  }
+>>>> =20
+>>>> +/*
+>>>> + * END ESB MMIO loads
+>>>> + */
+>>>> +static uint64_t xive_end_source_read(void *opaque, hwaddr addr, uns=
+igned size)
+>>>> +{
+>>>> +    XiveENDSource *xsrc =3D XIVE_END_SOURCE(opaque);
+>>>> +    XiveRouter *xrtr =3D xsrc->xrtr;
+>>>> +    uint32_t offset =3D addr & 0xFFF;
+>>>> +    uint8_t end_blk;
+>>>> +    uint32_t end_idx;
+>>>> +    XiveEND end;
+>>>> +    uint32_t end_esmask;
+>>>> +    uint8_t pq;
+>>>> +    uint64_t ret =3D -1;
+>>>> +
+>>>> +    end_blk =3D xrtr->chip_id;
+>>>> +    end_idx =3D addr >> (xsrc->esb_shift + 1);
+>>>> +    if (xive_router_get_end(xrtr, end_blk, end_idx, &end)) {
+>>
+>> The current END accessors require a block identifier, hence xrtr->chip=
+_id,=20
+>> but in this case, we don't really need it because we are using the END=
+T=20
+>> local to the router/chip.=20
+>=20
+>> I don't know how to handle simply this case without keeping chip_id :/
+>=20
+> I don't really follow how chip_id is relevant here.  AFAICT the END
+> accessors take a block id and the back end is responsible for
+> interpreting them.  The ponwernv one will map it to chip id, but the
+> PAPR one can just ignore it or only use block 0.
 
+Yes. But the block value comes from the xrtr->chip_id today, on PAPR and
+PowerNV, even if it's block 0.=20
 
-On 11/29/2018 10:20 PM, Eric Blake wrote:
-> On 11/29/18 4:03 AM, Fei Li wrote:
->> These five patches almost get the Reviewed-by and are extracted from
->> previous "[PATCH RFC v7 0/9] qemu_thread_create: propagate errors to
->> callers to check."=C2=A0 The mentioned patch series have waited on one
->> multifd issue for a while and still needs a further discussion.
->>
->> Thus separate(send) these five almost-done patches and hope they can
->> be merged for the next tag. Thanks for the review. :)
->
-> How likely are any of these crashers to affect an end user?=20
-IMHO, they are not easily triggered.
-> Are any of them regressions over 3.0?
-I do not think so.
-> I'm trying to gauge if any of this is serious enough to warrant a=20
-> -rc4, or if we are okay just documenting them as known corner-case=20
-> bugs and deferring the fix to 4.0 and qemu-stable.
-Emm, actually not so emergency to be included in -rc4.
-And I think it is ok to wait for maintainers to do the pick for the=20
-appropriate release.
-BTW, why 4.0, but not 3.2 or 3.3 (I mean 3.minor version)?
-> The fact that the series is still titled RFC is also an argument in=20
-> favor of deferral.
-Sorry that I forgot to remove the RFC..
+What I could do is add a "chip-id" property to XiveENDSource possibly.
 
-Have a nice day, thanks :)
-Fei
->
->>
->> v2:
->> - Update the commit message for patch 1/5, and get one more
->> =C2=A0=C2=A0 Reviewed-by.
->> - Get one Reviewed-by for patch 3/5.
->>
->>
->> Fei Li (5):
->> =C2=A0=C2=A0 Fix segmentation fault when qemu_signal_init fails
->> =C2=A0=C2=A0 qemu_thread_join: fix segmentation fault
->> =C2=A0=C2=A0 migration: fix the multifd code when receiving less chann=
-els
->> =C2=A0=C2=A0 migration: remove unused &local_err parameter in multifd_=
-save_cleanup
->> =C2=A0=C2=A0 migration: add more error handling for postcopy_ram_enabl=
-e_notify
->
+C.=20
