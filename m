@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gT6ku-0005RI-1S
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 10:00:30 -0500
+	(envelope-from <public@hansmi.ch>) id 1gT5ej-0008Rr-8C
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 08:50:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gT6ks-00015q-7F
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 10:00:27 -0500
-Date: Sat, 1 Dec 2018 15:00:15 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181201150015.GM27120@redhat.com>
-References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181201074244.GF27120@redhat.com>
-	<6e32f97a-6b4c-2627-ed63-25d4c9f35eb3@redhat.com>
+	(envelope-from <public@hansmi.ch>) id 1gT5ee-0003Fv-9y
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 08:50:01 -0500
+Received: from relay9-d.mail.gandi.net ([217.70.183.199]:54847)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <public@hansmi.ch>) id 1gT5ec-0003DQ-DE
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 08:49:56 -0500
+References: <20181130111222.25386-1-kraxel@redhat.com>
+	<20181130111222.25386-3-kraxel@redhat.com>
+	<75c973a5-f571-e69e-e2fd-72d3b3b118b2@redhat.com>
+	<bfce1b7d-6b41-0296-605e-e63ed359d249@redhat.com>
+	<c0da7ecd-4929-e64c-347d-a80b5368a47d@redhat.com>
+From: Michael Hanselmann <public@hansmi.ch>
+Message-ID: <8bbf6ad2-cd8a-fdfe-a96c-5024bd63c562@msgid.hansmi.ch>
+Date: Sat, 1 Dec 2018 14:49:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6e32f97a-6b4c-2627-ed63-25d4c9f35eb3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 00/14] nbd: add qemu-nbd --list
+In-Reply-To: <c0da7ecd-4929-e64c-347d-a80b5368a47d@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="rpjwbiMon5fvMEr3sH9Sy3DGJjuB8kDYp"
+Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] usb-mtp: outlaw slashes in
+ filenames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +32,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, nsoffer@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Michael Hanselmann <hansmi@vshn.ch>
 
-On Sat, Dec 01, 2018 at 07:57:51AM -0600, Eric Blake wrote:
-> On 12/1/18 1:42 AM, Richard W.M. Jones wrote:
-> >On Fri, Nov 30, 2018 at 04:03:29PM -0600, Eric Blake wrote:
-> >>I note that upstream NBD has 'nbd-client -l $host' for querying
-> >>just export names (with no quoting, so you have to know that
-> >>a blank line means the default export), but it wasn't powerful
-> >>enough, so I implemented 'qemu-nbd -L' to document everything.
-> >>Upstream NBD has separate 'nbd-client' and 'nbd-server' binaries,
-> >>while we only have 'qemu-nbd' (which is normally just a server,
-> >>but 'qemu-nbd -c' also operates a second thread as a client).
-> >>Our other uses of qemu as NBD client are for consuming a block
-> >>device (as in qemu-io, qemu-img, or a drive to qemu) - but those
-> >>binaries are less suited to something so specific to the NBD
-> >>protocol.
-> >
-> >I tried it against nbdkit and it works (obviously):
-> >
-> >$ ./qemu-nbd -L
-> >exports available: 1
-> >  export: ''
-> >   size:  67108864
-> >   flags: 0x61 ( trim zeroes )
-> >
-> >What I couldn't work out is how to connect to other hosts.  It's
-> >possible to add -p or -k to change the localhost port number or to use
-> >a Unix domain socket (and I checked both work).  However can we
-> >connect to remote hosts?
-> 
-> Should work by adding '-b host' (if -b is omitted, it defaults to
-> 0.0.0.0).  However, I admit that so far I have only tested '-b
-> localhost' or '-b 127.0.0.1' (per the iotest additions at the end of
-> the series), so it could well be something that I missed in setting
-> up the client socket in nbd_build_socket_address().
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rpjwbiMon5fvMEr3sH9Sy3DGJjuB8kDYp
+From: Michael Hanselmann <public@hansmi.ch>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-devel@nongnu.org, Michael Hanselmann <hansmi@vshn.ch>
+Message-ID: <8bbf6ad2-cd8a-fdfe-a96c-5024bd63c562@msgid.hansmi.ch>
+Subject: Re: [Qemu-devel] [PATCH for-3.1 2/2] usb-mtp: outlaw slashes in
+ filenames
+References: <20181130111222.25386-1-kraxel@redhat.com>
+ <20181130111222.25386-3-kraxel@redhat.com>
+ <75c973a5-f571-e69e-e2fd-72d3b3b118b2@redhat.com>
+ <bfce1b7d-6b41-0296-605e-e63ed359d249@redhat.com>
+ <c0da7ecd-4929-e64c-347d-a80b5368a47d@redhat.com>
+In-Reply-To: <c0da7ecd-4929-e64c-347d-a80b5368a47d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Must have missed that option.  It does work, thanks.
+On 01.12.18 12:55, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 30/11/18 20:58, Eric Blake wrote:
+>> On 11/30/18 1:08 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> On 30/11/18 12:12, Gerd Hoffmann wrote:
+>>>> Slash is unix directory separator, so they are not allowed in filena=
+mes.
+>>>> Note this also stops the classic escape via "../".
+>>>>
+>>>> Fixes: CVE-2018-16867
+>>>> Reported-by: Michael Hanselmann (hansmi.ch)
+>>>
+>>> It's common for scripts to match '<email>', can you write this one as=
 
-Rich.
+>>> Michael Hanselmann <hansmi.ch>?
+>>
+>> That's not an email address, though. Do we have an email for Michael, =
+or
+>> just a username?
+>>
+>=20
+> I did not notice hehe :)
+>=20
+> Per the gpg key: Michael Hanselmann <public@hansmi.ch>
+> Per git commits: Michael Hanselmann <hansmi@vshn.ch>
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+It'd be <public@hansmi.ch> for this one. Thanks for asking!
+
+Best regards,
+Michael
+
+--=20
+https://hansmi.ch/
+
+
+--rpjwbiMon5fvMEr3sH9Sy3DGJjuB8kDYp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEENEVC6w7lpobWh8t0Yy8zJpbbY3YFAlwCkXgACgkQYy8zJpbb
+Y3alVhAAk3+3EC/zJIcA7ygrpDelAmgBD9EHw2HEcbxd7PRu2YbGt8uWRL+wm9dC
+5ss9HDHIpp4+9SCZUwMoSSCcFmmYFW7rRvvN68BY5XB5A5tOV/9nP6/rOP/GPJZg
+Oc1IEnrt60meL+idsiiLyVgtDPcvpzmOtnZ96e0NRwBlUZxHtb0MXDXeNvXhwSKU
+x58y1GM0cQrzLkR43FOZliYxRye5zLrgE6d1bmW/1Ea3Z2LmhkCjTNB/4dz8lXyP
+sWH7/TKLgStFBtrzfQ7teQsFARYNo5nMkcjtuwO4dM078X7+Uz8ivpVm4t8XjhSX
+LvFEJF2qFAKrvVn3aJuDHOXA5Q2puk0v/jenbdz5HvguGkJORlB2ADsurCxvQ93y
+DQffc5Vh10hM+Xn22Ri+5c68tmsOyU56Sx4szDa4+jQmGnWGT8gafv7vo+1peOfl
+8VpaRe6hX1bHJAk+cipXH41Q07YFybqe/HiUFUpXD/0EWlMwPmt9CMK50tfR9Ohh
+2onpvYQR7ff4GYgSw3CuWH9NWujnC+akHkJuhG5gb4VduBdAUTA0m7Bk5gaSDdWx
+O85ibSMezeLZa3m7wmpdo0Z6su7ENNZ2tsBDx988zybfxKmySogMJOsXv+Vfdl6M
+9Xn/BmlstvUR3IBWTVZ1J9GDBjpFt9nJiYxQr87PJrv8lLPUr8o=
+=Kpfu
+-----END PGP SIGNATURE-----
+
+--rpjwbiMon5fvMEr3sH9Sy3DGJjuB8kDYp--
