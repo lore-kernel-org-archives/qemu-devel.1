@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gT2yr-0007bU-GX
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 05:58:39 -0500
+	(envelope-from <rjones@redhat.com>) id 1gT34d-00011l-7X
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 06:04:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gT2yp-0005EB-PX
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 05:58:37 -0500
-Date: Sat, 1 Dec 2018 10:58:24 +0000
+	(envelope-from <rjones@redhat.com>) id 1gT34b-0008NO-Um
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 06:04:35 -0500
+Date: Sat, 1 Dec 2018 11:04:22 +0000
 From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181201105824.GK27120@redhat.com>
+Message-ID: <20181201110422.GL27120@redhat.com>
 References: <20181130220344.3350618-1-eblake@redhat.com>
-	<20181130220344.3350618-14-eblake@redhat.com>
+	<20181130220344.3350618-15-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181130220344.3350618-14-eblake@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 13/14] qemu-nbd: Add --list option
+In-Reply-To: <20181130220344.3350618-15-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 14/14] iotests: Enhance 223,
+ 233 to cover 'qemu-nbd --list'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,397 +25,189 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, nsoffer@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, nsoffer@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Fri, Nov 30, 2018 at 04:03:42PM -0600, Eric Blake wrote:
-> We want to be able to detect whether a given qemu NBD server is
-> exposing the right export(s) and dirty bitmaps, at least for
-> regression testing.  We could use 'nbd-client -l' from the upstream
-> NBD project to list exports, but it's annoying to rely on
-> out-of-tree binaries; furthermore, nbd-client doesn't necessarily
-> know about all of the qemu NBD extensions.  Thus, we plan on adding
-> a new mode to qemu-nbd that merely sniffs all possible information
-> from the server during handshake phase, then disconnects and dumps
-> the information.
->=20
-> This patch actually implements --list/-L, while reusing other
-> options such as --tls-creds for now designating how to connect
-> as the client (rather than their non-list usage of how to operate
-> as the server).
->=20
-> I debated about adding this functionality to something akin to
-> 'qemu-img info' - but that tool does not readily lend itself
-> to connecting to an arbitrary NBD server without also tying to
-> a specific export (I may, however, still add ImageInfoSpecificNBD
-> for reporting the bitmaps available when connecting to a single
-> export).  And, while it may feel a bit odd that normally
-> qemu-nbd is a server but 'qemu-nbd -L' is a client, we are not
-> really making the qemu-nbd binary that much larger, because
-> 'qemu-nbd -c' has to operate as both server and client
-> simultaneously across two threads when feeding the kernel module
-> for /dev/nbdN access.
->=20
-> Sample output:
-> $ qemu-nbd -L
-> exports available: 1
->  export: ''
->   size:  65536
->   flags: 0x4ed ( flush fua trim zeroes df cache )
->   min block: 512
->   opt block: 4096
->   max block: 33554432
->   available meta contexts: 1
->    base:allocation
->=20
+On Fri, Nov 30, 2018 at 04:03:43PM -0600, Eric Blake wrote:
+> Any good new feature deserves some regression testing :)
+> Coverage includes:
+> - 223: what happens when there are 0 or more than 1 export,
+> proof that we can see multiple contexts including qemu:dirty-bitmap
+> - 233: proof that we can list over TLS, and that mix-and-match of
+> plain/TLS listings sanely
+> 
 > Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  qemu-nbd.c | 153 ++++++++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 141 insertions(+), 12 deletions(-)
->=20
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index c57053a0795..e19a841b869 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -76,6 +76,7 @@ static void usage(const char *name)
->  {
->      (printf) (
->  "Usage: %s [OPTIONS] FILE\n"
-> +"  or:  %s -L [OPTIONS]\n"
->  "QEMU Disk Network Block Device Server\n"
->  "\n"
->  "  -h, --help                display this help and exit\n"
-> @@ -97,6 +98,7 @@ static void usage(const char *name)
->  "  -P, --partition=3DNUM       only expose partition NUM\n"
->  "\n"
->  "General purpose options:\n"
-> +"  -L, --list                list NBD exports visible to client\n"
->  "  --object type,id=3DID,...   define an object such as 'secret' for p=
-roviding\n"
->  "                            passwords and/or encryption keys\n"
->  "  --tls-creds=3DID            use id of an earlier --object to provid=
-e TLS\n"
-> @@ -130,7 +132,7 @@ static void usage(const char *name)
->  "      --image-opts          treat FILE as a full set of image options=
-\n"
->  "\n"
->  QEMU_HELP_BOTTOM "\n"
-> -    , name, NBD_DEFAULT_PORT, "DEVICE");
-> +    , name, name, NBD_DEFAULT_PORT, "DEVICE");
->  }
->=20
->  static void version(const char *name)
-> @@ -242,6 +244,92 @@ static void termsig_handler(int signum)
->  }
->=20
->=20
-> +static int qemu_nbd_client_list(SocketAddress *saddr, QCryptoTLSCreds =
-*tls,
-> +                                const char *hostname)
-> +{
-> +    int ret =3D EXIT_FAILURE;
-> +    int rc;
-> +    Error *err =3D NULL;
-> +    QIOChannelSocket *sioc;
-> +    NBDExportInfo *list;
-> +    int i, j;
-> +
-> +    sioc =3D qio_channel_socket_new();
-> +    if (qio_channel_socket_connect_sync(sioc, saddr, &err) < 0) {
-> +        error_report_err(err);
-> +        goto out;
-> +    }
-> +    rc =3D nbd_receive_export_list(QIO_CHANNEL(sioc), tls, hostname, &=
-list,
-> +                                 &err);
-> +    if (rc < 0) {
-> +        if (err) {
-> +            error_report_err(err);
-> +        }
-> +        goto out_socket;
-> +    }
-> +    printf("exports available: %d\n", rc);
-> +    for (i =3D 0; i < rc; i++) {
-> +        printf(" export: '%s'\n", list[i].name);
-> +        if (list[i].description && *list[i].description) {
-> +            printf("  description: %s\n", list[i].description);
-> +        }
-> +        if (list[i].flags & NBD_FLAG_HAS_FLAGS) {
-> +            printf("  size:  %" PRIu64 "\n", list[i].size);
-> +            printf("  flags: 0x%x (", list[i].flags);
-> +            if (list[i].flags & NBD_FLAG_READ_ONLY) {
-> +                printf(" readonly");
-> +            }
+>  tests/qemu-iotests/223     |  2 ++
+>  tests/qemu-iotests/223.out | 20 ++++++++++++++++++++
+>  tests/qemu-iotests/233     | 10 ++++++++++
+>  tests/qemu-iotests/233.out | 15 +++++++++++++++
+>  4 files changed, 47 insertions(+)
+> 
+> diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
+> index 397b865d347..e64747a9a61 100755
+> --- a/tests/qemu-iotests/223
+> +++ b/tests/qemu-iotests/223
+> @@ -119,6 +119,7 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-block-dirty-bitmap-disable",
+>  _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-start",
+>    "arguments":{"addr":{"type":"unix",
+>      "data":{"path":"'"$TEST_DIR/nbd"'"}}}}' "return"
+> +$QEMU_NBD_PROG -L -k "$TEST_DIR/nbd"
+>  _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
+>    "arguments":{"device":"n"}}' "return"
+>  _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
+> @@ -127,6 +128,7 @@ _send_qemu_cmd $QEMU_HANDLE '{"execute":"nbd-server-add",
+>    "arguments":{"device":"n", "name":"n2"}}' "return"
+>  _send_qemu_cmd $QEMU_HANDLE '{"execute":"x-nbd-server-add-bitmap",
+>    "arguments":{"name":"n2", "bitmap":"b2"}}' "return"
+> +$QEMU_NBD_PROG -L -k "$TEST_DIR/nbd"
+> 
+>  echo
+>  echo "=== Contrast normal status to large granularity dirty-bitmap ==="
+> diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
+> index de417477de0..3342bff3447 100644
+> --- a/tests/qemu-iotests/223.out
+> +++ b/tests/qemu-iotests/223.out
+> @@ -29,10 +29,30 @@ wrote 2097152/2097152 bytes at offset 2097152
+>  {"return": {}}
+>  {"return": {}}
+>  {"return": {}}
+> +exports available: 0
+>  {"return": {}}
+>  {"return": {}}
+>  {"return": {}}
+>  {"return": {}}
+> +exports available: 2
+> + export: 'n'
+> +  size:  4194304
+> +  flags: 0x4ef ( readonly flush fua trim zeroes df cache )
+> +  min block: 512
+> +  opt block: 4096
+> +  max block: 33554432
+> +  available meta contexts: 2
+> +   base:allocation
+> +   qemu:dirty-bitmap:b
+> + export: 'n2'
+> +  size:  4194304
+> +  flags: 0x4ef ( readonly flush fua trim zeroes df cache )
+> +  min block: 512
+> +  opt block: 4096
+> +  max block: 33554432
+> +  available meta contexts: 2
+> +   base:allocation
+> +   qemu:dirty-bitmap:b2
+> 
+>  === Contrast normal status to large granularity dirty-bitmap ===
+> 
+> diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
+> index 1814efe3333..5d694d9d242 100755
+> --- a/tests/qemu-iotests/233
+> +++ b/tests/qemu-iotests/233
+> @@ -72,6 +72,9 @@ $QEMU_IMG info --image-opts \
+>      --object tls-creds-x509,dir=${tls_dir}/client1,endpoint=client,id=tls0 \
+>      driver=nbd,host=$nbd_tcp_addr,port=$nbd_tcp_port,tls-creds=tls0 \
+>      2>&1 | sed "s/$nbd_tcp_port/PORT/g"
+> +$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port \
+> +    --object tls-creds-x509,dir=${tls_dir}/client1,endpoint=client,id=tls0 \
+> +    --tls-creds=tls0
+> 
+>  nbd_server_stop
+> 
+> @@ -84,6 +87,7 @@ nbd_server_start_tcp_socket \
+>      -f $IMGFMT "$TEST_IMG"
+> 
+>  $QEMU_IMG info nbd://localhost:$nbd_tcp_port 2>&1 | sed "s/$nbd_tcp_port/PORT/g"
+> +$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port
+> 
+>  echo
+>  echo "== check TLS works =="
+> @@ -91,6 +95,9 @@ $QEMU_IMG info --image-opts \
+>      --object tls-creds-x509,dir=${tls_dir}/client1,endpoint=client,id=tls0 \
+>      driver=nbd,host=$nbd_tcp_addr,port=$nbd_tcp_port,tls-creds=tls0 \
+>      2>&1 | sed "s/$nbd_tcp_port/PORT/g"
+> +$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port \
+> +    --object tls-creds-x509,dir=${tls_dir}/client1,endpoint=client,id=tls0 \
+> +    --tls-creds=tls0
+> 
+>  echo
+>  echo "== check TLS with different CA fails =="
+> @@ -98,6 +105,9 @@ $QEMU_IMG info --image-opts \
+>      --object tls-creds-x509,dir=${tls_dir}/client2,endpoint=client,id=tls0 \
+>      driver=nbd,host=$nbd_tcp_addr,port=$nbd_tcp_port,tls-creds=tls0 \
+>      2>&1 | sed "s/$nbd_tcp_port/PORT/g"
+> +$QEMU_NBD_PROG -L -b $nbd_tcp_addr -p $nbd_tcp_port \
+> +    --object tls-creds-x509,dir=${tls_dir}/client2,endpoint=client,id=tls0 \
+> +    --tls-creds=tls0
+> 
+>  echo
+>  echo "== perform I/O over TLS =="
+> diff --git a/tests/qemu-iotests/233.out b/tests/qemu-iotests/233.out
+> index 5f416721b03..ab669488669 100644
+> --- a/tests/qemu-iotests/233.out
+> +++ b/tests/qemu-iotests/233.out
+> @@ -15,20 +15,35 @@ wrote 1048576/1048576 bytes at offset 1048576
+>  == check TLS client to plain server fails ==
+>  qemu-img: Could not open 'driver=nbd,host=127.0.0.1,port=PORT,tls-creds=tls0': Denied by server for option 5 (starttls)
+>  server reported: TLS not configured
+> +qemu-nbd: Denied by server for option 5 (starttls)
+> +server reported: TLS not configured
+> 
+>  == check plain client to TLS server fails ==
+>  qemu-img: Could not open 'nbd://localhost:PORT': TLS negotiation required before option 8 (structured reply)
+>  server reported: Option 0x8 not permitted before TLS
+> +qemu-nbd: TLS negotiation required before option 8 (structured reply)
+> +server reported: Option 0x8 not permitted before TLS
+> 
+>  == check TLS works ==
+>  image: nbd://127.0.0.1:PORT
+>  file format: nbd
+>  virtual size: 64M (67108864 bytes)
+>  disk size: unavailable
+> +exports available: 1
+> + export: ''
+> +  size:  67108864
+> +  flags: 0x4ed ( flush fua trim zeroes df cache )
+> +  min block: 512
+> +  opt block: 4096
+> +  max block: 33554432
+> +  available meta contexts: 1
+> +   base:allocation
+> 
+>  == check TLS with different CA fails ==
+>  qemu-nbd: option negotiation failed: Verify failed: No certificate was found.
+>  qemu-img: Could not open 'driver=nbd,host=127.0.0.1,port=PORT,tls-creds=tls0': The certificate hasn't got a known issuer
+> +qemu-nbd: option negotiation failed: Verify failed: No certificate was found.
+> +qemu-nbd: The certificate hasn't got a known issuer
+> 
+>  == perform I/O over TLS ==
+>  read 1048576/1048576 bytes at offset 1048576
+> -- 
+> 2.17.2
 
-This adds an extra space in the output unconditionally, if that's
-a problem, ie. the output looks like:
+Tests look good, and I ran them too:
 
-  flags: 0x61 ( trim zeroes )
+QEMU          -- "/home/rjones/d/qemu/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64" -nodefaults -machine accel=qtest
+QEMU_IMG      -- "/home/rjones/d/qemu/tests/qemu-iotests/../../qemu-img" 
+QEMU_IO       -- "/home/rjones/d/qemu/tests/qemu-iotests/../../qemu-io"  --cache writeback -f qcow2
+QEMU_NBD      -- "/home/rjones/d/qemu/tests/qemu-iotests/../../qemu-nbd" 
+IMGFMT        -- qcow2 (compat=1.1)
+IMGPROTO      -- file
+PLATFORM      -- Linux/x86_64 moo 4.18.18-300.fc29.x86_64
+TEST_DIR      -- /home/rjones/d/qemu/tests/qemu-iotests/scratch
+SOCKET_SCM_HELPER -- /home/rjones/d/qemu/tests/qemu-iotests/socket_scm_helper
 
-instead of:
+223        
+233        
+Passed all 2 tests
 
-  flags: 0x61 (trim zeroes)
+So:
 
-if that's a problem.
-
-I might have used a loop with a static array of flag names, like:
-
-  const char *nbd_flag_name[] =3D {
-    ...
-    .5 =3D "trim",
-    .6 =3D "zeroes",
-  };
-
-although it's a bit awkward given the current definitions in
-include/block/nbd.h.
-
-Anyway not a big issue.
-
-> +            if (list[i].flags & NBD_FLAG_SEND_FLUSH) {
-> +                printf(" flush");
-> +            }
-> +            if (list[i].flags & NBD_FLAG_SEND_FUA) {
-> +                printf(" fua");
-> +            }
-> +            if (list[i].flags & NBD_FLAG_ROTATIONAL) {
-> +                printf(" rotational");
-> +            }
-> +            if (list[i].flags & NBD_FLAG_SEND_TRIM) {
-> +                printf(" trim");
-> +            }
-> +            if (list[i].flags & NBD_FLAG_SEND_WRITE_ZEROES) {
-> +                printf(" zeroes");
-> +            }
-> +            if (list[i].flags & NBD_FLAG_SEND_DF) {
-> +                printf(" df");
-> +            }
-> +            if (list[i].flags & NBD_FLAG_CAN_MULTI_CONN) {
-> +                printf(" multi");
-> +            }
-> +            if (list[i].flags & NBD_FLAG_SEND_RESIZE) {
-> +                printf(" resize");
-> +            }
-> +            if (list[i].flags & NBD_FLAG_SEND_CACHE) {
-> +                printf(" cache");
-> +            }
-> +            printf(" )\n");
-> +        }
-> +        if (list[i].min_block) {
-> +            printf("  min block: %u\n", list[i].min_block);
-> +            printf("  opt block: %u\n", list[i].opt_block);
-> +            printf("  max block: %u\n", list[i].max_block);
-> +        }
-> +        if (list[i].n_contexts) {
-> +            printf("  available meta contexts: %d\n", list[i].n_contex=
-ts);
-> +            for (j =3D 0; j < list[i].n_contexts; j++) {
-> +                printf("   %s\n", list[i].contexts[j]);
-> +            }
-> +        }
-> +    }
-> +    nbd_free_export_list(list, rc);
-> +
-> +    ret =3D EXIT_SUCCESS;
-> + out_socket:
-> +    object_unref(OBJECT(sioc));
-> + out:
-> +    return ret;
-> +}
-> +
-> +
->  #if HAVE_NBD_DEVICE
->  static void *show_parts(void *arg)
->  {
-> @@ -424,7 +512,8 @@ static QemuOptsList qemu_object_opts =3D {
->=20
->=20
->=20
-> -static QCryptoTLSCreds *nbd_get_tls_creds(const char *id, Error **errp=
-)
-> +static QCryptoTLSCreds *nbd_get_tls_creds(const char *id, bool list,
-> +                                          Error **errp)
->  {
->      Object *obj;
->      QCryptoTLSCreds *creds;
-> @@ -444,10 +533,18 @@ static QCryptoTLSCreds *nbd_get_tls_creds(const c=
-har *id, Error **errp)
->          return NULL;
->      }
->=20
-> -    if (creds->endpoint !=3D QCRYPTO_TLS_CREDS_ENDPOINT_SERVER) {
-> -        error_setg(errp,
-> -                   "Expecting TLS credentials with a server endpoint")=
-;
-> -        return NULL;
-> +    if (list) {
-> +        if (creds->endpoint !=3D QCRYPTO_TLS_CREDS_ENDPOINT_CLIENT) {
-> +            error_setg(errp,
-> +                       "Expecting TLS credentials with a client endpoi=
-nt");
-> +            return NULL;
-> +        }
-> +    } else {
-> +        if (creds->endpoint !=3D QCRYPTO_TLS_CREDS_ENDPOINT_SERVER) {
-> +            error_setg(errp,
-> +                       "Expecting TLS credentials with a server endpoi=
-nt");
-> +            return NULL;
-> +        }
->      }
->      object_ref(obj);
->      return creds;
-> @@ -470,7 +567,8 @@ static void setup_address_and_port(const char **add=
-ress, const char **port)
->  static const char *socket_activation_validate_opts(const char *device,
->                                                     const char *sockpat=
-h,
->                                                     const char *address=
-,
-> -                                                   const char *port)
-> +                                                   const char *port,
-> +                                                   bool list)
->  {
->      if (device !=3D NULL) {
->          return "NBD device can't be set when using socket activation";
-> @@ -488,6 +586,10 @@ static const char *socket_activation_validate_opts=
-(const char *device,
->          return "TCP port number can't be set when using socket activat=
-ion";
->      }
->=20
-> +    if (list) {
-> +        return "List mode is incompatible with socket activation";
-> +    }
-> +
->      return NULL;
->  }
->=20
-> @@ -511,7 +613,7 @@ int main(int argc, char **argv)
->      off_t fd_size;
->      QemuOpts *sn_opts =3D NULL;
->      const char *sn_id_or_name =3D NULL;
-> -    const char *sopt =3D "hVb:o:p:rsnP:c:dvk:e:f:tl:x:T:D:";
-> +    const char *sopt =3D "hVb:o:p:rsnP:c:dvk:e:f:tl:x:T:D:L";
->      struct option lopt[] =3D {
->          { "help", no_argument, NULL, 'h' },
->          { "version", no_argument, NULL, 'V' },
-> @@ -523,6 +625,7 @@ int main(int argc, char **argv)
->          { "partition", required_argument, NULL, 'P' },
->          { "connect", required_argument, NULL, 'c' },
->          { "disconnect", no_argument, NULL, 'd' },
-> +        { "list", no_argument, NULL, 'L' },
->          { "snapshot", no_argument, NULL, 's' },
->          { "load-snapshot", required_argument, NULL, 'l' },
->          { "nocache", no_argument, NULL, 'n' },
-> @@ -558,13 +661,14 @@ int main(int argc, char **argv)
->      Error *local_err =3D NULL;
->      BlockdevDetectZeroesOptions detect_zeroes =3D BLOCKDEV_DETECT_ZERO=
-ES_OPTIONS_OFF;
->      QDict *options =3D NULL;
-> -    const char *export_name =3D ""; /* Default export name */
-> +    const char *export_name =3D NULL;
->      const char *export_description =3D NULL;
->      const char *tlscredsid =3D NULL;
->      bool imageOpts =3D false;
->      bool writethrough =3D true;
->      char *trace_file =3D NULL;
->      bool fork_process =3D false;
-> +    bool list =3D false;
->      int old_stderr =3D -1;
->      unsigned socket_activation;
->=20
-> @@ -764,13 +868,32 @@ int main(int argc, char **argv)
->          case QEMU_NBD_OPT_FORK:
->              fork_process =3D true;
->              break;
-> +        case 'L':
-> +            list =3D true;
-> +            break;
->          }
->      }
->=20
-> -    if ((argc - optind) !=3D 1) {
-> +    if (list) {
-> +        if (argc !=3D optind) {
-> +            error_report("List mode is incompatible with a file name")=
-;
-> +            exit(EXIT_FAILURE);
-> +        }
-> +        if (export_name || export_description || dev_offset || partiti=
-on ||
-> +            device || disconnect || fmt || sn_id_or_name) {
-> +            error_report("List mode is incompatible with per-device se=
-ttings");
-> +            exit(EXIT_FAILURE);
-> +        }
-> +        if (fork_process) {
-> +            error_report("List mode is incompatible with forking");
-> +            exit(EXIT_FAILURE);
-> +        }
-> +    } else if ((argc - optind) !=3D 1) {
->          error_report("Invalid number of arguments");
->          error_printf("Try `%s --help' for more information.\n", argv[0=
-]);
->          exit(EXIT_FAILURE);
-> +    } else if (!export_name) {
-> +        export_name =3D "";
->      }
->=20
->      qemu_opts_foreach(&qemu_object_opts,
-> @@ -789,7 +912,8 @@ int main(int argc, char **argv)
->      } else {
->          /* Using socket activation - check user didn't use -p etc. */
->          const char *err_msg =3D socket_activation_validate_opts(device=
-, sockpath,
-> -                                                              bindto, =
-port);
-> +                                                              bindto, =
-port,
-> +                                                              list);
->          if (err_msg !=3D NULL) {
->              error_report("%s", err_msg);
->              exit(EXIT_FAILURE);
-> @@ -812,7 +936,7 @@ int main(int argc, char **argv)
->              error_report("TLS is not supported with a host device");
->              exit(EXIT_FAILURE);
->          }
-> -        tlscreds =3D nbd_get_tls_creds(tlscredsid, &local_err);
-> +        tlscreds =3D nbd_get_tls_creds(tlscredsid, list, &local_err);
->          if (local_err) {
->              error_report("Failed to get TLS creds %s",
->                           error_get_pretty(local_err));
-> @@ -820,6 +944,11 @@ int main(int argc, char **argv)
->          }
->      }
->=20
-> +    if (list) {
-> +        saddr =3D nbd_build_socket_address(sockpath, bindto, port);
-> +        return qemu_nbd_client_list(saddr, tlscreds, bindto);
-> +    }
-> +
->      if (disconnect) {
->  #if HAVE_NBD_DEVICE
->          int nbdfd =3D open(argv[optind], O_RDWR);
-
-The code is a bit awkward since we've now effectively added a new mode
-to qemu-nbd.
-
-I can foresee in future that someone will add some code before the
-=E2=80=98if (list) / if (disconnect)=E2=80=99 statements which will apply=
- only to
-"server mode", and they won't necessarily know that they have to add a
-mode check to that code, resulting in the list option doing something
-weird that might not show up as broken in unit tests.
-
-Still, I don't have any idea how to make it better, for all the
-reasons you outlined in your commit message.  I'll leave it to others
-who know qemu code in greater detail to comment.
+Reviewed-by: Richard W.M. Jones <rjones@redhat.com>
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
 
 Rich.
 
---=20
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
-ones
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
 Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-top is 'top' for virtual machines.  Tiny program with many
-powerful monitoring features, net stats, disk stats, logging, etc.
-http://people.redhat.com/~rjones/virt-top
+libguestfs lets you edit virtual machines.  Supports shell scripting,
+bindings from many languages.  http://libguestfs.org
