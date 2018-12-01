@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gT5fJ-0000EI-G5
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 08:50:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1gT5mY-0004W1-4G
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 08:58:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gT5fE-0003n2-Hp
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 08:50:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34696)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gT5fE-0003mF-CF
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 08:50:32 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gT5fD-0006Me-Dl
-	for <qemu-devel@nongnu.org>; Sat, 01 Dec 2018 13:50:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 48B3D2E80CB
-	for <qemu-devel@nongnu.org>; Sat,  1 Dec 2018 13:50:31 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1gT5mX-0003Oq-AL
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 08:58:06 -0500
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181201074244.GF27120@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6e32f97a-6b4c-2627-ed63-25d4c9f35eb3@redhat.com>
+Date: Sat, 1 Dec 2018 07:57:51 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 01 Dec 2018 13:44:10 -0000
-From: Kan Li <1805913@bugs.launchpad.net>
-Reply-To: Bug 1805913 <1805913@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154353638253.10384.17899256838547579767.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154367185076.9921.17446235867573990030.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805913] Re: readdir() returns NULL
- (errno=EOVERFLOW) for 32-bit user-static qemu on 64-bit host
+In-Reply-To: <20181201074244.GF27120@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 00/14] nbd: add qemu-nbd --list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,73 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, nsoffer@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-More notes: this bug hits glibc-2.28 and later. It works on glibc-2.27.
-Therefore to reproduce it it needs ubuntu 18.10 or later. Seems like it
-works for 18.04.
+On 12/1/18 1:42 AM, Richard W.M. Jones wrote:
+> On Fri, Nov 30, 2018 at 04:03:29PM -0600, Eric Blake wrote:
+>> I note that upstream NBD has 'nbd-client -l $host' for querying
+>> just export names (with no quoting, so you have to know that
+>> a blank line means the default export), but it wasn't powerful
+>> enough, so I implemented 'qemu-nbd -L' to document everything.
+>> Upstream NBD has separate 'nbd-client' and 'nbd-server' binaries,
+>> while we only have 'qemu-nbd' (which is normally just a server,
+>> but 'qemu-nbd -c' also operates a second thread as a client).
+>> Our other uses of qemu as NBD client are for consuming a block
+>> device (as in qemu-io, qemu-img, or a drive to qemu) - but those
+>> binaries are less suited to something so specific to the NBD
+>> protocol.
+> 
+> I tried it against nbdkit and it works (obviously):
+> 
+> $ ./qemu-nbd -L
+> exports available: 1
+>   export: ''
+>    size:  67108864
+>    flags: 0x61 ( trim zeroes )
+> 
+> What I couldn't work out is how to connect to other hosts.  It's
+> possible to add -p or -k to change the localhost port number or to use
+> a Unix domain socket (and I checked both work).  However can we
+> connect to remote hosts?
 
-This bug affects all Java programs that (implicitly) uses File.list() or
-File.listFiles(). Also it makes dash not expanding wildcard
-/some/directory/* . However, bash works because it uses glob() instead
-of readdir().
+Should work by adding '-b host' (if -b is omitted, it defaults to 
+0.0.0.0).  However, I admit that so far I have only tested '-b 
+localhost' or '-b 127.0.0.1' (per the iotest additions at the end of the 
+series), so it could well be something that I missed in setting up the 
+client socket in nbd_build_socket_address().
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805913
-
-Title:
-  readdir() returns NULL (errno=3DEOVERFLOW) for 32-bit user-static qemu
-  on 64-bit host
-
-Status in QEMU:
-  New
-
-Bug description:
-  This can be simply reproduced by compiling and running the attached C
-  code (readdir-bug.c) under 32-bit user-static qemu, such as qemu-arm-
-  static:
-
-  # Setup docker for user-static binfmt
-  docker run --rm --privileged multiarch/qemu-user-static:register --reset
-  # Compile the code and run (readdir for / is fine, so create a new direct=
-ory /test).
-  docker run -v /path/to/qemu-arm-static:/usr/bin/qemu-arm-static -v /path/=
-to/readdir-bug.c:/tmp/readdir-bug.c -it --rm arm32v7/ubuntu:18.10 bash -c '=
-{ apt update && apt install -y gcc; } >&/dev/null && mkdir -p /test && cd /=
-test && gcc /tmp/readdir-bug.c && ./a.out'
-  dir=3D0xff5b4150
-  readdir(dir)=3D(nil)
-  errno=3D75: Value too large for defined data type
-
-  Do remember to replace the /path/to/qemu-arm-static and /path/to
-  /readdir-bug.c to the actual paths of the files.
-
-  The root cause is in glibc:
-  https://sourceware.org/git/?p=3Dglibc.git;a=3Dblob;f=3Dsysdeps/unix/sysv/=
-linux/getdents.c;h=3D6d09a5be7057e2792be9150d3a2c7b293cf6fc34;hb=3Da5275ba5=
-378c9256d18e582572b4315e8edfcbfb#l87
-
-  By C standard, the return type of readdir() is DIR*, in which the
-  inode number and offset are 32-bit integers, therefore, glibc calls
-  getdents64() and check if the inode number and offset fits the 32-bit
-  range, and reports EOVERFLOW if not.
-
-  The problem here is for 32-bit user-static qemu running on 64-bit
-  host, getdents64 simply passing through the inode number and offset
-  from underlying getdents64 syscall (from 64-bit kernel), which is very
-  likely to not fit into 32-bit range. On real hardware, the 32-bit
-  kernel creates 32-bit inode numbers, therefore works properly.
-
-  The glibc code makes sense to do the check to be conformant with C
-  standard, therefore ideally it should be a fix on qemu side. I admit
-  this is difficult because qemu has to maintain a mapping between
-  underlying 64-bit inode numbers and 32-bit inode numbers, which would
-  severely hurt the performance. I don't expect this could be fix
-  anytime soon (or even there would be a fix), but it would be
-  worthwhile to surface this issue.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805913/+subscriptions
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
