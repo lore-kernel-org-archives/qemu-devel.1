@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gSsug-0001cD-FV
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 19:13:39 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gSsuk-0001d4-Qn
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 19:13:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gSsuc-0005TK-Ek
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 19:13:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53628)
+	(envelope-from <alex.williamson@redhat.com>) id 1gSsuj-0005Zm-TY
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 19:13:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57720)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gSsuc-0005SV-5h
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 19:13:34 -0500
+	id 1gSsuj-0005ZR-Ko
+	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 19:13:41 -0500
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Fri, 30 Nov 2018 17:13:23 -0700
-Message-ID: <154362272919.7153.15101701755308287523.stgit@gimli.home>
+Date: Fri, 30 Nov 2018 17:13:36 -0700
+Message-ID: <154362321596.7153.13933812223570022458.stgit@gimli.home>
+In-Reply-To: <154362272919.7153.15101701755308287523.stgit@gimli.home>
+References: <154362272919.7153.15101701755308287523.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-3.2 PATCH 0/9] pcie: Enhanced link speed and
- width support
+Subject: [Qemu-devel] [for-3.2 PATCH 1/9] pcie: Create enums for link speed
+ and width
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +29,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, Geoffrey McRae <geoff@hostfission.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>
 
-RFC->v1:
- - Add Cc reported by get_maintainer
- - Fixup some commit logs (no code changes in patches 1-7)
- - Add Geoffrey's Tested-by
- - Add patches 8 & 9 which define a QEMU 3.2 machine type and cranking
-   up the link speed and width for that machine type while maintaining
-   compatibile speeds for older machine types (testing requested for
-   non-x86 machine types)
- - Various other users have also reported success with this series
-   (/r/VFIO)
+In preparation for reporting higher virtual link speeds and widths,
+create enums and macros to help us manage them.
 
-Original cover letter:
-
-QEMU exposes gen1 PCI-express interconnect devices supporting only
-2.5GT/s and x1 width.  It might not seem obvious that a virtual
-bandwidth limitation can result in a real performance degradation, but
-it's been reported that in some configurations assigned GPUs might not
-scale their link speed up to the maximum supported value if the
-downstream port above it only advertises limited link support.
-
-As proposed[1] this series effectively implements virtual link
-negotiation on downstream ports and enhances the generic PCIe root
-port to allow user configurable speeds and widths.  The "negotiation"
-simply mirrors the link status of the connected downstream device
-providing the appearance of dynamic link speed scaling to match the
-endpoint device.  Not yet implemented from the proposal is support
-for globally updating defaults based on machine type, though the
-foundation is provided here by allowing supporting PCIESlots to
-implement an instance_init callback which can call into a common
-helper for this.
-
-I have not specifically tested migration with this, but we already
-consider LNKSTA to be dynamic and the other changes implemented here
-are static config space changes with no changes being implemented for
-devices using default values, ie. they should be compatible by virtue
-of existing config space migration support.
-
-I think I've covered the required link related registers to support
-PCIe 4.0, but please let me know if I've missed any.
-
-Testing and feedback appreciated, patch 6/7 provides example qemu:arg
-options and requirements to use with existing libvirt.  Native libvirt
-support TBD.  Thanks,
-
-Alex
-
-[1] https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03086.html
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Tested-by: Geoffrey McRae <geoff@hostfission.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
+ hw/pci/pcie.c              |    7 ++++---
+ hw/vfio/pci.c              |    3 ++-
+ include/hw/pci/pcie_regs.h |   23 +++++++++++++++++++++--
+ 3 files changed, 27 insertions(+), 6 deletions(-)
 
-Alex Williamson (9):
-      pcie: Create enums for link speed and width
-      pci: Sync PCIe downstream port LNKSTA on read
-      qapi: Define PCIe link speed and width properties
-      pcie: Add link speed and width fields to PCIESlot
-      pcie: Fill PCIESlot link fields to support higher speeds and widths
-      pcie: Allow generic PCIe root port to specify link speed and width
-      vfio/pci: Remove PCIe Link Status emulation
-      q35/440fx/arm/spapr: Add QEMU 3.2 machine type
-      pcie: Fast PCIe root ports for new machines
-
-
- hw/arm/virt.c                      |   19 +++-
- hw/core/qdev-properties.c          |  178 ++++++++++++++++++++++++++++++++++++
- hw/i386/pc_piix.c                  |   15 ++-
- hw/i386/pc_q35.c                   |   13 ++-
- hw/pci-bridge/gen_pcie_root_port.c |    2 
- hw/pci-bridge/pcie_root_port.c     |   14 +++
- hw/pci/pci.c                       |    4 +
- hw/pci/pcie.c                      |  118 +++++++++++++++++++++++-
- hw/ppc/spapr.c                     |   25 ++++-
- hw/vfio/pci.c                      |    9 --
- include/hw/compat.h                |   11 ++
- include/hw/i386/pc.h               |    3 +
- include/hw/pci/pci.h               |   13 +++
- include/hw/pci/pcie.h              |    1 
- include/hw/pci/pcie_port.h         |    4 +
- include/hw/pci/pcie_regs.h         |   23 ++++-
- include/hw/qdev-properties.h       |    8 ++
- qapi/common.json                   |   42 ++++++++
- 18 files changed, 480 insertions(+), 22 deletions(-)
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 6c91bd44a0a5..914a5261a79b 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -68,11 +68,12 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_t type, uint8_t version)
+     pci_set_long(exp_cap + PCI_EXP_LNKCAP,
+                  (port << PCI_EXP_LNKCAP_PN_SHIFT) |
+                  PCI_EXP_LNKCAP_ASPMS_0S |
+-                 PCI_EXP_LNK_MLW_1 |
+-                 PCI_EXP_LNK_LS_25);
++                 QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
++                 QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT));
+ 
+     pci_set_word(exp_cap + PCI_EXP_LNKSTA,
+-                 PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25);
++                 QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1) |
++                 QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT));
+ 
+     if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
+         pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 5c7bd9698496..74f9a46b4be0 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1897,7 +1897,8 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev, int pos, uint8_t size,
+                                    PCI_EXP_TYPE_ENDPOINT << 4,
+                                    PCI_EXP_FLAGS_TYPE);
+             vfio_add_emulated_long(vdev, pos + PCI_EXP_LNKCAP,
+-                                   PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25, ~0);
++                           QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
++                           QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT), ~0);
+             vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKCTL, 0, ~0);
+         }
+ 
+diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
+index a95522a13b04..ad4e7808b8ac 100644
+--- a/include/hw/pci/pcie_regs.h
++++ b/include/hw/pci/pcie_regs.h
+@@ -34,10 +34,29 @@
+ 
+ /* PCI_EXP_LINK{CAP, STA} */
+ /* link speed */
+-#define PCI_EXP_LNK_LS_25               1
++typedef enum PCIExpLinkSpeed {
++    QEMU_PCI_EXP_LNK_2_5GT = 1,
++    QEMU_PCI_EXP_LNK_5GT,
++    QEMU_PCI_EXP_LNK_8GT,
++    QEMU_PCI_EXP_LNK_16GT,
++} PCIExpLinkSpeed;
++
++#define QEMU_PCI_EXP_LNKCAP_MLS(speed)  (speed)
++#define QEMU_PCI_EXP_LNKSTA_CLS         QEMU_PCI_EXP_LNKCAP_MLS
++
++typedef enum PCIExpLinkWidth {
++    QEMU_PCI_EXP_LNK_X1 = 1,
++    QEMU_PCI_EXP_LNK_X2 = 2,
++    QEMU_PCI_EXP_LNK_X4 = 4,
++    QEMU_PCI_EXP_LNK_X8 = 8,
++    QEMU_PCI_EXP_LNK_X12 = 12,
++    QEMU_PCI_EXP_LNK_X16 = 16,
++    QEMU_PCI_EXP_LNK_X32 = 32,
++} PCIExpLinkWidth;
+ 
+ #define PCI_EXP_LNK_MLW_SHIFT           ctz32(PCI_EXP_LNKCAP_MLW)
+-#define PCI_EXP_LNK_MLW_1               (1 << PCI_EXP_LNK_MLW_SHIFT)
++#define QEMU_PCI_EXP_LNKCAP_MLW(width)  (width << PCI_EXP_LNK_MLW_SHIFT)
++#define QEMU_PCI_EXP_LNKSTA_NLW         QEMU_PCI_EXP_LNKCAP_MLW
+ 
+ /* PCI_EXP_LINKCAP */
+ #define PCI_EXP_LNKCAP_ASPMS_SHIFT      ctz32(PCI_EXP_LNKCAP_ASPMS)
