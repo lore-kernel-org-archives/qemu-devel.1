@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gT3tv-0007yz-7q
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 06:57:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gT41M-0002KM-AA
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 07:05:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gT3tu-00084Q-Co
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 06:57:35 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:33380)
+	(envelope-from <peter.maydell@linaro.org>) id 1gT41L-000583-4d
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 07:05:16 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gT3tu-00084B-02
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 06:57:34 -0500
-Received: by mail-oi1-x244.google.com with SMTP id c206so7104966oib.0
-	for <qemu-devel@nongnu.org>; Sat, 01 Dec 2018 03:57:33 -0800 (PST)
+	id 1gT41K-00057c-Ve
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 07:05:15 -0500
+Received: by mail-oi1-x241.google.com with SMTP id v6so7090255oif.2
+	for <qemu-devel@nongnu.org>; Sat, 01 Dec 2018 04:05:14 -0800 (PST)
 MIME-Version: 1.0
-References: <20181126200435.23408-1-minyard@acm.org>
-	<20181126200435.23408-16-minyard@acm.org>
-	<CAFEAcA8OuW0o5KmGLPuQB149yXowdb=8DyW5oe1yfjE4H--sPg@mail.gmail.com>
-	<874bc3cf-825f-7fc5-efed-a39acf1789fa@acm.org>
-In-Reply-To: <874bc3cf-825f-7fc5-efed-a39acf1789fa@acm.org>
+References: <CAFEAcA9Od4vjo2EeEXhP1iE_XONaK8H22L9eq1qw3w6C2nR_cQ@mail.gmail.com>
+	<201812011728499706543@zte.com.cn>
+In-Reply-To: <201812011728499706543@zte.com.cn>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 1 Dec 2018 11:57:22 +0000
-Message-ID: <CAFEAcA-hayNK33Aty4GHwV=izK_G--swGUNtoiTVorC_i6LTag@mail.gmail.com>
+Date: Sat, 1 Dec 2018 12:05:02 +0000
+Message-ID: <CAFEAcA-0DPo=4vzHtfD-bmAsfguOd7RiQUnHMpg0Q0e8aNZ_vA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 15/16] hw/i2c/smbus_eeprom: Create at
- most SMBUS_EEPROM_MAX EEPROMs on a SMBus
+Subject: Re: [Qemu-devel] [PATCH V10 7/9] hw/misc/pvpanic: preparing
+ foradding configure interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <minyard@acm.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, 30 Nov 2018 at 20:47, Corey Minyard <minyard@acm.org> wrote:
->
-> On 11/30/18 11:39 AM, Peter Maydell wrote:
-> > On Mon, 26 Nov 2018 at 20:04, <minyard@acm.org> wrote:
-> >> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >>        /* XXX: make this persistent */
-> >> -    uint8_t *eeprom_buf =3D g_malloc0(8 * SMBUS_EEPROM_SIZE);
-> >> +    eeprom_buf =3D g_malloc0(nb_eeprom * SMBUS_EEPROM_SIZE);
-> > So if we allocate N buffers as the caller requests, what
-> > is the thing that means that more than 8 won't work ?
-> >
-> > We've now changed from allocating always 8 lots of
-> > the EEPROM size to possibly allocating fewer than that.
-> > How does the code in the device know what the size
-> > of the buffer we're passing as the "data" property is
-> > now? We don't pass it the number of EEPROMs as a property.
->
-> It doesn't have to.  Each EEPROM is 256 bytes and that's all the data
-> it has.
->
-> But this whole thing is confusing, I agree.  The more I look at this
-> particular file, the less I like it.  But the caller is basically saying:
-> "I need N EEPROMs, here's the initialization data".  That's not
-> really very flexible, IMHO the EEPROM devices should be created
-> individually using standard qemu methods.
+On Sat, 1 Dec 2018 at 09:28, <peng.hao2@zte.com.cn> wrote:
+> Peter Maydell wrote:
+> >This kind of thing is why a PCI device is cleaner -- it just
+> >works on any machine with a PCI controller, it by default is
+> >something that the user can provide if they want to and not if
+> >they don't, and it's not a custom UI that management layers
+> >might need to special-case. The guest does need to do a bit
+> >of PCI probing and setup initially, but then it can just leave
+> >the MMIO BAR permanently mapped and write to that address
+> >when the guest panics.
 
-Oh, yes, I see now. We pass in a block of N * 256 bytes, and
-the function then hands a pointer to offsets 0, 256, ...
-to each device it creates.
+> Usually, it doesn't matter if there is this pvpanic device or not, so I
+> haven't considered configurability from the beginning.
 
-I definitely don't see why we need to say "only a maximum of
-8" now, though -- where does that limit come from? If we
-get passed in an arbitrary number of EEPROMs X, and we allocate
-256 * X bytes, and create X devices which each get one slice of
-the buffer, what goes wrong when X > 8 ?
+It matters to people who don't want it, because it increases
+the attack surface presented to the guest.
 
-> I'm tempted to rewrite this whole thing to make it cleaner.
+>  I didn't expect you to strongly recommend the use of PCI devices.
+> Doing so is not just going to roll back some of the code in the kernel...
+> I'll think about your suggestions.
 
-It's certainly pretty awkward code. I think personally given
-this patchset is already pretty big I'd go for getting it into
-master first and then doing a followup with further cleanup.
+My view on this hasn't changed since October:
+https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg03861.html
+if this really really needs to be an MMIO device then it can
+be done, but a PCI device is a much cleaner interface which
+is more widely usable than just the virt board.
 
 thanks
 -- PMM
