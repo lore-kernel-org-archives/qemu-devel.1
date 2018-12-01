@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gT1a7-0000OH-3L
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 04:28:59 -0500
+	(envelope-from <rjones@redhat.com>) id 1gT2Xk-0008Cy-Cn
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 05:30:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gT1a6-0005K1-Cr
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 04:28:59 -0500
-Date: Sat, 1 Dec 2018 17:28:49 +0800 (CST)
-Message-ID: <201812011728499706543@zte.com.cn>
-In-Reply-To: <CAFEAcA9Od4vjo2EeEXhP1iE_XONaK8H22L9eq1qw3w6C2nR_cQ@mail.gmail.com>
-References: 1543407172-16175-1-git-send-email-peng.hao2@zte.com.cn,
-	CAFEAcA83C_Eic3K4yY5bGeEKJpY2uf26diFtDJ5r+W71jcX2DQ@mail.gmail.com,
-	20181130161449.dg2yxiac5lnk7mbb@kamzik.brq.redhat.com,
-	CAFEAcA9Od4vjo2EeEXhP1iE_XONaK8H22L9eq1qw3w6C2nR_cQ@mail.gmail.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_V10_7/9=5D_hw/misc/pvpanic=3A_pr?=
- =?utf-8?q?eparing_foradding_configure_interface?=
+	(envelope-from <rjones@redhat.com>) id 1gT2Xj-0002YQ-3i
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 05:30:36 -0500
+Date: Sat, 1 Dec 2018 10:30:25 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20181201103025.GG27120@redhat.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181130220344.3350618-8-eblake@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181130220344.3350618-8-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 07/14] nbd/client: Refactor
+ nbd_negotiate_simple_meta_context()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +24,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: drjones@redhat.com, qemu-arm@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, nsoffer@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Pk9uIEZyaSwgMzAgTm92IDIwMTggYXQgMTY6MTQsIEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRo
-YXQuY29tPiB3cm90ZToKPj4KPj4gT24gRnJpLCBOb3YgMzAsIDIwMTggYXQgMDM6NTc6MTNQTSAr
-MDAwMCwgUGV0ZXIgTWF5ZGVsbCB3cm90ZToKPj4gPiBPbiBGcmksIDMwIE5vdiAyMDE4IGF0IDE1
-OjU2LCBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+IHdyb3RlOgo+PiA+
-ID4gSSBzdXNwZWN0IHRoZSByZWFzb24geW91J3ZlIGRvbmUgdGhpcyBpcyB0aGF0IHlvdSdyZQo+
-PiA+ID4gdHJ5aW5nIHRvIGdldCAiLWRldmljZSBwdnBhbmljIiB0byB3b3JrIG9uIHRoZSBjb21t
-YW5kCj4+ID4gPiBsaW5lLiBJIHJlY29tbWVuZCBub3QgdHJ5aW5nIHRvIGdldCB0aGF0IHRvIHdv
-cmsuCj4+ID4gPiBNTUlPIGRldmljZXMgYXJlIG5vdCBwbHVnZ2FibGUgZGV2aWNlcywgYW5kIC1k
-ZXZpY2UKPj4gPiA+IGlzIG5vdCBleHBlY3RlZCB0byB3b3JrIHdpdGggdGhlbS4KPj4gPgo+PiA+
-IElmIHlvdSBkbyB3YW50IGEgcGx1Z2dhYmxlIHB2cGFuaWMgZGV2aWNlIGZvciB0aGUgdmlydAo+
-PiA+IGJvYXJkIHRoZW4geW91IHNob3VsZCBpbXBsZW1lbnQgaXQgYXMgYSBQQ0kgZGV2aWNlLAo+
-PiA+IGluY2lkZW50YWxseS4KPj4gPgo+Pgo+PiBXZSdkIGhhdmUgdG8gYWxsb2NhdGUgaXQgYSBQ
-Q0kgZGV2aWNlIElELCBidXQgSSBndWVzcyB0aGF0J3MgT0sgYXMKPj4gdGhlcmUgYXJlIHBsZW50
-eSBvZiBJRHMgbGVmdCBmb3IgMWIzNi4gSSdtIG5vdCBzdXJlIGl0J3Mgd29ydGggaXQKPj4gdGhv
-dWdoLiBQaGlsIGFza2VkIHRoYXQgdGhpcyBkZXZpY2UgYnkgdXNlciBjcmVhdGFibGUsIGJ1dCBt
-YXliZQo+PiB0aGF0J3Mgbm90IG5lY2Vzc2FyeS4gTWF5YmUgd2UganVzdCBuZWVkIGEgbWFjaC12
-aXJ0IGNvbXBhdCBib29sZWFuCj4+IGFuZCB0aGVuIHRvIGFsd2F5cyBwcm92aWRlIHRoaXMgZGV2
-aWNlIGZvciA0LjAgYW5kIGxhdGVyIG1hY2hpbmVzPwo+Cj5ZZXMsIGlmIGl0J3MganVzdCBhbiBt
-bWlvIGRldmljZSB0aGVuIHdlIHNob3VsZCBlaXRoZXI6Cj4qIGRlZmF1bHQgdG8gcHJvdmlkaW5n
-IGl0LCB3aXRoIHRoZSB1c3VhbCBmbGFnIHRvIHNheSAiZG9uJ3QgY3JlYXRlCj5pbiBvbGRlciB2
-aXJ0IGJvYXJkIHZlcnNpb25zIiwgYW5kIGFsc28gYSBtYWNoaW5lIHByb3BlcnR5IHRvCj5kaXNh
-YmxlIGl0IG1hbnVhbGx5IChsaWtlIHdlIGRvIHdpdGggdGhlIElUUykKPiogZGVmYXVsdCB0byBu
-b3QgcHJvdmlkaW5nIGl0IGF0IGFsbCwgYW5kIGhhdmUgYSBtYWNoaW5lCj5wcm9wZXJ0eSB0byBl
-bmFibGUgaXQgKGxpa2Ugd2UgZG8gd2l0aCB0aGUgSU9NTVUpCj5XaGljaCBpcyBhbGwgZG9hYmxl
-LCBidXQgZXZlcnkgdGltZSB3ZSBkbyB0aGF0IGl0IG1ha2VzIHRoZQo+dmlydCBib2FyZCBjb2Rl
-IHRoYXQgZXh0cmEgYml0IG1vcmUgY29tcGxpY2F0ZWQgKHdlIGhhdmUKPmhhbGYgYSBkb3plbiBt
-YWNoaW5lIHByb3BlcnRpZXMgb24gaXQgYWxyZWFkeSkuCj4KPlRoaXMga2luZCBvZiB0aGluZyBp
-cyB3aHkgYSBQQ0kgZGV2aWNlIGlzIGNsZWFuZXIgLS0gaXQganVzdAo+d29ya3Mgb24gYW55IG1h
-Y2hpbmUgd2l0aCBhIFBDSSBjb250cm9sbGVyLCBpdCBieSBkZWZhdWx0IGlzCj5zb21ldGhpbmcg
-dGhhdCB0aGUgdXNlciBjYW4gcHJvdmlkZSBpZiB0aGV5IHdhbnQgdG8gYW5kIG5vdCBpZgo+dGhl
-eSBkb24ndCwgYW5kIGl0J3Mgbm90IGEgY3VzdG9tIFVJIHRoYXQgbWFuYWdlbWVudCBsYXllcnMK
-Pm1pZ2h0IG5lZWQgdG8gc3BlY2lhbC1jYXNlLiBUaGUgZ3Vlc3QgZG9lcyBuZWVkIHRvIGRvIGEg
-Yml0Cj5vZiBQQ0kgcHJvYmluZyBhbmQgc2V0dXAgaW5pdGlhbGx5LCBidXQgdGhlbiBpdCBjYW4g
-anVzdCBsZWF2ZQo+dGhlIE1NSU8gQkFSIHBlcm1hbmVudGx5IG1hcHBlZCBhbmQgd3JpdGUgdG8g
-dGhhdCBhZGRyZXNzCj53aGVuIHRoZSBndWVzdCBwYW5pY3MuCj4KVXN1YWxseSwgaXQgZG9lc24n
-dCBtYXR0ZXIgaWYgdGhlcmUgaXMgdGhpcyBwdnBhbmljIGRldmljZSBvciBub3QsIHNvIEkgCmhh
-dmVuJ3QgY29uc2lkZXJlZCBjb25maWd1cmFiaWxpdHkgZnJvbSB0aGUgYmVnaW5uaW5nLgogSSBk
-aWRuJ3QgZXhwZWN0IHlvdSB0byBzdHJvbmdseSByZWNvbW1lbmQgdGhlIHVzZSBvZiBQQ0kgZGV2
-aWNlcy4gCkRvaW5nIHNvIGlzIG5vdCBqdXN0IGdvaW5nIHRvIHJvbGwgYmFjayBzb21lIG9mIHRo
-ZSBjb2RlIGluIHRoZSBrZXJuZWwuLi4gCkknbGwgdGhpbmsgYWJvdXQgeW91ciBzdWdnZXN0aW9u
-cy4KdGhhbmtzLgo+dGhhbmtzCi0tIFBNTQ==
+On Fri, Nov 30, 2018 at 04:03:36PM -0600, Eric Blake wrote:
+> Change the signature to make it easier for a future patch to
+> reuse this function for calling NBD_OPT_LIST_META_CONTEXT with
+> 0 or 1 queries.  Also, always allocate space for the received
+> name, even if it doesn't match expected lengths (no point
+> trying to optimize the unlikely error case, and tracing the
+> received rather than expected name can help debug a server
+> implementation).
+> 
+> While there are now slightly different traces, and the error
+> message for a server replying with too many contexts is
+> different, there are no runtime-observable changes in behavior
+> for the more common case of the lone caller interacting with a
+> compliant server.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  nbd/client.c     | 105 +++++++++++++++++++++++++++--------------------
+>  nbd/trace-events |   2 +-
+>  2 files changed, 61 insertions(+), 46 deletions(-)
+
+I've stared at this patch over a 12 hour period now and while I do
+_not_ think it's wrong at all, and I've tested it against nbdkit, it's
+not very easy to follow.  Also my unfamiliarity with the qemu block
+layer / NBD client code doesn't help.
+
+> diff --git a/nbd/client.c b/nbd/client.c
+> index b5818a99d21..1dc8f83e19a 100644
+> --- a/nbd/client.c
+> +++ b/nbd/client.c
+> @@ -603,49 +603,57 @@ static QIOChannel *nbd_receive_starttls(QIOChannel *ioc,
+>  }
+> 
+>  /* nbd_negotiate_simple_meta_context:
+> - * Set one meta context. Simple means that reply must contain zero (not
+> - * negotiated) or one (negotiated) contexts. More contexts would be considered
+> - * as a protocol error. It's also implied that meta-data query equals queried
+> - * context name, so, if server replies with something different than @context,
+> - * it is considered an error too.
+> - * return 1 for successful negotiation, context_id is set
+> - *        0 if operation is unsupported,
+> + * List or set meta context data for export @info->name, based on @opt.
+> + * For list, leave @context NULL for 0 queries, or supplied for a single
+> + * query; all replies are ignored, and the call merely traces server behavior.
+> + * For set, @context must result in at most one matching server reply, in
+> + * which case @info->meta_base_allocation_id is set to the resulting id.
+> + * return 1 for successful negotiation,
+> + *        0 if operation is unsupported or context unavailable,
+>   *        -1 with errp set for any other error
+>   */
+>  static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+> -                                             const char *export,
+> +                                             int32_t opt,
+>                                               const char *context,
+> -                                             uint32_t *context_id,
+> +                                             NBDExportInfo *info,
+>                                               Error **errp)
+>  {
+>      int ret;
+>      NBDOptionReply reply;
+>      uint32_t received_id = 0;
+>      bool received = false;
+> -    uint32_t export_len = strlen(export);
+> -    uint32_t context_len = strlen(context);
+> -    uint32_t data_len = sizeof(export_len) + export_len +
+> -                        sizeof(uint32_t) + /* number of queries */
+> -                        sizeof(context_len) + context_len;
+> -    char *data = g_malloc(data_len);
+> -    char *p = data;
+> +    uint32_t export_len = strlen(info->name);
+> +    uint32_t context_len;
+> +    uint32_t data_len = sizeof(export_len) + export_len + sizeof(uint32_t);
+> +    char *data;
+> +    char *p;
+
+I think you could add a comment about how data_len is calculated here.
+The calculation is different from the previous code (in the fragment
+above, but the fragment below makes the calculation the same).  The
+old code at least had a brief comment.
+
+> -    trace_nbd_opt_meta_request(context, export);
+> +    if (!context) {
+> +        assert(opt == NBD_OPT_LIST_META_CONTEXT);
+> +    } else {
+> +        context_len = strlen(context);
+> +        data_len += sizeof(context_len) + context_len;
+> +    }
+> +    data = g_malloc(data_len);
+> +    p = data;
+> +
+> +    trace_nbd_opt_meta_request(nbd_opt_lookup(opt), context ?: "(all)",
+> +                               info->name);
+>      stl_be_p(p, export_len);
+> -    memcpy(p += sizeof(export_len), export, export_len);
+> -    stl_be_p(p += export_len, 1);
+> -    stl_be_p(p += sizeof(uint32_t), context_len);
+> -    memcpy(p += sizeof(context_len), context, context_len);
+> +    memcpy(p += sizeof(export_len), info->name, export_len);
+> +    stl_be_p(p += export_len, !!context);
+> +    if (context) {
+> +        stl_be_p(p += sizeof(uint32_t), context_len);
+> +        memcpy(p += sizeof(context_len), context, context_len);
+> +    }
+
+Again even though the old code wasn't commented, a brief comment
+describing the data layout wouldn't go amiss.
+
+> -    ret = nbd_send_option_request(ioc, NBD_OPT_SET_META_CONTEXT, data_len, data,
+> -                                  errp);
+> +    ret = nbd_send_option_request(ioc, opt, data_len, data, errp);
+>      g_free(data);
+>      if (ret < 0) {
+>          return ret;
+>      }
+> 
+> -    if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &reply,
+> -                                 errp) < 0)
+> +    if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0)
+>      {
+>          return -1;
+>      }
+> @@ -655,10 +663,10 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+>          return ret;
+>      }
+> 
+> -    if (reply.type == NBD_REP_META_CONTEXT) {
+> +    while (reply.type == NBD_REP_META_CONTEXT) {
+>          char *name;
+> 
+> -        if (reply.length != sizeof(received_id) + context_len) {
+> +        if (reply.length <= sizeof(received_id)) {
+>              error_setg(errp, "Failed to negotiate meta context '%s', server "
+>                         "answered with unexpected length %" PRIu32, context,
+>                         reply.length);
+> @@ -678,23 +686,31 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+>              return -1;
+>          }
+>          name[reply.length] = '\0';
+> -        if (strcmp(context, name)) {
+> -            error_setg(errp, "Failed to negotiate meta context '%s', server "
+> -                       "answered with different context '%s'", context,
+> -                       name);
+> -            g_free(name);
+> -            nbd_send_opt_abort(ioc);
+> -            return -1;
+> +
+> +        trace_nbd_opt_meta_reply(name, received_id);
+> +        if (opt == NBD_OPT_SET_META_CONTEXT) {
+> +            if (received) {
+> +                error_setg(errp, "Server replied with more than one context");
+> +                free(name);
+> +                nbd_send_opt_abort(ioc);
+> +                return -1;
+> +            }
+> +
+> +            if (strcmp(context, name)) {
+> +                error_setg(errp,
+> +                           "Failed to negotiate meta context '%s', server "
+> +                           "answered with different context '%s'", context,
+> +                           name);
+> +                g_free(name);
+> +                nbd_send_opt_abort(ioc);
+> +                return -1;
+> +            }
+>          }
+>          g_free(name);
+> -
+> -        trace_nbd_opt_meta_reply(context, received_id);
+>          received = true;
+> 
+>          /* receive NBD_REP_ACK */
+> -        if (nbd_receive_option_reply(ioc, NBD_OPT_SET_META_CONTEXT, &reply,
+> -                                     errp) < 0)
+> -        {
+> +        if (nbd_receive_option_reply(ioc, opt, &reply, errp) < 0) {
+>              return -1;
+>          }
+> 
+> @@ -717,12 +733,11 @@ static int nbd_negotiate_simple_meta_context(QIOChannel *ioc,
+>          return -1;
+>      }
+> 
+> -    if (received) {
+> -        *context_id = received_id;
+> -        return 1;
+> +    if (received && opt == NBD_OPT_SET_META_CONTEXT) {
+> +        info->meta_base_allocation_id = received_id;
+>      }
+> 
+> -    return 0;
+> +    return received || opt == NBD_OPT_LIST_META_CONTEXT;
+>  }
+> 
+>  int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+> @@ -822,9 +837,9 @@ int nbd_receive_negotiate(QIOChannel *ioc, QCryptoTLSCreds *tlscreds,
+> 
+>              if (info->structured_reply && base_allocation) {
+>                  result = nbd_negotiate_simple_meta_context(
+> -                        ioc, info->name,
+> +                        ioc, NBD_OPT_SET_META_CONTEXT,
+>                          info->x_dirty_bitmap ?: "base:allocation",
+> -                        &info->meta_base_allocation_id, errp);
+> +                        info, errp);
+>                  if (result < 0) {
+>                      goto fail;
+>                  }
+> diff --git a/nbd/trace-events b/nbd/trace-events
+> index 289337d0dc3..5d0d202fad2 100644
+> --- a/nbd/trace-events
+> +++ b/nbd/trace-events
+> @@ -10,7 +10,7 @@ nbd_receive_query_exports_start(const char *wantname) "Querying export list for
+>  nbd_receive_query_exports_success(const char *wantname) "Found desired export name '%s'"
+>  nbd_receive_starttls_new_client(void) "Setting up TLS"
+>  nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
+> -nbd_opt_meta_request(const char *context, const char *export) "Requesting to set meta context %s for export %s"
+> +nbd_opt_meta_request(const char *opt, const char *context, const char *export) "Requesting to %s %s for export %s"
+>  nbd_opt_meta_reply(const char *context, uint32_t id) "Received mapping of context %s to id %" PRIu32
+>  nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving negotiation tlscreds=%p hostname=%s"
+>  nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
+> -- 
+> 2.17.2
+
+Tested-by: Richard W.M. Jones <rjones@redhat.com>
+
+Rich.
+
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-top is 'top' for virtual machines.  Tiny program with many
+powerful monitoring features, net stats, disk stats, logging, etc.
+http://people.redhat.com/~rjones/virt-top
