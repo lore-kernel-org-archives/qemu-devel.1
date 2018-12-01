@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gT4QL-0005av-MX
+	(envelope-from <pm215@archaic.org.uk>) id 1gT4QK-0005as-PW
 	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 07:31:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1gT4QK-0008SV-Vj
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 07:31:05 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gT4QJ-0008S0-TY
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 07:31:04 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:53156)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1gT4QK-0008Qj-Ox
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 07:31:04 -0500
+	id 1gT4QJ-0008Qj-NN
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 07:31:03 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat,  1 Dec 2018 12:30:54 +0000
-Message-Id: <20181201123056.432-4-peter.maydell@linaro.org>
-In-Reply-To: <20181201123056.432-1-peter.maydell@linaro.org>
-References: <20181201123056.432-1-peter.maydell@linaro.org>
+Date: Sat,  1 Dec 2018 12:30:51 +0000
+Message-Id: <20181201123056.432-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC 3/5] ui/cocoa: Factor out initial menu creation
+Subject: [Qemu-devel] [RFC 0/5] ui/cocoa: Use OSX's main loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,110 +27,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Roman Bolshakov <r.bolshakov@yadro.com>
 
-Factor out the long code sequence in main() which creates
-the initial set of menus. This will make later patches
-which move initialization code around a bit clearer.
+This set of patches rearranges how we handle events on
+the OSX Cocoa UI so that we use the main thread to run
+the OSX event loop, and we don't do a long blocking
+operation from the applicationDidFinishLaunching callback.
+Instead we create a second thread which runs qemu_main()
+and becomes the QEMU main-loop thread. The callbacks from
+QEMU into the cocoa code asynchronously dispatch their
+work to the main thread, and the main thread takes the
+iothread lock before calling into QEMU code.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- ui/cocoa.m | 78 ++++++++++++++++++++++++++++--------------------------
- 1 file changed, 41 insertions(+), 37 deletions(-)
+This code all works (though I have only smoke-tested it),
+but it is marked RFC because it seems to be unclear whether
+the current code in git master is really problematic for
+Mojave. If it's not actually solving a problem then it's
+a bit tricky to justify this rework, though it does mean
+we're doing a less "weird" set of things and behaving a bit
+more like how OSX expects apps to behave, so it might in
+theory mean less chance of future breakage.
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 997b0199c6c..da511bfb4fa 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -1444,43 +1444,8 @@ QemuCocoaView *cocoaView;
- 
- @end
- 
--
--int main (int argc, const char * argv[]) {
--
--    gArgc = argc;
--    gArgv = (char **)argv;
--    int i;
--
--    /* In case we don't need to display a window, let's not do that */
--    for (i = 1; i < argc; i++) {
--        const char *opt = argv[i];
--
--        if (opt[0] == '-') {
--            /* Treat --foo the same as -foo.  */
--            if (opt[1] == '-') {
--                opt++;
--            }
--            if (!strcmp(opt, "-h") || !strcmp(opt, "-help") ||
--                !strcmp(opt, "-vnc") ||
--                !strcmp(opt, "-nographic") ||
--                !strcmp(opt, "-version") ||
--                !strcmp(opt, "-curses") ||
--                !strcmp(opt, "-display") ||
--                !strcmp(opt, "-qtest")) {
--                return qemu_main(gArgc, gArgv, *_NSGetEnviron());
--            }
--        }
--    }
--
--    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
--
--    // Pull this console process up to being a fully-fledged graphical
--    // app with a menubar and Dock icon
--    ProcessSerialNumber psn = { 0, kCurrentProcess };
--    TransformProcessType(&psn, kProcessTransformToForegroundApplication);
--
--    [NSApplication sharedApplication];
--
-+static void create_initial_menus(void)
-+{
-     // Add menus
-     NSMenu      *menu;
-     NSMenuItem  *menuItem;
-@@ -1564,6 +1529,45 @@ int main (int argc, const char * argv[]) {
-     menuItem = [[[NSMenuItem alloc] initWithTitle:@"Window" action:nil keyEquivalent:@""] autorelease];
-     [menuItem setSubmenu:menu];
-     [[NSApp mainMenu] addItem:menuItem];
-+}
-+
-+int main (int argc, const char * argv[]) {
-+
-+    gArgc = argc;
-+    gArgv = (char **)argv;
-+    int i;
-+
-+    /* In case we don't need to display a window, let's not do that */
-+    for (i = 1; i < argc; i++) {
-+        const char *opt = argv[i];
-+
-+        if (opt[0] == '-') {
-+            /* Treat --foo the same as -foo.  */
-+            if (opt[1] == '-') {
-+                opt++;
-+            }
-+            if (!strcmp(opt, "-h") || !strcmp(opt, "-help") ||
-+                !strcmp(opt, "-vnc") ||
-+                !strcmp(opt, "-nographic") ||
-+                !strcmp(opt, "-version") ||
-+                !strcmp(opt, "-curses") ||
-+                !strcmp(opt, "-display") ||
-+                !strcmp(opt, "-qtest")) {
-+                return qemu_main(gArgc, gArgv, *_NSGetEnviron());
-+            }
-+        }
-+    }
-+
-+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-+
-+    // Pull this console process up to being a fully-fledged graphical
-+    // app with a menubar and Dock icon
-+    ProcessSerialNumber psn = { 0, kCurrentProcess };
-+    TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-+
-+    [NSApplication sharedApplication];
-+
-+    create_initial_menus();
- 
-     // Create an Application controller
-     QemuCocoaAppController *appController = [[QemuCocoaAppController alloc] init];
+NB: the code to asynchronously run code blocks on the
+main thread uses dispatch_get_main_queue(), which is a
+10.10-or-later function. If we're going to go with this
+refactoring I think the benefit in clarity-of-code is a
+worthwhile gain for dropping support for ancient OSX versions.
+
+Patchset structure:
+ * patch 1 does the "make sure we have the iothread lock for
+   calls into QEMU" (which is effectively a no-op initially
+   since we'll already be holding that lock when our refresh
+   etc callbacks are called)
+ * patch 2 makes switchSurface directly take the pixman image
+   (which is refcounted) rather than the DisplaySurface (which
+   is not), so we can make the calls to it asynchronous later
+ * patches 3 and 4 are just trivial code motion
+ * patch 5 does the bulk of the work (and can't really be split
+   further without the UI being broken at the intermediate point)
+
+thanks
+-- PMM
+
+Peter Maydell (5):
+  ui/cocoa: Ensure we have the iothread lock when calling into QEMU
+  ui/cocoa: Use the pixman image directly in switchSurface
+  ui/cocoa: Factor out initial menu creation
+  ui/cocoa: Move console/device menu creation code up in file
+  ui/cocoa: Perform UI operations only on the main thread
+
+ ui/cocoa.m | 441 +++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 258 insertions(+), 183 deletions(-)
+
 -- 
 2.19.2
