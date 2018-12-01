@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dongli.zhang@oracle.com>) id 1gTANT-0005Wv-2A
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 13:52:31 -0500
+	(envelope-from <philmd@redhat.com>) id 1gTAVY-0001df-S9
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 14:00:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dongli.zhang@oracle.com>) id 1gTANO-0007Ur-13
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 13:52:31 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:44074)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dongli.zhang@oracle.com>)
-	id 1gTANN-0007Tm-Od
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 13:52:25 -0500
+	(envelope-from <philmd@redhat.com>) id 1gTAVU-0006nv-KO
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 14:00:52 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:35056)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gTAVU-0006ne-Dr
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 14:00:48 -0500
+Received: by mail-wm1-f68.google.com with SMTP id c126so2004720wmh.0
+	for <qemu-devel@nongnu.org>; Sat, 01 Dec 2018 11:00:48 -0800 (PST)
+References: <1543614312-54253-1-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f2d47b3a-1871-160c-e2bb-802a7f7b0374@redhat.com>
+Date: Sat, 1 Dec 2018 20:00:44 +0100
 MIME-Version: 1.0
-Message-ID: <099db937-3fa3-465e-9a23-a900df9adb7c@default>
-Date: Sat, 1 Dec 2018 10:52:21 -0800 (PST)
-From: Dongli Zhang <dongli.zhang@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Subject: [Qemu-devel] vfio failure with intel 760p 128GB nvme
+In-Reply-To: <1543614312-54253-1-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0] usb: move
+ ehci_create_ich9_with_companions to hw/i386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +30,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: keith.busch@intel.com, alex.williamson@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-Hi,
+Hi Paolo,
 
-I obtained below error when assigning an intel 760p 128GB nvme to guest via
-vfio on my desktop:
+On 30/11/18 22:45, Paolo Bonzini wrote:
+> This function is only needed when Q35 is in use.  Moving it to
+> the same file that uses it lets you disable the entire USB
+> subsystem in x86_64-softmmu.mak; of course doing that will
+> cause -usb to break horribly, but one thing at a time.
 
-qemu-system-x86_64: -device vfio-pci,host=3D0000:01:00.0: vfio 0000:01:00.0=
-: failed to add PCI capability 0x11[0x50]@0xb0: table & pba overlap, or the=
-y don't fit in BARs, or don't align
+Moving this out of hcd-ehci-pci.c is an improvement.
+I'm mitigated about adding this to pc_q35.c, but for the goal you
+mentioned, it is enough.
 
+(In a previous work I tried to refactor all ich9 under hw/southbridge/,
+keeping q35 clean of it. I might continue after qconfig merged, if this
+is worthwhile).
 
-This is because the msix table is overlapping with pba. According to below
-'lspci -vv' from host, the distance between msix table offset and pba offse=
-t is
-only 0x100, although there are 22 entries supported (22 entries need 0x160)=
-.
-Looks qemu supports at most 0x800.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/i386/pc_q35.c      | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  hw/usb/hcd-ehci-pci.c | 53 -------------------------------------------------
+>  include/hw/usb.h      |  2 --
+>  3 files changed, 54 insertions(+), 56 deletions(-)
+> 
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index ce38129..d2c80c9 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -58,6 +58,59 @@
+>  /* ICH9 AHCI has 6 ports */
+>  #define MAX_SATA_PORTS     6
+>  
+> +struct ehci_companions {
+> +    const char *name;
+> +    int func;
+> +    int port;
+> +};
+> +
+> +static const struct ehci_companions ich9_1d[] = {
+> +    { .name = "ich9-usb-uhci1", .func = 0, .port = 0 },
+> +    { .name = "ich9-usb-uhci2", .func = 1, .port = 2 },
+> +    { .name = "ich9-usb-uhci3", .func = 2, .port = 4 },
+> +};
+> +
+> +static const struct ehci_companions ich9_1a[] = {
+> +    { .name = "ich9-usb-uhci4", .func = 0, .port = 0 },
+> +    { .name = "ich9-usb-uhci5", .func = 1, .port = 2 },
+> +    { .name = "ich9-usb-uhci6", .func = 2, .port = 4 },
+> +};
+> +
+> +static int ehci_create_ich9_with_companions(PCIBus *bus, int slot)
+> +{
+> +    const struct ehci_companions *comp;
+> +    PCIDevice *ehci, *uhci;
+> +    BusState *usbbus;
+> +    const char *name;
+> +    int i;
+> +
+> +    switch (slot) {
+> +    case 0x1d:
+> +        name = "ich9-usb-ehci1";
+> +        comp = ich9_1d;
+> +        break;
+> +    case 0x1a:
+> +        name = "ich9-usb-ehci2";
+> +        comp = ich9_1a;
+> +        break;
+> +    default:
+> +        return -1;
+> +    }
+> +
+> +    ehci = pci_create_multifunction(bus, PCI_DEVFN(slot, 7), true, name);
+> +    qdev_init_nofail(&ehci->qdev);
+> +    usbbus = QLIST_FIRST(&ehci->qdev.child_bus);
+> +
+> +    for (i = 0; i < 3; i++) {
+> +        uhci = pci_create_multifunction(bus, PCI_DEVFN(slot, comp[i].func),
+> +                                        true, comp[i].name);
+> +        qdev_prop_set_string(&uhci->qdev, "masterbus", usbbus->name);
+> +        qdev_prop_set_uint32(&uhci->qdev, "firstport", comp[i].port);
+> +        qdev_init_nofail(&uhci->qdev);
+> +    }
+> +    return 0;
+> +}
+> +
+>  /* PC hardware initialisation */
+>  static void pc_q35_init(MachineState *machine)
+>  {
+> @@ -257,7 +310,7 @@ static void pc_q35_init(MachineState *machine)
+>          idebus[0] = idebus[1] = NULL;
+>      }
+>  
+> -    if (0 && machine_usb(machine)) {
+> +    if (machine_usb(machine)) {
 
-# sudo lspci -vv
-... ...
-01:00.0 Non-Volatile memory controller: Intel Corporation Device f1a6 (rev =
-03) (prog-if 02 [NVM Express])
-=09Subsystem: Intel Corporation Device 390b
-... ...
-=09Capabilities: [b0] MSI-X: Enable- Count=3D22 Masked-
-=09=09Vector table: BAR=3D0 offset=3D00002000
-=09=09PBA: BAR=3D0 offset=3D00002100
+This change shouldn't be unnotified in the commit message.
+Maybe this deserves a separate commit?
 
+Except this, I am OK with your patch.
 
-
-A patch below could workaround the issue and passthrough nvme successfully.
-
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 5c7bd96..54fc25e 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1510,6 +1510,11 @@ static void vfio_msix_early_setup(VFIOPCIDevice *vde=
-v, Error **errp)
-     msix->pba_offset =3D pba & ~PCI_MSIX_FLAGS_BIRMASK;
-     msix->entries =3D (ctrl & PCI_MSIX_FLAGS_QSIZE) + 1;
-=20
-+    if (msix->table_bar =3D=3D msix->pba_bar &&
-+        msix->table_offset + msix->entries * PCI_MSIX_ENTRY_SIZE > msix->p=
-ba_offset) {
-+        msix->entries =3D (msix->pba_offset - msix->table_offset) / PCI_MS=
-IX_ENTRY_SIZE;
-+    }
-+
-     /*
-      * Test the size of the pba_offset variable and catch if it extends ou=
-tside
-      * of the specified BAR. If it is the case, we need to apply a hardwar=
-e
-
-
-Would you please help confirm if this can be regarded as bug in qemu, or is=
-sue
-with nvme hardware? Should we fix thin in qemu, or we should never use such=
- buggy
-hardware with vfio?
-
-Thank you very much!
-
-Dongli Zhang
+>          /* Should we create 6 UHCI according to ich9 spec? */
+>          ehci_create_ich9_with_companions(host_bus, 0x1d);
+>      }
+> diff --git a/hw/usb/hcd-ehci-pci.c b/hw/usb/hcd-ehci-pci.c
+> index 8c0fc53..69abbf7 100644
+> --- a/hw/usb/hcd-ehci-pci.c
+> +++ b/hw/usb/hcd-ehci-pci.c
+> @@ -230,56 +230,3 @@ static void ehci_pci_register_types(void)
+>  }
+>  
+>  type_init(ehci_pci_register_types)
+> -
+> -struct ehci_companions {
+> -    const char *name;
+> -    int func;
+> -    int port;
+> -};
+> -
+> -static const struct ehci_companions ich9_1d[] = {
+> -    { .name = "ich9-usb-uhci1", .func = 0, .port = 0 },
+> -    { .name = "ich9-usb-uhci2", .func = 1, .port = 2 },
+> -    { .name = "ich9-usb-uhci3", .func = 2, .port = 4 },
+> -};
+> -
+> -static const struct ehci_companions ich9_1a[] = {
+> -    { .name = "ich9-usb-uhci4", .func = 0, .port = 0 },
+> -    { .name = "ich9-usb-uhci5", .func = 1, .port = 2 },
+> -    { .name = "ich9-usb-uhci6", .func = 2, .port = 4 },
+> -};
+> -
+> -int ehci_create_ich9_with_companions(PCIBus *bus, int slot)
+> -{
+> -    const struct ehci_companions *comp;
+> -    PCIDevice *ehci, *uhci;
+> -    BusState *usbbus;
+> -    const char *name;
+> -    int i;
+> -
+> -    switch (slot) {
+> -    case 0x1d:
+> -        name = "ich9-usb-ehci1";
+> -        comp = ich9_1d;
+> -        break;
+> -    case 0x1a:
+> -        name = "ich9-usb-ehci2";
+> -        comp = ich9_1a;
+> -        break;
+> -    default:
+> -        return -1;
+> -    }
+> -
+> -    ehci = pci_create_multifunction(bus, PCI_DEVFN(slot, 7), true, name);
+> -    qdev_init_nofail(&ehci->qdev);
+> -    usbbus = QLIST_FIRST(&ehci->qdev.child_bus);
+> -
+> -    for (i = 0; i < 3; i++) {
+> -        uhci = pci_create_multifunction(bus, PCI_DEVFN(slot, comp[i].func),
+> -                                        true, comp[i].name);
+> -        qdev_prop_set_string(&uhci->qdev, "masterbus", usbbus->name);
+> -        qdev_prop_set_uint32(&uhci->qdev, "firstport", comp[i].port);
+> -        qdev_init_nofail(&uhci->qdev);
+> -    }
+> -    return 0;
+> -}
+> diff --git a/include/hw/usb.h b/include/hw/usb.h
+> index a5080ad..4961405 100644
+> --- a/include/hw/usb.h
+> +++ b/include/hw/usb.h
+> @@ -593,8 +593,6 @@ const char *usb_device_get_product_desc(USBDevice *dev);
+>  
+>  const USBDesc *usb_device_get_usb_desc(USBDevice *dev);
+>  
+> -int ehci_create_ich9_with_companions(PCIBus *bus, int slot);
+> -
+>  /* quirks.c */
+>  
+>  /* In bulk endpoints are streaming data sources (iow behave like isoc eps) */
+> 
