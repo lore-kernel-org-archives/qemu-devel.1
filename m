@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gT1S4-0004kI-I2
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 04:20:41 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gT1a7-0000OH-3L
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 04:28:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gT1S1-00010K-FL
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 04:20:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40642)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gT1S1-0000zv-9s
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 04:20:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gT1S0-0005Cn-7R
-	for <qemu-devel@nongnu.org>; Sat, 01 Dec 2018 09:20:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 300292E8054
-	for <qemu-devel@nongnu.org>; Sat,  1 Dec 2018 09:20:36 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 01 Dec 2018 09:07:22 -0000
-From: Anton Sharpaev <1805697@bugs.launchpad.net>
-Reply-To: Bug 1805697 <1805697@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154343711336.10463.14315631936822945059.malonedeb@chaenomeles.canonical.com>
-Message-Id: <154365524280.16339.17119551706452896404.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1805697] Re: egl-headless crashes
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gT1a6-0005K1-Cr
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 04:28:59 -0500
+Date: Sat, 1 Dec 2018 17:28:49 +0800 (CST)
+Message-ID: <201812011728499706543@zte.com.cn>
+In-Reply-To: <CAFEAcA9Od4vjo2EeEXhP1iE_XONaK8H22L9eq1qw3w6C2nR_cQ@mail.gmail.com>
+References: 1543407172-16175-1-git-send-email-peng.hao2@zte.com.cn,
+	CAFEAcA83C_Eic3K4yY5bGeEKJpY2uf26diFtDJ5r+W71jcX2DQ@mail.gmail.com,
+	20181130161449.dg2yxiac5lnk7mbb@kamzik.brq.redhat.com,
+	CAFEAcA9Od4vjo2EeEXhP1iE_XONaK8H22L9eq1qw3w6C2nR_cQ@mail.gmail.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V10_7/9=5D_hw/misc/pvpanic=3A_pr?=
+ =?utf-8?q?eparing_foradding_configure_interface?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,43 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: drjones@redhat.com, qemu-arm@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org
 
-I mean this works: -device virtio-vga,xres=3D1920,yres=3D1080
-
-Not the patch. I try to patch 3.0 version. No result
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805697
-
-Title:
-  egl-headless crashes
-
-Status in QEMU:
-  New
-
-Bug description:
-  egl-headless crashes when it is trying change the resolution. After
-  XFCE login, for example.
-
-  I tryed it on 2.12, 3.0 and 3.1.0-rc2 versions.
-
-  # qemu-system-x86_64 -enable-kvm -enable-kvm -M q35 -smp 8 -vga virtio
-  -spice port=3D59011,addr=3D0.0.0.0,disable-ticketing -hda image.qcow2 -m
-  4G -display egl-headless -chardev spicevmc,name=3Dvdagent,id=3Dvdagent
-
-  main_channel_link: add main channel client
-  main_channel_client_handle_pong: net test: latency 6.942000 ms, bitrate 8=
-497925311 bps (8104.253112 Mbps)
-  inputs_connect: inputs channel client create
-  red_qxl_set_cursor_peer:
-  gl_version 31 - compat profile
-  qemu-system-x86_64: ui/egl-headless.c:128: egl_scanout_flush: Assertion `=
-surface_width(edpy->ds) =3D=3D edpy->guest_fb.width' failed.
-  Aborted (core dumped)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805697/+subscriptions
+Pk9uIEZyaSwgMzAgTm92IDIwMTggYXQgMTY6MTQsIEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRo
+YXQuY29tPiB3cm90ZToKPj4KPj4gT24gRnJpLCBOb3YgMzAsIDIwMTggYXQgMDM6NTc6MTNQTSAr
+MDAwMCwgUGV0ZXIgTWF5ZGVsbCB3cm90ZToKPj4gPiBPbiBGcmksIDMwIE5vdiAyMDE4IGF0IDE1
+OjU2LCBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+IHdyb3RlOgo+PiA+
+ID4gSSBzdXNwZWN0IHRoZSByZWFzb24geW91J3ZlIGRvbmUgdGhpcyBpcyB0aGF0IHlvdSdyZQo+
+PiA+ID4gdHJ5aW5nIHRvIGdldCAiLWRldmljZSBwdnBhbmljIiB0byB3b3JrIG9uIHRoZSBjb21t
+YW5kCj4+ID4gPiBsaW5lLiBJIHJlY29tbWVuZCBub3QgdHJ5aW5nIHRvIGdldCB0aGF0IHRvIHdv
+cmsuCj4+ID4gPiBNTUlPIGRldmljZXMgYXJlIG5vdCBwbHVnZ2FibGUgZGV2aWNlcywgYW5kIC1k
+ZXZpY2UKPj4gPiA+IGlzIG5vdCBleHBlY3RlZCB0byB3b3JrIHdpdGggdGhlbS4KPj4gPgo+PiA+
+IElmIHlvdSBkbyB3YW50IGEgcGx1Z2dhYmxlIHB2cGFuaWMgZGV2aWNlIGZvciB0aGUgdmlydAo+
+PiA+IGJvYXJkIHRoZW4geW91IHNob3VsZCBpbXBsZW1lbnQgaXQgYXMgYSBQQ0kgZGV2aWNlLAo+
+PiA+IGluY2lkZW50YWxseS4KPj4gPgo+Pgo+PiBXZSdkIGhhdmUgdG8gYWxsb2NhdGUgaXQgYSBQ
+Q0kgZGV2aWNlIElELCBidXQgSSBndWVzcyB0aGF0J3MgT0sgYXMKPj4gdGhlcmUgYXJlIHBsZW50
+eSBvZiBJRHMgbGVmdCBmb3IgMWIzNi4gSSdtIG5vdCBzdXJlIGl0J3Mgd29ydGggaXQKPj4gdGhv
+dWdoLiBQaGlsIGFza2VkIHRoYXQgdGhpcyBkZXZpY2UgYnkgdXNlciBjcmVhdGFibGUsIGJ1dCBt
+YXliZQo+PiB0aGF0J3Mgbm90IG5lY2Vzc2FyeS4gTWF5YmUgd2UganVzdCBuZWVkIGEgbWFjaC12
+aXJ0IGNvbXBhdCBib29sZWFuCj4+IGFuZCB0aGVuIHRvIGFsd2F5cyBwcm92aWRlIHRoaXMgZGV2
+aWNlIGZvciA0LjAgYW5kIGxhdGVyIG1hY2hpbmVzPwo+Cj5ZZXMsIGlmIGl0J3MganVzdCBhbiBt
+bWlvIGRldmljZSB0aGVuIHdlIHNob3VsZCBlaXRoZXI6Cj4qIGRlZmF1bHQgdG8gcHJvdmlkaW5n
+IGl0LCB3aXRoIHRoZSB1c3VhbCBmbGFnIHRvIHNheSAiZG9uJ3QgY3JlYXRlCj5pbiBvbGRlciB2
+aXJ0IGJvYXJkIHZlcnNpb25zIiwgYW5kIGFsc28gYSBtYWNoaW5lIHByb3BlcnR5IHRvCj5kaXNh
+YmxlIGl0IG1hbnVhbGx5IChsaWtlIHdlIGRvIHdpdGggdGhlIElUUykKPiogZGVmYXVsdCB0byBu
+b3QgcHJvdmlkaW5nIGl0IGF0IGFsbCwgYW5kIGhhdmUgYSBtYWNoaW5lCj5wcm9wZXJ0eSB0byBl
+bmFibGUgaXQgKGxpa2Ugd2UgZG8gd2l0aCB0aGUgSU9NTVUpCj5XaGljaCBpcyBhbGwgZG9hYmxl
+LCBidXQgZXZlcnkgdGltZSB3ZSBkbyB0aGF0IGl0IG1ha2VzIHRoZQo+dmlydCBib2FyZCBjb2Rl
+IHRoYXQgZXh0cmEgYml0IG1vcmUgY29tcGxpY2F0ZWQgKHdlIGhhdmUKPmhhbGYgYSBkb3plbiBt
+YWNoaW5lIHByb3BlcnRpZXMgb24gaXQgYWxyZWFkeSkuCj4KPlRoaXMga2luZCBvZiB0aGluZyBp
+cyB3aHkgYSBQQ0kgZGV2aWNlIGlzIGNsZWFuZXIgLS0gaXQganVzdAo+d29ya3Mgb24gYW55IG1h
+Y2hpbmUgd2l0aCBhIFBDSSBjb250cm9sbGVyLCBpdCBieSBkZWZhdWx0IGlzCj5zb21ldGhpbmcg
+dGhhdCB0aGUgdXNlciBjYW4gcHJvdmlkZSBpZiB0aGV5IHdhbnQgdG8gYW5kIG5vdCBpZgo+dGhl
+eSBkb24ndCwgYW5kIGl0J3Mgbm90IGEgY3VzdG9tIFVJIHRoYXQgbWFuYWdlbWVudCBsYXllcnMK
+Pm1pZ2h0IG5lZWQgdG8gc3BlY2lhbC1jYXNlLiBUaGUgZ3Vlc3QgZG9lcyBuZWVkIHRvIGRvIGEg
+Yml0Cj5vZiBQQ0kgcHJvYmluZyBhbmQgc2V0dXAgaW5pdGlhbGx5LCBidXQgdGhlbiBpdCBjYW4g
+anVzdCBsZWF2ZQo+dGhlIE1NSU8gQkFSIHBlcm1hbmVudGx5IG1hcHBlZCBhbmQgd3JpdGUgdG8g
+dGhhdCBhZGRyZXNzCj53aGVuIHRoZSBndWVzdCBwYW5pY3MuCj4KVXN1YWxseSwgaXQgZG9lc24n
+dCBtYXR0ZXIgaWYgdGhlcmUgaXMgdGhpcyBwdnBhbmljIGRldmljZSBvciBub3QsIHNvIEkgCmhh
+dmVuJ3QgY29uc2lkZXJlZCBjb25maWd1cmFiaWxpdHkgZnJvbSB0aGUgYmVnaW5uaW5nLgogSSBk
+aWRuJ3QgZXhwZWN0IHlvdSB0byBzdHJvbmdseSByZWNvbW1lbmQgdGhlIHVzZSBvZiBQQ0kgZGV2
+aWNlcy4gCkRvaW5nIHNvIGlzIG5vdCBqdXN0IGdvaW5nIHRvIHJvbGwgYmFjayBzb21lIG9mIHRo
+ZSBjb2RlIGluIHRoZSBrZXJuZWwuLi4gCkknbGwgdGhpbmsgYWJvdXQgeW91ciBzdWdnZXN0aW9u
+cy4KdGhhbmtzLgo+dGhhbmtzCi0tIFBNTQ==
