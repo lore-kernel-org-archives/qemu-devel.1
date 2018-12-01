@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gT5y2-0008P0-OZ
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 09:09:59 -0500
+	(envelope-from <rjones@redhat.com>) id 1gT6ku-0005RI-1S
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 10:00:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nicholas.a.hudson@gmail.com>) id 1gT5y1-00056r-V8
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 09:09:58 -0500
-References: <fe1367d1-33f7-21fa-be84-20b9795a2157@gmail.com>
-	<CAFEAcA_K6S2pB6cP+RHDZjeACU_ROJ6jkkG-2h7TCyiCkejRug@mail.gmail.com>
-From: Nick Hudson <nicholas.a.hudson@gmail.com>
-Message-ID: <da2ed5e8-d01b-2887-6015-d26e44eae095@gmail.com>
-Date: Sat, 1 Dec 2018 14:09:52 +0000
+	(envelope-from <rjones@redhat.com>) id 1gT6ks-00015q-7F
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 10:00:27 -0500
+Date: Sat, 1 Dec 2018 15:00:15 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20181201150015.GM27120@redhat.com>
+References: <20181130220344.3350618-1-eblake@redhat.com>
+	<20181201074244.GF27120@redhat.com>
+	<6e32f97a-6b4c-2627-ed63-25d4c9f35eb3@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_K6S2pB6cP+RHDZjeACU_ROJ6jkkG-2h7TCyiCkejRug@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2] Support u-boot noload images for arm as
- used by, NetBSD/evbarm GENERIC kernel.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6e32f97a-6b4c-2627-ed63-25d4c9f35eb3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 00/14] nbd: add qemu-nbd --list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, nsoffer@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
+On Sat, Dec 01, 2018 at 07:57:51AM -0600, Eric Blake wrote:
+> On 12/1/18 1:42 AM, Richard W.M. Jones wrote:
+> >On Fri, Nov 30, 2018 at 04:03:29PM -0600, Eric Blake wrote:
+> >>I note that upstream NBD has 'nbd-client -l $host' for querying
+> >>just export names (with no quoting, so you have to know that
+> >>a blank line means the default export), but it wasn't powerful
+> >>enough, so I implemented 'qemu-nbd -L' to document everything.
+> >>Upstream NBD has separate 'nbd-client' and 'nbd-server' binaries,
+> >>while we only have 'qemu-nbd' (which is normally just a server,
+> >>but 'qemu-nbd -c' also operates a second thread as a client).
+> >>Our other uses of qemu as NBD client are for consuming a block
+> >>device (as in qemu-io, qemu-img, or a drive to qemu) - but those
+> >>binaries are less suited to something so specific to the NBD
+> >>protocol.
+> >
+> >I tried it against nbdkit and it works (obviously):
+> >
+> >$ ./qemu-nbd -L
+> >exports available: 1
+> >  export: ''
+> >   size:  67108864
+> >   flags: 0x61 ( trim zeroes )
+> >
+> >What I couldn't work out is how to connect to other hosts.  It's
+> >possible to add -p or -k to change the localhost port number or to use
+> >a Unix domain socket (and I checked both work).  However can we
+> >connect to remote hosts?
+> 
+> Should work by adding '-b host' (if -b is omitted, it defaults to
+> 0.0.0.0).  However, I admit that so far I have only tested '-b
+> localhost' or '-b 127.0.0.1' (per the iotest additions at the end of
+> the series), so it could well be something that I missed in setting
+> up the client socket in nbd_build_socket_address().
 
-On 30/11/2018 17:18, Peter Maydell wrote:
-> On Thu, 29 Nov 2018 at 20:22, Nick Hudson <nicholas.a.hudson@gmail.com> wrote:
->> noload kernels are loaded with the u-boot image header and as a result
->> the header size needs adding to the entry point.  Fake up a hdr so the
->> kernel image is loaded at the right address and the entry point is
->> adjusted appropriately.
->>
->> The bootloader fits in the space that the uboot header would have occupied.
->>
->> Update the load_uimage API to allow passing of load address when an image
->> doesn't specify one.
->>
->> Signed-off-by: Nick Hudson <skrll@netbsd.org>
->> ---
->> diff --git a/include/hw/loader.h b/include/hw/loader.h
->> index 67a0af84ac..10ff0ff76d 100644
->> --- a/include/hw/loader.h
->> +++ b/include/hw/loader.h
->> @@ -163,7 +163,8 @@ int load_aout(const char *filename, hwaddr addr, int max_sz,
->>   /** load_uimage_as:
->>    * @filename: Path of uimage file
->>    * @ep: Populated with program entry point. Ignored if NULL.
->> - * @loadaddr: Populated with the load address. Ignored if NULL.
->> + * @loadaddr: load address if none specified in the image. Populated with the
->> + *            load address. Ignored if NULL.
-> This API change will break some existing users. For instance
-> hw/microblaze/boot.c does this:
->              hwaddr uentry, loadaddr;
->
->              kernel_size = load_uimage(kernel_filename, &uentry, &loadaddr, 0,
->                                        NULL, NULL);
+Must have missed that option.  It does work, thanks.
 
-I did a bit more digging and the same (ab)use of loadaddr to pass
+Rich.
 
-a value is used by load_ramdisk{,_as}.  Hopefully, I can do the same
-
-for kernel_noload?
-
-
-
-> which is a legitimate use of the current API, but your changes will
-> mean that load_uboot_image() will be using an uninitialized
-> variable. Getting every call site that cares about the returned
-> result from loadaddr to also provide a valid default load
-> address as input is going to be really painful, so I think we
-> need to figure out an API for this function that doesn't
-> make the input (default load address) argument the same
-> parameter as the output (where we actually loaded the image)
-> argument.
-
-I have version 3 ready with fixing these callers.
-
-
->
-> We should also make the load_uboot_image() function print an
-> error message if we don't load the file because it needs a
-> default load address and the caller didn't pass one
-> ("this image format cannot be loaded on this machine type",
-> or similar).
-Fixed in version 3.
->
-> PS: our coding style wants {} on all if()s -- scripts/checkpatch.pl
-> can help catch this kind of nit.
-
-There are lots of errors from this without my changes :(
-
-
-> thanks
-> -- PMM
-
-
-Thanks,
-
-Nick
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-builder quickly builds VMs from scratch
+http://libguestfs.org/virt-builder.1.html
