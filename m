@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gTEMC-0003h2-Gk
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 18:07:29 -0500
+	(envelope-from <philmd@redhat.com>) id 1gTEWW-00009a-Ac
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 18:18:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gTEM9-0002Gk-FH
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 18:07:28 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35317)
+	(envelope-from <philmd@redhat.com>) id 1gTEWS-0000lh-Ie
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 18:18:08 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:36703)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gTEM9-0002Do-7v
-	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 18:07:25 -0500
-Received: by mail-wr1-f65.google.com with SMTP id 96so8632247wrb.2
-	for <qemu-devel@nongnu.org>; Sat, 01 Dec 2018 15:07:23 -0800 (PST)
-References: <20181128195802.B6A6C7456B9@zero.eik.bme.hu>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gTEWS-0000lQ-Cm
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 18:18:04 -0500
+Received: by mail-wr1-f65.google.com with SMTP id u3so8616749wrs.3
+	for <qemu-devel@nongnu.org>; Sat, 01 Dec 2018 15:18:04 -0800 (PST)
+References: <20181121153036.2941-1-famz@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <62a45983-1ea6-c3d5-37e5-12b43cf34d39@redhat.com>
-Date: Sun, 2 Dec 2018 00:07:18 +0100
+Message-ID: <bdb6e6b7-0da0-d2aa-893f-a14e16230e4d@redhat.com>
+Date: Sun, 2 Dec 2018 00:17:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181128195802.B6A6C7456B9@zero.eik.bme.hu>
+In-Reply-To: <20181121153036.2941-1-famz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] i2c: Move typedef of bitbang_i2c_interface
- to i2c.h
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Update email address for Fam
+ Zheng
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +30,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Corey Minyard <minyard@acm.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: fam@euphon.net, QEMU Trivial <qemu-trivial@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, jsnow@redhat.com, stefanha@redhat.com, alex.bennee@linaro.org
 
-Cc'ing Corey, the new I2C maintainer (since 4.0).
+Cc'ing Trivial@ & Peter.
 
-On 28/11/18 20:27, BALATON Zoltan wrote:
-> Clang 3.4 considers duplicate typedef in ppc4xx_i2c.h and
-> bitbang_i2c.h an error even if they are identical. Move it to a common
-> place to allow building with this clang version.
+I seems this email is now over, thus it would be nice to have this patch
+merged in 4.1 early opening.
+(Does it apply as a fix before the 4.0 release?)
+
+On 21/11/18 16:30, Fam Zheng wrote:
+> Since I am about to change company, update the email address in
+> MAINTAINERS to my personal one. Depending on responsibility changes I
+> may eventually fade out in some of the maintained areas, but that will
+> be figured out afterward, or maybe I'll use the work email later. For
+> now, just do a search and replace.
 > 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Signed-off-by: Fam Zheng <fam@euphon.net>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  hw/i2c/bitbang_i2c.h        | 2 --
->  include/hw/i2c/i2c.h        | 2 ++
->  include/hw/i2c/ppc4xx_i2c.h | 3 ---
->  3 files changed, 2 insertions(+), 5 deletions(-)
+>  MAINTAINERS | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
 > 
-> diff --git a/hw/i2c/bitbang_i2c.h b/hw/i2c/bitbang_i2c.h
-> index 3a7126d5de..9443021710 100644
-> --- a/hw/i2c/bitbang_i2c.h
-> +++ b/hw/i2c/bitbang_i2c.h
-> @@ -3,8 +3,6 @@
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 1032406c56..906d40d06d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1252,7 +1252,7 @@ T: git https://github.com/jasowang/qemu.git net
 >  
->  #include "hw/i2c/i2c.h"
+>  SCSI
+>  M: Paolo Bonzini <pbonzini@redhat.com>
+> -R: Fam Zheng <famz@redhat.com>
+> +R: Fam Zheng <fam@euphon.net>
+>  S: Supported
+>  F: include/hw/scsi/*
+>  F: hw/scsi/*
+> @@ -1565,7 +1565,7 @@ T: git https://repo.or.cz/qemu/kevin.git block
 >  
-> -typedef struct bitbang_i2c_interface bitbang_i2c_interface;
-> -
->  #define BITBANG_I2C_SDA 0
->  #define BITBANG_I2C_SCL 1
+>  Block I/O path
+>  M: Stefan Hajnoczi <stefanha@redhat.com>
+> -M: Fam Zheng <famz@redhat.com>
+> +M: Fam Zheng <fam@euphon.net>
+>  L: qemu-block@nongnu.org
+>  S: Supported
+>  F: util/async.c
+> @@ -1579,7 +1579,7 @@ T: git https://github.com/stefanha/qemu.git block
 >  
-> diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-> index 5dc166158b..cf4c45a98f 100644
-> --- a/include/hw/i2c/i2c.h
-> +++ b/include/hw/i2c/i2c.h
-> @@ -82,6 +82,8 @@ int i2c_recv(I2CBus *bus);
+>  Block SCSI subsystem
+>  M: Paolo Bonzini <pbonzini@redhat.com>
+> -R: Fam Zheng <famz@redhat.com>
+> +R: Fam Zheng <fam@euphon.net>
+>  L: qemu-block@nongnu.org
+>  S: Supported
+>  F: include/scsi/*
+> @@ -1611,7 +1611,7 @@ F: qapi/transaction.json
+>  T: git https://repo.or.cz/qemu/armbru.git block-next
 >  
->  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr);
+>  Dirty Bitmaps
+> -M: Fam Zheng <famz@redhat.com>
+> +M: Fam Zheng <fam@euphon.net>
+>  M: John Snow <jsnow@redhat.com>
+>  L: qemu-block@nongnu.org
+>  S: Supported
+> @@ -1985,7 +1985,7 @@ F: tests/test-throttle.c
+>  L: qemu-block@nongnu.org
 >  
-> +typedef struct bitbang_i2c_interface bitbang_i2c_interface;
-> +
->  /* lm832x.c */
->  void lm832x_key_event(DeviceState *dev, int key, int state);
+>  UUID
+> -M: Fam Zheng <famz@redhat.com>
+> +M: Fam Zheng <fam@euphon.net>
+>  S: Supported
+>  F: util/uuid.c
+>  F: include/qemu/uuid.h
+> @@ -2116,7 +2116,7 @@ F: disas/tci.c
+>  Block drivers
+>  -------------
+>  VMDK
+> -M: Fam Zheng <famz@redhat.com>
+> +M: Fam Zheng <fam@euphon.net>
+>  L: qemu-block@nongnu.org
+>  S: Supported
+>  F: block/vmdk.c
+> @@ -2202,13 +2202,13 @@ F: block/gluster.c
+>  T: git https://github.com/codyprime/qemu-kvm-jtc.git block
 >  
-> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
-> index 0891a9c948..b3450bacf7 100644
-> --- a/include/hw/i2c/ppc4xx_i2c.h
-> +++ b/include/hw/i2c/ppc4xx_i2c.h
-> @@ -31,9 +31,6 @@
->  #include "hw/sysbus.h"
->  #include "hw/i2c/i2c.h"
+>  Null Block Driver
+> -M: Fam Zheng <famz@redhat.com>
+> +M: Fam Zheng <fam@euphon.net>
+>  L: qemu-block@nongnu.org
+>  S: Supported
+>  F: block/null.c
 >  
-> -/* from hw/i2c/bitbang_i2c.h */
-> -typedef struct bitbang_i2c_interface bitbang_i2c_interface;
-> -
->  #define TYPE_PPC4xx_I2C "ppc4xx-i2c"
->  #define PPC4xx_I2C(obj) OBJECT_CHECK(PPC4xxI2CState, (obj), TYPE_PPC4xx_I2C)
->  
+>  NVMe Block Driver
+> -M: Fam Zheng <famz@redhat.com>
+> +M: Fam Zheng <fam@euphon.net>
+>  L: qemu-block@nongnu.org
+>  S: Supported
+>  F: block/nvme*
+> @@ -2339,7 +2339,7 @@ Build and test automation
+>  -------------------------
+>  Build and test automation
+>  M: Alex Bennée <alex.bennee@linaro.org>
+> -M: Fam Zheng <famz@redhat.com>
+> +M: Fam Zheng <fam@euphon.net>
+>  R: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>  L: qemu-devel@nongnu.org
+>  S: Maintained
 > 
