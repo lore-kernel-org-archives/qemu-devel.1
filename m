@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gSsw3-0002Rl-5D
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 19:15:05 -0500
+	(envelope-from <bounces@canonical.com>) id 1gSync-0007KH-BI
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 01:30:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gSsw0-0006qX-0Y
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 19:15:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gSsvz-0006q4-Qf
-	for qemu-devel@nongnu.org; Fri, 30 Nov 2018 19:14:59 -0500
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Fri, 30 Nov 2018 17:14:53 -0700
-Message-ID: <154362329376.7153.3811206168329569401.stgit@gimli.home>
-In-Reply-To: <154362272919.7153.15101701755308287523.stgit@gimli.home>
-References: <154362272919.7153.15101701755308287523.stgit@gimli.home>
+	(envelope-from <bounces@canonical.com>) id 1gSynZ-0007R1-3w
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 01:30:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59160)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gSynY-0007Nb-UJ
+	for qemu-devel@nongnu.org; Sat, 01 Dec 2018 01:30:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gSynX-0004bW-IO
+	for <qemu-devel@nongnu.org>; Sat, 01 Dec 2018 06:30:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 503182E80CB
+	for <qemu-devel@nongnu.org>; Sat,  1 Dec 2018 06:30:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-3.2 PATCH 9/9] pcie: Fast PCIe root ports for new
- machines
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 01 Dec 2018 06:23:35 -0000
+From: Anton Sharpaev <1805697@bugs.launchpad.net>
+Reply-To: Bug 1805697 <1805697@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154343711336.10463.14315631936822945059.malonedeb@chaenomeles.canonical.com>
+	<154349742000.10234.7500488610340706268.malone@chaenomeles.canonical.com>
+Message-Id: <438634619.20181201092335@sharpaev.ru>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1805697] Re: egl-headless crashes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +38,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-Change the default speed and width for new machine types to the
-fastest and widest currently supported.  This should be compatible to
-the PCIe 4.0 spec.  Pre-QEMU-3.2 machine types remain at 2.5GT/s, x1
-width.
+Hi, Gerd.
 
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/pci-bridge/gen_pcie_root_port.c |    4 ++--
- include/hw/compat.h                |   10 +++++++++-
- 2 files changed, 11 insertions(+), 3 deletions(-)
+   Thank you very match! It's work for me.
 
-diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-index e3bba2ab68ef..8e70c32a49ee 100644
---- a/hw/pci-bridge/gen_pcie_root_port.c
-+++ b/hw/pci-bridge/gen_pcie_root_port.c
-@@ -124,8 +124,8 @@ static Property gen_rp_props[] = {
-                      res_reserve.mem_pref_32, -1),
-     DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
-                      res_reserve.mem_pref_64, -1),
--    DEFINE_PROP_PCIE_LINK_SPEED("speed", PCIESlot, speed, PCIE_LINK_SPEED_2_5),
--    DEFINE_PROP_PCIE_LINK_WIDTH("width", PCIESlot, width, PCIE_LINK_WIDTH_1),
-+    DEFINE_PROP_PCIE_LINK_SPEED("speed", PCIESlot, speed, PCIE_LINK_SPEED_16),
-+    DEFINE_PROP_PCIE_LINK_WIDTH("width", PCIESlot, width, PCIE_LINK_WIDTH_32),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 70958328fe7a..702cc62277db 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -2,7 +2,15 @@
- #define HW_COMPAT_H
- 
- #define HW_COMPAT_3_1 \
--    /* empty */
-+    {\
-+        .driver   = "pcie-root-port",\
-+        .property = "speed",\
-+        .value    = "2_5",\
-+    },{\
-+        .driver   = "pcie-root-port",\
-+        .property = "width",\
-+        .value    = "1",\
-+    },
- 
- #define HW_COMPAT_3_0 \
-     /* empty */
+   Now,  I need to contact with libvirt developers. Libvirt isn't work
+   with egl-headless. I'm trying last version (4.9.0)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805697
+
+Title:
+  egl-headless crashes
+
+Status in QEMU:
+  New
+
+Bug description:
+  egl-headless crashes when it is trying change the resolution. After
+  XFCE login, for example.
+
+  I tryed it on 2.12, 3.0 and 3.1.0-rc2 versions.
+
+  # qemu-system-x86_64 -enable-kvm -enable-kvm -M q35 -smp 8 -vga virtio
+  -spice port=3D59011,addr=3D0.0.0.0,disable-ticketing -hda image.qcow2 -m
+  4G -display egl-headless -chardev spicevmc,name=3Dvdagent,id=3Dvdagent
+
+  main_channel_link: add main channel client
+  main_channel_client_handle_pong: net test: latency 6.942000 ms, bitrate 8=
+497925311 bps (8104.253112 Mbps)
+  inputs_connect: inputs channel client create
+  red_qxl_set_cursor_peer:
+  gl_version 31 - compat profile
+  qemu-system-x86_64: ui/egl-headless.c:128: egl_scanout_flush: Assertion `=
+surface_width(edpy->ds) =3D=3D edpy->guest_fb.width' failed.
+  Aborted (core dumped)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805697/+subscriptions
