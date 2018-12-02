@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gTTmX-0000iC-MO
-	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 10:35:43 -0500
+	(envelope-from <lapointe.jonathan@gmail.com>) id 1gTQxf-0005jw-DE
+	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 07:35:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gTTmS-0002V5-P5
-	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 10:35:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43810)
+	(envelope-from <lapointe.jonathan@gmail.com>) id 1gTQxc-0008P0-9u
+	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 07:34:59 -0500
+Received: from mail-qk1-x733.google.com ([2607:f8b0:4864:20::733]:41429)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gTTmS-0002Ul-JZ
-	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 10:35:36 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gTTmP-0001Co-Th
-	for <qemu-devel@nongnu.org>; Sun, 02 Dec 2018 15:35:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AA4FD2E80D2
-	for <qemu-devel@nongnu.org>; Sun,  2 Dec 2018 15:35:33 +0000 (UTC)
+	(Exim 4.71) (envelope-from <lapointe.jonathan@gmail.com>)
+	id 1gTQxc-0008Oo-5V
+	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 07:34:56 -0500
+Received: by mail-qk1-x733.google.com with SMTP id 189so5791643qkj.8
+	for <qemu-devel@nongnu.org>; Sun, 02 Dec 2018 04:34:55 -0800 (PST)
+Received: from [192.168.0.100] (modemcable130.52-202-24.mc.videotron.ca.
+	[24.202.52.130])
+	by smtp.gmail.com with ESMTPSA id b6sm5085519qtq.29.2018.12.02.04.34.54
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Sun, 02 Dec 2018 04:34:54 -0800 (PST)
+Date: Sun, 02 Dec 2018 07:34:44 -0500
+From: Jonathan Lapointe <lapointe.jonathan@gmail.com>
+Message-Id: <1543754084.5692.0@smtp.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 02 Dec 2018 15:28:35 -0000
-From: Vincent Hamp <1806243@bugs.launchpad.net>
-Reply-To: Bug 1806243 <1806243@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154375655274.15827.14642274888173069615.malonedeb@gac.canonical.com>
-Message-Id: <154376451594.32238.12105587396998675246.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1806243] Re: ARM conditional branch after if-then
- instruction not working
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Subject: [Qemu-devel] dual monitors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,138 +34,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Oh damn it, you're right. Apparently encoding T3 of the branch
-instruction inside an IT block is always unpredictable... Guess the
-inline assembly version ignores the .w extension and creates some other
-encoding that simply works.
+I would like to use my two monitors with qemu.  I was working before 
+with qemu & virtio, but then the fullscreen mode was not a problem.  
+But since, I have two monitors I cannot be in fullscreen mode otherwise 
+I lost the other monitor, can't use it.  I heard that qxl could fix 
+this. When I start qemu with qxl, I have no cursor visible and I get 
+this message: qxl_cursor: not implemented: type 1.
 
-I've attached the .elf which is causing GDB to halt.
-
-Currently I'm invoking QEMU GNU MCU (some fork with small CortexM extension=
-s) with
-qemu-system-gnuarmeclipse -S -s -verbose -semihosting-config enable=3Don,ta=
-rget=3Dnative -mcu STM32F407VG --image arm_unpredictable_branch.elf
-
-QEMU GNU MCU is currently at version 2.8.0.
-
-But as I mentioned before I've also tried it with 3.0.0 from the ARCH
-repository and both versions did the same thing. I think the only
-difference is the "--image" option which translates to "--kernel" in the
-original.
-
-** Attachment added: "arm_unpredictable_branch.elf"
-   https://bugs.launchpad.net/qemu/+bug/1806243/+attachment/5218154/+files/=
-arm_unpredictable_branch.elf
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1806243
-
-Title:
-  ARM conditional branch after if-then instruction not working
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello
-
-  There seems to be an issue with QEMU when debugging if-then condition
-  blocks from the thumb2 instruction set. The following snippet runs
-  fine during normal execution, but keeps hanging at the conditional
-  branch when debugging. The jump at the branch should only be executed
-  as long as $r0 is lower than $r1. Problem is that once both are equal,
-  the execution is not continued past the branch and the program counter
-  never gets popped.
-
-  2000407a:   push    {lr}
-  2000407c:   movs    r0, r6
-  2000407e:   ldmia   r7!, {r1, r6}
-  20004080:   push    {r0, r1}
-  20004082:   str.w   r6, [r7, #-4]!
-  20004086:   ldr     r6, [sp, #0]
-  20004088:   pop     {r0, r1}
-  2000408a:   adds    r0, #1
-  2000408c:   cmp     r0, r1
-  2000408e:   itt     lt
-  20004090:   pushlt  {r0, r1}
-  20004092:   blt.w   0x20004082      ; unpredictable <IT:lt>  // <-- GDB h=
-angs here
-  20004096:   pop     {pc}
-
-  I have tried to reproduce the problem with inline assembly but for
-  some reason the following example just worked:
-
-  void f() {
-    static uint8_t stack[256]{};
-    stack[255] =3D 4;
-
-    asm volatile("\n\t"
-                 "push    {lr}"
-                 "\n\t"
-
-                 // pre-conditions
-                 "movs    r7, %[stack]"
-                 "\n\t"
-                 "movs    r6, #1"
-                 "\n\t"
-
-                 "movs    r0, r6"
-                 "\n\t"
-                 "ldmia   r7!, {r1, r6}"
-                 "\n\t"
-                 "push    {r0, r1}"
-                 "\n\t"
-                 "1:"
-                 "\n\t"
-                 "str.w   r6, [r7, #-4]!"
-                 "\n\t"
-                 "ldr     r6, [sp, #0]"
-                 "\n\t"
-                 "pop     {r0, r1}"
-                 "\n\t"
-                 "adds    r0, #1"
-                 "\n\t"
-                 "cmp     r0, r1"
-                 "\n\t"
-                 "itt     lt"
-                 "\n\t"
-                 "pushlt  {r0, r1}"
-                 "\n\t"
-
-                 // Original instruction
-                 //"blt.w   0x20004082"  //   ; unpredictable <IT:lt>
-
-                 // Trying to fake it
-                 "blt.w   1b"
-                 "\n\t"
-
-                 "pop     {pc}"
-                 "\n\t"
-                 :
-                 : [stack] "r"(&stack[255]));
-  }
-
-  The only real major difference I see to the other code snipped is that
-  the inline assembly is running from flash memory where as the original
-  code runs in ram? Maybe that's a clue somehow?
-
-  Quickly reading through already reported ARM bugs I think this might be r=
-elated:
-  https://bugs.launchpad.net/qemu/+bug/1364501
-  At least the symptoms sound identical.
-
-  =
-
-  The versions I'm running are:
-  QEMU 3.0.0
-  arm-none-eabi-gdb 8.2
-
-  I've also captured some trace output for single stepping from the
-  pushlt to the blt.w instruction with the trace arguments unimp,
-  guest_errors, op, int, exec.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1806243/+subscriptions
+My goal, would be to be able do fullscreen while with other monitor i 
+could open a new session of qemu, or browse the web.
