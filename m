@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gTT9o-0007wI-O1
-	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 09:55:41 -0500
+	(envelope-from <bounces@canonical.com>) id 1gTTmX-0000iC-MO
+	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 10:35:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gTT9i-0006PM-Gy
-	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 09:55:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40600)
+	(envelope-from <bounces@canonical.com>) id 1gTTmS-0002V5-P5
+	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 10:35:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43810)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gTT9i-0006P0-Aj
-	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 09:55:34 -0500
+	id 1gTTmS-0002Ul-JZ
+	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 10:35:36 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gTT9h-00076W-2j
-	for <qemu-devel@nongnu.org>; Sun, 02 Dec 2018 14:55:33 +0000
+	id 1gTTmP-0001Co-Th
+	for <qemu-devel@nongnu.org>; Sun, 02 Dec 2018 15:35:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 11C642E80C7
-	for <qemu-devel@nongnu.org>; Sun,  2 Dec 2018 14:55:33 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id AA4FD2E80D2
+	for <qemu-devel@nongnu.org>; Sun,  2 Dec 2018 15:35:33 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 02 Dec 2018 14:50:15 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 02 Dec 2018 15:28:35 -0000
+From: Vincent Hamp <1806243@bugs.launchpad.net>
 Reply-To: Bug 1806243 <1806243@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154375655274.15827.14642274888173069615.malonedeb@gac.canonical.com>
-Message-Id: <154376221570.10384.1481401012973013541.malone@chaenomeles.canonical.com>
+Message-Id: <154376451594.32238.12105587396998675246.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1806243] Re: ARM conditional branch after if-then
  instruction not working
@@ -39,25 +39,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The disassembler is giving you a hint here:
+Oh damn it, you're right. Apparently encoding T3 of the branch
+instruction inside an IT block is always unpredictable... Guess the
+inline assembly version ignores the .w extension and creates some other
+encoding that simply works.
 
-2000408e: itt lt
-20004090: pushlt {r0, r1}
-20004092: blt.w 0x20004082 ; unpredictable <IT:lt> // <-- GDB hangs here
+I've attached the .elf which is causing GDB to halt.
 
-Your code has a "blt" instruction inside an IT block in a way that is
-archictecturally UNPREDICTABLE, and the CPU is allowed to not behave in
-the way you might expect it to.
+Currently I'm invoking QEMU GNU MCU (some fork with small CortexM extension=
+s) with
+qemu-system-gnuarmeclipse -S -s -verbose -semihosting-config enable=3Don,ta=
+rget=3Dnative -mcu STM32F407VG --image arm_unpredictable_branch.elf
 
-Your attempt to reproduce the problem is likely generating different
-instructions (specifically probably a different encoding of the branch
-instruction).
+QEMU GNU MCU is currently at version 2.8.0.
 
-On the other hand having QEMU behave differently in singlestep mode and
-just hang (rather than, say, making the insn UNDEF or treating it as a
-condition-failed or a condition-passed) is not ideal.
+But as I mentioned before I've also tried it with 3.0.0 from the ARCH
+repository and both versions did the same thing. I think the only
+difference is the "--image" option which translates to "--kernel" in the
+original.
 
-Do you have a sample binary and QEMU command line that reproduces this?
+** Attachment added: "arm_unpredictable_branch.elf"
+   https://bugs.launchpad.net/qemu/+bug/1806243/+attachment/5218154/+files/=
+arm_unpredictable_branch.elf
 
 -- =
 
