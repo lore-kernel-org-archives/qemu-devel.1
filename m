@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqF0-0000fh-JY
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:39 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqF7-0000rq-1j
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEz-00055y-Rk
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45510)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqF2-00058h-57
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49972)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEz-00054A-Km
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:33 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqF1-00057v-TP
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:36 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:52 +0100
-Message-Id: <1543851204-41186-40-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:32:54 +0100
+Message-Id: <1543851204-41186-42-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 39/71] tests/qgraph: add generic virtio
- testcases
+Subject: [Qemu-devel] [PATCH 41/71] qos-test: virtio-console and
+ virtio-serial test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +27,177 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>
 
+From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+
+Convert tests/virtio-console-test and tests/virtio-serial-test
+in qgraph test node. This test consumes a virtio-serial interface
+and checks that its function return the expected values.
+
+Note that this test does not allocate any virtio-console or
+virtio-serial structure, it's all done by the qtest walking graph mechanism
+
+Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include |  1 +
- tests/virtio-test.c    | 25 +++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
- create mode 100644 tests/virtio-test.c
+ tests/Makefile.include      |  8 ++------
+ tests/libqos/virtio.c       |  1 +
+ tests/virtio-console-test.c | 38 --------------------------------------
+ tests/virtio-serial-test.c  | 27 ++++++++++++---------------
+ 4 files changed, 15 insertions(+), 59 deletions(-)
+ delete mode 100644 tests/virtio-console-test.c
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 4545232..9603022 100644
+index 58f548d..88821a7 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -692,6 +692,7 @@ qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
- qos-test-obj-y += tests/e1000e-test.o
+@@ -143,8 +143,6 @@ check-qtest-generic-y += tests/cdrom-test$(EXESUF)
+ 
+ check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
+ 
+-check-qtest-virtioserial-y += tests/virtio-console-test$(EXESUF)
+-
+ check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
+ check-qtest-virtio-y += tests/virtio-balloon-test$(EXESUF)
+ check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
+@@ -153,8 +151,6 @@ check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
+ ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
+ check-qtest-virtio-y += tests/virtio-9p-test$(EXESUF)
+ endif
+-check-qtest-virtio-y += tests/virtio-serial-test$(EXESUF)
+-check-qtest-virtio-y += $(check-qtest-virtioserial-y)
+ 
+ check-qtest-pci-y += tests/e1000-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_RTL8139_PCI) += tests/rtl8139-test$(EXESUF)
+@@ -293,6 +289,7 @@ check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
+ check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
+ check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
+ check-qtest-s390x-y += tests/virtio-ccw-test$(EXESUF)
++check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
+ check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
+ check-qtest-s390x-y += tests/migration-test$(EXESUF)
+ 
+@@ -694,6 +691,7 @@ qos-test-obj-y += tests/e1000e-test.o
  qos-test-obj-y += tests/pci-test.o
  qos-test-obj-y += tests/sdhci-test.o
-+qos-test-obj-y += tests/virtio-test.o
+ qos-test-obj-y += tests/virtio-test.o
++qos-test-obj-y += tests/virtio-serial-test.o
  
  check-unit-y += tests/test-qgraph$(EXESUF)
  tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
-diff --git a/tests/virtio-test.c b/tests/virtio-test.c
-new file mode 100644
-index 0000000..804e537
---- /dev/null
-+++ b/tests/virtio-test.c
-@@ -0,0 +1,25 @@
-+/*
-+ * QTest testcase for virtio
-+ *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "libqos/qgraph.h"
-+#include "libqos/pci.h"
-+
-+/* Tests only initialization so far. TODO: Replace with functional tests */
-+static void nop(void *obj, void *data, QGuestAllocator *alloc)
-+{
-+}
-+
-+static void register_virtio_test(void)
-+{
-+    qos_add_test("nop", "virtio", nop, NULL);
-+}
-+
-+libqos_init(register_virtio_test);
+@@ -745,8 +743,6 @@ tests/virtio-net-test$(EXESUF): tests/virtio-net-test.o $(libqos-pc-obj-y) $(lib
+ tests/virtio-rng-test$(EXESUF): tests/virtio-rng-test.o $(libqos-pc-obj-y)
+ tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
+ tests/virtio-9p-test$(EXESUF): tests/virtio-9p-test.o $(libqos-virtio-obj-y)
+-tests/virtio-serial-test$(EXESUF): tests/virtio-serial-test.o $(libqos-virtio-obj-y)
+-tests/virtio-console-test$(EXESUF): tests/virtio-console-test.o $(libqos-virtio-obj-y)
+ tests/tpci200-test$(EXESUF): tests/tpci200-test.o
+ tests/display-vga-test$(EXESUF): tests/display-vga-test.o
+ tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
+diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
+index 5a62950..9fc8c7e 100644
+--- a/tests/libqos/virtio.c
++++ b/tests/libqos/virtio.c
+@@ -352,6 +352,7 @@ void qvirtqueue_set_used_event(QVirtQueue *vq, uint16_t idx)
+ /*
+  * qvirtio_get_dev_type:
+  * Returns: the preferred virtio bus/device type for the current architecture.
++ * TODO: delete this
+  */
+ const char *qvirtio_get_dev_type(void)
+ {
+diff --git a/tests/virtio-console-test.c b/tests/virtio-console-test.c
+deleted file mode 100644
+index a7c6f16..0000000
+--- a/tests/virtio-console-test.c
++++ /dev/null
+@@ -1,38 +0,0 @@
+-/*
+- * QTest testcase for VirtIO Console
+- *
+- * Copyright (c) 2014 SUSE LINUX Products GmbH
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2 or later.
+- * See the COPYING file in the top-level directory.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "libqtest.h"
+-#include "libqos/virtio.h"
+-
+-/* Tests only initialization so far. TODO: Replace with functional tests */
+-static void console_nop(void)
+-{
+-    global_qtest = qtest_initf("-device virtio-serial-%s,id=vser0 "
+-                               "-device virtconsole,bus=vser0.0",
+-                               qvirtio_get_dev_type());
+-    qtest_end();
+-}
+-
+-static void serialport_nop(void)
+-{
+-    global_qtest = qtest_initf("-device virtio-serial-%s,id=vser0 "
+-                               "-device virtserialport,bus=vser0.0",
+-                               qvirtio_get_dev_type());
+-    qtest_end();
+-}
+-
+-int main(int argc, char **argv)
+-{
+-    g_test_init(&argc, &argv, NULL);
+-    qtest_add_func("/virtio/console/nop", console_nop);
+-    qtest_add_func("/virtio/serialport/nop", serialport_nop);
+-
+-    return g_test_run();
+-}
+diff --git a/tests/virtio-serial-test.c b/tests/virtio-serial-test.c
+index 8da9980..85f35e0 100644
+--- a/tests/virtio-serial-test.c
++++ b/tests/virtio-serial-test.c
+@@ -9,33 +9,30 @@
+ 
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
+-#include "libqos/virtio.h"
++#include "libqos/virtio-serial.h"
+ 
+ /* Tests only initialization so far. TODO: Replace with functional tests */
+-static void virtio_serial_nop(void)
++static void virtio_serial_nop(void *obj, void *data, QGuestAllocator *alloc)
+ {
++    /* no operation */
+ }
+ 
+-static void hotplug(void)
++static void serial_hotplug(void *obj, void *data, QGuestAllocator *alloc)
+ {
+     qtest_qmp_device_add("virtserialport", "hp-port", "{}");
+-
+     qtest_qmp_device_del("hp-port");
+ }
+ 
+-int main(int argc, char **argv)
++static void register_virtio_serial_test(void)
+ {
+-    int ret;
+-
+-    g_test_init(&argc, &argv, NULL);
+-    qtest_add_func("/virtio/serial/nop", virtio_serial_nop);
+-    qtest_add_func("/virtio/serial/hotplug", hotplug);
++    QOSGraphTestOptions opts = { };
+ 
+-    global_qtest = qtest_initf("-device virtio-serial-%s",
+-                               qvirtio_get_dev_type());
+-    ret = g_test_run();
++    opts.edge.before_cmd_line = "-device virtconsole,bus=vser0.0";
++    qos_add_test("console-nop", "virtio-serial", virtio_serial_nop, &opts);
+ 
+-    qtest_end();
++    opts.edge.before_cmd_line = "-device virtserialport,bus=vser0.0";
++    qos_add_test("serialport-nop", "virtio-serial", virtio_serial_nop, &opts);
+ 
+-    return ret;
++    qos_add_test("hotplug", "virtio-serial", serial_hotplug, NULL);
+ }
++libqos_init(register_virtio_serial_test);
 -- 
 1.8.3.1
