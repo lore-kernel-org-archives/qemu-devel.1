@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gTm1h-00046d-Dx
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 06:04:34 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gTm1h-00046y-JR
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 06:04:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gTm1g-0002eY-EK
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gTm1g-0002eh-Gj
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 06:04:33 -0500
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Tue, 4 Dec 2018 03:26:46 +0800
-Message-Id: <1543865209-50994-6-git-send-email-peng.hao2@zte.com.cn>
+Date: Tue, 4 Dec 2018 03:26:47 +0800
+Message-Id: <1543865209-50994-7-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1543865209-50994-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1543865209-50994-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V11 5/8] hw/arm/virt: add pvpanic device in
- virt acpi table
+Subject: [Qemu-devel] [PATCH V11 6/8] hw/arm/virt: add configure interface
+ for pvpanic-mmio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +23,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-Add pvpanic device in virt acpi table, so when kernel command line
-uses acpi=force, kernel can get info from acpi table.
+Add configure interface for pvpanic-mmio device in virt machine.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- hw/arm/virt-acpi-build.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ hw/arm/virt.c         | 23 +++++++++++++++++++++++
+ include/hw/arm/virt.h |  1 +
+ 2 files changed, 24 insertions(+)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 5785fb6..4215ca6 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -84,6 +84,20 @@ static void acpi_dsdt_add_uart(Aml *scope, const MemMapEntry *uart_memmap,
-     aml_append(scope, dev);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index a4541fa..fdd3f20 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1655,6 +1655,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
+     vms->its = value;
  }
  
-+static void acpi_dsdt_add_pvpanic(Aml *scope, const MemMapEntry *pvpanic_memmap)
++static bool virt_get_pvpanic(Object *obj, Error **errp)
 +{
-+    Aml *dev = aml_device("PEVT");
-+    aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0001")));
-+    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
++    VirtMachineState *vms = VIRT_MACHINE(obj);
 +
-+    Aml *crs = aml_resource_template();
-+    aml_append(crs, aml_memory32_fixed(pvpanic_memmap->base,
-+               pvpanic_memmap->size, AML_READ_WRITE));
-+
-+    aml_append(dev, aml_name_decl("_CRS", crs));
-+    aml_append(scope, dev);
++    return vms->pvpanic;
 +}
 +
- static void acpi_dsdt_add_fw_cfg(Aml *scope, const MemMapEntry *fw_cfg_memmap)
++static void virt_set_pvpanic(Object *obj, bool value, Error **errp)
++{
++    VirtMachineState *vms = VIRT_MACHINE(obj);
++
++    vms->pvpanic = value;
++}
++
+ static char *virt_get_gic_version(Object *obj, Error **errp)
  {
-     Aml *dev = aml_device("FWCF");
-@@ -771,6 +785,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
-                        (irqmap[VIRT_UART] + ARM_SPI_BASE));
-     acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
-+    acpi_dsdt_add_pvpanic(scope, &memmap[VIRT_PVPANIC]);
-     acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
-     acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
-                     (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+@@ -1884,6 +1898,15 @@ static void virt_3_1_instance_init(Object *obj)
+                                     "Valid values are none and smmuv3",
+                                     NULL);
+ 
++    /* Default disallows pvpanic-mmio instantiation */
++    vms->pvpanic = false;
++    object_property_add_bool(obj, "pvpanic", virt_get_pvpanic,
++                             virt_set_pvpanic, NULL);
++    object_property_set_description(obj, "pvpanic",
++                                    "Set on/off to enable/disable "
++                                    "PVPANIC MMIO device",
++                                    NULL);
++
+     vms->memmap = a15memmap;
+     vms->irqmap = a15irqmap;
+ }
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 937c124..7d6d1c0 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -113,6 +113,7 @@ typedef struct {
+     bool highmem;
+     bool highmem_ecam;
+     bool its;
++    bool pvpanic;
+     bool virt;
+     int32_t gic_version;
+     VirtIOMMUType iommu;
 -- 
 1.8.3.1
