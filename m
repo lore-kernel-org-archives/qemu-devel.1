@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqGN-0002Om-UH
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:36:01 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqGN-0002Oq-Uf
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:36:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqGM-0006dD-Re
+	(envelope-from <pbonzini@redhat.com>) id 1gTqGJ-0006a7-Hm
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54562)
+Received: from mx1.redhat.com ([209.132.183.28]:46752)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqGM-0006cb-KU
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:58 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqGJ-0006ZK-AG
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:55 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:33:18 +0100
-Message-Id: <1543851204-41186-66-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:33:17 +0100
+Message-Id: <1543851204-41186-65-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 65/71] qos-test: spapr-phb test node
+Subject: [Qemu-devel] [PATCH 64/71] qos-test: pcnet test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +28,107 @@ Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <l
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Convert tests/spapr-phb-test to a qgraph test node,
-spapr-phb-test. This test adds another
-spapr-pci-host-bridge device in the
-ppc64/pseries machine
+Convert tests/pcnet-test to a driver node; currently it runs
+the PCI nop test only, therefore we're not placing it in tests/libqos.
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
  tests/Makefile.include |  3 +--
- tests/spapr-phb-test.c | 32 ++++++++++++++------------------
- 2 files changed, 15 insertions(+), 20 deletions(-)
+ tests/pcnet-test.c     | 46 ++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 37 insertions(+), 12 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 351a729..9f19e31 100644
+index 64eb8b6..351a729 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -217,7 +217,6 @@ check-qtest-ppc-y += tests/boot-serial-test$(EXESUF)
- check-qtest-ppc-y += tests/m48t59-test$(EXESUF)
+@@ -143,7 +143,6 @@ check-qtest-generic-y += tests/cdrom-test$(EXESUF)
  
- check-qtest-ppc64-y += $(check-qtest-ppc-y)
--check-qtest-ppc64-y += tests/spapr-phb-test$(EXESUF)
- check-qtest-ppc64-y += tests/pnv-xscom-test$(EXESUF)
- check-qtest-ppc64-y += tests/migration-test$(EXESUF)
- check-qtest-ppc64-y += tests/rtas-test$(EXESUF)
-@@ -681,6 +680,7 @@ qos-test-obj-y += tests/nvme-test.o
+ check-qtest-pci-y += tests/e1000-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_RTL8139_PCI) += tests/rtl8139-test$(EXESUF)
+-check-qtest-pci-$(CONFIG_PCNET_PCI) += tests/pcnet-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_EEPRO100_PCI) += tests/eepro100-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_ES1370) += tests/es1370-test$(EXESUF)
+ check-qtest-pci-y += tests/display-vga-test$(EXESUF)
+@@ -680,6 +679,7 @@ qos-test-obj-y += tests/ipoctal232-test.o
+ qos-test-obj-y += tests/ne2000-test.o
+ qos-test-obj-y += tests/nvme-test.o
  qos-test-obj-y += tests/pci-test.o
- qos-test-obj-y += tests/pcnet-test.o
++qos-test-obj-y += tests/pcnet-test.o
  qos-test-obj-y += tests/sdhci-test.o
-+qos-test-obj-y += tests/spapr-phb-test.o
  qos-test-obj-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test.o $(chardev-obj-y) $(test-io-obj-y)
  qos-test-obj-y += tests/virtio-test.o
- qos-test-obj-y += tests/virtio-9p-test.o
-@@ -703,7 +703,6 @@ tests/rtc-test$(EXESUF): tests/rtc-test.o
- tests/m48t59-test$(EXESUF): tests/m48t59-test.o
- tests/hexloader-test$(EXESUF): tests/hexloader-test.o
- tests/endianness-test$(EXESUF): tests/endianness-test.o
--tests/spapr-phb-test$(EXESUF): tests/spapr-phb-test.o $(libqos-obj-y)
- tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
- tests/rtas-test$(EXESUF): tests/rtas-test.o $(libqos-spapr-obj-y)
- tests/fdc-test$(EXESUF): tests/fdc-test.o
-diff --git a/tests/spapr-phb-test.c b/tests/spapr-phb-test.c
-index d3522ea..39b5766 100644
---- a/tests/spapr-phb-test.c
-+++ b/tests/spapr-phb-test.c
-@@ -7,29 +7,25 @@
-  * This work is licensed under the terms of the GNU GPL, version 2 or later.
-  * See the COPYING file in the top-level directory.
-  */
--#include "qemu/osdep.h"
+@@ -726,7 +726,6 @@ tests/q35-test$(EXESUF): tests/q35-test.o $(libqos-pc-obj-y)
+ tests/fw_cfg-test$(EXESUF): tests/fw_cfg-test.o $(libqos-pc-obj-y)
+ tests/e1000-test$(EXESUF): tests/e1000-test.o
+ tests/rtl8139-test$(EXESUF): tests/rtl8139-test.o $(libqos-pc-obj-y)
+-tests/pcnet-test$(EXESUF): tests/pcnet-test.o
+ tests/pnv-xscom-test$(EXESUF): tests/pnv-xscom-test.o
+ tests/eepro100-test$(EXESUF): tests/eepro100-test.o
+ tests/vmxnet3-test$(EXESUF): tests/vmxnet3-test.o
+diff --git a/tests/pcnet-test.c b/tests/pcnet-test.c
+index efb1ef4..484448c 100644
+--- a/tests/pcnet-test.c
++++ b/tests/pcnet-test.c
+@@ -9,23 +9,49 @@
  
-+#include "qemu/osdep.h"
+ #include "qemu/osdep.h"
  #include "libqtest.h"
 +#include "libqos/qgraph.h"
++#include "libqos/pci.h"
  
--#define TYPE_SPAPR_PCI_HOST_BRIDGE "spapr-pci-host-bridge"
--
 -/* Tests only initialization so far. TODO: Replace with functional tests */
--static void test_phb_device(void)
-+/* Tests only initialization so far. TODO: Replace with functional tests,
-+ * for example by producing pci-bus.
-+ */
-+static void test_phb_device(void *obj, void *data, QGuestAllocator *alloc)
+-static void pci_nop(void)
++typedef struct QPCNet QPCNet;
++
++struct QPCNet {
++    QOSGraphObject obj;
++    QPCIDevice dev;
++};
++
++static void *pcnet_get_driver(void *obj, const char *interface)
  {
++    QPCNet *pcnet = obj;
++
++    if (!g_strcmp0(interface, "pci-device")) {
++        return &pcnet->dev;
++    }
++
++    fprintf(stderr, "%s not present in pcnet\n", interface);
++    g_assert_not_reached();
  }
  
 -int main(int argc, char **argv)
-+static void register_phb_test(void)
++static void *pcnet_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
  {
 -    int ret;
--
++    QPCNet *pcnet = g_new0(QPCNet, 1);
++    QPCIBus *bus = pci_bus;
+ 
 -    g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/spapr-phb/device", test_phb_device);
--
--    qtest_start("-device " TYPE_SPAPR_PCI_HOST_BRIDGE ",index=30");
--
+-    qtest_add_func("/pcnet/pci/nop", pci_nop);
++    qpci_device_init(&pcnet->dev, bus, addr);
++    pcnet->obj.get_driver = pcnet_get_driver;
+ 
+-    qtest_start("-device pcnet");
 -    ret = g_test_run();
--
++    return &pcnet->obj;
++}
+ 
 -    qtest_end();
--
++static void pcnet_register_nodes(void)
++{
++    QOSGraphEdgeOptions opts = {
++        .extra_device_opts = "addr=04.0",
++    };
++    add_qpci_address(&opts, &(QPCIAddress) { .devfn = QPCI_DEVFN(4, 0) });
+ 
 -    return ret;
-+    qos_add_test("spapr-phb-test", "ppc64/pseries",
-+                 test_phb_device, &(QOSGraphTestOptions) {
-+                     .edge.before_cmd_line = "-device spapr-pci-host-bridge"
-+                                             ",index=30",
-+                 });
++    qos_node_create_driver("pcnet", pcnet_create);
++    qos_node_consumes("pcnet", "pci-bus", &opts);
++    qos_node_produces("pcnet", "pci-device");
  }
 +
-+libqos_init(register_phb_test);
++libqos_init(pcnet_register_nodes);
 -- 
 1.8.3.1
