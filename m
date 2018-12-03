@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFr-0002IT-Vi
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:15:09 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFm-0004uI-5j
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFq-0002H5-10
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:15:07 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFl-0004tr-Nr
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:15:05 -0500
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 3 Dec 2018 10:14:53 +0000
-Message-ID: <20181203101429.88735-2-anton.nefedov@virtuozzo.com>
+Date: Mon, 3 Dec 2018 10:14:56 +0000
+Message-ID: <20181203101429.88735-5-anton.nefedov@virtuozzo.com>
 References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
 In-Reply-To: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v10 1/9] mirror: inherit supported write/zero
- flags
+Subject: [Qemu-devel] [PATCH v10 4/9] block: introduce BDRV_REQ_ALLOCATE flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +26,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
----
- block/mirror.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+The flag is supposed to indicate that the region of the disk image has
+to be sufficiently allocated so it reads as zeroes.
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 56d9ef7474..56908c9b19 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1528,8 +1528,12 @@ static void mirror_start_job(const char *job_id, Blo=
-ckDriverState *bs,
-         mirror_top_bs->implicit =3D true;
-     }
-     mirror_top_bs->total_sectors =3D bs->total_sectors;
--    mirror_top_bs->supported_write_flags =3D BDRV_REQ_WRITE_UNCHANGED;
--    mirror_top_bs->supported_zero_flags =3D BDRV_REQ_WRITE_UNCHANGED;
-+    mirror_top_bs->supported_write_flags =3D BDRV_REQ_WRITE_UNCHANGED |
-+        (BDRV_REQ_FUA & bs->supported_write_flags);
-+    mirror_top_bs->supported_zero_flags =3D BDRV_REQ_WRITE_UNCHANGED |
-+        ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP)
-+         & bs->supported_zero_flags);
+The call with the flag set must return -ENOTSUP if allocation cannot
+be done efficiently.
+This has to be made sure of by both
+  - the drivers that support the flag
+  - and the common block layer (so it will not fall back to any slowpath
+    (like writing zero buffers) in case the driver does not support
+    the flag).
+
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+---
+ include/block/block.h     |  9 ++++++++-
+ include/block/block_int.h |  2 +-
+ block/io.c                | 18 ++++++++++++++++--
+ 3 files changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/include/block/block.h b/include/block/block.h
+index 7f5453b45b..f571082415 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -83,8 +83,15 @@ typedef enum {
+      */
+     BDRV_REQ_SERIALISING        =3D 0x80,
+=20
++    /* The BDRV_REQ_ALLOCATE flag is used to indicate that the driver has =
+to
++     * efficiently allocate the space so it reads as zeroes, or return an =
+error.
++     * If this flag is set then BDRV_REQ_ZERO_WRITE must also be set.
++     * This flag cannot be set together with BDRV_REQ_MAY_UNMAP.
++     */
++    BDRV_REQ_ALLOCATE           =3D 0x100,
 +
-     bs_opaque =3D g_new0(MirrorBDSOpaque, 1);
-     mirror_top_bs->opaque =3D bs_opaque;
-     bdrv_set_aio_context(mirror_top_bs, bdrv_get_aio_context(bs));
+     /* Mask of valid flags */
+-    BDRV_REQ_MASK               =3D 0xff,
++    BDRV_REQ_MASK               =3D 0x1ff,
+ } BdrvRequestFlags;
+=20
+ typedef struct BlockSizes {
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index f605622216..ff84c5d8aa 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -724,7 +724,7 @@ struct BlockDriverState {
+      * their children. */
+     unsigned int supported_write_flags;
+     /* Flags honored during pwrite_zeroes (so far: BDRV_REQ_FUA,
+-     * BDRV_REQ_MAY_UNMAP, BDRV_REQ_WRITE_UNCHANGED) */
++     * BDRV_REQ_MAY_UNMAP, BDRV_REQ_WRITE_UNCHANGED, BDRV_REQ_ALLOCATE) */
+     unsigned int supported_zero_flags;
+=20
+     /* the following member gives a name to every node on the bs graph. */
+diff --git a/block/io.c b/block/io.c
+index bd9d688f8b..d9d7644858 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1534,7 +1534,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Bloc=
+kDriverState *bs,
+             assert(!bs->supported_zero_flags);
+         }
+=20
+-        if (ret =3D=3D -ENOTSUP) {
++        if (ret =3D=3D -ENOTSUP && !(flags & BDRV_REQ_ALLOCATE)) {
+             /* Fall back to bounce buffer if write zeroes is unsupported *=
+/
+             BdrvRequestFlags write_flags =3D flags & ~BDRV_REQ_ZERO_WRITE;
+=20
+@@ -1702,7 +1702,9 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChil=
+d *child,
+         !(flags & BDRV_REQ_ZERO_WRITE) && drv->bdrv_co_pwrite_zeroes &&
+         qemu_iovec_is_zero(qiov)) {
+         flags |=3D BDRV_REQ_ZERO_WRITE;
+-        if (bs->detect_zeroes =3D=3D BLOCKDEV_DETECT_ZEROES_OPTIONS_UNMAP)=
+ {
++        if (bs->detect_zeroes =3D=3D BLOCKDEV_DETECT_ZEROES_OPTIONS_UNMAP =
+&&
++            !(flags & BDRV_REQ_ALLOCATE))
++        {
+             flags |=3D BDRV_REQ_MAY_UNMAP;
+         }
+     }
+@@ -1773,6 +1775,9 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvC=
+hild *child,
+=20
+     assert(flags & BDRV_REQ_ZERO_WRITE);
+     if (head_padding_bytes || tail_padding_bytes) {
++        if (flags & BDRV_REQ_ALLOCATE) {
++            return -ENOTSUP;
++        }
+         buf =3D qemu_blockalign(bs, align);
+         iov =3D (struct iovec) {
+             .iov_base   =3D buf,
+@@ -1858,6 +1863,9 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     bool use_local_qiov =3D false;
+     int ret;
+=20
++    assert(!((flags & BDRV_REQ_ALLOCATE) && (flags & BDRV_REQ_MAY_UNMAP)))=
+;
++    assert(!((flags & BDRV_REQ_ALLOCATE) && !(flags & BDRV_REQ_ZERO_WRITE)=
+));
++
+     trace_bdrv_co_pwritev(child->bs, offset, bytes, flags);
+=20
+     if (!bs->drv) {
+@@ -1980,6 +1988,12 @@ int coroutine_fn bdrv_co_pwrite_zeroes(BdrvChild *ch=
+ild, int64_t offset,
+ {
+     trace_bdrv_co_pwrite_zeroes(child->bs, offset, bytes, flags);
+=20
++    if ((flags & BDRV_REQ_ALLOCATE) &&
++        !(child->bs->supported_zero_flags & BDRV_REQ_ALLOCATE))
++    {
++        return -ENOTSUP;
++    }
++
+     if (!(child->bs->open_flags & BDRV_O_UNMAP)) {
+         flags &=3D ~BDRV_REQ_MAY_UNMAP;
+     }
 --=20
 2.17.1
