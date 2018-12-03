@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gTgpd-0003Ws-MT
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 00:31:46 -0500
+	(envelope-from <thuth@redhat.com>) id 1gThOQ-00014o-R5
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 01:07:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gTgpa-0001WZ-Ie
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 00:31:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44946)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gTgpZ-0001Vr-Nr
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 00:31:42 -0500
-Date: Mon, 3 Dec 2018 13:31:18 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181203053118.GD27620@xz-x1>
-References: <1543803511-34793-1-git-send-email-wei.w.wang@intel.com>
-	<1543803511-34793-7-git-send-email-wei.w.wang@intel.com>
+	(envelope-from <thuth@redhat.com>) id 1gThON-00069l-LR
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 01:07:42 -0500
+References: <20181130192216.26987-1-richard.henderson@linaro.org>
+	<20181130192216.26987-2-richard.henderson@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <57ecd585-2e85-6f5a-5276-3d1a84b13e27@redhat.com>
+Date: Mon, 3 Dec 2018 07:07:32 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181130192216.26987-2-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1543803511-34793-7-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v10 6/7] migration/ram.c: add a function to
- disable the bulk stage
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.0 1/2] target/s390x:
+ Move TOD_UNIX_EPOCH to cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
 
-On Mon, Dec 03, 2018 at 10:18:30AM +0800, Wei Wang wrote:
-> This patch adds a function to enable a precopy notifier callback outside
-> the migration subsystem to disable the bulk stage flag. This is needed by
-> the free page optimization offered by virtio-balloon.
+On 2018-11-30 20:22, Richard Henderson wrote:
+> We will need this from CONFIG_USER_ONLY as well,
+> which cannot access include/hw/.
 > 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  include/migration/misc.h | 1 +
->  migration/ram.c          | 9 +++++++++
->  2 files changed, 10 insertions(+)
+>  include/hw/s390x/tod.h | 3 ---
+>  target/s390x/cpu.h     | 3 +++
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/include/migration/misc.h b/include/migration/misc.h
-> index 15f8d00..47e7ff5 100644
-> --- a/include/migration/misc.h
-> +++ b/include/migration/misc.h
-> @@ -37,6 +37,7 @@ void precopy_infrastructure_init(void);
->  void precopy_add_notifier(NotifierWithReturn *n);
->  void precopy_remove_notifier(NotifierWithReturn *n);
->  int precopy_notify(PrecopyNotifyReason reason, Error **errp);
-> +void precopy_disable_bulk_stage(void);
+> diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
+> index 413c0d7c02..6ec4fb426c 100644
+> --- a/include/hw/s390x/tod.h
+> +++ b/include/hw/s390x/tod.h
+> @@ -44,9 +44,6 @@ typedef struct S390TODClass {
+>      void (*set)(S390TODState *td, const S390TOD *tod, Error **errp);
+>  } S390TODClass;
 >  
->  void ram_mig_init(void);
->  void qemu_guest_free_page_hint(void *addr, size_t len);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index b90a3f2..739dc97 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -354,6 +354,15 @@ int precopy_notify(PrecopyNotifyReason reason, Error **errp)
->      return notifier_with_return_list_notify(&precopy_notifier_list, &pnd);
->  }
+> -/* The value of the TOD clock for 1.1.1970. */
+> -#define TOD_UNIX_EPOCH 0x7d91048bca000000ULL
+> -
+>  /* Converts ns to s390's clock format */
+>  static inline uint64_t time2tod(uint64_t ns)
+>  {
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 8c2320e882..d8049d181a 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -797,4 +797,7 @@ void s390_init_sigp(void);
+>  /* outside of target/s390x/ */
+>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
 >  
-> +void precopy_disable_bulk_stage(void)
-> +{
-> +    if (!ram_state) {
-> +        return;
-> +    }
+> +/* The value of the TOD clock for 1.1.1970. */
+> +#define TOD_UNIX_EPOCH 0x7d91048bca000000ULL
 > +
-> +    ram_state->ram_bulk_stage = false;
-> +}
-> +
+>  #endif
+> 
 
-This one is a bit tricky.  E.g., I think it'll at least affect XBZRLE
-and compression somehow.  Since we will have the on-off switch for
-balloon free page hinting so the user can at least decide what
-features to use, with that I don't see much issue with it so far. But
-I'd also like to see how other people see this change.
-
-Regards,
-
--- 
-Peter Xu
+Reviewed-by: Thomas Huth <thuth@redhat.com>
