@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gTuAO-0000mC-Sv
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 14:46:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gTuCf-0001eN-FT
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 14:48:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gTuAL-0001ug-LA
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 14:46:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48650)
+	(envelope-from <peter.maydell@linaro.org>) id 1gTuCd-0004TZ-DL
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 14:48:25 -0500
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:45006)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gTuAL-0001tA-E9
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 14:46:01 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gTuAH-0001rf-GV
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 19:45:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D938A2E818C
-	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 19:45:53 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gTuCc-0004SA-CA
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 14:48:23 -0500
+Received: by mail-oi1-x230.google.com with SMTP id m6so12044364oig.11
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 11:48:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Dec 2018 19:32:41 -0000
-From: John Snow <1806114@bugs.launchpad.net>
-Reply-To: Bug 1806114 <1806114@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <154360750589.15722.2632161476309150045.malonedeb@soybean.canonical.com>
-Message-Id: <154386556188.16587.3105980427512715721.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1806114] Re: Reading sectors from floppy with
- BIOS INT 13h is broken
+References: <20181203155936.114526-1-eblake@redhat.com>
+In-Reply-To: <20181203155936.114526-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Dec 2018 19:48:09 +0000
+Message-ID: <CAFEAcA9RNyr7hB1BaRr9Y1Zc_mTmujRm_c7hquFm1pPTPquXTA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] NBD patches for 3.1-rc4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,81 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hello! Thank you for your kindly and detailed report.
+On Mon, 3 Dec 2018 at 16:46, Eric Blake <eblake@redhat.com> wrote:
+>
+> The following changes since commit 4750e1a888ac3d320607f33b676f299005be98e6:
+>
+>   Update version for v3.1.0-rc3 release (2018-11-28 17:37:34 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-12-03
+>
+> for you to fetch changes up to c688e6ca7b41a105241054853d250df64addbf8f:
+>
+>   nbd/client: Send NBD_CMD_DISC if open fails after connect (2018-11-30 14:13:37 -0600)
+>
+> ----------------------------------------------------------------
+> nbd patches for 2018-12-03
+>
+> Improve x-dirty-bitmap handling for experimenting with pull mode
+> incremental backups.
+>
+> - Eric Blake: 0/3 NBD dirty bitmap cleanups
+>
+> ----------------------------------------------------------------
+> Eric Blake (3):
+>       nbd/server: Advertise all contexts in response to bare LIST
+>       nbd/client: Make x-dirty-bitmap more reliable
+>       nbd/client: Send NBD_CMD_DISC if open fails after connect
+>
+>  block/nbd-client.c | 21 ++++++++++++++++++++-
+>  nbd/server.c       |  1 +
+>  2 files changed, 21 insertions(+), 1 deletion(-)
 
-Since this is via the INT 13h mechanism, the problem is likely in
-SeaBIOS.
+Applied, thanks.
 
-If I'm reading the version strings right, it looks like QEMU 2.0.0 QEMU
-1.1.2 appear to be working correctly for you, but do you know what
-versions of the SeaBIOS firmware they're running with?
-
-It might be interesting to see if, on QEMU 2.0.0 but a modern version of
-SeaBIOS, that it still breaks the same way -- that way we can tell for
-sure if it's a QEMU regression or a SeaBIOS one.
-
-Thank you,
---js
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1806114
-
-Title:
-  Reading sectors from floppy with BIOS INT 13h is broken
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm developing a game bootable from a floppy disk, written in i386
-  assembly. I found out it doesn't work on newer QEMU versions. I
-  managed to isolate the issue and it seems that there's a problem with
-  handling of BIOS interrupt 13h when it comes to reading disk sectors
-  (AH=3D02).
-
-  I've written a simple test in assembly. It simply accesses four
-  different floppy disk sectors and prints out the strings they contain.
-  The problem is, the two latter strings don't show up at all nor the
-  BIOS interrupt returns an error (CF set). I've attached the code to
-  this bug report. I use following commands to compile it and run:
-
-  $ nasm disk-test.asm -o disk-test.bin
-  $ qemu-system-i386 -boot a -fda disk-test.bin
-
-  After running, the expected output is:
-
-      I am a test string from boot sector
-      C:H:S 0:0:2 - Hello
-      C:H:S 0:0:3 - there!
-      C:H:S 0:1:4 - In QEMU you can't
-      C:H:S 1:0:5 - see these two lines! :(
-
-  while the actual output is:
-
-      I am a test string from boot sector
-      C:H:S 0:0:2 - Hello
-      C:H:S 0:0:3 - there!
-
-  =
-
-  So far, I found this problem in the current QEMU version for Ubuntu 18.04=
- (Debian 1:2.11+dfsg-1ubuntu7.8), as well as in the 3.1.0-rc3 and 2.12.1 ve=
-rsions, available on the www.qemu.org website. Thus, the issue doesn't seem=
- to be very recent.
-
-  To be sure, I ran the program on my other machine with older QEMU
-  version (Debian 2.0.0+dfsg-2ubuntu1.43) and on my RaspberryPi 2
-  (Debian 1.1.2+dfsg-6+deb7u25) and everything works as expected there.
-  It also works well in VirtualBox.
-
-  I hope these information are useful to you, however, I feel like this
-  bug may be more related to Seabios. If so, please let me know and I
-  will report it somewhere else.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1806114/+subscriptions
+-- PMM
