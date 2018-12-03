@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gTpGP-0004oa-Cb
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:31:58 -0500
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gTpNv-00023M-Ex
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:39:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gTpGM-00027Q-NM
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:31:57 -0500
-References: <20181130192216.26987-1-richard.henderson@linaro.org>
-	<20181130192216.26987-3-richard.henderson@linaro.org>
-	<34711f80-1959-32e0-e4e9-d22e003a5636@redhat.com>
-	<75253fd5-7c6a-5a8e-fc18-14534a50bd03@linaro.org>
-	<6895cef5-646a-8e51-2493-75b7805d33b0@redhat.com>
-	<ef698cec-f0b4-3775-3313-b26b95267599@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1409414d-d799-09db-aa45-00d4a51e0962@redhat.com>
-Date: Mon, 3 Dec 2018 15:31:48 +0100
-MIME-Version: 1.0
-In-Reply-To: <ef698cec-f0b4-3775-3313-b26b95267599@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.0 2/2] target/s390x:
- Implement STCK et al for CONFIG_USER_ONLY
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gTpNu-0000iN-MP
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:39:43 -0500
+Received: from mga02.intel.com ([134.134.136.20]:32862)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lizhijian@cn.fujitsu.com>)
+	id 1gTpNu-0000gE-B2
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:39:42 -0500
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
+Date: Mon,  3 Dec 2018 22:48:52 +0800
+Message-Id: <1543848532-12604-5-git-send-email-lizhijian@cn.fujitsu.com>
+In-Reply-To: <1543848532-12604-1-git-send-email-lizhijian@cn.fujitsu.com>
+References: <1543848532-12604-1-git-send-email-lizhijian@cn.fujitsu.com>
+Subject: [Qemu-devel] [PATCH for-4.0 v3 4/4] i386: allow to load initrd
+ below 4G for recent linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+To: qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org
+Cc: philip.li@intel.com, zhijianx.li@intel.com, Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-On 2018-12-03 15:29, Richard Henderson wrote:
-> On 12/3/18 8:02 AM, Thomas Huth wrote:
->> On 2018-12-03 14:27, Richard Henderson wrote:
->>> On 12/3/18 12:19 AM, Thomas Huth wrote:
->>>> On 2018-11-30 20:22, Richard Henderson wrote:
->>>>> This is a non-privileged instruction that was only implemented
->>>>> for system mode.  However, the stck instruction is used by glibc,
->>>>> so this was causing SIGILL for programs run under debian stretch.
->>>>>
->>>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>>>> ---
->>>>>  target/s390x/helper.h      |  2 +-
->>>>>  target/s390x/misc_helper.c | 13 ++++++++++++-
->>>>>  target/s390x/translate.c   |  2 ++
->>>>>  target/s390x/insn-data.def | 11 ++++++-----
->>>>>  4 files changed, 21 insertions(+), 7 deletions(-)
->>>>>
->>>>> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
->>>>> index 018e9dd414..6260b50496 100644
->>>>> --- a/target/s390x/helper.h
->>>>> +++ b/target/s390x/helper.h
->>>>> @@ -121,13 +121,13 @@ DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
->>>>>  DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
->>>>>  DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
->>>>>  DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
->>>>> +DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->>>>>  
->>>>>  #ifndef CONFIG_USER_ONLY
->>>>>  DEF_HELPER_3(servc, i32, env, i64, i64)
->>>>>  DEF_HELPER_4(diag, void, env, i32, i32, i32)
->>>>>  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
->>>>>  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
->>>>> -DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->>>>>  DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
->>>>>  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
->>>>>  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
->>>>> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
->>>>> index 3f91579570..c2940afecb 100644
->>>>> --- a/target/s390x/misc_helper.c
->>>>> +++ b/target/s390x/misc_helper.c
->>>>> @@ -76,8 +76,19 @@ uint64_t HELPER(stpt)(CPUS390XState *env)
->>>>>  #endif
->>>>>  }
->>>>>  
->>>>> -#ifndef CONFIG_USER_ONLY
->>>>> +#ifdef CONFIG_USER_ONLY
->>>>> +/* Store Clock */
->>>>> +uint64_t HELPER(stck)(CPUS390XState *env)
->>>>> +{
->>>>> +    struct timespec ts;
->>>>> +    uint64_t ms;
->>>>
->>>> May I suggest "us" for microseconds? "ms" makes me thing of
->>>> "milliseconds"...
->>>
->>> Oops, think-o.
->>>
->>>>> +    clock_gettime(CLOCK_REALTIME, &ts);
->>>>> +    ms = (ts.tv_nsec / 1000) + (ts.tv_sec * 100000ull);
->>>>> +
->>>>> +    return TOD_UNIX_EPOCH + ms;
->>>>> +}
->>>>
->>>> Don't you need to shift the value around a little bit for getting the
->>>> right format of the TOD clock? The microseconds are not starting with
->>>> the lowest bit, the TOD clock has a higher resolution. See also the
->>>> time2tod() macro in include/hw/s390x/tod.h ...
->>>
->>> That's for STCKE, which does use this routine and shift the result around.
->>
->> STCKE certainly has even more bits ... but still, according to the PoP:
->>
->> "The TOD clock nominally is incremented by adding a
->> one in bit position 51 every microsecond."
-> 
-> I don't see that language within the description of STCK.
+a new field xloadflags was added to recent x86 linux, and BIT 1:
+XLF_CAN_BE_LOADED_ABOVE_4G is used to tell bootload that where initrd can be
+loaded safely.
 
-It's in chapter 4 instead, the sub-section about "Timing".
+Current QEMU/BIOS always loads initrd below below_4g_mem_size which is always
+less than 4G, so here limiting initrd_max to 4G - 1 simply is enough if
+this bit is set.
 
- Thomas
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+
+---
+V3: correct grammar and check XLF_CAN_BE_LOADED_ABOVE_4G first (Michael S. Tsirkin)
+
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+---
+ hw/i386/pc.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 8db7417..ebaa65f 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -897,7 +897,15 @@ static void load_linux(PCMachineState *pcms,
+ #endif
+ 
+     /* highest address for loading the initrd */
+-    if (protocol >= 0x203) {
++    if (protocol >= 0x20c &&
++        lduw_p(header+0x236) & XLF_CAN_BE_LOADED_ABOVE_4G) {
++        /*
++         * Although kernel allows initrd loading to above 4G,
++         * it just makes it as large as possible while still staying below 4G
++         * since current BIOS always loads initrd below pcms->below_4g_mem_size
++         */
++        initrd_max = UINT32_MAX;
++    } else if (protocol >= 0x203) {
+         initrd_max = ldl_p(header+0x22c);
+     } else {
+         initrd_max = 0x37ffffff;
+-- 
+2.7.4
