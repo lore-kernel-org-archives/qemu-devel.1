@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gTony-0004s5-Kc
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:02:48 -0500
+	(envelope-from <thuth@redhat.com>) id 1gTorV-0001lj-53
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:06:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gTono-0007I6-RH
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:02:34 -0500
-References: <20181130192216.26987-1-richard.henderson@linaro.org>
-	<20181130192216.26987-3-richard.henderson@linaro.org>
-	<34711f80-1959-32e0-e4e9-d22e003a5636@redhat.com>
-	<75253fd5-7c6a-5a8e-fc18-14534a50bd03@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1gTorE-0001uR-Hv
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:06:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49722)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gTorE-0001nX-7g
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:05:56 -0500
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6895cef5-646a-8e51-2493-75b7805d33b0@redhat.com>
-Date: Mon, 3 Dec 2018 15:02:00 +0100
-MIME-Version: 1.0
-In-Reply-To: <75253fd5-7c6a-5a8e-fc18-14534a50bd03@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.0 2/2] target/s390x:
- Implement STCK et al for CONFIG_USER_ONLY
+Date: Mon,  3 Dec 2018 15:05:37 +0100
+Message-Id: <1543845937-300-8-git-send-email-thuth@redhat.com>
+In-Reply-To: <1543845937-300-1-git-send-email-thuth@redhat.com>
+References: <1543845937-300-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-4.0 7/7] includes: Replace QEMU_GNUC_PREREQ
+ with "__has_builtin || !defined(__clang__)"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,86 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, pbonzini@redhat.com, peter.maydell@linaro.org
 
-On 2018-12-03 14:27, Richard Henderson wrote:
-> On 12/3/18 12:19 AM, Thomas Huth wrote:
->> On 2018-11-30 20:22, Richard Henderson wrote:
->>> This is a non-privileged instruction that was only implemented
->>> for system mode.  However, the stck instruction is used by glibc,
->>> so this was causing SIGILL for programs run under debian stretch.
->>>
->>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>> ---
->>>  target/s390x/helper.h      |  2 +-
->>>  target/s390x/misc_helper.c | 13 ++++++++++++-
->>>  target/s390x/translate.c   |  2 ++
->>>  target/s390x/insn-data.def | 11 ++++++-----
->>>  4 files changed, 21 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
->>> index 018e9dd414..6260b50496 100644
->>> --- a/target/s390x/helper.h
->>> +++ b/target/s390x/helper.h
->>> @@ -121,13 +121,13 @@ DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
->>>  DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
->>>  DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
->>>  DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
->>> +DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->>> =20
->>>  #ifndef CONFIG_USER_ONLY
->>>  DEF_HELPER_3(servc, i32, env, i64, i64)
->>>  DEF_HELPER_4(diag, void, env, i32, i32, i32)
->>>  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
->>>  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
->>> -DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->>>  DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
->>>  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
->>>  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
->>> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
->>> index 3f91579570..c2940afecb 100644
->>> --- a/target/s390x/misc_helper.c
->>> +++ b/target/s390x/misc_helper.c
->>> @@ -76,8 +76,19 @@ uint64_t HELPER(stpt)(CPUS390XState *env)
->>>  #endif
->>>  }
->>> =20
->>> -#ifndef CONFIG_USER_ONLY
->>> +#ifdef CONFIG_USER_ONLY
->>> +/* Store Clock */
->>> +uint64_t HELPER(stck)(CPUS390XState *env)
->>> +{
->>> +    struct timespec ts;
->>> +    uint64_t ms;
->>
->> May I suggest "us" for microseconds? "ms" makes me thing of
->> "milliseconds"...
->=20
-> Oops, think-o.
->=20
->>> +    clock_gettime(CLOCK_REALTIME, &ts);
->>> +    ms =3D (ts.tv_nsec / 1000) + (ts.tv_sec * 100000ull);
->>> +
->>> +    return TOD_UNIX_EPOCH + ms;
->>> +}
->>
->> Don't you need to shift the value around a little bit for getting the
->> right format of the TOD clock? The microseconds are not starting with
->> the lowest bit, the TOD clock has a higher resolution. See also the
->> time2tod() macro in include/hw/s390x/tod.h ...
->=20
-> That's for STCKE, which does use this routine and shift the result arou=
-nd.
+Since we require GCC version 4.8 or newer now, we can be sure that
+the builtin functions are always available on GCC. And for Clang,
+we can check the availablility with __has_builtin instead.
 
-STCKE certainly has even more bits ... but still, according to the PoP:
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ include/qemu/compiler.h   | 2 +-
+ include/qemu/host-utils.h | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-"The TOD clock nominally is incremented by adding a
-one in bit position 51 every microsecond."
-
-So you've got to shift the microseconds by 12 bits to the left?
-
-... but maybe I'm also just reading the PoP or the source code in a
-wrong way again...
-
- Thomas
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 8337361..261842b 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -121,7 +121,7 @@
+ #define __has_builtin(x) 0 /* compatibility with non-clang compilers */
+ #endif
+ 
+-#if __has_builtin(__builtin_assume_aligned) || QEMU_GNUC_PREREQ(4, 7)
++#if __has_builtin(__builtin_assume_aligned) || !defined(__clang__)
+ #define HAS_ASSUME_ALIGNED
+ #endif
+ 
+diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
+index 25ba3e8..0b3b79e 100644
+--- a/include/qemu/host-utils.h
++++ b/include/qemu/host-utils.h
+@@ -177,7 +177,7 @@ static inline int cto64(uint64_t val)
+  */
+ static inline int clrsb32(uint32_t val)
+ {
+-#if QEMU_GNUC_PREREQ(4, 7)
++#if __has_builtin(__builtin_clrsb) || !defined(__clang__)
+     return __builtin_clrsb(val);
+ #else
+     return clz32(val ^ ((int32_t)val >> 1)) - 1;
+@@ -193,7 +193,7 @@ static inline int clrsb32(uint32_t val)
+  */
+ static inline int clrsb64(uint64_t val)
+ {
+-#if QEMU_GNUC_PREREQ(4, 7)
++#if __has_builtin(__builtin_clrsbll) || !defined(__clang__)
+     return __builtin_clrsbll(val);
+ #else
+     return clz64(val ^ ((int64_t)val >> 1)) - 1;
+-- 
+1.8.3.1
