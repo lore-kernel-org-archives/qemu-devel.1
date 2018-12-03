@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gTmI2-000415-VP
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 06:21:30 -0500
+	(envelope-from <drjones@redhat.com>) id 1gTmIl-0004Q0-AH
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 06:22:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1gTmHv-0005xP-UO
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 06:21:22 -0500
-References: <20181123091729.29921-1-luc.michel@greensocs.com>
-	<20181123091729.29921-2-luc.michel@greensocs.com>
-	<20181123181059.GN18284@habkost.net>
-	<65d3a572-9a80-f332-1f88-69e43e8a3663@redhat.com>
-	<20181126132731.GJ18284@habkost.net>
-	<CAFEAcA8D7ZjO059Sgrx-4i0iT+V3gxT4f=DvdmUAJS7KomtyOg@mail.gmail.com>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <b8e20686-e5d1-a844-48f7-a4ae471e3fd5@greensocs.com>
-Date: Mon, 3 Dec 2018 12:20:58 +0100
+	(envelope-from <drjones@redhat.com>) id 1gTmIk-0006Mc-Ca
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 06:22:11 -0500
+Date: Mon, 3 Dec 2018 12:21:59 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20181203112159.64zzv33vhqnswa4z@kamzik.brq.redhat.com>
+References: <1543865209-50994-1-git-send-email-peng.hao2@zte.com.cn>
+	<1543865209-50994-5-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8D7ZjO059Sgrx-4i0iT+V3gxT4f=DvdmUAJS7KomtyOg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1543865209-50994-5-git-send-email-peng.hao2@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH V11 4/8] hw/arm/virt: Use the pvpanic device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +23,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: peter.maydell@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On 11/30/18 5:52 PM, Peter Maydell wrote:
-> On Mon, 26 Nov 2018 at 13:27, Eduardo Habkost <ehabkost@redhat.com> wro=
-te:
->>
->> On Sun, Nov 25, 2018 at 10:27:04PM +0100, Philippe Mathieu-Daud=C3=A9 =
-wrote:
->>> Hi Eduardo,
->>>
->>> On 23/11/18 19:10, Eduardo Habkost wrote:
->>>> If you really want to do this and assign cluster_id
->>>> automatically, please do it on realize, where it won't have
->>>> unexpected side-effects after a simple `qom-list-properties` QMP
->>>> command.
->>>
->>> This looks clean enough to me.
->>> Do you prefer we don't use static auto_increment at all?
->>
->> I would prefer to avoid the static variable if possible, but I
->> won't reject it if the alternatives make the API too complex to
->> use.
->=20
-> I guess the alternative would be to require the cluster ID
-> to be a QOM property on the cluster object. Usage would then
-> be something like
->     object_initialize_child(OBJECT(s), "rpu-cluster", &s->rpu_cluster,
->                             sizeof(s->rpu_cluster), TYPE_CPU_CLUSTER,
->                             &error_abort, NULL);
->     object_property_set_int(OBJECT(s), 1, "cluster-id", &error_abort);
->     qdev_init_nofail(DEVICE(&s->rpu_cluster));
->=20
-> (ie one extra line setting the cluster ID explicitly).
-I had such a line in v3 which was removed with the Philippe's
-auto-assign suggestion. Discussions seems to converge to the removal of
-the auto-assign mechanism though. I can rollback to manual assign for my
-next re-roll.
-Philippe: is it OK for you?
+On Tue, Dec 04, 2018 at 03:26:45AM +0800, Peng Hao wrote:
+> Add pvpanic device in arm virt machine.
+> 
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> ---
+>  default-configs/arm-softmmu.mak |  1 +
+>  hw/arm/virt.c                   | 22 ++++++++++++++++++++++
+>  include/hw/arm/virt.h           |  1 +
+>  3 files changed, 24 insertions(+)
+> 
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index 2420491..50345df 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -159,3 +159,4 @@ CONFIG_PCI_DESIGNWARE=y
+>  CONFIG_STRONGARM=y
+>  CONFIG_HIGHBANK=y
+>  CONFIG_MUSICPAL=y
+> +CONFIG_PVPANIC=y
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index a2b8d8f..a4541fa 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -59,6 +59,7 @@
+>  #include "qapi/visitor.h"
+>  #include "standard-headers/linux/input.h"
+>  #include "hw/arm/smmuv3.h"
+> +#include "hw/misc/pvpanic.h"
+>  
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -143,6 +144,7 @@ static const MemMapEntry a15memmap[] = {
+>      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+>      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
+>      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
+> +    [VIRT_PVPANIC] =            { 0x09070000, 0x00000002 },
+>      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+>      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+>      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+> @@ -190,6 +192,24 @@ static bool cpu_type_valid(const char *cpu)
+>      return false;
+>  }
+>  
+> +static void create_pvpanic_device(const VirtMachineState *vms)
+> +{
+> +    char *nodename;
+> +    hwaddr base = vms->memmap[VIRT_PVPANIC].base;
+> +    hwaddr size = vms->memmap[VIRT_PVPANIC].size;
+> +
+> +    sysbus_create_simple(TYPE_PVPANIC_MMIO, base, NULL);
+> +
+> +    nodename = g_strdup_printf("/pvpanic-mmio@%" PRIx64, base);
+> +    qemu_fdt_add_subnode(vms->fdt, nodename);
+> +    qemu_fdt_setprop_string(vms->fdt, nodename,
+> +                            "compatible", "qemu,pvpanic-mmio");
+> +    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
+> +                                 2, base, 2, size);
+> +
+> +    g_free(nodename);
+> +}
+> +
+>  static void create_fdt(VirtMachineState *vms)
+>  {
+>      void *fdt = create_device_tree(&vms->fdt_size);
+> @@ -1531,6 +1551,8 @@ static void machvirt_init(MachineState *machine)
+>  
+>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>  
+> +    create_pvpanic_device(vms);
+> +
+>      create_gic(vms, pic);
+>  
+>      fdt_add_pmu_nodes(vms);
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 4cc57a7..937c124 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -66,6 +66,7 @@ enum {
+>      VIRT_GIC_REDIST,
+>      VIRT_GIC_REDIST2,
+>      VIRT_SMMU,
+> +    VIRT_PVPANIC,
+>      VIRT_UART,
+>      VIRT_MMIO,
+>      VIRT_RTC,
+> -- 
+> 1.8.3.1
+>
 
->=20
-> SoC objects can probably reasonably assume that they are
-> the only SoC in the system, ie that they can just assign
-> cluster IDs themselves). If that turns out not to be true
-> we can make the SoC take a property to specify a cluster ID
-> base or something.
->=20
-> I guess if we've been bitten by cpu-ID auto-assignment
-> in the past, starting out with "user picks the cluster ID"
-> would be safer, and it's not too much pain at the callsite.
-> Plus it avoids the gdbstub changing its mind about which
-> order the cluster "processes" appear in if we refactor the
-> board code.
->=20
->> In either case, I'd like to ensure the caveats of the cluster_id
->> field are clearly documented: no guarantees about ordering or
->> predictability, making it not appropriate for external
->> interfaces.
->=20
-> The gdb stub is sort of an external interface, of course...
->=20
-> Luc: what are the requirements on boards using CPU cluster
-> objects? I assume these are both OK:
->  * does not use cluster objects at all
->    (the gdbstub puts all the CPUs in one process?)
-Yes, when no clusters are found, a process with PID 1 is created and
-used for all CPUs.
->  * all CPUs created are in some CPU cluster
->    (the gdbstub uses one process per CPU cluster)
-> but what about
->  * some CPUs are created in a CPU cluster, but some
->    are "loose", not in any cluster at all> ?
-> Is that just invalid, or do the "loose" CPUs end up in
-> a default cluster (gdbstub process), or do they get
-> one cluster each?
-Currently this is valid and the "loose" CPUs end up in the first
-available process (which will be PID 1 if we are in your first case,
-i.e. no clusters in the machine).
+With the change pointed out in 6/8
 
->=20
-> If it's invalid (which doesn't seem like a bad idea),
-> is there an assert somewhere so that getting it wrong
-> results in the board failing to start (ie a "make check"
-> failure) ?
-I could add such a check if you think it's a good idea, i.e. assert that
-"no cluster exist" or "all CPUs are in a cluster"
-
-But maybe in the end this check should not be done in the gdb stub? For
-the same reasons maybe you want to ensure that all CPUs have a well
-known address space or whatever information the cluster will provide?
-
-Thanks.
-
---=20
-Luc
+Reviewed-by: Andrew Jones <drjones@redhat.com>
