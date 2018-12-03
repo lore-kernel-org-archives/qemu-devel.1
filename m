@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gTwiY-0002wN-Tn
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 17:29:32 -0500
+	(envelope-from <bounces@canonical.com>) id 1gTwob-0005sR-To
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 17:35:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1gTwiV-0001lN-3X
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 17:29:30 -0500
-Resent-Message-Id: <E1gTwiV-0001lN-3X@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21380)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1gTwi8-0001N4-NQ
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 17:29:20 -0500
-In-Reply-To: <20181203160840.15115-1-richard.henderson@linaro.org>
-Message-ID: <154387611197.15376.13448557668017988691@c26723477dc9>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <bounces@canonical.com>) id 1gTwoW-00081Y-LG
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 17:35:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60886)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gTwoW-0007wz-9w
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 17:35:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gTwoU-0000Xx-Mb
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 22:35:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 95D292E80CB
+	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 22:35:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 3 Dec 2018 14:28:33 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH for-4.0 0/5] tcg/i386: Improve guest_base
- handling
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 03 Dec 2018 22:24:03 -0000
+From: Jacek Wieczorek <mrjjot@gmail.com>
+Reply-To: Bug 1806114 <1806114@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <154360750589.15722.2632161476309150045.malonedeb@soybean.canonical.com>
+Message-Id: <154387584375.15484.3305409784363122007.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1806114] Re: Reading sectors from floppy with
+ BIOS INT 13h is broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +37,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org, alex.bennee@linaro.org
+To: qemu-devel@nongnu.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIwMzE2MDg0MC4xNTEx
-NS0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggZm9yLTQu
-MCAwLzVdIHRjZy9pMzg2OiBJbXByb3ZlIGd1ZXN0X2Jhc2UgaGFuZGxpbmcKTWVzc2FnZS1pZDog
-MjAxODEyMDMxNjA4NDAuMTUxMTUtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClR5cGU6
-IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
-Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0
-b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
-CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
-OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
-IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
-aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
-b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
-NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJh
-bmNoICd0ZXN0Jwo3Njg2MWI0IHRjZy9pMzg2OiBBZGQgc2V0dXBfZ3Vlc3RfYmFzZV9zZWcgZm9y
-IEZyZWVCU0QKOTRmMTUxMCB0Y2cvaTM4NjogUHJlY29tcHV0ZSBhbGwgZ3Vlc3RfYmFzZSBwYXJh
-bWV0ZXJzCjk3OWE2NDUgdGNnL2kzODY6IEFzc3VtZSAzMi1iaXQgdmFsdWVzIGFyZSB6ZXJvLWV4
-dGVuZGVkCmVjNDZhMTcgdGNnL2kzODY6IEltcGxlbWVudCBJTkRFWF9vcF9leHRye2xofV9pNjRf
-aTMyIGZvciAzMi1iaXQgZ3Vlc3RzCjdlYWI0M2YgdGNnL2kzODY6IFByb3BhZ2F0ZSBpczY0IHRv
-IHRjZ19vdXRfcWVtdV9sZF9kaXJlY3QKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBB
-VENIIDEvNTogdGNnL2kzODY6IFByb3BhZ2F0ZSBpczY0IHRvIHRjZ19vdXRfcWVtdV9sZF9kaXJl
-Y3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMi81OiB0Y2cvaTM4NjogSW1wbGVtZW50IElOREVYX29wX2V4
-dHJ7bGh9X2k2NF9pMzIgZm9yIDMyLWJpdCBndWVzdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy81OiB0
-Y2cvaTM4NjogQXNzdW1lIDMyLWJpdCB2YWx1ZXMgYXJlIHplcm8tZXh0ZW5kZWQuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNC81OiB0Y2cvaTM4NjogUHJlY29tcHV0ZSBhbGwgZ3Vlc3RfYmFzZSBwYXJhbWV0
-ZXJzLi4uCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBh
-dm9pZGVkCiMzNDogRklMRTogdGNnL2kzODYvdGNnLXRhcmdldC5pbmMuYzoxODY0OgorIyBpZiBk
-ZWZpbmVkKF9feDg2XzY0X18pICYmIGRlZmluZWQoX19saW51eF9fKQoKdG90YWw6IDAgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCAxMzYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA1LzU6IHRjZy9pMzg2OiBBZGQgc2V0dXBfZ3Vl
-c3RfYmFzZV9zZWcgZm9yIEZyZWVCU0QuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2Vl
-biBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTc6IEZJTEU6IHRjZy9p
-Mzg2L3RjZy10YXJnZXQuaW5jLmM6MTg3NToKKyMgZWxpZiBkZWZpbmVkIChfX0ZyZWVCU0RfXykg
-fHwgZGVmaW5lZCAoX19GcmVlQlNEX2tlcm5lbF9fKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
-YmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTc6IEZJTEU6
-IHRjZy9pMzg2L3RjZy10YXJnZXQuaW5jLmM6MTg3NToKKyMgZWxpZiBkZWZpbmVkIChfX0ZyZWVC
-U0RfXykgfHwgZGVmaW5lZCAoX19GcmVlQlNEX2tlcm5lbF9fKQoKdG90YWw6IDIgZXJyb3JzLCAw
-IHdhcm5pbmdzLCAxNSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
-b2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
-bG9ncy8yMDE4MTIwMzE2MDg0MC4xNTExNS0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcv
-dGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Alright, I managed to compile 2.5.0, 2.5.1 and 2.6.0 by simply making
+memfd_create() non-static.
+
+It turns out that 2.6.0 is the first version causing problems. I tested
+each of these with the provided SeaBIOS version and with SeaBIOS
+rel-1.7.4-0-g96917a8.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1806114
+
+Title:
+  Reading sectors from floppy with BIOS INT 13h is broken
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm developing a game bootable from a floppy disk, written in i386
+  assembly. I found out it doesn't work on newer QEMU versions. I
+  managed to isolate the issue and it seems that there's a problem with
+  handling of BIOS interrupt 13h when it comes to reading disk sectors
+  (AH=3D02).
+
+  I've written a simple test in assembly. It simply accesses four
+  different floppy disk sectors and prints out the strings they contain.
+  The problem is, the two latter strings don't show up at all nor the
+  BIOS interrupt returns an error (CF set). I've attached the code to
+  this bug report. I use following commands to compile it and run:
+
+  $ nasm disk-test.asm -o disk-test.bin
+  $ qemu-system-i386 -boot a -fda disk-test.bin
+
+  After running, the expected output is:
+
+      I am a test string from boot sector
+      C:H:S 0:0:2 - Hello
+      C:H:S 0:0:3 - there!
+      C:H:S 0:1:4 - In QEMU you can't
+      C:H:S 1:0:5 - see these two lines! :(
+
+  while the actual output is:
+
+      I am a test string from boot sector
+      C:H:S 0:0:2 - Hello
+      C:H:S 0:0:3 - there!
+
+  =
+
+  So far, I found this problem in the current QEMU version for Ubuntu 18.04=
+ (Debian 1:2.11+dfsg-1ubuntu7.8), as well as in the 3.1.0-rc3 and 2.12.1 ve=
+rsions, available on the www.qemu.org website. Thus, the issue doesn't seem=
+ to be very recent.
+
+  To be sure, I ran the program on my other machine with older QEMU
+  version (Debian 2.0.0+dfsg-2ubuntu1.43) and on my RaspberryPi 2
+  (Debian 1.1.2+dfsg-6+deb7u25) and everything works as expected there.
+  It also works well in VirtualBox.
+
+  I hope these information are useful to you, however, I feel like this
+  bug may be more related to Seabios. If so, please let me know and I
+  will report it somewhere else.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1806114/+subscriptions
