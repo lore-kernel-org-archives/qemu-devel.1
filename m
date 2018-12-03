@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fwsgonzo@hotmail.com>) id 1gTnju-0007cT-3O
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:54:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gTpgv-0003FV-3z
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:59:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fwsgonzo@hotmail.com>) id 1gTnjp-0001we-5E
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:54:18 -0500
-Received: from mail-oln040092065033.outbound.protection.outlook.com
-	([40.92.65.33]:12416
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fwsgonzo@hotmail.com>)
-	id 1gTnjo-0001U8-CK
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:54:13 -0500
-From: Gonzo FWS <fwsgonzo@hotmail.com>
-Date: Mon, 3 Dec 2018 12:54:07 +0000
-Message-ID: <HE1P190MB0073644AE7C57B520A8675CEDEAE0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>
-Content-Language: en-US
+	(envelope-from <peter.maydell@linaro.org>) id 1gTpgt-0008PQ-Bo
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:59:21 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38639)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gTpgs-0008OC-Px
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:59:19 -0500
+Received: by mail-ot1-x341.google.com with SMTP id e12so11840948otl.5
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 06:59:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Calendar
+References: <20181203101045.27976-1-kraxel@redhat.com>
+	<20181203101045.27976-2-kraxel@redhat.com>
+In-Reply-To: <20181203101045.27976-2-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Dec 2018 14:59:06 +0000
+Message-ID: <CAFEAcA9ToxMAjKBzKfs-1UhhLk0Dr_cTa31EcA+SrMJqt6v9dQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-3.1 v3 1/2] usb-mtp: fix utf16_to_str
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,13 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, public@hansmi.ch
 
-Hey, I have written an embedded gameboy color emulator for my OS (IncludeOS=
-) which does run primarily in Qemu-KVM atm. And therein lies the problem - =
-PS2 only works with KVM enabled at present.
+On Mon, 3 Dec 2018 at 10:15, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> Make utf16_to_str return an allocated string.  Remove the assumtion that
+> the number of string bytes equals the number of utf16 chars (which is
+> only true for ascii chars).  Instead call wcstombs twice, once to figure
+> the storage size and once for the actual conversion (as suggested by the
+> wcstombs manpage).
+>
+> Reported-by: Michael Hanselmann <public@hansmi.ch>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/usb/dev-mtp.c | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
 
-Is it too late to submit something? I will submit a static image with a fre=
-e homebrew ROM in it if you are interested.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
--gonzo
+thanks
+-- PMM
