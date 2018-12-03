@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gTt4L-0000WM-Kd
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:35:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gTtGf-00059F-Ha
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:48:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gTt4H-00034P-Lc
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:35:45 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42401)
+	(envelope-from <peter.maydell@linaro.org>) id 1gTtGe-0004N1-TC
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:48:29 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44077)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gTt4F-00033P-Ec
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:35:39 -0500
-Received: by mail-oi1-x244.google.com with SMTP id w13so11844627oiw.9
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 10:35:39 -0800 (PST)
-References: <20181203160840.15115-1-richard.henderson@linaro.org>
-	<20181203160840.15115-6-richard.henderson@linaro.org>
-	<58a36fe9-8a56-d949-a942-a5ca3cc243f5@gmx.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ad5bd9c1-72fd-496c-0cb8-4c94cd27e919@linaro.org>
-Date: Mon, 3 Dec 2018 12:35:35 -0600
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gTtGe-0004Mi-Nr
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:48:28 -0500
+Received: by mail-oi1-x244.google.com with SMTP id m6so11867306oig.11
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 10:48:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <58a36fe9-8a56-d949-a942-a5ca3cc243f5@gmx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 5/5] tcg/i386: Add
- setup_guest_base_seg for FreeBSD
+References: <20181129163655.20370-1-edgar.iglesias@gmail.com>
+In-Reply-To: <20181129163655.20370-1-edgar.iglesias@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Dec 2018 18:48:14 +0000
+Message-ID: <CAFEAcA8RniYSkvAv5zLMzyRbyekuE47ZQ7Rrv-7joO5bqmhm7A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 0/4] hw/arm: versal: Correct number of
+ IRQs in GIC setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>, qemu-devel@nongnu.org
-Cc: cota@braap.org, alex.bennee@linaro.org
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, mbilal <muhammad_bilal@mentor.com>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Luc Michel <luc.michel@greensocs.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>
 
-On 12/3/18 11:01 AM, Kamil Rytarowski wrote:
-> On 03.12.2018 17:08, Richard Henderson wrote:
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  tcg/i386/tcg-target.inc.c | 9 +++++++++
->>  1 file changed, 9 insertions(+)
->>
->> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
->> index b8d2dd5ba3..3a39b51685 100644
->> --- a/tcg/i386/tcg-target.inc.c
->> +++ b/tcg/i386/tcg-target.inc.c
->> @@ -1873,6 +1873,15 @@ static inline int setup_guest_base_seg(void)
->>      }
->>      return 0;
->>  }
->> +# elif defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
->> +#  include <machine/sysarch.h>
->> +static inline int setup_guest_base_seg(void)
->> +{
->> +    if (sysarch(AMD64_SET_GSBASE, &guest_base) == 0) {
->> +        return P_GS;
->> +    }
->> +    return 0;
->> +}
->>  # else
->>  static inline int setup_guest_base_seg(void)
->>  {
->>
-> 
-> There is also X86_SET_GSBASE in <include/sysarch.h> in NetBSD. Do we
-> need to set it for this OS too?
+On Thu, 29 Nov 2018 at 16:36, Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
+>
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> The Versal GIC has 192 IRQs not 256 as we previously had setup.
+> This series fixes the setup and moves the virtio-mmio nodes
+> to use other reserved interrupts.
+>
+> Since we don't have 32 reserved lines, we also reduce the number of
+> virtio-mmio regions to 8 (we do have some more lines free but let's
+> leave some for future use).
+>
+> Cheers,
+> Edgar
+>
+> Edgar E. Iglesias (4):
+>   hw/arm: versal: Remove bogus virtio-mmio creation
+>   hw/arm: versal: Reduce number of virtio-mmio instances
+>   hw/arm: versal: Use IRQs 111 - 118 for virtio-mmio
+>   hw/arm: versal: Correct the nr of IRQs to 192
 
-You will want to do so, yes.  In the meantime NetBSD should not break; it is
-only an optimization.
+Applied to target-arm.next for 4.0, thanks.
 
-
-r~
+-- PMM
