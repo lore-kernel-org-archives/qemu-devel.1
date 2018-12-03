@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gTpB7-0004g4-8b
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:26:30 -0500
+	(envelope-from <sgarzare@redhat.com>) id 1gTpC1-0005QQ-Et
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:27:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gTpB6-0006sF-8G
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:26:29 -0500
-References: <20181129101801.6421-1-vsementsov@virtuozzo.com>
-	<da28be03-4e8a-c75f-8bfa-35e24ad14cca@redhat.com>
-	<28cbfc9d-c734-835e-7e0c-5524af733453@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9082a92e-45cf-9e31-4ce0-4e4711799b57@redhat.com>
-Date: Mon, 3 Dec 2018 15:26:11 +0100
+	(envelope-from <sgarzare@redhat.com>) id 1gTpBy-0007Pc-OT
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:27:25 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:39809)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1gTpBy-0007Op-J2
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:27:22 -0500
+Received: by mail-it1-f194.google.com with SMTP id a6so8733208itl.4
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 06:27:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <28cbfc9d-c734-835e-7e0c-5524af733453@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MgiedUMVOceAtzANq570FKLKUNonJmtlJ"
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] mirror dead-lock
+References: <CAGxU2F7+NZUS-BQ1hCnKynVxfsVUYTHRCWQvJwBA12bYmg0ZJA@mail.gmail.com>
+	<938a2f54426dc059428fcfe1882bbb3b2d5cbc99.camel@intel.com>
+	<CAGxU2F50U=NH8fGDXygcYycjoveNpdbKnnG3H0soCvub_Ea5cw@mail.gmail.com>
+In-Reply-To: <CAGxU2F50U=NH8fGDXygcYycjoveNpdbKnnG3H0soCvub_Ea5cw@mail.gmail.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Mon, 3 Dec 2018 15:27:08 +0100
+Message-ID: <CAGxU2F7SA-kc0gsLNaUzbiinytJ2DF_r5UpB1JzRy-Su1_WOLw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] QEMU/NEMU boot time with several x86 firmwares
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +29,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
+To: Rob Bradford <robert.bradford@intel.com>
+Cc: Samuel Ortiz <sameo@linux.intel.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MgiedUMVOceAtzANq570FKLKUNonJmtlJ
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com"
- <jcody@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>, Denis Lunev <den@virtuozzo.com>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
-Message-ID: <9082a92e-45cf-9e31-4ce0-4e4711799b57@redhat.com>
-Subject: Re: [PATCH v2 0/2] mirror dead-lock
-References: <20181129101801.6421-1-vsementsov@virtuozzo.com>
- <da28be03-4e8a-c75f-8bfa-35e24ad14cca@redhat.com>
- <28cbfc9d-c734-835e-7e0c-5524af733453@virtuozzo.com>
-In-Reply-To: <28cbfc9d-c734-835e-7e0c-5524af733453@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Rob,
+I continued to investigate the boot time, and as you suggested I
+looked also at qemu-lite 2.11.2
+(https://github.com/kata-containers/qemu) and NEMU "virt" machine. I
+did the following tests using the Kata kernel configuration
+(https://github.com/kata-containers/packaging/blob/master/kernel/configs/x86_64_kata_kvm_4.14.x)
 
-On 03.12.18 15:13, Vladimir Sementsov-Ogievskiy wrote:
-> 03.12.2018 16:59, Max Reitz wrote:
->> On 29.11.18 11:17, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi all!
->>>
->>> v2: add fix:)
->>>
->>> We've faced the following mirror bug:
->>>
->>> Just run mirror on qcow2 image more than 1G, and qemu is in dead lock=
-=2E
->>
->> So because apparently there is going to be an rc4 anyway (like basical=
-ly
->> always...), I'd really like to bring this fix into it, unless there ar=
-e
->> any objections from anyone (though all of you are more than welcome to=
+To compare the results with qemu-lite direct kernel load, I added
+another tracepoint:
+- linux_start_kernel: first entry of the Linux kernel (start_kernel())
 
->> explicitly agree, too :-)).
->>
->> Do you have any plans for the iotest?  Right now, I'd rather just take=
+As you can see, NEMU is faster to jump to the kernel
+(linux_start_kernel) than qemu-lite when uses qboot or seabios with
+virt support, but the time to the user space is strangely high, maybe
+the kernel configuration that I used is not the best one.
+Do you suggest another kernel configuration?
 
->> patch 1 as-is and add the test later, but then again, adding a patch f=
-or
->> rc4 without a test is not so nice either, I suppose.
->>
->> Max
->>
->=20
-> I think, everything is better with test:) I can't say that I really lik=
-e your
-> additions, because it's anyway a kind of cheating, less real-life,
+Anyway, I obtained the best boot time with qemu-lite and direct kernel
+load (vmlinux ELF image). I think because the kernel was not
+compressed. Indeed, looking to the others test, the kernel
+decompression (bzImage) takes about 80 ms (linux_start_kernel -
+linux_start_boot). (I'll investigate better)
 
-You mean like all iotests? ;-)
+* QEMU
+    + qboot
+      qemu_init_end: 41.306968
+      fw_start: 41.478601 (+0.171633)
+      fw_do_boot: 47.03688 (+5.558279)
+      linux_start_boot: 48.80918 (+1.7723)
+      linux_start_kernel: 128.474013 (+79.664833)
+      linux_start_user: 347.257097 (+218.783084)
+    + seabios
+      qemu_init_end: 40.703177
+      fw_start: 40.902842 (+0.199665)
+      fw_do_boot: 54.604878 (+13.702036)
+      linux_start_boot: 56.314063 (+1.709185)
+      linux_start_kernel: 136.942521 (+80.628458)
+      linux_start_user: 356.211221 (+219.2687)
+    + OVMF
+      qemu_init_end: 44.055712
+      fw_start: 168.094131 (+124.038419)
+      fw_do_boot: 322.222745 (+154.128614)
+      linux_start_boot: 323.809639 (+1.586894)
+      linux_start_kernel: 401.756773 (+77.947134)
+      linux_start_user: 604.601438 (+202.844665)
+* NEMU "virt" machine
+    + qboot
+      qemu_init_end: 27.732925
+      fw_start: 27.887483 (+0.154558)
+      fw_do_boot: 29.20226 (+1.314777)
+      linux_start_boot: 30.842672 (+1.640412)
+      linux_start_kernel: 111.639445 (+80.796773)
+      linux_start_user: 862.294876 (+750.655431)
+    + seabios
+      qemu_init_end: 28.203907
+      fw_start: 28.68285 (+0.478943)
+      fw_do_boot: 36.337377 (+7.654527)
+      linux_start_boot: 37.995622 (+1.658245)
+      linux_start_kernel: 118.11591 (+80.120288)
+      linux_start_user: 897.110477 (+778.994567)
+    + OVMF
+      qemu_init_end: 31.219852
+      fw_start: 153.304126 (+122.084274)
+      fw_do_boot: 183.69459 (+30.390464)
+      linux_start_boot: 185.296567 (+1.601977)
+      linux_start_kernel: 361.11524 (+175.818673)
+      linux_start_user: 1231.590077 (+870.474837)
+* Qemu-lite
+    + no FW (-machine pc,...,fw=off KERNEL=/path/to/vmlinux)
+      qemu_init_end: 32.243801
+      linux_start_kernel: 32.330323 (+0.086522)
+      linux_start_user: 208.742712 (+176.412389)
+    + qboot
+      qemu_init_end: 25.393047
+      fw_start: 25.545285 (+0.152238)
+      fw_do_boot: 31.073253 (+5.527968)
+      linux_start_boot: 33.139721 (+2.066468)
+      linux_start_kernel: 114.604384 (+81.464663)
+      linux_start_user: 287.93128 (+173.326896)
+    + seabios
+      qemu_init_end: 25.448283
+      fw_start: 25.628977 (+0.180694)
+      fw_do_boot: 38.551957 (+12.92298)
+      linux_start_boot: 40.220319 (+1.668362)
+      linux_start_kernel: 126.392991 (+86.172672)
+      linux_start_user: 308.807806 (+182.414815)
+    + OVMF
+      qemu_init_end: 27.616988
+      fw_start: 151.272286 (+123.655298)
+      fw_do_boot: 309.068926 (+157.79664)
+      linux_start_boot: 310.602074 (+1.533148)
+      linux_start_kernel: 387.83349 (+77.231416)
+      linux_start_user: 576.057453 (+188.223963)
 
-iotests usually only test a single specific thing and not a full
-real-life case.
+Testbed:
+* seabios: https://github.com/rbradford/seabios/tree/virt-x86 + patch
+to disable debug writes
+(https://mail.coreboot.org/pipermail/seabios/2018-December/012654.html)
+* qboot: https://github.com/rbradford/qboot/tree/virt-x86
+* OVMF: https://github.com/intel/ovmf-virt/tree/virt-x86
+* QEMU command: $QEMU -bios $BIOS -machine
+$MACHINE,accel=kvm,kernel_irqchip,nvdimm -cpu host -m
+512,maxmem=1G,slots=1 -smp 1 -kernel $KERNEL -append 'root=/dev/pmem0
+ro console=hvc0' -vga none -display none -no-user-config -nodefaults
+-object memory-backend-file,id=mem0,share,mem-path=$ROOTFS,size=$ROOTFS_SIZE
+-device nvdimm,memdev=mem0,id=nv0 -chardev stdio,id=virtiocon0 -device
+virtio-serial -device virtconsole,chardev=virtiocon0
 
->                                                                    but =
-on the
-> other hand, as I understand, allocating a lot of disk space in iotests =
-is a bad
-> thing too.
->=20
-> May be it should be a kind of parameter, with default to your variant, =
-something
-> like ./check --big-disk-allocations-allowed :).
+Cheers,
+Stefano
 
-As I said, we would need to add a new group (e.g. "big-disk-allocation")
-and then probably disable that group in check by default.  You could run
-those tests with ./check -g big-disk-allocation.
+On Tue, Nov 27, 2018 at 3:21 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+> Hi Rob,
+>
+> On Tue, Nov 27, 2018 at 10:57 AM Rob Bradford <robert.bradford@intel.com> wrote:
+> >
+> > Hi Stefano,
+> >
+> > On Mon, 2018-11-26 at 17:40 +0100, Stefano Garzarella wrote:
+> > > Hi Samuel, Rob,
+> > > I'm proceeding to compare several x86 firmwares in order to
+> > > understand
+> > > which suits better with -kernel option to have a fast boot with
+> > > QEMU/NEMU.
+> > >
+> > > For your use cases, what boot time do you expect?
+> > >
+> >
+> > Kata Containers, one of the use cases we're looking at, is very
+> > sensitive to boot time, although it is configurable, the default
+> > configuration is to use qemu-lite with it's direct to kernel loader.
+> >
+> > That is probably a baseline we should be comparing with.
+> >
+> > As an aside, yesterday I posted the Seabios patches for enabling on
+> > NEMU/virt:
+> >
+> > https://github.com/rbradford/seabios/tree/virt-x86
+> >
+> > I didn't yet start optimising the configuration file we use for it
+> > beyond getting it < 128KiB or apply any optimisation patches.
+> >
+> > And I also have some qboot patches too:
+> >
+> > https://github.com/rbradford/qboot/tree/virt-x86
+> >
+> > So we're in a situation where we can start comparing other machine
+> > types against virt too.
+>
+> Thanks for the pointers, I'll try to do the same tests with qemu-lite
+> and direct kernel loader and also with NEMU "virt" machine, using your
+> versions of SeaBIOS and qboot.
+>
+> >
+> > >
+> > > I compared SeaBIOS, qboot, and OVMF. I started each test using this
+> > > qemu parameters: "./qemu-system-x86_64 -bios path/to/bios.bin -m 1G
+> > > -cpu host -M accel=kvm -vga none -kernel path/to/bzImage -initrd
+> > > path/to/rootfs.cpio ..."
+> > >
+> > > As Samuel suggested, I added the total time to userspace adding a
+> > > probe in the kernel_init(), so the times (in msec) that I measured
+> > > are:
+> > > - qemu_init_end: first kvm_entry (i.e. QEMU initialized has finished)
+> > > - fw_start: first entry of the firmware
+> > > - fw_do_boot: after the firmware initialization (e.g. PCI setup,
+> > > etc.)
+> > > - linux_start_boot: before the jump to the Linux kernel
+> > > - linux_start_user: before starting the init process
+> > >
+> > > * SeaBIOS
+> > > Default configuration without debug messages (CONFIG_DEBUG_LEVEL=0) +
+> > > Stephen's patch (tpm: Check for TPM related ACPI tables before
+> > > attempting hw) + my patch (qemu: fast boot when linuxboot optionrom
+> > > is
+> > > used).
+> > >  qemu_init_end: 41.634812
+> > >  fw_start: 41.857374 (+0.222562)
+> > >  fw_do_boot: 52.754109 (+10.896735)
+> > >  linux_start_boot: 54.117220 (+1.363111)
+> > >  linux_start_user: 495.684199 (+441.566979)
+> > >
+> > > * qboot
+> > > Default configuration + my patch (pci: reduce pci_foreach() calls).
+> > >  qemu_init_end: 40.233717
+> > >  fw_start: 40.384048 (+0.150331)
+> > >  fw_do_boot: 45.660497 (+5.276449)
+> > >  linux_start_boot: 47.252119 (+1.591622)
+> > >  linux_start_user: 509.173886 (+461.921767)
+> > >
+> > > * OVMF (https://github.com/intel/ovmf-virt)
+> > > I followed this script
+> > > (
+> > > https://github.com/intel/nemu/blob/topic/virt-x86/tools/CI/run_nats.sh
+> > > )
+> > > to build OVMF.
+> > > Note: I put the "fw_start" probe in the BdsEntry()
+> > > [MdeModulePkg/Universal/BdsDxe/BdsEntry.c], I'm not sure if it is
+> > > "near" to the real entry point.
+> > >  qemu_init_end: 42.734555
+> > >  fw_start: 163.611506 (+120.876951)
+> > >  fw_do_boot: 369.713760 (+206.102254)
+> > >  linux_start_boot: 370.960364 (+1.246604)
+> > >  linux_start_user: 796.799667 (+425.839303)
+> > >
+> > > For OVMF case, are reasonable the times that I measured? Do you use a
+> > > different configuration?
+> > >
+> >
+> > That is the same OVMF configuration as we normally use, I have the
+> > configuration file checked in. Those numbers look like the ones I
+> > expect.
+>
+> Perfect!
+>
+> Please, let me know if you have something more important than boot
+> time to help you.
+>
+> Regards,
+> Stefano
+>
+> >
+> > > Thanks,
+> > > Stefano
+> > >
+> >
+> > Great work,
+> >
+> > Rob
+> >
+>
+> --
+> Stefano Garzarella
+> Red Hat
 
-> But let's commit at least the test with your additions.
-
-I mean, we can also add both tests.  But I should say that your version
-did not fail on tmpfs before this fix, and I usually run tests on tmpfs,
-so...  It wouldn't be very indicative of the issue for me.
-
-Max
 
 
---MgiedUMVOceAtzANq570FKLKUNonJmtlJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlwFPQMACgkQ9AfbAGHV
-z0ClSAf/Y2reAMkeClWiHDNLnumxq9dmsBrbzBhRSxB6F3einWX2s56+YonOh/lI
-mIsVcR/5I3JHUD+9cckha9gT/0rYYay7D5BrSY+k7cgWB4QaPEt/ivqqKTsELScr
-aktlz7RZCHhmuLnfARFvJpBiuf2bNDjmXFpQCZVv+xe9OptrZWoPDrl0F8Q03SJf
-EGT/ZCVJcF0sg8XBoTHAKMpip7614lblBZY7VomY8RvPeGP/hJFFSk4ZnSL8dyVE
-+top0GKtXSpPoVjs9kP52nT8WMOdRaaZyQ/olAwCedp0yWwn2tPMIq4VNGz0uJmm
-mQYuNXzMqfRHJwzs8tkbpmlakWl5jQ==
-=HEvP
------END PGP SIGNATURE-----
-
---MgiedUMVOceAtzANq570FKLKUNonJmtlJ--
+--
+Stefano Garzarella
+Red Hat
