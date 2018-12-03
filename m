@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqF8-0000tl-18
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:45 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqF6-0005Cv-4c
+	(envelope-from <pbonzini@redhat.com>) id 1gTqF4-0000n3-Q6
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53762)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqF0-00056n-Jo
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:61927)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqF5-0005CD-TA
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:40 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqF0-00055s-Ae
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:34 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:55 +0100
-Message-Id: <1543851204-41186-43-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:32:53 +0100
+Message-Id: <1543851204-41186-41-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 42/71] tests/libqos: virtio-9p driver and
+Subject: [Qemu-devel] [PATCH 40/71] tests/libqos: virtio-serial driver and
  interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,40 +29,40 @@ Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <l
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add qgraph nodes for virtio-9p-pci and virtio-9p-device.
-Both nodes produce virtio-9p, but virtio-9p-pci receives
-a pci-bus and overrides virtio-pci QOSGraphObject and its functions,
-while virtio-9p-device receives a virtio and implements
+Add qgraph nodes for virtio-serial-pci and virtio-serial-device.
+Both nodes produce virtio-serial, but virtio-serial-pci receives
+a pci-bus and uses virtio-pci QOSGraphObject and functions,
+while virtio-serial-device receives a virtio-bus and implements
 its own functions
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include   |   1 +
- tests/libqos/virtio-9p.c | 173 +++++++++++++++++++++++++++++++++++++++++++++++
- tests/libqos/virtio-9p.h |  42 ++++++++++++
- 3 files changed, 216 insertions(+)
- create mode 100644 tests/libqos/virtio-9p.c
- create mode 100644 tests/libqos/virtio-9p.h
+ tests/Makefile.include       |   1 +
+ tests/libqos/virtio-serial.c | 110 +++++++++++++++++++++++++++++++++++++++++++
+ tests/libqos/virtio-serial.h |  39 +++++++++++++++
+ 3 files changed, 150 insertions(+)
+ create mode 100644 tests/libqos/virtio-serial.c
+ create mode 100644 tests/libqos/virtio-serial.h
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 88821a7..6a6aa7d 100644
+index 9603022..58f548d 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -674,6 +674,7 @@ qos-test-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+@@ -677,6 +677,7 @@ qos-test-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
  qos-test-obj-y += tests/libqos/e1000e.o
  qos-test-obj-y += tests/libqos/sdhci.o
  qos-test-obj-y += $(libqos-virtio-obj-y)
-+qos-test-obj-y += tests/libqos/virtio-9p.o
- qos-test-obj-y += tests/libqos/virtio-serial.o
++qos-test-obj-y += tests/libqos/virtio-serial.o
  
  # Machines
-diff --git a/tests/libqos/virtio-9p.c b/tests/libqos/virtio-9p.c
+ qos-test-obj-y += tests/libqos/aarch64-xlnx-zcu102-machine.o
+diff --git a/tests/libqos/virtio-serial.c b/tests/libqos/virtio-serial.c
 new file mode 100644
-index 0000000..a378b56
+index 0000000..91cedef
 --- /dev/null
-+++ b/tests/libqos/virtio-9p.c
-@@ -0,0 +1,173 @@
++++ b/tests/libqos/virtio-serial.c
+@@ -0,0 +1,110 @@
 +/*
 + * libqos driver framework
 + *
@@ -83,165 +83,102 @@ index 0000000..a378b56
 +
 +#include "qemu/osdep.h"
 +#include "libqtest.h"
-+#include "standard-headers/linux/virtio_ids.h"
-+#include "libqos/virtio-9p.h"
 +#include "libqos/qgraph.h"
++#include "libqos/virtio-serial.h"
 +
-+static QGuestAllocator *alloc;
-+
-+static void virtio_9p_cleanup(QVirtio9P *interface)
++static void *qvirtio_serial_get_driver(QVirtioSerial *v_serial,
++                                       const char *interface)
 +{
-+    qvirtqueue_cleanup(interface->vdev->bus, interface->vq, alloc);
-+}
-+
-+static void virtio_9p_setup(QVirtio9P *interface)
-+{
-+    interface->vq = qvirtqueue_setup(interface->vdev, alloc, 0);
-+    qvirtio_set_driver_ok(interface->vdev);
-+}
-+
-+/* virtio-9p-device */
-+static void virtio_9p_device_destructor(QOSGraphObject *obj)
-+{
-+    QVirtio9PDevice *v_9p = (QVirtio9PDevice *) obj;
-+    QVirtio9P *v9p = &v_9p->v9p;
-+
-+    virtio_9p_cleanup(v9p);
-+}
-+
-+static void virtio_9p_device_start_hw(QOSGraphObject *obj)
-+{
-+    QVirtio9PDevice *v_9p = (QVirtio9PDevice *) obj;
-+    QVirtio9P *v9p = &v_9p->v9p;
-+
-+    virtio_9p_setup(v9p);
-+}
-+
-+static void *virtio_9p_get_driver(QVirtio9P *v_9p,
-+                                         const char *interface)
-+{
-+    if (!g_strcmp0(interface, "virtio-9p")) {
-+        return v_9p;
++    if (!g_strcmp0(interface, "virtio-serial")) {
++        return v_serial;
 +    }
 +    if (!g_strcmp0(interface, "virtio")) {
-+        return v_9p->vdev;
++        return v_serial->vdev;
 +    }
 +
-+    fprintf(stderr, "%s not present in virtio-9p-device\n", interface);
++    fprintf(stderr, "%s not present in virtio-serial-device\n", interface);
 +    g_assert_not_reached();
 +}
 +
-+static void *virtio_9p_device_get_driver(void *object, const char *interface)
++static void *qvirtio_serial_device_get_driver(void *object,
++                                              const char *interface)
 +{
-+    QVirtio9PDevice *v_9p = object;
-+    return virtio_9p_get_driver(&v_9p->v9p, interface);
++    QVirtioSerialDevice *v_serial = object;
++    return qvirtio_serial_get_driver(&v_serial->serial, interface);
 +}
 +
-+static void *virtio_9p_device_create(void *virtio_dev,
-+                                     QGuestAllocator *t_alloc,
-+                                     void *addr)
++static void *virtio_serial_device_create(void *virtio_dev,
++                                         QGuestAllocator *t_alloc,
++                                         void *addr)
 +{
-+    QVirtio9PDevice *virtio_device = g_new0(QVirtio9PDevice, 1);
-+    QVirtio9P *interface = &virtio_device->v9p;
++    QVirtioSerialDevice *virtio_device = g_new0(QVirtioSerialDevice, 1);
++    QVirtioSerial *interface = &virtio_device->serial;
 +
 +    interface->vdev = virtio_dev;
-+    alloc = t_alloc;
 +
-+    virtio_device->obj.destructor = virtio_9p_device_destructor;
-+    virtio_device->obj.get_driver = virtio_9p_device_get_driver;
-+    virtio_device->obj.start_hw = virtio_9p_device_start_hw;
++    virtio_device->obj.get_driver = qvirtio_serial_device_get_driver;
 +
 +    return &virtio_device->obj;
 +}
 +
-+/* virtio-9p-pci */
-+static void virtio_9p_pci_destructor(QOSGraphObject *obj)
++/* virtio-serial-pci */
++static void *qvirtio_serial_pci_get_driver(void *object, const char *interface)
 +{
-+    QVirtio9PPCI *v9_pci = (QVirtio9PPCI *) obj;
-+    QVirtio9P *interface = &v9_pci->v9p;
-+    QOSGraphObject *pci_vobj =  &v9_pci->pci_vdev.obj;
-+
-+    virtio_9p_cleanup(interface);
-+    qvirtio_pci_destructor(pci_vobj);
-+}
-+
-+static void virtio_9p_pci_start_hw(QOSGraphObject *obj)
-+{
-+    QVirtio9PPCI *v9_pci = (QVirtio9PPCI *) obj;
-+    QVirtio9P *interface = &v9_pci->v9p;
-+    QOSGraphObject *pci_vobj =  &v9_pci->pci_vdev.obj;
-+
-+    qvirtio_pci_start_hw(pci_vobj);
-+    virtio_9p_setup(interface);
-+}
-+
-+static void *virtio_9p_pci_get_driver(void *object, const char *interface)
-+{
-+    QVirtio9PPCI *v_9p = object;
++    QVirtioSerialPCI *v_serial = object;
 +    if (!g_strcmp0(interface, "pci-device")) {
-+        return v_9p->pci_vdev.pdev;
++        return v_serial->pci_vdev.pdev;
 +    }
-+    return virtio_9p_get_driver(&v_9p->v9p, interface);
++    return qvirtio_serial_get_driver(&v_serial->serial, interface);
 +}
 +
-+static void *virtio_9p_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
-+                                  void *addr)
++static void *virtio_serial_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
++                                      void *addr)
 +{
-+    QVirtio9PPCI *v9_pci = g_new0(QVirtio9PPCI, 1);
-+    QVirtio9P *interface = &v9_pci->v9p;
-+    QOSGraphObject *obj = &v9_pci->pci_vdev.obj;
++    QVirtioSerialPCI *virtio_spci = g_new0(QVirtioSerialPCI, 1);
++    QVirtioSerial *interface = &virtio_spci->serial;
++    QOSGraphObject *obj = &virtio_spci->pci_vdev.obj;
 +
-+    virtio_pci_init(&v9_pci->pci_vdev, pci_bus, addr);
-+    interface->vdev = &v9_pci->pci_vdev.vdev;
-+    alloc = t_alloc;
++    virtio_pci_init(&virtio_spci->pci_vdev, pci_bus, addr);
++    interface->vdev = &virtio_spci->pci_vdev.vdev;
 +
-+    g_assert_cmphex(interface->vdev->device_type, ==, VIRTIO_ID_9P);
-+
-+    obj->destructor = virtio_9p_pci_destructor;
-+    obj->start_hw = virtio_9p_pci_start_hw;
-+    obj->get_driver = virtio_9p_pci_get_driver;
++    obj->get_driver = qvirtio_serial_pci_get_driver;
 +
 +    return obj;
 +}
 +
-+static void virtio_9p_register_nodes(void)
++static void virtio_serial_register_nodes(void)
 +{
-+    const char *str_simple = "fsdev=fsdev0,mount_tag=" MOUNT_TAG;
-+    const char *str_addr = "fsdev=fsdev0,addr=04.0,mount_tag=" MOUNT_TAG;
-+
-+    QPCIAddress addr = {
++   QPCIAddress addr = {
 +        .devfn = QPCI_DEVFN(4, 0),
 +    };
 +
-+    QOSGraphEdgeOptions opts = {
-+        .before_cmd_line = "-fsdev synth,id=fsdev0",
-+    };
++    QOSGraphEdgeOptions edge_opts = { };
 +
-+    /* virtio-9p-device */
-+    opts.extra_device_opts = str_simple,
-+    qos_node_create_driver("virtio-9p-device", virtio_9p_device_create);
-+    qos_node_consumes("virtio-9p-device", "virtio-bus", &opts);
-+    qos_node_produces("virtio-9p-device", "virtio");
-+    qos_node_produces("virtio-9p-device", "virtio-9p");
++    /* virtio-serial-device */
++    edge_opts.extra_device_opts = "id=vser0";
++    qos_node_create_driver("virtio-serial-device",
++                            virtio_serial_device_create);
++    qos_node_consumes("virtio-serial-device", "virtio-bus", &edge_opts);
++    qos_node_produces("virtio-serial-device", "virtio");
++    qos_node_produces("virtio-serial-device", "virtio-serial");
 +
-+    /* virtio-9p-pci */
-+    opts.extra_device_opts = str_addr;
-+    add_qpci_address(&opts, &addr);
-+    qos_node_create_driver("virtio-9p-pci", virtio_9p_pci_create);
-+    qos_node_consumes("virtio-9p-pci", "pci-bus", &opts);
-+    qos_node_produces("virtio-9p-pci", "pci-device");
-+    qos_node_produces("virtio-9p-pci", "virtio");
-+    qos_node_produces("virtio-9p-pci", "virtio-9p");
-+
++    /* virtio-serial-pci */
++    edge_opts.extra_device_opts = "id=vser0,addr=04.0";
++    add_qpci_address(&edge_opts, &addr);
++    qos_node_create_driver("virtio-serial-pci", virtio_serial_pci_create);
++    qos_node_consumes("virtio-serial-pci", "pci-bus", &edge_opts);
++    qos_node_produces("virtio-serial-pci", "pci-device");
++    qos_node_produces("virtio-serial-pci", "virtio");
++    qos_node_produces("virtio-serial-pci", "virtio-serial");
 +}
 +
-+libqos_init(virtio_9p_register_nodes);
-diff --git a/tests/libqos/virtio-9p.h b/tests/libqos/virtio-9p.h
++libqos_init(virtio_serial_register_nodes);
+diff --git a/tests/libqos/virtio-serial.h b/tests/libqos/virtio-serial.h
 new file mode 100644
-index 0000000..dba2277
+index 0000000..b7e2a5d
 --- /dev/null
-+++ b/tests/libqos/virtio-9p.h
-@@ -0,0 +1,42 @@
++++ b/tests/libqos/virtio-serial.h
+@@ -0,0 +1,39 @@
 +/*
 + * libqos driver framework
 + *
@@ -264,25 +201,22 @@ index 0000000..dba2277
 +#include "libqos/virtio.h"
 +#include "libqos/virtio-pci.h"
 +
-+typedef struct QVirtio9P QVirtio9P;
-+typedef struct QVirtio9PPCI QVirtio9PPCI;
-+typedef struct QVirtio9PDevice QVirtio9PDevice;
++typedef struct QVirtioSerial QVirtioSerial;
++typedef struct QVirtioSerialPCI QVirtioSerialPCI;
++typedef struct QVirtioSerialDevice QVirtioSerialDevice;
 +
-+#define MOUNT_TAG "qtest"
-+
-+struct QVirtio9P {
++struct QVirtioSerial {
 +    QVirtioDevice *vdev;
-+    QVirtQueue *vq;
 +};
 +
-+struct QVirtio9PPCI {
++struct QVirtioSerialPCI {
 +    QVirtioPCIDevice pci_vdev;
-+    QVirtio9P v9p;
++    QVirtioSerial serial;
 +};
 +
-+struct QVirtio9PDevice {
++struct QVirtioSerialDevice {
 +    QOSGraphObject obj;
-+    QVirtio9P v9p;
++    QVirtioSerial serial;
 +};
 -- 
 1.8.3.1
