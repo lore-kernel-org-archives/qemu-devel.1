@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gThWt-0005tg-Lx
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 01:16:28 -0500
+	(envelope-from <thuth@redhat.com>) id 1gTha4-000884-FU
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 01:19:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gThWq-0003eg-Gi
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 01:16:27 -0500
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:51306
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1gThWq-0003bk-4t
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 01:16:24 -0500
-References: <1542765966-20244-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1542765966-20244-2-git-send-email-lizhijian@cn.fujitsu.com>
-	<1542765966-20244-3-git-send-email-lizhijian@cn.fujitsu.com>
-	<CAFEAcA8pdUkPBYngX5_UKRf0OkGDtLZA99zMH07RWeRTh=+BvQ@mail.gmail.com>
-	<CAFEAcA81nmEom5m4tVQCGwnHXxXLQBEuMJmHJx1FV_MVFVnKQw@mail.gmail.com>
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Message-ID: <dbaf7e49-9039-7ff5-52a8-8c1d87cb9396@cn.fujitsu.com>
-Date: Mon, 3 Dec 2018 14:16:21 +0800
+	(envelope-from <thuth@redhat.com>) id 1gThZz-0006ww-Le
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 01:19:44 -0500
+References: <20181130192216.26987-1-richard.henderson@linaro.org>
+	<20181130192216.26987-3-richard.henderson@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <34711f80-1959-32e0-e4e9-d22e003a5636@redhat.com>
+Date: Mon, 3 Dec 2018 07:19:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA81nmEom5m4tVQCGwnHXxXLQBEuMJmHJx1FV_MVFVnKQw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20181130192216.26987-3-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] change load_image() reture type to
- ssize_t
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.0 2/2] target/s390x:
+ Implement STCK et al for CONFIG_USER_ONLY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,16 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Philip Li <philip.li@intel.com>, zhijianx.li@intel.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
 
+On 2018-11-30 20:22, Richard Henderson wrote:
+> This is a non-privileged instruction that was only implemented
+> for system mode.  However, the stck instruction is used by glibc,
+> so this was causing SIGILL for programs run under debian stretch.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/s390x/helper.h      |  2 +-
+>  target/s390x/misc_helper.c | 13 ++++++++++++-
+>  target/s390x/translate.c   |  2 ++
+>  target/s390x/insn-data.def | 11 ++++++-----
+>  4 files changed, 21 insertions(+), 7 deletions(-)
+> 
+> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+> index 018e9dd414..6260b50496 100644
+> --- a/target/s390x/helper.h
+> +++ b/target/s390x/helper.h
+> @@ -121,13 +121,13 @@ DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
+>  DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
+>  DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
+>  DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
+> +DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+>  
+>  #ifndef CONFIG_USER_ONLY
+>  DEF_HELPER_3(servc, i32, env, i64, i64)
+>  DEF_HELPER_4(diag, void, env, i32, i32, i32)
+>  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
+>  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
+> -DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+>  DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
+>  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
+>  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
+> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+> index 3f91579570..c2940afecb 100644
+> --- a/target/s390x/misc_helper.c
+> +++ b/target/s390x/misc_helper.c
+> @@ -76,8 +76,19 @@ uint64_t HELPER(stpt)(CPUS390XState *env)
+>  #endif
+>  }
+>  
+> -#ifndef CONFIG_USER_ONLY
+> +#ifdef CONFIG_USER_ONLY
+> +/* Store Clock */
+> +uint64_t HELPER(stck)(CPUS390XState *env)
+> +{
+> +    struct timespec ts;
+> +    uint64_t ms;
 
-On 11/30/2018 11:14 PM, Peter Maydell wrote:
-> I'm just about to send out a patchset which removes all the
-> load_image() callers; that would make patches 2 and 4 in this
-> set unnecessary.
+May I suggest "us" for microseconds? "ms" makes me thing of
+"milliseconds"...
 
-Got it, i will remove them at next version basing on your patch set.
+> +    clock_gettime(CLOCK_REALTIME, &ts);
+> +    ms = (ts.tv_nsec / 1000) + (ts.tv_sec * 100000ull);
+> +
+> +    return TOD_UNIX_EPOCH + ms;
+> +}
 
-Thanks
-Zhijian
+Don't you need to shift the value around a little bit for getting the
+right format of the TOD clock? The microseconds are not starting with
+the lowest bit, the TOD clock has a higher resolution. See also the
+time2tod() macro in include/hw/s390x/tod.h ...
+
+ Thomas
