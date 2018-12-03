@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gTr59-0005Ti-2Q
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:28:31 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gTr5E-0005XK-K7
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:28:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gTr58-000350-C3
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:28:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54714)
+	(envelope-from <alex.williamson@redhat.com>) id 1gTr5D-00037c-Vm
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:28:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44276)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gTr58-00034b-3K
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:28:26 -0500
+	id 1gTr5D-00037D-Q4
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:28:31 -0500
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Mon, 03 Dec 2018 09:28:20 -0700
-Message-ID: <154385450060.17724.13002565063457905823.stgit@gimli.home>
+Date: Mon, 03 Dec 2018 09:28:30 -0700
+Message-ID: <154385451043.17724.16271001117325356391.stgit@gimli.home>
 In-Reply-To: <154385426086.17724.4390242199797858265.stgit@gimli.home>
 References: <154385426086.17724.4390242199797858265.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-4.0 PATCH v2 6/9] pcie: Allow generic PCIe root
- port to specify link speed and width
+Subject: [Qemu-devel] [for-4.0 PATCH v2 7/9] vfio/pci: Remove PCIe Link
+ Status emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +29,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Geoffrey McRae <geoff@hostfission.com>
+Cc: Geoffrey McRae <geoff@hostfission.com>
 
-Allow users to specify speed and width values for the generic PCIe
-root port.  Defaults remain at 2.5GT/s & x1 for compatiblity.
+Now that the downstream port will virtually negotiate itself to the
+link status of the downstream devie, we can remove this emulation.
+It's not clear that it was every terribly useful anyway.
 
-Note for libvirt testing that pcie-root-port controllers are given
-default names like "pci.7" which don't play well with using the
-"-set device.$name.$prop=$value" options accessible to us via
-<qemu:commandline> options.  The solution is to add an <alias> to the
-pcie-root-port <controller>, for example:
-
-    <controller type='pci' index='7' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='7' port='0x15'/>
-      <alias name='ua-gfx0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x5'/>
-    </controller>
-
-The "ua-" here is a mandatory prefix.  We can then use:
-
-  <qemu:commandline>
-    <qemu:arg value='-set'/>
-    <qemu:arg value='device.ua-gfx0.speed=8'/>
-    <qemu:arg value='-set'/>
-    <qemu:arg value='device.ua-gfx0.width=16'/>
-  </qemu:commandline>
-
-or, without an alias, set globals such as:
-
-  <qemu:commandline>
-    <qemu:arg value='-global'/>
-    <qemu:arg value='pcie-root-port.speed=8'/>
-    <qemu:arg value='-global'/>
-    <qemu:arg value='pcie-root-port.width=16'/>
-  </qemu:commandline>
-
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Tested-by: Geoffrey McRae <geoff@hostfission.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/pci-bridge/gen_pcie_root_port.c |    2 ++
- 1 file changed, 2 insertions(+)
+ hw/vfio/pci.c |    6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-index 299de429ec1e..e3bba2ab68ef 100644
---- a/hw/pci-bridge/gen_pcie_root_port.c
-+++ b/hw/pci-bridge/gen_pcie_root_port.c
-@@ -124,6 +124,8 @@ static Property gen_rp_props[] = {
-                      res_reserve.mem_pref_32, -1),
-     DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
-                      res_reserve.mem_pref_64, -1),
-+    DEFINE_PROP_PCIE_LINK_SPEED("speed", PCIESlot, speed, PCIE_LINK_SPEED_2_5),
-+    DEFINE_PROP_PCIE_LINK_WIDTH("width", PCIESlot, width, PCIE_LINK_WIDTH_1),
-     DEFINE_PROP_END_OF_LIST()
- };
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 74f9a46b4be0..c0cb1ec28908 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1901,12 +1901,6 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev, int pos, uint8_t size,
+                            QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT), ~0);
+             vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKCTL, 0, ~0);
+         }
+-
+-        /* Mark the Link Status bits as emulated to allow virtual negotiation */
+-        vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKSTA,
+-                               pci_get_word(vdev->pdev.config + pos +
+-                                            PCI_EXP_LNKSTA),
+-                               PCI_EXP_LNKCAP_MLW | PCI_EXP_LNKCAP_SLS);
+     }
  
+     /*
