@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gTr5q-000651-A7
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:29:11 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gTr6x-00074q-5o
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:30:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gTr5l-0003LU-0u
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:29:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59312)
+	(envelope-from <mreitz@redhat.com>) id 1gTr6t-0003ue-Fk
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:30:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35130)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gTr5i-0003K0-RD
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:29:03 -0500
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Mon, 03 Dec 2018 09:28:51 -0700
-Message-ID: <154385453112.17724.5531705925756096220.stgit@gimli.home>
-In-Reply-To: <154385426086.17724.4390242199797858265.stgit@gimli.home>
-References: <154385426086.17724.4390242199797858265.stgit@gimli.home>
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1gTr6t-0003tn-2H
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:30:15 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B5B1630014D2
+	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 16:30:13 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f60b8f1e-979b-4af9-7b48-a691c1937f6a@redhat.com>
+Date: Mon, 3 Dec 2018 17:30:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [for-4.0 PATCH v2 9/9] pcie: Fast PCIe root ports for
- new machines
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="DaoEdYI6QuwJ5c7lUzXWOULkJyCztyC0m"
+Subject: [Qemu-devel] QMP accepts double dict keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Change the default speed and width for new machine types to the
-fastest and widest currently supported.  This should be compatible to
-the PCIe 4.0 spec.  Pre-QEMU-4.0 machine types remain at 2.5GT/s, x1
-width.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DaoEdYI6QuwJ5c7lUzXWOULkJyCztyC0m
+From: Max Reitz <mreitz@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <f60b8f1e-979b-4af9-7b48-a691c1937f6a@redhat.com>
+Subject: QMP accepts double dict keys
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/pci-bridge/gen_pcie_root_port.c |    4 ++--
- include/hw/compat.h                |   10 +++++++++-
- 2 files changed, 11 insertions(+), 3 deletions(-)
+Hi,
 
-diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
-index e3bba2ab68ef..8e70c32a49ee 100644
---- a/hw/pci-bridge/gen_pcie_root_port.c
-+++ b/hw/pci-bridge/gen_pcie_root_port.c
-@@ -124,8 +124,8 @@ static Property gen_rp_props[] = {
-                      res_reserve.mem_pref_32, -1),
-     DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
-                      res_reserve.mem_pref_64, -1),
--    DEFINE_PROP_PCIE_LINK_SPEED("speed", PCIESlot, speed, PCIE_LINK_SPEED_2_5),
--    DEFINE_PROP_PCIE_LINK_WIDTH("width", PCIESlot, width, PCIE_LINK_WIDTH_1),
-+    DEFINE_PROP_PCIE_LINK_SPEED("speed", PCIESlot, speed, PCIE_LINK_SPEED_16),
-+    DEFINE_PROP_PCIE_LINK_WIDTH("width", PCIESlot, width, PCIE_LINK_WIDTH_32),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 70958328fe7a..702cc62277db 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -2,7 +2,15 @@
- #define HW_COMPAT_H
- 
- #define HW_COMPAT_3_1 \
--    /* empty */
-+    {\
-+        .driver   = "pcie-root-port",\
-+        .property = "speed",\
-+        .value    = "2_5",\
-+    },{\
-+        .driver   = "pcie-root-port",\
-+        .property = "width",\
-+        .value    = "1",\
-+    },
- 
- #define HW_COMPAT_3_0 \
-     /* empty */
+QMP accepts double keys in dicts without complaining.  The value it is
+using is apparently the last one specified:
+
+$ qemu-system-x86_64 -qmp stdio
+{"QMP": {"version": {"qemu": {"micro": 93, "minor": 0, "major": 3},
+"package": "v3.1.0-rc3-7-g87a45d86ed"}, "capabilities": []}}
+{'execute':'qmp_capabilities'}
+{"return": {}}
+{'execute':'blockdev-add','arguments':{'driver':'null-co',
+ 'node-name':'foo','node-name':'bar'}}
+{"return": {}}
+{'execute':'query-named-block-nodes'}
+{"return": [{ [...] "node-name": "bar" [...] }]}
+
+Another test case is iotest 229 which specifies both mode=3Dabsolute-path=
+s
+and mode=3Dexisting (it wants the latter).
+
+Max
+
+
+--DaoEdYI6QuwJ5c7lUzXWOULkJyCztyC0m
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlwFWhIACgkQ9AfbAGHV
+z0CcHggAjztDiYYf3d6m+bg9VUAYMDQWgZvXCgGEXuITRw1/9nmOSc6d2EAqeNUr
+pH3vv/YIjLGKcp3BGb9knyOGcL03zvu5cRygNHgwcH+O2acd1mNYld0AsZvG6tc9
+aCdbn3CXu1ft8bMWy9ls+dayULzwUlZEbjYWO+palh4IV2RXXZUftm0jnKDoIG/0
+fj6OSvqVwuA1+K8ENZLIlmDx0YwJCZVQDee3dDsCL5pMJ+sYzEOCZ2Hg2YL8FQjR
+yfQe/pw7AkDroiG0DKIOFwMikSzKZHX1jbdX09zZqQlhpwSLR28LjLTxpkw0RXhU
+siWhIViuhje2Ob0aQ+s+WfPMx/nocw==
+=E/Tu
+-----END PGP SIGNATURE-----
+
+--DaoEdYI6QuwJ5c7lUzXWOULkJyCztyC0m--
