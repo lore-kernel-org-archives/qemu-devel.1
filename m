@@ -1,44 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gTjUZ-0002bY-7q
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:22:16 -0500
+	(envelope-from <armbru@redhat.com>) id 1gTjWH-0005XG-Q8
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:23:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gTjBl-0000eY-2M
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:02:51 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49190)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gTjBk-0000e9-Py
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:02:45 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	wB37wM0J050195
-	for <qemu-devel@nongnu.org>; Mon, 3 Dec 2018 03:02:43 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2p50ckrrt2-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 03:02:35 -0500
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Mon, 3 Dec 2018 08:02:32 -0000
-Reply-To: pmorel@linux.ibm.com
-References: <1542904555-1136-1-git-send-email-pmorel@linux.ibm.com>
-	<1542904555-1136-3-git-send-email-pmorel@linux.ibm.com>
-	<07102a0f-d37e-b9a6-047e-370bc3209686@linux.ibm.com>
-	<b2e78d9d-a939-1b5f-df6d-cdc143dfe380@linux.ibm.com>
-	<49c28e28-9380-474b-b5d3-5ab61dd0af9e@linux.ibm.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Mon, 3 Dec 2018 09:02:25 +0100
+	(envelope-from <armbru@redhat.com>) id 1gTjWC-0002dB-Mr
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:23:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60726)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gTjWC-0002c1-Fr
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:23:52 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9E48B3097074
+	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 08:23:51 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181029125733.14597-1-marcandre.lureau@redhat.com>
+	<20181029125733.14597-5-marcandre.lureau@redhat.com>
+Date: Mon, 03 Dec 2018 09:23:45 +0100
+In-Reply-To: <20181029125733.14597-5-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Mon, 29 Oct 2018 16:57:31 +0400")
+Message-ID: <871s6z81da.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <49c28e28-9380-474b-b5d3-5ab61dd0af9e@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <c00e8814-2490-cb8b-6417-efd870ec8573@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] s390x/vfio: ap: Use the APdevice as
- a child of the APBus
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] monitor: check if chardev can
+ switch gcontext for OOB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,65 +36,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.ibm.com>, borntraeger@de.ibm.com
-Cc: cohuck@redhat.com, agraf@suse.de, rth@twiddle.net, david@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, mst@redhat.com, eric.auger@redhat.com, pasic@linux.ibm.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-On 30/11/2018 16:58, Tony Krowiak wrote:
-> On 11/30/18 4:31 AM, Pierre Morel wrote:
->> On 29/11/2018 21:42, Tony Krowiak wrote:
->>> On 11/22/18 11:35 AM, Pierre Morel wrote:
->>>> Two good reasons to use the base device as a child of the
->>>> AP BUS:
->>>> - We can easily find the device without traversing the qtree.
->>>> - In case we have different APdevice instantiation, VFIO with
->>>> =C2=A0=C2=A0 interception or emulation, we will need the APDevice as
->>>> =C2=A0=C2=A0 a parent device.
->>>>
->>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>> ---
->>>> =C2=A0 hw/s390x/ap-device.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 22 ++++++++++++++++++++++
->>>> =C2=A0 hw/vfio/ap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 16 ++++++----------
->>>> =C2=A0 include/hw/s390x/ap-device.h |=C2=A0 2 ++
->>>> =C2=A0 3 files changed, 30 insertions(+), 10 deletions(-)
->>>>
->>>> diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
->>>> index f5ac8db..554d5aa 100644
->>>> --- a/hw/s390x/ap-device.c
->>>> +++ b/hw/s390x/ap-device.c
->>>> @@ -11,13 +11,35 @@
->>>> =C2=A0 #include "qemu/module.h"
->>>> =C2=A0 #include "qapi/error.h"
->>>> =C2=A0 #include "hw/qdev.h"
->>>> +#include "hw/s390x/ap-bridge.h"
->>>> =C2=A0 #include "hw/s390x/ap-device.h"
->>>> +APDevice *s390_get_ap(void)
->>>
->>> How about ap_get_device(void)?
->>
->> Yes, keep same conventions.
->>
->>>
->>>> +{
->>>> +=C2=A0=C2=A0=C2=A0 static DeviceState *apb;
->>>
->>> Why static if you call s390_get_ap_bridge()
->>> to retrieve it without first checking for NULL?
->>
->> static are initialized as NULL.
->=20
-> Yes, but down below, you call s390_get_ap_bridge() to set apb
-> regardless of whether apb is NULL or not. It makes no sense to
-> declare is as static here. It is also redundant because the=20
-> s390_get_ap_bridge() function already caches it in a static
-> variable.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
+> Not all backends are able to switch gcontext. Those backends cannot
+> drive a OOB monitor (the monitor would then be blocking on main
+> thread).
+>
+> For example, ringbuf, spice, or more esoteric input chardevs like
+> braille or MUX.
+>
+> We currently forbid MUX because not all frontends are ready to run
+> outside main loop. Extend to add a context-switching feature check.
 
-OK thanks, yes we do not need the static for apb here.
+Double-checking: the reason for forbidding MUX and the reason for
+requiring QEMU_CHAR_FEATURE_GCONTEXT are orthogonal, right?
 
+> Note: this patch will conflict with Peter "[PATCH v9 3/6] monitor:
+> remove "x-oob", turn oob on by default", but can be trivially updated.
 
+I intend to merge this series first, and drop this sentence.
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  monitor.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index 511dd11d1c..fffeb27ef9 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -4560,9 +4560,11 @@ void monitor_init(Chardev *chr, int flags)
+>      bool use_oob =3D flags & MONITOR_USE_OOB;
+>=20=20
+>      if (use_oob) {
+> -        if (CHARDEV_IS_MUX(chr)) {
+> +        if (CHARDEV_IS_MUX(chr) ||
+> +            !qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT)) {
+>              error_report("Monitor out-of-band is not supported with "
+> -                         "MUX typed chardev backend");
+> +                         "%s typed chardev backend",
+> +                         object_get_typename(OBJECT(chr)));
+>              exit(1);
+>          }
+>          if (use_readline) {
