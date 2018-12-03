@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1gTeBh-0004zo-2L
-	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 21:42:21 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1gTeKd-0000si-7R
+	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 21:51:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1gTeBd-0004js-UM
-	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 21:42:21 -0500
-Received: from mga03.intel.com ([134.134.136.65]:62117)
+	(envelope-from <wei.w.wang@intel.com>) id 1gTeKc-0000ar-CH
+	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 21:51:35 -0500
+Received: from mga07.intel.com ([134.134.136.100]:65450)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
-	id 1gTeBd-0004hU-MV
-	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 21:42:17 -0500
-From: Zhao Yan <yan.y.zhao@intel.com>
-Date: Sun,  2 Dec 2018 21:37:28 -0500
-Message-Id: <20181203023728.26774-1-yan.y.zhao@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] xen/pt: Fix a xen passthrough failure
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1gTeKc-0000Zq-3J
+	for qemu-devel@nongnu.org; Sun, 02 Dec 2018 21:51:34 -0500
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Mon,  3 Dec 2018 10:18:26 +0800
+Message-Id: <1543803511-34793-3-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1543803511-34793-1-git-send-email-wei.w.wang@intel.com>
+References: <1543803511-34793-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v10 2/7] bitmap: bitmap_count_one_with_offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: anthony.perard@citrix.com, sstabellini@kernel.org, roger.pau@citrix.com, JBeulich@suse.com, qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, Zhao Yan <yan.y.zhao@intel.com>
+To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+Cc: pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com, wei.w.wang@intel.com
 
-For some pci device, even its PCI_INTERRUPT_PIN is not 0, it actually
-doesn't support INTx mode, so its machine irq read from host sysfs is 0.
-In that case, report PCI_INTERRUPT_PIN as 0 to guest and let passthrough
-continue.
+Count the number of 1s in a bitmap starting from an offset.
 
-Cc: Roger Pau Monné <roger.pau@citrix.com>
-Cc: Jan Beulich <JBeulich@suse.com>
-Signed-off-by: Zhao Yan <yan.y.zhao@intel.com>
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+CC: Juan Quintela <quintela@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/xen/xen_pt.c             | 5 +++++
- hw/xen/xen_pt_config_init.c | 7 ++++++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ include/qemu/bitmap.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
-index f1f3a3727c..de63cb8e94 100644
---- a/hw/xen/xen_pt.c
-+++ b/hw/xen/xen_pt.c
-@@ -847,6 +847,11 @@ static void xen_pt_realize(PCIDevice *d, Error **errp)
+diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+index 679f1bd..5c31334 100644
+--- a/include/qemu/bitmap.h
++++ b/include/qemu/bitmap.h
+@@ -232,6 +232,19 @@ static inline long bitmap_count_one(const unsigned long *bitmap, long nbits)
      }
- 
-     machine_irq = s->real_device.irq;
-+    if(machine_irq == 0) {
-+        XEN_PT_LOG(d, "machine irq is 0\n");
-+        goto out;
-+    }
-+
-     rc = xc_physdev_map_pirq(xen_xc, xen_domid, machine_irq, &pirq);
-     if (rc < 0) {
-         error_setg_errno(errp, errno, "Mapping machine irq %u to"
-diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
-index 47f9010c75..8baddbed90 100644
---- a/hw/xen/xen_pt_config_init.c
-+++ b/hw/xen/xen_pt_config_init.c
-@@ -300,7 +300,12 @@ static int xen_pt_irqpin_reg_init(XenPCIPassthroughState *s,
-                                   XenPTRegInfo *reg, uint32_t real_offset,
-                                   uint32_t *data)
- {
--    *data = xen_pt_pci_read_intx(s);
-+    if (s->real_device.irq)
-+        *data = xen_pt_pci_read_intx(s);
-+    else {
-+        XEN_PT_LOG(&s->dev, "machine irq is 0, init guest PCI_INTERRUPT_PIN to 0\n");
-+        *data = 0;
-+    }
-     return 0;
  }
  
++static inline long bitmap_count_one_with_offset(const unsigned long *bitmap,
++                                                long offset, long nbits)
++{
++    long aligned_offset = QEMU_ALIGN_DOWN(offset, BITS_PER_LONG);
++    long redundant_bits = offset - aligned_offset;
++    long bits_to_count = nbits + redundant_bits;
++    const unsigned long *bitmap_start = bitmap +
++                                        aligned_offset / BITS_PER_LONG;
++
++    return bitmap_count_one(bitmap_start, bits_to_count) -
++           bitmap_count_one(bitmap_start, redundant_bits);
++}
++
+ void bitmap_set(unsigned long *map, long i, long len);
+ void bitmap_set_atomic(unsigned long *map, long i, long len);
+ void bitmap_clear(unsigned long *map, long start, long nr);
 -- 
-2.17.1
+1.8.3.1
