@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEw-0000ZT-8i
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:32 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqF0-0000fh-JY
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEr-0004vt-EB
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49056)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqEz-00055y-Rk
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEr-0004uy-5B
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:25 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEz-00054A-Km
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:33 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:47 +0100
-Message-Id: <1543851204-41186-35-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:32:52 +0100
+Message-Id: <1543851204-41186-40-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 34/71] qos-test: e1000e test node
+Subject: [Qemu-devel] [PATCH 39/71] tests/qgraph: add generic virtio
+ testcases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,478 +27,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>
 
-From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-
-Convert tests/e1000e-test in qgraph test node, e1000e-test. This test
-consumes an e1000e interface and checks that its function return the
-expected values.
-
-Note that this test does not allocate any e1000e structure, it's all done by the
-qtest walking graph mechanism
-
-Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include |   3 +-
- tests/e1000e-test.c    | 356 +++++++++++--------------------------------------
- 2 files changed, 78 insertions(+), 281 deletions(-)
+ tests/Makefile.include |  1 +
+ tests/virtio-test.c    | 25 +++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
+ create mode 100644 tests/virtio-test.c
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 7d53a54..dc40b10 100644
+index 4545232..9603022 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -157,7 +157,6 @@ check-qtest-virtio-y += tests/virtio-serial-test$(EXESUF)
- check-qtest-virtio-y += $(check-qtest-virtioserial-y)
- 
- check-qtest-pci-y += tests/e1000-test$(EXESUF)
--check-qtest-pci-y += tests/e1000e-test$(EXESUF)
- check-qtest-pci-$(CONFIG_RTL8139_PCI) += tests/rtl8139-test$(EXESUF)
- check-qtest-pci-$(CONFIG_PCNET_PCI) += tests/pcnet-test$(EXESUF)
- check-qtest-pci-$(CONFIG_EEPRO100_PCI) += tests/eepro100-test$(EXESUF)
-@@ -688,6 +687,7 @@ qos-test-obj-y += tests/libqos/ppc64_pseries-machine.o
- qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
- 
- # Tests
-+qos-test-obj-y += tests/e1000e-test.o
+@@ -692,6 +692,7 @@ qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
+ qos-test-obj-y += tests/e1000e-test.o
  qos-test-obj-y += tests/pci-test.o
  qos-test-obj-y += tests/sdhci-test.o
++qos-test-obj-y += tests/virtio-test.o
  
-@@ -726,7 +726,6 @@ tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
- tests/q35-test$(EXESUF): tests/q35-test.o $(libqos-pc-obj-y)
- tests/fw_cfg-test$(EXESUF): tests/fw_cfg-test.o $(libqos-pc-obj-y)
- tests/e1000-test$(EXESUF): tests/e1000-test.o
--tests/e1000e-test$(EXESUF): tests/e1000e-test.o $(libqos-pc-obj-y)
- tests/rtl8139-test$(EXESUF): tests/rtl8139-test.o $(libqos-pc-obj-y)
- tests/pcnet-test$(EXESUF): tests/pcnet-test.o
- tests/pnv-xscom-test$(EXESUF): tests/pnv-xscom-test.o
-diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
-index 17a12b8..652a606 100644
---- a/tests/e1000e-test.c
-+++ b/tests/e1000e-test.c
-@@ -32,210 +32,9 @@
- #include "qemu/iov.h"
- #include "qemu/bitops.h"
- #include "libqos/malloc.h"
--#include "libqos/malloc-pc.h"
--#include "libqos/malloc-generic.h"
-+#include "libqos/e1000e.h"
- 
--#define E1000E_IMS      (0x00d0)
--
--#define E1000E_STATUS   (0x0008)
--#define E1000E_STATUS_LU BIT(1)
--#define E1000E_STATUS_ASDV1000 BIT(9)
--
--#define E1000E_CTRL     (0x0000)
--#define E1000E_CTRL_RESET BIT(26)
--
--#define E1000E_RCTL     (0x0100)
--#define E1000E_RCTL_EN  BIT(1)
--#define E1000E_RCTL_UPE BIT(3)
--#define E1000E_RCTL_MPE BIT(4)
--
--#define E1000E_RFCTL     (0x5008)
--#define E1000E_RFCTL_EXTEN  BIT(15)
--
--#define E1000E_TCTL     (0x0400)
--#define E1000E_TCTL_EN  BIT(1)
--
--#define E1000E_CTRL_EXT             (0x0018)
--#define E1000E_CTRL_EXT_DRV_LOAD    BIT(28)
--#define E1000E_CTRL_EXT_TXLSFLOW    BIT(22)
--
--#define E1000E_RX0_MSG_ID           (0)
--#define E1000E_TX0_MSG_ID           (1)
--#define E1000E_OTHER_MSG_ID         (2)
--
--#define E1000E_IVAR                 (0x00E4)
--#define E1000E_IVAR_TEST_CFG        ((E1000E_RX0_MSG_ID << 0)    | BIT(3)  | \
--                                     (E1000E_TX0_MSG_ID << 8)    | BIT(11) | \
--                                     (E1000E_OTHER_MSG_ID << 16) | BIT(19) | \
--                                     BIT(31))
--
--#define E1000E_RING_LEN             (0x1000)
--#define E1000E_TXD_LEN              (16)
--#define E1000E_RXD_LEN              (16)
--
--#define E1000E_TDBAL    (0x3800)
--#define E1000E_TDBAH    (0x3804)
--#define E1000E_TDLEN    (0x3808)
--#define E1000E_TDH      (0x3810)
--#define E1000E_TDT      (0x3818)
--
--#define E1000E_RDBAL    (0x2800)
--#define E1000E_RDBAH    (0x2804)
--#define E1000E_RDLEN    (0x2808)
--#define E1000E_RDH      (0x2810)
--#define E1000E_RDT      (0x2818)
--
--typedef struct e1000e_device {
--    QPCIDevice *pci_dev;
--    QPCIBar mac_regs;
--
--    uint64_t tx_ring;
--    uint64_t rx_ring;
--} e1000e_device;
--
--static int test_sockets[2];
--static QGuestAllocator test_alloc;
--static QPCIBus *test_bus;
--
--static void e1000e_pci_foreach_callback(QPCIDevice *dev, int devfn, void *data)
--{
--    QPCIDevice **res = data;
--
--    g_assert_null(*res);
--    *res = dev;
--}
--
--static QPCIDevice *e1000e_device_find(QPCIBus *bus)
--{
--    static const int e1000e_vendor_id = 0x8086;
--    static const int e1000e_dev_id = 0x10D3;
--
--    QPCIDevice *e1000e_dev = NULL;
--
--    qpci_device_foreach(bus, e1000e_vendor_id, e1000e_dev_id,
--        e1000e_pci_foreach_callback, &e1000e_dev);
--
--    g_assert_nonnull(e1000e_dev);
--
--    return e1000e_dev;
--}
--
--static void e1000e_macreg_write(e1000e_device *d, uint32_t reg, uint32_t val)
--{
--    qpci_io_writel(d->pci_dev, d->mac_regs, reg, val);
--}
--
--static uint32_t e1000e_macreg_read(e1000e_device *d, uint32_t reg)
--{
--    return qpci_io_readl(d->pci_dev, d->mac_regs, reg);
--}
--
--static void e1000e_device_init(QPCIBus *bus, e1000e_device *d)
--{
--    uint32_t val;
--
--    d->pci_dev = e1000e_device_find(bus);
--
--    /* Enable the device */
--    qpci_device_enable(d->pci_dev);
--
--    /* Map BAR0 (mac registers) */
--    d->mac_regs = qpci_iomap(d->pci_dev, 0, NULL);
--
--    /* Reset the device */
--    val = e1000e_macreg_read(d, E1000E_CTRL);
--    e1000e_macreg_write(d, E1000E_CTRL, val | E1000E_CTRL_RESET);
--
--    /* Enable and configure MSI-X */
--    qpci_msix_enable(d->pci_dev);
--    e1000e_macreg_write(d, E1000E_IVAR, E1000E_IVAR_TEST_CFG);
--
--    /* Check the device status - link and speed */
--    val = e1000e_macreg_read(d, E1000E_STATUS);
--    g_assert_cmphex(val & (E1000E_STATUS_LU | E1000E_STATUS_ASDV1000),
--        ==, E1000E_STATUS_LU | E1000E_STATUS_ASDV1000);
--
--    /* Initialize TX/RX logic */
--    e1000e_macreg_write(d, E1000E_RCTL, 0);
--    e1000e_macreg_write(d, E1000E_TCTL, 0);
--
--    /* Notify the device that the driver is ready */
--    val = e1000e_macreg_read(d, E1000E_CTRL_EXT);
--    e1000e_macreg_write(d, E1000E_CTRL_EXT,
--        val | E1000E_CTRL_EXT_DRV_LOAD | E1000E_CTRL_EXT_TXLSFLOW);
--
--    /* Allocate and setup TX ring */
--    d->tx_ring = guest_alloc(&test_alloc, E1000E_RING_LEN);
--    g_assert(d->tx_ring != 0);
--
--    e1000e_macreg_write(d, E1000E_TDBAL, (uint32_t) d->tx_ring);
--    e1000e_macreg_write(d, E1000E_TDBAH, (uint32_t) (d->tx_ring >> 32));
--    e1000e_macreg_write(d, E1000E_TDLEN, E1000E_RING_LEN);
--    e1000e_macreg_write(d, E1000E_TDT, 0);
--    e1000e_macreg_write(d, E1000E_TDH, 0);
--
--    /* Enable transmit */
--    e1000e_macreg_write(d, E1000E_TCTL, E1000E_TCTL_EN);
--
--    /* Allocate and setup RX ring */
--    d->rx_ring = guest_alloc(&test_alloc, E1000E_RING_LEN);
--    g_assert(d->rx_ring != 0);
--
--    e1000e_macreg_write(d, E1000E_RDBAL, (uint32_t)d->rx_ring);
--    e1000e_macreg_write(d, E1000E_RDBAH, (uint32_t)(d->rx_ring >> 32));
--    e1000e_macreg_write(d, E1000E_RDLEN, E1000E_RING_LEN);
--    e1000e_macreg_write(d, E1000E_RDT, 0);
--    e1000e_macreg_write(d, E1000E_RDH, 0);
--
--    /* Enable receive */
--    e1000e_macreg_write(d, E1000E_RFCTL, E1000E_RFCTL_EXTEN);
--    e1000e_macreg_write(d, E1000E_RCTL, E1000E_RCTL_EN  |
--                                        E1000E_RCTL_UPE |
--                                        E1000E_RCTL_MPE);
--
--    /* Enable all interrupts */
--    e1000e_macreg_write(d, E1000E_IMS, 0xFFFFFFFF);
--}
--
--static void e1000e_tx_ring_push(e1000e_device *d, void *descr)
--{
--    uint32_t tail = e1000e_macreg_read(d, E1000E_TDT);
--    uint32_t len = e1000e_macreg_read(d, E1000E_TDLEN) / E1000E_TXD_LEN;
--
--    memwrite(d->tx_ring + tail * E1000E_TXD_LEN, descr, E1000E_TXD_LEN);
--    e1000e_macreg_write(d, E1000E_TDT, (tail + 1) % len);
--
--    /* Read WB data for the packet transmitted */
--    memread(d->tx_ring + tail * E1000E_TXD_LEN, descr, E1000E_TXD_LEN);
--}
--
--static void e1000e_rx_ring_push(e1000e_device *d, void *descr)
--{
--    uint32_t tail = e1000e_macreg_read(d, E1000E_RDT);
--    uint32_t len = e1000e_macreg_read(d, E1000E_RDLEN) / E1000E_RXD_LEN;
--
--    memwrite(d->rx_ring + tail * E1000E_RXD_LEN, descr, E1000E_RXD_LEN);
--    e1000e_macreg_write(d, E1000E_RDT, (tail + 1) % len);
--
--    /* Read WB data for the packet received */
--    memread(d->rx_ring + tail * E1000E_RXD_LEN, descr, E1000E_RXD_LEN);
--}
--
--static void e1000e_wait_isr(e1000e_device *d, uint16_t msg_id)
--{
--    guint64 end_time = g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
--
--    do {
--        if (qpci_msix_pending(d->pci_dev, msg_id)) {
--            return;
--        }
--        clock_step(10000);
--    } while (g_get_monotonic_time() < end_time);
--
--    g_error("Timeout expired");
--}
--
--static void e1000e_send_verify(e1000e_device *d)
-+static void e1000e_send_verify(QE1000E *d, int *test_sockets, QGuestAllocator *alloc)
- {
-     struct {
-         uint64_t buffer_addr;
-@@ -268,7 +67,7 @@ static void e1000e_send_verify(e1000e_device *d)
-     uint32_t recv_len;
- 
-     /* Prepare test data buffer */
--    uint64_t data = guest_alloc(&test_alloc, data_len);
-+    uint64_t data = guest_alloc(alloc, data_len);
-     memwrite(data, "TEST", 5);
- 
-     /* Prepare TX descriptor */
-@@ -296,10 +95,10 @@ static void e1000e_send_verify(e1000e_device *d)
-     g_assert_cmpstr(buffer, == , "TEST");
- 
-     /* Free test data buffer */
--    guest_free(&test_alloc, data);
-+    guest_free(alloc, data);
- }
- 
--static void e1000e_receive_verify(e1000e_device *d)
-+static void e1000e_receive_verify(QE1000E *d, int *test_sockets, QGuestAllocator *alloc)
- {
-     union {
-         struct {
-@@ -348,7 +147,7 @@ static void e1000e_receive_verify(e1000e_device *d)
-     g_assert_cmpint(ret, == , sizeof(test) + sizeof(len));
- 
-     /* Prepare test data buffer */
--    uint64_t data = guest_alloc(&test_alloc, data_len);
-+    uint64_t data = guest_alloc(alloc, data_len);
- 
-     /* Prepare RX descriptor */
-     memset(&descr, 0, sizeof(descr));
-@@ -369,109 +168,108 @@ static void e1000e_receive_verify(e1000e_device *d)
-     g_assert_cmpstr(buffer, == , "TEST");
- 
-     /* Free test data buffer */
--    guest_free(&test_alloc, data);
--}
--
--static void e1000e_device_clear(QPCIBus *bus, e1000e_device *d)
--{
--    qpci_iounmap(d->pci_dev, d->mac_regs);
--    qpci_msix_disable(d->pci_dev);
-+    guest_free(alloc, data);
- }
- 
--static void data_test_init(e1000e_device *d)
-+static void test_e1000e_init(void *obj, void *data, QGuestAllocator * alloc)
- {
--    char *cmdline;
--
--    int ret = socketpair(PF_UNIX, SOCK_STREAM, 0, test_sockets);
--    g_assert_cmpint(ret, != , -1);
--
--    cmdline = g_strdup_printf("-netdev socket,fd=%d,id=hs0 "
--                              "-device e1000e,netdev=hs0", test_sockets[1]);
--    g_assert_nonnull(cmdline);
--
--    qtest_start(cmdline);
--    g_free(cmdline);
--
--    pc_alloc_init(&test_alloc, global_qtest, 0);
--    test_bus = qpci_new_pc(global_qtest, &test_alloc);
--    g_assert_nonnull(test_bus);
--
--    e1000e_device_init(test_bus, d);
-+    /* init does nothing */
- }
- 
--static void data_test_clear(e1000e_device *d)
-+static void test_e1000e_tx(void *obj, void *data, QGuestAllocator * alloc)
- {
--    e1000e_device_clear(test_bus, d);
--    close(test_sockets[0]);
--    alloc_destroy(&test_alloc);
--    g_free(d->pci_dev);
--    qpci_free_pc(test_bus);
--    qtest_end();
--}
--
--static void test_e1000e_init(gconstpointer data)
--{
--    e1000e_device d;
--
--    data_test_init(&d);
--    data_test_clear(&d);
--}
--
--static void test_e1000e_tx(gconstpointer data)
--{
--    e1000e_device d;
-+    QE1000E_PCI *e1000e = obj;
-+    QE1000E *d = &e1000e->e1000e;
-+    QOSGraphObject *e_object = obj;
-+    QPCIDevice *dev = e_object->get_driver(e_object, "pci-device");
+ check-unit-y += tests/test-qgraph$(EXESUF)
+ tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
+diff --git a/tests/virtio-test.c b/tests/virtio-test.c
+new file mode 100644
+index 0000000..804e537
+--- /dev/null
++++ b/tests/virtio-test.c
+@@ -0,0 +1,25 @@
++/*
++ * QTest testcase for virtio
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+    /* FIXME: add spapr support */
-+    if (qpci_check_buggy_msi(dev)) {
-+        return;
-+    }
- 
--    data_test_init(&d);
--    e1000e_send_verify(&d);
--    data_test_clear(&d);
-+    e1000e_send_verify(d, data, alloc);
- }
- 
--static void test_e1000e_rx(gconstpointer data)
-+static void test_e1000e_rx(void *obj, void *data, QGuestAllocator * alloc)
- {
--    e1000e_device d;
-+    QE1000E_PCI *e1000e = obj;
-+    QE1000E *d = &e1000e->e1000e;
-+    QOSGraphObject *e_object = obj;
-+    QPCIDevice *dev = e_object->get_driver(e_object, "pci-device");
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "libqos/qgraph.h"
++#include "libqos/pci.h"
 +
-+    /* FIXME: add spapr support */
-+    if (qpci_check_buggy_msi(dev)) {
-+        return;
-+    }
- 
--    data_test_init(&d);
--    e1000e_receive_verify(&d);
--    data_test_clear(&d);
-+    e1000e_receive_verify(d, data, alloc);
- }
- 
--static void test_e1000e_multiple_transfers(gconstpointer data)
-+static void test_e1000e_multiple_transfers(void *obj, void *data,
-+                                           QGuestAllocator *alloc)
- {
-     static const long iterations = 4 * 1024;
-     long i;
- 
--    e1000e_device d;
-+    QE1000E_PCI *e1000e = obj;
-+    QE1000E *d = &e1000e->e1000e;
-+    QOSGraphObject *e_object = obj;
-+    QPCIDevice *dev = e_object->get_driver(e_object, "pci-device");
- 
--    data_test_init(&d);
-+    /* FIXME: add spapr support */
-+    if (qpci_check_buggy_msi(dev)) {
-+        return;
-+    }
- 
-     for (i = 0; i < iterations; i++) {
--        e1000e_send_verify(&d);
--        e1000e_receive_verify(&d);
-+        e1000e_send_verify(d, data, alloc);
-+        e1000e_receive_verify(d, data, alloc);
-     }
- 
--    data_test_clear(&d);
- }
- 
--static void test_e1000e_hotplug(gconstpointer data)
-+static void test_e1000e_hotplug(void *obj, void *data, QGuestAllocator * alloc)
- {
--    qtest_start("-device e1000e");
--
-     qtest_qmp_device_add("e1000e", "e1000e_net", "{'addr': '0x06'}");
-     qpci_unplug_acpi_device_test("e1000e_net", 0x06);
++/* Tests only initialization so far. TODO: Replace with functional tests */
++static void nop(void *obj, void *data, QGuestAllocator *alloc)
++{
 +}
 +
-+static void data_test_clear(void *sockets)
++static void register_virtio_test(void)
 +{
-+    int *test_sockets = sockets;
- 
--    qtest_end();
-+    close(test_sockets[0]);
-+    qos_invalidate_command_line();
-+    close(test_sockets[1]);
-+    g_free(test_sockets);
- }
- 
--int main(int argc, char **argv)
-+static void *data_test_init(GString *cmd_line, void *arg)
- {
--    g_test_init(&argc, &argv, NULL);
-+    int *test_sockets = g_new(int, 2);
-+    int ret = socketpair(PF_UNIX, SOCK_STREAM, 0, test_sockets);
-+    g_assert_cmpint(ret, != , -1);
- 
--    qtest_add_data_func("e1000e/init", NULL, test_e1000e_init);
--    qtest_add_data_func("e1000e/tx", NULL, test_e1000e_tx);
--    qtest_add_data_func("e1000e/rx", NULL, test_e1000e_rx);
--    qtest_add_data_func("e1000e/multiple_transfers", NULL,
--        test_e1000e_multiple_transfers);
--    qtest_add_data_func("e1000e/hotplug", NULL, test_e1000e_hotplug);
-+    g_string_append_printf(cmd_line, " -netdev socket,fd=%d,id=hs0 ",
-+			   test_sockets[1]);
- 
--    return g_test_run();
-+    g_test_queue_destroy(data_test_clear, test_sockets);
-+    return test_sockets;
- }
-+
-+static void register_e1000e_test(void)
-+{
-+    QOSGraphTestOptions opts = {
-+        .before = data_test_init,
-+    };
-+
-+    qos_add_test("init", "e1000e", test_e1000e_init, &opts);
-+    qos_add_test("tx", "e1000e", test_e1000e_tx, &opts);
-+    qos_add_test("rx", "e1000e", test_e1000e_rx, &opts);
-+    qos_add_test("multiple_transfers", "e1000e",
-+                      test_e1000e_multiple_transfers, &opts);
-+    qos_add_test("hotplug", "e1000e", test_e1000e_hotplug, &opts);
++    qos_add_test("nop", "virtio", nop, NULL);
 +}
 +
-+libqos_init(register_e1000e_test);
++libqos_init(register_virtio_test);
 -- 
 1.8.3.1
