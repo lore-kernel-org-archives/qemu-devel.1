@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFr-0002IS-VL
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:15:09 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFt-0002KD-R8
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:15:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFq-0004xz-36
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:15:07 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFo-0004w1-3v
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:15:09 -0500
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 3 Dec 2018 10:14:54 +0000
-Message-ID: <20181203101429.88735-3-anton.nefedov@virtuozzo.com>
+Date: Mon, 3 Dec 2018 10:14:55 +0000
+Message-ID: <20181203101429.88735-4-anton.nefedov@virtuozzo.com>
 References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
 In-Reply-To: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v10 2/9] blkverify: set supported write/zero
- flags
+Subject: [Qemu-devel] [PATCH v10 3/9] quorum: set supported write flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +28,64 @@ Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@r
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 ---
- block/blkverify.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ block/quorum.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/block/blkverify.c b/block/blkverify.c
-index 89bf4386e3..bb52596cbb 100644
---- a/block/blkverify.c
-+++ b/block/blkverify.c
-@@ -141,8 +141,14 @@ static int blkverify_open(BlockDriverState *bs, QDict =
-*options, int flags,
-         goto fail;
+diff --git a/block/quorum.c b/block/quorum.c
+index 16b3c8067c..d21a6a3b8e 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -857,6 +857,19 @@ static QemuOptsList quorum_runtime_opts =3D {
+     },
+ };
+=20
++static void quorum_set_supported_flags(BlockDriverState *bs)
++{
++    BDRVQuorumState *s =3D bs->opaque;
++    int i;
++
++    bs->supported_write_flags =3D BDRV_REQ_FUA;
++    for (i =3D 0; i < s->num_children; i++) {
++        bs->supported_write_flags &=3D s->children[i]->bs->supported_write=
+_flags;
++    }
++
++    bs->supported_write_flags |=3D BDRV_REQ_WRITE_UNCHANGED;
++}
++
+ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+                        Error **errp)
+ {
+@@ -950,7 +963,7 @@ static int quorum_open(BlockDriverState *bs, QDict *opt=
+ions, int flags,
      }
+     s->next_child_index =3D s->num_children;
 =20
 -    bs->supported_write_flags =3D BDRV_REQ_WRITE_UNCHANGED;
--    bs->supported_zero_flags =3D BDRV_REQ_WRITE_UNCHANGED;
-+    bs->supported_write_flags =3D BDRV_REQ_WRITE_UNCHANGED |
-+        (BDRV_REQ_FUA &
-+         bs->file->bs->supported_write_flags &
-+         s->test_file->bs->supported_write_flags);
-+    bs->supported_zero_flags =3D BDRV_REQ_WRITE_UNCHANGED |
-+        ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
-+         bs->file->bs->supported_zero_flags &
-+         s->test_file->bs->supported_zero_flags);
++    quorum_set_supported_flags(bs);
 =20
-     ret =3D 0;
- fail:
+     g_free(opened);
+     goto exit;
+@@ -1025,6 +1038,8 @@ static void quorum_add_child(BlockDriverState *bs, Bl=
+ockDriverState *child_bs,
+     s->children =3D g_renew(BdrvChild *, s->children, s->num_children + 1)=
+;
+     s->children[s->num_children++] =3D child;
+=20
++    quorum_set_supported_flags(bs);
++
+ out:
+     bdrv_drained_end(bs);
+ }
+@@ -1063,6 +1078,8 @@ static void quorum_del_child(BlockDriverState *bs, Bd=
+rvChild *child,
+     bdrv_unref_child(bs, child);
+=20
+     bdrv_drained_end(bs);
++
++    quorum_set_supported_flags(bs);
+ }
+=20
+ static void quorum_refresh_filename(BlockDriverState *bs, QDict *options)
 --=20
 2.17.1
