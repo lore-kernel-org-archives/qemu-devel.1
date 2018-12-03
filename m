@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gTrHa-0000lh-Cw
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:41:20 -0500
+	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
+	id 1gTrIl-0001oW-E2
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:42:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gTrHU-0002h7-HV
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:41:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52940)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gTrHU-0002fo-90
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:41:12 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D9D793082139
-	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 16:41:09 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon,  3 Dec 2018 16:41:05 +0000
-Message-Id: <20181203164105.29858-1-berrange@redhat.com>
+	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
+	id 1gTrIh-0003QM-2s
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:42:29 -0500
+Date: Mon, 3 Dec 2018 16:42:04 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20181203164204.GO14786@perard.uk.xensource.com>
+References: <20181121151211.15997-1-paul.durrant@citrix.com>
+	<20181121151211.15997-9-paul.durrant@citrix.com>
+	<20181203163539.GN14786@perard.uk.xensource.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [qemu-web PATCH] Import historical documentation
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20181203163539.GN14786@perard.uk.xensource.com>
+Subject: Re: [Qemu-devel] [PATCH 08/18] xen: duplicate xen_disk.c as basis
+ of dataplane/xen-qdisk.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,248 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-The files included are taken from formal builds of previous versions
-of QEMU, going back to 2.0.0
+On Mon, Dec 03, 2018 at 04:35:39PM +0000, Anthony PERARD wrote:
+> On Wed, Nov 21, 2018 at 03:12:01PM +0000, Paul Durrant wrote:
+> > The new xen-qdisk XenDevice implementation requires the same core dataplane
+> > as the legacy xen_disk implementation it will eventually replace. This
+> > patch therefore copies the legacy xen_disk.c source module into a new
+> > dataplane/xen-qdisk.c source module as the basis for the new dataplane and
+> > adjusts the MAINTAINERS file accordingly.
+> > 
+> > NOTE: The duplicated code is not yet built. It is simply put into place by
+> >       this patch (just fixing style violations) such that the
+> >       modifications that will need to be made to the code are not
+> >       conflated with code movement, thus making review harder.
+> > 
+> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> 
+> Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-  - qemu-doc.html
-  - qemu-qmp-ref.html
-  - qemu-ga-ref.html
+FYI, You can use --find-copies-harder when sending this kind of patch,
+it will show the diff between the old file and the new file, even if the
+old file is still around ;-).
 
-To import them all content outside of <body></body> is stripped and
-replaced by a trivial jekyll header. This causes the rendered docs
-to get consistent styling and navbar heading.
-
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
-
-This patch shows what it would be like if we just copied the
-pre-rendered QEMU docs into qemu-web for each major release....
-
-...it would be large. 2.0.0 was only 300 KB in size, but latest
-3.0.0 release has 1.3 MB of docs. So we'd be adding about 4 MB
-of docs to qemu-web each year if we committed them.
-
-This feels undesirable as a strategy.
-
-I trimmed this mail to cut out the .html files to avoid spamming
-the list. If you want to see the full commit it is here:
-
-   https://github.com/berrange/qemu-web/commit/c5f6d0f8664d7edd016f469f07=
-09caec8360f783
-
-At least in terms of the end result for users, I think it is
-positive.
-
-Other ideas
-
- 1. Upload built docs to a lookaside directory on the download
-    site when making a release, then have a jekyll plugin to
-    pull them in. Extra work for the person making releases
-    principally.
-
- 2. Have a jekyll plugin that uses docker env to build each
-    release docs from pristine tarballs. Would need caching
-    to avoid burning CPU cycles in each web update. Reliably
-    building older QEMU versions gets increasingly troublesome
-
- assets/css/style.css               |    14 +
- documentation.md                   |    78 +-
- reference/2.0.0/qemu-doc.html      |  7323 +++++++++
- reference/2.1.0/qemu-doc.html      |  7567 ++++++++++
- reference/2.10.0/qemu-doc.html     | 10026 +++++++++++++
- reference/2.10.0/qemu-ga-ref.html  |  1947 +++
- reference/2.10.0/qemu-qmp-ref.html | 18766 +++++++++++++++++++++++
- reference/2.11.0/qemu-doc.html     | 10128 +++++++++++++
- reference/2.11.0/qemu-ga-ref.html  |  1993 +++
- reference/2.11.0/qemu-qmp-ref.html | 19171 ++++++++++++++++++++++++
- reference/2.12.0/qemu-doc.html     | 10555 +++++++++++++
- reference/2.12.0/qemu-ga-ref.html  |  1931 +++
- reference/2.12.0/qemu-qmp-ref.html | 20616 +++++++++++++++++++++++++
- reference/2.2.0/qemu-doc.html      |  7622 ++++++++++
- reference/2.3.0/qemu-doc.html      |  7692 ++++++++++
- reference/2.4.0/qemu-doc.html      |  7812 ++++++++++
- reference/2.5.0/qemu-doc.html      |  8300 +++++++++++
- reference/2.6.0/qemu-doc.html      |  8647 +++++++++++
- reference/2.7.0/qemu-doc.html      |  8771 +++++++++++
- reference/2.8.0/qemu-doc.html      |  9097 ++++++++++++
- reference/2.9.0/qemu-doc.html      |  9209 ++++++++++++
- reference/2.9.0/qemu-ga-ref.html   |  1693 +++
- reference/2.9.0/qemu-qmp-ref.html  | 18082 ++++++++++++++++++++++
- reference/3.0.0/qemu-doc.html      | 10810 ++++++++++++++
- reference/3.0.0/qemu-ga-ref.html   |  1939 +++
- reference/3.0.0/qemu-qmp-ref.html  | 21458 +++++++++++++++++++++++++++
- 26 files changed, 231246 insertions(+), 1 deletion(-)
- create mode 100644 reference/2.0.0/qemu-doc.html
- create mode 100644 reference/2.1.0/qemu-doc.html
- create mode 100644 reference/2.10.0/qemu-doc.html
- create mode 100644 reference/2.10.0/qemu-ga-ref.html
- create mode 100644 reference/2.10.0/qemu-qmp-ref.html
- create mode 100644 reference/2.11.0/qemu-doc.html
- create mode 100644 reference/2.11.0/qemu-ga-ref.html
- create mode 100644 reference/2.11.0/qemu-qmp-ref.html
- create mode 100644 reference/2.12.0/qemu-doc.html
- create mode 100644 reference/2.12.0/qemu-ga-ref.html
- create mode 100644 reference/2.12.0/qemu-qmp-ref.html
- create mode 100644 reference/2.2.0/qemu-doc.html
- create mode 100644 reference/2.3.0/qemu-doc.html
- create mode 100644 reference/2.4.0/qemu-doc.html
- create mode 100644 reference/2.5.0/qemu-doc.html
- create mode 100644 reference/2.6.0/qemu-doc.html
- create mode 100644 reference/2.7.0/qemu-doc.html
- create mode 100644 reference/2.8.0/qemu-doc.html
- create mode 100644 reference/2.9.0/qemu-doc.html
- create mode 100644 reference/2.9.0/qemu-ga-ref.html
- create mode 100644 reference/2.9.0/qemu-qmp-ref.html
- create mode 100644 reference/3.0.0/qemu-doc.html
- create mode 100644 reference/3.0.0/qemu-ga-ref.html
- create mode 100644 reference/3.0.0/qemu-qmp-ref.html
-diff --git a/assets/css/style.css b/assets/css/style.css
-index b828887..b1d7339 100644
---- a/assets/css/style.css
-+++ b/assets/css/style.css
-@@ -590,3 +590,17 @@
- 	{
- 		margin-top: 1.5em;
- 	}
-+
-+	#refdoc  {
-+	    border-spacing: 4px;
-+	}
-+	#refdoc td {
-+	    background: rgb(240,240,240);
-+	    padding: 6px;
-+	    margin: 6px;
-+	}
-+	#refdoc th {
-+	    background: rgb(220,220,220);
-+	    padding: 6px;
-+	    text-align: right;
-+	}
-diff --git a/documentation.md b/documentation.md
-index f4ef9f4..571259d 100644
---- a/documentation.md
-+++ b/documentation.md
-@@ -3,7 +3,11 @@ title: QEMU documentation
- permalink: /documentation/
- ---
-=20
--The [QEMU user manual](https://qemu.weilnetz.de/qemu-doc.html) can be re=
-ad online, courtesy of Stefan Weil.
-+## Reference guides
-+
-+The table below provides copies of the formal documentation associated
-+with each release of QEMU.
-+
- More documentation is found in the <a href=3D"https://git.qemu.org/?p=3D=
-qemu.git;a=3Dtree;f=3Ddocs;hb=3Dmaster">`docs`</a>
- directory of the QEMU git tree.
-=20
-@@ -11,3 +15,75 @@ The [QEMU wiki](https://wiki.qemu.org) contains more
- [user documentation](https://wiki.qemu.org/Category:User_documentation) =
-and
- [developer documentation](https://wiki.qemu.org/Category:Developer_docum=
-entation)
- that has not been integrated into the QEMU git tree.
-+
-+<table id=3D"refdoc">
-+<tbody>
-+<tr>
-+<th>3.0.0</th>
-+<td><a href=3D"/reference/3.0.0/qemu-doc.html">User guide</a></td>
-+<td><a href=3D"/reference/3.0.0/qemu-qmp-ref.html">QMP ref</a></td>
-+<td><a href=3D"/reference/3.0.0/qemu-ga-ref.html">GA ref</a></td>
-+</tr>
-+<tr>
-+<th>2.12.0</th>
-+<td><a href=3D"/reference/2.12.0/qemu-doc.html">User guide</a></td>
-+<td><a href=3D"/reference/2.12.0/qemu-qmp-ref.html">QMP ref</a></td>
-+<td><a href=3D"/reference/2.12.0/qemu-ga-ref.html">GA ref</a></td>
-+</tr>
-+<tr>
-+<th>2.11.0</th>
-+<td><a href=3D"/reference/2.11.0/qemu-doc.html">User guide</a></td>
-+<td><a href=3D"/reference/2.11.0/qemu-qmp-ref.html">QMP ref</a></td>
-+<td><a href=3D"/reference/2.11.0/qemu-ga-ref.html">GA ref</a></td>
-+</tr>
-+<tr>
-+<th>2.10.0</th>
-+<td><a href=3D"/reference/2.10.0/qemu-doc.html">User guide</a></td>
-+<td><a href=3D"/reference/2.10.0/qemu-qmp-ref.html">QMP ref</a></td>
-+<td><a href=3D"/reference/2.10.0/qemu-ga-ref.html">GA ref</a></td>
-+</tr>
-+<tr>
-+<th>2.9.0</th>
-+<td><a href=3D"/reference/2.9.0/qemu-doc.html">User guide</a></td>
-+<td><a href=3D"/reference/2.9.0/qemu-qmp-ref.html">QMP ref</a></td>
-+<td><a href=3D"/reference/2.9.0/qemu-ga-ref.html">GA ref</a></td>
-+</tr>
-+<tr>
-+<th>2.8.0</th>
-+<td><a href=3D"/reference/2.11.0/qemu-doc.html">User guide</a></td>
-+</tr>
-+<tr>
-+<th>2.7.0</th>
-+<td><a href=3D"/reference/2.7.0/qemu-doc.html">User guide</a></td>
-+</tr>
-+<tr>
-+<th>2.6.0</th>
-+<td><a href=3D"/reference/2.6.0/qemu-doc.html">User guide</a></td>
-+</tr>
-+<tr>
-+<th>2.5.0</th>
-+<td><a href=3D"/reference/2.5.0/qemu-doc.html">User guide</a></td>
-+</tr>
-+<tr>
-+<th>2.4.0</th>
-+<td><a href=3D"/reference/2.4.0/qemu-doc.html">User guide</a></td>
-+</tr>
-+<tr>
-+<th>2.3.0</th>
-+<td><a href=3D"/reference/2.3.0/qemu-doc.html">User guide</a></td>
-+</tr>
-+<tr>
-+<th>2.2.0</th>
-+<td><a href=3D"/reference/2.2.0/qemu-doc.html">User guide</a></td>
-+</tr>
-+<tr>
-+<th>2.1.0</th>
-+<td><a href=3D"/reference/2.1.0/qemu-doc.html">User guide</a></td>
-+</tr>
-+<tr>
-+<th>2.0.0</th>
-+<td><a href=3D"/reference/2.0.0/qemu-doc.html">User guide</a></td>
-+</tr>
-+</tbody>
-+</table>
-+
-diff --git a/reference/3.0.0/qemu-doc.html b/reference/3.0.0/qemu-doc.htm=
-l
-new file mode 100644
-index 0000000..e7abe8f
---- /dev/null
-+++ b/reference/3.0.0/qemu-doc.html
-@@ -0,0 +1,18 @@
-+---
-+permalink: reference/3.0.0/qemu-doc.html
-+---
-+<h1 class=3D"settitle" align=3D"center">QEMU version 3.0.0 User Document=
-ation</h1>
-+
-+
-+
-+
-+
-+<a name=3D"Top"></a>
-+<a name=3D"SEC_Top"></a>
-+
-+
-+<a name=3D"SEC_Contents"></a>
-+<h2 class=3D"contents-heading">Table of Contents</h2>
-+
-+<div class=3D"contents">
-+
-
-[...snip...]
+-- 
+Anthony PERARD
