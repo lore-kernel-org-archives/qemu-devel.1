@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqFj-0001lS-0N
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:22 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqFm-0001rd-Cm
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqFe-0005x6-7Q
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:22663)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqFh-00060L-Js
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54192)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqFe-0005w8-0L
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:14 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqFh-0005zo-CO
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:17 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:33:05 +0100
-Message-Id: <1543851204-41186-53-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:33:06 +0100
+Message-Id: <1543851204-41186-54-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 52/71] tests/libqos: support multiqueue for
- virtio-net
+Subject: [Qemu-devel] [PATCH 53/71] vhost-user-test: always use 256 MiB of
+ guest memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +27,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>
 
-Initialize the additional virtqueues if they are supported.
-This is needed to switch vhost-user-test's multiqueue test
-to the virtio-net qgraph.
+Some tests are using a small amount of RAM for the guest (2 MiB) in order to
+save host memory, others are using 512 MiB.
+
+However, pSeries machines only support multiples of 256 MiB.  Using 256
+MiB of memory does not use more host memory than now, even for the
+migration test that starts two guests, and it allows running the test on
+pSeries too.
+
+This of course is not optimal, it would be nice to let the qgraph machine object
+judge how much memory to provide.  This is left for future work, together
+with a more generic framework that wraps the QEMU command line.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/libqos/virtio-net.c | 21 +++++++++++++++++----
- tests/libqos/virtio-net.h |  4 ++--
- tests/virtio-net-test.c   |  6 +++---
- 3 files changed, 22 insertions(+), 9 deletions(-)
+ tests/vhost-user-test.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/tests/libqos/virtio-net.c b/tests/libqos/virtio-net.c
-index 3ddfbdc..61c5617 100644
---- a/tests/libqos/virtio-net.c
-+++ b/tests/libqos/virtio-net.c
-@@ -27,14 +27,19 @@ static QGuestAllocator *alloc;
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index 0c9a79a..f135052 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -694,7 +694,7 @@ static void test_read_guest_mem(const void *arg)
+                              "read-guest-memfd" : "read-guest-mem");
+     test_server_listen(server);
  
- static void virtio_net_cleanup(QVirtioNet *interface)
- {
--    qvirtqueue_cleanup(interface->vdev->bus, interface->rx, alloc);
--    qvirtqueue_cleanup(interface->vdev->bus, interface->tx, alloc);
-+    int i;
-+
-+    for (i = 0; i < interface->n_queues; i++) {
-+        qvirtqueue_cleanup(interface->vdev->bus, interface->queues[i], alloc);
-+    }
-+    g_free(interface->queues);
- }
+-    qemu_cmd = get_qemu_cmd(server, 512, memfd, "", "");
++    qemu_cmd = get_qemu_cmd(server, 256, memfd, "", "");
  
- static void virtio_net_setup(QVirtioNet *interface)
- {
-     QVirtioDevice *vdev = interface->vdev;
-     uint64_t features;
-+    int i;
+     s = qtest_start(qemu_cmd);
+     g_free(qemu_cmd);
+@@ -729,7 +729,7 @@ static void test_migrate(void)
+     test_server_listen(s);
+     test_server_listen(dest);
  
-     features = qvirtio_get_features(vdev);
-     features &= ~(QVIRTIO_F_BAD_FEATURE |
-@@ -42,8 +47,16 @@ static void virtio_net_setup(QVirtioNet *interface)
-                   (1u << VIRTIO_RING_F_EVENT_IDX));
-     qvirtio_set_features(vdev, features);
+-    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, "", "");
++    cmd = get_qemu_cmd(s, 256, TEST_MEMFD_AUTO, "", "");
+     from = qtest_start(cmd);
+     g_free(cmd);
  
--    interface->rx = qvirtqueue_setup(vdev, alloc, 0);
--    interface->tx = qvirtqueue_setup(vdev, alloc, 1);
-+    if (features & (1u << VIRTIO_NET_F_MQ)) {
-+        interface->n_queues = qvirtio_config_readw(vdev, 8) * 2;
-+    } else {
-+        interface->n_queues = 2;
-+    }
-+
-+    interface->queues = g_new(QVirtQueue *, interface->n_queues);
-+    for (i = 0; i < interface->n_queues; i++) {
-+        interface->queues[i] = qvirtqueue_setup(vdev, alloc, i);
-+    }
-     qvirtio_set_driver_ok(vdev);
- }
+@@ -739,10 +739,10 @@ static void test_migrate(void)
+     }
  
-diff --git a/tests/libqos/virtio-net.h b/tests/libqos/virtio-net.h
-index e6905cd..28238a1 100644
---- a/tests/libqos/virtio-net.h
-+++ b/tests/libqos/virtio-net.h
-@@ -26,8 +26,8 @@ typedef struct QVirtioNetDevice QVirtioNetDevice;
+     size = get_log_size(s);
+-    g_assert_cmpint(size, ==, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
++    g_assert_cmpint(size, ==, (256 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
  
- struct QVirtioNet {
-     QVirtioDevice *vdev;
--    QVirtQueue *rx;
--    QVirtQueue *tx;
-+    int n_queues;
-+    QVirtQueue **queues;
- };
+     tmp = g_strdup_printf(" -incoming %s", uri);
+-    cmd = get_qemu_cmd(dest, 2, TEST_MEMFD_AUTO, "", tmp);
++    cmd = get_qemu_cmd(dest, 256, TEST_MEMFD_AUTO, "", tmp);
+     g_free(tmp);
+     to = qtest_init(cmd);
+     g_free(cmd);
+@@ -852,7 +852,7 @@ static void test_reconnect_subprocess(void)
+     char *cmd;
  
- struct QVirtioNetPCI {
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index c6550e1..b232074 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -137,8 +137,8 @@ static void send_recv_test(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-     QVirtioNet *net_if = obj;
-     QVirtioDevice *dev = net_if->vdev;
--    QVirtQueue *rx = net_if->rx;
--    QVirtQueue *tx = net_if->tx;
-+    QVirtQueue *rx = net_if->queues[0];
-+    QVirtQueue *tx = net_if->queues[1];
-     int *sv = data;
+     g_thread_new("connect", connect_thread, s);
+-    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, ",server", "");
++    cmd = get_qemu_cmd(s, 256, TEST_MEMFD_AUTO, ",server", "");
+     qtest_start(cmd);
+     g_free(cmd);
  
-     rx_test(dev, t_alloc, rx, sv[0]);
-@@ -149,7 +149,7 @@ static void stop_cont_test(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-     QVirtioNet *net_if = obj;
-     QVirtioDevice *dev = net_if->vdev;
--    QVirtQueue *rx = net_if->rx;
-+    QVirtQueue *rx = net_if->queues[0];
-     int *sv = data;
+@@ -894,7 +894,7 @@ static void test_connect_fail_subprocess(void)
  
-     rx_stop_cont_test(dev, t_alloc, rx, sv[0]);
+     s->test_fail = true;
+     g_thread_new("connect", connect_thread, s);
+-    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, ",server", "");
++    cmd = get_qemu_cmd(s, 256, TEST_MEMFD_AUTO, ",server", "");
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+@@ -927,7 +927,7 @@ static void test_flags_mismatch_subprocess(void)
+ 
+     s->test_flags = TEST_FLAGS_DISCONNECT;
+     g_thread_new("connect", connect_thread, s);
+-    cmd = get_qemu_cmd(s, 2, TEST_MEMFD_AUTO, ",server", "");
++    cmd = get_qemu_cmd(s, 256, TEST_MEMFD_AUTO, ",server", "");
+     qtest_start(cmd);
+     g_free(cmd);
+ 
+@@ -968,14 +968,14 @@ static void test_multiqueue(void)
+         cmd = g_strdup_printf(
+             QEMU_CMD_MEMFD QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=%d "
+             "-device virtio-net-pci,netdev=net0,mq=on,vectors=%d",
+-            512, 512, s->chr_name,
++            256, 256, s->chr_name,
+             s->socket_path, "", s->chr_name,
+             s->queues, s->queues * 2 + 2);
+     } else {
+         cmd = g_strdup_printf(
+             QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=%d "
+             "-device virtio-net-pci,netdev=net0,mq=on,vectors=%d",
+-            512, 512, s->mem_path, s->chr_name,
++            256, 256, s->mem_path, s->chr_name,
+             s->socket_path, "", s->chr_name,
+             s->queues, s->queues * 2 + 2);
+     }
 -- 
 1.8.3.1
