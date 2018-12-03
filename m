@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gTpd9-0003Md-5n
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:55:28 -0500
+	(envelope-from <fwsgonzo@hotmail.com>) id 1gTnju-0007cT-3O
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:54:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1gTpd6-00051Y-1P
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:55:27 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44897)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1gTpd5-00050O-QU
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:55:23 -0500
-Received: by mail-wr1-x442.google.com with SMTP id z5so12485555wrt.11
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 06:55:23 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 15:55:19 +0100
-Message-Id: <1543848919-31931-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] docker: centos7: upgrade to SDL2-devel
+	(envelope-from <fwsgonzo@hotmail.com>) id 1gTnjp-0001we-5E
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:54:18 -0500
+Received: from mail-oln040092065033.outbound.protection.outlook.com
+	([40.92.65.33]:12416
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fwsgonzo@hotmail.com>)
+	id 1gTnjo-0001U8-CK
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:54:13 -0500
+From: Gonzo FWS <fwsgonzo@hotmail.com>
+Date: Mon, 3 Dec 2018 12:54:07 +0000
+Message-ID: <HE1P190MB0073644AE7C57B520A8675CEDEAE0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>
+Content-Language: en-US
+MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] Calendar
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +28,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, fam@euphon.net
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-All CentOS 7 builds on Patchew are showing this warning:
+Hey, I have written an embedded gameboy color emulator for my OS (IncludeOS=
+) which does run primarily in Qemu-KVM atm. And therein lies the problem - =
+PS2 only works with KVM enabled at present.
 
-   WARNING: Use of SDL 1.2 is deprecated and will be removed in
-   WARNING: future releases. Please switch to using SDL 2.0
+Is it too late to submit something? I will submit a static image with a fre=
+e homebrew ROM in it if you are interested.
 
-Update the packages so that the warning goes away and the more
-interesting SDL2 code is compiled instead.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- tests/docker/dockerfiles/centos7.docker | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
-index e0f18f5..12a61fe 100644
---- a/tests/docker/dockerfiles/centos7.docker
-+++ b/tests/docker/dockerfiles/centos7.docker
-@@ -24,7 +24,7 @@ ENV PACKAGES \
-     nettle-devel \
-     perl-Test-Harness \
-     pixman-devel \
--    SDL-devel \
-+    SDL2-devel \
-     spice-glib-devel \
-     spice-server-devel \
-     tar \
--- 
-1.8.3.1
+-gonzo
