@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gTqmJ-0001hG-7S
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:08:59 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gTqoc-0003Wx-P7
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:11:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gTqmF-0003U8-9P
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:08:58 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:46649)
+	(envelope-from <richard.henderson@linaro.org>) id 1gTqoW-0005ds-7X
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:11:21 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39701)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gTqmD-0003S7-Gg
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:08:53 -0500
-Received: by mail-oi1-x243.google.com with SMTP id x202so11327537oif.13
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 08:08:52 -0800 (PST)
+	id 1gTqoT-0005bu-0X
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:11:14 -0500
+Received: by mail-ot1-x344.google.com with SMTP id n8so8223513otl.6
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 08:11:12 -0800 (PST)
+References: <1543845937-300-1-git-send-email-thuth@redhat.com>
+	<1543845937-300-4-git-send-email-thuth@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon,  3 Dec 2018 10:08:40 -0600
-Message-Id: <20181203160840.15115-6-richard.henderson@linaro.org>
-In-Reply-To: <20181203160840.15115-1-richard.henderson@linaro.org>
-References: <20181203160840.15115-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH for-4.0 5/5] tcg/i386: Add setup_guest_base_seg
- for FreeBSD
+Message-ID: <dd9cb736-402a-7f5b-62de-d3edc44e501a@linaro.org>
+Date: Mon, 3 Dec 2018 10:11:08 -0600
+MIME-Version: 1.0
+In-Reply-To: <1543845937-300-4-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 3/7] configure: Remove old
+ -fno-gcse workaround for GCC 4.6.x and 4.7.[012]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cota@braap.org, alex.bennee@linaro.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/i386/tcg-target.inc.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+On 12/3/18 8:05 AM, Thomas Huth wrote:
+> Now that we require at least GCC 4.8, we don't need this als workaround
+> for 4.6 and 4.7 anymore.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  Makefile.target |  3 ---
+>  configure       | 27 ---------------------------
+>  2 files changed, 30 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index b8d2dd5ba3..3a39b51685 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -1873,6 +1873,15 @@ static inline int setup_guest_base_seg(void)
-     }
-     return 0;
- }
-+# elif defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
-+#  include <machine/sysarch.h>
-+static inline int setup_guest_base_seg(void)
-+{
-+    if (sysarch(AMD64_SET_GSBASE, &guest_base) == 0) {
-+        return P_GS;
-+    }
-+    return 0;
-+}
- # else
- static inline int setup_guest_base_seg(void)
- {
--- 
-2.17.2
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
