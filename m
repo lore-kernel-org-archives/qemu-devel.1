@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gTlLr-0006vk-Dl
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:21:20 -0500
+	(envelope-from <david@redhat.com>) id 1gTlMY-0007RG-C6
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:22:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gTlLn-00023C-F0
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:21:19 -0500
+	(envelope-from <david@redhat.com>) id 1gTlMU-0002kt-EO
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:22:02 -0500
 References: <20181130192216.26987-1-richard.henderson@linaro.org>
-	<20181130192216.26987-3-richard.henderson@linaro.org>
+	<20181130192216.26987-2-richard.henderson@linaro.org>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <cf30fb27-a5a3-6614-1053-351ffc8555c3@redhat.com>
-Date: Mon, 3 Dec 2018 11:21:11 +0100
+Message-ID: <a85ff3b6-67a4-c445-2784-db3564bbbaad@redhat.com>
+Date: Mon, 3 Dec 2018 11:21:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181130192216.26987-3-richard.henderson@linaro.org>
+In-Reply-To: <20181130192216.26987-2-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 2/2] target/s390x: Implement STCK
- et al for CONFIG_USER_ONLY
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 1/2] target/s390x: Move
+ TOD_UNIX_EPOCH to cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +29,50 @@ To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Cc: cohuck@redhat.com, qemu-s390x@nongnu.org
 
 On 30.11.18 20:22, Richard Henderson wrote:
-> This is a non-privileged instruction that was only implemented
-> for system mode.  However, the stck instruction is used by glibc,
-> so this was causing SIGILL for programs run under debian stretch.
->=20
+> We will need this from CONFIG_USER_ONLY as well,
+> which cannot access include/hw/.
+> 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/s390x/helper.h      |  2 +-
->  target/s390x/misc_helper.c | 13 ++++++++++++-
->  target/s390x/translate.c   |  2 ++
->  target/s390x/insn-data.def | 11 ++++++-----
->  4 files changed, 21 insertions(+), 7 deletions(-)
->=20
-> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> index 018e9dd414..6260b50496 100644
-> --- a/target/s390x/helper.h
-> +++ b/target/s390x/helper.h
-> @@ -121,13 +121,13 @@ DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
->  DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
->  DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
->  DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
-> +DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
-> =20
->  #ifndef CONFIG_USER_ONLY
->  DEF_HELPER_3(servc, i32, env, i64, i64)
->  DEF_HELPER_4(diag, void, env, i32, i32, i32)
->  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
->  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
-> -DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->  DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
->  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
->  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index 3f91579570..c2940afecb 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -76,8 +76,19 @@ uint64_t HELPER(stpt)(CPUS390XState *env)
->  #endif
->  }
-> =20
-> -#ifndef CONFIG_USER_ONLY
-> +#ifdef CONFIG_USER_ONLY
-> +/* Store Clock */
-> +uint64_t HELPER(stck)(CPUS390XState *env)
-> +{
-> +    struct timespec ts;
-> +    uint64_t ms;
-> =20
-> +    clock_gettime(CLOCK_REALTIME, &ts);
-> +    ms =3D (ts.tv_nsec / 1000) + (ts.tv_sec * 100000ull);
+>  include/hw/s390x/tod.h | 3 ---
+>  target/s390x/cpu.h     | 3 +++
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
+> index 413c0d7c02..6ec4fb426c 100644
+> --- a/include/hw/s390x/tod.h
+> +++ b/include/hw/s390x/tod.h
+> @@ -44,9 +44,6 @@ typedef struct S390TODClass {
+>      void (*set)(S390TODState *td, const S390TOD *tod, Error **errp);
+>  } S390TODClass;
+>  
+> -/* The value of the TOD clock for 1.1.1970. */
+> -#define TOD_UNIX_EPOCH 0x7d91048bca000000ULL
+> -
+>  /* Converts ns to s390's clock format */
+>  static inline uint64_t time2tod(uint64_t ns)
+>  {
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 8c2320e882..d8049d181a 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -797,4 +797,7 @@ void s390_init_sigp(void);
+>  /* outside of target/s390x/ */
+>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+>  
+> +/* The value of the TOD clock for 1.1.1970. */
+> +#define TOD_UNIX_EPOCH 0x7d91048bca000000ULL
 > +
-> +    return TOD_UNIX_EPOCH + ms;
+>  #endif
+> 
 
-In theory, the TOD can be completely controlled by the operating system
-(e.g. set the TOD to X). So for user space, there isn't really any
-guarantee about the values returned via stck.
+As said in response to patch 2, this might not be needed.
 
-E.g. in the PoP 4-51:
+If you're going to stick to it
 
-"4. A program using the clock value as a time-of-day
-and calendar indication must be consistent with
-the programming support under which the pro-
-gram is to be executed. [...]"
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Of course, in an ideal world, the system TOD value really corresponds to
-the reference TOD. So I assume, in theory, we can simply indicate any
-monotonic values here. E.g. not using TOD_UNIX_EPOCH and only forwarding
-the result from CLOCK_REALTIME converted to appropriate TOD values.
-
-If I am not wrong, under Linux, user space will only use stck for
-measurement, and use the vdso for getting the real time.
-
-
---=20
+-- 
 
 Thanks,
 
