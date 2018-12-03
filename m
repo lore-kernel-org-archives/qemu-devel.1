@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gTp2E-0004U3-4e
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:17:21 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gTp3l-0005fA-Ey
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:18:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1gTp27-0006wp-Sk
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:17:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59608)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gTp27-0006tj-Ht
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:17:11 -0500
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-In-Reply-To: <20181130183608.GQ18284@habkost.net>
-References: <20181126135958.20956-1-vkuznets@redhat.com>
-	<c30c335e-ca21-1179-670b-d4506ce14571@redhat.com>
-	<878t1chzj8.fsf@vitty.brq.redhat.com>
-	<20181130183608.GQ18284@habkost.net>
-Date: Mon, 03 Dec 2018 15:17:06 +0100
-Message-ID: <871s6yy9st.fsf@vitty.brq.redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gTp3j-0008IG-Oi
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:18:52 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:32907)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gTp3j-0008Hl-KU
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:18:51 -0500
+Received: by mail-ot1-x344.google.com with SMTP id i20so11706774otl.0
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 06:18:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] i386/kvm: expose
- HV_CPUID_ENLIGHTMENT_INFO.EAX and HV_CPUID_NESTED_FEATURES.EAX as feature
- words
+References: <1543845937-300-1-git-send-email-thuth@redhat.com>
+	<1543845937-300-2-git-send-email-thuth@redhat.com>
+	<20181203141611.GG8870@redhat.com>
+In-Reply-To: <20181203141611.GG8870@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Dec 2018 14:18:39 +0000
+Message-ID: <CAFEAcA9Jkegcx6VmYkzDE4dYrxec2s5XFjWd3qOWb9=PAhaDfg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 1/7] configure: Add a test for the
+ minimum compiler version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
-
-> On Thu, Nov 29, 2018 at 12:51:55PM +0100, Vitaly Kuznetsov wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->> 
->> > On 26/11/18 14:59, Vitaly Kuznetsov wrote:
->> >> It was found that QMP users of QEMU (e.g. libvirt) may need
->> >> HV_CPUID_ENLIGHTMENT_INFO.EAX/HV_CPUID_NESTED_FEATURES.EAX information. In
->> >> particular, 'hv_tlbflush' and 'hv_evmcs' enlightenments are only exposed in
->> >> HV_CPUID_ENLIGHTMENT_INFO.EAX.
->> >> 
->> >> HV_CPUID_NESTED_FEATURES.EAX is exposed for two reasons: convenience
->> >> (we don't need to export it from hyperv_handle_properties() and as
->> >> future-proof for Enlightened MSR-Bitmap, PV EPT invalidation and
->> >> direct virtual flush features.
->> >> 
->> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> >
->> > Can you add a comment to feature_word_info, explaining why the
->> > feat_names are not set?
->> 
->> I had to do some code archeology to make sure I understand, I think it
->> goes back to
->> 
->> http://lists.gnu.org/archive/html/qemu-devel/2016-06/msg06579.html
->> 
->> So the comment (probably added before FEAT_HYPERV_EAX definition) would
->> be
->> 
->> ".feat_names are commented out for Hyper-V enlightenments because we
->> don't want to have two different ways for enabling them on QEMU command
->> line. Some features (e.g. "hyperv_time", "hyperv_vapic", ...) require
->> enabling several feature bits simultaneously, exposing these bits
->> individually may just confuse guests."
->> 
->> Would do?
+On Mon, 3 Dec 2018 at 14:16, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
+wrote:
+> NB although this will succeed, it is not technically checking the
+> right thing on macOS platforms as their clang used a completely
+> different numbering scheme. It just happens to have larger numbers
+> than upstream clang, so we'll always succeed.
 >
-> That's an accurate description.
+> Compare clang on Ubuntu:
 >
-
-Thanks, I'll send v2 out with it.
-
-> But note that we might still be able to move the existing
-> "hyperv_*" features to feature_word_info[].feat_names.  We just
-> need to keep the same semantics (e.g. enable
-> HV_HYPERCALL_AVAILABLE automatically when some features are set).
+>   https://travis-ci.org/qemu/qemu/jobs/460892603
 >
-> Maybe we can make some of the feature properties read-only.  This
-> way we can give them meaningful names for debugging and error
-> messages, even if we don't want to make them configurable
-> directly.
+>   $ clang --version
+>   clang version 5.0.0 (tags/RELEASE_500/final)
+>
+> with clang on macOS:
+>
+>   https://travis-ci.org/qemu/qemu/jobs/460892611
+>
+>   $ clang --version
+>   Apple LLVM version 9.1.0 (clang-902.0.39.2)
+>
+> Fortunately there's a mapping recorded here:
+>
+>    https://en.wikipedia.org/wiki/Xcode#Latest_versions
+>
+> See "LLVM" and "CLang version string" columns.
 
-I'd suggest (if there are no objections of course) we do this separately
-from this patch. Some time ago when merging direct mode stimers for KVM
-Paolo suggested we stop adding capabilities to KVM for each individulat
-feature and replace them with something like KVM_GET_SUPPORTED_HV_CPUID
-ioctl returning all Hyper-V related feature words. When this is done we
-can reconsider how Qemu discoveres Hyper-V related KVM features and as
-part of this work we can take a closer look at feature words and
-feat_names.
+...but overall it is better to check for feature presence/absence
+where possible rather than using a version number check.
+clang does at least make this easier than it has historically
+been for gcc.
 
--- 
-Vitaly
+thanks
+-- PMM
