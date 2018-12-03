@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gTr3h-0004Ja-VX
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:26:58 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gTr4G-0004kw-Km
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:27:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gTr3d-0002EM-AS
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:26:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37792)
+	(envelope-from <alex.williamson@redhat.com>) id 1gTr4E-0002Xu-T9
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:27:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34062)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gTr3d-0002Dy-3p
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:26:53 -0500
-References: <20181203100608.28538-1-jasowang@redhat.com>
-	<20181203100608.28538-4-jasowang@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3b1e4aed-84e8-1541-6fd3-5c69a0fdd945@redhat.com>
-Date: Mon, 3 Dec 2018 10:26:02 -0600
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gTr4E-0002XB-HB
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:27:30 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Mon, 03 Dec 2018 09:27:21 -0700
+Message-ID: <154385426086.17724.4390242199797858265.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <20181203100608.28538-4-jasowang@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V4 for 3.1 3/4] virtio-net-test: remove
- unused macro
+Subject: [Qemu-devel] [for-4.0 PATCH v2 0/9] pcie: Enhanced link speed and
+ width support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +26,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: mst@redhat.com, ppandit@redhat.com, liq3ea@163.com, liq3ea@gmail.com, pbonzini@redhat.com, thuth@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, Geoffrey McRae <geoff@hostfission.com>
 
-On 12/3/18 4:06 AM, Jason Wang wrote:
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->   tests/virtio-net-test.c | 1 -
->   1 file changed, 1 deletion(-)
-> 
+v1->v2:
+ - Update for QEMU release numbering, next is 4.0 not 3.2.  Only
+   patch 8 and the commit log of patch 9 updated.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+RFC->v1:
+ - Add Cc reported by get_maintainer
+ - Fixup some commit logs (no code changes in patches 1-7)
+ - Add Geoffrey's Tested-by
+ - Add patches 8 & 9 which define a QEMU 3.2 machine type and cranking
+   up the link speed and width for that machine type while maintaining
+   compatibile speeds for older machine types (testing requested for
+   non-x86 machine types)
+ - Various other users have also reported success with this series
+   (/r/VFIO)
 
-> diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-> index 587a043e67..bdd6af9999 100644
-> --- a/tests/virtio-net-test.c
-> +++ b/tests/virtio-net-test.c
-> @@ -24,7 +24,6 @@
->   
->   #define PCI_SLOT_HP             0x06
->   #define PCI_SLOT                0x04
-> -#define PCI_FN                  0x00
->   
->   #define QVIRTIO_NET_TIMEOUT_US (30 * 1000 * 1000)
->   #define VNET_HDR_SIZE sizeof(struct virtio_net_hdr_mrg_rxbuf)
-> 
+Original cover letter:
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+QEMU exposes gen1 PCI-express interconnect devices supporting only
+2.5GT/s and x1 width.  It might not seem obvious that a virtual
+bandwidth limitation can result in a real performance degradation, but
+it's been reported that in some configurations assigned GPUs might not
+scale their link speed up to the maximum supported value if the
+downstream port above it only advertises limited link support.
+
+As proposed[1] this series effectively implements virtual link
+negotiation on downstream ports and enhances the generic PCIe root
+port to allow user configurable speeds and widths.  The "negotiation"
+simply mirrors the link status of the connected downstream device
+providing the appearance of dynamic link speed scaling to match the
+endpoint device.  Not yet implemented from the proposal is support
+for globally updating defaults based on machine type, though the
+foundation is provided here by allowing supporting PCIESlots to
+implement an instance_init callback which can call into a common
+helper for this.
+
+I have not specifically tested migration with this, but we already
+consider LNKSTA to be dynamic and the other changes implemented here
+are static config space changes with no changes being implemented for
+devices using default values, ie. they should be compatible by virtue
+of existing config space migration support.
+
+I think I've covered the required link related registers to support
+PCIe 4.0, but please let me know if I've missed any.
+
+Testing and feedback appreciated, patch 6/7 provides example qemu:arg
+options and requirements to use with existing libvirt.  Native libvirt
+support TBD.  Thanks,
+
+Alex
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03086.html
+
+---
+
+Alex Williamson (9):
+      pcie: Create enums for link speed and width
+      pci: Sync PCIe downstream port LNKSTA on read
+      qapi: Define PCIe link speed and width properties
+      pcie: Add link speed and width fields to PCIESlot
+      pcie: Fill PCIESlot link fields to support higher speeds and widths
+      pcie: Allow generic PCIe root port to specify link speed and width
+      vfio/pci: Remove PCIe Link Status emulation
+      q35/440fx/arm/spapr: Add QEMU 4.0 machine type
+      pcie: Fast PCIe root ports for new machines
+
+
+ hw/arm/virt.c                      |   19 +++-
+ hw/core/qdev-properties.c          |  178 ++++++++++++++++++++++++++++++++++++
+ hw/i386/pc_piix.c                  |   15 ++-
+ hw/i386/pc_q35.c                   |   13 ++-
+ hw/pci-bridge/gen_pcie_root_port.c |    2 
+ hw/pci-bridge/pcie_root_port.c     |   14 +++
+ hw/pci/pci.c                       |    4 +
+ hw/pci/pcie.c                      |  118 +++++++++++++++++++++++-
+ hw/ppc/spapr.c                     |   25 ++++-
+ hw/vfio/pci.c                      |    9 --
+ include/hw/compat.h                |   11 ++
+ include/hw/i386/pc.h               |    3 +
+ include/hw/pci/pci.h               |   13 +++
+ include/hw/pci/pcie.h              |    1 
+ include/hw/pci/pcie_port.h         |    4 +
+ include/hw/pci/pcie_regs.h         |   23 ++++-
+ include/hw/qdev-properties.h       |    8 ++
+ qapi/common.json                   |   42 ++++++++
+ 18 files changed, 480 insertions(+), 22 deletions(-)
