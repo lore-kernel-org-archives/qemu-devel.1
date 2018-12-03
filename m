@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEu-0000ZQ-BK
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:30 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqEw-0000ZY-Fc
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEp-0004tx-Tj
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52482)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqEt-0004xm-14
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53120)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEp-0004t2-LW
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:23 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEs-0004wl-PB
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:26 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:46 +0100
-Message-Id: <1543851204-41186-34-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:32:48 +0100
+Message-Id: <1543851204-41186-36-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 33/71] tests/libqos: e1000e driver and
+Subject: [Qemu-devel] [PATCH 35/71] tests/libqos: virtio-pci driver and
  interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,356 +29,377 @@ Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <l
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add qgraph nodes for virtio-e1000e.
-It consumes a pci-bus, and it's directly used by tests
-(e1000e is pci based).
+Add QOSGraphObject to QVirtioPCIDevice structure, with a basic
+constructor. virtio-pci is not present in qgraph, since it
+will be used as starting point by its subclasses (virtio-*-pci)
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include |   1 +
- tests/libqos/e1000e.c  | 260 +++++++++++++++++++++++++++++++++++++++++++++++++
- tests/libqos/e1000e.h  |  53 ++++++++++
- 3 files changed, 314 insertions(+)
- create mode 100644 tests/libqos/e1000e.c
- create mode 100644 tests/libqos/e1000e.h
+ tests/Makefile.include    |   1 +
+ tests/libqos/virtio-pci.c | 106 ++++++++++++++++++++++++++++++++++------------
+ tests/libqos/virtio-pci.h |  14 ++++++
+ tests/virtio-blk-test.c   |   6 +++
+ 4 files changed, 99 insertions(+), 28 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index ae8adb0..7d53a54 100644
+index dc40b10..1d4e147 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -675,6 +675,7 @@ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virt
- # Devices
- qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
+@@ -676,6 +676,7 @@ qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
  qos-test-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
-+qos-test-obj-y += tests/libqos/e1000e.o
+ qos-test-obj-y += tests/libqos/e1000e.o
  qos-test-obj-y += tests/libqos/sdhci.o
++qos-test-obj-y += $(libqos-virtio-obj-y)
  
  # Machines
-diff --git a/tests/libqos/e1000e.c b/tests/libqos/e1000e.c
-new file mode 100644
-index 0000000..54d3898
---- /dev/null
-+++ b/tests/libqos/e1000e.c
-@@ -0,0 +1,260 @@
-+/*
-+ * libqos driver framework
-+ *
-+ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License version 2 as published by the Free Software Foundation.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
+ qos-test-obj-y += tests/libqos/aarch64-xlnx-zcu102-machine.o
+diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
+index 550dede..6bcdbbb 100644
+--- a/tests/libqos/virtio-pci.c
++++ b/tests/libqos/virtio-pci.c
+@@ -15,12 +15,26 @@
+ #include "libqos/pci-pc.h"
+ #include "libqos/malloc.h"
+ #include "libqos/malloc-pc.h"
++#include "libqos/qgraph.h"
+ #include "standard-headers/linux/virtio_ring.h"
+ #include "standard-headers/linux/virtio_pci.h"
+ 
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_regs.h"
+ 
++/* virtio-pci is a superclass of all virtio-xxx-pci devices;
++ * the relation between virtio-pci and virtio-xxx-pci is implicit,
++ * and therefore virtio-pci does not produce virtio and is not
++ * reached by any edge, not even as a "contains" edge.
++ * In facts, every device is a QVirtioPCIDevice with
++ * additional fields, since every one has its own
++ * number of queues and various attributes.
++ * Virtio-pci provides default functions to start the
++ * hw and destroy the object, and nodes that want to
++ * override them should always remember to call the
++ * original qvirtio_pci_destructor and qvirtio_pci_start_hw.
 + */
 +
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "qemu-common.h"
-+#include "libqos/pci-pc.h"
-+#include "qemu/sockets.h"
-+#include "qemu/iov.h"
-+#include "qemu/bitops.h"
-+#include "libqos/malloc.h"
-+#include "libqos/qgraph.h"
-+#include "e1000e.h"
+ typedef struct QVirtioPCIForeachData {
+     void (*func)(QVirtioDevice *d, void *data);
+     uint16_t device_type;
+@@ -32,36 +46,36 @@ typedef struct QVirtioPCIForeachData {
+ void qvirtio_pci_device_free(QVirtioPCIDevice *dev)
+ {
+     g_free(dev->pdev);
+-    g_free(dev);
+ }
+ 
+-static QVirtioPCIDevice *qpcidevice_to_qvirtiodevice(QPCIDevice *pdev)
++static void qvirtio_pci_init_from_pcidev(QVirtioPCIDevice *dev, QPCIDevice *pci_dev)
+ {
+-    QVirtioPCIDevice *vpcidev;
+-    vpcidev = g_malloc0(sizeof(*vpcidev));
++    dev->pdev = pci_dev;
++    dev->vdev.device_type = qpci_config_readw(pci_dev, PCI_SUBSYSTEM_ID);
+ 
+-    if (pdev) {
+-        vpcidev->pdev = pdev;
+-        vpcidev->vdev.device_type =
+-                            qpci_config_readw(vpcidev->pdev, PCI_SUBSYSTEM_ID);
+-    }
++    dev->config_msix_entry = -1;
+ 
+-    vpcidev->config_msix_entry = -1;
++    dev->vdev.bus = &qvirtio_pci;
+ 
+-    return vpcidev;
++    /* each virtio-xxx-pci device should override at least this function */
++    dev->obj.get_driver = NULL;
++    dev->obj.start_hw = qvirtio_pci_start_hw;
++    dev->obj.destructor = qvirtio_pci_destructor;
+ }
+ 
+ static void qvirtio_pci_foreach_callback(
+                         QPCIDevice *dev, int devfn, void *data)
+ {
+     QVirtioPCIForeachData *d = data;
+-    QVirtioPCIDevice *vpcidev = qpcidevice_to_qvirtiodevice(dev);
++    QVirtioPCIDevice *vpcidev = g_new0(QVirtioPCIDevice, 1);
+ 
++    qvirtio_pci_init_from_pcidev(vpcidev, dev);
+     if (vpcidev->vdev.device_type == d->device_type &&
+         (!d->has_slot || vpcidev->pdev->devfn == d->slot << 3)) {
+         d->func(&vpcidev->vdev, d->user_data);
+     } else {
+         qvirtio_pci_device_free(vpcidev);
++        g_free(vpcidev);
+     }
+ }
+ 
+@@ -69,14 +83,14 @@ static void qvirtio_pci_assign_device(QVirtioDevice *d, void *data)
+ {
+     QVirtioPCIDevice **vpcidev = data;
+     assert(!*vpcidev);
+-    *vpcidev = (QVirtioPCIDevice *)d;
++    *vpcidev = container_of(d, QVirtioPCIDevice, vdev);
+ }
+ 
+ #define CONFIG_BASE(dev) (VIRTIO_PCI_CONFIG_OFF((dev)->pdev->msix_enabled))
+ 
+ static uint8_t qvirtio_pci_config_readb(QVirtioDevice *d, uint64_t off)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     return qpci_io_readb(dev->pdev, dev->bar, CONFIG_BASE(dev) + off);
+ }
+ 
+@@ -90,7 +104,7 @@ static uint8_t qvirtio_pci_config_readb(QVirtioDevice *d, uint64_t off)
+ 
+ static uint16_t qvirtio_pci_config_readw(QVirtioDevice *d, uint64_t off)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     uint16_t value;
+ 
+     value = qpci_io_readw(dev->pdev, dev->bar, CONFIG_BASE(dev) + off);
+@@ -102,7 +116,7 @@ static uint16_t qvirtio_pci_config_readw(QVirtioDevice *d, uint64_t off)
+ 
+ static uint32_t qvirtio_pci_config_readl(QVirtioDevice *d, uint64_t off)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     uint32_t value;
+ 
+     value = qpci_io_readl(dev->pdev, dev->bar, CONFIG_BASE(dev) + off);
+@@ -114,7 +128,7 @@ static uint32_t qvirtio_pci_config_readl(QVirtioDevice *d, uint64_t off)
+ 
+ static uint64_t qvirtio_pci_config_readq(QVirtioDevice *d, uint64_t off)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     uint64_t val;
+ 
+     val = qpci_io_readq(dev->pdev, dev->bar, CONFIG_BASE(dev) + off);
+@@ -127,37 +141,37 @@ static uint64_t qvirtio_pci_config_readq(QVirtioDevice *d, uint64_t off)
+ 
+ static uint32_t qvirtio_pci_get_features(QVirtioDevice *d)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     return qpci_io_readl(dev->pdev, dev->bar, VIRTIO_PCI_HOST_FEATURES);
+ }
+ 
+ static void qvirtio_pci_set_features(QVirtioDevice *d, uint32_t features)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     qpci_io_writel(dev->pdev, dev->bar, VIRTIO_PCI_GUEST_FEATURES, features);
+ }
+ 
+ static uint32_t qvirtio_pci_get_guest_features(QVirtioDevice *d)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     return qpci_io_readl(dev->pdev, dev->bar, VIRTIO_PCI_GUEST_FEATURES);
+ }
+ 
+ static uint8_t qvirtio_pci_get_status(QVirtioDevice *d)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     return qpci_io_readb(dev->pdev, dev->bar, VIRTIO_PCI_STATUS);
+ }
+ 
+ static void qvirtio_pci_set_status(QVirtioDevice *d, uint8_t status)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     qpci_io_writeb(dev->pdev, dev->bar, VIRTIO_PCI_STATUS, status);
+ }
+ 
+ static bool qvirtio_pci_get_queue_isr_status(QVirtioDevice *d, QVirtQueue *vq)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     QVirtQueuePCI *vqpci = (QVirtQueuePCI *)vq;
+     uint32_t data;
+ 
+@@ -182,7 +196,7 @@ static bool qvirtio_pci_get_queue_isr_status(QVirtioDevice *d, QVirtQueue *vq)
+ 
+ static bool qvirtio_pci_get_config_isr_status(QVirtioDevice *d)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     uint32_t data;
+ 
+     if (dev->pdev->msix_enabled) {
+@@ -206,19 +220,19 @@ static bool qvirtio_pci_get_config_isr_status(QVirtioDevice *d)
+ 
+ static void qvirtio_pci_queue_select(QVirtioDevice *d, uint16_t index)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     qpci_io_writeb(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_SEL, index);
+ }
+ 
+ static uint16_t qvirtio_pci_get_queue_size(QVirtioDevice *d)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     return qpci_io_readw(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_NUM);
+ }
+ 
+ static void qvirtio_pci_set_queue_address(QVirtioDevice *d, uint32_t pfn)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     qpci_io_writel(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_PFN, pfn);
+ }
+ 
+@@ -270,7 +284,7 @@ static void qvirtio_pci_virtqueue_cleanup(QVirtQueue *vq,
+ 
+ static void qvirtio_pci_virtqueue_kick(QVirtioDevice *d, QVirtQueue *vq)
+ {
+-    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)d;
++    QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
+     qpci_io_writew(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_NOTIFY, vq->index);
+ }
+ 
+@@ -294,6 +308,7 @@ const QVirtioBus qvirtio_pci = {
+     .virtqueue_kick = qvirtio_pci_virtqueue_kick,
+ };
+ 
++/* TODO: delete this once qgraph is completed */
+ static void qvirtio_pci_foreach(QPCIBus *bus, uint16_t device_type,
+                 bool has_slot, int slot,
+                 void (*func)(QVirtioDevice *d, void *data), void *data)
+@@ -416,3 +431,38 @@ void qvirtio_pci_set_msix_configuration_vector(QVirtioPCIDevice *d,
+     vector = qpci_io_readw(d->pdev, d->bar, VIRTIO_MSI_CONFIG_VECTOR);
+     g_assert_cmphex(vector, !=, VIRTIO_MSI_NO_VECTOR);
+ }
 +
-+#define E1000E_IMS      (0x00d0)
-+
-+#define E1000E_STATUS   (0x0008)
-+#define E1000E_STATUS_LU BIT(1)
-+#define E1000E_STATUS_ASDV1000 BIT(9)
-+
-+#define E1000E_CTRL     (0x0000)
-+#define E1000E_CTRL_RESET BIT(26)
-+
-+#define E1000E_RCTL     (0x0100)
-+#define E1000E_RCTL_EN  BIT(1)
-+#define E1000E_RCTL_UPE BIT(3)
-+#define E1000E_RCTL_MPE BIT(4)
-+
-+#define E1000E_RFCTL     (0x5008)
-+#define E1000E_RFCTL_EXTEN  BIT(15)
-+
-+#define E1000E_TCTL     (0x0400)
-+#define E1000E_TCTL_EN  BIT(1)
-+
-+#define E1000E_CTRL_EXT             (0x0018)
-+#define E1000E_CTRL_EXT_DRV_LOAD    BIT(28)
-+#define E1000E_CTRL_EXT_TXLSFLOW    BIT(22)
-+
-+#define E1000E_IVAR                 (0x00E4)
-+#define E1000E_IVAR_TEST_CFG        ((E1000E_RX0_MSG_ID << 0)    | BIT(3)  | \
-+                                     (E1000E_TX0_MSG_ID << 8)    | BIT(11) | \
-+                                     (E1000E_OTHER_MSG_ID << 16) | BIT(19) | \
-+                                     BIT(31))
-+
-+#define E1000E_RING_LEN             (0x1000)
-+
-+#define E1000E_TDBAL    (0x3800)
-+
-+#define E1000E_TDBAH    (0x3804)
-+#define E1000E_TDH      (0x3810)
-+
-+#define E1000E_RDBAL    (0x2800)
-+#define E1000E_RDBAH    (0x2804)
-+#define E1000E_RDH      (0x2810)
-+
-+#define E1000E_TXD_LEN              (16)
-+#define E1000E_RXD_LEN              (16)
-+
-+static void e1000e_macreg_write(QE1000E *d, uint32_t reg, uint32_t val)
++void qvirtio_pci_destructor(QOSGraphObject *obj)
 +{
-+    QE1000E_PCI *d_pci = container_of(d, QE1000E_PCI, e1000e);
-+    qpci_io_writel(&d_pci->pci_dev, d_pci->mac_regs, reg, val);
++    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)obj;
++    qvirtio_pci_device_disable(dev);
++    qvirtio_pci_device_free(dev);
 +}
 +
-+static uint32_t e1000e_macreg_read(QE1000E *d, uint32_t reg)
++void qvirtio_pci_start_hw(QOSGraphObject *obj)
 +{
-+    QE1000E_PCI *d_pci = container_of(d, QE1000E_PCI, e1000e);
-+    return qpci_io_readl(&d_pci->pci_dev, d_pci->mac_regs, reg);
++    QVirtioPCIDevice *dev = (QVirtioPCIDevice *)obj;
++    qvirtio_pci_device_enable(dev);
++    qvirtio_start_device(&dev->vdev);
 +}
 +
-+void e1000e_tx_ring_push(QE1000E *d, void *descr)
++void virtio_pci_init(QVirtioPCIDevice *dev, QPCIBus *bus, QPCIAddress * addr)
 +{
-+    uint32_t tail = e1000e_macreg_read(d, E1000E_TDT);
-+    uint32_t len = e1000e_macreg_read(d, E1000E_TDLEN) / E1000E_TXD_LEN;
-+
-+    memwrite(d->tx_ring + tail * E1000E_TXD_LEN, descr, E1000E_TXD_LEN);
-+    e1000e_macreg_write(d, E1000E_TDT, (tail + 1) % len);
-+
-+    /* Read WB data for the packet transmitted */
-+    memread(d->tx_ring + tail * E1000E_TXD_LEN, descr, E1000E_TXD_LEN);
++    QPCIDevice *pci_dev = qpci_device_find(bus, addr->devfn);
++    g_assert_nonnull(pci_dev);
++    qvirtio_pci_init_from_pcidev(dev, pci_dev);
 +}
 +
-+void e1000e_rx_ring_push(QE1000E *d, void *descr)
++QVirtioPCIDevice *virtio_pci_new(QPCIBus *bus, QPCIAddress * addr)
 +{
-+    uint32_t tail = e1000e_macreg_read(d, E1000E_RDT);
-+    uint32_t len = e1000e_macreg_read(d, E1000E_RDLEN) / E1000E_RXD_LEN;
-+
-+    memwrite(d->rx_ring + tail * E1000E_RXD_LEN, descr, E1000E_RXD_LEN);
-+    e1000e_macreg_write(d, E1000E_RDT, (tail + 1) % len);
-+
-+    /* Read WB data for the packet received */
-+    memread(d->rx_ring + tail * E1000E_RXD_LEN, descr, E1000E_RXD_LEN);
-+}
-+
-+static void e1000e_foreach_callback(QPCIDevice *dev, int devfn, void *data)
-+{
-+    QPCIDevice *res = data;
-+    memcpy(res, dev, sizeof(QPCIDevice));
-+    g_free(dev);
-+}
-+
-+void e1000e_wait_isr(QE1000E *d, uint16_t msg_id)
-+{
-+    QE1000E_PCI *d_pci = container_of(d, QE1000E_PCI, e1000e);
-+    guint64 end_time = g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
-+
-+    do {
-+        if (qpci_msix_pending(&d_pci->pci_dev, msg_id)) {
-+            return;
-+        }
-+        clock_step(10000);
-+    } while (g_get_monotonic_time() < end_time);
-+
-+    g_error("Timeout expired");
-+}
-+
-+static void e1000e_pci_destructor(QOSGraphObject *obj)
-+{
-+    QE1000E_PCI *epci = (QE1000E_PCI *) obj;
-+    qpci_iounmap(&epci->pci_dev, epci->mac_regs);
-+    qpci_msix_disable(&epci->pci_dev);
-+}
-+
-+static void e1000e_pci_start_hw(QOSGraphObject *obj)
-+{
-+    QE1000E_PCI *d = (QE1000E_PCI *) obj;
-+    uint32_t val;
-+
-+    /* Enable the device */
-+    qpci_device_enable(&d->pci_dev);
-+
-+    /* Reset the device */
-+    val = e1000e_macreg_read(&d->e1000e, E1000E_CTRL);
-+    e1000e_macreg_write(&d->e1000e, E1000E_CTRL, val | E1000E_CTRL_RESET);
-+
-+    /* Enable and configure MSI-X */
-+    qpci_msix_enable(&d->pci_dev);
-+    e1000e_macreg_write(&d->e1000e, E1000E_IVAR, E1000E_IVAR_TEST_CFG);
-+
-+    /* Check the device status - link and speed */
-+    val = e1000e_macreg_read(&d->e1000e, E1000E_STATUS);
-+    g_assert_cmphex(val & (E1000E_STATUS_LU | E1000E_STATUS_ASDV1000),
-+        ==, E1000E_STATUS_LU | E1000E_STATUS_ASDV1000);
-+
-+    /* Initialize TX/RX logic */
-+    e1000e_macreg_write(&d->e1000e, E1000E_RCTL, 0);
-+    e1000e_macreg_write(&d->e1000e, E1000E_TCTL, 0);
-+
-+    /* Notify the device that the driver is ready */
-+    val = e1000e_macreg_read(&d->e1000e, E1000E_CTRL_EXT);
-+    e1000e_macreg_write(&d->e1000e, E1000E_CTRL_EXT,
-+        val | E1000E_CTRL_EXT_DRV_LOAD | E1000E_CTRL_EXT_TXLSFLOW);
-+
-+    e1000e_macreg_write(&d->e1000e, E1000E_TDBAL,
-+                           (uint32_t) d->e1000e.tx_ring);
-+    e1000e_macreg_write(&d->e1000e, E1000E_TDBAH,
-+                           (uint32_t) (d->e1000e.tx_ring >> 32));
-+    e1000e_macreg_write(&d->e1000e, E1000E_TDLEN, E1000E_RING_LEN);
-+    e1000e_macreg_write(&d->e1000e, E1000E_TDT, 0);
-+    e1000e_macreg_write(&d->e1000e, E1000E_TDH, 0);
-+
-+    /* Enable transmit */
-+    e1000e_macreg_write(&d->e1000e, E1000E_TCTL, E1000E_TCTL_EN);
-+    e1000e_macreg_write(&d->e1000e, E1000E_RDBAL,
-+                           (uint32_t)d->e1000e.rx_ring);
-+    e1000e_macreg_write(&d->e1000e, E1000E_RDBAH,
-+                           (uint32_t)(d->e1000e.rx_ring >> 32));
-+    e1000e_macreg_write(&d->e1000e, E1000E_RDLEN, E1000E_RING_LEN);
-+    e1000e_macreg_write(&d->e1000e, E1000E_RDT, 0);
-+    e1000e_macreg_write(&d->e1000e, E1000E_RDH, 0);
-+
-+    /* Enable receive */
-+    e1000e_macreg_write(&d->e1000e, E1000E_RFCTL, E1000E_RFCTL_EXTEN);
-+    e1000e_macreg_write(&d->e1000e, E1000E_RCTL, E1000E_RCTL_EN  |
-+                                        E1000E_RCTL_UPE |
-+                                        E1000E_RCTL_MPE);
-+
-+    /* Enable all interrupts */
-+    e1000e_macreg_write(&d->e1000e, E1000E_IMS, 0xFFFFFFFF);
-+
-+}
-+
-+static void *e1000e_pci_get_driver(void *obj, const char *interface)
-+{
-+    QE1000E_PCI *epci = obj;
-+    if (!g_strcmp0(interface, "e1000e-if")) {
-+        return &epci->e1000e;
++    QVirtioPCIDevice *dev;
++    QPCIDevice *pci_dev = qpci_device_find(bus, addr->devfn);
++    if (!pci_dev) {
++        return NULL;
 +    }
 +
-+    /* implicit contains */
-+    if (!g_strcmp0(interface, "pci-device")) {
-+        return &epci->pci_dev;
-+    }
-+
-+    fprintf(stderr, "%s not present in e1000e\n", interface);
-+    g_assert_not_reached();
++    dev = g_new0(QVirtioPCIDevice, 1);
++    qvirtio_pci_init_from_pcidev(dev, pci_dev);
++    dev->obj.free = g_free;
++    return dev;
 +}
-+
-+static void *e1000e_pci_create(void *pci_bus, QGuestAllocator *alloc,
-+                               void *addr)
-+{
-+    QE1000E_PCI *d = g_new0(QE1000E_PCI, 1);
-+    QPCIBus *bus = pci_bus;
-+    QPCIAddress *address = addr;
-+
-+    qpci_device_foreach(bus, address->vendor_id, address->device_id,
-+                        e1000e_foreach_callback, &d->pci_dev);
-+
-+    /* Map BAR0 (mac registers) */
-+    d->mac_regs = qpci_iomap(&d->pci_dev, 0, NULL);
-+
-+    /* Allocate and setup TX ring */
-+    d->e1000e.tx_ring = guest_alloc(alloc, E1000E_RING_LEN);
-+    g_assert(d->e1000e.tx_ring != 0);
-+
-+    /* Allocate and setup RX ring */
-+    d->e1000e.rx_ring = guest_alloc(alloc, E1000E_RING_LEN);
-+    g_assert(d->e1000e.rx_ring != 0);
-+
-+    d->obj.get_driver = e1000e_pci_get_driver;
-+    d->obj.start_hw = e1000e_pci_start_hw;
-+    d->obj.destructor = e1000e_pci_destructor;
-+
-+    return &d->obj;
-+}
-+
-+static void e1000e_register_nodes(void)
-+{
-+    QPCIAddress addr = {
-+        .vendor_id = 0x8086,
-+        .device_id = 0x10D3,
-+    };
-+
-+    /* FIXME: every test using this node needs to setup a -netdev socket,id=hs0
-+     * otherwise QEMU is not going to start */
-+    QOSGraphEdgeOptions opts = {
-+        .extra_device_opts = "netdev=hs0",
-+    };
-+    add_qpci_address(&opts, &addr);
-+
-+    qos_node_create_driver("e1000e", e1000e_pci_create);
-+    qos_node_consumes("e1000e", "pci-bus", &opts);
-+}
-+
-+libqos_init(e1000e_register_nodes);
-diff --git a/tests/libqos/e1000e.h b/tests/libqos/e1000e.h
-new file mode 100644
-index 0000000..9d37094
---- /dev/null
-+++ b/tests/libqos/e1000e.h
-@@ -0,0 +1,53 @@
-+/*
-+ * libqos driver framework
-+ *
-+ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License version 2 as published by the Free Software Foundation.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#ifndef QGRAPH_E1000E
-+#define QGRAPH_E1000E
-+
+diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
+index 6ef1909..5631352 100644
+--- a/tests/libqos/virtio-pci.h
++++ b/tests/libqos/virtio-pci.h
+@@ -12,8 +12,10 @@
+ 
+ #include "libqos/virtio.h"
+ #include "libqos/pci.h"
 +#include "libqos/qgraph.h"
-+#include "pci.h"
-+
-+#define E1000E_RX0_MSG_ID           (0)
-+#define E1000E_TX0_MSG_ID           (1)
-+#define E1000E_OTHER_MSG_ID         (2)
-+
-+#define E1000E_TDLEN    (0x3808)
-+#define E1000E_TDT      (0x3818)
-+#define E1000E_RDLEN    (0x2808)
-+#define E1000E_RDT      (0x2818)
-+
-+typedef struct QE1000E QE1000E;
-+typedef struct QE1000E_PCI QE1000E_PCI;
-+
-+struct QE1000E {
-+    uint64_t tx_ring;
-+    uint64_t rx_ring;
-+};
-+
-+struct QE1000E_PCI {
+ 
+ typedef struct QVirtioPCIDevice {
 +    QOSGraphObject obj;
-+    QPCIDevice pci_dev;
-+    QPCIBar mac_regs;
-+    QE1000E e1000e;
-+};
+     QVirtioDevice vdev;
+     QPCIDevice *pdev;
+     QPCIBar bar;
+@@ -31,11 +33,23 @@ typedef struct QVirtQueuePCI {
+ 
+ extern const QVirtioBus qvirtio_pci;
+ 
++void virtio_pci_init(QVirtioPCIDevice *dev, QPCIBus *bus, QPCIAddress * addr);
++QVirtioPCIDevice *virtio_pci_new(QPCIBus *bus, QPCIAddress * addr);
+ QVirtioPCIDevice *qvirtio_pci_device_find(QPCIBus *bus, uint16_t device_type);
+ QVirtioPCIDevice *qvirtio_pci_device_find_slot(QPCIBus *bus,
+                                                uint16_t device_type, int slot);
+ void qvirtio_pci_device_free(QVirtioPCIDevice *dev);
+ 
++/* virtio-pci object functions available for subclasses that
++ * override the original start_hw and destroy
++ * function. All virtio-xxx-pci subclass that override must
++ * take care of calling these two functions in the respective
++ * places
++ */
++void qvirtio_pci_destructor(QOSGraphObject *obj);
++void qvirtio_pci_start_hw(QOSGraphObject *obj);
 +
-+void e1000e_wait_isr(QE1000E *d, uint16_t msg_id);
-+void e1000e_tx_ring_push(QE1000E *d, void *descr);
-+void e1000e_rx_ring_push(QE1000E *d, void *descr);
 +
-+#endif
+ void qvirtio_pci_device_enable(QVirtioPCIDevice *d);
+ void qvirtio_pci_device_disable(QVirtioPCIDevice *d);
+ 
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 77457f7..a9dcbe2 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -299,6 +299,7 @@ static void pci_basic(void)
+     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, &qs->alloc);
+     qvirtio_pci_device_disable(dev);
+     qvirtio_pci_device_free(dev);
++    g_free(dev);
+     qtest_shutdown(qs);
+ }
+ 
+@@ -393,6 +394,7 @@ static void pci_indirect(void)
+     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, &qs->alloc);
+     qvirtio_pci_device_disable(dev);
+     qvirtio_pci_device_free(dev);
++    g_free(dev);
+     qtest_shutdown(qs);
+ }
+ 
+@@ -422,6 +424,7 @@ static void pci_config(void)
+ 
+     qvirtio_pci_device_disable(dev);
+     qvirtio_pci_device_free(dev);
++    g_free(dev);
+ 
+     qtest_shutdown(qs);
+ }
+@@ -530,6 +533,7 @@ static void pci_msix(void)
+     qpci_msix_disable(dev->pdev);
+     qvirtio_pci_device_disable(dev);
+     qvirtio_pci_device_free(dev);
++    g_free(dev);
+     qtest_shutdown(qs);
+ }
+ 
+@@ -653,6 +657,7 @@ static void pci_idx(void)
+     qpci_msix_disable(dev->pdev);
+     qvirtio_pci_device_disable(dev);
+     qvirtio_pci_device_free(dev);
++    g_free(dev);
+     qtest_shutdown(qs);
+ }
+ 
+@@ -673,6 +678,7 @@ static void pci_hotplug(void)
+     g_assert(dev);
+     qvirtio_pci_device_disable(dev);
+     qvirtio_pci_device_free(dev);
++    g_free(dev);
+ 
+     /* unplug secondary disk */
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
 -- 
 1.8.3.1
