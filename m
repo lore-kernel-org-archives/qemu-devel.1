@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gTrYH-0007gI-0n
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:58:35 -0500
+	(envelope-from <vkuznets@redhat.com>) id 1gTrYn-0000f9-Oy
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:59:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gTrYF-0008LW-AP
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:58:32 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  3 Dec 2018 17:58:10 +0100
-Message-Id: <20181203165810.14509-3-kwolf@redhat.com>
-In-Reply-To: <20181203165810.14509-1-kwolf@redhat.com>
-References: <20181203165810.14509-1-kwolf@redhat.com>
+	(envelope-from <vkuznets@redhat.com>) id 1gTrYl-0000JF-3a
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:59:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59288)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1gTrYj-0000EN-5P
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:59:03 -0500
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date: Mon,  3 Dec 2018 17:58:57 +0100
+Message-Id: <20181203165857.9819-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/2] iotests: simple mirror test with kvm on 1G
- image
+Subject: [Qemu-devel] [PATCH v2] i386/kvm: expose
+ HV_CPUID_ENLIGHTMENT_INFO.EAX and HV_CPUID_NESTED_FEATURES.EAX as feature
+ words
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,130 +25,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+It was found that QMP users of QEMU (e.g. libvirt) may need
+HV_CPUID_ENLIGHTMENT_INFO.EAX/HV_CPUID_NESTED_FEATURES.EAX information. I=
+n
+particular, 'hv_tlbflush' and 'hv_evmcs' enlightenments are only exposed =
+in
+HV_CPUID_ENLIGHTMENT_INFO.EAX.
 
-This test is broken without previous commit fixing dead-lock in mirror.
+HV_CPUID_NESTED_FEATURES.EAX is exposed for two reasons: convenience
+(we don't need to export it from hyperv_handle_properties() and as
+future-proof for Enlightened MSR-Bitmap, PV EPT invalidation and
+direct virtual flush features.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Acked-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+While on it, add a comment explaining why .feat_names are currently
+commented out for Hyper-V feature words.
+
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
 ---
- tests/qemu-iotests/235     | 76 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/235.out |  3 ++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 80 insertions(+)
- create mode 100755 tests/qemu-iotests/235
- create mode 100644 tests/qemu-iotests/235.out
+Changes since v1:
+- Add a comment explaining why .feat_names are currently
+  commented out for Hyper-V feature words. [Paolo Bonzini]
+- Add Roman's R-b tag.
+---
+ target/i386/cpu.c | 37 +++++++++++++++++++++
+ target/i386/cpu.h |  2 ++
+ target/i386/kvm.c | 85 +++++++++++++++++++++++++----------------------
+ 3 files changed, 84 insertions(+), 40 deletions(-)
 
-diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
-new file mode 100755
-index 0000000000..da044ed34e
---- /dev/null
-+++ b/tests/qemu-iotests/235
-@@ -0,0 +1,76 @@
-+#!/usr/bin/env python
-+#
-+# Simple mirror test
-+#
-+# Copyright (c) 2018 Virtuozzo International GmbH. All rights reserved.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index f81d35e1f9..6685c8e5f6 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -929,6 +929,13 @@ static FeatureWordInfo feature_word_info[FEATURE_WOR=
+DS] =3D {
+          */
+         .no_autoenable_flags =3D ~0U,
+     },
++    /*
++     * .feat_names are commented out for Hyper-V enlightenments because =
+we
++     * don't want to have two different ways for enabling them on QEMU c=
+ommand
++     * line. Some features (e.g. "hyperv_time", "hyperv_vapic", ...) req=
+uire
++     * enabling several feature bits simultaneously, exposing these bits
++     * individually may just confuse guests.
++     */
+     [FEAT_HYPERV_EAX] =3D {
+         .type =3D CPUID_FEATURE_WORD,
+         .feat_names =3D {
+@@ -980,6 +987,36 @@ static FeatureWordInfo feature_word_info[FEATURE_WOR=
+DS] =3D {
+         },
+         .cpuid =3D { .eax =3D 0x40000003, .reg =3D R_EDX, },
+     },
++    [FEAT_HV_RECOMM_EAX] =3D {
++        .type =3D CPUID_FEATURE_WORD,
++        .feat_names =3D {
++            NULL /* hv_recommend_pv_as_switch */,
++            NULL /* hv_recommend_pv_tlbflush_local */,
++            NULL /* hv_recommend_pv_tlbflush_remote */,
++            NULL /* hv_recommend_msr_apic_access */,
++            NULL /* hv_recommend_msr_reset */,
++            NULL /* hv_recommend_relaxed_timing */,
++            NULL /* hv_recommend_dma_remapping */,
++            NULL /* hv_recommend_int_remapping */,
++            NULL /* hv_recommend_x2apic_msrs */,
++            NULL /* hv_recommend_autoeoi_deprecation */,
++            NULL /* hv_recommend_pv_ipi */,
++            NULL /* hv_recommend_ex_hypercalls */,
++            NULL /* hv_hypervisor_is_nested */,
++            NULL /* hv_recommend_int_mbec */,
++            NULL /* hv_recommend_evmcs */,
++            NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .cpuid =3D { .eax =3D 0x40000004, .reg =3D R_EAX, },
++    },
++    [FEAT_HV_NESTED_EAX] =3D {
++        .type =3D CPUID_FEATURE_WORD,
++        .cpuid =3D { .eax =3D 0x4000000A, .reg =3D R_EAX, },
++    },
+     [FEAT_SVM] =3D {
+         .type =3D CPUID_FEATURE_WORD,
+         .feat_names =3D {
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 9c52d0cbeb..dd881510ac 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -497,6 +497,8 @@ typedef enum FeatureWord {
+     FEAT_HYPERV_EAX,    /* CPUID[4000_0003].EAX */
+     FEAT_HYPERV_EBX,    /* CPUID[4000_0003].EBX */
+     FEAT_HYPERV_EDX,    /* CPUID[4000_0003].EDX */
++    FEAT_HV_RECOMM_EAX, /* CPUID[4000_0004].EAX */
++    FEAT_HV_NESTED_EAX, /* CPUID[4000_000A].EAX */
+     FEAT_SVM,           /* CPUID[8000_000A].EDX */
+     FEAT_XSAVE,         /* CPUID[EAX=3D0xd,ECX=3D1].EAX */
+     FEAT_6_EAX,         /* CPUID[6].EAX */
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index f524e7d929..b4d2b40a40 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -797,6 +797,48 @@ static int hyperv_handle_properties(CPUState *cs)
+         }
+         env->features[FEAT_HYPERV_EAX] |=3D HV_SYNTIMERS_AVAILABLE;
+     }
++    if (cpu->hyperv_relaxed_timing) {
++        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_RELAXED_TIMING_RECOMME=
+NDED;
++    }
++    if (cpu->hyperv_vapic) {
++        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_APIC_ACCESS_RECOMMENDE=
+D;
++    }
++    if (cpu->hyperv_tlbflush) {
++        if (kvm_check_extension(cs->kvm_state,
++                                KVM_CAP_HYPERV_TLBFLUSH) <=3D 0) {
++            fprintf(stderr, "Hyper-V TLB flush support "
++                    "(requested by 'hv-tlbflush' cpu flag) "
++                    " is not supported by kernel\n");
++            return -ENOSYS;
++        }
++        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_REMOTE_TLB_FLUSH_RECOM=
+MENDED;
++        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_EX_PROCESSOR_MASKS_REC=
+OMMENDED;
++    }
++    if (cpu->hyperv_ipi) {
++        if (kvm_check_extension(cs->kvm_state,
++                                KVM_CAP_HYPERV_SEND_IPI) <=3D 0) {
++            fprintf(stderr, "Hyper-V IPI send support "
++                    "(requested by 'hv-ipi' cpu flag) "
++                    " is not supported by kernel\n");
++            return -ENOSYS;
++        }
++        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_CLUSTER_IPI_RECOMMENDE=
+D;
++        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_EX_PROCESSOR_MASKS_REC=
+OMMENDED;
++    }
++    if (cpu->hyperv_evmcs) {
++        uint16_t evmcs_version;
 +
-+import sys
-+import os
-+import iotests
-+from iotests import qemu_img_create, qemu_io, file_path, log
++        if (kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_ENLIGHTENED_VMCS, 0,
++                                (uintptr_t)&evmcs_version)) {
++            fprintf(stderr, "Hyper-V Enlightened VMCS "
++                    "(requested by 'hv-evmcs' cpu flag) "
++                    "is not supported by kernel\n");
++            return -ENOSYS;
++        }
++        env->features[FEAT_HV_RECOMM_EAX] |=3D HV_ENLIGHTENED_VMCS_RECOM=
+MENDED;
++        env->features[FEAT_HV_NESTED_EAX] =3D evmcs_version;
++    }
 +
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scr=
-ipts'))
+     return 0;
+ }
+=20
+@@ -869,7 +911,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     uint32_t unused;
+     struct kvm_cpuid_entry2 *c;
+     uint32_t signature[3];
+-    uint16_t evmcs_version;
+     int kvm_base =3D KVM_CPUID_SIGNATURE;
+     int r;
+     Error *local_err =3D NULL;
+@@ -944,44 +985,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+=20
+         c =3D &cpuid_data.entries[cpuid_i++];
+         c->function =3D HV_CPUID_ENLIGHTMENT_INFO;
+-        if (cpu->hyperv_relaxed_timing) {
+-            c->eax |=3D HV_RELAXED_TIMING_RECOMMENDED;
+-        }
+-        if (cpu->hyperv_vapic) {
+-            c->eax |=3D HV_APIC_ACCESS_RECOMMENDED;
+-        }
+-        if (cpu->hyperv_tlbflush) {
+-            if (kvm_check_extension(cs->kvm_state,
+-                                    KVM_CAP_HYPERV_TLBFLUSH) <=3D 0) {
+-                fprintf(stderr, "Hyper-V TLB flush support "
+-                        "(requested by 'hv-tlbflush' cpu flag) "
+-                        " is not supported by kernel\n");
+-                return -ENOSYS;
+-            }
+-            c->eax |=3D HV_REMOTE_TLB_FLUSH_RECOMMENDED;
+-            c->eax |=3D HV_EX_PROCESSOR_MASKS_RECOMMENDED;
+-        }
+-        if (cpu->hyperv_ipi) {
+-            if (kvm_check_extension(cs->kvm_state,
+-                                    KVM_CAP_HYPERV_SEND_IPI) <=3D 0) {
+-                fprintf(stderr, "Hyper-V IPI send support "
+-                        "(requested by 'hv-ipi' cpu flag) "
+-                        " is not supported by kernel\n");
+-                return -ENOSYS;
+-            }
+-            c->eax |=3D HV_CLUSTER_IPI_RECOMMENDED;
+-            c->eax |=3D HV_EX_PROCESSOR_MASKS_RECOMMENDED;
+-        }
+-        if (cpu->hyperv_evmcs) {
+-            if (kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_ENLIGHTENED_VMCS,=
+ 0,
+-                                    (uintptr_t)&evmcs_version)) {
+-                fprintf(stderr, "Hyper-V Enlightened VMCS "
+-                        "(requested by 'hv-evmcs' cpu flag) "
+-                        "is not supported by kernel\n");
+-                return -ENOSYS;
+-            }
+-            c->eax |=3D HV_ENLIGHTENED_VMCS_RECOMMENDED;
+-        }
 +
-+from qemu import QEMUMachine
-+
-+# Note:
-+# This test was added to check that mirror dead-lock was fixed (see prev=
-ious
-+# commit before this test addition).
-+# And it didn't reproduce if at least one of the following:
-+# 1. use small image size
-+# 2. use raw format (not qcow2)
-+# 3. drop kvm and use iotests.VM() (maybe, because of qtest) (however, i=
-t still
-+#    reproduces, if just drop kvm, but gdb failed to produce full backtr=
-aces
-+#    for me)
-+# 4. add iothread
-+
-+size =3D 1 * 1024 * 1024 * 1024
-+
-+iotests.verify_image_format(supported_fmts=3D['qcow2'])
-+
-+disk =3D file_path('disk')
-+
-+# prepare source image
-+qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=3Dmetadata', =
-disk,
-+                str(size))
-+
-+vm =3D QEMUMachine(iotests.qemu_prog)
-+vm.add_args('-machine', 'pc,accel=3Dkvm')
-+vm.add_args('-drive', 'id=3Dsrc,file=3D' + disk)
-+vm.launch()
-+
-+log(vm.qmp('object-add', qom_type=3D'throttle-group', id=3D'tg0',
-+           props=3D{ 'x-bps-total': size }))
-+
-+log(vm.qmp('blockdev-add',
-+           **{ 'node-name': 'target',
-+               'driver': 'throttle',
-+               'throttle-group': 'tg0',
-+               'file': {
-+                   'driver': 'null-co',
-+                   'size': size
-+                } }))
-+
-+log(vm.qmp('blockdev-mirror', device=3D'src', target=3D'target', sync=3D=
-'full'))
-+
-+try:
-+    vm.event_wait('BLOCK_JOB_READY', timeout=3D10.0)
-+except:
-+    vm.shutdown()
-+    raise
-+
-+vm.shutdown()
-diff --git a/tests/qemu-iotests/235.out b/tests/qemu-iotests/235.out
-new file mode 100644
-index 0000000000..39db621e04
---- /dev/null
-+++ b/tests/qemu-iotests/235.out
-@@ -0,0 +1,3 @@
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 8c56a0ad11..61a6d98ebd 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -232,3 +232,4 @@
- 232 auto quick
- 233 auto quick
- 234 auto quick migration
-+235 auto quick
++        c->eax =3D env->features[FEAT_HV_RECOMM_EAX];
+         c->ebx =3D cpu->hyperv_spinlock_attempts;
+=20
+         c =3D &cpuid_data.entries[cpuid_i++];
+@@ -1005,7 +1010,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+=20
+             c =3D &cpuid_data.entries[cpuid_i++];
+             c->function =3D HV_CPUID_NESTED_FEATURES;
+-            c->eax =3D evmcs_version;
++            c->eax =3D env->features[FEAT_HV_NESTED_EAX];
+         }
+     }
+=20
 --=20
 2.19.2
