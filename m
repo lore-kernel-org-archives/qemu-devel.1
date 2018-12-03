@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
-	id 1gTrCI-0003Ur-Ls
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:35:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1gTrCp-000417-Nz
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:36:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
-	id 1gTrCH-0007W9-T5
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:35:50 -0500
-Date: Mon, 3 Dec 2018 16:35:39 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181203163539.GN14786@perard.uk.xensource.com>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-9-paul.durrant@citrix.com>
+	(envelope-from <eblake@redhat.com>) id 1gTrCl-0007sJ-NP
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:36:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35502)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gTrCl-0007rt-HG
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:36:19 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C985D3084218
+	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 16:36:18 +0000 (UTC)
+References: <f60b8f1e-979b-4af9-7b48-a691c1937f6a@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4dd4e70a-7129-722c-971a-1b9f8b9aa349@redhat.com>
+Date: Mon, 3 Dec 2018 10:36:17 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20181121151211.15997-9-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH 08/18] xen: duplicate xen_disk.c as basis
- of dataplane/xen-qdisk.c
+In-Reply-To: <f60b8f1e-979b-4af9-7b48-a691c1937f6a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] QMP accepts double dict keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,24 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, Nov 21, 2018 at 03:12:01PM +0000, Paul Durrant wrote:
-> The new xen-qdisk XenDevice implementation requires the same core dataplane
-> as the legacy xen_disk implementation it will eventually replace. This
-> patch therefore copies the legacy xen_disk.c source module into a new
-> dataplane/xen-qdisk.c source module as the basis for the new dataplane and
-> adjusts the MAINTAINERS file accordingly.
+On 12/3/18 10:30 AM, Max Reitz wrote:
+> Hi,
 > 
-> NOTE: The duplicated code is not yet built. It is simply put into place by
->       this patch (just fixing style violations) such that the
->       modifications that will need to be made to the code are not
->       conflated with code movement, thus making review harder.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> QMP accepts double keys in dicts without complaining.  The value it is
+> using is apparently the last one specified:
 
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+JSON says it is undefined what happens when a client passes double keys. 
+  We are probably best off if we teach our parser to be strict and 
+reject doubled keys in QMP as invalid.
+
+Hmm - can a client abuse QMP with duplicate keys to cause qemu to leak 
+memory?
+
+> 
+> $ qemu-system-x86_64 -qmp stdio
+> {"QMP": {"version": {"qemu": {"micro": 93, "minor": 0, "major": 3},
+> "package": "v3.1.0-rc3-7-g87a45d86ed"}, "capabilities": []}}
+> {'execute':'qmp_capabilities'}
+> {"return": {}}
+> {'execute':'blockdev-add','arguments':{'driver':'null-co',
+>   'node-name':'foo','node-name':'bar'}}
+> {"return": {}}
+> {'execute':'query-named-block-nodes'}
+> {"return": [{ [...] "node-name": "bar" [...] }]}
+> 
+> Another test case is iotest 229 which specifies both mode=absolute-paths
+> and mode=existing (it wants the latter).
+> 
+> Max
+> 
 
 -- 
-Anthony PERARD
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
