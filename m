@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEb-0008Oz-JQ
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:17 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqEl-0000LB-Bb
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEU-0004RW-RE
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45320)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqEh-0004k6-SP
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51704)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEU-0004Qd-J7
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:02 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEh-0004iy-Ji
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:15 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:33 +0100
-Message-Id: <1543851204-41186-21-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:32:41 +0100
+Message-Id: <1543851204-41186-29-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 20/71] tests/libqos: pci-pc driver and
- interface nodes
+Subject: [Qemu-devel] [PATCH 28/71] qos-test: sdhci test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,310 +28,316 @@ Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <l
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add pci-bus-pc node, move QPCIBusPC struct declaration in its header
-(since it will be needed by other drivers) and introduce a setter method
-for drivers that do not need to allocate but have to initialize QPCIBusPC.
+Convert tests/sdhci-test in first qgraph test node, sdhci-test. This test
+consumes an sdhci interface and checks that its function return the
+expected values.
+
+Note that this test does not allocate any sdhci structure, it's all done by the
+qtest walking graph mechanism
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include |  6 +++-
- tests/libqos/pci-pc.c  | 83 ++++++++++++++++++++++++++++++++------------------
- tests/libqos/pci-pc.h  | 17 +++++++++--
- tests/libqos/pci.c     | 32 +++++++++++++++++--
- tests/libqos/pci.h     | 12 ++++++++
- 5 files changed, 115 insertions(+), 35 deletions(-)
+ tests/Makefile.include |   7 +-
+ tests/sdhci-test.c     | 185 ++++++-------------------------------------------
+ 2 files changed, 24 insertions(+), 168 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 905841e..93f31e8 100644
+index 752f2c2..e6be21c 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -675,11 +675,15 @@ libqos-imx-obj-y = $(libqos-obj-y) tests/libqos/i2c-imx.o
- libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
- libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virtio.o tests/libqos/virtio-pci.o tests/libqos/virtio-mmio.o
+@@ -216,7 +216,6 @@ check-qtest-i386-y += tests/migration-test$(EXESUF)
+ check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
+ check-qtest-i386-y += tests/numa-test$(EXESUF)
+ check-qtest-x86_64-y += $(check-qtest-i386-y)
+-check-qtest-x86_64-$(CONFIG_SDHCI) += tests/sdhci-test$(EXESUF)
  
-+# Devices
-+qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
-+qos-test-obj-y += $(libqos-pc-obj-y)
+ check-qtest-alpha-y += tests/boot-serial-test$(EXESUF)
+ 
+@@ -278,11 +277,9 @@ check-qtest-arm-y += tests/m25p80-test$(EXESUF)
+ check-qtest-arm-y += tests/virtio-blk-test$(EXESUF)
+ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
+ check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
+-check-qtest-arm-$(CONFIG_SDHCI) += tests/sdhci-test$(EXESUF)
+ check-qtest-arm-y += tests/hexloader-test$(EXESUF)
+ 
+ check-qtest-aarch64-y = tests/numa-test$(EXESUF)
+-check-qtest-aarch64-$(CONFIG_SDHCI) += tests/sdhci-test$(EXESUF)
+ check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
+ check-qtest-aarch64-y += tests/migration-test$(EXESUF)
+ 
+@@ -688,6 +685,9 @@ qos-test-obj-y += tests/libqos/arm-smdkc210-machine.o
+ qos-test-obj-y += tests/libqos/arm-xilinx-zynq-a9-machine.o
+ qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
+ 
++# Tests
++qos-test-obj-y += tests/sdhci-test.o
 +
  check-unit-y += tests/test-qgraph$(EXESUF)
  tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
  
- check-qtest-generic-y += tests/qos-test$(EXESUF)
--tests/qos-test$(EXESUF): tests/qos-test.o $(libqgraph-obj-y)
-+tests/qos-test$(EXESUF): $(qos-test-obj-y)
+@@ -780,7 +780,6 @@ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
+ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
+ tests/numa-test$(EXESUF): tests/numa-test.o
+ tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
+-tests/sdhci-test$(EXESUF): tests/sdhci-test.o $(libqos-pc-obj-y)
+ tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libqos-obj-y)
  
- tests/qmp-test$(EXESUF): tests/qmp-test.o
- tests/qmp-cmd-test$(EXESUF): tests/qmp-cmd-test.o
-diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
-index d21f3e8..041bfed 100644
---- a/tests/libqos/pci-pc.c
-+++ b/tests/libqos/pci-pc.c
-@@ -18,15 +18,9 @@
+ tests/migration/stress$(EXESUF): tests/migration/stress.o
+diff --git a/tests/sdhci-test.c b/tests/sdhci-test.c
+index 28d481b..2f177e5 100644
+--- a/tests/sdhci-test.c
++++ b/tests/sdhci-test.c
+@@ -12,6 +12,8 @@
+ #include "libqtest.h"
+ #include "libqos/pci-pc.h"
+ #include "hw/pci/pci.h"
++#include "libqos/qgraph.h"
++#include "libqos/sdhci.h"
  
- #include "qemu-common.h"
+ #define SDHC_CAPAB                      0x40
+ FIELD(SDHC_CAPAB, BASECLKFREQ,               8, 8); /* since v2 */
+@@ -20,99 +22,11 @@ FIELD(SDHC_CAPAB, SDR,                      32, 3); /* since v3 */
+ FIELD(SDHC_CAPAB, DRIVER,                   36, 3); /* since v3 */
+ #define SDHC_HCVER                      0xFE
  
+-static const struct sdhci_t {
+-    const char *arch, *machine;
+-    struct {
+-        uintptr_t addr;
+-        uint8_t version;
+-        uint8_t baseclock;
+-        struct {
+-            bool sdma;
+-            uint64_t reg;
+-        } capab;
+-    } sdhci;
+-    struct {
+-        uint16_t vendor_id, device_id;
+-    } pci;
+-} models[] = {
+-    /* PC via PCI */
+-    { "x86_64", "pc",
+-        {-1,         2, 0,  {1, 0x057834b4} },
+-        .pci = { PCI_VENDOR_ID_REDHAT, PCI_DEVICE_ID_REDHAT_SDHCI } },
 -
- #define ACPI_PCIHP_ADDR         0xae00
- #define PCI_EJ_BASE             0x0008
- 
--typedef struct QPCIBusPC
+-    /* Exynos4210 */
+-    { "arm",    "smdkc210",
+-        {0x12510000, 2, 0,  {1, 0x5e80080} } },
+-
+-    /* i.MX 6 */
+-    { "arm",    "sabrelite",
+-        {0x02190000, 3, 0,  {1, 0x057834b4} } },
+-
+-    /* BCM2835 */
+-    { "arm",    "raspi2",
+-        {0x3f300000, 3, 52, {0, 0x052134b4} } },
+-
+-    /* Zynq-7000 */
+-    { "arm",    "xilinx-zynq-a9",   /* Datasheet: UG585 (v1.12.1) */
+-        {0xe0100000, 2, 0,  {1, 0x69ec0080} } },
+-
+-    /* ZynqMP */
+-    { "aarch64", "xlnx-zcu102",     /* Datasheet: UG1085 (v1.7) */
+-        {0xff160000, 3, 0,  {1, 0x280737ec6481} } },
+-
+-};
+-
+-typedef struct QSDHCI {
+-    struct {
+-        QPCIBus *bus;
+-        QPCIDevice *dev;
+-    } pci;
+-    union {
+-        QPCIBar mem_bar;
+-        uint64_t addr;
+-    };
+-} QSDHCI;
+-
+-static uint16_t sdhci_readw(QSDHCI *s, uint32_t reg)
 -{
--    QPCIBus bus;
--} QPCIBusPC;
+-    uint16_t val;
 -
- static uint8_t qpci_pc_pio_readb(QPCIBus *bus, uint32_t addr)
+-    if (s->pci.dev) {
+-        val = qpci_io_readw(s->pci.dev, s->mem_bar, reg);
+-    } else {
+-        val = qtest_readw(global_qtest, s->addr + reg);
+-    }
+-
+-    return val;
+-}
+-
+-static uint64_t sdhci_readq(QSDHCI *s, uint32_t reg)
+-{
+-    uint64_t val;
+-
+-    if (s->pci.dev) {
+-        val = qpci_io_readq(s->pci.dev, s->mem_bar, reg);
+-    } else {
+-        val = qtest_readq(global_qtest, s->addr + reg);
+-    }
+-
+-    return val;
+-}
+-
+-static void sdhci_writeq(QSDHCI *s, uint32_t reg, uint64_t val)
+-{
+-    if (s->pci.dev) {
+-        qpci_io_writeq(s->pci.dev, s->mem_bar, reg, val);
+-    } else {
+-        qtest_writeq(global_qtest, s->addr + reg, val);
+-    }
+-}
+-
+ static void check_specs_version(QSDHCI *s, uint8_t version)
  {
-     return inb(addr);
-@@ -115,44 +109,65 @@ static void qpci_pc_config_writel(QPCIBus *bus, int devfn, uint8_t offset, uint3
-     outl(0xcfc, value);
- }
+     uint32_t v;
  
--QPCIBus *qpci_new_pc(QTestState *qts, QGuestAllocator *alloc)
-+static void *qpci_pc_get_driver(void *obj, const char *interface)
+-    v = sdhci_readw(s, SDHC_HCVER);
++    v = s->readw(s, SDHC_HCVER);
+     v &= 0xff;
+     v += 1;
+     g_assert_cmpuint(v, ==, version);
+@@ -122,7 +36,7 @@ static void check_capab_capareg(QSDHCI *s, uint64_t expec_capab)
  {
--    QPCIBusPC *ret = g_new0(QPCIBusPC, 1);
-+    QPCIBusPC *qpci = obj;
-+    if (!g_strcmp0(interface, "pci-bus")) {
-+        return &qpci->bus;
-+    }
-+    fprintf(stderr, "%s not present in pci-bus-pc\n", interface);
-+    g_assert_not_reached();
-+}
+     uint64_t capab;
  
-+void qpci_init_pc(QPCIBusPC *qpci, QTestState *qts, QGuestAllocator *alloc)
-+{
-     assert(qts);
- 
--    ret->bus.pio_readb = qpci_pc_pio_readb;
--    ret->bus.pio_readw = qpci_pc_pio_readw;
--    ret->bus.pio_readl = qpci_pc_pio_readl;
--    ret->bus.pio_readq = qpci_pc_pio_readq;
-+    qpci->bus.pio_readb = qpci_pc_pio_readb;
-+    qpci->bus.pio_readw = qpci_pc_pio_readw;
-+    qpci->bus.pio_readl = qpci_pc_pio_readl;
-+    qpci->bus.pio_readq = qpci_pc_pio_readq;
-+
-+    qpci->bus.pio_writeb = qpci_pc_pio_writeb;
-+    qpci->bus.pio_writew = qpci_pc_pio_writew;
-+    qpci->bus.pio_writel = qpci_pc_pio_writel;
-+    qpci->bus.pio_writeq = qpci_pc_pio_writeq;
-+
-+    qpci->bus.memread = qpci_pc_memread;
-+    qpci->bus.memwrite = qpci_pc_memwrite;
- 
--    ret->bus.pio_writeb = qpci_pc_pio_writeb;
--    ret->bus.pio_writew = qpci_pc_pio_writew;
--    ret->bus.pio_writel = qpci_pc_pio_writel;
--    ret->bus.pio_writeq = qpci_pc_pio_writeq;
-+    qpci->bus.config_readb = qpci_pc_config_readb;
-+    qpci->bus.config_readw = qpci_pc_config_readw;
-+    qpci->bus.config_readl = qpci_pc_config_readl;
- 
--    ret->bus.memread = qpci_pc_memread;
--    ret->bus.memwrite = qpci_pc_memwrite;
-+    qpci->bus.config_writeb = qpci_pc_config_writeb;
-+    qpci->bus.config_writew = qpci_pc_config_writew;
-+    qpci->bus.config_writel = qpci_pc_config_writel;
- 
--    ret->bus.config_readb = qpci_pc_config_readb;
--    ret->bus.config_readw = qpci_pc_config_readw;
--    ret->bus.config_readl = qpci_pc_config_readl;
-+    qpci->bus.qts = qts;
-+    qpci->bus.pio_alloc_ptr = 0xc000;
-+    qpci->bus.mmio_alloc_ptr = 0xE0000000;
-+    qpci->bus.mmio_limit = 0x100000000ULL;
- 
--    ret->bus.config_writeb = qpci_pc_config_writeb;
--    ret->bus.config_writew = qpci_pc_config_writew;
--    ret->bus.config_writel = qpci_pc_config_writel;
-+    qpci->obj.get_driver = qpci_pc_get_driver;
-+}
- 
--    ret->bus.qts = qts;
--    ret->bus.pio_alloc_ptr = 0xc000;
--    ret->bus.mmio_alloc_ptr = 0xE0000000;
--    ret->bus.mmio_limit = 0x100000000ULL;
-+QPCIBus *qpci_new_pc(QTestState *qts, QGuestAllocator *alloc)
-+{
-+    QPCIBusPC *qpci = g_new0(QPCIBusPC, 1);
-+    qpci_init_pc(qpci, qts, alloc);
- 
--    return &ret->bus;
-+    return &qpci->bus;
+-    capab = sdhci_readq(s, SDHC_CAPAB);
++    capab = s->readq(s, SDHC_CAPAB);
+     g_assert_cmphex(capab, ==, expec_capab);
  }
  
- void qpci_free_pc(QPCIBus *bus)
+@@ -131,11 +45,11 @@ static void check_capab_readonly(QSDHCI *s)
+     const uint64_t vrand = 0x123456789abcdef;
+     uint64_t capab0, capab1;
+ 
+-    capab0 = sdhci_readq(s, SDHC_CAPAB);
++    capab0 = s->readq(s, SDHC_CAPAB);
+     g_assert_cmpuint(capab0, !=, vrand);
+ 
+-    sdhci_writeq(s, SDHC_CAPAB, vrand);
+-    capab1 = sdhci_readq(s, SDHC_CAPAB);
++    s->writeq(s, SDHC_CAPAB, vrand);
++    capab1 = s->readq(s, SDHC_CAPAB);
+     g_assert_cmpuint(capab1, !=, vrand);
+     g_assert_cmpuint(capab1, ==, capab0);
+ }
+@@ -147,7 +61,7 @@ static void check_capab_baseclock(QSDHCI *s, uint8_t expec_freq)
+     if (!expec_freq) {
+         return;
+     }
+-    capab = sdhci_readq(s, SDHC_CAPAB);
++    capab = s->readq(s, SDHC_CAPAB);
+     capab_freq = FIELD_EX64(capab, SDHC_CAPAB, BASECLKFREQ);
+     g_assert_cmpuint(capab_freq, ==, expec_freq);
+ }
+@@ -156,7 +70,7 @@ static void check_capab_sdma(QSDHCI *s, bool supported)
  {
--    QPCIBusPC *s = container_of(bus, QPCIBusPC, bus);
-+    QPCIBusPC *s;
-+
-+    if (!bus) {
-+        return;
-+    }
-+    s = container_of(bus, QPCIBusPC, bus);
+     uint64_t capab, capab_sdma;
  
-     g_free(s);
+-    capab = sdhci_readq(s, SDHC_CAPAB);
++    capab = s->readq(s, SDHC_CAPAB);
+     capab_sdma = FIELD_EX64(capab, SDHC_CAPAB, SDMA);
+     g_assert_cmpuint(capab_sdma, ==, supported);
  }
-@@ -171,3 +186,11 @@ void qpci_unplug_acpi_device_test(const char *id, uint8_t slot)
+@@ -167,7 +81,7 @@ static void check_capab_v3(QSDHCI *s, uint8_t version)
  
-     qmp_eventwait("DEVICE_DELETED");
- }
-+
-+static void qpci_pc_register_nodes(void)
-+{
-+    qos_node_create_driver("pci-bus-pc", NULL);
-+    qos_node_produces("pci-bus-pc", "pci-bus");
-+}
-+
-+libqos_init(qpci_pc_register_nodes);
-diff --git a/tests/libqos/pci-pc.h b/tests/libqos/pci-pc.h
-index 84cc300..7b0751d 100644
---- a/tests/libqos/pci-pc.h
-+++ b/tests/libqos/pci-pc.h
-@@ -15,9 +15,22 @@
- 
- #include "libqos/pci.h"
- #include "libqos/malloc.h"
-+#include "libqos/qgraph.h"
- 
--/* qpci_new_pc():
--* this function creates a new QPCIBusPC object,
-+typedef struct QPCIBusPC {
-+    QOSGraphObject obj;
-+    QPCIBus bus;
-+} QPCIBusPC;
-+
-+/* qpci_init_pc():
-+ * this function initialize an already allocated
-+ * QPCIBusPC object.
-+ *
-+ * @ret must be a valid QPCIBusPC * pointer.
-+ */
-+void qpci_init_pc(QPCIBusPC *ret, QTestState *qts, QGuestAllocator *alloc);
-+/* qpci_pc_new():
-+ * this function creates a new QPCIBusPC object,
-  * and properly initialize its fields.
-  *
-  * returns the QPCIBus *bus field of a newly
-diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
-index e8c342c..8257904 100644
---- a/tests/libqos/pci.c
-+++ b/tests/libqos/pci.c
-@@ -15,6 +15,7 @@
- 
- #include "hw/pci/pci_regs.h"
- #include "qemu/host-utils.h"
-+#include "libqos/qgraph.h"
- 
- void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
-                          void (*func)(QPCIDevice *dev, int devfn, void *data),
-@@ -50,13 +51,20 @@ void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
+     if (version < 3) {
+         /* before v3 those fields are RESERVED */
+-        capab = sdhci_readq(s, SDHC_CAPAB);
++        capab = s->readq(s, SDHC_CAPAB);
+         capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, SDR);
+         g_assert_cmpuint(capab_v3, ==, 0);
+         capab_v3 = FIELD_EX64(capab, SDHC_CAPAB, DRIVER);
+@@ -175,78 +89,21 @@ static void check_capab_v3(QSDHCI *s, uint8_t version)
      }
  }
  
-+static void qpci_device_set(QPCIDevice *dev, QPCIBus *bus, int devfn)
-+{
-+    g_assert(dev);
-+
-+    dev->bus = bus;
-+    dev->devfn = devfn;
-+}
-+
- QPCIDevice *qpci_device_find(QPCIBus *bus, int devfn)
+-static QSDHCI *machine_start(const struct sdhci_t *test)
+-{
+-    QSDHCI *s = g_new0(QSDHCI, 1);
+-
+-    if (test->pci.vendor_id) {
+-        /* PCI */
+-        uint16_t vendor_id, device_id;
+-        uint64_t barsize;
+-
+-        global_qtest = qtest_initf("-machine %s -device sdhci-pci",
+-                                   test->machine);
+-
+-        s->pci.bus = qpci_new_pc(global_qtest, NULL);
+-
+-        /* Find PCI device and verify it's the right one */
+-        s->pci.dev = qpci_device_find(s->pci.bus, QPCI_DEVFN(4, 0));
+-        g_assert_nonnull(s->pci.dev);
+-        vendor_id = qpci_config_readw(s->pci.dev, PCI_VENDOR_ID);
+-        device_id = qpci_config_readw(s->pci.dev, PCI_DEVICE_ID);
+-        g_assert(vendor_id == test->pci.vendor_id);
+-        g_assert(device_id == test->pci.device_id);
+-        s->mem_bar = qpci_iomap(s->pci.dev, 0, &barsize);
+-        qpci_device_enable(s->pci.dev);
+-    } else {
+-        /* SysBus */
+-        global_qtest = qtest_initf("-machine %s", test->machine);
+-        s->addr = test->sdhci.addr;
+-    }
+-
+-    return s;
+-}
+-
+-static void machine_stop(QSDHCI *s)
+-{
+-    qpci_free_pc(s->pci.bus);
+-    g_free(s->pci.dev);
+-    qtest_quit(global_qtest);
+-    g_free(s);
+-}
+-
+-static void test_machine(const void *data)
++static void test_registers(void *obj, void *data, QGuestAllocator *alloc)
  {
-     QPCIDevice *dev;
+-    const struct sdhci_t *test = data;
+-    QSDHCI *s;
++    QSDHCI *s = obj;
  
-     dev = g_malloc0(sizeof(*dev));
--    dev->bus = bus;
--    dev->devfn = devfn;
-+    qpci_device_set(dev, bus, devfn);
- 
-     if (qpci_config_readw(dev, PCI_VENDOR_ID) == 0xFFFF) {
-         g_free(dev);
-@@ -66,6 +74,17 @@ QPCIDevice *qpci_device_find(QPCIBus *bus, int devfn)
-     return dev;
+-    s = machine_start(test);
+-
+-    check_specs_version(s, test->sdhci.version);
+-    check_capab_capareg(s, test->sdhci.capab.reg);
++    check_specs_version(s, s->props.version);
++    check_capab_capareg(s, s->props.capab.reg);
+     check_capab_readonly(s);
+-    check_capab_v3(s, test->sdhci.version);
+-    check_capab_sdma(s, test->sdhci.capab.sdma);
+-    check_capab_baseclock(s, test->sdhci.baseclock);
+-
+-    machine_stop(s);
++    check_capab_v3(s, s->props.version);
++    check_capab_sdma(s, s->props.capab.sdma);
++    check_capab_baseclock(s, s->props.baseclock);
  }
  
-+void qpci_device_init(QPCIDevice *dev, QPCIBus *bus, QPCIAddress *addr)
-+{
-+    uint16_t vendor_id, device_id;
-+
-+    qpci_device_set(dev, bus, addr->devfn);
-+    vendor_id = qpci_config_readw(dev, PCI_VENDOR_ID);
-+    device_id = qpci_config_readw(dev, PCI_DEVICE_ID);
-+    g_assert(!addr->vendor_id || vendor_id == addr->vendor_id);
-+    g_assert(!addr->device_id || device_id == addr->device_id);
-+}
-+
- void qpci_device_enable(QPCIDevice *dev)
+-int main(int argc, char *argv[])
++static void register_sdhci_test(void)
  {
-     uint16_t cmd;
-@@ -395,3 +414,12 @@ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr)
-     QPCIBar bar = { .addr = addr };
-     return bar;
+-    const char *arch = qtest_get_arch();
+-    char *name;
+-    int i;
+-
+-    g_test_init(&argc, &argv, NULL);
+-    for (i = 0; i < ARRAY_SIZE(models); i++) {
+-        if (strcmp(arch, models[i].arch)) {
+-            continue;
+-        }
+-        name = g_strdup_printf("sdhci/%s", models[i].machine);
+-        qtest_add_data_func(name, &models[i], test_machine);
+-        g_free(name);
+-    }
+-
+-    return g_test_run();
++    qos_add_test("registers", "sdhci", test_registers, NULL);
  }
 +
-+void add_qpci_address(QOSGraphEdgeOptions *opts, QPCIAddress *addr)
-+{
-+    g_assert(addr);
-+    g_assert(opts);
-+
-+    opts->arg = addr;
-+    opts->size_arg = sizeof(QPCIAddress);
-+}
-diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
-index 0b7e936..9fd521a 100644
---- a/tests/libqos/pci.h
-+++ b/tests/libqos/pci.h
-@@ -14,6 +14,7 @@
- #define LIBQOS_PCI_H
- 
- #include "libqtest.h"
-+#include "libqos/qgraph.h"
- 
- #define QPCI_PIO_LIMIT    0x10000
- 
-@@ -22,6 +23,7 @@
- typedef struct QPCIDevice QPCIDevice;
- typedef struct QPCIBus QPCIBus;
- typedef struct QPCIBar QPCIBar;
-+typedef struct QPCIAddress QPCIAddress;
- 
- struct QPCIBus {
-     uint8_t (*pio_readb)(QPCIBus *bus, uint32_t addr);
-@@ -51,6 +53,7 @@ struct QPCIBus {
-     QTestState *qts;
-     uint16_t pio_alloc_ptr;
-     uint64_t mmio_alloc_ptr, mmio_limit;
-+
- };
- 
- struct QPCIBar {
-@@ -66,10 +69,17 @@ struct QPCIDevice
-     uint64_t msix_table_off, msix_pba_off;
- };
- 
-+struct QPCIAddress {
-+    uint32_t devfn;
-+    uint16_t vendor_id;
-+    uint16_t device_id;
-+};
-+
- void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
-                          void (*func)(QPCIDevice *dev, int devfn, void *data),
-                          void *data);
- QPCIDevice *qpci_device_find(QPCIBus *bus, int devfn);
-+void qpci_device_init(QPCIDevice *dev, QPCIBus *bus, QPCIAddress *addr);
- 
- void qpci_device_enable(QPCIDevice *dev);
- uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id);
-@@ -110,4 +120,6 @@ void qpci_iounmap(QPCIDevice *dev, QPCIBar addr);
- QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr);
- 
- void qpci_unplug_acpi_device_test(const char *id, uint8_t slot);
-+
-+void add_qpci_address(QOSGraphEdgeOptions *opts, QPCIAddress *addr);
- #endif
++libqos_init(register_sdhci_test);
 -- 
 1.8.3.1
