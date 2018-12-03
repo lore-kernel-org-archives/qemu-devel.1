@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gTm1h-00046y-JR
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gTm1i-00047x-Ov
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 06:04:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1gTm1g-0002eh-Gj
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 06:04:33 -0500
+	(envelope-from <peng.hao2@zte.com.cn>) id 1gTm1h-0002fG-5i
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 06:04:34 -0500
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Tue, 4 Dec 2018 03:26:47 +0800
-Message-Id: <1543865209-50994-7-git-send-email-peng.hao2@zte.com.cn>
+Date: Tue, 4 Dec 2018 03:26:45 +0800
+Message-Id: <1543865209-50994-5-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1543865209-50994-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1543865209-50994-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V11 6/8] hw/arm/virt: add configure interface
- for pvpanic-mmio
+Subject: [Qemu-devel] [PATCH V11 4/8]  hw/arm/virt: Use the pvpanic device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +22,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org, drjones@redhat.com, philmd@redhat.com
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-Add configure interface for pvpanic-mmio device in virt machine.
+Add pvpanic device in arm virt machine.
 
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- hw/arm/virt.c         | 23 +++++++++++++++++++++++
- include/hw/arm/virt.h |  1 +
- 2 files changed, 24 insertions(+)
+ default-configs/arm-softmmu.mak |  1 +
+ hw/arm/virt.c                   | 22 ++++++++++++++++++++++
+ include/hw/arm/virt.h           |  1 +
+ 3 files changed, 24 insertions(+)
 
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 2420491..50345df 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -159,3 +159,4 @@ CONFIG_PCI_DESIGNWARE=y
+ CONFIG_STRONGARM=y
+ CONFIG_HIGHBANK=y
+ CONFIG_MUSICPAL=y
++CONFIG_PVPANIC=y
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index a4541fa..fdd3f20 100644
+index a2b8d8f..a4541fa 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -1655,6 +1655,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
-     vms->its = value;
+@@ -59,6 +59,7 @@
+ #include "qapi/visitor.h"
+ #include "standard-headers/linux/input.h"
+ #include "hw/arm/smmuv3.h"
++#include "hw/misc/pvpanic.h"
+ 
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -143,6 +144,7 @@ static const MemMapEntry a15memmap[] = {
+     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
+     [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
++    [VIRT_PVPANIC] =            { 0x09070000, 0x00000002 },
+     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+@@ -190,6 +192,24 @@ static bool cpu_type_valid(const char *cpu)
+     return false;
  }
  
-+static bool virt_get_pvpanic(Object *obj, Error **errp)
++static void create_pvpanic_device(const VirtMachineState *vms)
 +{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
++    char *nodename;
++    hwaddr base = vms->memmap[VIRT_PVPANIC].base;
++    hwaddr size = vms->memmap[VIRT_PVPANIC].size;
 +
-+    return vms->pvpanic;
++    sysbus_create_simple(TYPE_PVPANIC_MMIO, base, NULL);
++
++    nodename = g_strdup_printf("/pvpanic-mmio@%" PRIx64, base);
++    qemu_fdt_add_subnode(vms->fdt, nodename);
++    qemu_fdt_setprop_string(vms->fdt, nodename,
++                            "compatible", "qemu,pvpanic-mmio");
++    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
++                                 2, base, 2, size);
++
++    g_free(nodename);
 +}
 +
-+static void virt_set_pvpanic(Object *obj, bool value, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+
-+    vms->pvpanic = value;
-+}
-+
- static char *virt_get_gic_version(Object *obj, Error **errp)
+ static void create_fdt(VirtMachineState *vms)
  {
-     VirtMachineState *vms = VIRT_MACHINE(obj);
-@@ -1884,6 +1898,15 @@ static void virt_3_1_instance_init(Object *obj)
-                                     "Valid values are none and smmuv3",
-                                     NULL);
+     void *fdt = create_device_tree(&vms->fdt_size);
+@@ -1531,6 +1551,8 @@ static void machvirt_init(MachineState *machine)
  
-+    /* Default disallows pvpanic-mmio instantiation */
-+    vms->pvpanic = false;
-+    object_property_add_bool(obj, "pvpanic", virt_get_pvpanic,
-+                             virt_set_pvpanic, NULL);
-+    object_property_set_description(obj, "pvpanic",
-+                                    "Set on/off to enable/disable "
-+                                    "PVPANIC MMIO device",
-+                                    NULL);
+     create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+ 
++    create_pvpanic_device(vms);
 +
-     vms->memmap = a15memmap;
-     vms->irqmap = a15irqmap;
- }
+     create_gic(vms, pic);
+ 
+     fdt_add_pmu_nodes(vms);
 diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 937c124..7d6d1c0 100644
+index 4cc57a7..937c124 100644
 --- a/include/hw/arm/virt.h
 +++ b/include/hw/arm/virt.h
-@@ -113,6 +113,7 @@ typedef struct {
-     bool highmem;
-     bool highmem_ecam;
-     bool its;
-+    bool pvpanic;
-     bool virt;
-     int32_t gic_version;
-     VirtIOMMUType iommu;
+@@ -66,6 +66,7 @@ enum {
+     VIRT_GIC_REDIST,
+     VIRT_GIC_REDIST2,
+     VIRT_SMMU,
++    VIRT_PVPANIC,
+     VIRT_UART,
+     VIRT_MMIO,
+     VIRT_RTC,
 -- 
 1.8.3.1
