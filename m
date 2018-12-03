@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gTl7v-0004Cx-GI
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:06:56 -0500
+	(envelope-from <jasowang@redhat.com>) id 1gTl7v-0004Cw-GK
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:07:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gTl7p-0004ky-SJ
+	(envelope-from <jasowang@redhat.com>) id 1gTl7p-0004ks-Rh
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:06:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40808)
+Received: from mx1.redhat.com ([209.132.183.28]:49616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gTl7n-0004gK-U3
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gTl7n-0004dU-Su
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:06:48 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon,  3 Dec 2018 18:06:08 +0800
-Message-Id: <20181203100608.28538-5-jasowang@redhat.com>
+Date: Mon,  3 Dec 2018 18:06:07 +0800
+Message-Id: <20181203100608.28538-4-jasowang@redhat.com>
 In-Reply-To: <20181203100608.28538-1-jasowang@redhat.com>
 References: <20181203100608.28538-1-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH V4 for 3.1 4/4] virtio-net-test: add large tx
- buffer test
+Subject: [Qemu-devel] [PATCH V4 for 3.1 3/4] virtio-net-test: remove unused
+ macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +27,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: mst@redhat.com, ppandit@redhat.com, liq3ea@163.com, liq3ea@gmail.com, pbonzini@redhat.com, thuth@redhat.com, eblake@redhat.com, Jason Wang <jasowang@redhat.com>
 
-This test tries to build a packet whose size is greater than INT_MAX
-which tries to trigger integer overflow in qemu_net_queue_append_iov()
-which may result OOB.
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- tests/virtio-net-test.c | 44 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+ tests/virtio-net-test.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index bdd6af9999..566596a397 100644
+index 587a043e67..bdd6af9999 100644
 --- a/tests/virtio-net-test.c
 +++ b/tests/virtio-net-test.c
-@@ -245,6 +245,49 @@ static void pci_basic(gconstpointer data)
-     g_free(dev);
-     qtest_shutdown(qs);
- }
-+
-+static void large_tx(gconstpointer data)
-+{
-+    QVirtioPCIDevice *dev;
-+    QOSState *qs;
-+    QVirtQueuePCI *tx, *rx;
-+    QVirtQueue *vq;
-+    uint64_t req_addr;
-+    uint32_t free_head;
-+    size_t alloc_size = UINT_MAX / 64;
-+    int i;
-+
-+    qs = pci_test_start("-netdev hubport,id=hp0,hubid=0 "
-+                        "-device virtio-net-pci,netdev=hp0 ");
-+    dev = virtio_net_pci_init(qs->pcibus, PCI_SLOT);
-+
-+    rx = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
-+    tx = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 1);
-+
-+    driver_init(&dev->vdev);
-+    vq = &tx->vq;
-+
-+    /* Bypass the limitation by pointing several descriptors to a single
-+     * smaller area */
-+    req_addr = guest_alloc(qs->alloc, alloc_size);
-+    free_head = qvirtqueue_add(vq, req_addr, alloc_size, false, true);
-+
-+    for (i = 0; i < 64; i++) {
-+        qvirtqueue_add(vq, req_addr, alloc_size, false, i == 63 ?
-+                       false : true);
-+    }
-+    qvirtqueue_kick(&dev->vdev, vq, free_head);
-+
-+    qvirtio_wait_used_elem(&dev->vdev, vq, free_head, NULL,
-+                           QVIRTIO_NET_TIMEOUT_US);
-+
-+    qvirtqueue_cleanup(dev->vdev.bus, &tx->vq, qs->alloc);
-+    qvirtqueue_cleanup(dev->vdev.bus, &rx->vq, qs->alloc);
-+    qvirtio_pci_device_disable(dev);
-+    g_free(dev->pdev);
-+    g_free(dev);
-+    qtest_shutdown(qs);
-+}
- #endif
+@@ -24,7 +24,6 @@
  
- static void hotplug(void)
-@@ -270,6 +313,7 @@ int main(int argc, char **argv)
-     qtest_add_data_func("/virtio/net/pci/basic", send_recv_test, pci_basic);
-     qtest_add_data_func("/virtio/net/pci/rx_stop_cont",
-                         stop_cont_test, pci_basic);
-+    qtest_add_data_func("/virtio/net/pci/large_tx", NULL, large_tx);
- #endif
-     qtest_add_func("/virtio/net/pci/hotplug", hotplug);
+ #define PCI_SLOT_HP             0x06
+ #define PCI_SLOT                0x04
+-#define PCI_FN                  0x00
  
+ #define QVIRTIO_NET_TIMEOUT_US (30 * 1000 * 1000)
+ #define VNET_HDR_SIZE sizeof(struct virtio_net_hdr_mrg_rxbuf)
 -- 
 2.17.1
