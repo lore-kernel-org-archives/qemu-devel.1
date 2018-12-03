@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqFH-00010n-3M
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:52 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqFJ-000137-8B
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqFC-0005KY-Tg
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57769)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqFH-0005Qm-Vi
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqFC-0005Jh-L7
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:46 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqFH-0005Q0-N9
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:51 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:59 +0100
-Message-Id: <1543851204-41186-47-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:33:01 +0100
+Message-Id: <1543851204-41186-49-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 46/71] tests/libqos: virtio-rng driver and
+Subject: [Qemu-devel] [PATCH 48/71] tests/libqos: virtio-blk driver and
  interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,40 +29,40 @@ Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <l
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add qgraph nodes for virtio-rng-pci and virtio-rng-device.
-Both nodes produce virtio-rng, but virtio-rng-pci receives
+Add qgraph nodes for virtio-blk-pci and virtio-blk-device.
+Both nodes produce virtio-blk, but virtio-blk-pci receives
 a pci-bus and uses virtio-pci QOSGraphObject and functions,
-while virtio-rng-device receives a virtio and implements
+while virtio-blk-device receives a virtio and implements
 its own functions
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
  tests/Makefile.include    |   1 +
- tests/libqos/virtio-rng.c | 110 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/libqos/virtio-rng.h |  39 ++++++++++++++++
- 3 files changed, 150 insertions(+)
- create mode 100644 tests/libqos/virtio-rng.c
- create mode 100644 tests/libqos/virtio-rng.h
+ tests/libqos/virtio-blk.c | 124 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/libqos/virtio-blk.h |  40 +++++++++++++++
+ 3 files changed, 165 insertions(+)
+ create mode 100644 tests/libqos/virtio-blk.c
+ create mode 100644 tests/libqos/virtio-blk.h
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 68bacf1..00ca6e8 100644
+index a7c01a3..5e1d75c 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -671,6 +671,7 @@ qos-test-obj-y += tests/libqos/sdhci.o
+@@ -670,6 +670,7 @@ qos-test-obj-y += tests/libqos/sdhci.o
  qos-test-obj-y += $(libqos-virtio-obj-y)
  qos-test-obj-y += tests/libqos/virtio-9p.o
  qos-test-obj-y += tests/libqos/virtio-balloon.o
-+qos-test-obj-y += tests/libqos/virtio-rng.o
++qos-test-obj-y += tests/libqos/virtio-blk.o
+ qos-test-obj-y += tests/libqos/virtio-rng.o
  qos-test-obj-y += tests/libqos/virtio-serial.o
  
- # Machines
-diff --git a/tests/libqos/virtio-rng.c b/tests/libqos/virtio-rng.c
+diff --git a/tests/libqos/virtio-blk.c b/tests/libqos/virtio-blk.c
 new file mode 100644
-index 0000000..a1d2c76
+index 0000000..c17bdf4
 --- /dev/null
-+++ b/tests/libqos/virtio-rng.c
-@@ -0,0 +1,110 @@
++++ b/tests/libqos/virtio-blk.c
+@@ -0,0 +1,124 @@
 +/*
 + * libqos driver framework
 + *
@@ -83,102 +83,116 @@ index 0000000..a1d2c76
 +
 +#include "qemu/osdep.h"
 +#include "libqtest.h"
++#include "standard-headers/linux/virtio_blk.h"
 +#include "libqos/qgraph.h"
-+#include "libqos/virtio-rng.h"
++#include "libqos/virtio-blk.h"
 +
-+/* virtio-rng-device */
-+static void *qvirtio_rng_get_driver(QVirtioRng *v_rng,
++#define PCI_SLOT                0x04
++#define PCI_FN                  0x00
++
++/* virtio-blk-device */
++static void *qvirtio_blk_get_driver(QVirtioBlk *v_blk,
 +                                    const char *interface)
 +{
-+    if (!g_strcmp0(interface, "virtio-rng")) {
-+        return v_rng;
++    if (!g_strcmp0(interface, "virtio-blk")) {
++        return v_blk;
 +    }
 +    if (!g_strcmp0(interface, "virtio")) {
-+        return v_rng->vdev;
++        return v_blk->vdev;
 +    }
 +
-+    fprintf(stderr, "%s not present in virtio-rng-device\n", interface);
++    fprintf(stderr, "%s not present in virtio-blk-device\n", interface);
 +    g_assert_not_reached();
 +}
 +
-+static void *qvirtio_rng_device_get_driver(void *object,
++static void *qvirtio_blk_device_get_driver(void *object,
 +                                           const char *interface)
 +{
-+    QVirtioRngDevice *v_rng = object;
-+    return qvirtio_rng_get_driver(&v_rng->rng, interface);
++    QVirtioBlkDevice *v_blk = object;
++    return qvirtio_blk_get_driver(&v_blk->blk, interface);
 +}
 +
-+static void *virtio_rng_device_create(void *virtio_dev,
++static void *virtio_blk_device_create(void *virtio_dev,
 +                                      QGuestAllocator *t_alloc,
 +                                      void *addr)
 +{
-+    QVirtioRngDevice *virtio_rdevice = g_new0(QVirtioRngDevice, 1);
-+    QVirtioRng *interface = &virtio_rdevice->rng;
++    QVirtioBlkDevice *virtio_blk = g_new0(QVirtioBlkDevice, 1);
++    QVirtioBlk *interface = &virtio_blk->blk;
 +
 +    interface->vdev = virtio_dev;
 +
-+    virtio_rdevice->obj.get_driver = qvirtio_rng_device_get_driver;
++    virtio_blk->obj.get_driver = qvirtio_blk_device_get_driver;
 +
-+    return &virtio_rdevice->obj;
++    return &virtio_blk->obj;
 +}
 +
-+/* virtio-rng-pci */
-+static void *qvirtio_rng_pci_get_driver(void *object, const char *interface)
++/* virtio-blk-pci */
++static void *qvirtio_blk_pci_get_driver(void *object, const char *interface)
 +{
-+    QVirtioRngPCI *v_rng = object;
++    QVirtioBlkPCI *v_blk = object;
 +    if (!g_strcmp0(interface, "pci-device")) {
-+        return v_rng->pci_vdev.pdev;
++        return v_blk->pci_vdev.pdev;
 +    }
-+    return qvirtio_rng_get_driver(&v_rng->rng, interface);
++    return qvirtio_blk_get_driver(&v_blk->blk, interface);
 +}
 +
-+static void *virtio_rng_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
-+                                   void *addr)
++static void *virtio_blk_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
++                                      void *addr)
 +{
-+    QVirtioRngPCI *virtio_rpci = g_new0(QVirtioRngPCI, 1);
-+    QVirtioRng *interface = &virtio_rpci->rng;
-+    QOSGraphObject *obj = &virtio_rpci->pci_vdev.obj;
++    QVirtioBlkPCI *virtio_blk = g_new0(QVirtioBlkPCI, 1);
++    QVirtioBlk *interface = &virtio_blk->blk;
++    QOSGraphObject *obj = &virtio_blk->pci_vdev.obj;
 +
-+    virtio_pci_init(&virtio_rpci->pci_vdev, pci_bus, addr);
-+    interface->vdev = &virtio_rpci->pci_vdev.vdev;
++    virtio_pci_init(&virtio_blk->pci_vdev, pci_bus, addr);
++    interface->vdev = &virtio_blk->pci_vdev.vdev;
 +
-+    obj->get_driver = qvirtio_rng_pci_get_driver;
++    g_assert_cmphex(interface->vdev->device_type, ==, VIRTIO_ID_BLOCK);
++
++    obj->get_driver = qvirtio_blk_pci_get_driver;
 +
 +    return obj;
 +}
 +
-+static void virtio_rng_register_nodes(void)
++static void virtio_blk_register_nodes(void)
 +{
++    /* FIXME: every test using these two nodes needs to setup a
++     * -drive,id=drive0 otherwise QEMU is not going to start.
++     * Therefore, we do not include "produces" edge for virtio
++     * and pci-device yet.
++    */
++
++    char *arg = g_strdup_printf("id=drv0,drive=drive0,addr=%x.%x",
++                                PCI_SLOT, PCI_FN);
++
 +    QPCIAddress addr = {
-+        .devfn = QPCI_DEVFN(4, 0),
++        .devfn = QPCI_DEVFN(PCI_SLOT, PCI_FN),
 +    };
 +
-+    QOSGraphEdgeOptions opts = {
-+        .extra_device_opts = "addr=04.0",
-+    };
++    QOSGraphEdgeOptions opts = { };
 +
-+    /* virtio-rng-device */
-+    qos_node_create_driver("virtio-rng-device", virtio_rng_device_create);
-+    qos_node_consumes("virtio-rng-device", "virtio-bus", NULL);
-+    qos_node_produces("virtio-rng-device", "virtio");
-+    qos_node_produces("virtio-rng-device", "virtio-rng");
++    /* virtio-blk-device */
++    opts.extra_device_opts = "drive=drive0";
++    qos_node_create_driver("virtio-blk-device", virtio_blk_device_create);
++    qos_node_consumes("virtio-blk-device", "virtio-bus", &opts);
++    qos_node_produces("virtio-blk-device", "virtio-blk");
 +
-+    /* virtio-rng-pci */
++    /* virtio-blk-pci */
++    opts.extra_device_opts = arg;
 +    add_qpci_address(&opts, &addr);
-+    qos_node_create_driver("virtio-rng-pci", virtio_rng_pci_create);
-+    qos_node_consumes("virtio-rng-pci", "pci-bus", &opts);
-+    qos_node_produces("virtio-rng-pci", "pci-device");
-+    qos_node_produces("virtio-rng-pci", "virtio");
-+    qos_node_produces("virtio-rng-pci", "virtio-rng");
++    qos_node_create_driver("virtio-blk-pci", virtio_blk_pci_create);
++    qos_node_consumes("virtio-blk-pci", "pci-bus", &opts);
++    qos_node_produces("virtio-blk-pci", "virtio-blk");
++
++    g_free(arg);
 +}
 +
-+libqos_init(virtio_rng_register_nodes);
-diff --git a/tests/libqos/virtio-rng.h b/tests/libqos/virtio-rng.h
++libqos_init(virtio_blk_register_nodes);
+diff --git a/tests/libqos/virtio-blk.h b/tests/libqos/virtio-blk.h
 new file mode 100644
-index 0000000..fbba988
+index 0000000..dc25849
 --- /dev/null
-+++ b/tests/libqos/virtio-rng.h
-@@ -0,0 +1,39 @@
++++ b/tests/libqos/virtio-blk.h
+@@ -0,0 +1,40 @@
 +/*
 + * libqos driver framework
 + *
@@ -201,22 +215,23 @@ index 0000000..fbba988
 +#include "libqos/virtio.h"
 +#include "libqos/virtio-pci.h"
 +
-+typedef struct QVirtioRng QVirtioRng;
-+typedef struct QVirtioRngPCI QVirtioRngPCI;
-+typedef struct QVirtioRngDevice QVirtioRngDevice;
++typedef struct QVirtioBlk QVirtioBlk;
++typedef struct QVirtioBlkPCI QVirtioBlkPCI;
++typedef struct QVirtioBlkDevice QVirtioBlkDevice;
 +
-+struct QVirtioRng {
++/* virtqueue is created in each test */
++struct QVirtioBlk {
 +    QVirtioDevice *vdev;
 +};
 +
-+struct QVirtioRngPCI {
++struct QVirtioBlkPCI {
 +    QVirtioPCIDevice pci_vdev;
-+    QVirtioRng rng;
++    QVirtioBlk blk;
 +};
 +
-+struct QVirtioRngDevice {
++struct QVirtioBlkDevice {
 +    QOSGraphObject obj;
-+    QVirtioRng rng;
++    QVirtioBlk blk;
 +};
 -- 
 1.8.3.1
