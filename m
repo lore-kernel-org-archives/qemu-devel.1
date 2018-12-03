@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gTpZM-0001Ch-8c
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:51:34 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gTpd9-0003Md-5n
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:55:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gTpZH-0001fy-2y
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:51:30 -0500
-References: <20181130192216.26987-1-richard.henderson@linaro.org>
-	<20181130192216.26987-3-richard.henderson@linaro.org>
-	<34711f80-1959-32e0-e4e9-d22e003a5636@redhat.com>
-	<75253fd5-7c6a-5a8e-fc18-14534a50bd03@linaro.org>
-	<6895cef5-646a-8e51-2493-75b7805d33b0@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <5ff65640-7a88-1cf9-1d39-7928a1c2265d@redhat.com>
-Date: Mon, 3 Dec 2018 15:51:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <6895cef5-646a-8e51-2493-75b7805d33b0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.0 2/2] target/s390x:
- Implement STCK et al for CONFIG_USER_ONLY
+	(envelope-from <paolo.bonzini@gmail.com>) id 1gTpd6-00051Y-1P
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:55:27 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44897)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1gTpd5-00050O-QU
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:55:23 -0500
+Received: by mail-wr1-x442.google.com with SMTP id z5so12485555wrt.11
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 06:55:23 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 15:55:19 +0100
+Message-Id: <1543848919-31931-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] docker: centos7: upgrade to SDL2-devel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, fam@euphon.net
 
-On 03.12.18 15:02, Thomas Huth wrote:
-> On 2018-12-03 14:27, Richard Henderson wrote:
->> On 12/3/18 12:19 AM, Thomas Huth wrote:
->>> On 2018-11-30 20:22, Richard Henderson wrote:
->>>> This is a non-privileged instruction that was only implemented
->>>> for system mode.  However, the stck instruction is used by glibc,
->>>> so this was causing SIGILL for programs run under debian stretch.
->>>>
->>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>>> ---
->>>>  target/s390x/helper.h      |  2 +-
->>>>  target/s390x/misc_helper.c | 13 ++++++++++++-
->>>>  target/s390x/translate.c   |  2 ++
->>>>  target/s390x/insn-data.def | 11 ++++++-----
->>>>  4 files changed, 21 insertions(+), 7 deletions(-)
->>>>
->>>> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
->>>> index 018e9dd414..6260b50496 100644
->>>> --- a/target/s390x/helper.h
->>>> +++ b/target/s390x/helper.h
->>>> @@ -121,13 +121,13 @@ DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
->>>>  DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
->>>>  DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
->>>>  DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
->>>> +DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->>>>  
->>>>  #ifndef CONFIG_USER_ONLY
->>>>  DEF_HELPER_3(servc, i32, env, i64, i64)
->>>>  DEF_HELPER_4(diag, void, env, i32, i32, i32)
->>>>  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
->>>>  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
->>>> -DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->>>>  DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
->>>>  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
->>>>  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
->>>> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
->>>> index 3f91579570..c2940afecb 100644
->>>> --- a/target/s390x/misc_helper.c
->>>> +++ b/target/s390x/misc_helper.c
->>>> @@ -76,8 +76,19 @@ uint64_t HELPER(stpt)(CPUS390XState *env)
->>>>  #endif
->>>>  }
->>>>  
->>>> -#ifndef CONFIG_USER_ONLY
->>>> +#ifdef CONFIG_USER_ONLY
->>>> +/* Store Clock */
->>>> +uint64_t HELPER(stck)(CPUS390XState *env)
->>>> +{
->>>> +    struct timespec ts;
->>>> +    uint64_t ms;
->>>
->>> May I suggest "us" for microseconds? "ms" makes me thing of
->>> "milliseconds"...
->>
->> Oops, think-o.
->>
->>>> +    clock_gettime(CLOCK_REALTIME, &ts);
->>>> +    ms = (ts.tv_nsec / 1000) + (ts.tv_sec * 100000ull);
->>>> +
->>>> +    return TOD_UNIX_EPOCH + ms;
->>>> +}
->>>
->>> Don't you need to shift the value around a little bit for getting the
->>> right format of the TOD clock? The microseconds are not starting with
->>> the lowest bit, the TOD clock has a higher resolution. See also the
->>> time2tod() macro in include/hw/s390x/tod.h ...
+All CentOS 7 builds on Patchew are showing this warning:
 
-I agree, this needs time2tod(). By definition, the TOD is stepped like
-this. STCK/STCKE just provide different means to that value. But the
-stepping remains the same.
+   WARNING: Use of SDL 1.2 is deprecated and will be removed in
+   WARNING: future releases. Please switch to using SDL 2.0
 
-> 
->  Thomas
-> 
+Update the packages so that the warning goes away and the more
+interesting SDL2 code is compiled instead.
 
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/docker/dockerfiles/centos7.docker | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
+index e0f18f5..12a61fe 100644
+--- a/tests/docker/dockerfiles/centos7.docker
++++ b/tests/docker/dockerfiles/centos7.docker
+@@ -24,7 +24,7 @@ ENV PACKAGES \
+     nettle-devel \
+     perl-Test-Harness \
+     pixman-devel \
+-    SDL-devel \
++    SDL2-devel \
+     spice-glib-devel \
+     spice-server-devel \
+     tar \
 -- 
-
-Thanks,
-
-David / dhildenb
+1.8.3.1
