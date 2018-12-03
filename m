@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFt-0002KG-Ro
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:15:12 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFr-0002IR-VE
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:15:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFs-000509-0I
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:15:09 -0500
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1gTlFo-0004vt-2C
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:15:07 -0500
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 3 Dec 2018 10:14:58 +0000
-Message-ID: <20181203101429.88735-7-anton.nefedov@virtuozzo.com>
+Date: Mon, 3 Dec 2018 10:14:57 +0000
+Message-ID: <20181203101429.88735-6-anton.nefedov@virtuozzo.com>
 References: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
 In-Reply-To: <20181203101429.88735-1-anton.nefedov@virtuozzo.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v10 6/9] file-posix: support BDRV_REQ_ALLOCATE
+Subject: [Qemu-devel] [PATCH v10 5/9] block: treat BDRV_REQ_ALLOCATE as
+ serialising
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +27,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Current write_zeroes implementation is good enough to satisfy this flag too
+The idea is that ALLOCATE requests may overlap with other requests.
+Reuse the existing block layer infrastructure for serialising requests.
+Use the following approach:
+  - mark ALLOCATE also SERIALISING, so subsequent requests to the area wait
+  - ALLOCATE request itself must never wait if another request is in flight
+    already. Return EAGAIN, let the caller reconsider.
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 ---
- block/file-posix.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ block/io.c | 31 ++++++++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 7 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 07bbdab953..b0b7ab0159 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -603,6 +603,7 @@ static int raw_open_common(BlockDriverState *bs, QDict =
-*options,
-         } else {
-             s->discard_zeroes =3D true;
-             s->has_fallocate =3D true;
-+            bs->supported_zero_flags =3D BDRV_REQ_ALLOCATE;
-         }
-     } else {
-         if (!(S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode))) {
-@@ -646,10 +647,11 @@ static int raw_open_common(BlockDriverState *bs, QDic=
-t *options,
- #ifdef CONFIG_XFS
-     if (platform_test_xfs_fd(s->fd)) {
-         s->is_xfs =3D true;
-+        bs->supported_zero_flags =3D BDRV_REQ_ALLOCATE;
-     }
- #endif
+diff --git a/block/io.c b/block/io.c
+index d9d7644858..6ff946f63d 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -720,12 +720,13 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
+     bdrv_wakeup(bs);
+ }
 =20
--    bs->supported_zero_flags =3D BDRV_REQ_MAY_UNMAP;
-+    bs->supported_zero_flags |=3D BDRV_REQ_MAY_UNMAP;
-     ret =3D 0;
- fail:
-     if (filename && (bdrv_flags & BDRV_O_TEMPORARY)) {
-@@ -1520,6 +1522,10 @@ static ssize_t handle_aiocb_write_zeroes(RawPosixAIO=
-Data *aiocb)
-         }
-         s->has_fallocate =3D false;
-     }
+-static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *sel=
+f)
++static bool coroutine_fn find_or_wait_serialising_requests(
++    BdrvTrackedRequest *self, bool wait)
+ {
+     BlockDriverState *bs =3D self->bs;
+     BdrvTrackedRequest *req;
+     bool retry;
+-    bool waited =3D false;
++    bool found =3D false;
+=20
+     if (!atomic_read(&bs->serialising_in_flight)) {
+         return false;
+@@ -751,11 +752,14 @@ static bool coroutine_fn wait_serialising_requests(Bd=
+rvTrackedRequest *self)
+                  * will wait for us as soon as it wakes up, then just go o=
+n
+                  * (instead of producing a deadlock in the former case). *=
+/
+                 if (!req->waiting_for) {
++                    found =3D true;
++                    if (!wait) {
++                        break;
++                    }
+                     self->waiting_for =3D req;
+                     qemu_co_queue_wait(&req->wait_queue, &bs->reqs_lock);
+                     self->waiting_for =3D NULL;
+                     retry =3D true;
+-                    waited =3D true;
+                     break;
+                 }
+             }
+@@ -763,7 +767,12 @@ static bool coroutine_fn wait_serialising_requests(Bdr=
+vTrackedRequest *self)
+         qemu_co_mutex_unlock(&bs->reqs_lock);
+     } while (retry);
+=20
+-    return waited;
++    return found;
++}
 +
-+    if (!s->has_fallocate) {
-+        aiocb->bs->supported_zero_flags &=3D ~BDRV_REQ_ALLOCATE;
-+    }
- #endif
++static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *sel=
+f)
++{
++    return find_or_wait_serialising_requests(self, true);
+ }
 =20
-     return -ENOTSUP;
+ static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
+@@ -1585,7 +1594,7 @@ bdrv_co_write_req_prepare(BdrvChild *child, int64_t o=
+ffset, uint64_t bytes,
+                           BdrvTrackedRequest *req, int flags)
+ {
+     BlockDriverState *bs =3D child->bs;
+-    bool waited;
++    bool found;
+     int64_t end_sector =3D DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
+=20
+     if (bs->read_only) {
+@@ -1602,9 +1611,13 @@ bdrv_co_write_req_prepare(BdrvChild *child, int64_t =
+offset, uint64_t bytes,
+         mark_request_serialising(req, bdrv_get_cluster_size(bs));
+     }
+=20
+-    waited =3D wait_serialising_requests(req);
++    found =3D find_or_wait_serialising_requests(req,
++                                              !(flags & BDRV_REQ_ALLOCATE)=
+);
++    if (found && (flags & BDRV_REQ_ALLOCATE)) {
++        return -EAGAIN;
++    }
+=20
+-    assert(!waited || !req->serialising ||
++    assert(!found || !req->serialising ||
+            is_request_serialising_and_aligned(req));
+     assert(req->overlap_offset <=3D offset);
+     assert(offset + bytes <=3D req->overlap_offset + req->overlap_bytes);
+@@ -1866,6 +1879,10 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     assert(!((flags & BDRV_REQ_ALLOCATE) && (flags & BDRV_REQ_MAY_UNMAP)))=
+;
+     assert(!((flags & BDRV_REQ_ALLOCATE) && !(flags & BDRV_REQ_ZERO_WRITE)=
+));
+=20
++    if (flags & BDRV_REQ_ALLOCATE) {
++        flags |=3D BDRV_REQ_SERIALISING;
++    }
++
+     trace_bdrv_co_pwritev(child->bs, offset, bytes, flags);
+=20
+     if (!bs->drv) {
 --=20
 2.17.1
