@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqFG-0000zo-0S
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:51 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqFH-00011m-Tm
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqFB-0005Iz-Dw
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50068)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqFE-0005MZ-Df
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49280)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqFB-0005Ho-4j
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:45 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqFE-0005LZ-5D
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:48 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:58 +0100
-Message-Id: <1543851204-41186-46-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:33:00 +0100
+Message-Id: <1543851204-41186-48-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 45/71] tests/qgraph: remove virtio-balloon-test
+Subject: [Qemu-devel] [PATCH 47/71] qos-test: virtio-rng test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +28,97 @@ Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <l
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-The tests/virtio-balloon-test is covered by generic virtio tests,
-so remove it.
+Convert tests/virtio-rng-test in qgraph test node,
+virtio-rng-test. This test consumes a virtio-rng interface
+and checks that its function return the expected values.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Some functions are implemented only for virtio-rng-pci, so they
+don't consume virtio-rng, but virtio-rng-pci
+
+Note that this test does not allocate any virtio-rng structure,
+it's all done by the qtest walking graph mechanism
+
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include      |  3 ---
- tests/virtio-balloon-test.c | 33 ---------------------------------
- 2 files changed, 36 deletions(-)
- delete mode 100644 tests/virtio-balloon-test.c
+ tests/Makefile.include  |  3 +--
+ tests/virtio-rng-test.c | 27 +++++++--------------------
+ 2 files changed, 8 insertions(+), 22 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index d31aade..68bacf1 100644
+index 00ca6e8..a7c01a3 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -144,7 +144,6 @@ check-qtest-generic-y += tests/cdrom-test$(EXESUF)
- check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
+@@ -145,7 +145,6 @@ check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
  
  check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
--check-qtest-virtio-y += tests/virtio-balloon-test$(EXESUF)
  check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
- check-qtest-virtio-y += tests/virtio-rng-test$(EXESUF)
+-check-qtest-virtio-y += tests/virtio-rng-test$(EXESUF)
  check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
-@@ -286,7 +285,6 @@ check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
- check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
- check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-ccw-test$(EXESUF)
--check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
- check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
- check-qtest-s390x-y += tests/migration-test$(EXESUF)
  
-@@ -736,7 +734,6 @@ tests/vmxnet3-test$(EXESUF): tests/vmxnet3-test.o
- tests/ne2000-test$(EXESUF): tests/ne2000-test.o
- tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
- tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
--tests/virtio-balloon-test$(EXESUF): tests/virtio-balloon-test.o $(libqos-virtio-obj-y)
+ check-qtest-pci-y += tests/e1000-test$(EXESUF)
+@@ -690,6 +689,7 @@ qos-test-obj-y += tests/pci-test.o
+ qos-test-obj-y += tests/sdhci-test.o
+ qos-test-obj-y += tests/virtio-test.o
+ qos-test-obj-y += tests/virtio-9p-test.o
++qos-test-obj-y += tests/virtio-rng-test.o
+ qos-test-obj-y += tests/virtio-serial-test.o
+ 
+ check-unit-y += tests/test-qgraph$(EXESUF)
+@@ -738,7 +738,6 @@ tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
  tests/virtio-blk-test$(EXESUF): tests/virtio-blk-test.o $(libqos-virtio-obj-y)
  tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
  tests/virtio-net-test$(EXESUF): tests/virtio-net-test.o $(libqos-pc-obj-y) $(libqos-virtio-obj-y)
-diff --git a/tests/virtio-balloon-test.c b/tests/virtio-balloon-test.c
-deleted file mode 100644
-index 5a1d0cc..0000000
---- a/tests/virtio-balloon-test.c
-+++ /dev/null
-@@ -1,33 +0,0 @@
--/*
-- * QTest testcase for VirtIO Balloon
-- *
-- * Copyright (c) 2014 SUSE LINUX Products GmbH
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or later.
-- * See the COPYING file in the top-level directory.
-- */
--
--#include "qemu/osdep.h"
--#include "libqtest.h"
--#include "libqos/virtio.h"
--
+-tests/virtio-rng-test$(EXESUF): tests/virtio-rng-test.o $(libqos-pc-obj-y)
+ tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
+ tests/tpci200-test$(EXESUF): tests/tpci200-test.o
+ tests/display-vga-test$(EXESUF): tests/display-vga-test.o
+diff --git a/tests/virtio-rng-test.c b/tests/virtio-rng-test.c
+index 657d9a4..5309c7c 100644
+--- a/tests/virtio-rng-test.c
++++ b/tests/virtio-rng-test.c
+@@ -9,16 +9,12 @@
+ 
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
+-#include "libqos/pci.h"
++#include "libqos/qgraph.h"
++#include "libqos/virtio-rng.h"
+ 
+ #define PCI_SLOT_HP             0x06
+ 
 -/* Tests only initialization so far. TODO: Replace with functional tests */
--static void balloon_nop(void)
+-static void pci_nop(void)
 -{
 -}
 -
+-static void hotplug(void)
++static void rng_hotplug(void *obj, void *data, QGuestAllocator *alloc)
+ {
+     const char *arch = qtest_get_arch();
+ 
+@@ -30,18 +26,9 @@ static void hotplug(void)
+     }
+ }
+ 
 -int main(int argc, char **argv)
--{
++static void register_virtio_rng_test(void)
+ {
 -    int ret;
 -
 -    g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/virtio/balloon/nop", balloon_nop);
+-    qtest_add_func("/virtio/rng/pci/nop", pci_nop);
+-    qtest_add_func("/virtio/rng/pci/hotplug", hotplug);
 -
--    global_qtest = qtest_initf("-device virtio-balloon-%s",
--                               qvirtio_get_dev_type());
+-    qtest_start("-device virtio-rng-pci");
 -    ret = g_test_run();
 -
 -    qtest_end();
 -
 -    return ret;
--}
++    qos_add_test("hotplug", "virtio-rng-pci", rng_hotplug, NULL);
+ }
++
++libqos_init(register_virtio_rng_test);
 -- 
 1.8.3.1
