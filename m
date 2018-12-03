@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fwsgonzo@hotmail.com>) id 1gTqxE-0007KO-2W
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:20:17 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gTqy1-0007sF-35
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:21:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fwsgonzo@hotmail.com>) id 1gTqxC-0005ux-HN
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:20:16 -0500
-Received: from mail-he1eur01olkn082a.outbound.protection.outlook.com
-	([2a01:111:f400:fe1e::82a]:6302
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fwsgonzo@hotmail.com>)
-	id 1gTqxC-0005tb-6C
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:20:14 -0500
-From: Gonzo FWS <fwsgonzo@hotmail.com>
-Date: Mon, 3 Dec 2018 16:20:11 +0000
-Message-ID: <HE1P190MB00733AB17DBC2DC950108B0DDEAE0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>
-References: <HE1P190MB0073644AE7C57B520A8675CEDEAE0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>,
-	<3a15ac98-5687-03d3-ca89-772b171b8415@tuxfamily.org>,
-	<HE1P190MB007324727C407C4962CB6189DEAE0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>
-In-Reply-To: <HE1P190MB007324727C407C4962CB6189DEAE0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>
-Content-Language: en-US
+	(envelope-from <richard.henderson@linaro.org>) id 1gTqxv-0006Nq-KM
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:21:05 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gTqxv-0006Ne-Fe
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:20:59 -0500
+Received: by mail-oi1-x241.google.com with SMTP id x23so11416823oix.3
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 08:20:59 -0800 (PST)
+References: <1543845937-300-1-git-send-email-thuth@redhat.com>
+	<1543845937-300-8-git-send-email-thuth@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3759f21c-bd8e-d10b-0f85-38191c9533ad@linaro.org>
+Date: Mon, 3 Dec 2018 10:20:55 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] Calendar
+In-Reply-To: <1543845937-300-8-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 7/7] includes: Replace
+ QEMU_GNUC_PREREQ with "__has_builtin || !defined(__clang__)"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <huth@tuxfamily.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
 
-U29ycnksIEkgY29tcGxldGVseSBmb3Jnb3QgdG8gbWVudGlvbiB0aGUgZGVtbyBpbWFnZSBJIGF0
-dGFjaGVkIGNvbnRhaW5zIHRoZSBST00gIkZsb3JhY3kiIHdoaWNoIGlzIGEgZ2FtZSB0aGF0IG5l
-dmVyIGZvdW5kIGEgcHVibGlzaGVyIGFuZCB3YXMgbGF0ZXIgbWFkZSBwdWJsaWMgYnkgdGhlIGF1
-dGhvci4NCg0KDQpTb3VyY2U6IGh0dHA6Ly93d3cubmVzd29ybGQuY29tL2FydGljbGUucGhwP3N5
-c3RlbT1nYmMmZGF0YT1nYmNob21lYnJldw0KR2FtZWJveSBDb2xvciBIb21lYnJldyAod3d3Lm5l
-c3dvcmxkLmNvbSk8aHR0cDovL3d3dy5uZXN3b3JsZC5jb20vYXJ0aWNsZS5waHA/c3lzdGVtPWdi
-YyZkYXRhPWdiY2hvbWVicmV3Pg0KR0FNRUJPWSBDT0xPUiBIT01FQlJFVzogR0FNRVMsIERFTU9T
-IEFORCBNT1JFOiBXaGF0IHlvdSBmaW5kIGhlcmUgaXMgYSBsYXJnZSBzZWN0aW9uIG9mIEdhbWVi
-b3kgQ29sb3IgaG9tZWJyZXcgZGV2ZWxvcGVkIG92ZXIgdGhlIHllYXJzLCBieSBob21lYnJldyBJ
-IG1lYW4gZ2FtZXMvYXBwcyBhbmQgb3RoZXIgYmluYXJpZXMgZm9yIHVzZSBvbiB0aGUgR2FtZWJv
-eSBDb2xvciB0aGF0IGFyZSBhY3R1YWxseSBkZXZlbG9wZWQgZnJvbSBzY3JhdGNoIChubyBoYWNr
-cykuDQp3d3cubmVzd29ybGQuY29tDQoNCg0KIkZsb3JhY3kiIGlzIGEgcm9sZXBsYXlpbmcgZ2Ft
-ZSB3aXRoIGVsZW1lbnRzIG9mIHN0cmF0ZWd5IGFuZCBhY3Rpb24gZ2FtZXMsIGluIHdoaWNoIHRo
-ZSBwbGF5ZXIgYnJlZWRzIHBsYW50bGlrZSBjcmVhdHVyZXMgZm9yIGV4Y2l0aW5nIGFuaW1hdGVk
-IGNvbWJhdHMuIFRoaXMgZGVtbyB3YXMgbWFkZSBwdWJsaWMgYnkgdGhlIGRldmVsb3BlciAtIG5v
-IHB1Ymxpc2hlciB3YXMgZm91bmQgZm9yIHRoZSBnYW1lIGV2ZW4gYWZ0ZXIgc2V2ZXJhbCBhdHRl
-bXB0cy4NCmh0dHBzOi8vd2ViLmFyY2hpdmUub3JnL3dlYi8yMDAxMDQwNzIyNTEyOC9odHRwOi8v
-d3d3LmZsb3JhY3kuY29tL2ZwcmV2aWV3Lmh0bWwNCl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fDQpGcm9tOiBHb256byBGV1MgPGZ3c2dvbnpvQGhvdG1haWwuY29tPg0KU2VudDogTW9u
-ZGF5LCBEZWNlbWJlciAzLCAyMDE4IDU6MTYgUE0NClRvOiBUaG9tYXMgSHV0aDsgcWVtdS1kZXZl
-bEBub25nbnUub3JnDQpTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIENhbGVuZGFyDQoNCkkgZG9u
-J3QgdGhpbmsgc28uIFlvdSBjYW4gcnVuIHdpdGggYSBjb3B5cmlnaHRlZCBib290IFJPTSBpZiB5
-b3UgY2hvb3NlIHRvIGRvIHNvLCBidXQgeW91IGNhbiBhbHNvIGp1c3Qgc2V0IHlvdXIgUkFNIGFu
-ZCBDUFUgcmVnaXN0ZXJzIHRvIG1pbWljayB3aGF0IHRoZSBib290IFJPTSBkb2VzLiBFdmVuIHNv
-LCB0aGVyZSBhcmUgbWFueSBnYW1lYm95IHZhcmlhbnRzIChldmVuIGEgc3VwZXIgbmludGVuZG8g
-Y2FydHJpZGdlIHZhcmlhbnQpLCB3aGljaCBhbGwgZG8gdGhpbmdzIHNsaWdodGx5IGRpZmZlcmVu
-dGx5LCBzbyB0aGVyZSBhcmUgZmV3IG9mZmljaWFsIFJPTXMgdGhhdCBkZXBlbmQgb24gYW55IGtp
-bmQgb2YgbWVtb3J5IG9yIHJlZ2lzdGVycyBiZWluZyBhIHNwZWNpZmljIHdheSBhdCB0aGUgc3Rh
-cnQuDQoNCkhhdmluZyBzYWlkIGFsbCB0aGlzLCB0aGVyZSBhcmUgc3RpbGwgbXVya3kgY29ybmVy
-cyBmb3IgZW11bGF0b3JzLCBhbmQgSSBjb21wbGV0ZWx5IHVuZGVyc3RhbmQgdGhlIHF1ZXN0aW9u
-LiBCdXQgbXkgc3VibWlzc2lvbiBpcyBub3QgYW4gb3BlbiBPUyBvciAiYW4gZW11bGF0b3IuIiBJ
-biBwcmFjdGljZSBpdHMgYSBzdGF0aWMgbWFjaGluZSBpbWFnZSBidWlsdCBmcm9tIEluY2x1ZGVP
-UyBhbmQgbXkgZW1iZWRkZWQgR0JDIGVtdWxhdG9yLCB3aGljaCBjYW4gb25seSBydW4gdGhlIGVt
-YmVkZGVkIGZyZWV3YXJlIFJPTSB3aGljaCBpcyBhbHNvIGJ1aWx0IGludG8gdGhlIGltYWdlLiBU
-aGUgbWFjaGluZSBpbWFnZSBpcyBoYXJkLXdpcmVkIHRvIHBsYXkgb25seSB0aGlzIFJPTS4gSSB3
-b25kZXIgaWYgdGhhdCBtaWdodCBtYWtlIHRoZSB3aG9sZSB0aGluZyBsZXNzIGludGVyZXN0aW5n
-PyBUaGlzIGlzIG15IHJlcG9zaXRvcnkgZm9yIHRoZSBlbXVsYXRvcjogaHR0cHM6Ly9naXRodWIu
-Y29tL2Z3c0dvbnpvL2dhbWVicm8NCg0KSnVzdCB0byBzaG93IHdoYXQgSSBtZWFuLCBJIGhhdmUg
-YWRkZWQgYW4gZXhhbXBsZSBtYWNoaW5lIGltYWdlIHdpdGggYSBmcmVlIFJPTSAod2hpY2ggSSBo
-YXZlIG5vdCBhc2tlZCBmb3IgcGVybWlzc2lvbiB0byBlbWJlZCwgc28gdGhpcyBpcyBqdXN0IHRv
-IHNob3cgeW91IGhlcmUpLiBUaGVyZSBhcmUgYWxzbyBzb21lIGFubm95aW5nIGJ1Z3MgbGVmdCBp
-biB0aGUgZW11bGF0b3IuIElmIHlvdSBhcmUgaW50ZXJlc3RlZCBJIHdpbGwgY3JlYXRlIGEgbWFj
-aGluZSBpbWFnZSB3aXRoIGEgaG9tZWJyZXcgUk9NIHdoaWNoIEkgaGF2ZSBwZXJtaXNzaW9uIHRv
-IHVzZS4NCg0KVGhlIHJlYXNvbiBmb3IgdGhlIGxhcmdlIHNpemUgb2YgdGhlIC5JU08gaXMgYmVj
-YXVzZSBvZiBHUlVCLiBRZW11IGhhcyBhbiBpZi1zZW50ZW5jZSB0aGF0IGV4aXRzIHdpdGggYW4g
-ZXJyb3Igb24gRWxmNjQgYmluYXJpZXMsIHdoaWNoIGlmIHJlbW92ZWQgd2lsbCBtYWtlIHRoZSBp
-bWFnZSAzTUIgYW5kIHdvdWxkIHJ1biB3aXRoIG11bHRpYm9vdCAoNjQtYml0KSDwn5iKIEkgZG9u
-J3Qga25vdyBob3cgdG8gY29udHJpYnV0ZSB0byBRZW11IHRvIGdldCB0aG9zZSBsaW5lcyByZW1v
-dmVkLg0KDQpFaXRoZXIgd2F5LCBJIGNvbXBsZXRlbHkgdW5kZXJzdGFuZCBpZiB5b3UncmUgbm90
-IGludGVyZXN0ZWQuIEhhdmUgYSBnb29kIGRheS4NCi1nb256bw0KX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18NCkZyb206IFRob21hcyBIdXRoIDxodXRoQHR1eGZhbWlseS5vcmc+DQpT
-ZW50OiBNb25kYXksIERlY2VtYmVyIDMsIDIwMTggNDozNiBQTQ0KVG86IEdvbnpvIEZXUzsgcWVt
-dS1kZXZlbEBub25nbnUub3JnDQpTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIENhbGVuZGFyDQoN
-Ck9uIDIwMTgtMTItMDMgMTM6NTQsIEdvbnpvIEZXUyB3cm90ZToNCj4gSGV5LCBJIGhhdmUgd3Jp
-dHRlbiBhbiBlbWJlZGRlZCBnYW1lYm95IGNvbG9yIGVtdWxhdG9yIGZvciBteSBPUyAoSW5jbHVk
-ZU9TKSB3aGljaCBkb2VzIHJ1biBwcmltYXJpbHkgaW4gUWVtdS1LVk0gYXRtLiBBbmQgdGhlcmVp
-biBsaWVzIHRoZSBwcm9ibGVtIC0gUFMyIG9ubHkgd29ya3Mgd2l0aCBLVk0gZW5hYmxlZCBhdCBw
-cmVzZW50Lg0KPg0KPiBJcyBpdCB0b28gbGF0ZSB0byBzdWJtaXQgc29tZXRoaW5nPyBJIHdpbGwg
-c3VibWl0IGEgc3RhdGljIGltYWdlIHdpdGggYSBmcmVlIGhvbWVicmV3IFJPTSBpbiBpdCBpZiB5
-b3UgYXJlIGludGVyZXN0ZWQuDQoNCiBIaSwNCg0KdGhlcmUgYXJlIHN0aWxsIHNvbWUgb3BlbiBz
-bG90cyBsZWZ0LCAuLi4gYnV0IEknbSBub3Qgc3VyZSB3aGV0aGVyIGENCkdhbWVib3kgZW11bGF0
-b3IgaXMgcmVhbGx5IDEwMCUgZnJlZWx5IHJlZGlzdHJpYnV0YWJsZT8gRG9uJ3QgeW91IGFsc28N
-Cm5lZWQgc29tZSBwcm9wcmlldGFyeSBmaXJtd2FyZSBmb3Igc3VjaCBlbXVsYXRvcnM/DQoNCiBU
-aG9tYXMNCg==
+On 12/3/18 8:05 AM, Thomas Huth wrote:
+> Since we require GCC version 4.8 or newer now, we can be sure that
+> the builtin functions are always available on GCC. And for Clang,
+> we can check the availablility with __has_builtin instead.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  include/qemu/compiler.h   | 2 +-
+>  include/qemu/host-utils.h | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
