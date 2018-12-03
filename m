@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gTqEZ-0008KI-TH
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:09 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqEb-0008OO-47
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gTqEW-0004T1-8I
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:17659)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqEZ-0004XW-Sg
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33994)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gTqEV-0004S6-VW
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:04 -0500
-Date: Mon, 3 Dec 2018 15:33:57 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181203153357.GB7141@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1543845937-300-1-git-send-email-thuth@redhat.com>
-	<1543845937-300-2-git-send-email-thuth@redhat.com>
-	<20181203141611.GG8870@redhat.com>
-	<bbaa2b99-9503-3c35-f933-01c0e0cb0368@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <bbaa2b99-9503-3c35-f933-01c0e0cb0368@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-4.0 1/7] configure: Add a test for the
- minimum compiler version
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEZ-0004Wf-Jn
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:07 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:32:36 +0100
+Message-Id: <1543851204-41186-24-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
+References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 23/71] tests/libqos: arm/raspi2 machine node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,128 +23,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>
 
-On Mon, Dec 03, 2018 at 03:27:35PM +0100, Thomas Huth wrote:
-> On 2018-12-03 15:16, Daniel P. Berrang=C3=A9 wrote:
-> > On Mon, Dec 03, 2018 at 03:05:31PM +0100, Thomas Huth wrote:
-> >> So far we only had implicit requirements for the minimum compiler ve=
-rsion,
-> >> e.g. we require at least GCC 4.1 for the support of atomics. However=
-,
-> >> such old compiler versions are not tested anymore by the developers,=
- so
-> >> they are not really supported anymore. Since we recently declared ex=
-plicitly
-> >> what platforms we intend to support, we can also get more explicit o=
-n the
-> >> compiler version now. The supported distributions use the following =
-version
-> >> of GCC:
-> >>
-> >>       RHEL-7: 4.8.5
-> >>       Debian (Stretch): 6.3.0
-> >>       Debian (Jessie): 4.8.4
-> >>       OpenBSD (ports): 4.9.4
-> >>       FreeBSD (ports): 8.2.0
-> >>       OpenSUSE Leap 15: 7.3.1
-> >>       Ubuntu (Xenial): 5.3.1
-> >>       macOS (Homebrew): 8.2.0
-> >>
-> >> So we can safely assume GCC 4.8 these days. For Clang, the situation=
- is
-> >> a little bit more ambiguous, since it is sometimes not available in =
-the
-> >> main distros but rather third party repositories. At least Debian Je=
-ssie
-> >> uses version 3.5, and EPEL7 for RHEL7 uses 3.4, so let's use 3.4 as
-> >> minimum Clang version now - we still can adjust this later if necess=
-ary.
-> >>
-> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >> ---
-> >>  configure | 19 +++++++++++++++++++
-> >>  1 file changed, 19 insertions(+)
-> >>
-> >> diff --git a/configure b/configure
-> >> index 0a3c6a7..f1e305e 100755
-> >> --- a/configure
-> >> +++ b/configure
-> >> @@ -1840,6 +1840,25 @@ if test "$bogus_os" =3D "yes"; then
-> >>      error_exit "Unrecognized host OS (uname -s reports '$(uname -s)=
-')"
-> >>  fi
-> >> =20
-> >> +# Check whether the compiler matches our minimum requirements:
-> >> +cat > $TMPC << EOF
-> >> +#if defined(__clang_major__) && defined(__clang_minor__)
-> >> +# if __clang_major__ < 3 || (__clang_major__ =3D=3D 3 && __clang_mi=
-nor__ < 4)
-> >> +#  error You need at least Clang v3.4 to compile QEMU
-> >> +# endif
-> >=20
-> > NB although this will succeed, it is not technically checking the
-> > right thing on macOS platforms as their clang used a completely
-> > different numbering scheme. It just happens to have larger numbers
-> > than upstream clang, so we'll always succeed.
->=20
-> Does that only apply to the version string that is reported by "clang
-> --version" or does it also apply to the __clang_major/minor__ macros?
->=20
-> In the latter case, I think I could add a comment to the patch here.
->=20
-> I'm also not sure whether the LLVM version necessarily matches the Clan=
-g
-> version? In older versions, you can also see "4.2 (clang-425.0.28)
-> (based on LLVM 3.2svn)" in the tables there...
+From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-The first number in the clang version string is what we're interested
-in, and that matches the XCode version number, and is what's reflected
-in the __clang_major/minor__ macros.  The the LLVM version in the table
-reflects what upstream release they forked the XCode version from.
+Add arm/raspi2 machine to the graph. This machine contains a generic-sdhci, so
+its constructor must take care of setting it properly when called.
 
-> > IOW, to require clang >=3D 3.4 on macOS, we would need to require
-> > their version >=3D 5.1
->=20
-> If they also messed up the macros, I think we likely have a problem the
-> other way round: What upstream Clang version corresponds to the Apple
-> Clang version 3.4 ? ... but if I interpret the old table right, they
-> just started the confusion with 5.0, so I think the check above should
-> still be fine.
+Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/Makefile.include            |  1 +
+ tests/libqos/arm-raspi2-machine.c | 91 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 92 insertions(+)
+ create mode 100644 tests/libqos/arm-raspi2-machine.c
 
-I think you're mis-reading it. There is  no Apple Clang version 3.4 - at
-least not in this table.
-
-The earliest version Apple Clang version is 5.0 (in XCode 5.0.0), and
-that corresponds to upstream CLang version 3.3
-
-Effectively what this means is that we need a separate check for Apple's
-version of CLang. We can't simply use __apple__ as that would fire if
-someone had built upstream clang on macOS. Instead we need to toggle
-on  __apple_build_version__ which is specific to Apple's fork
-
- #if defined(__clang_major__) && defined(__clang_minor__)
- #  ifdef __apple_build_version__
- #    if __clang_major__ < 5 || (__clang_major__ =3D=3D 5 && __clang_mino=
-r__ < 1)
- #      error You need at least XCode CLang v5.1 to compile QEMU
- #    endif
- #  else
- #    if __clang_major__ < 3 || (__clang_major__ =3D=3D 3 && __clang_mino=
-r__ < 4)
- #      error You need at least Clang v3.4 to compile QEMU
- #    endif
- #  endif
- ....gcc....
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 66c7848..75951f8 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -681,6 +681,7 @@ qos-test-obj-y += $(libqos-pc-obj-y)
+ qos-test-obj-y += tests/libqos/sdhci.o
+ 
+ # Machines
++qos-test-obj-y += tests/libqos/arm-raspi2-machine.o
+ qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
+ 
+ check-unit-y += tests/test-qgraph$(EXESUF)
+diff --git a/tests/libqos/arm-raspi2-machine.c b/tests/libqos/arm-raspi2-machine.c
+new file mode 100644
+index 0000000..3aff670
+--- /dev/null
++++ b/tests/libqos/arm-raspi2-machine.c
+@@ -0,0 +1,91 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "libqos/malloc.h"
++#include "libqos/qgraph.h"
++#include "sdhci.h"
++
++#define ARM_PAGE_SIZE             4096
++#define RASPI2_RAM_ADDR           0
++#define RASPI2_RAM_SIZE           0x20000000
++
++typedef struct QRaspi2Machine QRaspi2Machine;
++
++struct QRaspi2Machine {
++    QOSGraphObject obj;
++    QGuestAllocator alloc;
++    QSDHCI_MemoryMapped sdhci;
++};
++
++static void *raspi2_get_driver(void *object, const char *interface)
++{
++    QRaspi2Machine *machine = object;
++    if (!g_strcmp0(interface, "memory")) {
++        return &machine->alloc;
++    }
++
++    fprintf(stderr, "%s not present in arm/raspi2\n", interface);
++    g_assert_not_reached();
++}
++
++static QOSGraphObject *raspi2_get_device(void *obj, const char *device)
++{
++    QRaspi2Machine *machine = obj;
++    if (!g_strcmp0(device, "generic-sdhci")) {
++        return &machine->sdhci.obj;
++    }
++
++    fprintf(stderr, "%s not present in arm/raspi2\n", device);
++    g_assert_not_reached();
++}
++
++static void raspi2_destructor(QOSGraphObject *obj)
++{
++    QRaspi2Machine *machine = (QRaspi2Machine *) obj;
++    alloc_destroy(&machine->alloc);
++}
++
++static void *qos_create_machine_arm_raspi2(QTestState *qts)
++{
++    QRaspi2Machine *machine = g_new0(QRaspi2Machine, 1);
++
++    alloc_init(&machine->alloc, 0,
++               RASPI2_RAM_ADDR + (1 << 20),
++               RASPI2_RAM_ADDR + RASPI2_RAM_SIZE,
++               ARM_PAGE_SIZE);
++    machine->obj.get_device = raspi2_get_device;
++    machine->obj.get_driver = raspi2_get_driver;
++    machine->obj.destructor = raspi2_destructor;
++    qos_init_sdhci_mm(&machine->sdhci, qts, 0x3f300000, &(QSDHCIProperties) {
++        .version = 3,
++        .baseclock = 52,
++        .capab.sdma = false,
++        .capab.reg = 0x052134b4
++    });
++    return &machine->obj;
++}
++
++static void raspi2_register_nodes(void)
++{
++    qos_node_create_machine("arm/raspi2", qos_create_machine_arm_raspi2);
++    qos_node_contains("arm/raspi2", "generic-sdhci", NULL);
++}
++
++libqos_init(raspi2_register_nodes);
+-- 
+1.8.3.1
