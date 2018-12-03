@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45716)
+Received: from eggs.gnu.org ([208.118.235.92]:59691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gTjqp-0007Pk-MZ
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:45:12 -0500
+	(envelope-from <kraxel@redhat.com>) id 1gTkF3-0007IS-6E
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 04:10:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gTjqk-0007kn-02
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:45:10 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52362)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gTjqj-0007jV-Dx
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:45:05 -0500
-Received: by mail-wm1-x341.google.com with SMTP id r11-v6so4780632wmb.2
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 00:45:01 -0800 (PST)
-References: <20181130215221.20554-1-richard.henderson@linaro.org>
-	<20181130215221.20554-4-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181130215221.20554-4-richard.henderson@linaro.org>
-Date: Mon, 03 Dec 2018 08:44:58 +0000
-Message-ID: <87a7ln3sol.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 03/16] tcg/aarch64: Remove
- reloc_pc26_atomic
+	(envelope-from <kraxel@redhat.com>) id 1gTk4v-0002IO-L3
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:59:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gTk4v-0002Gc-Em
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:59:45 -0500
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon,  3 Dec 2018 09:59:37 +0100
+Message-Id: <20181203085938.10247-2-kraxel@redhat.com>
+In-Reply-To: <20181203085938.10247-1-kraxel@redhat.com>
+References: <20181203085938.10247-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH for-3.1 v2 1/2] usb-mtp: fix utf16_to_str
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +23,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: public@hansmi.ch, Gerd Hoffmann <kraxel@redhat.com>
 
+Make utf16_to_str return an allocated string.  Remove the assumtion that
+the number of string bytes equals the number of utf16 chars (which is
+only true for ascii chars).  Instead call wcstombs twice, once to figure
+the storage size and once for the actual conversion (as suggested by the
+wcstombs manpage).
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Reported-by: Michael Hanselmann <public@hansmi.ch>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/dev-mtp.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-> It is unused since b68686bd4bfeb70040b4099df993dfa0b4f37b03.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  tcg/aarch64/tcg-target.inc.c | 12 ------------
->  1 file changed, 12 deletions(-)
->
-> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-> index 083592a4d7..a41b633960 100644
-> --- a/tcg/aarch64/tcg-target.inc.c
-> +++ b/tcg/aarch64/tcg-target.inc.c
-> @@ -87,18 +87,6 @@ static inline void reloc_pc26(tcg_insn_unit *code_ptr,=
- tcg_insn_unit *target)
->      *code_ptr =3D deposit32(*code_ptr, 0, 26, offset);
->  }
->
-> -static inline void reloc_pc26_atomic(tcg_insn_unit *code_ptr,
-> -                                     tcg_insn_unit *target)
-> -{
-> -    ptrdiff_t offset =3D target - code_ptr;
-> -    tcg_insn_unit insn;
-> -    tcg_debug_assert(offset =3D=3D sextract64(offset, 0, 26));
-> -    /* read instruction, mask away previous PC_REL26 parameter contents,
-> -       set the proper offset, then write back the instruction. */
-> -    insn =3D atomic_read(code_ptr);
-> -    atomic_set(code_ptr, deposit32(insn, 0, 26, offset));
-> -}
-> -
->  static inline void reloc_pc19(tcg_insn_unit *code_ptr, tcg_insn_unit *ta=
-rget)
->  {
->      ptrdiff_t offset =3D target - code_ptr;
-
-
---
-Alex Benn=C3=A9e
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 00a3691bae..0f6a9702ef 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -1593,17 +1593,23 @@ static void usb_mtp_cancel_packet(USBDevice *dev, USBPacket *p)
+     fprintf(stderr, "%s\n", __func__);
+ }
+ 
+-static void utf16_to_str(uint8_t len, uint16_t *arr, char *name)
++static char *utf16_to_str(uint8_t len, uint16_t *arr)
+ {
+-    int count;
+-    wchar_t *wstr = g_new0(wchar_t, len);
++    wchar_t *wstr = g_new0(wchar_t, len + 1);
++    int count, dlen;
++    char *dest;
+ 
+     for (count = 0; count < len; count++) {
++        /* FIXME: not working for surrogate pairs */
+         wstr[count] = (wchar_t)arr[count];
+     }
++    wstr[count] = 0;
+ 
+-    wcstombs(name, wstr, len);
++    dlen = wcstombs(NULL, wstr, 0) + 1;
++    dest = g_malloc(dlen);
++    wcstombs(dest, wstr, dlen);
+     g_free(wstr);
++    return dest;
+ }
+ 
+ /* Wrapper around write, returns 0 on failure */
+@@ -1703,7 +1709,7 @@ static void usb_mtp_write_metadata(MTPState *s)
+ {
+     MTPData *d = s->data_out;
+     ObjectInfo *dataset = (ObjectInfo *)d->data;
+-    char *filename = g_new0(char, dataset->length);
++    char *filename;
+     MTPObject *o;
+     MTPObject *p = usb_mtp_object_lookup(s, s->dataset.parent_handle);
+     uint32_t next_handle = s->next_handle;
+@@ -1711,7 +1717,7 @@ static void usb_mtp_write_metadata(MTPState *s)
+     assert(!s->write_pending);
+     assert(p != NULL);
+ 
+-    utf16_to_str(dataset->length, dataset->filename, filename);
++    filename = utf16_to_str(dataset->length, dataset->filename);
+ 
+     o = usb_mtp_object_lookup_name(p, filename, dataset->length);
+     if (o != NULL) {
+-- 
+2.9.3
