@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gTrLB-00053n-1J
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:45:01 -0500
+	(envelope-from <eblake@redhat.com>) id 1gTrMl-00071a-4v
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:46:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gTrL6-0004ts-Vf
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:45:00 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40191)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gTrL6-0004tK-QZ
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:44:56 -0500
-Received: by mail-oi1-x244.google.com with SMTP id t204so11484286oie.7
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 08:44:56 -0800 (PST)
-References: <1543848532-12604-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1543848532-12604-4-git-send-email-lizhijian@cn.fujitsu.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <39f2fb36-417f-a9fa-d462-39ce2c3af319@linaro.org>
-Date: Mon, 3 Dec 2018 10:44:52 -0600
+	(envelope-from <eblake@redhat.com>) id 1gTrMh-0006He-4k
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:46:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53398)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gTrMg-0006FB-SM
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:46:35 -0500
+References: <20181203100608.28538-1-jasowang@redhat.com>
+	<20181203100608.28538-5-jasowang@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ebf8ecc1-fd57-d929-41aa-464dedce589c@redhat.com>
+Date: Mon, 3 Dec 2018 10:46:13 -0600
 MIME-Version: 1.0
-In-Reply-To: <1543848532-12604-4-git-send-email-lizhijian@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181203100608.28538-5-jasowang@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 3/4] i386: import bootparam.h
+Subject: Re: [Qemu-devel] [PATCH V4 for 3.1 4/4] virtio-net-test: add large
+ tx buffer test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +29,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Zhijian <lizhijian@cn.fujitsu.com>, qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org
-Cc: philip.li@intel.com, zhijianx.li@intel.com
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: mst@redhat.com, ppandit@redhat.com, liq3ea@163.com, liq3ea@gmail.com, pbonzini@redhat.com, thuth@redhat.com
 
-On 12/3/18 8:48 AM, Li Zhijian wrote:
->  #include "hw/net/ne2000-isa.h"
-> +#include <asm/bootparam.h>
->  
->  /* debug PC/ISA interrupts */
->  //#define DEBUG_IRQ
-> @@ -820,20 +821,6 @@ static long get_file_size(FILE *f)
->      return size;
->  }
->  
-> -/* setup_data types */
-> -#define SETUP_NONE     0
-> -#define SETUP_E820_EXT 1
-> -#define SETUP_DTB      2
-> -#define SETUP_PCI      3
-> -#define SETUP_EFI      4
-> -
-> -struct setup_data {
-> -    uint64_t next;
-> -    uint32_t type;
-> -    uint32_t len;
-> -    uint8_t data[0];
-> -} __attribute__((packed));
-> -
+On 12/3/18 4:06 AM, Jason Wang wrote:
+> This test tries to build a packet whose size is greater than INT_MAX
+> which tries to trigger integer overflow in qemu_net_queue_append_iov()
+> which may result OOB.
 
-No, this will fail to build for a non-x86 host, which will not have
-<asm/bootparam.h>.  Or, perhaps, have a *different* asm/bootparam.h that will
-be specific to a different host cpu.
+Can you also add a packet just slightly larger than NET_BUFSIZE (68k) to 
+show that we aren't having any further issues at even smaller (and more 
+likely) values of oversized packets?
 
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>   tests/virtio-net-test.c | 44 +++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 44 insertions(+)
+> 
 
-r~
+> +++ b/tests/virtio-net-test.c
+> @@ -245,6 +245,49 @@ static void pci_basic(gconstpointer data)
+>       g_free(dev);
+>       qtest_shutdown(qs);
+>   }
+> +
+> +static void large_tx(gconstpointer data)
+> +{
+> +    QVirtioPCIDevice *dev;
+> +    QOSState *qs;
+> +    QVirtQueuePCI *tx, *rx;
+> +    QVirtQueue *vq;
+> +    uint64_t req_addr;
+> +    uint32_t free_head;
+> +    size_t alloc_size = UINT_MAX / 64;
+> +    int i;
+> +
+> +    qs = pci_test_start("-netdev hubport,id=hp0,hubid=0 "
+> +                        "-device virtio-net-pci,netdev=hp0 ");
+
+Why the trailing space?
+
+> +    dev = virtio_net_pci_init(qs->pcibus, PCI_SLOT);
+> +
+> +    rx = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 0);
+> +    tx = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, qs->alloc, 1);
+> +
+> +    driver_init(&dev->vdev);
+> +    vq = &tx->vq;
+> +
+> +    /* Bypass the limitation by pointing several descriptors to a single
+> +     * smaller area */
+> +    req_addr = guest_alloc(qs->alloc, alloc_size);
+> +    free_head = qvirtqueue_add(vq, req_addr, alloc_size, false, true);
+> +
+> +    for (i = 0; i < 64; i++) {
+> +        qvirtqueue_add(vq, req_addr, alloc_size, false, i == 63 ?
+> +                       false : true);
+
+Any time I see both 'true' and 'false' in a ?: operator, I have to 
+wonder why you didn't just write the simpler version directly on the 
+condition.  This is the same as  'i != 63'.
+
+> +    }
+> +    qvirtqueue_kick(&dev->vdev, vq, free_head);
+> +
+> +    qvirtio_wait_used_elem(&dev->vdev, vq, free_head, NULL,
+> +                           QVIRTIO_NET_TIMEOUT_US);
+> +
+> +    qvirtqueue_cleanup(dev->vdev.bus, &tx->vq, qs->alloc);
+> +    qvirtqueue_cleanup(dev->vdev.bus, &rx->vq, qs->alloc);
+> +    qvirtio_pci_device_disable(dev);
+> +    g_free(dev->pdev);
+> +    g_free(dev);
+> +    qtest_shutdown(qs);
+> +}
+>   #endif
+>   
+>   static void hotplug(void)
+> @@ -270,6 +313,7 @@ int main(int argc, char **argv)
+>       qtest_add_data_func("/virtio/net/pci/basic", send_recv_test, pci_basic);
+>       qtest_add_data_func("/virtio/net/pci/rx_stop_cont",
+>                           stop_cont_test, pci_basic);
+> +    qtest_add_data_func("/virtio/net/pci/large_tx", NULL, large_tx);
+>   #endif
+>       qtest_add_func("/virtio/net/pci/hotplug", hotplug);
+>   
+
+I can reproduce Peter's complaints of this introducing noise to 'make 
+check':
+qemu-system-x86_64: warning: hub 0 is not connected to host network
+
+With patches 2-4 applied but patch 1 omitted, 'make check' fails with:
+
+Broken pipe
+tests/libqtest.c:125: kill_qemu() detected QEMU death from signal 11 
+(Segmentation fault) (core dumped)
+GTester: last random seed: R02S9569aabcb2d834a9dadcce272c5588db
+
+so the test is definitely triggering the problem as patched by part 1. 
+Although I'm not confident enough of what the test is doing for an R-b, 
+and would like it to be less noisy, I can at least add:
+
+Tested-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
