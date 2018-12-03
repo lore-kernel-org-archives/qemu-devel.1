@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqFy-00026m-NB
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:35 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqG5-0002CS-TI
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqFt-0006C5-SF
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34842)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqG1-0006J3-43
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54000)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqFt-0006BK-Jd
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:29 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqG0-0006IJ-So
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:35:37 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:33:10 +0100
-Message-Id: <1543851204-41186-58-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:33:12 +0100
+Message-Id: <1543851204-41186-60-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 57/71] tests/libqos: remove pre-qgraph
- QVirtioPCIDevice API
+Subject: [Qemu-devel] [PATCH 59/71] qos-test: ac97 test node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,180 +26,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>
 
-Remove the qvirtio_pci_device_find* and qvirtio_pci_device_free
-APIs, now that they do not have any users.
+From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
+Convert tests/ac97-test to a driver node; currently it runs
+the PCI nop test only, therefore we're not placing it in tests/libqos.
+
+Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/libqos/virtio-pci.c | 112 +++++++---------------------------------------
- tests/libqos/virtio-pci.h |   4 --
- 2 files changed, 17 insertions(+), 99 deletions(-)
+ tests/Makefile.include |  3 +--
+ tests/ac97-test.c      | 47 ++++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 37 insertions(+), 13 deletions(-)
 
-diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
-index 0b58b74..993d347 100644
---- a/tests/libqos/virtio-pci.c
-+++ b/tests/libqos/virtio-pci.c
-@@ -35,14 +35,6 @@
-  * original qvirtio_pci_destructor and qvirtio_pci_start_hw.
-  */
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index c0b370b..5d65bd1 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -149,7 +149,6 @@ check-qtest-pci-$(CONFIG_PCNET_PCI) += tests/pcnet-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_EEPRO100_PCI) += tests/eepro100-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_NE2000_PCI) += tests/ne2000-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_NVME_PCI) += tests/nvme-test$(EXESUF)
+-check-qtest-pci-$(CONFIG_AC97) += tests/ac97-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_ES1370) += tests/es1370-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_IPACK) += tests/tpci200-test$(EXESUF)
+ check-qtest-pci-$(CONFIG_IPACK) += $(check-qtest-ipack-y)
+@@ -680,6 +679,7 @@ qos-test-obj-y += tests/libqos/ppc64_pseries-machine.o
+ qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
  
--typedef struct QVirtioPCIForeachData {
--    void (*func)(QVirtioDevice *d, void *data);
--    uint16_t device_type;
--    bool has_slot;
--    int slot;
--    void *user_data;
--} QVirtioPCIForeachData;
--
- static inline bool qvirtio_pci_is_big_endian(QVirtioPCIDevice *dev)
+ # Tests
++qos-test-obj-y += tests/ac97-test.o
+ qos-test-obj-y += tests/e1000e-test.o
+ qos-test-obj-y += tests/pci-test.o
+ qos-test-obj-y += tests/sdhci-test.o
+@@ -746,7 +746,6 @@ tests/drive_del-test$(EXESUF): tests/drive_del-test.o
+ tests/nvme-test$(EXESUF): tests/nvme-test.o $(libqos-pc-obj-y)
+ tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
+ tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
+-tests/ac97-test$(EXESUF): tests/ac97-test.o
+ tests/es1370-test$(EXESUF): tests/es1370-test.o
+ tests/intel-hda-test$(EXESUF): tests/intel-hda-test.o
+ tests/ioh3420-test$(EXESUF): tests/ioh3420-test.o
+diff --git a/tests/ac97-test.c b/tests/ac97-test.c
+index e0d177b..532fb1c 100644
+--- a/tests/ac97-test.c
++++ b/tests/ac97-test.c
+@@ -9,23 +9,48 @@
+ 
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
++#include "libqos/qgraph.h"
++#include "libqos/pci.h"
+ 
+-/* Tests only initialization so far. TODO: Replace with functional tests */
+-static void nop(void)
++typedef struct QAC97 QAC97;
++
++struct QAC97 {
++    QOSGraphObject obj;
++    QPCIDevice dev;
++};
++
++static void *ac97_get_driver(void *obj, const char *interface)
  {
-     QPCIBus *bus = dev->pdev->bus;
-@@ -51,50 +43,6 @@ static inline bool qvirtio_pci_is_big_endian(QVirtioPCIDevice *dev)
-     return qtest_big_endian(bus->qts);
++    QAC97 *ac97 = obj;
++
++    if (!g_strcmp0(interface, "pci-device")) {
++        return &ac97->dev;
++    }
++
++    fprintf(stderr, "%s not present in e1000e\n", interface);
++    g_assert_not_reached();
  }
  
--void qvirtio_pci_device_free(QVirtioPCIDevice *dev)
--{
--    g_free(dev->pdev);
--}
--
--static void qvirtio_pci_init_from_pcidev(QVirtioPCIDevice *dev, QPCIDevice *pci_dev)
--{
--    dev->pdev = pci_dev;
--    dev->vdev.device_type = qpci_config_readw(pci_dev, PCI_SUBSYSTEM_ID);
--
--    dev->config_msix_entry = -1;
--
--    dev->vdev.bus = &qvirtio_pci;
--    dev->vdev.big_endian = qvirtio_pci_is_big_endian(dev);
--
--    /* each virtio-xxx-pci device should override at least this function */
--    dev->obj.get_driver = NULL;
--    dev->obj.start_hw = qvirtio_pci_start_hw;
--    dev->obj.destructor = qvirtio_pci_destructor;
--}
--
--static void qvirtio_pci_foreach_callback(
--                        QPCIDevice *dev, int devfn, void *data)
--{
--    QVirtioPCIForeachData *d = data;
--    QVirtioPCIDevice *vpcidev = g_new0(QVirtioPCIDevice, 1);
--
--    qvirtio_pci_init_from_pcidev(vpcidev, dev);
--    if (vpcidev->vdev.device_type == d->device_type &&
--        (!d->has_slot || vpcidev->pdev->devfn == d->slot << 3)) {
--        d->func(&vpcidev->vdev, d->user_data);
--    } else {
--        qvirtio_pci_device_free(vpcidev);
--        g_free(vpcidev);
--    }
--}
--
--static void qvirtio_pci_assign_device(QVirtioDevice *d, void *data)
--{
--    QVirtioPCIDevice **vpcidev = data;
--    assert(!*vpcidev);
--    *vpcidev = container_of(d, QVirtioPCIDevice, vdev);
--}
--
- #define CONFIG_BASE(dev) (VIRTIO_PCI_CONFIG_OFF((dev)->pdev->msix_enabled))
- 
- static uint8_t qvirtio_pci_config_readb(QVirtioDevice *d, uint64_t off)
-@@ -317,48 +265,6 @@ const QVirtioBus qvirtio_pci = {
-     .virtqueue_kick = qvirtio_pci_virtqueue_kick,
- };
- 
--/* TODO: delete this once qgraph is completed */
--static void qvirtio_pci_foreach(QPCIBus *bus, uint16_t device_type,
--                bool has_slot, int slot,
--                void (*func)(QVirtioDevice *d, void *data), void *data)
--{
--    QVirtioPCIForeachData d = { .func = func,
--                                .device_type = device_type,
--                                .has_slot = has_slot,
--                                .slot = slot,
--                                .user_data = data };
--
--    qpci_device_foreach(bus, PCI_VENDOR_ID_REDHAT_QUMRANET, -1,
--                        qvirtio_pci_foreach_callback, &d);
--}
--
--QVirtioPCIDevice *qvirtio_pci_device_find(QPCIBus *bus, uint16_t device_type)
--{
--    QVirtioPCIDevice *dev = NULL;
--
--    qvirtio_pci_foreach(bus, device_type, false, 0,
--                        qvirtio_pci_assign_device, &dev);
--
--    if (dev) {
--        dev->vdev.bus = &qvirtio_pci;
--    }
--
--    return dev;
--}
--
--QVirtioPCIDevice *qvirtio_pci_device_find_slot(QPCIBus *bus,
--                                               uint16_t device_type, int slot)
--{
--    QVirtioPCIDevice *dev = NULL;
--
--    qvirtio_pci_foreach(bus, device_type, true, slot,
--                        qvirtio_pci_assign_device, &dev);
--
--    dev->vdev.bus = &qvirtio_pci;
--
--    return dev;
--}
--
- void qvirtio_pci_device_enable(QVirtioPCIDevice *d)
+-int main(int argc, char **argv)
++static void *ac97_create(void *pci_bus, QGuestAllocator *alloc, void *addr)
  {
-     qpci_device_enable(d->pdev);
-@@ -445,7 +351,7 @@ void qvirtio_pci_destructor(QOSGraphObject *obj)
- {
-     QVirtioPCIDevice *dev = (QVirtioPCIDevice *)obj;
-     qvirtio_pci_device_disable(dev);
--    qvirtio_pci_device_free(dev);
-+    g_free(dev->pdev);
- }
+-    int ret;
++    QAC97 *ac97 = g_new0(QAC97, 1);
++    QPCIBus *bus = pci_bus;
  
- void qvirtio_pci_start_hw(QOSGraphObject *obj)
-@@ -455,6 +361,22 @@ void qvirtio_pci_start_hw(QOSGraphObject *obj)
-     qvirtio_start_device(&dev->vdev);
- }
- 
-+static void qvirtio_pci_init_from_pcidev(QVirtioPCIDevice *dev, QPCIDevice *pci_dev)
-+{
-+    dev->pdev = pci_dev;
-+    dev->vdev.device_type = qpci_config_readw(pci_dev, PCI_SUBSYSTEM_ID);
-+
-+    dev->config_msix_entry = -1;
-+
-+    dev->vdev.bus = &qvirtio_pci;
-+    dev->vdev.big_endian = qvirtio_pci_is_big_endian(dev);
-+
-+    /* each virtio-xxx-pci device should override at least this function */
-+    dev->obj.get_driver = NULL;
-+    dev->obj.start_hw = qvirtio_pci_start_hw;
-+    dev->obj.destructor = qvirtio_pci_destructor;
+-    g_test_init(&argc, &argv, NULL);
+-    qtest_add_func("/ac97/nop", nop);
+-
+-    qtest_start("-device AC97");
+-    ret = g_test_run();
++    qpci_device_init(&ac97->dev, bus, addr);
++    ac97->obj.get_driver = ac97_get_driver;
++    return &ac97->obj;
 +}
+ 
+-    qtest_end();
++static void ac97_register_nodes(void)
++{
++    QOSGraphEdgeOptions opts = {
++        .extra_device_opts = "addr=04.0",
++    };
++    add_qpci_address(&opts, &(QPCIAddress) { .devfn = QPCI_DEVFN(4, 0) });
+ 
+-    return ret;
++    qos_node_create_driver("AC97", ac97_create);
++    qos_node_produces("AC97", "pci-device");
++    qos_node_consumes("AC97", "pci-bus", &opts);
+ }
 +
- void virtio_pci_init(QVirtioPCIDevice *dev, QPCIBus *bus, QPCIAddress * addr)
- {
-     QPCIDevice *pci_dev = qpci_device_find(bus, addr->devfn);
-diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
-index 5631352..728b471 100644
---- a/tests/libqos/virtio-pci.h
-+++ b/tests/libqos/virtio-pci.h
-@@ -35,10 +35,6 @@ extern const QVirtioBus qvirtio_pci;
- 
- void virtio_pci_init(QVirtioPCIDevice *dev, QPCIBus *bus, QPCIAddress * addr);
- QVirtioPCIDevice *virtio_pci_new(QPCIBus *bus, QPCIAddress * addr);
--QVirtioPCIDevice *qvirtio_pci_device_find(QPCIBus *bus, uint16_t device_type);
--QVirtioPCIDevice *qvirtio_pci_device_find_slot(QPCIBus *bus,
--                                               uint16_t device_type, int slot);
--void qvirtio_pci_device_free(QVirtioPCIDevice *dev);
- 
- /* virtio-pci object functions available for subclasses that
-  * override the original start_hw and destroy
++libqos_init(ac97_register_nodes);
 -- 
 1.8.3.1
