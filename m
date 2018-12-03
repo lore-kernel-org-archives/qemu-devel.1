@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
-	id 1gTsfI-0004bI-NE
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:09:53 -0500
+	(envelope-from <armbru@redhat.com>) id 1gTsg5-0005Di-G5
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:10:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
-	id 1gTsfH-0002XS-N0
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:09:52 -0500
-Date: Mon, 3 Dec 2018 18:09:11 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181203180911.GQ14786@perard.uk.xensource.com>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-11-paul.durrant@citrix.com>
+	(envelope-from <armbru@redhat.com>) id 1gTsg0-0003C2-Hk
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:10:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:8599)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gTsg0-0003BM-BQ
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:10:36 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181203101045.27976-1-kraxel@redhat.com>
+	<20181203101045.27976-2-kraxel@redhat.com>
+Date: Mon, 03 Dec 2018 19:10:33 +0100
+In-Reply-To: <20181203101045.27976-2-kraxel@redhat.com> (Gerd Hoffmann's
+	message of "Mon, 3 Dec 2018 11:10:44 +0100")
+Message-ID: <87d0qio50m.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20181121151211.15997-11-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH 10/18] xen: add header and build
- dataplane/xen-qdisk.c
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-3.1 v3 1/2] usb-mtp: fix utf16_to_str
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,158 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, public@hansmi.ch
 
-On Wed, Nov 21, 2018 at 03:12:03PM +0000, Paul Durrant wrote:
-> This patch adds the transformations necessary to get dataplane/xen-qdisk.c
-> to build against the new XenBus/XenDevice framework. MAINTAINERS is also
-> updated due to the introduction of dataplane/xen-qdisk.h.
-> 
-> NOTE: Existing data structure names are retained for the moment. These will
->       be modified by subsequent patches. A typedef for XenQdiskDataPlane
->       has been added to the header (based on the old struct XenBlkDev name
->       for the moment) so that the old names don't need to leak out of the
->       dataplane code.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Gerd Hoffmann <kraxel@redhat.com> writes:
+
+> Make utf16_to_str return an allocated string.  Remove the assumtion that
+> the number of string bytes equals the number of utf16 chars (which is
+> only true for ascii chars).  Instead call wcstombs twice, once to figure
+> the storage size and once for the actual conversion (as suggested by the
+> wcstombs manpage).
+>
+> Reported-by: Michael Hanselmann <public@hansmi.ch>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
-> diff --git a/hw/block/dataplane/xen-qdisk.c b/hw/block/dataplane/xen-qdisk.c
-> index 8e4368e7af..b075aa975d 100644
-> --- a/hw/block/dataplane/xen-qdisk.c
-> +++ b/hw/block/dataplane/xen-qdisk.c
-> @@ -5,65 +5,56 @@
->   * Based on original code (c) Gerd Hoffmann <kraxel@redhat.com>
->   */
+>  hw/usb/dev-mtp.c | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+> index 00a3691bae..0f6a9702ef 100644
+> --- a/hw/usb/dev-mtp.c
+> +++ b/hw/usb/dev-mtp.c
+> @@ -1593,17 +1593,23 @@ static void usb_mtp_cancel_packet(USBDevice *dev, USBPacket *p)
+>      fprintf(stderr, "%s\n", __func__);
+>  }
 >  
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "qapi/error.h"
-> +#include "hw/hw.h"
-> +#include "hw/xen/xen.h"
-
-xen.h isn't needed, xen_common.h should be enough.
-
-> +#include "hw/xen/xen_common.h"
-> +#include "hw/block/block.h"
-
-block.h isn't needed, block-backend.h should be enough.
-
-> +#include "hw/block/xen_blkif.h"
-> +#include "sysemu/blockdev.h"
-
-blockdev.h doesn't seems to be used.
-
-> +#include "sysemu/block-backend.h"
-> +#include "sysemu/iothread.h"
-> +#include "xen-qdisk.h"
-> +
-> @@ -227,20 +219,24 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
->                  file_blk;
->              segs[i].dest.virt = virt;
->          }
-> -        segs[i].len = (ioreq->req.seg[i].last_sect
-> -                       - ioreq->req.seg[i].first_sect + 1) * file_blk;
-> +        segs[i].len = (ioreq->req.seg[i].last_sect -
-> +                       ioreq->req.seg[i].first_sect + 1) * file_blk;
->          virt += segs[i].len;
->      }
->  
-> -    rc = xen_be_copy_grant_refs(xendev, to_domain, segs, count);
-> +    xen_device_copy_grant_refs(xendev, to_domain, segs, count, &local_err);
-> +
-> +    if (local_err) {
-> +        const char *msg = error_get_pretty(local_err);
-> +
-> +        error_report("failed to copy data: %s", msg);
-> +        error_free(local_err);
-
-You can do the  following instead:
-    error_prepend(local_err, "failed to copy data: ")
-    error_report_err(local_err);
-
-> +void xen_qdisk_dataplane_start(struct XenBlkDev *blkdev,
-> +                               const unsigned int ring_ref[],
-> +                               unsigned int nr_ring_ref,
-> +                               unsigned int event_channel,
-> +                               unsigned int protocol)
+> -static void utf16_to_str(uint8_t len, uint16_t *arr, char *name)
+> +static char *utf16_to_str(uint8_t len, uint16_t *arr)
 >  {
-> -    struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
-> +    XenDevice *xendev = blkdev->xendev;
-> +    unsigned int ring_size;
-> +    unsigned int i;
+> -    int count;
+> -    wchar_t *wstr = g_new0(wchar_t, len);
+> +    wchar_t *wstr = g_new0(wchar_t, len + 1);
+> +    int count, dlen;
+> +    char *dest;
 >  
-> -    qemu_bh_schedule(blkdev->bh);
-> +    blkdev->nr_ring_ref = nr_ring_ref;
-> +    blkdev->ring_ref = g_new(unsigned int, nr_ring_ref);
-> +
-> +    for (i = 0; i < nr_ring_ref; i++) {
-> +        blkdev->ring_ref[i] = ring_ref[i];
-> +    }
-> +
-> +    blkdev->protocol = protocol;
-> +
-> +    ring_size = XC_PAGE_SIZE * blkdev->nr_ring_ref;
-> +    switch (blkdev->protocol) {
-> +    case BLKIF_PROTOCOL_NATIVE:
-> +    {
-> +        blkdev->max_requests = __CONST_RING_SIZE(blkif, ring_size);
-> +        break;
-> +    }
-> +    case BLKIF_PROTOCOL_X86_32:
-> +    {
-> +        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_32, ring_size);
-> +        break;
-> +    }
-> +    case BLKIF_PROTOCOL_X86_64:
-> +    {
-> +        blkdev->max_requests = __CONST_RING_SIZE(blkif_x86_64, ring_size);
-> +        break;
-> +    }
-> +    default:
-> +        assert(false);
-> +        break;
+>      for (count = 0; count < len; count++) {
+> +        /* FIXME: not working for surrogate pairs */
 
-This should return rather than keep going.
-And maybe set an Error that could be added to the parameter of the
-function.
+Please mention the FIXME in the commit message.
 
-> +    }
-> +
-> +    xen_device_set_max_grant_refs(xendev, blkdev->nr_ring_ref,
-> +                                  &error_fatal);
+With that:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-Do we really want to exit() here if an error happen, rather than let the
-caller know? (Same question for other uses of error_fatal.)
-
-> diff --git a/hw/block/dataplane/xen-qdisk.h b/hw/block/dataplane/xen-qdisk.h
-> new file mode 100644
-> index 0000000000..16bcd500bf
-> --- /dev/null
-> +++ b/hw/block/dataplane/xen-qdisk.h
-> @@ -0,0 +1,25 @@
-> +/*
-> + * Copyright (c) Citrix Systems Inc.
-> + * All rights reserved.
-> + */
-> +
-> +#ifndef HW_BLOCK_DATAPLANE_QDISK_H
-> +#define HW_BLOCK_DATAPLANE_QDISK_H
-> +
-> +#include "hw/xen/xen-bus.h"
-> +#include "sysemu/iothread.h"
-
-I would add #include "hw/block/block.h" since it includes the definition
-of BlockConf.
-
-> +
-> +typedef struct XenBlkDev XenQdiskDataPlane;
-> +
-> +XenQdiskDataPlane *xen_qdisk_dataplane_create(XenDevice *xendev,
-> +                                              BlockConf *conf,
-> +                                              IOThread *iothread);
-
-Thanks,
-
--- 
-Anthony PERARD
+>          wstr[count] = (wchar_t)arr[count];
+>      }
+> +    wstr[count] = 0;
+>  
+> -    wcstombs(name, wstr, len);
+> +    dlen = wcstombs(NULL, wstr, 0) + 1;
+> +    dest = g_malloc(dlen);
+> +    wcstombs(dest, wstr, dlen);
+>      g_free(wstr);
+> +    return dest;
+>  }
+>  
+>  /* Wrapper around write, returns 0 on failure */
+[...]
