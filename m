@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gTolr-0003eb-3h
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:00:25 -0500
+	(envelope-from <thuth@redhat.com>) id 1gTony-0004s5-Kc
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:02:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gTolm-0005nH-TM
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:00:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54322)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gTolm-0005mJ-M9
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:00:18 -0500
-Date: Mon, 3 Dec 2018 07:00:15 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181203070015.03244928@x1.home>
-In-Reply-To: <5C052A3D.01FFE0.13753@m12-18.163.com>
-References: <5C052A3D.01FFE0.13753@m12-18.163.com>
+	(envelope-from <thuth@redhat.com>) id 1gTono-0007I6-RH
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:02:34 -0500
+References: <20181130192216.26987-1-richard.henderson@linaro.org>
+	<20181130192216.26987-3-richard.henderson@linaro.org>
+	<34711f80-1959-32e0-e4e9-d22e003a5636@redhat.com>
+	<75253fd5-7c6a-5a8e-fc18-14534a50bd03@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6895cef5-646a-8e51-2493-75b7805d33b0@redhat.com>
+Date: Mon, 3 Dec 2018 15:02:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <75253fd5-7c6a-5a8e-fc18-14534a50bd03@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Questions about the VFIO device BAR emulation
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH for-4.0 2/2] target/s390x:
+ Implement STCK et al for CONFIG_USER_ONLY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +27,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@163.com>
-Cc: Alex Williamson <alex.l.williamson@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
 
-On Mon, 3 Dec 2018 21:06:00 +0800
-Li Qiang <liq3ea@163.com> wrote:
-
-> Hello Alex, Paolo and all
+On 2018-12-03 14:27, Richard Henderson wrote:
+> On 12/3/18 12:19 AM, Thomas Huth wrote:
+>> On 2018-11-30 20:22, Richard Henderson wrote:
+>>> This is a non-privileged instruction that was only implemented
+>>> for system mode.  However, the stck instruction is used by glibc,
+>>> so this was causing SIGILL for programs run under debian stretch.
+>>>
+>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>> ---
+>>>  target/s390x/helper.h      |  2 +-
+>>>  target/s390x/misc_helper.c | 13 ++++++++++++-
+>>>  target/s390x/translate.c   |  2 ++
+>>>  target/s390x/insn-data.def | 11 ++++++-----
+>>>  4 files changed, 21 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+>>> index 018e9dd414..6260b50496 100644
+>>> --- a/target/s390x/helper.h
+>>> +++ b/target/s390x/helper.h
+>>> @@ -121,13 +121,13 @@ DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
+>>>  DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
+>>>  DEF_HELPER_5(msa, i32, env, i32, i32, i32, i32)
+>>>  DEF_HELPER_FLAGS_1(stpt, TCG_CALL_NO_RWG, i64, env)
+>>> +DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+>>> =20
+>>>  #ifndef CONFIG_USER_ONLY
+>>>  DEF_HELPER_3(servc, i32, env, i64, i64)
+>>>  DEF_HELPER_4(diag, void, env, i32, i32, i32)
+>>>  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
+>>>  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
+>>> -DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+>>>  DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
+>>>  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
+>>>  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
+>>> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+>>> index 3f91579570..c2940afecb 100644
+>>> --- a/target/s390x/misc_helper.c
+>>> +++ b/target/s390x/misc_helper.c
+>>> @@ -76,8 +76,19 @@ uint64_t HELPER(stpt)(CPUS390XState *env)
+>>>  #endif
+>>>  }
+>>> =20
+>>> -#ifndef CONFIG_USER_ONLY
+>>> +#ifdef CONFIG_USER_ONLY
+>>> +/* Store Clock */
+>>> +uint64_t HELPER(stck)(CPUS390XState *env)
+>>> +{
+>>> +    struct timespec ts;
+>>> +    uint64_t ms;
+>>
+>> May I suggest "us" for microseconds? "ms" makes me thing of
+>> "milliseconds"...
 >=20
-> I have a question about VFIO about the BAR.
+> Oops, think-o.
 >=20
-> Why we have two MemoryRegion for every device=E2=80=99s BAR.
-> I mean in VFIOBAR we have a field =E2=80=98mr=E2=80=99.
-> typedef struct VFIOBAR {
->     VFIORegion region;
->     MemoryRegion *mr;
->     size_t size;
->     uint8_t type;
->     bool ioport;
->     bool mem64;
->     QLIST_HEAD(, VFIOQuirk) quirks;
-> } VFIOBAR;
+>>> +    clock_gettime(CLOCK_REALTIME, &ts);
+>>> +    ms =3D (ts.tv_nsec / 1000) + (ts.tv_sec * 100000ull);
+>>> +
+>>> +    return TOD_UNIX_EPOCH + ms;
+>>> +}
+>>
+>> Don't you need to shift the value around a little bit for getting the
+>> right format of the TOD clock? The microseconds are not starting with
+>> the lowest bit, the TOD clock has a higher resolution. See also the
+>> time2tod() macro in include/hw/s390x/tod.h ...
 >=20
-> And in the field =E2=80=98region=E2=80=99 field of VFIOBAR,
-> We also have a MemoryReion named =E2=80=98mem=E2=80=99.
-> And the =E2=80=98VFIOBAR=E2=80=99s mr is just the subregion of =E2=80=98V=
-FIOREGION=E2=80=99.
->=20
-> Why here we can=E2=80=99t use just one MR link VFIOREGION=E2=80=99s =E2=
-=80=98mem=E2=80=99field to represent the device=E2=80=99s BAR?
+> That's for STCKE, which does use this routine and shift the result arou=
+nd.
 
-The answer lives in git history:
+STCKE certainly has even more bits ... but still, according to the PoP:
 
-commit 3a286732d1563bdb440718d4e68137e06af785dd
-Author: Alex Williamson <alex.williamson@redhat.com>
-Date:   Tue Feb 6 11:08:25 2018 -0700
+"The TOD clock nominally is incremented by adding a
+one in bit position 51 every microsecond."
 
-    vfio/pci: Add base BAR MemoryRegion
-   =20
-    Add one more layer to our stack of MemoryRegions, this base region
-    allows us to register BARs independently of the vfio region or to
-    extend the size of BARs which do map to a region.  This will be
-    useful when we want hypervisor defined BARs or sections of BARs,
-    for purposes such as relocating MSI-X emulation.  We therefore call
-    msix_init() based on this new base MemoryRegion, while the quirks,
-    which only modify regions still operate on those sub-MemoryRegions.
-   =20
-    Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+So you've got to shift the microseconds by 12 bits to the left?
+
+... but maybe I'm also just reading the PoP or the source code in a
+wrong way again...
+
+ Thomas
