@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gTjTx-0001mM-P0
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:21:38 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gTjUD-0001uV-Gn
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:21:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1gTjNr-0006BZ-IQ
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:15:18 -0500
-Received: from mga14.intel.com ([192.55.52.115]:16513)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1gTjNr-0006BO-AY
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:15:15 -0500
-Message-ID: <5C04E73F.9040202@intel.com>
-Date: Mon, 03 Dec 2018 16:20:15 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gTjKa-00056l-AT
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:11:53 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39485)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1gTjKa-00056Y-0f
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:11:52 -0500
+Received: by mail-wm1-x343.google.com with SMTP id f81so2204722wmd.4
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 00:11:51 -0800 (PST)
 MIME-Version: 1.0
-References: <1543803511-34793-1-git-send-email-wei.w.wang@intel.com>
-	<1543803511-34793-7-git-send-email-wei.w.wang@intel.com>
-	<20181203053118.GD27620@xz-x1>
-In-Reply-To: <20181203053118.GD27620@xz-x1>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 6/7] migration/ram.c: add a function to
- disable the bulk stage
+References: <20181029125733.14597-1-marcandre.lureau@redhat.com>
+	<20181029125733.14597-4-marcandre.lureau@redhat.com>
+	<87d0qj84al.fsf@dusky.pond.sub.org>
+In-Reply-To: <87d0qj84al.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 3 Dec 2018 12:11:39 +0400
+Message-ID: <CAJ+F1CLwTyjGGL7Wc+j-xj_RqHbMh+o3j00+zGZSHNdkQUrHRQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] char: add a
+ QEMU_CHAR_FEATURE_GCONTEXT flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +32,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, nilal@redhat.com, riel@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 12/03/2018 01:31 PM, Peter Xu wrote:
-> On Mon, Dec 03, 2018 at 10:18:30AM +0800, Wei Wang wrote:
->> This patch adds a function to enable a precopy notifier callback outside
->> the migration subsystem to disable the bulk stage flag. This is needed by
->> the free page optimization offered by virtio-balloon.
->>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> CC: Juan Quintela <quintela@redhat.com>
->> CC: Michael S. Tsirkin <mst@redhat.com>
->> CC: Peter Xu <peterx@redhat.com>
->> ---
->>   include/migration/misc.h | 1 +
->>   migration/ram.c          | 9 +++++++++
->>   2 files changed, 10 insertions(+)
->>
->> diff --git a/include/migration/misc.h b/include/migration/misc.h
->> index 15f8d00..47e7ff5 100644
->> --- a/include/migration/misc.h
->> +++ b/include/migration/misc.h
->> @@ -37,6 +37,7 @@ void precopy_infrastructure_init(void);
->>   void precopy_add_notifier(NotifierWithReturn *n);
->>   void precopy_remove_notifier(NotifierWithReturn *n);
->>   int precopy_notify(PrecopyNotifyReason reason, Error **errp);
->> +void precopy_disable_bulk_stage(void);
->>   
->>   void ram_mig_init(void);
->>   void qemu_guest_free_page_hint(void *addr, size_t len);
->> diff --git a/migration/ram.c b/migration/ram.c
->> index b90a3f2..739dc97 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -354,6 +354,15 @@ int precopy_notify(PrecopyNotifyReason reason, Error **errp)
->>       return notifier_with_return_list_notify(&precopy_notifier_list, &pnd);
->>   }
->>   
->> +void precopy_disable_bulk_stage(void)
->> +{
->> +    if (!ram_state) {
->> +        return;
->> +    }
->> +
->> +    ram_state->ram_bulk_stage = false;
->> +}
->> +
-> This one is a bit tricky.  E.g., I think it'll at least affect XBZRLE
-> and compression somehow.  Since we will have the on-off switch for
-> balloon free page hinting so the user can at least decide what
-> features to use, with that I don't see much issue with it so far. But
-> I'd also like to see how other people see this change.
+Hi
+
+On Mon, Dec 3, 2018 at 11:25 AM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> This one needs review by a chardev guy, with an eye on its use in the
+> next patch.  Paolo?
+>
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+> > The feature should be set if the chardev is able to switch
+> > GMainContext. Callers that want to put a chardev in a different thread
+> > context can/should check this capabilities.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  include/chardev/char.h |  3 +++
+> >  chardev/char.c         | 11 +++++++++++
+> >  2 files changed, 14 insertions(+)
+> >
+> > diff --git a/include/chardev/char.h b/include/chardev/char.h
+> > index 7becd8c80c..014566c3de 100644
+> > --- a/include/chardev/char.h
+> > +++ b/include/chardev/char.h
+> > @@ -47,6 +47,9 @@ typedef enum {
+> >      QEMU_CHAR_FEATURE_FD_PASS,
+> >      /* Whether replay or record mode is enabled */
+> >      QEMU_CHAR_FEATURE_REPLAY,
+> > +    /* Whether the gcontext can be changed after calling
+> > +     * qemu_chr_be_update_read_handlers() */
+> > +    QEMU_CHAR_FEATURE_GCONTEXT,
+> >
+> >      QEMU_CHAR_FEATURE_LAST,
+> >  } ChardevFeature;
+> > diff --git a/chardev/char.c b/chardev/char.c
+> > index 7f07a1bfbd..b5ee58b7d2 100644
+> > --- a/chardev/char.c
+> > +++ b/chardev/char.c
+> > @@ -196,6 +196,8 @@ void qemu_chr_be_update_read_handlers(Chardev *s,
+> >      s->gcontext =3D context;
+> >      if (cc->chr_update_read_handler) {
+> >          cc->chr_update_read_handler(s);
+> > +    } else if (s->gcontext) {
+> > +        error_report("switching context isn't supported by this charde=
+v");
+>
+> Code smell: error_report() without returning failure.
+>
+> If it's truly an error, then the function should fail.  We'd still need
+> to decide how: error_report() and return -1, or error_setg().
+>
+> Except if it's a programming error; then we should assert().
 >
 
-Yes. I think it would be better that this optimization could co-exist 
-with the
-compression feature.
+After this patch, it's an error.
+There should be a preliminary check for qemu_chr_has_feature(chr,
+QEMU_CHAR_FEATURE_GCONTEXT) before switching context.
 
-How about adding a new flag "ram_state->free_page_optimization_enabled"?
+I'll replace the error_report() with an assert.
 
-We will then need a change in migration_bitmap_find_dirty:
-  - if (rs->ram_bulk_stage && start > 0) {
-+ if (!rs->free_page_optimization_enabled && rs->ram_bulk_stage && start 
- > 0) {
-         next = start + 1;
-     } else {
-         next = find_next_bit(bitmap, size, start);
-     }
+> If it's not an error, it's probably a warning, and we should use
+> warn_report().
+>
+> >      }
+> >  }
+> >
+> > @@ -240,6 +242,15 @@ static void char_init(Object *obj)
+> >
+> >      chr->logfd =3D -1;
+> >      qemu_mutex_init(&chr->chr_write_lock);
+> > +
+> > +    /*
+> > +     * Assume if chr_update_read_handler is implemented it will
+> > +     * take the updated gcontext into account.
+> > +     */
+> > +    if (CHARDEV_GET_CLASS(chr)->chr_update_read_handler) {
+> > +        qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT);
+> > +    }
+> > +
+> >  }
+> >
+> >  static int null_chr_write(Chardev *chr, const uint8_t *buf, int len)
+>
 
-Best,
-Wei
+
+--=20
+Marc-Andr=C3=A9 Lureau
