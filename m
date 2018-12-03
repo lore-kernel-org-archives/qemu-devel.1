@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54300)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
-	id 1gTrZ1-0001X9-Nd
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:59:21 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55000)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1gTraG-0002dg-6Y
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 12:00:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
-	id 1gTrYz-0000Sj-KA
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:59:19 -0500
-Date: Mon, 3 Dec 2018 16:58:58 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181203165858.GP14786@perard.uk.xensource.com>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-10-paul.durrant@citrix.com>
+	(envelope-from <n54@gmx.com>) id 1gTraC-0001ym-VR
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 12:00:36 -0500
+Received: from mout.gmx.net ([212.227.17.22]:36317)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1gTraC-0001y4-MI
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 12:00:32 -0500
+References: <20181203160840.15115-1-richard.henderson@linaro.org>
+	<20181203160840.15115-6-richard.henderson@linaro.org>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <58a36fe9-8a56-d949-a942-a5ca3cc243f5@gmx.com>
+Date: Mon, 3 Dec 2018 18:01:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20181121151211.15997-10-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH 09/18] xen: remove unnecessary code from
- dataplane/xen-qdisk.c
+In-Reply-To: <20181203160840.15115-6-richard.henderson@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Pt5gvEI4rgHrATxmvdsT4w1DhwzrskNKm"
+Subject: Re: [Qemu-devel] [PATCH for-4.0 5/5] tcg/i386: Add
+ setup_guest_base_seg for FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: cota@braap.org, alex.bennee@linaro.org
 
-On Wed, Nov 21, 2018 at 03:12:02PM +0000, Paul Durrant wrote:
-> Not all of the code duplicated from xen_disk.c is required as the basis for
-> the new dataplane implementation so this patch removes extraneous code,
-> along with the legacy #includes and calls to the legacy xen_pv_printf()
-> function. Error messages are changed to be reported using error_report().
-> 
-> NOTE: The code is still not yet built. Further transformations will be
->       required to make it correctly interface to the new XenBus/XenDevice
->       framework. They will be delivered in a subsequent patch.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Pt5gvEI4rgHrATxmvdsT4w1DhwzrskNKm
+From: Kamil Rytarowski <n54@gmx.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: cota@braap.org, alex.bennee@linaro.org
+Message-ID: <58a36fe9-8a56-d949-a942-a5ca3cc243f5@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.0 5/5] tcg/i386: Add
+ setup_guest_base_seg for FreeBSD
+References: <20181203160840.15115-1-richard.henderson@linaro.org>
+ <20181203160840.15115-6-richard.henderson@linaro.org>
+In-Reply-To: <20181203160840.15115-6-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 03.12.2018 17:08, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
-> diff --git a/hw/block/dataplane/xen-qdisk.c b/hw/block/dataplane/xen-qdisk.c
-> index 9fae50534e..8e4368e7af 100644
-> --- a/hw/block/dataplane/xen-qdisk.c
-> +++ b/hw/block/dataplane/xen-qdisk.c
-> @@ -1,45 +1,10 @@
->  /*
-> - *  xen paravirt block device backend
-> + * Copyright (c) Citrix Systems Inc.
-> + * All rights reserved.
->   *
-> - *  (c) Gerd Hoffmann <kraxel@redhat.com>
-> - *
-> - *  This program is free software; you can redistribute it and/or modify
-> - *  it under the terms of the GNU General Public License as published by
-> - *  the Free Software Foundation; under version 2 of the License.
-> - *
-> - *  This program is distributed in the hope that it will be useful,
-> - *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> - *  GNU General Public License for more details.
-> - *
-> - *  You should have received a copy of the GNU General Public License along
-> - *  with this program; if not, see <http://www.gnu.org/licenses/>.
-> - *
-> - *  Contributions after 2012-01-13 are licensed under the terms of the
-> - *  GNU GPL, version 2 or (at your option) any later version.
-> + * Based on original code (c) Gerd Hoffmann <kraxel@redhat.com>
->   */
+>  tcg/i386/tcg-target.inc.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>=20
+> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+> index b8d2dd5ba3..3a39b51685 100644
+> --- a/tcg/i386/tcg-target.inc.c
+> +++ b/tcg/i386/tcg-target.inc.c
+> @@ -1873,6 +1873,15 @@ static inline int setup_guest_base_seg(void)
+>      }
+>      return 0;
+>  }
+> +# elif defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
+> +#  include <machine/sysarch.h>
+> +static inline int setup_guest_base_seg(void)
+> +{
+> +    if (sysarch(AMD64_SET_GSBASE, &guest_base) =3D=3D 0) {
+> +        return P_GS;
+> +    }
+> +    return 0;
+> +}
+>  # else
+>  static inline int setup_guest_base_seg(void)
+>  {
+>=20
 
-Once this license boilerplate is kept unchange, beside the extra
-Copyright line, then:
+There is also X86_SET_GSBASE in <include/sysarch.h> in NetBSD. Do we
+need to set it for this OS too?
 
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
--- 
-Anthony PERARD
+--Pt5gvEI4rgHrATxmvdsT4w1DhwzrskNKm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlwFYX8MHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZs2eIP/0Hp8g2Zv/kX9tvhJDECSgk56gVB5MSW6fUxlfBn
+HO5Zd1pHIJuMKM+TdvnkDH1B8le7M/05+L+WYi9VgdfhGMNlK56vbmKxATjEhOE4
+GDvKVZl6rcz1ev80DWJdbz+87IB7Y+ZCxjnOD0RzJahNlP4xsrRYIy1i+WdxZ+q1
+xe+iQYS26pMb21cIkzBXYTCWpjLk705NWsFxRIAlKxc6LkpPiT7hFm1GE4VDjFaB
++FlWzVv9NTSanvd9wGBVaScl1vIxaNVFWbUBx8rVg1d1aKBS9zKvSx5qPkvs6eX2
+vrXSv+4vgZgMgdfA8ZOW/pZ1S9zwwbGu+SCxc4EVv1/PGLyPktB4Ubl9rAttf7xJ
+x5HNKaE5ERNnF9nm7dxa6FIh0LKGgiwA+/Yd9uMXPcFkbUUVhikKCNNdZqZ5mEjc
+x1xoYcICFCLnx0yXatGhzKO/9sVBdUsm6Ac+da8j8xHFiroZ90eEyP8DbfnEqF9c
+36b5SfbVBM2SJNjKPPh9Ofq7KNmEWVb+H7vwDfUWOAWo1568vnBA94QA+PhfIVG6
+wO1OPYYivJBGPWv6NMKWt1BFpvA2jqTehuV3WycHhBsv7KlnRBbJQvolx4cqA+NF
+o0OJN3xGzPB1ssJk6LMSebnKS59QYG56QR5vSSC+OSHI2TfQzm5lddnACJtBPzAJ
+2QFw
+=4V8v
+-----END PGP SIGNATURE-----
+
+--Pt5gvEI4rgHrATxmvdsT4w1DhwzrskNKm--
