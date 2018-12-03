@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gTsne-0000Kz-Rv
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:18:31 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gTt4L-0000WM-Kd
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:35:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gTsnZ-0000fP-UX
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:18:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gTsnZ-0000eo-M7
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:18:25 -0500
-References: <20181203100608.28538-1-jasowang@redhat.com>
-	<20181203100608.28538-3-jasowang@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <da253555-57f4-971e-8a12-88a085140397@redhat.com>
-Date: Mon, 3 Dec 2018 19:18:21 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1gTt4H-00034P-Lc
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:35:45 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42401)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gTt4F-00033P-Ec
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 13:35:39 -0500
+Received: by mail-oi1-x244.google.com with SMTP id w13so11844627oiw.9
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 10:35:39 -0800 (PST)
+References: <20181203160840.15115-1-richard.henderson@linaro.org>
+	<20181203160840.15115-6-richard.henderson@linaro.org>
+	<58a36fe9-8a56-d949-a942-a5ca3cc243f5@gmx.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ad5bd9c1-72fd-496c-0cb8-4c94cd27e919@linaro.org>
+Date: Mon, 3 Dec 2018 12:35:35 -0600
 MIME-Version: 1.0
-In-Reply-To: <20181203100608.28538-3-jasowang@redhat.com>
+In-Reply-To: <58a36fe9-8a56-d949-a942-a5ca3cc243f5@gmx.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V4 for 3.1 2/4] virtio-net-test: accept
- variable length argument in pci_test_start()
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 5/5] tcg/i386: Add
+ setup_guest_base_seg for FreeBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,16 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: mst@redhat.com, liq3ea@163.com, liq3ea@gmail.com, ppandit@redhat.com, pbonzini@redhat.com
+To: Kamil Rytarowski <n54@gmx.com>, qemu-devel@nongnu.org
+Cc: cota@braap.org, alex.bennee@linaro.org
 
-On 2018-12-03 11:06, Jason Wang wrote:
-> This allows flexibility to be reused for all kinds of command line
-> used by other tests.
+On 12/3/18 11:01 AM, Kamil Rytarowski wrote:
+> On 03.12.2018 17:08, Richard Henderson wrote:
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  tcg/i386/tcg-target.inc.c | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>>
+>> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+>> index b8d2dd5ba3..3a39b51685 100644
+>> --- a/tcg/i386/tcg-target.inc.c
+>> +++ b/tcg/i386/tcg-target.inc.c
+>> @@ -1873,6 +1873,15 @@ static inline int setup_guest_base_seg(void)
+>>      }
+>>      return 0;
+>>  }
+>> +# elif defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
+>> +#  include <machine/sysarch.h>
+>> +static inline int setup_guest_base_seg(void)
+>> +{
+>> +    if (sysarch(AMD64_SET_GSBASE, &guest_base) == 0) {
+>> +        return P_GS;
+>> +    }
+>> +    return 0;
+>> +}
+>>  # else
+>>  static inline int setup_guest_base_seg(void)
+>>  {
+>>
 > 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  tests/virtio-net-test.c | 17 +++++++++++------
->  1 file changed, 11 insertions(+), 6 deletions(-)
+> There is also X86_SET_GSBASE in <include/sysarch.h> in NetBSD. Do we
+> need to set it for this OS too?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+You will want to do so, yes.  In the meantime NetBSD should not break; it is
+only an optimization.
+
+
+r~
