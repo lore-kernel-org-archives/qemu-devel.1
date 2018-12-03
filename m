@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gTlMY-0007RG-C6
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:22:05 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gTlYC-0006aj-JL
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:34:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gTlMU-0002kt-EO
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:22:02 -0500
-References: <20181130192216.26987-1-richard.henderson@linaro.org>
-	<20181130192216.26987-2-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <a85ff3b6-67a4-c445-2784-db3564bbbaad@redhat.com>
-Date: Mon, 3 Dec 2018 11:21:55 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1gTlY7-0003Mi-0N
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:34:04 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39534)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1gTlY4-0003IP-Bp
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:33:58 -0500
+Received: by mail-wm1-x342.google.com with SMTP id f81so2665793wmd.4
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 02:33:55 -0800 (PST)
+References: <20181130215221.20554-1-richard.henderson@linaro.org>
+	<20181130215221.20554-7-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181130215221.20554-7-richard.henderson@linaro.org>
+Date: Mon, 03 Dec 2018 10:33:53 +0000
+Message-ID: <878t16527i.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181130192216.26987-2-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-4.0 1/2] target/s390x: Move
- TOD_UNIX_EPOCH to cpu.h
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 06/16] tcg/arm: Fold away "noaddr"
+ branch routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, qemu-s390x@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On 30.11.18 20:22, Richard Henderson wrote:
-> We will need this from CONFIG_USER_ONLY as well,
-> which cannot access include/hw/.
-> 
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> There are one use apiece for these.  There is no longer a need for
+> preserving branch offset operands, as we no longer re-translate.
+>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  include/hw/s390x/tod.h | 3 ---
->  target/s390x/cpu.h     | 3 +++
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
-> index 413c0d7c02..6ec4fb426c 100644
-> --- a/include/hw/s390x/tod.h
-> +++ b/include/hw/s390x/tod.h
-> @@ -44,9 +44,6 @@ typedef struct S390TODClass {
->      void (*set)(S390TODState *td, const S390TOD *tod, Error **errp);
->  } S390TODClass;
->  
-> -/* The value of the TOD clock for 1.1.1970. */
-> -#define TOD_UNIX_EPOCH 0x7d91048bca000000ULL
+>  tcg/arm/tcg-target.inc.c | 22 +++-------------------
+>  1 file changed, 3 insertions(+), 19 deletions(-)
+>
+> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+> index 1142eb13ad..1651f00281 100644
+> --- a/tcg/arm/tcg-target.inc.c
+> +++ b/tcg/arm/tcg-target.inc.c
+> @@ -366,22 +366,6 @@ static inline void tcg_out_b(TCGContext *s, int cond=
+, int32_t offset)
+>                      (((offset - 8) >> 2) & 0x00ffffff));
+>  }
+>
+> -static inline void tcg_out_b_noaddr(TCGContext *s, int cond)
+> -{
+> -    /* We pay attention here to not modify the branch target by masking
+> -       the corresponding bytes.  This ensure that caches and memory are
+> -       kept coherent during retranslation. */
+> -    tcg_out32(s, deposit32(*s->code_ptr, 24, 8, (cond << 4) | 0x0a));
+> -}
 > -
->  /* Converts ns to s390's clock format */
->  static inline uint64_t time2tod(uint64_t ns)
+> -static inline void tcg_out_bl_noaddr(TCGContext *s, int cond)
+> -{
+> -    /* We pay attention here to not modify the branch target by masking
+> -       the corresponding bytes.  This ensure that caches and memory are
+> -       kept coherent during retranslation. */
+> -    tcg_out32(s, deposit32(*s->code_ptr, 24, 8, (cond << 4) | 0x0b));
+> -}
+> -
+>  static inline void tcg_out_bl(TCGContext *s, int cond, int32_t offset)
 >  {
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 8c2320e882..d8049d181a 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -797,4 +797,7 @@ void s390_init_sigp(void);
->  /* outside of target/s390x/ */
->  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
->  
-> +/* The value of the TOD clock for 1.1.1970. */
-> +#define TOD_UNIX_EPOCH 0x7d91048bca000000ULL
-> +
->  #endif
-> 
+>      tcg_out32(s, (cond << 28) | 0x0b000000 |
+> @@ -1082,7 +1066,7 @@ static inline void tcg_out_goto_label(TCGContext *s=
+, int cond, TCGLabel *l)
+>          tcg_out_goto(s, cond, l->u.value_ptr);
+>      } else {
+>          tcg_out_reloc(s, s->code_ptr, R_ARM_PC24, l, 0);
+> -        tcg_out_b_noaddr(s, cond);
+> +        tcg_out_b(s, cond, 0);
+>      }
+>  }
+>
+> @@ -1628,7 +1612,7 @@ static void tcg_out_qemu_ld(TCGContext *s, const TC=
+GArg *args, bool is64)
+>      /* This a conditional BL only to load a pointer within this opcode i=
+nto LR
+>         for the slow path.  We will not be using the value for a tail cal=
+l.  */
+>      label_ptr =3D s->code_ptr;
+> -    tcg_out_bl_noaddr(s, COND_NE);
+> +    tcg_out_bl(s, COND_NE, 0);
+>
+>      tcg_out_qemu_ld_index(s, opc, datalo, datahi, addrlo, addend);
+>
+> @@ -1760,7 +1744,7 @@ static void tcg_out_qemu_st(TCGContext *s, const TC=
+GArg *args, bool is64)
+>
+>      /* The conditional call must come last, as we're going to return her=
+e.  */
+>      label_ptr =3D s->code_ptr;
+> -    tcg_out_bl_noaddr(s, COND_NE);
+> +    tcg_out_bl(s, COND_NE, 0);
+>
+>      add_qemu_ldst_label(s, false, oi, datalo, datahi, addrlo, addrhi,
+>                          s->code_ptr, label_ptr);
 
-As said in response to patch 2, this might not be needed.
 
-If you're going to stick to it
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-
-Thanks,
-
-David / dhildenb
+--
+Alex Benn=C3=A9e
