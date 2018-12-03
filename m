@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
-	id 1gTqQF-0002qS-4g
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:46:12 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gTqRQ-0004CM-CF
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:47:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
-	id 1gTqQB-0008Ef-5M
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:46:11 -0500
-Date: Mon, 3 Dec 2018 15:45:56 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181203154556.GL14786@perard.uk.xensource.com>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-7-paul.durrant@citrix.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1gTqRM-0000fD-Cr
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:47:24 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43683)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gTqRM-0000eN-5O
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:47:20 -0500
+Received: by mail-oi1-x244.google.com with SMTP id u18so11280034oie.10
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 07:47:20 -0800 (PST)
+References: <20181201123056.432-1-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <fc1c6621-ed1a-d53f-0b79-08fbab57205d@linaro.org>
+Date: Mon, 3 Dec 2018 09:47:15 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20181121151211.15997-7-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH 06/18] xen: add grant table interface for
- XenDevice-s
+In-Reply-To: <20181201123056.432-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/5] ui/cocoa: Use OSX's main loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: John Arbuckle <programmingkidx@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>, Berkus Decker <berkus@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, patches@linaro.org
 
-On Wed, Nov 21, 2018 at 03:11:59PM +0000, Paul Durrant wrote:
-> The legacy PV backend infrastructure provides functions to map, unmap and
-> copy pages granted by frontends. Similar functionality will be required
-> by XenDevice implementations so this patch adds the necessary support.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> ---
-> +typedef struct XenDeviceGrantCopySegment {
-> +    union {
-> +        void *virt;
-> +        struct {
-> +            uint32_t ref;
-> +            off_t offset;
-> +        } foreign;
-> +    } source, dest;
+On 12/1/18 6:30 AM, Peter Maydell wrote:
+> Patchset structure:
+>  * patch 1 does the "make sure we have the iothread lock for
+>    calls into QEMU" (which is effectively a no-op initially
+>    since we'll already be holding that lock when our refresh
+>    etc callbacks are called)
+>  * patch 2 makes switchSurface directly take the pixman image
+>    (which is refcounted) rather than the DisplaySurface (which
+>    is not), so we can make the calls to it asynchronous later
+>  * patches 3 and 4 are just trivial code motion
+>  * patch 5 does the bulk of the work (and can't really be split
+>    further without the UI being broken at the intermediate point)
 
-Why is there a union between `source` and `dest`, I don't see any way
-(another field) to distinguish which is which. Can't we have a
-segment without `source`/`dest`? It mimic the
-xengnttab_grant_copy_segment_t but that doesn't seems very useful as it
-doesn't really prevent mistake.
+FWIW, this makes sense and is relatively easy to follow.
+That said, I've never touched OSX at all, so can't even test.
 
-> +    size_t len;
-> +} XenDeviceGrantCopySegment;
 
-Anyway, it's not very important:
-
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-
-Thanks,
-
--- 
-Anthony PERARD
+r~
