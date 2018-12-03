@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gTsLA-0004d3-Gw
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 12:49:07 -0500
+	(envelope-from <mreitz@redhat.com>) id 1gTsOQ-0006Ef-In
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 12:52:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gTsL8-00058o-Kf
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 12:49:04 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34128)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gTsL6-00056M-Mc
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 12:49:00 -0500
-Received: by mail-oi1-x243.google.com with SMTP id h25so11736025oig.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 09:48:59 -0800 (PST)
+	(envelope-from <mreitz@redhat.com>) id 1gTsOO-0007L7-LW
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 12:52:26 -0500
+From: Max Reitz <mreitz@redhat.com>
+Date: Mon,  3 Dec 2018 18:52:06 +0100
+Message-Id: <20181203175211.8230-2-mreitz@redhat.com>
+In-Reply-To: <20181203175211.8230-1-mreitz@redhat.com>
+References: <20181203175211.8230-1-mreitz@redhat.com>
 MIME-Version: 1.0
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-28-clg@kaod.org>
-	<20181129040917.GF14697@umbus.fritz.box>
-In-Reply-To: <20181129040917.GF14697@umbus.fritz.box>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 3 Dec 2018 17:48:46 +0000
-Message-ID: <CAFEAcA8=xJCoTmXmygpK2yVdq5Viqi-dQoiTJrML=goutzKujQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 27/36] sysbus: add a sysbus_mmio_unmap()
- helper
+Subject: [Qemu-devel] [PATCH for-next 1/6] qemu-img: Move quiet into
+ ImgConvertState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +22,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, 29 Nov 2018 at 04:55, David Gibson <david@gibson.dropbear.id.au> wr=
-ote:
->
-> On Fri, Nov 16, 2018 at 11:57:20AM +0100, C=C3=A9dric Le Goater wrote:
-> > This will be used to remove the MMIO regions of the POWER9 XIVE
-> > interrupt controller when the sPAPR machine is reseted.
-> >
-> > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->
-> Since the code looks sane.
->
-> Hoever, I think using memory_region_set_enabled() would be a better
-> idea for our purposes than actually adding/deleting the subregion.
+Move img_convert()'s quiet flag into the ImgConvertState so it is
+accessible by nested functions.  -q dictates that it suppresses anything
+but errors, so if those functions want to emit warnings, they need to
+query this flag first.  (There currently are no such warnings, but there
+will be as of the next patch.)
 
-The other approach I've used in the past is to use
-sysbus_mmio_get_region() and then just map and unmap
-that directly, rather than using the sysbus_mmio_map()
-convenience function. (Often the kind of device that's
-doing complicated things like this will be working in
-a setup where it doesn't necessarily want to be mapping
-directly into system memory rather than an SoC or similar
-container MemoryRegion anyway.)
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ qemu-img.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-thanks
--- PMM
+diff --git a/qemu-img.c b/qemu-img.c
+index ad04f59565..1582ef63f3 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1569,6 +1569,7 @@ typedef struct ImgConvertState {
+     int64_t target_backing_sectors; /* negative if unknown */
+     bool wr_in_order;
+     bool copy_range;
++    bool quiet;
+     int min_sparse;
+     int alignment;
+     size_t cluster_sectors;
+@@ -2008,7 +2009,7 @@ static int img_convert(int argc, char **argv)
+     QDict *open_opts =3D NULL;
+     char *options =3D NULL;
+     Error *local_err =3D NULL;
+-    bool writethrough, src_writethrough, quiet =3D false, image_opts =3D=
+ false,
++    bool writethrough, src_writethrough, image_opts =3D false,
+          skip_create =3D false, progress =3D false, tgt_image_opts =3D f=
+alse;
+     int64_t ret =3D -EINVAL;
+     bool force_share =3D false;
+@@ -2116,7 +2117,7 @@ static int img_convert(int argc, char **argv)
+             src_cache =3D optarg;
+             break;
+         case 'q':
+-            quiet =3D true;
++            s.quiet =3D true;
+             break;
+         case 'n':
+             skip_create =3D true;
+@@ -2205,7 +2206,7 @@ static int img_convert(int argc, char **argv)
+     }
+=20
+     /* Initialize before goto out */
+-    if (quiet) {
++    if (s.quiet) {
+         progress =3D false;
+     }
+     qemu_progress_init(progress, 1.0);
+@@ -2216,7 +2217,7 @@ static int img_convert(int argc, char **argv)
+=20
+     for (bs_i =3D 0; bs_i < s.src_num; bs_i++) {
+         s.src[bs_i] =3D img_open(image_opts, argv[optind + bs_i],
+-                               fmt, src_flags, src_writethrough, quiet,
++                               fmt, src_flags, src_writethrough, s.quiet=
+,
+                                force_share);
+         if (!s.src[bs_i]) {
+             ret =3D -1;
+@@ -2379,7 +2380,7 @@ static int img_convert(int argc, char **argv)
+=20
+     if (skip_create) {
+         s.target =3D img_open(tgt_image_opts, out_filename, out_fmt,
+-                            flags, writethrough, quiet, false);
++                            flags, writethrough, s.quiet, false);
+     } else {
+         /* TODO ultimately we should allow --target-image-opts
+          * to be used even when -n is not given.
+@@ -2387,7 +2388,7 @@ static int img_convert(int argc, char **argv)
+          * to allow filenames in option syntax
+          */
+         s.target =3D img_open_file(out_filename, open_opts, out_fmt,
+-                                 flags, writethrough, quiet, false);
++                                 flags, writethrough, s.quiet, false);
+         open_opts =3D NULL; /* blk_new_open will have freed it */
+     }
+     if (!s.target) {
+--=20
+2.19.2
