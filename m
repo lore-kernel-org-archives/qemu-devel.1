@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gTn74-0004X3-0K
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:14:10 -0500
+	(envelope-from <armbru@redhat.com>) id 1gTn9J-0005GI-Ty
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:16:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gTn70-0006vl-7U
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:14:10 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50350)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gTn6w-0006rH-Jy
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:14:04 -0500
-Received: by mail-wm1-x344.google.com with SMTP id n190so3088324wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 04:14:01 -0800 (PST)
-References: <20181124235553.17371-1-cota@braap.org>
-	<20181124235553.17371-2-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181124235553.17371-2-cota@braap.org>
-Date: Mon, 03 Dec 2018 12:13:58 +0000
-Message-ID: <87sgze3j09.fsf@linaro.org>
+	(envelope-from <armbru@redhat.com>) id 1gTn9F-0008Ry-Ew
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:16:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:29982)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gTn9F-0008RB-84
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 07:16:25 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 465403001FE5
+	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 12:16:24 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181029125733.14597-1-marcandre.lureau@redhat.com>
+	<20181029125733.14597-6-marcandre.lureau@redhat.com>
+	<87mupn6l5v.fsf@dusky.pond.sub.org>
+	<CAMxuvawM0PV0EaCcP+=3ZWPQF5LXLDvxgsrgD0shPzDTm_1_dQ@mail.gmail.com>
+Date: Mon, 03 Dec 2018 13:16:09 +0100
+In-Reply-To: <CAMxuvawM0PV0EaCcP+=3ZWPQF5LXLDvxgsrgD0shPzDTm_1_dQ@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 3 Dec 2018
+	13:55:43 +0400")
+Message-ID: <87o9a24xh2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 01/13] fp-test: pick TARGET_ARM to get
- its specialization
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] monitor: prevent inserting new
+ monitors after cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +38,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: "Bonzini, Paolo" <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Emilio G. Cota <cota@braap.org> writes:
-
-> This gets rid of the muladd errors due to not raising the invalid flag.
+> Hi
+> On Mon, Dec 3, 2018 at 12:59 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>> > Add a monitor_destroyed global to check if monitor_cleanup() has been
+>> > already called. In this case, don't insert the new monitor in the
+>> > list, but free it instead.
+>> >
+>> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>
+>> The commit message explains what the patch does, but not why we want to
+>> do it.
+>>
+>> > ---
+>> >  monitor.c | 14 ++++++++++++--
+>> >  1 file changed, 12 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/monitor.c b/monitor.c
+>> > index fffeb27ef9..7fe89daa87 100644
+>> > --- a/monitor.c
+>> > +++ b/monitor.c
+>> > @@ -263,10 +263,11 @@ typedef struct QMPRequest QMPRequest;
+>> >  /* QMP checker flags */
+>> >  #define QMP_ACCEPT_UNKNOWNS 1
+>> >
+>> > -/* Protects mon_list, monitor_qapi_event_state.  */
+>> > +/* Protects mon_list, monitor_qapi_event_state, monitor_destroyed.  */
+>> >  static QemuMutex monitor_lock;
+>> >  static GHashTable *monitor_qapi_event_state;
+>> >  static QTAILQ_HEAD(mon_list, Monitor) mon_list;
+>> > +static bool monitor_destroyed;
+>> >
+>> >  /* Protects mon_fdsets */
+>> >  static QemuMutex mon_fdsets_lock;
+>> > @@ -4536,8 +4537,16 @@ void error_vprintf_unless_qmp(const char *fmt, =
+va_list ap)
+>> >  static void monitor_list_append(Monitor *mon)
+>> >  {
+>> >      qemu_mutex_lock(&monitor_lock);
+>> > -    QTAILQ_INSERT_HEAD(&mon_list, mon, entry);
+>> > +    if (!monitor_destroyed) {
+>> > +        QTAILQ_INSERT_HEAD(&mon_list, mon, entry);
+>> > +        mon =3D NULL;
+>> > +    }
+>> >      qemu_mutex_unlock(&monitor_lock);
+>> > +
+>> > +    if (mon) {
+>> > +        monitor_data_destroy(mon);
+>> > +        g_free(mon);
+>> > +    }
+>> >  }
+>> >
+>> >  static void monitor_qmp_setup_handlers_bh(void *opaque)
+>> > @@ -4631,6 +4640,7 @@ void monitor_cleanup(void)
+>> >
+>> >      /* Flush output buffers and destroy monitors */
+>> >      qemu_mutex_lock(&monitor_lock);
+>> > +    monitor_destroyed =3D true;
+>> >      QTAILQ_FOREACH_SAFE(mon, &mon_list, entry, next) {
+>> >          QTAILQ_REMOVE(&mon_list, mon, entry);
+>> >          monitor_flush(mon);
+>>
+>> monitor_cleanup() is one of the last things main() calls before it
+>> returns.  If another thread creates a monitor afterwards, it won't be
+>> cleaned up.  I figure that's the reason we want this patch.  There might
+>> be more serious issues than failure to clean up.  Please explain in your
+>> commit message.
 >
-> - Before:
-> Errors found in f64_mulAdd, rounding near_even, tininess before rounding:
-> +000.0000000000000  +7FF.0000000000000  +7FF.FFFFFFFFFFFFF
->         =3D> +7FF.FFFFFFFFFFFFF .....  expected -7FF.FFFFFFFFFFFFF v....
-> [...]
+> Is this clearer?
 >
-> - After:
-> In 6133248 tests, no errors found in f64_mulAdd, rounding near_even, tini=
-ness before rounding.
-> [...]
+>     monitor_cleanup() is one of the last things main() calls before it
+>     returns.  In the following patch, monitor_cleanup() will release the
+>     monitor_lock during flushing. There may be pending commands to insert
+>     new monitors, which would modify the mon_list during iteration, and
+>     the clean-up could thus miss those new insertions.
 >
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+>     Add a monitor_destroyed global to check if monitor_cleanup() has been
+>     already called. In this case, don't insert the new monitor in the
+>     list, but free it instead.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Yes.
 
-> ---
->  tests/fp/Makefile | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/tests/fp/Makefile b/tests/fp/Makefile
-> index d649a5a1db..49cdcd1bd2 100644
-> --- a/tests/fp/Makefile
-> +++ b/tests/fp/Makefile
-> @@ -29,6 +29,9 @@ QEMU_INCLUDES +=3D -I$(TF_SOURCE_DIR)
->
->  # work around TARGET_* poisoning
->  QEMU_CFLAGS +=3D -DHW_POISON_H
-> +# define a target to match testfloat's implementation-defined choices, s=
-uch as
-> +# whether to raise the invalid flag when dealing with NaNs in muladd.
-> +QEMU_CFLAGS +=3D -DTARGET_ARM
->
->  # capstone has a platform.h file that clashes with softfloat's
->  QEMU_CFLAGS :=3D $(filter-out %capstone, $(QEMU_CFLAGS))
+The solution feels a bit clunky: it duplicates part of the work
+monitor_cleanup() does into monitor_list_append().  Works because the
+part it doesn't duplicate needn't be done in this case: removing from
+@mon_list, and monitor_flush().
 
+I suspect a cleaner solution would involve the main thread telling other
+threads to terminate, waiting for their termination with pthread_join(),
+and only then do final cleanup.
 
---
-Alex Benn=C3=A9e
+I'm not asking for that solution now.  A clunky fix we have is better
+than a refactoring we don't have.  A comment admitting the clunkiness
+would be nice.
+
+>> monitor_list_append() is called by monitor_init(), either directly right
+>> before it returns, or via a bottom half if mon->use_io_thread.
+>> Therefore, @monitor_destroyed can only be true if monitor_init()
+>> commonly runs in a thread other than the main thread.  Please give an
+>> example where it does, in your commit message.
