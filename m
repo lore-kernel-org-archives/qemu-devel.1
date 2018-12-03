@@ -1,28 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gTr6x-00074q-5o
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:30:21 -0500
+	(envelope-from <clg@kaod.org>) id 1gTr7Q-0007Sp-Bl
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:30:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gTr6t-0003ue-Fk
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:30:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35130)
+	(envelope-from <clg@kaod.org>) id 1gTr7L-00046Z-CM
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:30:48 -0500
+Received: from 12.mo7.mail-out.ovh.net ([178.33.107.167]:39211)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1gTr6t-0003tn-2H
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:30:15 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B5B1630014D2
-	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 16:30:13 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f60b8f1e-979b-4af9-7b48-a691c1937f6a@redhat.com>
-Date: Mon, 3 Dec 2018 17:30:10 +0100
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gTr7L-00046B-5w
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:30:43 -0500
+Received: from player774.ha.ovh.net (unknown [10.109.143.146])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 5EEA6EE0A8
+	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 17:30:41 +0100 (CET)
+References: <20181116105729.23240-1-clg@kaod.org>
+	<20181116105729.23240-12-clg@kaod.org>
+	<20181128023902.GU2251@umbus.fritz.box>
+	<dbd8810e-09b9-7344-92d2-faddebf30c10@kaod.org>
+	<20181129010047.GM2251@umbus.fritz.box>
+	<cde0bf38-a766-deab-8d46-41fa7e776185@kaod.org>
+	<20181130011135.GG30479@umbus.fritz.box>
+	<bed23f8a-68bb-0f88-54c4-a4dfea085e34@kaod.org>
+	<20181203011812.GQ30479@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <8752cd19-cc18-5dbc-dd5a-2bcf2db63332@kaod.org>
+Date: Mon, 3 Dec 2018 17:30:35 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DaoEdYI6QuwJ5c7lUzXWOULkJyCztyC0m"
-Subject: [Qemu-devel] QMP accepts double dict keys
+In-Reply-To: <20181203011812.GQ30479@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 11/36] spapr/xive: use the VCPU id as a
+ NVT identifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +39,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DaoEdYI6QuwJ5c7lUzXWOULkJyCztyC0m
-From: Max Reitz <mreitz@redhat.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Message-ID: <f60b8f1e-979b-4af9-7b48-a691c1937f6a@redhat.com>
-Subject: QMP accepts double dict keys
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+>>>>> I'm thinking about the END->NVT stage of the process here, rather than
+>>>>> the NVT->TCTX stage.
+>>>>>
+>>>>> Oh, also, you're using "VP" here which IIUC == "NVT".  Can we
+>>>>> standardize on one, please.
+>>>>
+>>>> VP is used in Linux/KVM Linux/Native and skiboot. Yes. it's a mess. 
+>>>> Let's have consistent naming in QEMU and use NVT. 
+>>>
+>>> Right.  And to cover any inevitable missed ones is why I'd like to see
+>>> a cheatsheet giving both terms in the header comments somewhere.
+>>
+>> yes. I have added a list of names in xive.h. 
+> 
+> Great.  Oh BTW - this is getting big enough, that I wonder if it makes
+> sense to create a hw/intc/xive subdir to put things in, then splitting
+> IVSE, IVRE, IVPE related code into separate .c files (I'd still expect
+> a common .h though).
 
-Hi,
+Here is what I have for now, for the new files only :
 
-QMP accepts double keys in dicts without complaining.  The value it is
-using is apparently the last one specified:
+   190 include/hw/ppc/xive_regs.h
+   343 include/hw/ppc/xive.h
+    78 include/hw/ppc/spapr_xive.h
+  1453 hw/intc/spapr_xive.c (sPAPRXive + hcalls)
+  1678 hw/intc/xive.c       (XiveSource, XiveRouter, XiveENDSource, XiveTCTX, 
+			     END helpers)
+   864 hw/intc/spapr_xive_kvm.c
+  4606 total
 
-$ qemu-system-x86_64 -qmp stdio
-{"QMP": {"version": {"qemu": {"micro": 93, "minor": 0, "major": 3},
-"package": "v3.1.0-rc3-7-g87a45d86ed"}, "capabilities": []}}
-{'execute':'qmp_capabilities'}
-{"return": {}}
-{'execute':'blockdev-add','arguments':{'driver':'null-co',
- 'node-name':'foo','node-name':'bar'}}
-{"return": {}}
-{'execute':'query-named-block-nodes'}
-{"return": [{ [...] "node-name": "bar" [...] }]}
+I am putting the KVM export definitions in spapr_xive.h and xive.h but all 
+the code is in spapr_xive_kvm.c.
 
-Another test case is iotest 229 which specifies both mode=3Dabsolute-path=
-s
-and mode=3Dexisting (it wants the latter).
+So you would rather have something like :
+ 
+   include/hw/ppc/xive_regs.h
+   include/hw/ppc/xive.h
+   include/hw/ppc/spapr_xive.h
 
-Max
+   hw/intc/xive/spapr.c 
+   hw/intc/xive/spapr_kvm.c 
+   hw/intc/xive/source.c 
+   hw/intc/xive/router.c 
+   hw/intc/xive/presenter.c 
+   hw/intc/xive/tcontext.c 
 
+>> I was wondering if I should put the diagram below somewhere in a .h file 
+>> or under doc/specs/.
+> 
+> I'd prefer it in the .h file.
 
---DaoEdYI6QuwJ5c7lUzXWOULkJyCztyC0m
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlwFWhIACgkQ9AfbAGHV
-z0CcHggAjztDiYYf3d6m+bg9VUAYMDQWgZvXCgGEXuITRw1/9nmOSc6d2EAqeNUr
-pH3vv/YIjLGKcp3BGb9knyOGcL03zvu5cRygNHgwcH+O2acd1mNYld0AsZvG6tc9
-aCdbn3CXu1ft8bMWy9ls+dayULzwUlZEbjYWO+palh4IV2RXXZUftm0jnKDoIG/0
-fj6OSvqVwuA1+K8ENZLIlmDx0YwJCZVQDee3dDsCL5pMJ+sYzEOCZ2Hg2YL8FQjR
-yfQe/pw7AkDroiG0DKIOFwMikSzKZHX1jbdX09zZqQlhpwSLR28LjLTxpkw0RXhU
-siWhIViuhje2Ob0aQ+s+WfPMx/nocw==
-=E/Tu
------END PGP SIGNATURE-----
-
---DaoEdYI6QuwJ5c7lUzXWOULkJyCztyC0m--
+OK. will do in  xive.h
+ 
+>>
+>> Thanks,
+>>
+>> C.  
+>>
+>>
+>> = XIVE =================================================================
+>>
+>> The POWER9 processor comes with a new interrupt controller, called
+>> XIVE as "eXternal Interrupt Virtualization Engine".
+>>
+>>
+>> * Overall architecture
+>>
+>>
+>>              XIVE Interrupt Controller
+>>              +------------------------------------+      IPIs
+>>              | +---------+ +---------+ +--------+ |    +-------+
+>>              | |VC       | |CQ       | |PC      |----> | CORES |
+>>              | |     esb | |         | |        |----> |       |
+>>              | |     eas | |  Bridge | |   tctx |----> |       |
+>>              | |SC   end | |         | |    nvt | |    |       |
+>>  +------+    | +---------+ +----+----+ +--------+ |    +-+-+-+-+
+>>  | RAM  |    +------------------|-----------------+      | | |
+>>  |      |                       |                        | | |
+>>  |      |                       |                        | | |
+>>  |      |  +--------------------v------------------------v-v-v--+    other
+>>  |      <--+                     Power Bus                      +--> chips
+>>  |  esb |  +---------+-----------------------+------------------+
+>>  |  eas |            |                       |
+>>  |  end |        +---|-----+                 |
+>>  |  nvt |       +----+----+|            +----+----+
+>>  +------+       |SC       ||            |SC       |
+>>                 |         ||            |         |
+>>                 | PQ-bits ||            | PQ-bits |
+>>                 | local   |+            |  in VC  |
+>>                 +---------+             +---------+
+>>                    PCIe                 NX,NPU,CAPI
+>>
+>>                   SC: Source Controller (aka. IVSE)
+>>                   VC: Virtualization Controller (aka. IVRE)
+>>                   PC: Presentation Controller (aka. IVPE)
+>>                   CQ: Common Queue (Bridge)
+>>
+>>              PQ-bits: 2 bits source state machine (P:pending Q:queued)
+>>                  esb: Event State Buffer (Array of PQ bits in an IVSE)
+>>                  eas: Event Assignment Structure
+>>                  end: Event Notification Descriptor
+>>                  nvt: Notification Virtual Target
+>>                 tctx: Thread interrupt Context
+>>
+>>
+>> The XIVE IC is composed of three sub-engines :
+>>
+>>   - Interrupt Virtualization Source Engine (IVSE), or Source
+>>     Controller (SC). These are found in PCI PHBs, in the PSI host
+>>     bridge controller, but also inside the main controller for the
+>>     core IPIs and other sub-chips (NX, CAP, NPU) of the
+>>     chip/processor. They are configured to feed the IVRE with events.
+>>
+>>   - Interrupt Virtualization Routing Engine (IVRE) or Virtualization
+>>     Controller (VC). Its job is to match an event source with an Event
+>>     Notification Descriptor (END).
+>>
+>>   - Interrupt Virtualization Presentation Engine (IVPE) or Presentation
+>>     Controller (PC). It maintains the interrupt context state of each
+>>     thread and handles the delivery of the external exception to the
+>>     thread.
+>>
+>>
+>> * XIVE internal tables
+>>
+>> Each of the sub-engines uses a set of tables to redirect exceptions
+>> from event sources to CPU threads.
+>>
+>>                                           +-------+
+>>   User or OS                              |  EQ   |
+>>       or                          +------>|entries|
+>>   Hypervisor                      |       |  ..   |
+>>     Memory                        |       +-------+
+>>                                   |           ^
+>>                                   |           |
+>>              +-------------------------------------------------+
+>>                                   |           |
+>>   Hypervisor      +------+    +---+--+    +---+--+   +------+
+>>     Memory        | ESB  |    | EAT  |    | ENDT |   | NVTT |
+>>    (skiboot)      +----+-+    +----+-+    +----+-+   +------+
+>>                     ^  |        ^  |        ^  |       ^
+>>                     |  |        |  |        |  |       |
+>>              +-------------------------------------------------+
+>>                     |  |        |  |        |  |       |
+>>                     |  |        |  |        |  |       |
+>>                +----|--|--------|--|--------|--|-+   +-|-----+    +------+
+>>                |    |  |        |  |        |  | |   | | tctx|    |Thread|
+>>    IPI or   ---+    +  v        +  v        +  v |---| +  .. |----->     |
+>>   HW events    |                                 |   |       |    |      |
+>>                |             IVRE                |   | IVPE  |    +------+
+>>                +---------------------------------+   +-------+
+>>             
+>>
+>>
+>> The IVSE have a 2-bits, P for pending and Q for queued, state machine
+>> for each source that allows events to be triggered. They are stored in
+>> an array, the Event State Buffer (ESB) and controlled by MMIOs.
+>>
+>> If the event is let through, the IVRE looks up in the Event Assignment
+>> Structure (EAS) table for an Event Notification Descriptor (END)
+>> configured for the source. Each Event Notification Descriptor defines
+>> a notification path to a CPU and an in-memory Event Queue, in which
+>> will be pushed an EQ data for the OS to pull.
+>>
+>> The IVPE determines if a Notification Virtual Target (NVT) can handle
+>> the event by scanning the thread contexts of the VPs dispatched on the
+>> processor HW threads. It maintains the interrupt context state of each
+>> thread in a NVT table.
+>>
+> 
