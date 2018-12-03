@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gTlbi-0001Du-Hp
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:37:43 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1gTld2-00016D-RX
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:39:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1gTlbe-0007tD-Ci
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:37:42 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40756)
+	(envelope-from <alex.bennee@linaro.org>) id 1gTld0-0002bg-Ji
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:39:04 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54895)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1gTlbc-0007rh-Lg
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:37:38 -0500
-Received: by mail-wr1-x441.google.com with SMTP id p4so11552371wrt.7
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 02:37:36 -0800 (PST)
+	id 1gTld0-0002b9-Dx
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 05:39:02 -0500
+Received: by mail-wm1-x342.google.com with SMTP id z18so5204521wmc.4
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 02:39:02 -0800 (PST)
 References: <20181130215221.20554-1-richard.henderson@linaro.org>
-	<20181130215221.20554-9-richard.henderson@linaro.org>
+	<20181130215221.20554-10-richard.henderson@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181130215221.20554-9-richard.henderson@linaro.org>
-Date: Mon, 03 Dec 2018 10:37:34 +0000
-Message-ID: <875zwa521d.fsf@linaro.org>
+In-reply-to: <20181130215221.20554-10-richard.henderson@linaro.org>
+Date: Mon, 03 Dec 2018 10:39:00 +0000
+Message-ID: <874lbu51yz.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 08/16] tcg/s390: Remove retranslation
+Subject: Re: [Qemu-devel] [PATCH v3 09/16] tcg/sparc: Remove retranslation
  code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -45,64 +45,48 @@ Richard Henderson <richard.henderson@linaro.org> writes:
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  tcg/s390/tcg-target.inc.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
+>  tcg/sparc/tcg-target.inc.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
 >
-> diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-> index 17c435ade5..96c344142e 100644
-> --- a/tcg/s390/tcg-target.inc.c
-> +++ b/tcg/s390/tcg-target.inc.c
-> @@ -1329,13 +1329,11 @@ static void tgen_branch(TCGContext *s, int cc, TC=
-GLabel *l)
->  static void tgen_compare_branch(TCGContext *s, S390Opcode opc, int cc,
->                                  TCGReg r1, TCGReg r2, TCGLabel *l)
+> diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
+> index 04bdc3df5e..671a04c54b 100644
+> --- a/tcg/sparc/tcg-target.inc.c
+> +++ b/tcg/sparc/tcg-target.inc.c
+> @@ -639,13 +639,11 @@ static void tcg_out_bpcc0(TCGContext *s, int scond,=
+ int flags, int off19)
+>
+>  static void tcg_out_bpcc(TCGContext *s, int scond, int flags, TCGLabel *=
+l)
 >  {
-> -    intptr_t off;
-> +    intptr_t off =3D 0;
+> -    int off19;
+> +    int off19 =3D 0;
 >
 >      if (l->has_value) {
->          off =3D l->u.value_ptr - s->code_ptr;
+>          off19 =3D INSN_OFF19(tcg_pcrel_diff(s, l->u.value_ptr));
 >      } else {
-> -        /* We need to keep the offset unchanged for retranslation.  */
-> -        off =3D s->code_ptr[1];
->          tcg_out_reloc(s, s->code_ptr + 1, R_390_PC16DBL, l, 2);
+> -        /* Make sure to preserve destinations during retranslation.  */
+> -        off19 =3D *s->code_ptr & INSN_OFF19(-1);
+>          tcg_out_reloc(s, s->code_ptr, R_SPARC_WDISP19, l, 0);
 >      }
->
-> @@ -1347,13 +1345,11 @@ static void tgen_compare_branch(TCGContext *s, S3=
-90Opcode opc, int cc,
->  static void tgen_compare_imm_branch(TCGContext *s, S390Opcode opc, int c=
-c,
->                                      TCGReg r1, int i2, TCGLabel *l)
+>      tcg_out_bpcc0(s, scond, flags, off19);
+> @@ -685,13 +683,11 @@ static void tcg_out_brcond_i64(TCGContext *s, TCGCo=
+nd cond, TCGReg arg1,
 >  {
-> -    tcg_target_long off;
-> +    tcg_target_long off =3D 0;
+>      /* For 64-bit signed comparisons vs zero, we can avoid the compare. =
+ */
+>      if (arg2 =3D=3D 0 && !is_unsigned_cond(cond)) {
+> -        int off16;
+> +        int off16 =3D 0;
 >
->      if (l->has_value) {
->          off =3D l->u.value_ptr - s->code_ptr;
->      } else {
-> -        /* We need to keep the offset unchanged for retranslation.  */
-> -        off =3D s->code_ptr[1];
->          tcg_out_reloc(s, s->code_ptr + 1, R_390_PC16DBL, l, 2);
->      }
->
-> @@ -1696,7 +1692,6 @@ static void tcg_out_qemu_ld(TCGContext* s, TCGReg d=
-ata_reg, TCGReg addr_reg,
->
->      base_reg =3D tcg_out_tlb_read(s, addr_reg, opc, mem_index, 1);
->
-> -    /* We need to keep the offset unchanged for retranslation.  */
->      tcg_out16(s, RI_BRC | (S390_CC_NE << 4));
->      label_ptr =3D s->code_ptr;
->      s->code_ptr +=3D 1;
-> @@ -1724,7 +1719,6 @@ static void tcg_out_qemu_st(TCGContext* s, TCGReg d=
-ata_reg, TCGReg addr_reg,
->
->      base_reg =3D tcg_out_tlb_read(s, addr_reg, opc, mem_index, 0);
->
-> -    /* We need to keep the offset unchanged for retranslation.  */
->      tcg_out16(s, RI_BRC | (S390_CC_NE << 4));
->      label_ptr =3D s->code_ptr;
->      s->code_ptr +=3D 1;
+>          if (l->has_value) {
+>              off16 =3D INSN_OFF16(tcg_pcrel_diff(s, l->u.value_ptr));
+>          } else {
+> -            /* Make sure to preserve destinations during retranslation. =
+ */
+> -            off16 =3D *s->code_ptr & INSN_OFF16(-1);
+>              tcg_out_reloc(s, s->code_ptr, R_SPARC_WDISP16, l, 0);
+>          }
+>          tcg_out32(s, INSN_OP(0) | INSN_OP2(3) | BPR_PT | INSN_RS1(arg1)
 
 
 --
