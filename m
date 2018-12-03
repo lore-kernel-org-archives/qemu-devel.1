@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gTqwp-0006yp-5a
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:19:52 -0500
+	(envelope-from <fwsgonzo@hotmail.com>) id 1gTqxE-0007KO-2W
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:20:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gTqwl-0004fl-VP
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:19:51 -0500
-Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:46838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gTqwl-0004Zw-OH
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:19:47 -0500
-Received: from player691.ha.ovh.net (unknown [10.109.159.7])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 3EEF1108729
-	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 17:19:45 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-7-clg@kaod.org>
-	<20181122051302.GG10448@umbus.fritz.box>
-	<390808b9-250e-e1ae-ea54-fcf47b309833@kaod.org>
-	<20181130010410.GE30479@umbus.fritz.box>
-	<d8ba2082-625f-b547-47af-416148c04e9c@kaod.org>
-	<20181203011406.GP30479@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <dcfe41e1-fd62-3b2c-fb7e-426ac3f32a88@kaod.org>
-Date: Mon, 3 Dec 2018 17:19:38 +0100
-MIME-Version: 1.0
-In-Reply-To: <20181203011406.GP30479@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+	(envelope-from <fwsgonzo@hotmail.com>) id 1gTqxC-0005ux-HN
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:20:16 -0500
+Received: from mail-he1eur01olkn082a.outbound.protection.outlook.com
+	([2a01:111:f400:fe1e::82a]:6302
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fwsgonzo@hotmail.com>)
+	id 1gTqxC-0005tb-6C
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:20:14 -0500
+From: Gonzo FWS <fwsgonzo@hotmail.com>
+Date: Mon, 3 Dec 2018 16:20:11 +0000
+Message-ID: <HE1P190MB00733AB17DBC2DC950108B0DDEAE0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>
+References: <HE1P190MB0073644AE7C57B520A8675CEDEAE0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>,
+	<3a15ac98-5687-03d3-ca89-772b171b8415@tuxfamily.org>,
+	<HE1P190MB007324727C407C4962CB6189DEAE0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>
+In-Reply-To: <HE1P190MB007324727C407C4962CB6189DEAE0@HE1P190MB0073.EURP190.PROD.OUTLOOK.COM>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 06/36] ppc/xive: add support for the END
- Event State buffers
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] Calendar
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,172 +32,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Thomas Huth <huth@tuxfamily.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 12/3/18 2:14 AM, David Gibson wrote:
-> On Fri, Nov 30, 2018 at 07:41:33AM +0100, C=E9dric Le Goater wrote:
->> On 11/30/18 2:04 AM, David Gibson wrote:
->>> On Thu, Nov 29, 2018 at 11:06:13PM +0100, C=E9dric Le Goater wrote:
->>>> On 11/22/18 6:13 AM, David Gibson wrote:
->>>>> On Fri, Nov 16, 2018 at 11:56:59AM +0100, C=E9dric Le Goater wrote:
->>>>>> The Event Notification Descriptor also contains two Event State
->>>>>> Buffers providing further coalescing of interrupts, one for the
->>>>>> notification event (ESn) and one for the escalation events (ESe). =
-A
->>>>>> MMIO page is assigned for each to control the EOI through loads
->>>>>> only. Stores are not allowed.
->>>>>>
->>>>>> The END ESBs are modeled through an object resembling the 'XiveSou=
-rce'
->>>>>> It is stateless as the END state bits are backed into the XiveEND
->>>>>> structure under the XiveRouter and the MMIO accesses follow the sa=
-me
->>>>>> rules as for the standard source ESBs.
->>>>>>
->>>>>> END ESBs are not supported by the Linux drivers neither on OPAL no=
-r on
->>>>>> sPAPR. Nevetherless, it provides a mean to study the question in t=
-he
->>>>>> future and validates a bit more the XIVE model.
->>>>>>
->>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>>>> ---
->>>>>>  include/hw/ppc/xive.h |  20 ++++++
->>>>>>  hw/intc/xive.c        | 160 +++++++++++++++++++++++++++++++++++++=
-++++-
->>>>>>  2 files changed, 178 insertions(+), 2 deletions(-)
->>>>>>
->>>>>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->>>>>> index ce62aaf28343..24301bf2076d 100644
->>>>>> --- a/include/hw/ppc/xive.h
->>>>>> +++ b/include/hw/ppc/xive.h
->>>>>> @@ -208,6 +208,26 @@ int xive_router_get_end(XiveRouter *xrtr, uin=
-t8_t end_blk, uint32_t end_idx,
->>>>>>  int xive_router_set_end(XiveRouter *xrtr, uint8_t end_blk, uint32=
-_t end_idx,
->>>>>>                          XiveEND *end);
->>>>>> =20
->>>>>> +/*
->>>>>> + * XIVE END ESBs
->>>>>> + */
->>>>>> +
->>>>>> +#define TYPE_XIVE_END_SOURCE "xive-end-source"
->>>>>> +#define XIVE_END_SOURCE(obj) \
->>>>>> +    OBJECT_CHECK(XiveENDSource, (obj), TYPE_XIVE_END_SOURCE)
->>>>>
->>>>> Is there a particular reason to make this a full QOM object, rather
->>>>> than just embedding it in the XiveRouter?
->>>>
->>>> Coming back on this question because removing the chip_id from the
->>>> router is a problem for the END triggering. At least with the curren=
-t
->>>> design. See below for the comment.
->>>>
->>>>>> +typedef struct XiveENDSource {
->>>>>> +    SysBusDevice parent;
->>>>>> +
->>>>>> +    uint32_t        nr_ends;
->>>>>> +
->>>>>> +    /* ESB memory region */
->>>>>> +    uint32_t        esb_shift;
->>>>>> +    MemoryRegion    esb_mmio;
->>>>>> +
->>>>>> +    XiveRouter      *xrtr;
->>>>>> +} XiveENDSource;
->>>>>> +
->>>>>>  /*
->>>>>>   * For legacy compatibility, the exceptions define up to 256 diff=
-erent
->>>>>>   * priorities. P9 implements only 9 levels : 8 active levels [0 -=
- 7]
->>>>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->>>>>> index 9cb001e7b540..5a8882d47a98 100644
->>>>>> --- a/hw/intc/xive.c
->>>>>> +++ b/hw/intc/xive.c
->>>>>> @@ -622,8 +622,18 @@ static void xive_router_end_notify(XiveRouter=
- *xrtr, uint8_t end_blk,
->>>>>>       * even futher coalescing in the Router
->>>>>>       */
->>>>>>      if (!(end.w0 & END_W0_UCOND_NOTIFY)) {
->>>>>> -        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not impleme=
-nted\n");
->>>>>> -        return;
->>>>>> +        uint8_t pq =3D GETFIELD(END_W1_ESn, end.w1);
->>>>>> +        bool notify =3D xive_esb_trigger(&pq);
->>>>>> +
->>>>>> +        if (pq !=3D GETFIELD(END_W1_ESn, end.w1)) {
->>>>>> +            end.w1 =3D SETFIELD(END_W1_ESn, end.w1, pq);
->>>>>> +            xive_router_set_end(xrtr, end_blk, end_idx, &end);
->>>>>> +        }
->>>>>> +
->>>>>> +        /* ESn[Q]=3D1 : end of notification */
->>>>>> +        if (!notify) {
->>>>>> +            return;
->>>>>> +        }
->>>>>>      }
->>>>>> =20
->>>>>>      /*
->>>>>> @@ -706,6 +716,151 @@ void xive_eas_pic_print_info(XiveEAS *eas, u=
-int32_t lisn, Monitor *mon)
->>>>>>                     (uint32_t) GETFIELD(EAS_END_DATA, eas->w));
->>>>>>  }
->>>>>> =20
->>>>>> +/*
->>>>>> + * END ESB MMIO loads
->>>>>> + */
->>>>>> +static uint64_t xive_end_source_read(void *opaque, hwaddr addr, u=
-nsigned size)
->>>>>> +{
->>>>>> +    XiveENDSource *xsrc =3D XIVE_END_SOURCE(opaque);
->>>>>> +    XiveRouter *xrtr =3D xsrc->xrtr;
->>>>>> +    uint32_t offset =3D addr & 0xFFF;
->>>>>> +    uint8_t end_blk;
->>>>>> +    uint32_t end_idx;
->>>>>> +    XiveEND end;
->>>>>> +    uint32_t end_esmask;
->>>>>> +    uint8_t pq;
->>>>>> +    uint64_t ret =3D -1;
->>>>>> +
->>>>>> +    end_blk =3D xrtr->chip_id;
->>>>>> +    end_idx =3D addr >> (xsrc->esb_shift + 1);
->>>>>> +    if (xive_router_get_end(xrtr, end_blk, end_idx, &end)) {
->>>>
->>>> The current END accessors require a block identifier, hence xrtr->ch=
-ip_id,=20
->>>> but in this case, we don't really need it because we are using the E=
-NDT=20
->>>> local to the router/chip.=20
->>>
->>>> I don't know how to handle simply this case without keeping chip_id =
-:/
->>>
->>> I don't really follow how chip_id is relevant here.  AFAICT the END
->>> accessors take a block id and the back end is responsible for
->>> interpreting them.  The ponwernv one will map it to chip id, but the
->>> PAPR one can just ignore it or only use block 0.
->>
->> Yes. But the block value comes from the xrtr->chip_id today, on PAPR a=
-nd
->> PowerNV, even if it's block 0.=20
->>
->> What I could do is add a "chip-id" property to XiveENDSource possibly.
->=20
-> This still seems wrong for the PAPR model.=20
-
-We don't really care for PAPR. We can use 0 but the model is common
-with PowerNV.
-
-> Why can't you configure the end_block value directly in the Xive=20
-> components,=20
-
-That is what I am proposing to add a "chip-id" property to XiveENDSource=20
-
-> then just set it equal to the chip_id when you build the powernv=20
-> machine?
-
-yes. that's how it's more or less built. It's a little more complex
-on PowerNV because there are low level settings on how the chip_id is
-used in the PC and VC, but the modeling is minimal.
-
-C.
+U29ycnksIEkgY29tcGxldGVseSBmb3Jnb3QgdG8gbWVudGlvbiB0aGUgZGVtbyBpbWFnZSBJIGF0
+dGFjaGVkIGNvbnRhaW5zIHRoZSBST00gIkZsb3JhY3kiIHdoaWNoIGlzIGEgZ2FtZSB0aGF0IG5l
+dmVyIGZvdW5kIGEgcHVibGlzaGVyIGFuZCB3YXMgbGF0ZXIgbWFkZSBwdWJsaWMgYnkgdGhlIGF1
+dGhvci4NCg0KDQpTb3VyY2U6IGh0dHA6Ly93d3cubmVzd29ybGQuY29tL2FydGljbGUucGhwP3N5
+c3RlbT1nYmMmZGF0YT1nYmNob21lYnJldw0KR2FtZWJveSBDb2xvciBIb21lYnJldyAod3d3Lm5l
+c3dvcmxkLmNvbSk8aHR0cDovL3d3dy5uZXN3b3JsZC5jb20vYXJ0aWNsZS5waHA/c3lzdGVtPWdi
+YyZkYXRhPWdiY2hvbWVicmV3Pg0KR0FNRUJPWSBDT0xPUiBIT01FQlJFVzogR0FNRVMsIERFTU9T
+IEFORCBNT1JFOiBXaGF0IHlvdSBmaW5kIGhlcmUgaXMgYSBsYXJnZSBzZWN0aW9uIG9mIEdhbWVi
+b3kgQ29sb3IgaG9tZWJyZXcgZGV2ZWxvcGVkIG92ZXIgdGhlIHllYXJzLCBieSBob21lYnJldyBJ
+IG1lYW4gZ2FtZXMvYXBwcyBhbmQgb3RoZXIgYmluYXJpZXMgZm9yIHVzZSBvbiB0aGUgR2FtZWJv
+eSBDb2xvciB0aGF0IGFyZSBhY3R1YWxseSBkZXZlbG9wZWQgZnJvbSBzY3JhdGNoIChubyBoYWNr
+cykuDQp3d3cubmVzd29ybGQuY29tDQoNCg0KIkZsb3JhY3kiIGlzIGEgcm9sZXBsYXlpbmcgZ2Ft
+ZSB3aXRoIGVsZW1lbnRzIG9mIHN0cmF0ZWd5IGFuZCBhY3Rpb24gZ2FtZXMsIGluIHdoaWNoIHRo
+ZSBwbGF5ZXIgYnJlZWRzIHBsYW50bGlrZSBjcmVhdHVyZXMgZm9yIGV4Y2l0aW5nIGFuaW1hdGVk
+IGNvbWJhdHMuIFRoaXMgZGVtbyB3YXMgbWFkZSBwdWJsaWMgYnkgdGhlIGRldmVsb3BlciAtIG5v
+IHB1Ymxpc2hlciB3YXMgZm91bmQgZm9yIHRoZSBnYW1lIGV2ZW4gYWZ0ZXIgc2V2ZXJhbCBhdHRl
+bXB0cy4NCmh0dHBzOi8vd2ViLmFyY2hpdmUub3JnL3dlYi8yMDAxMDQwNzIyNTEyOC9odHRwOi8v
+d3d3LmZsb3JhY3kuY29tL2ZwcmV2aWV3Lmh0bWwNCl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fDQpGcm9tOiBHb256byBGV1MgPGZ3c2dvbnpvQGhvdG1haWwuY29tPg0KU2VudDogTW9u
+ZGF5LCBEZWNlbWJlciAzLCAyMDE4IDU6MTYgUE0NClRvOiBUaG9tYXMgSHV0aDsgcWVtdS1kZXZl
+bEBub25nbnUub3JnDQpTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIENhbGVuZGFyDQoNCkkgZG9u
+J3QgdGhpbmsgc28uIFlvdSBjYW4gcnVuIHdpdGggYSBjb3B5cmlnaHRlZCBib290IFJPTSBpZiB5
+b3UgY2hvb3NlIHRvIGRvIHNvLCBidXQgeW91IGNhbiBhbHNvIGp1c3Qgc2V0IHlvdXIgUkFNIGFu
+ZCBDUFUgcmVnaXN0ZXJzIHRvIG1pbWljayB3aGF0IHRoZSBib290IFJPTSBkb2VzLiBFdmVuIHNv
+LCB0aGVyZSBhcmUgbWFueSBnYW1lYm95IHZhcmlhbnRzIChldmVuIGEgc3VwZXIgbmludGVuZG8g
+Y2FydHJpZGdlIHZhcmlhbnQpLCB3aGljaCBhbGwgZG8gdGhpbmdzIHNsaWdodGx5IGRpZmZlcmVu
+dGx5LCBzbyB0aGVyZSBhcmUgZmV3IG9mZmljaWFsIFJPTXMgdGhhdCBkZXBlbmQgb24gYW55IGtp
+bmQgb2YgbWVtb3J5IG9yIHJlZ2lzdGVycyBiZWluZyBhIHNwZWNpZmljIHdheSBhdCB0aGUgc3Rh
+cnQuDQoNCkhhdmluZyBzYWlkIGFsbCB0aGlzLCB0aGVyZSBhcmUgc3RpbGwgbXVya3kgY29ybmVy
+cyBmb3IgZW11bGF0b3JzLCBhbmQgSSBjb21wbGV0ZWx5IHVuZGVyc3RhbmQgdGhlIHF1ZXN0aW9u
+LiBCdXQgbXkgc3VibWlzc2lvbiBpcyBub3QgYW4gb3BlbiBPUyBvciAiYW4gZW11bGF0b3IuIiBJ
+biBwcmFjdGljZSBpdHMgYSBzdGF0aWMgbWFjaGluZSBpbWFnZSBidWlsdCBmcm9tIEluY2x1ZGVP
+UyBhbmQgbXkgZW1iZWRkZWQgR0JDIGVtdWxhdG9yLCB3aGljaCBjYW4gb25seSBydW4gdGhlIGVt
+YmVkZGVkIGZyZWV3YXJlIFJPTSB3aGljaCBpcyBhbHNvIGJ1aWx0IGludG8gdGhlIGltYWdlLiBU
+aGUgbWFjaGluZSBpbWFnZSBpcyBoYXJkLXdpcmVkIHRvIHBsYXkgb25seSB0aGlzIFJPTS4gSSB3
+b25kZXIgaWYgdGhhdCBtaWdodCBtYWtlIHRoZSB3aG9sZSB0aGluZyBsZXNzIGludGVyZXN0aW5n
+PyBUaGlzIGlzIG15IHJlcG9zaXRvcnkgZm9yIHRoZSBlbXVsYXRvcjogaHR0cHM6Ly9naXRodWIu
+Y29tL2Z3c0dvbnpvL2dhbWVicm8NCg0KSnVzdCB0byBzaG93IHdoYXQgSSBtZWFuLCBJIGhhdmUg
+YWRkZWQgYW4gZXhhbXBsZSBtYWNoaW5lIGltYWdlIHdpdGggYSBmcmVlIFJPTSAod2hpY2ggSSBo
+YXZlIG5vdCBhc2tlZCBmb3IgcGVybWlzc2lvbiB0byBlbWJlZCwgc28gdGhpcyBpcyBqdXN0IHRv
+IHNob3cgeW91IGhlcmUpLiBUaGVyZSBhcmUgYWxzbyBzb21lIGFubm95aW5nIGJ1Z3MgbGVmdCBp
+biB0aGUgZW11bGF0b3IuIElmIHlvdSBhcmUgaW50ZXJlc3RlZCBJIHdpbGwgY3JlYXRlIGEgbWFj
+aGluZSBpbWFnZSB3aXRoIGEgaG9tZWJyZXcgUk9NIHdoaWNoIEkgaGF2ZSBwZXJtaXNzaW9uIHRv
+IHVzZS4NCg0KVGhlIHJlYXNvbiBmb3IgdGhlIGxhcmdlIHNpemUgb2YgdGhlIC5JU08gaXMgYmVj
+YXVzZSBvZiBHUlVCLiBRZW11IGhhcyBhbiBpZi1zZW50ZW5jZSB0aGF0IGV4aXRzIHdpdGggYW4g
+ZXJyb3Igb24gRWxmNjQgYmluYXJpZXMsIHdoaWNoIGlmIHJlbW92ZWQgd2lsbCBtYWtlIHRoZSBp
+bWFnZSAzTUIgYW5kIHdvdWxkIHJ1biB3aXRoIG11bHRpYm9vdCAoNjQtYml0KSDwn5iKIEkgZG9u
+J3Qga25vdyBob3cgdG8gY29udHJpYnV0ZSB0byBRZW11IHRvIGdldCB0aG9zZSBsaW5lcyByZW1v
+dmVkLg0KDQpFaXRoZXIgd2F5LCBJIGNvbXBsZXRlbHkgdW5kZXJzdGFuZCBpZiB5b3UncmUgbm90
+IGludGVyZXN0ZWQuIEhhdmUgYSBnb29kIGRheS4NCi1nb256bw0KX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX18NCkZyb206IFRob21hcyBIdXRoIDxodXRoQHR1eGZhbWlseS5vcmc+DQpT
+ZW50OiBNb25kYXksIERlY2VtYmVyIDMsIDIwMTggNDozNiBQTQ0KVG86IEdvbnpvIEZXUzsgcWVt
+dS1kZXZlbEBub25nbnUub3JnDQpTdWJqZWN0OiBSZTogW1FlbXUtZGV2ZWxdIENhbGVuZGFyDQoN
+Ck9uIDIwMTgtMTItMDMgMTM6NTQsIEdvbnpvIEZXUyB3cm90ZToNCj4gSGV5LCBJIGhhdmUgd3Jp
+dHRlbiBhbiBlbWJlZGRlZCBnYW1lYm95IGNvbG9yIGVtdWxhdG9yIGZvciBteSBPUyAoSW5jbHVk
+ZU9TKSB3aGljaCBkb2VzIHJ1biBwcmltYXJpbHkgaW4gUWVtdS1LVk0gYXRtLiBBbmQgdGhlcmVp
+biBsaWVzIHRoZSBwcm9ibGVtIC0gUFMyIG9ubHkgd29ya3Mgd2l0aCBLVk0gZW5hYmxlZCBhdCBw
+cmVzZW50Lg0KPg0KPiBJcyBpdCB0b28gbGF0ZSB0byBzdWJtaXQgc29tZXRoaW5nPyBJIHdpbGwg
+c3VibWl0IGEgc3RhdGljIGltYWdlIHdpdGggYSBmcmVlIGhvbWVicmV3IFJPTSBpbiBpdCBpZiB5
+b3UgYXJlIGludGVyZXN0ZWQuDQoNCiBIaSwNCg0KdGhlcmUgYXJlIHN0aWxsIHNvbWUgb3BlbiBz
+bG90cyBsZWZ0LCAuLi4gYnV0IEknbSBub3Qgc3VyZSB3aGV0aGVyIGENCkdhbWVib3kgZW11bGF0
+b3IgaXMgcmVhbGx5IDEwMCUgZnJlZWx5IHJlZGlzdHJpYnV0YWJsZT8gRG9uJ3QgeW91IGFsc28N
+Cm5lZWQgc29tZSBwcm9wcmlldGFyeSBmaXJtd2FyZSBmb3Igc3VjaCBlbXVsYXRvcnM/DQoNCiBU
+aG9tYXMNCg==
