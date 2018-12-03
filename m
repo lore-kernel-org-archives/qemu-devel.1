@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gTos3-0002E9-5Y
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:09:12 -0500
+	(envelope-from <luc.michel@greensocs.com>) id 1gTov2-0005J6-SP
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:09:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gTorc-0002PF-4m
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:06:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:21789)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gTorb-0001jS-Nf
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:06:19 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon,  3 Dec 2018 15:05:33 +0100
-Message-Id: <1543845937-300-4-git-send-email-thuth@redhat.com>
-In-Reply-To: <1543845937-300-1-git-send-email-thuth@redhat.com>
-References: <1543845937-300-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH for-4.0 3/7] configure: Remove old -fno-gcse
- workaround for GCC 4.6.x and 4.7.[012]
+	(envelope-from <luc.michel@greensocs.com>) id 1gTouq-0005n2-Fh
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 09:09:47 -0500
+References: <20181123091729.29921-1-luc.michel@greensocs.com>
+	<20181123091729.29921-2-luc.michel@greensocs.com>
+	<20181123181059.GN18284@habkost.net>
+	<65d3a572-9a80-f332-1f88-69e43e8a3663@redhat.com>
+	<20181126132731.GJ18284@habkost.net>
+	<CAFEAcA8D7ZjO059Sgrx-4i0iT+V3gxT4f=DvdmUAJS7KomtyOg@mail.gmail.com>
+	<b8e20686-e5d1-a844-48f7-a4ae471e3fd5@greensocs.com>
+	<CAFEAcA8j4xTiS3_ktiA0hm2N4cu5RvxAtYqUHgvY-bUXgcwbjQ@mail.gmail.com>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <50645862-a638-ad2a-bafe-1b46be42aec4@greensocs.com>
+Date: Mon, 3 Dec 2018 15:09:14 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8j4xTiS3_ktiA0hm2N4cu5RvxAtYqUHgvY-bUXgcwbjQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, pbonzini@redhat.com, peter.maydell@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
 
-Now that we require at least GCC 4.8, we don't need this als workaround
-for 4.6 and 4.7 anymore.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- Makefile.target |  3 ---
- configure       | 27 ---------------------------
- 2 files changed, 30 deletions(-)
 
-diff --git a/Makefile.target b/Makefile.target
-index 4d56298..44ec4b6 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -158,9 +158,6 @@ GENERATED_FILES += hmp-commands.h hmp-commands-info.h
- 
- endif # CONFIG_SOFTMMU
- 
--# Workaround for http://gcc.gnu.org/PR55489, see configure.
--%/translate.o: QEMU_CFLAGS += $(TRANSLATE_OPT_CFLAGS)
--
- dummy := $(call unnest-vars,,obj-y)
- all-obj-y := $(obj-y)
- 
-diff --git a/configure b/configure
-index 14e9722..ba95f01 100755
---- a/configure
-+++ b/configure
-@@ -1930,32 +1930,6 @@ else
-   QEMU_CFLAGS="$QEMU_CFLAGS -Wno-missing-braces"
- fi
- 
--# Workaround for http://gcc.gnu.org/PR55489.  Happens with -fPIE/-fPIC and
--# large functions that use global variables.  The bug is in all releases of
--# GCC, but it became particularly acute in 4.6.x and 4.7.x.  It is fixed in
--# 4.7.3 and 4.8.0.  We should be able to delete this at the end of 2013.
--cat > $TMPC << EOF
--#if __GNUC__ == 4 && (__GNUC_MINOR__ == 6 || (__GNUC_MINOR__ == 7 && __GNUC_PATCHLEVEL__ <= 2))
--int main(void) { return 0; }
--#else
--#error No bug in this compiler.
--#endif
--EOF
--if compile_prog "-Werror -fno-gcse" "" ; then
--  TRANSLATE_OPT_CFLAGS=-fno-gcse
--fi
--
--if test "$static" = "yes" ; then
--  if test "$modules" = "yes" ; then
--    error_exit "static and modules are mutually incompatible"
--  fi
--  if test "$pie" = "yes" ; then
--    error_exit "static and pie are mutually incompatible"
--  else
--    pie="no"
--  fi
--fi
--
- # Unconditional check for compiler __thread support
-   cat > $TMPC << EOF
- static __thread int tls_var;
-@@ -6953,7 +6927,6 @@ echo "LIBS_QGA+=$libs_qga" >> $config_host_mak
- echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
- echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
- echo "POD2MAN=$POD2MAN" >> $config_host_mak
--echo "TRANSLATE_OPT_CFLAGS=$TRANSLATE_OPT_CFLAGS" >> $config_host_mak
- if test "$gcov" = "yes" ; then
-   echo "CONFIG_GCOV=y" >> $config_host_mak
-   echo "GCOV=$gcov_tool" >> $config_host_mak
--- 
-1.8.3.1
+On 12/3/18 12:23 PM, Peter Maydell wrote:
+> On Mon, 3 Dec 2018 at 11:21, Luc Michel <luc.michel@greensocs.com> wrot=
+e:
+>>
+>> On 11/30/18 5:52 PM, Peter Maydell wrote:
+>>> Luc: what are the requirements on boards using CPU cluster
+>>> objects? I assume these are both OK:
+>>>  * does not use cluster objects at all
+>>>    (the gdbstub puts all the CPUs in one process?)
+>> Yes, when no clusters are found, a process with PID 1 is created and
+>> used for all CPUs.
+>>>  * all CPUs created are in some CPU cluster
+>>>    (the gdbstub uses one process per CPU cluster)
+>>> but what about
+>>>  * some CPUs are created in a CPU cluster, but some
+>>>    are "loose", not in any cluster at all> ?
+>>> Is that just invalid, or do the "loose" CPUs end up in
+>>> a default cluster (gdbstub process), or do they get
+>>> one cluster each?
+>> Currently this is valid and the "loose" CPUs end up in the first
+>> available process (which will be PID 1 if we are in your first case,
+>> i.e. no clusters in the machine).
+>=20
+> So if there are some defined clusters 1 and 2, and some
+> loose CPUs, the clusters get PID 1 and PID 2, and the
+> loose CPUs end up in PID 3? That seems reasonable.
+No sorry I was not clear, the loose CPUs would end up on PID 1 in that ca=
+se.
+
+The current behaviour is as follows:
+During gdb stub initialization:
+  - A process is created per cluster.
+  - If no cluster are found, an unique process is created with PID 1
+
+When trying to find a CPU PID:
+  - If it is attached to a cluster, return the associated process,
+  - If it is loose, return the first available process.
+
+--=20
+Luc
+
+>=20
+> thanks
+> -- PMM
+>=20
