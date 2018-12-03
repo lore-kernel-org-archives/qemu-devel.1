@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gTkj4-0002W3-D5
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 04:41:16 -0500
+	(envelope-from <armbru@redhat.com>) id 1gTkj4-0002bf-Dd
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 04:41:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gTkeJ-0007vV-PF
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 04:36:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58420)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gTkeJ-0007vC-Kb
+	(envelope-from <armbru@redhat.com>) id 1gTkeG-0007uG-3F
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 04:36:19 -0500
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon,  3 Dec 2018 17:35:43 +0800
-Message-Id: <20181203093544.6184-4-jasowang@redhat.com>
-In-Reply-To: <20181203093544.6184-1-jasowang@redhat.com>
-References: <20181203093544.6184-1-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH V3 for 3.1 3/4] virtio-net-test: remove unused
- macro
+Received: from mx1.redhat.com ([209.132.183.28]:58368)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gTkeF-0007ty-UY
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 04:36:16 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4ED16C0587FC
+	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 09:36:15 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181029125733.14597-1-marcandre.lureau@redhat.com>
+Date: Mon, 03 Dec 2018 10:36:08 +0100
+In-Reply-To: <20181029125733.14597-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Mon, 29 Oct 2018 16:57:27 +0400")
+Message-ID: <87a7ln54vr.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] monitor: misc fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +33,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: mst@redhat.com, ppandit@redhat.com, liq3ea@163.com, liq3ea@gmail.com, pbonzini@redhat.com, thuth@redhat.com, eblake@redhat.com, Jason Wang <jasowang@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- tests/virtio-net-test.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index 233b9ab5f7..f12f0afb51 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -24,7 +24,6 @@
- 
- #define PCI_SLOT_HP             0x06
- #define PCI_SLOT                0x04
--#define PCI_FN                  0x00
- 
- #define QVIRTIO_NET_TIMEOUT_US (30 * 1000 * 1000)
- #define VNET_HDR_SIZE sizeof(struct virtio_net_hdr_mrg_rxbuf)
--- 
-2.17.1
+Found only minor issues.  v3 should do the trick.  Thanks!
