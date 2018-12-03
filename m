@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEn-0000OH-Rc
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:23 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqEp-0000Po-76
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEm-0004pl-FJ
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45882)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqEo-0004s2-8m
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEm-0004oj-5q
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:20 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEn-0004r8-Vu
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:22 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:44 +0100
-Message-Id: <1543851204-41186-32-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:32:45 +0100
+Message-Id: <1543851204-41186-33-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 31/71] tests/qgraph: ppc64/pseries machine node
+Subject: [Qemu-devel] [PATCH 32/71] tests/libqos: has_buggy_msi flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,146 +28,95 @@ Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <l
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Add pseries  machine for the ppc64 QEMU binary. This machine contains a
-spapr-pci-host-bridge driver, that contains itself a pci-bus-spapr
-that produces the pci-bus interface.
+The Qgraph framework makes any test using
+pci bus run the same function using pci-pci and
+pci-spapr bus. However, some tests are not ready to use
+the spapr bus, due to a MSI bug. Until it does not get
+fixed, this flag allows them to skip the test
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include               |   1 +
- tests/libqos/ppc64_pseries-machine.c | 111 +++++++++++++++++++++++++++++++++++
- 2 files changed, 112 insertions(+)
- create mode 100644 tests/libqos/ppc64_pseries-machine.c
+ tests/libqos/pci-pc.c    |  3 +++
+ tests/libqos/pci-spapr.c |  3 +++
+ tests/libqos/pci.c       | 14 ++++++++++++++
+ tests/libqos/pci.h       |  4 ++++
+ 4 files changed, 24 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 9bf1f25..ae8adb0 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -683,6 +683,7 @@ qos-test-obj-y += tests/libqos/arm-raspi2-machine.o
- qos-test-obj-y += tests/libqos/arm-sabrelite-machine.o
- qos-test-obj-y += tests/libqos/arm-smdkc210-machine.o
- qos-test-obj-y += tests/libqos/arm-xilinx-zynq-a9-machine.o
-+qos-test-obj-y += tests/libqos/ppc64_pseries-machine.o
- qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
+diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+index 041bfed..4247cda 100644
+--- a/tests/libqos/pci-pc.c
++++ b/tests/libqos/pci-pc.c
+@@ -123,6 +123,9 @@ void qpci_init_pc(QPCIBusPC *qpci, QTestState *qts, QGuestAllocator *alloc)
+ {
+     assert(qts);
  
- # Tests
-diff --git a/tests/libqos/ppc64_pseries-machine.c b/tests/libqos/ppc64_pseries-machine.c
-new file mode 100644
-index 0000000..534320f
---- /dev/null
-+++ b/tests/libqos/ppc64_pseries-machine.c
-@@ -0,0 +1,111 @@
-+/*
-+ * libqos driver framework
-+ *
-+ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License version 2 as published by the Free Software Foundation.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
++    /* tests can use pci-bus */
++    qpci->bus.has_buggy_msi = FALSE;
 +
-+ #include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "libqos/qgraph.h"
-+#include "pci-spapr.h"
-+#include "libqos/malloc-spapr.h"
+     qpci->bus.pio_readb = qpci_pc_pio_readb;
+     qpci->bus.pio_readw = qpci_pc_pio_readw;
+     qpci->bus.pio_readl = qpci_pc_pio_readl;
+diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
+index 24f2c2c..502a0e5 100644
+--- a/tests/libqos/pci-spapr.c
++++ b/tests/libqos/pci-spapr.c
+@@ -155,6 +155,9 @@ void qpci_init_spapr(QPCIBusSPAPR *qpci, QTestState *qts,
+ {
+     assert(qts);
+ 
++    /* tests cannot use spapr, needs to be fixed first */
++    qpci->bus.has_buggy_msi = TRUE;
 +
-+typedef struct QSPAPR_pci_host QSPAPR_pci_host;
-+typedef struct Qppc64_pseriesMachine Qppc64_pseriesMachine;
-+
-+struct QSPAPR_pci_host {
-+    QOSGraphObject obj;
-+    QPCIBusSPAPR pci;
-+};
-+
-+struct Qppc64_pseriesMachine {
-+    QOSGraphObject obj;
-+    QGuestAllocator alloc;
-+    QSPAPR_pci_host bridge;
-+};
-+
-+/* QSPAPR_pci_host */
-+
-+static QOSGraphObject *QSPAPR_host_get_device(void *obj, const char *device)
+     qpci->alloc = alloc;
+ 
+     qpci->bus.pio_readb = qpci_spapr_pio_readb;
+diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
+index 8257904..662ee7a 100644
+--- a/tests/libqos/pci.c
++++ b/tests/libqos/pci.c
+@@ -51,6 +51,20 @@ void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
+     }
+ }
+ 
++bool qpci_has_buggy_msi(QPCIDevice *dev)
 +{
-+    QSPAPR_pci_host *host = obj;
-+    if (!g_strcmp0(device, "pci-bus-spapr")) {
-+        return &host->pci.obj;
++    return dev->bus->has_buggy_msi;
++}
++
++bool qpci_check_buggy_msi(QPCIDevice *dev)
++{
++    if (qpci_has_buggy_msi(dev)) {
++        g_test_skip("Skipping due to incomplete support for MSI");
++        return true;
 +    }
-+    fprintf(stderr, "%s not present in QSPAPR_pci_host\n", device);
-+    g_assert_not_reached();
++    return false;
 +}
 +
-+static void qos_create_QSPAPR_host(QSPAPR_pci_host *host,
-+                                   QTestState *qts,
-+				   QGuestAllocator *alloc)
-+{
-+    host->obj.get_device = QSPAPR_host_get_device;
-+    qpci_init_spapr(&host->pci, qts, alloc);
-+}
+ static void qpci_device_set(QPCIDevice *dev, QPCIBus *bus, int devfn)
+ {
+     g_assert(dev);
+diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
+index 9fd521a..8e1d292 100644
+--- a/tests/libqos/pci.h
++++ b/tests/libqos/pci.h
+@@ -53,6 +53,7 @@ struct QPCIBus {
+     QTestState *qts;
+     uint16_t pio_alloc_ptr;
+     uint64_t mmio_alloc_ptr, mmio_limit;
++    bool has_buggy_msi; /* TRUE for spapr, FALSE for pci */
+ 
+ };
+ 
+@@ -81,6 +82,9 @@ void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
+ QPCIDevice *qpci_device_find(QPCIBus *bus, int devfn);
+ void qpci_device_init(QPCIDevice *dev, QPCIBus *bus, QPCIAddress *addr);
+ 
++bool qpci_has_buggy_msi(QPCIDevice *dev);
++bool qpci_check_buggy_msi(QPCIDevice *dev);
 +
-+/* ppc64/pseries machine */
-+
-+static void spapr_destructor(QOSGraphObject *obj)
-+{
-+    Qppc64_pseriesMachine *machine = (Qppc64_pseriesMachine *) obj;
-+    alloc_destroy(&machine->alloc);
-+}
-+
-+static void *spapr_get_driver(void *object, const char *interface)
-+{
-+    Qppc64_pseriesMachine *machine = object;
-+    if (!g_strcmp0(interface, "memory")) {
-+        return &machine->alloc;
-+    }
-+
-+    fprintf(stderr, "%s not present in ppc64/pseries\n", interface);
-+    g_assert_not_reached();
-+}
-+
-+static QOSGraphObject *spapr_get_device(void *obj, const char *device)
-+{
-+    Qppc64_pseriesMachine *machine = obj;
-+    if (!g_strcmp0(device, "spapr-pci-host-bridge")) {
-+        return &machine->bridge.obj;
-+    }
-+
-+    fprintf(stderr, "%s not present in ppc64/pseries\n", device);
-+    g_assert_not_reached();
-+}
-+
-+static void *qos_create_machine_spapr(QTestState *qts)
-+{
-+    Qppc64_pseriesMachine *machine = g_new0(Qppc64_pseriesMachine, 1);
-+    machine->obj.get_device = spapr_get_device;
-+    machine->obj.get_driver = spapr_get_driver;
-+    machine->obj.destructor = spapr_destructor;
-+    spapr_alloc_init(&machine->alloc, qts, ALLOC_NO_FLAGS);
-+
-+    qos_create_QSPAPR_host(&machine->bridge, qts, &machine->alloc);
-+
-+    return &machine->obj;
-+}
-+
-+static void spapr_machine_register_nodes(void)
-+{
-+    qos_node_create_machine("ppc64/pseries", qos_create_machine_spapr);
-+    qos_node_create_driver("spapr-pci-host-bridge", NULL);
-+    qos_node_contains("ppc64/pseries", "spapr-pci-host-bridge", NULL);
-+    qos_node_contains("spapr-pci-host-bridge", "pci-bus-spapr", NULL);
-+}
-+
-+libqos_init(spapr_machine_register_nodes);
-+
+ void qpci_device_enable(QPCIDevice *dev);
+ uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id);
+ void qpci_msix_enable(QPCIDevice *dev);
 -- 
 1.8.3.1
