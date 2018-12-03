@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEp-0000Po-76
+	(envelope-from <pbonzini@redhat.com>) id 1gTqEu-0000ZQ-BK
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEo-0004s2-8m
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47432)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqEp-0004tx-Tj
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52482)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEn-0004r8-Vu
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:22 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEp-0004t2-LW
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:23 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:45 +0100
-Message-Id: <1543851204-41186-33-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:32:46 +0100
+Message-Id: <1543851204-41186-34-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 32/71] tests/libqos: has_buggy_msi flag
+Subject: [Qemu-devel] [PATCH 33/71] tests/libqos: e1000e driver and
+ interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +29,356 @@ Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <l
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-The Qgraph framework makes any test using
-pci bus run the same function using pci-pci and
-pci-spapr bus. However, some tests are not ready to use
-the spapr bus, due to a MSI bug. Until it does not get
-fixed, this flag allows them to skip the test
+Add qgraph nodes for virtio-e1000e.
+It consumes a pci-bus, and it's directly used by tests
+(e1000e is pci based).
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/libqos/pci-pc.c    |  3 +++
- tests/libqos/pci-spapr.c |  3 +++
- tests/libqos/pci.c       | 14 ++++++++++++++
- tests/libqos/pci.h       |  4 ++++
- 4 files changed, 24 insertions(+)
+ tests/Makefile.include |   1 +
+ tests/libqos/e1000e.c  | 260 +++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/libqos/e1000e.h  |  53 ++++++++++
+ 3 files changed, 314 insertions(+)
+ create mode 100644 tests/libqos/e1000e.c
+ create mode 100644 tests/libqos/e1000e.h
 
-diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
-index 041bfed..4247cda 100644
---- a/tests/libqos/pci-pc.c
-+++ b/tests/libqos/pci-pc.c
-@@ -123,6 +123,9 @@ void qpci_init_pc(QPCIBusPC *qpci, QTestState *qts, QGuestAllocator *alloc)
- {
-     assert(qts);
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index ae8adb0..7d53a54 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -675,6 +675,7 @@ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virt
+ # Devices
+ qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
+ qos-test-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
++qos-test-obj-y += tests/libqos/e1000e.o
+ qos-test-obj-y += tests/libqos/sdhci.o
  
-+    /* tests can use pci-bus */
-+    qpci->bus.has_buggy_msi = FALSE;
+ # Machines
+diff --git a/tests/libqos/e1000e.c b/tests/libqos/e1000e.c
+new file mode 100644
+index 0000000..54d3898
+--- /dev/null
++++ b/tests/libqos/e1000e.c
+@@ -0,0 +1,260 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
 +
-     qpci->bus.pio_readb = qpci_pc_pio_readb;
-     qpci->bus.pio_readw = qpci_pc_pio_readw;
-     qpci->bus.pio_readl = qpci_pc_pio_readl;
-diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
-index 24f2c2c..502a0e5 100644
---- a/tests/libqos/pci-spapr.c
-+++ b/tests/libqos/pci-spapr.c
-@@ -155,6 +155,9 @@ void qpci_init_spapr(QPCIBusSPAPR *qpci, QTestState *qts,
- {
-     assert(qts);
- 
-+    /* tests cannot use spapr, needs to be fixed first */
-+    qpci->bus.has_buggy_msi = TRUE;
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "qemu-common.h"
++#include "libqos/pci-pc.h"
++#include "qemu/sockets.h"
++#include "qemu/iov.h"
++#include "qemu/bitops.h"
++#include "libqos/malloc.h"
++#include "libqos/qgraph.h"
++#include "e1000e.h"
 +
-     qpci->alloc = alloc;
- 
-     qpci->bus.pio_readb = qpci_spapr_pio_readb;
-diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
-index 8257904..662ee7a 100644
---- a/tests/libqos/pci.c
-+++ b/tests/libqos/pci.c
-@@ -51,6 +51,20 @@ void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
-     }
- }
- 
-+bool qpci_has_buggy_msi(QPCIDevice *dev)
++#define E1000E_IMS      (0x00d0)
++
++#define E1000E_STATUS   (0x0008)
++#define E1000E_STATUS_LU BIT(1)
++#define E1000E_STATUS_ASDV1000 BIT(9)
++
++#define E1000E_CTRL     (0x0000)
++#define E1000E_CTRL_RESET BIT(26)
++
++#define E1000E_RCTL     (0x0100)
++#define E1000E_RCTL_EN  BIT(1)
++#define E1000E_RCTL_UPE BIT(3)
++#define E1000E_RCTL_MPE BIT(4)
++
++#define E1000E_RFCTL     (0x5008)
++#define E1000E_RFCTL_EXTEN  BIT(15)
++
++#define E1000E_TCTL     (0x0400)
++#define E1000E_TCTL_EN  BIT(1)
++
++#define E1000E_CTRL_EXT             (0x0018)
++#define E1000E_CTRL_EXT_DRV_LOAD    BIT(28)
++#define E1000E_CTRL_EXT_TXLSFLOW    BIT(22)
++
++#define E1000E_IVAR                 (0x00E4)
++#define E1000E_IVAR_TEST_CFG        ((E1000E_RX0_MSG_ID << 0)    | BIT(3)  | \
++                                     (E1000E_TX0_MSG_ID << 8)    | BIT(11) | \
++                                     (E1000E_OTHER_MSG_ID << 16) | BIT(19) | \
++                                     BIT(31))
++
++#define E1000E_RING_LEN             (0x1000)
++
++#define E1000E_TDBAL    (0x3800)
++
++#define E1000E_TDBAH    (0x3804)
++#define E1000E_TDH      (0x3810)
++
++#define E1000E_RDBAL    (0x2800)
++#define E1000E_RDBAH    (0x2804)
++#define E1000E_RDH      (0x2810)
++
++#define E1000E_TXD_LEN              (16)
++#define E1000E_RXD_LEN              (16)
++
++static void e1000e_macreg_write(QE1000E *d, uint32_t reg, uint32_t val)
 +{
-+    return dev->bus->has_buggy_msi;
++    QE1000E_PCI *d_pci = container_of(d, QE1000E_PCI, e1000e);
++    qpci_io_writel(&d_pci->pci_dev, d_pci->mac_regs, reg, val);
 +}
 +
-+bool qpci_check_buggy_msi(QPCIDevice *dev)
++static uint32_t e1000e_macreg_read(QE1000E *d, uint32_t reg)
 +{
-+    if (qpci_has_buggy_msi(dev)) {
-+        g_test_skip("Skipping due to incomplete support for MSI");
-+        return true;
++    QE1000E_PCI *d_pci = container_of(d, QE1000E_PCI, e1000e);
++    return qpci_io_readl(&d_pci->pci_dev, d_pci->mac_regs, reg);
++}
++
++void e1000e_tx_ring_push(QE1000E *d, void *descr)
++{
++    uint32_t tail = e1000e_macreg_read(d, E1000E_TDT);
++    uint32_t len = e1000e_macreg_read(d, E1000E_TDLEN) / E1000E_TXD_LEN;
++
++    memwrite(d->tx_ring + tail * E1000E_TXD_LEN, descr, E1000E_TXD_LEN);
++    e1000e_macreg_write(d, E1000E_TDT, (tail + 1) % len);
++
++    /* Read WB data for the packet transmitted */
++    memread(d->tx_ring + tail * E1000E_TXD_LEN, descr, E1000E_TXD_LEN);
++}
++
++void e1000e_rx_ring_push(QE1000E *d, void *descr)
++{
++    uint32_t tail = e1000e_macreg_read(d, E1000E_RDT);
++    uint32_t len = e1000e_macreg_read(d, E1000E_RDLEN) / E1000E_RXD_LEN;
++
++    memwrite(d->rx_ring + tail * E1000E_RXD_LEN, descr, E1000E_RXD_LEN);
++    e1000e_macreg_write(d, E1000E_RDT, (tail + 1) % len);
++
++    /* Read WB data for the packet received */
++    memread(d->rx_ring + tail * E1000E_RXD_LEN, descr, E1000E_RXD_LEN);
++}
++
++static void e1000e_foreach_callback(QPCIDevice *dev, int devfn, void *data)
++{
++    QPCIDevice *res = data;
++    memcpy(res, dev, sizeof(QPCIDevice));
++    g_free(dev);
++}
++
++void e1000e_wait_isr(QE1000E *d, uint16_t msg_id)
++{
++    QE1000E_PCI *d_pci = container_of(d, QE1000E_PCI, e1000e);
++    guint64 end_time = g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
++
++    do {
++        if (qpci_msix_pending(&d_pci->pci_dev, msg_id)) {
++            return;
++        }
++        clock_step(10000);
++    } while (g_get_monotonic_time() < end_time);
++
++    g_error("Timeout expired");
++}
++
++static void e1000e_pci_destructor(QOSGraphObject *obj)
++{
++    QE1000E_PCI *epci = (QE1000E_PCI *) obj;
++    qpci_iounmap(&epci->pci_dev, epci->mac_regs);
++    qpci_msix_disable(&epci->pci_dev);
++}
++
++static void e1000e_pci_start_hw(QOSGraphObject *obj)
++{
++    QE1000E_PCI *d = (QE1000E_PCI *) obj;
++    uint32_t val;
++
++    /* Enable the device */
++    qpci_device_enable(&d->pci_dev);
++
++    /* Reset the device */
++    val = e1000e_macreg_read(&d->e1000e, E1000E_CTRL);
++    e1000e_macreg_write(&d->e1000e, E1000E_CTRL, val | E1000E_CTRL_RESET);
++
++    /* Enable and configure MSI-X */
++    qpci_msix_enable(&d->pci_dev);
++    e1000e_macreg_write(&d->e1000e, E1000E_IVAR, E1000E_IVAR_TEST_CFG);
++
++    /* Check the device status - link and speed */
++    val = e1000e_macreg_read(&d->e1000e, E1000E_STATUS);
++    g_assert_cmphex(val & (E1000E_STATUS_LU | E1000E_STATUS_ASDV1000),
++        ==, E1000E_STATUS_LU | E1000E_STATUS_ASDV1000);
++
++    /* Initialize TX/RX logic */
++    e1000e_macreg_write(&d->e1000e, E1000E_RCTL, 0);
++    e1000e_macreg_write(&d->e1000e, E1000E_TCTL, 0);
++
++    /* Notify the device that the driver is ready */
++    val = e1000e_macreg_read(&d->e1000e, E1000E_CTRL_EXT);
++    e1000e_macreg_write(&d->e1000e, E1000E_CTRL_EXT,
++        val | E1000E_CTRL_EXT_DRV_LOAD | E1000E_CTRL_EXT_TXLSFLOW);
++
++    e1000e_macreg_write(&d->e1000e, E1000E_TDBAL,
++                           (uint32_t) d->e1000e.tx_ring);
++    e1000e_macreg_write(&d->e1000e, E1000E_TDBAH,
++                           (uint32_t) (d->e1000e.tx_ring >> 32));
++    e1000e_macreg_write(&d->e1000e, E1000E_TDLEN, E1000E_RING_LEN);
++    e1000e_macreg_write(&d->e1000e, E1000E_TDT, 0);
++    e1000e_macreg_write(&d->e1000e, E1000E_TDH, 0);
++
++    /* Enable transmit */
++    e1000e_macreg_write(&d->e1000e, E1000E_TCTL, E1000E_TCTL_EN);
++    e1000e_macreg_write(&d->e1000e, E1000E_RDBAL,
++                           (uint32_t)d->e1000e.rx_ring);
++    e1000e_macreg_write(&d->e1000e, E1000E_RDBAH,
++                           (uint32_t)(d->e1000e.rx_ring >> 32));
++    e1000e_macreg_write(&d->e1000e, E1000E_RDLEN, E1000E_RING_LEN);
++    e1000e_macreg_write(&d->e1000e, E1000E_RDT, 0);
++    e1000e_macreg_write(&d->e1000e, E1000E_RDH, 0);
++
++    /* Enable receive */
++    e1000e_macreg_write(&d->e1000e, E1000E_RFCTL, E1000E_RFCTL_EXTEN);
++    e1000e_macreg_write(&d->e1000e, E1000E_RCTL, E1000E_RCTL_EN  |
++                                        E1000E_RCTL_UPE |
++                                        E1000E_RCTL_MPE);
++
++    /* Enable all interrupts */
++    e1000e_macreg_write(&d->e1000e, E1000E_IMS, 0xFFFFFFFF);
++
++}
++
++static void *e1000e_pci_get_driver(void *obj, const char *interface)
++{
++    QE1000E_PCI *epci = obj;
++    if (!g_strcmp0(interface, "e1000e-if")) {
++        return &epci->e1000e;
 +    }
-+    return false;
++
++    /* implicit contains */
++    if (!g_strcmp0(interface, "pci-device")) {
++        return &epci->pci_dev;
++    }
++
++    fprintf(stderr, "%s not present in e1000e\n", interface);
++    g_assert_not_reached();
 +}
 +
- static void qpci_device_set(QPCIDevice *dev, QPCIBus *bus, int devfn)
- {
-     g_assert(dev);
-diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
-index 9fd521a..8e1d292 100644
---- a/tests/libqos/pci.h
-+++ b/tests/libqos/pci.h
-@@ -53,6 +53,7 @@ struct QPCIBus {
-     QTestState *qts;
-     uint16_t pio_alloc_ptr;
-     uint64_t mmio_alloc_ptr, mmio_limit;
-+    bool has_buggy_msi; /* TRUE for spapr, FALSE for pci */
- 
- };
- 
-@@ -81,6 +82,9 @@ void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
- QPCIDevice *qpci_device_find(QPCIBus *bus, int devfn);
- void qpci_device_init(QPCIDevice *dev, QPCIBus *bus, QPCIAddress *addr);
- 
-+bool qpci_has_buggy_msi(QPCIDevice *dev);
-+bool qpci_check_buggy_msi(QPCIDevice *dev);
++static void *e1000e_pci_create(void *pci_bus, QGuestAllocator *alloc,
++                               void *addr)
++{
++    QE1000E_PCI *d = g_new0(QE1000E_PCI, 1);
++    QPCIBus *bus = pci_bus;
++    QPCIAddress *address = addr;
 +
- void qpci_device_enable(QPCIDevice *dev);
- uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id);
- void qpci_msix_enable(QPCIDevice *dev);
++    qpci_device_foreach(bus, address->vendor_id, address->device_id,
++                        e1000e_foreach_callback, &d->pci_dev);
++
++    /* Map BAR0 (mac registers) */
++    d->mac_regs = qpci_iomap(&d->pci_dev, 0, NULL);
++
++    /* Allocate and setup TX ring */
++    d->e1000e.tx_ring = guest_alloc(alloc, E1000E_RING_LEN);
++    g_assert(d->e1000e.tx_ring != 0);
++
++    /* Allocate and setup RX ring */
++    d->e1000e.rx_ring = guest_alloc(alloc, E1000E_RING_LEN);
++    g_assert(d->e1000e.rx_ring != 0);
++
++    d->obj.get_driver = e1000e_pci_get_driver;
++    d->obj.start_hw = e1000e_pci_start_hw;
++    d->obj.destructor = e1000e_pci_destructor;
++
++    return &d->obj;
++}
++
++static void e1000e_register_nodes(void)
++{
++    QPCIAddress addr = {
++        .vendor_id = 0x8086,
++        .device_id = 0x10D3,
++    };
++
++    /* FIXME: every test using this node needs to setup a -netdev socket,id=hs0
++     * otherwise QEMU is not going to start */
++    QOSGraphEdgeOptions opts = {
++        .extra_device_opts = "netdev=hs0",
++    };
++    add_qpci_address(&opts, &addr);
++
++    qos_node_create_driver("e1000e", e1000e_pci_create);
++    qos_node_consumes("e1000e", "pci-bus", &opts);
++}
++
++libqos_init(e1000e_register_nodes);
+diff --git a/tests/libqos/e1000e.h b/tests/libqos/e1000e.h
+new file mode 100644
+index 0000000..9d37094
+--- /dev/null
++++ b/tests/libqos/e1000e.h
+@@ -0,0 +1,53 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#ifndef QGRAPH_E1000E
++#define QGRAPH_E1000E
++
++#include "libqos/qgraph.h"
++#include "pci.h"
++
++#define E1000E_RX0_MSG_ID           (0)
++#define E1000E_TX0_MSG_ID           (1)
++#define E1000E_OTHER_MSG_ID         (2)
++
++#define E1000E_TDLEN    (0x3808)
++#define E1000E_TDT      (0x3818)
++#define E1000E_RDLEN    (0x2808)
++#define E1000E_RDT      (0x2818)
++
++typedef struct QE1000E QE1000E;
++typedef struct QE1000E_PCI QE1000E_PCI;
++
++struct QE1000E {
++    uint64_t tx_ring;
++    uint64_t rx_ring;
++};
++
++struct QE1000E_PCI {
++    QOSGraphObject obj;
++    QPCIDevice pci_dev;
++    QPCIBar mac_regs;
++    QE1000E e1000e;
++};
++
++void e1000e_wait_isr(QE1000E *d, uint16_t msg_id);
++void e1000e_tx_ring_push(QE1000E *d, void *descr);
++void e1000e_rx_ring_push(QE1000E *d, void *descr);
++
++#endif
 -- 
 1.8.3.1
