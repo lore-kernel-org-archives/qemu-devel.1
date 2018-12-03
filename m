@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEZ-0008KG-Sg
+	(envelope-from <berrange@redhat.com>) id 1gTqEZ-0008KI-TH
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqEW-0004TH-CP
+	(envelope-from <berrange@redhat.com>) id 1gTqEW-0004T1-8I
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41224)
+Received: from mx1.redhat.com ([209.132.183.28]:17659)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqEW-0004SI-4O
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gTqEV-0004S6-VW
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:04 -0500
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:34 +0100
-Message-Id: <1543851204-41186-22-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 21/71] tests/libqos: x86_64/pc machine node
+Date: Mon, 3 Dec 2018 15:33:57 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181203153357.GB7141@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <1543845937-300-1-git-send-email-thuth@redhat.com>
+	<1543845937-300-2-git-send-email-thuth@redhat.com>
+	<20181203141611.GG8870@redhat.com>
+	<bbaa2b99-9503-3c35-f933-01c0e0cb0368@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <bbaa2b99-9503-3c35-f933-01c0e0cb0368@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-4.0 1/7] configure: Add a test for the
+ minimum compiler version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,151 +32,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, pbonzini@redhat.com, peter.maydell@linaro.org
 
-From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+On Mon, Dec 03, 2018 at 03:27:35PM +0100, Thomas Huth wrote:
+> On 2018-12-03 15:16, Daniel P. Berrang=C3=A9 wrote:
+> > On Mon, Dec 03, 2018 at 03:05:31PM +0100, Thomas Huth wrote:
+> >> So far we only had implicit requirements for the minimum compiler ve=
+rsion,
+> >> e.g. we require at least GCC 4.1 for the support of atomics. However=
+,
+> >> such old compiler versions are not tested anymore by the developers,=
+ so
+> >> they are not really supported anymore. Since we recently declared ex=
+plicitly
+> >> what platforms we intend to support, we can also get more explicit o=
+n the
+> >> compiler version now. The supported distributions use the following =
+version
+> >> of GCC:
+> >>
+> >>       RHEL-7: 4.8.5
+> >>       Debian (Stretch): 6.3.0
+> >>       Debian (Jessie): 4.8.4
+> >>       OpenBSD (ports): 4.9.4
+> >>       FreeBSD (ports): 8.2.0
+> >>       OpenSUSE Leap 15: 7.3.1
+> >>       Ubuntu (Xenial): 5.3.1
+> >>       macOS (Homebrew): 8.2.0
+> >>
+> >> So we can safely assume GCC 4.8 these days. For Clang, the situation=
+ is
+> >> a little bit more ambiguous, since it is sometimes not available in =
+the
+> >> main distros but rather third party repositories. At least Debian Je=
+ssie
+> >> uses version 3.5, and EPEL7 for RHEL7 uses 3.4, so let's use 3.4 as
+> >> minimum Clang version now - we still can adjust this later if necess=
+ary.
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>  configure | 19 +++++++++++++++++++
+> >>  1 file changed, 19 insertions(+)
+> >>
+> >> diff --git a/configure b/configure
+> >> index 0a3c6a7..f1e305e 100755
+> >> --- a/configure
+> >> +++ b/configure
+> >> @@ -1840,6 +1840,25 @@ if test "$bogus_os" =3D "yes"; then
+> >>      error_exit "Unrecognized host OS (uname -s reports '$(uname -s)=
+')"
+> >>  fi
+> >> =20
+> >> +# Check whether the compiler matches our minimum requirements:
+> >> +cat > $TMPC << EOF
+> >> +#if defined(__clang_major__) && defined(__clang_minor__)
+> >> +# if __clang_major__ < 3 || (__clang_major__ =3D=3D 3 && __clang_mi=
+nor__ < 4)
+> >> +#  error You need at least Clang v3.4 to compile QEMU
+> >> +# endif
+> >=20
+> > NB although this will succeed, it is not technically checking the
+> > right thing on macOS platforms as their clang used a completely
+> > different numbering scheme. It just happens to have larger numbers
+> > than upstream clang, so we'll always succeed.
+>=20
+> Does that only apply to the version string that is reported by "clang
+> --version" or does it also apply to the __clang_major/minor__ macros?
+>=20
+> In the latter case, I think I could add a comment to the patch here.
+>=20
+> I'm also not sure whether the LLVM version necessarily matches the Clan=
+g
+> version? In older versions, you can also see "4.2 (clang-425.0.28)
+> (based on LLVM 3.2svn)" in the tables there...
 
-Add pc machine for the x86_64 QEMU binary. This machine contains an i440FX-pcihost
-driver, that contains itself a pci-bus-pc that produces the pci-bus interface.
+The first number in the clang version string is what we're interested
+in, and that matches the XCode version number, and is what's reflected
+in the __clang_major/minor__ macros.  The the LLVM version in the table
+reflects what upstream release they forked the XCode version from.
 
-Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- tests/Makefile.include           |   3 ++
- tests/libqos/x86_64_pc-machine.c | 110 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 113 insertions(+)
- create mode 100644 tests/libqos/x86_64_pc-machine.c
+> > IOW, to require clang >=3D 3.4 on macOS, we would need to require
+> > their version >=3D 5.1
+>=20
+> If they also messed up the macros, I think we likely have a problem the
+> other way round: What upstream Clang version corresponds to the Apple
+> Clang version 3.4 ? ... but if I interpret the old table right, they
+> just started the confusion with 5.0, so I think the check above should
+> still be fine.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 93f31e8..1266109 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -679,6 +679,9 @@ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virt
- qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
- qos-test-obj-y += $(libqos-pc-obj-y)
- 
-+# Machines
-+qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
-+
- check-unit-y += tests/test-qgraph$(EXESUF)
- tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
- 
-diff --git a/tests/libqos/x86_64_pc-machine.c b/tests/libqos/x86_64_pc-machine.c
-new file mode 100644
-index 0000000..5834c01
---- /dev/null
-+++ b/tests/libqos/x86_64_pc-machine.c
-@@ -0,0 +1,110 @@
-+/*
-+ * libqos driver framework
-+ *
-+ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License version 2 as published by the Free Software Foundation.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "libqos/qgraph.h"
-+#include "pci-pc.h"
-+#include "malloc-pc.h"
-+
-+typedef struct QX86_64_PCMachine QX86_64_PCMachine;
-+typedef struct i440FX_pcihost i440FX_pcihost;
-+typedef struct QSDHCI_PCI  QSDHCI_PCI;
-+
-+struct i440FX_pcihost {
-+    QOSGraphObject obj;
-+    QPCIBusPC pci;
-+};
-+
-+struct QX86_64_PCMachine {
-+    QOSGraphObject obj;
-+    QGuestAllocator alloc;
-+    i440FX_pcihost bridge;
-+};
-+
-+/* i440FX_pcihost */
-+
-+static QOSGraphObject *i440FX_host_get_device(void *obj, const char *device)
-+{
-+    i440FX_pcihost *host = obj;
-+    if (!g_strcmp0(device, "pci-bus-pc")) {
-+        return &host->pci.obj;
-+    }
-+    fprintf(stderr, "%s not present in i440FX-pcihost\n", device);
-+    g_assert_not_reached();
-+}
-+
-+static void qos_create_i440FX_host(i440FX_pcihost *host,
-+				   QTestState *qts,
-+                                   QGuestAllocator *alloc)
-+{
-+    host->obj.get_device = i440FX_host_get_device;
-+    qpci_init_pc(&host->pci, qts, alloc);
-+}
-+
-+/* x86_64/pc machine */
-+
-+static void pc_destructor(QOSGraphObject *obj)
-+{
-+    QX86_64_PCMachine *machine = (QX86_64_PCMachine *) obj;
-+    alloc_destroy(&machine->alloc);
-+}
-+
-+static void *pc_get_driver(void *object, const char *interface)
-+{
-+    QX86_64_PCMachine *machine = object;
-+    if (!g_strcmp0(interface, "memory")) {
-+        return &machine->alloc;
-+    }
-+
-+    fprintf(stderr, "%s not present in x86_64/pc\n", interface);
-+    g_assert_not_reached();
-+}
-+
-+static QOSGraphObject *pc_get_device(void *obj, const char *device)
-+{
-+    QX86_64_PCMachine *machine = obj;
-+    if (!g_strcmp0(device, "i440FX-pcihost")) {
-+        return &machine->bridge.obj;
-+    }
-+
-+    fprintf(stderr, "%s not present in x86_64/pc\n", device);
-+    g_assert_not_reached();
-+}
-+
-+static void *qos_create_machine_pc(QTestState *qts)
-+{
-+    QX86_64_PCMachine *machine = g_new0(QX86_64_PCMachine, 1);
-+    machine->obj.get_device = pc_get_device;
-+    machine->obj.get_driver = pc_get_driver;
-+    machine->obj.destructor = pc_destructor;
-+    pc_alloc_init(&machine->alloc, qts, ALLOC_NO_FLAGS);
-+    qos_create_i440FX_host(&machine->bridge, qts, &machine->alloc);
-+
-+    return &machine->obj;
-+}
-+
-+static void pc_machine_register_nodes(void)
-+{
-+    qos_node_create_machine("x86_64/pc", qos_create_machine_pc);
-+    qos_node_create_driver("i440FX-pcihost", NULL);
-+    qos_node_contains("x86_64/pc", "i440FX-pcihost", NULL);
-+    qos_node_contains("i440FX-pcihost", "pci-bus-pc", NULL);
-+}
-+
-+libqos_init(pc_machine_register_nodes);
--- 
-1.8.3.1
+I think you're mis-reading it. There is  no Apple Clang version 3.4 - at
+least not in this table.
+
+The earliest version Apple Clang version is 5.0 (in XCode 5.0.0), and
+that corresponds to upstream CLang version 3.3
+
+Effectively what this means is that we need a separate check for Apple's
+version of CLang. We can't simply use __apple__ as that would fire if
+someone had built upstream clang on macOS. Instead we need to toggle
+on  __apple_build_version__ which is specific to Apple's fork
+
+ #if defined(__clang_major__) && defined(__clang_minor__)
+ #  ifdef __apple_build_version__
+ #    if __clang_major__ < 5 || (__clang_major__ =3D=3D 5 && __clang_mino=
+r__ < 1)
+ #      error You need at least XCode CLang v5.1 to compile QEMU
+ #    endif
+ #  else
+ #    if __clang_major__ < 3 || (__clang_major__ =3D=3D 3 && __clang_mino=
+r__ < 4)
+ #      error You need at least Clang v3.4 to compile QEMU
+ #    endif
+ #  endif
+ ....gcc....
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
