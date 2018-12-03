@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqE3-0007pf-2a
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:33:37 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqE7-0007uP-TF
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:33:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqDy-0003oG-04
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:33:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40712)
+	(envelope-from <pbonzini@redhat.com>) id 1gTqE6-0003zL-Ou
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:33:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33110)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqDx-0003mL-Ox
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:33:29 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqE6-0003xz-Ge
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:33:38 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:13 +0100
-Message-Id: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:32:18 +0100
+Message-Id: <1543851204-41186-6-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
+References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-4.0 00/71] qtest: qgraph driver framework
+Subject: [Qemu-devel] [PATCH 05/71] vhost-net: revamp configure logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,275 +29,236 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Thomas Huth <thuth@redhat.com>
 
-Patches 1-14 are actually a refactoring of vhost and vhost-user-test so
-that it can be "qtested" on all targets that support virtio-net.
+Detect all invalid configurations (e.g. mingw32 with vhost-user,
+non-Linux with vhost-kernel).  As a collateral benefit, all vhost-kernel
+backends can be now disabled if one wants to reduce the attack surface.
 
-Patches 15-18 are other small refactorings to the libqos library and fixe=
-s
-to the Makefile.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ configure                 | 89 +++++++++++++++++++++++++++++++----------=
+------
+ hw/virtio/Makefile.objs   |  4 +--
+ hw/virtio/vhost-backend.c |  4 +--
+ 3 files changed, 63 insertions(+), 34 deletions(-)
 
-Patch 19 is the framework, including unit tests, while the rest is conver=
-sions
-of existing tests.  We tried to pick tests that used a mix of features of
-qtest, and that cover as many use cases as possible within qgraph.=20
-In particular:
-
-- sdhci-test was the motivating example for the duplication between
-  PCI and MMIO versions of the same devices, so it come first
-
-- all virtio tests were converted, since they also have both MMIO and
-  PCI variants and they taught us a lot about modeling devices within
-  qgraph
-
-- all PCI devices that had "nop" tests only were converted, so that they
-  can avoid defining their copy of the test, and can instead use a
-  common test
-
-- finally, three more PCI devices were converted as an example - e1000e,
-  nvme and megasas
-
-This submission includes quite a few changes and cleanups that we did
-not manage to complete before Emanuele restarted classes, but this
-is almost entirely his baby; don't be fooled by the number of patches
-authored by him vs. myself.  I have noted my changes to the framework
-in the commit message to patch 19, to help people that followed the
-previous submissions; apart from that my changes consist of porting
-vhost-user-test and turning the nop tests into generic PCI and virtio
-tests (even though Emanuele had done the conversion to qgraph, he had
-left the tests in the nodes due to lack of time).
-
-Thanks,
-
-Paolo
-
-Based-on: <1543513531-1151-1-git-send-email-pbonzini@redhat.com>
-
-Emanuele Giuseppe Esposito (45):
-  tests/libqos: introduce virtio_start_device
-  tests/libqos: rename qpci_init_pc and qpci_init_spapr functions
-  tests: qgraph API for the qtest driver framework
-  tests/libqos: pci-pc driver and interface nodes
-  tests/libqos: x86_64/pc machine node
-  tests/libqos: sdhci driver and interface nodes
-  tests/libqos: arm/raspi2 machine node
-  tests/libqos: arm/smdkc210 machine node
-  tests/libqos: arm/sabrelite machine node
-  tests/libqos: arm/xilinx-zynq-a9 machine node
-  tests/libqos: aarch64/xlnx-zcu102 machine node
-  qos-test: sdhci test node
-  tests/libqos: pci-spapr driver and interface nodes
-  tests/qgraph: ppc64/pseries machine node
-  tests/libqos: has_buggy_msi flag
-  tests/libqos: e1000e driver and interface nodes
-  qos-test: e1000e test node
-  tests/libqos: virtio-pci driver and interface nodes
-  tests/libqos: virtio-mmio driver and interface nodes
-  tests/libqos: arm/virt machine node
-  tests/libqos: virtio-serial driver and interface nodes
-  qos-test: virtio-console and virtio-serial test node
-  tests/libqos: virtio-9p driver and interface nodes
-  qos-test: virtio-9p test node
-  tests/libqos: virtio-balloon driver and interface nodes
-  tests/qgraph: remove virtio-balloon-test
-  tests/libqos: virtio-rng driver and interface nodes
-  qos-test: virtio-rng test node
-  tests/libqos: virtio-blk driver and interface nodes
-  tests/libqos: virtio-net driver and interface nodes
-  qos-test: virtio-net test node
-  tests/libqos: virtio-scsi driver and interface nodes
-  qos-test: virtio-scsi test node
-  qos-test: ac97 test node
-  qos-test: tpci200 test node
-  qos-test: ipoctal232 test node
-  qos-test: ne2k_pci test node
-  qos-test: nvme test node
-  qos-test: pcnet test node
-  qos-test: spapr-phb test node
-  qos-test: usb-hcd-ohci test node
-  qos-test: vmxnet3 test node
-  qos-test: es1370 test node
-  qos-test: eepro100 test node
-  qos-test: e1000 test node
-
-Paolo Bonzini (26):
-  vhost-net: move stubs to a separate file
-  vhost-net-user: add stubs for when no virtio-net device is present
-  vhost: restrict Linux dependency to kernel vhost
-  vhost-net: compile it on all targets that have virtio-net.
-  vhost-net: revamp configure logic
-  vhost-user-test: use g_cond_broadcast
-  vhost-user-test: signal data_cond when s->rings changes
-  vhost-user: support cross-endian vnet headers
-  vhost-user-test: support VHOST_USER_PROTOCOL_F_CROSS_ENDIAN
-  vhost-user-test: skip if there is no memory at address 0
-  vhost-user-test: reduce usage of global_qtest
-  vhost-user-test: create a main loop per TestServer
-  vhost-user-test: small changes to init_hugepagefs
-  vhost-user-test: create a temporary directory per TestServer
-  tests: remove rule for nonexisting qdev-monitor-test
-  tests/libqos: embed allocators instead of malloc-ing them
-  tests/qgraph: add generic PCI testcases
-  tests/libqos: remove global_qtest from virtio endianness checks
-  tests/qgraph: add generic virtio testcases
-  qos-test: virtio-blk test node
-  tests/libqos: support multiqueue for virtio-net
-  vhost-user-test: always use 256 MiB of guest memory
-  qos-test: vhost-user test node
-  tests/libqos: remove pre-qgraph QVirtioPCIDevice API
-  tests: move virtio entirely to qos-test
-  qos-test: megasas test node
-
- backends/Makefile.objs                     |   5 +-
- configure                                  | 104 ++--
- default-configs/virtio.mak                 |   4 +-
- hw/net/Makefile.objs                       |   4 +-
- hw/net/vhost_net-stub.c                    |  95 ++++
- hw/net/vhost_net.c                         |  78 +--
- hw/virtio/Makefile.objs                    |   5 +-
- hw/virtio/vhost-backend.c                  |  11 +-
- include/exec/poison.h                      |   1 -
- include/qemu/module.h                      |   2 +
- net/Makefile.objs                          |   4 +-
- net/net.c                                  |   2 +-
- net/vhost-user-stub.c                      |  23 +
- net/vhost-user.c                           |  13 +
- tests/Makefile.include                     | 133 +++--
- tests/ac97-test.c                          |  47 +-
- tests/ahci-test.c                          |   6 +-
- tests/drive_del-test.c                     |  25 +-
- tests/e1000-test.c                         |  64 ++-
- tests/e1000e-test.c                        | 358 +++-----------
- tests/eepro100-test.c                      |  65 ++-
- tests/es1370-test.c                        |  46 +-
- tests/i440fx-test.c                        |   2 +-
- tests/ide-test.c                           |  19 +-
- tests/ipoctal232-test.c                    |  35 +-
- tests/libqos/aarch64-xlnx-zcu102-machine.c |  93 ++++
- tests/libqos/ahci.c                        |   2 +-
- tests/libqos/arm-raspi2-machine.c          |  91 ++++
- tests/libqos/arm-sabrelite-machine.c       |  91 ++++
- tests/libqos/arm-smdkc210-machine.c        |  91 ++++
- tests/libqos/arm-virt-machine.c            |  90 ++++
- tests/libqos/arm-xilinx-zynq-a9-machine.c  |  94 ++++
- tests/libqos/e1000e.c                      | 260 ++++++++++
- tests/libqos/e1000e.h                      |  53 ++
- tests/libqos/libqos-pc.c                   |   5 +-
- tests/libqos/libqos-spapr.c                |   5 +-
- tests/libqos/libqos.c                      |  13 +-
- tests/libqos/libqos.h                      |  13 +-
- tests/libqos/malloc-generic.c              |  39 --
- tests/libqos/malloc-generic.h              |  21 -
- tests/libqos/malloc-pc.c                   |  18 +-
- tests/libqos/malloc-pc.h                   |   4 +-
- tests/libqos/malloc-spapr.c                |  19 +-
- tests/libqos/malloc-spapr.h                |   4 +-
- tests/libqos/malloc.c                      |  41 +-
- tests/libqos/malloc.h                      |  21 +-
- tests/libqos/pci-pc.c                      |  86 ++--
- tests/libqos/pci-pc.h                      |  22 +-
- tests/libqos/pci-spapr.c                   | 119 +++--
- tests/libqos/pci-spapr.h                   |  26 +-
- tests/libqos/pci.c                         |  46 +-
- tests/libqos/pci.h                         |  16 +
- tests/libqos/ppc64_pseries-machine.c       | 111 +++++
- tests/libqos/qgraph.c                      | 760 +++++++++++++++++++++++=
-++++++
- tests/libqos/qgraph.h                      | 575 ++++++++++++++++++++++
- tests/libqos/qgraph_internal.h             | 264 ++++++++++
- tests/libqos/sdhci.c                       | 163 +++++++
- tests/libqos/sdhci.h                       |  70 +++
- tests/libqos/tpci200.c                     |  65 +++
- tests/libqos/virtio-9p.c                   | 173 +++++++
- tests/libqos/virtio-9p.h                   |  42 ++
- tests/libqos/virtio-balloon.c              | 113 +++++
- tests/libqos/virtio-balloon.h              |  39 ++
- tests/libqos/virtio-blk.c                  | 124 +++++
- tests/libqos/virtio-blk.h                  |  40 ++
- tests/libqos/virtio-mmio.c                 | 116 +++--
- tests/libqos/virtio-mmio.h                 |   6 +-
- tests/libqos/virtio-net.c                  | 195 ++++++++
- tests/libqos/virtio-net.h                  |  41 ++
- tests/libqos/virtio-pci.c                  | 187 ++++---
- tests/libqos/virtio-pci.h                  |  18 +-
- tests/libqos/virtio-rng.c                  | 110 +++++
- tests/libqos/virtio-rng.h                  |  39 ++
- tests/libqos/virtio-scsi.c                 | 117 +++++
- tests/libqos/virtio-scsi.h                 |  39 ++
- tests/libqos/virtio-serial.c               | 110 +++++
- tests/libqos/virtio-serial.h               |  39 ++
- tests/libqos/virtio.c                      |  24 +-
- tests/libqos/virtio.h                      |  11 +-
- tests/libqos/x86_64_pc-machine.c           | 110 +++++
- tests/libqtest.h                           |   6 +
- tests/megasas-test.c                       |  80 +--
- tests/ne2000-test.c                        |  46 +-
- tests/nvme-test.c                          |  78 +--
- tests/pci-test.c                           |  25 +
- tests/pcnet-test.c                         |  46 +-
- tests/q35-test.c                           |   4 +-
- tests/qos-test.c                           | 470 ++++++++++++++++++
- tests/rtas-test.c                          |   2 +-
- tests/rtl8139-test.c                       |   2 +-
- tests/sdhci-test.c                         | 185 +------
- tests/spapr-phb-test.c                     |  32 +-
- tests/tco-test.c                           |   2 +-
- tests/test-qgraph.c                        | 434 ++++++++++++++++
- tests/tpci200-test.c                       |  31 --
- tests/usb-hcd-ehci-test.c                  |   2 +-
- tests/usb-hcd-ohci-test.c                  |  54 +-
- tests/vhost-user-test.c                    | 516 +++++++++-----------
- tests/virtio-9p-test.c                     | 220 +++------
- tests/virtio-balloon-test.c                |  33 --
- tests/virtio-blk-test.c                    | 471 +++++++-----------
- tests/virtio-console-test.c                |  38 --
- tests/virtio-net-test.c                    | 167 ++-----
- tests/virtio-rng-test.c                    |  27 +-
- tests/virtio-scsi-test.c                   | 145 +++---
- tests/virtio-serial-test.c                 |  27 +-
- tests/virtio-test.c                        |  25 +
- tests/vmxnet3-test.c                       |  46 +-
- 108 files changed, 7084 insertions(+), 2365 deletions(-)
- create mode 100644 hw/net/vhost_net-stub.c
- create mode 100644 net/vhost-user-stub.c
- create mode 100644 tests/libqos/aarch64-xlnx-zcu102-machine.c
- create mode 100644 tests/libqos/arm-raspi2-machine.c
- create mode 100644 tests/libqos/arm-sabrelite-machine.c
- create mode 100644 tests/libqos/arm-smdkc210-machine.c
- create mode 100644 tests/libqos/arm-virt-machine.c
- create mode 100644 tests/libqos/arm-xilinx-zynq-a9-machine.c
- create mode 100644 tests/libqos/e1000e.c
- create mode 100644 tests/libqos/e1000e.h
- delete mode 100644 tests/libqos/malloc-generic.c
- delete mode 100644 tests/libqos/malloc-generic.h
- create mode 100644 tests/libqos/ppc64_pseries-machine.c
- create mode 100644 tests/libqos/qgraph.c
- create mode 100644 tests/libqos/qgraph.h
- create mode 100644 tests/libqos/qgraph_internal.h
- create mode 100644 tests/libqos/sdhci.c
- create mode 100644 tests/libqos/sdhci.h
- create mode 100644 tests/libqos/tpci200.c
- create mode 100644 tests/libqos/virtio-9p.c
- create mode 100644 tests/libqos/virtio-9p.h
- create mode 100644 tests/libqos/virtio-balloon.c
- create mode 100644 tests/libqos/virtio-balloon.h
- create mode 100644 tests/libqos/virtio-blk.c
- create mode 100644 tests/libqos/virtio-blk.h
- create mode 100644 tests/libqos/virtio-net.c
- create mode 100644 tests/libqos/virtio-net.h
- create mode 100644 tests/libqos/virtio-rng.c
- create mode 100644 tests/libqos/virtio-rng.h
- create mode 100644 tests/libqos/virtio-scsi.c
- create mode 100644 tests/libqos/virtio-scsi.h
- create mode 100644 tests/libqos/virtio-serial.c
- create mode 100644 tests/libqos/virtio-serial.h
- create mode 100644 tests/libqos/x86_64_pc-machine.c
- create mode 100644 tests/pci-test.c
- create mode 100644 tests/qos-test.c
- create mode 100644 tests/test-qgraph.c
- delete mode 100644 tests/tpci200-test.c
- delete mode 100644 tests/virtio-balloon-test.c
- delete mode 100644 tests/virtio-console-test.c
- create mode 100644 tests/virtio-test.c
-
+diff --git a/configure b/configure
+index b3b4464..d2c0fd3 100755
+--- a/configure
++++ b/configure
+@@ -366,10 +366,10 @@ libattr=3D""
+ xfs=3D""
+ tcg=3D"yes"
+ membarrier=3D""
+-vhost_net=3D"no"
+-vhost_crypto=3D"no"
+-vhost_scsi=3D"no"
+-vhost_vsock=3D"no"
++vhost_net=3D""
++vhost_crypto=3D""
++vhost_scsi=3D""
++vhost_vsock=3D""
+ vhost_user=3D""
+ kvm=3D"no"
+ hax=3D"no"
+@@ -774,6 +774,7 @@ case $targetos in
+ MINGW32*)
+   mingw32=3D"yes"
+   hax=3D"yes"
++  vhost_user=3D"no"
+   audio_possible_drivers=3D"dsound sdl"
+   if check_include dsound.h; then
+     audio_drv_list=3D"dsound"
+@@ -874,10 +875,6 @@ Linux)
+   linux=3D"yes"
+   linux_user=3D"yes"
+   kvm=3D"yes"
+-  vhost_net=3D"yes"
+-  vhost_crypto=3D"yes"
+-  vhost_scsi=3D"yes"
+-  vhost_vsock=3D"yes"
+   QEMU_INCLUDES=3D"-I\$(SRC_PATH)/linux-headers -I$PWD/linux-headers $QE=
+MU_INCLUDES"
+   supported_os=3D"yes"
+   libudev=3D"yes"
+@@ -1258,11 +1255,7 @@ for opt do
+   ;;
+   --disable-vhost-crypto) vhost_crypto=3D"no"
+   ;;
+-  --enable-vhost-crypto)
+-      vhost_crypto=3D"yes"
+-      if test "$mingw32" =3D "yes"; then
+-          error_exit "vhost-crypto isn't available on win32"
+-      fi
++  --enable-vhost-crypto) vhost_crypto=3D"yes"
+   ;;
+   --disable-vhost-scsi) vhost_scsi=3D"no"
+   ;;
+@@ -1463,11 +1456,11 @@ for opt do
+   ;;
+   --disable-vhost-user) vhost_user=3D"no"
+   ;;
+-  --enable-vhost-user)
+-      vhost_user=3D"yes"
+-      if test "$mingw32" =3D "yes"; then
+-          error_exit "vhost-user isn't available on win32"
+-      fi
++  --enable-vhost-user) vhost_user=3D"yes"
++  ;;
++  --disable-vhost-kernel) vhost_kernel=3D"no"
++  ;;
++  --enable-vhost-kernel) vhost_kernel=3D"yes"
+   ;;
+   --disable-capstone) capstone=3D"no"
+   ;;
+@@ -1499,14 +1492,6 @@ for opt do
+   esac
+ done
+=20
+-if test "$vhost_user" =3D ""; then
+-    if test "$mingw32" =3D "yes"; then
+-        vhost_user=3D"no"
+-    else
+-        vhost_user=3D"yes"
+-    fi
+-fi
+-
+ case "$cpu" in
+     ppc)
+            CPU_CFLAGS=3D"-m32"
+@@ -1731,8 +1716,12 @@ disabled with --disable-FEATURE, default is enable=
+d if available:
+   linux-aio       Linux AIO support
+   cap-ng          libcap-ng support
+   attr            attr and xattr support
+-  vhost-net       vhost-net acceleration support
+-  vhost-crypto    vhost-crypto acceleration support
++  vhost-net       vhost-net kernel acceleration support
++  vhost-vsock     virtio sockets device support
++  vhost-scsi      vhost-scsi kernel target support
++  vhost-crypto    vhost-user-crypto backend support
++  vhost-kernel    vhost kernel backend support
++  vhost-user      vhost-user backend support
+   spice           spice
+   rbd             rados block device (rbd)
+   libiscsi        iscsi support
+@@ -1756,7 +1745,6 @@ disabled with --disable-FEATURE, default is enabled=
+ if available:
+   jemalloc        jemalloc support
+   avx2            AVX2 optimization support
+   replication     replication support
+-  vhost-vsock     virtio sockets device support
+   opengl          opengl support
+   virglrenderer   virgl rendering support
+   xfsctl          xfsctl support
+@@ -1773,7 +1761,6 @@ disabled with --disable-FEATURE, default is enabled=
+ if available:
+   parallels       parallels image format support
+   sheepdog        sheepdog block driver support
+   crypto-afalg    Linux AF_ALG crypto backend driver
+-  vhost-user      vhost-user support
+   capstone        capstone disassembler support
+   debug-mutex     mutex debugging support
+   libpmem         libpmem support
+@@ -2150,6 +2137,45 @@ else
+   l2tpv3=3Dno
+ fi
+=20
++#########################################
++# vhost interdependencies and host support
++
++# vhost backends
++test "$vhost_user" =3D "" && vhost_user=3Dyes
++if test "$vhost_user" =3D "yes" && test "$mingw32" =3D "yes"; then
++  error_exit "vhost-user isn't available on win32"
++fi
++test "$vhost_kernel" =3D "" && vhost_kernel=3D$linux
++if test "$vhost_kernel" =3D "yes" && test "$linux" !=3D "yes"; then
++  error_exit "vhost-kernel is only available on Linux"
++fi
++
++# vhost-kernel devices
++test "$vhost_scsi" =3D "" && vhost_scsi=3D$vhost_kernel
++if test "$vhost_scsi" =3D "yes" && test "$vhost_kernel" !=3D "yes"; then
++  error_exit "--enable-vhost-scsi requires --enable-vhost-kernel"
++fi
++test "$vhost_vsock" =3D "" && vhost_vsock=3D$vhost_kernel
++if test "$vhost_vsock" =3D "yes" && test "$vhost_kernel" !=3D "yes"; the=
+n
++  error_exit "--enable-vhost-vsock requires --enable-vhost-kernel"
++fi
++
++# vhost-user backends
++test "$vhost_net_user" =3D "" && vhost_net_user=3D$vhost_user
++if test "$vhost_net_user" =3D "yes" && test "$vhost_user" =3D "no"; then
++  error_exit "--enable-vhost-net-user requires --enable-vhost-user"
++fi
++test "$vhost_crypto" =3D "" && vhost_crypto=3D$vhost_user
++if test "$vhost_crypto" =3D "yes" && test "$vhost_user" =3D "no"; then
++  error_exit "--enable-vhost-crypto requires --enable-vhost-user"
++fi
++
++# OR the vhost-kernel and vhost-user values for simplicity
++if test "$vhost_net" =3D ""; then
++  test "$vhost_net_user" =3D "yes" && vhost_net=3Dyes
++  test "$vhost_kernel" =3D "yes" && vhost_net=3Dyes
++fi
++
+ ##########################################
+ # MinGW / Mingw-w64 localtime_r/gmtime_r check
+=20
+@@ -6524,6 +6550,9 @@ fi
+ if test "$vhost_vsock" =3D "yes" ; then
+   echo "CONFIG_VHOST_VSOCK=3Dy" >> $config_host_mak
+ fi
++if test "$vhost_kernel" =3D "yes" ; then
++  echo "CONFIG_VHOST_KERNEL=3Dy" >> $config_host_mak
++fi
+ if test "$vhost_user" =3D "yes" ; then
+   echo "CONFIG_VHOST_USER=3Dy" >> $config_host_mak
+ fi
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index e8eff80..87402d1 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -11,8 +11,8 @@ obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO=
+_PCI)) +=3D virtio-crypto-p
+=20
+ obj-$(CONFIG_VHOST_USER) +=3D vhost-user.o
+ obj-$(CONFIG_VHOST_VSOCK) +=3D vhost-vsock.o
+-obj-$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) +=3D vhost.o vhost-=
+backend.o
+-common-obj-$(call lnot,$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)))=
+ +=3D vhost-stub.o
++obj-$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_VHOST_KERNEL)) +=3D vhost.o=
+ vhost-backend.o
++common-obj-$(call lnot,$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_VHOST_KE=
+RNEL))) +=3D vhost-stub.o
+ endif
+=20
+ common-obj-$(CONFIG_ALL) +=3D vhost-stub.o
+diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+index b5d2e30..46d388b 100644
+--- a/hw/virtio/vhost-backend.c
++++ b/hw/virtio/vhost-backend.c
+@@ -13,7 +13,7 @@
+ #include "hw/virtio/vhost-backend.h"
+ #include "qemu/error-report.h"
+=20
+-#ifdef CONFIG_LINUX
++#ifdef CONFIG_VHOST_KERNEL
+ #include <linux/vhost.h>
+ #include <sys/ioctl.h>
+=20
+@@ -274,7 +274,7 @@ int vhost_set_backend_type(struct vhost_dev *dev, Vho=
+stBackendType backend_type)
+     int r =3D 0;
+=20
+     switch (backend_type) {
+-#ifdef CONFIG_LINUX
++#ifdef CONFIG_VHOST_KERNEL
+     case VHOST_BACKEND_TYPE_KERNEL:
+         dev->vhost_ops =3D &kernel_ops;
+         break;
 --=20
 1.8.3.1
