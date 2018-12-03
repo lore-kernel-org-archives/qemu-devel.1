@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
-	id 1gTr1P-0002Gw-GU
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:24:36 -0500
+	(envelope-from <eblake@redhat.com>) id 1gTr2O-0003EJ-GY
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:25:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=86815d540=anthony.perard@citrix.com>)
-	id 1gTr1K-0000pC-9E
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:24:35 -0500
-Date: Mon, 3 Dec 2018 16:24:24 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181203162424.GM14786@perard.uk.xensource.com>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-8-paul.durrant@citrix.com>
+	(envelope-from <eblake@redhat.com>) id 1gTr2J-0001P3-Mt
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:25:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60950)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gTr2J-0001Of-HK
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 11:25:31 -0500
+References: <20181203100608.28538-1-jasowang@redhat.com>
+	<20181203100608.28538-3-jasowang@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <008aa0d8-dcb0-7424-edee-d1f9f72f7231@redhat.com>
+Date: Mon, 3 Dec 2018 10:25:20 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20181121151211.15997-8-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH 07/18] xen: add event channel interface for
- XenDevice-s
+In-Reply-To: <20181203100608.28538-3-jasowang@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V4 for 3.1 2/4] virtio-net-test: accept
+ variable length argument in pci_test_start()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: mst@redhat.com, ppandit@redhat.com, liq3ea@163.com, liq3ea@gmail.com, pbonzini@redhat.com, thuth@redhat.com
 
-On Wed, Nov 21, 2018 at 03:12:00PM +0000, Paul Durrant wrote:
-> The legacy PV backend infrastructure provides functions to bind, unbind
-> and send notifications to event channnels. Similar functionality will be
-> required by XenDevice implementations so this patch adds the necessary
-> support.
+On 12/3/18 4:06 AM, Jason Wang wrote:
+> This allows flexibility to be reused for all kinds of command line
+> used by other tests.
 > 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 > ---
-> +void xen_device_notify_event_channel(XenDevice *xendev,
-> +                                     XenEventChannel *channel)
-> +{
-> +    xenevtchn_notify(xendev->xeh, channel->local_port);
+>   tests/virtio-net-test.c | 17 +++++++++++------
+>   1 file changed, 11 insertions(+), 6 deletions(-)
+> 
 
-Since xenevtchn_notify and xenevtchn_unbind below can fail, it will be
-nice to check for error and grab the errno.
-
-Users of xen_device_notify_event_channel could simply ignore the error,
-or just print a warning/error and continue
-(warn_report_err/error_report_err).
-
-> +}
-> +
-> +void xen_device_unbind_event_channel(XenDevice *xendev,
-> +                                     XenEventChannel *channel)
-> +{
-> +    notifier_remove(&channel->notifier);
-> +
-> +    xenevtchn_unbind(xendev->xeh, channel->local_port);
-> +
-> +    g_free(channel);
-> +}
-> +
-
-
-> +static void xen_device_event(void *opaque)
-> +{
-> +    XenDevice *xendev = opaque;
-> +    unsigned long port = xenevtchn_pending(xendev->xeh);
-> +
-> +    notifier_list_notify(&xendev->event_notifiers, (void *)port);
-
-I wonder if a Notifier is a good fit for XenDevice, like here for the
-events or the xenstore watches in previous patches, as NotifierLists are
-normaly used when every Notifiers want to do something, but here there
-is only one that is going to do something. But I guess it might not be
-much better to write a loop in here rather than use the one in
-notifier_list_notify.
-
-> +
-> +    xenevtchn_unmask(xendev->xeh, port);
-> +}
-> +
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
-Anthony PERARD
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
