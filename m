@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gTjUD-0001uV-Gn
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:21:50 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gTjUU-0001oE-C7
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:22:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gTjKa-00056l-AT
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:11:53 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39485)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1gTjDC-0001px-VP
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:04:15 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34399)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gTjKa-00056Y-0f
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:11:52 -0500
-Received: by mail-wm1-x343.google.com with SMTP id f81so2204722wmd.4
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 00:11:51 -0800 (PST)
+	id 1gTjDC-0001pP-Pl
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 03:04:14 -0500
+Received: by mail-wr1-x442.google.com with SMTP id j2so11056786wrw.1
+	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 00:04:14 -0800 (PST)
 MIME-Version: 1.0
 References: <20181029125733.14597-1-marcandre.lureau@redhat.com>
-	<20181029125733.14597-4-marcandre.lureau@redhat.com>
-	<87d0qj84al.fsf@dusky.pond.sub.org>
-In-Reply-To: <87d0qj84al.fsf@dusky.pond.sub.org>
+	<20181029125733.14597-3-marcandre.lureau@redhat.com>
+	<87in0b84r6.fsf@dusky.pond.sub.org>
+In-Reply-To: <87in0b84r6.fsf@dusky.pond.sub.org>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 3 Dec 2018 12:11:39 +0400
-Message-ID: <CAJ+F1CLwTyjGGL7Wc+j-xj_RqHbMh+o3j00+zGZSHNdkQUrHRQ@mail.gmail.com>
+Date: Mon, 3 Dec 2018 12:04:00 +0400
+Message-ID: <CAJ+F1CJQ0SGWnQvL7A8oYHCiuyv-2wS_78Aoeco2ZMLVpH9gLw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] char: add a
- QEMU_CHAR_FEATURE_GCONTEXT flag
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] monitor: accept chardev input from
+ iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,86 +37,104 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Peter Xu 
 
 Hi
 
-On Mon, Dec 3, 2018 at 11:25 AM Markus Armbruster <armbru@redhat.com> wrote=
+On Mon, Dec 3, 2018 at 11:26 AM Markus Armbruster <armbru@redhat.com> wrote=
 :
->
-> This one needs review by a chardev guy, with an eye on its use in the
-> next patch.  Paolo?
 >
 > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 >
-> > The feature should be set if the chardev is able to switch
-> > GMainContext. Callers that want to put a chardev in a different thread
-> > context can/should check this capabilities.
+> > Chardev backends may not handle safely IO events from concurrent
+> > threads.
+>
+> What exactly could go wrong?  Or is this a well-known fact that doesn't
+> need further elaboration?
+
+chardev are not thread-safe. Only the write path is, since commit
+9005b2a7589540a3733b3abdcfbccfe7746cd1a1.
+
+> "safely handle I/O events"
+>
+> >          Better to wake up the chardev from the monitor IO thread if
+> > it's being used as the chardev context.
+> >
+> > Unify code paths by using a BH in all cases.
+> >
+> > Drop the now redundant aio_notify() call.
 > >
 > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > > ---
-> >  include/chardev/char.h |  3 +++
-> >  chardev/char.c         | 11 +++++++++++
-> >  2 files changed, 14 insertions(+)
+> >  monitor.c | 15 +++++++++++++--
+> >  1 file changed, 13 insertions(+), 2 deletions(-)
 > >
-> > diff --git a/include/chardev/char.h b/include/chardev/char.h
-> > index 7becd8c80c..014566c3de 100644
-> > --- a/include/chardev/char.h
-> > +++ b/include/chardev/char.h
-> > @@ -47,6 +47,9 @@ typedef enum {
-> >      QEMU_CHAR_FEATURE_FD_PASS,
-> >      /* Whether replay or record mode is enabled */
-> >      QEMU_CHAR_FEATURE_REPLAY,
-> > +    /* Whether the gcontext can be changed after calling
-> > +     * qemu_chr_be_update_read_handlers() */
-> > +    QEMU_CHAR_FEATURE_GCONTEXT,
+> > diff --git a/monitor.c b/monitor.c
+> > index 07712d89f9..511dd11d1c 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -4304,6 +4304,13 @@ int monitor_suspend(Monitor *mon)
+> >      return 0;
+> >  }
 > >
-> >      QEMU_CHAR_FEATURE_LAST,
-> >  } ChardevFeature;
-> > diff --git a/chardev/char.c b/chardev/char.c
-> > index 7f07a1bfbd..b5ee58b7d2 100644
-> > --- a/chardev/char.c
-> > +++ b/chardev/char.c
-> > @@ -196,6 +196,8 @@ void qemu_chr_be_update_read_handlers(Chardev *s,
-> >      s->gcontext =3D context;
-> >      if (cc->chr_update_read_handler) {
-> >          cc->chr_update_read_handler(s);
-> > +    } else if (s->gcontext) {
-> > +        error_report("switching context isn't supported by this charde=
-v");
->
-> Code smell: error_report() without returning failure.
->
-> If it's truly an error, then the function should fail.  We'd still need
-> to decide how: error_report() and return -1, or error_setg().
->
-> Except if it's a programming error; then we should assert().
->
-
-After this patch, it's an error.
-There should be a preliminary check for qemu_chr_has_feature(chr,
-QEMU_CHAR_FEATURE_GCONTEXT) before switching context.
-
-I'll replace the error_report() with an assert.
-
-> If it's not an error, it's probably a warning, and we should use
-> warn_report().
->
+> > +static void monitor_accept_input(void *opaque)
+> > +{
+> > +    Monitor *mon =3D opaque;
+> > +
+> > +    qemu_chr_fe_accept_input(&mon->chr);
+> > +}
+> > +
+> >  void monitor_resume(Monitor *mon)
+> >  {
+> >      if (monitor_is_hmp_non_interactive(mon)) {
+> > @@ -4311,20 +4318,24 @@ void monitor_resume(Monitor *mon)
 > >      }
-> >  }
 > >
-> > @@ -240,6 +242,15 @@ static void char_init(Object *obj)
-> >
-> >      chr->logfd =3D -1;
-> >      qemu_mutex_init(&chr->chr_write_lock);
+> >      if (atomic_dec_fetch(&mon->suspend_cnt) =3D=3D 0) {
+> > +        AioContext *ctx =3D qemu_get_aio_context();
 > > +
-> > +    /*
-> > +     * Assume if chr_update_read_handler is implemented it will
-> > +     * take the updated gcontext into account.
-> > +     */
-> > +    if (CHARDEV_GET_CLASS(chr)->chr_update_read_handler) {
-> > +        qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT);
-> > +    }
+> >          if (monitor_is_qmp(mon)) {
+> >              /*
+> >               * For QMP monitors that are running in the I/O thread,
+> >               * let's kick the thread in case it's sleeping.
+> >               */
+> >              if (mon->use_io_thread) {
+> > -                aio_notify(iothread_get_aio_context(mon_iothread));
+> > +                ctx =3D iothread_get_aio_context(mon_iothread);
+> >              }
+> >          } else {
+> >              assert(mon->rs);
+> >              readline_show_prompt(mon->rs);
+> >          }
+>
+> Correct, since mon->use_io_thread can only be true in a QMP monitor so
+> far.  But there's no need to depend on that here:
+>
+>            AioContext *ctx;
+>
+>            if (mon->use_io_thread) {
+>                ctx =3D iothread_get_aio_context(mon_iothread);
+>            } else {
+>                ctx =3D qemu_get_aio_context();
+>            }
+>
+>            if (!monitor_is_qmp(mon)) {
+>                assert(mon->rs);
+>                readline_show_prompt(mon->rs);
+>            }
+>
+> Same in monitor_suspend(), by the way.
+>
+
+ok
+
+
+> The dependence in monitor_init() is tolerable, because it's the place
+> where the dependence is established.
+>
+> > -        qemu_chr_fe_accept_input(&mon->chr);
 > > +
+> > +        aio_bh_schedule_oneshot(ctx, monitor_accept_input, mon);
+> >      }
+> > +
+> >      trace_monitor_suspend(mon, -1);
 > >  }
-> >
-> >  static int null_chr_write(Chardev *chr, const uint8_t *buf, int len)
 >
 
 
