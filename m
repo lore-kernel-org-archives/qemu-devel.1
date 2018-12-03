@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqF7-0000rq-1j
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:42 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gTqF8-0000tl-18
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gTqF2-00058h-57
+	(envelope-from <pbonzini@redhat.com>) id 1gTqF6-0005Cv-4c
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49972)
+Received: from mx1.redhat.com ([209.132.183.28]:53762)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqF1-00057v-TP
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:36 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gTqF5-0005CD-TA
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 10:34:40 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  3 Dec 2018 16:32:54 +0100
-Message-Id: <1543851204-41186-42-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Dec 2018 16:32:55 +0100
+Message-Id: <1543851204-41186-43-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
 References: <1543851204-41186-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 41/71] qos-test: virtio-console and
- virtio-serial test node
+Subject: [Qemu-devel] [PATCH 42/71] tests/libqos: virtio-9p driver and
+ interface nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,175 +29,260 @@ Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>, Laurent Vivier <l
 
 From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 
-Convert tests/virtio-console-test and tests/virtio-serial-test
-in qgraph test node. This test consumes a virtio-serial interface
-and checks that its function return the expected values.
-
-Note that this test does not allocate any virtio-console or
-virtio-serial structure, it's all done by the qtest walking graph mechanism
+Add qgraph nodes for virtio-9p-pci and virtio-9p-device.
+Both nodes produce virtio-9p, but virtio-9p-pci receives
+a pci-bus and overrides virtio-pci QOSGraphObject and its functions,
+while virtio-9p-device receives a virtio and implements
+its own functions
 
 Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include      |  8 ++------
- tests/libqos/virtio.c       |  1 +
- tests/virtio-console-test.c | 38 --------------------------------------
- tests/virtio-serial-test.c  | 27 ++++++++++++---------------
- 4 files changed, 15 insertions(+), 59 deletions(-)
- delete mode 100644 tests/virtio-console-test.c
+ tests/Makefile.include   |   1 +
+ tests/libqos/virtio-9p.c | 173 +++++++++++++++++++++++++++++++++++++++++++++++
+ tests/libqos/virtio-9p.h |  42 ++++++++++++
+ 3 files changed, 216 insertions(+)
+ create mode 100644 tests/libqos/virtio-9p.c
+ create mode 100644 tests/libqos/virtio-9p.h
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 58f548d..88821a7 100644
+index 88821a7..6a6aa7d 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -143,8 +143,6 @@ check-qtest-generic-y += tests/cdrom-test$(EXESUF)
+@@ -674,6 +674,7 @@ qos-test-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+ qos-test-obj-y += tests/libqos/e1000e.o
+ qos-test-obj-y += tests/libqos/sdhci.o
+ qos-test-obj-y += $(libqos-virtio-obj-y)
++qos-test-obj-y += tests/libqos/virtio-9p.o
+ qos-test-obj-y += tests/libqos/virtio-serial.o
  
- check-qtest-ipack-y += tests/ipoctal232-test$(EXESUF)
- 
--check-qtest-virtioserial-y += tests/virtio-console-test$(EXESUF)
--
- check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
- check-qtest-virtio-y += tests/virtio-balloon-test$(EXESUF)
- check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
-@@ -153,8 +151,6 @@ check-qtest-virtio-y += tests/virtio-scsi-test$(EXESUF)
- ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
- check-qtest-virtio-y += tests/virtio-9p-test$(EXESUF)
- endif
--check-qtest-virtio-y += tests/virtio-serial-test$(EXESUF)
--check-qtest-virtio-y += $(check-qtest-virtioserial-y)
- 
- check-qtest-pci-y += tests/e1000-test$(EXESUF)
- check-qtest-pci-$(CONFIG_RTL8139_PCI) += tests/rtl8139-test$(EXESUF)
-@@ -293,6 +289,7 @@ check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
- check-qtest-s390x-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
- check-qtest-s390x-y += tests/drive_del-test$(EXESUF)
- check-qtest-s390x-y += tests/virtio-ccw-test$(EXESUF)
-+check-qtest-s390x-y += tests/virtio-balloon-test$(EXESUF)
- check-qtest-s390x-y += tests/cpu-plug-test$(EXESUF)
- check-qtest-s390x-y += tests/migration-test$(EXESUF)
- 
-@@ -694,6 +691,7 @@ qos-test-obj-y += tests/e1000e-test.o
- qos-test-obj-y += tests/pci-test.o
- qos-test-obj-y += tests/sdhci-test.o
- qos-test-obj-y += tests/virtio-test.o
-+qos-test-obj-y += tests/virtio-serial-test.o
- 
- check-unit-y += tests/test-qgraph$(EXESUF)
- tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
-@@ -745,8 +743,6 @@ tests/virtio-net-test$(EXESUF): tests/virtio-net-test.o $(libqos-pc-obj-y) $(lib
- tests/virtio-rng-test$(EXESUF): tests/virtio-rng-test.o $(libqos-pc-obj-y)
- tests/virtio-scsi-test$(EXESUF): tests/virtio-scsi-test.o $(libqos-virtio-obj-y)
- tests/virtio-9p-test$(EXESUF): tests/virtio-9p-test.o $(libqos-virtio-obj-y)
--tests/virtio-serial-test$(EXESUF): tests/virtio-serial-test.o $(libqos-virtio-obj-y)
--tests/virtio-console-test$(EXESUF): tests/virtio-console-test.o $(libqos-virtio-obj-y)
- tests/tpci200-test$(EXESUF): tests/tpci200-test.o
- tests/display-vga-test$(EXESUF): tests/display-vga-test.o
- tests/ipoctal232-test$(EXESUF): tests/ipoctal232-test.o
-diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
-index 5a62950..9fc8c7e 100644
---- a/tests/libqos/virtio.c
-+++ b/tests/libqos/virtio.c
-@@ -352,6 +352,7 @@ void qvirtqueue_set_used_event(QVirtQueue *vq, uint16_t idx)
- /*
-  * qvirtio_get_dev_type:
-  * Returns: the preferred virtio bus/device type for the current architecture.
-+ * TODO: delete this
-  */
- const char *qvirtio_get_dev_type(void)
- {
-diff --git a/tests/virtio-console-test.c b/tests/virtio-console-test.c
-deleted file mode 100644
-index a7c6f16..0000000
---- a/tests/virtio-console-test.c
-+++ /dev/null
-@@ -1,38 +0,0 @@
--/*
-- * QTest testcase for VirtIO Console
-- *
-- * Copyright (c) 2014 SUSE LINUX Products GmbH
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or later.
-- * See the COPYING file in the top-level directory.
-- */
--
--#include "qemu/osdep.h"
--#include "libqtest.h"
--#include "libqos/virtio.h"
--
--/* Tests only initialization so far. TODO: Replace with functional tests */
--static void console_nop(void)
--{
--    global_qtest = qtest_initf("-device virtio-serial-%s,id=vser0 "
--                               "-device virtconsole,bus=vser0.0",
--                               qvirtio_get_dev_type());
--    qtest_end();
--}
--
--static void serialport_nop(void)
--{
--    global_qtest = qtest_initf("-device virtio-serial-%s,id=vser0 "
--                               "-device virtserialport,bus=vser0.0",
--                               qvirtio_get_dev_type());
--    qtest_end();
--}
--
--int main(int argc, char **argv)
--{
--    g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/virtio/console/nop", console_nop);
--    qtest_add_func("/virtio/serialport/nop", serialport_nop);
--
--    return g_test_run();
--}
-diff --git a/tests/virtio-serial-test.c b/tests/virtio-serial-test.c
-index 8da9980..85f35e0 100644
---- a/tests/virtio-serial-test.c
-+++ b/tests/virtio-serial-test.c
-@@ -9,33 +9,30 @@
- 
- #include "qemu/osdep.h"
- #include "libqtest.h"
--#include "libqos/virtio.h"
-+#include "libqos/virtio-serial.h"
- 
- /* Tests only initialization so far. TODO: Replace with functional tests */
--static void virtio_serial_nop(void)
-+static void virtio_serial_nop(void *obj, void *data, QGuestAllocator *alloc)
- {
-+    /* no operation */
- }
- 
--static void hotplug(void)
-+static void serial_hotplug(void *obj, void *data, QGuestAllocator *alloc)
- {
-     qtest_qmp_device_add("virtserialport", "hp-port", "{}");
--
-     qtest_qmp_device_del("hp-port");
- }
- 
--int main(int argc, char **argv)
-+static void register_virtio_serial_test(void)
- {
--    int ret;
--
--    g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/virtio/serial/nop", virtio_serial_nop);
--    qtest_add_func("/virtio/serial/hotplug", hotplug);
-+    QOSGraphTestOptions opts = { };
- 
--    global_qtest = qtest_initf("-device virtio-serial-%s",
--                               qvirtio_get_dev_type());
--    ret = g_test_run();
-+    opts.edge.before_cmd_line = "-device virtconsole,bus=vser0.0";
-+    qos_add_test("console-nop", "virtio-serial", virtio_serial_nop, &opts);
- 
--    qtest_end();
-+    opts.edge.before_cmd_line = "-device virtserialport,bus=vser0.0";
-+    qos_add_test("serialport-nop", "virtio-serial", virtio_serial_nop, &opts);
- 
--    return ret;
-+    qos_add_test("hotplug", "virtio-serial", serial_hotplug, NULL);
- }
-+libqos_init(register_virtio_serial_test);
+ # Machines
+diff --git a/tests/libqos/virtio-9p.c b/tests/libqos/virtio-9p.c
+new file mode 100644
+index 0000000..a378b56
+--- /dev/null
++++ b/tests/libqos/virtio-9p.c
+@@ -0,0 +1,173 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "standard-headers/linux/virtio_ids.h"
++#include "libqos/virtio-9p.h"
++#include "libqos/qgraph.h"
++
++static QGuestAllocator *alloc;
++
++static void virtio_9p_cleanup(QVirtio9P *interface)
++{
++    qvirtqueue_cleanup(interface->vdev->bus, interface->vq, alloc);
++}
++
++static void virtio_9p_setup(QVirtio9P *interface)
++{
++    interface->vq = qvirtqueue_setup(interface->vdev, alloc, 0);
++    qvirtio_set_driver_ok(interface->vdev);
++}
++
++/* virtio-9p-device */
++static void virtio_9p_device_destructor(QOSGraphObject *obj)
++{
++    QVirtio9PDevice *v_9p = (QVirtio9PDevice *) obj;
++    QVirtio9P *v9p = &v_9p->v9p;
++
++    virtio_9p_cleanup(v9p);
++}
++
++static void virtio_9p_device_start_hw(QOSGraphObject *obj)
++{
++    QVirtio9PDevice *v_9p = (QVirtio9PDevice *) obj;
++    QVirtio9P *v9p = &v_9p->v9p;
++
++    virtio_9p_setup(v9p);
++}
++
++static void *virtio_9p_get_driver(QVirtio9P *v_9p,
++                                         const char *interface)
++{
++    if (!g_strcmp0(interface, "virtio-9p")) {
++        return v_9p;
++    }
++    if (!g_strcmp0(interface, "virtio")) {
++        return v_9p->vdev;
++    }
++
++    fprintf(stderr, "%s not present in virtio-9p-device\n", interface);
++    g_assert_not_reached();
++}
++
++static void *virtio_9p_device_get_driver(void *object, const char *interface)
++{
++    QVirtio9PDevice *v_9p = object;
++    return virtio_9p_get_driver(&v_9p->v9p, interface);
++}
++
++static void *virtio_9p_device_create(void *virtio_dev,
++                                     QGuestAllocator *t_alloc,
++                                     void *addr)
++{
++    QVirtio9PDevice *virtio_device = g_new0(QVirtio9PDevice, 1);
++    QVirtio9P *interface = &virtio_device->v9p;
++
++    interface->vdev = virtio_dev;
++    alloc = t_alloc;
++
++    virtio_device->obj.destructor = virtio_9p_device_destructor;
++    virtio_device->obj.get_driver = virtio_9p_device_get_driver;
++    virtio_device->obj.start_hw = virtio_9p_device_start_hw;
++
++    return &virtio_device->obj;
++}
++
++/* virtio-9p-pci */
++static void virtio_9p_pci_destructor(QOSGraphObject *obj)
++{
++    QVirtio9PPCI *v9_pci = (QVirtio9PPCI *) obj;
++    QVirtio9P *interface = &v9_pci->v9p;
++    QOSGraphObject *pci_vobj =  &v9_pci->pci_vdev.obj;
++
++    virtio_9p_cleanup(interface);
++    qvirtio_pci_destructor(pci_vobj);
++}
++
++static void virtio_9p_pci_start_hw(QOSGraphObject *obj)
++{
++    QVirtio9PPCI *v9_pci = (QVirtio9PPCI *) obj;
++    QVirtio9P *interface = &v9_pci->v9p;
++    QOSGraphObject *pci_vobj =  &v9_pci->pci_vdev.obj;
++
++    qvirtio_pci_start_hw(pci_vobj);
++    virtio_9p_setup(interface);
++}
++
++static void *virtio_9p_pci_get_driver(void *object, const char *interface)
++{
++    QVirtio9PPCI *v_9p = object;
++    if (!g_strcmp0(interface, "pci-device")) {
++        return v_9p->pci_vdev.pdev;
++    }
++    return virtio_9p_get_driver(&v_9p->v9p, interface);
++}
++
++static void *virtio_9p_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
++                                  void *addr)
++{
++    QVirtio9PPCI *v9_pci = g_new0(QVirtio9PPCI, 1);
++    QVirtio9P *interface = &v9_pci->v9p;
++    QOSGraphObject *obj = &v9_pci->pci_vdev.obj;
++
++    virtio_pci_init(&v9_pci->pci_vdev, pci_bus, addr);
++    interface->vdev = &v9_pci->pci_vdev.vdev;
++    alloc = t_alloc;
++
++    g_assert_cmphex(interface->vdev->device_type, ==, VIRTIO_ID_9P);
++
++    obj->destructor = virtio_9p_pci_destructor;
++    obj->start_hw = virtio_9p_pci_start_hw;
++    obj->get_driver = virtio_9p_pci_get_driver;
++
++    return obj;
++}
++
++static void virtio_9p_register_nodes(void)
++{
++    const char *str_simple = "fsdev=fsdev0,mount_tag=" MOUNT_TAG;
++    const char *str_addr = "fsdev=fsdev0,addr=04.0,mount_tag=" MOUNT_TAG;
++
++    QPCIAddress addr = {
++        .devfn = QPCI_DEVFN(4, 0),
++    };
++
++    QOSGraphEdgeOptions opts = {
++        .before_cmd_line = "-fsdev synth,id=fsdev0",
++    };
++
++    /* virtio-9p-device */
++    opts.extra_device_opts = str_simple,
++    qos_node_create_driver("virtio-9p-device", virtio_9p_device_create);
++    qos_node_consumes("virtio-9p-device", "virtio-bus", &opts);
++    qos_node_produces("virtio-9p-device", "virtio");
++    qos_node_produces("virtio-9p-device", "virtio-9p");
++
++    /* virtio-9p-pci */
++    opts.extra_device_opts = str_addr;
++    add_qpci_address(&opts, &addr);
++    qos_node_create_driver("virtio-9p-pci", virtio_9p_pci_create);
++    qos_node_consumes("virtio-9p-pci", "pci-bus", &opts);
++    qos_node_produces("virtio-9p-pci", "pci-device");
++    qos_node_produces("virtio-9p-pci", "virtio");
++    qos_node_produces("virtio-9p-pci", "virtio-9p");
++
++}
++
++libqos_init(virtio_9p_register_nodes);
+diff --git a/tests/libqos/virtio-9p.h b/tests/libqos/virtio-9p.h
+new file mode 100644
+index 0000000..dba2277
+--- /dev/null
++++ b/tests/libqos/virtio-9p.h
+@@ -0,0 +1,42 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "libqos/qgraph.h"
++#include "libqos/virtio.h"
++#include "libqos/virtio-pci.h"
++
++typedef struct QVirtio9P QVirtio9P;
++typedef struct QVirtio9PPCI QVirtio9PPCI;
++typedef struct QVirtio9PDevice QVirtio9PDevice;
++
++#define MOUNT_TAG "qtest"
++
++struct QVirtio9P {
++    QVirtioDevice *vdev;
++    QVirtQueue *vq;
++};
++
++struct QVirtio9PPCI {
++    QVirtioPCIDevice pci_vdev;
++    QVirtio9P v9p;
++};
++
++struct QVirtio9PDevice {
++    QOSGraphObject obj;
++    QVirtio9P v9p;
++};
 -- 
 1.8.3.1
