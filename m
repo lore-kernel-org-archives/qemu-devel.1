@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gUB8x-0004KR-Jp
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:53:44 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1gUBCd-0005md-EB
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:57:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gUB8w-0005n5-Ot
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:53:43 -0500
-References: <1543865209-50994-1-git-send-email-peng.hao2@zte.com.cn>
-	<CAFEAcA-oFFz-NtfwHmORxQd4rHsfKa1=tV1kyvPuGQoOZwDB3A@mail.gmail.com>
-	<20181204124739.GA17825@redhat.com>
-	<CAFEAcA_ovMgKPPjtYVASFqhzM7MX79EJYMZuFY4-FGRh4oqN8A@mail.gmail.com>
-	<9ad451bd-7eb1-902f-6023-4b48bb84249c@redhat.com>
-	<CAFEAcA-tzZVVXk+vV=uWOeL6dU3EnFiFRzLu8KR69Ju4PsPrJg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <149484eb-c59f-2b22-aa45-d4e5f0abac07@redhat.com>
-Date: Tue, 4 Dec 2018 14:53:26 +0100
+	(envelope-from <richard.henderson@linaro.org>) id 1gUBCb-00005n-BV
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:57:31 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45255)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gUBCZ-0008VM-GE
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:57:27 -0500
+Received: by mail-ot1-x343.google.com with SMTP id 32so15178910ota.12
+	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 05:57:27 -0800 (PST)
+References: <20181204132952.2601-1-peter.maydell@linaro.org>
+	<20181204132952.2601-2-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <f79fa7ae-3d36-651b-a123-e048c925bf50@linaro.org>
+Date: Tue, 4 Dec 2018 07:57:22 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-tzZVVXk+vV=uWOeL6dU3EnFiFRzLu8KR69Ju4PsPrJg@mail.gmail.com>
+In-Reply-To: <20181204132952.2601-2-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V11 0/8] add pvpanic mmio support
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/5] target/arm: Free name string in
+ ARMCPRegInfo hashtable entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +32,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Andrew Jones <drjones@redhat.com>, Peng Hao <peng.hao2@zte.com.cn>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 04/12/18 14:43, Peter Maydell wrote:
-> The point about PCI is that it is the same everywhere and
-> discoverable, and easy for the user to add to the system or not.
-> MMIO requires extra work for every board model that we want to
-> put the device into, plus extra on both kernel and QEMU side
-> for every system description mechanism (ACPI, dtb, whatever
-> some future architecture might use), even if we have the basic
-> "mmio pvpanic" device code already.
+On 12/4/18 7:29 AM, Peter Maydell wrote:
+> When we add a new entry to the ARMCPRegInfo hash table in
+> add_cpreg_to_hashtable(), we allocate memory for tehe
+> ARMCPRegInfo struct itself, and we also g_strdup() the
+> name string. So the hashtable's value destructor function
+> must free the name string as well as the struct.
+> 
+> Spotted by clang's leak sanitizer. The leak here is a
+> small one-off leak at startup, because we don't support
+> CPU hotplug, and so the only time when we destroy
+> hash table entries is for the case where ARM_CP_OVERRIDE
+> means we register a wildcard entry and then override it later.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/cpu.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
 
-Looks like dtb is becoming a standard?  Even RISC-V switched from their
-own system description to device tree.  Anyway, this is not too
-important.  I agree with you about discoverability, on the other hand if
-we could have something defined by the vendor rather than QEMU it would
-be even better.  (Even better would be something that distro kernels
-already have support for, but that would be asking too much probably).
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
->> Also, while reusing code in general is nice, sometimes there are
->> platform-specific ways to do it.  For ARM, for example, would it make
->> sense to use an HVC/SMC that "extends" the PSCI, and pass the number i=
-n
->> the PSCI device tree node?
->=20
-> If you want a hypercall then these days the arm HVC calling convention
-> includes mechanisms for discoverably determining whether a particular
-> hypercall is supported, so you wouldn't need to pass anything in the
-> ACPI or dtb. But I didn't get the impression that anybody wanted a
-> hypercall for this particularly.
 
-Not for x86, where each hypervisor has its own hypercall number and even
-its calling convention.  But for ARM it already makes more sense.
-
->> Related to this, is there a more or less "standard" watchdog device on
->> ARM that could be added to virt?  There is the SBSA watchdog, but it's
->> ugly for implementation in KVM because it counts down with frequency
->> equal to CNTFRQ (which I'm not sure if QEMU has access too, and also i=
-t
->> doesn't play well with live migration).
->=20
-> The i6300esb is PCI, presumably that would work?
-
-Yeah, I was wondering if there was something in PrimeCell.  I found
-SP805 exists now.
-
->>> I notice also that there's a mention in that thread that the pvpanic
->>> ACPI table entry on x86 resulted in unhelpful Windows notifications
->>> about new devices it didn't understand. Is that going to be an issue
->>> for Arm with this mmio pvpanic ?
->>
->> Yes, it is probably the same as for x86.
->=20
-> I guess we need to find out if that is a problem before we can
-> merge this, then.
-
-As long as the pvpanic device is not added by default it's okay.
-
-Paolo
+r~
