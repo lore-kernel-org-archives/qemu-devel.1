@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gUBZX-0004XR-JL
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:21:12 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gUBZd-0004cc-5E
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:21:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gUBZW-0006vD-LE
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:21:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50166)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gUBZc-0006xK-1r
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:21:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40364)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gUBZW-0006uo-Dj
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:21:10 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C88BA2D7F3
-	for <qemu-devel@nongnu.org>; Tue,  4 Dec 2018 14:21:09 +0000 (UTC)
+	id 1gUBZb-0006ww-OE
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:21:15 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  4 Dec 2018 18:20:08 +0400
-Message-Id: <20181204142023.15982-5-marcandre.lureau@redhat.com>
+Date: Tue,  4 Dec 2018 18:20:09 +0400
+Message-Id: <20181204142023.15982-6-marcandre.lureau@redhat.com>
 In-Reply-To: <20181204142023.15982-1-marcandre.lureau@redhat.com>
 References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.2 v5 04/19] accel: register global_props
- like machine globals
+Subject: [Qemu-devel] [PATCH for-3.2 v5 05/19] qdev: move
+ qdev_prop_register_global_list() to tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,120 +29,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: imammedo@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-global_props is only used for Xen xen_compat_props. It's a static
-array of GlobalProperty, like machine globals in SET_MACHINE_COMPAT().
-Let's register the globals the same way, without extra copy allocation.
+The function is only used by a test, move it there.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- include/hw/qdev-properties.h | 29 -----------------------------
- accel/accel.c                |  9 ++++++++-
- hw/core/qdev-properties.c    | 21 ---------------------
- 3 files changed, 8 insertions(+), 51 deletions(-)
+ include/hw/qdev-properties.h   |  1 -
+ hw/core/qdev-properties.c      |  9 ---------
+ tests/test-qdev-global-props.c | 18 ++++++++++++++----
+ 3 files changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 4f60cc88f3..a95f4a73eb 100644
+index a95f4a73eb..3ab9cd2eb6 100644
 --- a/include/hw/qdev-properties.h
 +++ b/include/hw/qdev-properties.h
-@@ -255,35 +255,6 @@ void qdev_prop_set_globals(DeviceState *dev);
+@@ -249,7 +249,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char =
+*name, int value);
+ void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
+=20
+ void qdev_prop_register_global(GlobalProperty *prop);
+-void qdev_prop_register_global_list(GlobalProperty *props);
+ int qdev_prop_check_globals(void);
+ void qdev_prop_set_globals(DeviceState *dev);
  void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *=
 dev,
-                                     Property *prop, const char *value);
-=20
--/**
-- * register_compat_prop:
-- *
-- * Register internal (not user-provided) global property, changing the
-- * default value of a given property in a device type.  This can be used
-- * for enabling machine-type compatibility or for enabling
-- * accelerator-specific defaults in devices.
-- *
-- * The property values set using this function must be always valid and
-- * never report setter errors, as the property will have
-- * GlobalProperty::errp set to &error_abort.
-- *
-- * User-provided global properties should override internal global
-- * properties, so callers of this function should ensure that it is
-- * called before user-provided global properties are registered.
-- *
-- * @driver: Device type to be affected
-- * @property: Property whose default value is going to be changed
-- * @value: New default value for the property
-- */
--void register_compat_prop(const char *driver, const char *property,
--                          const char *value);
--/*
-- * register_compat_props_array(): using register_compat_prop(), which
-- * only registers internal global properties (which has lower priority
-- * than user-provided global properties)
-- */
--void register_compat_props_array(GlobalProperty *prop);
--
- /**
-  * qdev_property_add_static:
-  * @dev: Device to add the property to.
-diff --git a/accel/accel.c b/accel/accel.c
-index 966b2d8f53..3da26eb90f 100644
---- a/accel/accel.c
-+++ b/accel/accel.c
-@@ -34,6 +34,7 @@
- #include "qom/object.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
-+#include "qapi/error.h"
-=20
- static const TypeInfo accel_type =3D {
-     .name =3D TYPE_ACCEL,
-@@ -121,7 +122,13 @@ void configure_accelerator(MachineState *ms)
- void accel_register_compat_props(AccelState *accel)
- {
-     AccelClass *class =3D ACCEL_GET_CLASS(accel);
--    register_compat_props_array(class->global_props);
-+    GlobalProperty *prop =3D class->global_props;
-+
-+    for (; prop && prop->driver; prop++) {
-+        /* Any compat_props must never cause error */
-+        prop->errp =3D &error_abort;
-+        qdev_prop_register_global(prop);
-+    }
- }
-=20
- void accel_setup_post(MachineState *ms)
 diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 35072dec1e..ab61d502fd 100644
+index ab61d502fd..bd84c4ea4c 100644
 --- a/hw/core/qdev-properties.c
 +++ b/hw/core/qdev-properties.c
-@@ -1180,27 +1180,6 @@ void qdev_prop_register_global(GlobalProperty *pro=
+@@ -1180,15 +1180,6 @@ void qdev_prop_register_global(GlobalProperty *pro=
 p)
      global_props =3D g_list_append(global_props, prop);
  }
 =20
--void register_compat_prop(const char *driver,
--                          const char *property,
--                          const char *value)
+-void qdev_prop_register_global_list(GlobalProperty *props)
 -{
--    GlobalProperty *p =3D g_new0(GlobalProperty, 1);
+-    int i;
 -
--    /* Any compat_props must never cause error */
--    p->errp =3D &error_abort;
--    p->driver =3D driver;
--    p->property =3D property;
--    p->value =3D value;
--    qdev_prop_register_global(p);
--}
--
--void register_compat_props_array(GlobalProperty *prop)
--{
--    for (; prop && prop->driver; prop++) {
--        register_compat_prop(prop->driver, prop->property, prop->value);
+-    for (i =3D 0; props[i].driver !=3D NULL; i++) {
+-        qdev_prop_register_global(props+i);
 -    }
 -}
 -
- void qdev_prop_register_global_list(GlobalProperty *props)
+ int qdev_prop_check_globals(void)
  {
-     int i;
+     GList *l;
+diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-prop=
+s.c
+index ccdf6c57c1..b1eb505442 100644
+--- a/tests/test-qdev-global-props.c
++++ b/tests/test-qdev-global-props.c
+@@ -89,6 +89,16 @@ static void test_static_prop(void)
+     g_test_trap_assert_stdout("");
+ }
+=20
++static void register_global_properties(GlobalProperty *props)
++{
++    int i;
++
++    for (i =3D 0; props[i].driver !=3D NULL; i++) {
++        qdev_prop_register_global(props + i);
++    }
++}
++
++
+ /* Test setting of static property using global properties */
+ static void test_static_globalprop_subprocess(void)
+ {
+@@ -98,7 +108,7 @@ static void test_static_globalprop_subprocess(void)
+         {}
+     };
+=20
+-    qdev_prop_register_global_list(props);
++    register_global_properties(props);
+=20
+     mt =3D STATIC_TYPE(object_new(TYPE_STATIC_PROPS));
+     qdev_init_nofail(DEVICE(mt));
+@@ -216,7 +226,7 @@ static void test_dynamic_globalprop_subprocess(void)
+     };
+     int global_error;
+=20
+-    qdev_prop_register_global_list(props);
++    register_global_properties(props);
+=20
+     mt =3D DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
+     qdev_init_nofail(DEVICE(mt));
+@@ -261,7 +271,7 @@ static void test_dynamic_globalprop_nouser_subprocess=
+(void)
+     };
+     int global_error;
+=20
+-    qdev_prop_register_global_list(props);
++    register_global_properties(props);
+=20
+     mt =3D DYNAMIC_TYPE(object_new(TYPE_DYNAMIC_PROPS));
+     qdev_init_nofail(DEVICE(mt));
+@@ -299,7 +309,7 @@ static void test_subclass_global_props(void)
+         {}
+     };
+=20
+-    qdev_prop_register_global_list(props);
++    register_global_properties(props);
+=20
+     mt =3D STATIC_TYPE(object_new(TYPE_SUBCLASS));
+     qdev_init_nofail(DEVICE(mt));
 --=20
 2.20.0.rc1
