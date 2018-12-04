@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=869b801c3=Paul.Durrant@citrix.com>)
-	id 1gUEcE-0005Tj-RN
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:36:12 -0500
+	(envelope-from <philmd@redhat.com>) id 1gUEgf-0001Rm-OX
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:40:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=869b801c3=Paul.Durrant@citrix.com>)
-	id 1gUEcD-0005iF-6J
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:36:10 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Tue, 4 Dec 2018 17:14:01 +0000
-Message-ID: <ff67fbfdb62e49b1bd28ed70cdb461ca@AMSPEX02CL03.citrite.net>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-4-paul.durrant@citrix.com>
-	<20181129160541.GG14786@perard.uk.xensource.com>
-	<311937f3c787461686f2ebf68a70a326@AMSPEX02CL03.citrite.net>
-In-Reply-To: <311937f3c787461686f2ebf68a70a326@AMSPEX02CL03.citrite.net>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <philmd@redhat.com>) id 1gUEgb-0000AQ-CK
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:40:45 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46698)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gUEgb-0000A3-2o
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:40:41 -0500
+Received: by mail-wr1-f65.google.com with SMTP id l9so16870316wrt.13
+	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 09:40:41 -0800 (PST)
+References: <1543848532-12604-1-git-send-email-lizhijian@cn.fujitsu.com>
+	<1543848532-12604-2-git-send-email-lizhijian@cn.fujitsu.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <92678cef-b2de-0eb6-d7c8-013f7adca4a2@redhat.com>
+Date: Tue, 4 Dec 2018 18:40:35 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 03/18] xen: introduce 'xen-qdisk'
+In-Reply-To: <1543848532-12604-2-git-send-email-lizhijian@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 1/4] unify len and addr type for
+ memory/address APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,247 +31,355 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>, Anthony Perard <anthony.perard@citrix.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+To: Li Zhijian <lizhijian@cn.fujitsu.com>, qemu-devel@nongnu.org, mst@redhat.com, peter.maydell@linaro.org
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, philip.li@intel.com, zhijianx.li@intel.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-> -----Original Message-----
-> From: Qemu-devel [mailto:qemu-devel-
-> bounces+paul.durrant=3Dcitrix.com@nongnu.org] On Behalf Of Paul Durrant
-> Sent: 04 December 2018 15:20
-> To: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>; Stefano Stabellini
-> <sstabellini@kernel.org>; qemu-block@nongnu.org; qemu-devel@nongnu.org;
-> Max Reitz <mreitz@redhat.com>; xen-devel@lists.xenproject.org
-> Subject: Re: [Qemu-devel] [PATCH 03/18] xen: introduce 'xen-qdisk'
->=20
-> > -----Original Message-----
-> > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> > Sent: 29 November 2018 16:06
-> > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
-> > devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
-> > <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
-> > Subject: Re: [PATCH 03/18] xen: introduce 'xen-qdisk'
-> >
-> > On Wed, Nov 21, 2018 at 03:11:56PM +0000, Paul Durrant wrote:
-> > > This patch adds a new XenDevice: 'xen-qdisk' [1]. This will eventuall=
-y
-> > > replace the 'xen_disk' legacy PV backend but it is illustrative to
-> build
-> > > up the implementation incrementally, along with the XenBus/XenDevice
-> > > framework. Subsequent patches will therefore add to this device's
-> > > implementation as new features are added to the framework.
-> > >
-> > > After this patch has been applied it is possible to instantiate a new
-> > > 'xen-qdisk' device with a single 'vdev' parameter, which accepts
-> values
-> > > adhering to the Xen VBD naming scheme [2]. For example, a command-lin=
-e
-> > > instantiation of a xen-qdisk can be done with an argument similar to
-> the
-> > > following:
-> > >
-> > > -device xen-qdisk,vdev=3Dhda
-> >
-> > That works when QEMU boot, but doing the same thing once the guest have
-> > booted, via QMP, doesn't. Here is the result (tested in qmp-shell):
-> >
-> > (QEMU) device_add driver=3Dxen-qdisk vdev=3Dhda
-> > {
-> >     "error": {
-> >         "class": "GenericError",
-> >         "desc": "Bus 'xen-bus.0' does not support hotplugging"
-> >     }
-> > }
-> >
-> > That's probably why I've asked about the hotplug capability on the
-> > previous patch.
-> >
->=20
-> Ok. I've added the hotplug now so I'll make sure QMP DTRT.
->=20
-> > > The implementation of the vdev parameter formulates the appropriate
-> VBD
-> > > number for use in the PV protocol.
-> > >
-> > > [1] The name 'qdisk' as always been the name given to the QEMU
-> > >     implementation of the Xen PV block protocol backend implementatio=
-n
-> > > [2] http://xenbits.xen.org/gitweb/?p=3Dxen.git;a=3Dblob;f=3Ddocs/man/=
-xen-
-> vbd-
-> > interface.markdown.7
-> >
-> > Maybe a link to the generated docs would be better:
-> > https://xenbits.xen.org/docs/unstable/man/xen-vbd-interface.7.html
-> >
->=20
-> Ok.
->=20
-> > Also, it would be useful to have the same link in the source code.
-> >
->=20
-> Yes, I'll add a comment.
->=20
-> > > diff --git a/hw/block/xen-qdisk.c b/hw/block/xen-qdisk.c
-> > > new file mode 100644
-> > > index 0000000000..72122073f7
-> > > --- /dev/null
-> > > +++ b/hw/block/xen-qdisk.c
-> > [...]
-> > > +static char *disk_to_vbd_name(unsigned int disk)
-> > > +{
-> > > +    unsigned int len =3D DIV_ROUND_UP(disk, 26);
-> > > +    char *name =3D g_malloc0(len + 1);
-> > > +
-> > > +    do {
-> > > +        name[len--] =3D 'a' + (disk % 26);
-> > > +        disk /=3D 26;
-> > > +    } while (disk !=3D 0);
-> > > +    assert(len =3D=3D 0);
-> > > +
-> > > +    return name;
-> > > +}
-> >
-> > That function doesn't work.
-> >
-> > For a simple xvdp, (so disk=3D=3D15), it return "", I mean "\0p".
-> >
-> > For a more complicated 'xvdbhwza', we have len =3D=3D 22901. And the as=
-sert
-> > failed.
-> >
-> > Maybe the recursing algo in libxl would be fine, with a buffer that is
-> > big enough, and could probably be on the stack (in _get_vdev).
->=20
-> I used libxl__device_disk_dev_number() as my model (as well as cross-
-> checking with the spec), but I guess a recursing algorithm would be
-> neater.
->=20
-> >
-> > > +
-> > > +    switch (vdev->type) {
-> > > +    case XEN_QDISK_VDEV_TYPE_DP:
-> > > +    case XEN_QDISK_VDEV_TYPE_XVD:
-> > > +        if (vdev->disk < (1 << 4) && vdev->partition < (1 << 4)) {
-> > > +            vdev->number =3D (202 << 8) | (vdev->disk << 4) |
-> > > +                vdev->partition;
-> > > +        } else if (vdev->disk < (1 << 20) && vdev->partition < (1 <<
-> > 8)) {
-> > > +            vdev->number =3D (1 << 28) | (vdev->disk << 8) |
-> > > +                vdev->partition;
-> > > +        } else {
-> > > +            goto invalid;
-> > > +        }
-> > > +        break;
-> > > +
-> > > +    case XEN_QDISK_VDEV_TYPE_HD:
-> > > +        if ((vdev->disk =3D=3D 0 || vdev->disk =3D=3D 1) &&
-> > > +            vdev->partition < (1 << 4)) {
-> >
-> > I think that should be:
-> >
-> >     vdev->partition < (1 << 6)
-> >
-> > Because hd disk have 0..63 partitions.
->=20
-> Yes, I must have typo-ed it...
->=20
-> >
-> > > +            vdev->number =3D (3 << 8) | (vdev->disk << 6) | vdev-
-> > >partition;
-> > > +        } else if ((vdev->disk =3D=3D 2 || vdev->disk =3D=3D 3) &&
-> > > +                   vdev->partition < (1 << 4)) {
-> >
-> > same here.
->=20
-> ...and then cut'n'pasted.
->=20
-> >
-> > > +            vdev->number =3D (22 << 8) | ((vdev->disk - 2) << 6) |
-> > > +                vdev->partition;
-> > > +        } else {
-> > > +            goto invalid;
-> > > +        }
-> > > +        break;
-> > > +
-> > > +    case XEN_QDISK_VDEV_TYPE_SD:
-> > > +        if (vdev->disk < (1 << 4) && vdev->partition < (1 << 4)) {
-> > > +            vdev->number =3D (8 << 8) | (vdev->disk << 4) | vdev-
-> > >partition;
-> > > +        } else {
-> > > +            goto invalid;
-> > > +        }
-> > > +        break;
-> > > +
-> > > +    default:
-> > > +        goto invalid;
-> > > +    }
-> > > +
-> > > +    g_free(str);
-> > > +    vdev->valid =3D true;
-> > > +    return;
-> > > +
-> > > +invalid:
-> > > +    error_setg(errp, "invalid virtual disk specifier");
-> > > +    g_free(str);
-> >
-> > :(, g_free is called twice.
->=20
-> Oops. Good catch.
+Hi Li,
 
-Oh, I thought you'd found a double free...
+On 3/12/18 15:48, Li Zhijian wrote:
+> Some address/memory APIs have different type between
+> 'hwaddr/target_ulong addr' and 'int len'. It is very unsafety, espcially
 
->=20
-> >
-> > maybe we could have:
-> >     vdev->valid=3Dtrue;
-> >     out:
-> >       if (!vdev->valid)
-> >         error_setg(...);
-> >       g_free;
+I'm not native English speaker, but I think this should be spell:
 
-No, that's quite convoluted. I prefer separate 'fail' and 'success' paths, =
-even if they both need to call g_free().
+... "very unsafe, especially" ...
 
-  Paul
-
-> >
-> > > diff --git a/include/hw/xen/xen-qdisk.h b/include/hw/xen/xen-qdisk.h
-> > > new file mode 100644
-> > > index 0000000000..ade0866037
-> > > --- /dev/null
-> > > +++ b/include/hw/xen/xen-qdisk.h
-> > > @@ -0,0 +1,38 @@
-> > > +/*
-> > > + * Copyright (c) Citrix Systems Inc.
-> > > + * All rights reserved.
-> > > + */
-> > > +
-> > > +#ifndef HW_XEN_QDISK_H
-> > > +#define HW_XEN_QDISK_H
-> > > +
-> > > +#include "hw/xen/xen-bus.h"
-> > > +
-> > > +typedef enum XenQdiskVdevType {
-> > > +    XEN_QDISK_VDEV_TYPE_DP,
-> >
-> > Maybe we could set type_dp value to 1, so that, when vdev->type isn't
-> > set, we can detect it later.
->=20
-> Rather than having the 'valid' bool? Yes, that would work.
->=20
->   Paul
->=20
-> >
-> >
-> > > +    XEN_QDISK_VDEV_TYPE_XVD,
-> > > +    XEN_QDISK_VDEV_TYPE_HD,
-> > > +    XEN_QDISK_VDEV_TYPE_SD,
-> > > +    XEN_QDISK_VDEV_TYPE__MAX
-> > > +} XenQdiskVdevType;
-> >
-> > Thanks,
-> >
-> > --
-> > Anthony PERARD
+> some APIs will be passed a non-int len by caller which might cause
+> overflow quietly.
+> Below is an potential overflow case:
+>     dma_memory_read(uint32_t len)
+>       -> dma_memory_rw(uint32_t len)
+>         -> dma_memory_rw_relaxed(uint32_t len)
+>           -> address_space_rw(int len) # len overflow
+> 
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+> CC: Richard Henderson <rth@twiddle.net>
+> CC: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> 
+> ---
+> V3: use the same type between len and addr(Peter Maydell)
+>     rebase code basing on https://patchew.org/QEMU/20181122133507.30950-1-peter.maydell@linaro.org/
+> ---
+>  exec.c                    | 47 +++++++++++++++++++++++------------------------
+>  include/exec/cpu-all.h    |  2 +-
+>  include/exec/cpu-common.h |  8 ++++----
+>  include/exec/memory.h     | 22 +++++++++++-----------
+>  4 files changed, 39 insertions(+), 40 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index 6e875f0..f475974 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2848,10 +2848,10 @@ static const MemoryRegionOps watch_mem_ops = {
+>  };
+>  
+>  static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
+> -                                      MemTxAttrs attrs, uint8_t *buf, int len);
+> +                                      MemTxAttrs attrs, uint8_t *buf, hwaddr len);
+>  static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
+> -                                  const uint8_t *buf, int len);
+> -static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
+> +                                  const uint8_t *buf, hwaddr len);
+> +static bool flatview_access_valid(FlatView *fv, hwaddr addr, hwaddr len,
+>                                    bool is_write, MemTxAttrs attrs);
+>  
+>  static MemTxResult subpage_read(void *opaque, hwaddr addr, uint64_t *data,
+> @@ -3099,10 +3099,10 @@ MemoryRegion *get_system_io(void)
+>  /* physical memory access (slow version, mainly for debug) */
+>  #if defined(CONFIG_USER_ONLY)
+>  int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+> -                        uint8_t *buf, int len, int is_write)
+> +                        uint8_t *buf, target_ulong len, int is_write)
+>  {
+> -    int l, flags;
+> -    target_ulong page;
+> +    int flags;
+> +    target_ulong l, page;
+>      void * p;
+>  
+>      while (len > 0) {
+> @@ -3215,7 +3215,7 @@ static bool prepare_mmio_access(MemoryRegion *mr)
+>  static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
+>                                             MemTxAttrs attrs,
+>                                             const uint8_t *buf,
+> -                                           int len, hwaddr addr1,
+> +                                           hwaddr len, hwaddr addr1,
+>                                             hwaddr l, MemoryRegion *mr)
+>  {
+>      uint8_t *ptr;
+> @@ -3260,7 +3260,7 @@ static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
+>  
+>  /* Called from RCU critical section.  */
+>  static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
+> -                                  const uint8_t *buf, int len)
+> +                                  const uint8_t *buf, hwaddr len)
+>  {
+>      hwaddr l;
+>      hwaddr addr1;
+> @@ -3278,7 +3278,7 @@ static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
+>  /* Called within RCU critical section.  */
+>  MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+>                                     MemTxAttrs attrs, uint8_t *buf,
+> -                                   int len, hwaddr addr1, hwaddr l,
+> +                                   hwaddr len, hwaddr addr1, hwaddr l,
+>                                     MemoryRegion *mr)
+>  {
+>      uint8_t *ptr;
+> @@ -3321,7 +3321,7 @@ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+>  
+>  /* Called from RCU critical section.  */
+>  static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
+> -                                 MemTxAttrs attrs, uint8_t *buf, int len)
+> +                                 MemTxAttrs attrs, uint8_t *buf, hwaddr len)
+>  {
+>      hwaddr l;
+>      hwaddr addr1;
+> @@ -3334,7 +3334,7 @@ static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
+>  }
+>  
+>  MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
+> -                                    MemTxAttrs attrs, uint8_t *buf, int len)
+> +                                    MemTxAttrs attrs, uint8_t *buf, hwaddr len)
+>  {
+>      MemTxResult result = MEMTX_OK;
+>      FlatView *fv;
+> @@ -3351,7 +3351,7 @@ MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
+>  
+>  MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+>                                  MemTxAttrs attrs,
+> -                                const uint8_t *buf, int len)
+> +                                const uint8_t *buf, hwaddr len)
+>  {
+>      MemTxResult result = MEMTX_OK;
+>      FlatView *fv;
+> @@ -3367,7 +3367,7 @@ MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+>  }
+>  
+>  MemTxResult address_space_rw(AddressSpace *as, hwaddr addr, MemTxAttrs attrs,
+> -                             uint8_t *buf, int len, bool is_write)
+> +                             uint8_t *buf, hwaddr len, bool is_write)
+>  {
+>      if (is_write) {
+>          return address_space_write(as, addr, attrs, buf, len);
+> @@ -3377,7 +3377,7 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr, MemTxAttrs attrs,
+>  }
+>  
+>  void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
+> -                            int len, int is_write)
+> +                            hwaddr len, int is_write)
+>  {
+>      address_space_rw(&address_space_memory, addr, MEMTXATTRS_UNSPECIFIED,
+>                       buf, len, is_write);
+> @@ -3392,7 +3392,7 @@ static inline MemTxResult address_space_write_rom_internal(AddressSpace *as,
+>                                                             hwaddr addr,
+>                                                             MemTxAttrs attrs,
+>                                                             const uint8_t *buf,
+> -                                                           int len,
+> +                                                           hwaddr len,
+>                                                             enum write_rom_type type)
+>  {
+>      hwaddr l;
+> @@ -3432,13 +3432,13 @@ static inline MemTxResult address_space_write_rom_internal(AddressSpace *as,
+>  /* used for ROM loading : can write in RAM and ROM */
+>  MemTxResult address_space_write_rom(AddressSpace *as, hwaddr addr,
+>                                      MemTxAttrs attrs,
+> -                                    const uint8_t *buf, int len)
+> +                                    const uint8_t *buf, hwaddr len)
+>  {
+>      return address_space_write_rom_internal(as, addr, attrs,
+>                                              buf, len, WRITE_DATA);
+>  }
+>  
+> -void cpu_flush_icache_range(hwaddr start, int len)
+> +void cpu_flush_icache_range(hwaddr start, hwaddr len)
+>  {
+>      /*
+>       * This function should do the same thing as an icache flush that was
+> @@ -3541,7 +3541,7 @@ static void cpu_notify_map_clients(void)
+>      qemu_mutex_unlock(&map_client_list_lock);
+>  }
+>  
+> -static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
+> +static bool flatview_access_valid(FlatView *fv, hwaddr addr, hwaddr len,
+>                                    bool is_write, MemTxAttrs attrs)
+>  {
+>      MemoryRegion *mr;
+> @@ -3564,7 +3564,7 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
+>  }
+>  
+>  bool address_space_access_valid(AddressSpace *as, hwaddr addr,
+> -                                int len, bool is_write,
+> +                                hwaddr len, bool is_write,
+>                                  MemTxAttrs attrs)
+>  {
+>      FlatView *fv;
+> @@ -3817,7 +3817,7 @@ static inline MemoryRegion *address_space_translate_cached(
+>   */
+>  void
+>  address_space_read_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+> -                                   void *buf, int len)
+> +                                   void *buf, hwaddr len)
+>  {
+>      hwaddr addr1, l;
+>      MemoryRegion *mr;
+> @@ -3835,7 +3835,7 @@ address_space_read_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+>   */
+>  void
+>  address_space_write_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+> -                                    const void *buf, int len)
+> +                                    const void *buf, hwaddr len)
+>  {
+>      hwaddr addr1, l;
+>      MemoryRegion *mr;
+> @@ -3858,11 +3858,10 @@ address_space_write_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+>  
+>  /* virtual memory access for debug (includes writing to ROM) */
+>  int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+> -                        uint8_t *buf, int len, int is_write)
+> +                        uint8_t *buf, target_ulong len, int is_write)
+>  {
+> -    int l;
+>      hwaddr phys_addr;
+> -    target_ulong page;
+> +    target_ulong l, page;
+>  
+>      cpu_synchronize_state(cpu);
+>      while (len > 0) {
+> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+> index 117d2fb..b16c9ec 100644
+> --- a/include/exec/cpu-all.h
+> +++ b/include/exec/cpu-all.h
+> @@ -367,7 +367,7 @@ void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf);
+>  #endif /* !CONFIG_USER_ONLY */
+>  
+>  int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+> -                        uint8_t *buf, int len, int is_write);
+> +                        uint8_t *buf, target_ulong len, int is_write);
+>  
+>  int cpu_exec(CPUState *cpu);
+>  
+> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> index 2ad2d6d..63ec1f9 100644
+> --- a/include/exec/cpu-common.h
+> +++ b/include/exec/cpu-common.h
+> @@ -83,14 +83,14 @@ size_t qemu_ram_pagesize(RAMBlock *block);
+>  size_t qemu_ram_pagesize_largest(void);
+>  
+>  void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
+> -                            int len, int is_write);
+> +                            hwaddr len, int is_write);
+>  static inline void cpu_physical_memory_read(hwaddr addr,
+> -                                            void *buf, int len)
+> +                                            void *buf, hwaddr len)
+>  {
+>      cpu_physical_memory_rw(addr, buf, len, 0);
+>  }
+>  static inline void cpu_physical_memory_write(hwaddr addr,
+> -                                             const void *buf, int len)
+> +                                             const void *buf, hwaddr len)
+>  {
+>      cpu_physical_memory_rw(addr, (void *)buf, len, 1);
+>  }
+> @@ -111,7 +111,7 @@ bool cpu_physical_memory_is_io(hwaddr phys_addr);
+>   */
+>  void qemu_flush_coalesced_mmio_buffer(void);
+>  
+> -void cpu_flush_icache_range(hwaddr start, int len);
+> +void cpu_flush_icache_range(hwaddr start, hwaddr len);
+>  
+>  extern struct MemoryRegion io_mem_rom;
+>  extern struct MemoryRegion io_mem_notdirty;
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index ffd23ed..6235f77 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -1773,7 +1773,7 @@ void address_space_destroy(AddressSpace *as);
+>   */
+>  MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
+>                               MemTxAttrs attrs, uint8_t *buf,
+> -                             int len, bool is_write);
+> +                             hwaddr len, bool is_write);
+>  
+>  /**
+>   * address_space_write: write to address space.
+> @@ -1790,7 +1790,7 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
+>   */
+>  MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+>                                  MemTxAttrs attrs,
+> -                                const uint8_t *buf, int len);
+> +                                const uint8_t *buf, hwaddr len);
+>  
+>  /**
+>   * address_space_write_rom: write to address space, including ROM.
+> @@ -1816,7 +1816,7 @@ MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+>   */
+>  MemTxResult address_space_write_rom(AddressSpace *as, hwaddr addr,
+>                                      MemTxAttrs attrs,
+> -                                    const uint8_t *buf, int len);
+> +                                    const uint8_t *buf, hwaddr len);
+>  
+>  /* address_space_ld*: load from an address space
+>   * address_space_st*: store to an address space
+> @@ -2017,7 +2017,7 @@ static inline MemoryRegion *address_space_translate(AddressSpace *as,
+>   * @is_write: indicates the transfer direction
+>   * @attrs: memory attributes
+>   */
+> -bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len,
+> +bool address_space_access_valid(AddressSpace *as, hwaddr addr, hwaddr len,
+>                                  bool is_write, MemTxAttrs attrs);
+>  
+>  /* address_space_map: map a physical memory region into a host virtual address
+> @@ -2054,19 +2054,19 @@ void address_space_unmap(AddressSpace *as, void *buffer, hwaddr len,
+>  
+>  /* Internal functions, part of the implementation of address_space_read.  */
+>  MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
+> -                                    MemTxAttrs attrs, uint8_t *buf, int len);
+> +                                    MemTxAttrs attrs, uint8_t *buf, hwaddr len);
+>  MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+>                                     MemTxAttrs attrs, uint8_t *buf,
+> -                                   int len, hwaddr addr1, hwaddr l,
+> +                                   hwaddr len, hwaddr addr1, hwaddr l,
+>                                     MemoryRegion *mr);
+>  void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr);
+>  
+>  /* Internal functions, part of the implementation of address_space_read_cached
+>   * and address_space_write_cached.  */
+>  void address_space_read_cached_slow(MemoryRegionCache *cache,
+> -                                    hwaddr addr, void *buf, int len);
+> +                                    hwaddr addr, void *buf, hwaddr len);
+>  void address_space_write_cached_slow(MemoryRegionCache *cache,
+> -                                     hwaddr addr, const void *buf, int len);
+> +                                     hwaddr addr, const void *buf, hwaddr len);
+>  
+>  static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
+>  {
+> @@ -2094,7 +2094,7 @@ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
+>  static inline __attribute__((__always_inline__))
+>  MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
+>                                 MemTxAttrs attrs, uint8_t *buf,
+> -                               int len)
+> +                               hwaddr len)
+>  {
+>      MemTxResult result = MEMTX_OK;
+>      hwaddr l, addr1;
+> @@ -2133,7 +2133,7 @@ MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
+>   */
+>  static inline void
+>  address_space_read_cached(MemoryRegionCache *cache, hwaddr addr,
+> -                          void *buf, int len)
+> +                          void *buf, hwaddr len)
+>  {
+>      assert(addr < cache->len && len <= cache->len - addr);
+>      if (likely(cache->ptr)) {
+> @@ -2153,7 +2153,7 @@ address_space_read_cached(MemoryRegionCache *cache, hwaddr addr,
+>   */
+>  static inline void
+>  address_space_write_cached(MemoryRegionCache *cache, hwaddr addr,
+> -                           void *buf, int len)
+> +                           void *buf, hwaddr len)
+>  {
+>      assert(addr < cache->len && len <= cache->len - addr);
+>      if (likely(cache->ptr)) {
+> 
