@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41717)
+Received: from eggs.gnu.org ([208.118.235.92]:35383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gTzAm-0006ZC-Dl
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 20:06:49 -0500
+	(envelope-from <no-reply@patchew.org>) id 1gTzeY-0003WX-B5
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 20:37:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gTzAg-0003CX-KS
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 20:06:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42858)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1gTzAg-00037Q-82
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 20:06:42 -0500
-Date: Mon, 3 Dec 2018 20:06:37 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181203200403-mutt-send-email-mst@kernel.org>
-References: <1543848532-12604-1-git-send-email-lizhijian@cn.fujitsu.com>
-	<1543848532-12604-4-git-send-email-lizhijian@cn.fujitsu.com>
+	(envelope-from <no-reply@patchew.org>) id 1gTzWH-0002Wl-Q9
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 20:29:06 -0500
+Resent-Message-Id: <E1gTzWH-0002Wl-Q9@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21783)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1gTzW9-0002R8-MC
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 20:28:55 -0500
+In-Reply-To: <20181203170105.2367492-1-stefanb@linux.vnet.ibm.com>
+Message-ID: <154388690188.15376.11474455213164869616@c26723477dc9>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1543848532-12604-4-git-send-email-lizhijian@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH for-4.0 v3 3/4] i386: import bootparam.h
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 3 Dec 2018 17:28:23 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Cleanup and locality range check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Zhijian <lizhijian@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, philip.li@intel.com, zhijianx.li@intel.com
+To: stefanb@linux.vnet.ibm.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, marcandre.lureau@gmail.com, ppandit@redhat.com
 
-On Mon, Dec 03, 2018 at 10:48:51PM +0800, Li Zhijian wrote:
-> It provides setup_data struct and header fields
-> 
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-
-
-Sorry I was unclear when I said "import it from Linux".
-
-The way to import it is to copy the header
-from the linux kernel by adding it to ./scripts/update-linux-headers.sh
-and placing a copy into include/standard-headers/
-
-Hope that helps.
-
-> ---
-> V3: new patch
-> ---
->  hw/i386/pc.c | 15 +--------------
->  1 file changed, 1 insertion(+), 14 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 067d23a..8db7417 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -74,6 +74,7 @@
->  #include "hw/nmi.h"
->  #include "hw/i386/intel_iommu.h"
->  #include "hw/net/ne2000-isa.h"
-> +#include <asm/bootparam.h>
->  
->  /* debug PC/ISA interrupts */
->  //#define DEBUG_IRQ
-> @@ -820,20 +821,6 @@ static long get_file_size(FILE *f)
->      return size;
->  }
->  
-> -/* setup_data types */
-> -#define SETUP_NONE     0
-> -#define SETUP_E820_EXT 1
-> -#define SETUP_DTB      2
-> -#define SETUP_PCI      3
-> -#define SETUP_EFI      4
-> -
-> -struct setup_data {
-> -    uint64_t next;
-> -    uint32_t type;
-> -    uint32_t len;
-> -    uint8_t data[0];
-> -} __attribute__((packed));
-> -
->  static void load_linux(PCMachineState *pcms,
->                         FWCfgState *fw_cfg)
->  {
-> -- 
-> 2.7.4
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE4MTIwMzE3MDEwNS4yMzY3
+NDkyLTEtc3RlZmFuYkBsaW51eC52bmV0LmlibS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8y
+XSBDbGVhbnVwIGFuZCBsb2NhbGl0eSByYW5nZSBjaGVjawpNZXNzYWdlLWlkOiAyMDE4MTIwMzE3
+MDEwNS4yMzY3NDkyLTEtc3RlZmFuYkBsaW51eC52bmV0LmlibS5jb20KVHlwZTogc2VyaWVzCgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFs
+PSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29t
+bWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4g
+JGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxv
+ZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9
+ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAg
+ICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQg
+JGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
+ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CjhlNzk4YzQgdHBtOiBNYWtlIHN1cmUgbmV3IGxvY2FsaXR5IHBhc3NlZCB0byB0cG1fdGlzX3By
+ZXBfYWJvcnQoKSBpcyB2YWxpZApiM2RmY2RmIHRwbTogUmVtb3ZlIHVudXNlZCBsb2N0eSBwYXJh
+bWV0ZXIgZnJvbSB0cG1fdGlzX2Fib3J0KCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
+IFBBVENIIDEvMjogdHBtOiBSZW1vdmUgdW51c2VkIGxvY3R5IHBhcmFtZXRlciBmcm9tIHRwbV90
+aXNfYWJvcnQoKS4uLgpDaGVja2luZyBQQVRDSCAyLzI6IHRwbTogTWFrZSBzdXJlIG5ldyBsb2Nh
+bGl0eSBwYXNzZWQgdG8gdHBtX3Rpc19wcmVwX2Fib3J0KCkgaXMgdmFsaWQuLi4KRVJST1I6IGJy
+YWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjY6
+IEZJTEU6IGh3L3RwbS90cG1fdGlzLmM6MjY2OgorICAgIGlmICghVFBNX1RJU19JU19WQUxJRF9M
+T0NUWShuZXdsb2N0eSkpClsuLi5dCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDExIGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBP
+VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVs
+bCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTgxMjAzMTcw
+MTA1LjIzNjc0OTItMS1zdGVmYW5iQGxpbnV4LnZuZXQuaWJtLmNvbS90ZXN0aW5nLmNoZWNrcGF0
+Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
