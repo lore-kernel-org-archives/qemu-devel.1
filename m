@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=869b801c3=Paul.Durrant@citrix.com>)
-	id 1gUD4Z-0007RD-Fe
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 10:57:20 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gUDAc-00014c-U1
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:03:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=869b801c3=Paul.Durrant@citrix.com>)
-	id 1gUD4V-0002uw-EV
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 10:57:19 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Tue, 4 Dec 2018 15:50:48 +0000
-Message-ID: <bf0b3df5c0c44ddabf153df52321dc4c@AMSPEX02CL03.citrite.net>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-4-paul.durrant@citrix.com>
-	<20181129160541.GG14786@perard.uk.xensource.com>
-	<311937f3c787461686f2ebf68a70a326@AMSPEX02CL03.citrite.net>
-	<20181204154908.GX14786@perard.uk.xensource.com>
-In-Reply-To: <20181204154908.GX14786@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <cohuck@redhat.com>) id 1gUDAZ-0006h5-FS
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:03:34 -0500
+Date: Tue, 4 Dec 2018 17:03:21 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181204170321.6919aeae.cohuck@redhat.com>
+In-Reply-To: <20181204160124.48a32fbe@oc2783563651>
+References: <20181204133802.100998-1-borntraeger@de.ibm.com>
+	<20181204160124.48a32fbe@oc2783563651>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 03/18] xen: introduce 'xen-qdisk'
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] s390/MAINTAINERS: Add Halil
+ as kvm and machine maintainer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 
+On Tue, 4 Dec 2018 16:01:24 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
+> On Tue,  4 Dec 2018 14:38:02 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+> > Halil does more work in this area than I do right now. Lets add Halil.
+> > 
+> > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>  
+> 
+> Acked-by: Halil Pasic <pasic@linux.ibm.com>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 04 December 2018 15:49
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: qemu-block@nongnu.org; qemu-devel@nongnu.org; xen-
-> devel@lists.xenproject.org; Kevin Wolf <kwolf@redhat.com>; Max Reitz
-> <mreitz@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>
-> Subject: Re: [PATCH 03/18] xen: introduce 'xen-qdisk'
->=20
-> On Tue, Dec 04, 2018 at 03:20:04PM +0000, Paul Durrant wrote:
-> > > > +static char *disk_to_vbd_name(unsigned int disk)
-> > > > +{
-> > > > +    unsigned int len =3D DIV_ROUND_UP(disk, 26);
-> > > > +    char *name =3D g_malloc0(len + 1);
-> > > > +
-> > > > +    do {
-> > > > +        name[len--] =3D 'a' + (disk % 26);
-> > > > +        disk /=3D 26;
-> > > > +    } while (disk !=3D 0);
-> > > > +    assert(len =3D=3D 0);
-> > > > +
-> > > > +    return name;
-> > > > +}
-> > >
-> > > That function doesn't work.
-> > >
-> > > For a simple xvdp, (so disk=3D=3D15), it return "", I mean "\0p".
-> > >
-> > > For a more complicated 'xvdbhwza', we have len =3D=3D 22901. And the
-> assert
-> > > failed.
-> > >
-> > > Maybe the recursing algo in libxl would be fine, with a buffer that i=
-s
-> > > big enough, and could probably be on the stack (in _get_vdev).
-> >
-> > I used libxl__device_disk_dev_number() as my model (as well as cross-
-> checking with the spec), but I guess a recursing algorithm would be
-> neater.
->=20
-> There is libxl__devid_to_vdev() actually just after ;-) which calls
-> encode_disk_name which is recursing.
+Thanks, applied.
 
-Ah, I'll look for that. Currently having trouble reconciling the 'tq' -> 53=
-6 mapping in the doc.
-
-  Paul
-
->=20
-> > > > diff --git a/include/hw/xen/xen-qdisk.h b/include/hw/xen/xen-qdisk.=
-h
-> > > > new file mode 100644
-> > > > index 0000000000..ade0866037
-> > > > --- /dev/null
-> > > > +++ b/include/hw/xen/xen-qdisk.h
-> > > > @@ -0,0 +1,38 @@
-> > > > +/*
-> > > > + * Copyright (c) Citrix Systems Inc.
-> > > > + * All rights reserved.
-> > > > + */
-> > > > +
-> > > > +#ifndef HW_XEN_QDISK_H
-> > > > +#define HW_XEN_QDISK_H
-> > > > +
-> > > > +#include "hw/xen/xen-bus.h"
-> > > > +
-> > > > +typedef enum XenQdiskVdevType {
-> > > > +    XEN_QDISK_VDEV_TYPE_DP,
-> > >
-> > > Maybe we could set type_dp value to 1, so that, when vdev->type isn't
-> > > set, we can detect it later.
-> >
-> > Rather than having the 'valid' bool? Yes, that would work.
->=20
-> Well, the 'valid' bool doesn't seems to always be check so it would be
-> better. e.g. xen_qdisk_get_vdev() doesn't check `valid` before
-> genereting a string. Then xen_qdisk_set_vdev could set `type` to invalid
-> when it is invalid.
->=20
-> --
-> Anthony PERARD
+> 
+> > ---
+> >  MAINTAINERS | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 63effdc473..76fbf1331a 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -365,8 +365,9 @@ S: Maintained
+> >  F: target/ppc/kvm.c
+> >  
+> >  S390
+> > -M: Christian Borntraeger <borntraeger@de.ibm.com>
+> > +M: Halil Pasic <pasic@linux.ibm.com>
+> >  M: Cornelia Huck <cohuck@redhat.com>
+> > +M: Christian Borntraeger <borntraeger@de.ibm.com>
+> >  S: Maintained
+> >  F: target/s390x/kvm.c
+> >  F: target/s390x/kvm_s390x.h
+> > @@ -1057,6 +1058,7 @@ S390 Machines
+> >  -------------
+> >  S390 Virtio-ccw
+> >  M: Cornelia Huck <cohuck@redhat.com>
+> > +M: Halil Pasic <pasic@linux.ibm.com>
+> >  M: Christian Borntraeger <borntraeger@de.ibm.com>
+> >  S: Supported
+> >  F: hw/char/sclp*.[hc]  
+> 
