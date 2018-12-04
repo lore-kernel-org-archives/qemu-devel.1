@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gUBaQ-0005Dh-0h
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:22:07 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gUBas-0005ZX-Me
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:22:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1gUBaN-0007PU-Bw
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:22:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47848)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1gUBaq-0007hx-SX
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:22:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49704)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1gUBaN-0007OQ-07
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:22:03 -0500
+	id 1gUBao-0007gX-Sr
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:22:31 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  4 Dec 2018 18:20:17 +0400
-Message-Id: <20181204142023.15982-14-marcandre.lureau@redhat.com>
+Date: Tue,  4 Dec 2018 18:20:18 +0400
+Message-Id: <20181204142023.15982-15-marcandre.lureau@redhat.com>
 In-Reply-To: <20181204142023.15982-1-marcandre.lureau@redhat.com>
 References: <20181204142023.15982-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-3.2 v5 13/19] qdev-props: remove errp from
- GlobalProperty
+Subject: [Qemu-devel] [PATCH for-3.2 v5 14/19] qdev-props: call
+ object_apply_global_props()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,111 +29,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: imammedo@redhat.com, ehabkost@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-All qdev_prop_register_global() set &error_fatal for errp, except
-'-rtc driftfix=3Dslew', which arguably should also use &error_fatal, as
-otherwise failing to apply the property would only report a warning.
+It's now possible to use the common function.
+
+Teach object_apply_global_props() to warn if Error argument is NULL.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/hw/qdev-core.h    | 6 ------
- hw/core/qdev-properties.c | 4 ++--
- qom/cpu.c                 | 1 -
- target/i386/cpu.c         | 1 -
- target/sparc/cpu.c        | 1 -
- vl.c                      | 1 -
- 6 files changed, 2 insertions(+), 12 deletions(-)
+ hw/core/qdev-properties.c | 24 ++----------------------
+ qom/object.c              | 12 +++++++++++-
+ 2 files changed, 13 insertions(+), 23 deletions(-)
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 7d25c99a77..1d4f4aa1f5 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -250,18 +250,12 @@ struct PropertyInfo {
- /**
-  * GlobalProperty:
-  * @used: Set to true if property was used when initializing a device.
-- * @errp: Error destination, used like first argument of error_setg()
-- *        in case property setting fails later. If @errp is NULL, we
-- *        print warnings instead of ignoring errors silently. For
-- *        hotplugged devices, errp is always ignored and warnings are
-- *        printed instead.
-  */
- typedef struct GlobalProperty {
-     const char *driver;
-     const char *property;
-     const char *value;
-     bool used;
--    Error **errp;
- } GlobalProperty;
-=20
- static inline void
 diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 3467e0485c..a2d25d3d37 100644
+index a2d25d3d37..6061090dc2 100644
 --- a/hw/core/qdev-properties.c
 +++ b/hw/core/qdev-properties.c
-@@ -1238,8 +1238,8 @@ void qdev_prop_set_globals(DeviceState *dev)
-         if (err !=3D NULL) {
-             error_prepend(&err, "can't apply global %s.%s=3D%s: ",
-                           prop->driver, prop->property, prop->value);
--            if (!dev->hotplugged && prop->errp) {
--                error_propagate(prop->errp, err);
-+            if (!dev->hotplugged) {
-+                error_propagate(&error_fatal, err);
-             } else {
-                 warn_report_err(err);
-             }
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 9ad1372d57..5442a7323b 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -312,7 +312,6 @@ static void cpu_common_parse_features(const char *typ=
-ename, char *features,
-             prop->driver =3D typename;
-             prop->property =3D g_strdup(featurestr);
-             prop->value =3D g_strdup(val);
--            prop->errp =3D &error_fatal;
-             qdev_prop_register_global(prop);
-         } else {
-             error_setg(errp, "Expected key=3Dvalue format, found %s.",
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f81d35e1f9..c687a9b694 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3568,7 +3568,6 @@ static void x86_cpu_parse_featurestr(const char *ty=
-pename, char *features,
-         prop->driver =3D typename;
-         prop->property =3D g_strdup(name);
-         prop->value =3D g_strdup(val);
--        prop->errp =3D &error_fatal;
-         qdev_prop_register_global(prop);
-     }
+@@ -1223,28 +1223,8 @@ int qdev_prop_check_globals(void)
 =20
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index 0f090ece54..4a4445bdf5 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -111,7 +111,6 @@ cpu_add_feat_as_prop(const char *typename, const char=
- *name, const char *val)
-     prop->driver =3D typename;
-     prop->property =3D g_strdup(name);
-     prop->value =3D g_strdup(val);
--    prop->errp =3D &error_fatal;
-     qdev_prop_register_global(prop);
+ void qdev_prop_set_globals(DeviceState *dev)
+ {
+-    int i;
+-
+-    for (i =3D 0; i < global_props()->len; i++) {
+-        GlobalProperty *prop;
+-        Error *err =3D NULL;
+-
+-        prop =3D g_ptr_array_index(global_props(), i);
+-        if (object_dynamic_cast(OBJECT(dev), prop->driver) =3D=3D NULL) =
+{
+-            continue;
+-        }
+-        prop->used =3D true;
+-        object_property_parse(OBJECT(dev), prop->value, prop->property, =
+&err);
+-        if (err !=3D NULL) {
+-            error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+-                          prop->driver, prop->property, prop->value);
+-            if (!dev->hotplugged) {
+-                error_propagate(&error_fatal, err);
+-            } else {
+-                warn_report_err(err);
+-            }
+-        }
+-    }
++    object_apply_global_props(OBJECT(dev), global_props(),
++                              dev->hotplugged ? NULL : &error_fatal);
  }
 =20
-diff --git a/vl.c b/vl.c
-index dfc100f51a..1b25cb3da2 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2936,7 +2936,6 @@ static int global_init_func(void *opaque, QemuOpts =
-*opts, Error **errp)
-     g->driver   =3D qemu_opt_get(opts, "driver");
-     g->property =3D qemu_opt_get(opts, "property");
-     g->value    =3D qemu_opt_get(opts, "value");
--    g->errp =3D &error_fatal;
-     qdev_prop_register_global(g);
-     return 0;
+ /* --- 64bit unsigned int 'size' type --- */
+diff --git a/qom/object.c b/qom/object.c
+index dbdab0aead..aa6f3a2a71 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -390,7 +390,17 @@ void object_apply_global_props(Object *obj, const GP=
+trArray *props, Error **errp
+         if (err !=3D NULL) {
+             error_prepend(&err, "can't apply global %s.%s=3D%s: ",
+                           p->driver, p->property, p->value);
+-            error_propagate(errp, err);
++            /*
++             * If errp !=3D NULL, propagate error and return.
++             * If errp =3D=3D NULL, report a warning, but keep going
++             * with the remaining globals.
++             */
++            if (errp) {
++                error_propagate(errp, err);
++                return;
++            } else {
++                warn_report_err(err);
++            }
+         }
+     }
  }
 --=20
 2.20.0.rc1
