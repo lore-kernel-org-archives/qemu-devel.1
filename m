@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gUBiY-0006vF-L7
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:30:31 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1gUC0H-000158-5C
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:48:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gUBiS-0002DQ-CF
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:30:30 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:33757)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gUBiS-0001zH-65
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:30:24 -0500
-Received: by mail-wm1-f66.google.com with SMTP id r24so9552386wmh.0
-	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 06:30:22 -0800 (PST)
-References: <20181204132952.2601-1-peter.maydell@linaro.org>
-	<20181204132952.2601-4-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <99578b97-5903-52cb-ebc8-939a966665df@redhat.com>
-Date: Tue, 4 Dec 2018 15:29:46 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1gUC0C-0006xZ-3j
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:48:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:30529)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gUC0B-0006wx-Aj
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 09:48:43 -0500
+References: <CAFEAcA8rx-ZzHfb5ABcGBHOWDcDwxOejxp_SW9LLuOf1-_cxdg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <321187aa-69e8-ed78-7402-89026e1e9558@redhat.com>
+Date: Tue, 4 Dec 2018 15:48:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181204132952.2601-4-peter.maydell@linaro.org>
+In-Reply-To: <CAFEAcA8rx-ZzHfb5ABcGBHOWDcDwxOejxp_SW9LLuOf1-_cxdg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/5] hw/sd/sdhci: Don't leak memory region
- in sdhci_sysbus_realize()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] hax_enabled() cannot be called in vl.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Vincent Palatin <vpalatin@chromium.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 4/12/18 14:29, Peter Maydell wrote:
-> In sdhci_sysbus_realize() we override the initialization of
-> s->iomem that sdhci_common_realize() performs. However we
-> don't destroy the old memory region before reinitializing
-> it, which means that the memory allocated for mr->name in
-> memory_region_do_init() is leaked.
+On 04/12/18 15:45, Peter Maydell wrote:
+> kvm_enabled() does a similar thing to what hax_enabled() does,
+> but this works out OK because it takes care to avoid
+> providing the #define-to-0 implementation except in the
+> case where it is building a target-specific file for a
+> target where KVM is not enabled; for common files it
+> will provide the function prototype which will end up
+> linking to a stub implementation. So we could handle hax
+> like that too.
 
-Oops
+Yes, the KVM one is the correct way to do it.  The #define-to-0
+implementation is used so that the compiler can optimize out more code,
+the function acts as a fallback.
 
-> 
-> Since sdhci_initfn() already initializes s->io_ops to
-> &sdhci_mmio_ops, always use that in sdhci_common_realize()
-> and remove the now-unnecessary reinitialization of the
-> MMIO region from sdhci_sysbus_realize().
-
-Thanks for the cleanup!
-
-> 
-> Spotted by clang's leak sanitizer.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  hw/sd/sdhci.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-> index 81bbf032794..83f1574ffdc 100644
-> --- a/hw/sd/sdhci.c
-> +++ b/hw/sd/sdhci.c
-> @@ -1371,7 +1371,7 @@ static void sdhci_common_realize(SDHCIState *s, Error **errp)
->      s->buf_maxsz = sdhci_get_fifolen(s);
->      s->fifo_buffer = g_malloc0(s->buf_maxsz);
->  
-> -    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdhci",
-> +    memory_region_init_io(&s->iomem, OBJECT(s), s->io_ops, s, "sdhci",
->                            SDHC_REGISTERS_MAP_SIZE);
->  }
->  
-> @@ -1565,9 +1565,6 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
->  
->      sysbus_init_irq(sbd, &s->irq);
->  
-> -    memory_region_init_io(&s->iomem, OBJECT(s), s->io_ops, s, "sdhci",
-> -            SDHC_REGISTERS_MAP_SIZE);
-> -
->      sysbus_init_mmio(sbd, &s->iomem);
->  }
->  
-> 
+Paolo
