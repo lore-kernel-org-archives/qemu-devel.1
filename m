@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUANd-0005Wc-IA
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:04:55 -0500
+	(envelope-from <cohuck@redhat.com>) id 1gUAUJ-0002UV-HU
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:11:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gUANc-0006Vg-3D
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:04:49 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37322)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gUANa-0006NL-Sv
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:04:47 -0500
-Received: by mail-oi1-x241.google.com with SMTP id y23so14171081oia.4
-	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 05:04:46 -0800 (PST)
+	(envelope-from <cohuck@redhat.com>) id 1gUAUG-0004sQ-E2
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:11:43 -0500
+Date: Tue, 4 Dec 2018 14:11:30 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181204141130.06496b9b.cohuck@redhat.com>
+In-Reply-To: <20181204133810.66e8cfe5@oc2783563651>
+References: <20181122165432.4437-1-cohuck@redhat.com>
+	<20181204133810.66e8cfe5@oc2783563651>
 MIME-Version: 1.0
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-28-clg@kaod.org>
-	<20181129040917.GF14697@umbus.fritz.box>
-	<CAFEAcA8=xJCoTmXmygpK2yVdq5Viqi-dQoiTJrML=goutzKujQ@mail.gmail.com>
-	<f92e8c2c-3384-ba88-3d85-0c168441b052@kaod.org>
-In-Reply-To: <f92e8c2c-3384-ba88-3d85-0c168441b052@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Dec 2018 13:04:34 +0000
-Message-ID: <CAFEAcA_3Qy1R8uOT_QayXfUneQT0_rL3J3Rv_uTG0DDFSCyRvQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 27/36] sysbus: add a sysbus_mmio_unmap()
- helper
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] vfio-ccw: support hsch/csch (kernel
+ part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
-On Tue, 4 Dec 2018 at 12:33, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> A completely new interrupt controller was introduced on the POWER9
-> processor and it uses MMIO regions for interrupt management. These
-> regions are backed by simple MRs in QEMU, when using TCG, and backed
-> by ram_device_ptr MRs under KVM.
->
-> Difficulties arise with the fact that POWER9 pseries guests need
-> to support the old mode (XICS, no MMIOs) and the new mode XIVE.
-> The interrupt mode is negotiated at boot between the hypervisor
-> and the guest and a reset is generated to take into account
-> the changes. Which means that, at reset, we may need to disconnect
-> from a KVM IC device and reconnect to another.
+On Tue, 4 Dec 2018 13:38:10 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-This is a painful API for QEMU to implement, incidentally,
-because we don't have any concept really of a warm reset. In
-theory reset should get you back to exactly the same state
-as if you'd just started QEMU. You can probably bodge something
-together, though.
+> On Thu, 22 Nov 2018 17:54:29 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > [This is the Linux kernel part, git tree is available at
+> > https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git vfio-ccw-caps
+> > 
+> > The companion QEMU patches are available at
+> > https://github.com/cohuck/qemu vfio-ccw-caps]
+> > 
+> > Currently, vfio-ccw only relays START SUBCHANNEL requests to the real
+> > device. This tends to work well for the most common 'good path' scenarios;
+> > however, as we emulate {HALT,CLEAR} SUBCHANNEL in QEMU, things like
+> > clearing pending requests at the device is currently not supported.
+> > This may be a problem for e.g. error recovery.  
+> 
+> I'm wondering: what about MODIFY SUBCHANNEL? Do we plan to add MSCH
+> as well or is it supposed to remain 'userspace emulated'? AFAIR MSCH
+> may have an effect on error recovery as well.
 
-> When switching from XICS to XIVE mode :
->
->   if kvm
->     - destroy KVM XICS device
->     - create KVM XIVE device
->     - get fd, mmap, init ram_device_ptr MRs
->     - map mmio
->   - enable MMIOs
->
-> When switching from XIVE to XICS  :
->
->   - disable MMIOs
->   if kvm
->     - delete MRs
->     - munmap
->     - destroy KVM XIVE device
->     - create KVM XICS device
+I think that would require a deeper change, as we have the requirement
+to enable the subchannel before handing it to userspace. IOW, the guest
+does not cause the subchannel to be enabled/disabled, but the host does.
 
-This seems basically OK, I think.
+Parameters (like for channel measurements) are a different game. It is
+something we should look into, but it will need a different region.
 
-thanks
--- PMM
+> BTW I would like to have the concurrency discussion sorted out before
+> I proceed with my review, because reviewing the stuff without a fair idea
+> of what exactly are we trying to achieve would yield poor results.
+
+I'm not sure what is unclear about what we're trying to achieve (enable
+the guest to issue halt/clear on real hardware)?
+
+But yes, we need to sort out that concurrency thing; I'm currently
+unsure if the core should do some things as well or if it's more of a
+vendor-driver thing.
