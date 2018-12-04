@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gUA7G-00067y-Qa
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 07:47:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1gUA7x-0007Xl-3H
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 07:48:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gUA7F-0003Z2-6g
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 07:47:54 -0500
-Date: Tue, 4 Dec 2018 12:47:39 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181204124739.GA17825@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1543865209-50994-1-git-send-email-peng.hao2@zte.com.cn>
-	<CAFEAcA-oFFz-NtfwHmORxQd4rHsfKa1=tV1kyvPuGQoOZwDB3A@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1gUA7w-0003yk-C0
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 07:48:37 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40173)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gUA7w-0003y7-0B
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 07:48:36 -0500
+Received: by mail-ot1-x344.google.com with SMTP id s5so15003593oth.7
+	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 04:48:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-oFFz-NtfwHmORxQd4rHsfKa1=tV1kyvPuGQoOZwDB3A@mail.gmail.com>
+References: <CAFEAcA-oFFz-NtfwHmORxQd4rHsfKa1=tV1kyvPuGQoOZwDB3A@mail.gmail.com>
+	<201812040841510784684@zte.com.cn>
+	<CAFEAcA8hw_PHrBTC+v9rr8VoeU5uiV3Z6nMRknDM7WWdG1Ti5g@mail.gmail.com>
+	<20181204120547.x5qa7q6usq6bfgkw@kamzik.brq.redhat.com>
+In-Reply-To: <20181204120547.x5qa7q6usq6bfgkw@kamzik.brq.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 4 Dec 2018 12:48:23 +0000
+Message-ID: <CAFEAcA-JCAvgGCLVPRHGRM47Mw_G_9utG3NUn-FRaT+txJSfXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH V11 0/8] add pvpanic mmio support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,83 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Peng Hao <peng.hao2@zte.com.cn>, Andrew Jones <drjones@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Andrew Jones <drjones@redhat.com>
+Cc: Peng Hao <peng.hao2@zte.com.cn>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Dec 03, 2018 at 06:50:03PM +0000, Peter Maydell wrote:
-> On Mon, 3 Dec 2018 at 11:04, Peng Hao <peng.hao2@zte.com.cn> wrote:
-> >
-> > The first patches are simple cleanups:
-> >      - patch 1 move the pvpanic device with the 'ocmmon objects' so we compile
-> >                it once for the x86/arm/aarch64 archs,
-> >      - patch 2 simply renames ISA fields/definitions to generic ones.
-> >
-> >      Then instead of add/use the MMIO pvpanic device in the virt machine in an
-> >      unique patch, I split it in two distinct patches:
-> >      - patch 3 uses Peng Hao's work, but add the MMIO interface to the existing
-> >         device (no logical change).
-> >      - patch 4 is Peng Hao's work in the virt machine (no logical change).
-> >      - patch 5 add pvpanic device in acpi table in virt machine
-> >      v2 from Peng Hao is:
-> >      https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg03433.html
-> 
-> I would still prefer to see a more detailed examination of whether
-> we can do this with a PCI device before we commit to taking the
-> MMIO version into the virt board.
+On Tue, 4 Dec 2018 at 12:05, Andrew Jones <drjones@redhat.com> wrote:
+> To muddy the waters a bit more, while I'm not opposed to this device
+> being a PCI device, there is a chance that someone will still want a
+> platform-mmio version as well. I'm not sure how everything will
+> eventually fall into place, but I've seen some super minimal guest
+> configs proposed for the VMs-used-like-containers use cases, even
+> configs that choose to use virtio-mmio over virtio-pci, and then not
+> provide a PCI bus at all to the vm.
+>
+> Maybe this series and the current kernel series can be allowed to
+> continue as they are, and if later there's a demand for a pci version,
+> it could just be yet another variant added later?
 
-The original design rational for using an I/O port is mentioned here,
-though it is quite brief:
+I like the PCI device idea because it avoids adding yet
+another complication to the virt board. Adding the MMIO
+variant now and the PCI device later doesn't let us avoid
+the complication or even remove it in the future.
 
-  http://lists.gnu.org/archive/html/qemu-devel/2012-10/msg04361.html
+The last I heard we were still thinking about deprecating
+virtio-mmio entirely.
 
-[quote]
-We have three solutions to implement this feature:
-1. use vmcall
-2. use I/O port
-3. use virtio-serial.
-
-We have decided to avoid touching hypervisor. The reason why I choose
-choose the I/O port is:
-1. it is easier to implememt
-2. it does not depend any virtual device
-3. it can work when starting the kernel
-[/quote]
-
-Later postings then exposed the port via ACPI
-
-  http://lists.nongnu.org/archive/html/qemu-devel/2013-03/msg02293.html
-
-After it had merged there were some changes and the question of turning
-it into a PCI device was raised. Paolo was concerned that the guest OS
-is in an unknown state (arbitrary locks held, data structures corrupt,
-etc) when panic is fired, so simplicity of the I/O port was desirable:
-
-  https://lists.gnu.org/archive/html/qemu-devel/2013-08/msg03309.html
-
-Anthony countered that even a PCI device could simply do an outb() in
-config space:
-
-  https://lists.gnu.org/archive/html/qemu-devel/2013-08/msg03325.html
-
-So it is not clear using a PCI device is in fact a problem in terms of
-reliability at time of firing.
-
-
-Perhaps more relevant is the question of how easily it can be initialized,
-as that affects whether it can be used for panics during very early boot,
-or from firmware:
-
-  https://lists.gnu.org/archive/html/qemu-devel/2013-08/msg03296.html
-
-Finally, there is also the point that PCI slots are precious, and this
-is something to be enabled out of the box on all VMs, so you'd be removing
-one extra PCI slot from general usage. Thus mgmt apps would need to start
-adding PCI bridges sooner. Not a blocker but something to bear in mind
-when weighing up options.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
