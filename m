@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gUAlX-0007OK-6V
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:29:32 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1gUAmA-0007lr-NI
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:30:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gUAlS-0000UE-9A
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:29:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35667)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gUAlR-0000Tc-UX
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:29:26 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D4728309D55C
-	for <qemu-devel@nongnu.org>; Tue,  4 Dec 2018 13:29:24 +0000 (UTC)
-Date: Tue, 4 Dec 2018 14:29:01 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181204142901.23c3f37c@redhat.com>
-In-Reply-To: <20181130122844.29103-1-ehabkost@redhat.com>
-References: <20181130122844.29103-1-ehabkost@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1gUAm6-00012S-Ux
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 08:30:10 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  4 Dec 2018 13:29:51 +0000
+Message-Id: <20181204132952.2601-5-peter.maydell@linaro.org>
+In-Reply-To: <20181204132952.2601-1-peter.maydell@linaro.org>
+References: <20181204132952.2601-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] hostmem: Validate host-nodes before
- setting bitmap
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 4/5] tests/test-arm-mptimer: Don't leak string
+ memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,109 +22,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Fri, 30 Nov 2018 10:28:44 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+The test-arm-mptimer setup creates a lot of test names using
+g_strdup_printf() and never frees them. This is entirely
+harmless since it's one-shot test code, but it clutters
+up the output from clang's LeakSanitizer. Refactor to
+use a helper function so we can free the memory.
 
-> host_memory_backend_set_host_nodes() was not validating
-> host-nodes before writing to backend->host_nodes, making QEMU
-> write beyond the end of the bitmap.
-> 
-> Fix the crash and add a simple regression test for the fix.
-> 
-> While at it, fix memory leak of the list returned by
-> visit_type_uint16List().
-> 
-> Reported-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ tests/test-arm-mptimer.c | 153 ++++++++++++++++++---------------------
+ 1 file changed, 69 insertions(+), 84 deletions(-)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
-> Changes v1 -> v2:
-> * Remove extra `l = l->next` statement
->   (reported by Stefano Garzarella)
-> * Fix (existing) leak of `host_nodes`
->   (reported by Markus Armbruster)
-> ---
->  backends/hostmem.c                   | 17 +++++++++----
->  tests/acceptance/host-nodes-limit.py | 36 ++++++++++++++++++++++++++++
->  2 files changed, 49 insertions(+), 4 deletions(-)
->  create mode 100644 tests/acceptance/host-nodes-limit.py
-> 
-> diff --git a/backends/hostmem.c b/backends/hostmem.c
-> index 1a89342039..af800284e0 100644
-> --- a/backends/hostmem.c
-> +++ b/backends/hostmem.c
-> @@ -103,14 +103,23 @@ host_memory_backend_set_host_nodes(Object *obj, Visitor *v, const char *name,
->  {
->  #ifdef CONFIG_NUMA
->      HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-> -    uint16List *l = NULL;
-> +    uint16List *l, *host_nodes = NULL;
->  
-> -    visit_type_uint16List(v, name, &l, errp);
-> +    visit_type_uint16List(v, name, &host_nodes, errp);
->  
-> -    while (l) {
-> +    for (l = host_nodes; l; l = l->next) {
-> +        if (l->value >= MAX_NODES) {
-> +            error_setg(errp, "Invalid host-nodes value: %d", l->value);
-> +            goto out;
-> +        }
-> +    }
-> +
-> +    for (l = host_nodes; l; l = l->next) {
->          bitmap_set(backend->host_nodes, l->value, 1);
-> -        l = l->next;
->      }
-> +
-> +out:
-> +    qapi_free_uint16List(host_nodes);
->  #else
->      error_setg(errp, "NUMA node binding are not supported by this QEMU");
->  #endif
-> diff --git a/tests/acceptance/host-nodes-limit.py b/tests/acceptance/host-nodes-limit.py
-> new file mode 100644
-> index 0000000000..e803e10104
-> --- /dev/null
-> +++ b/tests/acceptance/host-nodes-limit.py
-> @@ -0,0 +1,36 @@
-> +# Regression test for host-nodes limit validation
-> +#
-> +# Copyright (c) 2018 Red Hat, Inc.
-> +#
-> +# Author:
-> +#  Eduardo Habkost <ehabkost@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or
-> +# later.  See the COPYING file in the top-level directory.
-> +
-> +from avocado_qemu import Test
-> +from subprocess import Popen, PIPE
-> +
-> +MAX_NODES = 128
-> +
-> +class HostNodesValidation(Test):
-> +    def test_large_host_nodes(self):
-> +        p = Popen([self.qemu_bin, '-display', 'none', '-nodefaults',
-> +                   '-object', 'memory-backend-ram,id=m0,'
-> +                              'size=4096,host-nodes=%d' % (MAX_NODES)],
-> +                  stderr=PIPE, stdout=PIPE)
-> +        stdout,stderr = p.communicate()
-> +
-> +        self.assertIn(b'Invalid host-nodes', stderr)
-> +        self.assertEquals(stdout, b'')
-> +        self.assertEquals(p.returncode, 1)
-> +
-> +    def test_valid_host_nodes(self):
-> +        p = Popen([self.qemu_bin, '-display', 'none', '-nodefaults',
-> +                   '-object', 'memory-backend-ram,id=m0,'
-> +                              'size=4096,host-nodes=%d' % (MAX_NODES - 1)],
-> +                  stderr=PIPE, stdout=PIPE)
-> +        stdout,stderr = p.communicate()
-> +
-> +        self.assertIn(b'host-nodes must be empty', stderr)
-> +        self.assertEquals(p.returncode, 1)
+diff --git a/tests/test-arm-mptimer.c b/tests/test-arm-mptimer.c
+index cb8f2df9141..156a39f50dd 100644
+--- a/tests/test-arm-mptimer.c
++++ b/tests/test-arm-mptimer.c
+@@ -991,10 +991,25 @@ static void test_timer_zero_load_nonscaled_periodic_to_prescaled_oneshot(void)
+     g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+ }
+ 
++/*
++ * Add a qtest test that comes in two versions: one with
++ * a timer scaler setting, and one with the timer nonscaled.
++ */
++static void add_scaler_test(const char *str, bool scale,
++                            void (*fn)(const void *))
++{
++    char *name;
++    int *scaler = scale ? &scaled : &nonscaled;
++
++    name = g_strdup_printf("%s=%d", str, *scaler);
++    qtest_add_data_func(name, scaler, fn);
++    g_free(name);
++}
++
+ int main(int argc, char **argv)
+ {
+-    int *scaler = &nonscaled;
+     int ret;
++    int scale;
+ 
+     g_test_init(&argc, &argv, NULL);
+ 
+@@ -1012,89 +1027,59 @@ int main(int argc, char **argv)
+     qtest_add_func("mptimer/prescaler", test_timer_prescaler);
+     qtest_add_func("mptimer/prescaler_on_the_fly", test_timer_prescaler_on_the_fly);
+ 
+-tests_with_prescaler_arg:
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/oneshot scaler=%d", *scaler),
+-                        scaler, test_timer_oneshot);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/pause scaler=%d", *scaler),
+-                        scaler, test_timer_pause);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/reload scaler=%d", *scaler),
+-                        scaler, test_timer_reload);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/periodic scaler=%d", *scaler),
+-                        scaler, test_timer_periodic);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/oneshot_to_periodic scaler=%d", *scaler),
+-                        scaler, test_timer_oneshot_to_periodic);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/periodic_to_oneshot scaler=%d", *scaler),
+-                        scaler, test_timer_periodic_to_oneshot);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/set_oneshot_counter_to_0 scaler=%d", *scaler),
+-                        scaler, test_timer_set_oneshot_counter_to_0);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/set_periodic_counter_to_0 scaler=%d", *scaler),
+-                        scaler, test_timer_set_periodic_counter_to_0);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/noload_oneshot scaler=%d", *scaler),
+-                        scaler, test_timer_noload_oneshot);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/noload_periodic scaler=%d", *scaler),
+-                        scaler, test_timer_noload_periodic);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/zero_load_oneshot scaler=%d", *scaler),
+-                        scaler, test_timer_zero_load_oneshot);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/zero_load_periodic scaler=%d", *scaler),
+-                        scaler, test_timer_zero_load_periodic);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/zero_load_oneshot_to_nonzero scaler=%d", *scaler),
+-                        scaler, test_timer_zero_load_oneshot_to_nonzero);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/zero_load_periodic_to_nonzero scaler=%d", *scaler),
+-                        scaler, test_timer_zero_load_periodic_to_nonzero);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/nonzero_load_oneshot_to_zero scaler=%d", *scaler),
+-                        scaler, test_timer_nonzero_load_oneshot_to_zero);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/nonzero_load_periodic_to_zero scaler=%d", *scaler),
+-                        scaler, test_timer_nonzero_load_periodic_to_zero);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/set_periodic_counter_on_the_fly scaler=%d", *scaler),
+-                        scaler, test_timer_set_periodic_counter_on_the_fly);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/enable_and_set_counter scaler=%d", *scaler),
+-                        scaler, test_timer_enable_and_set_counter);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/set_counter_and_enable scaler=%d", *scaler),
+-                        scaler, test_timer_set_counter_and_enable);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/oneshot_with_counter_0_on_start scaler=%d", *scaler),
+-                        scaler, test_timer_oneshot_with_counter_0_on_start);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/periodic_with_counter_0_on_start scaler=%d", *scaler),
+-                        scaler, test_timer_periodic_with_counter_0_on_start);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/periodic_counter scaler=%d", *scaler),
+-                        scaler, test_periodic_counter);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/set_counter_periodic_with_zero_load scaler=%d", *scaler),
+-                        scaler, test_timer_set_counter_periodic_with_zero_load);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/set_oneshot_load_to_0 scaler=%d", *scaler),
+-                        scaler, test_timer_set_oneshot_load_to_0);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/set_periodic_load_to_0 scaler=%d", *scaler),
+-                        scaler, test_timer_set_periodic_load_to_0);
+-    qtest_add_data_func(
+-        g_strdup_printf("mptimer/zero_load_mode_switch scaler=%d", *scaler),
+-                        scaler, test_timer_zero_load_mode_switch);
+-
+-    if (scaler == &nonscaled) {
+-        scaler = &scaled;
+-        goto tests_with_prescaler_arg;
++    for (scale = 0; scale < 2; scale++) {
++        add_scaler_test("mptimer/oneshot scaler",
++                        scale, test_timer_oneshot);
++        add_scaler_test("mptimer/pause scaler",
++                        scale, test_timer_pause);
++        add_scaler_test("mptimer/reload scaler",
++                        scale, test_timer_reload);
++        add_scaler_test("mptimer/periodic scaler",
++                        scale, test_timer_periodic);
++        add_scaler_test("mptimer/oneshot_to_periodic scaler",
++                        scale, test_timer_oneshot_to_periodic);
++        add_scaler_test("mptimer/periodic_to_oneshot scaler",
++                        scale, test_timer_periodic_to_oneshot);
++        add_scaler_test("mptimer/set_oneshot_counter_to_0 scaler",
++                        scale, test_timer_set_oneshot_counter_to_0);
++        add_scaler_test("mptimer/set_periodic_counter_to_0 scaler",
++                        scale, test_timer_set_periodic_counter_to_0);
++        add_scaler_test("mptimer/noload_oneshot scaler",
++                        scale, test_timer_noload_oneshot);
++        add_scaler_test("mptimer/noload_periodic scaler",
++                        scale, test_timer_noload_periodic);
++        add_scaler_test("mptimer/zero_load_oneshot scaler",
++                        scale, test_timer_zero_load_oneshot);
++        add_scaler_test("mptimer/zero_load_periodic scaler",
++                        scale, test_timer_zero_load_periodic);
++        add_scaler_test("mptimer/zero_load_oneshot_to_nonzero scaler",
++                        scale, test_timer_zero_load_oneshot_to_nonzero);
++        add_scaler_test("mptimer/zero_load_periodic_to_nonzero scaler",
++                        scale, test_timer_zero_load_periodic_to_nonzero);
++        add_scaler_test("mptimer/nonzero_load_oneshot_to_zero scaler",
++                        scale, test_timer_nonzero_load_oneshot_to_zero);
++        add_scaler_test("mptimer/nonzero_load_periodic_to_zero scaler",
++                        scale, test_timer_nonzero_load_periodic_to_zero);
++        add_scaler_test("mptimer/set_periodic_counter_on_the_fly scaler",
++                        scale, test_timer_set_periodic_counter_on_the_fly);
++        add_scaler_test("mptimer/enable_and_set_counter scaler",
++                        scale, test_timer_enable_and_set_counter);
++        add_scaler_test("mptimer/set_counter_and_enable scaler",
++                        scale, test_timer_set_counter_and_enable);
++        add_scaler_test("mptimer/oneshot_with_counter_0_on_start scaler",
++                        scale, test_timer_oneshot_with_counter_0_on_start);
++        add_scaler_test("mptimer/periodic_with_counter_0_on_start scaler",
++                        scale, test_timer_periodic_with_counter_0_on_start);
++        add_scaler_test("mptimer/periodic_counter scaler",
++                        scale, test_periodic_counter);
++        add_scaler_test("mptimer/set_counter_periodic_with_zero_load scaler",
++                        scale, test_timer_set_counter_periodic_with_zero_load);
++        add_scaler_test("mptimer/set_oneshot_load_to_0 scaler",
++                        scale, test_timer_set_oneshot_load_to_0);
++        add_scaler_test("mptimer/set_periodic_load_to_0 scaler",
++                        scale, test_timer_set_periodic_load_to_0);
++        add_scaler_test("mptimer/zero_load_mode_switch scaler",
++                        scale, test_timer_zero_load_mode_switch);
+     }
+ 
+     qtest_start("-machine vexpress-a9");
+-- 
+2.19.2
