@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gUG5l-0003pp-KR
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:10:46 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gUGA9-0007SK-L2
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:15:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1gUG5k-0007hw-Gy
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:10:45 -0500
-Date: Tue, 4 Dec 2018 14:10:35 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20181204140755-mutt-send-email-mst@kernel.org>
-References: <1543865209-50994-1-git-send-email-peng.hao2@zte.com.cn>
-	<CAFEAcA-oFFz-NtfwHmORxQd4rHsfKa1=tV1kyvPuGQoOZwDB3A@mail.gmail.com>
-	<20181204124739.GA17825@redhat.com>
-	<CAFEAcA_ovMgKPPjtYVASFqhzM7MX79EJYMZuFY4-FGRh4oqN8A@mail.gmail.com>
-	<9ad451bd-7eb1-902f-6023-4b48bb84249c@redhat.com>
-	<CAFEAcA-tzZVVXk+vV=uWOeL6dU3EnFiFRzLu8KR69Ju4PsPrJg@mail.gmail.com>
-	<149484eb-c59f-2b22-aa45-d4e5f0abac07@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1gUGA6-0007Zj-TS
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:15:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gUGA6-0007ZD-LS
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:15:14 -0500
+Date: Tue, 4 Dec 2018 17:15:06 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181204191506.GI18284@habkost.net>
+References: <20181109173309.25212-1-danielhb413@gmail.com>
+	<20181109173309.25212-4-danielhb413@gmail.com>
+	<87bm689ien.fsf@dusky.pond.sub.org>
+	<87va4f4st9.fsf@dusky.pond.sub.org>
+	<2883a083-81a4-f29c-7c3c-df80853ce06b@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <149484eb-c59f-2b22-aa45-d4e5f0abac07@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V11 0/8] add pvpanic mmio support
+In-Reply-To: <2883a083-81a4-f29c-7c3c-df80853ce06b@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH for-3.2 v10 3/3] qmp hmp: Make
+ system_wakeup check wake-up support and run state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +31,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Peng Hao <peng.hao2@zte.com.cn>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, mdroth@linux.vnet.ibm.com, imammedo@redhat.com
 
-On Tue, Dec 04, 2018 at 02:53:26PM +0100, Paolo Bonzini wrote:
-> On 04/12/18 14:43, Peter Maydell wrote:
-> > The point about PCI is that it is the same everywhere and
-> > discoverable, and easy for the user to add to the system or not.
-> > MMIO requires extra work for every board model that we want to
-> > put the device into, plus extra on both kernel and QEMU side
-> > for every system description mechanism (ACPI, dtb, whatever
-> > some future architecture might use), even if we have the basic
-> > "mmio pvpanic" device code already.
+On Tue, Dec 04, 2018 at 04:36:56PM -0200, Daniel Henrique Barboza wrote:
 > 
-> Looks like dtb is becoming a standard?  Even RISC-V switched from their
-> own system description to device tree.  Anyway, this is not too
-> important.  I agree with you about discoverability, on the other hand if
-> we could have something defined by the vendor rather than QEMU it would
-> be even better.  (Even better would be something that distro kernels
-> already have support for, but that would be asking too much probably).
 > 
-> >> Also, while reusing code in general is nice, sometimes there are
-> >> platform-specific ways to do it.  For ARM, for example, would it make
-> >> sense to use an HVC/SMC that "extends" the PSCI, and pass the number in
-> >> the PSCI device tree node?
+> On 11/29/18 4:55 PM, Markus Armbruster wrote:
+> > One more thing...
 > > 
-> > If you want a hypercall then these days the arm HVC calling convention
-> > includes mechanisms for discoverably determining whether a particular
-> > hypercall is supported, so you wouldn't need to pass anything in the
-> > ACPI or dtb. But I didn't get the impression that anybody wanted a
-> > hypercall for this particularly.
-> 
-> Not for x86, where each hypervisor has its own hypercall number and even
-> its calling convention.  But for ARM it already makes more sense.
-> 
-> >> Related to this, is there a more or less "standard" watchdog device on
-> >> ARM that could be added to virt?  There is the SBSA watchdog, but it's
-> >> ugly for implementation in KVM because it counts down with frequency
-> >> equal to CNTFRQ (which I'm not sure if QEMU has access too, and also it
-> >> doesn't play well with live migration).
+> > Markus Armbruster <armbru@redhat.com> writes:
 > > 
-> > The i6300esb is PCI, presumably that would work?
-> 
-> Yeah, I was wondering if there was something in PrimeCell.  I found
-> SP805 exists now.
-> 
-> >>> I notice also that there's a mention in that thread that the pvpanic
-> >>> ACPI table entry on x86 resulted in unhelpful Windows notifications
-> >>> about new devices it didn't understand. Is that going to be an issue
-> >>> for Arm with this mmio pvpanic ?
-> >>
-> >> Yes, it is probably the same as for x86.
+> > > Daniel Henrique Barboza <danielhb413@gmail.com> writes:
+> > > 
+> > > > The qmp/hmp command 'system_wakeup' is simply a direct call to
+> > > > 'qemu_system_wakeup_request' from vl.c. This function verifies if
+> > > > runstate is SUSPENDED and if the wake up reason is valid before
+> > > > proceeding. However, no error or warning is thrown if any of those
+> > > > pre-requirements isn't met. There is no way for the caller to
+> > > > differentiate between a successful wakeup or an error state caused
+> > > > when trying to wake up a guest that wasn't suspended.
+> > > > 
+> > > > This means that system_wakeup is silently failing, which can be
+> > > > considered a bug. Adding error handling isn't an API break in this
+> > > > case - applications that didn't check the result will remain broken,
+> > > > the ones that check it will have a chance to deal with it.
+> > > > 
+> > > > Adding to that, the commit before previous created a new QMP API called
+> > > > query-current-machine, with a new flag called wakeup-suspend-support,
+> > > > that indicates if the guest has the capability of waking up from suspended
+> > > > state. Although such guest will never reach SUSPENDED state and erroring
+> > > > it out in this scenario would suffice, it is more informative for the user
+> > > > to differentiate between a failure because the guest isn't suspended versus
+> > > > a failure because the guest does not have support for wake up at all.
+> > > > 
+> > > > All this considered, this patch changes qmp_system_wakeup to check if
+> > > > the guest is capable of waking up from suspend, and if it is suspended.
+> > > > After this patch, this is the output of system_wakeup in a guest that
+> > > > does not have wake-up from suspend support (ppc64):
+> > > > 
+> > > > (qemu) system_wakeup
+> > > > wake-up from suspend is not supported by this guest
+> > > > (qemu)
+> > > > 
+> > > > And this is the output of system_wakeup in a x86 guest that has the
+> > > > support but isn't suspended:
+> > > > 
+> > > > (qemu) system_wakeup
+> > > > Unable to wake up: guest is not in suspended state
+> > > > (qemu)
+> > > > 
+> > > > Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> > > > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> > > > ---
+> > > >   hmp.c                   |  5 ++++-
+> > > >   hw/acpi/core.c          |  4 +++-
+> > > >   hw/char/serial.c        |  3 ++-
+> > > >   hw/input/ps2.c          |  9 ++++++---
+> > > >   hw/timer/mc146818rtc.c  |  3 ++-
+> > > >   include/sysemu/sysemu.h |  3 ++-
+> > > >   migration/migration.c   |  7 +++++--
+> > > >   qapi/misc.json          |  8 +++++++-
+> > > >   qmp.c                   | 13 ++++++++++++-
+> > > >   vl.c                    |  6 ++++--
+> > > >   10 files changed, 47 insertions(+), 14 deletions(-)
+> > > > 
+> > > > diff --git a/hmp.c b/hmp.c
+> > > > index 7828f93a39..0f5d943413 100644
+> > > > --- a/hmp.c
+> > > > +++ b/hmp.c
+> > > > @@ -1220,7 +1220,10 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
+> > > >   void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
+> > > >   {
+> > > > -    qmp_system_wakeup(NULL);
+> > > > +    Error *err = NULL;
+> > > > +
+> > > > +    qmp_system_wakeup(&err);
+> > > > +    hmp_handle_error(mon, &err);
+> > > >   }
+> > > >   void hmp_nmi(Monitor *mon, const QDict *qdict)
+> > > > diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+> > > > index 52e18d7810..a7073dd435 100644
+> > > > --- a/hw/acpi/core.c
+> > > > +++ b/hw/acpi/core.c
+> > > > @@ -514,7 +514,9 @@ static uint32_t acpi_pm_tmr_get(ACPIREGS *ar)
+> > > >   static void acpi_pm_tmr_timer(void *opaque)
+> > > >   {
+> > > >       ACPIREGS *ar = opaque;
+> > > > -    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_PMTIMER);
+> > > > +    Error *err = NULL;
+> > > > +
+> > > > +    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_PMTIMER, &err);
+> > > >       ar->tmr.update_sci(ar);
+> > > >   }
+> > Leaks the error object when qemu_system_wakeup_request() fails.
 > > 
-> > I guess we need to find out if that is a problem before we can
-> > merge this, then.
+> > If it cannot fail here, pass &error_abort.
+> > 
+> > If it can fail, but you want to ignore failure, pass NULL.
 > 
-> As long as the pvpanic device is not added by default it's okay.
-> 
-> Paolo
+> Good point. I'll simply pass NULL to all callers that didn't care
+> for the error prior to this change.
 
-It isn't too bad, you just include a driver and then it's happy.
+Most times I saw QEMU code ignoring errors, it actually didn't
+expect any errors to happen and was supposed to be using
+&error_abort instead.
 
-Isn't a device just for panic going too far though?
-Should it be some kind of PV device that we
-can use to add more pv stuff in the future, with
-a panic option?
+This makes NULL errp always look like a bug to be fixed.  If you
+are sure you really want to ignore an error, I'd recommend adding
+a comment making your intention explicit.
 
 -- 
-MST
+Eduardo
