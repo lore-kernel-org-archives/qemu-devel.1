@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([208.118.235.92]:37902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gTxzP-0004df-NB
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 18:51:04 -0500
+	(envelope-from <bounces@canonical.com>) id 1gTyNO-0001xr-Rl
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 19:15:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gTxz8-0001j1-9F
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 18:50:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:53196)
+	(envelope-from <bounces@canonical.com>) id 1gTyNL-0006os-FI
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 19:15:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55958)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gTxz6-0001Ze-7U
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 18:50:40 -0500
+	id 1gTyNL-0006n1-4S
+	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 19:15:43 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gTxz2-0003bv-2c
-	for <qemu-devel@nongnu.org>; Mon, 03 Dec 2018 23:50:36 +0000
+	id 1gTyNJ-0005aK-Uj
+	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 00:15:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CE7E22E80CC
-	for <qemu-devel@nongnu.org>; Mon,  3 Dec 2018 23:50:35 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DFD0A2E804F
+	for <qemu-devel@nongnu.org>; Tue,  4 Dec 2018 00:15:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Dec 2018 23:37:52 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 04 Dec 2018 00:01:57 -0000
+From: Jacek Wieczorek <mrjjot@gmail.com>
 Reply-To: Bug 1806114 <1806114@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <154360750589.15722.2632161476309150045.malonedeb@soybean.canonical.com>
-Message-Id: <154388027240.10196.224859422259204532.malone@chaenomeles.canonical.com>
+Message-Id: <154388171786.15228.11277922375295031544.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1806114] Re: Reading sectors from floppy with
  BIOS INT 13h is broken
@@ -39,12 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The memfd_create() compilation failure is a bug in older QEMU versions
-that was only revealed by a newer glibc version (ie old QEMU built OK
-with older glibc but fails with newer glibc). It's fixed in git in
-commit 75e5b70e6b5dcc4f221, so backporting that to the older versions
-you're trying to build is probably the correct fix there, though it
-sounds like you've sufficiently worked around it anyway.
+I see. That wasn't much of a problem, but thank you for the information.
+I'll try to keep it in mind when building QEMU in future.
 
 -- =
 
