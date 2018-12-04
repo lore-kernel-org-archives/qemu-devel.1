@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUEEb-00032E-EB
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:11:50 -0500
+	(envelope-from <philmd@redhat.com>) id 1gUEEl-000350-KW
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:12:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUE7Z-0000ya-2K
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:04:34 -0500
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:57420)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUE7Y-0000qg-Ic
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:04:28 -0500
-Received: from player792.ha.ovh.net (unknown [10.109.146.137])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 9732B17684A
-	for <qemu-devel@nongnu.org>; Tue,  4 Dec 2018 18:04:20 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-9-clg@kaod.org>
-	<20181127234956.GR2251@umbus.fritz.box>
-	<c16b55c5-8144-82bc-37f7-70427c6460a4@kaod.org>
-	<20181129004718.GJ2251@umbus.fritz.box>
-	<c6a8a8cf-3782-0d64-d4c9-68ee5f7d2e96@kaod.org>
-	<20181204015419.GF1682@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <419bb915-5fa6-a1da-fbe7-6261155d1791@kaod.org>
-Date: Tue, 4 Dec 2018 18:04:13 +0100
+	(envelope-from <philmd@redhat.com>) id 1gUE5s-0008FJ-0Y
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:02:48 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:34616)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gUE5r-0008Ee-Qt
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:02:43 -0500
+Received: by mail-wr1-f67.google.com with SMTP id j2so16768262wrw.1
+	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 09:02:43 -0800 (PST)
+References: <154393964026.28192.13536237934563059985.stgit@gimli.home>
+	<154394076572.28192.17922483382108051842.stgit@gimli.home>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4d705555-4d3f-5db9-f58c-ad18ef2e1348@redhat.com>
+Date: Tue, 4 Dec 2018 18:02:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181204015419.GF1682@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <154394076572.28192.17922483382108051842.stgit@gimli.home>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 08/36] ppc/xive: introduce a simplified
- XIVE presenter
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [for-4.0 PATCH v3 1/9] pcie: Create enums for link
+ speed and width
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,136 +31,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
+Cc: Geoffrey McRae <geoff@hostfission.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 12/4/18 2:54 AM, David Gibson wrote:
-> On Mon, Dec 03, 2018 at 06:05:12PM +0100, C=E9dric Le Goater wrote:
->> I forgot to reply to this one.
->>
->> On 11/29/18 1:47 AM, David Gibson wrote:
->>> On Wed, Nov 28, 2018 at 11:59:58AM +0100, C=E9dric Le Goater wrote:
->>>> On 11/28/18 12:49 AM, David Gibson wrote:
->>>>> On Fri, Nov 16, 2018 at 11:57:01AM +0100, C=E9dric Le Goater wrote:
->>>>>> The last sub-engine of the XIVE architecture is the Interrupt
->>>>>> Virtualization Presentation Engine (IVPE). On HW, they share eleme=
-nts,
->>>>>> the Power Bus interface (CQ), the routing table descriptors, and t=
-hey
->>>>>> can be combined in the same HW logic. We do the same in QEMU and
->>>>>> combine both engines in the XiveRouter for simplicity.
->>>>>
->>>>> Ok, I'm not entirely convinced combining the IVPE and IVRE into a
->>>>> single object is a good idea, but we can probably discuss that once
->>>>> I've read further.
->>>>
->>>> We could introduce a simplified presenter for sPAPR but I am not eve=
-n
->>>> sure of that as it will get more complex if we support the EBB
->>>> one day.
->=20
-> [snip]
->>>>>> +static inline uint32_t xive_tctx_cam_line(uint8_t nvt_blk, uint32=
-_t nvt_idx)
->>>>>> +{
->>>>>> +    return (nvt_blk << 19) | nvt_idx;
->>>>>
->>>>> I'm guessing this formula is the standard way of combining the NVT
->>>>> block and index into a single word? =20
->>>>
->>>> That number is the VP/NVT identifier which is written in the CAM val=
-ue.=20
->>>> The index is on 19 bits because of the NVT  definition in the END=20
->>>> structure. It is being increased to 24 bits on Power10=20
->>>>
->>>>> If so, I think we should
->>>>> standardize on passing a single word "nvt_id" around and only
->>>>> splitting it when we need to use the block separately. =20
->>>>
->>>> This is really the only place where we concatenate the two NVT value=
-s,
->>>> block and index.=20
->>>
->>> Hm, ok.  I know we don't model them (yet, maybe ever) but could
->>> combined values appear in the PowerBUS messages that handle remote
->>> notifications?
->>
->> They do.=20
->> =20
->>>>> Same goes for
->>>>> the end_id, assuming there's a standard way of putting that into a
->>>>> single word.  That will address the point I raised earlier about li=
-sn
->>>>> being passed around as a single word, but these later stage ids bei=
-ng
->>>>> split.
->>>>
->>>> Hmm, I am not sure this is a good option. It is not how the PowerNV=20
->>>> model would use it, skiboot is very much aware of these blocks and=20
->>>> indexes and for remote accesses chips are identified using the block=
-.=20
->>>> I will take a look at it but I am not found of it. I can add helpers=
-=20
->>>> in some places though.   =20
->>>
->>> Hm, ok.  Do the block and index appear as an (effectively) single
->>> field in the EAS?
->>
->> no. In all XIVE structures, block and index are always distinct.
->=20
-> Hm.  Distinct in what sense?  I get that the fields are labelled
-> separately in the documentation, but if the fields are adjacent, you
-> could equally well treat them as one.
+On 4/12/18 17:26, Alex Williamson wrote:
+> In preparation for reporting higher virtual link speeds and widths,
+> create enums and macros to help us manage them.
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Tested-by: Geoffrey McRae <geoff@hostfission.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-yes. Indeed. They are adjacent. The size of the index is subject to=20
-change in P10.=20
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-I am not sure that treating them as one will be of any help because=20
-we need to extract them from their XIVE structure with the *_INDEX=20
-and *_BLOCK masks first. I will take a look. May be not in v6.
-
-
->>>>>> +    if (!match->tctx) {
->>>>>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: NVT %x/%x is not di=
-spatched\n",
->>>>>> +                      nvt_blk, nvt_idx);
->>>>>> +        return false;
->>>>>
->>>>> Hmm.. this isn't actually an error isn't it? At least not for power=
-nv
->>>>
->>>> It is on sPAPR, it would mean the END was configured with an unknow =
-CPU.=20
->>>
->>> Right.
->>>
->>>> It is not error on PowerNV, when we support escalations.
->>>>
->>>>> - that just means the NVT isn't currently dispatched, so we'll need=
- to
->>>>> trigger the escalation interrupt. =20
->>>>
->>>> Yes.
->>>>
->>>>> Does this get changed later in the series?
->>>>
->>>> No.
->>>
->>> But this code is common to PAPR and powernv, yes, so it will need to?
->>
->> When we add support for escalations, yes, it will change. Would you ra=
-ther
->> use an error_report() until then ?
->=20
-> Ah, I guess leaving an error until we implement escalation makes
-> sense.  It shouldn't be LOG_GUEST_ERROR, though, the guest didn't do
-> anything wrong, and error_report() doesn't really make sense for the
-> same reason.
->=20
-> LOG_UNIMP, I guess?
-
-OK. will do.
-
-Thanks,
-
-C.
+> ---
+>  hw/pci/pcie.c              |    7 ++++---
+>  hw/vfio/pci.c              |    3 ++-
+>  include/hw/pci/pcie_regs.h |   23 +++++++++++++++++++++--
+>  3 files changed, 27 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> index 6c91bd44a0a5..914a5261a79b 100644
+> --- a/hw/pci/pcie.c
+> +++ b/hw/pci/pcie.c
+> @@ -68,11 +68,12 @@ pcie_cap_v1_fill(PCIDevice *dev, uint8_t port, uint8_t type, uint8_t version)
+>      pci_set_long(exp_cap + PCI_EXP_LNKCAP,
+>                   (port << PCI_EXP_LNKCAP_PN_SHIFT) |
+>                   PCI_EXP_LNKCAP_ASPMS_0S |
+> -                 PCI_EXP_LNK_MLW_1 |
+> -                 PCI_EXP_LNK_LS_25);
+> +                 QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
+> +                 QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT));
+>  
+>      pci_set_word(exp_cap + PCI_EXP_LNKSTA,
+> -                 PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25);
+> +                 QEMU_PCI_EXP_LNKSTA_NLW(QEMU_PCI_EXP_LNK_X1) |
+> +                 QEMU_PCI_EXP_LNKSTA_CLS(QEMU_PCI_EXP_LNK_2_5GT));
+>  
+>      if (dev->cap_present & QEMU_PCIE_LNKSTA_DLLLA) {
+>          pci_word_test_and_set_mask(exp_cap + PCI_EXP_LNKSTA,
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 5c7bd9698496..74f9a46b4be0 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -1897,7 +1897,8 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev, int pos, uint8_t size,
+>                                     PCI_EXP_TYPE_ENDPOINT << 4,
+>                                     PCI_EXP_FLAGS_TYPE);
+>              vfio_add_emulated_long(vdev, pos + PCI_EXP_LNKCAP,
+> -                                   PCI_EXP_LNK_MLW_1 | PCI_EXP_LNK_LS_25, ~0);
+> +                           QEMU_PCI_EXP_LNKCAP_MLW(QEMU_PCI_EXP_LNK_X1) |
+> +                           QEMU_PCI_EXP_LNKCAP_MLS(QEMU_PCI_EXP_LNK_2_5GT), ~0);
+>              vfio_add_emulated_word(vdev, pos + PCI_EXP_LNKCTL, 0, ~0);
+>          }
+>  
+> diff --git a/include/hw/pci/pcie_regs.h b/include/hw/pci/pcie_regs.h
+> index a95522a13b04..ad4e7808b8ac 100644
+> --- a/include/hw/pci/pcie_regs.h
+> +++ b/include/hw/pci/pcie_regs.h
+> @@ -34,10 +34,29 @@
+>  
+>  /* PCI_EXP_LINK{CAP, STA} */
+>  /* link speed */
+> -#define PCI_EXP_LNK_LS_25               1
+> +typedef enum PCIExpLinkSpeed {
+> +    QEMU_PCI_EXP_LNK_2_5GT = 1,
+> +    QEMU_PCI_EXP_LNK_5GT,
+> +    QEMU_PCI_EXP_LNK_8GT,
+> +    QEMU_PCI_EXP_LNK_16GT,
+> +} PCIExpLinkSpeed;
+> +
+> +#define QEMU_PCI_EXP_LNKCAP_MLS(speed)  (speed)
+> +#define QEMU_PCI_EXP_LNKSTA_CLS         QEMU_PCI_EXP_LNKCAP_MLS
+> +
+> +typedef enum PCIExpLinkWidth {
+> +    QEMU_PCI_EXP_LNK_X1 = 1,
+> +    QEMU_PCI_EXP_LNK_X2 = 2,
+> +    QEMU_PCI_EXP_LNK_X4 = 4,
+> +    QEMU_PCI_EXP_LNK_X8 = 8,
+> +    QEMU_PCI_EXP_LNK_X12 = 12,
+> +    QEMU_PCI_EXP_LNK_X16 = 16,
+> +    QEMU_PCI_EXP_LNK_X32 = 32,
+> +} PCIExpLinkWidth;
+>  
+>  #define PCI_EXP_LNK_MLW_SHIFT           ctz32(PCI_EXP_LNKCAP_MLW)
+> -#define PCI_EXP_LNK_MLW_1               (1 << PCI_EXP_LNK_MLW_SHIFT)
+> +#define QEMU_PCI_EXP_LNKCAP_MLW(width)  (width << PCI_EXP_LNK_MLW_SHIFT)
+> +#define QEMU_PCI_EXP_LNKSTA_NLW         QEMU_PCI_EXP_LNKCAP_MLW
+>  
+>  /* PCI_EXP_LINKCAP */
+>  #define PCI_EXP_LNKCAP_ASPMS_SHIFT      ctz32(PCI_EXP_LNKCAP_ASPMS)
+> 
+> 
