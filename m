@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gUGY0-0003ZY-T7
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:39:58 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gUGdc-0004tX-3U
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:45:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1gUGXz-0002x9-9g
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:39:56 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36454)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1gUGXz-0002vg-0J
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:39:55 -0500
-Received: by mail-wr1-x441.google.com with SMTP id u3so17214194wrs.3
-	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 11:39:54 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1gUGdb-0001dN-9e
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 14:45:43 -0500
+Date: Tue, 4 Dec 2018 17:45:32 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181204194532.GJ18284@habkost.net>
+References: <65d3a572-9a80-f332-1f88-69e43e8a3663@redhat.com>
+	<20181126132731.GJ18284@habkost.net>
+	<CAFEAcA8D7ZjO059Sgrx-4i0iT+V3gxT4f=DvdmUAJS7KomtyOg@mail.gmail.com>
+	<b8e20686-e5d1-a844-48f7-a4ae471e3fd5@greensocs.com>
+	<CAFEAcA8j4xTiS3_ktiA0hm2N4cu5RvxAtYqUHgvY-bUXgcwbjQ@mail.gmail.com>
+	<50645862-a638-ad2a-bafe-1b46be42aec4@greensocs.com>
+	<20181204180607.GB18284@habkost.net>
+	<CAFEAcA9JXeRGfKzouYJQKxgXuw_Z-up0a1ijZX9hZvXbdkwiuA@mail.gmail.com>
+	<20181204190548.GH18284@habkost.net>
+	<CAFEAcA9M3akT7sF-kjCg41ucuUhv2PxKaCBmkN3eacvqvf_w9Q@mail.gmail.com>
 MIME-Version: 1.0
-References: <154394083644.28192.8501647946108201466.stgit@gimli.home>
-	<154394987445.795.4102526920089904508.stgit@gimli.home>
-	<6bc68937-ec9e-d28f-9468-5ee9ba08ef52@de.ibm.com>
-In-Reply-To: <6bc68937-ec9e-d28f-9468-5ee9ba08ef52@de.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 4 Dec 2018 23:39:40 +0400
-Message-ID: <CAJ+F1CLpw2ESeZ-EyAUS4pffZ+b9xY5ruPmnwar-co_r8ecMbQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [for-4.0 PATCH v3.1 8/9] q35/440fx/arm/spapr/ccw:
- Add QEMU 4.0 machine type
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9M3akT7sF-kjCg41ucuUhv2PxKaCBmkN3eacvqvf_w9Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v7 01/16] hw/cpu: introduce CPU clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,297 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: alex.williamson@redhat.com, QEMU <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Luc Michel <luc.michel@greensocs.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi
-On Tue, Dec 4, 2018 at 11:17 PM Christian Borntraeger
-<borntraeger@de.ibm.com> wrote:
->
-> I think Conny has already added the s390/ccw part to her next tree.
-> From a quick glimpse both patches look identical.
->
+On Tue, Dec 04, 2018 at 07:16:39PM +0000, Peter Maydell wrote:
+> On Tue, 4 Dec 2018 at 19:05, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > On Tue, Dec 04, 2018 at 06:24:19PM +0000, Peter Maydell wrote:
+> > > A cluster is a group of CPUs which are all identical and have
+> > > the same view of the rest of the system.
+> 
+> > With that definition in mind, why can't QEMU cluster CPUs
+> > automatically by looking at CPU models and address space objects?
+> 
+> That sounds like it is in theory feasible and in practice
+> quite tricky. You would have to look not just at the CPU
+> model name but also introspect all its properties for
+> ones which change features of the CPU and are set differently
+> on different CPUs (and I don't think there's any way to
+> automatically tell which properties are ones which make
+> the CPU different for which-cluster purposes and which aren't).
+> And if we automatically checked whether address space objects
+> were the same it would rule out implementing devices with
+> per-cpu banked memory mapped registers by mapping different
+> things into the AS for each CPU (though that's a hypothetical
+> at the moment -- I've thought about implementing stuff that
+> way but we tend to implement that sort of thing by looking
+> at current_cpu->cpu_index at the moment).
 
-I also have them in my machine compatibilities series:
-https://patchew.org/QEMU/20181204142023.15982-1-marcandre.lureau@redhat.com=
-/20181204142023.15982-18-marcandre.lureau@redhat.com/
-https://patchew.org/QEMU/20181204142023.15982-1-marcandre.lureau@redhat.com=
-/20181204142023.15982-19-marcandre.lureau@redhat.com/
+I see.
 
-Whoever goes first :)
+Can't we at least do something to make sure the cluster objects
+make sense?  e.g. by ensuring at least QOM CPU type is the same,
+and that cpu->address_space somehow points to
+cpu->cluster->address_space?
 
-> On 04.12.2018 20:04, Alex Williamson wrote:
-> > For upcoming pcie-root-port compatibility, among possibly others.
-> >
-> > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > Cc: David Hildenbrand <david@redhat.com>
-> > Cc: Cornelia Huck <cohuck@redhat.com>
-> > Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> > Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > ---
-> >
-> > Re-spinning just this patch to include machine bump for ccw and
-> > Cc'ing s390/ccw maintainers.  I think this rounds out all the
-> > versioned machines per Peter's request.  I can respin a full series,
-> > but at the risk of confounding automated tools, I didn't want to
-> > further bombard inboxes with a high cadence.  Thanks,
-> >
-> > Alex
-> >
-> >  hw/arm/virt.c              |   19 +++++++++++++++++--
-> >  hw/i386/pc_piix.c          |   15 ++++++++++++---
-> >  hw/i386/pc_q35.c           |   13 +++++++++++--
-> >  hw/ppc/spapr.c             |   25 ++++++++++++++++++++++---
-> >  hw/s390x/s390-virtio-ccw.c |   17 ++++++++++++++++-
-> >  include/hw/compat.h        |    3 +++
-> >  include/hw/i386/pc.h       |    3 +++
-> >  7 files changed, 84 insertions(+), 11 deletions(-)
-> >
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index f69e7eb39977..beaf6bc43905 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1797,7 +1797,7 @@ static void machvirt_machine_init(void)
-> >  }
-> >  type_init(machvirt_machine_init);
-> >
-> > -static void virt_3_1_instance_init(Object *obj)
-> > +static void virt_4_0_instance_init(Object *obj)
-> >  {
-> >      VirtMachineState *vms =3D VIRT_MACHINE(obj);
-> >      VirtMachineClass *vmc =3D VIRT_MACHINE_GET_CLASS(vms);
-> > @@ -1867,10 +1867,25 @@ static void virt_3_1_instance_init(Object *obj)
-> >      vms->irqmap =3D a15irqmap;
-> >  }
-> >
-> > +static void virt_machine_4_0_options(MachineClass *mc)
-> > +{
-> > +}
-> > +DEFINE_VIRT_MACHINE_AS_LATEST(4, 0)
-> > +
-> > +#define VIRT_COMPAT_3_1 \
-> > +    HW_COMPAT_3_1
-> > +
-> > +static void virt_3_1_instance_init(Object *obj)
-> > +{
-> > +    virt_4_0_instance_init(obj);
-> > +}
-> > +
-> >  static void virt_machine_3_1_options(MachineClass *mc)
-> >  {
-> > +    virt_machine_4_0_options(mc);
-> > +    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_3_1);
-> >  }
-> > -DEFINE_VIRT_MACHINE_AS_LATEST(3, 1)
-> > +DEFINE_VIRT_MACHINE(3, 1)
-> >
-> >  #define VIRT_COMPAT_3_0 \
-> >      HW_COMPAT_3_0
-> > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > index 7092d6d13f66..cfaa83ee2fad 100644
-> > --- a/hw/i386/pc_piix.c
-> > +++ b/hw/i386/pc_piix.c
-> > @@ -428,21 +428,30 @@ static void pc_i440fx_machine_options(MachineClas=
-s *m)
-> >      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
-> >  }
-> >
-> > -static void pc_i440fx_3_1_machine_options(MachineClass *m)
-> > +static void pc_i440fx_4_0_machine_options(MachineClass *m)
-> >  {
-> >      pc_i440fx_machine_options(m);
-> >      m->alias =3D "pc";
-> >      m->is_default =3D 1;
-> >  }
-> >
-> > +DEFINE_I440FX_MACHINE(v4_0, "pc-i440fx-4.0", NULL,
-> > +                      pc_i440fx_4_0_machine_options);
-> > +
-> > +static void pc_i440fx_3_1_machine_options(MachineClass *m)
-> > +{
-> > +    pc_i440fx_4_0_machine_options(m);
-> > +    m->is_default =3D 0;
-> > +    m->alias =3D NULL;
-> > +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
-> > +}
-> > +
-> >  DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
-> >                        pc_i440fx_3_1_machine_options);
-> >
-> >  static void pc_i440fx_3_0_machine_options(MachineClass *m)
-> >  {
-> >      pc_i440fx_3_1_machine_options(m);
-> > -    m->is_default =3D 0;
-> > -    m->alias =3D NULL;
-> >      SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-> >  }
-> >
-> > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> > index 4702bb13c472..e245db096dc1 100644
-> > --- a/hw/i386/pc_q35.c
-> > +++ b/hw/i386/pc_q35.c
-> > @@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass *=
-m)
-> >      m->max_cpus =3D 288;
-> >  }
-> >
-> > -static void pc_q35_3_1_machine_options(MachineClass *m)
-> > +static void pc_q35_4_0_machine_options(MachineClass *m)
-> >  {
-> >      pc_q35_machine_options(m);
-> >      m->alias =3D "q35";
-> >  }
-> >
-> > +DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
-> > +                   pc_q35_4_0_machine_options);
-> > +
-> > +static void pc_q35_3_1_machine_options(MachineClass *m)
-> > +{
-> > +    pc_q35_4_0_machine_options(m);
-> > +    m->alias =3D NULL;
-> > +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_1);
-> > +}
-> > +
-> >  DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
-> >                     pc_q35_3_1_machine_options);
-> >
-> >  static void pc_q35_3_0_machine_options(MachineClass *m)
-> >  {
-> >      pc_q35_3_1_machine_options(m);
-> > -    m->alias =3D NULL;
-> >      SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-> >  }
-> >
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 7afd1a175bf2..80d8498867a6 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -3956,19 +3956,38 @@ static const TypeInfo spapr_machine_info =3D {
-> >      }                                                                \
-> >      type_init(spapr_machine_register_##suffix)
-> >
-> > - /*
-> > +/*
-> > + * pseries-4.0
-> > + */
-> > +static void spapr_machine_4_0_instance_options(MachineState *machine)
-> > +{
-> > +}
-> > +
-> > +static void spapr_machine_4_0_class_options(MachineClass *mc)
-> > +{
-> > +    /* Defaults for the latest behaviour inherited from the base class=
- */
-> > +}
-> > +
-> > +DEFINE_SPAPR_MACHINE(4_0, "4.0", true);
-> > +
-> > +/*
-> >   * pseries-3.1
-> >   */
-> > +#define SPAPR_COMPAT_3_1                                              =
-\
-> > +    HW_COMPAT_3_1
-> > +
-> >  static void spapr_machine_3_1_instance_options(MachineState *machine)
-> >  {
-> > +    spapr_machine_4_0_instance_options(machine);
-> >  }
-> >
-> >  static void spapr_machine_3_1_class_options(MachineClass *mc)
-> >  {
-> > -    /* Defaults for the latest behaviour inherited from the base class=
- */
-> > +    spapr_machine_3_1_class_options(mc);
-> > +    SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_1);
-> >  }
-> >
-> > -DEFINE_SPAPR_MACHINE(3_1, "3.1", true);
-> > +DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
-> >
-> >  /*
-> >   * pseries-3.0
-> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> > index a0615a8b35f5..fd9d0b0542bb 100644
-> > --- a/hw/s390x/s390-virtio-ccw.c
-> > +++ b/hw/s390x/s390-virtio-ccw.c
-> > @@ -651,6 +651,9 @@ bool css_migration_enabled(void)
-> >      }                                                                 =
-        \
-> >      type_init(ccw_machine_register_##suffix)
-> >
-> > +#define CCW_COMPAT_3_1 \
-> > +        HW_COMPAT_3_1
-> > +
-> >  #define CCW_COMPAT_3_0 \
-> >          HW_COMPAT_3_0
-> >
-> > @@ -742,14 +745,26 @@ bool css_migration_enabled(void)
-> >              .value    =3D "0",\
-> >          },
-> >
-> > +static void ccw_machine_4_0_instance_options(MachineState *machine)
-> > +{
-> > +}
-> > +
-> > +static void ccw_machine_4_0_class_options(MachineClass *mc)
-> > +{
-> > +}
-> > +DEFINE_CCW_MACHINE(4_0, "4.0", true);
-> > +
-> >  static void ccw_machine_3_1_instance_options(MachineState *machine)
-> >  {
-> > +    ccw_machine_4_0_instance_options(machine);
-> >  }
-> >
-> >  static void ccw_machine_3_1_class_options(MachineClass *mc)
-> >  {
-> > +    ccw_machine_4_0_class_options(mc);
-> > +    SET_MACHINE_COMPAT(mc, CCW_COMPAT_3_1);
-> >  }
-> > -DEFINE_CCW_MACHINE(3_1, "3.1", true);
-> > +DEFINE_CCW_MACHINE(3_1, "3.1", false);
-> >
-> >  static void ccw_machine_3_0_instance_options(MachineState *machine)
-> >  {
-> > diff --git a/include/hw/compat.h b/include/hw/compat.h
-> > index 6f4d5fc64704..70958328fe7a 100644
-> > --- a/include/hw/compat.h
-> > +++ b/include/hw/compat.h
-> > @@ -1,6 +1,9 @@
-> >  #ifndef HW_COMPAT_H
-> >  #define HW_COMPAT_H
-> >
-> > +#define HW_COMPAT_3_1 \
-> > +    /* empty */
-> > +
-> >  #define HW_COMPAT_3_0 \
-> >      /* empty */
-> >
-> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > index 136fe497b6b2..cb645bf368a3 100644
-> > --- a/include/hw/i386/pc.h
-> > +++ b/include/hw/i386/pc.h
-> > @@ -294,6 +294,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
-> >  int e820_get_num_entries(void);
-> >  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> >
-> > +#define PC_COMPAT_3_1 \
-> > +    HW_COMPAT_3_1 \
-> > +
-> >  #define PC_COMPAT_3_0 \
-> >      HW_COMPAT_3_0 \
-> >      {\
-> >
->
->
+CCing Paolo, so he can correct me if this doesn't make sense.
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+-- 
+Eduardo
