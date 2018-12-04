@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=869086d29=anthony.perard@citrix.com>)
-	id 1gUDlz-0007wa-2P
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:42:12 -0500
+	(envelope-from <imammedo@redhat.com>) id 1gUDnL-0001Zo-Dh
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:43:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=869086d29=anthony.perard@citrix.com>)
-	id 1gUDlw-0007MQ-0F
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:42:11 -0500
-Date: Tue, 4 Dec 2018 16:42:03 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181204164203.GZ14786@perard.uk.xensource.com>
-References: <20181121151211.15997-1-paul.durrant@citrix.com>
-	<20181121151211.15997-18-paul.durrant@citrix.com>
+	(envelope-from <imammedo@redhat.com>) id 1gUDnJ-0001ZI-Tk
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 11:43:35 -0500
+Date: Tue, 4 Dec 2018 17:43:05 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181204174305.34a8644d@redhat.com>
+In-Reply-To: <20181204151052.otrsahh4dqehiwif@kamzik.brq.redhat.com>
+References: <20181130130032.11835-1-sameo@linux.intel.com>
+	<20181130130032.11835-9-sameo@linux.intel.com>
+	<20181204151052.otrsahh4dqehiwif@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20181121151211.15997-18-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH 17/18] MAINTAINERS: add myself as a Xen
- maintainer
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 8/8] hw: acpi: Remove AcpiRsdpDescriptor
+ and fix tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +25,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: Samuel Ortiz <sameo@linux.intel.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, Nov 21, 2018 at 03:12:10PM +0000, Paul Durrant wrote:
-> I have made many significant contributions to the Xen code in QEMU,
-> particularly the recent patches introducing a new PV device framework.
-> I intend to make further significant contributions, porting other PV back-
-> ends to the new framework with the intent of eventually removing the
-> legacy code. It therefore seems reasonable that I become a maintiner of
-> the Xen code.
+On Tue, 4 Dec 2018 16:10:52 +0100
+Andrew Jones <drjones@redhat.com> wrote:
+
+> On Fri, Nov 30, 2018 at 02:00:32PM +0100, Samuel Ortiz wrote:
+> > The only remaining AcpiRsdpDescriptor users are the ACPI utils for the
+> > BIOS table tests.
+> > We remove that dependency and can thus remove the structure itself.
+> > 
+> > Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+> > ---
+> >  include/hw/acpi/acpi-defs.h | 13 -----------
+> >  tests/acpi-utils.h          |  4 +++-
+> >  tests/acpi-utils.c          | 46 ++++++++++++++++++++++++++++++-------
+> >  tests/bios-tables-test.c    | 21 +++++++++++++----
+> >  tests/vmgenid-test.c        |  8 ++++---
+> >  5 files changed, 62 insertions(+), 30 deletions(-)
+> > 
+> > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> > index 8425ecb8c6..5021cb9e79 100644
+> > --- a/include/hw/acpi/acpi-defs.h
+> > +++ b/include/hw/acpi/acpi-defs.h
+> > @@ -40,19 +40,6 @@ enum {
+> >      ACPI_FADT_F_LOW_POWER_S0_IDLE_CAPABLE,
+> >  };
+> >  
+> > -struct AcpiRsdpDescriptor {        /* Root System Descriptor Pointer */
+> > -    uint64_t signature;              /* ACPI signature, contains "RSD PTR " */
+> > -    uint8_t  checksum;               /* To make sum of struct == 0 */
+> > -    uint8_t  oem_id [6];             /* OEM identification */
+> > -    uint8_t  revision;               /* Must be 0 for 1.0, 2 for 2.0 */
+> > -    uint32_t rsdt_physical_address;  /* 32-bit physical address of RSDT */
+> > -    uint32_t length;                 /* XSDT Length in bytes including hdr */
+> > -    uint64_t xsdt_physical_address;  /* 64-bit physical address of XSDT */
+> > -    uint8_t  extended_checksum;      /* Checksum of entire table */
+> > -    uint8_t  reserved [3];           /* Reserved field must be 0 */
+> > -} QEMU_PACKED;
+> > -typedef struct AcpiRsdpDescriptor AcpiRsdpDescriptor;
+> > -
+> >  typedef struct AcpiRsdpData {
+> >      uint8_t oem_id[6]; /* OEM identification */
+> >      uint8_t revision;  /* Must be 0 for 1.0, 2 for 2.0 */
+> > diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+> > index ac52abd0dd..4f4899deb5 100644
+> > --- a/tests/acpi-utils.h
+> > +++ b/tests/acpi-utils.h
+> > @@ -82,6 +82,8 @@ typedef struct {
+> >  
+> >  uint8_t acpi_calc_checksum(const uint8_t *data, int len);
+> >  uint32_t acpi_find_rsdp_address(void);
+> > -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
+> > +uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table);
+> > +uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table);
+> > +void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table);
+> >  
+> >  #endif  /* TEST_ACPI_UTILS_H */
+> > diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
+> > index 41dc1ea9b4..d07f7487e2 100644
+> > --- a/tests/acpi-utils.c
+> > +++ b/tests/acpi-utils.c
+> > @@ -52,14 +52,44 @@ uint32_t acpi_find_rsdp_address(void)
+> >      return off;
+> >  }
+> >  
+> > -void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table)
+> > +uint32_t acpi_get_rsdt_address(uint8_t *rsdp_table)
+> >  {
+> > -    ACPI_READ_FIELD(rsdp_table->signature, addr);
+> > -    ACPI_ASSERT_CMP64(rsdp_table->signature, "RSD PTR ");
+> > +    uint32_t rsdt_physical_address;
+> >  
+> > -    ACPI_READ_FIELD(rsdp_table->checksum, addr);
+> > -    ACPI_READ_ARRAY(rsdp_table->oem_id, addr);
+> > -    ACPI_READ_FIELD(rsdp_table->revision, addr);
+> > -    ACPI_READ_FIELD(rsdp_table->rsdt_physical_address, addr);
+> > -    ACPI_READ_FIELD(rsdp_table->length, addr);
+> > +    memcpy(&rsdt_physical_address, &rsdp_table[16 /* RsdtAddress offset */], 4);
+> > +    return le32_to_cpu(rsdt_physical_address);
+> > +}
+> > +
+> > +uint64_t acpi_get_xsdt_address(uint8_t *rsdp_table)
+> > +{
+> > +    uint64_t xsdt_physical_address;
+> > +    uint8_t revision = rsdp_table[15 /* Revision offset */];
+> > +
+> > +    /* We must have revision 2 if we're looking for an XSDT pointer */
+> > +    g_assert(revision == 2);
+> > +
+> > +    memcpy(&xsdt_physical_address, &rsdp_table[24 /* XsdtAddress offset */], 8);
+> > +    return le64_to_cpu(xsdt_physical_address);
+> > +}
+> > +
+> > +void acpi_parse_rsdp_table(uint32_t addr, uint8_t *rsdp_table)
+> > +{
+> > +    uint8_t revision;
+> > +
+> > +    /* Read mandatory revision 0 table data (20 bytes) first */
+> > +    memread(addr, rsdp_table, 20);
+> > +    revision = rsdp_table[15 /* Revision offset */];
+> > +
+> > +    switch (revision) {
+> > +    case 0: /* ACPI 1.0 RSDP */
+> > +        break;
+> > +    case 2: /* ACPI 2.0+ RSDP */
+> > +        /* Read the rest of the RSDP table */
+> > +        memread(addr + 20, rsdp_table + 20, 16);
+> > +        break;
+> > +    default:
+> > +        g_assert_not_reached();
+> > +    }
+> > +
+> > +    ACPI_ASSERT_CMP64(*((uint64_t *)(rsdp_table)), "RSD PTR ");
+> >  }
+> > diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> > index d661d9be62..8749b77b36 100644
+> > --- a/tests/bios-tables-test.c
+> > +++ b/tests/bios-tables-test.c
+> > @@ -27,7 +27,7 @@ typedef struct {
+> >      const char *machine;
+> >      const char *variant;
+> >      uint32_t rsdp_addr;
+> > -    AcpiRsdpDescriptor rsdp_table;
+> > +    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
+> >      AcpiRsdtDescriptorRev1 rsdt_table;
+> >      uint32_t dsdt_addr;
+> >      uint32_t facs_addr;
+> > @@ -85,19 +85,30 @@ static void test_acpi_rsdp_address(test_data *data)
+> >  
+> >  static void test_acpi_rsdp_table(test_data *data)
+> >  {
+> > -    AcpiRsdpDescriptor *rsdp_table = &data->rsdp_table;
+> > +    uint8_t *rsdp_table = data->rsdp_table, revision;
+> >      uint32_t addr = data->rsdp_addr;
+> >  
+> >      acpi_parse_rsdp_table(addr, rsdp_table);
+> > +    revision = rsdp_table[15 /* Revision offset */];
+> >  
+> > -    /* rsdp checksum is not for the whole table, but for the first 20 bytes */
+> > -    g_assert(!acpi_calc_checksum((uint8_t *)rsdp_table, 20));
+> > +    switch (revision) {
+> > +    case 0: /* ACPI 1.0 RSDP */
+> > +        /* With rev 1, checksum is only for the first 20 bytes */
+> > +        g_assert(!acpi_calc_checksum(rsdp_table,  20));
+> > +        break;
+> > +    case 2: /* ACPI 2.0+ RSDP */
+> > +        /* With revision 2, we have 2 checksums */
+> > +        g_assert(!acpi_calc_checksum(rsdp_table, 20));
+> > +        g_assert(!acpi_calc_checksum(rsdp_table, 36));  
 > 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> Missing break. I guess this wasn't yet tested with ACPI 2.0+?
+> Are we going to extend the tests to do that?
+I'm working on adding arm/virt board to these tests,
+so that will use this 2.0 path
 
-With the typo fixed:
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
-
--- 
-Anthony PERARD
+> 
+> > +    default:
+> > +        g_assert_not_reached();
+> > +    }
+> >  }
+> >  
+> >  static void test_acpi_rsdt_table(test_data *data)
+> >  {
+> >      AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
+> > -    uint32_t addr = le32_to_cpu(data->rsdp_table.rsdt_physical_address);
+> > +    uint32_t addr = acpi_get_rsdt_address(data->rsdp_table);
+> >      uint32_t *tables;
+> >      int tables_nr;
+> >      uint8_t checksum;
+> > diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+> > index 0a6fb55f2e..97219ae86c 100644
+> > --- a/tests/vmgenid-test.c
+> > +++ b/tests/vmgenid-test.c
+> > @@ -35,7 +35,7 @@ static uint32_t acpi_find_vgia(void)
+> >  {
+> >      uint32_t rsdp_offset;
+> >      uint32_t guid_offset = 0;
+> > -    AcpiRsdpDescriptor rsdp_table;
+> > +    uint8_t rsdp_table[36 /* ACPI 2.0+ RSDP size */];
+> >      uint32_t rsdt, rsdt_table_length;
+> >      AcpiRsdtDescriptorRev1 rsdt_table;
+> >      size_t tables_nr;
+> > @@ -52,9 +52,11 @@ static uint32_t acpi_find_vgia(void)
+> >  
+> >      g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
+> >  
+> > -    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
+> > +    acpi_parse_rsdp_table(rsdp_offset, rsdp_table);
+> > +
+> > +    rsdt = acpi_get_rsdt_address(rsdp_table);
+> > +    g_assert(rsdt);
+> >  
+> > -    rsdt = le32_to_cpu(rsdp_table.rsdt_physical_address);
+> >      /* read the header */
+> >      ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
+> >      ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
+> > -- 
+> > 2.19.2
+> > 
+> >  
+> 
+> Besides the missing break
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> 
