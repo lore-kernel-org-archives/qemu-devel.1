@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gU7wI-0002TX-Rp
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:28:27 -0500
+	(envelope-from <stefanha@gmail.com>) id 1gU7zt-0005px-1n
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:32:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1gU7wH-00041Q-VX
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:28:26 -0500
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:38926)
+	(envelope-from <stefanha@gmail.com>) id 1gU7zo-00076W-P0
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:32:09 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1gU7wH-00040u-QG
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:28:25 -0500
-Received: by mail-oi1-x235.google.com with SMTP id i6so13782550oia.6
-	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 02:28:25 -0800 (PST)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1gU7zo-00075m-GD
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 05:32:04 -0500
+Received: by mail-wr1-x444.google.com with SMTP id b14so1755001wru.12
+	for <qemu-devel@nongnu.org>; Tue, 04 Dec 2018 02:32:04 -0800 (PST)
+Date: Tue, 4 Dec 2018 10:32:00 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20181204103200.GB5541@stefanha-x1.localdomain>
+References: <CAG48ez2Rq18M+a84Ae+N5_=eS2A6zZNrG9r19MWS6hddq=x4Rw@mail.gmail.com>
+	<CAFEAcA_+oq2H=-_7+AxqpXb_VhUsSAgVgN8K7Q+ffeKXxs5gWQ@mail.gmail.com>
+	<CAG48ez2CkA4jS8WiJ7Yj6dTsvoC_ozNdoQeOXxfg7JmRaK8srw@mail.gmail.com>
+	<0aadcc23-ae86-bb04-a7e2-be654fe5144a@redhat.com>
 MIME-Version: 1.0
-References: <20181102171638.24069-1-peter.maydell@linaro.org>
-	<20181102171638.24069-11-peter.maydell@linaro.org>
-In-Reply-To: <20181102171638.24069-11-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Dec 2018 10:28:13 +0000
-Message-ID: <CAFEAcA_Fp8r7HPY6hORagGo=1ypAn-U_wqq7e3HkouUHJAQW5A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 10/10] hw/arm: versal: Add a virtual Xilinx
- Versal board
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ftEhullJWpWg/VHq"
+Content-Disposition: inline
+In-Reply-To: <0aadcc23-ae86-bb04-a7e2-be654fe5144a@redhat.com>
+Subject: Re: [Qemu-devel] insecure git submodule URLs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-
-On Fri, 2 Nov 2018 at 17:24, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Add a virtual Xilinx Versal board.
->
-> This board is based on the Xilinx Versal SoC. The exact
-> details of what peripherals are attached to this board
-> will remain in control of QEMU. QEMU will generate an
-> FDT on the fly for Linux and other software to auto-discover
-> peripherals.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> Message-id: 20181102131913.1535-3-edgar.iglesias@xilinx.com
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Hi Edgar -- I've been running the clang-7 leak sanitizer
-on "make check", and it spotted a couple of minor memory
-leaks in the versal board code:
-
-> +static void fdt_add_gic_nodes(VersalVirt *s)
-> +{
-> +    char *nodename;
-> +
-> +    nodename = g_strdup_printf("/gic@%x", MM_GIC_APU_DIST_MAIN);
-> +    qemu_fdt_add_subnode(s->fdt, nodename);
-> +    qemu_fdt_setprop_cell(s->fdt, nodename, "phandle", s->phandle.gic);
-> +    qemu_fdt_setprop_cells(s->fdt, nodename, "interrupts",
-> +                           GIC_FDT_IRQ_TYPE_PPI, VERSAL_GIC_MAINT_IRQ,
-> +                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
-> +    qemu_fdt_setprop(s->fdt, nodename, "interrupt-controller", NULL, 0);
-> +    qemu_fdt_setprop_sized_cells(s->fdt, nodename, "reg",
-> +                                 2, MM_GIC_APU_DIST_MAIN,
-> +                                 2, MM_GIC_APU_DIST_MAIN_SIZE,
-> +                                 2, MM_GIC_APU_REDIST_0,
-> +                                 2, MM_GIC_APU_REDIST_0_SIZE);
-> +    qemu_fdt_setprop_cell(s->fdt, nodename, "#interrupt-cells", 3);
-> +    qemu_fdt_setprop_string(s->fdt, nodename, "compatible", "arm,gic-v3");
-
-nodename is allocated but never freed here.
-
-> +}
+To: Eric Blake <eblake@redhat.com>
+Cc: Jann Horn <jannh@google.com>, Peter Maydell <peter.maydell@linaro.org>, jeff@codyprime.org, Stefan Hajnoczi <stefanha@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
 
 
-> +#define NUM_VIRTIO_TRANSPORT 32
-> +static void create_virtio_regions(VersalVirt *s)
-> +{
-> +    int virtio_mmio_size = 0x200;
-> +    int i;
-> +
-> +    for (i = 0; i < NUM_VIRTIO_TRANSPORT; i++) {
-> +        char *name = g_strdup_printf("virtio%d", i);;
-> +        hwaddr base = MM_TOP_RSVD + i * virtio_mmio_size;
-> +        int irq = VERSAL_RSVD_HIGH_IRQ_FIRST + i;
-> +        MemoryRegion *mr;
-> +        DeviceState *dev;
-> +        qemu_irq pic_irq;
-> +
-> +        pic_irq = qdev_get_gpio_in(DEVICE(&s->soc.fpd.apu.gic), irq);
-> +        dev = qdev_create(NULL, "virtio-mmio");
-> +        object_property_add_child(OBJECT(&s->soc), name, OBJECT(dev),
-> +                                  &error_fatal);
-> +        qdev_init_nofail(dev);
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic_irq);
-> +        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-> +        memory_region_add_subregion(&s->soc.mr_ps, base, mr);
-> +        sysbus_create_simple("virtio-mmio", base, pic_irq);
+--ftEhullJWpWg/VHq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The body of this loop allocates name but forgets to free it.
+On Mon, Oct 08, 2018 at 02:17:39PM -0500, Eric Blake wrote:
+> On 7/15/18 7:56 PM, Jann Horn via Qemu-devel wrote:
+> > On Sun, Jul 15, 2018 at 11:18 PM Peter Maydell <peter.maydell@linaro.or=
+g> wrote:
+> > >=20
+> > > On 15 July 2018 at 20:50, Jann Horn via Qemu-devel
+> > > <qemu-devel@nongnu.org> wrote:
+> > > > I noticed that when I build QEMU from git for the first time, it pu=
+lls
+> > > > in submodules over the insecure git:// protocol - in other words, as
+> > > > far as I can tell, if I'm e.g. on an open wifi network while buildi=
+ng
+> > > > QEMU for the first time, even if I cloned the main repository over
+> > > > https, anyone could smuggle in malicious code as part of e.g. a
+> > > > submodule's makefile.
+> > >=20
+> > > Yes, this came up the other week.
+> > >=20
+> > > > I'm not sure what your preferred fix for this is, so I'm not sendin=
+g a
+> > > > patch yet. As far as I can tell, the two options are:
+> > > >=20
+> > > >   - change .gitmodules to use https for everything
+> > >=20
+> > > We should probably do this...
+> > >=20
+>=20
+> > > > As far as I can tell, the QEMU git server only supports the "dumb" =
+git
+> > > > protocol when accessed over HTTPS, not the "smart" protocol. I'm not
+> > > > sure whether that might be why QEMU is currently still using the
+> > > > insecure git protocol instead of git over HTTPS?
+> > >=20
+> > > This is why we haven't switched over the submodules yet, yes.
+> > > It's on Jeff's todo list for the server, though.
+>=20
+> Did we ever get this done? (And updating this thread to pull in Jeff's new
+> email). (Reminded of this now that there is yet another submodule being
+> proposed for mirroring)
 
-> +    }
+For the record, Jeff Cody set up smart HTTP for https://git.qemu.org/
+and QEMU 3.1.0 will use https for submodules.
 
-thanks
--- PMM
+Stefan
+
+--ftEhullJWpWg/VHq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcBlegAAoJEJykq7OBq3PIe6YH/Ra9AgrPAdoivWKxDh/Kjqtx
+J8Nhv7a8XMtnn0ZjaPxn2wUQvq3FsfdrhyM33n7l0pGOWWztI1FyUfd0gpBat1qF
+nCTnHJxs6iqrUIm6YZuu4OHabKrvNuotMAWMFZg+GaBmLqe2cX9n36FA+VJ+Mre/
+YTcMgses2vUFIl+Ox28/Bc0nlKD0HClSwrm4FNsAnnZ6D+djI7DZBy6fsmg//wFH
+l9QYUa8E6PoGr0GzVr9fUIblEpAHYS5zHLnh3696R7lCb+vkDS8M46vGh9qRr1E+
+IiL/F99zA37zP2Kb1kf3OkY6kd7zCyrxmBZuYw8apxOTM2oPjYMEFza+uV9dD9Y=
+=kdy6
+-----END PGP SIGNATURE-----
+
+--ftEhullJWpWg/VHq--
