@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gUFfk-0001b2-CM
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:43:53 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1gUFfv-0001kX-OI
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:44:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gUFfj-0007ZX-Bq
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:43:52 -0500
-Date: Tue, 4 Dec 2018 16:43:35 -0200
+	(envelope-from <ehabkost@redhat.com>) id 1gUFfu-0007nR-Ia
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 13:44:03 -0500
+Date: Tue, 4 Dec 2018 16:43:55 -0200
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181204184335.GF18284@habkost.net>
-References: <20181127125644.GB18284@habkost.net>
-	<CAMxuvaySoJ2TokV8M81CVU3Hp4dC25c+PW_p2kk+V88-88U-CQ@mail.gmail.com>
-	<20181127133527.GI18284@habkost.net>
-	<20181128184027.7d584eaa@redhat.com>
-	<CAJ+F1CK5NkgsJWFGZ7kvR81KyeOPE_ytk=tOjKqTUGtbfywmJQ@mail.gmail.com>
-	<20181129175055.GQ18284@habkost.net>
-	<CAJ+F1CJBKVibRrgjiNKjSJ5ufK=CUodx26aHnKzeL3Cs7adbeA@mail.gmail.com>
-	<20181130115526.5974ca7a@redhat.com>
-	<20181130114142.GV18284@habkost.net>
-	<20181204141724.5f06bd1b@redhat.com>
+Message-ID: <20181204184355.GG18284@habkost.net>
+References: <20181204172535.2799-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181204141724.5f06bd1b@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-3.2 v4 16/28] hw: apply machine compat
- properties without touching globals
+In-Reply-To: <20181204172535.2799-1-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Clean up includes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,190 +22,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, QEMU <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Qemu-s390x list <qemu-s390x@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:sPAPR pseries" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cohuck@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Stefan Berger <stefanb@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-riscv@nongnu.org
 
-On Tue, Dec 04, 2018 at 02:17:24PM +0100, Igor Mammedov wrote:
-> On Fri, 30 Nov 2018 09:41:42 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
->=20
-> > On Fri, Nov 30, 2018 at 11:55:26AM +0100, Igor Mammedov wrote:
-> > > On Fri, 30 Nov 2018 01:36:03 +0400
-> > > Marc-Andr=E9 Lureau <marcandre.lureau@gmail.com> wrote:
-> > >  =20
-> > > > Hi
-> > > >=20
-> > > > On Thu, Nov 29, 2018 at 9:51 PM Eduardo Habkost <ehabkost@redhat.=
-com> wrote: =20
-> > > > >
-> > > > > On Thu, Nov 29, 2018 at 02:32:18PM +0400, Marc-Andr=E9 Lureau w=
-rote:   =20
-> > > > > > Hi
-> > > > > > On Wed, Nov 28, 2018 at 9:53 PM Igor Mammedov <imammedo@redha=
-t.com> wrote:   =20
-> > > > > > >
-> > > > > > > On Tue, 27 Nov 2018 11:35:27 -0200
-> > > > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > > > > >   =20
-> > > > > > > > On Tue, Nov 27, 2018 at 05:10:05PM +0400, Marc-Andr=E9 Lu=
-reau wrote:   =20
-> > > > > > > > > On Tue, Nov 27, 2018 at 4:57 PM Eduardo Habkost <ehabko=
-st@redhat.com> wrote:   =20
-> > > > > > > > > >
-> > > > > > > > > > On Tue, Nov 27, 2018 at 01:27:49PM +0400, Marc-Andr=E9=
- Lureau wrote:   =20
-> > > > > > > > > > > Similarly to accel properties, move compat properti=
-es out of globals
-> > > > > > > > > > > registration, and apply the machine compat properti=
-es during
-> > > > > > > > > > > device_post_init().
-> > > > > > > > > > >
-> > > > > > > > > > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lurea=
-u@redhat.com>   =20
-> > > > > > > > > > [...]   =20
-> > > > > > > > > > > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > > > > > > > > > > index 7066d28271..3b31b2c025 100644
-> > > > > > > > > > > --- a/hw/core/qdev.c
-> > > > > > > > > > > +++ b/hw/core/qdev.c
-> > > > > > > > > > > @@ -971,17 +971,26 @@ static void device_initfn(Obj=
-ect *obj)
-> > > > > > > > > > >  }
-> > > > > > > > > > >
-> > > > > > > > > > >  static const GPtrArray *ac_compat_props;
-> > > > > > > > > > > +static const GPtrArray *mc_compat_props;   =20
-> > > > > > > why you didn't use just 'compat_props' for both?
-> > > > > > > (it would be cleaner have single registry for compat
-> > > > > > > properties, and the place that takes care of registration
-> > > > > > > will take care of necessary ordering)   =20
-> > > > > >
-> > > > > > There are two arrays, one from the accelerator class, the oth=
-er from
-> > > > > > the machine class. We can't make it a singleton (all compats =
-props for
-> > > > > > the various machines would be mixed).
-> > > > > >
-> > > > > > We could create a third array that would be the set of both, =
-but that
-> > > > > > would require more copy/allocation.   =20
-> > > > >
-> > > > > I am failing to see the advantage of replacing the `global_prop=
-s`
-> > > > > static variable from qdev-properties.c with a collection of
-> > > > > separate static variables scattered around the code.  I thought
-> > > > > the main point of the changes was to reduce the amount of
-> > > > > duplicate data stored in static variables. =20
-> > > Main point was to use compats for backends then on top of that=20
-> > > we added split global from compat properties goal.
-> > >  =20
-> > > > > I was expecting something like this:
-> > > > >
-> > > > > accel.c:
-> > > > >
-> > > > >   void accel_apply_compat_props(AccelState *accel, Object *obj)
-> > > > >   {
-> > > > >       object_apply_global_props(obj, ACCEL_GET_CLASS(accel)->co=
-mpat_props, &error_abort);
-> > > > >   }
-> > > > >
-> > > > > machine.c:
-> > > > >
-> > > > >   /* Apply compat properties and global properties to an object=
- */
-> > > > >   void machine_apply_compat_props(MachineState *ms, Object *obj=
-)
-> > > > >   {
-> > > > >       accel_apply_compat_props(ms->accel, obj);
-> > > > >       object_apply_global_props(obj, MACHINE_GET_CLASS(ms)->com=
-pat_props, &error_abort);
-> > > > >   }
-> > > > >
-> > > > > compat-props.c:
-> > > > >
-> > > > >   static void object_apply_compat_props(Object *obj)
-> > > > >   {
-> > > > >       MachineState *machine =3D MACHINE(qdev_get_machine());
-> > > > >       machine_apply_compat_props(machine, obj);
-> > > > >   }
-> > > > >
-> > > > > qdev.c:
-> > > > >
-> > > > >   static void device_post_init(Object *obj)
-> > > > >   {
-> > > > >       object_apply_compat_props(obj);
-> > > > >       apply_user_provided_globals(obj);
-> > > > >   }
-> > > > >
-> > > > > object_interface.c:
-> > > > >
-> > > > >   void user_creatable_complete(Object *obj, Error **errp)
-> > > > >   {
-> > > > >       object_apply_compat_props(obj);
-> > > > >       ...
-> > > > >       ucc->complete(...)
-> > > > >   }
-> > > > >   =20
-> > > >=20
-> > > > I like that solution too (which you also proposed in the other
-> > > > thread). But we have to decide whether it's acceptable to referen=
-ce
-> > > > MachineState, or if the compat properties should be registered. =20
-> > > I dislike pulling in machine into basic object code and
-> > > I think a separate compats would be cleaner interface without
-> > > layer violation. But to unstuck, lets go with qdev_get_machine()
-> > > for now. =20
-> >=20
-> > Which basic object code?  The only reference to machine above is
-> > at compat-props.c.  I don't see any layering violation here.
-> I see compat properties as just a set of arbitrary properties
-> that's applied to objects depending on configuration.
-> Which currently includes machine version and accel type
-> but in no way inherently tied to them.
+On Tue, Dec 04, 2018 at 06:25:35PM +0100, Markus Armbruster wrote:
+> Clean up includes so that osdep.h is included first and headers
+> which it implies are not included manually.
+> 
+> This commit was created with scripts/clean-includes, with the changes
+> to the following files manually reverted:
+> 
+>     contrib/libvhost-user/libvhost-user-glib.h
+>     contrib/libvhost-user/libvhost-user.c
+>     contrib/libvhost-user/libvhost-user.h
+>     linux-user/mips64/cpu_loop.c
+>     linux-user/mips64/signal.c
+>     linux-user/sparc64/cpu_loop.c
+>     linux-user/sparc64/signal.c
+>     linux-user/x86_64/cpu_loop.c
+>     linux-user/x86_64/signal.c
+>     target/s390x/gen-features.c
+>     tests/migration/s390x/a-b-bios.c
+>     tests/test-rcu-simpleq.c
+>     tests/test-rcu-tailq.c
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-I understand you want to have a more generic abstraction layer,
-but my question is: why do we need it?  I still don't see which
-problems it would solve.
+Acked-by: Eduardo Habkost <ehabkost@redhat.com>
 
->=20
-> As for layering violation, we do it in device model cases
-> as it's machine related (ugly 'acceptable' but helps to cut corners)
-> and with new interface it will be used wit backends which are not
-> machine related at all.
-
-I don't see why it's ugly to have QEMU backend object code use
-machine core code.  What problems does it cause?
-
-
->=20
-> Doing like you suggest would make it usable with current machine
-> initialization order (with some fixes) but if one would consider
-> a bit earlier time (preconfig time) and creating machine step by
-> step from there it might be less usable (as it needs machine instance,
-> it still would be possible but probably more tricky (pure speculation))=
-.
-
-I agree that this is a problem: we really have a
-backend -> compat_props -> current_machine dependency chain here.
-
-Using a registration mechanism that copies data, the dependency
-would still exists, but be implicit in the initialization
-ordering.  Then the system would silently break as soon as we
-reorder the code.
-
->=20
-> So I'd vote for abstracted from machine compat props that could be
-> called from any object that implements interface and explicit
-> compats registration (like we do now) and explicit registration failure
-> if compats happend to be applied to any object. But in case of this
-> series I'm fine with any approach just to get compat properties work
-> with backends for now.
-
-Thanks.  I agree we'll want to refactor this later.  We may want
-to be able to apply compat properties to backend objects before
-creating machine and accel instances.
-
-Or maybe we will want to apply only MachineClass::compat_props to
-backend objects, and not AccelClass::compat_props?  This is not
-clear to me yet.
-
---=20
+-- 
 Eduardo
