@@ -1,21 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gU1n7-0006q8-UO
+	(envelope-from <jasowang@redhat.com>) id 1gU1n7-0006q9-VE
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 22:54:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1gU1n4-0005fp-RZ
+	(envelope-from <jasowang@redhat.com>) id 1gU1n5-0005gr-EZ
 	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 22:54:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43604)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1gU1n3-0005Wv-Ss
-	for qemu-devel@nongnu.org; Mon, 03 Dec 2018 22:54:30 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue,  4 Dec 2018 11:53:44 +0800
-Message-Id: <20181204035347.6148-3-jasowang@redhat.com>
+Date: Tue,  4 Dec 2018 11:53:43 +0800
+Message-Id: <20181204035347.6148-2-jasowang@redhat.com>
 In-Reply-To: <20181204035347.6148-1-jasowang@redhat.com>
 References: <20181204035347.6148-1-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH V5 for 3.1 2/5] net: hub: suppress warnings of
- no host network for qtest
+Subject: [Qemu-devel] [PATCH V5 for 3.1 1/5] net: drop too large packet early
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +20,131 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: mst@redhat.com, ppandit@redhat.com, liq3ea@163.com, liq3ea@gmail.com, pbonzini@redhat.com, thuth@redhat.com, eblake@redhat.com, Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, ppandit@redhat.com, liq3ea@163.com, liq3ea@gmail.com, pbonzini@redhat.com, thuth@redhat.com, eblake@redhat.com, Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org
 
-If we want to qtest through hub, it would be much more simpler and
-safer to configure the hub without host network. So silent this
-warnings for qtest.
+We try to detect and drop too large packet (>INT_MAX) in 1592a9947036
+("net: ignore packet size greater than INT_MAX") during packet
+delivering. Unfortunately, this is not sufficient as we may hit
+another integer overflow when trying to queue such large packet in
+qemu_net_queue_append_iov():
 
+- size of the allocation may overflow on 32bit
+- packet->size is integer which may overflow even on 64bit
+
+Fixing this by moving the check to qemu_sendv_packet_async() which is
+the entrance of all networking codes and reduce the limit to
+NET_BUFSIZE to be more conservative. This works since:
+
+- For the callers that call qemu_sendv_packet_async() directly, they
+  only care about if zero is returned to determine whether to prevent
+  the source from producing more packets. A callback will be triggered
+  if peer can accept more then source could be enabled. This is
+  usually used by high speed networking implementation like virtio-net
+  or netmap.
+- For the callers that call qemu_sendv_packet() that calls
+  qemu_sendv_packet_async() indirectly, they often ignore the return
+  value. In this case qemu will just the drop packets if peer can't
+  receive.
+
+Qemu will copy the packet if it was queued. So it was safe for both
+kinds of the callers to assume the packet was sent.
+
+Since we move the check from qemu_deliver_packet_iov() to
+qemu_sendv_packet_async(), it would be safer to make
+qemu_deliver_packet_iov() static to prevent any external user in the
+future.
+
+This is a revised patch of CVE-2018-17963.
+
+Cc: qemu-stable@nongnu.org
+Cc: Li Qiang <liq3ea@163.com>
+Fixes: 1592a9947036 ("net: ignore packet size greater than INT_MAX")
+Reported-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/hub.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/net/net.h |  6 ------
+ net/net.c         | 28 +++++++++++++++++-----------
+ 2 files changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/net/hub.c b/net/hub.c
-index 78b671ed95..5795a678ed 100644
---- a/net/hub.c
-+++ b/net/hub.c
-@@ -20,6 +20,7 @@
- #include "hub.h"
- #include "qemu/iov.h"
- #include "qemu/error-report.h"
-+#include "sysemu/qtest.h"
+diff --git a/include/net/net.h b/include/net/net.h
+index 7936d53d2f..ec13702dbf 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -169,12 +169,6 @@ void qemu_check_nic_model(NICInfo *nd, const char *model);
+ int qemu_find_nic_model(NICInfo *nd, const char * const *models,
+                         const char *default_model);
  
- /*
-  * A hub broadcasts incoming packets to all its ports except the source port.
-@@ -346,7 +347,7 @@ void net_hub_check_clients(void)
-         if (has_host_dev && !has_nic) {
-             warn_report("hub %d with no nics", hub->id);
-         }
--        if (has_nic && !has_host_dev) {
-+        if (has_nic && !has_host_dev && !qtest_enabled()) {
-             warn_report("hub %d is not connected to host network", hub->id);
-         }
+-ssize_t qemu_deliver_packet_iov(NetClientState *sender,
+-                            unsigned flags,
+-                            const struct iovec *iov,
+-                            int iovcnt,
+-                            void *opaque);
+-
+ void print_net_client(Monitor *mon, NetClientState *nc);
+ void hmp_info_network(Monitor *mon, const QDict *qdict);
+ void net_socket_rs_init(SocketReadState *rs,
+diff --git a/net/net.c b/net/net.c
+index 07c194a8f6..1f7d626197 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -231,6 +231,11 @@ static void qemu_net_client_destructor(NetClientState *nc)
+ {
+     g_free(nc);
+ }
++static ssize_t qemu_deliver_packet_iov(NetClientState *sender,
++                                       unsigned flags,
++                                       const struct iovec *iov,
++                                       int iovcnt,
++                                       void *opaque);
+ 
+ static void qemu_net_client_setup(NetClientState *nc,
+                                   NetClientInfo *info,
+@@ -705,22 +710,18 @@ static ssize_t nc_sendv_compat(NetClientState *nc, const struct iovec *iov,
+     return ret;
+ }
+ 
+-ssize_t qemu_deliver_packet_iov(NetClientState *sender,
+-                                unsigned flags,
+-                                const struct iovec *iov,
+-                                int iovcnt,
+-                                void *opaque)
++static ssize_t qemu_deliver_packet_iov(NetClientState *sender,
++                                       unsigned flags,
++                                       const struct iovec *iov,
++                                       int iovcnt,
++                                       void *opaque)
+ {
+     NetClientState *nc = opaque;
+-    size_t size = iov_size(iov, iovcnt);
+     int ret;
+ 
+-    if (size > INT_MAX) {
+-        return size;
+-    }
+ 
+     if (nc->link_down) {
+-        return size;
++        return iov_size(iov, iovcnt);
      }
+ 
+     if (nc->receive_disabled) {
+@@ -745,10 +746,15 @@ ssize_t qemu_sendv_packet_async(NetClientState *sender,
+                                 NetPacketSent *sent_cb)
+ {
+     NetQueue *queue;
++    size_t size = iov_size(iov, iovcnt);
+     int ret;
+ 
++    if (size > NET_BUFSIZE) {
++        return size;
++    }
++
+     if (sender->link_down || !sender->peer) {
+-        return iov_size(iov, iovcnt);
++        return size;
+     }
+ 
+     /* Let filters handle the packet first */
 -- 
 2.17.1
