@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUEFI-0003gl-Vq
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:12:30 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1gUEH9-0006Gv-A3
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:14:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1gUEFB-0005sx-Ei
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:12:28 -0500
-Received: from 19.mo5.mail-out.ovh.net ([46.105.35.78]:37517)
+	(envelope-from <alex.williamson@redhat.com>) id 1gUEH5-0007OH-AD
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:14:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:9162)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1gUEFA-0005mp-Tj
-	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:12:21 -0500
-Received: from player763.ha.ovh.net (unknown [10.109.146.53])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id E1A7E204530
-	for <qemu-devel@nongnu.org>; Tue,  4 Dec 2018 18:12:16 +0100 (CET)
-References: <20181116105729.23240-1-clg@kaod.org>
-	<20181116105729.23240-11-clg@kaod.org>
-	<20181128005255.GT2251@umbus.fritz.box>
-	<64aef78f-e374-9c6d-1a1f-892c4e3b0677@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <42cb5e91-0006-3b63-5240-5f09b275c04a@kaod.org>
-Date: Tue, 4 Dec 2018 18:12:11 +0100
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gUEH5-0007Nl-36
+	for qemu-devel@nongnu.org; Tue, 04 Dec 2018 12:14:19 -0500
+Date: Tue, 4 Dec 2018 10:14:14 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20181204101414.7cbdd974@x1.home>
+In-Reply-To: <20181204115333.6d33c6a9.cohuck@redhat.com>
+References: <1542746383-18288-1-git-send-email-kwankhede@nvidia.com>
+	<1542746383-18288-2-git-send-email-kwankhede@nvidia.com>
+	<20181127125248.01ef3e86@x1.home>
+	<20181204115333.6d33c6a9.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <64aef78f-e374-9c6d-1a1f-892c4e3b0677@kaod.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 10/36] spapr/xive: introduce a XIVE
- interrupt controller
+Subject: Re: [Qemu-devel] [PATCH 1/5] VFIO KABI for migration interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>, cjia@nvidia.com, kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com, yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com, dgilbert@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com, aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com, Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com, Ken.Xue@amd.com, zhi.a.wang@intel.com, qemu-devel@nongnu.org
 
-[ ... ]
+On Tue, 4 Dec 2018 11:53:33 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
->>> +void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon)
->>> +{
->>> +    int i;
->>> +    uint32_t offset = 0;
->>> +
->>> +    monitor_printf(mon, "XIVE Source %08x .. %08x\n", offset,
->>> +                   offset + xive->source.nr_irqs - 1);
->>> +    xive_source_pic_print_info(&xive->source, offset, mon);
->>> +
->>> +    monitor_printf(mon, "XIVE EAT %08x .. %08x\n", 0, xive->nr_irqs - 1);
->>> +    for (i = 0; i < xive->nr_irqs; i++) {
->>> +        xive_eas_pic_print_info(&xive->eat[i], i, mon);
->>> +    }
->>> +
->>> +    monitor_printf(mon, "XIVE ENDT %08x .. %08x\n", 0, xive->nr_ends - 1);
->>> +    for (i = 0; i < xive->nr_ends; i++) {
->>> +        xive_end_pic_print_info(&xive->endt[i], i, mon);
->>> +    }
->>
->> AIUI the PAPR model hides the details of ENDs, EQs and NVTs - instead
->> each logical EAS just points at a (thread, priority) pair, which under
->> the hood has exactly one END and one NVT bound to it.
->>
->> Given that, would it make more sense to reformat the info here to show
->> things in terms of those (thread, priority) pairs, rather than the
->> internal EAS and END details?
+> On Tue, 27 Nov 2018 12:52:48 -0700
+> Alex Williamson <alex.williamson@redhat.com> wrote:
 > 
-> Yes. I had a version doing something like that before. I will rework
-> the ouput a little for sPAPR.  
+> > Actually I'm wondering if we can distill everything down to two bits,
+> > STOPPED and LOGGING.
+> > 
+> > We start at RUNNING, the user can optionally enable LOGGING when
+> > supported by the device to cover the SETUP and PRECOPY states
+> > proposed.  The device stays running, but activates any sort of
+> > dirtly page tracking that's necessary to activate those interfaces.
+> > LOGGING can also be cleared to handle the CANCELLED state.  The user
+> > would set STOPPED which should quiesce the device and make the full
+> > device state available through the device data section.  Clearing
+> > STOPPED and LOGGING would handle the FAILED state below.  Likewise on
+> > the migration target, QEMU would set the device top STOPPED in order to
+> > write the incoming data via the data section and clear STOPPED to
+> > indicate the device returns to RUNNING (aka RESUME/RESUME_COMPLETED).  
+> 
+> This idea sounds like something that can be more easily adapted to
+> other device types as well. The LOGGING bit is probably more flexible
+> if you reframe it as a PREPARATION bit: That would also cover devices
+> or device types that don't do dirty logging, but need some other kind
+> of preparation prior to moving over.
 
-I would like to keep the 'advanced' monitor output in some ways and have
-two possible outputs : simple and long.
+Can you elaborate on what PREPARATION might do w/o dirty logging?
+LOGGING is just a state, it's on or off, whereas PREPARATION implies
+some sequential step in a process and then I'm afraid we slide back into
+states that a really steps in a QEMU specific migration process.  So
+I'm curious why PREPARATION wouldn't just be a vendor implementation
+specific first step when RUNNING is turned off.  A device that doesn't
+implement dirty logging could always just claim everything is dirty if
+it wants that advanced warning that RUNNING might be turned off soon,
+but there are probably more efficient ways to support that, ex. a flag
+indicating the dirty logging granularity.  Thanks,
 
-Is it possible to add command line options or arguments to the Monitor 
-interface ? 
-
-Thanks,
-
-C. 
+Alex
